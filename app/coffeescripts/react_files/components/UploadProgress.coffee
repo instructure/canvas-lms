@@ -1,11 +1,13 @@
 define [
   'i18n!react_files'
-  'old_unsupported_dont_use_react'
-  'compiled/react/shared/utils/withReactDOM'
+  'react'
+  'compiled/react/shared/utils/withReactElement'
   '../modules/FileUploader'
   './ProgressBar'
   'compiled/util/mimeClass'
-], (I18n, React, withReactDOM, FileUploader, ProgressBar, mimeClass) ->
+], (I18n, React, withReactElement, FileUploader, ProgressBarComponent, mimeClass) ->
+
+  ProgressBar = React.createFactory ProgressBarComponent
 
   UploadProgress = React.createClass
     displayName: 'UploadProgress'
@@ -18,7 +20,7 @@ define [
         file: React.PropTypes.instanceOf(File).isRequired
       })
 
-    render: withReactDOM ->
+    render: withReactElement ->
       div className: "ef-item-row #{'text-error' if @props.uploader.error}",
         div className: 'col-xs-6',
           div className: 'media ellipsis',

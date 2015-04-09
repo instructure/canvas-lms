@@ -760,6 +760,15 @@ describe CalendarEventsApiController, type: :request do
         expect(json['title']).to eql "event (#{@course.default_section.name})"
         expect(json['hidden']).to be_falsey
       end
+
+      it "allows media comments in the event description" do
+        event.description = '<a href="/media_objects/abcde" class="instructure_inline_media_comment audio_comment" id="media_comment_abcde"><img></a>'
+        event.save!
+        child_event_id = event.child_event_ids.first
+        json = api_call(:get, "/api/v1/calendar_events/#{child_event_id}",
+                        {:controller => 'calendar_events_api', :action => 'show', :id => child_event_id.to_s, :format => 'json'})
+        expect(response).to be_success
+      end
     end
   end
 

@@ -260,7 +260,7 @@ class DiscussionEntry < ActiveRecord::Base
 
   def update_topic
     if self.discussion_topic
-      last_reply_at = [self.discussion_topic.last_reply_at, self.created_at].max
+      last_reply_at = [self.discussion_topic.last_reply_at, self.created_at].compact.max
       DiscussionTopic.where(:id => self.discussion_topic_id).update_all(:last_reply_at => last_reply_at, :updated_at => Time.now.utc)
     end
   end
@@ -298,12 +298,6 @@ class DiscussionEntry < ActiveRecord::Base
 
     given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.context.grants_right?(user, session, :moderate_forum) }
     can :update and can :delete and can :read
-
-    given { |user, session| self.discussion_topic.context.respond_to?(:collection) && self.discussion_topic.context.collection.grants_right?(user, session, :read) }
-    can :read
-
-    given { |user, session| self.discussion_topic.context.respond_to?(:collection) && self.discussion_topic.context.collection.grants_right?(user, session, :comment) }
-    can :create
   end
 
   scope :for_user, lambda { |user| where(:user_id => user).order("discussion_entries.created_at") }

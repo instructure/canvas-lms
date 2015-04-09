@@ -1,12 +1,14 @@
 define [
   'i18n!react_files'
-  'old_unsupported_dont_use_react'
+  'react'
   'compiled/util/friendlyBytes'
-  'compiled/react/shared/utils/withReactDOM'
+  'compiled/react/shared/utils/withReactElement'
   './ProgressBar'
   '../modules/customPropTypes'
   '../utils/toFixedDecimal'
-], (I18n, React, friendlyBytes, withReactDOM, ProgressBar, customPropTypes, toFixedDecimal) ->
+], (I18n, React, friendlyBytes, withReactElement, ProgressBarComponent, customPropTypes, toFixedDecimal) ->
+
+  ProgressBar = React.createFactory ProgressBarComponent
 
   FilesUsage = React.createClass
     displayName: 'FilesUsage'
@@ -28,8 +30,8 @@ define [
     componentWillUnmount: ->
       clearInterval @interval
 
-    render: withReactDOM ->
-      @transferPropsTo div {},
+    render: withReactElement ->
+      div {},
         if @state
 
           percentUsed = Math.round(@state.quota_used / @state.quota * 100)
@@ -46,7 +48,7 @@ define [
               }),
             div {
               className: 'col-xs-7'
-              style: 'padding-left': '0px'
+              style: paddingLeft: '0px'
               'aria-hidden': true
             },
               label

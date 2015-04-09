@@ -199,6 +199,25 @@ describe DiscussionTopic do
       expect(@topic.visible_for?(new_teacher)).to be_truthy
     end
 
+    it "unpublished topics should not be visible to custom account admins by default" do
+      @topic.unpublish
+
+      account = @course.root_account
+      nobody_role = custom_account_role('NobodyAdmin', account: account)
+      admin = account_admin_user(account: account, role: nobody_role, active_user: true)
+      expect(@topic.visible_for?(admin)).to be_falsey
+    end
+
+    it "unpublished topics should be visible to account admins with :read_course_content permission" do
+      @topic.unpublish
+
+      account = @course.root_account
+      nobody_role = custom_account_role('NobodyAdmin', account: account)
+      account_with_role_changes(account: account, role: nobody_role, role_changes: { read_course_content: true })
+      admin = account_admin_user(account: account, role: nobody_role, active_user: true)
+      expect(@topic.visible_for?(admin)).to be_truthy
+    end
+
     context "differentiated assignements" do
       before do
         @course = course(:active_course => true)
@@ -598,10 +617,20 @@ describe DiscussionTopic do
       it "should copy appropriate attributes from the parent topic to subtopics on updates to the parent" do
         @topic.refresh_subtopics
         subtopics = @topic.reload.child_topics
-        subtopics.each {|st| expect(st.discussion_type).to eq 'side_comment' }
+        subtopics.each do |st|
+          expect(st.discussion_type).to eq 'side_comment'
+          expect(st.attachment_id).to be_nil
+        end
+
+        attachment_model(context: @course)
         @topic.discussion_type = 'threaded'
+        @topic.attachment = @attachment
         @topic.save!
-        subtopics.each {|st| expect(st.reload.discussion_type).to eq 'threaded' }
+        subtopics = @topic.reload.child_topics
+        subtopics.each do |st|
+          expect(st.discussion_type).to eq 'threaded'
+          expect(st.attachment_id).to eq @attachment.id
+        end
       end
 
       it "should not rename the assignment to match a subtopic" do
@@ -1553,6 +1582,25 @@ describe DiscussionTopic do
       ids = new_order.map {|x| topics[x-1].id}
       topics[0].update_order(ids)
       expect(topics.first.list_scope.map(&:id)).to eq ids
+    end
+  end
+
+  describe "context_module_action" do
+    context "group discussion" do
+      before :once do
+        group_assignment_discussion
+        @module = @course.context_modules.create!
+        @topic_tag = @module.add_item(type: 'discussion_topic', id: @root_topic.id)
+        @module.completion_requirements = { @topic_tag.id => { type: 'must_contribute' } }
+        @module.save!
+        student_in_course active_all: true
+        @group.add_user @student, 'accepted'
+      end
+
+      it "fulfills module completion requirements on the root topic" do
+        @topic.reply_from(user: @student, text: "huttah!")
+        expect(@student.context_module_progressions.where(context_module_id: @module).first.requirements_met).to include({id: @topic_tag.id, type: 'must_contribute'})
+      end
     end
   end
 end

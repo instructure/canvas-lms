@@ -1,10 +1,11 @@
 define [
   'underscore'
   'i18n!react_files'
-  'old_unsupported_dont_use_react'
+  'react'
+  'react-router'
   'compiled/models/Folder'
   'compiled/collections/FilesCollection'
-  'compiled/react/shared/utils/withReactDOM'
+  'compiled/react/shared/utils/withReactElement'
   './ColumnHeaders'
   './LoadingIndicator'
   './FolderChild'
@@ -14,7 +15,13 @@ define [
   './FilePreview'
   './NoResults'
   '../utils/locationOrigin'
-], (_, I18n, React, Folder, FilesCollection, withReactDOM, ColumnHeaders, LoadingIndicator, FolderChild, customPropTypes, updateAPIQuerySortParams, getAllPages, FilePreview, NoResults) ->
+], (_, I18n, React, ReactRouter, Folder, FilesCollection, withReactElement, ColumnHeadersComponent, LoadingIndicatorComponent, FolderChildComponent, customPropTypes, updateAPIQuerySortParams, getAllPages, FilePreviewComponent, NoResultsComponent) ->
+
+  ColumnHeaders = React.createFactory ColumnHeadersComponent
+  LoadingIndicator = React.createFactory LoadingIndicatorComponent
+  FolderChild = React.createFactory FolderChildComponent
+  FilePreview = React.createFactory FilePreviewComponent
+  NoResults = React.createFactory NoResultsComponent
 
   SearchResults = React.createClass
     displayName: 'SearchResults'
@@ -22,6 +29,10 @@ define [
     propTypes:
       contextType: customPropTypes.contextType
       contextId: customPropTypes.contextId
+
+    mixins: [ReactRouter.State]
+
+    name: 'search'
 
     getInitialState: ->
       return {
@@ -56,13 +67,13 @@ define [
     updateResults: (props) ->
       oldUrl = @state.collection.url
       @state.collection.url = "#{window.location.origin}/api/v1/#{@props.contextType}/#{@props.contextId}/files"
-      updateAPIQuerySortParams(@state.collection, @props.query)
+      updateAPIQuerySortParams(@state.collection, @getQuery())
 
       return if @state.collection.url is oldUrl # if you doesn't search for the same thing twice
       @setState({collection: @state.collection})
 
       # Refactor this when given time. Maybe even use setState instead of forceUpdate
-      unless @state.collection.loadedAll and _.isEqual(@props.query.search_term, props.query.search_term)
+      unless @state.collection.loadedAll and _.isEqual(@getQuery().search_term, props.query?.search_term?)
         forceUpdate = =>
           @setState({errors: null})
           @forceUpdate() if @isMounted()
@@ -74,19 +85,18 @@ define [
     componentWillReceiveProps: (newProps) ->
       @updateResults(newProps)
 
-    componentWillMount: ->
+    componentDidMount: ->
       @updateResults(@props)
 
-    componentDidMount: ->
       # this setTimeout is to handle a race condition with the setTimeout in the componentWillUnmount method of ShowFolder
       setTimeout =>
         @props.onResolvePath({currentFolder: null, rootTillCurrentFolder: null, showingSearchResults: true, searchResultCollection: @state.collection})
 
-    render: withReactDOM ->
+    render: withReactElement ->
       if @state.errors
         @displayErrors(@state.errors)
       else if @state.collection.loadedAll and (@state.collection.length is 0)
-        NoResults {search_term: @props.query.search_term}
+        NoResults {search_term: @getQuery().search_term}
       else
         div role: 'grid',
           div {
@@ -97,13 +107,13 @@ define [
             I18n.t("Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu.")
           ColumnHeaders {
             to: 'search'
-            query: @props.query
-            params: @props.params
+            query: @getQuery()
+            params: @getParams()
             toggleAllSelected: @props.toggleAllSelected
             areAllItemsSelected: @props.areAllItemsSelected
             usageRightsRequiredForContext: @props.usageRightsRequiredForContext
           }
-          @state.collection.models.sort(Folder::childrenSorter.bind(@state.collection, @props.query.sort, @props.query.order)).map (child) =>
+          @state.collection.models.sort(Folder::childrenSorter.bind(@state.collection, @getQuery().sort, @getQuery().order)).map (child) =>
             FolderChild
               key: child.cid
               model: child
@@ -119,9 +129,9 @@ define [
 
           # Prepare and render the FilePreview if needed.
           # As long as ?preview is present in the url.
-          if @props.query.preview? and @state.collection.length
+          if @getQuery().preview? and @state.collection.length
             FilePreview
-              params: @props.params
-              query: @props.query
+              params: @getParams()
+              query: @getQuery()
               collection: @state.collection
               usageRightsRequiredForContext: @props.usageRightsRequiredForContext

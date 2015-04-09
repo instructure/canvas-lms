@@ -40,6 +40,7 @@ class ActiveRecord::Base
     'enrollments' => %w(invitation_email can_participate_before_start_at limit_priveleges_to_course_sections role_name),
     'external_feeds' => %w(body_match feed_type feed_purpose),
     'failed_jobs' => %w(original_id),
+    'gradebook_uploads' => %w(context_type context_id),
     'grading_periods' => %w(course_id account_id),
     'groups' => %w(sis_name type groupable_id groupable_type),
     'messages' => %w(cc bcc),

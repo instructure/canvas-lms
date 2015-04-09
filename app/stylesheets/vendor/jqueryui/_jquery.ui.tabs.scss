@@ -43,9 +43,6 @@
       &.ui-tabs-active, &.ui-state-disabled, &.ui-state-processing {
         a { cursor: text; }
       }
-      &.ui-state-focus {
-        @if $use_high_contrast { @include button-focus; }
-      }
     }
   }
   .ui-tabs-nav li a, &.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-active a { cursor: pointer; } /* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */

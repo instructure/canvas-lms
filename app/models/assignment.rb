@@ -978,6 +978,7 @@ class Assignment < ActiveRecord::Base
     submissions = []
     find_or_create_submissions(students) do |submission|
       submission_updated = false
+      submission.skip_grade_calc = opts[:skip_grade_calc]
       student = submission.user
       if student == original_student || !grade_group_students_individually
         previously_graded = submission.grade.present?
@@ -1602,6 +1603,10 @@ class Assignment < ActiveRecord::Base
   scope :no_graded_quizzes_or_topics, -> { where("submission_types NOT IN ('online_quiz', 'discussion_topic')") }
 
   scope :with_submissions, -> { includes(:submissions) }
+
+  scope :with_submissions_for_user, lambda { |user|
+    includes(:submissions).where("submissions.user_id = ?", user.id)
+  }
 
   scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
   scope :for_course, lambda { |course_id| where(:context_type => 'Course', :context_id => course_id) }

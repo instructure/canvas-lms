@@ -133,6 +133,7 @@
         <xs:element name="assignment" type="assignmentType" minOccurs="0"/>
         <xs:element name="posted_at" type="xs:dateTime" minOccurs="0"/>
         <xs:element name="delayed_post_at" type="xs:dateTime" minOccurs="0"/>
+        <xs:element name="lock_at" type="xs:dateTime" minOccurs="0"/>
         <xs:element name="position" type="xs:integer" minOccurs="0"/>
         <xs:element name="pinned" type="xs:boolean" minOccurs="0"/>
         <xs:element name="require_initial_post" type="xs:boolean" minOccurs="0"/>

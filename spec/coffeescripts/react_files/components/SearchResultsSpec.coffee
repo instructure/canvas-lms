@@ -1,7 +1,7 @@
 define [
   'jquery'
-  'old_unsupported_dont_use_react'
-  'old_unsupported_dont_use_react-router'
+  'react'
+  'react-router'
   'compiled/react_files/components/SearchResults'
   'compiled/collections/FilesCollection'
   'compiled/react_files/routes'

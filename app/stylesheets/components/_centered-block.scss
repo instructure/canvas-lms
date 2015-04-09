@@ -1,0 +1,28 @@
+// this allows you to have a block-level element that does not have a defined with be horizontally centered.
+// usage:
+//     <div class="centered-block">
+//       <div class="centered-block-wrap">
+//         <div class="centered-block-inner">
+//           put your the element you want centered here
+
+.centered-block {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  .centered-block-wrap {
+    clear: left;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    left: 50%;
+    text-align: center;
+    .centered-block-inner {
+      display: block;
+      margin: 0;
+      padding: 0;
+      position: relative;
+      right: 50%;
+      text-align: left;
+    }
+  }
+}

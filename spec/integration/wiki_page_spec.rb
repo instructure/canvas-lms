@@ -29,6 +29,13 @@ describe WikiPagesController do
     page
   end
 
+  it "should still work with periods in titles for new pages" do
+    course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym)
+
+    get "/courses/#{@course.id}/pages/windurs%203.won/edit?titleize=1"
+    expect(response).to be_success
+  end
+
   it "should not render wiki page body at all if it was deleted" do
     @wiki_page = create_page :title => "Some random wiki page",
                                                 :body => "this is the content of the wikipage body asdfasdf"

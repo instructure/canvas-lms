@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 define([
-  'old_unsupported_dont_use_react',
+  'react',
   'jsx/grading/dataRow',
   'jquery',
   'i18n!external_tools'
@@ -13,7 +13,6 @@ function(React, DataRow, $, I18n) {
     getInitialState: function() {
       return {
         standard: this.props.standard,
-        permissions: this.props.permissions,
         editingStandard: $.extend(true, {}, this.props.standard),
         saving: false
       };
@@ -22,48 +21,54 @@ function(React, DataRow, $, I18n) {
     componentWillReceiveProps: function(nextProps) {
       this.setState({
         standard: nextProps.standard,
-        permissions: nextProps.permissions,
         editingStandard: $.extend(true, {}, this.props.standard),
         saving: nextProps.saving
       });
     },
 
     componentDidMount: function() {
-      if(this.props.justAdded) this.refs.gradingStandardTitle.getDOMNode().focus();
+      if(this.props.justAdded) this.refs.title.getDOMNode().focus();
     },
 
     componentDidUpdate: function(prevProps, prevState) {
       if(this.props.editing !== prevProps.editing){
-       this.refs.gradingStandardTitle.getDOMNode().focus();
+       this.refs.title.getDOMNode().focus();
        this.setState({editingStandard: $.extend(true, {}, this.state.standard)})
       }
     },
 
     triggerEditGradingStandard: function(event) {
       event.preventDefault();
-      this.props.onSetEditingStatus(this.props.key, true);
+      this.props.onSetEditingStatus(this.props.uniqueId, true);
     },
 
     triggerStopEditingGradingStandard: function() {
-      this.props.onSetEditingStatus(this.props.key, false);
+      this.props.onSetEditingStatus(this.props.uniqueId, false);
     },
 
     triggerDeleteGradingStandard: function(event) {
-      return this.props.onDeleteGradingStandard(event, this.props.key);
+      return this.props.onDeleteGradingStandard(event, this.props.uniqueId);
     },
 
     triggerSaveGradingStandard: function() {
-      this.setState({saving: true});
-      return this.props.onSaveGradingStandard(this.state.editingStandard);
+      this.setState({saving: true},
+        this.props.onSaveGradingStandard(this.state.editingStandard)
+      );
     },
 
     assessedAssignment: function() {
-      return this.state.standard && this.state.standard["assessed_assignment?"];
+      return !!(this.state.standard && this.state.standard["assessed_assignment?"]);
     },
 
     deleteDataRow: function(index) {
-      this.state.editingStandard.data.splice(index, 1);
-      this.setState({editingStandard: this.state.editingStandard});
+      if(this.moreThanOneDataRowRemains()){
+        this.state.editingStandard.data.splice(index, 1);
+        this.setState({editingStandard: this.state.editingStandard});
+      }
+    },
+
+    moreThanOneDataRowRemains: function() {
+      return this.state.editingStandard.data.length > 1;
     },
 
     insertGradingStandardRow: function(index) {
@@ -90,13 +95,13 @@ function(React, DataRow, $, I18n) {
       if(this.props.permissions.manage && this.props.othersEditing) return null;
       if(this.state.standard.context_name){
         return (
-          <div>
+          <div ref="cannotManageMessage">
             {I18n.t("(%{context}: %{contextName})", { context: this.state.standard.context_type.toLowerCase(), contextName: this.state.standard.context_name })}
           </div>
         );
       }
       return (
-        <div>
+        <div ref="cannotManageMessage">
           {I18n.t("(%{context} level)", { context: this.state.standard.context_type.toLowerCase() })}
         </div>
       );
@@ -113,13 +118,13 @@ function(React, DataRow, $, I18n) {
           <div className="pull-left" tabIndex="0">
             <input type="text" onChange={this.titleChange} className="grading_standard_title"
                    name="grading_standard[title]" className="scheme_name" title={I18n.t("Grading standard title")}
-                   value={this.state.editingStandard.title} ref="gradingStandardTitle"/>
+                   value={this.state.editingStandard.title} ref="title"/>
           </div>
         );
       }
       return (
-        <div className="pull-left" tabIndex="0" ref="gradingStandardTitle">
-          <div className="title">
+        <div className="pull-left" tabIndex="0">
+          <div className="title" ref="title">
             <span className="screenreader-only">{I18n.t("Grading standard title")}</span>
             {this.state.standard.title}
           </div>
@@ -131,8 +136,9 @@ function(React, DataRow, $, I18n) {
       var data = this.props.editing ? this.state.editingStandard.data : this.state.standard.data;
       return data.map(function(item, idx, array){
         return (
-          <DataRow key={idx} row={item} siblingRow={array[idx - 1]} editing={this.props.editing}
+          <DataRow key={idx} uniqueId={idx} row={item} siblingRow={array[idx - 1]} editing={this.props.editing}
                    onDeleteRow={this.deleteDataRow} onInsertRow={this.insertGradingStandardRow}
+                   onlyDataRowRemaining={!this.moreThanOneDataRowRemains()}
                    onRowMinScoreChange={this.changeRowMinScore} onRowNameChange={this.changeRowName}/>
         );
       }, this);
@@ -141,13 +147,13 @@ function(React, DataRow, $, I18n) {
     renderSaveButton: function() {
       if(this.state.saving){
         return (
-          <button type="button" className="btn btn-primary save_button" disabled="true">
+          <button type="button" ref="saveButton" className="btn btn-primary save_button" disabled="true">
             {I18n.t("Saving...")}
           </button>
         );
       }
       return (
-        <button type="button" onClick={this.triggerSaveGradingStandard} className="btn btn-primary save_button">
+        <button type="button" ref="saveButton" onClick={this.triggerSaveGradingStandard} className="btn btn-primary save_button">
           {I18n.t("Save")}
         </button>
       );
@@ -157,7 +163,7 @@ function(React, DataRow, $, I18n) {
       if(this.props.editing){
         return (
           <div className="form-actions">
-            <button type="button" onClick={this.triggerStopEditingGradingStandard} className="btn cancel_button">
+            <button type="button" ref="cancelButton" onClick={this.triggerStopEditingGradingStandard} className="btn cancel_button">
               {I18n.t("Cancel")}
             </button>
               {this.renderSaveButton()}
@@ -172,13 +178,13 @@ function(React, DataRow, $, I18n) {
         return(
           <div>
             <a href="#" onClick={this.triggerEditGradingStandard} title={I18n.t("Edit Grading Scheme")}
-               className={"edit_grading_standard_link no-hover " + (this.assessedAssignment() ? "read_only" : "")}
-               tabIndex="1">
+               ref="editLink" tabIndex="1"
+               className={"edit_grading_standard_link no-hover " + (this.assessedAssignment() ? "read_only" : "")}>
                <span className="screenreader-only">{I18n.t("Edit Grading Scheme")}</span>
               <i className="icon-edit standalone-icon"/>
             </a>
             <a href="#" title={I18n.t("Delete Grading Scheme")} onClick={this.triggerDeleteGradingStandard}
-               className="delete_grading_standard_link no-hover" tabIndex="1">
+               ref="deleteLink" className="delete_grading_standard_link no-hover" tabIndex="1">
                <span className="screenreader-only">{I18n.t("Delete Grading Scheme")}</span>
               <i className="icon-trash standalone-icon"/>
             </a>
@@ -189,7 +195,7 @@ function(React, DataRow, $, I18n) {
     },
 
     renderIconsAndTitle: function() {
-      if(this.state.permissions.manage && !this.props.othersEditing){
+      if(this.props.permissions.manage && !this.props.othersEditing){
         return (
           <div>
             {this.renderTitle()}
@@ -202,7 +208,7 @@ function(React, DataRow, $, I18n) {
       return (
         <div>
           {this.renderTitle()}
-          <div className="disabled-links">
+          <div className="disabled-links" ref="disabledLinks">
             <i className="icon-edit standalone-icon"/>
             <i className="icon-trash standalone-icon"/>
           </div>

@@ -172,7 +172,7 @@ shared_examples_for "a differentiable_object" do
       DifferentiableAssignment.filter(:not_filtered, @user, @course, {}, &block)
     end
     it "should filter for students" do
-      student_in_course(:course => course)
+      student_in_course(:course => @course)
       expect(call_filter).to eq :filtered
     end
     context "observer" do
@@ -185,7 +185,7 @@ shared_examples_for "a differentiable_object" do
         expect(call_filter).to eq :not_filtered
       end
       it "should filter with observed students" do
-        student_in_course(:course => course)
+        student_in_course(:course => @course)
         @observer_enrollment.update_attribute(:associated_user_id, @user.id)
         @user = @observer_enrollment.user
         @observer_enrollment.update_attribute(:associated_user_id, @user.id)
@@ -193,11 +193,18 @@ shared_examples_for "a differentiable_object" do
       end
     end
     it "should not filter for the teacher" do
-      teacher_in_course(:course => course)
+      teacher_in_course(:course => @course)
       expect(call_filter).to eq :not_filtered
     end
     it "should not filter if no user" do
       @user = nil
+      expect(call_filter).to eq :not_filtered
+    end
+    it "should not filter if user not in course" do
+      original_user = @user
+      # override @user and @course
+      student_in_course(:course => course)
+      @user = original_user
       expect(call_filter).to eq :not_filtered
     end
   end

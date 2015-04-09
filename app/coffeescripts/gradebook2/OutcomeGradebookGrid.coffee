@@ -14,7 +14,7 @@ define [
   ###
 
   Grid =
-    filter: ['mastery', 'near-mastery', 'remedial']
+    filter: ['exceeds', 'mastery', 'near-mastery', 'remedial']
 
     averageFn: 'mean'
 
@@ -353,6 +353,8 @@ define [
       masteryClassName: (score, outcome) ->
         mastery     = outcome.mastery_points
         nearMastery = mastery / 2
+        exceedsMastery = mastery + (mastery / 2)
+        return 'exceeds' if score >= exceedsMastery
         return 'mastery' if score >= mastery
         return 'near-mastery' if score >= nearMastery
         'remedial'
@@ -392,7 +394,7 @@ define [
 
       calculateRatingsTotals: (grid, column) ->
         results = Grid.View.getColumnResults(grid.getData(), column)
-        ratings = column.outcome.ratings
+        ratings = column.outcome.ratings || []
         ratings.result_count = results.length
         points = _.pluck ratings, 'points'
         counts = _.countBy results, (result) ->

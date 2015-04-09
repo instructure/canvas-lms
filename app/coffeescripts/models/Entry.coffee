@@ -15,8 +15,7 @@ define [
   # Model representing an entry in discussion topic
   class Entry extends Backbone.Model
 
-    defaults:
-
+    defaults: ->
       ##
       # Attributes persisted with the server
       id: null
@@ -77,7 +76,13 @@ define [
       ENV.DISCUSSION.DELETE_URL.replace /:id/, @get 'id'
 
     sync: (method, model, options = {}) ->
+      replies = @get('replies')
+      @set('replies', [])
       options.url = @[method]()
+      oldComplete = options.complete
+      options.complete = =>
+        @set('replies', replies)
+        oldComplete() if oldComplete?
       Backbone.sync method, this, options
 
     parse: (data) ->

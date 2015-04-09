@@ -1,7 +1,7 @@
 define [
   "i18n!usage.rights"
   "jquery"
-  "old_unsupported_dont_use_react" # React.js
+  "react" # React.js
   "compiled/react_files/components/UsageRightsSelectBox" # Usage rights select boxes (React component)
   "compiled/str/splitAssetString" # For splitting up the context_asset_string
 ], (I18n, $, React, UsageRightsSelectBox, splitAssetString) ->
@@ -47,7 +47,7 @@ define [
       if @usageRightsRequired
         context = @getContext()
 
-        @usageRightsFields = React.renderComponent(UsageRightsSelectBox(
+        @usageRightsFields = React.render(React.createFactory(UsageRightsSelectBox)(
           use_justification: "choose"
           showMessage: true
           contextType: context.contextType

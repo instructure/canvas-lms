@@ -59,7 +59,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
       @last_entry.find_element(:css, '.discussion-reply-attachments input').send_keys(fullpath)
     end
 
-    submit_form('.discussion-reply-form')
+    submit_form(@last_entry.find_element(:css, ".discussion-reply-form"))
     wait_for_ajaximations
     keep_trying_until do
       id = DiscussionEntry.last.id
@@ -73,7 +73,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
   def validate_entry_text(discussion_entry, text)
     keep_trying_until do
-      expect(f("#entry-#{discussion_entry.id}")).to include_text(text)
+      f("#entry-#{discussion_entry.id}").text.to_s.include?(text)
     end
   end
 

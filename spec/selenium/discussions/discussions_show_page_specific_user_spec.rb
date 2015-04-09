@@ -101,6 +101,11 @@ describe "discussions" do
           expect(entries[0]).to include_text("teacher entry")
           expect(entries[1]).to include_text(new_student_entry_text)
         end
+
+        it "should not show discussion creation time" do
+          get url
+          expect(f("#discussion_topic time")).to be_nil
+        end
       end
     end
 
@@ -221,6 +226,11 @@ describe "discussions" do
         expect(ff('.discussion-reply-action')).not_to be_empty
         expect(DiscussionTopic.last.workflow_state).to eq 'active'
         expect(DiscussionTopic.last.locked?).to be_falsey
+      end
+
+      it "should show discussion creation time" do
+        get url
+        expect(f("#discussion_topic time")).not_to be_nil
       end
 
       context "graded" do

@@ -256,6 +256,164 @@ describe AssignmentsApiController, type: :request do
       expect(json.size).to eq 0
     end
 
+    describe "assignment bucketing" do
+      before :once do
+        course_with_student_logged_in(:active_all => true)
+        @student1 = @user
+        @section = @course.course_sections.create!(name: "test section")
+        student_in_section(@section, user: @student1)
+
+        @student2 = create_users(1, return_type: :record).first
+        @course.enroll_student(@student2, :enrollment_state => 'active')
+        @section2 = @course.course_sections.create!(name: "second test section")
+        student_in_section(@section2, user: @student2)
+
+        # names based on student 1's due dates
+        @past_assignment = @course.assignments.create!(title: "past", only_visible_to_overrides: true, due_at: (Time.now - 10.days))
+        create_section_override_for_assignment(@past_assignment, {course_section: @section, due_at: (Time.now - 10.days)})
+
+        @overdue_assignment = @course.assignments.create!(title: "overdue", only_visible_to_overrides: true, submission_types: "online")
+        create_section_override_for_assignment(@overdue_assignment, {course_section: @section, due_at: (Time.now - 10.days)})
+
+        @far_future_assignment = @course.assignments.create!(title: "far future", only_visible_to_overrides: true)
+        create_section_override_for_assignment(@far_future_assignment, {course_section: @section, due_at: (Time.now + 30.days)})
+
+        @upcoming_assignment = @course.assignments.create!(title: "upcoming", only_visible_to_overrides: true)
+        create_section_override_for_assignment(@upcoming_assignment, {course_section: @section, due_at: (Time.now + 1.days)})
+
+        @undated_assignment = @course.assignments.create!(title: "undated", only_visible_to_overrides: true)
+        override = create_section_override_for_assignment(@undated_assignment, {course_section: @section, due_at: nil})
+        override.due_at = nil
+        override.save
+
+        # student2 overrides
+        create_section_override_for_assignment(@past_assignment, {course_section: @section2, due_at: (Time.now - 10.days)})
+        create_section_override_for_assignment(@far_future_assignment, {course_section: @section2, due_at: (Time.now - 10.days)})
+      end
+
+      it "returns an error with an invalid bucket" do
+        raw_api_call(:get, "/api/v1/courses/#{@course.id}/assignments.json",
+          { :controller => 'assignments_api',
+            :action => 'index',
+            :format => 'json',
+            :course_id => @course.id.to_s,
+            :bucket => "invalid bucket name"
+          }
+        )
+
+        expect(response).not_to be_success
+        json = JSON.parse response.body
+        expect(json["errors"]["bucket"].first["message"]).to eq "bucket name must be one of the following: past, overdue, undated, ungraded, upcoming, future"
+      end
+
+      def assignment_index_bucketed_api_call(bucket)
+        api_call(:get, "/api/v1/courses/#{@course.id}/assignments.json",
+          { :controller => 'assignments_api',
+            :action => 'index',
+            :format => 'json',
+            :course_id => @course.id.to_s,
+            :bucket => bucket
+          }
+        )
+      end
+
+      def assert_call_gets_assignments(bucket, assignments)
+        assignments_json = assignment_index_bucketed_api_call(bucket)
+        expect(assignments_json.map{|a| a["id"]}.sort).to eq assignments.map(&:id).sort
+        if assignments_json.any?
+          expect(assignments_json.first["bucket"]).to eq bucket
+        end
+      end
+
+      def assert_calls_get_assignments(expectations)
+        expectations.each do |bucket, assignments|
+          assert_call_gets_assignments(bucket.to_s, assignments)
+        end
+      end
+
+      context "as a student" do
+        it "should bucket assignments properly" do
+          assert_calls_get_assignments(
+            future: [@upcoming_assignment, @far_future_assignment, @undated_assignment],
+            upcoming: [@upcoming_assignment],
+            past: [@past_assignment, @overdue_assignment],
+            undated: [@undated_assignment],
+            overdue: [@overdue_assignment]
+          )
+        end
+
+        it "should apply overrides properly to different students" do
+          # as student1
+          assert_call_gets_assignments("past", [@past_assignment, @overdue_assignment])
+
+          user_session(@student2)
+          @user = @student2
+
+          assert_call_gets_assignments("past", [@past_assignment, @far_future_assignment])
+        end
+      end
+
+      context "as a teacher" do
+        it "should use default assignment dates" do
+          teacher = @course.teachers.first
+          user_session(teacher)
+          @user = teacher
+
+          assert_calls_get_assignments(
+            past: [@past_assignment],
+            undated: [@upcoming_assignment, @undated_assignment, @overdue_assignment, @far_future_assignment]
+          )
+        end
+      end
+
+      context "as an observer" do
+        before :once do
+          @observer = User.create
+          user_session(@observer)
+          @user = @observer
+        end
+        it "should get the same results as a student when only observing one student" do
+          @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
+          @observer_enrollment.update_attribute(:associated_user_id, @student1.id)
+
+          assert_calls_get_assignments(
+            future: [@upcoming_assignment, @far_future_assignment, @undated_assignment],
+            upcoming: [@upcoming_assignment],
+            past: [@past_assignment, @overdue_assignment],
+            undated: [@undated_assignment],
+            overdue: [@overdue_assignment]
+          )
+        end
+
+        it "should treat multi-student observers like course observers" do
+          @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+          @observer_enrollment.update_attribute(:associated_user_id, @student1.id)
+          @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+          @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
+
+          assert_calls_get_assignments(
+            future: [@upcoming_assignment, @far_future_assignment, @undated_assignment],
+            upcoming: [@upcoming_assignment],
+            past: [@past_assignment, @overdue_assignment],
+            undated: [@undated_assignment],
+            overdue: []
+          )
+        end
+
+        it "should use sections dates when observing a whole course" do
+          @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section, :enrollment_state => 'active')
+
+          assert_calls_get_assignments(
+            future: [@upcoming_assignment, @far_future_assignment, @undated_assignment],
+            upcoming: [@upcoming_assignment],
+            past: [@past_assignment, @overdue_assignment],
+            undated: [@undated_assignment],
+            overdue: []
+          )
+        end
+      end
+    end
+
     describe "enable draft" do
       before :once do
         course_with_teacher(:active_all => true)

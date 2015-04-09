@@ -1,11 +1,15 @@
 define [
   'i18n!file_rename_form'
-  'old_unsupported_dont_use_react'
-  'compiled/react/shared/utils/withReactDOM'
+  'react'
+  'compiled/react/shared/utils/withReactElement'
   './DialogAdapter'
   './DialogContent'
   './DialogButtons'
-], (I18n, React, withReactDOM, DialogAdapter, DialogContent, DialogButtons) ->
+], (I18n, React, withReactElement, DialogAdapterComponent, DialogContentComponent, DialogButtonsComponent) ->
+
+  DialogAdapter = React.createFactory DialogAdapterComponent
+  DialogContent = React.createFactory DialogContentComponent
+  DialogButtons = React.createFactory DialogButtonsComponent
 
   FileRenameForm = React.createClass
     displayName: 'FileRenameForm'
@@ -36,6 +40,7 @@ define [
     # pass back expandZip to preserve options that was possibly already made
     # in a previous modal
     handleReplaceClick: ->
+      @refs.dialogAdapter.close() if @props.closeOnResolve
       @props.onNameConflictResolved({
         file: @state.fileOptions.file
         dup: 'overwrite'
@@ -45,6 +50,7 @@ define [
     # pass back expandZip to preserve options that was possibly already made
     # in a previous modal
     handleChangeClick: ->
+      @refs.dialogAdapter.close() if @props.closeOnResolve
       @props.onNameConflictResolved({
         file: @state.fileOptions.file
         dup: 'rename'
@@ -56,7 +62,7 @@ define [
       e.preventDefault()
       @handleChangeClick()
 
-    buildContent: withReactDOM ->
+    buildContent: withReactElement ->
       nameToUse = @state.fileOptions?.name || @state.fileOptions?.file.name
       if !@state.isEditing
         div {},
@@ -77,7 +83,7 @@ define [
             },
               i className: 'icon-x'
 
-    buildButtons: withReactDOM ->
+    buildButtons: withReactElement ->
       if !@state.isEditing
         div {},
           button
@@ -103,10 +109,8 @@ define [
             onClick: @handleChangeClick,
               I18n.t('change', 'Change')
 
-
-
-    render: withReactDOM ->
-      DialogAdapter open: @props.fileOptions?, title: I18n.t('rename_title', 'Copy'), onClose: @props.onClose,
+    render: withReactElement ->
+      DialogAdapter ref: 'dialogAdapter', open: @props.fileOptions?, title: I18n.t('rename_title', 'Copy'), onClose: @props.onClose,
         DialogContent {},
           @buildContent()
         DialogButtons {},

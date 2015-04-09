@@ -2848,7 +2848,7 @@ describe 'Submissions API', type: :request do
         "/api/v1/courses/#{@course.id}/assignments/#{@a1.id}/submissions/update_grades",
         { :controller => 'submissions_api', :action => 'bulk_update',
           :format => 'json', :course_id => @course.id.to_s,
-          :assignment_id => @a1.id.to_s }, {})
+          :assignment_id => @a1.id.to_s, :grade_data => {foo: "bar"} }, {})
       assert_status(401)
     end
 

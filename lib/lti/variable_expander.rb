@@ -222,7 +222,7 @@ module Lti
                        -> { @controller.lti_xapi_url(Lti::AnalyticsService.create_token(@tool, @current_user, @context)) },
                        -> { @current_user && @context.is_a?(Course) && @tool }
 
-    register_expansion 'Canvas.caliper.url', [],
+    register_expansion 'Caliper.url', [],
                        -> { @controller.lti_caliper_url(Lti::AnalyticsService.create_token(@tool, @current_user, @context)) },
                        -> { @current_user && @context.is_a?(Course) && @tool }
 

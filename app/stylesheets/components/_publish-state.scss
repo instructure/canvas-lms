@@ -42,7 +42,7 @@ The publish button has two states on click (publish and published) and a hover s
 .btn-publish,
 .btn-published,
 .btn-unpublish {
-  transition: none; // Background transition set on default buttons was making publish transitions look flickery
+  transition: none;
   padding-left: 9px;
 
   i {
@@ -62,14 +62,17 @@ The publish button has two states on click (publish and published) and a hover s
 
 .btn-published,
 .btn-published:hover {
-  background: $canvas-success;
-  border: 1px solid darken($canvas-success, 15%);
-  color: $canvas-light;
+  background: $ic-color-success;
+  border: 1px solid darken($ic-color-success, 15%);
+  color: $ic-color-light;
 }
 
-.btn-published:focus {
-  background: darken($canvas-success, 10%); 
-  color: $canvas-light; 
+.btn-published {
+  &:focus {
+    @include button-focus-dark;
+    background: darken($ic-color-success, 10%); 
+    color: $ic-color-light;  
+  } 
 }
 
 .btn-published.disabled,
@@ -83,6 +86,7 @@ The publish button has two states on click (publish and published) and a hover s
 .btn-unpublish {
   @include buttonBackground($btnDangerBackground, $btnDangerBackgroundHighlight);
   box-shadow: none;
+  &:focus { @include button-focus-dark; }
 }
 
 .btn-published.disabled,
@@ -93,31 +97,21 @@ The publish button has two states on click (publish and published) and a hover s
 }
 
 .publish-icon {
+  @include ic-focus-base;
   display: inline-block;  
   color: $ic-color-icon-disabled;
   cursor: pointer;
-  &:focus {
-    @if $use_high_contrast { @include button-focus; }
-  }
-
-  &.publish-icon-unpublish {
-    color: $ic-color-icon-disabled;
-  }
-
-  &.publish-icon-published {
-    color: $canvas-success;
-  }
-
-  .publish-text {
-    display: none;
-  }
+  &:focus { @include ic-focus-variant; }
+  &.publish-icon-unpublish { color: $ic-color-icon-disabled; }
+  &.publish-icon-published { color: $ic-color-success; }
+  .publish-text { display: none; }
 }
 
 .published-status {
   &.published {
     font-weight: bold;
-    @if $use_high_contrast { color: darken($canvas-success, 4%); }
-    @else { color: $canvas-success; }
+    @if $use_high_contrast { color: darken($ic-color-success, 4%); }
+    @else { color: $ic-color-success; }
   }
 
   &.unpublished {

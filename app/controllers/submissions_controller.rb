@@ -635,8 +635,8 @@ class SubmissionsController < ApplicationController
     respond_to do |format|
       if attachment.zipped?
         if Attachment.s3_storage?
-          format.html { redirect_to attachment.cacheable_s3_inline_url }
-          format.zip { redirect_to attachment.cacheable_s3_inline_url }
+          format.html { redirect_to attachment.inline_url }
+          format.zip { redirect_to attachment.inline_url }
         else
           cancel_cache_buster
 

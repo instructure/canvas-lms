@@ -36,11 +36,6 @@ module CC
               "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
       ) do |groups_node|
         @course.assignment_groups.active.each do |group|
-          add_item_to_export(group) if for_course_copy && !export_object?(group) && group.assignments.any? do |a|
-            export_object?(a) ||
-              a.quiz && export_object?(a.quiz) ||
-              a.discussion_topic && export_object?(a.discussion_topic)
-          end
           next unless export_object?(group)
           migration_id = CCHelper.create_key(group)
           groups_node.assignmentGroup(:identifier=>migration_id) do |group_node|

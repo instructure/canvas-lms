@@ -8,6 +8,7 @@ module LearningOutcomeContext
       klass.send :include, InstanceMethods
     end
   end
+
   module InstanceMethods
     # create a shim for plugins that use the old association name. this is
     # TEMPORARY. the plugins should update to use the new association name, and

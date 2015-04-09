@@ -130,6 +130,27 @@ describe "course copy" do
       opts = ContentMigration.last.migration_settings["date_shift_options"]
       expect(opts['remove_dates']).to eq '1'
     end
+
+    it "should create the new course in the same sub-account" do
+      account_model
+      subaccount = @account.sub_accounts.create!(:name => "subadubdub")
+      course_with_admin_logged_in(:account => subaccount)
+      @course.syllabus_body = "<p>haha</p>"
+      @course.save!
+
+      get "/courses/#{@course.id}/settings"
+      link = f('.copy_course_link')
+      expect(link).to be_displayed
+
+      expect_new_page_load { link.click }
+
+      expect_new_page_load { f('button[type="submit"]').click }
+      run_jobs
+      keep_trying_until { f('div.progressStatus span').text == 'Completed' }
+
+      @new_course = subaccount.courses.where("id <>?", @course.id).last
+      expect(@new_course.syllabus_body).to eq @course.syllabus_body
+    end
   end
 
   describe "course file imports" do

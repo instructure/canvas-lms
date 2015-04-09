@@ -105,10 +105,14 @@ define [
         my: 'center '+(if @options.verticalSide == 'bottom' then 'top' else 'bottom'),
         at: 'center '+(@options.verticalSide || 'top'),
         of: @trigger,
-        offset: if @options.verticalSide == 'bottom' then '0px 10px' else '0px -10px',
+        offset: "0px #{@offsetPx()}px",
         within: 'body',
         collision: 'flipfit '+(if @options.verticalSide then 'none' else 'flipfit')
         using: using
+
+    offsetPx: ->
+      offset = if @options.verticalSide == 'bottom' then 10 else -10
+      if @options.invertOffset then (offset * -1) else offset
 
     restoreFocus: ->
       # set focus back to the previously focused item.

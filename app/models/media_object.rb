@@ -231,7 +231,7 @@ class MediaObject < ActiveRecord::Base
       old_id = tags.detect{|t| t.match(/old_id_/) }
       self.old_media_id = old_id.sub(/old_id_/, '') if old_id
     end
-    assets = client.flavorAssetGetByEntryId(self.media_id)
+    assets = client.flavorAssetGetByEntryId(self.media_id) || []
     self.data[:extensions] ||= {}
     assets.each do |asset|
       asset[:fileExt] = "none" if asset[:fileExt].blank?

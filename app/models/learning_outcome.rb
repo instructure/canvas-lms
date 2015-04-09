@@ -92,13 +92,13 @@ class LearningOutcome < ActiveRecord::Base
     # if we've been used to assess a student, refuse to accept any changes to our calculation options
     if calculation_method_changed?
       errors.add(:calculation_method, t(
-        "This outcome has been used to assess a student. The calculation method is fixed",
+        "This outcome has been used to assess a student. The calculation method is locked",
       ))
     end
 
     if calculation_int_changed?
       errors.add(:calculation_int, t(
-        "This outcome has been used to assess a student. The calculation value is fixed"
+        "This outcome has been used to assess a student. The calculation value is locked"
       ))
     end
   end

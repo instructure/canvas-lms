@@ -70,6 +70,39 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
 
       expect(f('a.edit-wiki')).to be_displayed
     end
+    
+    it "should allow students to create new pages if enabled" do
+      @course.default_wiki_editing_roles = "teachers,students"
+      @course.save!
+
+      get "/courses/#{@course.id}/pages"
+      wait_for_ajax_requests
+      f('.new_page').click
+      f("#title").send_keys("new page")
+
+      expect_new_page_load { f('form.edit-form button.submit').click }
+      new_page = @course.wiki.wiki_pages.last
+      expect(new_page).to be_published
+    end
+
+    it "should not allow students to add links to new pages unless they can create pages" do
+      create_wiki_page("test_page", false, "public")
+      get "/courses/#{@course.id}/pages/test_page/edit"
+      wait_for_ajax_requests
+
+      expect(f('#new_page_link')).to be_nil
+
+      @course.default_wiki_editing_roles = "teachers,students"
+      @course.save!
+
+      get "/courses/#{@course.id}/pages/somenewpage/edit" # page that doesn't exist
+      wait_for_ajax_requests
+
+      expect(f('#new_page_link')).to_not be_nil
+      expect_new_page_load { f('form.edit-form button.submit').click }
+      new_page = @course.wiki.wiki_pages.last
+      expect(new_page).to be_published
+    end
 
     it "should notify users when wiki page gets changed" do
       set_notification_policy

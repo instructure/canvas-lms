@@ -45,6 +45,18 @@ describe SearchHelper do
       expect(@contexts[:sections].count).to eq 1
     end
 
+    it "only loads the group and its course when given a group context" do
+      course_with_teacher(:active_all => true)
+      course_with_teacher(:active_all => true, :user => @teacher)
+      @current_user = @teacher
+      group_model(context: @course)
+      load_all_contexts(context: @group)
+
+      expect(@contexts[:courses].count).to eq 1
+      expect(@contexts[:groups].count).to eq 1
+      expect(@contexts[:sections].count).to eq 0
+    end
+
     it "loads the section even with section-restricted teacher privileges" do
       course_with_teacher(:active_all => true, :limit_privileges_to_course_section => true)
       @current_user = @teacher

@@ -57,8 +57,8 @@ define [
         parent = @rawCollections.groups.get(link.get('outcome_group').id)
         rollup = rollups[outcome.id]
         outcome.set('score', rollup?.score)
-        outcome.set('resultTitle', rollup?.title)
-        outcome.set('submissionTime', rollup?.submitted_at)
+        outcome.set('result_title', rollup?.title)
+        outcome.set('submission_time', rollup?.submitted_at)
         outcome.set('count', rollup?.count || 0)
         outcome.group = parent
         parent.get('outcomes').add(outcome)

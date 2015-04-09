@@ -12,7 +12,7 @@ describe "Tiny MCE editor plugins" do
     wait_for_ajaximations
     wait_for_tiny(f('#editor_box_unique_id_1'))
 
-    f('#editor_box_unique_id_1_tbl a.mce_instructure_image').click
+    f("div[aria-label='Embed Image'] button").click
     wait_for_ajaximations
 
     fj('.imageSourceTabs a:contains(Canvas)').click

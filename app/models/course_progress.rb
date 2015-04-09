@@ -37,6 +37,7 @@ class CourseProgress
   def module_progressions
     @_module_progressions ||= user.context_module_progressions
                                   .where("context_module_id IN (?)", modules.map(&:id))
+                                  .shard(course)
   end
 
   def current_position

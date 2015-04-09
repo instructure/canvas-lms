@@ -1,18 +1,20 @@
 define [
-  'old_unsupported_dont_use_react'
+  'react'
   'jquery'
   'compiled/react_files/components/FolderChild'
   'compiled/models/Folder'
   'compiled/react_files/routes'
 ], (React, $, FolderChild, Folder, routes) ->
 
-  Simulate = React.addons.TestUtils.Simulate
+  # Simulate = React.addons.TestUtils.Simulate
 
-  TEST_FOLDERS_COLLECTION_URL = '/courses/<course_id>/folders/<folder_id>/folders'
+  # TEST_FOLDERS_COLLECTION_URL = '/courses/<course_id>/folders/<folder_id>/folders'
 
   # module 'FolderChild',
   #   setup: ->
-  #     React.addons.TestUtils.renderIntoDocument(routes)
+  #     @div =  $('<div>').appendTo('body')[0]
+
+  #     # React.addons.TestUtils.renderIntoDocument(routes)
   #     @currentFolder = new Folder()
   #     @currentFolder.folders.url = TEST_FOLDERS_COLLECTION_URL
   #     thisFolder = @currentFolder.folders.add({})
@@ -29,14 +31,14 @@ define [
   #         onItemDragLeaveOrEnd: ->
   #         onItemDrop: ->
 
-  #     @component = React.renderComponent(FolderChild(@sampleProps(true)), $('<div>').appendTo('body')[0])
+  #     @component = React.render(FolderChild(@sampleProps(true)), @div)
 
   #   teardown: ->
   #     React.unmountComponentAtNode(@component.getDOMNode().parentNode)
 
 
   # test 'allows creating a new folder', ->
-  #   input = @component.refs.newName.getDOMNode()
+  #   input = $(@div).find('.ef-edit-name-form .input-block-level')[0] #@component.refs.newName.getDOMNode()
   #   equal input, document.activeElement, 'input is focused automatically'
 
   #   input.value = 'testing 123'

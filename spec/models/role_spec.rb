@@ -259,7 +259,7 @@ describe Role do
       end
     end
 
-    it "should set manageable_by_user correctly with restricted permissions" do
+    it "should set manageable_by_user correctly with manage_admin_users permission restricted" do
       course_with_ta
       @course.account.role_overrides.create!(role: ta_role, enabled: false, permission: :manage_admin_users)
 
@@ -268,6 +268,18 @@ describe Role do
         expect(roles.detect{|r| r[:id] == role.id}[:manageable_by_user]).to be_falsey
       end
       [student_role, observer_role].each do |role|
+        expect(roles.detect{|r| r[:id] == role.id}[:manageable_by_user]).to be_truthy
+      end
+    end
+
+    it "should set manageable_by_user correctly with manage_students permission restricted" do
+      course_with_ta
+      @course.account.role_overrides.create!(role: ta_role, enabled: true, permission: :manage_admin_users)
+      @course.account.role_overrides.create!(role: ta_role, enabled: false, permission: :manage_students)
+
+      roles = Role.role_data(@course, @ta)
+      expect(roles.detect{|r| r[:id] == student_role.id}[:manageable_by_user]).to be_falsey
+      [observer_role, ta_role, teacher_role, designer_role].each do |role|
         expect(roles.detect{|r| r[:id] == role.id}[:manageable_by_user]).to be_truthy
       end
     end

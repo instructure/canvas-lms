@@ -3,7 +3,7 @@
 define([
   'underscore',
   'i18n!modules',
-  'old_unsupported_dont_use_react',
+  'react',
   'jsx/gradebook/SISGradePassback/assignmentUtils',
   'jsx/gradebook/SISGradePassback/AssignmentCorrectionRow'
 ], (_, I18n, React, assignmentUtils, AssignmentCorrectionRow) => {

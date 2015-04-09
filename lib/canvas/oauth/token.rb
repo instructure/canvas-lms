@@ -58,7 +58,7 @@ module Canvas::Oauth
     end
 
     def self.find_reusable_access_token(user, key, scopes, purpose)
-      if key.trusted?
+      if key.force_token_reuse
         find_access_token(user, key, scopes, purpose)
       elsif AccessToken.scopes_match?(scopes, ["userinfo"])
         find_userinfo_access_token(user, key, purpose)

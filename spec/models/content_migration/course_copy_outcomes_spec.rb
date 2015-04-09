@@ -45,7 +45,7 @@ describe ContentMigration do
       default.add_outcome(lo)
 
       bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
-      bank.assessment_questions.create!(:question_data => {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
+      bank.assessment_questions.create!(:question_data => {'name' => 'test question', 'question_type' => 'essay_question'})
 
       lo.align(bank, @copy_from, {:mastery_type => 'points', :mastery_score => 50.0})
 

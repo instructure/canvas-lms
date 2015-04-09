@@ -1,6 +1,6 @@
 <% if !course || !course.deleted? %>
-<% teacher_names = course && (course.read_attribute(:teacher_names) || course.teachers.uniq.map(&:name)) %>
-<% student_count = course && (course.read_attribute(:student_count) || course.students.count) %>
+<% teacher_names = course && (course.teacher_names || course.teachers.uniq.map(&:name)) %>
+<% student_count = course && (course.student_count || course.students.where("enrollments.type <> ?", "StudentViewEnrollment").count) %>
 <li class="course" id="course_<%= course ? course.id : "blank" %>" style="<%= hidden unless course %>">
   <div class="course <%= 'unpublished' if course && course.read_attribute(:workflow_state) && (course.created? || course.claimed?) %>">
     <div class="name">

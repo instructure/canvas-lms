@@ -55,7 +55,7 @@ by adding the `.ic-Expand-link--active` class to the
           <a href="#" class="close_wizard_link ic-Expand-link__trigger">
             <div class="ic-Expand-link__layout">
               <i class="icon-settings ic-Expand-link__icon"></i>
-              <span class="ic-Expand-link__text">I am branded w $canvas-primary</span>
+              <span class="ic-Expand-link__text">I am branded w $ic-brand-primary</span>
             </div>
           </a>
         </div>
@@ -70,7 +70,7 @@ by adding the `.ic-Expand-link--active` class to the
           <a href="#" class="close_wizard_link ic-Expand-link__trigger">
             <div class="ic-Expand-link__layout">
               <i class="icon-check ic-Expand-link__icon"></i>
-              <span class="ic-Expand-link__text">I am branded w $canvas-success</span>
+              <span class="ic-Expand-link__text">I am branded w $ic-color-success</span>
             </div>
           </a>
         </div>
@@ -89,7 +89,7 @@ by adding the `.ic-Expand-link--active` class to the
           <a href="#" class="close_wizard_link ic-Expand-link__trigger">
             <div class="ic-Expand-link__layout">
               <i class="icon-warning ic-Expand-link__icon"></i>
-              <span class="ic-Expand-link__text">I am branded w $canvas-danger</span>
+              <span class="ic-Expand-link__text">I am branded w $ic-color-danger</span>
             </div>
           </a>
         </div>
@@ -121,9 +121,9 @@ by adding the `.ic-Expand-link--active` class to the
 $ic-Expand-link-size: $ic-sp*4;
 
 @mixin ic-Expand-link-branding(
-  $bg-color: rgba($canvas-dark, 0.8), 
-  $bg-color-hover: $canvas-dark, 
-  $text-color: $canvas-light) {
+  $bg-color: rgba($ic-color-dark, 0.8), 
+  $bg-color-hover: $ic-color-dark, 
+  $text-color: $ic-color-light) {
 
   .ic-Expand-link__trigger {
     .ic-Expand-link__layout {
@@ -235,10 +235,10 @@ $ic-Expand-link-size: $ic-sp*4;
   // Branding -- call the mixin with just defaults to establish basic branding
   @include ic-Expand-link-branding;
 
-  &.ic-Expand-link--Primary { @include ic-Expand-link-branding(rgba($canvas-primary, 0.8),$canvas-primary,$canvas-light); }
-  &.ic-Expand-link--Secondary { @include ic-Expand-link-branding(rgba($canvas-secondary, 0.8),$canvas-secondary,$canvas-light); }
-  &.ic-Expand-link--Success { @include ic-Expand-link-branding(rgba($canvas-success, 0.8),$canvas-success,$canvas-light); }
-  &.ic-Expand-link--Danger { @include ic-Expand-link-branding(rgba($canvas-danger, 0.8),$canvas-danger,$canvas-light); }
-  &.ic-Expand-link--Light { @include ic-Expand-link-branding(rgba($canvas-light, 0.8),$canvas-light,$canvas-dark); }
+  &.ic-Expand-link--Primary { @include ic-Expand-link-branding(rgba($ic-brand-primary, 0.8),$ic-brand-primary,$ic-color-light); }
+  &.ic-Expand-link--Secondary { @include ic-Expand-link-branding(rgba($ic-brand-secondary, 0.8),$ic-brand-secondary,$ic-color-light); }
+  &.ic-Expand-link--Success { @include ic-Expand-link-branding(rgba($ic-color-success, 0.8),$ic-color-success,$ic-color-light); }
+  &.ic-Expand-link--Danger { @include ic-Expand-link-branding(rgba($ic-color-danger, 0.8),$ic-color-danger,$ic-color-light); }
+  &.ic-Expand-link--Light { @include ic-Expand-link-branding(rgba($ic-color-light, 0.8),$ic-color-light,$ic-color-dark); }
 
 }

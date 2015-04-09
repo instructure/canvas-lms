@@ -218,6 +218,11 @@ class Enrollment < ActiveRecord::Base
         joins(:course).
         where("enrollments.type IN ('TeacherEnrollment','TaEnrollment', 'DesignerEnrollment') AND (courses.workflow_state='claimed' OR (enrollments.workflow_state='active' AND courses.workflow_state='available'))") }
 
+  scope :instructor, -> {
+    select(:course_id).
+        joins(:course).
+        where("enrollments.type IN ('TeacherEnrollment','TaEnrollment') AND (courses.workflow_state='claimed' OR (enrollments.workflow_state='active' AND courses.workflow_state='available'))") }
+
   scope :of_admin_type, -> { where(:type => ['TeacherEnrollment','TaEnrollment', 'DesignerEnrollment']) }
 
   scope :of_instructor_type, -> { where(:type => ['TeacherEnrollment', 'TaEnrollment']) }
@@ -449,6 +454,13 @@ class Enrollment < ActiveRecord::Base
     self.save
   end
 
+  def unconclude
+    self.workflow_state = 'active'
+    self.completed_at = nil
+    self.user.touch
+    self.save
+  end
+
   def defined_by_sis?
     !!self.sis_source_id
   end
@@ -611,7 +623,13 @@ class Enrollment < ActiveRecord::Base
   end
 
   def state_based_on_date
-    return state unless [:invited, :active].include?(state)
+    unless [:invited, :active].include?(state)
+      if state == :completed && self.restrict_past_view?
+        return :inactive
+      else
+        return state
+      end
+    end
 
     ranges = self.enrollment_dates
     now    = Time.now
@@ -624,13 +642,25 @@ class Enrollment < ActiveRecord::Base
     # Not strictly within any range
     return state unless global_start_at = ranges.map(&:compact).map(&:min).compact.min
     if global_start_at < now
-      :completed
+      self.restrict_past_view? ? :inactive : :completed
     # Allow student view students to use the course before the term starts
-    elsif self.fake_student? || (state == :invited && !self.root_account.settings[:restrict_student_future_view])
+    elsif self.fake_student? || (state == :invited && !self.restrict_future_view?)
       state
     else
       :inactive
     end
+  end
+
+  def view_restrictable?
+    self.student? || self.observer?
+  end
+
+  def restrict_past_view?
+    self.view_restrictable? && self.course.restrict_student_past_view?
+  end
+
+  def restrict_future_view?
+    self.view_restrictable? && self.course.restrict_student_future_view?
   end
 
   def active?

@@ -82,6 +82,11 @@ require 'csv'
 #           "example": "12",
 #           "type": "integer"
 #         },
+#         "lti_guid": {
+#           "description": "The account's identifier that is sent as context_id in LTI launches.",
+#           "example": "123xyz",
+#           "type": "string"
+#         },
 #         "workflow_state": {
 #           "description": "The state of the account. Can be 'active' or 'deleted'.",
 #           "example": "active",
@@ -104,6 +109,12 @@ class AccountsController < ApplicationController
   # students and even teachers will get an empty list in response, only
   # account admins can view the accounts that they are in.
   #
+  # @argument include[] [String, "lti_guid"|"registration_settings"]
+  #   Array of additional information to include.
+  #
+  #   "lti_guid":: the 'tool_consumer_instance_guid' that will be sent for this account on LTI launches
+  #   "registration_settings":: returns info about the privacy policy and terms of use
+  #
   # @returns [Account]
   def index
     respond_to do |format|
@@ -117,7 +128,10 @@ class AccountsController < ApplicationController
           @accounts = []
         end
         ActiveRecord::Associations::Preloader.new(@accounts, :root_account).run
-        render :json => @accounts.map { |a| account_json(a, @current_user, session, params[:includes] || [], false) }
+
+        # originally had 'includes' instead of 'include' like other endpoints
+        includes = params[:include] || params[:includes]
+        render :json => @accounts.map { |a| account_json(a, @current_user, session, includes || [], false) }
       end
     end
   end

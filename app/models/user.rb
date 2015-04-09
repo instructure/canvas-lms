@@ -1239,12 +1239,12 @@ class User < ActiveRecord::Base
   end
 
   def report_avatar_image!(associated_context=nil)
-    if avatar_state == :approved || avatar_state == :locked
-      avatar_state = 're_reported'
+    if self.avatar_state == :approved || self.avatar_state == :locked
+      self.avatar_state = 're_reported'
     else
-      avatar_state = 'reported'
+      self.avatar_state = 'reported'
     end
-    save!
+    self.save!
   end
 
   def avatar_state
@@ -1436,9 +1436,9 @@ class User < ActiveRecord::Base
       course_ids = Shackles.activate(:slave) do
         if opts[:contexts]
           (Array(opts[:contexts]).map(&:id) &
-           current_student_enrollment_course_ids)
+           current_student_course_ids)
         else
-          current_student_enrollment_course_ids
+          current_student_course_ids
         end
       end
 
@@ -1475,9 +1475,9 @@ class User < ActiveRecord::Base
       course_ids = Shackles.activate(:slave) do
         if opts[:contexts]
           (Array(opts[:contexts]).map(&:id) &
-          current_admin_enrollment_course_ids)
+          current_instructor_course_ids)
         else
-          current_admin_enrollment_course_ids
+          current_instructor_course_ids
         end
       end
 
@@ -1507,9 +1507,9 @@ class User < ActiveRecord::Base
     course_ids = Shackles.activate(:slave) do
       if opts[:contexts]
         (Array(opts[:contexts]).map(&:id) &
-        current_student_enrollment_course_ids)
+        current_student_course_ids)
       else
-        current_student_enrollment_course_ids
+        current_student_course_ids
       end
     end
 
@@ -1761,18 +1761,18 @@ class User < ActiveRecord::Base
     end
   end
 
-  def current_student_enrollment_course_ids
-    @current_student_enrollments ||= Rails.cache.fetch([self, 'current_student_enrollments'].cache_key) do
-      self.enrollments.with_each_shard { |scope| scope.student.select(:course_id) }
+  def current_student_course_ids
+    @current_student_course_ids ||= Rails.cache.fetch([self, 'current_student_course_ids'].cache_key) do
+      self.enrollments.with_each_shard { |scope| scope.student.select(:course_id) }.map(&:course_id)
     end
-    @current_student_enrollments.map(&:course_id)
+    @current_student_course_ids.map{|id| Shard.relative_id_for(id, self.shard, Shard.current)}
   end
 
-  def current_admin_enrollment_course_ids
-    @current_admin_enrollments ||= Rails.cache.fetch([self, 'current_admin_enrollments'].cache_key) do
-      self.enrollments.with_each_shard { |scope| scope.admin.select(:course_id) }
+  def current_instructor_course_ids
+    @current_instructor_course_ids ||= Rails.cache.fetch([self, 'current_instructor_course_ids'].cache_key) do
+      self.enrollments.with_each_shard { |scope| scope.instructor.select(:course_id) }.map(&:course_id)
     end
-    @current_admin_enrollments.map(&:course_id)
+    @current_instructor_course_ids.map{|id| Shard.relative_id_for(id, self.shard, Shard.current)}
   end
 
   def submissions_for_context_codes(context_codes, opts={})
@@ -1830,7 +1830,7 @@ class User < ActiveRecord::Base
     context_codes ||= if opts[:contexts]
         setup_context_lookups(opts[:contexts])
       else
-        self.current_student_enrollment_course_ids.map { |id| "course_#{id}" }
+        self.current_student_course_ids.map { |id| "course_#{id}" }
       end
     submissions_for_context_codes(context_codes, opts)
   end
@@ -2365,11 +2365,14 @@ class User < ActiveRecord::Base
   end
 
   def can_create_enrollment_for?(course, session, type)
-    can_add = %w{StudentEnrollment ObserverEnrollment}.include?(type) && course.grants_right?(self, session, :manage_students)
-    can_add ||= type == 'TeacherEnrollment' && course.teacherless? && course.grants_right?(self, session, :manage_students)
-    can_add ||= course.grants_right?(self, session, :manage_admin_users)
-
-    can_add
+    if type != "StudentEnrollment" && course.grants_right?(self, session, :manage_admin_users)
+      return true
+    end
+    if course.grants_right?(self, session, :manage_students)
+      if %w{StudentEnrollment ObserverEnrollment}.include?(type) || (type == 'TeacherEnrollment' && course.teacherless?)
+        return true
+      end
+    end
   end
 
   def can_be_enrolled_in_course?(course)

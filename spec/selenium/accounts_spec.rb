@@ -177,6 +177,28 @@ describe "account" do
       expect(f('#add_course_form')).to be_displayed
     end
 
+    it "should be able to add a term" do
+      get "/accounts/#{Account.default.id}/terms"
+      f(".add_term_link").click
+      wait_for_ajaximations
+
+      f("#enrollment_term_name").send_keys("some name")
+      f("#enrollment_term_sis_source_id").send_keys("some id")
+
+      f("#term_new .general_dates .start_date .edit_term input").send_keys("2011-07-01")
+      f("#term_new .general_dates .end_date .edit_term input").send_keys("2011-07-31")
+
+      submit_form(".enrollment_term_form")
+      wait_for_ajaximations
+
+      term = Account.default.enrollment_terms.last
+      expect(term.name).to eq "some name"
+      expect(term.sis_source_id).to eq "some id"
+
+      expect(term.start_at).to eq Date.parse("2011-07-01")
+      expect(term.end_at).to eq Date.parse("2011-07-31")
+    end
+
     it "should be able to update term dates" do
 
       def verify_displayed_term_dates(term, dates)

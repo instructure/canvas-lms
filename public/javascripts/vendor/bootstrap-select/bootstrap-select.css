@@ -45,10 +45,6 @@
     z-index: 1001;
 }
 
-.bootstrap-select .btn:focus {
-    @include button-focus;
-}
-
 .bootstrap-select.btn-group .btn .filter-option {
     overflow: hidden;
     position: absolute;

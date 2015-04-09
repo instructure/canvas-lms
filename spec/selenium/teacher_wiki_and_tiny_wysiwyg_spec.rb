@@ -3,6 +3,8 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common
 describe "Wiki pages and Tiny WYSIWYG editor features" do
   include_examples "in-process server selenium tests"
 
+  equation_button_selector = "div[aria-label='Insert Math Equation'] button"
+
   context "WYSIWYG generic as a teacher" do
 
     before (:each) do
@@ -34,7 +36,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       wysiwyg_state_setup(text, val = true)
 
       select_all_wiki
-      f('.mce_unlink').click
+      f('.mce-i-unlink').click
       save_wiki
 
       in_frame wiki_page_body_ifr_id do
@@ -52,13 +54,14 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it "should add and remove bullet lists" do
       wysiwyg_state_setup
+      bullist_selector = ".mce-i-bullist"
 
-      f('.mce_bullist').click
+      f(bullist_selector).click
       in_frame wiki_page_body_ifr_id do
         ff('#tinymce li').length == 3
       end
 
-      f('.mce_bullist').click
+      f(bullist_selector).click
       in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce li')).to be_nil
       end
@@ -66,13 +69,14 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it "should add and remove numbered lists" do
       wysiwyg_state_setup
+      numlist_selector = '.mce-i-numlist'
 
-      f('.mce_numlist').click
+      f(numlist_selector).click
       in_frame wiki_page_body_ifr_id do
         ff('#tinymce li').length == 3
       end
 
-      f('.mce_numlist').click
+      f(numlist_selector).click
       in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce li')).to be_nil
       end
@@ -81,34 +85,36 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     it "should change font color for all selected text" do
       wysiwyg_state_setup
 
-      f("##{wiki_page_editor_id}_forecolor_open").click
-      fba("##{wiki_page_editor_id}_forecolor_menu", "title", "Red")
+      # order-dependent ID of the forecolor button
+      f("#mceu_3 .mce-caret").click
+      f(".mce-colorbutton-grid div[title='Red']").click
       validate_wiki_style_attrib("color", "rgb(255, 0, 0)", "p span")
     end
 
     it "should change background font color" do
       wysiwyg_state_setup
 
-      f("##{wiki_page_editor_id}_backcolor_open").click
-      fba("##{wiki_page_editor_id}_backcolor_menu", "title", "Red")
+      # order-dependent ID of the backcolor button
+      f("#mceu_4 .mce-caret").click
+      f(".mce-colorbutton-grid div[title='Red']").click
       validate_wiki_style_attrib("background-color", "rgb(255, 0, 0)", "p span")
     end
 
     it "should change font size" do
       wysiwyg_state_setup
-      f("##{wiki_page_editor_id}_fontsizeselect_open").click
-      #f('#menu_#{wiki_page_editor_id}_#{wiki_page_editor_id}_fontsizeselect_menu_tbl [style="font-size:small"]').click
 
-      fba("#menu_#{wiki_page_editor_id}_#{wiki_page_editor_id}_fontsizeselect_menu_tbl", "style", "font-size:xx-large")
-      validate_wiki_style_attrib("font-size", "xx-large", "p span")
+      # I'm so, so sorry...
+      driver.find_element(:xpath, "//button/span[text()[contains(.,'Font Sizes')]]").click
+      driver.find_element(:xpath, "//span[text()[contains(.,'36pt')]]").click
+      validate_wiki_style_attrib("font-size", "36pt", "p span")
     end
 
     it "should change and remove all custom formatting on selected text" do
       wysiwyg_state_setup
-      f("##{wiki_page_editor_id}_fontsizeselect_open").click
-      fba("#menu_#{wiki_page_editor_id}_#{wiki_page_editor_id}_fontsizeselect_menu_tbl", "style", "font-size:xx-large")
-      validate_wiki_style_attrib("font-size", "xx-large", "p span")
-      f("##{wiki_page_editor_id}_removeformat").click
+      driver.find_element(:xpath, "//button/span[text()[contains(.,'Font Sizes')]]").click
+      driver.find_element(:xpath, "//span[text()[contains(.,'36pt')]]").click
+      validate_wiki_style_attrib("font-size", "36pt", "p span")
+      f(".mce-i-removeformat").click
       validate_wiki_style_attrib_empty("p")
     end
 
@@ -122,25 +128,25 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       @image_list.find_element(:css, '.img_link').click
 
       select_all_wiki
-      f('.mce_indent').click
+      f('.mce-i-indent').click
       validate_wiki_style_attrib("padding-left", "30px", "p")
-      f('.mce_outdent').click
+      f('.mce-i-outdent').click
       validate_wiki_style_attrib_empty("p")
     end
 
     it "should indent and remove indentation for text" do
       wysiwyg_state_setup(text = "test")
 
-      f('.mce_indent').click
+      f('.mce-i-indent').click
       validate_wiki_style_attrib("padding-left", "30px", "p")
-      f('.mce_outdent').click
+      f('.mce-i-outdent').click
       validate_wiki_style_attrib_empty("p")
     end
 
     ["right", "center", "left"].each do |setting|
       it "should align text to the #{setting}" do
         wysiwyg_state_setup(text = "test")
-        f(".mce_justify#{setting}").click
+        f(".mce-i-align#{setting}").click
         validate_wiki_style_attrib("text-align", setting, "p")
       end
     end
@@ -155,7 +161,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
         @image_list.find_element(:css, '.img_link').click
         select_all_wiki
-        f(".mce_justify#{setting}").click
+        f(".mce-i-align#{setting}").click
 
         validate_wiki_style_attrib("text-align", setting, "p")
       end
@@ -181,7 +187,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       end
 
       select_all_wiki
-      f('.mce_unlink').click
+      f('.mce-i-unlink').click
       in_frame wiki_page_body_ifr_id do
         expect(f('#tinymce p a')).to be_nil
       end
@@ -190,19 +196,19 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     it "should change paragraph type" do
       text = "<p>This is a sample paragraph</p><p>This is a test</p><p>I E O U A</p>"
       wysiwyg_state_setup(text)
-      f("##{wiki_page_editor_id}_formatselect_open").click
-      f("#menu_#{wiki_page_editor_id}_#{wiki_page_editor_id}_formatselect_menu .mce_pre").click
+      driver.find_element(:xpath, "//button/span[text()[contains(.,'Paragraph')]]").click
+      driver.find_element(:xpath, "//span[text()[contains(.,'Preformatted')]]").click
       in_frame wiki_page_body_ifr_id do
         expect(ff('#tinymce pre').length).to eq 3
+      end
     end
-  end
 
   it "should add bold and italic text to the rce" do
     get "/courses/#{@course.id}/pages/front-page/edit"
 
     wait_for_tiny(keep_trying_until { f("form.edit-form .edit-content") })
-    f('.mceIcon.mce_bold').click
-    f('.mceIcon.mce_italic').click
+    f('.mce-i-bold').click
+    f('.mce-i-italic').click
     first_text = 'This is my text.'
 
     type_in_tiny("##{wiki_page_editor_id}", first_text)
@@ -253,7 +259,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     equation_text = '\\text{yay math stuff:}\\:\\frac{d}{dx}\\sqrt{x}=\\frac{d}{dx}x^{\\frac{1}{2}}=\\frac{1}{2}x^{-\\frac{1}{2}}=\\frac{1}{2\\sqrt{x}}\\text{that. is. so. cool.}'
 
     get "/courses/#{@course.id}/pages/front-page/edit"
-    f("##{wiki_page_editor_id}_instructure_equation").click
+    f(equation_button_selector).click
     wait_for_ajaximations
     expect(f('.mathquill-editor')).to be_displayed
     textarea = f('.mathquill-editor .textarea textarea')
@@ -334,7 +340,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     equation_text = '\\text{yay math stuff:}\\:\\frac{d}{dx}\\sqrt{x}=\\frac{d}{dx}x^{\\frac{1}{2}}= \\frac{1}{2}x^{-\\frac{1}{2}}=\\frac{1}{2\\sqrt{x}}\\text{that. is. so. cool.}'
 
     get "/courses/#{@course.id}/pages/front-page/edit"
-    f("##{wiki_page_editor_id}_instructure_equation").click
+    f(equation_button_selector).click
     wait_for_ajaximations
     expect(f('.mathquill-editor')).to be_displayed
     f('a.math-toggle-link').click
@@ -369,13 +375,13 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     end
   end
 
-    it "should display record video dialog" do
-      stub_kaltura
-      #pending("failing because it is dependant on an external kaltura system")
+  it "should display record video dialog" do
+    stub_kaltura
+    #pending("failing because it is dependant on an external kaltura system")
 
-      get "/courses/#{@course.id}/pages/front-page/edit"
+    get "/courses/#{@course.id}/pages/front-page/edit"
 
-    f('.mce_instructure_record').click
+    f("div[aria-label='Record/Upload Media'] button").click
     keep_trying_until { expect(f('#record_media_tab')).to be_displayed }
     f('#media_comment_dialog a[href="#upload_media_tab"]').click
     expect(f('#media_comment_dialog #audio_upload')).to be_displayed
@@ -383,68 +389,5 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     expect(f('#media_comment_dialog')).not_to be_displayed
   end
 
-  it "should handle table borders correctly" do
-    get "/courses/#{@course.id}/pages/front-page/edit"
-
-    def check_table(attributes = {})
-      # clear out whatever is in the editor
-      driver.execute_script("$('##{wiki_page_body_ifr_id}')[0].contentDocument.body.innerHTML =''")
-
-      # this is the only way I know to actually trigger the insert table dialog to open
-      # listening to the click events on the button in the menu did not work
-      driver.execute_script("$('##{wiki_page_editor_id}').editorBox('execute', 'mceInsertTable')")
-
-      # the iframe will be created with an id of mce_<some number>_ifr
-      table_iframe_id = keep_trying_until { ff('iframe').map { |f| f['id'] }.detect { |w| w =~ /mce_\d+_ifr/ } }
-      expect(table_iframe_id).not_to be_nil
-      in_frame(table_iframe_id) do
-        attributes.each do |attribute, value|
-          tab_to_show = attribute == :bordercolor ? 'advanced' : 'general'
-          keep_trying_until do
-            driver.execute_script "mcTabs.displayTab('#{tab_to_show}_tab', '#{tab_to_show}_panel')"
-            set_value(f("##{attribute}"), value)
-            true
-          end
-        end
-        f('#insert').click
-      end
-      in_frame wiki_page_body_ifr_id do
-        table = f('#tinymce table')
-        attributes.each do |attribute, value|
-          (expect(table[attribute]).to eq value.to_s) if (value && (attribute != :bordercolor))
-        end
-        [:width, :color].each do |part|
-          [:top, :right, :bottom, :left].each do |side|
-            expected_value = attributes[{:width => :border, :color => :bordercolor}[part]] || {:width => 1, :color => 'rgba(136, 136, 136, 1)'}[part]
-            if expected_value.is_a?(Numeric)
-              expected_value = 1 if expected_value == 0
-              expected_value = "#{expected_value}px"
-            end
-            expect(table.style("border-#{side}-#{part}")).to eq expected_value
-          end
-        end
-      end
-      # TODO: test how it looks after page is saved.
-      #submit_form('#new_wiki_page')
-
-    end
-
-    # check with default settings
-    check_table()
-
-    check_table(
-        :align => 'center',
-        :cellpadding => 5,
-        :cellspacing => 6,
-        :border => 7,
-        :bordercolor => 'rgba(255, 0, 0, 1)'
-    )
-    check_table(
-        :align => 'center',
-        :cellpadding => 0,
-        :cellspacing => 0,
-        :border => 0
-    )
-  end
 end
 end

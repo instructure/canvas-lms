@@ -116,7 +116,7 @@
         <a href="<%= eportfolio_entry_preview_submission_path(@portfolio, @page, submission.id) %>" style="display: none;" class="submission_preview_url"></a>
         <div style="float: right; font-size: 0.8em; color: #aaa; margin-right: 20px; margin-top: 0.5em;">
           <%= datetime_string(submission.submitted_at || submission.updated_at) %>
-          &nbsp;<a href="<%= context_url(submission.assignment.context, :context_assignment_submission_url, submission.assignment_id, submission.id) %>" target="_blank" class="no-hover"><%= image_tag "popout.png", :title => t('titles.view_submission', "View the Submission") %></a>
+          &nbsp;<a href="<%= context_url(submission.assignment.context, :context_assignment_submission_url, submission.assignment_id, @portfolio.user.id) %>" target="_blank" class="no-hover view_submission_url"><%= image_tag "popout.png", :title => t('titles.view_submission', "View the Submission") %></a>
         </div>
         <span class="text" style="font-size: 1.2em;">
           <span class="text assignment_title"><%= submission.assignment.title %></span>

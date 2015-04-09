@@ -40,6 +40,8 @@ define [
     strictEqual collection.course, course, "assigns course to this.course"
 
   test "(#getGrades) loading grades from the server", ->
+    ENV.observed_student_ids = []
+    ENV.PERMISSIONS.read_grades = true
     triggeredChangeForAssignmentWithoutSubmission = false
     submissions = ({id: id, assignment_id: id, grade: id} for id in [1..3])
     @server.respondWith "GET", "#{COURSE_SUBMISSIONS_URL}?per_page=50", [

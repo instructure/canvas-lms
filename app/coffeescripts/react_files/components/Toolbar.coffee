@@ -1,9 +1,9 @@
 define [
   'underscore'
   'i18n!react_files'
-  'old_unsupported_dont_use_react'
-  'old_unsupported_dont_use_react-router'
-  'compiled/react/shared/utils/withReactDOM'
+  'react'
+  'react-router'
+  'compiled/react/shared/utils/withReactElement'
   './UploadButton'
   './UsageRightsDialog'
   '../utils/openMoveDialog'
@@ -11,14 +11,22 @@ define [
   '../utils/deleteStuff'
   '../modules/customPropTypes'
   './RestrictedDialogForm'
+  'compiled/fn/preventDefault'
+  '../modules/FocusStore'
   'jquery'
   'compiled/jquery.rails_flash_notifications'
-], (_, I18n, React, Router, withReactDOM, UploadButton, UsageRightsDialog, openMoveDialog, downloadStuffAsAZip, deleteStuff, customPropTypes, RestrictedDialogForm, $) ->
+], (_, I18n, React, Router, withReactElement, UploadButtonComponent, UsageRightsDialogComponent, openMoveDialog, downloadStuffAsAZip, deleteStuff, customPropTypes, RestrictedDialogFormComponent, preventDefault, FocusStore, $) ->
+
+  UploadButton = React.createFactory UploadButtonComponent
+  UsageRightsDialog = React.createFactory UsageRightsDialogComponent
+  RestrictedDialogForm = React.createFactory RestrictedDialogFormComponent
+  Link = React.createFactory Router.Link
+
 
   Toolbar = React.createClass
     displayName: 'Toolbar'
 
-    mixins: [Router.Navigation]
+    mixins: [Router.Navigation, Router.State]
 
     propTypes:
       currentFolder: customPropTypes.folder # not required as we don't have it on the first render
@@ -70,7 +78,7 @@ define [
           React.unmountComponentAtNode this
           $(this).remove()
 
-      React.renderComponent(RestrictedDialogForm({
+      React.render(RestrictedDialogForm({
         models: @props.selectedItems
         usageRightsRequiredForContext: @props.usageRightsRequiredForContext
         closeDialog: -> $dialog.dialog('close')
@@ -86,7 +94,11 @@ define [
 
       @props.modalOptions.openModal(contents, => @refs.usageRightsBtn.getDOMNode().focus())
 
-    render: withReactDOM ->
+    openPreview: ->
+      FocusStore.setItemToFocus(@refs.previewLink.getDOMNode())
+      @transitionTo(@props.getPreviewRoute(), {splat: @props.currentFolder?.urlPath()}, @props.getPreviewQuery())
+
+    render: withReactElement ->
       showingButtons = @props.selectedItems.length
       downloadTitle = if @props.selectedItems.length is 1
         I18n.t('download', 'Download')
@@ -110,15 +122,14 @@ define [
             'aria-label': I18n.t('search_for_files', 'Search for files')
             type: 'search'
             ref: 'searchTerm'
-            defaultValue: @props.query.search_term
+            defaultValue: @getQuery().search_term
 
         div className: "ui-buttonset col-xs #{'screenreader-only' unless showingButtons}",
 
-
-          Router.Link {
-              to: @props.getPreviewRoute()
-              query: @props.getPreviewQuery()
-              params: {splat: @props.currentFolder?.urlPath()}
+          a {
+              ref: 'previewLink'
+              href: '#'
+              onClick: preventDefault(@openPreview)
               className: 'ui-button btn-view'
               title: I18n.t('view', 'View')
               role: 'button'

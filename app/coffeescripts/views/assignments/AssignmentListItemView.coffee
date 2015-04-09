@@ -109,7 +109,7 @@ define [
         @moveAssignmentView.hide()
         @moveAssignmentView.setTrigger @$moveAssignmentButton
 
-      @updateScore() unless (@canManage() || !@userIsStudent())
+      @updateScore() if @canReadGrades()
 
     toggleHidden: (model, hidden) =>
       @$el.toggleClass('hidden', hidden)
@@ -241,8 +241,8 @@ define [
       json = @_setJSONForGrade(json) unless @canManage()
       @$('.js-score').html scoreTemplate(json)
 
-    userIsStudent: ->
-      _.include(ENV.current_user_roles, "student")
+    canReadGrades: ->
+      ENV.PERMISSIONS.read_grades
 
     goToNextItem: =>
       if @nextAssignmentInGroup()?

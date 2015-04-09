@@ -20,7 +20,7 @@
             <%= f.text_field :name, :class => "input-xlarge" %>
           </div>
         </div>
-      <% if term && can_do(@root_account, @current_user, :manage_sis) %>
+      <% if can_do(@root_account, @current_user, :manage_sis) %>
         <div class="control-group edit_term">
           <label class="control-label" for="enrollment_term_sis_source_id"><%= t :sis_source_id, 'SIS ID:' %></label>
           <div class="controls">

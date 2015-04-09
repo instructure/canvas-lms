@@ -17,7 +17,8 @@ define(['jquery','vendor/slickgrid/slick.core'],function(jQuery) {
         "YesNoSelect": YesNoSelectEditor,
         "Checkbox": CheckboxEditor,
         "PercentComplete": PercentCompleteEditor,
-        "LongText": LongTextEditor
+        "LongText": LongTextEditor,
+        "UploadGradeCellEditor": UploadGradeCellEditor
       }
     }
   });
@@ -510,6 +511,133 @@ define(['jquery','vendor/slickgrid/slick.core'],function(jQuery) {
     };
 
     this.init();
+  }
+
+  function UploadGradeCellEditor(args) {
+    var $container = args.container,
+        columnDef = args.column,
+        value = args.item[columnDef.id];
+
+    if (columnDef.active) {
+      value = value || {};
+      var $input;
+      var defaultValue = value.grade;
+      var scope = this;
+
+      this.init = function() {
+        switch(columnDef.grading_type){
+
+        case "letter_grade":
+          var letterGrades = [
+            { text: "--", value: ""},
+            { text: "A",  value: "A"},
+            { text: "A-", value: "A-"},
+            { text: "B+", value: "B+"},
+            { text: "B",  value: "B"},
+            { text: "B-", value: "B-"},
+            { text: "C+", value: "C+"},
+            { text: "C-", value: "C-"},
+            { text: "D+", value: "D+"},
+            { text: "D",  value: "D"},
+            { text: "D-", value: "D-"},
+            { text: "F",  value: "F"}
+          ];
+          var outputString = "";
+          $.each(letterGrades, function() {
+            outputString += '<option value="' + this.value + '" ' + (this.value === value.grade ? "selected": "") + '>' + this.text + '</option>';
+          });
+          $input = $("<select>" + outputString + "</select>");
+          break;
+
+        default:
+          $input = $("<INPUT type=text class='editor-text' />");
+        }
+
+        //if there is something typed in to the grade,
+        //can't do if (value.grade) because if they had a grade of 0 it would break.
+        if (typeof(value.grade) !== "undefined" && value.grade + "" !== "" ) {
+          $input[0].defaultValue = value.grade;
+          $input.val(defaultValue);
+        }
+
+        $input.appendTo($container);
+        $input.focus().select();
+
+        if (typeof(value.uploaded_grade) === "undefined") {
+          value.uploaded_grade = value.grade;
+        }
+      }
+      this.serializeValue = function serializeValue() {
+        return $input.val();
+      }
+
+      this.loadValue = function () {}
+
+      this.destroy = function() {
+        $input.remove();
+      }
+
+      this.focus = function() {
+        $input.focus();
+      }
+
+      this.applyValue = function(item, state) {
+        item[columnDef.id].grade = state;
+      }
+
+      this.getValue = function() {
+        return $input.val();
+      }
+
+      this.isValueChanged = function() {
+        return (! ($input.val() === "" && defaultValue == null)) && ($input.val() !== defaultValue);
+      }
+
+      this.validate = function() {
+        if (columnDef.validator) {
+          var validationResults = columnDef.validator(scope.getValue());
+          if (!validationResults.valid)
+          return validationResults;
+        }
+
+        return {
+          valid: true,
+          msg: null
+        };
+      }
+
+      this.init();
+    }
+    else {
+      var $input;
+      this.init = function() {
+        var html = value ? value.grade: "";
+        $container.removeClass("selected editable").html(html);
+      }
+
+      this.destroy = function() {}
+
+      this.focus = function() {}
+
+      this.setValue = function() {}
+
+      this.getValue = function() {
+        return value;
+      }
+
+      this.isValueChanged = function() {
+        return false;
+      }
+
+      this.validate = function() {
+        return {
+          valid: true,
+          msg: null
+        };
+      }
+
+      this.init();
+    }
   }
 })(jQuery);
 

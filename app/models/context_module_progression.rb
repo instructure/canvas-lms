@@ -165,7 +165,9 @@ class ContextModuleProgression < ActiveRecord::Base
 
   def get_submission_or_quiz_submission(tag)
     if tag.content_type_quiz?
-      Quizzes::QuizSubmission.where(quiz_id: tag.content_id, user_id: user).first
+      sub = Quizzes::QuizSubmission.where(quiz_id: tag.content_id, user_id: user).first
+      sub ||= Submission.where(assignment_id: tag.content.assignment_id, user_id: user).first
+      sub
     elsif tag.content_type_discussion?
       if tag.content
         Submission.where(assignment_id: tag.content.assignment_id, user_id: user).first
@@ -178,7 +180,7 @@ class ContextModuleProgression < ActiveRecord::Base
 
   def get_submission_score(tag)
     submission = get_submission_or_quiz_submission(tag)
-    if tag.content_type_quiz?
+    if submission.is_a?(Quizzes::QuizSubmission)
       submission.try(:kept_score)
     else
       submission.try(:score)

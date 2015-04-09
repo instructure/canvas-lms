@@ -365,6 +365,27 @@ describe AssignmentOverrideApplicator do
           expect(result.length).to eq 1
         end
 
+        it "should enforce lenient date" do
+
+          adhoc_due_at = 10.days.from_now
+
+          ao = AssignmentOverride.new()
+          ao.assignment = @assignment
+          ao.title = "ADHOC OVERRIDE"
+          ao.workflow_state = "active"
+          ao.set_type = "ADHOC"
+          ao.override_due_at(adhoc_due_at)
+          ao.save!
+          override_student = ao.assignment_override_students.build
+          override_student.user = @student2
+          override_student.save!
+          @assignment.reload
+
+          students_assignment = AssignmentOverrideApplicator.
+            assignment_overridden_for(@assignment, @student2)
+          expect(students_assignment.due_at.to_i).to eq adhoc_due_at.to_i
+        end
+
         it "should include section overrides for sections with an active student enrollment" do
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student2)
           expect(overrides).to eq [@override2]

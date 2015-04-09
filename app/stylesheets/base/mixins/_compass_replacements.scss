@@ -13,8 +13,6 @@
 }
 
 @mixin hide-text {
-  $approximate_em_value: 12px / 1em;
-  $wider_than_any_screen: -9999em;
-  text-indent: $wider_than_any_screen * $approximate_em_value;
+  text-indent: -119988px;
   overflow: hidden;
   text-align: left; }

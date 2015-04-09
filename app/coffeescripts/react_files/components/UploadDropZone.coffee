@@ -1,12 +1,12 @@
 define [
   'jquery'
   'i18n!upload_drop_zone'
-  'old_unsupported_dont_use_react'
-  'compiled/react/shared/utils/withReactDOM'
+  'react'
+  'compiled/react/shared/utils/withReactElement'
   '../modules/FileOptionsCollection'
   'compiled/models/Folder'
   'compiled/jquery.rails_flash_notifications'
-], ($, I18n, React, withReactDOM, FileOptionsCollection, Folder) ->
+], ($, I18n, React, withReactElement, FileOptionsCollection, Folder) ->
 
   UploadDropZone = React.createClass
 
@@ -93,7 +93,7 @@ define [
         onDragEnter: this.onDragEnter,
           @buildInstructions()
 
-    render: withReactDOM ->
+    render: withReactElement ->
       if @state.active
         @buildDropZone()
       else

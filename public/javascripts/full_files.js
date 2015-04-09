@@ -1631,6 +1631,34 @@ define([
         INST.downloadFolderFiles($(this).find(".download_zip_link").attr('href'));
       });
 
+      /**
+       * swaps in a version of tinymce that will be *very* loose
+       * with what elements it strips out as invalid. The *[*]
+       * below basically means "any elements with any attributes are ok"
+       * for this editor.
+       *
+       * @private
+       * @param {jQuery Object} textarea the DOM element to wrap
+       *    tinymce around.
+       */
+      function initTiny(textarea){
+        textarea.editorBox({
+          tinyOptions: {
+            valid_elements: '*[*]',
+            extended_valid_elements: '*[*]',
+            plugins: "autolink,media,paste,table",
+            external_plugins: {
+              "instructure_image": "/javascripts/tinymce_plugins/instructure_image/plugin.js",
+              "instructure_links": "/javascripts/tinymce_plugins/instructure_links/plugin.js",
+              "instructure_equation": "/javascripts/tinymce_plugins/instructure_equation/plugin.js",
+              "instructure_equella": "/javascripts/tinymce_plugins/instructure_equella/plugin.js",
+              "instructure_external_tools": "/javascripts/tinymce_plugins/instructure_external_tools/plugin.js"
+            }
+          }
+        });
+        textarea.data('tinyIsVisible', !textarea.data('tinyIsVisible'));
+      }
+
       $(".folder_item .edit_item_content_link").click(function(event) {
         event.preventDefault();
         event.stopPropagation();
@@ -1692,14 +1720,7 @@ define([
                   setTimeout(function(){
                     $dialog.find('.html_edit_warning').fadeIn();
                   }, 250);
-                  $textarea.editorBox({
-                    tinyOptions: {
-                      valid_elements: '*[*]',
-                      extended_valid_elements: '*[*]',
-                      plugins: "autolink,instructure_external_tools,instructure_contextmenu,instructure_links,instructure_image,instructure_equation,instructure_equella,media,paste,table,inlinepopups"
-                    }
-                  });
-                  $textarea.data('tinyIsVisible', !tinyIsVisible);
+                  initTiny($textarea);
                 }
               });
             }

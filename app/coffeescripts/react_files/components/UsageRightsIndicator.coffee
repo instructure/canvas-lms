@@ -1,13 +1,14 @@
 define [
   'i18n!react_files'
-  'old_unsupported_dont_use_react'
+  'react'
   '../modules/customPropTypes'
   'compiled/models/Folder'
   '../modules/filesEnv'
   './UsageRightsDialog'
-], (I18n, React, customPropTypes, Folder, filesEnv, UsageRightsDialog) ->
+  'compiled/react/shared/utils/withReactElement'
+], (I18n, React, customPropTypes, Folder, filesEnv, UsageRightsDialogComponent, withReactElement) ->
 
-  {button, span, i} = React.DOM
+  UsageRightsDialog = React.createFactory UsageRightsDialogComponent
 
   UsageRightsIndicator = React.createClass
     displayName: 'UsageRightsIndicator'
@@ -30,7 +31,7 @@ define [
 
       @props.modalOptions.openModal(contents, => @getDOMNode().focus())
 
-    render: ->
+    render: withReactElement ->
       if (@props.model instanceof Folder) || (!@props.usageRightsRequiredForContext && !@props.model.get('usage_rights'))
         null
       else if (@props.usageRightsRequiredForContext && !@props.model.get('usage_rights'))

@@ -43,7 +43,7 @@ describe ContentMigration do
       expect(to_outcomes).to eql [mig_id(@outcome)]
     end
 
-    it "should link assignments to assignment groups on selective copy" do
+    it "should link assignments to assignment groups when copying all assignments" do
       g = @copy_from.assignment_groups.create!(:name => "group")
       from_assign = @copy_from.assignments.create!(:title => "some assignment", :assignment_group_id => g.id)
 
@@ -52,6 +52,29 @@ describe ContentMigration do
 
       to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
       expect(to_assign.assignment_group).to eq @copy_to.assignment_groups.where(migration_id: mig_id(g)).first
+    end
+
+    it "should link assignments to assignment groups when copying entire assignment group" do
+      g = @copy_from.assignment_groups.create!(:name => "group")
+      from_assign = @copy_from.assignments.create!(:title => "some assignment", :assignment_group_id => g.id)
+
+      @cm.copy_options = {:assignment_groups => {mig_id(g) => true}, :assignments => {mig_id(from_assign) => true}}
+      run_course_copy
+
+      to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
+      expect(to_assign.assignment_group).to eq @copy_to.assignment_groups.where(migration_id: mig_id(g)).first
+    end
+
+    it "should not link assignments to assignment groups when copying single assignment" do
+      g = @copy_from.assignment_groups.create!(:name => "group")
+      from_assign = @copy_from.assignments.create!(:title => "some assignment", :assignment_group_id => g.id)
+
+      @cm.copy_options = {:assignments => {mig_id(from_assign) => true}}
+      run_course_copy
+
+      to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
+      expect(@copy_to.assignment_groups.where(migration_id: mig_id(g)).first).to be_nil
+      expect(to_assign.assignment_group.migration_id).to be_nil
     end
 
     it "should link assignments to assignment groups on complete export" do
@@ -243,15 +266,17 @@ describe ContentMigration do
       end
 
       it "should not copy for teacher" do
-        run_course_copy
+        warnings = [
+            "The assignment \"lock locky\" could not be copied because it is locked.",
+            "The topic \"topic\" could not be copied because it is locked.",
+            "The quiz \"quiz\" could not be copied because it is locked."]
+
+        run_course_copy(warnings)
 
         expect(@copy_to.assignments.count).to eq 0
         expect(@copy_to.quizzes.count).to eq 0
         expect(@copy_to.discussion_topics.count).to eq 0
-        expect(@cm.content_export.error_messages).to eq [
-                ["The assignment \"lock locky\" could not be copied because it is locked.", nil],
-                ["The topic \"topic\" could not be copied because it is locked.", nil],
-                ["The quiz \"quiz\" could not be copied because it is locked.", nil]]
+        expect(@cm.content_export.error_messages.sort).to eq warnings.sort.map{|w| [w, nil]}
       end
 
       it "should not mark assignment as copied if not set to be frozen" do
@@ -259,7 +284,10 @@ describe ContentMigration do
         @asmnt.copied = false
         @asmnt.save!
 
-        run_course_copy
+        warnings = ["The topic \"topic\" could not be copied because it is locked.",
+                    "The quiz \"quiz\" could not be copied because it is locked."]
+
+        run_course_copy(warnings)
 
         asmnt_2 = @copy_to.assignments.where(migration_id: mig_id(@asmnt)).first
         expect(asmnt_2.freeze_on_copy).to be_nil

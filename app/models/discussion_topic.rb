@@ -32,7 +32,7 @@ class DiscussionTopic < ActiveRecord::Base
     :plaintext_message, :podcast_enabled, :podcast_has_student_posts,
     :require_initial_post, :threaded, :discussion_type, :context, :pinned, :locked,
     :group_category
-  attr_accessor :user_has_posted
+  attr_accessor :user_has_posted, :saved_by
 
   module DiscussionTypes
     SIDE_COMMENT = 'side_comment'
@@ -167,6 +167,7 @@ class DiscussionTopic < ActiveRecord::Base
           topic.message = self.message
           topic.title = "#{self.title} - #{group.name}"
           topic.assignment_id = self.assignment_id
+          topic.attachment_id = self.attachment_id
           topic.group_category_id = self.group_category_id
           topic.user_id = self.user_id
           topic.discussion_type = self.discussion_type
@@ -749,12 +750,15 @@ class DiscussionTopic < ActiveRecord::Base
 
   def initialize_last_reply_at
     self.posted_at ||= Time.now.utc
-    self.last_reply_at ||= Time.now.utc
+    self.last_reply_at ||= Time.now.utc unless self.saved_by == :migration
   end
 
   set_policy do
     given { |user| self.user && self.user == user }
     can :read
+
+    given { |user| self.grants_right?(user, :read) }
+    can :read_replies
 
     given { |user| self.user && self.user == user && self.visible_for?(user) && !self.locked_for?(user, :check_policies => true) }
     can :reply
@@ -772,7 +776,7 @@ class DiscussionTopic < ActiveRecord::Base
         self.context.grants_right?(user, session, :post_to_forum) && self.visible_for?(user)}
     can :reply and can :read
 
-    given { |user, session| self.context.grants_right?(user, session, :post_to_forum) && self.visible_for?(user)}
+    given { |user, session| self.context.grants_any_right?(user, session, :read_forum, :post_to_forum) && self.visible_for?(user)}
     can :read
 
     given { |user, session|
@@ -800,15 +804,6 @@ class DiscussionTopic < ActiveRecord::Base
 
     given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :read) }
     can :read
-
-    given { |user, session| self.context.respond_to?(:collection) && self.context.collection.grants_right?(user, session, :read) }
-    can :read
-
-    given { |user, session| self.context.respond_to?(:collection) && self.context.collection.grants_right?(user, session, :comment) }
-    can :reply
-
-    given { |user| self.context.respond_to?(:collection) && user == self.context.user }
-    can :read and can :update and can :delete and can :reply
   end
 
   def self.context_allows_user_to_create?(context, user, session)
@@ -850,6 +845,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def context_module_action(user, action, points=nil)
+    return self.root_topic.context_module_action(user, action, points) if self.root_topic
     tags_to_update = self.context_module_tags.to_a
     if self.for_assignment?
       tags_to_update += self.assignment.context_module_tags
@@ -973,8 +969,9 @@ class DiscussionTopic < ActiveRecord::Base
     # user is the topic's author
     return true if user == self.user
 
-    # user is an admin in the context (teacher/ta/designer)
-    return true if context.grants_right?(user, :manage)
+    # user is an admin in the context (teacher/ta/designer) OR
+    # user is an account admin with appropriate permission
+    return true if context.grants_any_right?(user, :manage, :read_course_content)
 
     # assignment exists and isnt assigned to user (differentiated assignments)
     if for_assignment? && !self.assignment.visible_to_user?(user)
@@ -1031,36 +1028,34 @@ class DiscussionTopic < ActiveRecord::Base
       txt = (message.message || "")
       attachment_matches = txt.scan(/\/#{context.class.to_s.pluralize.underscore}\/#{context.id}\/files\/(\d+)\/download/)
       attachment_ids += (attachment_matches || []).map{|m| m[0] }
-      media_object_matches = txt.scan(/media_comment_([0-9a-z_]+)/)
+      media_object_matches = txt.scan(/media_comment_([\w\-]+)/)
       media_object_ids += (media_object_matches || []).map{|m| m[0] }
       (attachment_ids + media_object_ids).each do |id|
         messages_hash[id] ||= message
       end
     end
+
     media_object_ids = media_object_ids.uniq.compact
     attachment_ids = attachment_ids.uniq.compact
     attachments = attachment_ids.empty? ? [] : context.attachments.active.find_all_by_id(attachment_ids)
     attachments = attachments.select{|a| a.content_type && a.content_type.match(/(video|audio)/) }
     attachments.each do |attachment|
-      attachment.podcast_associated_asset = messages_hash[attachment.id]
+      attachment.podcast_associated_asset = messages_hash[attachment.id.to_s]
     end
+    media_object_ids -= attachments.map{|a| a.media_entry_id}.compact # don't include media objects if the file is already included
+
     media_objects = media_object_ids.empty? ? [] : MediaObject.where(media_id: media_object_ids).to_a
-    media_objects += media_object_ids.map{|id| MediaObject.new(:media_id => id) }
     media_objects = media_objects.uniq(&:media_id)
     media_objects = media_objects.map do |media_object|
-      if media_object.new_record?
-        media_object.context = context
-        media_object.user_id = messages_hash[media_object.media_id].user_id rescue nil
-        media_object.root_account_id = context.root_account_id rescue nil
-        media_object.save
-      elsif media_object.deleted? || media_object.context != context
+      if media_object.media_id == "maybe" || media_object.deleted? || media_object.context != context
         media_object = nil
       end
-      if media_object.try(:podcast_format_details)
+      if media_object && media_object.podcast_format_details
         media_object.podcast_associated_asset = messages_hash[media_object.media_id]
       end
       media_object
     end
+
     to_podcast(attachments + media_objects.compact)
   end
 
@@ -1085,17 +1080,18 @@ class DiscussionTopic < ActiveRecord::Base
       item.enclosure
       if elem.is_a?(Attachment)
         item.guid.content = link + "/#{elem.uuid}"
-        item.enclosure = RSS::Rss::Channel::Item::Enclosure.new("http://#{HostUrl.context_host(elem.context)}/#{elem.context_url_prefix}/files/#{elem.id}/download.#{}?verifier=#{elem.uuid}", elem.size, elem.content_type)
+        item.enclosure = RSS::Rss::Channel::Item::Enclosure.new("http://#{HostUrl.context_host(elem.context)}/#{elem.context_url_prefix}/files/#{elem.id}/download?verifier=#{elem.uuid}", elem.size, elem.content_type)
       elsif elem.is_a?(MediaObject)
         item.guid.content = link + "/#{elem.media_id}"
         details = elem.podcast_format_details
         content_type = 'video/mpeg'
         content_type = 'audio/mpeg' if elem.media_type == 'audio'
         size = details[:size].to_i.kilobytes
-        item.enclosure = RSS::Rss::Channel::Item::Enclosure.new("http://#{HostUrl.context_host(elem.context)}/#{elem.context_url_prefix}/media_download.#{details[:fileExt]}?entryId=#{elem.media_id}&redirect=1", size, content_type)
+        ext = details[:extension] || details[:fileExt]
+        item.enclosure = RSS::Rss::Channel::Item::Enclosure.new("http://#{HostUrl.context_host(elem.context)}/#{elem.context_url_prefix}/media_download?type=#{ext}&entryId=#{elem.media_id}&redirect=1", size, content_type)
       end
       item
-    end
+    end.compact
   end
 
   def initial_post_required?(user, enrollment, session)

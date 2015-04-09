@@ -15,6 +15,7 @@ define([
 
   return React.createClass({
     displayName: 'AddExternalToolButton',
+    throttleCreation: false,
 
     getInitialState() {
       return {
@@ -44,6 +45,7 @@ define([
     },
 
     _successHandler() {
+      this.throttleCreation = false;
       this.setState({ modalIsOpen: false, tool: {}, isLti2: false, lti2RegistrationUrl: null }, function() {
         $.flashMessage(I18n.t('The app was added'));
         store.fetch({ force: true });
@@ -51,6 +53,7 @@ define([
     },
 
     _errorHandler() {
+      this.throttleCreation = false;
       store.fetch({ force: true });
       this.setState({ tool: {}, isLti2: false, lti2RegistrationUrl: null });
       $.flashError(I18n.t('We were unable to add the app.'));
@@ -73,8 +76,9 @@ define([
           lti2RegistrationUrl: data.registrationUrl,
           tool: {}
         });
-      } else {
-        store.save(configurationType, data, this._successHandler.bind(this), this._errorHandler.bind(this));
+      } else if (!this.throttleCreation) {
+          store.save(configurationType, data, this._successHandler.bind(this), this._errorHandler.bind(this));
+          this.throttleCreation = true;
       }
     },
 
@@ -95,7 +99,7 @@ define([
     render() {
       return (
         <span className="AddExternalToolButton">
-          <a href="#" role="button" aria-label={I18n.t('Add App')} className="btn btn-primary add_tool_link lm pull-right" onClick={this.openModal}>{I18n.t('Add App')}</a>
+          <a href="#" role="button" aria-label={I18n.t('Add App')} className="btn btn-primary add_tool_link lm" onClick={this.openModal}>{I18n.t('Add App')}</a>
           <Modal className="ReactModal__Content--canvas"
             overlayClassName="ReactModal__Overlay--canvas"
             isOpen={this.state.modalIsOpen}

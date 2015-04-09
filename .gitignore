@@ -20,6 +20,7 @@
 /config/environments/*-local.rb
 /config/locales/generated/
 /config/RAILS4
+/coverage/
 /db/schema.rb
 /db/*.sqlite*
 /db/*sql

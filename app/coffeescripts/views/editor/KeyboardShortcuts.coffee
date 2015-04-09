@@ -5,9 +5,10 @@ define [
   'Backbone'
   'jst/editor/KeyboardShortcuts'
 ], (_, I18n, $, Backbone, Template) ->
-  ZERO_KEYCODES = [
+  HELP_KEYCODES = [
     48 # regular 0
     96 # numpad 0
+    119 # F8
   ]
 
   ##
@@ -23,15 +24,19 @@ define [
 
     keybindings: [
       {
-        key: 'ALT+F10 (Windows, Linux)',
+        key: 'ALT+F10',
         description: I18n.t('keybindings.open_toolbar', 'Open the editor\'s toolbar')
       },
       {
-        key: 'ALT+FN+F10 (Mac)',
-        description: I18n.t('keybindings.open_toolbar', 'Open the editor\'s toolbar')
+        key: 'ESC',
+        description: I18n.t('keybindings.close_submenu', 'Close menu or dialog, also gets you back to editor area')
       },
       {
-        key: 'ALT+0',
+        key: 'TAB/Arrows',
+        description: I18n.t('keybindings.navigate_toolbar', 'Navigate left/right through menu/toolbar')
+      },
+      {
+        key: 'ALT+F8',
         description: I18n.t('keybindings.open_dialog', 'Open this help dialog')
       }
     ]
@@ -40,6 +45,7 @@ define [
 
     initialize: ->
       this.el.href = '#' # for keyboard accessibility
+      $(this.el).attr("title", I18n.t("editor_help_link", "Open Help Menu"))
 
       $('<i class="icon-info" />').appendTo(this.el)
       $('<span class="screenreader-only" />')
@@ -60,10 +66,16 @@ define [
 
       $(document).on('keyup.tinymce_keyboard_shortcuts', @openDialogByKeybinding.bind(this))
 
+      #special event for keyups in the editor iframe, fired from "tinymce.editor_box.js"
+      $(document).on('editorKeyUp', ((e, originalEvent)->
+        @openDialogByKeybinding(originalEvent)
+      ).bind(this))
+
       return this
 
     remove: () ->
       $(document).off('keyup.tinymce_keyboard_shortcuts')
+      $(document).off('editorKeyUp')
       this.$dialog.dialog('destroy')
 
     openDialog: ->
@@ -71,7 +83,7 @@ define [
         this.$dialog.dialog('open')
 
     openDialogByKeybinding: (e) ->
-      if ZERO_KEYCODES.indexOf(e.keyCode) > -1 && e.altKey
+      if HELP_KEYCODES.indexOf(e.keyCode) > -1 && e.altKey
         this.openDialog()
 
   KeyboardShortcuts

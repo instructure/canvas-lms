@@ -126,7 +126,7 @@
   <% elsif @course_home_view == 'syllabus' %>
     <%= render :partial => 'assignments/syllabus_right_side', :locals => {:course_home => true} %>
   <% else %>
-    <% locals = {:title => t("Coming Up"), :display_count => 3, :period => "the next week", :contexts_to_link_to => @context, :upcoming => true} %>
+    <% locals = {:title => t("Coming Up"), :contexts_to_link_to => @context, :upcoming => true, :period => :one_week} %>
     <% if @current_user %>
       <% cache(safe_cache_key([@current_user, @contexts, 'course_upcoming_events' ])) do %>
         <%= render :partial => "shared/event_list", :object => @current_user.upcoming_events(:contexts => @contexts), :locals => locals %>
@@ -136,7 +136,7 @@
     <% end %>
   <% end %>
   <% if @show_recent_feedback %>
-    <%= render :partial => "shared/event_list", :object => @recent_feedback, :locals => {:title => t('titles.recent_feedback', "Recent Feedback"), :display_count => 3, :period => t('period_name', "the last 2 weeks"), :contexts_to_link_to => @context, :is_recent_feedback => true} %>
+    <%= render :partial => "shared/event_list", :object => @recent_feedback, :locals => {:title => t('titles.recent_feedback', "Recent Feedback"), :contexts_to_link_to => @context, :is_recent_feedback => true, :period => :two_weeks} %>
   <% end %>
 <% end %>
 
