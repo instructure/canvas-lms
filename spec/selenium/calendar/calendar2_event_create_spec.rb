@@ -32,6 +32,13 @@ describe "calendar2" do
         expect(fj('.event-details-content:visible')).to include_text('location title')
       end
 
+      it "should create an event with duplicates" do
+        event_name = 'event with duplicates'
+        create_middle_day_event(event_name, true, true, true)
+        fj('.fc-event:visible').click
+        expect(fj('.event-details-content:visible')).to include_text('location title')
+      end
+
       it 'should create an event with location name and address' do
         get "/calendar2"
         event_title = 'event title'
