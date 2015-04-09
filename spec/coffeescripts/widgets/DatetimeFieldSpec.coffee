@@ -301,16 +301,29 @@ define [
     equal @$field.data('time-minute'), '56'
     equal @$field.data('time-ampm'), 'pm'
 
-  # TODO: this isn't how I think it should be, but is how it was and I'm not
-  # changing it yet
-  test 'no change to time-* if blank or invalid', ->
+  test 'only sets time-* if for full datetime field', ->
+    @$field.removeData('time-hour')
+    @field.showDate = false
+    @field.updateData()
+    equal @$field.data('time-hour'), undefined
+    @field.allowTime = false
+    @field.updateData()
+    equal @$field.data('time-hour'), undefined
+
+  test 'clear time-* to null if blank', ->
     @field.blank = true
     @field.updateData()
-    equal @$field.data('time-hour'), '12'
-    @field.blank = false
+    equal @$field.data('time-hour'), null
+
+  test 'clear time-* to null if invalid', ->
     @field.invalid = true
     @field.updateData()
-    equal @$field.data('time-hour'), '12'
+    equal @$field.data('time-hour'), null
+
+  test 'clear time-* to null if not @showTime (midnight)', ->
+    @field.showTime = false
+    @field.updateData()
+    equal @$field.data('time-hour'), null
 
   module 'updateSuggest',
     setup: ->

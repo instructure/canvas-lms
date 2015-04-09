@@ -132,12 +132,17 @@ define [
         @$hiddenInput.val(@fudged)
 
       # date_fields and time_fields don't have timepicker data fields
-      unless @blank or @invalid
-        if @showDate and @showTime
-          @$field.data
-            'time-hour': tz.format(@datetime, "%-l")
-            'time-minute': tz.format(@datetime, "%M")
-            'time-ampm': tz.format(@datetime, "%P")
+      return unless @showDate and @allowTime
+      if @invalid or @blank or not @showTime
+        @$field.data
+          'time-hour': null
+          'time-minute': null
+          'time-ampm': null
+      else
+        @$field.data
+          'time-hour': tz.format(@datetime, "%-l")
+          'time-minute': tz.format(@datetime, "%M")
+          'time-ampm': tz.format(@datetime, "%P")
 
     updateSuggest: ->
       text = @formatSuggest()
