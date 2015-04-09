@@ -463,6 +463,14 @@ CanvasRails::Application.routes.draw do
 
     resources :collaborations
     get 'calendar' => 'calendars#show2', as: :old_calendar
+
+    resources :external_tools do
+      get :finished
+      get :resource_selection
+      collection do
+        get :retrieve
+      end
+    end
   end
 
   resources :accounts do

@@ -22,6 +22,8 @@ module Lti
                         end
                       when User
                         LtiOutbound::LTIUser.new
+                      else
+                        LtiOutbound::LTIContext.new
                     end
 
       lti_context.consumer_instance = consumer_instance
