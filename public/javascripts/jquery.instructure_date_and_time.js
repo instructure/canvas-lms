@@ -112,8 +112,14 @@ define([
   $.sameDate = function(d1, d2) {
     return tz.format(d1, '%F') == tz.format(d2, '%F');
   };
-  $.midnight = function(date) {
-    return date != null && tz.format(date, '%R') == '00:00';
+  $.midnight = function(date, options) {
+    if (date == null) return false;
+    var timezone = options && options.timezone;
+    if (typeof timezone == 'string' || timezone instanceof String) {
+      return tz.format(date, '%R', timezone) == '00:00';
+    } else {
+      return tz.format(date, '%R') == '00:00';
+    }
   };
   $.dateString = function(date, options) {
     if (date == null) return "";

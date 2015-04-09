@@ -680,8 +680,7 @@ define([
       if ((inputType == "radio" || inputType == 'checkbox') && !$input.attr('checked')) return;
       var val = $input.val();
       if ($input.hasClass('datetime_field_enabled')) {
-        var suggestText = $input.parent().children(".datetime_suggest").text();
-        if (suggestText) val = suggestText;
+        val = $input.data('iso8601');
       }
       try {
         if($input.data('rich_text')) {
@@ -843,7 +842,7 @@ define([
     if(options.date_fields) {
       $.each(options.date_fields, function(i, name) {
         var $item = $form.find("input[name='" + name + "']").filter(".datetime_field_enabled");
-        if($item.length && $item.parent().children(".datetime_suggest").hasClass('invalid_datetime')) {
+        if ($item.length && $item.data('invalid')) {
           if (!errors[name]) {
             errors[name] = [];
           }

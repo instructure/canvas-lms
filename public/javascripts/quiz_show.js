@@ -150,6 +150,8 @@ define([
         return false;
       });
 
+      var $lock_at = $(this).find('.datetime_field');
+
       $unlock_for_how_long_dialog.dialog({
         autoOpen: false,
         modal: true,
@@ -157,16 +159,16 @@ define([
         width: 400,
         buttons: {
           'Unlock' : function(){
-            var dateString = $(this).find('.datetime_suggest').text();
-
             $('#quiz_unlock_form')
               // append this back to the form since it got moved to be a child of body when we called .dialog('open')
               .append($(this).dialog('destroy'))
-              .find('#quiz_lock_at').val(dateString).end()
+              .find('#quiz_lock_at').val($lock_at.data('iso8601')).end()
               .submit();
           }
         }
-      }).find('.datetime_field').datetime_field();
+      });
+
+      $lock_at.datetime_field();
     });
 
     $('#lock_this_quiz_now_link').ifExists(function($link) {

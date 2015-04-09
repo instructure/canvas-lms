@@ -124,9 +124,12 @@ define [
       @updateAriaAlert()
 
     updateData: ->
+      iso8601 = @datetime?.toISOString() || ''
       @$field.data
         'unfudged-date': @datetime
         'date': @fudged
+        'iso8601': iso8601
+        'invalid': @invalid
 
       if @$hiddenInput
         @$hiddenInput.val(@fudged)

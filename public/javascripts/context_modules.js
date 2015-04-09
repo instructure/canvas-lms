@@ -651,8 +651,6 @@ define([
           data["context_module[completion_requirements][" + id + "][type]"] = $(this).find(".type").val();
           data["context_module[completion_requirements][" + id + "][min_score]"] = $(this).find(".min_score").val();
         });
-        var date = $.datetime.parse(data['context_module[unlock_at]']);
-        data['context_module[unlock_at]'] = date ? $.unfudgeDateForProfileTimezone(date).toISOString() : "";
         return data;
       },
       beforeSubmit: function(data) {

@@ -290,6 +290,10 @@ define [
     @field.updateData()
     equal +@$field.data('unfudged-date'), +moonwalk
 
+  test 'sets invalid field', ->
+    @field.updateData()
+    equal @$field.data('invalid'), false
+
   test 'sets value of hiddenInput, if present, to fudged time', ->
     @field.addHiddenInput()
     @field.updateData()

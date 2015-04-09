@@ -78,7 +78,6 @@ $(document).ready(function() {
     },
     beforeSubmit: function(data) {
       var $list = $(".email_channels");
-      var data = $(this).getFormData({object_name: 'communication_channel'});
       if($(this).attr('id') == "register_sms_number") {
         $list = $(".other_channels");
       }
