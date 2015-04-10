@@ -1,10 +1,10 @@
 require_relative "./diff_parser"
 module RuboCop::Canvas
   class Comments
-    def self.build(raw_diff_tree, cop_output)
+    def self.build(raw_diff_tree, cop_output, boyscout_mode = false)
       diff = DiffParser.new(raw_diff_tree)
       comments = self.new(diff)
-      comments.on_output(cop_output)
+      comments.on_output(cop_output, boyscout_mode)
     end
 
     attr_reader :diff
@@ -12,12 +12,12 @@ module RuboCop::Canvas
       @diff = diff
     end
 
-    def on_output(cop_output)
+    def on_output(cop_output, boyscout_mode = false)
       comments = []
       cop_output['files'].each do |file|
         path = file['path']
         file['offenses'].each do |offense|
-          if diff.relevant?(path, line_number(offense), severe?(offense))
+          if diff.relevant?(path, line_number(offense), boyscout_mode || severe?(offense))
             comments << transform_to_gergich_comment(path, offense)
           end
         end

@@ -56,9 +56,6 @@ Style/SpaceAroundEqualsInParameterDefault:
   Enabled: false
 Style/SingleSpaceBeforeFirstArg:
   Enabled: false
-Style/HashSyntax:
-  Enabled: true
-  UseHashRocketsWithSymbolValues: true
 Style/EmptyLinesAroundAccessModifier:
   Enabled: false
 Style/IfUnlessModifier:
@@ -107,4 +104,6 @@ RSpec/InstanceVariable:
 RSpec/ExampleWording:
   Enabled: false
 RSpec/DescribedClass:
+  Enabled: false
+Style/HashSyntax:
   Enabled: false

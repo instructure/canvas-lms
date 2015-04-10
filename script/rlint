@@ -70,6 +70,7 @@ if ENV['GERRIT_REFSPEC']
   end
 else
   heavy_mode = ARGV.include?("--heavy")
+  boyscout_mode = ARGV.include?("--boy-scout")
   #local run, just spit out everything wrong with these files to output
   env_sha = ENV['SHA']
   ruby_files = pick_ruby_files(env_sha)
@@ -80,7 +81,7 @@ else
     cli.run(ruby_files + ["--format", "json", "--out", ".rubocop-output.json"])
     results_json = JSON.parse(File.read(".rubocop-output.json"))
     diff = git_diff(env_sha)
-    comments = RuboCop::Canvas::Comments.build(diff, results_json)
+    comments = RuboCop::Canvas::Comments.build(diff, results_json, boyscout_mode)
     comments.each{ |comment| pretty_comment(comment) }
   end
 end
