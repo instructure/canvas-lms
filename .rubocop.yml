@@ -76,6 +76,10 @@ Style/MethodCallParentheses:
   Enabled: false
 Style/TrailingBlankLines:
   Enabled: false
+Style/IndentationConsistency:
+  Enabled: false
+Style/IndentationWidth:
+  Enabled: false
 
 # these need better configuration than the default:
 Style/AndOr:
