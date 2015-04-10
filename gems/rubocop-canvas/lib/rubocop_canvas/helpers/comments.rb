@@ -17,7 +17,7 @@ module RuboCop::Canvas
       cop_output['files'].each do |file|
         path = file['path']
         file['offenses'].each do |offense|
-          if diff.relevant?(path, line_number(offense))
+          if diff.relevant?(path, line_number(offense), severe?(offense))
             comments << transform_to_gergich_comment(path, offense)
           end
         end
@@ -34,6 +34,10 @@ module RuboCop::Canvas
       'error' => 'error',
       'fatal' => 'error'
     }.freeze
+
+    def severe?(offense)
+      %w(warning error fatal).include?(offense['severity'])
+    end
 
     def transform_to_gergich_comment(path, offense)
       {

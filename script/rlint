@@ -61,8 +61,19 @@ if ENV['GERRIT_REFSPEC']
     `gergich comment #{Shellwords.escape(comments.to_json)}`
   end
 else
+  heavy_mode = ARGV.include?("--heavy")
   #local run, just spit out everything wrong with these files to output
   env_sha = ENV['SHA']
   ruby_files = pick_ruby_files(env_sha)
-  cli.run(ruby_files)
+  if heavy_mode
+    cli.run(ruby_files)
+  else
+    cli.run(ruby_files + ["--format", "json", "--out", ".rubocop-output.json"])
+    results_json = JSON.parse(File.read(".rubocop-output.json"))
+    diff = git_diff(env_sha)
+    comments = RuboCop::Canvas::Comments.build(diff, results_json)
+    comments.each do |comment|
+      $stdout.printf("[%s] %s:%s => %s\n\n", comment[:severity], comment[:path], comment[:position], comment[:message])
+    end
+  end
 end

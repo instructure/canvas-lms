@@ -5,8 +5,14 @@ describe RuboCop::Canvas::Comments do
   it "picks out which comments are applicable" do
     output = TWO_FILE_OFFENSE_OUTPUT
     diff = {
-      'app/controllers/quizzes/quizzes_controller.rb' => [(1..3), (200..250)],
-      'app/controllers/application_controller.rb' => [(80..110)]
+      'app/controllers/quizzes/quizzes_controller.rb' => {
+         context: [(1..3), (200..250)],
+         change: []
+       },
+      'app/controllers/application_controller.rb' => {
+        context: [(80..110)],
+        change: []
+      }
     }
     parsed_diff = ::RuboCop::Canvas::DiffParser.new(diff, false)
     comments = described_class.new(parsed_diff)
@@ -15,7 +21,7 @@ describe RuboCop::Canvas::Comments do
         path: "app/controllers/application_controller.rb",
         position: 100,
         message: "Class definition is too long. [748/100]",
-        severity: "info"
+        severity: "error"
     }]
     expect(results).to eq(expected)
   end
@@ -50,7 +56,7 @@ index 00f8cde..087ac4a 100644
     diff = ::RuboCop::Canvas::DiffParser.new(raw_diff)
     comments = described_class.new(diff)
     results = comments.on_output(parsed_rubocop_output)
-    expect(results.length).to eq(3)
+    expect(results.length).to eq(1) # only grab the ones for touched lines
   end
 
 
@@ -102,12 +108,12 @@ index 00f8cde..087ac4a 100644
     "files" => [
       {
         "path" => "app/controllers/quizzes/quizzes_controller.rb","offenses" =>
-          [{"severity" => "convention","message" => "Class definition is too long. [748/100]",
+          [{"severity" => "fatal","message" => "Class definition is too long. [748/100]",
           "cop_name" => "Metrics/ClassLength","corrected" =>nil,"location"=>{"line"=>19,"column"=>1,"length"=>5}}]
       },
       {
         "path"=>"app/controllers/application_controller.rb","offenses"=>
-          [{"severity"=>"convention","message"=>"Class definition is too long. [748/100]",
+          [{"severity"=>"fatal","message"=>"Class definition is too long. [748/100]",
           "cop_name"=>"Metrics/ClassLength","corrected" => nil,"location"=>{"line"=>100,"column"=>1,"length"=>5}}]
       }
     ]
