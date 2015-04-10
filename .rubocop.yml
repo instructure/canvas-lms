@@ -74,6 +74,12 @@ Style/TrailingComma:
   Enabled: false
 Style/MethodCallParentheses:
   Enabled: false
+Style/TrailingBlankLines:
+  Enabled: false
+
+# these need better configuration than the default:
+Style/AndOr:
+  EnforcedStyle: conditionals
 
 # these don't make sense pre-Rails 4
 
