@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/outcome_common')
 
-describe "outcomes" do
+describe "outcomes", priority: 1 do
   include_examples "in-process server selenium tests"
   let(:who_to_login) { 'teacher' }
   let(:outcome_url) { "/courses/#{@course.id}/outcomes" }
@@ -30,6 +30,18 @@ describe "outcomes" do
 
       it "should validate mastery points" do
         should_validate_mastery_points
+      end
+
+      it "should_validate_calculation_method_dropdown", test_id: 162376 do
+        should_validate_calculation_method_dropdown
+      end
+
+      it "should validate decaying average", test_id: 162377 do
+        should_validate_decaying_average
+      end
+
+      it "should validate n mastery", test_id: 162378 do
+        should_validate_n_mastery
       end
 
       it "should require a title" do
@@ -99,37 +111,6 @@ describe "outcomes" do
         wait_for_ajaximations
 
         expect(f('#alignments').text).to match(/#{@rubric.title}/)
-      end
-    end
-  end
-
-  context "account outcomes" do
-    context "create/edit/delete outcome groups" do
-      context "account level", :priority => 2 do
-
-        let(:outcome_url) { "/accounts/self/outcomes" }
-        let(:who_to_login) { "admin" }
-        let(:account) { Account.first }
-
-        before(:each) do
-          course_with_admin_logged_in
-        end
-
-        it "should create an outcome group (root level)" do
-          should_create_an_outcome_group_root_level
-        end
-
-        it "should create a learning outcome with a new rating (nested)" do
-          should_create_a_learning_outcome_with_a_new_rating_nested
-        end
-
-        it "should edit an outcome group" do
-          should_edit_an_outcome_group
-        end
-
-        it "should delete an outcome group" do
-          should_delete_an_outcome_group
-        end
       end
     end
   end
