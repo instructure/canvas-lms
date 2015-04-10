@@ -23,6 +23,7 @@ module Quizzes::QuizQuestion::AnswerParsers
         fields = Quizzes::QuizQuestion::RawFields.new(answer)
         a = {
           comments: fields.fetch_with_enforced_length([:answer_comment, :comments]),
+          comments_html: fields.fetch_with_enforced_length([:answer_comment_html, :comments_html]),
           text: fields.fetch_any([:answer_text, :text]),
           weight: fields.fetch_any([:answer_weight, :weight]).to_i
         }

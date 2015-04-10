@@ -144,11 +144,8 @@
     <% end %>
     <% if show_comment %>
       <div class="quiz_comment <%= "empty" unless has_answer_comment %>">
-        <% if hash_get(answer, :comments_html).present? %>
-          <div class="answer_comment_html"><%= raw(hash_get(answer, :comments_html)) %></div>
-        <% else %>
-          <div class="answer_comment"><%= comment_get(answer, :comments) %></div>
-        <% end %>
+        <div class="answer_comment" <%= hidden(true) if hash_get(answer, :comments_html).present? %>><%= comment_get(answer, :comments) %></div>
+        <div class="answer_comment_html"><%= raw(hash_get(answer, :comments_html)) %></div>
       </div>
     <% end %>
 

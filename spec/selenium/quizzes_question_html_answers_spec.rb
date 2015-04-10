@@ -17,7 +17,7 @@ describe "quizzes question with html answers" do
   end
 
   def close_first_html_answer
-    f('.edit-html-done').click
+    f('.edit_html_done').click
   end
 
   it "should allow HTML answers for multiple choice" do

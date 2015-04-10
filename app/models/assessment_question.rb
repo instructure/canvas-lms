@@ -252,7 +252,8 @@ class AssessmentQuestion < ActiveRecord::Base
       :id, :regrade_option, :points_possible, :correct_comments, :incorrect_comments,
       :neutral_comments, :question_type, :question_name, :question_text, :answers,
       :formulas, :variables, :answer_tolerance, :formula_decimal_places,
-      :matching_answer_incorrect_matches, :matches
+      :matching_answer_incorrect_matches, :matches,
+      :correct_comments_html, :incorrect_comments_html, :neutral_comments_html
     )
 
     question = Quizzes::QuizQuestion::QuestionData.generate(data)

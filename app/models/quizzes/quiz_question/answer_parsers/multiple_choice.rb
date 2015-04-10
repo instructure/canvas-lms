@@ -26,10 +26,11 @@ module Quizzes::QuizQuestion::AnswerParsers
         id = id.to_i if id
         text = fields.fetch_with_enforced_length([:answer_text, :text])
         comments = fields.fetch_with_enforced_length([:answer_comment, :comments])
+        comments_html = fields.fetch_with_enforced_length([:answer_comment_html, :comments_html])
         weight = fields.fetch_any([:answer_weight, :weight]).to_f
         html = fields.sanitize(fields.fetch_any([:answer_html, :html]))
 
-        answer = Quizzes::QuizQuestion::AnswerGroup::Answer.new(id: id, text: text, html: html, comments: comments, weight: weight)
+        answer = Quizzes::QuizQuestion::AnswerGroup::Answer.new(id: id, text: text, html: html, comments: comments, comments_html: comments_html, weight: weight)
         answer_group.taken_ids << answer.set_id(answer_group.taken_ids)
         answer
       end

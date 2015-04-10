@@ -233,13 +233,13 @@ shared_examples_for "quizzes selenium tests" do
   def set_answer_comment(answer_num, text)
     driver.execute_script("$('.question_form:visible .form_answers .answer:eq(#{answer_num}) .comment_focus').click()")
     wait_for_ajaximations
-    driver.execute_script("$('.question_form:visible .form_answers .answer:eq(#{answer_num}) .answer_comment_box').val('#{text}')\;")
+    type_in_tiny(".question_form:visible .form_answers .answer:eq(#{answer_num}) .answer_comments textarea", text)
   end
 
   def set_question_comment(selector, text)
     driver.execute_script("$('.question_form:visible #{selector} .comment_focus').click()")
     wait_for_ajaximations
-    driver.execute_script("$('.question_form:visible #{selector} .comments').val('#{text}')\;")
+    type_in_tiny(".question_form:visible #{selector} textarea", text)
   end
 
   def hover_first_question
