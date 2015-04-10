@@ -79,6 +79,8 @@ Style/MethodCallParentheses:
 
 Rails/FindBy:
   Enabled: false
+Rails/ActionFilter:
+  Enabled: false
 
 # Things we may want to tighten down later
 Metrics/LineLength:
