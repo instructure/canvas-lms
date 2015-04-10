@@ -332,6 +332,18 @@ describe GradebooksController do
           Enrollment.expects(:recompute_final_score).never
           get 'show', :course_id => @course.id, :init => 1, :assignments => 1, :format => 'csv'
         end
+        it "should get all the expected datas even with multibytes characters", :focus => true do
+          @course.assignments.create(:title => "Déjà vu")
+          get 'show', :course_id => @course.id, :init => 1, :assignments => 1, :format => 'csv'
+          raw_csv = @course.gradebook_to_csv({
+            :user => @teacher,
+            :include_priors => false,
+            :include_sis_id => true
+          })
+
+          downloaded_body = response.body.mb_chars.limit(response.header['Content-Length'].to_i)
+          expect(downloaded_body).to eq(raw_csv)
+        end
       end
 
       context "with teacher that prefers Grid View" do
