@@ -47,7 +47,7 @@ class BigBlueButtonConference < WebConference
       :moderatorPW => settings[:admin_key],
       :logoutURL => (settings[:default_return_url] || "http://www.instructure.com"),
       :record => settings[:record] ? "true" : "false",
-      :welcome => settings[:record] ? t(:conference_is_recorded, "This conference is being recorded.") : ""
+      :welcome => settings[:record] ? t(:conference_is_recorded, "This conference may be recorded.") : ""
     }) or return nil
     @conference_active = true
     save
@@ -81,6 +81,23 @@ class BigBlueButtonConference < WebConference
     end
   end
 
+  def delete_all_recordings
+    fetch_recordings.map do |recording|
+      delete_recording recording[:recordID]
+    end
+  end
+
+  def close
+    end_meeting
+    super
+  end
+
+  def destroy
+    end_meeting
+    delete_all_recordings
+    super
+  end
+
   private
 
   def retouch?
@@ -103,6 +120,14 @@ class BigBlueButtonConference < WebConference
       :meetingID => conference_key,
       :password => settings[(type == :user ? :user_key : :admin_key)],
       :userID => user.id
+  end
+
+  def end_meeting
+    response = send_request(:end, {
+      :meetingID => conference_key,
+      :password => settings[(type == :user ? :user_key : :admin_key)],
+      })
+    response[:ended] if response
   end
 
   def fetch_recordings

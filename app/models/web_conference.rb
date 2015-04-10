@@ -386,12 +386,12 @@ class WebConference < ActiveRecord::Base
     can :initiate
 
     given { |user, session| self.context.grants_all_rights?(user, session, :manage_content, :create_conferences) }
-    can :read and can :join and can :initiate and can :delete
+    can :read and can :join and can :initiate and can :create and can :delete and can :close
 
     given { |user, session| context.grants_all_rights?(user, session, :manage_content, :create_conferences) && !finished? }
     can :update
 
-    given { |user, session| context.grants_all_rights?(user, session, :manage_content, :create_conferences) && long_running? && active? }
+    given { |user, session| context.grants_all_rights?(user, session, :manage_content, :create_conferences) && active? }
     can :close
   end
 
