@@ -4,7 +4,7 @@ group :development do
   gem 'rb-inotify', '~>0.9.0', require: false
   gem 'rb-fsevent', require: false
   gem 'rb-fchange', require: false
-  gem 'rainbow', require: false
+  gem 'colorize', require: false
 
   gem "letter_opener"
   gem 'spring', '>= 1.3.0'

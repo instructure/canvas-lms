@@ -46,6 +46,14 @@ def get_offenses_json(cli, env_sha)
   results_json = JSON.parse(json)
 end
 
+def pretty_comment(comment)
+  message = ""
+  message += "[#{comment[:severity]}]".colorize(:yellow)
+  message += " #{comment[:path].colorize(:light_blue)}:#{comment[:position]}"
+  message += " => #{comment[:message].colorize(:green)}"
+  puts message
+end
+
 require 'rubocop_canvas'
 
 cli = RuboCop::CLI.new
@@ -68,12 +76,11 @@ else
   if heavy_mode
     cli.run(ruby_files)
   else
+    require 'colorize'
     cli.run(ruby_files + ["--format", "json", "--out", ".rubocop-output.json"])
     results_json = JSON.parse(File.read(".rubocop-output.json"))
     diff = git_diff(env_sha)
     comments = RuboCop::Canvas::Comments.build(diff, results_json)
-    comments.each do |comment|
-      $stdout.printf("[%s] %s:%s => %s\n\n", comment[:severity], comment[:path], comment[:position], comment[:message])
-    end
+    comments.each{ |comment| pretty_comment(comment) }
   end
 end

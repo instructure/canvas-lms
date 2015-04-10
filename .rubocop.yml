@@ -94,10 +94,14 @@ Rails/ActionFilter:
   Enabled: false
 
 # Things we may want to tighten down later
+Metrics/AbcSize:
+  Max: 20
 Metrics/LineLength:
   Max: 120
 Metrics/MethodLength:
   Max: 16
+Metrics/CyclomaticComplexity:
+  Max: 10
 RSpec/InstanceVariable:
   Enabled: false
 RSpec/ExampleWording:
