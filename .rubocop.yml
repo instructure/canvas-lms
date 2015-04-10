@@ -57,7 +57,8 @@ Style/SpaceAroundEqualsInParameterDefault:
 Style/SingleSpaceBeforeFirstArg:
   Enabled: false
 Style/HashSyntax:
-  Enabled: false
+  Enabled: true
+  UseHashRocketsWithSymbolValues: true
 Style/EmptyLinesAroundAccessModifier:
   Enabled: false
 Style/IfUnlessModifier:
