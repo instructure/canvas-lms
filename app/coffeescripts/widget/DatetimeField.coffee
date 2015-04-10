@@ -174,12 +174,15 @@ define [
 
     updateSuggest: ->
       text = @formatSuggest()
+      screenreaderSuggest = text
       if @$courseSuggest
         courseText = @formatSuggestCourse()
         if courseText
           text = @localLabel + text
           courseText = @courseLabel + courseText
+          screenreaderSuggest = "#{text}\n#{courseText}"
         @$courseSuggest.text(courseText)
+      @$field.data('screenreader-suggest', screenreaderSuggest)
       @$suggest
         .toggleClass('invalid_datetime', @invalid)
         .text(text)

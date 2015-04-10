@@ -372,6 +372,21 @@ define [
     @field.updateSuggest()
     ok @field.$suggest.hasClass('invalid_datetime')
 
+  test 'puts suggest text in screenreader-suggest data attribute', ->
+    value = 'suggested value'
+    @field.formatSuggest = -> value
+    @field.updateSuggest()
+    equal @$field.data('screenreader-suggest'), value
+
+  test 'puts combined suggest text in screenreader-suggest when there is course suggest text', ->
+    @field.$courseSuggest = $('<div>')
+    value = 'suggested value'
+    courseValue = 'suggested course value'
+    @field.formatSuggest = -> value
+    @field.formatSuggestCourse = -> courseValue
+    @field.updateSuggest()
+    equal @$field.data('screenreader-suggest'), "Local: #{value}\nCourse: #{courseValue}"
+
   module 'updateAriaAlert',
     setup: ->
       @clock = sinon.useFakeTimers()
