@@ -13,32 +13,16 @@ define [
           clearTimeout timeoutId
           @focus()
         focusout: => timeoutId = setTimeout((=> @$row.removeClass('focused')), 50)
-      @inputs = {}
-      unless @locked
-        @$row.find('.date_field').date_field()
-        @$row.find('.time_field').time_field()
-      $.each @inputNames, (i, inputName) =>
-        @inputs[inputName] = {}
-        @inputs[inputName].$el = @$row.find("input[name='#{inputName}']").change =>
-          @handleInputChange(inputName)
-        @updateModel(inputName)
-        @inputs[inputName].valid = true if @locked
+
+      @$date = @$row.find("input[name='date']")
+      @$start_time = @$row.find("input[name='start_time']")
+      @$end_time = @$row.find("input[name='end_time']")
+
+      @$date.date_field().change(@validate)
+      @$start_time.time_field().change(@validate)
+      @$end_time.time_field().change(@validate)
+
       @$row.find('.delete-block-link').click(@remove)
-
-    inputNames: ['date', 'start_time', 'end_time']
-
-    updateModel: (inputName) ->
-      @inputs[inputName].val = $.trim(@inputs[inputName].$el.val())
-
-    handleInputChange: (inputName) ->
-      @updateModel(inputName)
-      @validateField(inputName)
-      @validate()
-      return
-
-    updateDom: (inputName, val) ->
-      @inputs[inputName].val = val
-      @inputs[inputName].$el.val(val)
 
     remove: (event) =>
       event?.preventDefault()
@@ -55,49 +39,67 @@ define [
       if @$row.is ':last-child'
         @$row.parents('.time-block-list-body-wrapper').scrollTop(9999)
 
-    validateField: (inputName) ->
-      $suggest = @inputs[inputName].$el.closest('td').find('.datetime_suggest')
-      invalidDate = $suggest.hasClass('invalid_datetime')
-      @updateDom(inputName, $suggest.text()) unless invalidDate
-      @inputs[inputName].$el.toggleClass 'error', invalidDate
-      @inputs[inputName].valid = !invalidDate
+    validate: =>
+      # clear previous errors
+      @$date.data('associated_error_box')?.remove()
+      @$date.toggleClass 'error', false
+      @$start_time.data('associated_error_box')?.remove()
+      @$start_time.toggleClass 'error', false
+      @$end_time.data('associated_error_box')?.remove()
+      @$end_time.toggleClass 'error', false
 
-    validate: ->
+      # for locked row, all values are valid, regardless of actual value
       return true if @locked
-      valid = true
-      for own name, input of @inputs
-        input.$el.data('associated_error_box')?.remove()
-        valid = false unless @validateField(name)
-      if valid && !@blank()
-        if @validDate() && @inputs.end_time.val && @endAt() < new Date()
-          valid = false
-          @inputs.end_time.$el
-            .addClass('error')
-            .errorBox(I18n.t 'ends_in_past_error', 'You cannot create an appointment slot that ends in the past')
-        # make sure start is before end
-        if @inputs.start_time.val && @inputs.end_time.val
-          testDate = @validDate() || 'Today'
-          if @timeToDate(testDate, @inputs.end_time.val) <= @timeToDate(testDate, @inputs.start_time.val)
-            valid = false
-            @inputs.start_time.$el
-              .addClass('error')
-              .errorBox(I18n.t 'end_before_start_error', 'Start time must be before end time')
-      @blank() || valid
+
+      # initialize field validity by parse validity
+      dateValid = not @$date.data('invalid')
+      startValid = not @$start_time.data('invalid')
+      endValid = not @$end_time.data('invalid')
+
+      # also make sure start is before end
+      start = @startAt()
+      end = @endAt()
+      if start and end and end <= start
+        @$start_time.errorBox(I18n.t 'end_before_start_error', 'Start time must be before end time')
+        startValid = false
+
+      # and end is in the future
+      if end and end < $.fudgeDateForProfileTimezone(new Date())
+        @$end_time.errorBox(I18n.t 'ends_in_past_error', 'You cannot create an appointment slot that ends in the past')
+        endValid = false
+
+      # toggle error class on each as appropriate
+      @$date.toggleClass 'error', not dateValid
+      @$end_time.toggleClass 'error', not endValid
+      @$start_time.toggleClass 'error', not startValid
+
+      # valid if all are valid
+      return dateValid and startValid and endValid
 
     timeToDate: (date, time) ->
-      Date.parse date+' '+time
-
-    endAt: ->
-      @timeToDate(@inputs.date.val, @inputs.end_time.val) if @validDate()
+      return unless date and time
+      date = $.fudgeDateForProfileTimezone(date)
+      time = $.fudgeDateForProfileTimezone(time)
+      time.setFullYear(date.getFullYear())
+      time.setMonth(date.getMonth())
+      time.setDate(date.getDate())
+      return time
 
     startAt: ->
-      @timeToDate(@inputs.date.val, @inputs.start_time.val) if @validDate()
+      date = @$date.data('unfudged-date')
+      time = @$start_time.data('unfudged-date')
+      @timeToDate(date, time)
 
-    validDate: ->
-      @inputs.date.val if @inputs.date.val && @inputs.date.valid
+    endAt: ->
+      date = @$date.data('unfudged-date')
+      time = @$end_time.data('unfudged-date')
+      @timeToDate(date, time)
 
     getData: ->
       [@startAt(), @endAt(), !!@locked]
 
     blank: ->
-      @inputs.date.val is '' and @inputs.start_time.val is '' and @inputs.end_time.val is ''
+      @$date.data('blank') and @$start_time.data('blank') and @$end_time.data('blank')
+
+    incomplete: ->
+      not @blank() and (@$date.data('blank') or @$start_time.data('blank') or @$end_time.data('blank'))

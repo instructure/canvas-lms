@@ -294,6 +294,10 @@ define [
     @field.updateData()
     equal @$field.data('invalid'), false
 
+  test 'sets blank field', ->
+    @field.updateData()
+    equal @$field.data('blank'), false
+
   test 'sets value of hiddenInput, if present, to fudged time', ->
     @field.addHiddenInput()
     @field.updateData()

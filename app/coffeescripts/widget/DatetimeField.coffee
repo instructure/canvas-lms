@@ -153,6 +153,7 @@ define [
         'unfudged-date': @datetime
         'date': @fudged
         'iso8601': iso8601
+        'blank': @blank
         'invalid': @invalid
 
       if @$hiddenInput
