@@ -42,8 +42,8 @@ end
 
 def get_offenses_json(cli, env_sha)
   ruby_files = pick_ruby_files(env_sha)
-  cli.run(ruby_files + ["--format", "json", "--out", "rubocop.json"])
-  results_json = JSON.parse(File.read("rubocop.json"))
+  json = `rubocop #{ruby_files.join(' ')} --format json`
+  results_json = JSON.parse(json)
 end
 
 require 'rubocop_canvas'
@@ -54,12 +54,11 @@ if ENV['GERRIT_REFSPEC']
     require 'rubocop_canvas/helpers/comments'
     require 'shellwords'
     rev = ENV['GERRIT_REFSPEC']
-    env_sha = `git fetch origin $GERRIT_REFSPEC && git rev-parse FETCH_HEAD`
+    env_sha = `git fetch origin #{rev} && git rev-parse FETCH_HEAD`
     results_json = get_offenses_json(cli, env_sha)
     diff = git_diff(env_sha)
-    RuboCop::Canvas::Comments.build(diff, results_json).each do |comment|
-      `gergich comment #{Shellwords.escape(comment.to_json)}`
-    end
+    comments = RuboCop::Canvas::Comments.build(diff, results_json)
+    `gergich comment #{Shellwords.escape(comments.to_json)}`
   end
 else
   #local run, just spit out everything wrong with these files to output
