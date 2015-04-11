@@ -90,17 +90,26 @@ define [
 
 
 
-  test 'clicking the info button should render out the info panel', ->
+  asyncTest 'clicking the info button should render out the info panel', ->
+    expect(1)
     @runRouter ->
       $('.ef-file-preview-header-info').click()
-      ok $('.ef-file-preview-information-container').length, 'The info panel did not show'
+      setTimeout ()->
+        start()
+        ok $('.ef-file-preview-information-container').length, 'The info panel did not show'
 
-  test 'clicking the info button after the panel has been opened should hide the info panel', ->
+  asyncTest 'clicking the info button after the panel has been opened should hide the info panel', ->
+    expect(2)
     @runRouter ->
       $('.ef-file-preview-header-info').click()
-      ok $('.ef-file-preview-information-container').length, 'The info panel did not show'
-      $('.ef-file-preview-header-info').click()
-      ok !$('.ef-file-preview-information-container').length, 'The info panel did not close'
+      setTimeout ()->
+        start()
+        ok $('.ef-file-preview-information-container').length, 'The info panel did not show'
+        stop()
+        $('.ef-file-preview-header-info').click()
+        setTimeout ()->
+          start()
+          ok !$('.ef-file-preview-information-container').length, 'The info panel did not close'
 
   test 'opening the preview for one file should show navigation buttons for the previous and next files in the current folder', ->
     @runRouter ->
