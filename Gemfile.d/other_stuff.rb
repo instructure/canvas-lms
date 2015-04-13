@@ -3,17 +3,16 @@ if CANVAS_RAILS3
   gem 'rails', '3.2.21', github: 'rails/rails', branch: '3-2-stable', ref: 'b344986bc3d94ca7821fc5e0eef1874882ac6cbb'
   gem 'rack', '1.4.5'
   gem 'builder', '3.0.0'
-  gem 'tzinfo', '0.3.39'
   gem 'routing_concerns', '0.1.0'
   gem 'strong_parameters', '0.2.3'
 else
   gem 'rails', '4.0.12'
   gem 'rack', '1.5.2'
   gem 'builder', '3.1.4'
-  gem 'tzinfo', '0.3.39'
   gem 'protected_attributes', '1.0.8'
   gem 'rails-observers', '0.1.2'
 end
+gem 'tzinfo', '0.3.43'
 gem 'encrypted_cookie_store-instructure', '1.1.10', require: 'encrypted_cookie_store'
 gem 'active_model_serializers', '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
