@@ -4,7 +4,7 @@ module Autoextend
       if block
         block.call(klass)
       else
-        klass.send(method, Object.const_get(module_name.to_s, false))
+        klass.send(method, Autoextend.const_get(module_name.to_s))
       end
     end
   end
@@ -50,6 +50,25 @@ module Autoextend
 
   def self.included(klass)
     klass.extend(ClassMethods)
+  end
+
+  def self.const_defined?(class_name)
+    if RUBY_VERSION >= '2.0.0'
+      Object.const_defined?(class_name, false)
+    else
+      class_name.to_s.split("::").inject(Object) do |parent, name|
+        return false unless parent.const_defined?(name, false)
+        parent.const_get(name, false)
+      end
+    end
+  end
+
+  def self.const_get(class_name)
+    if RUBY_VERSION >= '2.0.0'
+      Object.const_get(class_name, false)
+    else
+      class_name.to_s.split("::").inject(Object) { |parent, name| parent.const_get(name, false) }
+    end
   end
 
   module ClassMethods
@@ -138,8 +157,8 @@ module Autoextend::ObjectMethods
     klass_extensions = Autoextend.extensions[klass_name.to_sym] ||= []
     klass_extensions << (extension = Autoextend::Extension.new(module_name, method, block))
     # immediately extend the class if it's already defined
-    if (Object.const_defined?(klass_name.to_s, false))
-      extension.extend(Object.const_get(klass_name.to_s, false))
+    if (Autoextend.const_defined?(klass_name.to_s))
+      extension.extend(Autoextend.const_get(klass_name.to_s))
     end
     nil
   end

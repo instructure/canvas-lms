@@ -13,7 +13,7 @@ describe Autoextend::ObjectMethods do
 
   it "should autoextend a class afterwards" do
     module AutoextendSpec::MyExtension; end
-    autoextend_class(:"AutoextendSpec::Class", :"AutoextendSpec::MyExtension")
+    autoextend_class(:"AutoextendSpec::Class", :"AutoextendSpec::MyExtension", :include)
     defined?(AutoextendSpec::Class).must_equal nil
     class AutoextendSpec::Class; end
     AutoextendSpec::Class.ancestors.must_include AutoextendSpec::MyExtension
@@ -22,7 +22,7 @@ describe Autoextend::ObjectMethods do
   it "should autoextend an already defined class" do
     class AutoextendSpec::Class; end
     module AutoextendSpec::MyExtension; end
-    autoextend_class(:"AutoextendSpec::Class", :"AutoextendSpec::MyExtension")
+    autoextend_class(:"AutoextendSpec::Class", :"AutoextendSpec::MyExtension", :include)
     AutoextendSpec::Class.ancestors.must_include AutoextendSpec::MyExtension
   end
 
