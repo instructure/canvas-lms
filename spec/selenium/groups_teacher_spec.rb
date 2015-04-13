@@ -56,5 +56,40 @@ describe "new groups" do
       expect(f('.group-summary')).to include_text("1 student")
       expect(f('.group-user-name')).to include_text(@student.name)
     end
+
+    it "should allow teachers to move a student to a different group", :priority => "1", :test_id => 94157 do
+      seed_users(1)
+      # Creates 1 groupset and 2 groups within it
+      seed_groups(1,2)
+      # Add seeded student to first seeded group
+      @testgroup[0].add_user @student
+      @testgroup[0].save!
+
+      get "/courses/#{@course.id}/groups"
+
+      # Toggles the first group collapse arrow to see the student
+      fj('.toggle-group :contains("Test Group 1")').click
+      wait_for_ajaximations
+
+      # Verifies the student is in their group
+      expect(f('.group-user')).to include_text(@student.name)
+
+      # Moves the student
+      f('.group-user-actions').click
+      wait_for_ajaximations
+      f('.edit-group-assignment').click
+      wait_for_ajaximations
+      click_option('.single-select', "#{@testgroup[1].name}")
+      f('.set-group').click
+      wait_for_ajaximations
+
+      # Verifies the student count updates
+      expect(ff('.group-summary')[1]).to include_text("1 student")
+
+      # Verifies student is within new group
+      fj('.toggle-group :contains("Test Group 2")').click
+      wait_for_ajaximations
+      expect(f('.group-user')).to include_text(@student.name)
+    end
   end
 end
