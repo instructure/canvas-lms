@@ -1,5 +1,8 @@
 Lint/FreezeConstants:
-  enabled: true
+  Enabled: true
+
+Rails/SmartTimeZone:
+  Enabled: true
 
 Migration/ConcurrentIndex: &Migration
   Enabled: true

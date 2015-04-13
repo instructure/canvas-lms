@@ -8,6 +8,7 @@ require 'rubocop_canvas/helpers/comments'
 require 'rubocop_canvas/helpers/diff_parser'
 
 require 'rubocop_canvas/cops/lint/freeze_constants'
+require 'rubocop_canvas/cops/rails/smart_time_zone'
 require 'rubocop_canvas/cops/datafixup/find_ids'
 require 'rubocop_canvas/cops/migration/concurrent_index'
 require 'rubocop_canvas/cops/migration/primary_key'
