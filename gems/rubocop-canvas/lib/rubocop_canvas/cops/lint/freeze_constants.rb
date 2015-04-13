@@ -14,6 +14,7 @@ module RuboCop
           elsif node.type == :array || node.type == :hash
             mark_offense!(node) unless safe_at_this_level
           end
+          return if node.type == :block
           check_children(node, safe_at_next_level)
         end
 

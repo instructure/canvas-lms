@@ -64,4 +64,21 @@ describe RuboCop::Cop::Lint::FreezeConstants do
     })
     expect(cop.offenses.size).to eq(0)
   end
+
+  it "isn't offended by non-array/hash structures" do
+    inspect_source(cop, %{
+      module Autoextend
+        Extension = Struct.new(:module_name, :method, :block) do
+          def extend(klass)
+            if block
+              block.call(klass)
+            else
+              klass.send(method, Autoextend.const_get(module_name.to_s))
+            end
+          end
+        end
+      end
+    })
+    expect(cop.offenses.size).to eq(0)
+  end
 end
