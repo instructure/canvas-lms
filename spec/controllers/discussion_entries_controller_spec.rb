@@ -243,8 +243,7 @@ describe DiscussionEntriesController do
       topic_with_media_reply
       @topic.update_attribute(:podcast_has_student_posts, true)
 
-      @a = @course.attachments.create!(:uploaded_data => default_uploaded_data)
-      @a.content_type = "video/mp4"
+      @a = attachment_model(:context => @course, :filename => 'test.mp4', :content_type => 'video')
       @a.media_entry_id = @mo1.media_id
       @a.save!
       @topic.discussion_entries.create!(:user => @student, :message => " /courses/#{@course.id}/files/#{@a.id}/download ")
@@ -255,7 +254,8 @@ describe DiscussionEntriesController do
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
       expect(rss.items.length).to eql(1)
-      expect(rss.items.first.enclosure.url).to end_with("courses/#{@course.id}/files/#{@a.id}/download?verifier=#{@a.uuid}")
+      expected_url = "courses/#{@course.id}/files/#{@a.id}/download.mp4?verifier=#{@a.uuid}"
+      expect(rss.items.first.enclosure.url).to end_with(expected_url)
     end
 
     it "should include student entries if enabled" do
@@ -269,7 +269,8 @@ describe DiscussionEntriesController do
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
       expect(rss.items.length).to eql(1)
-      expect(rss.items.first.enclosure.url).to end_with("courses/#{@course.id}/media_download?type=mp4&entryId=#{@mo1.media_id}&redirect=1")
+      expected_url = "courses/#{@course.id}/media_download.mp4?type=mp4&entryId=#{@mo1.media_id}&redirect=1"
+      expect(rss.items.first.enclosure.url).to end_with(expected_url)
       expect(assigns[:discussion_entries]).not_to be_empty
       expect(assigns[:discussion_entries][0]).to eql(@entry)
     end

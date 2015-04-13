@@ -1096,7 +1096,9 @@ class DiscussionTopic < ActiveRecord::Base
       item.enclosure
       if elem.is_a?(Attachment)
         item.guid.content = link + "/#{elem.uuid}"
-        item.enclosure = RSS::Rss::Channel::Item::Enclosure.new("http://#{HostUrl.context_host(elem.context)}/#{elem.context_url_prefix}/files/#{elem.id}/download?verifier=#{elem.uuid}", elem.size, elem.content_type)
+        url = "http://#{HostUrl.context_host(elem.context)}/#{elem.context_url_prefix}"\
+          "/files/#{elem.id}/download#{elem.extension}?verifier=#{elem.uuid}"
+        item.enclosure = RSS::Rss::Channel::Item::Enclosure.new(url, elem.size, elem.content_type)
       elsif elem.is_a?(MediaObject)
         item.guid.content = link + "/#{elem.media_id}"
         details = elem.podcast_format_details
@@ -1104,7 +1106,9 @@ class DiscussionTopic < ActiveRecord::Base
         content_type = 'audio/mpeg' if elem.media_type == 'audio'
         size = details[:size].to_i.kilobytes
         ext = details[:extension] || details[:fileExt]
-        item.enclosure = RSS::Rss::Channel::Item::Enclosure.new("http://#{HostUrl.context_host(elem.context)}/#{elem.context_url_prefix}/media_download?type=#{ext}&entryId=#{elem.media_id}&redirect=1", size, content_type)
+        url = "http://#{HostUrl.context_host(elem.context)}/#{elem.context_url_prefix}"\
+          "/media_download.#{ext}?type=#{ext}&entryId=#{elem.media_id}&redirect=1"
+        item.enclosure = RSS::Rss::Channel::Item::Enclosure.new(url, size, content_type)
       end
       item
     end.compact
