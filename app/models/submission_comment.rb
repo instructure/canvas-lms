@@ -103,7 +103,8 @@ class SubmissionComment < ActiveRecord::Base
     given { |user, session|
       !self.anonymous? ||
         self.author == user ||
-        self.submission.assignment.context.grants_right?(user, session, :view_all_grades)
+        self.submission.assignment.context.grants_right?(user, session, :view_all_grades) ||
+        self.submission.assignment.context.grants_right?(self.author, session, :view_all_grades)
     }
     can :read_author
   end

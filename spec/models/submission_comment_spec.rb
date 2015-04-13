@@ -193,6 +193,11 @@ This text has a http://www.google.com link in it...
           author: @student2,
           comment: "My peer review comment."
         })
+
+        @teacher_comment = @submission.add_comment({
+          author: @teacher,
+          comment: "My teacher review comment."
+        })
       end
 
       it "should mark submission comment as anonymous" do
@@ -205,6 +210,10 @@ This text has a http://www.google.com link in it...
 
       it "should allow teacher to see reviewer name" do
         expect(@reviewer_comment.grants_right?(@teacher, :read_author)).to be_truthy
+      end
+
+      it "should allow reviewed to see a teacher comment" do
+        expect(@teacher_comment.grants_right?(@student1, :read_author)).to be_truthy
       end
     end
   end
