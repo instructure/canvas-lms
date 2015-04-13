@@ -155,5 +155,21 @@ describe RubricAssessment do
         expect(@assessment.grants_right?(@teacher, :read_assessor)).to be_truthy
       end
     end
+
+    describe "#considered_anonymous?" do
+      let_once(:assessment) {
+        RubricAssessment.create!({
+          artifact: @assignment.find_or_create_submission(@student),
+          assessment_type: 'peer_review',
+          assessor: student_in_course(active_all: true).user,
+          rubric: @rubric,
+          user: @student
+        })
+      }
+
+      it "should not blow up without a rubric_association" do
+        expect{assessment.considered_anonymous?}.not_to raise_error
+      end
+    end
   end
 end
