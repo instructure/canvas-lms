@@ -706,6 +706,7 @@ define([
         }
         var rubric = data.rubric;
         rubric.rubric_association_id = data.rubric_association.id;
+        rubric.use_for_grading = data.rubric_association.use_for_grading;
         rubric.permissions = rubric.permissions || {};
         if(data.rubric_association.permissions) {
           rubric.permissions.update_association = data.rubric_association.permissions.update;
@@ -792,6 +793,7 @@ define([
         var rubric = data.rubric;
         $rubric.loadingImage('remove');
         rubric.rubric_association_id = data.rubric_association.id;
+        rubric.use_for_grading = data.rubric_association.use_for_grading;
         rubric.permissions = rubric.permissions || {};
         if(data.rubric_association.permissions) {
           rubric.permissions.update_association = data.rubric_association.permissions.update;
