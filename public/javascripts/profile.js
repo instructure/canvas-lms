@@ -47,7 +47,7 @@ define([
       .find(":text:first").focus().select();
   return false;
   });
-  
+
   $profile_table.find(".cancel_button").click(function(event) {
     $edit_settings_link.show();
     $profile_table
@@ -56,7 +56,7 @@ define([
       .find("#change_password_checkbox").attr('checked', false);
     return false;
   });
-  
+
   $profile_table.find("#change_password_checkbox")
     .change(function(event) {
       if(!$(this).attr('checked')) {
@@ -68,7 +68,7 @@ define([
     })
     .attr('checked', false)
     .change();
-    
+
   $update_profile_form
     .attr('method', 'PUT')
     .formSubmit({
@@ -123,17 +123,20 @@ define([
       $update_profile_form.find(".more_options_row").show();
       return false;
     });
-    
+
   $("#default_email_id").change(function() {
     if($(this).val() == "new") {
       $(".add_email_link:first").click();
     }
   });
-  
+
   $("#unregistered_services li.service").click(function(event) {
     event.preventDefault();
     $("#" + $(this).attr('id') + "_dialog").dialog({
-      width: 350
+      width: 350,
+      open: function(){
+        $(this).dialog("widget").find('a').focus()
+      }
     });
   });
   $(".create_user_service_form").formSubmit({
@@ -242,7 +245,7 @@ define([
   $("#token_details_dialog .regenerate_token").click(function() {
     var result = confirm(I18n.t('confirms.regenerate_token', "Are you sure you want to regenerate this token?  Anything using this token will have to be updated."));
     if(!result) { return; }
-    
+
     var $dialog = $("#token_details_dialog");
     var $token = $dialog.data('token');
     var url = $dialog.data('token_url');
@@ -297,7 +300,7 @@ define([
           .find(".results,.loading_message").hide();
       });
     }
-    
+
   });
   $(".add_access_token_link").click(function(event) {
     event.preventDefault();
