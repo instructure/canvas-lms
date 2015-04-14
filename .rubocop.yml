@@ -80,8 +80,20 @@ Style/IndentationWidth:
   Enabled: false
 Style/AlignParameters:
   Enabled: false
+Style/RescueModifier:
+  Severity: warning
+
+# Rails style changes
 Rails/TimeZone:
   Enabled: false
+
+# Lint changes
+Lint/AmbiguousRegexpLiteral:
+  Severity: convention
+
+# Performance changes
+Performance/Detect:
+  Severity: warning
 
 # these need better configuration than the default:
 Style/AndOr:
@@ -96,7 +108,7 @@ Rails/ActionFilter:
 
 # Things we may want to tighten down later
 Metrics/AbcSize:
-  Max: 20
+  Enabled: false
 Metrics/LineLength:
   Max: 120
 Metrics/MethodLength:
