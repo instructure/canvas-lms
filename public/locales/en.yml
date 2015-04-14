@@ -4869,10 +4869,6 @@ en:
       - October
       - November
       - December
-    order: 
-      - !ruby/symbol year
-      - !ruby/symbol month
-      - !ruby/symbol day
   date_error_7b38f8ff: "Date Error"
   dates: 
     no_date: "No Date"
