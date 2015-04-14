@@ -44,7 +44,7 @@ describe Attachments::Verification do
         id: attachment.global_id, user_id: student.global_id, ctx: course.asset_string
       }, nil).returns("thetoken")
 
-      verifier = v.verifier_for_user(student, course.asset_string)
+      verifier = v.verifier_for_user(student, context: course.asset_string)
       expect(verifier).to eq("thetoken")
     end
 
@@ -53,7 +53,7 @@ describe Attachments::Verification do
         id: attachment.global_id, ctx: course.asset_string
       }, nil).returns("thetoken")
 
-      verifier = v.verifier_for_user(nil, course.asset_string)
+      verifier = v.verifier_for_user(nil, context: course.asset_string)
       expect(verifier).to eq("thetoken")
     end
 
@@ -63,7 +63,7 @@ describe Attachments::Verification do
         id: attachment.global_id, ctx: course.asset_string
       }, expires).returns("thetoken")
 
-      verifier = v.verifier_for_user(nil, course.asset_string, expires)
+      verifier = v.verifier_for_user(nil, context: course.asset_string, expires: expires)
       expect(verifier).to eq("thetoken")
     end
   end
@@ -109,6 +109,23 @@ describe Attachments::Verification do
 
       expect(v2.valid_verifier_for_permission?("token", :read)).to eq(true)
       expect(v2.valid_verifier_for_permission?("token", :download)).to eq(false)
+    end
+
+    it "follows custom permissions" do
+      att2 = attachment_model(context: student)
+      eportfolio = student.eportfolios.create! public: true
+      v2 = Attachments::Verification.new(att2)
+      other_user = user_model
+      token = v2.verifier_for_user(other_user, context: eportfolio.asset_string, permission_map_id: :r_rd)
+      expect(v2.valid_verifier_for_permission?(token, :read)).to eq(true)
+      expect(v2.valid_verifier_for_permission?(token, :download)).to eq(true)
+      # revoke :read on the eportfolio, and the verifier should no longer work
+      Timecop.travel(2.seconds) do # allow the eportfolio's updated_at to change to invalidate the permissions cache
+        eportfolio.public = false
+        eportfolio.save!
+        expect(v2.valid_verifier_for_permission?(token, :read)).to eq(false)
+        expect(v2.valid_verifier_for_permission?(token, :download)).to eq(false)
+      end
     end
   end
 end
