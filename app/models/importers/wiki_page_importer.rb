@@ -211,6 +211,9 @@ module Importers
         allow_save = false
       end
       if allow_save && hash[:migration_id]
+        if item.changed?
+          item.user = nil
+        end
         item.save_without_broadcasting!
         migration.add_imported_item(item) if migration
         if migration

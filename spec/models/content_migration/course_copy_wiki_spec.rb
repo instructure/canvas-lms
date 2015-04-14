@@ -4,6 +4,23 @@ describe ContentMigration do
   context "course copy wiki" do
     include_examples "course copy"
 
+    it "should reset user on re-import" do
+      page = @copy_from.wiki.wiki_pages.create!(:title => "reset me", :body => "<p>blah</p>")
+
+      run_course_copy
+
+      page_to = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(page)).first
+      page_to.body = "something else"
+      page_to.user = user
+      page_to.save!
+
+      run_course_copy
+
+      page_to.reload
+      expect(page_to.user).to be_nil
+      expect(page_to.body).to eq page.body
+    end
+
     it "should not escape links to wiki urls" do
       page1 = @copy_from.wiki.wiki_pages.create!(:title => "keepthese%20percent signs", :body => "blah")
 
