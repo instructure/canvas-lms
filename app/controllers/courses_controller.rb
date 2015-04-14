@@ -363,7 +363,13 @@ class CoursesController < ApplicationController
         @current_enrollments = []
         @future_enrollments  = []
         Canvas::Builders::EnrollmentDateBuilder.preload(all_enrollments)
-        all_enrollments.each do |e|
+        all_enrollments.group_by{|e| [e.course_id, e.type]}.values.each do |enrollments|
+          e = enrollments.first
+          if enrollments.count > 1
+            e.course_section = nil
+            e.readonly!
+          end
+
           state = e.state_based_on_date
           if [:completed, :rejected].include?(state)
             @past_enrollments << e unless e.workflow_state == "invited" || e.restrict_past_view?
