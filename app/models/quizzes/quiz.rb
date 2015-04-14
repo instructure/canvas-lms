@@ -549,6 +549,13 @@ class Quizzes::Quiz < ActiveRecord::Base
     published? ? question_count : unpublished_question_count
   end
 
+  def question_types
+    return [] unless quiz_data
+    quiz_data.map do |question|
+      question["question_type"]
+    end.uniq
+  end
+
   # Returns data for the SAVED version of the quiz.  That is, not
   # the version found by gathering relationships on the Quiz data models,
   # but the version being held in Quizzes::Quiz.quiz_data.  Caches the result

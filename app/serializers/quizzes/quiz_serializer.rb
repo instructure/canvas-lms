@@ -21,7 +21,8 @@ module Quizzes
                 # :takeable,
                 :quiz_submissions_zip_url, :preview_url, :quiz_submission_versions_html_url,
                 :assignment_id, :one_time_results, :only_visible_to_overrides,
-                :assignment_group_id, :show_correct_answers_last_attempt, :version_number
+                :assignment_group_id, :show_correct_answers_last_attempt, :version_number,
+                :question_types
 
     def_delegators :@controller,
       # :api_v1_course_assignment_group_url,
@@ -43,6 +44,8 @@ module Quizzes
       :context,
       :submitted_students_visible_to,
       :unsubmitted_students_visible_to
+
+    def_delegators :@quiz, :quiz_questions
 
     # has_one :assignment_group, embed: :ids, root: :assignment_group
     # has_one :quiz_submission, embed: :ids, root: :quiz_submissions, embed_in_root: true, serializer: Quizzes::QuizSubmissionSerializer
