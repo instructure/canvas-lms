@@ -90,6 +90,23 @@ describe Context do
       expect(@course.find_asset("assignment_0")).to eql(nil)
       expect(@course.find_asset("")).to eql(nil)
     end
+
+    describe "context" do
+      before(:once) do
+        @course = Course.create!
+        @course2 = Course.create!
+        attachment_model context: @course
+      end
+
+      it "should scope to context if context is provided" do
+        expect(Context.find_asset_by_asset_string(@attachment.asset_string, @course)).to eq(@attachment)
+        expect(Context.find_asset_by_asset_string(@attachment.asset_string, @course2)).to be_nil
+      end
+
+      it "should find in any context if context is not provided" do
+        expect(Context.find_asset_by_asset_string(@attachment.asset_string)).to eq(@attachment)
+      end
+    end
   end
 
   context "self.names_by_context_types_and_ids" do

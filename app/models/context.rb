@@ -50,7 +50,8 @@ module Context
       Submission: :Submission,
       WebConference: :WebConference,
       Wiki: :Wiki,
-      WikiPage: :WikiPage
+      WikiPage: :WikiPage,
+      Eportfolio: :Eportfolio
   }.freeze
 
   def add_aggregate_entries(entries, feed)
@@ -174,15 +175,10 @@ module Context
     klass = nil if allowed_types && !allowed_types.include?(klass.to_s.underscore.to_sym)
     return nil unless klass
     res = nil
-    if klass == WikiPage
-      res = context.wiki.wiki_pages.where(id: id).first
-    elsif klass == ContextExternalTool
+    if context && klass == ContextExternalTool
       res = klass.find_external_tool_by_id(id, context)
-    elsif (klass.column_names & ['context_id', 'context_type']).length == 2
+    elsif context && (klass.column_names & ['context_id', 'context_type']).length == 2
       res = klass.where(context_id: context, context_type: context.class.to_s, id: id).first
-    elsif klass == Attachment
-      res = klass.where(id: id).first
-      res = nil if context && res && res.context != context
     else
       res = klass.where(id: id).first
       res = nil if context && res && res.respond_to?(:context) && res.context != context

@@ -1491,8 +1491,9 @@ class ApplicationController < ActionController::Base
   end
   helper_method :page_views_enabled?
 
-  def verified_file_download_url(attachment, context = nil, *opts)
-    verifier = Attachments::Verification.new(attachment).verifier_for_user(@current_user, context.try(:asset_string))
+  def verified_file_download_url(attachment, context = nil, permission_map_id = nil, *opts)
+    verifier = Attachments::Verification.new(attachment).verifier_for_user(@current_user,
+        context: context.try(:asset_string), permission_map_id: permission_map_id)
     file_download_url(attachment, { :verifier => verifier }, *opts)
   end
   helper_method :verified_file_download_url
