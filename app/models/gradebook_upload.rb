@@ -30,6 +30,6 @@ class GradebookUpload < ActiveRecord::Base
   end
 
   def stale?
-    created_at < 60.minutes.ago
+    created_at < 60.minutes.ago || progress.try(:workflow_state) == "failed"
   end
 end
