@@ -22,7 +22,7 @@ describe "people" do
   end
 
   def create_student_group(group_text = "new student group")
-    expect_new_page_load { driver.find_element(:link, 'View User Groups').click }
+    expect_new_page_load { fln('View User Groups').click }
     open_student_group_dialog
     inputs = ffj('input:visible')
     replace_content(inputs[0], group_text)
@@ -105,8 +105,8 @@ describe "people" do
     end
 
     it "should navigate to registered services on profile page" do
-      driver.find_element(:link, 'View Registered Services').click
-      driver.find_element(:link, 'Link web services to my account').click
+      fln('View Registered Services').click
+      fln('Link web services to my account').click
       expect(f('#unregistered_services')).to be_displayed
     end
 
@@ -115,7 +115,7 @@ describe "people" do
     end
 
     it "should test self sign up help functionality" do
-      expect_new_page_load { driver.find_element(:link, 'View User Groups').click }
+      expect_new_page_load { fln('View User Groups').click }
       open_student_group_dialog
       fj('.self_signup_help_link:visible').click
       help_dialog = f('#self_signup_help_dialog')
@@ -123,7 +123,7 @@ describe "people" do
     end
 
     it "should test self sign up functionality" do
-      expect_new_page_load { driver.find_element(:link, 'View User Groups').click }
+      expect_new_page_load { fln('View User Groups').click }
       dialog = open_student_group_dialog
       dialog.find_element(:css, '#category_enable_self_signup').click
       expect(dialog.find_element(:css, '#category_split_group_count')).not_to be_displayed
@@ -132,7 +132,7 @@ describe "people" do
 
     it "should test self sign up / group structure functionality" do
       group_count = "4"
-      expect_new_page_load { driver.find_element(:link, 'View User Groups').click }
+      expect_new_page_load { fln('View User Groups').click }
       dialog = open_student_group_dialog
       dialog.find_element(:css, '#category_enable_self_signup').click
       dialog.find_element(:css, '#category_create_group_count').send_keys(group_count)
@@ -146,7 +146,7 @@ describe "people" do
       enroll_more_students
 
       group_count = "4"
-      expect_new_page_load { driver.find_element(:link, 'View User Groups').click }
+      expect_new_page_load { fln('View User Groups').click }
       dialog = open_student_group_dialog
       dialog.find_element(:css, '#category_split_groups').click
       replace_content(f('#category_split_group_count'), group_count)
@@ -187,8 +187,8 @@ describe "people" do
       enroll_more_students
 
       group_count = 4
-      expect_new_page_load { driver.find_element(:link, 'View User Groups').click }
-      dialog = open_student_group_dialog
+      expect_new_page_load { fln('View User Groups').click }
+      open_student_group_dialog
       submit_form('#add_category_form')
       wait_for_ajaximations
       group_count.times do
@@ -210,7 +210,7 @@ describe "people" do
     it "should test prior enrollment functionality" do
       @course.complete
       get "/courses/#{@course.id}/users"
-      expect_new_page_load { driver.find_element(:link, 'View Prior Enrollments').click }
+      expect_new_page_load { fln('View Prior Enrollments').click }
       expect(f('#users')).to include_text(@student_1.name)
     end
 

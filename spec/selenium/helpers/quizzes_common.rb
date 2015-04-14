@@ -198,7 +198,7 @@ shared_examples_for "quizzes selenium tests" do
     yield
   ensure
     #This step is to prevent selenium from freezing when the dialog appears when leaving the page
-    driver.find_element(:link, 'Quizzes').click
+    fln('Quizzes').click
     driver.switch_to.alert.accept
   end
 
@@ -206,9 +206,9 @@ shared_examples_for "quizzes selenium tests" do
   #   You can pass a block to specify which answer to choose, the block will
   #   receive the set of possible answers. If you don't, the first (and correct)
   #   answer will be chosen.
-  def take_and_answer_quiz(submit=true, &answer_chooser)
+  def take_and_answer_quiz(submit=true)
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@user.id}"
-    expect_new_page_load { driver.find_element(:link_text, 'Take the Quiz').click }
+    expect_new_page_load { fln('Take the Quiz').click }
 
     answer = if block_given?
       yield(@quiz.stored_questions[0][:answers])
