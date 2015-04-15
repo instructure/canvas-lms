@@ -15,6 +15,7 @@ define [
 
   Simulate = React.addons.TestUtils.Simulate
   FilePreview = stubRouterContext FilePreviewComponent
+  wrapper = null
 
   module 'File Preview Rendering',
     setup: ->
@@ -54,7 +55,9 @@ define [
       @filesCollection.add(@file3)
       @currentFolder = new Folder()
       @currentFolder.files = @filesCollection
-      @div = $('<div>').appendTo('body')[0]
+      wrapper = document.getElementById('fixtures')
+      wrapper.innerHTML = "<div id='app_element'></div>"
+      @div = document.getElementById("app_element")
 
       Modal.setAppElement(@div)
 
@@ -87,6 +90,7 @@ define [
 
      teardown: ->
        React.unmountComponentAtNode(@div)
+       wrapper.innerHTML = ""
 
 
 
