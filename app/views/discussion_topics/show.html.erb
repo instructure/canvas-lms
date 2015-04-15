@@ -284,13 +284,15 @@
             <div class="span3 right-align">
               <a href='#' class='btn topic-subscribe-button' data-tooltip="bottom"
                  title="<%= t('topic_subscribe_tooltip', 'You are unsubscribed and will not be notified of new comments') %>"
-                 aria-label="<%= t('topic_subscribe_tooltip', 'You are unsubscribed and will not be notified of new comments') %>">
+                 role="button"
+                 aria-label="<%= t('You are unsubscribed and will not be notified of new comments. Click to subscribe') %> ">
                 <i class='icon-discussion-check' aria-hidden="hidden"></i>
                 <%= t(:topic_subscribe, 'Subscribe') %>
               </a>
               <a href='#' class='btn topic-unsubscribe-button btn-success' data-tooltip="bottom"
                  title="<%= t('topic_subscribed_tooltip', 'You are subscribed and will be notified of new comments') %>"
-                 aria-label="<%= t('topic_subscribed_tooltip', 'You are subscribed and will be notified of new comments') %>">
+                 role="button"
+                 aria-label="<%= t('You are subscribed and will be notified of new comments. Click to unsubscribe') %> ">
                 <i class='icon-discussion-check' aria-hidden="hidden"></i>
                 <%= t(:topic_unsubscribe, 'Subscribed') %>
               </a>
