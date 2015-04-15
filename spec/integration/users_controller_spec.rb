@@ -219,10 +219,10 @@ describe UsersController do
       disable_avatars!
       enable_cache do
         get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
-        expect(response).to redirect_to "http://someschool.instructure.com/images/no_pic.gif"
+        expect(response).to redirect_to "http://someschool.instructure.com/images/messages/avatar-50.png"
 
         get "https://otherschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
-        expect(response).to redirect_to "https://otherschool.instructure.com/images/no_pic.gif"
+        expect(response).to redirect_to "https://otherschool.instructure.com/images/messages/avatar-50.png"
       end
     end
 
@@ -236,19 +236,6 @@ describe UsersController do
       end
     end
 
-    it "should return different urls for different fallbacks" do
-      enable_cache do
-        get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
-        expect(response).to redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("http://someschool.instructure.com/images/messages/avatar-50.png")}"
-
-        get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}?fallback=#{CGI.escape("/my/custom/fallback/url.png")}"
-        expect(response).to redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("http://someschool.instructure.com/my/custom/fallback/url.png")}"
-
-        get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}?fallback=#{CGI.escape("https://test.domain/another/custom/fallback/url.png")}"
-        expect(response).to redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("https://test.domain/another/custom/fallback/url.png")}"
-      end
-    end
-
     it "should forget all cached urls when the avatar changes" do
       enable_cache do
         data = Rails.cache.instance_variable_get(:@data)
@@ -256,9 +243,6 @@ describe UsersController do
 
         get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
         expect(response).to redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("http://someschool.instructure.com/images/messages/avatar-50.png")}"
-
-        get "https://otherschool.instructure.com/images/users/#{User.avatar_key(@user.id)}?fallback=/my/custom/fallback/url.png"
-        expect(response).to redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI::escape("https://otherschool.instructure.com/my/custom/fallback/url.png")}"
 
         diff = data.select{|k,v|k =~ /avatar_img/}.size - orig_size
         expect(diff).to be > 0
@@ -268,10 +252,6 @@ describe UsersController do
 
         get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
         expect(response).to redirect_to "http://someschool.instructure.com/images/thumbnails/foo.gif"
-
-        get "http://otherschool.instructure.com/images/users/#{User.avatar_key(@user.id)}?fallback=#{CGI::escape("https://test.domain/my/custom/fallback/url.png")}"
-        expect(response).to redirect_to "http://otherschool.instructure.com/images/thumbnails/foo.gif"
-        expect(data.select{|k,v|k =~ /avatar_img/}.size).to eq orig_size + diff
       end
     end
   end
