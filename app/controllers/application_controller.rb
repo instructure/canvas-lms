@@ -1144,7 +1144,6 @@ class ApplicationController < ActionController::Base
   # the page title.
   def get_wiki_page
     @wiki = @context.wiki
-    @wiki.check_has_front_page
 
     @page_name = params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title])
     if(params[:format] && !['json', 'html'].include?(params[:format]))

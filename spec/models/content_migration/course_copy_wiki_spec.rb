@@ -50,14 +50,23 @@ describe ContentMigration do
 
     context "wiki front page" do
       it "should copy wiki front page setting if there is no front page" do
-        page = @copy_from.wiki.wiki_pages.create!(:title => "stuff and stuff")
-        @copy_from.wiki.set_front_page_url!(page.url)
+        fake_front_page = @copy_from.wiki.wiki_pages.create!(:title => "Front Page")
+        real_front_page = @copy_from.wiki.wiki_pages.create!(:title => "actual front page")
+        @copy_from.wiki.set_front_page_url!(real_front_page.url)
 
-        @copy_to.wiki.unset_front_page!
         run_course_copy
 
-        new_page = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(page)).first
-        expect(@copy_to.wiki.front_page).to eq new_page
+        new_front_page = @copy_to.wiki.wiki_pages.where(migration_id: mig_id(real_front_page)).first
+        expect(@copy_to.wiki.front_page).to eq new_front_page
+      end
+
+      it "should not set 'Front Page' as the front page" do
+        fake_front_page = @copy_from.wiki.wiki_pages.create!(:title => "Front Page")
+
+        run_course_copy
+
+        @copy_to.reload
+        expect(@copy_to.wiki.front_page).to be_nil
       end
 
       it "should not overwrite current front page" do

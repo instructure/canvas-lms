@@ -42,7 +42,7 @@ class Wiki < ActiveRecord::Base
   DEFAULT_FRONT_PAGE_URL = 'front-page'
 
   def set_has_no_front_page_default
-    if self.has_no_front_page.nil? && self.id && context
+    if self.has_no_front_page.nil?
       self.has_no_front_page = true
     end
   end
@@ -70,15 +70,6 @@ class Wiki < ActiveRecord::Base
         p.save
       end
     end
-  end
-
-  def check_has_front_page
-    return unless self.has_no_front_page.nil?
-
-    url = DEFAULT_FRONT_PAGE_URL
-    self.has_no_front_page = !self.wiki_pages.not_deleted.where(:url => url).exists?
-    self.front_page_url = url unless self.has_no_front_page
-    self.save
   end
 
   def front_page
@@ -129,7 +120,7 @@ class Wiki < ActiveRecord::Base
 
   def context
     shard.activate do
-      @context ||= Course.where(wiki_id: self).first || Group.where(wiki_id: self).first
+      @context ||= self.id && (Course.where(wiki_id: self).first || Group.where(wiki_id: self).first)
     end
   end
 

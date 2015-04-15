@@ -137,7 +137,6 @@ module Importers
       end
 
       # be very explicit about draft state courses, but be liberal toward legacy courses
-      course.wiki.check_has_front_page
       if course.wiki.has_no_front_page
         if migration.for_course_copy? && (source = migration.source_course || Course.where(id: migration.migration_settings[:source_course_id]).first)
           mig_id = CC::CCHelper.create_key(source.wiki.front_page)
