@@ -1012,22 +1012,21 @@ class ApplicationController < ActionController::Base
       request.format = :html
       template = exception.error_template if exception.respond_to?(:error_template)
       unless template
-        erbfile = "#{status.to_s[0,3]}_message.html.erb"
-        erbpath = File.join('app', 'views', 'shared', 'errors', erbfile)
-        erbfile = "500_message.html.erb" unless File.exists?(erbpath)
-        template = "shared/errors/#{erbfile}"
+        template = "shared/errors/#{status.to_s[0,3]}_message"
+        erbpath = Rails.root.join('app', 'views', "#{template}.html.erb")
+        template = "shared/errors/500_message" unless erbpath.file?
       end
 
       @status_code = status_code
       message = exception.is_a?(RequestError) ? exception.message : nil
-      render :template => template,
-        :layout => 'application',
-        :status => status,
-        :locals => {
-          :error => error,
-          :exception => exception,
-          :status => status,
-          :message => message,
+      render template: template,
+        layout: 'application',
+        status: status,
+        locals: {
+          error: error,
+          exception: exception,
+          status: status,
+          message: message,
         }
     end
   end
