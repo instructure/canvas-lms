@@ -67,9 +67,13 @@ describe UsersController do
       settings_mock = mock()
       settings_mock.stubs(:settings).returns({})
       settings_mock.stubs(:enabled?).returns(true)
+
+      user(:active_all => true)
+      user_session(@user)
+
       Canvas::Plugin.stubs(:find).returns(settings_mock)
       SecureRandom.stubs(:hex).returns('abc123')
-      GoogleDrive::Client.expects(:auth_uri).with() {|c, s| state = s and true}.returns("http://example.com/redirect")
+      GoogleDrive::Client.expects(:auth_uri).with() {|_c, s| state = s and true}.returns("http://example.com/redirect")
 
       get :oauth, {service: "google_drive", return_to: "http://example.com"}
 
@@ -585,6 +589,19 @@ describe UsersController do
 
         it "should allow setting a password" do
           post 'create', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal' }
+          u = User.where(name: 'Jacob Fugal').first
+          expect(u).to be_present
+          expect(u.pseudonym).not_to be_password_auto_generated
+        end
+
+        it "allows admins to force the self-registration workflow for a given user" do
+          Pseudonym.any_instance.expects(:send_confirmation!)
+          post 'create', account_id: account.id,
+            pseudonym: {
+              unique_id: 'jacob@instructure.com', password: 'asdfasdf',
+              password_confirmation: 'asdfasdf', force_self_registration: "1",
+            }, user: { name: 'Jacob Fugal' }
+          expect(response).to be_success
           u = User.where(name: 'Jacob Fugal').first
           expect(u).to be_present
           expect(u.pseudonym).not_to be_password_auto_generated
