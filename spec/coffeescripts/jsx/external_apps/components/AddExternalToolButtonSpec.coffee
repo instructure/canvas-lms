@@ -6,9 +6,8 @@ define [
 
   TestUtils = React.addons.TestUtils
   Simulate = TestUtils.Simulate
-  wrapper = document.getElementById('fixtures')
+  wrapper = null
 
-  Modal.setAppElement(wrapper)
 
   createElement = ->
     AddExternalToolButton({})
@@ -28,8 +27,14 @@ define [
     }
 
   module 'ExternalApps.AddExternalToolButton',
+    setup: ->
+      wrapper = document.getElementById('fixtures')
+      wrapper.innerHTML = ''
+      Modal.setAppElement(wrapper)
+
     teardown: ->
       React.unmountComponentAtNode wrapper
+      wrapper.innerHTML = ''
 
   test 'render', ->
     nodes = getDOMNodes()
