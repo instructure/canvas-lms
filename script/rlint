@@ -42,6 +42,7 @@ end
 
 def get_offenses_json(cli, env_sha)
   ruby_files = pick_ruby_files(env_sha)
+  return [] unless ruby_files.size > 0
   json = `rubocop #{ruby_files.join(' ')} --format json`
   results_json = JSON.parse(json)
 end
@@ -71,17 +72,22 @@ if ENV['GERRIT_REFSPEC']
 else
   heavy_mode = ARGV.include?("--heavy")
   boyscout_mode = ARGV.include?("--boy-scout")
-  #local run, just spit out everything wrong with these files to output
   env_sha = ENV['SHA']
   ruby_files = pick_ruby_files(env_sha)
-  if heavy_mode
-    cli.run(ruby_files)
+  if ruby_files.size > 0
+    if heavy_mode
+      cli.run(ruby_files)
+    else
+      require 'colorize'
+      output_filename = ".rubocop-output.json"
+      cli.run(ruby_files + ["--format", "json", "--out", output_filename])
+      results_json = JSON.parse(File.read(output_filename))
+      diff = git_diff(env_sha)
+      comments = RuboCop::Canvas::Comments.build(diff, results_json, boyscout_mode)
+      comments.each{ |comment| pretty_comment(comment) }
+      File.delete(output_filename)
+    end
   else
-    require 'colorize'
-    cli.run(ruby_files + ["--format", "json", "--out", ".rubocop-output.json"])
-    results_json = JSON.parse(File.read(".rubocop-output.json"))
-    diff = git_diff(env_sha)
-    comments = RuboCop::Canvas::Comments.build(diff, results_json, boyscout_mode)
-    comments.each{ |comment| pretty_comment(comment) }
+    puts "No ruby file changes found!"
   end
 end
