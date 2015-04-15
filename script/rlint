@@ -42,7 +42,7 @@ end
 
 def get_offenses_json(cli, env_sha)
   ruby_files = pick_ruby_files(env_sha)
-  return [] unless ruby_files.size > 0
+  return {} unless ruby_files.size > 0
   json = `rubocop #{ruby_files.join(' ')} --format json`
   results_json = JSON.parse(json)
 end
@@ -65,9 +65,11 @@ if ENV['GERRIT_REFSPEC']
     rev = ENV['GERRIT_REFSPEC']
     env_sha = `git fetch origin #{rev} && git rev-parse FETCH_HEAD`
     results_json = get_offenses_json(cli, env_sha)
-    diff = git_diff(env_sha)
-    comments = RuboCop::Canvas::Comments.build(diff, results_json)
-    `gergich comment #{Shellwords.escape(comments.to_json)}`
+    unless results_json.empty?
+      diff = git_diff(env_sha)
+      comments = RuboCop::Canvas::Comments.build(diff, results_json)
+      `gergich comment #{Shellwords.escape(comments.to_json)}`
+    end
   end
 else
   heavy_mode = ARGV.include?("--heavy")
