@@ -93,28 +93,8 @@ define([
           $.publish('editorBox/focus', $editor);
         };
 
-        // Make shift+tab take the user to the previous focusable element in the DOM.
-        var focusPrevious = function (event) {
-          if (event.keyCode == 9 && event.shiftKey) {
-            var $cur = $(ed.getContainer());
-            while (true) {
-              // When jQuery is upgraded to 1.8+, use .addBack(':tabbable') instead of andSelf().filter(...)
-              if ($cur.prevAll().find(':tabbable').andSelf().filter(':tabbable').last().focus().length) {
-                return false;
-              }
-              $cur = $cur.parent();
-              if (!$cur || !$cur.length || $cur.is(document)) {
-                return false;
-              }
-            }
-          } else {
-            return true;
-          }
-        };
-
         ed.on('click', focus);
         ed.on('keypress', focus);
-        ed.on('keyup', focusPrevious);
 
         // KeyboardShortcuts.coffee needs to listen to events
         // fired from inside the editor, so we pass out
@@ -426,8 +406,8 @@ define([
 
   $.fn._toggleView = function() {
     var id = this.attr('id');
-    this._setContentCode(this._getContentCode());
     tinyMCE.execCommand('mceToggleEditor', false, id);
+    this._setContentCode(this._getContentCode());
     // Ensure that keyboard focus doesn't get trapped in the ether.
     this.removeAttr('aria-hidden')
       .filter('textarea:visible')
@@ -440,9 +420,12 @@ define([
 
   $.fn._setContentCode = function(val) {
     var id = this.attr('id');
+    var editbox = tinyMCE.get(id)
     $instructureEditorBoxList._getTextArea(id).val(val);
-    if(tinyMCE.get(id) && $.isFunction(tinyMCE.get(id).execCommand)) {
-      tinyMCE.get(id).execCommand('mceSetContent', false, val);
+    if(editbox &&
+      $.isFunction(editbox.execCommand) &&
+      $(editbox.container).is(":visible")) {
+      editbox.execCommand('mceSetContent', false, val);
     }
   };
 

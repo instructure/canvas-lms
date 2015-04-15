@@ -17,6 +17,7 @@ define [
       @_addLabels()
       @_disableNonScreenreaderButtons()
       @_accessiblizeMenubar()
+      @_removeStatusbarFromTabindex()
 
     ### PRIVATE FUNCTIONS ###
     _cacheElements: ->
@@ -54,3 +55,9 @@ define [
         $firstMenu.focus()
         # Once it's shown, we don't need to show it again, so replace this handler with one that just focuses.
         @editor.addShortcut 'Alt+F9', '', -> $firstMenu.focus()
+
+    # keyboard only nav gets permastuck in the statusbar in FF. If you can't
+    # click with a mouse, the only way out is to refresh the page.
+    _removeStatusbarFromTabindex: ->
+      $statusbar = @$el.find '.mce-statusbar > .mce-container-body'
+      $statusbar.attr 'tabindex', -1

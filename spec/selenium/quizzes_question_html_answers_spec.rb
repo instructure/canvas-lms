@@ -70,7 +70,7 @@ describe "quizzes question with html answers" do
     type_in_tiny '.answer:eq(3) textarea', 'HTML'
 
     # clear tiny
-    driver.execute_script "$('.answer:eq(3) textarea')._setContentCode('')"
+    driver.execute_script "tinyMCE.activeEditor.setContent('')"
     close_first_html_answer
     input_length = driver.execute_script "return $('.answer:eq(3) input[name=answer_text]:visible').length"
     expect(input_length).to eq 1
@@ -94,7 +94,7 @@ describe "quizzes question with html answers" do
     expect(content).to eq '<p>ohai</p>'
 
     # clear it out, make sure the original input is empty also
-    driver.execute_script "$('.answer:eq(3) textarea')._setContentCode('')"
+    driver.execute_script "tinyMCE.activeEditor.setContent('')"
     close_first_html_answer
     value = driver.execute_script "return $('input[name=answer_text]:visible')[0].value"
     expect(value).to eq ''
