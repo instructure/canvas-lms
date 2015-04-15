@@ -258,14 +258,14 @@ describe "LTI integration tests" do
       expect(hash['tool_consumer_instance_guid']).to eq sub_account.root_account.lti_guid
     end
 
-    it "should include URI query parameters" do
+    it "should not include URI query parameters" do
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
       variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
       adapter.prepare_tool_launch('http://www.google.com', variable_expander, launch_url: 'http://www.yahoo.com?a=1&b=2', link_code: '123456')
       hash = adapter.generate_post_payload
 
-      expect(hash['a']).to eq '1'
-      expect(hash['b']).to eq '2'
+      expect(hash.key('a')).to be_falsey
+      expect(hash.key('b')).to be_falsey
     end
 
     it "should not allow overwriting other parameters from the URI query string" do

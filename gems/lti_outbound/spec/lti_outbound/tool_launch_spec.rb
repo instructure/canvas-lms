@@ -230,7 +230,7 @@ describe LtiOutbound::ToolLaunch do
       expect(hash['tool_consumer_instance_guid']).to eq 'root_account_lti_guid' #was hash['tool_consumer_instance_guid']).to eq sub_account.root_account.lti_guid
     end
 
-    it 'includes URI query parameters' do
+    it 'does not include URI query parameters' do
       hash = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com?paramater_a=value_a&parameter_b=value_b',
                                          :tool => tool,
                                          :user => user,
@@ -239,8 +239,8 @@ describe LtiOutbound::ToolLaunch do
                                          :link_code => '123456',
                                          :return_url => 'http://www.google.com',
                                          :variable_expander => variable_expander).generate
-      expect(hash['paramater_a']).to eq 'value_a'
-      expect(hash['parameter_b']).to eq 'value_b'
+      expect(hash.key?('paramater_a')).to be false
+      expect(hash.key?('parameter_b')).to be false
     end
 
     it 'does not allow overwriting other parameters from the URI query string' do
@@ -427,8 +427,8 @@ describe LtiOutbound::ToolLaunch do
                                                             :tool_consumer_instance_description => 'University of School (LMSng)',
                                                             :lti_submit => 'Launch Endpoint with LTI Data'
                                                           }, 'http://dr-chuck.com/ims/php-simple/tool.php?a=1&b=2&c=3%20%26a', '12345', 'secret')
-      expect(hash['oauth_signature']).to eql('k/+aMdax1Jm5kuGF6DG/ptN5VfY=')
-      expect(hash['c']).to eq '3 &a'
+      expect(hash['oauth_signature']).to eql('l1ZTsn1HjGXzqeaTQMPbjrqvjLU=')
+      expect(hash.key?('c')).to be false
     end
 
     it 'generate a correct signature with a non-standard port' do
