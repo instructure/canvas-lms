@@ -263,8 +263,8 @@ function(React, DataRow, $, I18n, _) {
 
     renderInvalidStandardMessage: function() {
       var message = "Invalid grading scheme";
-      if(!this.rowDataIsValid()) message = "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.";
-      if(!this.rowNamesAreValid()) message = "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.";
+      if (!this.rowDataIsValid()) message = "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.";
+      if (!this.rowNamesAreValid()) message = "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.";
       return (
         <div id={"invalid_standard_message_" + this.props.uniqueId} className="alert-message" tabIndex="-1" ref="invalidStandardAlert">
           {I18n.t("%{message}", { message: message })}

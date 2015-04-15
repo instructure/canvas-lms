@@ -33,9 +33,9 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
     gotPeriods: function(periods, idToExclude) {
       var unsavedPeriods = [];
       if (this.state.periods) {
-        unsavedPeriods = this.state.periods.filter(p => p.id.indexOf('new') > -1 && p.id !== idToExclude);
+        unsavedPeriods = _.filter(this.state.periods, period => period.id.indexOf('new') > -1 && period.id !== idToExclude);
       }
-      var camelizedPeriods = _.map(periods.grading_periods, function (gradingPeriod) { return ConvertCase.camelize(gradingPeriod) });
+      var camelizedPeriods = _.map(periods.grading_periods, period => ConvertCase.camelize(period));
       this.setState({
         periods: camelizedPeriods.concat(unsavedPeriods),
         needsToCopy: !this.canManageAtLeastOnePeriod(camelizedPeriods) && camelizedPeriods.length > 0,
@@ -51,7 +51,7 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
     },
 
     canManageAtLeastOnePeriod: function(periods) {
-      return _.any(periods, function(period){ return period.permissions.manage });
+      return _.any(periods, period => period.permissions.manage);
     },
 
     copyTemplatePeriods: function(periodsToCopy, idToExclude) {
@@ -72,28 +72,16 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
       });
     },
 
-    componentDidUpdate: function(prevProps, prevState) {
-      if (prevState.periods) {
-        var removedAGradingPeriod = this.state.periods.length < prevState.periods.length;
-        if (removedAGradingPeriod) this.refs.addPeriodButton.getDOMNode().focus();
-      }
-    },
-
-    deleteGradingPeriod: function(event, id) {
-      var $gradingPeriodElement = $(event.target).parents('.grading-period'),
-        self = this;
-
+    deleteGradingPeriod: function(id) {
       if (id.indexOf('new') > -1) {
         this.removeDeletedGradingPeriod(id);
-        return;
-      }
-
-      if (this.state.needsToCopy) {
+      } else if (this.state.needsToCopy) {
         var periodsToCopy = _.reject(this.state.periods, p => p.id === id || isNaN(p.id));
-        var confirmDelete = confirm("Are you sure you want to remove this grading period?");
+        var confirmDelete = confirm(I18n.t("Are you sure you want to remove this grading period?"));
         if (confirmDelete) this.copyTemplatePeriods(periodsToCopy);
       } else {
-        $gradingPeriodElement.confirmDelete({
+        var self = this;
+        $("#grading-period-" + id).confirmDelete({
           url: ENV.GRADING_PERIODS_URL + "/" + id,
           message: I18n.t("Are you sure you want to delete this grading period?"),
           success: function () {
@@ -120,17 +108,16 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
     },
 
     removeDeletedGradingPeriod: function(id) {
-      var newPeriods = _.reject(this.state.periods, function(period){ return period.id === id });
       if (this.lastRemainingPeriod()) {
         this.getPeriods();
       } else {
+        var newPeriods = _.reject(this.state.periods, period => period.id === id);
         this.setState({periods: newPeriods});
       }
     },
 
     getCreateGradingPeriodCSS: function() {
       var cssClasses = "center-md new-grading-period pad-box border border-round";
-
       if (!this.state.periods || this.state.periods.length === 0) {
         cssClasses += " no-active-grading-periods";
       }
@@ -139,18 +126,19 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
     },
 
     createNewGradingPeriod: function() {
-      var newPeriod = {title: '', startDate: '', endDate: '', id: _.uniqueId('new'), permissions: { read: true, manage: true }};
+      var newPeriod = { title: '', startDate: '', endDate: '', id: _.uniqueId('new'),
+        permissions: { read: true, manage: true } };
       var periods = update(this.state.periods, {$push: [newPeriod]});
       this.setState({periods: periods});
     },
 
     getPeriodById: function(id) {
-      return _.find(this.state.periods, function(period){ return period.id === id });
+      return _.find(this.state.periods, period => period.id === id);
     },
 
     updateGradingPeriodCollection: function(updatedGradingPeriod, permissions, previousStateId) {
       if (this.state.needsToCopy && previousStateId) {
-        var periodsToCopy = _.reject(this.state.periods, p => p.id === previousStateId || isNaN(p.id));
+        var periodsToCopy = _.reject(this.state.periods, p => (p.id === previousStateId) || isNaN(p.id));
         this.copyTemplatePeriods(periodsToCopy, previousStateId);
       } else if (previousStateId) {
         this.getPeriods(previousStateId);
@@ -167,7 +155,7 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
     renderLinkToSettingsPage: function() {
       if (this.state.periods && this.state.periods.length <= 1) {
         return (
-          <span id="disable-feature-message">
+          <span id="disable-feature-message" ref="linkToSettings">
             {I18n.t("You can disable this feature ")}
             <a href={ENV.CONTEXT_SETTINGS_URL + "#tab-features"} aria-label={I18n.t("Feature Options")}> {I18n.t("here.")} </a>
           </span>);
@@ -176,19 +164,19 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
 
     renderAdminPeriodsMessage: function() {
       if (this.state.periods && this.state.periods.length > 0 && !this.canManageAtLeastOnePeriod(this.state.periods)) {
-        return <span id="admin-periods-message"> {I18n.t("These grading periods were created for you by an administrator.")} </span>;
+        return <span id="admin-periods-message" ref="adminPeriodsMessage"> {I18n.t("These grading periods were created for you by an administrator.")} </span>;
       }
     },
 
     renderGradingPeriods: function() {
       if (!this.state.periods) return null;
-      return this.state.periods.map(function(period){
+      return _.map(this.state.periods, period => {
         return (<GradingPeriod id={period.id} key={period.id} title={period.title} startDate={period.startDate}
                                endDate={period.endDate} weight={period.weight} permissions={period.permissions}
                                onDeleteGradingPeriod={this.deleteGradingPeriod} cannotDelete={this.cannotDeleteLastPeriod}
                                updateGradingPeriodCollection={this.updateGradingPeriodCollection}
                                disabled={this.state.disabled}/>);
-      }, this);
+      });
     },
 
     render: function () {

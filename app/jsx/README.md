@@ -43,7 +43,7 @@ var b = arr.map( (s) => {
 // lexical `this`
 var obj = {
   multiplier: 3,
-  
+
   multiplyStuff (stuff) {
     return stuff.map((x) =>
       // no bind!
@@ -194,7 +194,7 @@ console.log(`Fifteen is ${a + b} and not ${2 * a + b}.`);
 ```
 
 
-  [1]:https://github.com/instructure-wfx/RFCs/blob/master/active/canvas-js-structure-build.md 
+  [1]:https://github.com/instructure-wfx/RFCs/blob/master/active/canvas-js-structure-build.md
   [arrows]:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions
   [class]:http://tc39wiki.calculist.org/es6/classes/
   [rest]:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters
