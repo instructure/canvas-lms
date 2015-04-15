@@ -90,9 +90,13 @@ describe UsersController do
       settings_mock = mock()
       settings_mock.stubs(:settings).returns({})
       settings_mock.stubs(:enabled?).returns(true)
+
+      user(:active_all => true)
+      user_session(@user)
+
       Canvas::Plugin.stubs(:find).returns(settings_mock)
       SecureRandom.stubs(:hex).returns('abc123')
-      GoogleDrive::Client.expects(:auth_uri).with() {|c, s| state = s and true}.returns("http://example.com/redirect")
+      GoogleDrive::Client.expects(:auth_uri).with() {|_c, s| state = s and true}.returns("http://example.com/redirect")
 
       get :oauth, {service: "google_drive", return_to: "http://example.com"}
 
@@ -631,7 +635,6 @@ describe UsersController do
           expect(u).to be_present
           expect(u.pseudonym).not_to be_password_auto_generated
         end
-
       end
 
       it "should not allow an admin to set the sis id when creating a user if they don't have privileges to manage sis" do

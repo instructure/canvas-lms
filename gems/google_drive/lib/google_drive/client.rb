@@ -21,14 +21,20 @@ module GoogleDrive
     end
 
 
-    def self.auth_uri(client, state)
+    def self.auth_uri(client, state, login=nil)
       auth_client = client.authorization
       auth_client.update!
 
-      auth_client.authorization_uri(
+      request_data = {
         :approval_prompt => :force,
         :state => state,
-        :access_type => :offline).to_s
+        :access_type => :offline
+      }
+
+      request_data[:login_hint] = login if login
+
+
+      auth_client.authorization_uri(request_data).to_s
     end
   end
 end
