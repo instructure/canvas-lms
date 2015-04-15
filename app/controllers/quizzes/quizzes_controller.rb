@@ -795,7 +795,7 @@ class Quizzes::QuizzesController < ApplicationController
   def quiz_redirect_params(opts = {})
     return opts if !@quiz.require_lockdown_browser? || @quiz.grants_right?(@current_user, session, :grade)
     plugin = Canvas::LockdownBrowser.plugin.base
-    plugin.redirect_params(self, opts)
+    plugin.redirect_params(opts)
   end
   helper_method :quiz_redirect_params
 
