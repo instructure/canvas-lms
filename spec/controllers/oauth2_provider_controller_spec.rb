@@ -129,6 +129,22 @@ describe Oauth2ProviderController do
       expect(response).to be_success
       expect(JSON.parse(response.body).keys.sort).to eq ['access_token', 'user']
     end
+
+    it 'deletes existing tokens for the same key when replace_tokens=1' do
+      old_token = user.access_tokens.create! :developer_key => key
+      Canvas.stubs(:redis => redis)
+      get :token, :client_id => key.id, :client_secret => key.api_key, :code => valid_code, :replace_tokens => '1'
+      expect(response).to be_success
+      expect(AccessToken.exists?(old_token.id)).to be(false)
+    end
+
+    it 'does not delete existing tokens without replace_tokens' do
+      old_token = user.access_tokens.create! :developer_key => key
+      Canvas.stubs(:redis => redis)
+      get :token, :client_id => key.id, :client_secret => key.api_key, :code => valid_code
+      expect(response).to be_success
+      expect(AccessToken.exists?(old_token.id)).to be(true)
+    end
   end
 
   describe 'POST accept' do

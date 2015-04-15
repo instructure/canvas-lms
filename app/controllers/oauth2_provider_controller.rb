@@ -76,6 +76,8 @@ class Oauth2ProviderController < ApplicationController
     token = provider.token_for(params[:code])
     return render(:status => 400, :json => { :message => "invalid code" }) unless token.is_for_valid_code?
 
+    token.create_access_token_if_needed(value_to_boolean(params[:replace_tokens]))
+
     Canvas::Oauth::Token.expire_code(params[:code])
 
     render :json => token
