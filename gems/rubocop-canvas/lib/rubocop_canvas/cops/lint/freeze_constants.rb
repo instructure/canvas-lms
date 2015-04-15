@@ -8,6 +8,7 @@ module RuboCop
         end
 
         def check_for_unfrozen_structures(node, safe_at_this_level=false)
+          return if node.nil?
           safe_at_next_level = false
           if node.type == :send
             safe_at_next_level = send_is_safe?(node)

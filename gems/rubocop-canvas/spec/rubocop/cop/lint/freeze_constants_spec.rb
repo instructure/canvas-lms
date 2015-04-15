@@ -81,4 +81,21 @@ describe RuboCop::Cop::Lint::FreezeConstants do
     })
     expect(cop.offenses.size).to eq(0)
   end
+
+  it "doesnt bomb on multiple constant assignments" do
+    source = %{
+      class Group < ActiveRecord::Base
+        include Context
+        include Workflow
+        include CustomValidations
+
+        TAB_HOME, TAB_PAGES, TAB_PEOPLE, TAB_DISCUSSIONS, TAB_FILES,
+          TAB_CONFERENCES, TAB_ANNOUNCEMENTS, TAB_PROFILE, TAB_SETTINGS, TAB_COLLABORATIONS = *1..20
+
+      end
+
+    }
+    inspect_source(cop, source)
+    expect(cop.offenses.size).to eq(0)
+  end
 end
