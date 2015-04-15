@@ -82,6 +82,16 @@ Style/AlignParameters:
   Enabled: false
 Style/RescueModifier:
   Severity: warning
+Style/DotPosition:
+  Enabled: false
+Style/TrailingWhitespace:
+  Enabled: false
+Style/MultilineOperationIndentation:
+  Enabled: false
+Style/AlignHash:
+  Enabled: false
+Style/AlignParameters:
+  Enabled: false
 
 # Rails style changes
 Rails/TimeZone:
@@ -89,6 +99,8 @@ Rails/TimeZone:
 
 # Lint changes
 Lint/AmbiguousRegexpLiteral:
+  Severity: convention
+Lint/UselessAssignment:
   Severity: convention
 
 # Performance changes
