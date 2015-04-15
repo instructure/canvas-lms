@@ -55,7 +55,7 @@ module GoogleDocs
         # TODO: get extension from response header
         [result, file['title'],  entry.extension]
       else
-        raise DriveConnectionException
+        raise DriveConnectionException, result.error_message
       end
     end
 
@@ -80,7 +80,7 @@ module GoogleDocs
       if result.status == 200
         result
       else
-        raise DriveConnectionException
+        raise DriveConnectionException, result.error_message
       end
     end
 
@@ -90,7 +90,7 @@ module GoogleDocs
         :api_method => drive.files.delete,
         :parameters => { :fileId => document_id })
       if result.error? && !result.error_message.include?('File not found')
-        raise DriveConnectionException
+        raise DriveConnectionException, result.error_message
       end
     end
 
@@ -104,7 +104,7 @@ module GoogleDocs
             :fileId => document_id,
             :permissionId => user_id })
         if result.error?
-          raise DriveConnectionException, result
+          raise DriveConnectionException, result.error_message
         end
       end
     end
@@ -132,7 +132,7 @@ module GoogleDocs
           :parameters => { :fileId => document_id }
         )
         if result.error?
-          raise DriveConnectionException
+          raise DriveConnectionException, result.error_message
         end
       end
     end
