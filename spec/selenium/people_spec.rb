@@ -338,6 +338,22 @@ describe "people" do
     end
   end
 
+  it "should get the max total activity time" do
+    course_with_admin_logged_in
+    sec1 = @course.course_sections.create!(:name => "section1")
+    sec2 = @course.course_sections.create!(:name => "section2")
+
+    @student = user
+    e1 = @course.enroll_student(@student, :section => sec1, :allow_multiple_enrollments => true)
+    e2 = @course.enroll_student(@student, :section => sec2, :allow_multiple_enrollments => true)
+    Enrollment.where(:id => e1).update_all(:total_activity_time => 900)
+
+    get "/courses/#{@course.id}/users"
+
+    wait_for_ajaximations
+    expect(fj("#user_#{@student.id} td:nth-child(7)").text.strip).to eq "15:00"
+  end
+
   it "should filter by role ids" do
     account_model
     course_with_teacher_logged_in(:account => @account)

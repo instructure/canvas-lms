@@ -42,7 +42,8 @@ module Lti
       seconds = duration ? Duration.new(duration).to_i : nil
 
       if seconds
-        course.enrollments.where(:user_id => user).
+
+        course.all_enrollments.where(:user_id => user).
           update_all(['total_activity_time = COALESCE(total_activity_time, 0) + ?', seconds])
       end
 
