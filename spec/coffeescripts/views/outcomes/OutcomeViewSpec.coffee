@@ -5,8 +5,6 @@ define [
   'compiled/views/outcomes/OutcomeView'
 ], ($, Backbone, Outcome, OutcomeView) ->
 
-  fixtures = $('#fixtures')
-
   newOutcome = (options) ->
     new Outcome(buildOutcome(options), { parse: true })
 
@@ -43,7 +41,7 @@ define [
 
   createView = (opts) ->
     view = new OutcomeView(opts)
-    view.$el.appendTo $('#fixtures')
+    view.$el.appendTo($("#fixtures"))
     view.render()
 
   module 'OutcomeView',
@@ -51,7 +49,7 @@ define [
       @outcome1 = outcome1()
 
     teardown: ->
-      #@outcomeView.remove()
+      document.getElementById("fixtures").innerHTML = ""
 
   changeSelectedCalcMethod = (view, calcMethod) ->
     view.$el.find('#calculation_method').val(calcMethod)
