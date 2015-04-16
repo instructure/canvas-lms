@@ -76,7 +76,6 @@ ar:
       avatars: "الصور المجسمة للمستخدم"
       delicious: Delicious
       diigo: Diigo
-      facebook: Facebook
       google_docs: "Google Docs"
       google_docs_preview: "معاينة Google Docs"
       google_drive: "Google Drive"
@@ -92,8 +91,6 @@ ar:
       invalid_discovery_url: "عنوان URL الخاص بالاكتشاف غير صالح"
     feedback_coach: "طرح سؤا ل على المجتمع"
     feedback_coach_sub: "الحصول على مساعدة من خبير Canvas"
-    feedback_feature_request: "طلب الحصول على ميزة"
-    feedback_feature_request_canvas_net: "طلب الحصول على ميزة في شبكة Canvas"
     feedback_feature_request_sub: "هل لديك مقترحات لتحسين Canvas؟"
     manually_created_courses: "مساقات تم إنشاؤها يدويًا"
     root_account_cant_have_sis_id: "لا يمكن ضبط معرفات SIS على حسابات أصلية"
@@ -244,7 +241,7 @@ ar:
         login_handle_name: "تسمية تسجيل الدخول"
         position: الموضع
         requested_authn_context: "سياق المصادقة"
-        unkown_user_url: "Url لمستخدم غير معروف"
+        unknown_user_url: "Url لمستخدم غير معروف"
       log_in_url: "عنوان URL لتسجيل الدخول"
       log_out_url: "عنوان URL لتسجيل الخروج"
       login_attribute: "سمة تسجيل الدخول"
@@ -259,7 +256,7 @@ ar:
       save_button: "حفظ إعدادات المصادقة"
       start_debugging: "بدء التصحيح"
       stop_debugging: "إيقاف التصحيح"
-      unkown_user_url_description: "عنوان url مخصص لإعادة التوجيه في حالة عدم العثور على مستخدم مصدق في Canvas."
+      unknown_user_url_description: "عنوان url مخصص لإعادة التوجيه في حالة عدم العثور على مستخدم مصدق في Canvas."
     saml_testing: 
       auth_request_to_idp: "تم إرسال AuthnRequest إلى IdP"
       auth_response_from_idp: "AuthnResponse من IdP"
@@ -959,6 +956,7 @@ ar:
         outgoing_email_default_name_option_default: "إعداد Canvas الافتراضي\n"
         prevent_course_renaming_by_teachers: "عدم السماح للمعلمين بإعادة تسمية المساقات الخاصة بهم"
         restrict_quiz_questions: "تقييد الطلاب من عرض أسئلة الاختبار بعد تاريخ انتهاء المساق"
+        restrict_student_future_view: "تقييد الطلاب من عرض المساقات قبل تاريخ البدء"
         role_id: "إضافة المزيد"
         self_enrollment: "السماح بالتسجيل الذاتي"
         self_registration: "التسجيل الذاتي"
@@ -1578,6 +1576,7 @@ ar:
     titles: 
       gpa_scale_explainer: "ما هو تقدير الدرجات بمقياس GPA؟"
       grading_scheme_info: "عرض/تحرير نظام تقييم الدرجات"
+  assignment_976578a8: المهمة
   assignment_comments_e43ed898: "تعليقات المهام"
   assignment_details: 
     no_graded_submissions: "لا توجد عمليات إرسال تم تقدير درجاتها"
@@ -2234,6 +2233,7 @@ ar:
     upload_error_timeout: "انتهت مهلة الطلب: %{url}"
     upload_error_too_many_redirects: "عدد كبير جدًا من حالات إعادة التوجيه"
     upload_error_unexpected: "حدث خطأ غير معروف أثناء التنزيل من %{url}"
+  attachment_deffe5a9: مرفق
   attendance: 
     default_attendance_title: "الحضور %{date}"
     errors: 
@@ -2512,7 +2512,6 @@ ar:
       create_event: "إنشاء حدث جديد"
       done_go_back_to_list: "تم. يرجى العودة إلى القائمة"
       links: 
-        accessibility_warning: "تحذير: هذا العرض لا يمكن الوصول إليه من قِبل قراء الشاشة. استخدم عرض جدول الأعمال بدلاً من ذلك."
         calendar_agenda: "جدول الأعمال"
         calendar_month: الشهر
         calendar_scheduler: المجدوِّل
@@ -2711,25 +2710,9 @@ ar:
     crumbs: 
       new: "الحدث الجديد للتقويم"
     full_calendar_event: 
-      buttons: 
-        create: "إنشاء حدث"
-        update: "تحديث حدث"
-      labels: 
-        address: العنوان
-        date: التاريخ
-        event_description: "وصف الحدث"
-        from: من
-        location: الموقع
-        title: العنوان
       no_content: "لا يوجد محتوى"
-      timespan: "%{start_time} *إلى* %{end_time}"
     new: 
-      links: 
-        back_to_calendar: "العودة إلى التقويم"
-        delete: "حذف الحدث"
-        edit: "تحرير حدث التقويم"
       page_title: "الحدث الجديد للتقويم"
-    no_content: "لا يوجد محتوى"
     notices: 
       created: "تم إنشاء الحدث بنجاح."
       deleted: "تم حذف هذا الحدث"
@@ -2749,47 +2732,6 @@ ar:
     invalid_date_or_time: "تاريخ أو تاريخ/وقت غير صالح لـ %{attr}"
   calendars: 
     assignment_details: "تفاصيل المهمة"
-    calendar: 
-      alts: 
-        next: التالي
-        previous: السابق
-      calendars_count: 
-        few: "%{count} من التقويمات، %{open_count} مفتوح"
-        many: "%{count} من التقويمات، %{open_count} مفتوح"
-        one: "تقويم واحد، %{open_count} مفتوح"
-        other: "%{count} من التقويمات، %{open_count} مفتوح"
-        two: "%{count} من التقويمات، %{open_count} مفتوح"
-        zero: "%{count} من التقويمات، %{open_count} مفتوح"
-      feed_title: "موجز التقويم"
-      instructions: 
-        ics_link: "انسخ الارتباط أدناه والصقه في أي تطبيق من تطبيقات التقويم التي تقبل موجزات iCal (تقويم Google وiCal وOutlook إلخ)"
-      labels: 
-        calendar: التقويم
-        date: التاريخ
-        details: التفاصيل
-        due: "موعد الاستحقاق"
-        from: من
-        group: المجموعة
-        title: العنوان
-        undated_events: "أحداث غير مؤرخة"
-      links: 
-        add_event: "إضافة حدث"
-        delete: حذف
-        edit: تحرير
-        feed: "انقر هنا لعرض الموجز"
-        full_details: "تفاصيل كاملة"
-        how_do_i: "كيف يمكنني...؟"
-        jump_to_calendar: "الانتقال إلى التقويم"
-        more_options: "مزيد من الخيارات"
-        show_undated_events: "عرض %{count} حدثًا غير مؤرخ"
-      messages: 
-        max_visible: "يمكنك عرض حتى %{count} تقويمًا في وقت واحد"
-      options: 
-        new_group: "[ مجموعة جديدة ]"
-      tabs: 
-        assignment: المهمة
-        event: الحدث
-      timespan: "%{start_time} *إلى* %{end_time}"
     default_title: حدث
     event: 
       due: "موعد الاستحقاق"
@@ -2813,36 +2755,6 @@ ar:
     prompts: 
       delete_assignment: "هل ترغب بالتأكيد في حذف هذه المهمة؟"
       delete_event: "هل ترغب بالتأكيد في حذف هذا الحدث؟"
-    show: 
-      crumbs: 
-        my_calendar: تقويمي
-      feed_title: "موجز Atom لتقويم المساق"
-      keycode_descriptions: 
-        delete: "حذف الحدث الحالي"
-        edit: "تحرير الحدث الحالي"
-        next_day: "يوم التقويم التالي"
-        next_event: "يوم/حدث التقويم التالي"
-        next_week: "الأسبوع التالي"
-        open: "فتح الحدث الحالي"
-        previous_day: "يوم التقويم السابق"
-        previous_event: "يوم/حدث التقويم السابق"
-        previous_week: "الأسبوع السابق"
-        refresh: "تحديث التقويم"
-      keycode_descriptoins: 
-        new: "حدث جديد لليوم الحالي"
-      keycodes: 
-        delete: d
-        edit: e
-        new: "n"
-        next_day: "ctrl+سهم لليمين"
-        next_event: ل
-        next_week: "ctrl+سهم لأسفل"
-        open: o
-        previous_day: "ctrl+سهم لليسار"
-        previous_event: k
-        previous_week: "ctrl+سهم لأعلى"
-        refresh: r
-      page_title: التقويم
     show2: 
       calendar_feed: "موجز التقويم"
       calendar_feed_instructions: "انسخ الارتباط أدناه وألصقه في أي تطبيق من تطبيقات التقويم التي تقبل موجزات iCal (تقويم Google وiCal وOutlook إلخ)"
@@ -2861,7 +2773,6 @@ ar:
       add_new_event: "إضافة حدث جديد"
       edit_assignment: "تحرير المهمة"
       edit_event: "تحرير الحدث"
-    use_new_calendar: "حاول تجريب التقويم الجديد"
     wizard_box: 
       descriptions: 
         assignment: "حسنًا. والآن انقر فوق علامة تبويب \"المهمة\" في مربع الحوار لإنشاء مهمة بدلاً من حدث التقويم."
@@ -2918,6 +2829,7 @@ ar:
     titles: 
       update_assignment_points: "هل تريد تغيير النقاط الممكنة لمطابقة نموذج التقييم؟"
   choose_a_course_home_page_8059c7b: "اختيار الصفحة الرئيسية للمساق"
+  choose_a_csv_file_to_upload_9644480c: "اختيار ملف CSV لتحميله:"
   choose_usage_rights_33683854: "اختيار حقوق الاستخدام..."
   clear_file_name_text_field_fce73840: "مسح حقل نص اسم الملف"
   click_here_on_the_calendar_link_c9965631: "انقر هنا فوق ارتباط *التقويم*"
@@ -3035,7 +2947,6 @@ ar:
   communication_5255723c: الاتصالات
   communication_channel: 
     body: "كود تحقق Canvas الخاص بك هو %{verification_code}"
-    default_facebook_account: "حساب Facebook"
     default_twitter_handle: "التعامل مع Twitter"
     default_yo_name: "اسم حساب Yo"
   communication_channels: 
@@ -3493,7 +3404,6 @@ ar:
         user_services: "خدمات الويب المسجّلة"
       help: 
         list_services: "لم تقم بتمكين قائمة الخدمات المسجلة. إن تمكين هذه القائمة سيتيح للزملاء في المساق وأعضاء المجموعة بالتواصل معك بسهولة أكبر خارج الفصل."
-        services: "لم تقم بربط الملف الشخصي للمستخدم بأية خدمات خارجية. يمكنك ربط حساب Canvas بالخدمات مثل Facebook وTwitter. وهذا يجعل من السهل للزملاء في المساق وأعضاء المجموعة بالتواصل معك خارج غرفة الدراسة."
       labels: 
         public_list_services: "اسمح للزملاء في المساق/أعضاء المجموعة برؤية أي الخدمات قمت بربطها بملف التعريف الخاص بي"
         user_privileges: امتيازات
@@ -3532,7 +3442,6 @@ ar:
         registered_services: "الخدمات المسجّلة"
         service_types: "أنواع الخدمة"
       help: 
-        no_services: "لم تقم بربط الملف الشخصي للمستخدم بأية خدمات خارجية. يمكنك ربط حساب Canvas بخدمات مثل Facebook وTwitter."
         services_private: "لم تقم بتمكين قائمة الخدمات المسجَلة. إن تمكين هذه القائمة سيتيح للزملاء في المساق وأعضاء المجموعة مشاهدة أي الخدمات قمت بربطها بحساب Canvas."
         user_services: "يمكن للأعضاء الآخرين السماح لك ـ حسب اختيارهم ـ بمشاهدة أي الخدمات الخارجية قاموا بربطها بحساب Canvas الخاص بهم. وهذا يجعل من السهل تنسيق مشروعات المجموعة والربط أيضًا بخارج غرفة التدريس."
       labels: 
@@ -3849,12 +3758,9 @@ ar:
     all_courses: "جميع المساقات"
     all_in_context: "الكل في %{context}"
     archive: أرشيف
-    archive_conversation: "أرشفة محادثات"
     autocomplete_result: 
       group_people: "الأشخاص: %{people}"
       no_results: "بلا نتائج"
-    autocomplete_token: 
-      remove_recipient: "إزالة المستلم"
     back: عودة
     cannot_add_to_private: "لا يمكنك إضافة مشاركين إلى محادثة خاصة."
     cannot_be_empty: "لا يمكن أن تكون الرسالة فارغة"
@@ -3898,12 +3804,10 @@ ar:
     hide: إخفاء
     index_new: 
       archive: أرشيف
-      archive_conversation: "أرشفة محادثة"
       archived: مؤرشف
       clear_search: "مسح نتائج البحث"
       compose_new_message: "إنشاء رسالة جديدة"
       delete: حذف
-      delete_conversation: "حذف المحادثة"
       filter_messages_by_course: "تصفية الرسائل حسب المساق"
       filter_messages_by_type: "تصفية الرسائل حسب النوع"
       forward: "إعادة توجيه"
@@ -3956,7 +3860,6 @@ ar:
         add_to_faculty_journal: "إضافة كإدخال دفتر الكلية"
         attachments: المرفقات
         course: المساق
-        course_required: "يجب تحديد مساق قبل إدخال المستلمين."
         select_course: "تحديد مساق"
         subject: الموضوع
         to: إلى
@@ -4012,7 +3915,6 @@ ar:
     titles: 
       rss_feed: "موجز المحادثات"
     unarchive: "إلغاء الأرشفة"
-    unarchive_conversation: "إلغاء أرشفة محادثة"
     unstar: "إلغاء النجمة"
     unstar_conversation: "إزالة النجمة من محادثة"
   copyright_holder_66ee111: "مالك حقوق النشر:"
@@ -4323,14 +4225,8 @@ ar:
       headings: 
         grade: "تقييم %{assignment}"
         to_do: "المهام التي يجب عليك فعلها"
-      images: 
-        alt: 
-          ignore: تجاهل
       links: 
         show_more: "%{count} المزيد..."
-        title: 
-          ignore: "تجاهل هذه المهمة"
-          ignore_review: "تجاهل هذه المراجعة"
       need_grading_count: 
         few: "%{count} بحاجة للتصنيف"
         many: "%{count} بحاجة للتصنيف"
@@ -4352,8 +4248,6 @@ ar:
         conclude_course: "الوصول إلى المساق"
         delete_course: "حذف المساق"
       details: 
-        conclude_alt_text: "إذا كنت ترغب في الاحتفاظ بالقدرة على تغيير الدرجات مع تحديد إمكانية وصول الطالب إلى المساق، فالرجاء استخدام إعدادات تواريخ المساق. ويمكنك التعرف على إعدادات تاريخ المساق من خلال الأدلة الخاصة بنا *هنا*"
-        confirm_conclude: "تحذير: إنهاء هذا المساق سيمنعك من تعديل الدرجات والوصول إلى محتوى المساق."
         confirm_delete: "هل ترغب بالتأكيد في حذف هذا المساق؟ بمجرد حذفه، لن يعود بإمكان الطلاب والمعلمين الوصول إليه. إذا كنت ترغب فقط في إزالته من القائمة المنسدلة للمساقات، يجب *إنهاء المساق بدلاً من ذلك*."
         confirm_delete_addendum: "إذا لم يكن لديك إذن بإنهاء المساق، يمكنك *تغيير تاريخ إنهاء المساق*، أو مطالبة المسؤول بإنهاء المساق."
       headings: 
@@ -5302,6 +5196,7 @@ ar:
       درجتها النهائية بدون هذه النقاط.
   disable_a5c05db3: تعطيل
   disabled_18c33a73: (معطل)
+  discussion_6719c51d: المناقشة
   discussion_entries: 
     created_entry_notice: "تم إنشاء الإدخال بنجاح."
     deleted_entry_notice: "تم حذف هذا الإدخال"
@@ -5318,6 +5213,7 @@ ar:
     atom_no_author: "بلا مؤلف"
     default_title: "بلا عنوان"
     empty_message: "لا توجد رسالة"
+  discussion_topic_dc85ad4c: "موضوع المناقشة"
   discussion_topics: 
     assignment_details: 
       available_from: "متوفر بدءًا من"
@@ -5390,7 +5286,6 @@ ar:
         published: "تم النشر"
       delay_posting: "تأخير النشر"
       enable_podcast_feed: "تمكين موجز بودكاست"
-      include_replies_in_podcast_feed: "تضمين الردود في موجز البودكاست"
       only_visible_to_overrides_note: "ملاحظة: لا يمكن مشاهدة هذه المناقشة *إلا* بواسطة القسم (الأقسام) المحدد أدناه:"
       options: خيارات
       page_header_title: "نقاش جديد"
@@ -5445,7 +5340,6 @@ ar:
       loading: "جارٍ التحميل..."
       lock_for_comments: "التأمين ضد التعليقات"
       make_sure_all_search_terms_are_spelled_correctly: "تأكد من كتابة كل مصطلحات البحث بشكل صحيح إملائيًا."
-      new_discussion: "*ابدأ* مناقشة"
       rss_feed: "موجز RSS"
       start_one_now: "بدء واحد الآن"
       suggestions: "الاقتراحات:"
@@ -5511,7 +5405,7 @@ ar:
       reply_to_topic: "الرد على الموضوع"
       retrieved_from_feed: "تم الاسترداد من %{feed}"
       show_rubric: "إظهار العنوان"
-      speed_grader: "تقييم سريع"
+      speed_grader: SpeedGrader™
       topic: الموضوع
       topic_podcast_feed_link: "موجز Podcast للموضوع"
       topic_subscribe: اشتراك
@@ -5642,7 +5536,6 @@ ar:
   due_datetime_f5a81b81: "موعد الاستحقاق: %{dateTime}"
   due_multiple_dates_cc0ee3f5: "موعد الاستحقاق: عدة تواريخ"
   due_on_date_aa4725cd: "تاريخ الاستحقاق:"
-  due_on_date_ffc98ebc: "تاريخ الاستحقاق"
   e_mail_only_2cc5e513: "البريد الإلكتروني فقط"
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "يمثل كل شريط مهمة واحدة. تمتد *الخطوط العمودية الرفيعة* من أقل درجة لأي طالب في المساق إلى أعلى درجة. بينما يمتد **الشريط الأكثر سمكًا** من القيمة المئوية 25 إلى 75، مع تمييز ***المتوسط***."
   each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "يمثل كل شريط مهمة واحدة. يمتد الخط العمودي الرفيع من أقل درجة لأي طالب في المساق إلى أعلى درجة. بينما يمتد الشريط الأكثر سمكًا من القيمة المئوية 25 إلى 75، مع تمييز المتوسط. يتم تمييز درجة الطالب بنقطة."
@@ -5668,6 +5561,7 @@ ar:
     buttons: 
       create_rubric: "إنشاء عنوان"
       update_rubric: "تحديث العنوان"
+    change: تغيير
     discussion_points_possible: 
       few: "%{count} نقطة ممكنة"
       many: "%{count} نقطة ممكنة"
@@ -6152,6 +6046,7 @@ ar:
       posts_added: "النشرات المضافة"
       remove_feed: "إزالة %{display_name}"
   external_integration_keys_8b4f4548: "مفاتيح التكامل الخارجية"
+  external_tool_c5a6410a: "الأداة الخارجية"
   external_tools: 
     account_navigation_configured: "تم تكوين التنقل في الحساب"
     app_full_view: 
@@ -6259,53 +6154,6 @@ ar:
     submit: إرسال
     user_navigation_configured: "تم تكوين تنقل المستخدم"
     wiki_page_menu_configured: "تم تكوين قائمة صفحات Wiki "
-  facebook: 
-    authorization_required: "يمكن للمستخدمين المخولين فقط الوصول لهذه الصفحة"
-    authorization_success: "تخويل ناجح!  Canvas وFacebook أصدقاء الآن."
-    deleted: محذوف
-    index: 
-      all_set: "تم إعدادك بالكامل!"
-      bookmark_notice: "يمكنك عرض عدد الإعلامات الجديدة لموقع Canvas من الصفحة الرئيسية لـ Facebook إذا وضعت علامة مرجعية لهذا التطبيق."
-      canvas_messages: "رسائل Canvas"
-      configure_notification_preferences_notice: "بعد *تكوين تفضيلات الإعلام* يجب بدء عرض ظهور الإعلامات هنا مما يسمح لك بمعرفة الأمور التي تحدث في حساب Canvas."
-      installation_about: "لتثبيت تطبيق Canvas Facebook، انتقل لصفحة ملف التعريف في موقع Canvas وانقر فوق زر Facebook لتوصيل حسابك بـ Facebook."
-      learn_more: "معرفة المزيد في موقع instructure.com"
-      more_information: "مزيد من المعلومات في %{domain_list}"
-      no_messages_notice: "مع توالي الأحداث في المساق سوف تبدأ ترى ظهور إعلامات هنا مما يسمح لك بمعرفة الأمور التي تحدث في حساب Canvas الخاص بك."
-      notification_about: "يهدف تطبيق Canvas Facebook هنا إلى منحك وصولا أسهل للتفاعلات التي تحدث داخل المساقات الخاصة بك. يمكنك ضبطه لإرسال الإعلامات عند تقييم درجات المهام، وعند تغيير مواعيد الاستحقاق إلخ. وستظل البيانات الخاصة في الموقع Canvas."
-      notification_settings: "إعدادات الإعلام"
-      notifications_notice: "يمكنك عرض قائمة بأحدث الإعلامات من Canvas أدناه. يمكنك عرض عدد الإعلامات الجديدة لموقع Canvas من الصفحة الرئيسية لـ Facebook إذا وضعت علامة مرجعية لهذا التطبيق."
-      welcome: "مرحبًا بعودتك، %{name}!"
-      welcome_message: "مرحبًا بك في إصدار جديد من برنامج التعليم عبر الإنترنت، عبر Instructure. إن مهمتنا أن نجعل استخدام الويب أسهل بالنسبة لك لتحسين عملية التعليم. فالواجهة الخاصة بنا سهلة وواضحة ومفتوحة ونعمل بالأدوات التي تستخدمها أنت والطلاب بالفعل - مثل Facebook - لتقديم خبرة تعليم مفتوحة وتعاونية بشكل أكبر. وقمنا بتجميعها في مجموعة رائعة ومفتوحة لإنجاز أشياء أكثر من مجرد تتبع المهام. فهي تشجع التفاعل وتدعم التعليم."
-      welcome_title: "مرحبًا بكم في Instructure Canvas"
-    index_disabled: 
-      disabled_notice: "لم يتم تكوين موقع Canvas هذا للاتصال بـ Facebook."
-      get_help: "الحصول على المساعدة من خلال موقع support.instructure.com"
-      instructure_canvas: "Instructure Canvas"
-    invalid_signature: "توقيع Facebook غير صالح"
-    message: 
-      hide: إخفاء
-    notification_policies: 
-      alerts: تنبيهات
-      cancel: إلغاء
-      change_settings: "تغيير الإعدادات"
-      daily: يوميًا
-      labels: 
-        alerts_for_category: "تنبيهات %{category_name}"
-      loading: "جارٍ التحميل..."
-      never: مطلقًا
-      notification_type: "نوع الإعلام"
-      right_away: مباشرة
-      send_to_facebook: "إرسال إلى Facebook؟"
-      update_preferences: "تحديث التفضيلات"
-      updating_preferences: "جارٍ تحديث التفضيلات..."
-      weekly: أسبوعيًا
-    settings: 
-      back_to_messages: "العودة إلى الرسائل"
-      link_needed: "قبل أن تتمكن من تمكين تطبيق Canvas Facebook فإنك تحتاج إلى ربطه بتسجيل دخول Canvas. الرجاء النقر فوق \"مرحبًا\" للحصول على مزيد من المعلومات."
-      notifications_config_notice: "يمكن إرسال إعلامات من Canvas تلقائيًا من خلال حساب Facebook الخاص بك. ستشاهد أدناه أنواع الإعلامات التي يمكنك إرسالها. يمكنك تغيير تفضيلات الإعلام في أي وقت، سواء هنا أو في Canvas."
-      settings_title: "إعدادات إعلام Canvas"
-      updating_preferences: "جارٍ تحديث التفضيلات..."
   fair_use_bee47d77: "الاستخدام العادل"
   favicon_6e658914: "أيقونة المفضلة"
   feature_flags: 
@@ -6590,6 +6438,7 @@ ar:
     only_one_folder: "يتعذر تعيين مسار مجلد ومعرف المجلد"
   for: لـ
   for_all_devices_1f603968: "لكل الأجهزة"
+  from_fdd4956d: من
   from_from_to_to_e31f6422: "من %{from} إلى %{to}"
   global_message_icons: 
     announcement: إعلان
@@ -6790,25 +6639,9 @@ ar:
       switch_to_points: "تبديل إلى النقاط"
     ungraded: "لم توضع في الحسبان عند التصحيح"
   gradebook_uploads: 
-    errors: 
-      invalid_file: "ملف csv غير صالح، تعذر تحديث الدرجات"
-      upload_failed: "تعذر تحميل الملف."
-    form: 
-      labels: 
-        upload: "اختيار ملف CSV لتحميله"
-      titles: 
-        upload_form: "اختيار ملف CSV لتحميله"
     new: 
       titles: 
         new_upload: "تحميل دفتر الدرجات"
-    notices: 
-      updated: 
-        few: "تم تحديث %{count} من عمليات الإرسال بنجاح."
-        many: "تم تحديث %{count} من عمليات الإرسال بنجاح."
-        one: "تم تحديث عملية إرسال بنجاح."
-        other: "تم تحديث %{count} من عمليات الإرسال بنجاح."
-        two: "تم تحديث %{count} من عمليات الإرسال بنجاح."
-        zero: "تم تحديث %{count} من عمليات الإرسال بنجاح."
     show: 
       assignment_answer: "هذه المهمة"
       assignment_example: "اختبار مؤشرات المساواة"
@@ -6835,14 +6668,6 @@ ar:
       student_answer: "هذا الشخص حقيقي"
       student_example: "شخص ما"
       student_question: "الطالب محل الاستفسار"
-  gradebook_uploads_form: 
-    buttons: 
-      upload_data: "تحميل البيانات"
-    labels: 
-      upload: "اختيار ملف CSV لتحميله:"
-    titles: 
-      upload_form: "اختيار ملف CSV لتحميله"
-    what_should_csv_look_like: "ما الشكل الذي يجب أن يكون عليه ملف CSV؟"
   gradebooks: 
     attendance: 
       attendance_info: "لم يتم إنشاء أي مهام للحضور."
@@ -6967,12 +6792,14 @@ ar:
       set_group_weights: "ضبط تقييمات المجموعة"
       show_attendance_columns: "إظهار أعمدة الحضور"
       show_concluded_enrollments: "عرض التسجيلات المنتهية"
-      upload_scores: استيراد
       view_grading_history: "عرض محفوظات التقييم"
     grades: 
       complete: مكتمل
       incomplete: "غير كامل"
     grades_filename: الدرجات
+    grading_box_extended: 
+      labels: 
+        grade: الدرجة
     history: 
       graded_on_submission: "تم التصحيح بعد الإرسال"
       grades_for_date: "الدرجات للتاريخ"
@@ -7055,7 +6882,6 @@ ar:
       labels: 
         add_comment: "إضافة تعليق"
         average: المتوسط
-        grade: الدرجة
         grade_by_question_beta: "الدرجات حسب السؤال (بيتا)"
         group_comment: "إرسال تعليق إلى المجموعة بالكامل"
         hide_names: "إخفاء أسماء الطلاب في SpeedGrader"
@@ -7698,8 +7524,11 @@ ar:
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "إذا قمت بالمغادرة، فسيتم إلغاء تنزبل الملف المضغوط الذي يجري إعداده حاليًا."
   if_you_ve_been_using_another_course_management_sys_67edfab1: "إذا كنت تستخدم نظام إدارة مساق آخر، فربما يكون لديك بعض الأشياء تريد نقلها إلى Canvas. يمكننا إرشادك عبر عملية ترحيل المحتوى بسهولة إلى داخل موقع Canvas."
   ignore_assignment_738b3c99: "تجاهل المهمة"
+  ignore_forever_dd4a6cdf: "تجاهل للأبد"
   ignore_name_55edc6fe: "تجاهل %{name}"
   ignore_these_3940f6f5: "تجاهل هذه"
+  ignore_this_assignment_b7a71f80: "تجاهل هذه المهمة"
+  ignore_until_new_submission_87f32b4: "تجاهل حتى إرسال جديد"
   image_8ad06: الصورة
   images: 
     error_checking_color: "خطأ في التحقق من لون الصورة"
@@ -7709,6 +7538,7 @@ ar:
     invalid_file_type: "نوع الملف غير صالح %{type}. تتضمن الأنواع المسموح بها: %{type_list}"
     not_an_image: "الملف المحدد ليس صورة"
   immediately_c128ede6: فورًا
+  import_1b31507: استيراد
   import_content_b2fd6620: "استيراد المحتوى"
   importers/assignment_importer: 
     errors: 
@@ -7781,8 +7611,6 @@ ar:
       posting_message_failed: "فشل النشر، حاول مرة أخرى"
       required: "حقل مطلوب"
       search_failed: "فشل البحث، الرجاء المحاولة مرة أخرى."
-    ignore_forever: "تجاهل للأبد"
-    ignore_until_new_submission: "تجاهل حتى إرسال جديد"
     labels: 
       datepicker: 
         time: الاتصال
@@ -7916,8 +7744,6 @@ ar:
         dashboard: "لوحة معلوماتي"
         skip_to_content: "التخطي إلى المحتوى"
       open_source_learning_management_system: "نظام LMS مفتوح المصدر"
-    facebook: 
-      title: "صفحة Facebook"
     fixed_bottom: 
       masquerading: 
         stop: "إيقاف إخفاء الأسماء"
@@ -8067,6 +7893,7 @@ ar:
   lock_date_cannot_be_after_term_end_cf1a188f: "لا يمكن أن يكون تاريخ التأمين بعد نهاية الفصل الدراسي"
   lock_date_cannot_be_before_due_date_ac30f54: "لا يمكن أن يكون تاريخ التأمين قبل تاريخ الاستحقاق"
   lock_until_date_62ce1b5c: "قفل حتى تاريخ"
+  log_out_379ba28a: "تسجيل الخروج"
   logged_out_user: "المستخدم الذي قام بتسجيل الخروج %{user_counter}"
   logo_a040ae0e: شعار
   low_score_4eeb95b2: "الدرجة المنخفضة: %{score}"
@@ -8098,7 +7925,6 @@ ar:
   manage_usage_rights_c5a8c216: "إدارة حقوق الاستخدام"
   manual_entry_e4a4f99a: "إدخال يدوي"
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "تعكس درجة الإتقان أحدث مهمة أو اختبار تم تقييم درجته."
-  mastery_scrore_reflects_the_highest_score_of_a_gra_a71008b7: "تعكس درجة الإتقان أعلى درجة لمهمة أو اختبار تم تقييم درجته."
   mathquill: 
     tabs: 
       arrows: الأسهم
@@ -8157,6 +7983,7 @@ ar:
     my_courses: مساقاتي
   message: 
     default_subject: "تنبيه Canvas"
+  message_896d2ed0: "%{message}"
   message_students: 
     buttons: 
       send_message: "إرسال رسالة"
@@ -8208,10 +8035,6 @@ ar:
           subject: "قام %{user_name} بإضافتك إلى محادثة في Canvas."
           unknown_user: "مستخدم غير معروف"
         subject: "أضافك %{user_name} لتوه في محادثة في Canvas."
-        unknown_user: "مستخدم غير معروف"
-      facebook: 
-        body: "أضافك %{user_name} لتوه في محادثة في Canvas."
-        link_text: "عرض المحادثة"
         unknown_user: "مستخدم غير معروف"
       sms: 
         body: "أضافك %{user_name} لتوه في محادثة في Canvas."
@@ -8266,49 +8089,6 @@ ar:
         ungraded_count_description: "لم يتم تقييم درجات %{count} أو مزيد من الإرسالات"
         ungraded_timespan_description: "تم ترك إرسال لم يتم تقييم درجاته لمدة %{count} يومًا (أيام)"
         usernote_description: "لا توجد إدخالات دفاتر للكلية لمدة %{count} يومًا (أيام)"
-      facebook: 
-        body: 
-          few: "تم تشغيل تنبيه لـ %{student} نظرًا لتوافر الشروط التالية:"
-          many: "تم تشغيل تنبيه لـ %{student} نظرًا لتوافر الشروط التالية:"
-          one: "تم تشغيل تنبيه لـ %{student} نظرًا لتوافر الشرط التالي:"
-          other: "تم تشغيل تنبيه لـ %{student} نظرًا لتوافر الشروط التالية:"
-          two: "تم تشغيل تنبيه لـ %{student} نظرًا لتوافر الشروط التالية:"
-          zero: "تم تشغيل تنبيه لـ %{student} نظرًا لتوافر الشروط التالية:"
-        body_student: 
-          few: "تم تشغيل تنبيه لك نظرًا لتوافر الشروط التالية:"
-          many: "تم تشغيل تنبيه لك نظرًا لتوافر الشروط التالية:"
-          one: "تم تشغيل تنبيه لك نظرًا لتوافر الشرط التالي:"
-          other: "تم تشغيل تنبيه لك نظرًا لتوافر الشروط التالية:"
-          two: "تم تشغيل تنبيه لك نظرًا لتوافر الشروط التالية:"
-          zero: "تم تشغيل تنبيه لك نظرًا لتوافر الشروط التالية:"
-        interaction_description: 
-          few: "لم يحدث تفاعل بين الطالب/المعلم لمدة %{count} من الأيام أو أكثر"
-          many: "لم يحدث تفاعل بين الطالب/المعلم لمدة %{count} من الأيام أو أكثر"
-          one: "لم يحدث تفاعل بين الطالب/المعلم لمدة يوم واحد"
-          other: "لم يحدث تفاعل بين الطالب/المعلم لمدة %{count} من الأيام أو أكثر"
-          two: "لم يحدث تفاعل بين الطالب/المعلم لمدة %{count} من الأيام أو أكثر"
-          zero: "لم يحدث تفاعل بين الطالب/المعلم لمدة %{count} من الأيام أو أكثر"
-        ungraded_count_description: 
-          few: "لم يتم تصنيف %{count} من التعيينات أو أكثر"
-          many: "لم يتم تصنيف %{count} من التعيينات أو أكثر"
-          one: "لم يتم تصنيف تعيين واحد أو أكثر"
-          other: "لم يتم تصنيف %{count} من التعيينات أو أكثر"
-          two: "لم يتم تصنيف %{count} من التعيينات أو أكثر"
-          zero: "لم يتم تصنيف %{count} من التعيينات أو أكثر"
-        ungraded_timespan_description: 
-          few: "تم ترك عملية إرسال واحدة أو أكثر دون تصنيف لمدة %{count} من الأيام أو أكثر"
-          many: "تم ترك عملية إرسال واحدة أو أكثر دون تصنيف لمدة %{count} من الأيام أو أكثر"
-          one: "تم ترك عملية إرسال واحدة أو أكثر دون تصنيف لمدة يوم واحد أو أكثر"
-          other: "تم ترك عملية إرسال واحدة أو أكثر دون تصنيف لمدة %{count} من الأيام أو أكثر"
-          two: "تم ترك عملية إرسال واحدة أو أكثر دون تصنيف لمدة %{count} من الأيام أو أكثر"
-          zero: "تم ترك عملية إرسال واحدة أو أكثر دون تصنيف لمدة %{count} من الأيام أو أكثر"
-        usernote_description: 
-          few: "لا توجد إدخالات لدفاتر الكلية لمدة %{count} من الأيام أو أكثر"
-          many: "لا توجد إدخالات لدفاتر الكلية لمدة %{count} من الأيام أو أكثر"
-          one: "لا توجد إدخالات لدفاتر الكلية لمدة يوم واحد أو أكثر"
-          other: "لا توجد إدخالات لدفاتر الكلية لمدة %{count} من الأيام أو أكثر"
-          two: "لا توجد إدخالات لدفاتر الكلية لمدة %{count} من الأيام أو أكثر"
-          zero: "لا توجد إدخالات لدفاتر الكلية لمدة %{count} من الأيام أو أكثر"
       sms: 
         body: "لم يتم تشغيل تنبيه لـ %{student}"
         body_student: "لم يتم تشغيل تنبيه لك"
@@ -8368,8 +8148,6 @@ ar:
           link: "عرض الإعلان"
         labels: 
           file_included: "الملف المضمَن"
-      facebook: 
-        body: "قمت بإنشاء هذا الإعلان: %{title}، %{course}"
       sms: 
         details: "مزيد من المعلومات على %{url}"
         subject: "قمت بإنشاء هذا الإعلان: %{title}، %{course}"
@@ -8385,8 +8163,6 @@ ar:
           link: "انقر هنا للانضمام لعرض الإعلان"
           subject: "تعليق جديد على الإعلان %{discussion_topic}: %{course}"
         subject: "تعليق جديد على الإعلان %{discussion_topic}: %{course}"
-      facebook: 
-        body: "تعليق جديد على الإعلان: %{discussion_topic}, %{course}"
       sms: 
         body: "تعليق جديد على الإعلان %{discussion_topic}: %{course}"
         details: "مزيد من المعلومات على %{url}"
@@ -8421,19 +8197,6 @@ ar:
         message: "قام %{user} بإلغاء حجزه في \"%{appointment_name}\"."
         no_reason_given: "لم يتم توفير شيء"
         subject: "تم إلغاء الحجز لـ \"%{appointment_name}\" (%{course})"
-      facebook: 
-        instructions: "عرض الموعد"
-        labels: 
-          attendee: الحاضر
-          attendees: الحضور
-          cancel_reason: "سبب الإلغاء"
-          course: المساق
-          date_and_time: التاريخ/الوقت
-          details: "تفاصيل الموعد"
-          group: المجموعة
-          slots_remaining: "الأجزاء الزمنية المتاحة"
-        message: "قام %{user} بإلغاء حجزه في \"%{appointment_name}\"."
-        no_reason_given: "لم يتم تحديد شيء"
       sms: 
         message: "قام %{user} بإلغاء حجزه في \"%{appointment_name}\"."
         more_info: "مزيد من المعلومات على %{url}"
@@ -8465,18 +8228,6 @@ ar:
         message: "قام المستخدم %{user} بإلغاء الجزء الزمني الخاص بك في \"%{appointment_name}\"."
         no_reason_given: "لم يتم تحديد شيء"
         subject: "الجزء الزمني الخاص بك لـ \"%{appointment_name}\" has تم إلغاؤه (%{course})"
-      facebook: 
-        instructions: "تسجيل الاشتراك في جزء زمني مختلف"
-        labels: 
-          attendee: الحاضر
-          attendees: الحضور
-          cancel_reason: "سبب الإلغاء"
-          course: المساق
-          date_and_time: التاريخ/الوقت
-          details: "تفاصيل الموعد"
-          group: المجموعة
-        message: "قام %{user} بإلغاء الجزء الزمني الخاص بك لـ \"%{appointment_name}\"."
-        no_reason_given: "لم يتم تحديد شيء"
       sms: 
         message: "تم إلغاء الجزء الزمني الخاص بك لـ \"%{appointment_name}\"."
         more_info: "مزيد من المعلومات على %{url}"
@@ -8501,14 +8252,6 @@ ar:
         message: "كل المواعيد الخاصة بـ \"%{appointment_name}\" تم إلغاؤها."
         no_reason_given: "لم يتم تحديد شيء"
         subject: "المواعيد الخاصة بـ \"%{appointment_name}\" تم إلغاؤها (%{course})"
-      facebook: 
-        labels: 
-          cancel_reason: "سبب الإلغاء"
-          course: المساق
-          dates: "التاريخ (التواريخ)"
-          details: "تفاصيل الموعد"
-        message: "كل المواعيد الخاصة بـ \"%{appointment_name}\" تم إلغاؤها."
-        no_reason_given: "لم يتم تحديد شيء"
       sms: 
         message: "تم إلغاء كل المواعيد الخاصة بـ \"%{appointment_name}\"."
         more_info: "مزيد من المعلومات على %{url}"
@@ -8538,17 +8281,6 @@ ar:
           slots_remaining: "الأجزاء الزمنية المتاحة"
         message: "الأجزاء الزمنية لـ \"%{appointment_name}\" متاحة الآن للتسجيل."
         subject: "الموعد \"%{appointment_name}\" متاح للتسجيل (%{course})"
-      facebook: 
-        group_signup: "المجموعة (%{group_category})"
-        individual_signup: فردي
-        instructions: "التسجيل في جزء زمني"
-        labels: 
-          course: المساق
-          dates: "التاريخ (التواريخ)"
-          details: "تفاصيل الموعد"
-          signup_type: "نوع التسجيل"
-          slots_remaining: "الأجزاء الزمنية المتاحة"
-        message: "الأجزاء الزمنية لـ \"%{appointment_name}\" متاحة الآن للتسجيل."
       sms: 
         message: "عمليات التسجيل مفتوحة لـ \"%{appointment_name}\"."
         more_info: "مزيد من المعلومات على %{url}"
@@ -8580,17 +8312,6 @@ ar:
           slots_remaining: "الأجزاء الزمنية المتاحة"
         message: "تمت إضافة أجزاء زمنية إلى \"%{appointment_name}\" وهي متاحة الآن للتسجيل."
         subject: "الموعد \"%{appointment_name}\" تم تحديثه (%{course})"
-      facebook: 
-        group_signup: "المجموعة (%{group_category})"
-        individual_signup: الفردي
-        instructions: "التسجيل في جزء زمني"
-        labels: 
-          course: المساق
-          dates: "التاريخ (التواريخ)"
-          details: "تفاصيل الموعد"
-          signup_type: "نوع التسجيل"
-          slots_remaining: "الأجزاء الزمنية المتاحة"
-        message: "تمت إضافة أجزاء زمنية إلى \"%{appointment_name}\" وهي متاحة للتسجيل."
       sms: 
         message: "توجد أجزاء زمنية جديدة متاحة لـ \"%{appointment_name}\"."
         more_info: "مزيد من المعلومات على %{url}"
@@ -8623,17 +8344,6 @@ ar:
           slots_remaining: "الأجزاء الزمنية المتاحة"
         message: "قام %{user} بالتسجيل في \"%{appointment_name}\"."
         subject: "قام مستخدم بالتسجيل في \"%{appointment_name}\" (%{course})"
-      facebook: 
-        instructions: "عرض الموعد"
-        labels: 
-          attendee: الحاضر
-          attendees: الحضور
-          course: المساق
-          date_and_time: التاريخ/الوقت
-          details: "تفاصيل الموعد"
-          group: المجموعة
-          slots_remaining: "الأجزاء الزمنية المتاحة"
-        message: "قام %{user} بالتسجيل في \"%{appointment_name}\"."
       sms: 
         message: "قام %{user} بالتسجيل في \"%{appointment_name}\"."
         more_info: "مزيد من المعلومات على %{url}"
@@ -8663,17 +8373,6 @@ ar:
           slots_remaining: "الأجزاء الزمنية المتاحة"
         message: "قام %{user} بتسجيلك في \"%{appointment_name}\"."
         subject: "لقد قمت بالتسجيل في \"%{appointment_name}\""
-      facebook: 
-        instructions: "التسجيل في جزء زمني مختلف"
-        labels: 
-          attendee: الحاضر
-          attendees: الحضور
-          course: المساق
-          date_and_time: التاريخ/الوقت
-          details: "تفاصيل الموعد"
-          group: المجموعة
-          slots_remaining: "الأجزاء الزمنية المتاحة"
-        message: "قام %{user} بتسجيلك في \"%{appointment_name}\"."
       sms: 
         message: "لقد تم تسجيلك في \"%{appointment_name}\"."
         more_info: "مزيد من المعلومات على %{url}"
@@ -8694,8 +8393,6 @@ ar:
           link: "انقر هنا لعرض المهمة"
           subject: "تم تغيير المهمة: %{title}، %{course}"
         subject: "تم تغيير المهمة: %{title}, %{course}"
-      facebook: 
-        body: "لقد تغيرت المهمة %{title_link} لـ %{course}."
       sms: 
         body: |-
             لقد تغير %{title}، %{course}.
@@ -8720,11 +8417,6 @@ ar:
           click_to_see_assignment: "انقر هنا لعرض المهمة"
         multiple_due_dates: "موعد الاستحقاق: تواريخ عديدة"
         new_assignment: "تم إنشاء مهمة جديدة للمساق، %{course_name}"
-        no_due_date: "موعد الاستحقاق: بلا تاريخ استحقاق"
-      facebook: 
-        due_at: "موعد الاستحقاق: %{assignment_due_date_time}"
-        multiple_due_dates: "موعد الاستحقاق: تواريخ عديدة"
-        new_assignment: "تم إنشاء مهمة جديدة لـ %{course_name}"
         no_due_date: "موعد الاستحقاق: بلا تاريخ استحقاق"
       sms: 
         due_at: "موعد الاستحقاق: %{assignment_due_date_time}"
@@ -8754,9 +8446,6 @@ ar:
         labels: 
           click_to_see_assignment: "انقر هنا لعرض المهمة"
         no_due_date: "بلا تاريخ استحقاق"
-      facebook: 
-        assignment_due_date_changed_sentence: "لقد تغير تاريخ الاستحقاق للمهمة *%{assignment_name}* لـ %{course_name}, إلى:"
-        no_due_date: "بلا تاريخ استحقاق"
       sms: 
         assignment_due_date_changed: "%{assignment_name}، %{course_name}, مستحق الآن:"
         more_info_at_url: "مزيد من المعلومات على %{web_address}"
@@ -8781,9 +8470,6 @@ ar:
         labels: 
           click_to_see_assignment: "انقر هنا لعرض المهمة"
         no_due_date: "لا يوجد تاريخ استحقاق"
-      facebook: 
-        assignment_due_date_changed_sentence: "تاريخ الاستحقاق للمهمة*%{assignment_name}* for %{course_name} (%{override}) has تغير إلى:"
-        no_due_date: "لا يوجد تاريخ استحقاق"
       sms: 
         assignment_due_date_changed: "حان وقت استحقاق %{assignment_name}, %{course_name} (%{override}):"
         more_info_at_url: "مزيد من المعلومات على %{web_address}"
@@ -8805,8 +8491,6 @@ ar:
           the_assignment_is_graded: "تم تقييم الدرجات للمهمة %{assignment_name}."
         labels: 
           view_here: "يمكنك عرضها هنا"
-        the_assignment_is_graded: "تم تقييم درجات للمهمة, %{assignment_name}."
-      facebook: 
         the_assignment_is_graded: "تم تقييم درجات للمهمة, %{assignment_name}."
       sms: 
         assignment_is_graded: "تم تقييم درجات لـ %{assignment_name} و%{course_name}."
@@ -8831,9 +8515,6 @@ ar:
           view_submission: "يمكنك عرض الإرسال هنا"
         user_resubmitted: "إعادة الإرسال: %{user_name}, %{assignment_name}"
         user_resubmitted_sentence: "قام %{user_name} بتسليم إعادة إرسال لـ %{assignment_name} في المساق %{course_name}"
-      facebook: 
-        click_to_view: "انقر هنا لعرض الإرسال."
-        user_resubmitted: "**قام %{user_name}** بتسليم إعادة إرسال لـ **%{assignment_name}** في المساق %{course_name}"
       sms: 
         more_info_at: "مزيد من المعلومات على %{web_address}"
         user_resubmitted: "%{user_name} تم للتو التسليم في المهمة الخاصة بهم (مرة أخرى)، %{assignment_name}"
@@ -8852,9 +8533,6 @@ ar:
           view_submission: "يمكنك عرض الإرسال هنا"
         user_submitted: "الإرسال: %{user_name}, %{assignment_name}"
         user_submitted_sentence: "قام %{user_name} بتسليم إرسال لـ %{assignment_name} في المساق %{course_name}"
-      facebook: 
-        click_to_view: "انقر هنا لعرض الإرسال."
-        user_submitted: "**قام %{user_name}** بتسليم إرسال لـ **%{assignment_name}** في المساق %{course_name}"
       sms: 
         more_info_at: "مزيد من المعلومات على %{web_address}"
         user_submitted: "%{user_name} تم للتو تسليم المهمة الخاصة بهم، %{assignment_name}"
@@ -8873,9 +8551,6 @@ ar:
           view_submission: "يمكنك عرض الإرسال هنا"
         user_resubmitted_sentence: "قام %{user_name} بتسليم إرسال متأخر لـ %{assignment_name} في المساق %{course_name}"
         user_submitted: "المهمة المتأخرة: %{user_name}, %{assignment_name}"
-      facebook: 
-        click_to_view: "انقر هنا لعرض الإرسال."
-        user_resubmitted_sentence: "**قام %{user_name}** بتسليم إرسال متأخر لـ **%{assignment_name}** في المساق %{course_name}"
       sms: 
         more_info_at: "مزيد من المعلومات على %{web_address}"
         user_submitted: "%{user_name} تم للتو تسليم المهمة الخاصة بهم (المتأخرة)، %{assignment_name}"
@@ -8931,9 +8606,6 @@ ar:
           link: "يمكنك الاطلاع على التفاصيل هنا"
           subject: "دعوة التعاون: %{course_or_group}"
         subject: "دعوة التعاون: %{course_or_group}"
-      facebook: 
-        body: "لقد تمت دعوتك للتعاون في المستند، %{document} لـ %{course_or_group}. تم إنشاء المستند في %{service}."
-        body_with_user: "لقد تمت دعوتك للتعاون في المستند، %{document} لـ %{course_or_group}. تم إنشاء المستند بواسطة %{user} في %{service}."
       sms: 
         body: |-
             تمت دعوتك للتعاون في المستند، %{document} لـ
@@ -9018,10 +8690,6 @@ ar:
         subject: "%{user_name}، أرسلت للتو رسالة في Canvas."
         unknown_user: "مستخدم غير معروف"
         view_message: "عرض هذه المحادثة في المحادثات"
-      facebook: 
-        body: "%{user_name}، أرسلت للتو رسالة في Canvas."
-        link_text: "عرض الرسالة"
-        unknown_user: "مستخدم غير معروف"
       sms: 
         body: "%{user_name}، أرسلت للتو رسالة في Canvas:"
         more_info: "مزيد من المعلومات على %{url}"
@@ -9048,10 +8716,6 @@ ar:
         subject: "أرسل %{user_name} لتوه رسالة لك في Canvas."
         unknown_user: "مستخدم غير معروف"
         view_message: "عرض هذه المحادثة في المحادثات"
-      facebook: 
-        body: "أرسل %{user_name} لتوه رسالة لك في Canvas."
-        link_text: "عرض الرسالة"
-        unknown_user: "مستخدم غير معروف"
       sms: 
         body: "%{user_name} أرسل لتوه رسالة لك في Canvas:"
         more_info: "مزيد من المعلومات على %{url}"
@@ -9143,12 +8807,6 @@ ar:
           details: "راجع قائمة التسجيلات الحالية"
           subject: "قام %{user} بقبول دعوة المساق"
         subject: "قام %{user} بقبول دعوة المساق"
-      facebook: 
-        body_designer: "قام %{user} بقبول دعوتهم للمشاركة في المساق %{course} بوصفه مصممًا فقط."
-        body_observer: "قام %{user} بقبول دعوتهم للمشاركة في المساق %{course} بوصفه ملاحظًا فقط."
-        body_student: "قام %{user} بقبول دعوتهم للمشاركة في المساق %{course} بوصفه طالبًا فقط."
-        body_ta: "قام %{user} بقبول دعوتهم للمشاركة في المساق %{course} بوصفه مساعد معلم فقط."
-        body_teacher: "قام %{user} بقبول دعوتهم للمشاركة في المساق %{course} بوصفه معلمًا فقط."
       sms: 
         body_designer: "%{user} قام بقبول دعوة المصمم للمساق، %{course}"
         body_observer: "%{user} قام بقبول دعوة الملاحظ للمساق، %{course}"
@@ -9191,17 +8849,6 @@ ar:
           username: "اسم المستخدم"
         none: بلا
         subject: "دعوة المساق"
-      facebook: 
-        body_designer: "لقد تمت دعوتك للمشاركة في المساق %{course} بوصفك مصممًا."
-        body_observer: "لقد تمت دعوتك للمشاركة في المساق %{course} بوصفك ملاحظًا."
-        body_student: "لقد تمت دعوتك للمشاركة في المساق %{course} بوصفك طالبًا."
-        body_ta: "لقد تمت دعوتك للمشاركة في المساق %{course} بوصفك مساعد معلم."
-        body_teacher: "لقد تمت دعوتك للمشاركة في المساق %{course} بوصفك معلمًا."
-        labels: 
-          email: "البريد الإلكتروني"
-          name: الاسم
-          username: "اسم المستخدم"
-        none: بلا
       sms: 
         body_designer: "لقد تمت دعوتك إلى المساق بوصفك مصممًا."
         body_observer: "لقد تمت دعوتك إلى المساق بوصفك ملاحظًا."
@@ -9250,17 +8897,6 @@ ar:
         none: بلا
         register: "تفضل بزيارة %{link} لإكمال التسجيل"
         subject: "تسجيل المساق"
-      facebook: 
-        body_designer: "لقد تم تسجيلك في المساق %{course} بوصفك مصمم."
-        body_observer: "لقد تم تسجيلك في المساق %{course} بوصفك ملاحظ."
-        body_student: "لقد تم تسجيلك في المساق %{course} بوصفك طالب."
-        body_ta: "لقد تم تسجيلك في المساق %{course} بوصفك TA."
-        body_teacher: "لقد تم تسجيلك في المساق %{course} بوصفك معلمًا."
-        labels: 
-          email: "البريد الإلكتروني"
-          name: الاسم
-          username: "اسم المستخدم"
-        none: بلا
       sms: 
         body_designer: "لقد تم تسجيلك في المساق بوصفك مصمم."
         body_observer: "لقد تم تسجيلك في المساق بوصفك ملاحظ."
@@ -9345,10 +8981,6 @@ ar:
           see_details: "يمكنك الاطلاع على التفاصيل هنا"
         no_time_set: "لم يتم تعيين وقت"
         subject: "تاريخ الحدث تغير: %{event_title}, %{course_name}"
-      facebook: 
-        from_to_time: "من %{start_date_time} إلى %{end_date_time}"
-        no_time_set: "لم يتم تعيين وقت"
-        subject: "لقد تغير الحدث [%{event_title}](%{link_to_event}) لـ %{course_name} عدة مرات. إنه الآن:"
       sms: 
         from_to_time: "من %{start_date_time} إلى %{end_date_time}"
         more_info: "مزيد من المعلومات على %{web_link}"
@@ -9406,11 +9038,6 @@ ar:
           grades_based_on_percent: "يعتمد تقييم الدرجات على الإجمالي المقدر لكل مجموعة مهام"
           now_see_here: "يمكنك الاطلاع على التفاصيل هنا"
           subject: "لقد تغير تقييم الدرجات"
-      facebook: 
-        grading_based_on_points: "يعتمد تقييم الدرجات على إجمالي النقاط لكافة المهام."
-        grading_policy_changed: "لقد تغيرت سياسة تقييم الدرجات لـ **[%{course_name}](%{course_url})**."
-        labels: 
-          grades_based_on_percent: "يعتمد تقييم الدرجات على الإجمالي المقدر لكل مجموعة مهام"
       sms: 
         grade_changed: "لقد تغيرت سياسة تقييم الدرجات للمساق, %{course_name}."
         more_info_at: "مزيد من المعلومات على %{course_url}"
@@ -9432,8 +9059,6 @@ ar:
         labels: 
           view_submission_here: "يمكنك عرض الإرسال هنا"
         subject: "المهمة المتأخرة: %{group_name}, %{assignment_name}"
-      facebook: 
-        body: "قامت المجموعة %{group_name} لتوها بتسليم إرسال متأخر لـ **[%{assignment_name}](%{assignment_url})** في المساق %{course_name}."
       sms: 
         more_info: "مزيد من المعلومات على %{web_address}"
         subject: "%{group_name} تم للتو تسليم المهمة الخاصة بهم (المتأخرة)، %{assignment_name}"
@@ -9456,10 +9081,6 @@ ar:
         labels: 
           click_below: "يمكنك التحقق من المجموعة عن طريق النقر فوق الارتباط أدناه"
         subject: "عضوية المجموعة المقبولة: %{group_name}"
-      facebook: 
-        account_group: "تم قبول طلبك للانضمام إلى المجموعة **[%{group_name}](%{group_url})** للحساب %{account_name}."
-        course_group: "تم قبول طلبك للانضمام إلى المجموعة **[%{group_name}](%{group_url})** للمساق %{course_name}."
-        group_request_accepted: "طلب المجموعة المقبول: %{group_name}"
       sms: 
         account_group: "تم قبول طلبك للانضمام إلى المجموعة %{group_name} للحساب %{account_name}."
         course_group: "تم قبول طلبك للانضمام إلى المجموعة %{group_name} للمساق %{course_name}."
@@ -9485,9 +9106,6 @@ ar:
         labels: 
           click_below: "يمكنك التحقق من المجموعات الأخرى عن طريق النقر فوق الارتباط أدناه"
         subject: "عضوية المجموعة المرفوضة: %{group_name}"
-      facebook: 
-        account_group: "تم رفض طلبك للانضمام إلى المجموعة **[%{group_name}](%{group_url})** للحساب %{account_name}."
-        course_group: "تم رفض طلبك للانضمام إلى المجموعة **[%{group_name}](%{group_url})** للمساق %{course_name}."
       sms: 
         account_group: "تم رفض طلبك للانضمام إلى المجموعة %{group_name} للحساب %{account_name}."
         course_group: "تم رفض طلبك للانضمام إلى المجموعة %{group_name} للمساق %{course_name}."
@@ -9543,9 +9161,6 @@ ar:
           details: "تمت إضافة مسؤول جديد، %{user}، إلى الحساب %{account}"
           subject: "مستخدم الحساب الجديد"
         subject: "مستخدم الحساب الجديد"
-      facebook: 
-        body: "تمت إضافة مسؤول جديد **%{user}** للحساب **%{account}**."
-        subject: "مسؤول الحساب الجديد لـ %{account}"
       sms: 
         body: "تمت إضافة مسؤول جديد, %{user}, للحساب %{account}"
         details: "مزيد من المعلومات على %{website}"
@@ -9561,8 +9176,6 @@ ar:
           link: "عرض الإعلان"
         labels: 
           file_included: "الملف المضمَن"
-      facebook: 
-        body: "الإعلان الجديد: %{title}, %{course}"
       sms: 
         details: "مزيد من المعلومات على %{url}"
         subject: "الإعلان الجديد: %{title}, %{course}"
@@ -9582,9 +9195,6 @@ ar:
           title: "عضوية المجموعة الجديدة: %{group_name}"
         subject: "عضوية مجموعة جديدة لـ %{course_or_account}"
         title: "عضوية المجموعة الجديدة:  %{group_name}"
-      facebook: 
-        body_account: "لقد تمت إضافتك إلى مجموعة جديدة للحساب %{account}. اسم المجموعة هو %{group_name}."
-        body_course: "لقد تمت إضافتك إلى مجموعة جديدة للمساق %{course}. اسم المجموعة هو %{group_name}."
       sms: 
         body_account: "لقد تمت إضافتك إلى مجموعة جديدة للحساب %{account}.  اسم المجموعة هو %{group_name}."
         body_course: "لقد تمت إضافتك إلى مجموعة جديدة للمساق %{course}.  اسم المجموعة هو %{group_name}."
@@ -9609,9 +9219,6 @@ ar:
           title: "عضوية المجموعة الجديدة: %{group_name}"
         subject: "عضوية مجموعة جديدة لـ %{course_or_account}"
         title: "عضوية المجموعة الجديدة:  %{group_name}"
-      facebook: 
-        body_account: "لقد تمت دعوتك للانضمام إلى المجموعة %{group} للحساب %{account}."
-        body_course: "لقد تمت دعوتك للانضمام إلى المجموعة %{group} للمساق %{course}."
       sms: 
         body_account: "لقد تمت دعوتك للانضمام إلى المجموعة %{group} للحساب %{account}."
         body_course: "لقد تمت دعوتك للانضمام إلى المجموعة %{group} للمساق %{course}."
@@ -9637,11 +9244,6 @@ ar:
           teachers: المعلمون
         subject: "المساق الجديد"
         title: "المساق الجديد لـ %{account}"
-      facebook: 
-        body: "تمت إضافة مساق جديد **%{course}** للحساب **%{account}**."
-        labels: 
-          teachers: المعلمون
-        subject: "المساق الجديد لـ %{account}"
       sms: 
         body: "تمت إضافة مساق جديد, %{course}, للحساب %{account}"
         details: "مزيد من المعلومات على %{url}"
@@ -9664,8 +9266,6 @@ ar:
           link: "انقر هنا للانضمام إلى المحادثة"
           subject: "تعليق جديد لـ %{discussion_topic}: %{course}"
         subject: "التعليق الجديد لـ %{discussion_topic}: %{course}"
-      facebook: 
-        body: "التعليق الجديد لـ %{discussion_topic}, %{course}"
       sms: 
         body: "التعليق الجديد لـ %{discussion_topic}: %{course}"
         details: "مزيد من المعلومات على %{url}"
@@ -9686,8 +9286,6 @@ ar:
         labels: 
           file_included: "الملف المضمَن"
         subject: "المناقشة الجديدة - %{discussion_topic}: %{course}"
-      facebook: 
-        body: "موضوع المنتدى الجديد: %{discussion_topic}, %{course}"
       sms: 
         body: "الموضوع الجديد لـ %{course}:"
         details: "مزيد من المعلومات على %{url}"
@@ -9709,10 +9307,6 @@ ar:
           see_details: "يمكنك الاطلاع على التفاصيل هنا"
         no_time_set: "لم يتم تعيين وقت"
         subject: "الحدث الجديد - %{event_title}, %{course_name}"
-      facebook: 
-        body: "يوجد حدث جديد تمت جدولته لـ %{course_name}:"
-        from_to_time: "من %{start_date_time} إلى %{end_date_time}"
-        no_time_set: "لم يتم تعيين وقت"
       sms: 
         from_to_time: "من %{start_date_time} إلى %{end_date_time}"
         more_info: "مزيد من المعلومات على %{web_address}"
@@ -9735,8 +9329,6 @@ ar:
           subject: "الملف الجديد المضاف:%{title}، %{name}"
         subject: "الملف الجديد المضاف:%{title}، %{name}"
         view: "يمكنك عرضها هنا"
-      facebook: 
-        body: "تمت إضافة ملف جديد للمساق، %{name}:"
       sms: 
         body: "الملف الجديد المضاف لـ %{name}:"
         link: "مزيد من المعلومات على %{link}"
@@ -9753,9 +9345,6 @@ ar:
           subject: "%{count} من الملفات الجديدة المضافة للمساق، %{name}:"
         link: "يمكنك عرضها هنا"
         subject: "%{count} من الملفات الجديدة المضافة للمساق، %{name}:"
-      facebook: 
-        body: "تمت إضافة %{count} من الملفات الجديدة للمساق، %{name}:"
-        link: "يمكنك عرضها هنا"
       sms: 
         body: "تمت إضافة %{count} من الملفات الجديدة لـ %{name}."
         link: "مزيد من المعلومات على %{link}"
@@ -9778,9 +9367,6 @@ ar:
           title: "مجموعة الطلاب الجديدة: %{group_name}"
         subject: "مجموعة الطلاب الجديدة لـ %{course_or_account}"
         title: "مجموعة الطلاب الجديدة: %{group_name}"
-      facebook: 
-        body_account: "تم إنشاء مجموعة طلاب جديدة منظمة تسمى %{group_name} للحساب %{account}. العضو الأول هو %{user}."
-        body_course: "تم إنشاء مجموعة طلاب جديدة منظمة تسمى %{group_name} للمساق %{course}. العضو الأول هو %{user}."
       sms: 
         body_account: "تم إنشاء مجموعة جديدة تسمى \"%{group_name}\" للحساب %{account}. العضو الأول هو %{user}."
         body_course: "تم إنشاء مجموعة جديدة تسمى \"%{group_name}\" للمساق %{course}. العضو الأول هو %{user}."
@@ -9800,9 +9386,6 @@ ar:
           link: "انقر هنا لعرض المستخدم"
           subject: "المستخدم الجديد"
         subject: "المستخدم الجديد"
-        title: "المستخدم الجديد لـ %{account}"
-      facebook: 
-        body: "قام مستخدم جديد, **%{user}**, لتوه بالتسجيل للحساب **%{account}**."
         title: "المستخدم الجديد لـ %{account}"
       sms: 
         body: "قام مستخدم جديد, %{user}, بالتسجيل للحساب %{account}"
@@ -9824,8 +9407,6 @@ ar:
         html: 
           link_message: "انقر هنا لإكمال المراجعة"
         subject: "تم تعيين مراجعة الأقران لـ %{reviewee}"
-      facebook: 
-        body: "تمت دعوتك لإجراء مراجعة الأقران على %{reviewee}. اتبع الرابط التالي للمراجعة!"
       sms: 
         more_info: "مزيد من المعلومات على %{url}"
       summary: 
@@ -9855,8 +9436,6 @@ ar:
           subject: "الاختبار الذي تم الانتهاء من إعادة تقييمه: %{quiz}، %{context}"
         link_message: "يمكنك عرض الاختبار هنا:"
         subject: "الاختبار الذي تم الانتهاء من إعادة تقييمه: %{quiz}، %{context}"
-      facebook: 
-        body: "الاختبار الذي تم الانتهاء من إعادة تقييمه: %{title}"
       sms: 
         body_sms: "تم الانتهاء من إعادة تقييم الاختبار ذي العنوان %{title} في السياق %{context}."
         more_info: "مزيد من المعلومات على %{url}"
@@ -9887,8 +9466,6 @@ ar:
           subject: "تذكير بالتقييم: %{rubric}، %{context}"
         link_message: "يمكنك مراجعة التقييم وإرسال الإدخال هنا:"
         subject: "تذكير بالتقييم: %{rubric}, %{context}"
-      facebook: 
-        body: "لقد تم تذكيرك بالتقييم: *%{title}* لـ %{context}."
       sms: 
         body: "لقد تم تذكيرك بالتقييم: %{rubric}, %{context}."
         more_info: "مزيد من المعلومات على %{url}"
@@ -9906,8 +9483,6 @@ ar:
           subject: "التقييم الجديد: %{title}، %{context}"
         link_message: "يمكنك مراجعة التقييم وإرسال الإدخال هنا:"
         subject: "التقييم الجديد: %{title}, %{context}"
-      facebook: 
-        body: "لقد تم إنشاء تقييم جديد لـ %{context}:"
       sms: 
         body: "لقد تم إنشاء تقييم جديد لـ %{context}."
         more_info: "مزيد من المعلومات على %{url}"
@@ -9932,9 +9507,6 @@ ar:
         link_message: "يمكنك مراجعة تفاصيل الإرسال هنا:"
         someone: "شخص ما"
         subject: "تعليق الإرسال: %{user}, %{assignment}, %{context}"
-      facebook: 
-        body: "*وضع %{author}* لتوه تعليقًا جديدًا على الإرسال الخاص بـ **%{user} لـ %{assignment}**"
-        someone: "شخص ما"
       sms: 
         body: "تعليق جديد بواسطة %{author} لـ %{assignment}, %{user}, %{context}."
         more_info: "مزيد من المعلومات على %{url}"
@@ -9956,9 +9528,6 @@ ar:
         someone: "شخص ما"
         subject: "تعليق الإرسال: %{user}, %{assignment}, %{context}"
         submission_comment_link_message: "يمكنك مراجعة تفاصيل الإرسال باستخدام الارتباط أدناه، أو يمكنك الرد على هذا التعليق عن طريق الاستجابة لهذه الرسالة."
-      facebook: 
-        body: "*وضع %{author}* لتوه تعليقًا جديدًا على الإرسال الخاص بـ **%{user} لـ %{assignment}**"
-        someone: "شخص ما"
       sms: 
         more_info: "مزيد من المعلومات على %{url}"
         sms_body: "تعليق جديد بواسطة %{author} لـ %{assignment}, %{user}, %{context}."
@@ -9987,13 +9556,6 @@ ar:
         score: "النقاط:  %{score} من  %{total}"
         score_pending: "مراجعة النقاط المعلقة بواسطة المعلم"
         subject: "الدرجة التي تم تغييرها: %{assignment}, %{context}"
-      facebook: 
-        body: "لقد تم تغيير الدرجة الخاصة بمهمتك *%{title}*."
-        no_date_set: "لم يتم تعيين تاريخ"
-        not_applicable: "لا يوجد"
-        regraded_date: "تمت إعادة تقييم الدرجات: %{date}"
-        score: "النقاط: %{score} من  %{total}"
-        score_pending: "مراجعة النقاط المعلقة بواسطة المعلم"
       sms: 
         body_sms: "تغيرت درجة %{title}, %{context} لتوها."
         more_info: "مزيد من المعلومات على %{url}"
@@ -10034,13 +9596,6 @@ ar:
         score: "النقاط:  %{score} من  %{total}"
         score_pending_review: "مراجعة النقاط المعلقة بواسطة المعلم"
         subject: "تم تقييم درجات للمهمة: %{assignment}, %{context}"
-      facebook: 
-        body: "لقد تم تقييم درجات لمهمتك, *%{title}*."
-        graded_date: "تم تقييم الدرجات: %{date}"
-        no_date_set: "لم يتم تعيين تاريخ"
-        not_applicable: "لا يوجد"
-        score: "النقاط: %{score} من  %{total}"
-        score_pending_review: "مراجعة النقاط المعلقة بواسطة المعلم"
       sms: 
         graded_date: "تم تقييم الدرجات: %{date}"
         more_info: "مزيد من المعلومات على %{url}"
@@ -10073,9 +9628,6 @@ ar:
         link_message: "يمكنك استعراض الإرسال هنا:"
         subject: "الاختبار الذي تم إرساله: %{quiz}, %{context}"
         submitted_date: "تاريخ الإرسال: %{date}"
-      facebook: 
-        body: "%{user_name} أكمل الاختبار %{quiz_title}، ويحتاج إلى وضع الدرجات يدويًا."
-        submitted_date: "تاريخ الإرسال: %{date}"
       sms: 
         body_sms: "تغيرت درجة %{title}, %{context} لتوها."
         more_info: "مزيد من المعلومات على %{url}"
@@ -10102,8 +9654,6 @@ ar:
         notifications_link: "يمكنك تغيير إعدادات الإعلام عن طريق زيارة الصفحة التالية:"
         subject: "إعلامات Canvas الأخيرة"
         weekly_body: "تم تسجيلك لاستلام تقرير أسبوعي خاص ببعض الإعلامات الواردة من حساب Canvas.  فيما يلي التقرير الخاص بنهاية الأسبوع %{date}:"
-      facebook: 
-        new_notifications: "لقد تلقيت *%{notification_count} إعلامًا جديدًا* في #Canvas#."
       sms: 
         notifications_sms: "%{notifications_count} إعلامًا جديدًا على %{url}"
       twitter: 
@@ -10123,8 +9673,6 @@ ar:
           subject: "صفحة Wiki المحدثة: %{title}، %{user}"
         link_message: "يمكنك مراجعتها هنا: %{link}"
         subject: "صفحة Wiki المحدثة: %{title}, %{user}"
-      facebook: 
-        body: "لقد تم تحديث صفحة على wiki لـ %{title}."
       sms: 
         more_info: "مزيد من المعلومات على %{url}"
         updated_message: "%{title}, %{user} الذي تم تحديثه للتو:"
@@ -10142,8 +9690,6 @@ ar:
           details_link: "انقر هنا لعرض التفاصيل"
           subject: "دعوة لمؤتمر عبر الويب: %{name}"
         subject: "دعوة لمؤتمر عبر الويب: %{name}"
-      facebook: 
-        body: "لقد تمت دعوتك للمشاركة في مؤتمر عبر الويب، *%{title}* لـ #%{name}#."
       sms: 
         body: "تمت دعوتك للانضمام إلى مؤتمر عبر الويب، %{title} لـ %{name}."
         link_message: "مزيد من المعلومات على %{url}"
@@ -10370,7 +9916,6 @@ ar:
   name_only_5f56718e: "الاسم فقط"
   new_account_role_6e5c4964: "دور حساب جديد"
   new_course_role_6a7bb75f: "دور مساق جديد"
-  new_facebook_message: "لديك رسالة جديدة من Canvas"
   new_file_135ae520: "[ ملف جديد ]"
   new_outcome_7fba8c7d: "نتيجة جديدة"
   new_quiz_statistics_desc: "تمكين صفحة إحصائيات الاختبار الجديد لمساق."
@@ -10597,8 +10142,6 @@ ar:
         display: "عنوان البريد الإلكتروني"
       errors: 
         saving_preferences_failed: "يا للحسرة! حدث مكروه ما.  الرجاء إعادة المحاولة"
-      facebook: 
-        display: Facebook
       push: 
         display: "إرسال إعلام"
       sms: 
@@ -10917,6 +10460,7 @@ ar:
   paginated_view: 
     loading_more_results: "تحميل مزيد من النتائج"
   participations_1823832d: المشاركون
+  password_8a271b1c: "كلمة المرور"
   paste_xml_cda3a64e: "لصق XML"
   paypal: 
     exception: "عذرًا، حدث خطأ، الرجاء المحاولة مرة أخرى لاحقًا."
@@ -11037,32 +10581,6 @@ ar:
       primary_pad: "Primary Pad"
       sketchpad: SketchPad
       typewithme: TypeWith.me
-    facebook: 
-      description: "تطبيق Canvas Facebook"
-      name: Facebook
-    facebook_settings: 
-      description: |-
-          ستحتاج إلى إنشاء [تطبيق جديد على موقع facebook.com](%{facebook_url})، وإضافة "التطبيق على Facebook" كنظام أساسي.
-          قم بتعيين خيارات التكوين التالية لضمان أن يعمل تطبيق Facebook بشكل صحيح:
-          
-          * **إعدادات -- التطبيق على Facebook -- صفحة Canvas:** دوِّن ملاحظة باختيارك أيًا كان (الجزء الذي يلي apps.facebook.com) وأدخلها بالشكل التالي
-          * **إعدادات -- التطبيق على Facebook -- عنوان URL لـ Canvas:** تعيين على %{canvas_url}
-          * بعد حفظ التطبيق، دوِّن ملاحظة بمعرف التطبيق ورمز العميل وكلمة سر التطبيق
-      domain_name: مجال
-      headers: 
-        domain_settings: "إعدادات المجال"
-      hints: 
-        api_key: "يُشار إليه أيضًا كرمز العميل"
-        canvas_domain: "هذا هو المجال المحدد في \"عنوان URL لـ Canvas\""
-        canvas_name: "هذا هو المسار المحدد في \"صفحة Canvas\""
-        disable_ssl: "استخدام الاختبارات المحلية"
-      labels: 
-        api_key: "مفتاح واجهة برمجة التطبيقات (API)"
-        app_id: "معرف التطبيق"
-        canvas_domain: "مجال Canvas"
-        canvas_name: "اسم Canvas"
-        disable_ssl: "تعطيل SSL"
-        secret: "كلمة سر التطبيق"
     google_docs: 
       description: "مشاركة مستند Google Docs"
       name: "Google Docs"
@@ -11312,7 +10830,6 @@ ar:
     labels: 
       requirements_must_be_completed: "يلزم إكمال المتطلبات التالية قبل إلغاء تأمين هذه الصفحة"
   presentation_2d9387ca: "عرض تقديمي"
-  press_spacebar_for_more_details_on_this_outcome_f6713a42: "اضغط على مفتاح المسافة للحصول على مزيد من التفاصيل عن هذه النتيجة"
   privacy_290109ea: الخصوصية
   product_name: Canvas
   profile: 
@@ -11363,8 +10880,6 @@ ar:
       profile_update_failed: "فشل تحديث تسجيل الدخول"
       regenerating_token_failed: "فشل إعادة إنشاء الرمز المميز"
       registration_failed: "فشل التسجيل. تحقق من اسم المستخدم وكلمة المرور، وحاول مرة أخرى."
-    facebook_select: 
-      facebook: Facebook
     failed_resending: "فشل الطلب. حاول مرة أخرى."
     links: 
       resend_confirmation: "تأكيد إعادة الإرسال"
@@ -11389,7 +10904,6 @@ ar:
         generate_token: "إنشاء الرمز المميز"
         new_access_token: "رمز مميز جديد للوصول"
         regenerate_token: "إعادة إنشاء الرمز المميز"
-        register_facebook_account: "تسجيل حساب Facebook"
         register_linkedin_account: "تسجيل حساب LinkedIn"
         save_login: "حفظ تسجيل الدخول"
         save_skype_name: "حفظ اسم Skype"
@@ -11400,7 +10914,6 @@ ar:
       delicious_description: "تعد Delicious أداة تتيح لك تخزين إشاراتك المرجعية ومشاركتها مع الآخرين. وسيتيح لك محرر محتوى Canvas الثري بالخيارات البحث في علامات Delicious لسهولة إجراء ارتباط من داخل Canvas إلى الموارد الأخرى التي تراها مفيدة."
       diigo_description: "تعد Diigo أداة لوضع إشارات مرجعية اجتماعية تم تصميمها خصيصًا للأبحاث والتعليم. وسيتيح لك محرر محتوى Canvas الثري بالخيارات البحث في علامات Diigo لسهولة إجراء ارتباط من داخل Canvas إلى الموارد الأخرى التي تراها مفيدة."
       error_loading_token_details: "خطأ أثناء تحميل تفاصيل الرمز المميز"
-      facebook_description: "إذا كان لديك حساب Facebook، فيمكنك تثبيت تطبيق Canvas وتلقي إعلامات المساق على ملف التعريف الخاص بك. ويمكنك تحديد أنواع الإعلامات التي تريدها وعدد مرات إرسالها كما ترغب."
       feature_options: "خيارات الميزة"
       full_token_warning: |-
           **انسخ هذا الرمز المميز الآن**. وبمجرد أن تترك هذه الصفحة، لن تستطيع
@@ -11413,7 +10926,6 @@ ar:
         dates: التواريخ
         delicious_login: "تسجيل الدخول إلى Delicious"
         diigo_login: "تسجيل الدخول إلى Diigo"
-        facebook_access: "الوصول إلى Facebook"
         generate_access_token: "إنشاء رمز وصول مميز"
         google_docs_access: "الوصول إلى Google Docs"
         google_drive_access: "الوصول إلى Google Drive"
@@ -11475,7 +10987,6 @@ ar:
         diigo: Diigo
         disable_mfa: "تعطيل المصادقة متعددة العوامل"
         edit_settings: "تحرير الإعدادات"
-        facebook: Facebook
         google_docs: "Google Docs"
         google_drive: "Google Drive"
         linkedin: LinkedIn
@@ -11484,7 +10995,6 @@ ar:
         skype: Skype
         twitter: Twitter
         upload_new_image: "تحميل صورة جديدة"
-        view_facebook_app: "عرض تطبيق Facebook"
         view_your_profile: "عرض ملف تعريفك"
         yo: Yo
       loading_token_details: "جارٍ تحميل تفاصيل الرمز المميز..."
@@ -11498,7 +11008,6 @@ ar:
       subscribe_to_emails: "أريد تلقي معلومات وأخبارًا ونصائح من Instructure"
       titles: 
         access_token_details: "تفاصيل رمز الوصول المميز"
-        authorize_facebook: "تخويل Facebook"
         authorize_google_docs: "تخويل Google Docs"
         authorize_google_drive: "تخويل Google Drive"
         authorize_linkedin: "تخويل LinkedIn"
@@ -11912,6 +11421,7 @@ ar:
       regrade_options: "خيارات إعادة النقييم *(للطلاب الذين أجابوا بالفعل على هذا السؤال):*"
       some_scores_reduced: "منح النقاط للإجابة الصحيحة فقط (*قد يتم تقليل بعض درجات الطلاب*)"
       update_question_without_regrading: "تحديث السؤال دون إعادة تقييم"
+  quiz_e0dcce8f: اختبار
   quiz_log_auditing: 
     buttons: 
       reload_events: "إعادة تحميل"
@@ -13872,9 +13382,7 @@ ar:
         next: التالي
       getting_started: "أنت تقوم الآن بالتسجيل في **%{course}**."
       labels: 
-        email: "البريد الإلكتروني"
         password: "كلمة المرور"
-      log_in: "الرجاء إدخال البريد الإلكتروني وكلمة المرور:"
     authenticate_or_register: 
       buttons: 
         enroll_in_course: "تسجيل في المساق"
@@ -14344,7 +13852,6 @@ ar:
       labels: 
         custom_rating: "سأكتب تعليقات بدون نماذج عند تقييم الطلاب"
         grading_rubric: "استخدام هذا العنوان تقييم درجات المهمة"
-        title: العنوان
         total_points: "إجمالي النقاط"
         totallying_rubric: "إخفاء إجمالي النقاط لنتائج التقييم"
       links: 
@@ -14368,6 +13875,7 @@ ar:
       out_of: "%{points} *من %{total}*"
       rubric: العنوان
       rubric_title: العنوان
+      title: "العنوان:"
       titles: 
         find_existing_rubric: "بحث عن العنوان الحالي"
     rubric_criterion: 
@@ -14416,6 +13924,7 @@ ar:
       titles: 
         find_a_rubric: "العثور على عنوان"
     rubric_forms: 
+      criteria_description_label: "وصف المعيار"
       points: "%{points} نقطة (نقاط)"
     rubric_summary: 
       buttons: 
@@ -15357,6 +14866,7 @@ ar:
     people: الأشخاص
     view_in_separate_window: "عرض في نافذة منفصلة"
   to_35c6baa2: إلى
+  to_51406be9: إلى
   to_c4c44f4b: إلى
   to_minscore_43e5452e: "إلى %{minScore}%"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "لعرض المهام، تأكد من أن طريقة عرض *جدول الأعمال* نشطة."
@@ -15409,6 +14919,7 @@ ar:
   updated_group_group_name_727b1d98: "تم تحديث المجموعة %{group_name}"
   upload_button: 
     upload: تحميل
+  upload_data_dc4fa4cb: "تحميل البيانات"
   upload_drop_zone: 
     drop_to_upload: "إسقاط العناصر لتحميلها"
   upper_limit_of_range_c454a8f2: "الحد الأقصى للنطاق"
@@ -15571,13 +15082,13 @@ ar:
     descriptions: 
       delicious: "تعد Delicious أداة مشاركة ارتباط تعاونية.  ويمكنك وضع علامة على أية صفحة على الإنترنت للرجوع إليها لاحقًا.  كما يمكنك الارتباط بحسابات Delicious الخاصة بالمستخدمين الآخرين لمشاركة ارتباطات ذات اهتمام مشترك."
       diigo: "تعد Diigo أداة مشاركة ارتباطات تعاونية.  ويمكنك تعليم أية صفحة على الإنترنت للرجوع إليها لاحقًا.  كما يمكنك الارتباط بحسابات Diigo الخاصة بالمستخدمين الآخرين لمشاركة ارتباطات تهمك بنفس القدر."
-      facebook: "سيتيح لك سرد ملف تعريف Facebook الاتصال بأصدقائك الذين تقوم بتكوينهم في الفصول والمجموعات التي تنضم إليها على نحو أكثر سهولة."
       google_docs: "يستطيع الطلاب استخدام Google Docs للتعاون في المشروعات الجماعية.  حيث إن Google Docs يسمح بالتحرير الجماعي في الوقت الفعلي للمستندات وجداول البيانات والعروض الإرسالية."
       google_drive: "يستطيع المستخدمون استخدام Google Drive للتعاون على مشروعات المجموعة. يتيح Google Drive التحرير التعاوني للمستندات وأوراق العمل والعروض التقديمية في الوقت الحقيقي."
       linked_in: "يعد LinkedIn موردًا لشبكات الأعمال.  يمكن أن تكون العديد من العلاقات التي تقوم بتكوينها في مدرسة ما من المدارس علاقات مفيدة بعدما تنخرط في حقل العمل."
       skype: "يعد Skype أداة مجانية للمكالمات الصوتية ومكالمات الفيديو عبر الإنترنت."
       twitter: "يعتبر Twitter موردًا رائعًا للتواصل خارج الفصل الدراسي."
       yo: "تطبيق Yo عبارة عن أداة للتواصل بنقرة واحدة وبدون كتابة أي حروف."
+  username_47bb5bbe: "اسم المستخدم"
   users: 
     admin_merge: 
       buttons: 
@@ -15649,8 +15160,6 @@ ar:
     errors: 
       no_teacher_courses: "لا توجد مساقات مشتركة بين هذا المعلم والطالب"
       user_not_teacher: "هذا المستخدم ليس مُعلمًا في هذا المساق"
-    facebook_added: "تم إضافة حساب Facebook بنجاح!"
-    facebook_fail: "فشل تخويل Facebook."
     google_docs_added: "تم تخويل الوصول إلى Google Docs!"
     google_docs_fail: "فشل تخويل Google Docs. يرجى المحاولة مرة أخرى"
     google_drive_added: "تمت إضافة حساب Google Drive بنجاح!"
@@ -15884,6 +15393,7 @@ ar:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE،‏ WebCT 6+ المساق"
   webct_name: "Blackboard Vista/CE (WebCT)"
+  what_should_the_csv_file_look_like_985a59ac: "ما الشكل الذي يجب أن يكون عليه ملف CSV؟"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "عندما يزور الأشخاص المساق، هذه هي الصفحة التي سيرونها. يمكنك إعدادها لتعرض تدفق النشاط أو قائمة وحدات المساق أو المناهج أو صفحة مخصصة تكتبها بنفسك. الإعداد الافتراضي هو تدفق نشاط المساق."
   where_would_you_like_to_move_title_fabd6e8f: "إلى أين ترغب في نقل %{title}؟"
   widget: 
@@ -16001,6 +15511,7 @@ ar:
       title_characters: "يجب أن يحتوي العنوان على حرف أو رقم واحد على الأقل"
       title_too_long: "لا يمكن أن يتجاوز العنوان %{max_characters} حرفًا (أحرف)"
     unknown_user_name: "غير معروف"
+  wiki_page_6c11ee20: "صفحة Wiki"
   wiki_pages: 
     edit: 
       page_header_title: "تحرير %{page_name}"
