@@ -68,7 +68,6 @@ zh:
       avatars: 用户头像
       delicious: Delicious
       diigo: Diigo
-      facebook: Facebook
       google_docs: "Google Docs"
       google_docs_preview: "Google Docs Preview"
       google_drive: "Google Drive"
@@ -84,8 +83,6 @@ zh:
       invalid_discovery_url: "发现 URL 无效\n"
     feedback_coach: 询问社区
     feedback_coach_sub: "从 Canvas 专家处获得帮助"
-    feedback_feature_request: 请求功能
-    feedback_feature_request_canvas_net: "在 Canvas 网络中请求功能"
     feedback_feature_request_sub: "有改进 Canvas 的想法？"
     manually_created_courses: 手动创建的课程
     root_account_cant_have_sis_id: 无法对根帐户设置学号
@@ -237,7 +234,7 @@ zh:
         login_handle_name: 登录标签
         position: 职位
         requested_authn_context: 上下文认证
-        unkown_user_url: "未知用户 Url"
+        unknown_user_url: "未知用户 Url"
       log_in_url: "登录 URL"
       log_out_url: "注销 URL"
       login_attribute: 登录属性
@@ -252,7 +249,7 @@ zh:
       save_button: 保存身份验证设置
       start_debugging: 开始纠错
       stop_debugging: 停止纠错
-      unkown_user_url_description: "在 Canvas 中未找到通过身份验证的用户时要重定向到的 url。"
+      unknown_user_url_description: "在 Canvas 中未找到通过身份验证的用户时要重定向到的 url。"
     saml_testing: 
       auth_request_to_idp: "已向 IdP 发送 AuthnRequest"
       auth_response_from_idp: "来自 IdP 的 AuthnResponse"
@@ -945,6 +942,7 @@ zh:
         outgoing_email_default_name_option_default: "默认 Canvas 设置"
         prevent_course_renaming_by_teachers: 不要让教师重命名其课程
         restrict_quiz_questions: 限制学生在课程结束日期后查看测验题
+        restrict_student_future_view: 限制学生在开始日期之前查看课程
         role_id: 添加更多
         self_enrollment: 允许自我注册
         self_registration: 自行注册
@@ -1536,6 +1534,7 @@ zh:
     titles: 
       gpa_scale_explainer: "什么是 GPA 等级评分？"
       grading_scheme_info: 查看/编辑评分方案
+  assignment_976578a8: 作业
   assignment_comments_e43ed898: 作业评论
   assignment_details: 
     no_graded_submissions: 无已评分作业
@@ -2166,6 +2165,7 @@ zh:
     upload_error_timeout: "请求超时: %{url}"
     upload_error_too_many_redirects: 太多重定向
     upload_error_unexpected: "从 %{url} 下载时发生未知错误"
+  attachment_deffe5a9: 附件
   attendance: 
     default_attendance_title: "参与 %{date}"
     errors: 
@@ -2444,7 +2444,6 @@ zh:
       create_event: 创建新事件
       done_go_back_to_list: 完成，返回列表
       links: 
-        accessibility_warning: "警告: 无法通过屏幕阅读器访问此视图。请使用议程视图。"
         calendar_agenda: 议程
         calendar_month: 月
         calendar_scheduler: 计划程序
@@ -2639,25 +2638,9 @@ zh:
     crumbs: 
       new: 新日历事件
     full_calendar_event: 
-      buttons: 
-        create: 创建事件
-        update: 更新事件
-      labels: 
-        address: 地址
-        date: 日期
-        event_description: 事件说明
-        from: 从
-        location: 位置
-        title: 标题
       no_content: 无内容
-      timespan: "%{start_time} *到* %{end_time}"
     new: 
-      links: 
-        back_to_calendar: 返回日历
-        delete: 删除事件
-        edit: 编辑日历事件
       page_title: 新日历事件
-    no_content: 无内容
     notices: 
       created: 事件已成功创建。
       deleted: 此事件已删除
@@ -2677,43 +2660,6 @@ zh:
     invalid_date_or_time: "%{attr} 的日期或日期时间无效"
   calendars: 
     assignment_details: 作业详细信息
-    calendar: 
-      alts: 
-        next: 下一页
-        previous: 上一页
-      calendars_count: 
-        one: "%{count} 个日程表，%{open_count} 已打开"
-        other: "%{count} 个日程表，%{open_count} 已打开"
-      feed_title: 日历馈送
-      instructions: 
-        ics_link: "复制以下链接并将其粘贴到提取 iCal 馈送的任何日历应用程序（Google Calendar、iCal、Outlook 等）"
-      labels: 
-        calendar: 日历
-        date: 日期
-        details: 详细信息
-        due: 截止时间
-        from: 从
-        group: 小组
-        title: 标题
-        undated_events: 无日期的事件
-      links: 
-        add_event: 添加事件
-        delete: 删除
-        edit: 编辑
-        feed: 单击此处查看馈送
-        full_details: 完全详细信息
-        how_do_i: 如何...?
-        jump_to_calendar: 跳至日历
-        more_options: 更多可更多选项
-        show_undated_events: "显示 %{count} 个无日期的事件"
-      messages: 
-        max_visible: "每次最多可显示 %{count} 个日历"
-      options: 
-        new_group: "[创建新小组]"
-      tabs: 
-        assignment: 作业
-        event: 事件
-      timespan: "%{start_time} *到* %{end_time}"
     default_title: 事件
     event: 
       due: 截止时间
@@ -2737,36 +2683,6 @@ zh:
     prompts: 
       delete_assignment: 是否确定要删除此作业?
       delete_event: 是否确定要删除此事件?
-    show: 
-      crumbs: 
-        my_calendar: 我的日历
-      feed_title: "课程日历 Atom 馈送"
-      keycode_descriptions: 
-        delete: 删除当前事件
-        edit: 编辑当前事件
-        next_day: 下一个日历日
-        next_event: 下一个日历日/事件
-        next_week: 下周
-        open: 打开当前事件
-        previous_day: 上一个日历日
-        previous_event: 上一个日历日/事件
-        previous_week: 上周
-        refresh: 刷新日历
-      keycode_descriptoins: 
-        new: 当前日的新事件
-      keycodes: 
-        delete: d
-        edit: e
-        new: "n"
-        next_day: ctrl+向右键
-        next_event: j
-        next_week: ctrl+向下键
-        open: o
-        previous_day: ctrl+向左键
-        previous_event: k
-        previous_week: ctrl+向上键
-        refresh: r
-      page_title: 日历
     show2: 
       calendar_feed: 日历馈送
       calendar_feed_instructions: "复制以下链接并将其粘贴到提取 iCal 馈送的任何日历应用程序（Google Calendar、iCal、Outlook 等）"
@@ -2785,7 +2701,6 @@ zh:
       add_new_event: 添加新事件
       edit_assignment: 编辑作业
       edit_event: 编辑事件
-    use_new_calendar: 试试新的日程表
     wizard_box: 
       descriptions: 
         assignment: 很好。现在单击对话框中的"作业"选项卡以创建作业而非日历事件。
@@ -2842,6 +2757,7 @@ zh:
     titles: 
       update_assignment_points: 是否改变可能得分以匹配评分标准?
   choose_a_course_home_page_8059c7b: 选择课程主页
+  choose_a_csv_file_to_upload_9644480c: "选择要上传的 CSV 文件:"
   choose_usage_rights_33683854: 选择使用权限...
   clear_file_name_text_field_fce73840: 清除文件名文本字段
   click_here_on_the_calendar_link_c9965631: "单击此处的 *日历* 链接"
@@ -2958,7 +2874,6 @@ zh:
   communication_5255723c: 通信
   communication_channel: 
     body: "您的 Canvas 验证码为 %{verification_code}"
-    default_facebook_account: "Facebook 帐户"
     default_twitter_handle: "Twitter 处理"
     default_yo_name: "Yo 名称"
   communication_channels: 
@@ -3418,7 +3333,6 @@ zh:
         user_services: 已注册的网络服务
       help: 
         list_services: 您未启用已注册服务的列表。启用此列表可让课程和小组的同伴成员在课外更轻松地与您链接。
-        services: "您没有将用户配置文件链接到任何外部服务。您可以将 Canvas 帐户链接到 Facebook 和 Twitter 等服务。这更便于课程和小组同伴成员在课外与您链接。"
       labels: 
         public_list_services: 让课程/小组同伴成员查看我已将哪些服务链接到配置文件
         user_privileges: 权限
@@ -3457,7 +3371,6 @@ zh:
         registered_services: 注册的服务
         service_types: 服务类型
       help: 
-        no_services: "您没有将用户配置文件链接到任何外部服务。您可以将 Canvas 帐户链接到 Facebook 和 Twitter 等服务。"
         services_private: "您未启用已注册服务的列表。启用此列表可让课程和小组同伴成员查看您已将哪些服务链接至您的 Canvas 帐户。"
         user_services: "如果其它成员选择，他们可让您查看他们已将哪些外部服务链接至其 Canvas 帐户。这样更便于协调组项目以及链接课堂外部。"
       labels: 
@@ -3766,12 +3679,9 @@ zh:
     all_courses: 所有课程
     all_in_context: "全部在 %{context} 中"
     archive: 存档
-    archive_conversation: 存档会话
     autocomplete_result: 
       group_people: "人员: %{people}"
       no_results: 无结果
-    autocomplete_token: 
-      remove_recipient: 删除收件人
     back: 返回
     cannot_add_to_private: 不能将参与者添加到私人会话。
     cannot_be_empty: 消息不能为空
@@ -3815,12 +3725,10 @@ zh:
     hide: 隐藏
     index_new: 
       archive: 存档
-      archive_conversation: 存档会话
       archived: 已存档
       clear_search: 清除搜索结果
       compose_new_message: 编写一条新消息
       delete: 删除
-      delete_conversation: 删除会话
       filter_messages_by_course: 按课程过滤消息
       filter_messages_by_type: 按类型过滤消息
       forward: 转发
@@ -3873,7 +3781,6 @@ zh:
         add_to_faculty_journal: 添加为教师日志条目
         attachments: 附件
         course: 课程
-        course_required: 您必须选择一个课程才能输入收件人。
         select_course: 选择课程
         subject: 主题
         to: 至
@@ -3921,7 +3828,6 @@ zh:
     titles: 
       rss_feed: 会话消息源
     unarchive: 取消存档
-    unarchive_conversation: 取消存档会话
     unstar: 取消标记
     unstar_conversation: 取消标记会话
   copyright_holder_66ee111: 版权持有者：
@@ -4200,14 +4106,8 @@ zh:
       headings: 
         grade: "评分 %{assignment}"
         to_do: 待办事项
-      images: 
-        alt: 
-          ignore: 忽略
       links: 
         show_more: "%{count} 个其它..."
-        title: 
-          ignore: 忽略此作业
-          ignore_review: 忽略此次审阅
       need_grading_count: 
         one: "%{count} 个需要评分"
         other: "%{count} 个需要评分"
@@ -4225,8 +4125,6 @@ zh:
         conclude_course: 结束课程
         delete_course: 删除课程
       details: 
-        conclude_alt_text: 如果您要在限制学生访问课程的同时，保留更改评分的能力，请使用课程日期设置。您可以在我们*此处*的指南中了解关于课程日期设置的信息
-        confirm_conclude: "警告: 结束课程后，您将无法修改评分，也无法访问课程内容。"
         confirm_delete: 是否确定要删除此课程？在删除之后，学生和教师无法再访问。如果只想将其从课程下拉菜单中删除，则应*改用结束课程*。
         confirm_delete_addendum: "如果您无权结束课程，您可以*更改课程结束日期*，或请求您的管理员结束课程。 "
       headings: 
@@ -5091,6 +4989,7 @@ zh:
       在不使用那些分数的情况下计算出来。
   disable_a5c05db3: 禁用
   disabled_18c33a73: （已禁用）
+  discussion_6719c51d: 讨论
   discussion_entries: 
     created_entry_notice: 条目已成功创建。
     deleted_entry_notice: 该条目已删除
@@ -5107,6 +5006,7 @@ zh:
     atom_no_author: 无作者
     default_title: 无标题
     empty_message: 无消息
+  discussion_topic_dc85ad4c: 讨论主题
   discussion_topics: 
     assignment_details: 
       available_from: 开始时间
@@ -5167,7 +5067,6 @@ zh:
         published: 已发布
       delay_posting: 延迟发布
       enable_podcast_feed: 启用播客动态消息
-      include_replies_in_podcast_feed: 在播客动态消息中包括回复
       only_visible_to_overrides_note: "注意：此讨论 *仅* 对下面指定的章节显示："
       options: 可选功能
       page_header_title: 新讨论
@@ -5214,7 +5113,6 @@ zh:
       loading: 正在加载...
       lock_for_comments: 锁定以发表评论
       make_sure_all_search_terms_are_spelled_correctly: 确保所有的搜索词拼写正确。
-      new_discussion: "*开始* 讨论"
       rss_feed: "RSS 信息源"
       start_one_now: 立即开始
       suggestions: "建议:"
@@ -5280,7 +5178,7 @@ zh:
       reply_to_topic: 回复主题
       retrieved_from_feed: "从 %{feed} 检索"
       show_rubric: 显示评分标准说明
-      speed_grader: 快速评分器
+      speed_grader: 快速评分器™
       topic: 主题
       topic_podcast_feed_link: 主题播客动态消息
       topic_subscribe: 订阅
@@ -5407,7 +5305,6 @@ zh:
   due_datetime_f5a81b81: "到期日期：%{dateTime}"
   due_multiple_dates_cc0ee3f5: 到期日期：多个日期
   due_on_date_aa4725cd: 到期日期：
-  due_on_date_ffc98ebc: 到期日期
   e_mail_only_2cc5e513: 仅限电子邮件
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "每一条为一项作业。*垂直细条* 表示该课程中任意学生的最低分一直到最高分。**粗条** 表示第 25 个百分位一直到第 75 个百分位，其中标记了 ***中值分数***。"
   each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "每一条为一项作业。垂直细条表示该课程中任意学生的最低分一直到最高分。粗条表示第 25 个百分位一直到第 75 个百分位，其中标记了中值分数。该学生的分数标有圆点。"
@@ -5429,6 +5326,7 @@ zh:
     buttons: 
       create_rubric: 创建评分标准
       update_rubric: 更新评分标准说明
+    change: 更改
     discussion_points_possible: 
       one: "满分为 %{count} 分"
       other: "满分为 %{count} 分"
@@ -5899,6 +5797,7 @@ zh:
       posts_added: 帖子已添加
       remove_feed: "删除 %{display_name}"
   external_integration_keys_8b4f4548: 外部集成密钥
+  external_tool_c5a6410a: 外部工具
   external_tools: 
     account_navigation_configured: 帐户导航已配置
     app_full_view: 
@@ -6006,53 +5905,6 @@ zh:
     submit: 提交
     user_navigation_configured: 用户导航已配置
     wiki_page_menu_configured: "Wiki 页面菜单已配置"
-  facebook: 
-    authorization_required: 只有经授权的用户才能访问该页面。
-    authorization_success: "授权成功！Canvas 和 Facebook 现在是盟友。"
-    deleted: 已删除
-    index: 
-      all_set: 已设置完毕！
-      bookmark_notice: "您可以从 Facebook 主页查看 Canvas 新通知的数量（如果您制作了此应用程序的书签）。"
-      canvas_messages: "Canvas 消息"
-      configure_notification_preferences_notice: "在*配置您的通知首选项*之后，就可以在此处看到通知，从而知道您的 Canvas 帐户中发生的事情。"
-      installation_about: "要安装 Canvas Facebook 应用程序，请转至 Canvas 中的配置文件页面，然后单击 Facebook 按钮将您的帐户连接到 Facebook。"
-      learn_more: "更多信息请参阅 instructure.com"
-      more_information: "更多信息请参阅 %{domain_list}"
-      no_messages_notice: "当课程中发生事情时，您将在此处看到通知，从而知道您的 Canvas 帐户中发生的事情。"
-      notification_about: "Canvas Facebook 应用程序旨在方便您访问课程中的互动信息。您可以设置为当您的作业被计分、截止时间更改等事件时向您发送通知。您的私人数据在 Canvas 中仍然保持私密性。"
-      notification_settings: 通知设置
-      notifications_notice: "下面您可以看到来自 Canvas 的最近通知列表。您可以从 Facebook 主页查看 Canvas 新通知的数量（如果您制作了此应用程序的书签）。"
-      welcome: "欢迎回来，%{name}！"
-      welcome_message: "欢迎使用 Instructure 免费提供的新款在线学习软件。这款软件旨在帮助您更好地利用网络提高学习。我们的界面简洁、清爽且开放，我们充分利用您和您的学生已在使用的工具（例如 Facebook）提供更开放、更协作的学习体验。我们将它融合成一个强大、开放的软件包，而不仅仅一款跟踪作业的软件。它鼓励互动并促进学习。"
-      welcome_title: "欢迎使用 Instructure Canvas"
-    index_disabled: 
-      disabled_notice: "此 Canvas 网站未配置为与 Facebook 通信。"
-      get_help: "请登录 support.instructure.com 获取帮助"
-      instructure_canvas: "Instructure Canvas"
-    invalid_signature: "无效的 Facebook 签名"
-    message: 
-      hide: 隐藏
-    notification_policies: 
-      alerts: 警报
-      cancel: 取消
-      change_settings: 更改设置
-      daily: 每天
-      labels: 
-        alerts_for_category: "%{category_name} 警报"
-      loading: 正在加载...
-      never: 从不
-      notification_type: 通知类型
-      right_away: 立即
-      send_to_facebook: "发送到 Facebook?"
-      update_preferences: 更新首选项
-      updating_preferences: 正在更新首选项...
-      weekly: 每周
-    settings: 
-      back_to_messages: 返回到消息
-      link_needed: "在配置 Canvas Facebook 应用程序之前需要将其链接到您的 Canvas 登录。请单击 \"欢迎\" 了解更多信息。"
-      notifications_config_notice: "来自 Canvas 的通知可自动发送到您的 Facebook 帐户。下面您会看到可发送的通知类型。您可以在此处或 Canvas 中随时更改您的通知首选项。"
-      settings_title: "Canvas 通知设置"
-      updating_preferences: 正在更新首选项...
   fair_use_bee47d77: 公正使用
   favicon_6e658914: Favicon
   feature_flags: 
@@ -6331,6 +6183,7 @@ zh:
     only_one_folder: "无法设置文件夹的路径和 ID"
   for: 针对
   for_all_devices_1f603968: 针对所有设备
+  from_fdd4956d: 从
   from_from_to_to_e31f6422: "从 %{from} 到 %{to}"
   global_message_icons: 
     announcement: 通告
@@ -6527,21 +6380,9 @@ zh:
       switch_to_points: 切换到得分
     ungraded: 不影响评分
   gradebook_uploads: 
-    errors: 
-      invalid_file: "csv 文件无效，无法更新评分"
-      upload_failed: 无法上传文件。
-    form: 
-      labels: 
-        upload: "选择要上传的 CSV 文件"
-      titles: 
-        upload_form: "选择要上传的 CSV 文件"
     new: 
       titles: 
         new_upload: 上传评分册
-    notices: 
-      updated: 
-        one: "已成功更新 %{count} 份提交。"
-        other: "已成功更新 %{count} 份提交。"
     show: 
       assignment_answer: 此作业为
       assignment_example: 股票指数测验
@@ -6568,14 +6409,6 @@ zh:
       student_answer: 此人是真的
       student_example: 一些家伙
       student_question: 有疑问的学生
-  gradebook_uploads_form: 
-    buttons: 
-      upload_data: 上传数据
-    labels: 
-      upload: "选择要上传的 CSV 文件:"
-    titles: 
-      upload_form: "选择要上传的 CSV 文件"
-    what_should_csv_look_like: "CSV 文件应该是什么样子?"
   gradebooks: 
     attendance: 
       attendance_info: 尚未创建参与作业。
@@ -6696,12 +6529,14 @@ zh:
       set_group_weights: 设置组权重
       show_attendance_columns: 显示参与列
       show_concluded_enrollments: 显示结业登记
-      upload_scores: 导入
       view_grading_history: 查看评分历史记录
     grades: 
       complete: 完成
       incomplete: 未完成
     grades_filename: 评分
+    grading_box_extended: 
+      labels: 
+        grade: 评分
     history: 
       graded_on_submission: 为提交内容计分
       grades_for_date: 日期的评分
@@ -6772,7 +6607,6 @@ zh:
       labels: 
         add_comment: 添加评论
         average: 平均
-        grade: 评分
         grade_by_question_beta: "按问题评分 (beta)"
         group_comment: 发送评论到全小组
         hide_names: 在快速评分器中隐藏学生姓名
@@ -7378,8 +7212,11 @@ zh:
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "如果您离开，目前正在准备的 zip 文件下载将被取消。"
   if_you_ve_been_using_another_course_management_sys_67edfab1: "如果您曾使用其他课程管理系统，则可能需要将其中的材料转移到 Canvas 中。我们可以引导您轻松将内容迁移到 Canvas。"
   ignore_assignment_738b3c99: 忽略作业
+  ignore_forever_dd4a6cdf: 总是忽略
   ignore_name_55edc6fe: "忽略 %{name}"
   ignore_these_3940f6f5: 忽略这些
+  ignore_this_assignment_b7a71f80: 忽略此作业
+  ignore_until_new_submission_87f32b4: 在出现新提交文件之前忽略
   image_8ad06: 图像
   images: 
     error_checking_color: 检查图像颜色时出错
@@ -7389,6 +7226,7 @@ zh:
     invalid_file_type: "文件类型 %{type} 无效。允许的类型包括: %{type_list}"
     not_an_image: 所选文件不是图像
   immediately_c128ede6: 立即
+  import_1b31507: 导入
   import_content_b2fd6620: 导入内容
   importers/assignment_importer: 
     errors: 
@@ -7461,8 +7299,6 @@ zh:
       posting_message_failed: 发布失败，请重试
       required: 必填字段
       search_failed: 搜索失败，请重试。
-    ignore_forever: 总是忽略
-    ignore_until_new_submission: 在出现新提交文件之前忽略
     labels: 
       datepicker: 
         time: 时间
@@ -7596,8 +7432,6 @@ zh:
         dashboard: 我的面板
         skip_to_content: 跳至内容
       open_source_learning_management_system: "开源 LMS"
-    facebook: 
-      title: "Facebook 页面"
     fixed_bottom: 
       masquerading: 
         stop: 停止仿冒
@@ -7743,6 +7577,7 @@ zh:
   lock_date_cannot_be_after_term_end_cf1a188f: 锁定日期不能晚于学期结束日期
   lock_date_cannot_be_before_due_date_ac30f54: 锁定时间不能早于截止时间
   lock_until_date_62ce1b5c: 锁定截止时间
+  log_out_379ba28a: 注销
   logged_out_user: "注销的用户 %{user_counter}"
   logo_a040ae0e: 徽标
   low_score_4eeb95b2: "低分：%{score}"
@@ -7774,7 +7609,6 @@ zh:
   manage_usage_rights_c5a8c216: 管理使用权限
   manual_entry_e4a4f99a: 手动输入
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: 掌握分数反映最近评分的作业或测验。
-  mastery_scrore_reflects_the_highest_score_of_a_gra_a71008b7: 掌握分数反映已评分作业或测验的最高分。
   mathquill: 
     tabs: 
       arrows: 箭头
@@ -7833,6 +7667,7 @@ zh:
     my_courses: 我的课程
   message: 
     default_subject: "Canvas 警报"
+  message_896d2ed0: "%{message}"
   message_students: 
     buttons: 
       send_message: 发送邮件
@@ -7885,10 +7720,6 @@ zh:
           unknown_user: 未知用户
         subject: "%{user_name} 仅将您添加到 Canvas 中的会话。"
         unknown_user: 未知用户
-      facebook: 
-        body: "%{user_name} 仅将您添加到 Canvas 中的会话。"
-        link_text: 查看会话
-        unknown_user: 未知用户
       sms: 
         body: "%{user_name} 仅将您添加到 Canvas 中的会话。"
         more_info: "更多信息请访问 %{url}"
@@ -7926,25 +7757,6 @@ zh:
         ungraded_count_description: "%{count} 个或多个提交文件尚未计分"
         ungraded_timespan_description: "提交文件已 %{count} 天未计分"
         usernote_description: "没有教师日志条目已 %{count} 天"
-      facebook: 
-        body: 
-          one: "已对 %{student} 触发了警报，因为满足以下条件："
-          other: "已对 %{student} 触发了警报，因为满足以下条件："
-        body_student: 
-          one: 已对您触发了警报，因为满足以下条件：
-          other: 已对您触发了警报，因为满足以下条件：
-        interaction_description: 
-          one: "没有学生/教师交互已 %{count} 天或更久"
-          other: "没有学生/教师交互已 %{count} 天或更久"
-        ungraded_count_description: 
-          one: "%{count} 份或更多作业尚未计分"
-          other: "%{count} 份或更多作业尚未计分"
-        ungraded_timespan_description: 
-          one: "1 个或多个提交文件已 %{count} 天或更久未计分"
-          other: "1 个或多个提交文件已 %{count} 天或更久未计分"
-        usernote_description: 
-          one: "没有教师日志条目已 %{count} 天或更久"
-          other: "没有教师日志条目已 %{count} 天或更久"
       sms: 
         body: "已触发针对 %{student} 的警报"
         body_student: 已触发针对您的警报
@@ -7980,8 +7792,6 @@ zh:
           link: 查看通告
         labels: 
           file_included: 包括的文件
-      facebook: 
-        body: "您创建了此通告：%{title}，%{course}"
       sms: 
         details: "更多信息请访问 %{url}"
         subject: "您创建了此通告：%{title}，%{course}"
@@ -7997,8 +7807,6 @@ zh:
           link: 单击此处可加入查看通告
           subject: "通告 %{discussion_topic} 上的新评论：%{course}"
         subject: "通告 %{discussion_topic} 上的新评论：%{course}"
-      facebook: 
-        body: "通告上的新评论：%{discussion_topic}，%{course}"
       sms: 
         body: "通告 %{discussion_topic} 上的新评论：%{course}"
         details: "更多信息请访问 %{url}"
@@ -8033,19 +7841,6 @@ zh:
         message: "%{user} 已取消他/她的 \"%{appointment_name}\" 预订。"
         no_reason_given: 未给定
         subject: " \"%{appointment_name}\" (%{course}) 的预订已取消"
-      facebook: 
-        instructions: 查看约会
-        labels: 
-          attendee: 参加者
-          attendees: 参加者
-          cancel_reason: 取消原因
-          course: 课程
-          date_and_time: 日期/时间
-          details: 约会详细信息
-          group: 小组
-          slots_remaining: 可用时段
-        message: "%{user} 已取消他/她的 \"%{appointment_name}\" 预订。"
-        no_reason_given: 未给定
       sms: 
         message: "%{user} 已取消他/她的 \"%{appointment_name}\" 预订。"
         more_info: "更多信息请访问 %{url}"
@@ -8077,18 +7872,6 @@ zh:
         message: "%{user} 已取消您的 \"%{appointment_name}\" 时段。"
         no_reason_given: 未给定
         subject: "您的 \"%{appointment_name}\" 时段已取消 (%{course})"
-      facebook: 
-        instructions: 注册其它时段
-        labels: 
-          attendee: 参加者
-          attendees: 参加者
-          cancel_reason: "取消原因 "
-          course: 课程
-          date_and_time: 日期/时间
-          details: 约会详细信息
-          group: 小组
-        message: "%{user} 已取消您的 \"%{appointment_name}\" 时段。"
-        no_reason_given: 未给定
       sms: 
         message: "您的 \"%{appointment_name}\" 时段已取消。"
         more_info: "更多信息请访问 %{url}"
@@ -8113,14 +7896,6 @@ zh:
         message: "针对 \"%{appointment_name}\" 的所有约会已取消。"
         no_reason_given: 未给定
         subject: "针对 \"%{appointment_name}\" 的约会已取消 (%{course})"
-      facebook: 
-        labels: 
-          cancel_reason: 取消原因
-          course: 课程
-          dates: 日期
-          details: 约会详细信息
-        message: "针对 \"%{appointment_name}\" 的所有约会已取消。"
-        no_reason_given: 未给定
       sms: 
         message: "针对 \"%{appointment_name}\" 的所有约会已取消。"
         more_info: "更多信息请访问 %{url}"
@@ -8150,17 +7925,6 @@ zh:
           slots_remaining: 可用时段
         message: "针对 \"%{appointment_name}\" 的时段现在可用于注册。"
         subject: "约会 \"%{appointment_name}\" 可用于注册 (%{course})"
-      facebook: 
-        group_signup: "小组 (%{group_category})"
-        individual_signup: 个人
-        instructions: 注册时段
-        labels: 
-          course: 课程
-          dates: 日期
-          details: 约会详细信息
-          signup_type: 注册类型
-          slots_remaining: 可用时段
-        message: "针对 \"%{appointment_name}\" 的时段现在可用于注册。"
       sms: 
         message: "针对 \"%{appointment_name}\" 的注册已开启。"
         more_info: "更多信息请访问 %{url}"
@@ -8192,17 +7956,6 @@ zh:
           slots_remaining: 可用时段
         message: "时段已添加到 \"%{appointment_name}\"，可用于注册。"
         subject: "约会 \"%{appointment_name}\" 已更新 (%{course})"
-      facebook: 
-        group_signup: "小组 (%{group_category})"
-        individual_signup: 个人
-        instructions: 注册时段
-        labels: 
-          course: 课程
-          dates: 日期
-          details: 约会详细信息
-          signup_type: 注册类型
-          slots_remaining: 可用时段
-        message: "时段已添加到 \"%{appointment_name}\" ，可用于注册。"
       sms: 
         message: "新的时段可用于 \"%{appointment_name}\"。"
         more_info: "更多信息请访问 %{url}"
@@ -8235,17 +7988,6 @@ zh:
           slots_remaining: 可用时段
         message: "%{user} 已注册 \"%{appointment_name}\"。"
         subject: "用户已注册 \"%{appointment_name}\" (%{course})"
-      facebook: 
-        instructions: 查看约会
-        labels: 
-          attendee: 参加者
-          attendees: 参加者
-          course: 课程
-          date_and_time: 日期/时间
-          details: 约会详细信息
-          group: 小组
-          slots_remaining: 可用时段
-        message: "%{user} 已注册 \"%{appointment_name}\"。"
       sms: 
         message: "%{user} 已注册 \"%{appointment_name}\"。"
         more_info: "更多信息请访问 %{url}"
@@ -8275,17 +8017,6 @@ zh:
           slots_remaining: 可用时段
         message: "%{user} 已注册 \"%{appointment_name}\"。"
         subject: "您已注册 \"%{appointment_name}\""
-      facebook: 
-        instructions: 注册其它时段
-        labels: 
-          attendee: 参加者
-          attendees: 参加者
-          course: 课程
-          date_and_time: 日期/时间
-          details: 约会详细信息
-          group: 小组
-          slots_remaining: 可用时段
-        message: "%{user} 已为您注册了 \"%{appointment_name}\"。"
       sms: 
         message: "已为您注册了 \"%{appointment_name}\"。"
         more_info: "更多信息请访问 %{url}"
@@ -8306,8 +8037,6 @@ zh:
           link: 单击此处查看作业
           subject: "作业已更改:%{title}，%{course}"
         subject: "作业已更改:%{title}，%{course}"
-      facebook: 
-        body: "%{course} 的作业 %{title_link} 已更改。"
       sms: 
         body: |-
             %{title}，%{course} 已更改。
@@ -8332,11 +8061,6 @@ zh:
           click_to_see_assignment: 单击此处查看作业
         multiple_due_dates: "截止时间: 多个日期"
         new_assignment: "已创建针对您的课程 %{course_name} 的新作业"
-        no_due_date: "截止时间: 无截止时间"
-      facebook: 
-        due_at: "截止时间: %{assignment_due_date_time}"
-        multiple_due_dates: "截止时间: 多个日期"
-        new_assignment: "已创建针对 %{course_name} 的新作业"
         no_due_date: "截止时间: 无截止时间"
       sms: 
         due_at: "截止时间: %{assignment_due_date_time}"
@@ -8366,9 +8090,6 @@ zh:
         labels: 
           click_to_see_assignment: 单击此处查看作业
         no_due_date: 无截止时间
-      facebook: 
-        assignment_due_date_changed_sentence: "课程 %{course_name} 的作业 *%{assignment_name}* 的截止时间已更改为:"
-        no_due_date: 无截止时间
       sms: 
         assignment_due_date_changed: "%{assignment_name}，%{course_name} 现在的截止时间为:"
         more_info_at_url: "更多信息请访问 %{web_address}"
@@ -8393,9 +8114,6 @@ zh:
         labels: 
           click_to_see_assignment: 单击此处查看作业
         no_due_date: 无截止时间
-      facebook: 
-        assignment_due_date_changed_sentence: "%{course_name} (%{override}) 的作业 *%{assignment_name}* 的截止时间已更改为:"
-        no_due_date: 无截止时间
       sms: 
         assignment_due_date_changed: "%{assignment_name}，%{course_name} (%{override}) 现在已截止:"
         more_info_at_url: "更多信息请访问 %{web_address}"
@@ -8417,8 +8135,6 @@ zh:
           the_assignment_is_graded: "作业 %{assignment_name} 已计分。"
         labels: 
           view_here: 您可在此处进行查看
-        the_assignment_is_graded: "作业 %{assignment_name} 已计分。"
-      facebook: 
         the_assignment_is_graded: "作业 %{assignment_name} 已计分。"
       sms: 
         assignment_is_graded: "%{assignment_name}，%{course_name} 已计分。"
@@ -8443,9 +8159,6 @@ zh:
           view_submission: 您可在此处查看提交文件
         user_resubmitted: "重新提交文件:%{user_name}，%{assignment_name}"
         user_resubmitted_sentence: "%{user_name} 刚刚提交课程 %{course_name} 中 %{assignment_name} 的重新提交文件"
-      facebook: 
-        click_to_view: 单击此处查看提交文件。
-        user_resubmitted: "**%{user_name}** 刚刚提交课程 %{course_name} 中 **%{assignment_name}** 的重新提交文件"
       sms: 
         more_info_at: "更多信息请访问 %{web_address}"
         user_resubmitted: "%{user_name} 刚刚再次提交其作业 %{assignment_name}"
@@ -8464,9 +8177,6 @@ zh:
           view_submission: 您可在此处查看提交文件
         user_submitted: "提交文件:%{user_name}，%{assignment_name}"
         user_submitted_sentence: "%{user_name} 刚刚提交课程 %{course_name} 中 %{assignment_name} 的提交文件"
-      facebook: 
-        click_to_view: 单击此处查看提交文件。
-        user_submitted: "**%{user_name}** 刚刚提交课程 %{course_name} 中 **%{assignment_name}** 的提交文件"
       sms: 
         more_info_at: "更多信息请访问 %{web_address}"
         user_submitted: "%{user_name} 刚刚提交其作业 %{assignment_name}"
@@ -8485,9 +8195,6 @@ zh:
           view_submission: 您可在此处查看提交文件
         user_resubmitted_sentence: "%{user_name} 刚刚提交课程 %{course_name} 中 %{assignment_name} 的最近提交的作业"
         user_submitted: "最近作业:%{user_name}，%{assignment_name}"
-      facebook: 
-        click_to_view: 单击此处查看提交文件。
-        user_resubmitted_sentence: "**%{user_name}** 刚刚提交课程 %{course_name} 中 **%{assignment_name}** 的最近提交的作业"
       sms: 
         more_info_at: "更多信息请访问 %{web_address}"
         user_submitted: "%{user_name} 刚刚提交其作业（最近） %{assignment_name}"
@@ -8545,9 +8252,6 @@ zh:
           link: 您可以在此处查看详细信息
           subject: "协作邀请: %{course_or_group}"
         subject: "协作邀请: %{course_or_group}"
-      facebook: 
-        body: "您已被邀请协作文档 %{document} (%{course_or_group})。该文档在 %{service} 中创建。"
-        body_with_user: "您已被邀请协作文档 %{document} (%{course_or_group})。该文档由 %{user} 在 %{service} 中创建。"
       sms: 
         body: |-
             您被邀请协作文档 %{document} (%{course_or_group})。
@@ -8631,10 +8335,6 @@ zh:
         subject: "%{user_name}，您刚刚在 Canvas 中发送了一封邮件。"
         unknown_user: 未知用户
         view_message: 在“对话”中查看此邮件
-      facebook: 
-        body: "%{user_name}，您刚刚在 Canvas 中发送了一封邮件。"
-        link_text: 查看邮件
-        unknown_user: 未知用户
       sms: 
         body: "%{user_name}，您刚刚在 Canvas 中发送了一封邮件："
         more_info: "更多信息请访问 %{url}"
@@ -8661,10 +8361,6 @@ zh:
         subject: "%{user_name} 刚刚在 Canvas 中向您发送了一封邮件。"
         unknown_user: 未知用户
         view_message: 在“对话”中查看此消息
-      facebook: 
-        body: "%{user_name} 刚刚在 Canvas 中向您发送了一封邮件。"
-        link_text: 查看邮件
-        unknown_user: 未知用户
       sms: 
         body: "%{user_name} 刚刚在 Canvas 中向您发送了一封邮件:"
         more_info: "更多信息请访问 %{url}"
@@ -8756,12 +8452,6 @@ zh:
           details: 查看当前注册列表
           subject: "%{user} 接受了课程邀请"
         subject: "%{user} 接受了课程邀请"
-      facebook: 
-        body_designer: "%{user} 刚刚接受了作为设计者参与课程 %{course} 的邀请。"
-        body_observer: "%{user} 刚刚接受了作为观察员参与课程 %{course} 的邀请。"
-        body_student: "%{user} 刚刚接受了作为学生参与课程 %{course} 的邀请。"
-        body_ta: "%{user} 刚刚接受了作为助教参与课程 %{course} 的邀请。"
-        body_teacher: "%{user} 刚刚接受了作为教师参与课程 %{course} 的邀请。"
       sms: 
         body_designer: "%{user} 接受了课程 %{course} 的设计者邀请"
         body_observer: "%{user} 接受了课程 %{course} 的观察员邀请"
@@ -8804,17 +8494,6 @@ zh:
           username: 用户名
         none: 无
         subject: 课程邀请
-      facebook: 
-        body_designer: "我们邀请您作为设计者参与课程 %{course}。"
-        body_observer: "我们邀请您作为观察员参与课程 %{course}。"
-        body_student: "我们邀请您作为学生参与课程 %{course}。"
-        body_ta: "我们邀请您作为助教参与课程 %{course}。"
-        body_teacher: "我们邀请您作为教师参与课程 %{course}。"
-        labels: 
-          email: 电子邮件
-          name: 姓名
-          username: 用户名
-        none: 无
       sms: 
         body_designer: 我们邀请您作为设计者参与课程。
         body_observer: 我们邀请您作为观察员参与课程。
@@ -8863,17 +8542,6 @@ zh:
         none: 无
         register: "访问 %{link} 完成注册"
         subject: 课程注册
-      facebook: 
-        body_designer: "您已作为设计者注册课程 %{course}。"
-        body_observer: "您已作为观察员注册课程 %{course}。"
-        body_student: "您已作为学生注册课程 %{course}。"
-        body_ta: "您已作为助教注册课程 %{course}。"
-        body_teacher: "您已作为教师注册课程 %{course}。"
-        labels: 
-          email: 电子邮件
-          name: 姓名
-          username: 用户名
-        none: 无
       sms: 
         body_designer: 您已作为设计者注册课程。
         body_observer: 您已作为观察员注册课程。
@@ -8958,10 +8626,6 @@ zh:
           see_details: 您可在此处查看详细信息
         no_time_set: 没有设置时间
         subject: "活动日期更改:%{event_title}，%{course_name}"
-      facebook: 
-        from_to_time: "从 %{start_date_time} 到 %{end_date_time}"
-        no_time_set: 没有设置时间
-        subject: "%{course_name} 的活动 [%{event_title}](%{link_to_event}) 已更改时间。时间现在为:"
       sms: 
         from_to_time: "从 %{start_date_time} 到 %{end_date_time}"
         more_info: "更多信息请访问 %{web_link}"
@@ -9019,11 +8683,6 @@ zh:
           grades_based_on_percent: 评分基于每个作业小组的加权总计
           now_see_here: 您可在此处查看详细信息
           subject: 评分加权已更改
-      facebook: 
-        grading_based_on_points: 评分基于所有作业的总得分。
-        grading_policy_changed: "**[%{course_name}](%{course_url})** 的评分政策已更改。"
-        labels: 
-          grades_based_on_percent: 评分基于每个作业小组的加权总计
       sms: 
         grade_changed: "课程 %{course_name} 的评分政策已更改。"
         more_info_at: "更多信息请访问 %{course_url}"
@@ -9045,8 +8704,6 @@ zh:
         labels: 
           view_submission_here: 您可在此处查看提交文件
         subject: "最近作业: %{group_name}，%{assignment_name}"
-      facebook: 
-        body: "小组 %{group_name} 刚刚提交课程 %{course_name} 中 **[%{assignment_name}](%{assignment_url})** 的最近提交的作业。"
       sms: 
         more_info: "更多信息请访问 %{web_address}"
         subject: "%{group_name} 刚刚提交其作业（最近） %{assignment_name}"
@@ -9069,10 +8726,6 @@ zh:
         labels: 
           click_below: 您可通过单击下面的链接检查小组
         subject: "小组成员资格已接受: %{group_name}"
-      facebook: 
-        account_group: "帐户 %{account_name} 加入小组 **[%{group_name}](%{group_url})** 的请求已被接受。"
-        course_group: "课程 %{course_name} 加入小组 **[%{group_name}](%{group_url})** 的请求已被接受。"
-        group_request_accepted: "小组请求已接受: %{group_name}"
       sms: 
         account_group: "帐户 %{account_name} 加入小组 %{group_name} 的请求已被接受。"
         course_group: "课程 %{course_name} 加入小组 %{group_name} 的请求已被接受。"
@@ -9098,9 +8751,6 @@ zh:
         labels: 
           click_below: 您可通过单击下面的链接检查其它小组
         subject: "小组成员资格已拒绝: %{group_name}"
-      facebook: 
-        account_group: "帐户 %{account_name} 加入小组 **[%{group_name}](%{group_url})** 的请求已被拒绝。"
-        course_group: "课程 %{course_name} 加入小组 **[%{group_name}](%{group_url})** 的请求已被拒绝。"
       sms: 
         account_group: "帐户 %{account_name} 加入小组 %{group_name} 的请求已被拒绝。"
         course_group: "课程 %{course_name} 加入小组 %{group_name} 的请求已被拒绝。"
@@ -9156,9 +8806,6 @@ zh:
           details: "已添加帐户 %{account} 的新管理员 %{user}"
           subject: 新帐户用户
         subject: 新帐户用户
-      facebook: 
-        body: "已添加帐户 **%{account}** 的新管理员 **%{user}**。"
-        subject: "%{account} 的新帐户管理员"
       sms: 
         body: "已添加帐户 %{account} 的新管理员 %{user}"
         details: "更多信息请访问 %{website}"
@@ -9174,8 +8821,6 @@ zh:
           link: 查看通告
         labels: 
           file_included: 包括的文件
-      facebook: 
-        body: "新通告:%{title}，%{course}"
       sms: 
         details: "更多信息请访问 %{url}"
         subject: "新通告:%{title}，%{course}"
@@ -9195,9 +8840,6 @@ zh:
           title: "新小组成员资格: %{group_name}"
         subject: "%{course_or_account} 的新小组成员资格"
         title: "新小组成员资格: %{group_name}"
-      facebook: 
-        body_account: "您已被添加到帐户 %{account} 的新小组。小组名称为 %{group_name}。"
-        body_course: "您已被添加到课程 %{course} 的新小组。小组名称为 %{group_name}。"
       sms: 
         body_account: "您已被添加到帐户 %{account} 的新小组。小组名称为 %{group_name}。"
         body_course: "您已被添加到课程 %{course} 的新小组。小组名称为 %{group_name}。"
@@ -9222,9 +8864,6 @@ zh:
           title: "新小组成员资格: %{group_name}"
         subject: "%{course_or_account} 的新小组成员资格"
         title: "新小组成员资格: %{group_name}"
-      facebook: 
-        body_account: "您已被邀请加入帐户 %{account} 的小组 %{group}。"
-        body_course: "您已被邀请加入课程 %{course} 的小组 %{group}。"
       sms: 
         body_account: "您已被邀请加入帐户 %{account} 的小组 %{group}。"
         body_course: "您已被邀请加入课程 %{course} 的小组 %{group}。"
@@ -9250,11 +8889,6 @@ zh:
           teachers: 教师
         subject: 新课程
         title: "%{account} 的新课程"
-      facebook: 
-        body: "已添加帐户 **%{account}** 的新课程 **%{course}**。"
-        labels: 
-          teachers: 教师
-        subject: "%{account} 的新课程"
       sms: 
         body: "已添加帐户 %{account} 的新课程 %{course}"
         details: "更多信息请访问 %{url}"
@@ -9277,8 +8911,6 @@ zh:
           link: 单击此处加入会话
           subject: "%{discussion_topic}: %{course} 的新评论"
         subject: "%{discussion_topic}: %{course} 的新评论"
-      facebook: 
-        body: "%{discussion_topic}，%{course} 的新评论"
       sms: 
         body: "%{discussion_topic}: %{course} 的新评论"
         details: "更多信息请访问 %{url}"
@@ -9299,8 +8931,6 @@ zh:
         labels: 
           file_included: 包括的文件
         subject: "新讨论 - %{discussion_topic}: %{course}"
-      facebook: 
-        body: "新论坛主题:%{discussion_topic}，%{course}"
       sms: 
         body: "%{course} 的新主题:"
         details: "更多信息请访问 %{url}"
@@ -9322,10 +8952,6 @@ zh:
           see_details: 您可在此处查看详细信息
         no_time_set: 没有设置时间
         subject: "新活动 - %{event_title}，%{course_name}"
-      facebook: 
-        body: "%{course_name} 有一个预定的新活动:"
-        from_to_time: "从 %{start_date_time} 到 %{end_date_time}"
-        no_time_set: 没有设置时间
       sms: 
         from_to_time: "从 %{start_date_time} 到 %{end_date_time}"
         more_info: "更多信息请访问 %{web_address}"
@@ -9348,8 +8974,6 @@ zh:
           subject: "添加的新文件: %{title}，%{name}"
         subject: "添加的新文件: %{title}，%{name}"
         view: 您可在此处进行查看
-      facebook: 
-        body: "已添加课程 %{name} 的新文件: "
       sms: 
         body: "为 %{name} 添加的新文件: "
         link: "更多信息请访问 %{link}"
@@ -9366,9 +8990,6 @@ zh:
           subject: "为课程 %{name} 添加的 %{count} 个新文件:"
         link: 您可在此处进行查看
         subject: "为课程 %{name} 添加的 %{count} 个新文件:"
-      facebook: 
-        body: "已添加课程 %{name} 的 %{count} 个新文件:"
-        link: 您可在此处进行查看
       sms: 
         body: "添加了 %{name} 的 %{count} 个新文件。"
         link: "更多信息请访问 %{link}"
@@ -9391,9 +9012,6 @@ zh:
           title: "新学习小组: %{group_name}"
         subject: "%{course_or_account} 的新学习小组"
         title: "新学习小组: %{group_name}"
-      facebook: 
-        body_account: "已为帐户 %{account} 创建名为 %{group_name} 的新学生组织学习小组。第一位成员是 %{user}。"
-        body_course: "已为课程 %{course} 创建名为 %{group_name} 的新学生组织学习小组。第一位成员是 %{user}。"
       sms: 
         body_account: "已为帐户 %{account} 创建名为\"%{group_name}\"的新小组。第一位成员是 %{user}。"
         body_course: "已为课程 %{course} 创建名为\"%{group_name}\"的新小组。第一位成员是 %{user}。"
@@ -9413,9 +9031,6 @@ zh:
           link: 单击此处查看用户
           subject: 新用户
         subject: 新用户
-        title: "%{account} 的新用户"
-      facebook: 
-        body: "刚刚注册帐户 **%{account}** 的新用户 **%{user}**。"
         title: "%{account} 的新用户"
       sms: 
         body: "已注册帐户 %{account} 的新用户 %{user}"
@@ -9437,8 +9052,6 @@ zh:
         html: 
           link_message: 单击此处完成审阅
         subject: "已指定 %{reviewee} 的同伴审阅"
-      facebook: 
-        body: "已邀请您对 %{reviewee} 进行同伴审阅。点击下面的链接进行审阅！"
       sms: 
         more_info: "更多信息请访问 %{url}"
       summary: 
@@ -9468,8 +9081,6 @@ zh:
           subject: "已完成测验重新评分：%{quiz}，%{context}"
         link_message: 您可在此处查看测验：
         subject: "已完成测验重新评分：%{quiz}，%{context}"
-      facebook: 
-        body: "已完成测验重新评分：%{title}"
       sms: 
         body_sms: "已为测验 %{title} 完成了重新评分：%{context}。"
         more_info: "更多信息请访问 %{url}"
@@ -9500,8 +9111,6 @@ zh:
           subject: "评估提醒:%{rubric}，%{context}"
         link_message: "您可在此处审阅测验并提交您的输入:"
         subject: "评估提醒: %{rubric}，%{context}"
-      facebook: 
-        body: "系统已提醒您评估:*%{title}* (%{context})。"
       sms: 
         body: "系统已提醒您评估: %{rubric}，%{context}。"
         more_info: "更多信息请访问 %{url}"
@@ -9519,8 +9128,6 @@ zh:
           subject: "新测验:%{title}，%{context}"
         link_message: "您可在此处审阅测验并提交您的输入:"
         subject: "新测验:%{title}，%{context}"
-      facebook: 
-        body: "已创建针对 %{context} 的新测验:"
       sms: 
         body: "已创建针对 %{context} 的新测验。"
         more_info: "更多信息请访问 %{url}"
@@ -9545,9 +9152,6 @@ zh:
         link_message: "您可在此处审阅提交文件的详细信息:"
         someone: 某人
         subject: "提交评论:%{user}，%{assignment}，%{context}"
-      facebook: 
-        body: "*%{author}* 刚刚对 **%{user} 的 %{assignment}** 的提交文件进行了新评论。"
-        someone: 某人
       sms: 
         body: "%{author} 针对 %{assignment}，%{user}，%{context} 的新评论。"
         more_info: "更多信息请访问 %{url}"
@@ -9569,9 +9173,6 @@ zh:
         someone: 某人
         subject: "提交评论:%{user}，%{assignment}，%{context}"
         submission_comment_link_message: 您可以使用下面的链接审阅提交文件，或对此消息作出响应以回复此评论。
-      facebook: 
-        body: "*%{author}* 刚刚对 **%{user} 的 %{assignment}** 的提交文件进行了新评论。"
-        someone: 某人
       sms: 
         more_info: "更多信息请访问 %{url}"
         sms_body: "%{author} 针对 %{assignment}，%{user}，%{context} 的新评论。"
@@ -9600,13 +9201,6 @@ zh:
         score: "分数:%{score}，满分 %{total} 分"
         score_pending: 教师待审阅的分数
         subject: "分数已更改:%{assignment}，%{context}"
-      facebook: 
-        body: "您的作业 *%{title}* 的评分已更改。"
-        no_date_set: 未设置日期
-        not_applicable: 不适用
-        regraded_date: "重新计分日期: %{date}"
-        score: "分数:%{score}，满分 %{total} 分"
-        score_pending: 教师待审阅的分数
       sms: 
         body_sms: "%{title}，%{context} 的评分刚刚更改。"
         more_info: "更多信息请访问 %{url}"
@@ -9647,13 +9241,6 @@ zh:
         score: "分数:%{score}，满分 %{total} 分"
         score_pending_review: 教师待审阅的分数
         subject: "作业已计分:%{assignment}，%{context}"
-      facebook: 
-        body: "您的作业 *%{title}* 已计分。"
-        graded_date: "计分日期: %{date}"
-        no_date_set: 未设置日期
-        not_applicable: 不适用
-        score: "分数:%{score}，满分 %{total} 分"
-        score_pending_review: 教师待审阅的分数
       sms: 
         graded_date: "计分日期: %{date}"
         more_info: "更多信息请访问 %{url}"
@@ -9686,9 +9273,6 @@ zh:
         link_message: 您可在此处审阅提交文件：
         subject: "提交的测验：%{quiz}，%{context}"
         submitted_date: "已提交：%{date}"
-      facebook: 
-        body: "%{user_name} 已完成测验 %{quiz_title}，该测验需要手动评分。"
-        submitted_date: "已提交：%{date}"
       sms: 
         body_sms: "您的 %{title} 的 %{context} 评分刚刚更改。"
         more_info: "更多信息请访问 %{url}"
@@ -9715,8 +9299,6 @@ zh:
         notifications_link: "您可通过访问以下页面更改通知设置:"
         subject: "最近 Canvas 通知"
         weekly_body: "您已注册接收来自 Canvas 帐户的一些通知的每周报告。下面是一周结束 %{date} 的报告:"
-      facebook: 
-        new_notifications: "您已收到 #Canvas# 中的 *%{notification_count} 个新通知*。"
       sms: 
         notifications_sms: "%{notifications_count} 新通知，位于 %{url}"
       twitter: 
@@ -9736,8 +9318,6 @@ zh:
           subject: "更新的维基页面:%{title}，%{user}"
         link_message: "您可在此处进行审阅: %{link}"
         subject: "更新的维基页面:%{title}，%{user}"
-      facebook: 
-        body: "维基上针对 %{title} 的页面已更新。"
       sms: 
         more_info: "更多信息请访问 %{url}"
         updated_message: "%{title}，%{user} 刚刚更新:"
@@ -9755,8 +9335,6 @@ zh:
           details_link: 单击此处查看详细信息
           subject: "网络会议邀请: %{name}"
         subject: "网络会议邀请: %{name}"
-      facebook: 
-        body: "我们邀请您参与 #%{name}# 的网络会议 *%{title}*。"
       sms: 
         body: "我们邀请您加入 %{name} 的网络会议 %{title}。"
         link_message: "更多信息请访问 %{url}"
@@ -9975,7 +9553,6 @@ zh:
   name_only_5f56718e: 仅限姓名
   new_account_role_6e5c4964: 新建帐户角色
   new_course_role_6a7bb75f: 新建课程角色
-  new_facebook_message: "您有来自 Canvas 的新消息"
   new_file_135ae520: "[新文件]"
   new_outcome_7fba8c7d: 新建结果
   new_quiz_statistics_desc: 启用某课程的新测验统计页面。
@@ -10202,8 +9779,6 @@ zh:
         display: 电子邮件地址
       errors: 
         saving_preferences_failed: "啊噢! 有些内容已损坏。请重试"
-      facebook: 
-        display: Facebook
       push: 
         display: 推送通知
       sms: 
@@ -10498,6 +10073,7 @@ zh:
   paginated_view: 
     loading_more_results: 正在加载其它结果
   participations_1823832d: 参与
+  password_8a271b1c: 密码
   paste_xml_cda3a64e: "粘贴 XML"
   paypal: 
     exception: 抱歉，出现错误，请稍后重试。
@@ -10618,33 +10194,6 @@ zh:
       primary_pad: "Primary Pad"
       sketchpad: SketchPad
       typewithme: TypeWith.me
-    facebook: 
-      description: "Canvas Facebook 应用程序"
-      name: Facebook
-    facebook_settings: 
-      description: |-
-          您将需要创建 [facebook.com 上的新应用程序](%{facebook_url})，并且将“Facebook 上的应用程序”添加为平台。
-          设置以下配置选项以确保您的 Facebook 应用程序
-          正常工作：
-          
-          * **设置 -- Facebook 上的应用程序 -- Canvas 页面：** 记下您的选择（apps.facebook.com 后的部分）并在下面的表单中输入
-          * **设置 -- Facebook 上的应用程序 -- Canvas URL：** 设置为 %{canvas_url}
-          * 保存应用程序之后，记下应用程序 ID、客户端令牌和应用程序密码
-      domain_name: 域
-      headers: 
-        domain_settings: 域设置
-      hints: 
-        api_key: 也称为客户端令牌
-        canvas_domain: "此项是\"Canvas URL\"中指定的域"
-        canvas_name: "此项是\"Canvas 页面\"中指定的路径"
-        disable_ssl: 仅用于本地测试
-      labels: 
-        api_key: "API 密钥"
-        app_id: "应用程序 ID"
-        canvas_domain: "Canvas 域"
-        canvas_name: "Canvas 名称"
-        disable_ssl: "禁用 SSL"
-        secret: 应用程序密码
     google_docs: 
       description: "Google Docs 文档共享"
       name: "Google Docs"
@@ -10900,7 +10449,6 @@ zh:
     labels: 
       requirements_must_be_completed: 需要完成以下要求，然后才能解锁此页面
   presentation_2d9387ca: 展示
-  press_spacebar_for_more_details_on_this_outcome_f6713a42: 按空格键了解有关此结果的更多详细信息
   privacy_290109ea: 隐私
   product_name: Canvas
   profile: 
@@ -10951,8 +10499,6 @@ zh:
       profile_update_failed: 登录信息无法更新
       regenerating_token_failed: 重新生成令牌失败
       registration_failed: 注册失败。检查用户名和密码，然后重试。
-    facebook_select: 
-      facebook: Facebook
     failed_resending: 请求失败。请重试。
     links: 
       resend_confirmation: 重新发送确认
@@ -10977,7 +10523,6 @@ zh:
         generate_token: 生成令牌
         new_access_token: 创建新访问许可证
         regenerate_token: 重新生成令牌
-        register_facebook_account: "注册您的 Facebook 帐户"
         register_linkedin_account: "注册您的 LinkedIn 帐户"
         save_login: 保存登录信息
         save_skype_name: "保存 Skype 名称"
@@ -10988,7 +10533,6 @@ zh:
       delicious_description: "Delicious 是一个工具，可让您存储和与其他人分享您的书签。Canvas 的丰富内容编辑器可让您搜索 Delicious 标记，从而轻松地从 Canvas 内链接到您觉得有用的其它资源。"
       diigo_description: "Diigo 是专为研究和教育人士量身打造的一款社交书签工具。Canvas 的丰富内容编辑器可让您搜索 Diigo 标记，从而轻松地从 Canvas 内链接到您觉得有用的其它资源。"
       error_loading_token_details: 加载令牌详细信息时出错
-      facebook_description: "如果您有 Facebook 帐户，您可以安装 Canvas 应用程序并在个人资料中接收课程通知。您可以指定要接收哪些类型的通知以及多久发送一次。"
       feature_options: 功能选项
       full_token_warning: |-
           **立即复制此令牌**。一旦离开此页面，您将无法
@@ -11006,7 +10550,6 @@ zh:
         dates: 日期
         delicious_login: "Delicious 登录"
         diigo_login: "Diigo 登录"
-        facebook_access: "Facebook 访问"
         generate_access_token: 生成访问许可证
         google_docs_access: "Google Docs 访问"
         google_drive_access: "Google Drive 访问"
@@ -11068,7 +10611,6 @@ zh:
         diigo: Diigo
         disable_mfa: 禁用多重身份验证
         edit_settings: 编辑设置
-        facebook: Facebook
         google_docs: "Google Docs"
         google_drive: "Google Drive"
         linkedin: LinkedIn
@@ -11077,7 +10619,6 @@ zh:
         skype: Skype
         twitter: Twitter
         upload_new_image: 上传新图像
-        view_facebook_app: "查看 Facebook 应用程序"
         view_your_profile: 查看您的个人资料
         yo: Yo
       loading_token_details: 正在加载令牌详细信息...
@@ -11091,7 +10632,6 @@ zh:
       subscribe_to_emails: "我要从 Instructure 接收信息、新闻和提示"
       titles: 
         access_token_details: 访问许可证详细信息
-        authorize_facebook: "授权 Facebook"
         authorize_google_docs: "授权 Google Docs"
         authorize_google_drive: "授权 Google Drive"
         authorize_linkedin: "授权 LinkedIn"
@@ -11491,6 +11031,7 @@ zh:
       regrade_options: "重新评分可选功能 *（针对已回答此问题的学生）：*"
       some_scores_reduced: 仅正确的回答可得分（*可能会扣除某些学生的分数*）
       update_question_without_regrading: 更新问题而不重新评分
+  quiz_e0dcce8f: 测验
   quiz_log_auditing: 
     buttons: 
       reload_events: 重新加载
@@ -13289,9 +12830,7 @@ zh:
         next: 下一页
       getting_started: "您正在登记 **%{course}**。"
       labels: 
-        email: 电子邮件
         password: 密码
-      log_in: "请输入您的电子邮件和密码:"
     authenticate_or_register: 
       buttons: 
         enroll_in_course: 注册课程
@@ -13753,7 +13292,6 @@ zh:
       labels: 
         custom_rating: 评估学生时，我会撰写自由格式的评论
         grading_rubric: 使用此评分标准进行作业评分
-        title: 标题
         total_points: 总得分
         totallying_rubric: 隐藏测验结果的总分
       links: 
@@ -13773,6 +13311,7 @@ zh:
       out_of: "%{points}*，满分 %{total} 分*"
       rubric: 评分标准说明
       rubric_title: 标题
+      title: "标题:"
       titles: 
         find_existing_rubric: 查找现有评分标准
     rubric_criterion: 
@@ -13821,6 +13360,7 @@ zh:
       titles: 
         find_a_rubric: 查找评分标准
     rubric_forms: 
+      criteria_description_label: 标准说明
       points: "%{points} 分"
     rubric_summary: 
       buttons: 
@@ -14724,6 +14264,7 @@ zh:
     people: 人员
     view_in_separate_window: 在单独的窗口中查看
   to_35c6baa2: 至
+  to_51406be9: 至
   to_c4c44f4b: 到
   to_minscore_43e5452e: "至 %{minScore}%"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "要查看作业，请确保 *议程* 视图处于活动状态。"
@@ -14776,6 +14317,7 @@ zh:
   updated_group_group_name_727b1d98: "已更新组 %{group_name}"
   upload_button: 
     upload: 上传
+  upload_data_dc4fa4cb: 上传数据
   upload_drop_zone: 
     drop_to_upload: 放下项目即可上传
   upper_limit_of_range_c454a8f2: 范围的上限
@@ -14914,13 +14456,13 @@ zh:
     descriptions: 
       delicious: "Delicious 是一个协作的链接分享工具。您可以标记 Internet 上的任何页面供今后参考。您还可以链接至其他用户的 Delicious 帐户以分享相似兴趣的链接。"
       diigo: "Diigo 是一个协作的链接分享工具。您可以标记 Internet 上的任何页面供今后参考。您还可以链接至其他用户的 Diigo 帐户以分享相似兴趣的链接。"
-      facebook: "列出您的 Facebook 个人资料可以更轻松地与班级和小组中的好友进行联系。"
       google_docs: "学生可以使用 Google Docs 协作小组项目。Google Docs 可以实时协作编辑文档、电子表格和演示文稿。"
       google_drive: "学生可以使用 Google Drive 在组项目上协作。Google Drive 可实现文档、电子表格和演示文稿的实时协作编辑。"
       linked_in: "LinkedIn 是一种业务网络资源。您在学校时建立的许多关系在您进入职场后仍然会有帮助。"
       skype: "Skype 是一个免费的在线语音和视频呼叫工具。"
       twitter: "Twitter 是一个优秀的课外通信资源。"
       yo: "Yo 是一个单触式零字符通信工具。"
+  username_47bb5bbe: 用户名
   users: 
     admin_merge: 
       buttons: 
@@ -14988,8 +14530,6 @@ zh:
     errors: 
       no_teacher_courses: 没有在此教师和学生之间共享的课程
       user_not_teacher: 该用户并非此课程中的教师
-    facebook_added: "Facebook 帐户已成功添加！"
-    facebook_fail: "Facebook 授权失败。"
     google_docs_added: "Google Docs 访问已授权！"
     google_docs_fail: "Google Docs 授权失败。请重试"
     google_drive_added: "已成功添加 Google Drive 帐户！"
@@ -15215,6 +14755,7 @@ zh:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE，WebCT 6+ 课程"
   webct_name: "Blackboard Vista/CE (WebCT)"
+  what_should_the_csv_file_look_like_985a59ac: "CSV 文件应该是什么样子?"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: 此页面是用户访问课程时将看到的页面。您可以将其设置为显示活动流、课程单元列表、提纲或自己编写的自定义页面。默认显示为课程活动流。
   where_would_you_like_to_move_title_fabd6e8f: "您要将 %{title} 移到何处？"
   widget: 
@@ -15332,6 +14873,7 @@ zh:
       title_characters: 标题必须包含至少一个字母或数字
       title_too_long: "标题不能超过 %{max_characters} 个字符"
     unknown_user_name: 未知
+  wiki_page_6c11ee20: 维基页面
   wiki_pages: 
     edit: 
       page_header_title: "编辑 %{page_name}"
