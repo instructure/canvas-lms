@@ -960,6 +960,20 @@ describe PseudonymSessionsController do
       expect(session[:cas_session]).to be_nil
     end
 
+    it "should time out correctly" do
+      Setting.set('cas_timelimit', 0.01)
+      account_with_cas(account: Account.default)
+
+      cas_client = mock()
+      controller.stubs(:cas_client).returns(cas_client)
+      start = Time.now.utc
+      cas_client.expects(:validate_service_ticket).returns { sleep 5 }
+      get 'new', :ticket => 'ST-abcd'
+      expect(response).to redirect_to(cas_login_url(:no_auto => 'true'))
+      expect(flash[:delegated_message]).to_not be_blank
+      expect(Time.now.utc - start).to be < 1
+    end
+
     it "should log out correctly if the user is from a different account" do
       account = account_with_cas
       user_with_pseudonym(active_all: true, account: account)

@@ -67,7 +67,13 @@ class PseudonymSessionsController < ApplicationController
         logger.info "Attempting CAS login with ticket #{params[:ticket]} in account #{@domain_root_account.id}"
         st = CASClient::ServiceTicket.new(params[:ticket], cas_login_url)
         begin
-          cas_client.validate_service_ticket(st)
+          default_timeout = Setting.get('cas_timelimit', 5.seconds.to_s).to_f
+
+          timeout_options = { raise_on_timeout: true, fallback_timeout_length: default_timeout }
+
+          Canvas.timeout_protection("cas:#{@domain_root_account.account_authorization_config.global_id}", timeout_options) do
+            cas_client.validate_service_ticket(st)
+          end
         rescue => e
           logger.warn "Failed to validate CAS ticket: #{e.inspect}"
           flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
