@@ -1,7 +1,9 @@
 define [
+  'jquery'
   'react'
   'react-router'
   'react-modal'
+  'compiled/bundles/roles'
   'compiled/react_files/components/FilesApp'
   'compiled/react_files/modules/filesEnv'
   'compiled/react_files/components/FilePreview'
@@ -11,14 +13,24 @@ define [
   '../mockFilesENV'
   '../TestLocation'
   '../../helpers/stubRouterContext'
-], (React, Router, Modal, FilesApp, filesEnv, FilePreviewComponent, Folder, File, FilesCollection, mockFilesENV, TestLocation, stubRouterContext) ->
+], ($, React, Router, Modal, RolesBundle, FilesApp, filesEnv, FilePreviewComponent, Folder, File, FilesCollection, mockFilesENV, TestLocation, stubRouterContext) ->
 
   Simulate = React.addons.TestUtils.Simulate
-  FilePreview = stubRouterContext FilePreviewComponent
   wrapper = null
+
+  # In an ideal world, this wouldn't be necessary
+  # but we've been bitten by something that's attaching to click events
+  # that's returning "false", thus stopping propogation on
+  # our click events in this test intermittantly. I've spent
+  # several hours today trying to track down which and where, and eventually
+  # found and fixed it as part of this same commit, but this prevents
+  # something similar stomping on us in the future, and costs little
+  cleanEventHandlers = ()->
+    $(document).off()
 
   module 'File Preview Rendering',
     setup: ->
+      cleanEventHandlers()
       # Initialize a few things to view in the preview.
       @filesCollection = new FilesCollection()
       @file1 = new File({
@@ -91,29 +103,21 @@ define [
      teardown: ->
        React.unmountComponentAtNode(@div)
        wrapper.innerHTML = ""
+       window.backlogTracing = false
 
 
 
-  asyncTest 'clicking the info button should render out the info panel', ->
-    expect(1)
+  test 'clicking the info button should render out the info panel', ->
     @runRouter ->
       $('.ef-file-preview-header-info').click()
-      setTimeout ()->
-        start()
-        ok $('.ef-file-preview-information-container').length, 'The info panel did not show'
+      ok $('.ef-file-preview-information-container').length, 'The info panel did not show'
 
-  asyncTest 'clicking the info button after the panel has been opened should hide the info panel', ->
-    expect(2)
+  test 'clicking the info button after the panel has been opened should hide the info panel', ->
     @runRouter ->
       $('.ef-file-preview-header-info').click()
-      setTimeout ()->
-        start()
-        ok $('.ef-file-preview-information-container').length, 'The info panel did not show'
-        stop()
-        $('.ef-file-preview-header-info').click()
-        setTimeout ()->
-          start()
-          ok !$('.ef-file-preview-information-container').length, 'The info panel did not close'
+      ok $('.ef-file-preview-information-container').length, 'The info panel did not show'
+      $('.ef-file-preview-header-info').click()
+      ok !$('.ef-file-preview-information-container').length, 'The info panel did not close'
 
   test 'opening the preview for one file should show navigation buttons for the previous and next files in the current folder', ->
     @runRouter ->

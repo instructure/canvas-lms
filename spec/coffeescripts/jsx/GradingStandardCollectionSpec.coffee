@@ -7,12 +7,16 @@ define [
 ], (React, $, _, GradingStandardCollection, GradingStandard) ->
 
   Simulate = React.addons.TestUtils.Simulate
-  $.flashMessage = ->
-  $.flashError = ->
-  window.confirm = ->
 
   module 'GradingStandardCollection',
     setup: ->
+      # be very careful to clean up things you monkeypatch out
+      @fMessage = $.flashMessage
+      $.flashMessage = ->
+      @fError = $.flashError
+      $.flashError = ->
+      @wConfirm = window.confirm
+      window.confirm = ->
       @server = sinon.fakeServer.create()
       ENV.current_user_roles = ["admin", "teacher"]
       ENV.GRADING_STANDARDS_URL = "/courses/1/grading_standards"
@@ -67,12 +71,16 @@ define [
       @server.respondWith "PUT", ENV.GRADING_STANDARDS_URL + "/1", [200, {"Content-Type":"application/json"}, JSON.stringify @updatedStandard]
       @gradingStandardCollection = React.addons.TestUtils.renderIntoDocument(GradingStandardCollection())
       @server.respond()
+
     teardown: ->
       React.unmountComponentAtNode(@gradingStandardCollection.getDOMNode().parentNode)
       ENV.current_user_roles = null
       ENV.GRADING_STANDARDS_URL = null
       ENV.DEFAULT_GRADING_STANDARD_DATA = null
       @server.restore()
+      $.flashMessage = @fMessage
+      $.flashError = @fError
+      window.confirm = @wConfirm
 
   test 'gets the standards data from the grading standards controller, and multiplies data values by 100 (i.e. .20 becomes 20)', ->
     deepEqual @gradingStandardCollection.state.standards, @processedIndexData
