@@ -56,7 +56,6 @@ fa-IR:
       avatars: "آواتارهای کاربر"
       delicious: Delicious
       diigo: Diigo
-      facebook: "فیس بوک"
       google_docs: "Google Docs"
       google_docs_preview: "پیش نمایش Google Docs"
       linked_in: لینکدین
@@ -71,8 +70,6 @@ fa-IR:
       invalid_discovery_url: "نشانی اینترنتی کشف خودکار معتبر نیست"
     feedback_coach: "پرسیدن از انجمن"
     feedback_coach_sub: "دریافت راهنمایی از کارشناس کانواس"
-    feedback_feature_request: "درخواست ویژگی"
-    feedback_feature_request_canvas_net: "درخواست ویژگی در شبکه کانواس "
     feedback_feature_request_sub: "ایده ای برای بهبود کانواس دارید؟"
     manually_created_courses: "درس‌های ایجاد شده به طور دستی"
     root_account_cant_have_sis_id: "شناسه های سامانه اطلاعات دانشجو را نمی توان روی حساب‌های ریشه تنظیم کرد"
@@ -221,7 +218,7 @@ fa-IR:
         login_handle_name: "برچسب ورود"
         position: موقعیت
         requested_authn_context: "زمینه اعتبارسنجی"
-        unkown_user_url: "نشانی اینترنتی کاربر ناشناس"
+        unknown_user_url: "نشانی اینترنتی کاربر ناشناس"
       log_in_url: "نشانی اینترنتی ورود"
       log_out_url: "نشانی اینترنتی خروج"
       login_attribute: "ویژگی ورود"
@@ -236,7 +233,7 @@ fa-IR:
       save_button: "ذخیره سازی تنظیمات اعتبارسنجی"
       start_debugging: "آغاز اشکال زدایی"
       stop_debugging: "توقف اشکال زدایی"
-      unkown_user_url_description: "نشانی اینترنتی برای تغییر مسیر به آن در هنگامی که کاربر اعتبارسنجی شده در کانواس موجود نیست."
+      unknown_user_url_description: "نشانی اینترنتی برای تغییر مسیر به آن در هنگامی که کاربر اعتبارسنجی شده در کانواس موجود نیست."
     saml_testing: 
       auth_request_to_idp: "درخواست اعتبارسنجی برای IdP فرستاده شد"
       auth_response_from_idp: "پاسخ اعتبارسنجی از IdP"
@@ -921,6 +918,7 @@ fa-IR:
         outgoing_email_default_name_option_default: "تنظیمات پیش فرض کانواس"
         prevent_course_renaming_by_teachers: "عدم اجازه دادن به اساتید برای تغییر نام درس های خود"
         restrict_quiz_questions: "محدود کردن دانشجویان از دیدن پرسش های آزمون بعد از تاریخ پایان درس"
+        restrict_student_future_view: "محدود کردن دانشجویان برای مشاهده درس ها قبل از تاریخ شروع"
         role_id: "افزودن موارد دیگر"
         self_enrollment: "اجازه دادن برای ثبت نام شخصی"
         self_registration: "ثبت نام شخصی"
@@ -1501,6 +1499,7 @@ fa-IR:
     titles: 
       gpa_scale_explainer: "نمره گذاری مقیاس معدل چیست؟"
       grading_scheme_info: "مشاهده/ویرایش طرح نمره گذاری"
+  assignment_976578a8: تکلیف
   assignment_comments_e43ed898: "نظرهای مربوط به تکلیف"
   assignment_details: 
     no_graded_submissions: "هیچ مورد ارسالی نمره گذاری شده موجود نیست"
@@ -2128,6 +2127,7 @@ fa-IR:
     upload_error_timeout: "زمان درخواست به پایان رسید: %{url}"
     upload_error_too_many_redirects: "تغییر مسیر بیش از حد"
     upload_error_unexpected: "در هنگام بارگیری از %{url} یک خطای ناشناس رخ داد"
+  attachment_deffe5a9: پیوست
   attendance: 
     default_attendance_title: "حضور %{date}"
     errors: 
@@ -2397,7 +2397,6 @@ fa-IR:
       create_event: "ایجاد رویداد جدید"
       done_go_back_to_list: "انجام شد. بازگشت به فهرست"
       links: 
-        accessibility_warning: "هشدار: این نما برای صفحه خوان ها قابل دسترسی نیست. در عوض، از نمای Agenda استفاده کنید."
         calendar_agenda: Agenda
         calendar_month: ماه
         calendar_scheduler: "زمان بند"
@@ -2592,25 +2591,9 @@ fa-IR:
     crumbs: 
       new: "رویداد جدید تقویم"
     full_calendar_event: 
-      buttons: 
-        create: "ایجاد رویداد"
-        update: "بهنگام سازی رویداد"
-      labels: 
-        address: نشانی
-        date: تاریخ
-        event_description: "شرح رویداد"
-        from: از
-        location: مکان
-        title: عنوان
       no_content: "محتوا موجود نیست"
-      timespan: "%{start_time} *تا* %{end_time}"
     new: 
-      links: 
-        back_to_calendar: "بازگشت به تقویم"
-        delete: "حذف رویداد"
-        edit: "ویرایش رویداد تقویم"
       page_title: "رویداد جدید تقویم"
-    no_content: "محتوا موجود نیست"
     notices: 
       created: "رویداد با موفقیت ایجاد شد."
       deleted: "این رویداد حذف شده است"
@@ -2630,43 +2613,6 @@ fa-IR:
     invalid_date_or_time: "تاریخ یا تاریخ و زمان برای %{attr} معتبر نیست"
   calendars: 
     assignment_details: "اطلاعات تکلیف"
-    calendar: 
-      alts: 
-        next: بعدی
-        previous: قبلی
-      calendars_count: 
-        one: "%{count} تقویم، %{open_count} باز"
-        other: "%{count} تقویم، %{open_count} باز"
-      feed_title: "خوراک خبری تقویم"
-      instructions: 
-        ics_link: "پیوند زیر را کپی کرده و در هر برنامه تقویم که خوراک های خبری iCal (نظیر تقویم گوگل، iCal، Outlook و غیره) را می گیرد بچسبانید"
-      labels: 
-        calendar: تقویم
-        date: تاریخ
-        details: "اطلاعات بیشتر"
-        due: مهلت
-        from: از
-        group: گروه
-        title: عنوان
-        undated_events: "رویدادهای بدون تاریخ"
-      links: 
-        add_event: "افزودن رویداد"
-        delete: حذف
-        edit: ویرایش
-        feed: "برای مشاهده این خوراک خبری اینجا کلیک کنید"
-        full_details: "اطلاعات کامل"
-        how_do_i: چگونه...؟
-        jump_to_calendar: "پرش به تقویم"
-        more_options: "گزینه های دیگر"
-        show_undated_events: "نمایش %{count} رویداد بدون تاریخ"
-      messages: 
-        max_visible: "می توانید تا %{count} تقویم را در یک زمان نمایش دهید"
-      options: 
-        new_group: "[ گروه جدید ]"
-      tabs: 
-        assignment: تکلیف
-        event: رویداد
-      timespan: "%{start_time} *تا* %{end_time}"
     default_title: رویداد
     event: 
       due: مهلت
@@ -2690,36 +2636,6 @@ fa-IR:
     prompts: 
       delete_assignment: "مطمئنید که می خواهید این تکلیف حذف شود؟"
       delete_event: "مطمئنید که می خواهید این رویداد حذف شود؟"
-    show: 
-      crumbs: 
-        my_calendar: "تقویم من"
-      feed_title: "تک خوراک خبری تقویم درس"
-      keycode_descriptions: 
-        delete: "حذف رویداد فعلی"
-        edit: "ویرایش رویداد فعلی"
-        next_day: "روز بعدی تقویم"
-        next_event: "روز/رویداد بعدی تقویم"
-        next_week: "هفته بعدی"
-        open: "باز کردن رویداد فعلی"
-        previous_day: "روز قبلی تقویم"
-        previous_event: "روز/رویداد قبلی تقویم"
-        previous_week: "هفته قبلی"
-        refresh: "تازه سازی تقویم"
-      keycode_descriptoins: 
-        new: "رویداد جدید برای روز فعلی"
-      keycodes: 
-        delete: d
-        edit: e
-        new: "n"
-        next_day: ctrl+right
-        next_event: j
-        next_week: ctrl+down
-        open: o
-        previous_day: ctrl+left
-        previous_event: k
-        previous_week: ctrl+up
-        refresh: r
-      page_title: تقویم
     show2: 
       calendar_feed: "خوراک خبری تقویم"
       calendar_feed_instructions: "پیوند زیر را کپی کرده و در هر برنامه تقویم که خوراک های خبری iCal را می گیرد (نظیر تقویم گوگل، iCal، Outlook و غیره) بچسبانید"
@@ -2738,7 +2654,6 @@ fa-IR:
       add_new_event: "افزودن رویداد جدید"
       edit_assignment: "ویرایش تکلیف"
       edit_event: "ویرایش رویداد"
-    use_new_calendar: "آزمودن تقویم جدید"
     wizard_box: 
       descriptions: 
         assignment: "خوبه. حالا روی زبانه \"تکلیف\" در کادر گفتگو کلیک کنید تا یک تکلیف به جای یک رویداد تقویم ایجاد شود."
@@ -2794,6 +2709,7 @@ fa-IR:
     titles: 
       update_assignment_points: "امتیازهای ممکن برای مطابقت با دستورالعمل ارزیابی تغییر داده شوند؟"
   choose_a_course_home_page_8059c7b: "انتخاب صفحه خانگی یک درس"
+  choose_a_csv_file_to_upload_9644480c: "انتخاب یک فایل CSV برای بارگذاری:"
   choose_usage_rights_33683854: "انتخاب حقوق استفاده..."
   close_and_return_to_canvas_80544344: "بستن و بازگشتن به کانواس"
   close_d634289d: بستن
@@ -2903,7 +2819,6 @@ fa-IR:
   communication_5255723c: ارتباط
   communication_channel: 
     body: "رمز تأیید اعتبار کانواس شما، %{verification_code} است"
-    default_facebook_account: "حساب فیس بوک"
     default_twitter_handle: "دستگیره توییتر"
     default_yo_name: "نام Yo"
   communication_channels: 
@@ -3358,7 +3273,6 @@ fa-IR:
         user_services: "وب سرویس های ثبت شده"
       help: 
         list_services: "فهرست سرویس های ثبت شده خود را فعال نکرده اید. فعال کردن این فهرست، به اعضای هم گروهی و هم کلاسی شما امکان می دهد که در خارج از کلاس به طور آسان تر با شما در ارتباط باشند."
-        services: "رخ نمای کاربری خود را به هیچ گونه سرویس بیرونی پیوند نداده اید. می توانید حساب کانواس خود را به سرویس هایی نظیر فیس بوک و توییتر پیوند دهید. این امر برقراری ارتباط اعضای هم گروهی و هم کلاسی با شما را در خارج از کلاس آسان تر می سازد."
       labels: 
         public_list_services: "به اعضای هم کلاسی/هم گروهی اجازه داده شود که ببینند کدام خدمات را به رخ نمای خود پیوند داده ام"
         user_privileges: مجوزها
@@ -3397,7 +3311,6 @@ fa-IR:
         registered_services: "سرویس های ثبت شده"
         service_types: "نوع سرویس"
       help: 
-        no_services: "رخ نمای کاربری خود را به هیچ سرویس بیرونی پیوند نداده اید. می توانید حساب کانواس خود را به سرویس هایی مانند فیس بوک و توییتر پیوند دهید."
         services_private: "فهرست سرویس های ثبت شده خود را فعال نکرده اید. فعال کردن این فهرست به همکلاسی و هم گروهی های شما اجازه می دهد خدماتی که به حساب کانوس خود پیوند داده اید را ببینند."
         user_services: "اگر بقیه اعضا انتخاب کنند، می توانند به شما اجازه دهند ببینید چه سرویس های بیرونی را به حساب کانوس خود پیوند داده اند. این امر می تواند هماهنگی طرح های گروهی و نیز برقراری ارتباط در بیرون از کلاس درس را آسان تر سازد."
       labels: 
@@ -3704,12 +3617,9 @@ fa-IR:
     all_courses: "همه درس ها"
     all_in_context: "همه در %{context} "
     archive: بایگانی
-    archive_conversation: "بایگانی گفتگو"
     autocomplete_result: 
       group_people: "افراد: %{people}"
       no_results: "نتیجه موجود نیست"
-    autocomplete_token: 
-      remove_recipient: "حذف گیرنده"
     back: بازگشت
     cannot_add_to_private: "نمی توانید به یک گفت و گوی خصوصی شرکت کننده اضافه کنید."
     cannot_be_empty: "پیام نمی تواند خالی باشد"
@@ -3753,12 +3663,10 @@ fa-IR:
     hide: "مخفی کردن"
     index_new: 
       archive: بایگانی
-      archive_conversation: "بایگانی گفتگو"
       archived: "بایگانی شده"
       clear_search: "پاک کردن نتایج جستجو"
       compose_new_message: "نوشتن پیام جدید"
       delete: حذف
-      delete_conversation: "حذف بحث"
       filter_messages_by_course: "فیلتر کردن پیام ها بر اساس درس"
       filter_messages_by_type: "فیلتر پیام ها بر اساس نوع"
       forward: "ارسال به دیگری"
@@ -3811,7 +3719,6 @@ fa-IR:
         add_to_faculty_journal: "افزودن به عنوان ورودی ژورنال هیأت علمی"
         attachments: "پیوست ها"
         course: درس
-        course_required: "باید قبل از وارد کردن گیرنده ها، یک درس را انتخاب کنید."
         select_course: "انتخاب یک درس"
         subject: موضوع
         to: به
@@ -3859,7 +3766,6 @@ fa-IR:
     titles: 
       rss_feed: "خوراک خبری گفتگوها"
     unarchive: "لغو بایگانی"
-    unarchive_conversation: "لغو بایگانی گفتگو"
     unstar: "برداشتن ستاره"
     unstar_conversation: "برداشتن ستاره گفتگو"
   copyright_holder_66ee111: "دارنده حق نشر:"
@@ -4129,14 +4035,8 @@ fa-IR:
       headings: 
         grade: "نمره گذاری  %{assignment}"
         to_do: "برای انجام"
-      images: 
-        alt: 
-          ignore: "صرفنظر کردن"
       links: 
         show_more: "%{count} بیشتر..."
-        title: 
-          ignore: "صرفنظر کردن از این تکلیف"
-          ignore_review: "صرفنظر کردن از این بازبینی"
       need_grading_count: 
         one: "%{count} نیاز به نمره گذاری دارد"
         other: "%{count} نیاز به نمره گذاری دارد"
@@ -4154,8 +4054,6 @@ fa-IR:
         conclude_course: "خاتمه دادن به درس"
         delete_course: "حذف درس"
       details: 
-        conclude_alt_text: "اگر مایلید قابلیت تغییر دادن نمره ها و در عین حال محدود کردن دسترسی دانشجو به درس حفظ شود، لطفا از تنظیمات تاریخ درس استفاده کنید. می توانید از طریق راهنماهای موجود در *اینجا* با تنظیمات تاریخ درس آشنا شوید"
-        confirm_conclude: "هشدار: خاتمه دادن به این درس از تغییر نمره ها و دسترسی به محتوای درس توسط شما جلوگیری خواهد کرد."
         confirm_delete: "مطمئنید که می خواهید این درس حذف شود؟ پس از حذف شدن، دانشجویان و اساتید به آن دسترسی نخواهند داشت. اگر می خواهید آن را از منوی بازشونده درس حذف کنید، باید *در عوض به درس خاتمه دهید*."
         confirm_delete_addendum: "اگر مجوز خاتمه دادن به درس را ندارید، می توانید *تاریخ پایان درس را تغییر دهید*، یا از مدیر خود بخواهید درس را خاتمه دهد."
       headings: 
@@ -5014,6 +4912,7 @@ fa-IR:
       بخش هایی که تکلیف به آن اختصاص داده نشده است، آن را در محتوای درس خود نمی ببینند و نمره نهایی آنها
       بدون این امتیازها محاسبه می شود.
   disable_a5c05db3: "غیر فعال سازی"
+  discussion_6719c51d: بحث
   discussion_entries: 
     created_entry_notice: "ورودی با موفقیت ایجاد شد."
     deleted_entry_notice: "ورودی حذف شده است"
@@ -5030,6 +4929,7 @@ fa-IR:
     atom_no_author: "نویسنده موجود نیست"
     default_title: "عنوان موجود نیست"
     empty_message: "پیام موجود نیست"
+  discussion_topic_dc85ad4c: "موضوع بحث"
   discussion_topics: 
     assignment_details: 
       available_from: "قابل دسترسی از طریق"
@@ -5089,7 +4989,6 @@ fa-IR:
         published: "منتشر شده"
       delay_posting: "ارسال با تأخیر"
       enable_podcast_feed: "فعال سازی خوراک خبری پادکست"
-      include_replies_in_podcast_feed: "شامل سازی پاسخ ها در خوراک خبری پادکست"
       only_visible_to_overrides_note: "نکته: این بحث *فقط* برای بخش(های) تعیین شده در زیر قابل مشاهده است:"
       options: "گزینه ها"
       page_header_title: "بحث جدید"
@@ -5136,7 +5035,6 @@ fa-IR:
       loading: "در حال بارگذاری..."
       lock_for_comments: "قفل کردن امکان ارسال نظر"
       make_sure_all_search_terms_are_spelled_correctly: "مطمئن شوید همه عبارت های جستجو درست نوشته شده اند."
-      new_discussion: "*شروع یک* بحث"
       rss_feed: "خوراک خبری RSS"
       start_one_now: "اکنون یکی را شروع کنید"
       suggestions: "پیشنهادها:"
@@ -5201,7 +5099,7 @@ fa-IR:
       reply_to_topic: "پاسخ به موضوع"
       retrieved_from_feed: "بازیابی شده از %{feed}"
       show_rubric: "نمایش دستورالعمل ارزیابی"
-      speed_grader: "برنامه نمره گذار سریع"
+      speed_grader: "برنامه نمره گذاری سریع™"
       topic: موضوع
       topic_podcast_feed_link: "خوراک خبری پادکست موضوع"
       topic_subscribe: اشتراک
@@ -5335,6 +5233,7 @@ fa-IR:
     buttons: 
       create_rubric: "ایجاد دستورالعمل ارزیابی"
       update_rubric: "بهنگام سازی دستورالعمل ارزیابی"
+    change: تغییر
     discussion_points_possible: 
       one: "%{count} امتیاز ممکن"
       other: "%{count} امتیاز ممکن"
@@ -5792,6 +5691,7 @@ fa-IR:
       posts_added: "ارسال ها افزوده شدند"
       remove_feed: "حذف %{display_name}"
   external_integration_keys_8b4f4548: "کلیدهای یکپارچه سازی بیرونی"
+  external_tool_c5a6410a: "ابزار بیرونی"
   external_tools: 
     account_navigation_configured: "پیمایش حساب پیکربندی شد"
     app_full_view: 
@@ -5899,53 +5799,6 @@ fa-IR:
     submit: ارسال
     user_navigation_configured: "پیمایش کاربر پیکربندی شد"
     wiki_page_menu_configured: "منوی صفحه ویکی پیکربندی شد"
-  facebook: 
-    authorization_required: "فقط کاربران تایید شده اجازه دسترسی به این صفحه را دارند"
-    authorization_success: "تأیید اعتبار انجام شد! کانواس و فیس بوک اکنون دوست هستند."
-    deleted: "حذف شد"
-    index: 
-      all_set: "شما کاملا اماده هستید!"
-      bookmark_notice: "اگر این برنامه را علامتگذاری کنید، می توانید تعداد اطلاعیه های جدید کانواس را از صفحه اصلی فیسبوک خود مشاهده کنید."
-      canvas_messages: "پیام های کانواس"
-      configure_notification_preferences_notice: "بعد از اینکه *تنظیمات دلخواه اطلاعیه خود را پیکربندی کردید*، باید از این پس در اینجا شاهد نمایش اطلاعیه هایی باشید که به شما امکان می دهد از اتفاقاتی که در حساب کانواس شما می افتد، آگاهی یابید."
-      installation_about: "برای نصب برنامه فیس بوک کانواس، به صفحه رخ نمای خود در کانواس مراجعه کنید و برای متصل کردن حساب خود به فیس بوک، روی دکمه فیس بوک کلیک کنید."
-      learn_more: "در instructure.com چیزهای بیشتری بیاموزید"
-      more_information: "اطلاعات بیشتر در %{domain_list}"
-      no_messages_notice: "وقتی اتفاقاتی در درس رخ می دهد، از این پس در اینجا شاهد نمایش اطلاعیه هایی خواهید بود که به شما امکان می دهد از اتفاقاتی که در حساب کانواس شما رخ می دهند، آگاهی یابید."
-      notification_about: "از برنامه فیس بوک کانواس برای دادن دسترسی آسان تر به تعامل هایی که در داخل درس های شما جریان دارند، استفاده می شود. وقتی تکلیف های شما نمره گذاری شدند، وقتی تاریخ های مهلت تغییر یافتند و غیره، می توانید آن را برای ارسال اطلاعیه ها تنظیم کنید. با این وجود، اطلاعات خصوصی شما در کانواس خصوصی باقی خواهند ماند."
-      notification_settings: "تنظیمات اطلاعیه"
-      notifications_notice: "در قسمت زیر، می توانید فهرستی از جدیدترین اطلاعیه های کانواس را ببینید. اگر این برنامه را علامتگذاری کنید، می توانید تعداد اطلاعیه های جدید کانواس را از صفحه اصلی فیس بوک خود مشاهده کنید."
-      welcome: "%{name} خوش آمدید!"
-      welcome_message: "به نسخه جدید نرم افزار یادگیری آنلاین که توسط شرکت Instructure ارائه شده است، خوش آمدید. با این نرم افزار استفاده از شبکه وب را برای بهبود یادگیری آسان می کنیم. واسط ما ساده، قانونی و آزاد است و ما با ابزارهایی کار می کنیم که شما و دانشجویان شما هم اکنون از آنها استفاده می کنند -- ابزارهایی مانند فیس بوک --- تا یک تجربه یادگیری گروهی آزادانه تر را به شما ارائه دهیم. این تجربه را در قالب یک بسته باز قدرتمند که کارهایی بیشتر از پیگیری تکلیف ها را انجام می دهد، ارائه کرده ایم. این بسته تعامل را ترویج می دهد و یادگیری را ارتقا می بخشد."
-      welcome_title: "به نرم افزار کانواس شرکت Instructure خوش آمدید"
-    index_disabled: 
-      disabled_notice: "این تارنمای کانواس برای برقراری ارتباط با فیس بوک پیکربندی نشده است."
-      get_help: "راهنمایی های لازم را در تارنمای support.instructure.com دریافت نمایید"
-      instructure_canvas: "نرم افزار کانواس شرکت Instructure"
-    invalid_signature: "امضای فیس بوک معتبر نیست"
-    message: 
-      hide: "مخفی کردن"
-    notification_policies: 
-      alerts: هشدارها
-      cancel: لغو
-      change_settings: "تغییر تنظیمات"
-      daily: روزانه
-      labels: 
-        alerts_for_category: "هشدارهای %{category_name}"
-      loading: "درحال بارگذاری..."
-      never: هرگز
-      notification_type: "نوع اطلاعیه"
-      right_away: "همین حالا"
-      send_to_facebook: "به فیس بوک ارسال شود؟"
-      update_preferences: "بهنگام سازی تنظیمات دلخواه"
-      updating_preferences: "درحال بهنگام سازی تنظیمات دلخواه..."
-      weekly: هفتگی
-    settings: 
-      back_to_messages: "بازگشت به پیام ها"
-      link_needed: "قبل از اینکه بتوانید برنامه فیس بوک کانواس را پیکربندی کنید، باید آن را به صفحه ورود کانواس خود پیوند دهید. لطفا برای کسب اطلاعات بیشتر، روی «خوش آمدید» کلیک کنید."
-      notifications_config_notice: "اطلاعیه های کانواس می تواند به طور خودکار به حساب فیس بوک شما ارسال شود. در قسمت زیر، انواع اطلاعیه هایی که می توانید ارسال کنید را خواهید دید. می توانید تنظیمات دلخواه اطلاعیه خود را در هر زمان چه در اینجا و چه در کانواس تغییر دهید."
-      settings_title: "تنظیمات اطلاعیه کانواس"
-      updating_preferences: "درحال بهنگام سازی تنظیمات دلخواه..."
   fair_use_bee47d77: "استفاده منصفانه"
   feature_flags: 
     feature_flag: 
@@ -6221,6 +6074,7 @@ fa-IR:
     no_deleting_root: "نمی توان پوشه ریشه را حذف نمود"
     only_one_folder: "نمی توان مسیر و شناسه پوشه را تنظیم نمود"
   for: برای
+  from_fdd4956d: از
   from_from_to_to_e31f6422: "از %{from} به %{to}"
   global_message_icons: 
     announcement: اطلاعیه
@@ -6412,21 +6266,9 @@ fa-IR:
       switch_to_points: "تبدیل به امتیاز"
     ungraded: "در نمره گذاری لحاظ نشده است"
   gradebook_uploads: 
-    errors: 
-      invalid_file: "فایل csv معتبر نیست، نمره ها را نمی توان بهنگام سازی کرد"
-      upload_failed: "فایل بارگذاری نشد."
-    form: 
-      labels: 
-        upload: "انتخاب یک فایل CSV برای بارگذاری"
-      titles: 
-        upload_form: "انتخاب یک فایل CSV برای بارگذاری"
     new: 
       titles: 
         new_upload: "بارگذاری دفتر نمره"
-    notices: 
-      updated: 
-        one: "%{count} مورد ارسالی با موفقیت بهنگام سازی شد."
-        other: "%{count} مورد ارسالی با موفقیت بهنگام سازی شد."
     show: 
       assignment_answer: "این تکلیف عبارت است از"
       assignment_example: "آرمون شاخص های برابری"
@@ -6453,14 +6295,6 @@ fa-IR:
       student_answer: "این شخص واقعا"
       student_example: "یک شخص"
       student_question: "دانشجوی مورد بحث"
-  gradebook_uploads_form: 
-    buttons: 
-      upload_data: "بارگذاری داده ها"
-    labels: 
-      upload: "انتخاب یک فایل CSV برای بارگذاری:"
-    titles: 
-      upload_form: "انتخاب یک فایل CSV برای بارگذاری"
-    what_should_csv_look_like: "فایل CSV باید چطور باشد؟"
   gradebooks: 
     attendance: 
       attendance_info: "هیچ تکلیف حضوری ایجاد نشده است."
@@ -6579,12 +6413,14 @@ fa-IR:
       set_group_weights: "تعیین وزن های گروه"
       show_attendance_columns: "نمایش ستون های حضور"
       show_concluded_enrollments: "نمایش ثبت نام های خاتمه یافته"
-      upload_scores: "وارد کردن"
       view_grading_history: "مشاهده تاریخچه نمره گذاری"
     grades: 
       complete: کامل
       incomplete: ناقص
     grades_filename: "نمره ها"
+    grading_box_extended: 
+      labels: 
+        grade: نمره
     history: 
       graded_on_submission: "نمره گذاری شده در هنگام ارسال"
       grades_for_date: "نمره ها بر اساس تاریخ"
@@ -6655,7 +6491,6 @@ fa-IR:
       labels: 
         add_comment: "افزودن یک نظر"
         average: میانگین
-        grade: نمره
         grade_by_question_beta: "نمره گذاری بر اساس پرسش (بتا)"
         group_comment: "ارسال نظر برای کل گروه"
         hide_names: "مخفی کردن نام دانشجویان در برنامه نمره گذاری سریع"
@@ -7263,8 +7098,11 @@ fa-IR:
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "اگر اینجا را ترک کنید، بارگیری فایل زیپ که اکنون در حال آماده سازی است، لغو خواهد شد."
   if_you_ve_been_using_another_course_management_sys_67edfab1: "اگر از یک سیستم مدیریت درس دیگر استفاده می کنید، احتمالا چیزهایی دارید که می خواهید به کانواس منتقل کنید. می توانیم شما را در فرایند انتقال آسان محتوای خود به کانواس همراهی کنیم."
   ignore_assignment_738b3c99: "صرفنظر کردن از تکلیف"
+  ignore_forever_dd4a6cdf: "صرفنظر برای همیشه"
   ignore_name_55edc6fe: "صرفنظر کردن از %{name}"
   ignore_these_3940f6f5: "صرفنظر کردن از اینها"
+  ignore_this_assignment_b7a71f80: "صرفنظر کردن از این تکلیف"
+  ignore_until_new_submission_87f32b4: "صرفنظر تا زمان ارسال جدید"
   image_8ad06: تصویر
   images: 
     error_checking_color: "خطا در بازبینی رنگ تصویر"
@@ -7274,6 +7112,7 @@ fa-IR:
     invalid_file_type: "نوع فایل معتبر نیست %{type}. انواع مجاز عبارتند از: %{type_list}"
     not_an_image: "فایل انتخابی تصویر نیست"
   immediately_c128ede6: بلافاصله
+  import_1b31507: "وارد کردن"
   import_content_b2fd6620: "وارد کردن محتوا"
   importers/assignment_importer: 
     errors: 
@@ -7342,8 +7181,6 @@ fa-IR:
       posting_message_failed: "ارسال انجام نشد، دوباره سعی کنید"
       required: "تکمیل جای خالی لازم است"
       search_failed: "جستجو انجام نشد، لطفا دوباره سعی کنید."
-    ignore_forever: "صرفنظر برای همیشه"
-    ignore_until_new_submission: "صرفنظر تا زمان ارسال جدید"
     labels: 
       datepicker: 
         time: زمان
@@ -7475,8 +7312,6 @@ fa-IR:
         dashboard: "داشبورد من"
         skip_to_content: "رفتن به محتوا"
       open_source_learning_management_system: "سامانه مدیریت یادگیری منبع باز"
-    facebook: 
-      title: "صفحه فیس بوک"
     fixed_bottom: 
       masquerading: 
         stop: "متوقف کردن تغییر عنوان"
@@ -7620,6 +7455,7 @@ fa-IR:
   lock_date_cannot_be_after_section_end_d37da70c: "تاریخ قفل کردن نمی تواند بعد از خاتمه بخش باشد"
   lock_date_cannot_be_after_term_end_cf1a188f: "تاریخ قفل کردن نمی تواند بعد از پایان نیمسال باشد"
   lock_date_cannot_be_before_due_date_ac30f54: "تاریخ قفل کردن نمی تواند قبل تاریخ مهلت باشد"
+  log_out_379ba28a: خروج
   logged_out_user: "کاربر خارج شده %{user_counter}"
   logo_a040ae0e: نماد
   low_score_4eeb95b2: "پایین: %{score}"
@@ -7707,6 +7543,7 @@ fa-IR:
     my_courses: "درس های من"
   message: 
     default_subject: "هشدار کانواس"
+  message_896d2ed0: "%{message}"
   message_students: 
     buttons: 
       send_message: "ارسال پیام"
@@ -7759,10 +7596,6 @@ fa-IR:
           unknown_user: "کاربر ناشناس"
         subject: "%{user_name} شما را به یک گفتگو در کانواس افزود."
         unknown_user: "کاربر ناشناس"
-      facebook: 
-        body: "%{user_name} شما را به یک گفتگو در کانواس افزود."
-        link_text: "مشاهده گفتگو"
-        unknown_user: "کاربر ناشناس"
       sms: 
         body: "%{user_name} شما را به یک گفتگو در کانواس افزود."
         more_info: "اطلاعات بیشتر در %{url}"
@@ -7800,25 +7633,6 @@ fa-IR:
         ungraded_count_description: "%{count} یا چند مورد ارسالی نمره گذاری نشده است"
         ungraded_timespan_description: "یک مورد ارسالی به مدت %{count} روز بدون نمره گذاری مانده است"
         usernote_description: "بدون ورودی ژورنال هیأت علمی به مدت %{count} روز"
-      facebook: 
-        body: 
-          one: "یک هشدار برای %{student} فعال شده است، زیرا شرایط زیر بر آورده شده است:"
-          other: "یک هشدار برای %{student} فعال شده است، زیرا شرایط زیر بر آورده شده است:"
-        body_student: 
-          one: "یک هشدار برای شما فعال شده است، زیرا شرایط زیر بر آورده شده است:"
-          other: "یک هشدار برای شما فعال شده است، زیرا شرایط زیر بر آورده شده است:"
-        interaction_description: 
-          one: "عدم وجود تعامل بین دانشجو و استاد به مدت %{count} روز یا بیشتر"
-          other: "عدم وجود تعامل بین دانشجو و استاد به مدت %{count} روز یا بیشتر"
-        ungraded_count_description: 
-          one: "%{count} یا چند تکلیف نمره گذاری نشده است"
-          other: "%{count} یا چند تکلیف نمره گذاری نشده است"
-        ungraded_timespan_description: 
-          one: "یک یا چند مورد ارسالی برای مدت %{count} یا چند روز بدون نمره گذاری مانده است"
-          other: "یک یا چند مورد ارسالی برای مدت %{count} یا چند روز بدون نمره گذاری مانده است"
-        usernote_description: 
-          one: "بدون ورودی ژورنال هیأت علمی به مدت %{count} یا چند روز"
-          other: "بدون ورودی ژورنال هیأت علمی به مدت %{count} یا چند روز"
       sms: 
         body: "یک هشدار برای %{student} فعال شده است"
         body_student: "یک هشدار برای شما فعال شده است"
@@ -7854,8 +7668,6 @@ fa-IR:
           link: "مشاهده اطلاعیه"
         labels: 
           file_included: "فایل درج شد"
-      facebook: 
-        body: "این اطلاعیه را ایجاد کرده اید: %{title}، %{course}"
       sms: 
         details: "اطلاعات بیشتر در %{url}"
         subject: "این اطلاعیه را ایجاد کرده اید: %{title}، %{course}"
@@ -7871,8 +7683,6 @@ fa-IR:
           link: "برای مشاهده اطلاعیه، اینجا کلیک کنید"
           subject: "نظر جدید درباره اطلاعیه %{discussion_topic}: %{course}"
         subject: "نظر جدید درباره اطلاعیه %{discussion_topic}: %{course}"
-      facebook: 
-        body: "نظر جدید درباره اطلاعیه: %{discussion_topic}، %{course}"
       sms: 
         body: "نظر جدید درباره اطلاعیه %{discussion_topic}: %{course}"
         details: "اطلاعات بیشتر در %{url}"
@@ -7907,19 +7717,6 @@ fa-IR:
         message: "%{user} رزرو خود برای \"%{appointment_name}\" را لغو کرد."
         no_reason_given: "ارائه نشده"
         subject: "رزرو برای \"%{appointment_name}\" (%{course}) لغو شد"
-      facebook: 
-        instructions: "مشاهده قرار ملاقات"
-        labels: 
-          attendee: حاضر
-          attendees: حاضرین
-          cancel_reason: "دلیل لغو"
-          course: درس
-          date_and_time: تاریخ/زمان
-          details: "اطلاعات قرار ملاقات"
-          group: گروه
-          slots_remaining: "بازه های زمانی موجود"
-        message: "%{user} رزرو خود برای \"%{appointment_name}\" را لغو کرد."
-        no_reason_given: "ارائه نشده"
       sms: 
         message: "%{user} رزرو خود برای \"%{appointment_name}\" را لغو کرد."
         more_info: "اطلاعات بیشتر در %{url}"
@@ -7951,18 +7748,6 @@ fa-IR:
         message: "%{user} بازه زمانی شما برای \"%{appointment_name}\" را لغو کرد."
         no_reason_given: "ارائه نشده"
         subject: "بازه زمانی شما برای \"%{appointment_name}\" لغو شده است (%{course})"
-      facebook: 
-        instructions: "ثبت نام برای یک بازه زمانی دیگر"
-        labels: 
-          attendee: حاضر
-          attendees: حاضرین
-          cancel_reason: "دلیل لغو"
-          course: درس
-          date_and_time: تاریخ/زمان
-          details: "اطلاعات قرار ملاقات"
-          group: گروه
-        message: "%{user} بازه زمانی شما برای \"%{appointment_name}\" را لغو کرد."
-        no_reason_given: "ارائه نشده"
       sms: 
         message: "بازه زمانی شما برای \"%{appointment_name} لغو شد."
         more_info: "اطلاعات بیشتر در %{url}"
@@ -7987,14 +7772,6 @@ fa-IR:
         message: "همه قرارهای ملاقات برای \"%{appointment_name}\" لغو شده است."
         no_reason_given: "ارائه نشده"
         subject: "قرارهای ملاقات برای \"%{appointment_name}\" لغو شده است (%{course})"
-      facebook: 
-        labels: 
-          cancel_reason: "دلیل لغو"
-          course: درس
-          dates: تاریخ(ها)
-          details: "اطلاعات قرار ملاقات"
-        message: "همه قرارهای ملاقات برای \"%{appointment_name}\" لغو شده است."
-        no_reason_given: "ارائه نشده"
       sms: 
         message: "همه قرارهای ملاقات برای «%{appointment_name} لغو شده است»."
         more_info: "اطلاعات بیشتر در %{url}"
@@ -8024,17 +7801,6 @@ fa-IR:
           slots_remaining: "بازه های زمانی موجود"
         message: "بازه های زمانی برای \"%{appointment_name}\" اکنون برای ثبت نام موجود هستند."
         subject: "قرار ملاقات \"%{appointment_name}\" برای ثبت نام (%{course}) موجود است"
-      facebook: 
-        group_signup: "گروه (%{group_category})"
-        individual_signup: انفرادی
-        instructions: "ثبت نام برای یک بازه زمانی"
-        labels: 
-          course: درس
-          dates: تاریخ(ها)
-          details: "اطلاعات قرار ملاقات"
-          signup_type: "نوع ثبت نام"
-          slots_remaining: "بازه های زمانی موجود"
-        message: "بازه های زمانی برای \"%{appointment_name}\" اکنون برای ثبت نام موجود هستند."
       sms: 
         message: "ثبت نام ها برای \"%{appointment_name}\" باز هستند."
         more_info: "اطلاعات بیشتر در %{url}"
@@ -8066,17 +7832,6 @@ fa-IR:
           slots_remaining: "بازه های زمانی موجود"
         message: "بازه های زمانی به \"%{appointment_name}\" افزوده شده اند و برای ثبت نام موجود هستند."
         subject: "قرار ملاقات \"%{appointment_name}\" بهنگام سازی شده است (%{course})"
-      facebook: 
-        group_signup: "گروه (%{group_category})"
-        individual_signup: انفرادی
-        instructions: "ثبت نام برای یک بازه زمانی"
-        labels: 
-          course: درس
-          dates: تاریخ(ها)
-          details: "اطلاعات قرار ملاقات"
-          signup_type: "نوع ثبت نام"
-          slots_remaining: "بازه های زمانی موجود"
-        message: "بازه های زمانی به \"%{appointment_name}\" افزوده شده اند و برای ثبت نام موجود هستند."
       sms: 
         message: "بازه های زمانی جدید برای \"%{appointment_name}\" موجود هستند."
         more_info: "اطلاعات بیشتر در %{url}"
@@ -8109,17 +7864,6 @@ fa-IR:
           slots_remaining: "بازه های زمانی موجود"
         message: "%{user} برای \"%{appointment_name}\" ثبت نام کرده است."
         subject: "کاربر برای \"%{appointment_name}\" (%{course}) ثبت نام کرد"
-      facebook: 
-        instructions: "مشاهده قرار ملاقات"
-        labels: 
-          attendee: حاضر
-          attendees: حاضرین
-          course: درس
-          date_and_time: تاریخ/زمان
-          details: "اطلاعات قرار ملاقات"
-          group: گروه
-          slots_remaining: "بازه های زمانی موجود"
-        message: "%{user} برای \"%{appointment_name}\" ثبت نام کرده است."
       sms: 
         message: "%{user} برای \"%{appointment_name}\" ثبت نام کرده است."
         more_info: "اطلاعات بیشتر در %{url}"
@@ -8149,17 +7893,6 @@ fa-IR:
           slots_remaining: "بازه های زمانی موجود"
         message: "%{user} برای \"%{appointment_name}\" ثبت نام کرده است."
         subject: "برای \"%{appointment_name}\" ثبت نام شده اید"
-      facebook: 
-        instructions: "ثبت نام برای یک بازه زمانی دیگر"
-        labels: 
-          attendee: حاضر
-          attendees: حاضرین
-          course: درس
-          date_and_time: تاریخ/زمان
-          details: "اطلاعات قرار ملاقات"
-          group: گروه
-          slots_remaining: "بازه های زمانی موجود"
-        message: "%{user} شما را برای \"%{appointment_name}\" ثبت نام کرده است."
       sms: 
         message: "شما برای \"%{appointment_name}\" ثبت نام شده اید."
         more_info: "اطلاعات بیشتر در %{url}"
@@ -8180,8 +7913,6 @@ fa-IR:
           link: "برای مشاهده تکلیف، اینجا کلیک کنید"
           subject: "تکلیف تغییر یافت: %{title}، %{course}"
         subject: "تکلیف تغییر یافت: %{title}، %{course}"
-      facebook: 
-        body: "تکلیف %{title_link} برای %{course} تغییر یافته است."
       sms: 
         body: |-
             %{title}، %{course} تغییر یافته است.
@@ -8206,11 +7937,6 @@ fa-IR:
           click_to_see_assignment: "برای مشاهده تکلیف، اینجا کلیک کنید"
         multiple_due_dates: "مهلت: چند تاریخ"
         new_assignment: "یک تکلیف جدید برای درس  %{course_name} شما ایجاد شده است"
-        no_due_date: "مهلت: بدون تاریخ مهلت"
-      facebook: 
-        due_at: "مهلت: %{assignment_due_date_time}"
-        multiple_due_dates: "مهلت: چند تاریخ"
-        new_assignment: "یک تکلیف جدید برای %{course_name} ایجاد شده است"
         no_due_date: "مهلت: بدون تاریخ مهلت"
       sms: 
         due_at: "مهلت: %{assignment_due_date_time}"
@@ -8240,9 +7966,6 @@ fa-IR:
         labels: 
           click_to_see_assignment: "برای مشاهده تکلیف، اینجا کلیک کنید"
         no_due_date: "بدون تاریخ مهلت"
-      facebook: 
-        assignment_due_date_changed_sentence: "تاریخ مهلت برای تکلیف *%{assignment_name}* برای %{course_name} به تاریخ زیر تغییر یافته است:"
-        no_due_date: "بدون تاریخ مهلت"
       sms: 
         assignment_due_date_changed: "موعد %{assignment_name}، %{course_name} اکنون فرا رسیده است:"
         more_info_at_url: "اطلاعات بیشتر در %{web_address}"
@@ -8267,9 +7990,6 @@ fa-IR:
         labels: 
           click_to_see_assignment: "برای مشاهده تکلیف، اینجا کلیک کنید"
         no_due_date: "بدون تاریخ مهلت"
-      facebook: 
-        assignment_due_date_changed_sentence: "تاریخ مهلت برای تکلیف *%{assignment_name}* برای %{course_name} (%{override}) تغییر یافت به:"
-        no_due_date: "بدون تاریخ مهلت"
       sms: 
         assignment_due_date_changed: "مهلت %{assignment_name}، %{course_name} (%{override}) اکنون فرا رسیده است:"
         more_info_at_url: "اطلاعات بیشتر در %{web_address}"
@@ -8291,8 +8011,6 @@ fa-IR:
           the_assignment_is_graded: "تکلیف %{assignment_name} نمره گذاری شده است."
         labels: 
           view_here: "می توانید آن را در اینجا مشاهده کنید"
-        the_assignment_is_graded: "تکلیف %{assignment_name} نمره گذاری شده است."
-      facebook: 
         the_assignment_is_graded: "تکلیف %{assignment_name} نمره گذاری شده است."
       sms: 
         assignment_is_graded: "%{assignment_name}، %{course_name} نمره گذاری شده است."
@@ -8317,9 +8035,6 @@ fa-IR:
           view_submission: "در اینجا می توانید مورد ارسالی مشاهده کنید"
         user_resubmitted: "ارسال دوباره: %{user_name}، %{assignment_name}"
         user_resubmitted_sentence: "%{user_name} یک مورد ارسالی را دوباره برای %{assignment_name} در درس %{course_name} تحویل داده است"
-      facebook: 
-        click_to_view: "برای مشاهده مورد ارسالی، اینجا کلیک کنید."
-        user_resubmitted: "**%{user_name}** یک مورد ارسالی را دوباره برای **%{assignment_name}**  در درس %{course_name} تحویل داده است"
       sms: 
         more_info_at: "اطلاعات بیشتر در %{web_address}"
         user_resubmitted: "%{user_name} تکلیف %{assignment_name} خود را (دوباره) تحویل داد"
@@ -8338,9 +8053,6 @@ fa-IR:
           view_submission: "در اینجا می توانید مورد ارسالی مشاهده کنید"
         user_submitted: "ارسال: %{user_name}، %{assignment_name}"
         user_submitted_sentence: "%{user_name} یک مورد ارسالی را برای %{assignment_name} در درس %{course_name} تحویل داده است"
-      facebook: 
-        click_to_view: "برای مشاهده مورد ارسالی، اینجا کلیک کنید."
-        user_submitted: "**%{user_name}** یک مورد ارسالی را برای **%{assignment_name}** در درس %{course_name} تحویل داده است"
       sms: 
         more_info_at: "اطلاعات بیشتر در %{web_address}"
         user_submitted: "%{user_name} تکلیف %{assignment_name} خود را تحویل داد"
@@ -8359,9 +8071,6 @@ fa-IR:
           view_submission: "در اینجا می توانید مورد ارسالی را مشاهده کنید"
         user_resubmitted_sentence: "%{user_name} یک مورد ارسالی دارای تأخیر را برای %{assignment_name} در درس %{course_name} تحویل داده است"
         user_submitted: "تکلیف دارای تأخیر: %{user_name}، %{assignment_name}"
-      facebook: 
-        click_to_view: "برای مشاهده مورد ارسالی، اینجا کلیک کنید."
-        user_resubmitted_sentence: "**%{user_name}** یک مورد ارسالی دارای تأخیر را برای **%{assignment_name}** در درس %{course_name} تحویل داده است"
       sms: 
         more_info_at: "اطلاعات بیشتر در %{web_address}"
         user_submitted: "%{user_name} تکلیف (دارای تأخیر) %{assignment_name} خود را تحویل داد"
@@ -8413,9 +8122,6 @@ fa-IR:
           link: "می توانید اطلاعات بیشتر را اینجا ببینید"
           subject: "دعوت نامه همکاری: %{course_or_group}"
         subject: "دعوت نامه همکاری: %{course_or_group}"
-      facebook: 
-        body: "از شما برای همکاری روی یک سند، %{document} برای %{course_or_group} دعوت شده است. سند در %{service} ایجاد شده است."
-        body_with_user: "از شما برای همکاری روی یک سند %{document} برای %{course_or_group} دعوت شده است. سند توسط %{user} در %{service} ایجاد شده است."
       sms: 
         body: |-
             از شما برای همکاری روی یک سند، %{document} برای %{course_or_group} دعوت شده است. 
@@ -8499,10 +8205,6 @@ fa-IR:
         subject: "%{user_name}، یک پیام در کانواس ارسال کرده اید."
         unknown_user: "کاربر ناشناس"
         view_message: "مشاهده این پیام در گفتگوها"
-      facebook: 
-        body: "%{user_name}، یک پیام در کانواس ارسال کرده اید."
-        link_text: "مشاهده پیام"
-        unknown_user: "کاربر ناشناس"
       sms: 
         body: "%{user_name}، یک پیام در کانواس ارسال کرده اید:"
         more_info: "اطلاعات بیشتر در %{url}"
@@ -8529,10 +8231,6 @@ fa-IR:
         subject: "%{user_name} یک پیام را برای شما در کانواس ارسال کرد."
         unknown_user: "کاربر ناشناس"
         view_message: "مشاهده این پیام در گفتگوها"
-      facebook: 
-        body: "%{user_name} یک پیام را برای شما در کانواس ارسال کرد."
-        link_text: "مشاهده پیام"
-        unknown_user: "کاربر ناشناس"
       sms: 
         body: "%{user_name} یک پیام را برای شما در کانواس ارسال کرد:"
         more_info: "اطلاعات بیشتر در %{url}"
@@ -8627,12 +8325,6 @@ fa-IR:
           details: "مشاهده فهرست ثبت نام های فعلی"
           subject: "%{user} دعوت نامه درس را پذیرفت"
         subject: "%{user} دعوت برای درس را پذیرفت"
-      facebook: 
-        body_designer: "%{user} دعوت آنها برای شرکت در درس %{course} را به عنوان طراح پذیرفت."
-        body_observer: "%{user} دعوت آنها برای شرکت در درس %{course} را به عنوان بیننده پذیرفت."
-        body_student: "%{user} دعوت آنها برای شرکت در درس %{course} را به عنوان دانشجو پذیرفت."
-        body_ta: "%{user} دعوت آنها برای شرکت در درس %{course} را به عنوان دستیار آموزشی پذیرفت."
-        body_teacher: "%{user} دعوت آنها برای شرکت در درس %{course} را به عنوان استاد پذیرفت."
       sms: 
         body_designer: "%{user} دعوت برای درس %{course} را به عنوان طراح پذیرفت"
         body_observer: "%{user} دعوت برای درس %{course} را به عنوان بیننده پذیرفت"
@@ -8675,17 +8367,6 @@ fa-IR:
           username: "نام کاربری"
         none: "هیچ یک"
         subject: "دعوت نامه درس"
-      facebook: 
-        body_designer: "از شما برای شرکت در درس %{course} به عنوان طراح دعوت شده است."
-        body_observer: "از شما برای شرکت در درس %{course} به عنوان بیننده دعوت شده است."
-        body_student: "از شما برای شرکت در درس %{course} به عنوان دانشجو دعوت شده است."
-        body_ta: "از شما برای شرکت در درس %{course} به عنوان دستیار آموزشی دعوت شده است."
-        body_teacher: "از شما برای شرکت در درس %{course} به عنوان استاد دعوت شده است."
-        labels: 
-          email: "پست الکترونیکی"
-          name: نام
-          username: "نام کاربری"
-        none: "هیچ یک"
       sms: 
         body_designer: "شما به عنوان طراح به این درس دعوت شده اید."
         body_observer: "شما به عنوان بیننده به این درس دعوت شده اید."
@@ -8734,17 +8415,6 @@ fa-IR:
         none: "هیچ یک"
         register: "برای تکمیل ثبت نام از %{link} بازدید نمایید"
         subject: "ثبت نام درس"
-      facebook: 
-        body_designer: "شما در درس %{course} به عنوان طراح ثبت نام شده اید."
-        body_observer: "شما در درس %{course} به عنوان بیننده ثبت نام شده اید."
-        body_student: "شما در درس %{course} به عنوان دانشجو ثبت نام شده اید."
-        body_ta: "شما در درس %{course} به عنوان دستیار آموزشی ثبت نام شده اید."
-        body_teacher: "شما در درس %{course} به عنوان استاد دعوت شده اید."
-        labels: 
-          email: "پست الکترونیکی"
-          name: نام
-          username: "نام کاربری"
-        none: "هیچ یک"
       sms: 
         body_designer: "شما در این درس به عنوان طراح ثبت نام شده اید."
         body_observer: "شما در این درس به عنوان بیننده ثبت نام شده اید."
@@ -8829,10 +8499,6 @@ fa-IR:
           see_details: "در اینجا می توانید اطلاعات بیشتر را مشاهده کنید"
         no_time_set: "هیچ زمانی تعیین نشده است"
         subject: "تاریخ رویداد تغییر یافت: %{event_title}، %{course_name}"
-      facebook: 
-        from_to_time: "از %{start_date_time} تا %{end_date_time}"
-        no_time_set: "هیچ زمانی تعیین نشده است"
-        subject: "زمان رویداد [%{event_title}](%{link_to_event}) برای %{course_name} تغییر یافته است. اکنون بدین قرار است:"
       sms: 
         from_to_time: "از %{start_date_time} تا %{end_date_time}"
         more_info: "اطلاعات بیشتر در %{web_link}"
@@ -8890,11 +8556,6 @@ fa-IR:
           grades_based_on_percent: "نمره گذاری بر اساس نمره کل وزن دار شده برای هر گروه تکلیف است"
           now_see_here: "در اینجا می توانید اطلاعات بیشتر را مشاهده کنید"
           subject: "وزن نمره تغییر یافت"
-      facebook: 
-        grading_based_on_points: "نمره گذاری بر اساس امتیازهای کل برای همه تکلیف هاست."
-        grading_policy_changed: "سیاست نمره گذاری برای **[%{course_name}](%{course_url})** تغییر یافته است."
-        labels: 
-          grades_based_on_percent: "نمره گذاری بر اساس نمره کل وزن دار شده برای هر گروه تکلیف است"
       sms: 
         grade_changed: "سیاست نمره گذاری برای درس %{course_name} تغییر یافته است."
         more_info_at: "اطلاعات بیشتر در %{course_url}"
@@ -8916,8 +8577,6 @@ fa-IR:
         labels: 
           view_submission_here: "در اینجا می توانید مورد ارسالی را مشاهده کنید"
         subject: "تکلیف دارای تأخیر: %{group_name}، %{assignment_name}"
-      facebook: 
-        body: "گروه %{group_name} یک مورد ارسالی دارای تأخیر را برای **[%{assignment_name}](%{assignment_url})** در درس %{course_name} تحویل داده است."
       sms: 
         more_info: "اطلاعات بیشتر در %{web_address}"
         subject: "%{group_name} تکلیف (دارای تأخیر) %{assignment_name} را تحویل داد"
@@ -8940,10 +8599,6 @@ fa-IR:
         labels: 
           click_below: "می توانید با کلیک کردن روی پیوند زیر، گروه را بررسی کنید"
         subject: "عضویت در گروه پذیرفته شد: %{group_name}"
-      facebook: 
-        account_group: "درخواست شما برای پیوستن به گروه **[%{group_name}](%{group_url})** برای حساب %{account_name} پذیرفته شده است."
-        course_group: "درخواست شما برای پیوستن به گروه **[%{group_name}](%{group_url})** برای درس %{course_name} پذیرفته شده است."
-        group_request_accepted: "درخواست گروه پذیرفته شد: %{group_name}"
       sms: 
         account_group: "درخواست شما برای پیوستن به گروه %{group_name} برای حساب %{account_name} پذیرفته شده است."
         course_group: "درخواست شما برای پیوستن به گروه %{group_name} برای درس %{course_name} پذیرفته شده است."
@@ -8969,9 +8624,6 @@ fa-IR:
         labels: 
           click_below: "می توانید با کلیک کردن روی پیوند زیر، گروه های دیگر را بررسی کنید"
         subject: "عضویت در گروه رد شد: %{group_name}"
-      facebook: 
-        account_group: "درخواست شما برای پیوستن به گروه **[%{group_name}](%{group_url})** برای حساب %{account_name} رد شده است."
-        course_group: "درخواست شما برای پیوستن به گروه **[%{group_name}](%{group_url})** برای درس %{course_name} رد شده است."
       sms: 
         account_group: "درخواست شما برای پیوستن به گروه %{group_name} برای حساب %{account_name} رد شده است."
         course_group: "درخواست شما برای پیوستن به گروه %{group_name} برای درس %{course_name} رد شده است."
@@ -9027,9 +8679,6 @@ fa-IR:
           details: "یک مدیر جدید، %{user}، برای حساب %{account} افزوده شده است"
           subject: "کاربر حساب جدید"
         subject: "کاربر حساب جدید"
-      facebook: 
-        body: "یک مدیر جدید **%{user}** برای حساب **%{account}** افزوده شده است."
-        subject: "مدیر حساب جدید برای %{account}"
       sms: 
         body: "یک مدیر جدید، %{user}، برای حساب %{account} افزوده شده است"
         details: "اطلاعات بیشتر در %{website}"
@@ -9045,8 +8694,6 @@ fa-IR:
           link: "مشاهده اطلاعیه"
         labels: 
           file_included: "فایل درج شد"
-      facebook: 
-        body: "اطلاعیه جدید: %{title}، %{course}"
       sms: 
         details: "اطلاعات بیشتر در %{url}"
         subject: "اطلاعیه جدید: %{title}، %{course}"
@@ -9066,9 +8713,6 @@ fa-IR:
           title: "عضویت در گروه جدید: %{group_name}"
         subject: "عضویت در گروه جدید برای %{course_or_account}"
         title: "عضویت در گروه جدید: %{group_name}"
-      facebook: 
-        body_account: "به یک گروه جدید برای حساب %{account} افزوده شده اید. نام گروه %{group_name} است."
-        body_course: "به یک گروه جدید برای درس %{course} افزوده شده اید. نام گروه، %{group_name} است."
       sms: 
         body_account: "به یک گروه جدید برای حساب %{account} افزوده شده اید. نام گروه، %{group_name} است."
         body_course: "به یک گروه جدید برای درس %{course} افزوده شده اید. نام گروه، %{group_name} است."
@@ -9093,9 +8737,6 @@ fa-IR:
           title: "عضویت در گروه جدید: %{group_name}"
         subject: "عضویت در گروه جدید برای %{course_or_account}"
         title: "عضویت در گروه جدید: %{group_name}"
-      facebook: 
-        body_account: "به عضویت در گروه %{group} برای حساب %{account} دعوت شده اید."
-        body_course: "به عضویت در گروه %{group} برای درس %{course} دعوت شده اید."
       sms: 
         body_account: "به عضویت در گروه %{group} برای حساب %{account} دعوت شده اید."
         body_course: "به عضویت در گروه %{group} برای درس %{course} دعوت شده اید."
@@ -9121,11 +8762,6 @@ fa-IR:
           teachers: اساتید
         subject: "درس جدید"
         title: "درس جدید برای %{account}"
-      facebook: 
-        body: "درس جدید **%{course}** برای حساب کاربری **%{account}** افزوده شده است."
-        labels: 
-          teachers: اساتید
-        subject: "درس جدید برای %{account}"
       sms: 
         body: "درس جدید، %{course}، برای حساب %{account} افزوده شده است"
         details: "اطلاعات بیشتر در %{url}"
@@ -9148,8 +8784,6 @@ fa-IR:
           link: "برای پیوستن به گفتگو، اینجا کلیک کنید"
           subject: "نظر جدید برای %{discussion_topic}: %{course}"
         subject: "نظر جدید برای %{discussion_topic}: %{course}"
-      facebook: 
-        body: "نظر جدید برای %{discussion_topic}، %{course}"
       sms: 
         body: "نظر جدید برای %{discussion_topic}: %{course}"
         details: "اطلاعات بیشتر در %{url}"
@@ -9170,8 +8804,6 @@ fa-IR:
         labels: 
           file_included: "فایل درج شد"
         subject: "بحث جدید - %{discussion_topic}: %{course}"
-      facebook: 
-        body: "موضوع جدید نشست: %{discussion_topic}، %{course}"
       sms: 
         body: "موضوع جدید برای %{course}:"
         details: "اطلاعات بیشتر در %{url}"
@@ -9193,10 +8825,6 @@ fa-IR:
           see_details: "در اینجا می توانید اطلاعات بیشتر را مشاهده کنید"
         no_time_set: "هیچ زمانی تعیین نشده است"
         subject: "رویداد جدید - %{event_title}، %{course_name}"
-      facebook: 
-        body: "یک رویداد جدید برای %{course_name} زمان بندی شده است:"
-        from_to_time: "از %{start_date_time} تا %{end_date_time}"
-        no_time_set: "هیچ زمانی تعیین نشده است"
       sms: 
         from_to_time: "از %{start_date_time} تا %{end_date_time}"
         more_info: "اطلاعات بیشتر در %{web_address}"
@@ -9219,8 +8847,6 @@ fa-IR:
           subject: "فایل جدید افزوده شد: %{title}، %{name}"
         subject: "فایل جدید افزوده شد: %{title}، %{name}"
         view: "می توانید آن را در اینجا مشاهده کنید"
-      facebook: 
-        body: "یک فایل جدید برای درس %{name} اضافه شده است:"
       sms: 
         body: "فایل جدید برای %{name} افزوده شد:"
         link: "اطلاعات بیشتر در %{link}"
@@ -9237,9 +8863,6 @@ fa-IR:
           subject: "%{count} فایل جدید به درس %{name} افزوده شده است:"
         link: "می توانید آنها را در اینجا مشاهده کنید"
         subject: "%{count} فایل جدید به درس %{name} افزوده شد:"
-      facebook: 
-        body: "%{count} فایل جدید به درس %{name} افزوده شده است:"
-        link: "می توانید آنها را در اینجا مشاهده کنید"
       sms: 
         body: "%{count} فایل جدید به درس %{name} افزوده شد."
         link: "اطلاعات بیشتر در %{link}"
@@ -9262,9 +8885,6 @@ fa-IR:
           title: "گروه دانشجویی جدید: %{group_name}"
         subject: "گروه دانشجویی جدید برای %{course_or_account}"
         title: "گروه دانشجویی جدید: %{group_name}"
-      facebook: 
-        body_account: "یک گروه جدید سازماندهی شده توسط دانشجو به نام %{group_name} برای حساب %{account} ایجاد شد. اولین عضو آن %{user} است."
-        body_course: "یک گروه جدید سازماندهی شده توسط دانشجو به نام %{group_name} برای درس %{course} ایجاد شد. اولین عضو آن %{user} است."
       sms: 
         body_account: "یک گروه جدید به نام \"%{group_name}\" برای حساب %{account} ایجاد شد. اولین عضو آن %{user} است."
         body_course: "یک گروه جدید به نام \"%{group_name}\" برای درس %{course} ایجاد شد. اولین عضو آن %{user} است."
@@ -9284,9 +8904,6 @@ fa-IR:
           link: "برای مشاهده کاربر، اینجا کلیک کنید"
           subject: "کاربر جدید"
         subject: "کاربر جدید"
-        title: "کاربر جدید برای %{account}"
-      facebook: 
-        body: "یک کاربر جدید، **%{user}**، برای حساب **%{account}** ثبت نام کرده است."
         title: "کاربر جدید برای %{account}"
       sms: 
         body: "یک کاربر جدید، %{user}، برای حساب %{account} ثبت نام کرده است"
@@ -9308,8 +8925,6 @@ fa-IR:
         html: 
           link_message: "برای تکمیل بازبینی خود، اینجا کلیک کنید"
         subject: "بازبینی گروهی تخصیص داده شده برای %{reviewee}"
-      facebook: 
-        body: "از شما برای بازبینی گروهی %{reviewee} دعوت شده است. برای بازبینی آنها، از پیوند زیر پیروی کنید!"
       sms: 
         more_info: "اطلاعات بیشتر در %{url}"
       summary: 
@@ -9339,8 +8954,6 @@ fa-IR:
           subject: "نمره گذاری دوباره آزمون پایان یافت: %{quiz}، %{context}"
         link_message: "در اینجا می توانید آزمون را مشاهده کنید:"
         subject: "نمره گذاری دوباره آزمون پایان یافت: %{quiz}، %{context}"
-      facebook: 
-        body: "نمره گذاری دوباره آزمون پایان یافت: %{title}"
       sms: 
         body_sms: "نمره گذاری دوباره آزمون برای %{title} در %{context} پایان یافت."
         more_info: "اطلاعات بیشتر در %{url}"
@@ -9371,8 +8984,6 @@ fa-IR:
           subject: "یادآور برای ارزیابی: %{rubric}, %{context}"
         link_message: "می توانید ارزیابی را بازبینی کنید و ورودی خود را اینجا قراردهید:"
         subject: "یادآور برای ارزیابی: %{rubric}، %{context}"
-      facebook: 
-        body: "به شما یادآوری شده که ارزیابی کنید: *%{title}* برای %{context}."
       sms: 
         body: "به شما یادآوری شده که ارزیابی کنید: %{rubric}، %{context}."
         more_info: "اطلاعات بیشتردر %{url}"
@@ -9390,8 +9001,6 @@ fa-IR:
           subject: "ارزیابی جدید : %{title}, %{context}"
         link_message: "می توانید ارزیابی را بازبینی کنید و ورودی خود را اینجا قراردهید:"
         subject: "ارزیابی جدید : %{title}، %{context}"
-      facebook: 
-        body: "یک ارزیابی جدید برای %{context} ایجاد شده است:"
       sms: 
         body: "یک ارزیابی جدید برای %{context} ایجاد شده است."
         more_info: "اطلاعات بیشتر در %{url}"
@@ -9416,9 +9025,6 @@ fa-IR:
         link_message: "در اینجا می توانید اطلاعات مربوط به مورد ارسالی را بازبینی کنید:"
         someone: "یک شخص"
         subject: "نظر درباره مورد ارسالی : %{user}، %{assignment}، %{context}"
-      facebook: 
-        body: "*%{author}* یک  نظر جدید درباره مورد ارسالی برای **%{user} برای %{assignment}** ایجاد  کرد."
-        someone: "یک شخص"
       sms: 
         body: " نظر جدید توسط %{author} برای %{assignment}، %{user}، %{context}."
         more_info: "اطلاعات بیشتر در %{url}"
@@ -9440,9 +9046,6 @@ fa-IR:
         someone: "یک شخص"
         subject: "نظر درباره مورد ارسالی: %{user}، %{assignment}، %{context}"
         submission_comment_link_message: "می توانید اطلاعات مورد ارسالی را با استفاده از پیوند زیر بازبینی کنید، یا می توانید با پاسخ دادن به این پیام نظر دهید."
-      facebook: 
-        body: "*%{author}* یک  نظر جدید درباره مورد ارسالی برای **%{user} برای %{assignment}** ایجاد کرد."
-        someone: "یک شخص"
       sms: 
         more_info: "اطلاعات بیشتر در %{url}"
         sms_body: " نظر جدید توسط %{author} برای %{assignment}، %{user}، %{context}."
@@ -9471,13 +9074,6 @@ fa-IR:
         score: "نمره : %{score} از %{total}"
         score_pending: "نمره در انتظار بازبینی توسط استاد است"
         subject: "نمره تغییر یافت: %{assignment}، %{context}"
-      facebook: 
-        body: "نمره مربوط به تکلیف شما، *%{title}* تغییر یافته است."
-        no_date_set: "تاریخ تعیین نشده است"
-        not_applicable: "موجود نیست"
-        regraded_date: "دوباره نمره گذاری شد: %{date}"
-        score: "نمره : %{score} از %{total}"
-        score_pending: "نمره در انتظار بازبینی توسط استاد است"
       sms: 
         body_sms: "نمره ی شما برای %{title}، %{context} تغییر یافت."
         more_info: "اطلاعات بیشتر در %{url}"
@@ -9518,13 +9114,6 @@ fa-IR:
         score: "نمره : %{score} از %{total}"
         score_pending_review: "نمره در انتظار بازبینی توسط استاد است."
         subject: "تکلیف نمره گذاری شد: %{assignment}، %{context}"
-      facebook: 
-        body: "تکلیف شما، *%{title}*، نمره گذاری شده است."
-        graded_date: "نمره گذاری شد: %{date}"
-        no_date_set: "تاریخ تعیین نشده است"
-        not_applicable: "موجود نیست"
-        score: "نمره : %{score} از%{total}"
-        score_pending_review: "نمره در انتظار بازبینی توسط استاد است"
       sms: 
         graded_date: "نمره گذاری شد: %{date}"
         more_info: "اطلاعات بیشتر در %{url}"
@@ -9557,9 +9146,6 @@ fa-IR:
         link_message: "در اینجا می توانید مورد ارسالی را بازبینی کنید:"
         subject: "آزمون ارسال شد: %{quiz}، %{context}"
         submitted_date: "ارسال شد: %{date}"
-      facebook: 
-        body: "%{user_name} آزمون %{quiz_title} را تکمیل کرده است، و به نمره گذاری دستی نیاز دارد."
-        submitted_date: "ارسال شد: %{date}"
       sms: 
         body_sms: "نمره شما برای %{title}، %{context} تغییر یافت."
         more_info: "اطلاعات بیشتر در %{url}"
@@ -9586,8 +9172,6 @@ fa-IR:
         notifications_link: "می توانید با بازدید از صفحه ی زیر، تنظیمات اطلاعیه خود را تغییر دهید:"
         subject: "اطلاعیه های اخیر کانواس"
         weekly_body: "برای دریافت یک گزارش هفتگی بعضی اطلاعیه ها از طریق حساب کانواس خود ثبت نام شده اید. در زیر گزارش مربوط به تاریخ %{date} آمده است:"
-      facebook: 
-        new_notifications: "*%{notification_count} اطلاعیه جدید* در #Canvas# دریافت کرده اید."
       sms: 
         notifications_sms: "%{notifications_count} اطلاعیه جدید در %{url}"
       twitter: 
@@ -9607,8 +9191,6 @@ fa-IR:
           subject: "صفحه بهنگام سازی شده ویکی: %{title}، %{user}"
         link_message: "در اینجا می توانید آن را بازبینی کنید: %{link}"
         subject: "صفحه بهنگام سازی شده ویکی: %{title}، %{user}"
-      facebook: 
-        body: "یک صفحه در ویکی برای %{title} بهنگام سازی شده است."
       sms: 
         more_info: "اطلاعات بیشتردر %{url}"
         updated_message: "%{title}، %{user} بهنگام سازی شد:"
@@ -9626,8 +9208,6 @@ fa-IR:
           details_link: "برای مشاهده اطلاعات بیشتر، کلیک کنید"
           subject: "دعوت نامه کنفرانس مجازی: %{name}"
         subject: "دعوت نامه کنفرانس مجازی: %{name}"
-      facebook: 
-        body: "برای شرکت در یک کنفرانس مجازی، *%{title}* برای #%{name}#، دعوت شده اید، "
       sms: 
         body: "برای پیوستن به یک کنفرانس مجازی، %{title} برای %{name} دعوت شده اید."
         link_message: "اطلاعات بیشتر در %{url}"
@@ -9835,7 +9415,6 @@ fa-IR:
   name_only_5f56718e: "فقط نام"
   new_account_role_6e5c4964: "نقش حساب جدید"
   new_course_role_6a7bb75f: "نقش درس جدید"
-  new_facebook_message: "یک پیام جدید از طرف کانواس  دارید"
   new_file_135ae520: "[ فایل جدید ]"
   new_outcome_7fba8c7d: "نتیجه جدید"
   new_quiz_statistics_desc: "صفحه آمار آزمون جدید را برای یک درس فعال سازید."
@@ -10059,8 +9638,6 @@ fa-IR:
         display: "نشانی پست الکترونیکی"
       errors: 
         saving_preferences_failed: "اوه! اشکالی رخ داد. لطفا دوباره سعی کنید"
-      facebook: 
-        display: "فیس بوک"
       push: 
         display: "وارد کردن اطلاعیه"
       sms: 
@@ -10349,6 +9926,7 @@ fa-IR:
     view_more_link: "مشاهده بیشتر"
   paginated_view: 
     loading_more_results: "در حال بارگذاری نتایج بیشتر"
+  password_8a271b1c: "رمز عبور"
   paste_xml_cda3a64e: "چسباندن XML"
   paypal: 
     exception: "متأسفانه خطایی رخ داده است، لطفا بعدا دوباره امتحان کنید."
@@ -10471,33 +10049,6 @@ fa-IR:
       primary_pad: "Primary Pad"
       sketchpad: SketchPad
       typewithme: TypeWith.me
-    facebook: 
-      description: "برنامه فیس بوک کانواس"
-      name: "فیس بوک"
-    facebook_settings: 
-      description: |-
-          نیاز خواهید داشت یک [برنامه جدید در facebook.com](%{facebook_url}) ایجاد کنید و «برنامه در فیس بوک» را به عنوان یک پلتفرم بیفزایید.
-          گزینه های پیکربندی زیر را تنظیم کنید تا مطمئن شوید که برنامه فیس بوک
-          درست کار می کند:
-          
-          * **تنظیمات -- برنامه در فیس بوک -- نشانی اینترنتی کانواس:** از هر آنچه انتخاب می کنید (بخش بعد از apps.facebook.com) یادداشت بردارید و در فرم زیر وارد نمایید
-          * **تنظیمات-- برنامه در فیس بوک -- نشانی اینترنتی کانواس:** روی %{canvas_url} تنظیم کنید
-          * بعد از ذخیره سازی برنامه، از شناسه برنامه، نشانه مشتری و رمز برنامه یادداشت بردارید
-      domain_name: دامنه
-      headers: 
-        domain_settings: "تنظیمات دامنه"
-      hints: 
-        api_key: "که به آن نشانه خدمت گیرنده نیز گفته می شود"
-        canvas_domain: "این دامنه در «نشانی اینترنتی کانواس» مشخص شده است"
-        canvas_name: "این مسیر در «صفحه کانواس» مشخص شده است"
-        disable_ssl: "استفاده فقط برای آزمایش محلی"
-      labels: 
-        api_key: "کلید API"
-        app_id: "شناسه برنامه"
-        canvas_domain: "دامنه کانواس"
-        canvas_name: "نام کانواس"
-        disable_ssl: "غیر فعال کردن SSL"
-        secret: "رمز برنامه"
     google_docs: 
       description: "به اشتراک گذاری سند Google Docs"
       name: "Google Docs"
@@ -10791,8 +10342,6 @@ fa-IR:
       profile_update_failed: "بهنگام سازی ورود انجام نشد"
       regenerating_token_failed: "ایجاد دوباره ی نشانه انجام نشد"
       registration_failed: "ثبت نام انجام نشد. نام کاربری و رمز عبور را بررسی کنید و دوباره تلاش کنید."
-    facebook_select: 
-      facebook: "فیس بوک"
     failed_resending: "درخواست انجام نشد. لطفا دوباره سعی کنید."
     links: 
       resend_confirmation: "ارسال دوباره تأییدیه"
@@ -10816,7 +10365,6 @@ fa-IR:
         generate_token: "ایجاد نشانه"
         new_access_token: "نشانه دسترسی جدید"
         regenerate_token: "ایجاد دوباره نشانه"
-        register_facebook_account: "ثبت نام حساب فیس بوک"
         register_linkedin_account: "ثبت نام حساب لینکدین"
         save_login: "ذخیره سازی ورود"
         save_skype_name: "ذخیره سازی نام اسکایپ"
@@ -10827,7 +10375,6 @@ fa-IR:
       delicious_description: "Delicious ابزاری است که به شما امکان می دهد نشانه گذاری های خود را ذخیره کنید و با دیگران به اشتراک بگذارید. ویرایشگر محتوای غنی کانواس به شما اجازه می دهد برچسب ها ی Delicious خود را جستجو کنید تا به راحتی از داخل کانواس به منابع دیگری که مفید تشخیص می دهید پیوند دهید."
       diigo_description: "Diigo یک ابزار نشانه گذار اجتماعی است که به طور خاص برای تحقیق و آموزش طراحی شده است. ویرایشگر محتوای غنی کانواس به شما اجازه می دهد برچسب های Diigo خود را جستجو کنید تا به راحتی از داخل کانواس به منابع دیگری که مفید تشخیص می دهید پیوند دهید."
       error_loading_token_details: "خطا در بارگذاری اطلاعات نشانه"
-      facebook_description: "اگر یک حساب فیس بوک دارید، می توانید برنامه کانواس را نصب کنید و اطلاعیه های درس را روی رخ نمای خود دریافت کنید. می توانید تعیین کنید که چه نوع اطلاعیه هایی می خواهید و هر چند وقت یکبار می خواهید ارسال شوند."
       feature_options: "گزینه‌های ویژگی"
       full_token_warning: "**این نشانه را الان کپی کنید**. به محض اینکه این صفحه را ترک کنید، دیگر نمی توانید کل نشانه را بازیابی کنید، باید آن را دوباره ایجاد کنید تا مقدار جدیدی دریافت کنید."
       generate_access_token_description: |-
@@ -10840,7 +10387,6 @@ fa-IR:
         dates: "تاریخ ها"
         delicious_login: "ورود Delicious "
         diigo_login: "ورود Diigo"
-        facebook_access: "دسترسی به فیس بوک"
         generate_access_token: "ایجاد نشانه دسترسی"
         google_docs_access: "دسترسی به Google Docs "
         inbox_opt_out: "انتخاب از صندوق ورودی گفتگوها"
@@ -10901,7 +10447,6 @@ fa-IR:
         diigo: Diigo
         disable_mfa: "غیر فعال سازی اعتبارسنجی چند عاملی"
         edit_settings: "ویرایش تنظیمات"
-        facebook: "فیس بوک"
         google_docs: "Google Docs"
         linkedin: لینکدین
         more_options: "گزینه های بیشتر"
@@ -10909,7 +10454,6 @@ fa-IR:
         skype: اسکایپ
         twitter: توییتر
         upload_new_image: "بارگذاری یک تصویر جدید"
-        view_facebook_app: "مشاهده برنامه فیس بوک"
         view_your_profile: "مشاهده رخ نما"
         yo: Yo
       loading_token_details: "در حال بارگذاری اطلاعات نشانه..."
@@ -10923,7 +10467,6 @@ fa-IR:
       subscribe_to_emails: "می خواهم اطلاعات، اخبار و نکات را از Instructure دریافت نمایم"
       titles: 
         access_token_details: "اطلاعات نشانه دسترسی"
-        authorize_facebook: "دادن اجازه دسترسی به فیس بوک"
         authorize_google_docs: "دادن اجازه دسترسی به Google Docs"
         authorize_linkedin: "دادن اجازه دسترسی به لینکدین"
         authorize_twitter: "دادن اجازه دسترسی به توییتر"
@@ -11320,6 +10863,7 @@ fa-IR:
       regrade_options: "گزینه های نمره گذاری دوباره *(برای دانشجویانی که قبلا به این پرسش پاسخ داده اند):*"
       some_scores_reduced: "دادن امتیاز فقط به پاسخ درست (*برخی نمره های دانشجویان ممکن است کسر شود*) "
       update_question_without_regrading: "بهنگام سازی پرسش بدون نمره گذاری دوباره"
+  quiz_e0dcce8f: آزمون
   quiz_log_auditing: 
     buttons: 
       reload_events: "بارگذاری دوباره"
@@ -13084,9 +12628,7 @@ fa-IR:
         next: بعدی
       getting_started: "در حال ثبت نام در **%{course}** هستید."
       labels: 
-        email: "پست الکترونیکی"
         password: "رمز عبور"
-      log_in: "لطفا نشانی پست الکترونیکی و رمز عبور خود را وارد کنید:"
     authenticate_or_register: 
       buttons: 
         enroll_in_course: "ثبت نام در درس"
@@ -13544,7 +13086,6 @@ fa-IR:
       labels: 
         custom_rating: "در هنگام ارزیابی دانشجویان، نظرهای بدون فرم خواهم نوشت"
         grading_rubric: "استفاده از این دستورالعمل ارزیابی برای نمره گذاری تکلیف"
-        title: عنوان
         total_points: "امتیازهای کل"
         totallying_rubric: "مخفی کردن کل نمره برای نتایج ارزیابی"
       links: 
@@ -13564,6 +13105,7 @@ fa-IR:
       out_of: "%{points} *از %{total}*"
       rubric: "دستورالعمل ارزیابی"
       rubric_title: عنوان
+      title: "عنوان:"
       titles: 
         find_existing_rubric: "یافتن دستورالعمل ارزیابی موجود"
     rubric_criterion: 
@@ -13612,6 +13154,7 @@ fa-IR:
       titles: 
         find_a_rubric: "یافتن یک دستورالعمل ارزیابی"
     rubric_forms: 
+      criteria_description_label: "شرح معیار"
       points: "%{points} امتیاز"
     rubric_summary: 
       buttons: 
@@ -14491,6 +14034,7 @@ fa-IR:
     people: افراد
     view_in_separate_window: "مشاهده در پنجره جداگانه"
   to_35c6baa2: به
+  to_51406be9: گیرنده
   to_c4c44f4b: تا
   to_minscore_43e5452e: "به %{minScore}%"
   too_many_members_b8b15069: "تعداد عضو زیاد است"
@@ -14542,6 +14086,7 @@ fa-IR:
   updated_group_group_name_727b1d98: "گروه %{group_name} بهنگام سازی شد"
   upload_button: 
     upload: بارگذاری
+  upload_data_dc4fa4cb: "بارگذاری داده ها"
   upload_drop_zone: 
     drop_to_upload: "حذف موردها برای بارگذاری"
   upper_limit_of_range_c454a8f2: "حد بالاتر محدوده"
@@ -14679,12 +14224,12 @@ fa-IR:
     descriptions: 
       delicious: "Delicious یک ابزار گروهی به اشتراک گذاری پیوند است. می توانید هر صفحه در اینترنت را برای مراجعه بعدی برچسب گذاری کنید. همچنین می توانید به حساب های Delicious کاربران دیگر وصل شوید تا پیوندهای دارای علایق مشترک را به اشتراک بگذارید."
       diigo: "Diigo یک ابزار گروهی به اشتراک گذاری پیوند است. می توانید هر صفحه در اینترنت را برای مراجعه بعدی برچسب گذاری کنید. همچنین می توانید به حساب های Diigo کاربران دیگر وصل شوید تا لینک های دارای علایق مشترک را به اشتراک بگذارید."
-      facebook: "فهرست کردن رخ نمای فیس بوک به شما امکان می دهد راحت تر با دوستانی که در گروه ها و کلاس های خود پیدا کرده اید، ارتباط برقرار کنید."
       google_docs: "دانشجویان می توانند از Google Docs برای همکاری در پروژه های گروهی استفاده کنند. Google Docs امکان ویرایش بلادرنگ اسناد، صفحه های گسترده و سخنرانی ها را فراهم می سازد."
       linked_in: "لینکدین منبعی برای شبکه سازی تجاری است. بسیاری از روابطی که در دانشگاه ایجاد می کنید می تواند در زمانی که وارد بازار کار می شوید نیز مفید باشد. "
       skype: "اسکایپ یک ابزار رایگان برای برقراری تماس های صوتی و تصویری آنلاین است."
       twitter: "توییتر یک منبع خوب برای برقراری ارتباط در خارج از کلاس است."
       yo: "Yo یک ابزار ارتباطی بدون نویسه تک ضربه ای است."
+  username_47bb5bbe: "نام کاربری"
   users: 
     admin_merge: 
       buttons: 
@@ -14752,8 +14297,6 @@ fa-IR:
     errors: 
       no_teacher_courses: "هیچ درسی بین این استاد و دانشجو مشترک نیست"
       user_not_teacher: "این کاربر استاد این درس نیست"
-    facebook_added: "حساب فیس بوک با موفقیت اضافه شد!"
-    facebook_fail: "تأیید اعتبار فیس بوک انجام نشد."
     google_docs_added: "اعتبار دسترسی به Google Docs تأیید نشد!"
     google_docs_fail: "تأیید اعتبار Google Docs انجام نشد. لطفا دوباره تلاش کنید"
     grades: 
@@ -14981,6 +14524,7 @@ fa-IR:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "درس Blackboard Vista/CE ،WebCT 6+ Course"
   webct_name: "Blackboard Vista/CE (WebCT)"
+  what_should_the_csv_file_look_like_985a59ac: "فایل CSV باید چطور باشد؟"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "وقتی افراد از درس بازدید می کنند، این صفحه را خواهند دید. می توانید آن را برای نمایش جریان فعالیت، فهرست ماژول های درس، سرفصل یا یک صفحه سفارشی که خودتان می نویسید، تنظیم کنید. حالت پیش فرض، نمایش جریان فعالیت است."
   widget: 
     upload_media_track_form: 
@@ -15097,6 +14641,7 @@ fa-IR:
       title_characters: "عنوان باید حداقل یک حرف یا عدد داشته باشد"
       title_too_long: "عنوان نمی تواند از %{max_characters} فراتر رود"
     unknown_user_name: ناشناس
+  wiki_page_6c11ee20: "صفحه ویکی"
   wiki_pages: 
     edit: 
       page_header_title: "ویرایش %{page_name}"
