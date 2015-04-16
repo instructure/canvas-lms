@@ -70,7 +70,6 @@ ru:
       avatars: "Аватары пользователя"
       delicious: Delicious
       diigo: Diigo
-      facebook: Facebook
       google_docs: "Google Docs"
       google_docs_preview: "Функция предварительного просмотра Google Docs"
       google_drive: "Диск Google"
@@ -86,8 +85,6 @@ ru:
       invalid_discovery_url: "Неверный URL-адрес представления сведений"
     feedback_coach: "Задать вопрос сообществу"
     feedback_coach_sub: "Получить помощь от эксперта Canvas"
-    feedback_feature_request: "Запросить функцию"
-    feedback_feature_request_canvas_net: "Запросить функцию в сети Canvas"
     feedback_feature_request_sub: "У вас есть идеи, как улучшить Canvas?"
     manually_created_courses: "Созданные вручную курсы"
     root_account_cant_have_sis_id: "Идентификаторы SIS не могут быть установлены для корневых учетных записей"
@@ -239,7 +236,7 @@ ru:
         login_handle_name: "Метка входа"
         position: Позиция
         requested_authn_context: "Проверка подлинности контекста"
-        unkown_user_url: "Url-адрес неизвестного пользователя"
+        unknown_user_url: "Url-адрес неизвестного пользователя"
       log_in_url: "URL-адрес входа в систему"
       log_out_url: "URL-адрес выхода в систему"
       login_attribute: "Атрибуты входа в систему"
@@ -254,7 +251,7 @@ ru:
       save_button: "Сохранить настройки аутентификации"
       start_debugging: "Начать отладку"
       stop_debugging: "Остановить отладку"
-      unkown_user_url_description: "Url-адрес для переадресации, когда аутентифицированный пользователь не найден в системе Canvas."
+      unknown_user_url_description: "Url-адрес для переадресации, когда аутентифицированный пользователь не найден в системе Canvas."
     saml_testing: 
       auth_request_to_idp: "Запрос проверки подлинности отправлен IdP"
       auth_response_from_idp: "Ответ проверки подлинности от IdP"
@@ -941,6 +938,7 @@ ru:
         outgoing_email_default_name_option_default: "Настройки Canvas по умолчанию"
         prevent_course_renaming_by_teachers: "Не разрешать преподавателям переименовывать курсы"
         restrict_quiz_questions: "Ограничить просмотр вопросов контрольной работы для студентов после даты завершения курса"
+        restrict_student_future_view: "Ограничить просмотр курсов для студентов до даты начала"
         role_id: Добавить
         self_enrollment: "Разрешить самостоятельную регистрацию"
         self_registration: "Самостоятельная регистрация"
@@ -1539,6 +1537,7 @@ ru:
     titles: 
       gpa_scale_explainer: "Что такое система оценок GPA?"
       grading_scheme_info: "Просмотр/редактирование схемы оценок"
+  assignment_976578a8: Задание
   assignment_comments_e43ed898: "Комментарии задания"
   assignment_details: 
     no_graded_submissions: "Нет оцененных отправок"
@@ -2176,6 +2175,7 @@ ru:
     upload_error_timeout: "Истекло время ожидания запроса: %{url}"
     upload_error_too_many_redirects: "Слишком много перенаправлений"
     upload_error_unexpected: "Произошла неизвестная ошибка при загрузке с %{url}"
+  attachment_deffe5a9: Вложение
   attendance: 
     default_attendance_title: "Посещение %{date}"
     errors: 
@@ -2454,7 +2454,6 @@ ru:
       create_event: "Создать новое событие"
       done_go_back_to_list: "Готово, вернуться к списку"
       links: 
-        accessibility_warning: "Предупреждение. Данный способ просмотра недоступен для программ для чтения с экрана.  Вместо этого используйте представление Agenda (повестка дня)."
         calendar_agenda: Программа
         calendar_month: Месяц
         calendar_scheduler: Планировщик
@@ -2650,25 +2649,9 @@ ru:
     crumbs: 
       new: "Новое календарное событие"
     full_calendar_event: 
-      buttons: 
-        create: "Создать событие"
-        update: "Обновить событие"
-      labels: 
-        address: Адрес
-        date: Дата
-        event_description: "Описание события"
-        from: От
-        location: Местоположение
-        title: Заголовок
       no_content: "Нет содержимого"
-      timespan: "%{start_time} *до* %{end_time}"
     new: 
-      links: 
-        back_to_calendar: "Вернуться к календарю"
-        delete: "Удалить событие"
-        edit: "Редактировать календарное событие"
       page_title: "Новое календарное событие"
-    no_content: "Нет содержимого"
     notices: 
       created: "Событие успешно создано."
       deleted: "Это событие было удалено"
@@ -2688,44 +2671,6 @@ ru:
     invalid_date_or_time: "Неверно указана дата или дата и время для %{attr}"
   calendars: 
     assignment_details: "Сведения о задании"
-    calendar: 
-      alts: 
-        next: Далее
-        previous: Назад
-      calendars_count: 
-        few: " %{count} календаря(ей), %{open_count} открыто"
-        one: "1 календарь, %{open_count} открыто"
-        other: " %{count} календаря(ей), %{open_count} открыто"
-      feed_title: "Канал календаряq"
-      instructions: 
-        ics_link: "Скопируйте ссылку ниже и вставьте ее в любое приложение календаря, использующее каналы iCal (Google Calendar, iCal, Outlook и т.д.)"
-      labels: 
-        calendar: Календарь
-        date: Дата
-        details: Сведения
-        due: Срок
-        from: От
-        group: Группа
-        title: Заголовок
-        undated_events: "Обновленные события"
-      links: 
-        add_event: "Добавить событие"
-        delete: Удалить
-        edit: Редактировать
-        feed: "щелкните здесь для просмотра канала"
-        full_details: "Полные сведения"
-        how_do_i: Как...?
-        jump_to_calendar: "Перейти к календарю"
-        more_options: "Дополнительные опции"
-        show_undated_events: "показать %{count} события без даты"
-      messages: 
-        max_visible: "Одновременно можно отобразить до %{count} календарей"
-      options: 
-        new_group: "[ Новая группа ]"
-      tabs: 
-        assignment: Задание
-        event: Событие
-      timespan: "%{start_time} *до* %{end_time}"
     default_title: событие
     event: 
       due: окончание
@@ -2749,36 +2694,6 @@ ru:
     prompts: 
       delete_assignment: "Вы действительно хотите удалить это задание?"
       delete_event: "Действительно хотите удалить это событие?"
-    show: 
-      crumbs: 
-        my_calendar: "Мой календарь"
-      feed_title: "Канал Atom календаря курса"
-      keycode_descriptions: 
-        delete: "Удалить текущее событие"
-        edit: "Редактировать текущее событие"
-        next_day: "Следующий календарный день"
-        next_event: "Следующий календарный день/событие"
-        next_week: "Следующая неделя"
-        open: "Открыть текущее событие"
-        previous_day: "Предыдущий календарный день"
-        previous_event: "Предыдущий календарный день/событие"
-        previous_week: "Предыдущая неделя"
-        refresh: "Обновить календарь"
-      keycode_descriptoins: 
-        new: "Новое событие для текущего дня"
-      keycodes: 
-        delete: d
-        edit: e
-        new: "n"
-        next_day: ctrl+вправо
-        next_event: j
-        next_week: ctrl+вниз
-        open: о
-        previous_day: ctrl+влево
-        previous_event: k
-        previous_week: ctrl+вверх
-        refresh: r
-      page_title: Календарь
     show2: 
       calendar_feed: "Канал календаря"
       calendar_feed_instructions: "Скопируйте ссылку ниже и вставьте ее в любое приложение календаря, использующее каналы iCal (Календарь Google, iCal, Outlook и т. д.)"
@@ -2797,7 +2712,6 @@ ru:
       add_new_event: "Добавить новое мероприятие"
       edit_assignment: "Редактировать задание"
       edit_event: "Редактировать событие"
-    use_new_calendar: "Попробуте новый календарь"
     wizard_box: 
       descriptions: 
         assignment: "Отлично. Теперь нажмите вкладку \"Задание\" в диалоговом окне, чтобы создать задание вместо календарного события."
@@ -2854,6 +2768,7 @@ ru:
     titles: 
       update_assignment_points: "Изменить возможное количество баллов для соответствия рубрике?"
   choose_a_course_home_page_8059c7b: "Выбрать домашнюю страницу курса"
+  choose_a_csv_file_to_upload_9644480c: "Выберите CSV-файл для отправки:"
   choose_usage_rights_33683854: "Выбрать права на использование..."
   clear_file_name_text_field_fce73840: "Очистите текстовое поле имени файла"
   click_here_on_the_calendar_link_c9965631: "Щелкните здесь по ссылке *Календарь*"
@@ -2972,7 +2887,6 @@ ru:
   communication_5255723c: Связь
   communication_channel: 
     body: "Ваш код подтверждения в Canvas: %{verification_code}"
-    default_facebook_account: "Учетная запись Facebook"
     default_twitter_handle: "Имя пользователя Twitter"
     default_yo_name: "Имя Yo"
   communication_channels: 
@@ -3426,7 +3340,6 @@ ru:
         user_services: "Зарегистрированные веб-сервисы"
       help: 
         list_services: "Список зарегистрированных служб не включен. Разрешение этого списка упростит связь других членов курса и группы с вами вне класса."
-        services: "Профиль пользователя не связан с внешними службами. Можно связать учетные записи Canvas со службами, такими как Facebook и Twitter. Это упростит связь других членов курса и группы с вами вне класса."
       labels: 
         public_list_services: "Разрешить членам курса/группы видеть, какие сервисы связаны с моим профилем"
         user_privileges: Полномочия
@@ -3465,7 +3378,6 @@ ru:
         registered_services: "Зарегистрированные сервисы"
         service_types: "Типы служб"
       help: 
-        no_services: "Профиль пользователя не связан с внешними службами. Можно связать учетные записи Canvas со службами, такими как Facebook и Twitter."
         services_private: "Список зарегистрированных сервисов не подключен. Подключение этого списка позволит членам курса и группы просматривать сервисы, связанные с вашей учетной записью в Canvas."
         user_services: "Другие члены могут просматривать внешние услуги, связанные с учетной записью Canvas. Это может упростить координацию групповых проектов и связь вне занятий."
       labels: 
@@ -3776,12 +3688,9 @@ ru:
     all_courses: "Все курсы"
     all_in_context: "Включая все %{context}"
     archive: Архив
-    archive_conversation: "Архивировать разговор"
     autocomplete_result: 
       group_people: "Люди: %{people}"
       no_results: "Без результата"
-    autocomplete_token: 
-      remove_recipient: "Удалить получателя"
     back: Назад
     cannot_add_to_private: "Вы не можете добавлять участников к приватному разговору."
     cannot_be_empty: "Сообщение не может быть пустым"
@@ -3825,12 +3734,10 @@ ru:
     hide: Скрыть
     index_new: 
       archive: Архив
-      archive_conversation: "Архивировать разговор"
       archived: "Перемещено в архив"
       clear_search: "Очистить результаты поиска"
       compose_new_message: "Написать новое сообщение"
       delete: Удалить
-      delete_conversation: "Удалить разговор"
       filter_messages_by_course: "Фильтровать сообщения по курсам"
       filter_messages_by_type: "Фильтровать сообщения по типам"
       forward: Переслать
@@ -3883,7 +3790,6 @@ ru:
         add_to_faculty_journal: "Добавить как запись журнала преподавателей"
         attachments: Вложения
         course: Курс
-        course_required: "Вы должны выбрать Курс, прежде чем вводить получателей."
         select_course: "Выбрать курс"
         subject: Тема
         to: Кому
@@ -3933,7 +3839,6 @@ ru:
     titles: 
       rss_feed: "Канал разговоров"
     unarchive: Разархивировать
-    unarchive_conversation: "Разархивировать разговор"
     unstar: "Снять метку"
     unstar_conversation: "Снять метку с разговора"
   copyright_holder_66ee111: "Правообладатель:"
@@ -4221,14 +4126,8 @@ ru:
       headings: 
         grade: "Оценка %{assignment}"
         to_do: Задача
-      images: 
-        alt: 
-          ignore: игнорировать
       links: 
         show_more: "%{count} дополнительно..."
-        title: 
-          ignore: "Игнорировать это задание"
-          ignore_review: "Игнорировать это рассмотрение"
       need_grading_count: 
         few: "%{count} требуют оценки"
         one: "1 требует оценки"
@@ -4247,8 +4146,6 @@ ru:
         conclude_course: "Завершить курс"
         delete_course: "Удалить курс"
       details: 
-        conclude_alt_text: "Если вы хотели бы сохранить возможность изменять оценки, ограничивая доступа студентов к этому курсу, используйте настройки дат курса. Вы можете узнать о настройках даты курса в нашем руководстве *здесь*"
-        confirm_conclude: "Предупреждение. Завершение курса поможет предотвратить изменение оценок и доступ к содержимому курса."
         confirm_delete: "Вы уверены, что хотите удалить этот курс? После удаления у студентов и учителей не будет доступа к нему. Если его необходимо удалить из раскрывающегося списка курса, следует *завершить курс*."
         confirm_delete_addendum: "Если у вас нет разрешения на завершение курса, *измените дату завершения курса*, или попросите вашего администратора завершить курс."
       headings: 
@@ -5134,6 +5031,7 @@ ru:
       рассчитываться без этих баллов.
   disable_a5c05db3: Отключить
   disabled_18c33a73: (отключено)
+  discussion_6719c51d: Обсуждение
   discussion_entries: 
     created_entry_notice: "Запись успешно создана."
     deleted_entry_notice: "Эта запись удалена"
@@ -5150,6 +5048,7 @@ ru:
     atom_no_author: "Автор отсутствует"
     default_title: "Без названия"
     empty_message: "Нет сообщения"
+  discussion_topic_dc85ad4c: "Тема обсуждения"
   discussion_topics: 
     assignment_details: 
       available_from: "Доступно с"
@@ -5213,7 +5112,6 @@ ru:
         published: Опубликовано
       delay_posting: "Отложить размещение сообщения"
       enable_podcast_feed: "Включить канал подкастов"
-      include_replies_in_podcast_feed: "Включить Ответы в канал подкастов"
       only_visible_to_overrides_note: "Примечание. Данное обсуждение отображается *только* для указанного ниже раздела (-ов):"
       options: Опции
       page_header_title: "Новое обсуждение"
@@ -5262,7 +5160,6 @@ ru:
       loading: Загрузка...
       lock_for_comments: "Закрыть для комментариев"
       make_sure_all_search_terms_are_spelled_correctly: "Убедитесь, что поисковые слова написаны правильно."
-      new_discussion: "*Начать* обсуждение"
       rss_feed: "Канал RSS"
       start_one_now: "Начать сейчас"
       suggestions: "Предложения:"
@@ -5328,7 +5225,7 @@ ru:
       reply_to_topic: "Ответить на тему"
       retrieved_from_feed: "Получено от %{feed}"
       show_rubric: "Показать рубрику"
-      speed_grader: "Speed Grader"
+      speed_grader: SpeedGrader™
       topic: Тема
       topic_podcast_feed_link: "Канал подкастов темы"
       topic_subscribe: Подписаться
@@ -5456,7 +5353,6 @@ ru:
   due_datetime_f5a81b81: "До: %{dateTime}"
   due_multiple_dates_cc0ee3f5: "До: несколько дат"
   due_on_date_aa4725cd: "Выполнить до даты:"
-  due_on_date_ffc98ebc: "Выполнить до даты"
   e_mail_only_2cc5e513: "Только электронная почта"
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Каждая полоска представляет собой одно задание. *Тонкие вертикальные усы* простираются от самой низкой оценки любого из студентов курса до самой высокой оценки. **Более толстая линия** простирается от 25 до 75 процентилей, с ***отмеченной медианой***."
   each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "Каждая полоска представляет собой одно задание. Тонкие усы простираются от самой низкой оценки любого из студентов курса до самой высокой оценки. Более толстая линия простирается от 25 до 75 процентилей с отмеченной медианой. Оценка студента помечена точкой."
@@ -5479,6 +5375,7 @@ ru:
     buttons: 
       create_rubric: "Создать рубрику"
       update_rubric: "Обновить рубрику"
+    change: Изменить
     discussion_points_possible: 
       few: "%{count} возможных балла"
       one: "%{count} возможный балл"
@@ -5952,6 +5849,7 @@ ru:
       posts_added: "Сообщения добавлены"
       remove_feed: "Удалить %{display_name}"
   external_integration_keys_8b4f4548: "Ключи внешней интеграции"
+  external_tool_c5a6410a: "Внешний инструмент"
   external_tools: 
     account_navigation_configured: "Навигация учетной записи настроена"
     app_full_view: 
@@ -6059,53 +5957,6 @@ ru:
     submit: Отправить
     user_navigation_configured: "Навигация пользователя настроена"
     wiki_page_menu_configured: "Меню вики-страницы настроено"
-  facebook: 
-    authorization_required: "Эта страница доступна только авторизованным пользователям"
-    authorization_success: "Авторизация успешно выполнена!  Canvas и Facebook теперь друзья."
-    deleted: Удалено
-    index: 
-      all_set: "Все настроено."
-      bookmark_notice: "Если добавить это приложение в закладки, на домашней странице Facebook можно увидеть ряд новых уведомлений Canvas."
-      canvas_messages: "Сообщения Canvas"
-      configure_notification_preferences_notice: "После *настройки параметров уведомлений* будут отображаться уведомления, позволяющие получить сведения о том, что происходит с учетной записью Canvas."
-      installation_about: "Для установки приложения Canvas Facebook перейдите к странице профиля в Canvas и нажмите кнопку Facebook для подключения учетной записи к Facebook."
-      learn_more: "Дополнительные сведения доступны на веб-сайте instructure.com"
-      more_information: "Дополнительные сведения доступны в %{domain_list}"
-      no_messages_notice: "При работе с курсом вы начнете получать уведомления, позволяющие узнать о действиях в учетной записи Canvas."
-      notification_about: "Приложение Canvas Facebook предоставляет простой доступ к взаимодействиям в курсе. Можно настроить его на отправку уведомлений при оценке заданий, при изменении дат выполнения и т.д. Частные данные останутся частными в Canvas."
-      notification_settings: "Настройки уведомления"
-      notifications_notice: "Ниже приведен список последних уведомлений Canvas. Если добавить это приложение в закладки, на домашней странице Facebook можно увидеть ряд новых уведомлений Canvas."
-      welcome: "Добро пожаловать, %{name}!"
-      welcome_message: "Вас приветствует новое интерактивное программное обеспечение для обучения, предоставленное Instructure. Мы упрощаем использование Интернета для улучшения обучения. Наш интерфейс простой и открытый, и мы работаем с инструментами, которые вы и ваши студенты уже используете, например Facebook, для обеспечения более открытого совместного обучения. Мы объединили все это в один мощный и открытый пакет, обеспечивающий больше, чем просто отслеживание назначений. Он способствует взаимодействию и обучению."
-      welcome_title: "Вас приветствует Instructure Canvas"
-    index_disabled: 
-      disabled_notice: "Этот сайт Canvas не настроен для связи с Facebook."
-      get_help: "Получите поддержку на сайте support.instructure.com"
-      instructure_canvas: "Instructure Canvas"
-    invalid_signature: "Неверная подпись Facebook"
-    message: 
-      hide: Скрыть
-    notification_policies: 
-      alerts: Оповещения
-      cancel: Отменить
-      change_settings: "Изменить настройки"
-      daily: Ежедневно
-      labels: 
-        alerts_for_category: "%{category_name} Оповещения"
-      loading: загрузка...
-      never: Никогда
-      notification_type: "Тип уведомлений"
-      right_away: "Прямо сейчас"
-      send_to_facebook: "Отправить в Facebook?"
-      update_preferences: "Обновить предпочтения"
-      updating_preferences: "Обновление предпочтений..."
-      weekly: Еженедельно
-    settings: 
-      back_to_messages: "Вернуться к сообщениям"
-      link_needed: "Перед настройкой приложения Canvas Facebook необходимо связать его с данными для входа в Canvas. Щелкните \"Добро пожаловать\" для получения дополнительной информации."
-      notifications_config_notice: "Уведомления Canvas могут автоматически отправляться с помощью учетной записи Facebook. Ниже приведены типа уведомлений, которые можно отправлять. Можно изменить предпочтения уведомлений в любое время, здесь или в Canvas."
-      settings_title: "Настройки уведомлений Canvas"
-      updating_preferences: "Обновление предпочтений..."
   fair_use_bee47d77: "Добросовестное использование"
   favicon_6e658914: "Иконка веб-сайта"
   feature_flags: 
@@ -6386,6 +6237,7 @@ ru:
     only_one_folder: "Невозможно задать путь к папке и установить идентификатор папки"
   for: для
   for_all_devices_1f603968: "Для всех устройств"
+  from_fdd4956d: От
   from_from_to_to_e31f6422: "С %{from} по %{to}"
   global_message_icons: 
     announcement: объявление
@@ -6584,22 +6436,9 @@ ru:
       switch_to_points: "Переключиться на баллы"
     ungraded: "Не учтено в процессе выставления оценки"
   gradebook_uploads: 
-    errors: 
-      invalid_file: "Неверный файл csv, невозможно обновить оценки"
-      upload_failed: "Файл не может быть обновлен."
-    form: 
-      labels: 
-        upload: "Выберите CSV-файл для отправки"
-      titles: 
-        upload_form: "Выберите CSV-файл для отправки"
     new: 
       titles: 
         new_upload: "Загрузить табель успеваемости"
-    notices: 
-      updated: 
-        few: "Успешно обновлено %{count} отправки."
-        one: "Успешно обновлена 1 отправка."
-        other: "Успешно обновлено %{count} отправок."
     show: 
       assignment_answer: "Это задание"
       assignment_example: "Контрольная работа с равными индексами"
@@ -6626,14 +6465,6 @@ ru:
       student_answer: "Этот пользователь существует"
       student_example: "Некоторый пользователь"
       student_question: "Рассматриваемый студент"
-  gradebook_uploads_form: 
-    buttons: 
-      upload_data: "Загрузка данных"
-    labels: 
-      upload: "Выберите CSV-файл для отправки:"
-    titles: 
-      upload_form: "Выберите CSV-файл для отправки"
-    what_should_csv_look_like: "Как должен быть выполнен CSV-файл?"
   gradebooks: 
     attendance: 
       attendance_info: "Задания участников не созданы."
@@ -6755,12 +6586,14 @@ ru:
       set_group_weights: "Установить весовые критерии для группы"
       show_attendance_columns: "Показать столбцы посещений"
       show_concluded_enrollments: "Показать завершенные регистрации"
-      upload_scores: Импортировать
       view_grading_history: "Просмотр истории оценок"
     grades: 
       complete: Завершено
       incomplete: "Не завершено"
     grades_filename: Оценки
+    grading_box_extended: 
+      labels: 
+        grade: Оценить
     history: 
       graded_on_submission: "Оценка по отправке"
       grades_for_date: "Оценок за дату"
@@ -6834,7 +6667,6 @@ ru:
       labels: 
         add_comment: "Добавление комментария"
         average: Сред.
-        grade: Оценить
         grade_by_question_beta: "Оценка по вопросу (бета-версия)"
         group_comment: "Отправить комментарий всей группе"
         hide_names: "Скрыть имена студентов в SpeedGrader"
@@ -7448,8 +7280,11 @@ ru:
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "Если вы уйдете, подготовленная загрузка zip-файла будет отменена."
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Если вы используете другую систему управления курсами, вероятно, вам потребуется переместить что-либо в Canvas. Мы поможем вам разобраться в процессе перемещения содержимого в Canvas."
   ignore_assignment_738b3c99: "Игнорировать задание"
+  ignore_forever_dd4a6cdf: "Всегда игнорировать"
   ignore_name_55edc6fe: "Игнорировать %{name}"
   ignore_these_3940f6f5: "Игнорировать эти"
+  ignore_this_assignment_b7a71f80: "Игнорировать это задание"
+  ignore_until_new_submission_87f32b4: "Игнорировать до новой отправки"
   image_8ad06: Изображение
   images: 
     error_checking_color: "Ошибка при проверке цвета изображения"
@@ -7459,6 +7294,7 @@ ru:
     invalid_file_type: "Неверный тип файла %{type}. Разрешены следующие типы: %{type_list}"
     not_an_image: "Выбранный файл не является изображением"
   immediately_c128ede6: Немедленно
+  import_1b31507: Импортировать
   import_content_b2fd6620: "Импорт содержимого"
   importers/assignment_importer: 
     errors: 
@@ -7531,8 +7367,6 @@ ru:
       posting_message_failed: "Сбой записи, повторите попытку"
       required: "Обязательное для заполнения поле"
       search_failed: "Сбой поиска, повторите попытку"
-    ignore_forever: "Всегда игнорировать"
-    ignore_until_new_submission: "Игнорировать до новой отправки"
     labels: 
       datepicker: 
         time: Время
@@ -7666,8 +7500,6 @@ ru:
         dashboard: "Моя информационная панель"
         skip_to_content: "Перейти к содержимому"
       open_source_learning_management_system: "LMS с открытым исходным кодом."
-    facebook: 
-      title: "Страница Facebook"
     fixed_bottom: 
       masquerading: 
         stop: "Остановить подмену"
@@ -7816,6 +7648,7 @@ ru:
   lock_date_cannot_be_after_term_end_cf1a188f: "Дата блокировки не может быть позднее окончания семестра"
   lock_date_cannot_be_before_due_date_ac30f54: "Дата блокировки не может быть раньше даты выполнения"
   lock_until_date_62ce1b5c: "Заблокировать до даты"
+  log_out_379ba28a: "	Выйти "
   logged_out_user: "Вышедший из системы пользователь %{user_counter}"
   logo_a040ae0e: Логотип
   low_score_4eeb95b2: "Низкая: %{score}"
@@ -7847,7 +7680,6 @@ ru:
   manage_usage_rights_c5a8c216: "Управление правами на использование"
   manual_entry_e4a4f99a: "Ручной ввод"
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Оценка усвоения отражает самое последнее проверенное задание или контрольную работу."
-  mastery_scrore_reflects_the_highest_score_of_a_gra_a71008b7: "Оценка усвоения отражает самую высокую оценку из проверенных заданий или контрольных работ."
   mathquill: 
     tabs: 
       arrows: Стрелки
@@ -7906,6 +7738,7 @@ ru:
     my_courses: "Мои курсы"
   message: 
     default_subject: "Уведомление Canvas"
+  message_896d2ed0: "%{message}"
   message_students: 
     buttons: 
       send_message: "Отправить сообщение"
@@ -7958,10 +7791,6 @@ ru:
           unknown_user: "Неизвестный пользователь"
         subject: "%{user_name} добавил вас к разговору в Canvas."
         unknown_user: "Неизвестный пользователь"
-      facebook: 
-        body: "%{user_name} добавил вас к разговору в Canvas."
-        link_text: "Просмотр разговора"
-        unknown_user: "Неизвестный пользователь"
       sms: 
         body: "%{user_name} добавил вас к разговору в Canvas."
         more_info: "Дополнительные сведения доступны в %{url}"
@@ -8003,31 +7832,6 @@ ru:
         ungraded_count_description: "%{count} или больше подписок не оценены"
         ungraded_timespan_description: "Отправка остается без оценки в течение %{count} дней"
         usernote_description: "Нет записей журнала преподавателей в течение %{count} дней"
-      facebook: 
-        body: 
-          few: "Оповещение было инициировано для %{student}, потому что следующие условия были выполнены:"
-          one: "Оповещение было инициировано для %{student}, потому что следующее условие было выполнено:"
-          other: "Оповещение было инициировано для %{student}, потому что следующие условия были выполнены:"
-        body_student: 
-          few: "Оповещение было инициировано для вас, потому что следующие условия были выполнены:"
-          one: "Оповещение было инициировано для вас, потому что следующее условие было выполнено:"
-          other: "Оповещение было инициировано для вас, потому что следующие условия были выполнены:"
-        interaction_description: 
-          few: "Отсутствует взаимодействие студент/учитель за %{count} или больше дней"
-          one: "Отсутствует взаимодействие студент/учитель в этот день"
-          other: "Отсутствует взаимодействие студент/учитель за %{count} или больше дней"
-        ungraded_count_description: 
-          few: "%{count} или больше заданий не получили оценок"
-          one: "Одно или больше заданий не получили оценок"
-          other: "%{count} или больше заданий не получили оценок"
-        ungraded_timespan_description: 
-          few: "Одна или несколько отправок остались без оценки %{count} или больше дней"
-          one: "Одна или несколько отправок остались без оценки один или больше дней"
-          other: "Одна или несколько отправок остались без оценки %{count} или больше дней"
-        usernote_description: 
-          few: "Отсутствуют записи преподавательского состава в журнале за %{count} или больше дней"
-          one: "Отсутствуют записи преподавательского состава в журнале в течение дня или больше"
-          other: "Отсутствуют записи преподавательского состава в журнале за %{count} или больше дней"
       sms: 
         body: "Уведомление создано для %{student}"
         body_student: "Уведомление создано для вас"
@@ -8069,8 +7873,6 @@ ru:
           link: "Просмотреть объявление"
         labels: 
           file_included: "Файл включен"
-      facebook: 
-        body: "Вы создали это объявление:%{title}, %{course}"
       sms: 
         details: "Дополнительная информация доступна по адресу: %{url}"
         subject: "Вы создали это объявление:%{title}, %{course}"
@@ -8086,8 +7888,6 @@ ru:
           link: "Для присоединения к просмотру объявления нажмите здесь"
           subject: "Новый комментарий по объявлению %{discussion_topic}:%{course}"
         subject: "	Новый комментарий по объявлению %{discussion_topic}:%{course}"
-      facebook: 
-        body: "Новый комментарий по объявлению: %{discussion_topic}, %{course}"
       sms: 
         body: "	Новый комментарий по объявлению %{discussion_topic}:%{course}"
         details: "Дополнительная информация доступна по адресу: %{url}"
@@ -8122,19 +7922,6 @@ ru:
         message: "%{user} отменил свое бронирование для \"%{appointment_name}\"."
         no_reason_given: "Не дано"
         subject: "Бронирование отменено для \"%{appointment_name}\" (%{course})"
-      facebook: 
-        instructions: "Просмотреть встречу"
-        labels: 
-          attendee: Участник
-          attendees: Участники
-          cancel_reason: "Причина отмены"
-          course: Курс
-          date_and_time: Дата/время
-          details: "Детали встречи"
-          group: Группа
-          slots_remaining: "Доступные интервалы времени"
-        message: "%{user} отменил свое бронирование для \"%{appointment_name}\"."
-        no_reason_given: "не дано"
       sms: 
         message: "%{user} отменил свое бронирование для \"%{appointment_name}\"."
         more_info: "Дополнительные сведения доступны в %{url}"
@@ -8166,18 +7953,6 @@ ru:
         message: "%{user} отменили ваш временной интервал для \"%{appointment_name}\"."
         no_reason_given: "Не дано"
         subject: "Ваш временной интервал для \"%{appointment_name}\" был отменен (%{course})"
-      facebook: 
-        instructions: "Зарегистрироваться на другой временной интервал."
-        labels: 
-          attendee: Участник
-          attendees: Участники
-          cancel_reason: "Причина отмены"
-          course: Курс
-          date_and_time: Дата/время
-          details: "Детали встречи"
-          group: Группа
-        message: "%{user} отменил ваш временной интервал для \"%{appointment_name}\"."
-        no_reason_given: "не дано"
       sms: 
         message: "Ваш временной интервал для \"%{appointment_name} был отменен\"."
         more_info: "Дополнительные сведения доступны в %{url}"
@@ -8202,14 +7977,6 @@ ru:
         message: "Все встречи для \"%{appointment_name}\" были отменены."
         no_reason_given: "не дано"
         subject: "Встречи для \"%{appointment_name}\" были отменены (%{course})"
-      facebook: 
-        labels: 
-          cancel_reason: "Причина отмены"
-          course: Курс
-          dates: Дата(ы)
-          details: "Детали встречи"
-        message: "Все встречи для \"%{appointment_name}\" были отменены."
-        no_reason_given: "не дано"
       sms: 
         message: "Все встречи для \"%{appointment_name} были отменены\"."
         more_info: "Дополнительные сведения доступны в %{url}"
@@ -8239,17 +8006,6 @@ ru:
           slots_remaining: "Доступные промежутки времени"
         message: "Временные интервалы для \"%{appointment_name}\" теперь доступны для регистрации."
         subject: " Временные интервалы для \"%{appointment_name}\" теперь доступны для регистрации (%{course})"
-      facebook: 
-        group_signup: "Группа (%{group_category})"
-        individual_signup: Индивид
-        instructions: "Регистрация на временной интервал"
-        labels: 
-          course: Курс
-          dates: Дата(ы)
-          details: "Детали встречи"
-          signup_type: "Тип регистрации"
-          slots_remaining: "Доступные промежутки времени"
-        message: "Временные интервалы для \"%{appointment_name}\" теперь доступны для регистрации."
       sms: 
         message: "Регистрация открыта для \"%{appointment_name}\"."
         more_info: "Дополнительные сведения доступны в %{url}"
@@ -8281,17 +8037,6 @@ ru:
           slots_remaining: "Доступные временные интервалы"
         message: "Временные интервалы были добавлены для \"%{appointment_name}\" и теперь доступны для регистрации."
         subject: "Встреча \"%{appointment_name}\" была обновлена (%{course})"
-      facebook: 
-        group_signup: "Группа (%{group_category})"
-        individual_signup: Индивид
-        instructions: "Регистрация на временной интервал"
-        labels: 
-          course: Курс
-          dates: Дата(ы)
-          details: "Детали встречи"
-          signup_type: "Тип регистрации"
-          slots_remaining: "Доступные интервалы времени"
-        message: "Временные интервалы были добавлены для \"%{appointment_name}\" и теперь доступны для регистрации."
       sms: 
         message: "Новые промежутки времени доступны для \"%{appointment_name}\"."
         more_info: "Дополнительные сведения доступны в %{url}"
@@ -8324,17 +8069,6 @@ ru:
           slots_remaining: "Доступные интервалы времени"
         message: "%{user} зарегистрировался на \"%{appointment_name}\"."
         subject: "Пользователь зарегистрировался на \"%{appointment_name}\" (%{course})"
-      facebook: 
-        instructions: "Посмотреть встречу"
-        labels: 
-          attendee: Участник
-          attendees: Участники
-          course: Курс
-          date_and_time: Дата/время
-          details: "Детали встречи"
-          group: Группа
-          slots_remaining: "Доступные интервалы времени"
-        message: "%{user} зарегистрировался на \"%{appointment_name}\"."
       sms: 
         message: "%{user} зарегистрировался на \"%{appointment_name}\"."
         more_info: "Дополнительные сведения доступны в %{url}"
@@ -8364,17 +8098,6 @@ ru:
           slots_remaining: "Доступные промежутки времени"
         message: "%{user} зарегистрировал вас на \"%{appointment_name}\"."
         subject: "Вы были зарегистрированы на \"%{appointment_name}\""
-      facebook: 
-        instructions: "Зарегиструйтесь на другой интервал времени"
-        labels: 
-          attendee: Участник
-          attendees: Участники
-          course: Курс
-          date_and_time: Дата/время
-          details: "Детали встречи"
-          group: Группа
-          slots_remaining: "Доступные интервалы времени"
-        message: "%{user} зарегистрировал вас на \"%{appointment_name}\"."
       sms: 
         message: "Вы были зарегистрированы на \"%{appointment_name}\"."
         more_info: "Дополнительные сведения доступны в %{url}"
@@ -8395,8 +8118,6 @@ ru:
           link: "Щелкните здесь для просмотра задания"
           subject: "Задание изменено: %{title}, %{course}"
         subject: "Задание изменено: %{title}, %{course}"
-      facebook: 
-        body: "Задание %{title_link} для %{course} изменено."
       sms: 
         body: |-
             %{title}, %{course} изменено.
@@ -8421,11 +8142,6 @@ ru:
           click_to_see_assignment: "Щелкните здесь для просмотра задания"
         multiple_due_dates: "до: Несколько дат"
         new_assignment: "Новое задание создано для вашего курса, %{course_name}"
-        no_due_date: "до: Нет даты выполнения"
-      facebook: 
-        due_at: "до: %{assignment_due_date_time}"
-        multiple_due_dates: "до: Несколько дат"
-        new_assignment: "Новое задание создано для %{course_name}"
         no_due_date: "до: Нет даты выполнения"
       sms: 
         due_at: "до: %{assignment_due_date_time}"
@@ -8455,9 +8171,6 @@ ru:
         labels: 
           click_to_see_assignment: "Щелкните здесь для просмотра задания"
         no_due_date: "Нет даты выполнения"
-      facebook: 
-        assignment_due_date_changed_sentence: "Дата окончания для задания *%{assignment_name}* для %{course_name}, изменена на:"
-        no_due_date: "Нет даты выполнения"
       sms: 
         assignment_due_date_changed: "%{assignment_name}, %{course_name}, теперь до:"
         more_info_at_url: "Дополнительные сведения доступны в %{web_address}"
@@ -8482,9 +8195,6 @@ ru:
         labels: 
           click_to_see_assignment: "Щелкните здесь для просмотра задания"
         no_due_date: "Нет даты выполнения"
-      facebook: 
-        assignment_due_date_changed_sentence: "Срок выполнения задания *%{assignment_name}* для %{course_name} (%{override}) был изменен на:"
-        no_due_date: "Нет даты выполнения"
       sms: 
         assignment_due_date_changed: "%{assignment_name}, %{course_name} (%{override}) теперь до:"
         more_info_at_url: "Дополнительные сведения доступны по адресу %{web_address}"
@@ -8506,8 +8216,6 @@ ru:
           the_assignment_is_graded: "Задание, %{assignment_name}, было оценено."
         labels: 
           view_here: "Его можно просмотреть здесь"
-        the_assignment_is_graded: "Задание, %{assignment_name}, оценено."
-      facebook: 
         the_assignment_is_graded: "Задание, %{assignment_name}, оценено."
       sms: 
         assignment_is_graded: "%{assignment_name}, %{course_name} было оценено."
@@ -8532,9 +8240,6 @@ ru:
           view_submission: "Отправку можно просмотреть здесь"
         user_resubmitted: "Повторная отправка: %{user_name}, %{assignment_name}"
         user_resubmitted_sentence: "%{user_name} только что включил повторную отправку для %{assignment_name} в курсе %{course_name}"
-      facebook: 
-        click_to_view: "Щелкните здесь для просмотра отправки."
-        user_resubmitted: "**%{user_name}** только что включил повторную отправку для **%{assignment_name}** в курсе %{course_name}"
       sms: 
         more_info_at: "Дополнительные сведения доступны в %{web_address}"
         user_resubmitted: "%{user_name} только что отправил(а) задание (снова), %{assignment_name}"
@@ -8553,9 +8258,6 @@ ru:
           view_submission: "Отправку можно просмотреть здесь"
         user_submitted: "Отправка: %{user_name}, %{assignment_name}"
         user_submitted_sentence: "%{user_name} только что включил отправку для %{assignment_name} в курсе %{course_name}"
-      facebook: 
-        click_to_view: "Щелкните здесь для просмотра отправки."
-        user_submitted: "**%{user_name}** только что включил отправку для **%{assignment_name}** в курсе %{course_name}"
       sms: 
         more_info_at: "Дополнительные сведения доступны в %{web_address}"
         user_submitted: "%{user_name} только что отправил(а) задание, %{assignment_name}"
@@ -8574,9 +8276,6 @@ ru:
           view_submission: "Отправку можно просмотреть здесь"
         user_resubmitted_sentence: "%{user_name} только что включил позднюю отправку для %{assignment_name} в курсе %{course_name}"
         user_submitted: "Поздняя отправка: %{user_name}, %{assignment_name}"
-      facebook: 
-        click_to_view: "Щелкните здесь для просмотра отправки."
-        user_resubmitted_sentence: "**%{user_name}** только что включил позднюю отправку для **%{assignment_name}** в курсе %{course_name}"
       sms: 
         more_info_at: "Дополнительные сведения доступны в %{web_address}"
         user_submitted: "%{user_name} только что отправил(а) задание (поздно), %{assignment_name}"
@@ -8634,9 +8333,6 @@ ru:
           link: "Сведения можно просмотреть здесь"
           subject: "Приглашение на участие в совместной работе: %{course_or_group}"
         subject: "Приглашение на участие в совместной работе: %{course_or_group}"
-      facebook: 
-        body: "Вы приглашены для совместной работы с документом, %{document} для            %{course_or_group}. Документ был создан в %{service}."
-        body_with_user: "Вы приглашены для совместной работы с документом, %{document} для           %{course_or_group}. Документ был создан %{user} в %{service}."
       sms: 
         body: |-
             Вы приглашены для совместной работы с документом, %{document} для %{course_or_group}.
@@ -8720,10 +8416,6 @@ ru:
         subject: "%{user_name}, вы только что отправили сообщение в Canvas."
         unknown_user: "Неизвестный пользователь"
         view_message: "Просмотреть это сообщение в разговорах"
-      facebook: 
-        body: "%{user_name}, вы только что отправили сообщение в Canvas."
-        link_text: "Просмотреть сообщение"
-        unknown_user: "Неизвестный пользователь"
       sms: 
         body: "%{user_name}, вы только что отправили сообщение в Canvas:"
         more_info: "Дополнительная информация доступна по адресу: %{url}"
@@ -8750,10 +8442,6 @@ ru:
         subject: "%{user_name} только что отправил вам сообщение в Canvas."
         unknown_user: "Неизвестный пользователь"
         view_message: "Просмотреть это сообщение в разговорах"
-      facebook: 
-        body: "%{user_name} только что отправил вам сообщение в Canvas."
-        link_text: "Просмотреть сообщение"
-        unknown_user: "Неизвестный пользователь"
       sms: 
         body: "%{user_name} только что отправил вам сообщение в Canvas:"
         more_info: "Дополнительные сведения доступны в %{url}"
@@ -8847,12 +8535,6 @@ ru:
           details: "Смотрите список текущих регистраций"
           subject: "%{user} принял приглашение на участие в курсе"
         subject: "%{user} принял приглашение на участие в курсе"
-      facebook: 
-        body_designer: "%{user} только что принял приглашение на участие в курсе %{course} как дизайнер."
-        body_observer: "%{user} только что принял приглашение на участие в курсе %{course} как наблюдатель."
-        body_student: "%{user} только что принял приглашение на участие в курсе %{course} как студент."
-        body_ta: "%{user} только что принял приглашение на участие в курсе %{course} как ассистент."
-        body_teacher: "%{user} только что принял приглашение на участие в курсе %{course} как учитель."
       sms: 
         body_designer: "%{user} принял приглашение дизайнера на участие в курсе, %{course}"
         body_observer: "%{user} принял приглашение наблюдателя на участие в курсе, %{course}"
@@ -8895,17 +8577,6 @@ ru:
           username: "Имя пользователя"
         none: нет
         subject: "Приглашение курса"
-      facebook: 
-        body_designer: "Вы приглашены на участие в курсе %{course} как дизайнер."
-        body_observer: "Вы приглашены на участие в курсе %{course} как наблюдатель."
-        body_student: "Вы приглашены на участие в курсе %{course} как студент."
-        body_ta: "Вы приглашены на участие в курсе %{course} как ассистент."
-        body_teacher: "Вы приглашены на участие в курсе %{course} как учитель."
-        labels: 
-          email: "Электронная почта"
-          name: Имя
-          username: "Имя пользователя"
-        none: нет
       sms: 
         body_designer: "Вы приглашены на участие в курсе как дизайнер."
         body_observer: "Вы приглашены на участие в курсе как наблюдатель."
@@ -8954,17 +8625,6 @@ ru:
         none: нет
         register: "Посетите %{link} для завершения регистрации"
         subject: "Регистрация в курсе"
-      facebook: 
-        body_designer: "Вы зарегистрированы в курсе %{course} как дизайнер."
-        body_observer: "Вы зарегистрированы в курсе %{course} как наблюдатель."
-        body_student: "Вы зарегистрированы в курсе %{course} как студент."
-        body_ta: "Вы зарегистрированы в курсе %{course} как ассистент."
-        body_teacher: "Вы зарегистрированы в курсе %{course} как учитель."
-        labels: 
-          email: "Электронная почта"
-          name: Имя
-          username: "Имя пользователя"
-        none: нет
       sms: 
         body_designer: "Вы зарегистрированы в курсе как дизайнер."
         body_observer: "Вы зарегистрированы в курсе как наблюдатель."
@@ -9049,10 +8709,6 @@ ru:
           see_details: "Сведения можно просмотреть здесь:"
         no_time_set: "Время не установлено"
         subject: "Дата события изменена: %{event_title}, %{course_name}"
-      facebook: 
-        from_to_time: "c %{start_date_time} на %{end_date_time}"
-        no_time_set: "Время не установлено"
-        subject: "Событие [%{event_title}](%{link_to_event}) для %{course_name} изменило время. Теперь оно:"
       sms: 
         from_to_time: "c %{start_date_time} на %{end_date_time}"
         more_info: "Дополнительные сведения доступны в %{web_link}"
@@ -9110,11 +8766,6 @@ ru:
           grades_based_on_percent: "Оценка основана на взвешенном общем числе для каждой группы оценок"
           now_see_here: "Сведения можно просмотреть здесь:"
           subject: "Вес оценки изменен"
-      facebook: 
-        grading_based_on_points: "Оценка основана на общем количестве баллов для всех заданий."
-        grading_policy_changed: "Политика оценки для **[%{course_name}](%{course_url})** изменена."
-        labels: 
-          grades_based_on_percent: "Оценка основана на взвешенном общем числе для каждой группы оценок"
       sms: 
         grade_changed: "Политика оценки для курса, %{course_name} изменена."
         more_info_at: "Дополнительные сведения доступны в %{course_url}"
@@ -9136,8 +8787,6 @@ ru:
         labels: 
           view_submission_here: "Отправку можно просмотреть здесь"
         subject: "Поздняя отправка: %{group_name}, %{assignment_name}"
-      facebook: 
-        body: "Группа %{group_name} только что включила позднюю отправку для **[%{assignment_name}](%{assignment_url})** в курсе %{course_name}."
       sms: 
         more_info: "Дополнительные сведения доступны в %{web_address}"
         subject: "%{group_name} только что отправил задание (поздно), %{assignment_name}"
@@ -9160,10 +8809,6 @@ ru:
         labels: 
           click_below: "Можно проверить группу, щелкнув ссылку ниже"
         subject: "Членство в группе принято: %{group_name}"
-      facebook: 
-        account_group: "Ваш запрос на присоединение к группе **[%{group_name}](%{group_url})** для учетной записи %{account_name} принят."
-        course_group: "Ваш запрос на присоединение к группе **[%{group_name}](%{group_url})** для курса %{course_name} принят."
-        group_request_accepted: "Запрос группы принят: %{group_name}"
       sms: 
         account_group: "Ваш запрос на присоединение к группе %{group_name} для учетной записи %{account_name} принят."
         course_group: "Ваш запрос на присоединение к группе %{group_name} для курса %{course_name} принят."
@@ -9189,9 +8834,6 @@ ru:
         labels: 
           click_below: "Можно проверить другие группы, щелкнув ссылку ниже"
         subject: "Членство в группе отклонено: %{group_name}"
-      facebook: 
-        account_group: "Ваш запрос на присоединение к группе **[%{group_name}](%{group_url})** для учетной записи %{account_name} отклонен."
-        course_group: "Ваш запрос на присоединение к группе **[%{group_name}](%{group_url})** для курса %{course_name} отклонен."
       sms: 
         account_group: "Ваш запрос на присоединение к группе %{group_name} для учетной записи %{account_name} отклонен."
         course_group: "Ваш запрос на присоединение к группе %{group_name} для курса %{course_name} отклонен."
@@ -9247,9 +8889,6 @@ ru:
           details: "Для учетной записи %{account} добавлен новый администратор, %{user}"
           subject: "Новый пользователь учетной записи"
         subject: "Новый пользователь учетной записи"
-      facebook: 
-        body: "Новый администратор **%{user}** добавлен для учетной записи **%{account}**."
-        subject: "Новая учетная запись администратора для %{account}"
       sms: 
         body: "Новый администратор, %{user}, добавлен для учетной записи %{account}"
         details: "Дополнительные сведения доступны в %{website}"
@@ -9265,8 +8904,6 @@ ru:
           link: "Просмотреть объявления"
         labels: 
           file_included: "Файл включен"
-      facebook: 
-        body: "Новое объявление: %{title}, %{course}"
       sms: 
         details: "Дополнительные сведения доступны в %{url}"
         subject: "Новое объявление: %{title}, %{course}"
@@ -9286,9 +8923,6 @@ ru:
           title: "Новое членство в группе: %{group_name}"
         subject: "Новое членство в группе для %{course_or_account}"
         title: "Новое членство в группе: %{group_name}"
-      facebook: 
-        body_account: "Вы добавлены в новую группу для учетной записи %{account}. Название группы — %{group_name}."
-        body_course: "Вы добавлены в новую группу для курса %{course}. Название группы — %{group_name}."
       sms: 
         body_account: "Вы добавлены в новую группу для учетной записи %{account}.  Название группы — %{group_name}."
         body_course: "Вы добавлены в новую группу для курса %{course}.  Название группы — %{group_name}."
@@ -9313,9 +8947,6 @@ ru:
           title: "Новое членство в группе: %{group_name}"
         subject: "Новое членство в группе для %{course_or_account}"
         title: "Новое членство в группе: %{group_name}"
-      facebook: 
-        body_account: "Вы приглашены присоединиться к группе %{group} для учетной записи %{account}."
-        body_course: "Вы приглашены присоединиться к группе %{group} для курса %{course}."
       sms: 
         body_account: "Вы приглашены присоединиться к группе %{group} для учетной записи %{account}."
         body_course: "Вы приглашены присоединиться к группе %{group} для курса %{course}."
@@ -9341,11 +8972,6 @@ ru:
           teachers: Учителя
         subject: "Новый курс"
         title: "Новый курс для %{account}"
-      facebook: 
-        body: "Новый курс **%{course}** добавлен для учетной записи **%{account}**."
-        labels: 
-          teachers: Учителя
-        subject: "Новый курс для %{account}"
       sms: 
         body: "Новый курс, %{course}, добавлен для учетной записи %{account}"
         details: "Дополнительные сведения доступны в %{url}"
@@ -9368,8 +8994,6 @@ ru:
           link: "Щелкните здесь, чтобы присоединиться к разговору"
           subject: "Новый комментарий для %{discussion_topic}: %{course}"
         subject: "Новый комментарий для %{discussion_topic}: %{course}"
-      facebook: 
-        body: "Новый комментарий для %{discussion_topic}, %{course}"
       sms: 
         body: "Новый комментарий для %{discussion_topic}: %{course}"
         details: "Дополнительные сведения доступны в %{url}"
@@ -9390,8 +9014,6 @@ ru:
         labels: 
           file_included: "Файл включен"
         subject: "Новое обсуждение - %{discussion_topic}: %{course}"
-      facebook: 
-        body: "Новая тема форума: %{discussion_topic}, %{course}"
       sms: 
         body: "Новая тема для %{course}:"
         details: "Дополнительные сведения доступны в %{url}"
@@ -9413,10 +9035,6 @@ ru:
           see_details: "Сведения можно просмотреть здесь:"
         no_time_set: "Время не установлено"
         subject: "Новое событие - %{event_title}, %{course_name}"
-      facebook: 
-        body: "Для %{course_name} запланировано новое событие:"
-        from_to_time: "c %{start_date_time} на %{end_date_time}"
-        no_time_set: "Время не установлено"
       sms: 
         from_to_time: "c %{start_date_time} на %{end_date_time}"
         more_info: "Дополнительные сведения доступны в %{web_address}"
@@ -9439,8 +9057,6 @@ ru:
           subject: "Добавлен новый файл: %{title}, %{name}"
         subject: "Добавлен новый файл: %{title}, %{name}"
         view: "Можно просмотреть здесь"
-      facebook: 
-        body: "Новый файл был добавлен к курсу, %{name}:"
       sms: 
         body: "Новый файл добавлен для %{name}:"
         link: "Дополнительные сведения доступны в %{link}"
@@ -9457,9 +9073,6 @@ ru:
           subject: "%{count} новых файлов, добавленных к курсу, %{name}:"
         link: "Вы можете просмотреть их здесь"
         subject: "%{count} новых файлов, добавленных к курсу, %{name}:"
-      facebook: 
-        body: "%{count} новых файлов, добавленных к курсу, %{name}:"
-        link: "Вы можете просмотреть их здесь"
       sms: 
         body: "%{count} новых файлов, добавленных для %{name}."
         link: "Дополнительные сведения доступны в %{link}"
@@ -9482,9 +9095,6 @@ ru:
           title: "Новая группа студентов: %{group_name}"
         subject: "Новая группа студентов для %{course_or_account}"
         title: "Новая группа студентов: %{group_name}"
-      facebook: 
-        body_account: "Новая группа студентов с названием %{group_name} создана для учетной записи %{account}. Первый член — %{user}."
-        body_course: "Новая группа студентов с названием %{group_name} создана для курса %{course}. Первый член — %{user}."
       sms: 
         body_account: "Новая группа с названием \"%{group_name}\" создана для учетной записи %{account}. Первый член — %{user}."
         body_course: "Новая группа с названием \"%{group_name}\" создана для курса %{course}. Первый член — %{user}."
@@ -9504,9 +9114,6 @@ ru:
           link: "Щелкните здесь, чтобы посмотреть пользователя"
           subject: "Новый пользователь"
         subject: "Новый пользователь"
-        title: "Новый пользователь для %{account}"
-      facebook: 
-        body: "Новый пользователь, **%{user}**, только что зарегистрировался для учетной записи **%{account}**."
         title: "Новый пользователь для %{account}"
       sms: 
         body: "Новый пользователь, %{user}, зарегистрировался для учетной записи %{account}"
@@ -9528,8 +9135,6 @@ ru:
         html: 
           link_message: "Щелкните здесь, чтобы завершить рассмотрение"
         subject: "Назначенное рассмотрение коллегами для %{reviewee}"
-      facebook: 
-        body: "Вы приглашены на рассмотрение коллегами %{reviewee}. Перейдите по ссылке ниже, чтобы провести их рассмотрение!"
       sms: 
         more_info: "Дополнительная информация доступна по адресу: %{url}"
       summary: 
@@ -9559,8 +9164,6 @@ ru:
           subject: "Повторная оценка контрольной работы завершена: %{quiz}, %{context}"
         link_message: "Вы можете просмотреть данную контрольную работу здесь: "
         subject: "Повторная оценка контрольной работы завершена: %{quiz}, %{context}"
-      facebook: 
-        body: "Повторная оценка контрольной работы завершена: %{title}"
       sms: 
         body_sms: "Завершена повторная оценка контрольной работы для %{title} в %{context}."
         more_info: "Дополнительные сведения доступны в %{url}"
@@ -9591,8 +9194,6 @@ ru:
           subject: "Напоминание о проверке знаний: %{rubric}, %{context}"
         link_message: "Вы можете пересмотреть материал для проверки и добавать вашу запись здесь:"
         subject: "Напоминание о проверке знаний: %{rubric}, %{context}"
-      facebook: 
-        body: "Вам напомнили о проверке знаний: *%{title}* для %{context}."
       sms: 
         body: "Вам напомнили о проверке знаний: %{rubric}, %{context}."
         more_info: "Дополнительные сведения доступны в %{url}"
@@ -9610,8 +9211,6 @@ ru:
           subject: "Новая проверка знаний: %{title}, %{context}"
         link_message: "Запись можно оценить и отправить здесь:"
         subject: "Новая проверка знаний: %{title}, %{context}"
-      facebook: 
-        body: "Новая проверка знаний создана для %{context}:"
       sms: 
         body: "Новая проверка знаний создана для %{context}."
         more_info: "Дополнительные сведения доступны в %{url}"
@@ -9636,9 +9235,6 @@ ru:
         link_message: "Сведения об отправке можно просмотреть здесь:"
         someone: Кто-либо
         subject: "Комментарий отправки: %{user}, %{assignment}, %{context}"
-      facebook: 
-        body: "*%{author}* только что создал новый комментарий к отправке для **%{user} для %{assignment}**."
-        someone: Кто-либо
       sms: 
         body: "Новый комментарий %{author} для %{assignment}, %{user}, %{context}."
         more_info: "Дополнительные сведения доступны в %{url}"
@@ -9660,9 +9256,6 @@ ru:
         someone: Кто-либо
         subject: "Комментарий отправки: %{user}, %{assignment}, %{context}"
         submission_comment_link_message: "Вы можете просмотреть подробные сведения об отправке, перейдя по ссылке ниже, или можете ответить на этот комментарий, ответив непосредственно на это сообщение."
-      facebook: 
-        body: "*%{author}* только что создал новый комментарий к отправке для **%{user} для %{assignment}**."
-        someone: Кто-либо
       sms: 
         more_info: "Дополнительные сведения доступны в %{url}"
         sms_body: "Новый комментарий %{author} для %{assignment}, %{user}, %{context}."
@@ -9691,13 +9284,6 @@ ru:
         score: "оценка:  %{score} из %{total}"
         score_pending: "оценка ожидает рассмотрения учителем"
         subject: "Оценка изменена: %{assignment}, %{context}"
-      facebook: 
-        body: "Оценка вашего задания, *%{title}* изменена."
-        no_date_set: "Дата не установлена"
-        not_applicable: "Н/Д (недоступно)"
-        regraded_date: "повторная оценка: %{date}"
-        score: "оценка: %{score} из %{total}"
-        score_pending: "оценка ожидает рассмотрения учителем"
       sms: 
         body_sms: "Оценка для %{title}, %{context} изменена."
         more_info: "Дополнительные сведения доступны в %{url}"
@@ -9738,13 +9324,6 @@ ru:
         score: "оценка:  %{score} из %{total}"
         score_pending_review: "оценка ожидает рассмотрения учителем"
         subject: "Задание оценено: %{assignment}, %{context}"
-      facebook: 
-        body: "Задание, *%{title}*, было оценено."
-        graded_date: "оценено: %{date}"
-        no_date_set: "Дата не установлена"
-        not_applicable: "Н/Д (недоступно)"
-        score: "оценка: %{score} из %{total}"
-        score_pending_review: "оценка ожидает рассмотрения учителем"
       sms: 
         graded_date: "оценено: %{date}"
         more_info: "Дополнительные сведения доступны в %{url}"
@@ -9777,9 +9356,6 @@ ru:
         link_message: "Вы можете просмотреть отправленную работу здесь"
         subject: "Отправленная контрольная работа: %{quiz}, %{context}"
         submitted_date: "отправлено: %{date}"
-      facebook: 
-        body: "%{user_name} выполнил контрольную работу %{quiz_title}. Требуется выставление оценки вручную."
-        submitted_date: "отправлено: %{date}"
       sms: 
         body_sms: "Оценка для %{title}, %{context} изменена."
         more_info: "Дополнительные сведения доступны в %{url}"
@@ -9806,8 +9382,6 @@ ru:
         notifications_link: "Можно изменить настройки уведомлений, посетив следующую страницу:"
         subject: "Последние уведомления Canvas"
         weekly_body: "Вы зарегистрировались на получение еженедельного отчета о некоторых уведомлениях учетной записи Canvas.  Ниже приведен отчет для недели, заканчивающейся %{date}:"
-      facebook: 
-        new_notifications: "Вы получили *%{notification_count} новых уведомлений* в #Canvas#."
       sms: 
         notifications_sms: "%{notifications_count} новые уведомления в %{url}"
       twitter: 
@@ -9827,8 +9401,6 @@ ru:
           subject: "Обновленная вики-страница: %{title}, %{user}"
         link_message: "Ее можно просмотреть здесь: %{link}"
         subject: "Обновленная вики-страница: %{title}, %{user}"
-      facebook: 
-        body: "В вики обновлена страница для %{title}."
       sms: 
         more_info: "Дополнительные сведения доступны в %{url}"
         updated_message: "%{title}, %{user} только что обновлен:"
@@ -9846,8 +9418,6 @@ ru:
           details_link: "Щелкните здесь для просмотра сведений"
           subject: "Приглашение на участие в веб-конференции: %{name}"
         subject: "Приглашение на участие в веб-конференции: %{name}"
-      facebook: 
-        body: "Вы приглашены на участие в веб-конференции, *%{title}* для #%{name}#."
       sms: 
         body: "Вы приглашены присоединиться к веб-конференции, %{title} для %{name}."
         link_message: "Дополнительные сведения доступны в %{url}"
@@ -10068,7 +9638,6 @@ ru:
   name_only_5f56718e: "Только имя"
   new_account_role_6e5c4964: "Новая роль учетной записи"
   new_course_role_6a7bb75f: "Новая роль курса"
-  new_facebook_message: "У вас есть новое сообщение от Canvas"
   new_file_135ae520: "[ Новый файл ]"
   new_outcome_7fba8c7d: "Новый результат"
   new_quiz_statistics_desc: "Включить страницу статистики новой контрольной работы для курса."
@@ -10296,8 +9865,6 @@ ru:
         display: "Адрес электронной почты"
       errors: 
         saving_preferences_failed: "Ой! Что-то сломалось. Пожалуйста, попробуйте еще раз"
-      facebook: 
-        display: Facebook
       push: 
         display: "Нажать уведомление"
       sms: 
@@ -10598,6 +10165,7 @@ ru:
   paginated_view: 
     loading_more_results: "Загрузка других результатов"
   participations_1823832d: Участия
+  password_8a271b1c: Пароль
   paste_xml_cda3a64e: "Вставить XML"
   paypal: 
     exception: "Нам очень жаль, но произошла ошибка. Повторите попытку через некоторое время."
@@ -10718,33 +10286,6 @@ ru:
       primary_pad: "Primary Pad"
       sketchpad: SketchPad
       typewithme: TypeWith.me
-    facebook: 
-      description: "Приложение Canvas Facebook"
-      name: Facebook
-    facebook_settings: 
-      description: |-
-          Вам необходимо будет создать [новое приложение на facebook.com](%{facebook_url}), и добавить 'Приложение на Facebook' в качестве платформы.
-          Установите следующие параметры конфигурации, чтобы убедиться, что ваше приложение Facebook
-          работает правильно:
-          
-          * **Настройки – Приложение на Facebook -- Страница Canvas:** записывайте все, что вы выбираете (часть, идущая после apps.facebook.com), и вводите в расположенную ниже форму
-          * **Настройки – Приложения на Facebook -- Canvas URL:** установите %{canvas_url}
-          * После того, как вы сохраните приложение, запишите идентификатор приложения, маркер клиента и секретный ключ приложения
-      domain_name: домен
-      headers: 
-        domain_settings: "Настройки домена"
-      hints: 
-        api_key: "Также упоминается в качестве маркера клиента"
-        canvas_domain: "это домен, указанный в \"URL-адресе Canvas\""
-        canvas_name: "это путь, указанный на \"странице Canvas\""
-        disable_ssl: "Использовать только для локального тестирования"
-      labels: 
-        api_key: "Ключ API"
-        app_id: "Код приложения"
-        canvas_domain: "Домен Canvas"
-        canvas_name: "Имя Canvas"
-        disable_ssl: "Отключить SSL"
-        secret: "Секретный ключ приложения"
     google_docs: 
       description: "общий доступ к доменам Google Docs"
       name: "Google Docs"
@@ -11000,7 +10541,6 @@ ru:
     labels: 
       requirements_must_be_completed: "Для разблокирования этой страницы должны быть выполнены следующие требования"
   presentation_2d9387ca: Презентация
-  press_spacebar_for_more_details_on_this_outcome_f6713a42: "нажмите пробел, чтобы получить дополнительную информацию по данному результату"
   privacy_290109ea: Конфиденциальность
   product_name: Canvas
   profile: 
@@ -11051,8 +10591,6 @@ ru:
       profile_update_failed: "Ошибка обновления данных входа"
       regenerating_token_failed: "Ошибка повторного создания маркера"
       registration_failed: "Ошибка регистрации. Щелкните имя пользователя и пароль и повторите попытку."
-    facebook_select: 
-      facebook: Facebook
     failed_resending: "Ошибка запроса. Повторите попытку."
     links: 
       resend_confirmation: "Отправить подтверждение заново"
@@ -11077,7 +10615,6 @@ ru:
         generate_token: "Создать маркер"
         new_access_token: "Новый маркер доступа"
         regenerate_token: "Повторно создать маркер"
-        register_facebook_account: "Регистрация учетной записи Facebook"
         register_linkedin_account: "Регистрация учетной записи LinkedIn"
         save_login: "Сохранить данные входа"
         save_skype_name: "Сохранить имя Skype"
@@ -11088,7 +10625,6 @@ ru:
       delicious_description: "Delicious — это инструмент для хранения и совместного использования закладок. Редактор мультимедийного содержания Canvas поддерживает поиск тегов Delicious для простой связи с другими полезными ресурсами из Canvas."
       diigo_description: "Diigo — это инструмент для работы с закладками, специально предназначенный для исследований и образования. Редактор мультимедийного содержания Canvas поддерживает поиск тегов Diigo для простой связи с другими полезными ресурсами из Canvas."
       error_loading_token_details: "Ошибка загрузки сведений о маркере"
-      facebook_description: "Если имеется учетная запись Facebook, можно установить приложение Canvas и получать уведомления курса в профиле. Можно указать типы уведомлений и частоту их отправки."
       feature_options: "Опции функции"
       full_token_warning: |-
           **Копировать этот маркер сейчас**. После того как вы покинете эту страницу, вы больше никогда не
@@ -11106,7 +10642,6 @@ ru:
         dates: Даты
         delicious_login: "Данные входа Delicious"
         diigo_login: "Данные входа Diigo"
-        facebook_access: "Доступ к Facebook"
         generate_access_token: "Создание маркера доступа"
         google_docs_access: "Доступ к Google Docs"
         google_drive_access: "Доступ к Диску Google"
@@ -11168,7 +10703,6 @@ ru:
         diigo: Diigo
         disable_mfa: "Отключить многофакторную аутентификацию"
         edit_settings: "Изменить настройки"
-        facebook: Facebook
         google_docs: "Google Docs"
         google_drive: "Диск Google"
         linkedin: LinkedIn
@@ -11177,7 +10711,6 @@ ru:
         skype: Skype
         twitter: Twitter
         upload_new_image: "Загрузить новое изображение"
-        view_facebook_app: "просмотр приложения Facebook"
         view_your_profile: "просмотреть профиль"
         yo: Yo
       loading_token_details: "Загрузка сведений о маркере..."
@@ -11191,7 +10724,6 @@ ru:
       subscribe_to_emails: "Я хочу получать информацию, новости и советы от Instructure"
       titles: 
         access_token_details: "Сведения о маркере доступа"
-        authorize_facebook: "Авторизация Facebook"
         authorize_google_docs: "Авторизация Google Docs"
         authorize_google_drive: "Авторизовать Диск Google"
         authorize_linkedin: "Авторизация LinkedIn"
@@ -11599,6 +11131,7 @@ ru:
       regrade_options: "Опции повторной оценки *(для студентов, уже ответивших на данные вопросы):*"
       some_scores_reduced: "Присуждать баллы только за верный ответ (*некоторые оценки студентов могут понизиться*)"
       update_question_without_regrading: "Обновить вопросы без повторной оценки"
+  quiz_e0dcce8f: "Контрольная работа"
   quiz_log_auditing: 
     buttons: 
       reload_events: Перезагрузить
@@ -13425,9 +12958,7 @@ ru:
         next: Далее
       getting_started: "Вы регистрируетесь на **%{course}**."
       labels: 
-        email: "Электронная почта"
         password: Пароль
-      log_in: "Пожалуйста, введите адрес электронной почты и пароль:"
     authenticate_or_register: 
       buttons: 
         enroll_in_course: "Регистрация в курсе"
@@ -13891,7 +13422,6 @@ ru:
       labels: 
         custom_rating: "При оценке студентов я буду писать комментарии в свободной форме"
         grading_rubric: "Эта рубрика используется для оценки заданий"
-        title: Заголовок
         total_points: "Общее число баллов"
         totallying_rubric: "Скрыть общие баллы для результатов проверки"
       links: 
@@ -13912,6 +13442,7 @@ ru:
       out_of: "%{points} *из %{total}*"
       rubric: Рубрика
       rubric_title: Заголовок
+      title: Название
       titles: 
         find_existing_rubric: "Найти существующую рубрику"
     rubric_criterion: 
@@ -13960,6 +13491,7 @@ ru:
       titles: 
         find_a_rubric: "Найти рубрику"
     rubric_forms: 
+      criteria_description_label: "Описание критерия"
       points: "%{points} pts"
     rubric_summary: 
       buttons: 
@@ -14871,6 +14403,7 @@ ru:
     people: Пользователи
     view_in_separate_window: "Просмотреть в отдельном окне"
   to_35c6baa2: для
+  to_51406be9: Кому
   to_c4c44f4b: к
   to_minscore_43e5452e: "для %{minScore}"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "Чтобы просматривать задания, убедитесь, что включено представление *Повестка дня*."
@@ -14923,6 +14456,7 @@ ru:
   updated_group_group_name_727b1d98: "Обновленная группа %{group_name}"
   upload_button: 
     upload: Загрузить
+  upload_data_dc4fa4cb: "Загрузка данных"
   upload_drop_zone: 
     drop_to_upload: "Положить элементы для загрузки"
   upper_limit_of_range_c454a8f2: "Верхняя граница диапазона"
@@ -15067,13 +14601,13 @@ ru:
     descriptions: 
       delicious: "Delicious — это инструмент для обмена ссылками.  Можно добавить тег для любой веб-страницы для обращения в будущем.  Также можно связать учетные записи Delicious других пользователей для обмена ссылками на схожее содержание."
       diigo: "Diigo — это инструмент для обмена ссылками.  Можно добавить тег для любой веб-страницы для обращения в будущем.  Также можно связать учетные записи Diigo других пользователей для обмена ссылками на схожее содержание."
-      facebook: "Отслеживание профиля Facebook позволит просто общаться с друзьями по занятиям и группам."
       google_docs: "Студенты могут использовать Google Docs для совместной работы с групповыми проектами.  Google Docs позволяет совместно редактировать в реальном времени документы, таблицы и презентации."
       google_drive: "Студенты могут пользоваться Диском Google для совместной работы над проектами группы. Диск Google позволяет совместное редактирование документов, презентаций и электронных таблиц в режиме реального времени."
       linked_in: "LinkedIn — это ресурс для делового общения.  Многие отношения, установленные в школе, могут быть полезны в вашей работе."
       skype: "Skype — это бесплатный инструмент для аудио- и видеовызовов."
       twitter: "Twitter — отличный ресурс для общения вне занятий."
       yo: "Yo   это простой инструмент для связи одним касанием, без необходимости набора каких-либо символов."
+  username_47bb5bbe: "Имя пользователя"
   users: 
     admin_merge: 
       buttons: 
@@ -15142,8 +14676,6 @@ ru:
     errors: 
       no_teacher_courses: "Для этого учителя и студента нет общих курсов"
       user_not_teacher: "Этот пользователь не является учителем данного курса"
-    facebook_added: "Учетная запись Facebook успешно добавлена!"
-    facebook_fail: "Ошибка авторизации Facebook."
     google_docs_added: "Успешная авторизация Google Docs!"
     google_docs_fail: "Ошибка авторизации Google Docs. Повторите попытку"
     google_drive_added: "Учетная запись Диска Google успешно добавлена!"
@@ -15371,6 +14903,7 @@ ru:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Курс Blackboard Vista/CE, WebCT 6+ "
   webct_name: "Blackboard Vista/CE (WebCT)"
+  what_should_the_csv_file_look_like_985a59ac: "Как должен быть выполнен CSV-файл?"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Эту страницу видят люди, посещающие курс. Вы можете настроить на ней отображение ленты активности, списка модулей курса, программы обучения или установить пользовательскую страницу, созданную вами. По умолчанию на ней отображается лента активности курса."
   where_would_you_like_to_move_title_fabd6e8f: "Куда вы хотите переместить %{title}?"
   widget: 
@@ -15488,6 +15021,7 @@ ru:
       title_characters: "Заголовок должен содержать ходя бы одну букву или цифру"
       title_too_long: "Заголовок не может превышать %{max_characters} символов"
     unknown_user_name: Неизвестно
+  wiki_page_6c11ee20: Вики-страница
   wiki_pages: 
     edit: 
       page_header_title: "Редактировать %{page_name}"
