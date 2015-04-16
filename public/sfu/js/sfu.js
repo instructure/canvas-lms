@@ -245,22 +245,20 @@
 
     });
 
+    // Setup Backbone event handler that will be called when all the content DOM elements 
+    // have been rendered. This will activate the accordion and tab components on the page.
+    function setupAccordionAndTabActivation() {
+        $.subscribe('userContent/change', function () {
+            $("div.accordion").accordion({header: "h3"});
+            $(".sfu-tabs").tabs();
+        });
+    }
 
     // On course and wiki pages, activate accordion and tab components, if they exist.
-    utils.onPage(/^\/(courses|groups)\/\d+\/pages\/[A-Za-z0-9_\-+~<>]+$/, function() {
-        $.subscribe('userContent/change', function () {
-            $("div.accordion").accordion({header: "h3"});
-            $(".sfu-tabs").tabs();
-        });
-    });
-
+    utils.onPage(/^\/(courses|groups)\/\d+\/pages\/[A-Za-z0-9_\-+~<>]+$/, setupAccordionAndTabActivation);
+    
     // A page designated as a front page has a different url.
-    utils.onPage(/^\/(courses|groups)\/\d+\/wiki$/, function() {
-        $.subscribe('userContent/change', function () {
-            $("div.accordion").accordion({header: "h3"});
-            $(".sfu-tabs").tabs();
-        });
-    });
+    utils.onPage(/^\/(courses|groups)\/\d+\/wiki$/, setupAccordionAndTabActivation);
 
 })(jQuery);
 
