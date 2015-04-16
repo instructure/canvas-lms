@@ -4,11 +4,18 @@ define [
   'react'
   'compiled/react/shared/utils/withReactElement'
   'compiled/fn/preventDefault'
-  '../modules/BBTreeBrowserView'
-  'compiled/views/RootFoldersFinder'
   '../modules/customPropTypes'
   '../utils/moveStuff'
-], (I18n, $, React, withReactElement, preventDefault, BBTreeBrowserView, RootFoldersFinder, customPropTypes, moveStuff) ->
+  'jsx/shared/modal'
+  'jsx/shared/modal-content'
+  'jsx/shared/modal-buttons'
+  'jsx/files/BBTreeBrowser'
+], (I18n, $, React, withReactElement, preventDefault,  customPropTypes, moveStuff, Modal, ModalContent, ModalButtons, BBTreeBrowser) ->
+
+  Modal = React.createFactory(Modal)
+  ModalContent = React.createFactory(ModalContent)
+  ModalButtons = React.createFactory(ModalButtons)
+  BBTreeBrowser = React.createFactory(BBTreeBrowser)
 
   MoveDialog = React.createClass
     displayName: 'MoveDialog'
@@ -16,40 +23,11 @@ define [
     propTypes:
       rootFoldersToShow: React.PropTypes.arrayOf(customPropTypes.folder).isRequired
       thingsToMove: React.PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired
-      closeDialog: React.PropTypes.func.isRequired
+      onClose: React.PropTypes.func.isRequired
 
     getInitialState: ->
       destinationFolder: null
-
-    componentDidMount: ->
-      @props.setTitle I18n.t('move_question', {
-        one: "Where would you like to move %{item}?",
-        other: "Where would you like to move these %{count} items?"
-      },{
-        count: @props.thingsToMove.length
-        item: @props.thingsToMove[0]?.displayName()
-      })
-
-      rootFoldersFinder = new RootFoldersFinder({
-        rootFoldersToShow: @props.rootFoldersToShow
-      })
-
-      @treeBrowserViewId = BBTreeBrowserView.create({
-          onlyShowSubtrees: true,
-          rootModelsFinder: rootFoldersFinder
-          rootFoldersToShow: @props.rootFoldersToShow
-          onClick: @onSelectFolder
-          focusStyleClass: 'MoveDialog__folderItem--focused'
-          selectedStyleClass: 'MoveDialog__folderItem--selected'
-        },
-        {
-          element: @refs.FolderTreeHolder.getDOMNode()
-        }).index
-
-      BBTreeBrowserView.getView(@treeBrowserViewId).render().$el.appendTo(@refs.FolderTreeHolder.getDOMNode()).find(':tabbable:first').focus()
-
-    componentWillUnmount: ->
-      BBTreeBrowserView.remove(@treeBrowserViewId)
+      isOpen: true
 
     contextsAreEqual: (destination = {}, sources = []) ->
       differentContexts = sources.filter (source) ->
@@ -62,27 +40,44 @@ define [
       event.preventDefault()
       @setState(destinationFolder: folder, isCopyingFile: !@contextsAreEqual(folder, @props.thingsToMove))
 
-    submit: ->
+    submit: () ->
       promise = moveStuff(@props.thingsToMove, @state.destinationFolder)
       promise.then =>
-        @props.closeDialog()
-        BBTreeBrowserView.refresh()
-      $(@refs.form.getDOMNode()).disableWhileLoading(promise)
+        @closeDialog()
 
+    closeDialog: ->
+      @props.onClose()
+      @setState isOpen: false
+
+    getTitle: ->
+      I18n.t('move_question', {
+        one: "Where would you like to move %{item}?",
+        other: "Where would you like to move these %{count} items?"
+      },{
+        count: @props.thingsToMove.length
+        item: @props.thingsToMove[0]?.displayName()
+      })
 
     render: withReactElement ->
-      form { ref: 'form', className: 'form-dialog', onSubmit: preventDefault(@submit)},
-        div {className: 'form-dialog-content'},
-          aside {
-            role: 'region'
-            'aria-label' : I18n.t('folder_browsing_tree', 'Folder Browsing Tree')
-          },
-            div ref: 'FolderTreeHolder'
-        div {className: 'form-controls'},
+
+      Modal {
+        className: 'ReactModal__Content--canvas ReactModal__Content--mini-modal',
+        ref: 'canvasModal',
+        isOpen: @state.isOpen,
+        title: @getTitle(),
+        onRequestClose: @closeDialog,
+        onSubmit: @submit
+      },
+        ModalContent {},
+          BBTreeBrowser {
+            rootFoldersToShow: @props.rootFoldersToShow
+            onSelectFolder: @onSelectFolder
+          }
+        ModalButtons {},
           button {
             type: 'button'
             className: 'btn'
-            onClick: @props.closeDialog
+            onClick: @closeDialog
           }, I18n.t('cancel', 'Cancel')
           if @state.isCopyingFile
             button {

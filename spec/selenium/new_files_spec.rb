@@ -284,7 +284,7 @@ describe "better_file_browsing" do
         file_name = "a_file.txt"
         move_using_cog_icon(file_name)
         wait_for_ajaximations
-        expect(f(".ui-dialog-content p").text).to eq "An item named \"#{file_name}\" already exists in this location. Do you want to replace the existing file?"
+        expect(f("#renameFileMessage").text).to eq "An item named \"#{file_name}\" already exists in this location. Do you want to replace the existing file?"
         ff(".btn-primary")[2].click
         wait_for_ajaximations
         expect(f("#flash_message_holder").text).to eq "#{file_name} moved to course files\nClose"

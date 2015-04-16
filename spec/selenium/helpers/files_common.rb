@@ -56,7 +56,7 @@ def move_using_cog_icon(file_name, offset = 0)
   ff('.al-trigger')[offset].click
   fln("Move").click
   wait_for_ajaximations
-  expect(f(".ui-dialog-title").text).to eq "Where would you like to move #{file_name}?"
+  expect(f(".ReactModal__Header-Title h4").text).to eq "Where would you like to move #{file_name}?"
   ff(".treeLabel span")[3].click
   driver.action.send_keys(:return).perform
   wait_for_ajaximations
