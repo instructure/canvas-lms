@@ -68,7 +68,6 @@ ja:
       avatars: ユーザのアバター
       delicious: Delicious
       diigo: Diigo
-      facebook: Facebook
       google_docs: "Google ドキュメント"
       google_docs_preview: "Google ドキュメントのプレビュー"
       google_drive: "Google ドライブ"
@@ -84,8 +83,6 @@ ja:
       invalid_discovery_url: "検出 URL が有効ではありません"
     feedback_coach: コミュニティに質問する
     feedback_coach_sub: "Canvas エキスパートに質問する"
-    feedback_feature_request: 機能の要求
-    feedback_feature_request_canvas_net: "Canvas ネットワークの機能を要求"
     feedback_feature_request_sub: "Canvas の機能向上のためにご意見をお寄せください"
     manually_created_courses: 手動で作成されたコース
     root_account_cant_have_sis_id: "SIS ID はルート アカウントには設定できません"
@@ -237,7 +234,7 @@ ja:
         login_handle_name: "ログイン ラベル"
         position: 職位
         requested_authn_context: 認証コンテキスト
-        unkown_user_url: "不明なユーザの URL"
+        unknown_user_url: "不明なユーザの URL"
       log_in_url: "ログオンの URL"
       log_out_url: "ログアウトの URL"
       login_attribute: ログイン属性
@@ -252,7 +249,7 @@ ja:
       save_button: 認証設定の保存
       start_debugging: デバッグを開始
       stop_debugging: デバッグを停止
-      unkown_user_url_description: "認証されたユーザが Canvas で見つからないときにリダイレクトする URL。"
+      unknown_user_url_description: "認証されたユーザが Canvas で見つからないときにリダイレクトする URL。"
     saml_testing: 
       auth_request_to_idp: "IdP に送信された AuthnRequest"
       auth_response_from_idp: "IdP からの AuthnResponse"
@@ -945,6 +942,7 @@ ja:
         outgoing_email_default_name_option_default: "Canvas のデフォルト設定"
         prevent_course_renaming_by_teachers: 講師によるコース名の変更を許可しない
         restrict_quiz_questions: コースの終了日以降はクイズ問題を受講生に表示しない
+        restrict_student_future_view: 開始日前のコースは受講生に表示しない
         role_id: さらに追加
         self_enrollment: セルフ登録を許可する
         self_registration: 自己登録
@@ -1536,6 +1534,7 @@ ja:
     titles: 
       gpa_scale_explainer: "GPA スケール採点とは"
       grading_scheme_info: 採点スキームの表示/編集
+  assignment_976578a8: 課題
   assignment_comments_e43ed898: 課題コメント
   assignment_details: 
     no_graded_submissions: 採点済みの提出物なし
@@ -2166,6 +2165,7 @@ ja:
     upload_error_timeout: "要求がタイムアウトしました: %{url}"
     upload_error_too_many_redirects: リダイレクトが多すぎます
     upload_error_unexpected: "%{url} からのダウンロードの際に、不明なエラーが発生しました"
+  attachment_deffe5a9: 添付ファイル
   attendance: 
     default_attendance_title: "出欠 %{date}"
     errors: 
@@ -2444,7 +2444,6 @@ ja:
       create_event: 新しいイベントの作成
       done_go_back_to_list: 完了し、リストに戻る
       links: 
-        accessibility_warning: "警告: スクリーン リーダーはこのビューにアクセスできません。代わりにアジェンダ ビューを使用してください。"
         calendar_agenda: アジェンダ
         calendar_month: 月
         calendar_scheduler: スケジューラ
@@ -2639,25 +2638,9 @@ ja:
     crumbs: 
       new: "カレンダー イベントの新規作成"
     full_calendar_event: 
-      buttons: 
-        create: イベントの作成
-        update: イベントの更新
-      labels: 
-        address: 住所
-        date: 日付
-        event_description: イベントの説明
-        from: 自
-        location: 場所
-        title: タイトル
       no_content: コンテンツなし
-      timespan: "%{start_time} *至* %{end_time}"
     new: 
-      links: 
-        back_to_calendar: カレンダーに戻る
-        delete: イベントの削除
-        edit: "カレンダー イベントの編集"
       page_title: "カレンダー イベントの新規作成"
-    no_content: コンテンツなし
     notices: 
       created: イベントは正常に作成されました。
       deleted: このイベントは削除されました
@@ -2677,43 +2660,6 @@ ja:
     invalid_date_or_time: "%{attr} の日付または日時が無効です"
   calendars: 
     assignment_details: 課題の詳細
-    calendar: 
-      alts: 
-        next: 次へ
-        previous: 前へ
-      calendars_count: 
-        one: "%{count} 個のカレンダー (%{open_count} 個がオープン)"
-        other: "%{count} 個のカレンダー (%{open_count} 個がオープン)"
-      feed_title: "カレンダー フィード"
-      instructions: 
-        ics_link: "下のリンクをコピーして、iCal フィードを取得する任意のカレンダー アプリ (Google カレンダー、iCal、Outlook) に貼り付けます。"
-      labels: 
-        calendar: カレンダー
-        date: 日付
-        details: 詳細
-        due: 期限
-        from: 自
-        group: グループ
-        title: タイトル
-        undated_events: 日付のないイベント
-      links: 
-        add_event: イベントの追加
-        delete: 削除
-        edit: 編集
-        feed: フィードを表示するにはここをクリック
-        full_details: 全詳細情報
-        how_do_i: どうすればいいですか...?
-        jump_to_calendar: カレンダーに移動
-        more_options: その他のオプション
-        show_undated_events: "%{count} 件の更新イベントを表示"
-      messages: 
-        max_visible: "一度に %{count} 件のカレンダーを表示できます"
-      options: 
-        new_group: "[ 新しいグループ ]"
-      tabs: 
-        assignment: 課題
-        event: イベント
-      timespan: "%{start_time} *至* %{end_time}"
     default_title: イベント
     event: 
       due: 期限
@@ -2737,36 +2683,6 @@ ja:
     prompts: 
       delete_assignment: この課題を削除してもよろしいですか?
       delete_event: このイベントを削除してもよろしいですか?
-    show: 
-      crumbs: 
-        my_calendar: "マイ カレンダー"
-      feed_title: "コース カレンダーの Atom フィード"
-      keycode_descriptions: 
-        delete: 現在のイベントを削除
-        edit: 現在のイベントを編集
-        next_day: 次の曜日
-        next_event: 次の曜日/イベント
-        next_week: 次の週
-        open: 現在のイベントを開く
-        previous_day: 前の曜日
-        previous_event: 前の曜日/イベント
-        previous_week: 前の週
-        refresh: カレンダーを最新の情報に更新
-      keycode_descriptoins: 
-        new: 当日の新しいイベント
-      keycodes: 
-        delete: d
-        edit: e
-        new: "n"
-        next_day: Ctrl+Right
-        next_event: j
-        next_week: Ctrl+Down
-        open: o
-        previous_day: Ctrl+Left
-        previous_event: k
-        previous_week: Ctrl+Up
-        refresh: r
-      page_title: カレンダー
     show2: 
       calendar_feed: "カレンダー フィード"
       calendar_feed_instructions: "下のリンクをコピーして、iCal フィードを取得する任意のカレンダー アプリ (Google カレンダー、iCal、Outlook) に貼り付けます。"
@@ -2785,7 +2701,6 @@ ja:
       add_new_event: 新しいイベントの追加
       edit_assignment: 課題の編集
       edit_event: イベントの編集
-    use_new_calendar: 新しいカレンダーを試す
     wizard_box: 
       descriptions: 
         assignment: "よくできました。ここでダイアログの \"課題\" タブをクリックして、カレンダー イベントではなく課題を作成します。"
@@ -2842,6 +2757,7 @@ ja:
     titles: 
       update_assignment_points: 注釈と一致するように配点を変更しますか?
   choose_a_course_home_page_8059c7b: "コースのホーム ページの選択"
+  choose_a_csv_file_to_upload_9644480c: "アップロードする CSV ファイルの選択:"
   choose_usage_rights_33683854: 使用権を選択...
   clear_file_name_text_field_fce73840: "ファイル名のテキスト フィールドをクリア"
   click_here_on_the_calendar_link_c9965631: "*カレンダー* リンクのここをクリック"
@@ -2959,7 +2875,6 @@ ja:
   communication_5255723c: コミュニケーション
   communication_channel: 
     body: "Canvas 検証コードは %{verification_code} です"
-    default_facebook_account: "Facebook アカウント"
     default_twitter_handle: "Twitter ハンドルネーム"
     default_yo_name: "Yo 名"
   communication_channels: 
@@ -3419,7 +3334,6 @@ ja:
         user_services: "登録済みの Web サービス"
       help: 
         list_services: まだ、登録済みサービスのリストを有効にしていません。このリストを有効にすると、教室を離れているときでも、仲間のコースやグループのメンバーがより簡単にご自分と連携できるようになります。
-        services: "まだ、ご自分のユーザ プロフィールをどの外部サービスにもリンクしていません。Canvas アカウントを Facebook や Twitter などのサービスにリンクすることができます。そうすれば、教室を離れているときでも、仲間のコースやグループのメンバーがより簡単にご自分と連携できるようになります。"
       labels: 
         public_list_services: マイプロフィールにリンクされているサービスを、仲間のコース/グループのメンバーが確認できるようにする
         user_privileges: 特権
@@ -3458,7 +3372,6 @@ ja:
         registered_services: 登録済みサービス
         service_types: サービスのタイプ
       help: 
-        no_services: "まだ、ご自分のユーザ プロフィールをどの外部サービスにもリンクしていません。Canvas アカウントを Facebook や Twitter などのサービスにリンクすることができます。"
         services_private: "まだ、登録済みサービスのリストを有効にしていません。このリストを有効にすると、ご自分の Canvas アカウントにリンクされているサービスを、仲間のコースやグループのメンバーが確認できるようになります。"
         user_services: "ほかのメンバーは、必要と思えば、そのメンバーの Canvas アカウントにリンクされている外部サービスをあなたに公開することもできます。これにより、グループ プロジェクトのコーディネートや、教室を離れているときの連携がより簡単になります。"
       labels: 
@@ -3767,12 +3680,9 @@ ja:
     all_courses: すべてのコース
     all_in_context: "%{context} のすべて"
     archive: アーカイブ
-    archive_conversation: 会話のアーカイブ
     autocomplete_result: 
       group_people: "メンバー: %{people}"
       no_results: 結果なし
-    autocomplete_token: 
-      remove_recipient: 受信者の削除
     back: 戻る
     cannot_add_to_private: 非公開の会話には参加者を追加できません。
     cannot_be_empty: メッセージは空白にできません
@@ -3816,12 +3726,10 @@ ja:
     hide: 非表示
     index_new: 
       archive: アーカイブ
-      archive_conversation: 会話のアーカイブ
       archived: アーカイブされました
       clear_search: 検索結果のクリア
       compose_new_message: 新しいメッセージの作成
       delete: 削除
-      delete_conversation: 会話の削除
       filter_messages_by_course: コースでメッセージをフィルタ
       filter_messages_by_type: タイプでメッセージをフィルタ
       forward: 早送り
@@ -3874,7 +3782,6 @@ ja:
         add_to_faculty_journal: 講師日誌へのエントリとして追加
         attachments: 添付ファイル
         course: コース
-        course_required: 受信者を入力する前に、コースを選択する必要があります。
         select_course: コースの選択
         subject: 科目
         to: 宛先
@@ -3922,7 +3829,6 @@ ja:
     titles: 
       rss_feed: 会話フィード
     unarchive: アーカイブ解凍
-    unarchive_conversation: 会話のアーカイブを解凍
     unstar: スター取り消し
     unstar_conversation: 会話からスターを削除
   copyright_holder_66ee111: "著作権保有者:"
@@ -4201,14 +4107,8 @@ ja:
       headings: 
         grade: "%{assignment} を採点"
         to_do: やるべきこと
-      images: 
-        alt: 
-          ignore: 無視
       links: 
         show_more: "あと %{count} 件..."
-        title: 
-          ignore: この課題を無視
-          ignore_review: このレビューを無視
       need_grading_count: 
         one: "%{count} 個が未採点"
         other: "%{count} 個が未採点"
@@ -4226,8 +4126,6 @@ ja:
         conclude_course: コースの完了
         delete_course: コースの削除
       details: 
-        conclude_alt_text: "コースへの受講生のアクセスを制限しつつ、採点を変更できる状態にしておくには、コースの日付の設定を利用してください。コースの日付の設定については、*こちら* のガイドを参照してください"
-        confirm_conclude: "警告: コースを完了すると、成績を修正したり、コースの内容にアクセスしたりできなくなります。"
         confirm_delete: "このコースを削除してもよろしいですか?　削除すると、 受講生と講師はこのコースを利用できなくなります。コースをドロップダウン メニューから除外することが目的であれば、*コースの完了* を行ってください。"
         confirm_delete_addendum: "コースを完了する権限がない場合は、*コースの終了日の変更* を行うか、コースを完了するよう管理者に依頼してください。"
       headings: 
@@ -5092,6 +4990,7 @@ ja:
       最終的な成績は課題の点数なしで計算されます。
   disable_a5c05db3: 無効
   disabled_18c33a73: (無効)
+  discussion_6719c51d: ディスカッション
   discussion_entries: 
     created_entry_notice: エントリは正常に作成されました。
     deleted_entry_notice: そのエントリは削除されました
@@ -5108,6 +5007,7 @@ ja:
     atom_no_author: 作成者なし
     default_title: タイトルなし
     empty_message: メッセージなし
+  discussion_topic_dc85ad4c: "ディスカッション トピック"
   discussion_topics: 
     assignment_details: 
       available_from: 次から使用可能
@@ -5168,7 +5068,6 @@ ja:
         published: 公開済み
       delay_posting: 後で投稿
       enable_podcast_feed: "ポッドキャスト フィードを使用可能にする"
-      include_replies_in_podcast_feed: "ポッドキャスト フィードに返信を含める"
       only_visible_to_overrides_note: "注: このディスカッションは、以下の指定されたセクションに*のみ*表示されます。"
       options: オプション
       page_header_title: 新しいディスカッション
@@ -5215,7 +5114,6 @@ ja:
       loading: 読み込んでいます...
       lock_for_comments: コメントのロック
       make_sure_all_search_terms_are_spelled_correctly: すべての検索条件について誤入力がないことを確認してください。
-      new_discussion: "ディスカッションを *開始する*"
       rss_feed: "RSS フィード"
       start_one_now: 今すぐ開始する
       suggestions: "提案:"
@@ -5281,7 +5179,7 @@ ja:
       reply_to_topic: トピックへの返信
       retrieved_from_feed: "%{feed} から取得"
       show_rubric: 注釈の表示
-      speed_grader: SpeedGrader
+      speed_grader: SpeedGrader™
       topic: トピック
       topic_podcast_feed_link: "トピックのポッドキャスト フィード"
       topic_subscribe: 定期購読
@@ -5408,7 +5306,6 @@ ja:
   due_datetime_f5a81b81: "期限: %{dateTime}"
   due_multiple_dates_cc0ee3f5: "期限: 複数の期日"
   due_on_date_aa4725cd: "期日:"
-  due_on_date_ffc98ebc: 期日
   e_mail_only_2cc5e513: 電子メールのみ
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "各バーは 1 つの課題を表します。*細い垂直のヒゲ* は、コース内のすべての受講生の最低スコアから最高スコアまでひかれています。**厚いバー** は、第 1 四分位から第 3 四分位までを表しており、***中央値にマークが付けられて*** います。"
   each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "各バーは 1 つの課題を表します。細いヒゲは、コース内のすべての受講生の最低スコアから最高スコアまでひかれています。厚いバーは、第 1 四分位から第 3 四分位までを表しており、中央値にマークが付けられています。受講生のスコアは点で表されています。"
@@ -5430,6 +5327,7 @@ ja:
     buttons: 
       create_rubric: 注釈の作成
       update_rubric: 注釈の更新
+    change: 変更
     discussion_points_possible: 
       one: "配点 %{count}"
       other: "配点 %{count}"
@@ -5900,6 +5798,7 @@ ja:
       posts_added: 投稿が追加されました
       remove_feed: "%{display_name} の削除"
   external_integration_keys_8b4f4548: 外部統合鍵
+  external_tool_c5a6410a: 外部ツール
   external_tools: 
     account_navigation_configured: アカウントのナビゲーションが構成されました
     app_full_view: 
@@ -6007,53 +5906,6 @@ ja:
     submit: 提出
     user_navigation_configured: ユーザのナビゲーションが構成されました
     wiki_page_menu_configured: "Wiki ページ メニューが設定されました"
-  facebook: 
-    authorization_required: 認証されたユーザのみが、そのページにアクセスできます
-    authorization_success: "正常に認証されました!これで Canvas と Facebook はフレンドです。"
-    deleted: 削除済み
-    index: 
-      all_set: すべて設定されました!
-      bookmark_notice: "このアプリケーションを Facebook のブックマークに登録すると、Canvas の新しいお知らせの数を Facebook のホーム ページから確認できます。"
-      canvas_messages: "Canvas メッセージ"
-      configure_notification_preferences_notice: "*お知らせの基本設定* が完了すると、ここにお知らせが表示されるようになり、ご自分の Canvas アカウントで起きている事柄を知ることができます。"
-      installation_about: "Canvas Facebook アプリをインストールするには、Canvas のプロフィール ページに進み、Facebook ボタンをクリックして、アカウントを Facebook に接続します。"
-      learn_more: "instructure.com で詳しく学ぶ"
-      more_information: "詳細は %{domain_list} をご覧ください"
-      no_messages_notice: "コースで物事が起きるにつれ、ここにお知らせが表示されるようになります。ご自分の Canvas アカウントで起きている事柄を知ることができます。"
-      notification_about: "Canvas Facebook アプリによって、コース内部で行われている交流に、より簡単にアクセスできます。自分の課題が採点されたとき、期日が変更されたときなどに、お知らせを受けるように設定できます。個人情報はCanvas でも非公開のままとなります。"
-      notification_settings: お知らせ設定
-      notifications_notice: "以下に表示されているのは、Canvas から送信された最新のお知らせ一覧です。このアプリケーションを Facebook のブックマークに登録すると、Canvas の新しいお知らせの数を Facebook のホーム ページから確認できます。"
-      welcome: "%{name} さん、お帰りなさい!"
-      welcome_message: "Instructure が提供する、新しいタイプのオンライン ラーニング ソフトウェアへようこそ。学習成果を向上させるため、Web をより簡単に利用できるようにするためのシステムです。当システムのインターフェイスはシンプルで、公平で、オープンです。講師や受講生が既に使用しているツール (Facebook など) を使って作業し、よりオープンな、共同作業による学習体験を提供します。単に課題を追跡するだけにとどまらない、パワフルでオープンな 1 つのパッケージにすべてを包み込んだシステムです。交流を促し、学習を促進します。"
-      welcome_title: "Instructure Canvas へようこそ。"
-    index_disabled: 
-      disabled_notice: "この Canvas サイトは、Facebook と通信するようには設定されていません。"
-      get_help: "support.instructure.com でヘルプをご覧ください"
-      instructure_canvas: "Instructure Canvas"
-    invalid_signature: "無効な Facebook 署名です"
-    message: 
-      hide: 非表示
-    notification_policies: 
-      alerts: アラート
-      cancel: キャンセル
-      change_settings: 設定の変更
-      daily: 毎日
-      labels: 
-        alerts_for_category: "%{category_name} のアラート"
-      loading: 読み込んでいます...
-      never: 一切なし
-      notification_type: お知らせのタイプ
-      right_away: 今すぐ
-      send_to_facebook: "Facebook に送信しますか?"
-      update_preferences: 基本設定の更新
-      updating_preferences: 基本設定を更新しています...
-      weekly: 毎週
-    settings: 
-      back_to_messages: メッセージに戻る
-      link_needed: "Canvas Facebook アプリを設定するには、その前に、アプリをご自分の Canvas ログインにリンクする必要があります。詳細については、\"ようこそ\" をクリックしてください。"
-      notifications_config_notice: "Canvas からのお知らせを、自動的に Facebook アカウントに送信できます。送信できるお知らせのタイプには、次のものがあります。お知らせの基本設定は、ここで、または Canvas 内でいつでも変更できます。"
-      settings_title: "Canvas のお知らせ設定"
-      updating_preferences: 基本設定を更新しています...
   fair_use_bee47d77: 公正な使用
   favicon_6e658914: お気に入りアイコン
   feature_flags: 
@@ -6332,6 +6184,7 @@ ja:
     only_one_folder: "フォルダ パスおよびフォルダ ID を設定できません"
   for: ための
   for_all_devices_1f603968: すべてのデバイス
+  from_fdd4956d: 変更前
   from_from_to_to_e31f6422: "%{from} ～ %{to}"
   global_message_icons: 
     announcement: アナウンス
@@ -6527,21 +6380,9 @@ ja:
       switch_to_points: 点数に切り替え
     ungraded: 採点に考慮されない
   gradebook_uploads: 
-    errors: 
-      invalid_file: "無効な csv ファイルです。採点を更新できませんでした"
-      upload_failed: ファイルをアップロードできませんでした。
-    form: 
-      labels: 
-        upload: "アップロードする CSV ファイルの選択"
-      titles: 
-        upload_form: "アップロードする CSV ファイルの選択"
     new: 
       titles: 
         new_upload: 成績表のアップロード
-    notices: 
-      updated: 
-        one: "%{count} 件の提出を正常に更新しました。"
-        other: "%{count} 件の提出を正常に更新しました。"
     show: 
       assignment_answer: "この課題のタイプ:"
       assignment_example: 株価指数クイズ
@@ -6568,14 +6409,6 @@ ja:
       student_answer: この人物は確かに次のとおりです
       student_example: 受講生の誰か
       student_question: 問題となっている受講生
-  gradebook_uploads_form: 
-    buttons: 
-      upload_data: データのアップロード
-    labels: 
-      upload: "アップロードする CSV ファイルの選択:"
-    titles: 
-      upload_form: "アップロードする CSV ファイルの選択"
-    what_should_csv_look_like: "CSV ファイルはどのような表示にしたいですか?"
   gradebooks: 
     attendance: 
       attendance_info: 出欠課題が作成されていません。
@@ -6696,12 +6529,14 @@ ja:
       set_group_weights: グループの重み付けの設定
       show_attendance_columns: 出席者列の表示
       show_concluded_enrollments: 完了した登録の表示
-      upload_scores: インポート
       view_grading_history: 採点履歴の表示
     grades: 
       complete: 完了
       incomplete: 未完了
     grades_filename: 成績
+    grading_box_extended: 
+      labels: 
+        grade: 成績
     history: 
       graded_on_submission: 提出時に採点済み
       grades_for_date: 採点日
@@ -6772,7 +6607,6 @@ ja:
       labels: 
         add_comment: コメントの追加
         average: 平均
-        grade: 成績
         grade_by_question_beta: "問題ごとの成績 (ベータ)"
         group_comment: グループ全体にコメントを送信
         hide_names: "SpeedGrader 内の受講生の名前を非表示にする"
@@ -7379,8 +7213,11 @@ ja:
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "退出すると、現在準備中の zip ファイルのダウンロードはキャンセルされます。"
   if_you_ve_been_using_another_course_management_sys_67edfab1: "別のコース管理システムをご利用になっていた場合は、そのシステム上のコンテンツを Canvas に移動したいとお考えでしょう。そのようなご希望をお持ちの方のために、コンテンツを簡単に Canvas に移行するためのプロセスを、順を追ってご説明します。"
   ignore_assignment_738b3c99: 課題を無視
+  ignore_forever_dd4a6cdf: 絶えず無視
   ignore_name_55edc6fe: "%{name} を無視"
   ignore_these_3940f6f5: これらを無視
+  ignore_this_assignment_b7a71f80: この課題を無視
+  ignore_until_new_submission_87f32b4: 新しい提出があるまで無視
   image_8ad06: 画像
   images: 
     error_checking_color: 画像の色の確認でエラーが発生しました
@@ -7390,6 +7227,7 @@ ja:
     invalid_file_type: "無効なファイル タイプです: %{type}。指定可能なタイプ: %{type_list}"
     not_an_image: 選択されたファイルは画像ではありません
   immediately_c128ede6: 即時
+  import_1b31507: インポート
   import_content_b2fd6620: コンテンツのインポート
   importers/assignment_importer: 
     errors: 
@@ -7462,8 +7300,6 @@ ja:
       posting_message_failed: 投稿に失敗しました。もう一度、試してください
       required: 必須フィールド
       search_failed: 検索に失敗しました。もう一度やり直してください。
-    ignore_forever: 絶えず無視
-    ignore_until_new_submission: 新しい提出があるまで無視
     labels: 
       datepicker: 
         time: 時刻
@@ -7597,8 +7433,6 @@ ja:
         dashboard: "マイ ダッシュボード"
         skip_to_content: コンテンツまでスキップする
       open_source_learning_management_system: "オープン ソース LMS"
-    facebook: 
-      title: "Facebook ページ"
     fixed_bottom: 
       masquerading: 
         stop: マスカレードの停止
@@ -7742,6 +7576,7 @@ ja:
   lock_date_cannot_be_after_term_end_cf1a188f: ロック日を期間の終了日より後にすることはできません
   lock_date_cannot_be_before_due_date_ac30f54: ロック日を期日より前にすることはできません
   lock_until_date_62ce1b5c: ロック終了日付
+  log_out_379ba28a: ログアウト
   logged_out_user: "ログアウトしたユーザ %{user_counter}"
   logo_a040ae0e: ロゴ
   low_score_4eeb95b2: "低: %{score}"
@@ -7773,7 +7608,6 @@ ja:
   manage_usage_rights_c5a8c216: 使用権の管理
   manual_entry_e4a4f99a: 手入力
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: 熟達スコアは、直近に採点された課題またはクイズのスコアを反映しています。
-  mastery_scrore_reflects_the_highest_score_of_a_gra_a71008b7: 熟達スコアは、採点された課題またはクイズの最高スコアを反映しています。
   mathquill: 
     tabs: 
       arrows: 矢印
@@ -7832,6 +7666,7 @@ ja:
     my_courses: "マイ コース"
   message: 
     default_subject: "Canvas アラート"
+  message_896d2ed0: "%{message}"
   message_students: 
     buttons: 
       send_message: メッセージの送信
@@ -7884,10 +7719,6 @@ ja:
           unknown_user: 不明なユーザ
         subject: "たった今、%{user_name} さんによって Canvas の会話に追加されました。"
         unknown_user: 不明なユーザ
-      facebook: 
-        body: "たった今、%{user_name} さんによって Canvas の会話に追加されました。"
-        link_text: 会話の表示
-        unknown_user: 不明なユーザ
       sms: 
         body: "たった今、%{user_name} さんによって Canvas の会話に追加されました。"
         more_info: "詳細は %{url} をご覧ください"
@@ -7925,25 +7756,6 @@ ja:
         ungraded_count_description: "%{count} 件以上の提出物がまだ採点されていません"
         ungraded_timespan_description: "%{count} 日間、未採点のままになっている提出物があります"
         usernote_description: "%{count} 日間、講師日誌へのエントリがありません"
-      facebook: 
-        body: 
-          one: "次の条件が満たされたため、%{student} に対してアラートが発行されました:"
-          other: "次の条件が満たされたため、%{student} に対してアラートが発行されました:"
-        body_student: 
-          one: "次の条件が満たされたため、アラートが発行されました:"
-          other: "次の条件が満たされたため、アラートが発行されました:"
-        interaction_description: 
-          one: "受講生/講師の対話が %{count} 日以上ありません"
-          other: "受講生/講師の対話が %{count} 日以上ありません"
-        ungraded_count_description: 
-          one: "%{count} 件以上の課題がまだ採点されていません"
-          other: "%{count} 件以上の課題がまだ採点されていません"
-        ungraded_timespan_description: 
-          one: "%{count} 日以上、未採点のままになっている提出物があります"
-          other: "%{count} 日以上、未採点のままになっている提出物があります"
-        usernote_description: 
-          one: "%{count} 日以上、講師日誌への記入がありません"
-          other: "%{count} 日以上、講師日誌への記入がありません"
       sms: 
         body: "%{student} にアラートが発行されました"
         body_student: アラートが発行されました
@@ -7979,8 +7791,6 @@ ja:
           link: アナウンスを表示
         labels: 
           file_included: ファイルが含まれています
-      facebook: 
-        body: "このアナウンスを作成しました: %{title}、%{course}"
       sms: 
         details: "詳細は %{url} をご覧ください"
         subject: "このアナウンスを作成しました: %{title}、%{course}"
@@ -7996,8 +7806,6 @@ ja:
           link: アナウンスを表示するには、ここをクリックします
           subject: "アナウンスへの新規コメント %{discussion_topic}: %{course}"
         subject: "アナウンスへの新規コメント %{discussion_topic}: %{course}"
-      facebook: 
-        body: "アナウンスへの新規コメント: %{discussion_topic}、%{course}"
       sms: 
         body: "アナウンスへの新規コメント %{discussion_topic}: %{course}"
         details: "詳細は %{url} をご覧ください"
@@ -8032,19 +7840,6 @@ ja:
         message: "%{user} が \"%{appointment_name}\" の予約を取り消しました。"
         no_reason_given: 何も指定されていません
         subject: "\"%{appointment_name}\" の予約が取り消されました (%{course})"
-      facebook: 
-        instructions: 予定を表示する
-        labels: 
-          attendee: 出席者
-          attendees: 出席者
-          cancel_reason: 取り消しの理由
-          course: コース
-          date_and_time: 日付/時刻
-          details: 予定の詳細
-          group: グループ
-          slots_remaining: 利用できる時間スロット
-        message: "%{user} が \"%{appointment_name}\" の予約を取り消しました。"
-        no_reason_given: 何も指定されていません
       sms: 
         message: "%{user} が \"%{appointment_name}\" の予約を取り消しました。"
         more_info: "詳細は %{url} をご覧ください"
@@ -8076,18 +7871,6 @@ ja:
         message: "%{user} が \"%{appointment_name}\" の時間スロットを取り消しました。"
         no_reason_given: 何も指定されていません
         subject: "\"%{appointment_name}\" の時間スロットが取り消されました (%{course})"
-      facebook: 
-        instructions: 異なる時間スロットにサインアップする
-        labels: 
-          attendee: 出席者
-          attendees: 出席者
-          cancel_reason: 取り消しの理由
-          course: コース
-          date_and_time: 日付/時刻
-          details: 予定の詳細
-          group: グループ
-        message: "%{user} が \"%{appointment_name}\" の時間スロットを取り消しました。"
-        no_reason_given: 何も指定されていません
       sms: 
         message: "\"%{appointment_name}\" の時間スロットが取り消されました。"
         more_info: "詳細は %{url} をご覧ください"
@@ -8112,14 +7895,6 @@ ja:
         message: "\"%{appointment_name}\" のすべての予定が取り消されました。"
         no_reason_given: 何も指定されていません
         subject: "\"%{appointment_name}\" の予定が取り消されました (%{course})"
-      facebook: 
-        labels: 
-          cancel_reason: 取り消しの理由
-          course: コース
-          dates: 日付
-          details: 予定の詳細
-        message: "\"%{appointment_name}\" のすべての予定が取り消されました。"
-        no_reason_given: 何も指定されていません
       sms: 
         message: "\"%{appointment_name}\" のすべての予定が取り消されました。"
         more_info: "詳細は %{url} をご覧ください"
@@ -8149,17 +7924,6 @@ ja:
           slots_remaining: 利用できる時間スロット
         message: "\"%{appointment_name}\" の時間スロットがサインアップ可能になりました。"
         subject: "予定 \"%{appointment_name}\" はサインアップ可能です (%{course})"
-      facebook: 
-        group_signup: "グループ (%{group_category})"
-        individual_signup: 個人
-        instructions: 時間スロットにサインアップしてください
-        labels: 
-          course: コース
-          dates: 日付
-          details: 予定の詳細
-          signup_type: サインアップのタイプ
-          slots_remaining: 利用できる時間スロット
-        message: "\"%{appointment_name}\" の時間スロットがサインアップ可能になりました。"
       sms: 
         message: "\"%{appointment_name}\" はサインアップ可能です。"
         more_info: "詳細は %{url} をご覧ください"
@@ -8191,17 +7955,6 @@ ja:
           slots_remaining: 利用できる時間スロット
         message: "\"%{appointment_name}\" に時間スロットが追加され、サインアップ可能になりました。"
         subject: "予定 \"%{appointment_name}\" が更新されました (%{course})"
-      facebook: 
-        group_signup: "グループ (%{group_category})"
-        individual_signup: 個人
-        instructions: 時間スロットにサインアップしてください
-        labels: 
-          course: コース
-          dates: 日付
-          details: 予定の詳細
-          signup_type: サインアップのタイプ
-          slots_remaining: 利用できる時間スロット
-        message: "\"%{appointment_name}\" に時間スロットが追加され、サインアップ可能になりました。"
       sms: 
         message: "\"%{appointment_name}\" に新しい時間スロットを使用できます。"
         more_info: "詳細は %{url} をご覧ください"
@@ -8234,17 +7987,6 @@ ja:
           slots_remaining: 利用できる時間スロット
         message: "%{user} が \"%{appointment_name}\" にサインアップしました。"
         subject: "ユーザが \"%{appointment_name}\" にサインアップしました (%{course})"
-      facebook: 
-        instructions: 予定を表示する
-        labels: 
-          attendee: 出席者
-          attendees: 出席者
-          course: コース
-          date_and_time: 日付/時刻
-          details: 予定の詳細
-          group: グループ
-          slots_remaining: 利用できる時間スロット
-        message: "%{user} が \"%{appointment_name}\" にサインアップしました。"
       sms: 
         message: "%{user} が \"%{appointment_name}\" にサインアップしました。"
         more_info: "詳細は %{url} をご覧ください"
@@ -8274,17 +8016,6 @@ ja:
           slots_remaining: 利用できる時間スロット
         message: "%{user} があなたを \"%{appointment_name}\" にサインアップしました。"
         subject: "あなたは \"%{appointment_name}\" にサインアップされました"
-      facebook: 
-        instructions: 異なる時間スロットにサインアップする
-        labels: 
-          attendee: 出席者
-          attendees: 出席者
-          course: コース
-          date_and_time: 日付/時刻
-          details: 予定の詳細
-          group: グループ
-          slots_remaining: 利用できる時間スロット
-        message: "%{user} があなたを \"%{appointment_name}\" にサインアップしました。"
       sms: 
         message: "あなたは \"%{appointment_name}\" にサインアップされました。"
         more_info: "詳細は %{url} をご覧ください"
@@ -8305,8 +8036,6 @@ ja:
           link: 課題を表示するにはここをクリック
           subject: "課題が変更されました: %{title}、%{course}"
         subject: "課題が変更されました: %{title}、%{course}"
-      facebook: 
-        body: "%{course} の課題 \"%{title_link}\" が変更されました。"
       sms: 
         body: |-
             %{title}、%{course} が変更されました。
@@ -8331,11 +8060,6 @@ ja:
           click_to_see_assignment: 課題を表示するにはここをクリック
         multiple_due_dates: "期限: 複数の期日"
         new_assignment: "ご利用のコース「%{course_name}」に新しい課題が作成されました"
-        no_due_date: "期限:期日なし"
-      facebook: 
-        due_at: "期限: %{assignment_due_date_time}"
-        multiple_due_dates: "期限: 複数の期日"
-        new_assignment: "コースに新しい課題が作成されました。コース: %{course_name}"
         no_due_date: "期限:期日なし"
       sms: 
         due_at: "期限: %{assignment_due_date_time}"
@@ -8365,9 +8089,6 @@ ja:
         labels: 
           click_to_see_assignment: 課題を表示するにはここをクリック
         no_due_date: 期日なし
-      facebook: 
-        assignment_due_date_changed_sentence: "コース「%{course_name}」の課題「*%{assignment_name}*」の期日が、次のように変更されました:"
-        no_due_date: 期日なし
       sms: 
         assignment_due_date_changed: "%{assignment_name}、%{course_name} の期限がきました:"
         more_info_at_url: "詳細は %{web_address} をご覧ください"
@@ -8392,9 +8113,6 @@ ja:
         labels: 
           click_to_see_assignment: 課題を表示するにはここをクリック
         no_due_date: 期日なし
-      facebook: 
-        assignment_due_date_changed_sentence: "コース「%{course_name}」(%{override}) の課題「*%{assignment_name}*」の期日が、次のように変更されました:"
-        no_due_date: 期日なし
       sms: 
         assignment_due_date_changed: "%{assignment_name}、%{course_name} (%{override}) の期限になりました:"
         more_info_at_url: "詳細は %{web_address} をご覧ください"
@@ -8416,8 +8134,6 @@ ja:
           the_assignment_is_graded: "課題「%{assignment_name}」が採点されました。"
         labels: 
           view_here: ここで表示できます
-        the_assignment_is_graded: "課題「%{assignment_name}」が採点されました。"
-      facebook: 
         the_assignment_is_graded: "課題「%{assignment_name}」が採点されました。"
       sms: 
         assignment_is_graded: "%{assignment_name}、%{course_name} が採点されました。"
@@ -8442,9 +8158,6 @@ ja:
           view_submission: 提出物はここで表示できます
         user_resubmitted: "再提出: %{user_name}、%{assignment_name}"
         user_resubmitted_sentence: "%{user_name} は、コース「%{course_name}」の %{assignment_name} に対して、たった今、再提出物を提出しました。"
-      facebook: 
-        click_to_view: 提出物を表示するには、ここをクリックしてください。
-        user_resubmitted: "**%{user_name}** は、コース「%{course_name}」の **%{assignment_name}** に対して、たった今、再提出物を提出しました**。"
       sms: 
         more_info_at: "詳細は %{web_address} をご覧ください"
         user_resubmitted: "%{user_name} は、たった今、課題を提出しました (再)。 %{assignment_name}"
@@ -8463,9 +8176,6 @@ ja:
           view_submission: 提出物はここで表示できます
         user_submitted: "提出: %{user_name}、%{assignment_name}"
         user_submitted_sentence: "%{user_name} は、コース「%{course_name}」の %{assignment_name} に対して、たった今、提出物を提出しました。"
-      facebook: 
-        click_to_view: 提出物を表示するには、ここをクリックしてください。
-        user_submitted: "**%{user_name}** は、コース「%{course_name}」の **%{assignment_name}** に対して、たった今、提出物を提出しました**。"
       sms: 
         more_info_at: "詳細は %{web_address} をご覧ください"
         user_submitted: "%{user_name} はたった今、課題を提出しました。 %{assignment_name}"
@@ -8484,9 +8194,6 @@ ja:
           view_submission: 提出物はここで表示できます
         user_resubmitted_sentence: "%{user_name} は、コース「%{course_name}」の %{assignment_name} に対して、たった今、提出物を遅れて提出しました。"
         user_submitted: "遅延した課題: %{user_name}、%{assignment_name}"
-      facebook: 
-        click_to_view: 提出物を表示するには、ここをクリックしてください。
-        user_resubmitted_sentence: "**%{user_name}** は、コース「%{course_name}」の **%{assignment_name}** に対して、たった今、提出物を遅れて提出しました**。"
       sms: 
         more_info_at: "詳細は %{web_address} をご覧ください"
         user_submitted: "%{user_name} は、たった今、課題を提出しました (遅延)。 %{assignment_name}"
@@ -8544,9 +8251,6 @@ ja:
           link: 詳細はここで確認できます
           subject: "共同作業への招待: %{course_or_group}"
         subject: "共同作業への招待: %{course_or_group}"
-      facebook: 
-        body: "文書「%{document}」の共同作業に招待されました。対象は %{course_or_group} です。文書は %{service} で作成されました。"
-        body_with_user: "文書「%{document}」の共同作業に招待されました。対象は %{course_or_group} です。文書は、%{user} により %{service} で作成されました。"
       sms: 
         body: |-
             文書「%{document}」の共同作業に招待されました。対象は %{course_or_group} です。
@@ -8630,10 +8334,6 @@ ja:
         subject: "%{user_name} は先ほど Canvas 内でメッセージを送信しました。"
         unknown_user: 不明なユーザ
         view_message: このメッセージを会話に表示
-      facebook: 
-        body: "%{user_name} は先ほど Canvas 内でメッセージを送信しました。"
-        link_text: メッセージの表示
-        unknown_user: 不明なユーザ
       sms: 
         body: "%{user_name} は先ほど Canvas 内でメッセージを送信しました:"
         more_info: "詳細は %{url} をご覧ください"
@@ -8660,10 +8360,6 @@ ja:
         subject: "たった今、Canvas で %{user_name} さんからメッセージが送信されました。"
         unknown_user: 不明なユーザ
         view_message: このメッセージを会話に表示
-      facebook: 
-        body: "たった今、Canvas で %{user_name} さんからメッセージが送信されました。"
-        link_text: メッセージの表示
-        unknown_user: 不明なユーザ
       sms: 
         body: "たった今、Canvas で %{user_name} さんからメッセージが送信されました:"
         more_info: "詳細は %{url} をご覧ください"
@@ -8757,12 +8453,6 @@ ja:
           details: 現在の登録リストを参照
           subject: "%{user} さんがコースへの招待を受諾しました"
         subject: "%{user} さんがコースへの招待を受諾しました"
-      facebook: 
-        body_designer: "コース「%{course}」に設計者として招待された %{user} さんが、たった今、招待を受諾しました。"
-        body_observer: "コース「%{course}」にオブザーバとして招待された %{user} さんが、たった今、招待を受諾しました。"
-        body_student: "コース「%{course}」に受講者として招待された %{user} さんが、たった今、招待を受諾しました。"
-        body_ta: "コース「%{course}」に TA として招待された %{user} さんが、たった今、招待を受諾しました。"
-        body_teacher: "コース「%{course}」に講師として招待された %{user} さんが、たった今、招待を受諾しました。"
       sms: 
         body_designer: "%{user} さんが、設計者としての招待を受諾したコース:  %{course}"
         body_observer: "%{user} さんが、オブザーバとしての招待を受諾したコース:  %{course}"
@@ -8805,17 +8495,6 @@ ja:
           username: ユーザ名
         none: なし
         subject: コースへの招待
-      facebook: 
-        body_designer: "コース「%{course}」に、設計者として招待されています。"
-        body_observer: "コース「%{course}」に、オブザーバとして招待されています。"
-        body_student: "コース「%{course}」に、受講生として招待されています。"
-        body_ta: "コース「%{course}」に、TA として招待されています。"
-        body_teacher: "コース「%{course}」に、講師として招待されています。"
-        labels: 
-          email: "電子メール アドレス"
-          name: 名前
-          username: ユーザ名
-        none: なし
       sms: 
         body_designer: コースに、設計者として招待されています。
         body_observer: コースに、オブザーバとして招待されています。
@@ -8864,17 +8543,6 @@ ja:
         none: なし
         register: "%{link} にアクセスして、登録を完了してください"
         subject: コース登録
-      facebook: 
-        body_designer: "コース「%{course}」に、設計者として名前が登録されています。"
-        body_observer: "コース「%{course}」に、オブザーバとして名前が登録されています。"
-        body_student: "コース「%{course}」に、受講生として名前が登録されています。"
-        body_ta: "コース「%{course}」に、TA として名前が登録されています。"
-        body_teacher: "コース「%{course}」に、講師として名前が登録されています。"
-        labels: 
-          email: "電子メール アドレス"
-          name: 名前
-          username: ユーザ名
-        none: なし
       sms: 
         body_designer: コースに、設計者として名前が登録されています。
         body_observer: コースに、オブザーバとして名前が登録されています。
@@ -8959,10 +8627,6 @@ ja:
           see_details: 詳細はここで確認できます
         no_time_set: 時間が設定されていません
         subject: "イベントの日程が変更されました: %{event_title}、%{course_name}"
-      facebook: 
-        from_to_time: "開始日時 %{start_date_time} 終了日時 %{end_date_time}"
-        no_time_set: 時間が設定されていません
-        subject: "イベント [%{event_title}](%{link_to_event}) (対象コース: %{course_name}) の時間が変更されました。現在は次のとおりです:"
       sms: 
         from_to_time: "開始日時 %{start_date_time} 終了日時 %{end_date_time}"
         more_info: "詳細は %{web_link} をご覧ください"
@@ -9020,11 +8684,6 @@ ja:
           grades_based_on_percent: 課題グループごとに、総体的な重み付けに基づいて採点されます
           now_see_here: 詳細はここで確認できます
           subject: 成績の重み付けが変更されました
-      facebook: 
-        grading_based_on_points: すべての課題の合計点に基づいて採点されます。
-        grading_policy_changed: "**[%{course_name}](%{course_url})** の採点方針が変更されました。"
-        labels: 
-          grades_based_on_percent: 課題グループごとに、総体的な重み付けに基づいて採点されます
       sms: 
         grade_changed: "コース「%{course_name}」の採点方針が変更されました。"
         more_info_at: "詳細は %{course_url} をご覧ください"
@@ -9046,8 +8705,6 @@ ja:
         labels: 
           view_submission_here: 提出物はここで表示できます
         subject: "遅延した課題: %{group_name}、%{assignment_name}"
-      facebook: 
-        body: "グループ「%{group_name}」は、コース「%{course_name}」の **[%{assignment_name}](%{assignment_url})** に対して、たった今、提出物を遅れて提出しました。"
       sms: 
         more_info: "詳細は %{web_address} をご覧ください"
         subject: "%{group_name} は、たった今、課題を提出しました (遅延)。 %{assignment_name}"
@@ -9070,10 +8727,6 @@ ja:
         labels: 
           click_below: 下のリンクをクリックすると、グループについて調べることができます
         subject: "グループ メンバーシップが受諾されました: %{group_name}"
-      facebook: 
-        account_group: "アカウント「%{account_name}」について、グループ **[%{group_name}](%{group_url})** への参加要求が受諾されました。"
-        course_group: "コース「%{course_name}」について、グループ **[%{group_name}](%{group_url})** への参加要求が受諾されました。"
-        group_request_accepted: "グループ要求が受諾されました: %{group_name}"
       sms: 
         account_group: "アカウント「%{account_name}」について、グループ「%{group_name}」への参加要求が受諾されました。"
         course_group: "コース「%{course_name}」について、グループ「%{group_name}」への参加要求が受諾されました。"
@@ -9099,9 +8752,6 @@ ja:
         labels: 
           click_below: 下のリンクをクリックすると、他のグループについて調べることができます
         subject: "グループ メンバーシップが拒否されました: %{group_name}"
-      facebook: 
-        account_group: "アカウント「%{account_name}」について、グループ **[%{group_name}](%{group_url})** への参加要求が拒否されました。"
-        course_group: "コース「%{course_name}」について、グループ **[%{group_name}](%{group_url})** への参加要求が拒否されました。"
       sms: 
         account_group: "アカウント「%{account_name}」について、グループ「%{group_name}」への参加要求が拒否されました。"
         course_group: "コース「%{course_name}」について、グループ「%{group_name}」への参加要求が拒否されました。"
@@ -9157,9 +8807,6 @@ ja:
           details: "新しい管理者「%{user}」が、アカウント「%{account}」用に追加されました"
           subject: "新しいアカウント ユーザ"
         subject: "新しいアカウント ユーザ"
-      facebook: 
-        body: "新しい管理者 **%{user}** が、アカウント **%{account}** 用に追加されました。"
-        subject: "%{account} に新しいアカウント管理者が追加されました"
       sms: 
         body: "新しい管理者「%{user}」が、アカウント「%{account}」用に追加されました"
         details: "詳細は %{website} をご覧ください"
@@ -9175,8 +8822,6 @@ ja:
           link: アナウンスを表示
         labels: 
           file_included: ファイルが含まれています
-      facebook: 
-        body: "新しいアナウンス: %{title}、%{course}"
       sms: 
         details: "詳細は %{url} をご覧ください"
         subject: "新しいアナウンス: %{title}、%{course}"
@@ -9196,9 +8841,6 @@ ja:
           title: "新しいグループ メンバーシップ: %{group_name}"
         subject: "%{course_or_account} の新しいグループ メンバーシップ"
         title: "新しいグループ メンバーシップ: %{group_name}"
-      facebook: 
-        body_account: "アカウント「%{account}」の新しいグループに追加されました。グループ名は %{group_name} です。"
-        body_course: "コース「%{course}」の新しいグループに追加されました。グループ名は %{group_name} です。"
       sms: 
         body_account: "アカウント「%{account}」の新しいグループに追加されました。グループ名は %{group_name} です。"
         body_course: "コース「%{course}」の新しいグループに追加されました。グループ名は %{group_name} です。"
@@ -9223,9 +8865,6 @@ ja:
           title: "新しいグループ メンバーシップ: %{group_name}"
         subject: "%{course_or_account} の新しいグループ メンバーシップ"
         title: "新しいグループ メンバーシップ: %{group_name}"
-      facebook: 
-        body_account: "アカウント「%{account}」のグループ「%{group}」に招待されました。"
-        body_course: "コース「%{course}」のグループ「%{group}」に招待されました。"
       sms: 
         body_account: "アカウント「%{account}」のグループ「%{group}」に招待されました。"
         body_course: "コース「%{course}」のグループ「%{group}」に招待されました。"
@@ -9251,11 +8890,6 @@ ja:
           teachers: 講師
         subject: 新しいコース
         title: "%{account} の新しいコース"
-      facebook: 
-        body: "新しいコース **%{course}** が、アカウント **%{account}** 用に追加されました。"
-        labels: 
-          teachers: 講師
-        subject: "%{account} の新しいコース"
       sms: 
         body: "新しいコース「%{course}」が、アカウント「%{account}」に対して追加されました"
         details: "詳細は %{url} をご覧ください"
@@ -9278,8 +8912,6 @@ ja:
           link: 会話に参加するにはここをクリック
           subject: "「%{discussion_topic}」への新しいコメント: %{course}"
         subject: "%{discussion_topic} への新しいコメント: %{course}"
-      facebook: 
-        body: "%{discussion_topic}、%{course} への新しいコメント"
       sms: 
         body: "%{discussion_topic} への新しいコメント: %{course}"
         details: "詳細は %{url} をご覧ください"
@@ -9300,8 +8932,6 @@ ja:
         labels: 
           file_included: ファイルが含まれています
         subject: "新しいディスカッション - %{discussion_topic}: %{course}"
-      facebook: 
-        body: "新しいフォーラム トピック: %{discussion_topic}、%{course}"
       sms: 
         body: "%{course} の新しいトピック:"
         details: "詳細は %{url} をご覧ください"
@@ -9323,10 +8953,6 @@ ja:
           see_details: 詳細はここで確認できます
         no_time_set: 時間が設定されていません
         subject: "新しいイベント - %{event_title}、%{course_name}"
-      facebook: 
-        body: "%{course_name} に新しいイベントがスケジュールされました:"
-        from_to_time: "開始日時 %{start_date_time} 終了日時 %{end_date_time}"
-        no_time_set: 時間が設定されていません
       sms: 
         from_to_time: "開始日時 %{start_date_time} 終了日時 %{end_date_time}"
         more_info: "詳細は %{web_address} をご覧ください"
@@ -9349,8 +8975,6 @@ ja:
           subject: "新しいファイルが追加されました:%{title}、%{name}"
         subject: "新しいファイルが追加されました:%{title}、%{name}"
         view: ここで表示できます
-      facebook: 
-        body: "コース「%{name}」に新しいファイルが追加されました:"
       sms: 
         body: "「%{name}」に新しいファイルが追加されました:"
         link: "詳細は %{link} をご覧ください"
@@ -9367,9 +8991,6 @@ ja:
           subject: "%{count} 個の新しいファイルがコース「%{name}」に追加されました:"
         link: ここで表示できます
         subject: "%{count} 個の新しいファイルがコース「%{name}」に追加されました:"
-      facebook: 
-        body: "%{count} 個の新しいファイルがコース「%{name}」に追加されました:"
-        link: ここで表示できます
       sms: 
         body: "%{count} 個の新しいファイルが「%{name}」に追加されました。"
         link: "詳細は %{link} をご覧ください"
@@ -9392,9 +9013,6 @@ ja:
           title: "新しい受講生グループ: %{group_name}"
         subject: "%{course_or_account} の新しい受講生グループ"
         title: "新しい受講生グループ: %{group_name}"
-      facebook: 
-        body_account: "新しい受講生により、アカウント「%{account}」に対し、%{group_name} というグループが組織されました。最初のメンバーは %{user} です。"
-        body_course: "新しい受講生により、コース「%{course}」に対し、%{group_name} というグループが組織されました。最初のメンバーは %{user} です。"
       sms: 
         body_account: "アカウント「%{account}」に対し、\"%{group_name}\" という新しいグループが作成されました。最初のメンバーは %{user} です。"
         body_course: "コース「%{course}」に対し、\"%{group_name}\" という新しいグループが作成されました。最初のメンバーは %{user} です。"
@@ -9414,9 +9032,6 @@ ja:
           link: ユーザを表示するにはここをクリック
           subject: 新しいユーザ
         subject: 新しいユーザ
-        title: "%{account} の新しいユーザ"
-      facebook: 
-        body: "たった今、アカウント **%{account}** に対して、新しいユーザ **%{user}** が登録されました。"
         title: "%{account} の新しいユーザ"
       sms: 
         body: "アカウント「%{account}」に対して、新しいユーザ「%{user}」が登録されました"
@@ -9438,8 +9053,6 @@ ja:
         html: 
           link_message: レビューを完了するにはここをクリックします
         subject: "%{reviewee} の割り当てられたピア レビュー"
-      facebook: 
-        body: "%{reviewee} のピア レビューに招待されました。レビューするには、以下のリンクをクリックしてください。"
       sms: 
         more_info: "詳細は %{url} をご覧ください"
       summary: 
@@ -9469,8 +9082,6 @@ ja:
           subject: "再評価済みのクイズ: %{quiz}, %{context}"
         link_message: クイズはここで表示できます
         subject: "再評価済みのクイズ: %{quiz}, %{context}"
-      facebook: 
-        body: "再評価済みのクイズ: %{title}"
       sms: 
         body_sms: "%{context} の %{title} のクイズが再評価されました。"
         more_info: "詳細は %{url} をご覧ください"
@@ -9501,8 +9112,6 @@ ja:
           subject: "アセスメントの実施をお忘れなく: %{rubric}、%{context}"
         link_message: "アセスメントのレビューとエントリの提出は、ここで行えます:"
         subject: "アセスメントの実施をお忘れなく: %{rubric}、%{context}"
-      facebook: 
-        body: "アセスメントの実施について念押しの通知が届いています。対象:*%{title}* 対象: %{context}。"
       sms: 
         body: "アセスメントの実施について念押しの通知が届いています。対象: %{rubric}、%{context}"
         more_info: "詳細は %{url} をご覧ください"
@@ -9520,8 +9129,6 @@ ja:
           subject: "新しいアセスメント: %{title}、%{context}"
         link_message: "アセスメントのレビューとエントリの提出は、ここで行えます:"
         subject: "新しいアセスメント: %{title}、%{context}"
-      facebook: 
-        body: "%{context} に対して新しいアセスメントが作成されました:"
       sms: 
         body: "%{context} に対して新しいアセスメントが作成されました。"
         more_info: "詳細は %{url} をご覧ください"
@@ -9546,9 +9153,6 @@ ja:
         link_message: "提出物の詳細はここでレビューできます:"
         someone: 名前未登録ユーザ
         subject: "提出コメント: %{user}、%{assignment}、%{context}"
-      facebook: 
-        body: "*%{author}* は、たった今、**%{assignment} への提出物について %{user}** に新しいコメントを書きました。"
-        someone: 名前未登録ユーザ
       sms: 
         body: "%{author} から %{assignment}、%{user}、%{context} に対する新しいコメント"
         more_info: "詳細は %{url} をご覧ください"
@@ -9570,9 +9174,6 @@ ja:
         someone: 名前未登録ユーザ
         subject: "提出コメント: %{user}、%{assignment}、%{context}"
         submission_comment_link_message: 以下のリンクを使用して提出物の詳細を確認できます。または、このメッセージに応答してこのコメントに返信できます。
-      facebook: 
-        body: "*%{author}* は、たった今、**%{assignment} への提出物について %{user}** に新しいコメントを書きました。"
-        someone: 名前未登録ユーザ
       sms: 
         more_info: "詳細は %{url} をご覧ください"
         sms_body: "%{author} から %{assignment}、%{user}、%{context} に対する新しいコメント"
@@ -9601,13 +9202,6 @@ ja:
         score: "スコア:%{score} / 配点: %{total}"
         score_pending: 講師によるレビューが保留になっているスコア
         subject: "成績変更: %{assignment}、%{context}"
-      facebook: 
-        body: "課題「*%{title}*」の成績が変更されました。"
-        no_date_set: 日付が設定されていません
-        not_applicable: N/A
-        regraded_date: "再評価日: %{date}"
-        score: "スコア:%{score} / 配点: %{total}"
-        score_pending: 講師によるレビューが保留になっているスコア
       sms: 
         body_sms: "%{title}、%{context} に対する成績が、たった今、変更されました。"
         more_info: "詳細は %{url} をご覧ください"
@@ -9648,13 +9242,6 @@ ja:
         score: "スコア:%{score} / 配点: %{total}"
         score_pending_review: 講師によるレビューが保留になっているスコア
         subject: "課題が採点されました: %{assignment}、%{context}"
-      facebook: 
-        body: "課題「*%{title}*」が採点されました。"
-        graded_date: "採点日: %{date}"
-        no_date_set: 日付が設定されていません
-        not_applicable: N/A
-        score: "スコア:%{score} / 配点: %{total}"
-        score_pending_review: 講師によるレビューが保留になっているスコア
       sms: 
         graded_date: "採点日: %{date}"
         more_info: "詳細は %{url} をご覧ください"
@@ -9687,9 +9274,6 @@ ja:
         link_message: "提出物はここでレビューできます:"
         subject: "クイズ提出済み: %{quiz}, %{context}"
         submitted_date: "提出済み: %{date}"
-      facebook: 
-        body: "%{user_name} はクイズ %{quiz_title} を完了しました。手動での採点が必要です。"
-        submitted_date: "提出済み: %{date}"
       sms: 
         body_sms: "%{title}、%{context} に対する成績が、たった今、変更されました。"
         more_info: "詳細は %{url} をご覧ください"
@@ -9716,8 +9300,6 @@ ja:
         notifications_link: "次のページにアクセスすると、お知らせ設定を変更できます:"
         subject: "Canvas からの最近のお知らせ"
         weekly_body: "Canvas アカウントからのお知らせを週次レポートとして受け取る設定でサインアップしています。以下は、%{date} までの週次レポートです:"
-      facebook: 
-        new_notifications: "#Canvas# に *%{notification_count} 件の新しいお知らせ* が届いています。"
       sms: 
         notifications_sms: "%{notifications_count} 新しいお知らせは次の場所にあります: %{url}"
       twitter: 
@@ -9737,8 +9319,6 @@ ja:
           subject: "更新された Wiki ページ: %{title}、%{user}"
         link_message: "ここでレビューできます: %{link}"
         subject: "更新された Wiki ページ: %{title}、%{user}"
-      facebook: 
-        body: "%{title} についての Wiki のページが更新されました。"
       sms: 
         more_info: "詳細は %{url} をご覧ください"
         updated_message: "たった今、%{title}、%{user} が更新されました:"
@@ -9756,8 +9336,6 @@ ja:
           details_link: 詳細を表示するにはここをクリック
           subject: "Web 会議への招待: %{name}"
         subject: "Web 会議への招待: %{name}"
-      facebook: 
-        body: "#%{name}# さんの Web 会議「*%{title}*」に招待されています。"
       sms: 
         body: "%{name} さんの Web 会議「%{title}」に招待されました。"
         link_message: "詳細は %{url} をご覧ください"
@@ -9976,7 +9554,6 @@ ja:
   name_only_5f56718e: 名前のみ
   new_account_role_6e5c4964: 新しいアカウントの役割
   new_course_role_6a7bb75f: 新しいコースの役割
-  new_facebook_message: "Canvas からの新しいメッセージがあります"
   new_file_135ae520: "[ 新しいファイル ]"
   new_outcome_7fba8c7d: 新しい成果
   new_quiz_statistics_desc: コースの新しいクイズ統計ページを有効にします。
@@ -10204,8 +9781,6 @@ ja:
         display: "電子メール アドレス"
       errors: 
         saving_preferences_failed: 問題が発生したために中断されました。もう一度、試してください
-      facebook: 
-        display: Facebook
       push: 
         display: お知らせをプッシュ
       sms: 
@@ -10500,6 +10075,7 @@ ja:
   paginated_view: 
     loading_more_results: より多くの結果を読み込んでいます
   participations_1823832d: 参加
+  password_8a271b1c: パスワード
   paste_xml_cda3a64e: "XML を貼り付け"
   paypal: 
     exception: 申し訳ありません。エラーが発生しました。後でもう一度試してください。
@@ -10616,33 +10192,6 @@ ja:
       primary_pad: "Primary Pad"
       sketchpad: SketchPad
       typewithme: TypeWith.me
-    facebook: 
-      description: "Canvas Facebook 申請"
-      name: Facebook
-    facebook_settings: 
-      description: |-
-          [facebook.com 上の新しいアプリ] (%{facebook_url}) を作成し、'App on Facebook' をプラットフォームとして追加する必要があります。
-          Facebook アプリが正しく動作するように、 次の構成オプションを
-          設定します。
-          
-          * **設定 -- App on Facebook -- Canvas ページ:** 選択した内容 (apps.facebook.com の後の部分) をメモし、下のフォームに入力します。
-          * **設定 -- App on Facebook -- Canvas URL:** %{canvas_url} に設定します。
-          * アプリを保存した後、アプリ ID、クライアント トークン、およびアプリ シークレットをメモします。
-      domain_name: ドメイン
-      headers: 
-        domain_settings: ドメイン設定
-      hints: 
-        api_key: "クライアント トークンとも呼ばれます"
-        canvas_domain: "これは、\"Canvas URL\" に指定されているドメインです"
-        canvas_name: "これは、\"Canvas Page\" に指定されているパスです"
-        disable_ssl: ローカルでのテスト用としてのみ使用してください
-      labels: 
-        api_key: "API 鍵"
-        app_id: "アプリ ID"
-        canvas_domain: "Canvas ドメイン"
-        canvas_name: "Canvas 名"
-        disable_ssl: "SSL を無効化"
-        secret: "アプリ シークレット"
     google_docs: 
       description: "Google ドキュメントでの文書共有"
       name: "Google ドキュメント"
@@ -10892,7 +10441,6 @@ ja:
     labels: 
       requirements_must_be_completed: このページをロック解除するためには、次の要件が揃っていることが必要です。
   presentation_2d9387ca: プレゼンテーション
-  press_spacebar_for_more_details_on_this_outcome_f6713a42: "この成果の詳細を表示するには、Space キーを押します"
   privacy_290109ea: プライバシー
   product_name: Canvas
   profile: 
@@ -10943,8 +10491,6 @@ ja:
       profile_update_failed: ログインの更新が失敗しました
       regenerating_token_failed: トークンの再生成に失敗しました
       registration_failed: 登録に失敗しました。ユーザ名とパスワードを確認して、もう一度試してください。
-    facebook_select: 
-      facebook: Facebook
     failed_resending: 要求が失敗しました。もう一度、試してください。
     links: 
       resend_confirmation: 確認の再送信
@@ -10969,7 +10515,6 @@ ja:
         generate_token: トークンの生成
         new_access_token: "新しいアクセス トークン"
         regenerate_token: トークンの再生成
-        register_facebook_account: "Facebook アカウントの登録"
         register_linkedin_account: "LinkedIn アカウントの登録"
         save_login: ログイン情報の保存
         save_skype_name: "Skype 名の保存"
@@ -10980,7 +10525,6 @@ ja:
       delicious_description: "Delicious は、ブックマークを保存し、ほかの人と共有できるようにするためのツールです。Canvas のリッチ コンテンツ エディタでは、Delicious タグを検索でき、役立ちそうな他のリソースに Canvas の中から簡単にリンクすることができます。"
       diigo_description: "Diigo は、研究および教育に特に適したソーシャル ブックマーク ツールです。Canvas のリッチ コンテンツ エディタでは、Diigo タグを検索でき、役立ちそうな他のリソースに Canvas の中から簡単にリンクすることができます。"
       error_loading_token_details: トークンの詳細情報の読み込みエラー
-      facebook_description: "Facebook アカウントをお持ちであれば、Canvas アプリをインストールして、ご自分のプロフィール ページでコースのお知らせを受け取ることができます。受け取るお知らせのタイプや、お知らせを受け取る頻度を指定できます。"
       feature_options: 機能オプション
       full_token_warning: |-
           **今すぐ、このトークンをメモしてください**。一度このページから移動すると、完全なトークンは
@@ -10998,7 +10542,6 @@ ja:
         dates: 日付
         delicious_login: "Delicious へのログイン"
         diigo_login: "Diigo へのログイン"
-        facebook_access: "Facebook へのアクセス"
         generate_access_token: "アクセス トークンの生成"
         google_docs_access: "Google ドキュメントへのアクセス"
         google_drive_access: "Google ドライブ アクセス"
@@ -11060,7 +10603,6 @@ ja:
         diigo: Diigo
         disable_mfa: マルチファクタ認証の無効化
         edit_settings: 設定の編集
-        facebook: Facebook
         google_docs: "Google ドキュメント"
         google_drive: "Google ドライブ"
         linkedin: LinkedIn
@@ -11069,7 +10611,6 @@ ja:
         skype: Skype
         twitter: Twitter
         upload_new_image: 新しい画像をアップロードする
-        view_facebook_app: "Facebook アプリを表示する"
         view_your_profile: 自分のプロフィールを表示する
         yo: Yo
       loading_token_details: トークンの詳細を読み込んでいます...
@@ -11083,7 +10624,6 @@ ja:
       subscribe_to_emails: "Instructure から、情報、ニュース、ヒントを受け取ることを希望します。"
       titles: 
         access_token_details: "アクセス トークンの詳細情報"
-        authorize_facebook: "Facebook の認証"
         authorize_google_docs: "Google ドキュメントの認証"
         authorize_google_drive: "Google ドライブの承認"
         authorize_linkedin: "LinkedIn の認証"
@@ -11481,6 +11021,7 @@ ja:
       regrade_options: "再評価オプション *(すでにこの問題に回答した受講生用):*"
       some_scores_reduced: "正しい回答に対してのみポイントを与える (*一部の受講生は減点される場合があります*)"
       update_question_without_regrading: 再評価せずに問題を更新する
+  quiz_e0dcce8f: クイズ
   quiz_log_auditing: 
     buttons: 
       reload_events: 再読み込み
@@ -13263,9 +12804,7 @@ ja:
         next: 次へ
       getting_started: "**%{course}** に登録しています。"
       labels: 
-        email: "電子メール アドレス"
         password: パスワード
-      log_in: "電子メール アドレスとパスワードを入力してください:"
     authenticate_or_register: 
       buttons: 
         enroll_in_course: コースへの登録
@@ -13725,7 +13264,6 @@ ja:
       labels: 
         custom_rating: 受講生を評価する際、自由形式のコメントを書きます
         grading_rubric: 採点にこの注釈を使用
-        title: タイトル
         total_points: 合計点
         totallying_rubric: アセスメント結果の合計スコアを非表示
       links: 
@@ -13745,6 +13283,7 @@ ja:
       out_of: "スコア: %{points} / *配点: %{total}*"
       rubric: 注釈
       rubric_title: タイトル
+      title: "タイトル:"
       titles: 
         find_existing_rubric: 既存の注釈の検索
     rubric_criterion: 
@@ -13793,6 +13332,7 @@ ja:
       titles: 
         find_a_rubric: 注釈の検索
     rubric_forms: 
+      criteria_description_label: 基準の説明
       points: "%{points} 点"
     rubric_summary: 
       buttons: 
@@ -14693,6 +14233,7 @@ ja:
     people: メンバー
     view_in_separate_window: 別のウィンドウで表示
   to_35c6baa2: ～
+  to_51406be9: 変更後
   to_c4c44f4b: 移動先
   to_minscore_43e5452e: "%{minScore}% まで"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "課題を表示するには、*アジェンダ* ビューがアクティブであることを確認します。"
@@ -14745,6 +14286,7 @@ ja:
   updated_group_group_name_727b1d98: "更新されたグループ %{group_name}"
   upload_button: 
     upload: アップロード
+  upload_data_dc4fa4cb: データのアップロード
   upload_drop_zone: 
     drop_to_upload: アップロードするアイテムをドロップ
   upper_limit_of_range_c454a8f2: 範囲の上限
@@ -14883,13 +14425,13 @@ ja:
     descriptions: 
       delicious: "Delicious は、共同作業向けの、リンクを共有できるツールです。インターネット上のどのページでも、後で参照できるようにタグを付けることができます。他のユーザの Delicious アカウントにリンクして、同じような関心事のリンクを共有することもできます。"
       diigo: "Diigo は、共同作業向けの、リンクを共有できるツールです。インターネット上のどのページでも、後で参照できるようにタグを付けることができます。他のユーザの Diigo アカウントにリンクして、同じような関心事のリンクを共有することもできます。"
-      facebook: "ご自分の Facebook プロフィールをリストに載せれば、クラスやグループのフレンドとより簡単につながることができるようになります。"
       google_docs: "受講生は Google ドキュメントを使用して、グループ プロジェクトでの共同作業を行なうことができます。Google ドキュメントを使用すれば、文書、スプレッドシート、プレゼンテーションなどをリアルタイムで共同編集することが可能です。"
       google_drive: "受講生は、Google ドライブを使用して、グループ プロジェクトで共同作業を行うことができます。Google ドライブを使用することで、ドキュメント、スプレッドシート、およびプレゼンテーションを共同でリアルタイムに編集できます。"
       linked_in: "LinkedIn は、ビジネス ネットワークのためのリソースです学生時代に築いた人脈の多くは、仕事をするようになってからも役立つものです。"
       skype: "Skype は、インターネット経由で音声通話やビデオ通話を行なうための無料のツールです。"
       twitter: "Twitter は、クラス外コミュニケーションのための素晴らしいリソースです。"
       yo: "Yo は、タップするだけの文字入力が不要なコミュニケーション ツールです。"
+  username_47bb5bbe: ユーザ名
   users: 
     admin_merge: 
       buttons: 
@@ -14957,8 +14499,6 @@ ja:
     errors: 
       no_teacher_courses: この講師と受講生で共有しているコースはありません
       user_not_teacher: そのユーザは、このコースの講師ではありません
-    facebook_added: "Facebook アカウントは正常に追加されました!"
-    facebook_fail: "Facebook の認証に失敗しました。"
     google_docs_added: "Google ドキュメントへのアクセスが承認されました!"
     google_docs_fail: "Google ドキュメントの認証に失敗しました。もう一度、試してください"
     google_drive_added: "Google ドライブ アカウントが正常に追加されました。"
@@ -15184,6 +14724,7 @@ ja:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE、WebCT 6+ コース"
   webct_name: "Blackboard Vista/CE (WebCT)"
+  what_should_the_csv_file_look_like_985a59ac: "CSV ファイルはどのような表示にしたいですか?"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "メンバーがコースにアクセスすると、このページが表示されます。アクティビティ ストリーム、コース モジュールのリスト、要綱、その他のカスタム ページを表示するように設定できます。デフォルトでは、コースのアクティビティ ストリームが表示されます。"
   where_would_you_like_to_move_title_fabd6e8f: "%{title} をどこに移動しますか?"
   widget: 
@@ -15301,6 +14842,7 @@ ja:
       title_characters: "タイトルには、文字または数字を少なくとも 1 文字含めてください"
       title_too_long: "タイトルは %{max_characters} 文字以内にしてください"
     unknown_user_name: 不明
+  wiki_page_6c11ee20: "Wiki ページ"
   wiki_pages: 
     edit: 
       page_header_title: "%{page_name} の編集"
