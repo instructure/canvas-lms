@@ -521,8 +521,9 @@ describe "security" do
       expect(session[:become_user_id]).to be_nil
       expect(assigns['current_user'].id).to eq @admin.id
       expect(assigns['real_current_user']).to be_nil
-      expect(PageView.last.user_id).to eq @admin.id
-      expect(PageView.last.real_user_id).to be_nil
+      pv1 = PageView.last
+      expect(pv1.user_id).to eq @admin.id
+      expect(pv1.real_user_id).to be_nil
 
       post "/users/#{@student.id}/masquerade"
       assert_response 302
@@ -533,8 +534,9 @@ describe "security" do
       expect(session[:become_user_id]).to eq @student.id.to_s
       expect(assigns['current_user'].id).to eq @student.id
       expect(assigns['real_current_user'].id).to eq @admin.id
-      expect(PageView.last.user_id).to eq @student.id
-      expect(PageView.last.real_user_id).to eq @admin.id
+      pv2 = PageView.all.detect{|pv| pv != pv1}
+      expect(pv2.user_id).to eq @student.id
+      expect(pv2.real_user_id).to eq @admin.id
     end
 
     it "should remember the destination with an intervening auth" do
