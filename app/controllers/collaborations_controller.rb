@@ -93,7 +93,7 @@ class CollaborationsController < ApplicationController
           redirect_to named_context_url(@context, :context_collaborations_url)
         end
       rescue GoogleDocs::DriveConnectionException => drive_exception
-        Canvas::Errors.capture(drive_exception)
+        ErrorReport.log_exception(:google_drive, drive_exception)
       end
     end
   end
