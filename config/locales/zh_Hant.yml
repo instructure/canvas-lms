@@ -68,7 +68,6 @@ zh_Hant:
       avatars: 使用者頭像
       delicious: 美味
       diigo: Diigo
-      facebook: Facebook
       google_docs: "Google Docs"
       google_docs_preview: "Google Docs 預覽"
       google_drive: "Google Drive"
@@ -84,8 +83,6 @@ zh_Hant:
       invalid_discovery_url: "探索 URL 無效"
     feedback_coach: 諮詢社區
     feedback_coach_sub: "向 Canvas 專家尋求幫助"
-    feedback_feature_request: 要求功能
-    feedback_feature_request_canvas_net: "要求 Canvas 網路中的功能"
     feedback_feature_request_sub: "創意如何提高 Canvas？"
     manually_created_courses: 手動創建的課程
     root_account_cant_have_sis_id: "無法在根帳戶中設置 SIS ID"
@@ -237,7 +234,7 @@ zh_Hant:
         login_handle_name: 登入標籤
         position: 位置
         requested_authn_context: 驗證內容
-        unkown_user_url: "未知使用者 URL"
+        unknown_user_url: "未知使用者 URL"
       log_in_url: "登入 URL"
       log_out_url: "註銷 URL"
       login_attribute: 登入屬性
@@ -252,7 +249,7 @@ zh_Hant:
       save_button: 儲存驗證設定
       start_debugging: 開始偵錯
       stop_debugging: 停止偵錯
-      unkown_user_url_description: "在 Canvas 中找不到已驗證的使用者時重定向到的 URL。"
+      unknown_user_url_description: "在 Canvas 中找不到已驗證的使用者時重定向到的 URL。"
     saml_testing: 
       auth_request_to_idp: "AuthnRequest發送至 IdP"
       auth_response_from_idp: "AuthnResponse 來自於 IdP"
@@ -937,6 +934,7 @@ zh_Hant:
         outgoing_email_default_name_option_default: "預設 Canvas 設定"
         prevent_course_renaming_by_teachers: 請勿讓教師重新命名他們的課程
         restrict_quiz_questions: 限制學生在課程結束日期之後查看測驗問題
+        restrict_student_future_view: 限制學生在開始日期之前查看課程
         role_id: 新增更多
         self_enrollment: 允許自行註冊
         self_registration: 自行登記
@@ -1525,6 +1523,7 @@ zh_Hant:
     titles: 
       gpa_scale_explainer: "GPA 比例分級是什麼？"
       grading_scheme_info: 查看/編輯評分配置
+  assignment_976578a8: 任務
   assignment_comments_e43ed898: 任務註解
   assignment_details: 
     no_graded_submissions: 沒有已評分的提交件
@@ -2150,6 +2149,7 @@ zh_Hant:
     upload_error_timeout: "請求超時：%{url}"
     upload_error_too_many_redirects: 過多的重新導向
     upload_error_unexpected: "從 %{url} 下載時發生未知錯誤"
+  attachment_deffe5a9: 附件
   attendance: 
     default_attendance_title: "考勤 %{date}"
     errors: 
@@ -2425,7 +2425,6 @@ zh_Hant:
       create_event: 建立新事件
       done_go_back_to_list: 已完成，返回至清單
       links: 
-        accessibility_warning: 警告：螢幕閱讀程式不能存取此檢視。使用議程檢視代替。
         calendar_agenda: 議程
         calendar_month: 月
         calendar_scheduler: 排程器
@@ -2620,25 +2619,9 @@ zh_Hant:
     crumbs: 
       new: 新月曆事件
     full_calendar_event: 
-      buttons: 
-        create: 建立事件
-        update: 更新事件
-      labels: 
-        address: 地址
-        date: 日期
-        event_description: 事件說明
-        from: 自
-        location: 位置
-        title: 標題
       no_content: 無內容
-      timespan: "%{start_time} *至* %{end_time}"
     new: 
-      links: 
-        back_to_calendar: 返回至月曆
-        delete: 刪除事件
-        edit: 編輯月曆事件
       page_title: 新月曆事件
-    no_content: 無內容
     notices: 
       created: 事件已成功建立。
       deleted: 此事件已刪除。
@@ -2658,43 +2641,6 @@ zh_Hant:
     invalid_date_or_time: "%{attr} 的無效日期或無效日期時間"
   calendars: 
     assignment_details: 任務詳細資料
-    calendar: 
-      alts: 
-        next: 下一個
-        previous: 上一個
-      calendars_count: 
-        one: "%{count} 個月曆， %{open_count} 個公開的"
-        other: "%{count} 個月曆， %{open_count} 個公開的"
-      feed_title: 月曆摘要
-      instructions: 
-        ics_link: "複製下面的連結並將其粘貼到任何一個攜帶 iCal 摘要的月曆應用程式（Google Calendar、iCal、Outlook等）"
-      labels: 
-        calendar: 月曆
-        date: 日期
-        details: 詳細資料
-        due: 截止日期
-        from: 自
-        group: 群組
-        title: 標題
-        undated_events: 未注日期的事件
-      links: 
-        add_event: 新增事件
-        delete: 刪除
-        edit: 編輯
-        feed: 按一下此處以查看摘要
-        full_details: 全部詳細資料
-        how_do_i: 如何做…？
-        jump_to_calendar: 跳轉到月曆
-        more_options: 更多選項
-        show_undated_events: "顯示 %{count} 個未注日期的事件"
-      messages: 
-        max_visible: "一次最多可以顯示 %{count} 個月曆"
-      options: 
-        new_group: "[新群組]"
-      tabs: 
-        assignment: 任務
-        event: 事件
-      timespan: "%{start_time} *至* %{end_time}"
     default_title: 事件
     event: 
       due: 截止日期
@@ -2718,36 +2664,6 @@ zh_Hant:
     prompts: 
       delete_assignment: 是否確定要刪除此任務？
       delete_event: 是否確定要刪除此事件？
-    show: 
-      crumbs: 
-        my_calendar: 我的月曆
-      feed_title: "課程月曆 Atom 摘要"
-      keycode_descriptions: 
-        delete: 刪除當前事件
-        edit: 編輯當前事件
-        next_day: 下一個月曆日
-        next_event: 下一個月曆日/事件
-        next_week: 下週
-        open: 打開當前事件
-        previous_day: 上一個月曆日
-        previous_event: 上一個月曆日/事件
-        previous_week: 上週
-        refresh: 重新整理月曆
-      keycode_descriptoins: 
-        new: 當前日期的新事件
-      keycodes: 
-        delete: d
-        edit: e
-        new: "n"
-        next_day: "Ctrl + 向右鍵"
-        next_event: j
-        next_week: "Ctrl + 向下鍵"
-        open: o
-        previous_day: "Ctrl + 向左鍵"
-        previous_event: k
-        previous_week: "Ctrl + 向上鍵"
-        refresh: r
-      page_title: 月曆
     show2: 
       calendar_feed: 月曆摘要
       calendar_feed_instructions: "複製下面的連結並將其粘貼到任何一個攜帶 iCal 摘要的月曆應用程式（Google Calendar、iCal、Outlook等）"
@@ -2766,7 +2682,6 @@ zh_Hant:
       add_new_event: 新增新事件
       edit_assignment: 編輯任務
       edit_event: 編輯事件
-    use_new_calendar: 試用新月曆
     wizard_box: 
       descriptions: 
         assignment: 好極了。現在按一下對話方塊中的『任務』選項卡以建立一個任務，而不是月曆事件。
@@ -2823,6 +2738,7 @@ zh_Hant:
     titles: 
       update_assignment_points: 更改可能的點以與題目相符？
   choose_a_course_home_page_8059c7b: 選擇課程首頁
+  choose_a_csv_file_to_upload_9644480c: "選擇 CSV 檔案以上傳："
   choose_usage_rights_33683854: 選擇使用權。。。
   clear_file_name_text_field_fce73840: 清除檔案名文本欄位
   click_here_on_the_calendar_link_c9965631: "在此處點擊 *月曆* 連結"
@@ -2933,7 +2849,6 @@ zh_Hant:
   communication_5255723c: 通訊
   communication_channel: 
     body: "您的 Canvas 驗證碼為 %{verification_code}"
-    default_facebook_account: "Facebook 帳戶"
     default_twitter_handle: "Twitter Handle"
     default_yo_name: "Yo 名稱"
   communication_channels: 
@@ -3393,7 +3308,6 @@ zh_Hant:
         user_services: "登錄的 Web 服務"
       help: 
         list_services: 您尚未啟用您所登錄的服務清單。啟用此清單將讓同行課程和群組成員更容易地與您在課堂外進行聯繫。
-        services: "您尚未將您的使用者個人檔案連結至任何外部服務。您可以將您的 Canvas 帳戶連結至如 Facebook 和 Twitter 的服務。這將使同行課程和群組成員更容易地與您在課堂外進行聯繫。"
       labels: 
         public_list_services: 讓同行課程/群組成員查看連結至我的個人檔案的服務。
         user_privileges: 權限
@@ -3432,7 +3346,6 @@ zh_Hant:
         registered_services: 登錄的服務
         service_types: 服務類型
       help: 
-        no_services: "您尚未連結您的使用者個人檔案至任何外部服務。您可以將您的 Canvas 帳戶連結至服務，如 Facebook 和 Twitter。"
         services_private: "您尚未啟用您所登錄的服務清單。啟用此清單將讓同行課程及群組成員看到您已連接到您的 Canvas 帳戶的那些服務。"
         user_services: "如果其他成員選擇，他們可以讓您看到他們已經連接至他們的 Canvas 帳戶的那些外部服務。這樣可以更容易協調群組項目，以及與課堂外進行聯繫。"
       labels: 
@@ -3741,12 +3654,9 @@ zh_Hant:
     all_courses: 所有課程
     all_in_context: "%{context} 中的所有"
     archive: 封存
-    archive_conversation: 封存交談
     autocomplete_result: 
       group_people: "人員：%{people}"
       no_results: 無結果
-    autocomplete_token: 
-      remove_recipient: 移除收件者
     back: 返回
     cannot_add_to_private: 不能將參與者新增至私人交談。
     cannot_be_empty: 訊息不能為空
@@ -3790,12 +3700,10 @@ zh_Hant:
     hide: 隱藏
     index_new: 
       archive: 封存
-      archive_conversation: 封存交談
       archived: 已封存
       clear_search: 清除搜尋結果
       compose_new_message: 撰寫新郵件
       delete: 刪除
-      delete_conversation: 刪除交談
       filter_messages_by_course: 按課程篩選郵件
       filter_messages_by_type: 按類型篩選郵件
       forward: 轉寄
@@ -3848,7 +3756,6 @@ zh_Hant:
         add_to_faculty_journal: 作為教職員日誌條目新增
         attachments: 附件
         course: 課程
-        course_required: 輸入收件人前，您必須選擇一門課程。
         select_course: 選擇課程
         subject: 主旨
         to: 至
@@ -3896,7 +3803,6 @@ zh_Hant:
     titles: 
       rss_feed: 交談摘要
     unarchive: 取消封存
-    unarchive_conversation: 取消封存交談
     unstar: 刪除星號
     unstar_conversation: 刪除交談的星號
   copyright_holder_66ee111: 版權持有人：
@@ -4175,14 +4081,8 @@ zh_Hant:
       headings: 
         grade: "評分 %{assignment}"
         to_do: 要進行
-      images: 
-        alt: 
-          ignore: 忽略
       links: 
         show_more: "%{count} 個以上..."
-        title: 
-          ignore: 忽略此任務
-          ignore_review: 忽略此檢閱
       need_grading_count: 
         one: "%{count} 個需要分級"
         other: "%{count} 個需要分級"
@@ -4200,8 +4100,6 @@ zh_Hant:
         conclude_course: 結束課程
         delete_course: 刪除課程
       details: 
-        conclude_alt_text: 如果您想保留在更改成績的同時限制學生存取課程的能力，請利用課程時間設定。您可以在我們的指南*此處*瞭解最新課程設定
-        confirm_conclude: 警告：如果結束課程，您將無法修改成績和存取課程內容。
         confirm_delete: 是否確定要刪除該課程？一旦刪除，學生和教師將無法再存取該課程。如果只是想從課程下拉式功能表中將其移除，則應該*結束課程*。
         confirm_delete_addendum: 如果您無權結束課程，則可以*更改課程結束日期*，或要求您的管理員結束課程。
       headings: 
@@ -5065,6 +4963,7 @@ zh_Hant:
       未提供任務的章節將不會在他們的課程內容中看到它，並且他們的最終成績將被計算，而不包括這些點。
   disable_a5c05db3: 停用
   disabled_18c33a73: (已停用)
+  discussion_6719c51d: 討論
   discussion_entries: 
     created_entry_notice: 輸入項目已成功建立。
     deleted_entry_notice: 該輸入項目已被刪除
@@ -5081,6 +4980,7 @@ zh_Hant:
     atom_no_author: 無作者
     default_title: 無標題
     empty_message: 無訊息
+  discussion_topic_dc85ad4c: 討論主題
   discussion_topics: 
     assignment_details: 
       available_from: 自…可用
@@ -5141,7 +5041,6 @@ zh_Hant:
         published: 已發佈
       delay_posting: 延遲公佈
       enable_podcast_feed: 啟用播客摘要
-      include_replies_in_podcast_feed: 將回覆納入播客摘要
       only_visible_to_overrides_note: 注意：*僅*以下指定的章節可見此討論：
       options: 選項
       page_header_title: 新討論
@@ -5188,7 +5087,6 @@ zh_Hant:
       loading: 正在載入…
       lock_for_comments: 鎖定以查看註解
       make_sure_all_search_terms_are_spelled_correctly: 確保所有的搜尋詞均拼寫正確。
-      new_discussion: "*開始*討論"
       rss_feed: "RSS 摘要"
       start_one_now: 即刻開始一個
       suggestions: 建議：
@@ -5254,7 +5152,7 @@ zh_Hant:
       reply_to_topic: 回覆主題
       retrieved_from_feed: "從 %{feed} 抓取"
       show_rubric: 顯示題目
-      speed_grader: "Speed Grader"
+      speed_grader: SpeedGrader™
       topic: 主題
       topic_podcast_feed_link: 主題播客摘要
       topic_subscribe: 訂閱
@@ -5379,7 +5277,6 @@ zh_Hant:
   due_datetime_f5a81b81: "到期：%{dateTime}"
   due_multiple_dates_cc0ee3f5: 到期：多個日期
   due_on_date_aa4725cd: 截止日期
-  due_on_date_ffc98ebc: 截止日期
   e_mail_only_2cc5e513: 僅電子郵件
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "每一條為一項任務。*垂直細條* 表示該課程中任一學生的最低分一直到最高分。**粗條** 表示第 25 個百分位一直到第 75 個百分位，其中標記了 ***中值分數***。"
   each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "每一條爲一項任務。垂直細條表示該課程中任一學生的最低分一直到最高分。粗條表示第 25 個百分位一直到第 75 個百分位，其中標記了中值分數。該學生的分數標有圓點。"
@@ -5401,6 +5298,7 @@ zh_Hant:
     buttons: 
       create_rubric: 建立題目
       update_rubric: 更新題目
+    change: 更改
     discussion_points_possible: 
       one: "%{count} 個點可能"
       other: "%{count} 個點可能"
@@ -5868,6 +5766,7 @@ zh_Hant:
       posts_added: 新增的帖子
       remove_feed: "移除 %{display_name}"
   external_integration_keys_8b4f4548: 外部整合金鑰
+  external_tool_c5a6410a: 外部工具
   external_tools: 
     account_navigation_configured: 帐户瀏覽已設定
     app_full_view: 
@@ -5975,53 +5874,6 @@ zh_Hant:
     submit: 提交
     user_navigation_configured: 使用者瀏覽已設定
     wiki_page_menu_configured: "Wiki 頁面功能表已設定"
-  facebook: 
-    authorization_required: 僅獲授權的用戶才能存取該頁面
-    authorization_success: "授權成功！Canvas 和 Facebook 成為了朋友。"
-    deleted: 已刪除
-    index: 
-      all_set: 你們全部已設定！
-      bookmark_notice: "如果您收藏此應用程式，則可以從您的 Facebook 主頁看到新 Canvas 通知的數量。"
-      canvas_messages: "Canvas 訊息"
-      configure_notification_preferences_notice: "當您*設定通知喜好*之後，您應該會開始看到通知顯示在此處，以便讓您知道您的 Canvas 帳戶中發生的事項。"
-      installation_about: "要安裝 Canvas Facebook 應用程式，跳至 Canvas 上您的個人檔案頁面，並按一下 Facebook 按鈕，以將您的帳戶連接到 Facebook。"
-      learn_more: "請瀏覽 instructure.com 以瞭解更多資訊"
-      more_information: "%{domain_list} 上有更多資訊"
-      no_messages_notice: "隨著課程中事項的發生，您會開始看到通知顯示在此處，以便讓您知道您的 Canvas 帳戶中發生的事項。"
-      notification_about: "Canvas Facebook 應用程式便於您更容易地存取課程中的互動。您可以將其設定為當您的任務被評分時、截止日期更改時等向您發送通知。您的私人資料將在 Canvas 中仍然處於私人化。"
-      notification_settings: 通知設定
-      notifications_notice: "在下面可以看到來自 Canvas 的最近通知的清單。如果您收藏此應用程式，則可以從您的 Facebook 主頁看到新 Canvas 通知的數量。"
-      welcome: "歡迎回來，%{name}！"
-      welcome_message: "歡迎使用新線上學習軟體，Instructure 的貢獻。我們旨在讓您很容易地使用網頁來提高學習。我們的介面簡潔、乾淨、開放，我們將使用您和您的學生已經在使用的工具（如 Facebook 這樣的工具）工作，為客戶提供一個更加開放、協作的學習經驗。我們將其全部聚集在一個功能強大的、開放的封裝中，並不僅僅是跟蹤任務。其鼓勵互動和促進學習。"
-      welcome_title: "歡迎使用 Instructure Canvas"
-    index_disabled: 
-      disabled_notice: "此 Canvas 網站沒有設定為與 Facebook 進行通訊。"
-      get_help: "請瀏覽 support.instructure.com 以獲得幫助"
-      instructure_canvas: "Instructure Canvas"
-    invalid_signature: "無效的 Facebook 簽名"
-    message: 
-      hide: 隱藏
-    notification_policies: 
-      alerts: 警示
-      cancel: 取消
-      change_settings: 更改設定
-      daily: 每天
-      labels: 
-        alerts_for_category: "%{category_name} 警示"
-      loading: 正在載入...
-      never: 切勿
-      notification_type: 通知類型
-      right_away: 馬上
-      send_to_facebook: "傳送至 Facebook？"
-      update_preferences: 更新喜好設定
-      updating_preferences: 正在更新喜好設定...
-      weekly: 每週
-    settings: 
-      back_to_messages: 返回至郵件
-      link_needed: "在您可以設定 Canvas Facebook 應用程式之前，您需要將其連結到您的 Canvas 登入頁面 。請按一下『歡迎』以獲取詳細資訊。"
-      notifications_config_notice: "來自 Canvas 的通知可以自動傳送到您的 Facebook 帳戶。下面您將看到您可能已經傳送的通知的類型。您可以隨時更改您的通知喜好設定，無論是在這裡還是在 Canvas上。"
-      settings_title: "Canvas 通知設定"
-      updating_preferences: 正在更新喜好設定...
   fair_use_bee47d77: 公平使用
   favicon_6e658914: Favicon
   feature_flags: 
@@ -6296,6 +6148,7 @@ zh_Hant:
     only_one_folder: "無法設定資料夾路徑和資料夾 ID"
   for: 對於
   for_all_devices_1f603968: 針對所有設備
+  from_fdd4956d: 自
   from_from_to_to_e31f6422: "自 %{from} 至 %{to}"
   global_message_icons: 
     announcement: 宣告
@@ -6486,21 +6339,9 @@ zh_Hant:
       switch_to_points: 切換至點
     ungraded: 不計入評分
   gradebook_uploads: 
-    errors: 
-      invalid_file: "無效的 csv 檔案，成績無法更新"
-      upload_failed: 檔案無法上傳。
-    form: 
-      labels: 
-        upload: "選擇 CSV 檔案以上傳"
-      titles: 
-        upload_form: "選擇 CSV 檔案以上傳"
     new: 
       titles: 
         new_upload: 上傳成績冊
-    notices: 
-      updated: 
-        one: "已成功高新 %{count} 個提交件。"
-        other: "已成功高新 %{count} 個提交件。"
     show: 
       assignment_answer: 此任務為
       assignment_example: 平衡指數測驗
@@ -6527,14 +6368,6 @@ zh_Hant:
       student_answer: 此人是真的
       student_example: 某些人
       student_question: 所述學生
-  gradebook_uploads_form: 
-    buttons: 
-      upload_data: 上傳資料
-    labels: 
-      upload: "選擇 CSV 檔案以上傳："
-    titles: 
-      upload_form: "選擇 CSV 檔案以上傳"
-    what_should_csv_look_like: "CSV 檔案應該是什麼樣的？"
   gradebooks: 
     attendance: 
       attendance_info: 沒有已建立的考勤任務。
@@ -6655,12 +6488,14 @@ zh_Hant:
       set_group_weights: 設定群組權重
       show_attendance_columns: 顯示考勤欄
       show_concluded_enrollments: 顯示已結束的註冊
-      upload_scores: 匯入
       view_grading_history: 檢視評分記錄
     grades: 
       complete: 完成
       incomplete: 未完成
     grades_filename: 成績
+    grading_box_extended: 
+      labels: 
+        grade: 成績
     history: 
       graded_on_submission: 提交件評分
       grades_for_date: " 日期的成績"
@@ -6731,7 +6566,6 @@ zh_Hant:
       labels: 
         add_comment: 新增註解
         average: 平均
-        grade: 成績
         grade_by_question_beta: 按問題評分（测试）
         group_comment: 發送批註給全體群組
         hide_names: "在 SpeedGrader 中隱藏學生名稱"
@@ -7331,8 +7165,11 @@ zh_Hant:
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: 如果您離開，目前正在準備進行的壓縮檔案下載將取消。
   if_you_ve_been_using_another_course_management_sys_67edfab1: "如果您已經使用了其他的課程管理系統，其中可能有您想移動至 Canvas 的資料。我們可以引導您輕鬆遷移您的內容到 Canvas 的過程。"
   ignore_assignment_738b3c99: 忽略任務
+  ignore_forever_dd4a6cdf: 永遠忽略
   ignore_name_55edc6fe: "忽略 %{name}"
   ignore_these_3940f6f5: 忽略這些
+  ignore_this_assignment_b7a71f80: 忽略此任務
+  ignore_until_new_submission_87f32b4: 忽略直到有新提交件
   image_8ad06: 影像
   images: 
     error_checking_color: 檢查影像色彩時發生錯誤
@@ -7342,6 +7179,7 @@ zh_Hant:
     invalid_file_type: "無效的檔案類型 %{type}。允許的類型包括：%{type_list}"
     not_an_image: 選定的檔案不是影像
   immediately_c128ede6: 立即
+  import_1b31507: 匯入
   import_content_b2fd6620: 匯入內容
   importers/assignment_importer: 
     errors: 
@@ -7414,8 +7252,6 @@ zh_Hant:
       posting_message_failed: 公佈失敗，請再試一次
       required: 必填欄位
       search_failed: 搜尋失敗，請再試一次。
-    ignore_forever: 永遠忽略
-    ignore_until_new_submission: 忽略直到有新提交件
     labels: 
       datepicker: 
         time: 時間
@@ -7547,8 +7383,6 @@ zh_Hant:
         dashboard: 我的儀表板
         skip_to_content: 跳到內容
       open_source_learning_management_system: "開源 LMS"
-    facebook: 
-      title: "Facebook 頁面"
     fixed_bottom: 
       masquerading: 
         stop: 停止偽裝
@@ -7690,6 +7524,7 @@ zh_Hant:
   lock_date_cannot_be_after_term_end_cf1a188f: 鎖定日期不得晚於學期結束之日
   lock_date_cannot_be_before_due_date_ac30f54: 鎖定日期不能在截止日期之前
   lock_until_date_62ce1b5c: 鎖定截止時間
+  log_out_379ba28a: 登出
   logged_out_user: "已登出的使用者 %{user_counter}"
   logo_a040ae0e: 標誌
   low_score_4eeb95b2: "低：%{score}"
@@ -7721,7 +7556,6 @@ zh_Hant:
   manage_usage_rights_c5a8c216: 管理使用權
   manual_entry_e4a4f99a: 手動輸入
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: 精通分數反映最近評分的任務或測驗。
-  mastery_scrore_reflects_the_highest_score_of_a_gra_a71008b7: 精通分數反映某一已評分任務或測驗的最高分數。
   mathquill: 
     tabs: 
       arrows: 箭號
@@ -7780,6 +7614,7 @@ zh_Hant:
     my_courses: 我的課程
   message: 
     default_subject: "Canvas 警示"
+  message_896d2ed0: "%{message}"
   message_students: 
     buttons: 
       send_message: 傳送訊息
@@ -7828,10 +7663,6 @@ zh_Hant:
           unknown_user: 未知使用者
         subject: "%{user_name} 剛把您新增至 Canvas 中的交談。"
         unknown_user: 未知使用者
-      facebook: 
-        body: "%{user_name} 剛把您新增至 Canvas 中的交談。"
-        link_text: 檢視交談
-        unknown_user: 未知使用者
       sms: 
         body: "%{user_name} 剛把您新增至 Canvas 中的交談。"
         more_info: "在 %{url} 上有更多資訊"
@@ -7869,25 +7700,6 @@ zh_Hant:
         ungraded_count_description: "%{count} 個或更多的提交件尚未評分"
         ungraded_timespan_description: "提交件未評分已達 %{count} 天"
         usernote_description: "沒有教職員日誌條目已達 %{count} 天"
-      facebook: 
-        body: 
-          one: "已為 %{student} 觸發了警示，因為下列條件已得到滿足："
-          other: "已為 %{student} 觸發了警示，因為下列條件已得到滿足："
-        body_student: 
-          one: 已為您觸發了警示，因為下列條件已得到滿足：
-          other: 已為您觸發了警示，因為下列條件已得到滿足：
-        interaction_description: 
-          one: "沒有學生/教師互動已達 %{count} 或更多天"
-          other: "沒有學生/教師互動已達 %{count} 或更多天"
-        ungraded_count_description: 
-          one: "%{count} 個或更多的任務尚未評分"
-          other: "%{count} 個或更多的任務尚未評分"
-        ungraded_timespan_description: 
-          one: "一個或多個提交件尚未評分已達 %{count} 或更多天"
-          other: "一個或多個提交件尚未評分已達 %{count} 或更多天"
-        usernote_description: 
-          one: "沒有教職員日誌條目已達 %{count} 或更多天"
-          other: "沒有教職員日誌條目已達 %{count} 或更多天"
       sms: 
         body: "已為 %{student} 觸發了警示"
         body_student: 已為您觸發了警示
@@ -7923,8 +7735,6 @@ zh_Hant:
           link: 檢視公告
         labels: 
           file_included: 檔案已包括
-      facebook: 
-        body: "您建立了公告：%{title}, %{course}"
       sms: 
         details: "在 %{url} 上有更多資訊"
         subject: "您建立了公告：%{title}, %{course}"
@@ -7940,8 +7750,6 @@ zh_Hant:
           link: 點此加入查看公告
           subject: "公告 %{discussion_topic}: %{course} 的新注解"
         subject: "公告 %{discussion_topic}: %{course} 的新注解"
-      facebook: 
-        body: "公告 %{discussion_topic}, %{course} 的新注解"
       sms: 
         body: "公告 %{discussion_topic}: %{course} 的新注解"
         details: "在 %{url} 上有更多資訊"
@@ -7976,19 +7784,6 @@ zh_Hant:
         message: "%{user} 取消了他/她關於『%{appointment_name}』的預約。"
         no_reason_given: 未給定
         subject: "為『%{appointment_name}』(%{course}) 取消的預約"
-      facebook: 
-        instructions: 檢視約會
-        labels: 
-          attendee: 出席者
-          attendees: 出席者
-          cancel_reason: 取消的原因
-          course: 課程
-          date_and_time: 日期/時間
-          details: 約會詳細資料
-          group: 群組
-          slots_remaining: 可用時段
-        message: "%{user} 取消了他/她關於『%{appointment_name}』的預約。"
-        no_reason_given: 未給定
       sms: 
         message: "%{user} 取消了他/她關於『%{appointment_name}』的預約。"
         more_info: "在 %{url} 上有更多資訊"
@@ -8020,18 +7815,6 @@ zh_Hant:
         message: "%{user} 取消了您的『%{appointment_name}』時段。"
         no_reason_given: 未給定
         subject: "您的『%{appointment_name}』時段已被取消 (%{course})"
-      facebook: 
-        instructions: 註冊一個不同的時段
-        labels: 
-          attendee: 出席者
-          attendees: 出席者
-          cancel_reason: 取消的原因
-          course: 課程
-          date_and_time: 日期/時間
-          details: 約會詳細資料
-          group: 群組
-        message: "%{user} 取消了您的『%{appointment_name}』時段。"
-        no_reason_given: 未給定
       sms: 
         message: "您的『%{appointment_name}』時段已被取消。"
         more_info: "在 %{url} 上有更多資訊"
@@ -8056,14 +7839,6 @@ zh_Hant:
         message: "『%{appointment_name}』的所有約會均已被取消。"
         no_reason_given: 未給定
         subject: "『%{appointment_name}』的約會已被取消 (%{course})"
-      facebook: 
-        labels: 
-          cancel_reason: 取消的原因
-          course: 課程
-          dates: 日期
-          details: 約會詳細資料
-        message: "『%{appointment_name}』的所有約會均已被取消。"
-        no_reason_given: 未給定
       sms: 
         message: "『%{appointment_name}』的所有約會均已被取消。"
         more_info: "在 %{url} 上有更多資訊"
@@ -8093,17 +7868,6 @@ zh_Hant:
           slots_remaining: 可用時段
         message: "『%{appointment_name}』的時段現在可供註冊。"
         subject: "『%{appointment_name}』的約會可供註冊 (%{course})"
-      facebook: 
-        group_signup: "群組 (%{group_category})"
-        individual_signup: 個人
-        instructions: 註冊一個時段
-        labels: 
-          course: 課程
-          dates: 日期
-          details: 約會詳細資料
-          signup_type: 註冊類型
-          slots_remaining: 可用時段
-        message: "『%{appointment_name}』的時段現在可供註冊。"
       sms: 
         message: "『%{appointment_name}』的註冊是開放的。"
         more_info: "在 %{url} 上有更多資訊"
@@ -8135,17 +7899,6 @@ zh_Hant:
           slots_remaining: 可用時段
         message: "時段已新增至『%{appointment_name}』并可供註冊。"
         subject: "約會『%{appointment_name}』已更新 (%{course})"
-      facebook: 
-        group_signup: "群組 (%{group_category})"
-        individual_signup: 個人
-        instructions: 註冊一個時段
-        labels: 
-          course: 課程
-          dates: 日期
-          details: 約會詳細資料
-          signup_type: 註冊類型
-          slots_remaining: 可用時段
-        message: "時段已新增至『%{appointment_name}』并可供註冊。"
       sms: 
         message: "可用於『%{appointment_name}』的新時段。"
         more_info: "在 %{url} 上有更多資訊"
@@ -8178,17 +7931,6 @@ zh_Hant:
           slots_remaining: 可用時段
         message: "%{user} 已註冊『%{appointment_name}』。"
         subject: "使用者已註冊『%{appointment_name}』(%{course})"
-      facebook: 
-        instructions: 檢視約會
-        labels: 
-          attendee: 出席者
-          attendees: 出席者
-          course: 課程
-          date_and_time: 日期/時間
-          details: 約會詳細資料
-          group: 群組
-          slots_remaining: 可用時段
-        message: "%{user} 已註冊『%{appointment_name}』。"
       sms: 
         message: "%{user} 已註冊『%{appointment_name}』。"
         more_info: "在 %{url} 上有更多資訊"
@@ -8218,17 +7960,6 @@ zh_Hant:
           slots_remaining: 可用時段
         message: "%{user} 已將您註冊至『%{appointment_name}』。"
         subject: "您已註冊『%{appointment_name}』。"
-      facebook: 
-        instructions: 註冊一個不同的時段
-        labels: 
-          attendee: 出席者
-          attendees: 出席者
-          course: 課程
-          date_and_time: 日期/時間
-          details: 約會詳細資料
-          group: 群組
-          slots_remaining: 可用時段
-        message: "%{user} 已將您註冊至『%{appointment_name}』。"
       sms: 
         message: "您已註冊『%{appointment_name}』。"
         more_info: "在 %{url} 上有更多資訊"
@@ -8248,8 +7979,6 @@ zh_Hant:
           link: 按一下此處檢視任務
           subject: "任務已更改：%{title}，%{course}"
         subject: "任務已更改：%{title}，%{course}"
-      facebook: 
-        body: "%{course} 的任務 %{title_link} 已更改。"
       sms: 
         body: |-
             %{title}，%{course} 已更改。
@@ -8274,11 +8003,6 @@ zh_Hant:
           click_to_see_assignment: 按一下此處檢視任務
         multiple_due_dates: 截止日期：多個日期
         new_assignment: "已為您的課程 %{course_name} 建立了新任務"
-        no_due_date: 截止日期：無截止日期
-      facebook: 
-        due_at: "截止日期：%{assignment_due_date_time}"
-        multiple_due_dates: 截止日期：多個日期
-        new_assignment: "已為課程 %{course_name} 建立了新任務"
         no_due_date: 截止日期：無截止日期
       sms: 
         due_at: "截止日期：%{assignment_due_date_time}"
@@ -8308,9 +8032,6 @@ zh_Hant:
         labels: 
           click_to_see_assignment: 按一下此處檢視任務
         no_due_date: 無截止日期
-      facebook: 
-        assignment_due_date_changed_sentence: "%{course_name} 的任務 *%{assignment_name}* 的截止日期已更改為："
-        no_due_date: 無截止日期
       sms: 
         assignment_due_date_changed: "%{assignment_name}，%{course_name}，現在已到截止日期："
         more_info_at_url: "在 %{web_address} 上有更多資訊"
@@ -8335,9 +8056,6 @@ zh_Hant:
         labels: 
           click_to_see_assignment: 按一下此處檢視任務
         no_due_date: 無截止日期
-      facebook: 
-        assignment_due_date_changed_sentence: "%{course_name} (%{override}) 的任務 *%{assignment_name}* 的截止日期已更改為："
-        no_due_date: 無截止日期
       sms: 
         assignment_due_date_changed: "%{assignment_name}，%{course_name} (%{override}) 現在已到截止日期："
         more_info_at_url: "在 %{web_address} 上有更多資訊"
@@ -8359,8 +8077,6 @@ zh_Hant:
           the_assignment_is_graded: "任務 %{assignment_name} 已評分。"
         labels: 
           view_here: 可以在此處檢視其。
-        the_assignment_is_graded: "任務 %{assignment_name} 已評分。"
-      facebook: 
         the_assignment_is_graded: "任務 %{assignment_name} 已評分。"
       sms: 
         assignment_is_graded: "%{assignment_name}，%{course_name} 已評分。"
@@ -8385,9 +8101,6 @@ zh_Hant:
           view_submission: 您可以在此處檢視提交件
         user_resubmitted: "重新提交：%{user_name}，%{assignment_name}"
         user_resubmitted_sentence: "%{user_name} 剛剛提交了課程 %{course_name} 之 %{assignment_name} 的重新提交件"
-      facebook: 
-        click_to_view: 按一下此處檢視提交件。
-        user_resubmitted: "**%{user_name}**剛剛提交了課程 %{course_name} 之**%{assignment_name}**的重新提交件"
       sms: 
         more_info_at: "在 %{web_address} 上有更多資訊"
         user_resubmitted: "%{user_name} 剛剛（再次）提交了其任務 %{assignment_name}"
@@ -8406,9 +8119,6 @@ zh_Hant:
           view_submission: 您可以在此處檢視提交件
         user_submitted: "提交：%{user_name}，%{assignment_name}"
         user_submitted_sentence: "%{user_name} 剛剛提交了課程 %{course_name} 之 %{assignment_name} 的提交件"
-      facebook: 
-        click_to_view: 按一下此處檢視提交件。
-        user_submitted: "**%{user_name}**剛剛提交了課程 %{course_name} 之**%{assignment_name}**的提交件"
       sms: 
         more_info_at: "在 %{web_address} 上有更多資訊"
         user_submitted: "%{user_name} 剛剛提交了其任務 %{assignment_name}"
@@ -8427,9 +8137,6 @@ zh_Hant:
           view_submission: 您可以在此處檢視提交件
         user_resubmitted_sentence: "%{user_name} 剛剛提交了課程 %{course_name} 之 %{assignment_name} 的遲交的提交件"
         user_submitted: "遲的任務：%{user_name}，%{assignment_name}"
-      facebook: 
-        click_to_view: 按一下此處檢視提交件。
-        user_resubmitted_sentence: "**%{user_name}**剛剛提交了課程 %{course_name} 之**%{assignment_name}**遲交的提交件"
       sms: 
         more_info_at: "在 %{web_address} 上有更多資訊"
         user_submitted: "%{user_name} 剛剛提交了其任務（遲交）%{assignment_name}"
@@ -8475,9 +8182,6 @@ zh_Hant:
           link: 您可以在此處查看詳細資料
           subject: "協作邀請：%{course_or_group}"
         subject: "協作邀請：%{course_or_group}"
-      facebook: 
-        body: "您已被邀請協作處理 %{course_or_group} 的一個文件 %{document}。文件建立於 %{service}。"
-        body_with_user: "您已被邀請協作處理 %{course_or_group} 的一個文件 %{document}。文件由 %{user} 建立於 %{service}。"
       sms: 
         body: |-
             您已被邀請協作處理 %{course_or_group} 的一個文件 %{document}。
@@ -8550,10 +8254,6 @@ zh_Hant:
         subject: "%{user_name}，您剛剛在 Canvas 傳送了一條訊息。"
         unknown_user: 未知使用者
         view_message: 在交談中檢視此訊息
-      facebook: 
-        body: "%{user_name}，您剛剛在 Canvas 傳送了一條訊息。"
-        link_text: 檢視訊息
-        unknown_user: 未知使用者
       sms: 
         body: "%{user_name}，您剛剛在 Canvas 傳送了一條訊息。"
         more_info: "在 %{url} 上有更多資訊"
@@ -8580,10 +8280,6 @@ zh_Hant:
         subject: "%{user_name} 剛剛在 Canvas 中給您傳送了訊息。"
         unknown_user: 未知使用者
         view_message: 在交談中檢視此訊息
-      facebook: 
-        body: "%{user_name} 剛剛在 Canvas 中給您傳送了訊息。"
-        link_text: 檢視訊息
-        unknown_user: 未知使用者
       sms: 
         body: "%{user_name} 剛剛在 Canvas 中給您傳送了訊息："
         more_info: "在 %{url} 上有更多資訊"
@@ -8673,12 +8369,6 @@ zh_Hant:
           details: 查看目前註冊人數的清單
           subject: "%{user} 接受了課程邀請"
         subject: "%{user} 接受了課程邀請"
-      facebook: 
-        body_designer: "%{user} 剛剛接受了他們的邀請，作為一個設計師參加該課程 %{course}。"
-        body_observer: "%{user} 剛剛接受了他們的邀請，作為一個觀察者參加該課程 %{course}。"
-        body_student: "%{user} 剛剛接受了他們的邀請，作為一個學生參加該課程 %{course}。"
-        body_ta: "%{user} 剛剛接受了他們的邀請，作為一個助教參加該課程 %{course}。"
-        body_teacher: "%{user} 剛剛接受了他們的邀請，作為一個教師參加該課程 %{course}。"
       sms: 
         body_designer: "%{user} 接受了課程 %{course} 的設計師邀請"
         body_observer: "%{user} 接受了課程 %{course} 的觀察者邀請"
@@ -8721,17 +8411,6 @@ zh_Hant:
           username: 使用者名稱
         none: 無
         subject: 課程邀請
-      facebook: 
-        body_designer: "您已被邀請作為設計師參加課程 %{course}。"
-        body_observer: "您已被邀請作為觀察者參加課程 %{course}。"
-        body_student: "您已被邀請作為學生參加課程 %{course}。"
-        body_ta: "您已被邀請作為助教參加課程 %{course}。"
-        body_teacher: "您已被邀請作為教師參加課程 %{course}。"
-        labels: 
-          email: 電子郵件
-          name: 名稱
-          username: 使用者名稱
-        none: 無
       sms: 
         body_designer: 您已被邀請作為設計師參加課程。
         body_observer: 您已被邀請作為觀察者參加課程。
@@ -8780,17 +8459,6 @@ zh_Hant:
         none: 無
         register: "瀏覽 %{link} 以完成註冊"
         subject: 課程註冊
-      facebook: 
-        body_designer: "您已作為設計師註冊了課程 %{course}。"
-        body_observer: "您已作為觀察者註冊了課程 %{course}。"
-        body_student: "您已作為學生註冊了課程 %{course}。"
-        body_ta: "您已作為助教註冊了課程 %{course}。"
-        body_teacher: "您已作為教師註冊了課程 %{course}。"
-        labels: 
-          email: 電子郵件
-          name: 名稱
-          username: 使用者名稱
-        none: 無
       sms: 
         body_designer: 您已作為設計師註冊了課程。
         body_observer: 您已作為觀察者註冊了課程。
@@ -8875,10 +8543,6 @@ zh_Hant:
           see_details: 您可以在此處查看詳細資料
         no_time_set: 沒有時間設定
         subject: "事件日期已更改：%{event_title}，%{course_name}"
-      facebook: 
-        from_to_time: "自 %{start_date_time} 至 %{end_date_time}"
-        no_time_set: 沒有時間設定
-        subject: "%{course_name} 的事件 [%{event_title}](%{link_to_event}) 已更改了時間。現在為："
       sms: 
         from_to_time: "自 %{start_date_time} 至 %{end_date_time}"
         more_info: "在 %{web_link} 上有更多資訊"
@@ -8936,11 +8600,6 @@ zh_Hant:
           grades_based_on_percent: 評分以每個任務群組的總分為基礎
           now_see_here: 您可以在此處查看詳細資料
           subject: 成績加權已更改
-      facebook: 
-        grading_based_on_points: 評分以所有任務的總點數為基礎。
-        grading_policy_changed: "**[%{course_name}](%{course_url})**的評分政策已更改。"
-        labels: 
-          grades_based_on_percent: 評分以每個任務群組的總分為基礎
       sms: 
         grade_changed: "課程 %{course_name} 的評分政策已更改。"
         more_info_at: "在 %{course_url} 上有更多資訊"
@@ -8962,8 +8621,6 @@ zh_Hant:
         labels: 
           view_submission_here: 您可以在此處檢視提交件
         subject: "遲的任務：%{group_name}，%{assignment_name}"
-      facebook: 
-        body: "群組 %{group_name} 剛剛提交了課程 %{course_name} 之**[%{assignment_name}](%{assignment_url})**的遲的提交件。"
       sms: 
         more_info: "在 %{web_address} 上有更多資訊"
         subject: "%{group_name} 剛剛提交了其任務（遲交），%{assignment_name}"
@@ -8986,10 +8643,6 @@ zh_Hant:
         labels: 
           click_below: 您可以透過按一下以下連結查看群組
         subject: "群組成員資格已接受：%{group_name}"
-      facebook: 
-        account_group: "您加入帳戶 %{account_name} 的群組**[%{group_name}](%{group_url})**的要求已被接受。"
-        course_group: "您加入課程 %{course_name} 的群組**[%{group_name}](%{group_url})**的要求已被接受。"
-        group_request_accepted: "群組要求已接受：%{group_name}"
       sms: 
         account_group: "您加入帳戶 %{account_name} 的群組 %{group_name} 的要求已被接受。"
         course_group: "您加入課程 %{course_name} 的群組 %{group_name} 的要求已被接受。"
@@ -9015,9 +8668,6 @@ zh_Hant:
         labels: 
           click_below: 您可以透過按一下以下連結查看其他群組
         subject: "群組成員資格已被拒絕：%{group_name}"
-      facebook: 
-        account_group: "您加入帳戶 %{account_name} 的群組**[%{group_name}](%{group_url})**的要求已被拒絕。"
-        course_group: "您加入課程 %{course_name} 的群組**[%{group_name}](%{group_url})**的要求已被拒絕。"
       sms: 
         account_group: "您加入帳戶 %{account_name} 的群組 %{group_name} 的要求已被拒絕。"
         course_group: "您加入課程 %{course_name} 的群組 %{group_name} 的要求已被拒絕。"
@@ -9073,9 +8723,6 @@ zh_Hant:
           details: "新管理員 %{user} 已被新增至帳戶 %{account}"
           subject: 新帳戶使用者
         subject: 新帳戶使用者
-      facebook: 
-        body: "新管理員**%{user}**已被新增至帳戶**%{account}**。"
-        subject: "%{account} 的新帳戶管理員"
       sms: 
         body: "新管理員 %{user} 已被新增至帳戶 %{account}"
         details: "在 %{website} 上有更多資訊"
@@ -9091,8 +8738,6 @@ zh_Hant:
           link: 檢視宣告
         labels: 
           file_included: 檔案已包括
-      facebook: 
-        body: "新宣告：%{title}，%{course}"
       sms: 
         details: "在 %{url} 上有更多資訊"
         subject: "新宣告：%{title}，%{course}"
@@ -9112,9 +8757,6 @@ zh_Hant:
           title: "新群組成員資格：%{group_name}"
         subject: "%{course_or_account} 的新群組成員資格"
         title: "新群組成員資格：%{group_name}"
-      facebook: 
-        body_account: "您已被新增至帳戶 %{account} 的新群組。該群組的名稱為 %{group_name}。"
-        body_course: "您已被新增至課程 %{course} 的新群組。該群組的名稱為 %{group_name}。"
       sms: 
         body_account: "您已被新增至帳戶 %{account} 的新群組。該群組的名稱為 %{group_name}。"
         body_course: "您已被新增至課程 %{course} 的新群組。該群組的名稱為 %{group_name}。"
@@ -9139,9 +8781,6 @@ zh_Hant:
           title: "新群組成員資格：%{group_name}"
         subject: "%{course_or_account} 的新群組成員資格"
         title: "新群組成員資格：%{group_name}"
-      facebook: 
-        body_account: "您已被邀請加入帳戶 %{account} 的群組 %{group}。"
-        body_course: "您已被邀請加入課程 %{course} 的群組 %{group}。"
       sms: 
         body_account: "您已被邀請加入帳戶 %{account} 的群組 %{group}。"
         body_course: "您已被邀請加入課程 %{course} 的群組 %{group}。"
@@ -9167,11 +8806,6 @@ zh_Hant:
           teachers: 教師
         subject: 新課程
         title: "%{account} 的新課程"
-      facebook: 
-        body: "新課程**%{course}**已被新增至帳戶**%{account}**。"
-        labels: 
-          teachers: 教師
-        subject: "%{account} 的新課程"
       sms: 
         body: "課程 %{course} 已被新增至帳戶 %{account}"
         details: "在 %{url} 上有更多資訊"
@@ -9194,8 +8828,6 @@ zh_Hant:
           link: 按一下此處加入交談
           subject: "關於 %{discussion_topic} 的新註解：%{course}"
         subject: "關於 %{discussion_topic} 的新註解：%{course}"
-      facebook: 
-        body: "關於 %{discussion_topic} 的新註解，%{course}"
       sms: 
         body: "關於 %{discussion_topic} 的新註解：%{course}"
         details: "在 %{url} 上有更多資訊"
@@ -9216,8 +8848,6 @@ zh_Hant:
         labels: 
           file_included: 檔案已包括
         subject: "新討論 - %{discussion_topic}：%{course}"
-      facebook: 
-        body: "新論壇主題：%{discussion_topic}，%{course}"
       sms: 
         body: "%{course} 的新主題："
         details: "在 %{url} 上有更多資訊"
@@ -9239,10 +8869,6 @@ zh_Hant:
           see_details: 您可以在此處查看詳細資料
         no_time_set: 沒有時間設定
         subject: "新事件：%{event_title}，%{course_name}"
-      facebook: 
-        body: "為 %{course_name} 排程的新事件："
-        from_to_time: "自 %{start_date_time} 至 %{end_date_time}"
-        no_time_set: 沒有時間設定
       sms: 
         from_to_time: "自 %{start_date_time} 至 %{end_date_time}"
         more_info: "在 %{web_address} 上有更多資訊"
@@ -9265,8 +8891,6 @@ zh_Hant:
           subject: "新增的新檔案：%{title}，%{name}"
         subject: "新增的新檔案：%{title}，%{name}"
         view: 可以在此處檢視其。
-      facebook: 
-        body: "新檔案已被新增至課程，%{name}："
       sms: 
         body: "為 %{name} 新增的新檔案："
         link: "在 %{link} 上有更多資訊"
@@ -9283,9 +8907,6 @@ zh_Hant:
           subject: "%{count} 個新檔案已被新增至課程，%{name}："
         link: 可以在此處檢視它們
         subject: "%{count} 個新檔案已被新增至課程，%{name}："
-      facebook: 
-        body: "%{count} 個新檔案已被新增至課程，%{name}："
-        link: 可以在此處檢視它們
       sms: 
         body: "%{count} 個新檔案新增至 %{name}。"
         link: "在 %{link} 上有更多資訊"
@@ -9308,9 +8929,6 @@ zh_Hant:
           title: "新學生群組：%{group_name}"
         subject: "%{course_or_account} 的新學生群組"
         title: "新學生群組：%{group_name}"
-      facebook: 
-        body_account: "已為帳戶 %{account} 建立了新學生組織的名為 %{group_name} 的群組。第一個成員是 %{user}。"
-        body_course: "已為課程 %{course} 建立了新學生組織的名為 %{group_name} 的群組。第一個成員是 %{user}。"
       sms: 
         body_account: "已為帳戶 %{account} 建立了名為『%{group_name}』的新群組。第一個成員是 %{user}。"
         body_course: "已為課程 %{course} 建立了名為 %{group_name} 的新群組。第一個成員是 %{user}。"
@@ -9330,9 +8948,6 @@ zh_Hant:
           link: 按一下此處檢視使用者
           subject: 新使用者
         subject: 新使用者
-        title: "%{account} 的新使用者"
-      facebook: 
-        body: "新使用者**%{user}**剛剛註冊了帳戶**%{account}**。"
         title: "%{account} 的新使用者"
       sms: 
         body: "新使用者 %{user} 註冊了帳戶 %{account}"
@@ -9354,8 +8969,6 @@ zh_Hant:
         html: 
           link_message: 按一下此處以完成您的檢閱
         subject: "為 %{reviewee} 指派的同行檢閱"
-      facebook: 
-        body: "您已受邀參加同行檢閱 %{reviewee}。按照以下連結檢閱他們！"
       sms: 
         more_info: "在 %{url} 上有更多資訊"
       summary: 
@@ -9385,8 +8998,6 @@ zh_Hant:
           subject: "測驗重新評分已完成：%{quiz}，%{context}"
         link_message: 可以在此處檢視測驗：
         subject: "測驗重新評分已完成：%{quiz}，%{context}"
-      facebook: 
-        body: "測驗重新評分已完成：%{title}"
       sms: 
         body_sms: "已在 %{context} 中完成了 %{title} 的測驗重新評分"
         more_info: "在 %{url} 上有更多資訊"
@@ -9417,8 +9028,6 @@ zh_Hant:
           subject: "進行評估的提醒：%{rubric}，%{context}"
         link_message: 可以在此處檢閱評估並提交您的輸入項目：
         subject: "進行評估的提醒：%{rubric}，%{context}"
-      facebook: 
-        body: "您已經被提醒進行評估： %{context} 的*%{title}*。"
       sms: 
         body: "您已經被提醒進行評估：%{rubric}，%{context}。"
         more_info: "在 %{url} 上有更多資訊"
@@ -9436,8 +9045,6 @@ zh_Hant:
           subject: "新評估：%{title}，%{context}"
         link_message: 可以在此處檢閱評估並提交您的輸入項目：
         subject: "新評估：%{title}，%{context}"
-      facebook: 
-        body: "已為 %{context} 建立了新評估："
       sms: 
         body: "已為 %{context} 建立了新評估："
         more_info: "在 %{url} 上有更多資訊"
@@ -9462,9 +9069,6 @@ zh_Hant:
         link_message: 您可以在此處檢閱提交件的詳細資料：
         someone: 某人
         subject: "提交件註解：%{user}，%{assignment}，%{context}"
-      facebook: 
-        body: "*%{author}*剛剛對**%{assignment} 的 %{user}**的提交件進行了新註解。"
-        someone: 某人
       sms: 
         body: "%{author} 對 %{assignment}，%{user}，%{context} 所做的新註解。"
         more_info: "在 %{url} 上有更多資訊"
@@ -9486,9 +9090,6 @@ zh_Hant:
         someone: 某人
         subject: "提交件註解：%{user}，%{assignment}，%{context}"
         submission_comment_link_message: 您可以使用以下連結檢閱提交件的詳細資料，或者可以透過回應此郵件回覆此評論。
-      facebook: 
-        body: "*%{author}*剛剛對**%{assignment} 的 %{user}**的提交件進行了新註解。"
-        someone: 某人
       sms: 
         more_info: "在 %{url} 上有更多資訊"
         sms_body: "%{author} 對 %{assignment}，%{user}，%{context} 所做的新註解。"
@@ -9517,13 +9118,6 @@ zh_Hant:
         score: "分數：%{score}，超出 %{total}"
         score_pending: 待教師檢閱的分數
         subject: "成績已更改：%{assignment}，%{context}"
-      facebook: 
-        body: "關於您的任務*%{title}*的評分已更改。"
-        no_date_set: 沒有設定日期
-        not_applicable: 不適用
-        regraded_date: "已重新評分：%{date}"
-        score: "分數：%{score}，超出 %{total}"
-        score_pending: 待教師檢閱的分數
       sms: 
         body_sms: "您的 %{title}，%{context} 的成績剛剛更改。"
         more_info: "在 %{url} 上有更多資訊"
@@ -9564,13 +9158,6 @@ zh_Hant:
         score: "分數：%{score}，超出 %{total}"
         score_pending_review: 待教師檢閱的分數
         subject: "已評分的任務：%{assignment}，%{context}"
-      facebook: 
-        body: "您的任務*%{title}*已評分。"
-        graded_date: "已評分：%{date}"
-        no_date_set: 沒有設定日期
-        not_applicable: 不適用
-        score: "分數：%{score}，超出 %{total}"
-        score_pending_review: 待教師檢閱的分數
       sms: 
         graded_date: "已評分：%{date}"
         more_info: "在 %{url} 上有更多資訊"
@@ -9603,9 +9190,6 @@ zh_Hant:
         link_message: 您可以在此處檢閱提交件：
         subject: "已提交的測驗：%{quiz}，%{context}"
         submitted_date: "已提交：%{date}"
-      facebook: 
-        body: "%{user_name} 已完成測驗 %{quiz_title}，其需要手動評分。"
-        submitted_date: "已提交：%{date}"
       sms: 
         body_sms: "您的 %{title}，%{context} 的成績剛剛更改。"
         more_info: "在 %{url} 上有更多資訊"
@@ -9632,8 +9216,6 @@ zh_Hant:
         notifications_link: 您可以透過瀏覽以下頁面更改您的通知設定：
         subject: "近期 Canvas 通知"
         weekly_body: "您已註冊以從您的 Canvas 帳戶收到一些通知的每週報告。以下是每週結束時的報告，%{date}："
-      facebook: 
-        new_notifications: "您已收到了在 #Canvas# 中的*%{notification_count} 新通知*。"
       sms: 
         notifications_sms: "在 %{url} 上的 %{notifications_count} 新通知"
       twitter: 
@@ -9653,8 +9235,6 @@ zh_Hant:
           subject: "已更新的 Wiki 頁面：%{title}，%{user}"
         link_message: "您可以在此處檢閱其：%{link}"
         subject: "已更新的 Wiki 頁面：%{title}，%{user}"
-      facebook: 
-        body: "已在 Wiki 上更新了 %{title} 的頁面。"
       sms: 
         more_info: "在 %{url} 上有更多資訊"
         updated_message: "%{title}，%{user} 剛剛更新："
@@ -9672,8 +9252,6 @@ zh_Hant:
           details_link: 按一下此處以查看詳細資料
           subject: "網路會議邀請：%{name}"
         subject: "網路會議邀請：%{name}"
-      facebook: 
-        body: "您已被邀請參加一個網路會議，#%{name}#，*%{title}*。"
       sms: 
         body: "您已被邀請參加一個網路會議，%{name}，%{title}。"
         link_message: "在 %{url} 上有更多資訊"
@@ -9892,7 +9470,6 @@ zh_Hant:
   name_only_5f56718e: 僅名稱
   new_account_role_6e5c4964: 新帳戶角色
   new_course_role_6a7bb75f: 新課程角色
-  new_facebook_message: "您有一個來自 Canvas 的新郵件"
   new_file_135ae520: "[新檔案]"
   new_outcome_7fba8c7d: 新成果
   new_quiz_statistics_desc: 為一門課程啟用新測驗統計資料頁面。
@@ -10118,8 +9695,6 @@ zh_Hant:
         display: 電子郵件地址
       errors: 
         saving_preferences_failed: 糟糕！什麼地方出問題了。請再試一次
-      facebook: 
-        display: Facebook
       push: 
         display: 推播通知
       sms: 
@@ -10414,6 +9989,7 @@ zh_Hant:
   paginated_view: 
     loading_more_results: 載入更多結果
   participations_1823832d: 參與
+  password_8a271b1c: 密碼
   paste_xml_cda3a64e: "粘貼 XML"
   paypal: 
     exception: 很抱歉，發生錯誤，請稍後再試一次。
@@ -10534,32 +10110,6 @@ zh_Hant:
       primary_pad: "Primary Pad"
       sketchpad: SketchPad
       typewithme: TypeWith.me
-    facebook: 
-      description: "Canvas Facebook 應用程式"
-      name: Facebook
-    facebook_settings: 
-      description: |-
-          您將需要建立[在 facebook.com 上的新應用程式](%{facebook_url})，然後新增「應用程式於 Facebook 之上」，作為一個平台。
-          設定以下設定選項，以確保您的 Facebook 應用程式正常工作：
-          
-          * **設定 -- 在 Facebook 上的應用程式 -- Canvas 頁面：**請記下您所做選擇(apps.facebook.com 之後的部分)，並在下面的表格中輸入
-           * **設定 -- 在 Facebook 上的應用程式 -- Canvas URL：**設定至%{canvas_url}
-          *儲存您的應用程式之後，請記下該應用程式 ID、用戶端權杖和應用程式密碼
-      domain_name: 網域
-      headers: 
-        domain_settings: 網域設定
-      hints: 
-        api_key: 也稱為用戶端權杖
-        canvas_domain: "這是在『Canvas URL』上指定的網域"
-        canvas_name: "這是在『Canvas 頁面』上指定的路徑"
-        disable_ssl: 僅用於本機測試
-      labels: 
-        api_key: "API 金鑰"
-        app_id: "應用程式 ID"
-        canvas_domain: "Canvas 網域"
-        canvas_name: "Canvas 名稱"
-        disable_ssl: "停用 SSL"
-        secret: 應用程式密碼
     google_docs: 
       description: "Google Docs 文件共用"
       name: "Google Docs"
@@ -10803,7 +10353,6 @@ zh_Hant:
     labels: 
       requirements_must_be_completed: 以下要求需要在此頁面將被解除鎖定之前完成
   presentation_2d9387ca: 簡報
-  press_spacebar_for_more_details_on_this_outcome_f6713a42: 按下空白鍵，了解關於此成果的更多詳情
   privacy_290109ea: 隱私權
   product_name: Canvas
   profile: 
@@ -10854,8 +10403,6 @@ zh_Hant:
       profile_update_failed: 登入無法更新
       regenerating_token_failed: 重新生成權杖失敗
       registration_failed: 重新生成失敗。檢查使用者名稱和密碼，然後再試一次。
-    facebook_select: 
-      facebook: Facebook
     failed_resending: 請求失敗。再試一次。
     links: 
       resend_confirmation: 重新傳送確認函
@@ -10880,7 +10427,6 @@ zh_Hant:
         generate_token: 生成權杖
         new_access_token: 新存取權杖
         regenerate_token: 重新生成權杖
-        register_facebook_account: "註冊您的 Facebook 帳戶"
         register_linkedin_account: "註冊您的 LinkedIn 帳戶"
         save_login: 儲存登入
         save_skype_name: "儲存 Skype 名稱"
@@ -10891,7 +10437,6 @@ zh_Hant:
       delicious_description: "Delicious 是一種工具，可以讓您儲存並與他人共用您的書簽。Canvas 的多種格式的內容編輯器可以讓您搜尋您的 Delicious 標籤，以便很容易地從 Canvas 內部連結到您覺得有用的其他資源。"
       diigo_description: "Diigo 是专门针对科研和教育的社会书签工具。Canvas 的多種格式的內容編輯器可以讓您搜尋您的 Diigo 標籤，以便很容易地從 Canvas 內部連結到您覺得有用的其他資源。"
       error_loading_token_details: 載入權杖詳細資料時發生錯誤
-      facebook_description: "如果您有一個 Facebook 帳戶，則可以安裝 Canvas 應用程式和接收您的個人檔案中的課程通知。您可以指定您想要的通知類型，以及您希望傳送它們的頻率。"
       feature_options: 功能選項
       full_token_warning: "**現在就複製此權杖**。一旦您離開這個頁面，將無法再抓取完整權杖，您就必須重新生成一個以獲得一個新值。"
       generate_access_token_description: "存取權杖允許第三方應用程式代表您存取 Canvas 資源。這些權杖通常是根據需要自動為應用程式建立的，但如果[您正在開發一個新的或有限的專案](%{documentation_url})，您可以從此處生成權杖。"
@@ -10902,7 +10447,6 @@ zh_Hant:
         dates: 日期
         delicious_login: "Delicious 登入"
         diigo_login: "Diigo 登入"
-        facebook_access: "Facebook 存取"
         generate_access_token: 生成存取權杖
         google_docs_access: "Google Docs 存取"
         google_drive_access: "Google Drive 存取"
@@ -10964,7 +10508,6 @@ zh_Hant:
         diigo: Diigo
         disable_mfa: 停用多因素驗證
         edit_settings: 編輯設定
-        facebook: Facebook
         google_docs: "Google Docs"
         google_drive: "Google Drive"
         linkedin: LinkedIn
@@ -10973,7 +10516,6 @@ zh_Hant:
         skype: Skype
         twitter: Twitter
         upload_new_image: 上傳新影像
-        view_facebook_app: "檢視 Facebook 應用程式"
         view_your_profile: 檢視您的個人檔案
         yo: Yo
       loading_token_details: 正在載入權杖詳細資料...
@@ -10987,7 +10529,6 @@ zh_Hant:
       subscribe_to_emails: "我想收到來自的 Instructure 資訊、新聞和提示"
       titles: 
         access_token_details: 存取權杖詳細資料
-        authorize_facebook: "授權 Facebook"
         authorize_google_docs: "授權 Google Docs"
         authorize_google_drive: "授權 Google Drive"
         authorize_linkedin: "授權 LinkedIn"
@@ -11385,6 +10926,7 @@ zh_Hant:
       regrade_options: 重新評分選項*(針對已經回答了此問題的學生)：*
       some_scores_reduced: 僅為正確答案獎勵積分(*部分學生的分數可能會減少*)
       update_question_without_regrading: 更新問題，而不重新評分
+  quiz_e0dcce8f: 測驗
   quiz_log_auditing: 
     buttons: 
       reload_events: 重新載入
@@ -13161,9 +12703,7 @@ zh_Hant:
         next: 下一個
       getting_started: "您正在報讀**%{course}**。"
       labels: 
-        email: 電子郵件
         password: 密碼
-      log_in: 請輸入您的電子郵件地址和密碼：
     authenticate_or_register: 
       buttons: 
         enroll_in_course: 報讀課程
@@ -13616,7 +13156,6 @@ zh_Hant:
       labels: 
         custom_rating: 評估學生的時候我會寫下自由形式的註解
         grading_rubric: 使用此評估準則進行任務評分
-        title: 標題
         total_points: 總點數
         totallying_rubric: 隱藏評估結果的總分數
       links: 
@@ -13636,6 +13175,7 @@ zh_Hant:
       out_of: "%{points} *超出 %{total}*"
       rubric: 題目
       rubric_title: 標題
+      title: 標題：
       titles: 
         find_existing_rubric: 尋找現有題目
     rubric_criterion: 
@@ -13684,6 +13224,7 @@ zh_Hant:
       titles: 
         find_a_rubric: 尋找評估準則
     rubric_forms: 
+      criteria_description_label: 標準說明
       points: "%{points} 點"
     rubric_summary: 
       buttons: 
@@ -14578,6 +14119,7 @@ zh_Hant:
     people: 人員
     view_in_separate_window: 在單獨的視窗中檢視
   to_35c6baa2: 至
+  to_51406be9: 至
   to_c4c44f4b: 至
   to_minscore_43e5452e: "至 %{minScore}%"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "要檢視任務，請確保 *議程* 檢視處於活動狀態。"
@@ -14630,6 +14172,7 @@ zh_Hant:
   updated_group_group_name_727b1d98: "已更新群組 %{group_name}"
   upload_button: 
     upload: " "
+  upload_data_dc4fa4cb: 上傳資料
   upload_drop_zone: 
     drop_to_upload: 拖放項目，開始上傳
   upper_limit_of_range_c454a8f2: 範圍上限
@@ -14768,13 +14311,13 @@ zh_Hant:
     descriptions: 
       delicious: "Delicious 是一個協作性連結共用工具。您可以在 Internet 上標記任何頁面以供日後參考。您也可以連結到其他使用者的 Delicious 帳戶，以共用相似興趣的連結。"
       diigo: "Diigo 是一個協作性連結共用工具。您可以在 Internet 上標記任何頁面以供日後參考。您也可以連結到其他使用者的 Diigo 帳戶，以共用相似興趣的連結。"
-      facebook: "列出您的 Facebook 的个人檔案将會让您更轻松地与您班级和群組中的朋友聯繫。"
       google_docs: "學生可以使用 Google Docs 進行群組項目的協作。Google Docs 允許在文件、試算表和演示文稿中的即時協作編輯。"
       google_drive: "學生可以使用 Google Drive 在群組專案上協作。Google Drive 可實現文件、試算表和簡報的實時協作編輯。"
       linked_in: "LinkedIn 是商業網絡化的資源。您在校期間建立的許多關係在您進入職場之後也是有益。"
       skype: "Skype 是用於線上音訊和視訊通話的免費工具。"
       twitter: "Twitter 是課外通訊的很好的資源。"
       yo: "Yo 是一款單觸式、零字符通訊工具。"
+  username_47bb5bbe: 使用者名稱
   users: 
     admin_merge: 
       buttons: 
@@ -14842,8 +14385,6 @@ zh_Hant:
     errors: 
       no_teacher_courses: 在此教師和學生之間沒有共用的課程
       user_not_teacher: 該使用者不是這門課程的教師
-    facebook_added: "Facebook 帳戶已成功新增！"
-    facebook_fail: "Facebook 授權失敗。"
     google_docs_added: "Google Docs 存取已授權！"
     google_docs_fail: "Google Docs 授權失敗。請再試一次"
     google_drive_added: "已成功添加 Google Drive 帳戶！"
@@ -15069,6 +14610,7 @@ zh_Hant:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE，WebCT 6+ 課程"
   webct_name: "Blackboard Vista/CE (WebCT)"
+  what_should_the_csv_file_look_like_985a59ac: "CSV 檔案應該是什麼樣的？"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: 當人們訪問課程時，這就是他們將看到的頁面。您可以將其設定為顯示一個活動流、課程模組清單、一個課程教學大綱或一個您描寫您自己的自訂頁面。預設顯示為課程活動流。
   where_would_you_like_to_move_title_fabd6e8f: "您要將 %{title} 移至何處？"
   widget: 
@@ -15186,6 +14728,7 @@ zh_Hant:
       title_characters: 標題必須至少包含一個字母或數字
       title_too_long: "標題不能超過 %{max_characters} 個字元"
     unknown_user_name: 未知
+  wiki_page_6c11ee20: "Wiki 頁面"
   wiki_pages: 
     edit: 
       page_header_title: "編輯 %{page_name}"
