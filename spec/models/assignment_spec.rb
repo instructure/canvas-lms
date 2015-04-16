@@ -143,11 +143,11 @@ describe Assignment do
     end
 
     it 'raises an error if there is no student' do
-      expect { @assignment.grade_student(nil) }.to raise_error(StandardError, 'Student is required')
+      expect { @assignment.grade_student(nil) }.to raise_error(Assignment::GradeError, 'Student is required')
     end
 
     it 'will not continue if the student does not belong here' do
-      expect { @assignment.grade_student(User.new) }.to raise_error(StandardError, 'Student must be enrolled in the course as a student to be graded')
+      expect { @assignment.grade_student(User.new) }.to raise_error(Assignment::GradeError, 'Student must be enrolled in the course as a student to be graded')
     end
   end
 
@@ -489,6 +489,31 @@ describe Assignment do
       # there should only be one version, even though the grade changed
       expect(s.versions.length).to eql(1)
       expect(s2[0].state).to eql(:graded)
+    end
+
+    context "excused assignments" do
+      it "marks assignments excused" do
+        submission, _ = @assignment.grade_student(@student, excuse: 1)
+        expect(submission).to be_excused
+      end
+
+      it "doesn't mark everyone in the group excused" do
+        student1, student2 = n_students_in_course(2)
+        gc = @course.group_categories.create! name: "asdf"
+        group = gc.groups.create! name: "zxcv", context: @course
+        [student1, student2].each { |u|
+          group.group_memberships.create! user: u, workflow_state: "accepted"
+        }
+        @assignment.update_attribute :group_category, gc
+        student_in_course active_all: true
+        sub1, sub2 = @assignment.grade_student(student1,
+                                               excuse: true,
+                                               comment: "...",
+                                               group_comment: true)
+        expect(sub1).to be_excused
+        expect(sub1.user).to eq student1
+        expect(sub2).to_not be_excused
+      end
     end
   end
 

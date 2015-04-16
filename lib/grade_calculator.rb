@@ -56,7 +56,7 @@ class GradeCalculator
         except(:order, :select).
         for_user(@user_ids).
         where(assignment_id: @assignments.map(&:id)).
-        select("submissions.id, user_id, assignment_id, score")
+        select("submissions.id, user_id, assignment_id, score, excused")
     submissions_by_user = @submissions.group_by(&:user_id)
 
     scores = []
@@ -147,13 +147,16 @@ class GradeCalculator
         s = nil if @ignore_muted && a.muted?
 
         {
-          :assignment => a,
-          :submission => s,
-          :score => s && s.score,
-          :total => a.points_possible || 0,
+          assignment: a,
+          submission: s,
+          score: s && s.score,
+          total: a.points_possible || 0,
+          excused: s && s.excused?,
         }
       end
+
       group_submissions.reject! { |s| s[:score].nil? } if ignore_ungraded
+      group_submissions.reject! { |s| s[:excused] }
       group_submissions.each { |s| s[:score] ||= 0 }
 
       logged_submissions = group_submissions.map { |s| loggable_submission(s) }

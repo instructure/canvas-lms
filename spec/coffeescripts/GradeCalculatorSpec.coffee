@@ -266,3 +266,14 @@ define ['compiled/grade_calculator', 'underscore'], (GradeCalculator, _) ->
 
     result = GradeCalculator.create_group_sum @group, @submissions, true
     equal result.submissions.length, 1
+
+  test "excused assignments", ->
+    @submissions = []
+    @group.rules = {}
+    @setup_grades @group, [[10, 10], [0, 90]]
+    result = GradeCalculator.calculate @submissions, [@group]
+    assertGrade result, 'final', 10, 100
+
+    @submissions[1].excused = 1
+    result = GradeCalculator.calculate @submissions, [@group]
+    assertGrade result, 'final', 10, 10

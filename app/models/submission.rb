@@ -246,7 +246,7 @@ class Submission < ActiveRecord::Base
   end
 
   def update_final_score
-    if score_changed?
+    if score_changed? || excused_changed?
       if skip_grade_calc
         Rails.logger.info "GRADES: NOT recomputing scores for submission #{global_id} because skip_grade_calc was set"
       else
@@ -1030,8 +1030,15 @@ class Submission < ActiveRecord::Base
     end
     alias_method :missing, :missing?
 
+    # QUESTIONS ABOUT EXCUSED:
+    #   * what happens for group assignments? excuse individually
+    #     * can't excuse for group assignments in speedgrader 1.0
+    #     * TODO make sure Assignment#representatives is updated accordingly
+    #
+    # QUESTIONS FOR ME:
+    #   * are we messing up graded / not graded counts???
     def graded?
-      !!self.score && self.workflow_state == 'graded'
+      excused? || (!!score && workflow_state == 'graded')
     end
   end
   include Tardiness
@@ -1127,6 +1134,16 @@ class Submission < ActiveRecord::Base
     self.save!
   end
 
+  def excused=(excused)
+    if excused
+      self[:excused] = true
+      self.grade = nil
+      self.score = nil
+    else
+      self[:excused] = false
+    end
+  end
+
   def comments_for(user)
     grants_right?(user, :read_grade)? submission_comments : visible_submission_comments
   end
@@ -1145,7 +1162,7 @@ class Submission < ActiveRecord::Base
     return if assignment.deleted? || assignment.muted?
     return unless self.user_id
 
-    if score_changed? || grade_changed?
+    if score_changed? || grade_changed? || excused_changed?
       ContentParticipation.create_or_update({
         :content => self,
         :user => self.user,

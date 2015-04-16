@@ -810,6 +810,24 @@ describe Submission do
     end
   end
 
+  describe "graded?" do
+    it "is false before graded" do
+      s, _ = @assignment.find_or_create_submission(@user)
+      expect(s.graded?).to eql false
+    end
+
+    it "is true for graded assignments" do
+      s, _ = @assignment.grade_student(@user, grade: 1)
+      expect(s.graded?).to eql true
+    end
+
+    it "is also true for excused assignments" do
+      s, _ = @assignment.find_or_create_submission(@user)
+      s.excused = true
+      expect(s.graded?).to eql true
+    end
+  end
+
   describe "autograded" do
     let(:submission) { Submission.new }
 

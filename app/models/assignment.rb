@@ -855,7 +855,8 @@ class Assignment < ActiveRecord::Base
       (submittable_type? || submission_types == "discussion_topic") &&
       context.grants_right?(user, session, :participate_as_student) &&
       !locked_for?(user) &&
-      visible_to_user?(user)
+      visible_to_user?(user) &&
+      !excused_for?(user)
     }
     can :submit and can :attach_submission_comment_files
 
@@ -976,6 +977,8 @@ class Assignment < ActiveRecord::Base
     group_comment = Canvas::Plugin.value_to_boolean(opts.delete(:group_comment))
     group, students = group_students(original_student)
     grader = opts.delete :grader
+    grade = opts.delete :grade
+    score = opts.delete :score
     comment = {
       :comment => (opts.delete :comment),
       :attachments => (opts.delete :comment_attachments),
@@ -986,22 +989,36 @@ class Assignment < ActiveRecord::Base
     }
     comment[:group_comment_id] = CanvasSlug.generate_securish_uuid if group_comment && group
     submissions = []
+
+    if opts.key? :excuse
+      opts[:excused] = Canvas::Plugin.value_to_boolean(opts.delete(:excuse))
+    end
+
+    grade_group_students = !grade_group_students_individually && !opts.key?(:excused)
+
     find_or_create_submissions(students) do |submission|
       submission_updated = false
       submission.skip_grade_calc = opts[:skip_grade_calc]
       student = submission.user
-      if student == original_student || !grade_group_students_individually
+      if student == original_student || grade_group_students
         previously_graded = submission.grade.present?
         next if previously_graded && dont_overwrite_grade
+
+        did_grade = false
         submission.attributes = opts
         submission.assignment_id = self.id
         submission.user_id = student.id
         submission.grader_id = grader.try(:id)
-        if !opts[:grade] || opts[:grade] == ""
+
+        if grade.present? || score.present?
+          submission.grade = grade
+          submission.score = score
+          submission.excused = false
+        else
           submission.score = nil
           submission.grade = nil
         end
-        did_grade = false
+
         if submission.grade
           did_grade = true
           submission.score = self.grade_to_score(submission.grade)
@@ -1941,6 +1958,11 @@ class Assignment < ActiveRecord::Base
   def unpublish
     self.workflow_state = 'unpublished'
     self.save
+  end
+
+  def excused_for?(user)
+    s = submissions.where(user_id: user.id).first_or_initialize
+    s.excused?
   end
 
   # simply versioned models are always marked new_record, but for our purposes

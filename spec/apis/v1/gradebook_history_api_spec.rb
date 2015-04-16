@@ -142,19 +142,6 @@ describe GradebookHistoryApiController, type: :request do
       @submission4 = @assignment2.submit_homework(@student1)
     end
 
-    it 'should return submission version API objects' do
-      @submission4.update_attributes!(:graded_at => 24.hours.ago, :grader_id => @other_grader.id, :score => 70)
-
-      json = api_call_as_user(@teacher, :get, "/api/v1/courses/#{@course.id}/gradebook_history/feed.json", {
-        :controller => 'gradebook_history_api',
-        :action => 'feed',
-        :format => 'json',
-        :course_id => @course.id.to_s
-      }).first
-
-      expect(json.keys.sort).to eq ["assignment_id", "assignment_name", "attempt", "body", "current_grade", "current_graded_at", "current_grader", "grade", "grade_matches_current_submission", "graded_at", "grader", "grader_id", "id", "late", "preview_url", "score", "submission_type", "submitted_at", "url", "user_id", "user_name", "workflow_state"]
-    end
-
     it 'should return all applicable versions' do
       @submission1.update_attributes!(:graded_at => Time.zone.now, :grader_id => @grader.id, :score => 100)
       @submission2.update_attributes!(:graded_at => Time.zone.now, :grader_id => @super_grader.id, :score => 90)
