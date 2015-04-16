@@ -68,7 +68,6 @@ en-GB:
       avatars: "User avatars"
       delicious: Delicious
       diigo: Diigo
-      facebook: Facebook
       google_docs: "Google Docs"
       google_docs_preview: "Google Docs preview"
       google_drive: "Google Drive"
@@ -84,8 +83,6 @@ en-GB:
       invalid_discovery_url: "The discovery URL is not valid"
     feedback_coach: "Ask the Community"
     feedback_coach_sub: "Get help from a Canvas expert"
-    feedback_feature_request: "Request a feature"
-    feedback_feature_request_canvas_net: "Request a feature in Canvas Network"
     feedback_feature_request_sub: "Have an idea to improve Canvas?"
     manually_created_courses: "Manually-created courses"
     root_account_cant_have_sis_id: "SIS IDs cannot be set on root accounts"
@@ -237,7 +234,7 @@ en-GB:
         login_handle_name: "Login label"
         position: Position
         requested_authn_context: "Authentication context"
-        unkown_user_url: "Unknown User Url"
+        unknown_user_url: "Unknown User Url"
       log_in_url: "Log on URL"
       log_out_url: "Log out URL"
       login_attribute: "Login attribute"
@@ -252,7 +249,7 @@ en-GB:
       save_button: "Save authentication settings"
       start_debugging: "Start debugging"
       stop_debugging: "Stop debugging"
-      unkown_user_url_description: "The url to redirect to when an authenticated user is not found in Canvas."
+      unknown_user_url_description: "The url to redirect to when an authenticated user is not found in Canvas."
     saml_testing: 
       auth_request_to_idp: "AuthnRequest sent to IdP"
       auth_response_from_idp: "AuthnResponse from IdP"
@@ -946,6 +943,7 @@ en-GB:
         outgoing_email_default_name_option_default: "Default Canvas setting"
         prevent_course_renaming_by_teachers: "Don't let teachers rename their courses"
         restrict_quiz_questions: "Restrict students from viewing quiz questions after course end date"
+        restrict_student_future_view: "Restrict students from viewing courses before start date"
         role_id: "Add more"
         self_enrollment: "Allow self-enrolment"
         self_registration: "Self registration"
@@ -1537,6 +1535,7 @@ en-GB:
     titles: 
       gpa_scale_explainer: "What is GPA Scale Grading?"
       grading_scheme_info: "View/edit grading scheme"
+  assignment_976578a8: Assignment
   assignment_comments_e43ed898: "Assignment comments"
   assignment_details: 
     no_graded_submissions: "No graded submissions"
@@ -2165,6 +2164,7 @@ en-GB:
     upload_error_timeout: "The request timed out: %{url}"
     upload_error_too_many_redirects: "Too many redirects"
     upload_error_unexpected: "An unknown error occurred downloading from %{url}"
+  attachment_deffe5a9: Attachment
   attendance: 
     default_attendance_title: "Attendance %{date}"
     errors: 
@@ -2443,7 +2443,6 @@ en-GB:
       create_event: "Create new event"
       done_go_back_to_list: "Done. Go back to list"
       links: 
-        accessibility_warning: "Warning: This view is not accessible to screenreaders. Use the Agenda View instead."
         calendar_agenda: Agenda
         calendar_month: Month
         calendar_scheduler: Scheduler
@@ -2638,25 +2637,9 @@ en-GB:
     crumbs: 
       new: "New calendar event"
     full_calendar_event: 
-      buttons: 
-        create: "Create event"
-        update: "Update event"
-      labels: 
-        address: Address
-        date: Date
-        event_description: "Event Description"
-        from: From
-        location: Location
-        title: Title
       no_content: "No content"
-      timespan: "%{start_time} *to* %{end_time}"
     new: 
-      links: 
-        back_to_calendar: "Back to calendar"
-        delete: "Delete the event"
-        edit: "Edit calendar event"
       page_title: "New calendar event"
-    no_content: "No content"
     notices: 
       created: "Event was successfully created."
       deleted: "This event has been deleted"
@@ -2676,43 +2659,6 @@ en-GB:
     invalid_date_or_time: "Invalid date or invalid datetime for %{attr}"
   calendars: 
     assignment_details: "Assignment details"
-    calendar: 
-      alts: 
-        next: Next
-        previous: Previous
-      calendars_count: 
-        one: "1 calendar, %{open_count} open"
-        other: "%{count} calendars, %{open_count} open"
-      feed_title: "Calendar feed"
-      instructions: 
-        ics_link: "Copy the link below and paste it into any calendar app that takes iCal feeds (Google Calendar, iCal, Outlook, etc.)"
-      labels: 
-        calendar: Calendar
-        date: Date
-        details: Details
-        due: Due
-        from: From
-        group: Group
-        title: Title
-        undated_events: "Undated events"
-      links: 
-        add_event: "Add event"
-        delete: Delete
-        edit: Edit
-        feed: "click here to view the feed"
-        full_details: "Full details"
-        how_do_i: "How do I...?"
-        jump_to_calendar: "Jump to calendar"
-        more_options: "More options"
-        show_undated_events: "show %{count} undated events"
-      messages: 
-        max_visible: "You can show up to %{count} calendars at a time"
-      options: 
-        new_group: "[ New group ]"
-      tabs: 
-        assignment: Assignment
-        event: Event
-      timespan: "%{start_time} *to* %{end_time}"
     default_title: event
     event: 
       due: due
@@ -2736,36 +2682,6 @@ en-GB:
     prompts: 
       delete_assignment: "Are you sure you want to delete this assignment?"
       delete_event: "Are you sure you want to delete this event?"
-    show: 
-      crumbs: 
-        my_calendar: "My calendar"
-      feed_title: "Course calendar Atom feed"
-      keycode_descriptions: 
-        delete: "Delete current event"
-        edit: "Edit current event"
-        next_day: "Next calendar day"
-        next_event: "Next calendar day/event"
-        next_week: "Next week"
-        open: "Open current event"
-        previous_day: "Previous calendar day"
-        previous_event: "Previous calendar day/event"
-        previous_week: "Previous week"
-        refresh: "Refresh calendar"
-      keycode_descriptoins: 
-        new: "New event for current day"
-      keycodes: 
-        delete: d
-        edit: e
-        new: "n"
-        next_day: ctrl+right
-        next_event: j
-        next_week: ctrl+down
-        open: o
-        previous_day: ctrl+left
-        previous_event: k
-        previous_week: ctrl+up
-        refresh: r
-      page_title: Calendar
     show2: 
       calendar_feed: "Calendar feed"
       calendar_feed_instructions: "Copy the link below and paste it into any calendar app that takes iCal feeds (Google Calendar, iCal, Outlook, etc.)"
@@ -2784,7 +2700,6 @@ en-GB:
       add_new_event: "Add new event"
       edit_assignment: "Edit assignment"
       edit_event: "Edit event"
-    use_new_calendar: "Try out the new calendar"
     wizard_box: 
       descriptions: 
         assignment: "Now click the \"Assignment\" tab in the dialog to create an assignment instead of a calendar event."
@@ -2841,6 +2756,7 @@ en-GB:
     titles: 
       update_assignment_points: "Change points possible to match rubric?"
   choose_a_course_home_page_8059c7b: "Choose a course home page"
+  choose_a_csv_file_to_upload_9644480c: "Choose a CSV file to upload:"
   choose_usage_rights_33683854: "Choose usage rights..."
   clear_file_name_text_field_fce73840: "Clear file name text field"
   click_here_on_the_calendar_link_c9965631: "Click here on the *Calendar* link"
@@ -2958,7 +2874,6 @@ en-GB:
   communication_5255723c: Communication
   communication_channel: 
     body: "Your Canvas verification code is %{verification_code}"
-    default_facebook_account: "Facebook account"
     default_twitter_handle: "Twitter handle"
     default_yo_name: "Yo Name"
   communication_channels: 
@@ -3418,7 +3333,6 @@ en-GB:
         user_services: "Registered web services"
       help: 
         list_services: "You haven't enabled your list of registered services. Enabling this list will let fellow course and group members more easily link up with you outside of class."
-        services: "You haven't linked your user profile to any external services. You can link your Canvas account to services like Facebook and Twitter. This will make it easier for fellow course and group members to link up with you outside of class."
       labels: 
         public_list_services: "Let fellow course/group members see which services I've linked to my profile"
         user_privileges: Privileges
@@ -3457,7 +3371,6 @@ en-GB:
         registered_services: "Registered services"
         service_types: "Service types"
       help: 
-        no_services: "You haven't linked your user profile to any external services. You can link your Canvas account to services like Facebook and Twitter."
         services_private: "You haven't enabled your list of registered services. Enabling this list will let fellow course and group members see which services you have linked to your Canvas account."
         user_services: "If other members choose, they can let you see which outside services they've linked to their Canvas account. This can make it easier to coordinate group projects and also link up outside of class."
       labels: 
@@ -3766,12 +3679,9 @@ en-GB:
     all_courses: "All courses"
     all_in_context: "All in %{context}"
     archive: Archive
-    archive_conversation: "Archive conversation"
     autocomplete_result: 
       group_people: "People: %{people}"
       no_results: "No results"
-    autocomplete_token: 
-      remove_recipient: "Remove recipient"
     back: Back
     cannot_add_to_private: "You cannot add participants to a private conversation."
     cannot_be_empty: "Message cannot be blank"
@@ -3815,12 +3725,10 @@ en-GB:
     hide: Hide
     index_new: 
       archive: Archive
-      archive_conversation: "Archive conversation"
       archived: Archived
       clear_search: "Clear search results"
       compose_new_message: "Compose a new message"
       delete: Delete
-      delete_conversation: "Delete conversation"
       filter_messages_by_course: "Filter messages by course"
       filter_messages_by_type: "Filter messages by type"
       forward: Forward
@@ -3873,7 +3781,6 @@ en-GB:
         add_to_faculty_journal: "Add as a faculty journal entry"
         attachments: Attachments
         course: Course
-        course_required: "You must select a Course before entering recipients."
         select_course: "Select a course"
         subject: Subject
         to: To
@@ -3921,7 +3828,6 @@ en-GB:
     titles: 
       rss_feed: "Conversations feed"
     unarchive: Unarchive
-    unarchive_conversation: "Unarchive conversation"
     unstar: Unstar
     unstar_conversation: "Unstar conversation"
   copyright_holder_66ee111: "Copyright holder:"
@@ -4200,14 +4106,8 @@ en-GB:
       headings: 
         grade: "Grade %{assignment}"
         to_do: "To do"
-      images: 
-        alt: 
-          ignore: ignore
       links: 
         show_more: "%{count} more..."
-        title: 
-          ignore: "Ignore this assignment"
-          ignore_review: "Ignore this review"
       need_grading_count: 
         one: "1 needs grading"
         other: "%{count} need grading"
@@ -4225,8 +4125,6 @@ en-GB:
         conclude_course: "Conclude course"
         delete_course: "Delete course"
       details: 
-        conclude_alt_text: "If you would like to retain the ability to change grades while limiting student access to the course, please utilise the course dates settings. You can learn about course date settings in our guides *here*"
-        confirm_conclude: "Warning: Concluding the course will prevent you from modifying grades and accessing course content."
         confirm_delete: "Are you sure you want to delete this course? Once it is deleted, students and teachers will no longer have access to it. If you just want to remove it from the course drop-down menu, you should *conclude the course instead*."
         confirm_delete_addendum: "If you do not have permission to conclude the course, you can *change the course end date*, or ask your administrator to conclude the course."
       headings: 
@@ -5091,6 +4989,7 @@ en-GB:
       calculated without those points.
   disable_a5c05db3: Disable
   disabled_18c33a73: (disabled)
+  discussion_6719c51d: Discussion
   discussion_entries: 
     created_entry_notice: "Entry was successfully created."
     deleted_entry_notice: "That entry has been deleted"
@@ -5107,6 +5006,7 @@ en-GB:
     atom_no_author: "No author"
     default_title: "No title"
     empty_message: "No message"
+  discussion_topic_dc85ad4c: "Discussion topic"
   discussion_topics: 
     assignment_details: 
       available_from: "Available from"
@@ -5167,7 +5067,6 @@ en-GB:
         published: Published
       delay_posting: "Delay posting"
       enable_podcast_feed: "Enable podcast feed"
-      include_replies_in_podcast_feed: "Include Replies in podcast feed"
       only_visible_to_overrides_note: "Note: This discussion is *only* visible to the section(s) specified below:"
       options: Options
       page_header_title: "New discussion"
@@ -5214,7 +5113,6 @@ en-GB:
       loading: Loading...
       lock_for_comments: "Lock for comments"
       make_sure_all_search_terms_are_spelled_correctly: "Make sure all search terms are spelled correctly."
-      new_discussion: "*Start a* discussion"
       rss_feed: "RSS feed"
       start_one_now: "Start one now"
       suggestions: "Suggestions:"
@@ -5280,7 +5178,7 @@ en-GB:
       reply_to_topic: "Reply to topic"
       retrieved_from_feed: "Retrieved from %{feed}"
       show_rubric: "Show rubric"
-      speed_grader: "Speed grader"
+      speed_grader: SpeedGrader™
       topic: Topic
       topic_podcast_feed_link: "Topic podcast feed"
       topic_subscribe: Subscribe
@@ -5407,7 +5305,6 @@ en-GB:
   due_datetime_f5a81b81: "Due: %{dateTime}"
   due_multiple_dates_cc0ee3f5: "Due: multiple dates"
   due_on_date_aa4725cd: "Due on date:"
-  due_on_date_ffc98ebc: "Due on date"
   e_mail_only_2cc5e513: "E-Mail only"
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Each bar is one assignment. The *thin vertical whisker* extends from the lowest score for any student in the course to the highest score. The **thicker bar** extends from the 25th percentile to the 75th, with the ***median marked***."
   each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "Each bar is one assignment. The thin whisker extends from the lowest score for any student in the course to the highest score. The thicker bar extends from the 25th percentile to the 75th, with the median marked. The student's score is marked with a dot."
@@ -5429,6 +5326,7 @@ en-GB:
     buttons: 
       create_rubric: "Create rubric"
       update_rubric: "Update rubric"
+    change: Change
     discussion_points_possible: 
       one: "%{count} point possible"
       other: "%{count} points possible"
@@ -5897,6 +5795,7 @@ en-GB:
       posts_added: "Posts added"
       remove_feed: "Remove %{display_name}"
   external_integration_keys_8b4f4548: "External Integration Keys"
+  external_tool_c5a6410a: "External tool"
   external_tools: 
     account_navigation_configured: "Account navigation configured"
     app_full_view: 
@@ -6004,53 +5903,6 @@ en-GB:
     submit: Submit
     user_navigation_configured: "User navigation configured"
     wiki_page_menu_configured: "Wiki page menu configured"
-  facebook: 
-    authorization_required: "Only authorised users can access that page"
-    authorization_success: "Authorisation successful!  Canvas and Facebook are now friends."
-    deleted: Deleted
-    index: 
-      all_set: "You're all set up!"
-      bookmark_notice: "You can see the number of new Canvas notifications from your Facebook home page if you bookmark this application."
-      canvas_messages: "Canvas messages"
-      configure_notification_preferences_notice: "After you *configure your notification preferences* you should start to see notifications show up here letting you know about things happening in your Canvas account."
-      installation_about: "To install the Canvas Facebook app, go to your profile page in Canvas and click the Facebook button to connect your account to Facebook."
-      learn_more: "Learn more at instructure.com"
-      more_information: "More information at %{domain_list}"
-      no_messages_notice: "As things happen in the course you'll start seeing notifications show up here letting you know about things happening in your Canvas account."
-      notification_about: "The Canvas Facebook app is here to give you easier access to the interactions going on inside your courses. You can set it to send you notifications when your assignments are graded, when due dates change, etc. Your private data will still stay private at Canvas."
-      notification_settings: "Notification settings"
-      notifications_notice: "Below you can see a list of your most recent notifications from Canvas. You can see the number of new Canvas notifications from your Facebook home page if you bookmark this application."
-      welcome: "Welcome back, %{name}!"
-      welcome_message: "Welcome to a new breed of online learning software, courtesy of Instructure. We're here to make it easy for you to use the web to improve learning. Our interface is simple, clean and open, and we work with the tools you and your students are already using -- tools like Facebook -- to provide a more open, collaborative learning experience. We roll it all up into one powerful, open package that does more than just tracks assignments. It encourages interaction and fosters learning."
-      welcome_title: "Welcome to Instructure Canvas"
-    index_disabled: 
-      disabled_notice: "This Canvas site is not configured to communicate with Facebook."
-      get_help: "Get help at support.instructure.com"
-      instructure_canvas: "Instructure Canvas"
-    invalid_signature: "Invalid Facebook signature"
-    message: 
-      hide: Hide
-    notification_policies: 
-      alerts: Alerts
-      cancel: Cancel
-      change_settings: "Change settings"
-      daily: Daily
-      labels: 
-        alerts_for_category: "%{category_name} alerts"
-      loading: loading...
-      never: Never
-      notification_type: "Notification type"
-      right_away: "Right away"
-      send_to_facebook: "Send to Facebook?"
-      update_preferences: "Update preferences"
-      updating_preferences: "Updating preferences..."
-      weekly: Weekly
-    settings: 
-      back_to_messages: "Back to messages"
-      link_needed: "Before you can configure the Canvas Facebook App you need to link it to your Canvas login. Please click \"Welcome\" for more information."
-      notifications_config_notice: "Notifications from Canvas can automatically be sent over to your Facebook account. Below you'll see the types of notifications you can have sent. You can change your notification preferences at any time, either here or in Canvas."
-      settings_title: "Canvas notification settings"
-      updating_preferences: "Updating preferences..."
   fair_use_bee47d77: "Fair Use"
   favicon_6e658914: Favicon
   feature_flags: 
@@ -6329,6 +6181,7 @@ en-GB:
     only_one_folder: "Can't set folder path and folder ID"
   for: for
   for_all_devices_1f603968: "For all devices"
+  from_fdd4956d: From
   from_from_to_to_e31f6422: "From %{from} to %{to}"
   global_message_icons: 
     announcement: announcement
@@ -6525,21 +6378,9 @@ en-GB:
       switch_to_points: "Switch to points"
     ungraded: "Not factored into grading"
   gradebook_uploads: 
-    errors: 
-      invalid_file: "Invalid csv file, grades could not be updated"
-      upload_failed: "File could not be uploaded."
-    form: 
-      labels: 
-        upload: "Choose a CSV file to upload"
-      titles: 
-        upload_form: "Choose a CSV file to upload"
     new: 
       titles: 
         new_upload: "Upload Gradebook"
-    notices: 
-      updated: 
-        one: "Successfully updated 1 submission."
-        other: "Successfully updated %{count} submissions."
     show: 
       assignment_answer: "This assignment is"
       assignment_example: "Equity indices quiz"
@@ -6566,14 +6407,6 @@ en-GB:
       student_answer: "This person is really"
       student_example: "Some guy"
       student_question: "Student in question"
-  gradebook_uploads_form: 
-    buttons: 
-      upload_data: "Upload data"
-    labels: 
-      upload: "Choose a CSV file to upload:"
-    titles: 
-      upload_form: "Choose a CSV file to upload"
-    what_should_csv_look_like: "What should the CSV file look like?"
   gradebooks: 
     attendance: 
       attendance_info: "No attendance assignments have been created."
@@ -6694,12 +6527,14 @@ en-GB:
       set_group_weights: "Set group weights"
       show_attendance_columns: "Show attendance columns"
       show_concluded_enrollments: "Show concluded enrolments"
-      upload_scores: Import
       view_grading_history: "View grading history"
     grades: 
       complete: Complete
       incomplete: Incomplete
     grades_filename: Grades
+    grading_box_extended: 
+      labels: 
+        grade: Grade
     history: 
       graded_on_submission: "Graded on submission"
       grades_for_date: "Grades for date"
@@ -6770,7 +6605,6 @@ en-GB:
       labels: 
         add_comment: "Add a comment"
         average: Avg
-        grade: Grade
         grade_by_question_beta: "Grade by question (beta)"
         group_comment: "Send comment to the whole group"
         hide_names: "Hide student names in the SpeedGrader"
@@ -7383,8 +7217,11 @@ en-GB:
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "If you leave, the zip file download currently being prepared will be cancelled."
   if_you_ve_been_using_another_course_management_sys_67edfab1: "If you've been using another course management system, you probably have stuff in there that you're going to want moved over to Canvas. We can walk you through the process of easily migrating your content into Canvas."
   ignore_assignment_738b3c99: "Ignore assignment"
+  ignore_forever_dd4a6cdf: "Ignore forever"
   ignore_name_55edc6fe: "Ignore %{name}"
   ignore_these_3940f6f5: "Ignore these"
+  ignore_this_assignment_b7a71f80: "Ignore this assignment"
+  ignore_until_new_submission_87f32b4: "Ignore until new submission"
   image_8ad06: Image
   images: 
     error_checking_color: "Error checking image colour"
@@ -7394,6 +7231,7 @@ en-GB:
     invalid_file_type: "Invalid file type %{type}. Allowed types include: %{type_list}"
     not_an_image: "Selected file is not an image"
   immediately_c128ede6: Immediately
+  import_1b31507: Import
   import_content_b2fd6620: "Import content"
   importers/assignment_importer: 
     errors: 
@@ -7466,8 +7304,6 @@ en-GB:
       posting_message_failed: "Post failed. Try again"
       required: "Required field"
       search_failed: "Search failed, please try again."
-    ignore_forever: "Ignore forever"
-    ignore_until_new_submission: "Ignore until new submission"
     labels: 
       datepicker: 
         time: Time
@@ -7601,8 +7437,6 @@ en-GB:
         dashboard: "My dashboard"
         skip_to_content: "Skip to content"
       open_source_learning_management_system: "Open source LMS"
-    facebook: 
-      title: "Facebook page"
     fixed_bottom: 
       masquerading: 
         stop: "Stop masquerading"
@@ -7750,6 +7584,7 @@ en-GB:
   lock_date_cannot_be_after_term_end_cf1a188f: "Lock date cannot be after term end"
   lock_date_cannot_be_before_due_date_ac30f54: "Lock date cannot be before due date"
   lock_until_date_62ce1b5c: "Lock until date"
+  log_out_379ba28a: "Log out"
   logged_out_user: "Logged out user %{user_counter}"
   logo_a040ae0e: Logo
   low_score_4eeb95b2: "Low: %{score}"
@@ -7781,7 +7616,6 @@ en-GB:
   manage_usage_rights_c5a8c216: "Manage usage rights"
   manual_entry_e4a4f99a: "Manual entry"
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Mastery score reflects the most recent graded assigment or quiz."
-  mastery_scrore_reflects_the_highest_score_of_a_gra_a71008b7: "Mastery score reflects the highest score of a graded assignment or quiz."
   mathquill: 
     tabs: 
       arrows: Arrows
@@ -7840,6 +7674,7 @@ en-GB:
     my_courses: "My courses"
   message: 
     default_subject: "Canvas alert"
+  message_896d2ed0: "%{message}"
   message_students: 
     buttons: 
       send_message: "Send message"
@@ -7892,10 +7727,6 @@ en-GB:
           unknown_user: "Unknown user"
         subject: "%{user_name} just added you to a conversation in Canvas."
         unknown_user: "Unknown user"
-      facebook: 
-        body: "%{user_name} just added you to a conversation in Canvas."
-        link_text: "View conversation"
-        unknown_user: "Unknown user"
       sms: 
         body: "%{user_name} just added you to a conversation in Canvas."
         more_info: "More info at %{url}"
@@ -7933,25 +7764,6 @@ en-GB:
         ungraded_count_description: "%{count} or more submissions have not been graded"
         ungraded_timespan_description: "A submission has been left ungraded for %{count} days"
         usernote_description: "No faculty journal entries for %{count} days"
-      facebook: 
-        body: 
-          one: "An alert has been triggered for %{student} because the following condition has been met:"
-          other: "An alert has been triggered for %{student} because the following conditions have been met:"
-        body_student: 
-          one: "An alert has been triggered for you because the following condition has been met:"
-          other: "An alert has been triggered for you because the following conditions have been met:"
-        interaction_description: 
-          one: "No student/teacher interaction for one day"
-          other: "No student/teacher interaction for %{count} or more days"
-        ungraded_count_description: 
-          one: "One or more assignments have not been graded"
-          other: "%{count} or more assignments have not been graded"
-        ungraded_timespan_description: 
-          one: "One or more submissions have been left ungraded for one or more days"
-          other: "One or more submissions have been left ungraded for %{count} or more days"
-        usernote_description: 
-          one: "No faculty journal entries for one or more days"
-          other: "No faculty journal entries for %{count} or more days"
       sms: 
         body: "An alert has been triggered for %{student}"
         body_student: "An alert has been triggered for you"
@@ -7987,8 +7799,6 @@ en-GB:
           link: "View announcement"
         labels: 
           file_included: "File included"
-      facebook: 
-        body: "You created this Announcement: %{title}, %{course}"
       sms: 
         details: "More info at %{url}"
         subject: "You created this Announcement: %{title}, %{course}"
@@ -8004,8 +7814,6 @@ en-GB:
           link: "Click here to join view the announcement"
           subject: "New comment on Announcement %{discussion_topic}: %{course}"
         subject: "New comment on Announcement %{discussion_topic}: %{course}"
-      facebook: 
-        body: "New comment on Announcement: %{discussion_topic}, %{course}"
       sms: 
         body: "New comment on Announcement %{discussion_topic}: %{course}"
         details: "More info at %{url}"
@@ -8040,19 +7848,6 @@ en-GB:
         message: "%{user} cancelled his/her reservation for \"%{appointment_name}\"."
         no_reason_given: "none given"
         subject: "Reservation cancelled for \"%{appointment_name}\" (%{course})"
-      facebook: 
-        instructions: "View the appointment"
-        labels: 
-          attendee: Attendee
-          attendees: Attendees
-          cancel_reason: "Reason for cancelling"
-          course: Course
-          date_and_time: Date/time
-          details: "Appointment details"
-          group: Group
-          slots_remaining: "Available time slots"
-        message: "%{user} cancelled his/her reservation for \"%{appointment_name}\"."
-        no_reason_given: "none given"
       sms: 
         message: "%{user} cancelled his/her reservation for \"%{appointment_name}\"."
         more_info: "More info at %{url}"
@@ -8084,18 +7879,6 @@ en-GB:
         message: "%{user} cancelled your time slot for \"%{appointment_name}\"."
         no_reason_given: "none given"
         subject: "Your time slot for \"%{appointment_name}\" has been cancelled (%{course})"
-      facebook: 
-        instructions: "Sign up for a different time slot"
-        labels: 
-          attendee: Attendee
-          attendees: Attendees
-          cancel_reason: "Reason for cancelling"
-          course: Course
-          date_and_time: Date/time
-          details: "Appointment details"
-          group: Group
-        message: "%{user} cancelled your time slot for \"%{appointment_name}\"."
-        no_reason_given: "none given"
       sms: 
         message: "Your time slot for \"%{appointment_name} was cancelled\"."
         more_info: "More info at %{url}"
@@ -8120,14 +7903,6 @@ en-GB:
         message: "All appointments for \"%{appointment_name}\" have been cancelled."
         no_reason_given: "none given"
         subject: "Appointments for \"%{appointment_name}\" have been cancelled (%{course})"
-      facebook: 
-        labels: 
-          cancel_reason: "Reason for cancelling"
-          course: Course
-          dates: Date(s)
-          details: "Appointment details"
-        message: "All appointments for \"%{appointment_name}\" have been cancelled."
-        no_reason_given: "none given"
       sms: 
         message: "All appointments for \"%{appointment_name} have been cancelled\"."
         more_info: "More info at %{url}"
@@ -8157,17 +7932,6 @@ en-GB:
           slots_remaining: "Available time slots"
         message: "Time slots for \"%{appointment_name}\" are now available for signup."
         subject: "Appointment \"%{appointment_name}\" is available for signup (%{course})"
-      facebook: 
-        group_signup: "Group (%{group_category})"
-        individual_signup: Individual
-        instructions: "Sign up for a time slot"
-        labels: 
-          course: Course
-          dates: Date(s)
-          details: "Appointment details"
-          signup_type: "Signup type"
-          slots_remaining: "Available time slots"
-        message: "Time slots for \"%{appointment_name}\" are now available for signup."
       sms: 
         message: "Signups are open for \"%{appointment_name}\"."
         more_info: "More info at %{url}"
@@ -8199,17 +7963,6 @@ en-GB:
           slots_remaining: "Available time slots"
         message: "Time slots have been added to \"%{appointment_name}\" and are available for signup."
         subject: "Appointment \"%{appointment_name}\" has been updated (%{course})"
-      facebook: 
-        group_signup: "Group (%{group_category})"
-        individual_signup: Individual
-        instructions: "Sign up for a time slot"
-        labels: 
-          course: Course
-          dates: Date(s)
-          details: "Appointment details"
-          signup_type: "Signup Type"
-          slots_remaining: "Available time slots"
-        message: "Time slots have been added to \"%{appointment_name}\" and are available for signup."
       sms: 
         message: "New time slots are available for \"%{appointment_name}\"."
         more_info: "More info at %{url}"
@@ -8242,17 +7995,6 @@ en-GB:
           slots_remaining: "Available time slots"
         message: "%{user} has signed up for \"%{appointment_name}\"."
         subject: "User signed up for \"%{appointment_name}\" (%{course})"
-      facebook: 
-        instructions: "View the appointment"
-        labels: 
-          attendee: Attendee
-          attendees: Attendees
-          course: Course
-          date_and_time: Date/time
-          details: "Appointment details"
-          group: Group
-          slots_remaining: "Available time slots"
-        message: "%{user} has signed up for \"%{appointment_name}\"."
       sms: 
         message: "%{user} has signed up for \"%{appointment_name}\"."
         more_info: "More info at %{url}"
@@ -8282,17 +8024,6 @@ en-GB:
           slots_remaining: "Available time slots"
         message: "%{user} has signed you up for \"%{appointment_name}\"."
         subject: "You have been signed up for \"%{appointment_name}\""
-      facebook: 
-        instructions: "Sign up for a different time slot"
-        labels: 
-          attendee: Attendee
-          attendees: Attendees
-          course: Course
-          date_and_time: Date/time
-          details: "Appointment details"
-          group: Group
-          slots_remaining: "Available time slots"
-        message: "%{user} has signed you up for \"%{appointment_name}\"."
       sms: 
         message: "You have been signed up for \"%{appointment_name}\"."
         more_info: "More info at %{url}"
@@ -8313,8 +8044,6 @@ en-GB:
           link: "Click here to view the assignment"
           subject: "Assignment Changed: %{title}, %{course}"
         subject: "Assignment changed: %{title}, %{course}"
-      facebook: 
-        body: "The assignment %{title_link} for %{course} has changed."
       sms: 
         body: |-
             %{title}, %{course} has changed.
@@ -8339,11 +8068,6 @@ en-GB:
           click_to_see_assignment: "Click here to view the assignment"
         multiple_due_dates: "due: Multiple dates"
         new_assignment: "A new assignment has been created for your course, %{course_name}"
-        no_due_date: "due: No due date"
-      facebook: 
-        due_at: "due: %{assignment_due_date_time}"
-        multiple_due_dates: "due: Multiple dates"
-        new_assignment: "A new assignment has been created for %{course_name}"
         no_due_date: "due: No due date"
       sms: 
         due_at: "due: %{assignment_due_date_time}"
@@ -8373,9 +8097,6 @@ en-GB:
         labels: 
           click_to_see_assignment: "Click here to view the assignment"
         no_due_date: "No due date"
-      facebook: 
-        assignment_due_date_changed_sentence: "The due date for the assignment *%{assignment_name}* for %{course_name}, has changed to:"
-        no_due_date: "No due date"
       sms: 
         assignment_due_date_changed: "%{assignment_name}, %{course_name}, is now due:"
         more_info_at_url: "More info at %{web_address}"
@@ -8400,9 +8121,6 @@ en-GB:
         labels: 
           click_to_see_assignment: "Click here to view the assignment"
         no_due_date: "No due date"
-      facebook: 
-        assignment_due_date_changed_sentence: "The due date for the assignment *%{assignment_name}* for %{course_name} (%{override}) has changed to:"
-        no_due_date: "No due date"
       sms: 
         assignment_due_date_changed: "%{assignment_name}, %{course_name} (%{override}) is now due:"
         more_info_at_url: "More info at %{web_address}"
@@ -8424,8 +8142,6 @@ en-GB:
           the_assignment_is_graded: "The assignment, %{assignment_name}, has been graded."
         labels: 
           view_here: "You can view it here"
-        the_assignment_is_graded: "The assignment, %{assignment_name}, has been graded."
-      facebook: 
         the_assignment_is_graded: "The assignment, %{assignment_name}, has been graded."
       sms: 
         assignment_is_graded: "%{assignment_name}, %{course_name} has been graded."
@@ -8450,9 +8166,6 @@ en-GB:
           view_submission: "You can view the submission here"
         user_resubmitted: "Resubmission: %{user_name}, %{assignment_name}"
         user_resubmitted_sentence: "%{user_name} has just resubmitted to %{assignment_name} in the course %{course_name}"
-      facebook: 
-        click_to_view: "Click here to view the submission."
-        user_resubmitted: "**%{user_name}** has just resubmitted to **%{assignment_name}** in the course %{course_name}"
       sms: 
         more_info_at: "More info at %{web_address}"
         user_resubmitted: "%{user_name} just turned in their assignment (again), %{assignment_name}"
@@ -8471,9 +8184,6 @@ en-GB:
           view_submission: "You can view the submission here"
         user_submitted: "Submission: %{user_name}, %{assignment_name}"
         user_submitted_sentence: "%{user_name} has just resubmitted to %{assignment_name} in the course %{course_name}"
-      facebook: 
-        click_to_view: "Click here to view the submission."
-        user_submitted: "**%{user_name}** has just submitted to **%{assignment_name}** in the course %{course_name}"
       sms: 
         more_info_at: "More info at %{web_address}"
         user_submitted: "%{user_name} just submitted their assignment, %{assignment_name}"
@@ -8492,9 +8202,6 @@ en-GB:
           view_submission: "You can view the submission here"
         user_resubmitted_sentence: "%{user_name} has just submitted late to %{assignment_name} in the course %{course_name}"
         user_submitted: "Late assignment: %{user_name}, %{assignment_name}"
-      facebook: 
-        click_to_view: "Click here to view the submission."
-        user_resubmitted_sentence: "**%{user_name}** has just submitted late to **%{assignment_name}** in the course %{course_name}"
       sms: 
         more_info_at: "More info at %{web_address}"
         user_submitted: "%{user_name} just submitted their assignment (late), %{assignment_name}"
@@ -8552,9 +8259,6 @@ en-GB:
           link: "You can see the details here"
           subject: "Collaboration invitation: %{course_or_group}"
         subject: "Collaboration invitation: %{course_or_group}"
-      facebook: 
-        body: "You've been invited to collaborate on a document, %{document} for %{course_or_group}. The document was created in %{service}."
-        body_with_user: "You've been invited to collaborate on a document, %{document} for %{course_or_group}. The document was created by %{user} in %{service}."
       sms: 
         body: |-
             You were invited to collaborate on a document, %{document} for %{course_or_group}.
@@ -8638,10 +8342,6 @@ en-GB:
         subject: "%{user_name}, you just sent a message in Canvas."
         unknown_user: "Unknown user"
         view_message: "View this message in Conversations"
-      facebook: 
-        body: "%{user_name}, you just sent a message in Canvas."
-        link_text: "View message"
-        unknown_user: "Unknown user"
       sms: 
         body: "%{user_name}, you just sent a message in Canvas:"
         more_info: "More info at %{url}"
@@ -8668,10 +8368,6 @@ en-GB:
         subject: "%{user_name} just sent you a message in Canvas."
         unknown_user: "Unknown user"
         view_message: "View this message in Conversations"
-      facebook: 
-        body: "%{user_name} just sent you a message in Canvas."
-        link_text: "View message"
-        unknown_user: "Unknown user"
       sms: 
         body: "%{user_name} just sent you a message in Canvas:"
         more_info: "More info at %{url}"
@@ -8765,12 +8461,6 @@ en-GB:
           details: "See the list of current enrolments"
           subject: "%{user} accepted the course invitation"
         subject: "%{user} accepted the course invitation"
-      facebook: 
-        body_designer: "%{user} just accepted their invitation to participate in the course %{course} as a designer."
-        body_observer: "%{user} just accepted their invitation to participate in the course %{course} as an observer."
-        body_student: "%{user} just accepted their invitation to participate in the course %{course} as a student."
-        body_ta: "%{user} just accepted their invitation to participate in the course %{course} as a TA."
-        body_teacher: "%{user} just accepted their invitation to participate in the course %{course} as a teacher."
       sms: 
         body_designer: "%{user} accepted the designer invitation for the course, %{course}"
         body_observer: "%{user} accepted the observer invitation for the course, %{course}"
@@ -8813,17 +8503,6 @@ en-GB:
           username: Username
         none: none
         subject: "Course invitation"
-      facebook: 
-        body_designer: "You've been invited to participate in the course %{course} as a designer."
-        body_observer: "You've been invited to participate in the course %{course} as an observer."
-        body_student: "You've been invited to participate in the course %{course} as a student."
-        body_ta: "You've been invited to participate in the course %{course} as a TA."
-        body_teacher: "You've been invited to participate in the course %{course} as a teacher."
-        labels: 
-          email: Email
-          name: Name
-          username: Username
-        none: none
       sms: 
         body_designer: "You've been invited to the course as a designer."
         body_observer: "You've been invited to the course as an observer."
@@ -8872,17 +8551,6 @@ en-GB:
         none: none
         register: "Visit %{link} to complete registration"
         subject: "Course enrolment"
-      facebook: 
-        body_designer: "You've been enrolled in the course %{course} as a designer."
-        body_observer: "You've been enrolled in the course %{course} as an observer."
-        body_student: "You've been enrolled in the course %{course} as a student."
-        body_ta: "You've been enrolled in the course %{course} as a TA."
-        body_teacher: "You've been enrolled in the course %{course} as a teacher."
-        labels: 
-          email: Email
-          name: Name
-          username: Username
-        none: none
       sms: 
         body_designer: "You've been enrolled in the course as a designer."
         body_observer: "You've been enrolled in the course as an observer."
@@ -8967,10 +8635,6 @@ en-GB:
           see_details: "You can see details here"
         no_time_set: "No time set"
         subject: "Event date changed: %{event_title}, %{course_name}"
-      facebook: 
-        from_to_time: "from %{start_date_time} to %{end_date_time}"
-        no_time_set: "No time set"
-        subject: "The event [%{event_title}](%{link_to_event}) for %{course_name} has changed times. It's now:"
       sms: 
         from_to_time: "from %{start_date_time} to %{end_date_time}"
         more_info: "More info at %{web_link}"
@@ -9028,11 +8692,6 @@ en-GB:
           grades_based_on_percent: "Grading is based on the weighted total for each assignment group"
           now_see_here: "You can see details here"
           subject: "Grade weight changed"
-      facebook: 
-        grading_based_on_points: "Grading is based on total points for all assignments."
-        grading_policy_changed: "The grading policy for **[%{course_name}](%{course_url})** has changed."
-        labels: 
-          grades_based_on_percent: "Grading is based on the weighted total for each assignment group"
       sms: 
         grade_changed: "The grading policy for the course, %{course_name} has changed."
         more_info_at: "More info at %{course_url}"
@@ -9054,8 +8713,6 @@ en-GB:
         labels: 
           view_submission_here: "You can view the submission here"
         subject: "Late assignment: %{group_name}, %{assignment_name}"
-      facebook: 
-        body: "The group %{group_name} has just submitted late to **[%{assignment_name}](%{assignment_url})** in the course %{course_name}."
       sms: 
         more_info: "More info at %{web_address}"
         subject: "%{group_name} submitted their assignment (late), %{assignment_name}"
@@ -9078,10 +8735,6 @@ en-GB:
         labels: 
           click_below: "You can check out the group by clicking the link below"
         subject: "Group membership accepted: %{group_name}"
-      facebook: 
-        account_group: "Your request to join the group **[%{group_name}](%{group_url})** for the account %{account_name} has been accepted."
-        course_group: "Your request to join the group **[%{group_name}](%{group_url})** for the course %{course_name} has been accepted."
-        group_request_accepted: "Group request accepted: %{group_name}"
       sms: 
         account_group: "Your request to join the group %{group_name} for the account %{account_name} has been accepted."
         course_group: "Your request to join the group %{group_name} for the course %{course_name} has been accepted."
@@ -9107,9 +8760,6 @@ en-GB:
         labels: 
           click_below: "You can check out other groups by clicking the link below"
         subject: "Group membership Rejected: %{group_name}"
-      facebook: 
-        account_group: "Your request to join the group **[%{group_name}](%{group_url})** for the account %{account_name} has been rejected."
-        course_group: "Your request to join the group **[%{group_name}](%{group_url})** for the course %{course_name} has been rejected."
       sms: 
         account_group: "Your request to join the group %{group_name} for the account %{account_name} has been rejected."
         course_group: "Your request to join the group %{group_name} for the course %{course_name} has been rejected."
@@ -9165,9 +8815,6 @@ en-GB:
           details: "A new admin, %{user}, has been added for the account %{account}"
           subject: "New account user"
         subject: "New account user"
-      facebook: 
-        body: "A new admin **%{user}** has been added for the account **%{account}**."
-        subject: "New account admin for %{account}"
       sms: 
         body: "A new admin, %{user}, has been added for the account %{account}"
         details: "More info at %{website}"
@@ -9183,8 +8830,6 @@ en-GB:
           link: "View announcement"
         labels: 
           file_included: "File included"
-      facebook: 
-        body: "New announcement: %{title}, %{course}"
       sms: 
         details: "More info at %{url}"
         subject: "New announcement: %{title}, %{course}"
@@ -9204,9 +8849,6 @@ en-GB:
           title: "New Group Membership: %{group_name}"
         subject: "New group membership for %{course_or_account}"
         title: "New group membership: %{group_name}"
-      facebook: 
-        body_account: "You've been added to a new group for the account %{account}. The name of the group is %{group_name}."
-        body_course: "You've been added to a new group for the course %{course}. The name of the group is %{group_name}."
       sms: 
         body_account: "You've been added to a new group for the account %{account}.  The name of the group is %{group_name}."
         body_course: "You've been added to a new group for the course %{course}.  The name of the group is %{group_name}."
@@ -9231,9 +8873,6 @@ en-GB:
           title: "New group membership: %{group_name}"
         subject: "New group membership for %{course_or_account}"
         title: "New group membership: %{group_name}"
-      facebook: 
-        body_account: "You've been invited to join the group %{group} for the account %{account}."
-        body_course: "You've been invited to join the group %{group} for the course %{course}."
       sms: 
         body_account: "You've been invited to join the group %{group} for the account %{account}."
         body_course: "You've been invited to join the group %{group} for the course %{course}."
@@ -9259,11 +8898,6 @@ en-GB:
           teachers: Teachers
         subject: "New course"
         title: "New course for %{account}"
-      facebook: 
-        body: "A new course **%{course}** has been added for the account **%{account}**."
-        labels: 
-          teachers: Teachers
-        subject: "New course for %{account}"
       sms: 
         body: "A new course, %{course}, has been added for the account %{account}"
         details: "More info at %{url}"
@@ -9286,8 +8920,6 @@ en-GB:
           link: "Click here to join the conversation"
           subject: "New comment for %{discussion_topic}: %{course}"
         subject: "New comment for %{discussion_topic}: %{course}"
-      facebook: 
-        body: "New comment for %{discussion_topic}, %{course}"
       sms: 
         body: "New comment for %{discussion_topic}: %{course}"
         details: "More info at %{url}"
@@ -9308,8 +8940,6 @@ en-GB:
         labels: 
           file_included: "File included"
         subject: "New discussion - %{discussion_topic}: %{course}"
-      facebook: 
-        body: "New forum topic: %{discussion_topic}, %{course}"
       sms: 
         body: "New topic for %{course}:"
         details: "More info at %{url}"
@@ -9331,10 +8961,6 @@ en-GB:
           see_details: "You can see details here"
         no_time_set: "No time set"
         subject: "New event - %{event_title}, %{course_name}"
-      facebook: 
-        body: "There's a new event scheduled for %{course_name}:"
-        from_to_time: "from %{start_date_time} to %{end_date_time}"
-        no_time_set: "No time set"
       sms: 
         from_to_time: "from %{start_date_time} to %{end_date_time}"
         more_info: "More info at %{web_address}"
@@ -9357,8 +8983,6 @@ en-GB:
           subject: "New file added: %{title}, %{name}"
         subject: "New file added: %{title}, %{name}"
         view: "You can view it here"
-      facebook: 
-        body: "A new file has been added for the course, %{name}:"
       sms: 
         body: "New file added for %{name}:"
         link: "More info at %{link}"
@@ -9375,9 +8999,6 @@ en-GB:
           subject: "%{count} new files added for the course, %{name}:"
         link: "You can view them here"
         subject: "%{count} new files added for the course, %{name}:"
-      facebook: 
-        body: "%{count} new files have been added for the course, %{name}:"
-        link: "You can view them here"
       sms: 
         body: "%{count} new files added for %{name}."
         link: "More info at %{link}"
@@ -9400,9 +9021,6 @@ en-GB:
           title: "New student group: %{group_name}"
         subject: "New student group for %{course_or_account}"
         title: "New student group: %{group_name}"
-      facebook: 
-        body_account: "A new student organised group named %{group_name} was created for the account %{account}. The first member is %{user}."
-        body_course: "A new student organised group named %{group_name} was created for the course %{course}. The first member is %{user}."
       sms: 
         body_account: "A new group named \"%{group_name}\" was created for the account %{account}. The first member is %{user}."
         body_course: "A new group named \"%{group_name}\" was created for the course %{course}. The first member is %{user}."
@@ -9422,9 +9040,6 @@ en-GB:
           link: "Click here to view user"
           subject: "New user"
         subject: "New user"
-        title: "New user for %{account}"
-      facebook: 
-        body: "A new user, **%{user}**, has just registered for the account **%{account}**."
         title: "New user for %{account}"
       sms: 
         body: "A new user, %{user}, has registered for the account %{account}"
@@ -9446,8 +9061,6 @@ en-GB:
         html: 
           link_message: "Click here to complete your review"
         subject: "Assigned peer review for %{reviewee}"
-      facebook: 
-        body: "You've been invited to peer review %{reviewee}. Follow the link below to review them!"
       sms: 
         more_info: "More info at %{url}"
       summary: 
@@ -9477,8 +9090,6 @@ en-GB:
           subject: "Quiz regrade finished: %{quiz}, %{context}"
         link_message: "You can view the quiz here:"
         subject: "Quiz regrade finished: %{quiz}, %{context}"
-      facebook: 
-        body: "Quiz regrade finished: %{title}"
       sms: 
         body_sms: "Quiz regrade finished for %{title} in %{context}."
         more_info: "More info at %{url}"
@@ -9509,8 +9120,6 @@ en-GB:
           subject: "Reminder to assess: %{rubric}, %{context}"
         link_message: "You can review the assessment and submit your entry here:"
         subject: "Reminder to assess: %{rubric}, %{context}"
-      facebook: 
-        body: "You've been reminded to assess: *%{title}* for %{context}."
       sms: 
         body: "You've been reminded to assess: %{rubric}, %{context}."
         more_info: "More info at %{url}"
@@ -9528,8 +9137,6 @@ en-GB:
           subject: "New assessment: %{title}, %{context}"
         link_message: "You can review the assessment and submit your entry here:"
         subject: "New assessment: %{title}, %{context}"
-      facebook: 
-        body: "A new assessment has been created for %{context}:"
       sms: 
         body: "A new assessment has been created for %{context}."
         more_info: "More info at %{url}"
@@ -9554,9 +9161,6 @@ en-GB:
         link_message: "You can review the submission details here:"
         someone: Someone
         subject: "Submission comment: %{user}, %{assignment}, %{context}"
-      facebook: 
-        body: "*%{author}* just made a new comment on the submission for **%{user} for %{assignment}**."
-        someone: Someone
       sms: 
         body: "New comment by %{author} for %{assignment}, %{user}, %{context}."
         more_info: "More info at %{url}"
@@ -9578,9 +9182,6 @@ en-GB:
         someone: Someone
         subject: "Submission Comment: %{user}, %{assignment}, %{context}"
         submission_comment_link_message: "You can review the submission details using the link below, or can reply to this comment by responding to this message."
-      facebook: 
-        body: "*%{author}* just made a new comment on the submission for **%{user} for %{assignment}**."
-        someone: Someone
       sms: 
         more_info: "More info at %{url}"
         sms_body: "New comment by %{author} for %{assignment}, %{user}, %{context}."
@@ -9609,13 +9210,6 @@ en-GB:
         score: "score:  %{score} out of %{total}"
         score_pending: "score pending review by the teacher"
         subject: "Grade changed: %{assignment}, %{context}"
-      facebook: 
-        body: "The grade on your assignment, *%{title}* has been changed."
-        no_date_set: "No date set"
-        not_applicable: N/A
-        regraded_date: "regraded: %{date}"
-        score: "score: %{score} out of %{total}"
-        score_pending: "score pending review by the teacher"
       sms: 
         body_sms: "Your grade for %{title}, %{context} just changed."
         more_info: "More info at %{url}"
@@ -9656,13 +9250,6 @@ en-GB:
         score: "score:  %{score} out of %{total}"
         score_pending_review: "score pending review by the teacher"
         subject: "Assignment graded: %{assignment}, %{context}"
-      facebook: 
-        body: "Your assignment, *%{title}*, has been graded."
-        graded_date: "graded: %{date}"
-        no_date_set: "No date set"
-        not_applicable: N/A
-        score: "score: %{score} out of %{total}"
-        score_pending_review: "score pending review by the teacher"
       sms: 
         graded_date: "graded: %{date}"
         more_info: "More info at %{url}"
@@ -9695,9 +9282,6 @@ en-GB:
         link_message: "You can review the submission here:"
         subject: "Quiz Submitted: %{quiz}, %{context}"
         submitted_date: "submitted: %{date}"
-      facebook: 
-        body: "%{user_name} has completed the quiz %{quiz_title}, and it requires manual grading."
-        submitted_date: "submitted: %{date}"
       sms: 
         body_sms: "Your grade for %{title}, %{context} just changed."
         more_info: "More info at %{url}"
@@ -9724,8 +9308,6 @@ en-GB:
         notifications_link: "You can change your notification settings by visiting the following page:"
         subject: "Recent Canvas Notifications"
         weekly_body: "You're signed up to receive a weekly report of some notifications from your Canvas account.  Below is the report for the week ending %{date}:"
-      facebook: 
-        new_notifications: "You've received *%{notification_count} new notifications* in #Canvas#."
       sms: 
         notifications_sms: "%{notifications_count} new notifications at %{url}"
       twitter: 
@@ -9745,8 +9327,6 @@ en-GB:
           subject: "Updated Wiki page: %{title}, %{user}"
         link_message: "You can review it here: %{link}"
         subject: "Updated Wiki Page: %{title}, %{user}"
-      facebook: 
-        body: "A page has been updated on the wiki for %{title}."
       sms: 
         more_info: "More info at %{url}"
         updated_message: "%{title}, %{user} just updated:"
@@ -9764,8 +9344,6 @@ en-GB:
           details_link: "Click here to see the details"
           subject: "Web Conference invitation: %{name}"
         subject: "Web conference invitation: %{name}"
-      facebook: 
-        body: "You've been invited to participate in a web conference, *%{title}* for #%{name}#."
       sms: 
         body: "You were invited to join a web conference, %{title} for %{name}."
         link_message: "More info at %{url}"
@@ -9984,7 +9562,6 @@ en-GB:
   name_only_5f56718e: "Name only"
   new_account_role_6e5c4964: "New account role"
   new_course_role_6a7bb75f: "New course role"
-  new_facebook_message: "You have a new message from Canvas"
   new_file_135ae520: "[ New file ]"
   new_outcome_7fba8c7d: "New outcome"
   new_quiz_statistics_desc: "Enable the new quiz statistics page for a course."
@@ -10212,8 +9789,6 @@ en-GB:
         display: "Email address"
       errors: 
         saving_preferences_failed: "Oops! Something broke.  Please try again"
-      facebook: 
-        display: Facebook
       push: 
         display: "Push Notification"
       sms: 
@@ -10508,6 +10083,7 @@ en-GB:
   paginated_view: 
     loading_more_results: "Loading more results"
   participations_1823832d: Participations
+  password_8a271b1c: Password
   paste_xml_cda3a64e: "Paste XML"
   paypal: 
     exception: "We're sorry, an error has occurred, please try again later."
@@ -10628,33 +10204,6 @@ en-GB:
       primary_pad: "Primary Pad"
       sketchpad: SketchPad
       typewithme: TypeWith.me
-    facebook: 
-      description: "Canvas Facebook application"
-      name: Facebook
-    facebook_settings: 
-      description: |-
-          You will need to create a [new app on facebook.com](%{facebook_url}), and add 'App on Facebook' as a platform.
-          Set the following configuration options to ensure your Facebook app
-          works correctly:
-          
-          * **Settings -- App on Facebook -- Canvas Page:** make a note of whatever you choose (the part after apps.facebook.com) and enter in the form below
-          * **Settings -- App on Facebook -- Canvas URL:** set to %{canvas_url}
-          * After you save your app, make a note of the App ID, Client Token and App Secret
-      domain_name: domain
-      headers: 
-        domain_settings: "Domain settings"
-      hints: 
-        api_key: "Also referred to as Client Token"
-        canvas_domain: "this is the domain specified in \"Canvas URL\""
-        canvas_name: "this is the path specified in \"Canvas Page\""
-        disable_ssl: "Use only for local testing"
-      labels: 
-        api_key: "API Key"
-        app_id: "App ID"
-        canvas_domain: "Canvas domain"
-        canvas_name: "Canvas name"
-        disable_ssl: "Disable SSL"
-        secret: "App secret"
     google_docs: 
       description: "Google Docs document sharing"
       name: "Google Docs"
@@ -10910,7 +10459,6 @@ en-GB:
     labels: 
       requirements_must_be_completed: "The following requirements need to be completed before this page will be unlocked"
   presentation_2d9387ca: Presentation
-  press_spacebar_for_more_details_on_this_outcome_f6713a42: "press spacebar for more details on this outcome"
   privacy_290109ea: Privacy
   product_name: Canvas
   profile: 
@@ -10961,8 +10509,6 @@ en-GB:
       profile_update_failed: "Login failed to update"
       regenerating_token_failed: "Regenerating token failed"
       registration_failed: "Registration failed. Check the user name and password, and try again."
-    facebook_select: 
-      facebook: Facebook
     failed_resending: "Request failed. Try again."
     links: 
       resend_confirmation: "Resend confirmation"
@@ -10987,7 +10533,6 @@ en-GB:
         generate_token: "Generate token"
         new_access_token: "New access token"
         regenerate_token: "Regenerate token"
-        register_facebook_account: "Register your facebook account"
         register_linkedin_account: "Register your LinkedIn account"
         save_login: "Save login"
         save_skype_name: "Save Skype name"
@@ -10998,7 +10543,6 @@ en-GB:
       delicious_description: "Delicious is a tool that lets you store and share your bookmarks with others. Canvas's rich content editor will let you search your Delicious tags to easily link from within Canvas to other resources you find useful."
       diigo_description: "Diigo is a social bookmarking tool tailored specifically to research and education. Canvas's rich content editor will let you search your Diigo tags to easily link from within Canvas to other resources you find useful."
       error_loading_token_details: "Error loading token details"
-      facebook_description: "If you have a Facebook account, you can install the Canvas app and receive course notifications on your profile. You can specify which types of notifications you want and how often you'd like them sent."
       feature_options: "Feature Options"
       full_token_warning: |-
           **Copy this token down now**. Once you leave this page you won't be able to
@@ -11012,7 +10556,6 @@ en-GB:
         dates: Dates
         delicious_login: "Delicious login"
         diigo_login: "Diigo login"
-        facebook_access: "Facebook access"
         generate_access_token: "Generate an access token"
         google_docs_access: "Google Docs access"
         google_drive_access: "Google Drive access"
@@ -11074,7 +10617,6 @@ en-GB:
         diigo: Diigo
         disable_mfa: "Disable multi-factor authentication"
         edit_settings: "Edit settings"
-        facebook: Facebook
         google_docs: "Google Docs"
         google_drive: "Google Drive"
         linkedin: LinkedIn
@@ -11083,7 +10625,6 @@ en-GB:
         skype: Skype
         twitter: Twitter
         upload_new_image: "Upload a new image"
-        view_facebook_app: "view the Facebook app"
         view_your_profile: "view your profile"
         yo: Yo
       loading_token_details: "Loading token details..."
@@ -11097,7 +10638,6 @@ en-GB:
       subscribe_to_emails: "I want to receive information, news and tips from Instructure"
       titles: 
         access_token_details: "Access token details"
-        authorize_facebook: "Authorise Facebook"
         authorize_google_docs: "Authorise Google Docs"
         authorize_google_drive: "Authorie Google Drive"
         authorize_linkedin: "Authorise LinkedIn"
@@ -11497,6 +11037,7 @@ en-GB:
       regrade_options: "Regrade options *(for students who have already answered this question):*"
       some_scores_reduced: "Only award points for the correct answer (*some students' scores may be reduced*)"
       update_question_without_regrading: "Update question without regrading"
+  quiz_e0dcce8f: Quiz
   quiz_log_auditing: 
     buttons: 
       reload_events: Reload
@@ -13277,9 +12818,7 @@ en-GB:
         next: Next
       getting_started: "You are enrolling in **%{course}**."
       labels: 
-        email: Email
         password: Password
-      log_in: "Please enter your email and password:"
     authenticate_or_register: 
       buttons: 
         enroll_in_course: "Enroll in course"
@@ -13741,7 +13280,6 @@ en-GB:
       labels: 
         custom_rating: "I'll write free-form comments when assessing students"
         grading_rubric: "Use this rubric for assignment grading"
-        title: Title
         total_points: "Total points"
         totallying_rubric: "Hide score total for assessment results"
       links: 
@@ -13761,6 +13299,7 @@ en-GB:
       out_of: "%{points} *out of %{total}*"
       rubric: Rubric
       rubric_title: Title
+      title: "Title:"
       titles: 
         find_existing_rubric: "Find existing rubric"
     rubric_criterion: 
@@ -13809,6 +13348,7 @@ en-GB:
       titles: 
         find_a_rubric: "Find a rubric"
     rubric_forms: 
+      criteria_description_label: "Description of criterion"
       points: "%{points} pts"
     rubric_summary: 
       buttons: 
@@ -14710,6 +14250,7 @@ en-GB:
     people: People
     view_in_separate_window: "View in separate window"
   to_35c6baa2: "to "
+  to_51406be9: To
   to_c4c44f4b: to
   to_minscore_43e5452e: "to %{minScore}%"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "To view assignments, make sure the *Agenda* view is active."
@@ -14762,6 +14303,7 @@ en-GB:
   updated_group_group_name_727b1d98: "Updated group %{group_name}"
   upload_button: 
     upload: Upload
+  upload_data_dc4fa4cb: "Upload data"
   upload_drop_zone: 
     drop_to_upload: "Drop items to upload"
   upper_limit_of_range_c454a8f2: "Upper limit of range"
@@ -14900,13 +14442,13 @@ en-GB:
     descriptions: 
       delicious: "Delicious is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users' Delicious accounts to share links of similar interest."
       diigo: "Diigo is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users' Diigo accounts to share links of similar interest."
-      facebook: "Listing your Facebook profile will let you more easily connect with friends you make in your classes and groups."
       google_docs: "Students can use Google Docs to collaborate on group projects.  Google Docs allows for real-time collaborative editing of documents, spreadsheets and presentations."
       google_drive: "Students can use Google Drive to collaborate on group projects.  Google Drive allows for real-time collaborative editing of documents, spreadsheets and presentations."
       linked_in: "LinkedIn is a resource for business networking.  Many of the relationships you build while in school can also be helpful once you enter the workplace."
       skype: "Skype is a free tool for online voice and video calls."
       twitter: "Twitter is a great resource for out-of-class communication."
       yo: "Yo is a single-tap zero-character communication tool."
+  username_47bb5bbe: Username
   users: 
     admin_merge: 
       buttons: 
@@ -14974,8 +14516,6 @@ en-GB:
     errors: 
       no_teacher_courses: "There are no courses shared between this teacher and student"
       user_not_teacher: "That user is not a teacher in this course"
-    facebook_added: "Facebook account successfully added!"
-    facebook_fail: "Facebook authorisation failed."
     google_docs_added: "Google Docs access authorised!"
     google_docs_fail: "Google Docs authorisation failed. Please try again"
     google_drive_added: "Google Drive account successfully added!"
@@ -15203,6 +14743,7 @@ en-GB:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ course"
   webct_name: "Blackboard Vista/CE (WebCT)"
+  what_should_the_csv_file_look_like_985a59ac: "What should the CSV file look like?"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "When people visit the course, this is the page they'll see.  You can set it to show an activity stream, the list of course modules, a syllabus, or a custom page you write yourself.  The default is the course activity stream."
   where_would_you_like_to_move_title_fabd6e8f: "Where would you like to move %{title}?"
   widget: 
@@ -15320,6 +14861,7 @@ en-GB:
       title_characters: "Title must contain at least one letter or number"
       title_too_long: "Title can't exceed %{max_characters} characters"
     unknown_user_name: Unknown
+  wiki_page_6c11ee20: "Wiki page"
   wiki_pages: 
     edit: 
       page_header_title: "Edit %{page_name}"
