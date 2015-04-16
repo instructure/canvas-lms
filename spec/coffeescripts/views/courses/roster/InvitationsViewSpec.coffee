@@ -5,9 +5,6 @@ define [
   'helpers/assertions'
 ], ($, InvitationsView, RosterUser, assert) ->
 
-  view = null
-  server = null
-
   module 'InvitationsView',
     setup: ->
     teardown: ->
@@ -15,14 +12,14 @@ define [
   buildView = (enrollment)->
     model = new RosterUser( enrollments: [enrollment] )
     model.currentRole = 'student'
-    view = new InvitationsView(model: model)
+    new InvitationsView(model: model)
 
   test 'knows when invitation is pending', ->
     enrollment = {id: 1, role: 'student', enrollment_state: 'invited'}
-    buildView enrollment
+    view = buildView enrollment
     equal view.invitationIsPending(), true
 
   test 'knows when invitation is not pending', ->
     enrollment = {id: 1, role: 'student', enrollment_state: 'accepted'}
-    buildView enrollment
+    view = buildView enrollment
     equal view.invitationIsPending(), false
