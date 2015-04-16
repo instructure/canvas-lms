@@ -76,7 +76,7 @@ define [
       }, {
         step: =>
           #reposition vertically to reflect current height
-          @initDialog() unless @dialogInited
+          @initDialog() unless @dialogInited and @$dialog?.hasClass("ui-dialog-content")
           @$dialog?.dialog('option', 'position', 'center')
         duration: 100
         complete: ->
@@ -95,7 +95,7 @@ define [
       @$dialog.dialog 'option', 'title', newTitle
 
     open: ->
-      helpDialog.initDialog() unless helpDialog.dialogInited
+      helpDialog.initDialog() unless helpDialog.dialogInited and helpDialog.$dialog?.hasClass("ui-dialog-content")
       helpDialog.$dialog.dialog('open')
       helpDialog.initTeacherFeedback()
 
