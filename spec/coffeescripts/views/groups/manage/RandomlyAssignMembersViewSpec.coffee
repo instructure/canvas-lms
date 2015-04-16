@@ -150,7 +150,7 @@ define [
         [200, { "Content-Type": "application/json" }, JSON.stringify(unassignedUsersResponse)])
 
       view.render()
-      view.$el.appendTo($(document.body))
+      view.$el.appendTo($("#fixtures"))
 
       server.respond()
       server.responses = []
@@ -159,6 +159,7 @@ define [
       server.restore()
       globalObj.ENV = @_ENV
       view.remove()
+      document.getElementById("fixtures").innerHTML = ""
 
   test 'randomly assigns unassigned users', ->
     $progressContainer = $('.progress-container')

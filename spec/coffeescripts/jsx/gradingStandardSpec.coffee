@@ -24,10 +24,11 @@ define [
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.render(GradingStandard(props), $('<div>').appendTo('body')[0])
+      @gradingStandard = React.render(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
+      $("#fixtures").empty()
 
   test 'returns false for assessedAssignment', ->
     deepEqual @gradingStandard.assessedAssignment(), false
@@ -84,10 +85,11 @@ define [
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('body')[0])
+      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
+      $("#fixtures").empty()
 
   test 'displays a cannot manage message', ->
     ok @gradingStandard.refs.cannotManageMessage
@@ -113,7 +115,7 @@ define [
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('body')[0])
+      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
@@ -197,10 +199,11 @@ define [
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('body')[0])
+      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
+      $("#fixtures").empty()
 
   test 'rowNamesAreValid() returns false with empty row names', ->
     deepEqual @gradingStandard.rowNamesAreValid(), false
@@ -232,10 +235,11 @@ define [
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('body')[0])
+      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
+      $("#fixtures").empty()
 
   test 'rowNamesAreValid() returns false with duplicate row names', ->
     deepEqual @gradingStandard.rowNamesAreValid(), false
@@ -267,10 +271,11 @@ define [
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('body')[0])
+      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
+      $("#fixtures").empty()
 
   test 'rowDataIsValid() returns false with empty values', ->
     deepEqual @gradingStandard.rowDataIsValid(), false
@@ -302,10 +307,11 @@ define [
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('body')[0])
+      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
+      $("#fixtures").empty()
 
   test 'rowDataIsValid() returns false with duplicate values', ->
     deepEqual @gradingStandard.rowDataIsValid(), false
@@ -337,10 +343,11 @@ define [
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('body')[0])
+      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
+      $("#fixtures").empty()
 
   test 'rowDataIsValid() returns false with if values round to the same number (91.996 rounds to 92)', ->
     deepEqual @gradingStandard.rowDataIsValid(), false
@@ -372,10 +379,11 @@ define [
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
 
-      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('body')[0])
+      @gradingStandard = React.renderComponent(GradingStandard(props), $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@gradingStandard.getDOMNode().parentNode)
+      $("#fixtures").empty()
 
   test 'rowDataIsValid() returns false if scheme values overlap', ->
     deepEqual @gradingStandard.rowDataIsValid(), false

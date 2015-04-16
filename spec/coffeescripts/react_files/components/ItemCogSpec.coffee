@@ -43,10 +43,11 @@ define [
         'move': true
         'deleteLink': true
 
-      @itemCog = React.render(ItemCog(@sampleProps(true)), $('<div>').appendTo('body')[0])
+      @itemCog = React.render(ItemCog(@sampleProps(true)), $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@itemCog.getDOMNode().parentNode)
+      $("#fixtures").empty()
 
   test 'deletes model when delete link is pressed', ->
     ajaxSpy = sinon.spy($, 'ajax')
@@ -61,7 +62,7 @@ define [
     ajaxSpy.restore()
 
   test 'only shows download button for limited users', ->
-    readOnlyItemCog = React.render(ItemCog(@sampleProps(false)), $('<div>').appendTo('body')[0])
+    readOnlyItemCog = React.render(ItemCog(@sampleProps(false)), $('<div>').appendTo('#fixtures')[0])
     ok @buttonsEnabled(readOnlyItemCog, @readOnlyConfig), 'only download button is shown'
 
   test 'shows all buttons for users with manage_files permissions', ->

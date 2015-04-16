@@ -14,10 +14,11 @@ define [
           files:
             models: []
 
-      @button = React.render(UploadButton(props), $('<div>').appendTo('body')[0])
+      @button = React.render(UploadButton(props), $('<div>').appendTo("#fixtures")[0])
 
     teardown: ->
       React.unmountComponentAtNode(@button.getDOMNode().parentNode)
+      $("#fixtures").empty()
 
   test 'hides actual file input form', ->
     form = @button.refs.form.getDOMNode()

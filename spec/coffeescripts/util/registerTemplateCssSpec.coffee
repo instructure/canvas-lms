@@ -2,15 +2,15 @@ define [
   'jquery'
   'compiled/util/registerTemplateCss'
 ], ($, registerTemplateCss) ->
-  
+
   testColor = 'rgb(255, 0, 0)'
-  testRule = "body {color:#{testColor};}"
+  testRule = "#fixtures {color:#{testColor};}"
   testTemplateId = templateId = 'test_template_id'
 
   module 'registerTemplateCss'
   test 'should render correctly', ->
     registerTemplateCss testTemplateId, testRule
-    equal $('body').css('color'), testColor
+    equal $('#fixtures').css('color'), testColor
 
   test 'should append <style> node to bottom of <head>', ->
     registerTemplateCss testTemplateId, testRule
@@ -20,4 +20,4 @@ define [
     registerTemplateCss testTemplateId, testRule
     registerTemplateCss.clear()
     equal $('head style:last').text(), ''
-    ok $('body').css('color') != testColor
+    ok $('#fixtures').css('color') != testColor

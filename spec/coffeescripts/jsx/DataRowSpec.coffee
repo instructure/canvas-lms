@@ -16,10 +16,11 @@ define [
         editing: false
         round: (number)-> return Math.round(number * 100)/100;
 
-      @dataRow = React.render(DataRow(props), $('<table>').appendTo('body')[0])
+      @dataRow = React.render(DataRow(props), $('<table>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@dataRow.getDOMNode().parentNode)
+      $("#fixtures").empty()
 
   test 'renders in "view" mode (as opposed to "edit" mode)', ->
     ok @dataRow.refs.viewContainer
@@ -48,10 +49,11 @@ define [
         onRowNameChange: ->
         onDeleteRow: ->
 
-      @dataRow = React.renderComponent(DataRow(props), $('<table>').appendTo('body')[0])
+      @dataRow = React.renderComponent(DataRow(props), $('<table>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@dataRow.getDOMNode().parentNode)
+      $("#fixtures").empty()
 
   test 'renders in "edit" mode (as opposed to "view" mode)', ->
     ok @dataRow.refs.editContainer
@@ -123,10 +125,11 @@ define [
         editing: false
         round: (number)-> return Math.round(number * 100)/100;
 
-      @dataRow = React.renderComponent(DataRow(props), $('<table>').appendTo('body')[0])
+      @dataRow = React.renderComponent(DataRow(props), $('<table>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@dataRow.getDOMNode().parentNode)
+      $("#fixtures").empty()
 
   test "shows the max score as the sibling's min score", ->
     deepEqual @dataRow.renderMaxScore(), '< 92.35'
