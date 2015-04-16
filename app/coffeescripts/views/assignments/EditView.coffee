@@ -309,6 +309,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
         errors = @groupCategorySelector.validateBeforeSave(data, errors)
       errors = @_validatePointsPossible(data, errors)
       errors = @_validatePointsRequired(data, errors)
+      errors = @_validateExternalTool(data, errors)
       data2 =
         assignment_overrides: @dueDateOverrideView.getAllDates(data)
       errors = @dueDateOverrideView.validateBeforeSave(data2,errors)
@@ -354,5 +355,12 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       if parseInt(data.points_possible,10) < 0 or isNaN(parseFloat(data.points_possible))
         errors["points_possible"] = [
           message: I18n.t("Points possible must be 0 or more for selected grading type")
+        ]
+      errors
+
+    _validateExternalTool: (data, errors) =>
+      if data.submission_type == 'external_tool' and $.trim(data.external_tool_tag_attributes?.url?.toString()).length == 0
+        errors["external_tool_tag_attributes[url]"] = [
+          message: I18n.t 'External Tool URL cannot be left blank'
         ]
       errors
