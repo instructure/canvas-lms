@@ -9,7 +9,7 @@ describe "new groups" do
       course_with_teacher_logged_in
     end
 
-    it "should allow teachers to add a group set", :priority => "1", :test_id => 94152 do
+    it "should allow teachers to add a group set", priority: "1", test_id: 94152 do
       get "/courses/#{@course.id}/groups"
       f('#add-group-set').click
       wait_for_ajaximations
@@ -20,7 +20,7 @@ describe "new groups" do
       expect(fj('.collectionViewItems[role=tablist]>li:last-child').text).to match "Test Group Set"
     end
 
-    it "should allow teachers to create groups within group sets", :priority => "1", :test_id => 94153 do
+    it "should allow teachers to create groups within group sets", priority: "1", test_id: 94153 do
       seed_groups(1,0)
 
       get "/courses/#{@course.id}/groups"
@@ -34,11 +34,9 @@ describe "new groups" do
       expect(fj('.collectionViewItems.unstyled.groups-list>li:last-child')).to include_text("Test Group")
     end
 
-    it "should allow teachers to add a student to a group", :priority => "1", :test_id => 94155 do
-      # Creates one user
-      seed_users(1)
-      # Creates one group set with one group inside it
-      seed_groups(1,1)
+    it "should allow teachers to add a student to a group", priority: "1", test_id: 94155 do
+      # Creates one user, and one groupset with a group inside it
+      group_test_setup(1,1,1)
 
       get "/courses/#{@course.id}/groups"
 
@@ -57,13 +55,11 @@ describe "new groups" do
       expect(f('.group-user-name')).to include_text(@student.name)
     end
 
-    it "should allow teachers to move a student to a different group", :priority => "1", :test_id => 94157 do
-      seed_users(1)
-      # Creates 1 groupset and 2 groups within it
-      seed_groups(1,2)
+    it "should allow teachers to move a student to a different group", priority: "1", test_id: 94157 do
+      # Creates 1 user, 1 groupset, and 2 groups within the groupset
+      group_test_setup(1,1,2)
       # Add seeded student to first seeded group
-      @testgroup[0].add_user @student
-      @testgroup[0].save!
+      add_user_to_group(@student,@testgroup[0])
 
       get "/courses/#{@course.id}/groups"
 
@@ -90,6 +86,26 @@ describe "new groups" do
       fj('.toggle-group :contains("Test Group 2")').click
       wait_for_ajaximations
       expect(f('.group-user')).to include_text(@student.name)
+    end
+
+    it "should allow teachers to remove a student from a group", priority: "1", test_id: 94158 do
+      group_test_setup
+      add_user_to_group(@student,@testgroup[0])
+
+      get "/courses/#{@course.id}/groups"
+
+      f('.toggle-group').click
+      wait_for_ajaximations
+
+      # Deletes the user
+      f('.group-user-actions').click
+      wait_for_ajaximations
+      f('.remove-from-group').click
+      wait_for_ajaximations
+
+      expect(f('.ui-cnvs-scrollable')).to include_text(@student.name)
+      expect(f('.unassigned-users-heading')).to include_text("Unassigned Students (1)")
+      expect(f('.group-summary')).to include_text("0 students")
     end
   end
 end
