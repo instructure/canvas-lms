@@ -787,7 +787,7 @@ class FilesController < ApplicationController
         @attachment.folder_id = @folder.id
       end
       @attachment.content_type = Attachment.mimetype(@attachment.filename)
-      @attachment.locked = true if @attachment.usage_rights_id.nil? && context.respond_to?(:feature_enabled?) && context.feature_enabled?(:better_file_browsing) && context.feature_enabled?(:usage_rights_required)
+      @attachment.set_publish_state_for_usage_rights
       @attachment.save!
 
       res = @attachment.ajax_upload_params(@current_pseudonym,
@@ -975,7 +975,7 @@ class FilesController < ApplicationController
         end
         @attachment.folder = @folder
         @folder_id_changed = @attachment.folder_id_changed?
-        @attachment.locked = true if !@attachment.locked? && @attachment.locked_changed? && @attachment.usage_rights_id.nil? && @context.respond_to?(:feature_enabled?) && context.feature_enabled?(:better_file_browsing) && @context.feature_enabled?(:usage_rights_required)
+        @attachment.set_publish_state_for_usage_rights
         if @attachment.save
           @attachment.move_to_bottom if @folder_id_changed
           flash[:notice] = t 'notices.updated', "File was successfully updated."

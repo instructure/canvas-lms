@@ -274,9 +274,12 @@ class Attachment < ActiveRecord::Base
     end
     dup.context = context
     dup.migration_id = CC::CCHelper.create_key(self)
-    context.log_merge_result("File \"#{dup.folder.full_name rescue ''}/#{dup.display_name}\" created") if context.respond_to?(:log_merge_result)
+    if context.respond_to?(:log_merge_result)
+      context.log_merge_result("File \"#{dup.folder && dup.folder.full_name}/#{dup.display_name}\" created")
+    end
     dup.updated_at = Time.now
     dup.clone_updated = true
+    dup.set_publish_state_for_usage_rights unless self.locked?
     dup
   end
 
@@ -1449,6 +1452,15 @@ class Attachment < ActiveRecord::Base
 
   def can_unpublish?
     false
+  end
+
+  def set_publish_state_for_usage_rights
+    if self.context &&
+       self.context.respond_to?(:feature_enabled?) &&
+       self.context.feature_enabled?(:better_file_browsing) &&
+       self.context.feature_enabled?(:usage_rights_required)
+      self.locked = self.usage_rights.nil?
+    end
   end
 
   # Download a URL using a GET request and return a new un-saved Attachment
