@@ -1,5 +1,6 @@
 // Shared between:
 // - bundles/login.scss
+// - bundles/login_confirm.scss
 // - bundles/otp_login.scss
 // must have @import base/environment and @import pages/shared/registration_dialog.scss
 // loaded within compiler for this to work
@@ -9,12 +10,14 @@ $modal_box_padding: 20px;
 
 body.modal {
   #footer {
+    display: block !important;
     @if $use_new_styles {
-      display: block !important;
-      @include breakpoint(desktop) { display: flex !important; }
+      @include breakpoint(desktop) {
+        display: flex !important;
+        align-items: center;  
+      }
     }
     @else {
-      display: block !important;
       width: $modal_box_width + 20px;
       margin: 20px auto;
     }
@@ -58,9 +61,9 @@ body.modal {
   #modal-box {
     border: 1px solid #888;
     border-top-color: #ccc;
+    @include vertical-gradient(#f4f4f4, #e2e2e2);
     width: $modal_box_width - 2 * $modal_box_padding;
     padding: 2 * $modal_box_padding;
-    @include vertical-gradient(#f4f4f4, #e2e2e2);
     .bootstrap-form {
       p.instructions {
         font-weight: bold;
@@ -69,8 +72,8 @@ body.modal {
       }
       margin: 0 20px 20px;
       .btn-large {
-        float: none;
         width: 220px;
+        float: none;
       }
     }
     h2, .h2 {
@@ -102,7 +105,7 @@ body.modal {
         text-indent: -999em;
       }
       a {
-        color: #64b9f9 !important;
+        color: #64b9f9;
         &:hover {
           text-decoration: underline;
         }
@@ -120,6 +123,15 @@ body.modal {
       .radio_spacer {
         width: 25px;
         display: inline-block;
+      }
+    }
+    #forgot_password_form {
+      margin: 0 auto;
+      width: 455px;
+      .btn {
+        margin: 7px 0;
+        float: none;
+        padding: 10px 24px;
       }
     }
   }
@@ -146,17 +158,12 @@ body.webkit #modal-box.login-box input.text {
     float: left;
     line-height: 1.75em;
   }
-}
-
-body.modal {
-  #forgot_password_form {
-    margin: 0 auto;
-    width: 455px;
-    .btn {
-      margin: 7px 0;
-      float: none;
-      padding: 10px 24px;
-    }
+  .errorBox {
+    display: block;
+    position:relative;
+    top: auto;
+    left: auto;
+    max-width: 400px;
   }
 }
 
@@ -175,7 +182,7 @@ span.field-with-fancyplaceholder {
       span {
         position: absolute;
         z-index: 2;
-        -webkit-user-select: none;
+        user-select: none;
         padding: 19px 22px 18px 24px;
       }
     }
@@ -213,15 +220,13 @@ span.field-with-fancyplaceholder {
   text-align: center;
   font-size: 1.1em;
   line-height: 1.25;
-  i, b {
-    display: block;
-  }
-  i {
+  .ic-Login__banner-title {
     color: #444;
     font-style: normal;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.25);
+
   }
-  b {
+  .ic-Login__banner-subtitle {
     font-weight: normal;
     color: #fff;
   }
@@ -260,72 +265,4 @@ span.field-with-fancyplaceholder {
       font-weight: normal;
     }
   }
-}
-///
-//// SSO Login Links
-///
-@mixin shared-sso($direction) {
-  content: "";
-  flex: 1;
-  height: 1px;
-  margin: 0 1em;
-  background: linear-gradient(to $direction, darken($ic-color-neutral, 10), transparent);
-}
-.ic-Login_sso {
-  clear: both;
-  text-align: center;
-}
-.ic-Login_sso-divider {
-  padding: 10px 0;
-  margin: 0;
-  line-height: normal;
-  font-size: 11px;
-  color: darken($ic-color-neutral, 10);
-  display: flex;
-  align-items: center;
-  &:before {   @include shared-sso(left); }
-  &:after  {   @include shared-sso(right);}
-}
-.ic-Login_sso-list {
-  padding: 0;
-  margin: 0;
-}
-.ic-Login_sso-list_item {
-  list-style: none;
-  display: inline-block;
-}
-.Button.ic-Login_sso-button {
-  padding: 10px 24px 10px 24px;
-  background: transparent;
-  color: $ic-color-light;
-  border: transparent;
-  &--has-text {
-    display: flex;
-    align-items: center;
-  }
-  &:focus { color: $ic-color-light; }
-  &:hover {
-    background: $ic-brand-primary;
-    color: $ic-color-light;
-    &.ui-state-hover {
-      background: $ic-brand-primary;
-      color: $ic-color-light;
-      border-color: darken($ic-brand-primary, 15%);
-    }
-  }
-  transition: all 0.5s;
-}
-.ic-Login_icon-sso {
-  padding-right: $ic-sp;
-}
-.ic-Login_icon-sso--icon-only {
-  padding-right: 0;
-}
-
-.ic-Login_sso-button_title {
-  border-left: 1px solid $ic-color-light;
-  padding: 0 $ic-sp;
-}
-.ic-Login_sso-button_title-caps {
-  text-transform: capitalize;
 }
