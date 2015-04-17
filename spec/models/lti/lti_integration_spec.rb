@@ -134,8 +134,13 @@ describe "LTI integration tests" do
     expect(post_payload['oauth_callback']).to eq 'about:blank'
     expect(post_payload['resource_link_id']).to eq canvas_tool.opaque_identifier_for(canvas_course)
     expect(post_payload['resource_link_title']).to eq canvas_tool.name
-    expect(post_payload['roles']).to eq 'urn:lti:role:ims/lis/TeachingAssistant,Instructor'
-    expect(post_payload['ext_roles']).to eq "urn:lti:instrole:ims/lis/Administrator,urn:lti:instrole:ims/lis/Instructor,urn:lti:role:ims/lis/Instructor,urn:lti:role:ims/lis/TeachingAssistant,urn:lti:sysrole:ims/lis/User"
+
+    expect(post_payload['roles'].split(',')).to match_array ['urn:lti:role:ims/lis/TeachingAssistant', 'Instructor']
+    expect(post_payload['ext_roles'].split(',')).to match_array ['urn:lti:instrole:ims/lis/Administrator',
+                                                                 'urn:lti:instrole:ims/lis/Instructor',
+                                                                 'urn:lti:role:ims/lis/Instructor',
+                                                                 'urn:lti:role:ims/lis/TeachingAssistant',
+                                                                 'urn:lti:sysrole:ims/lis/User']
     expect(post_payload['tool_consumer_info_product_family_code']).to eq 'canvas'
     expect(post_payload['tool_consumer_info_version']).to eq 'cloud'
     expect(post_payload['tool_consumer_instance_contact_email']).to eq HostUrl.outgoing_email_address

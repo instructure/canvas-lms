@@ -81,8 +81,9 @@ describe SectionsController, type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course2.id}/sections.json",
                       { :controller => 'sections', :action => 'index', :course_id => @course2.to_param, :format => 'json' }, { :include => 'total_students' })
 
-      expect(json.first).to include('total_students')
-      expect(json.first['total_students']).to eq 3
+      hash = json.detect{|s| s['id'] == section2.id}
+      expect(hash).to include('total_students')
+      expect(hash['total_students']).to eq 3
     end
 
     it "should not return deleted sections" do
