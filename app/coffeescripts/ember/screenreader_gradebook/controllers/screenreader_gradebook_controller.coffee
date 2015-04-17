@@ -71,6 +71,7 @@ define [
     contextUrl: contextUrl
 
     downloadCsvUrl: "#{contextUrl}/gradebook.csv"
+    uploadCsvUrl: "#{contextUrl}/gradebook_upload/new"
 
     downloadOutcomeCsvUrl: "#{contextUrl}/outcome_rollups.csv"
 

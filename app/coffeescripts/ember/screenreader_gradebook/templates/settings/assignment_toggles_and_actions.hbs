@@ -89,13 +89,13 @@
       <a class="btn" role="button" href="{{ unbound downloadCsvUrl }}">
         <i class="icon-download"></i> {{#t 'download_scores'}}Download Scores (.csv){{/t}}
       </a>
-      <button
+      <a
         id="upload"
         class="btn"
-        {{ action 'openDialog' 'upload' target=view }}
+        href="{{unbound uploadCsvUrl}}"
       >
         <i class="icon-upload"></i> {{#t 'upload_scores'}}Upload Scores (.csv){{/t}}
-      </button>
+      </a>
     </div>
 
     <div class="pad-box bottom-only">
