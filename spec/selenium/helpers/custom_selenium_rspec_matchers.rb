@@ -31,19 +31,16 @@ module CustomSeleniumRspecMatchers
 
     def matches?(element)
       @element = element
-      if (@element.instance_of? String)
-        @element.include?(@text)
-      else
-        @element.text.include?(@text)
-      end
+      @element_text = @element.instance_of?(String) ? @element : @element.text
+      @element_text.include?(@text)
     end
 
     def failure_message
-      "expected #{@element.inspect} text to include #{@text}, actual text was: #{@element.text}"
+      "expected #{@element.inspect} text to include #{@text}, actual text was: #{@element_text}"
     end
 
     def failure_message_when_negated
-      "expected #{@element.inspect} text to NOT include #{@text}, actual text was: #{@element.text}"
+      "expected #{@element.inspect} text to NOT include #{@text}, actual text was: #{@element_text}"
     end
   end
 
