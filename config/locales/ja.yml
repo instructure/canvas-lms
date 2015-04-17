@@ -2,8 +2,17 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 ja: 
+  1_item_scores_1_2_2_3_5_5_3_39f6c397: "1 - アイテムのスコア: 1, 2, 2, 3, 5, 5, 3"
+  1_item_scores_1_3_2_4_5_3_6_mastery_score_set_at_5_70ff296a: "1- アイテムのスコア: 1, 3, 2, 4, 5, 3, 6。5の習得スコアセット 。"
+  1_item_scores_3_2_2_4_1_3_4_e0de3073: "1 - アイテムのスコア: 3, 2, 2, 4, 1, 3, 4"
+  1_item_scores_4_3_2_5_3e2933a0: "1 - アイテムのスコア: 4, 3, 2, 5"
   1_item_scores_5512cd03: "1- アイテムのスコア"
+  2_final_score_5_5_8418d475: "2- 最終スコア: 5.5"
   2_final_score_7b0fd15e: "2- 最終スコア"
+  2_highest_score_4_3b4bc250: "2 - 最高スコア: 4"
+  2_most_recent_score_3_766dbf4e: "2 - 最新のスコア: 3"
+  2_the_rest_item_average_4_3_2_3_3_d05f04e2: "2 - 「残り」のアイテムの平均: (4 + 3 + 2) / 3 = 3"
+  3_calculated_mastery_score_5_0_75_3_0_25_4_5_c88c3a7b: "3 - 計算済み習得スコア: 5(0.75) + 3(0.25) = 4.5"
   451_message: 
     description: 米国の貿易制限が適用される国からはこのサイトにアクセスできません。
     headings: 
@@ -42,6 +51,7 @@ ja:
     save: 保存
   _section_not_synced_yet_cd07d0dd: "-- セクションはまだ同期されていません"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: この計算メソッドで計算値が使用されていません
+  a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "このフォルダ中にすでに存在する、%{itemName}という名のファイル。"
   a_message_is_required_129e1814: メッセージが必要です
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: 採点スキームの名前とスキームの編集または削除用のアイコンを含む表です。
   a_table_that_contains_the_grading_scheme_data_each_d461c205: 採点スキームのデータを含む表です。各行には、名前、最大のパーセンテージ、最低のパーセンテージが含まれています。さらに、下に行を追加するためのアイコンと現在の行を削除するアイコンも含まれています。
@@ -930,6 +940,7 @@ ja:
         help_link_text: リンクに表示するテキスト
         help_link_url: URL
         include_students_in_global_survey: "受講生をグローバル サーベイに含める"
+        locked: サブアカウントとコースのために、この設定を保存。
         login_handle_name: "ログイン ラベル"
         message: メッセージ
         mfa_settings: マルチファクタ認証
@@ -943,6 +954,7 @@ ja:
         prevent_course_renaming_by_teachers: 講師によるコース名の変更を許可しない
         restrict_quiz_questions: コースの終了日以降はクイズ問題を受講生に表示しない
         restrict_student_future_view: 開始日前のコースは受講生に表示しない
+        restrict_student_past_view: 期日終了後、生徒がコースを閲覧することが制限されます。
         role_id: さらに追加
         self_enrollment: セルフ登録を許可する
         self_registration: 自己登録
@@ -1047,6 +1059,13 @@ ja:
       subtitle_term: "対象期間 **%{term}**"
       title: このアカウント内のコース
       too_many_courses_message: "コースが多すぎて全部を表示できません (%{count} 件)。右側の検索機能を使用し、目的のコースを検索してください。"
+    single_course_ag_selector_parameters: 
+      account_reports: 
+        linn_benton: 
+          assignment_group_id: 
+            text: "割り当てグループID:"
+          course_id: 
+            text: "コースID:"
     sis_batch_counts: 
       accounts_label: アカウント
       courses_label: コース
@@ -1276,6 +1295,7 @@ ja:
   add_course_assignments_628ed6d0: コースの課題の追加
   add_course_calendar_events_146154a5: "コースのカレンダー イベントの追加"
   add_files_to_the_course_da6ffd32: コースにファイルを追加
+  add_grading_period_6f774dc3: 採点期間を追加
   add_grading_scheme_81e23c05: 採点スキームを追加
   add_module_item: 
     add_assignment_to: "課題を %{module} に追加"
@@ -1420,7 +1440,9 @@ ja:
     podcast_feed_description_group: "\"%{group}\" グループのアナウンス内にリンク元がある、または埋め込まれているメディア ファイルはすべて、このフィードに表示されます。"
     podcast_feed_name: "%{course} アナウンスのポッドキャスト フィード"
   anonymous_e1b8ad27: 匿名
+  anonymous_user_d984b9ce: 匿名のユーザー
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: 最後の試行の後に解答が表示されます
+  api_url_3ee7cb0a: "API URL"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "コースまたはアカウントの設定ページの「アプリ」タブにアプリ センターが表示されます。下の URL はアプリ センターのエンドポイントを指している必要があります。 (例: %{url} -- 末尾のスラッシュは省略します"
   apple_touch_icon_2c258bb3: "Apple タッチ アイコン"
   application: 
@@ -1481,6 +1503,7 @@ ja:
     title: "%{name} の編集"
     update: 更新
   archive_3f794d7e: アーカイブ
+  archive_selected_d64506ca: 選択されたアーカイブ
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     one: "この %{count} アイテムを削除してよろしいですか?"
     other: "この %{count} アイテムを削除してよろしいですか?"
@@ -1488,6 +1511,7 @@ ja:
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: この採点期間を削除してもよろしいですか?
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: この採点スキームを削除してもよろしいですか?
   are_you_sure_you_want_to_remove_this_tool_7363f90b: このツールを削除してもよろしいですか?
+  are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: このプロファイルの写真をレポートしてもよろしいですか？
   aria_labels: 
     unlock_at_date: ロック解除日付
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: このフィールドに入力すると、グループのリストが自動的にフィルタリングされて、入力した文字に一致する名前のグループのみが表示されます。
@@ -1937,8 +1961,10 @@ ja:
         remind: "アセスメントについて %{assessor} に念押しする。最終通知日: %{time}"
         reminder: "アセスメントについて %{assessor} に念押しする。最終通知日: %{time}"
     peer_reviews_selector: 
+      anonymous_peer_reviews: 匿名
       how_to_peer_review: "ピア レビューの割り当て方法"
       labels: 
+        anonymous_peer_reviews: 相互評価は匿名で表示します
         automatically_assign_peer_reviews: "ピア レビューの自動割り当て"
         manually_assign_peer_reviews: "ピア レビューの手動割り当て"
         require_peer_reviews: "ピア レビューが必要"
@@ -2190,6 +2216,8 @@ ja:
   available_after_unlock_at_until_lock_at_499e8092: "%{unlock_at} 後に %{lock_at} まで利用可能"
   available_from_587ce92f: 次の日付から使用可能
   available_from_date_43b5e11d: 利用可能期間の開始日付
+  available_from_date_afc594fa: "日付から利用可能:"
+  available_until_date_2c0ccec3: "日付まで利用可能:"
   available_until_date_cd125c62: 利用可能期間の終了日付
   available_until_f3b9c4ed: 次の日付まで利用可能
   available_until_lock_at_ab022445: "%{lock_at} まで利用可能"
@@ -2206,9 +2234,12 @@ ja:
       新しい、シンプルで使いやすいファイル参照インターフェイスです。これをコースレベルで有効にすると、
       そのコースのすべてのユーザに新しいインターフェイスが表示されます。ユーザの個人用ファイルのページ ('/files') で
       このインターフェイスを表示するには、ユーザが属するアカウントで設定を有効にする必要があります。
+  between_1_and_99_d421a4c0: " 1% a から 99%の間"
+  between_2_and_5_c34f5152: "2 と 5の間"
   big_blue_button_conference: 
     conference_is_recorded: この会議は記録されています。
     recording_setting: 記録
+    recording_setting_enabled_description: この会議は録音可能です
   blackboard: 
     no_manifest: "この Blackboard .zip のルート ディレクトリには imsmanifest.xml ファイルがありません。"
   bookmark_service: 
@@ -2220,6 +2251,7 @@ ja:
       permissions: "編集権限: %{name}"
     unpublished_title: 未公開
   broken_file_link_found_in_your_course_7cc24395: "コース内のファイル リンクに問題があります"
+  bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "バケット名は、以下のうちの一つである必要があります: %{bucket_names}"
   bulk_course_migration: 
     export_failed: "bb_lcid %{id} のコースを Blackboard からエクスポートする際にエラーが発生しました"
     export_failed_no_id: コースをインポートする際にエラーが発生しました
@@ -2444,6 +2476,7 @@ ja:
       create_event: 新しいイベントの作成
       done_go_back_to_list: 完了し、リストに戻る
       links: 
+        accessibility_warning: "警告: アジェンダビューを使って行事予定表へのアクセスを向上させてください。"
         calendar_agenda: アジェンダ
         calendar_month: 月
         calendar_scheduler: スケジューラ
@@ -2722,7 +2755,12 @@ ja:
         delete: イベント/課題の削除
         new: 新しいイベントの作成
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: 注釈への関連付けに基づいたアライメントは削除できません。これらの関連付けを削除するには、そのアセットの注釈から当該行を削除する必要があります
+  can_t_perform_diffing_against_more_than_one_file_o_44475c0d: 同じタイプの複数のファイルに対する差分の実行はできません。
   cancel_caeb1e68: キャンセル
+  cannot_be_nil_when_account_id_is_nil_be6d1d60: アカウント_idが無のとき、無になるはずはありません。
+  cannot_be_nil_when_course_id_is_nil_f539388: コース_idが無のとき、無になるはずはありません。
+  cannot_be_present_when_account_id_is_present_f7d9b51f: アカウント_idが現在であるとき、現在になるはずはありません。
+  cannot_be_present_when_course_id_is_present_785e6a59: コース_idが現在であるとき、現在になるはずはありません。
   canvas: 
     migration: 
       errors: 
@@ -2732,15 +2770,22 @@ ja:
     plugins: 
       errors: 
         all_fields_required: すべて必須項目です
+        aws_creds_required: AWSの資格が必要です。
+        endpoint_or_region_required: AWS領域(またはエンドポイント)が必要です。
         fields_required: "フィールド \"%{field}\" は必須項目です"
+        invalid_live_events_url: 無効なエンドポイントです。有効なURLでなければなりません。
         invalid_url: "無効な URL"
         login_expiration_minimum: "セッションの有効期間は 20 分以上にする必要があります"
         need_integer: "プレイ リスト キャッシュの整数を入力してください"
+        stream_name_required: キネシス·ストリーム名が必要です。
   canvas_cartridge_description: "これは、Canvas のエクスポートを JSON 形式の中間ファイルに変換し、インポートできるようにします。"
   canvas_cartridge_display: "Canvas コモン カートリッジ"
   canvas_cartridge_file_description: "Canvas コース エクスポート パッケージ"
   canvas_cartridge_name: "Canvas カートリッジ インポーター"
+  canvas_error_report_ff678539: キャンバス・エラー・レポート
   canvas_revision_unknown: 不明
+  canvas_ticketing_email_connector_27e253ae: キャンバス・チケット・メールコネクタ
+  canvas_ticketing_web_post_connector_11158897: キャンバス・チケット・ウェブポストコネクタ
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: クイズを保存すると、すべての提出物が再評価されます。この処理には数分かかる場合があります。
   cc: 
     by: "CC 属性"
@@ -2760,7 +2805,10 @@ ja:
   choose_a_csv_file_to_upload_9644480c: "アップロードする CSV ファイルの選択:"
   choose_usage_rights_33683854: 使用権を選択...
   clear_file_name_text_field_fce73840: "ファイル名のテキスト フィールドをクリア"
+  click_for_more_details_on_this_outcome_8c018d2f: クリックして、結果の更なる詳細をみる
   click_here_on_the_calendar_link_c9965631: "*カレンダー* リンクのここをクリック"
+  click_to_modify_89fa26aa: クリックして変更する
+  click_to_report_profile_picture_370f9625: クリックして、プロファイルの写真をレポートする。
   close_and_return_to_canvas_80544344: "閉じて Canvas に戻る"
   close_d634289d: 閉じる
   collaboration: 
@@ -2864,6 +2912,7 @@ ja:
     titles: 
       delete: 共同作業を削除しますか?
   collapse_list_of_group_members_for_groupname_d6c66fa0: "%{groupName} のグループ メンバーのリストを折りたたむ"
+  collapse_subdiscussion_89af1f5c: サブディスカッションを折りたたむ
   coming_up_4348b0bd: 次の予定
   comm_messages: 
     from_beginning: 開始
@@ -5228,6 +5277,7 @@ ja:
       add_reply_to_topic: トピックへの返信を追加
     entry_content: 
       authors_name: 作成者名
+      collapsible_subdiscussion: サブディスカッションを折りたたむ
       delete: 削除
       edit: 編集
       edited_comment: "*%{editor.display_name}* が %{edited_at} に編集"
@@ -13817,6 +13867,7 @@ ja:
     resubmitted_to_turnitin: "turnitin に正常に再提出されました。"
     see_attached_files: 添付ファイルを参照してください
     show: 
+      anonymous_user: 匿名のユーザー
       attach_file: ファイルを添付
       buttons: 
         save: 保存
