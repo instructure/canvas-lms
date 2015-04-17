@@ -2,8 +2,15 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 zh_Hant: 
+  1_item_scores_1_2_2_3_5_5_3_39f6c397: "1 - 項目分數：1, 2, 2, 3, 5, 5, 3"
+  1_item_scores_1_3_2_4_5_3_6_mastery_score_set_at_5_70ff296a: "1- 項目分數：1, 3, 2, 4, 5, 3, 6。精通分數設定為5分。"
+  1_item_scores_3_2_2_4_1_3_4_e0de3073: "1 - 項目分數：3, 2, 2, 4, 1, 3, 4 "
+  1_item_scores_4_3_2_5_3e2933a0: "1 - 項目分數：4, 3, 2, 5"
   1_item_scores_5512cd03: "1- 項目分數"
+  2_final_score_5_5_8418d475: "2- 最終分數：5.5 "
   2_final_score_7b0fd15e: "2- 最終分數"
+  2_highest_score_4_3b4bc250: "2 - 最高分數：4 "
+  2_most_recent_score_3_766dbf4e: "2 - 最近分數：3"
   451_message: 
     description: 因為您所在國家受美國貿易限制的約束，所以您無法獲得此網站的授權。
     headings: 
@@ -4831,6 +4838,7 @@ zh_Hant:
       month: 月
       second: 秒
       year: 年
+  decaying_average_8bf6a0dd: 衰減平均分
   default_conference_title: "%{course_name} 會議"
   default_question_name: 問題
   default_question_text: 問題文字
