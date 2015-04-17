@@ -621,7 +621,8 @@ class Attachment < ActiveRecord::Base
       self.shard.activate do
         while !valid_name
           existing_names = self.folder.active_file_attachments.where("id <> ?", self.id).pluck(:display_name)
-          self.display_name = Attachment.make_unique_filename(self.display_name, existing_names)
+          new_name = opts[:name] || self.display_name
+          self.display_name = Attachment.make_unique_filename(new_name, existing_names)
 
           if Attachment.where("id = ? AND NOT EXISTS (SELECT 1 FROM attachments WHERE id <> ? AND display_name = ? AND folder_id = ? AND file_state <> ?)",
                               self.id, self.id, self.display_name, self.folder_id, 'deleted').limit(1).update_all(:display_name => self.display_name) > 0

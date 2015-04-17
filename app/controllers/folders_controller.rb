@@ -597,7 +597,8 @@ class FoldersController < ApplicationController
     if authorized_action(@source_file, @current_user, :download)
       @attachment = @context.attachments.build(folder: @dest_folder)
       if authorized_action(@attachment, @current_user, :create)
-        on_duplicate = params[:on_duplicate].presence
+        on_duplicate, name = params[:on_duplicate].presence, params[:name].presence
+        duplicate_options = (on_duplicate == 'rename' && name) ? {name: name} : {}
         return render :json => {:message => "on_duplicate must be 'overwrite' or 'rename'"}, :status => :bad_request if on_duplicate && %w(overwrite rename).exclude?(on_duplicate)
         if on_duplicate.nil? && @dest_folder.active_file_attachments.where(display_name: @source_file.display_name).exists?
           return render :json => {:message => "file already exists; set on_duplicate to 'rename' or 'overwrite'"}, :status => :conflict
@@ -605,7 +606,7 @@ class FoldersController < ApplicationController
         @attachment = @source_file.clone_for(@context, @attachment, force_copy: true)
         if @attachment.save
           # default to rename on race condition (if a file happened to be created after the check above, and on_duplicate was not given)
-          @attachment.handle_duplicates(on_duplicate == 'overwrite' ? :overwrite : :rename)
+          @attachment.handle_duplicates(on_duplicate == 'overwrite' ? :overwrite : :rename, duplicate_options)
           render :json => attachment_json(@attachment, @current_user, {}, { omit_verifier_in_app: true })
         else
           render :json => @attachment.errors
