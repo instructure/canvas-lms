@@ -294,11 +294,15 @@ class LearningOutcome < ActiveRecord::Base
     save!
   end
 
-  def assessed?
-    if learning_outcome_results.loaded?
-      learning_outcome_results.any?
+  def assessed?(course = nil)
+    if course
+      self.learning_outcome_results.where(context_id: course, context_type: "Course").exists?
     else
-      learning_outcome_results.exists?
+      if learning_outcome_results.loaded?
+        learning_outcome_results.any?
+      else
+        learning_outcome_results.exists?
+      end
     end
   end
 
@@ -327,13 +331,16 @@ class LearningOutcome < ActiveRecord::Base
     LearningOutcome.where(:id => to_delete).update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
   end
 
-  scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
-  scope :active, -> { where("learning_outcomes.workflow_state<>'deleted'") }
-  scope :has_result_for, lambda { |user|
-    joins(:learning_outcome_results).
-        where("learning_outcomes.id=learning_outcome_results.learning_outcome_id AND learning_outcome_results.user_id=?", user).
-        order(best_unicode_collation_key('short_description'))
-  }
+  scope(:for_context_codes, ->(codes) { where(:context_code => codes) })
+  scope(:active, -> { where("learning_outcomes.workflow_state<>'deleted'") })
+  scope(:has_result_for_user,
+    lambda do |user|
+      joins(:learning_outcome_results)
+        .where("learning_outcomes.id=learning_outcome_results.learning_outcome_id " \
+               "AND learning_outcome_results.user_id=?", user)
+        .order(best_unicode_collation_key('short_description'))
+    end
+  )
 
   scope :global, -> { where(:context_id => nil) }
 end

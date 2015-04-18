@@ -869,4 +869,121 @@ describe LearningOutcome do
       end
     end
   end
+
+  context "learning outcome results" do
+    let(:outcome) do
+      LearningOutcome.create!(
+        context: account.call,
+        title: 'outcome',
+        calculation_method: 'highest'
+      )
+    end
+
+    let(:c1) { course_with_teacher; @course }
+    let(:c2) { course_with_teacher; @course }
+
+    let(:add_student) do
+      ->(*courses) { courses.each { |c| student_in_course(course: c) } }
+    end
+
+    let(:account) { ->{ Account.all.find{|a| !a.site_admin? && a.root_account?} } }
+
+    let(:create_rubric) do
+      ->(outcome) do
+        rubric = Rubric.create!(:context => outcome.context)
+        rubric.data = [{
+          :points => 3,
+          :description => "Outcome row",
+          :id => 1,
+          :ratings => [
+            {
+              :points => 3,
+              :description => "Rockin'",
+              :criterion_id => 1,
+              :id => 2
+            },
+            {
+              :points => 0,
+              :description => "Lame",
+              :criterion_id => 1,
+              :id => 3
+            }
+          ],
+          :learning_outcome_id => outcome.id
+        }]
+        rubric.save!
+        rubric
+      end
+    end
+
+    let(:find_rubric) do
+      ->(outcome) do
+        # This is horribly inefficient, but there's not a good
+        # way to query by learning outcome id because it's stored
+        # in a serialized field :facepalm:.  When we do our outcomes
+        # refactor we should get rid of the serialized field here also
+        Rubric.all.each { |r| return r if r.data.first[:learning_outcome_id] == outcome.id }
+        nil
+      end
+    end
+
+    def add_or_get_rubric(outcome)
+      @add_or_get_rubric_cache ||= Hash.new do |h, key|
+        h[key] = find_rubric.call(outcome) || create_rubric.call(outcome)
+      end
+      @add_or_get_rubric_cache[outcome.id]
+    end
+
+    let(:assess_with) do
+      ->(outcome, context) do
+        assignment = assignment_model(context: context)
+        rubric = add_or_get_rubric(outcome)
+        user = user(:active_all => true)
+        context.enroll_student(user)
+        a = rubric.associate_with(assignment, context, :purpose => 'grading')
+        assignment.reload
+        submission = assignment.grade_student(user, :grade => "10").first
+        a.assess({
+          :user => user,
+          :assessor => user,
+          :artifact => submission,
+          :assessment => {
+            :assessment_type => 'grading',
+            :criterion_1 => {
+              :points => 2,
+              :comments => "cool, yo"
+            }
+          }
+        })
+        result = outcome.learning_outcome_results.first
+        assessment = a.assess({
+          :user => user,
+          :assessor => user,
+          :artifact => submission,
+          :assessment => {
+            :assessment_type => 'grading',
+            :criterion_1 => {
+              :points => 3,
+              :comments => "cool, yo"
+            }
+          }
+        })
+        result.reload
+        rubric.reload
+        { assignment: assignment, assessment: assessment, rubric: rubric }
+      end
+    end
+
+    it "properly reports whether assessed in a course" do
+      add_student.call(c1, c2)
+      add_or_get_rubric(outcome)
+      [c1, c2].each { |c| outcome.align(nil, c, :mastery_type => "points") }
+      assess_with.call(outcome, c1)
+
+      expect(outcome.alignments.length).to eq(3)
+      expect(outcome).to be_assessed
+      expect(outcome).to be_assessed(c1)
+      expect(outcome).not_to be_assessed(c2)
+    end
+  end
 end

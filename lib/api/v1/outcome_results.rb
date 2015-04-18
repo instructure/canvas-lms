@@ -82,7 +82,8 @@ module Api::V1::OutcomeResults
   #
   # Returns a Hash containing serialized outcome links.
   def outcome_results_include_outcome_links_json(outcome_links)
-    outcome_links.map { |l| Api.recursively_stringify_json_ids(outcome_link_json(l, @current_user, session)) }
+    ols_json = outcome_links_json(outcome_links, @current_user, session)
+    ols_json.map{ |ol| Api.recursively_stringify_json_ids(ol) }
   end
 
   # Public: Returns an Array of serialized Course objects for linked hash.
