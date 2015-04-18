@@ -4150,6 +4150,8 @@ es:
         conclude_course: "Concluír el Curso"
         delete_course: "Borrar el Curso"
       details: 
+        conclude_alt_text: "Si desea conservar la capacidad de cambiar las calificaciones mientras que limita el acceso del estudiante al curso, por favor utilice las configuraciones de las fechas del curso. Usted puede aprender sobre las configuraciones de la fecha del curso en nuestras guías *aquí*."
+        confirm_conclude: "Advertencia: Al concluir el curso se archivará todo el contenido del curso y le impiderá modificar las calificacones."
         confirm_delete: "¿Está seguro de que desea eliminar este curso? Una vez eliminado, los alumnos y los profesores ya no tendrán acceso al mismo. Si solo desea eliminarlo del menú desplegable, debe elegir la opción de *finalizar el curso*."
         confirm_delete_addendum: "Si no tiene permiso para finalizar el curso, puede *cambiar la fecha de finalización del curso* o solicitar al administrador que finalice el curso."
       headings: 
@@ -4436,6 +4438,8 @@ es:
         open_enrollment: "Agregar un enlace de \"Unirse a este Curso\" a la página de inicio del curso"
         public_syllabus: "Hacer que el programa de estudios de este curso sea visible públicamente"
         restrict_enrollments_to_course_dates: "Los usuarios sólo pueden participar en el curso entre estas fechas"
+        restrict_student_future_view: "Restringir que los alumnos vean el curso antes de la fecha de inicio"
+        restrict_student_past_view: "Restringir estudiantes de ver el curso después del la fecha de término"
         root_account: "Cuenta principal"
         root_account_id: "Cuenta Principal"
         sis_source_id: "ID de SIS"
@@ -4811,6 +4815,7 @@ es:
     formats: 
       date_at_time: "%-d %b en %k:%M"
       default: "%d/%m/%Y"
+      full: "%-d %b, %Y %-l:%M%P"
       long: "%-d %B %Y"
       long_with_weekday: "%A, %-d %B"
       medium: "%-d %b %Y"
