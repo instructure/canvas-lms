@@ -10173,6 +10173,7 @@ nl:
   permissions: 
     manage_webhooks: "Webhooks beheren "
   pick_a_destination_we_ll_send_you_errors_fa0cb0e0: "selecteer een bestemming, we sturen je fouten toe"
+  pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "selecteer een eindpunt, we zullen uw foutrapporten daar posten"
   plain_text_e3ab33aa: "Tekst zonder opmaak "
   please_add_at_least_one_non_blank_answer_213c2c8e: " Tenminste een antwoord toevoegen."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Tenminste een variabele toevoegen. "
@@ -10424,6 +10425,18 @@ nl:
       labels: 
         api_key: API-sleutel
         secret_key: "Geheime sleutel"
+    live_events: 
+      description: "Service voor real-time evenementen."
+      name: "Live Evenementen"
+    live_events_settings: 
+      description: "Pusht evenementen naar een Kinesis stroom."
+      endpoint_region_requirement: "Of AWS Regio of Eindpunt zijn vereist. Het eindpunt wordt doorgaans alleen gebruikt voor ontwikkeling."
+      labels: 
+        aws_access_key_id: "AWS Toegang Toets ID"
+        aws_endpoint: "AWS Eindpunt (url)"
+        aws_region: "AWS Regio"
+        aws_secret_access_key: "AWS Geheime Toegangscode"
+        kinesis_stream_name: "Kinesis Stroomnaam"
     lockdown_browser: 
       labels: 
         download_url: "LockDown Browser-download-URL"
@@ -10478,6 +10491,10 @@ nl:
         minimum_rows_for_parallel: "Minimum aantal rijen in een SIS-import voordat parallelle verwerking  gebruikt kan worden"
         parallelism: "Aantal taak processors dat  gebruikt moet worden voor de parallelle verwerking van SIS-imports"
         queue_for_parallel_jobs: "Taakwachtrij voor parallelle taken (leeg voor standaardinstelling)"
+    ticketing_system_settings: 
+      description: "Ticketing Systeeminstellingen"
+      labels: 
+        type: "Ticketing Systeemsoort"
     twitter: 
       description: "Meldingen op twitter"
       name: Twitter
@@ -10534,6 +10551,7 @@ nl:
         poll_choice_belongs_to_poll: "Die peiling keuze behoort niet tot de bestaande peiling."
         poll_is_published: "Deze peilingsessie is niet open voor inzendingen."
         user_and_poll_session_uniqueness: "kan slechts een keuze per peilingsessie insturen."
+  possible_combination_count_db651ca4: "Mogelijke combinatietelling"
   possible_score_5e0a328e: "Mogelijk: %{score} "
   post_grades_39c52870: "Cijfers bekend maken/posten "
   post_grades_description: "Cijfers publiceren laat docenten toe cijfers in ingeschakelde SIS systemen te publiceren: Powerschool,\n\
@@ -11013,6 +11031,7 @@ nl:
     disabled_assignment: "Kan publicatie niet ongedaan maken als er inzendingen van cursist zijn"
     disabled_discussion_topic: "Kan publicatie niet ongedaan maken als er inzendingen van cursist zijn"
     disabled_quiz: "Kan publicatie niet ongedaan maken als er inzendingen van cursist zijn"
+  published_click_to_modify_233c0d4: "Gepubliceerd - Klik om te wijzigen"
   purchases: 
     new: 
       payment_info: Betaalgegevens
@@ -11192,6 +11211,7 @@ nl:
       page_header: "Sequentie van het antwoord "
   quiz_log_auditing_desc: "Het bijhouden van gebeurtenissen voor een toets inzending inschakelen, en de mogelijkheid\n\
       om een logboek van die gebeurtenissen te bekijken eenmaal een inzending is gedaan. "
+  quiz_lti_plugin_a189607f: "Toets LTI plugin"
   quiz_reports: 
     cancel_generation: "Annuleren "
     download_item_analysis: "Onderdeel van rapport met analyses downloaden. "
@@ -11863,6 +11883,7 @@ nl:
         labels: 
           allow_multiple_attempts: "Meerdere pogingen toestaan"
           hide_results_only_after_last: "Alleen na zijn/haar laatste poging"
+          ip_addresses: "Filteren op IP-adres"
           ip_filter: "IP-adressen filteren"
           never_hide_results: "Laat aan cursisten hun toetsantwoorden zien"
           quiz_instructions: Toetsinstructies
@@ -11887,6 +11908,7 @@ nl:
         only_visible_to_overrides_note: "Opmerking: Deze toets is **alleen** zichtbaar voor sectie(s) hieronder vermeld:"
         points_possible: "Punten %{n}"
         post_to_sis: "Cijfers op SIS posten "
+        quiz_access_code: "Verplichte toegangscode"
         quiz_title: "Naam van toets"
         quiz_type: Toetstype
         require_lockdown_browser: "Vereisen Respondus LockDown Browser"
@@ -12434,6 +12456,7 @@ nl:
   remind_me_next_time_6402eb7d: "Herinner me de volgende keer"
   remove_attachment_ceae0973: "Bijlage verwijderen"
   remove_f47dc62a: "Verwijderen "
+  remove_recipient_name_a6b83cef: "Verwijder ontvanger %{name}"
   remove_row_c198da5a: "Rij verwijderen "
   remove_row_f9d59cba: "Rij verwijderen "
   rename_45608f54: "Naam wijzigen "
@@ -12582,6 +12605,7 @@ nl:
         enable: Inschakelen
         enable_and_lock: "Inschakelen en vergrendelen"
         use_default: "Gebruik standaard"
+        use_default_and_lock: "Gebruik standaard en vergrendelen"
     permissions: Machtigingen
     role: 
       remove_role_confirmation: "Indien er al gebruikers met deze functie zijn, zullen ze de huidige machtiging voor deze functie behouden, maar het is niet meer mogelijk om nieuwe gebruikers met deze functie te maken. Klikken op OK om met het verwijderen van deze functie door te gaan. "
@@ -12663,6 +12687,8 @@ nl:
         are_you_sure_remove: "Weet je zeker dat je deze rubric uit de lijst wilt verwijderen?"
       remove_rubric: "Deze rubric uit mijn lijst verwijderen"
   salesforce_account_id_eb5c78ad: "Id van account in Salesforce "
+  salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce heeft een andere login host voor sandbox accounts dan voor de productie van accounts, dus als je een Salesforce Sandbox-account gebruikt,en je dit veld niet aanvinkt, zal het niet geverifieerd worden (dit werkt ook omgekeerd, als je een productie account hebt en je het vakje WEL aanvinkt, zal het niet geverifieerd worden)"
+  salesforce_ticketing_webtocase_connector_80f75716: "Salesforce Ticketing WebToCase Connector"
   save_11a80ec3: "Opslaan "
   saving_d55dd90e: "Bezig met opslaan... "
   score_muted_82eef66: "Score: (gedempt) "
@@ -12888,6 +12914,8 @@ nl:
     titles: 
       add_item_to_module: "Item aan module toevoegen"
       find_links_using_service: "Koppelingen zoeken met %{service}"
+  select_course_a_selection_is_required_before_recip_f622d9df: "Selecteer een cursus: een selectie is verplicht voordat het veld ontvanger verschijnt"
+  select_itemname_f70db487: "Selecteer %{itemName}"
   select_navigation_links_68e1e924: "Navigatiekoppelingen selecteren "
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Het bestand selecteren die je wilt koppelen, of een bestand toevoegen door \"Nieuw bestand\" te selecteren."
   selected_answer: "Je hebt dit antwoord geselecteerd."
@@ -12943,6 +12971,7 @@ nl:
     prev_module: "Vorige module"
     prev_module_desc: "Vorige module: *module*"
     prev_module_item_desc: "Vorige: *item*"
+  service_cloud_ticketing_connector_889e1b7b: "Service Cloud Ticketing Connector"
   services_api: 
     must_be_logged_in: "Je moet aangemeld zijn om Kaltura te kunnen gebruiken"
   set_default_grade_dialog: 
@@ -12961,6 +12990,18 @@ nl:
       labels: 
         recaptcha_private_key: "ReCAPTCHA-privésleutel "
         recaptcha_public_key: "Openbare ReCAPTCHA-sleutel "
+    service_cloud_settings: 
+      labels: 
+        api_url: "Salesforce API Host (https://something.salesforce.com)"
+        consumer_key: "Salesforce Consumententoets"
+        consumer_secret: "Salesforce Consumentengeheim"
+        is_sandbox: "Dit is een salesforce sandbox account"
+        refresh_token: "Token Verversen"
+    web_to_case_settings: 
+      labels: 
+        api_url: "Salesforce API Eindpunt URL"
+        orgid: "Salesforce Org ID"
+        ret_val: Retour-URL
   setup_checklist_eb8b00b8: "Controlelijst instellen"
   shared: 
     account_notification: 
@@ -13650,10 +13691,12 @@ nl:
   shared_secret_892c88f2: "Gedeeld geheim "
   show_by_date_e3967761: "Tonen per datum"
   show_by_type_c5d61732: "Tonen per soort"
+  show_correct_answers_at_a5475aa3: "Juiste Antwoorden Tonen Op"
   show_lti_2_configuration_ui_94ce35a9: "LTI 2 Configuratie UI tonen"
   show_me_76823679: "Toon mij"
   sis_agent_token_authentication_2a0b29e3: "SIS Agent code verificatie "
   sis_batch: 
+    diff_filename: "sis_upload_diffed_%{id}.zip"
     errors: 
       too_many_errors: "Er zijn meer(dere) %{count} fouten"
       too_many_warnings: "Er zijn meer(dere) %{count} waarschuwingen"
@@ -13694,6 +13737,7 @@ nl:
     sis_import_in_process_notice: "Een SIS-import wordt momenteel al uitgevoerd."
   site: 
     view_privacy_policy: "Privacy-beleid bekijken"
+  site_2d8d3df9: Website
   site_admin: 
     columns: 
       date: Datum
@@ -13772,6 +13816,7 @@ nl:
     previous_object: "Vorige %{type}"
     student_hidden_name: "Cursist %{position}"
   start_date_e937be8a: Startdatum
+  start_date_must_be_before_end_date_a00be892: "Startdatum moet voor einddatum liggen"
   starts_on_date_a777f505: Startdatum
   statistics: 
     csv_columns: 
@@ -13975,6 +14020,7 @@ nl:
       gathering_files: "Bezig met het verzamelen van bestanden..."
   submissions_11e96106: Inzendingen
   submit_a3cc6859: "Inzenden "
+  submit_a_feature_idea_2d4baa3d: "Een idee voor een functie indienen"
   submitted_datetime_fa2e9287: "Ingezonden: %{dateTime} "
   successfully_moved_model_to_newgroup_f7b7aa5a: " %{model} succesvol naar %{newGroup} verplaatst"
   support: 
@@ -13986,12 +14032,16 @@ nl:
       two_words_connector: en
       words_connector: ", "
     help_menu: 
+      cisco_netacad_facebook: Ondersteuningsgemeenschap
+      cisco_netacad_facebook_description: "Bezoek onze Facebookpagina Networking Academy voor gemeenschapsondersteuning of neem contact op met uw docent."
       community_support_description: "Communiceren met en hulp krijgen van mede cursisten."
       community_support_forums: "Community Support Forums"
       contact_support: "Contact opnemen met ondersteuning"
       contact_support_sub_text: "Hulp krijgen bij urgente zaken."
       curriculum_assessment_errata: "Fouten in curriculums en opdrachten"
       curriculum_assessment_errata_description: "Reeds gerapporteerde beoordelings- en curriculumfouten bekijken. Zoeken op \"errata\"."
+      global_support_desk: "Algemene Helpdesk"
+      global_support_desk_description: "Onze ASC's zijn je eerste lijn van ondersteuning en kunnen je in verbinding brengen met onze Algemene Helpdesk voor zaken die extra hulp vereisen."
       networking_academy_description: "Het bekijken van Cisco-antwoorden op de meest gestelde vragen."
       networking_academy_faqs: "Networking Academy-FAQs"
       support_desk_livechat: "Helpdesk Live Chat"
@@ -14088,17 +14138,22 @@ nl:
         unspecified: "wanneer dan ook"
       timespan: "%{start_at} *tot* %{end_at}"
   text_document_eacbcdb7: "Tekstdocument "
+  text_entry_submission_cannot_be_empty_3d187cae: "Tekstinvoer inzending mag niet leeg zijn"
   the_app_was_activated_a84e055f: "De app is geactiveerd"
   the_app_was_added_58e2836a: "De app werd toegevoegd "
   the_app_was_added_successfully_3f785a23: "De app werd succesvol toegevoegd "
   the_app_was_deactivated_573520ab: "De app is gedeactiveerd"
   the_app_was_updated_successfully_3d71cd1b: "De app werd succesvol bijgewerkt "
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "Het tabblad Bestanden is de plaats waar je dia's van lezingen, voorbeelden van documenten, hulpstukken om te studeren -- wat dan ook dat jouw cursist wil downloaden. Jouw bestanden met Canvas uploaden en organiseren is makkelijk. Wij zullen je laten zien hoe. "
+  the_following_fields_are_invalid_fields_b3565800: "De volgende velden zijn ongeldig: %{fields}"
+  the_grading_period_was_deleted_7814a349: "De beoordelingsperiode is verwijderd"
+  the_grading_period_was_saved_4a504c5: "De beoordelingsperiode is opgeslagen"
   the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "Het logo rechtsboven in de Canvas header. 200 x 200 svg of png"
   the_material_is_in_the_public_domain_279c39a3: "Het materiaal bevindt zich in het openbaar domein "
   the_material_is_licensed_under_creative_commons_3242cb5e: "Het materiaal is onder Creative Commons gelicentieerd "
   the_material_is_subject_to_fair_use_exception_41bc6a4b: "Het materiaal is onderworpen aan faire gebruikersuitzondering  "
   the_module_item_is_locked_27fe420b: "Het item van de module is vergrendeld. "
+  the_profile_picture_has_been_reported_d609d6dd: "De profielfoto is gemeld"
   the_shortcut_icon_for_ios_android_devices_180x180__f87fa178: "Het pictogram voor de snelkoppeling voor iOS/Android apparaten. 180 x 180 png of svg"
   the_state_parameter_is_required_ffadf213: "De staat parameter is verplicht"
   the_top_track_represents_days_on_which_the_student_2a347099: "De bovenste lijn vertegenwoordigt de dagen waarop de *cursist berichten verzond* aan de docenten van de cursus. De onderste lijn is voor **berichten van de docenten** aan de cursist."
@@ -14107,6 +14162,7 @@ nl:
     other: "Er zijn %{count} resultaten in de lijst"
   there_was_a_problem_deleting_the_grading_period_50ce07c5: "Er was een probleem bij het verwijderen van de beoordelingsperiode"
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: "Er is een probleem met het verwijderen van het beoordelingsschema "
+  there_was_a_problem_saving_the_grading_period_243bed6c: "Er was een probleem bij het het opslaan van de beoordelingsperiode"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "Er is een probleem met het opslaan van het beoordelingsschema "
   there_was_an_error_in_processing_your_request_6513a49a: "Er is een fout opgetreden bij het verwerken van jouw verzoek "
   there_was_an_error_setting_usage_rights_53739e1d: "Er is een fout bij het instellen van gebruiksrechten. "
@@ -14121,9 +14177,14 @@ nl:
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Deze map is momenteel vergrendeld en kan niet bekeken worden. "
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Dit is een door komma's gescheiden lijst van URL's die vertrouwd kunnen worden. Iedere vertrouwde URL in deze lijst  zal de code voor CSRF overslaan wanneer je je op Canvas aanmeldt."
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Dit gebeurde zeer waarschijnlijk omdat je de inhoud van de cursus zonder gekoppelde bestanden hebt geïmporteerd. "
+  this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Dit resultaat is gebruikt om een cursist te beoordelen en kan niet bewerkt of verwijderd worden"
+  this_outcome_has_been_used_to_assess_a_student_the_1f04402e: "Dit resultaat is gebruikt om een student te beoordelen. De berekeningsmethode is vergrendeld."
+  this_outcome_has_been_used_to_assess_a_student_the_1ff3a596: "Dit resultaat is gebruikt om een cursist te beoordelen. De berekeningswaarde is vergrendeld"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Deze toets is niet gepubliceerd* Alleen docenten kunnen de toets zien totdat deze gepubliceerd wordt."
   this_student_wrote_f1a3f22d: "Deze cursist schreef: "
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Dit zal het je toestaan om Canvas te verifiëren om eindcijfers in SIS te posten "
+  ticketing_system_52205bff: "Ticketing Systeem"
+  ticketing_system_configurations_c4fecd96: "Ticketing systeemconfiguraties"
   time: 
     am: "s ochtends"
     count_hours_ago: 
@@ -14329,8 +14390,10 @@ nl:
   to_35c6baa2: "tot "
   to_51406be9: Aan/naar
   to_c4c44f4b: tot
+  to_link_the_course_observer_name_to_a_student_star_f993c826: "Om de cursuswaarnemer *%{name}*  aan een cursist te koppelen, type eerst de naam van de cursist hieronder om hem te vinden en klik vervolgens op Update."
   to_minscore_43e5452e: "tot %{minScore}% "
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "Om opdrachten te zien, zorg dat de *Agenda* weergave actief is."
+  tolerance_value_9e96573c: Tolerantiewaarde
   too_many_members_b8b15069: "Te veel leden "
   tooltips: 
     finished: voltooid
@@ -14359,10 +14422,13 @@ nl:
     buttons: 
       resubmit_to_turnitin: "Opnieuw inleveren bij Turnitin"
   unable_to_remove_app_4293cb53: "Kan app niet verwijderen "
+  unarchive_selected_e0c4bd3d: "Geselecteerde dearchiveren"
+  unchanged_aca18e02: "[Ongewijzigd]"
   ungraded_submissions_44efb0ec: "Niet beoordeelde inzendingen "
   ungraded_survey_ad7de790: "Niet-beoordeelde enquête"
   unknown: Onbekend
   unknown_47a3b725: Onbekend
+  unknown_content_type_ae6d08e8: "Onbekende Contentsoort"
   unknown_question_bank: "Onbekende toetsbank"
   unknown_quiz: "Onbekende toets"
   unlock_date_cannot_be_after_due_date_8829d9ca: "Ontgrendeldatum kan niet na vervaldatum vallen "
@@ -14370,6 +14436,7 @@ nl:
   unlock_date_cannot_be_before_course_start_9c7b8524: "Ontgrendeldatum kan niet voor start van cursus plaatsvinden "
   unlock_date_cannot_be_before_section_start_793ddc66: "Datum ontgrendelen  kan niet voor start van sectie plaatsvinden "
   unlock_date_cannot_be_before_term_start_d3c01813: "Datum ontgrendelen kan niet voor start van termijn plaatsvinden  "
+  unpublished_click_to_modify_60f9051: "Niet gepubliceerd - Klik om te wijzigen"
   unpublished_courses_title: "Cursussen die niet gepubliceerd zijn"
   unstarted_932f2990: "Nog niet begonnen"
   unsupported_package: "Niet ondersteund inhoud pakket"
@@ -14389,6 +14456,9 @@ nl:
   usage_rights_have_been_set_d1b433c7: "Gebruiksrechten zijn ingesteld "
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Gebruiksrechten zullen ingesteld worden voor alle bestanden opgenomen in: "
   use_a_single_16x16_32x32_48x48_ico_file_60bc8d91: "Gebruik een *enkel 16x16, 32x32, 48x48 ico bestand*."
+  use_the_highest_score_eb29329d: "Gebruik de hoogste score"
+  use_the_most_recent_score_9ae3742c: "Gebruik de meest recente score"
+  use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Gebruik de nieuwe toets LTI tool in plaats van de gewone canvas toetsen"
   used_by_permission_314a78dd: "Met toestemming gebruikt "
   user: 
     default_user_name: Gebruiker
@@ -14515,6 +14585,8 @@ nl:
       notifications: Meldingen
       profile: Profiel
       settings: Instellingen
+  user_selected_answer: "Je selecteerde"
+  user_selected_wrong: "Het juiste antwoord was %{correct_answer_text}."
   user_service: 
     descriptions: 
       delicious: "Delicious is een samenwerkingshulpprogramma om koppelingen te delen. Op internet kun je ieder pagina van een label voorzien om deze later te raadplegen. Je kunt deze ook koppelen aan de Delicious-accounts van andere gebruikers om koppelingen met vergelijkbare interesse te delen."
@@ -14818,6 +14890,7 @@ nl:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE, WebCT 6+-cursus"
   webct_name: "Blackboard Vista/CE (WebCT)"
+  well_below_mastery_37664bdc: "Ruim onder Meesterschap"
   what_should_the_csv_file_look_like_985a59ac: "Hoe zou het CSV-bestand er uit moeten zien?"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Wanneer mensen de cursus bezoeken, is dit de pagina dat ze zullen zien. Je kunt de pagina instellen om een activiteitenstroom, de lijst met cursus modulen, een syllabus, of een eigen pagina die jezelf schrijft weer te geven. De standaardinstelling is de activiteitenstroom van de cursus."
   where_would_you_like_to_move_title_fabd6e8f: "Waar wil je %{title} naar verplaatsen?"
@@ -14998,7 +15071,9 @@ nl:
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "Jij hebt het maximum aantal webhooks per accountlimiet  (%{max}) bereikt "
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "Jij hebt het maximum aantal webhooks per gebruikerslimiet (%{max}) bereikt  "
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "Jij zult er zeker enkele van deze willen zien. Wat is de lol om een cursus te geven als niemand luistert? "
+  you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "Je moet een token verversen, volg de stappen onder deze link, mogelijk heb je een technische expert nodig om je te helpen"
   you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "Jij wilt misschien meerdere onderwijsassistenten aanstellen om je te helpen met de cursus. Onderwijsassistenten kunnen inzendingen van cursisten beoordelen, kunnen discussies helpen beheren, en zelfs inleverdata en opdrachtdetails voor jou bijwerken."
+  you_must_log_in_to_view_replies_9ccd4da0: "Je moet inloggen om de antwoorden te bekijken"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Je moet een cursus selecteren om content van te kopieren"
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "Je moet het instellen op een cijfer gelijk aan of groter dan %{min} "
   you_must_specify_a_usage_right_5eb57f87: "Je  moet een gebruiksrecht aangeven. "
@@ -15007,11 +15082,15 @@ nl:
   your_assignments_will_show_here_listed_by_due_date_18dc880f: "Je opdrachten worden hier weergegeven, op volgorde van vervaldatum."
   your_browser_does_not_meet_the_minimum_requirement_7a7022db: "Jouw internetbrowser voldoet niet aan de minimumvereisten van Canvas. Bekijk de *Canvas handleidingen* voor een volledige lijst van ondersteunde browsers."
   your_content_has_been_exported_bbb57764: "Jouw inhoud is geëxporteerd. "
+  your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: "Je bestand wordt geüpload naar de Cijferlijst, en je kunt deze pagina op elk gewenst moment verlaten. Als je een groot CSV-bestand hebt, kan het een paar minuten duren om je wijzigingen te updaten. Om het overschrijven van gegevens te voorkomen, controleer of de upload voltooid is en of je Cijferlijst juist is, alvorens aanvullende wijzigingen aan te brengen."
   your_message_has_been_sent_thank_you_e0284316: "Jouw bericht is verzonden. Dank je wel! "
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Je profielfoto kon niet geüpload worden. Mogelijk heb je je upload limiet overschreden."
   your_search_encountered_the_following_errors_fc3e5e7f: 
     one: "De volgende fout  zijn opgetreden bij jouw zoekactie:"
     other: "Bij jouw zoekactie zijn de volgende fouten opgetreden:"
+  zendesk: 
+    engine: 
+      plugin_name: Zendesk
   zero_activity_title: "Geen activiteit"
   zip_argument_error: "Voor het uploaden van een zipbestand is een map nodig om te uploaden naar."
   zip_file_description: "Migratieplug-in voor het uitpakken van gewone zipbestanden in cursus, groep, of gebruiker bestanden"
