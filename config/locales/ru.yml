@@ -2,8 +2,17 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 ru: 
+  1_item_scores_1_2_2_3_5_5_3_39f6c397: "1 - Оценки за элементы: 1, 2, 2, 3, 5, 5, 3"
+  1_item_scores_1_3_2_4_5_3_6_mastery_score_set_at_5_70ff296a: "1- Оценки за элементы: 1, 3, 2, 4, 5, 3, 6. Проходной балл равен 5."
+  1_item_scores_3_2_2_4_1_3_4_e0de3073: "1 - Оценки за элементы: 3, 2, 2, 4, 1, 3, 4"
+  1_item_scores_4_3_2_5_3e2933a0: "1 - Оценки за элементы: 4, 3, 2, 5"
   1_item_scores_5512cd03: "1 - Оценки за элементы"
+  2_final_score_5_5_8418d475: "2- Итоговая оценка: 5.5"
   2_final_score_7b0fd15e: "2- Итоговая оценка"
+  2_highest_score_4_3b4bc250: "2 - Самая высокая оценка: 4"
+  2_most_recent_score_3_766dbf4e: "2 - Самая последняя оценка: 3"
+  2_the_rest_item_average_4_3_2_3_3_d05f04e2: "2 - Средняя по \"оставшимся\" элементам: (4 + 3 + 2) / 3 = 3"
+  3_calculated_mastery_score_5_0_75_3_0_25_4_5_c88c3a7b: "3 - Подсчитанный проходной балл: 5(0.75) + 3(0.25) = 4.5"
   451_message: 
     description: "Вы не авторизованы для доступа к этому сайту, поскольку находитесь в стране, на которую распространяются торговые ограничения США."
     headings: 
@@ -44,6 +53,7 @@ ru:
     save: Сохранить
   _section_not_synced_yet_cd07d0dd: "-- Раздел пока не синхронизирован"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Вычисляемое значение не используется с данным методом вычисления"
+  a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "Файл с именем %{itemName} уже существует в этой папке."
   a_message_is_required_129e1814: "Требуется сообщение"
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "Таблица содержит название схемы оценок и значки для редактирования или удаления схемы."
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "Таблица, содержащая данные схемы оценок. Каждая строка содержит имя, минимальное и максимальное процентное значение. Кроме того, каждая строка содержит значок добавления новой строки снизу и значок удаления текущей строки."
@@ -926,6 +936,7 @@ ru:
         help_link_text: "Текст для ссылки"
         help_link_url: URL-адрес
         include_students_in_global_survey: "Включить студентов в глобальные опросы"
+        locked: "Зафиксируйте этот параметр для субаккаунтов и курсов"
         login_handle_name: "Ярлык входа в систему"
         message: Сообщение
         mfa_settings: "Многофакторная аутентификация"
@@ -939,6 +950,7 @@ ru:
         prevent_course_renaming_by_teachers: "Не разрешать преподавателям переименовывать курсы"
         restrict_quiz_questions: "Ограничить просмотр вопросов контрольной работы для студентов после даты завершения курса"
         restrict_student_future_view: "Ограничить просмотр курсов для студентов до даты начала"
+        restrict_student_past_view: "Запретить студентам просматривать курсы после даты окончания"
         role_id: Добавить
         self_enrollment: "Разрешить самостоятельную регистрацию"
         self_registration: "Самостоятельная регистрация"
@@ -1043,6 +1055,13 @@ ru:
       subtitle_term: "Для периода **%{term}**"
       title: "Курсы в этой учетной записи"
       too_many_courses_message: "Слишком много курсов для показа (%{count}). Пожалуйста, воспользуйтесь поисковой строкой справа, чтобы найти определенный курс"
+    single_course_ag_selector_parameters: 
+      account_reports: 
+        linn_benton: 
+          assignment_group_id: 
+            text: "Id Группы Заданий:"
+          course_id: 
+            text: "Id Курса:"
     sis_batch_counts: 
       accounts_label: "Учетные записи"
       courses_label: Курсы
@@ -1276,6 +1295,7 @@ ru:
   add_course_assignments_628ed6d0: "Добавить задания курса"
   add_course_calendar_events_146154a5: "Добавить календарные события курса"
   add_files_to_the_course_da6ffd32: "Добавить файлы к курсу"
+  add_grading_period_6f774dc3: "Добавить Оценочный период"
   add_grading_scheme_81e23c05: "Добавить схему оценок"
   add_module_item: 
     add_assignment_to: "Добавить задание к %{module}"
@@ -1421,7 +1441,9 @@ ru:
     podcast_feed_description_group: "Все медиафайлы, связанные или встроенные в объявления в этой группе \"%{group}\", будут отображаться в этом канале."
     podcast_feed_name: "%{course} Канал подкастов объявлений"
   anonymous_e1b8ad27: Анонимно
+  anonymous_user_d984b9ce: "Анонимный пользователь"
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Ответы будут показаны после того, как вы завершите последнюю попытку"
+  api_url_3ee7cb0a: "API URL"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: " App Center появится во вкладке «Приложения» на странице настроек курса или учетной записи. Приведенный ниже URL-адрес должен вести к рабочей конечной точке в App Center (например, %{url} – не забудьте опустить завершающий слэш"
   apple_touch_icon_2c258bb3: "Значок Apple Touch"
   application: 
@@ -1482,6 +1504,7 @@ ru:
     title: "Редактировать %{name}"
     update: Обновить
   archive_3f794d7e: Архив
+  archive_selected_d64506ca: "Архив выбран"
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     few: "Вы уверены, что хотите удалить эти %{count} элемента?"
     one: "Вы уверены, что хотите удалить %{name}?"
@@ -1490,6 +1513,7 @@ ru:
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Вы уверены, что хотите удалить этот период выставления оценок?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Вы уверены, что хотите удалить эту схему оценок?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Вы уверены, что хотите удалить этот инструмент?"
+  are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Вы уверены, что хотите сообщить об этой фотографии профиля?"
   aria_labels: 
     unlock_at_date: "Разблокировать после наступления даты"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Когда вы начнете набирать текст в этом поле, список групп будет автоматически фильтроваться, оставляя только те названия, которые соответствуют вашему вводу."
@@ -1946,8 +1970,10 @@ ru:
         remind: "Напомнить %{assessor} о проверке знаний, последнее уведомление %{time}"
         reminder: "Напомнить %{assessor} о проверке знаний, последнее уведомление %{time}"
     peer_reviews_selector: 
+      anonymous_peer_reviews: Анонимность
       how_to_peer_review: "Как назначить рассмотрение коллегами"
       labels: 
+        anonymous_peer_reviews: "Обзоры пользователей будут анонимными"
         automatically_assign_peer_reviews: "Автоматически назначать рассмотрение коллегами"
         manually_assign_peer_reviews: "Назначить рассмотрение коллегами вручную"
         require_peer_reviews: "Требуется рассмотрение коллегами"
@@ -2200,6 +2226,8 @@ ru:
   available_after_unlock_at_until_lock_at_499e8092: "Доступно с %{unlock_at} до %{lock_at}"
   available_from_587ce92f: "Доступно с"
   available_from_date_43b5e11d: "Доступно с даты"
+  available_from_date_afc594fa: "Доступно с даты:"
+  available_until_date_2c0ccec3: "Доступно до даты:"
   available_until_date_cd125c62: "Доступно до даты"
   available_until_f3b9c4ed: "Доступно до"
   available_until_lock_at_ab022445: "Доступно до %{lock_at}"
@@ -2216,9 +2244,12 @@ ru:
       Новый, упрощенный и более удобный для пользователя интерфейс поиска файлов. Если вы включите эту опцию на уровне курса,
       все пользователи этого курса увидят новый интерфейс. Чтобы показать его, когда кто-то
       переходит на страницу персональных файлов пользователя ('/files'), вам необходимо включить данную опцию для учетной записи, членами которой они являются.
+  between_1_and_99_d421a4c0: "Между 1% aи 99%"
+  between_2_and_5_c34f5152: "Между 2 и 5"
   big_blue_button_conference: 
     conference_is_recorded: "Эта конференция записывается."
     recording_setting: Запись
+    recording_setting_enabled_description: "Невозможно записать эту конференцию"
   blackboard: 
     no_manifest: "Этот zip-архив системы Blackboard не содержит файла imsmanifest.xml в корневом каталоге."
   bookmark_service: 
@@ -2230,6 +2261,7 @@ ru:
       permissions: "Редактирование разрешений для: %{name}"
     unpublished_title: "Не опубликовано"
   broken_file_link_found_in_your_course_7cc24395: "В вашем курсе обнаружена нерабочая ссылка на файл"
+  bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "Имя интервала должно быть одним из следующих: %{bucket_names}"
   bulk_course_migration: 
     export_failed: "Произошла ошибка при экспорте курса с bb_lcid %{id} с Blackboard"
     export_failed_no_id: "Произошла ошибка при импорте курса"
@@ -2454,6 +2486,7 @@ ru:
       create_event: "Создать новое событие"
       done_go_back_to_list: "Готово, вернуться к списку"
       links: 
+        accessibility_warning: "Внимание: Для улучшения доступности календарных событий, пожалуйста, используйте вкладку повестки дня"
         calendar_agenda: Программа
         calendar_month: Месяц
         calendar_scheduler: Планировщик
@@ -2733,7 +2766,12 @@ ru:
         delete: "Удалить событие/задание"
         new: "Создать новое событие"
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Невозможно удалить соответствия, основанные на связях с рубрикой. Чтобы удалить эти связи, необходимо удалить строку из рубрики активов"
+  can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Невозможно выполнить определение различий в отношении нескольких файлов того же типа"
   cancel_caeb1e68: Отменить
+  cannot_be_nil_when_account_id_is_nil_be6d1d60: "не может быть нулем, если account_id равно нулю"
+  cannot_be_nil_when_course_id_is_nil_f539388: "не может быть нулем, если course_id равно нулю"
+  cannot_be_present_when_account_id_is_present_f7d9b51f: "не может присутствовать,  если присутствует account_id"
+  cannot_be_present_when_course_id_is_present_785e6a59: "не может присутствовать,  если присутствует course_id"
   canvas: 
     migration: 
       errors: 
@@ -2743,7 +2781,10 @@ ru:
     plugins: 
       errors: 
         all_fields_required: "Все поля обязательны для заполнения"
+        aws_creds_required: "Необходимы полномочия AWS."
+        endpoint_or_region_required: "Необходим регион (или конечная точка) AWS."
         fields_required: "Необходимо поле \"%{field}\""
+        invalid_live_events_url: "Недопустимая конечная точка, должна быть действительным URL."
         invalid_url: "Неверный URL"
         login_expiration_minimum: "Длительность сессии должна быть не менее 20 минут"
         need_integer: "Введите целое число для кэша списка воспроизведения"
@@ -13982,6 +14023,7 @@ ru:
     resubmitted_to_turnitin: "Повторно отправлено на Turnitin."
     see_attached_files: "Смотрите приложенные файлы "
     show: 
+      anonymous_user: "Анонимный пользователь"
       attach_file: "Прикрепить файл"
       buttons: 
         save: Сохранить
