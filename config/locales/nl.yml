@@ -5382,6 +5382,7 @@ nl:
       other: "%{count} mogelijke punten"
     errors: 
       load_rubrics_failed: "Het laden van de rubrics is mislukt, probeer het opnieuw"
+    leave_different: "Anders laten"
     messages: 
       loading_rubric_groups: "Bezig met laden van rubricgroepen..."
       loading_rubrics: "Bezig met het laden van rubrics..."
@@ -13001,6 +13002,8 @@ nl:
       labels: 
         api_url: "Salesforce API Eindpunt URL"
         orgid: "Salesforce Org ID"
+        record_type: "Gegevenstype\n\
+            \x20"
         ret_val: Retour-URL
   setup_checklist_eb8b00b8: "Controlelijst instellen"
   shared: 
