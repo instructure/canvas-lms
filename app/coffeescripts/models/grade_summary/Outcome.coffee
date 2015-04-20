@@ -3,7 +3,8 @@ define [
   'underscore'
   'Backbone'
   'compiled/models/grade_summary/CalculationMethodContent'
-], (I18n, _, {Model, Collection}, CalculationMethodContent) ->
+  'timezone'
+], (I18n, _, {Model, Collection}, CalculationMethodContent, tz) ->
 
   class Outcome extends Model
     defaults:
@@ -13,6 +14,11 @@ define [
       super
       @set 'friendly_name', @get('display_name') || @get('title')
       @set 'hover_name', (@get('title') if @get('display_name'))
+
+    parse: (response) ->
+      super _.extend(response, {
+        submitted_or_assessed_at: tz.parse(response.submitted_or_assessed_at)
+      })
 
     status: ->
       if @scoreDefined()
