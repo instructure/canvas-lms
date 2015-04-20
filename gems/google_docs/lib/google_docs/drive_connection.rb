@@ -39,7 +39,7 @@ module GoogleDocs
     def download(document_id, extensions)
       response = api_client.execute!(
         :api_method => drive.files.get,
-        :parameters => { :fileId => document_id }
+        :parameters => { :fileId => normalize_document_id(document_id) }
       )
 
       file = response.data.to_hash
@@ -88,7 +88,7 @@ module GoogleDocs
       api_client.authorization.update_token!
       result = api_client.execute(
         :api_method => drive.files.delete,
-        :parameters => { :fileId => document_id })
+        :parameters => { :fileId => normalize_document_id(document_id) })
       if result.error? && !result.error_message.include?('File not found')
         raise DriveConnectionException, result.error_message
       end
@@ -101,7 +101,7 @@ module GoogleDocs
         result = api_client.execute(
           :api_method => drive.permissions.delete,
           :parameters => {
-            :fileId => document_id,
+            :fileId => normalize_document_id(document_id),
             :permissionId => user_id })
         if result.error?
           raise DriveConnectionException, result.error_message
@@ -129,7 +129,7 @@ module GoogleDocs
         result = api_client.execute(
           :api_method => drive.permissions.insert,
           :body_object => new_permission,
-          :parameters => { :fileId => document_id }
+          :parameters => { :fileId => normalize_document_id(document_id) }
         )
         if result.error?
           raise DriveConnectionException, result.error_message
@@ -163,6 +163,9 @@ module GoogleDocs
       folderize_list(api_client.execute!(:api_method => drive.files.list, :parameters => {:maxResults => 0}).data.to_hash, extensions)
     end
 
+    def normalize_document_id(doc_id)
+      doc_id.gsub(/^.+:/, '')
+    end
 
     def folderize_list(documents, extensions)
       root = GoogleDocs::DriveFolder.new('/')
