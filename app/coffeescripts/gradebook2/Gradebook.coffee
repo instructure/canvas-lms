@@ -37,6 +37,8 @@ define [
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
   'jqueryui/dialog'
+  'jqueryui/tooltip'
+  'compiled/behaviors/tooltip'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
@@ -935,15 +937,16 @@ define [
         @arrangeColumnsBy(newSortOrder, false)
       @arrangeColumnsBy(@getStoredSortOrder(), true)
 
-      $('#gradebook_settings').show().kyleMenu()
+      $('#gradebook_settings').kyleMenu()
+      $('#download_csv').kyleMenu()
 
       $settingsMenu.find('.student_names_toggle').click(@studentNamesToggle)
 
       @userFilter = new InputFilterView el: '.gradebook_filter input'
       @userFilter.on 'input', @onUserFilterInput
 
-      @setDownloadCsvUrl()
       @renderTotalHeader()
+      @initGradebookExporter()
 
       if !!window.chrome
         $('.ui-menu-item').on('mouseout', @fix_chrome_render_bug)
@@ -961,10 +964,89 @@ define [
       gradebook_grid.offsetHeight
       gradebook_grid.style.display = 'block'
 
-    setDownloadCsvUrl: ->
-      if @show_concluded_enrollments
-        $("#download_csv")[0].href += "?include_priors=true"
+    initGradebookExporter: () =>
+      self = this
 
+      @initPreviousGradebookExportLink()
+
+      current_progress = ENV.GRADEBOOK_OPTIONS.gradebook_csv_progress
+      attachment = ENV.GRADEBOOK_OPTIONS.attachment
+
+      if current_progress && current_progress.progress.workflow_state != 'completed'
+        $('#download_csv').prop('disabled', true)
+        loading_interval = self.exportingGradebookStatus()
+
+        attachment_progress =
+          progress_id: current_progress.progress.id
+          attachment_id: attachment.attachment.id
+
+        @pollProgressForCSVExport(loading_interval, attachment_progress)
+
+      $('.generate_new_csv').click ->
+        $('#download_csv').prop('disabled', true)
+        loading_interval = self.exportingGradebookStatus()
+        $.ajaxJSON(ENV.GRADEBOOK_OPTIONS.export_gradebook_csv_url, 'GET')
+          .then((attachment_progress) ->
+            self.pollProgressForCSVExport(loading_interval, attachment_progress)
+          )
+
+    pollProgressForCSVExport: (loading_interval, attachment_progress) =>
+      self = this
+      polling = setInterval(() ->
+        $.ajaxJSON("/api/v1/progress/#{attachment_progress.progress_id}", 'GET').promise()
+          .then((response) ->
+            if response.workflow_state == 'failed'
+              clearInterval polling
+              clearInterval loading_interval
+              $.flashError(I18n.t('There was a problem exporting.'))
+
+            if response.workflow_state == 'completed'
+              $.ajaxJSON("/api/v1/users/#{ENV.current_user_id}/files/#{attachment_progress.attachment_id}", 'get')
+                .then((response) ->
+                  document.getElementById('csv_download').src = response.url
+
+                  updated_date = $.datetimeString(response.created_at)
+                  updated_previous_report = "#{I18n.t('Previous (%{timestamp})', timestamp: updated_date)}"
+                  $previous_link = $('#csv_export_options').children('li').last().children('a')
+                  $previous_link.text(updated_previous_report)
+                  $previous_link.attr('href', response.url)
+                  $('#csv_export_options').children('li').last().css('display', 'block')
+                  self.initPreviousGradebookExportLink()
+
+                  $('#download_csv').prop('disabled', false)
+                  self.setExportButtonTitle(I18n.t('Export'))
+
+                  clearInterval polling
+                  clearInterval loading_interval
+               )
+          )
+      , 2000)
+
+    initPreviousGradebookExportLink: () =>
+      link = $('#csv_export_options').children('li').last().children()
+      link.on 'click', (event) ->
+        event.preventDefault()
+        document.getElementById('csv_download').src = link[0].href
+
+    exportingGradebookStatus: () =>
+      self = this
+      loading_indicator = ''
+      count = 0
+      loading = setInterval(() ->
+        count++
+
+        loading_indicator = new Array(count % 5).join('.')
+        nonBreakingSpacesCount = 3 - loading_indicator.length
+        nonBreakingSpaces = ""
+        for scale in [0..nonBreakingSpacesCount]
+          nonBreakingSpaces += "&nbsp;"
+
+        self.setExportButtonTitle("#{I18n.t("Exporting")}#{loading_indicator}#{nonBreakingSpaces}")
+      , 200)
+      loading
+
+    setExportButtonTitle: (updated_title) =>
+      $($('#download_csv').children('span').contents()[2]).replaceWith(updated_title)
 
     studentNamesToggle: (e) =>
       e.preventDefault()

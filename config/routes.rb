@@ -197,6 +197,7 @@ CanvasRails::Application.routes.draw do
       end
     end
 
+    resource :gradebook_csv, only: [:show]
     get 'gradebook2' => "gradebooks#gradebook2"
 
     get 'attendance' => 'gradebooks#attendance'

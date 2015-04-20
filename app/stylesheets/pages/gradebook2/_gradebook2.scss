@@ -670,9 +670,25 @@ $gradebook_checkbox_width: 16px;
   margin-left: -16px;
 }
 
-.gradebook_drop_down {
+.gradebook_drop_down, .export_dropdown {
   li, label {
     @include gradebook_menu_label(13px);
+    cursor:pointer;
+  }
+}
+
+#export_progress {
+  background-color: gray;
+  width: 100px;
+  height: 8px;
+  margin: auto;
+
+  div {
+    position: relative;
+    left: 0;
+    width: 20px;
+    height: 8px;
+    background: blue;
   }
 }
 

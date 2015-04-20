@@ -1469,7 +1469,33 @@ class Course < ActiveRecord::Base
       enrollment.type != "StudentViewEnrollment"
     }.flatten
   end
+
   private :enrollments_for_csv
+
+  def gradebook_to_csv_in_background(filename, user, options = {})
+    progress = user.progresses.build(tag: 'gradebook_to_csv')
+    progress.save!
+
+    exported_gradebook = user.gradebook_csvs.where(course_id: self.id).first
+    exported_gradebook ||= user.gradebook_csvs.build
+    attachment = user.attachments.build
+    attachment.filename = filename
+    attachment.content_type = 'text/csv'
+    attachment.file_state = 'hidden'
+    attachment.save!
+    exported_gradebook.attachment = attachment
+    exported_gradebook.progress = progress
+    exported_gradebook.course_id = self.id
+    exported_gradebook.save!
+
+    progress.process_job(self, :generate_csv, options, attachment)
+    {attachment_id: attachment.id, progress_id: progress.id}
+  end
+
+  def generate_csv(options, attachment)
+    csv = gradebook_to_csv(options)
+    create_attachment(attachment, csv)
+  end
 
   def gradebook_to_csv(options = {})
     student_enrollments = enrollments_for_csv(options)
@@ -1600,6 +1626,11 @@ class Course < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def create_attachment(attachment, csv)
+    attachment.uploaded_data = StringIO.new(csv)
+    attachment.save!
   end
 
   # included to make it easier to work with api, which returns
