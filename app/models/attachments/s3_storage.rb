@@ -13,11 +13,15 @@ class Attachments::S3Storage
     attachment.bucket
   end
 
+  def exists?
+    attachment.s3object.exists?
+  end
+
   def change_namespace(old_full_filename)
     # copying rather than moving to avoid unhappy accidents
     # note that GC of the S3 bucket isn't yet implemented,
     # so there's a bit of a cost here
-    if !attachment.s3object.exists?
+    if !exists?
       if !attachment.size
         attachment.size = bucket.objects[old_full_filename].head[:content_length]
       end
