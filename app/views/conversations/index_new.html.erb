@@ -6,6 +6,7 @@
 
 <div class="conversations">
   <header class="panel">
+    <% if use_new_styles? %><div class="panel__primary"><% end %>
     <div class="filters">
       <span aria-hidden="true" class="screenreader-only" id="course-filter-description">
         <%= t(:filter_messages_by_course, "Filter messages by course") %>
@@ -13,7 +14,6 @@
         <span class="current-selection-label"></span>
       </span>
       <select class="course-filter" id="course-filter" aria-haspopup="true" aria-labelledby="course-filter-description"></select>
-
       <span aria-hidden="true" class="screenreader-only" id="type-filter-description">
         <%= t(:filter_messages_by_type, "Filter messages by type") %>
         &nbsp;
@@ -28,7 +28,8 @@
         <option value="submission_comments"><%= t(:submission_comments, "Submission Comments") %></option>
       </select>
     </div>
-
+    <% if use_new_styles? %></div><% end %>
+    <% if use_new_styles? %><div class="panel__secondary"><% end %>
     <div class="actions" id="submission-comment-actions" style="display: none;">
       <button class="btn"
               id="submission-reply-btn"
@@ -108,7 +109,7 @@
       <div id="sending-spinner"></div>
     </div>
 
-    <div role="search" class="search pull-right form-search">
+    <div role="search" class="search <% unless use_new_styles? %>pull-right<% end %> form-search">
       <div class="ac" id="search-autocomplete">
         <div class="ac-input-box">
           <ul class="ac-token-list"></ul>
@@ -154,6 +155,7 @@
         </div>
       </div>
     </div>
+    <% if use_new_styles? %></div><% end %>
   </header>
 
   <div class="row-fluid messaging-wrapper">
