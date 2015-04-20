@@ -2,8 +2,17 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 en-AU: 
+  1_item_scores_1_2_2_3_5_5_3_39f6c397: "1 - Item scores: 1, 2, 2, 3, 5, 5, 3."
+  1_item_scores_1_3_2_4_5_3_6_mastery_score_set_at_5_70ff296a: "1 - Item scores: 1, 3, 2, 4, 5, 3, 6. Mastery score set at 5."
+  1_item_scores_3_2_2_4_1_3_4_e0de3073: "1 - Item scores: 3, 2, 2, 4, 1, 3, 4."
+  1_item_scores_4_3_2_5_3e2933a0: "1 - Item scores: 4, 3, 2, 5."
   1_item_scores_5512cd03: "1- Item scores"
+  2_final_score_5_5_8418d475: "2- Final score: 5.5"
   2_final_score_7b0fd15e: "2- Final score"
+  2_highest_score_4_3b4bc250: "2 - Highest score: 4"
+  2_most_recent_score_3_766dbf4e: "2 - Most recent score: 3"
+  2_the_rest_item_average_4_3_2_3_3_d05f04e2: "2 - 'The rest' item average: (4 + 3 + 2) / 3 = 3"
+  3_calculated_mastery_score_5_0_75_3_0_25_4_5_c88c3a7b: "3 - Calculated mastery score: 5(0.75) + 3(0.25) = 4.5"
   451_message: 
     description: "You are not authorised to access this site because you are located in a country subject to U.S. trade restrictions."
     headings: 
@@ -42,6 +51,7 @@ en-AU:
     save: Save
   _section_not_synced_yet_cd07d0dd: "-- Section not synced yet"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "A calculation value is not used with this calculation method"
+  a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "A file named %{itemName} already exists in this folder."
   a_message_is_required_129e1814: "A message is required"
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "A table containing the name of the grading scheme and icons for editing or deleting the scheme."
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "A table that contains the grading scheme data. Each row contains a name, a maximum percentage, and a minimum percentage. In addition, each row contains an icon to add a new row below, and an icon to delete the current row."
@@ -931,6 +941,7 @@ en-AU:
         help_link_text: "Text to display for link"
         help_link_url: URL
         include_students_in_global_survey: "Include students in global surveys"
+        locked: "Lock this setting for sub-accounts and courses."
         login_handle_name: "Login Label"
         message: Message
         mfa_settings: "Multi-Factor Authentication"
@@ -944,6 +955,7 @@ en-AU:
         prevent_course_renaming_by_teachers: "Don't let teachers rename their courses"
         restrict_quiz_questions: "Restrict students from viewing quiz questions after course end date"
         restrict_student_future_view: "Restrict students from viewing courses before start date"
+        restrict_student_past_view: "Restrict students from viewing courses after end date."
         role_id: "Add More"
         self_enrollment: "Allow Self-Enrollment"
         self_registration: "Self Registration"
@@ -1048,6 +1060,13 @@ en-AU:
       subtitle_term: "For the term **%{term}**"
       title: "Courses In This Account"
       too_many_courses_message: "There are too many courses to show (%{count}). Please use the finder on the right to find a specific course."
+    single_course_ag_selector_parameters: 
+      account_reports: 
+        linn_benton: 
+          assignment_group_id: 
+            text: "Assignment Group Id:"
+          course_id: 
+            text: "Course Id:"
     sis_batch_counts: 
       accounts_label: Accounts
       courses_label: Courses
@@ -1277,6 +1296,7 @@ en-AU:
   add_course_assignments_628ed6d0: "Add Course Assignments"
   add_course_calendar_events_146154a5: "Add Course Calendar Events"
   add_files_to_the_course_da6ffd32: "Add Files to the Course"
+  add_grading_period_6f774dc3: "Add Grading Period"
   add_grading_scheme_81e23c05: " Add grading scheme"
   add_module_item: 
     add_assignment_to: "Add an assignment to %{module}"
@@ -1421,7 +1441,9 @@ en-AU:
     podcast_feed_description_group: "Any media files linked from or embedded within announcements in the group \"%{group}\" will appear in this feed."
     podcast_feed_name: "%{course} Announcements Podcast Feed"
   anonymous_e1b8ad27: Anonymous
+  anonymous_user_d984b9ce: "Anonymous User"
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Answers will be shown after your last attempt"
+  api_url_3ee7cb0a: "API URL"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "App Centre will appear in the \"Apps\" tab on the settings page of either a course or account. The URL provided below should point to a valid App Centre endpoint (for example, %{url} -- be sure to omit the trailing slash"
   apple_touch_icon_2c258bb3: "Apple Touch Icon"
   application: 
@@ -1482,6 +1504,7 @@ en-AU:
     title: "Edit %{name}"
     update: Update
   archive_3f794d7e: Archive
+  archive_selected_d64506ca: "Archive Selected"
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     one: "Are you sure you want to delete %{name}?"
     other: "Are you sure you want to delete these %{count} items?"
@@ -1489,6 +1512,7 @@ en-AU:
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Are you sure you want to delete this grading period?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Are you sure you want to delete this grading scheme?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Are you sure you want to remove this tool?"
+  are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Are you sure you want to report this profile picture?"
   aria_labels: 
     unlock_at_date: "Unlock on Date"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "As you type in this field, the list of groups will be automatically filtered to only include those whose names match your input."
@@ -1938,8 +1962,10 @@ en-AU:
         remind: "Remind %{assessor} about Assessment, last notified %{time}"
         reminder: "Remind %{assessor} about Assessment, last notified %{time}"
     peer_reviews_selector: 
+      anonymous_peer_reviews: Anonymity
       how_to_peer_review: "How to Assign Peer Reviews"
       labels: 
+        anonymous_peer_reviews: "Peer Reviews Appear Anonymously"
         automatically_assign_peer_reviews: "Automatically Assign Peer Reviews"
         manually_assign_peer_reviews: "Manually Assign Peer Reviews"
         require_peer_reviews: "Require Peer Reviews"
@@ -2191,6 +2217,8 @@ en-AU:
   available_after_unlock_at_until_lock_at_499e8092: "Available after %{unlock_at} until %{lock_at}"
   available_from_587ce92f: "Available From"
   available_from_date_43b5e11d: "Available From Date"
+  available_from_date_afc594fa: "Available From:"
+  available_until_date_2c0ccec3: "Available Until:"
   available_until_date_cd125c62: "Available Until Date"
   available_until_f3b9c4ed: "Available Until"
   available_until_lock_at_ab022445: "Available until %{lock_at}"
@@ -2207,9 +2235,12 @@ en-AU:
       A new, simpler, more user friendly file browsing interface.  If you turn this on at the course level,
       then all of the users in that course will see the new interface.  To get it to show up when someone
       goes to the personal files page for a user ('/files') then you need to turn it on for the account they are a member of.
+  between_1_and_99_d421a4c0: "Between 1% and 99%"
+  between_2_and_5_c34f5152: "Between 2 and 5"
   big_blue_button_conference: 
     conference_is_recorded: "This conference is being recorded."
     recording_setting: Recording
+    recording_setting_enabled_description: "Enable recording for this conference."
   blackboard: 
     no_manifest: "This Blackboard .zip has no imsmanifest.xml file in the root directory."
   bookmark_service: 
@@ -2221,6 +2252,7 @@ en-AU:
       permissions: "Editing permissions for: %{name}"
     unpublished_title: Unpublished
   broken_file_link_found_in_your_course_7cc24395: "Broken file link found in your course"
+  bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "The bucket name must be one of the following: %{bucket_names}."
   bulk_course_migration: 
     export_failed: "There was an error exporting the course with bb_lcid %{id} from Blackboard"
     export_failed_no_id: "There was an error importing a course"
@@ -2445,6 +2477,7 @@ en-AU:
       create_event: "Create New Event"
       done_go_back_to_list: "Done, Go Back To List"
       links: 
+        accessibility_warning: "Tip: For improved accessibility to calendar events, please use the agenda view."
         calendar_agenda: Agenda
         calendar_month: Month
         calendar_scheduler: Scheduler
@@ -2723,7 +2756,10 @@ en-AU:
         delete: "Delete an Event/Assignment"
         new: "Create a New Event"
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Can't delete alignments based on rubric associations.  To remove these associations you need to remove the row from the asset's rubric"
+  can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Diffing cannot be performed against more than one file of the same type."
   cancel_caeb1e68: Cancel
+  cannot_be_nil_when_account_id_is_nil_be6d1d60: "This cannot be nil when account_id is nil."
+  cannot_be_nil_when_course_id_is_nil_f539388: "This cannot be nil when course_id is nil."
   canvas: 
     migration: 
       errors: 
@@ -2733,6 +2769,8 @@ en-AU:
     plugins: 
       errors: 
         all_fields_required: "All fields are required"
+        aws_creds_required: "The AWS credentials are required."
+        endpoint_or_region_required: "The AWS region (or endpoint) is required."
         fields_required: "The field \"%{field}\" is required"
         invalid_url: "Invalid URL"
         login_expiration_minimum: "Session expiration must be 20 minutes or greater"
@@ -2741,6 +2779,7 @@ en-AU:
   canvas_cartridge_display: "Canvas Common Cartridge"
   canvas_cartridge_file_description: "Canvas Course Export Package"
   canvas_cartridge_name: "Canvas Cartridge Importer"
+  canvas_error_report_ff678539: "Canvas Error Report"
   canvas_revision_unknown: Unknown
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas will regrade all your submissions after you save the quiz, this may take a few minutes."
   cc: 
@@ -2762,6 +2801,7 @@ en-AU:
   choose_usage_rights_33683854: "Choose usage rights..."
   clear_file_name_text_field_fce73840: "Clear file name text field"
   click_here_on_the_calendar_link_c9965631: "Click here on the *Calendar* link"
+  click_to_modify_89fa26aa: "Click to modify"
   close_and_return_to_canvas_80544344: "Close and return to Canvas"
   close_d634289d: Close
   collaboration: 
@@ -4127,6 +4167,8 @@ en-AU:
         conclude_course: "Conclude Course"
         delete_course: "Delete Course"
       details: 
+        conclude_alt_text: "If you would like to retain the ability to change grades while limiting student access to the course, please utilise the course date settings. You can learn about course date settings in our guides *here*."
+        confirm_conclude: "Warning: Concluding the course will archive all course content and prevent you from modifying grades."
         confirm_delete: "Are you sure you want to delete this course? Once it is deleted, students and teachers will no longer have access to it. If you just want to remove it from the course drop-down menu, you should *conclude the course instead*."
         confirm_delete_addendum: "If you do not have permission to conclude the course, you can *change the course end date*, or ask your administrator to conclude the course."
       headings: 
@@ -13847,6 +13889,7 @@ en-AU:
     resubmitted_to_turnitin: "Successfully resubmitted to turnitin."
     see_attached_files: "See attached files"
     show: 
+      anonymous_user: "Anonymous User"
       attach_file: "Attach File"
       buttons: 
         save: Save
