@@ -1339,18 +1339,18 @@ describe Course, "tabs_available" do
     end
 
     it "should handle hidden_unused correctly for discussions" do
-      tabs = @course.uncached_tabs_available(@teacher)
+      tabs = @course.uncached_tabs_available(@teacher, {})
       dtab = tabs.detect{|t| t[:id] == Course::TAB_DISCUSSIONS}
       expect(dtab[:hidden_unused]).to be_falsey
 
       @course.allow_student_discussion_topics = false
-      tabs = @course.uncached_tabs_available(@teacher)
+      tabs = @course.uncached_tabs_available(@teacher, {})
       dtab = tabs.detect{|t| t[:id] == Course::TAB_DISCUSSIONS}
       expect(dtab[:hidden_unused]).to be_truthy
 
       @course.allow_student_discussion_topics = true
       discussion_topic_model
-      tabs = @course.uncached_tabs_available(@teacher)
+      tabs = @course.uncached_tabs_available(@teacher, {})
       dtab = tabs.detect{|t| t[:id] == Course::TAB_DISCUSSIONS}
       expect(dtab[:hidden_unused]).to be_falsey
     end

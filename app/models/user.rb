@@ -147,6 +147,8 @@ class User < ActiveRecord::Base
   has_many :content_exports, :as => :context
   has_many :usage_rights, as: :context, class_name: 'UsageRights', dependent: :destroy
 
+  has_many :gradebook_csvs, dependent: :destroy
+
   has_one :profile, :class_name => 'UserProfile'
   alias :orig_profile :profile
 
