@@ -206,7 +206,7 @@ class FilesController < ApplicationController
       end
     else
       # to turn :better_file_browsing on for user files, turn it on for the account they are a part of.
-      return react_files if (@context.is_a?(User) ? @context.account : @context).feature_enabled?(:better_file_browsing)
+      return react_files if (@context.is_a?(User) ? @domain_root_account : @context).feature_enabled?(:better_file_browsing)
       full_index
     end
   end
@@ -323,7 +323,7 @@ class FilesController < ApplicationController
   end
 
   def react_files
-    raise ActiveRecord::RecordNotFound unless (@context.is_a?(User) ? @context.account : @context).feature_enabled?(:better_file_browsing)
+    raise ActiveRecord::RecordNotFound unless (@context.is_a?(User) ? @domain_root_account : @context).feature_enabled?(:better_file_browsing)
     if tab_enabled?(@context.class::TAB_FILES)
       @contexts = [@context]
       get_all_pertinent_contexts(include_groups: true) if @context == @current_user
