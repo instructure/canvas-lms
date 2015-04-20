@@ -12,7 +12,7 @@ zh:
   2_highest_score_4_3b4bc250: "2 - 最高得分： 4"
   2_most_recent_score_3_766dbf4e: "2 - 最近得分： 3"
   2_the_rest_item_average_4_3_2_3_3_d05f04e2: "2 - ‘余下’ 项目平均: (4 + 3 + 2) / 3 = 3"
-  3_calculated_mastery_score_5_0_75_3_0_25_4_5_c88c3a7b: "3 - 掌握计算得分：5(0.75) + 3(0.25) = 4.5"
+  3_calculated_mastery_score_5_0_75_3_0_25_4_5_c88c3a7b: "3 - 计算掌握的得分：5(0.75) + 3(0.25) = 4.5"
   451_message: 
     description: 因为您所在的国家/地区受美国贸易限制的约束，您无法获得此网站的访问授权。
     headings: 
@@ -51,7 +51,7 @@ zh:
     save: 保存
   _section_not_synced_yet_cd07d0dd: "-- 章节尚未同步"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: 此计算方法未使用计算值
-  a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "一个文件名为%{itemName}已存在此文件夹中。"
+  a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "一个文件名为 %{itemName} 已存在此文件夹中。"
   a_message_is_required_129e1814: 需要消息
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: 一个表格，包含评分方案名称和用于编辑或删除该方案的图标。
   a_table_that_contains_the_grading_scheme_data_each_d461c205: 一个表格，包含评分方案数据。每行包含名称、最大百分比和最小百分比。此外，每行包含一个用于在下面添加新行的图标，以及一个用于删除当前行的图标。
@@ -2216,8 +2216,8 @@ zh:
   available_after_unlock_at_until_lock_at_499e8092: "%{unlock_at} 之后、%{lock_at} 之前可供使用"
   available_from_587ce92f: 开始时间
   available_from_date_43b5e11d: 可供使用的起始日期
-  available_from_date_afc594fa: 有效从日期：
-  available_until_date_2c0ccec3: 有效直至日期：
+  available_from_date_afc594fa: 有效日期从：
+  available_until_date_2c0ccec3: 有效日期直至：
   available_until_date_cd125c62: 可供使用的截止日期
   available_until_f3b9c4ed: 可供使用的截止日期
   available_until_lock_at_ab022445: "%{lock_at} 之前可供使用"
@@ -5989,7 +5989,7 @@ zh:
     submit: 提交
     user_navigation_configured: 用户导航已配置
     wiki_page_menu_configured: "Wiki 页面菜单已配置"
-  external_url_e9b87215: 外部URL
+  external_url_e9b87215: "外部 URL"
   failed_to_create_zip_file_1a943d06: 无法创建压缩文件
   fair_use_bee47d77: 公正使用
   favicon_6e658914: Favicon
@@ -6272,9 +6272,9 @@ zh:
   for_section_8503af93: 对于班级
   from_fdd4956d: 从
   from_from_to_to_e31f6422: "从 %{from} 到 %{to}"
-  get_the_following_from_your_salesforce_connected_a_881fc9a3: "从您的 Salesforce 连接如下的应用程序"
-  get_your_users_error_reports_posted_to_salesforce__76f57839: "获取用户发布到 Salesforce 的云服务的错误报告。"
-  get_your_users_error_reports_posted_to_salesforce_dfb1a6c2: "获取用户发布到 Salesforce 的错误报告。"
+  get_the_following_from_your_salesforce_connected_a_881fc9a3: 从您的销售团队连接如下的应用程序
+  get_your_users_error_reports_posted_to_salesforce__76f57839: 获取用户发布到销售团队的云服务的错误报告。
+  get_your_users_error_reports_posted_to_salesforce_dfb1a6c2: 获取用户发布到销售团队的错误报告。
   global_message_icons: 
     announcement: 通告
     calendar: 日历
@@ -8400,7 +8400,7 @@ zh:
         details: "要完成注册过程，请访问以下 url:"
         html: 
           body: "感谢您注册 %{product_name}！此电子邮件用于确认用户 %{user} 正在 %{website} 上注册一个新帐户。"
-          link: 单击此处完成注册过程
+          link: 点击此处完成注册过程
           subject: "确认注册：%{product_name}"
         subject: "确认注册：%{product_name}"
     confirm_sms_communication_channel: 
@@ -10460,7 +10460,7 @@ zh:
       description: 实时活动服务
       name: 现场活动
     live_events_settings: 
-      description: 推到活动到一个室壁运动流。
+      description: 推动活动到一个室壁运动流。
       endpoint_region_requirement: "无论 AWS 区域或终端都是必需的。终端通常只用于开发。"
       labels: 
         aws_access_key_id: "AWS 的访问钥 ID"
@@ -11941,7 +11941,7 @@ zh:
         labels: 
           allow_multiple_attempts: 允许多次尝试
           hide_results_only_after_last: 仅在其上次尝试后
-          ip_addresses: 通过IP地址过滤器
+          ip_addresses: "通过 IP 地址过滤器"
           ip_filter: "过滤 IP 地址"
           never_hide_results: 允许学生查看其测验结果
           quiz_instructions: 测验说明
@@ -13226,14 +13226,14 @@ zh:
       at_least_more_events_one_week: "上周至少有 %{count_of_events} 个以上的事件"
       at_least_more_events_one_week_future: "下周至少还有 %{count_of_events} 个"
       at_least_more_events_two_weeks: "上两周至少有 %{count_of_events} 个以上的事件"
-      at_least_more_events_two_weeks_future: "接下来的两周至少还有 %{count_of_events} 个"
+      at_least_more_events_two_weeks_future: "接下来的两周至少还有 %{count_of_events} "
       links: 
         view_calendar: 查看日历
       more_events: "还有 %{count_of_events} 个"
       more_events_one_week: "上周有 %{count_of_events} 个以上的事件"
-      more_events_one_week_future: "下周还有 %{count_of_events} 个"
+      more_events_one_week_future: "下周还有 %{count_of_events} "
       more_events_two_weeks: "上两周有 %{count_of_events} 个以上的事件"
-      more_events_two_weeks_future: "接下来的两周还有 %{count_of_events} 个"
+      more_events_two_weeks_future: "接下来的两周还有 %{count_of_events} "
       nothing_for_now: 目前没有任何内容
       nothing_one_week: 下周没有任何内容
       nothing_two_weeks: 接下来的两周没有任何内容
@@ -14103,15 +14103,15 @@ zh:
       words_connector: ", "
     help_menu: 
       cisco_netacad_facebook: 支持社区
-      cisco_netacad_facebook_description: 请访问我们的网络学院的Facebook页面社区的支持，或咨询您的教师。
-      community_support_description: 与您的同伴进行交互并得到帮助。
+      cisco_netacad_facebook_description: "请访问我们的网络学院的 Facebook 页面社区的支持，或咨询您的讲师。"
+      community_support_description: 与您的同伴进行交流互动并得到帮助。
       community_support_forums: 社区支持论坛
       contact_support: 联系支持
       contact_support_sub_text: 针对时间敏感的问题获得帮助。
       curriculum_assessment_errata: 课程/测验勘误
       curriculum_assessment_errata_description: 查看已经报告的测验和课程错误。搜索“勘误”。
-      global_support_desk: 全局支持台
-      global_support_desk_description: 我们的携带者是你的第一行的支持，并可以为需要另外帮助的问题连接您到我们的全球支持台。
+      global_support_desk: 全局支持桌面
+      global_support_desk_description: "我们的 ASCs 是您的第一线支持，并可以为需要额外帮助的事项连接您到我们的全球支持桌面。"
       networking_academy_description: "查看 Cisco 对最常见问题的答案。"
       networking_academy_faqs: "Networking Academy 常见问题解答"
       support_desk_livechat: 支持桌面实时聊天
@@ -14208,7 +14208,7 @@ zh:
         unspecified: 无论何时
       timespan: "%{start_at} *到* %{end_at}"
   text_document_eacbcdb7: 文本文档
-  text_entry_submission_cannot_be_empty_3d187cae: 文字输入的提交不能是空的
+  text_entry_submission_cannot_be_empty_3d187cae: 文字输入的提交不能为空白。
   the_app_was_activated_a84e055f: 应用程序已激活
   the_app_was_added_58e2836a: 已添加应用程序
   the_app_was_added_successfully_3f785a23: 已成功添加应用程序
@@ -14216,8 +14216,8 @@ zh:
   the_app_was_updated_successfully_3d71cd1b: 已成功更新应用程序
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "“文件”选项卡是共享演讲幻灯片、示例文档、学习帮助等学生希望下载的任何内容的位置。使用 Canvas 可轻松上传和组织您的文件。我们将向您展示操作方法。"
   the_following_fields_are_invalid_fields_b3565800: "以下栏目是无效的：%{fields}"
-  the_grading_period_was_deleted_7814a349: 评分期限删除
-  the_grading_period_was_saved_4a504c5: 评分期限保存
+  the_grading_period_was_deleted_7814a349: 删除评分期限
+  the_grading_period_was_saved_4a504c5: 保存评分期限
   the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "Canvas 右上角标题中的徽标图像。200x200 svg 或 png"
   the_material_is_in_the_public_domain_279c39a3: 材料在公开域中
   the_material_is_licensed_under_creative_commons_3242cb5e: "材料已根据 Creative Commons 许可"
@@ -14247,7 +14247,7 @@ zh:
   this_folder_is_currently_locked_and_unavailable_to_f85c451: 此文件夹目前已锁定并且无法查看。
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "这是一个受信任 URL的逗号分隔列表。登录 Canvas 时，信任此列表中的任何 URL 将绕过 CSRF 令牌。"
   this_most_likely_happened_because_you_imported_cou_a78ea880: 这很可能发生，因为您导入了不带关联文件的课程内容。
-  this_outcome_has_been_used_to_assess_a_student_and_5a925169: 此成果已经用来评估学生并不可以被编辑或删除
+  this_outcome_has_been_used_to_assess_a_student_and_5a925169: 此成果已经用来评估学生，而且不可以被编辑或删除
   this_outcome_has_been_used_to_assess_a_student_the_1f04402e: 此成果已经用来评估学生。计算方法锁定。
   this_outcome_has_been_used_to_assess_a_student_the_1ff3a596: 此成果已经用来评估学生。计算数值锁定。
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*此测验未发布* 在发布之前，只有教师才能查看此课程。"
@@ -14528,7 +14528,7 @@ zh:
   use_a_single_16x16_32x32_48x48_ico_file_60bc8d91: "使用 *单个 16x16、32x32、48x48 图标文件*。"
   use_the_highest_score_eb29329d: 使用最高评分
   use_the_most_recent_score_9ae3742c: 使用最近的评分
-  use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: 使用新的测验LTI工具来代替平常的Canvas测验。
+  use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "使用新的测验 LTI工具来代替平常的Canvas测验。"
   used_by_permission_314a78dd: 按权限使用
   user: 
     default_user_name: 用户
@@ -14655,8 +14655,8 @@ zh:
       notifications: 通知
       profile: 个人资料
       settings: 设置
-  user_selected_answer: 您选择了
-  user_selected_wrong: "正确答案是%{correct_answer_text}。"
+  user_selected_answer: 您已选择
+  user_selected_wrong: "正确答案是 %{correct_answer_text}。"
   user_service: 
     descriptions: 
       delicious: "Delicious 是一个协作的链接分享工具。您可以标记 Internet 上的任何页面供今后参考。您还可以链接至其他用户的 Delicious 帐户以分享相似兴趣的链接。"
@@ -14960,7 +14960,7 @@ zh:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE，WebCT 6+ 课程"
   webct_name: "Blackboard Vista/CE (WebCT)"
-  well_below_mastery_37664bdc: 远低于通达
+  well_below_mastery_37664bdc: 远低于掌握
   what_should_the_csv_file_look_like_985a59ac: "CSV 文件应该是什么样子?"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: 此页面是用户访问课程时将看到的页面。您可以将其设置为显示活动流、课程单元列表、提纲或自己编写的自定义页面。默认显示为课程活动流。
   where_would_you_like_to_move_title_fabd6e8f: "您要将 %{title} 移到何处？"
@@ -15141,7 +15141,7 @@ zh:
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "您已达到每帐户限制的最大网勾数 (%{max})"
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "您已达到每用户限制的最大网勾数 (%{max})"
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: 您肯定想要这么一些内容。如果没人听讲，教一门课程有何乐趣可言？
-  you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: 你需要一个刷新的令牌，遵循这个链接的步骤，您可能需要一个技术专家，以帮助
+  you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: 您需要一个刷新的令牌，遵循这个链接的步骤。您可能需要一个技术专家帮助。
   you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: 您可能要指定一些助教帮助您教授课程。助教可以帮助您批改学生提交项、引导讨论以及更新到期日期和作业详细信息。
   you_must_log_in_to_view_replies_9ccd4da0: 您必须登录才能查看回复
   you_must_select_a_course_to_copy_content_from_e7bd9e09: 您必须选择一门要从中复制内容的课程
@@ -15152,7 +15152,7 @@ zh:
   your_assignments_will_show_here_listed_by_due_date_18dc880f: 您的作业将显示在此处，按到期日期列出。
   your_browser_does_not_meet_the_minimum_requirement_7a7022db: "您的浏览器不符合 Canvas 的最低要求。请访问 *Canvas 指南* 查看受支持浏览器的完整列表。"
   your_content_has_been_exported_bbb57764: 您的内容已被导出。
-  your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: 您的文件正被上传到评分册，您可以在任何时候离开这个页面。如果您有一个大的CSV文件，您的更改可能需要几分钟来更新。为了避免覆盖任何数据，请确认上载完成与你的评分册是正确才进行任何另外更改。
+  your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: 您的文件正被上传到评分册。您可以在任何时候离开这个页面。如果您有一个大的CSV文件，您的更改可能需要几分钟来更新。为了避免覆盖任何数据，请确认上载完成与您的评分册是正确才进行任何另外的更改。
   your_message_has_been_sent_thank_you_e0284316: 您的消息已发送。谢谢！
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: 您的个人资料照片无法上传。您可能已超过上传限制。
   your_search_encountered_the_following_errors_fc3e5e7f: 
