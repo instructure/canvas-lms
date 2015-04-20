@@ -251,4 +251,16 @@ describe "course settings" do
       expect(fj('.summary tr:nth(5)').text).to match /taaaa:\s*None/
     end
   end
+
+  it "should disable inherited settings if locked by the account" do
+    @account.settings[:restrict_student_future_view] = {:locked => true, :value => true}
+    @account.save!
+
+    get "/courses/#{@course.id}/settings"
+
+    expect(f('#course_restrict_student_past_view').attribute('disabled')).to be_nil
+    expect(f('#course_restrict_student_future_view').attribute('disabled')).to_not be_nil
+
+    expect(is_checked('#course_restrict_student_future_view')).to be_truthy
+  end
 end

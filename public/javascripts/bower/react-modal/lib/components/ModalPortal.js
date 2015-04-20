@@ -9,14 +9,16 @@ var CLASS_NAMES = {
   overlay: {
     base: 'ReactModal__Overlay',
     afterOpen: 'ReactModal__Overlay--after-open',
-    beforeClose: 'ReactModal__Overlay--before-close',
+    beforeClose: 'ReactModal__Overlay--before-close'
   },
   content: {
     base: 'ReactModal__Content',
     afterOpen: 'ReactModal__Content--after-open',
-    beforeClose: 'ReactModal__Content--before-close',
+    beforeClose: 'ReactModal__Content--before-close'
   }
 };
+
+var OVERLAY_STYLES = { position: 'fixed', left: 0, right: 0, top: 0, bottom: 0 };
 
 function stopPropagation(event) {
   event.stopPropagation();
@@ -45,12 +47,10 @@ var ModalPortal = module.exports = React.createClass({
     // Focus only needs to be set once when the modal is being opened
     if (!this.props.isOpen && newProps.isOpen) {
       this.setFocusAfterRender(true);
-    }
-
-    if (newProps.isOpen === true)
       this.open();
-    else if (newProps.isOpen === false)
+    } else if (this.props.isOpen && !newProps.isOpen) {
       this.close();
+    }
   },
 
   componentDidUpdate: function () {
@@ -104,7 +104,7 @@ var ModalPortal = module.exports = React.createClass({
   },
 
   handleKeyDown: function(event) {
-    if (event.keyCode == 9 /*tab*/) scopeTab(this.getDOMNode(), event);
+    if (event.keyCode == 9 /*tab*/) scopeTab(this.refs.content.getDOMNode(), event);
     if (event.keyCode == 27 /*esc*/) this.requestClose();
   },
 
@@ -128,8 +128,6 @@ var ModalPortal = module.exports = React.createClass({
     return !this.props.isOpen && !this.state.beforeClose;
   },
 
-  overlayStyles: { position: 'fixed', left: 0, right: 0, top: 0, bottom: 0 },
-
   buildClassName: function(which) {
     var className = CLASS_NAMES[which].base;
     if (this.state.afterOpen)
@@ -144,7 +142,7 @@ var ModalPortal = module.exports = React.createClass({
       div({
         ref: "overlay",
         className: cx(this.buildClassName('overlay'), this.props.overlayClassName),
-        style: this.overlayStyles,
+        style: OVERLAY_STYLES,
         onClick: this.handleOverlayClick
       },
         div({

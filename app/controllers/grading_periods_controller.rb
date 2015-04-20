@@ -29,6 +29,11 @@
 #           "example": 1023,
 #           "type": "integer"
 #         },
+#         "title": {
+#           "description": "The title for the grading period.",
+#           "example": "First Block",
+#           "type": "string"
+#         },
 #         "start_date": {
 #           "description": "The start date of the grading period.",
 #           "example": "2014-01-07T15:04:00Z",
@@ -68,10 +73,10 @@ class GradingPeriodsController < ApplicationController
   #
   def index
     if authorized_action(@context, @current_user, :read)
-      # inheritance check instead of #get_context?
-      @grading_periods = @context.grading_periods.active.order('start_date')
-      json, meta = paginate_for(@grading_periods)
-      render json: serialize_jsonapi(json, meta)
+      grading_periods = GradingPeriod.for(@context).sort_by(&:start_date)
+      paginated_grading_periods, meta = paginate_for(grading_periods)
+
+      render json: serialize_json_api(paginated_grading_periods, meta)
     end
   end
 
@@ -86,9 +91,12 @@ class GradingPeriodsController < ApplicationController
   #   }
   #
   def show
-    @grading_period = @context.grading_periods.active.find(params[:id])
-    if @grading_period && authorized_action(@grading_period, @current_user, :read)
-      render json: serialize_jsonapi(@grading_period)
+    params_id = params[:id].to_i
+    grading_period = GradingPeriod.context_find(context: @context, id: params_id)
+    fail ActionController::RoutingError.new('Not Found') if grading_period.blank?
+
+    if authorized_action(grading_period, @current_user, :read)
+      render json: serialize_json_api(grading_period)
     end
   end
 
@@ -111,15 +119,15 @@ class GradingPeriodsController < ApplicationController
   #   }
   #
   def create
-    grading_period_params = params[:grading_periods][0]
+    grading_period_params = params[:grading_periods].first
     # grabbing the first grading_period_group for now, until
     # we decide to allow for multiple grading_period_groups later
-    grading_period_group = @context.grading_period_groups.first_or_create
+    grading_period_group = @context.grading_period_groups.active.first_or_create
     # another inheritance check here?
     @grading_period = grading_period_group.grading_periods.new(grading_period_params)
     if @grading_period && authorized_action(@grading_period, @current_user, :manage)
       if @grading_period.save
-        render json: serialize_jsonapi(@grading_period)
+        render json: serialize_json_api(@grading_period)
       else
         render json: @grading_period.errors, status: :bad_request
       end
@@ -150,7 +158,7 @@ class GradingPeriodsController < ApplicationController
 
     if @grading_period && authorized_action(@grading_period, @current_user, :manage)
       if @grading_period.update_attributes(grading_period_params)
-        render json: serialize_jsonapi(@grading_period)
+        render json: serialize_json_api(@grading_period)
       else
         render json: @grading_period.errors, status: :bad_request
       end
@@ -170,15 +178,15 @@ class GradingPeriodsController < ApplicationController
     end
   end
 
-  protected
+  private
+
   def paginate_for(grading_periods)
-    meta = {}
-    grading_periods, meta = Api.jsonapi_paginate(grading_periods, self, named_context_url(@context, :api_v1_context_grading_periods_url))
+    paginated_grading_periods, meta = Api.jsonapi_paginate(grading_periods, self, named_context_url(@context, :api_v1_context_grading_periods_url))
     meta[:primaryCollection] = 'grading_periods'
-    return grading_periods, meta
+    [paginated_grading_periods, meta]
   end
 
-  def serialize_jsonapi(grading_periods, meta = {})
+  def serialize_json_api(grading_periods, meta = {})
     grading_periods = Array.wrap(grading_periods)
 
     Canvas::APIArraySerializer.new(grading_periods, {

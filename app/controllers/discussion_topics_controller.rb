@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require 'atom'
+
 # @API Discussion Topics
 #
 # API for accessing and participating in discussion topics in groups and courses.
@@ -280,7 +282,7 @@ class DiscussionTopicsController < ApplicationController
     end
 
     if @context.feature_enabled?(:differentiated_assignments)
-      scope = DifferentiableAssignment.scope_filter(scope, @current_user, @context)
+      scope = scope_for_differentiated_assignments(scope)
     end
 
     @topics = Api.paginate(scope, self, topic_pagination_url)
@@ -332,6 +334,23 @@ class DiscussionTopicsController < ApplicationController
     end
   end
 
+  def scope_for_differentiated_assignments(scope)
+    return scope if @context.is_a?(Account)
+    return DifferentiableAssignment.scope_filter(scope, @current_user, @context) if @context.is_a?(Course)
+    return scope if @context.context.is_a?(Account)
+
+    # group context owned by a course
+    course = @context.context
+    course_scope = course.discussion_topics.active
+    course_level_topic_ids = DifferentiableAssignment.scope_filter(course_scope, @current_user, course).pluck(:id)
+    if course_level_topic_ids.any?
+      scope.where("root_topic_id IN (?) OR root_topic_id IS NULL OR id IN (?)", course_level_topic_ids, course_level_topic_ids)
+    else
+      scope.where(root_topic_id: nil)
+    end
+  end
+  private :scope_for_differentiated_assignments
+
   def is_child_topic?
     root_topic_id = params[:root_discussion_topic_id]
 
@@ -368,6 +387,13 @@ class DiscussionTopicsController < ApplicationController
       hash[:ATTRIBUTES][:can_group] = @topic.can_group?
       handle_assignment_edit_params(hash[:ATTRIBUTES])
 
+      categories = @context.respond_to?(:group_categories) ? @context.group_categories : []
+      # if discussion has entries and is attached to a deleted group category,
+      # add that category to the ENV list so it will be shown on the edit page.
+      if @topic.group_category_deleted_with_entries?
+        categories << @topic.group_category
+      end
+
       if @topic.assignment.present?
         hash[:ATTRIBUTES][:assignment][:assignment_overrides] =
           (assignment_overrides_json(
@@ -376,7 +402,6 @@ class DiscussionTopicsController < ApplicationController
         hash[:ATTRIBUTES][:assignment][:has_student_submissions] = @topic.assignment.has_student_submissions?
       end
 
-      categories = @context.respond_to?(:group_categories) ? @context.group_categories : []
       sections = @context.respond_to?(:course_sections) ? @context.course_sections.active : []
 
       js_hash = {DISCUSSION_TOPIC: hash,
@@ -403,7 +428,7 @@ class DiscussionTopicsController < ApplicationController
 
       append_sis_data(js_hash)
       js_env(js_hash)
-      render :action => "edit"
+      render :edit
     end
   end
 
@@ -438,7 +463,7 @@ class DiscussionTopicsController < ApplicationController
       @unlock_at = @topic.available_from_for(@current_user)
       @topic.change_read_state('read', @current_user) unless @locked
       if @topic.for_group_discussion?
-        @groups = @topic.group_category.groups.active.select{ |g| g.grants_right?(@current_user, session, :read) }
+        @groups = @topic.group_category.groups.active.select{ |g| g.grants_right?(@current_user, session, :post_to_forum) }
         topics = @topic.child_topics.to_a
         topics = topics.select{|t| @groups.include?(t.context) } unless @topic.grants_right?(@current_user, session, :update)
         @group_topics = @groups.map do |group|
@@ -468,16 +493,16 @@ class DiscussionTopicsController < ApplicationController
               :TOPIC => {
                 :ID => @topic.id,
                 :IS_SUBSCRIBED => @topic.subscribed?(@current_user),
-                :IS_PUBLISHED => @topic.published?,
+                :IS_PUBLISHED  => @topic.published?,
                 :CAN_UNPUBLISH => @topic.can_unpublish?,
-
               },
               :PERMISSIONS => {
-                :CAN_REPLY      => @topic.grants_right?(@current_user, session, :reply),     # Can reply
-                :CAN_ATTACH     => @topic.grants_right?(@current_user, session, :attach), # Can attach files on replies
-                :CAN_MANAGE_OWN => @context.user_can_manage_own_discussion_posts?(@current_user) &&
-                                    !@topic.locked_for?(@current_user, :check_policies => true),           # Can moderate their own topics
-                :MODERATE       => user_can_moderate                                                        # Can moderate any topic
+                :CAN_REPLY        => @topic.grants_right?(@current_user, session, :reply),       # Can reply
+                :CAN_ATTACH       => @topic.grants_right?(@current_user, session, :attach),      # Can attach files on replies
+                :CAN_READ_REPLIES => @topic.grants_right?(@current_user, :read_replies),
+                :CAN_MANAGE_OWN   => @context.user_can_manage_own_discussion_posts?(@current_user) &&
+                                    !@topic.locked_for?(@current_user, :check_policies => true), # Can moderate their own topics
+                :MODERATE         => user_can_moderate                                           # Can moderate any topic
               },
               :ROOT_URL => named_context_url(@context, :api_v1_context_discussion_topic_view_url, @topic),
               :ENTRY_ROOT_URL => named_context_url(@context, :api_v1_context_discussion_topic_entry_list_url, @topic),
@@ -697,7 +722,8 @@ class DiscussionTopicsController < ApplicationController
       f.id = polymorphic_url([@context, :discussion_topics])
     end
     @entries = []
-    @entries.concat @context.discussion_topics.reject{|a| a.locked_for?(@current_user, :check_policies => true) }
+    @entries.concat @context.discussion_topics.
+      select{|dt| dt.visible_for?(@current_user) }
     @entries.concat @context.discussion_entries.active
     @entries = @entries.sort_by{|e| e.updated_at}
     @entries.each do |entry|

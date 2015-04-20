@@ -260,8 +260,7 @@ i[class*=icon-].icon-messageRecipient--cancel {
 
   &.selected, &:hover {
     background: $ic-bg-light-primary;
-    color: #fff;
-		text-shadow: -1px -1px 0 rgba(0, 0, 0, .2);
+    color: $ic-brand-primary;
   }
 }
 
@@ -269,16 +268,11 @@ i[class*=icon-].icon-messageRecipient--cancel {
   .context, .everyone {
     border-bottom: 1px solid $ic-border-light;
     color: $ic-brand-primary;
-
-    &.selected, &:hover {
-      color: #fff;
-    }
   }
 
   .back {
     color: #333;
   }
-
   li:last-child {
     border-bottom: none;
   }
@@ -292,6 +286,6 @@ i[class*=icon-].icon-messageRecipient--cancel {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    width: 80%;
+    width: 80%;    
   }
 }

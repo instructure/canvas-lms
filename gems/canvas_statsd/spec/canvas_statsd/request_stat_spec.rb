@@ -121,20 +121,50 @@ describe CanvasStatsd::RequestStat do
       rs.report
     end
 
-    it 'sends sql_count when present' do
-      statsd = double
-      payload = {
-        params: {
-          'controller' => 'foo',
-          'action'     => 'index'
+    describe 'sql stats' do
+
+      before :each do
+        @statsd = double
+        payload = {
+          params: {
+            'controller' => 'foo',
+            'action'     => 'index'
+          }
         }
-      }
-      rs = create_subject(payload, statsd)
-      rs.sql_count = 10
-      allow(statsd).to receive(:timing).with('request.foo.index.total', 1000)
-      expect(statsd).to receive(:timing).with('request.foo.index.sql', 10)
-      rs.report
+        @rs = create_subject(payload, @statsd)
+      end
+
+      it 'doesnt send sql stats when they dont exist' do
+        allow(@statsd).to receive(:timing).with('request.foo.index.total', 1000)
+        expect(@statsd).to_not receive(:timing).with('request.foo.index.sql.read', kind_of(Numeric))
+        expect(@statsd).to_not receive(:timing).with('request.foo.index.sql.write', kind_of(Numeric))
+        expect(@statsd).to_not receive(:timing).with('request.foo.index.sql.cache', kind_of(Numeric))
+        @rs.report
+      end
+
+      it 'sends sql_read_count when present' do
+        @rs.sql_read_count = 10
+        allow(@statsd).to receive(:timing).with('request.foo.index.total', 1000)
+        expect(@statsd).to receive(:timing).with('request.foo.index.sql.read', 10)
+        @rs.report
+      end
+
+      it 'sends sql_read_count when present' do
+        @rs.sql_write_count = 3
+        allow(@statsd).to receive(:timing).with('request.foo.index.total', 1000)
+        expect(@statsd).to receive(:timing).with('request.foo.index.sql.write', 3)
+        @rs.report
+      end
+
+      it 'sends sql_cache_count when present' do
+        @rs.sql_cache_count = 1
+        allow(@statsd).to receive(:timing).with('request.foo.index.total', 1000)
+        expect(@statsd).to receive(:timing).with('request.foo.index.sql.cache', 1)
+        @rs.report
+      end
+
     end
+
   end
 
 end

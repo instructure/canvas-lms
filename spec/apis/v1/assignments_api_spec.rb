@@ -449,6 +449,8 @@ describe AssignmentsApiController, type: :request do
       before :once do
         course_with_teacher_logged_in(:active_all => true)
         @assignment = @course.assignments.create :name => 'differentiated assignment'
+        section = @course.course_sections.create!(name: "second test section")
+        create_section_override_for_assignment(@assignment, {course_section: section})
       end
 
       it "should include overrides if overrides flag is included in the params" do

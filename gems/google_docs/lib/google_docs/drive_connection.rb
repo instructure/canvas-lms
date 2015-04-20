@@ -49,13 +49,13 @@ module GoogleDocs
 
         # hack to make it seem like the old object
         result.define_singleton_method(:content_type) do
-          result.headers['Content-Type']
+          result.headers['Content-Type'].sub(/; charset=[^;]+/, '')
         end
 
         # TODO: get extension from response header
         [result, file['title'],  entry.extension]
       else
-        raise DriveConnectionException
+        raise DriveConnectionException, result.error_message
       end
     end
 
@@ -80,7 +80,7 @@ module GoogleDocs
       if result.status == 200
         result
       else
-        raise DriveConnectionException
+        raise DriveConnectionException, result.error_message
       end
     end
 
@@ -90,21 +90,21 @@ module GoogleDocs
         :api_method => drive.files.delete,
         :parameters => { :fileId => document_id })
       if result.error? && !result.error_message.include?('File not found')
-        raise DriveConnectionException
+        raise DriveConnectionException, result.error_message
       end
     end
 
     def acl_remove(document_id, users)
       api_client.authorization.update_token!
       users.each do |user_id|
-        next if user_id.blank?
+        next if user_id.blank? || /@/.match(user_id) # google drive ids are numeric, google docs are emails. if it is a google doc email just skip it
         result = api_client.execute(
           :api_method => drive.permissions.delete,
           :parameters => {
             :fileId => document_id,
             :permissionId => user_id })
         if result.error?
-          raise DriveConnectionException, result
+          raise DriveConnectionException, result.error_message
         end
       end
     end
@@ -132,7 +132,7 @@ module GoogleDocs
           :parameters => { :fileId => document_id }
         )
         if result.error?
-          raise DriveConnectionException
+          raise DriveConnectionException, result.error_message
         end
       end
     end
@@ -169,6 +169,7 @@ module GoogleDocs
       folders = {nil => root}
 
       documents['items'].each do |doc_entry|
+        next unless doc_entry['downloadUrl'] || doc_entry['exportLinks']
         entry = GoogleDocs::DriveEntry.new(doc_entry, extensions)
         if folders.has_key?(entry.folder)
           folder = folders[entry.folder]

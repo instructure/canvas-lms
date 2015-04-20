@@ -50,7 +50,10 @@ define [
         $.get("#{url}/#{contentExportId}")
       .pipe (response) ->
         $(window).off('beforeunload', promptBeforeLeaving)
-        window.location = response.attachment.url
+        if response.workflow_state is 'exported'
+          window.location = response.attachment.url
+        else
+          $.flashError I18n.t('progress_error', 'An error occured trying to prepare download, please try again.')
       .fail ->
         $.flashError I18n.t('progress_error', 'An error occured trying to prepare download, please try again.')
       .always ->

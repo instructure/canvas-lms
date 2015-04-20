@@ -237,6 +237,74 @@ describe Folder do
       expect(Folder.resolve_path(@course, ['foo', 'bar'])).to eql [@root_folder, foo, bar]
     end
   end
+
+  describe "file_attachments_visible_to" do
+    before(:once) do
+      @root_folder = Folder.root_folders(@course).first
+      attachment_model context: @course, display_name: 'normal.txt', folder: @root_folder, uploaded_data: default_uploaded_data
+      attachment_model context: @course, display_name: 'hidden.txt', folder: @root_folder, uploaded_data: default_uploaded_data, hidden: true
+      attachment_model context: @course, display_name: 'locked.txt', folder: @root_folder, uploaded_data: default_uploaded_data, locked: true
+      attachment_model context: @course, display_name: 'date_restricted_unlocked.txt', folder: @root_folder, uploaded_data: default_uploaded_data, unlock_at: 1.day.ago, lock_at: 1.year.from_now
+      attachment_model context: @course, display_name: 'date_restricted_locked.txt', folder: @root_folder, uploaded_data: default_uploaded_data, lock_at: 1.day.ago, unlock_at: 1.year.from_now
+    end
+
+    it "should include all files for teachers" do
+      teacher_in_course active_all: true
+      expect(@root_folder.file_attachments_visible_to(@teacher).map(&:name)).to match_array %w(normal.txt hidden.txt locked.txt date_restricted_unlocked.txt date_restricted_locked.txt)
+    end
+
+    it "should exclude locked and hidden files for students" do
+      student_in_course active_all: true
+      expect(@root_folder.file_attachments_visible_to(@student).map(&:name)).to match_array %w(normal.txt date_restricted_unlocked.txt)
+    end
+  end
+
+  describe "all_visible_folder_ids" do
+    before(:once) do
+      @root_folder = Folder.root_folders(@course).first
+      @normal_folder = @root_folder.active_sub_folders.create!(:context => @course, :name => "normal")
+      @normal_sub1 = @normal_folder.active_sub_folders.create!(:context => @course, :name => "normal_sub1")
+      @normal_sub2 = @normal_sub1.active_sub_folders.create!(:context => @course, :name => "normal_sub2")
+      @locked_folder = @root_folder.active_sub_folders.create!(:context => @course, :name => "locked", :lock_at => 1.week.ago)
+      @locked_sub1 = @locked_folder.active_sub_folders.create!(:context => @course, :name => "locked_sub1")
+      @locked_sub2 = @locked_sub1.active_sub_folders.create!(:context => @course, :name => "locked_sub2")
+    end
+
+    it "should exclude all descendants of locked folders" do
+      expect(Folder.all_visible_folder_ids(@course)).to match_array([@root_folder, @normal_folder, @normal_sub1, @normal_sub2].map(&:id))
+    end
+  end
+
+  describe "read_contents permission" do
+    before(:once) do
+      @course.offer!
+      @root_folder = Folder.root_folders(@course).first
+      student_in_course(:course => @course, :active_all => true)
+      teacher_in_course(:course => @course, :active_all => true)
+    end
+
+    it "should grant right to students and teachers" do
+      expect(@root_folder.grants_right?(@student, :read_contents)).to be_truthy
+      expect(@root_folder.grants_right?(@teacher, :read_contents)).to be_truthy
+    end
+
+    context "with files tab hidden to students" do
+      before :once do
+        @course.tab_configuration = [{"id" => Course::TAB_FILES, "hidden" => true}]
+        @course.save!
+        @root_folder.reload
+      end
+
+      it "should grant right to teachers but not students" do
+        expect(@root_folder.grants_right?(@student, :read_contents)).to be_falsey
+        expect(@root_folder.grants_right?(@teacher, :read_contents)).to be_truthy
+      end
+
+      it "should still grant rights to teachers even if the teacher enrollment is concluded" do
+        @teacher.enrollments.where(:course_id => @course).first.complete!
+        expect(@course.grants_right?(@teacher, :manage_files)).to be_falsey
+        expect(@root_folder.grants_right?(@teacher, :read_contents)).to be_truthy
+      end
+    end
+  end
 end
-
-

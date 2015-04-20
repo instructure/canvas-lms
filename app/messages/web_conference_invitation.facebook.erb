@@ -1,5 +1,0 @@
-<% define_content :link do %>
-  <%= polymorphic_url([asset.context, :conferences]) %>
-<% end %>
-
-<%= t :body, "You've been invited to participate in a web conference, *%{title}* for #%{name}#.", :wrapper => { "*" => "<b><a href=\"#{content(:link)}\">\\1</a></b>", "#" => '<b>\1</b>' }, :title => asset.title, :name => asset.context.name %>

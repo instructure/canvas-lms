@@ -2,8 +2,14 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 nb: 
+  1_item_scores_1_2_2_3_5_5_3_39f6c397: "1 - Element poeng: 1, 2, 2, 3, 5, 5, 3"
+  1_item_scores_3_2_2_4_1_3_4_e0de3073: "1 - Element poeng: 3, 2, 2, 4, 1, 3, 4"
   1_item_scores_5512cd03: "1- Element poeng"
+  2_final_score_5_5_8418d475: "2- Sluttresultat: 5.5"
   2_final_score_7b0fd15e: "2- Sluttresultat"
+  2_highest_score_4_3b4bc250: "2 - Høyeste poengsum: 4"
+  2_most_recent_score_3_766dbf4e: "2 - Siste poengsum: 3"
+  3_calculated_mastery_score_5_0_75_3_0_25_4_5_c88c3a7b: "3 - Beregnet mestring poengsum: 5(0.75) + 3(0.25) = 4.5"
   451_message: 
     description: "Du er ikke autorisert til å få tilgang til denne siden fordi du befinner i et land underlagt U.S. handelsrestriksjoner."
     headings: 
@@ -42,6 +48,7 @@ nb:
     save: Lagre
   _section_not_synced_yet_cd07d0dd: "-- Seksjon synkroniseres ikke ennå"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "En beregnede verdien brukes ikke med denne beregningsmetoden"
+  a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "En fil med navnet %{itemName} finnes allerede i denne mappen."
   a_message_is_required_129e1814: "En melding kreves"
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "En tabell som inneholder navnet på gradering ordningen og ikoner for å redigere eller slette ordningen."
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "En tabell som inneholder gradering ordningen data. Hver rad inneholder et navn, en maksimal prosent, og en minimum prosent. I tillegg inneholder hver rad et ikon for å legge til en ny rad under, og et ikon for å slette gjeldende rad."
@@ -68,7 +75,6 @@ nb:
       avatars: Brukeravatar
       delicious: Delicious
       diigo: Diigo
-      facebook: Facebook
       google_docs: "Google Docs"
       google_docs_preview: "Google Docs forhåndsvisning"
       google_drive: "Google Drive"
@@ -84,8 +90,6 @@ nb:
       invalid_discovery_url: "Oppdagelses-URL-en er ugyldig"
     feedback_coach: "Spør fellesskapet"
     feedback_coach_sub: "Få hjelp fra en Canvas-ekspert"
-    feedback_feature_request: "Etterspør en funksjon"
-    feedback_feature_request_canvas_net: "Etterspør en funksjon i Canvas Network"
     feedback_feature_request_sub: "Har du en idé for å forbedre Canvas?"
     manually_created_courses: "Manuelt innlagte kurs"
     root_account_cant_have_sis_id: "SIS IDer kan ikke settes på rot-kontoer"
@@ -237,7 +241,7 @@ nb:
         login_handle_name: Innloggingstekst
         position: Posisjon
         requested_authn_context: Autentiseringskontekst
-        unkown_user_url: "Ukjent Bruker URL"
+        unknown_user_url: "Ukjent Bruker URL"
       log_in_url: Påloggings-URL
       log_out_url: Avloggings-URL
       login_attribute: Innloggingsattributt
@@ -252,7 +256,7 @@ nb:
       save_button: "Lagre innstillinger for autentisering"
       start_debugging: "Start feilsøking"
       stop_debugging: "Stopp feilsøking"
-      unkown_user_url_description: "Nettadressen for å omdirigere til når en autentisert bruker finnes ikke i Canvas."
+      unknown_user_url_description: "Nettadressen for å omdirigere til når en autentisert bruker finnes ikke i Canvas."
     saml_testing: 
       auth_request_to_idp: "AuthnRequest sendt til IdP"
       auth_response_from_idp: "AuthnResponse fra IdP"
@@ -946,6 +950,7 @@ nb:
         outgoing_email_default_name_option_default: "Standard Canvas-innstilling"
         prevent_course_renaming_by_teachers: "Ikke la forelesere endre navn på sine kurs"
         restrict_quiz_questions: "Forhindre studentene fra å se prøvespørsmålene etter at kurset er over"
+        restrict_student_future_view: "Forhindre studenter fra å se kursene før startdatoen"
         role_id: "Legg til flere"
         self_enrollment: "Tillat selv-påmelding"
         self_registration: Egenregistrering
@@ -1050,6 +1055,13 @@ nb:
       subtitle_term: "For semesteret **%{term}**"
       title: "Kurs i denne kontoen"
       too_many_courses_message: "Det er for mange kurs å vise (%{count}). Bruk dialogboksen til høyre for å finne et spesifikt kurs."
+    single_course_ag_selector_parameters: 
+      account_reports: 
+        linn_benton: 
+          assignment_group_id: 
+            text: "Overdragelse Gruppe Id:"
+          course_id: 
+            text: "Kurs Id:"
     sis_batch_counts: 
       accounts_label: Kontoer
       courses_label: Kurs
@@ -1260,6 +1272,7 @@ nb:
           zero_activity: 
             text: "Denne rapporten viser alle studenter som er påmeldt kurs i et gitt semester. Den resulterende CSV-filen vil ha én rad per brukerpåmelding som ikke har besøkt kurset siden datoen."
   achieve_mastery_count_times_8c9bbcec: "Oppnå mestring %{count} ganger"
+  actions_efcde10d: Aksjoner
   activerecord: 
     errors: 
       messages: 
@@ -1490,6 +1503,7 @@ nb:
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Er du sikker på at du vil slette dette gradering periode?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Er du sikker på at du vil slette denne karaktersettingsplanen?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Er du sikker på at du vil fjerne dette verktøyet?"
+  are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Er du sikker på at du vil rapportere dette profilbildet?"
   aria_labels: 
     unlock_at_date: "Lås opp på dato"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Etter hvert som du skriver tekst i dette feltet, vil listen over grupper bli automatisk filtrert til kun å inneholde de som har et navn som passer med det du skriver inn. "
@@ -1536,6 +1550,7 @@ nb:
     titles: 
       gpa_scale_explainer: "Hva er tallkaraktersetting?"
       grading_scheme_info: "Se/rediger karaktersettingsplan"
+  assignment_976578a8: Oppgave
   assignment_comments_e43ed898: "Overdragelse Kommentarer"
   assignment_details: 
     no_graded_submissions: "Ingen innleveringer som er karaktersatt"
@@ -2164,6 +2179,7 @@ nb:
     upload_error_timeout: "Forespørselen hadde et tidsavbrudd: %{url}"
     upload_error_too_many_redirects: "For mange omdirigeringer"
     upload_error_unexpected: "En ukjent feil oppsto under nedlasting fra %{url}"
+  attachment_deffe5a9: Vedlegg
   attendance: 
     default_attendance_title: "Oppmøte %{date}"
     errors: 
@@ -2204,9 +2220,12 @@ nb:
       Et nytt, enklere, mer brukervennlig fil surfing grensesnitt. Hvis du slår dette på ved kursnivå
       deretter alle brukere som er i dette kurset vil se det nye grensesnittet. For å få det til å viser opp når noen
       går til den personlige filer side for en bruker ('/files') så du må slå den på for kontoen de er medlem av.
+  between_1_and_99_d421a4c0: "Mellom 1% og 99%"
+  between_2_and_5_c34f5152: "Mellom 2 og 5"
   big_blue_button_conference: 
     conference_is_recorded: "Denne konferansen tas opp."
     recording_setting: "Spiller inn"
+    recording_setting_enabled_description: "Aktiver innspilling for denne konferansen"
   blackboard: 
     no_manifest: "Denne Blackboard-zipfilen har ingen imsmanifest.xml-fil i rotmappen."
   bookmark_service: 
@@ -2218,6 +2237,7 @@ nb:
       permissions: "Redigere tillatelser for: %{name}"
     unpublished_title: Upublisert
   broken_file_link_found_in_your_course_7cc24395: "Brutt fil kobling funnet i kurset"
+  bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "bøtte navn må være en av de følgende: %{bucket_names}"
   bulk_course_migration: 
     export_failed: "En feil oppsto under eksporteringen av kurset med bb_lcid %{id} fra Blackboard"
     export_failed_no_id: "En feil oppsto under importering av kurs"
@@ -2442,7 +2462,6 @@ nb:
       create_event: "Opprett ny hendelse"
       done_go_back_to_list: "Gjort, tilbake til listen"
       links: 
-        accessibility_warning: "Advarsel: Denne visningen er ikke tilgjengelig for skjermlesere. Bruke Agenda-visningen i stedet."
         calendar_agenda: Agenda
         calendar_month: Måned
         calendar_scheduler: Planlegger
@@ -2637,25 +2656,9 @@ nb:
     crumbs: 
       new: "Ny kalenderhendelse"
     full_calendar_event: 
-      buttons: 
-        create: "Opprett hendelse"
-        update: "Oppdater hendelse"
-      labels: 
-        address: Adresse
-        date: Dato
-        event_description: "Beskrivelse av hendelse"
-        from: Fra
-        location: Sted
-        title: Tittel
       no_content: "Uten innhold"
-      timespan: "%{start_time} *til* %{end_time}"
     new: 
-      links: 
-        back_to_calendar: "Tilbake til kalender"
-        delete: "Slett hendelsen"
-        edit: "Rediger kalenderhendelse"
       page_title: "Ny kalenderhendelse"
-    no_content: "Uten innhold"
     notices: 
       created: "Hendelsen ble opprettet"
       deleted: "Denne hendelsen er slettet"
@@ -2675,43 +2678,6 @@ nb:
     invalid_date_or_time: "Ugyldig dato eller ugyldig datotid for %{attr}"
   calendars: 
     assignment_details: Oppgavedetaljer
-    calendar: 
-      alts: 
-        next: Neste
-        previous: Forrige
-      calendars_count: 
-        one: "1 kalender, %{open_count} åpen"
-        other: "%{count} kalendere, %{open_count} åpne"
-      feed_title: Kalenderstrøm
-      instructions: 
-        ics_link: "Kopier lenken nedenfor og lim den inn i hvilket som helst kalenderprogram som aksepterer iCal strømmer (Google Calendar, iCal, Outlook, etc.)"
-      labels: 
-        calendar: Kalender
-        date: Dato
-        details: Detaljer
-        due: "Leveres innen"
-        from: Fra
-        group: Gruppe
-        title: Tittel
-        undated_events: "Udaterte hendelser"
-      links: 
-        add_event: "Legg til hendelse"
-        delete: Slett
-        edit: Rediger
-        feed: "klikk her for å se strømmen"
-        full_details: "Full oversikt"
-        how_do_i: Hvordan...?
-        jump_to_calendar: "Hopp til kalenderen"
-        more_options: "Flere alternativer"
-        show_undated_events: "vis %{count} udaterte hendelser"
-      messages: 
-        max_visible: "Du kan vise inntil %{count} kalendere samtidig"
-      options: 
-        new_group: "[ Ny gruppe ]"
-      tabs: 
-        assignment: Oppgave
-        event: Hendelse
-      timespan: "%{start_time} *til* %{end_time}"
     default_title: hendelse
     event: 
       due: "leveres innen"
@@ -2735,36 +2701,6 @@ nb:
     prompts: 
       delete_assignment: "Er du sikker på at du vil slette denne oppgaven?"
       delete_event: "Er du sikker på at du ønsker å slette denne hendelsen?"
-    show: 
-      crumbs: 
-        my_calendar: "Min kalender"
-      feed_title: "Kurskalender Atom-strøm"
-      keycode_descriptions: 
-        delete: "Slett denne hendelsen"
-        edit: "Rediger denne hendelsen"
-        next_day: "Neste kalenderdag"
-        next_event: "Neste kalenderdag/hendelse"
-        next_week: "Neste uke"
-        open: "Åpne denne hendelsen"
-        previous_day: "Forrige kalenderdag"
-        previous_event: "Forrige kalenderdag/hendelse"
-        previous_week: "Forrige uke"
-        refresh: "Frisk opp kalenderen"
-      keycode_descriptoins: 
-        new: "Ny hendelse for denne dagen"
-      keycodes: 
-        delete: d
-        edit: e
-        new: "n"
-        next_day: ctrl+høyre
-        next_event: j
-        next_week: ctrl+ned
-        open: o
-        previous_day: ctrl+venstre
-        previous_event: k
-        previous_week: ctrl+opp
-        refresh: r
-      page_title: Kalender
     show2: 
       calendar_feed: Kalenderstrøm
       calendar_feed_instructions: "Kopier lenken nedenfor og lim den inn i hvilket som helst kalenderprogram som aksepterer iCal strøm (Google Calendar, iCal, Outlook, etc.)"
@@ -2783,7 +2719,6 @@ nb:
       add_new_event: "Legg til ny hendelse"
       edit_assignment: "Rediger oppgave"
       edit_event: "Rediger hendelse"
-    use_new_calendar: "Prøv ut den nye kalenderen"
     wizard_box: 
       descriptions: 
         assignment: "Bra. Nå kan du klikke på \"Oppgave\"-fanen i dialogboksen for å lage en oppgave i stedet for en kalenderhendelse."
@@ -2805,6 +2740,7 @@ nb:
         delete: "Slett en hendelse/oppgave"
         new: "Opprett en ny hendelse"
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Kan ikke slette justeringer basert på Rubrikk foreninger. For å fjerne disse assosiasjonene du trenger å fjerne rad fra eiendelens rubrikk"
+  can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Kan ikke utføre diffing mot mer enn én fil av samme type"
   cancel_caeb1e68: Avbryt
   canvas: 
     migration: 
@@ -2840,9 +2776,12 @@ nb:
     titles: 
       update_assignment_points: "Endre oppnåelige poeng for å passe med vurderingen?"
   choose_a_course_home_page_8059c7b: "Velg en startside for kurset"
+  choose_a_csv_file_to_upload_9644480c: "Velg en CSV-fil å laste opp:"
   choose_usage_rights_33683854: "Velg bruksrettigheter..."
   clear_file_name_text_field_fce73840: "Klar filnavnet tekstfeltet"
   click_here_on_the_calendar_link_c9965631: "Klikk her på *Kalender* lenken"
+  click_to_modify_89fa26aa: "Klikk for å modifisere"
+  click_to_report_profile_picture_370f9625: "Klikk for å rapportere profilbilde"
   close_and_return_to_canvas_80544344: "Lukk og retur til Canvas"
   close_d634289d: Lukk
   collaboration: 
@@ -2945,6 +2884,7 @@ nb:
     titles: 
       delete: "Slette samarbeid?"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Kollapse liste over medlemmene i gruppen for %{groupName}"
+  collapse_subdiscussion_89af1f5c: "Kollapse Sub diskusjon"
   coming_up_4348b0bd: "Kommer snart"
   comm_messages: 
     from_beginning: begynnelsen
@@ -2956,7 +2896,6 @@ nb:
   communication_5255723c: Kommunikasjon
   communication_channel: 
     body: "Bekreftelseskoden din for Canvas er %{verification_code}"
-    default_facebook_account: "Facebook konto"
     default_twitter_handle: "Twitter Handle"
     default_yo_name: "Yo Navn"
   communication_channels: 
@@ -3416,7 +3355,6 @@ nb:
         user_services: "TIlgjengelige Web-tjenester"
       help: 
         list_services: "Du har ikke gjort tilgjengelig din liste over tilgjengelige tjenester. Ved å åpne denne listen vil du gjøre det lettere for dine medstudenter å koble seg opp med deg utenfor kurset."
-        services: "Du har ikke koblet brukerkontoen din til noen eksterne tjenester. Du kan koble din Canvas-konto til tjenester som Facebook og Twitter. Dette vil gjøre det enklere for dine medstudenter å koble seg til deg utenfor kurset."
       labels: 
         public_list_services: "La dine medstudenter se hvilke tjenester jeg har koblet til min profil"
         user_privileges: Privilegier
@@ -3455,7 +3393,6 @@ nb:
         registered_services: "Registrerte tjenester"
         service_types: Tjenestetyper
       help: 
-        no_services: "Du har ikke koblet brukerkontoen din til noen eksterne tjenester. Du kan koble din Canvas-konto til tjenester som Facebook og Twitter."
         services_private: "Du har ikke gjort tilgjengelig din liste over tilgjengelige tjenester. Ved å åpne denne listen vil dine medstudenter se hvilke tjenester du har koblet til din Canvas-konto."
         user_services: "Hvis andre medlemmer velger, kan de la deg se hvilke eksterne tjenester de har koblet til sin Canvas-konto. Dette kan gjør det enklere å koordinere gruppeprosjekter samt å koble seg til hverandre utenfor kurset."
       labels: 
@@ -3764,12 +3701,9 @@ nb:
     all_courses: "Alle kurs"
     all_in_context: "Alle i %{context}"
     archive: Arkiv
-    archive_conversation: "Arkiver samtale"
     autocomplete_result: 
       group_people: "Personer: %{people}"
       no_results: "Ingen resultater"
-    autocomplete_token: 
-      remove_recipient: "Fjern mottaker"
     back: Tilbake
     cannot_add_to_private: "Du kan ikke legge til deltakere i private samtaler."
     cannot_be_empty: "Beskjeden kan ikke være tom"
@@ -3813,12 +3747,10 @@ nb:
     hide: Skjul
     index_new: 
       archive: Arkiv
-      archive_conversation: "Arkiver samtale"
       archived: Arkivert
       clear_search: "Tøm søkeresultater"
       compose_new_message: "Skriv ny beskjed"
       delete: Slett
-      delete_conversation: "Slett samtale"
       filter_messages_by_course: "Filtrer beskjeder etter kurs"
       filter_messages_by_type: "Filtrer beskjeder etter type"
       forward: Videresend
@@ -3871,7 +3803,6 @@ nb:
         add_to_faculty_journal: "Add as a Faculty Journal entry"
         attachments: Vedlegg
         course: Kurs
-        course_required: "Du må velge en kurs før du går inn mottakere."
         select_course: "Velg et kurs"
         subject: Tema
         to: Til
@@ -3919,7 +3850,6 @@ nb:
     titles: 
       rss_feed: "Strøm for samtaler"
     unarchive: "Fjern arkivering"
-    unarchive_conversation: "Fjern samtalen fra arkivering"
     unstar: "Fjern stjernemerking"
     unstar_conversation: "Fjern stjernemerking fra samtalen"
   copyright_holder_66ee111: "Opphavsrett Innehaver:"
@@ -3930,6 +3860,7 @@ nb:
   correct_answers_will_be_available_from_to_5762e8c6: "Korrekte svar vil være tilgjengelige %{from}–%{to}."
   correct_answers_will_be_available_on_date_48137: "Korrekte svar blir tilgjengelige %{date}."
   couldn_t_find_canvas_csv_import_headers_487f1b6c: "Fant ikke Canvas CSV importere overskrifter"
+  couldn_t_generate_diff_message_a0528b20: "Kunne ikke generere diff: %{message}"
   count_assignments_with_errors_e8f3c18c: 
     one: "1 Oppdraget med feil"
     other: "%{count} Oppdrager med feil"
@@ -4198,14 +4129,8 @@ nb:
       headings: 
         grade: "Evaluer %{assignment}"
         to_do: "Å gjøre"
-      images: 
-        alt: 
-          ignore: ignorer
       links: 
         show_more: "%{count} mer..."
-        title: 
-          ignore: "Ignorer denne oppgaven"
-          ignore_review: "Ignorer denne anmeldelsen"
       need_grading_count: 
         one: "1 må rettes"
         other: "%{count} må rettes"
@@ -4223,8 +4148,6 @@ nb:
         conclude_course: "Avslutt kurs"
         delete_course: "Slett kurs"
       details: 
-        conclude_alt_text: "Hvis du ønsker å beholde muligheten til å endre karakterer samtidig som den begrenser studentenes tilgang til kurset, kan du benytte innstilling for  kursdatoer. Du kan lære om innstillinger for kursdato i våre guider *her*"
-        confirm_conclude: "Advarsel: Avslutting av kurset vil forhindre deg fra å endre karakterer og få tilgang til kursinnholdet."
         confirm_delete: "Er du sikker på at du vil slette dette kurset? Når det er slettet vil ikke studentene og foreleserne ha tilgang til det lenger. Om du bare ønsker å fjerne det fra nedtrekksmenyen over kurs bør du *avslutte kurset i stedet*."
         confirm_delete_addendum: "Om du ikke har tillatelse til å avslutte kurset kan du *endre sluttdatoen for kurset* eller spørre en administrator om å avslutte kurset."
       headings: 
@@ -4511,6 +4434,8 @@ nb:
         open_enrollment: "Legg til en \"Delta i dette kurset\" lenke på kursets hjemmeside"
         public_syllabus: "Gjør pensum i dette kurset synlig for offentligheten"
         restrict_enrollments_to_course_dates: "Brukere kan bare delta i kurset mellom disse datoene"
+        restrict_student_future_view: "Begrense studenter fra visning kurs før startdato"
+        restrict_student_past_view: "Begrense studenter fra visning kurs etter sluttdato"
         root_account: Rot-konto
         root_account_id: Rot-konto
         sis_source_id: "SIS ID"
@@ -4794,6 +4719,7 @@ nb:
         count: "Feil studentantall"
         ratio: "Feil studentratio"
   current_3ce5414a: "Nåværende:"
+  current_mastery_score_score_out_of_mastery_points_fedd343f: "Nåværende Mestring Poeng: %{score} out of %{mastery_points}"
   current_score_6c81792: "Gjeldende resultat"
   current_total_67bf5f72: "Nåværende Totalt:"
   curve_grades_dialog: 
@@ -4847,6 +4773,7 @@ nb:
       show_less: "Vis mindre"
       show_more: "Vis mer"
   data_exports: "data eksporten"
+  data_set_identifier_data_set_id_c228b5df: "Datasett Identifier: %{data_set_id}"
   date: 
     abbr_day_names: 
       - Søn
@@ -4956,6 +4883,7 @@ nb:
       month: Måned
       second: Sekund
       year: År
+  decaying_average_8bf6a0dd: "Forfalne Gjennomsnittlig"
   default_conference_title: "%{course_name}-konferanse"
   default_question_name: Spørsmål
   default_question_text: Spørsmålstekst
@@ -5089,6 +5017,7 @@ nb:
       basert på øvrige oppgaver.
   disable_a5c05db3: "Slå av"
   disabled_18c33a73: (deaktivert)
+  discussion_6719c51d: Diskusjon
   discussion_entries: 
     created_entry_notice: "Innleggingen ble opprettet."
     deleted_entry_notice: "Innleggingen er slettet"
@@ -5105,6 +5034,7 @@ nb:
     atom_no_author: "Ingen forfatter"
     default_title: "Ingen tittel"
     empty_message: "Ingen beskjed"
+  discussion_topic_dc85ad4c: Diskusjonstema
   discussion_topics: 
     assignment_details: 
       available_from: "Tilgjengelig fra"
@@ -5165,7 +5095,6 @@ nb:
         published: Publisert
       delay_posting: "Avvent posting"
       enable_podcast_feed: "Slå på podkaststrøm"
-      include_replies_in_podcast_feed: "Inkluder svar i podkaststrømmen"
       only_visible_to_overrides_note: "Merk: Diskusjonen er *bare* synlig for seksjonen(s) spesifisert nedenfor:"
       options: Muligheter
       page_header_title: "Ny diskusjon"
@@ -5212,7 +5141,6 @@ nb:
       loading: Laster...
       lock_for_comments: "Lås kommentering"
       make_sure_all_search_terms_are_spelled_correctly: "Pass på at alle søkeord er stavet riktig."
-      new_discussion: "*Start en* diskusjon"
       rss_feed: RSS-strøm
       start_one_now: "Start en nå"
       suggestions: "Forslag:"
@@ -5278,7 +5206,7 @@ nb:
       reply_to_topic: "Svar på temaet"
       retrieved_from_feed: "Hentet fra %{feed}"
       show_rubric: "Vis vurderingsveiledning"
-      speed_grader: "Speed Grader"
+      speed_grader: SpeedGrader™
       topic: Tema
       topic_podcast_feed_link: "Podkast-strøm for tema"
       topic_subscribe: Abbonner
@@ -5327,6 +5255,7 @@ nb:
       add_reply_to_topic: "Legg til svar på temaet"
     entry_content: 
       authors_name: "Forfatterens navn"
+      collapsible_subdiscussion: "Kollapse Sub diskusjon"
       delete: Slett
       edit: Rediger
       edited_comment: "Redigert av *%{editor.display_name}* %{edited_at}"
@@ -5405,8 +5334,8 @@ nb:
   due_datetime_f5a81b81: "Frist: %{dateTime}"
   due_multiple_dates_cc0ee3f5: "Frist: Flere datoer"
   due_on_date_aa4725cd: "Frist Dato"
-  due_on_date_ffc98ebc: "Frist Dato"
   e_mail_only_2cc5e513: "Kun epost"
+  each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: "Hver bar er et oppdrag. Den grønne laget representerer prosentandelen av elever som viste i sin underkastelse *på tide*. Anførsler som er **sent** er gul, og ***mangler*** innleveringer er rød."
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Hver linjen er ett oppdrag. Den *tynn vertikal værhår* utvider fra den laveste poengsummen for enhver student i kurset til den høyeste poengsummen. Den **tykkere bar** strekker seg fra den 25. persentilen til den 75., med ***median merket***."
   each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "Hver linjen er ett oppdrag. Den tynne værhår strekker seg fra den laveste poengsummen for enhver student i kurset til den høyeste poengsummen. Tykkere linjen strekker seg fra den 25. persentilen til den 75., med median merket. Studentens poengsum er merket med en prikk."
   each_bar_represents_the_number_of_page_views_on_th_3f833fcd: "Hver linjen representerer antall *sidevisninger* på den dagen. En oransje søyle viser at studenten **tok noen handling** innenfor kurset på den dagen."
@@ -5427,6 +5356,7 @@ nb:
     buttons: 
       create_rubric: "Opprett vurderingsveiledning"
       update_rubric: "Oppdater vurderingsveiledning"
+    change: Endre
     discussion_points_possible: 
       one: "%{count} poeng oppnåelig"
       other: "%{count} poeng oppnåelig"
@@ -5461,7 +5391,10 @@ nb:
     instructions: "Lim inn eller skriv URL til det bildet du vil inkludere:"
     keyboard_shortcuts: 
       dialog_title: Tastatursnarveier
+      editor_help_link: "Åpne Hjelp Menyen"
       keybindings: 
+        close_submenu: "Lukk meny eller dialogboks, får du også tilbake til redaktør område"
+        navigate_toolbar: "Naviger til venstre/høyre gjennom meny/verktøylinje"
         open_dialog: "Åpne dette hjelp dialogen"
         open_toolbar: "Åpne redigereren verktøylinje"
     loading: Laster...
@@ -5496,6 +5429,7 @@ nb:
     titles: 
       font_size: "Skriftstørrelse, trykk nedover for å velge"
       formatting: "Formatering, trykk nedover for å velge"
+      rte_help: "Rik Tekst Område. Trykk ALT+F8 for hjelp"
   either_the_url_or_domain_should_be_set_c29cf8c1: "Enten URL-en eller domenet må angis."
   element_option_missing_error_an_element_to_attach__be433478: "`element` alternativ manglende feil: Et element for å feste TreeBrowserView må oppgis når du setter den gjengi muligheten til å 'true' for BBTreeBrowserView"
   email: 
@@ -5855,10 +5789,12 @@ nb:
   example_https_example_com_config_xml_be5f36ac: "Eksempel: https://example.com/config.xml"
   example_https_lti_tool_provider_example_herokuapp__e9802142: "Eksempel: https://lti-tool-provider-example.herokuapp.com/register"
   example_item_scores_6726c689: "Eksempel element poeng"
+  exceeds_mastery_1f995dce: "Overgår Mestring"
   expand_collapse_title_outcome_group_239f0a9d: "utvide/kollaps %{title} Utfallet Gruppe"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Utvide listen over gruppemedlemmer for %{groupName}"
   expand_or_collapse_calendars_9854b0d0: "Utvides eller skjul Kalendere"
   expand_or_collapse_undated_items_b901de09: "Utvide eller skjule Udaterte elementer"
+  expand_subdiscussion_cd226ed4: "Utvide Sub diskusjon"
   expires_on_date_18efe4e2: "Utløper på dato"
   external_apps_f5490181: "Eksterne apper"
   external_content: 
@@ -5897,6 +5833,7 @@ nb:
       posts_added: "Poster lagt til"
       remove_feed: "Fjern %{display_name}"
   external_integration_keys_8b4f4548: "Eksterne Integrasjons Taster"
+  external_tool_c5a6410a: "Eksternt verktøy"
   external_tools: 
     account_navigation_configured: "Kontonavigering konfigurert"
     app_full_view: 
@@ -6004,53 +5941,6 @@ nb:
     submit: "Send inn"
     user_navigation_configured: "Brukernavigering konfigurert"
     wiki_page_menu_configured: "Wiki side menyen konfigurert"
-  facebook: 
-    authorization_required: "Kun autoriserte brukere har tilgang til den siden"
-    authorization_success: "Autorisering lyktes! Canvas og Facebook er nå venner."
-    deleted: Slettet
-    index: 
-      all_set: "Du er klar!"
-      bookmark_notice: "Du kan se antall nye Canvas-varsler fra Facebook-forsiden din om du legger til denne applikasjonen som et bokmerke."
-      canvas_messages: Canvas-beskjeder
-      configure_notification_preferences_notice: "Etter at du har *konfigurert varselsinnstillingene dine* vil du kunne se varsler fra Canvas her."
-      installation_about: "For å innstallere Facebook-applikasjonen fra Canvas, gå til profilsiden din i Canvas og klikk på Facebook-knappen for å koble sammen Canvas- og Facebook-kontoene dine."
-      learn_more: "Lær mer på instructure.com"
-      more_information: "Mer informasjon på %{domain_list}"
-      no_messages_notice: "Etter hvert som ting skjer i kurset vil du få varsler her om hva som skjer på Canvas-kontoen din."
-      notification_about: "Facebook-applikasjonen til Canvas er her for å gi deg lettere tilgang til interaksjonene som foregår i kursene dine. Du kan sette den opp til å sende deg varsler når du får karakterer på innleveringer, når oppgavefrister endres, osv. Dine private data forblir private på Canvas."
-      notification_settings: Varselinnstillinger
-      notifications_notice: "Nedenfor kan du se en liste over de nyeste varslene dine fra Canvas. Du kan se antall Canvas-varsler på Facebook-forsiden om du legger til denne applikasjonen som bokmerke."
-      welcome: "Velkommen tilbake, %{name}!"
-      welcome_message: "Velkommen til en ny type læringsprogramvare. Vi finnes for å gjøre det lettere for deg å bruke nettet til å forbedre læringsprosessen din. Grensesnittet vårt er enkelt, rent og åpent, og vi bruker de verktøyene du og studentene dine allerede bruker – som Facebook – for å gi en mer åpen og samarbeidsbasert læringserfaring. Vi har satt det sammen til én kraftig, åpen pakke som gjør mye mer enn bare å holde styr på oppgaver. Den legger til rette for interaksjon og stimulerer læring."
-      welcome_title: "Velkommen til Canvas"
-    index_disabled: 
-      disabled_notice: "Denne Canvas-siden er ikke satt opp til å kommunisere med Facebook."
-      get_help: "Få hjelp på support.instructure.com"
-      instructure_canvas: "Instructure Canvas"
-    invalid_signature: "Ugyldig Facebook-signatur"
-    message: 
-      hide: Skjul
-    notification_policies: 
-      alerts: Varsler
-      cancel: Avbryt
-      change_settings: "Endre innstillinger"
-      daily: Daglig
-      labels: 
-        alerts_for_category: "%{category_name}-varsler"
-      loading: laster...
-      never: Aldri
-      notification_type: Varselstype
-      right_away: Umiddelbart
-      send_to_facebook: "Send til Facebook?"
-      update_preferences: "Oppdater innstillinger"
-      updating_preferences: "Oppdaterer innstillinger…"
-      weekly: Ukentlig
-    settings: 
-      back_to_messages: "Tilbake til beskjeder"
-      link_needed: "Før du kan konfigurere Facebook-applikasjonen til Canvas må du koble den med Canvas-innloggingen din. Klikk på \"Velkommen\" for mer informasjon."
-      notifications_config_notice: "Varsler fra Canvas kan sendes til Facebook-kontoen din automatisk. Nedenfor ser du hva slags varsler du kan få tilsendt. Du kan endre varselsinnstillingene når som helst, enten her eller i Canvas."
-      settings_title: "Innstillinger for Canvas-varsler"
-      updating_preferences: "Oppdaterer innstillinger…"
   fair_use_bee47d77: "Virkelig Bruk"
   favicon_6e658914: Favicon
   feature_flags: 
@@ -6327,6 +6217,7 @@ nb:
     only_one_folder: "Kan ikke sette mappesti og mappe-ID"
   for: før
   for_all_devices_1f603968: "For alle enheter"
+  from_fdd4956d: Fra
   from_from_to_to_e31f6422: "Fra %{from} til %{to}"
   global_message_icons: 
     announcement: kunngjøring
@@ -6523,21 +6414,9 @@ nb:
       switch_to_points: "Bytt til poeng"
     ungraded: "Ikke tatt med i sensur"
   gradebook_uploads: 
-    errors: 
-      invalid_file: "Ugyldig csv fil, karakterer kunne ikke oppdateres "
-      upload_failed: "Filen kunne ikke lastes opp."
-    form: 
-      labels: 
-        upload: "Velg en CSV fil for opplasting"
-      titles: 
-        upload_form: "Velg en CSV for opplasting"
     new: 
       titles: 
         new_upload: "Last opp karakteroversikt"
-    notices: 
-      updated: 
-        one: "Vellykket oppdatering av 1 innlevering."
-        other: "Vellykket oppdatering av %{count} innleveringer."
     show: 
       assignment_answer: "Denne oppgaven er"
       assignment_example: "Prøve om egenkapitalindekser"
@@ -6564,14 +6443,6 @@ nb:
       student_answer: "Denne personen er virkelig"
       student_example: "Litt av en type"
       student_question: "Studenten det gjelder"
-  gradebook_uploads_form: 
-    buttons: 
-      upload_data: "Last opp data"
-    labels: 
-      upload: "Velg en CSV-fil å laste opp:"
-    titles: 
-      upload_form: "Velg en CSV for opplasting"
-    what_should_csv_look_like: "Hvordan bør en CSV fil se ut?"
   gradebooks: 
     attendance: 
       attendance_info: "Ingen oppgaver som krever oppmøte har blitt opprettet."
@@ -6692,12 +6563,14 @@ nb:
       set_group_weights: "Sett vekting for grupper"
       show_attendance_columns: "Vis kolonner for oppmøte"
       show_concluded_enrollments: "Vis fullførte påmeldinger"
-      upload_scores: Importer
       view_grading_history: "Se på karakterhistorikk"
     grades: 
       complete: Ferdig
       incomplete: Ufullstendig
     grades_filename: Karakterer
+    grading_box_extended: 
+      labels: 
+        grade: Karakter
     history: 
       graded_on_submission: "Karaktersatt ved innlevering"
       grades_for_date: "Karakterer for dato"
@@ -6768,7 +6641,6 @@ nb:
       labels: 
         add_comment: "Legg til en kommentar"
         average: Gjsn
-        grade: Karakter
         grade_by_question_beta: "Karakter etter spørsmål (beta)"
         group_comment: "Send kommentar til hele gruppen"
         hide_names: "Skjul studentnavn i SpeedGrader"
@@ -7353,6 +7225,7 @@ nb:
       update: "Oppdater %{model}"
   here_are_your_assignments_listed_by_due_date_7d8e98e6: "Her er dine Oppgaver, listet etter forfallsdato."
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Her er en flott mulighet til å bli kjent med kalenderen og legge til ikke-oppgave hendelser du kanskje har til kurset. Ikke bekymre deg, vi vil hjelpe deg gjennom det."
+  hidden_available_with_a_link_click_to_modify_184990e7: "Skjult. Tilgjengelig med en link - Klikk for å modifisere"
   hidden_files_inside_will_be_available_with_links_9bdf702b: "Skjult, filer inne vil være tilgjengelig med linker."
   high_contrast_description: |-
       Hvis du foretrekker en høyere kontrast versjon av Canvas brukergrensesnitt, aktivere den.
@@ -7381,8 +7254,11 @@ nb:
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "Hvis du forlate, vil zip filen nedlasting under utarbeidelse bli kansellert."
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Om du har brukt en annen læringsplattform har du sikkert saker der som du ønsker å flytte over til Canvas. Vi kan vise deg prosessen med hvordan man enkelt flytter innholdet over til Canvas."
   ignore_assignment_738b3c99: "Ignorer Oppdraget"
+  ignore_forever_dd4a6cdf: "Ignorer for alltid"
   ignore_name_55edc6fe: "Ignorere %{name}"
   ignore_these_3940f6f5: "Ignorere disse"
+  ignore_this_assignment_b7a71f80: "Ignorer denne oppgaven"
+  ignore_until_new_submission_87f32b4: "Ignorer fram til ny innlevering"
   image_8ad06: Bilde
   images: 
     error_checking_color: "Feil under sjekking av bildefarge"
@@ -7392,6 +7268,7 @@ nb:
     invalid_file_type: "Ugyldig filtype %{type}. Tillatte typer inkluderer: %{type_list}"
     not_an_image: "Valgte fil er ikke et bilde"
   immediately_c128ede6: Umiddelbart
+  import_1b31507: Importer
   import_content_b2fd6620: "Importer innhold"
   importers/assignment_importer: 
     errors: 
@@ -7430,6 +7307,7 @@ nb:
       start_a_group: "Start en gruppe"
     styleguide: 
       manage: Behandle
+  insert_math_equation_57c6e767: "Sett Matte Likning"
   insert_row_below_25187f89: "Sett inn rad under"
   installed_7b284a91: Installert
   installed_by_admin_97c3a721: "Installert av Admin"
@@ -7464,8 +7342,6 @@ nb:
       posting_message_failed: "Posting mislyktes, prøv igjen"
       required: "Påkrevd felt"
       search_failed: "Søk mislyktes, vennligst prøv igjen."
-    ignore_forever: "Ignorer for alltid"
-    ignore_until_new_submission: "Ignorer fram til ny innlevering"
     labels: 
       datepicker: 
         time: Tid
@@ -7506,6 +7382,9 @@ nb:
   invalid_utf_8_13c76a6: "Ugyldig UTF-8"
   invalid_xml_syntax: "ugyldig XML-syntaks"
   invite_5b1fcbcd: Inviter
+  item_complete_d334fd43: "(Item Complete)"
+  item_incomplete_d6a16040: "(Item Incomplete)"
+  items_299a7626: "Elementer:"
   items_items_selected_5b55e566: "%{items} elementer valgt"
   items_selected_have_different_usage_rights_52b325cc: "Elementer som er valgt har ulike bruksrettigheter."
   jobs: 
@@ -7578,8 +7457,10 @@ nb:
       gjelder noen stil endringer, men flere K-12 spesifikke ting kan legges i fremtiden.
   labels: 
     lock_module_until: "Lås modulen inntil en gitt dato"
+  last_item_79583712: "Siste Element:"
   last_user_access_title: "Forrige brukertilgang"
   late_percent_b91d01b3: "Sent: %{percent}"
+  latest_assessment_a85280ef: "Siste Vurdering"
   latest_f604a75: Senest
   latest_score_905aa87b: "Siste resultat"
   launch_registration_tool_38d4781: "Lanseringen Registrering Verktøy"
@@ -7599,8 +7480,6 @@ nb:
         dashboard: "Mitt kontrollpanel"
         skip_to_content: "Gå til innhold"
       open_source_learning_management_system: "Læringsplattform basert på åpen kildekode"
-    facebook: 
-      title: Facebook-side
     fixed_bottom: 
       masquerading: 
         stop: "Stopp forkledning"
@@ -7746,6 +7625,7 @@ nb:
   lock_date_cannot_be_after_term_end_cf1a188f: "Lås Datoen kan ikke være etter termin slutt"
   lock_date_cannot_be_before_due_date_ac30f54: "Låsingsdato kan ikke være før fristen"
   lock_until_date_62ce1b5c: "Lås Inntil Dato"
+  log_out_379ba28a: "Logg Ut"
   logged_out_user: "Avlogget bruker %{user_counter}"
   logo_a040ae0e: Logo
   low_score_4eeb95b2: "Lav: %{score}"
@@ -7777,7 +7657,6 @@ nb:
   manage_usage_rights_c5a8c216: "Administrere bruksrettigheter"
   manual_entry_e4a4f99a: "Manuell innlegging"
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Mestring poengsum reflekterer den siste gradert oppgave eller quiz."
-  mastery_scrore_reflects_the_highest_score_of_a_gra_a71008b7: "Mestring poengsum reflekterer den høyeste poengsummen av en gradert oppdrag eller quiz."
   mathquill: 
     tabs: 
       arrows: Piler
@@ -7826,6 +7705,7 @@ nb:
     uploading: "Laster opp..."
   media_recordings_749aef6d: Medieinnspillinger
   median_score_4657e907: "Median: %{score}"
+  meets_mastery_754e1c06: "Oppfyller Mestring"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} medlemmer ut av maksimalt %{max_membership}"
   members_af25c21d: Medlemmer
   membership_by_invitation_only_9bc27199: "Medlemsskap kun etter invitasjon"
@@ -7836,6 +7716,7 @@ nb:
     my_courses: "Mine kurs"
   message: 
     default_subject: "Canvas varsel"
+  message_896d2ed0: "%{message}"
   message_students: 
     buttons: 
       send_message: "Send beskjed"
@@ -7888,10 +7769,6 @@ nb:
           unknown_user: "Ukjent bruker"
         subject: "%{user_name} la deg nettopp til i en samtale i Canvas."
         unknown_user: "Ukjent bruker"
-      facebook: 
-        body: "%{user_name} la deg nettopp til i en samtale i Canvas."
-        link_text: "Se samtale"
-        unknown_user: "Ukjent bruker"
       sms: 
         body: "%{user_name} la deg nettopp til i en samtale i Canvas."
         more_info: "Mer info på %{url}"
@@ -7929,25 +7806,6 @@ nb:
         ungraded_count_description: "%{count} eller flere innleveringer er ikke rettet"
         ungraded_timespan_description: "En innlevering er ikke rettet på %{count} dager"
         usernote_description: "Ingen aktivitet i forelesers protokoll på %{count} dager"
-      facebook: 
-        body: 
-          one: "Et varsel er utløst for %{student} fordi følgende har skjedd:"
-          other: "Et varsel er utløst for %{student} fordi følgende forutsetninger er innfridd:"
-        body_student: 
-          one: "Et varsel er utløst for deg fordi følgende forutsetning er innfridd:"
-          other: "Et varsel er utløst for deg fordi følgende forutsetninger er innfridd:"
-        interaction_description: 
-          one: "Ingen interaksjon mellom student og foreleser på én dag"
-          other: "Ingen interaksjon mellom student og foreleser på %{count} eller flere dager"
-        ungraded_count_description: 
-          one: "En eller flere oppgaver er ikke rettet"
-          other: "%{count} eller flere oppgaver er ikke rettet"
-        ungraded_timespan_description: 
-          one: "En eller flere innleveringer er ikke rettet på en eller flere dager"
-          other: "En eller flere innleveringer er ikke rettet på %{count} eller flere dager"
-        usernote_description: 
-          one: "Ingen notat lagt inn i forelesers protokoll på en eller flere dager"
-          other: "Ingen notat lagt inn i forelesers protokoll på %{count} eller flere dager"
       sms: 
         body: "Et varsel er utløst for %{student}"
         body_student: "Et varsel er utløst for deg"
@@ -7983,8 +7841,6 @@ nb:
           link: "Vis kunngjøring"
         labels: 
           file_included: "Fil inkludert"
-      facebook: 
-        body: "Du opprettet dette Kunngjøring: %{title}, %{course}"
       sms: 
         details: "Mer informasjon på %{url}"
         subject: "Du opprettet dette Kunngjøring: %{title}, %{course}"
@@ -8000,8 +7856,6 @@ nb:
           link: "Klikk her for å melde seg vise utlysningen"
           subject: "Ny kommentar på Kunngjøring %{discussion_topic}: %{course}"
         subject: "Ny kommentar på Kunngjøring %{discussion_topic}: %{course}"
-      facebook: 
-        body: "Ny kommentar på Kunngjøring: %{discussion_topic}: %{course}"
       sms: 
         body: "Ny kommentar på Kunngjøring %{discussion_topic}: %{course}"
         details: "Mer informasjon på %{url}"
@@ -8036,19 +7890,6 @@ nb:
         message: "%{user} kansellerte hans/hennes reservasjon for \"%{appointment_name}\"."
         no_reason_given: "ingen gitt"
         subject: "Reservasjonen kansellert for \"%{appointment_name}\" (%{course})"
-      facebook: 
-        instructions: "Se avtalen"
-        labels: 
-          attendee: Deltaker
-          attendees: Deltakere
-          cancel_reason: "Årsak til kansellering"
-          course: Kurs
-          date_and_time: Dato/tidspunkt
-          details: Avtaledetaljer
-          group: Gruppe
-          slots_remaining: "Tilgjengelige tidspunkt"
-        message: "%{user} kansellerte hans/hennes reservasjon for \"%{appointment_name}\"."
-        no_reason_given: "ingen gitt"
       sms: 
         message: "%{user} kansellerte hans/hennes reservasjon for \"%{appointment_name}\"."
         more_info: "Mer info på %{url}"
@@ -8080,18 +7921,6 @@ nb:
         message: "%{user} kansellerte ditt tidspunkt for \"%{appointment_name}\"."
         no_reason_given: "ingen gitt"
         subject: "Ditt tidspunkt for \"%{appointment_name}\" har blitt kansellert (%{course})"
-      facebook: 
-        instructions: "Meld deg på et annet tidspunkt"
-        labels: 
-          attendee: Deltaker
-          attendees: Deltakere
-          cancel_reason: "Årsak til kanselleringen"
-          course: Kurs
-          date_and_time: Dato/tidspunkt
-          details: Avtaledetaljer
-          group: Gruppe
-        message: "%{user} kansellerte ditt tidspunkt for \"%{appointment_name}\"."
-        no_reason_given: "ingen gitt"
       sms: 
         message: "Ditt tidspunkt for \"%{appointment_name} ble kansellert\"."
         more_info: "Mer info på %{url}"
@@ -8116,14 +7945,6 @@ nb:
         message: "Alle avtaler for \"%{appointment_name}\" har blitt kansellert."
         no_reason_given: "ingen gitt"
         subject: "Avtaler for \"%{appointment_name}\" har blitt kansellert (%{course})"
-      facebook: 
-        labels: 
-          cancel_reason: "Årsak til kanselleringen"
-          course: Kurs
-          dates: Dato(er)
-          details: Avtaledetaljer
-        message: "Alle avtaler for \"%{appointment_name}\" har blitt kansellert."
-        no_reason_given: "ingen gitt"
       sms: 
         message: "Alle avtaler for \"%{appointment_name} har blitt kansellert\"."
         more_info: "Mer info på %{url}"
@@ -8153,17 +7974,6 @@ nb:
           slots_remaining: "Tilgjengelige tidspunkt"
         message: "Tidspunkt for \"%{appointment_name}\" er nå tilgjengelig for påmelding."
         subject: "Avtalen \"%{appointment_name}\" er tilgjengelig for påmelding (%{course})"
-      facebook: 
-        group_signup: "Gruppe (%{group_category})"
-        individual_signup: Individuell
-        instructions: "Meld deg på et tidspunkt"
-        labels: 
-          course: Kurs
-          dates: Dato(er)
-          details: Avtaledetaljer
-          signup_type: Påmeldingsmetode
-          slots_remaining: "Tilgjengelige tidspunkt"
-        message: "Tidspunkter for \"%{appointment_name}\" er nå tilgjengelig for påmelding."
       sms: 
         message: "Påmelding kan nå gjøres for \"%{appointment_name}\"."
         more_info: "Mer info på %{url}"
@@ -8195,17 +8005,6 @@ nb:
           slots_remaining: "Tilgjengelige tidspunkt"
         message: "Ytterligere tidspunkt er lagt inn for \"%{appointment_name}\" og er tilgjengelig for påmelding."
         subject: "Avtale om \"%{appointment_name}\" er oppdatert (%{course})"
-      facebook: 
-        group_signup: "Gruppe (%{group_category})"
-        individual_signup: Person
-        instructions: "Meld deg på et tidspunkt"
-        labels: 
-          course: Kurs
-          dates: Dato(er)
-          details: Avtaledetaljer
-          signup_type: Påmeldingsmetode
-          slots_remaining: "Tilgjengelige tidspunkt"
-        message: "Ytterligere tidspunkt er lagt inn for \"%{appointment_name}\" og er tilgjengelig for påmelding."
       sms: 
         message: "Nye tidspunkter er tilgjengelige for \"%{appointment_name}\"."
         more_info: "Mer info på %{url}"
@@ -8238,17 +8037,6 @@ nb:
           slots_remaining: "Tilgjengelige tidspunkt"
         message: "%{user} har meldt seg opp til \"%{appointment_name}\"."
         subject: "Bruker meldte seg opp til \"%{appointment_name}\" (%{course})"
-      facebook: 
-        instructions: "Se avtalen"
-        labels: 
-          attendee: Deltaker
-          attendees: Deltakere
-          course: Kurs
-          date_and_time: Dato/tidspunkt
-          details: Avtaledetaljer
-          group: Gruppe
-          slots_remaining: "Tilgjengelige tidspunkt"
-        message: "%{user} meldte seg opp til \"%{appointment_name}\"."
       sms: 
         message: "%{user} meldte seg opp til \"%{appointment_name}\"."
         more_info: "Mer info på %{url}"
@@ -8278,17 +8066,6 @@ nb:
           slots_remaining: "Tilgjengelige tidspunkt"
         message: "%{user} meldte deg opp til \"%{appointment_name}\"."
         subject: "Du har blitt meldt opp til \"%{appointment_name}\"."
-      facebook: 
-        instructions: "Meld deg på et annet tidspunkt"
-        labels: 
-          attendee: Deltaker
-          attendees: Deltakere
-          course: Kurs
-          date_and_time: Dato/tidspunkt
-          details: Avtaledetaljer
-          group: Gruppe
-          slots_remaining: "Tilgjengelige tidspunkt"
-        message: "%{user} meldte deg opp til \"%{appointment_name}\"."
       sms: 
         message: "Du har blitt meldt opp til \"%{appointment_name}\"."
         more_info: "Mer info på %{url}"
@@ -8309,8 +8086,6 @@ nb:
           link: "Klikk her for å vise oppgaven"
           subject: "Oppgave er endret: %{title}, %{course}"
         subject: "Oppgave er endret: %{title}, %{course}"
-      facebook: 
-        body: "Oppgaven %{title_link} for %{course} er endret."
       sms: 
         body: |-
             %{title}, %{course} er endret.
@@ -8335,11 +8110,6 @@ nb:
           click_to_see_assignment: "Klikk her for å se oppgaven"
         multiple_due_dates: "frist: Flere datoer"
         new_assignment: "En ny oppgave er opprettet for kurset ditt, %{course_name}"
-        no_due_date: "leveres innen: Ingen frist"
-      facebook: 
-        due_at: "leveres innen: %{assignment_due_date_time}"
-        multiple_due_dates: "frist: Flere datoer"
-        new_assignment: "En ny oppgave er opprettet for %{course_name}"
         no_due_date: "leveres innen: Ingen frist"
       sms: 
         due_at: "leveres innen: %{assignment_due_date_time}"
@@ -8369,9 +8139,6 @@ nb:
         labels: 
           click_to_see_assignment: "Klikk her for å se oppgaven"
         no_due_date: "Ingen frist"
-      facebook: 
-        assignment_due_date_changed_sentence: "Fristen for oppgaven *%{assignment_name}* i %{course_name} er endret til:"
-        no_due_date: "Ingen frist"
       sms: 
         assignment_due_date_changed: "%{assignment_name}, %{course_name}, har innleveringsfrist:"
         more_info_at_url: "Mer info på %{web_address}"
@@ -8396,9 +8163,6 @@ nb:
         labels: 
           click_to_see_assignment: "Klikk her for å vise oppgaven"
         no_due_date: "Ingen frist"
-      facebook: 
-        assignment_due_date_changed_sentence: "Fristen for oppgaven *%{assignment_name}* i %{course_name} (%{override}) har blitt endret til:"
-        no_due_date: "Ingen frist"
       sms: 
         assignment_due_date_changed: "%{assignment_name} i %{course_name} (%{override}) har frist nå:"
         more_info_at_url: "Mer info på %{web_address}"
@@ -8420,8 +8184,6 @@ nb:
           the_assignment_is_graded: "Oppgaven %{assignment_name}, er ferdig rettet."
         labels: 
           view_here: "Du kan se det her"
-        the_assignment_is_graded: "Oppgaven %{assignment_name}, er ferdig rettet."
-      facebook: 
         the_assignment_is_graded: "Oppgaven %{assignment_name}, er ferdig rettet."
       sms: 
         assignment_is_graded: "%{assignment_name}, %{course_name} er rettet."
@@ -8446,9 +8208,6 @@ nb:
           view_submission: "Du kan se innleveringen her"
         user_resubmitted: "Ny innlevering: %{user_name}, %{assignment_name}"
         user_resubmitted_sentence: "%{user_name} har nettop levert %{assignment_name} i kurset %{course_name} på nytt"
-      facebook: 
-        click_to_view: "Klikk her for å se innleveringen"
-        user_resubmitted: "**%{user_name}**har nettopp levert **%{assignment_name}** i kurset %{course_name}"
       sms: 
         more_info_at: "Mer info på %{web_address}"
         user_resubmitted: "%{user_name} leverte nettopp sin besvarelse (på nytt), %{assignment_name}"
@@ -8467,9 +8226,6 @@ nb:
           view_submission: "Du kan se innleveringen her"
         user_submitted: "Innlevering: %{user_name}, %{assignment_name}"
         user_submitted_sentence: "%{user_name} har nettopp levert en besvarelse for %{assignment_name} i kurset %{course_name}"
-      facebook: 
-        click_to_view: "Klikk her for å se innleveringen."
-        user_submitted: "**%{user_name}** har nettopp levert en besvarelse for **%{assignment_name}** i  kurset %{course_name}"
       sms: 
         more_info_at: "Mer info på %{web_address}"
         user_submitted: "%{user_name} leverte nettopp sin besvarelse, %{assignment_name}"
@@ -8488,9 +8244,6 @@ nb:
           view_submission: "Du kan se innleveringen her"
         user_resubmitted_sentence: "%{user_name} har nettopp levert besvarelse for %{assignment_name} i kurset %{course_name} for sent"
         user_submitted: "Sen innleveringt: %{user_name}, %{assignment_name}"
-      facebook: 
-        click_to_view: "Klikk her for å se innleveringen."
-        user_resubmitted_sentence: "**%{user_name}** har nettopp levert besvarelse for **%{assignment_name}** i kurset %{course_name} for sent"
       sms: 
         more_info_at: "Mer info på %{web_address}"
         user_submitted: "%{user_name} leverte nettopp sin besvarelse (sent), %{assignment_name}"
@@ -8545,9 +8298,6 @@ nb:
           link: "Du kan se detaljene her"
           subject: "Samarbeidsinvitasjon: %{course_or_group}"
         subject: "Samarbeidsinvitasjon: %{course_or_group}"
-      facebook: 
-        body: "Du har blitt invitert til å samarbeide på dokumentet %{document} i %{course_or_group}. Dokumentet ble opprettet i %{service}."
-        body_with_user: "Du har blitt invitert til å samarbeide på dokumentet %{document} i %{course_or_group}. Dokumentet ble opprettet av %{user} i %{service}."
       sms: 
         body: |-
             Du har blitt invitert til å samarbeide på dokumentet %{document} i %{course_or_group}.
@@ -8630,10 +8380,6 @@ nb:
         subject: "%{user_name}, du har nettopp sendt en melding i Canvas"
         unknown_user: "Ukjent bruker"
         view_message: "Vis denne beskjeden i samtaler"
-      facebook: 
-        body: "%{user_name}, du har nettopp sendt en melding i Canvas"
-        link_text: "Se beskjeden"
-        unknown_user: "Ukjent bruker"
       sms: 
         body: "%{user_name}, du har nettopp sendt en melding i Canvas"
         more_info: "Mer informasjon på %{url}"
@@ -8660,10 +8406,6 @@ nb:
         subject: "%{user_name} sendte deg nettopp en beskjed i Canvas:"
         unknown_user: "Ukjent bruker"
         view_message: "Vis denne beskjeden i samtaler"
-      facebook: 
-        body: "%{user_name} sendte deg nettopp en beskjed i Canvas:"
-        link_text: "Se beskjeden"
-        unknown_user: "Ukjent bruker"
       sms: 
         body: "%{user_name} sendte deg nettopp en beskjed i Canvas:"
         more_info: "Mer info på %{url}"
@@ -8757,12 +8499,6 @@ nb:
           details: "Se den listen over gjeldende påmeldinger"
           subject: "%{user} aksepterte kursinvitasjonen"
         subject: "%{user} aksepterte kursinvitasjonen"
-      facebook: 
-        body_designer: "%{user}  aksepterte nylig invitasjonen om å delta i kurset %{course} som designer."
-        body_observer: "%{user}  aksepterte nylig invitasjonen om å delta i kurset %{course} som observatør."
-        body_student: "%{user}  aksepterte nylig invitasjonen om å delta i kurset %{course} som student."
-        body_ta: "%{user}  aksepterte nylig invitasjonen om å delta i kurset %{course} som LA."
-        body_teacher: "%{user}  aksepterte nylig invitasjonen om å delta i kurset %{course} som faglærer."
       sms: 
         body_designer: "%{user} aksepterte invitasjonen som designer til kurset, %{course}"
         body_observer: "%{user} aksepterte invitasjonen som observatør til kurset, %{course}"
@@ -8805,17 +8541,6 @@ nb:
           username: Brukernavn
         none: ingen
         subject: Kursinvitasjon
-      facebook: 
-        body_designer: "Du er invitert til å delta i kurset %{course} som designer."
-        body_observer: "Du er invitert i kurset %{course} som observatør."
-        body_student: "Du er invitert i kurset %{course} som student."
-        body_ta: "Du er invitert i kurset %{course} som LA."
-        body_teacher: "Du er invitert i kurset %{course} som faglærer."
-        labels: 
-          email: Epost
-          name: Navn
-          username: Brukernavn
-        none: ingen
       sms: 
         body_designer: "Du er invitert til kurset som designer."
         body_observer: "Du er invitert til kurset som observatør."
@@ -8864,17 +8589,6 @@ nb:
         none: ingen
         register: "Besøk %{link} for å gjøre ferdig registreringen"
         subject: Kurspåmelding
-      facebook: 
-        body_designer: "Du er påmeldt i kurset %{course} som designer."
-        body_observer: "Du er påmeldt i kurset %{course} som observatør."
-        body_student: "Du er påmeldt i kurset %{course} som student."
-        body_ta: "Du er påmeldt i kurset %{course} som LA."
-        body_teacher: "Du er påmeldt i kurset %{course} som faglærer."
-        labels: 
-          email: Epost
-          name: Navn
-          username: Brukernavn
-        none: ingen
       sms: 
         body_designer: "Du er påmeldt i kurset som designer."
         body_observer: "Du er påmeldt i kurset som observatør."
@@ -8959,10 +8673,6 @@ nb:
           see_details: "Du kan se detaljer her"
         no_time_set: "Ingen tidspunkt satt"
         subject: "Dato for aktiviteten endret: %{event_title}, %{course_name}"
-      facebook: 
-        from_to_time: "fra %{start_date_time} til %{end_date_time}"
-        no_time_set: "Ingen tidspunkt satt"
-        subject: "Aktiviteten, [%{event_title}](%{link_to_event}) for %{course_name}, har endret tidspunkt. Det er nå:"
       sms: 
         from_to_time: "fra %{start_date_time} til %{end_date_time}"
         more_info: "Mer info på %{web_link}"
@@ -9020,11 +8730,6 @@ nb:
           grades_based_on_percent: "Karaktersetting er basert på vektet total for hver oppgavegruppe"
           now_see_here: "Du kan se detaljer her"
           subject: "Karaktervekting endret"
-      facebook: 
-        grading_based_on_points: "Karaktersetting er basert på totalt antall poeng for samtlige oppgaver."
-        grading_policy_changed: "Policy for karaktersetting i **[%{course_name}](%{course_url})** er endret."
-        labels: 
-          grades_based_on_percent: "Karaktersetting er basert på vektet total for hver oppgavegruppe"
       sms: 
         grade_changed: "Policy for karaktersetting i kurset, %{course_name} er endret."
         more_info_at: "Mer informasjon i %{course_url}"
@@ -9046,8 +8751,6 @@ nb:
         labels: 
           view_submission_here: "Du kan se innleveringen her"
         subject: "Sen innlevering: %{group_name}, %{assignment_name}"
-      facebook: 
-        body: "Gruppen %{group_name} har nettopp levert en sen innlevering i **[%{assignment_name}](%{assignment_url})** i kurset %{course_name}."
       sms: 
         more_info: "Mer info på %{web_address}"
         subject: "%{group_name} har nettopp levert (for sent) deres besvarelse for, %{assignment_name}"
@@ -9070,10 +8773,6 @@ nb:
         labels: 
           click_below: "Du kan se nærmere på gruppen ved å klikke lenken nedenfor"
         subject: "Gruppemedlemsskap akseptert: %{group_name}"
-      facebook: 
-        account_group: "Din forespørsel om å bli med i gruppen **[%{group_name}](%{group_url})** med kontoen %{account_name} har blitt godkjent."
-        course_group: "Din forespørsel om å delta i gruppen **[%{group_name}](%{group_url})** for kurset %{course_name} har blitt akseptert."
-        group_request_accepted: "Gruppeforespørsel akseptert: %{group_name}"
       sms: 
         account_group: "Din forespørsel om å delta i gruppen %{group_name} for konto %{account_name} ble akseptert."
         course_group: "Din forespørsel om å delta i gruppen %{group_name} for kurset %{course_name} ble akseptert."
@@ -9099,9 +8798,6 @@ nb:
         labels: 
           click_below: "Du kan se på andre grupper ved å klikke lenken nedenfor"
         subject: "Gruppemedlemskap avvist: %{group_name}"
-      facebook: 
-        account_group: "Din forespørsel om å bli med i gruppen **[%{group_name}](%{group_url})** som er i kontoen %{account_name} har blitt avvist."
-        course_group: "Din forespørsel om å bli med i gruppen **[%{group_name}](%{group_url})** for kurset %{course_name} ble avvist."
       sms: 
         account_group: "Din forespørsel om å bli med i gruppen %{group_name} som er i kontoen %{account_name} har blitt avvist."
         course_group: "Forespørselen din om å bli med i gruppen %{group_name} i kurset %{course_name} har blitt avvist."
@@ -9157,9 +8853,6 @@ nb:
           details: "En ny administrator, %{user}, har blitt lagt til for kontoen %{account}"
           subject: "Ny kontobruker "
         subject: "Ny kontobruker"
-      facebook: 
-        body: "En ny administrator, **%{user}**, har blitt lagt til for kontoen **%{account}**."
-        subject: "Ny kontoadministrator for %{account}"
       sms: 
         body: "En ny administrator, %{user}, har blitt lagt til for kontoen %{account}"
         details: "Mer informasjon på %{website}"
@@ -9175,8 +8868,6 @@ nb:
           link: "Vis kunngjøring"
         labels: 
           file_included: "Fil inkludert"
-      facebook: 
-        body: "Ny kunngjøring: %{title}, %{course}"
       sms: 
         details: "Mer info på %{url}"
         subject: "Ny kunngjøring: %{title}, %{course}"
@@ -9196,9 +8887,6 @@ nb:
           title: "Nytt gruppemedlemskap: %{group_name}"
         subject: "Nytt gruppemedlemskap for %{course_or_account}"
         title: "Nytt gruppemedlemskap: %{group_name}"
-      facebook: 
-        body_account: "Du har blitt lagt til i en ny gruppe med kontoen %{account}. Navnet på gruppen er %{group_name}."
-        body_course: "Du har blitt lagt til en ny gruppe i kurset %{course}. Navnet på gruppa er %{group_name}."
       sms: 
         body_account: "Du har blitt lagt til i en ny gruppe med kontoen %{account}. Navnet på gruppen er %{group_name}."
         body_course: "Du er lagt til i en ny gruppe for kurset %{course}.  Navnet på gruppen er %{group_name}."
@@ -9223,9 +8911,6 @@ nb:
           title: "Nytt gruppemedlemskap: %{group_name}"
         subject: "Nytt gruppemedlemskap for %{course_or_account}"
         title: "Nytt gruppemedlemskap: %{group_name}"
-      facebook: 
-        body_account: "Du har blitt invitert til å bli med i gruppen %{group} med kontoen %{account}."
-        body_course: "Du har blitt invitert til å bli med i gruppen %{group} i kurset %{course}."
       sms: 
         body_account: "Du har blitt invitert til å bli med i gruppen %{group} med kontoen %{account}."
         body_course: "Du har blitt invitert til å bli med i gruppen %{group} i kurset %{course}."
@@ -9251,11 +8936,6 @@ nb:
           teachers: Forelesere
         subject: "Nytt kurs"
         title: "Nytt kurs for %{account}"
-      facebook: 
-        body: "Et nytt kurs, **%{course}**, har blitt lagt til kontoen **%{account}**."
-        labels: 
-          teachers: Forelesere
-        subject: "Nytt kurs for %{account}"
       sms: 
         body: "Et nytt kurs, %{course}, har blitt lagt til for kontoen %{account}"
         details: "Mer info på %{url}"
@@ -9278,8 +8958,6 @@ nb:
           link: "Klikk her for å bli med i samtalen"
           subject: "Ny kommentar i %{discussion_topic}: %{course}"
         subject: "Ny kommentar i %{discussion_topic}: %{course}"
-      facebook: 
-        body: "Ny kommentar for %{discussion_topic}, %{course}"
       sms: 
         body: "Ny kommentar i %{discussion_topic}: %{course}"
         details: "Mer info på %{url}"
@@ -9300,8 +8978,6 @@ nb:
         labels: 
           file_included: "Fil lagt til"
         subject: "Ny diskusjon - %{discussion_topic}: %{course}"
-      facebook: 
-        body: "Nytt forumemne: %{discussion_topic}, %{course}"
       sms: 
         body: "Nytt tema for %{course}:"
         details: "Mer info på %{url}"
@@ -9323,10 +8999,6 @@ nb:
           see_details: "Du kan se detaljer her"
         no_time_set: "Ingen tidspunkt satt"
         subject: "Ny hendelse – %{event_title}, %{course_name}"
-      facebook: 
-        body: "En ny hendelse er planlagt for %{course_name}:"
-        from_to_time: "fra %{start_date_time} til %{end_date_time}"
-        no_time_set: "Ingen tidspunkt satt"
       sms: 
         from_to_time: "fra %{start_date_time} til %{end_date_time}"
         more_info: "Mer info på %{web_address}"
@@ -9349,8 +9021,6 @@ nb:
           subject: "Ny fil lagt til: %{title}, %{name}"
         subject: "Ny fil lagt til: %{title}, %{name}"
         view: "Du kan se det her"
-      facebook: 
-        body: "En ny fil har blitt lagt til i kurset %{name}:"
       sms: 
         body: "Ny fil lagt til i %{name}:"
         link: "Mer informasjon på %{link}"
@@ -9367,9 +9037,6 @@ nb:
           subject: "%{count} nye filer lagt til i kurset %{name}:"
         link: "Du kan se dem her"
         subject: "%{count} nye filer lagt til i kurset %{name}"
-      facebook: 
-        body: "%{count} nye filer har blitt lagt til i kurset %{name}"
-        link: "Du kan se dem her"
       sms: 
         body: "%{count} nye filer lagt til i %{name}."
         link: "Mer informasjon på %{link}"
@@ -9392,9 +9059,6 @@ nb:
           title: "Ny studentgruppe: %{group_name}"
         subject: "Ny studentgruppe for %{course_or_account}"
         title: "Ny studentgruppe: %{group_name}"
-      facebook: 
-        body_account: "En ny studentgruppe kalt %{group_name} ble opprettet for kontoen %{account}. Det første medlemmet er %{user}."
-        body_course: "En ny studentgruppe kalt %{group_name} ble opprettet for kurset %{course}. Det første medlemmet er %{user}."
       sms: 
         body_account: "En ny gruppe kalt \"%{group_name}\" ble opprettet for kontoen %{account}. Det første medlemmet er %{user}."
         body_course: "En ny gruppe kalt \"%{group_name}\" ble opprettet for kurset %{course}. Det første medlemmet er %{user}."
@@ -9414,9 +9078,6 @@ nb:
           link: "Klikk her for å se bruker"
           subject: "Ny bruker"
         subject: "Ny bruker"
-        title: "Ny bruker for %{account}"
-      facebook: 
-        body: "En ny bruker, **%{user}**, har nettopp registrert kontoen **%{account}**."
         title: "Ny bruker for %{account}"
       sms: 
         body: "En ny bruker, %{user}, har registrert kontoen %{account}"
@@ -9438,8 +9099,6 @@ nb:
         html: 
           link_message: "Klikk her for å fullføre anmeldelsen din"
         subject: "Tilordnet fagfellevurdering for %{reviewee}"
-      facebook: 
-        body: "Du har blitt invitert til fagfellevurdering %{reviewee}. Følg lenken nedenfor for å gjennomgå dem!"
       sms: 
         more_info: "Mer informasjon på %{url}"
       summary: 
@@ -9469,8 +9128,6 @@ nb:
           subject: "Karakterrevisjon for prøven er ferdig: %{quiz}, %{context}"
         link_message: "Du kan se prøven her:"
         subject: "Karakterrevisjon for prøven er ferdig: %{quiz}, %{context}"
-      facebook: 
-        body: "Karakterrevisjon for prøven er ferdig: %{title}"
       sms: 
         body_sms: "Karakterrevisjon for prøven er ferdig %{title} in %{context}."
         more_info: "Mer informasjon på %{url}"
@@ -9501,8 +9158,6 @@ nb:
           subject: "Påminnelse til å vurdere: %{rubric}, %{context}"
         link_message: "Du kan se gjennom vurderingen og levere innlegget din her:"
         subject: "Påminnelse om å vurdere: %{rubric}, %{context}"
-      facebook: 
-        body: "Du har blitt minnet på å vurdere: *%{title}* for %{context}."
       sms: 
         body: "Du har blitt minnet på å vurdere: %{rubric}, %{context}."
         more_info: "Mer info på %{url}"
@@ -9520,8 +9175,6 @@ nb:
           subject: "Ny vurdering: %{title}, %{context}"
         link_message: "Du kan se gjennom vurderingen og levere innlegget din her:"
         subject: "Ny vurdering: %{title}, %{context}"
-      facebook: 
-        body: "En ny vurdering har blitt opprettet for %{context}:"
       sms: 
         body: "En ny vurdering har blitt opprettet for %{context}."
         more_info: "Mer info på %{url}"
@@ -9546,9 +9199,6 @@ nb:
         link_message: "Du kan gå gjennom innleveringsdetaljene her:"
         someone: Noen
         subject: "Kommentar til innlevering: %{user}, %{assignment}, %{context}"
-      facebook: 
-        body: "*%{author}* har nettopp kommentert på en innlevering fra **%{user} på %{assignment}**."
-        someone: Noen
       sms: 
         body: "Ny kommentar fra %{author} på %{assignment}, %{user}, %{context}."
         more_info: "Mer info på %{url}"
@@ -9570,9 +9220,6 @@ nb:
         someone: Noen
         subject: "Kommentar til innlevering: %{user}, %{assignment}, %{context}"
         submission_comment_link_message: "Du kan se detaljer om innleveringen ved å benytte lenken nedenfor, eller du kan svare på denne kommentaren ved å respondere på meldingen."
-      facebook: 
-        body: "*%{author}* har nettopp kommentert på en innlevering fra **%{user} på %{assignment}**."
-        someone: Noen
       sms: 
         more_info: "Mer info på %{url}"
         sms_body: "Ny kommentar fra %{author} på %{assignment}, %{user}, %{context}."
@@ -9601,13 +9248,6 @@ nb:
         score: "resultat: %{score} av %{total}"
         score_pending: "resultatet avhenger av gjennomgang fra faglærer"
         subject: "Karakter endret: %{assignment}, %{context}"
-      facebook: 
-        body: "Resultatet på din besvarelse, *%{title}* er endret."
-        no_date_set: "Ingen dato satt"
-        not_applicable: N/A
-        regraded_date: "endret karakter: %{date}"
-        score: "resultat: %{score} av %{total}"
-        score_pending: "resultatet avhenger av gjennomgang fra faglærer"
       sms: 
         body_sms: "Karakteren din for %{title}, %{context} ble nettopp endret."
         more_info: "Mer info på %{url}"
@@ -9648,13 +9288,6 @@ nb:
         score: "resultat: %{score} av %{total}"
         score_pending_review: "resultatet avhenger av gjennomgang fra faglærer"
         subject: "Besvarelsen rettet: %{assignment}, %{context}"
-      facebook: 
-        body: "Din besvarelse, *%{title}*, er rettet."
-        graded_date: "vurdert: %{date}"
-        no_date_set: "Ingen dato satt"
-        not_applicable: N/A
-        score: "resultat: %{score} av %{total}"
-        score_pending_review: "resultatet avhenger av gjennomgang fra faglærer"
       sms: 
         graded_date: "vurdert: %{date}"
         more_info: "Mer info på %{url}"
@@ -9687,9 +9320,6 @@ nb:
         link_message: "Du kan gå gjennom innleveringen her:"
         subject: "Prøve innlevert: %{quiz}, %{context}"
         submitted_date: "levert: %{date}"
-      facebook: 
-        body: "%{user_name} har fullført prøven %{quiz_title}, og den krever manuell karaktersetting."
-        submitted_date: "levert: %{date}"
       sms: 
         body_sms: "Karakteren din for %{title}, %{context} ble nettopp endret."
         more_info: "Mer info på %{url}"
@@ -9716,8 +9346,6 @@ nb:
         notifications_link: "Du kan endre varslingsinnstillingene ved å besøke følgende side:"
         subject: "Nylige Canvas-varsler"
         weekly_body: "Du har meldt deg på for å få en ukentlig rapport med varsler fra Canvas-kontoen din. Nedenfor er rapporten for uka som slutter %{date}:"
-      facebook: 
-        new_notifications: "Du har mottatt *%{notification_count} nye kunngjøringer* i #Canvas#."
       sms: 
         notifications_sms: "%{notifications_count} nye kunngjøringer på %{url}"
       twitter: 
@@ -9737,8 +9365,6 @@ nb:
           subject: "Oppdatert wikiside: %{title}, %{user}"
         link_message: "Du kan se det her: %{link}"
         subject: "Oppdatert wikiside: %{title}, %{user}"
-      facebook: 
-        body: "En side har blitt oppdatert på wikien for %{title}."
       sms: 
         more_info: "Mer info på %{url}"
         updated_message: "%{title}, %{user} nylig oppdatert:"
@@ -9756,8 +9382,6 @@ nb:
           details_link: "Klikk her for å se detaljene"
           subject: "Invitasjon til nettkonferanse: %{name}"
         subject: "Invitasjon til nettkonferanse: %{name}"
-      facebook: 
-        body: "Du har blitt invitert til å delta i en nettkonferanse, *%{title}* for #%{name}#."
       sms: 
         body: "Du har blitt invitert til å delta i en nettkonferanse, %{title} for %{name}."
         link_message: "Mer info på %{url}"
@@ -9941,6 +9565,7 @@ nb:
   moodle_formula_many_warning_title: "Det er %{count} Formel-spørsmål i denne banken som må ha sine mulige svar regenerert"
   moodle_formula_warning_title: "Mulige svar må lages på nytt for Formel-spørsmål"
   more_courses_5ebbe998: "Flere kurs"
+  most_recent_score_13a87e8c: "Siste Poeng"
   most_recent_score_counts_as_75_of_mastery_weight_a_f1e3e6c2: "Fleste poeng teller som 75% av mestring vekt, gjennomsnitt av alle andre poeng teller som 25% av vekt."
   move_dialog: 
     cancel: Avbryt
@@ -9966,6 +9591,7 @@ nb:
   muted_283cfa0f: (muted)
   my_dashboard_b724020: "Mitt dashbord"
   n_a_d6f6c42f: N/A
+  n_number_of_times_c2e78b72: "n Antall ganger"
   name: "Academic Benchmark-importør"
   name_1aed4a1b: Navn
   name_3806192d: "Navn:"
@@ -9974,9 +9600,9 @@ nb:
   name_has_been_successfully_installed_but_has_not_y_c3148b96: "*navn* har blitt installert, men har ennå ikke blitt aktivert."
   name_is_currently_status_9065c996: "*navn* er for tiden **status**."
   name_only_5f56718e: "Kun navn"
+  near_mastery_f25174a4: "Nær Mestring"
   new_account_role_6e5c4964: "Ny konto Rolle"
   new_course_role_6a7bb75f: "Ny Kurset Rolle"
-  new_facebook_message: "Du har en ny beskjed fra Canvas"
   new_file_135ae520: "[ Ny fil ]"
   new_outcome_7fba8c7d: "Nytt resultat"
   new_quiz_statistics_desc: "Aktivere den nye quizstatistikkside for et kurs."
@@ -10000,6 +9626,7 @@ nb:
   no_students_have_taken_the_survey_yet_d378cd35: "Ingen studenter har tatt undersøkelsen ennå"
   no_usage_rights_object_supplied_304b8d40: "Ingen 'usage_rights' objekt som følger"
   not_a_number: "må være et positivt tall"
+  not_available_until_next_submission_2175158: "Ikke tilgjengelig før neste innsending"
   not_installed_37a21a76: "Ikke installert"
   not_now_97efd947: "Ikke nå"
   note_some_items_fall_outside_the_start_and_or_end__feab0642: "Merk: noen elementer faller utenfor start og/eller sluttdato for kurset"
@@ -10204,8 +9831,6 @@ nb:
         display: Epostadresse
       errors: 
         saving_preferences_failed: "Ops! Noe gikk galt. Prøv igjen"
-      facebook: 
-        display: Facebook
       push: 
         display: Pushvarsel
       sms: 
@@ -10378,6 +10003,7 @@ nb:
         delete_outcome: "Slett resultat"
         edit_outcome: "Rediger resultat"
       mastery_at_label: "Sett mestring for resultat på eller over:"
+      point_mastery: "Mestring: %{mastery_points} Poeng"
       points: 
         rating: "%{points} poeng"
         total: "%{points_possible} points"
@@ -10500,6 +10126,7 @@ nb:
   paginated_view: 
     loading_more_results: "Laster flere resultater"
   participations_1823832d: Deltakelser
+  password_8a271b1c: Passord
   paste_xml_cda3a64e: "Lim inn XML"
   paypal: 
     exception: "Beklager, en feil har oppstått. Prøv igjen senere."
@@ -10512,6 +10139,7 @@ nb:
   plain_text_e3ab33aa: "Enkel tekst"
   please_add_at_least_one_non_blank_answer_213c2c8e: "Legg til minst én ikke-tomt svar."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Legg til minst ett ikke-tomt svar for hver variabel."
+  please_enter_your_label_name_7745272d: "Vennligst skriv inn %{label_name}:"
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: "Vennligst la dem få vite hvilken side du så på og koble du klikket på."
   plugins: 
     academic_benchmark_importer: 
@@ -10622,33 +10250,6 @@ nb:
       primary_pad: "Primary Pad"
       sketchpad: SketchPad
       typewithme: TypeWith.me
-    facebook: 
-      description: "Canvas' Facebook-applikasjon"
-      name: Facebook
-    facebook_settings: 
-      description: |-
-          Du må opprette en [ny app på facebook.com](%{facebook_url}), og legg til  'App på Facebook' som en plattform.
-          Sett følgende konfigurasjonsalternativer for å sikre at din Facebook-app
-          fungerer riktig:
-          
-          * **Innstillinger -- App på Facebook -- Canvas Page:** noter hva du velger (den delen som er etter apps.facebook.com) og gå inn i skjemaet nedenfor
-          * **Innstillinger -- App på Facebook -- Canvas URL:** satt til%{canvas_url}
-          * Når du har lagret programmet ditt, bør du notere deg App-ID, Client Token og App Secret
-      domain_name: domene
-      headers: 
-        domain_settings: "Innstillinger for domene"
-      hints: 
-        api_key: "Også referert til som Client Token"
-        canvas_domain: "dette er domenet som er angitt i \"Canvas-URL\""
-        canvas_name: "dette er stien som angis i \"Canvas-side\""
-        disable_ssl: "Bruk kun for lokal testing"
-      labels: 
-        api_key: API-nøkkel
-        app_id: App-ID
-        canvas_domain: Canvas-domene
-        canvas_name: Canvas-navn
-        disable_ssl: "Slå av SSL"
-        secret: "App hemmelighet"
     google_docs: 
       description: "Dokumentdeling i Google Docs"
       name: "Google Docs"
@@ -10898,7 +10499,6 @@ nb:
     labels: 
       requirements_must_be_completed: "Følgende krav må imøtekommes før denne siden blir låst opp"
   presentation_2d9387ca: Presentasjon
-  press_spacebar_for_more_details_on_this_outcome_f6713a42: "trykk på mellomromstasten for mer informasjon om dette utfallet"
   privacy_290109ea: Personvern
   product_name: Canvas
   profile: 
@@ -10949,8 +10549,6 @@ nb:
       profile_update_failed: "Oppdatering av innlogging mislyktes"
       regenerating_token_failed: "Regenerering av symbol mislyktes"
       registration_failed: "Registrering mislyktes. Sjekk at brukernavn og passord er riktig, og prøv igjen."
-    facebook_select: 
-      facebook: Facebook
     failed_resending: "Forespørselen feilet. Forsøk igjen."
     links: 
       resend_confirmation: "Send bekreftelse på nytt"
@@ -10975,7 +10573,6 @@ nb:
         generate_token: "Generer symbol"
         new_access_token: "Nytt tilgangssymbol"
         regenerate_token: "Regenerer symbol"
-        register_facebook_account: "Registrer Facebook-kontoen din"
         register_linkedin_account: "Registrer LinkedIn-kontoen din"
         save_login: "Lagre innlogging"
         save_skype_name: "Lagre Skype-navn"
@@ -10986,7 +10583,6 @@ nb:
       delicious_description: "Delicious er et verktøy som lar deg lagre og dele bokmerker med andre. Canvas' redigeringsverktøy lar deg søke gjennom Delicious-merkelappene dine for enkelt å legge til lenker fra Canvas til de ressursene du synes er nyttige."
       diigo_description: "Diigo er et verktøy for sosiale bokmerker som er skreddersydd for forskning og utdanning. Canvas' redigeringsverktøy lar deg søke gjennom Diigo-merkelappene dine for enkelt å legge til lenker fra Canvas til de ressursene du synes er nyttige."
       error_loading_token_details: "Feil under lasting av symboldetaljer"
-      facebook_description: "Om du har en Facebook-konto kan du installere Canvas-appen og motta kursvarsler på profilen din. Du kan også velge hvilken type varsler du ønsker å motta og hvor ofte du vil motta dem."
       feature_options: Funksjonsvalg
       full_token_warning: "**Kopier dette symbolet nå**. Når du forlater denne siden vil du ikke kunne hente symbolet lenger, og du vil bli nødt til å generere et nytt simbol for å få en ny verdi."
       generate_access_token_description: "Tilgangssymboler er det som lar tredjepartsapplikasjoner få tilgang til Canvas-ressurser på dine vegne. Disse symbolene opprettes normalt automatisk etter behov, men om [du utvikler et nytt eller begrenset prosjekt](%{documentation_url}) kan du generere symbolet herfra."
@@ -10997,7 +10593,6 @@ nb:
         dates: Datoer
         delicious_login: Delicious-innlogging
         diigo_login: Diigo-innlogging
-        facebook_access: Facebook-tilgang
         generate_access_token: "Opprett et tilgangssymbol"
         google_docs_access: "Google Docs-tilgang"
         google_drive_access: "Google Drive Tilgang"
@@ -11059,7 +10654,6 @@ nb:
         diigo: Diigo
         disable_mfa: "Slå av flerfaktors autentisering"
         edit_settings: "Rediger innstillinger"
-        facebook: Facebook
         google_docs: "Google Docs"
         google_drive: "Google Drive"
         linkedin: LinkedIn
@@ -11068,7 +10662,6 @@ nb:
         skype: Skype
         twitter: Twitter
         upload_new_image: "Last opp et nytt bilde"
-        view_facebook_app: "vis Facebook-appen"
         view_your_profile: "se profilen din"
         yo: Yo
       loading_token_details: "Laster symboldetaljer…"
@@ -11082,7 +10675,6 @@ nb:
       subscribe_to_emails: "Jeg vil motta informasjon, nyheter og tips fra Instructure"
       titles: 
         access_token_details: Tilgangssymboldetaljer
-        authorize_facebook: "Godkjenn Facebook"
         authorize_google_docs: "Godkjenn Google Docs"
         authorize_google_drive: "Autorisere Google Drive"
         authorize_linkedin: "Godkjenn LinkedIn"
@@ -11367,6 +10959,7 @@ nb:
     disabled_assignment: "Kan ikke fjerne publisering om det er studentinnleveringer"
     disabled_discussion_topic: "Kan ikke fjerne publisering om det er studentinnleveringer"
     disabled_quiz: "Kan ikke fjerne publisering om det er studentinnleveringer"
+  published_click_to_modify_233c0d4: "Publisert - Klikk for å modifisere"
   purchases: 
     new: 
       payment_info: Betalingsinformasjon
@@ -11479,6 +11072,7 @@ nb:
       regrade_options: "Valgmuligheter for ny vurdering *(for studenter som allerede har besvart dette spørsmålet):*"
       some_scores_reduced: "Gi kun poeng til korrekte svar (*enkelte studenters resultater kan bli redusert*)"
       update_question_without_regrading: "Oppdater spørsmålet uten å sette karakter på nytt"
+  quiz_e0dcce8f: Prøve
   quiz_log_auditing: 
     buttons: 
       reload_events: Oppdater
@@ -13240,6 +12834,7 @@ nb:
     titles: 
       add_item_to_module: "Legg til element i modul"
       find_links_using_service: "Finner lenker med %{service}"
+  select_itemname_f70db487: "Velg %{itemName}"
   select_navigation_links_68e1e924: "Velg navigasjonslenker"
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Velg filen du ønsker å assosiere, eller legge til en fil ved å velge \"Ny fil\"."
   selected_answer: "Du valgte dette svaret."
@@ -13256,9 +12851,7 @@ nb:
         next: Neste
       getting_started: "Du registrerer deg i **%{course}**."
       labels: 
-        email: Epost
         password: Passord
-      log_in: "Vennligst oppgi eposten og passordet ditt"
     authenticate_or_register: 
       buttons: 
         enroll_in_course: "Meld deg på kurset"
@@ -13718,7 +13311,6 @@ nb:
       labels: 
         custom_rating: "Jeg vil kommentere i fritekst når jeg vurderer studentene"
         grading_rubric: "Bruk dette kriteriet i karaktersetting for oppgave"
-        title: Tittel
         total_points: "Totalt antall poeng"
         totallying_rubric: "Skjul totalt resultat for vurderingsresultater"
       links: 
@@ -13738,6 +13330,7 @@ nb:
       out_of: "%{points} *av %{total}*"
       rubric: Vurderingsveiledning
       rubric_title: Tittel
+      title: "Tittel:"
       titles: 
         find_existing_rubric: "Finn eksisterende vurderingsveiledning"
     rubric_criterion: 
@@ -13786,6 +13379,7 @@ nb:
       titles: 
         find_a_rubric: "Finn en vurderingsveiledning"
     rubric_forms: 
+      criteria_description_label: "Beskrivelse av kriterium"
       points: "%{points} poeng"
     rubric_summary: 
       buttons: 
@@ -14012,6 +13606,7 @@ nb:
   show_me_76823679: "Vis meg"
   sis_agent_token_authentication_2a0b29e3: "SIS Meglere Tegnet Autentiserings"
   sis_batch: 
+    diff_filename: "sis_upload_diffed_%{id}.zip"
     errors: 
       too_many_errors: "Det var ytterligere %{count} feil"
       too_many_warnings: "Det var ytterligere %{count} advarsler"
@@ -14333,6 +13928,7 @@ nb:
     submission_download: 
       download_message: "**Dine innleveringer samles opp** og komprimeres til en zip-fil. Dette kan ta litt tid, avhengig av størrelsen på og antall innleveringer."
       gathering_files: "Samler filer..."
+  submissions_11e96106: Innleveringer
   submit_a3cc6859: "Send inn"
   submitted_datetime_fa2e9287: "Innlevert: %{dateTime}"
   successfully_moved_model_to_newgroup_f7b7aa5a: "Vellykket flyttet %{model} til %{newGroup}"
@@ -14345,12 +13941,14 @@ nb:
       two_words_connector: og
       words_connector: ", "
     help_menu: 
+      cisco_netacad_facebook: "Støtte Samfunnet"
       community_support_description: "Samhandle med og få hjelp fra dine medstudenter."
       community_support_forums: "Felles brukerstøtte-forum"
       contact_support: "Kontakt brukerstøtte"
       contact_support_sub_text: "Få hjelp med saker som haster."
       curriculum_assessment_errata: "Trykkfeil i læreplan/vurdering"
       curriculum_assessment_errata_description: "Vis allerede meldt vurderings- og fagplanfeil. Søk etter \"errata\"."
+      global_support_desk: "Global støtte Skranke"
       networking_academy_description: "Vis Cisco sine svar på de vanligst stilte spørsmålene."
       networking_academy_faqs: "Networking Academy FAQs"
       support_desk_livechat: "Skrivebord Støtte  Nettprat"
@@ -14458,6 +14056,7 @@ nb:
   the_material_is_licensed_under_creative_commons_3242cb5e: "Materialet er lisensiert under Creative Commons"
   the_material_is_subject_to_fair_use_exception_41bc6a4b: "Materialet er underlagt til rimelig bruk unntak"
   the_module_item_is_locked_27fe420b: "Modulen element er låst."
+  the_profile_picture_has_been_reported_d609d6dd: "Den profilbildet har blitt rapportert"
   the_shortcut_icon_for_ios_android_devices_180x180__f87fa178: "Snarveisikonet for iOS/Android enheter. 180x180 png eller svg"
   the_state_parameter_is_required_ffadf213: "Staten parameteren er nødvendig"
   the_top_track_represents_days_on_which_the_student_2a347099: "Den øverste spor representerer dager hvor *student sendte meldinger* til kursinstruktører. Den nederste sporet er for **meldinger fra instruktørene** til studenter."
@@ -14686,6 +14285,7 @@ nb:
     people: Personer
     view_in_separate_window: "Vis i eget vindu"
   to_35c6baa2: til
+  to_51406be9: Til
   to_c4c44f4b: til
   to_minscore_43e5452e: "til %{minScore}%"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "For å vise oppgaver, sørge for at *Agenda* visningen er aktiv."
@@ -14717,6 +14317,7 @@ nb:
     buttons: 
       resubmit_to_turnitin: "Lever til Turnitin på nytt"
   unable_to_remove_app_4293cb53: "Kan ikke fjerne app"
+  unchanged_aca18e02: "[Unchanged]"
   ungraded_submissions_44efb0ec: "Usorterte innleveringer"
   ungraded_survey_ad7de790: "Ikke vurdert undersøkelse"
   unknown: Ukjent
@@ -14728,6 +14329,7 @@ nb:
   unlock_date_cannot_be_before_course_start_9c7b8524: "Lås opp dato kan ikke være før kursstart"
   unlock_date_cannot_be_before_section_start_793ddc66: "Lås opp dato kan ikke være før seksjonsstart"
   unlock_date_cannot_be_before_term_start_d3c01813: "Lås opp dato kan ikke være før semesterstart"
+  unpublished_click_to_modify_60f9051: "Upublisert - Klikk for å modifisere"
   unpublished_courses_title: "Ikke publiserte kurs"
   unstarted_932f2990: "Ikke påbegynt"
   unsupported_package: "Ustøttet innholdspakke"
@@ -14738,6 +14340,7 @@ nb:
   updated_group_group_name_727b1d98: "Oppdatert Gruppe %{group_name}"
   upload_button: 
     upload: "Last opp"
+  upload_data_dc4fa4cb: "Last opp data"
   upload_drop_zone: 
     drop_to_upload: "Slippe elementer for å laste opp"
   upper_limit_of_range_c454a8f2: "Øvre grense for utvalg"
@@ -14746,6 +14349,8 @@ nb:
   usage_rights_have_been_set_d1b433c7: "Bruksrettigheter har blitt satt."
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Bruksretten vil bli satt for alle filene som er inneholdt i:"
   use_a_single_16x16_32x32_48x48_ico_file_60bc8d91: "Bruk en *single 16x16, 32x32, 48x48 ico file*."
+  use_the_highest_score_eb29329d: "Bruk den høyeste poengsum"
+  use_the_most_recent_score_9ae3742c: "Bruke den nyeste poengsum"
   used_by_permission_314a78dd: "Brukt med tillatelse"
   user: 
     default_user_name: Bruker
@@ -14876,13 +14481,13 @@ nb:
     descriptions: 
       delicious: "Delicious er et samarbeidsverktøy for deling av lenker. Du kan merke enhver side på internett for senere bruk. Du kan også lenke til andre brukeres Delicious-kontoer for å dele lenker av interesse."
       diigo: "Diigo  er et samarbeidsverktøy for deling av lenker. Du kan merke enhver side på internett for senere bruk. Du kan også lenke til andre brukeres Diigo-kontoer for å dele lenker av interesse."
-      facebook: "Å angi Facebook-profilen din vil gjøre det lettere å kontakte venner du får i klasser og grupper."
       google_docs: "Studenter kan bruke Google Docs for å samarbeide om gruppeprosjekter. Google Docs tilbyr sanntidsredigering av dokumenter, regneark og presentasjoner."
       google_drive: "Studenter kan bruke Google Drive for å samarbeide med gruppeoppgaver. Google Drive gir mulighet for sanntids samarbeid redigering av dokumenter, regneark og presentasjoner."
       linked_in: "LinkedIn er en ressurs for å danne nettverk. Mange av relasjonene du etablerer under studiet kan komme til nytte senere."
       skype: "Skype er et gratis verktøy for stemme- og videosamtaler."
       twitter: "Twitter er en god ressurs for kommunikasjon utenfor klasserommet."
       yo: "Yo er en enkelt-trykk null tegn kommunikasjonsverktøy."
+  username_47bb5bbe: Brukernavn
   users: 
     admin_merge: 
       buttons: 
@@ -14950,8 +14555,6 @@ nb:
     errors: 
       no_teacher_courses: "Denne faglæreren og denne studenten har ingen kurs til felles"
       user_not_teacher: "Den brukeren er ikke en faglærer i dette kurset"
-    facebook_added: "Facebook-konto lagt til."
-    facebook_fail: "Facebook-autorisering mislyktes."
     google_docs_added: "Google Docs-tilgang autorisert."
     google_docs_fail: "Google Docs-autorisering mislyktes. Prøv igjen"
     google_drive_added: "Google Drive konto lagt!"
@@ -15177,6 +14780,8 @@ nb:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ Course"
   webct_name: "Blackboard Vista/CE (WebCT)"
+  well_below_mastery_37664bdc: "Vel Nedenfor Mestring"
+  what_should_the_csv_file_look_like_985a59ac: "Hvordan bør en CSV fil se ut?"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Når folk besøker kurset, er dette siden de får se. Du kan sette den til å vise en aktivitet stream, listen over kursmoduler, et pensum, eller en tilpasset side du skriver selv. Standarden er selvfølgelig aktivitetsforløp."
   where_would_you_like_to_move_title_fabd6e8f: "Hvor ønsker du å flytte %{title}?"
   widget: 
@@ -15294,6 +14899,7 @@ nb:
       title_characters: "Tittelen må inneholde minst én bokstav eller ett tall"
       title_too_long: "Tittelen kan ikke være lengre enn %{max_characters} "
     unknown_user_name: Ukjent
+  wiki_page_6c11ee20: Wikiside
   wiki_pages: 
     edit: 
       page_header_title: "Rediger %{page_name}"

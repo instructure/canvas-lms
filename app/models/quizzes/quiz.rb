@@ -370,7 +370,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def restrict_answers_for_concluded_course?
     course = self.context
-    course.soft_concluded? && course.root_account.settings[:restrict_quiz_questions]
+    course.concluded? && course.root_account.settings[:restrict_quiz_questions]
   end
 
   def update_existing_submissions
@@ -1108,6 +1108,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def can_unpublish?
+    return true if new_record?
     !has_student_submissions? &&
       (assignment.blank? || assignment.can_unpublish?)
   end

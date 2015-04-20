@@ -517,7 +517,8 @@ define([
           }
         }
       })
-      .delegate(".flag_question", 'click', function() {
+      .delegate(".flag_question", 'click', function(e) {
+        e.preventDefault();
         var $question = $(this).parents(".question");
         $question.toggleClass('marked');
         $(this).attr("aria-checked", $question.hasClass('marked'));

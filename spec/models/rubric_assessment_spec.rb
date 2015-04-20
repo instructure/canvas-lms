@@ -74,7 +74,7 @@ describe RubricAssessment do
       expect(@assessment.artifact.score).to eql(5.0)
       expect(@assessment.data.first[:comments_html]).to be_nil
     end
-    
+
     it "should not update scores if not used for grading" do
       rubric_model
       @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => false)
@@ -98,7 +98,7 @@ describe RubricAssessment do
       expect(@assessment.artifact.grader).to eql(nil)
       expect(@assessment.artifact.score).to eql(nil)
     end
-    
+
     it "should not update scores if not a valid grader" do
       @student2 = user(:active_all => true)
       @course.enroll_student(@student2).accept
@@ -121,6 +121,39 @@ describe RubricAssessment do
       expect(@assessment.artifact.user).to eql(@student)
       expect(@assessment.artifact.grader).to eql(nil)
       expect(@assessment.artifact.score).to eql(nil)
+    end
+
+    describe "for assignment requiring anonymous peer reviews" do
+      before(:once) do
+        @assignment.update_attribute(:anonymous_peer_reviews, true)
+        @reviewed = @student
+        @reviewer = student_in_course(:active_all => true).user
+        @assignment.assign_peer_review(@reviewer, @student)
+        @assessment = @association.assess({
+          :user => @reviewed,
+          :assessor => @reviewer,
+          :artifact => @assignment.find_or_create_submission(@student),
+          :assessment => {
+            :assessment_type => 'peer_review',
+            :criterion_crit1 => {
+              :points => 5,
+              :comments => "Hey, it's a comment."
+            }
+          }
+        })
+      end
+
+      it "should prevent reviewed from seeing reviewer's name" do
+        expect(@assessment.grants_right?(@reviewed, :read_assessor)).to be_falsey
+      end
+
+      it "should allow reviewer to see own name" do
+        expect(@assessment.grants_right?(@reviewer, :read_assessor)).to be_truthy
+      end
+
+      it "should allow teacher to see reviewer's name" do
+        expect(@assessment.grants_right?(@teacher, :read_assessor)).to be_truthy
+      end
     end
   end
 end

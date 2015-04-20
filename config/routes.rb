@@ -204,7 +204,9 @@ CanvasRails::Application.routes.draw do
     get 'imports/list' => 'content_imports#index', as: :import_list
     # DEPRECATED
     get 'imports' => 'content_imports#intro'
-    resource :gradebook_upload
+    resource :gradebook_upload do
+      get 'data' => 'gradebook_uploads#data'
+    end
     get 'grades' => 'gradebooks#grade_summary', id: nil
     get 'grading_rubrics' => 'gradebooks#grading_rubrics'
     get 'grades/:id' => 'gradebooks#grade_summary', as: :student_grades
@@ -461,6 +463,14 @@ CanvasRails::Application.routes.draw do
 
     resources :collaborations
     get 'calendar' => 'calendars#show2', as: :old_calendar
+
+    resources :external_tools do
+      get :finished
+      get :resource_selection
+      collection do
+        get :retrieve
+      end
+    end
   end
 
   resources :accounts do
@@ -581,7 +591,6 @@ CanvasRails::Application.routes.draw do
   get 'login' => 'pseudonym_sessions#new'
   post 'login' => 'pseudonym_sessions#create'
   delete 'logout' => 'pseudonym_sessions#destroy'
-  post 'logout' => 'pseudonym_sessions#saml_logout'
   get 'logout' => 'pseudonym_sessions#logout_confirm'
   get 'login/cas' => 'pseudonym_sessions#new', as: :cas_login
   post 'login/cas' => 'pseudonym_sessions#cas_logout', as: :cas_logout
@@ -702,21 +711,15 @@ CanvasRails::Application.routes.draw do
   resources :appointment_groups, only: [:index, :show]
 
   post 'errors' => 'info#record_error'
-  get 'record_js_error' => 'info#record_js_error'
   resources :errors, only: [:show, :index], path: :error_reports
 
   get 'health_check' => 'info#health_check'
 
   get 'browserconfig.xml', to: 'info#browserconfig', defaults: { format: 'xml' }
 
-  get 'facebook' => 'facebook#index'
-  post 'facebook/message/:id' => 'facebook#hide_message', as: :facebook_hide_message
-  get 'facebook/settings' => 'facebook#settings'
-  post 'facebook/notification_preferences' => 'facebook#notification_preferences'
-
   post 'object_snippet' => 'context#object_snippet'
   post 'saml_consume' => 'pseudonym_sessions#saml_consume'
-  match 'saml_logout' => 'pseudonym_sessions#saml_logout', via: [:get, :post, :delete]
+  get 'saml_logout' => 'pseudonym_sessions#saml_logout'
   get 'saml_meta_data' => 'accounts#saml_meta_data'
 
   # Routes for course exports
@@ -880,6 +883,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :submissions_api) do
       def submissions_api(context, path_prefix = context)
+        post "#{context.pluralize}/:#{context}_id/submissions/update_grades", action: :bulk_update
         put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/read", action: :mark_submission_read, as: "#{context}_submission_mark_read"
         delete "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/read", action: :mark_submission_unread, as: "#{context}_submission_mark_unread"
         get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions", action: :index, as: "#{path_prefix}_assignment_submissions"
@@ -1252,6 +1256,7 @@ CanvasRails::Application.routes.draw do
       get 'files/:id/public_url', action: :public_url
       %w(course group user).each do |context|
         get "#{context}s/:#{context}_id/files/quota", action: :api_quota
+        get "#{context}s/:#{context}_id/files/:id", action: :api_show, as: "#{context}_attachment"
       end
     end
 
@@ -1374,6 +1379,7 @@ CanvasRails::Application.routes.draw do
       put 'courses/:course_id/quizzes/:quiz_id/submissions/:id', action: :update, as: 'course_quiz_submission_update'
       post 'courses/:course_id/quizzes/:quiz_id/submissions/:id/complete', action: :complete, as: 'course_quiz_submission_complete'
     end
+
     scope(:controller => 'quizzes/outstanding_quiz_submissions') do
       get 'courses/:course_id/quizzes/:quiz_id/outstanding_quiz_submissions', :action => :index, :path_name => 'outstanding_quiz_submission_index'
       post 'courses/:course_id/quizzes/:quiz_id/outstanding_quiz_submissions', :action => :grade, :path_name => 'outstanding_quiz_submission_grade'

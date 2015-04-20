@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+require 'nokogiri'
+
 describe GroupsController do
   it "should generate the correct 'Add Announcement' link" do
     course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym)

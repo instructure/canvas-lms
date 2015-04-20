@@ -59,10 +59,13 @@ module DifferentiableAssignment
   def self.teacher_or_public_user?(user, context, opts)
     return true if opts[:is_teacher] == true
     return true if !context.includes_user?(user)
-    context.grants_any_right?(user, :manage_content, :read_as_admin, :manage_grades, :manage_assignments)
+    permissions_implying_visibility = [:read_as_admin, :manage_grades, :manage_assignments]
+    permissions_implying_visibility << :manage_content if context.is_a?(Course)
+    context.grants_any_right?(user, *permissions_implying_visibility)
   end
 
   def self.user_not_observer?(user, context, opts)
-    opts[:ignore_observer_logic] || !context.user_has_been_observer?(user)
+    return true if opts[:ignore_observer_logic] || context.is_a?(Group)
+    !context.user_has_been_observer?(user)
   end
 end

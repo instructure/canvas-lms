@@ -104,7 +104,9 @@
         </div>
         <div id="outcome_result_value">
           {{#if outcomeResultIsDefined}}
-            {{selectedOutcomeResult.score}}
+            {{#with selectedOutcomeResult}}
+              <p>{{#t}}Current Mastery Score: {{score}} out of {{mastery_points}}{{/t}}</p>
+            {{/with}}
           {{else}}
             -
           {{/if}}

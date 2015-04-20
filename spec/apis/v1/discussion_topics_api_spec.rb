@@ -19,6 +19,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
+require 'nokogiri'
+
 class DiscussionTopicsTestCourseApi
   include Api
   include Api::V1::DiscussionTopics
@@ -1367,7 +1369,7 @@ describe DiscussionTopicsController, type: :request do
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
       entry_json = json.first
       expect(entry_json['attachment']).not_to be_nil
-      expect(entry_json['attachment']['url']).to eq "http://#{Account.default.domain}/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}"
+      expect(entry_json['attachment']['url']).to eq "http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}"
     end
 
     it "should include replies on top level entries" do
@@ -2062,6 +2064,8 @@ describe DiscussionTopicsController, type: :request do
       end
 
       it "should set and return editor_id if editing another user's post" do
+        pending "WIP: Not implemented"
+        fail
       end
 
       it "should fail if the max entry depth is reached" do
@@ -2135,7 +2139,7 @@ describe DiscussionTopicsController, type: :request do
 
         reply_reply1_attachment_json = {
           "content-type"=>"application/loser",
-          "url"=>"http://#{Account.default.domain}/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
+          "url"=>"http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
           "filename"=>"unknown.loser",
           "display_name"=>"unknown.loser",
           "id" => @attachment.id,
@@ -2182,19 +2186,19 @@ describe DiscussionTopicsController, type: :request do
         message = Nokogiri::HTML::DocumentFragment.parse(v0_r1["message"])
 
         a_tag = message.css("p a").first
-        expect(a_tag["href"]).to eq "http://#{Account.default.domain}/courses/#{@course.id}/files/#{@reply2_attachment.id}/download"
-        expect(a_tag["data-api-endpoint"]).to eq "http://#{Account.default.domain}/api/v1/files/#{@reply2_attachment.id}"
+        expect(a_tag["href"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@reply2_attachment.id}/download"
+        expect(a_tag["data-api-endpoint"]).to eq "http://www.example.com/api/v1/courses/#{@course.id}/files/#{@reply2_attachment.id}"
         expect(a_tag["data-api-returntype"]).to eq "File"
         expect(a_tag.inner_text).to eq "This is a file link"
 
         video_tag = message.css("p video").first
-        expect(video_tag["poster"]).to eq "http://#{Account.default.domain}/media_objects/0_abcde/thumbnail?height=448&type=3&width=550"
+        expect(video_tag["poster"]).to eq "http://www.example.com/media_objects/0_abcde/thumbnail?height=448&type=3&width=550"
         expect(video_tag["data-media_comment_type"]).to eq "video"
         expect(video_tag["preload"]).to eq "none"
         expect(video_tag["class"]).to eq "instructure_inline_media_comment"
         expect(video_tag["data-media_comment_id"]).to eq "0_abcde"
         expect(video_tag["controls"]).to eq "controls"
-        expect(video_tag["src"]).to eq "http://#{Account.default.domain}/courses/#{@course.id}/media_download?entryId=0_abcde&media_type=video&redirect=1"
+        expect(video_tag["src"]).to eq "http://www.example.com/courses/#{@course.id}/media_download?entryId=0_abcde&media_type=video&redirect=1"
         expect(video_tag.inner_text).to eq "link"
 
         expect(v0_r1['parent_id']).to  eq @root1.id
@@ -2315,6 +2319,99 @@ describe DiscussionTopicsController, type: :request do
               { :controller => "discussion_topics_api", :action => "show", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
     expect(json['assignment']).not_to be_nil
     expect(json['assignment']['due_at']).to eq override.due_at.iso8601.to_s
+  end
+
+  context "public courses" do
+    let(:announcements_view_api) {
+      ->(user, course_id, announcement_id, status = 200) do
+        old_at_user = @user
+        @user = user # this is required because of api_call :-(
+        json = api_call(
+          :get,
+          "/api/v1/courses/#{course_id}/discussion_topics/#{announcement_id}/view?include_new_entries=1",
+          {
+            controller: "discussion_topics_api",
+            action: "view",
+            format: "json",
+            course_id: course_id.to_s,
+            topic_id: announcement_id.to_s,
+            include_new_entries: 1
+          },
+          {},
+          {},
+          {
+            expected_status: status
+          }
+        )
+        @user = old_at_user
+        json
+      end
+    }
+
+    before :each do
+      course_with_teacher(active_all: true, is_public: true) # sets @teacher and @course
+      expect(@course.is_public).to be_truthy
+      account_admin_user(account: @course.account) # sets @admin
+      @student1 = student_in_course(active_all: true).user
+      @student2 = student_in_course(active_all: true).user
+
+      @context = @course
+      @announcement = announcement_model(user: @teacher) # sets @a
+
+      s1e = @announcement.discussion_entries.create!(:user => @student1, :message => "Hello I'm student 1!")
+      @announcement.discussion_entries.create!(:user => @student2, :parent_entry => s1e, :message => "Hello I'm student 2!")
+    end
+
+    context "should be shown" do
+      let(:check_access) {
+        ->(json) do
+          expect(json["new_entries"]).not_to be_nil
+          expect(json["new_entries"].count).to eq(2)
+          expect(json["new_entries"].first["user_id"]).to  eq(@student1.id)
+          expect(json["new_entries"].second["user_id"]).to eq(@student2.id)
+        end
+      }
+
+      it "shows student comments to students" do
+        check_access.call(announcements_view_api.call(@student1, @course.id, @announcement.id))
+      end
+
+      it "shows student comments to teachers" do
+        check_access.call(announcements_view_api.call(@teacher, @course.id, @announcement.id))
+      end
+
+      it "shows student comments to admins" do
+        check_access.call(announcements_view_api.call(@admin, @course.id, @announcement.id))
+      end
+    end
+
+    context "should not be shown" do
+      let(:check_access) {
+        ->(json) do
+          expect(json["new_entries"]).to be_nil
+          expect(%w[unauthorized unauthenticated]).to include(json["status"])
+        end
+      }
+
+      before :each do
+        prev_course = @course
+        course_with_teacher
+        @student = student_in_course.user
+        @course = prev_course
+      end
+
+      it "does not show student comments to unauthenticated users" do
+        check_access.call(announcements_view_api.call(nil, @course.id, @announcement.id, 401))
+      end
+
+      it "does not show student comments to other students not in the course" do
+        check_access.call(announcements_view_api.call(@student, @course.id, @announcement.id, 401))
+      end
+
+      it "does not show student comments to other teachers not in the course" do
+        check_access.call(announcements_view_api.call(@teacher, @course.id, @announcement.id, 401))
+      end
+    end
   end
 end
 

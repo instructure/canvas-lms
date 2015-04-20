@@ -247,6 +247,39 @@ fieldset.rate_app_wrapper {
 
 .ConfigurationForm {
   margin: 0px;
+
+  // Fix problems with bootstrap's select //
+  .bootstrap-select.btn-group {
+    white-space: normal; // Thanks firefox! //
+
+    & > button {
+      // We want to fill the container //
+      width: 100%;
+
+      .caret {
+        float: right;
+      }
+    }
+
+    .dropdown-menu {
+      width: 100%; // we want this to also fill the container //
+
+      // There's a strange...something. Let's remove it. (Taken from conversations css) //
+      &.inner {
+        width: 100%;
+        position: static;
+        border: 0;
+        padding: 0;
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+    }
+  }
+
+  .ConfigurationsTypeSelector {
+    margin-bottom: 10px;
+  }
 }
 
 .ExternalAppsRoot, .ReactModal__Content--canvas {

@@ -16,7 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
 require 'set'
+require 'securerandom'
 
 # @API Courses
 # API for accessing course information.
@@ -361,20 +363,25 @@ class CoursesController < ApplicationController
         @current_enrollments = []
         @future_enrollments  = []
         Canvas::Builders::EnrollmentDateBuilder.preload(all_enrollments)
-        all_enrollments.each do |e|
+        all_enrollments.group_by{|e| [e.course_id, e.type]}.values.each do |enrollments|
+          e = enrollments.first
+          if enrollments.count > 1
+            e.course_section = nil
+            e.readonly!
+          end
+
           state = e.state_based_on_date
           if [:completed, :rejected].include?(state)
             @past_enrollments << e unless e.workflow_state == "invited" || e.restrict_past_view?
-          elsif state != :inactive
+          else
             start_at, end_at = e.enrollment_dates.first
             if start_at && start_at > Time.now.utc
-              @future_enrollments << e
-            else
+              @future_enrollments << e unless e.restrict_future_view?
+            elsif state != :inactive
               @current_enrollments << e
             end
           end
         end
-
         @visible_groups = @current_user.visible_groups
 
         @past_enrollments.sort_by!{|e| Canvas::ICU.collation_key(e.long_name)}
@@ -1038,7 +1045,7 @@ class CoursesController < ApplicationController
   #   Disable comments on announcements
   #
   # @argument restrict_student_past_view [Boolean]
-  #   Restrict students from preventing courses after end date
+  #   Restrict students from viewing courses after end date
   #
   # @argument restrict_student_future_view [Boolean]
   #   Restrict students from viewing courses before start date
@@ -1175,7 +1182,7 @@ class CoursesController < ApplicationController
     end
 
     session.delete(:enrollment_uuid)
-    session[:permissions_key] = CanvasUUID.generate
+    session[:permissions_key] = SecureRandom.uuid
 
     redirect_to(@current_user ? dashboard_url : root_url)
   end
@@ -1219,7 +1226,7 @@ class CoursesController < ApplicationController
 
       session[:enrollment_uuid] = enrollment.uuid
       session[:enrollment_uuid_course_id] = enrollment.course_id
-      session[:permissions_key] = CanvasUUID.generate
+      session[:permissions_key] = SecureRandom.uuid
 
       @pending_enrollment = enrollment
 
@@ -1244,7 +1251,7 @@ class CoursesController < ApplicationController
 
       if session[:enrollment_uuid] == session[:accepted_enrollment_uuid]
         session.delete(:enrollment_uuid)
-        session[:permissions_key] = CanvasUUID.generate
+        session[:permissions_key] = SecureRandom.uuid
       end
       session.delete(:accepted_enrollment_uuid)
       session.delete(:enrollment_uuid_course_id)
@@ -1491,7 +1498,6 @@ class CoursesController < ApplicationController
 
       # make sure the wiki front page exists
       if @course_home_view == 'wiki'
-        @context.wiki.check_has_front_page
         @course_home_view = 'feed' if @context.wiki.front_page.nil?
       end
 
@@ -1539,7 +1545,7 @@ class CoursesController < ApplicationController
         @course_home_sub_navigation_tools.reject! { |tool| tool.course_home_sub_navigation(:visibility) == 'admins' }
       end
     elsif @context.indexed
-      render :template => "courses/description"
+      render :description
     else
       # clear notices that would have been displayed as a result of processing
       # an enrollment invitation, since we're giving an error
@@ -1795,7 +1801,7 @@ class CoursesController < ApplicationController
   #
   # Arguments are the same as Courses#create, with a few exceptions (enroll_me).
   #
-  # @argument course[account_id] [Required, Integer]
+  # @argument course[account_id] [Integer]
   #   The unique ID of the account to create to course under.
   #
   # @argument course[name] [String]
@@ -1932,7 +1938,7 @@ class CoursesController < ApplicationController
         standard_id = params[:course].delete :grading_standard_id
         if @course.grants_right?(@current_user, session, :manage_grades)
           if standard_id.present?
-            grading_standard = GradingStandard.standards_for(@course).where(id: standard_id).first
+            grading_standard = GradingStandard.for(@course).where(id: standard_id).first
             @course.grading_standard = grading_standard if grading_standard
           else
             @course.grading_standard = nil
@@ -1965,12 +1971,14 @@ class CoursesController < ApplicationController
       params[:course][:event] = :offer if params[:offer].present?
 
       lock_announcements = params[:course].delete(:lock_all_announcements)
-      if value_to_boolean(lock_announcements)
-        @course.lock_all_announcements = true
-        Announcement.where(:context_type => 'Course', :context_id => @course, :workflow_state => 'active').
-            update_all(:locked => true)
-      elsif @course.lock_all_announcements
-        @course.lock_all_announcements = false
+      unless lock_announcements.nil?
+        if value_to_boolean(lock_announcements)
+          @course.lock_all_announcements = true
+          Announcement.where(:context_type => 'Course', :context_id => @course, :workflow_state => 'active').
+              update_all(:locked => true)
+        elsif @course.lock_all_announcements
+          @course.lock_all_announcements = false
+        end
       end
 
       if params[:course].has_key?(:locale) && params[:course][:locale].blank?
@@ -2010,7 +2018,7 @@ class CoursesController < ApplicationController
         render_update_success
       else
         respond_to do |format|
-          format.html { render :action => "edit" }
+          format.html { render :edit }
           format.json { render :json => @course.errors, :status => :bad_request }
         end
       end

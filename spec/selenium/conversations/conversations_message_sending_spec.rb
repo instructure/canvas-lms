@@ -45,7 +45,7 @@ describe "conversations new" do
       get_conversations
       fj('#compose-btn').click
       wait_for_animations
-      expect(fj('#compose-new-message .ac-input')).to have_attribute(:disabled, 'true')
+      expect(fj('#recipient-row')).to have_attribute(:style, 'display: none;')
     end
 
     it "should allow non-admins to send a message to an account-level group" do

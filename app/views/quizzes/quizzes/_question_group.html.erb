@@ -13,7 +13,7 @@
 
   <div style="float: left;">
     <input type="hidden" name="quiz_group[assessment_question_bank_id]" class="bank_id"/>
-    <span class="group_display name" style="font-weight: bold; padding-right: 20px;"><%= hash_get(group, :name, t(:default_group_name, "Group")) %></span>
+    <h2 class="group_display name"><%= hash_get(group, :name, t(:default_group_name, "Group")) %></h2>
     <input name="quiz_group[name]" aria-label=<%= t('labels.group_name', "Group Name") %> type="text" value="Group Name" class="group_edit" value="<%= hash_get(group, :name, t(:default_group_name, "Group")) %>"/>
     <span class="group_display">
       <%= t(:show_questions_and_points, "Pick *%{num_questions}* questions, #%{num_points}# pts per question",

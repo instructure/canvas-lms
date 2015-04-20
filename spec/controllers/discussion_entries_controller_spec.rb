@@ -288,7 +288,6 @@ describe DiscussionEntriesController do
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
       expect(rss.items.length).to eql(0)
       expect(assigns[:discussion_entries]).to be_empty
-      expect(assigns[:all_discussion_entries]).not_to be_empty
     end
     
     it "should not include student entries if initial post is required but missing" do
@@ -308,7 +307,6 @@ describe DiscussionEntriesController do
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
       expect(rss.items.length).to eql(0)
       expect(assigns[:discussion_entries]).to be_empty
-      expect(assigns[:all_discussion_entries]).not_to be_empty
     end
 
     it "should include student entries if initial post is required and given" do
@@ -357,6 +355,23 @@ describe DiscussionEntriesController do
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
       expect(rss.items.length).to eql(0)
+    end
+
+    it 'respects podcast_has_student_posts for course discussions' do
+      @topic.update_attributes(podcast_enabled: true, podcast_has_student_posts: false)
+      get 'public_feed', :discussion_topic_id => @topic.id, :format => 'rss', :feed_code => @enrollment.feed_code
+      expect(assigns[:discussion_entries].length).to eql 0
+    end
+
+    it 'always returns student entries for group discussions' do
+      group_category
+      membership = group_with_user(group_category: @group_category, user: @student)
+      @topic = @group.discussion_topics.create(title: "group topic", user: @teacher)
+      @entry = @topic.discussion_entries.create(message: "some message", user: @student)
+
+      @topic.update_attributes(podcast_enabled: true, podcast_has_student_posts: false)
+      get 'public_feed', :discussion_topic_id => @topic.id, :format => 'rss', :feed_code => membership.feed_code
+      expect(assigns[:discussion_entries].length).to eql 1
     end
   end
 end

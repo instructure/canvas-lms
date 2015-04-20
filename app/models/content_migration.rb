@@ -198,8 +198,8 @@ class ContentMigration < ActiveRecord::Base
     if opts[:error_report_id]
       mi.error_report_id = opts[:error_report_id]
     elsif opts[:exception]
-      er = ErrorReport.log_exception(:content_migration, opts[:exception])
-      mi.error_report_id = er.id
+      er = Canvas::Errors.capture_exception(:content_migration, opts[:exception])[:error_report]
+      mi.error_report_id = er
     end
     mi.error_message = opts[:error_message]
     mi.fix_issue_html_url = opts[:fix_issue_html_url]
@@ -327,7 +327,7 @@ class ContentMigration < ActiveRecord::Base
           self.workflow_state = 'failed'
           message = "The migration plugin #{migration_type} doesn't have a worker."
           migration_settings[:last_error] = message
-          ErrorReport.log_exception(:content_migration, $!)
+          Canvas::Errors.capture_exception(:content_migration, $ERROR_INFO)
           logger.error message
           self.save
         end
@@ -444,8 +444,8 @@ class ContentMigration < ActiveRecord::Base
       end
     rescue => e
       self.workflow_state = :failed
-      er = ErrorReport.log_exception(:content_migration, e)
-      migration_settings[:last_error] = "ErrorReport:#{er.id}"
+      er_id = Canvas::Errors.capture_exception(:content_migration, e)[:error_report]
+      migration_settings[:last_error] = "ErrorReport:#{er_id}"
       logger.error e
       self.save
       raise e

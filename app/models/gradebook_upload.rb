@@ -17,7 +17,19 @@
 #
 
 class GradebookUpload < ActiveRecord::Base
-  belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
-  attr_accessible
+  belongs_to :course
+  belongs_to :user
+  belongs_to :progress
+
+  serialize :gradebook, JSON
+
+  def self.queue_from(course, user, params)
+    progress = Progress.create!(:context => course, :tag => "gradebook_upload", user: user)
+    progress.process_job(GradebookImporter, :create_from, {}, course, user, params)
+    progress
+  end
+
+  def stale?
+    created_at < 60.minutes.ago
+  end
 end

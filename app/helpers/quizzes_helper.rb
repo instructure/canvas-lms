@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'nokogiri'
+
 module QuizzesHelper
   RE_EXTRACT_BLANK_ID = /['"]question_\w+_(.*?)['"]/
 
@@ -595,7 +597,7 @@ module QuizzesHelper
     titles = []
 
     if selected_answer || correct_answer || show_correct_answers
-      titles << h("#{answer}.")
+      titles << ("#{answer}.")
     end
 
     if selected_answer
@@ -606,6 +608,33 @@ module QuizzesHelper
       titles << I18n.t(:correct_answer, "This was the correct answer.")
     end
 
+    titles = titles.map { |title| h(title) }
+    title = "title=\"#{titles.join(' ')}\"".html_safe if titles.length > 0
+  end
+
+  def matching_answer_title(item_text, did_select_answer, selected_answer_text, is_correct_answer, correct_answer_text, show_correct_answers)
+    titles = []
+
+    if did_select_answer || is_correct_answer || show_correct_answers
+      titles << "#{item_text}."
+    end
+
+
+    if did_select_answer
+      titles << I18n.t(:user_selected_answer, "You selected")
+    end
+
+    titles << "#{selected_answer_text}."
+
+    if is_correct_answer && show_correct_answers
+      titles << I18n.t(:correct_answer, "This was the correct answer.")
+    end
+
+    if !is_correct_answer && show_correct_answers
+      titles << I18n.t(:user_selected_wrong, "The correct answer was %{correct_answer_text}.", correct_answer_text: correct_answer_text)
+    end
+
+    titles = titles.map { |title| h(title) }
     title = "title=\"#{titles.join(' ')}\"".html_safe if titles.length > 0
   end
 

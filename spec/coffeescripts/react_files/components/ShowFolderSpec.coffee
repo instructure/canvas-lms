@@ -10,11 +10,12 @@ define [
 
   # module 'ShowFolder',
   #   setup: ->
-  #     @$container = $('<div>').appendTo(document.body)
+  #     @$container = $('<div>').appendTo($("#fixtures"))
   #     @renderedRoutes = React.render(routes, @$container[0])
 
   #   teardown: ->
   #     React.unmountComponentAtNode(@$container[0])
+  #     $("#fixtures").empty()
 
 
   # asyncTest 'returns empty div if there is no currentFolder', ->

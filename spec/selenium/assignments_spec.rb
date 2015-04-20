@@ -218,6 +218,49 @@ describe "assignments" do
       expect(visBoxes.first.text).to eq "Please select a group set for this assignment"
     end
 
+    context "group assignments" do
+      before(:each) do
+        ag = @course.assignment_groups.first
+        @assignment1, @assignment2 = [1,2].map do |i|
+          gc = GroupCategory.create(:name => "gc#{i}", :context => @course)
+          group = @course.groups.create!(:group_category => gc)
+          group.users << student_in_course(:course => @course, :active_all => true).user
+          ag.assignments.create! :context => @course, :name => "assignment#{i}", :group_category => gc, :submission_types => 'online_text_entry'
+        end
+        submission = @assignment1.submit_homework(@student)
+        submission.submission_type = "online_text_entry"
+        submission.save!
+      end
+
+      it "should not allow group set to be changed if there are submissions" do
+        get "/courses/#{@course.id}/assignments/#{@assignment1.id}/edit"
+        wait_for_ajaximations
+        expect(f("#assignment_group_category_id").attribute('disabled')).to be_present
+      end
+
+      it "should still show deleted group set only on an attached assignment with " +
+        "submissions" do
+        @assignment1.group_category.destroy
+        @assignment2.group_category.destroy
+
+        # ensure neither deleted group shows up on an assignment with no submissions
+        get "/courses/#{@course.id}/assignments/#{@assignment2.id}/edit"
+        wait_for_ajaximations
+
+        expect(f("#assignment_group_category_id")).not_to include_text @assignment1.group_category.name
+        expect(f("#assignment_group_category_id")).not_to include_text @assignment2.group_category.name
+
+        # ensure an assignment attached to a deleted group shows the group it's attached to,
+        # but no other deleted groups, and that the dropdown is disabled
+        get "/courses/#{@course.id}/assignments/#{@assignment1.id}/edit"
+        wait_for_ajaximations
+
+        expect(get_value("#assignment_group_category_id")).to eq @assignment1.group_category.id.to_s
+        expect(f("#assignment_group_category_id")).not_to include_text @assignment2.group_category.name
+        expect(f("#assignment_group_category_id").attribute('disabled')).to be_present
+      end
+    end
+
     context "frozen assignment", :priority => "2" do
       before do
         stub_freezer_plugin Hash[Assignment::FREEZABLE_ATTRIBUTES.map { |a| [a, "true"] }]

@@ -28,9 +28,6 @@
         </ul>
       </nav>
       <div class="section-button-placeholder"></div>
-      <% if @context.feature_enabled?(:post_grades) %>
-        <div class="pull-right post-grades-placeholder"></div>
-      <% end %>
     <% end %>
   </div>
 
@@ -48,13 +45,16 @@
         <% placeholder = t('filter_by_student', 'Filter by student name or secondary ID') %>
         <input type="text" class="search-query" placeholder="<%= placeholder %>" aria-label="<%= placeholder %>">
       </div>
+        <% if @context.feature_enabled?(:post_grades) %>
+            <div class="pull-right post-grades-placeholder"></div>
+        <% end %>
       <div class="gradebook_menu">
         <span class="ui-buttonset">
           <% if @gradebook_is_editable && @context.allows_gradebook_uploads? %>
-            <a class="gradebook_upload_link ui-button" href="#">
+            <%= link_to(new_course_gradebook_upload_path(@context), class: "ui-button") do %>
               <i class="icon-import"></i>
-              <%= t('upload_scores', 'Import') %>
-            </a>
+              <%= t 'Import' %>
+            <% end %>
           <% end %>
 
           <a class="ui-button" id=download_csv href="<%= context_url(@context, :context_gradebook_url) %>.csv">

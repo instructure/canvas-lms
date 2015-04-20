@@ -1,18 +1,25 @@
 <% assignment = grading_box_extended
   submission ||= nil
 %>
+<label class="bold" for="grading-box-extended"><%= t('labels.grade', "Grade") %>
 <% if assignment.grading_type == "points" %>
-  <input type="text" style="width: 35px; margin-bottom: 0" maxlength="254"/>
+  <input type="text" id="grading-box-extended" maxlength="254"/>
 <% elsif assignment.grading_type == "percent" %>
-  <input type="text" style="width: 35px; margin-bottom: 0" maxlength="254"/> %
+  <input type="text" id="grading-box-extended" maxlength="254"/> %
 <% elsif assignment.grading_type == "letter_grade" %>
-  <input type="text" style="width: 35px; margin-bottom: 0" maxlength="254"/>
+  <input type="text" id="grading-box-extended" maxlength="254"/>
 <% elsif assignment.grading_type == "gpa_scale" %>
-  <input type="text" style="width: 35px; margin-bottom: 0" maxlength="254"/>
+  <input type="text" id="grading-box-extended" maxlength="254"/>
 <% elsif assignment.grading_type == "pass_fail" %>
-  <select>
+  <select id="grading-box-extended">
     <option value="">---</option>
     <option value="complete"><%= t('#gradebooks.grades.complete', "Complete") %></option>
     <option value="incomplete"><%= t('#gradebooks.grades.incomplete', "Incomplete") %></option>
   </select>
 <% end %>
+ <% if assignment.grading_type == "points" %>
+  <%= t('#gradebooks.out_of_points_possible', "out of %{points_possible}", :points_possible => assignment.points_possible) %>
+<% elsif  assignment.grading_type != "gpa_scale" %>
+  (<span class="score">&nbsp;</span> / <%= assignment.points_possible %>)
+<% end %>
+</label>

@@ -1,3 +1,52 @@
+Version 4.1.9 (2015-03-10)
+	Fixed bug where indentation wouldn't work properly for non list elements.
+	Fixed bug with image plugin not pulling the image dimensions out correctly if a custom document_base_url was used.
+	Fixed bug where ctrl+alt+[1-9] would conflict with the AltGr+[1-9] on Windows. New shortcuts is ctrl+shift+[1-9].
+	Fixed bug with removing formatting on nodes in inline mode would sometimes include nodes outside the editor body.
+	Fixed bug where extra nbsp:s would be inserted when you replaced a word surronded by spaces using insertContent.
+	Fixed bug with pasting from Google Docs would produce extra strong elements and line feeds.
+Version 4.1.8 (2015-03-05)
+	Added new html5 sizes attribute to img elements used together with srcset.
+	Added new elementpath option that makes it possible to disable the element path but keep the statusbar.
+	Added new option table_style_by_css for the table plugin to set table styling with css rather than table attributes.
+	Added new link_assume_external_targets option to prompt the user to prepend http:// prefix if the supplied link does not contain a protocol prefix.
+	Added new image_prepend_url option to allow a custom base path/url to be added to images.
+	Added new table_appearance_options option to make it possible to disable some options.
+	Added new image_title option to make it possible to alter the title of the image, disabled by default.
+	Fixed bug where selection starting from out side of the body wouldn't produce a proper selection range on IE 11.
+	Fixed bug where pressing enter twice before a table moves the cursor in the table and causes a javascript error.
+	Fixed bug where advanced image styles were not respected.
+	Fixed bug where the less common Shift+Delete didn't produce a proper cut operation on WebKit browsers.
+	Fixed bug where image/media size constrain logic would produce NaN when handling non number values.
+	Fixed bug where internal classes where removed by the removeformat command.
+	Fixed bug with creating links table cell contents with a specific selection would throw a exceptions on WebKit/Blink.
+	Fixed bug where valid_classes option didn't work as expected according to docs. Patch provided by thorn0.
+	Fixed bug where jQuery plugin would patch the internal methods multiple times. Patch provided by Drew Martin.
+	Fixed bug where backspace key wouldn't delete the current selection of newly formatted content.
+	Fixed bug where type over of inline formatting elements wouldn't properly keep the format on WebKit/Blink.
+	Fixed bug where selection needed to be properly normalized on modern IE versions.
+	Fixed bug where Command+Backspace didn't properly delete the whole line of text but the previous word.
+	Fixed bug where UI active states wheren't properly updated on IE if you placed caret within the current range.
+	Fixed bug where delete/backspace on WebKit/Blink would remove span elements created by the user.
+	Fixed bug where delete/backspace would produce incorrect results when deleting between two text blocks with br elements.
+	Fixed bug where captions where removed when pasting from MS Office.
+	Fixed bug where lists plugin wouldn't properly remove fully selected nested lists.
+	Fixed bug where the ttf font used for icons would throw an warning message on Gecko on Mac OS X.
+	Fixed a bug where applying a color to text did not update the undo/redo history.
+	Fixed so shy entities gets displayed when using the visualchars plugin.
+	Fixed so removeformat removes ins/del by default since these might be used for strikethough.
+	Fixed so multiple language packs can be loaded and added to the global I18n data structure.
+	Fixed so transparent color selection gets treated as a normal color selection. Patch contributed by Alexander Hofbauer.
+	Fixed so it's possible to disable autoresize_overflow_padding, autoresize_bottom_margin options by setting them to false.
+	Fixed so the charmap plugin shows the description of the character in the dialog. Patch contributed by Jelle Hissink.
+	Removed address from the default list of block formats since it tends to be missused.
+	Fixed so the pre block format is called preformatted to make it more verbose.
+	Fixed so it's possible to context scope translation strings this isn't needed most of the time.
+	Fixed so the max length of the width/height input fields of the media dialog is 5 instead of 3.
+	Fixed so drag/dropped contents gets properly processed by paste plugin since it's basically a paste. Patch contributed by Greg Fairbanks.
+	Fixed so shortcut keys for headers is ctrl+alt+[1-9] instead of ctrl+[1-9] since these are for switching tabs in the browsers.
+	Fixed so "u" doesn't get converted into a span element by the legacy input filter. Since this is now a valid HTML5 element.
+	Fixed font families in order to provide appropriate web-safe fonts.
 Version 4.1.7 (2014-11-27)
 	Added HTML5 schema support for srcset, source and picture. Patch contributed by mattheu.
 	Added new cache_suffix setting to enable cache busting by producing unique urls.

@@ -1,0 +1,12 @@
+development:
+  servers:
+    - redis://redis
+
+test:
+  # only tests that are exercising the integration with redis require redis to run.
+  servers:
+    - redis://redis
+  # warning: the redis database will get cleared before each test, so if you
+  # use this server for anything else, make sure to set aside a database id for
+  # these tests to use.
+  database: 1

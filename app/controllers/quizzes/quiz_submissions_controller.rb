@@ -68,6 +68,8 @@ class Quizzes::QuizSubmissionsController < ApplicationController
         @submission.record_answer(params_hash.dup)
         flash[:notice] = t('errors.late_quiz', "You submitted this quiz late, and your answers may not have been recorded.") if @submission.overdue?
         Quizzes::SubmissionGrader.new(@submission).grade_submission
+
+        Canvas::LiveEvents.quiz_submitted(@submission)
       end
     end
     if session.delete('lockdown_browser_popup')
@@ -192,8 +194,8 @@ class Quizzes::QuizSubmissionsController < ApplicationController
     respond_to do |format|
       if attachment.zipped?
         if Attachment.s3_storage?
-          format.html { redirect_to attachment.cacheable_s3_inline_url }
-          format.zip { redirect_to attachment.cacheable_s3_inline_url }
+          format.html { redirect_to attachment.inline_url }
+          format.zip { redirect_to attachment.inline_url }
         else
           cancel_cache_buster
 

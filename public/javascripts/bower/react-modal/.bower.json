@@ -1,6 +1,6 @@
 {
   "name": "react-modal",
-  "version": "0.0.7",
+  "version": "0.1.1",
   "homepage": "https://github.com/rackt/react-modal",
   "authors": [
     "Ryan Florence",
@@ -26,13 +26,13 @@
     "karma.conf.js",
     "package.json"
   ],
-  "_release": "0.0.7",
+  "_release": "0.1.1",
   "_resolution": {
     "type": "version",
-    "tag": "v0.0.7",
-    "commit": "6fd8456b92ea70135d8c8261c198288f476b87e3"
+    "tag": "v0.1.1",
+    "commit": "0b2028e6158654750cc3148444ec7d961adb8f91"
   },
   "_source": "git://github.com/rackt/react-modal.git",
-  "_target": "0.0.7",
+  "_target": "0.1.1",
   "_originalSource": "react-modal"
 }

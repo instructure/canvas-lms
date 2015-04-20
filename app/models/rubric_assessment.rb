@@ -168,6 +168,11 @@ class RubricAssessment < ActiveRecord::Base
       (self.rubric_association.association_object.context.grants_right?(self.assessor, :manage_rubrics) rescue false)
     }
     can :update
+
+    given {|user, session|
+      self.can_read_assessor_name?(user, session)
+    }
+    can :read_assessor
   end
 
   scope :of_type, lambda { |type| where(:assessment_type => type.to_s) }
@@ -186,6 +191,19 @@ class RubricAssessment < ActiveRecord::Base
 
   def assessment_url
     self.artifact.url rescue nil
+  end
+
+  def can_read_assessor_name?(user, session)
+    !self.considered_anonymous? ||
+    self.assessor_id == user.id ||
+    self.rubric_association.association_object.context.grants_right?(
+      user, session, :view_all_grades
+    )
+  end
+
+  def considered_anonymous?
+    self.rubric_association.association_type == 'Assignment' &&
+    self.rubric_association.association_object.anonymous_peer_reviews?
   end
 
   def ratings

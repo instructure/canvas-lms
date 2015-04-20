@@ -17,7 +17,7 @@ describe "quizzes question with html answers" do
   end
 
   def close_first_html_answer
-    f('.edit-html-done').click
+    f('.edit_html_done').click
   end
 
   it "should allow HTML answers for multiple choice" do
@@ -34,6 +34,14 @@ describe "quizzes question with html answers" do
     edit_first_question
     html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
     expect(html).to eq '<p>HTML</p>'
+  end
+
+  it "should set focus back to the edit button after editing" do
+    quiz_with_new_questions
+    click_questions_tab
+    edit_first_html_answer
+    close_first_html_answer
+    check_element_has_focus(fj('.edit_html:visible'))
   end
 
   def check_for_no_edit_button(option)

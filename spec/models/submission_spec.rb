@@ -1139,6 +1139,47 @@ describe Submission do
       expect(sub.attachments).to eq [@attachment]
     end
   end
+
+  describe '.process_bulk_update' do
+    before(:once) do
+      course_with_teacher active_all: true
+      @u1, @u2 = n_students_in_course(2)
+      @a1, @a2 = 2.times.map {
+        @course.assignments.create! points_possible: 10
+      }
+      @progress = Progress.create!(context: @course, tag: "submissions_update")
+    end
+
+    it 'updates submissions on an assignment' do
+      Submission.process_bulk_update(@progress, @course, nil, @teacher, {
+        @a1.id.to_s => {
+          @u1.id => {posted_grade: 5},
+          @u2.id => {posted_grade: 10}
+        }
+      })
+
+      expect(@a1.submission_for_student(@u1).grade).to eql "5"
+      expect(@a1.submission_for_student(@u2).grade).to eql "10"
+    end
+
+    it 'updates submissions on multiple assignments' do
+      Submission.process_bulk_update(@progress, @course, nil, @teacher, {
+        @a1.id => {
+          @u1.id => {posted_grade: 5},
+          @u2.id => {posted_grade: 10}
+        },
+        @a2.id.to_s => {
+          @u1.id => {posted_grade: 10},
+          @u2.id => {posted_grade: 5}
+        }
+      })
+
+      expect(@a1.submission_for_student(@u1).grade).to eql "5"
+      expect(@a1.submission_for_student(@u2).grade).to eql "10"
+      expect(@a2.submission_for_student(@u1).grade).to eql "10"
+      expect(@a2.submission_for_student(@u2).grade).to eql "5"
+    end
+  end
 end
 
 def submission_spec_model(opts={})

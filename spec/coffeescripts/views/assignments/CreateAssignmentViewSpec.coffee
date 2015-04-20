@@ -6,9 +6,13 @@ define [
   'compiled/views/assignments/CreateAssignmentView'
   'compiled/views/DialogFormView'
   'jquery'
+  'timezone'
+  'vendor/timezone/America/Juneau'
+  'vendor/timezone/fr_FR'
+  'helpers/I18nStubber'
   'helpers/jquery.simulate'
   'compiled/behaviors/tooltip'
-], (Backbone, AssignmentGroupCollection, AssignmentGroup, Assignment, CreateAssignmentView, DialogFormView, $) ->
+], (Backbone, AssignmentGroupCollection, AssignmentGroup, Assignment, CreateAssignmentView, DialogFormView, $, tz, juneau, french, I18nStubber) ->
 
   fixtures = $('#fixtures')
 
@@ -113,11 +117,17 @@ define [
       @assignment4 = assignment4()
       @group       = assignmentGroup()
 
+      @snapshot = tz.snapshot()
+      I18nStubber.pushFrame()
+
     teardown: ->
       ENV.VALID_DATE_RANGE = {
         start_at: {date: null, date_context: null}
         end_at: {date: null, date_context: null}
       }
+
+      tz.restore(@snapshot)
+      I18nStubber.popFrame()
 
   test "initialize generates a new assignment for creation", ->
     view = createView(@group)
@@ -297,3 +307,19 @@ define [
     ok errors["due_at"]
     equal errors['due_at'][0]['message'], 'Due date cannot be before unlock date'
 
+  test "renders due dates with locale-appropriate format string", ->
+    tz.changeLocale(french, 'fr_FR')
+    I18nStubber.setLocale 'fr_FR'
+    I18nStubber.stub 'fr_FR',
+      'date.formats.short': '%-d %b'
+      'date.abbr_month_names.8': 'août'
+    view = createView(@assignment1)
+    equal view.$("#vdd_tooltip_assign_1 div dd").first().text().trim(), '28 août'
+
+  test "renders due dates in appropriate time zone", ->
+    tz.changeZone(juneau, 'America/Juneau')
+    I18nStubber.stub 'en',
+      'date.formats.short': '%b %-d'
+      'date.abbr_month_names.8': 'Aug'
+    view = createView(@assignment1)
+    equal view.$("#vdd_tooltip_assign_1 div dd").first().text().trim(), 'Aug 27'

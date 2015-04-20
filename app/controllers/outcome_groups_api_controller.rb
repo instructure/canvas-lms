@@ -380,8 +380,8 @@ class OutcomeGroupsApiController < ApplicationController
   #
   # If defining a new outcome, the outcome is created in the outcome group's
   # context using the provided title, description, ratings, and mastery points;
-  # the title is required but all other fields are optional. The new outcome is
-  # then linked into the outcome group.
+  # the title is required but all other fields are optional. The new outcome
+  # is then linked into the outcome group.
   #
   # If ratings are provided when creating a new outcome, an embedded rubric
   # criterion is included in the new outcome. This criterion's mastery_points
@@ -417,7 +417,7 @@ class OutcomeGroupsApiController < ApplicationController
   #   The points corresponding to a rating level for the embedded rubric criterion.
   #
   # @argument calculation_method [String, "decaying_average"|"n_mastery"|"latest"|"highest"]
-  #   The new calculation method.
+  #   The new calculation method.  Defaults to "highest"
   #
   # @argument calculation_int [Integer]
   #   The new calculation int.  Only applies if the calculation_method is "decaying_average" or "n_mastery"

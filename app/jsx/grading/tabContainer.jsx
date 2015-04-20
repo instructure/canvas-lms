@@ -6,10 +6,9 @@ define([
   'jsx/grading/gradingPeriodCollection',
   'jquery',
   'i18n!external_tools',
-  'underscore',
   'jquery.instructure_misc_plugins'
 ],
-function(React, GradingStandardCollection, GradingPeriodCollection, $, I18n, _) {
+function(React, GradingStandardCollection, GradingPeriodCollection, $, I18n) {
 
   var TabContainer = React.createClass({
 

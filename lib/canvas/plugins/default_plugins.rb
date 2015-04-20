@@ -2,16 +2,6 @@ Dir.glob('lib/canvas/plugins/validators/*').each do |file|
   require_dependency file
 end
 
-Canvas::Plugin.register('facebook', nil, {
-  :name => lambda{ t :name, 'Facebook' },
-  :description => lambda{ t :description, 'Canvas Facebook application' },
-  :website => 'http://www.facebook.com',
-  :author => 'Instructure',
-  :author_website => 'http://www.instructure.com',
-  :version => '1.0.0',
-  :settings_partial => 'plugins/facebook_settings',
-  :validator => 'FacebookValidator'
-})
 Canvas::Plugin.register('linked_in', nil, {
   :name => lambda{ t :name, 'LinkedIn' },
   :description => lambda{ t :description, 'LinkedIn integration' },
@@ -317,4 +307,22 @@ Canvas::Plugin.register('pandapub', nil, {
   },
   :settings_partial => 'plugins/panda_pub_settings',
   :validator => 'PandaPubValidator'
+})
+Canvas::Plugins::TicketingSystem.register!
+Canvas::Plugin.register('live_events', nil, {
+  :name => lambda{ t :name, 'Live Events' },
+  :description => lambda{ t :description, 'Service for real-time events.' },
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings => {
+    :kinesis_stream_name => nil,
+    :aws_access_key_id => nil,
+    :aws_secret_access_key => nil,
+    :aws_region => 'us-east-1',
+    :aws_endpoint => nil,
+  },
+  :encrypted_settings => [ :aws_secret_access_key ],
+  :settings_partial => 'plugins/live_events_settings',
+  :validator => 'LiveEventsValidator'
 })

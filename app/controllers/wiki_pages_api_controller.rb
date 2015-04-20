@@ -485,7 +485,6 @@ class WikiPagesApiController < ApplicationController
   
   def get_wiki_page
     @wiki = @context.wiki
-    @wiki.check_has_front_page
 
     # attempt to find an existing page
     url = params[:url]

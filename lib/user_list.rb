@@ -172,8 +172,7 @@ class UserList
           where("(LOWER(unique_id) IN (?) OR sis_user_id IN (?)) AND account_id IN (?)", @addresses.map {|x| x[:address].downcase}, @addresses.map {|x| x[:address]}, account_ids).
           map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |login|
         addresses = @addresses.select { |a| a[:address].downcase == login[:address].downcase ||
-            a[:address] ==  login[:sis_user_id]}
-        login.delete(:sis_user_id)
+            (login[:sis_user_id] && (a[:address] == login[:sis_user_id] || a[:sis_user_id] == login[:sis_user_id]))}
         addresses.each do |address|
           # already found a matching pseudonym
           if address[:user_id]
@@ -277,6 +276,7 @@ class UserList
       # This is temporary working data
       address.delete :workflow_state
       address.delete :account_id
+      address.delete :sis_user_id
       # Only allow addresses that we found a user, or that we can implicitly create the user
       if address[:user_id].present?
         (@addresses.find { |a| a[:user_id] == address[:user_id] && a[:shard] == address[:shard] } ? @duplicate_addresses : @addresses) << address

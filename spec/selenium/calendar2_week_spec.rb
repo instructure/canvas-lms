@@ -117,7 +117,7 @@ describe "calendar2" do
       expect(old_header_title).not_to eq get_header_text
     end
 
-    it "should create event by clicking on week calendar" do
+    it "should create event by clicking on week calendar", :priority => "1", :test_id => 138862 do
       title = "from clicking week calendar"
       load_week_view
 
@@ -128,7 +128,7 @@ describe "calendar2" do
       expect(f('.fc-event-time').text).to include title
     end
 
-    it "should create all day event on week calendar" do
+    it "should create all day event on week calendar", :priority => "1", :test_id => 138865 do
       title = "all day event title"
       load_week_view
 
@@ -141,7 +141,7 @@ describe "calendar2" do
       expect(f('.fc-event-title').text).to include title
     end
 
-    it "should have a working today button" do
+    it "should have a working today button", :priority => "1", :test_id => 142042 do
       load_week_view
 
       # Mini calendar on the right of page has this html element I am looking for so
@@ -150,21 +150,15 @@ describe "calendar2" do
       # Check for highlight to be present on this week
       expect(ff(".fc-today").size).to eq 2
 
-      # Get the month so we can check to see if the month changes
-      starting_month = f(".fc-header-title").text
-
-      # Change calendar week and make sure that the highlight is not there
-      # If the month does not change, it should still be on the mini calendar so we still expect 1
-      # If the month changes, we should expect 0
-      change_calendar
-      changed_month = f(".fc-header-title").text
-      if (starting_month == changed_month)
-        expect(ff(".fc-today").size).to eq 1
-      else
-        expect(ff(".fc-today").size).to eq 0
+      # Change calendar week until the highlight is not there (it should eventually)
+      count = 0
+      while ff(".fc-today").size > 0
+        change_calendar
+        count += 1
+        raise if count > 10
       end
 
-      # Back to today. Make sure that the highlight is present
+      # Back to today. Make sure that the highlight is present again
       change_calendar(:today)
       expect(ff(".fc-today").size).to eq 2
     end

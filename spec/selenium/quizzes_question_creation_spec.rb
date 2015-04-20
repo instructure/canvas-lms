@@ -19,17 +19,19 @@ describe "quizzes question creation" do
     expect(question_data[:answers].length).to eq 4
     expect(question_data[:answers][0][:text]).to eq "Correct Answer"
     expect(question_data[:answers][0][:weight]).to eq 100
+    expect(question_data[:answers][0][:comments_html]).to eq "<p>Good job!</p>"
     expect(question_data[:answers][1][:text]).to eq "Wrong Answer #1"
     expect(question_data[:answers][1][:weight]).to eq 0
+    expect(question_data[:answers][1][:comments_html]).to eq "<p>Bad job :(</p>"
     expect(question_data[:answers][2][:text]).to eq "Second Wrong Answer"
     expect(question_data[:answers][2][:weight]).to eq 0
     expect(question_data[:answers][3][:text]).to eq "Wrongest Answer"
     expect(question_data[:answers][3][:weight]).to eq 0
     expect(question_data[:points_possible]).to eq 1
     expect(question_data[:question_type]).to eq "multiple_choice_question"
-    expect(question_data[:correct_comments]).to eq "Good job on the question!"
-    expect(question_data[:incorrect_comments]).to eq "You know what they say - study long study wrong."
-    expect(question_data[:neutral_comments]).to eq "Pass or fail you are a winner!"
+    expect(question_data[:correct_comments_html]).to eq "<p>Good job on the question!</p>"
+    expect(question_data[:incorrect_comments_html]).to eq "<p>You know what they say - study long study wrong.</p>"
+    expect(question_data[:neutral_comments_html]).to eq "<p>Pass or fail you are a winner!</p>"
   end
 
 
@@ -38,6 +40,10 @@ describe "quizzes question creation" do
     create_true_false_question
     quiz.reload
     keep_trying_until { expect(f("#question_#{quiz.quiz_questions[0].id}")).to be_displayed }
+
+    quiz.reload
+    question_data = quiz.quiz_questions[0].question_data
+    expect(question_data[:answers][1][:comments_html]).to eq "<p>Good job!</p>"
   end
 
   it "should create a quiz question with a fill in the blank question" do
@@ -445,7 +451,7 @@ describe "quizzes question creation" do
     end
 
     def close_first_html_answer
-      f('.edit-html-done').click
+      f('.edit_html_done').click
     end
 
     it "should allow HTML answers for multiple choice" do

@@ -3,37 +3,13 @@ define [
   'underscore'
   'Backbone'
   'compiled/models/grade_summary/Outcome'
-  'compiled/collections/WrappedCollection'
+  'compiled/collections/OutcomeResultCollection'
   'compiled/views/DialogBaseView'
   'compiled/views/CollectionView'
   'compiled/views/grade_summary/AlignmentView'
   'compiled/views/grade_summary/ProgressBarView'
   'jst/grade_summary/outcome_detail'
-], ($, _, Backbone, Outcome, WrappedCollection, DialogBaseView, CollectionView, AlignmentView, ProgressBarView, template) ->
-  class OutcomeResultCollection extends WrappedCollection
-    key: 'outcome_results'
-    model: Outcome
-    @optionProperty 'outcome'
-    @optionProperty 'user_id'
-    @optionProperty 'course_id'
-    url: -> "/api/v1/courses/#{@course_id}/outcome_results?user_ids[]=#{@user_id}&outcome_ids[]=#{@outcome.id}&include[]=alignments"
-    loadAll: true
-
-    initialize: ->
-      super
-      @on('reset', @handleReset)
-      @on('add', @handleAdd)
-
-    handleReset: =>
-      @alignments = new Backbone.Collection(@linked.alignments)
-      @each @handleAdd
-
-    handleAdd: (model) =>
-      alignment_id = model.get('links').alignment
-      model.set('name', @alignments.get(alignment_id).get('name'))
-      model.set('mastery_points', @outcome.get('mastery_points'))
-      model.set('points_possible', @outcome.get('points_possible'))
-
+], ($, _, Backbone, Outcome, OutcomeResultCollection, DialogBaseView, CollectionView, AlignmentView, ProgressBarView, template) ->
   class OutcomeDetailView extends DialogBaseView
 
     template: template

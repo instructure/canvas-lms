@@ -161,10 +161,10 @@ define [
       newState = {}
       newState[key] = !@state[key]
       return =>
-        @setState(newState)
+        @setState newState
 
     render: withReactElement ->
-      ReactModal {isOpen: true, onRequestClose: @closeModal, className: 'ReactModal__Content--ef-file-preview', overlayClassName: 'ReactModal__Overlay--ef-file-preview', closeTimeoutMS: 10},
+      React.createFactory(ReactModal) {isOpen: true, onRequestClose: @closeModal, className: 'ReactModal__Content--ef-file-preview', overlayClassName: 'ReactModal__Overlay--ef-file-preview', closeTimeoutMS: 10},
         div {className: 'ef-file-preview-overlay'},
           div {className: 'ef-file-preview-header'},
             h1 {className: 'ef-file-preview-header-filename'},
@@ -197,7 +197,8 @@ define [
 
           div {className: 'ef-file-preview-stretch'},
             @renderArrowLink('left') if @state.otherItems?.length > 0
-            if @state.displayedItem
+
+            if @state.displayedItem?.get 'preview_url'
               iframe {
                 allowFullScreen: true
                 title: I18n.t('File Preview')

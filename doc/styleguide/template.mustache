@@ -45,7 +45,6 @@
       <a class="Sg-header__Subnavigation-item" href="#popovers">Popovers</a>
       <a class="Sg-header__Subnavigation-item" href="#progress_bar">Progress Bar</a>
       <a class="Sg-header__Subnavigation-item" href="#publish_state">Publish State</a>
-      <a class="Sg-header__Subnavigation-item" href="#tour_popups">Tour Popups</a>
     </section>
   </nav>  
 </header>
@@ -57,7 +56,8 @@
     {{#docs}}
       <section class="Sg-Section {{id}}" style="position: relative;">
         <div class="Sg-Content">  
-          <h1 id="{{id}}">{{component}}</h1>   
+          <span id="{{id}}" class="Sg-Anchor"></span>
+          <h1>{{component}}</h1>   
           
           <div class="sg-src-file-path">{{file}}</div>
           <div class="grid-row">

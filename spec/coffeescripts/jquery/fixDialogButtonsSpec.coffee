@@ -12,6 +12,7 @@ define [
 
     teardown: ->
       @clock.restore()
+      $("#fixtures").empty()
 
 
   test 'handles buttons', ->
@@ -30,7 +31,7 @@ define [
           </a>
         </div>
       </form>
-    """).appendTo('body').dialog().fixDialogButtons()
+    """).appendTo('#fixtures').dialog().fixDialogButtons()
 
     ok $dialog.is(':ui-dialog:visible'), 'pops up dialog'
     equal $dialog.dialog('option', 'buttons').length, 2, 'converts both buttons in .button-pane only'
@@ -68,7 +69,7 @@ define [
     $dialog.remove() #clean up
 
   test "enter key submits form", ->
-    $dialog = $("<form style='display:none'><input id='box' type='text'></input><div class='button-container'><button type='submit'></button></div></form>").appendTo('body').dialog()
+    $dialog = $("<form style='display:none'><input id='box' type='text'></input><div class='button-container'><button type='submit'></button></div></form>").appendTo('#fixtures').dialog()
     $dialog.fixDialogButtons()
 
     submitCount = 0
@@ -82,7 +83,7 @@ define [
     $dialog.remove()
 
   test "enter key does not duplicate submissions if fixDialogButtons invoked more than once", ->
-    $dialog = $("<form style='display:none'><input id='box' type='text'></input><div class='button-container'><button type='submit'></button></div></form>").appendTo('body').dialog()
+    $dialog = $("<form style='display:none'><input id='box' type='text'></input><div class='button-container'><button type='submit'></button></div></form>").appendTo('#fixtures').dialog()
     $dialog.fixDialogButtons()
     $dialog.fixDialogButtons()
 
@@ -97,7 +98,7 @@ define [
     $dialog.remove()
 
   test "enter key submits form only once without preventDefault", ->
-    $dialog = $("<form style='display:none' action='#' onsubmit='return false;'><input id='box' type='text'></input><div class='button-container'><button type='submit'></button></div></form>").appendTo('body').dialog()
+    $dialog = $("<form style='display:none' action='#' onsubmit='return false;'><input id='box' type='text'></input><div class='button-container'><button type='submit'></button></div></form>").appendTo('#fixtures').dialog()
     $dialog.fixDialogButtons()
 
     submitCount = 0

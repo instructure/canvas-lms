@@ -113,7 +113,13 @@
       <%= before_label('show_assessment_by', 'Show Assessment By') %>
       <select id="rubric_assessments_select">
         <% @visible_rubric_assessments.each do |assessment| %>
-          <option id="rubric_assessment_option_<%= assessment.id %>" value="<%= assessment.id %>"><%= assessment.assessor_name %></option>
+          <option id="rubric_assessment_option_<%= assessment.id %>" value="<%= assessment.id %>">
+            <% if can_do(assessment, @current_user, :read_assessor) -%>
+              <%= assessment.assessor_name %>
+            <% else -%>
+              <%= t(:anonymous_user, "Anonymous User") %>
+            <% end -%>
+          </option>
         <% end %>
         <% if can_do(@assignment.rubric_association, @current_user, :assess) && @submission.user != @current_user %>
         <% unless @visible_rubric_assessments.map{|a| a.assessor_id}.include?(@current_user.id) %>
@@ -182,7 +188,9 @@
                   <% end %>
                 </div>
                 <div style="text-align: right; font-size: 0.8em; color: #888;">
-                  <span class="author_name"><%= comment.author_name %></span>,
+                  <span class="author_name">
+                    <%= comment_author_name_for(comment) %>
+                  </span>,
                   <span class="posted_at"><%= datetime_string(comment.created_at) %></span>
                 </div>
               </div>

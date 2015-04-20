@@ -1,3 +1,5 @@
+require 'nokogiri'
+
 module Qti
 class AssociateInteraction < AssessmentItemConverter
   include Canvas::Migration::XMLHelper

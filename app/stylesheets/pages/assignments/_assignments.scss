@@ -159,3 +159,47 @@
 #content {
   padding-bottom: 110px;
 }
+
+#sidebar_content {
+  .details {
+    h3 {
+      margin: 0;
+    }
+    .header {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-top: 2px;
+    }
+    .content {
+      padding-left: 5px;
+      h4 {
+        font-size: 11px;
+        font-weight: bold;
+        margin-bottom: 0;
+      }
+      .module {
+        padding-top: 10px;
+      }
+      .late {
+        color: #880000;
+        font-weight: bold;
+      }
+      .unstyled_list {
+        margin: 5px 10px 0 10px;
+      }
+      .comments {
+        font-size: 11px;
+        max-height: 300px;
+        overflow: auto;
+        .comment {
+          margin-left: 10px;
+          .signature {
+            color: #888888;
+            font-size: 0.8em;
+            text-align: right;
+          }
+        }
+      }
+    }
+  }
+}

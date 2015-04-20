@@ -117,6 +117,26 @@ define [
     assertItemRendered '3'
     assertItemRendered '4'
 
+  test 'fetches every page until it reaches the last when fetchItAll is set', ->
+    view.remove()
+    view = new PaginatedCollectionView
+      collection: collection
+      itemView: ItemView
+      scrollContainer: fixtures
+      fetchItAll: true
+    view.$el.appendTo fixtures
+    view.render()
+    fixtures.css height: 1 # to show that it will continue to load in the background even if it's filled the current view height
+
+    collection.fetch()
+    server.sendPage fakePage(), collection.url
+    assertItemRendered '1'
+    assertItemRendered '2'
+    clock.tick(0)
+    server.sendPage fakePage(2), collection.urls.next
+    assertItemRendered '3'
+    assertItemRendered '4'
+
   test 'stops fetching pages after the last page', ->
     # see later in the test why this exists
     fakeEvent = "foo.pagination:#{view.cid}"

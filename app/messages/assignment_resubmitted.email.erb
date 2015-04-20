@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= polymorphic_url([asset.assignment.context, asset.assignment, :submissions], id: asset.user_id) %>
+  <%= course_assignment_submission_url(asset.assignment.context, asset.assignment, asset.user_id) %>
 <% end %>
 
 <% define_content :subject do %>

@@ -63,8 +63,8 @@ module Canvas::Redis
     Rails.logger.error "Failure handling redis command on #{redis_name}: #{e.inspect}"
 
     if self.ignore_redis_failures?
-      ErrorReport.log_exception(:redis, e)
-      last_redis_failure[redis_name] = Time.now
+      Canvas::Errors.capture(e, type: :redis)
+      last_redis_failure[redis_name] = Time.zone.now
       failure_retval
     else
       raise

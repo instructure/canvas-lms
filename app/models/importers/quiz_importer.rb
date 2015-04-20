@@ -167,7 +167,7 @@ module Importers
       item ||= Quizzes::Quiz.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
       if item && !allow_update
         if item.deleted?
-          item.workflow_state = hash[:available] ? 'available' : 'created'
+          item.workflow_state = (hash[:available] || !item.can_unpublish?) ? 'available' : 'unpublished'
           item.saved_by = :migration
           item.save
         end
@@ -266,7 +266,7 @@ module Importers
 
         item.assignment = ::Importers::AssignmentImporter.import_from_migration(hash[:assignment], context, migration, item.assignment, item)
 
-        if !hash[:available]
+        if !hash[:available] && item.can_unpublish?
           item.workflow_state = 'unpublished'
           item.assignment.workflow_state = 'unpublished'
         end
@@ -288,7 +288,7 @@ module Importers
         end
       end
 
-      if item.for_assignment? && !item.assignment
+      if item.for_assignment? && !item.assignment && item.can_unpublish?
         item.workflow_state = 'unpublished'
       end
 

@@ -78,7 +78,7 @@ module CanvasRails
     end
 
     # Activate observers that should always be running
-    config.active_record.observers = [:cacher, :stream_item_cache]
+    config.active_record.observers = [:cacher, :stream_item_cache, :live_events_observer ]
 
     config.autoload_paths += %W(#{Rails.root}/app/middleware
                             #{Rails.root}/app/observers

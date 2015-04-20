@@ -8,19 +8,20 @@ define [
 
     teardown: ->
       el?.remove() for el in [@$trigger, @$otherTrigger, @$target, @$target1, @$target2]
+      $("#fixtures").empty()
 
   test 'handles data-html-while-target-shown', ->
     @$trigger = $('<a href="#" class="element_toggler" role="button"
                       data-html-while-target-shown="Hide Thing"
-                      aria-controls="thing">Show Thing</a>').appendTo('body')
+                      aria-controls="thing">Show Thing</a>').appendTo('#fixtures')
 
     @$otherTrigger = $('<a class="element_toggler"
                            data-html-while-target-shown="while shown"
-                           aria-controls="thing">while hidden</a>').appendTo('body')
+                           aria-controls="thing">while hidden</a>').appendTo('#fixtures')
 
     @$target = $('<div id="thing" tabindex="-1" role="region" style="display:none">
                     Here is a bunch more info about "thing"
-                  </div>').appendTo('body')
+                  </div>').appendTo('#fixtures')
 
     # click to show it
     @$trigger.click()
@@ -39,16 +40,16 @@ define [
     @$trigger = $('<a href="#"
                       class="element_toggler"
                       data-hide-while-target-shown="true"
-                      aria-controls="thing">Show Thing, then hide me</a>').appendTo('body')
+                      aria-controls="thing">Show Thing, then hide me</a>').appendTo('#fixtures')
 
     @$otherTrigger = $('<a class="element_toggler"
                            data-hide-while-target-shown=true
-                           aria-controls="thing">also hide me</a>').appendTo('body')
+                           aria-controls="thing">also hide me</a>').appendTo('#fixtures')
 
     @$target = $('<div id="thing"
                        tabindex="-1"
                        role="region"
-                       style="display:none">blah</div>').appendTo('body')
+                       style="display:none">blah</div>').appendTo('#fixtures')
 
     # click to show it
     @$trigger.click()
@@ -69,7 +70,7 @@ define [
 
   test 'handles dialogs', ->
     @$trigger = $('<button class="element_toggler"
-                           aria-controls="thing">Show Thing Dialog</button>').appendTo('body')
+                           aria-controls="thing">Show Thing Dialog</button>').appendTo('#fixtures')
 
     @$target = $("""
       <form id="thing" data-turn-into-dialog='{"width":450,"modal":true}' style="display:none">
@@ -82,7 +83,7 @@ define [
           <a class="btn dialog_closer">This will cause the dialog to close</a>
         </div>
       </form>
-    """).appendTo('body')
+    """).appendTo('#fixtures')
 
     # click to show it
     msg = "target pops up as a dialog"
@@ -121,9 +122,9 @@ define [
     equal @$target.dialog('isOpen'), false
 
   test 'checkboxes can be used as trigger', ->
-    @$trigger = $('<input type="checkbox" class="element_toggler" aria-controls="thing">').appendTo('body')
+    @$trigger = $('<input type="checkbox" class="element_toggler" aria-controls="thing">').appendTo('#fixtures')
 
-    @$target = $('<div id="thing" style="display:none">thing</div>').appendTo('body')
+    @$target = $('<div id="thing" style="display:none">thing</div>').appendTo('#fixtures')
 
     @$trigger.prop('checked', true).trigger('change')
     ok @$target.is(':visible'), "target is shown"
@@ -132,9 +133,9 @@ define [
     ok @$target.is(':hidden'), "target is hidden"
 
   test 'toggles multiple elements separated by spaces', ->
-    @$trigger = $('<input type="checkbox" class="element_toggler" aria-controls="one two" />').appendTo('body')
-    @$target1 = $('<div id="one" style="display: none;">one</div>').appendTo('body')
-    @$target2 = $('<div id="two" style="display: none;">two</div>').appendTo('body')
+    @$trigger = $('<input type="checkbox" class="element_toggler" aria-controls="one two" />').appendTo('#fixtures')
+    @$target1 = $('<div id="one" style="display: none;">one</div>').appendTo('#fixtures')
+    @$target2 = $('<div id="two" style="display: none;">two</div>').appendTo('#fixtures')
     @$trigger.prop('checked', true).trigger('change')
 
 

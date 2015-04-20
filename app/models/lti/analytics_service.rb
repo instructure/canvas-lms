@@ -1,4 +1,6 @@
+require 'duration'
 require 'net/http'
+require 'securerandom'
 
 module Lti
   class AnalyticsService
@@ -49,7 +51,7 @@ module Lti
 
       if PageView.page_views_enabled?
         PageView.new(user: user, context: course, account: course.account).tap { |p|
-          p.request_id = CanvasUUID.generate
+          p.request_id = SecureRandom.uuid
           p.url = opts[:url]
           # TODO: override 10m cap?
           p.interaction_seconds = seconds

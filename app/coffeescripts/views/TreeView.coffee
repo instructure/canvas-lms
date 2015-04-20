@@ -20,6 +20,7 @@ define [
     @optionProperty 'focusStyleClass'
     @optionProperty 'selectedStyleClass'
     @optionProperty 'autoFetch'
+    @optionProperty 'fetchItAll'
 
     defaults:
       nestingLevel: 1
@@ -125,11 +126,13 @@ define [
               focusStyleClass: @focusStyleClass
               selectedStyleClass: @selectedStyleClass
               autoFetch: @autoFetch
+              fetchItAll: @fetchItAll
             tagName: 'li'
             className: 'subtrees'
             template: collectionTemplate
             scrollContainer: @$treeContents.closest('div[role=tabpanel]')
             autoFetch: @autoFetch
+            fetchItAll: @fetchItAll
           )
           @$treeContents.append(subtreesView.render().el)
           unless @onlyShowSubtrees

@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'mail'
+
 class Mailer < ActionMailer::Base
 
   attr_reader :email

@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+require 'nokogiri'
+
 describe ProfileController do
   it "should respect account setting for editing names" do
     a = Account.create!

@@ -35,7 +35,7 @@ describe ErrorReport do
     expect(m).not_to be_nil
     expect(m.to).to eql("nobody@nowhere.com")
   end
-  
+
   it "should not send emails if not configured" do
     account_model
     report = ErrorReport.new
@@ -49,7 +49,8 @@ describe ErrorReport do
   end
 
   it "should not fail with invalid UTF-8" do
-    ErrorReport.log_error('my error', :message => "he\xffllo")
+    data = { extra: { message: "he\xffllo" } }
+    described_class.log_exception_from_canvas_errors('my error', data)
   end
 
   it "should return categories" do
@@ -71,8 +72,9 @@ describe ErrorReport do
   end
 
   it "should use class name for category" do
-    report = ErrorReport.log_exception(nil, e = Exception.new("error"))
-    expect(report.category).to eq e.class.name
+    e = Exception.new("error")
+    report = described_class.log_exception_from_canvas_errors(e, {extra:{}})
+    expect(report.category).to eq(e.class.name)
   end
 
   it "should filter params" do
@@ -88,12 +90,17 @@ describe ErrorReport do
     }
     mock_attrs[:url] = mock_attrs[:env]["REQUEST_URI"]
     req = mock(mock_attrs)
-    report = ErrorReport.new
-    report.assign_data(ErrorReport.useful_http_env_stuff_from_request(req))
+    report = described_class.new
+    report.assign_data(Canvas::Errors::Info.useful_http_env_stuff_from_request(req))
     expect(report.data["QUERY_STRING"]).to eq "?access_token=[FILTERED]&pseudonym[password]=[FILTERED]"
-    expect(report.data["REQUEST_URI"]).to eq "https://www.instructure.example.com?access_token=[FILTERED]&pseudonym[password]=[FILTERED]"
+
+    expected_uri = "https://www.instructure.example.com?"\
+      "access_token=[FILTERED]&pseudonym[password]=[FILTERED]"
+    expect(report.data["REQUEST_URI"]).to eq(expected_uri)
     expect(report.data["path_parameters"]).to eq({ :api_key => "[FILTERED]" }.inspect)
-    expect(report.data["query_parameters"]).to eq({ "access_token" => "[FILTERED]", "pseudonym[password]" => "[FILTERED]" }.inspect)
+    q_params = { "access_token" => "[FILTERED]", "pseudonym[password]" => "[FILTERED]" }
+    expect(report.data["query_parameters"]).to eq(q_params.inspect)
     expect(report.data["request_parameters"]).to eq({ "client_secret" => "[FILTERED]" }.inspect)
   end
+
 end

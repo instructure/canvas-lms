@@ -22,7 +22,7 @@ module Api::V1::CommunicationChannel
   # Internal: The attributes returned by communication_channel_json.
   #
   # Uses the method "path_description" instead of the field "path" because
-  # when path_type is facebook or twitter, it goes and fetches tha user's account
+  # when path_type is twitter or yo, it goes and fetches tha user's account
   # name with a fallback display value.
   JSON_OPTS = {
     :only => %w{ id path_type position workflow_state user_id },

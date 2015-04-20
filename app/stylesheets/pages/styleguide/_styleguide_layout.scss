@@ -88,7 +88,8 @@ body.Sg-only {
   }
   &:focus {
     text-decoration: none;  
-  }
+    color: $sg-header-navigation-item;
+  }  
 }
 .Sg-header__Navigation-item.active {
   background: $sg-background-sub-nav;

@@ -163,6 +163,15 @@ describe Assignment do
     expect(@submission.graded_at).not_to eql original_graded_at
   end
 
+  it "should hide grading comments if assignment is muted" do
+    setup_assignment_with_homework
+    @assignment.mute!
+    @assignment.grade_student(@user, :comment => 'hi')
+    submission = @assignment.submissions.first
+    comment = submission.submission_comments.first
+    expect(comment).to be_hidden
+  end
+
   context "needs_grading_count" do
     before :once do
       setup_assignment_with_homework
@@ -834,6 +843,17 @@ describe Assignment do
       @a.due_at = Time.zone.now
 
       expects_job_with_tag('Assignment#do_auto_peer_review') {
+        @a.save!
+      }
+    end
+
+    it "should not schedule auto_assign when skip_schedule_peer_reviews is set" do
+      @a.peer_reviews = true
+      @a.automatic_peer_reviews = true
+      @a.due_at = Time.zone.now
+      @a.skip_schedule_peer_reviews = true
+
+      expects_job_with_tag('Assignment#do_auto_peer_review', 0) {
         @a.save!
       }
     end
@@ -3199,6 +3219,18 @@ describe Assignment do
       a2.submit_homework @student, body: "hello, world"
       a2.group_category = nil
       expect(a2).not_to be_valid
+    end
+
+    it "recognizes if it has submissions and belongs to a deleted group category" do
+      a1.group_category = @group_category
+      a1.submit_homework @student, body: "hello, world"
+      expect(a1.group_category_deleted_with_submissions?).to eq false
+      a1.group_category.destroy
+      expect(a1.group_category_deleted_with_submissions?).to eq true
+
+      a2 = assignment(@group_category)
+      a2.group_category.destroy
+      expect(a2.group_category_deleted_with_submissions?).to eq false
     end
   end
 end

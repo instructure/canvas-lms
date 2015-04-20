@@ -52,19 +52,23 @@ class InfoController < ApplicationController
       @report.account ||= @domain_root_account
       backtrace = params[:error].delete(:backtrace) rescue nil
       backtrace ||= ""
-      backtrace += "\n\n-----------------------------------------\n\n" + @report.backtrace if @report.backtrace
+      if @report.backtrace
+        backtrace += "\n\n-----------------------------------------\n\n"
+        backtrace += @report.backtrace
+      end
       @report.backtrace = backtrace
-      @report.http_env ||= ErrorReport.useful_http_env_stuff_from_request(request)
+      @report.http_env ||= Canvas::Errors::Info.useful_http_env_stuff_from_request(request)
       @report.request_context_id = RequestContextGenerator.request_id
       @report.assign_data(error)
       @report.save
       @report.send_later(:send_to_external)
     rescue => e
       @exception = e
-      ErrorReport.log_exception(:default, e,
-        :message => "Error Report Creation failed",
-        :user_email => (error[:email] rescue ''),
-        :user_id => @current_user.try(:id)
+      Canvas::Errors.capture(
+        e,
+        message: "Error Report Creation failed",
+        user_email: error[:email],
+        user_id: @current_user.try(:id)
       )
     end
     respond_to do |format|
@@ -72,12 +76,6 @@ class InfoController < ApplicationController
       format.html { redirect_to root_url }
       format.json { render :json => {:logged => true, :id => @report.try(:id) } }
     end
-  end
-
-  def record_js_error
-    ErrorReport.log_error('javascript', params[:error])
-    # Render a 0x0 gif
-    render  :content_type =>'image/gif', :text => "GIF89a\001\000\001\000\200\377\000\377\377\377\000\000\000,\000\000\000\000\001\000\001\000\000\002\002D\001\000;"
   end
 
   def health_check

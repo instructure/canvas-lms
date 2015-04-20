@@ -39,13 +39,13 @@
         title="<%= t('drag_to_reorder', %{Drag to reorder or move item to another module}) %>"
       ><i class="icon-drag-handle"></i></span>
       <% end %>
-      <span class="type_icon" title="<%= module_item.content_type if module_item %>">
-        <i class="icon-document" aria-label="Item type: Document"></i>
-        <i class="icon-download" aria-label="Item type: Download"></i>
-        <i class="icon-discussion" aria-label="Item type: Discussion"></i>
-        <i class="icon-assignment" aria-label="Item type: Assignment"></i>
-        <i class="icon-quiz" aria-label="Item type: Quiz"></i>
-        <i class="icon-link" aria-label="Item type: Link"></i>
+      <span class="type_icon" title="<%= module_item_translated_content_type(module_item) %>">
+        <i class="icon-document" aria-label="<%= t('Item type: Document') %>"></i>
+        <i class="icon-download" aria-label="<%= t('Item type: Download') %>"></i>
+        <i class="icon-discussion" aria-label="<%= t('Item type: Discussion') %>"></i>
+        <i class="icon-assignment" aria-label="<%= t('Item type: Assignment') %>"></i>
+        <i class="icon-quiz" aria-label="<%= t('Item type: Quiz') %>"></i>
+        <i class="icon-link" aria-label="<%= t('Item type: Link') %>"></i>
       </span>
 
       <span class="item_name">

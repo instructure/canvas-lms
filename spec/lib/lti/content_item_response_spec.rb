@@ -168,25 +168,25 @@ describe Lti::ContentItemResponse do
     end
   end
 
-  describe '#json_id' do
+  describe '#url' do
     it 'gets the id for a file' do
       file = attachment_model(context: context)
       content_item_response = described_class.new(context, controller, @user, {files: [file.id]}, 'common_cartridge')
-      expect(content_item_response.json_id).to eq 'file_download_url'
+      expect(content_item_response.url).to eq 'file_download_url'
     end
 
     it 'gets the id for non files' do
       quiz = context.quizzes.create!(title: 'a quiz')
       content_item_response = described_class.new(context, controller, @user, {quizzes: [quiz.id]}, 'common_cartridge')
-      expect(content_item_response.json_id).to include 'api_export_url'
+      expect(content_item_response.url).to include 'api_export_url'
     end
   end
 
   describe '#as_json' do
-    it 'generates the json content_item_response' do
+    it 'generates the json for ContentItemSelectionResponse' do
       quiz = context.quizzes.create!(title: 'a quiz')
       content_item_response = described_class.new(context, controller, @user, {quizzes: [quiz.id]}, 'common_cartridge')
-      json = content_item_response.as_json
+      json = content_item_response.as_json(lti_message_type: 'ContentItemSelectionResponse')
       expect(json['@context']).to eq "http://purl.imsglobal.org/ctx/lti/v1/ContentItemPlacement"
       expect(json['@graph'].first['@type']).to eq "ContentItemPlacement"
       expect(json['@graph'].first['placementOf']['@type']).to eq "FileItem"
@@ -194,6 +194,19 @@ describe Lti::ContentItemResponse do
       expect(json['@graph'].first['placementOf']['mediaType']).to eq "application/vnd.instructure.api.content-exports.quiz"
       expect(json['@graph'].first['placementOf']['title']).to eq "a quiz"
     end
+
+    it 'generates the json for ContentItemSelection' do
+      quiz = context.quizzes.create!(title: 'a quiz')
+      content_item_response = described_class.new(context, controller, @user, {quizzes: [quiz.id]}, 'common_cartridge')
+      json = content_item_response.as_json(lti_message_type: 'ContentItemSelection')
+      expect(json['@context']).to eq "http://purl.imsglobal.org/ctx/lti/v1/ContentItem"
+      expect(json['@graph'].first['@type']).to eq "FileItem"
+      expect(json['@graph'].first['url']).to include "api_export_url"
+      expect(json['@graph'].first['mediaType']).to eq "application/vnd.instructure.api.content-exports.quiz"
+      expect(json['@graph'].first['title']).to eq "a quiz"
+      expect(json['@graph'].first['copyAdvice']).to eq true
+    end
+
   end
 
 end

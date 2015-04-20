@@ -660,7 +660,7 @@ class SubmissionsApiController < ApplicationController
     end
   end
 
-  # @API Grade or comment on multiple submissions for an assignment
+  # @API Grade or comment on multiple submissions
   #
   # Update the grading and comments on multiple student's assignment
   # submissions in an asynchronous job.
@@ -694,18 +694,26 @@ class SubmissionsApiController < ApplicationController
   #
   # @returns Progress
   def bulk_update
-    @assignment = @context.assignments.active.find(params[:assignment_id])
-
-    unless @assignment.published? && @context.grants_right?(@current_user, session, :manage_grades)
-      return render_unauthorized_action
-    end
-
     grade_data = params[:grade_data]
     unless grade_data.is_a?(Hash) && grade_data.present?
       return render :json => "'grade_data' parameter required", :status => :bad_request
     end
 
-    progress = Submission.queue_bulk_update(@context, @section, @assignment, @current_user, grade_data)
+    # singular case doesn't require the user to pass an assignment_id in
+    # grade_data, so we do it for them
+    if params[:assignment_id]
+      grade_data = {params[:assignment_id] => grade_data}
+    end
+
+    assignment_ids = grade_data.keys
+    @assignments = @context.assignments.active.find(assignment_ids)
+
+    unless @assignments.all?(&:published?) &&
+           @context.grants_right?(@current_user, session, :manage_grades)
+      return render_unauthorized_action
+    end
+
+    progress = Submission.queue_bulk_update(@context, @section, @current_user, grade_data)
     render :json => progress_json(progress, @current_user, session)
   end
 

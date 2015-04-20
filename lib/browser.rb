@@ -1,3 +1,5 @@
+require 'user_agent'
+
 class Browser < Struct.new(:browser, :version)
   def self.supported?(user_agent)
     user_agent = UserAgent.parse(user_agent)

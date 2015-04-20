@@ -17,6 +17,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+
 class DiscussionTopic < ActiveRecord::Base
 
   include Workflow
@@ -32,7 +34,7 @@ class DiscussionTopic < ActiveRecord::Base
     :plaintext_message, :podcast_enabled, :podcast_has_student_posts,
     :require_initial_post, :threaded, :discussion_type, :context, :pinned, :locked,
     :group_category
-  attr_accessor :user_has_posted
+  attr_accessor :user_has_posted, :saved_by
 
   module DiscussionTypes
     SIDE_COMMENT = 'side_comment'
@@ -259,6 +261,10 @@ class DiscussionTopic < ActiveRecord::Base
     DiscussionTopic::MaterializedView.for(self).update_materialized_view
   end
 
+  def group_category_deleted_with_entries?
+    self.group_category.try(:deleted_at?) && !can_group?
+  end
+
   # If no join record exists, assume all discussion enrties are unread, and
   # that a join record will be created the first time one is marked as read.
   attr_accessor :current_user
@@ -463,24 +469,24 @@ class DiscussionTopic < ActiveRecord::Base
   scope :by_position_legacy, -> { order("discussion_topics.position DESC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
   scope :by_last_reply_at, -> { order("discussion_topics.last_reply_at DESC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
 
-   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
-     without_assignment_in_course(course_ids).union(joins_assignment_student_visibilities(user_ids, course_ids))
-   }
+  scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
+    without_assignment_in_course(course_ids).union(joins_assignment_student_visibilities(user_ids, course_ids))
+  }
 
-   scope :without_assignment_in_course, lambda { |course_ids|
-     where(context_id: course_ids, context_type: "Course").where("discussion_topics.assignment_id IS NULL")
-   }
+  scope :without_assignment_in_course, lambda { |course_ids|
+    where(context_id: course_ids, context_type: "Course").where("discussion_topics.assignment_id IS NULL")
+  }
 
-   scope :joins_assignment_student_visibilities, lambda { |user_ids, course_ids|
-     user_ids = Array.wrap(user_ids).join(',')
-     course_ids = Array.wrap(course_ids).join(',')
-     joins(sanitize_sql([<<-SQL, user_ids, course_ids]))
+  scope :joins_assignment_student_visibilities, lambda { |user_ids, course_ids|
+    user_ids = Array.wrap(user_ids).join(',')
+    course_ids = Array.wrap(course_ids).join(',')
+    joins(sanitize_sql([<<-SQL, user_ids, course_ids]))
       JOIN assignment_student_visibilities
         ON (assignment_student_visibilities.assignment_id = discussion_topics.assignment_id
-            AND assignment_student_visibilities.user_id IN (%s)
-            AND assignment_student_visibilities.course_id IN (%s)
+          AND assignment_student_visibilities.user_id IN (%s)
+          AND assignment_student_visibilities.course_id IN (%s)
         )
-      SQL
+    SQL
   }
 
   alias_attribute :available_from, :delayed_post_at
@@ -750,12 +756,15 @@ class DiscussionTopic < ActiveRecord::Base
 
   def initialize_last_reply_at
     self.posted_at ||= Time.now.utc
-    self.last_reply_at ||= Time.now.utc
+    self.last_reply_at ||= Time.now.utc unless self.saved_by == :migration
   end
 
   set_policy do
     given { |user| self.user && self.user == user }
     can :read
+
+    given { |user| self.grants_right?(user, :read) }
+    can :read_replies
 
     given { |user| self.user && self.user == user && self.visible_for?(user) && !self.locked_for?(user, :check_policies => true) }
     can :reply
@@ -959,10 +968,9 @@ class DiscussionTopic < ActiveRecord::Base
   # Public: Determine if the given user can view this discussion topic.
   #
   # user - The user attempting to view the topic (default: nil).
-  # options - Options passed to the locked_for? call (default: {}).
   #
   # Returns a boolean.
-  def visible_for?(user = nil, options = {})
+  def visible_for?(user = nil)
     # user is the topic's author
     return true if user == self.user
 
@@ -1015,6 +1023,17 @@ class DiscussionTopic < ActiveRecord::Base
     super
     Rails.cache.delete(assignment.locked_cache_key(user)) if assignment
     Rails.cache.delete(root_topic.locked_cache_key(user)) if root_topic
+  end
+
+  def entries_for_feed(user, podcast_feed=false)
+    return [] if !user_can_see_posts?(user)
+    return [] if locked_for?(user, check_policies: true)
+
+    entries = discussion_entries.active
+    if podcast_feed && !podcast_has_student_posts && context.is_a?(Course)
+      entries = entries.where(user_id: context.admins)
+    end
+    entries
   end
 
   def self.podcast_elements(messages, context)

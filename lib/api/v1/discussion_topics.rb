@@ -41,7 +41,7 @@ module Api::V1::DiscussionTopics
   # Returns an array of hashes.
   def discussion_topics_api_json(topics, context, user, session, opts={})
     topics.inject([]) do |result, topic|
-      if topic.visible_for?(user, check_policies: true)
+      if topic.visible_for?(user)
         result << discussion_topic_api_json(topic, context, user, session, opts)
       end
 
@@ -65,7 +65,7 @@ module Api::V1::DiscussionTopics
     )
 
     opts[:user_can_moderate] = context.grants_right?(user, session, :moderate_forum) if opts[:user_can_moderate].nil?
-    json = api_json(topic, user, session, {only: ALLOWED_TOPIC_FIELDS, methods: ALLOWED_TOPIC_METHODS }, [:attach, :update, :delete])
+    json = api_json(topic, user, session, { only: ALLOWED_TOPIC_FIELDS, methods: ALLOWED_TOPIC_METHODS }, [:attach, :update, :delete])
     json.merge!(serialize_additional_topic_fields(topic, context, user, opts))
 
     if hold = topic.subscription_hold(user, @context_enrollment, session)
@@ -171,7 +171,9 @@ module Api::V1::DiscussionTopics
   # Returns a hash.
   def discussion_entry_attachment(entry, user, context)
     return {} unless entry.attachment
-    json = {attachment: attachment_json(entry.attachment, user, host: HostUrl.context_host(context))}
+    url_options = {}
+    url_options.merge!(host: Api::PLACEHOLDER_HOST, protocol: Api::PLACEHOLDER_PROTOCOL) if respond_to?(:use_placeholder_host?) && use_placeholder_host? unless respond_to?(:request)
+    json = {attachment: attachment_json(entry.attachment, user, url_options)}
     json[:attachments] = [json[:attachment]]
 
     json

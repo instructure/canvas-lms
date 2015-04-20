@@ -8,4 +8,4 @@ require [
 ], (FeatureFlagAdminView) ->
 
   view = new FeatureFlagAdminView(el: '.feature-flag-wrapper')
-  view.collection.fetch()
+  view.collection.fetchAll()

@@ -19,6 +19,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
+RSpec.configure do |config|
+  config.include ApplicationHelper
+end
+
 describe "Files API", type: :request do
   context 'locked api item' do
     let(:item_type) { 'file' }
@@ -89,6 +93,7 @@ describe "Files API", type: :request do
         'hidden' => false,
         'lock_at' => nil,
         'locked_for_user' => false,
+        'preview_url' => context_url(@attachment.context, :context_file_file_preview_url, @attachment, annotate: 0),
         'hidden_for_user' => false,
         'created_at' => @attachment.created_at.as_json,
         'updated_at' => @attachment.updated_at.as_json,
@@ -120,6 +125,7 @@ describe "Files API", type: :request do
         'hidden' => false,
         'lock_at' => nil,
         'locked_for_user' => false,
+        'preview_url' => context_url(@attachment.context, :context_file_file_preview_url, @attachment, annotate: 0),
         'hidden_for_user' => false,
         'created_at' => @attachment.created_at.as_json,
         'updated_at' => @attachment.updated_at.as_json,
@@ -499,6 +505,34 @@ describe "Files API", type: :request do
       json = api_call(:get, @files_path + "?search_term=fir", @files_path_options.merge(:search_term => 'fir'), {})
       expect(json.map{|h| h['id']}.sort).to eq atts.map(&:id).sort
     end
+
+    describe "hidden folders" do
+      before :once do
+        hidden_subfolder = @f1.active_sub_folders.build(:name => "hidden", :context => @course)
+        hidden_subfolder.workflow_state = 'hidden'
+        hidden_subfolder.save!
+        hidden_subsub = hidden_subfolder.active_sub_folders.create!(:name => "hsub", :context => @course)
+        @teh_file = Attachment.create!(:filename => "implicitly hidden", :uploaded_data => default_uploaded_data, :folder => hidden_subsub, :context => @course)
+      end
+
+      context "as teacher" do
+        it "should include files in subfolders of hidden folders" do
+          json = api_call(:get, @files_path, @files_path_options)
+          expect(json.map{|entry| entry['id']}).to include @teh_file.id
+        end
+      end
+
+      context "as student" do
+        before :once do
+          student_in_course active_all: true
+        end
+
+        it "should exclude files in subfolders of hidden folders" do
+          json = api_call(:get, @files_path, @files_path_options)
+          expect(json.map{|entry| entry['id']}).not_to include @teh_file.id
+        end
+      end
+    end
   end
 
   describe "#index other contexts" do
@@ -548,6 +582,20 @@ describe "Files API", type: :request do
       })
     end
 
+    it "should work with a context path" do
+      user_session(@user)
+      opts = @file_path_options.merge(:course_id => @course.id.to_param)
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/files/#{@att.id}", opts, {})
+      expect(json['id']).to eq @att.id
+    end
+
+    it "should 404 with wrong context" do
+      course
+      user_session(@user)
+      opts = @file_path_options.merge(:course_id => @course.id.to_param)
+      api_call(:get, "/api/v1/courses/#{@course.id}/files/#{@att.id}", opts, {}, {}, :expected_status => 404)
+    end
+
     it "should omit verifiers when using session auth" do
       user_session(@user)
       get @file_path
@@ -579,7 +627,7 @@ describe "Files API", type: :request do
       expect(json['unlock_at']).to eq one_month_ago.as_json
       expect(json['lock_at']).to eq one_month_from_now.as_json
     end
-    
+
     it "should not be locked/hidden for a teacher" do
       att2 = Attachment.create!(:filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course, :locked => true)
       att2.hidden = true

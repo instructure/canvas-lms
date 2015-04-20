@@ -7,7 +7,7 @@ describe "external tool buttons" do
     course_with_teacher_logged_in
   end
 
-  def load_selection_test_tool(element)
+  def load_selection_test_tool(element, context=@course)
     tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :url => "http://www.example.com/ims/lti")
     tool.editor_button = {
         :url => "http://#{HostUrl.default_host}/selection_test",
@@ -15,17 +15,12 @@ describe "external tool buttons" do
         :text => "Selection Test"
     }
     tool.save!
-    get "/courses/#{@course.id}/discussion_topics"
-    wait_for_ajaximations
 
-    add_button = keep_trying_until do
-      add_button = f('.btn-primary')
-      expect(add_button).not_to be_nil
-      add_button
-    end
-    expect_new_page_load { add_button.click }
+    get "/#{context.class.to_s.downcase.pluralize}/#{context.id}/discussion_topics/new"
+    wait_for_ajaximations
     external_tool_button = f(".mce-instructure_external_tool_button")
     expect(external_tool_button).to be_displayed
+    
     external_tool_button.click
     wait_for_ajax_requests
     html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")
@@ -38,6 +33,14 @@ describe "external tool buttons" do
       wait_for_ajax_requests
     end
     keep_trying_until { !expect(f("#external_tool_button_dialog")).not_to be_displayed }
+  end
+
+  it "should work with groups" do
+    group(:context => @course)
+    load_selection_test_tool("#oembed_link", @group)
+
+    html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")
+    expect(html).to match(/ZB8T0193/)
   end
 
   it "should allow inserting oembed content from external tool buttons" do

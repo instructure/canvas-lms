@@ -43,14 +43,6 @@ define [
           "installed_locally": true,
           "name": "Twitter"
         },
-        {
-          "app_id": 3,
-          "app_type": "Lti::ToolProxy",
-          "description": null,
-          "enabled": false,
-          "installed_locally": true,
-          "name": "Facebook"
-        }
       ]
       store.reset()
       store.setState({ externalTools: @tools })

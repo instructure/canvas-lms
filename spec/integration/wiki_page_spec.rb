@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+require 'nokogiri'
+
 describe WikiPagesController do
   before do
     course_with_teacher_logged_in(:active_all => true)

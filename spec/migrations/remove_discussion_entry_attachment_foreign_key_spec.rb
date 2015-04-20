@@ -1,6 +1,7 @@
 
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 require 'db/migrate/20150312155754_remove_discussion_entry_attachment_foreign_key'
 
 describe 'RemoveDiscussionEntryAttachmentForeignKey' do

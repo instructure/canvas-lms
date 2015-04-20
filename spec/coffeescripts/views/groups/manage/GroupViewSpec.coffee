@@ -31,11 +31,12 @@ define [
       groupDetailView = new GroupDetailView {model: group, users}
       view = new GroupView {groupUsersView, groupDetailView, model: group}
       view.render()
-      view.$el.appendTo($(document.body))
+      view.$el.appendTo($("#fixtures"))
 
     teardown: ->
       fakeENV.teardown()
       view.remove()
+      document.getElementById("fixtures").innerHTML = ""
 
   assertCollapsed = (view) ->
     ok view.$el.hasClass('group-collapsed'), 'expand visible'

@@ -63,7 +63,7 @@ define [
     open: =>
       @dialog.dialog('open')
       @scrollCommentsToBottom()
-      $('.submission_details_dialog .assignment-name').focus()
+      $('.ui-dialog-titlebar-close').focus()
 
     scrollCommentsToBottom: =>
       @dialog.find('.submission_details_comments').scrollTop(999999)
@@ -76,7 +76,7 @@ define [
         for comment in submission.submission_comments || []
           comment.url = "#{@options.context_url}/users/#{comment.author_id}"
           urlPrefix = "#{location.protocol}//#{location.host}"
-          comment.image_url = "#{urlPrefix}/images/users/#{comment.author_id}?fallback=#{encodeURIComponent(urlPrefix+'/images/messages/avatar-50.png')}"
+          comment.image_url = "#{urlPrefix}/images/users/#{comment.author_id}"
         submission.turnitin = extractDataFor(submission, "submission_#{submission.id}", @options.context_url)
         for attachment in submission.attachments || []
           attachment.turnitin = extractDataFor(submission, "attachment_#{attachment.id}", @options.context_url)

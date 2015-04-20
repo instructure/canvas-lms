@@ -141,6 +141,7 @@ define [
       @clock.restore()
       tz.restore(@tzSnapshot)
       @server.restore()
+      document.getElementById("fixtures").innerHTML = ""
 
     render: ->
       @view.render()

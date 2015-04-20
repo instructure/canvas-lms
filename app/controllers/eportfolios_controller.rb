@@ -16,6 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+require 'securerandom'
+
 class EportfoliosController < ApplicationController
   include EportfolioPage
   before_filter :require_user, :only => [:index, :user_index]
@@ -32,7 +35,7 @@ class EportfoliosController < ApplicationController
     add_crumb(@current_user.short_name, user_profile_url(@current_user))
     add_crumb(t(:crumb, "ePortfolios"))
     @portfolios = @current_user.eportfolios.active.order(:updated_at).all
-    render :action => 'user_index'
+    render :user_index
   end
   
   def create
@@ -45,7 +48,7 @@ class EportfoliosController < ApplicationController
           format.html { redirect_to eportfolio_url(@portfolio) }
           format.json { render :json => @portfolio.as_json(:permissions => {:user => @current_user, :session => session}) }
         else
-          format.html { render :action => "new" }
+          format.html { render :new }
           format.json { render :json => @portfolio.errors, :status => :bad_request }
         end
       end
@@ -57,7 +60,7 @@ class EportfoliosController < ApplicationController
     if params[:verifier] == @portfolio.uuid
       session[:eportfolio_ids] ||= []
       session[:eportfolio_ids] << @portfolio.id
-      session[:permissions_key] = CanvasUUID.generate
+      session[:permissions_key] = SecureRandom.uuid
     end
     if authorized_action(@portfolio, @current_user, :read)
       @portfolio.ensure_defaults
@@ -92,7 +95,6 @@ class EportfoliosController < ApplicationController
         js_env :folder_id => Folder.unfiled_folder(@current_user).id,
                :context_code => @current_user.asset_string
       end
-      render :template => "eportfolios/show"
     end
   end
   
@@ -106,7 +108,7 @@ class EportfoliosController < ApplicationController
           format.html { redirect_to eportfolio_url(@portfolio) }
           format.json { render :json => @portfolio.as_json(:permissions => {:user => @current_user, :session => session}) }
         else
-          format.html { render :action => "edit" }
+          format.html { render :edit }
           format.json { render :json => @portfolio.errors, :status => :bad_request }
         end
       end
@@ -122,7 +124,7 @@ class EportfoliosController < ApplicationController
           format.html { redirect_to user_profile_url(@current_user) }
           format.json { render :json => @portfolio }
         else
-          format.html { render :action => "delete" }
+          format.html { render :delete }
           format.json { render :json => @portfolio.errors, :status => :bad_request }
         end
       end
@@ -169,8 +171,8 @@ class EportfoliosController < ApplicationController
         respond_to do |format|
           if @attachment.zipped?
             if Attachment.s3_storage?
-              format.html { redirect_to @attachment.cacheable_s3_inline_url }
-              format.zip { redirect_to @attachment.cacheable_s3_inline_url }
+              format.html { redirect_to @attachment.inline_url }
+              format.zip { redirect_to @attachment.inline_url }
             else
               cancel_cache_buster
               format.html { send_file(@attachment.full_filename, :type => @attachment.content_type_with_encoding, :disposition => 'inline') }

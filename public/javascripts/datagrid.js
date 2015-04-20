@@ -21,7 +21,6 @@
 define([
   'INST' /* INST */,
   'jquery' /* $ */,
-  'ajax_errors' /* INST.log_error */,
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.keycodes' /* keycodes */,
   'jquery.scrollToVisible' /* scrollToVisible */,
@@ -144,61 +143,55 @@ define([
       }
       var idx = 0;
       var nextRow = function(finisher) {
-        try {
-          if(tick && $.isFunction(tick) && finisher) { tick(); }
-          if(idx < rows.length) {
-            var i = idx;
-            idx++;
-            handleRow.call(rows[i], i);
-            setTimeout(function() { 
-              nextRow(true) 
-            }, 1);
-          } else if(finisher && !nextRow.finished) {
-            nextRow.finished = true;
-            datagrid.initialized = true;
-            $table.hide();
-            if(datagrid.ready && $.isFunction(datagrid.ready)) {
-              datagrid.ready();
-            }
-            if(callback && $.isFunction(callback)) {
-              callback();
-            }
-            
-            // stupid hack to handle if you have zoomed in on the page in firefox.
-            if (INST.browser.ff) {
-              var $datagrid_top= $('#datagrid_top'),
-                  $topRow = $datagrid_top.find('.row'),
-                  $all_rows = $topRow.add('#datagrid_data .row');
-                  
-              function fixForDifferentZoomLevelInFirefox(){
-                var existingDatagridTopWidth = $datagrid_top.width();
-                
-                // make styles so the .row can be as wide as it needs to fit all the .cell's in it without wrapping
-                $datagrid_top.width(99999999);
-                $topRow.css({'position': 'relative', 'width' : ''});
-                var topWidth = $topRow.width() +1;
-                
-                //reset styles back to what they were was
-                $datagrid_top.width(existingDatagridTopWidth);
-                $topRow.css('position', ''); 
-                
-                $all_rows.width(topWidth); 
-              }
-              fixForDifferentZoomLevelInFirefox();
-              
-              // changing the zoom level in firefox will trigger the resize event on the window.
-              // so listen to it and re-run the fix when it is fired
-              var firefoxZoomHackTimout;
-              $(window).resize(function(){
-                clearTimeout(firefoxZoomHackTimout);
-                firefoxZoomHackTimout = setTimeout(fixForDifferentZoomLevelInFirefox, 100);
-              });
-            } //end of stupid firefox zoomlevel hack
+        if(tick && $.isFunction(tick) && finisher) { tick(); }
+        if(idx < rows.length) {
+          var i = idx;
+          idx++;
+          handleRow.call(rows[i], i);
+          setTimeout(function() { 
+            nextRow(true) 
+          }, 1);
+        } else if(finisher && !nextRow.finished) {
+          nextRow.finished = true;
+          datagrid.initialized = true;
+          $table.hide();
+          if(datagrid.ready && $.isFunction(datagrid.ready)) {
+            datagrid.ready();
           }
-        } catch(e) {
-          INST.log_error({
-            'message': e.toString()
-          });
+          if(callback && $.isFunction(callback)) {
+            callback();
+          }
+
+          // stupid hack to handle if you have zoomed in on the page in firefox.
+          if (INST.browser.ff) {
+            var $datagrid_top= $('#datagrid_top'),
+                $topRow = $datagrid_top.find('.row'),
+                $all_rows = $topRow.add('#datagrid_data .row');
+
+            function fixForDifferentZoomLevelInFirefox(){
+              var existingDatagridTopWidth = $datagrid_top.width();
+
+              // make styles so the .row can be as wide as it needs to fit all the .cell's in it without wrapping
+              $datagrid_top.width(99999999);
+              $topRow.css({'position': 'relative', 'width' : ''});
+              var topWidth = $topRow.width() +1;
+
+              //reset styles back to what they were was
+              $datagrid_top.width(existingDatagridTopWidth);
+              $topRow.css('position', ''); 
+
+              $all_rows.width(topWidth); 
+            }
+            fixForDifferentZoomLevelInFirefox();
+
+            // changing the zoom level in firefox will trigger the resize event on the window.
+            // so listen to it and re-run the fix when it is fired
+            var firefoxZoomHackTimout;
+            $(window).resize(function(){
+              clearTimeout(firefoxZoomHackTimout);
+              firefoxZoomHackTimout = setTimeout(fixForDifferentZoomLevelInFirefox, 100);
+            });
+          } //end of stupid firefox zoomlevel hack
         }
       };
       setTimeout(function() { nextRow(true); }, 5);

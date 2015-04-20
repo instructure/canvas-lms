@@ -38,20 +38,26 @@ function intro_message {
   echo "-----------------------------" >>"$LOG"
 }
 
+function update_plugin {
+  (
+    cd "$1"
+    if is_git_dir; then
+      echo_console_and_log "  Updating plugin $1 ..."
+      ( git checkout master >>"$LOG" 2>&1 && \
+        git pull --rebase >>"$LOG" 2>&1 ) || \
+      ( echo "  failed to pull plugin (see $LOG)"; kill -INT $$ )
+    fi
+  )
+}
+
 function update_plugins {
   # Loop through each plugin dir, and if it's a git repo, update it
   # This needs to be done first so that db:migrate can pull in any plugin-
   # precipitated changes to the database.
-  for PLUGIN in {gems,vendor}/plugins/*; do
-    (
-      cd "$PLUGIN"
-      if is_git_dir; then
-        echo_console_and_log "  Updating plugin $PLUGIN ..."
-        ( git checkout master >>"$LOG" 2>&1 && \
-          git pull --rebase >>"$LOG" 2>&1 ) || \
-        ( echo "  failed to pull plugin (see $LOG)"; kill -INT $$ )
-      fi
-    )
+  for dir in {gems,vendor}; do
+    if [ -d "$dir/plugins" ]; then
+      for plugin in $dir/plugins/*; do update_plugin "$plugin"; done
+    fi
   done
 }
 

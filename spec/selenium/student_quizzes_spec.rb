@@ -138,7 +138,7 @@ describe "quizzes" do
         expect_new_page_load { fill_in_login_form(@pseudonym.unique_id, @pseudonym.password) }
 
         # we should be back at the quiz show page
-        expect(driver.find_element(:link_text, 'Resume Quiz')).to be_present
+        expect(fln('Resume Quiz')).to be_present
       end
     end
   end

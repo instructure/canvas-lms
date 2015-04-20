@@ -23,11 +23,11 @@
                     <div class="ig-details">
                       {{#if assignment}}
                         <b>{{#t "due"}}Due{{/t}}</b><span class="screenreader-only">,</span>
-                        {{strftime originalStart "%l:%M%P"}}
+                        {{tTimeToString originalStart "tiny"}}
                       {{else}}
                         {{#unless all_day}}
                           <span class="screenreader-only">{{#t "starts_at"}}Starts at{{/t}},</span>
-                          {{strftime originalStart "%l:%M%P"}}
+                          {{tTimeToString originalStart "tiny"}}
                         {{/unless}}
                       {{/if}}
                     </div>

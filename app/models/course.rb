@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
 require 'csv'
 
 class Course < ActiveRecord::Base
@@ -193,7 +194,6 @@ class Course < ActiveRecord::Base
   has_many :external_feeds, :as => :context, :dependent => :destroy
   belongs_to :default_grading_standard, :class_name => 'GradingStandard', :foreign_key => 'grading_standard_id'
   has_many :grading_standards, :as => :context, :conditions => ['workflow_state != ?', 'deleted']
-  has_one :gradebook_upload, :as => :context, :dependent => :destroy
   has_many :web_conferences, :as => :context, :order => 'created_at DESC', :dependent => :destroy
   has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
   has_many :context_modules, :as => :context, :order => :position, :dependent => :destroy
@@ -1566,7 +1566,9 @@ class Course < ActiveRecord::Base
               "N/A"
             else
               submission = submissions[[student.id, a.id]]
-              submission.try(:score)
+              a.grading_type == "gpa_scale" && submission.try(:score) ?
+                a.score_to_grade(submission.score) :
+                submission.try(:score)
             end
           end
           #Last Row
@@ -2045,7 +2047,7 @@ class Course < ActiveRecord::Base
   def self.clonable_attributes
     [ :group_weighting_scheme, :grading_standard_id, :is_public, :public_syllabus,
       :allow_student_wiki_edits, :show_public_context_messages,
-      :syllabus_body, :allow_student_forum_attachments,
+      :syllabus_body, :allow_student_forum_attachments, :lock_all_announcements,
       :default_wiki_editing_roles, :allow_student_organized_groups,
       :default_view, :show_total_grade_as_points,
       :show_all_discussion_entries, :open_enrollment,
@@ -2380,7 +2382,7 @@ class Course < ActiveRecord::Base
         tabs.delete_if { |t| t[:id] == TAB_PEOPLE } unless self.grants_any_right?(user, opts[:session], :read_roster, :manage_students, :manage_admin_users)
         tabs.detect { |t| t[:id] == TAB_PEOPLE }[:manageable] = true if self.grants_any_right?(user, opts[:session], :manage_students, :manage_admin_users)
         tabs.delete_if { |t| t[:id] == TAB_FILES } unless self.grants_any_right?(user, opts[:session], :read, :manage_files)
-        tabs.detect { |t| t[:id] == TAB_FILES }[:manageable] = true if self.grants_right?(user, opts[:session], :managed_files)
+        tabs.detect { |t| t[:id] == TAB_FILES }[:manageable] = true if self.grants_right?(user, opts[:session], :manage_files)
         tabs.delete_if { |t| t[:id] == TAB_DISCUSSIONS } unless self.grants_any_right?(user, opts[:session], :read_forum, :moderate_forum, :post_to_forum)
         tabs.detect { |t| t[:id] == TAB_DISCUSSIONS }[:manageable] = true if self.grants_right?(user, opts[:session], :moderate_forum)
         tabs.delete_if { |t| t[:id] == TAB_SETTINGS } unless self.grants_right?(user, opts[:session], :read_as_admin)
@@ -2468,7 +2470,14 @@ class Course < ActiveRecord::Base
     end
     class_eval <<-CODE
       def #{setting}
-        if settings_frd[#{setting.inspect}].nil? && !@disable_setting_defaults
+        if Course.settings_options[#{setting.inspect}][:inherited]
+          inherited = self.account.send(#{setting.inspect})
+          if inherited[:locked] || settings_frd[#{setting.inspect}].nil?
+            inherited[:value]
+          else
+            settings_frd[#{setting.inspect}]
+          end
+        elsif settings_frd[#{setting.inspect}].nil? && !@disable_setting_defaults
           default = Course.settings_options[#{setting.inspect}][:default]
           default.respond_to?(:call) ? default.call(self) : default
         else
@@ -2501,8 +2510,8 @@ class Course < ActiveRecord::Base
   add_setting :course_format
   add_setting :is_public_to_auth_users, :boolean => true, :default => false
 
-  add_setting :restrict_student_future_view, :boolean => true, :default => lambda {|c| !!c.root_account.restrict_student_future_view?}
-  add_setting :restrict_student_past_view, :boolean => true
+  add_setting :restrict_student_future_view, :boolean => true, :inherited => true
+  add_setting :restrict_student_past_view, :boolean => true, :inherited => true
 
   def user_can_manage_own_discussion_posts?(user)
     return true if allow_student_discussion_editing?

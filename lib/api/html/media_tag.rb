@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'nokogiri'
+
 module Api
   module Html
     class MediaTag

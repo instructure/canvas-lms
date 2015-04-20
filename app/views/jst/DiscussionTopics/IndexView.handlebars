@@ -38,14 +38,14 @@
       </span>
 
       {{#if options.permissions.create}}
-        <a href="{{new_topic_url}}"
-           class="btn btn-primary icon-plus"
-           id="new-discussion-btn">
-          {{#t "new_discussion"}}
-            <span class="screenreader-only">Start a</span>
-            Discussion
-          {{/t}}
-        </a>
+        <a
+          href="{{new_topic_url}}"
+          class="btn btn-primary icon-plus"
+          id="new-discussion-btn"
+          role="button"
+          title='{{#t "title_start_a_discussion"}}Start a Discussion{{/t}}'
+          aria-label='{{#t "title_start_a_discussion"}}Start a Discussion{{/t}}'
+        >{{#t}}Discussion{{/t}}</a>
       {{/if}}
 
       <button

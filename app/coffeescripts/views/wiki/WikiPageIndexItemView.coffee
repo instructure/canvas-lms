@@ -64,10 +64,14 @@ define [
     settingsMenu: (ev) ->
       ev?.preventDefault()
 
-    editPage: (ev) ->
-      ev?.preventDefault()
+    editPage: (ev = {}) ->
+      ev.preventDefault()
+
+      $curCog = $(ev.target).parents('td').children().find('.al-trigger')
+
       editDialog = new WikiPageIndexEditDialog
         model: @model
+        returnFocusTo: $curCog
       editDialog.open()
 
       indexView = @indexView

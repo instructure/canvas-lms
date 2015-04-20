@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'sanitize'
+
 class Quizzes::QuizQuestion::RawFields
 
   class FieldTooLongError < RuntimeError; end

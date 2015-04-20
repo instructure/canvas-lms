@@ -511,6 +511,16 @@ define [
       for arg in args when arg
         return arg
 
+    # Public: returns icon for outcome mastery level
+    #
+    addMasteryIcon: (status, options={}) ->
+      iconType = {
+        'exceeds': 'check-plus'
+        'mastery': 'check'
+        'near': 'plus'
+      }[status] or 'x'
+      new Handlebars.SafeString "<i aria-hidden='true' class='icon-#{htmlEscape iconType}'></i>"
+
   }
 
   return Handlebars

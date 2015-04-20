@@ -3,12 +3,16 @@ define [
   'compiled/quizzes/log_auditing/constants'
   'jquery'
 ], (Subject, K, $) ->
-  module 'Quizzes::LogAuditing::EventTrackers::QuestionFlagged'
+  module 'Quizzes::LogAuditing::EventTrackers::QuestionFlagged',
+    setup: ->
+    teardown: ->
+      document.getElementById("fixtures").innerHTML = ""
+
   DEFAULTS = Subject.prototype.options
 
   createQuestion = (id) ->
     $question = $('<div />', { class: 'question', id: "question_#{id}" })
-      .appendTo(document.body)
+      .appendTo(document.getElementById("fixtures"))
 
     $('<a />', { class: 'flag_question' }).appendTo($question).on 'click', ->
       $question.toggleClass('marked')

@@ -52,6 +52,30 @@ def make_event(params = {})
   c
 end
 
+def create_quiz
+  due_at = 5.minute.from_now
+  unlock_at = Time.zone.now.advance(days:-2)
+  lock_at = Time.zone.now.advance(days:4)
+  @context = @course
+  @quiz = quiz_model
+  @quiz.generate_quiz_data
+  @quiz.due_at = due_at
+  @quiz.lock_at = lock_at
+  @quiz.unlock_at = unlock_at
+  @quiz.save!
+  @quiz
+end
+
+def create_graded_discussion
+  assignment = @course.assignments.create!(
+      :title => 'assignment',
+      :points_possible => 10,
+      :due_at => Time.now + 5.minute,
+      :submission_types => 'online_text_entry',
+      :only_visible_to_overrides => true)
+  @course.discussion_topics.create!(:title => 'Graded Discussion', :assignment => assignment)
+end
+
 def find_middle_day
   f('.calendar .fc-week:nth-child(1) .fc-wed')
 end

@@ -1,3 +1,5 @@
+require 'bigdecimal'
+
 module Qti
 class NumericInteraction < AssessmentItemConverter
   def initialize(opts={})
@@ -39,11 +41,13 @@ class NumericInteraction < AssessmentItemConverter
         exact_node = or_node.at_css('stringMatch baseValue')
         next unless exact_node
         answer[:numerical_answer_type] = 'exact_answer'
-        exact = exact_node.text.to_f rescue 0.0
-        answer[:exact] = exact
+        exact = exact_node.text rescue "0.0"
+        answer[:exact] = exact.to_f
         if upper = or_node.at_css('and customOperator[class=varlte] baseValue')
-          margin = upper.text.to_f - exact rescue 0.0
-          answer[:margin] = margin
+          # do margin computation with BigDecimal to avoid rounding errors
+          # (this is also used when _scoring_ numeric range questions)
+          margin = BigDecimal.new(upper.text) - BigDecimal.new(exact) rescue "0.0"
+          answer[:margin] = margin.to_f
         end
         @question[:answers] << answer
       elsif and_node = r_if.at_css('and')

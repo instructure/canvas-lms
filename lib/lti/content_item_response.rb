@@ -116,11 +116,28 @@ module Lti
       @content_type ||= @media_types.include?(:files) ? file.content_type : "application/vnd.instructure.api.content-exports.#{media_type}"
     end
 
-    def json_id
-      @json_id ||= @media_types.include?(:files) ? @controller.file_download_url(file, {:verifier => file.uuid, :download => '1', :download_frd => '1'}) : @controller.api_v1_course_content_exports_url(@context) + '?' + query_params.to_query
+    def url
+      @url ||= @media_types.include?(:files) ? @controller.file_download_url(file, {:verifier => file.uuid, :download => '1', :download_frd => '1'}) : @controller.api_v1_course_content_exports_url(@context) + '?' + query_params.to_query
     end
 
     def as_json(opts={})
+      case opts[:lti_message_type]
+        when 'ContentItemSelectionResponse'
+          content_item_selection_response_json
+        when 'ContentItemSelection'
+          content_item_selection_json
+        else
+          raise Lti::UnsupportedMessageTypeError
+      end
+    end
+
+
+    private
+
+    ##
+    # This message type is deprecated, please use content_item_selection_json
+    ##
+    def content_item_selection_response_json
       {
         "@context" => "http://purl.imsglobal.org/ctx/lti/v1/ContentItemPlacement",
         "@graph" => [
@@ -128,7 +145,7 @@ module Lti
             "@type" => "ContentItemPlacement",
             "placementOf" => {
               "@type" => "FileItem",
-              "@id" => json_id,
+              "@id" => url,
               "mediaType" => content_type,
               "title" => title
             }
@@ -136,12 +153,31 @@ module Lti
         ]
       }
     end
+
+    def content_item_selection_json
+      {
+        "@context" => "http://purl.imsglobal.org/ctx/lti/v1/ContentItem",
+        "@graph" => [
+          {
+            "@type" => "FileItem",
+            "url" => url,
+            "mediaType" => content_type,
+            "title" => title,
+            "copyAdvice" => true
+          }
+        ]
+      }
+    end
+
   end
 
   class UnauthorizedError < StandardError
   end
 
   class UnsupportedExportTypeError < StandardError
+  end
+
+  class UnsupportedMessageTypeError < StandardError
   end
 
 end

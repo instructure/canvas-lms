@@ -97,9 +97,12 @@ class DiscussionTopicsApiController < ApplicationController
   #     ]
   #   }
   def view
+    return unless authorized_action(@topic, @current_user, :read_replies)
+
     structure, participant_ids, entry_ids, new_entries = @topic.materialized_view(:include_new_entries => params[:include_new_entries] == '1')
 
     if structure
+      structure = resolve_placeholders(structure)
 
       # we assume that json_structure will typically be served to users requesting string IDs
       unless stringify_json_ids?
@@ -621,5 +624,5 @@ class DiscussionTopicsApiController < ApplicationController
     else
       render :json => result.try(:errors) || {}, :status => :bad_request
     end
-  end 
+  end
 end

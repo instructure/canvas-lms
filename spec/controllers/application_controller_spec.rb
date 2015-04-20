@@ -21,7 +21,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 describe ApplicationController do
 
   before :each do
-    controller.stubs(:request).returns(stub(:host_with_port => "www.example.com"))
+    controller.stubs(:request).returns(stub(:host_with_port => "www.example.com",
+                                            :host => "www.example.com",
+                                            :headers => {}))
   end
 
   describe "#twitter_connection" do
@@ -438,6 +440,8 @@ describe ApplicationController do
       acct.save!
       controller.instance_variable_set(:@domain_root_account, acct)
       req = mock()
+
+      req.stubs(:host).returns('www.example.com')
       req.stubs(:headers).returns({})
       controller.stubs(:request).returns(req)
       controller.send(:assign_localizer)
@@ -467,8 +471,10 @@ describe ApplicationController do
       end
 
       it 'should log error reports to the domain_root_accounts shard' do
-        ErrorReport.stubs(:log_exception).returns(ErrorReport.new)
-        ErrorReport.stubs(:useful_http_env_stuff_from_request).returns({})
+        report = ErrorReport.new
+        ErrorReport.stubs(:log_exception).returns(report)
+        ErrorReport.stubs(:find).returns(report)
+        Canvas::Errors::Info.stubs(:useful_http_env_stuff_from_request).returns({})
 
         req = mock()
         req.stubs(:url).returns('url')
@@ -482,7 +488,7 @@ describe ApplicationController do
 
         controller.instance_variable_set(:@domain_root_account, @account)
 
-        @shard2.expects(:activate).twice
+        @shard2.expects(:activate)
 
         controller.send(:rescue_action_in_public, Exception.new)
       end

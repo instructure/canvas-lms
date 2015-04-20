@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+
 class Account < ActiveRecord::Base
   include Context
   attr_accessible :name, :turnitin_account_id, :turnitin_shared_secret,
@@ -148,23 +150,7 @@ class Account < ActiveRecord::Base
     result
   end
 
-  cattr_accessor :account_settings_options
-  self.account_settings_options = {}
-
-  def self.add_setting(setting, opts=nil)
-    self.account_settings_options[setting.to_sym] = opts || {}
-    if (opts && opts[:boolean] && opts.has_key?(:default))
-      if opts[:default]
-        # if the default is true, we want a nil result to evaluate to true.
-        # this prevents us from having to backfill true values into a
-        # serialized column, which would be expensive.
-        self.class_eval "def #{setting}?; settings[:#{setting}] != false; end"
-      else
-        # if the default is not true, we can fall back to a straight boolean.
-        self.class_eval "def #{setting}?; !!settings[:#{setting}]; end"
-      end
-    end
-  end
+  include ::Account::Settings
 
   # these settings either are or could be easily added to
   # the account settings page
@@ -177,7 +163,10 @@ class Account < ActiveRecord::Base
   add_setting :custom_help_links, :root_only => true
   add_setting :prevent_course_renaming_by_teachers, :boolean => true, :root_only => true
   add_setting :login_handle_name, :root_only => true
-  add_setting :restrict_student_future_view, :boolean => true, :root_only => true, :default => false # NO LONGER VISIBLE - MOVED TO COURSE SETTING
+
+  add_setting :restrict_student_future_view, :boolean => true, :default => false, :inheritable => true
+  add_setting :restrict_student_past_view, :boolean => true, :default => false, :inheritable => true
+
   add_setting :teachers_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :students_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :restrict_quiz_questions, :boolean => true, :root_only => true, :default => false
@@ -234,18 +223,23 @@ class Account < ActiveRecord::Base
           opts = account_settings_options[key.to_sym]
           if (opts[:root_only] && !self.root_account?) || (opts[:condition] && !self.send("#{opts[:condition]}?".to_sym))
             settings.delete key.to_sym
-          elsif opts[:boolean]
-            settings[key.to_sym] = (val == true || val == 'true' || val == '1' || val == 'on')
           elsif opts[:hash]
             new_hash = {}
             if val.is_a?(Hash)
               val.each do |inner_key, inner_val|
-                if opts[:values].include?(inner_key.to_sym)
-                  new_hash[inner_key.to_sym] = inner_val.to_s
+                inner_key = inner_key.to_sym
+                if opts[:values].include?(inner_key)
+                  if opts[:inheritable] && (inner_key == :locked || (inner_key == :value && opts[:boolean]))
+                    new_hash[inner_key] = Canvas::Plugin.value_to_boolean(inner_val)
+                  else
+                    new_hash[inner_key] = inner_val.to_s
+                  end
                 end
               end
             end
             settings[key.to_sym] = new_hash.empty? ? nil : new_hash
+          elsif opts[:boolean]
+            settings[key.to_sym] = Canvas::Plugin.value_to_boolean(val)
           else
             settings[key.to_sym] = val.to_s
           end
@@ -1316,11 +1310,6 @@ class Account < ActiveRecord::Base
         :name => t("account_settings.google_docs_preview", "Google Docs Preview"),
         :description => "",
         :expose_to_ui => :service
-      },
-      :facebook => {
-        :name => t("account_settings.facebook", "Facebook"),
-        :description => "",
-        :expose_to_ui => (Facebook::Connection.config ? :service : false)
       },
       :skype => {
         :name => t("account_settings.skype", "Skype"),

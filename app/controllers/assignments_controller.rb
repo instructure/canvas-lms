@@ -70,7 +70,7 @@ class AssignmentsController < ApplicationController
       respond_to do |format|
         format.html do
           @padless = true
-          render :action => :new_index
+          render :new_index
         end
       end
     end
@@ -161,7 +161,7 @@ class AssignmentsController < ApplicationController
           tag_type = params[:module_item_id].present? ? :modules : :assignments
           format.html { content_tag_redirect(@context, @assignment.external_tool_tag, :context_url, tag_type) }
         else
-          format.html { render :action => 'show' }
+          format.html { render }
         end
         format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}) }
       end
@@ -175,12 +175,12 @@ class AssignmentsController < ApplicationController
       docs = {}
       begin
         docs = google_service_connection.list_with_extension_filter(assignment.allowed_extensions)
-      rescue GoogleDocs::NoTokenError
-        #do nothing
-      rescue ArgumentError
-        #do nothing
+      rescue GoogleDocs::NoTokenError => e
+        CanvasErrors.capture_exception(:oauth, e)
+      rescue ArgumentError => e
+        CanvasErrors.capture_exception(:oauth, e)
       rescue => e
-        ErrorReport.log_exception(:oauth, e)
+        CanvasErrors.capture_exception(:oauth, e)
         raise e
       end
       respond_to do |format|
@@ -341,7 +341,7 @@ class AssignmentsController < ApplicationController
           format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
           format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}), :status => :created}
         else
-          format.html { render :action => "new" }
+          format.html { render :new }
           format.json { render :json => @assignment.errors, :status => :bad_request }
         end
       end
@@ -383,6 +383,13 @@ class AssignmentsController < ApplicationController
         select { |c| !c.student_organized? }.
         map { |c| { :id => c.id, :name => c.name } }
 
+      # if assignment has student submissions and is attached to a deleted group category,
+      # add that category to the ENV list so it can be shown on the edit page.
+      if @assignment.group_category_deleted_with_submissions?
+        locked_category = @assignment.group_category
+        group_categories << { :id => locked_category.id, :name => locked_category.name }
+      end
+
       json_for_assignment_groups = assignment_groups.map do |group|
         assignment_group_json(group, @current_user, session, [], {stringify_json_ids: true})
       end
@@ -419,7 +426,7 @@ class AssignmentsController < ApplicationController
       append_sis_data(hash)
       js_env(hash)
       @padless = true
-      render :action => "edit"
+      render :edit
     end
   end
 
@@ -462,7 +469,7 @@ class AssignmentsController < ApplicationController
           format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment) }
           format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}, :include => [:quiz, :discussion_topic]), :status => :ok }
         else
-          format.html { render :action => "edit" }
+          format.html { render :edit }
           format.json { render :json => @assignment.errors, :status => :bad_request }
         end
       end

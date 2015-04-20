@@ -1,3 +1,5 @@
+require 'sanitize'
+
 module Quizzes::QuizQuestion::AnswerSerializers
   module Util
     MaxTextualAnswerLength = 16.kilobyte

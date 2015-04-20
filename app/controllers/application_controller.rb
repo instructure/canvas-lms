@@ -41,7 +41,11 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
   # load_user checks masquerading permissions, so this needs to be cleared first
   before_filter :clear_cached_contexts
-  before_filter :load_account, :load_user
+  prepend_before_filter :load_user, :load_account
+  # make sure authlogic is before load_user
+  skip_before_filter :activate_authlogic
+  prepend_before_filter :activate_authlogic
+
   before_filter ::Filters::AllowAppProfiling
   before_filter :check_pending_otp
   before_filter :set_user_id_header
@@ -49,6 +53,7 @@ class ApplicationController < ActionController::Base
   before_filter :set_page_view
   before_filter :require_reacceptance_of_terms
   before_filter :clear_policy_cache
+  before_filter :setup_live_events_context
   after_filter :log_page_view
   after_filter :discard_flash_if_xhr
   after_filter :cache_buster
@@ -59,6 +64,7 @@ class ApplicationController < ActionController::Base
   before_filter :init_body_classes
   after_filter :set_response_headers
   after_filter :update_enrollment_last_activity_at
+  after_filter :teardown_live_events_context
   include Tour
 
   add_crumb(proc {
@@ -165,7 +171,10 @@ class ApplicationController < ActionController::Base
   helper_method 'use_new_styles?'
 
   def multiple_grading_periods?
-    @domain_root_account && @domain_root_account.feature_enabled?(:multiple_grading_periods)
+    is_account_and_mgp_is_allowed = !!(@context &&
+                                       @context.is_a?(Account) &&
+                                       @context.feature_allowed?(:multiple_grading_periods))
+    (@context && @context.feature_enabled?(:multiple_grading_periods)) || is_account_and_mgp_is_allowed
   end
   helper_method 'multiple_grading_periods?'
 
@@ -390,7 +399,7 @@ class ApplicationController < ActionController::Base
         end
 
         @is_delegated = delegated_authentication_url?
-        render :template => "shared/unauthorized", :layout => "application", :status => :unauthorized
+        render "shared/unauthorized", status: :unauthorized
       }
       format.zip { redirect_to(url_for(params)) }
       format.json { render_json_unauthorized }
@@ -507,6 +516,10 @@ class ApplicationController < ActionController::Base
         set_badge_counts_for(@context, @current_user, @current_enrollment)
       end
     end
+
+    # There is lots of interesting information set up in here, that we want
+    # to place into the live events context.
+    setup_live_events_context
   end
 
   # This is used by a number of actions to retrieve a list of all contexts
@@ -741,8 +754,8 @@ class ApplicationController < ActionController::Base
       @current_user = @membership.user unless @problem
     else
       @context_type = pieces[0].classify
-      if Context::ContextTypes.const_defined?(@context_type)
-        @context_class = Context::ContextTypes.const_get(@context_type)
+      if Context::CONTEXT_TYPES.include?(@context_type.to_sym)
+        @context_class = Object.const_get(@context_type, false)
         @context = @context_class.where(uuid: pieces[1]).first if pieces[1]
       end
       if !@context
@@ -803,7 +816,7 @@ class ApplicationController < ActionController::Base
 
   def require_reacceptance_of_terms
     if session[:require_terms] && !api_request? && request.get?
-      render :template => "shared/terms_required", :layout => "application", :status => :unauthorized
+      render "shared/terms_required", status: :unauthorized
       false
     end
   end
@@ -922,7 +935,7 @@ class ApplicationController < ActionController::Base
       logger.fatal("#{message}\n\n")
     end
 
-    if config.consider_all_requests_local || local_request?
+    if config.consider_all_requests_local
       rescue_action_locally(exception)
     else
       rescue_action_in_public(exception)
@@ -961,23 +974,11 @@ class ApplicationController < ActionController::Base
       type = '404' if status == '404 Not Found'
 
       unless exception.respond_to?(:skip_error_report?) && exception.skip_error_report?
-        error_info = {
-          :url => request.url,
-          :user => @current_user,
-          :user_agent => request.headers['User-Agent'],
-          :request_context_id => RequestContextGenerator.request_id,
-          :account => @domain_root_account,
-          :request_method => request.request_method_symbol,
-          :format => request.format,
-        }.merge(ErrorReport.useful_http_env_stuff_from_request(request))
-
-        error = if @domain_root_account
-          @domain_root_account.shard.activate do
-            ErrorReport.log_exception(type, exception, error_info)
-          end
-        else
-          ErrorReport.log_exception(type, exception, error_info)
-        end
+        opts = {type: type}
+        info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts)
+        error_info = info.to_h
+        capture_outputs = Canvas::Errors.capture(exception, error_info)
+        error = ErrorReport.find(capture_outputs[:error_report])
       end
 
       if api_request?
@@ -987,8 +988,8 @@ class ApplicationController < ActionController::Base
       end
     rescue => e
       # error generating the error page? failsafe.
+      Canvas::Errors.capture(e)
       render_optional_error_file response_code_for_rescue(exception)
-      ErrorReport.log_exception(:default, e)
     end
   end
 
@@ -1014,22 +1015,21 @@ class ApplicationController < ActionController::Base
       request.format = :html
       template = exception.error_template if exception.respond_to?(:error_template)
       unless template
-        erbfile = "#{status.to_s[0,3]}_message.html.erb"
-        erbpath = File.join('app', 'views', 'shared', 'errors', erbfile)
-        erbfile = "500_message.html.erb" unless File.exists?(erbpath)
-        template = "shared/errors/#{erbfile}"
+        template = "shared/errors/#{status.to_s[0,3]}_message"
+        erbpath = Rails.root.join('app', 'views', "#{template}.html.erb")
+        template = "shared/errors/500_message" unless erbpath.file?
       end
 
       @status_code = status_code
       message = exception.is_a?(RequestError) ? exception.message : nil
-      render :template => template,
-        :layout => 'application',
-        :status => status,
-        :locals => {
-          :error => error,
-          :exception => exception,
-          :status => status,
-          :message => message,
+      render template: template,
+        layout: 'application',
+        status: status,
+        locals: {
+          error: error,
+          exception: exception,
+          status: status,
+          message: message,
         }
     end
   end
@@ -1084,10 +1084,6 @@ class ApplicationController < ActionController::Base
     else
       super
     end
-  end
-
-  def local_request?
-    false
   end
 
   def claim_session_course(course, user, state=nil)
@@ -1150,7 +1146,6 @@ class ApplicationController < ActionController::Base
   # the page title.
   def get_wiki_page
     @wiki = @context.wiki
-    @wiki.check_has_front_page
 
     @page_name = params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title])
     if(params[:format] && !['json', 'html'].include?(params[:format]))
@@ -1192,7 +1187,7 @@ class ApplicationController < ActionController::Base
       @module = tag.context_module
       log_asset_access(@tag, "external_urls", "external_urls")
       tag.context_module_action(@current_user, :read) unless tag.locked_for? @current_user
-      render :template => 'context_modules/url_show'
+      render 'context_modules/url_show'
     elsif tag.content_type == 'ContextExternalTool'
       @tag = tag
       if @tag.context.is_a?(Assignment)
@@ -1390,8 +1385,6 @@ class ApplicationController < ActionController::Base
         Canvas::Plugin.find(:yo).try(:enabled?)
       elsif feature == :twitter
         !!Twitter::Connection.config
-      elsif feature == :facebook
-        !!Facebook::Connection.config
       elsif feature == :linked_in
         !!LinkedIn::Connection.config
       elsif feature == :diigo
@@ -1475,7 +1468,7 @@ class ApplicationController < ActionController::Base
     return false if require_user == false
     unless @current_user.registered?
       respond_to do |format|
-        format.html { render :template => "shared/registration_incomplete", :layout => "application", :status => :unauthorized }
+        format.html { render "shared/registration_incomplete", status: :unauthorized }
         format.json { render :json => { 'status' => 'unauthorized', 'message' => t('#errors.registration_incomplete', 'You need to confirm your email address before you can view this page') }, :status => :unauthorized }
       end
       return false
@@ -1498,8 +1491,9 @@ class ApplicationController < ActionController::Base
   end
   helper_method :page_views_enabled?
 
-  def verified_file_download_url(attachment, context = nil, *opts)
-    verifier = Attachments::Verification.new(attachment).verifier_for_user(@current_user, context.try(:asset_string))
+  def verified_file_download_url(attachment, context = nil, permission_map_id = nil, *opts)
+    verifier = Attachments::Verification.new(attachment).verifier_for_user(@current_user,
+        context: context.try(:asset_string), permission_map_id: permission_map_id)
     file_download_url(attachment, { :verifier => verifier }, *opts)
   end
   helper_method :verified_file_download_url
@@ -1578,7 +1572,7 @@ class ApplicationController < ActionController::Base
 
   def render(options = nil, extra_options = {}, &block)
     set_layout_options
-    if options && options.key?(:json)
+    if options.is_a?(Hash) && options.key?(:json)
       json = options.delete(:json)
       unless json.is_a?(String)
         json_cast(json)
@@ -1884,5 +1878,37 @@ class ApplicationController < ActionController::Base
     nil
   end
   helper_method :request_delete_account_link
-end
 
+  def setup_live_events_context
+    ctx = {}
+    ctx[:root_account_id] = @domain_root_account.global_id if @domain_root_account
+    ctx[:user_id] = @current_user.global_id if @current_user
+    ctx[:real_user_id] = @real_current_user.global_id if @real_current_user
+    ctx[:user_login] = @current_pseudonym.unique_id if @current_pseudonym
+    ctx[:hostname] = request.host
+    ctx[:user_agent] = request.headers['User-Agent']
+    ctx[:context_type] = @context.class.to_s if @context
+    ctx[:context_id] = @context.global_id if @context
+    if @context_membership
+      ctx[:context_role] =
+        if @context_membership.respond_to?(:role)
+          @context_membership.role.name
+        elsif @context_membership.respond_to?(:type)
+          @context_membership.type
+        else
+          @context_membership.class.to_s
+        end
+    end
+
+    if tctx = Thread.current[:context]
+      ctx[:request_id] = tctx[:request_id]
+      ctx[:session_id] = tctx[:session_id]
+    end
+
+    LiveEvents.set_context(ctx)
+  end
+
+  def teardown_live_events_context
+    LiveEvents.clear_context!
+  end
+end

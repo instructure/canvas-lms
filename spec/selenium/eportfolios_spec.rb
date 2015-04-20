@@ -43,8 +43,9 @@ describe "eportfolios" do
       get "/eportfolios/#{@eportfolio.id}"
       f('.manage_pages_link').click
       f('.add_page_link').click
+      wait_for_ajaximations
       replace_content(f('#page_name'), page_title)
-      f('#content').click
+      driver.action.send_keys(:return).perform
       wait_for_ajaximations
       fj('.done_editing_button:visible').click
       wait_for_ajaximations
@@ -77,6 +78,27 @@ describe "eportfolios" do
       wait_for_ajax_requests
       @eportfolio.reload
       expect(@eportfolio.name).to eq "new ePortfolio name"
+    end
+
+    it "should validate time stamp on ePortfolio", priority: 2 do
+      # Freezes time to 2 days from today.
+      old_time = Timecop.freeze(Date.today + 2).utc
+      current_time = old_time.strftime('%b %-d at %-l') << old_time.strftime('%p').downcase
+      # Saves an entry to initiate an update.
+      @eportfolio_entry.save!
+      # Checks for correct time.
+      get "/dashboard/eportfolios"
+      expect(f(".updated_at")).to include_text(current_time)
+
+      # Freezes time to 3 days from previous date.
+      new_time = Timecop.freeze(Date.today + 3).utc
+      current_time = new_time.strftime('%b %-d at %-l') << new_time.strftime('%p').downcase
+      # Saves to initiate an update.
+      @eportfolio_entry.save!
+      # Checks for correct time, then unfreezes time.
+      get "/dashboard/eportfolios"
+      expect(f(".updated_at")).to include_text(current_time)
+      Timecop.return
     end
 
     it "should have a working flickr search dialog" do

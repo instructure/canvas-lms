@@ -1,42 +1,95 @@
 @import "base/environment";
-@import "vendor/slick.grid";
 
-#gradebook_importer_resolution_section {
-  margin: 1em 2em;
-  table {
-    border-collapse: collapse;
-    width: 100%;
-    td, th {
-      border: 1px solid #EEEEEE;
-      padding: 0.2em 20px;
+#gradebook_uploader_container {
+  overflow: scroll;
+
+  #gradebook_grid_header {
+    .slick-header-column {
+      background-image: none !important;
+    }
+
+    .slick-header-column:not(:first-of-type) {
+      border-top: 1px solid $ic-color-neutral;
     }
   }
-  select {
-    text-align: center;
-    option {
-      text-align: left;
+
+  #gradebook_grid {
+    input.editor-text {
+      border: none;
+      font-size: 14px;
+      width: 100%;
+      padding: 0;
+      outline: default;
+      margin: 0;
+      height:28px;
+      background: none;
+      box-shadow: none !important;
     }
-    .new {
-      color: green;
+    .slick-header-column {
+      background-color: lighten($ic-brand-secondary, 51);
+      background-image: none !important;
+      border-top: 1px solid $ic-color-neutral;
+      border-bottom: 1px solid $ic-color-neutral;
     }
-    .ignore {
-      color: red;
+
+    .slick-column-name {
+      font-weight: bold;
+    }
+
+    .slick-header-column:nth-child(even) {
+      border-right-style:dashed;
+    }
+
+    .slick-cell {
+      line-height: 25px;
+      padding-left: 5px;
     }
   }
-  .points_possible_section {
-    opacity: 0;
+
+  .slick-header {
+    background-image:none;
+    border:none;
   }
-  input.points_possible {
-    width: 50px;
+
+  .slick-row.even {
+    background-color: lighten($ic-color-neutral, 5);
+  }
+
+  .slick-cell {
+    border-right-style:dashed;
+  }
+
+  .slick-cell.editable, .slick-cell.active {
+    box-shadow: 0 0 5px lighten($ic-brand-primary, 10);
+    border: 1px solid $ic-brand-primary;
+  }
+
+  .slick-cell:nth-child(odd) {
+    border-right-style:solid;
+  }
+
+  .slick-header-column {
+    height: 24px;
+    padding: 8px 4px 0px 4px;
+  }
+
+  .left-highlight {
+    background-color: lighten($ic-color-danger, 50);
+    border-left-color: $ic-color-danger;
+    border-top-color: $ic-color-danger;
+    border-bottom-color: $ic-color-danger;
+    color:$ic-color-danger;
+    font-weight: bold;
+  }
+
+  .right-highlight {
+    background-color: lighten($ic-color-danger, 50);
+    border-right-style: solid;
+    border-right-color: $ic-color-danger;
+    border-top-color: $ic-color-danger;
+    border-bottom-color: $ic-color-danger;
+    color:$ic-color-danger;
+    font-weight: bold;
   }
 }
 
-.cell-title {
-  font-weight: bold;
-}
-
-#assignments_without_changes_alert {
-  color: orange;
-  font-size: 0.8em;
-  margin-left: 100px;
-}

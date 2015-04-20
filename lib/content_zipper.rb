@@ -48,15 +48,13 @@ class ContentZipper
 
     begin
       case attachment.context
-      when Assignment; zip_assignment(attachment, attachment.context)
-      when Eportfolio; zip_eportfolio(attachment, attachment.context)
-      when Folder; zip_base_folder(attachment, attachment.context)
-      when Quizzes::Quiz; zip_quiz(attachment, attachment.context)
+      when Assignment then zip_assignment(attachment, attachment.context)
+      when Eportfolio then zip_eportfolio(attachment, attachment.context)
+      when Folder then zip_base_folder(attachment, attachment.context)
+      when Quizzes::Quiz then zip_quiz(attachment, attachment.context)
       end
     rescue => e
-      ErrorReport.log_exception(:default, e, {
-        :message => "Content zipping failed",
-      })
+      Canvas::Errors.capture(e, message: "Content zipping failed")
       @logger.debug(e.to_s)
       @logger.debug(e.backtrace.join('\n'))
       attachment.update_attribute(:workflow_state, 'to_be_zipped')
@@ -222,7 +220,11 @@ class ContentZipper
   end
 
   def zip_base_folder(zip_attachment, folder)
-    @files_added = true
+    # this file count is admittedly an upper bound; not all files may be selected, and I don't want to count the ones
+    # that are, but this will provide visible progress on large jobs, where it's most needed
+    @zip_attachment = zip_attachment
+    @file_count = folder.context.attachments.not_deleted.count
+    @files_added = nil
     @logger.debug("zipping into attachment: #{zip_attachment.id}")
     zip_attachment.workflow_state = 'zipping' #!(:workflow_state => 'zipping')
     zip_attachment.save!
@@ -233,7 +235,7 @@ class ContentZipper
         @logger.debug("zip_name: #{zip_name}")
         process_folder(folder, zipfile)
       end
-      mark_successful! if @files_added
+      mark_successful! unless @files_added == false
       complete_attachment!(zip_attachment, zip_name)
     end
   end
@@ -278,7 +280,13 @@ class ContentZipper
       @context = folder.context
       @logger.debug("  found attachment: #{attachment.unencoded_filename}")
       path = folder_names.empty? ? attachment.display_name : File.join(folder_names, attachment.display_name)
-      @files_added = false unless add_attachment_to_zip(attachment, zipfile, path)
+      if add_attachment_to_zip(attachment, zipfile, path)
+        @files_added ||= 0
+        @files_added += 1
+        update_progress(@zip_attachment, @files_added, @file_count) if @zip_attachment
+      else
+        @files_added = false if @files_added.nil?
+      end
     end
     folder.active_sub_folders.select{|f| !@check_user || f.grants_right?(@user, :read_contents)}.each do |sub_folder|
       new_names = Array.new(folder_names) << sub_folder.name
@@ -333,7 +341,9 @@ class ContentZipper
   end
 
   def update_progress(zip_attachment, idx, count)
+    return unless count && count > 0
     zip_attachment.file_state = ((idx + 1).to_f / count.to_f * 100).to_i
+    return unless zip_attachment.file_state_changed?
     zip_attachment.save!
     @logger.debug("status for #{zip_attachment.id} updated to #{zip_attachment.file_state}")
   end

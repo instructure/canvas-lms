@@ -1,6 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/collaborations_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/collaborations_specs_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/google_drive_common')
 
 describe "collaborations" do
   include_examples "in-process server selenium tests"
@@ -10,7 +11,7 @@ describe "collaborations" do
       context "#{title} collaboration" do
         before(:each) do
           course_with_student_logged_in
-          set_up_google_docs(type)
+          set_up_google_docs
         end
 
         # The if statements before each spec are to set the test id based on what tye of collaboration we are doing

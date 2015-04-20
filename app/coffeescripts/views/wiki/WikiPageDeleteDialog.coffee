@@ -55,12 +55,17 @@ define [
       super
 
       form = @
+
+      # Add a close event for focus handling
+      form.$el.on('dialogclose', (event, ui) =>
+        @focusOnCancel?.focus()
+      )
+
       buttons = [
         class: 'btn'
         text: I18n.t 'cancel_button', 'Cancel'
         click: =>
           form.$el.dialog 'close'
-          $(@focusOnCancel).focus() if @focusOnCancel
       ,
         class: 'btn btn-danger'
         text: I18n.t 'delete_button', 'Delete'

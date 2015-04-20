@@ -30,7 +30,7 @@ define [
         "description": null,
         "enabled": false,
         "installed_locally": true,
-        "name": "Facebook"
+        "name": "Twitter"
       }
       handleActivateLti2: ->
       handleDeactivateLti2: ->

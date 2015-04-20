@@ -246,7 +246,7 @@ describe "Module Items API", type: :request do
           "position" => 2,
           "title" => @attachment_tag.title,
           "indent" => 0,
-          "url" => "http://www.example.com/api/v1/files/#{@attachment.id}",
+          "url" => "http://www.example.com/api/v1/courses/#{@course.id}/files/#{@attachment.id}",
           "published" => false,
           "module_id" => @module2.id
       })
