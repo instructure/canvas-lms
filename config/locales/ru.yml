@@ -2788,11 +2788,15 @@ ru:
         invalid_url: "Неверный URL"
         login_expiration_minimum: "Длительность сессии должна быть не менее 20 минут"
         need_integer: "Введите целое число для кэша списка воспроизведения"
+        stream_name_required: "Требуется имя потока активности."
   canvas_cartridge_description: "Это позволяет преобразовать экспорт canvas в промежуточный формат json для импорта"
   canvas_cartridge_display: "Общий картридж Canvas"
   canvas_cartridge_file_description: "Пакет экспорта курса Canvas"
   canvas_cartridge_name: "Импортер Canvas Cartridge"
+  canvas_error_report_ff678539: "Отчет об ошибках Canvas"
   canvas_revision_unknown: Неизвестно
+  canvas_ticketing_email_connector_27e253ae: "Коннектор для электронной почты, генерирующий формы Canvas"
+  canvas_ticketing_web_post_connector_11158897: "Коннектор для веб-публикаций, генерирующий формы Canvas"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas повторно оценит все отправки после того, как вы сохраните контрольную работу. Это может занять несколько минут."
   cc: 
     by: "Принадлежность CC"
@@ -2812,7 +2816,10 @@ ru:
   choose_a_csv_file_to_upload_9644480c: "Выберите CSV-файл для отправки:"
   choose_usage_rights_33683854: "Выбрать права на использование..."
   clear_file_name_text_field_fce73840: "Очистите текстовое поле имени файла"
+  click_for_more_details_on_this_outcome_8c018d2f: "нажмите для более подробной информации по этому результату"
   click_here_on_the_calendar_link_c9965631: "Щелкните здесь по ссылке *Календарь*"
+  click_to_modify_89fa26aa: "Нажмите, чтобы изменить"
+  click_to_report_profile_picture_370f9625: "Нажмите, чтобы сообщить о фотографии профиля"
   close_and_return_to_canvas_80544344: "Закрыть и вернуться в Canvas"
   close_d634289d: Закрыть
   collaboration: 
@@ -2917,6 +2924,7 @@ ru:
     titles: 
       delete: "Удалить совместную работу?"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Свернуть список участников группы для %{groupName}"
+  collapse_subdiscussion_89af1f5c: "Свернуть под-обсуждение"
   coming_up_4348b0bd: Готовится
   comm_messages: 
     from_beginning: начало
@@ -3381,6 +3389,7 @@ ru:
         user_services: "Зарегистрированные веб-сервисы"
       help: 
         list_services: "Список зарегистрированных служб не включен. Разрешение этого списка упростит связь других членов курса и группы с вами вне класса."
+        services: "Вы не связали свой профиль c какими-либо внешними сервисами. Вы можете связать свой аккаунт на Canvas с такими сервисами, как Twitter. Это облегчит вашим коллегам по курсам и группе возможность связаться с вами за пределами класса."
       labels: 
         public_list_services: "Разрешить членам курса/группы видеть, какие сервисы связаны с моим профилем"
         user_privileges: Полномочия
@@ -3419,6 +3428,7 @@ ru:
         registered_services: "Зарегистрированные сервисы"
         service_types: "Типы служб"
       help: 
+        no_services: "Вы не связали свой профиль c какими-либо внешними сервисами. Вы можете связать свой аккаунт на Canvas с такими сервисами, как Twitter."
         services_private: "Список зарегистрированных сервисов не подключен. Подключение этого списка позволит членам курса и группы просматривать сервисы, связанные с вашей учетной записью в Canvas."
         user_services: "Другие члены могут просматривать внешние услуги, связанные с учетной записью Canvas. Это может упростить координацию групповых проектов и связь вне занятий."
       labels: 
@@ -3468,6 +3478,7 @@ ru:
     invalid_content: "Не удалось найти содержимое"
     invalid_position: "Неверная позиция"
     invalid_requirement_type: "Неподходящий для завершения тип"
+  context_module_sub_header_2f39e87b: "Подзаголовок контекстного модуля"
   context_modules: 
     buttons: 
       add: "Добавить модуль"
@@ -5315,6 +5326,7 @@ ru:
       add_reply_to_topic: "Добавить ответ к теме"
     entry_content: 
       authors_name: "Имя автора"
+      collapsible_subdiscussion: "Свернуть под-обсуждение"
       delete: Удалить
       edit: Редактировать
       edited_comment: "Отредактировано *%{editor.display_name}* %{edited_at}"
