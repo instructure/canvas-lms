@@ -227,7 +227,7 @@ class ApplicationController < ActionController::Base
   def assign_localizer
     I18n.localizer = lambda {
       infer_locale :context => @context,
-                   :user => @current_user,
+                   :user => logged_in_user,
                    :root_account => @domain_root_account,
                    :session_locale => session[:locale],
                    :accept_language => request.headers['Accept-Language']
@@ -265,10 +265,11 @@ class ApplicationController < ActionController::Base
 
   # scopes all time objects to the user's specified time zone
   def set_time_zone
-    if @current_user && !@current_user.time_zone.blank?
-      Time.zone = @current_user.time_zone
-      if Time.zone && Time.zone.name == "UTC" && @current_user.time_zone && @current_user.time_zone.name.match(/\s/)
-        Time.zone = @current_user.time_zone.name.split(/\s/)[1..-1].join(" ") rescue nil
+    user = logged_in_user
+    if user && !user.time_zone.blank?
+      Time.zone = user.time_zone
+      if Time.zone && Time.zone.name == "UTC" && user.time_zone && user.time_zone.name.match(/\s/)
+        Time.zone = user.time_zone.name.split(/\s/)[1..-1].join(" ") rescue nil
       end
     else
       Time.zone = @domain_root_account && @domain_root_account.default_time_zone
