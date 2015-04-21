@@ -337,7 +337,8 @@ define([
           maxUploads: 1,
           partnerData: $.mediaComment.partnerData(),
           partner_data: $.mediaComment.partnerData(),
-          entryName:temporaryName
+          entryName:temporaryName,
+          soundcodec: 'Speex'
         };
 
         var params = {
