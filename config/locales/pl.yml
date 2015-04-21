@@ -3,7 +3,7 @@
 --- 
 pl: 
   1_item_scores_1_2_2_3_5_5_3_39f6c397: "1 - wyniki pozycji: 1, 2, 2, 3, 5, 5, 3"
-  1_item_scores_1_3_2_4_5_3_6_mastery_score_set_at_5_70ff296a: "1- Wyniki pozycji: 1, 3, 2, 4, 5, 3, 6. Mistrzowski wynik ustalony na 5."
+  1_item_scores_1_3_2_4_5_3_6_mastery_score_set_at_5_70ff296a: "1- Wyniki pozycji: 1, 3, 2, 4, 5, 3, 6. Wynik poziomu biegłośći ustalony na 5."
   1_item_scores_3_2_2_4_1_3_4_e0de3073: "1 - Wyniki pozycji: 3, 2, 2, 4, 1, 3, 4"
   1_item_scores_4_3_2_5_3e2933a0: "1 - Wyniki pozycji: 4, 3, 2, 5"
   1_item_scores_5512cd03: "1- Wyniki punktowe elementów"
@@ -12,7 +12,7 @@ pl:
   2_highest_score_4_3b4bc250: "2 - Najwyższy wynik: 4"
   2_most_recent_score_3_766dbf4e: "2 - Ostatni wynik: 3"
   2_the_rest_item_average_4_3_2_3_3_d05f04e2: "2 - 'Reszta' średnia pozycji: (4 + 3 + 2) / 3 = 3"
-  3_calculated_mastery_score_5_0_75_3_0_25_4_5_c88c3a7b: "3 - Obliczony wynik mistrzowski: 5(0.75) + 3(0.25) = 4.5"
+  3_calculated_mastery_score_5_0_75_3_0_25_4_5_c88c3a7b: "3 - Obliczony wynik biegłości: 5(0.75) + 3(0.25) = 4.5"
   451_message: 
     description: "Nie masz prawa dostępu do niniejszej strony, ponieważ przebywasz w kraju podlegającym ograniczeniom handlowym Stanów Zjednoczonych."
     headings: 
@@ -4770,7 +4770,7 @@ pl:
         count: "Nieprawidłowa liczba studentów"
         ratio: "Nieprawidłowy stosunek studentów"
   current_3ce5414a: Bieżący
-  current_mastery_score_score_out_of_mastery_points_fedd343f: "Obecny Wynik Mistrzowski: %{score} out of %{mastery_points}"
+  current_mastery_score_score_out_of_mastery_points_fedd343f: "Obecny wynik poziomu biegłości: %{score} out of %{mastery_points}"
   current_score_6c81792: "Bieżący wynik punktowy"
   current_total_67bf5f72: "Bieżąca łączna liczba:"
   curve_grades_dialog: 
@@ -5170,7 +5170,7 @@ pl:
         published: Opublikowane
       delay_posting: "Opóźnij ogłaszanie"
       enable_podcast_feed: "Uaktywnij kanał informacyjny"
-      include_replies_in_podcast_feed: "Włącz odpowiedzi uczniów do źródła pokastów"
+      include_replies_in_podcast_feed: "Włącz odpowiedzi uczniów do źródła podkastów"
       only_visible_to_overrides_note: "Uwaga: ta dyskusja widoczna jest *jedynie* dla sekcji określonych poniżej:"
       options: Opcje
       page_header_title: "Nowa dyskusja"
@@ -5883,7 +5883,7 @@ pl:
   example_https_example_com_config_xml_be5f36ac: "Przykład: https://example.com/config.xml"
   example_https_lti_tool_provider_example_herokuapp__e9802142: "Przykład: https://lti-tool-provider-example.herokuapp.com/register"
   example_item_scores_6726c689: "Przykładowe wyniki punktowe elementów"
-  exceeds_mastery_1f995dce: "Przekracza mistrzowski"
+  exceeds_mastery_1f995dce: "Przekracza poziom biegłości"
   expand_collapse_title_outcome_group_239f0a9d: "rozwiń/zwiń grupę wyników %{title} "
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Rozwiń listę członków grupy dla %{groupName}"
   expand_or_collapse_calendars_9854b0d0: "Rozwiń lub zwiń kalendarze"
@@ -7584,7 +7584,7 @@ pl:
   labels: 
     lock_module_until: "Zablokuj moduł do określonej daty"
   last_item_79583712: "Ostatnia pozycja:"
-  last_item_is_75_of_mastery_average_of_the_rest_is__614d41f4: "Ostatnia pozycja to 75% mistrzostwa. Średnia \"pozostałe\" to 25% mistrzostwa."
+  last_item_is_75_of_mastery_average_of_the_rest_is__614d41f4: "Ostatnia pozycja to 75% biegłośći. Średnia \"reszty\" to 25% biegłości."
   last_user_access_title: "Ostatni dostęp użytkownika"
   late_percent_b91d01b3: "Po czasie: %{percent}"
   latest_assessment_a85280ef: "Najnowsza ocena"
@@ -7787,7 +7787,7 @@ pl:
   manage_group_group_name_ac8578c6: "Zarządzaj grupą %{group_name}"
   manage_usage_rights_c5a8c216: "Zarządzaj prawami użytkowania"
   manual_entry_e4a4f99a: "Wpis ręczny"
-  mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Wynik mistrzowski odzwierciedla najwyższy wynik ocenianego przydziału lub testu."
+  mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Wynik poziomu biegłości odzwierciedla najwyższy wynik ocenianego przydziału lub testu."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Wynik punktowy biegłości odzwierciedla najnowsze ocenione zadanie lub test."
   mathquill: 
     tabs: 
@@ -7837,7 +7837,7 @@ pl:
     uploading: "Trwa przekazywanie..."
   media_recordings_749aef6d: "Nagrania multimedialne"
   median_score_4657e907: "Mediana: %{score}"
-  meets_mastery_754e1c06: "Spełnia mistrzostwo"
+  meets_mastery_754e1c06: "Spełnia poziom biegłości"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} członków z maksymalnie %{max_membership}"
   members_af25c21d: Członkowie/uczestnicy
   membership_by_invitation_only_9bc27199: "Przynależność tylko na zaproszenie"
@@ -9757,7 +9757,7 @@ pl:
   name_has_been_successfully_installed_but_has_not_y_c3148b96: "Pomyślnie zainstalowano, ale jeszcze nie włączono *name*."
   name_is_currently_status_9065c996: "*name* jest obecnie **status**."
   name_only_5f56718e: "Tylko nazwa"
-  near_mastery_f25174a4: "Blisko mistrzostwa"
+  near_mastery_f25174a4: "Blisko biegłości"
   new_account_role_6e5c4964: "Nowa rola konta"
   new_course_role_6a7bb75f: "Nowa rola kursu"
   new_file_135ae520: "[ Nowy plik ]"
@@ -14385,6 +14385,7 @@ pl:
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Najprawdopodobniej doszło do tego, ponieważ zaimportowano zawartość kursu bez skojarzonych plików."
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Ten wynik został wykorzystany do oceny ucznia i nie może być zmieniony ani usunięty"
   this_outcome_has_been_used_to_assess_a_student_the_1f04402e: "Wynik ten został użyty do ocenienia ucznia. Metoda obliczenia jest stała."
+  this_outcome_has_been_used_to_assess_a_student_the_1ff3a596: "Ten wynik został wykorzystany do ocenienia ucznia. Wartość obliczenia jest stała."
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Ten test jest nieopublikowany* Tylko instruktorzy będą widzieć ten kurs zanim zostanie opublikowany"
   this_student_wrote_f1a3f22d: "Ten uczestnik napisał:"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Umożliwi to uwierzytelnienie systemu Canvas w celu zamieszczania ocen w systemie SIS"
@@ -14600,6 +14601,7 @@ pl:
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Aby połączyć obserwatora kursu *%{name}* do ucznia, wpisz imię ucznia poniżej aby go znaleźć, następnie kliknij Aktualizuj."
   to_minscore_43e5452e: "do %{minScore}%"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "Aby wyświetlić zadania, upewnij się, że aktywny jest widok *Harmonogram*."
+  tolerance_value_9e96573c: "Wartość tolerancji"
   too_many_members_b8b15069: "Zbyt duża liczba członków"
   tooltips: 
     finished: ukończono
@@ -14628,10 +14630,13 @@ pl:
     buttons: 
       resubmit_to_turnitin: "Wyślij ponownie do programu Turnitin"
   unable_to_remove_app_4293cb53: "Nie można usunąć aplikacji"
+  unarchive_selected_e0c4bd3d: "Wybrano zdezarchywizowanie"
+  unchanged_aca18e02: "[Bez zmian]"
   ungraded_submissions_44efb0ec: "Przesłane zadania bez oceny"
   ungraded_survey_ad7de790: "Ankieta bez oceny"
   unknown: Nieznany
   unknown_47a3b725: Nieznany
+  unknown_content_type_ae6d08e8: "Nieznany rodzaj treści"
   unknown_question_bank: "Nieznany bank pytań"
   unknown_quiz: "Nieznany test"
   unlock_date_cannot_be_after_due_date_8829d9ca: "Data odblokowania nie może przypadać po terminie dostarczenia"
@@ -14639,6 +14644,7 @@ pl:
   unlock_date_cannot_be_before_course_start_9c7b8524: "Data odblokowania nie może przypadać przed rozpoczęciem kursu"
   unlock_date_cannot_be_before_section_start_793ddc66: "Data odblokowania nie może przypadać przed rozpoczęciem sekcji"
   unlock_date_cannot_be_before_term_start_d3c01813: "Data odblokowania nie może przypadać przed rozpoczęciem semestru"
+  unpublished_click_to_modify_60f9051: "Nieopublikowany - Kliknij aby zmienić"
   unpublished_courses_title: "Nieopublikowane kursy"
   unstarted_932f2990: Nierozpoczęto
   unsupported_package: "Nieobsługiwany pakiet zawartości"
@@ -14658,6 +14664,9 @@ pl:
   usage_rights_have_been_set_d1b433c7: "Prawa użytkowania zostały nadane."
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Prawa użytkowania zostaną nadane dla wszystkich plików zawartych w:"
   use_a_single_16x16_32x32_48x48_ico_file_60bc8d91: "Użyj *pojedynczego pliku ico 16x16, 32x32, 48x48*."
+  use_the_highest_score_eb29329d: "Wykorzystaj najwyższy wynik"
+  use_the_most_recent_score_9ae3742c: "Wykorzystaj ostatni wynik"
+  use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Wykorzystaj nowe narżedzie LTI do testów w miejsce regularnych testów canvas"
   used_by_permission_314a78dd: "Użycie według uprawnień"
   user: 
     default_user_name: Użytkownik
@@ -14790,6 +14799,8 @@ pl:
       notifications: Powiadomienia
       profile: Profil
       settings: Ustawienia
+  user_selected_answer: Wybrałeś
+  user_selected_wrong: "Prawidłowa odpowiedź to %{correct_answer_text}."
   user_service: 
     descriptions: 
       delicious: "Delicious to narzędzie do wspólnego dzielenia się łączami.  Pozwala oznaczyć dowolną stronę internetową, po to by później do niej wrócić.  Umożliwia też łączenie się z innymi kontami użytkowników narzędzia Delicious, aby dzielić się łączami do stron o danej tematyce."
@@ -15096,6 +15107,7 @@ pl:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE, Kurs WebCT 6+"
   webct_name: "Blackboard Vista/CE (WebCT)"
+  well_below_mastery_37664bdc: "Znacznie poniżej poziomu biegłości"
   what_should_the_csv_file_look_like_985a59ac: "Jak powinien wyglądać plik CSV?"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "To jest strona, którą zobaczą osoby odwiedzające kurs. Możesz ustawić ją tak, aby pokazywała strumień aktywności, listę modułów kursu, program kursu lub stronę niestandardową napisaną przez Ciebie. Wartością domyślną jest strumień aktywności kursu."
   where_would_you_like_to_move_title_fabd6e8f: "Gdzie chcesz przenieść %{title}?"
@@ -15276,7 +15288,9 @@ pl:
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "Użytkownik osiągnął maksymalną liczbę sieciowych punktów zaczepienia według limitu konta (%{max})"
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "Użytkownik osiągnął maksymalną liczbę sieciowych punktów zaczepienia według limitu użytkownika (%{max})"
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "Na pewno przydadzą się uczestnicy. Prowadzenie kursu bez nich nie jest żadną przyjemnością."
+  you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "Potrzebujesz odświeżonego tokena, postępuj zgodnie z krokami zawartymi w tym linku, może będziesz wymagać pomocy eksperta technicznego"
   you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "Możesz wyznaczyć asystentów, którzy będę pomagać w prowadzenie kursu. Asystenci mogą oceniać zadania przesłane przez uczestników, pomagać prowadzić dyskusje, czy nawet aktualizować terminy dostarczenia i szczegółowe informacje dot. zadań"
+  you_must_log_in_to_view_replies_9ccd4da0: "Musisz się zalogować aby zobaczyć odpowiedzi"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Musisz wybrać kurs, z którego ma być skopiowana zawartość"
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "Musisz ustawić liczbę większą lub równą %{min}"
   you_must_specify_a_usage_right_5eb57f87: "Musisz określić prawo użytkowania."
@@ -15285,12 +15299,16 @@ pl:
   your_assignments_will_show_here_listed_by_due_date_18dc880f: "Twoje zadania pojawią się w tym miejscu, ułożone według terminu dostarczenia."
   your_browser_does_not_meet_the_minimum_requirement_7a7022db: "Przeglądarka nie spełnia minimalnych wymagań dotyczących systemu Canvas. Odwiedź *Przewodnik systemu Canvas* w celu uzyskania informacji na temat obsługiwanych przeglądarek."
   your_content_has_been_exported_bbb57764: "Twoja zawartość została wyeksportowana."
+  your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: "Twój plik jest wysyłany do Dziennika ocen, możesz opuścić tą stronę w każdej chwili. Jeśli masz duży plik CSV, zmiany mogą zając kilka minut aby się zaktualizować. Aby zapobiec nadpisaniu danych, prosimy potwierdzić zakończenie procesu przesyłania a Dziennik ocen jest poprawny, przed wprowadzeniem dodatkowych zmian."
   your_message_has_been_sent_thank_you_e0284316: "Twoja wiadomość została wysłana. Dziękujemy!"
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Twoje zdjęcie profilowe nie mogło zostać przesłane. Być może przekroczono limit przesyłania."
   your_search_encountered_the_following_errors_fc3e5e7f: 
     few: "Podczas wyszukiwanie pojawiły się następujące błędy:"
     one: "Podczas wyszukiwania pojawił się następujący błąd:"
     other: "Podczas wyszukiwanie pojawiły się następujące błędy:"
+  zendesk: 
+    engine: 
+      plugin_name: Zendesk
   zero_activity_title: "Zerowa aktywność"
   zip_argument_error: "Do przekazania pliku .zip potrzebny jest folder, do którego plik zostanie przekazany."
   zip_file_description: "Wtyczka migracji w celu rozpakowania zwykłych plików .zip do kursu, grupy lub plików użytkownika"
