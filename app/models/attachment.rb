@@ -63,6 +63,7 @@ class Attachment < ActiveRecord::Base
   has_one :sis_batch
   has_one :thumbnail, :foreign_key => "parent_id", :conditions => {:thumbnail => "thumb"}
   has_many :thumbnails, :foreign_key => "parent_id"
+  has_many :children, foreign_key: :root_attachment_id, class_name: 'Attachment'
   has_one :crocodoc_document
   has_one :canvadoc
   belongs_to :usage_rights
