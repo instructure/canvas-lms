@@ -695,6 +695,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       end
       e[:published_at] = t
     end
+    possible = 0 if possible < 0
     data = entries
     if opts[:persist] != false
       self.quiz_data = data

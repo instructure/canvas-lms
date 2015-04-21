@@ -793,12 +793,12 @@ define([
       var tally = 0;
       $("#questions .question_holder:not(.group) .question:not(#question_new)").each(function() {
         var val = parseFloat($(this).find(".question_points,.question_points.hidden").text());
-        if (isNaN(val)) { val = 0; }
+        if (isNaN(val) || val < 0) { val = 0; }
         tally += val;
       });
       $("#questions .group_top:not(#group_top_new)").each(function() {
         var val = parseFloat($(this).find(".question_points").text());
-        if (isNaN(val)) { val = 0; }
+        if (isNaN(val) || val < 0) { val = 0; }
         var cnt = parseInt($(this).find(".pick_count").text(), 10);
         if (isNaN(cnt)) { cnt = 0; }
         tally += val * cnt;
@@ -1267,7 +1267,7 @@ define([
       }
       question.position = i;
       question.question_points = parseFloat(question.question_points);
-      if (isNaN(question.question_points)) {
+      if (isNaN(question.question_points) || question.question_points < 0) {
         question.question_points = 0;
       }
       quiz.points_possible += question.question_points;
@@ -1827,7 +1827,7 @@ define([
 
       question.matching_answer_incorrect_matches = matches.join("\n");
       question.question_points = parseFloat(question.question_points, 10);
-      if (isNaN(question.question_points)) { question.question_points = 0; }
+      if (isNaN(question.question_points) || question.question_points < 0) { question.question_points = 0; }
       var $form = $("#question_form_template").clone(true).attr('id', '');
       var $formQuestion = $form.find(".question");
       $formQuestion.addClass('initialLoad');
@@ -2694,6 +2694,11 @@ define([
           'regrade_option', 'regrade_disabled'],
         htmlValues: ['correct_comments_html', 'incorrect_comments_html', 'neutral_comments_html']
       });
+
+      if (questionData.question_points && questionData.question_points < 0) {
+        $form.find("input[name='question_points']").errorBox(I18n.t('question.positive_points', "Must be zero or greater"));
+        return;
+      }
 
       questionData.assessment_question_bank_id = $(".question_bank_id").text() || ""
       var error_text = null;

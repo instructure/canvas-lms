@@ -354,6 +354,19 @@ describe "quizzes question creation" do
     expect(quiz.quiz_questions.first.question_data["answers"].detect { |a| a["text"] == "" }).to be_nil
   end
 
+  it "doesn't allow negative question points" do
+    quiz = @last_quiz
+    question = fj(".question_form:visible")
+    click_option('.question_form:visible .question_type', 'essay_question', :value)
+
+    replace_content(question.find_element(:css, "input[name='question_points']"), '-4')
+    submit_form(question)
+
+    wait_for_ajaximations
+    expect(question).to be_displayed
+    assert_error_box(".question_form:visible input[name='question_points']")
+  end
+
   it "respects character limits on short answer questions" do
     quiz = @last_quiz
     question = fj(".question_form:visible")
