@@ -23,6 +23,7 @@ define [
 
       @url = @options.change_grade_url.replace(":assignment", @assignment.id).replace(":submission", @student.id)
       @submission = $.extend {}, @student["assignment_#{@assignment.id}"],
+        label: "student_grading_#{@assignment.id}"
         inputName: 'submission[posted_grade]'
         assignment: @assignment
         speedGraderUrl: speedGraderUrl
