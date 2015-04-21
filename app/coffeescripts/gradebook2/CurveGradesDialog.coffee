@@ -60,6 +60,7 @@ define [
           close: => @$dialog.remove()
         .fixDialogButtons()
 
+      @$dialog.parent().find('.ui-dialog-titlebar-close').focus()
       @$dialog.find("#middle_score").bind "blur change keyup focus", @curve
       @$dialog.find("#assign_blanks").change @curve
 
