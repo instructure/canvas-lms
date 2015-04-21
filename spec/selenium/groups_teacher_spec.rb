@@ -107,5 +107,27 @@ describe "new groups" do
       expect(f('.unassigned-users-heading')).to include_text("Unassigned Students (1)")
       expect(f('.group-summary')).to include_text("0 students")
     end
+
+    it "should allow teachers to make a student a group leader", priority: "1", test_id: 96021 do
+      group_test_setup
+      add_user_to_group(@student,@testgroup[0])
+
+      get "/courses/#{@course.id}/groups"
+
+      fj('.toggle-group :contains("Test Group 1")').click
+      wait_for_ajaximations
+
+      # Sets user as group leader
+      f('.group-user-actions').click
+      wait_for_ajaximations
+      f('.set-as-leader').click
+      wait_for_ajaximations
+
+      # Looks for student to have a group leader icon
+      expect(f('.icon-user.group-leader')).to be_displayed
+      # Verifies group leader silhouette and leader's name appear in the group header
+      expect(f('.span3.ellipsis.group-leader')).to be_displayed
+      expect(f('.span3.ellipsis.group-leader')).to include_text(@student.name)
+    end
   end
 end
