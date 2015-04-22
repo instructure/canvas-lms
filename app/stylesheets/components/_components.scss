@@ -155,6 +155,10 @@
       font-weight: 500;
       color: $ic-color-light;
       &:hover, &:focus { background-color: $ic-brand-primary; } 
+      .nav-badge {
+        background: $ic-color-light;
+        color: $ic-brand-primary;
+      }
     }
     
     @else {
