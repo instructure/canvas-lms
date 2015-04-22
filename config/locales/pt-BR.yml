@@ -10286,7 +10286,7 @@ pt-BR:
         api_key: "Chave de API do Crocdoc"
     custom_ticketing_email_settings: 
       labels: 
-        email_address: "endereço de email para o qual deve enviar relatórios de erros (algo@exemplo.com)"
+        email_address: "endereço de email para o qual deve enviar relatórios de erros (something@example.com)"
     custom_ticketing_web_post_settings: 
       labels: 
         endpoint_uri: "URI (Identificador Uniforme de Recursos) para POSTAR dados para (https://www.algumlugar.com/endpoint/caminho)"
@@ -13066,7 +13066,7 @@ pt-BR:
         recaptcha_public_key: "Chave pública ReCAPTCHA"
     service_cloud_settings: 
       labels: 
-        api_url: "Hospedagem de API do Salesforce (https://algumacoisa.salesforce.com)"
+        api_url: "Hospedagem de API do Salesforce (https://something.salesforce.com)"
         consumer_key: "Chave do Consumidor Salesforce"
         consumer_secret: "Segredo do Consumidor de Salesforce"
         is_sandbox: "Esta é uma conta sandbox do salesforce"
