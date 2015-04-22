@@ -12,27 +12,26 @@ define ['jquery', 'underscore', 'Backbone'], ($, _, Backbone) ->
     urlRoot: ->
       "/api/v1/#{@contextType()}s/#{@contextId()}/features/flags"
 
-    flagContext: ->
-      flag = @get('flag')
-      "#{flag.context_type}_#{flag.context_id}".toLowerCase()
+    flag: ->
+      @get('feature_flag')
 
-    hasContext: ->
-      flag = @get('flag')
-      flag.context_type and flag.context_id
+    state: ->
+      @flag().state
 
     isAllowed: ->
-      @get('state') == 'allowed'
+      @state() == 'allowed'
 
     isOn: ->
-      @get('state') == 'on'
+      @state() == 'on'
 
-    isOff: (forDisplay = false) ->
-      cond1 = _.include(['off', 'hidden'], @get('state'))
-      cond2 = !@currentContextIsAccount() and @isAllowed()
-      if forDisplay then cond1 or cond2 else cond1
+    isOff: ->
+      _.include(['off', 'hidden'], @state()) or (!@currentContextIsAccount() and @isAllowed())
 
     isHidden: ->
-      @get('hidden')
+      @flag().hidden
+
+    isLocked: ->
+      @flag().locked
 
     isSiteAdmin: ->
       !!ENV.ACCOUNT?.site_admin
@@ -53,9 +52,22 @@ define ['jquery', 'underscore', 'Backbone'], ($, _, Backbone) ->
       settings = @transitions()[action]
       return if settings?.message then settings else false
 
-    updateTransitions: =>
-      $.getJSON(@url()).then ({transitions}) =>
-        @get('feature_flag').transitions = transitions
+    shouldDelete: (action) ->
+      @isHidden() && action == 'off'
+
+    updateState: (new_state) =>
+      if @shouldDelete(new_state)
+        $.ajaxJSON @url(), "DELETE", {}, =>
+          # get inherited state
+          $.ajaxJSON @url(), "GET", {}, (data) =>
+            @updateLocalState(data)
+      else
+        $.ajaxJSON @url(), "PUT", {state: new_state}, (data) =>
+          @updateLocalState(data)
+
+    updateLocalState: (data) ->
+      @flag().state = data.state
+      @flag().transitions = data.transitions
 
     transitions: ->
       @get('feature_flag').transitions
@@ -67,10 +79,13 @@ define ['jquery', 'underscore', 'Backbone'], ($, _, Backbone) ->
 
     toJSON: ->
       _.extend(super, isAllowed: @isAllowed(), isHidden: @isHidden(),
-        isOff: @isOff(true), isOn: @isOn(), isSiteAdmin: @isSiteAdmin(),
+        isOff: @isOff(), isOn: @isOn(), isSiteAdmin: @isSiteAdmin(),
         currentContextIsAccount: @isContext('account'),
-        disableOn: @transitionLocked('on'), disableAllow: @transitionLocked('allowed'),
-        disableOff: @transitionLocked('off'))
+        threeState: @currentContextIsAccount() && !@transitionLocked('allowed'),
+        disableOn: @isLocked() || @isSiteAdmin() || @transitionLocked('on'),
+        disableAllow: @isLocked() || @transitionLocked('allowed'),
+        disableOff: @isLocked() || @transitionLocked('off'),
+        disableToggle: @isLocked() || @transitionLocked('on') || @transitionLocked('off'))
 
     parse: (json) ->
       _.extend(json, @attributes)
@@ -78,17 +93,10 @@ define ['jquery', 'underscore', 'Backbone'], ($, _, Backbone) ->
         appliesTo: json.applies_to.toLowerCase()
         id: json.feature
         title: json.display_name
-        isLocked: json.feature_flag.locked
-        flag: json.feature_flag
         releaseOn: if json.enable_at then new Date(json.enable_at) else null
         releaseNotesUrl: json.release_notes_url
-        state: json.feature_flag?.state
         labels: []
-      if json.feature_flag
-        feature.flag = json.feature_flag
-        feature.state = json.feature_flag.state
-        feature.hidden = json.feature_flag.hidden
       feature.labels.push(FeatureFlag::LABEL.beta)        if json.beta
-      feature.labels.push(FeatureFlag::LABEL.hidden)      if feature.hidden
+      feature.labels.push(FeatureFlag::LABEL.hidden)      if json.feature_flag.hidden
       feature.labels.push(FeatureFlag::LABEL.development) if json.development
       _.extend(json, feature)

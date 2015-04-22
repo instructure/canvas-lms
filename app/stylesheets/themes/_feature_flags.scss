@@ -41,8 +41,8 @@ $left-offset:  16px;
   &:focus { @include ic-focus-variant; }
 }
 
-.feature-flag .btn {
-  min-width: 80px;
+.feature-flag .ui-button {
+  min-width: 50px;
 }
 
 .feature-flag-group-title {
@@ -63,10 +63,6 @@ $left-offset:  16px;
 
 .feature-release-date {
   font-weight: bold;
-}
-
-.feature-lock-message {
-  text-transform: uppercase;
 }
 
 .feature-details {
