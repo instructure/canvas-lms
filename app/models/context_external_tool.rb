@@ -317,10 +317,7 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
 
-  def infer_defaults
-    self.url = nil if url.blank?
-    self.domain = nil if domain.blank?
-
+  def self.normalize_sizes!(settings)
     settings[:selection_width] = settings[:selection_width].to_i if settings[:selection_width]
     settings[:selection_height] = settings[:selection_height].to_i if settings[:selection_height]
 
@@ -330,6 +327,14 @@ class ContextExternalTool < ActiveRecord::Base
         settings[type][:selection_height] = settings[type][:selection_height].to_i if settings[type][:selection_height]
       end
     end
+  end
+
+  def infer_defaults
+    self.url = nil if url.blank?
+    self.domain = nil if domain.blank?
+
+    ContextExternalTool.normalize_sizes!(self.settings)
+
     EXTENSION_TYPES.each do |type|
       if settings[type]
         if !(extension_setting(type, :url)) || (settings[type].has_key?(:enabled) && !settings[type][:enabled])
