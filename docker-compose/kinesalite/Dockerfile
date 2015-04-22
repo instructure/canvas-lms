@@ -1,4 +1,4 @@
-FROM dockerfile/nodejs:latest
+FROM node:latest
 
 RUN npm install kinesalite --global
 EXPOSE 4567
