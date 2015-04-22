@@ -16,34 +16,41 @@ describe "grades" do
     @group2 = @course.assignment_groups.create!(:name => 'second assignment group', :group_weight => 33.3)
     @group3 = @course.assignment_groups.create!(:name => 'third assignment group', :group_weight => 33.3)
     @first_assignment = assignment_model({
-                                             :course => @course,
-                                             :title => 'first assignment',
-                                             :due_at => due_date,
-                                             :points_possible => 10,
-                                             :submission_types => 'online_text_entry',
-                                             :assignment_group => @group
-                                         })
+      :course => @course,
+      :title => 'first assignment',
+      :due_at => due_date,
+      :points_possible => 10,
+      :submission_types => 'online_text_entry',
+      :assignment_group => @group,
+      :peer_reviews => true,
+      :anonymous_peer_reviews => true
+    })
     rubric_model
     @association = @rubric.associate_with(@first_assignment, @course, :purpose => 'grading')
+    @assignment.assign_peer_review(@student_2, @student_1)
     @assignment.reload
 
     @submission = @first_assignment.submit_homework(@student_1, :body => 'student first submission')
     @first_assignment.grade_student(@user, :grade => 2)
     @assessment = @association.assess({
-                                          :user => @student_1,
-                                          :assessor => @teacher,
-                                          :artifact => @submission,
-                                          :assessment => {
-                                              :assessment_type => 'grading',
-                                              :criterion_crit1 => {
-                                                  :points => 2,
-                                                  :comments => "cool, yo"
-                                              }
-                                          }
-                                      })
+      :user => @student_1,
+      :assessor => @teacher,
+      :artifact => @submission,
+      :assessment => {
+        :assessment_type => 'grading',
+        :criterion_crit1 => {
+          :points => 2,
+          :comments => "cool, yo"
+        }
+      }
+    })
     @submission.reload
     @submission.score = 3
     @submission.add_comment(:author => @teacher, :comment => 'submission comment')
+    @submission.add_comment({
+      :author => @student_2,
+      :comment => "Anonymous Peer Review"
+    })
     @submission.save!
 
     #second student submission
@@ -55,13 +62,13 @@ describe "grades" do
     #second assigmnent data
     due_date = due_date + 1.days
     @second_assignment = assignment_model({
-                                              :course => @course,
-                                              :title => 'second assignment',
-                                              :due_at => due_date,
-                                              :points_possible => 5,
-                                              :submission_types => 'online_text_entry',
-                                              :assignment_group => @group
-                                          })
+      :course => @course,
+      :title => 'second assignment',
+      :due_at => due_date,
+      :points_possible => 5,
+      :submission_types => 'online_text_entry',
+      :assignment_group => @group
+    })
 
     @second_association = @rubric.associate_with(@second_assignment, @course, :purpose => 'grading')
     @second_submission = @second_assignment.submit_homework(@student_1, :body => 'student second submission')
@@ -191,14 +198,14 @@ describe "grades" do
       get "/courses/#{@course.id}/grades"
 
       @another_assignment = assignment_model({
-                                                 :course => @course,
-                                                 :title => 'another assignment',
-                                                 :points_possible => 100,
-                                                 :submission_types => 'online_text_entry',
-                                                 :assignment_group => @group,
-                                                 :grading_type => 'letter_grade',
-                                                 :muted => 'true'
-                                             })
+        :course => @course,
+        :title => 'another assignment',
+        :points_possible => 100,
+        :submission_types => 'online_text_entry',
+        :assignment_group => @group,
+        :grading_type => 'letter_grade',
+        :muted => 'true'
+      })
       @another_submission = @another_assignment.submit_homework(@student_1, :body => 'student second submission')
       @another_assignment.grade_student(@student_1, :grade => 81)
       @another_submission.save!
@@ -231,6 +238,14 @@ describe "grades" do
       expect(comment_row).to include_text('submission comment')
     end
 
+    it 'should not display name of anonymous reviewer' do
+      get "/courses/#{@course.id}/grades"
+
+      f('.toggle_comments_link').click
+      comment_row = f('#grades_summary tr.comments_thread')
+      expect(comment_row).to include_text('Anonymous User')
+    end
+
     it "should not show assignment statistics on assignments with less than 5 submissions" do
       get "/courses/#{@course.id}/grades"
       expect(f("#grade_info_#{@first_assignment.id} .tooltip")).to be_nil
@@ -255,17 +270,17 @@ describe "grades" do
       @third_submission = @third_assignment.submissions.create!(:user => @student_1) # unsubmitted submission :/
 
       @third_association.assess({
-                                    :user => @student_1,
-                                    :assessor => @teacher,
-                                    :artifact => @third_submission,
-                                    :assessment => {
-                                        :assessment_type => 'grading',
-                                        :criterion_crit1 => {
-                                            :points => 2,
-                                            :comments => "not bad, not bad"
-                                        }
-                                    }
-                                })
+        :user => @student_1,
+        :assessor => @teacher,
+        :artifact => @third_submission,
+        :assessment => {
+          :assessment_type => 'grading',
+          :criterion_crit1 => {
+            :points => 2,
+            :comments => "not bad, not bad"
+          }
+        }
+      })
 
       get "/courses/#{@course.id}/grades"
 
