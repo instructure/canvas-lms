@@ -71,6 +71,13 @@ define [
     delete: =>
       @$el.slideUp(=> @$el.remove())
       @trigger('delete', this)
+      otherDeleteLinks = $('.delete_collaboration_link').toArray()
+      curDeleteLink = @$el.find('.delete_collaboration_link')[0]
+      newIndex = otherDeleteLinks.indexOf(curDeleteLink)
+      if (newIndex > 0)
+        otherDeleteLinks[newIndex - 1].focus()
+      else
+        $('.add_collaboration_link').focus()
 
     # Internal: Hide collaboration and display an edit form.
     #
