@@ -4728,6 +4728,7 @@ es:
         count: "Recuento erróneo de alumnos"
         ratio: "Relación errónea de alumnos"
   current_3ce5414a: "Actual:"
+  current_mastery_score_score_out_of_mastery_points_fedd343f: "Puntuación de dominio actual: %{score} de %{mastery_points}"
   current_score_6c81792: "Calificación actual"
   current_total_67bf5f72: "Total actual:"
   curve_grades_dialog: 
@@ -10021,6 +10022,7 @@ es:
         delete_outcome: "Eliminar resultado"
         edit_outcome: "Editar resultado"
       mastery_at_label: "Fijar dominio en cualquier puntuación igual o superior a:"
+      point_mastery: "Dominio: %{mastery_points} puntos"
       points: 
         rating: "%{points} Puntos"
         total: "%{points_possible} Puntos"
@@ -14364,6 +14366,7 @@ es:
   to_35c6baa2: a
   to_51406be9: A
   to_c4c44f4b: para
+  to_link_the_course_observer_name_to_a_student_star_f993c826: "Para conectar a un observador del curso *%{name}* a un estudiante, comience a escribir el nombre del estudiantes más abajo para encontrarle y luego haga clic en Actualizar."
   to_minscore_43e5452e: "a %{minScore}%"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "Para ver las tareas, asegúrese de que esté activa la vista *Agenda*."
   tolerance_value_9e96573c: "Valor de tolerancia"
