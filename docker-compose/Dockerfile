@@ -8,6 +8,7 @@ RUN  apt-get update -qq \
        locales \
        nodejs \
        postgresql-client \
+       libxmlsec1-dev \
   && rm -rf /var/lib/apt/lists/*
 
 # Ensure UTF-8 locale
