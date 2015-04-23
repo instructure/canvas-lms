@@ -86,7 +86,7 @@ define [
       @numberOfFrozenCols = if @totalColumnInFront then 3 else 2
       @mgpEnabled = ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled
       @gradingPeriods = ENV.GRADEBOOK_OPTIONS.active_grading_periods
-      @gradingPeriodToShow = userSettings.contextGet('gradebook_current_grading_period') || ENV.GRADEBOOK_OPTIONS.current_grading_period_id
+      @gradingPeriodToShow = @getGradingPeriodToShow()
 
       $.subscribe 'assignment_group_weights_changed', @handleAssignmentGroupWeightChange
       $.subscribe 'assignment_muting_toggled',        @handleAssignmentMutingChange
@@ -193,6 +193,17 @@ define [
 
     gradingPeriodIsClosed: (gradingPeriod) ->
       new Date(gradingPeriod.end_date) < new Date()
+
+    gradingPeriodIsActive: (gradingPeriodId) ->
+      activePeriodIds = _.pluck(@gradingPeriods, 'id')
+      _.contains(activePeriodIds, gradingPeriodId)
+
+    getGradingPeriodToShow: () ->
+      currentPeriodId = userSettings.contextGet('gradebook_current_grading_period')
+      if currentPeriodId && @gradingPeriodIsActive(currentPeriodId)
+        currentPeriodId
+      else
+        ENV.GRADEBOOK_OPTIONS.current_grading_period_id
 
     getAssignmentsInClosedGradingPeriods: (gradingPeriods) ->
       latestEndDate = new Date(gradingPeriods[0]?.end_date)
