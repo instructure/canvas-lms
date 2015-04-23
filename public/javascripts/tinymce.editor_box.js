@@ -498,12 +498,12 @@ define([
     }
     var selection = tinyMCE.get(id).selection;
     var anchor = selection.getNode();
-    while(anchor.nodeName != 'A' && anchor.nodeName != 'BODY' && anchor.parentNode) {
+    while(anchor.nodeName !== "A" && anchor.nodeName !== "BODY" && anchor.parentNode) {
       anchor = anchor.parentNode;
     }
-    if(anchor.nodeName != 'A') { anchor = null; }
+    if(anchor.nodeName !== "A") { anchor = null; }
 
-    var selectedContent = selection.getContent();
+    var selectedContent = options.selectedContent || selection.getContent();
     if($instructureEditorBoxList._getEditor(id).isHidden()) {
       selectionText = defaultText;
       var $div = $("<div><a/></div>");
@@ -525,7 +525,7 @@ define([
           '_mce_href': url,
           title: title || '',
           id: link_id,
-          'class': classes,
+          "class": classes,
           target: target
         });
       } else {
@@ -535,7 +535,14 @@ define([
         tinyMCE.get(id).execCommand('mceInsertContent', false, $div.html());
       }
     } else {
-      tinyMCE.get(id).execCommand('mceInsertLink', false, {target: (target || ''), title: (title || ''), href: url, 'class': classes, 'id': link_id});
+      var linkAttrs = {
+        target: (target || ""),
+        title: (title || ""),
+        href: url,
+        "class": classes,
+        "id": link_id
+      };
+      EditorCommands.insertLink(id, selectedContent, linkAttrs)
     }
 
     var ed = tinyMCE.get(id);
