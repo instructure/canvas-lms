@@ -99,9 +99,13 @@ class Notification < ActiveRecord::Base
   # to_list - a list of who to send the message to. the list can contain Users, User ids, or communication channels
   # options - a hash of extra options to merge with the options used to build the Message
   #
-  # Returns a list of the messages dispatched immediately
   def create_message(asset, to_list, options={})
-    return NotificationMessageCreator.new(self, asset, options.merge(:to_list => to_list)).create_message
+    messages = [] if Rails.env.test?
+    to_list.each do |to|
+      msgs = NotificationMessageCreator.new(self, asset, options.merge(:to_list => to)).create_message
+      messages.concat msgs if Rails.env.test?
+    end
+    messages
   end
 
   def category_spaceless
