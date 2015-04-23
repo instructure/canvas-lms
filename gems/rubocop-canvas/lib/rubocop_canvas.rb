@@ -6,6 +6,8 @@ require 'rubocop_canvas/version'
 require 'rubocop_canvas/helpers/migration_tags'
 require 'rubocop_canvas/helpers/comments'
 require 'rubocop_canvas/helpers/diff_parser'
+require 'rubocop_canvas/helpers/git_proxy'
+require 'rubocop_canvas/helpers/file_sieve'
 
 require 'rubocop_canvas/cops/lint/freeze_constants'
 require 'rubocop_canvas/cops/rails/smart_time_zone'

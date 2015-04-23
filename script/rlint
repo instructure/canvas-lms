@@ -1,47 +1,17 @@
 #!/usr/bin/env ruby
 $:.push File.expand_path("../../gems/rubocop-canvas/lib", __FILE__)
 
-def git_changes(include_untracked=false)
-  if include_untracked
-    `git status --porcelain`
-  else
-    `git status --porcelain -uno`
-  end
-end
-
-def git_is_dirty?
-  !git_changes.strip.empty?
-end
-
-def head_sha
-  `git log --oneline -n 1 | cut -d " " -f 1`
-end
-
-def pick_ruby_files(env_sha)
-  sha = env_sha
-  if sha.nil?
-    if git_is_dirty?
-      return git_changes(true).split("\n").map{|f| f.strip.split(/\s/).last }.select{|f| f =~ /\.rb$/}
-    else
-      # no changes, no sha specified, use the HEAD commit
-      sha = head_sha
-    end
-  end
-  files = `git diff-tree --no-commit-id --name-only -r #{sha}`
-  return files.split("\n").select{|f| f =~ /\.rb$/}
-end
-
 def git_diff(env_sha)
   sha = env_sha
   if sha.nil?
-    return `git diff` if git_is_dirty?
-    sha = head_sha
+    return `git diff` if RuboCop::Canvas::GitProxy.dirty?
+    sha = RuboCop::Canvas::GitProxy.head_sha
   end
   `git show #{sha}`
 end
 
 def get_offenses_json(cli, env_sha)
-  ruby_files = pick_ruby_files(env_sha)
+  ruby_files = RuboCop::Canvas::FileSieve.new.files(env_sha)
   return {} unless ruby_files.size > 0
   json = `rubocop #{ruby_files.join(' ')} --format json`
   results_json = JSON.parse(json)
@@ -75,7 +45,7 @@ else
   heavy_mode = ARGV.include?("--heavy")
   boyscout_mode = ARGV.include?("--boy-scout")
   env_sha = ENV['SHA']
-  ruby_files = pick_ruby_files(env_sha)
+  ruby_files = RuboCop::Canvas::FileSieve.new.files(env_sha)
   if ruby_files.size > 0
     if heavy_mode
       cli.run(ruby_files)
