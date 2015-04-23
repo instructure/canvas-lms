@@ -42,7 +42,6 @@ ar:
       other: "%{count} من الطلاب"
       two: "%{count} طالب"
       zero: "%{count} طالب"
-    student_count_max: "%{count} / %{max} من الطلاب"
     user_count: 
       few: "%{count} مستخدمين"
       many: "%{count} مستخدم"
@@ -50,7 +49,6 @@ ar:
       other: "%{count} من المستخدمين"
       two: "%{count} مستخدم"
       zero: "%{count} مستخدم"
-    user_count_max: "%{count} / %{max} من المستخدمين"
   GroupUserCollection: 
     flash: 
       userAlreadyInGroup: "تحذير: %{user} هو عضو بالفعل في %{group}"
