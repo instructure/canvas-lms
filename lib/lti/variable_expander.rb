@@ -37,6 +37,8 @@ module Lti
     end
 
     COURSE_GUARD = -> { @context.is_a? Course }
+    TERM_START_DATE_GUARD = -> { @context.is_a?(Course) && @context.enrollment_term &&
+                                 @context.enrollment_term.start_at }
     USER_GUARD = -> { @current_user }
     PSEUDONYM_GUARD = -> { sis_pseudonym }
     ENROLLMENT_GUARD = -> { @current_user && @context.is_a?(Course) }
@@ -45,7 +47,6 @@ module Lti
     MEDIA_OBJECT_GUARD = -> { @attachment && @attachment.media_object}
     USAGE_RIGHTS_GUARD = -> { @attachment && @attachment.usage_rights}
     MEDIA_OBJECT_ID_GUARD = -> {@attachment && (@attachment.media_object || @attachment.media_entry_id )}
-
 
     def initialize(root_account, context, controller, opts = {})
       @root_account = root_account
@@ -119,6 +120,14 @@ module Lti
                        -> { @context.sis_source_id },
                        COURSE_GUARD
 
+    register_expansion 'Canvas.course.startAt', [],
+                       -> { @context.start_at },
+                       COURSE_GUARD
+
+    register_expansion 'Canvas.term.startAt', [],
+                       -> { @context.enrollment_term.start_at },
+                       TERM_START_DATE_GUARD
+
     register_expansion 'CourseSection.sourcedId', [],
                        -> { @context.sis_source_id },
                        COURSE_GUARD
@@ -187,7 +196,6 @@ module Lti
     register_expansion 'Canvas.xuser.allRoles', [],
                        -> { lti_helper.all_roles }
 
-
     # Substitutions for the primary pseudonym for the user for the account
     # This should hold all the SIS information for the user
     # This may not be the pseudonym the user is actually gingged in with
@@ -241,7 +249,6 @@ module Lti
     register_expansion 'Canvas.moduleItem.id', [],
                        -> { @content_tag.id },
                        CONTENT_TAG_GUARD
-
 
     register_expansion 'Canvas.assignment.id', [],
                        -> { @assignment.id },
