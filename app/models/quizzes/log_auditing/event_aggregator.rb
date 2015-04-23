@@ -73,9 +73,11 @@ module Quizzes::LogAuditing
         when Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED
           answers.each do |question_id, answer|
             question = Quizzes::QuizQuestion.where(id: question_id).first
-            serializer = Quizzes::QuizQuestion::AnswerSerializers.serializer_for(question)
-            thing = serializer.serialize(answer).answer
-            response.merge! thing
+            if question.question_data["question_type"] != "text_only_question"
+              serializer = Quizzes::QuizQuestion::AnswerSerializers.serializer_for(question)
+              thing = serializer.serialize(answer).answer
+              response.merge! thing
+            end
           end
         end
         submission_data.merge! response if response
