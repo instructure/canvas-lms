@@ -12506,6 +12506,7 @@ pt:
   remind_me_next_time_6402eb7d: "Lembrar-me da próxima vez"
   remove_attachment_ceae0973: "Remover anexo"
   remove_f47dc62a: Remover
+  remove_recipient_name_a6b83cef: "Remover recetor %{name}"
   remove_row_c198da5a: "Remover linha"
   remove_row_f9d59cba: "Remover linha"
   rename_45608f54: "Mudar o nome"
