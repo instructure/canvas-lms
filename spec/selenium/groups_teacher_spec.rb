@@ -14,7 +14,7 @@ describe "new groups" do
       f('#add-group-set').click
       wait_for_ajaximations
       f('#new_category_name').send_keys("Test Group Set")
-      f('.btn-primary[type=submit]').click
+      f('#newGroupSubmitButton').click
       wait_for_ajaximations
       # Looks in the group tab list for the last item, which should be the group set
       expect(fj('.collectionViewItems[role=tablist]>li:last-child').text).to match "Test Group Set"
@@ -29,7 +29,7 @@ describe "new groups" do
       f('.btn.add-group').click
       wait_for_ajaximations
       f('#group_name').send_keys("Test Group")
-      f('.btn-primary[type=submit]').click
+      f('#groupEditSaveButton').click
       wait_for_ajaximations
       expect(fj('.collectionViewItems.unstyled.groups-list>li:last-child')).to include_text("Test Group")
     end
@@ -128,6 +128,42 @@ describe "new groups" do
       # Verifies group leader silhouette and leader's name appear in the group header
       expect(f('.span3.ellipsis.group-leader')).to be_displayed
       expect(f('.span3.ellipsis.group-leader')).to include_text(@student.name)
+    end
+
+    it "should allow a teacher to set up a group set with member limits", priority: "1", test_id: 94160 do
+      group_test_setup(3,0,0)
+      get "/courses/#{@course.id}/groups"
+
+      f('#add-group-set').click
+      wait_for_ajaximations
+      f('#new_category_name').send_keys("Test Group Set")
+      f('.self-signup-toggle').click
+      fj('input[name="group_limit"]:visible').send_keys("2")
+      f('#newGroupSubmitButton').click
+      wait_for_ajaximations
+      expect(f('.group-category-summary')).to include_text("Groups are limited to 2 members.")
+
+      # Creates a group and checks to see if group set's limit is inherited by its groups
+      f('.btn.add-group').click
+      wait_for_ajaximations
+      f('#group_name').send_keys("Test Group")
+      f('#groupEditSaveButton').click
+      wait_for_ajaximations
+      expect(f('.group-summary')).to include_text("0 / 2 students")
+    end
+
+    it "should allow a teacher to set up a group with member limits", priority: "1", test_id: 94161 do
+      group_test_setup(3,1,0)
+      get "/courses/#{@course.id}/groups"
+
+      f('.btn.add-group').click
+      wait_for_ajaximations
+      f('#group_name').send_keys("Test Group")
+      f('#group_max_membership').send_keys("2")
+      wait_for_ajaximations
+      f('#groupEditSaveButton').click
+      wait_for_ajaximations
+      expect(f('.group-summary')).to include_text("0 / 2 students")
     end
   end
 end
