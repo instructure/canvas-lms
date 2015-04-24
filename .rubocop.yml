@@ -102,6 +102,8 @@ Lint/AmbiguousRegexpLiteral:
   Severity: convention
 Lint/UselessAssignment:
   Severity: convention
+Lint/Debugger:
+  Severity: error
 
 # Performance changes
 Performance/Detect:
