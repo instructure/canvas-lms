@@ -752,36 +752,43 @@ class ConversationsController < ApplicationController
   def add_message
     get_conversation(true)
     if params[:body].present?
-
       # allow responses to be sent to anyone who is already a conversation participant.
       params[:from_conversation_id] = @conversation.conversation_id
       # not a before_filter because we need to set the above parameter.
       normalize_recipients
-
-      message = build_message
       # find included_messages
       message_ids = params[:included_messages]
       message_ids = message_ids.split(/,/) if message_ids.is_a?(String)
-      messages = ConversationMessage.where(:id => message_ids) if message_ids
 
       # these checks could be folded into the initial ConversationMessage lookup for better efficiency
-      if messages
-        # sanity check: can the user see the included messages?
-        return render_error('included_messages', 'not a participant') unless messages.all? { |m| m.conversation_message_participants.where(:user_id => @current_user.id).exists? }
+      if message_ids
+
         # sanity check: are the messages part of this conversation?
-        return render_error('included_messages', 'not for this conversation') unless messages.all? { |m| m.conversation_id == @conversation.conversation.id }
+        db_ids = ConversationMessage.where(:id => message_ids, :conversation_id => @conversation.conversation_id).pluck(:id)
+        unless db_ids.count == message_ids.count
+          return render_error('included_messages', 'not for this conversation')
+        end
+        message_ids = db_ids
+
+        # sanity check: can the user see the included messages?
+        unless ConversationMessageParticipant.where(:conversation_message_id => message_ids,
+            :user_id => @current_user.id).count == message_ids.count
+          return render_error('included_messages', 'not a participant')
+        end
       end
 
-      unless @conversation.private?
-        @conversation.add_participants @recipients, no_messages: true if @recipients
+      message_args = build_message_args
+      if @conversation.should_process_immediately?
+        message = @conversation.process_new_message(message_args, @recipients, message_ids, @tags)
+        render :json => conversation_json(@conversation.reload, @current_user, session, :messages => [message])
+      else
+        @conversation.send_later_enqueue_args(:process_new_message,
+          {:strand => "add_message_#{@conversation.global_conversation_id}", :max_attempts => 1},
+          message_args, @recipients, message_ids, @tags)
+        return render :json => [], :status => :accepted
       end
-      @conversation.reload
-      messages.each { |msg| @conversation.conversation.add_message_to_participants msg, new_message: false, only_users: @recipients, reset_unread_counts: false } if messages
-      @conversation.add_message message, :tags => @tags, :update_for_sender => false, only_users: @recipients
-
-      render :json => conversation_json(@conversation.reload, @current_user, session, :messages => [message])
     else
-      render :json => {}, :status => :bad_request
+      render :json => {}, :status => :bad_reqquest
     end
   end
 
@@ -1011,15 +1018,21 @@ class ConversationsController < ApplicationController
   end
 
   def build_message
-    Conversation.build_message(
+    Conversation.build_message(*build_message_args)
+  end
+
+  def build_message_args
+    [
       @current_user,
       params[:body],
-      :attachment_ids => params[:attachment_ids],
-      :forwarded_message_ids => params[:forwarded_message_ids],
-      :root_account_id => @domain_root_account.id,
-      :media_comment => infer_media_comment,
-      :generate_user_note => value_to_boolean(params[:user_note])
-    )
+      {
+        :attachment_ids => params[:attachment_ids],
+        :forwarded_message_ids => params[:forwarded_message_ids],
+        :root_account_id => @domain_root_account.id,
+        :media_comment => infer_media_comment,
+        :generate_user_note => value_to_boolean(params[:user_note])
+      }
+    ]
   end
 
   def infer_media_comment
