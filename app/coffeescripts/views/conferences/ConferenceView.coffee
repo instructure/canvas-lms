@@ -27,8 +27,18 @@ define [
 
     delete: (e) ->
       e.preventDefault()
-      return if !confirm I18n.t('confirm.delete', "Are you sure you want to delete this conference?")
-      @model.destroy()
+      if !confirm I18n.t('confirm.delete', "Are you sure you want to delete this conference?")
+        $(e.currentTarget).parents('.inline-block').find('.al-trigger').focus()
+      else
+        currentCog = $(e.currentTarget).parents('.inline-block').find('.al-trigger')[0]
+        allCogs = $('#content .al-trigger').toArray()
+        # Find the preceeding cog
+        curIndex = allCogs.indexOf(currentCog)
+        if (curIndex > 0)
+          allCogs[curIndex - 1].focus()
+        else
+          $('.new-conference-btn').focus()
+        @model.destroy()
 
     close: (e) ->
       e.preventDefault()
