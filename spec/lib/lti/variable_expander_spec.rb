@@ -264,6 +264,15 @@ module Lti
           subject.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq '2015-05-21 17:01:36'
         end
+
+        it 'has substitution for $Canvas.externalTool.url' do
+          course.save!
+          tool = course.context_external_tools.create!(:domain => 'example.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'anonymous', :name => 'tool')
+          expander = described_class.new(root_account, course, controller, current_user: user, tool:tool)
+          exp_hash = {test: '$Canvas.externalTool.url'}
+          expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq "url"
+        end
       end
 
       context 'context is a course with an assignment' do

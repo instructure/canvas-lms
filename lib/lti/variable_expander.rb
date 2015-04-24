@@ -47,6 +47,7 @@ module Lti
     MEDIA_OBJECT_GUARD = -> { @attachment && @attachment.media_object}
     USAGE_RIGHTS_GUARD = -> { @attachment && @attachment.usage_rights}
     MEDIA_OBJECT_ID_GUARD = -> {@attachment && (@attachment.media_object || @attachment.media_entry_id )}
+    LTI1_GUARD = -> { @tool.is_a? ContextExternalTool }
 
     def initialize(root_account, context, controller, opts = {})
       @root_account = root_account
@@ -102,6 +103,12 @@ module Lti
 
     register_expansion 'Canvas.rootAccount.sisSourceId', [],
                        -> { @root_account.sis_source_id }
+
+    register_expansion 'Canvas.externalTool.url', [],
+                       -> { @controller.named_context_url(@context, :api_v1_context_external_tools_update_url,
+                                                          @tool.id, include_host:true) },
+                       LTI1_GUARD
+
 
     ##### Deprecated Substitutions #####
 
