@@ -286,6 +286,29 @@ class ConversationParticipant < ActiveRecord::Base
     conversation.add_message(user, body_or_obj, options.merge(:generated => false))
   end
 
+  def process_new_message(message_args, recipients, included_message_ids, tags)
+    if recipients && !self.private?
+      self.add_participants recipients, no_messages: true
+    end
+    self.reload
+
+    if included_message_ids
+      ConversationMessage.where(:id => included_message_ids).each do |msg|
+        self.conversation.add_message_to_participants(msg, new_message: false, only_users: recipients, reset_unread_counts: false)
+      end
+    end
+
+    message = Conversation.build_message(*message_args)
+    self.add_message(message, :tags => tags, :update_for_sender => false, :only_users => recipients)
+
+    message
+  end
+
+  # if this is false, should queue a job to add the message, don't wait
+  def should_process_immediately?
+    conversation.conversation_participants.count < Setting.get('max_immediate_conversation_participants', 100).to_i
+  end
+
   # Public: soft deletes the message participants for this conversation
   # participant for the specified messages. May pass :all to soft delete all
   # message participants.

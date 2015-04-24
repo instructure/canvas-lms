@@ -464,6 +464,23 @@ describe ConversationsController do
       expect(@conversation.reload.last_message_at).to eql expected_lma
     end
 
+    it "should queue a job if needed" do
+      course_with_student_logged_in(:active_all => true)
+      conversation
+      expected_lma = Time.zone.parse('2012-12-21T12:42:00Z')
+      @conversation.last_message_at = expected_lma
+      @conversation.save!
+
+      ConversationParticipant.any_instance.stubs(:should_process_immediately?).returns(false)
+
+      post 'add_message', :conversation_id => @conversation.conversation_id, :body => "hello world"
+      expect(response).to be_success
+      expect(@conversation.reload.messages.count).to eq 1
+      run_jobs
+      expect(@conversation.reload.messages.count).to eq 2
+      expect(@conversation.reload.last_message_at).to eql expected_lma
+    end
+
     it "should generate a user note when requested" do
       Account.default.update_attribute :enable_user_notes, true
       course_with_teacher_logged_in(:active_all => true)
