@@ -98,6 +98,7 @@ class WikiPagesController < ApplicationController
 
       js_env :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu)
 
+      @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user)
       @padless = true
     end
   end

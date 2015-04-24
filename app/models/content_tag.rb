@@ -373,6 +373,10 @@ class ContentTag < ActiveRecord::Base
   def context_module_action(user, action, points=nil)
     self.context_module.update_for(user, action, self, points) if self.context_module
   end
+
+  def progression_for_user(user)
+    context_module.context_module_progressions.where(user_id: user.id).first
+  end
   
   def content_asset_string
     @content_asset_string ||= "#{self.content_type.underscore}_#{self.content_id}"

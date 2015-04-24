@@ -148,6 +148,9 @@ class AssignmentsController < ApplicationController
 
       @assignment_menu_tools = external_tools_display_hashes(:assignment_menu)
 
+
+      @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user)
+
       respond_to do |format|
         if @assignment.submission_types == 'online_quiz' && @assignment.quiz
           format.html { redirect_to named_context_url(@context, :context_quiz_url, @assignment.quiz.id) }
@@ -158,6 +161,7 @@ class AssignmentsController < ApplicationController
         elsif @assignment.submission_types == 'external_tool' && @assignment.external_tool_tag && @unlocked
           tag_type = params[:module_item_id].present? ? :modules : :assignments
           format.html { content_tag_redirect(@context, @assignment.external_tool_tag, :context_url, tag_type) }
+
         else
           format.html { render }
         end

@@ -160,6 +160,8 @@ stylesheets:
     - public/stylesheets/compiled/bundles/external_tool_full_width.css
   terms:
     - public/stylesheets/compiled/bundles/terms.css
+  wiki_page:
+    - public/stylesheets/compiled/bundles/wiki_page.css
   # Client Apps:
   canvas_quizzes:
     - public/stylesheets/compiled/bundles/canvas_quizzes.css
