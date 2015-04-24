@@ -1318,6 +1318,8 @@ CanvasRails::Application.routes.draw do
     scope(controller: :context_module_items_api) do
       get "courses/:course_id/modules/:module_id/items", action: :index, as: 'course_context_module_items'
       get "courses/:course_id/modules/:module_id/items/:id", action: :show, as: 'course_context_module_item'
+      put "courses/:course_id/modules/:module_id/items/:id/done", action: :mark_as_done, as: 'course_context_module_item_done'
+      delete "courses/:course_id/modules/:module_id/items/:id/done", action: :mark_as_not_done, as: 'course_context_module_item_not_done'
       get "courses/:course_id/module_item_redirect/:id", action: :redirect, as: 'course_context_module_item_redirect'
       get "courses/:course_id/module_item_sequence", action: :item_sequence
       post "courses/:course_id/modules/:module_id/items", action: :create, as: 'course_context_module_items_create'

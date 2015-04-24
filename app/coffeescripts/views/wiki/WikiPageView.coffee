@@ -79,6 +79,7 @@ define [
 
     afterRender: ->
       super
+      $(".header-bar-outer-container .header-bar-right").append($("#mark-as-done-checkbox"))
       @navigateToLinkAnchor()
       @reloadView = new WikiPageReloadView
         el: @$pageChangedAlert
