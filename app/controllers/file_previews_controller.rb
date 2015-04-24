@@ -44,7 +44,7 @@ class FilePreviewsController < ApplicationController
    application/postscript
    application/pdf
    application/vnd.ms-powerpoint
-}
+  }.freeze
 
   # renders (or redirects to) appropriate content for the file, such as
   # canvadocs, crocodoc, inline image, etc.

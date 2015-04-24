@@ -136,7 +136,7 @@ class ConversationsController < ApplicationController
   # batch up all delayed jobs to make this more responsive to the user
   batch_jobs_in_actions :only => :create
 
-  API_ALLOWED_FIELDS = %w{workflow_state subscribed starred scope filter}
+  API_ALLOWED_FIELDS = %w{workflow_state subscribed starred scope filter}.freeze
 
   # @API List conversations
   # Returns the list of conversations for the current user, most recent ones first.

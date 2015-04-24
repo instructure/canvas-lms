@@ -52,7 +52,7 @@ class Quizzes::QuizzesController < ApplicationController
 
   QUIZ_TYPE_ASSIGNMENT = 'assignment'
   QUIZ_TYPE_PRACTICE = 'practice_quiz'
-  QUIZ_TYPE_SURVEYS = ['survey', 'graded_survey']
+  QUIZ_TYPE_SURVEYS = ['survey', 'graded_survey'].freeze
 
   def index
     return unless authorized_action(@context, @current_user, :read)

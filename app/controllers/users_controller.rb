@@ -1003,7 +1003,7 @@ class UsersController < ApplicationController
 
     @active_tab = @tool.asset_string
     add_crumb(@current_user.short_name, user_profile_path(@current_user))
-    render ExternalToolsController::TOOL_DISPLAY_TEMPLATES['default']
+    render ExternalToolsController.display_template('default')
   end
 
   def new
