@@ -1221,8 +1221,8 @@ CanvasRails::Application.routes.draw do
       delete "groups/:group_id/followers/self", action: :unfollow
 
       scope(controller: :group_memberships) do
-        resources :memberships, path: "groups/:group_id/memberships", name_prefix: "group_", controller: :group_memberships, except: :show
-        resources :users, path: "groups/:group_id/users", name_prefix: "group_", controller: :group_memberships, except: [:index, :show, :create]
+        resources :memberships, path: "groups/:group_id/memberships", name_prefix: "group_", controller: :group_memberships
+        resources :users, path: "groups/:group_id/users", name_prefix: "group_", controller: :group_memberships, except: [:index, :create]
       end
 
       get  'groups/:group_id/files', controller: :files, action: :api_index, as: 'group_files'
