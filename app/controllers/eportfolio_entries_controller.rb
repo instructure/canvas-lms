@@ -61,7 +61,7 @@ class EportfolioEntriesController < ApplicationController
       end
       @category = @page.eportfolio_category
       eportfolio_page_attributes
-      render :template => "eportfolios/show"
+      render "eportfolios/show"
     end
   end
   
@@ -129,7 +129,7 @@ class EportfolioEntriesController < ApplicationController
       @context = @assignment.context
       # @entry.check_for_matching_attachment_id
       @headers = false
-      render :template => "submissions/show_preview"
+      render "submissions/show_preview"
     end
   end
 end

@@ -466,34 +466,47 @@ describe Quizzes::QuizzesController do
 
     it "should assign variables" do
       user_session(@teacher)
-      @sub = @quiz.generate_submission(@student)
+      sub = @quiz.generate_submission(@student)
       get 'moderate', :course_id => @course.id, :quiz_id => @quiz.id
       expect(assigns[:quiz]).to eq @quiz
       expect(assigns[:students]).to include @student
-      expect(assigns[:submissions]).to eq [@sub]
+      expect(assigns[:submissions]).to eq [sub]
     end
 
     it "should respect section privilege limitations" do
-      @course.student_enrollments.destroy_all
-      @section = @course.course_sections.create!(:name => 'section 2')
-      @user2 = user_with_pseudonym(:active_all => true, :name => 'Student2', :username => 'student2@instructure.com')
-      @section.enroll_user(@user2, 'StudentEnrollment', 'active')
-      @user1 = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
-      @course.enroll_student(@user1)
-      @ta1 = user_with_pseudonym(:active_all => true, :name => 'TA1', :username => 'ta1@instructure.com')
-      @course.enroll_ta(@ta1).update_attribute(:limit_privileges_to_course_section, true)
-      @sub1 = @quiz.generate_submission(@user1)
-      @sub2 = @quiz.generate_submission(@user2)
+      section = @course.course_sections.create!(:name => 'section 2')
+      @student2.enrollments.update_all(course_section_id: section)
+
+      ta1 = user_with_pseudonym(:active_all => true, :name => 'TA1', :username => 'ta1@instructure.com')
+      @course.enroll_ta(ta1).update_attribute(:limit_privileges_to_course_section, true)
+      sub1 = @quiz.generate_submission(@student)
+      sub2 = @quiz.generate_submission(@student2)
 
       user_session @teacher
       get 'moderate', :course_id => @course.id, :quiz_id => @quiz.id
-      expect(assigns[:students].sort_by(&:id)).to eq [@user1, @user2].sort_by(&:id)
-      expect(assigns[:submissions].sort_by(&:id)).to eq [@sub1, @sub2].sort_by(&:id)
+      expect(assigns[:students].sort_by(&:id)).to eq [@student, @student2].sort_by(&:id)
+      expect(assigns[:submissions].sort_by(&:id)).to eq [sub1, sub2].sort_by(&:id)
 
-      user_session @ta1
+      user_session ta1
       get 'moderate', :course_id => @course.id, :quiz_id => @quiz.id
-      expect(assigns[:students]).to eq [@user1]
-      expect(assigns[:submissions]).to eq [@sub1]
+      expect(assigns[:students]).to eq [@student]
+      expect(assigns[:submissions]).to eq [sub1]
+    end
+
+    it 'should not show duplicate students if they are enrolled in multiple sections' do
+      section = @course.course_sections.create!(:name => 'section 2')
+      @course.enroll_user(@student, 'StudentEnrollment', {
+        enrollment_state: 'active',
+        section: section,
+        allow_multiple_enrollments: true
+      })
+
+      expect(@student.reload.enrollments.count).to eq 2
+
+      user_session @teacher
+      get 'moderate', :course_id => @course.id, :quiz_id => @quiz.id
+
+      expect(assigns[:students].sort_by(&:id)).to eq [@student, @student2].sort_by(&:id)
     end
   end
 

@@ -49,6 +49,7 @@ class ApplicationController < ActionController::Base
   before_filter :set_page_view
   before_filter :require_reacceptance_of_terms
   before_filter :clear_policy_cache
+  before_filter :setup_live_events_context
   after_filter :log_page_view
   after_filter :discard_flash_if_xhr
   after_filter :cache_buster
@@ -59,6 +60,7 @@ class ApplicationController < ActionController::Base
   before_filter :init_body_classes
   after_filter :set_response_headers
   after_filter :update_enrollment_last_activity_at
+  after_filter :teardown_live_events_context
   include Tour
 
   add_crumb(proc {
@@ -106,9 +108,11 @@ class ApplicationController < ActionController::Base
         :current_user_roles => @current_user.try(:roles, @domain_root_account),
         :files_domain => HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
         :DOMAIN_ROOT_ACCOUNT_ID => @domain_root_account.try(:global_id),
+        :use_new_styles => use_new_styles?,
+        :k12 => k12?,
+        :use_high_contrast => @current_user.try(:prefers_high_contrast?),
         :SETTINGS => {
-          open_registration: @domain_root_account.try(:open_registration?),
-          use_high_contrast: @current_user.try(:prefers_high_contrast?)
+          open_registration: @domain_root_account.try(:open_registration?)
         }
       }
       @js_env[:lolcalize] = true if ENV['LOLCALIZE']
@@ -163,7 +167,10 @@ class ApplicationController < ActionController::Base
   helper_method 'use_new_styles?'
 
   def multiple_grading_periods?
-    @domain_root_account && @domain_root_account.feature_enabled?(:multiple_grading_periods)
+    is_account_and_mgp_is_allowed = !!(@context &&
+                                       @context.is_a?(Account) &&
+                                       @context.feature_allowed?(:multiple_grading_periods))
+    (@context && @context.feature_enabled?(:multiple_grading_periods)) || is_account_and_mgp_is_allowed
   end
   helper_method 'multiple_grading_periods?'
 
@@ -388,7 +395,7 @@ class ApplicationController < ActionController::Base
         end
 
         @is_delegated = delegated_authentication_url?
-        render :template => "shared/unauthorized", :layout => "application", :status => :unauthorized
+        render "shared/unauthorized", status: :unauthorized
       }
       format.zip { redirect_to(url_for(params)) }
       format.json { render_json_unauthorized }
@@ -505,6 +512,10 @@ class ApplicationController < ActionController::Base
         set_badge_counts_for(@context, @current_user, @current_enrollment)
       end
     end
+
+    # There is lots of interesting information set up in here, that we want
+    # to place into the live events context.
+    setup_live_events_context
   end
 
   # This is used by a number of actions to retrieve a list of all contexts
@@ -801,7 +812,7 @@ class ApplicationController < ActionController::Base
 
   def require_reacceptance_of_terms
     if session[:require_terms] && !api_request? && request.get?
-      render :template => "shared/terms_required", :layout => "application", :status => :unauthorized
+      render "shared/terms_required", status: :unauthorized
       false
     end
   end
@@ -1190,7 +1201,7 @@ class ApplicationController < ActionController::Base
       @module = tag.context_module
       log_asset_access(@tag, "external_urls", "external_urls")
       tag.context_module_action(@current_user, :read) unless tag.locked_for? @current_user
-      render :template => 'context_modules/url_show'
+      render 'context_modules/url_show'
     elsif tag.content_type == 'ContextExternalTool'
       @tag = tag
       if @tag.context.is_a?(Assignment)
@@ -1388,8 +1399,6 @@ class ApplicationController < ActionController::Base
         Canvas::Plugin.find(:yo).try(:enabled?)
       elsif feature == :twitter
         !!Twitter::Connection.config
-      elsif feature == :facebook
-        !!Facebook::Connection.config
       elsif feature == :linked_in
         !!LinkedIn::Connection.config
       elsif feature == :diigo
@@ -1473,7 +1482,7 @@ class ApplicationController < ActionController::Base
     return false if require_user == false
     unless @current_user.registered?
       respond_to do |format|
-        format.html { render :template => "shared/registration_incomplete", :layout => "application", :status => :unauthorized }
+        format.html { render "shared/registration_incomplete", status: :unauthorized }
         format.json { render :json => { 'status' => 'unauthorized', 'message' => t('#errors.registration_incomplete', 'You need to confirm your email address before you can view this page') }, :status => :unauthorized }
       end
       return false
@@ -1576,7 +1585,7 @@ class ApplicationController < ActionController::Base
 
   def render(options = nil, extra_options = {}, &block)
     set_layout_options
-    if options && options.key?(:json)
+    if options.is_a?(Hash) && options.key?(:json)
       json = options.delete(:json)
       unless json.is_a?(String)
         json_cast(json)
@@ -1882,5 +1891,37 @@ class ApplicationController < ActionController::Base
     nil
   end
   helper_method :request_delete_account_link
-end
 
+  def setup_live_events_context
+    ctx = {}
+    ctx[:root_account_id] = @domain_root_account.global_id if @domain_root_account
+    ctx[:user_id] = @current_user.global_id if @current_user
+    ctx[:real_user_id] = @real_current_user.global_id if @real_current_user
+    ctx[:user_login] = @current_pseudonym.unique_id if @current_pseudonym
+    ctx[:hostname] = request.host
+    ctx[:user_agent] = request.headers['User-Agent']
+    ctx[:context_type] = @context.class.to_s if @context
+    ctx[:context_id] = @context.global_id if @context
+    if @context_membership
+      ctx[:context_role] =
+        if @context_membership.respond_to?(:role)
+          @context_membership.role.name
+        elsif @context_membership.respond_to?(:type)
+          @context_membership.type
+        else
+          @context_membership.class.to_s
+        end
+    end
+
+    if tctx = Thread.current[:context]
+      ctx[:request_id] = tctx[:request_id]
+      ctx[:session_id] = tctx[:session_id]
+    end
+
+    LiveEvents.set_context(ctx)
+  end
+
+  def teardown_live_events_context
+    LiveEvents.clear_context!
+  end
+end

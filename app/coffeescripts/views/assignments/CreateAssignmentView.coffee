@@ -2,12 +2,13 @@ define [
   'underscore'
   'compiled/models/Assignment'
   'compiled/views/DialogFormView'
+  'compiled/util/DateValidator'
   'jst/assignments/CreateAssignment'
   'jst/EmptyDialogFormWrapper'
   'i18n!assignments'
   'jquery'
   'jquery.instructure_date_and_time'
-], (_, Assignment, DialogFormView, template, wrapper, I18n, $) ->
+], (_, Assignment, DialogFormView, DateValidator, template, wrapper, I18n, $) ->
 
   class CreateAssignmentView extends DialogFormView
     defaults:
@@ -92,6 +93,7 @@ define [
     validateBeforeSave: (data, errors) ->
       errors = @_validateTitle data, errors
       errors = @_validatePointsPossible data, errors
+      errors = @_validateDueDate data, errors
       errors
 
     _validateTitle: (data, errors) ->
@@ -114,3 +116,24 @@ define [
           message: I18n.t 'points_possible_number', 'Points possible must be a number'
         ]
       errors
+
+    _validateDueDate: (data, errors) ->
+      return errors unless data.due_at
+
+      validRange = ENV.VALID_DATE_RANGE
+      data.lock_at = @model.lockAt()
+      data.unlock_at = @model.unlockAt()
+      dateValidator = new DateValidator({date_range: validRange, data: data})
+      errs = dateValidator.validateDates()
+
+      return errors if _.isEmpty(errs)
+
+      # need to override default error message to focus only on due date field for quick add/edit
+      if errs['lock_at']
+        errs['due_at'] = I18n.t('Due date cannot be after lock date')
+      if errs['unlock_at']
+        errs['due_at'] = I18n.t('Due date cannot be before unlock date')
+
+      errors["due_at"] = [message: errs["due_at"]]
+      errors
+

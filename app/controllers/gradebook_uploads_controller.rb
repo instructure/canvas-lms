@@ -48,6 +48,7 @@ class GradebookUploadsController < ApplicationController
 
   def show
     if authorized_action(@context, @current_user, :manage_grades)
+
       upload = gradebook_upload
       unless upload
         redirect_to new_course_gradebook_upload_path(@context)
@@ -64,7 +65,7 @@ class GradebookUploadsController < ApplicationController
       attachment = params[:gradebook_upload][:uploaded_data]
       @progress = GradebookUpload.queue_from(@context, @current_user, attachment.read)
       js_env gradebook_env(@progress)
-      render :action => :show
+      render :show
     end
   end
 

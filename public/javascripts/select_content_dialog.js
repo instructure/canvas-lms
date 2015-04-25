@@ -157,7 +157,7 @@ $(document).ready(function() {
     } else if(item_type == 'context_external_tool') {
 
       var tool = $("#context_external_tools_select .tools .tool.selected").data('tool');
-      var tool_type = tool ? tool.definition_type :$("#add_module_item_select").val()
+      var tool_type = tool ? $.underscore(tool.definition_type) : $("#add_module_item_select").val();
       var tool_id = tool ? tool.definition_id : 0
       var item_data = {
         'item[type]': tool_type,

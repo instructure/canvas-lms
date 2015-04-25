@@ -26,6 +26,7 @@ namespace :i18n do
     @command = I18nliner::Commands::Check.run(options)
     @command.success? or exit 1
     @translations = @command.translations
+    remove_unwanted_translations(@translations)
 
     # merge js in
     js_translations.each do |key, value|
@@ -343,6 +344,10 @@ namespace :i18n do
     end
     new_translations = YAML.safe_load(open(args[:translated_file]))
     autoimport(source_translations, new_translations)
+  end
+
+  def remove_unwanted_translations(translations)
+    translations['date'].delete('order')
   end
 
   def autoimport(source_translations, new_translations)

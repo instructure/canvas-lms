@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+
+require File.expand_path('../../config/boot',  __FILE__)
+
+require 'aws-sdk-v1'
+require 'json'
+require 'pp'
+
+HOSTNAME = ARGV[0]
+PORT = ARGV[1]
+STREAM_NAME = ARGV[2]
+
+@kinesis = AWS::Kinesis.new(
+  access_key_id: 'key',
+  secret_access_key: 'secret',
+  kinesis_endpoint: HOSTNAME,
+  kinesis_port: PORT,
+  use_ssl: false
+).client
+
+res = @kinesis.get_shard_iterator(
+  stream_name: STREAM_NAME,
+  shard_id: "shardId-000000000000",
+  shard_iterator_type: "TRIM_HORIZON"
+)
+iterator = res.data[:shard_iterator]
+
+loop do
+  res = @kinesis.get_records(shard_iterator: iterator)
+  res.data[:records].each do |record|
+    body = record[:data]
+    pp JSON.parse(body)
+    puts "---"
+  end
+
+  iterator = res.data[:next_shard_iterator]
+  sleep 1
+end
+

@@ -25,7 +25,7 @@ describe "scheduler" do
       create_appointment_group_manual
     end
 
-    it "should create appointment group and go back and publish it" do
+    it "should create appointment group and go back and publish it", :priority => "1", :test_id => 85934 do
       get "/calendar2"
       click_scheduler_link
 
@@ -101,7 +101,7 @@ describe "scheduler" do
       expect(new_group.sub_contexts.first).to eq section
     end
 
-    it "should delete an appointment group" do
+    it "should delete an appointment group", :priority => "1", :test_id => 140216 do
       create_appointment_group
       get "/calendar2"
       click_scheduler_link
@@ -137,7 +137,7 @@ describe "scheduler" do
       keep_trying_until { expect(element_exists('.fc-event-bg')).to be_falsey }
     end
 
-    it "should check index page for correct element", :priority => "1" do
+    it "should check index page for correct element", :priority => "1", :test_id => 85949 do
       title = "blarg"
       location = "brighton"
 

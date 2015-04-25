@@ -3,7 +3,8 @@ define [
   'underscore'
   'str/htmlEscape'
   'jquery'
-], (I18n, _, htmlEscape, $) ->
+  'compiled/util/deparam'
+], (I18n, _, htmlEscape, $, deparam) ->
 
   MEDIA_COMMENT_THUMBNAIL_SIZES =
     normal: {width: 140, height: 100}
@@ -13,6 +14,10 @@ define [
     return console.log('Kaltura has not been enabled for this account') unless INST.kalturaSettings
 
     $link = $(elem)
+    try
+      url = new URL($link.attr('href'))
+    return if url && deparam(url.search).no_preview
+
     dimensions = MEDIA_COMMENT_THUMBNAIL_SIZES[size] ? MEDIA_COMMENT_THUMBNAIL_SIZES.normal
     id = $link.data('media_comment_id') ||
          $.trim($link.find(".media_comment_id:first").text()) ||

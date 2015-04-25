@@ -85,7 +85,7 @@ define [
       @totalColumnInFront = userSettings.contextGet 'total_column_in_front'
       @numberOfFrozenCols = if @totalColumnInFront then 3 else 2
       @mgpEnabled = ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled
-      @gradingPeriods = ENV.GRADEBOOK_OPTIONS.grading_periods
+      @gradingPeriods = ENV.GRADEBOOK_OPTIONS.active_grading_periods
       @gradingPeriodToShow = userSettings.contextGet('gradebook_current_grading_period') || ENV.GRADEBOOK_OPTIONS.current_grading_period_id
 
       $.subscribe 'assignment_group_weights_changed', @handleAssignmentGroupWeightChange
@@ -105,7 +105,7 @@ define [
       @alignCoursePreferencesWithLocalStorage()
 
       assignmentGroupsParams = {exclude_descriptions: true}
-      if @mgpEnabled && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
+      if @mgpEnabled && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
         $.extend(assignmentGroupsParams, {grading_period_id: @gradingPeriodToShow})
 
       ajax_calls = [
@@ -152,6 +152,7 @@ define [
           url = @options.custom_column_data_url.replace /:id/, c.id
           @getCustomColumnData(c.id)
         @assignment_visibility() if ENV.GRADEBOOK_OPTIONS.differentiated_assignments_enabled
+        @disableAssignmentsInClosedGradingPeriods() if @mgpEnabled
 
       @showCustomColumnDropdownOption()
       @initPostGradesStore()
@@ -172,6 +173,37 @@ define [
       assignment = @assignments[hiddenSub.assignment_id]
       filteredVisibility = assignment.assignment_visibility.filter (id) -> id != hiddenSub.user_id
       assignment.assignment_visibility = filteredVisibility
+
+    disableAssignmentsInClosedGradingPeriods: () ->
+      closedAdminGradingPeriods = @getClosedAdminGradingPeriods()
+
+      if closedAdminGradingPeriods.length > 0
+        assignments = @getAssignmentsInClosedGradingPeriods(closedAdminGradingPeriods)
+        @disabledAssignments = assignments.map (a) ->
+          a.id
+
+        @grid.setColumns @getVisibleGradeGridColumns()
+
+    getClosedAdminGradingPeriods: () ->
+      _.select @gradingPeriods, (gradingPeriod) =>
+        @gradingPeriodIsAdmin(gradingPeriod) && @gradingPeriodIsClosed(gradingPeriod)
+
+    gradingPeriodIsAdmin: (gradingPeriod) ->
+      !gradingPeriod.permissions.manage
+
+    gradingPeriodIsClosed: (gradingPeriod) ->
+      new Date(gradingPeriod.end_date) < new Date()
+
+    getAssignmentsInClosedGradingPeriods: (gradingPeriods) ->
+      latestEndDate = new Date(gradingPeriods[0]?.end_date)
+      for gradingPeriod in gradingPeriods
+        latestEndDate = new Date(gradingPeriod.end_date) if latestEndDate < new Date(gradingPeriod.end_date)
+      #return assignments whose end date is within the latest closed's end date
+      _.select @assignments, (a) =>
+        @assignmentIsDueBeforeEndDate(a, latestEndDate)
+
+    assignmentIsDueBeforeEndDate: (assignment, gradingPeriodEndDate) ->
+      new Date(assignment.due_at) <= gradingPeriodEndDate
 
     onShow: ->
       $(".post-grades-placeholder").show();
@@ -474,7 +506,7 @@ define [
           params =
             student_ids: (student.id for student in students)
             response_fields: ['id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission', 'attachments', 'late', 'workflow_state']
-          params['grading_period_id'] = @gradingPeriodToShow if @mgpEnabled && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
+          params['grading_period_id'] = @gradingPeriodToShow if @mgpEnabled && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
           $.ajaxJSON(@options.submissions_url, "GET", params, @gotSubmissionsChunk)
           @chunk_start += @options.chunk_size
 
@@ -557,13 +589,13 @@ define [
           if assignment.grading_type == 'points' && assignment.points_possible
             SubmissionCell.out_of.formatter(row, col, submission, assignment)
           else
-            (SubmissionCell[assignment.grading_type] || SubmissionCell).formatter(row, col, submission, assignment)
+            (SubmissionCell[assignment.grading_type] || SubmissionCell).formatter(row, col, submission, assignment, @grid)
 
     staticCellFormatter: (row, col, val) =>
       "<div class='cell-content gradebook-cell'>#{htmlEscape(val)}</div>"
 
     uneditableCellFormatter: (row, col) =>
-      "<div class='cell-content gradebook-cell grayed-out'></div>"
+      "<div class='cell-content gradebook-cell grayed-out cannot_edit'></div>"
 
     groupTotalFormatter: (row, col, val, columnDef, student) =>
       return '' unless val?
@@ -774,6 +806,7 @@ define [
             $(this).find('div.gradebook-tooltip').removeClass('first-row')
         .delegate '.gradebook-cell-comment', 'click.gradebook', (event) =>
           event.preventDefault()
+          return false if $(@grid.getActiveCellNode()).hasClass("cannot_edit")
           data = $(event.currentTarget).data()
           $(@grid.getActiveCellNode()).removeClass('editable')
           SubmissionDetailsDialog.open @assignments[data.assignmentId], @student(data.userId.toString()), @options
@@ -1000,6 +1033,8 @@ define [
     getVisibleGradeGridColumns: ->
       res = [].concat @parentColumns, @customColumnDefinitions()
       for column in @allAssignmentColumns
+        if @disabledAssignments && @disabledAssignments.indexOf(column.object.id) != -1
+          column.cssClass = "cannot_edit"
         submissionType = ''+ column.object.submission_types
         res.push(column) unless submissionType is "not_graded" or
                                 submissionType is "attendance" and !@show_attendance
@@ -1175,7 +1210,7 @@ define [
 
     onBeforeEditCell: (event, {row, cell}) =>
       $cell = @grid.getCellNode(row, cell)
-      return false if $($cell).find(".gradebook-cell").hasClass("grayed-out")
+      return false if $($cell).hasClass("cannot_edit") || $($cell).find(".gradebook-cell").hasClass("cannot_edit")
 
     onCellChange: (event, {item, column}) =>
       if col_id = column.field.match /^custom_col_(\d+)/

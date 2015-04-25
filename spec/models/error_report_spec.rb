@@ -96,4 +96,21 @@ describe ErrorReport do
     expect(report.data["query_parameters"]).to eq({ "access_token" => "[FILTERED]", "pseudonym[password]" => "[FILTERED]" }.inspect)
     expect(report.data["request_parameters"]).to eq({ "client_secret" => "[FILTERED]" }.inspect)
   end
+
+  describe ".useful_http_env_stuff_from_request" do
+    it "duplicates to get away from frozen strings out of the request.env" do
+      dangerous_hash = {
+        "QUERY_STRING".force_encoding(Encoding::ASCII_8BIT).freeze =>
+          "somestuff=blah".force_encoding(Encoding::ASCII_8BIT).freeze,
+        "HTTP_HOST".force_encoding(Encoding::ASCII_8BIT).freeze =>
+          "somehost.com".force_encoding(Encoding::ASCII_8BIT).freeze,
+      }
+      req = stub(env: dangerous_hash, remote_ip: "", url: "",
+                 path_parameters: {}, query_parameters: {}, request_parameters: {})
+      env_stuff = ErrorReport.useful_http_env_stuff_from_request(req)
+      expect{
+        Utf8Cleaner.recursively_strip_invalid_utf8!(env_stuff, true)
+      }.not_to raise_error
+    end
+  end
 end

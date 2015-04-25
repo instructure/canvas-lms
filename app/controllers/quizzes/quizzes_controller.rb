@@ -285,20 +285,12 @@ class Quizzes::QuizzesController < ApplicationController
         :CONTEXT_ACTION_SOURCE => :quizzes,
         :REGRADE_OPTIONS => regrade_options,
         :quiz_max_combination_count => QUIZ_MAX_COMBINATION_COUNT,
-        :COURSE_DATE_RANGE => {
-          :start_at => @context.start_at,
-          :end_at => @context.conclude_at,
-          :override_term_dates => @context.restrict_enrollments_to_course_dates
-        },
-        :TERM_DATE_RANGE => {
-          :start_at => @context.enrollment_term.start_at,
-          :end_at => @context.enrollment_term.end_at
-        }
+        :VALID_DATE_RANGE => CourseDateRange.new(@context)
       }
 
       append_sis_data(hash)
       js_env(hash)
-      render :action => "new"
+      render :new
     end
   end
 
@@ -528,7 +520,7 @@ class Quizzes::QuizzesController < ApplicationController
             quiz_reports_url: api_v1_course_quiz_reports_url(@context, @quiz),
           })
 
-          render action: "statistics_cqs"
+          render :statistics_cqs
         }
       end
     end
@@ -653,8 +645,7 @@ class Quizzes::QuizzesController < ApplicationController
 
   def moderate
     if authorized_action(@quiz, @current_user, :grade)
-      @all_students = @context.students_visible_to(@current_user).order_by_sortable_name
-      @students = @all_students
+      @students = @context.students_visible_to(@current_user).uniq.order_by_sortable_name
       @students = @students.order(:uuid) if @quiz.survey? && @quiz.anonymous_submissions
       last_updated_at = Time.parse(params[:last_updated_at]) rescue nil
       respond_to do |format|
@@ -844,7 +835,7 @@ class Quizzes::QuizzesController < ApplicationController
     js_env QUIZ_SUBMISSION_EVENTS_URL: events_url unless @js_env[:QUIZ_SUBMISSION_EVENTS_URL]
 
     @quiz_presenter = Quizzes::TakeQuizPresenter.new(@quiz, @submission, params)
-    render :action => 'take_quiz'
+    render :take_quiz
   end
 
   def valid_question?(submission, question_id)
@@ -862,10 +853,10 @@ class Quizzes::QuizzesController < ApplicationController
       session[quiz_access_code_key] = true
     end
     if @quiz.access_code.present? && !session[quiz_access_code_key]
-      render :action => 'access_code'
+      render :access_code
       false
     elsif @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
-      render :action => 'invalid_ip'
+      render :invalid_ip
       false
     elsif @section.present? && @section.restrict_enrollments_to_section_dates && @section.end_at < Time.now
       false

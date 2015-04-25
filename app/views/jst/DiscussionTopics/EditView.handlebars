@@ -116,12 +116,14 @@
           {{#t "enable_podcast_feed"}}Enable podcast feed{{/t}}
         </label>
 
-        <label id="podcast_has_student_posts_container"
-               style="{{hiddenUnless podcast_url}}"
-               class="checkbox" for="podcast_has_student_posts">
-          {{checkbox "podcast_has_student_posts"}}
-          {{#t "include_replies_in_podcast_feed"}}Include Replies in podcast feed{{/t}}
-        </label>
+        {{#if contextIsCourse}}
+          <label id="podcast_has_student_posts_container"
+                 style="{{hiddenUnless podcast_url}}"
+                 class="checkbox" for="podcast_has_student_posts">
+            {{checkbox "podcast_has_student_posts"}}
+            {{#t "include_replies_in_podcast_feed"}}Include student replies in podcast feed{{/t}}
+          </label>
+        {{/if}}
       {{/if}}
       {{#if showAssignment}}
         <label class="checkbox" for="use_for_grading">

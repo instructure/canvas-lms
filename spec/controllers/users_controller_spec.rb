@@ -62,37 +62,18 @@ describe UsersController do
   end
 
   describe "GET oauth" do
-    it "sets up oauth for facebook" do
-      Facebook::Connection.config = Proc.new do
-        {}
-      end
-      CanvasSlug.stubs(:generate).returns("some_uuid")
-
-      user_with_pseudonym
-      user_session(@user)
-
-      OauthRequest.expects(:create).with(
-          :service => "facebook",
-          :secret => "some_uuid",
-          :return_url => "http://example.com",
-          :user => @user,
-          :original_host_with_port => "test.host"
-      ).returns(stub(global_id: "123"))
-      Facebook::Connection.expects(:authorize_url).returns("http://example.com/redirect")
-
-      get :oauth, {service: "facebook", return_to: "http://example.com"}
-
-      expect(response).to redirect_to "http://example.com/redirect"
-    end
-
     it "sets up oauth for google_drive" do
       state = nil
       settings_mock = mock()
       settings_mock.stubs(:settings).returns({})
       settings_mock.stubs(:enabled?).returns(true)
+
+      user(:active_all => true)
+      user_session(@user)
+
       Canvas::Plugin.stubs(:find).returns(settings_mock)
       SecureRandom.stubs(:hex).returns('abc123')
-      GoogleDrive::Client.expects(:auth_uri).with() {|c, s| state = s and true}.returns("http://example.com/redirect")
+      GoogleDrive::Client.expects(:auth_uri).with() {|_c, s| state = s and true}.returns("http://example.com/redirect")
 
       get :oauth, {service: "google_drive", return_to: "http://example.com"}
 
@@ -107,25 +88,6 @@ describe UsersController do
   end
 
   describe "GET oauth_success" do
-    it "handles facebook post oauth redirects" do
-
-      user_with_pseudonym
-      user_session(@user)
-
-
-      Canvas::Security.expects(:decrypt_password).with("some", "state", 'facebook_oauth_request').returns("123")
-      mock_oauth_request = stub(original_host_with_port: "test.host", user: @user, return_url: "example.com")
-      OauthRequest.expects(:where).with(id: "123").returns(stub(first: mock_oauth_request))
-      Facebook::Connection.expects(:get_service_user_info).with("access_token").returns({"id" => "456", "name" => "joe", "link" => "some_link"})
-      UserService.any_instance.expects(:save) do |user_service|
-        expect(user_service.id).to eq "456"
-        expect(user_service.name).to eq "joe"
-        expect(user_service.link).to eq "some_link"
-      end
-
-      get :oauth_success, state: "some.state", service: "facebook", access_token: "access_token"
-    end
-
     it "handles google_drive oauth_success for a logged_in_user" do
       settings_mock = mock()
       settings_mock.stubs(:settings).returns({})
@@ -627,6 +589,19 @@ describe UsersController do
 
         it "should allow setting a password" do
           post 'create', :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal' }
+          u = User.where(name: 'Jacob Fugal').first
+          expect(u).to be_present
+          expect(u.pseudonym).not_to be_password_auto_generated
+        end
+
+        it "allows admins to force the self-registration workflow for a given user" do
+          Pseudonym.any_instance.expects(:send_confirmation!)
+          post 'create', account_id: account.id,
+            pseudonym: {
+              unique_id: 'jacob@instructure.com', password: 'asdfasdf',
+              password_confirmation: 'asdfasdf', force_self_registration: "1",
+            }, user: { name: 'Jacob Fugal' }
+          expect(response).to be_success
           u = User.where(name: 'Jacob Fugal').first
           expect(u).to be_present
           expect(u.pseudonym).not_to be_password_auto_generated

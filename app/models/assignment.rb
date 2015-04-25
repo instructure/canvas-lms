@@ -33,7 +33,7 @@ class Assignment < ActiveRecord::Base
 
   attr_accessible :title, :name, :description, :due_at, :points_possible,
     :grading_type, :submission_types, :assignment_group, :unlock_at, :lock_at,
-    :group_category, :group_category_id, :peer_review_count,
+    :group_category, :group_category_id, :peer_review_count, :anonymous_peer_reviews,
     :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
     :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
     :notify_of_update, :time_zone_edited, :turnitin_enabled,
@@ -911,11 +911,6 @@ class Assignment < ActiveRecord::Base
     send_later_if_production(:multiple_module_actions, student_ids, :scored, score)
   end
 
-  def update_user_from_rubric(user, assessment)
-    score = self.points_possible * (assessment.score / assessment.rubric.points_possible)
-    self.grade_student(user, :grade => self.score_to_grade(score), :grader => assessment.assessor)
-  end
-
   def title_with_id
     "#{title} (#{id})"
   end
@@ -958,10 +953,12 @@ class Assignment < ActiveRecord::Base
     self.submissions.where(user_id: user.id).first_or_initialize
   end
 
+  class GradeError < StandardError; end
+
   def grade_student(original_student, opts={})
-    raise "Student is required" unless original_student
-    raise "Student must be enrolled in the course as a student to be graded" unless context.includes_student?(original_student)
-    raise "Grader must be enrolled as a course admin" if opts[:grader] && !self.context.grants_right?(opts[:grader], :manage_grades)
+    raise GradeError.new("Student is required") unless original_student
+    raise GradeError.new("Student must be enrolled in the course as a student to be graded") unless context.includes_student?(original_student)
+    raise GradeError.new("Grader must be enrolled as a course admin") if opts[:grader] && !self.context.grants_right?(opts[:grader], :manage_grades)
     opts.delete(:id)
     dont_overwrite_grade = opts.delete(:dont_overwrite_grade)
     group_comment = Canvas::Plugin.value_to_boolean(opts.delete(:group_comment))
@@ -973,6 +970,7 @@ class Assignment < ActiveRecord::Base
       :author => grader,
       :media_comment_id => (opts.delete :media_comment_id),
       :media_comment_type => (opts.delete :media_comment_type),
+      :hidden => muted?,
     }
     comment[:group_comment_id] = CanvasSlug.generate_securish_uuid if group_comment && group
     submissions = []
@@ -1901,6 +1899,10 @@ class Assignment < ActiveRecord::Base
     else
       submissions.having_submission.where("user_id IS NOT NULL").exists?
     end
+  end
+
+  def group_category_deleted_with_submissions?
+    self.group_category.try(:deleted_at?) && self.has_student_submissions?
   end
 
   def self.with_student_submission_count

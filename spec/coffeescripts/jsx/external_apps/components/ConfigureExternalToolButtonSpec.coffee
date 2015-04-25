@@ -44,15 +44,6 @@ define [
           "name": "Twitter",
           "tool_configuration": null
         },
-        {
-          "app_id": 3,
-          "app_type": "Lti::ToolProxy",
-          "description": null,
-          "enabled": false,
-          "installed_locally": true,
-          "name": "Facebook",
-          "tool_configuration": null
-        }
       ]
     teardown: ->
       React.unmountComponentAtNode wrapper

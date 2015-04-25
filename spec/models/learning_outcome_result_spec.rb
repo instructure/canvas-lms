@@ -82,4 +82,24 @@ describe LearningOutcomeResult do
     end
   end
 
+  describe '#submitted_or_assessed_at' do
+    before(:once) do
+      @submitted_at = 1.month.ago
+      @assessed_at = 2.weeks.ago
+    end
+
+    it 'returns #submitted_at when present' do
+      learning_outcome_result.update_attribute(:submitted_at, @submitted_at)
+      expect(learning_outcome_result.submitted_or_assessed_at).to eq(@submitted_at)
+    end
+
+    it 'returns #assessed_at when #submitted_at is not present' do
+      learning_outcome_result.assign_attributes({
+        assessed_at: @assessed_at,
+        submitted_at: nil
+      }, without_protection: true)
+      expect(learning_outcome_result.submitted_or_assessed_at).to eq(@assessed_at)
+    end
+
+  end
 end

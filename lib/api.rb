@@ -388,14 +388,30 @@ module Api
     end
   end
 
+  PLACEHOLDER_PROTOCOL = 'https'
+  PLACEHOLDER_HOST = 'placeholder.invalid'
+
+  def get_host_and_protocol_from_request
+    [ request.host_with_port, request.ssl? ? 'https' : 'http' ]
+  end
+
+  def resolve_placeholders(content)
+    host, protocol = get_host_and_protocol_from_request
+    # content is a json-encoded string; slashes are escaped
+    content.gsub("#{PLACEHOLDER_PROTOCOL}:\\/\\/#{PLACEHOLDER_HOST}", "#{protocol}:\\/\\/#{host}")
+  end
+
   def api_user_content(html, context = @context, user = @current_user, preloaded_attachments = {}, is_public=false)
     return html if html.blank?
 
-    # if we're a controller, use the host of the request, otherwise let HostUrl
-    # figure out what host is appropriate
-    if self.is_a?(ApplicationController)
-      host = request.host_with_port
-      protocol = request.ssl? ? 'https' : 'http'
+    # use the host of the request if available;
+    # use a placeholder host for pre-generated content, which we will replace with the request host when available;
+    # otherwise let HostUrl figure out what host is appropriate
+    if self.respond_to?(:request)
+      host, protocol = get_host_and_protocol_from_request
+    elsif self.respond_to?(:use_placeholder_host?) && use_placeholder_host?
+      host = PLACEHOLDER_HOST
+      protocol = PLACEHOLDER_PROTOCOL
     else
       host = HostUrl.context_host(context, @account_domain.try(:host))
       protocol = HostUrl.protocol
@@ -412,11 +428,18 @@ module Api
                 end
       end
 
-      next unless obj && ((is_public && !obj.locked_for?(user)) || obj.grants_right?(user, nil, :download))
+      unless obj && ((is_public && !obj.locked_for?(user)) || obj.grants_right?(user, nil, :download))
+        if obj && obj.previewable_media? && (uri = URI.parse(match.url) rescue nil)
+          uri.query = (uri.query.to_s.split("&") + ["no_preview=1"]).join("&")
+          next uri.to_s
+        else
+          next
+        end
+      end
 
       if ["Course", "Group", "Account", "User"].include?(obj.context_type)
         opts = {:only_path => true}
-        opts.merge!(:verifier => obj.uuid) unless respond_to?(:in_app?, true) && in_app?
+        opts.merge!(:verifier => obj.uuid) unless respond_to?(:in_app?, true) && in_app? && !is_public
         if match.rest.start_with?("/preview")
           url = self.send("#{obj.context_type.downcase}_file_preview_url", obj.context_id, obj.id, opts)
         else
@@ -426,7 +449,7 @@ module Api
         end
       else
         opts = {:download => '1', :only_path => true}
-        opts.merge!(:verifier => obj.uuid) unless respond_to?(:in_app?, true) && in_app?
+        opts.merge!(:verifier => obj.uuid) unless respond_to?(:in_app?, true) && in_app? && !is_public
         url = file_download_url(obj.id, opts)
       end
       url

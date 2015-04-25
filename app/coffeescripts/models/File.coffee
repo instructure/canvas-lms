@@ -70,6 +70,10 @@ define [
 
     externalToolEnabled: (tool) =>
       if tool.accept_media_types && tool.accept_media_types.length > 0
-        _.indexOf(tool.accept_media_types.split(","), @get('content-type')) != -1
+        content_type = @get('content-type')
+        _.find(tool.accept_media_types.split(","), (t) ->
+          regex = new RegExp("^#{t.replace('*', '.*')}$")
+          content_type.match(regex)
+        )
       else
         true

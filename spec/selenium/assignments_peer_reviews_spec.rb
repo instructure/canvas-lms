@@ -55,4 +55,109 @@ describe "assignments" do
       expect(assessment.assessment_type).to eq 'peer_review'
     end
   end
+
+  describe 'with anonymous peer reviews' do
+    let!(:review_course) { course(active_all: true) }
+    let!(:teacher) { review_course.teachers.first }
+    let!(:reviewed) { student_in_course(active_all: true).user }
+    let!(:reviewer) { student_in_course(active_all: true).user }
+    let!(:assignment) {
+      assignment_model({
+        course: review_course,
+        peer_reviews: true,
+        anonymous_peer_reviews: true
+      })
+    }
+    let!(:submission) {
+      submission_model({
+        assignment: assignment,
+        body: 'submission body',
+        course: review_course,
+        grade: "5",
+        score: "5",
+        submission_type: 'online_text_entry',
+        user: reviewed
+      })
+    }
+    let!(:comment) {
+      submission_comment_model({
+        author: reviewer,
+        recipient: reviewed
+      })
+    }
+    let!(:rubric) { rubric_model }
+    let!(:association) {
+      rubric.associate_with(assignment, review_course, {
+        :purpose => 'grading', :use_for_grading => true
+      })
+    }
+    let!(:assessment) {
+      association.assess({
+        :user => reviewed,
+        :assessor => reviewer,
+        :artifact => submission,
+        :assessment => {
+          :assessment_type => 'peer_review',
+          :criterion_crit1 => {
+            :points => 5,
+            :comments => "Hey, it's a comment."
+          }
+        }
+      })
+    }
+    before(:each) { assignment.assign_peer_review(reviewer, reviewed) }
+
+    context 'when reviewed is logged in' do
+      before(:each) { user_logged_in(user: reviewed) }
+
+      it 'should block reviewer name on assignments page' do
+        get "/courses/#{review_course.id}/assignments/#{assignment.id}"
+        expect(f("#comment-#{comment.id} .signature")).to include_text(t("Anonymous User"))
+      end
+
+      it 'should hide comment reviewer name on submission page' do
+        get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
+        expect(f("#submission_comment_#{comment.id} .author_name")).to include_text(t("Anonymous User"))
+      end
+
+      it 'should hide comment reviewer name on rubric popup' do
+        get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
+        f('.assess_submission_link').click
+        wait_for_animations
+        expect(f("#rubric_assessment_option_#{assessment.id}")).to include_text(t("Anonymous User"))
+      end
+    end
+
+    context 'when reviewer is logged in' do
+      before(:each) { user_logged_in(user: reviewer) }
+
+      it 'should show comment reviewer name on submission page' do
+        get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
+        expect(f("#submission_comment_#{comment.id} .author_name")).to include_text(comment.author_name)
+      end
+
+      it 'should show comment reviewer name on rubric popup' do
+        get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
+        f('.assess_submission_link').click
+        wait_for_animations
+        expect(f("#rubric_assessment_option_#{assessment.id}")).to include_text(reviewer.email)
+      end
+    end
+
+    context 'when teacher is logged in' do
+      before(:each) { user_logged_in(user: teacher) }
+
+      it 'should show comment reviewer name on submission page' do
+        get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
+        expect(f("#submission_comment_#{comment.id} .author_name")).to include_text(comment.author_name)
+      end
+
+      it 'should show comment reviewer name on rubric popup' do
+        get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
+        f('.assess_submission_link').click
+        wait_for_animations
+        expect(f("#rubric_assessment_option_#{assessment.id}")).to include_text(assessment.assessor_name)
+      end
+    end
+  end
 end

@@ -52,6 +52,7 @@ define [
       @$el.html(template(data))
       @$el.selectpicker('refresh')
       @$picker.find('.paginatedLoadingIndicator').remove()
+      @getAriaLabel()
       @createSearchViews()
       if !@renderValue() then @loadAll()
 
@@ -85,8 +86,14 @@ define [
       return if @silenced
       @_value = @$el.val()
       @triggerEvent()
+      @getAriaLabel()
       @searchViews.forEach (view) ->
         view.clearSearch()
+
+    getAriaLabel: ->
+      return if _.include(ENV.current_user_roles, 'admin')
+      label = @getCurrentContext().name || I18n.t("Select course: a selection is required before recipients field will become available")
+      @$picker.find('button').attr("aria-label", label)
 
     getCurrentContext: ->
       matches = @_value.match(/(\w+)_(\d+)/)

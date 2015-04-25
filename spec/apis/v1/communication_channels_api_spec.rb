@@ -178,10 +178,7 @@ describe 'CommunicationChannels API', type: :request do
           dk.sns_arn = 'apparn'
           dk.save!
           $spec_api_tokens[@user] = @user.access_tokens.create!(developer_key: dk).full_token
-          response = mock()
-          response.expects(:successful?).returns(true)
-          response.expects(:data).returns(endpoint_arn: 'endpointarn')
-          client.expects(:create_platform_endpoint).once.returns(response)
+          client.expects(:create_platform_endpoint).once.returns(endpoint_arn: 'endpointarn')
 
           json = api_call(:post, @path, @path_options, @post_params)
           expect(json['type']).to eq 'push'

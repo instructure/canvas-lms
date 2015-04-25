@@ -38,6 +38,7 @@ define [
       ).fixDialogButtons()
 
       $form = @$dialog
+      $(".ui-dialog-titlebar-close").focus()
       $form.submit (e) =>
         e.preventDefault()
         submittingDfd = $.Deferred()
@@ -65,6 +66,7 @@ define [
           ,
             count: submissions.length)
           submittingDfd.resolve()
+          $("#set_default_grade").focus()
           @$dialog.remove()
 
       getStudents = =>

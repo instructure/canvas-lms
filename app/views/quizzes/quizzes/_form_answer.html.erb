@@ -6,7 +6,7 @@
         <div style="width: 30px;" class="answer_box">
           <% click_to_set_correct = t('titles.click_to_set_as_correct', "Click to set this answer as correct") %>
           <a href="#" class="select_answer_link no-hover" role="button" title="<%= click_to_set_correct %>"><%= image_tag "blank_answer.png", :class => "answer_image", :alt => click_to_set_correct %></a><br/>
-          <span class="answer_weight"><input class="float_value" type="text" style="width: 25px;" arial-label="<%= t('answer_weight', "Answer Weight") %>" name="answer_weight"/>%</span>
+          <span class="answer_weight"><input class="float_value" type="text" style="width: 25px;" aria-label="<%= t('answer_weight', "Answer Weight") %>" name="answer_weight"/>%</span>
         </div>
       </td><td>
         <div class="select_answer answer_type">

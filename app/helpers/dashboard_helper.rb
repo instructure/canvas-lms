@@ -138,4 +138,19 @@ module DashboardHelper
     end
   end
 
+  def todo_ignore_api_url(activity_type, item, force_permanent = false)
+    activity_symbol = activity_type.to_sym
+
+    permanent = (activity_symbol != :grading || force_permanent) ? 1 : nil
+
+    api_v1_users_todo_ignore_url(item.asset_string, activity_type, { permanent: permanent })
+  end
+
+  def todo_link_classes(activity_type)
+    activity_symbol = activity_type.to_sym
+
+    (activity_symbol == :grading) ? 'al-trigger disable_item_link' : 'disable_item_link disable-todo-item-link'
+
+  end
+
 end

@@ -546,4 +546,27 @@ describe ContextModulesController do
       end
     end
   end
+
+  describe "GET 'show'" do
+    before :once do
+      course_with_teacher(active_all: true)
+    end
+
+    it "should redirect to the module on the index page" do
+      @m2 = @course.context_modules.create!(:name => "published hey")
+      user_session(@teacher)
+      get 'show', course_id: @course.id, id: @m2.id
+      expect(response).to redirect_to course_context_modules_url(course_id: @course.id, anchor: "module_#{@m2.id}")
+    end
+
+    it "should unauthorized for students and unpublished modules" do
+      @m1 = @course.context_modules.create(:name => "unpublished oi")
+      @m1.workflow_state = 'unpublished'
+      @m1.save!
+      student_in_course active_all: true
+      user_session(@student)
+      get 'show', course_id: @course.id, id: @m1.id
+      assert_unauthorized
+    end
+  end
 end

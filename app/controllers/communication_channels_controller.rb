@@ -18,8 +18,8 @@
 
 # @API Communication Channels
 #
-# API for accessing users' email addresses, SMS phone numbers, Twitter, Yo,
-# and Facebook communication channels.
+# API for accessing users' email addresses, SMS phone numbers, Twitter, and Yo
+# communication channels.
 #
 # In this API, the `:user_id` parameter can always be replaced with `self` if
 # the requesting user is asking for his/her own information.
@@ -40,7 +40,7 @@
 #           "type": "string"
 #         },
 #         "type": {
-#           "description": "The type of communcation channel being described. Possible values are: 'email', 'sms', 'chat', 'facebook', 'twitter' or 'yo'. This field determines the type of value seen in 'address'.",
+#           "description": "The type of communcation channel being described. Possible values are: 'email', 'sms', 'chat', 'twitter' or 'yo'. This field determines the type of value seen in 'address'.",
 #           "example": "email",
 #           "type": "string",
 #           "allowableValues": {
@@ -48,7 +48,6 @@
 #               "email",
 #               "sms",
 #               "chat",
-#               "facebook",
 #               "twitter",
 #               "yo"
 #             ]
@@ -327,7 +326,7 @@ class CommunicationChannelsController < ApplicationController
         @pseudonym.unique_id = '' if @pseudonym && @pseudonym.new_record? && @root_account.pseudonyms.active.by_unique_id(@pseudonym.unique_id).first
 
         # Have to either have a pseudonym to register with, or be looking at merge opportunities
-        return render :action => 'confirm_failed', :status => :bad_request if !@pseudonym && @merge_opportunities.empty?
+        return render :confirm_failed, status: :bad_request if !@pseudonym && @merge_opportunities.empty?
 
         # User chose to continue with this cc/pseudonym/user combination on confirmation page
         if @pseudonym && params[:register]
@@ -387,7 +386,7 @@ class CommunicationChannelsController < ApplicationController
     end
     if failed
       respond_to do |format|
-        format.html { render :action => "confirm_failed", :status => :bad_request }
+        format.html { render :confirm_failed, status: :bad_request }
         format.json { render :json => {}, :status => :bad_request }
       end
     else

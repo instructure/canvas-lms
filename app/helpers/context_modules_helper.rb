@@ -55,4 +55,33 @@ module ContextModulesHelper
     return true if item.nil? || !item.content || !item.content.respond_to?(:can_unpublish?)
     item.content.can_unpublish?
   end
+
+  def module_item_translated_content_type(item)
+    return '' unless item
+
+    case item.content_type
+    when 'Announcement'
+      I18n.t('Announcement')
+    when 'Assignment'
+      I18n.t('Assignment')
+    when 'Attachment'
+      I18n.t('Attachment')
+    when 'ContextExternalTool'
+      I18n.t('External Tool')
+    when 'ContextModuleSubHeader'
+      I18n.t('Context Module Sub Header')
+    when 'DiscussionTopic'
+      I18n.t('Discussion Topic')
+    when 'ExternalUrl'
+      I18n.t('External Url')
+    when 'Quiz'
+      I18n.t('Quiz')
+    when 'Quizzes::Quiz'
+      I18n.t('Quiz')
+    when 'WikiPage'
+      I18n.t('Wiki Page')
+    else
+      I18n.t('Unknown Content Type')
+    end
+  end
 end

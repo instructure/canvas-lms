@@ -46,17 +46,8 @@ define [
       # Ensure that we clean up any dangling references when the component is destroyed.
       @props.currentFolder?.off(null, null, this)
 
-    buildFolderPath: (splat) ->
-      # We don't want the slashes to go away so we are doing some magic here
-      if (splat)
-        splat = splat.split('/').map((splatPiece) ->
-          encodeURIComponent(splatPiece)
-        ).join('/')
-
-      '/' + (splat || '')
-
     getCurrentFolder: ->
-      path = @buildFolderPath(@getParams().splat)
+      path = '/' + (@getParams().splat || '')
 
       if filesEnv.showingAllContexts
         pluralAssetString = path.split('/')[1]

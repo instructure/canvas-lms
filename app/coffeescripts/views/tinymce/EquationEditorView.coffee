@@ -11,24 +11,40 @@ define [
   'mathquill'
 ], (I18n, $, _, Backbone, EquationToolbarView, template, htmlEscape) ->
 
-  # like $.text() / Sizzle.getText(elems), except it also gets alt attributes from images
-  getEquationText = (elems) ->
-    _.map elems, (elem) ->
-      # Get the text from text nodes and CDATA nodes
-      if elem.nodeType in [3,4]
-        elem.nodeValue
-
-      # Get alt attributes from IMG nodes
-      else if elem.nodeName is 'IMG' && elem.className is 'equation_image'
-        elem.alt
-
-      # Traverse everything else, except comment nodes
-      else if elem.nodeType isnt 8
-        getEquationText( elem.childNodes )
-    .join('')
-
-
   class EquationEditorView extends Backbone.View
+
+    ##
+    # class method
+    #
+    # like $.text() / Sizzle.getText(elems), except it also gets alt 
+    #   attributes from images
+    #
+    # @param {jquery object} elems The collection of elements (or the
+    # singular jquery element) that represents the currently selected
+    #   thing in the editor to turn into an equation
+    @getEquationText: (elems)->
+      self = this
+      _.map elems, (elem) ->
+        # Get the text from text nodes and CDATA nodes
+        if elem.nodeType in [3,4]
+          if elem.nodeValue.match(/^<img/)
+            #if the "text" is really just an unparsed "img" node
+            # then we really want the alt element
+            self.getEquationText($(elem.nodeValue))
+          else
+            elem.nodeValue
+
+        # Get alt attributes from IMG nodes
+        else if elem.nodeName is 'IMG' && elem.className is 'equation_image'
+          elem.alt
+
+        # Traverse everything else, except comment nodes
+        else if elem.nodeType isnt 8
+          self.getEquationText( elem.childNodes )
+      .join('')
+
+    getEquationText: (elems)->
+      @constructor.getEquationText(elems)
 
     template: template
 
@@ -47,8 +63,8 @@ define [
       @prevSelection = @editor.selection.getBookmark()
 
       unless @toolbar = @$el.data('toolbar')
-        nodes = $('<span>').text @editor.selection.getContent()
-        equation = getEquationText(nodes).replace(/^\s+|\s+$/g, '')
+        nodes = $('<span>').text @editor.selection.getNode()
+        equation = @getEquationText(nodes).replace(/^\s+|\s+$/g, '')
         @addToolbar(equation)
 
       @cacheEls()
@@ -75,7 +91,7 @@ define [
 
     initialRender: =>
       nodes = $('<span>').text @editor.selection.getContent()
-      equation = getEquationText(nodes).replace(/^\s+|\s+$/g, '')
+      equation = @getEquationText(nodes).replace(/^\s+|\s+$/g, '')
 
       @$mathjaxMessage.empty()
       @setView(@$el.data('view'), equation)

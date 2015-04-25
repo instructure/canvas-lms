@@ -35,7 +35,7 @@ context "threaded discussions" do
   end
 
   it "should allow edits to entries with replies" do
-    edit_text = 'edit message '
+    edit_text = 'edit message'
     entry       = @topic.discussion_entries.create!(:user => @student, :message => 'new threaded reply from student')
     child_entry = @topic.discussion_entries.create!(:user => @student, :message => 'new threaded child reply from student', :parent_entry => entry)
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
@@ -44,7 +44,7 @@ context "threaded discussions" do
   end
 
   it "should edit a reply" do
-    edit_text = 'edit message '
+    edit_text = 'edit message'
     entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     edit_entry(entry, edit_text)
@@ -70,7 +70,7 @@ context "threaded discussions" do
   end
 
   it "should display editor name and timestamp after edit" do
-    edit_text = 'edit message '
+    edit_text = 'edit message'
     entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     edit_entry(entry, edit_text)
@@ -89,7 +89,7 @@ context "threaded discussions" do
   end
 
   it "should re-render replies after editing" do
-    edit_text = 'edit message '
+    edit_text = 'edit message'
     entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
 
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"

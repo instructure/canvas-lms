@@ -369,7 +369,8 @@
                     </div>
                   </td>
                   <td>
-                    <%= comment.author_name %>, <%= datetime_string(comment.created_at) %>
+                    <%= comment_author_name_for(comment) %>,
+                    <%= datetime_string(comment.created_at) %>
                   </td>
                 <% end %>
               </tr>

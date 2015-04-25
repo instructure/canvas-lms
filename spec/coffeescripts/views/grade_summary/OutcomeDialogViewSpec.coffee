@@ -2,7 +2,8 @@ define [
   'underscore'
   'compiled/models/grade_summary/Outcome'
   'compiled/views/grade_summary/OutcomeDialogView'
-], (_, Outcome, OutcomeDialogView) ->
+  'compiled/views/grade_summary/OutcomeLineGraphView'
+], (_, Outcome, OutcomeDialogView, OutcomeLineGraphView) ->
 
   module 'OutcomeDialogViewSpec',
     setup: ->
@@ -12,6 +13,21 @@ define [
       @e = (name, options={}) -> $.Event(name, _.extend(options, {
         currentTarget: @outcomeDialogView.el
       }))
+
+  test 'assign instance of OutcomeLineGraphView on init', ->
+    ok @outcomeDialogView.outcomeLineGraphView instanceof OutcomeLineGraphView
+
+  test 'afterRender', ->
+    setElementSpy = sinon.stub(@outcomeDialogView.outcomeLineGraphView, 'setElement')
+    renderSpy = sinon.stub(@outcomeDialogView.outcomeLineGraphView, 'render')
+
+    @outcomeDialogView.render()
+
+    ok setElementSpy.called, 'should set linegraph element'
+    ok renderSpy.called, 'should render line graph'
+
+    @outcomeDialogView.outcomeLineGraphView.setElement.restore()
+    @outcomeDialogView.outcomeLineGraphView.render.restore()
 
   test '#show', ->
     renderSpy = sinon.stub(@outcomeDialogView, 'render')

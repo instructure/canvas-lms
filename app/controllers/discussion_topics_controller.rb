@@ -280,7 +280,7 @@ class DiscussionTopicsController < ApplicationController
     end
 
     if @context.feature_enabled?(:differentiated_assignments)
-      scope = DifferentiableAssignment.scope_filter(scope, @current_user, @context)
+      scope = scope_for_differentiated_assignments(scope)
     end
 
     @topics = Api.paginate(scope, self, topic_pagination_url)
@@ -332,6 +332,23 @@ class DiscussionTopicsController < ApplicationController
     end
   end
 
+  def scope_for_differentiated_assignments(scope)
+    return scope if @context.is_a?(Account)
+    return DifferentiableAssignment.scope_filter(scope, @current_user, @context) if @context.is_a?(Course)
+    return scope if @context.context.is_a?(Account)
+
+    # group context owned by a course
+    course = @context.context
+    course_scope = course.discussion_topics.active
+    course_level_topic_ids = DifferentiableAssignment.scope_filter(course_scope, @current_user, course).pluck(:id)
+    if course_level_topic_ids.any?
+      scope.where("root_topic_id IN (?) OR root_topic_id IS NULL OR id IN (?)", course_level_topic_ids, course_level_topic_ids)
+    else
+      scope.where(root_topic_id: nil)
+    end
+  end
+  private :scope_for_differentiated_assignments
+
   def is_child_topic?
     root_topic_id = params[:root_discussion_topic_id]
 
@@ -368,6 +385,13 @@ class DiscussionTopicsController < ApplicationController
       hash[:ATTRIBUTES][:can_group] = @topic.can_group?
       handle_assignment_edit_params(hash[:ATTRIBUTES])
 
+      categories = @context.respond_to?(:group_categories) ? @context.group_categories : []
+      # if discussion has entries and is attached to a deleted group category,
+      # add that category to the ENV list so it will be shown on the edit page.
+      if @topic.group_category_deleted_with_entries?
+        categories << @topic.group_category
+      end
+
       if @topic.assignment.present?
         hash[:ATTRIBUTES][:assignment][:assignment_overrides] =
           (assignment_overrides_json(
@@ -376,7 +400,6 @@ class DiscussionTopicsController < ApplicationController
         hash[:ATTRIBUTES][:assignment][:has_student_submissions] = @topic.assignment.has_student_submissions?
       end
 
-      categories = @context.respond_to?(:group_categories) ? @context.group_categories : []
       sections = @context.respond_to?(:course_sections) ? @context.course_sections.active : []
 
       js_hash = {DISCUSSION_TOPIC: hash,
@@ -398,20 +421,12 @@ class DiscussionTopicsController < ApplicationController
             override_course_dates: section.restrict_enrollments_to_section_dates
           }
         }
-        js_hash['COURSE_DATE_RANGE'] = {
-          start_at: @context.start_at,
-          end_at: @context.conclude_at,
-          override_term_dates: @context.restrict_enrollments_to_course_dates
-        }
-        js_hash['TERM_DATE_RANGE'] = {
-          start_at: @context.enrollment_term.start_at,
-          end_at: @context.enrollment_term.end_at
-        }
+        js_hash['VALID_DATE_RANGE'] = CourseDateRange.new(@context)
       end
 
       append_sis_data(js_hash)
       js_env(js_hash)
-      render :action => "edit"
+      render :edit
     end
   end
 
@@ -444,9 +459,9 @@ class DiscussionTopicsController < ApplicationController
       @headers = !params[:headless]
       @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true) || @topic.locked?
       @unlock_at = @topic.available_from_for(@current_user)
-      @topic.change_read_state('read', @current_user)
+      @topic.change_read_state('read', @current_user) unless @locked
       if @topic.for_group_discussion?
-        @groups = @topic.group_category.groups.active.select{ |g| g.grants_right?(@current_user, session, :read) }
+        @groups = @topic.group_category.groups.active.select{ |g| g.grants_right?(@current_user, session, :post_to_forum) }
         topics = @topic.child_topics.to_a
         topics = topics.select{|t| @groups.include?(t.context) } unless @topic.grants_right?(@current_user, session, :update)
         @group_topics = @groups.map do |group|
@@ -967,6 +982,7 @@ class DiscussionTopicsController < ApplicationController
       elsif (@assignment = @topic.assignment || @topic.restore_old_assignment || (@topic.assignment = @context.assignments.build)) &&
              @assignment.grants_right?(@current_user, session, :update)
         params[:assignment][:group_category_id] = nil unless @topic.group_category_id || @assignment.has_submitted_submissions?
+        params[:assignment][:published] = @topic.published?
         update_api_assignment(@assignment, params[:assignment].merge(@topic.attributes.slice('title')), @current_user)
         @assignment.submission_types = 'discussion_topic'
         @assignment.saved_by = :discussion_topic

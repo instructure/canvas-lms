@@ -6,6 +6,7 @@ group :test do
   gem 'simplecov-rcov', '0.2.3', :require => false
   gem 'bluecloth', '2.2.0' # for generating api docs
     gem 'redcarpet', '3.0.0'
+    gem 'github-markdown', '0.6.8'
   gem 'bullet_instructure', '4.0.3', :require => 'bullet'
   gem 'mocha', github: 'maneframe/mocha', :ref => 'bb8813fbb4cc589d7c58073d93983722d61b6919', :require => false
     gem 'metaclass', '0.0.2'
@@ -27,7 +28,7 @@ group :test do
   gem 'webmock', '1.16.1', :require => false
     gem 'addressable', '2.3.5'
     gem 'crack', '0.4.1'
-  gem 'yard', '0.8.0'
+  gem 'yard', '0.8.7.6'
   gem 'yard-appendix', '>=0.1.8'
   gem 'timecop', '0.6.3'
 end

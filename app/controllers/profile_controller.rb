@@ -173,9 +173,9 @@ class ProfileController < ApplicationController
     known_user = @user_data[:common_contexts].present?
     if @user_data[:known_user] # if you can message them, you can see the profile
       add_crumb(t('crumbs.settings_frd', "%{user}'s settings", :user => @user.short_name), user_profile_path(@user))
-      return render :action => :show
+      render
     else
-      return render :action => :unauthorized
+      render :unauthorized
     end
   end
 
@@ -208,7 +208,7 @@ class ProfileController < ApplicationController
     respond_to do |format|
       format.html do
         add_crumb(t(:crumb, "%{user}'s settings", :user => @user.short_name), settings_profile_path )
-        render :action => "profile"
+        render :profile
       end
       format.json do
         render :json => user_profile_json(@user.profile, @current_user, session, params[:include])

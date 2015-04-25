@@ -158,6 +158,17 @@ describe ApplicationHelper do
     end
   end
 
+  describe "accessible date formats" do
+    it "generates a date format for use throughout the app" do
+      expect(accessible_date_format).to match(/YYYY/)
+      expect(accessible_date_format).to match(/hh:mm/)
+    end
+
+    it "wraps a prompt around the format for Screenreader users" do
+      expect(datepicker_screenreader_prompt).to include(accessible_date_format)
+    end
+  end
+
   describe "cache_if" do
     it "should cache the fragment if the condition is true" do
       enable_cache do

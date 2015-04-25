@@ -1,11 +1,12 @@
 define [
+  'jquery'
   'underscore'
   'Backbone'
   'compiled/views/grade_summary/ProgressBarView'
   'compiled/views/grade_summary/OutcomePopoverView'
   'compiled/views/grade_summary/OutcomeDialogView'
   'jst/grade_summary/outcome'
-], (_, Backbone, ProgressBarView, OutcomePopoverView, OutcomeDialogView, template) ->
+], ($, _, Backbone, ProgressBarView, OutcomePopoverView, OutcomeDialogView, template) ->
 
   class OutcomeView extends Backbone.View
     className: 'outcome'

@@ -50,8 +50,8 @@ define [
       unstar: I18n.t('unstar', 'Unstar')
       archive: I18n.t('archive', 'Archive')
       unarchive: I18n.t('unarchive', 'Unarchive')
-      archive_conversation: I18n.t('archive_conversation', 'Archive conversation')
-      unarchive_conversation: I18n.t('unarchive_conversation', 'Unarchive conversation')
+      archive_conversation: I18n.t('Archive Selected')
+      unarchive_conversation: I18n.t('Unarchive Selected')
 
     spinnerOptions:
       color: '#fff'

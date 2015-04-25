@@ -1,11 +1,11 @@
 <tr class="<%= 'kept' if kept %>">
-  <td>
+  <th scope="row">
     <% if kept %>
       <%= t 'kept', 'KEPT' %>
     <% elsif version.version_number == @submission.version_number %>
       <%= t 'latest', 'LATEST' %>
     <% end %>
-  </td>
+  </th>
   <td>
     <a href="<%= course_quiz_history_path(@context, @quiz, version: version.version_number)%>">
       <%= t 'attempt_number', 'Attempt %{att_no}', :att_no => index %>

@@ -120,8 +120,8 @@ module Importers
       Importers::AssignmentImporter.process_migration(data, migration);migration.update_import_progress(65)
 
       # and second time...
-      Importers::QuizImporter.process_migration(data, migration, question_data); migration.update_import_progress(70)
-      Importers::ContextModuleImporter.process_migration(data, migration);migration.update_import_progress(72)
+      Importers::ContextModuleImporter.process_migration(data, migration);migration.update_import_progress(70)
+      Importers::QuizImporter.process_migration(data, migration, question_data); migration.update_import_progress(72)
       Importers::DiscussionTopicImporter.process_migration(data, migration);migration.update_import_progress(75)
       Importers::WikiPageImporter.process_migration(data, migration);migration.update_import_progress(80)
       Importers::AssignmentImporter.process_migration(data, migration);migration.update_import_progress(85)
@@ -275,7 +275,7 @@ module Importers
             migration.add_warning(t(:copied_grading_standard_warning, "Couldn't find copied grading standard for the course."))
           end
         elsif settings[:grading_standard_id].present?
-          if gs = GradingStandard.standards_for(course).where(id: settings[:grading_standard_id]).first
+          if gs = GradingStandard.for(course).where(id: settings[:grading_standard_id]).first
             course.grading_standard = gs
           else
             migration.add_warning(t(:account_grading_standard_warning,"Couldn't find account grading standard for the course." ))

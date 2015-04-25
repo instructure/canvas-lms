@@ -1,0 +1,3 @@
+default:
+  workers:
+  - queue: canvas_queue

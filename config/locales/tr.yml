@@ -3,15 +3,12 @@
 --- 
 tr: 
   1_item_scores_1_2_2_3_5_5_3_39f6c397: "1 - Öğe puanları: 1, 2, 2, 3, 5, 5, 3"
-  1_item_scores_1_3_2_4_5_3_6_a9696b8f: "1- Öğe Puanları: 1, 3, 2, 4, 5, 3, 6"
-  1_item_scores_2_4_2_5_f6907d69: "1 - Öğe puanları: 2, 4, 2, 5"
   1_item_scores_3_2_2_4_1_3_4_e0de3073: "1 - Öğe puanları: 3, 2, 2, 4, 1, 3, 4"
   1_item_scores_5512cd03: "1- Öğe puanları"
   2_final_score_5_5_8418d475: "2- Final puanı: 5.5"
   2_final_score_7b0fd15e: "2- Final puanı"
   2_highest_score_4_3b4bc250: "2 - En yüksek puan: 4"
   2_most_recent_score_3_766dbf4e: "2 - En güncel puan: 3"
-  2_the_rest_item_average_2_4_2_3_3_bbee12a7: "2 - 'Geri kalan' öğe ortalaması: (2 + 4 + 2) / 3 = 3"
   3_calculated_mastery_score_5_0_75_3_0_25_4_5_c88c3a7b: "3 - Hesaplanmış yeterlik puanı: 5(0.75) + 3(0.25) = 4.5"
   451_message: 
     description: "Birleşik Devletler ticari sınırlılıkları uygulanan bir ülkede bulunduğunuz için bu siteye erişme yetkiniz yok."
@@ -78,7 +75,6 @@ tr:
       avatars: "Kullanıcı Avatarları"
       delicious: Delicious
       diigo: Diigo
-      facebook: Facebook
       google_docs: "Google Docs"
       google_docs_preview: "Google Docs Önizlemesi"
       google_drive: "Google Drive"
@@ -94,8 +90,6 @@ tr:
       invalid_discovery_url: "Keşif bağlantısı geçersiz"
     feedback_coach: "Topluluğa Sor"
     feedback_coach_sub: "Canvas uzmanlarından yardım al"
-    feedback_feature_request: "Bir Özellik Talep Edin"
-    feedback_feature_request_canvas_net: "Canvas Ağından Bir Özellik Talep Edin"
     feedback_feature_request_sub: "Canvas'ın gelişimi için bir fikrin mi var?"
     manually_created_courses: "Manuel Oluşturulan Dersler"
     root_account_cant_have_sis_id: "ÖBS ID'leri kök hesaplara ayarlanamaz"
@@ -247,7 +241,7 @@ tr:
         login_handle_name: "Oturum Açma Etiketi"
         position: Pozisyon
         requested_authn_context: "Kimlik Doğrulama Bağlamı"
-        unkown_user_url: "Bilinmeyen Kullanıcı URL'si"
+        unknown_user_url: "Bilinmeyen Kullanıcı URL'si"
       log_in_url: "Hesap Oluşturma URL'si"
       log_out_url: "Oturum Kapatma URL'si"
       login_attribute: "Oturum Açma Özelliği"
@@ -262,7 +256,7 @@ tr:
       save_button: "Kimlik Doğrulama Ayarlarını Kaydet"
       start_debugging: "Hata  Ayıklamayı Başlat"
       stop_debugging: "Hata  Ayıklamayı Durdur"
-      unkown_user_url_description: "Canvas'ta bulunamayan yetkilendirilmiş bir kullanıcı olması durumunda yönlendirilecek url."
+      unknown_user_url_description: "Canvas'ta bulunamayan yetkilendirilmiş bir kullanıcı olması durumunda yönlendirilecek url."
     saml_testing: 
       auth_request_to_idp: "AuthnRequest IdP'ye gönderildi"
       auth_response_from_idp: "IdP'den AuthnResponse"
@@ -955,6 +949,7 @@ tr:
         outgoing_email_default_name_option_default: "Varsayılan Canvas Ayarları"
         prevent_course_renaming_by_teachers: "Öğretmenlerin derslerin isimlerini değiştirmelerine izin verme"
         restrict_quiz_questions: "Ders bitim tarihinden sonra öğrencilerin kısa sınav sorularını görmelerini engelle"
+        restrict_student_future_view: "Başlangıç zamanından önce öğrencilerin dersi görmesini engelle"
         role_id: "Daha Fazla Ekle"
         self_enrollment: "Kendi kendine Kayda İzin Ver"
         self_registration: "Kendi Kendine Kayıt"
@@ -1555,6 +1550,7 @@ tr:
     titles: 
       gpa_scale_explainer: "GNO Notlandırma Ölçeği Nedir?"
       grading_scheme_info: "Notlandırma Şemasını Göster/Düzenle"
+  assignment_976578a8: Ödev
   assignment_comments_e43ed898: "Ödev Yorumları"
   assignment_details: 
     no_graded_submissions: "Notlandırılmış gönderi yok"
@@ -2186,6 +2182,7 @@ tr:
     upload_error_timeout: "İstek zaman aşımına uğradı : %{url}"
     upload_error_too_many_redirects: "Çok fazla yönlendirmeler"
     upload_error_unexpected: "%{url} indirilirken bilinmeyen hata meydana geldi"
+  attachment_deffe5a9: "Dosya Eki"
   attendance: 
     default_attendance_title: "Katılım %{date}"
     errors: 
@@ -2467,7 +2464,6 @@ tr:
       create_event: "Yeni Bir Olay Oluştur"
       done_go_back_to_list: "Başarılı, Listeye Geri Dön"
       links: 
-        accessibility_warning: "Uyarı: Bu görünüme ekran okuyucu kullananlar erişemez. Ajanda Görününümü kullanın. "
         calendar_agenda: Ajanda
         calendar_month: Ay
         calendar_scheduler: Zamanlayıcı
@@ -2662,25 +2658,9 @@ tr:
     crumbs: 
       new: "Yeni Takvim Olayı"
     full_calendar_event: 
-      buttons: 
-        create: "Olay Oluştur"
-        update: "Olayı Güncelle"
-      labels: 
-        address: Adres
-        date: "Tarih:"
-        event_description: "Olay Açıklaması"
-        from: Kimden
-        location: Konum
-        title: Başlık
       no_content: "İçerik Yok"
-      timespan: "%{start_time} *den* %{end_time}'a"
     new: 
-      links: 
-        back_to_calendar: "Takvime Geri Dön"
-        delete: "Olayı Sil"
-        edit: "Takvim Olayını Düzenle"
       page_title: "Yeni Takvim Olayı"
-    no_content: "İçerik Yok"
     notices: 
       created: "Olay başarıyla oluşturuldu."
       deleted: "Bu olay silindi"
@@ -2700,43 +2680,6 @@ tr:
     invalid_date_or_time: "%{attr} için geçersiz tarih veya zaman"
   calendars: 
     assignment_details: "Ödev Ayrıntıları"
-    calendar: 
-      alts: 
-        next: Sonraki
-        previous: Önceki
-      calendars_count: 
-        one: "1 takvim, %{open_count} açık"
-        other: "%{count} takvim, %{open_count} açık"
-      feed_title: "Takvim Akış Verisi"
-      instructions: 
-        ics_link: "iCal beslemelerini alan (Google Takvim, iCal, Outlook vb.) bir takvim uygulamasına aşağıdaki bağlantıyı kopyalayıp yapıştırın"
-      labels: 
-        calendar: Takvim
-        date: Tarih
-        details: Ayrıntılar
-        due: Bitiş
-        from: Kimden
-        group: Grup
-        title: Başlık
-        undated_events: "Tarihsiz Olaylar"
-      links: 
-        add_event: "Olay Ekle"
-        delete: Sil
-        edit: Düzenle
-        feed: "akış verisini görmek için buraya tıklayın"
-        full_details: "Tüm Ayrıntılar"
-        how_do_i: "Nasıl Yaparım?"
-        jump_to_calendar: "Takvime Git"
-        more_options: "Daha fazla seçenek"
-        show_undated_events: "%{count} tarihsiz olay göster"
-      messages: 
-        max_visible: "Bir kerede  %{count}  adet takvim görüntüleyebilirsiniz."
-      options: 
-        new_group: "[ Yeni Grup ]"
-      tabs: 
-        assignment: Ödev
-        event: Olay
-      timespan: "%{start_time} *ile* %{end_time}"
     default_title: olay
     event: 
       due: bitiş
@@ -2760,36 +2703,6 @@ tr:
     prompts: 
       delete_assignment: "Bu ödevi silmek isteğinize emin misiniz?"
       delete_event: "Bu olayı silmek istediğinize emin misiniz?"
-    show: 
-      crumbs: 
-        my_calendar: Takvimim
-      feed_title: "Ders Takvimi Atom Akış Verisi"
-      keycode_descriptions: 
-        delete: "Geçerli Olayı Sil"
-        edit: "Geçerli Olayı Düzenle"
-        next_day: "Sonraki Takvim Günü"
-        next_event: "Sonraki Takvim Gün/Olay"
-        next_week: "Gelecek Hafta"
-        open: "Geçerli Olayı Aç"
-        previous_day: "Önceki Takvim Günü"
-        previous_event: "Önceki Takvim Gün/Olay"
-        previous_week: "Önceki Hafta"
-        refresh: "Takvimi Yenile"
-      keycode_descriptoins: 
-        new: "Geçerli Gün İçin Yeni Olay"
-      keycodes: 
-        delete: d
-        edit: e
-        new: " "
-        next_day: "ctrl+sağ ok"
-        next_event: j
-        next_week: "ctrl+alt ok"
-        open: o
-        previous_day: "ctrl+sol ok"
-        previous_event: k
-        previous_week: "ctrl+yukarı ok"
-        refresh: r
-      page_title: Takvim
     show2: 
       calendar_feed: "Takvim Akış Verisi"
       calendar_feed_instructions: "Aşağıdaki linki kopyalayıp iCal beslemesi alan (Google Takvim, iCal, Outlook vb.) herhangi bir takvim uygulamasına yapıştırın."
@@ -2808,7 +2721,6 @@ tr:
       add_new_event: "Yeni Olay Ekle"
       edit_assignment: "Ödevi Düzenle"
       edit_event: "Olayı Düzenle"
-    use_new_calendar: "Yeni takvimi deneyin"
     wizard_box: 
       descriptions: 
         assignment: "Güzel. Şimdi, takvimde gösterilecek olay yerine bir ödev oluşturmak için diyalog kutusundaki \"Ödev\" sekmesine tıklayın. "
@@ -2866,6 +2778,7 @@ tr:
     titles: 
       update_assignment_points: "Değerlendirme listesine uyması için olası puanlar değiştirilsin mi?"
   choose_a_course_home_page_8059c7b: "Bir Ders Ana Sayfası Seçin"
+  choose_a_csv_file_to_upload_9644480c: "Yüklencek bir CSV dosyası seçin:"
   choose_usage_rights_33683854: "Kullanıcı haklarını seçin..."
   clear_file_name_text_field_fce73840: "Dosya adı metin alanını temizle"
   click_here_on_the_calendar_link_c9965631: "*Takvim* bağlantısı üzerinde buraya tıklayın"
@@ -2985,7 +2898,6 @@ tr:
   communication_5255723c: İletişim
   communication_channel: 
     body: "Canvas doğrulama kodunuz : %{verification_code}"
-    default_facebook_account: "Facebook Hesabı"
     default_twitter_handle: "Twitter Bağlantısı"
     default_yo_name: "Yo İsmi"
   communication_channels: 
@@ -3447,7 +3359,6 @@ tr:
         user_services: "Kayıt Olunan Web Servisleri"
       help: 
         list_services: "Kayıtlı servislerin listesi etkinleştirilmemiş. Bu listeyi etkinleştimek ders ve grup üyelerinin sınıf dışında size daha kolay bağlanmalarını sağlar. "
-        services: "Kullanıcı profilinizi herhangi bir dış servisle ilişkilendirmediniz. Canvas hesabınızı Facebook ve Twitter gibi servislere bağlayabilirsiniz. Bunu yaparsanız ders ve grup üyeleri sınıf dışında size daha kolay bağlanabilirler."
       labels: 
         public_list_services: "Ders/grup arkadaşlarım profilimi ilişkilendirdiğim servisleri görebilsinler"
         user_privileges: Ayrıcalıklar
@@ -3486,7 +3397,6 @@ tr:
         registered_services: "Kayıt olunan Servisler"
         service_types: "Hizmet Türleri"
       help: 
-        no_services: "Kullanıcı profilinizi herhangi bir dış servisle ilişkilendirmediniz. Canvas hesabınızı Facebook ve Twitter gibi servislere bağlayabilirsiniz."
         services_private: "Kayıtlı servislerin listesi etkinleştirilmemiş. Bu listeyi etkinleştimek ders ve grup üyelerinin Canvas hesabınızla hangi servisleri ilişkilendirdiğinizi görmelerini sağlar."
         user_services: "Eğer diğer üyeler seçerlerse, Canvas hesapları ile hangi harici servisleri ilişkilendirdiklerini görebilirsiniz. Bu durumda grup projelerinin koordinasyonu kolaylaşır ve sınıf dışında da iletişim sağlanır."
       labels: 
@@ -3795,12 +3705,9 @@ tr:
     all_courses: "Tüm Dersler"
     all_in_context: "%{context}'ın Tümü"
     archive: Arşiv
-    archive_conversation: "Arşivdeki Karşılıklı Görüşmeler"
     autocomplete_result: 
       group_people: "Kişi : %{people}"
       no_results: "Sonuç yok"
-    autocomplete_token: 
-      remove_recipient: "Alıcıları sil"
     back: Geri
     cannot_add_to_private: "Özel olan karşılıklı konuşmaya kişi eklenemiyor."
     cannot_be_empty: "Mesaj boş olamaz"
@@ -3844,12 +3751,10 @@ tr:
     hide: Gizle
     index_new: 
       archive: Arşiv
-      archive_conversation: "Arşivdeki Karşılıklı Görüşmeler"
       archived: Arşivlenmiş
       clear_search: "Arama sonuçlarını temizle"
       compose_new_message: "Yeni bir mesaj yaz"
       delete: Sil
-      delete_conversation: "Karşılıklı konuşmayı sil"
       filter_messages_by_course: "Mesajları derse göre sırala"
       filter_messages_by_type: "Mesajları türe göre sırala"
       forward: Yönlendir
@@ -3902,7 +3807,6 @@ tr:
         add_to_faculty_journal: "Öğretim Üyesi Kayıt girişi olarak ekle"
         attachments: "Dosya Ekleri"
         course: Ders
-        course_required: "Alıcıları girmeden önce bir ders seçmelisiniz."
         select_course: "Ders seçiniz"
         subject: Konu
         to: Kime
@@ -3950,7 +3854,6 @@ tr:
     titles: 
       rss_feed: "Karşılıklı Konuşma Beslemesi"
     unarchive: Arşivlenmemiş
-    unarchive_conversation: "Arşivlenmemiş karşılıklı konuşma"
     unstar: "Yıldız Al"
     unstar_conversation: "Tartışmadan yıldızı kaldır"
   copyright_holder_66ee111: "Telif Sahibi:"
@@ -4230,14 +4133,8 @@ tr:
       headings: 
         grade: "Not %{assignment}"
         to_do: Yapılacaklar
-      images: 
-        alt: 
-          ignore: "yok say"
       links: 
         show_more: "%{count} daha fazla..."
-        title: 
-          ignore: "Bu ödevi yok say"
-          ignore_review: "Bu incelemeyi yok say"
       need_grading_count: 
         one: "1 ödevin notlandırılması gerek"
         other: "%{count} ödevin notlandırılması gerek"
@@ -4255,8 +4152,6 @@ tr:
         conclude_course: "Dersi Sonlandır"
         delete_course: "Dersi Sil"
       details: 
-        conclude_alt_text: "Öğrencilerin derse erişimini sınırlandırıp notları değiştirebilme yetkisini tekrar elde etmek isterseniz lütfen ders tarihleri ayarını kullanın. Ders tarih ayarları hakkında bilgiyi *burada* bulabilirsiniz"
-        confirm_conclude: "Uyarı: Dersi sonlandırırsanız notları değiştiremez ve ders içeriğine erişemezsiniz."
         confirm_delete: "Bu dersi silmek istediğinize emin misiniz? Silerseniz, öğrenciler ve öğretmenler birdaha erişemeyeceklerdir. Eğer açılır menüden kaldırılmasını istiyorsanız *dersi sonlandırmalısınız*."
         confirm_delete_addendum: "Dersi sonlandırmaya izin vermiyorsa, *ders bitiş tarihini değiştirmelisiniz* veya yöneticiye dersin sonlandırılması için başvurun."
       headings: 
@@ -5126,6 +5021,7 @@ tr:
       Ödev içermeyen bölümlerde ders içeriğinde bu görünmez ve finla notları bu notlar olmadan hesaplanır.
   disable_a5c05db3: "Devre Dışı"
   disabled_18c33a73: "(devre dışı)"
+  discussion_6719c51d: Tartışma
   discussion_entries: 
     created_entry_notice: "Girdi başarıyla oluşturuldu."
     deleted_entry_notice: "Bu girdi silindi"
@@ -5142,6 +5038,7 @@ tr:
     atom_no_author: "Yazar Yok"
     default_title: "Başlık Yok"
     empty_message: "Mesaj yok"
+  discussion_topic_dc85ad4c: "Tartışma Konusu"
   discussion_topics: 
     assignment_details: 
       available_from: Kullanılabilir
@@ -5202,7 +5099,6 @@ tr:
         published: Yayınlandı
       delay_posting: "Sonra gönder"
       enable_podcast_feed: "PodCast yayınları aktif"
-      include_replies_in_podcast_feed: "PodCast yayınında cevapları içer"
       only_visible_to_overrides_note: "Not: Bu tartışma *yalnızca* aşağıda belirtilen kısım(lar)'da görülebilir. "
       options: Seçenekler
       page_header_title: "Yeni Tartışma"
@@ -5249,7 +5145,6 @@ tr:
       loading: Yükleniyor...
       lock_for_comments: "Yorumları kapat"
       make_sure_all_search_terms_are_spelled_correctly: "Tüm arama ifadelerinin doğru yazıldığına emin olun."
-      new_discussion: "Tartışma *başlat*"
       rss_feed: "RSS beslemesi"
       start_one_now: "Şimdi Bir Tane Başlat"
       suggestions: "Öneriler:"
@@ -5315,7 +5210,7 @@ tr:
       reply_to_topic: "Konuya Cevap yaz"
       retrieved_from_feed: "%{feed}'den Alındı"
       show_rubric: "Değerlendirme Listesini Göster"
-      speed_grader: "Speed Grader"
+      speed_grader: SpeedGrader™
       topic: Konu
       topic_podcast_feed_link: "Konu Podcast Akışı"
       topic_subscribe: "Takip Et"
@@ -5443,7 +5338,6 @@ tr:
   due_datetime_f5a81b81: "Teslim Tarihi: %{dateTime}"
   due_multiple_dates_cc0ee3f5: "Teslim Tarihi: Birden Çok Gün"
   due_on_date_aa4725cd: "Şu tarihte bitiyor:"
-  due_on_date_ffc98ebc: "Şu tarihte bitiyor:"
   e_mail_only_2cc5e513: "Sadece E-Posta"
   each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: "Her çubuk bir ödevdir. Yeşil tabaka ödevini *zamanında* teslim etmiş öğrencileri temsil eder. **Geç** teslim edilen ödevler sarı ve ***teslim edilmeyen*** ödevler ise kırmızıdır."
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Her çubuk bir ödevdir. *İnce dikey diyagram* dersteki herhangi bir öğrenci için en düşük puandan en yükseğe doğru yayılır. **Kalın çubuk**, ***belirlenmiş medyanlı*** 25. yüzdeden 75. yüzdeye doğru yayılır."
@@ -5466,6 +5360,7 @@ tr:
     buttons: 
       create_rubric: "Değerlendirme Listesi Oluştur"
       update_rubric: "Değerlendirme Listesini Güncelle"
+    change: Değiştir
     discussion_points_possible: 
       one: "%{count} olası puan"
       other: "%{count} olası puan"
@@ -5942,6 +5837,7 @@ tr:
       posts_added: "Gönderi Eklendi"
       remove_feed: "%{display_name}'ı kaldır"
   external_integration_keys_8b4f4548: "Harici Entegrasyon Anahtarları"
+  external_tool_c5a6410a: "Harici Araç"
   external_tools: 
     account_navigation_configured: "Hesap gezinme menüsü yapılandırıldı"
     app_full_view: 
@@ -6049,53 +5945,6 @@ tr:
     submit: Gönder
     user_navigation_configured: "Kullanıcı gezinme menüsü yapılandırıldı"
     wiki_page_menu_configured: "Wiki sayfa menüsü ayarlandı"
-  facebook: 
-    authorization_required: "Yalnızca yetkili kullanıcılar bu sayfaya erişebilir"
-    authorization_success: "Yetkilendirme başarılı! Canvas ve Facebook artık birer arkadaş."
-    deleted: Silindi
-    index: 
-      all_set: "Herşey hazır!"
-      bookmark_notice: "Eğer bu uygulamayı yer imi olarak eklerseniz Facebook ana sayfanızda Canvas bildirimlerinin sayısını görebilirsiniz."
-      canvas_messages: "Canvas Mesajları"
-      configure_notification_preferences_notice: "*bildirim tercihlerinizi yapılandırdıktan* sonra Canvas hesabınızda neler olduğu ile ilgili bilgi sahibi olmanızı sağlayacak bildirimleri burada görmeye başlayacaksınız."
-      installation_about: "Canvas Facebook uygulamasını yüklemek için Canvas'taki profil sayfanıza gidip Facebook butonuna tıklayarak hesabınıza bağlanın."
-      learn_more: "Daha fazla bilgiyi instructure.com adresinde bulabilirsiniz"
-      more_information: "Daha fazla bilgi için %{domain_list}"
-      no_messages_notice: "Derste olaylar geliştikçe Canvas hesabınızda neler olduğu ile ilgili bilgi sahibi olmanızı sağlayacak bildirimleri burada görmeye başlayacaksınız."
-      notification_about: "Canvas Facebook uygulaması ile derslerinizde devam eden etkileşimlere daha kolay ulaşabilirsiniz. Ödevleriniz notlandırıldığında, son teslim tarihleri değiştiğinde bildirim alacak şekilde ayarlayabilirsiniz. Özel verilerini Canvas'ta gizli kalacaktır."
-      notification_settings: "Bildirim Ayarları"
-      notifications_notice: "Aşağıda Canvas'tan gelen en son bildirimleri görebilirsiniz. Bu uygulamayı yer işareti olarak eklerseniz Facebook ana sayfanızda Canvas bildirimlerinin sayısını görebilirsiniz."
-      welcome: "Tekrar Hoşgeldiniz %{name}!"
-      welcome_message: "Instructure'ın sunduğu yeni nesil çevrimiçi öğrenme yazılımına hoşgeldiniz. Web ortamında öğrenmeyi geliştirme sürecini kolaylaştırmak için buradayız. Arayüzümüz basit, anlaşılır ve açıktır. Daha açık ve işbirliğine dayalı bir öğrenme ortamı sağlamak için Facebook gibi sizin ve öğrencilerinizin zaten kullandıkları araçlarla çalışıyoruz. Bütün bunları, yalnızca ödevlerin takip edildiği bir sistemden daha fazlası altında birleştirdik. Bu sistem etkileşimi destekleyip öğrenmeyi teşvik ediyor."
-      welcome_title: "Instructure Canvas'a Hoşgeldiniz"
-    index_disabled: 
-      disabled_notice: "Bu Canvas sistemi Facebook kullanımı için yapılandırılmamış."
-      get_help: "support.instructure.com adresinden yardım alın"
-      instructure_canvas: "Instructure Canvas"
-    invalid_signature: "Geçersiz Facebook imzası"
-    message: 
-      hide: Gizle
-    notification_policies: 
-      alerts: Uyarılar
-      cancel: İptal
-      change_settings: "Ayarları Değiştir"
-      daily: Günlük
-      labels: 
-        alerts_for_category: "%{category_name} Uyarılar"
-      loading: yükleniyor...
-      never: Asla
-      notification_type: "Bildirim Türü"
-      right_away: "Hemen Şimdi"
-      send_to_facebook: "Facebook'a gönderilsin mi?"
-      update_preferences: "Tercihleri Güncelle"
-      updating_preferences: "Tercihleri Güncelle..."
-      weekly: Haftalık
-    settings: 
-      back_to_messages: "Mesajlara Geri Dön"
-      link_needed: "Canvas Facebook Uygulamasını yapılandırmadan önce Canvas giriş sayfanıza bağlantı vermelisiniz. Daha fazla bilgi için lütfen \"Hoşgeldiniz\" e tıklayın"
-      notifications_config_notice: "Canvas'tan gelen bildirimler otomatik olarak Facebook hesabınıza gönderilebilir. Aşağıda gönderebileceğiniz bildirim türlerini görüyorsunuz. Bildirim tercihlerinizi ister burada ister Canvas'ta dilediğiniz zaman değiştirebilirsiniz."
-      settings_title: "Canvas Bildirim Ayarları"
-      updating_preferences: "Tercihler Güncelleniyor..."
   fair_use_bee47d77: "Adil Kullanım"
   favicon_6e658914: "Site ikonu"
   feature_flags: 
@@ -6374,6 +6223,7 @@ tr:
     only_one_folder: "Dizin yolu ve dizin numarası ayarlanamıyor"
   for: için
   for_all_devices_1f603968: "Tüm Aygıtlar İçin"
+  from_fdd4956d: Kimden
   from_from_to_to_e31f6422: "%{from}'dan %{to}'a"
   global_message_icons: 
     announcement: duyuru
@@ -6569,21 +6419,9 @@ tr:
       switch_to_points: "Puanlara geç"
     ungraded: "Notlandırma katsayısına dahil edilmedi"
   gradebook_uploads: 
-    errors: 
-      invalid_file: "Geçersiz csv dosyası, notlar güncellenemedi"
-      upload_failed: "Dosya yüklenemedi."
-    form: 
-      labels: 
-        upload: "Yüklenecek bir CSV dosyası seçin"
-      titles: 
-        upload_form: "Yüklenecek bir CSV dosyası seçin"
     new: 
       titles: 
         new_upload: "Not Defteri Yükle"
-    notices: 
-      updated: 
-        one: "1 gönderi başarılı bir şekilde güncellendi"
-        other: "%{count} gönderi başarılı bir şekilde güncellendi."
     show: 
       assignment_answer: "Bu Ödev"
       assignment_example: "Eşitlik Endeks Kısa Sınavı"
@@ -6610,14 +6448,6 @@ tr:
       student_answer: "Bu kişi gerçekten"
       student_example: "Herhangi biri"
       student_question: "Sorudaki öğrenci"
-  gradebook_uploads_form: 
-    buttons: 
-      upload_data: "Veri Gönder"
-    labels: 
-      upload: "Yüklencek bir CSV dosyası seçin:"
-    titles: 
-      upload_form: "Yüklenecek bir CSV dosyası seçin"
-    what_should_csv_look_like: "CSV dosyası nasıl olmalı?"
   gradebooks: 
     attendance: 
       attendance_info: "Herhangi bir katılım ödevi oluşturulmadı."
@@ -6738,12 +6568,14 @@ tr:
       set_group_weights: "Grup Ağırlıklarını Ayarla"
       show_attendance_columns: "Devam Sütunlarını Göster"
       show_concluded_enrollments: "Sonlandırılmış Ders Kayıtlarını Göster"
-      upload_scores: "İçeri Aktar"
       view_grading_history: "Notlandırma Geçmişini Göster"
     grades: 
       complete: Tamam
       incomplete: Eksik
     grades_filename: Notlar
+    grading_box_extended: 
+      labels: 
+        grade: Not
     history: 
       graded_on_submission: "Notlandırılmış gönderiler"
       grades_for_date: "Günü için Notlar"
@@ -6814,7 +6646,6 @@ tr:
       labels: 
         add_comment: "Yorum Ekle"
         average: Ort
-        grade: Not
         grade_by_question_beta: "Soruya göre değerlendir (beta)"
         group_comment: "Tüm Gruba Yorum Gönder "
         hide_names: "SpeedGrader'da öğrenci isimlerini gizle"
@@ -7427,8 +7258,11 @@ tr:
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "Çıkarsanız, şu anda hazırlanan zip'li dosya indirmesi iptal edilecek."
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Başka bir öğrenme yönetim sistemi kullanıyorsanız buradaki malzemelerinizi Canvas'a taşımak isteyebilirsiniz. İçeriğinizi Canvas'a kolayca aktarma sürecini birlikte yapalım."
   ignore_assignment_738b3c99: "Ödevi Gözardı Et"
+  ignore_forever_dd4a6cdf: "Daima Yoksay"
   ignore_name_55edc6fe: "%{name} yoksay"
   ignore_these_3940f6f5: "Bu Geçersiz"
+  ignore_this_assignment_b7a71f80: "Bu ödevi yok say"
+  ignore_until_new_submission_87f32b4: "Yeni Gönderime Kadar Yoksay"
   image_8ad06: Resim
   images: 
     error_checking_color: "Resim renk kontrolünde hata"
@@ -7438,6 +7272,7 @@ tr:
     invalid_file_type: "%{type} bilinmeyen dosya tipi. İzin verilen tipler : %{type_list}"
     not_an_image: "Seçtiğiniz dosya bir resim değil"
   immediately_c128ede6: Hemen
+  import_1b31507: "İçeri Aktar"
   import_content_b2fd6620: "İçeriği İçeri Aktar"
   importers/assignment_importer: 
     errors: 
@@ -7512,8 +7347,6 @@ tr:
       posting_message_failed: "Gönderim Başarısız, Lütfen Tekrar Deneyin"
       required: "Zorunlu alan"
       search_failed: "Arama işlemi başarısız, lütfen tekrar deneyin."
-    ignore_forever: "Daima Yoksay"
-    ignore_until_new_submission: "Yeni Gönderime Kadar Yoksay"
     labels: 
       datepicker: 
         time: Zaman
@@ -7653,8 +7486,6 @@ tr:
         dashboard: "Kontrol Panelim"
         skip_to_content: "Bu İçeriği Atla"
       open_source_learning_management_system: "Açık Kaynak Kod ÖYS"
-    facebook: 
-      title: "Facebook Sayfası"
     fixed_bottom: 
       masquerading: 
         stop: "Rolüme Geri Dön"
@@ -7803,6 +7634,7 @@ tr:
   lock_date_cannot_be_after_term_end_cf1a188f: "Kilitleme tarihi dönem sonundan sonra olamaz"
   lock_date_cannot_be_before_due_date_ac30f54: "Kilit tarihi bitiş tarihinden önce olamaz"
   lock_until_date_62ce1b5c: "Şu Tarihe Kadar Kilitle"
+  log_out_379ba28a: "Oturumu Kapat"
   logged_out_user: "Oturum Kapatan Kullanıcı %{user_counter}"
   logo_a040ae0e: Logo
   low_score_4eeb95b2: "En Düşük : %{score}"
@@ -7834,7 +7666,6 @@ tr:
   manage_usage_rights_c5a8c216: "Kullanım Şartlarını Yönet"
   manual_entry_e4a4f99a: "Elle Giriş"
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Yeterlik puanı en son notlandırılan ödev ya da kısa sınavı gösterir."
-  mastery_scrore_reflects_the_highest_score_of_a_gra_a71008b7: "Yeterlik puanı notlandırılmış ödev ya da kısa sınavın en yüksek puanını gösterir."
   mathquill: 
     tabs: 
       arrows: Oklar
@@ -7894,6 +7725,7 @@ tr:
     my_courses: Derslerim
   message: 
     default_subject: "Canvas Uyarısı"
+  message_896d2ed0: "%{message}"
   message_students: 
     buttons: 
       send_message: "Mesaj Gönder"
@@ -7946,10 +7778,6 @@ tr:
           unknown_user: "Bilinmeyen Kullanıcı"
         subject: "%{user_name} size Canvas'ta tartışmaya ekledi."
         unknown_user: "Bilinmeyen Kullanıcı"
-      facebook: 
-        body: "%{user_name} size Canvas'ta tartışmaya ekledi."
-        link_text: "Karşılıklı Konuşmaları Görüntüle"
-        unknown_user: "Bilinmeyen Kullanıcı"
       sms: 
         body: "%{user_name} size Canvas'ta tartışmaya ekledi."
         more_info: "Daha fazla bilgi için %{url}"
@@ -7987,25 +7815,6 @@ tr:
         ungraded_count_description: "%{count} veya daha fazla gönderi henüz notlandırılmadı"
         ungraded_timespan_description: "%{count} gündür bir gönderi notlandırılmadı"
         usernote_description: "%{count} gündür öğretim üyesi kaydı yok"
-      facebook: 
-        body: 
-          one: "Aşağıdaki koşul sağlandığından dolayı %{student} için bir uyarı mesajı gönderildi:"
-          other: "Aşağıdaki koşullar sağlandığından dolayı %{student} için bir uyarı mesajı gönderildi:"
-        body_student: 
-          one: "Aşağıdaki koşul sağlandığından dolayı sizin için bir uyarı mesajı gönderildi:"
-          other: "Aşağıdaki koşullar sağlandığından dolayı sizin için bir uyarı mesajı gönderildi:"
-        interaction_description: 
-          one: "Bir gündür öğrenci/öğretmen etkileşimi yok"
-          other: "%{count} veya daha fazla gündür öğrenci/öğretmen etkileşimi yok"
-        ungraded_count_description: 
-          one: "Bir veya daha fazla ödev henüz notlandırılmadı"
-          other: "%{count} veya daha fazla ödev henüz notlandırılmadı"
-        ungraded_timespan_description: 
-          one: "Bir veya daha fazla ödev bir veya daha fazla gündür notlandırılmadı"
-          other: "Bir veya daha fazla ödev %{count} veya daha fazla gündür notlandırılmadı"
-        usernote_description: 
-          one: "1 veya daha fazla gündür öğretim üyesi kaydı yok"
-          other: "%{count} ya da daha fazla gündür öğretim üyesi kaydı yok"
       sms: 
         body: "%{student} için bir uyarı mesajı gönderildi"
         body_student: "Sizin için bir uyarı mesajı gönderildi"
@@ -8041,8 +7850,6 @@ tr:
           link: "Duyuruları Göster"
         labels: 
           file_included: "Dosya Dahil Edildi"
-      facebook: 
-        body: "Şu Duyuruyu oluşturdunuz: %{title}, %{course}"
       sms: 
         details: "Daha fazla bilgi için %{url}"
         subject: "Şu Duyuruyu oluşturdunuz: %{title}, %{course}"
@@ -8058,8 +7865,6 @@ tr:
           link: "Duyuruyu görmek için buraya tıklayın"
           subject: " %{discussion_topic} Duyurusu üzerine Yeni Yorum: %{course}"
         subject: " %{discussion_topic} Duyurusu üzerine Yeni Yorum: %{course}"
-      facebook: 
-        body: "Duyuru ile ilgili Yeni Yorum: %{discussion_topic}, %{course}"
       sms: 
         body: " %{discussion_topic} Duyurusu üzerine Yeni Yorum: %{course}"
         details: "Daha fazla bilgi için %{url}"
@@ -8094,19 +7899,6 @@ tr:
         message: "%{user} , \"%{appointment_name}\" rezervasyonundan vazgeçti."
         no_reason_given: belirtilmemiş
         subject: "\"%{appointment_name}\" (%{course}) için rezervasyon iptal edildi"
-      facebook: 
-        instructions: "Randevuyu Göster"
-        labels: 
-          attendee: Katılımcı
-          attendees: Katılımcılar
-          cancel_reason: "İptal etme nedeni"
-          course: Ders
-          date_and_time: Tarih/saat
-          details: "Randevu ayrıntıları"
-          group: Grup
-          slots_remaining: "Mevcut zaman dilimleri"
-        message: "%{user} , \"%{appointment_name}\" rezervasyonundan vazgeçti."
-        no_reason_given: belirtilmemiş
       sms: 
         message: "%{user}, \"%{appointment_name}\" rezervasyonundan vazgeçti."
         more_info: "Daha fazla bilgi için %{url}"
@@ -8138,18 +7930,6 @@ tr:
         message: "%{user} , \"%{appointment_name}\" için zaman aralığınızı iptal etti."
         no_reason_given: belirtilmemiş
         subject: "\"%{appointment_name}\" için zaman aralığınız iptal edildi (%{course})"
-      facebook: 
-        instructions: "Farklı zaman aralığı için kaydolun"
-        labels: 
-          attendee: Katılımcı
-          attendees: Katılımcılar
-          cancel_reason: "İptal etme nedeni"
-          course: Ders
-          date_and_time: Tarih/saat
-          details: "Randevu ayrıntıları"
-          group: Grup
-        message: "%{user} , \"%{appointment_name}\" için zaman aralığınızı iptal etti."
-        no_reason_given: belirtilmemiş
       sms: 
         message: "\"%{appointment_name}\" için zaman aralığınız iptal edildi."
         more_info: "Daha fazla bilgi için %{url}"
@@ -8174,14 +7954,6 @@ tr:
         message: "\"%{appointment_name}\" için tüm randevular iptal edildi."
         no_reason_given: belirtilmemiş
         subject: "\"%{appointment_name}\" için randevular iptal edildi  (%{course})"
-      facebook: 
-        labels: 
-          cancel_reason: "İptal etme nedeni"
-          course: Ders
-          dates: Tarih(ler)
-          details: "Randevu ayrıntıları"
-        message: "\"%{appointment_name}\" için tüm randevular iptal edildi."
-        no_reason_given: belirtilmemiş
       sms: 
         message: "\"%{appointment_name}\" için tüm randevular iptal edildi."
         more_info: "Daha fazla bilgi için %{url}"
@@ -8211,17 +7983,6 @@ tr:
           slots_remaining: "Mevcut zaman dilimleri"
         message: "\"%{appointment_name}\" için zaman aralıklarına şimdi kayıt yaptırılabilir."
         subject: "\"%{appointment_name}\" randevusu için şimdi kayıt yaptırılabilir (%{course})"
-      facebook: 
-        group_signup: "Grup (%{group_category})"
-        individual_signup: Bireysel
-        instructions: "Bir zaman dilimine kayıt ol"
-        labels: 
-          course: Ders
-          dates: Tarih(ler)
-          details: "Randevu ayrıntıları"
-          signup_type: "Kayıt Tipi"
-          slots_remaining: "Mevcut zaman dilimleri"
-        message: "\"%{appointment_name}\" için zaman aralıklarına şimdi kayıt yaptırılabilir."
       sms: 
         message: "\"%{appointment_name}\" için kayıtlar açık."
         more_info: "Daha fazla bilgi için %{url}"
@@ -8253,17 +8014,6 @@ tr:
           slots_remaining: "Mevcut zaman dilimleri"
         message: "\"%{appointment_name}\" için zaman aralıkları eklendi ve kayıt yaptırılabilir."
         subject: "\"%{appointment_name}\" randevusu güncellendi (%{course})"
-      facebook: 
-        group_signup: "Grup (%{group_category})"
-        individual_signup: Bireysel
-        instructions: "Bir zaman dilimine kayıt ol"
-        labels: 
-          course: Ders
-          dates: Tarih(ler)
-          details: "Randevu ayrıntıları"
-          signup_type: "Kayıt Tipi"
-          slots_remaining: "Mevcut zaman dilimleri"
-        message: "\"%{appointment_name}\" için zaman aralıkları eklendi ve kayıt yaptırılabilir."
       sms: 
         message: "\"%{appointment_name}\" için yeni zaman aralıkları var."
         more_info: "Daha fazla bilgi için %{url}"
@@ -8296,17 +8046,6 @@ tr:
           slots_remaining: "Mevcut zaman dilimleri"
         message: "%{user}, \"%{appointment_name}\" için kaydoldu."
         subject: "\"%{appointment_name}\" için kullanıcı kaydoldu (%{course})"
-      facebook: 
-        instructions: "Randevuyu Göster"
-        labels: 
-          attendee: Katılımcı
-          attendees: Katılımcılar
-          course: Ders
-          date_and_time: Tarih/saat
-          details: "Randevu ayrıntıları"
-          group: Grup
-          slots_remaining: "Mevcut zaman dilimleri"
-        message: "%{user}, \"%{appointment_name}\" için kaydoldu."
       sms: 
         message: "%{user}, \"%{appointment_name}\" için kaydoldu."
         more_info: "Daha fazla bilgi için %{url}"
@@ -8336,17 +8075,6 @@ tr:
           slots_remaining: "Mevcut zaman dilimleri"
         message: "%{user}, \"%{appointment_name}\" için sizi kaydetti."
         subject: "\"%{appointment_name}\" için kaydınız yapıldı"
-      facebook: 
-        instructions: "Farklı zaman aralığı için kaydolun"
-        labels: 
-          attendee: Katılımcı
-          attendees: Katılımcılar
-          course: Ders
-          date_and_time: Tarih/saat
-          details: "Randevu ayrıntıları"
-          group: Grup
-          slots_remaining: "Mevcut zaman dilimleri"
-        message: "%{user}, \"%{appointment_name}\" için sizi kaydetti."
       sms: 
         message: "\"%{appointment_name}\" için kaydınız yapıldı"
         more_info: "Daha fazla bilgi için %{url}"
@@ -8367,8 +8095,6 @@ tr:
           link: "Ödevi görmek için tıklayınız."
           subject: "Ödev Değişti: %{title}, %{course}"
         subject: "Ödev Değişti: %{title}, %{course}"
-      facebook: 
-        body: "%{course} dersindeki ödev %{title_link} değişti."
       sms: 
         body: |-
             %{title}, %{course} değiştirildi.
@@ -8393,11 +8119,6 @@ tr:
           click_to_see_assignment: "Ödevi görmek için buraya tıklayın"
         multiple_due_dates: "Bitiş : Çoklu Tarih"
         new_assignment: "Dersiniz %{course_name} için yeni bir ödev oluşturuldu"
-        no_due_date: "bitiş: Bitiş Tarihi Yok"
-      facebook: 
-        due_at: "bitiş: %{assignment_due_date_time}"
-        multiple_due_dates: "Bitiş : Çoklu Tarih"
-        new_assignment: "%{course_name} dersi için yeni bir ödev oluşturuldu"
         no_due_date: "bitiş: Bitiş Tarihi Yok"
       sms: 
         due_at: "bitiş: %{assignment_due_date_time}"
@@ -8427,9 +8148,6 @@ tr:
         labels: 
           click_to_see_assignment: "Ödevi görmek için tıklayınız."
         no_due_date: "Bitiş Tarihi Yok"
-      facebook: 
-        assignment_due_date_changed_sentence: "%{course_name} dersindeki *%{assignment_name}* ödevinin teslim tarihi şununla değiştirildi:"
-        no_due_date: "Bitiş Tarihi Yok"
       sms: 
         assignment_due_date_changed: "%{assignment_name}, %{course_name}, bitiş tarihi artık:"
         more_info_at_url: "Daha fazla bilgi için %{web_address}"
@@ -8454,9 +8172,6 @@ tr:
         labels: 
           click_to_see_assignment: "Ödevi görmek için tıklayınız."
         no_due_date: "Bitiş Tarihi Yok"
-      facebook: 
-        assignment_due_date_changed_sentence: "%{course_name} (%{override}) dersindeki *%{assignment_name}* ödevinin teslim tarihi şununla değiştirildi:"
-        no_due_date: "Bitiş Tarihi Yok"
       sms: 
         assignment_due_date_changed: "%{course_name} (%{override}), %{assignment_name} bitişi :"
         more_info_at_url: "Daha fazla bilgi için %{web_address}"
@@ -8478,8 +8193,6 @@ tr:
           the_assignment_is_graded: "%{assignment_name} ödevi notlandırıldı."
         labels: 
           view_here: "Buradan görebilirsiniz"
-        the_assignment_is_graded: "%{assignment_name} ödevi notlandırıldı."
-      facebook: 
         the_assignment_is_graded: "%{assignment_name} ödevi notlandırıldı."
       sms: 
         assignment_is_graded: "%{course_name} dersindeki %{assignment_name} ödevi notlandırıldı."
@@ -8504,9 +8217,6 @@ tr:
           view_submission: "Gönderiyi burada görebilirsiniz"
         user_resubmitted: "Yeniden Gönderim:  %{user_name}, %{assignment_name}"
         user_resubmitted_sentence: "%{user_name}, %{course_name} dersindeki %{assignment_name} ödev için yeniden gönderim yaptı"
-      facebook: 
-        click_to_view: "Ödevi görmek için tıklayın."
-        user_resubmitted: "**%{user_name}**, %{course_name} dersindeki **%{assignment_name}** ödev için yeniden gönderim yaptı"
       sms: 
         more_info_at: "Daha fazla bilgi için %{web_address}"
         user_resubmitted: "%{user_name}, %{assignment_name} ödevini teslim etti (yeniden)"
@@ -8525,9 +8235,6 @@ tr:
           view_submission: "Gönderiyi burada görebilirsiniz"
         user_submitted: "Gönderim: %{user_name}, %{assignment_name}"
         user_submitted_sentence: "%{user_name}, %{course_name} dersindeki %{assignment_name} ödevi için bir gönderi yaptı."
-      facebook: 
-        click_to_view: "Ödevi görmek için tıklayın."
-        user_submitted: "**%{user_name}**, %{course_name} dersindeki **%{assignment_name}** ödevi için bir gönderi yaptı."
       sms: 
         more_info_at: "Daha fazla bilgi için %{web_address}"
         user_submitted: "%{user_name}, %{assignment_name} ödevini teslim etti "
@@ -8546,9 +8253,6 @@ tr:
           view_submission: "Gönderiyi burada görebilirsiniz"
         user_resubmitted_sentence: "%{user_name}, %{course_name} dersindeki  %{assignment_name} ödevi için geç bir gönderim yaptı"
         user_submitted: "Geç Göndeirilen Ödev:  %{user_name}, %{assignment_name}"
-      facebook: 
-        click_to_view: "Ödevi görmek için tıklayın."
-        user_resubmitted_sentence: "**%{user_name}**, %{course_name} dersindeki  **%{assignment_name}** ödevi için geç bir gönderim yaptı"
       sms: 
         more_info_at: "Daha fazla bilgi için %{web_address}"
         user_submitted: "%{user_name},  %{assignment_name} ödevini teslim etti (geç)"
@@ -8606,9 +8310,6 @@ tr:
           link: "Ayrıntıları burada görebilirsiniz"
           subject: "Çalışma ekibi daveti : %{course_or_group}"
         subject: "İşbirliği Daveti: %{course_or_group}"
-      facebook: 
-        body: "%{course_or_group} dersi %{document} dökümanı üzerinde işbirlikli çalışmanız için davet edildiniz. Bu dökümanı %{service} oluşturdu."
-        body_with_user: "%{course_or_group} dersi %{document} dökümanı üzerinde işbirlikli çalışmanız için davet edildiniz. Bu dökümanı %{user} kullanıcısı %{service} servisinde oluşturdu."
       sms: 
         body: |-
             %{course_or_group} dersi %{document} dökümanını üzerinde işbirlikli çalışmanız için davet edildiniz.
@@ -8692,10 +8393,6 @@ tr:
         subject: "%{user_name}, Canvas üzerinden bir mesaj gönderdiniz."
         unknown_user: "Bilinmeyen Kullanıcı"
         view_message: "Bu mesajı karşılıklı konuşmalarda gör"
-      facebook: 
-        body: "%{user_name}, Canvas üzerinden bir mesaj gönderdiniz."
-        link_text: "Mesajı Gör"
-        unknown_user: "Bilinmeyen Kullanıcı"
       sms: 
         body: "%{user_name}, Canvas üzerinden bir mesaj gönderdiniz."
         more_info: "Daha fazla bilgi için %{url}"
@@ -8722,10 +8419,6 @@ tr:
         subject: "%{user_name} kullanıcısı Canvas'ta sizlere mesaj yolladı."
         unknown_user: "Bilinmeyen Kullanıcı"
         view_message: "Bu mesajı karşılıklı konuşmalarda gör"
-      facebook: 
-        body: "%{user_name} kullanıcısı Canvas'ta sizlere mesaj yolladı."
-        link_text: "Mesajları Gör"
-        unknown_user: "Bilinmeyen Kullanıcı"
       sms: 
         body: "%{user_name} kullanıcısı Canvas'ta sizlere mesaj yolladı:"
         more_info: "Daha fazla bilgi için %{url}"
@@ -8817,12 +8510,6 @@ tr:
           details: "Mevcut kayıtların listesini görün"
           subject: "%{user} ders daveti kabul edildi"
         subject: "%{user} ders daveti kabul edildi"
-      facebook: 
-        body_designer: "%{user} kullanıcısı %{course} dersi için sadece tasarımcı olarak davetiniz kabul edildi."
-        body_observer: "%{user} kullanıcısı %{course} dersi için sadece gözlemci olarak davetiniz kabul edildi."
-        body_student: "%{user} kullanıcısı %{course} dersi için sadece öğrenci olarak davetiniz kabul edildi."
-        body_ta: "%{user} kullanıcısı %{course} dersi için sadece asistan öğretmen olarak davetiniz kabul edildi."
-        body_teacher: "%{user} kullanıcısı %{course} dersi için sadece öğretmen olarak davetiniz kabul edildi."
       sms: 
         body_designer: "%{user} kullanıcısı %{course} dersi için tasarımcı davetiniz kabul edildi"
         body_observer: "%{user} kullanıcısı %{course} dersi için gözlemci davetiniz kabul edildi"
@@ -8865,17 +8552,6 @@ tr:
           username: "Kullanıcı Adı"
         none: yok
         subject: "Ders Daveti"
-      facebook: 
-        body_designer: "Tasarımcı olarak %{course} dersine davet edildiniz."
-        body_observer: "Gözlemci olarak %{course} dersine davet edildiniz."
-        body_student: "Öğrenci olarak %{course} dersine davet edildiniz."
-        body_ta: "Öğretmen yardımcısı olarak %{course} dersine davet edildiniz."
-        body_teacher: "Öğretmen olarak %{course} dersine davet edildiniz."
-        labels: 
-          email: Eposta
-          name: Ad
-          username: "Kullanıcı Adı"
-        none: yok
       sms: 
         body_designer: "Tasarımcı olarak bu derse davet edildiniz."
         body_observer: "Gözlemci olarak bu derse davet edildiniz."
@@ -8924,17 +8600,6 @@ tr:
         none: yok
         register: "Kaydı tamamlamak için %{link} bağlantısını tıklayınız"
         subject: "Derse Kayıt"
-      facebook: 
-        body_designer: "Tasarımcı olarak %{course} dersine dahil oldunuz."
-        body_observer: "Gözlemci olarak %{course} dersine dahil oldunuz."
-        body_student: "Öğrenci olarak %{course} dersine dahil oldunuz."
-        body_ta: "Öğretmen yardımcısı olarak %{course} dersine dahil oldunuz."
-        body_teacher: "Öğretmen olarak %{course} dersine dahil oldunuz."
-        labels: 
-          email: Eposta
-          name: Ad
-          username: "Kullanıcı Adı"
-        none: yok
       sms: 
         body_designer: "Tasarımcı olarak derse kayıt oldunuz."
         body_observer: "Gözlemci olarak derse kayıt oldunuz."
@@ -9019,10 +8684,6 @@ tr:
           see_details: "Ayrıntıyı buradan görebilirsiniz"
         no_time_set: "Zaman Ayarlanmadı"
         subject: "Olay Tarihi Değişti: %{event_title}, %{course_name}"
-      facebook: 
-        from_to_time: "%{start_date_time} ile %{end_date_time}"
-        no_time_set: "Zaman Ayarlanmadı"
-        subject: "%{course_name} dersi için [%{event_title}](%{link_to_event}) olayının zamanı değiştirildi. Şu anda:"
       sms: 
         from_to_time: "%{start_date_time} ile %{end_date_time}"
         more_info: "Daha fazla bilgi için %{web_link}"
@@ -9080,11 +8741,6 @@ tr:
           grades_based_on_percent: "Notlandırma her ödev grubu için ağırlıklı toplam üzerinden yapılır"
           now_see_here: "Ayrıntıyı buradan görebilirsiniz"
           subject: "Değerlendirme Ağırlıklı Ortalamaları Değişti"
-      facebook: 
-        grading_based_on_points: "Notlandırma tüm ödevler için toplam puanlar üzerinden yapılır."
-        grading_policy_changed: "**[%{course_name}](%{course_url})** dersinin notlandırma ilkesi değişti."
-        labels: 
-          grades_based_on_percent: "Notlandırma her ödev grubu için ağırlıklı toplam üzerinden yapılır"
       sms: 
         grade_changed: "%{course_name} dersinin notlandırma ilkesi değişti."
         more_info_at: "Daha fazla bilgi için %{course_url}"
@@ -9106,8 +8762,6 @@ tr:
         labels: 
           view_submission_here: "Gönderiyi burada görebilirsiniz"
         subject: "Geç Gönderilen Ödev: %{group_name}, %{assignment_name}"
-      facebook: 
-        body: "%{group_name} grubu, %{course_name} dersindeki **[%{assignment_name}](%{assignment_url})** ödev için geç gönderim yaptı."
       sms: 
         more_info: "Daha fazla bilgi için %{web_address}"
         subject: "%{group_name}, %{assignment_name} ödevini gönderdi (geç)"
@@ -9130,10 +8784,6 @@ tr:
         labels: 
           click_below: "Aşağıdaki bağlantıya tıklayarak gruptan ayrılabilirsiniz"
         subject: "Grup Üyeliğiniz Onaylandı: %{group_name}"
-      facebook: 
-        account_group: "%{account_name} hesabı için **[%{group_name}](%{group_url})** grubuna katılma isteğiniz kabul edildi."
-        course_group: "%{course_name} dersi için **[%{group_name}](%{group_url})** grubuna katılma isteğiniz kabul edildi."
-        group_request_accepted: "Grup İsteğiniz Onaylandı: %{group_name}"
       sms: 
         account_group: "%{account_name} hesabı için %{group_name} grubuna katılma isteğiniz kabul edildi."
         course_group: "%{course_name} dersi için %{group_name} grubuna katılma isteğiniz kabul edildi."
@@ -9159,9 +8809,6 @@ tr:
         labels: 
           click_below: "Aşağıdaki bağlantıya tıklayarak diğer gruplardan ayrılabilirsiniz"
         subject: "Grup Üyeliğiniz Reddedildi: %{group_name}"
-      facebook: 
-        account_group: "%{account_name} hesabı için **[%{group_name}](%{group_url})** grubuna katılma isteğiniz reddedildi."
-        course_group: "%{course_name} dersi için **[%{group_name}](%{group_url})** grubuna katılma isteğiniz reddedildi."
       sms: 
         account_group: "%{account_name} hesabı için %{group_name} grubuna katılma isteğiniz reddedildi."
         course_group: "%{course_name} dersi için %{group_name} grubuna katılma isteğiniz reddedildi."
@@ -9217,9 +8864,6 @@ tr:
           details: " %{account} hesabı için yeni bir yönetici %{user} eklendi"
           subject: "Yeni Kullanıcı Hesabı"
         subject: "Yeni Kullanıcı Hesabı"
-      facebook: 
-        body: " **%{account}** hesabı için yeni bir yönetici **%{user}** eklendi."
-        subject: "%{account} için Yeni Hesap Yöneticisi"
       sms: 
         body: " %{account} hesabı için yeni bir yönetici %{user} eklendi"
         details: "Daha fazla bilgi için %{website}"
@@ -9235,8 +8879,6 @@ tr:
           link: "Duyuruyu göster"
         labels: 
           file_included: "Dosya Dahil Edildi"
-      facebook: 
-        body: "Yeni Duyuru: %{title}, %{course}"
       sms: 
         details: "Daha fazla bilgi için %{url}"
         subject: "Yeni Duyuru: %{title}, %{course}"
@@ -9256,9 +8898,6 @@ tr:
           title: "Yeni Grup Üyeliği: %{group_name}"
         subject: "%{course_or_account} için Yeni Grup Üyeliği"
         title: "Yeni Grup Üyeliği: %{group_name}"
-      facebook: 
-        body_account: "%{account} hesabı için yeni bir gruba eklendiniz. Bu grubun adı %{group_name}."
-        body_course: "%{course} dersi için yeni bir gruba eklendiniz. Bu grubun adı %{group_name}."
       sms: 
         body_account: "%{account} hesabı için yeni bir gruba eklendiniz. Bu grubun adı %{group_name}."
         body_course: "%{course} dersi için yeni bir gruba eklendiniz. Bu grubun adı %{group_name}."
@@ -9283,9 +8922,6 @@ tr:
           title: "Yeni Grup Üyeliği: %{group_name}"
         subject: "%{course_or_account} için Yeni Grup Üyeliği"
         title: "Yeni Grup Üyeliği: %{group_name}"
-      facebook: 
-        body_account: "%{account} hesabı için %{group} grubuna katılmaya davet edildiniz."
-        body_course: "%{course} dersi için %{group} grubuna katılmaya davet edildiniz."
       sms: 
         body_account: "%{account} hesabı için %{group} grubuna katılmaya davet edildiniz."
         body_course: "%{course} dersi için %{group} grubuna katılmaya davet edildiniz."
@@ -9311,11 +8947,6 @@ tr:
           teachers: Öğretmenler
         subject: "Yeni Ders"
         title: "%{account} İçin Yeni Ders"
-      facebook: 
-        body: "**%{account}** hesabı için yeni bir ders **%{course}** eklendi."
-        labels: 
-          teachers: Öğretmenler
-        subject: "%{account} İçin Yeni Ders"
       sms: 
         body: "%{account} hesabı için yeni bir ders %{course} eklendi"
         details: "Daha fazla bilgi için %{url}"
@@ -9338,8 +8969,6 @@ tr:
           link: "Bu konuşmaya katılmak için tıklayınız"
           subject: "Yeni Yorum %{discussion_topic}: %{course}"
         subject: "Yeni Yorum %{discussion_topic}: %{course}"
-      facebook: 
-        body: "%{course} dersindeki %{discussion_topic} için Yeni Yorum"
       sms: 
         body: "Yeni Yorum %{discussion_topic}: %{course}"
         details: "Daha fazla bilgi için %{url}"
@@ -9360,8 +8989,6 @@ tr:
         labels: 
           file_included: "Dosya Dahil Edildi"
         subject: "Yeni Tartışma - %{discussion_topic}: %{course}"
-      facebook: 
-        body: "Yeni Forum Başlığı: %{discussion_topic}, %{course}"
       sms: 
         body: "%{course} için Yeni Konu:"
         details: "Daha fazla bilgi için %{url}"
@@ -9383,10 +9010,6 @@ tr:
           see_details: "Ayrıntıyı buradan görebilirsiniz"
         no_time_set: "Zaman Ayarlanmadı"
         subject: "Yeni Olay - %{event_title}, %{course_name}"
-      facebook: 
-        body: "%{course_name} dersi için planlanmış yeni bir olay var:"
-        from_to_time: "%{start_date_time} ile %{end_date_time}"
-        no_time_set: "Zaman Ayarlanmadı"
       sms: 
         from_to_time: "%{start_date_time} ile %{end_date_time}"
         more_info: "Daha fazla bilgi için %{web_address}"
@@ -9409,8 +9032,6 @@ tr:
           subject: "Yeni Dosya Eklendi: %{title}, %{name}"
         subject: "Yeni Dosya Eklendi: %{title}, %{name}"
         view: "Buradan görebilirsiniz"
-      facebook: 
-        body: "Derse yeni bir dosya eklendi, %{name}:"
       sms: 
         body: "%{name} yeni bir dosya ekledi:"
         link: "Daha fazla bilgi için %{link}"
@@ -9427,9 +9048,6 @@ tr:
           subject: "Bu ders için %{count} yeni dosya yüklendi , %{name}:"
         link: "Buradan görebilirsiniz"
         subject: "Bu ders için %{count} yeni dosya yüklendi , %{name}:"
-      facebook: 
-        body: "Bu ders için %{count} yeni dosya yüklendi , %{name}:"
-        link: "Buradan görebilirsiniz"
       sms: 
         body: "Bu ders için %{count} yeni dosya yüklendi , %{name}:"
         link: "Daha fazla bilgi için %{link}"
@@ -9452,9 +9070,6 @@ tr:
           title: "Yeni Öğrenci Grubu: %{group_name}"
         subject: "%{course_or_account} için Yeni Öğrenci Grubu"
         title: "Yeni Öğrenci Grubu: %{group_name}"
-      facebook: 
-        body_account: "%{account} hesabı için %{group_name} adında öğrencilerin organize ettikleri yeni bir grup oluşturuldu. İlk üyesi %{user}."
-        body_course: "%{course} dersi için %{group_name} adında öğrencilerin organize ettikleri yeni bir grup oluşturuldu. İlk üyesi %{user}."
       sms: 
         body_account: "%{account} hesabı için \"%{group_name}\" adında yeni bir grup oluşturuldu. İlk üyesi %{user}."
         body_course: "%{course} dersi için \"%{group_name}\" adında yeni bir grup oluşturuldu. İlk üyesi %{user}."
@@ -9474,9 +9089,6 @@ tr:
           link: "Kullanıcı görünümü için tıklayınız"
           subject: "Yeni Kullanıcı"
         subject: "Yeni Kullanıcı"
-        title: "%{account} için Yeni Kullanıcı"
-      facebook: 
-        body: "**%{user}** adına yeni bir kullanıcı **%{account}** hesabı için az önce kaydoldu."
         title: "%{account} için Yeni Kullanıcı"
       sms: 
         body: "%{user} adına yeni bir kullanıcı %{account} hesabı için kaydoldu"
@@ -9498,8 +9110,6 @@ tr:
         html: 
           link_message: "İncelemenizi tamamlamak için tıklayınız"
         subject: "%{reviewee} için Atanmış akran incelemesi"
-      facebook: 
-        body: "%{reviewee} akran incelemesine davet edildiniz. İncelemek için aşağıdaki bağlantıya tıklayın!"
       sms: 
         more_info: "Daha fazla bilgi için %{url}"
       summary: 
@@ -9529,8 +9139,6 @@ tr:
           subject: "Kısa Sınavı Tekrar Notlandırma Tamamlandı: %{quiz}, %{context}"
         link_message: "Kısa sınavı buradan görebilirsiniz:"
         subject: "Kısa Sınavı Tekrar Notlandırma Tamamlandı: %{quiz}, %{context}"
-      facebook: 
-        body: "Kısa Sınavı Tekrar Notlandırma Tamamlandı: %{title}"
       sms: 
         body_sms: "%{context} içindeki %{title} için kısa sınavı tekrar notlandırma tamamlandı."
         more_info: "Daha fazla bilgi için %{url}"
@@ -9561,8 +9169,6 @@ tr:
           subject: "Değerlendirme Hatırlatma: %{rubric}, %{context}"
         link_message: "Değerlendirmeyi gözden geçirip mesajınızı buraya gönderebilirsiniz:"
         subject: "Değerlendirme Hatırlatma: %{rubric}, %{context}"
-      facebook: 
-        body: "%{context} için *%{title}* değerlendirmeniz hatırlatılıyor:"
       sms: 
         body: "%{rubric}, %{context}'i değerlendirmeniz hatırlatılıyor."
         more_info: "Daha fazla bilgi için %{url}"
@@ -9580,8 +9186,6 @@ tr:
           subject: "Yeni Değerlendirme: %{title}, %{context}"
         link_message: "Değerlendirmeyi gözden geçirip mesajınızı buraya gönderebilirsiniz:"
         subject: "Yeni Değerlendirme: %{title}, %{context}"
-      facebook: 
-        body: "%{context} için yeni bir değerlendirme oluşturuldu:"
       sms: 
         body: "%{context} için yeni bir değerlendirme oluşturuldu."
         more_info: "Daha fazla bilgi için %{url}"
@@ -9606,9 +9210,6 @@ tr:
         link_message: "Gönderi ayrıntılarını burada inceleyebilirsiniz:"
         someone: Birisi
         subject: "Gönderi Yorumu: %{user}, %{assignment}, %{context}"
-      facebook: 
-        body: "*%{author}*, **%{user} for %{assignment}** gönderisi için az önce yeni bir yorum yaptı."
-        someone: Birisi
       sms: 
         body: "%{user}, %{context}'deki %{assignment} için %{author} tarafından yeni yorum"
         more_info: "Daha fazla bilgi için %{url}"
@@ -9630,9 +9231,6 @@ tr:
         someone: Birisi
         subject: "Gönderi Yorumu: %{user}, %{assignment}, %{context}"
         submission_comment_link_message: "Aşağıdaki bağlantıyı kullanarak gönderi ayrıntılarını yeniden inceleyebilir veya bu mesajı yanıtlayarak bu yoruma cevap yazabilirsiniz."
-      facebook: 
-        body: "*%{author}*, **%{user} for %{assignment}** gönderisi için az önce yeni bir yorum yaptı."
-        someone: Birisi
       sms: 
         more_info: "Daha fazla bilgi için %{url}"
         sms_body: "%{user}, %{context}'deki %{assignment} için %{author} tarafından yeni yorum"
@@ -9661,13 +9259,6 @@ tr:
         score: "puan:  %{total} üzerinden %{score}"
         score_pending: "puan eğitmenin incelemesine sunuldu"
         subject: "Not Değiştirildi : %{assignment}, %{context}"
-      facebook: 
-        body: "*%{title}* ödevinizin notu değişti."
-        no_date_set: "Ayarlanmış Gün Yok"
-        not_applicable: Yok
-        regraded_date: "tekrar değerlendirildi:  %{date}"
-        score: "puan : %{total} üzerinden %{score}"
-        score_pending: "puan eğitmenin incelemesine sunuldu"
       sms: 
         body_sms: "%{title}, %{context} için notunuz değişti."
         more_info: "Daha fazla bilgi için %{url}"
@@ -9708,13 +9299,6 @@ tr:
         score: "puan:  %{total} üzerinden %{score}"
         score_pending_review: "puan eğitmenin incelemesine sunuldu"
         subject: "Ödev Notlandırıldı: %{assignment}, %{context}"
-      facebook: 
-        body: "*%{title}*  ödeviniz notlandırıldı."
-        graded_date: "notlandırıldı : %{date}"
-        no_date_set: "Ayarlanmış Gün Yok"
-        not_applicable: Yok
-        score: "puan : %{total} üzerinden %{score}"
-        score_pending_review: "puan eğitmenin incelemesine sunuldu"
       sms: 
         graded_date: "notlandırıldı: %{date}"
         more_info: "Daha fazla bilgi için %{url}"
@@ -9747,9 +9331,6 @@ tr:
         link_message: "Gönderiyi buradan görebilirsiniz:"
         subject: "Kısa Sınav Gönderildi: %{quiz}, %{context}"
         submitted_date: "gönderildi: %{date}"
-      facebook: 
-        body: "%{user_name} kullanıcısı %{quiz_title} kısa sınavını tamamladı ve manuel değerlendirme gerekmektedir."
-        submitted_date: "gönderildi:  %{date}"
       sms: 
         body_sms: "%{title}, %{context} için notunuz değişti."
         more_info: "Daha fazla bilgi için %{url}"
@@ -9776,8 +9357,6 @@ tr:
         notifications_link: "Bildirim ayarlarınızı değiştirmek için bu sayfayı ziyaret edebilirsiniz:"
         subject: "En Son Canvas Bildirimleri"
         weekly_body: "Canvas hesabınızdan bazı bildirimlerin haftalık raporunu almak için kayıt oldunuz. Aşağıda %{date} ile biten haftanın raporu bulunmaktadır:"
-      facebook: 
-        new_notifications: "#Canvas#'ta *%{notification_count} yeni bildiriminiz* var."
       sms: 
         notifications_sms: "%{url} adresinde %{notifications_count} yeni bildirim"
       twitter: 
@@ -9797,8 +9376,6 @@ tr:
           subject: "Wiki Sayfası Güncellendi: %{title}, %{user}"
         link_message: "İncelemeyi buradan görebilirsiniz: %{link}"
         subject: "Wiki Sayfası Güncellendi: %{title}, %{user}"
-      facebook: 
-        body: "%{title} wikide bir sayfa güncellendi."
       sms: 
         more_info: "Daha fazla bilgi için %{url}"
         updated_message: "%{title}, %{user} az önce şunu güncelledi:"
@@ -9816,8 +9393,6 @@ tr:
           details_link: "Ayrıntıları görmek için tıklayınız"
           subject: "Web Konferans Daveti: %{name}"
         subject: "Web Konferans Daveti: %{name}"
-      facebook: 
-        body: "Bir Web konferansına davet edildiniz,  #%{name}# için *%{title}*."
       sms: 
         body: "Bir Web konferansına davet edildiniz, %{title} for %{name}."
         link_message: "Daha fazla bilgi için %{url}"
@@ -10040,7 +9615,6 @@ tr:
   near_mastery_f25174a4: "Yeterliğe Yakın"
   new_account_role_6e5c4964: "Yeni Hesap Rolü"
   new_course_role_6a7bb75f: "Yeni Kurs Rolü"
-  new_facebook_message: "Canvas'tan yeni bir mesajınız var"
   new_file_135ae520: "[ Yeni Dosya ]"
   new_outcome_7fba8c7d: "Yeni Öğrenme Çıktısı"
   new_quiz_statistics_desc: "Ders için yeni kısa sınav istatistik sayfasını etkinleştir."
@@ -10260,8 +9834,6 @@ tr:
         display: "Eposta Adresi"
       errors: 
         saving_preferences_failed: "Oops! Bazı şeyler yanlış gitti. Lütfen tekrar deneyin"
-      facebook: 
-        display: Facebook
       push: 
         display: "Bilgilendirme Bildirimleri"
       sms: 
@@ -10556,6 +10128,7 @@ tr:
   paginated_view: 
     loading_more_results: "Daha fazla sonuç yükleniyor"
   participations_1823832d: Katılımlar
+  password_8a271b1c: Şifre
   paste_xml_cda3a64e: "XML Yapıştır"
   paypal: 
     exception: "Üzgünüz, bir hata oluştu, lütfen daha sonra tekrar deneyin."
@@ -10680,33 +10253,6 @@ tr:
       primary_pad: "Primary Pad"
       sketchpad: SketchPad
       typewithme: TypeWith.me
-    facebook: 
-      description: "Canvas Facebook uygulaması"
-      name: Facebook
-    facebook_settings: 
-      description: |-
-          Facebook'ta [facebook.com'da yeni bir uygulama](%{facebook_url}) oluşturup platform olarak 'Facebook'ta Uygulama' olarak eklemeniz gerekmekte.
-          Facebook uygulamanızın doğru bir şekilde çalıştığından emin olmak
-          için aşağıdaki yapılandırma seçeneklerini ayarlayın:
-          
-          * **Ayarlar -- Facebook'ta Uygulama -- Canvas Sayfası:** Bu kısıma yazdığınızı not alın (apps.facebook.com'dan sonraki bölüm) ve aşağıdaki forma yazın
-          * **Ayarlar -- Facebook'ta Uygulama -- Canvas URL:** %{canvas_url} ye ayarlayın
-          * Uygulamanızı kaydettikten sonra App ID'sini, Client Token ve App Secret'i not edin.
-      domain_name: "alan adı"
-      headers: 
-        domain_settings: "Alan Adı Ayarları"
-      hints: 
-        api_key: "Client Toekn olarak da bilinir"
-        canvas_domain: "Canvas URL'i için belirtilen alan adıdır"
-        canvas_name: "Canvas sayfası için belirtilen dizin yoludur"
-        disable_ssl: "Yerel test işlemi için kullan"
-      labels: 
-        api_key: "API Key"
-        app_id: "App ID"
-        canvas_domain: "Canvas Alan Adı"
-        canvas_name: "Canvas Adı"
-        disable_ssl: "SSL Devre Dışı"
-        secret: "App Secret"
     google_docs: 
       description: "Google Docs belge paylaşımı"
       name: "Goolgle Docs"
@@ -10966,7 +10512,6 @@ tr:
     labels: 
       requirements_must_be_completed: "Bu sayfa kilidini açmak için öncelikle şu gereksinimleri karşılamanız gerekmektedir"
   presentation_2d9387ca: Sunum
-  press_spacebar_for_more_details_on_this_outcome_f6713a42: "bu öğrenme çıktısı ile ilgili daha fazla detay için klavyede boşluk tuşuna basın"
   privacy_290109ea: Gizlilik
   product_name: Canvas
   profile: 
@@ -11017,8 +10562,6 @@ tr:
       profile_update_failed: "Oturum açma güncellemede hata"
       regenerating_token_failed: "Yeniden Token Üretiminde Hata"
       registration_failed: "Kayıt işlemi başarısız. Kullanıcı adı ve şifrenizi kontrol edin ve tekrar deneyiniz."
-    facebook_select: 
-      facebook: Facebook
     failed_resending: "İstek başarısız oldu. Tekrar deneyin."
     links: 
       resend_confirmation: "Onayı Tekrar Yolla"
@@ -11043,7 +10586,6 @@ tr:
         generate_token: "Token Üret"
         new_access_token: "Yeni Access Token"
         regenerate_token: "Yeniden Token Üret"
-        register_facebook_account: "Facebook Hesabınızı Kaydedin"
         register_linkedin_account: "LinkedIn Hesabınızı Kaydedin"
         save_login: "Oturumu Kaydet"
         save_skype_name: "Skype İsmini Kaydet"
@@ -11054,7 +10596,6 @@ tr:
       delicious_description: "Delicious, kısayollarınızı kaydedip başkaları ile paylaşabilmenize yarayan bir araç. Canvas'ın zengin içerik editörü sayesinde Canvas içinden yararlı bulduğunuz diğer kaynaklara bağlantı eklemek için Delicious etiketleriniz içinde arama yapabilirsiniz."
       diigo_description: "Diigo, özellikle araştırma ve eğitim için tasarlanmış bir sosyal yer imi oluşturma aracıdır. Canvas'ın zengin içerik editörü sayesinde Canvas içinden yararlı bulduğunuz diğer kaynaklara bağlantı eklemek için Diigo etiketleriniz içinde arama yapabilirsiniz."
       error_loading_token_details: "Token Ayrıntılarını Yüklemede Hata"
-      facebook_description: "Eğer Facebook hesabına sahipseniz, Canvas uygulamasını yükleyin ve ders bildirimlerini profilinizde alın. Gönderilecek bildirim türünü ve sıklığını siz belirtebilirsiniz."
       feature_options: "Özellik Seçenekleri"
       full_token_warning: |-
           **Şu an bu token kopyalanıyor**. Bu sayfadan ayrıldıktan sonra tam token'ı
@@ -11072,7 +10613,6 @@ tr:
         dates: Tarihler
         delicious_login: "Delicious Girişi"
         diigo_login: "Diigo Girişi"
-        facebook_access: "Facebook Erişimi"
         generate_access_token: "Erişim Token'ı Üret"
         google_docs_access: "Google Docs Erişimi"
         google_drive_access: "Google Drive Erişimi"
@@ -11134,7 +10674,6 @@ tr:
         diigo: Diigo
         disable_mfa: "Çoklu Kimlik Doğrulamayı Pasifleştir"
         edit_settings: "Ayarları Düzenle"
-        facebook: Facebook
         google_docs: "Google Docs"
         google_drive: "Google Drive"
         linkedin: LinkedIn
@@ -11143,7 +10682,6 @@ tr:
         skype: Skype
         twitter: Twitter
         upload_new_image: "Yeni bir resim yükle"
-        view_facebook_app: "Facebook uygulamalarını gör"
         view_your_profile: "profilinizi inceleyin"
         yo: Yo
       loading_token_details: "Token Ayrıntıları Yükleniyor..."
@@ -11157,7 +10695,6 @@ tr:
       subscribe_to_emails: "Instructure'dan bilgi, haber ve ipuçları almak istiyorum"
       titles: 
         access_token_details: "Token Erişim Ayrıntıları"
-        authorize_facebook: "Facebook'a İzin Ver"
         authorize_google_docs: "Google Docs'a İzin Ver"
         authorize_google_drive: "Google Drive'a İzin Ver"
         authorize_linkedin: "LinkedIn'e İzin Ver"
@@ -11563,6 +11100,7 @@ tr:
       regrade_options: "*(bu soruyu daha önce cevaplamış öğrenciler için)* Yeniden Notlandırma Seçenekleri:"
       some_scores_reduced: "Yalnızca doğru cevaba ödül puan ver (*bazı öğrencilerin notları azalabilir*)"
       update_question_without_regrading: "Tekrar değerlendirme olmadan soruyu güncelle"
+  quiz_e0dcce8f: "Kısa Sınav"
   quiz_log_auditing: 
     buttons: 
       reload_events: Yenile
@@ -13344,9 +12882,7 @@ tr:
         next: Sonraki
       getting_started: "**%{course}** dersine kayıt oluyorsunuz."
       labels: 
-        email: Eposta
         password: Şifre
-      log_in: "Lütfen eposta ve şifrenizi girin:"
     authenticate_or_register: 
       buttons: 
         enroll_in_course: "Derse Kayıt Ol"
@@ -13809,7 +13345,6 @@ tr:
       labels: 
         custom_rating: "Öğrencileri değerlendirirken serbest biçimli yorumlar yazacağım"
         grading_rubric: "Ödev değerlendirmesi için bu ölçeği kullan"
-        title: Başlık
         total_points: "Toplam Puan"
         totallying_rubric: "Sınav sonuçlarından toplam puanları gizle"
       links: 
@@ -13829,6 +13364,7 @@ tr:
       out_of: "*%{total} üzerinden* %{points} puan"
       rubric: Tubrik
       rubric_title: Başlık
+      title: "Başlık:"
       titles: 
         find_existing_rubric: "Varolan Denetim Listesi Bul"
     rubric_criterion: 
@@ -13877,6 +13413,7 @@ tr:
       titles: 
         find_a_rubric: "Bir Değerlendirme Listesi Ara"
     rubric_forms: 
+      criteria_description_label: "Kriter açıklaması"
       points: "%{points} puan"
     rubric_summary: 
       buttons: 
@@ -14787,6 +14324,7 @@ tr:
     people: Kişi
     view_in_separate_window: "Ayrı Pencerede Görüntüle"
   to_35c6baa2: a
+  to_51406be9: Kime
   to_c4c44f4b: ile
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Ders gözlemcisi *%{name}* i bir öğrenciye bağlamak için aşağıda öğrencinin adını yazmaya başlayın ve Güncelle'ye tıklayın."
   to_minscore_43e5452e: "to %{minScore}%"
@@ -14842,6 +14380,7 @@ tr:
   updated_group_group_name_727b1d98: "%{group_name} Grubu Güncellendi"
   upload_button: 
     upload: Yükle
+  upload_data_dc4fa4cb: "Veri Gönder"
   upload_drop_zone: 
     drop_to_upload: "Yüklemek istediğiniz öğeyi sürükleyiniz"
   upper_limit_of_range_c454a8f2: "Aralık üst sınırı"
@@ -14982,13 +14521,13 @@ tr:
     descriptions: 
       delicious: "Delicious işbirlikli bağlantı paylaşım aracıdır. Daha sonra başvurmak üzere İnternette herhangi bir sayfayı etiketleyebilirsiniz. Ayrıca benzer ilgi alanlarını paylaşmak için diğer kullanıcıların Delicious hesaplarına bağlayabilirsiniz."
       diigo: "Diigo bir işbirliği linki paylaşım aracıdır. Sonradan referans olarak Internette herhangi bir sayfayı etiketleyebilirsiniz. Benzer ilgi alanlarındali linkleri paylaşmak için diğer kullanıcıların Diigo hesaplarına da linkler verebilirsiniz."
-      facebook: "Facebook profilinizi listeleyerek sınıf ve gruplarda edindiğiniz arkadaşlarınızla daha kolay iletişim kurabilirsiniz."
       google_docs: "Öğrenciler Google Docs'u grup projelerinde işbirliği halinde çalışmak için kullanabilir. Google Docs sayesinde belgelerin, hesap tabloları ve sunuların gerçek zamanlı düzenlemesi yapılabilir."
       google_drive: "Grup projelerinde işbirliği halinde çalışmak için öğrenciler Google Drive'ı kullanabilirler. Google Drive, belgelerin, elektronik tabloları ve sunumların gerçek zamanlı işbirliği ile düzenlenmesini sağlamaktadır."
       linked_in: "LinkedIn iş hayatı ağı için bir kaynaktır. Okulda kurmuş olduğunuz ilişkilerin çoğunun ilerde iş hayatında faydası olabilir."
       skype: "Skype çevrimiçi ses ve video aramaları yapabileceğiniz ücretsiz bir araçtır."
       twitter: "Twitter sınıf dışı iletişim için ideal bir kaynaktır."
       yo: "Yo tek sekmeli sıfır karakter bir iletişim aracıdır."
+  username_47bb5bbe: "Kullanıcı Adı"
   users: 
     admin_merge: 
       buttons: 
@@ -15056,8 +14595,6 @@ tr:
     errors: 
       no_teacher_courses: "Öğretmen ve öğrenci arasında paylaşılan ders bulunamadı"
       user_not_teacher: "Bu kullanıcı bu dersin eğitmeni değildir"
-    facebook_added: "Facebook hesabı başarıyla eklendi!"
-    facebook_fail: "Facebook'a izin verme başarısız oldu."
     google_docs_added: "Google Docs'a erişime izin verildi!"
     google_docs_fail: "Google Docs'a izin verme başarısız oldu. Lütfen tekrar deneyin"
     google_drive_added: "Google Drive hesabı başarılı bir şekilde eklendi!"
@@ -15291,6 +14828,7 @@ tr:
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ Dersi"
   webct_name: "Blackboard Vista/CE (WebCT)"
   well_below_mastery_37664bdc: "Yeterliğin Epey Altında"
+  what_should_the_csv_file_look_like_985a59ac: "CSV dosyası nasıl olmalı?"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "İnsnalar dersi ziyaret ettiğinde bu sayfayı görecekler. Bu sayfayı etkinlik akışını, ders modüllerinin bir listesini, ders izlencesini veya sizin oluşturduğunuz bir sayfayı gösterecek şekilde ayarlayabilirsiniz. Varsayılan olarak ders etkinlik akışı ayarlıdır."
   where_would_you_like_to_move_title_fabd6e8f: "%{title} ı nereye taşımak istersiniz?"
   widget: 
@@ -15408,6 +14946,7 @@ tr:
       title_characters: "Başlık, en az bir harf veya sayı içermelidir"
       title_too_long: "Başlık, maksimum %{max_characters} karakter içerebilir"
     unknown_user_name: Bilinmiyor
+  wiki_page_6c11ee20: "Wiki Sayfası"
   wiki_pages: 
     edit: 
       page_header_title: "%{page_name} ı düzenle"

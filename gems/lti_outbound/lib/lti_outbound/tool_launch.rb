@@ -155,11 +155,6 @@ module LtiOutbound
         hash['ext_content_return_types'] = 'file'
         hash['ext_content_file_extensions'] = 'zip,imscc'
         hash['ext_content_return_url'] = return_url
-      elsif resource_type == 'course_home_sub_navigation'
-        hash['ext_content_intended_use'] = 'content_package'
-        hash['ext_content_return_types'] = 'file'
-        hash['ext_content_file_extensions'] = 'zip,imscc'
-        hash['ext_content_return_url'] = return_url
       end
     end
 

@@ -195,7 +195,7 @@ class PseudonymsController < ApplicationController
       end
     else
       respond_to do |format|
-        format.html { render :action => :new }
+        format.html { render :new }
         format.json { render :json => @pseudonym.errors, :status => :bad_request }
       end
     end
@@ -254,7 +254,7 @@ class PseudonymsController < ApplicationController
       end
     else
       respond_to do |format|
-        format.html { render :action => :edit }
+        format.html { render :edit }
         format.json { render :json => @pseudonym.errors, :status => :bad_request }
       end
     end

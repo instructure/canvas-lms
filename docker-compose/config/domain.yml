@@ -1,0 +1,5 @@
+test:
+  domain: localhost
+
+development:
+  domain: "canvas.docker"

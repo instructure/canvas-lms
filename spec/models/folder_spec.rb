@@ -274,4 +274,37 @@ describe Folder do
       expect(Folder.all_visible_folder_ids(@course)).to match_array([@root_folder, @normal_folder, @normal_sub1, @normal_sub2].map(&:id))
     end
   end
+
+  describe "read_contents permission" do
+    before(:once) do
+      @course.offer!
+      @root_folder = Folder.root_folders(@course).first
+      student_in_course(:course => @course, :active_all => true)
+      teacher_in_course(:course => @course, :active_all => true)
+    end
+
+    it "should grant right to students and teachers" do
+      expect(@root_folder.grants_right?(@student, :read_contents)).to be_truthy
+      expect(@root_folder.grants_right?(@teacher, :read_contents)).to be_truthy
+    end
+
+    context "with files tab hidden to students" do
+      before :once do
+        @course.tab_configuration = [{"id" => Course::TAB_FILES, "hidden" => true}]
+        @course.save!
+        @root_folder.reload
+      end
+
+      it "should grant right to teachers but not students" do
+        expect(@root_folder.grants_right?(@student, :read_contents)).to be_falsey
+        expect(@root_folder.grants_right?(@teacher, :read_contents)).to be_truthy
+      end
+
+      it "should still grant rights to teachers even if the teacher enrollment is concluded" do
+        @teacher.enrollments.where(:course_id => @course).first.complete!
+        expect(@course.grants_right?(@teacher, :manage_files)).to be_falsey
+        expect(@root_folder.grants_right?(@teacher, :read_contents)).to be_truthy
+      end
+    end
+  end
 end

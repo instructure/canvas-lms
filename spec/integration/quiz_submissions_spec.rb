@@ -78,6 +78,8 @@ describe Quizzes::QuizSubmissionsController do
   end
 
   def submit_quiz
+    Canvas::LiveEvents.expects(:quiz_submitted).with(@qs)
+
     post "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/",
          :question_1 => 'password', :attempt => 1, :validation_token => @qs.validation_token
     expect(response).to be_redirect

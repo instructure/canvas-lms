@@ -1,7 +1,0 @@
-<% define_content :link do %>
-  <%= user_url(asset) %>
-<% end %>
-
-<%= t :title, "New User for %{account}", :account => asset.account.name %>
-
-<%= mt :body, "A new user, **%{user}**, has just registered for the account **%{account}**.", :user => asset.name, :account => asset.account.name %>

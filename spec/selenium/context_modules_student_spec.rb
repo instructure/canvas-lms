@@ -388,4 +388,26 @@ describe "context_modules" do
       end
     end
   end
+
+  it "should fetch locked module prerequisites" do
+    course_with_teacher(:active_all => true)
+    student_in_course(:course => @course, :active_all => true)
+    @module = @course.context_modules.create!(:name => "module", :require_sequential_progress => true)
+    @assignment = @course.assignments.create!(:title => "assignment")
+    @assignment2 = @course.assignments.create!(:title => "assignment2")
+
+    @tag1 = @module.add_item :id => @assignment.id, :type => 'assignment'
+    @tag2 = @module.add_item :id => @assignment2.id, :type => 'assignment'
+
+    @module.completion_requirements = {@tag1.id => {:type => 'must_view'}, @tag2.id => {:type => 'must_view'}}
+    @module.save!
+
+    user_session(@student)
+
+    get "/courses/#{@course.id}/assignments/#{@assignment2.id}"
+
+    wait_for_ajaximations
+    expect(f("#module_prerequisites_list")).to be_displayed
+    expect(f(".module_prerequisites_fallback")).to_not be_displayed
+  end
 end

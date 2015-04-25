@@ -11,6 +11,12 @@
 </span>
 <h2 class="navigation_title" tabindex="-1"><span role="button" class="navigation_title_text" tabindex="0"></span></h2>
 <span class="date_field_wrapper">
-  <input type="text" name="start date" style="width: 100px;" class="date_field"
-         aria-label="{{#t "enter_navigation_date"}}Enter the date you would like to navigate to.{{/t}}" />
+    <label class="screenreader-only" id="calendar_navigation_date_accessible_label">
+      {{#t "enter_navigation_date"}}Enter the date you would like to navigate to.{{/t}}
+      {{datepickerScreenreaderPrompt 'date'}}
+    </label>
+    <input type="text" name="start date"
+           style="width: 100px;" class="date_field"
+           aria-labelledby="calendar_navigation_date_accessible_label"
+           data-tooltip title="{{accessibleDateFormat 'date'}}"/>
 </span>

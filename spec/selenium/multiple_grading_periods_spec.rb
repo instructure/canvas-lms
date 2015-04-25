@@ -15,18 +15,13 @@ describe "interaction with multiple grading periods" do
       expect(f('.grading-period-select-button')).to include_text(future_grading_period.title)
     end
 
-    it "should not display All Grading Periods when a grading period id is provided" do
-      get "/courses/#{@course.id}/gradebook?grading_period_id=2"
-      expect(f('.grading-period-select-button')).to_not be_present
-    end
-
     it "should display All Grading Periods when grading period id is set to 0" do
       get "/courses/#{@course.id}/gradebook?grading_period_id=0"
       expect(f('.grading-period-select-button')).to include_text("All Grading Periods")
     end
 
     it "should display the current grading period without a GET param" do
-      current_grading_period = @course.grading_periods.second
+      current_grading_period = @course.grading_periods.current.first
       get "/courses/#{@course.id}/gradebook"
       expect(f('.grading-period-select-button')).to include_text(current_grading_period.title)
     end

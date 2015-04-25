@@ -282,8 +282,7 @@ class Attachment < ActiveRecord::Base
     return true if self.class.skip_media_object_creation?
     in_the_right_state = self.file_state == 'available' && self.workflow_state !~ /^unattached/
     transitioned_to_this_state = self.id_was == nil || self.file_state_changed? && self.workflow_state_was =~ /^unattached/
-    if in_the_right_state && transitioned_to_this_state &&
-        self.content_type && self.content_type.match(/\A(video|audio)/)
+    if in_the_right_state && transitioned_to_this_state && self.previewable_media?
       delay = Setting.get('attachment_build_media_object_delay_seconds', 10.to_s).to_i
       MediaObject.send_later_enqueue_args(:add_media_files, { :run_at => delay.seconds.from_now, :priority => Delayed::LOWER_PRIORITY }, self, false)
     end
@@ -392,7 +391,7 @@ class Attachment < ActiveRecord::Base
       self.namespace = infer_namespace
     end
 
-    self.media_entry_id ||= 'maybe' if self.new_record? && self.content_type && self.content_type.match(/(video|audio)/)
+    self.media_entry_id ||= 'maybe' if self.new_record? && self.previewable_media?
   end
   protected :default_values
 
@@ -819,46 +818,6 @@ class Attachment < ActiveRecord::Base
     self.display_name ||= unencoded_filename
   end
   protected :infer_display_name
-
-  # Accepts an array of words and returns an array of words, some of them
-  # combined by a dash.
-  def dashed_map(words, n=30)
-    line_length = 0
-    words.inject([]) do |list, word|
-
-      # Get the length of the word
-      word_size = word.size
-      # Add 1 for the space preceding the word
-      # There is no space added before the first word
-      word_size += 1 unless list.empty?
-
-      # If adding a word takes us over our limit,
-      # join two words by a dash and insert that
-      if word_size >= n
-        word_pieces = []
-        ((word_size / 15) + 1).times do |i|
-          word_pieces << word[(i * 15)..(((i+1) * 15)-1)]
-        end
-        word = word_pieces.compact.select{|p| p.length > 0}.join('-')
-        list << word
-        line_length = word.size
-      elsif (line_length + word_size >= n) and not list.empty?
-        previous = list.pop
-        previous ||= ''
-        list << previous + '-' + word
-        line_length = word_size
-      # Otherwise just add the word to the list
-      else
-        list << word
-        line_length += word_size
-      end
-
-      # Return the list so that inject works
-      list
-    end
-  end
-  protected :dashed_map
-
 
   def readable_size
     h = ActionView::Base.new
@@ -1456,6 +1415,10 @@ class Attachment < ActiveRecord::Base
   def crocodoc_url(user)
     return unless crocodoc_available?
     "/api/v1/crocodoc_session?#{preview_params(user, "crocodoc")}"
+  end
+
+  def previewable_media?
+    self.content_type && self.content_type.match(/\A(video|audio)/)
   end
 
   def preview_params(user, type)

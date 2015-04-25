@@ -79,7 +79,7 @@ define [
     ).property('status', 'percentComplete')
 
     updateProgressBar: (->
-      @$("#submissions_download_dialog #progressbar").progressbar value: @get('percentComplete')
+      $("#progressbar").progressbar value: @get('percentComplete')
     ).observes('percentComplete')
 
     downloadCompletedFile: (->
@@ -91,20 +91,6 @@ define [
       @set('attachment', null)
     ).observes('isOpened')
 
-    setDimensions: (->
-      if @get('isOpened')
-        @$('.ui-widget-overlay').css
-          height: $(window).height() + "px"
-          width: $(window).width() + "px"
-    ).observes('isOpened')
-
-    setPosition: (->
-      if @get('isOpened')
-        @$('.ui-dialog').css
-          top: ($(window).height() / 2) - (@$('.ui-dialog').height() / 2) + "px"
-          left: ($(window).width() / 2) - (@$('.ui-dialog').width() / 2) + "px"
-    ).observes('isOpened')
-
     closeOnEsc: ( (event) ->
       if event.keyCode == 27 #esc
         @close()
@@ -113,16 +99,19 @@ define [
     actions:
       openDialog: ->
         @set('isOpened', true)
-        @$("#submissions_download_dialog .ui-dialog").focus()
-        @updateProgressBar()
+        @dialogOptions ?=
+          title: "Download Assignment Submissions"
+          resizable: false
+        @$dialog ?= $("#submissions_download_dialog form").dialog(@dialogOptions)
+        @$dialog.dialog()
         @checkForChange()
 
       closeDialog: ->
         @close()
 
     close: ->
+      @$dialog.dialog('close')
       @set('isOpened', false)
-      @$("#submissions_download_button").focus()
 
     fileReady: ->
       state = @get('attachment.workflow_state')

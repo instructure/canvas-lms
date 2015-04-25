@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -191,7 +191,7 @@ require 'set'
 #         },
 #         "permissions": {
 #           "description": "optional: the permissions the user has for the course. returned only for a single course and include[]=permissions",
-#           "example": "{\"create_discussion_topic\"=>true}",
+#           "example": "{\"create_discussion_topic\"=>true,\"create_announcement\"=>true}",
 #           "type": "map",
 #           "key": { "type": "string" },
 #           "value": { "type": "boolean" }
@@ -365,16 +365,15 @@ class CoursesController < ApplicationController
           state = e.state_based_on_date
           if [:completed, :rejected].include?(state)
             @past_enrollments << e unless e.workflow_state == "invited" || e.restrict_past_view?
-          elsif state != :inactive
+          else
             start_at, end_at = e.enrollment_dates.first
             if start_at && start_at > Time.now.utc
-              @future_enrollments << e
-            else
+              @future_enrollments << e unless e.restrict_future_view?
+            elsif state != :inactive
               @current_enrollments << e
             end
           end
         end
-
         @visible_groups = @current_user.visible_groups
 
         @past_enrollments.sort_by!{|e| Canvas::ICU.collation_key(e.long_name)}
@@ -1539,7 +1538,7 @@ class CoursesController < ApplicationController
         @course_home_sub_navigation_tools.reject! { |tool| tool.course_home_sub_navigation(:visibility) == 'admins' }
       end
     elsif @context.indexed
-      render :template => "courses/description"
+      render :description
     else
       # clear notices that would have been displayed as a result of processing
       # an enrollment invitation, since we're giving an error
@@ -1688,7 +1687,9 @@ class CoursesController < ApplicationController
       enrollment = @context.observer_enrollments.find(params[:enrollment_id])
       student = nil
       student = @context.students.find(params[:student_id]) if params[:student_id] != 'none'
-      enrollment.update_attribute(:associated_user_id, student && student.id)
+      # this is used for linking and un-linking enrollments
+      enrollment.associated_user_id = student ? student.id : nil
+      enrollment.save!
       render :json => enrollment.as_json(:methods => :associated_user_name)
     end
   end
@@ -1930,7 +1931,7 @@ class CoursesController < ApplicationController
         standard_id = params[:course].delete :grading_standard_id
         if @course.grants_right?(@current_user, session, :manage_grades)
           if standard_id.present?
-            grading_standard = GradingStandard.standards_for(@course).where(id: standard_id).first
+            grading_standard = GradingStandard.for(@course).where(id: standard_id).first
             @course.grading_standard = grading_standard if grading_standard
           else
             @course.grading_standard = nil
@@ -2008,7 +2009,7 @@ class CoursesController < ApplicationController
         render_update_success
       else
         respond_to do |format|
-          format.html { render :action => "edit" }
+          format.html { render :edit }
           format.json { render :json => @course.errors, :status => :bad_request }
         end
       end

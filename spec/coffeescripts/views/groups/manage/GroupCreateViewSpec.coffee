@@ -36,6 +36,23 @@ define [
     $group_join_level_select = $('#group_join_level')
     equal $group_join_level_select.length, 0
 
+  module 'GroupCreateView with blank fields',
+    setup: ->
+      fakeENV.setup()
+      group = new Group
+      groupCategory = new GroupCategory()
+      view = new GroupCreateView({groupCategory: groupCategory, model: group})
+      view.render()
+      view.$el.appendTo($(document.body))
+
+    teardown: ->
+      fakeENV.teardown()
+      view.remove()
+
+  test 'set focus on the group edit save button', ->
+    view.setFocusAfterError()
+    equal document.activeElement, $("#groupEditSaveButton")[0], "Active element"
+
   ### fails sporadically on jenkins
   test 'editing group should change name', ->
     url = "/api/v1/groups/#{view.model.get('id')}"

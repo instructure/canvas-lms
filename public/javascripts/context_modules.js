@@ -1176,14 +1176,8 @@ define([
           // make sure styles are applied to new module items
           $el.attr('data-module-type', "attachment");
         }else{
-          var module = _.find(ENV.MODULES, function(module){
-            return parseInt(module.id, 10) == parseInt(data.moduleId, 10);
-          });
-
-          // Find the matching module items with content_details
-          moduleItem = _.find(module.items, function(item){
-            return parseInt(data.moduleItemId, 10) == parseInt(item.id, 10);
-          });
+          // retrieve preloaded content details for the file item
+          moduleItem = ENV.MODULE_FILE_DETAILS[parseInt(data.moduleItemId, 10)];
         }
 
         // Make sure content_details isn't empty. You don't want to break something.

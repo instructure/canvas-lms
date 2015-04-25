@@ -2,8 +2,17 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 pl: 
+  1_item_scores_1_2_2_3_5_5_3_39f6c397: "1 - wyniki pozycji: 1, 2, 2, 3, 5, 5, 3"
+  1_item_scores_1_3_2_4_5_3_6_mastery_score_set_at_5_70ff296a: "1- Wyniki pozycji: 1, 3, 2, 4, 5, 3, 6. Wynik poziomu biegłośći ustalony na 5."
+  1_item_scores_3_2_2_4_1_3_4_e0de3073: "1 - Wyniki pozycji: 3, 2, 2, 4, 1, 3, 4"
+  1_item_scores_4_3_2_5_3e2933a0: "1 - Wyniki pozycji: 4, 3, 2, 5"
   1_item_scores_5512cd03: "1- Wyniki punktowe elementów"
+  2_final_score_5_5_8418d475: "2- Końcowy wynik: 5.5"
   2_final_score_7b0fd15e: "2- Końcowy wynik"
+  2_highest_score_4_3b4bc250: "2 - Najwyższy wynik: 4"
+  2_most_recent_score_3_766dbf4e: "2 - Ostatni wynik: 3"
+  2_the_rest_item_average_4_3_2_3_3_d05f04e2: "2 - 'Reszta' średnia pozycji: (4 + 3 + 2) / 3 = 3"
+  3_calculated_mastery_score_5_0_75_3_0_25_4_5_c88c3a7b: "3 - Obliczony wynik biegłości: 5(0.75) + 3(0.25) = 4.5"
   451_message: 
     description: "Nie masz prawa dostępu do niniejszej strony, ponieważ przebywasz w kraju podlegającym ograniczeniom handlowym Stanów Zjednoczonych."
     headings: 
@@ -44,6 +53,7 @@ pl:
     save: Zapisz
   _section_not_synced_yet_cd07d0dd: "-- Sekcja jeszcze niezsynchronizowana"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Wartość obliczenia nie jest używana przy tej metodzie obliczania"
+  a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "Folder o nazwie %{itemName} już istnieje."
   a_message_is_required_129e1814: "Wymagana jest wiadomość"
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "Tabela zawierająca nazwę schematu oceniana i ikony do edytowania lub usuwania schematu. "
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "Tabela, która zawiera dane schematu oceniania. Każdy rząd zawiera nazwę, maksymalną wartość procentową i minimalną wartość procentową. Ponadto każdy rząd zawiera ikonę pozwalającą dodać nowy rząd poniżej, a także ikonę pozwalającą usunąć bieżący rząd."
@@ -70,7 +80,6 @@ pl:
       avatars: "Awatary użytkownika"
       delicious: Delicious
       diigo: Diigo
-      facebook: Facebook
       google_docs: "Google Docs"
       google_docs_preview: "Podgląd w programie Google Docs"
       google_drive: "Dysk Google"
@@ -86,8 +95,6 @@ pl:
       invalid_discovery_url: "Adres URL odnajdowania nie jest poprawny"
     feedback_coach: "Zapytaj społeczności"
     feedback_coach_sub: "Otrzymaj pomoc od eksperta z Canvas"
-    feedback_feature_request: "Poproś o dodatkowe funkcje"
-    feedback_feature_request_canvas_net: "Poproś o funkcję w sieci Canvas"
     feedback_feature_request_sub: "Masz pomysł jak ulepszyć Canvas?"
     manually_created_courses: "Kursy utworzone ręcznie"
     root_account_cant_have_sis_id: "Nie można ustawić identyfikatorów SIS na kontach źródłowych"
@@ -239,7 +246,7 @@ pl:
         login_handle_name: "Etykieta logowania"
         position: Pozycja
         requested_authn_context: "Kontekst uwierzytelniania"
-        unkown_user_url: "Adres Url nieznanego użytkownika"
+        unknown_user_url: "Adres Url nieznanego użytkownika"
       log_in_url: "Adres URL logowania"
       log_out_url: "Adres URL wylogowania"
       login_attribute: "Właściwości loginu"
@@ -254,7 +261,7 @@ pl:
       save_button: "Zapisz ustawienia uwierzytelniania"
       start_debugging: "Rozpocznij debugowanie"
       stop_debugging: "Zatrzymaj debugowanie"
-      unkown_user_url_description: "Adres Url do przekierowania w przypadku, gdy nie odnaleziono uwierzytelnionego użytkownika w systemie Canvas."
+      unknown_user_url_description: "Adres Url do przekierowania w przypadku, gdy nie odnaleziono uwierzytelnionego użytkownika w systemie Canvas."
     saml_testing: 
       auth_request_to_idp: "AuthnRequest sent to IdP"
       auth_response_from_idp: "AuthnResponse from IdP"
@@ -930,6 +937,7 @@ pl:
         help_link_text: "Tekst wyświetlony w łączu"
         help_link_url: "Adres URL"
         include_students_in_global_survey: "Dodaj uczestników do ankiet globalnych."
+        locked: "Zablokuj to ustawienie dla subkont i kursów"
         login_handle_name: "Etykieta logowania"
         message: Wiadomość
         mfa_settings: "Wieloskładnikowe uwierzytelnianie"
@@ -942,6 +950,8 @@ pl:
         outgoing_email_default_name_option_default: "Domyślne ustawienie systemu Canvas"
         prevent_course_renaming_by_teachers: "Nie zezwalaj, aby instruktorzy zmieniali nazwy kursów"
         restrict_quiz_questions: "Ogranicz liczbę studentów mających możliwość podglądania pytań testowych po dacie zakończenia kursu"
+        restrict_student_future_view: "Ogranicz liczbę studentów mających możliwość podglądania kursów przed datą rozpoczęcia"
+        restrict_student_past_view: "Ogranicz przeglądanie kursów przez studentów po dacie zakończenia"
         role_id: "Dodaj więcej"
         self_enrollment: "Zezwalaj na samodzielne zapisy"
         self_registration: "Samodzielna rejestracja"
@@ -1046,6 +1056,13 @@ pl:
       subtitle_term: "W terminie **%{term}**"
       title: "Kursy na tym koncie"
       too_many_courses_message: "Zbyt dużo kursów do pokazania  (%{count}). Użyj wyszukiwarki, aby znaleźć interesujący cię kurs."
+    single_course_ag_selector_parameters: 
+      account_reports: 
+        linn_benton: 
+          assignment_group_id: 
+            text: "Id Grupy Zadaniowej:"
+          course_id: 
+            text: "Id Kursu:"
     sis_batch_counts: 
       accounts_label: Konta
       courses_label: Kursy
@@ -1277,6 +1294,7 @@ pl:
   add_course_assignments_628ed6d0: "Dodaj zadania dla kursu"
   add_course_calendar_events_146154a5: "Dodaj wydarzenia z kalendarza dot. kursu"
   add_files_to_the_course_da6ffd32: "Dodaj pliki do kursu"
+  add_grading_period_6f774dc3: "Dodaj Okres Klasyfikacji"
   add_grading_scheme_81e23c05: "Dodaj schemat oceniania"
   add_module_item: 
     add_assignment_to: "Dodaj zadanie do modułu %{module}"
@@ -1422,7 +1440,9 @@ pl:
     podcast_feed_description_group: "W tym kanale informacyjnym zostaną zamieszczone wszystkie pliki multimedialne, do których łącza znajdują się w ogłoszeniach dla grupy \"%{group}\" lub które zostały do nich dołączone."
     podcast_feed_name: "Kanał informacyjny Podcast z ogłoszeniami dla kursu %{course}"
   anonymous_e1b8ad27: Anonimowy
+  anonymous_user_d984b9ce: "Anonimowy Użytkownik"
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Po ostatnim podejściu zostaną pokazane odpowiedzi"
+  api_url_3ee7cb0a: "API URL"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "Centrum aplikacji zostanie wyświetlone w zakładce „Aplikacje” znajdującej się na stronie ustawień kursu lub konta. Adres URL podany poniżej powinien wskazywać ważny punkt końcowy Centrum aplikacji (na przykład %{url} — należy pominąć ukośnik kończący"
   apple_touch_icon_2c258bb3: "Ikona dotykowa Apple"
   application: 
@@ -1483,6 +1503,7 @@ pl:
     title: "Edytuj %{name}"
     update: Aktualizuj
   archive_3f794d7e: Archiwum
+  archive_selected_d64506ca: "Wybrane Archiwum"
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     few: "Czy na pewno chcesz usunąć te %{count} elementy?"
     one: "Czy na pewno chcesz usunąć %{name}?"
@@ -1491,6 +1512,7 @@ pl:
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Czy na pewno chcesz usunąć ten okres oceniania?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Czy na pewno chcesz usunąć ten schemat oceniania?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Czy na pewno chcesz usunąć to narzędzie?"
+  are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Napewno chcesz zgłosić to zdjęcie profilowe?"
   aria_labels: 
     unlock_at_date: "Odblokuj w dniu"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Podczas uzupełniania tego pola lista grup będzie automatycznie filtrowana i zostaną pokazane jedynie nazwy odpowiadające wpisowi."
@@ -1538,6 +1560,7 @@ pl:
     titles: 
       gpa_scale_explainer: "Jak wygląda ocenianie w skali GPA?"
       grading_scheme_info: "Pokaż/edytuj schemat oceniania"
+  assignment_976578a8: Zadanie
   assignment_comments_e43ed898: "Komentarze do zadań"
   assignment_details: 
     no_graded_submissions: "Brak ocenionych zadań"
@@ -1945,8 +1968,10 @@ pl:
         remind: "Przypomnij użytkownikowi %{assessor} o zadaniu; data ostatniego przypomnienia %{time}"
         reminder: "Przypomnij użytkownikowi %{assessor} o zadaniu; data ostatniego przypomnienia %{time}"
     peer_reviews_selector: 
+      anonymous_peer_reviews: Anonimowość
       how_to_peer_review: "Jak przypisać recenzje uczestnikom"
       labels: 
+        anonymous_peer_reviews: "Recenzje równieśników są anonimowe"
         automatically_assign_peer_reviews: "Automatycznie przypisz recenzję drugiego uczestnika"
         manually_assign_peer_reviews: "Ręcznie przypisz recenzję drugiego uczestnika"
         require_peer_reviews: "Wymagaj recenzji drugiego uczestnika"
@@ -2174,6 +2199,7 @@ pl:
     upload_error_timeout: "Żądanie przekroczyło limit czasu: %{url}"
     upload_error_too_many_redirects: "Zbyt dużo przekierowań"
     upload_error_unexpected: "Nieznany błąd pojawił się podczas pobierania z adresu url %{url}"
+  attachment_deffe5a9: Załącznik
   attendance: 
     default_attendance_title: "Obecność %{date}"
     errors: 
@@ -2198,6 +2224,8 @@ pl:
   available_after_unlock_at_until_lock_at_499e8092: "Dostępne po %{unlock_at} aż do %{lock_at}"
   available_from_587ce92f: "Dostępne od"
   available_from_date_43b5e11d: "Dostępne od dnia"
+  available_from_date_afc594fa: "Dostępne od:"
+  available_until_date_2c0ccec3: "Dostępne do:"
   available_until_date_cd125c62: "Dostępne do dnia"
   available_until_f3b9c4ed: "Dostępne do"
   available_until_lock_at_ab022445: "Dostępne do %{lock_at}"
@@ -2214,9 +2242,12 @@ pl:
       Nowy, prostszy, bardziej przyjazny użytkownikowi interfejs przeglądania. Po włączeniu go na poziomie kursu
       wszyscy użytkownicy tego kursu będą mieli wyświetlony przed sobą nowy interfejs. Aby go wyświetlić, gdy inna osoba
       przechodzi do strony plików osobistych ('/files'), konieczne jest włączenie go dla konta odpowiedniego użytkownika.
+  between_1_and_99_d421a4c0: "Pomiędzy 1% a 99%"
+  between_2_and_5_c34f5152: "Pomiędzy 2 a 5"
   big_blue_button_conference: 
     conference_is_recorded: "Ta konferencja jest nagrywana."
     recording_setting: Nagrywanie
+    recording_setting_enabled_description: "Włącz nagrywanie tej konferencji"
   blackboard: 
     no_manifest: "Plik Blackboard w formacie .zip nie zawiera pliku imsmanifest.xml w katalogu źródłowym."
   bookmark_service: 
@@ -2228,6 +2259,7 @@ pl:
       permissions: "Uprawnienia do edycji posiada: %{name}"
     unpublished_title: Nieopublikowano
   broken_file_link_found_in_your_course_7cc24395: "W kursie znaleziono przerwane łącze pliku "
+  bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "Nazwa koszyka musi być następująca:%{bucket_names}"
   bulk_course_migration: 
     export_failed: "Wystąpił błąd podczas eksportowania kursu o identyfikatorze bb_lcid %{id} z Blackboard."
     export_failed_no_id: "Wystąpił błąd podczas importowania kursu"
@@ -2452,7 +2484,7 @@ pl:
       create_event: "Utwórz nowe wydarzenie"
       done_go_back_to_list: "Wykonane, wróć do listy"
       links: 
-        accessibility_warning: "Ostrzeżenie: ten widok jest niedostępny dla użytkowników z czytnikami ekranu. Skorzystaj z widoku harmonogramu."
+        accessibility_warning: "Uwaga: W celu zwiększenia dostępu do wydarzeń kalendarzowych, należy wybrać widok planera."
         calendar_agenda: Program
         calendar_month: Miesiąc
         calendar_scheduler: Planer
@@ -2648,25 +2680,9 @@ pl:
     crumbs: 
       new: "Nowe wydarzenie w kalendarzu"
     full_calendar_event: 
-      buttons: 
-        create: "Utwórz wydarzenie"
-        update: "Zaktualizuj wydarzenie"
-      labels: 
-        address: Adres
-        date: Data
-        event_description: "Opis wydarzenia"
-        from: Od
-        location: Położenie
-        title: Tytuł
       no_content: "Brak zawartości"
-      timespan: "%{start_time} *do* %{end_time}"
     new: 
-      links: 
-        back_to_calendar: "Powrót do kalendarza"
-        delete: "Usuń wydarzenie"
-        edit: "Edytuj wydarzenie w kalendarzu"
       page_title: "Nowe wydarzenie w kalendarzu"
-    no_content: "Brak zawartości"
     notices: 
       created: "Wydarzenie zostało pomyślnie utworzone."
       deleted: "Wydarzenie zostało usunięte"
@@ -2686,44 +2702,6 @@ pl:
     invalid_date_or_time: "Nieprawidłowa data lub nieprawidłowy termin dla %{attr}"
   calendars: 
     assignment_details: "Szczegółowe informacje dot. zadania"
-    calendar: 
-      alts: 
-        next: Dalej
-        previous: Wstecz
-      calendars_count: 
-        few: "%{count} kalendarze, %{open_count} otwarte"
-        one: "1 kalendarz, %{open_count} otwarty"
-        other: "%{count} kalendarzy, %{open_count} otwartych"
-      feed_title: "Kanał informacyjny kalendarza"
-      instructions: 
-        ics_link: "Skopiuj poniższe łącze i wklej je do aplikacji z kalendarzem obsługującej kanały informacyjne iCal (Google Calendar, iCal, Outlook itp.)"
-      labels: 
-        calendar: Kalendarz
-        date: Data
-        details: "Informacje szczegółowe"
-        due: "Termin dostarczenia"
-        from: Od
-        group: Grupa
-        title: Tytuł
-        undated_events: "Wydarzenia bez daty"
-      links: 
-        add_event: "Dodaj wydarzenie"
-        delete: Usuń
-        edit: Edytuj
-        feed: "kliknij tutaj, aby wyświetlić kanał informacyjny"
-        full_details: "Szczegółowe informacje"
-        how_do_i: "W jaki sposób...?"
-        jump_to_calendar: "Przejdź do kalendarza"
-        more_options: "Więcej opcji"
-        show_undated_events: "pokaż %{count} wydarzeń(-nia) bez daty"
-      messages: 
-        max_visible: "Można wyświetlić do %{count} kalendarzy jednocześnie"
-      options: 
-        new_group: "[ Nowa grupa ]"
-      tabs: 
-        assignment: Zadanie
-        event: Wydarzenie
-      timespan: "%{start_time} *do* %{end_time}"
     default_title: wydarzenie
     event: 
       due: "termin dostarczenia"
@@ -2747,36 +2725,6 @@ pl:
     prompts: 
       delete_assignment: "Czy na pewno chcesz usunąć to zadanie?"
       delete_event: "Czy na pewno chcesz usunąć to wydarzenie?"
-    show: 
-      crumbs: 
-        my_calendar: "Mój kalendarz"
-      feed_title: "Kanał informacyjny Atom kalendarza kursu"
-      keycode_descriptions: 
-        delete: "Usuń bieżące wydarzenie"
-        edit: "Edytuj bieżące wydarzenie"
-        next_day: "Następny dzień w kalendarzu"
-        next_event: "Następny dzień/wydarzenie w kalendarzu"
-        next_week: "Następny tydzień"
-        open: "Otwórz bieżące wydarzenie"
-        previous_day: "Poprzedni dzień w kalendarzu"
-        previous_event: "Poprzedni dzień/wydarzenie w kalendarzu"
-        previous_week: "Poprzedni tydzień"
-        refresh: "Odśwież kalendarz"
-      keycode_descriptoins: 
-        new: "Nowe wydarzenie w dzisiejszym dniu"
-      keycodes: 
-        delete: d
-        edit: e
-        new: "n"
-        next_day: "ctrl+strzałka w prawo"
-        next_event: j
-        next_week: "ctrl+strzałka w dół"
-        open: o
-        previous_day: "ctrl+strzałka w lewo"
-        previous_event: k
-        previous_week: "ctrl+strzałka w górę"
-        refresh: r
-      page_title: Kalendarz
     show2: 
       calendar_feed: "Kanał informacyjny kalendarza"
       calendar_feed_instructions: "Skopiuj poniższe łącze i wklej je do aplikacji z kalendarzem obsługującej kanały informacyjne iCal (Google Calendar, iCal, Outlook itp.)"
@@ -2795,7 +2743,6 @@ pl:
       add_new_event: "Dodaj nowe wydarzenie"
       edit_assignment: "Edytuj zadanie"
       edit_event: "Edytuj wydarzenie"
-    use_new_calendar: "Wypróbuj nowy kalendarz"
     wizard_box: 
       descriptions: 
         assignment: "Dobrze. Kliknij teraz zakładkę \"Zadanie\" znajdującą się w oknie dialogowym, aby utworzyć zadanie zamiast wydarzenia."
@@ -2817,7 +2764,12 @@ pl:
         delete: "Usunąć wydarzenie/zadanie"
         new: "Utworzyć nowe wydarzenie"
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Nie można usunąć uszeregowań opartych na skojarzeniach kryteriów ocen. Aby usunąć te skojarzenia, należy usunąć odpowiedni wiersz z kryteriów oceniania pozytywnych elementów."
+  can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Nie można diffować więcej niż jednego pliku tego samego typu"
   cancel_caeb1e68: Anuluj
+  cannot_be_nil_when_account_id_is_nil_be6d1d60: "nie może byż zerowy gdy ID_konta jest zerowe"
+  cannot_be_nil_when_course_id_is_nil_f539388: "nie może być zerowy gdy ID_kursu jest zerowe"
+  cannot_be_present_when_account_id_is_present_f7d9b51f: "nie może być obecny gdy ID_konta jest obecne"
+  cannot_be_present_when_course_id_is_present_785e6a59: "nie może być obecny gdy ID_kursu jest obecne"
   canvas: 
     migration: 
       errors: 
@@ -2827,15 +2779,22 @@ pl:
     plugins: 
       errors: 
         all_fields_required: "Wszystkie pola są wymagane"
+        aws_creds_required: "Referencje AWS są wymagane."
+        endpoint_or_region_required: "Region AWS (lub punkt końcowy) jest wymagany."
         fields_required: "Pole \"%{field}\" jest wymagane"
+        invalid_live_events_url: "Punkt końcowy nieprawidłowy, musi być prawidłowy adres URL."
         invalid_url: "Nieprawidłowy adres URL"
         login_expiration_minimum: "Wygaśnięcie sesji powinno wynosić 20 minut lub dłużej"
         need_integer: "Wprowadź liczbę całkowitą dla buforowania listy odtwarzania"
+        stream_name_required: "Wymagana jest nazwa strumienia kinesis."
   canvas_cartridge_description: "Umożliwia konwersję eksportu z systemu Canvas do pośredniego formatu JSON, który można importować"
   canvas_cartridge_display: "Canvas Common Cartridge"
   canvas_cartridge_file_description: "Paczka eksportu kursu Canvas"
   canvas_cartridge_name: "Canvas Cartridge Importer"
+  canvas_error_report_ff678539: "Zgłoś błąd Canvas"
   canvas_revision_unknown: Nieznany
+  canvas_ticketing_email_connector_27e253ae: "Canvas łącznik biletów Email "
+  canvas_ticketing_web_post_connector_11158897: "Canvas łącznik biletów posty internetowe"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Program Canvas oceni wszystkie przesłane zadania po zapisaniu testu, może to zająć kilka minut."
   cc: 
     by: "Przypisanie CC"
@@ -2852,9 +2811,13 @@ pl:
     titles: 
       update_assignment_points: "Zmień liczbę punktów, aby odpowiadała kryteriom."
   choose_a_course_home_page_8059c7b: "Wybierz stronę główną kursu"
+  choose_a_csv_file_to_upload_9644480c: "Wybierz plik CSV, który chcesz przekazać:"
   choose_usage_rights_33683854: "Wybierz prawa użytkowania..."
   clear_file_name_text_field_fce73840: "Wyczyść pole tekstowe nazwy pliku"
+  click_for_more_details_on_this_outcome_8c018d2f: "kliknij aby uzyskać więcej szczegółów na temat tego wyniku"
   click_here_on_the_calendar_link_c9965631: "Kliknij łącze *Kalendarz*"
+  click_to_modify_89fa26aa: "Kliknij aby zmienić"
+  click_to_report_profile_picture_370f9625: "Kliknij aby zgłosić zdjęcie profilowe"
   close_and_return_to_canvas_80544344: "Zamknij i powróc do systemu Canvas"
   close_d634289d: Zamknij
   collaboration: 
@@ -2955,6 +2918,7 @@ pl:
     titles: 
       delete: "Usunąć współpracę?"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Zwiń listę członków grupy dla %{groupName}"
+  collapse_subdiscussion_89af1f5c: "Zwiń Sub-dyskusję"
   coming_up_4348b0bd: Następne
   comm_messages: 
     from_beginning: początek
@@ -2966,7 +2930,6 @@ pl:
   communication_5255723c: Komunikacja
   communication_channel: 
     body: "Twój kod weryfikacji do Canvas to %{verification_code}"
-    default_facebook_account: "Konto w portalu Facebook"
     default_twitter_handle: "Adres URL z nazwą użytkownika w portalu Twitter"
     default_yo_name: "Nazwa Yo"
   communication_channels: 
@@ -3423,7 +3386,7 @@ pl:
         user_services: "Zarejestrowane usługi sieci Web"
       help: 
         list_services: "Lista zarejestrowanych usług nie została aktywowana. Aktywowanie listy ułatwia komunikację poza zajęciami z innymi uczestnikami kursu i członkami grupy."
-        services: "Profilu użytkownika nie został połączony z żadną zewnętrzną usługą. Możesz połączyć konto w programie Canvas z takimi usługami jak Facebook czy Twitter. Ułatwia to komunikację poza zajęciami z innymi uczestnikami kursu i członkami grupy."
+        services: "Nie połaczyłeś swojego profilu użytkownika z żadnymi usługami zewnętrznymi. Możesz połączyć swoje konto Canvas z usługami takimi jak Twitter. To ułatwi śledzenie kursów i łączenie się z członkami grupy poza klasą."
       labels: 
         public_list_services: "Pozwalaj innym uczestnikom kursu/członkom grupy zobaczyć, z jakimi usługami jest połączony mój profil"
         user_privileges: Przywileje
@@ -3462,7 +3425,7 @@ pl:
         registered_services: "Zarejestrowane usługi"
         service_types: "Typy usług"
       help: 
-        no_services: "Profilu użytkownika nie został połączony z żadną zewnętrzną usługą. Możesz połączyć konto w programie Canvas z takimi usługami jak Facebook czy Twitter."
+        no_services: "Nie połączyłeś swojego profilu użytkownika z żadnymi usługami zewnętrznymi. Możesz połączyć swoje konto Canvas z usługami takimi jak Twitter."
         services_private: "Lista zarejestrowanych usług nie została aktywowana. Po aktywowaniu tej listy inni uczestnicy kursu i członkowie grupy będą widzieć, jakie usługi zostały połączone z Twoim kontem."
         user_services: "Pozostali uczestnicy/członkowie mogą również zezwolić na wyświetlanie usług zewnętrznych połączonych z ich kontem Canvas. Funkcja ta ułatwia koordynację projektów grupowych i komunikację poza zajęciami."
       labels: 
@@ -3512,6 +3475,7 @@ pl:
     invalid_content: "Nie można odnaleźć zawartości"
     invalid_position: "Nieprawidłowa pozycja"
     invalid_requirement_type: "Nieprawidłowy typ wymogu ukończenia"
+  context_module_sub_header_2f39e87b: "Moduł kontekstu sub nagłówka"
   context_modules: 
     buttons: 
       add: "Dodaj moduł"
@@ -3773,12 +3737,9 @@ pl:
     all_courses: "Wszystkie kursy"
     all_in_context: "Wszystko w %{context}"
     archive: Archiwum
-    archive_conversation: "Dodaj konwersację do archiwum"
     autocomplete_result: 
       group_people: "Osoby: %{people}"
       no_results: "Brak wyników"
-    autocomplete_token: 
-      remove_recipient: "Usuń odbiorcę"
     back: Wstecz
     cannot_add_to_private: "Nie można dodawać uczestników do prywatnej rozmowy."
     cannot_be_empty: "Wiadomość nie może być pusta"
@@ -3822,12 +3783,10 @@ pl:
     hide: Ukryj
     index_new: 
       archive: Archiwum
-      archive_conversation: "Dodaj rozmowę do archiwum"
       archived: "Dodano do archiwum"
       clear_search: "Wyczyść wyniki wyszukiwana"
       compose_new_message: "Utwórz nową wiadomość"
       delete: Usuń
-      delete_conversation: "Usuń konwersację"
       filter_messages_by_course: "Filtruj wiadomości wg kursów"
       filter_messages_by_type: "Filtruj wiadomości wg typu"
       forward: Przekaż
@@ -3880,7 +3839,6 @@ pl:
         add_to_faculty_journal: "Dodaj jako wpis do dziennika wydziałowego"
         attachments: Załączniki
         course: Kurs
-        course_required: "Przed wpisaniem odbiorców należy wybrać kurs."
         select_course: "Wybierz kurs"
         subject: Temat
         to: Do
@@ -3930,7 +3888,6 @@ pl:
     titles: 
       rss_feed: "Strumień konwersacji"
     unarchive: "Usuń z archiwum"
-    unarchive_conversation: "Usuń rozmowę z archiwum"
     unstar: "Nieoznaczone gwiazdą"
     unstar_conversation: "Odznacz gwiazdkę z konwersacji"
   copyright_holder_66ee111: "Właściciel praw autorskich:"
@@ -3941,6 +3898,7 @@ pl:
   correct_answers_will_be_available_from_to_5762e8c6: "Poprawne odpowiedzi będą dostępne od %{from} do %{to}."
   correct_answers_will_be_available_on_date_48137: "Poprawne odpowiedzi będą dostępne %{date}."
   couldn_t_find_canvas_csv_import_headers_487f1b6c: "Nie odnaleziono nagłówków importowania plików CSV w systemie Canvas "
+  couldn_t_generate_diff_message_a0528b20: "Nie można wygenerować diffu:%{message}"
   count_assignments_with_errors_e8f3c18c: 
     one: "1 zadanie z błędami"
     other: "%{count} zadań z błędami"
@@ -4217,14 +4175,8 @@ pl:
       headings: 
         grade: "Oceń zadanie %{assignment}"
         to_do: "Lista czynności"
-      images: 
-        alt: 
-          ignore: ignoruj
       links: 
         show_more: "%{count} więcej..."
-        title: 
-          ignore: "Zignoruj to zadanie"
-          ignore_review: "Ignoruj tę recenzję"
       need_grading_count: 
         few: "%{count} wymagają oceny"
         one: "1 wymaga oceny"
@@ -4243,8 +4195,8 @@ pl:
         conclude_course: "Zakończ kurs"
         delete_course: "Usuń kurs"
       details: 
-        conclude_alt_text: "Jeśli chcesz zachować możliwość modyfikowania ocen i ograniczyć dostęp studenta do kursu, skorzystaj z ustawień dat kursu. Więcej informacji o ustawieniach daty kursu znajdziesz w naszych przewodnikach *here*"
-        confirm_conclude: "Ostrzeżenie: Po ukończeniu kursu nie będzie możliwości modyfikowania ocen ani dostępu do zawartości kursu."
+        conclude_alt_text: "Jeśli chcesz zachować zdolność do zmiany ocen przy jednoczesnym ograniczeniu uczniom dostępu do kursu, wykorzystaj opcję dotyczącą daty kursów w ustawieniach. Dowiedz się więcej o ustawieniu dat kursu w naszym przewodniku *tutaj*."
+        confirm_conclude: "Uwaga: Zakończenie kursu spowoduje przeniesienie całej zawartości kursu do archiwum i uniemożliwi zmianę ocen."
         confirm_delete: "Czy na pewno chcesz usunąć ten kurs? Po usunięciu kursu uczestnicy i instruktorzy nie będą mieć do niego dostępu. Jeśli chcesz tylko usunąć kurs z rozwijanej listy, powinieneś zamiast tego wybrać opcję *zakończ kurs*."
         confirm_delete_addendum: "Jeśli nie masz pozwolenia na zakończenie kursu, możesz *zmienić datę zakończenia kursu* lub poprosić administratora, aby zakończył ten kurs."
       headings: 
@@ -4532,6 +4484,8 @@ pl:
         open_enrollment: "Dodaj łącze \"Zgłoś się do uczestnictwa w tym kursie\" na stronie głównej kursu"
         public_syllabus: "Udostępnij publicznie ten program kursu."
         restrict_enrollments_to_course_dates: "Użytkownicy mogą uczestniczyć w kursie tylko w tym okresie"
+        restrict_student_future_view: "Ogranicz dostęp studentów do podglądu kursów przed datą rozpoczęcia"
+        restrict_student_past_view: "Ogranicz przeglądanie kursów przez studentów po dacie zakończenia"
         root_account: "Konto źródłowe"
         root_account_id: "Konto źródłowe"
         sis_source_id: "Identyfikator systemu SIS"
@@ -4816,6 +4770,7 @@ pl:
         count: "Nieprawidłowa liczba studentów"
         ratio: "Nieprawidłowy stosunek studentów"
   current_3ce5414a: Bieżący
+  current_mastery_score_score_out_of_mastery_points_fedd343f: "Obecny wynik poziomu biegłości: %{score} out of %{mastery_points}"
   current_score_6c81792: "Bieżący wynik punktowy"
   current_total_67bf5f72: "Bieżąca łączna liczba:"
   curve_grades_dialog: 
@@ -4877,6 +4832,7 @@ pl:
       show_less: "Pokaż mniej"
       show_more: "Pokaż więcej"
   data_exports: "eksport danych"
+  data_set_identifier_data_set_id_c228b5df: "Identyfikator Zbioru Danych:  %{data_set_id}"
   date: 
     abbr_day_names: 
       - Nd
@@ -4916,6 +4872,7 @@ pl:
     formats: 
       date_at_time: "%-d %b at %k:%M"
       default: "%d.%m.%Y"
+      full: "%b %-d, %Y %-l:%M%P"
       long: "%-d %B %Y"
       long_with_weekday: "%A, %-d %B"
       medium: "%-d %b %Y"
@@ -4997,6 +4954,7 @@ pl:
       month: Miesiąc
       second: Sekundy
       year: Rok
+  decaying_average_8bf6a0dd: "Rozkładająca Średnia"
   default_conference_title: "Konferencja kursu %{course_name}"
   default_question_name: Pytanie
   default_question_text: "Tekst pytania"
@@ -5005,6 +4963,7 @@ pl:
   delete_grading_scheme_6b308832: "Usuń schemat oceniania"
   delete_my_account_41060aad: "Usuń Moje konto"
   delete_quiz_142b8099: "Usuń test"
+  delete_selected_a023ccf8: "Wybrano usunięcie"
   delete_survey_56fddbbd: "Usuń ankietę"
   delete_tool_app_9c9f6d35: "Usunąć aplikację %{tool}?"
   delete_toolname_app_85f9d4ee: "Usuń aplikację %{toolName}"
@@ -5130,6 +5089,7 @@ pl:
       obliczona bez tych punktów.
   disable_a5c05db3: Wyłącz
   disabled_18c33a73: (wyłączone)
+  discussion_6719c51d: Dyskusja
   discussion_entries: 
     created_entry_notice: "Wpis został pomyślnie utworzony."
     deleted_entry_notice: "Wpis został usunięty."
@@ -5146,6 +5106,7 @@ pl:
     atom_no_author: "Brak autora"
     default_title: "Brak tytułu"
     empty_message: "Brak wiadomości"
+  discussion_topic_dc85ad4c: "Temat dyskusji"
   discussion_topics: 
     assignment_details: 
       available_from: "Dostępne od"
@@ -5209,7 +5170,7 @@ pl:
         published: Opublikowane
       delay_posting: "Opóźnij ogłaszanie"
       enable_podcast_feed: "Uaktywnij kanał informacyjny"
-      include_replies_in_podcast_feed: "Uwzględnij odpowiedzi w kanale informacyjnym"
+      include_replies_in_podcast_feed: "Włącz odpowiedzi uczniów do źródła podkastów"
       only_visible_to_overrides_note: "Uwaga: ta dyskusja widoczna jest *jedynie* dla sekcji określonych poniżej:"
       options: Opcje
       page_header_title: "Nowa dyskusja"
@@ -5258,11 +5219,11 @@ pl:
       loading: "Trwa ładowanie..."
       lock_for_comments: "Zablokuj wpisywanie komentarzy"
       make_sure_all_search_terms_are_spelled_correctly: "Sprawdź, czy wyszukiwane terminy są dobrze przeliterowane."
-      new_discussion: "*Rozpocznij* dyskusję"
       rss_feed: "Strumień RSS"
       start_one_now: "Rozpocznij dyskusję teraz"
       suggestions: "Sugestie:"
       there_are_no_discussion_topics_to_show: "Brak tematów dyskusji do wyświetlenia"
+      title_start_a_discussion: "Rozpocznij dyskusję"
       try_different_more_general_or_fewer_keywords: "Spróbuj w inny sposób, bardziej ogólny lub wpisz mniejszą liczbę słów"
       try_disabling_the_unread_or_assignments_filters: "Spróbuj wyłączyć filtry Nieprzeczytane lub Zadania."
       unread: Nieprzeczytane
@@ -5324,7 +5285,7 @@ pl:
       reply_to_topic: "Odpowiedz na temat"
       retrieved_from_feed: "Pobrano z kanału %{feed}"
       show_rubric: "Wyświetl kryteria ocen"
-      speed_grader: "Speed Grader"
+      speed_grader: SpeedGrader™
       topic: Temat
       topic_podcast_feed_link: "Kanał informacyjny Podcast dot. tematu"
       topic_subscribe: Subskrybuj
@@ -5373,6 +5334,7 @@ pl:
       add_reply_to_topic: "Dodaj odpowiedź do tematu"
     entry_content: 
       authors_name: "Nazwa autora"
+      collapsible_subdiscussion: "Zwiń Sub-dyskusję"
       delete: Usuń
       edit: Edytuj
       edited_comment: "Edytowane przez *%{editor.display_name}* w następującym dniu: %{edited_at}"
@@ -5434,15 +5396,20 @@ pl:
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: "Dystrybucja bieżących ocen w kursach między wszystkimi uczestnikami zapisanymi na kursy w działach"
   domain_3b54c511: Domena
   don_t_show_again_15d8253e: "nie pokazuj ponownie"
+  done_8af51c9b: Gotowe.
+  due_at_5e18eeac: "Godz:"
   due_by_c263dc10: "termin dostarczenia"
+  due_date_5d0a953c: "Termin:"
   due_date_6a281fe3: "Termin dostarczenia: %{date}"
   due_date_822625d8: "Termin dostarczenia"
   due_date_cannot_be_after_course_end_fd128a14: "Termin dostarczenia nie może przypadać po zakończeniu kursu"
+  due_date_cannot_be_after_lock_date_675b30aa: "Termin nie może być późniejszy niż data blokady"
   due_date_cannot_be_after_section_end_b0f54388: "Termin dostarczenia nie może przypadać po zakończeniu sekcji"
   due_date_cannot_be_after_term_end_5d504cb1: "Termin dostarczenia nie może przypadać po zakończeniu semestru"
   due_date_cannot_be_before_course_start_ecc523ba: "Termin dostarczenia nie może przypadać przed rozpoczęciem kursu"
   due_date_cannot_be_before_section_start_f8950484: "Termin dostarczenia nie może przypadać przed rozpoczęciem sekcji"
   due_date_cannot_be_before_term_start_ea660b2c: "Termin dostarczenia nie może przypadać przed rozpoczęciem semestru"
+  due_date_cannot_be_before_unlock_date_f263aab0: "Termin nie może być wcześniejszy od daty blokady"
   due_dates: 
     due_at: "termin dostarczenia: %{assignment_due_date_time}"
     multiple_due_dates: "termin dostarczenia: więcej niż jedna data"
@@ -5450,8 +5417,8 @@ pl:
   due_datetime_f5a81b81: "Termin dostarczenia: %{dateTime}"
   due_multiple_dates_cc0ee3f5: "Termin: Wiele dat"
   due_on_date_aa4725cd: "Termin dostarczenia:"
-  due_on_date_ffc98ebc: "Termin dostarczenia"
   e_mail_only_2cc5e513: "Tylko e-mail"
+  each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: "Każdy pasek to przydział. Zielona warstwa stanowi odsetek studentów, którzy oddali zgłoszenia *na czas*. **spóźnione** zgłoszenia są oznakowane kolorem żółtym a ***brakujące*** kolorem czerwonym."
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Każdy pasek to jedno zadanie. *Cienki pionowy włos* rozciąga się od najniższego wyniku punktowego dla każdego uczestnika kursu do najwyższego wyniku punktowego. **Grubszy pasek** rozciąga się od 25. percentyla do 75. z ***zaznaczoną medianą***."
   each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "Każdy pasek to jedno zadanie. Cienki włos rozciąga się od najniższego wyniku punktowego dla każdego uczestnika kursu do najwyższego wyniku punktowego. Grubszy pasek rozciąga się od 25. percentyla do 75., z zaznaczoną medianą. Wynik punktowy uczestnika jest oznaczony kropką."
   each_bar_represents_the_number_of_page_views_on_th_3f833fcd: "Każdy pasek reprezentuje liczbę *odsłon strony* w danym dniu. Pomarańczony pasek oznacza, że uczestnik **wykonał jakąś czynność** w ramach kursu danego dnia."
@@ -5473,12 +5440,14 @@ pl:
     buttons: 
       create_rubric: "Utwórz kryteria ocen"
       update_rubric: "Aktualizuj kryteria ocen"
+    change: Zmień
     discussion_points_possible: 
       few: "%{count} możliwe punkty"
       one: "%{count} możliwy punkt"
       other: "%{count} możliwych punktów"
     errors: 
       load_rubrics_failed: "Ładowanie kryteriów ocen nie powiodło się, ponów próbę"
+    leave_different: "Zostaw inne"
     messages: 
       loading_rubric_groups: "Trwa ładowanie grup kryteriów ocen..."
       loading_rubrics: "Trwa ładowanie kryteriów ocen..."
@@ -5508,8 +5477,12 @@ pl:
     instructions: "Wklej lub wpisz URL obrazu, który chcesz osadzić:"
     keyboard_shortcuts: 
       dialog_title: "Skróty klawiaturowe"
+      editor_help_link: "Otwórz Menu Pomocy"
       keybindings: 
+        close_submenu: "Zamknij menu lub dialog, również powraca do strefy edycji"
+        navigate_toolbar: "Nawigacja w lewo/prawo przez menu/pasek narzędzi"
         open_dialog: "Otwórz to okno pomocy"
+        open_menubar: "Otwórz pasek menu edytora"
         open_toolbar: "Otwórz pasek narzędzi edytora"
     loading: "Trwa ładowanie..."
     mathjax_text_entry_field_label: "Wprowadź równanie jako LaTeX."
@@ -5543,6 +5516,7 @@ pl:
     titles: 
       font_size: "Rozmiar czcionki; naciskaj do dołu, aby wybrać"
       formatting: "Formatowanie; naciskaj do dołu, aby wybrać"
+      rte_help: "Obszar Rich Text. Wciśnij ALT+F8 po pomoc"
   either_the_url_or_domain_should_be_set_c29cf8c1: "Musisz ustawić url albo domenę"
   element_option_missing_error_an_element_to_attach__be433478: "Błąd braku opcji `element`: element, do którego ma być dołączony widok TreeBrowserView musi zostać określony podczas ustawiania opcji renderowania na wartość 'true' dla widoku BBTreeBrowserView"
   email: 
@@ -5898,16 +5872,23 @@ pl:
     sis_id_in_use: "Identyfikator SIS \"%{sis_id}\" jest już używany"
     unsaved_changes: "Nie zapisano wszystkich zmian."
     wrong_file_extension: "Nie można przesłać zadania z wybranym plikiem o rozszerzeniu \"%{extension}\""
+  event_date_c9459fe3: "Data Wydarzenia"
+  event_date_f05219e7: "Data Wydarzenia:"
+  event_end_time_ef830e66: "Godzina zakończenia wydarzenia"
+  event_start_time_441b491f: "Godzina rozpoczęcia wydarzenia"
   everyone_854554dd: Wszyscy
   example_84698b7d: Przykład
+  example_final_score_355aff0f: "Przykładowy wynik końcowy"
   example_final_score_a92b30b9: "Przykładowy wynik końcowy]]"
   example_https_example_com_config_xml_be5f36ac: "Przykład: https://example.com/config.xml"
   example_https_lti_tool_provider_example_herokuapp__e9802142: "Przykład: https://lti-tool-provider-example.herokuapp.com/register"
   example_item_scores_6726c689: "Przykładowe wyniki punktowe elementów"
+  exceeds_mastery_1f995dce: "Przekracza poziom biegłości"
   expand_collapse_title_outcome_group_239f0a9d: "rozwiń/zwiń grupę wyników %{title} "
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Rozwiń listę członków grupy dla %{groupName}"
   expand_or_collapse_calendars_9854b0d0: "Rozwiń lub zwiń kalendarze"
   expand_or_collapse_undated_items_b901de09: "Rozwiń lub zwiń elementy bez daty"
+  expand_subdiscussion_cd226ed4: "Rozwiń sub-dyskusję"
   expires_on_date_18efe4e2: "Data wygaśnięcia"
   external_apps_f5490181: "Zewnętrzne aplikacje"
   external_content: 
@@ -5946,6 +5927,7 @@ pl:
       posts_added: "Dodano wiadomości"
       remove_feed: "Usuń nazwę %{display_name}"
   external_integration_keys_8b4f4548: "Zewnętrzne klucze integracji"
+  external_tool_c5a6410a: "Narzędzie zewnętrzne"
   external_tools: 
     account_navigation_configured: "Skonfigurowano nawigację konta"
     app_full_view: 
@@ -6053,53 +6035,8 @@ pl:
     submit: Prześlij
     user_navigation_configured: "Skonfigurowano nawigację użytkownika"
     wiki_page_menu_configured: "Skonfigurowano menu strony Wiki"
-  facebook: 
-    authorization_required: "Tylko użytkownicy posiadający odpowiednie uprawnienia mogą uzyskać dostęp do tej strony"
-    authorization_success: "Autoryzacja została pomyślnie zakończona!  Program Canvas i portal Facebook są teraz znajomymi."
-    deleted: Usunięty
-    index: 
-      all_set: "Wszystkie ustawienia zostały zakończone!"
-      bookmark_notice: "Jeśli dodasz tę aplikację do zakładek, liczba nowych powiadomień w programie Canvas będzie widoczna na Twojej stronie głównej w portalu Facebook."
-      canvas_messages: "Wiadomości z programu Canvas"
-      configure_notification_preferences_notice: "Po zakończeniu *konfiguracji preferencji dotyczących powiadomień* powiadomienia powinny zacząć wyświetlać się w tym miejscu, umożliwiając obserwację konta Canvas."
-      installation_about: "Aby zainstalować aplikację Canvas dla portalu Facebook, przejdź do strony profilowej w systemie Canvas i kliknij przycisk Facebook w celu połączenia swojego konta z kontem w portalu Facebook."
-      learn_more: "Dowiedz się więcej na stronie instructure.com"
-      more_information: "Dowiedz się więcej na %{domain_list}"
-      no_messages_notice: "Wraz z kolejnymi wydarzeniami związanymi z kursem w tym miejscu powinny zacząć wyświetlać się powiadomienia, umożliwiając obserwację konta Canvas."
-      notification_about: "Aplikacja Canvas dla portalu Facebook usprawnia dostęp do bieżących interakcji związanych z kursem. Aplikację można ustawić tak, aby otrzymywać powiadomienia o uzyskanych ocenach, zmianach terminów dostarczenia zadań itp. Dane prywatne zachowają swój status w systemie Canvas."
-      notification_settings: "Ustawienia powiadomień"
-      notifications_notice: "Poniżej widoczna jest lista ostatnich powiadomień z systemu Canvas. Jeśli dodasz tę aplikację do zakładek, liczba nowych powiadomień w programie Canvas będzie widoczna na Twojej stronie głównej w portalu Facebook."
-      welcome: "Witamy ponownie, %{name}!"
-      welcome_message: "Witamy w oprogramowaniu do nauki online nowej generacji, dzięki wsparciu platformy Instructure. Naszym zadaniem jest usprawnienie korzystania z sieci Web w celu doskonalenia procesu nauki. Nasz interfejs jest prosty, czytelny i otwarty. Korzystamy z narzędzi, z których korzystasz zarówno Ty, jak i uczestnicy Twoich kursów, np. portalu Facebook, co pozwala nam zapewnić bardziej otwarte środowisko do wspólnej nauki. Skondensowaliśmy to w jednym wszechstronnym, otwartym pakiecie, który jest czymś więcej niż tylko narzędziem do śledzenia zadań. Zachęca do interakcji i promuje naukę."
-      welcome_title: "Witamy w Instructure Canvas"
-    index_disabled: 
-      disabled_notice: "Ta strona programu Canvas nie została skonfigurowana do komunikacji z portalem Facebook."
-      get_help: "Uzyskaj pomoc na stronie support.instructure.com"
-      instructure_canvas: "Instructure Canvas"
-    invalid_signature: "Nieprawidłowa sygnatura portalu Facebook"
-    message: 
-      hide: Ukryj
-    notification_policies: 
-      alerts: Alerty
-      cancel: Anuluj
-      change_settings: "Zmień ustawienia"
-      daily: Codziennie
-      labels: 
-        alerts_for_category: "Alerty dla %{category_name}"
-      loading: "trwa ładowanie..."
-      never: Nigdy
-      notification_type: "Typ powiadomienia"
-      right_away: Natychmiast
-      send_to_facebook: "Wysłać do portal Facebook?"
-      update_preferences: "Aktualizuj preferencje"
-      updating_preferences: "Trwa aktualizacja preferencji..."
-      weekly: "Co tydzień"
-    settings: 
-      back_to_messages: "Powrót do wiadomości"
-      link_needed: "Zanim przejdziesz do konfigurowania aplikacji Canvas dla portalu Facebook, musisz połączyć ją z loginem do systemu Canvas. Kliknij pozycję \"Witamy\", aby uzyskać więcej informacji."
-      notifications_config_notice: "Powiadomienia z systemu Canvas mogą być automatycznie wysyłane do Twojego konta w portalu Facebook. Poniżej znajdują się rodzaje powiadomień, które można wysyłać. W dowolnej chwili można zmieniać preferencje dotyczące powiadomień tutaj lub w systemie Canvas."
-      settings_title: "Ustawienia powiadomień programu Canvas"
-      updating_preferences: "Trwa aktualizacja preferencji..."
+  external_url_e9b87215: "Zewnętrzny adres URL"
+  failed_to_create_zip_file_1a943d06: "Nie udało się utworzyć pliku zip"
   fair_use_bee47d77: "Dozwolony użytek"
   favicon_6e658914: Favicon
   feature_flags: 
@@ -6379,7 +6316,12 @@ pl:
     only_one_folder: "Nie mogę ustawić ścieżki folderu oraz id folderu"
   for: dla
   for_all_devices_1f603968: "Dla wszystkich urządzeń"
+  for_section_8503af93: "Dla sekcji"
+  from_fdd4956d: Od
   from_from_to_to_e31f6422: "Od %{from} do %{to}"
+  get_the_following_from_your_salesforce_connected_a_881fc9a3: "Pobierz następujące ze swojej aplikacji Salesforce Connected "
+  get_your_users_error_reports_posted_to_salesforce__76f57839: "Wysyłaj swoje raporty o błędach użytkowników do Chmury Usługowej Salesforce"
+  get_your_users_error_reports_posted_to_salesforce_dfb1a6c2: "Wysyłaj swoje raporty o błędach użytkowników do Salesforce"
   global_message_icons: 
     announcement: ogłoszenie
     calendar: kalendarz
@@ -6578,22 +6520,9 @@ pl:
       switch_to_points: "Przełącz na punkty"
     ungraded: "Nie uwzględnione w ocenianiu"
   gradebook_uploads: 
-    errors: 
-      invalid_file: "Niepoprawny plik .csv, nie można zaktualizować ocen"
-      upload_failed: "Nie można przekazać pliku."
-    form: 
-      labels: 
-        upload: "Wybierz plik CSV, który chcesz przekazać"
-      titles: 
-        upload_form: "Wybierz plik CSV, który chcesz przekazać"
     new: 
       titles: 
         new_upload: "Przekaż dzienniczek"
-    notices: 
-      updated: 
-        few: "%{count} wysyłki zaktulizowane z powodzeniem"
-        one: "1 wysyłka zaktulizowana z powodzeniem"
-        other: "%{count} wysyłek zaktulizowano z powodzeniem"
     show: 
       assignment_answer: "To zadanie jest"
       assignment_example: "Test — wskaźniki równość"
@@ -6620,14 +6549,6 @@ pl:
       student_answer: "Ta osoba jest"
       student_example: "Nieznaną osobą"
       student_question: "Uczestnikiem, o którym mowa"
-  gradebook_uploads_form: 
-    buttons: 
-      upload_data: "Przekaż dane"
-    labels: 
-      upload: "Wybierz plik CSV, który chcesz przekazać:"
-    titles: 
-      upload_form: "Wybierz plik CSV, który chcesz przekazać"
-    what_should_csv_look_like: "Jak powinien wyglądać plik CSV?"
   gradebooks: 
     attendance: 
       attendance_info: "Nie utworzono żadnych zadań dot. obecności."
@@ -6749,12 +6670,14 @@ pl:
       set_group_weights: "Ustaw wyważanie grup"
       show_attendance_columns: "Pokaż kolumny obecności"
       show_concluded_enrollments: "Pokaż zaakceptowane zapisy"
-      upload_scores: Importuj
       view_grading_history: "Wyświetl historię oceniania"
     grades: 
       complete: Gotowe
       incomplete: Niekompletne
     grades_filename: Oceny
+    grading_box_extended: 
+      labels: 
+        grade: Ocena
     history: 
       graded_on_submission: "Oceniono przy przesyłaniu"
       grades_for_date: "Oceny wg daty"
@@ -6828,7 +6751,6 @@ pl:
       labels: 
         add_comment: "Dodaj komentarz"
         average: Śred.
-        grade: Ocena
         grade_by_question_beta: "Ocena według pytania (beta)"
         group_comment: "Wyślij komentarz do całej grupy"
         hide_names: "Ukryj nazwy uczestników w programie SpeedGrader"
@@ -6924,6 +6846,8 @@ pl:
       invalid_grading_period_end_date: "Data zakończenia okresu rozliczeniowego jest przed datą rozpoczęcia"
   grading_period_name_31ceb3e3: "Nazwa okresu oceniania"
   grading_periods_81941e66: "Okresy oceniania"
+  grading_scheme_deleted_7ae5a072: "System klasyfikacji usunięty"
+  grading_scheme_saved_85535151: "System klasyfikacji zapisany"
   grading_schemes_1c3c3252: "Schematy oceniania"
   grading_standard: 
     unknown_grading_details: "Nieznane informacje szczegółowe"
@@ -7368,6 +7292,8 @@ pl:
     which_course_is_this_question_about: "Którego kursu dotyczy pytanie?"
     your_email_address: "Twój adres email"
   helpers: 
+    accessible_date_format: "RRRR-MM-DD gg:mm"
+    accessible_date_prompt: "Rodzaj formatu"
     button: 
       create: "Utwórz %{model}"
       submit: "Zapisz %{model} "
@@ -7414,7 +7340,9 @@ pl:
       update: "Aktualizuj %{model}"
   here_are_your_assignments_listed_by_due_date_7d8e98e6: "Oto zadania użytkownika, podane według terminu dostarczenia."
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Oto wspaniała okazja, aby zapoznać się z kalendarzem i dodać do kursu wszelkie wydarzenia, które nie są zadaniami. Nie obawiaj się — pomożemy Ci w tym."
+  hidden_available_with_a_link_click_to_modify_184990e7: "Ukryty. Dostępny z linkiem - Kliknij aby zmienić"
   hidden_files_inside_will_be_available_with_links_9bdf702b: "Ukryte, zawarte pliki będą dostępne za pomocą łączy."
+  hide_correct_answers_at_b1a59408: "Ukryj prawidłowe odpowiedzi w"
   high_contrast_description: |-
       Jeśli wolisz wersję interfejsu użytkownika systemu Canvas z wyższym kontrastem, uaktywnij to.
       Opcja może okazać się pomocna dla osób niedowidzących lub mających problem z czytaniem.
@@ -7436,14 +7364,19 @@ pl:
     online_url_submission: "Przesłane zadanie w formie adresu URL on-line"
     quiz_submission: "Przesłane zadanie w formie testu"
     text_entry_submission: "Przesłane zadanie w formie wpisu"
+  if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Jeśli włączone, projektanci treści muszą dostarczyć informacji o prawach autorskich i licencji dla plików zanim zostaną opublikowane. Działa tylko w przypadku uruchomienia Better File Browsing."
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "W przypadku włączenia tej opcji użytkownicy będą mogli skonfigurować narzędzia LTI 2."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Jeśli zmienisz maksymalną możliwą liczbę punktów za zadanie, musisz ponownie je ocenić."
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Jeśli nie wybierzesz teraz praw użytkowania, ten plik nie zostanie opublikowany po jego przekazaniu."
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "Jeśli wyjdziesz z programu, aktualnie przygotowywany do pobrania plik zip zostanie anulowany."
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Możliwe, że chcesz przenieść swoje materiały z innego systemu zarządzania kursami do programu Canvas. Pomożemy Ci w łatwy sposób przenieść zawartość do systemu Canvas."
+  ignore_91750df8: Ignoruj
   ignore_assignment_738b3c99: "Zignoruj zadanie"
+  ignore_forever_dd4a6cdf: "Zawsze ignoruj"
   ignore_name_55edc6fe: "Zignoruj %{name}"
   ignore_these_3940f6f5: "Zignoruj to"
+  ignore_this_assignment_b7a71f80: "Zignoruj to zadanie"
+  ignore_until_new_submission_87f32b4: "Ignoruj do następnego dostarczenia zadania"
   image_8ad06: Obraz
   images: 
     error_checking_color: "Błąd w trakcie sprawdzania koloru obrazu"
@@ -7453,6 +7386,7 @@ pl:
     invalid_file_type: "Nieprawidłowy typ pliku %{type}. Dozwolone typy uwzględniają: %{type_list}"
     not_an_image: "Wybrany plik nie jest obrazem"
   immediately_c128ede6: Natychmiast
+  import_1b31507: Importuj
   import_content_b2fd6620: "Importuj zawartość"
   importers/assignment_importer: 
     errors: 
@@ -7483,6 +7417,7 @@ pl:
     warnings: 
       truncated_wiki_title: "Tytuł następującej strony typu Wiki został skrócony: %{title}"
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Uwzględnij oceny za zadanie podczas zamieszczania danych w Systemie informacji o uczestnikach szkoły."
+  incremental_update_successfully_generated_against__db3f3f06: "Bieżąca aktualizacja skutecznie wygenerowana wobec poprzedniego SIS Import"
   info: 
     notices: 
       error_reported: "Dziękujemy za poświęcony czas!  Zajmiemy się tym"
@@ -7491,6 +7426,7 @@ pl:
       start_a_group: "Załóż grupę"
     styleguide: 
       manage: Zarządzaj
+  insert_math_equation_57c6e767: "Wpisz równanie matematyczne"
   insert_row_below_25187f89: "Wstaw rząd poniżej"
   installed_7b284a91: Zainstalowano
   installed_by_admin_97c3a721: "Zainstalowane przez administratora"
@@ -7525,8 +7461,6 @@ pl:
       posting_message_failed: "Publikacja nie powiodła się, spróbuj ponownie"
       required: "Wymagane pole"
       search_failed: "Wyszukiwanie nie powiodło się, ponów próbę."
-    ignore_forever: "Zawsze ignoruj"
-    ignore_until_new_submission: "Ignoruj do następnego dostarczenia zadania"
     labels: 
       datepicker: 
         time: Godzina
@@ -7561,12 +7495,22 @@ pl:
     tooltips: 
       enter_search_terms: "wprowadź szukane terminy"
   invalid_authenticity_token_b753558c: "Nieprawidłowy token uwierzytelniania"
+  invalid_csv_file_grades_could_not_be_updated_6ebdeca4: "Nieprawidłowy plik csv, oceny nie mogą zostać uaktualnione."
   invalid_points_possible: "Wartość możliwych punktów do zdobycia dla tego zadania powinna wynosić co najmniej zero."
   invalid_state_parameter_7a5aa108: "Nieprawidłowy parametr stanu"
   invalid_url_in_xml: "Nieprawidłowy adres URL w XML. Należy zmienić znaki &."
   invalid_utf_8_13c76a6: "Nieprawidłowe kodowanie UTF-8"
   invalid_xml_syntax: "Nieprawidłowa składnia xml"
   invite_5b1fcbcd: Zaproś
+  item_complete_d334fd43: "(Poz Kompletna)"
+  item_incomplete_d6a16040: "(Poz Niekompletna)"
+  item_type_assignment_13a1132e: "Rodzaj pozycji: Przydział"
+  item_type_discussion_e3ddae9b: "Rodzaj pozycji: Dyskusja"
+  item_type_document_493ac5b0: "Rodzaj pozycji: Dokument"
+  item_type_download_e949cdb6: "Rodzaj pozycji: Pobieranie"
+  item_type_link_5a2abed2: "Rodzaj pozycji: Link"
+  item_type_quiz_c894ddb1: "Rodzaj pozycji: Test"
+  items_299a7626: "Pozycje:"
   items_items_selected_5b55e566: "Wybrano elementy %{items}"
   items_selected_have_different_usage_rights_52b325cc: "Wybrane elementy mają różne prawa użytkowania."
   jobs: 
@@ -7639,8 +7583,11 @@ pl:
       niektórych zmian stylu, jednak więcej elementów charakterystycznych dla K-12 może zostać w przyszłości dodanych.
   labels: 
     lock_module_until: "Zablokuj moduł do określonej daty"
+  last_item_79583712: "Ostatnia pozycja:"
+  last_item_is_75_of_mastery_average_of_the_rest_is__614d41f4: "Ostatnia pozycja to 75% biegłośći. Średnia \"reszty\" to 25% biegłości."
   last_user_access_title: "Ostatni dostęp użytkownika"
   late_percent_b91d01b3: "Po czasie: %{percent}"
+  latest_assessment_a85280ef: "Najnowsza ocena"
   latest_f604a75: Najnowsze
   latest_score_905aa87b: "Najnowszy wynik punktowy"
   launch_registration_tool_38d4781: "Uruchom narzędzie rejestracji"
@@ -7660,8 +7607,6 @@ pl:
         dashboard: "Mój panel"
         skip_to_content: "Przejdź do zawartości"
       open_source_learning_management_system: "System zarządzania nauczaniem na wolnej licencji"
-    facebook: 
-      title: "Strona portalu Facebook"
     fixed_bottom: 
       masquerading: 
         stop: "Zakończ podszywanie się"
@@ -7810,8 +7755,10 @@ pl:
   lock_date_cannot_be_after_term_end_cf1a188f: "Data zablokowania nie może przypadać po zakończeniu semestru"
   lock_date_cannot_be_before_due_date_ac30f54: "Data zablokowania nie może przypadać przed terminem dostarczenia"
   lock_until_date_62ce1b5c: "Zablokuj do daty"
+  log_out_379ba28a: Wyloguj
   logged_out_user: "Użytkownik wylogowany %{user_counter}"
   logo_a040ae0e: Logo
+  looks_great_e4d883ed: Świetnie!
   low_score_4eeb95b2: "Niski wynik punktowy: %{score}"
   lower_limit_of_range_6ddd4983: "Niższy limit zakresu"
   lti: 
@@ -7840,8 +7787,8 @@ pl:
   manage_group_group_name_ac8578c6: "Zarządzaj grupą %{group_name}"
   manage_usage_rights_c5a8c216: "Zarządzaj prawami użytkowania"
   manual_entry_e4a4f99a: "Wpis ręczny"
+  mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Wynik poziomu biegłości odzwierciedla najwyższy wynik ocenianego przydziału lub testu."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Wynik punktowy biegłości odzwierciedla najnowsze ocenione zadanie lub test."
-  mastery_scrore_reflects_the_highest_score_of_a_gra_a71008b7: "Wynik punktowy biegłości odzwierciedla najwyższy wynik punktowy ocenionego zadania lub testu."
   mathquill: 
     tabs: 
       arrows: Strzałki
@@ -7890,6 +7837,7 @@ pl:
     uploading: "Trwa przekazywanie..."
   media_recordings_749aef6d: "Nagrania multimedialne"
   median_score_4657e907: "Mediana: %{score}"
+  meets_mastery_754e1c06: "Spełnia poziom biegłości"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} członków z maksymalnie %{max_membership}"
   members_af25c21d: Członkowie/uczestnicy
   membership_by_invitation_only_9bc27199: "Przynależność tylko na zaproszenie"
@@ -7900,6 +7848,7 @@ pl:
     my_courses: "Moje kursy"
   message: 
     default_subject: "Alert systemu Canvas"
+  message_896d2ed0: "%{message}"
   message_students: 
     buttons: 
       send_message: "Wyślij wiadomość"
@@ -7952,10 +7901,6 @@ pl:
           unknown_user: "Nieznany użytkownik"
         subject: "Użytkownik %{user_name} właśnie dodał Cię do rozmowy w systemie Canvas."
         unknown_user: "Nieznany użytkownik"
-      facebook: 
-        body: "Użytkownik %{user_name} właśnie dodał Cię do rozmowy w systemie Canvas."
-        link_text: "Pokaż rozmowę"
-        unknown_user: "Nieznany użytkownik"
       sms: 
         body: "Użytkownik %{user_name} właśnie dodał Cię do rozmowy w systemie Canvas."
         more_info: "Więcej informacji pod adresem %{url}"
@@ -7997,31 +7942,6 @@ pl:
         ungraded_count_description: "%{count} lub więcej dostarczonych zadań nie zostało ocenionych"
         ungraded_timespan_description: "Dostarczone zadanie pozostaje bez oceny przez %{count} dzień/dni"
         usernote_description: "Brak wpisów do dziennika wydziałowego od %{count} dni"
-      facebook: 
-        body: 
-          few: "Alarm został uruchomiony dla %{student}, ponieważ następujące warunki  zostały spełnione:"
-          one: "Alarm został uruchomiony dla %{student}, ponieważ następujący warunek  został spełniony:"
-          other: "Alarm został uruchomiony dla %{student}, ponieważ następujące warunki  zostały spełnione:"
-        body_student: 
-          few: "Alarm został uruchomiony dla ciebie, ponieważ następujące warunki  zostały spełnione:"
-          one: "Alarm został uruchomiony dla ciebie, ponieważ następujący warunek  został spełniony:"
-          other: "Alarm został uruchomiony dla ciebie, ponieważ następujące warunki  zostały spełnione:"
-        interaction_description: 
-          few: "Brak interakcji uczestnik/nauczyciel przez %{count} lub więcej dni"
-          one: "Brak interakcji uczestnik/nauczyciel przez jeden dzień"
-          other: "Brak interakcji uczestnik/nauczyciel przez %{count} lub więcej dni"
-        ungraded_count_description: 
-          few: " %{count} lub więcej zadań nie zostało ocenionych."
-          one: "Jedno lub więcej zadań nie zostało ocenione."
-          other: "%{count} lub więcej zadań nie zostało ocenionych."
-        ungraded_timespan_description: 
-          few: "Jedno lub więcej przesłanych zadań nie zostało ocenione przez %{count} lub więcej dni."
-          one: "Jedno lub więcej przesłanych zadań nie zostało ocenione przez 1 lub więcej dni."
-          other: "Jedno lub więcej przesłanych zadań nie zostało ocenione przez %{count} lub więcej dni."
-        usernote_description: 
-          few: "Brak wpisów do dziennika wydziału przez %{count} lub więcej dni"
-          one: "Brak wpisów do dziennika wydziału przez dzień lub więcej"
-          other: "Brak wpisów do dziennika wydziału przez %{count} lub więcej dni"
       sms: 
         body: "Wysłano alert do uczestnika %{student}"
         body_student: "Wysłano do Ciebie alert"
@@ -8063,8 +7983,6 @@ pl:
           link: "Zobacz ogłoszenie"
         labels: 
           file_included: "Dołączono plik"
-      facebook: 
-        body: "Utworzono ogłoszenie: %{title}, %{course}"
       sms: 
         details: "Więcej informacji pod adresem %{url}"
         subject: "Utworzono ogłoszenie: %{title}, %{course}"
@@ -8080,8 +7998,6 @@ pl:
           link: "Kliknij tutaj, aby zobaczyć ogłoszenie"
           subject: "Nowy komentarz do ogłoszenia na temat dyskusji %{discussion_topic}: kurs %{course}"
         subject: "Nowy komentarz do ogłoszenia na temat dyskusji %{discussion_topic}: kurs %{course}"
-      facebook: 
-        body: "Nowy komentarz do ogłoszenia na temat dyskusji %{discussion_topic}, kurs %{course}"
       sms: 
         body: "Nowy komentarz do ogłoszenia na temat dyskusji %{discussion_topic}: kurs %{course}"
         details: "Więcej informacji pod adresem %{url}"
@@ -8116,19 +8032,6 @@ pl:
         message: "Użytkownik %{user} anulował rezerwację  \"%{appointment_name}\"."
         no_reason_given: "nie podano"
         subject: "Rezerwacja anulowana dla \"%{appointment_name}\" (%{course})"
-      facebook: 
-        instructions: "Podgląd spotkania"
-        labels: 
-          attendee: Uczestnik
-          attendees: Uczestnicy
-          cancel_reason: "Przyczyna odwołania"
-          course: Kurs
-          date_and_time: Data/czas
-          details: "Szczegóły spotkania"
-          group: Grupa
-          slots_remaining: "Dostępne terminy"
-        message: "Użytkownik %{user} anulował rezerwację \"%{appointment_name}\"."
-        no_reason_given: "nie podano"
       sms: 
         message: "Użytkownik %{user} anulował rezerwację  \"%{appointment_name}\"."
         more_info: "Więcej informacji pod adresem %{url}"
@@ -8160,18 +8063,6 @@ pl:
         message: "Użytkownik %{user} anulował twój termin dotyczący \"%{appointment_name}\"."
         no_reason_given: "nie podano"
         subject: "Twój termin dotyczący \"%{appointment_name}\" został anulowany (%{course})"
-      facebook: 
-        instructions: "Zapisz się na inny termin."
-        labels: 
-          attendee: Uczestnik
-          attendees: Uczestnicy
-          cancel_reason: "Przyczyna anulowania"
-          course: Kurs
-          date_and_time: Data/czas
-          details: "Szczegóły spotkania"
-          group: Grupa
-        message: "Użytkownik %{user} anulował twój termin dotyczący \"%{appointment_name}\"."
-        no_reason_given: "nie podano"
       sms: 
         message: "Twój termin dotyczący \"%{appointment_name} anulowano\"."
         more_info: "Więcej informacji pod adresem %{url}"
@@ -8196,14 +8087,6 @@ pl:
         message: "Wszystkie spotkania dotyczące \"%{appointment_name}\" zostały anulowane."
         no_reason_given: "nie podano"
         subject: "Spotkania dotyczące \"%{appointment_name}\" zostały anulowane (%{course})"
-      facebook: 
-        labels: 
-          cancel_reason: "Przyczyna anulowania"
-          course: Kurs
-          dates: Data(y)
-          details: "Szczegóły spotkania"
-        message: "Wszystkie spotkania dotyczące \"%{appointment_name}\" zostały anulowane."
-        no_reason_given: "nie podano"
       sms: 
         message: "Wszystkie spotkania dotyczące \"%{appointment_name}\" zostały anulowane."
         more_info: "Więcej informacji pod adresem %{url}"
@@ -8233,17 +8116,6 @@ pl:
           slots_remaining: "Dostępne terminy"
         message: "Terminy dotyczące \"%{appointment_name}\" są dostępne do zapisów."
         subject: "Spotkanie \"%{appointment_name}\" jest dostępne do zapisów (%{course})"
-      facebook: 
-        group_signup: "Grupa (%{group_category})"
-        individual_signup: Indywidualny
-        instructions: "Zapisy na termin"
-        labels: 
-          course: Kurs
-          dates: Data(y)
-          details: "Szczegóły spotkania"
-          signup_type: "Typ zapisów"
-          slots_remaining: "Dostępne terminy"
-        message: "Terminy dotyczące \"%{appointment_name}\" są dostępne do zapisów."
       sms: 
         message: "Otwarto zapisy na \"%{appointment_name}\"."
         more_info: "Więcej informacji pod adresem %{url}"
@@ -8275,17 +8147,6 @@ pl:
           slots_remaining: "Dostępne terminy"
         message: "Dodano terminy dotyczące \"%{appointment_name}\" i są one dostępne do zapisów."
         subject: "Spotkanie \"%{appointment_name}\" zostało zaktualizowane (%{course})"
-      facebook: 
-        group_signup: "Grupa (%{group_category})"
-        individual_signup: Indywidualny
-        instructions: "Zapisy na termin"
-        labels: 
-          course: Kurs
-          dates: Data(y)
-          details: "Szczegóły spotkania"
-          signup_type: "Typ zapisów"
-          slots_remaining: "Dostępne terminy"
-        message: "Dodano terminy dotyczące \"%{appointment_name}\" i są one dostępne do zapisów."
       sms: 
         message: "Są dostępne nowe terminy dotyczące \"%{appointment_name}\"."
         more_info: "Więcej informacji pod adresem %{url}"
@@ -8318,17 +8179,6 @@ pl:
           slots_remaining: "Dostępne terminy"
         message: "Użytkownik %{user} zapisał się na \"%{appointment_name}\"."
         subject: "Użytkownik zapisał się na \"%{appointment_name}\" (%{course})"
-      facebook: 
-        instructions: "Podejrzyj spotkanie"
-        labels: 
-          attendee: Uczestnik
-          attendees: Uczestnicy
-          course: Kurs
-          date_and_time: Data/czas
-          details: "Szczegóły spotkania"
-          group: Grupa
-          slots_remaining: "Dostępne terminy"
-        message: "Użytkownik %{user} zapisał się na \"%{appointment_name}\"."
       sms: 
         message: "Użytkownik %{user} zapisał się na \"%{appointment_name}\"."
         more_info: "Więcej informacji pod adresem %{url}"
@@ -8358,17 +8208,6 @@ pl:
           slots_remaining: "Dostępne terminy"
         message: "Użytkownik %{user} zapisał cię na \"%{appointment_name}\"."
         subject: "Zostałeś zapisany/-a na \"%{appointment_name}\""
-      facebook: 
-        instructions: "Zapisz się na inny termin"
-        labels: 
-          attendee: Uczestnik
-          attendees: Uczestnicy
-          course: Kurs
-          date_and_time: Data/czas
-          details: "Szczegóły spotkania"
-          group: Grupa
-          slots_remaining: "Dostępne terminy"
-        message: "Użytkownik %{user} zapisał cię na \"%{appointment_name}\"."
       sms: 
         message: "Zostałeś zapisany/-a na \"%{appointment_name}\"."
         more_info: "Więcej informacji pod adresem %{url}"
@@ -8389,8 +8228,6 @@ pl:
           link: "Kliknij tutaj, aby wyświetlić zadanie"
           subject: "Zadanie zostało zmienione: %{title}, %{course}"
         subject: "Zadanie zostało zmienione: %{title}, %{course}"
-      facebook: 
-        body: "Zadanie o nazwie %{title_link} dla kursu %{course} zostało zmienione."
       sms: 
         body: |-
             Zadanie %{title}, %{course} zostało zmienione.
@@ -8415,11 +8252,6 @@ pl:
           click_to_see_assignment: "Kliknij tutaj, aby wyświetlić zadanie"
         multiple_due_dates: "termin dostarczenia: więcej niż jedna data"
         new_assignment: "Utworzono nowe zadanie dla twojego kursu, %{course_name}"
-        no_due_date: "termin dostarczenia: Brak terminu dostarczenia"
-      facebook: 
-        due_at: "termin dostarczenia: %{assignment_due_date_time}"
-        multiple_due_dates: "termin dostarczenia: więcej niż jedna data"
-        new_assignment: "Utworzono nowe zadanie dla %{course_name}"
         no_due_date: "termin dostarczenia: Brak terminu dostarczenia"
       sms: 
         due_at: "termin dostarczenia: %{assignment_due_date_time}"
@@ -8449,9 +8281,6 @@ pl:
         labels: 
           click_to_see_assignment: "Kliknij tutaj, aby wyświetlić zadanie"
         no_due_date: "Brak terminu dostarczenia"
-      facebook: 
-        assignment_due_date_changed_sentence: "Termin dostarczenia zadania *%{assignment_name}* dla kursu %{course_name} został zmieniony na:"
-        no_due_date: "Brak terminu dostarczenia"
       sms: 
         assignment_due_date_changed: "Zadanie %{assignment_name}, %{course_name}, ma nowy termin dostarczenia:"
         more_info_at_url: "Więcej informacji pod adresem %{web_address}"
@@ -8476,9 +8305,6 @@ pl:
         labels: 
           click_to_see_assignment: "Kliknij tutaj, aby wyświetlić zadanie"
         no_due_date: "Brak terminu dostarczenia"
-      facebook: 
-        assignment_due_date_changed_sentence: "Termin dostarczenia zadania *%{assignment_name}* dla kursu %{course_name} (%{override}) został zmieniony na:"
-        no_due_date: "Brak terminu dostarczenia"
       sms: 
         assignment_due_date_changed: "Zadanie %{assignment_name}, nazwa kursu %{course_name} (%{override}), ma nowy termin dostarczenia:"
         more_info_at_url: "Więcej informacji pod adresem %{web_address}"
@@ -8500,8 +8326,6 @@ pl:
           the_assignment_is_graded: "Zadanie %{assignment_name} zostało ocenione."
         labels: 
           view_here: "Można je zobaczyć tutaj"
-        the_assignment_is_graded: "Zadanie %{assignment_name} zostało ocenione."
-      facebook: 
         the_assignment_is_graded: "Zadanie %{assignment_name} zostało ocenione."
       sms: 
         assignment_is_graded: "Zadanie %{assignment_name}, %{course_name}, zostało ocenione."
@@ -8526,9 +8350,6 @@ pl:
           view_submission: "Dostarczone zadanie można wyświetlić tutaj"
         user_resubmitted: "Ponowne dostarczenie zadania: %{user_name}, %{assignment_name}"
         user_resubmitted_sentence: "Użytkownik %{user_name} właśnie ponownie dostarczył zadanie %{assignment_name} z kursu %{course_name}"
-      facebook: 
-        click_to_view: "Kliknij tutaj, aby wyświetlić dostarczone zadanie."
-        user_resubmitted: "**Użytkownik %{user_name}** właśnie ponownie dostarczył zadanie **%{assignment_name}** z kursu %{course_name}"
       sms: 
         more_info_at: "Więcej informacji pod adresem %{web_address}"
         user_resubmitted: "%{user_name} właśnie (ponownie) dostarczył(a) zadanie %{assignment_name}"
@@ -8547,9 +8368,6 @@ pl:
           view_submission: "Dostarczone zadanie można wyświetlić tutaj"
         user_submitted: "Dostarczenie zadania: %{user_name}, %{assignment_name}"
         user_submitted_sentence: "Użytkownik %{user_name} właśnie dostarczył zadanie %{assignment_name} z kursu %{course_name}"
-      facebook: 
-        click_to_view: "Kliknij tutaj, aby wyświetlić dostarczone zadanie."
-        user_submitted: "**Użytkownik %{user_name}** właśnie dostarczył zadanie **%{assignment_name}** z kursu %{course_name}"
       sms: 
         more_info_at: "Więcej informacji pod adresem %{web_address}"
         user_submitted: "%{user_name} właśnie dostarczył(a) zadanie, %{assignment_name}"
@@ -8568,9 +8386,6 @@ pl:
           view_submission: "Dostarczone zadanie można wyświetlić tutaj"
         user_resubmitted_sentence: "Użytkownik %{user_name} właśnie dostarczył po czasie zadanie %{assignment_name} z kursu %{course_name}"
         user_submitted: "Zaległe zadanie: %{user_name}, %{assignment_name}"
-      facebook: 
-        click_to_view: "Kliknij tutaj, aby wyświetlić dostarczone zadanie."
-        user_resubmitted_sentence: "**Użytkownik %{user_name}** właśnie dostarczył po czasie zadanie **%{assignment_name}** z kursu %{course_name}"
       sms: 
         more_info_at: "Więcej informacji pod adresem %{web_address}"
         user_submitted: "%{user_name} właśnie dostarczył(a) zadanie (po czasie), %{assignment_name}"
@@ -8633,9 +8448,6 @@ pl:
           link: "Szczegóły można zobaczyć w tym miejscu"
           subject: "Zaproszenie do współpracy: %{course_or_group}"
         subject: "Zaproszenie do współpracy: %{course_or_group}"
-      facebook: 
-        body: "Zaproszono Cię do współpracy nad dokumentem %{document} dla %{course_or_group}. Dokument został utworzony za pośrednictwem usługi %{service}."
-        body_with_user: "Zaproszono Cię do współpracy nad dokumentem %{document} dla %{course_or_group}. Dokument został utworzony przez uczestnika %{user} za pośrednictwem usługi %{service}."
       sms: 
         body: |-
             Zaproszono Cię do współpracy nad dokumentem %{document} dla
@@ -8722,10 +8534,6 @@ pl:
         subject: "%{user_name}, przesłano właśnie wiadomość do systemu Canvas."
         unknown_user: "Nieznany użytkownik"
         view_message: "Wyświetl tę wiadomość w Konwersacjach"
-      facebook: 
-        body: "%{user_name}, przesłano właśnie wiadomość do systemu Canvas."
-        link_text: "Pokaż wiadomość"
-        unknown_user: "Nieznany użytkownik"
       sms: 
         body: "%{user_name}, przesłano właśnie wiadomość do systemu Canvas:"
         more_info: "Więcej informacji pod adresem %{url}"
@@ -8752,10 +8560,6 @@ pl:
         subject: "Użytkownik %{user_name} właśnie przesłał Ci wiadomość za pośrednictwem systemu Canvas."
         unknown_user: "Nieznany użytkownik"
         view_message: "Wyświetl tę wiadomość w Konwersacjach"
-      facebook: 
-        body: "Użytkownik %{user_name} właśnie przesłał Ci wiadomość za pośrednictwem systemu Canvas."
-        link_text: "Pokaż wiadomość"
-        unknown_user: "Nieznany użytkownik"
       sms: 
         body: "Użytkownik %{user_name} właśnie przesłał Ci wiadomość za pośrednictwem systemu Canvas:"
         more_info: "Więcej informacji pod adresem %{url}"
@@ -8849,12 +8653,6 @@ pl:
           details: "Zobacz listę bieżących zapisów"
           subject: "Użytkownik %{user} przyjął Zaproszenie do kursu"
         subject: "Użytkownik %{user} przyjął Zaproszenie do kursu"
-      facebook: 
-        body_designer: "Użytkownik %{user} właśnie przyjął zaproszenie do udziału w kursie %{course} w roli autora."
-        body_observer: "Użytkownik %{user} właśnie przyjął zaproszenie do udziału w kursie %{course} w roli słuchacza."
-        body_student: "Użytkownik %{user} właśnie przyjął zaproszenie do udziału w kursie %{course} w roli uczestnika."
-        body_ta: "Użytkownik %{user} właśnie przyjął zaproszenie do udziału w kursie %{course} w roli pomocnika instruktora."
-        body_teacher: "Użytkownik %{user} właśnie przyjął zaproszenie do udziału w kursie %{course} w roli instruktora."
       sms: 
         body_designer: "Użytkownik %{user} przyjął zaproszenie do udziału w kursie w roli autora, %{course}"
         body_observer: "Użytkownik %{user} przyjął zaproszenie do udziału w kursie w roli słuchacza, %{course}"
@@ -8897,17 +8695,6 @@ pl:
           username: "Nazwa użytkownika"
         none: brak
         subject: "Zaproszenie do uczestnictwa w kursie"
-      facebook: 
-        body_designer: "Zaproszono Cię do udziału w kursie %{course} w roli autora."
-        body_observer: "Zaproszono Cię do udziału w kursie %{course} w roli słuchacza."
-        body_student: "Zaproszono Cię do udziału w kursie %{course} w roli uczestnika."
-        body_ta: "Zaproszono Cię do udziału w kursie %{course} w roli pomocnika instruktora."
-        body_teacher: "Zaproszono Cię do udziału w kursie %{course} w roli instruktora."
-        labels: 
-          email: "Adres e-mail"
-          name: Nazwa
-          username: "Nazwa użytkownika"
-        none: brak
       sms: 
         body_designer: "Zaproszono Cię do pełnienia roli autora na kursie."
         body_observer: "Zaproszono Cię do pełnienia roli słuchacza na kursie."
@@ -8956,17 +8743,6 @@ pl:
         none: brak
         register: "Odwiedź stronę %{link}, aby zakończyć rejestrację"
         subject: "Zapisy na kurs"
-      facebook: 
-        body_designer: "Użytkownik został zapisany na kurs %{course} jako autor."
-        body_observer: "Użytkownik został zapisany na kurs %{course} jako słuchacz."
-        body_student: "Użytkownik został zapisany na kurs %{course} jako uczestnik."
-        body_ta: "Użytkownik został zapisany na kurs %{course} jako pomocnik instruktora."
-        body_teacher: "Użytkownik został zapisany na kurs %{course} jako instruktor."
-        labels: 
-          email: "Adres e-mail"
-          name: Nazwa
-          username: "Nazwa użytkownika"
-        none: brak
       sms: 
         body_designer: "Użytkownik został zapisany na kurs jako autor."
         body_observer: "Użytkownik został zapisany na kurs jako słuchacz."
@@ -9051,10 +8827,6 @@ pl:
           see_details: "Szczegóły można zobaczyć tutaj"
         no_time_set: "Nie ustawiono godziny"
         subject: "Data wydarzenia została zmieniona: %{event_title}, %{course_name}"
-      facebook: 
-        from_to_time: "od %{start_date_time} do %{end_date_time}"
-        no_time_set: "Nie ustawiono godziny"
-        subject: "Nastąpiła zmian daty wydarzenia [%{event_title}](%{link_to_event}) dla kursu %{course_name}. Aktualna data to:"
       sms: 
         from_to_time: "od %{start_date_time} do %{end_date_time}"
         more_info: "Więcej informacji pod adresem %{web_link}"
@@ -9112,11 +8884,6 @@ pl:
           grades_based_on_percent: "Ocenianie jest oparte na sumie ważonej dla każdej z grup zadania"
           now_see_here: "Szczegóły można zobaczyć tutaj"
           subject: "Waga stopnia została zmieniona"
-      facebook: 
-        grading_based_on_points: "Ocena jest wystawiana na podstawie sumy punktów uzyskanych za wszystkie zadania."
-        grading_policy_changed: "Nastąpiła zmiana polityki oceniania dla kursu **[%{course_name}](%{course_url})**."
-        labels: 
-          grades_based_on_percent: "Ocenianie jest oparte na sumie ważonej dla każdej z grup zadania"
       sms: 
         grade_changed: "Nastąpiła zmiana polityki oceniania dla kursu, %{course_name}."
         more_info_at: "Więcej informacji pod adresem %{course_url}"
@@ -9138,8 +8905,6 @@ pl:
         labels: 
           view_submission_here: "Dostarczone zadanie można wyświetlić tutaj"
         subject: "Zaległe zadanie: %{group_name}, %{assignment_name}"
-      facebook: 
-        body: "Grupa %{group_name} właśnie dostarczyła po czasie zadanie **[%{assignment_name}](%{assignment_url})** z kursu %{course_name}."
       sms: 
         more_info: "Więcej informacji pod adresem %{web_address}"
         subject: "Grupa %{group_name} właśnie dostarczyła zadanie (po czasie), %{assignment_name}"
@@ -9162,10 +8927,6 @@ pl:
         labels: 
           click_below: "Więcej informacji na temat grupy można uzyskać, klikając poniższe łącze"
         subject: "Członkostwo w grupie zaakceptowane: %{group_name}"
-      facebook: 
-        account_group: "Twoja prośba o przyłączenie się do grupy **[%{group_name}](%{group_url})** dla konta %{account_name} została zaakceptowana."
-        course_group: "Twoja prośba o przyłączenie się do grupy **[%{group_name}](%{group_url})** dla kursu %{course_name} została zaakceptowana."
-        group_request_accepted: "Prośba do grupy zaakceptowana: %{group_name}"
       sms: 
         account_group: "Twoja prośba o przyłączenie się do grupy %{group_name} dla konta %{account_name} została zaakceptowana."
         course_group: "Twoja prośba o przyłączenie się do grupy %{group_name} z kursu %{course_name} została zaakceptowana."
@@ -9191,9 +8952,6 @@ pl:
         labels: 
           click_below: "Więcej informacji na temat innych grup można uzyskać, klikając poniższe łącze"
         subject: "Członkostwo w grupie odrzucone: %{group_name}"
-      facebook: 
-        account_group: "Twoja prośba o przyłączenie się do grupy **[%{group_name}](%{group_url})** dla konta %{account_name} została odrzucona."
-        course_group: "Twoja prośba o przyłączenie się do grupy **[%{group_name}](%{group_url})** dla kursu %{course_name} została odrzucona."
       sms: 
         account_group: "Twoja prośba o przyłączenie się do grupy %{group_name} dla konta %{account_name} została odrzucona."
         course_group: "Twoja prośba o przyłączenie się do grupy %{group_name} dla kursu %{course_name} została odrzucona."
@@ -9249,9 +9007,6 @@ pl:
           details: "Nowy administrator, %{user}, został dodany dla konta %{account}"
           subject: "Nowy użytkownik konta"
         subject: "Nowy użytkownik konta"
-      facebook: 
-        body: "Nowy administrator**%{user}** został dodany dla konta **%{account}**."
-        subject: "Nowy administrator dla konta %{account}"
       sms: 
         body: "Nowy administrator, %{user}, został dodany dla konta %{account}"
         details: "Więcej informacji pod adresem %{website}"
@@ -9267,8 +9022,6 @@ pl:
           link: "Zobacz ogłoszenie"
         labels: 
           file_included: "Dołączono plik"
-      facebook: 
-        body: "Nowe ogłoszenie: %{title}, %{course}"
       sms: 
         details: "Więcej informacji pod adresem %{url}"
         subject: "Nowe ogłoszenie: %{title}, %{course}"
@@ -9288,9 +9041,6 @@ pl:
           title: "Nowe członkostwo w grupie: %{group_name}"
         subject: "Nowe członkostwo w grupie dla %{course_or_account}"
         title: "Nowe członkostwo w grupie: %{group_name}"
-      facebook: 
-        body_account: "Dodano Cię do nowej grupy dla konta %{account}. Nazwa grupy to %{group_name}."
-        body_course: "Dodano Cię do nowej grupy na kursie %{course}. Nazwa grupy to %{group_name}."
       sms: 
         body_account: "Dodano Cię do nowej grupy dla konta %{account}.  Nazwa grupy to %{group_name}."
         body_course: "Dodano Cię do nowej grupy na kursie %{course}.  Nazwa grupy to %{group_name}."
@@ -9315,9 +9065,6 @@ pl:
           title: "Nowe członkostwo w grupie: %{group_name}"
         subject: "Nowe członkostwo w grupie dla %{course_or_account}"
         title: "Nowe członkostwo w grupie: %{group_name}"
-      facebook: 
-        body_account: "Zaproszono Cię do grupy %{group} dla konta %{account}."
-        body_course: "Zaproszono Cię do grupy %{group} na kursie %{course}."
       sms: 
         body_account: "Zaproszono Cię do grupy %{group} dla konta %{account}."
         body_course: "Zaproszono Cię do grupy %{group} na kursie %{course}."
@@ -9343,11 +9090,6 @@ pl:
           teachers: Instruktorzy
         subject: "Nowy kurs"
         title: "Nowy kurs dla konta %{account}"
-      facebook: 
-        body: "Nowy kurs**%{course}** został dodany dla konta **%{account}**."
-        labels: 
-          teachers: Instruktorzy
-        subject: "Nowy kurs dla konta %{account}"
       sms: 
         body: "Nowy kurs, %{course}, został dodany dla konta %{account}"
         details: "Więcej informacji pod adresem %{url}"
@@ -9370,8 +9112,6 @@ pl:
           link: "Kliknij tutaj, aby przyłączyć się do rozmowy"
           subject: "Nowy komentarz w temacie %{discussion_topic}: %{course}"
         subject: "Nowy komentarz w temacie %{discussion_topic}: %{course}"
-      facebook: 
-        body: "Nowy komentarz w temacie %{discussion_topic}, %{course}"
       sms: 
         body: "Nowy komentarz w temacie %{discussion_topic}: %{course}"
         details: "Więcej informacji pod adresem %{url}"
@@ -9392,8 +9132,6 @@ pl:
         labels: 
           file_included: "Dołączono plik"
         subject: "Nowa dyskusja — %{discussion_topic}: %{course}"
-      facebook: 
-        body: "Nowy temat na forum: %{discussion_topic}, %{course}"
       sms: 
         body: "Nowy temat dla kursu %{course}:"
         details: "Więcej informacji pod adresem %{url}"
@@ -9415,10 +9153,6 @@ pl:
           see_details: "Szczegóły można zobaczyć tutaj"
         no_time_set: "Nie ustawiono godziny"
         subject: "Nowe wydarzenie — %{event_title}, %{course_name}"
-      facebook: 
-        body: "Zaplanowano nowe wydarzenie dla kursu %{course_name}:"
-        from_to_time: "od %{start_date_time} do %{end_date_time}"
-        no_time_set: "Nie ustawiono godziny"
       sms: 
         from_to_time: "od %{start_date_time} do %{end_date_time}"
         more_info: "Więcej informacji pod adresem %{web_address}"
@@ -9441,8 +9175,6 @@ pl:
           subject: "Dodano nowy plik: %{title}, %{name}"
         subject: "Dodano nowy plik: %{title}, %{name}"
         view: "Można je zobaczyć tutaj"
-      facebook: 
-        body: "Dodano nowy plik dla tego kursu, %{name}:"
       sms: 
         body: "Dodano nowy plik dla %{name}:"
         link: "Więcej informacji pod adresem %{link}"
@@ -9459,9 +9191,6 @@ pl:
           subject: "Do kursu %{name} dodano następującą liczbę nowych plików: %{count}:"
         link: "Można je zobaczyć tutaj"
         subject: "Do kursu %{name} dodano następującą liczbę nowych plików: %{count}:"
-      facebook: 
-        body: "Do kursu %{name} dodano następującą liczbę nowych plików: %{count}:"
-        link: "Można je zobaczyć tutaj"
       sms: 
         body: "Do kursu %{name} dodano następującą liczbę nowych plików: %{count}."
         link: "Więcej informacji pod adresem %{link}"
@@ -9484,9 +9213,6 @@ pl:
           title: "Nowa grupa uczestników: %{group_name}"
         subject: "Nowa grupa uczestników dla %{course_or_account}"
         title: "Nowa grupa uczestników: %{group_name}"
-      facebook: 
-        body_account: "Nowa zorganizowana grupa uczestników o nazwie %{group_name} została utworzona dla konta %{account}. Pierwszym jej członkiem jest użytkownik %{user}."
-        body_course: "Nowa zorganizowana grupa uczestników o nazwie %{group_name} została utworzona dla kursu %{course}. Pierwszym jej członkiem jest użytkownik %{user}."
       sms: 
         body_account: "Nowa grupa o nazwie \"%{group_name}\" została utworzona dla konta %{account}. Pierwszym jej członkiem jest użytkownik %{user}."
         body_course: "Nowa grupa o nazwie \"%{group_name}\" została utworzona dla kursu %{course}. Pierwszym jej członkiem jest użytkownik %{user}."
@@ -9506,9 +9232,6 @@ pl:
           link: "Kliknij tutaj, aby wyświetlić użytkownika"
           subject: "Nowy użytkownik"
         subject: "Nowy użytkownik"
-        title: "Nowy użytkownik dla konta %{account}"
-      facebook: 
-        body: "Nowy użytkownik, **%{user}**, właśnie zarejestrował się dla konta **%{account}**."
         title: "Nowy użytkownik dla konta %{account}"
       sms: 
         body: "Nowy użytkownik, %{user}, zarejestrował się dla konta %{account}"
@@ -9530,8 +9253,6 @@ pl:
         html: 
           link_message: "Kliknij tutaj, aby zakończyć recenzję"
         subject: "Nadana recenzja drugiego uczestnika dla %{reviewee}"
-      facebook: 
-        body: "Zaproszono Cię do recenzji drugiego uczestnika %{reviewee}. Naciśnij poniższy link, aby wprowadzić recenzję! "
       sms: 
         more_info: "Więcej informacji pod adresem %{url}"
       summary: 
@@ -9561,8 +9282,6 @@ pl:
           subject: "Ukończono ponowne ocenianie testu: %{quiz}, %{context}"
         link_message: "Test można zobaczyć tutaj:"
         subject: "Ukończono ponowne ocenianie testu: %{quiz}, %{context}"
-      facebook: 
-        body: "Ukończono ponowne ocenianie testu: %{title}"
       sms: 
         body_sms: "Ukończono ponowne ocenianie testu zatytułowanego %{title} w %{context}."
         more_info: "Więcej informacji pod adresem %{url}"
@@ -9593,8 +9312,6 @@ pl:
           subject: "Przypomnienie o ocenie: %{rubric}, %{context}"
         link_message: "Tutaj można sprawdzić ocenę i przesłać swój wpis:"
         subject: "Przypomnienie o ocenie: %{rubric}, %{context}"
-      facebook: 
-        body: "Użytkownik otrzymał przypomnienie o ocenie: *%{title}* dla %{context}."
       sms: 
         body: "Użytkownik otrzymał przypomnienie o ocenie: %{rubric}, %{context}."
         more_info: "Więcej informacji pod adresem %{url}"
@@ -9612,8 +9329,6 @@ pl:
           subject: "Nowa ocena: %{title}, %{context}"
         link_message: "Tutaj można sprawdzić ocenę i przesłać swój wpis:"
         subject: "Nowa ocena: %{title}, %{context}"
-      facebook: 
-        body: "Nowa ocena została utworzona dla %{context}:"
       sms: 
         body: "Nowa ocena została utworzona dla %{context}."
         more_info: "Więcej informacji pod adresem %{url}"
@@ -9638,9 +9353,6 @@ pl:
         link_message: "Szczegółowe informacje na temat dostarczonego zadania można zobaczyć tutaj:"
         someone: Gość
         subject: "Komentarz do przesłanego zadania: %{user}, %{assignment}, %{context}"
-      facebook: 
-        body: "*Autor %{author}* właśnie dodał komentarz dotyczący dostarczonego przez użytkownika **%{user} zadania %{assignment}**."
-        someone: Gość
       sms: 
         body: "Nowy komentarz od autora %{author} do zadania %{assignment}, %{user}, %{context}."
         more_info: "Więcej informacji pod adresem %{url}"
@@ -9662,9 +9374,6 @@ pl:
         someone: Gość
         subject: "Komentarz do przesłanego zadania: %{user}, %{assignment}, %{context}"
         submission_comment_link_message: "Szczegółowe informacje na temat dostarczonego zadania można uzyskać, klikając poniższe łącze; komentarz można dodać, odpowiadając na tę wiadomość."
-      facebook: 
-        body: "*Autor %{author}* właśnie dodał komentarz dotyczący dostarczonego przez użytkownika **%{user} zadania %{assignment}**."
-        someone: Gość
       sms: 
         more_info: "Więcej informacji pod adresem %{url}"
         sms_body: "Nowy komentarz od autora %{author} do zadania %{assignment}, %{user}, %{context}."
@@ -9693,13 +9402,6 @@ pl:
         score: "wynik punktowy:  %{score} na %{total} możliwych"
         score_pending: "oczekuje sprawdzenia punktów przez instruktora"
         subject: "Ocena została zmieniona: %{assignment}, %{context}"
-      facebook: 
-        body: "Ocena Twojego zadania, *%{title}* została zmieniona."
-        no_date_set: "Nie ustawiono daty"
-        not_applicable: "Brak danych"
-        regraded_date: "ponownie ocenione: %{date}"
-        score: "wynik punktowy: %{score} na %{total} możliwych"
-        score_pending: "oczekuje sprawdzenia punktów przez instruktora"
       sms: 
         body_sms: "Twoja ocena za zadanie %{title}, %{context} właśnie została zmieniona."
         more_info: "Więcej informacji pod adresem %{url}"
@@ -9740,13 +9442,6 @@ pl:
         score: "wynik punktowy:  %{score} na %{total} możliwych"
         score_pending_review: "oczekuje sprawdzenia punktów przez instruktora"
         subject: "Zadanie ocenione: %{assignment}, %{context}"
-      facebook: 
-        body: "Zadanie,*%{title}*, zostało ocenione."
-        graded_date: "oceniono: %{date}"
-        no_date_set: "Nie ustawiono daty"
-        not_applicable: "Brak danych"
-        score: "wynik punktowy: %{score} na %{total} możliwych"
-        score_pending_review: "oczekuje sprawdzenia punktów przez instruktora"
       sms: 
         graded_date: "oceniono: %{date}"
         more_info: "Więcej informacji pod adresem %{url}"
@@ -9779,9 +9474,6 @@ pl:
         link_message: "Dostarczone zadanie można sprawdzić tutaj:"
         subject: "Przesłano test: %{quiz}, %{context}"
         submitted_date: "przesłano: %{date} "
-      facebook: 
-        body: "Użytkownik o nazwie %{user_name} zakończył test %{quiz_title}, który należy ocenić."
-        submitted_date: "przesłano: %{date}"
       sms: 
         body_sms: "Twoja ocena za zadanie %{title}, %{context} właśnie została zmieniona."
         more_info: "Więcej informacji pod adresem %{url}"
@@ -9808,8 +9500,6 @@ pl:
         notifications_link: "Ustawienia powiadomień można zmienić, odwiedzając następującą stronę:"
         subject: "Najnowsze powiadomienia z systemu Canvas"
         weekly_body: "Korzystasz z usługi przesyłania tygodniowych raportów dotyczących powiadomień z konta Canvas.  Poniżej znajduje się raport z tygodnia zakończonego w dniu %{date}:"
-      facebook: 
-        new_notifications: "Użytkownik otrzymał *%{notification_count} nowych powiadomień* z systemu #Canvas#."
       sms: 
         notifications_sms: "%{notifications_count} owych powiadomień pod adresem %{url}"
       twitter: 
@@ -9829,8 +9519,6 @@ pl:
           subject: "Zaktualizowana strona typu Wiki: %{title}, %{user}"
         link_message: "Można ją przejrzeć tutaj: %{link}"
         subject: "Zaktualizowana strona typu Wiki: %{title}, %{user}"
-      facebook: 
-        body: "Zaktualizowana została strona typu Wiki, zatytułowana %{title}."
       sms: 
         more_info: "Więcej informacji pod adresem %{url}"
         updated_message: "Strona %{title}, %{user}, właśnie została zaktualizowana:"
@@ -9848,8 +9536,6 @@ pl:
           details_link: "Kliknij tutaj, aby zobaczyć szczegółowe informacje"
           subject: "Zaproszenie do konferencji sieciowej: %{name}"
         subject: "Zaproszenie do konferencji sieciowej: %{name}"
-      facebook: 
-        body: "Zaproszono Cię do udziału w konferencji sieciowej, *%{title}* dla #%{name}#."
       sms: 
         body: "Zaproszono Cię do przyłączenia się do konferencji sieciowej, %{title} dla %{name}."
         link_message: "Więcej informacji pod adresem %{url}"
@@ -10035,6 +9721,7 @@ pl:
   moodle_formula_many_warning_title: "Istnieje %{count} pytań opartych na formule w tym banku, których odpowiedzi trzeba będzie ponownie wygenerować"
   moodle_formula_warning_title: "Trzeba będzie ponownie wygenerować możliwe odpowiedzi do pytania opartego na formule"
   more_courses_5ebbe998: "Więcej kursów"
+  most_recent_score_13a87e8c: "Najnowszy wynik"
   most_recent_score_counts_as_75_of_mastery_weight_a_f1e3e6c2: "Najnowszy wynik punktowy liczy się jako 75% wagi biegłości, średnia z wszystkich innych wyników punktowych liczy się jako 25% wagi."
   move_dialog: 
     cancel: Anuluj
@@ -10045,6 +9732,7 @@ pl:
     move_to_end: "-- Na dół --"
   move_outcome_ce497e6c: "Przenieś wynik"
   move_outcome_group_cfa1a505: "Przenieś grupę wyników"
+  must_achieve_mastery_at_least_2_times_must_also_co_b2ae7688: "Musi osiągnąć wynik mistrzowski przynajmniej 2 razy. Musi również wykonać 2 pozycje do kalkulacji. Wyniki powyżej mistrzostwa zostaną uśrednione aby obliczyć ostateczny wynik."
   must_achieve_mastery_at_least_2_times_scores_above_57077a88: "Należy osiągnąć biegłość co najmniej 2 razy. Wyniki punktowe powyżej biegłości zostaną uśrednione w celu obliczenia końcowego wyniku punktowego."
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "Należy podać parametr 'file_ids' i/lub 'folder_ids'"
   mute_dialog: 
@@ -10060,6 +9748,7 @@ pl:
   muted_283cfa0f: (wyłączone)
   my_dashboard_b724020: "Mój panel"
   n_a_d6f6c42f: "Brak danych"
+  n_number_of_times_c2e78b72: "n Ilość razy"
   name: "Importer usługi Academic Benchmark"
   name_1aed4a1b: Nazwa
   name_3806192d: "Nazwa:"
@@ -10068,9 +9757,9 @@ pl:
   name_has_been_successfully_installed_but_has_not_y_c3148b96: "Pomyślnie zainstalowano, ale jeszcze nie włączono *name*."
   name_is_currently_status_9065c996: "*name* jest obecnie **status**."
   name_only_5f56718e: "Tylko nazwa"
+  near_mastery_f25174a4: "Blisko biegłości"
   new_account_role_6e5c4964: "Nowa rola konta"
   new_course_role_6a7bb75f: "Nowa rola kursu"
-  new_facebook_message: "Masz nową wiadomość z programu Canvas"
   new_file_135ae520: "[ Nowy plik ]"
   new_outcome_7fba8c7d: "Nowy wynik"
   new_quiz_statistics_desc: "Włącz nową stronę statystyki testu na koncie."
@@ -10093,6 +9782,7 @@ pl:
   no_students_have_taken_the_survey_yet_d378cd35: "Żaden z uczestników nie wypełnił jeszcze tej ankiety"
   no_usage_rights_object_supplied_304b8d40: "Nie podano obiektu 'usage_rights'"
   not_a_number: "należy wpisać liczbę dodatnią"
+  not_available_until_next_submission_2175158: "Niedostępne do kolejnego zgłoszenia"
   not_installed_37a21a76: "Nie zainstalowano"
   not_now_97efd947: "Nie teraz"
   note_some_items_fall_outside_the_start_and_or_end__feab0642: "Uwaga: niektóre elementy wychodzą poza daty rozpoczęcia i/lub zakończenia kursu."
@@ -10297,8 +9987,6 @@ pl:
         display: "Adres e-mail"
       errors: 
         saving_preferences_failed: "Ups! Coś się popsuło. Spróbuj ponownie."
-      facebook: 
-        display: Facebook
       push: 
         display: "Powiadomienie Push"
       sms: 
@@ -10475,6 +10163,7 @@ pl:
         delete_outcome: "Usuń wynik"
         edit_outcome: "Edytuj wynik"
       mastery_at_label: "Ustaw biegłość dla każdego wyniku większego lub równego:"
+      point_mastery: "Mistrzostwo: %{mastery_points} Punkty"
       points: 
         rating: "%{points} punkty"
         total: "%{points_possible} punkty"
@@ -10599,6 +10288,7 @@ pl:
   paginated_view: 
     loading_more_results: "Trwa ładowanie większej liczby wyników"
   participations_1823832d: Uczestnictwa
+  password_8a271b1c: Hasło
   paste_xml_cda3a64e: "Wklej XML"
   paypal: 
     exception: "Przepraszamy, wystąpił błąd, spróbuj później."
@@ -10608,9 +10298,13 @@ pl:
   permission_not_found_620b80d1: "Nie znaleziono uprawnienia"
   permissions: 
     manage_webhooks: "Zarządzaj sieciowymi punktami zaczepienia"
+  pick_a_destination_we_ll_send_you_errors_fa0cb0e0: "wybierz lokalizację, wyślemy ci błędy"
+  pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "wybierz punkt końcowy, wyślemy tam twoje raporty o błędach"
   plain_text_e3ab33aa: "Zwykły tekst"
   please_add_at_least_one_non_blank_answer_213c2c8e: "Dodaj co najmniej jedną niepustą odpowiedź."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Dodaj co najmniej jedną niepustą odpowiedź dla każdej zmiennej."
+  please_enter_your_label_name_7745272d: "Proszę wprowadzić swój %{label_name}:"
+  please_enter_your_label_name_and_password_5c56be80: "Proszę wprowadzić swoje %{label_name} i hasło."
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: "Przekaż im dane dotyczące wyświetlanej strony i klikniętego łącza."
   plugins: 
     academic_benchmark_importer: 
@@ -10670,6 +10364,12 @@ pl:
       description: "Ta wtyczka integruje się z Crocodoc, aby dostarczyć podgląd dokumentu HTML5, dzięki któremu uczniowie i studenci mogą opatrywać dokumenty przypisami."
       labels: 
         api_key: "Klucz API Crocodoc"
+    custom_ticketing_email_settings: 
+      labels: 
+        email_address: "adres email do raportów o błędach (something@example.com)"
+    custom_ticketing_web_post_settings: 
+      labels: 
+        endpoint_uri: "Adres URL do wpisywania danych  (https://www.somewhere.com/endpoint/path)"
     diigo: 
       description: "Integracja z platformą Diigo "
       name: Diigo
@@ -10721,33 +10421,6 @@ pl:
       primary_pad: "Primary Pad"
       sketchpad: SketchPad
       typewithme: TypeWith.me
-    facebook: 
-      description: "Aplikacja Facebook systemu Canvas"
-      name: Facebook
-    facebook_settings: 
-      description: |-
-          Konieczne będzie utworzenie [nowej aplikacji w portalu facebook.com](%{facebook_url}) i dodanie „Aplikacja w portalu Facebook” jako platformy.
-          Aby zapewnić prawidłowe działanie własnej aplikacji Facebook,
-          należy wprowadzić poniższe ustawienia:
-          
-          * **Settings -- App on Facebook -- Canvas Page:** należy zanotować swój wybór (część po apps.facebook.com) i wprowadzić w poniższym formularzu
-          * **Settings -- App on Facebook -- Canvas URL:** ustawiono na %{canvas_url}
-          * Po zapisaniu aplikacji należy zanotować identyfikator aplikacji, token klienta i tajny klucz aplikacji
-      domain_name: domena
-      headers: 
-        domain_settings: "Ustawienia domeny"
-      hints: 
-        api_key: "Również nazywanego tokenem klienta"
-        canvas_domain: "jest to domena określona w \"adresie URL Canvas\""
-        canvas_name: "jest to ścieżka określona na \"Stronie Canvas\""
-        disable_ssl: "Służy tylko do testowania lokalnego"
-      labels: 
-        api_key: "Klucz API"
-        app_id: "Identyfikator aplikacji"
-        canvas_domain: "Domena Canvas"
-        canvas_name: "Nazwa w systemie Canvas"
-        disable_ssl: "Wyłącz SSL"
-        secret: "Tajny klucz aplikacji"
     google_docs: 
       description: "Udostępnianie dokumentów za pośrednictwem usługi Google Docs"
       name: "Google Docs"
@@ -10869,6 +10542,18 @@ pl:
       labels: 
         api_key: "Klucz API"
         secret_key: "Klucz tajny"
+    live_events: 
+      description: "Obsługa zdarzeń w czasie rzeczywistym."
+      name: "Wydarzenia na żywo"
+    live_events_settings: 
+      description: "Włącza wydarzenia do strumienia Kinesis."
+      endpoint_region_requirement: "Wymagany jest Region AWS lub Punkt Końcowy. Punkt końcowy jest zwykle używany tylko do rozwoju."
+      labels: 
+        aws_access_key_id: "AWS ID Klucza dostępu"
+        aws_endpoint: "Punkt Końcowy AWS (url)"
+        aws_region: "Region AWS"
+        aws_secret_access_key: "AWS Tajny klucz dostępu"
+        kinesis_stream_name: "Nazwa Strumienia Kinesis"
     lockdown_browser: 
       labels: 
         download_url: "Adres URL w celu pobrania programu LockDown Browser"
@@ -10923,6 +10608,10 @@ pl:
         minimum_rows_for_parallel: "Minimalna liczba wierszy dla importu z systemu SIS przed użyciem przetwarzania równoległego"
         parallelism: "Liczba procesorów zadań, które są wykorzystywane do przetwarzania importów z systemu SIS w sposób równoległy"
         queue_for_parallel_jobs: "Kolejka zadań dla zadań równoległych (puste lub ustawienie domyślne)"
+    ticketing_system_settings: 
+      description: "Konfiguracja systemu sprzedaży biletów"
+      labels: 
+        type: "Rodzaj systemu sprzedaży biletów"
     twitter: 
       description: "Powiadomienia serwisu Twitter"
       name: Twitter
@@ -10979,6 +10668,7 @@ pl:
         poll_choice_belongs_to_poll: "Ten wybór sondy nie należy do istniejącej sondy."
         poll_is_published: "Ta sesja sondy nie jest otwarta dla przesyłania zadań."
         user_and_poll_session_uniqueness: "można przesłać jedynie jeden wybór na sesję sondy."
+  possible_combination_count_db651ca4: "Możliwa liczba kombinacji"
   possible_score_5e0a328e: "Możliwe: %{score}"
   post_grades_39c52870: "Wyślij oceny"
   post_grades_description: |-
@@ -10993,7 +10683,6 @@ pl:
     labels: 
       requirements_must_be_completed: "Strona zostanie odblokowana po spełnieniu poniższych wymogów"
   presentation_2d9387ca: Prezentacja
-  press_spacebar_for_more_details_on_this_outcome_f6713a42: "naciśnij klawisz spacji, aby uzyskać więcej szczegółów dotyczących tego wyniku"
   privacy_290109ea: Prywatność
   product_name: "System Canvas"
   profile: 
@@ -11044,8 +10733,6 @@ pl:
       profile_update_failed: "Aktualizacja nazwy logowania nie powiodła się"
       regenerating_token_failed: "Ponowne generowanie tokenu nie powiodło się"
       registration_failed: "Rejestracja nie powiodła się. Sprawdź nazwę użytkownika oraz hasło i spróbuj ponownie."
-    facebook_select: 
-      facebook: Facebook
     failed_resending: "Żądanie nie powiodło się. Spróbuj ponownie."
     links: 
       resend_confirmation: "Wyślij ponownie potwierdzenie"
@@ -11070,7 +10757,6 @@ pl:
         generate_token: "Generuj token"
         new_access_token: "Nowy token dostępu"
         regenerate_token: "Ponownie generuj token"
-        register_facebook_account: "Zarejestruj konto w portalu Facebook"
         register_linkedin_account: "Zarejestruj konto w witrynie LinkedIn"
         save_login: "Zapisz nazwę logowania"
         save_skype_name: "Zapisz nazwę Skype"
@@ -11081,7 +10767,6 @@ pl:
       delicious_description: "Delicious to narzędzie umożliwiające przechowywanie i udostępnianie innym zakładek. Edytor sformatowanej zawartości Canvas pozwala na przeszukiwanie etykiet Delicious, co umożliwia szybkie łączenie się z innymi użytecznymi źródłami z poziomu systemu Canvas."
       diigo_description: "Diigo to narzędzie gromadzenia zakładek w ramach społeczności internetowej ukierunkowane na prowadzenie badań i edukację. Edytor sformatowanej zawartości Canvas pozwala na przeszukiwanie etykiet Diigo, co umożliwia szybkie łączenie się z innymi użytecznymi źródłami z poziomu systemu Canvas."
       error_loading_token_details: "Błąd w czasie ładowania szczegółowych informacji dot. tokenu"
-      facebook_description: "Użytkownicy, którzy mają konto na portalu Facebook mogą zainstalować aplikację Canvas i otrzymywać powiadomienia dotyczące kursu na swoim profilu. Istnieje możliwość określenia rodzaju otrzymywanych powiadomień i częstotliwości ich wysyłania."
       feature_options: "Opcje funkcji"
       full_token_warning: |-
           **Teraz skopiuj ten token**. Po opuszczeniu strony odzyskanie pełnego tokenu
@@ -11099,7 +10784,6 @@ pl:
         dates: Daty
         delicious_login: "Logowanie w platformie Delicious"
         diigo_login: "Logowanie w platformie Diigo"
-        facebook_access: "Dostęp do portalu Facebook"
         generate_access_token: "Generuj token dostępu"
         google_docs_access: "Dostęp do usługi Google Docs"
         google_drive_access: "Dostęp do dysku Google"
@@ -11161,7 +10845,6 @@ pl:
         diigo: Diigo
         disable_mfa: "Wyłącz wieloskładnikowe uwierzytelnianie"
         edit_settings: "Edytuj Ustawienia"
-        facebook: Facebook
         google_docs: "Google Docs"
         google_drive: "Dysk Google"
         linkedin: LinkedIn
@@ -11170,7 +10853,6 @@ pl:
         skype: Skype
         twitter: Twitter
         upload_new_image: "Przekaż nowy obraz"
-        view_facebook_app: "pokaż aplikację portalu Facebook"
         view_your_profile: "pokaż profil"
         yo: Yo
       loading_token_details: "Trwa ładowanie informacji szczegółowych tokenu..."
@@ -11184,7 +10866,6 @@ pl:
       subscribe_to_emails: "Chcę otrzymywać informacje, aktualności i wskazówki z systemu Instructure"
       titles: 
         access_token_details: "Informacje szczegółowe dot. tokenów dostępu"
-        authorize_facebook: "Autoryzuj portal Facebook"
         authorize_google_docs: "Autoryzuj usługę Google Docs"
         authorize_google_drive: "Autoryzuj dysk Google"
         authorize_linkedin: "Autoryzuj witrynę LinkedIn"
@@ -11472,6 +11153,7 @@ pl:
     disabled_assignment: "Nie można cofnąć publikowania, jeśli znajdują się przesłane zadania uczestnika"
     disabled_discussion_topic: "Nie można cofnąć publikowania, jeśli znajdują się przesłane zadania uczestnika"
     disabled_quiz: "Nie można cofnąć publikowania, jeśli znajdują się przesłane zadania uczestnika"
+  published_click_to_modify_233c0d4: "Opublikowane - Kliknij aby zmienić"
   purchases: 
     new: 
       payment_info: "Informacje o opłatach"
@@ -11589,6 +11271,7 @@ pl:
       regrade_options: "Opcje ponownego oceniania *(w odniesieniu do uczestników, którzy już odpowiedzieli na to pytanie):*"
       some_scores_reduced: "Przydziel punkty jedynie za poprawną odpowiedź (*wyniki niektórych studentów mogą zostać zmniejszone*)"
       update_question_without_regrading: "Aktualizuj pytanie bez ponownego oceniania"
+  quiz_e0dcce8f: Test
   quiz_log_auditing: 
     buttons: 
       reload_events: "Załaduj ponownie"
@@ -11656,6 +11339,7 @@ pl:
         truncate: "Skróć odpowiedzi tekstowe"
       page_header: "Kolejność odpowiedzi"
   quiz_log_auditing_desc: "Włącz śledzenie wydarzeń w odniesieniu do przesłanego testu, a także możliwość wyświetlenia dziennika tych wydarzeń po przesłaniu zadania."
+  quiz_lti_plugin_a189607f: "Wtyczka LTI Testu"
   quiz_reports: 
     cancel_generation: Anuluj
     download_item_analysis: "Pobierz raport analizy elementu."
@@ -12356,6 +12040,7 @@ pl:
         labels: 
           allow_multiple_attempts: "Zezwalaj na wiele prób"
           hide_results_only_after_last: "Dopiero po ostatniej próbie"
+          ip_addresses: "Filtruj przez adres IP"
           ip_filter: "Filtruj adresy IP"
           never_hide_results: "Udostępniaj uczestnikom wyniki ich testów"
           quiz_instructions: "Instrukcje do testu"
@@ -12380,6 +12065,7 @@ pl:
         only_visible_to_overrides_note: "Uwaga: ten test jest **jedynie** widoczny w sekcjach podanych poniżej:"
         points_possible: "Punkty %{n}"
         post_to_sis: "Wyślij oceny do SIS"
+        quiz_access_code: "Wymagany kod dostępu"
         quiz_title: "Tytuł testu"
         quiz_type: "Typ testu"
         require_lockdown_browser: "Wymagaj programu Respondus LockDown Browser"
@@ -12956,6 +12642,7 @@ pl:
   remind_me_next_time_6402eb7d: "Przypomnij mi następnym razem"
   remove_attachment_ceae0973: "Usuń załącznik"
   remove_f47dc62a: Usuń
+  remove_recipient_name_a6b83cef: "Usuń odbiorcę %{name}"
   remove_row_c198da5a: "Usuń rząd"
   remove_row_f9d59cba: "Usuń rząd"
   rename_45608f54: "Zmień nazwę"
@@ -13104,6 +12791,7 @@ pl:
         enable: Uaktywnij
         enable_and_lock: "Uaktywnij i zablokuj"
         use_default: "Użyj domyślne"
+        use_default_and_lock: "Użyj Domyślny i Blokuj"
     permissions: Uprawnienia
     role: 
       remove_role_confirmation: "Jeśli istnieją użytkownicy z taką rolą, zachowają oni obecne uprawnienia, ale nie będzie można utworzyć nowych użytkowników z ta rolą. Kliknij przycisk Ok, aby kontynuować usuwanie tej roli."
@@ -13187,6 +12875,8 @@ pl:
         are_you_sure_remove: "Czy na pewno chcesz usunąć te kryteria ocen ze swojej listy?"
       remove_rubric: "Usuń te kryteria ocen z mojej listy"
   salesforce_account_id_eb5c78ad: "Identyfikator konta Salesforce"
+  salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce posiada inny host logowania dla kont sandbox niż w przypadku kont produkcji, więc jeśli używasz konta Salesforce sandbox i nie zaznaczysz tego pola, nie będzie w stanie uwierzytelnić (działa to również w drugą stronę - jeśli posiadasz konto produkcyjne i zaznaczysz to pole - nie będzie mógł uwierzytelnić)"
+  salesforce_ticketing_webtocase_connector_80f75716: "Łącznik biletów WebToCase Salesforce"
   save_11a80ec3: Zapisz
   saving_d55dd90e: "Trwa zapisywanie..."
   score_muted_82eef66: "Wynik: (wyłączony)"
@@ -13415,6 +13105,8 @@ pl:
     titles: 
       add_item_to_module: "Dodaj element do modułu"
       find_links_using_service: "Znajdź łącza za pomocą %{service}"
+  select_course_a_selection_is_required_before_recip_f622d9df: "Wybierz kurs: konieczne jest dokonanie wyboru zanim pole odbiorcy zostanie udostępnione"
+  select_itemname_f70db487: "Wybierz %{itemName}"
   select_navigation_links_68e1e924: "Wybierz łącza nawigacyjne"
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Wybierz plik, który chcesz powiązać lub dodaj plik, wybierając „Nowy plik”."
   selected_answer: "Zaznaczono tę odpowiedź."
@@ -13431,9 +13123,7 @@ pl:
         next: Dalej
       getting_started: "Zapisujesz się na kurs **%{course}**."
       labels: 
-        email: "Adres e-mail"
         password: Hasło
-      log_in: "Podaj adres e-mail oraz hasło:"
     authenticate_or_register: 
       buttons: 
         enroll_in_course: "Zapisz się na kurs"
@@ -13472,6 +13162,7 @@ pl:
     prev_module: "Poprzedni moduł:"
     prev_module_desc: "Poprzedni moduł: *moduł*"
     prev_module_item_desc: "Poprzedni: *element*"
+  service_cloud_ticketing_connector_889e1b7b: "Łącznik biletów na chmurze usługowej"
   services_api: 
     must_be_logged_in: "Aby korzystać z platformy Kaltura należy się zalogować"
   set_default_grade_dialog: 
@@ -13486,6 +13177,19 @@ pl:
       labels: 
         recaptcha_private_key: "Klucz prywatny ReCAPTCHA"
         recaptcha_public_key: "Klucz publiczny ReCAPTCHA"
+    service_cloud_settings: 
+      labels: 
+        api_url: "API Host dla Salesforce (https://something.salesforce.com)"
+        consumer_key: "Klucz konsumencki Salesforce"
+        consumer_secret: "Tajemnica konsumencka Salesforce"
+        is_sandbox: "To jest konto sandbox salesforce"
+        refresh_token: "Odśwież token"
+    web_to_case_settings: 
+      labels: 
+        api_url: "Końcowy adres URL dla API Salesforce"
+        orgid: "ID Org Salesforce"
+        record_type: "Rodzaj zapisu"
+        ret_val: "Zwrotny adres URL"
   setup_checklist_eb8b00b8: "Lista kontrolna konfiguracji"
   shared: 
     account_notification: 
@@ -13890,7 +13594,6 @@ pl:
       labels: 
         custom_rating: "Oceniając uczestników, chcę pisać komentarze w formie dowolnej"
         grading_rubric: "Użyj tych kryteriów ocen do oceniania zadania"
-        title: Tytuł
         total_points: "Łączna liczba punktów"
         totallying_rubric: "Nie pokazuj łącznej liczby punktów przy wynikach zadania"
       links: 
@@ -13911,6 +13614,7 @@ pl:
       out_of: "%{points} *na %{total} możliwych*"
       rubric: "Kryteria oceny"
       rubric_title: Tytuł
+      title: "Tytuł:"
       titles: 
         find_existing_rubric: "Znajdź istniejące kryteria ocen"
     rubric_criterion: 
@@ -13959,6 +13663,7 @@ pl:
       titles: 
         find_a_rubric: "Znajdź kryteria ocen"
     rubric_forms: 
+      criteria_description_label: "Opis kryterium"
       points: "%{points} pkt"
     rubric_summary: 
       buttons: 
@@ -14181,10 +13886,12 @@ pl:
   shared_secret_892c88f2: "Wspólny klucz"
   show_by_date_e3967761: "Pokaż według daty"
   show_by_type_c5d61732: "Pokaż według typu"
+  show_correct_answers_at_a5475aa3: "Pokaż poprawne odpowiedzi na"
   show_lti_2_configuration_ui_94ce35a9: "Pokaż interfejs użytkownika konfiguracji LTI 2 "
   show_me_76823679: "Pokaż mnie"
   sis_agent_token_authentication_2a0b29e3: "Uwierzytelnienie tokena agenta SIS"
   sis_batch: 
+    diff_filename: "sis_upload_diffed_%{id}.zip"
     errors: 
       too_many_errors: "Pojawiła się następująca liczba kolejnych błędów: %{count}"
       too_many_warnings: "Pojawiła się następująca liczba kolejnych ostrzeżeń: %{count} "
@@ -14225,6 +13932,7 @@ pl:
     sis_import_in_process_notice: "Importowanie danych SIS zostało już rozpoczęte."
   site: 
     view_privacy_policy: "Pokaż politykę prywatności"
+  site_2d8d3df9: Witryna
   site_admin: 
     columns: 
       date: Data
@@ -14304,6 +14012,7 @@ pl:
     previous_object: "Poprzedni %{type}"
     student_hidden_name: "Uczestnik %{position}"
   start_date_e937be8a: "Data rozpoczęcia"
+  start_date_must_be_before_end_date_a00be892: "Data rozpoczęcia musi wypadać przed datą zakończenia"
   starts_on_date_a777f505: "Data rozpoczęcia"
   statistics: 
     csv_columns: 
@@ -14449,6 +14158,7 @@ pl:
     resubmitted_to_turnitin: "Z powodzeniem wysłano ponownie do programu Turnitin."
     see_attached_files: "Zobacz dołączone pliki"
     show: 
+      anonymous_user: "Anonimowy Użytkownik"
       attach_file: "Dołącz plik"
       buttons: 
         save: Zapisz
@@ -14513,6 +14223,7 @@ pl:
       gathering_files: "Trwa zbieranie plików..."
   submissions_11e96106: "Przesłane zadania"
   submit_a3cc6859: Prześlij
+  submit_a_feature_idea_2d4baa3d: "Zgłoś charakterystyczny pomysł"
   submitted_datetime_fa2e9287: "Przesłano: %{dateTime}"
   successfully_moved_model_to_newgroup_f7b7aa5a: "Pomyślnie przeniesiono %{model} do %{newGroup}"
   support: 
@@ -14524,12 +14235,16 @@ pl:
       two_words_connector: " i "
       words_connector: ", "
     help_menu: 
+      cisco_netacad_facebook: "Społeczność wspierająca"
+      cisco_netacad_facebook_description: "Proszę odwiedzić naszą stronę  Networking Academy na Facebook'u dla wsparcia społecznego lub skontaktowania się ze swoim instruktorem."
       community_support_description: "Komunikuj się z innymi uczestnikami i pytaj ich o pomoc."
       community_support_forums: "Forum wsparcia"
       contact_support: "Skontaktuj się z działem pomocy"
       contact_support_sub_text: "Zdobądź pomoc w sprawach uwarunkowanych czasowo."
       curriculum_assessment_errata: "Wykaz błędów programu/oceniania"
       curriculum_assessment_errata_description: "Zobacz zgłoszone błędy oceniania i programu. Wyszukaj słowo „errata”."
+      global_support_desk: "Globalne biuro obsługi"
+      global_support_desk_description: "Nasi ASC są twoją pierwsza linią wsparcia i mogą cię skontaktować z Globalnym biurem obsługi w kwestiach, które wymagają dodatkowej pomocy."
       networking_academy_description: "Zobacz odpowiedzi Cisco na najczęściej zadawane pytania."
       networking_academy_faqs: "Najczęściej zadawane pytania Networking Academy"
       support_desk_livechat: "Czat na żywo z działem wsparcia"
@@ -14628,17 +14343,22 @@ pl:
         unspecified: kiedykolwiek
       timespan: "%{start_at} *do* %{end_at}"
   text_document_eacbcdb7: "Dokument tekstowy"
+  text_entry_submission_cannot_be_empty_3d187cae: "Zgłoszenie z wprowadzonym tekstem nie może być puste"
   the_app_was_activated_a84e055f: "Aplikacja została aktywowana"
   the_app_was_added_58e2836a: "Aplikacja została dodana"
   the_app_was_added_successfully_3f785a23: "Aplikacja została pomyślnie dodana"
   the_app_was_deactivated_573520ab: "Aplikacja została zdezaktywowana"
   the_app_was_updated_successfully_3d71cd1b: "Aplikacja została pomyślnie zaktualizowana"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "Zakładka Pliki służy do udostępniania materiałów związanych z wykładami, np. dokumentów, pomocy naukowych — wszystkiego, co uczestnicy mogliby pobrać. Program Canvas zapewnia łatwy sposób przekazywania i organizacji plików. Wszystko zostanie dokładnie przedstawione."
+  the_following_fields_are_invalid_fields_b3565800: "Poniższe pola są nieprawidłowe: %{fields}"
+  the_grading_period_was_deleted_7814a349: "Okres klasyfikacyjny został usunięty"
+  the_grading_period_was_saved_4a504c5: "Okres klasyfikacynjy została zapisany"
   the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "Obraz logo w prawym górnym nagłówku programu Canvas. 200x200 svg lub png"
   the_material_is_in_the_public_domain_279c39a3: "Materiał znajduje się w domenie publicznej"
   the_material_is_licensed_under_creative_commons_3242cb5e: "Materiał jest objęty licencją Creative Commons"
   the_material_is_subject_to_fair_use_exception_41bc6a4b: "Materiał podlega wyjątkowi dozwolonego użytku"
   the_module_item_is_locked_27fe420b: "Element modułu jest zablokowany."
+  the_profile_picture_has_been_reported_d609d6dd: "Zdjęcie profilowe zostało zgłoszone"
   the_shortcut_icon_for_ios_android_devices_180x180__f87fa178: "Ikona skrótu dla urządzeń iOS/Android. 180x180 png lub svg"
   the_state_parameter_is_required_ffadf213: "Wymagany jest parametr stanu."
   the_top_track_represents_days_on_which_the_student_2a347099: "Górna ścieżka reprezentuje dni, w których *uczestnik wysłał wiadomości* do instruktorów kursu. Dolna ścieżka jest przeznaczona na **wiadomości od instruktorów** do uczestników."
@@ -14648,6 +14368,7 @@ pl:
     other: "Na liście jest %{count} wyników "
   there_was_a_problem_deleting_the_grading_period_50ce07c5: "Wystąpił problem z usunięciem okresu oceniania"
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: "Wystąpił problem z usunięciem schematu oceniania"
+  there_was_a_problem_saving_the_grading_period_243bed6c: "Wystąpił błąd podczas zapisywania okresu klasyfikacyjnego"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "Wystąpił problem z zapisaniem schematu oceniania"
   there_was_an_error_in_processing_your_request_6513a49a: "Wystąpił błąd podczas przetwarzania żądania"
   there_was_an_error_setting_usage_rights_53739e1d: "Wystąpił błąd podczas nadawania praw użytkowania"
@@ -14662,9 +14383,14 @@ pl:
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Ten folder jest aktualnie zablokowany i niedostępny do wyświetlenia."
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Jest to rozdzielona przecinkami lista zaufanych adresów URL. Zaufanie adresom URL na tej liście spowoduje obejście tokena CSRF podczas logowania do systemu Canvas."
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Najprawdopodobniej doszło do tego, ponieważ zaimportowano zawartość kursu bez skojarzonych plików."
+  this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Ten wynik został wykorzystany do oceny ucznia i nie może być zmieniony ani usunięty"
+  this_outcome_has_been_used_to_assess_a_student_the_1f04402e: "Wynik ten został użyty do ocenienia ucznia. Metoda obliczenia jest stała."
+  this_outcome_has_been_used_to_assess_a_student_the_1ff3a596: "Ten wynik został wykorzystany do ocenienia ucznia. Wartość obliczenia jest stała."
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Ten test jest nieopublikowany* Tylko instruktorzy będą widzieć ten kurs zanim zostanie opublikowany"
   this_student_wrote_f1a3f22d: "Ten uczestnik napisał:"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Umożliwi to uwierzytelnienie systemu Canvas w celu zamieszczania ocen w systemie SIS"
+  ticketing_system_52205bff: "System biletowy"
+  ticketing_system_configurations_c4fecd96: "Konfiguracje systemu biletowego"
   time: 
     am: rano
     count_hours_ago: 
@@ -14870,9 +14596,12 @@ pl:
     people: Osoby
     view_in_separate_window: "Pokaż w osobnym oknie"
   to_35c6baa2: do
+  to_51406be9: Do
   to_c4c44f4b: do
+  to_link_the_course_observer_name_to_a_student_star_f993c826: "Aby połączyć obserwatora kursu *%{name}* do ucznia, wpisz imię ucznia poniżej aby go znaleźć, następnie kliknij Aktualizuj."
   to_minscore_43e5452e: "do %{minScore}%"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "Aby wyświetlić zadania, upewnij się, że aktywny jest widok *Harmonogram*."
+  tolerance_value_9e96573c: "Wartość tolerancji"
   too_many_members_b8b15069: "Zbyt duża liczba członków"
   tooltips: 
     finished: ukończono
@@ -14901,10 +14630,13 @@ pl:
     buttons: 
       resubmit_to_turnitin: "Wyślij ponownie do programu Turnitin"
   unable_to_remove_app_4293cb53: "Nie można usunąć aplikacji"
+  unarchive_selected_e0c4bd3d: "Wybrano zdezarchywizowanie"
+  unchanged_aca18e02: "[Bez zmian]"
   ungraded_submissions_44efb0ec: "Przesłane zadania bez oceny"
   ungraded_survey_ad7de790: "Ankieta bez oceny"
   unknown: Nieznany
   unknown_47a3b725: Nieznany
+  unknown_content_type_ae6d08e8: "Nieznany rodzaj treści"
   unknown_question_bank: "Nieznany bank pytań"
   unknown_quiz: "Nieznany test"
   unlock_date_cannot_be_after_due_date_8829d9ca: "Data odblokowania nie może przypadać po terminie dostarczenia"
@@ -14912,6 +14644,7 @@ pl:
   unlock_date_cannot_be_before_course_start_9c7b8524: "Data odblokowania nie może przypadać przed rozpoczęciem kursu"
   unlock_date_cannot_be_before_section_start_793ddc66: "Data odblokowania nie może przypadać przed rozpoczęciem sekcji"
   unlock_date_cannot_be_before_term_start_d3c01813: "Data odblokowania nie może przypadać przed rozpoczęciem semestru"
+  unpublished_click_to_modify_60f9051: "Nieopublikowany - Kliknij aby zmienić"
   unpublished_courses_title: "Nieopublikowane kursy"
   unstarted_932f2990: Nierozpoczęto
   unsupported_package: "Nieobsługiwany pakiet zawartości"
@@ -14922,6 +14655,7 @@ pl:
   updated_group_group_name_727b1d98: "Zaktualizowano grupę %{group_name}"
   upload_button: 
     upload: Przekaż
+  upload_data_dc4fa4cb: "Przekaż dane"
   upload_drop_zone: 
     drop_to_upload: "Upuść elementy, aby przekazać"
   upper_limit_of_range_c454a8f2: "Wyższy limit zakresu"
@@ -14930,6 +14664,9 @@ pl:
   usage_rights_have_been_set_d1b433c7: "Prawa użytkowania zostały nadane."
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Prawa użytkowania zostaną nadane dla wszystkich plików zawartych w:"
   use_a_single_16x16_32x32_48x48_ico_file_60bc8d91: "Użyj *pojedynczego pliku ico 16x16, 32x32, 48x48*."
+  use_the_highest_score_eb29329d: "Wykorzystaj najwyższy wynik"
+  use_the_most_recent_score_9ae3742c: "Wykorzystaj ostatni wynik"
+  use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Wykorzystaj nowe narżedzie LTI do testów w miejsce regularnych testów canvas"
   used_by_permission_314a78dd: "Użycie według uprawnień"
   user: 
     default_user_name: Użytkownik
@@ -15062,17 +14799,19 @@ pl:
       notifications: Powiadomienia
       profile: Profil
       settings: Ustawienia
+  user_selected_answer: Wybrałeś
+  user_selected_wrong: "Prawidłowa odpowiedź to %{correct_answer_text}."
   user_service: 
     descriptions: 
       delicious: "Delicious to narzędzie do wspólnego dzielenia się łączami.  Pozwala oznaczyć dowolną stronę internetową, po to by później do niej wrócić.  Umożliwia też łączenie się z innymi kontami użytkowników narzędzia Delicious, aby dzielić się łączami do stron o danej tematyce."
       diigo: "Diigo to narzędzie do wspólnego dzielenia się łączami.  Pozwala oznaczyć dowolną stronę internetową, po to by później do niej wrócić.  Umożliwia też łączenie się z innymi kontami użytkowników narzędzia Diigo, aby dzielić się łączami do stron o danej tematyce."
-      facebook: "Umieszczenie twojego profilu Facebook na liście ułatwi kontaktowanie się z nowymi znajomymi z klas i grup."
       google_docs: "Uczestnicy mogą skorzystać z usługi Google Docs, aby wspólnie pracować nad projektami grupowymi.  Usługa Google Docs umożliwia wspólną edycję dokumentów, arkuszy i prezentacji w czasie rzeczywistym."
       google_drive: "Uczestnicy mogą korzystać z dysku Google, aby współpracować nad projektami grupowymi. Dysk Google umożliwia wspólną edycję w czasie rzeczywistym dokumentów, arkuszy kalkulacyjnych i prezentacji."
       linked_in: "LinkedIn to narzędzie do nawiązywania kontaktów biznesowych.  Wiele ze znajomości nawiązanych w szkole może okazać się pomocnych po rozpoczęciu pracy zawodowej."
       skype: "Skype to darmowe narzędzie do prowadzenia rozmów głosowych i wideo w trybie on-line."
       twitter: "Twitter to doskonałe narzędzie do komunikowania się poza zajęciami kursowymi."
       yo: "Yo to narzędzie do komunikacji, które obsługuje się pojedynczymi kliknięciami bez wpisywania znaków."
+  username_47bb5bbe: "Nazwa użytkownika"
   users: 
     admin_merge: 
       buttons: 
@@ -15141,8 +14880,6 @@ pl:
     errors: 
       no_teacher_courses: "Dla tego instruktora i uczestnika nie ma kursów wspólnych"
       user_not_teacher: "Ten użytkownik nie jest instruktorem na danym kursie"
-    facebook_added: "Konto w portalu Facebook zostało pomyślnie dodane!"
-    facebook_fail: "Autoryzacja portalu Facebook nie powiodła się."
     google_docs_added: "Zautoryzowano dostęp dla usługi Google Docs!"
     google_docs_fail: "Autoryzacja dla usługi Google Docs nie powiodła się. Spróbuj ponownie"
     google_drive_added: "Pomyślnie dodano konto na dysku Google!"
@@ -15370,6 +15107,8 @@ pl:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE, Kurs WebCT 6+"
   webct_name: "Blackboard Vista/CE (WebCT)"
+  well_below_mastery_37664bdc: "Znacznie poniżej poziomu biegłości"
+  what_should_the_csv_file_look_like_985a59ac: "Jak powinien wyglądać plik CSV?"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "To jest strona, którą zobaczą osoby odwiedzające kurs. Możesz ustawić ją tak, aby pokazywała strumień aktywności, listę modułów kursu, program kursu lub stronę niestandardową napisaną przez Ciebie. Wartością domyślną jest strumień aktywności kursu."
   where_would_you_like_to_move_title_fabd6e8f: "Gdzie chcesz przenieść %{title}?"
   widget: 
@@ -15487,6 +15226,7 @@ pl:
       title_characters: "Tytuł musi zawierać co najmniej jedną literę lub cyfrę"
       title_too_long: "Tytuł nie może być dłuższy niż %{max_characters} znaków"
     unknown_user_name: Nieznany
+  wiki_page_6c11ee20: "Strona Wiki"
   wiki_pages: 
     edit: 
       page_header_title: "Edytuj stronę %{page_name}"
@@ -15548,7 +15288,9 @@ pl:
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "Użytkownik osiągnął maksymalną liczbę sieciowych punktów zaczepienia według limitu konta (%{max})"
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "Użytkownik osiągnął maksymalną liczbę sieciowych punktów zaczepienia według limitu użytkownika (%{max})"
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "Na pewno przydadzą się uczestnicy. Prowadzenie kursu bez nich nie jest żadną przyjemnością."
+  you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "Potrzebujesz odświeżonego tokena, postępuj zgodnie z krokami zawartymi w tym linku, może będziesz wymagać pomocy eksperta technicznego"
   you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "Możesz wyznaczyć asystentów, którzy będę pomagać w prowadzenie kursu. Asystenci mogą oceniać zadania przesłane przez uczestników, pomagać prowadzić dyskusje, czy nawet aktualizować terminy dostarczenia i szczegółowe informacje dot. zadań"
+  you_must_log_in_to_view_replies_9ccd4da0: "Musisz się zalogować aby zobaczyć odpowiedzi"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Musisz wybrać kurs, z którego ma być skopiowana zawartość"
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "Musisz ustawić liczbę większą lub równą %{min}"
   you_must_specify_a_usage_right_5eb57f87: "Musisz określić prawo użytkowania."
@@ -15557,12 +15299,16 @@ pl:
   your_assignments_will_show_here_listed_by_due_date_18dc880f: "Twoje zadania pojawią się w tym miejscu, ułożone według terminu dostarczenia."
   your_browser_does_not_meet_the_minimum_requirement_7a7022db: "Przeglądarka nie spełnia minimalnych wymagań dotyczących systemu Canvas. Odwiedź *Przewodnik systemu Canvas* w celu uzyskania informacji na temat obsługiwanych przeglądarek."
   your_content_has_been_exported_bbb57764: "Twoja zawartość została wyeksportowana."
+  your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: "Twój plik jest wysyłany do Dziennika ocen, możesz opuścić tą stronę w każdej chwili. Jeśli masz duży plik CSV, zmiany mogą zając kilka minut aby się zaktualizować. Aby zapobiec nadpisaniu danych, prosimy potwierdzić zakończenie procesu przesyłania a Dziennik ocen jest poprawny, przed wprowadzeniem dodatkowych zmian."
   your_message_has_been_sent_thank_you_e0284316: "Twoja wiadomość została wysłana. Dziękujemy!"
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Twoje zdjęcie profilowe nie mogło zostać przesłane. Być może przekroczono limit przesyłania."
   your_search_encountered_the_following_errors_fc3e5e7f: 
     few: "Podczas wyszukiwanie pojawiły się następujące błędy:"
     one: "Podczas wyszukiwania pojawił się następujący błąd:"
     other: "Podczas wyszukiwanie pojawiły się następujące błędy:"
+  zendesk: 
+    engine: 
+      plugin_name: Zendesk
   zero_activity_title: "Zerowa aktywność"
   zip_argument_error: "Do przekazania pliku .zip potrzebny jest folder, do którego plik zostanie przekazany."
   zip_file_description: "Wtyczka migracji w celu rozpakowania zwykłych plików .zip do kursu, grupy lub plików użytkownika"

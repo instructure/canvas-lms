@@ -21,6 +21,7 @@ module Api::V1::Assignment
   include ApplicationHelper
   include Api::V1::ExternalTools::UrlHelpers
   include Api::V1::Locked
+  include Api::V1::AssignmentOverride
 
   API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS = {
     :only => %w(
@@ -36,13 +37,14 @@ module Api::V1::Assignment
       unlock_at
       assignment_group_id
       peer_reviews
+      anonymous_peer_reviews
       automatic_peer_reviews
       post_to_sis
       grade_group_students_individually
       group_category_id
       grading_standard_id
     )
-  }
+  }.freeze
 
   API_ASSIGNMENT_NEW_RECORD_FIELDS = {
     :only => %w(
@@ -51,7 +53,7 @@ module Api::V1::Assignment
       assignment_group_id
       post_to_sis
     )
-  }
+  }.freeze
 
   def assignments_json(assignments, user, session, opts = {})
     assignments.map{ |assignment| assignment_json(assignment, user, session, opts) }
@@ -62,16 +64,20 @@ module Api::V1::Assignment
       include_discussion_topic: true,
       include_all_dates: false,
       override_dates: true,
+      needs_grading_count_by_section: false,
       exclude_description: false
     )
 
     if opts[:override_dates] && !assignment.new_record?
       assignment = assignment.overridden_for(user)
+
     end
+
     fields = assignment.new_record? ? API_ASSIGNMENT_NEW_RECORD_FIELDS : API_ALLOWED_ASSIGNMENT_OUTPUT_FIELDS
     if opts[:exclude_description]
-      fields = fields.dup
-      fields[:only].delete("description")
+      fields_copy = fields[:only].dup
+      fields_copy.delete("description")
+      fields = {only: fields_copy}
     end
 
     hash = api_json(assignment, user, session, fields)
@@ -79,6 +85,10 @@ module Api::V1::Assignment
     hash['name'] = assignment.title
     hash['submission_types'] = assignment.submission_types_array
     hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
+
+    if !opts[:overrides].blank?
+      hash['overrides'] = assignment_overrides_json(opts[:overrides])
+    end
 
     if !assignment.user_submitted.nil?
       hash['user_submitted'] = assignment.user_submitted
@@ -258,6 +268,7 @@ module Api::V1::Assignment
     assignment_group_id
     group_category_id
     peer_reviews
+    anonymous_peer_reviews
     peer_reviews_assign_at
     peer_review_count
     automatic_peer_reviews
@@ -378,7 +389,7 @@ module Api::V1::Assignment
       assignment.assignment_group = assignment.context.assignment_groups.where(id: ag_id).first
     end
 
-    if update_params.has_key?("group_category_id")
+    if update_params.has_key?("group_category_id") && !assignment.group_category_deleted_with_submissions?
       gc_id = update_params.delete("group_category_id").presence
       assignment.group_category = assignment.context.group_categories.where(id: gc_id).first
     end
@@ -386,7 +397,7 @@ module Api::V1::Assignment
     if update_params.has_key?("grading_standard_id")
       standard_id = update_params.delete("grading_standard_id")
       if standard_id.present?
-        grading_standard = GradingStandard.standards_for(context).where(id: standard_id).first
+        grading_standard = GradingStandard.for(context).where(id: standard_id).first
         assignment.grading_standard = grading_standard if grading_standard
       else
         assignment.grading_standard = nil

@@ -127,7 +127,7 @@ module Importers
         gs = context.grading_standards.where(migration_id: hash[:grading_standard_migration_id]).first
         item.grading_standard = gs if gs
       elsif hash[:grading_standard_id] && migration
-        gs = GradingStandard.standards_for(context).where(id: hash[:grading_standard_id]).first unless migration.cross_institution?
+        gs = GradingStandard.for(context).where(id: hash[:grading_standard_id]).first unless migration.cross_institution?
         if gs
           item.grading_standard = gs if gs
         else

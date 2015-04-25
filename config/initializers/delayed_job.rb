@@ -54,6 +54,12 @@ Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
     :session_id => worker.name,
   }
 
+  LiveEvents.set_context({
+    :root_account_id => job.respond_to?(:global_account_id) ? job.global_account_id : nil,
+    :job_id => job.global_id,
+    :job_tag => job.tag
+  })
+
   starting_mem = Canvas.sample_memory()
   starting_cpu = Process.times()
   lag = ((Time.now - job.run_at) * 1000).round
@@ -74,6 +80,8 @@ Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
     user_cpu = ending_cpu.utime - starting_cpu.utime
     system_cpu = ending_cpu.stime - starting_cpu.stime
     Thread.current[:context] = nil
+
+    LiveEvents.clear_context!
 
     Rails.logger.info "[STAT] #{starting_mem} #{ending_mem} #{ending_mem - starting_mem} #{user_cpu} #{system_cpu}"
   end
