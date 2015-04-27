@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 define([
-  'old_unsupported_dont_use_react',
-  'old_unsupported_dont_use_react-modal',
+  'react',
+  'react-modal',
   './SFUCopyrightComplianceNotice'
   ], function (React, ReactModal, SFUCopyrightComplianceNotice) {
 
