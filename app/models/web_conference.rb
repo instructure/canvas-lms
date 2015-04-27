@@ -197,9 +197,11 @@ class WebConference < ActiveRecord::Base
   def add_initiator(user)
     add_user(user, 'initiator')
   end
+
   def add_invitee(user)
     add_user(user, 'invitee')
   end
+
   def add_attendee(user)
     add_user(user, 'attendee')
   end
@@ -256,6 +258,7 @@ class WebConference < ActiveRecord::Base
   def long_running?
     duration.nil?
   end
+
   def long_running
     long_running? ? 1 : 0
   end
@@ -363,6 +366,7 @@ class WebConference < ActiveRecord::Base
   def has_advanced_settings?
     respond_to?(:admin_settings_url)
   end
+
   def has_advanced_settings
     has_advanced_settings? ? 1 : 0
   end

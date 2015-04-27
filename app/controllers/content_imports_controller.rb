@@ -34,6 +34,7 @@ class ContentImportsController < ApplicationController
   def index
     redirect_to course_content_migrations_url(@context)
   end
+
   def intro
     redirect_to course_content_migrations_url(@context)
   end

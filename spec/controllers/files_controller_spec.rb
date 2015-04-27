@@ -23,9 +23,11 @@ describe FilesController do
   def course_folder
     @folder = @course.folders.create!(:name => "a folder", :workflow_state => "visible")
   end
+
   def io
     fixture_file_upload('scribd_docs/doc.doc', 'application/msword', true)
   end
+
   def course_file
     @file = factory_with_protected_attributes(@course.attachments, :uploaded_data => io)
   end

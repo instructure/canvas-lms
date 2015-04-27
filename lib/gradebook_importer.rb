@@ -25,6 +25,7 @@ class GradebookImporter
       def generate
         instance.next
       end
+
       def instance
         @@inst ||= new
       end

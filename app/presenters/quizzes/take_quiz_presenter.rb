@@ -86,6 +86,7 @@ class Quizzes::TakeQuizPresenter
   def text_only?(q)
     q['question_type'] == "text_only_question"
   end
+
   def answered_icon(q)
     question_answered?(q) ? 'icon-check' : 'icon-question'
   end

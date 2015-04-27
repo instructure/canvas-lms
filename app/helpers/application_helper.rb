@@ -175,7 +175,9 @@ module ApplicationHelper
       :contents => capture(&block)
     )
   end
+
   def js_blocks; @js_blocks ||= []; end
+
   def render_js_blocks
     output = js_blocks.inject('') do |str, e|
       # print file and line number for debugging in development mode.
@@ -195,7 +197,9 @@ module ApplicationHelper
     end
     hidden_dialogs[id] = capture(&block)
   end
+
   def hidden_dialogs; @hidden_dialogs ||= {}; end
+
   def render_hidden_dialogs
     output = hidden_dialogs.keys.sort.inject('') do |str, id|
       str << "<div id='#{id}' style='display: none;''>" << hidden_dialogs[id] << "</div>"

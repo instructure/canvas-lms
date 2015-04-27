@@ -69,6 +69,7 @@ class CSVParser
     end
 
     def num_rows; trimmed_contents.size end
+
     def num_cols; trimmed_contents.first.size end
 
 end

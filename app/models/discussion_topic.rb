@@ -901,6 +901,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def delay_posting=(val); end
+
   def set_assignment=(val); end
 
   def participants(include_observers=false)

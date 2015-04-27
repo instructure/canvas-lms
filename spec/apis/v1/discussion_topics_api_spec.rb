@@ -25,7 +25,9 @@ class DiscussionTopicsTestCourseApi
   include Api
   include Api::V1::DiscussionTopics
   def feeds_topic_format_path(topic_id, code, format); "feeds_topic_format_path(#{topic_id.inspect}, #{code.inspect}, #{format.inspect})"; end
+
   def named_context_url(*args); "named_context_url(#{args.inspect[1..-2]})"; end
+
   def course_assignment_url(*args); "course_assignment_url(#{args.inspect[1..-2]})"; end
 end
 
@@ -104,6 +106,7 @@ describe DiscussionTopicsController, type: :request do
   def avatar_url_for_user(user, *a)
     User.avatar_fallback_url
   end
+
   def blank_fallback
     nil
   end

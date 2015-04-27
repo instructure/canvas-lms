@@ -3,6 +3,7 @@ require 'spec_helper'
 module Canvas::Plugins::TicketingSystem
   class FakePlugin < BasePlugin
     def plugin_id; "fake_plugin"; end
+
     def settings; {setting1: 1, setting2: 2}; end
 
     def export_error(report, conf)

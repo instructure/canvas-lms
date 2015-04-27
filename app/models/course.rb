@@ -1925,6 +1925,7 @@ class Course < ActiveRecord::Base
     logger.debug text
     @merge_results << text
   end
+
   def warn_merge_result(text)
     log_merge_result(text)
   end

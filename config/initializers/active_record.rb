@@ -1197,6 +1197,7 @@ if defined?(ActiveRecord::ConnectionAdapters::SQLiteAdapter)
     def quoted_true
       '1'
     end
+
     def quoted_false
       '0'
     end

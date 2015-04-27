@@ -23,7 +23,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper'
 class TestCourseApi
   include Api::V1::Course
   def feeds_calendar_url(feed_code); "feed_calendar_url(#{feed_code.inspect})"; end
+
   def course_url(course, opts = {}); return "course_url(Course.find(#{course.id}), :host => #{HostUrl.context_host(@course1)})"; end
+
   def api_user_content(syllabus, course); return "api_user_content(#{syllabus}, #{course.id})"; end
 end
 

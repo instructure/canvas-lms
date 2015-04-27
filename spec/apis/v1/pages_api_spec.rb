@@ -23,6 +23,7 @@ describe "Pages API", type: :request do
   def avatar_url_for_user(user, *a)
     User.avatar_fallback_url
   end
+
   def blank_fallback
     nil
   end

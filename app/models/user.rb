@@ -580,6 +580,7 @@ class User < ActiveRecord::Base
   # These methods can be overridden by a plugin if you want to have an approval
   # process or implement additional tracking for new users
   def registration_approval_required?; false; end
+
   def new_registration(form_params = {}); end
   # DEPRECATED, override new_registration instead
   def new_teacher_registration(form_params = {}); new_registration(form_params); end
@@ -1577,10 +1578,12 @@ class User < ActiveRecord::Base
 
   def map_merge(*args)
   end
+
   def log_merge_result(text)
     @merge_results ||= []
     @merge_results << text
   end
+
   def warn_merge_result(text)
     record_merge_result(text)
   end
