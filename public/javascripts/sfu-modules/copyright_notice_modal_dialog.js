@@ -1,6 +1,6 @@
 define([
   'jquery',
-  'old_unsupported_dont_use_react',
+  'react',
   '../jsx/sfu_copyright_compliance_notice/SFUCopyrightComplianceNoticeModalDialog'
 ], function($, React, SFUCopyrightComplianceModalDialog) {
 
