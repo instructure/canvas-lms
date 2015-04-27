@@ -62,36 +62,34 @@ class Feature
 
   # Register one or more features.  Must be done during application initialization.
   # The feature_hash is as follows:
-=begin
-  automatic_essay_grading: {
-    display_name: lambda { I18n.t('features.automatic_essay_grading', 'Automatic Essay Grading') },
-    description: lambda { I18n.t('features.automatic_essay_grading_description, 'Popup text describing the feature goes here') },
-    applies_to: 'Course', # or 'RootAccount' or 'Account' or 'User'
-    state: 'allowed',     # or 'off', 'on', 'hidden', or 'hidden_in_prod'
-                          # - 'hidden' means the feature must be set by a site admin before it will be visible
-                          #   (in that context and below) to other users
-                          # - 'hidden_in_prod' registers 'hidden' in production environments or 'allowed' elsewhere
-    root_opt_in: false,   # if true, 'allowed' features in source or site admin
-                          # will be inherited in "off" state by root accounts
-    enable_at: Date.new(2014, 1, 1),  # estimated release date shown in UI
-    beta: false,          # 'beta' tag shown in UI
-    development: false,   # whether the feature is restricted to development / test / beta instances
-    release_notes_url: 'http://example.com/',
-
-    # optional: you can supply a Proc to attach warning messages to and/or forbid certain transitions
-    # see lib/feature/draft_state.rb for example usage
-    custom_transition_proc: ->(user, context, from_state, transitions) do
-      if from_state == 'off' && context.is_a?(Course) && context.has_submitted_essays?
-        transitions['on']['warning'] = I18n.t('features.automatic_essay_grading.enable_warning',
-          'Enabling this feature after some students have submitted essays may yield inconsistent grades.')
-      end
-    end,
-
-    # optional hook to be called before after a feature flag change
-    # queue a delayed_job to perform any nontrivial processing
-    after_state_change_proc:  ->(context, old_state, new_state) { ... }
-  }
-=end
+  #   automatic_essay_grading: {
+  #     display_name: lambda { I18n.t('features.automatic_essay_grading', 'Automatic Essay Grading') },
+  #     description: lambda { I18n.t('features.automatic_essay_grading_description, 'Popup text describing the feature goes here') },
+  #     applies_to: 'Course', # or 'RootAccount' or 'Account' or 'User'
+  #     state: 'allowed',     # or 'off', 'on', 'hidden', or 'hidden_in_prod'
+  #                           # - 'hidden' means the feature must be set by a site admin before it will be visible
+  #                           #   (in that context and below) to other users
+  #                           # - 'hidden_in_prod' registers 'hidden' in production environments or 'allowed' elsewhere
+  #     root_opt_in: false,   # if true, 'allowed' features in source or site admin
+  #                           # will be inherited in "off" state by root accounts
+  #     enable_at: Date.new(2014, 1, 1),  # estimated release date shown in UI
+  #     beta: false,          # 'beta' tag shown in UI
+  #     development: false,   # whether the feature is restricted to development / test / beta instances
+  #     release_notes_url: 'http://example.com/',
+  #
+  #     # optional: you can supply a Proc to attach warning messages to and/or forbid certain transitions
+  #     # see lib/feature/draft_state.rb for example usage
+  #     custom_transition_proc: ->(user, context, from_state, transitions) do
+  #       if from_state == 'off' && context.is_a?(Course) && context.has_submitted_essays?
+  #         transitions['on']['warning'] = I18n.t('features.automatic_essay_grading.enable_warning',
+  #           'Enabling this feature after some students have submitted essays may yield inconsistent grades.')
+  #       end
+  #     end,
+  #
+  #     # optional hook to be called before after a feature flag change
+  #     # queue a delayed_job to perform any nontrivial processing
+  #     after_state_change_proc:  ->(context, old_state, new_state) { ... }
+  #   }
 
   def self.register(feature_hash)
     @features ||= {}
