@@ -1121,8 +1121,7 @@ describe CoursesController do
         :limit_privileges_to_course_section => true
       expect(response).to be_success
       run_jobs
-      enrollment = @course.reload.teachers.select { |t| t.name == 'Sam' }.
-        first.enrollments.first
+      enrollment = @course.reload.teachers.find { |t| t.name == 'Sam' }.enrollments.first
       expect(enrollment.limit_privileges_to_course_section).to eq true
     end
   end

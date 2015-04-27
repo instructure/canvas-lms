@@ -71,15 +71,15 @@ module Api::V1
       end
 
       it 'has a hash of graders for each day keyed by id' do
-        graders_hash = @days.select{|d| d[:date] == yesterday.to_date.as_json }.first[:graders]
+        graders_hash = @days.find{|d| d[:date] == yesterday.to_date.as_json }[:graders]
         grader = graders_hash.first
         expect(grader[:id]).to eq @grader2.id
         expect(grader[:name]).to eq @grader2.name
       end
 
       it 'puts an assignment list under each grader' do
-        graders = @days.select{|d| d[:date] == yesterday.to_date.as_json }.first[:graders]
-        grader2_assignments = graders.select { |g| g[:id] == @grader2.id }.first[:assignments]
+        graders = @days.find{|d| d[:date] == yesterday.to_date.as_json }[:graders]
+        grader2_assignments = graders.find { |g| g[:id] == @grader2.id }[:assignments]
         ids = grader2_assignments.map { |assignment| assignment['id'] }
         expect(ids).to include(@assignment1.id)
         expect(ids).to include(@assignment2.id)
@@ -122,7 +122,7 @@ module Api::V1
       end
 
       it 'includes assignment data' do
-        assignment_hash = @day_hash.select{|g| g[:id] == @grader1.id}.first[:assignments].first
+        assignment_hash = @day_hash.find{|g| g[:id] == @grader1.id}[:assignments].first
         expect(assignment_hash['id']).to eq @assignment.id
         expect(assignment_hash['name']).to eq @assignment.title
       end

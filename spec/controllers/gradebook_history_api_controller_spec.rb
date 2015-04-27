@@ -46,7 +46,7 @@ describe GradebookHistoryApiController do
   describe 'GET days' do
 
     def graders_hash_for(submission)
-      json_body.select{|d| d['date'] == date_key(submission) }.first['graders']
+      json_body.find{|d| d['date'] == date_key(submission) }['graders']
     end
 
     describe 'default params' do
@@ -63,7 +63,7 @@ describe GradebookHistoryApiController do
       end
 
       it 'includes a list of assignment names for each grader' do
-        grader_hash = graders_hash_for(@submission3).select{|h| h['id'] == @other_grader.id }.first
+        grader_hash = graders_hash_for(@submission3).find{|h| h['id'] == @other_grader.id }
         expect(grader_hash['assignments'].map{|a| a['name'] }.sort).to eq ['some assignment', 'another assignment'].sort
       end
     end
@@ -82,7 +82,7 @@ describe GradebookHistoryApiController do
     end
 
     it 'lists assignment names under the graders' do
-      expect(json_body.select{|g| g['id'] == @grader.id }.first['assignments'].first['name']).to eq @assignment1.title
+      expect(json_body.find{|g| g['id'] == @grader.id }['assignments'].first['name']).to eq @assignment1.title
     end
   end
 
