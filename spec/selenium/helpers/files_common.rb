@@ -14,19 +14,19 @@ def add_file(fixture, context, name)
 end
 
 # This method downloads the file from top toolbar in New Files
-def download_from_toolbar
-  ff('.ef-item-row')[0].click
+def download_from_toolbar(row_selected = 0)
+  ff('.ef-item-row')[row_selected].click
   f('.btn-download').click
 end
 
 # This method downloads the file using the Download option on Cog menu button
-def download_from_cog_icon
-  ff('.al-trigger')[0].click
+def download_from_cog_icon(row_selected = 0)
+  ff('.al-trigger')[row_selected].click
   ff('.al-options .ui-menu-item')[0].click
 end
 
-def edit_name_from_cog_icon(file_name_new)
-  ff('.al-trigger')[0].click
+def edit_name_from_cog_icon(file_name_new, row_selected = 0)
+  ff('.al-trigger')[row_selected].click
   fln("Rename").click
   expect(f(".ef-edit-name-cancel")).to be_displayed
   file_name_textbox_el = f('.input-block-level')
@@ -40,20 +40,20 @@ def download_from_preview
   f('.icon-download').click
 end
 
-def delete_from_cog_icon
-  ff('.al-trigger')[0].click
+def delete_from_cog_icon(row_selected = 0)
+  ff('.al-trigger')[row_selected].click
   fln("Delete").click
   confirm_delete_on_dialog
 end
 
-def delete_from_toolbar
-  ff('.ef-item-row')[0].click
+def delete_from_toolbar(row_selected = 0)
+  ff('.ef-item-row')[row_selected].click
   f('.btn-delete').click
   confirm_delete_on_dialog
 end
 
-def move_using_cog_icon(file_name, offset = 0)
-  ff('.al-trigger')[offset].click
+def move_using_cog_icon(file_name, row_selected = 0)
+  ff('.al-trigger')[row_selected].click
   fln("Move").click
   wait_for_ajaximations
   expect(f(".ReactModal__Header-Title h4").text).to eq "Where would you like to move #{file_name}?"
