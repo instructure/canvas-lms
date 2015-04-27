@@ -403,6 +403,26 @@ describe "speed grader" do
     expect(saved_comment.text).to eq to_comment
   end
 
+  it "should not convert invalid text to 0" do
+    student_submission
+    @association.save!
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajaximations
+
+    f('.toggle_full_rubric').click
+    wait_for_ajaximations
+    rubric = f('#rubric_full')
+
+    #test rubric input
+    rubric.find_element(:css, 'input.criterion_points').send_keys('SMRT')
+    f('#rubric_full .save_rubric_button').click
+    wait_for_ajaximations
+    f('.toggle_full_rubric').click
+    wait_for_ajaximations
+    expect(f('.rubric_container .criterion_points').attribute(:value)).to eq('')
+  end
+
   it "creates a comment on assignment" do
     #pending("failing because it is dependant on an external kaltura system")
 
