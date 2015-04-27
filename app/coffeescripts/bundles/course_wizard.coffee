@@ -1,6 +1,6 @@
 require [
   'jquery'
-  'old_unsupported_dont_use_react'
+  'react'
   'compiled/userSettings'
   'jsx/course_wizard/CourseWizard'
 ], ($, React, userSettings, CourseWizard) ->
@@ -14,8 +14,11 @@ require [
 
   pathname = window.location.pathname
 
+  # Need to render a factory with the newest versions of react
+  courseWizardFactory = React.createFactory(CourseWizard)
+
   $(".wizard_popup_link").click((event) ->
-      React.renderComponent(CourseWizard({
+      React.render(courseWizardFactory({
         overlayClassName:'CourseWizard__modalOverlay',
         showWizard: true
       }), $wizard_box[0])

@@ -177,7 +177,7 @@ class ErrorReport < ActiveRecord::Base
     stuff['path_parameters'] = LoggingFilter.filter_params(request.path_parameters.dup).inspect # params rails picks up from the url
     stuff['query_parameters'] = LoggingFilter.filter_params(request.query_parameters.dup).inspect # params rails picks up from the query string
     stuff['request_parameters'] = LoggingFilter.filter_params(request.request_parameters.dup).inspect # params from forms
-    stuff
+    Marshal.load(Marshal.dump(stuff))
   end
 
   def self.categories

@@ -56,7 +56,10 @@ ENV["RAILS_ENV"] = 'test'
 require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
 require 'rspec/rails'
 
+Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
+
 ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
+
 
 module RSpec::Rails
   module ViewExampleGroup
@@ -821,6 +824,7 @@ RSpec.configure do |config|
       # object_id should make it unique (but obviously things will fail if
       # it tries to load it from the db.)
       pseudonym.stubs(:id).returns(pseudonym.object_id)
+      pseudonym.stubs(:unique_id).returns('unique_id')
     end
 
     session = stub('PseudonymSession', :record => pseudonym, :session_credentials => nil)

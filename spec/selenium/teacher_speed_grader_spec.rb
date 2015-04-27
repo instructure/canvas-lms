@@ -398,6 +398,7 @@ describe "speed grader" do
     f('textarea.criterion_comments').send_keys(to_comment)
     f('#rubric_criterion_comments_dialog .save_button').click
     f('#rubric_full .save_rubric_button').click
+    wait_for_ajaximations
     saved_comment = f('#rubric_summary_container .rubric_table tr.learning_outcome_criterion .rating_comments_dialog_link')
     expect(saved_comment.text).to eq to_comment
   end

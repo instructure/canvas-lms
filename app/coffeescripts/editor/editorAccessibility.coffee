@@ -7,6 +7,7 @@ define [
   # Used to insert accessibility titles into core TinyMCE components
   class EditorAccessiblity
     constructor: (editor) ->
+      @editor = editor
       @id_prepend = editor.id
       @$el = $ "##{editor.editorContainer.id}"
 
@@ -15,6 +16,7 @@ define [
       @_addTitles()
       @_addLabels()
       @_disableNonScreenreaderButtons()
+      @_accessiblizeMenubar()
 
     ### PRIVATE FUNCTIONS ###
     _cacheElements: ->
@@ -41,3 +43,14 @@ define [
 
     _addTitles: ->
       @$iframe.attr 'title', I18n.t('titles.rte_help', 'Rich Text Area. Press ALT+F8 for help')
+
+    # Hide the menubar until ALT+F9 is pressed.
+    _accessiblizeMenubar: ->
+      $menubar = @$el.find '.mce-menubar'
+      $firstMenu = $menubar.find('.mce-menubtn').first()
+      $menubar.hide()
+      @editor.addShortcut 'Alt+F9', '', =>
+        $menubar.show()
+        $firstMenu.focus()
+        # Once it's shown, we don't need to show it again, so replace this handler with one that just focuses.
+        @editor.addShortcut 'Alt+F9', '', -> $firstMenu.focus()

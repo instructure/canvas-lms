@@ -40,29 +40,50 @@
       <tbody>
         <tr>
           <td>
-            <input type="text"
-                   name="start_date"
-                   class="date_field"
-                   value="{{tDateToString start_at "medium"}}"
-                   aria-label="{{#t "date"}}Date{{/t}}"
-                   placeholder="{{#t "date"}}Date{{/t}}" />
+            <div class='date_field_container'>
+              <label class='screenreader-only' id='calendar_event_date_accessible_label'>
+                {{#t}}Event Date{{/t}}
+                {{datepickerScreenreaderPrompt 'date'}}
+              </label>
+              <input type="text"
+                     name="start_date"
+                     class="date_field"
+                     value="{{tDateToString start_at "medium"}}"
+                     placeholder="{{#t "date"}}Date{{/t}}"
+                     aria-labelledby='calendar_event_date_accessible_label'
+                     data-tooltip title="{{accessibleDateFormat 'date'}}"/>
+            </div>
           </td>
           <td>
-            <input type="text"
-                   name="start_time"
-                   class="time_field"
-                   {{#unless all_day}} value="{{tTimeToString start_at "tiny"}}" {{/unless}}
-                   aria-label="{{#t "start_time"}}Start Time{{/t}}"
-                   placeholder="{{#t "start_time"}}Start Time{{/t}}" />
+            <div class='date_field_container'>
+              <label class='screenreader-only' id='calendar_event_start_time_accessible_label'>
+                {{#t}}Event Start Time{{/t}}
+                {{datepickerScreenreaderPrompt 'time'}}
+              </label>
+              <input type="text"
+                     name="start_time"
+                     class="time_field"
+                     {{#unless all_day}} value="{{tTimeToString start_at "tiny"}}" {{/unless}}
+                     placeholder="{{#t "start_time"}}Start Time{{/t}}"
+                     aria-labelledby='calendar_event_start_time_accessible_label'
+                     data-tooltip title="{{accessibleDateFormat 'time'}}"/>
+            </div>
           </td>
           <td><span class="time_separator">-</span></td>
           <td>
-            <input type="text"
-                   name="end_time"
-                   class="time_field"
-                   {{#unless all_day}} value="{{tTimeToString end_at "tiny"}}" {{/unless}}
-                   aria-label="{{#t "end_time"}}End Time{{/t}}"
-                   placeholder="{{#t "end_time"}}End Time{{/t}}" />
+            <div class='date_field_container'>
+              <label class='screenreader-only' id='calendar_event_end_time_accessible_label'>
+                {{#t}}Event End Time{{/t}}
+                {{datepickerScreenreaderPrompt 'time'}}
+              </label>
+              <input type="text"
+                     name="end_time"
+                     class="time_field"
+                     {{#unless all_day}} value="{{tTimeToString end_at "tiny"}}" {{/unless}}
+                     placeholder="{{#t "end_time"}}End Time{{/t}}"
+                     aria-labelledby='calendar_event_end_time_accessible_label'
+                     data-tooltip title="{{accessibleDateFormat 'time'}}"/>
+            </div>
           </td>
         </tr>
       </tbody>

@@ -160,7 +160,7 @@ class SubmissionsController < ApplicationController
                                             @assignment.quiz.id, quiz_params)
             }
           else
-            format.html { render :action => "show_preview" }
+            format.html { render :show_preview }
           end
         elsif params[:download]
           if params[:comment_id]
@@ -283,6 +283,7 @@ class SubmissionsController < ApplicationController
 
     @group = @assignment.group_category.group_for(@current_user) if @assignment.has_group_category?
 
+    return unless valid_text_entry?
     return unless process_api_submission_params if api_request?
 
     lookup_existing_attachments
@@ -345,7 +346,7 @@ class SubmissionsController < ApplicationController
       else
         format.html do
           flash[:error] = t('errors.assignment_submit_fail', "Assignment failed to submit")
-          render :action => "show", :id => @submission.assignment.context.id
+          render :show, id: @submission.assignment.context.id
         end
         format.json { render :json => @submission.errors, :status => :bad_request }
       end
@@ -468,6 +469,17 @@ class SubmissionsController < ApplicationController
     return true
   end
   private :extensions_allowed?
+
+  def valid_text_entry?
+    sub_params = params[:submission]
+    if sub_params[:submission_type] == 'online_text_entry' && sub_params[:body].blank?
+      flash[:error] = t('Text entry submission cannot be empty')
+      redirect_to named_context_url(@context, :context_assignment_url, @assignment)
+      return false
+    end
+    return true
+  end
+  private :valid_text_entry?
 
   def is_google_doc?
     return params[:google_doc] && params[:google_doc][:document_id] && params[:submission][:submission_type] == "google_doc"
@@ -610,7 +622,7 @@ class SubmissionsController < ApplicationController
         else
           @error_message = t('errors_update_failed', "Update Failed")
           flash[:error] = @error_message
-          format.html { render :action => "show", :id => @assignment.context.id }
+          format.html { render :show, id: @assignment.context.id }
           format.json { render :json => {:errors => {:base => @error_message}}, :status => :bad_request }
           format.text { render :json => {:errors => {:base => @error_message}}, :status => :bad_request }
         end

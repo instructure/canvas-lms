@@ -1,5 +1,0 @@
-<% define_content :link do %>
-  <%= polymorphic_url([asset.context, asset]) %>
-<% end %>
-
-<%= t :body, "You created this Announcement: %{title}, %{course}", :title => %{<b><a href="#{ content :link }">#{h asset.title}</a></b>}.html_safe, :course => asset.context.name %>

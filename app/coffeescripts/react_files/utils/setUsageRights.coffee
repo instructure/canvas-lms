@@ -20,8 +20,14 @@ define [
   #     - data is the data returned from the api
   ####
   setUsageRights = (items, usageRights, callback) ->
+    if filesEnv.contextType == 'users' && items.length > 0 && parentFolder = items[0].collection?.parentFolder
+      contextType = parentFolder.get('context_type').toLowerCase() + 's'
+      contextId = parentFolder.get('context_id')
+    else
+      contextType = filesEnv.contextType
+      contextId = filesEnv.contextId
 
-    apiUrl = "/api/v1/#{filesEnv.contextType}/#{filesEnv.contextId}/usage_rights"
+    apiUrl = "/api/v1/#{contextType}/#{contextId}/usage_rights"
     folder_ids = []
     file_ids = []
 

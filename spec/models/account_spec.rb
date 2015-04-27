@@ -188,23 +188,23 @@ describe Account do
       @a = Account.new
     end
     it "should be able to specify a list of enabled services" do
-      @a.allowed_services = 'facebook,twitter'
-      expect(@a.service_enabled?(:facebook)).to be_truthy
+      @a.allowed_services = 'linked_in,twitter'
+      expect(@a.service_enabled?(:linked_in)).to be_truthy
       expect(@a.service_enabled?(:twitter)).to be_truthy
       expect(@a.service_enabled?(:diigo)).to be_falsey
       expect(@a.service_enabled?(:avatars)).to be_falsey
     end
 
     it "should not enable services off by default" do
-      expect(@a.service_enabled?(:facebook)).to be_truthy
+      expect(@a.service_enabled?(:linked_in)).to be_truthy
       expect(@a.service_enabled?(:avatars)).to be_falsey
     end
 
     it "should add and remove services from the defaults" do
-      @a.allowed_services = '+avatars,-facebook'
+      @a.allowed_services = '+avatars,-linked_in'
       expect(@a.service_enabled?(:avatars)).to be_truthy
       expect(@a.service_enabled?(:twitter)).to be_truthy
-      expect(@a.service_enabled?(:facebook)).to be_falsey
+      expect(@a.service_enabled?(:linked_in)).to be_falsey
     end
 
     it "should allow settings services" do
@@ -235,15 +235,15 @@ describe Account do
     end
 
     it "should be able to set service availibity for previously hard-coded values" do
-      @a.allowed_services = 'avatars,facebook'
+      @a.allowed_services = 'avatars,linked_in'
 
       @a.enable_service(:twitter)
       expect(@a.service_enabled?(:twitter)).to be_truthy
       expect(@a.allowed_services).to match(/twitter/)
       expect(@a.allowed_services).not_to match(/[+-]/)
 
-      @a.disable_service(:facebook)
-      expect(@a.allowed_services).not_to match(/facebook/)
+      @a.disable_service(:linked_in)
+      expect(@a.allowed_services).not_to match(/linked_in/)
       expect(@a.allowed_services).not_to match(/[+-]/)
 
       @a.disable_service(:avatars)

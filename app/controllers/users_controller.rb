@@ -163,7 +163,9 @@ class UsersController < ApplicationController
       redirect_uri = oauth_success_url(:service => 'google_drive')
       session[:oauth_gdrive_nonce] = SecureRandom.hex
       state = Canvas::Security.create_jwt(redirect_uri: redirect_uri, return_to_url: return_to_url, nonce: session[:oauth_gdrive_nonce])
-      redirect_to GoogleDrive::Client.auth_uri(google_drive_client, state)
+      doc_service = @current_user.user_services.where(service: "google_docs").first
+      user_name = doc_service.service_user_name if doc_service
+      redirect_to GoogleDrive::Client.auth_uri(google_drive_client, state, user_name)
     elsif params[:service] == "twitter"
       success_url = oauth_success_url(:service => 'twitter')
       request_token = Twitter::Connection.request_token(success_url)
@@ -193,16 +195,6 @@ class UsersController < ApplicationController
       )
 
       redirect_to request_token.authorize_url
-    elsif params[:service] == "facebook"
-      oauth_request = OauthRequest.create(
-        :service => 'facebook',
-        :secret => CanvasSlug.generate("fb", 10),
-        :return_url => return_to_url,
-        :user => @current_user,
-        :original_host_with_port => request.host_with_port
-      )
-      state = Canvas::Security.encrypt_password(oauth_request.global_id.to_s, 'facebook_oauth_request').join('.')
-      redirect_to Facebook::Connection.authorize_url(state)
     end
   end
 
@@ -210,11 +202,6 @@ class UsersController < ApplicationController
     oauth_request = nil
     if params[:oauth_token]
       oauth_request = OauthRequest.where(token: params[:oauth_token], service: params[:service]).first
-    elsif params[:state] && params[:service] == 'facebook'
-      key,salt = params[:state].split('.', 2)
-      request_id = Canvas::Security.decrypt_password(key, salt, 'facebook_oauth_request')
-
-      oauth_request = OauthRequest.where(id: request_id).first
     elsif params[:code] &&  params[:state] && params[:service] == 'google_drive'
 
       begin
@@ -265,23 +252,7 @@ class UsersController < ApplicationController
       url = url_for request.parameters.merge(:host => oauth_request.original_host_with_port, :only_path => false)
       redirect_to url
     else
-      if params[:service] == "facebook"
-        service = UserService.where(user_id: @current_user, service: 'facebook').first_or_initialize
-        service.token = params[:access_token]
-        data = Facebook::Connection.get_service_user_info(service.token)
-
-        if data
-          service.service_user_id = data['id']
-          service.service_user_name = data['name']
-          service.service_user_url = data['link']
-          service.save
-          service
-
-          flash[:notice] = t('facebook_added', "Facebook account successfully added!")
-        else
-          flash[:error] = t('facebook_fail', "Facebook authorization failed.")
-        end
-      elsif params[:service] == "google_docs"
+      if params[:service] == "google_docs"
         begin
           access_token = GoogleDocs::Connection.get_access_token(oauth_request.token, oauth_request.secret, params[:oauth_verifier])
           google_docs = GoogleDocs::Connection.new(oauth_request.token, oauth_request.secret)
@@ -1111,6 +1082,14 @@ class UsersController < ApplicationController
   #   Send user notification of account creation if true.
   #   Automatically set to true during self-registration.
   #
+  # @argument pseudonym[force_self_registration] [Boolean]
+  #   Send user a self-registration style email if true.
+  #   Setting it means the users will get a notification asking them
+  #   to "complete the registration process" by clicking it, setting
+  #   a password, and letting them in.  Will only be executed on
+  #   if the user does not need admin approval.
+  #   Defaults to false unless explicitly provided.
+  #
   # @argument communication_channel[type] [String]
   #   The communication channel type, e.g. 'email' or 'sms'.
   #
@@ -1151,8 +1130,7 @@ class UsersController < ApplicationController
     require_password = self_enrollment && allow_non_email_pseudonyms
     allow_password = require_password || manage_user_logins
 
-    notify = value_to_boolean(params[:pseudonym].delete(:send_confirmation))
-    notify = :self_registration unless manage_user_logins
+    notify_policy = Users::CreationNotifyPolicy.new(manage_user_logins, params[:pseudonym])
 
     includes = %w{locale}
 
@@ -1202,7 +1180,7 @@ class UsersController < ApplicationController
         # no email confirmation required (self_enrollment_code and password
         # validations will ensure everything is legit)
         'registered'
-      elsif notify == :self_registration && @user.registration_approval_required?
+      elsif notify_policy.is_self_registration? && @user.registration_approval_required?
         'pending_approval'
       else
         'pre_registered'
@@ -1267,19 +1245,11 @@ class UsersController < ApplicationController
         @user.user_observees << @user.user_observees.create!{ |uo| uo.user_id = @observee.id }
       end
 
-      message_sent = false
-      if notify == :self_registration
-        unless @user.pending_approval? || @user.registered?
-          message_sent = true
-          @pseudonym.send_confirmation!
-        end
-        @user.new_registration((params[:user] || {}).merge({:remote_ip  => request.remote_ip, :cookies => cookies}))
-      elsif notify && !@user.registered?
-        message_sent = true
-        @pseudonym.send_registration_notification!
-      else
-        @cc.send_merge_notification! if @cc.has_merge_candidates?
+      if notify_policy.is_self_registration?
+        registration_params = params.fetch(:user, {}).merge(remote_ip: request.remote_ip, cookies: cookies)
+        @user.new_registration(registration_params)
       end
+      message_sent = notify_policy.dispatch!(@user, @pseudonym, @cc)
 
       data = { :user => @user, :pseudonym => @pseudonym, :channel => @cc, :message_sent => message_sent, :course => @user.self_enrollment_course }
       if api_request?
@@ -1455,7 +1425,7 @@ class UsersController < ApplicationController
             render :json => user_json(@user, @current_user, session, %w{locale avatar_url},
               @current_user.pseudonym.account) }
         else
-          format.html { render :action => "edit" }
+          format.html { render :edit }
           format.json { render :json => @user.errors, :status => :bad_request }
         end
       end
@@ -1535,7 +1505,7 @@ class UsersController < ApplicationController
         end
       end
 
-      render action: 'admin_merge'
+      render :admin_merge
     end
   end
 

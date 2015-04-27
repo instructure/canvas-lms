@@ -863,9 +863,13 @@ define([
       }
       return false;
     });
-    $("#right-side, #topic_list").delegate('.disable_item_link', 'click', function(event) {
+
+    $('#right-side').on('click', '.disable-todo-item-link', function (event) {
       event.preventDefault();
-      var $item = $(this).parents("li, div.topic_message");
+      var $item = $(this).parents("li, div.topic_message").last();
+      var $prevItem = $(this).closest('.to-do-list > li').prev()
+      var toFocus = ($prevItem.find('.al-trigger').length && $prevItem.find('.al-trigger')) ||
+                    $('.event-list-view-calendar')
       var url = $(this).data('api-href');
       function remove(delete_url) {
         $item.confirmDelete({
@@ -874,19 +878,15 @@ define([
           success: function() {
             $(this).slideUp(function() {
               $(this).remove();
+              toFocus.focus();
             });
           }
         });
       }
-      if($(this).hasClass('grading')) {
-        options = {}
-        options['<span class="ui-icon ui-icon-trash">&nbsp;</span> ' + htmlEscape(I18n.t('ignore_forever', 'Ignore Forever'))] = function() { remove(url + "?permanent=1"); };
-        options['<span class="ui-icon ui-icon-star">&nbsp;</span> ' + htmlEscape(I18n.t('ignore_until_new_submission', 'Ignore Until New Submission'))] = function() { remove(url); };
-        $(this).dropdownList({ options: options });
-      } else {
-        remove(url + "?permanent=1");
-      }
+
+      remove(url);
     });
+
 
     // in 2 seconds (to give time for everything else to load), find all the external links and add give them
     // the external link look and behavior (force them to open in a new tab)

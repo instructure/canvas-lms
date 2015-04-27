@@ -94,7 +94,6 @@ class WikiPagesController < ApplicationController
 
     if authorized_action(@page, @current_user, :read)
       add_crumb(@page.title)
-      @page.increment_view_count(@current_user, @context)
       log_asset_access(@page, 'wiki', @wiki)
 
       js_env :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu)

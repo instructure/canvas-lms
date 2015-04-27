@@ -1,8 +1,0 @@
-<% define_content :link do %>
-  <%= polymorphic_url([asset.group.context, :groups]) %>
-<% end %>
-<% if asset.group.context.class.to_s == 'Account' %>
-<%= mt('account_group', "Your request to join the group **[%{group_name}](%{group_url})** for the account %{account_name} has been rejected.", :group_name => asset.group.name, :group_url => content(:link), :account_name => asset.group.context.name) %>
-<% elsif asset.group.context.class.to_s == 'Course' %>
-<%= mt('course_group', "Your request to join the group **[%{group_name}](%{group_url})** for the course %{course_name} has been rejected.", :group_name => asset.group.name, :group_url => content(:link), :course_name => asset.group.context.name) %>
-<% end %>

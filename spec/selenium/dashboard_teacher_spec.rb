@@ -36,6 +36,114 @@ describe "dashboard" do
       end
     end
 
+    it "should be able to ignore an assignment to grade permanently" do
+      assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
+      student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
+      student2 = user_with_pseudonym(:active_user => true, :username => 'student2@example.com', :password => 'qwerty')
+      @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
+      @course.enroll_user(student2, "StudentEnrollment", :enrollment_state => 'active')
+      assignment.reload
+      assignment.submit_homework(student, {:submission_type => 'online_text_entry', :body => 'ABC'})
+      assignment.reload
+      enable_cache do
+        get "/"
+
+        f('.to-do-list .disable_item_link').click
+        wait_for_ajaximations
+        f('#ignore_forever').click
+        wait_for_ajaximations
+        expect(f('.to-do-list > li')).to be_nil
+
+        get "/"
+
+        expect(f('.to-do-list')).to be_nil
+      end
+
+      assignment.reload
+      assignment.submit_homework(student2, {:submission_type => 'online_text_entry', :body => 'ABC'})
+      assignment.reload
+      enable_cache do
+        get "/"
+
+        expect(f('.to-do-list')).to be_nil
+
+      end
+
+    end
+
+    it "should be able to ignore an assignment until the next submission" do
+      assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
+      student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
+      student2 = user_with_pseudonym(:active_user => true, :username => 'student2@example.com', :password => 'qwerty')
+      @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
+      @course.enroll_user(student2, "StudentEnrollment", :enrollment_state => 'active')
+      assignment.reload
+      assignment.submit_homework(student, {:submission_type => 'online_text_entry', :body => 'ABC'})
+      assignment.reload
+      enable_cache do
+        get "/"
+
+        f('.to-do-list .disable_item_link').click
+        wait_for_ajaximations
+        f('#ignore_until_submission').click
+        wait_for_ajaximations
+        expect(f('.to-do-list > li')).to be_nil
+
+        get "/"
+
+        expect(f('.to-do-list')).to be_nil
+      end
+
+      assignment.reload
+      assignment.submit_homework(student2, {:submission_type => 'online_text_entry', :body => 'ABC'})
+      assignment.reload
+      enable_cache do
+        get "/"
+
+        expect(f('.to-do-list > li')).to include_text('Grade ' + assignment.title)
+
+      end
+
+    end
+
+    describe "Todo Ignore Options Focus Management" do
+      before :each do
+        assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
+        @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
+        @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
+        assignment.submit_homework(@student, {:submission_type => 'online_text_entry', :body => 'ABC'})
+      end
+
+      it "should focus on the previous ignore link after ignoring a todo item" do
+        assignment2 = assignment_model({:submission_types => 'online_text_entry', :course => @course})
+        assignment2.submit_homework(@student, {:submission_type => 'online_text_entry', :body => 'Number2'})
+        enable_cache do
+          get "/"
+
+          all_todo_links = ff('.to-do-list .disable_item_link')
+          all_todo_links.last.click
+          wait_for_ajaximations
+          ff('#ignore_forever').last.click
+          wait_for_ajaximations
+
+          check_element_has_focus(all_todo_links.first)
+        end
+      end
+
+      it "should focus on the 'View Calendar' link if there are no other todo items" do
+        enable_cache do
+          get "/"
+
+          f('.to-do-list .disable_item_link').click
+          wait_for_ajaximations
+          f('#ignore_forever').click
+          wait_for_ajaximations
+
+          check_element_has_focus(f('.event-list-view-calendar'))
+        end
+      end
+    end
+
     it "should not display assignment to grade in to do list for a designer" do
       course_with_designer_logged_in(:active_all => true)
       assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})

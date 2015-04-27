@@ -29,10 +29,6 @@ describe 'alert' do
     generate_message(:alert, :email, @alert, :asset_context => @course.enrollments.first)
   end
 
-  it "should render facebook" do
-    generate_message(:alert, :facebook, @alert, :asset_context => @course.enrollments.first)
-  end
-
   it "should render sms" do
     generate_message(:alert, :sms, @alert, :asset_context => @course.enrollments.first)
   end

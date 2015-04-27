@@ -74,5 +74,6 @@ define [
         name: { description: "Name", required: true, type: "text", value: "Acclaim" }
         shared_secret: { description: "Shared Secret", required: true, type: "text", value: "" }
       }
+      invalidFields: ["consumer_key", "shared_secret"]
       isValid: false
       modalIsOpen: false

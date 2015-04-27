@@ -91,6 +91,13 @@ describe "people" do
       expect(fj('.collectionViewItems>li:first').text).to match "Everyone"
     end
 
+    it "should focus on the + Group Set button after the tabs" do
+      driver.execute_script("$('.collectionViewItems > li:last a').focus()")
+      active = driver.execute_script("return document.activeElement")
+      active.send_keys(:tab)
+      check_element_has_focus(fj('.group-categories-actions .btn-primary'))
+    end
+
     it "should validate the main page" do
       users = ff('.roster_user_name')
       expect(users[1].text).to match @student_1.name

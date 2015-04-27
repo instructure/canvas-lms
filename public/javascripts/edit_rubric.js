@@ -474,8 +474,8 @@ define([
       if(editing && !isLearningOutcome) {
         $rubric_long_description_dialog
           .fillFormData(data)
-          .find('.editing').show()
-          .find(".displaying").hide();
+          .find('.editing').show().end()
+          .find(".displaying").hide().end();
       } else {
         if(!isLearningOutcome) {
           // We want to prevent XSS in this dialog but users expect to have line
@@ -501,8 +501,14 @@ define([
         .data('current_criterion', $criterion)
         .dialog({
           title: I18n.t('titles.criterion_long_description', "Criterion Long Description"),
-          width: 400
-        }).fixDialogButtons().find("textarea:visible:first").focus().select();
+          width: 400,
+          buttons: []
+        });
+
+      if(editing && !isLearningOutcome) {
+        $rubric_long_description_dialog.fixDialogButtons();
+        $rubric_long_description_dialog.find("textarea:visible:first").focus().select();
+      }
     })
     .delegate(".find_rubric_link", 'click', function(event) {
       event.preventDefault();
@@ -745,10 +751,16 @@ define([
               $("#edit_rubric_form").submit();
             };
             $confirmDialog.dialog({
-              buttons: {
-                "Change" : closeDialog,
-                "Leave different" : function(){ closeDialog(true); }
-              },
+              buttons: [
+                {
+                  text: I18n.t('change', 'Change'),
+                  click: closeDialog
+                },
+                {
+                  text: I18n.t('leave_different', "Leave different"),
+                  click: function() { closeDialog(true); }
+                }
+              ],
               width: 320,
               resizable: false,
               close: $confirmDialog.remove

@@ -83,6 +83,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     tag = ContentTag.last
     module_item = f("#context_module_item_#{tag.id}")
     expect(module_item).to include_text(page_name_text)
+    tag
   end
 
   def course_module

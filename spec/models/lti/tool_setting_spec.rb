@@ -49,6 +49,21 @@ module Lti
       expect(subject.errors.first).to eq [:context, "can't be blank"]
     end
 
+    describe '#custom_settings' do
+      before :each do
+        ToolSetting.create(tool_proxy: tool_proxy, context: account, resource_link_id: 'abc', custom: {link: :setting, a: 1, b: 2, c: 3})
+        ToolSetting.create(tool_proxy: tool_proxy, context: account, custom: {binding: :setting, a: 1, b: 2, d: 4})
+        ToolSetting.create(tool_proxy: tool_proxy, custom: {proxy: :setting, a: 1, c: 5, d: 4})
+      end
+
+        it 'creates the json' do
+          expect(ToolSetting.custom_settings(tool_proxy.id, account, 'abc')).to eq({link: :setting, a: 1, b: 2, c: 3, :binding=>:setting, :d=>4, :proxy=>:setting})
+        end
+
+
+
+    end
+
 
   end
 end

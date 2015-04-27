@@ -211,7 +211,7 @@ CanvasRails::Application.routes.draw do
     get 'grading_rubrics' => 'gradebooks#grading_rubrics'
     get 'grades/:id' => 'gradebooks#grade_summary', as: :student_grades
     concerns :announcements
-    get 'calendar' => 'calendars#show', as: :old_calendar
+    get 'calendar' => 'calendars#show2', as: :old_calendar
     get :locks
     concerns :discussions
     resources :assignments do
@@ -462,7 +462,7 @@ CanvasRails::Application.routes.draw do
     concerns :media
 
     resources :collaborations
-    get 'calendar' => 'calendars#show', as: :old_calendar
+    get 'calendar' => 'calendars#show2', as: :old_calendar
   end
 
   resources :accounts do
@@ -583,7 +583,6 @@ CanvasRails::Application.routes.draw do
   get 'login' => 'pseudonym_sessions#new'
   post 'login' => 'pseudonym_sessions#create'
   delete 'logout' => 'pseudonym_sessions#destroy'
-  post 'logout' => 'pseudonym_sessions#saml_logout'
   get 'logout' => 'pseudonym_sessions#logout_confirm'
   get 'login/cas' => 'pseudonym_sessions#new', as: :cas_login
   post 'login/cas' => 'pseudonym_sessions#cas_logout', as: :cas_logout
@@ -685,10 +684,9 @@ CanvasRails::Application.routes.draw do
 
   resources :plugins, only: [:index, :show, :update]
 
-  get 'calendar' => 'calendars#show'
+  get 'calendar' => 'calendars#show2'
   get 'calendar2' => 'calendars#show2'
   get 'course_sections/:course_section_id/calendar_events/:id' => 'calendar_events#show', as: :course_section_calendar_event
-  post 'switch_calendar/:preferred_calendar' => 'calendars#switch_calendar', as: :switch_calendar
   get 'files' => 'files#index'
   get "files/folder#{full_path_glob}", controller: 'files', action: 'react_files', format: false
   get "files/search", controller: 'files', action: 'react_files', format: false
@@ -711,14 +709,9 @@ CanvasRails::Application.routes.draw do
 
   get 'browserconfig.xml', to: 'info#browserconfig', defaults: { format: 'xml' }
 
-  get 'facebook' => 'facebook#index'
-  post 'facebook/message/:id' => 'facebook#hide_message', as: :facebook_hide_message
-  get 'facebook/settings' => 'facebook#settings'
-  post 'facebook/notification_preferences' => 'facebook#notification_preferences'
-
   post 'object_snippet' => 'context#object_snippet'
   post 'saml_consume' => 'pseudonym_sessions#saml_consume'
-  match 'saml_logout' => 'pseudonym_sessions#saml_logout', via: [:get, :post, :delete]
+  get 'saml_logout' => 'pseudonym_sessions#saml_logout'
   get 'saml_meta_data' => 'accounts#saml_meta_data'
 
   # Routes for course exports
@@ -1255,6 +1248,7 @@ CanvasRails::Application.routes.draw do
       get 'files/:id/public_url', action: :public_url
       %w(course group user).each do |context|
         get "#{context}s/:#{context}_id/files/quota", action: :api_quota
+        get "#{context}s/:#{context}_id/files/:id", action: :api_show, as: "#{context}_attachment"
       end
     end
 
@@ -1375,6 +1369,7 @@ CanvasRails::Application.routes.draw do
       put 'courses/:course_id/quizzes/:quiz_id/submissions/:id', action: :update, as: 'course_quiz_submission_update'
       post 'courses/:course_id/quizzes/:quiz_id/submissions/:id/complete', action: :complete, as: 'course_quiz_submission_complete'
     end
+
     scope(:controller => 'quizzes/outstanding_quiz_submissions') do
       get 'courses/:course_id/quizzes/:quiz_id/outstanding_quiz_submissions', :action => :index, :path_name => 'outstanding_quiz_submission_index'
       post 'courses/:course_id/quizzes/:quiz_id/outstanding_quiz_submissions', :action => :grade, :path_name => 'outstanding_quiz_submission_grade'

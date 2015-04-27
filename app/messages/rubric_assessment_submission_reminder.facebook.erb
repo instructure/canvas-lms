@@ -1,5 +1,0 @@
-<% define_content :link do %>
-  <%= polymorphic_url([asset.submission.assignment.context, asset.submission.assignment, :submission], id: asset.submission.user_id) %>
-<% end %>
-
-<%= t :body, "You've been reminded to assess: *%{title}* for %{context}.", :title => asset.rubric_association.title, :context => asset.rubric_association.context.name, :wrapper => "<b><a href=\"#{content :link}\">\\1</a></b>" %>

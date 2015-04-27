@@ -111,7 +111,9 @@ define [
         .attr('href', '#')
         .addClass('btn edit-html-done edit_html_done')
         .attr('title', I18n.t('done.title', 'Click to finish editing the rich text area'))
-        .click preventDefault => @display()
+        .click preventDefault =>
+          @display()
+          @editButton.focus()
 
     ##
     # create the switch views links to go between rich text and a textarea

@@ -65,7 +65,7 @@ describe "conversations new" do
       conversation_elements[0].click
       wait_for_ajaximations
       fj('#reply-btn').click
-      expect(fj('.compose_form .ac-input-box.disabled')).not_to be_nil
+      expect(fj('#recipient-row')).to have_attribute(:style, 'display: none;')
     end
   end
 end

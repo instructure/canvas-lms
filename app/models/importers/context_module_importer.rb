@@ -174,14 +174,18 @@ module Importers
       elsif hash[:linked_resource_type] =~ /url/i
         # external url
         if url = hash[:url]
-          url = migration.process_domain_substitutions(url) if migration
+          if (CanvasHttp.validate_url(hash[:url]) rescue nil)
+            url = migration.process_domain_substitutions(url) if migration
 
-          item = context_module.add_item({
-            :title => hash[:title] || hash[:linked_resource_title] || hash['description'],
-            :type => 'external_url',
-            :indent => hash[:indent].to_i,
-            :url => url
-          }, existing_item, :position => context_module.migration_position)
+            item = context_module.add_item({
+              :title => hash[:title] || hash[:linked_resource_title] || hash['description'],
+              :type => 'external_url',
+              :indent => hash[:indent].to_i,
+              :url => url
+            }, existing_item, :position => context_module.migration_position)
+          else
+            migration.add_import_warning(t(:migration_module_item_type, "Module Item"), hash[:title], "#{hash[:url]} is not a valid URL") if migration
+          end
         end
       elsif resource_class == ContextExternalTool
         # external tool

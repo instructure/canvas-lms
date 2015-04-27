@@ -1,9 +1,0 @@
-<% define_content :link do %>
-  <%= polymorphic_url([asset.assignment.context, asset.assignment]) %>
-<% end %>
-
-<%= t :body, "Your assignment, *%{title}*, has been graded.", :title => asset.assignment.title, :wrapper => "<b><a href=\"#{content :link}\">\\1</a></b>" %>
-
-<%= t :graded_date, "graded: %{date}", :date => (datetime_string(force_zone(asset.graded_at)) rescue t(:no_date_set, "No Date Set")) %>
-<% if asset.score && user.try(:send_scores_in_emails?) %><%= t :score, "score:  %{score} out of %{total}", :score => asset.score, :total => (asset.assignment.points_possible || t(:not_applicable, "N/A")) %><% end %>
-<%= t(:score_pending_review, "score pending review by the teacher") if asset.pending_review? %>

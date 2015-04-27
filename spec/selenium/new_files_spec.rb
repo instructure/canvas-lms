@@ -135,15 +135,6 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
    end
 
    context "Usage Rights Dialog", :priority => '2' do
-    before :each do
-      course_with_teacher_logged_in
-      Account.default.enable_feature!(:better_file_browsing)
-      Account.default.enable_feature!(:usage_rights_required)
-      add_file(fixture_file_upload('files/a_file.txt', 'text/plan'),
-               @course, "a_file.txt")
-      get "/courses/#{@course.id}/files"
-    end
-
     def set_usage_rights_in_modal(rights = 'creative_commons')
       set_value f('.UsageRightsSelectBox__select'), rights
       if rights == 'creative_commons'
@@ -162,44 +153,70 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
       expect(f('.ReactModal__Content')).to eq(nil)
     end
 
-    it "should set usage rights on a file via the modal by clicking the indicator" do
-      f('.UsageRightsIndicator__openModal').click
-      wait_for_ajaximations
-      set_usage_rights_in_modal
-      react_modal_hidden
-      # a11y: focus should go back to the element that was clicked.
-      check_element_has_focus(f('.UsageRightsIndicator__openModal'))
-      verify_usage_rights_ui_updates
+    before :each do
+      course_with_teacher_logged_in
+      Account.default.enable_feature!(:better_file_browsing)
+      Account.default.enable_feature!(:usage_rights_required)
+      add_file(fixture_file_upload('files/a_file.txt', 'text/plan'),
+               @course, "a_file.txt")
     end
 
-    it "should set usage rights on a file via the cog menu" do
-      f('.ef-links-col .al-trigger').click
-      f('.ItemCog__OpenUsageRights a').click
-      wait_for_ajaximations
-      set_usage_rights_in_modal
-      react_modal_hidden
-      # a11y: focus should go back to the element that was clicked.
-      check_element_has_focus(f('.ef-links-col .al-trigger'))
-      verify_usage_rights_ui_updates
+    context "course files" do
+      before :each do
+        get "/courses/#{@course.id}/files"
+      end
+
+      it "should set usage rights on a file via the modal by clicking the indicator" do
+        f('.UsageRightsIndicator__openModal').click
+        wait_for_ajaximations
+        set_usage_rights_in_modal
+        react_modal_hidden
+        # a11y: focus should go back to the element that was clicked.
+        check_element_has_focus(f('.UsageRightsIndicator__openModal'))
+        verify_usage_rights_ui_updates
+      end
+
+      it "should set usage rights on a file via the cog menu" do
+        f('.ef-links-col .al-trigger').click
+        f('.ItemCog__OpenUsageRights a').click
+        wait_for_ajaximations
+        set_usage_rights_in_modal
+        react_modal_hidden
+        # a11y: focus should go back to the element that was clicked.
+        check_element_has_focus(f('.ef-links-col .al-trigger'))
+        verify_usage_rights_ui_updates
+      end
+
+      it "should set usage rights on a file via the toolbar" do
+        f('.ef-item-row').click
+        f('.Toolbar__ManageUsageRights').click
+        wait_for_ajaximations
+        set_usage_rights_in_modal
+        react_modal_hidden
+        # a11y: focus should go back to the element that was clicked.
+        check_element_has_focus(f('.Toolbar__ManageUsageRights'))
+        verify_usage_rights_ui_updates
+      end
+
+      it "should not show the creative commons selection if creative commons isn't selected" do
+        f('.UsageRightsIndicator__openModal').click
+        wait_for_ajaximations
+        set_value f('.UsageRightsSelectBox__select'), 'fair_use'
+        expect(f('.UsageRightsSelectBox__creativeCommons')).to eq(nil)
+      end
     end
 
-    it "should set usage rights on a file via the toolbar" do
-      f('.ef-item-row').click
-      f('.Toolbar__ManageUsageRights').click
-      wait_for_ajaximations
-      set_usage_rights_in_modal
-      react_modal_hidden
-      # a11y: focus should go back to the element that was clicked.
-      check_element_has_focus(f('.Toolbar__ManageUsageRights'))
-      verify_usage_rights_ui_updates
+    context "user files" do
+      it "should update course files from user files page" do
+        get "/files/folder/courses_#{@course.id}/"
+        f('.UsageRightsIndicator__openModal').click
+        wait_for_ajaximations
+        set_usage_rights_in_modal
+        react_modal_hidden
+        # a11y: focus should go back to the element that was clicked.
+        check_element_has_focus(f('.UsageRightsIndicator__openModal'))
+        verify_usage_rights_ui_updates
+      end
     end
-
-    it "should not show the creative commons selection if creative commons isn't selected" do
-      f('.UsageRightsIndicator__openModal').click
-      wait_for_ajaximations
-      set_value f('.UsageRightsSelectBox__select'), 'fair_use'
-      expect(f('.UsageRightsSelectBox__creativeCommons')).to eq(nil)
-    end
-
   end
 end

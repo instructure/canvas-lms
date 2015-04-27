@@ -38,6 +38,7 @@ define([
   'tinymce.editor_box_list',
   'tinymce.config',
   'tinymce.commands',
+  'tinymce.editor_box_utils',
   //'compiled/tinymce', // required, but the bundles that ACTUALLY use
                         // tiny can require it themselves or else we have
                         // build problems
@@ -48,7 +49,7 @@ define([
   'vendor/jquery.ba-tinypubsub'
 ], function(I18nObj, $,
             EditorAccessibility, EditorBoxList, EditorConfig, EditorCommands,
-            INST) {
+            Utils, INST) {
 
   var enableBookmarking = !!INST.browser.ie;
   $(document).ready(function() {
@@ -476,12 +477,7 @@ define([
       options = {url: options};
     }
     var title = options.title;
-    var url = options.url || "";
-    if(url.match(/@/) && !url.match(/\//) && !url.match(/^mailto:/)) {
-      url = "mailto:" + url;
-    } else if(!url.match(/^\w+:\/\//) && !url.match(/^mailto:/) && !url.match(/^\//)) {
-      url = "http://" + url;
-    }
+    var url = Utils.cleanUrl(options.url || "");
     var classes = options.classes || "";
     var defaultText = options.text || options.title || "Link";
     var target = options.target || null;
@@ -489,9 +485,6 @@ define([
     if(url.indexOf("@") != -1) {
       options.file = false;
       options.image = false;
-      if(url.indexOf("mailto:") != 0) {
-        url = "mailto:" + url;
-      }
     } else if (url.indexOf("/") == -1) {
       title = url;
       url = url.replace(/\s/g, "");

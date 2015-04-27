@@ -76,6 +76,9 @@
     }
   }
   &.react_grading_standard {
+    .alert-message:focus {
+      outline: none;
+    }
     .grading_standard_title {
       width: 175px;
     }

@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 define([
-  'old_unsupported_dont_use_react',
+  'react',
   'i18n!course_wizard'
 ], function(React, I18n) {
 
@@ -24,7 +24,7 @@ define([
 
       handleClick: function (event) {
         event.preventDefault();
-        this.props.onClick(this.props.key)
+        this.props.onClick(this.props.stepKey)
       },
 
       setClassName: function (props) {

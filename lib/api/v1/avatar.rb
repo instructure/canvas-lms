@@ -22,9 +22,6 @@ module Api::V1::Avatar
 
   def avatars_json_for_user(user, includes={})
     avatars = []
-    if feature_enabled?(:facebook) && facebook = user.facebook
-      # TODO: add facebook picture if enabled
-    end
     avatars << avatar_json(user, user.gravatar_url(50, "/images/dotted_pic.png", request), {
       :type => 'gravatar',
       :alt => 'gravatar pic'

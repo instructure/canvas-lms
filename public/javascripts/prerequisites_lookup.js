@@ -20,19 +20,26 @@ define([
   'i18n!prerequisites_lookup',
   'jquery',
   'str/htmlEscape',
+  'vendor/spin',
   'context_modules',
   'jquery.ajaxJSON',
   'jquery.instructure_misc_helpers'
-], function(I18n, $, htmlEscape) {
+], function(I18n, $, htmlEscape, Spinner) {
 
   $(document).ready(function() {
     var $link = $("#module_prerequisites_lookup_link");
     var url = $link.attr('href');
+
+    var spinner = new Spinner({radius: 5});
+    spinner.spin();
+    $(spinner.el).css({opacity: 0.5, top: '25px', left: '200px'}).appendTo('.spinner');
+
     $.ajaxJSON(url, 'GET', {}, function(data) {
       if(data.locked === false) {
         window.reload();
         return;
       }
+      spinner.stop();
       var $ul = $("<ul/>");
       $ul.attr('id', 'module_prerequisites_list');
       for(var idx in data.modules) {
@@ -75,7 +82,10 @@ define([
       var sentence = I18n.beforeLabel(I18n.t("labels.requirements_must_be_completed", "The following requirements need to be completed before this page will be unlocked"));
       $link.after("<br/><h3 style='margin-top: 15px;'>" + htmlEscape(header) + "</h3>" + htmlEscape(sentence));
       $link.prev("a").hide();
-    }, function(data) {});
+    }, function(data) {
+      spinner.stop();
+      $('.module_prerequisites_fallback').show();
+    })
   });
 
 });

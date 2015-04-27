@@ -6,7 +6,7 @@ define([
      */
     return [
       {
-        key :'content_import',
+        key:'content_import',
         complete: ENV.COURSE_WIZARD.checklist_states.import_step,
         title: I18n.t("Import Content"),
         text: I18n.t("If you've been using another course management system, you probably have stuff in there that you're going to want moved over to Canvas. We can walk you through the process of easily migrating your content into Canvas."),
@@ -14,7 +14,7 @@ define([
         iconClass: 'icon-upload'
       },
       {
-        key :'add_assignments',
+        key:'add_assignments',
         complete: ENV.COURSE_WIZARD.checklist_states.assignment_step,
         title: I18n.t("Add Course Assignments"),
         text: I18n.t("Add your assignments.  You can just make a long list, or break them up into groups - and even specify weights for each assignment group."),
@@ -22,7 +22,7 @@ define([
         iconClass: 'icon-assignment'
       },
       {
-        key :'add_students',
+        key:'add_students',
         complete: ENV.COURSE_WIZARD.checklist_states.add_student_step,
         title: I18n.t("Add Students to the Course"),
         text: I18n.t("You'll definitely want some of these.  What's the fun of teaching a course if nobody's even listening?"),
@@ -30,7 +30,7 @@ define([
         iconClass: 'icon-group-new'
       },
       {
-        key :'add_files',
+        key:'add_files',
         complete: ENV.COURSE_WIZARD.checklist_states.import_step, /* Super odd in the existing wizard this is set to display: none */
         title: I18n.t("Add Files to the Course"),
         text: I18n.t("The Files tab is the place to share lecture slides, example documents, study helps -- anything your students will want to download.  Uploading and organizing your files is easy with Canvas.  We'll show you how."),
@@ -38,7 +38,7 @@ define([
         iconClass: 'icon-note-light'
       },
       {
-        key :'select_navigation',
+        key:'select_navigation',
         complete: ENV.COURSE_WIZARD.checklist_states.navigation_step,
         title: I18n.t("Select Navigation Links"),
         text: I18n.t("By default all links are enabled for a course.  Students won't see links to sections that don't have content.  For example, if you haven't created any quizzes, they won't see the quizzes link.  You can sort and explicitly disable these links if there are areas of the course you don't want your students accessing."),
@@ -46,14 +46,14 @@ define([
         iconClass: 'icon-hamburger'
       },
       {
-        key :'home_page',
+        key:'home_page',
         complete: ENV.COURSE_WIZARD.checklist_states.home_page_step,
         title: I18n.t("Choose a Course Home Page"),
         text: I18n.t("When people visit the course, this is the page they'll see.  You can set it to show an activity stream, the list of course modules, a syllabus, or a custom page you write yourself.  The default is the course activity stream."),
         iconClass: 'icon-home'
       },
       {
-        key :'course_calendar',
+        key:'course_calendar',
         complete: ENV.COURSE_WIZARD.checklist_states.calendar_event_step,
         title: I18n.t("Add Course Calendar Events"),
         text: I18n.t("Here's a great chance to get to know the calendar and add any non-assignment events you might have to the course. Don't worry, we'll help you through it."),
@@ -61,7 +61,7 @@ define([
         iconClass: 'icon-calendar-month'
       },
       {
-        key :'add_tas',
+        key:'add_tas',
         complete: ENV.COURSE_WIZARD.checklist_states.add_ta_step,
         title: I18n.t("Add TAs to the Course"),
         text: I18n.t("You may want to assign some TAs to help you with the course.  TAs can grade student submissions, help moderate the discussions and even update due dates and assignment details for you."),
@@ -69,7 +69,7 @@ define([
         iconClass: 'icon-educators'
       },
       {
-        key :'publish_course',
+        key:'publish_course',
         complete: ENV.COURSE_WIZARD.checklist_states.publish_step,
         title: I18n.t("Publish the Course"),
         text: I18n.t("All finished?  Time to publish your course!  Click the button below to make it official! Publishing will allow the users to begin participating in the course."),

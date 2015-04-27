@@ -34,7 +34,7 @@ AssignmentGroupCollection, GroupCategorySelector, fakeENV) ->
 
     app = new EditView
       model: discussion
-      permissions: {}
+      permissions: opts.permissions || {}
       views:
         'js-assignment-overrides': new DueDateOverrideView
           model: dueDateList
@@ -80,3 +80,10 @@ AssignmentGroupCollection, GroupCategorySelector, fakeENV) ->
     errors = view.validateBeforeSave(data, [])
     ok errors["groupCategorySelector"][0]["message"]
     clock.restore()
+
+  test 'does not render #podcast_has_student_posts_container for non-course contexts', ->
+    # not a course context because we are not passing contextType into the
+    # EditView constructor
+    view = editView({ withAssignment: true, permissions: { CAN_MODERATE: true } })
+    equal view.$el.find('#podcast_enabled').length, 1
+    equal view.$el.find('#podcast_has_student_posts_container').length, 0

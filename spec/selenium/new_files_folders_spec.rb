@@ -60,6 +60,25 @@ describe "better_file_browsing, folders" do
       delete_from_toolbar
       expect(get_all_files_folders.count).to eq 0
     end
+
+    it "should be able to create and view a new folder with uri characters" do
+      folder_name = "this#could+be bad? maybe"
+      add_folder(folder_name)
+      folder = @course.folders.where(:name => folder_name).first
+      expect(folder).to_not be_nil
+
+      file_name = "some silly file"
+      att = @course.attachments.create!(:display_name => file_name, :uploaded_data => default_uploaded_data, :folder => folder)
+
+      folder_link = fln(folder_name, f('.ef-directory'))
+      expect(folder_link).to be_present
+      folder_link.click
+      wait_for_ajaximations
+
+      # we should be viewing the new folders contents
+      file_link = fln(file_name, f('.ef-directory'))
+      expect(file_link).to be_present
+    end
   end
 
   context "Folder Tree" do

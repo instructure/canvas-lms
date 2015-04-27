@@ -51,7 +51,7 @@ class GradebooksController < ApplicationController
         gp_id = nil
         if multiple_grading_periods?
           set_current_grading_period
-          @grading_periods = get_grading_periods
+          @grading_periods = get_active_grading_periods
           gp_id = @current_grading_period_id unless view_all_grading_periods?
         end
 
@@ -76,11 +76,11 @@ class GradebooksController < ApplicationController
                group_weighting_scheme: @context.group_weighting_scheme,
                show_total_grade_as_points: @context.settings[:show_total_grade_as_points],
                grading_scheme: @context.grading_standard.try(:data) || GradingStandard.default_grading_standard,
+               grading_period: @grading_periods && @grading_periods.find {|grading_period| grading_period[:id].to_s == gp_id},
                student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
                student_id: @presenter.student_id
-        render :action => 'grade_summary'
       else
-        render :action => 'grade_summary_list'
+        render :grade_summary_list
       end
     end
   end
@@ -92,6 +92,7 @@ class GradebooksController < ApplicationController
           :id => a.id,
           :submission_types => a.submission_types_array,
           :points_possible => a.points_possible,
+          :due_at => a.due_at
         }
       end
       {
@@ -135,7 +136,7 @@ class GradebooksController < ApplicationController
       @students = @context.students_visible_to(@current_user).order_by_sortable_name
       @submissions = @context.submissions.where(user_id: @enrollment.user_id).to_a
       @user = @enrollment.user
-      render :action => "student_attendance"
+      render :student_attendance
       # render student_attendance, optional params[:assignment_id] to highlight and scroll to that particular assignment
     else
       flash[:notice] = t('notices.unauthorized', "You are not authorized to view attendance for this course")
@@ -152,10 +153,10 @@ class GradebooksController < ApplicationController
           set_js_env
           case @current_user.preferred_gradebook_version
           when "2"
-            render :action => "gradebook2"
+            render :gradebook2
             return
           when "srgb"
-            render :action => "screenreader"
+            render :screenreader
             return
           end
         }
@@ -185,8 +186,8 @@ class GradebooksController < ApplicationController
   def set_current_grading_period
     unless @current_grading_period_id = params[:grading_period_id].presence
       return if view_all_grading_periods?
-      return unless current = @context.grading_periods.active.current
-      @current_grading_period_id = current.first.try(:id).to_s
+      return unless current = GradingPeriod.for(@context).find(&:current?)
+      @current_grading_period_id = current.id.to_s
     end
   end
 
@@ -194,8 +195,12 @@ class GradebooksController < ApplicationController
     @current_grading_period_id == "0"
   end
 
-  def get_grading_periods
-    @context.grading_periods.active.map { |gp| {id: gp.id, title: gp.title} }
+  def get_active_grading_periods
+    GradingPeriod.for(@context).map do |gp|
+      json = gp.as_json(only: [:id, :title, :start_date, :end_date], permissions: {user: @current_user})
+      json[:grading_period][:is_last] = gp.last?
+      json[:grading_period]
+    end
   end
 
   def set_js_env
@@ -204,6 +209,7 @@ class GradebooksController < ApplicationController
     teacher_notes = @context.custom_gradebook_columns.not_deleted.where(:teacher_notes=> true).first
     ag_includes = [:assignments]
     ag_includes << :assignment_visibility if @context.feature_enabled?(:differentiated_assignments)
+    ag_includes << 'overrides' if @context.feature_enabled?(:differentiated_assignments)
     js_env  :GRADEBOOK_OPTIONS => {
       :chunk_size => Setting.get('gradebook2.submissions_chunk_size', '35').to_i,
       :assignment_groups_url => api_v1_course_assignment_groups_url(@context, :include => ag_includes, :override_assignment_dates => "false"),
@@ -232,7 +238,7 @@ class GradebooksController < ApplicationController
       :speed_grader_enabled => @context.allows_speed_grader?,
       :differentiated_assignments_enabled => @context.feature_enabled?(:differentiated_assignments),
       :multiple_grading_periods_enabled => multiple_grading_periods?,
-      :grading_periods => get_grading_periods,
+      :active_grading_periods => get_active_grading_periods,
       :current_grading_period_id => @current_grading_period_id,
       :outcome_gradebook_enabled => @context.feature_enabled?(:outcome_gradebook),
       :custom_columns_url => api_v1_course_custom_gradebook_columns_url(@context),
@@ -315,7 +321,8 @@ class GradebooksController < ApplicationController
 
           submission[:dont_overwrite_grade] = value_to_boolean(params[:dont_overwrite_grades])
           @submissions += @assignment.grade_student(@user, submission)
-        rescue => e
+        rescue Assignment::GradeError => e
+          logger.info "GRADES: grade_student failed because '#{e.message}'"
           @error_message = e.to_s
         end
       end
@@ -335,7 +342,7 @@ class GradebooksController < ApplicationController
           }
         else
           flash[:error] = t('errors.submission_failed', "Submission was unsuccessful: %{error}", :error => @error_message || t('errors.submission_failed_default', 'Submission Failed'))
-          format.html { render :action => "show", :course_id => @assignment.context.id }
+          format.html { render :show, course_id: @assignment.context.id }
           format.json { render :json => {:errors => {:base => @error_message}}, :status => :bad_request }
           format.text { render :json => {:errors => {:base => @error_message}}, :status => :bad_request }
         end
@@ -393,7 +400,7 @@ class GradebooksController < ApplicationController
         end
         append_sis_data(env)
         js_env(env)
-        render :action => "speed_grader"
+        render
       end
 
       format.json do
@@ -411,7 +418,6 @@ class GradebooksController < ApplicationController
 
   def blank_submission
     @headers = false
-    render :action => "blank_submission"
   end
 
   def change_gradebook_version

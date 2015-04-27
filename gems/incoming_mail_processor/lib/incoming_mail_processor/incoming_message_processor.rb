@@ -46,6 +46,10 @@ module IncomingMailProcessor
       configure_accounts(config.slice(*mailbox_keys))
     end
 
+    def self.workers
+      settings.workers || 1
+    end
+
     def self.run_periodically?
       if settings.run_periodically.nil?
         # check backwards compatibility settings
@@ -55,10 +59,12 @@ module IncomingMailProcessor
       end
     end
 
-    def process
+    def process(opts={})
       self.class.mailbox_accounts.each do |account|
         mailbox = self.class.create_mailbox(account)
-        process_mailbox(mailbox, account)
+        mailbox_opts = {}
+        mailbox_opts = {offset: opts[:worker_id], stride: self.class.workers} if opts[:worker_id] && self.class.workers > 1
+        process_mailbox(mailbox, account, mailbox_opts)
       end
     end
 
@@ -196,10 +202,10 @@ module IncomingMailProcessor
     end
 
 
-    def process_mailbox(mailbox, account)
+    def process_mailbox(mailbox, account, opts={})
       error_folder = account.error_folder
       mailbox.connect
-      mailbox.each_message do |message_id, raw_contents|
+      mailbox.each_message(opts) do |message_id, raw_contents|
         message, errors = parse_message(raw_contents)
         if message && !errors.present?
           process_message(message, account)

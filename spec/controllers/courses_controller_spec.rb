@@ -281,6 +281,15 @@ describe CoursesController do
         expect(assigns[:future_enrollments].map(&:course_id)).to eq [course1.id, course2.id]
       end
 
+      it "should include courses with accepted enrollments and future start dates" do
+        course1 = Account.default.courses.create! start_at: 1.month.from_now, restrict_enrollments_to_course_dates: true, name: 'A'
+        course1.offer!
+        student_in_course course: course1, active_all: true
+        user_session(@student)
+        get 'index'
+        expect(assigns[:future_enrollments].map(&:course_id)).to eq [course1.id]
+      end
+
       it "should be empty if the caller is a student or observer and the root account restricts students viewing courses before the start date" do
         course1 = Account.default.courses.create! start_at: 1.month.from_now, restrict_enrollments_to_course_dates: true
         course1.offer!

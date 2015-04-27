@@ -807,27 +807,6 @@ describe "gradebook2" do
     end
   end
 
-  describe "outcome gradebook" do
-    before(:each) do
-      gradebook_data_setup
-    end
-
-    it "should not be visible by default" do
-      get "/courses/#{@course.id}/gradebook2"
-      expect(ff('.gradebook-navigation').length).to eq 0
-    end
-
-    it "should be visible when enabled" do
-      Account.default.set_feature_flag!('outcome_gradebook', 'on')
-      get "/courses/#{@course.id}/gradebook2"
-      expect(ff('.gradebook-navigation').length).to eq 1
-
-      f('a[data-id=outcome]').click
-      wait_for_ajaximations
-      expect(f('.outcome-gradebook-container')).not_to be_nil
-    end
-  end
-
   describe "post_grades" do
     before(:each) do
       gradebook_data_setup

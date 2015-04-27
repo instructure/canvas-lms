@@ -139,6 +139,24 @@ define([
     $answers.filter('.correct_answer').find(".select_answer  input[name=answer_text]").attr("aria-label", correctAnswerLabel);
   }
 
+  function toggleSelectAnswerAltText($answers,type) {
+    if (type != "multiple_answer") {
+      $answers.find('.select_answer_link')
+        .attr('title', clickSetCorrect)
+        .find('img').attr('alt', clickSetCorrect);
+      $answers.filter('.correct_answer').find('.select_answer_link')
+        .attr('title', isSetCorrect)
+        .find('img').attr('alt', isSetCorrect);
+    } else {
+      $answers.filter(".correct_answer").find('.select_answer_link')
+        .attr('title', clickUnsetCorrect)
+        .find('img').attr('alt', clickUnsetCorrect);
+      $answers.filter(":not(.correct_answer)").find('.select_answer_link')
+        .attr('title', clickSetCorrect)
+        .find('img').attr('alt', clickSetCorrect);
+    }
+  }
+
   // TODO: refactor this... it's not going to be horrible, but it will
   // take a little bit of work.  I just wrapped it in a closure for now
   // to not pollute the global namespace, but it could use more.
@@ -212,20 +230,10 @@ define([
         if ($answers.filter(".correct_answer").length === 0) {
           $answers.filter(":first").addClass('correct_answer');
         }
-        $answers.find('.select_answer_link')
-          .attr('title', clickSetCorrect)
-          .find('img').attr('alt', clickSetCorrect);
-        $answers.filter('.correct_answer').find('.select_answer_link')
-          .attr('title', isSetCorrect)
-          .find('img').attr('alt', isSetCorrect);
+        toggleSelectAnswerAltText($answers,answer.answer_selection_type);
         togglePossibleCorrectAnswerLabel($answers);
       } else {
-        $answer.filter(".correct_answer").find('.select_answer_link')
-          .attr('title', clickUnsetCorrect)
-          .find('img').attr('alt', clickUnsetCorrect);
-        $answer.filter(":not(.correct_answer)").find('.select_answer_link')
-          .attr('title', clickSetCorrect)
-          .find('img').attr('alt', clickSetCorrect);
+        toggleSelectAnswerAltText($answers,answer.answer_selection_type);
         togglePossibleCorrectAnswerLabel($answers);
       }
 
@@ -1447,7 +1455,26 @@ define([
       var $optionGroup = $checkbox.closest('.option-group');
       var checked = $checkbox.prop('checked');
 
-      $optionGroup.find('> .options').toggle(checked);
+      // All of this magic here is so that VoiceOver will properly navigate to
+      // the inputs after they are shown.
+      var $foundOptions = $optionGroup.find('> .options');
+      if (checked) {
+        $foundOptions.removeClass('screenreader-only');
+        // We have to do this bit so keyboard only users aren't confused
+        // when their focus goes to something shown offscreen.
+        $foundOptions.find('[tabindex="-1"]').each(function (k,v) {
+          $(v).attr('tabindex', 0);
+        });
+      } else {
+        $foundOptions.addClass('screenreader-only');
+        // Same as above
+        $foundOptions.find('[tabindex="0"]').each(function (k,v) {
+          $(v).attr('tabindex', -1);
+        });
+      }
+
+
+
 
       if (!checked) {
         $optionGroup
@@ -1922,6 +1949,7 @@ define([
       if (REGRADE_OPTIONS[idValue]) {
         showRegradeOptions($question,questionID);
       }
+      toggleSelectAnswerAltText($(".form_answers .answer"), quiz.answerSelectionType(question.question_type))
       togglePossibleCorrectAnswerLabel($(".form_answers .answer"));
     });
 

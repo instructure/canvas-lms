@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+require 'bigdecimal'
+
 module CC
   module QTI
     module QTIItems
@@ -340,9 +342,10 @@ module CC
                   or_node.varequal exact, :respident=>"response1"
                   unless answer['margin'].blank?
                     or_node.and do |and_node|
-                      margin = answer['margin'].to_f
-                      and_node.vargte(exact - margin, :respident=>"response1")
-                      and_node.varlte(exact + margin, :respident=>"response1")
+                      exact = BigDecimal.new(answer['exact'].to_s)
+                      margin = BigDecimal.new(answer['margin'].to_s)
+                      and_node.vargte((exact - margin).to_f, :respident=>"response1")
+                      and_node.varlte((exact + margin).to_f, :respident=>"response1")
                     end
                   end
                 end

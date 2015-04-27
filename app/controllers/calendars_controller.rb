@@ -18,53 +18,6 @@
 
 class CalendarsController < ApplicationController
   before_filter :require_user, :except => [ :public_feed ]
-  before_filter :check_preferred_calendar, :only => [ :show, :show2 ]
-
-  def show
-    get_context
-    if @context != @current_user
-      # we used to have calendar pages under contexts, like
-      # /courses/X/calendar, but these all redirect to /calendar now.
-      # we shouldn't have any of these URLs anymore, but let's leave in this
-      # fail-safe in case somebody has a bookmark or something.
-      return redirect_to(calendar_url_for([@context]))
-    end
-    get_all_pertinent_contexts(include_groups: true)
-    # somewhere there's a bad link that doesn't separate parameters properly.
-    # make sure we don't do a find on a non-numeric id.
-    if params[:event_id] && params[:event_id] =~ Api::ID_REGEX
-      event = CalendarEvent.where(id: params[:event_id]).first
-      event = nil if event && event.start_at.nil?
-      @active_event_id = event.id if event
-    end
-    build_calendar_dates(event)
-
-    respond_to do |format|
-      format.html do
-        @events = []
-        @undated_events = []
-        @show_left_side = false
-        @calendar_event = @contexts[0].calendar_events.new
-        @contexts.each do |context|
-          log_asset_access("dashboard_calendar:#{context.asset_string}", "calendar", 'other')
-        end
-        calendarManagementContexts = @contexts.select{|c| can_do(c, @current_user, :manage_calendar) }.map(&:asset_string)
-        canCreateEvent = calendarManagementContexts.length > 0
-        js_env(calendarManagementContexts: calendarManagementContexts,
-               canCreateEvent: canCreateEvent)
-        render :action => "show"
-      end
-      # this  unless @dont_render_again stuff is ugly but I wanted to send back a 304 but it started giving me "Double Render errors"
-      format.json do
-        events = calendar_events_for_request_format
-        render :json => events unless @dont_render_again
-      end
-      format.ics {
-        events = calendar_events_for_request_format
-        render :text => events unless @dont_render_again
-      }
-    end
-  end
 
   def show2
     get_context
@@ -217,34 +170,4 @@ class CalendarsController < ApplicationController
   end
   protected :build_calendar_dates
 
-  def switch_calendar
-    if @domain_root_account.enable_scheduler?
-      if params[:preferred_calendar] == '2'
-        @current_user.preferences.delete(:use_calendar1)
-      else
-        @current_user.preferences[:use_calendar1] = true
-      end
-      @current_user.save!
-    end
-    check_preferred_calendar(true)
-  end
-
-  def check_preferred_calendar(always_redirect=false)
-    preferred_calendar = 'show'
-    if (@domain_root_account.enable_scheduler? &&
-          !@current_user.preferences[:use_calendar1]) ||
-       @domain_root_account.calendar2_only?
-      preferred_calendar = 'show2'
-    end
-    if always_redirect || params[:action] != preferred_calendar
-      redirect_to({ :action => preferred_calendar, :anchor => ' ' }.merge(params.slice(:include_contexts, :event_id)))
-      return false
-    end
-    if @domain_root_account.enable_scheduler?
-      if preferred_calendar == 'show'
-        add_crumb view_context.link_to(t(:use_new_calendar, "Try out the new calendar"), switch_calendar_url('2'), :method => :post), nil, :id => 'change_calendar_version_link_holder'
-      end
-    end
-  end
-  protected :check_preferred_calendar
 end

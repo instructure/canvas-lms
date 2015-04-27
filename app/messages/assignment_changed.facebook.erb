@@ -1,5 +1,0 @@
-<% define_content :link do %>
-  <%= polymorphic_url([asset.context, asset]) %>
-<% end %>
-  
-<%= mt :body, "The assignment %{title_link} for %{course} has changed.", :title_link => markdown_safe("**[#{markdown_escape(asset.title)}](#{content(:link)})**"), :course => asset.context.name %>

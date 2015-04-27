@@ -37,6 +37,9 @@
         visibility: visible;
       }
     }
+    label[for=rubric-title] {
+      font-weight: bold;
+    }
   }
   .rubric_table {
     border-collapse: collapse;

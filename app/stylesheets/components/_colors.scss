@@ -141,18 +141,18 @@
   </div>
 </div>
 
-## Using color variables implementing new UI
+## Using color variables
 
-While integrating new UI, it's best to use what we call a *functional variable* to pull in our main canvas variables.
+It's best to use what we call a *functional variable* to pull in our main canvas color variables.
 
 
-### For example, if our code looks like this:
+If our code looks like this:
 
 
     <p class="i-need-a-specific-color">Hello, Pando!</p>
 
 
-### Then we would write our scss it like:
+Then we would write our scss it like:
 
 
     $myCustomColor: $ic-brand-primary;
@@ -160,63 +160,28 @@ While integrating new UI, it's best to use what we call a *functional variable* 
       color: $myCustomColor;
     }
 
+## Background Colors
 
-## Using color variables when updating old code
-
-When you're in Canvas and changing old code and see a color that doesn't have a variable attached, be sure to change it and give it a functional variable or one of our primary canvas colors
-
-
-### The Bad Way
-
-    .class-name {
-      color: #123456;
-    }
-
-
-### The Best Way
-
-    $my-functional-variable: $ic-brand-primary;
-
-    .class-name {
-      color: $my-functional-variable;
-    }
+When adding background colors, use the variable we have provided. This will ensure we continue to meet our a11y contrast ratios.
+<br/>
+<br/>
+<div class="sg-bg-color-example">This is using: background: $ic-bg-light-primary</div>
+<br/>
+<div class="sg-bg-color-example sg-bg-color-example--neutral">This is using: background: $ic-bg-light-neutral</div>
+<br/>
+<div class="sg-bg-color-example sg-bg-color-example--success">This is using: background: $ic-bg-light-success</div>
+<br/>
+<div class="sg-bg-color-example sg-bg-color-example--alert">This is using: background: $ic-bg-light-alert</div>
+<br/>
+<div class="sg-bg-color-example sg-bg-color-example--danger">This is using: background: $ic-bg-light-danger</div>
 
 
-## Using color variables with accessibility in mind
 
-We have specific flags that denote when a user has on High-Contrast mode. Most of our color variables have a high-contrast equivalent already built into Canvas, however, for the occasion where some tweaking needs to happen, be sure to make use of sass functions (such as ```lighten()``` and ```darken()```) to help change our primary palette.
-
-### The Bad Way
-
-
-    .class-name {
-      color: #123456;
-      @if use_high_contrast {
-        color: #345678;
-      }
-    }
-
-
-### The Better Way
-
-    $my-functional-variable: $ic-brand-primary;
-
-    .class-name {
-      color: $ic-brand-primary; // this variable automatically switches when high contrast is on, yay!
-    }
-
-
-### The Best Way
-
-    $my-functional-variable: $ic-brand-primary;
-
-    .class-name {
-      color: $my-functional-variable;
-    }
 
 ## tl;dr
 
   - Use color variables when adding colors to your elements.
+  - Use function variable names when pulling in color variables.
   - Do not use hex codes in .scss files.
   - If that color needs to be tweaked, use the scss functions for `lighten($my-color, 10%)` and `darken($my-color, 10%)`
   - High Contrast colors are automatically pulled in based on the canvas color variables.

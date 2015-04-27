@@ -158,7 +158,7 @@ class I18nliner::Processors::ErbProcessor
     remove_whitespace = true
     scope = case filename
     when /app\/messages\//
-      remove_whitespace = false unless filename =~ /html|facebook/
+      remove_whitespace = false unless filename =~ /html/
       filename.gsub(/.*app\/|\.erb/, '').gsub(/\/_?/, '.')
     when /app\/views\//
       filename.gsub(/.*app\/views\/|\.(html\.|fbml\.)?erb\z/, '').gsub(/\/_?/, '.')

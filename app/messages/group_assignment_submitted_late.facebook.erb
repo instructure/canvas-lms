@@ -1,5 +1,0 @@
-<% define_content :link do %>
-  <%= polymorphic_url([asset.assignment.context, asset.assignment]) %>
-<% end %>
-
-<%= mt('body', "The group %{group_name} has just turned in a late submission for **[%{assignment_name}](%{assignment_url})** in the course %{course_name}.", :group_name => asset.group.name, :assignment_name => asset.assignment.title, :assignment_url => content(:link), :course_name => asset.assignment.context.name) %>
