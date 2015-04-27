@@ -126,7 +126,7 @@ class GradebookImporter
           submission['original_grade'].to_s == submission['grade'] || (submission['original_grade'].blank? && submission['grade'].blank?)
         end
       end
-      indexes_to_delete.reverse.each do |idx|
+      indexes_to_delete.reverse_each do |idx|
         @assignments.delete_at(idx)
         @students.each do |student|
           student.gradebook_importer_submissions.delete_at(idx)

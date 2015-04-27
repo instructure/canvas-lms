@@ -327,7 +327,7 @@ class AssessmentItemConverter
           child.remove
         end
   
-        node.children.reverse.each do |child|
+        node.children.reverse_each do |child|
           break unless child.text? && child.text =~ /\A\s+\z/ || child.element? && child.name.downcase == 'br'
           child.remove
         end

@@ -609,7 +609,7 @@ class Submission < ActiveRecord::Base
   def submission_history
     res = []
     last_submitted_at = nil
-    self.versions.sort_by(&:created_at).reverse.each do |version|
+    self.versions.sort_by(&:created_at).reverse_each do |version|
       model = version.model
       if model.submitted_at && last_submitted_at.to_i != model.submitted_at.to_i
         res << model

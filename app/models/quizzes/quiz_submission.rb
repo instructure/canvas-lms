@@ -449,7 +449,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     scores[attempt] = self.score if self.score
 
     # only most recent version for each attempt - some have regraded a version
-    versions.sort_by(&:number).reverse.each do |ver|
+    versions.sort_by(&:number).reverse_each do |ver|
       scores[ver.model.attempt] ||= ver.model.score || 0.0
     end
 

@@ -64,7 +64,7 @@ module Lti
           elsif bubble == 'distinct' && request.headers['accept'].include?('application/vnd.ims.lti.v2.toolsettings.simple+json')
             @content_type = 'application/vnd.ims.lti.v2.toolsettings.simple+json'
             custom = {}
-            graph.reverse.each { |tool_setting| custom.merge!(tool_setting.custom) }
+            graph.reverse_each { |tool_setting| custom.merge!(tool_setting.custom) }
             custom
           end
         else
