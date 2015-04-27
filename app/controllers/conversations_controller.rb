@@ -248,6 +248,7 @@ class ConversationsController < ApplicationController
       hash = {
         :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id,
         :ACCOUNT_CONTEXT_CODE => "account_#{@domain_root_account.id}",
+        :MAX_GROUP_CONVERSATION_SIZE => Conversation.max_group_conversation_size
       }
 
       notes_enabled_accounts = @current_user.associated_accounts.where(enable_user_notes: true)
@@ -291,7 +292,8 @@ class ConversationsController < ApplicationController
   # @argument group_conversation [Boolean]
   #   Defaults to false. If true, this will be a group conversation (i.e. all
   #   recipients may see all messages and replies). If false, individual private
-  #   conversations will be started with each recipient.
+  #   conversations will be started with each recipient. Must be set false if the
+  #   number of recipients is over the set maximum (default is 100).
   #
   # @argument attachment_ids[] [String]
   #   An array of attachments ids. These must be files that have been previously
@@ -354,6 +356,10 @@ class ConversationsController < ApplicationController
     batch_private_messages = !group_conversation && @recipients.size > 1
     batch_group_messages   = group_conversation && value_to_boolean(params[:bulk_message])
     message                = build_message
+
+    if !batch_group_messages && @recipients.size > Conversation.max_group_conversation_size
+      return render_error('recipients', 'too many for group conversation')
+    end
 
     if batch_private_messages || batch_group_messages
       mode = params[:mode] == 'async' ? :async : :sync

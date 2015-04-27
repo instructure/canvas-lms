@@ -120,6 +120,11 @@ class Conversation < ActiveRecord::Base
     end
   end
 
+  # conversations with more recipients than this should force individual messages
+  def self.max_group_conversation_size
+    Setting.get("max_group_conversation_size", 100).to_i
+  end
+
   def add_participants(current_user, users, options={})
     self.shard.activate do
       user_ids = users.map(&:id).uniq

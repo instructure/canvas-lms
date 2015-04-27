@@ -94,5 +94,54 @@ describe "conversations new" do
       driver.action.key_up(:shift).perform
       expect(fj('#compose-new-message:visible')).not_to be_nil
     end
+
+    context "bulk_message locking" do
+      before do
+        # because i'm too lazy to create more users
+        Conversation.stubs(:max_group_conversation_size).returns(1)
+      end
+
+      it "should check and lock the bulk_message checkbox when over the max size" do
+        get_conversations
+        compose course: @course, subject: 'lockme', body: 'hallo!', send: false
+
+        f("#recipient-search-btn").click
+        wait_for_ajaximations
+        f("li.everyone").click # send to everybody in the course
+        wait_for_ajaximations
+
+        selector = "#bulk_message"
+        bulk_cb = f(selector)
+        
+        expect(bulk_cb.attribute('disabled')).to be_present
+        expect(is_checked(selector)).to be_truthy
+
+        hover_and_click('.ac-token-remove-btn') # remove the token
+        wait_for_ajaximations
+
+        expect(bulk_cb.attribute('disabled')).to be_blank
+        expect(is_checked(selector)).to be_falsey # should be unchecked
+      end
+
+      it "should leave the value the same as before after unlocking" do
+        get_conversations
+        compose course: @course, subject: 'lockme', body: 'hallo!', send: false
+
+        selector = "#bulk_message"
+        bulk_cb = f(selector)
+        bulk_cb.click # check the box
+
+        f("#recipient-search-btn").click
+        wait_for_ajaximations
+        f("li.everyone").click # send to everybody in the course
+        wait_for_ajaximations
+        hover_and_click('.ac-token-remove-btn') # remove the token
+        wait_for_ajaximations
+
+        expect(bulk_cb.attribute('disabled')).to be_blank
+        expect(is_checked(selector)).to be_truthy # should still be checked
+      end
+
+    end
   end
 end
