@@ -92,6 +92,8 @@ Style/AlignHash:
   Enabled: false
 Style/AlignParameters:
   Enabled: false
+Style/Lambda:
+  Enabled: false
 
 # Rails style changes
 Rails/TimeZone:
