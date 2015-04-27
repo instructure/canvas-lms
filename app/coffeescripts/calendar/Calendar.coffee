@@ -69,6 +69,8 @@ define [
 
       if data.show && data.show != ''
         @visibleContextList = data.show.split(',')
+        for visibleContext, i in @visibleContextList
+          @visibleContextList[i] = visibleContext.replace(/^group_(.*_.*)/, '$1')
 
       $(document).fragmentChange(@fragmentChange)
 
