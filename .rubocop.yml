@@ -96,6 +96,9 @@ Style/AlignParameters:
 # Rails style changes
 Rails/TimeZone:
   Enabled: false
+# accessors are often defined in terms of read_attribute
+Rails/ReadWriteAttribute:
+  Enabled: false
 
 # Lint changes
 Lint/AmbiguousRegexpLiteral:
@@ -104,6 +107,8 @@ Lint/UselessAssignment:
   Severity: convention
 Lint/Debugger:
   Severity: error
+Lint/EndAlignment:
+  Severity: convention
 
 # Performance changes
 Performance/Detect:

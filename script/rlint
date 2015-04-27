@@ -48,7 +48,12 @@ else
   ruby_files = RuboCop::Canvas::FileSieve.new.files(env_sha)
   if ruby_files.size > 0
     if heavy_mode
-      cli.run(ruby_files)
+      args = ruby_files
+      args_index = ARGV.index('--')
+      if args_index
+        args.concat(ARGV[(args_index + 1)..-1])
+      end
+      cli.run(args)
     else
       require 'colorize'
       output_filename = ".rubocop-output.json"
