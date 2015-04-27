@@ -1375,6 +1375,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: 'quizzes/quiz_submissions_api') do
       get 'courses/:course_id/quizzes/:quiz_id/submissions', action: :index, as: 'course_quiz_submissions'
       get 'courses/:course_id/quizzes/:quiz_id/submissions/:id', action: :show, as: 'course_quiz_submission'
+      get 'courses/:course_id/quizzes/:quiz_id/submissions/:id/time', action: :time, as: 'course_quiz_submission_time'
       post 'courses/:course_id/quizzes/:quiz_id/submissions', action: :create, as: 'course_quiz_submission_create'
       put 'courses/:course_id/quizzes/:quiz_id/submissions/:id', action: :update, as: 'course_quiz_submission_update'
       post 'courses/:course_id/quizzes/:quiz_id/submissions/:id/complete', action: :complete, as: 'course_quiz_submission_complete'
