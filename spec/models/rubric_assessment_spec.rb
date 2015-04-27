@@ -75,6 +75,22 @@ describe RubricAssessment do
       expect(@assessment.data.first[:comments_html]).to be_nil
     end
 
+    it "should not mutate null/empty string score text to 0" do
+      @assessment = @association.assess({
+        :user => @student,
+        :assessor => @teacher,
+        :artifact => @assignment.find_or_create_submission(@student),
+        :assessment => {
+          :assessment_type => 'grading',
+          :criterion_crit1 => {
+            :points => ""
+          }
+        }
+      })
+      expect(@assessment.score).to be_nil
+      expect(@assessment.artifact.score).to eql(nil)
+    end
+
     it "should not update scores if not used for grading" do
       rubric_model
       @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => false)
