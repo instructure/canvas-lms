@@ -85,7 +85,7 @@ class Migrator
       @course[:file_map].each_value do |val|
         file_path = File.join(base_dir, val[:real_path] || val[:path_name])
         val.delete :real_path
-        if File.exists?(file_path)
+        if File.exist?(file_path)
           zipfile.add(val[:path_name], file_path)
         else
           add_warning(I18n.t('canvas.migration.errors.file_does_not_exist', 'The file "%{file_path}" did not exist in the content package and could not be imported.', :file_path => val[:path_name]))
@@ -138,7 +138,7 @@ class Migrator
     doc = nil
     if rel_path
       path = get_full_path(rel_path)
-      if File.exists?(path)
+      if File.exist?(path)
         doc = open_file_xml(path)
       end
     end

@@ -24,7 +24,7 @@ module CC::Importer::Canvas
       assessments = []
       qti_folder = File.join(@unzipped_file_path, ASSESSMENT_NON_CC_FOLDER)
 
-      return unless File.exists?(qti_folder) && File.directory?(qti_folder)
+      return unless File.exist?(qti_folder) && File.directory?(qti_folder)
 
       run_qti_converter(qti_folder)
       @course[:assessment_questions] = convert_questions
@@ -37,7 +37,7 @@ module CC::Importer::Canvas
     def run_qti_converter(qti_folder)
       # convert to 2.1
       @dest_dir_2_1 = File.join(qti_folder, "qti_2_1")
-      return unless File.exists?(qti_folder)
+      return unless File.exist?(qti_folder)
 
       command = Qti.get_conversion_command(@dest_dir_2_1, qti_folder)
       logger.debug "Running migration command: #{command}"

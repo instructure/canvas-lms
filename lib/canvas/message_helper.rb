@@ -22,7 +22,7 @@ module Canvas::MessageHelper
   end
 
   def self.add_message_path(path)
-    if File.exists?(path) && File.directory?(path)
+    if File.exist?(path) && File.directory?(path)
       @message_paths ||= []
       @message_paths << path
     end
@@ -33,7 +33,7 @@ module Canvas::MessageHelper
     if @message_paths
       @message_paths.each do |mp|
         test_path = File.join(mp, filename)
-        if File.exists?(test_path)
+        if File.exist?(test_path)
           path = test_path
           break
         end

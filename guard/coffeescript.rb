@@ -207,7 +207,7 @@ module Guard
     def run_on_deletion(paths)
       clean(paths).each do |file|
         javascript = file.gsub(/(js\.coffee|coffee)$/, 'js')
-        File.remove(javascript) if File.exists?(javascript)
+        File.remove(javascript) if File.exist?(javascript)
       end
     end
 
@@ -223,7 +223,7 @@ module Guard
     def clean(paths)
       paths.uniq!
       paths.compact!
-      paths.select { |p| p =~ /.coffee$/ && File.exists?(p) }
+      paths.select { |p| p =~ /.coffee$/ && File.exist?(p) }
     end
 
   end

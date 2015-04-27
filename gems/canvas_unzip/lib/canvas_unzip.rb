@@ -64,7 +64,7 @@ class CanvasUnzip
     bytes_left = limits.maximum_bytes
     files_left = limits.maximum_files
 
-    raise ArgumentError, "File not found" unless File.exists?(archive_filename)
+    raise ArgumentError, "File not found" unless File.exist?(archive_filename)
     raise ArgumentError, "Needs block or destination path" unless dest_folder || block
 
     each_entry(archive_filename) do |entry, index|

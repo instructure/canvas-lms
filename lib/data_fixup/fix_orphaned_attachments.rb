@@ -57,7 +57,7 @@ module DataFixup
     end
 
     def self.local_storage_save(rescued_orphan)
-      if File.exists? rescued_orphan.full_filename
+      if File.exist? rescued_orphan.full_filename
         finalize_attachment(rescued_orphan)
       else
         rescued_orphan.context_id = @broken_user.id
