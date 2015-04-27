@@ -35,11 +35,10 @@ module Outcomes
       required_opts = [:users, :context, :outcomes]
       required_opts.each { |p| raise "#{p} option is required" unless opts[p] }
       users, context, outcomes = opts.values_at(*required_opts)
-
       order_results_for_rollup LearningOutcomeResult.where(
         context_code:        context.asset_string,
         user_id:             users.map(&:id),
-        learning_outcome_id: outcomes.map(&:id),
+        learning_outcome_id: outcomes.map(&:id)
       )
     end
 
@@ -95,7 +94,8 @@ module Outcomes
     #
     # Returns an Array of RollupScore objects
     def rollup_user_results(user_results)
-      outcome_scores = user_results.chunk(&:learning_outcome_id).map do |_, outcome_results|
+      filtered_results = user_results.select{|r| r.score != nil}
+      outcome_scores = filtered_results.chunk(&:learning_outcome_id).map do |_, outcome_results|
         RollupScore.new(outcome_results)
       end
     end

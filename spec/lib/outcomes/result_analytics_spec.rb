@@ -107,6 +107,18 @@ describe Outcomes::ResultAnalytics do
       expect(rollups.map(&:score)).to eq [nil, nil, 3.25]
     end
 
+    it 'does not error out and correctly averages when a result has a score of nil' do
+      results = [
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[82, 'n_mastery', 4], 4.0],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[82, 'n_mastery', 4], 5.0],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[82, 'n_mastery', 4], 1.0],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[82, 'n_mastery', 4], 3.0],
+        MockOutcomeResult[MockUser[10, 'a'], MockOutcome[82, 'n_mastery', 4], nil],
+      ]
+      rollups = ra.rollup_user_results(results)
+      expect(rollups.map(&:score)).to eq [3.25]
+    end
+
     it 'properly calculates results when method is decaying average' do
       results = [
         #first outcome
