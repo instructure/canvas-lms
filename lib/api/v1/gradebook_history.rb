@@ -20,7 +20,7 @@ module Api::V1
 
     def json_for_date(date, course, api_context)
       submissions_set(course, api_context, :date => date).
-        each_with_object(Hash.new) { |sub, memo| update_graders_hash(memo, sub, api_context) }.values.
+        each_with_object({}) { |sub, memo| update_graders_hash(memo, sub, api_context) }.values.
         each { |grader| compress(grader, :assignments) }
     end
 

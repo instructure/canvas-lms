@@ -141,7 +141,7 @@ module Context
       ids_by_type[type] += [id]
     end
 
-    result = Hash.new
+    result = {}
     ids_by_type.each do |type, ids|
       klass = Object.const_get(type, false)
       klass.where(:id => ids).select([:id, :name]).map {|c| result[[type, c.id]] = c.name}
