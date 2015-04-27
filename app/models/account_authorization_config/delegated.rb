@@ -25,4 +25,5 @@ class AccountAuthorizationConfig::Delegated < AccountAuthorizationConfig
       self.account.save!
     end
   end
+
 end

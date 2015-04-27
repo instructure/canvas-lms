@@ -27,40 +27,41 @@ describe "/shared/_login" do
   it "should render" do
     course_with_student
     view_context
-    render :partial => "shared/login"
+    render partial: "shared/login"
     expect(response).not_to be_nil
   end
-  
+
   it "should use internal forgot password mechanism by default" do
-    render :partial => "shared/login"
+    render partial: "shared/login"
     page = Nokogiri(response.body)
     expect(page.css("#login_forgot_password")[0]['href']).to eq '#'
   end
-  
-  it "should use external forgot password mechanism if specified" do
-    @account = Account.default
-    config = @account.account_authorization_configs.build
-    config.auth_type = 'ldap'
-    config.change_password_url = "http://www.instructure.com"
-    config.save!
-    expect(@account.forgot_password_external_url).to eq config.change_password_url
-    assigns[:domain_root_account] = @account
-    render :partial => "shared/login"
-    page = Nokogiri(response.body)
-    expect(page.css("#login_forgot_password")[0]['href']).to eq config.change_password_url
-  end
-  
-  it "should use default forgot password mechanism if external mechanism specified but it's a canvas_login request" do
-    @account = Account.default
-    config = @account.account_authorization_configs.build
-    config.auth_type = 'ldap'
-    config.change_password_url = "http://www.instructure.com"
-    config.save!
-    expect(@account.forgot_password_external_url).to eq config.change_password_url
-    assigns[:domain_root_account] = @account
-    render :partial => "shared/login", :locals => {:params => {:canvas_login => '1'}}
-    page = Nokogiri(response.body)
-    expect(page.css("#login_forgot_password")[0]['href']).to eq '#'
+
+  context "with external mechanism specified" do
+    let(:account){ Account.default }
+    let(:config){ account.account_authorization_configs.build }
+
+    before do
+      config.auth_type = 'ldap'
+      config.save!
+      account.change_password_url = "http://www.instructure.com"
+      account.save!
+      expect(account.forgot_password_external_url).
+        to eq(account.change_password_url)
+      assigns[:domain_root_account] = account
+    end
+
+    it "should use external forgot password mechanism" do
+      render partial: "shared/login"
+      page = Nokogiri(response.body)
+      expect(page.css("#login_forgot_password")[0]['href']).
+        to eq(account.change_password_url)
+    end
+
+    it "uses default forgot password mechanism if it's a canvas_login request" do
+      render partial: "shared/login", locals: {params: {canvas_login: '1'}}
+      page = Nokogiri(response.body)
+      expect(page.css("#login_forgot_password")[0]['href']).to eq '#'
+    end
   end
 end
-

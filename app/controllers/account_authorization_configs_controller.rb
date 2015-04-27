@@ -24,7 +24,7 @@
 #       "description": "",
 #       "properties": {
 #         "login_handle_name": {
-#           "description": "Valid for SAML and CAS authorization.",
+#           "description": "_Deprecated_[2015-05-08: This is moving to an account setting ] Valid for SAML and CAS authorization.",
 #           "type": "string"
 #         },
 #         "identifier_format": {
@@ -58,7 +58,7 @@
 #           "type": "string"
 #         },
 #         "change_password_url": {
-#           "description": "Valid for SAML authorization.",
+#           "description": "_Deprecated_[2015-05-08: This is moving to an account setting] Valid for SAML authorization.",
 #           "type": "string"
 #         },
 #         "requested_authn_context": {
@@ -127,6 +127,29 @@
 #       }
 #     }
 #
+# @model SSOSettings
+#     {
+#       "id": "SSOSettings",
+#       "description": "Settings that are applicable across an account's authorization configuration, even if there are multiple individual account authorization configs",
+#       "properties": {
+#        "login_handle_name": {
+#           "description": "The label used for unique login identifiers.",
+#           "example": "Username",
+#           "type": "string"
+#         },
+#        "change_password_url": {
+#           "description": "The url to redirect users to for password resets. Leave blank for default Canvas behavior",
+#           "example": "https://example.com/reset_password",
+#           "type": "string"
+#        },
+#        "auth_discovery_url": {
+#           "description": "If a discovery url is set, canvas will forward all users to that URL when they need to be authenticated. That page will need to then help the user figure out where they need to go to log in. If no discovery url is configured, the first configuration will be used to attempt to authenticate the user.",
+#           "example": "https://example.com/which_account",
+#           "type": "string"
+#        }
+#       }
+#     }
+#
 class AccountAuthorizationConfigsController < ApplicationController
   before_filter :require_context, :require_root_account_management
   include Api::V1::AccountAuthorizationConfig
@@ -142,14 +165,9 @@ class AccountAuthorizationConfigsController < ApplicationController
   # @returns [AccountAuthorizationConfig]
   def index
     if api_request?
-      render :json => aacs_json(@account.account_authorization_configs)
+      render json: aacs_json(@account.account_authorization_configs)
     else
-      @account_configs = @account.account_authorization_configs.to_a
-      if AccountAuthorizationConfig::SAML.enabled?
-        @saml_identifiers = Onelogin::Saml::NameIdentifiers::ALL_IDENTIFIERS
-        @saml_login_attributes = AccountAuthorizationConfig::SAML.login_attributes
-        @saml_authn_contexts = [["No Value", nil]] + Onelogin::Saml::AuthnContexts::ALL_CONTEXTS.sort
-      end
+      @presenter = AccountAuthorizationConfigsPresenter.new(@account)
     end
   end
 
@@ -164,10 +182,10 @@ class AccountAuthorizationConfigsController < ApplicationController
   # parameters depend on this auth_type; unrecognized parameters are discarded.
   # Service specifications not specifying a valid auth_type are ignored.
   #
-  # Any service specification may include an optional 'login_handle_name'
+  # _Deprecated_[2015-05-08] Any service specification may include an optional 'login_handle_name'
   # parameter. This parameter specifies the label used for unique login
   # identifiers; for example: 'Login', 'Username', 'Student ID', etc. The
-  # default is 'Email'.
+  # default is 'Email'. _Deprecated_ [Use update_sso_settings instead]
   #
   # You can set the 'position' for any configuration. The config in the 1st position
   # is considered the default.
@@ -207,7 +225,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   #   The SAML service's certificate fingerprint.
   #
-  # - change_password_url [Optional]
+  # - change_password_url [Optional] _Deprecated_ [2015-05-08: use update_sso_settings instead]
   #
   #   Forgot Password URL. Leave blank for default Canvas behavior.
   #
@@ -272,7 +290,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   #   Password
   #
-  # - change_password_url [Optional]
+  # - change_password_url [Optional] _Deprecated_ [2015-05-08: use update_sso_settings instead]
   #
   #   Forgot Password URL. Leave blank for default Canvas behavior.
   #
@@ -314,7 +332,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #        -F 'log_in_url=<login_url>' \
   #        -H 'Authorization: Bearer <token>'
   #
-  # _Deprecated_ Examples:
+  # _Deprecated_[2015-05-08] Examples:
   #
   # This endpoint still supports a deprecated version of setting the authorization configs.
   # If you send data in this format it is considered a snapshot of how the configs
@@ -381,9 +399,9 @@ class AccountAuthorizationConfigsController < ApplicationController
     else
       aac_data = params.has_key?(:account_authorization_config) ? params[:account_authorization_config] : params
       data = filter_data(aac_data)
-
       position = data.delete :position
       account_config = @account.account_authorization_configs.build(data)
+      update_deprecated_account_settings_data(aac_data, account_config)
 
       if position.present?
         account_config.insert_at(position.to_i)
@@ -391,7 +409,10 @@ class AccountAuthorizationConfigsController < ApplicationController
         account_config.save!
       end
 
-      render :json => aac_json(account_config)
+      respond_to do |format|
+        format.html { redirect_to(account_account_authorization_configs_path(@account)) }
+        format.json { render json: aac_json(account_config) }
+      end
     end
   end
 
@@ -410,10 +431,16 @@ class AccountAuthorizationConfigsController < ApplicationController
   def update
     aac_data = params.has_key?(:account_authorization_config) ? params[:account_authorization_config] : params
     aac = @account.account_authorization_configs.find params[:id]
+    update_deprecated_account_settings_data(aac_data, aac)
     data = filter_data(aac_data)
 
     if aac.auth_type != data[:auth_type]
-      render :json => {:message => t('no_changing_auth_types', 'Can not change type of authorization config, please delete and create new config.')}, :status => 400
+      render(json: {
+               message: t('no_changing_auth_types',
+                           'Can not change type of authorization config, '\
+                           'please delete and create new config.')
+             },
+             status: 400)
       return
     end
 
@@ -425,7 +452,10 @@ class AccountAuthorizationConfigsController < ApplicationController
       aac.save!
     end
 
-    render :json => aac_json(aac)
+    respond_to do |format|
+      format.html { redirect_to(account_account_authorization_configs_path(@account)) }
+      format.json { render json: aac_json(aac) }
+    end
   end
 
   # @API Get Authorization Config
@@ -439,7 +469,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   def show
     aac = @account.account_authorization_configs.find params[:id]
-    render :json => aac_json(aac)
+    render json: aac_json(aac)
   end
 
   # @API Delete Authorization Config
@@ -452,7 +482,10 @@ class AccountAuthorizationConfigsController < ApplicationController
     aac = @account.account_authorization_configs.find params[:id]
     aac.destroy
 
-    render :json => aac_json(aac)
+    respond_to do |format|
+      format.html { redirect_to(account_account_authorization_configs_path(@account)) }
+      format.json { render json: aac_json(aac) }
+    end
   end
 
   # deprecated version of the AAC API
@@ -493,8 +526,10 @@ class AccountAuthorizationConfigsController < ApplicationController
     render :json => aacs_json(@account.account_authorization_configs)
   end
 
-  # @API GET discovery url
-  # Get the discovery url
+  # @API GET discovery url _Deprecated_[2015-05-08]
+  # Get the discovery url _Deprecated_[2015-05-08]
+  #
+  # [Use update_sso_settings instead]
   #
   # @example_request
   #   curl 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs/discovery_url' \
@@ -505,7 +540,9 @@ class AccountAuthorizationConfigsController < ApplicationController
     render :json => {:discovery_url => @account.auth_discovery_url}
   end
 
-  # @API Set discovery url
+  # @API Set discovery url _Deprecated_[2015-05-08]
+  #
+  # [Use update_sso_settings instead]
   #
   # If you have multiple IdPs configured, you can set a `discovery_url`.
   # If that is set, canvas will forward all users to that URL when they need to
@@ -535,8 +572,10 @@ class AccountAuthorizationConfigsController < ApplicationController
     end
   end
 
-  # @API Delete discovery url
-  # Clear discovery url
+  # @API Delete discovery url _Deprecated_[2015-05-08]
+  # Clear discovery url _Deprecated_[2015-05-08]
+  #
+  # [Use update_sso_settings instead]
   #
   # @example_request
   #   curl -XDELETE 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs/discovery_url' \
@@ -546,6 +585,75 @@ class AccountAuthorizationConfigsController < ApplicationController
     @account.auth_discovery_url = nil
     @account.save!
     render :json => {:discovery_url => @account.auth_discovery_url}
+  end
+
+
+  # @API show account auth settings
+  #
+  # The way to get the current state of each account level setting
+  # that's relevant to Single Sign On configuration
+  #
+  # You can list the current state of each setting with "update_sso_settings"
+  #
+  # @example_request
+  #   curl -XGET 'https://<canvas>/api/v1/accounts/<account_id>/sso_settings' \
+  #        -H 'Authorization: Bearer <token>'
+  #
+  # @returns SSOSettings
+  def show_sso_settings
+    respond_to do |format|
+      format.html { redirect_to(account_account_authorization_configs_path(@account)) }
+      format.json do
+        render json: {
+          sso_settings: {
+            login_handle_name: @account.login_handle_name,
+            change_password_url: @account.change_password_url,
+            auth_discovery_url: @account.auth_discovery_url
+          }
+        }
+      end
+    end
+  end
+
+  # @API update account auth settings
+  #
+  # For various cases of mixed SSO configurations, you may need to set some
+  # configuration at the account level to handle the particulars of your
+  # setup.
+  #
+  # This endpoint accepts a PUT request to set 3 possible account settings.
+  # All 3 are optional on each request, any that are not provided at all
+  # are simply retained as is.  Any that provide the key but a null-ish value
+  # (blank string, null, undefined) will be UN-set.
+  #
+  # You can list the current state of each setting with "show_sso_settings"
+  #
+  # @example_request
+  #   curl -XPUT 'https://<canvas>/api/v1/accounts/<account_id>/sso_settings' \
+  #        -F 'sso_settings[auth_discovery_url]=<new_url>' \
+  #        -F 'sso_settings[change_password_url]=<new_url>' \
+  #        -F 'sso_settings[login_handle_name]=<new_handle>' \
+  #        -H 'Authorization: Bearer <token>'
+  #
+  # @returns SSOSettings
+  def update_sso_settings
+    sets = strong_params.require(:sso_settings).permit(:login_handle_name,
+                                                       :change_password_url,
+                                                       :auth_discovery_url)
+    update_account_settings_from_hash(sets)
+
+    respond_to do |format|
+      format.html { redirect_to(account_account_authorization_configs_path(@account)) }
+      format.json do
+        render json: {
+          sso_settings: {
+            login_handle_name: @account.login_handle_name,
+            change_password_url: @account.change_password_url,
+            auth_discovery_url: @account.auth_discovery_url
+          }
+        }
+      end
+    end
   end
 
   def test_ldap_connection
@@ -631,23 +739,44 @@ class AccountAuthorizationConfigsController < ApplicationController
       @account_config.start_debugging if params[:start_debugging]
 
       respond_to do |format|
-        format.html { render :partial => 'saml_testing', :layout => false }
-        format.json { render :json => {:debugging => @account_config.debugging?, :debug_data => render_to_string(:partial => 'saml_testing.html', :layout => false) } }
+        format.html do
+          render partial: 'saml_testing',
+                 locals: { config: @account_config },
+                 layout: false
+        end
+        format.json do
+          render json: {
+            debugging: @account_config.debugging?,
+            debug_data: render_to_string(partial: 'saml_testing',
+                                         locals: { config: @account_config },
+                                         formats: [:html],
+                                         layout: false)
+          }
+        end
       end
     else
       respond_to do |format|
-        format.html { render :partial => 'saml_testing', :layout => false }
-        format.json { render :json => {:errors => {:account => t(:saml_required, "A SAML configuration is required to test SAML")}} }
+        format.html do
+          render partial: 'saml_testing',
+                 locals: { config: @account_config },
+                 layout: false
+        end
+        format.json do
+          render json: {
+            errors: {
+              account: t(:saml_required,
+                         "A SAML configuration is required to test SAML")
+            }
+          }
+        end
       end
     end
   end
 
   def saml_testing_stop
-    if @account_config = @account.account_authorization_config
-      @account_config.finish_debugging 
-    end
-
-    render :json => {:status => "ok"}
+    account_config = @account.account_authorization_config
+    account_config.finish_debugging if account_config.present?
+    render json: { status: "ok" }
   end
 
   protected
@@ -659,5 +788,25 @@ class AccountAuthorizationConfigsController < ApplicationController
       data[:auth_over_tls] = AccountAuthorizationConfig::LDAP.auth_over_tls_setting(data[:auth_over_tls])
     end
     data
+  end
+
+  # These settings were moved to the account settings level,
+  # but we can't just change the API with no warning, so this keeps
+  # them able to update through the API for an AAC until we get appropriate notifications
+  # sent and have given reasonable time to update any integrations.
+  #  --2015-05-08
+  def update_deprecated_account_settings_data(data, aac)
+    data ||= {}
+    data = data.slice(*aac.class.deprecated_params)
+    update_account_settings_from_hash(data)
+  end
+
+  def update_account_settings_from_hash(data)
+    return if data.empty?
+    data.each do |setting, value|
+      setting_val = value.present? ? value : nil
+      @account.public_send("#{setting}=".to_sym, setting_val)
+    end
+    @account.save!
   end
 end

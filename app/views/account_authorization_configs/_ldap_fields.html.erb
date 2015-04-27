@@ -1,0 +1,135 @@
+<table class="formtable" style="margin-left: 20px;">
+
+  <% if aac.try(:last_timeout_failure).present? %>
+    <tr class='last_timeout_failure'>
+      <td>
+        <%= before_label(t(:last_ldap_timeout_failure, "Last timeout failure")) %>
+      </td>
+      <td>
+        <%= datetime_string(aac.last_timeout_failure) %>
+        <p>
+          <%= t :ldap_timeout_failure_help2,
+                "If Canvas times out too many times communicating with the LDAP server,"\
+                  " it will block further login attempts from using that LDAP "\
+                  "server for %{time}.",
+                time: distance_of_time_in_words(aac.failure_wait_time) %>
+        </p>
+      </td>
+    </tr>
+  <% end %>
+
+  <%= render partial: "form_header",
+             locals: { auth_type: t("LDAP"), account: account, aac: aac } %>
+
+  <%= fields_for :account_authorization_config, aac do |f| %>
+    <%= f.hidden_field :disabled, value: '0' %>
+    <%= f.hidden_field :auth_type, :value => 'ldap' %>
+    <%= f.hidden_field :id %>
+    <tr>
+      <td style="vertical-align: top; width: 200px;">
+        <%= f.blabel :auth_host, en: "Host" %>
+      </td>
+      <td style="vertical-align: top;" class="nobr">
+        <%= f.text_field :auth_host, class: "auth_form", style: "width: 300px;" %>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; width: 200px;">
+        <%= f.blabel :auth_port, en: "Port" %>
+      </td>
+      <td style="vertical-align: top;" class="nobr">
+        <%= f.text_field :auth_port, class: "auth_form", style: "width: 50px;" %>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; width: 200px;">
+        <%= f.blabel :auth_over_tls, en: "Over TLS?" %>
+      </td>
+      <td style="vertical-align: top;" class="nobr">
+        <%= f.radio_button :auth_over_tls, 'start_tls', class: "auth_form" %>
+        <%= f.label :auth_over_tls_start_tls,
+                    :auth_over_tls_start_tls,
+                    en: "StartTLS",
+                    class: "auth_form" %>
+        <%= f.radio_button :auth_over_tls, 'simple_tls', class: "auth_form" %>
+        <%= f.label :auth_over_tls_simple_tls,
+                    :auth_over_tls_simple_tls,
+                    en: "Simple TLS",
+                    class: "auth_form" %>
+        <%= f.radio_button :auth_over_tls,
+                           'false',
+                           class: "auth_form",
+                           checked: !aac.auth_over_tls %>
+        <%= f.label :auth_over_tls_false,
+                    :auth_over_tls_false,
+                    en: "No TLS",
+                    class: "auth_form" %>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; width: 200px;">
+        <%= f.blabel :auth_base, en: "Base" %>
+      </td>
+      <td colspan="3" style="vertical-align: top;" class="nobr">
+        <%= f.text_field :auth_base, class: "auth_form", style: "width: 300px;" %>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
+        <%= f.blabel :auth_filter, en: "Filter" %>
+      </td>
+      <td style="vertical-align: top;">
+        <%= f.text_field :auth_filter, class: "auth_form", style: "width: 300px;" %>
+        <span class="auth_form" style="font-size: smaller;">
+          <br/>
+          <%= t(:auth_filter_description,
+                "Use *%{placeholder}* as a placeholder for the username "\
+                  "supplied by the user. \nFor example: "\
+                  "*(sAMAccountName=%{placeholder})*",
+                placeholder: '{{login}}',
+                wrapper: '<code>\1</code>') %>
+        </span>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
+        <%= f.blabel :identifier_format, en: "Login ID Attribute" %>
+      </td>
+      <td style="vertical-align: top;">
+        <%= f.text_field :identifier_format, class: "auth_form", style: "width: 300px;" %>
+        <span class="auth_form" style="font-size: smaller;">
+          <br/>
+          <%= t(:identifer_format_description,
+                  "The LDAP attribute to use to look up the Canvas login. "\
+                  "Leave blank to use the username supplied by the user.") %>
+        </span>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <%= f.blabel :auth_username, en: "Username" %>
+      </td>
+      <td>
+        <%= f.text_field :auth_username, class: "auth_form", style: "width: 300px;" %>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <%= f.blabel :auth_password, en: "Password" %>
+      </td>
+      <td style=" vertical-align: top;" class="nobr">
+        <%= f.text_field :auth_password, value: '', class: "auth_form" %>
+        <% if aac.auth_crypted_password -%>
+          <span class="auth_form" style="font-size: smaller;">
+            <br/>
+            <%= t(:auth_password_description,
+                  "Leave blank to continue using the current password.") %>
+          </span>
+        <% end %>
+      </td>
+    </tr>
+
+    <%= render partial: "form_footer",
+               locals: { presenter: presenter, account: account, aac: aac, f: f } %>
+  <% end %>
+</table>

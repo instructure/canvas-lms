@@ -523,6 +523,11 @@ CanvasRails::Application.routes.draw do
     resources :submissions
     put 'account_authorization_configs' => 'account_authorization_configs#update_all', as: :update_all_authorization_configs
     delete 'account_authorization_configs' => 'account_authorization_configs#destroy_all', as: :remove_all_authorization_configs
+    get 'sso_settings' => 'account_authorization_configs#show_sso_settings',
+        as: :sso_settings
+    put 'sso_settings' => 'account_authorization_configs#update_sso_settings',
+        as: :update_sso_settings
+
     resources :account_authorization_configs
     get 'test_ldap_connections' => 'account_authorization_configs#test_ldap_connection'
     get 'test_ldap_binds' => 'account_authorization_configs#test_ldap_bind'
@@ -1134,6 +1139,15 @@ CanvasRails::Application.routes.draw do
       get 'accounts/:account_id/account_authorization_configs/discovery_url', action: :show_discovery_url
       put 'accounts/:account_id/account_authorization_configs/discovery_url', action: :update_discovery_url, as: 'account_update_discovery_url'
       delete 'accounts/:account_id/account_authorization_configs/discovery_url', action: :destroy_discovery_url, as: 'account_destroy_discovery_url'
+
+      get 'accounts/:account_id/sso_settings',
+          action: :show_sso_settings,
+          as: 'account_show_sso_settings_url'
+
+      put 'accounts/:account_id/sso_settings',
+          action: :update_sso_settings,
+          as: 'account_update_sso_settings_url'
+
 
       get 'accounts/:account_id/account_authorization_configs', action: :index
       get 'accounts/:account_id/account_authorization_configs/:id', action: :show

@@ -32,6 +32,16 @@ module Api::V1::AccountAuthorizationConfig
     allowed_params.each do |param|
       result[param] = aac.send(param)
     end
+
+    # These settings were moved to the account settings level,
+    # but we can't just change the API with no warning, so this keeps
+    # them coming through in the JSON until we get appropriate notifications
+    # sent and have given reasonable time to update any integrations.
+    #  --2015-05-08
+    aac.class.deprecated_params.each do |setting|
+      result[setting] = aac.account.public_send(setting)
+    end
+
     result
   end
 end

@@ -3,7 +3,7 @@
 <% hide_self_reg_banner ||= false %>
 <% extend Api::V1::Account %>
 <% js_bundle :login %>
-<% login_handle_name = @domain_root_account.login_handle_name rescue AccountAuthorizationConfig.default_login_handle_name %>
+<% login_handle_name = @domain_root_account.login_handle_name_with_inference %>
 <div id="modal-box" class="login-box">
     <div id="modal-box-inner">
     <div class="clearfix">

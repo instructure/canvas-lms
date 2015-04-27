@@ -162,7 +162,8 @@ class Account < ActiveRecord::Base
   add_setting :error_reporting, :hash => true, :values => [:action, :email, :url, :subject_param, :body_param], :root_only => true
   add_setting :custom_help_links, :root_only => true
   add_setting :prevent_course_renaming_by_teachers, :boolean => true, :root_only => true
-  add_setting :login_handle_name, :root_only => true
+  add_setting :login_handle_name, root_only: true
+  add_setting :change_password_url, root_only: true
 
   add_setting :restrict_student_future_view, :boolean => true, :default => false, :inheritable => true
   add_setting :restrict_student_past_view, :boolean => true, :default => false, :inheritable => true
@@ -793,23 +794,13 @@ class Account < ActiveRecord::Base
     self.account_authorization_configs.first
   end
 
-  # If an account uses an authorization_config, it's login_handle_name is used.
-  # Otherwise they can set it on the account settings page.
   def login_handle_name_is_customized?
-    if self.account_authorization_config
-      self.account_authorization_config.login_handle_name.present?
-    else
-      settings[:login_handle_name].present?
-    end
+    self.login_handle_name.present?
   end
 
-  def login_handle_name
+  def login_handle_name_with_inference
     if login_handle_name_is_customized?
-      if account_authorization_config
-        account_authorization_config.login_handle_name
-      else
-        settings[:login_handle_name]
-      end
+      self.login_handle_name
     elsif self.delegated_authentication?
       AccountAuthorizationConfig.default_delegated_login_handle_name
     else
@@ -969,7 +960,7 @@ class Account < ActiveRecord::Base
   end
 
   def forgot_password_external_url
-    account_authorization_config.try(:change_password_url)
+    self.change_password_url
   end
 
   def cas_authentication?
@@ -994,6 +985,22 @@ class Account < ActiveRecord::Base
 
   def auth_discovery_url
     self.settings[:auth_discovery_url]
+  end
+
+  def login_handle_name=(handle_name)
+    self.settings[:login_handle_name] = handle_name
+  end
+
+  def login_handle_name
+    self.settings[:login_handle_name]
+  end
+
+  def change_password_url=(change_password_url)
+    self.settings[:change_password_url] = change_password_url
+  end
+
+  def change_password_url
+    self.settings[:change_password_url]
   end
 
   def validate_auth_discovery_url

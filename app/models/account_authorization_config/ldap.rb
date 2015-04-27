@@ -26,8 +26,8 @@ class AccountAuthorizationConfig::LDAP < AccountAuthorizationConfig
 
   def self.recognized_params
     [ :auth_type, :auth_host, :auth_port, :auth_over_tls, :auth_base,
-      :auth_filter, :auth_username, :auth_password, :change_password_url,
-      :identifier_format, :login_handle_name, :position ]
+      :auth_filter, :auth_username, :auth_password,
+      :identifier_format, :position ]
   end
 
   def clear_last_timeout_failure

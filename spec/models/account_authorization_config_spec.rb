@@ -19,12 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe AccountAuthorizationConfig do
-  it "should replace empty string with nil" do
-    @account = Account.new
-    config = @account.account_authorization_configs.build
-    config.change_password_url = ""
-    expect(config.change_password_url).to be_nil
-  end
 
   context "password" do
     it "should decrypt the password to the original value" do

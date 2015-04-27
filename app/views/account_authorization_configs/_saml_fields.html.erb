@@ -1,0 +1,70 @@
+<%= fields_for(:account_authorization_config, aac) do |f| %>
+  <%= f.hidden_field :auth_type, value: 'saml' %>
+  <%= f.hidden_field :id %>
+  <table class="formtable" style="margin-left: 20px;">
+    <%= render partial: "form_header",
+               locals: { auth_type: t("SAML"), account: account, aac: aac } %>
+
+    <tr>
+      <td><%= f.blabel :idp_entity_id, en: "IdP Entity ID" %></td>
+      <td><%= f.text_field :idp_entity_id, class: "input-xlarge" %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :log_in_url, en: "Log On URL" %></td>
+      <td><%= f.text_field :log_in_url, class: "input-xlarge", style: "width: 300px;" %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :log_out_url, en: "Log Out URL" %></td>
+      <td><%= f.text_field :log_out_url, class: "input-xlarge", style: "width: 300px;" %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :certificate_fingerprint, en: "Certificate Fingerprint" %></td>
+      <td><%= f.text_field :certificate_fingerprint, class: "input-xlarge" %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :login_attribute, en: "Login Attribute" %></td>
+      <td>
+        <%= f.select(:login_attribute,
+                     presenter.saml_login_attributes,
+                     {},
+                     {class: "input-xlarge"}) %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :identifier_format, en: "Identifier Format" %></td>
+      <td>
+        <%= f.select(:identifier_format,
+                      presenter.saml_identifiers,
+                      {},
+                      {class: "input-xlarge"}) %>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <%= f.blabel :requested_authn_context, en: "Authentication Context" %>
+      </td>
+      <td>
+        <%= f.select(:requested_authn_context,
+                     presenter.saml_authn_contexts,
+                     {},
+                     {class: "input-xlarge"}) %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :unknown_user_url, en: "Unknown User Url" %></td>
+      <td>
+        <%= f.text_field(:unknown_user_url,
+                         class: "input-xlarge",
+                         placeholder: login_url(no_auto: 'true')) %>
+        <span class="auth_form" style="font-size: smaller;">
+          <br/>
+          <%= t(:unknown_user_url_description,
+                "The url to redirect to when an authenticated user is not "\
+                "found in Canvas.") %>
+        </span>
+      </td>
+    </tr>
+    <%= render partial: "form_footer",
+               locals: { presenter: presenter, account: account, aac: aac, f: f } %>
+  </table>
+<% end %>

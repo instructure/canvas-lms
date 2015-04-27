@@ -1,0 +1,14 @@
+<tr>
+  <th style="text-align: left">
+    <%= before_label(t(:auth_type_label, "Type")) %>
+  </th>
+  <th style="text-align: left">
+    <%= auth_type %>
+  </th>
+</tr>
+<% if account.multi_auth? && !aac.new_record? %>
+  <tr>
+    <td><%= t :auth_url, "Login url for this config" %></td>
+    <td><%= aac_login_url(aac.id || '') %></td>
+  </tr>
+<% end %>

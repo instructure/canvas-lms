@@ -133,15 +133,18 @@ TEXT
                   </tr>
 
                   <% unless @account.account_authorization_config
-                    #if the account has a account_authorization_config, we'll use it's login_handle_name, and this is irrelevant
+                    # if the account has a account_authorization_config,
+                    # we'll control this setting from that page
                   %>
                     <tr>
-                      <td><%= settings.blabel :login_handle_name, :en => "Login Label" %></td>
+                      <td>
+                        <%= settings.blabel :login_handle_name, en: "Login Label" %>
+                      </td>
                       <td>
                         <%= settings.text_field :login_handle_name,
-                                                :value => @account.settings[:login_handle_name],
-                                                :class => 'same-width-as-select',
-                                                :placeholder => t(:login_handle_name_placeholder, "ex: Login, Username, or Student ID") %>
+                                                value: @account.login_handle_name,
+                                                class: 'same-width-as-select',
+                                                placeholder: t(:login_handle_name_placeholder, "ex: Login, Username, or Student ID") %>
                       </td>
                     </tr>
                   <% end %>

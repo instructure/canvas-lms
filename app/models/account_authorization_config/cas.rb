@@ -17,20 +17,13 @@
 #
 
 class AccountAuthorizationConfig::CAS < AccountAuthorizationConfig::Delegated
+
   def self.sti_name
     'cas'
   end
 
   def self.recognized_params
-    [ :auth_type, :auth_base, :log_in_url, :login_handle_name, :unknown_user_url ]
+    [ :auth_type, :auth_base, :log_in_url, :unknown_user_url, :position ]
   end
 
-  def validate_multiple_auth_configs
-    return true unless account
-    other_configs = account.account_authorization_configs - [self]
-    unless other_configs.empty?
-      return errors.add(:auth_type, :multiple_cas_configs)
-    end
-    super
-  end
 end

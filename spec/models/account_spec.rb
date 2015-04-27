@@ -580,23 +580,23 @@ describe Account do
     expect(account.all_group_categories.count).to eq 2
   end
 
-  it "should return correct values for login_handle_name based on authorization_config" do
+  it "should return correct values for login_handle_name_with_inference" do
     account = Account.default
-    expect(account.login_handle_name).to eq "Email"
+    expect(account.login_handle_name_with_inference).to eq "Email"
 
-    config = account.account_authorization_configs.create!(:auth_type => 'cas')
-    expect(account.login_handle_name).to eq "Login"
-
-    config.destroy
-    config = account.account_authorization_configs.create!(:auth_type => 'saml')
-    expect(account.reload.login_handle_name).to eq "Login"
+    config = account.account_authorization_configs.create!(auth_type: 'cas')
+    expect(account.login_handle_name_with_inference).to eq "Login"
 
     config.destroy
-    config = account.account_authorization_configs.create!(:auth_type => 'ldap')
-    expect(account.reload.login_handle_name).to eq "Email"
-    config.login_handle_name = "LDAP Login"
-    config.save!
-    expect(account.reload.login_handle_name).to eq "LDAP Login"
+    config = account.account_authorization_configs.create!(auth_type: 'saml')
+    expect(account.reload.login_handle_name_with_inference).to eq "Login"
+
+    config.destroy
+    account.account_authorization_configs.create!(auth_type: 'ldap')
+    expect(account.reload.login_handle_name_with_inference).to eq "Email"
+    account.login_handle_name = "LDAP Login"
+    account.save!
+    expect(account.reload.login_handle_name_with_inference).to eq "LDAP Login"
   end
 
   context "users_not_in_groups" do
