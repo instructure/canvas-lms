@@ -25,6 +25,10 @@ define [
       super
       @model.on('change', @render)
 
+    edit: (e) ->
+      # refocus if edit not finalized
+      @$el.find('.al-trigger').focus()
+
     delete: (e) ->
       e.preventDefault()
       if !confirm I18n.t('confirm.delete', "Are you sure you want to delete this conference?")
