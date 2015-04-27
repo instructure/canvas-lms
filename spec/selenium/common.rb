@@ -1036,7 +1036,7 @@ shared_examples_for "all selenium tests" do
   end
 
   def flash_message_present?(type=:warning, message_regex=nil)
-    messages = ff("#flash_message_holder .ic-flash-#{type.to_s}")
+    messages = ff("#flash_message_holder .ic-flash-#{type}")
     return false if messages.length == 0
     if message_regex
       text = messages.map(&:text).join('\n')

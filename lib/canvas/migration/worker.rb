@@ -64,7 +64,7 @@ module Canvas::Migration::Worker
       content_migration.exported_attachment = att
       content_migration.save
     rescue => e
-      Rails.logger.warn "Error while uploading exported data for content_migration #{content_migration.id} - #{e.to_s}"
+      Rails.logger.warn "Error while uploading exported data for content_migration #{content_migration.id} - #{e}"
       raise e
     end
 

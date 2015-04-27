@@ -58,7 +58,7 @@ class WimbaConference < WebConference
 
   def craft_api_url(action, opts={})
     url = "http://#{server}/admin/api/api.pl"
-    query_string = "function=#{action.to_s}"
+    query_string = "function=#{action}"
     opts.each do |key, val|
       query_string += "&#{CGI::escape(key)}=#{CGI::escape(val.to_s)}"
     end

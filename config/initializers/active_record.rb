@@ -48,7 +48,7 @@ class ActiveRecord::Base
 
   def feed_code
     id = self.uuid rescue self.id
-    "#{self.class.reflection_type_name}_#{id.to_s}"
+    "#{self.class.reflection_type_name}_#{id}"
   end
 
   def self.all_models
@@ -810,7 +810,7 @@ ActiveRecord::Relation.class_eval do
           join_conditions.each { |join| scope = scope.where(join) }
           sql.concat(scope.arel.where_sql.to_s)
         when 'MySQL', 'Mysql2'
-          sql = "DELETE #{quoted_table_name} FROM #{quoted_table_name} #{arel.join_sql.to_s} #{arel.where_sql.to_s}"
+          sql = "DELETE #{quoted_table_name} FROM #{quoted_table_name} #{arel.join_sql} #{arel.where_sql}"
         else
           raise "Joins in delete not supported!"
         end
@@ -828,7 +828,7 @@ ActiveRecord::Relation.class_eval do
       case connection.adapter_name
       when 'MySQL', 'Mysql2'
         v = arel.visitor
-        sql = "DELETE #{quoted_table_name} FROM #{quoted_table_name} #{arel.where_sql.to_s}
+        sql = "DELETE #{quoted_table_name} FROM #{quoted_table_name} #{arel.where_sql}
             ORDER BY #{arel.orders.map { |x| v.send(:visit, x) }.join(', ')} LIMIT #{v.send(:visit, arel.limit)}"
         return connection.delete(sql, "#{name} Delete all")
       else

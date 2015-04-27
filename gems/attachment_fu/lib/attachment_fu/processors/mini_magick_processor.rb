@@ -89,7 +89,7 @@ module AttachmentFu # :nodoc:
                 commands.extent(size)
             # resize image
             else
-              commands.resize("#{size.to_s}")
+              commands.resize("#{size}")
             end
           # crop end
           else

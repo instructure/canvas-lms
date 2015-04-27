@@ -432,7 +432,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       @assignment_submission.quiz_submission_id = self.id
       @assignment_submission.graded_at = [self.end_at, Time.zone.now].compact.min
       @assignment_submission.grader_id = self.grader_id || "-#{self.quiz_id}".to_i
-      @assignment_submission.body = "user: #{self.user_id}, quiz: #{self.quiz_id}, score: #{self.score}, time: #{Time.now.to_s}"
+      @assignment_submission.body = "user: #{self.user_id}, quiz: #{self.quiz_id}, score: #{self.score}, time: #{Time.now}"
       @assignment_submission.user_id = self.user_id
       @assignment_submission.submission_type = "online_quiz"
       @assignment_submission.saved_by = :quiz_submission
@@ -630,7 +630,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   def update_submission_version(version, attrs)
     version_data = YAML::load(version.yaml)
     version_data["submission_data"] = self.submission_data if attrs.include?(:submission_data)
-    version_data["temporary_user_code"] = "was #{version_data['score']} until #{Time.now.to_s}"
+    version_data["temporary_user_code"] = "was #{version_data['score']} until #{Time.now}"
     version_data["score"] = self.score if attrs.include?(:score)
     version_data["fudge_points"] = self.fudge_points if attrs.include?(:fudge_points)
     version_data["workflow_state"] = self.workflow_state if attrs.include?(:workflow_state)
@@ -734,7 +734,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
         s = self.submission
         s.score = self.kept_score
         s.grade_matches_current_submission = true
-        s.body = "user: #{self.user_id}, quiz: #{self.quiz_id}, score: #{self.kept_score}, time: #{Time.now.to_s}"
+        s.body = "user: #{self.user_id}, quiz: #{self.quiz_id}, score: #{self.kept_score}, time: #{Time.now}"
         s.saved_by = :quiz_submission
         s.save!
       end

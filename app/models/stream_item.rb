@@ -171,7 +171,7 @@ class StreamItem < ActiveRecord::Base
     when AssessmentRequest
       res = object.attributes
     else
-      raise "Unexpected stream item type: #{object.class.to_s}"
+      raise "Unexpected stream item type: #{object.class}"
     end
     if self.context_type
       res['context_short_name'] = Rails.cache.fetch(['short_name_lookup', self.context_type, self.context_id].cache_key) do

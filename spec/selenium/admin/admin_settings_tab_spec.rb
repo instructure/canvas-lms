@@ -38,7 +38,7 @@ describe "admin settings tab" do
       features.each do |feature|
         check_state = Account.default.service_enabled?(feature)
         state_checker checker, !check_state
-        default_selectors.push("#account_services_#{feature.to_s}")
+        default_selectors.push("#account_services_#{feature}")
       end
       css_selectors = default_selectors
     end
@@ -57,7 +57,7 @@ describe "admin settings tab" do
         features.each do |feature|
           check_state = Account.default.service_enabled?(feature)
           state_checker checker, check_state
-          default_selectors.push("#account_services_#{feature.to_s}")
+          default_selectors.push("#account_services_#{feature}")
         end
         if (checker)
           default_selectors += css_selectors
