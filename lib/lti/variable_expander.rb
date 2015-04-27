@@ -233,6 +233,10 @@ module Lti
                        -> { @current_pseudonym.id },
                        -> { @current_pseudonym != @current_user }
 
+    register_expansion 'Canvas.masqueradingUser.userId', [],
+                       -> { @tool.opaque_identifier_for(@controller.logged_in_user) },
+                       USER_GUARD
+
     register_expansion 'Canvas.xapi.url', [],
                        -> { @controller.lti_xapi_url(Lti::AnalyticsService.create_token(@tool, @current_user, @context)) },
                        -> { @current_user && @context.is_a?(Course) && @tool }

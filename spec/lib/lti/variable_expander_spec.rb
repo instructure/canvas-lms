@@ -34,6 +34,7 @@ module Lti
       shard_mock = mock('shard')
       shard_mock.stubs(:settings).returns({encription_key: 'abc'})
       m.stubs(:shard).returns(shard_mock)
+      m.stubs(:opaque_identifier_for).returns("6cd2e0d65bd5aef3b5ee56a64bdcd595e447bc8f")
       m
     end
     let(:controller) do
@@ -544,6 +545,12 @@ module Lti
           exp_hash = {test: '$Canvas.masqueradingUser.id'}
           subject.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq 7878
+        end
+
+        it 'has substitution for $Canvas.masqueradingUser.userId' do
+          exp_hash = {test: '$Canvas.masqueradingUser.userId'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq '6cd2e0d65bd5aef3b5ee56a64bdcd595e447bc8f'
         end
 
         it 'has substitution for Canvas.module.id' do
