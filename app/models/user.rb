@@ -2652,8 +2652,10 @@ class User < ActiveRecord::Base
   end
 
   def show_bouncing_channel_message!
-    self.preferences[:show_bouncing_channel_message] = true
-    self.save!
+    unless show_bouncing_channel_message?
+      self.preferences[:show_bouncing_channel_message] = true
+      self.save!
+    end
   end
 
   def show_bouncing_channel_message?
@@ -2661,8 +2663,10 @@ class User < ActiveRecord::Base
   end
 
   def dismiss_bouncing_channel_message!
-    self.preferences[:show_bouncing_channel_message] = false
-    self.save!
+    if show_bouncing_channel_message?
+      self.preferences[:show_bouncing_channel_message] = false
+      self.save!
+    end
   end
 
   def bouncing_channel_message_dismissed?
