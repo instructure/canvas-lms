@@ -45,7 +45,7 @@ module Lti
         if %w(all distinct).include?(bubble)
           graph = []
           distinct = bubble == 'distinct' ? [] : nil
-          while tool_setting do
+          while tool_setting
             graph << collect_tool_settings(tool_setting, distinct)
             distinct |= graph.last.custom.keys if distinct
             case tool_setting_type(tool_setting)
