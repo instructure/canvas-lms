@@ -1273,11 +1273,6 @@ de:
       messages: 
         record_invalid: "Bestätigungung fehlgeschlagen: %{errors}"
         taken: "ist bereits in Verwendung"
-      template: 
-        body: "Bei folgenden Feldern wurden Probleme festgestellt:"
-        header: 
-          one: "1 Fehler hat das Speichern von %{model} verhindert"
-          other: "%{count} Fehler haben das Speichern von %{model} verhindert"
   activity_13915493: Aktivität
   activity_by_category_9c2033d1: "Aktivität nach Kategorie"
   activity_by_date_878c5b49: "Aktivität nach Datum"
@@ -1685,6 +1680,8 @@ de:
       assignment_name: "Name:"
       assignment_points: "Punkte:"
       assignment_type: "Typ:"
+      buttons: 
+        save_and_publish: "Speichern & Veröffentlichen"
       cancel: Abbrechen
       differentiated_due_dates: "Differenzierter Abgabetermin"
       discussion_type: Diskussion
@@ -1757,7 +1754,8 @@ de:
     edit_view: 
       assignment_name: "Name der Aufgabe"
       buttons: 
-        update: "Aufgabe aktualisieren"
+        save: Speichern
+        save_and_publish: "Speichern & Veröffentlichen"
       description: Beschreibung
       freeze_properties: "Aufgabeeigenschaften nach Kopiervorgang sperren"
       notify_content_change: "Benutzer bei Änderung von Inhalten benachrichtigen"
@@ -2224,7 +2222,6 @@ de:
   between_1_and_99_d421a4c0: "Zwischen 1% und 99%"
   between_2_and_5_c34f5152: "Zwischen 2 und 5"
   big_blue_button_conference: 
-    conference_is_recorded: "Diese Konferenz wird aufgezeichnet."
     recording_setting: Aufzeichnung
     recording_setting_enabled_description: "Aufzeichnung für diese Konferenz aktivieren"
   blackboard: 
@@ -2745,9 +2742,9 @@ de:
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Kann Diffing nicht bei mehr als eienr Datei des selben Dateityps ausführen"
   cancel_caeb1e68: Abbrechen
   cannot_be_nil_when_account_id_is_nil_be6d1d60: "darf nicht null sein, wenn Account_ID null ist"
-  cannot_be_nil_when_course_id_is_nil_f539388: "darf nicht null sein, wenn Kurs_ID null ist"
-  cannot_be_present_when_account_id_is_present_f7d9b51f: "darf nicht vorhanden sein, wenn Account_ID vorhanden ist"
-  cannot_be_present_when_course_id_is_present_785e6a59: "darf nicht vorhanden sein, wenn Kurs_ID vorhanden ist"
+  cannot_be_nil_when_course_id_is_nil_f539388: "darf nicht null sein, wenn course_id null ist"
+  cannot_be_present_when_account_id_is_present_f7d9b51f: "darf nicht vorhanden sein, wenn account_id vorhanden ist"
+  cannot_be_present_when_course_id_is_present_785e6a59: "darf nicht vorhanden sein, wenn course_id vorhanden ist"
   canvas: 
     migration: 
       errors: 
@@ -3675,8 +3672,6 @@ de:
       edit_item: "Elementdetails bearbeiten"
     url_show: 
       new_tab: "Diese Site muss in einem neuen Browserfenster geöffnet werden."
-      open_url_button: "%{title} in einem neuen Fenster öffnen"
-      tool_insecure_warning: "Sie haben versucht, Insecure-Inhalte von einer sicheren Site (Canvas) aus zu öffnen. Manche Internetbrowser verhindern möglicherweise das Laden dieser Inhalte."
   context_modules_api: 
     invalid_position: "Ungültige Position"
   continue_ac067716: Fortfahren
@@ -5100,6 +5095,7 @@ de:
       buttons: 
         not_published: "Nicht veröffentlicht"
         published: Veröffentlicht
+        save_and_publish: "Speichern & Veröffentlichen"
       delay_posting: "Einstellen verzögern"
       enable_podcast_feed: "Podcast-feed zulassen"
       include_replies_in_podcast_feed: "Im Podcast-Feed Antworten der Studenten zulassen"
@@ -5455,7 +5451,6 @@ de:
   ember_modules_description: "In Ember neu geschriebene Module. Verwenden Sie die native API zum Ziehen und Ablegen, um das Ziehen und Ablegen aus externen Speicherorten zu gestatten."
   enable_6f5d1328: Aktivieren
   enable_gradebook_list_students_by_sortable_name: "Listen Sie Studenten im Notenbuch nach ihren sortierbaren Namen auf. Die Standardwerte für sortierbare Namen sind 'Nachname, Vorname'. Diese können in den Einstellungen geändert werden."
-  enable_multiple_grading_periods: "Verwaltung von mehreren Benotungszeiträumen in der Kontoverwaltung ermöglichen und im Notenbuch verwenden."
   end_date_e0093ed7: Enddatum
   ends_on_date_320e0c26: "Datum 'Endet am'"
   enrollment: 
@@ -5754,7 +5749,6 @@ de:
   errors: 
     bad_navigation_config: "Ungültige Kursfensterkonfiguration"
     blank: Erforderlich
-    dynamic_format: "%{message}"
     failed: Fehlgeschlagen
     format: "%{attribute} %{message}"
     index: 
@@ -5961,6 +5955,7 @@ de:
     wiki_page_menu_configured: "Menü \"Wiki-Seite\" konfiguriert"
   external_url_e9b87215: "Externe URL"
   failed_to_create_zip_file_1a943d06: "Erstellung der .zip-Datei fehlgeschlagen"
+  failed_to_import_media_objects_4c1fcb4f: "Fehler beim Import von Medienobjekten"
   fair_use_bee47d77: "Faire Nutzung"
   favicon_6e658914: Favicon
   feature_flags: 
@@ -5979,6 +5974,7 @@ de:
     feature_flag_admin_view: 
       feature_options: Funktionsoptionen
       no_features_available: "Derzeit sind keine Funktionen verfügbar."
+  feature_options_37a2c317: Funktionsoptionen
   features: 
     allow_opt_out_of_inbox: "Benutzern das Deaktivieren des Posteingangs ermöglichen"
     better_file_browsing: "Besseres Durchsuchen von Dateien"
@@ -7307,7 +7303,6 @@ de:
     account_grading_standard_warning: "Die Benotungskriterien für den Kurs konnten nicht gefunden werden."
     copied_grading_standard_warning: "Die kopierten Benotungskriterien für den Kurs konnten nicht gefunden werden."
     due_dates_warning: "Die Abgabefristen konnten nicht angepasst werden."
-    failed_import_media_objects: "Fehler beim Import von Medienobjekten"
     file_import_warning: "Die Datei %{file} konnte nicht gefunden werden"
   importers/learning_outcome_group_importer: 
     no_global_permission: "Sie dürfen keine globalen Ergebnisse verwalten. \"%{title}\" kann nicht hinzugefügt werden"
@@ -7337,6 +7332,7 @@ de:
   instructions: 
     authorize_google_docs: "Bevor Sie mit dem gemeinsamen Bearbeiten von Dokumenten beginnen können, müssen Sie Canvas die erforderliche Berechtigung zum Zugriff auf Ihren Google Docs-konto erteilen:"
     authorize_google_drive: "Bevor Sie mit anderen zusammen an Dokumenten arbeiten können, müssen Sie Canvas Zugriff auf Ihr Google Drive-Konto gewähren:"
+  instructions_2f88ee72: Hinweise
   instructors_4b491a07: Dozenten
   instructure: 
     alerts: 
@@ -7406,6 +7402,7 @@ de:
   invalid_utf_8_13c76a6: "Ungültiges UTF-8"
   invalid_xml_syntax: "Ungültiger XML-syntax"
   invite_5b1fcbcd: Einladen
+  it_looks_like_your_content_might_not_load_you_can__dfb85860: "Es scheint, dass Ihre Inhalte nicht geladen werden. Mit dieser Schaltfläche können Sie versuchen, sie auf einer neuen Registerkarte zu laden."
   item_complete_d334fd43: "(Element vollständig)"
   item_incomplete_d6a16040: "(Element unvollständig)"
   item_type_assignment_13a1132e: "Art des Elements: Aufgabe"
@@ -7670,8 +7667,6 @@ de:
       new_tab: "Dieses Tool muss in einem neuen Browserfenster geladen werden"
       new_tab_expired: "Die Sitzung für dieses Tool ist abgelaufen. Bitte laden Sie die Seite erneut, um wieder auf das Tool zugreifen zu können"
       new_tab_loaded: "Dieses Tool wurde erfolgreich in einem neuen Browserfenster geladen. Laden Sie die Seite erneut, um wieder auf das Tool zugreifen zu können."
-      tool_insecure_warning: "Sie haben versucht, Insecure-Inhalte von einer sicheren Site (Canvas) aus zu öffnen. Manche Internetbrowser verhindern möglicherweise das Laden dieser Inhalte."
-      tool_load_failure: "Es scheint, dass Ihre Inhalte nicht geladen werden. Mit dieser Schaltfläche können Sie versuchen, sie auf einer neuen Registerkarte zu laden."
   lti2: 
     register_tool: "Tool registrieren"
   m2c_file_description: "Moodle 1.9/2x"
@@ -7724,7 +7719,6 @@ de:
     loading: "Medien werden geladen..."
     media_still_converting: "Die Medien werden derzeit konvertiert. Versuchen Sie es in Kürze erneut."
     messages: 
-      file_failed_to_load: "Diese Multimedia-datei konnte nicht geladen werden"
       flash_required_record_audio: "Für Audioaufnahmen wird Flash benötigt."
       flash_required_upload_audio: "Um Audiodaten hochzuladen, wird Flash benötigt."
       flash_required_upload_video: "Um Videodaten hochzuladen, wird Flash benötigt."
@@ -9629,7 +9623,6 @@ de:
   no_due_date_44271c53: "Kein Abgabetermin"
   no_due_date_6e6a23c1: "(kein Abgabetermin)"
   no_e16d9132: Nein
-  no_grading_periods_to_display_ad25c8f3: "Keine anzuzeigenden Benotungszeiträume vorhanden"
   no_grading_schemes_to_display_8b0e92e7: "Keine anzuzeigenden Benotungssysteme vorhanden"
   no_migration_file: "Für die Inhaltsmigration ist eine Datei erforderlich."
   no_score_yet_c94e919b: "Noch keine Punktzahl vorhanden"
@@ -9911,6 +9904,27 @@ de:
           kb: KB
           mb: MB
           tb: TB
+  oauth2_provider: 
+    auth: 
+      oauth2_complete: "Die Applikation hat den Anmeldeworkflow beendet und sollte sich bald reaktivieren."
+    confirm: 
+      cancel: Abbrechen
+      details: 
+        allow_application: "%{app_name} hat eine Anfrage für den Zugriff auf Ihr Konto gestellt."
+        email: "Ihre E-Mail-Adresse ist %{email}."
+        login_name: "Sie melden sich bei dieser Anwendung als %{user_name} an."
+      labels: 
+        remember_access: "Meine Berechtigung für diesen Dienst speichern"
+      page_title: "Anmeldung by Anwendung"
+    confirm_mobile: 
+      cancel: Abbrechen
+      details: 
+        allow_application: "%{app_name} hat eine Anfrage für den Zugriff auf Ihr Konto gestellt."
+        email: "Ihre E-Mail-Adresse ist %{email}."
+        login_name: "Sie melden sich bei dieser Anwendung als %{user_name} an."
+      login: Anmeldung
+      page_title: "Anmeldung by Anwendung"
+      remember_auth: "Meine Berechtigung für diesen Dienst speichern"
   observees: 
     add_observee_button: "Student hinzufügen"
     being_observed: "Beobachtete Studenten"
@@ -9925,6 +9939,7 @@ de:
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Wenn Sie eine Antwort geändert haben, müssen Sie eine Option auswählen, bevor Sie die Frage aktualisieren."
   one_per_line_format_name_value_79647700: "Einer pro Zeile, Format: name=value"
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} rechtzeitig, %{late} verspätet, %{missing} fehlend"
+  open_title_in_a_new_window_b29fed77: "%{title} in einem neuen Fenster öffnen"
   options: 
     ? "no"
     : Nein
@@ -10338,16 +10353,6 @@ de:
     kaltura_settings: 
       account_settings: "Diese Werte finden Sie in der Kaltura-managementkonsole unter \"Einstellungen -> Integrationseinstellungen\""
       cache_explanation: "Durchschnittswert-Cache auf unbestimmte Zeit löschen, 0 Durchschnittswerte nicht zwischenspeichern."
-      description: |-
-          Sie benötigen ein Benutzerkonto bei [Kaltura.com](%{kaltura_url})
-          oder einer selbst gehosteten Kaltura-instanz.
-          
-          **Anmerkung:** sobald Sie Kaltura innerhalb von Canvas konfiguriert haben, öffnen Sie die Kaltura-managementkonsole und aktivieren Sie
-          Serverbenachrichtigungen unter "Einstellungen -> Integrationseinstellungen" mit einer Benachrichtigungs-URL von:
-          
-          %{notification_url}
-          
-          Anschließend aktivieren Sie die Kontrollkästchen für "Eintrag hinzufügen" und "Eintrag löschen" in der Spalte "vom Server versandt".
       headers: 
         account_settings: Kontoeinstellungen
         canvas_settings: Canvas-Einstellungen
@@ -10376,7 +10381,6 @@ de:
         secret_key: "Administrator Secret"
         subpartner_id: Subpartner-ID
         upload_ui_conf: "Uploader UI Conf ID"
-        use_alt_record_widget: "Alternatives Flash-Aufzeichnungswidget verwenden"
         user_secret_key: "User Secret"
       ui_conf_ids: "Für Kaltura-gehostete Kunden können Sie diese IDs bei Kaltura erfahren. Bei selbst gehosteten Instanzen finden Sie diese Werte in der Tabelle ui_confs."
     linked_in: 
@@ -10895,26 +10899,6 @@ de:
       page_title: "Bei Canvas anmelden"
     notices: 
       mfa_complete: "Mehrstufige Authentifizierung rekonfiguriert"
-    oauth2_auth: 
-      oauth2_complete: "Die Applikation hat den Anmeldeworkflow beendet und sollte sich bald reaktivieren."
-    oauth2_confirm: 
-      cancel: Abbrechen
-      details: 
-        allow_application: "%{app_name} bittet um Zugang zu Ihrem Konto."
-        email: "Ihre E-mailadresse ist %{email}."
-        login_name: "Sie melden sich bei dieser Applikation als %{user_name} an."
-      labels: 
-        remember_access: "Meine Berechtigung für diesen Dienst speichern"
-      page_title: Applikationsanmeldung
-    oauth2_confirm_mobile: 
-      cancel: Abbrechen
-      details: 
-        allow_application: "%{app_name} hat eine Anfrage für den Zugriff auf Ihr Konto gestellt."
-        email: "Ihre E-Mail-Adresse ist %{email}."
-        login_name: "Sie melden sich bei dieser Anwendung als %{user_name} an."
-      login: Anmeldung
-      page_title: "Anmeldung by Anwendung"
-      remember_auth: "Meine Berechtigung für diesen Dienst speichern"
     otp_login: 
       buttons: 
         send: Senden
@@ -11305,6 +11289,7 @@ de:
       generating: "Wird erstellt..."
       generating_combinations_progress: "Wird erstellt... (%{done}/%{total})"
       save: Speichern
+      save_and_publish: "Speichern & Veröffentlichen"
       saved: Gespeichert.
       saving: "Speichervorgang läuft..."
       update_group: "Gruppe aktualisieren"
@@ -11835,6 +11820,7 @@ de:
           not_published: "Nicht veröffentlicht"
           published: Veröffentlicht
           save: Speichern
+          save_and_publish: "Speichern & Veröffentlichen"
         cant_go_back: "Fragen nach der Beantwortung sperren"
         default_page_title: "Neues Quiz"
         group: Aufgabengruppe
@@ -13967,7 +13953,6 @@ de:
       entry_no_image: "Bedenken Sie, dass diese Seite seit der erstmaligen Einsendung möglicherweise geändert wurde."
       entry_with_image: "Ein angehängter Snapshot zeigt, wie die Seite zum Zeitpunkt der Einsendung ausgesehen hat. Alternativ kann die ursprüngliche Einsendung durch Anklicken angezeigt werden."
       external_url_submission: "Diese Einsendung war eine URL zu einer externen Seite."
-      file_uploads_for_user: "Dateiuploads für **%{user}**"
       group_discussion_submission_description: "Die Einsendungen für diese Aufgabe haben die Form von Beiträgen in der Aufgabendikussion der Gruppe. Unten sehen Sie die Beiträge von %{user}, Sie können auch *die komplette Gruppendiskussion ansehen*."
       group_discussion_submission_description_without_link: "Die Einsendungen für diese Aufgabe sind Beiträge in der Diskussion der Aufgabe für diese Gruppe. Unten finden Sie die Diskussionsbeiträge für %{user}."
       media_comment_link: "Diese Einsendung ist eine Multimedia-Aufzeichnung. *Zum Anzeigen hier klicken.*"
@@ -14934,6 +14919,7 @@ de:
       buttons: 
         cancel: Abbrechen
         save: Speichern
+        save_and_publish: "Speichern & Veröffentlichen"
       course_editing_roles: 
         anyone: Alle
         only_teachers: "Nur Dozenten"
