@@ -1282,11 +1282,6 @@ zh:
       messages: 
         record_invalid: "验证失败: %{errors}"
         taken: 已提取
-      template: 
-        body: "以下字段有问题:"
-        header: 
-          one: "%{count} 个错误阻止保存此 %{model}"
-          other: "%{count} 个错误阻止保存此 %{model}"
   activity_13915493: 活动
   activity_by_category_9c2033d1: 按类别划分的活动
   activity_by_date_878c5b49: 按日期划分的活动
@@ -1694,6 +1689,8 @@ zh:
       assignment_name: 姓名：
       assignment_points: 得分：
       assignment_type: 类型：
+      buttons: 
+        save_and_publish: 保存并发布
       cancel: 取消
       differentiated_due_dates: 差异化到期日期
       discussion_type: 讨论
@@ -1766,7 +1763,8 @@ zh:
     edit_view: 
       assignment_name: 作业名称
       buttons: 
-        update: 更新作业
+        save: 保存
+        save_and_publish: 保存并发布
       description: 说明
       freeze_properties: 复制时锁定作业属性
       notify_content_change: 通知用户此内容已更改
@@ -2237,7 +2235,6 @@ zh:
   between_1_and_99_d421a4c0: "在 1% 和 99% 之间"
   between_2_and_5_c34f5152: "在 2 和 5 之间"
   big_blue_button_conference: 
-    conference_is_recorded: 正在对此会议进行录制。
     recording_setting: 录制
     recording_setting_enabled_description: 启用记录本次会议
   blackboard: 
@@ -3701,8 +3698,6 @@ zh:
       edit_item: 编辑项目详细信息
     url_show: 
       new_tab: 此站点需要在新的浏览器窗口中打开。
-      open_url_button: "在新窗口中打开 %{title}"
-      tool_insecure_warning: "您正在尝试从安全站点 (canvas) 内启动不安全的内容。某些 Internet 浏览器可能阻止加载此内容。"
   context_modules_api: 
     invalid_position: 位置无效
   continue_ac067716: 继续
@@ -5127,6 +5122,7 @@ zh:
       buttons: 
         not_published: 未发布
         published: 已发布
+        save_and_publish: 保存并发布
       delay_posting: 延迟发布
       enable_podcast_feed: 启用播客动态消息
       include_replies_in_podcast_feed: 包括学生在播客馈赠的回复
@@ -5376,7 +5372,7 @@ zh:
   due_multiple_dates_cc0ee3f5: 到期日期：多个日期
   due_on_date_aa4725cd: 到期日期：
   e_mail_only_2cc5e513: 仅限电子邮件
-  each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: "每个栏目是一项作业。绿色层代表 *准时* 提交作业学生的百分比。迟交则显示为黄色，而***缺交***则显示为红色。"
+  each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: "每个栏目是一项作业。绿色层代表 *准时* 提交作业学生的百分比。**迟交**则显示为黄色，而***缺交***则显示为红色。"
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "每一条为一项作业。*垂直细条* 表示该课程中任意学生的最低分一直到最高分。**粗条** 表示第 25 个百分位一直到第 75 个百分位，其中标记了 ***中值分数***。"
   each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "每一条为一项作业。垂直细条表示该课程中任意学生的最低分一直到最高分。粗条表示第 25 个百分位一直到第 75 个百分位，其中标记了中值分数。该学生的分数标有圆点。"
   each_bar_represents_the_number_of_page_views_on_th_3f833fcd: "每一条表示该天的 *页面查看* 数。橙色条表示该天学生在课程内 **进行了一些操作**。"
@@ -5482,7 +5478,6 @@ zh:
   ember_modules_description: "单元已在 Ember 中重新编写。使用本机拖放 API 可从外部位置进行拖动。"
   enable_6f5d1328: 启用
   enable_gradebook_list_students_by_sortable_name: "在评分册中按可排序名称列出学生。可排序名称默认为“名, 姓”并且可以在设置中进行更改。"
-  enable_multiple_grading_periods: 在帐户管理中启用多个评分时段管理，并在评分册中使用。
   end_date_e0093ed7: 结束日期
   ends_on_date_320e0c26: 结束日期
   enrollment: 
@@ -5784,7 +5779,6 @@ zh:
   errors: 
     bad_navigation_config: 课程标签配置无效
     blank: 必需
-    dynamic_format: "%{message}"
     failed: 已失败
     format: "%{attribute} %{message}"
     index: 
@@ -5991,6 +5985,7 @@ zh:
     wiki_page_menu_configured: "Wiki 页面菜单已配置"
   external_url_e9b87215: "外部 URL"
   failed_to_create_zip_file_1a943d06: 无法创建压缩文件
+  failed_to_import_media_objects_4c1fcb4f: 导入媒体对象失败
   fair_use_bee47d77: 公正使用
   favicon_6e658914: Favicon
   feature_flags: 
@@ -6009,6 +6004,7 @@ zh:
     feature_flag_admin_view: 
       feature_options: 功能选项
       no_features_available: 当前没有可用的功能。
+  feature_options_37a2c317: 功能选项
   features: 
     allow_opt_out_of_inbox: 允许用户选择退出收件箱
     better_file_browsing: 更好的文件浏览功能
@@ -7341,7 +7337,6 @@ zh:
     account_grading_standard_warning: 无法找到针对课程的帐户评分标准。
     copied_grading_standard_warning: 无法找到针对课程的复制评分标准。
     due_dates_warning: 无法调整到期日期。
-    failed_import_media_objects: 导入媒体对象失败
     file_import_warning: "无法找到文件 %{file}"
   importers/learning_outcome_group_importer: 
     no_global_permission: "您不可以管理全局成果，无法添加“%{title}”"
@@ -7371,6 +7366,7 @@ zh:
   instructions: 
     authorize_google_docs: "需要授权 Canvas 访问您的 Google Docs 帐户之后才能协作处理文档:"
     authorize_google_drive: "您需要授权 Canvas 访问您的 Google Drive 帐户，然后才能在文档上进行协作："
+  instructions_2f88ee72: 说明
   instructors_4b491a07: 导师
   instructure: 
     alerts: 
@@ -7440,6 +7436,7 @@ zh:
   invalid_utf_8_13c76a6: "无效的 UTF-8"
   invalid_xml_syntax: "无效的 xml 语法"
   invite_5b1fcbcd: 邀请
+  it_looks_like_your_content_might_not_load_you_can__dfb85860: 看上去您的内容可能无法加载。您可以使用此按钮尝试在新选项卡中启动它。
   item_complete_d334fd43: （项目完成）
   item_incomplete_d6a16040: （项目未完成）
   item_type_assignment_13a1132e: 项目类型：作业
@@ -7702,8 +7699,6 @@ zh:
       new_tab: 需要在新的浏览器窗口中加载此工具
       new_tab_expired: 此工具的会话已过期。请重新加载页面以再次访问工具
       new_tab_loaded: 在新的浏览器窗口中成功加载此工具。请重新加载页面以再次访问工具。
-      tool_insecure_warning: "您正在尝试从安全站点 (canvas) 内启动不安全的内容。某些 Internet 浏览器可能阻止加载此内容。"
-      tool_load_failure: 看上去您的内容可能无法加载。您可以使用此按钮尝试在新选项卡中启动它。
   lti2: 
     register_tool: 注册工具
   m2c_file_description: "Moodle 1.9/2.x"
@@ -7756,7 +7751,6 @@ zh:
     loading: 正在加载媒体...
     media_still_converting: 目前正在转换媒体，请稍后重试。
     messages: 
-      file_failed_to_load: 此媒体文件无法加载
       flash_required_record_audio: "需要 Flash 才能录制音频。"
       flash_required_upload_audio: "需要 Flash 才能上传音频。"
       flash_required_upload_video: "需要 Flash 才能上传视频。"
@@ -9688,7 +9682,6 @@ zh:
   no_due_date_44271c53: 无截止时间
   no_due_date_6e6a23c1: （无到期日期）
   no_e16d9132: 否
-  no_grading_periods_to_display_ad25c8f3: 没有可显示的评分时段
   no_grading_schemes_to_display_8b0e92e7: 没有可显示的评分方案
   no_migration_file: 内容迁移需要文件
   no_score_yet_c94e919b: 尚无分数
@@ -9969,6 +9962,27 @@ zh:
           kb: KB
           mb: MB
           tb: TB
+  oauth2_provider: 
+    auth: 
+      oauth2_complete: 应用程序已完成登录工作流程，将会立刻重新激活。
+    confirm: 
+      cancel: 取消
+      details: 
+        allow_application: "%{app_name} 正在请求访问您的帐户。"
+        email: "您的电子邮件地址为 %{email}。"
+        login_name: "您正在作为 %{user_name} 登录到此应用程序。"
+      labels: 
+        remember_access: 记住我对此服务的授权
+      page_title: 应用程序登录
+    confirm_mobile: 
+      cancel: 取消
+      details: 
+        allow_application: "%{app_name} 正在请求访问您的帐户。"
+        email: "您的电子邮件地址为 %{email}。"
+        login_name: "您正在作为 %{user_name} 登录到此应用程序。"
+      login: 登录
+      page_title: 应用程序登录
+      remember_auth: 记住我对此服务的授权
   observees: 
     add_observee_button: 添加学生
     being_observed: 被观察的学生
@@ -9983,6 +9997,7 @@ zh:
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: 您更改答案之后，在更新问题前需要选择一个选项。
   one_per_line_format_name_value_79647700: "每行一个。格式:姓名=值"
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} 按时提交，%{late} 迟交，%{missing} 未交"
+  open_title_in_a_new_window_b29fed77: "在新窗口中打开 %{title}"
   options: 
     ? "no"
     : 否
@@ -10396,18 +10411,6 @@ zh:
     kaltura_settings: 
       account_settings: "这些值可在 Kaltura 管理控制台中\"设置 -> 集成设置\"下找到"
       cache_explanation: "空表示无限缓存，0 表示不缓存。"
-      description: |-
-          您将需要 [Kaltura.com](%{kaltura_url}) 的帐户
-          或 Kaltura 的自托管实例。
-          
-          **注:** 一旦在 Canvas 内配置 Kaltura 后，
-          您需要转到 Kaltura 管理控制台并在\"设置 -> 
-          集成设置\"下启用服务器通知， 
-          通知 URL 为:
-          
-          %{notification_url}
-          
-          然后选中\"通过服务器发送\"列中的\"添加条目\"和\"删除条目\"框。
       headers: 
         account_settings: 帐户设置
         canvas_settings: "Canvas 设置"
@@ -10436,7 +10439,6 @@ zh:
         secret_key: 管理员密码
         subpartner_id: "子合作伙伴 ID"
         upload_ui_conf: "上传程序 UI 配置 ID"
-        use_alt_record_widget: "使用备用的 Flash 录音小部件"
         user_secret_key: 用户密码
       ui_conf_ids: "对于 Kaltura 托管的客户，您可以要求 Kaltura 提供这些 ID。自托管实例可在 ui_confs 表中找到这些值。"
     linked_in: 
@@ -10968,26 +10970,6 @@ zh:
       page_title: "登录到 Canvas"
     notices: 
       mfa_complete: 多重身份验证已配置
-    oauth2_auth: 
-      oauth2_complete: 应用程序已完成登录工作流程，将会立刻重新激活。
-    oauth2_confirm: 
-      cancel: 取消
-      details: 
-        allow_application: "%{app_name} 正在请求访问您的帐户。"
-        email: "您的电子邮件地址为 %{email}。"
-        login_name: "您正在作为 %{user_name} 登录到此应用程序。"
-      labels: 
-        remember_access: 记住我对此服务的授权
-      page_title: 应用程序登录
-    oauth2_confirm_mobile: 
-      cancel: 取消
-      details: 
-        allow_application: "%{app_name} 正在请求访问您的帐户。"
-        email: "您的电子邮件地址为 %{email}。"
-        login_name: "您正在作为 %{user_name} 登录到此应用程序。"
-      login: 登录
-      page_title: 应用程序登录
-      remember_auth: 记住我对此服务的授权
     otp_login: 
       buttons: 
         send: 发送
@@ -11380,6 +11362,7 @@ zh:
       generating: 正在生成...
       generating_combinations_progress: "正在生成... (%{done}/%{total})"
       save: 保存
+      save_and_publish: 保存并发布
       saved: 已保存！
       saving: 正在保存...
       update_group: 更新小组
@@ -11926,6 +11909,7 @@ zh:
           not_published: 未发布
           published: 已发布
           save: 保存
+          save_and_publish: 保存并发布
         cant_go_back: 回答后锁定问题
         default_page_title: 新测验
         group: 作业小组
@@ -14064,7 +14048,6 @@ zh:
       entry_no_image: 请记住，此页面自最初进行提交后可能已更改。
       entry_with_image: 我们包括了页面提交时所显示内容的快照。或者您可以单击以查看原始提交文件。
       external_url_submission: "此提交是指向外部页面的一个 URL。"
-      file_uploads_for_user: "**%{user}** 的文件上传"
       group_discussion_submission_description: |-
           此作业的提交文件在该小组的作业讨论中发布。下面是 %{user} 的讨论帖
           ，或者您可以*查看完整的小组讨论*。
@@ -15026,6 +15009,7 @@ zh:
       buttons: 
         cancel: 取消
         save: 保存
+        save_and_publish: 保存并发布
       course_editing_roles: 
         anyone: 任何人
         only_teachers: 仅教师
