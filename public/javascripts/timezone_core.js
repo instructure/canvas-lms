@@ -2,8 +2,9 @@ define([
   "jquery",
   "underscore",
   "require",
-  "vendor/timezone"
-], function($, _, require, tz) {
+  "vendor/timezone",
+  "i18nObj"
+], function($, _, require, tz, I18n) {
   // start with the bare vendor-provided tz() function
   var _tz = tz;
   var _preloadedData = {};
@@ -44,6 +45,25 @@ define([
       var datetime = tz.parse(value);
       if (datetime == null) return null;
 
+      // translate recognized 'date.formats.*' and 'time.formats.*' to
+      // appropriate format strings according to locale.
+      if (format.match(/^(date|time)\.formats\./)) {
+        var locale_format = I18n.lookup(format);
+        if (locale_format) {
+          // in the process, turn %l, %k, and %e into %-l, %-k, and %-e
+          // (respectively) to avoid extra unnecessary space characters
+          //
+          // javascript doesn't have lookbehind, so do the fixing on the reversed
+          // string so we can use lookahead instead. the funky '(%%)*(?!%)' pattern
+          // in all the regexes is to make sure we match (once unreversed), e.g.,
+          // both %l and %%%l (literal-% + %l) but not %%l (literal-% + l).
+          format = locale_format.
+            split("").reverse().join("").
+            replace(/([lke])(?=%(%%)*(?!%))/, '$1-').
+            split("").reverse().join("");
+        }
+      }
+
       // some locales may not (according to bigeasy's localization files) use
       // an am/pm distinction, but could then be incorrectly used with 12-hour
       // format strings (e.g. %l:%M%P), whether by erroneous format strings in
@@ -51,12 +71,8 @@ define([
       // result, you might get 3am and 3pm both formatting to the same value.
       // to prevent this, 12-hour indicators with an am/pm indicator should be
       // promoted to the equivalent 24-hour indicator when the locale defines
-      // %P as an empty string.
-
-      // javascript doesn't have lookbehind, so do the fixing on the reversed
-      // string so we can use lookahead instead. the funky '(%%)*(?!%)' pattern
-      // in all the regexes is to make sure we match (once unreversed), e.g.,
-      // both %l and %%%l (literal-% + %l) but not %%l (literal-% + l).
+      // %P as an empty string. ("reverse, look-ahead, reverse" pattern for
+      // same reason as above)
       format = format.split("").reverse().join("");
       if (_tz(datetime, '%P') === '' &&
           ((format.match(/[lI][-_]?%(%%)*(?!%)/) &&

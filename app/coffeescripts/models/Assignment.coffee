@@ -145,6 +145,10 @@ define [
       return @get 'peer_reviews' unless arguments.length > 0
       @set 'peer_reviews', peerReviewBoolean
 
+    anonymousPeerReviews: (anonymousPeerReviewBoolean) =>
+      return @get 'anonymous_peer_reviews' unless arguments.length > 0
+      @set 'anonymous_peer_reviews', anonymousPeerReviewBoolean
+
     automaticPeerReviews: (autoPeerReviewBoolean) =>
       return @get 'automatic_peer_reviews' unless arguments.length > 0
       @set 'automatic_peer_reviews', autoPeerReviewBoolean
@@ -281,7 +285,7 @@ define [
       fields = [
         'name', 'dueAt','description','pointsPossible', 'lockAt', 'unlockAt',
         'gradingType', 'notifyOfUpdate', 'peerReviews', 'automaticPeerReviews',
-        'peerReviewCount', 'peerReviewsAssignAt',
+        'peerReviewCount', 'peerReviewsAssignAt', 'anonymousPeerReviews',
         'acceptsOnlineUpload','acceptsMediaRecording', 'submissionType',
         'acceptsOnlineTextEntries', 'acceptsOnlineURL', 'allowedExtensions',
         'restrictFileExtensions', 'isOnlineSubmission', 'isNotGraded',

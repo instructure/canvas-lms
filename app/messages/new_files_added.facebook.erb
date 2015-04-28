@@ -1,8 +1,0 @@
-<% define_content :link do %>
-  <%= polymorphic_url([asset.context, :files]) %>
-<% end %>
-<p><%= t('body', '%{count} new files have been added for the course, %{name}:', 
-        :count => data.count,
-        :name => asset.context.name) %></p>
-
-<p><a href="<%= content :link %>"><%= t 'link', 'You can view them here' %></a></p>

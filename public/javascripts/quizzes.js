@@ -35,6 +35,7 @@ define([
   'compiled/collections/SectionCollection',
   'compiled/views/calendar/MissingDateDialogView',
   'compiled/editor/MultipleChoiceToggle',
+  'compiled/editor/EditorToggle',
   'compiled/str/TextHelper',
   'compiled/views/editor/KeyboardShortcuts',
   'INST', // safari sniffing for VO workarounds
@@ -59,7 +60,7 @@ define([
 ], function(regradeTemplate, I18n,_,$,calcCmd, htmlEscape, pluralize,
             wikiSidebar, DueDateListView, DueDateOverrideView, Quiz,
             DueDateList,SectionList,
-            MissingDateDialog,MultipleChoiceToggle,TextHelper,
+            MissingDateDialog,MultipleChoiceToggle,EditorToggle,TextHelper,
             RCEKeyboardShortcuts, INST, QuizFormulaSolution){
 
   var dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility,
@@ -139,6 +140,24 @@ define([
     $answers.filter('.correct_answer').find(".select_answer  input[name=answer_text]").attr("aria-label", correctAnswerLabel);
   }
 
+  function toggleSelectAnswerAltText($answers,type) {
+    if (type != "multiple_answer") {
+      $answers.find('.select_answer_link')
+        .attr('title', clickSetCorrect)
+        .find('img').attr('alt', clickSetCorrect);
+      $answers.filter('.correct_answer').find('.select_answer_link')
+        .attr('title', isSetCorrect)
+        .find('img').attr('alt', isSetCorrect);
+    } else {
+      $answers.filter(".correct_answer").find('.select_answer_link')
+        .attr('title', clickUnsetCorrect)
+        .find('img').attr('alt', clickUnsetCorrect);
+      $answers.filter(":not(.correct_answer)").find('.select_answer_link')
+        .attr('title', clickSetCorrect)
+        .find('img').attr('alt', clickSetCorrect);
+    }
+  }
+
   // TODO: refactor this... it's not going to be horrible, but it will
   // take a little bit of work.  I just wrapped it in a closure for now
   // to not pollute the global namespace, but it could use more.
@@ -212,20 +231,10 @@ define([
         if ($answers.filter(".correct_answer").length === 0) {
           $answers.filter(":first").addClass('correct_answer');
         }
-        $answers.find('.select_answer_link')
-          .attr('title', clickSetCorrect)
-          .find('img').attr('alt', clickSetCorrect);
-        $answers.filter('.correct_answer').find('.select_answer_link')
-          .attr('title', isSetCorrect)
-          .find('img').attr('alt', isSetCorrect);
+        toggleSelectAnswerAltText($answers,answer.answer_selection_type);
         togglePossibleCorrectAnswerLabel($answers);
       } else {
-        $answer.filter(".correct_answer").find('.select_answer_link')
-          .attr('title', clickUnsetCorrect)
-          .find('img').attr('alt', clickUnsetCorrect);
-        $answer.filter(":not(.correct_answer)").find('.select_answer_link')
-          .attr('title', clickSetCorrect)
-          .find('img').attr('alt', clickSetCorrect);
+        toggleSelectAnswerAltText($answers,answer.answer_selection_type);
         togglePossibleCorrectAnswerLabel($answers);
       }
 
@@ -428,7 +437,7 @@ define([
       fillArgs = {
         data: question,
         except: ['answers'],
-        htmlValues: []
+        htmlValues: ['correct_comments_html', 'incorrect_comments_html', 'neutral_comments_html']
       };
 
       if (escaped) {
@@ -439,9 +448,6 @@ define([
 
       $question.fillTemplateData(fillArgs);
       $question.find(".original_question_text").fillFormData(question);
-      $question.find(".question_correct_comment").toggleClass('empty', !question.correct_comments && !question.correct_comments_html);
-      $question.find(".question_incorrect_comment").toggleClass('empty', !question.incorrect_comments && !question.incorrect_comments_html);
-      $question.find(".question_neutral_comment").toggleClass('empty', !question.neutral_comments && !question.neutral_comments_html);
       $question.find(".answers").empty();
       $question.find(".equation_combinations").empty();
       $question.find(".equation_combinations_holder_holder").css('display', 'none');
@@ -661,14 +667,7 @@ define([
       $formQuestion.find(".question_header").text(I18n.t('question_colon', "Question:"));
       $formQuestion.addClass(question_type);
         $formQuestion.find(".question_points_holder").showIf(!$formQuestion.closest(".question_holder").hasClass('group') && question_type != 'text_only_question');
-      $formQuestion.find("textarea.comments").each(function() {
-        $(this).val($.trim($(this).val()));
-        if ($(this).val()) {
-          $(this).parents(".question_comment").removeClass('empty');
-        } else {
-          $(this).parents(".question_comment").addClass('empty');
-        }
-      });
+
       var options = {
         addable: true
       };
@@ -794,12 +793,12 @@ define([
       var tally = 0;
       $("#questions .question_holder:not(.group) .question:not(#question_new)").each(function() {
         var val = parseFloat($(this).find(".question_points,.question_points.hidden").text());
-        if (isNaN(val)) { val = 0; }
+        if (isNaN(val) || val < 0) { val = 0; }
         tally += val;
       });
       $("#questions .group_top:not(#group_top_new)").each(function() {
         var val = parseFloat($(this).find(".question_points").text());
-        if (isNaN(val)) { val = 0; }
+        if (isNaN(val) || val < 0) { val = 0; }
         var cnt = parseInt($(this).find(".pick_count").text(), 10);
         if (isNaN(cnt)) { cnt = 0; }
         tally += val * cnt;
@@ -1268,7 +1267,7 @@ define([
       }
       question.position = i;
       question.question_points = parseFloat(question.question_points);
-      if (isNaN(question.question_points)) {
+      if (isNaN(question.question_points) || question.question_points < 0) {
         question.question_points = 0;
       }
       quiz.points_possible += question.question_points;
@@ -1304,9 +1303,9 @@ define([
       q.assessment_question_id = question.assessment_question_id;
       q.question_type = question.question_type;
       q.points_possible = question.question_points;
-      q.correct_comments = question.correct_comments;
-      q.incorrect_comments = question.incorrect_comments;
-      q.neutral_comments = question.neutral_comments;
+      q.correct_comments_html = question.correct_comments_html;
+      q.incorrect_comments_html = question.incorrect_comments_html;
+      q.neutral_comments_html = question.neutral_comments_html;
       q.question_text = question.question_text;
       q.regrade_option = question.regrade_option;
       q.position = question.position;
@@ -1327,10 +1326,13 @@ define([
 
   function addHTMLFeedback($container, question_data, name) {
     html = question_data[name+'_html'];
+    if (!html || html.length == 0) {
+      html = question_data[name];
+      question_data[name+'_html'] = html;
+    }
     if (html && html.length > 0) {
-      $container.find('.'+name+'_html').html(html).css('display', 'inline-block');
-      $container.find('textarea').val(html);
-      $container.find('a,textarea').hide();
+      $container.find('.'+name+'_html').html(html);
+      $container.find('input[type="hidden"]').val(html);
       $container.removeClass('empty');
     }
   }
@@ -1395,9 +1397,9 @@ define([
     var $quiz_edit_wrapper = $("#quiz_edit_wrapper");
     $.scrollSidebar();
     $(".datetime_field").datetime_field();
-    $("#questions").delegate('.group_top,.question,.answer_select', 'mouseover', function(event) {
+    $("#questions").delegate('.group_top,.question,.answer_select,.comment', 'mouseover', function(event) {
       $(this).addClass('hover');
-    }).delegate('.group_top,.question,.answer_select', 'mouseout', function(event) {
+    }).delegate('.group_top,.question,.answer_select,.comment', 'mouseout', function(event) {
       $(this).removeClass('hover');
     });
 
@@ -1447,7 +1449,26 @@ define([
       var $optionGroup = $checkbox.closest('.option-group');
       var checked = $checkbox.prop('checked');
 
-      $optionGroup.find('> .options').toggle(checked);
+      // All of this magic here is so that VoiceOver will properly navigate to
+      // the inputs after they are shown.
+      var $foundOptions = $optionGroup.find('> .options');
+      if (checked) {
+        $foundOptions.removeClass('screenreader-only');
+        // We have to do this bit so keyboard only users aren't confused
+        // when their focus goes to something shown offscreen.
+        $foundOptions.find('[tabindex="-1"]').each(function (k,v) {
+          $(v).attr('tabindex', 0);
+        });
+      } else {
+        $foundOptions.addClass('screenreader-only');
+        // Same as above
+        $foundOptions.find('[tabindex="0"]').each(function (k,v) {
+          $(v).attr('tabindex', -1);
+        });
+      }
+
+
+
 
       if (!checked) {
         $optionGroup
@@ -1662,16 +1683,14 @@ define([
       },
 
       beforeSubmit: function(data) {
-        $quiz_edit_wrapper
-          .find(".btn.save_quiz_button")
-          .attr('disabled', true)
-          .text(I18n.t('buttons.saving', "Saving..."));
+        $quiz_edit_wrapper.find(".btn.save_quiz_button").attr('disabled', true);
+        $quiz_edit_wrapper.find(".btn.save_and_publish").attr('disabled', true);
       },
 
       success: function(data) {
         var $form = $(this);
         $quiz_edit_wrapper
-          .find(".btn.save_quiz_button")
+          .find(".btn.saving")
           .text(I18n.t('buttons.saved', "Saved!"));
         if (data.quiz.assignment) {
           var assignment = data.quiz.assignment;
@@ -1696,17 +1715,44 @@ define([
         $("#quiz_edit_wrapper")
           .find(".btn.save_quiz_button")
           .attr('disabled', false)
+          .removeClass("saving")
           .text(I18n.t('buttons.save', "Save"));
+        $("#quiz_edit_wrapper")
+          .find(".btn.save_and_publish")
+          .attr('disabled', false)
+          .removeClass("saving")
+          .text(I18n.t('buttons.save_and_publish', "Save & Publish"));
+        $("#quiz_edit_wrapper")
+          .find('input[name="publish"]')
+          .remove();
 
         $(this).trigger('xhrError', data);
         $(this).formErrors(data);
-        $quiz_edit_wrapper.find(".btn.save_quiz_button").attr('disabled', false);
       }
     });
 
     $quiz_edit_wrapper.find(".save_quiz_button").click(function(event) {
       event.preventDefault();
       event.stopPropagation();
+      $quiz_edit_wrapper
+        .find(".btn.save_quiz_button")
+        .addClass("saving")
+        .text(I18n.t('buttons.saving', "Saving..."));
+      $quiz_options_form.data('submit_type', 'save_only').submit();
+    }).end();
+
+    $quiz_edit_wrapper.find(".save_and_publish").click(function(event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      var $publish_input = $(document.createElement('input'));
+      $publish_input.attr('type', 'hidden').attr('name', 'publish').attr('value', 'true');
+      $quiz_options_form.append($publish_input);
+
+      $quiz_edit_wrapper
+        .find(".btn.save_and_publish")
+        .addClass("saving")
+        .text(I18n.t('buttons.saving', "Saving..."));
       $quiz_options_form.data('submit_type', 'save_only').submit();
     }).end();
 
@@ -1806,7 +1852,7 @@ define([
 
       question.matching_answer_incorrect_matches = matches.join("\n");
       question.question_points = parseFloat(question.question_points, 10);
-      if (isNaN(question.question_points)) { question.question_points = 0; }
+      if (isNaN(question.question_points) || question.question_points < 0) { question.question_points = 0; }
       var $form = $("#question_form_template").clone(true).attr('id', '');
       var $formQuestion = $form.find(".question");
       $formQuestion.addClass('initialLoad');
@@ -1922,6 +1968,7 @@ define([
       if (REGRADE_OPTIONS[idValue]) {
         showRegradeOptions($question,questionID);
       }
+      toggleSelectAnswerAltText($(".form_answers .answer"), quiz.answerSelectionType(question.question_type))
       togglePossibleCorrectAnswerLabel($(".form_answers .answer"));
     });
 
@@ -1954,52 +2001,37 @@ define([
       quiz.updateDisplayComments();
     });
 
-    $(document).delegate("a.comment_focus", 'focus click', function(event) {
-      var $commentEditor;
-      var $focusProxy = $(this);
-      var focusEditor = function() {
-        $commentEditor.focus().select();
-      };
-
+    $(document).delegate("a.comment_focus", 'click', function(event) {
       event.preventDefault();
+      var $link = $(this);
+      var $comment = $link.closest('.question_comment, .answer_comments');
+      var $comment_html = $comment.find('.comment_html');
 
-      $commentEditor = $focusProxy
-        .closest('.question_comment, .answer_comments')
-          .removeClass('empty')
-          .find('textarea.comments');
+      var toggler = $comment.data('editorToggle');
 
-      // Hack to fix focusing the editor on Safari using keyboard arrows under
-      // VoiceOver (tab worked just fine, just not VO+arrow cursor navigation)
-      // by waiting a while before we focus the comment editor.
-      //
-      // Read below for a "guess" on why this is happening.
-      //
-      // It seems VO/Safari ignores manual focus calls past a certain threshold,
-      // so the fact that we're focusing the a.comment_focus then moving focus
-      // to the textarea does not work with arrows. This is the closest thing I
-      // found to the issue: http://bit.ly/1rkdSUh
-      //
-      // @since CNVS-15099
-      if (INST.browser.safari && event.type === 'focusin') {
-        setTimeout(function() {
-          // don't focus the editor if the user has tabbed/moved away from the
-          // proxy anchor
-          if ($focusProxy.is(':focus')) {
-            focusEditor();
+      // create toggler instance on the first click
+      if (!toggler) {
+        toggler = new EditorToggle($comment_html, {editorBoxLabel: $link.title });
+        toggler.editButton = $link;
+        toggler.on('display', function() {
+
+          $comment.removeClass('editing');
+
+          var html = $comment_html.html();
+          $comment.find('input[type="hidden"]').val(html);
+          if (html == '') {
+            $comment.addClass('empty');
           }
-        }, 500 /* the magic started working at 350ms but it wasn't reliable */);
-      } else {
-        focusEditor();
+        });
+        $comment.data('editorToggle', toggler);
       }
-    });
 
-    $(document).delegate("textarea.comments", 'focus', function() {
-      $(this).parents(".question_comment,.answer_comments").removeClass('empty');
-    }).delegate('textarea.comments', 'blur', function() {
-      $(this).val($.trim($(this).val()));
-      if ($(this).val() == "") {
-        $(this).parents(".question_comment,.answer_comments").addClass('empty');
+      if (!toggler.editing) {
+        $comment.removeClass('empty');
+        $comment.addClass('editing');
+        toggler.edit();
       }
+
     });
 
     $(document).delegate(".numerical_answer_type", 'change', function() {
@@ -2677,14 +2709,21 @@ define([
       var $answers = $form.find(".answer");
       var $question = $(this).find(".question");
       var answers = [];
+
+      // save any open html answers or comments
+      $form.find('.edit_html_done').trigger('click');
+
       var questionData = $question.getFormData({
         textValues: ['question_type', 'question_name', 'question_points', 'correct_comments', 'incorrect_comments', 'neutral_comments',
           'question_text', 'answer_selection_type', 'text_after_answers', 'matching_answer_incorrect_matches',
-          'regrade_option', 'regrade_disabled']
+          'regrade_option', 'regrade_disabled'],
+        htmlValues: ['correct_comments_html', 'incorrect_comments_html', 'neutral_comments_html']
       });
 
-      // save any open html answers
-      $form.find('.edit_html_done').trigger('click');
+      if (questionData.question_points && questionData.question_points < 0) {
+        $form.find("input[name='question_points']").errorBox(I18n.t('question.positive_points', "Must be zero or greater"));
+        return;
+      }
 
       questionData.assessment_question_bank_id = $(".question_bank_id").text() || ""
       var error_text = null;
@@ -2810,7 +2849,6 @@ define([
           question.answers.push(data);
         });
       }
-
 
       quiz.updateDisplayQuestion($displayQuestion, question);
 

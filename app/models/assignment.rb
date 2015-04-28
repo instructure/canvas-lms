@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
 require 'set'
 require 'canvas/draft_state_validations'
 require 'bigdecimal'
@@ -33,7 +34,7 @@ class Assignment < ActiveRecord::Base
 
   attr_accessible :title, :name, :description, :due_at, :points_possible,
     :grading_type, :submission_types, :assignment_group, :unlock_at, :lock_at,
-    :group_category, :group_category_id, :peer_review_count,
+    :group_category, :group_category_id, :peer_review_count, :anonymous_peer_reviews,
     :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
     :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
     :notify_of_update, :time_zone_edited, :turnitin_enabled,
@@ -256,18 +257,25 @@ class Assignment < ActiveRecord::Base
   end
 
   def schedule_do_auto_peer_review_job_if_automatic_peer_review
+    return unless needs_auto_peer_reviews_scheduled?
+
     reviews_due_at = self.peer_reviews_assign_at || self.due_at
-    if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && reviews_due_at
-      self.send_later_enqueue_args(:do_auto_peer_review, {
-        :run_at => reviews_due_at,
-        :singleton => Shard.birth.activate { "assignment:auto_peer_review:#{self.id}" }
-      })
-    end
-    true
+    return if reviews_due_at.blank?
+
+    self.send_later_enqueue_args(:do_auto_peer_review, {
+      :run_at => reviews_due_at,
+      :singleton => Shard.birth.activate { "assignment:auto_peer_review:#{self.id}" }
+    })
+  end
+
+  attr_accessor :skip_schedule_peer_reviews
+  alias_method :skip_schedule_peer_reviews?, :skip_schedule_peer_reviews
+  def needs_auto_peer_reviews_scheduled?
+    !skip_schedule_peer_reviews? && peer_reviews? && automatic_peer_reviews? && !peer_reviews_assigned?
   end
 
   def do_auto_peer_review
-    assign_peer_reviews if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && overdue?
+    assign_peer_reviews if needs_auto_peer_reviews_scheduled? && overdue?
   end
 
   def touch_assignment_group
@@ -499,22 +507,22 @@ class Assignment < ActiveRecord::Base
       participants(include_observers: true, excluded_user_ids: excluded_ids)
     }
     p.whenever { |assignment|
-      policy = BroadcastPolicies::AssignmentPolicy.new( assignment )
-      policy.should_dispatch_assignment_due_date_changed?
+      BroadcastPolicies::AssignmentPolicy.new(assignment).
+        should_dispatch_assignment_due_date_changed?
     }
 
     p.dispatch :assignment_changed
     p.to { participants(include_observers: true) }
     p.whenever { |assignment|
-      policy = BroadcastPolicies::AssignmentPolicy.new( assignment )
-      policy.should_dispatch_assignment_changed?
+      BroadcastPolicies::AssignmentPolicy.new(assignment).
+        should_dispatch_assignment_changed?
     }
 
     p.dispatch :assignment_created
     p.to { participants(include_observers: true) }
     p.whenever { |assignment|
-      policy = BroadcastPolicies::AssignmentPolicy.new( assignment )
-      policy.should_dispatch_assignment_created?
+      BroadcastPolicies::AssignmentPolicy.new(assignment).
+        should_dispatch_assignment_created?
     }
     p.filter_asset_by_recipient { |assignment, user|
       assignment.overridden_for(user)
@@ -523,7 +531,8 @@ class Assignment < ActiveRecord::Base
     p.dispatch :assignment_unmuted
     p.to { participants(include_observers: true) }
     p.whenever { |assignment|
-      assignment.context.available? && assignment.recently_unmuted
+      BroadcastPolicies::AssignmentPolicy.new(assignment).
+        should_dispatch_assignment_unmuted?
     }
 
   end
@@ -911,11 +920,6 @@ class Assignment < ActiveRecord::Base
     send_later_if_production(:multiple_module_actions, student_ids, :scored, score)
   end
 
-  def update_user_from_rubric(user, assessment)
-    score = self.points_possible * (assessment.score / assessment.rubric.points_possible)
-    self.grade_student(user, :grade => self.score_to_grade(score), :grader => assessment.assessor)
-  end
-
   def title_with_id
     "#{title} (#{id})"
   end
@@ -958,10 +962,12 @@ class Assignment < ActiveRecord::Base
     self.submissions.where(user_id: user.id).first_or_initialize
   end
 
+  class GradeError < StandardError; end
+
   def grade_student(original_student, opts={})
-    raise "Student is required" unless original_student
-    raise "Student must be enrolled in the course as a student to be graded" unless context.includes_student?(original_student)
-    raise "Grader must be enrolled as a course admin" if opts[:grader] && !self.context.grants_right?(opts[:grader], :manage_grades)
+    raise GradeError.new("Student is required") unless original_student
+    raise GradeError.new("Student must be enrolled in the course as a student to be graded") unless context.includes_student?(original_student)
+    raise GradeError.new("Grader must be enrolled as a course admin") if opts[:grader] && !self.context.grants_right?(opts[:grader], :manage_grades)
     opts.delete(:id)
     dont_overwrite_grade = opts.delete(:dont_overwrite_grade)
     group_comment = Canvas::Plugin.value_to_boolean(opts.delete(:group_comment))
@@ -973,11 +979,13 @@ class Assignment < ActiveRecord::Base
       :author => grader,
       :media_comment_id => (opts.delete :media_comment_id),
       :media_comment_type => (opts.delete :media_comment_type),
+      :hidden => muted?,
     }
     comment[:group_comment_id] = CanvasSlug.generate_securish_uuid if group_comment && group
     submissions = []
     find_or_create_submissions(students) do |submission|
       submission_updated = false
+      submission.skip_grade_calc = opts[:skip_grade_calc]
       student = submission.user
       if student == original_student || !grade_group_students_individually
         previously_graded = submission.grade.present?
@@ -1383,7 +1391,7 @@ class Assignment < ActiveRecord::Base
                                .map(&:user)
       users_with_turnitin_data = if turnitin_enabled?
                                    submissions
-                                   .where("turnitin_data IS NOT NULL")
+                                   .where("turnitin_data IS NOT NULL AND turnitin_data <> ?", {}.to_yaml)
                                    .map(&:user)
                                  else
                                    []
@@ -1902,6 +1910,10 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  def group_category_deleted_with_submissions?
+    self.group_category.try(:deleted_at?) && self.has_student_submissions?
+  end
+
   def self.with_student_submission_count
     joins("LEFT OUTER JOIN submissions s ON
            s.assignment_id = assignments.id AND
@@ -1912,6 +1924,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def can_unpublish?
+    return true if new_record?
     !has_student_submissions?
   end
 

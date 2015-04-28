@@ -2,11 +2,12 @@ define ['tinymce.editor_box_list'], (EditorBoxList)->
   list = null
   module "EditorBoxList",
     setup: ->
-      $("body").append("<textarea id=42></textarea>")
+      $("#fixtures").append("<textarea id=42></textarea>")
       list = new EditorBoxList()
 
     teardown: ->
       $("#42").remove()
+      $("#fixtures").empty()
 
   test 'constructor: property setting', ->
     ok(list._textareas?)

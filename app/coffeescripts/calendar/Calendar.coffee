@@ -69,6 +69,8 @@ define [
 
       if data.show && data.show != ''
         @visibleContextList = data.show.split(',')
+        for visibleContext, i in @visibleContextList
+          @visibleContextList[i] = visibleContext.replace(/^group_(.*_.*)/, '$1')
 
       $(document).fragmentChange(@fragmentChange)
 
@@ -670,7 +672,7 @@ define [
     $styleContainer = $('<div />').appendTo('body')
 
     colorizeContexts: =>
-      colors = colorSlicer.getColors(@contextCodes.length, 275, {unsafe: !ENV.SETTINGS.use_high_contrast})
+      colors = colorSlicer.getColors(@contextCodes.length, 275, {unsafe: !ENV.use_high_contrast})
       html = (for contextCode, index in @contextCodes
         color = colors[index]
         ".group_#{contextCode}{

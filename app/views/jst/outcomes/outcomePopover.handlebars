@@ -1,4 +1,7 @@
-<div class="outcome-details">
+<div class="outcome-details{{#if dialog}}-dialog{{/if}}">
+  <div class="line-graph">
+    <div class="screenreader-only"></div>
+  </div>
   <div class="head-content" tabindex="0">
     {{#if path}}
     <div class="title">{{path}}</div>
@@ -21,21 +24,12 @@
     </div>
     {{else}}
     <div class="mastery-details pull-right" aria-hidden="true">
-      {{#if score}}
-        <span>{{score}} / {{mastery_points}}</span>
-        {{#ifEqual status 'exceeds'}}
-            <i class="icon-check-plus exceeds"></i>
-        {{else}}
-          {{#ifEqual status 'mastery'}}
-            <i class="icon-check mastery"></i>
-          {{else}}
-            {{#ifEqual status 'near'}}
-            <i class="icon-plus near-mastery"></i>
-            {{else}}
-            <i class="icon-x remedial"></i>
-            {{/ifEqual}}
-          {{/ifEqual}}
-        {{/ifEqual}}
+      {{#if scoreDefined}}
+        <span>{{roundedScore}} / {{mastery_points}}</span>
+        <span class="screenreader-only">
+          {{#t}}Outcome: {{title}} has a status of {{statusTooltip}}{{/t}}
+        </span>
+        {{ addMasteryIcon status }}
       {{else}}
         <span>{{#t}}No score yet{{/t}}</span>
       {{/if}}
@@ -73,7 +67,7 @@
     </div>
     <div class="example">
       <span aria-hidden="true">{{#t}}2- Final score{{/t}}: </span>
-      <span class="screenreader-only">{{#t}}Example final score]]{{/t}}</span>
+      <span class="screenreader-only">{{#t}}Example final score{{/t}}</span>
       <span class="right-content">{{exResult}}</span>
     </div>
   </div>

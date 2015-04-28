@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+
 # @API Calendar Events
 #
 # API for creating, accessing and updating calendar events.

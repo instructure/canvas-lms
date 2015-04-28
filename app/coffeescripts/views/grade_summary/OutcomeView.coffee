@@ -1,38 +1,39 @@
 define [
-  'i18n!outcomes'
+  'jquery'
   'underscore'
   'Backbone'
   'compiled/views/grade_summary/ProgressBarView'
   'compiled/views/grade_summary/OutcomePopoverView'
+  'compiled/views/grade_summary/OutcomeDialogView'
   'jst/grade_summary/outcome'
-  'jst/outcomes/outcomePopover'
-], (I18n, _, Backbone, ProgressBarView, OutcomePopoverView, template, popover_template) ->
-  class OutcomeView extends Backbone.View
-    tagName: 'li'
-    className: 'outcome'
-    template: template
+], ($, _, Backbone, ProgressBarView, OutcomePopoverView, OutcomeDialogView, template) ->
 
-    afterRender: ->
-      @popover = new OutcomePopoverView({
-        el: @$('.alignment-info i')
-        model: @model
-        template: popover_template
-      })
+  class OutcomeView extends Backbone.View
+    className: 'outcome'
+    events:
+      'click .more-details' : 'show'
+      'keydown .more-details' : 'show'
+    tagName: 'li'
+    template: template
 
     initialize: ->
       super
       @progress = new ProgressBarView(model: @model)
 
+    afterRender: ->
+      @popover = new OutcomePopoverView({
+        el: @$('.more-details')
+        model: @model
+      })
+      @dialog = new OutcomeDialogView({
+        model: @model
+      })
+
+    show: (e) ->
+      @dialog.show e
+
     toJSON: ->
       json = super
       _.extend json,
-        statusTooltip: @statusTooltip()
         progress: @progress
 
-    statusTooltip: ->
-      switch @model.status()
-        when 'undefined' then I18n.t('Unstarted')
-        when 'remedial' then I18n.t('Well Below Mastery')
-        when 'near' then I18n.t('Near Mastery')
-        when 'mastery' then I18n.t('Meets Mastery')
-        when 'exceeds' then I18n.t('Exceeds Mastery')

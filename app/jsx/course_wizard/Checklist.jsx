@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 define([
-  'old_unsupported_dont_use_react',
+  'react',
   './ChecklistItem',
   './ListItems'
 ], function(React, ChecklistItem, ListItems) {
@@ -29,6 +29,7 @@ define([
             <ChecklistItem complete={item.complete}
                            id={id}
                            key={item.key}
+                           stepKey={item.key}
                            title={item.title}
                            onClick={this.props.clickHandler}
                            isSelected={isSelected}

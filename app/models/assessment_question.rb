@@ -107,8 +107,10 @@ class AssessmentQuestion < ActiveRecord::Base
               new_file = file.clone_for(self)
             rescue => e
               new_file = nil
-              er = ErrorReport.log_exception(:file_clone_during_translate_links, e)
-              logger.error("Error while cloning attachment during AssessmentQuestion#translate_links: id: #{self.id} error_report: #{er.id}")
+              er_id = Canvas::Errors.capture_exception(:file_clone_during_translate_links, e)[:error_report]
+              logger.error("Error while cloning attachment during"\
+                           " AssessmentQuestion#translate_links: "\
+                           "id: #{self.id} error_report: #{er_id}")
             end
             new_file.save if new_file
             file_substitutions[id_or_path] = new_file
@@ -250,7 +252,8 @@ class AssessmentQuestion < ActiveRecord::Base
       :id, :regrade_option, :points_possible, :correct_comments, :incorrect_comments,
       :neutral_comments, :question_type, :question_name, :question_text, :answers,
       :formulas, :variables, :answer_tolerance, :formula_decimal_places,
-      :matching_answer_incorrect_matches, :matches
+      :matching_answer_incorrect_matches, :matches,
+      :correct_comments_html, :incorrect_comments_html, :neutral_comments_html
     )
 
     question = Quizzes::QuizQuestion::QuestionData.generate(data)

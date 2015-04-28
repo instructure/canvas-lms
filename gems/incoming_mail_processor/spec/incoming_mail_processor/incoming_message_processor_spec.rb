@@ -277,6 +277,28 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       IncomingMessageProcessor.configure(config)
     end
 
+    it "splits messages between multiple workers" do
+      IncomingMessageProcessor.configure({
+        'workers' => 3,
+        'imap' => {
+          'username' => 'user@example.com',
+        }
+      })
+      @mock_mailbox.expects(:connect)
+      @mock_mailbox.expects(:each_message).with({stride: 3, offset: 0})
+      @mock_mailbox.expects(:disconnect)
+      imp = IncomingMessageProcessor.new(message_handler, error_reporter)
+      imp.process(worker_id: 0)
+      @mock_mailbox.expects(:connect)
+      @mock_mailbox.expects(:each_message).with({stride: 3, offset: 1})
+      @mock_mailbox.expects(:disconnect)
+      imp.process(worker_id: 1)
+      @mock_mailbox.expects(:connect)
+      @mock_mailbox.expects(:each_message).with({stride: 3, offset: 2})
+      @mock_mailbox.expects(:disconnect)
+      imp.process(worker_id: 2)
+    end
+
     describe "message processing" do
       before do
         IncomingMessageProcessor.configure({
@@ -438,7 +460,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       })
       processed_second = false
 
-      TimeoutMailbox.send(:define_method, :each_message) do
+      TimeoutMailbox.send(:define_method, :each_message) do |opts|
         if @config[:username] == 'first'
           raise Timeout::Error
         else

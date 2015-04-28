@@ -92,8 +92,9 @@ module Importers
           begin
             self.import_media_objects(mo_attachments, migration)
           rescue => e
-            er = ErrorReport.log_exception(:import_media_objects, e)
-            migration.add_error(t(:failed_import_media_objects, %{Failed to import media objects}), error_report_id: er.id)
+            er = Canvas::Errors.capture_exception(:import_media_objects, e)[:error_report]
+            error_message = t('Failed to import media objects')
+            migration.add_error(error_message, error_report_id: er)
           end
         end
         if migration.canvas_import?
@@ -120,8 +121,8 @@ module Importers
       Importers::AssignmentImporter.process_migration(data, migration);migration.update_import_progress(65)
 
       # and second time...
-      Importers::QuizImporter.process_migration(data, migration, question_data); migration.update_import_progress(70)
-      Importers::ContextModuleImporter.process_migration(data, migration);migration.update_import_progress(72)
+      Importers::ContextModuleImporter.process_migration(data, migration);migration.update_import_progress(70)
+      Importers::QuizImporter.process_migration(data, migration, question_data); migration.update_import_progress(72)
       Importers::DiscussionTopicImporter.process_migration(data, migration);migration.update_import_progress(75)
       Importers::WikiPageImporter.process_migration(data, migration);migration.update_import_progress(80)
       Importers::AssignmentImporter.process_migration(data, migration);migration.update_import_progress(85)
@@ -136,7 +137,6 @@ module Importers
       end
 
       # be very explicit about draft state courses, but be liberal toward legacy courses
-      course.wiki.check_has_front_page
       if course.wiki.has_no_front_page
         if migration.for_course_copy? && (source = migration.source_course || Course.where(id: migration.migration_settings[:source_course_id]).first)
           mig_id = CC::CCHelper.create_key(source.wiki.front_page)
@@ -275,7 +275,7 @@ module Importers
             migration.add_warning(t(:copied_grading_standard_warning, "Couldn't find copied grading standard for the course."))
           end
         elsif settings[:grading_standard_id].present?
-          if gs = GradingStandard.standards_for(course).where(id: settings[:grading_standard_id]).first
+          if gs = GradingStandard.for(course).where(id: settings[:grading_standard_id]).first
             course.grading_standard = gs
           else
             migration.add_warning(t(:account_grading_standard_warning,"Couldn't find account grading standard for the course." ))

@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 define([
-  'old_unsupported_dont_use_react',
+  'react',
   'jsx/grading/gradingStandard',
   'jquery',
   'i18n!external_tools',
@@ -9,7 +9,7 @@ define([
   'jquery.instructure_misc_plugins'
 ],
 function(React, GradingStandard, $, I18n, _) {
-
+  var update = React.addons.update;
   var GradingStandardCollection = React.createClass({
 
     getInitialState: function() {
@@ -22,28 +22,32 @@ function(React, GradingStandard, $, I18n, _) {
     },
 
     gotStandards: function(standards) {
-      this.setState({standards: standards});
+      var formattedStandards = $.extend(true, [], standards);
+      formattedStandards = _.map(formattedStandards, function(standard) {
+        standard.grading_standard.data = this.formatStandardData(standard.grading_standard.data);
+        return standard;
+      }, this);
+      this.setState({standards: formattedStandards});
+    },
+
+    formatStandardData: function(standardData) {
+      return _.map(standardData, function(dataRow){
+        return [dataRow[0], this.roundToTwoDecimalPlaces(dataRow[1] * 100)];
+      }, this);
     },
 
     addGradingStandard: function() {
-      var newStandards = _.map(this.state.standards, function(standard){
-        standard.editing = false;
-        standard.justAdded = false;
-        return standard;
-      });
-
       var newStandard = {
         editing: true,
         justAdded: true,
         grading_standard: {
           permissions: { manage: true },
           title: "",
-          data: ENV.DEFAULT_DATA,
+          data: this.formatStandardData(ENV.DEFAULT_GRADING_STANDARD_DATA),
           id: -1
         }
       };
-
-      newStandards.unshift(newStandard);
+      var newStandards = update(this.state.standards, {$unshift: [newStandard]});
       this.setState({standards: newStandards});
     },
 
@@ -56,66 +60,102 @@ function(React, GradingStandard, $, I18n, _) {
     },
 
     setEditingStatus: function(id, setEditingStatusTo){
-      var existingStandard = this.getStandardById(id)
+      var newStandards = $.extend(true, [], this.state.standards);
+      var existingStandard = this.getStandardById(id);
       var indexToEdit = this.state.standards.indexOf(existingStandard);
       if(setEditingStatusTo === false && this.standardNotCreated(existingStandard.grading_standard)){
-        var newStandards = this.state.standards;
         newStandards.splice(indexToEdit, 1);
         this.setState({standards: newStandards});
       }else{
-        this.state.standards[indexToEdit].editing = setEditingStatusTo;
-        this.setState({standards: this.state.standards})
+        newStandards[indexToEdit].editing = setEditingStatusTo;
+        this.setState({standards: newStandards});
       }
     },
 
-    standardBeingEdited: function() {
+    anyStandardBeingEdited: function() {
       return !!_.find(this.state.standards, function(standard){return standard.editing});
     },
 
     saveGradingStandard: function(standard) {
+      var newStandards = $.extend(true, [], this.state.standards);
       var indexToUpdate = this.state.standards.indexOf(this.getStandardById(standard.id));
-      if(standard.title === "" && this.standardNotCreated(standard)) standard.title = "New Grading Scheme";
-      var self = this;
+      var type, url, data;
+      standard.title = standard.title.trim();
+      if(this.standardNotCreated(standard)){
+        if(standard.title === "") standard.title = "New Grading Scheme";
+        type = "POST";
+        url = ENV.GRADING_STANDARDS_URL;
+        data = this.dataFormattedForCreate(standard);
+      }else{
+        type = "PUT";
+        url = ENV.GRADING_STANDARDS_URL + "/" + standard.id;
+        data = this.dataFormattedForUpdate(standard);
+      }
       $.ajax({
-        type: this.standardNotCreated(standard) ? "POST" : "PUT",
-        url: this.standardNotCreated(standard) ? ENV.GRADING_STANDARDS_URL : ENV.GRADING_STANDARDS_URL + "/" + standard.id,
-        data: this.dataFormattedForUpdate(standard),
-        dataType: "json"
+        type: type,
+        url: url,
+        dataType: "json",
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        context: this
       })
         .success(function(updatedStandard){
-          self.state.standards[indexToUpdate] = updatedStandard;
-          self.setState({standards: self.state.standards});
+          updatedStandard.grading_standard.data = this.formatStandardData(updatedStandard.grading_standard.data);
+          newStandards[indexToUpdate] = updatedStandard;
+          this.setState({standards: newStandards}, function() {
+            $.flashMessage(I18n.t("Grading scheme saved"));
+          });
         })
         .error(function(){
-          self.state.standards[indexToUpdate].grading_standard.saving = false;
-          self.setState({standards: self.state.standards});
-          $.flashError(I18n.t("There was a problem saving the grading scheme"));
+          newStandards[indexToUpdate].grading_standard.saving = false;
+          this.setState({standards: newStandards}, function() {
+            $.flashError(I18n.t("There was a problem saving the grading scheme"));
+          });
         });
+    },
+
+    dataFormattedForCreate: function(standard) {
+      var formattedData = { grading_standard: standard };
+      _.each(standard.data, function(dataRow, i){
+        var name = dataRow[0];
+        var value = dataRow[1];
+        formattedData["grading_standard"]["data"][i] = [
+          name.trim(),
+          this.roundToTwoDecimalPlaces(value) / 100
+        ];
+      }, this);
+      return formattedData;
     },
 
     dataFormattedForUpdate: function(standard) {
       var formattedData = { grading_standard: { title: standard.title, standard_data: {} } };
-      for(i = 0; i < standard.data.length; i++){
+      _.each(standard.data, function(dataRow, i){
+        var name = dataRow[0];
+        var value = dataRow[1];
         formattedData["grading_standard"]["standard_data"]["scheme_" + i] = {
-          name: standard.data[i][0],
-          value: Math.round(standard.data[i][1] * 10000)/100
+          name: name.trim(),
+          value: this.roundToTwoDecimalPlaces(value)
         };
-      };
+      }, this);
       return formattedData;
     },
 
-    deleteGradingStandard: function(event, key) {
+    roundToTwoDecimalPlaces: function(number) {
+      return Math.round(number * 100)/100;
+    },
+
+    deleteGradingStandard: function(event, uniqueId) {
       var self = this,
         $standard = $(event.target).parents(".grading_standard");
       $standard.confirmDelete({
-        url: ENV.GRADING_STANDARDS_URL + "/" + key,
+        url: ENV.GRADING_STANDARDS_URL + "/" + uniqueId,
         message: I18n.t("Are you sure you want to delete this grading scheme?"),
         success: function() {
-          $(this).slideUp(function() {
-            $(this).remove();
+          var indexToRemove = self.state.standards.indexOf(self.getStandardById(uniqueId));
+          var newStandards = update(self.state.standards, {$splice: [[indexToRemove, 1]]});
+          self.setState({standards: newStandards}, function(){
+            $.flashMessage(I18n.t("Grading scheme deleted"))
           });
-          var newStandards = _.reject(self.state.standards, function(standard){ return standard.grading_standard.id === key });
-          self.setState({standards: newStandards});
         },
         error: function() {
           $.flashError(I18n.t("There was a problem deleting the grading scheme"));
@@ -129,7 +169,7 @@ function(React, GradingStandard, $, I18n, _) {
 
     getAddButtonCssClasses: function() {
       var classes = "btn pull-right add_standard_link"
-      if(!this.hasAdminOrTeacherRole() || this.standardBeingEdited()) classes += " disabled"
+      if(!this.hasAdminOrTeacherRole() || this.anyStandardBeingEdited()) classes += " disabled"
       return classes;
     },
 
@@ -137,24 +177,24 @@ function(React, GradingStandard, $, I18n, _) {
       if(!this.state.standards){
         return null;
       } else if(this.state.standards.length === 0){
-        return <h3>{I18n.t("No grading schemes to display")}</h3>;
+        return <h3 ref="noSchemesMessage">{I18n.t("No grading schemes to display")}</h3>;
       }
-      var self = this;
       return this.state.standards.map(function(s){
-        return (<GradingStandard key={s.grading_standard.id} standard={s.grading_standard}
+        return (<GradingStandard ref={"gradingStandard" + s.grading_standard.id} key={s.grading_standard.id}
+                                 uniqueId={s.grading_standard.id} standard={s.grading_standard}
                                  editing={!!s.editing} permissions={s.grading_standard.permissions}
-                                 justAdded={s.justAdded} onSetEditingStatus={self.setEditingStatus}
-                                 othersEditing={!s.editing && self.standardBeingEdited()}
-                                 onDeleteGradingStandard={self.deleteGradingStandard}
-                                 onSaveGradingStandard={self.saveGradingStandard}/>);
-      });
+                                 justAdded={!!s.justAdded} onSetEditingStatus={this.setEditingStatus}
+                                 round={this.roundToTwoDecimalPlaces} onDeleteGradingStandard={this.deleteGradingStandard}
+                                 othersEditing={!s.editing && this.anyStandardBeingEdited()}
+                                 onSaveGradingStandard={this.saveGradingStandard}/>);
+      }, this);
     },
 
     render: function () {
       return(
         <div>
           <div className="rs-margin-all pull-right">
-            <a href="#" onClick={this.addGradingStandard} className={this.getAddButtonCssClasses()}>
+            <a href="#" ref="addButton" onClick={this.addGradingStandard} className={this.getAddButtonCssClasses()}>
               <i className="icon-add"/>
               {I18n.t(" Add grading scheme")}
             </a>

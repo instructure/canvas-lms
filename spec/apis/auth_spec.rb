@@ -136,7 +136,7 @@ describe "API Authentication", type: :request do
           expect(response).to be_redirect
           expect(response['Location']).to match(%r{/login/oauth2/confirm$})
           get response['Location']
-          expect(response).to render_template("pseudonym_sessions/oauth2_confirm")
+          expect(response).to render_template("oauth2_provider/confirm")
 
           post "/login/oauth2/accept", { :authenticity_token => cookies['_csrf_token'] }
 
@@ -244,7 +244,7 @@ describe "API Authentication", type: :request do
         expect(response).to be_redirect
         expect(response['Location']).to match(%r{/login/oauth2/confirm$})
         get response['Location']
-        expect(response).to render_template("pseudonym_sessions/oauth2_confirm")
+        expect(response).to render_template("oauth2_provider/confirm")
         post "/login/oauth2/accept", { :authenticity_token => cookies['_csrf_token'] }
         expect(response).to be_redirect
         expect(response['Location']).to match(%r{/login/oauth2/auth\?})
@@ -263,7 +263,7 @@ describe "API Authentication", type: :request do
         expect(response).to be_redirect
         expect(response['Location']).to match(%r{/login/oauth2/confirm$})
         get response['Location']
-        expect(response).to render_template("pseudonym_sessions/oauth2_confirm")
+        expect(response).to render_template("oauth2_provider/confirm")
         get "/login/oauth2/deny"
         expect(response).to be_redirect
         expect(response['Location']).to match(%r{/login/oauth2/auth\?})
@@ -327,7 +327,7 @@ describe "API Authentication", type: :request do
             expect(response).to be_redirect
             expect(response['Location']).to match(%r{/login/oauth2/confirm$})
             get response['Location']
-            expect(response).to render_template("pseudonym_sessions/oauth2_confirm")
+            expect(response).to render_template("oauth2_provider/confirm")
             post "/login/oauth2/accept", { :authenticity_token => cookies['_csrf_token'] }
 
             expect(response).to be_redirect

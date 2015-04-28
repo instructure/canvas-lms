@@ -210,11 +210,20 @@ define([
             $el = $("#submit_online_text_entry_form textarea:first");
             if (!$el.editorBox('exists?')) { $el.editorBox(); }
           }
+
+          if (ui.newTab.attr("aria-controls") === "submit_google_doc_form") {
+            listGoogleDocs();
+          }
         },
         create: function(event, ui) {
           if (ui.tab.find('a').hasClass('submit_online_text_entry_option')) {
             $el = $("#submit_online_text_entry_form textarea:first");
             if (!$el.editorBox('exists?')) { $el.editorBox(); }
+          }
+
+          //list Google Docs if Google Docs tab is active
+          if (ui.tab.attr("aria-controls") === "submit_google_doc_form") {
+            listGoogleDocs();
           }
         }
       });
@@ -273,56 +282,34 @@ define([
       }, 'json');
     }
 
-    $(".submit_online_url_option").click(function(event) {
-      if($(this).attr("href") == '#submit_google_doc_form'){
-        listGoogleDocs();
-      }
-    });
-
-    //list Google Docs if Google Docs tab is active
-    if(window.location.hash == "#submit_google_doc_form"){
-      listGoogleDocs();
-    }
-
     $("#auth-google").live('click', function(e){
       e.preventDefault();
       var href = $(this).attr("href");
       reauth(href);
     });
 
-    // Yay for IE!
-    var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
-    var eventHandler = window[eventMethod];
-    var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
-
-
     // Post message for anybody to listen to //
-    if (window.opener)
-        window.opener.postMessage({
-        type: "event",
-        payload: "done"
-      }, window.location.origin);
+    if (window.opener) {
+      window.opener.postMessage({
+        "type": "event",
+        "payload": "done"
+      }, window.opener.location.toString());
+    }
 
 
     function reauth(auth_url) {
-      var modal;
-
-      if(window.showModalDialog) {
-        modal = window.showModalDialog(auth_url, "Authorize Google Docs");
-      } else {
-        modal = window.open(auth_url, "Authorize Google Docs", 'menubar=no;directories=no;location=no;modal=yes');
-      }
-
-      eventHandler(messageEvent, function(event) {
-        if(!event || !event.data || event.origin !== window.location.origin) return;
+      var modal = window.open(auth_url, "Authorize Google Docs", 'menubar=no,directories=no,location=no,height=500,width=500');
+      $(window).on("message", function (event){
+        event = event.originalEvent;
+        if(!event || !event.data || event.origin !== window.location.protocol + "//" + window.location.host) return;
 
         if(event.data.type == "event" && event.data.payload == "done") {
           if (modal)
-              modal.close();
+            modal.close();
+
           reloadGoogleDrive();
         }
-      }, false);
-
+      });
     }
 
     function reloadGoogleDrive() {

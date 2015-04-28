@@ -12,7 +12,7 @@ module Canvas
           :available_to => ['user', 'student', 'teacher', 'admin'],
           :text => I18n.t('#help_dialog.search_the_canvas_guides', 'Search the Canvas Guides'),
           :subtext => I18n.t('#help_dialog.canvas_help_sub', 'Find answers to common questions'),
-          :url => 'http://guides.instructure.com'
+          :url => Setting.get('help_dialog_canvas_guide_url', 'http://guides.instructure.com')
         },
         {
           :available_to => ['user', 'student', 'teacher', 'admin'],

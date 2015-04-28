@@ -76,11 +76,11 @@ describe GradingStandard do
     compare_schemes(standard.data, GradingStandard.default_grading_standard)
   end
 
-  context "standards_for" do
+  context "#for" do
     it "should return standards that match the context" do
       grading_standard_for @course
 
-      standards = GradingStandard.standards_for(@course)
+      standards = GradingStandard.for(@course)
       expect(standards.length).to eq 1
       expect(standards[0].id).to eq @standard.id
     end
@@ -88,7 +88,7 @@ describe GradingStandard do
     it "should include standards made in the parent account" do
       grading_standard_for @course.root_account
 
-      standards = GradingStandard.standards_for(@course)
+      standards = GradingStandard.for(@course)
       expect(standards.length).to eq 1
       expect(standards[0].id).to eq @standard.id
     end
@@ -104,7 +104,7 @@ describe GradingStandard do
         @course.assignments.create!(:title => "hi", :grading_standard_id => gs.id)
       end
 
-      standards = GradingStandard.standards_for(@course).sorted
+      standards = GradingStandard.for(@course).sorted
       expect(standards.length).to eq 2
       expect(standards.map(&:id)).to eq [gs.id, gs2.id]
     end
@@ -115,7 +115,7 @@ describe GradingStandard do
       gs2.title = nil
       gs2.save!
 
-      standards = GradingStandard.standards_for(@course).sorted
+      standards = GradingStandard.for(@course).sorted
       expect(standards.length).to eq 2
       expect(standards.map(&:id)).to eq [gs.id, gs2.id]
     end

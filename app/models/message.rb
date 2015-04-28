@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'hey'
+
 class Message < ActiveRecord::Base
   # Included modules
   include Rails.application.routes.url_helpers
@@ -144,8 +146,6 @@ class Message < ActiveRecord::Base
 
   scope :to_email, -> { where(:path_type => ['email', 'sms']) }
 
-  scope :to_facebook, -> { where(:path_type => 'facebook', :workflow_state => 'sent').order("sent_at DESC").limit(25) }
-
   scope :not_to_email, -> { where("messages.path_type NOT IN ('email', 'sms')") }
 
   scope :by_name, lambda { |notification_name| where(:notification_name => notification_name) }
@@ -221,25 +221,29 @@ class Message < ActiveRecord::Base
   # Returns a JSON string
   def sns_json
     @sns_json ||= begin
-      urls = {html_url: self.url}
-      urls[:api_url] = content(:api_url) if content(:api_url) # no templates define this right now
+      custom_data = {
+        html_url: self.url,
+        user_id: self.user.global_id
+      }
+      custom_data[:api_url] = content(:api_url) if content(:api_url) # no templates define this right now
+
       {
         default: self.subject,
         GCM: {
           data: {
             alert: self.subject,
-          }.merge(urls)
+          }.merge(custom_data)
         }.to_json,
         APNS_SANDBOX: {
           aps: {
             alert: self.subject
           }
-        }.merge(urls).to_json,
+        }.merge(custom_data).to_json,
         APNS: {
           aps: {
             alert: self.subject
           }
-        }.merge(urls).to_json
+        }.merge(custom_data).to_json
       }.to_json
     end
   end
@@ -436,15 +440,9 @@ class Message < ActiveRecord::Base
   def populate_body(message_body_template, path_type, _binding, filename)
     # Build the body content based on the path type
 
-    if path_type == 'facebook'
-      # this will ensure we escape anything that's not already safe
-      @output_buffer = nil
-      self.body = ActionView::Template::Handlers::Erubis.new(message_body_template).result(_binding)
-    else
       self.body = Erubis::Eruby.new(message_body_template,
         bufvar: '@output_buffer', filename: filename).result(_binding)
       self.html_body = apply_html_template(_binding) if path_type == 'email'
-    end
 
     # Append a footer to the body if the path type is email
     if path_type == 'email'
@@ -560,25 +558,6 @@ class Message < ActiveRecord::Base
 
     # not sure what this is even doing?
     message_types.to_a.sort_by { |m| m[0] == 'Other' ? CanvasSort::Last : m[0] }
-  end
-
-  # Public: Format and return the body for this message.
-  #
-  # Returns a body string.
-  def formatted_body
-    # NOTE: I'm pretty sure this is only used for Facebook messages; confirm
-    # that and maybe rename the method/do something different with it?
-    case path_type
-    when 'facebook'
-      (body || '').
-        gsub(/\n/, "<br />\n").
-        gsub(/(\s\s+)/) { |str| str.gsub(/\s/, '&nbsp;') }
-    when 'email'
-      formatted_body = format_message(body).first
-      formatted_body
-    else
-      body
-    end
   end
 
   # Public: Get the root account of this message's context.
@@ -715,10 +694,12 @@ class Message < ActiveRecord::Base
       raise_error = @exception.to_s !~ /^450/
       log_error = raise_error && !@exception.is_a?(Timeout::Error)
       if log_error
-        ErrorReport.log_exception(:default, @exception, {
-          :message => 'Message delivery failed',
-          :to => to,
-          :object => inspect.to_s })
+        Canvas::Errors.capture(
+          @exception,
+          message: 'Message delivery failed',
+          to: to,
+          object: inspect.to_s
+        )
       end
 
       self.errored_dispatch
@@ -758,16 +739,6 @@ class Message < ActiveRecord::Base
     else
       cancel
     end
-  end
-
-  # Internal: Deliver the message through Facebook.
-  #
-  # Returns nothing.
-  def deliver_via_facebook
-    facebook_user_id = self.to.to_i.to_s
-    service = self.user.user_services.for_service('facebook').where(service_user_id: facebook_user_id).first
-    Facebook::Connection.dashboard_increment_count(service.service_user_id, service.token, I18n.t(:new_facebook_message, 'You have a new message from Canvas')) if service && service.token
-    complete_dispatch
   end
 
   # Internal: Send the message through SMS. Right now this just calls

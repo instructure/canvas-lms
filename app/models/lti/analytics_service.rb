@@ -1,4 +1,6 @@
+require 'duration'
 require 'net/http'
+require 'securerandom'
 
 module Lti
   class AnalyticsService
@@ -40,7 +42,8 @@ module Lti
       seconds = duration ? Duration.new(duration).to_i : nil
 
       if seconds
-        course.enrollments.where(:user_id => user).
+
+        course.all_enrollments.where(:user_id => user).
           update_all(['total_activity_time = COALESCE(total_activity_time, 0) + ?', seconds])
       end
 
@@ -49,7 +52,7 @@ module Lti
 
       if PageView.page_views_enabled?
         PageView.new(user: user, context: course, account: course.account).tap { |p|
-          p.request_id = CanvasUUID.generate
+          p.request_id = SecureRandom.uuid
           p.url = opts[:url]
           # TODO: override 10m cap?
           p.interaction_seconds = seconds

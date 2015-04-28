@@ -345,6 +345,9 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   def complete
     @service.complete @quiz_submission, params[:attempt]
 
+    # TODO: should this go in the service instead?
+    Canvas::LiveEvents.quiz_submitted(@quiz_submission)
+
     serialize_and_render @quiz_submission
   end
 

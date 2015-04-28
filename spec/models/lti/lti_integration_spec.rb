@@ -134,8 +134,13 @@ describe "LTI integration tests" do
     expect(post_payload['oauth_callback']).to eq 'about:blank'
     expect(post_payload['resource_link_id']).to eq canvas_tool.opaque_identifier_for(canvas_course)
     expect(post_payload['resource_link_title']).to eq canvas_tool.name
-    expect(post_payload['roles']).to eq 'urn:lti:role:ims/lis/TeachingAssistant,Instructor'
-    expect(post_payload['ext_roles']).to eq "urn:lti:instrole:ims/lis/Administrator,urn:lti:instrole:ims/lis/Instructor,urn:lti:role:ims/lis/Instructor,urn:lti:role:ims/lis/TeachingAssistant,urn:lti:sysrole:ims/lis/User"
+
+    expect(post_payload['roles'].split(',')).to match_array ['urn:lti:role:ims/lis/TeachingAssistant', 'Instructor']
+    expect(post_payload['ext_roles'].split(',')).to match_array ['urn:lti:instrole:ims/lis/Administrator',
+                                                                 'urn:lti:instrole:ims/lis/Instructor',
+                                                                 'urn:lti:role:ims/lis/Instructor',
+                                                                 'urn:lti:role:ims/lis/TeachingAssistant',
+                                                                 'urn:lti:sysrole:ims/lis/User']
     expect(post_payload['tool_consumer_info_product_family_code']).to eq 'canvas'
     expect(post_payload['tool_consumer_info_version']).to eq 'cloud'
     expect(post_payload['tool_consumer_instance_contact_email']).to eq HostUrl.outgoing_email_address
@@ -258,14 +263,14 @@ describe "LTI integration tests" do
       expect(hash['tool_consumer_instance_guid']).to eq sub_account.root_account.lti_guid
     end
 
-    it "should include URI query parameters" do
+    it "should not include URI query parameters" do
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
       variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
       adapter.prepare_tool_launch('http://www.google.com', variable_expander, launch_url: 'http://www.yahoo.com?a=1&b=2', link_code: '123456')
       hash = adapter.generate_post_payload
 
-      expect(hash['a']).to eq '1'
-      expect(hash['b']).to eq '2'
+      expect(hash.key('a')).to be_falsey
+      expect(hash.key('b')).to be_falsey
     end
 
     it "should not allow overwriting other parameters from the URI query string" do

@@ -152,7 +152,8 @@ define [
       if @model.get('locked') and !_.intersection(ENV.current_user_roles, ['teacher', 'ta', 'admin']).length
         base.permissions.delete = false
 
-      base.display_last_reply_at = I18n.l "#date.formats.medium", base.last_reply_at
+      if base.last_reply_at
+        base.display_last_reply_at = I18n.l "#date.formats.medium", base.last_reply_at
       base.ENV = ENV
       base.discussion_topic_menu_tools = ENV.discussion_topic_menu_tools
       _.each base.discussion_topic_menu_tools, (tool) =>

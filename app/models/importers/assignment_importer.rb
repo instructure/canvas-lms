@@ -35,7 +35,13 @@ module Importers
       item.title = hash[:title]
       item.title = I18n.t('untitled assignment') if item.title.blank?
       item.migration_id = hash[:migration_id]
-      item.workflow_state = (hash[:workflow_state] || 'published') if item.new_record? || item.deleted?
+      if item.new_record? || item.deleted?
+        if item.can_unpublish?
+          item.workflow_state = (hash[:workflow_state] || 'published')
+        else
+          item.workflow_state = 'published'
+        end
+      end
       if hash[:instructions_in_html] == false
         self.extend TextHelper
       end
@@ -127,7 +133,7 @@ module Importers
         gs = context.grading_standards.where(migration_id: hash[:grading_standard_migration_id]).first
         item.grading_standard = gs if gs
       elsif hash[:grading_standard_id] && migration
-        gs = GradingStandard.standards_for(context).where(id: hash[:grading_standard_id]).first unless migration.cross_institution?
+        gs = GradingStandard.for(context).where(id: hash[:grading_standard_id]).first unless migration.cross_institution?
         if gs
           item.grading_standard = gs if gs
         else
@@ -169,7 +175,19 @@ module Importers
       end
 
       migration.add_imported_item(item) if migration
+
+      if migration && migration.date_shift_options
+        # Unfortunately, we save the assignment here, and then shift dates and
+        # save the assignment again later in the course migration. Saving here
+        # would normally schedule the auto peer reviews job with the
+        # pre-shifted due date, which is probably in the past. After shifting
+        # dates, it is saved again, but because the job is stranded, and
+        # because the new date is probably later than the old date, the new job
+        # is not scheduled, even though that's the date we want.
+        item.skip_schedule_peer_reviews = true
+      end
       item.save_without_broadcasting!
+      item.skip_schedule_peer_reviews = nil
 
       if migration
         missing_links.each do |field, missing_links|

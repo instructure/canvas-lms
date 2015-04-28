@@ -370,7 +370,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def restrict_answers_for_concluded_course?
     course = self.context
-    course.soft_concluded? && course.root_account.settings[:restrict_quiz_questions]
+    course.concluded? && course.root_account.settings[:restrict_quiz_questions]
   end
 
   def update_existing_submissions
@@ -549,6 +549,13 @@ class Quizzes::Quiz < ActiveRecord::Base
     published? ? question_count : unpublished_question_count
   end
 
+  def question_types
+    return [] unless quiz_data
+    quiz_data.map do |question|
+      question["question_type"]
+    end.uniq
+  end
+
   # Returns data for the SAVED version of the quiz.  That is, not
   # the version found by gathering relationships on the Quiz data models,
   # but the version being held in Quizzes::Quiz.quiz_data.  Caches the result
@@ -688,6 +695,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       end
       e[:published_at] = t
     end
+    possible = 0 if possible < 0
     data = entries
     if opts[:persist] != false
       self.quiz_data = data
@@ -1108,6 +1116,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def can_unpublish?
+    return true if new_record?
     !has_student_submissions? &&
       (assignment.blank? || assignment.can_unpublish?)
   end

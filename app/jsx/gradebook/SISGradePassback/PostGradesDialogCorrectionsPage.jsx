@@ -9,10 +9,6 @@ define([
 ], (_, I18n, React, assignmentUtils, AssignmentCorrectionRow) => {
 
   var PostGradesDialogCorrectionsPage = React.createClass({
-    getInitialState () {
-      return this.props.store.getState();
-    },
-
     componentDidMount () {
       this.props.store.addChangeListener(this.handleStoreChange);
     },
@@ -26,7 +22,7 @@ define([
     },
 
     ignoreErrors () {
-      var assignments = assignmentUtils.withErrors(this.state.assignments)
+      var assignments = assignmentUtils.withErrors(this.props.store.getAssignments())
       _.each(assignments, (a) => this.props.store.updateAssignment(a.id, {please_ignore: true}) )
     },
 
@@ -37,7 +33,9 @@ define([
     },
 
     render () {
-      var assignments = this.state.assignments;
+      var assignments = _.filter(this.props.store.getAssignments(), (a) => {
+        return a.overrides == undefined || (a.overrideForThisSection != undefined)
+      });
       var errorCount = Object.keys(assignmentUtils.withErrors(assignments)).length;
       var store = this.props.store;
       return (
@@ -58,12 +56,14 @@ define([
                 <h5 className="muted span2" aria-hidden="true">{I18n.t("Due Date")}</h5>
               </div>
 
-              {assignmentUtils.withOriginalErrors(assignments).map((a) => {
+              {assignmentUtils.withOriginalErrors(assignments, this.props.store).map((a) => {
                 return (
                   <AssignmentCorrectionRow
                     assignment={ a }
                     assignmentList={ assignments }
-                    updateAssignment={ store.updateAssignment.bind(store, a.id) }
+                    updateAssignment={ store.updateAssignment.bind(store, a.id)}
+                    onDateChanged={store.updateAssignmentDate.bind(store, a.id)}
+                    store={store}
                   />
                 )
               })}

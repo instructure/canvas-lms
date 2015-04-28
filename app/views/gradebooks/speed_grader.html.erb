@@ -144,14 +144,7 @@
           <div>
             <% if can_do(@context, @current_user, :manage_grades) %>
             <div id="grade_container" class="content_box">
-              <label class="bold"><%= t('labels.grade', "Grade") %>
               <%= render :partial => "grading_box_extended", :object => @assignment %>
-              <% if @assignment.grading_type == "points" %>
-                <%= t('#gradebooks.out_of_points_possible', "out of %{points_possible}", :points_possible => @assignment.points_possible) %>
-              <% elsif  @assignment.grading_type != "gpa_scale" %>
-                (<span class="score">&nbsp;</span> / <%= @assignment.points_possible %>)
-              <% end %>
-              </label>
               <span class="turnitin_score_container"></span>
               <a href="#" id="submit_same_score"><br><%= t('links.submit_same_score', "Use this same grade for the resubmission") %></a>
               <a style="display: none;" title="POST" href="<%= context_url(@context, :update_submission_context_gradebook_url) %>" class="update_submission_grade_url">&nbsp;</a>

@@ -447,7 +447,12 @@ module AccountReports
         enrol = add_term_scope(enrol)
 
         Shackles.activate(:slave) do
-          enrol.find_each do |e|
+          # the "start" parameter is purely to
+          # force activerecord to use LIMIT/OFFSET
+          # rather than a cursor for this iteration
+          # because it often is big enough that the slave
+          # kills it mid-run (http://www.postgresql.org/docs/9.0/static/hot-standby.html)
+          enrol.find_each(start: 0) do |e|
             row = []
             if e.nxc_id == nil
               row << e.course_id unless @sis_format

@@ -43,6 +43,7 @@ module Lti
         tool_proxy = create_tool_proxy(tp, context, product_family)
         process_resources(tp, tool_proxy)
         create_proxy_binding(tool_proxy, context)
+        create_tool_settings(tp, tool_proxy)
       end
       tool_proxy
     end
@@ -150,6 +151,10 @@ module Lti
       else
         ResourcePlacement::DEFAULT_PLACEMENTS.each { |p| resource_handler.placements.create(placement: p) }
       end
+    end
+
+    def create_tool_settings(tp, tool_proxy)
+      ToolSetting.create!(tool_proxy:tool_proxy, custom: tp.custom) if tp.custom.present?
     end
 
     def create_json(obj)

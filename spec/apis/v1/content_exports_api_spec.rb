@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
+require 'nokogiri'
+
 describe ContentExportsApiController, type: :request do
   let_once(:t_teacher) do
     user(active_all: true)
@@ -441,6 +443,7 @@ describe ContentExportsApiController, type: :request do
         @sub_folder = t_course.folders.create! name: 'teh_folder', parent_folder: @root_folder, locked: true
         @file2 = attachment_model context: t_course, display_name: 'file2.txt', folder: @sub_folder, uploaded_data: stub_file_data('file2.txt', 'file2', 'text/plain')
         @empty_folder = t_course.folders.create! name: 'empty_folder', parent_folder: @sub_folder
+        @hiddenfile = attachment_model context: t_course, display_name: 'hidden.txt', folder: @root_folder, uploaded_data: stub_file_data('hidden.txt', 'hidden', 'text/plain'), hidden: true
       end
 
       it "should download course files" do
@@ -453,7 +456,7 @@ describe ContentExportsApiController, type: :request do
         expect(export.attachment.display_name).to eql 'course_files_export.zip'
         tf = export.attachment.open need_local_file: true
         Zip::File.open(tf) do |zf|
-          expect(zf.entries.select{ |entry| entry.ftype == :file }.map(&:name)).to match_array %w(file1.txt teh_folder/file2.txt)
+          expect(zf.entries.select{ |entry| entry.ftype == :file }.map(&:name)).to match_array %w(file1.txt hidden.txt teh_folder/file2.txt)
           expect(zf.entries.select{ |entry| entry.ftype == :directory }.map(&:name)).to match_array %w(teh_folder/ teh_folder/empty_folder/)
         end
       end
@@ -482,6 +485,19 @@ describe ContentExportsApiController, type: :request do
         expect(ce.export_object?(@file1)).to be true
       end
 
+      it "should log an error report and skip unreadable files" do
+        @file1.update_attribute(:filename, 'nonexistent_file')
+        json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=zip",
+                           { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'zip' })
+        run_jobs
+        export = t_course.content_exports.where(id: json['id']).first
+        expect(export.settings["errors"].map(&:first)).to include("Skipped file file1.txt due to error")
+        tf = export.attachment.open need_local_file: true
+        Zip::File.open(tf) do |zf|
+          expect(zf.entries.select{ |entry| entry.ftype == :file }.map(&:name)).to match_array %w(hidden.txt teh_folder/file2.txt)
+        end
+      end
+
       context "as a student" do
         it "should exclude non-zip and/or other users' exports from #index" do
           my_zip_export = past_export(t_course, t_student, 'zip')
@@ -499,7 +515,7 @@ describe ContentExportsApiController, type: :request do
                            {}, {}, {expected_status: 401})
         end
 
-        it "should exclude locked and deleted folders and files from archive" do
+        it "should exclude locked, deleted, and hidden folders and files from archive" do
           file3 = attachment_model context: t_course, display_name: 'file3.txt', folder: @root_folder, uploaded_data: stub_file_data('file3.txt', 'file3', 'text/plain'), locked: true
           del_file0 = attachment_model context: t_course, display_name: 'del_file0.txt', folder: @root_folder, uploaded_data: stub_file_data('del_file0.txt', 'del_file0', 'text/plain'), file_state: 'deleted'
           del_folder = t_course.folders.create! name: 'del_folder', parent_folder: @root_folder

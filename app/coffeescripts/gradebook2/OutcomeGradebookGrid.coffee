@@ -173,7 +173,8 @@ define [
       #
       # Returns an array of rows.
       toRows: (rollups, options = {}) ->
-        rows = _.reject(_.map(rollups, Grid.Util._toRowFn(options.section)), (v) -> v == null)
+        filtered_rollups = _.groupBy rollups, (rollup) -> rollup.links.user
+        rows = _.reject(_.map(filtered_rollups, Grid.Util._toRowFn(options.section)), (v) -> v == null)
         rows.sort((a, b) -> Grid.Events._sortStudents(a, b, true))
 
       # Internal: Generate a toRow function that filters by the given section.
@@ -188,18 +189,21 @@ define [
       # section - A section ID to filter by.
       #
       # Returns an object.
-      _toRow: (rollup, section) ->
-        return null unless Grid.Util.sectionFilter(section, rollup)
-        student = Grid.Util.lookupStudent(rollup.links.user)
-        section = Grid.Util.lookupSection(rollup.links.section)
-        return null unless section
+      _toRow: (rollup, section_filter) ->
+        return null unless Grid.Util.sectionFilter(section_filter, rollup)
+        user = rollup[0].links.user
+        section_list = _.map(rollup, (rollup) -> rollup.links.section)
+        return null if _.isEmpty(section_list)
+        student = Grid.Util.lookupStudent(user)
+        sections = Grid.Util.lookupSection(section_list)
+        section_name = $.toSentence(_.pluck(sections, 'name').sort())
+        courseID = ENV.context_asset_string.split('_')[1]
         row =
           student: _.extend(
-            grades_html_url: "/courses/#{section.course_id}/grades/#{student.id}#tab-outcomes" # probably should get this from the enrollment api
-            section: if _.keys(Grid.sections).length > 1 then section else null
+            grades_html_url: "/courses/#{courseID}/grades/#{user}#tab-outcomes" # probably should get this from the enrollment api
+            section_name: if _.keys(Grid.sections).length > 1 then section_name else null
             student)
-          section: rollup.links.section
-        _.each rollup.scores, (score) ->
+        _.each rollup[0].scores, (score) ->
           row["outcome_#{score.links.outcome}"] = score.score
         row
 
@@ -211,7 +215,7 @@ define [
       # Returns a boolean.
       sectionFilter: (section, row)->
         return true unless section
-        _.isEqual(section.toString(), row.links.section.toString())
+        return true if _.find row,(r) -> r.links.section == section
 
       # Public: Parse and store a list of outcomes from the outcome rollups API.
       #
@@ -275,8 +279,8 @@ define [
       # id - The id for the section to look for.
       #
       # Returns a section or null.
-      lookupSection: (id) ->
-        Grid.sections[id]
+      lookupSection: (id_or_ids) ->
+        _.pick(Grid.sections, id_or_ids)
 
     Math:
       mean: (values, round = false) ->

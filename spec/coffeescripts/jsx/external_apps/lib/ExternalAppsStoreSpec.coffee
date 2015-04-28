@@ -32,7 +32,7 @@ define [
           "description": null,
           "enabled": false,
           "installed_locally": true,
-          "name": "Facebook"
+          "name": "LinkedIn"
         }
       ]
 
@@ -221,4 +221,4 @@ define [
   test 'findById', ->
     store.setState({ externalTools: @tools })
     tool = store.findById(3)
-    equal tool.name, 'Facebook'
+    equal tool.name, 'LinkedIn'

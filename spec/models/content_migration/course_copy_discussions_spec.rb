@@ -29,7 +29,7 @@ describe ContentMigration do
       attrs = ["title", "message", "discussion_type", "type", "pinned", "position", "require_initial_post"]
       expect(topic.attributes.slice(*attrs)).to eq new_topic.attributes.slice(*attrs)
 
-      expect(new_topic.last_reply_at.to_i).to eq new_topic.posted_at.to_i
+      expect(new_topic.last_reply_at).to be_nil
       expect(topic.posted_at.to_i).to eq new_topic.posted_at.to_i
     end
 

@@ -32,9 +32,10 @@
   </thead>
   <tbody>
     <% count = @students.offset %>
+    <% submissions_by_student = @submissions.index_by(&:user_id) %>
     <% @students.each do |student| %>
       <% count += 1 %>
-      <% submission = @submissions.detect{|s| s.user_id == student.id} %>
+      <% submission = submissions_by_student[student.id] %>
       <% student_name = (@quiz.survey? && @quiz.anonymous_submissions) ? t(:student_n, "Student %{n}", :n => count) : student.last_name_first %>
       <tr class="student <%= 'extendable' if submission && submission.extendable? %> <%= 'in_progress' if submission && submission.untaken? %> <%= 'manually_unlocked' if submission && submission.manually_unlocked %>" id="student_<%= student.id %>" data-started-at="<%= submission && submission.started_at && submission.started_at.iso8601 %>" data-end-at="<%= submission && submission.end_at && submission.end_at.iso8601 %>" data-user-id="<%= student.id %>">
         <td class="check">

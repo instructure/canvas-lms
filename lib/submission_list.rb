@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'hashery/dictionary'
+
 # Contains a dictionary of arrays with hashes in them. This is so that
 # we can get all the submissions for a course grouped by date and
 # ordered by date, person, then assignment.  Since working with this is

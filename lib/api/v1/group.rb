@@ -29,7 +29,7 @@ module Api::V1::Group
     :only => %w(id group_id user_id workflow_state moderator)
   }
 
-  API_PERMISSIONS_TO_INCLUDE = [:create_discussion_topic, :join] # permission keys need to be symbols
+  API_PERMISSIONS_TO_INCLUDE = [:create_discussion_topic, :join, :create_announcement] # permission keys need to be symbols
 
   def group_json(group, user, session, options = {})
     includes = options[:include] || []

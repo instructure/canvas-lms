@@ -11,12 +11,13 @@ define ['compiled/object/unflatten'], (unflatten) ->
   deparam = (params, coerce) ->
     # shortcut for just deparam'ing the current querystring
     if !params or typeof params == 'boolean'
-      currentQueryString = window.location.search.replace(/^\?/, '')
+      currentQueryString = window.location.search
       return {} unless currentQueryString
       return deparam currentQueryString, arguments...
 
     obj = {}
 
+    params = params.replace(/^\?/, '')
     # Iterate over all name=value pairs.
     for param in params.replace(/\+/g, " ").split("&")
       [key, val] = param.split '='

@@ -20,7 +20,6 @@ require [
     checkForChange = ->
       return if cancelled or $("#download_folder_files_dialog:visible").length is 0
       $("#download_folder_files_dialog .status_loader").css "visibility", "visible"
-      lastProgress = null
       $.ajaxJSON url, "GET", {}, ((data) ->
         if data and data.attachment
           attachment = data.attachment
@@ -34,17 +33,18 @@ require [
             $("#download_folder_files_dialog .status_loader").css "visibility", "hidden"
             location.href = url
             return
+          else if attachment.workflow_state is "errored"
+            $("#download_folder_files_dialog .status").text I18n.t("Failed to create zip file")
+            $("#download_folder_files_dialog .status_loader").css "visibility", "hidden"
+            return
           else
-            progress = parseInt(attachment.file_state, 10)
-            progress = 0  if isNaN(progress)
-            progress += 5
+            if attachment.file_state is "available"
+              progress = 100
+            else
+              progress = parseInt(attachment.file_state, 10)
+              progress = 0  if isNaN(progress)
             $("#download_folder_files_dialog .progress").progressbar "value", progress
-            $("#download_folder_files_dialog .status").text (if progress >= 95 then I18n.t("messages.creating_zip", "Creating zip file...") else I18n.t("messages.gathering_files_with_progress", "Gathering Files (%{progress}%)...", {progress: progress}))
-            if progress <= 5 or progress is lastProgress
-              $.ajaxJSON url + "?compile=1", "GET", {}, (->
-              ), ->
-
-            lastProgress = progress
+            $("#download_folder_files_dialog .status").text (if progress >= 100 then I18n.t("messages.creating_zip", "Creating zip file...") else I18n.t("messages.gathering_files_with_progress", "Gathering Files (%{progress}%)...", {progress: progress}))
         $("#download_folder_files_dialog .status_loader").css "visibility", "hidden"
         setTimeout checkForChange, 3000
       ), (data) ->

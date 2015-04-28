@@ -28,7 +28,7 @@ describe DiscussionTopicsController do
 
   def course_topic(opts={})
     @topic = @course.discussion_topics.build(:title => "some topic", :pinned => opts[:pinned])
-    user = @user || opts[:user]
+    user = opts[:user] || @user
     if user && !opts[:skip_set_user]
       @topic.user = user
     end
@@ -42,6 +42,7 @@ describe DiscussionTopicsController do
     @topic.save
     @topic
   end
+
   def topic_entry
     @entry = @topic.discussion_entries.create(:message => "some message", :user => @user)
   end
@@ -57,6 +58,78 @@ describe DiscussionTopicsController do
       user_session(@student)
       get 'index', :course_id => @course.id
       assert_unauthorized
+    end
+
+    it "should load for :view_group_pages students" do
+      @course.account.role_overrides.create!(
+        role: student_role,
+        permission: 'view_group_pages',
+        enabled: true
+      )
+      @group_category = @course.group_categories.create(:name => 'gc')
+      @group = @course.groups.create!(:group_category => @group_category)
+      user_session(@student)
+
+      get 'index', :group_id => @group.id
+      expect(response).to be_success
+    end
+
+    context "graded group discussion" do
+      before do
+        @course.account.role_overrides.create!(
+          role: student_role,
+          permission: 'view_group_pages',
+          enabled: true
+        )
+        @course.enable_feature!(:differentiated_assignments)
+
+        group_discussion_assignment
+        @child_topic = @topic.child_topics.first
+        @group = @child_topic.context
+        @group.add_user(@student)
+        @assignment.only_visible_to_overrides = true
+        @assignment.save!
+      end
+
+      it "should return graded and visible group discussions properly" do
+        cs = @student.enrollments.first.course_section
+        create_section_override_for_assignment(@assignment, {course_section: cs})
+
+        user_session(@student)
+
+        get 'index', :group_id => @group.id
+        expect(response).to be_success
+        expect(assigns["topics"]).to include(@child_topic)
+      end
+
+      it "should not return graded group discussions if a student has no visibility" do
+        user_session(@student)
+
+        get 'index', :group_id => @group.id
+        expect(response).to be_success
+        expect(assigns["topics"]).not_to include(@child_topic)
+      end
+    end
+
+    it "should return non-graded group discussions properly" do
+      @course.account.role_overrides.create!(
+        role: student_role,
+        permission: 'view_group_pages',
+        enabled: true
+      )
+      @course.enable_feature!(:differentiated_assignments)
+
+      group_category(context: @course)
+      membership = group_with_user(group_category: @group_category, user: @student, context: @course)
+      @topic = @group.discussion_topics.create(:title => "group topic")
+      @topic.context = @group
+      @topic.save!
+
+      user_session(@student)
+
+      get 'index', :group_id => @group.id
+      expect(response).to be_success
+      expect(assigns["topics"]).to include(@topic)
     end
   end
 
@@ -95,7 +168,7 @@ describe DiscussionTopicsController do
       render_views
 
       before :once do
-        course_topic(:with_assignment => true, :user => @teacher)
+        course_topic(user: @teacher, with_assignment: true)
         @section = @course.course_sections.create!(:name => "I <3 Discusions")
         @override = assignment_override_model(:assignment => @topic.assignment,
                                   :due_at => Time.now,
@@ -143,14 +216,14 @@ describe DiscussionTopicsController do
 
     it "should display speedgrader when not for a large course" do
       user_session(@teacher)
-      course_topic(:with_assignment => true)
+      course_topic(user: @teacher, with_assignment: true)
       get 'show', :course_id => @course.id, :id => @topic.id
       expect(assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]).to be_truthy
     end
 
     it "should hide speedgrader when for a large course" do
       user_session(@teacher)
-      course_topic(:with_assignment => true)
+      course_topic(user: @teacher, with_assignment: true)
       Course.any_instance.stubs(:large_roster?).returns(true)
       get 'show', :course_id => @course.id, :id => @topic.id
       expect(assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]).to be_nil
@@ -158,7 +231,7 @@ describe DiscussionTopicsController do
 
     it "should setup speedgrader template for variable substitution" do
       user_session(@teacher)
-      course_topic(:with_assignment => true)
+      course_topic(user: @teacher, with_assignment: true)
       get 'show', :course_id => @course.id, :id => @topic.id
 
       # this is essentially a unit test for app/coffeescripts/models/Entry.coffee,
@@ -175,6 +248,17 @@ describe DiscussionTopicsController do
       expect(@topic.read_state(@student)).to eq 'unread'
       get 'show', :course_id => @course.id, :id => @topic.id
       expect(@topic.reload.read_state(@student)).to eq 'read'
+    end
+
+    it "should not mark as read if locked" do
+      user_session(@student)
+      course_topic(:skip_set_user => true)
+      mod = @course.context_modules.create! name: 'no soup for you', unlock_at: 1.year.from_now
+      mod.add_item(type: 'discussion_topic', id: @topic.id)
+      mod.save!
+      expect(@topic.read_state(@student)).to eq 'unread'
+      get 'show', :course_id => @course.id, :id => @topic.id
+      expect(@topic.reload.read_state(@student)).to eq 'unread'
     end
 
     it "should allow concluded teachers to see discussions" do
@@ -197,21 +281,57 @@ describe DiscussionTopicsController do
       expect(response).to be_success
     end
 
-    it "should assign groups from the topic's category if the topic is a group discussion" do
-      user_session(@teacher)
-      course_topic(:with_assignment => true)
+    context 'group discussions' do
+      before(:once) do
+        @group_category = @course.group_categories.create(:name => 'category 1')
+        @group1 = @course.groups.create!(:group_category => @group_category)
+        @group2 = @course.groups.create!(:group_category => @group_category)
 
-      # set up groups
-      group_category1 = @course.group_categories.create(:name => 'category 1')
-      group_category2 = @course.group_categories.create(:name => 'category 2')
-      @course.groups.create!(:group_category => group_category1)
-      @course.groups.create!(:group_category => group_category1)
-      @course.groups.create!(:group_category => group_category2)
-      @topic.group_category = group_category1
-      @topic.save!
+        group_category2 = @course.group_categories.create(:name => 'category 2')
+        @course.groups.create!(:group_category => group_category2)
+      end
 
-      get 'show', :course_id => @course.id, :id => @topic.id
-      expect(assigns[:groups].size).to eql(2)
+      it "should assign groups from the topic's category" do
+        user_session(@teacher)
+
+        course_topic(user: @teacher, with_assignment: true)
+        @topic.group_category = @group_category
+        @topic.save!
+
+        get 'show', :course_id => @course.id, :id => @topic.id
+        expect(assigns[:groups].size).to eql(2)
+      end
+
+      it "should redirect to the student's group" do
+        user_session(@student)
+        @group1.add_user(@student)
+
+        course_topic(user: @teacher, with_assignment: true)
+        @topic.group_category = @group_category
+        @topic.save!
+
+        get 'show', :course_id => @course.id, :id => @topic.id
+        redirect_path = "/groups/#{@group1.id}/discussion_topics?root_discussion_topic_id=#{@topic.id}"
+        expect(response).to redirect_to redirect_path
+      end
+
+      it "should redirect to the student's group even if students can view all groups" do
+        @course.account.role_overrides.create!(
+          role: student_role,
+          permission: 'view_group_pages',
+          enabled: true
+        )
+        user_session(@student)
+        @group1.add_user(@student)
+
+        course_topic(user: @teacher, with_assignment: true)
+        @topic.group_category = @group_category
+        @topic.save!
+
+        get 'show', :course_id => @course.id, :id => @topic.id
+        redirect_path = "/groups/#{@group1.id}/discussion_topics?root_discussion_topic_id=#{@topic.id}"
+        expect(response).to redirect_to redirect_path
+      end
     end
 
     context 'publishing' do
@@ -321,16 +441,42 @@ describe DiscussionTopicsController do
       Setting.set('enable_page_views', 'db')
     end
     before(:each) do
-      user_session(@student)
       controller.stubs(:form_authenticity_token => 'abc', :form_authenticity_param => 'abc')
-      post 'create', :course_id => @course.id, :title => 'Topic Title', :is_announcement => false,
-                     :discussion_type => 'side_comment', :require_initial_post => true, :format => 'json',
-                     :podcast_has_student_posts => false, :delayed_post_at => '', :lock_at => '',
-                     :message => 'Message', :delay_posting => false, :threaded => false
+    end
+
+    def topic_params(course, opts={})
+      {
+        :course_id => course.id,
+        :title => 'Topic Title',
+        :is_announcement => false,
+        :discussion_type => 'side_comment',
+        :require_initial_post => true,
+        :podcast_has_student_posts => false,
+        :delayed_post_at => '',
+        :lock_at => '',
+        :message => 'Message',
+        :delay_posting => false,
+        :threaded => false
+      }.merge(opts)
+    end
+
+    def assignment_params(course, opts={})
+      course.require_assignment_group
+      {
+        assignment: {
+          points_possible: 1,
+          grading_type: 'points',
+          assignment_group_id: @course.assignment_groups.first.id,
+        }.merge(opts)
+      }
     end
 
     describe 'the new topic' do
       let(:topic) { assigns[:topic] }
+      before(:each) do
+        user_session(@student)
+        post 'create', { :format => :json }.merge(topic_params(@course))
+      end
 
       specify { expect(topic).to be_a DiscussionTopic }
       specify { expect(topic.user).to eq @user }
@@ -347,17 +493,33 @@ describe DiscussionTopicsController do
     end
 
     it 'logs an asset access record for the discussion topic' do
+      user_session(@student)
+      post 'create', { :format => :json }.merge(topic_params(@course))
       accessed_asset = assigns[:accessed_asset]
       expect(accessed_asset[:category]).to eq 'topics'
       expect(accessed_asset[:level]).to eq 'participate'
     end
 
     it 'registers a page view' do
+      user_session(@student)
+      post 'create', { :format => :json }.merge(topic_params(@course))
       page_view = assigns[:page_view]
       expect(page_view).not_to be_nil
       expect(page_view.http_method).to eq 'post'
       expect(page_view.url).to match %r{^http://test\.host/api/v1/courses/\d+/discussion_topics}
       expect(page_view.participated).to be_truthy
+    end
+
+    it 'does not dispatch assignment created notification for unpublished graded topics' do
+      notification = Notification.create(:name => "Assignment Created")
+      obj_params = topic_params(@course).merge(assignment_params(@course))
+      user_session(@teacher)
+      post 'create', { :format => :json }.merge(obj_params)
+      json = JSON.parse response.body
+      topic = DiscussionTopic.find(json['id'])
+      expect(topic).to be_unpublished
+      expect(topic.assignment).to be_unpublished
+      expect(@student.recent_stream_items.map {|item| item.data['notification_id']}).not_to include notification.id
     end
 
   end
@@ -410,7 +572,7 @@ describe DiscussionTopicsController do
       group = @course.groups.create!(:group_category => group_category)
       group.add_user(@student)
 
-      course_topic(:with_assignment => true, :user => @teacher)
+      course_topic(user: @teacher, with_assignment: true)
       @topic.group_category = group_category
       @topic.save!
       @topic.publish!

@@ -1,3 +1,5 @@
+require 'nokogiri'
+
 module Qti
 class AssessmentTestConverter
   include Canvas::Migration::XMLHelper
@@ -49,7 +51,7 @@ class AssessmentTestConverter
       end
 
       # Get the actual assessment file
-      doc = Nokogiri::XML(open(@href))
+      doc = Nokogiri::XML(File.open(@href))
       parse_quiz_data(doc)
       parse_instructure_metadata(doc)
       

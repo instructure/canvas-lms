@@ -30,6 +30,7 @@ define [
       stringifiedValue = JSON.stringify(value)
       joinedTokens = _(tokens).map((token) -> ENV[token]).join('_')
       res = localStorage["#{method}Item"]("_#{joinedTokens}_#{key}", stringifiedValue)
+      return undefined if res == "undefined"
       JSON.parse(res) if res
 
   for method in ['get', 'set', 'remove']

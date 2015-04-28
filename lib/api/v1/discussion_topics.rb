@@ -24,12 +24,14 @@ module Api::V1::DiscussionTopics
   include Api::V1::Assignment
 
   # Public: DiscussionTopic fields to serialize.
-  ALLOWED_TOPIC_FIELDS  = %w{id title assignment_id delayed_post_at lock_at
+  ALLOWED_TOPIC_FIELDS  = %w{
+    id title assignment_id delayed_post_at lock_at
     last_reply_at posted_at root_topic_id podcast_has_student_posts
-    discussion_type position}
+    discussion_type position allow_rating only_graders_can_rate sort_by_rating
+  }.freeze
 
   # Public: DiscussionTopic methods to serialize.
-  ALLOWED_TOPIC_METHODS = [:user_name, :discussion_subentry_count]
+  ALLOWED_TOPIC_METHODS = [:user_name, :discussion_subentry_count].freeze
 
   # Public: Serialize an array of DiscussionTopic objects for returning as JSON.
   #
@@ -41,7 +43,7 @@ module Api::V1::DiscussionTopics
   # Returns an array of hashes.
   def discussion_topics_api_json(topics, context, user, session, opts={})
     topics.inject([]) do |result, topic|
-      if topic.visible_for?(user, check_policies: true)
+      if topic.visible_for?(user)
         result << discussion_topic_api_json(topic, context, user, session, opts)
       end
 
@@ -65,7 +67,7 @@ module Api::V1::DiscussionTopics
     )
 
     opts[:user_can_moderate] = context.grants_right?(user, session, :moderate_forum) if opts[:user_can_moderate].nil?
-    json = api_json(topic, user, session, {only: ALLOWED_TOPIC_FIELDS, methods: ALLOWED_TOPIC_METHODS }, [:attach, :update, :delete])
+    json = api_json(topic, user, session, { only: ALLOWED_TOPIC_FIELDS, methods: ALLOWED_TOPIC_METHODS }, [:attach, :update, :delete])
     json.merge!(serialize_additional_topic_fields(topic, context, user, opts))
 
     if hold = topic.subscription_hold(user, @context_enrollment, session)
@@ -141,7 +143,7 @@ module Api::V1::DiscussionTopics
   #
   # Returns a hash.
   def serialize_entry(entry, user, context, session, includes)
-    allowed_fields  = %w{id created_at updated_at parent_id}
+    allowed_fields  = %w{id created_at updated_at parent_id rating_count rating_sum}
     allowed_methods = []
     allowed_fields << 'editor_id' if entry.deleted? || entry.editor_id
     allowed_fields << 'user_id'   if !entry.deleted?
@@ -171,7 +173,9 @@ module Api::V1::DiscussionTopics
   # Returns a hash.
   def discussion_entry_attachment(entry, user, context)
     return {} unless entry.attachment
-    json = {attachment: attachment_json(entry.attachment, user, host: HostUrl.context_host(context))}
+    url_options = {}
+    url_options.merge!(host: Api::PLACEHOLDER_HOST, protocol: Api::PLACEHOLDER_PROTOCOL) if respond_to?(:use_placeholder_host?) && use_placeholder_host? unless respond_to?(:request)
+    json = {attachment: attachment_json(entry.attachment, user, url_options)}
     json[:attachments] = [json[:attachment]]
 
     json

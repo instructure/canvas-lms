@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
+require 'nokogiri'
+
 describe Announcement do
   it "should create a new instance given valid attributes" do
     @context = Course.create
@@ -64,6 +66,18 @@ describe Announcement do
       expect {
         course.announcements.create!(valid_announcement_attributes.merge(delayed_post_at: 1.week.from_now))
       }.to change(Delayed::Job, :count).by(1)
+    end
+  end
+
+  context "permissions" do
+    it "should not allow announcements on a course" do
+      course_with_student(:active_user => 1)
+      expect(Announcement.context_allows_user_to_create?(@course, @user, {})).to be_falsey
+    end
+
+    it "should allow announcements on a group" do
+      group_with_user(:active_user => 1)
+      expect(Announcement.context_allows_user_to_create?(@group, @user, {})).to be_truthy
     end
   end
   

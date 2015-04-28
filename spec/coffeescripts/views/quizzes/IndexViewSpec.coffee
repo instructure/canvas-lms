@@ -10,7 +10,7 @@ define [
   'helpers/jquery.simulate'
 ], (Backbone, Quiz, QuizCollection, IndexView, QuizItemGroupView, NoQuizzesView, $, fakeENV) ->
 
-  fixtures = $('#fixtures')
+  fixtures = null
 
   indexView = (assignments, open, surveys) ->
     $('<div id="content"></div>').appendTo fixtures
@@ -53,12 +53,16 @@ define [
       permissions:     permissions
       flags:           flags
       urls:            urls
-    view.$el.appendTo $('#fixtures')
+    view.$el.appendTo fixtures
     view.render()
 
   module 'IndexView',
-    setup: -> fakeENV.setup()
-    teardown: -> fakeENV.teardown()
+    setup: ->
+      fixtures = $("#fixtures")
+      fakeENV.setup()
+    teardown: ->
+      fakeENV.teardown()
+      fixtures.empty()
 
   # hasNoQuizzes
   test '#hasNoQuizzes if assignment and open quizzes are empty', ->

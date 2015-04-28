@@ -1,5 +1,0 @@
-<% define_content :link do %>
-  <%= polymorphic_url([asset.context, asset]) %>
-<% end %>
-
-<%= t('the_assignment_is_graded', 'The assignment, %{assignment_name}, has been graded.', :assignment_name => asset.title) %>

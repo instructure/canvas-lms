@@ -114,8 +114,8 @@ define [
         calcIntLabel: I18n.t("Last Item: ")
         calcIntRangeInfo: I18n.t('Between 1% and 99%')
         calcIntExample: I18n.t("Last item is 75% of mastery.  Average of 'the rest' is 25% of mastery")
-        calcIntExampleLine1: I18n.t("1 - Item scores: 2, 4, 2, 5")
-        calcIntExampleLine2: I18n.t("2 - 'The rest' item average: (2 + 4 + 2) / 3 = 3")
+        calcIntExampleLine1: I18n.t("1 - Item scores: 4, 3, 2, 5")
+        calcIntExampleLine2: I18n.t("2 - 'The rest' item average: (4 + 3 + 2) / 3 = 3")
         calcIntExampleLine3: I18n.t("3 - Calculated mastery score: 5(0.75) + 3(0.25) = 4.5")
       },
       'n_mastery' : {
@@ -124,7 +124,7 @@ define [
         calcIntLabel: I18n.t('Items: ')
         calcIntRangeInfo: I18n.t('Between 2 and 5')
         calcIntExample: I18n.t("Must achieve mastery at least 2 times.  Must also complete 2 items for calculation. Scores above mastery will be averaged to calculate final score.")
-        calcIntExampleLine1: I18n.t("1- Item Scores: 1, 3, 2, 4, 5, 3, 6")
+        calcIntExampleLine1: I18n.t("1- Item Scores: 1, 3, 2, 4, 5, 3, 6. Mastery score set at 5.")
         calcIntExampleLine2: I18n.t("2- Final score: 5.5")
         calcIntExampleLine3: ""
       },

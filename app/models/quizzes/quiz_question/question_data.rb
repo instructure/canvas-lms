@@ -68,6 +68,11 @@ class Quizzes::QuizQuestion::QuestionData
     question[:correct_comments] = fields.fetch_with_enforced_length(:correct_comments, max_size: 5.kilobyte)
     question[:incorrect_comments] = fields.fetch_with_enforced_length(:incorrect_comments, max_size: 5.kilobyte)
     question[:neutral_comments] = fields.fetch_with_enforced_length(:neutral_comments, max_size: 5.kilobyte)
+
+    question[:correct_comments_html] = fields.fetch_with_enforced_length(:correct_comments_html, max_size: 5.kilobyte)
+    question[:incorrect_comments_html] = fields.fetch_with_enforced_length(:incorrect_comments_html, max_size: 5.kilobyte)
+    question[:neutral_comments_html] = fields.fetch_with_enforced_length(:neutral_comments_html, max_size: 5.kilobyte)
+
     question[:question_type] = fields.fetch_any(:question_type, "text_only_question")
     question[:question_name] = fields.fetch_any(:question_name, I18n.t(:default_question_name, "Question"))
     question[:question_name] = I18n.t(:default_question_name, "Question") if question[:question_name].strip.blank?

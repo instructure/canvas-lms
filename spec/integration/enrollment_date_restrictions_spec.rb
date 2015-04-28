@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+require 'nokogiri'
+
 describe "enrollment_date_restrictions" do
   it "should not list inactive enrollments in the menu" do
     @student = user_with_pseudonym

@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+
+require 'oauth'
+
 module LtiOutbound
   class ToolLaunch
     attr_reader :url, :tool, :user, :context, :link_code, :return_url, :account,
@@ -155,11 +158,6 @@ module LtiOutbound
         hash['ext_content_return_types'] = 'file'
         hash['ext_content_file_extensions'] = 'zip,imscc'
         hash['ext_content_return_url'] = return_url
-      elsif resource_type == 'course_home_sub_navigation'
-        hash['ext_content_intended_use'] = 'content_package'
-        hash['ext_content_return_types'] = 'file'
-        hash['ext_content_file_extensions'] = 'zip,imscc'
-        hash['ext_content_return_url'] = return_url
       end
     end
 
@@ -179,13 +177,6 @@ module LtiOutbound
 
       path = uri.path
       path = '/' if path.empty?
-      if uri.query && uri.query != ''
-        CGI.parse(uri.query).each do |query_key, query_values|
-          unless params[query_key]
-            params[query_key] = query_values.first
-          end
-        end
-      end
       options = {
           :scheme           => 'body',
           :timestamp        => @timestamp,

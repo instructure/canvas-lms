@@ -37,6 +37,8 @@ module Lti
     end
 
     COURSE_GUARD = -> { @context.is_a? Course }
+    TERM_START_DATE_GUARD = -> { @context.is_a?(Course) && @context.enrollment_term &&
+                                 @context.enrollment_term.start_at }
     USER_GUARD = -> { @current_user }
     PSEUDONYM_GUARD = -> { sis_pseudonym }
     ENROLLMENT_GUARD = -> { @current_user && @context.is_a?(Course) }
@@ -45,7 +47,7 @@ module Lti
     MEDIA_OBJECT_GUARD = -> { @attachment && @attachment.media_object}
     USAGE_RIGHTS_GUARD = -> { @attachment && @attachment.usage_rights}
     MEDIA_OBJECT_ID_GUARD = -> {@attachment && (@attachment.media_object || @attachment.media_entry_id )}
-
+    LTI1_GUARD = -> { @tool.is_a? ContextExternalTool }
 
     def initialize(root_account, context, controller, opts = {})
       @root_account = root_account
@@ -102,6 +104,12 @@ module Lti
     register_expansion 'Canvas.rootAccount.sisSourceId', [],
                        -> { @root_account.sis_source_id }
 
+    register_expansion 'Canvas.externalTool.url', [],
+                       -> { @controller.named_context_url(@context, :api_v1_context_external_tools_update_url,
+                                                          @tool.id, include_host:true) },
+                       LTI1_GUARD
+
+
     ##### Deprecated Substitutions #####
 
     register_expansion 'Canvas.root_account.id', [],
@@ -118,6 +126,14 @@ module Lti
     register_expansion 'Canvas.course.sisSourceId', [],
                        -> { @context.sis_source_id },
                        COURSE_GUARD
+
+    register_expansion 'Canvas.course.startAt', [],
+                       -> { @context.start_at },
+                       COURSE_GUARD
+
+    register_expansion 'Canvas.term.startAt', [],
+                       -> { @context.enrollment_term.start_at },
+                       TERM_START_DATE_GUARD
 
     register_expansion 'CourseSection.sourcedId', [],
                        -> { @context.sis_source_id },
@@ -187,7 +203,6 @@ module Lti
     register_expansion 'Canvas.xuser.allRoles', [],
                        -> { lti_helper.all_roles }
 
-
     # Substitutions for the primary pseudonym for the user for the account
     # This should hold all the SIS information for the user
     # This may not be the pseudonym the user is actually gingged in with
@@ -242,7 +257,6 @@ module Lti
                        -> { @content_tag.id },
                        CONTENT_TAG_GUARD
 
-
     register_expansion 'Canvas.assignment.id', [],
                        -> { @assignment.id },
                        ASSIGNMENT_GUARD
@@ -253,6 +267,18 @@ module Lti
 
     register_expansion 'Canvas.assignment.pointsPossible', [],
                        -> { @assignment.points_possible },
+                       ASSIGNMENT_GUARD
+
+    register_expansion 'Canvas.assignment.unlockAt', [],
+                       -> { @assignment.unlock_at },
+                       ASSIGNMENT_GUARD
+
+    register_expansion 'Canvas.assignment.lockAt', [],
+                       -> { @assignment.lock_at },
+                       ASSIGNMENT_GUARD
+
+    register_expansion 'Canvas.assignment.dueAt', [],
+                       -> { @assignment.due_at },
                        ASSIGNMENT_GUARD
 
     register_expansion 'LtiLink.custom.url', [],

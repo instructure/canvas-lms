@@ -337,7 +337,8 @@ define([
           maxUploads: 1,
           partnerData: $.mediaComment.partnerData(),
           partner_data: $.mediaComment.partnerData(),
-          entryName:temporaryName
+          entryName:temporaryName,
+          soundcodec: 'Speex'
         };
 
         var params = {
@@ -351,20 +352,12 @@ define([
           "wmode": "opaque"
         };
         $("#audio_record").text(I18n.t('messages.flash_required_record_audio', "Flash required for recording audio."));
-        if (INST.kalturaSettings.use_alt_record_widget) {
-          swfobject.embedSWF("/media_record/KRecord_alt.swf", "audio_record", "400", "300", "9.0.0", false, recordVars, params);
-        } else {
-          swfobject.embedSWF("/media_record/KRecord.swf", "audio_record", "400", "300", "9.0.0", false, recordVars, params);
-        }
+        swfobject.embedSWF("/media_record/KRecord.swf", "audio_record", "400", "300", "9.0.0", false, recordVars, params);
 
         var params = $.extend({}, params, {name: 'KRecordVideo'});
         var recordVars = $.extend({}, recordVars, {useCamera: '1'});
         $("#video_record").html("Flash required for recording video.");
-        if (INST.kalturaSettings.use_alt_record_widget) {
-          swfobject.embedSWF("/media_record/KRecord_alt.swf", "video_record", "400", "300", "9.0.0", false, recordVars, params);
-        } else {
-          swfobject.embedSWF("/media_record/KRecord.swf", "video_record", "400", "300", "9.0.0", false, recordVars, params);
-        }
+        swfobject.embedSWF("/media_record/KRecord.swf", "video_record", "400", "300", "9.0.0", false, recordVars, params);
 
         // give the dialog time to initialize or the recorder will
         // render funky in ie

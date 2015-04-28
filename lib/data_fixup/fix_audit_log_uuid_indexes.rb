@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'securerandom'
+
 module DataFixup
   module FixAuditLogUuidIndexes
     MAPPING_TABLE = 'corrupted_index_mapping'
@@ -306,7 +308,7 @@ module DataFixup
             # Loop through each record we need to create a tombstone for.
             need_tombstone.each do |row|
               current_id, timestamp, key = extract_row_keys(index, row)
-              actual_id = CanvasUUID.generate
+              actual_id = SecureRandom.uuid
               create_tombstone(actual_id, timestamp)
               store_corrected_id(current_id, timestamp, actual_id)
               updates << [current_id, key, timestamp, actual_id]

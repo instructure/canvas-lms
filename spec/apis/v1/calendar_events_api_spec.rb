@@ -966,26 +966,26 @@ describe CalendarEventsApiController, type: :request do
 
     context 'differentiated assignments on' do
       before :once do
-        Timecop.travel(Time.local(2015))
-        course_with_teacher(:active_course => true, :active_enrollment => true, :user => @teacher)
-        @course.enable_feature!(:differentiated_assignments)
+        Timecop.travel(Time.utc(2015)) do
+          course_with_teacher(:active_course => true, :active_enrollment => true, :user => @teacher)
+          @course.enable_feature!(:differentiated_assignments)
 
-        @student_in_overriden_section = User.create
-        @student_in_general_section = User.create
+          @student_in_overriden_section = User.create
+          @student_in_general_section = User.create
 
-        @course.enroll_student(@student_in_general_section, :enrollment_state => 'active')
-        @section = @course.course_sections.create!(name: "test section")
-        student_in_section(@section, user: @student_in_overriden_section)
+          @course.enroll_student(@student_in_general_section, :enrollment_state => 'active')
+          @section = @course.course_sections.create!(name: "test section")
+          student_in_section(@section, user: @student_in_overriden_section)
 
 
-        @only_vis_to_o, @not_only_vis_to_o = (1..2).map{@course.assignments.create(:title => 'test assig', :workflow_state => 'published',:due_at => '2012-01-07 12:00:00')}
-        @only_vis_to_o.only_visible_to_overrides = true
-        @only_vis_to_o.save!
-        [@only_vis_to_o, @not_only_vis_to_o].each { |a| a.workflow_state = 'published'; a.save! }
+          @only_vis_to_o, @not_only_vis_to_o = (1..2).map{@course.assignments.create(:title => 'test assig', :workflow_state => 'published',:due_at => '2012-01-07 12:00:00')}
+          @only_vis_to_o.only_visible_to_overrides = true
+          @only_vis_to_o.save!
+          [@only_vis_to_o, @not_only_vis_to_o].each { |a| a.workflow_state = 'published'; a.save! }
 
-        create_section_override_for_assignment(@only_vis_to_o, {course_section: @section})
+          create_section_override_for_assignment(@only_vis_to_o, {course_section: @section})
+        end
       end
-
 
       context 'as a student' do
         it "only shows events for visible assignments" do
@@ -1671,24 +1671,24 @@ describe CalendarEventsApiController, type: :request do
 
   context "calendar feed" do
     before :once do
-      now = Time.now
+      time = Time.utc(Time.now.year, Time.now.month, Time.now.day, 4, 20)
       @student = user(:active_all => true, :active_state => 'active')
       @course.enroll_student(@student, :enrollment_state => 'active')
       @student2 = user(:active_all => true, :active_state => 'active')
       @course.enroll_student(@student2, :enrollment_state => 'active')
 
 
-      @event = @course.calendar_events.create(:title => 'course event', :start_at => now + 1.day)
-      @assignment = @course.assignments.create(:title => 'original assignment', :due_at => now + 2.days)
+      @event = @course.calendar_events.create(:title => 'course event', :start_at => time + 1.day)
+      @assignment = @course.assignments.create(:title => 'original assignment', :due_at => time + 2.days)
       @override = assignment_override_model(
         :assignment => @assignment, :due_at => @assignment.due_at + 3.days, :set => @course.default_section)
 
       @appointment_group = AppointmentGroup.create!(
         :title => "appointment group", :participants_per_appointment => 4,
         :new_appointments => [
-          [now + 3.days, now + 3.days + 1.hour],
-          [now + 3.days + 1.hour, now + 3.days + 2.hours],
-          [now + 3.days + 2.hours, now + 3.days + 3.hours]],
+          [time + 3.days, time + 3.days + 1.hour],
+          [time + 3.days + 1.hour, time + 3.days + 2.hours],
+          [time + 3.days + 2.hours, time + 3.days + 3.hours]],
         :contexts => [@course])
 
       @appointment_event = @appointment_group.appointments[0]

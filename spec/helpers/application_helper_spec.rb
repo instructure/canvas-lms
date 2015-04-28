@@ -19,6 +19,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+require 'nokogiri'
+
 describe ApplicationHelper do
   include ApplicationHelper
   include ERB::Util
@@ -155,6 +157,17 @@ describe ApplicationHelper do
         tag = friendly_datetime(nil, context: context)
         expect(tag).to eq "<time></time>"
       end
+    end
+  end
+
+  describe "accessible date formats" do
+    it "generates a date format for use throughout the app" do
+      expect(accessible_date_format).to match(/YYYY/)
+      expect(accessible_date_format).to match(/hh:mm/)
+    end
+
+    it "wraps a prompt around the format for Screenreader users" do
+      expect(datepicker_screenreader_prompt).to include(accessible_date_format)
     end
   end
 
@@ -524,7 +537,7 @@ describe ApplicationHelper do
   end
 
   describe "editor_buttons" do
-    it "should return empty hash if in group" do
+    it "should return hash of tools if in group" do
       @course = course_model
       @group = @course.groups.create!(:name => "some group")
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret", :url => "http://example.com")
@@ -532,7 +545,7 @@ describe ApplicationHelper do
       tool.save!
       @context = @group
 
-      expect(editor_buttons).to eq([])
+      expect(editor_buttons).to eq([{:name=>"bob", :id=>tool.id, :url=>"http://example.com", :icon_url=>"http://example.com", :width=>800, :height=>400}])
     end
 
     it "should return hash of tools if in course" do

@@ -1275,9 +1275,10 @@ describe Quizzes::QuizSubmission do
       Notification.create(:name => 'Submission Graded')
       Notification.create(:name => 'Submission Grade Changed')
       Notification.create(:name => 'Submission Needs Grading')
-      student_in_course
-      assignment_quiz([])
-      @course.enroll_student(@student)
+      @course.offer
+      student_in_course(active_all: true)
+      teacher_in_course(active_all: true)
+      assignment_quiz([], course: @course, user: @teacher)
       @submission = @quiz.generate_submission(@student)
     end
 
@@ -1307,15 +1308,13 @@ describe Quizzes::QuizSubmission do
     end
 
     it 'sends a notification if the submission needs manual review' do
-      teacher_in_course
-      @course.enroll_teacher(@teacher)
-      quiz_with_graded_submission([{:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question'}}])
+      quiz_with_graded_submission([{:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question'}}], course: @course, user: @user)
       expect(@quiz_submission.reload.messages_sent.keys).to include 'Submission Needs Grading'
     end
+
     it 'does not send a notification if the submission does not need manual review' do
-      teacher_in_course
-      @course.enroll_teacher(@teacher)
-      @submission.workflow_state = 'completed'; @submission.save!
+      @submission.workflow_state = 'completed'
+      @submission.save!
       expect(@submission.reload.messages_sent.keys).not_to include 'Submission Needs Grading'
     end
   end

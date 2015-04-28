@@ -124,7 +124,7 @@ describe SubmissionsController do
 
     describe 'when submitting a text response for the answer' do
       let(:assignment) { @course.assignments.create!(:title => "some assignment", :submission_types => "online_text_entry") }
-      let(:submission_params) { {:submission_type => "online_url", :body => "My Answer"} }
+      let(:submission_params) { {:submission_type => "online_text_entry", :body => "My Answer"} }
 
       before do
         Setting.set('enable_page_views', 'db')
@@ -160,6 +160,23 @@ describe SubmissionsController do
         expect(page_view.participated).to be_truthy
       end
 
+    end
+
+    it 'rejects an empty text response' do
+      course_with_student_logged_in(:active_all => true)
+      assignment = @course.assignments.create!(
+        :title => 'some assignment',
+        :submission_types => 'online_text_entry'
+      )
+      sub_params = { submission_type: 'online_text_entry', body: '' }
+      post 'create', {
+        :course_id => @course.id,
+        :assignment_id => assignment.id,
+        :submission => sub_params
+      }
+      expect(response).to be_redirect
+      expect(flash[:error]).not_to be_nil
+      expect(assigns[:submission]).to be_nil
     end
 
     it 'should build a pageview thats marked as participating' do

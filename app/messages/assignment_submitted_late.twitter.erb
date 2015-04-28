@@ -1,4 +1,4 @@
 <% define_content :link do -%>
-  <%= polymorphic_url([asset.assignment.context, asset.assignment, :submissions], id: asset.user_id) %>
+  <%= course_assignment_submission_url(asset.assignment.context, asset.assignment, asset.user_id) %>
 <% end -%>
 <%= t('user_submitted', 'Canvas Alert - Late Submission: %{user_name}, %{assignment_name}', :user_name => asset.user.name, :assignment_name => asset.assignment.title) %>

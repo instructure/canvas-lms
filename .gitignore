@@ -47,6 +47,7 @@ Gemfile.lock4
 /tmp/
 /vendor/plugins/rails_upgrade
 npm-debug.log
+/vendor/bundle
 
 # generated plugin stuff
 /app/coffeescripts/plugins/

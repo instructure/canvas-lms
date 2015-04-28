@@ -369,6 +369,8 @@ describe 'Submissions API', type: :request do
         'created_at' => se1.created_at.as_json,
         'updated_at' => se1.updated_at.as_json,
         'user_name' => 'User',
+        'rating_sum' => nil,
+        'rating_count' => nil,
       },
       {
         'id' => se2.id,
@@ -380,6 +382,8 @@ describe 'Submissions API', type: :request do
         'created_at' => se2.created_at.as_json,
         'updated_at' => se2.updated_at.as_json,
         'user_name' => 'User',
+        'rating_sum' => nil,
+        'rating_count' => nil,
       }].sort_by { |h| h['user_id'] }
     )
 
@@ -437,6 +441,8 @@ describe 'Submissions API', type: :request do
         'parent_id' => e1.id,
         'created_at' => se1.created_at.as_json,
         'updated_at' => se1.updated_at.as_json,
+        'rating_sum' => nil,
+        'rating_count' => nil,
       },
       {
         'id' => se2.id,
@@ -448,6 +454,8 @@ describe 'Submissions API', type: :request do
         'parent_id' => nil,
         'created_at' => se2.created_at.as_json,
         'updated_at' => se2.updated_at.as_json,
+        'rating_sum' => nil,
+        'rating_count' => nil,
       }].sort_by { |h| h['user_id'] }
     )
   end
@@ -2848,7 +2856,7 @@ describe 'Submissions API', type: :request do
         "/api/v1/courses/#{@course.id}/assignments/#{@a1.id}/submissions/update_grades",
         { :controller => 'submissions_api', :action => 'bulk_update',
           :format => 'json', :course_id => @course.id.to_s,
-          :assignment_id => @a1.id.to_s }, {})
+          :assignment_id => @a1.id.to_s, :grade_data => {foo: "bar"} }, {})
       assert_status(401)
     end
 

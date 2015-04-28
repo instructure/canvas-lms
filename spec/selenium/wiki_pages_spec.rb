@@ -20,6 +20,174 @@ describe "Navigating to wiki pages" do
     end
   end
 
+  describe "Accessibility" do
+
+    def check_header_focus(attribute)
+      f("[data-sort-field='#{attribute}']").click()
+      wait_for_ajaximations
+      check_element_has_focus(f("[data-sort-field='#{attribute}']"))
+    end
+
+    before :each do
+      account_model
+      course_with_teacher_logged_in :account => @account
+      @course.wiki.wiki_pages.create!(:title => "Foo")
+      @course.wiki.wiki_pages.create!(:title => "Bar")
+      @course.wiki.wiki_pages.create!(:title => "Baz")
+    end
+
+    it "returns focus to the header item clicked while sorting" do
+      get "/courses/#{@course.id}/pages"
+
+      check_header_focus('title')
+      check_header_focus('created_at')
+      check_header_focus('updated_at')
+    end
+
+    describe "Add Course Button" do
+      before :each do
+        get "/courses/#{@course.id}/pages"
+
+        driver.execute_script("$('.new_page').focus()")
+        @active_element = driver.execute_script('return document.activeElement')
+      end
+
+      it "navigates to the add course view when enter is pressed" do
+        @active_element.send_keys(:enter)
+        wait_for_ajaximations
+        check_element_has_focus(f('.edit-header #title'))
+      end
+
+      it "navigates to the add course view when spacebar is pressed" do
+        @active_element.send_keys(:space)
+        wait_for_ajaximations
+        check_element_has_focus(f('.edit-header #title'))
+      end
+    end
+
+    describe "Publish Cloud" do
+      it "should set focus back to the publish cloud after unpublish" do
+        get "/courses/#{@course.id}/pages"
+        f('.publish-icon').click
+        wait_for_ajaximations
+        check_element_has_focus(f('.publish-icon'))
+      end
+
+      it "should set focus back to the publish cloud after publish" do
+        get "/courses/#{@course.id}/pages"
+        f('.publish-icon').click # unpublish it.
+        wait_for_ajaximations
+        f('.publish-icon').click # publish it.
+        check_element_has_focus(f('.publish-icon'))
+      end
+    end
+
+    describe "Delete Page" do
+
+      before do
+        get "/courses/#{@course.id}/pages"
+      end
+
+      it "returns focus back to the item cog if the item was not deleted" do
+        f('.al-trigger').click
+        f('.delete-menu-item').click
+        f('.ui-dialog-buttonset .btn').click
+        wait_for_ajaximations
+        check_element_has_focus(f('.al-trigger'))
+      end
+
+      it "returns focus back to the item cog if escape was pressed" do
+        f('.al-trigger').click
+        f('.delete-menu-item').click
+        f('.ui-dialog-buttonset .btn').send_keys(:escape)
+        wait_for_ajaximations
+        check_element_has_focus(f('.al-trigger'))
+      end
+
+      it "returns focus back to the item cog if the dialog close was pressed" do
+        f('.al-trigger').click
+        f('.delete-menu-item').click
+        f('.ui-dialog-titlebar-close').click
+        wait_for_ajaximations
+        check_element_has_focus(f('.al-trigger'))
+      end
+
+      it "returns focus to the previous item cog if it was deleted" do
+        triggers = ff('.al-trigger')
+        triggers.last.click
+        ff('.delete-menu-item').last.click
+        f('.ui-dialog-buttonset .btn-danger').click
+        wait_for_ajaximations
+        check_element_has_focus(triggers[-2])
+      end
+
+      it "returns focus to the + Page button if there are no previous item cogs" do
+        f('.al-trigger').click
+        f('.delete-menu-item').click
+        f('.ui-dialog-buttonset .btn-danger').click
+        wait_for_ajaximations
+        check_element_has_focus(f('.new_page'))
+      end
+    end
+
+    describe "Use as Front Page Link" do
+      before :each do
+        get "/courses/#{@course.id}/pages"
+        f('.al-trigger').click
+      end
+
+      it "should set focus back to the cog after setting" do
+        f('.use-as-front-page-menu-item').click
+        wait_for_ajaximations
+        check_element_has_focus(f('.al-trigger'))
+      end
+
+      it "should set focus to the next focusable item if you press Tab" do
+        f('.use-as-front-page-menu-item').send_keys(:tab)
+        check_element_has_focus(ff('.wiki-page-link')[1])
+      end
+    end
+
+    describe "Edit Page" do
+      before :each do
+        get "/courses/#{@course.id}/pages"
+        f('.al-trigger').click
+        f('.edit-menu-item').click
+      end
+
+      it "should set focus back to the cog menu if you cancel the dialog" do
+        f('.ui-dialog-buttonset .btn').click
+        check_element_has_focus(f('.al-trigger'))
+      end
+
+      it "sets focus back to the cog if you press escape" do
+        f('.ui-dialog-buttonset .btn').send_keys(:escape)
+        check_element_has_focus(f('.al-trigger'))
+      end
+
+      it "sets focus back to the cog if you click the dialog close button" do
+        f('.ui-dialog-titlebar-close').click
+        check_element_has_focus(f('.al-trigger'))
+      end
+
+      it "should return focus to the dialog if you cancel, then reopen the dialog" do
+        f('.ui-dialog-titlebar-close').click
+        check_element_has_focus(f('.al-trigger'))
+        f('.al-trigger').click
+        f('.edit-menu-item').click
+        wait_for_ajaximations
+        check_element_has_focus(ff('.page-edit-dialog .edit-control-text').last)
+      end
+
+      it "should set focus back to the cog menu if you edit the title and save" do
+        f('.ui-dialog-buttonset .btn-primary').click
+        check_element_has_focus(f('.al-trigger'))
+      end
+    end
+
+  end
+
+
   describe "Permissions" do
     before do
       course_with_teacher

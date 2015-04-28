@@ -104,14 +104,10 @@ describe IncomingMailProcessor::Pop3Mailbox do
       @mailbox.connect
     end
 
-    def mock_pop_mail(body)
-      result = mock(:pop => body)
-    end
-
     it "should retrieve and yield messages" do
-      foo = mock_pop_mail("foo body")
-      bar = mock_pop_mail("bar body")
-      baz = mock_pop_mail("baz body")
+      foo = mock(pop: "foo body")
+      bar = mock(pop: "bar body")
+      baz = mock(pop: "baz body")
       @pop_mock.expects(:mails).returns([foo, bar, baz])
 
       yielded_values = []
@@ -122,9 +118,30 @@ describe IncomingMailProcessor::Pop3Mailbox do
       yielded_values.should eql [[foo, "foo body"], [bar, "bar body"], [baz, "baz body"]]
     end
 
+    it "retrieves messages using a stride and offset" do
+      foo, bar, baz = ["foo", "bar", "baz"].map do |msg|
+        m = mock(pop: "#{msg} body")
+        m.expects(:uidl).twice.returns(msg)
+        m
+      end
+      @pop_mock.expects(:mails).twice.returns([foo, bar, baz])
+
+      yielded_values = []
+      @mailbox.each_message(stride: 2, offset: 0) do |message_id, body|
+        yielded_values << [message_id, body]
+      end
+      yielded_values.should eql [[bar, "bar body"], [baz, "baz body"]]
+
+      yielded_values = []
+      @mailbox.each_message(stride: 2, offset: 1) do |message_id, body|
+        yielded_values << [message_id, body]
+      end
+      yielded_values.should eql [[foo, "foo body"]]
+    end
+
     context "with simple foo message" do
       before do
-        @foo = mock_pop_mail("foo body")
+        @foo = mock(pop: "foo body")
         @pop_mock.expects(:mails).returns([@foo])
       end
 

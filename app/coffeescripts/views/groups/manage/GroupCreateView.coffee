@@ -6,6 +6,9 @@ define [
 
   class GroupCreateView extends GroupEditView
 
+    setFocusAfterError: ->
+      @$('#groupEditSaveButton').focus()
+
     defaults: _.extend {},
       GroupEditView::defaults,
       title: I18n.t "add_group", "Add Group"

@@ -18,15 +18,18 @@
 
 class GradingStandard < ActiveRecord::Base
   include Workflow
+
   attr_accessible :title, :standard_data
+
   belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account', 'Course']
   belongs_to :user
   has_many :assignments
+
 
   EXPORTABLE_ATTRIBUTES = [:id, :title, :data, :context_id, :context_type, :created_at, :updated_at, :user_id, :usage_count, :context_code, :workflow_state, :version]
   EXPORTABLE_ASSOCIATIONS = [:context, :user, :assignments]
 
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account', 'Course']
   validates_presence_of :context_id, :context_type, :workflow_state, :data
   validate :valid_grading_scheme_data
 
@@ -67,6 +70,12 @@ class GradingStandard < ActiveRecord::Base
   set_policy do
     given { |user| self.context.grants_right?(user, :manage) }
     can :manage
+  end
+
+  def self.for(context)
+    context_codes = [context.asset_string]
+    context_codes.concat Account.all_accounts_for(context).map(&:asset_string)
+    GradingStandard.active.where(:context_code => context_codes.uniq)
   end
 
   def version
@@ -187,12 +196,6 @@ class GradingStandard < ActiveRecord::Base
       res[grade_name] = lower_bound.to_f
     end
     res
-  end
-
-  def self.standards_for(context)
-    context_codes = [context.asset_string]
-    context_codes.concat Account.all_accounts_for(context).map(&:asset_string)
-    GradingStandard.active.where(:context_code => context_codes.uniq)
   end
 
   def standard_data=(params={})

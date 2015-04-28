@@ -40,6 +40,7 @@ define([
                 placeholder={this.props.description}
                 defaultValue={this.props.value}
                 required={this.props.required}
+                aria-required={this.props.required}
                 data-rel={this.props.name}
                 name={this.props.name}
                 onChange={this.props.handleChange} />

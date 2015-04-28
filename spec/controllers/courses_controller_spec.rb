@@ -52,6 +52,35 @@ describe CoursesController do
       end
     end
 
+    describe 'current_enrollments' do
+      it "should group enrollments by course and type" do
+        # enrollments with multiple sections of the same type should be de-duped
+        course(:active_all => true)
+        user(:active_all => true)
+        sec1 = @course.course_sections.create!(:name => "section1")
+        sec2 = @course.course_sections.create!(:name => "section2")
+        ens = []
+        ens << @course.enroll_student(@user, :section => sec1, :allow_multiple_enrollments => true)
+        ens << @course.enroll_student(@user, :section => sec2, :allow_multiple_enrollments => true)
+        ens << @course.enroll_teacher(@user, :section => sec2, :allow_multiple_enrollments => true)
+        ens.each(&:accept!)
+
+        user_session(@user)
+        get 'index'
+        expect(response).to be_success
+        current_ens = assigns[:current_enrollments]
+        expect(current_ens.count).to eql(2)
+
+        student_e = current_ens.detect(&:student?)
+        teacher_e = current_ens.detect(&:teacher?)
+        expect(student_e.course_section).to be_nil
+        expect(teacher_e.course_section).to eq sec2
+
+        expect(assigns[:past_enrollments]).to eql([])
+        expect(assigns[:future_enrollments]).to eql([])
+      end
+    end
+
     describe 'past_enrollments' do
       it "should include 'completed' courses" do
         enrollment1 = course_with_student active_all: true
@@ -279,6 +308,15 @@ describe CoursesController do
         expect(assigns[:past_enrollments]).to be_empty
         expect(assigns[:current_enrollments]).to be_empty
         expect(assigns[:future_enrollments].map(&:course_id)).to eq [course1.id, course2.id]
+      end
+
+      it "should include courses with accepted enrollments and future start dates" do
+        course1 = Account.default.courses.create! start_at: 1.month.from_now, restrict_enrollments_to_course_dates: true, name: 'A'
+        course1.offer!
+        student_in_course course: course1, active_all: true
+        user_session(@student)
+        get 'index'
+        expect(assigns[:future_enrollments].map(&:course_id)).to eq [course1.id]
       end
 
       it "should be empty if the caller is a student or observer and the root account restricts students viewing courses before the start date" do

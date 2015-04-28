@@ -2133,6 +2133,13 @@ describe CoursesController, type: :request do
       expect(json["permissions"].has_key?("create_discussion_topic")).to be_truthy
     end
 
+    it 'should include permission create_announcement' do
+      json = api_call(:get, "/api/v1/courses/#{@course1.id}.json?include[]=permissions", { :controller => 'courses', :action => 'show', :id => @course1.to_param, :format => 'json', :include => [ "permissions" ] })
+      expect(json.has_key?("permissions")).to be_truthy
+      expect(json["permissions"].has_key?("create_announcement")).to be_truthy
+      expect(json["permissions"]["create_announcement"]).to be_truthy # The setup makes this user a teacher of the course too
+    end
+
     context "when scoped to account" do
       before :once do
         @admin = account_admin_user(:account => @course.account, :active_all => true)
@@ -2279,7 +2286,9 @@ describe CoursesController, type: :request do
         'allow_student_organized_groups' => true,
         'hide_distribution_graphs' => false,
         'hide_final_grades' => false,
-        'lock_all_announcements' => false
+        'lock_all_announcements' => false,
+        'restrict_student_past_view' => false,
+        'restrict_student_future_view' => false
       })
     end
 
@@ -2298,7 +2307,9 @@ describe CoursesController, type: :request do
         :allow_student_organized_groups => false,
         :hide_distribution_graphs => true,
         :hide_final_grades => true,
-        :lock_all_announcements => true
+        :lock_all_announcements => true,
+        :restrict_student_past_view => true,
+        :restrict_student_future_view => true
       })
       expect(json).to eq({
         'allow_student_discussion_topics' => false,
@@ -2309,7 +2320,9 @@ describe CoursesController, type: :request do
         'allow_student_organized_groups' => false,
         'hide_distribution_graphs' => true,
         'hide_final_grades' => true,
-        'lock_all_announcements' => true
+        'lock_all_announcements' => true,
+        'restrict_student_past_view' => true,
+        'restrict_student_future_view' => true
       })
       @course.reload
       expect(@course.allow_student_discussion_topics).to eq false

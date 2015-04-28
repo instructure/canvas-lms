@@ -15,7 +15,8 @@ Rails.configuration.after_initialize do
     expire_after ||= 1.day
 
     Delayed::Periodic.cron 'ActiveRecord::SessionStore::Session.delete_all', '*/5 * * * *' do
-      Shard.with_each_shard(exception: -> { ErrorReport.log_exception(:periodic_job, $!) }) do
+      callback = -> { Canvas::Errors.capture_exception(:periodic_job, $ERROR_INFO) }
+      Shard.with_each_shard(exception: callback) do
         ActiveRecord::SessionStore::Session.delete_all(['updated_at < ?', expire_after.ago])
       end
     end
@@ -60,8 +61,13 @@ Rails.configuration.after_initialize do
   end
 
   if IncomingMailProcessor::IncomingMessageProcessor.run_periodically?
-    Delayed::Periodic.cron 'IncomingMailProcessor::IncomingMessageProcessor.process', '*/1 * * * *' do
-      IncomingMailProcessor::IncomingMessageProcessor.new(IncomingMail::MessageHandler.new, ErrorReport::Reporter.new).process
+    Delayed::Periodic.cron 'IncomingMailProcessor::IncomingMessageProcessor#process', '*/1 * * * *' do
+      imp = IncomingMailProcessor::IncomingMessageProcessor.new(IncomingMail::MessageHandler.new, ErrorReport::Reporter.new)
+      IncomingMailProcessor::IncomingMessageProcessor.workers.times do |worker_id|
+        imp.send_later_enqueue_args(:process,
+                                    {strand: "IncomingMailProcessor::IncomingMessageProcessor#process:#{worker_id}", max_attempts: 1},
+                                    {worker_id: worker_id})
+      end
     end
   end
 
@@ -82,7 +88,7 @@ Rails.configuration.after_initialize do
 
   Delayed::Periodic.cron 'Attachment.do_notifications', '*/10 * * * *', :priority => Delayed::LOW_PRIORITY do
     Shard.with_each_shard do
-      Attachment.send_later_enqueue_args(:do_notifications, strand: "Attachment.do_notifications:#{Shard.current.database_server.id}")
+      Attachment.send_later_enqueue_args(:do_notifications, strand: "Attachment.do_notifications:#{Shard.current.database_server.id}", max_attempts: 1)
     end
   end
 

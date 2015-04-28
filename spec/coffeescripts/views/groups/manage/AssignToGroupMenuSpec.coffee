@@ -21,10 +21,11 @@ define [
         collection: groups
         model: user
       view.render()
-      view.$el.appendTo($(document.body))
+      view.$el.appendTo($("#fixtures"))
 
     teardown: ->
       view.remove()
+      document.getElementById("fixtures").innerHTML = ""
 
   test "updates the user's group", ->
     equal user.get('group'), null

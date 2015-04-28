@@ -68,6 +68,8 @@ class Quizzes::QuizSubmissionsController < ApplicationController
         @submission.record_answer(params_hash.dup)
         flash[:notice] = t('errors.late_quiz', "You submitted this quiz late, and your answers may not have been recorded.") if @submission.overdue?
         Quizzes::SubmissionGrader.new(@submission).grade_submission
+
+        Canvas::LiveEvents.quiz_submitted(@submission)
       end
     end
     if session.delete('lockdown_browser_popup')
@@ -161,7 +163,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
     if authorized_action(@submission, @current_user, :update_scores)
       @submission.update_scores(params.merge(:grader_id => @current_user.id))
       if params[:headless]
-        redirect_to named_context_url(@context, :context_quiz_history_url, @quiz, :user_id => @submission.user_id, :version => (params[:submission_version_number] || @submission.version_number), :headless => 1, :score_updated => 1)
+        redirect_to named_context_url(@context, :context_quiz_history_url, @quiz, :user_id => @submission.user_id, :version => (params[:submission_version_number] || @submission.version_number), :headless => 1, :score_updated => 1, :hide_student_name => params[:hide_student_name])
       else
         redirect_to named_context_url(@context, :context_quiz_history_url, @quiz, :user_id => @submission.user_id, :version => (params[:submission_version_number] || @submission.version_number))
       end
@@ -192,8 +194,8 @@ class Quizzes::QuizSubmissionsController < ApplicationController
     respond_to do |format|
       if attachment.zipped?
         if Attachment.s3_storage?
-          format.html { redirect_to attachment.cacheable_s3_inline_url }
-          format.zip { redirect_to attachment.cacheable_s3_inline_url }
+          format.html { redirect_to attachment.inline_url }
+          format.zip { redirect_to attachment.inline_url }
         else
           cancel_cache_buster
 

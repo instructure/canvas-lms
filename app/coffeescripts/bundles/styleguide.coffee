@@ -149,19 +149,6 @@ require [
   $("#repeat").buttonset()
 
   $(".styleguide-datetime_field-example").datetime_field()
-
-  # Smooth anchor scrolling
-
-  $(".Sg-header__Subnavigation a[href*=#]:not([href=#])").click ->
-    if location.pathname.replace(/^\//, "") is @pathname.replace(/^\//, "") and location.hostname is @hostname
-      target = $(@hash)
-      headerHeight = $(".Sg-header").height()
-      target = (if target.length then target else $("[name=" + @hash.slice(1) + "]"))
-      if target.length
-        $("html,body").animate
-          scrollTop: target.offset().top - headerHeight
-        , 3000
-        false
   
   #Global Navigation Hide/Show Subnav
   selectCategory = (event) ->

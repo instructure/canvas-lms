@@ -57,9 +57,7 @@ module SendToStream
       generate_stream_items(stream_recipients) if stream_recipients
     rescue => e
       if Rails.env.production?
-        ErrorReport.log_exception(:default, e, {
-          :message => "SendToStream failure",
-        })
+        Canvas::Errors.capture(e, {message: "SendToStream failure" })
       else
         raise
       end
@@ -82,19 +80,11 @@ module SendToStream
         true
       end
     rescue => e
-      ErrorReport.log_exception(:default, e, {
-        :message => "SendToStream failure",
-      })
+      Canvas::Errors.capture(e, { message: "SendToStream failure" })
       true
     end
-    
-    def generated_stream_items
-      @generated_stream_items
-    end
-    
-    def stream_item_recipient_ids
-      @stream_item_recipient_ids
-    end
+
+    attr_reader :generated_stream_items, :stream_item_recipient_ids
 
     def stream_item_inactive?
       (self.respond_to?(:workflow_state) && self.workflow_state == 'deleted') || (self.respond_to?(:deleted?) && self.deleted?)

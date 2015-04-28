@@ -1,4 +1,4 @@
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -1223,6 +1223,17 @@ describe Course, "gradebook_to_csv" do
     expect(rows[2][1]).to eq @user2.id.to_s
   end
 
+  it "shows gpa_scale grades instead of points" do
+    student_in_course(active_all: true)
+    a = @course.assignments.create! grading_type: "gpa_scale",
+      points_possible: 10,
+      title: "blah"
+    a.publish
+    a.grade_student(@student, grade: "C")
+    rows = CSV.parse(@course.gradebook_to_csv)
+    expect(rows[2][3]).to eql "C"
+  end
+
   context "differentiated assignments" do
     def setup_DA
       @course_section = @course.course_sections.create
@@ -1285,6 +1296,13 @@ describe Course, "update_account_associations" do
     c = account1.courses.create!
     c.course_account_associations.scoped.delete_all
     expect(c.associated_accounts).to eq [account1, Account.default]
+  end
+
+  it "should be reentrant" do
+    Course.skip_updating_account_associations do
+      Course.skip_updating_account_associations {}
+      expect(Course.skip_updating_account_associations?).to be_truthy
+    end
   end
 end
 
@@ -4090,15 +4108,37 @@ describe Course, 'touch_root_folder_if_necessary' do
     end
   end
 
-end
+  context "inheritable settings" do
+    before :each do
+      account_model
+      course(:account => @account)
+    end
 
-describe Course, "turnitin_id" do
-  before(:once) { course active_all: true }
-  it "writes the turnitin_id on first access" do
-    turnitin_id = @course.turnitin_id
-    expect(turnitin_id).to eql @course.global_id
+    it "should inherit account values by default" do
+      expect(@course.restrict_student_future_view?).to be_falsey
 
-    @course.update_attribute(:id, @course.id + 1)
-    expect(@course.turnitin_id).to eql turnitin_id
+      @account.settings[:restrict_student_future_view] = {:locked => false, :value => true}
+      @account.save!
+
+      expect(@course.restrict_student_future_view?).to be_truthy
+
+      @course.restrict_student_future_view = false
+      @course.save!
+
+      expect(@course.restrict_student_future_view?).to be_falsey
+    end
+
+    it "should be overridden by locked values from the account" do
+      @account.settings[:restrict_student_future_view] = {:locked => true, :value => true}
+      @account.save!
+
+      expect(@course.restrict_student_future_view?).to be_truthy
+
+      # explicitly setting shouldn't change anything
+      @course.restrict_student_future_view = false
+      @course.save!
+
+      expect(@course.restrict_student_future_view?).to be_truthy
+    end
   end
 end

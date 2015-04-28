@@ -1,4 +1,4 @@
-<div class="row-fluid">
+<div class="row-fluid feature {{id}}">
   <div class="span4">
     <span
        class="element_toggler"
@@ -22,7 +22,7 @@
     {{#if releaseOn}}
       {{#t "estimated_release"}}Estimated Release:{{/t}}
       <span class="feature-release-date">
-        {{strftime releaseOn "%B %-d, %Y"}}
+        {{tDateToString (fudge releaseOn) "medium"}}
       </span>
     {{/if}}
   </div>

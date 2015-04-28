@@ -2,12 +2,15 @@ define [
   'jquery'
   'compiled/jquery.rails_flash_notifications'
 ], ($) ->
+  fixtures = null
   module 'FlashNotifications',
     setup: ->
-      @fixture = $('<div id="flash_message_holder"/><div id="flash_screenreader_holder"/>').appendTo('#fixtures')
+      fixtures = document.getElementById("fixtures")
+      flashHtml = "<div id='flash_message_holder'/><div id='flash_screenreader_holder'/>"
+      fixtures.innerHTML = flashHtml
       $.initFlashContainer()
     teardown: ->
-      @fixture.remove()
+      fixtures.innerHTML = ""
 
   test 'text notification', ->
     $.flashMessage('here is a thing')

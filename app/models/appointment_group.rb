@@ -247,7 +247,7 @@ class AppointmentGroup < ActiveRecord::Base
         }.flatten
         next true if (sub_context_ids - user_visible_section_ids).empty?
       end
-      !contexts.all? { |c| c.visibility_limited_to_course_sections?(user) }
+      contexts.any? { |c| c.enrollment_visibility_level_for(user) == :full }
     }
     can :manage and can :manage_calendar and can :read and can :read_appointment_participants and
     can :create and can :update and can :delete

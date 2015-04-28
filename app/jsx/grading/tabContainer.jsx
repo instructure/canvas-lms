@@ -1,15 +1,14 @@
 /** @jsx React.DOM */
 
 define([
-  'old_unsupported_dont_use_react',
+  'react',
   'jsx/grading/gradingStandardCollection',
   'jsx/grading/gradingPeriodCollection',
   'jquery',
   'i18n!external_tools',
-  'underscore',
   'jquery.instructure_misc_plugins'
 ],
-function(React, GradingStandardCollection, GradingPeriodCollection, $, I18n, _) {
+function(React, GradingStandardCollection, GradingPeriodCollection, $, I18n) {
 
   var TabContainer = React.createClass({
 
@@ -46,6 +45,6 @@ function(React, GradingStandardCollection, GradingPeriodCollection, $, I18n, _) 
     }
   });
 
-  React.renderComponent(<TabContainer/>, document.getElementById("react_grading_tabs"));
+  React.render(<TabContainer/>, document.getElementById("react_grading_tabs"));
 
 });

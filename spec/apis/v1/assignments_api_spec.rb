@@ -449,6 +449,22 @@ describe AssignmentsApiController, type: :request do
       before :once do
         course_with_teacher_logged_in(:active_all => true)
         @assignment = @course.assignments.create :name => 'differentiated assignment'
+        section = @course.course_sections.create!(name: "second test section")
+        create_section_override_for_assignment(@assignment, {course_section: section})
+      end
+
+      it "should include overrides if overrides flag is included in the params" do
+        @course.account.enable_feature!(:differentiated_assignments)
+        assignments_json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments",
+          {
+            controller: 'assignments_api',
+            action: 'index',
+            format: 'json',
+            course_id: @course.id.to_s,
+          },
+            :include => ['overrides']
+          )
+        expect(assignments_json[0].keys).to include("overrides")
       end
 
       it "should exclude the only_visible_to_overrides flag if differentiated assignments is off" do
@@ -1982,6 +1998,9 @@ describe AssignmentsApiController, type: :request do
           'discussion_type' => 'side_comment',
           'group_category_id' => nil,
           'can_group' => true,
+          'allow_rating' => nil,
+          'only_graders_can_rate' => nil,
+          'sort_by_rating' => nil,
         })
       end
 
@@ -2319,6 +2338,21 @@ describe AssignmentsApiController, type: :request do
           :include => ['assignment_visibility']
         )
       end
+
+      it "should include overrides if overrides flag is included in the params" do
+        assignments_json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments/#{@assignment1.id}.json",
+          {
+            controller: 'assignments_api',
+            action: 'show',
+            format: 'json',
+            course_id: @course.id.to_s,
+            id: @assignment1.id.to_s
+          },
+          :include => ['overrides']
+        )
+        expect(assignments_json.keys).to include("overrides")
+      end
+
 
       it "returns any assignment" do
         json1 = api_get_assignment_in_course @assignment1, @course

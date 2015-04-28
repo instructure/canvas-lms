@@ -165,6 +165,15 @@ describe User do
     expect(@user.recent_stream_items.size).to eq 0
   end
 
+  it "should ignore stream item instances from courses the user is no longer participating in" do
+    course_with_student(:active_all => true)
+    google_docs_collaboration_model(:user_id => @user.id)
+    expect(@user.recent_stream_items.size).to eq 1
+    @enrollment.end_at = @enrollment.start_at = Time.now - 1.day
+    @enrollment.save!
+    expect(@user.recent_stream_items.size).to eq 0
+  end
+
   describe "#recent_stream_items" do
     it "should skip submission stream items" do
       course_with_teacher(:active_all => true)

@@ -16,6 +16,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'crocodoc'
+
 class CrocodocDocument < ActiveRecord::Base
   attr_accessible :uuid, :process_state, :attachment_id
 
@@ -144,7 +146,7 @@ class CrocodocDocument < ActiveRecord::Base
             if status['status'] == 'ERROR'
               error = status['error'] || 'No explanation given'
               error_uuids << status['uuid']
-              ErrorReport.log_error 'crocodoc', :message => error
+              Canvas::Errors.capture 'crocodoc', message: error
             end
           end
 

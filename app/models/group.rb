@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+
 class Group < ActiveRecord::Base
   include Context
   include Workflow
@@ -105,6 +107,11 @@ class Group < ActiveRecord::Base
     if self.group_category
       self.group_category.discussion_topics.active.each(&:update_subtopics)
     end
+  end
+
+  def includes_user?(user, membership_scope=group_memberships)
+    return false if user.nil? || user.new_record?
+    membership_scope.where(user_id: user).exists?
   end
 
   alias_method :participating_users_association, :participating_users
@@ -448,6 +455,7 @@ class Group < ActiveRecord::Base
     can :manage_wiki and
     can :post_to_forum and
     can :read and
+    can :read_forum and
     can :read_roster and
     can :send_messages and
     can :send_messages_all and
@@ -491,6 +499,7 @@ class Group < ActiveRecord::Base
     can :moderate_forum and
     can :post_to_forum and
     can :read and
+    can :read_forum and
     can :read_roster and
     can :send_messages and
     can :send_messages_all and
@@ -498,7 +507,7 @@ class Group < ActiveRecord::Base
     can :view_unpublished_items
 
     given { |user, session| self.context && self.context.grants_right?(user, session, :view_group_pages) }
-    can :read and can :read_roster
+    can :read and can :read_forum and can :read_roster
 
     # Participate means the user is connected to the group somehow and can be
     given { |user| user && can_participate?(user) }
@@ -662,7 +671,8 @@ class Group < ActiveRecord::Base
 
   def serialize_permissions(permissions_hash, user, session)
     permissions_hash.merge(
-      create_discussion_topic: DiscussionTopic.context_allows_user_to_create?(self, user, session)
+      create_discussion_topic: DiscussionTopic.context_allows_user_to_create?(self, user, session),
+      create_announcement: Announcement.context_allows_user_to_create?(self, user, session)
     )
   end
 

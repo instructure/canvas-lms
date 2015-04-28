@@ -62,37 +62,18 @@ describe UsersController do
   end
 
   describe "GET oauth" do
-    it "sets up oauth for facebook" do
-      Facebook::Connection.config = Proc.new do
-        {}
-      end
-      CanvasSlug.stubs(:generate).returns("some_uuid")
-
-      user_with_pseudonym
-      user_session(@user)
-
-      OauthRequest.expects(:create).with(
-          :service => "facebook",
-          :secret => "some_uuid",
-          :return_url => "http://example.com",
-          :user => @user,
-          :original_host_with_port => "test.host"
-      ).returns(stub(global_id: "123"))
-      Facebook::Connection.expects(:authorize_url).returns("http://example.com/redirect")
-
-      get :oauth, {service: "facebook", return_to: "http://example.com"}
-
-      expect(response).to redirect_to "http://example.com/redirect"
-    end
-
     it "sets up oauth for google_drive" do
       state = nil
       settings_mock = mock()
       settings_mock.stubs(:settings).returns({})
       settings_mock.stubs(:enabled?).returns(true)
+
+      user(:active_all => true)
+      user_session(@user)
+
       Canvas::Plugin.stubs(:find).returns(settings_mock)
       SecureRandom.stubs(:hex).returns('abc123')
-      GoogleDrive::Client.expects(:auth_uri).with() {|c, s| state = s and true}.returns("http://example.com/redirect")
+      GoogleDrive::Client.expects(:auth_uri).with() {|_c, s| state = s and true}.returns("http://example.com/redirect")
 
       get :oauth, {service: "google_drive", return_to: "http://example.com"}
 
@@ -107,25 +88,6 @@ describe UsersController do
   end
 
   describe "GET oauth_success" do
-    it "handles facebook post oauth redirects" do
-
-      user_with_pseudonym
-      user_session(@user)
-
-
-      Canvas::Security.expects(:decrypt_password).with("some", "state", 'facebook_oauth_request').returns("123")
-      mock_oauth_request = stub(original_host_with_port: "test.host", user: @user, return_url: "example.com")
-      OauthRequest.expects(:where).with(id: "123").returns(stub(first: mock_oauth_request))
-      Facebook::Connection.expects(:get_service_user_info).with("access_token").returns({"id" => "456", "name" => "joe", "link" => "some_link"})
-      UserService.any_instance.expects(:save) do |user_service|
-        expect(user_service.id).to eq "456"
-        expect(user_service.name).to eq "joe"
-        expect(user_service.link).to eq "some_link"
-      end
-
-      get :oauth_success, state: "some.state", service: "facebook", access_token: "access_token"
-    end
-
     it "handles google_drive oauth_success for a logged_in_user" do
       settings_mock = mock()
       settings_mock.stubs(:settings).returns({})
@@ -632,6 +594,19 @@ describe UsersController do
           expect(u.pseudonym).not_to be_password_auto_generated
         end
 
+        it "allows admins to force the self-registration workflow for a given user" do
+          Pseudonym.any_instance.expects(:send_confirmation!)
+          post 'create', account_id: account.id,
+            pseudonym: {
+              unique_id: 'jacob@instructure.com', password: 'asdfasdf',
+              password_confirmation: 'asdfasdf', force_self_registration: "1",
+            }, user: { name: 'Jacob Fugal' }
+          expect(response).to be_success
+          u = User.where(name: 'Jacob Fugal').first
+          expect(u).to be_present
+          expect(u.pseudonym).not_to be_password_auto_generated
+        end
+
       end
 
       it "should not allow an admin to set the sis id when creating a user if they don't have privileges to manage sis" do
@@ -757,23 +732,9 @@ describe UsersController do
     it "should redirect to no-pic if avatars are disabled" do
       course_with_student_logged_in(:active_all => true)
       get 'avatar_image', :user_id  => @user.id
-      expect(response).to redirect_to 'http://test.host/images/no_pic.gif'
+      expect(response).to redirect_to User.default_avatar_fallback
     end
-    it "should handle passing an absolute fallback if avatars are disabled" do
-      course_with_student_logged_in(:active_all => true)
-      get 'avatar_image', :user_id  => @user.id, :fallback => "http://foo.com/my/custom/fallback/url.png"
-      expect(response).to redirect_to 'http://foo.com/my/custom/fallback/url.png'
-    end
-    it "should handle passing an absolute fallback if avatars are enabled" do
-      course_with_student_logged_in(:active_all => true)
-      @account = Account.default
-      @account.enable_service(:avatars)
-      @account.settings[:avatars] = 'enabled_pending'
-      @account.save!
-      expect(@account.service_enabled?(:avatars)).to be_truthy
-      get 'avatar_image', :user_id  => @user.id, :fallback => "http://foo.com/my/custom/fallback/url.png"
-      expect(response).to redirect_to 'http://foo.com/my/custom/fallback/url.png'
-    end
+
     it "should redirect to avatar silhouette if no avatar is set and avatars are enabled" do
       course_with_student_logged_in(:active_all => true)
       @account = Account.default
@@ -782,13 +743,9 @@ describe UsersController do
       @account.save!
       expect(@account.service_enabled?(:avatars)).to be_truthy
       get 'avatar_image', :user_id  => @user.id
-      expect(response).to redirect_to '/images/messages/avatar-50.png'
+      expect(response).to redirect_to User.default_avatar_fallback
     end
-    it "should handle passing a host-relative fallback" do
-      course_with_student_logged_in(:active_all => true)
-      get 'avatar_image', :user_id  => @user.id, :fallback => "/my/custom/fallback/url.png"
-      expect(response).to redirect_to 'http://test.host/my/custom/fallback/url.png'
-    end
+
     it "should pass along the default fallback to gravatar" do
       course_with_student_logged_in(:active_all => true)
       @account = Account.default
@@ -798,24 +755,7 @@ describe UsersController do
       get 'avatar_image', :user_id  => @user.id
       expect(response).to redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI.escape("http://test.host/images/messages/avatar-50.png")}"
     end
-    it "should handle passing an absolute fallback when avatars are enabled" do
-      course_with_student_logged_in(:active_all => true)
-      @account = Account.default
-      @account.enable_service(:avatars)
-      @account.save!
-      expect(@account.service_enabled?(:avatars)).to be_truthy
-      get 'avatar_image', :user_id  => @user.id, :fallback => "https://test.domain/my/custom/fallback/url.png"
-      expect(response).to redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI.escape("https://test.domain/my/custom/fallback/url.png")}"
-    end
-    it "should handle passing a host-relative fallback when avatars are enabled" do
-      course_with_student_logged_in(:active_all => true)
-      @account = Account.default
-      @account.enable_service(:avatars)
-      @account.save!
-      expect(@account.service_enabled?(:avatars)).to be_truthy
-      get 'avatar_image', :user_id  => @user.id, :fallback => "/my/custom/fallback/url.png"
-      expect(response).to redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI.escape("http://test.host/my/custom/fallback/url.png")}"
-    end
+
     it "should take an invalid id and return silhouette" do
       @account = Account.default
       @account.enable_service(:avatars)
@@ -824,6 +764,7 @@ describe UsersController do
       get 'avatar_image', :user_id  => 'a'
       expect(response).to redirect_to 'http://test.host/images/messages/avatar-50.png'
     end
+
     it "should take an invalid id with a hyphen and return silhouette" do
       @account = Account.default
       @account.enable_service(:avatars)

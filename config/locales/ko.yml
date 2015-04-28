@@ -47,7 +47,6 @@ ko:
     account_settings: 
       delicious: Delicious
       diigo: Diigo
-      facebook: Facebook
       google_docs: "Google Docs"
       linked_in: LinkedIn
       skype: Skype
@@ -60,8 +59,6 @@ ko:
       invalid_discovery_url: "검색 URL이 유효하지 않음"
     feedback_coach: "커뮤니티에 묻기"
     feedback_coach_sub: "Canvas 전문가에게 도움 요청"
-    feedback_feature_request: "기능 요청"
-    feedback_feature_request_canvas_net: "Canvas Network에 기능 요청"
     feedback_feature_request_sub: "Canvas를 개선할 아이디어를 가지고 계십니까?"
     manually_created_courses: "수동으로 개설한 과목"
     root_account_cant_have_sis_id: "루트 계정에 SIS ID를 설정할 수 없음"
@@ -1041,16 +1038,12 @@ ko:
         default: 
           zero_activity: 
             text: "이 보고서는 주어진 학기의 과목에 등록된 사용자를 모두 표시합니다. 결과 CSV 파일은 해당 날짜 이후에 과목을 방문하지 않은 사용자 등록 당 하나의 행을 가지고 있습니다."
+  actions_efcde10d: 작업
   activerecord: 
     errors: 
       messages: 
         record_invalid: "유효성 검사 실패: %{errors}"
         taken: "이미 사용 중임"
-      template: 
-        body: "다음 필드에 문제가 있습니다:"
-        header: 
-          one: "%{count}개의 오류가 발생하여 %{model}을 저장할 수 없음"
-          other: "%{count}개의 오류가 발생하여 %{model}을 저장할 수 없음"
   activity_13915493: 활동
   add_app_baf540f: "앱 추가"
   add_course_assignments_628ed6d0: "과목 과제 추가"
@@ -1277,6 +1270,7 @@ ko:
       a_website_url: "웹사이트 URL"
     titles: 
       grading_scheme_info: "평가 구성표 보기/편집"
+  assignment_976578a8: 과제
   assignment_details_dialog: 
     average_score: "평균 점수:"
     count_of_submissions: "제출물 %{cnt}개"
@@ -1403,6 +1397,8 @@ ko:
       assignment_name: "이름:"
       assignment_points: "점수:"
       assignment_type: "유형:"
+      buttons: 
+        save_and_publish: "저장 & 게시"
       cancel: 취소
       discussion_type: 토론
       external_tool_type: "외부 도구"
@@ -1473,7 +1469,8 @@ ko:
     edit_view: 
       assignment_name: "과제 이름"
       buttons: 
-        update: "과제 업데이트"
+        save: 저장
+        save_and_publish: "저장 & 게시"
       description: 설명
       freeze_properties: "복사할 때 과제 속성 잠금"
       notify_content_change: "이 내용이 바뀐 것을 사용자에게 알림"
@@ -1853,6 +1850,7 @@ ko:
     upload_error_timeout: "요청 시간 초과: %{url}"
     upload_error_too_many_redirects: "너무 많은 리디렉션"
     upload_error_unexpected: "%{url}에서 다운로드하는 중에 알 수 없는 오류 발생"
+  attachment_deffe5a9: 첨부
   attendance: 
     default_attendance_title: "%{date}의 출석"
     errors: 
@@ -1878,15 +1876,11 @@ ko:
   bb_name: "Blackboard 변환기"
   big_blue_button_conference: 
     recording_setting: 녹음/녹화
-    recording_setting_description: "이 회의를 녹음/녹화"
   blackboard: 
     no_manifest: "이 Blackboard .zip은 루트 디렉토리에 imsmanifest.xml 파일이 없습니다."
   bookmark_service: 
     default_title: "제목 없음"
   broccoli_cloud: 
-    label: 
-      published: 게시됨
-      unpublished: "게시 안 됨"
     published_title: 게시됨
     unpublished_title: "게시 안 됨"
   bulk_course_migration: 
@@ -2286,24 +2280,9 @@ ko:
     crumbs: 
       new: "새 행사"
     full_calendar_event: 
-      buttons: 
-        create: "행사 만들기"
-        update: "행사 업데이트"
-      labels: 
-        date: 날짜
-        event_description: "행사 설명"
-        from: 시작
-        location: 위치
-        title: 제목
       no_content: "내용 없음"
-      timespan: "%{start_time} *부터* %{end_time}"
     new: 
-      links: 
-        back_to_calendar: "달력으로 돌아가기"
-        delete: "행사 삭제"
-        edit: "행사 편집"
       page_title: "새 행사"
-    no_content: "내용 없음"
     notices: 
       created: "행사를 성공적으로 만들었습니다."
       deleted: "행사를 삭제함"
@@ -2322,43 +2301,6 @@ ko:
     ics_title: "%{course_or_group_name} 달력 (Canvas)"
   calendars: 
     assignment_details: "과제 세부 정보"
-    calendar: 
-      alts: 
-        next: 다음
-        previous: 이전
-      calendars_count: 
-        one: "달력 %{count}개, 공개 %{open_count}개"
-        other: "달력 %{count}개, 공개 %{open_count}개"
-      feed_title: "달력 피드"
-      instructions: 
-        ics_link: "아래 링크를 복사하여 iCal 피드를 사용할 수 있는 달력 앱(Google Calendar, iCal, Outlook 등)에 붙여넣습니다."
-      labels: 
-        calendar: 달력
-        date: 날짜
-        details: "세부 정보"
-        due: 기한
-        from: 시작
-        group: 그룹
-        title: 제목
-        undated_events: "업데이트된 행사"
-      links: 
-        add_event: "행사 추가"
-        delete: 삭제
-        edit: 편집
-        feed: "피드를 보려면 여기를 클릭"
-        full_details: "전체 세부 정보"
-        how_do_i: 도움말
-        jump_to_calendar: "달력으로 가기"
-        more_options: "추가 옵션"
-        show_undated_events: "%{count}개의 날짜 없는 행사 표시"
-      messages: 
-        max_visible: "한 번에 달력 %{count}개까지 표시할 수 있음"
-      options: 
-        new_group: "[ 새 그룹 ]"
-      tabs: 
-        assignment: 과제
-        event: 행사
-      timespan: "%{start_time} *부터* %{end_time}"
     default_title: 행사
     event: 
       due: 기한
@@ -2382,36 +2324,6 @@ ko:
     prompts: 
       delete_assignment: "이 과제를 삭제하시겠습니까?"
       delete_event: "이 행사를 삭제하시겠습니까?"
-    show: 
-      crumbs: 
-        my_calendar: "내 달력"
-      feed_title: "과목 달력 Atom 피드"
-      keycode_descriptions: 
-        delete: "현재 행사 삭제"
-        edit: "현재 행사 편집"
-        next_day: "다음 날"
-        next_event: "다음 날/행사"
-        next_week: "다음 주"
-        open: "현재 행사 열기"
-        previous_day: "이전 날"
-        previous_event: "이전 날/행사"
-        previous_week: "이전 주"
-        refresh: "달력 새로 고침"
-      keycode_descriptoins: 
-        new: "오늘의 새 행사"
-      keycodes: 
-        delete: d
-        edit: e
-        new: "n"
-        next_day: ctrl+오른쪽
-        next_event: j
-        next_week: ctrl+아래쪽
-        open: o
-        previous_day: ctrl+왼쪽
-        previous_event: k
-        previous_week: ctrl+위쪽
-        refresh: r
-      page_title: Calendar
     show2: 
       calendar_feed: "달력 피드"
       calendar_feed_instructions: "아래 링크를 복사하여 iCal 피드를 사용할 수 있는 달력 앱(Google Calendar, iCal, Outlook 등)에 붙여넣습니다."
@@ -2430,7 +2342,6 @@ ko:
       add_new_event: "새 행사 추가"
       edit_assignment: "과제 편집"
       edit_event: "행사 편집"
-    use_new_calendar: "새 달력 사용해 보기"
     wizard_box: 
       descriptions: 
         assignment: "좋습니다. 이제 대화 상자에서 \"과제\" 탭을 클릭하고 달력 행사 대신 과제를 만드십시오."
@@ -2486,6 +2397,7 @@ ko:
     titles: 
       update_assignment_points: "루브릭과 일치하도록 가능 점수 변경?"
   choose_a_course_home_page_8059c7b: "과목 홈 페이지 선택"
+  choose_a_csv_file_to_upload_9644480c: "업로드할 CSV 파일 선택:"
   close_d634289d: 닫기
   collaboration: 
     default_title: "이름 없는 협업"
@@ -2589,7 +2501,6 @@ ko:
   communication_5255723c: 통신
   communication_channel: 
     body: "Canvas 확인 코드 %{verification_code}"
-    default_facebook_account: "페이스북 계정"
     default_twitter_handle: "트워터 이름"
   communication_channels: 
     confirm: 
@@ -2707,15 +2618,6 @@ ko:
       buttons: 
         close: "지금 마침"
         join: "지금 참여"
-        restart: "지금 다시 시작"
-        start: "지금 시작"
-      minute: 
-        one: "%{count}분"
-        other: "%{count}분"
-      status: 
-        finished: "%{date_and_time}에 마침 (%{duration})"
-        new: "아직 시작하지 않음"
-        started: "%{time}에 시작함"
     type_disabled_error: "이 Canvas 사이트에서 더 이상 이 유형의 회의를 사용하지 않음"
   configuration_type_25a084a4: "구성 유형"
   confirm_dialog: 
@@ -3031,7 +2933,6 @@ ko:
         recent_messages: "최근 메시지"
       help: 
         list_services: "등록된 서비스 목록을 아직 사용하지 않고 있습니다. 이 목록을 사용하면 동료 과목 및 그룹 구성원이 보다 손쉽게 과목 밖에서 여러분과 연결할 수 있습니다."
-        services: "아직 사용자 프로필을 외부 서비스에 연결하지 않았습니다. Canvas 계정을 페이스북이나 트위터 같은 서비스에 연결할 수 있습니다. 이를 사용하면 동료 과목 및 그룹 구성원이 보다 손쉽게 과목 밖에서 여러분과 연결할 수 있습니다."
       labels: 
         public_list_services: "동료 과목/그룹 구성원이 내 프로필에 연결된 서비스를 보도록 허용"
         user_privileges: 권한
@@ -3065,7 +2966,6 @@ ko:
         registered_services: "등록된 서비스"
         service_types: "서비스 유형"
       help: 
-        no_services: "아직 사용자 프로필을 외부 서비스에 연결하지 않았습니다. Canvas 계정을 페이스북이나 트위터 같은 서비스에 연결할 수 있습니다."
         services_private: "등록된 서비스 목록을 아직 사용하지 않고 있습니다. 이 목록을 사용하면 동료 과목 및 그룹 구성원이 여러분의 Canvas 계정으로 연결한 서비스를 볼 수 있습니다."
         user_services: "다른 구성원이 Canvas 계정으로 연결한 외부 서비스를 볼 수 있도록 선택할 수 있습니다. 이는 그룹 프로젝트를 조율하고 교실 밖에서 연결하기 쉽게 합니다."
       labels: 
@@ -3339,12 +3239,9 @@ ko:
     all_courses: "모든 과목"
     all_in_context: "%{context}에 속한 모두"
     archive: 저장소
-    archive_conversation: "대화 저장"
     autocomplete_result: 
       group_people: "사용자: %{people}"
       no_results: "결과 없음"
-    autocomplete_token: 
-      remove_recipient: "수신인 제거"
     back: 뒤로
     cannot_add_to_private: "사적인 대화에 참여자를 추가할 수 없습니다."
     cannot_be_empty: "메시지 내용이 있어야 함"
@@ -3388,12 +3285,10 @@ ko:
     hide: 숨기기
     index_new: 
       archive: 저장소
-      archive_conversation: "대화 저장"
       archived: "보관된 메시지"
       clear_search: "검색 결과 삭제"
       compose_new_message: "새 메시지 작성"
       delete: 삭제
-      delete_conversation: "대화 삭제"
       filter_messages_by_course: "과목으로 메시지 필터링"
       filter_messages_by_type: "유형으로 메시지 필터링"
       forward: 전달
@@ -3488,7 +3383,6 @@ ko:
     titles: 
       rss_feed: "대화 피드"
     unarchive: "보관 해제"
-    unarchive_conversation: "대화 저장 해제"
     unstar: "별표 해제"
     unstar_conversation: "대화 별표 취소"
   correct_answer: 정답입니다.
@@ -3673,13 +3567,8 @@ ko:
       headings: 
         grade: "%{assignment} 평가"
         to_do: "할 일"
-      images: 
-        alt: 
-          ignore: 무시
       links: 
         show_more: "%{count}개 더..."
-        title: 
-          ignore: "이 과제 무시"
       need_grading_count: 
         one: "%{count}개 평가 필요함"
         other: "%{count}개 평가 필요함"
@@ -3696,7 +3585,6 @@ ko:
         conclude_course: "과목 종결"
         delete_course: "과목 삭제"
       details: 
-        conclude_alt_text: "학생이 과목에 액세스하는 것을 제한하면서 평점을 변경할 수 있도록 하려면 과목 날짜 설정을 이용하시기 바랍니다. 과목 날짜 설정에 대해서는 *여기*에 있는 가이드에서 알아볼 수 있습니다."
         confirm_delete: "이 과목을 삭제하시겠습니까? 삭제하고 나면 학생과 교사는 더 이상 과목에 액세스할 수 없습니다. 이를 과목 드롭다운에서만 제거하려면 *과목을 종결해야 합니다*."
         confirm_delete_addendum: "과목을 종결할 권한이 없는 경우에는 *과목 종료 날짜를 바꾸거나* 관리자에게 과목 종결을 요청할 수 있습니다."
       headings: 
@@ -3865,7 +3753,6 @@ ko:
         student_invitation_unaccepted_available: "%{name}이(가) 아직 과목 참여 초대를 수락하지 않았습니다. 초대 발송 시각: %{time}"
         student_invitation_unaccepted_unavailable: "%{name}을(를) 과목에 추가했습니다: %{time}"
       link_to_students_view: 
-        link_student_action: "*%{name}* 과목 감독자를 학생에게 연결하려면 아래 목록에서 학생 이름을 선택하십시오."
         link_student_desc: "감독자를 학생에게 연결하면 학생의 평점과 과목 상호 작용을 액세스할 수 있습니다."
       resend_invitations: 
         pending_invitations: "초대 %{pendingInvitationsCount}건이 수락되지 않음"
@@ -4048,7 +3935,6 @@ ko:
         join_course: "이 과목에 참여"
         new_announcement: "새 공지"
         view_course_stream: "과목 스트림 보기"
-      period_name: "마지막 2주"
       re_sending: "다시 보내는 중..."
       send_done: "마쳤습니다. 메시지는 수 분이 걸릴 수 있습니다."
       send_failed: "요청이 실패했습니다. 다시 시도하십시오."
@@ -4244,6 +4130,11 @@ ko:
     assignments_expand: 
       one: "과제 공지 %{count}개 확장"
       other: "과제 공지 %{count}개 확장"
+    confirm: 
+      close: |-
+          이 회의를 마치시겠습니까?
+          
+          다시 열 수 없습니다.
     conversations_collapse: 
       one: "대화 메시지 %{count}개 축소"
       other: "대화 메시지 %{count}개 축소"
@@ -4371,6 +4262,7 @@ ko:
   default_question_text: "질문 텍스트"
   delete_a6efa79d: 삭제
   delete_grading_scheme_6b308832: "평가 구성표 삭제"
+  delete_my_account_41060aad: "내 계정 삭제"
   delete_quiz_142b8099: "퀴즈 삭제"
   delete_survey_56fddbbd: "설문 삭제"
   demos: 
@@ -4454,6 +4346,7 @@ ko:
     save_settings: "설정 저장"
     saving: "저장 중..."
   disable_a5c05db3: "사용 안 함"
+  discussion_6719c51d: 토론
   discussion_entries: 
     created_entry_notice: "항목을 성공적으로 만들었습니다."
     deleted_entry_notice: "해당 항목이 삭제됨"
@@ -4469,6 +4362,7 @@ ko:
     atom_no_author: "작성자 없음"
     default_title: "제목 없음"
     empty_message: "메시지 없음"
+  discussion_topic_dc85ad4c: "토론 주제"
   discussion_topics: 
     assignment_details: 
       available_from: "다음부터 사용 가능"
@@ -4521,9 +4415,9 @@ ko:
       buttons: 
         not_published: "게시 안 됨"
         published: 게시됨
+        save_and_publish: "저장 & 게시"
       delay_posting: "지연 게시"
       enable_podcast_feed: "Podcast 피드 사용"
-      include_replies_in_podcast_feed: "Podcast 피드에 답변 포함"
       options: 옵션
       page_header_title: "새 토론"
       points_possible: "가능한 점수"
@@ -4563,7 +4457,6 @@ ko:
       loading: "로드 중..."
       lock_for_comments: "의견 잠금"
       make_sure_all_search_terms_are_spelled_correctly: "모든 검색 용어의 철자가 올바른지 확인하십시오. "
-      new_discussion: "토론 *시작하기*"
       rss_feed: "RSS 피드"
       start_one_now: "지금 하나 시작"
       suggestions: "제안:"
@@ -4610,7 +4503,7 @@ ko:
       reply_to_topic: "주제에 대해 답변"
       retrieved_from_feed: "%{feed}에서 추출됨"
       show_rubric: "루브릭 표시"
-      speed_grader: "Speed Grader"
+      speed_grader: SpeedGrader™
       topic: 주제
       topic_podcast_feed_link: "주제 Podcast 피드"
       topic_subscribe: 구독
@@ -4777,6 +4670,7 @@ ko:
   either_the_url_or_domain_should_be_set_c29cf8c1: "url이나 도메인을 설정해야 합니다."
   email: 
     default_from_name: "Instructure Canvas"
+  email_e366fa29: 이메일
   enable_6f5d1328: 사용
   end_date_e0093ed7: "끝 날짜"
   enrollment: 
@@ -5146,6 +5040,7 @@ ko:
         truncated: 잘림
       phrase_to_look_for: "검색할 구"
       posts_added: "게시물 추가됨"
+  external_tool_c5a6410a: "외부 도구"
   external_tools: 
     account_navigation_configured: "계정 탐색이 구성됨"
     app_full_view: 
@@ -5242,53 +5137,6 @@ ko:
     shared_secret: "공유 시크릿"
     submit: 제출
     user_navigation_configured: "사용자 탐색이 구성됨"
-  facebook: 
-    authorization_required: "승인된 사용자만 해당 페이지를 액세스할 수 있음"
-    authorization_success: "인증이 성공했습니다! 이제 Canvas와 Facebook은 친구입니다."
-    deleted: 삭제됨
-    index: 
-      all_set: "설정을 마쳤습니다!"
-      bookmark_notice: "이 응용 프로그램을 북마크하면 페이스북 홈 페이지에서 새 Canvas 알림의 숫자를 볼 수 있습니다. "
-      canvas_messages: "Canvas 메시지"
-      configure_notification_preferences_notice: "*알림 기본 설정을 구성*하고 나면 Canvas 계정에서 일어나는 일을 알려주기 위해 알림이 여기에 표시되는 것을 볼 수 있습니다."
-      installation_about: "Canvas Facebook 앱을 설치하려면 Canvas에 있는 프로필 페이지로 가서 Facebook 버튼을 클릭하여 계정을 Facebook으로 연결하십시오."
-      learn_more: "instructure.com 에서 자세히 알아보기"
-      more_information: "자세한 정보는 %{domain_list}에서 확인"
-      no_messages_notice: "과목에서 일이 발생하면 Canvas 계정에서 일어나는 일을 알려주기 위해 알림이 여기에 표시되는 것을 볼 수 있습니다."
-      notification_about: "Canvas Facebook 앱은 과목 안에서 벌어지는 상호 작용에 대해 더 쉬운 액세스를 부여합니다. 과제가 평가되거나 기한이 바뀌는 경우 등에 알림을 보내도록 설정할 수 있습니다. 여러분의 비공개 자료는 Canvas에 비공개로 유지됩니다."
-      notification_settings: "알림 설정"
-      notifications_notice: "아래에서 Canvas에서 온 최근 알림의 목록을 볼 수 있습니다. 이 응용 프로그램을 북마크하면 Facebook 홈페이지에서 새 Canvas 알림을 볼 수 있습니다."
-      welcome: "%{name}님, 돌아오신 것을 환영합니다!"
-      welcome_message: "Instructure가 제공하는 완전히 새로운 온라인 학습 소프트웨어에 오신 것을 환영합니다. 우리는 학습을 개선하기 위해 웹을 사용하는 것을 쉽게 만들기 위해 여기에 있습니다. 우리의 인터페이스는 간단하고 깔끔하고 개방적이며, 보다 개방적인 협업 학습 경험을 제공하기 위해 여러분과 여러분의 학생이 이미 사용하고 있는 - Facebook과 같은 - 도구와 함께 동작합니다. 우리는 그 모두를 합하여 단순히 과제를 추적하는 일 이상을 하는 하나의 강력하고 개방된 패키지로 만들었습니다. 그것은 상호 작용을 촉진하고 학습을 강화합니다."
-      welcome_title: "Instructure Canvas에 오신 것을 환영합니다."
-    index_disabled: 
-      disabled_notice: "이 Canvas 사이트는 Facebook과 의사 소통하도록 구성되지 않았습니다."
-      get_help: "support.instructure.com에서 도움 받기"
-      instructure_canvas: "Instructure Canvas"
-    invalid_signature: "유효하지 않은 Facebook 서명"
-    message: 
-      hide: 숨기기
-    notification_policies: 
-      alerts: 알림
-      cancel: 취소
-      change_settings: "설정 바꾸기"
-      daily: 일별
-      labels: 
-        alerts_for_category: "%{category_name} 알림"
-      loading: "로드 중..."
-      never: "허용 안 함"
-      notification_type: "알림 유형"
-      right_away: 지금
-      send_to_facebook: "Facebook으로 보내기?"
-      update_preferences: "기본 설정 업데이트"
-      updating_preferences: "기본 설정 업데이트 중..."
-      weekly: 주별
-    settings: 
-      back_to_messages: "메시지로 돌아가기"
-      link_needed: "Canvas Facebook 앱을 구성하기 전에 Canvas 로그인에 연결해야 합니다. 자세한 정보를 보려면 \"환영\"을 클릭하십시오."
-      notifications_config_notice: "Canvas의 알림을 자동으로 Facebook 계정에 보낼 수 있습니다. 아래에서 보낼 수 있는 알림 유형을 볼 수 있습니다. 알림 기본 설정은 여기 또는 Canvas에서 언제든지 바꿀 수 있습니다."
-      settings_title: "Canvas 알림 설정"
-      updating_preferences: "기본 설정 업데이트 중..."
   feature_flags: 
     feature_flag: 
       allow: 허용
@@ -5503,6 +5351,7 @@ ko:
     no_deleting_folders_with_content: "내용이 있는 폴더를 삭제할 수 없음"
     no_deleting_root: "루트 폴더를 삭제할 수 없음"
     only_one_folder: "폴더 경로와 폴더 ID를 설정할 수 없음"
+  from_fdd4956d: 시작
   from_from_to_to_e31f6422: "%{from}부터 %{to}까지"
   global_message_icons: 
     announcement: "공지 사항"
@@ -5652,21 +5501,9 @@ ko:
       switch_to_points: "점수로 전환"
     ungraded: "평가 요인이 아님"
   gradebook_uploads: 
-    errors: 
-      invalid_file: "유효하지 않은 csv 파일, 평점을 업데이트 할 수 없음"
-      upload_failed: "파일을 업로드할 수 없습니다."
-    form: 
-      labels: 
-        upload: "업로드할 CSV 파일을 선택"
-      titles: 
-        upload_form: "업로드할 CSV 파일을 선택"
     new: 
       titles: 
         new_upload: "평점 기록부 업로드"
-    notices: 
-      updated: 
-        one: "제출물 %{count}개를 성공적으로 업데이트했습니다."
-        other: "제출물 %{count}개를 성공적으로 업데이트했습니다."
     show: 
       assignment_answer: "이 과제는"
       assignment_example: "주식 지수 퀴즈"
@@ -5693,14 +5530,6 @@ ko:
       student_answer: "이 사람은 실제"
       student_example: 아무개
       student_question: "문제의 학생"
-  gradebook_uploads_form: 
-    buttons: 
-      upload_data: "데이터 업로드"
-    labels: 
-      upload: "업로드할 CSV 파일 선택:"
-    titles: 
-      upload_form: "업로드할 CSV 파일 선택"
-    what_should_csv_look_like: "CSV 파일은 어떻게 보입니까?"
   gradebooks: 
     attendance: 
       attendance_info: "출석 과제를 만들지 않았습니다."
@@ -5807,12 +5636,14 @@ ko:
       set_group_weights: "그룹 가중치 설정"
       show_attendance_columns: "출석 열 표시"
       show_concluded_enrollments: "종결된 등록 표시"
-      upload_scores: 가져오기
       view_grading_history: "평가 기록 보기"
     grades: 
       complete: 완료
       incomplete: "완료 안 됨"
     grades_filename: 평점
+    grading_box_extended: 
+      labels: 
+        grade: 평점
     history: 
       graded_on_submission: "제출물로 평가됨"
       grades_for_date: "해당 날짜의 평점"
@@ -5878,7 +5709,6 @@ ko:
       labels: 
         add_comment: "의견 추가"
         average: 평균
-        grade: 평점
         grade_by_question_beta: "질문에 따라 평가 (베타)"
         group_comment: "전체 그룹에 의견 보내기"
         hide_names: "SpeedGrader에서 학생 이름 숨기기"
@@ -6316,7 +6146,6 @@ ko:
       edit_group: "그룹 편집"
       group_atom_feed: "그룹 Atom 피드"
       new_announcement: "새 공지"
-      next_week: "다음 주"
     status: 
       assigning_students: "학생 할당 중..."
       creating_groups: "범주 만드는 중..."
@@ -6392,6 +6221,9 @@ ko:
     quiz_submission: "퀴즈 제출물"
     text_entry_submission: "텍스트 항목 제출물"
   if_you_ve_been_using_another_course_management_sys_67edfab1: "다른 과목 관리 시스템을 사용했다면 Canvas로 옮기고 싶은 자료가 있을 지도 모릅니다. 여러분의 자료를 Canvas로 손쉽게 이전할 수 있는 과정을 안내해 드리겠습니다."
+  ignore_forever_dd4a6cdf: "계속 무시"
+  ignore_this_assignment_b7a71f80: "이 과제 무시"
+  ignore_until_new_submission_87f32b4: "새로 제출할 때까지 무시"
   image_8ad06: 이미지
   images: 
     error_checking_color: "이미지 색상 확인 오류"
@@ -6401,6 +6233,7 @@ ko:
     invalid_file_type: "유효하지 않은 파일 유형 %{type}. 허용되는 유형 목록: %{type_list}"
     not_an_image: "선택한 파일은 이미지가 아닙니다."
   immediately_c128ede6: 즉시
+  import_1b31507: 가져오기
   import_content_b2fd6620: "내용 가져오기"
   importers/assignment_importer: 
     errors: 
@@ -6433,6 +6266,7 @@ ko:
   installed_7b284a91: 설치됨
   instructions: 
     authorize_google_docs: "문서에 대해 협업하기 전에 Canvas가 Google Docs 계정을 접근할 수 있도록 권한을 부여해야 합니다."
+  instructions_2f88ee72: 교사
   instructure: 
     alerts: 
       file_previews_disabled: "이 Canvas 사이트에는 파일 미리 보기 사용 안 함"
@@ -6459,8 +6293,6 @@ ko:
       posting_message_failed: "게시 실패. 다시 시도하시기 바랍니다."
       required: "필수 필드"
       search_failed: "검색에 실패했습니다. 다시 시도하시기 바랍니다."
-    ignore_forever: "계속 무시"
-    ignore_until_new_submission: "새로 제출할 때까지 무시"
     labels: 
       datepicker: 
         time: 시간
@@ -6570,8 +6402,6 @@ ko:
         dashboard: "내 대시보드"
         skip_to_content: "내용으로 건너 뛰기"
       open_source_learning_management_system: "오픈 소스 LMS"
-    facebook: 
-      title: "Facebook 페이지"
     fixed_bottom: 
       masquerading: 
         stop: "가장 중지"
@@ -6693,6 +6523,7 @@ ko:
     help: 도움말
     show_me_where: "위치 표시"
   links_14b70841: 링크
+  loading_25990131: "로드하는 중..."
   locales: 
     ko: "한국말 (crowd-sourced)"
   lock_date_cannot_be_before_due_date_ac30f54: "잠금 해제 날짜는 기한 이전일 수 없음"
@@ -6746,7 +6577,6 @@ ko:
     loading: "미디어 로드 중..."
     media_still_converting: "현재 미디어를 변환 중입니다. 잠시 후에 다시 시도하시기 바랍니다."
     messages: 
-      file_failed_to_load: "미디어 파일 로드 실패"
       flash_required_record_audio: "음성을 녹음하려면 Flash가 필요합니다."
       flash_required_upload_audio: "음성을 업로드하려면 Flash가 필요합니다."
       flash_required_upload_video: "비디오를 업로드하려면 Flash가 필요합니다."
@@ -6820,10 +6650,6 @@ ko:
           unknown_user: "알 수 없는 사용자"
         subject: "%{user_name}이(가) 귀하를 Canvas에 있는 대화에 추가했습니다."
         unknown_user: "알 수 없는 사용자"
-      facebook: 
-        body: "%{user_name}이(가) 귀하를 Canvas에 있는 대화에 추가했습니다."
-        link_text: "대화 보기"
-        unknown_user: "알 수 없는 사용자"
       sms: 
         body: "%{user_name}이(가) 귀하를 Canvas에 있는 대화에 추가했습니다."
         more_info: "자세한 정보는 %{url} 참고"
@@ -6861,25 +6687,6 @@ ko:
         ungraded_count_description: "%{count}개 이상의 제출물이 평가 안 됨"
         ungraded_timespan_description: "제출물이 %{count}일 동안 평가 안 됨"
         usernote_description: "%{count}일 동안 교원 일지 항목이 없음"
-      facebook: 
-        body: 
-          one: "다음 조건을 만족하여 %{student}에게 알림이 트리거되었습니다:"
-          other: "다음 조건을 만족하여 %{student}에게 알림이 트리거되었습니다:"
-        body_student: 
-          one: "다음 조건을 만족하여 여러분에게 알림이 트리거되었습니다:"
-          other: "다음 조건을 만족하여 여러분에게 알림이 트리거되었습니다:"
-        interaction_description: 
-          one: "%{count}일 이상 학생/교사 상호 작용이 없음"
-          other: "%{count}일 이상 학생/교사 상호 작용이 없음"
-        ungraded_count_description: 
-          one: "과제 %{count}개 이상 평가 안 됨"
-          other: "과제 %{count}개 이상 평가 안 됨"
-        ungraded_timespan_description: 
-          one: "하나 이상의 과제가 %{count}일 이상 평가 안 됨"
-          other: "하나 이상의 과제가 %{count}일 이상 평가 안 됨"
-        usernote_description: 
-          one: "%{count}일 이상 교원 일지 항목이 없음"
-          other: "%{count}일 이상 교원 일지 항목이 없음"
       sms: 
         body: "%{student}에게 알림을 보냄"
         body_student: "귀하에게 알림을 보냄"
@@ -6945,19 +6752,6 @@ ko:
         message: "%{user}이(가) \"%{appointment_name}\"에 대한 예약을 취소했습니다."
         no_reason_given: 없음
         subject: "\"%{appointment_name}\"에 대한 예약이 취소됨 (%{course})"
-      facebook: 
-        instructions: "약속 보기"
-        labels: 
-          attendee: 참석자
-          attendees: 참석자
-          cancel_reason: "취소 사유"
-          course: 과목
-          date_and_time: 날짜/시간
-          details: "약속 세부 정보"
-          group: 그룹
-          slots_remaining: "등록할 수 있는 시간 슬롯"
-        message: "%{user}이(가) \"%{appointment_name}\"에 대한 예약을 취소했습니다."
-        no_reason_given: 없음
       sms: 
         message: "%{user}이(가) \"%{appointment_name}\"에 대한 예약을 취소했습니다."
         more_info: "자세한 정보는 %{url} 참고"
@@ -6989,18 +6783,6 @@ ko:
         message: "%{user}이(가) \"%{appointment_name}\"에 대한 예약을 취소했습니다."
         no_reason_given: 없음
         subject: "\"%{appointment_name}\"에 대한 시간 슬롯이 취소됨 (%{course})"
-      facebook: 
-        instructions: "다른 시간 슬롯 등록하기"
-        labels: 
-          attendee: 참석자
-          attendees: 참석자
-          cancel_reason: "취소 사유"
-          course: 과목
-          date_and_time: 날짜/시간
-          details: "약속 세부 정보"
-          group: 그룹
-        message: "%{user}이(가) \"%{appointment_name}\"에 대한 예약을 취소했습니다."
-        no_reason_given: 없음
       sms: 
         more_info: "자세한 정보는 %{url} 참고"
       twitter: 
@@ -7024,14 +6806,6 @@ ko:
         message: "\"%{appointment_name}\"에 대한 모든 약속이 취소되었습니다."
         no_reason_given: 없음
         subject: "\"%{appointment_name}\"에 대한 약속이 취소됨 (%{course})"
-      facebook: 
-        labels: 
-          cancel_reason: "취소 사유"
-          course: 과목
-          dates: 날짜
-          details: "약속 세부 정보"
-        message: "\"%{appointment_name}\"에 대한 모든 약속이 취소되었습니다."
-        no_reason_given: 없음
       sms: 
         message: "\"%{appointment_name}\"에 대한 모든 약속이 취소되었습니다."
         more_info: "자세한 정보는 %{url} 참고"
@@ -7061,17 +6835,6 @@ ko:
           slots_remaining: "등록할 수 있는 시간 슬롯"
         message: "이제 \"%{appointment_name}\"에 대한 시간 슬롯에 등록할 수 있습니다."
         subject: "\"%{appointment_name}\" 약속에 등록할 수 있음 (%{course})"
-      facebook: 
-        group_signup: "그룹 (%{group_category})"
-        individual_signup: 개별
-        instructions: "시간 슬롯에 등록하기"
-        labels: 
-          course: 과목
-          dates: 날짜
-          details: "약속 세부 정보"
-          signup_type: "등록 유형"
-          slots_remaining: "등록할 수 있는 시간 슬롯"
-        message: "이제 \"%{appointment_name}\"에 대한 시간 슬롯에 등록할 수 있습니다."
       sms: 
         message: "\"%{appointment_name}\"에 대한 등록이 시작되었습니다."
         more_info: "자세한 정보는 %{url} 참고"
@@ -7103,17 +6866,6 @@ ko:
           slots_remaining: "등록할 수 있는 시간 슬롯"
         message: "\"%{appointment_name}\"에 시간 슬롯이 추가되어 등록할 수 있습니다."
         subject: "\"%{appointment_name}\" 약속이 업데이트됨 (%{course})"
-      facebook: 
-        group_signup: "그룹 (%{group_category})"
-        individual_signup: 개별
-        instructions: "시간 슬롯에 등록하기"
-        labels: 
-          course: 과목
-          dates: 날짜
-          details: "약속 세부 정보"
-          signup_type: "등록 유형"
-          slots_remaining: "등록할 수 있는 시간 슬롯"
-        message: "\"%{appointment_name}\"에 시간 슬롯이 추가되어 등록할 수 있습니다."
       sms: 
         message: "\"%{appointment_name}\"에 대한 새 시간 슬롯에 등록할 수 있습니다."
         more_info: "자세한 정보는 %{url} 참고"
@@ -7146,17 +6898,6 @@ ko:
           slots_remaining: "등록할 수 있는 시간 슬롯"
         message: "%{user}이(가) \"%{appointment_name}\"에 등록했습니다."
         subject: "사용자가 \"%{appointment_name}\"에 등록함 (%{course})"
-      facebook: 
-        instructions: "약속 보기"
-        labels: 
-          attendee: 참석자
-          attendees: 참석자
-          course: 과목
-          date_and_time: 날짜/시간
-          details: "약속 세부 정보"
-          group: 그룹
-          slots_remaining: "등록할 수 있는 시간 슬롯"
-        message: "%{user}이(가) \"%{appointment_name}\"에 등록했습니다."
       sms: 
         message: "%{user}이(가) \"%{appointment_name}\"에 등록했습니다."
         more_info: "자세한 정보는 %{url} 참고"
@@ -7186,17 +6927,6 @@ ko:
           slots_remaining: "등록할 수 있는 시간 슬롯"
         message: "%{user}이(가) \"%{appointment_name}\"에 등록했습니다."
         subject: "\"%{appointment_name}\"에 등록함"
-      facebook: 
-        instructions: "다른 시간 슬롯에 등록하기"
-        labels: 
-          attendee: 참석자
-          attendees: "참석자  "
-          course: 과목
-          date_and_time: 날짜/시간
-          details: "약속 세부 정보"
-          group: 그룹
-          slots_remaining: "등록할 수 있는 시간 슬롯"
-        message: "%{user}이(가) \"%{appointment_name}\"에 등록했습니다."
       sms: 
         message: "\"%{appointment_name}\"에 등록했습니다."
         more_info: "자세한 정보는 %{url} 참고"
@@ -7217,8 +6947,6 @@ ko:
           link: "과제를 보려면 여기를 클릭"
           subject: "과제 변경됨: %{title}, %{course}"
         subject: "과제 변경됨: %{title}, %{course}"
-      facebook: 
-        body: "%{course}의 %{title_link} 과제가 변경되었습니다."
       sms: 
         body: |-
             %{title}, %{course} 이(가) 변경되었습니다.
@@ -7241,11 +6969,6 @@ ko:
           no_due_date: "기한 없음"
         labels: 
           click_to_see_assignment: "과제를 보려면 여기를 클릭"
-        multiple_due_dates: "기한: 여러 날짜"
-        new_assignment: "%{course_name} 과목에 대한 새 과제가 생성됨"
-        no_due_date: "기한: 기한 없음"
-      facebook: 
-        due_at: "기한: %{assignment_due_date_time}"
         multiple_due_dates: "기한: 여러 날짜"
         new_assignment: "%{course_name} 과목에 대한 새 과제가 생성됨"
         no_due_date: "기한: 기한 없음"
@@ -7277,9 +7000,6 @@ ko:
         labels: 
           click_to_see_assignment: "과제를 보려면 여기를 클릭"
         no_due_date: "기한 없음"
-      facebook: 
-        assignment_due_date_changed_sentence: "%{course_name} 과목 *%{assignment_name}* 과제의 변경된 기한:"
-        no_due_date: "기한 없음"
       sms: 
         assignment_due_date_changed: "%{assignment_name}, %{course_name} 의 변경된 기한:"
         more_info_at_url: "자세한 정보는 %{web_address} 참고"
@@ -7304,9 +7024,6 @@ ko:
         labels: 
           click_to_see_assignment: "과제를 보려면 여기를 클릭"
         no_due_date: "기한 없음"
-      facebook: 
-        assignment_due_date_changed_sentence: "%{course_name} (%{override}) 과목 *%{assignment_name}* 과제의 변경된 기한:"
-        no_due_date: "기한 없음"
       sms: 
         assignment_due_date_changed: "%{assignment_name}, %{course_name} (%{override})의 새로운 기한:"
         more_info_at_url: "자세한 정보는 %{web_address} 참고"
@@ -7329,8 +7046,6 @@ ko:
         labels: 
           view_here: "여기에서 볼 수 있음"
         the_assignment_is_graded: "%{assignment_name} 과제가 평가되었습니다."
-      facebook: 
-        the_assignment_is_graded: "%{assignment_name} 과제가 평가되었습니다."
       sms: 
         assignment_is_graded: "%{assignment_name}, %{course_name} 이(가) 평가되었습니다."
         more_info_at: "자세한 정보는 %{web_address} 참고"
@@ -7352,9 +7067,6 @@ ko:
           view_submission: "여기에서 제출물을 볼 수 있음"
         user_resubmitted: "다시 제출: %{user_name}, %{assignment_name}"
         user_resubmitted_sentence: "%{user_name}이(가) %{course_name} 과목의 %{assignment_name}을(를) 다시 제출했음"
-      facebook: 
-        click_to_view: "제출물을 보려면 여기를 클릭하십시오."
-        user_resubmitted: "**%{user_name}**이(가) %{course_name} 과목의 **%{assignment_name}**을(를) 다시 제출했음"
       sms: 
         more_info_at: "자세한 정보는 %{web_address} 참고"
         user_resubmitted: "%{user_name}이(가) 과제 %{assignment_name}을(를) (다시) 제출함"
@@ -7372,9 +7084,6 @@ ko:
           view_submission: "여기에서 제출물을 볼 수 있음"
         user_submitted: "제출물: %{user_name}, %{assignment_name}"
         user_submitted_sentence: "%{user_name}이(가) %{course_name} 과목의 %{assignment_name}에 대한 제출물을 제출함"
-      facebook: 
-        click_to_view: "제출물을 보려면 여기를 클릭하십시오."
-        user_submitted: "**%{user_name}**이(가) %{course_name} 과목의 **%{assignment_name}** 과제에 대한 제출물을 제출함"
       sms: 
         more_info_at: "자세한 정보는 %{web_address} 참고"
         user_submitted: "%{user_name}이(가) %{assignment_name} 과제를 제출함"
@@ -7392,9 +7101,6 @@ ko:
           view_submission: "여기에서 제출물을 볼 수 있음"
         user_resubmitted_sentence: "%{user_name}이(가) %{course_name} 과목의 %{assignment_name} 과제에 대한 제출물을 제출함"
         user_submitted: "지연된 과제: %{user_name}, %{assignment_name}"
-      facebook: 
-        click_to_view: "제출물을 보려면 여기를 클릭하십시오."
-        user_resubmitted_sentence: "**%{user_name}**이(가) %{course_name}의 **%{assignment_name}**에 대한 지연된 제출물을 제출했습니다."
       sms: 
         more_info_at: "자세한 정보는 %{web_address} 참고"
         user_submitted: "%{user_name}이(가) %{assignment_name} 과제를 제출함(지연)"
@@ -7450,9 +7156,6 @@ ko:
           link: "여기에서 세부 정보 보기"
           subject: "협업 초대: %{course_or_group}"
         subject: "협업 초대: %{course_or_group}"
-      facebook: 
-        body: "%{course_or_group}의 %{document} 문서에 대해 협업하도록 초대받았습니다. 문서는 %{service}에서 만들었습니다.\n"
-        body_with_user: "%{course_or_group}의 %{document} 문서에 대해 협업하도록 초대받았습니다. 문서는 %{user}이(가) %{service}에서 만들었습니다.\n"
       sms: 
         body: |-
             %{course_or_group}의 %{document} 문서에 대해 협업하도록 초대받았습니다.
@@ -7481,7 +7184,7 @@ ko:
       email: 
         details: "등록 과정을 마치려면 다음 URL을 방문하십시오:"
         html: 
-          details: "등록 과정을 마치려면 여기를 클릭"
+          link: "등록 과정을 마치려면 여기를 클릭"
     confirm_sms_communication_channel: 
       sms: 
         body: |-
@@ -7521,9 +7224,6 @@ ko:
           download: 다운로드
           unknown_user: "알 수 없는 사용자"
         unknown_user: "알 수 없는 사용자"
-      facebook: 
-        link_text: "메시지 보기"
-        unknown_user: "알 수 없는 사용자"
       sms: 
         more_info: "자세한 정보는 %{url}에서 확인"
         unknown_user: "알 수 없는 사용자"
@@ -7542,10 +7242,6 @@ ko:
           subject: "%{user_name}이(가) 방금 Canvas에서 메시지를 보냈습니다."
           unknown_user: "알 수 없는 사용자"
         subject: "%{user_name}이(가) 방금 Canvas에서 메시지를 보냈습니다."
-        unknown_user: "알 수 없는 사용자"
-      facebook: 
-        body: "%{user_name}이(가) 방금 Canvas에서 메시지를 보냈습니다."
-        link_text: "메시지 보기"
         unknown_user: "알 수 없는 사용자"
       sms: 
         body: "%{user_name}이(가) 방금 Canvas에서 메시지를 보냄:"
@@ -7628,12 +7324,6 @@ ko:
           details: "현재 등록 목록 보기"
           subject: "%{user}이(가) 과목 초대를 수락함"
         subject: "%{user}이(가) 과목 초대를 수락함"
-      facebook: 
-        body_designer: "%{user}이(가) %{course} 과목에 디자이너로 참여하기 위한 초대를 수락했습니다."
-        body_observer: "%{user}이(가) %{course} 과목에 감독자로 참여하기 위한 초대를 수락했습니다."
-        body_student: "%{user}이(가) %{course} 과목에 학생으로 참여하기 위한 초대를 수락했습니다."
-        body_ta: "%{user}이(가) %{course} 과목에 조교로 참여하기 위한 초대를 수락했습니다."
-        body_teacher: "%{user}이(가) %{course} 과목에 교사로 참여하기 위한 초대를 수락했습니다."
       sms: 
         body_designer: "%{user}이(가) %{course} 과목의 디자이너 초대를 수락함"
         body_observer: "%{user}이(가) %{course} 과목의 감독자 초대를 수락함"
@@ -7676,17 +7366,6 @@ ko:
           username: "사용자 이름"
         none: 없음
         subject: "과목 초대"
-      facebook: 
-        body_designer: "%{course} 과목에 디자이너로 참여하기 위한 초대를 받았습니다."
-        body_observer: "%{course} 과목에 감독자로 참여하기 위한 초대를 받았습니다."
-        body_student: "%{course} 과목에 학생으로 참여하기 위한 초대를 받았습니다."
-        body_ta: "%{course} 과목에 조교로 참여하기 위한 초대를 받았습니다."
-        body_teacher: "%{course} 과목에 교사로 참여하기 위한 초대를 받았습니다."
-        labels: 
-          email: 이메일
-          name: 이름
-          username: "사용자 이름"
-        none: 없음
       sms: 
         body_designer: "과목에 디자이너로 참여하기 위한 초대를 받았습니다."
         body_observer: "과목에 감독자로 참여하기 위한 초대를 받았습니다."
@@ -7735,17 +7414,6 @@ ko:
         none: 없음
         register: "등록을 마치려면 %{link} 방문"
         subject: "과목 등록"
-      facebook: 
-        body_designer: "%{course} 과목에 디자이너로 등록되었습니다."
-        body_observer: "%{course} 과목에 감독자로 등록되었습니다."
-        body_student: "%{course} 과목에 학생으로 등록되었습니다."
-        body_ta: "%{course} 과목에 조교로 등록되었습니다."
-        body_teacher: "%{course} 과목에 교사로 등록되었습니다."
-        labels: 
-          email: 이메일
-          name: 이름
-          username: "사용자 이름"
-        none: 없음
       sms: 
         body_designer: "과목에 디자이너로 등록되었습니다."
         body_observer: "과목에 감독자로 등록되었습니다."
@@ -7830,10 +7498,6 @@ ko:
           see_details: "여기에서 세부 정보를 확인할 수 있음"
         no_time_set: "시간 설정 안 됨"
         subject: "행사 날짜 변경: %{course_name}의 %{event_title}"
-      facebook: 
-        from_to_time: "%{start_date_time}부터 %{end_date_time}까지"
-        no_time_set: "시간 설정 안 됨"
-        subject: "%{course_name} 과목의 [%{event_title}](%{link_to_event}) 행사 시간이 변경되었습니다. 변경된 시간은:"
       sms: 
         from_to_time: "%{start_date_time}부터 %{end_date_time}까지"
         more_info: "자세한 정보는 %{web_link} 참고"
@@ -7890,11 +7554,6 @@ ko:
           grades_based_on_percent: "평가는 각 과제 그룹에 대한 가중 합계를 바탕으로 함"
           now_see_here: "여기에서 세부 정보 보기"
           subject: "평점 가중치 변경됨"
-      facebook: 
-        grading_based_on_points: "평가는 모든 과제에 대한 합계 점수를 바탕으로 합니다."
-        grading_policy_changed: "**[%{course_name}](%{course_url})**의 평가 정책이 변경되었습니다."
-        labels: 
-          grades_based_on_percent: "평가는 각 과제 그룹에 대한 가중 합계를 바탕으로 함"
       sms: 
         grade_changed: "%{course_name}에 대한 평가 정책이 변경되었습니다."
         more_info_at: "자세한 정보는 %{course_url} 참고"
@@ -7916,8 +7575,6 @@ ko:
         labels: 
           view_submission_here: "여기에서 제출물 보기"
         subject: "지연된 과제: %{group_name}, %{assignment_name}"
-      facebook: 
-        body: "%{group_name} 그룹이 %{course_name}에서 **[%{assignment_name}](%{assignment_url})**에 대한 지연된 제출물을 제출했습니다."
       sms: 
         more_info: "자세한 정보는 %{web_address} 참고"
         subject: "%{group_name}이 %{assignment_name} 과제 제출(지연)"
@@ -7939,10 +7596,6 @@ ko:
         labels: 
           click_below: "아래 링크를 클릭해서 그룹 확인하기"
         subject: "그룹 멤버쉽 수락됨: %{group_name}"
-      facebook: 
-        account_group: "%{account_name} 계정에 대한 **[%{group_name}](%{group_url})** 그룹 참여 요청이 수락되었습니다."
-        course_group: "%{course_name} 과목에 대한 **[%{group_name}](%{group_url})** 그룹 참여 요청이 수락되었습니다."
-        group_request_accepted: "그룹 요청 수락됨: %{group_name}"
       sms: 
         account_group: "%{account_name} 계정에 대한 %{group_name} 그룹 참여 요청이 수락되었습니다."
         course_group: "%{course_name} 과목에 대한 %{group_name} 그룹 참여 요청이 수락되었습니다."
@@ -7968,9 +7621,6 @@ ko:
         labels: 
           click_below: "아래 링크를 클릭해서 다른 그룹 확인하기"
         subject: "그룹 멤버쉽 거부됨: %{group_name}"
-      facebook: 
-        account_group: "%{account_name} 계정에 대한 **[%{group_name}](%{group_url})** 그룹 참여 요청이 거부되었습니다."
-        course_group: "%{course_name} 과목에 대한 **[%{group_name}](%{group_url})** 그룹 참여 요청이 거부되었습니다."
       sms: 
         account_group: "%{account_name} 계정에 대한 %{group_name} 그룹 참여 요청이 거부되었습니다."
         course_group: "%{course_name} 과목에 대한 %{group_name} 그룹 참여 요청이 거부되었습니다."
@@ -8022,9 +7672,6 @@ ko:
           details: "새 관리자 %{user}이(가) %{account} 계정에 추가됨"
           subject: "새 계정 사용자"
         subject: "새 계정 사용자"
-      facebook: 
-        body: "새 관리자 **%{user}**이(가) **%{account}** 계정에 추가되었습니다."
-        subject: "%{account}의 새 계정 관리자"
       sms: 
         body: "새 관리자 %{user}이(가) %{account} 계정에 추가됨"
         details: "자세한 정보는 %{website} 참고"
@@ -8040,8 +7687,6 @@ ko:
           link: "공지 보기"
         labels: 
           file_included: "포함된 파일"
-      facebook: 
-        body: "새 공지: %{title}, %{course}"
       sms: 
         details: "자세한 정보는 %{url} 참고"
         subject: "새 공지: %{title}, %{course}"
@@ -8061,9 +7706,6 @@ ko:
           title: "새 그룹 멤버쉽: %{group_name}"
         subject: "%{course_or_account}의 새 그룹 멤버쉽"
         title: "새 그룹 멤버쉽: %{group_name}"
-      facebook: 
-        body_account: "%{account} 계정의 새 그룹에 추가되었습니다. 그룹 이름은 %{group_name}입니다."
-        body_course: "%{course} 과목의 새 그룹에 추가되었습니다. 그룹 이름은 %{group_name}입니다."
       sms: 
         body_account: "%{account} 계정의 새 그룹에 추가되었습니다.  그룹 이름은 %{group_name}입니다."
         body_course: "%{course} 과목의 새 그룹에 추가되었습니다.  그룹 이름은 %{group_name}입니다."
@@ -8088,9 +7730,6 @@ ko:
           title: "새 그룹 멤버쉽: %{group_name}"
         subject: "%{course_or_account}의 새 그룹 멤버쉽"
         title: "새 그룹 멤버쉽: %{group_name}"
-      facebook: 
-        body_account: "%{account} 계정의 %{group} 그룹에 참여하도록 초대를 받았습니다."
-        body_course: "%{course} 과목의 %{group} 그룹에 참여하도록 초대를 받았습니다."
       sms: 
         body_account: "%{account} 계정의 %{group} 그룹에 참여하도록 초대를 받았습니다."
         body_course: "%{course} 과목의 %{group} 그룹에 참여하도록 초대받았습니다."
@@ -8116,11 +7755,6 @@ ko:
           teachers: 교사
         subject: "새 과목"
         title: "%{account}의 새 과목"
-      facebook: 
-        body: "새 과목 **%{course}**이(가) **%{account}** 계정에 추가되었습니다."
-        labels: 
-          teachers: 교사
-        subject: "%{account}의 새 과목"
       sms: 
         body: "새 과목 %{course}이(가) %{account} 계정에 추가됨"
         details: "자세한 정보는 %{url} 참고"
@@ -8141,8 +7775,6 @@ ko:
           link: "대화에 참여하려면 여기를 클릭"
           subject: "%{discussion_topic}에 대한 새 의견: %{course}"
         subject: "%{discussion_topic}에 대한 새 의견: %{course}"
-      facebook: 
-        body: "%{course}의 %{discussion_topic}에 대한 새 의견"
       sms: 
         body: "%{discussion_topic}에 대한 새 의견: %{course}"
         details: "자세한 정보는 %{url} 참고"
@@ -8163,8 +7795,6 @@ ko:
         labels: 
           file_included: "포함된 파일"
         subject: "새 토론 - %{discussion_topic}: %{course}"
-      facebook: 
-        body: "새 포럼 주제: %{discussion_topic}, %{course}"
       sms: 
         body: "%{course}의 새 주제:"
         details: "자세한 정보는 %{url} 참고"
@@ -8186,10 +7816,6 @@ ko:
           see_details: "여기에서 세부 정보 보기"
         no_time_set: "시간 설정 안 됨"
         subject: "새 행사 - %{event_title}, %{course_name}"
-      facebook: 
-        body: "%{course_name}의 새로 예정된 행사가 있음:"
-        from_to_time: "%{start_date_time}부터 %{end_date_time}까지"
-        no_time_set: "시간 설정 안 됨"
       sms: 
         from_to_time: "%{start_date_time}부터 %{end_date_time}까지"
         more_info: "자세한 정보는 %{web_address} 참고"
@@ -8212,8 +7838,6 @@ ko:
           subject: "새 파일 추가됨: %{title}, %{name}"
         subject: "새 파일 추가: %{title}, %{name}"
         view: "여기에서 볼 수 있음"
-      facebook: 
-        body: "%{name} 과목에 새 파일이 추가됨:"
       sms: 
         body: "%{name}에 새 파일 추가됨:"
         link: "자세한 정보는 %{link} 참고"
@@ -8230,9 +7854,6 @@ ko:
           subject: "%{name} 과목에 새 파일 %{count}개가 추가됨:"
         link: "여기에서 볼 수 있음"
         subject: "%{name} 과목에 새 파일 %{count}개가 추가됨:"
-      facebook: 
-        body: "%{name} 과목에 새 파일 %{count}개가 추가됨:"
-        link: "여기에서 볼 수 있음"
       sms: 
         body: "%{name} 과목에 새 파일 %{count}개가 추가되었습니다."
         link: "자세한 정보는 %{link} 참고"
@@ -8255,9 +7876,6 @@ ko:
           title: "새 학생 그룹: %{group_name}"
         subject: "%{course_or_account}의 새 학생 그룹"
         title: "새 학생 그룹: %{group_name}"
-      facebook: 
-        body_account: "%{account} 계정에 \"%{group_name}\"(이)라는 새 학생 구성 그룹이 생성되었습니다. 첫 번째 멤버는 %{user}입니다."
-        body_course: "%{course} 과목에 \"%{group_name}\"(이)라는 새 학생 구성 그룹이 생성되었습니다. 첫 번째 멤버는 %{user}입니다."
       sms: 
         body_account: "%{account} 계정에 \"%{group_name}\"(이)라는 새 학생 구성 그룹이 생성되었습니다. 첫 번째 멤버는 %{user}입니다."
         body_course: "%{course} 과목에 \"%{group_name}\"(이)라는 새 학생 구성 그룹이 생성되었습니다. 첫 번째 멤버는 %{user}입니다."
@@ -8277,9 +7895,6 @@ ko:
           link: "사용자를 보려면 여기를 클릭"
           subject: "새 사용자"
         subject: "새 사용자"
-        title: "%{account}의 새 사용자"
-      facebook: 
-        body: "새 사용자 **%{user}**이(가) **%{account}** 계정에 등록했습니다."
         title: "%{account}의 새 사용자"
       sms: 
         body: "새 사용자 %{user}이(가) %{account} 계정에 등록했음"
@@ -8319,8 +7934,6 @@ ko:
           subject: "퀴즈 다시 평가 마침: %{quiz}, %{context}"
         link_message: "여기에서 퀴즈를 볼 수 있음:"
         subject: "퀴즈 다시 평가 마침: %{quiz}, %{context}"
-      facebook: 
-        body: "퀴즈 다시 평가 마침: %{title}"
       sms: 
         body_sms: "%{context}의 %{title}에 대한 퀴즈 다시 평가를 마쳤습니다."
         more_info: "자세한 정보는 %{url}에서 확인"
@@ -8351,8 +7964,6 @@ ko:
           subject: "평가 알림: %{rubric}, %{context}"
         link_message: "여기에서 평가를 검토하고 항목을 제출할 수 있습니다:"
         subject: "평가 알림: %{rubric}, %{context}"
-      facebook: 
-        body: "평가 알림입니다: %{context}의 *%{title}*."
       sms: 
         body: "평가 알림입니다: %{rubric}, %{context}."
         more_info: "자세한 정보는 %{url} 참고"
@@ -8370,8 +7981,6 @@ ko:
           subject: "새 평가: %{title}, %{context}"
         link_message: "여기에서 평가를 검토하고 항목을 제출할 수 있습니다:"
         subject: "새 평가: %{title}, %{context}"
-      facebook: 
-        body: "%{context}에 대한 새 평가가 생성되었습니다:"
       sms: 
         body: "%{context}에 대한 새 평가가 생성되었습니다."
         more_info: "자세한 정보는 %{url} 참고"
@@ -8394,8 +8003,6 @@ ko:
         link_message: "여기에서 제출물 세부 정보를 검토할 수 있습니다:"
         someone: 아무개
         subject: "제출물 의견: %{user}, %{assignment}, %{context}"
-      facebook: 
-        someone: 아무개
       sms: 
         body: "%{assignment}, %{user}, %{context}에 대한 %{author}의 새 의견입니다."
         more_info: "자세한 정보는 %{url} 참고"
@@ -8414,8 +8021,6 @@ ko:
           subject: "제출물 의견: %{user}, %{assignment}, %{context}"
         someone: 아무개
         subject: "제출물 의견: %{user}, %{assignment}, %{context}"
-      facebook: 
-        someone: 아무개
       sms: 
         more_info: "자세한 정보는 %{url} 참고"
         sms_body: "%{assignment}, %{user}, %{context}에 대해 %{author}의 새 의견입니다."
@@ -8444,13 +8049,6 @@ ko:
         score: "점수:  %{score} / %{total}"
         score_pending: "점수가 교사의 검토 대기 중임"
         subject: "평점 변경됨: %{assignment}, %{context}"
-      facebook: 
-        body: "*%{title}* 과제의 평점이 변경되었습니다."
-        no_date_set: "날짜 설정 안 됨"
-        not_applicable: N/A
-        regraded_date: "다시 평가됨: %{date}"
-        score: "점수: %{score} / %{total}"
-        score_pending: "점수가 교사의 검토 대기 중임"
       sms: 
         body_sms: "%{title}, %{context} 에 대한 평점이 변경되었습니다."
         more_info: "자세한 정보는 %{url} 참고"
@@ -8491,13 +8089,6 @@ ko:
         score: "score:  %{score} / %{total}"
         score_pending_review: "점수가 교사의 검토 대기 중임"
         subject: "과제 평가됨: %{assignment}, %{context}"
-      facebook: 
-        body: "*%{title}* 과제가 평가되었습니다."
-        graded_date: "평가됨: %{date}"
-        no_date_set: "날짜 설정 안 됨"
-        not_applicable: N/A
-        score: "점수: %{score} / %{total}"
-        score_pending_review: "점수가 교사의 검토 대기 중임"
       sms: 
         graded_date: "평가됨: %{date}"
         more_info: "자세한 정보는 %{url} 참고"
@@ -8530,9 +8121,6 @@ ko:
         link_message: "여기에서 제출물을 검토할 수 있음:"
         subject: "퀴즈 제출: %{quiz}, %{context}"
         submitted_date: "제출됨: %{date}"
-      facebook: 
-        body: "%{user_name}이(가) %{quiz_title} 퀴즈를 마쳤으며, 수동으로 평가해야 합니다."
-        submitted_date: "제출: %{date}"
       sms: 
         body_sms: "%{title}, %{context} 에 대한 평점이 변경되었습니다."
         more_info: "자세한 정보는 %{url}에서 확인"
@@ -8559,8 +8147,6 @@ ko:
         notifications_link: "다음 페이지를 방문하여 알림 설정을 바꿀 수 있습니다:"
         subject: "최근 Canvas 알림"
         weekly_body: "Canvas 계정의 알림에 대한 주별 보고서를 받도록 등록했습니다. 아래는 %{date}에 끝나는 주의 보고서입니다:"
-      facebook: 
-        new_notifications: "#Canvas#에서 *새 알림 %{notification_count}개를 *을 받았습니다 ."
       sms: 
         notifications_sms: "%{url}에서 새 알림 %{notifications_count}개"
       twitter: 
@@ -8579,8 +8165,6 @@ ko:
           subject: "업데이트된 위키 페이지: %{title}, %{user}"
         link_message: "여기에서 검토할 수 있습니다: %{link}"
         subject: "업데이트된 위키 페이지: %{title}, %{user}"
-      facebook: 
-        body: "%{title}에 대한 페이지가 위키에서 업데이트되었습니다."
       sms: 
         more_info: "자세한 정보는 %{url} 참고"
         updated_message: "%{title}, %{user} 업데이트됨:"
@@ -8598,8 +8182,6 @@ ko:
           details_link: "세부 정보를 보려면 여기를 클릭"
           subject: "웹 회의 초대: %{name}"
         subject: "웹 회의 초대: %{name}"
-      facebook: 
-        body: "#%{name}#의 *%{title}* 웹 회의에 참여하도록 초대받았습니다."
       sms: 
         body: "%{name}의 %{title} 웹 회의에 초대받았습니다."
         link_message: "자세한 정보는 %{url} 참고"
@@ -8761,7 +8343,7 @@ ko:
   name_1aed4a1b: 이름
   name_3806192d: "이름:"
   name_only_5f56718e: 이름만
-  new_facebook_message: "Canvas에서 온 새로운 메시지가 있음"
+  new_file_135ae520: "[ 새 파일 ]"
   new_outcome_7fba8c7d: "새 성과"
   next_40e12421: 다음
   next_steps_ce0f0d0c: "다음 단계"
@@ -8939,8 +8521,6 @@ ko:
         display: "이메일 주소"
       errors: 
         saving_preferences_failed: "오류가 발생했습니다. 다시 시도하시기 바랍니다."
-      facebook: 
-        display: Facebook
       push: 
         display: "푸시 알림"
       sms: 
@@ -8991,6 +8571,27 @@ ko:
           kb: KB
           mb: MB
           tb: TB
+  oauth2_provider: 
+    auth: 
+      oauth2_complete: "응용 프로그램이 로그인 워크플로를 마쳤으며 곧 다시 활성화됩니다."
+    confirm: 
+      cancel: 취소
+      details: 
+        allow_application: "%{app_name}이(가) 여러분의 계정에 액세스를 요청하고 있습니다."
+        email: "이메일 주소가 %{email}입니다."
+        login_name: "이 앱에 %{user_name}로 로그인 중입니다."
+      labels: 
+        remember_access: "이 서비스에 대한 인증을 저장"
+      page_title: "앱 로그인"
+    confirm_mobile: 
+      cancel: 취소
+      details: 
+        allow_application: "%{app_name}이(가) 여러분의 계정에 액세스를 요청하고 있습니다."
+        email: "이메일 주소가 %{email}입니다."
+        login_name: "이 앱에 %{user_name}로 로그인 중입니다."
+      login: 로그인
+      page_title: "앱 로그인"
+      remember_auth: "이 서비스에 대한 인증을 저장"
   observees: 
     new_observee_password: 암호
     new_observee_username: "사용자 이름"
@@ -9067,11 +8668,11 @@ ko:
     missing_outcome: "해당 학습 성과를 찾을 수 없음"
     new_outcome_group: "새 성과 그룹"
     outcome: 
+      example: "예:"
       links: 
         delete_outcome: "성과 삭제"
         edit_outcome: "성과 편집"
       mastery_at_label: "다음 이상 점수에 대해 숙달 설정:"
-      point_mastery: "%{mastery_points}점에서 숙달"
       points: 
         rating: "%{points}점"
         total: "%{points_possible}점"
@@ -9083,6 +8684,7 @@ ko:
       criterion_dialog: "특정 과제에 정렬된 성과 숙달도를 평가하는 손쉬운 방법으로 학습 성과를 과제 루브릭에 포함할 수 있습니다. 학습 성과를 정의할 때 과제 루브릭을 작성할 때 사용하는 기준도 정의해야 합니다. 필요한 만큼의 루브릭 열을 정의하고 이 성과의 숙달도를 정의하는 데 사용하는 점수 임계값을 지정하십시오."
       criterion_info_link: "기준 등급에 대해서 알아보려면 클릭"
       description: "이 성과의 설명"
+      example: "예:"
       mastery: "숙달 점수"
       points: "%{points_possible}점"
       title: "성과 이름"
@@ -9181,6 +8783,7 @@ ko:
     view_more_link: "더 보기"
   paginated_view: 
     loading_more_results: "더 많은 결과 로드"
+  password_8a271b1c: 암호
   paste_xml_cda3a64e: "XML 붙여넣기"
   paypal: 
     exception: "죄송합니다. 오류가 발생했습니다. 나중에 다시 시도하시기 바랍니다."
@@ -9278,24 +8881,6 @@ ko:
       primary_pad: "Primary Pad"
       sketchpad: SketchPad
       typewithme: TypeWith.me
-    facebook: 
-      description: "Canvas Facebook 응용 프로그램"
-      name: Facebook
-    facebook_settings: 
-      domain_name: 도메인
-      headers: 
-        domain_settings: "도메인 설정"
-      hints: 
-        canvas_domain: "\"Canvas URL\"에 저징된 도메인"
-        canvas_name: "\"Canvas 페이지\"에 지정된 경로"
-        disable_ssl: "로컬 테스팅에만 사용됨"
-      labels: 
-        api_key: "API 키"
-        app_id: "앱 ID"
-        canvas_domain: "Canvas 도메인"
-        canvas_name: "Canvas 이름"
-        disable_ssl: "SSL 사용 안 함"
-        secret: "앱 시크릿"
     google_docs: 
       description: "Google Docs 문서 공유"
       name: "Google Docs"
@@ -9344,17 +8929,6 @@ ko:
     kaltura_settings: 
       account_settings: "이 값은 Kaltura 관리 콘솔의 \"Settings -> Integration Settings\"에서 찾을 수 있습니다."
       cache_explanation: "공란은 무기한 캐시하는 것을 의미하고 0은 캐시를 안하는 것을 의미합니다."
-      description: |-
-          [Kaltura.com](%{kaltura_url})에 있는 계정이나
-          직접 호스팅한 Kaltura 인스턴스가 필요합니다.
-          
-          **참고:** Canvas에서 Kaltura를 구성하고 나면
-          Kaltura 관리 콘솔에서 "Settings -> Integration Settings"으로 가서
-          다음 알림 URL로 서버 알림을 사용하도록 해야 합니다:
-          
-          %{notification_url}
-          
-          그리고 나서 "Sent by Server" 열에 있는 "Add Entry"와 "Delete Entry" 상자를 체크해야 합니다.
       headers: 
         account_settings: "계정 설정"
         canvas_settings: "Canvas 설정"
@@ -9534,8 +9108,6 @@ ko:
       profile_update_failed: "로그인 업데이트 실패"
       regenerating_token_failed: "토큰 다시 생성 실패"
       registration_failed: "등록에 실패했습니다. 사용자 이름과 암호를 확인하고 다시 시도하시기 바랍니다."
-    facebook_select: 
-      facebook: Facebook
     failed_resending: "요청이 실패했습니다. 다시 시도하시기 바랍니다."
     links: 
       resend_confirmation: "확인 다시 전송"
@@ -9557,7 +9129,6 @@ ko:
         generate_token: "토큰 생성"
         new_access_token: "새 액세스 토큰"
         regenerate_token: "토큰 다시 생성"
-        register_facebook_account: "Facebook 계정 등록"
         register_linkedin_account: "LinkedIn 계정 등록"
         save_login: "로그인 저장"
         save_skype_name: "Skype 이름 저장"
@@ -9567,7 +9138,6 @@ ko:
       delicious_description: "Delicious는 북마크를 저장하고 다른 사람들과 공유할 수 있는 도구입니다. Canvas의 서식있는 내용 편집기에서는 Canvas에서 유용한 리소스로 쉽게 연결할 수 있도록 Delicious 태그를 검색할 수 있습니다."
       diigo_description: "Diigo는 연구와 교육에 특화된 소셜 북마크 도구입니다. Canvas의 서식있는 내용 편집기에서는 Canvas에서 유용한 리소스로 쉽게 연결할 수 있도록 Diigo 태그를 검색할 수 있습니다."
       error_loading_token_details: "토큰 세부 정보 로드 오류"
-      facebook_description: "Facebook 계정을 가지고 있으면 프로필에서 Canvas 앱을 설치하고 과목 알림을 받을 수 있습니다. 또한 받고 싶은 알림 유형과 빈도를 지정할 수 있습니다."
       full_token_warning: |-
           **지금 이 토큰을 복사해 두십시오**. 이 페이지를 떠나면 더 이상 전체 토큰을 추출할 수 없으며
           새로운 값을 얻기 위해 토큰을 다시 생성해야 합니다.
@@ -9582,7 +9152,6 @@ ko:
         dates: 날짜
         delicious_login: "Delicious 로그인"
         diigo_login: "Diigo 로그인"
-        facebook_access: "Facebook 액세스"
         generate_access_token: "액세스 토큰 생성"
         google_docs_access: "Google Docs 액세스"
         linkedin_access: "LinkedIn 액세스"
@@ -9639,7 +9208,6 @@ ko:
         diigo: Diigo
         disable_mfa: "다단계 인증 사용 안 함"
         edit_settings: "설정 편집"
-        facebook: Facebook
         google_docs: "Google Docs"
         linkedin: LinkedIn
         more_options: "추가 옵션"
@@ -9647,7 +9215,6 @@ ko:
         skype: Skype
         twitter: Twitter
         upload_new_image: "새 이미지 업로드"
-        view_facebook_app: "Facebook 앱 보기"
         view_your_profile: "프로필 보기"
       loading_token_details: "토큰 세부 정보 로드 중..."
       no_approved_integrations: "타사 응용 프로그램이 여러분을 대신해서 Canvas 사이트에 액세스하도록 허가를 요청할 수 있습니다. 응용 프로그램 승인을 시작하면 여기에서 목록을 볼 수 있습니다."
@@ -9660,7 +9227,6 @@ ko:
       subscribe_to_emails: "Instructure로부터 정보, 뉴스, 팁 받기"
       titles: 
         access_token_details: "액세스 토큰 세부 정보"
-        authorize_facebook: "Facebook 승인"
         authorize_google_docs: "Google Docs 승인"
         authorize_linkedin: "LinkedIn 승인"
         authorize_twitter: "Twitter 승인"
@@ -9808,26 +9374,6 @@ ko:
       page_title: "Canvas에 로그인"
     notices: 
       mfa_complete: "다단계 인증 구성"
-    oauth2_auth: 
-      oauth2_complete: "응용 프로그램이 로그인 워크플로를 마쳤으며 곧 다시 활성화됩니다."
-    oauth2_confirm: 
-      cancel: 취소
-      details: 
-        allow_application: "%{app_name}이(가) 여러분의 계정에 액세스를 요청하고 있습니다."
-        email: "이메일 주소는 %{email}입니다."
-        login_name: "이 앱에 %{user_name}로 로그인 중입니다."
-      labels: 
-        remember_access: "이 서비스에 대한 인증을 저장"
-      page_title: "앱 로그인"
-    oauth2_confirm_mobile: 
-      cancel: 취소
-      details: 
-        allow_application: "%{app_name}이(가) 여러분의 계정에 액세스를 요청하고 있습니다."
-        email: "이메일 주소가 %{email}입니다."
-        login_name: "이 앱에 %{user_name}로 로그인 중입니다."
-      login: 로그인
-      page_title: "앱 로그인"
-      remember_auth: "이 서비스에 대한 인증을 저장"
     otp_login: 
       buttons: 
         send: 전송
@@ -10005,6 +9551,7 @@ ko:
       regrade_options: "*(이 문제를 이미 답변한 학생을 위한)* 다시 평가하기 옵션:"
       some_scores_reduced: "정답에만 점수 주기 (*일부 학생*의 점수가 낮아질 수도 있음)"
       update_question_without_regrading: "다시 평가하지 않고 문제를 업데이트"
+  quiz_e0dcce8f: 퀴즈
   quiz_log_auditing: 
     inverted_table_view: 
       headers: 
@@ -10064,6 +9611,7 @@ ko:
       generating: "만드는 중..."
       generating_combinations_progress: "만드는 중... (%{done}/%{total})"
       save: 저장
+      save_and_publish: "저장 & 게시"
       saved: 저장되었습니다!
       saving: "저장 중..."
       update_group: "그룹 업데이트"
@@ -10547,6 +10095,7 @@ ko:
           not_published: "게시 안 됨"
           published: 게시됨
           save: 저장
+          save_and_publish: "저장 & 게시"
         cant_go_back: "답변 후에 문제 잠금"
         default_page_title: "새 퀴즈"
         group: "과제 그룹"
@@ -11382,18 +10931,14 @@ ko:
         next: 다음
       getting_started: "**%{course}**에 등록하는 중입니다."
       labels: 
-        email: 이메일
         password: 암호
-      log_in: "이메일과 암호를 입력하시기 바랍니다:"
     authenticate_or_register: 
       buttons: 
         enroll_in_course: "과목에 등록"
         next: 다음
-      enter_email: "이메일 주소를 입력하시기 바랍니다:"
       existing_user: "%{institution_name} 로그인을 가지고 있음"
       getting_started: "**%{course}**에 등록하는 중입니다."
       labels: 
-        email: 이메일
         name: "전체 이름"
         password: 암호
       new_user: "새 사용자입니다."
@@ -11509,15 +11054,6 @@ ko:
     components: 
       ic_submission-download-dialog: 
         click_to_download: "다운로드하려면 여기를 클릭"
-    conference: 
-      buttons: 
-        delete: "회의 삭제"
-        edit: "회의 세부 정보 편집"
-      course_conference: "과목 회의"
-      group_conference: "그룹 회의"
-      participant: 
-        one: "참여자 %{count}명"
-        other: "참여자 %{count}명"
     current_enrollment: 
       enrolled_as_designer: "디자이너로 등록"
       enrolled_as_observer: "감독자로 등록"
@@ -11584,9 +11120,13 @@ ko:
           email: "이메일 (선택 사항)"
     event_list: 
       at_least_more_events: "최소 %{count_of_events}건 이상"
+      at_least_more_events_one_week_future: "다음 주에 최소 %{count_of_events}건 이상"
+      at_least_more_events_two_weeks_future: "다음 두 주에 최소 %{count_of_events}건 이상"
       links: 
         view_calendar: "달력 보기"
       more_events: "%{count_of_events}건 이상"
+      more_events_one_week_future: "다음 주에 %{count_of_events}건 이상"
+      more_events_two_weeks_future: "다음 두 주에 %{count_of_events}건 이상"
       nothing_for_now: "현재 없음"
       nothing_one_week: "다음 주까지 없음"
       nothing_two_weeks: "다음 두 주까지 없음"
@@ -11811,7 +11351,6 @@ ko:
       labels: 
         custom_rating: "학생을 평가할 때 자유 형식의 의견을 작성하겠음"
         grading_rubric: "과제 평가에 이 루브릭 사용"
-        title: 제목
         total_points: 총점
         totallying_rubric: "평가 결과에 대한 총점 숨기기"
       links: 
@@ -11831,6 +11370,7 @@ ko:
       out_of: "%{points} */ %{total}*"
       rubric: 루브릭
       rubric_title: 제목
+      title: "제목:"
       titles: 
         find_existing_rubric: "기존 루브릭 찾기"
     rubric_criterion: 
@@ -11872,6 +11412,7 @@ ko:
       titles: 
         find_a_rubric: "루브릭 찾기"
     rubric_forms: 
+      criteria_description_label: "기준에 대한 설명"
       points: "%{points}점"
     rubric_summary: 
       buttons: 
@@ -11928,7 +11469,6 @@ ko:
         wiki_page_namem: "과제 이름"
       loading: "로드 중..."
       new_assignment_option: "[ 새 과제 ]"
-      new_file_option: "[ 새 파일 ]"
       new_page_option: "[ 새 페이지 ]"
       new_quiz_option: "[ 새 퀴즈 ]"
       new_topic_option: "[ 새 주제 ]"
@@ -12306,7 +11846,6 @@ ko:
       entry_no_image: "이 페이지가 제출 이후에 바뀌었다는 것을 염두에 두십시오."
       entry_with_image: "제출할 때 페이지가 어떻게 보였는지에 대한 스냅숏을 포함했습니다. 클릭하면 원본 제출물을 볼 수도 있습니다."
       external_url_submission: "이 제출물을 외부 페이지를 가리키는 URL입니다."
-      file_uploads_for_user: "**%{user}**의 파일 업로드"
       group_discussion_submission_description: "이 과제의 제출물은 그룹에 대한 과제 토론의 게시글입니다. 아래는 %{user}의 토론 게시글이며 *전체 그룹 토론*을 볼 수도 있습니다."
       media_comment_link: "이 제출물은 미디어 녹음/녹화입니다. *보려면 여기를 클릭하십시오*."
       no_files: "이 제출물에 대해 업로드한 파일 없음"
@@ -12323,6 +11862,7 @@ ko:
     submission_download: 
       download_message: "**학생 제출물을 수집해서** ZIP 파일로 압축합니다. 이 작업은 제출물 파일의 크기와 수에 따라 다소 시간이 걸릴 수도 있습니다."
       gathering_files: "파일 수집 중..."
+  submissions_11e96106: 제출물
   submit_a3cc6859: 제출
   support: 
     array: 
@@ -12333,6 +11873,7 @@ ko:
       two_words_connector: " 와(과) "
       words_connector: ", "
     help_menu: 
+      community_support_description: "동료와 교류하고 도움을 받을 수 있습니다."
       community_support_forums: "커뮤니티 사용자 지원 포럼"
       contact_support: "지원팀에 문의"
       contact_support_sub_text: "시간이 중요한 이슈에 대해 지원을 받습니다."
@@ -12484,6 +12025,7 @@ ko:
     outcome_artifacts: "성과 아티팩트"
     people: 사용자
     view_in_separate_window: "별도 창에 보기"
+  to_51406be9: "받는 사람"
   to_c4c44f4b: "다음 요일로"
   tooltips: 
     finished: 완료됨
@@ -12520,6 +12062,7 @@ ko:
   update_4d8ee62: 업데이트
   upload_button: 
     upload: 업로드
+  upload_data_dc4fa4cb: "데이터 업로드"
   upper_limit_of_range_c454a8f2: "범위의 상한"
   user: 
     default_user_name: 사용자
@@ -12649,11 +12192,11 @@ ko:
     descriptions: 
       delicious: "Delicious는 협업 링크 공유 도구입니다.  나중에 참조하기 위해서 인터넷에 있는 페이지를 태그할 수 있습니다. 또한 유사한 관심을 가진 다른 사용자의 Delicious 계정으로 링크할 수도 있습니다."
       diigo: "Diigo는 협업 링크 공유 도구입니다.  나중에 참조하기 위해서 인터넷에 있는 페이지를 태그할 수 있습니다.  또한 유사한 관심을 가진 다른 사용자의 Diigo 계정으로 링크할 수도 있습니다."
-      facebook: "Facebook 프로필을 나열하면 학급과 그룹에서 사귄 친구와 더 쉽게 연결할 수 있습니다."
       google_docs: "학생들은 그룹 프로젝트에서 협업을 위해 Google Docs를 사용할 수 있습니다.  Google Docs를 이용하면 문서, 스프레드시트, 프레젠테이션을 실시간으로 협업해서 편집할 수 있습니다."
       linked_in: "LinkedIn은 비지니스 네트워킹을 위한 리소스입니다.  학교에서 맺은 관계가 회사에 들어가서도 도움이 될 수 있습니다."
       skype: "Skype는 온라인 음성 및 화상 전화를 위한 무료 도구입니다."
       twitter: "Twitter는 학급 밖 통신을 위한 훌륭한 리소스입니다."
+  username_47bb5bbe: "사용자 이름"
   users: 
     admin_merge: 
       buttons: 
@@ -12719,8 +12262,6 @@ ko:
     errors: 
       no_teacher_courses: "이 교사와 학생 사이에 공유된 과목이 없음"
       user_not_teacher: "해당 사용자는 이 과목에서 교사가 아님"
-    facebook_added: "Facebook 계정을 성공적으로 추가함!"
-    facebook_fail: "Facebook 승인에 실패했습니다."
     google_docs_added: "Google Docs 액세스 승인됨!"
     google_docs_fail: "Google Docs 승인에 실패했습니다. 다시 시도하시기 바랍니다."
     grades: 
@@ -12936,6 +12477,7 @@ ko:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ 과목"
   webct_name: "Blackboard Vista/CE (WebCT)"
+  what_should_the_csv_file_look_like_985a59ac: "CSV 파일은 어떻게 보입니까?"
   widget: 
     upload_media_track_form: 
       choose_a_language: "--언어 선택--"
@@ -12995,6 +12537,7 @@ ko:
       buttons: 
         cancel: 취소
         save: 저장
+        save_and_publish: "저장 & 게시"
       course_editing_roles: 
         anyone: 모두
         only_teachers: 교사만
@@ -13046,6 +12589,7 @@ ko:
       title_characters: "제목은 하나의 글자나 숫자를 포함해야 함"
       title_too_long: "제목은 %{max_characters} 글자를 넘을 수 없음"
     unknown_user_name: "알 수 없음"
+  wiki_page_6c11ee20: "위키 페이지"
   wiki_pages: 
     index: 
       titles: 

@@ -1,5 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../cc_spec_helper')
 
+require 'nokogiri'
+
 describe "Canvas Cartridge importing" do
   before(:each) do
     @converter = get_cc_converter

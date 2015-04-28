@@ -120,4 +120,23 @@ describe "site-wide" do
       get '/'
     end
   end
+
+  it "should use the real user's timezone and locale setting when masquerading" do
+    @fake_user = user_with_pseudonym(:active_all => true)
+
+    user_with_pseudonym(:active_all => true)
+    account_admin_user(:user => @user)
+    @user.time_zone = "Hawaii"
+    @user.locale = "es"
+    @user.save!
+
+    user_session(@user)
+
+    post "/users/#{@fake_user.id}/masquerade"
+    get "/"
+
+    expect(assigns[:real_current_user]).to eq @user
+    expect(Time.zone.name).to eq "Hawaii"
+    expect(I18n.locale).to eq :es
+  end
 end

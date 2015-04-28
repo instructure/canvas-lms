@@ -41,5 +41,6 @@ We use jQuery UI button set
       border-bottom-left-radius: $baseBorderRadius;
     }
   }
+  input[type=checkbox] + label.ui-button, input[type=radio] + label.ui-button { vertical-align: middle; }
 }
 

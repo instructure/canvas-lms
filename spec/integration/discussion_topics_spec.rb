@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+require 'nokogiri'
+
 describe "discussion_topics" do
   def discussion_assignment
     assignment_model(:course => @course, :submission_types => 'discussion_topic', :title => 'Assignment Discussion')

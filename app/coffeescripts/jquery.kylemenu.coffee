@@ -5,6 +5,14 @@ define [
   'jqueryui/popup'
 ], ($) ->
 
+  ###
+  # PLEASE READ BEFORE MODIFYING THIS FILE:
+  # This provides the 'admin cog' menus amongst other things used throughout
+  # Canvas.  It has been extensively tested for accessibility.  Before making
+  # any changes to this file, please check with someone about the accessibility
+  # repercussions of what you intend to do.
+  ###
+
   class KyleMenu
     constructor: (trigger, options) ->
       @$trigger = $(trigger).data('kyleMenu', this)
@@ -51,7 +59,6 @@ define [
         menuselect: @select
         popupopen: @onOpen
         popupclose: @onClose
-        keydown: @onKeyDown
 
     onOpen: (event) =>
       @$ariaMenuWrapper.attr 'role', 'application'
@@ -59,9 +66,6 @@ define [
       @$menu.addClass 'ui-state-open'
       @$notifyParent.addClass('menu_active') if @opts.notifyMenuActiveOnParent
 
-
-    onKeyDown: (event) =>
-      @$trigger.focus() unless event.keyCode != 9
 
     open: ->
       @$menu.popup 'open'

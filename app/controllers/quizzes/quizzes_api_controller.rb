@@ -223,6 +223,11 @@
 #           "description": "Current version number of the quiz",
 #           "example": 3,
 #           "type": "integer"
+#         },
+#         "question_types": {
+#           "description": "List of question types in the quiz",
+#           "example": ["mutliple_choice", "essay"],
+#           "type": "array"
 #         }
 #       }
 #     }

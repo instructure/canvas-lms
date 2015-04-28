@@ -46,6 +46,9 @@
       {{#t "notify_users_text"}}Notify users that this content has changed{{/t}}
     </label>
     <a class="btn cancel" tabindex="0" role="button">{{#t "buttons.cancel"}}Cancel{{/t}}</a>
+    {{#unless published}}
+      <button class="btn btn-default save_and_publish">{{#t "buttons.save_and_publish"}}Save & Publish{{/t}}</button>
+    {{/unless}}
     <button class="btn btn-primary submit">{{#t "buttons.save"}}Save{{/t}}</button>
   </div>
 </div>

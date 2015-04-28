@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+
 # See the uploads controller and views for examples on how to use this model.
 class Attachment < ActiveRecord::Base
   def self.display_name_order_by_clause(table = nil)
@@ -61,6 +63,7 @@ class Attachment < ActiveRecord::Base
   has_one :sis_batch
   has_one :thumbnail, :foreign_key => "parent_id", :conditions => {:thumbnail => "thumb"}
   has_many :thumbnails, :foreign_key => "parent_id"
+  has_many :children, foreign_key: :root_attachment_id, class_name: 'Attachment'
   has_one :crocodoc_document
   has_one :canvadoc
   belongs_to :usage_rights
@@ -125,7 +128,7 @@ class Attachment < ActiveRecord::Base
   # immediately after save if no data is being uploading during this save cycle.
   # That means you can't rely on these happening in the same transaction as the save.
   after_save_and_attachment_processing :touch_context_if_appropriate
-  after_save_and_attachment_processing :build_media_object
+  after_save_and_attachment_processing :ensure_media_object
 
   # this mixin can be added to a has_many :attachments association, and it'll
   # handle finding replaced attachments. In other words, if an attachment fond
@@ -272,20 +275,35 @@ class Attachment < ActiveRecord::Base
     end
     dup.context = context
     dup.migration_id = CC::CCHelper.create_key(self)
-    context.log_merge_result("File \"#{dup.folder.full_name rescue ''}/#{dup.display_name}\" created") if context.respond_to?(:log_merge_result)
+    if context.respond_to?(:log_merge_result)
+      context.log_merge_result("File \"#{dup.folder && dup.folder.full_name}/#{dup.display_name}\" created")
+    end
     dup.updated_at = Time.now
     dup.clone_updated = true
+    dup.set_publish_state_for_usage_rights unless self.locked?
     dup
   end
 
-  def build_media_object
+  def ensure_media_object
     return true if self.class.skip_media_object_creation?
     in_the_right_state = self.file_state == 'available' && self.workflow_state !~ /^unattached/
-    transitioned_to_this_state = self.id_was == nil || self.file_state_changed? && self.workflow_state_was =~ /^unattached/
-    if in_the_right_state && transitioned_to_this_state &&
+    if in_the_right_state && self.media_entry_id == 'maybe' &&
         self.content_type && self.content_type.match(/\A(video|audio)/)
-      delay = Setting.get('attachment_build_media_object_delay_seconds', 10.to_s).to_i
-      MediaObject.send_later_enqueue_args(:add_media_files, { :run_at => delay.seconds.from_now, :priority => Delayed::LOWER_PRIORITY }, self, false)
+      build_media_object
+    end
+  end
+
+  def build_media_object
+    tag = 'add_media_files'
+    delay = Setting.get('attachment_build_media_object_delay_seconds', 10.to_s).to_i
+    progress = Progress.where(context_type: 'Attachment', context_id: self, tag: tag).last
+    progress ||= Progress.new context: self, tag: tag
+
+    if progress.new_record?
+      progress.reset!
+      progress.process_job(MediaObject, :add_media_files, { :run_at => delay.seconds.from_now, :priority => Delayed::LOWER_PRIORITY, :preserve_method_args => true, :max_attempts => 5 }, self, false) && true
+    else
+      progress.completed? && !progress.failed?
     end
   end
 
@@ -392,7 +410,7 @@ class Attachment < ActiveRecord::Base
       self.namespace = infer_namespace
     end
 
-    self.media_entry_id ||= 'maybe' if self.new_record? && self.content_type && self.content_type.match(/(video|audio)/)
+    self.media_entry_id ||= 'maybe' if self.new_record? && self.previewable_media?
   end
   protected :default_values
 
@@ -462,14 +480,12 @@ class Attachment < ActiveRecord::Base
           s3object.delete rescue nil
           self.root_attachment = existing_attachment
           write_attribute(:filename, nil)
-          clear_cached_urls
         else
           # it looks like we had a duplicate, but the existing attachment doesn't
           # actually have an s3object (probably from an earlier bug). update it
           # and all its inheritors to inherit instead from this attachment.
           existing_attachment.root_attachment = self
           existing_attachment.write_attribute(:filename, nil)
-          existing_attachment.clear_cached_urls
           existing_attachment.save!
           Attachment.where(root_attachment_id: existing_attachment).update_all(
             root_attachment_id: self,
@@ -822,88 +838,39 @@ class Attachment < ActiveRecord::Base
   end
   protected :infer_display_name
 
-  # Accepts an array of words and returns an array of words, some of them
-  # combined by a dash.
-  def dashed_map(words, n=30)
-    line_length = 0
-    words.inject([]) do |list, word|
-
-      # Get the length of the word
-      word_size = word.size
-      # Add 1 for the space preceding the word
-      # There is no space added before the first word
-      word_size += 1 unless list.empty?
-
-      # If adding a word takes us over our limit,
-      # join two words by a dash and insert that
-      if word_size >= n
-        word_pieces = []
-        ((word_size / 15) + 1).times do |i|
-          word_pieces << word[(i * 15)..(((i+1) * 15)-1)]
-        end
-        word = word_pieces.compact.select{|p| p.length > 0}.join('-')
-        list << word
-        line_length = word.size
-      elsif (line_length + word_size >= n) and not list.empty?
-        previous = list.pop
-        previous ||= ''
-        list << previous + '-' + word
-        line_length = word_size
-      # Otherwise just add the word to the list
-      else
-        list << word
-        line_length += word_size
-      end
-
-      # Return the list so that inject works
-      list
-    end
-  end
-  protected :dashed_map
-
-
   def readable_size
     h = ActionView::Base.new
     h.extend ActionView::Helpers::NumberHelper
     h.number_to_human_size(self.size) rescue "size unknown"
   end
 
-  def clear_cached_urls
-    Rails.cache.delete(['cacheable_s3_urls', self].cache_key)
+  def download_url
+    authenticated_s3_url(:expires => url_ttl, :response_content_disposition => "attachment; " + disposition_filename)
   end
 
-  def cacheable_s3_download_url
-    cacheable_s3_urls['attachment']
+  def inline_url
+    authenticated_s3_url(:expires => url_ttl, :response_content_disposition => "inline; " + disposition_filename)
   end
 
-  def cacheable_s3_inline_url
-    cacheable_s3_urls['inline']
+  def url_ttl
+    Setting.get('attachment_url_ttl', 1.day.to_s).to_i
   end
+  protected :url_ttl
 
-  def cacheable_s3_urls
-    self.shard.activate do
-      Rails.cache.fetch(['cacheable_s3_urls', self].cache_key, :expires_in => 24.hours) do
-        ascii_filename = Iconv.conv("ASCII//TRANSLIT//IGNORE", "UTF-8", display_name)
+  def disposition_filename
+    ascii_filename = Iconv.conv("ASCII//TRANSLIT//IGNORE", "UTF-8", display_name)
 
-        # response-content-disposition will be url encoded in the depths of
-        # aws-s3, doesn't need to happen here. we'll be nice and ghetto http
-        # quote the filename string, though.
-        quoted_ascii = ascii_filename.gsub(/([\x00-\x1f"\x7f])/, '\\\\\\1')
+    # response-content-disposition will be url encoded in the depths of
+    # aws-s3, doesn't need to happen here. we'll be nice and ghetto http
+    # quote the filename string, though.
+    quoted_ascii = ascii_filename.gsub(/([\x00-\x1f"\x7f])/, '\\\\\\1')
 
-        # awesome browsers will use the filename* and get the proper unicode filename,
-        # everyone else will get the sanitized ascii version of the filename
-        quoted_unicode = "UTF-8''#{URI.escape(display_name, /[^A-Za-z0-9.]/)}"
-        filename = %(filename="#{quoted_ascii}"; filename*=#{quoted_unicode})
-
-        # we need to have versions of the url for each content-disposition
-        {
-          'inline' => authenticated_s3_url(:expires => 6.days, :response_content_disposition => "inline; " + filename),
-          'attachment' => authenticated_s3_url(:expires => 6.days, :response_content_disposition => "attachment; " + filename)
-        }
-      end
-    end
+    # awesome browsers will use the filename* and get the proper unicode filename,
+    # everyone else will get the sanitized ascii version of the filename
+    quoted_unicode = "UTF-8''#{URI.escape(display_name, /[^A-Za-z0-9.]/)}"
+    %(filename="#{quoted_ascii}"; filename*=#{quoted_unicode})
   end
-  protected :cacheable_s3_urls
+  protected :disposition_filename
 
   def attachment_path_id
     a = (self.respond_to?(:root_attachment) && self.root_attachment) || self
@@ -1236,7 +1203,7 @@ class Attachment < ActiveRecord::Base
     end
   rescue => e
     update_attribute(:workflow_state, 'errored')
-    ErrorReport.log_exception(:canvadocs, e, :attachment_id => id)
+    Canvas::Errors.capture(e, type: :canvadocs, attachment_id: id)
 
     if attempt <= Setting.get('max_canvadocs_attempts', '5').to_i
       send_later_enqueue_args :submit_to_canvadocs, {
@@ -1256,7 +1223,7 @@ class Attachment < ActiveRecord::Base
     end
   rescue => e
     update_attribute(:workflow_state, 'errored')
-    ErrorReport.log_exception(:crocodoc, e, :attachment_id => id)
+    Canvas::Errors.capture(e, type: :canvadocs, attachment_id: id)
 
     if attempt <= Setting.get('max_crocodoc_attempts', '5').to_i
       send_later_enqueue_args :submit_to_crocodoc, {
@@ -1469,6 +1436,10 @@ class Attachment < ActiveRecord::Base
     "/api/v1/crocodoc_session?#{preview_params(user, "crocodoc")}"
   end
 
+  def previewable_media?
+    self.content_type && self.content_type.match(/\A(video|audio)/)
+  end
+
   def preview_params(user, type)
     blob = {
       user_id: user.try(:global_id),
@@ -1482,6 +1453,15 @@ class Attachment < ActiveRecord::Base
 
   def can_unpublish?
     false
+  end
+
+  def set_publish_state_for_usage_rights
+    if self.context &&
+       self.context.respond_to?(:feature_enabled?) &&
+       self.context.feature_enabled?(:better_file_browsing) &&
+       self.context.feature_enabled?(:usage_rights_required)
+      self.locked = self.usage_rights.nil?
+    end
   end
 
   # Download a URL using a GET request and return a new un-saved Attachment

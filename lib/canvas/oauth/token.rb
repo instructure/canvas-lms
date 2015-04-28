@@ -46,14 +46,22 @@ module Canvas::Oauth
       Canvas.redis.get("#{REDIS_PREFIX}#{code}").presence || "{}"
     end
 
-    def access_token
+    def create_access_token_if_needed(replace_tokens = false)
       @access_token ||= self.class.find_reusable_access_token(user, key, scopes, purpose)
 
       if @access_token.nil?
+        # Clear other tokens issued under the same developer key if requested
+        user.access_tokens.where(developer_key_id: key).destroy_all if replace_tokens || key.replace_tokens
+
+        # Then create a new one
         @access_token = user.access_tokens.create!({:developer_key => key, :remember_access => remember_access?, :scopes => scopes, :purpose => purpose})
 
         @access_token.clear_full_token! if @access_token.scoped_to?(['userinfo'])
       end
+    end
+
+    def access_token
+      create_access_token_if_needed
       @access_token
     end
 

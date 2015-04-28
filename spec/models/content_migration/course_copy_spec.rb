@@ -127,6 +127,20 @@ describe ContentMigration do
       expect(page_to.body).to eq body % [@copy_to.id, tag_to.id]
     end
 
+    it "should translate links to modules in quiz content" do
+      skip unless Qti.qti_enabled?
+
+      mod1 = @copy_from.context_modules.create!(:name => "some module")
+      body = %{<p>Link to module: <a href="/courses/%s/modules/%s">some module</a></p>}
+      quiz = @copy_from.quizzes.create!(:title => "some page", :description => body % [@copy_from.id, mod1.id])
+
+      run_course_copy
+
+      mod1_to = @copy_to.context_modules.where(migration_id: mig_id(mod1)).first
+      quiz_to = @copy_to.quizzes.where(migration_id: mig_id(quiz)).first
+      expect(quiz_to.description).to eq body % [@copy_to.id, mod1_to.id]
+    end
+
     it "should be able to copy links to files in folders with html entities and unicode in path" do
       root_folder = Folder.root_folders(@copy_from).first
       folder1 = root_folder.sub_folders.create!(:context => @copy_from, :name => "mol&eacute;")
@@ -292,7 +306,7 @@ describe ContentMigration do
       expect(rub2.workflow_state).to eq 'active'
       expect(rub2.rubric_associations.first.bookmarked).to eq true
       expect(@copy_to.created_learning_outcomes.where(migration_id: mig_id(lo)).first.workflow_state).to eq 'active'
-      expect(@copy_to.quizzes.where(migration_id: mig_id(quiz)).first.workflow_state).to eq 'created' if Qti.qti_enabled?
+      expect(@copy_to.quizzes.where(migration_id: mig_id(quiz)).first.workflow_state).to eq 'unpublished' if Qti.qti_enabled?
       expect(@copy_to.context_external_tools.where(migration_id: mig_id(tool)).first.workflow_state).to eq 'public'
       expect(@copy_to.assignment_groups.where(migration_id: mig_id(ag)).first.workflow_state).to eq 'available'
       expect(@copy_to.assignments.where(migration_id: mig_id(asmnt)).first.workflow_state).to eq asmnt.workflow_state
@@ -329,6 +343,7 @@ describe ContentMigration do
       @copy_from.grading_standard_enabled = true
       @copy_from.is_public = true
       @copy_from.public_syllabus = true
+      @copy_from.lock_all_announcements = true
       @copy_from.save!
 
       run_course_copy
@@ -346,6 +361,7 @@ describe ContentMigration do
       expect(@copy_to.course_code).to eq "tocourse"
       expect(@copy_to.is_public).to eq true
       expect(@copy_to.public_syllabus).to eq true
+      expect(@copy_to.lock_all_announcements).to eq true
       atts = Course.clonable_attributes
       atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
       atts.each do |att|

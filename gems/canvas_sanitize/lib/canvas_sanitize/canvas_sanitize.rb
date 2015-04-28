@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'sanitize'
+
 module CanvasSanitize #:nodoc:
   def self.included(klass)
     klass.extend(ClassMethods)
@@ -86,6 +88,8 @@ module CanvasSanitize #:nodoc:
                    'id',
                    'title',
                    'role',
+                   'lang',
+                   'dir',
                    'aria-labelledby',
                    'aria-atomic',
                    'aria-busy',
@@ -133,7 +137,7 @@ module CanvasSanitize #:nodoc:
           'iframe' => ['src', 'width', 'height', 'name', 'align', 'frameborder', 'scrolling', 'sandbox', 'allowfullscreen','webkitallowfullscreen','mozallowfullscreen'],
           'ol' => ['start', 'type'],
           'q' => ['cite'],
-          'table' => ['summary', 'width', 'border', 'cellpadding', 'cellspacing', 'center', 'frame', 'rules', 'dir', 'lang'],
+          'table' => ['summary', 'width', 'border', 'cellpadding', 'cellspacing', 'center', 'frame', 'rules'],
           'tr' => ['align', 'valign', 'dir'],
           'td' => ['abbr', 'axis', 'colspan', 'rowspan', 'width', 'align', 'valign', 'dir'],
           'th' => ['abbr', 'axis', 'colspan', 'rowspan', 'width', 'align', 'valign', 'dir', 'scope'],

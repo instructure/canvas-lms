@@ -1,11 +1,14 @@
 define [
+  'underscore'
   'i18n!outcomes'
-], (I18n) ->
+], (_, I18n) ->
 
   class CalculationMethodContent
-    constructor: (@model) ->
-      @calculation_method = @model.get('calculation_method')
-      @calculation_int = @model.get('calculation_int')
+    constructor: (model) ->
+      # We can pass in a straight object or a backbone model
+      _.each(['calculation_method', 'calculation_int'], (attr) =>
+        @[attr] = if model.get? then model.get(attr) else model[attr]
+      )
 
     present: ->
       @toJSON()[@calculation_method]
@@ -33,6 +36,6 @@ define [
         exResult: "3"
       highest:
         method: I18n.t("Highest Score")
-        exampleText: I18n.t("Mastery scrore reflects the highest score of a graded assignment or quiz."),
+        exampleText: I18n.t("Mastery score reflects the highest score of a graded assignment or quiz."),
         exScores: "5, 3, 4, 2",
         exResult: "5"

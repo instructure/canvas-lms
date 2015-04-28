@@ -62,41 +62,6 @@ describe CalendarsController do
     end
   end
 
-  describe "POST 'switch_calendar'" do
-    it "should not switch to the old calendar anymore" do
-      expect(@user.preferences[:use_calendar1]).to be_nil
-
-      post 'switch_calendar', {:preferred_calendar => '1'}
-      expect(response).to redirect_to(calendar2_url(anchor: ' '))
-      expect(@user.reload.preferences[:use_calendar1]).to be_truthy
-    end
-
-    it "should not switch to the old calendar if not allowed" do
-      expect(@user.preferences[:use_calendar1]).to be_nil
-      post 'switch_calendar', {:preferred_calendar => '1'}
-      expect(response).to redirect_to(calendar2_url(anchor: ' '))
-
-      # not messing with their preference in case they prefer cal1 in a
-      # different account
-      expect(@user.reload.preferences[:use_calendar1]).to be_truthy
-    end
-
-    it "should redirect to new calendar regardless of old preference settings" do
-      expect(@user.preferences[:use_calendar1]).to be_nil
-
-      post 'switch_calendar', {:preferred_calendar => '2'}
-      expect(response).to redirect_to(calendar2_url(anchor: ' '))
-      expect(@user.reload.preferences[:use_calendar1]).to be_nil
-    end
-
-    it "should switch to the new calendar if allowed" do
-      @user.update_attribute(:preferences, {:use_calendar1 => true})
-
-      post 'switch_calendar', {:preferred_calendar => '2'}
-      expect(response).to redirect_to(calendar2_url(anchor: ' '))
-      expect(@user.reload.preferences[:use_calendar1]).to be_nil
-    end
-  end
 end
 
 describe CalendarEventsApiController do

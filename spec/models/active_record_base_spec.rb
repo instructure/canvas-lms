@@ -97,6 +97,24 @@ describe ActiveRecord::Base do
       expect(es).to eq [@e1.id,@e2.id,@e3.id,@e4.id,@e5.id,@e6.id]
     end
 
+    it "should pluck" do
+      scope = Course.where(id: [@c1, @c2])
+      cs = []
+      scope.find_in_batches_with_temp_table(batch_size: 1, pluck: :id) do |batch|
+        cs.concat(batch)
+      end
+      expect(cs.sort).to eq [@c1.id, @c2.id].sort
+    end
+
+    it "should pluck with join" do
+      scope = Enrollment.joins(:course).where(courses: { id: [@c1, @c2] })
+      es = []
+      scope.find_in_batches_with_temp_table(batch_size: 2, pluck: :id) do |batch|
+        es.concat(batch)
+      end
+      expect(es.sort).to eq [@e1.id, @e2.id, @e3.id, @e4.id, @e5.id, @e6.id].sort
+    end
+
     it "should honor includes when using a cursor" do
       skip "needs PostgreSQL" unless Account.connection.adapter_name == 'PostgreSQL'
       Account.default.courses.create!

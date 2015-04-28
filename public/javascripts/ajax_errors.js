@@ -24,75 +24,11 @@ define([
   'compiled/jquery.rails_flash_notifications', // flashError
   'jqueryui/effects/drop'
 ], function(INST, I18n, $, htmlEscape) {
-
-  var iTest = window.iTest;
-
-  INST.errorURL = '/record_js_error';
   INST.errorCount = 0;
-  INST.errorLastHandledTimes = {};
-  INST.log_error = function(params) {
-    params = params || {};
-    var timestamp = +new Date();
-    // log errors with the same message once every 5 seconds at most.
-    // (so we don't fill the DOM with logging gifs)
-    if (INST.errorLastHandledTimes[params.message] > timestamp - 5000) return;
-    INST.errorLastHandledTimes[params.message] = timestamp;
-    var username = "";
-    try {
-      username = $ && $.fn && $.fn.text && $("#identity .user_name").text();
-    } catch(e) {
-      //you can't try/catch inside window.onerror in firefox, so we really dont want to get here ever.
-    }
-    var txt = "?";
-    params.url = params.url || location.href;
-    params.backtrace = params.backtrace || params.url;
-    params.platform = params.platform || navigator.platform;
-    params.action = params.action || location.href;
-    params.user_name = username;
-    params.user_agent = navigator.userAgent;
-    params.parentPage = window.location;
-    for(var idx in params) {
-      txt = txt + 'error[' + idx + "]=" + encodeURIComponent(params[idx]) + "&";
-    }
-    txt = txt.substring(0, 2000);
-    // make sure we don't leave hanging broken %-encodings on the end
-    if (txt.length >= 1 && txt[txt.length - 1] === '%') {
-      txt = txt.substring(0, txt.length - 1);
-    } else if (txt.length >= 2 && txt[txt.length - 2] === '%') {
-      txt = txt.substring(0, txt.length - 2);
-    }
-    INST.errorCount += 1;
-
-    // doing this old-school in case something happend where jquery is not loaded.
-    var img = document.createElement('img');
-    img.src = INST.errorURL + txt;
-    img.style.position = 'absolute';
-    img.style.left = '-10000px';
-    img.style.top= 0;
-    document.body.appendChild(img);
-  }
   window.onerror = function (msg, url, line, column, errorObj) {
-    // these are errors that the actionScript in scrbd creates.
-    var ignoredErrors = ["webkitSafeEl", "NPMethod called on non-NPObject wrapped JSObject!"];
-    for(var idx in ignoredErrors) {
-      if(ignoredErrors[idx] && msg && msg.match && msg.match(ignoredErrors[idx])) {
-        return true;
-      }
-    }
-    // we're going to ignore errors generated from javascript that isn't served from canvas.
-    // this prevents a whole ton of errors about not being able to load google
-    // analytics because of firewall rules, etc.
-    if (url && url.match && !url.match(window.location.hostname)) {
-      return true;
-    }
-
-    var backtrace = errorObj && errorObj.stack;
-    INST.log_error({ message: msg, url: url, line: line, column: column, backtrace: backtrace});
+    INST.errorCount += 1;
     if(INST.environment == "production") {
       return true;
-    }
-    if(iTest) {
-      iTest.ok(false, 'unexpected error: ' + msg);
     }
   };
 

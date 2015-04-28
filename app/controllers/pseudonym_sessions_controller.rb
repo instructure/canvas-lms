@@ -16,12 +16,19 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'barby'
+require 'barby/barcode/qr_code'
+require 'barby/outputter/png_outputter'
+require 'casclient'
+require 'rotp'
+require 'securerandom'
+
 class PseudonymSessionsController < ApplicationController
-  protect_from_forgery :except => [:create, :destroy, :saml_logout, :saml_consume, :oauth2_token, :oauth2_logout, :cas_logout]
+  protect_from_forgery :except => [:create, :saml_logout, :saml_consume, :cas_logout]
   before_filter :forbid_on_files_domain, :except => [ :clear_file_session ]
   before_filter :require_password_session, :only => [ :otp_login, :disable_otp_login ]
   before_filter :require_user, :only => [ :otp_login ]
-  before_filter :run_login_hooks, :only => [:new, :create, :otp_login, :saml_consume, :oauth2_token]
+  before_filter :run_login_hooks, :only => [:new, :create, :otp_login, :saml_consume]
   skip_before_filter :require_reacceptance_of_terms
 
   def new
@@ -32,7 +39,7 @@ class PseudonymSessionsController < ApplicationController
 
     if params[:needs_cookies] == '1'
       @needs_cookies = true
-      return render(:template => 'shared/unauthorized', :layout => 'application', :status => :unauthorized)
+      return render 'shared/unauthorized', :layout => 'application', :status => :unauthorized
     end
 
     session[:expected_user_id] = params[:expected_user_id].to_i if params[:expected_user_id]
@@ -60,7 +67,13 @@ class PseudonymSessionsController < ApplicationController
         logger.info "Attempting CAS login with ticket #{params[:ticket]} in account #{@domain_root_account.id}"
         st = CASClient::ServiceTicket.new(params[:ticket], cas_login_url)
         begin
-          cas_client.validate_service_ticket(st)
+          default_timeout = Setting.get('cas_timelimit', 5.seconds.to_s).to_f
+
+          timeout_options = { raise_on_timeout: true, fallback_timeout_length: default_timeout }
+
+          Canvas.timeout_protection("cas:#{@domain_root_account.account_authorization_config.global_id}", timeout_options) do
+            cas_client.validate_service_ticket(st)
+          end
         rescue => e
           logger.warn "Failed to validate CAS ticket: #{e.inspect}"
           flash[:delegated_message] = t 'errors.login_error', "There was a problem logging in at %{institution}", :institution => @domain_root_account.display_name
@@ -132,10 +145,10 @@ class PseudonymSessionsController < ApplicationController
         :RESET_SENT =>  t("password_confirmation_sent", "Password confirmation sent. Make sure you check your spam box."),
         :RESET_ERROR =>  t("password_confirmation_error", "Error sending request.")
       )
-      render :template => 'pseudonym_sessions/mobile_login', :layout => 'mobile_auth', :status => status
+      render :mobile_login, :layout => 'mobile_auth', :status => status
     else
       @request = request
-      render :action => 'new', :status => status
+      render :new, :status => status
     end
   end
 
@@ -218,25 +231,7 @@ class PseudonymSessionsController < ApplicationController
 
   # DELETE /logout
   def destroy
-    # Only allow DELETE method for all logout requests except for SAML.
-    if saml_response? || saml_request?
-      saml_logout
-    else
-      # We can't verify the authenticity token for saml, so we do it in
-      # this branch rather than in the before filter.
-      #
-      # This also allows us to show the logout confirmation screen rather than
-      # an error if the token is invalid -- this can happen, for example, if
-      # they log out and back in on a 2nd tab, and then click logout on the 1st
-      # tab.
-      begin
-        return unless verify_authenticity_token
-      rescue ActionController::InvalidAuthenticityToken
-        return redirect_to(logout_url)
-      end
-
-      logout_user_action
-    end
+    logout_user_action
   end
 
   # GET /logout
@@ -330,7 +325,7 @@ class PseudonymSessionsController < ApplicationController
   def clear_file_session
     session.delete('file_access_user_id')
     session.delete('file_access_expiration')
-    session[:permissions_key] = CanvasUUID.generate
+    session[:permissions_key] = SecureRandom.uuid
 
     render :text => "ok"
   end
@@ -477,7 +472,7 @@ class PseudonymSessionsController < ApplicationController
     end
   end
 
-  # POST /logout
+  # GET /saml_logout
   def saml_logout
     if saml_response?
       increment_saml_stat("logout_response_received")
@@ -534,7 +529,7 @@ class PseudonymSessionsController < ApplicationController
     else
       @message = 'SAML Logout request requires a SAMLResponse parameter on a SAML enabled account.'
       respond_to do |format|
-        format.html { render :template => 'shared/errors/400_message', :status => :bad_request }
+        format.html { render 'shared/errors/400_message', :status => :bad_request }
         format.json { render :json => { message: @message }, :status => :bad_request }
       end
     end
@@ -590,7 +585,7 @@ class PseudonymSessionsController < ApplicationController
       @cc.try(:send_later_if_production_enqueue_args, :send_otp!, { :priority => Delayed::HIGH_PRIORITY, :max_attempts => 1 }, ROTP::TOTP.new(secret_key).now)
     end
 
-    return render :action => 'otp_login' unless params[:otp_login].try(:[], :verification_code)
+    return render :otp_login unless params[:otp_login].try(:[], :verification_code)
 
     verification_code = params[:otp_login][:verification_code]
     if Canvas.redis_enabled?
@@ -661,6 +656,12 @@ class PseudonymSessionsController < ApplicationController
     CanvasBreachMitigation::MaskingSecrets.reset_authenticity_token!(cookies)
     Auditors::Authentication.record(@current_pseudonym, 'login')
 
+    # Since the user just logged in, we'll reset the context to include their info.
+    setup_live_events_context
+    # TODO: Only send this if the current_pseudonym's root account matches the current root
+    # account?
+    Canvas::LiveEvents.logged_in(session)
+
     otp_passed ||= @current_user.validate_otp_secret_key_remember_me_cookie(cookies['canvas_otp_remember_me'], request.remote_ip)
     if !otp_passed
       mfa_settings = @current_user.mfa_settings
@@ -690,7 +691,7 @@ class PseudonymSessionsController < ApplicationController
     respond_to do |format|
       if oauth = session[:oauth2]
         provider = Canvas::Oauth::Provider.new(oauth[:client_id], oauth[:redirect_uri], oauth[:scopes], oauth[:purpose])
-        return oauth2_confirmation_redirect(provider)
+        return redirect_to Canvas::Oauth::Provider.confirmation_redirect(self, provider, @current_user)
       elsif session[:course_uuid] && user && (course = Course.where(uuid: session[:course_uuid], workflow_state: "created").first)
         claim_session_course(course, user)
         format.html { redirect_to(course_url(course, :login_success => '1')) }
@@ -730,103 +731,8 @@ class PseudonymSessionsController < ApplicationController
   def logout_current_user
     CanvasBreachMitigation::MaskingSecrets.reset_authenticity_token!(cookies)
     Auditors::Authentication.record(@current_pseudonym, 'logout')
+    Canvas::LiveEvents.logged_out
     Lti::LogoutService.queue_callbacks(@current_pseudonym)
     super
-  end
-
-  def oauth2_auth
-    if params[:code] || params[:error]
-      # hopefully the user never sees this, since it's an oob response and the
-      # browser should be closed automatically. but we'll at least display
-      # something basic.
-      return render()
-    end
-
-    scopes =  params[:scopes].split(',') if params.key? :scopes
-    scopes ||= []
-
-    provider = Canvas::Oauth::Provider.new(params[:client_id], params[:redirect_uri], scopes, params[:purpose])
-
-    return render(:status => 400, :json => { :message => "invalid client_id" }) unless provider.has_valid_key?
-    return render(:status => 400, :json => { :message => "invalid redirect_uri" }) unless provider.has_valid_redirect?
-    session[:oauth2] = provider.session_hash
-    session[:oauth2][:state] = params[:state] if params.key?(:state)
-
-    if @current_pseudonym && !params[:force_login]
-      oauth2_confirmation_redirect(provider)
-    else
-      redirect_to login_url(params.slice(:canvas_login, :pseudonym_session, :force_login))
-    end
-  end
-
-  def oauth2_confirm
-    @provider = Canvas::Oauth::Provider.new(session[:oauth2][:client_id], session[:oauth2][:redirect_uri], session[:oauth2][:scopes], session[:oauth2][:purpose])
-
-    if mobile_device?
-      js_env :GOOGLE_ANALYTICS_KEY => Setting.get('google_analytics_key', nil)
-      render :layout => 'mobile_auth', :action => 'oauth2_confirm_mobile'
-    end
-  end
-
-  def oauth2_accept
-    redirect_params = final_oauth2_redirect_params(:remember_access => params[:remember_access])
-    final_oauth2_redirect(session[:oauth2][:redirect_uri], redirect_params)
-  end
-
-  def oauth2_deny
-    final_oauth2_redirect(session[:oauth2][:redirect_uri], :error => "access_denied")
-  end
-
-  def oauth2_token
-    basic_user, basic_pass = ActionController::HttpAuthentication::Basic.user_name_and_password(request) if request.authorization
-
-    client_id = params[:client_id].presence || basic_user
-    secret = params[:client_secret].presence || basic_pass
-
-    provider = Canvas::Oauth::Provider.new(client_id)
-    return render(:status => 400, :json => { :message => "invalid client_id" }) unless provider.has_valid_key?
-    return render(:status => 400, :json => { :message => "invalid client_secret" }) unless provider.is_authorized_by?(secret)
-
-    token = provider.token_for(params[:code])
-    return render(:status => 400, :json => { :message => "invalid code" }) unless token.is_for_valid_code?
-
-    Canvas::Oauth::Token.expire_code(params[:code])
-
-    render :json => token
-  end
-
-  def oauth2_logout
-    logout_current_user if params[:expire_sessions]
-    return render :json => { :message => "can't delete OAuth access token when not using an OAuth access token" }, :status => 400 unless @access_token
-    @access_token.destroy
-    render :json => {}
-  end
-
-  def oauth2_confirmation_redirect(provider)
-    # skip the confirmation page if access is already (or automatically) granted
-    if provider.authorized_token?(@current_user)
-      final_oauth2_redirect(session[:oauth2][:redirect_uri], final_oauth2_redirect_params)
-    else
-      redirect_to oauth2_auth_confirm_url
-    end
-  end
-
-  def final_oauth2_redirect_params(options = {})
-    options = {:scopes => session[:oauth2][:scopes], :remember_access => options[:remember_access], :purpose => session[:oauth2][:purpose]}
-    code = Canvas::Oauth::Token.generate_code_for(@current_user.global_id, session[:oauth2][:client_id], options)
-    redirect_params = { :code => code }
-    redirect_params[:state] = session[:oauth2][:state] if session[:oauth2][:state]
-    redirect_params
-  end
-
-  def final_oauth2_redirect(redirect_uri, opts = {})
-    if Canvas::Oauth::Provider.is_oob?(redirect_uri)
-      redirect_to oauth2_auth_url(opts)
-    else
-      has_params = redirect_uri =~ %r{\?}
-      redirect_to(redirect_uri + (has_params ? "&" : "?") + opts.to_query)
-    end
-
-    session.delete(:oauth2)
   end
 end

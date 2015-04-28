@@ -85,7 +85,7 @@ describe DataFixup::FixAuditLogUuidIndexes do
 
   def corrupt_grade_changes
     event_id = CanvasSlug.generate
-    CanvasUUID.stubs(:generate).returns(event_id)
+    SecureRandom.stubs(:uuid).returns(event_id)
 
     (1..4).each do |i|
       time = Time.now - i.days
@@ -104,7 +104,7 @@ describe DataFixup::FixAuditLogUuidIndexes do
     # Lets simulate a deleted submission
     @submission.delete
 
-    CanvasUUID.unstub(:generate)
+    SecureRandom.unstub(:uuid)
 
     { event_id: event_id, count: 4 }
   end
@@ -112,7 +112,7 @@ describe DataFixup::FixAuditLogUuidIndexes do
   def corrupt_course_changes
     event_id = CanvasSlug.generate
     courses = []
-    CanvasUUID.stubs(:generate).returns(event_id)
+    SecureRandom.stubs(:uuid).returns(event_id)
 
     (1..3).each do |i|
       time = Time.now - i.days
@@ -124,14 +124,14 @@ describe DataFixup::FixAuditLogUuidIndexes do
       end
     end
 
-    CanvasUUID.unstub(:generate)
+    SecureRandom.unstub(:uuid)
 
     { event_id: event_id, count: 3, courses: courses }
   end
 
   def corrupt_authentications
     event_id = CanvasSlug.generate
-    CanvasUUID.stubs(:generate).returns(event_id)
+    SecureRandom.stubs(:uuid).returns(event_id)
 
     (1..3).each do |i|
       time = Time.now - i.days
@@ -142,7 +142,7 @@ describe DataFixup::FixAuditLogUuidIndexes do
       end
     end
 
-    CanvasUUID.unstub(:generate)
+    SecureRandom.unstub(:uuid)
 
     { event_id: event_id, count: 3 }
   end
@@ -192,12 +192,12 @@ describe DataFixup::FixAuditLogUuidIndexes do
   it "fixes index rows as they are queried for the same key" do
     event_id = CanvasSlug.generate
     course_with_teacher
-    CanvasUUID.stubs(:generate).returns(event_id)
+    SecureRandom.stubs(:uuid).returns(event_id)
     Auditors::Course.record_created(@course, @teacher, { name: @course.name }, source: :manual)
     Timecop.freeze(Time.now + 1.hour) do
       Auditors::Course.record_updated(@course, @teacher, { name: @course.name }, source: :manual)
     end
-    CanvasUUID.unstub(:generate)
+    SecureRandom.unstub(:uuid)
 
     expect(Auditors::Course.for_course(@course).paginate(per_page: 5).size).to eq 2
   end
@@ -206,7 +206,7 @@ describe DataFixup::FixAuditLogUuidIndexes do
     users = []
     pseudonyms = []
     event_id = CanvasSlug.generate
-    CanvasUUID.stubs(:generate).returns(event_id)
+    SecureRandom.stubs(:uuid).returns(event_id)
     (1..3).each do |i|
       time = Time.now - i.days
 
@@ -221,7 +221,7 @@ describe DataFixup::FixAuditLogUuidIndexes do
         end
       end
     end
-    CanvasUUID.unstub(:generate)
+    SecureRandom.unstub(:uuid)
 
     users.each do |user|
       expect(Auditors::Authentication.for_user(user).paginate(per_page: 5).size).to eq 2

@@ -1,6 +1,15 @@
 module Quizzes::QuizQuestion::AnswerSerializers
   class FileUpload < Quizzes::QuizQuestion::AnswerSerializers::AnswerSerializer
+
+    # @example output where the question ID is 5
+    # {
+    #   question_5_answer: "123"
+    # }
     def serialize(*args)
+      rc = SerializedAnswer.new
+
+      rc.answer[question_key] = args
+      rc
     end
 
     # @return [String|NilClass]

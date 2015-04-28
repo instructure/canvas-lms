@@ -181,18 +181,11 @@ describe "gradebook2" do
         get "/courses/#{@course.id}/gradebook2"
       end
 
-      it "should not allow editing grades" do
+      it "should allow editing grades" do
         cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
         expect(cell.text).to eq '10'
         cell.click
-        expect(ff('.grade', cell)).to be_blank
-      end
-
-      it "should hide mutable actions from the menu" do
-        open_gradebook_settings do |menu|
-          expect(ff("a.gradebook_upload_link", menu)).to be_blank
-          expect(ff("a.set_group_weights", menu)).to be_blank
-        end
+        expect(ff('.grade', cell)).to_not be_blank
       end
     end
 
@@ -811,27 +804,6 @@ describe "gradebook2" do
       f("#only_consider_graded_assignments").click
       wait_for_ajax_requests
       expect(f(".final_grade .grade")).to include_text("12.5")
-    end
-  end
-
-  describe "outcome gradebook" do
-    before(:each) do
-      gradebook_data_setup
-    end
-
-    it "should not be visible by default" do
-      get "/courses/#{@course.id}/gradebook2"
-      expect(ff('.gradebook-navigation').length).to eq 0
-    end
-
-    it "should be visible when enabled" do
-      Account.default.set_feature_flag!('outcome_gradebook', 'on')
-      get "/courses/#{@course.id}/gradebook2"
-      expect(ff('.gradebook-navigation').length).to eq 1
-
-      f('a[data-id=outcome]').click
-      wait_for_ajaximations
-      expect(f('.outcome-gradebook-container')).not_to be_nil
     end
   end
 

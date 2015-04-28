@@ -123,6 +123,7 @@ define([
       $criterion.find(".criterion_description").val(outcome.get('title')).focus().select();
 
       $criterion.find(".mastery_points").text(outcome.get('mastery_points'));
+      $criterion.find(".links").remove();
     },
     hideCriterionAdd: function($rubric) {
       $rubric.find('.add_right, .add_left, .add_column').removeClass('add_left add_right add_column');
@@ -438,6 +439,9 @@ define([
           $rating.fillTemplateData({data: rating});
           $criterion.find(".ratings").append($rating);
         });
+        if (criterion.learning_outcome_id) {
+          $criterion.find(".links").remove();
+        }
         $rubric.find(".summary").before($criterion);
         $criterion.find(".criterion_points").val(criterion.points).blur();
       });
@@ -474,8 +478,8 @@ define([
       if(editing && !isLearningOutcome) {
         $rubric_long_description_dialog
           .fillFormData(data)
-          .find('.editing').show()
-          .find(".displaying").hide();
+          .find('.editing').show().end()
+          .find(".displaying").hide().end();
       } else {
         if(!isLearningOutcome) {
           // We want to prevent XSS in this dialog but users expect to have line
@@ -501,8 +505,14 @@ define([
         .data('current_criterion', $criterion)
         .dialog({
           title: I18n.t('titles.criterion_long_description', "Criterion Long Description"),
-          width: 400
-        }).fixDialogButtons().find("textarea:visible:first").focus().select();
+          width: 400,
+          buttons: []
+        });
+
+      if(editing && !isLearningOutcome) {
+        $rubric_long_description_dialog.fixDialogButtons();
+        $rubric_long_description_dialog.find("textarea:visible:first").focus().select();
+      }
     })
     .delegate(".find_rubric_link", 'click', function(event) {
       event.preventDefault();
@@ -700,6 +710,7 @@ define([
         }
         var rubric = data.rubric;
         rubric.rubric_association_id = data.rubric_association.id;
+        rubric.use_for_grading = data.rubric_association.use_for_grading;
         rubric.permissions = rubric.permissions || {};
         if(data.rubric_association.permissions) {
           rubric.permissions.update_association = data.rubric_association.permissions.update;
@@ -745,10 +756,16 @@ define([
               $("#edit_rubric_form").submit();
             };
             $confirmDialog.dialog({
-              buttons: {
-                "Change" : closeDialog,
-                "Leave different" : function(){ closeDialog(true); }
-              },
+              buttons: [
+                {
+                  text: I18n.t('change', 'Change'),
+                  click: closeDialog
+                },
+                {
+                  text: I18n.t('leave_different', "Leave different"),
+                  click: function() { closeDialog(true); }
+                }
+              ],
               width: 320,
               resizable: false,
               close: $confirmDialog.remove
@@ -780,6 +797,7 @@ define([
         var rubric = data.rubric;
         $rubric.loadingImage('remove');
         rubric.rubric_association_id = data.rubric_association.id;
+        rubric.use_for_grading = data.rubric_association.use_for_grading;
         rubric.permissions = rubric.permissions || {};
         if(data.rubric_association.permissions) {
           rubric.permissions.update_association = data.rubric_association.permissions.update;

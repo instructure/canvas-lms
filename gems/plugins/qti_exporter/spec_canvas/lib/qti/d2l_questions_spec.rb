@@ -67,6 +67,10 @@ describe "Converting D2L QTI" do
     expect(get_quiz_data(d2l_question_dir, 'assessment_references', @opts).last.first).to eq D2LExpected::ASSESSMENT_REFS
   end
 
+  it "should convert text only questions" do
+    expect(get_quiz_data(d2l_question_dir, 'text_only', @opts).first).to eq D2LExpected::TEXT_ONLY
+  end
+
 end
 
 module D2LExpected
@@ -296,5 +300,22 @@ module D2LExpected
                   :points_possible => 1,
                   :question_bank_name => "02gilback",
                   :question_text => "<p>According to the class handout Basic Principles to Enhance Memory which of the following are effective ways to remember?</p>"}
+
+  TEXT_ONLY = [{:answers => [],
+                 :correct_comments => "",
+                 :incorrect_comments => "",
+                 :points_possible => 1,
+                 :question_text => "<p>Is this <strong>true</strong> or false?</p>",
+                 :question_name => "text only q 1",
+                 :migration_id => "QUES_968903_1181388",
+                 :question_type => "text_only_question"},
+                {:answers => [],
+                 :correct_comments => "",
+                 :incorrect_comments => "",
+                 :points_possible => 1,
+                 :question_text => "<img src=\"quizzing/bunny_consumer.png\" alt=\"\">",
+                 :question_name => "text only q 2",
+                 :migration_id => "QUES_968903_1181388b",
+                 :question_type => "text_only_question"}]
 end
 end

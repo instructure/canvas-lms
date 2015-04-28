@@ -1,3 +1,6 @@
+require 'nokogiri'
+require 'sanitize'
+
 module Qti
 class AssessmentItemConverter
   include Canvas::Migration::XMLHelper
@@ -52,7 +55,7 @@ class AssessmentItemConverter
 
   def create_xml_doc
     if @manifest_node
-      @doc = Nokogiri::XML(open(@href))
+      @doc = Nokogiri::XML(File.open(@href))
     else
       @doc = Nokogiri::XML(@qti_data)
     end
@@ -131,7 +134,8 @@ class AssessmentItemConverter
 
   QUESTION_TYPE_MAPPING = {
     /matching/i => 'matching_question',
-    'textInformation' => 'text_only_question',
+    /text\s?information/i => 'text_only_question',
+    /image/i => 'text_only_question',
     'trueFalse' => 'true_false_question',
     'multiple_dropdowns' => 'multiple_dropdowns_question'
   }
@@ -227,6 +231,10 @@ class AssessmentItemConverter
   # returns a tuple of [text, html]
   # html is null if it's not an html blob
   def detect_html(node)
+    if text_node = node.at_css('div.text')
+      return [text_node.text.strip, nil]
+    end
+
     text = clear_html(node.text.gsub(/\s+/, " ")).strip
     html_node = node.at_css('div.html') || (node.name.downcase == 'div' && node['class'] =~ /\bhtml\b/)
     is_html = false

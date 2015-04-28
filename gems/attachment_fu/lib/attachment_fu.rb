@@ -213,7 +213,7 @@ module AttachmentFu # :nodoc:
 
     # Copies the given file path to a new tempfile, returning the closed tempfile.
     def copy_to_temp_file(file, temp_base_name)
-      Tempfile.new([nil,temp_base_name], AttachmentFu.tempfile_path).tap do |tmp|
+      Tempfile.new(['',temp_base_name], AttachmentFu.tempfile_path).tap do |tmp|
         tmp.close
         FileUtils.cp file, tmp.path
       end
@@ -221,7 +221,7 @@ module AttachmentFu # :nodoc:
 
     # Writes the given data to a new tempfile, returning the closed tempfile.
     def write_to_temp_file(data, temp_base_name)
-      Tempfile.new([nil,temp_base_name], AttachmentFu.tempfile_path).tap do |tmp|
+      Tempfile.new(['',temp_base_name], AttachmentFu.tempfile_path).tap do |tmp|
         tmp.binmode
         tmp.write data
         tmp.close
@@ -399,7 +399,7 @@ module AttachmentFu # :nodoc:
         if self.md5.present? && ns = self.infer_namespace
           scope = Attachment.where(:md5 => md5, :namespace => ns, :root_attachment_id => nil, :content_type => content_type)
           scope = scope.where("id<>?", self) unless new_record?
-          scope.first
+          scope.detect { |a| a.store.exists? }
         end
       end
     end

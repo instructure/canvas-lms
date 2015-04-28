@@ -113,7 +113,7 @@ module Canvas
 
     # base class/module for this plugin
     def base
-      @meta[:base]
+      @meta[:base].is_a?(Symbol) ? @meta[:base].to_s.constantize : @meta[:base]
     end
 
     # arbitrary meta key/value pairs (these aren't configurable settings)

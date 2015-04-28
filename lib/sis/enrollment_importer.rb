@@ -195,9 +195,9 @@ module SIS
                 'TaEnrollment'
               elsif role_name =~ /\Aobserver\z/i
                 if associated_sis_user_id
-                  pseudo = root_account.pseudonyms.where(sis_user_id: associated_sis_user_id).first
-                  if pseudo
-                    associated_user_id = pseudo.user_id
+                  a_pseudo = root_account.pseudonyms.where(sis_user_id: associated_sis_user_id).first
+                  if a_pseudo
+                    associated_user_id = a_pseudo.user_id
                   else
                     @messages << "An enrollment referenced a non-existent associated user #{associated_sis_user_id}"
                     next
@@ -229,7 +229,7 @@ module SIS
             enrollment.course_section = @section
 
             if status =~ /\Aactive/i
-              if user.workflow_state != 'deleted'
+              if user.workflow_state != 'deleted' && pseudo.workflow_state != 'deleted'
                 enrollment.workflow_state = 'active'
               else
                 enrollment.workflow_state = 'deleted'

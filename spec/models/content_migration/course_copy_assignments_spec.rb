@@ -215,6 +215,25 @@ describe ContentMigration do
       end
     end
 
+    it "should not try to restore deleted assignments to an unpublished state if unable to" do
+      a_from = assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'online_text_entry', :grading_type => 'points')
+      a_from.unpublish!
+
+      run_course_copy
+
+      @copy_to.offer!
+      student_in_course(:course => @copy_to, :active_user => true)
+
+      a_to = @copy_to.assignments.where(:migration_id => mig_id(a_from)).first
+      a_to.publish!
+      a_to.submit_homework(@student, :submission_type => "online_text_entry")
+      a_to.destroy
+
+      run_course_copy
+      a_to.reload
+      expect(a_to).to be_published
+    end
+
     context "copying frozen assignments" do
       before :once do
         @setting = PluginSetting.create!(:name => "assignment_freezer", :settings => {"no_copying" => "yes"})

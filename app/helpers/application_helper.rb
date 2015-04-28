@@ -155,7 +155,7 @@ module ApplicationHelper
     includes.each{|i| @wiki_sidebar_data[i] ||= [] }
     @wiki_sidebar_data[:wiki_pages] = @context.wiki.wiki_pages.active.order(:title).limit(150) if @context.respond_to?(:wiki)
     @wiki_sidebar_data[:wiki_pages] ||= []
-    if can_do(@context, @current_user, :manage_files)
+    if can_do(@context, @current_user, :manage_files, :read_as_admin)
       @wiki_sidebar_data[:root_folders] = Folder.root_folders(@context)
     elsif @context.is_a?(Course) && !@context.tab_hidden?(Course::TAB_FILES)
       @wiki_sidebar_data[:root_folders] = Folder.root_folders(@context).reject{|folder| folder.locked? || folder.hidden}
@@ -411,7 +411,8 @@ module ApplicationHelper
     !!@equella_settings
   end
 
-  def show_user_create_course_button(user)
+  def show_user_create_course_button(user, account=nil)
+    return true if account && account.grants_any_right?(user, session, :create_courses, :manage_courses)
     @domain_root_account.manually_created_courses_account.grants_any_right?(user, session, :create_courses, :manage_courses)
   end
 
@@ -454,7 +455,11 @@ module ApplicationHelper
     global_inst_object = { :environment =>  Rails.env }
     {
       :allowMediaComments       => CanvasKaltura::ClientV3.config && @context.try_rescue(:allow_media_comments?),
-      :kalturaSettings          => CanvasKaltura::ClientV3.config.try(:slice, 'domain', 'resource_domain', 'rtmp_domain', 'partner_id', 'subpartner_id', 'player_ui_conf', 'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf', 'max_file_size_bytes', 'do_analytics', 'use_alt_record_widget', 'hide_rte_button', 'js_uploader'),
+      :kalturaSettings          => CanvasKaltura::ClientV3.config.try(:slice,
+                                    'domain', 'resource_domain', 'rtmp_domain',
+                                    'partner_id', 'subpartner_id', 'player_ui_conf',
+                                    'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf',
+                                    'max_file_size_bytes', 'do_analytics', 'hide_rte_button', 'js_uploader'),
       :equellaEnabled           => !!equella_enabled?,
       :googleAnalyticsAccount   => Setting.get('google_analytics_key', nil),
       :http_status              => @status,
@@ -477,13 +482,11 @@ module ApplicationHelper
   end
 
   def editor_buttons
-    return [] if @context.is_a?(Group)
-    contexts = []
-    contexts << @context if @context && @context.respond_to?(:context_external_tools)
-    contexts += @context.account_chain if @context.respond_to?(:account_chain)
+    contexts = ContextExternalTool.contexts_to_search(@context)
     return [] if contexts.empty?
     Rails.cache.fetch((['editor_buttons_for'] + contexts.uniq).cache_key) do
-      tools = ContextExternalTool.active.having_setting('editor_button').where(contexts.map{|context| "(context_type='#{context.class.base_class.to_s}' AND context_id=#{context.id})"}.join(" OR "))
+      tools = ContextExternalTool.shard(@context.shard).active.
+          having_setting('editor_button').polymorphic_where(context: contexts)
       tools.sort_by(&:id).map do |tool|
         {
           :name => tool.label_for(:editor_button, nil),
@@ -776,6 +779,22 @@ module ApplicationHelper
 
     return text if just_text
     "data-tooltip data-html-tooltip-title=\"#{text}\"".html_safe
+  end
+
+  # used for generating a
+  # prompt for use with date pickers
+  # so it doesn't need to be declared all over the place
+  def datepicker_screenreader_prompt
+    prompt_text = I18n.t("#helpers.accessible_date_prompt", "Format Like")
+    format = accessible_date_format
+    "#{prompt_text} #{format}"
+  end
+
+  # useful for presenting a consistent
+  # date format to screenreader users across the app
+  # when telling them how to fill in a datetime field
+  def accessible_date_format
+    I18n.t("#helpers.accessible_date_format", "YYYY-MM-DD hh:mm")
   end
 
   # render a link with a tooltip containing a summary of due dates

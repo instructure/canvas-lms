@@ -257,11 +257,11 @@ TEXT
           </div>
           <br/>
           <div>
-            <%= f.check_box :restrict_student_past_view %>
+            <%= f.check_box :restrict_student_past_view, :disabled => @context.account.restrict_student_past_view[:locked] %>
             <%= f.label :restrict_student_past_view, :en => "Restrict students from viewing course after end date" %>
           </div>
           <div>
-            <%= f.check_box :restrict_student_future_view %>
+            <%= f.check_box :restrict_student_future_view, :disabled => @context.account.restrict_student_future_view[:locked] %>
             <%= f.label :restrict_student_future_view, :en => "Restrict students from viewing course before start date" %>
           </div>
         </td>
@@ -570,7 +570,7 @@ TEXT
             <%= f.blabel :root_account_id, :en => "Root Account" %>
           </td>
           <td>
-            <%= f.select :root_account_id, Account.root_accounts.active.sort_by(&:name).map{|a| [a.name, a.id] }, :selected => @context.root_account_id %>
+            <%= f.select :root_account_id, Account.root_accounts.active.order("name DESC").select([:id, :name]).map{|a| [a.name, a.id] }, :selected => @context.root_account_id %>
           </td>
         </tr>
         <tr>
