@@ -823,6 +823,17 @@ describe Assignment do
         end
       end
 
+      it "should not assign peer reviews to fake students" do
+        fake_student = @course.student_view_student
+        fake_sub = @a.submit_homework(fake_student, :submission_type => "online_url", :url => "http://www.google.com")
+
+        @a.peer_review_count = 1
+        res = @a.assign_peer_reviews
+        expect(res.length).to eql(@submissions.length)
+        expect(res.map{|a| a.asset}).to_not be_include(fake_sub)
+        expect(res.map{|a| a.assessor_asset}).to_not be_include(fake_sub)
+      end
+
       it "should assign when already graded" do
         @users.each do |u|
           @a.grade_student(u, :grader => @teacher, :grade => '100')

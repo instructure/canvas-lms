@@ -273,7 +273,7 @@ class AssignmentsController < ApplicationController
                         @context.students_visible_to(@current_user)
                       end
 
-      @students = student_scope.uniq.order_by_sortable_name
+      @students = student_scope.not_fake_student.uniq.order_by_sortable_name
       @submissions = @assignment.submissions.include_assessment_requests
     end
   end

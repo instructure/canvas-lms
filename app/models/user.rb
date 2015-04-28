@@ -197,6 +197,8 @@ class User < ActiveRecord::Base
 
   scope :has_current_student_enrollments, -> { where("EXISTS (SELECT * FROM enrollments JOIN courses ON courses.id=enrollments.course_id AND courses.workflow_state='available' WHERE enrollments.user_id=users.id AND enrollments.workflow_state IN ('active','invited') AND enrollments.type='StudentEnrollment')") }
 
+  scope :not_fake_student, -> { where("enrollments.type <> 'StudentViewEnrollment'")}
+
   # NOTE: only use for courses with differentiated assignments on
   scope :able_to_see_assignment_in_course_with_da, lambda {|assignment_id, course_id|
     joins(:assignment_student_visibilities).
