@@ -199,13 +199,12 @@ describe "assignments" do
       expect(f('#self_signup_help_dialog')).to be_displayed
     end
 
-
     it "should validate that a group category is selected" do
       assignment_name = 'first test assignment'
       @assignment = @course.assignments.create({
-                                                   :name => assignment_name,
-                                                   :assignment_group => @course.assignment_groups.create!(:name => "default")
-                                               })
+        :name => assignment_name,
+        :assignment_group => @course.assignment_groups.create!(:name => "default")
+      })
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
       f('#has_group_category').click
@@ -216,6 +215,19 @@ describe "assignments" do
       errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
       visBoxes, hidBoxes = errorBoxes.partition { |eb| eb.displayed? }
       expect(visBoxes.first.text).to eq "Please select a group set for this assignment"
+    end
+
+    it "shows assignment details, un-editable, for concluded teachers" do
+      @teacher.enrollments.first.conclude
+      @assignment = @course.assignments.create({
+        :name => "assignment after concluded",
+        :assignment_group => @course.assignment_groups.create!(:name => "default")
+      })
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      expect(f(".description.teacher-version")).to be_present
+      expect(ff(".edit_assignment_link")).to be_empty
     end
 
     context "group assignments" do

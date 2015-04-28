@@ -794,7 +794,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def locked_for?(user, opts={})
-    return false if opts[:check_policies] && self.grants_right?(user, :update)
+    return false if opts[:check_policies] && context.grants_right?(user, :read_as_admin)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       assignment_for_user = self.overridden_for(user)
@@ -859,8 +859,11 @@ class Assignment < ActiveRecord::Base
     }
     can :submit and can :attach_submission_comment_files
 
+    given { |user, session| self.context.grants_right?(user, session, :read_as_admin) }
+    can :read
+
     given { |user, session| self.context.grants_right?(user, session, :manage_grades) }
-    can :grade and can :read and can :attach_submission_comment_files
+    can :grade and can :attach_submission_comment_files
 
     given { |user, session| self.context.grants_right?(user, session, :manage_assignments) }
     can :update and can :delete and can :create and can :read and can :attach_submission_comment_files

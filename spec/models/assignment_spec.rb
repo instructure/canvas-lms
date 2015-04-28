@@ -1983,36 +1983,36 @@ describe Assignment do
   end
 
   describe "sections_with_visibility" do
-   before(:once) do
-     course_with_teacher(:active_all => true)
-     @section = @course.course_sections.create!
-     @student = student_in_section(@section, opts={})
-     @assignment, @assignment2, @assignment3 = (1..3).map{|a|@course.assignments.create!}
+    before(:once) do
+      course_with_teacher(:active_all => true)
+      @section = @course.course_sections.create!
+      @student = student_in_section(@section)
+      @assignment, @assignment2, @assignment3 = (1..3).map{ @course.assignments.create! }
 
-     @assignment.only_visible_to_overrides = true
-     create_section_override_for_assignment(@assignment, course_section: @section)
+      @assignment.only_visible_to_overrides = true
+      create_section_override_for_assignment(@assignment, course_section: @section)
 
-     @assignment2.only_visible_to_overrides = true
+      @assignment2.only_visible_to_overrides = true
 
-     @assignment3.only_visible_to_overrides = false
-     create_section_override_for_assignment(@assignment3, course_section: @section)
-     [@assignment, @assignment2, @assignment3].each(&:save!)
-   end
+      @assignment3.only_visible_to_overrides = false
+      create_section_override_for_assignment(@assignment3, course_section: @section)
+      [@assignment, @assignment2, @assignment3].each(&:save!)
+    end
 
-   it "returns active_course_sections with differentiated assignments off" do
-     @course.disable_feature!(:differentiated_assignments)
-     expect(@assignment.sections_with_visibility(@teacher)).to eq @course.course_sections
-     expect(@assignment2.sections_with_visibility(@teacher)).to eq @course.course_sections
-     expect(@assignment3.sections_with_visibility(@teacher)).to eq @course.course_sections
-   end
+    it "returns active_course_sections with differentiated assignments off" do
+      @course.disable_feature!(:differentiated_assignments)
+      expect(@assignment.sections_with_visibility(@teacher)).to eq @course.course_sections
+      expect(@assignment2.sections_with_visibility(@teacher)).to eq @course.course_sections
+      expect(@assignment3.sections_with_visibility(@teacher)).to eq @course.course_sections
+    end
 
-   it "returns only sections with overrides with differentiated assignments on" do
-     @course.enable_feature!(:differentiated_assignments)
-     expect(@assignment.sections_with_visibility(@teacher)).to eq [@section]
-     expect(@assignment2.sections_with_visibility(@teacher)).to eq []
-     expect(@assignment3.sections_with_visibility(@teacher)).to eq @course.course_sections
-   end
- end
+    it "returns only sections with overrides with differentiated assignments on" do
+      @course.enable_feature!(:differentiated_assignments)
+      expect(@assignment.sections_with_visibility(@teacher)).to eq [@section]
+      expect(@assignment2.sections_with_visibility(@teacher)).to eq []
+      expect(@assignment3.sections_with_visibility(@teacher)).to eq @course.course_sections
+    end
+  end
 
   context "modules" do
     it "should be locked when part of a locked module" do
