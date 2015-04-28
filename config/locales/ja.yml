@@ -1282,11 +1282,6 @@ ja:
       messages: 
         record_invalid: "検証に失敗しました: %{errors}"
         taken: は既に使用されています
-      template: 
-        body: "次のフィールドにエラーがありました:"
-        header: 
-          one: "%{count} 個のエラーがあるため、この %{model} を保存できません"
-          other: "%{count} 個のエラーがあるため、この %{model} を保存できません"
   activity_13915493: アクティビティ
   activity_by_category_9c2033d1: カテゴリ別のアクティビティ
   activity_by_date_878c5b49: 日付別のアクティビティ
@@ -1694,6 +1689,8 @@ ja:
       assignment_name: "名前:"
       assignment_points: "点数:"
       assignment_type: "タイプ:"
+      buttons: 
+        save_and_publish: 保存して公開
       cancel: キャンセル
       differentiated_due_dates: 分化期日
       discussion_type: ディスカッション
@@ -1766,7 +1763,8 @@ ja:
     edit_view: 
       assignment_name: 課題名
       buttons: 
-        update: 課題の更新
+        save: 保存
+        save_and_publish: 保存して公開
       description: 説明
       freeze_properties: コピーされるときに課題のプロパティをロック
       notify_content_change: この内容が変更になったことをユーザに通知する
@@ -2237,7 +2235,6 @@ ja:
   between_1_and_99_d421a4c0: " 1% a から 99%の間"
   between_2_and_5_c34f5152: "2 と 5の間"
   big_blue_button_conference: 
-    conference_is_recorded: この会議は記録されています。
     recording_setting: 記録
     recording_setting_enabled_description: この会議は録音可能です
   blackboard: 
@@ -3702,8 +3699,6 @@ ja:
       edit_item: アイテムの詳細情報の編集
     url_show: 
       new_tab: このサイトは、ブラウザの別ウィンドウで表示する必要があります。
-      open_url_button: "%{title} を新しいウィンドウで表示"
-      tool_insecure_warning: "安全なサイト (Canvas) 内から安全でないコンテンツを開こうとしています。一部のインターネット ブラウザでは、このコンテンツを読み込めない場合があります。"
   context_modules_api: 
     invalid_position: 無効な場所
   continue_ac067716: 続行
@@ -5128,6 +5123,7 @@ ja:
       buttons: 
         not_published: 未公開
         published: 公開済み
+        save_and_publish: 保存して公開
       delay_posting: 後で投稿
       enable_podcast_feed: "ポッドキャスト フィードを使用可能にする"
       include_replies_in_podcast_feed: ポッドキャスト内の受講生の返信を含む
@@ -5483,7 +5479,6 @@ ja:
   ember_modules_description: "モジュールが Ember で書き直されています。外部の場所からのドラッグを許可するには、ネイティブのドラッグ アンド ドロップ API を使用します。"
   enable_6f5d1328: 有効
   enable_gradebook_list_students_by_sortable_name: "成績表の受講生の名前を、並べ替え可能な名前順に表示します。並べ替え可能な名前はデフォルトで '姓, 名' ですが、設定で変更できます。"
-  enable_multiple_grading_periods: アカウント管理で複数の採点期間管理を有効にし、成績表で使用します。
   end_date_e0093ed7: 終了日
   ends_on_date_320e0c26: 終了日
   enrollment: 
@@ -5785,7 +5780,6 @@ ja:
   errors: 
     bad_navigation_config: "無効なコース タブ構成です"
     blank: 必須
-    dynamic_format: "%{message}"
     failed: 失敗しました
     format: "%{attribute} %{message}"
     index: 
@@ -5992,6 +5986,7 @@ ja:
     wiki_page_menu_configured: "Wiki ページ メニューが設定されました"
   external_url_e9b87215: "外部 Url"
   failed_to_create_zip_file_1a943d06: zipファイルの作成に失敗しました
+  failed_to_import_media_objects_4c1fcb4f: "メディア オブジェクトのインポートに失敗しました"
   fair_use_bee47d77: 公正な使用
   favicon_6e658914: お気に入りアイコン
   feature_flags: 
@@ -6010,6 +6005,7 @@ ja:
     feature_flag_admin_view: 
       feature_options: 機能オプション
       no_features_available: 現在利用できる機能はありません。
+  feature_options_37a2c317: 機能オプション
   features: 
     allow_opt_out_of_inbox: ユーザに受信箱のオプトアウトを許可
     better_file_browsing: 改善されたファイル参照機能
@@ -7342,7 +7338,6 @@ ja:
     account_grading_standard_warning: コースのアカウントの採点基準が見つかりませんでした。
     copied_grading_standard_warning: コースのコピーされた採点基準が見つかりませんでした。
     due_dates_warning: 期限を調整できませんでした。
-    failed_import_media_objects: "メディア オブジェクトのインポートに失敗しました"
     file_import_warning: "ファイル %{file} が見つかりませんでした"
   importers/learning_outcome_group_importer: 
     no_global_permission: "グローバルな成果の管理は許可されていません。\"%{title}\" は追加できません"
@@ -7372,6 +7367,7 @@ ja:
   instructions: 
     authorize_google_docs: "文書の共同制作を行う場合は、その前に、次の Google ドキュメント アカウントにアクセスするための権限を Canvas に与える必要があります:"
     authorize_google_drive: "文書で共同作業を行うには、Canvas から Google ドライブ アカウントへのアクセスを許可する必要があります:"
+  instructions_2f88ee72: 指示
   instructors_4b491a07: インストラクタ
   instructure: 
     alerts: 
@@ -7441,6 +7437,7 @@ ja:
   invalid_utf_8_13c76a6: "無効な UTF-8"
   invalid_xml_syntax: "無効な XML 構文"
   invite_5b1fcbcd: 招待
+  it_looks_like_your_content_might_not_load_you_can__dfb85860: コンテンツが読み込まれていないようです。このボタンを使用すると、コンテンツを新しいタブで開くことができます。
   item_complete_d334fd43: (完了した項目)
   item_incomplete_d6a16040: (完了していない項目)
   item_type_assignment_13a1132e: "項目のタイプ: 課題"
@@ -7701,8 +7698,6 @@ ja:
       new_tab: このツールは、ブラウザの別ウィンドウに読み込む必要があります
       new_tab_expired: このツールのセッションが期限切れです。ページを再読み込みして、もう一度ツールにアクセスしてください
       new_tab_loaded: このツールは、ブラウザの別ウィンドウに正常に読み込まれました。ページを再読み込みして、もう一度ツールにアクセスしてください。
-      tool_insecure_warning: "安全なサイト (Canvas) 内から安全でないコンテンツを開こうとしています。一部のインターネット ブラウザでは、このコンテンツを読み込めない場合があります。"
-      tool_load_failure: コンテンツが読み込まれていないようです。このボタンを使用すると、コンテンツを新しいタブで開くことができます。
   lti2: 
     register_tool: 登録ツール
   m2c_file_description: "Moodle 1.9/2.x"
@@ -7755,7 +7750,6 @@ ja:
     loading: メディアを読み込んでいます...
     media_still_converting: 現在メディアを変換しています。しばらくしてからもう一度試してください。
     messages: 
-      file_failed_to_load: "このメディア ファイルの読み込みに失敗しました"
       flash_required_record_audio: "オーディオを録音するには Flash が必要です。"
       flash_required_upload_audio: "オーディオをアップロードするには Flash が必要です。"
       flash_required_upload_video: "ビデオをアップロードするには Flash が必要です。"
@@ -9689,7 +9683,6 @@ ja:
   no_due_date_44271c53: 期日なし
   no_due_date_6e6a23c1: (期日なし)
   no_e16d9132: いいえ
-  no_grading_periods_to_display_ad25c8f3: 表示する採点期間がありません
   no_grading_schemes_to_display_8b0e92e7: 表示する採点スキームがありません
   no_migration_file: コンテンツ移行にはファイルが必要です。
   no_score_yet_c94e919b: まだスコアがありません
@@ -9971,6 +9964,27 @@ ja:
           kb: KB
           mb: MB
           tb: TB
+  oauth2_provider: 
+    auth: 
+      oauth2_complete: "アプリケーションのログイン ワークフローが完了しました。すぐに再びアクティブになります。"
+    confirm: 
+      cancel: キャンセル
+      details: 
+        allow_application: "%{app_name} がユーザのアカウントへのアクセスを要求しています。"
+        email: "電子メール アドレスは %{email} です。"
+        login_name: "現在、%{user_name} としてこのアプリにログインしています。"
+      labels: 
+        remember_access: このサービスに関する権限を保存する
+      page_title: "アプリケーション ログイン"
+    confirm_mobile: 
+      cancel: キャンセル
+      details: 
+        allow_application: "%{app_name} がユーザのアカウントへのアクセスを要求しています。"
+        email: "電子メール アドレスは %{email} です。"
+        login_name: "現在、%{user_name} としてこのアプリにログインしています。"
+      login: ログイン
+      page_title: "アプリケーション ログイン"
+      remember_auth: このサービスに関する権限を保存する
   observees: 
     add_observee_button: 受講生を追加
     being_observed: 監視中の受講生
@@ -9985,6 +9999,7 @@ ja:
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: 解答を変更したら、問題を更新する前にオプションを選択する必要があります。
   one_per_line_format_name_value_79647700: "1 行に 1 つ。形式:名前=値"
   ontime_on_time_late_late_missing_missing_145e9e5d: "期日までに提出 %{onTime}、遅延 %{late}、未提出 %{missing}"
+  open_title_in_a_new_window_b29fed77: "%{title} を新しいウィンドウで表示"
   options: 
     ? "no"
     : いいえ
@@ -10281,6 +10296,10 @@ ja:
       description: "Diigo 統合"
       name: Diigo
     diigo_settings: 
+      description: |-
+          [Diigo の新しいアプリ](%{diigo_url}) を登録する必要があります。
+          
+          * アプリを保存した後、API キーをメモしてください
       labels: 
         api_key: "API 鍵"
     dim_dim_settings: 
@@ -10394,18 +10413,6 @@ ja:
     kaltura_settings: 
       account_settings: "これらの値は、\"設定 -> 統合設定\" のKaltura 管理コンソールにあります。"
       cache_explanation: "空欄は無限キャッシュ、0 はキャッシュしないことを意味します。"
-      description: |-
-          [Kaltura.com](%{kaltura_url}) でアカウントを持つか、または
-          Kaltura インスタンスを自己ホスティングしてアカウントを持つ必要があります。
-          
-          **注:** Canvas での Kaltura の構成が完了したら、
-          Kaltura の管理コンソールにアクセスして、"設定 -> 統合設定" で、 
-          サーバ通知を使用可能にする必要があります。このとき使用する 
-          通知 URL は次のとおりです:
-          
-          %{notification_url}
-          
-          次に "サーバから送信" 列の "エントリの追加" および "エントリの削除" チェックボックスを選択します。
       headers: 
         account_settings: アカウント設定
         canvas_settings: "Canvas の設定"
@@ -10434,7 +10441,6 @@ ja:
         secret_key: 管理者シークレット
         subpartner_id: "サブ パートナー ID"
         upload_ui_conf: "アップローダ UI 会議 ID"
-        use_alt_record_widget: "代替の Flash 録画ウィジェットを使用"
         user_secret_key: "ユーザ シークレット"
       ui_conf_ids: "Kaltura がホスティングするお客様の場合は、これらの ID を提供してくれるようKaltura に依頼してください。自己ホスティングするインスタンスは、これらの値を ui_confs 表から検索することができます。"
     linked_in: 
@@ -10560,6 +10566,7 @@ ja:
       description: "Yo です"
       name: Yo
     yo_settings: 
+      description: "[Yo の API トークン](%{yo_url}) が必要です。"
       labels: 
         api_token: "API トークン"
   points_bb475533: 点数
@@ -10960,26 +10967,6 @@ ja:
       page_title: "Canvas にログイン"
     notices: 
       mfa_complete: マルチファクタ認証が設定されました
-    oauth2_auth: 
-      oauth2_complete: "アプリケーションのログイン ワークフローが完了しました。すぐに再びアクティブになります。"
-    oauth2_confirm: 
-      cancel: キャンセル
-      details: 
-        allow_application: "%{app_name} がユーザのアカウントへのアクセスを要求しています。"
-        email: "ユーザの電子メール アドレスは %{email} です。"
-        login_name: "ユーザは %{user_name} としてこのアプリケーションにログインしています。"
-      labels: 
-        remember_access: このサービスに関する権限を保存する
-      page_title: "アプリケーション ログイン"
-    oauth2_confirm_mobile: 
-      cancel: キャンセル
-      details: 
-        allow_application: "%{app_name} がユーザのアカウントへのアクセスを要求しています。"
-        email: "電子メール アドレスは %{email} です。"
-        login_name: "現在、%{user_name} としてこのアプリにログインしています。"
-      login: ログイン
-      page_title: "アプリケーション ログイン"
-      remember_auth: このサービスに関する権限を保存する
     otp_login: 
       buttons: 
         send: 送信
@@ -11370,6 +11357,7 @@ ja:
       generating: 生成しています...
       generating_combinations_progress: "生成しています... (%{done}/%{total})"
       save: 保存
+      save_and_publish: 保存して公開
       saved: 保存されました!
       saving: 保存しています...
       update_group: グループの更新
@@ -11901,6 +11889,7 @@ ja:
           not_published: 未公開
           published: 公開済み
           save: 保存
+          save_and_publish: 保存して公開
         cant_go_back: 回答の後で問題をロックする
         default_page_title: 新しいクイズ
         group: 課題グループ
@@ -14035,7 +14024,6 @@ ja:
       entry_no_image: このページは、最初に提出されたときから、変更されている可能性がありますので注意してください。
       entry_with_image: 提出された時点のページの内容をスナップショットにして含めてあります。または、クリックして元の提出物を表示することもできます。
       external_url_submission: "この提出物は、外部ページへの URL でした。"
-      file_uploads_for_user: "**%{user}** さんのためのファイル アップロード"
       group_discussion_submission_description: "この課題への提出物は、このグループの課題のディスカッションに投稿されます。%{user} さんのディスカッション投稿は以下のとおりです。*全グループ ディスカッションを表示* することもできます。"
       group_discussion_submission_description_without_link: "この課題の提出物は、このグループの課題のディスカッションへの投稿です。以下に、%{user} のディスカッションへの投稿を示します。"
       media_comment_link: この提出物はメディアに記録されたデータです。*ここをクリックして表示します*。
@@ -14995,6 +14983,7 @@ ja:
       buttons: 
         cancel: キャンセル
         save: 保存
+        save_and_publish: 保存して公開
       course_editing_roles: 
         anyone: 全員
         only_teachers: 講師のみ
