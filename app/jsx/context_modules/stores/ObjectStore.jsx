@@ -6,8 +6,7 @@ define([
   'jsx/shared/helpers/createStore',
   'compiled/fn/parseLinkHeader',
   'compiled/jquery.rails_flash_notifications'
-], function($, _, createStore, parseLinkHeader) {
-
+], function ($, _, createStore, parseLinkHeader) {
 
   var initialStoreState = {
     links: {},
@@ -21,10 +20,16 @@ define([
 
     /**
      * apiEndpoint should be the endpoint for this resource.
+     * Options is an object containing additional options for the store:
+     *    - perPage - indicates the number of records that should be pulled per
+     *                request.
      */
-    constructor(apiEndpoint) {
+    constructor (apiEndpoint, options) {
       // We clone the initialStoreState so it doesn't hang onto a bad reference.
-      this.store = createStore(_.clone(initialStoreState))
+      this.store = createStore(_.clone(initialStoreState));
+      if (options && options.perPage) {
+        apiEndpoint += '?per_page=' + options.perPage;
+      }
       this.apiEndpoint = apiEndpoint;
     }
 
@@ -33,7 +38,7 @@ define([
      * options is an optional object.  Currently this allows for the following:
      *   - fetchAll: true - this will continually fetch all pages of the resource
      */
-    fetch(options) {
+    fetch (options) {
       var url = this.store.getState().links.next || this.apiEndpoint;
       this.store.setState({ isLoading: true });
       $.ajax({
@@ -47,7 +52,7 @@ define([
     /**
      * Sets the store back to the initial state.
      */
-    reset() {
+    reset () {
       // We clone the initialStoreState so it doesn't hang onto a bad reference.
       this.store.setState(_.clone(initialStoreState))
     }
@@ -55,25 +60,25 @@ define([
     /**
      * Returns the current state of the underlying store.
      */
-    getState() {
+    getState () {
       return this.store.getState();
     }
 
     /**
      * Adds a change listener
      */
-    addChangeListener(callback) {
+    addChangeListener (callback) {
       this.store.addChangeListener(callback);
     }
 
     /**
      * Removes a change listener
      */
-    removeChangeListener(callback) {
+    removeChangeListener (callback) {
       this.store.removeChangeListener(callback);
     }
 
-    _fetchSuccessHandler(options, items, status, xhr) {
+    _fetchSuccessHandler (options, items, status, xhr) {
       var links = parseLinkHeader(xhr);
       items = this.store.getState().items.concat(items);
 
@@ -90,7 +95,7 @@ define([
       }
     }
 
-    _fetchErrorHandler() {
+    _fetchErrorHandler () {
       this.store.setState({
         items: [],
         isLoading: false,
@@ -102,6 +107,5 @@ define([
   }
 
   return ObjectStore;
-
 
 });
