@@ -1309,23 +1309,12 @@ class ApplicationController < ActionController::Base
   # person's calendar with only those things checked.
   def calendar_url_for(contexts_to_link_to = nil, options={})
     options[:query] ||= {}
-    options[:anchor] ||= {}
     contexts_to_link_to = Array(contexts_to_link_to)
     if event = options.delete(:event)
       options[:query][:event_id] = event.id
     end
-    if !contexts_to_link_to.empty? && options[:anchor].is_a?(Hash)
-      options[:anchor][:show] = contexts_to_link_to.collect{ |c|
-        "group_#{c.class.to_s.downcase}_#{c.id}"
-      }.join(',')
-      options[:anchor] = options[:anchor].to_json
-    end
     options[:query][:include_contexts] = contexts_to_link_to.map{|c| c.asset_string}.join(",") unless contexts_to_link_to.empty?
-    calendar_url(
-      options[:query].merge(options[:anchor].empty? ? {} : {
-        :anchor => options[:anchor].unpack('H*').first # calendar anchor is hex encoded
-      })
-    )
+    calendar_url(options[:query])
   end
 
   # pass it a context or an array of contexts and it will give you a link to the
