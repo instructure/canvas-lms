@@ -1239,11 +1239,6 @@ fa-IR:
       messages: 
         record_invalid: "تأیید اعتبار انجام نشد: %{errors}"
         taken: "قبلا انتخاب شده است"
-      template: 
-        body: "جاهای خالی زیر مشکلاتی داشت:"
-        header: 
-          one: "%{count} خطا از ذخیره شدن این %{model} جلوگیری کرد"
-          other: "%{count} خطا از ذخیره شدن این %{model} جلوگیری کرد"
   activity_13915493: فعالیت
   add_app_baf540f: "افزودن برنامه"
   add_attachment_93868828: "افزودن پیوست"
@@ -1635,6 +1630,8 @@ fa-IR:
       assignment_name: "نام:"
       assignment_points: "امتیازها:"
       assignment_type: "نوع:"
+      buttons: 
+        save_and_publish: "ذخیره سازی و انتشار"
       cancel: لغو
       differentiated_due_dates: "تاریخ مهلت متمایز"
       discussion_type: بحث
@@ -1707,7 +1704,8 @@ fa-IR:
     edit_view: 
       assignment_name: "نام تکلیف"
       buttons: 
-        update: "بهنگام سازی تکلیف"
+        save: "ذخیره سازی"
+        save_and_publish: "ذخیره سازی و انتشار"
       description: شرح
       freeze_properties: "قفل کردن مشخصات تکلیف پس از کپی شدن"
       notify_content_change: "به کاربران اطلاع داده شود که این محتوا تغییر یافته است"
@@ -2167,7 +2165,6 @@ fa-IR:
       به صفحه فایل های شخصی یک کاربر می رود ('/files')، باید آن را برای حسابی که
       عضوی از آن هستید، فعال کنید.
   big_blue_button_conference: 
-    conference_is_recorded: "این کنفرانس در حال ضبط است."
     recording_setting: "در حال ضبط"
   blackboard: 
     no_manifest: "این Blackboard .zip هیچ فایل imsmanifest.xml در دایرکتوری ریشه ندارد."
@@ -3587,8 +3584,6 @@ fa-IR:
       edit_item: "ویرایش اطلاعات مورد"
     url_show: 
       new_tab: "این تارنما باید در یک پنجره مرورگر جدید باز شود."
-      open_url_button: "باز کردن %{title} در یک پنجره جدید"
-      tool_insecure_warning: "شما سعی دارید یک مطلب ناامن را از یک بخش امن (کانواس) اجرا کنید. بعضی از مرورگرهای اینترنتی ممکن است جلوی بارگذاری این محتوا را بگیرند."
   context_modules_api: 
     invalid_position: "موقعیت معتبر نیست"
   continue_ac067716: ادامه
@@ -4987,6 +4982,7 @@ fa-IR:
       buttons: 
         not_published: "منتشر نشده"
         published: "منتشر شده"
+        save_and_publish: "ذخیره سازی و انتشار"
       delay_posting: "ارسال با تأخیر"
       enable_podcast_feed: "فعال سازی خوراک خبری پادکست"
       only_visible_to_overrides_note: "نکته: این بحث *فقط* برای بخش(های) تعیین شده در زیر قابل مشاهده است:"
@@ -5311,7 +5307,6 @@ fa-IR:
   ember_modules_description: "ماژول هایی که در Ember بازنویسی شده اند. از API کشیدن و رها کردن اصلی برای فراهم کردن امکان کشیدن از محل های بیرونی استفاده می کند."
   enable_6f5d1328: "فعال سازی"
   enable_gradebook_list_students_by_sortable_name: "دانشجوها را بر اساس نام قابل مرتب سازی آنها در دفتر نمره فهرست بندی کنید. نام فایل مرتب سازی به طور پیش فرض بر اساس «نام خانوادگی، نام» است و می توان آن در قسمت تنظیمات تغییر داد."
-  enable_multiple_grading_periods: "مدیریت چند دوره نمره گذاری را در مدیر حساب فعال سازید و در دفتر نمره استفاده کنید."
   end_date_e0093ed7: "تاریخ پایان"
   enrollment: 
     default_course_name: درس
@@ -5607,7 +5602,6 @@ fa-IR:
   errors: 
     bad_navigation_config: "پیکربندی زبانه درس معتبر نیست"
     blank: لازم
-    dynamic_format: "%{message}"
     failed: "انجام نشد"
     format: "%{attribute} %{message}"
     index: 
@@ -5799,6 +5793,7 @@ fa-IR:
     submit: ارسال
     user_navigation_configured: "پیمایش کاربر پیکربندی شد"
     wiki_page_menu_configured: "منوی صفحه ویکی پیکربندی شد"
+  failed_to_import_media_objects_4c1fcb4f: "وارد کردن اشیاء رسانه ای انجام نشد"
   fair_use_bee47d77: "استفاده منصفانه"
   feature_flags: 
     feature_flag: 
@@ -5816,6 +5811,7 @@ fa-IR:
     feature_flag_admin_view: 
       feature_options: "گزینه‌های ویژگی"
       no_features_available: "هیچ ویژگی در حال حاضر در دسترس نیست."
+  feature_options_37a2c317: "گزینه‌های ویژگی"
   features: 
     allow_opt_out_of_inbox: "دادن امکان انتخاب از صندوق ورودی به کاربران"
     better_file_browsing: "مرور بهتر فایل"
@@ -7128,7 +7124,6 @@ fa-IR:
     account_grading_standard_warning: "قادر به یافتن استاندارد نمره گذاری حساب برای درس نبود."
     copied_grading_standard_warning: "قادر به یافتن استاندارد نمره گذاری کپی شده برای درس نبود."
     due_dates_warning: "قادر به تنظیم تاریخ های مهلت نبود."
-    failed_import_media_objects: "وارد کردن اشیاء رسانه ای انجام نشد"
     file_import_warning: "فایل %{file} یافت نشد"
   importers/learning_outcome_group_importer: 
     no_global_permission: "برای مدیریت نتایج همگانی مجاز نیستید، نمی توانید \"%{title}\" را بیفزایید"
@@ -7219,6 +7214,7 @@ fa-IR:
   invalid_utf_8_13c76a6: "UTF-8 معتبر نیست"
   invalid_xml_syntax: "قواعد xml معتبر نیست"
   invite_5b1fcbcd: "دعوت کردن"
+  it_looks_like_your_content_might_not_load_you_can__dfb85860: "به نظر می رسد محتوای شما بارگذاری نشود. می توانید از این دکمه برای راه اندازی آن در یک زبانه جدید استفاده کنید."
   items_items_selected_5b55e566: "%{items} مورد انتخاب شد"
   items_selected_have_different_usage_rights_52b325cc: "موردهای انتخاب شده دارای حقوق استفاده متفاوتی هستند."
   jobs: 
@@ -7466,8 +7462,6 @@ fa-IR:
       new_tab: "این ابزار باید در یک پنجره جدید مرورگر بارگذاری شود"
       new_tab_expired: "جلسه مربوط به این ابزار منقضی شده است. لطفا برای دسترسی دوباره به ابزار، صفحه را دوباره بارگذاری کنید"
       new_tab_loaded: "این ابزار به طور موفقیت آمیز در یک پنجره جدید مرورگر بارگذاری شد. برای دسترسی دوباره به این ابزار، صفحه را دوباره بارگذاری کنید."
-      tool_insecure_warning: "سعی دارید یک محتوای ناامن را از یک تارنمای امن (کانواس) اجرا کنید. بعضی از مرورگرهای داخلی ممکن است جلوی بارگذاری این محتوا را بگیرند."
-      tool_load_failure: "به نظر می رسد محتوای شما بارگذاری نشود. می توانید از این دکمه برای راه اندازی آن در یک زبانه جدید استفاده کنید."
   lti2: 
     register_tool: "ثبت ابزار"
   m2c_file_description: "ماژول 1.9/2.x"
@@ -7517,7 +7511,6 @@ fa-IR:
     loading: "در حال بارگذاری رسانه..."
     media_still_converting: "رسانه در حال حاضر در حال تبدیل است، لطفا کمی بعد دوباره تلاش کنید."
     messages: 
-      file_failed_to_load: "بارگذاری این فایل رسانه ای انجام نشد"
       flash_required_record_audio: "برای ضبط صدا، فلش لازم است."
       flash_required_upload_audio: "برای بارگذاری صدا؛ فلش لازم است."
       flash_required_upload_video: "برای بارگذاری تصویر، فلش لازم است."
@@ -9706,6 +9699,27 @@ fa-IR:
           kb: کیلوبایت
           mb: مگابایت
           tb: ترابایت
+  oauth2_provider: 
+    auth: 
+      oauth2_complete: "برنامه جریان کاری ورود را به پایان رسانده است و به زودی دوباره فعال می شود."
+    confirm: 
+      cancel: لغو
+      details: 
+        allow_application: "%{app_name} درخواست دسترسی به حساب شما را دارد."
+        email: "نشانی پست الکترونیکی شما %{email} است."
+        login_name: "شما در حال ورود به این برنامه با عنوان %{user_name} هستید."
+      labels: 
+        remember_access: "مجوز من برای این سرویس به خاطر سپرده شود"
+      page_title: "ورود به برنامه"
+    confirm_mobile: 
+      cancel: لغو
+      details: 
+        allow_application: "%{app_name} درخواست دسترسی به حساب شما را دارد."
+        email: "نشانی پست الکترونیکی شما %{email} است."
+        login_name: "شما در حال ورود به این برنامه با عنوان %{user_name} هستید."
+      login: ورود
+      page_title: "ورود به برنامه"
+      remember_auth: "مجوز من برای این سرویس به خاطر سپرده شود"
   observees: 
     add_observee_button: "افزودن دانشجو"
     being_observed: "دانشجویانی که در حال مشاهده شدن هستند"
@@ -9718,6 +9732,7 @@ fa-IR:
   on_time_percent_eebffe38: "بموقع: %{percent}"
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "هنگامی که یک پاسخ را تغییر داده اید، باید قبل از بهنگام سازی پرسش یک گزینه را انتخاب کنید."
   one_per_line_format_name_value_79647700: "یکی در هر خط.. قالب: نام=مقدار"
+  open_title_in_a_new_window_b29fed77: "باز کردن %{title} در یک پنجره جدید"
   options: 
     ? "no"
     : خیر
@@ -10107,16 +10122,6 @@ fa-IR:
     kaltura_settings: 
       account_settings: "این مقادیر را می توان در میز فرمان مدیریت Kaltura زیر قسمت «تنظیمات -> تنظیمات یکپارچگی» یافت"
       cache_explanation: "خالی به معنای ذخیره سازی نامحدود در حافظه نهان است، 0 به معنای عدم ذخیره سازی در حافظه نهان است."
-      description: |-
-          به یک حساب یا در [Kaltura.com](%{kaltura_url}) و یا
-          در یک مورد میزبانی شده توسط خود Kaltura نیاز خواهید داشت.
-          
-          **نکته:** وقتی Kaltura در کانواس پیکربندی شد، باید به میز فرمان مدیریت Kaltura بروید و زیر قسمت «تنظیمات -> تنظیمات یکپارچگی»، اطلاعیه های سرور را با یک نشانی اینترنتی اطلاعیه به قرار
-          زیر فعال سازید:
-          
-          %{notification_url}
-          
-          سپس کادرهای «افزودن ورودی» و «حذف ورودی» را در ستون «ارسالی توسط سرور» علامت بزنید.
       headers: 
         account_settings: "تنظیمات حساب"
         canvas_settings: "تنظیمات کانواس"
@@ -10145,7 +10150,6 @@ fa-IR:
         secret_key: "رمز مدیر"
         subpartner_id: "شناسه شریک فرعی"
         upload_ui_conf: "شناسه پیکربندی واسط کاربر بارگذاری کننده"
-        use_alt_record_widget: "استفاده از ابزار جایگزین ضبط فلش"
         user_secret_key: "رمز کاربر"
       ui_conf_ids: "برای مشتریانی که توسط Kaltura میزبانی می شوند، می توانید از Kaltura بخواهید این شناسه ها را در اختیار شما قرار دهد. نمونه های میزبانی شده توسط خود می توانند این مقادیر را در جدول ui_confs بیابند."
     linked_in: 
@@ -10644,26 +10648,6 @@ fa-IR:
       page_title: "ورود به کانواس"
     notices: 
       mfa_complete: "اعتبارسنجی چند عاملی پیکربندی شد"
-    oauth2_auth: 
-      oauth2_complete: "برنامه جریان کاری ورود را به پایان رسانده است و به زودی دوباره فعال می شود."
-    oauth2_confirm: 
-      cancel: لغو
-      details: 
-        allow_application: "%{app_name} دسترسی به حساب شما را درخواست می کند."
-        email: "نشانی پست الکترونیکی شما %{email}  است."
-        login_name: "به عنوان %{user_name} به این برنامه وارد می شوید."
-      labels: 
-        remember_access: "مجوز من برای این سرویس به خاطر سپرده شود"
-      page_title: "ورود به برنامه"
-    oauth2_confirm_mobile: 
-      cancel: لغو
-      details: 
-        allow_application: "%{app_name} درخواست دسترسی به حساب شما را دارد."
-        email: "نشانی پست الکترونیکی شما %{email} است."
-        login_name: "شما در حال ورود به این برنامه با عنوان %{user_name} هستید."
-      login: ورود
-      page_title: "ورود به برنامه"
-      remember_auth: "مجوز من برای این سرویس به خاطر سپرده شود"
     otp_login: 
       buttons: 
         send: ارسال
@@ -11057,6 +11041,7 @@ fa-IR:
       generating: "در حال ایجاد..."
       generating_combinations_progress: "در حال ایجاد... (%{done}/%{total})"
       save: "ذخیره سازی"
+      save_and_publish: "ذخیره سازی و انتشار"
       saved: "ذخیره شد!"
       saving: "در حال ذخیره سازی..."
       update_group: "بهنگام سازی گروه"
@@ -11582,6 +11567,7 @@ fa-IR:
           not_published: "منتشر نشده"
           published: "منتشر شده"
           save: "ذخیره سازی"
+          save_and_publish: "ذخیره سازی و انتشار"
         cant_go_back: "قفل کردن پرسش ها بعد از پاسخ دادن"
         default_page_title: "آزمون جدید"
         group: "گروه تکلیف"
@@ -13671,7 +13657,6 @@ fa-IR:
       entry_no_image: "به یاد داشته باشید که این صفحه از زمان ارسال اولیه، ممکن است تغییر یافته باشد."
       entry_with_image: "یک تصویر کلی از ظاهر صفحه در هنگام ارسال را گنجانده ایم. یا اینکه می توانید برای مشاهده مورد ارسالی اصلی  کلیک کنید."
       external_url_submission: "این مورد ارسالی یک نشانی اینترنتی به یک صفحه بیرونی بود."
-      file_uploads_for_user: "بارگذاری های فایل برای **%{user}**"
       group_discussion_submission_description: "موردهای ارسالی برای این تکلیف، ارسال های موجود در بحث مربوط به تکلیف هستند. در زیر ارسال های مربوط به بحث برای %{user} آمده است یا می توانید *بحث کامل گروه را مشاهده کنید*."
       group_discussion_submission_description_without_link: "موردهای ارسالی این تکلیف، ارسال های موجود در بحث تکلیف مربوط به این گروه هستند. در قسمت زیر، ارسال های بحث مربوط به %{user} آمده است."
       media_comment_link: "این مورد ارسالی یک ضبط رسانه ای است. *برای مشاهده، اینجا کلیک کنید.*"
@@ -14588,6 +14573,7 @@ fa-IR:
       buttons: 
         cancel: لغو
         save: "ذخیره سازی"
+        save_and_publish: "ذخیره سازی و انتشار"
       course_editing_roles: 
         anyone: همه
         only_teachers: "فقط اساتید"
