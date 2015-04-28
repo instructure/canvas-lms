@@ -593,6 +593,13 @@ describe Attachment do
       expect(a.grants_right?(nil, {'file_access_user_id' => student.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :download)).to eql(true)
     end
 
+    it "should correctly deny user access based on 'file_access_user_id'" do
+      a = attachment_model(context: user)
+      other_user = user_model
+      expect(a.grants_right?(nil, {'file_access_user_id' => other_user.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :read)).to eql(false)
+      expect(a.grants_right?(nil, {'file_access_user_id' => other_user.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :download)).to eql(false)
+    end
+
     it "should allow user access to anyone if the course is public to auth users (with 'file_access_user_id' and 'file_access_expiration' in the session)" do
       a = attachment_model(context: course)
 

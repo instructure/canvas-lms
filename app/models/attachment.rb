@@ -997,7 +997,8 @@ class Attachment < ActiveRecord::Base
     given { |user, session|
         session && session['file_access_user_id'].present? &&
         (u = User.where(id: session['file_access_user_id']).first) &&
-        (self.context.grants_right?(u, session, :read) || self.context.is_public_to_auth_users?) &&
+        (self.context.grants_right?(u, session, :read) ||
+          (self.context.respond_to?(:is_public_to_auth_users?) && self.context.is_public_to_auth_users?)) &&
         session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
     }
     can :read
@@ -1005,7 +1006,8 @@ class Attachment < ActiveRecord::Base
     given { |user, session|
         session && session['file_access_user_id'].present? &&
         (u = User.where(id: session['file_access_user_id']).first) &&
-        (self.context.grants_right?(u, session, :read) || self.context.is_public_to_auth_users?) &&
+        (self.context.grants_right?(u, session, :read) ||
+          (self.context.respond_to?(:is_public_to_auth_users?) && self.context.is_public_to_auth_users?)) &&
         (self.context.grants_right?(u, session, :manage_files) || !self.locked_for?(u)) &&
         session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
     }
