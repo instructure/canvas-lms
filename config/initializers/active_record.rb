@@ -70,7 +70,7 @@ class ActiveRecord::Base
     ].sort.collect { |file|
       model = begin
           file.sub(%r{.*/app/models/(.*)\.rb$}, '\1').camelize.constantize
-        rescue NameError
+        rescue NameError, LoadError
           next
         end
       next unless model < ActiveRecord::Base
