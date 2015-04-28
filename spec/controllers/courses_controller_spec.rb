@@ -1776,11 +1776,30 @@ describe CoursesController do
       post 'student_view', course_id: @course.id
       test_student = @course.student_view_student
       assignment = @course.assignments.create!(:workflow_state => 'published')
-      sub = assignment.grade_student test_student, { :grade => 1, :grader => @teacher }
+      assignment.grade_student test_student, { :grade => 1, :grader => @teacher }
       expect(test_student.submissions.size).not_to be_zero
       delete 'reset_test_student', course_id: @course.id
       test_student.reload
       expect(test_student.submissions.size).to be_zero
+    end
+
+    it "decrements needs grading counts" do
+      user_session(@teacher)
+      post 'student_view', course_id: @course.id
+      test_student = @course.student_view_student
+      assignment = @course.assignments.create!(:workflow_state => 'published')
+      s = assignment.find_or_create_submission(test_student)
+      s.submission_type = 'online_quiz'
+      s.workflow_state = 'submitted'
+      s.save!
+      assignment.reload
+
+      original_needs_grading_count = assignment.needs_grading_count
+
+      delete 'reset_test_student', course_id: @course.id
+      assignment.reload
+
+      expect(assignment.needs_grading_count).to eq original_needs_grading_count - 1
     end
   end
 end
