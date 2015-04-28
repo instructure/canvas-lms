@@ -1283,11 +1283,6 @@ en-AU:
       messages: 
         record_invalid: "Validation failed: %{errors}"
         taken: "has already been taken"
-      template: 
-        body: "There were problems with the following fields:"
-        header: 
-          one: "1 error prohibited this %{model} from being saved"
-          other: "%{count} errors prohibited this %{model} from being saved"
   activity_13915493: Activity
   activity_by_category_9c2033d1: "Activity by Category"
   activity_by_date_878c5b49: "Activity by Date"
@@ -1695,6 +1690,8 @@ en-AU:
       assignment_name: "Name:"
       assignment_points: "Points:"
       assignment_type: "Type:"
+      buttons: 
+        save_and_publish: "Save & Publish"
       cancel: Cancel
       differentiated_due_dates: "Differentiated due date"
       discussion_type: Discussion
@@ -1767,7 +1764,8 @@ en-AU:
     edit_view: 
       assignment_name: "Assignment Name"
       buttons: 
-        update: "Update Assignment"
+        save: Save
+        save_and_publish: "Save & Publish"
       description: Description
       freeze_properties: "Lock assignment properties when copied"
       notify_content_change: "Notify users that this content has changed"
@@ -2238,7 +2236,6 @@ en-AU:
   between_1_and_99_d421a4c0: "Between 1% and 99%"
   between_2_and_5_c34f5152: "Between 2 and 5"
   big_blue_button_conference: 
-    conference_is_recorded: "This conference is being recorded."
     recording_setting: Recording
     recording_setting_enabled_description: "Enable recording for this conference."
   blackboard: 
@@ -3703,8 +3700,6 @@ en-AU:
       edit_item: "Edit Item Details"
     url_show: 
       new_tab: "This site needs to be opened in a new browser window."
-      open_url_button: "Open %{title} in a new window"
-      tool_insecure_warning: "You are trying to launch insecure content from within a secure site (canvas). Some internet browsers may prevent this content from loading."
   context_modules_api: 
     invalid_position: "Invalid position"
   continue_ac067716: Continue
@@ -5129,6 +5124,7 @@ en-AU:
       buttons: 
         not_published: "Not Published"
         published: Published
+        save_and_publish: "Save & Publish"
       delay_posting: "Delay posting"
       enable_podcast_feed: "Enable podcast feed"
       include_replies_in_podcast_feed: "Include student replies in podcast feed."
@@ -5484,7 +5480,6 @@ en-AU:
   ember_modules_description: "Modules rewritten in Ember. Uses the native drag and drop API to allow dragging from external locations."
   enable_6f5d1328: Enable
   enable_gradebook_list_students_by_sortable_name: "List students by their sortable names in the Gradebook. Sortable name defaults to 'Last Name, First Name' and can be changed in settings."
-  enable_multiple_grading_periods: "Enable multiple grading periods management in the account admin, and use in the Markbook."
   end_date_e0093ed7: "End Date"
   ends_on_date_320e0c26: "Ends on Date"
   enrollment: 
@@ -5786,7 +5781,6 @@ en-AU:
   errors: 
     bad_navigation_config: "Invalid course tab configuration"
     blank: Required
-    dynamic_format: "%{message}"
     failed: Failed
     format: "%{attribute} %{message}"
     index: 
@@ -5993,6 +5987,7 @@ en-AU:
     wiki_page_menu_configured: "Wiki page menu configured"
   external_url_e9b87215: "External URL"
   failed_to_create_zip_file_1a943d06: "Failed to create zip file"
+  failed_to_import_media_objects_4c1fcb4f: "Failed to import media objects"
   fair_use_bee47d77: "Fair Use"
   favicon_6e658914: Favicon
   feature_flags: 
@@ -6011,6 +6006,7 @@ en-AU:
     feature_flag_admin_view: 
       feature_options: "Feature Options"
       no_features_available: "No features are currently available."
+  feature_options_37a2c317: "Feature Options"
   features: 
     allow_opt_out_of_inbox: "Allow Users to Opt-out of the Inbox"
     better_file_browsing: "Better File Browsing"
@@ -7350,7 +7346,6 @@ en-AU:
     account_grading_standard_warning: "Couldn't find account grading standard for the course."
     copied_grading_standard_warning: "Couldn't find copied grading standard for the course."
     due_dates_warning: "Couldn't adjust the due dates."
-    failed_import_media_objects: "Failed to import media objects"
     file_import_warning: "File %{file} could not be found"
   importers/learning_outcome_group_importer: 
     no_global_permission: "You're not allowed to manage global outcomes, can't add \"%{title}\""
@@ -7380,6 +7375,7 @@ en-AU:
   instructions: 
     authorize_google_docs: "Before you can collaborate on documents, you need to authorize Canvas to access your Google Docs account:"
     authorize_google_drive: "Before you can collaborate on documents, you need to authorise Canvas to access your Google Drive account:"
+  instructions_2f88ee72: Instructions
   instructors_4b491a07: instructors
   instructure: 
     alerts: 
@@ -7449,6 +7445,7 @@ en-AU:
   invalid_utf_8_13c76a6: "Invalid UTF-8"
   invalid_xml_syntax: "invalid xml syntax"
   invite_5b1fcbcd: Invite
+  it_looks_like_your_content_might_not_load_you_can__dfb85860: "It looks like your content might not load. You can use this button to try launching it in a new tab."
   item_complete_d334fd43: "(Item Complete)"
   item_incomplete_d6a16040: "(Item Incomplete)"
   item_type_assignment_13a1132e: "Item type: Assignment"
@@ -7713,8 +7710,6 @@ en-AU:
       new_tab: "This tool needs to be loaded in a new browser window"
       new_tab_expired: "The session for this tool has expired. Please reload the page to access the tool again"
       new_tab_loaded: "This tool was successfully loaded in a new browser window. Reload the page to access the tool again."
-      tool_insecure_warning: "You are trying to launch insecure content from within a secure site (canvas). Some internet browsers may prevent this content from loading."
-      tool_load_failure: "It looks like your content might not load. You can use this button to try launching it in a new tab."
   lti2: 
     register_tool: "Register Tool"
   m2c_file_description: "Moodle 1.9/2.x"
@@ -7767,7 +7762,6 @@ en-AU:
     loading: "Loading media..."
     media_still_converting: "Media is currently being converted, please try again in a little bit."
     messages: 
-      file_failed_to_load: "This media file failed to load"
       flash_required_record_audio: "Flash required for recording audio."
       flash_required_upload_audio: "Flash required for uploading audio."
       flash_required_upload_video: "Flash required for uploading video."
@@ -9701,7 +9695,6 @@ en-AU:
   no_due_date_44271c53: "No Due Date"
   no_due_date_6e6a23c1: "(no due date)"
   no_e16d9132: "No"
-  no_grading_periods_to_display_ad25c8f3: "No grading periods to display"
   no_grading_schemes_to_display_8b0e92e7: "No grading schemes to display"
   no_migration_file: "File required for content migration."
   no_score_yet_c94e919b: "No score yet"
@@ -9983,6 +9976,27 @@ en-AU:
           kb: KB
           mb: MB
           tb: TB
+  oauth2_provider: 
+    auth: 
+      oauth2_complete: "The application has finished the login workflow, and should reactivate shortly."
+    confirm: 
+      cancel: Cancel
+      details: 
+        allow_application: "%{app_name} is requesting access to your account."
+        email: "Your email address is %{email}."
+        login_name: "You are logging into this app as %{user_name}."
+      labels: 
+        remember_access: "Remember my authorisation for this service"
+      page_title: "App Login"
+    confirm_mobile: 
+      cancel: Cancel
+      details: 
+        allow_application: "%{app_name} is requesting access to your account."
+        email: "Your email address is %{email}."
+        login_name: "You are logging into this app as %{user_name}."
+      login: "Log In"
+      page_title: "App Login"
+      remember_auth: "Remember my authorisation for this service"
   observees: 
     add_observee_button: "Add Student"
     being_observed: "Students Being Observed"
@@ -9997,6 +10011,7 @@ en-AU:
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Once you’ve changed an answer you’ll need to choose an option before updating the question."
   one_per_line_format_name_value_79647700: "One per line. Format: name=value"
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} on time, %{late} late, %{missing} missing"
+  open_title_in_a_new_window_b29fed77: "Open %{title} in a new window"
   options: 
     ? "no"
     : "No"
@@ -10412,18 +10427,6 @@ en-AU:
     kaltura_settings: 
       account_settings: "These values can be found in the Kaltura Management Console under \"Settings -> Integration Settings\""
       cache_explanation: "Empty means cache indefinitely, 0 means don't cache."
-      description: |-
-          You will need an account either at [Kaltura.com](%{kaltura_url})
-          or with a self-hosted instance of Kaltura.
-          
-          **Note:** once you have Kaltura configured within Canvas,
-          you need to go to the Kaltura Management Console and under "Settings -> 
-          Integration Settings" enable server notifications with a 
-          Notification URL of:
-          
-          %{notification_url}
-          
-          Then check the boxes for "Add Entry" and "Delete Entry" in the "Sent by Server" column.
       headers: 
         account_settings: "Account Settings"
         canvas_settings: "Canvas Settings"
@@ -10452,7 +10455,6 @@ en-AU:
         secret_key: "Administrator Secret"
         subpartner_id: "Sub Partner ID"
         upload_ui_conf: "Uploader UI Conf ID"
-        use_alt_record_widget: "Use alternative flash recording widget"
         user_secret_key: "User Secret"
       ui_conf_ids: "For Kaltura-hosted customers, you can ask Kaltura to provide you with these ids. Self-hosted instances can find these values in the ui_confs table."
     linked_in: 
@@ -10984,26 +10986,6 @@ en-AU:
       page_title: "Log In to Canvas"
     notices: 
       mfa_complete: "Multi-factor authentication configured"
-    oauth2_auth: 
-      oauth2_complete: "The application has finished the login workflow, and should reactivate shortly."
-    oauth2_confirm: 
-      cancel: Cancel
-      details: 
-        allow_application: "%{app_name} is requesting access to your account."
-        email: "Your email address is %{email}."
-        login_name: "You are logging into this app as %{user_name}."
-      labels: 
-        remember_access: "Remember my authorisation for this service"
-      page_title: "App Login"
-    oauth2_confirm_mobile: 
-      cancel: Cancel
-      details: 
-        allow_application: "%{app_name} is requesting access to your account."
-        email: "Your email address is %{email}."
-        login_name: "You are logging into this app as %{user_name}."
-      login: "Log In"
-      page_title: "App Login"
-      remember_auth: "Remember my authorisation for this service"
     otp_login: 
       buttons: 
         send: Send
@@ -11399,6 +11381,7 @@ en-AU:
       generating: Generating...
       generating_combinations_progress: "Generating... (%{done}/%{total})"
       save: Save
+      save_and_publish: "Save & Publish"
       saved: Saved!
       saving: Saving...
       update_group: "Update Group"
@@ -11927,6 +11910,7 @@ en-AU:
           not_published: "Not Published"
           published: Published
           save: Save
+          save_and_publish: "Save & Publish"
         cant_go_back: "Lock questions after answering"
         default_page_title: "New Quiz"
         group: "Assignment Group"
@@ -14065,7 +14049,6 @@ en-AU:
       entry_no_image: "Keep in mind that this page may have changed since the submission originally occurred."
       entry_with_image: "We've included a snapshot of what the page looked like when it was submitted. Or you can click to view the original submission."
       external_url_submission: "This submission was a URL to an external page."
-      file_uploads_for_user: "File Uploads for **%{user}**"
       group_discussion_submission_description: "The submissions for this assignment are posts in the assignment's discussion for this group. Below are the discussion posts for %{user}, or you can *view the full group discussion*."
       group_discussion_submission_description_without_link: "The submissions for this assignment are posts in the assignment's discussion for this group. Below are the discussion posts for %{user}."
       media_comment_link: "This submission is a media recording. *click here to view*."
@@ -15029,6 +15012,7 @@ en-AU:
       buttons: 
         cancel: Cancel
         save: Save
+        save_and_publish: "Save & Publish"
       course_editing_roles: 
         anyone: Anyone
         only_teachers: "Only teachers"
