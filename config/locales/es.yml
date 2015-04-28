@@ -1277,11 +1277,6 @@ es:
       messages: 
         record_invalid: "La validación falló: %{errors}"
         taken: "ya ha sido tomado"
-      template: 
-        body: "Hubieron problemas con los siguientes campos:"
-        header: 
-          one: "1 error prohibió que este %{model} fuera guardado"
-          other: "%{count} errores prohibieron que este %{model} fuera guardado"
   activity_13915493: Actividad
   activity_by_category_9c2033d1: "Actividad por categoría"
   activity_by_date_878c5b49: "Actividad por fecha"
@@ -1689,6 +1684,8 @@ es:
       assignment_name: "Nombre:"
       assignment_points: "Puntos:"
       assignment_type: "Tipo:"
+      buttons: 
+        save_and_publish: "Guardar y publicar"
       cancel: Cancelar
       differentiated_due_dates: "Fecha de vencimiento diferenciada"
       discussion_type: Foro
@@ -1761,7 +1758,8 @@ es:
     edit_view: 
       assignment_name: "Nombre de tarea"
       buttons: 
-        update: "Actualizar tarea"
+        save: Guardar
+        save_and_publish: "Guardar y publicar"
       description: Descripción
       freeze_properties: "Bloquear las propiedades de la tarea al copiarla"
       notify_content_change: "Notificar a los usuarios que este contenido ha cambiado"
@@ -2229,7 +2227,6 @@ es:
   between_1_and_99_d421a4c0: "Entre el 1% y 99%"
   between_2_and_5_c34f5152: "Entre 2 y 5"
   big_blue_button_conference: 
-    conference_is_recorded: "Esta conferencia se está grabando."
     recording_setting: Grabación
     recording_setting_enabled_description: "Habilitar la grabación para esta conferencia"
   blackboard: 
@@ -3678,8 +3675,6 @@ es:
       edit_item: "Editar los Detalles del Elemento"
     url_show: 
       new_tab: "Debe abrir este sitio en una nueva ventana de exploración"
-      open_url_button: "Abrir %{title} en una nueva ventana"
-      tool_insecure_warning: "Esta tratando de iniciar contenido poco seguro desde un sitio seguro (canvas). Es posible que algunos navegadores de Internet eviten que se cargue este contenido."
   context_modules_api: 
     invalid_position: "Posición inválida"
   continue_ac067716: Continuar
@@ -5104,6 +5099,7 @@ es:
       buttons: 
         not_published: "No publicado"
         published: Publicado
+        save_and_publish: "Guardar y publicar"
       delay_posting: "Atrasar la publicación"
       enable_podcast_feed: "Activar el feed de podcast"
       include_replies_in_podcast_feed: "Incluir las respuestas del estudiante en la fuente de podcast"
@@ -5457,7 +5453,6 @@ es:
   ember_modules_description: "Módulos reescritos en Ember. Utiliza la API de arrastrar y soltar nativa para permitir arrastrar desde ubicaciones externas."
   enable_6f5d1328: Habilitar
   enable_gradebook_list_students_by_sortable_name: "Haga una lista de los alumnos por orden alfabético en el libro de calificaciones. El orden predeterminado de los nombres es \"Apellido, Nombre\", aunque esta opción puede cambiarse en la configuración."
-  enable_multiple_grading_periods: "Permitir gestión de calificación de periodos múltiple en la cuenta de administrador y utilizarla en el libro de calificaciones"
   end_date_e0093ed7: "Fecha límite"
   ends_on_date_320e0c26: "Fecha de finalización"
   enrollment: 
@@ -5757,7 +5752,6 @@ es:
   errors: 
     bad_navigation_config: "Configuración inválida de la pestaña del curso"
     blank: Obligatorio
-    dynamic_format: "%{message}"
     failed: Falló
     format: "%{attribute} %{message}"
     index: 
@@ -5964,6 +5958,7 @@ es:
     wiki_page_menu_configured: "Menú de páginas Wiki configurado"
   external_url_e9b87215: "URL externa"
   failed_to_create_zip_file_1a943d06: "Hubo una falla al crear el archivo comprimido"
+  failed_to_import_media_objects_4c1fcb4f: "Se produjo un error al importar los objetos multimedia"
   fair_use_bee47d77: "Uso legítimo"
   favicon_6e658914: "Icono de página"
   feature_flags: 
@@ -5982,6 +5977,7 @@ es:
     feature_flag_admin_view: 
       feature_options: "Opciones de características"
       no_features_available: "No hay funciones disponibles actualmente"
+  feature_options_37a2c317: "Opciones de características"
   features: 
     allow_opt_out_of_inbox: "Permitir a los usuarios autoexcluirse de la bandeja de entrada"
     better_file_browsing: "Exploración de archivos mejorada"
@@ -7307,7 +7303,6 @@ es:
     account_grading_standard_warning: "No se pudo encontrar el estándar de calificación de cuentas de este curso"
     copied_grading_standard_warning: "No se pudo encontrar el estándar de calificación copiado de este curso."
     due_dates_warning: "No se pudieron ajustar las fechas de vencimiento."
-    failed_import_media_objects: "Se produjo un error al importar los objetos multimedia"
     file_import_warning: "No se pudo encontrar el archivo %{file}"
   importers/learning_outcome_group_importer: 
     no_global_permission: "No se le permite gestionar resultados globales, no puede añadir \"%{title}\""
@@ -7337,6 +7332,7 @@ es:
   instructions: 
     authorize_google_docs: "Antes de poder colaborar en documentos, debe autorizar a Canvas para poder tener acceso a su cuenta de Google Docs:"
     authorize_google_drive: "Antes de poder colaborar en los documentos, debe autorizar a Canvas para que pueda acceder a su cuenta de Google Drive:"
+  instructions_2f88ee72: Instrucciones
   instructors_4b491a07: Instructores
   instructure: 
     alerts: 
@@ -7406,6 +7402,7 @@ es:
   invalid_utf_8_13c76a6: "UTF-8 no válido"
   invalid_xml_syntax: "Sintaxis xml inválida"
   invite_5b1fcbcd: Invitar
+  it_looks_like_your_content_might_not_load_you_can__dfb85860: "Parece que su contenido no se puede cargar. Puede utilizar este botón para tratar de iniciarlo en una nueva pestaña."
   item_complete_d334fd43: "(Elemento completo)"
   item_incomplete_d6a16040: "(Elemento incompleto)"
   item_type_assignment_13a1132e: "Tipo de elemento: tarea"
@@ -7660,8 +7657,6 @@ es:
       new_tab: "Es necesario cargar este herramienta en una ventana nueva del navegador"
       new_tab_expired: "Ha caducado la sesión para esta herramienta. Vuelva a cargar la página para poder acceder de nuevo a ella."
       new_tab_loaded: "Esta herramienta se cargó correctamente en una ventana nueva del navegador. Vuelva a cargar la página para poder acceder a la herramienta otra vez."
-      tool_insecure_warning: "Esta tratando de iniciar contenido poco seguro desde un sitio seguro (canvas). Es posible que algunos navegadores de Internet eviten que se cargue este contenido."
-      tool_load_failure: "Parece que su contenido no se puede cargar. Puede utilizar este botón para tratar de iniciarlo en una nueva pestaña."
   lti2: 
     register_tool: "Herramienta de registros"
   m2c_file_description: "Moodle 1.9/2.x"
@@ -7714,7 +7709,6 @@ es:
     loading: "Cargando archivo multimedia..."
     media_still_converting: "El archivo multimedia se está convirtiendo aún. Inténtelo de nuevo más tarde."
     messages: 
-      file_failed_to_load: "La carga de este archivo de media falló"
       flash_required_record_audio: "Se requiere Flash para grabar audio."
       flash_required_upload_audio: "Se requiere Flash para cargar audio."
       flash_required_upload_video: "Se requiere Flash para cargar video."
@@ -9637,7 +9631,6 @@ es:
   no_due_date_44271c53: "No hay fecha límite"
   no_due_date_6e6a23c1: "(no hay fecha límite)"
   no_e16d9132: "No"
-  no_grading_periods_to_display_ad25c8f3: "No hay ningún período de calificaciones que mostrar"
   no_grading_schemes_to_display_8b0e92e7: "No hay ningún esquema de calificaciones que mostrar"
   no_migration_file: "Archivo obligatorio para la migración de contenido."
   no_score_yet_c94e919b: "Aún sin puntuación"
@@ -9919,6 +9912,27 @@ es:
           kb: KB
           mb: MB
           tb: TB
+  oauth2_provider: 
+    auth: 
+      oauth2_complete: "La aplicación ha finalizado el flujo de trabajo de inicio de sesión, y debería reactivarse pronto"
+    confirm: 
+      cancel: Cancelar
+      details: 
+        allow_application: "%{app_name} está solicitando acceso a su cuenta."
+        email: "Su correo electrónico es %{email}."
+        login_name: "Está iniciando sesión en esta aplicación como %{user_name}."
+      labels: 
+        remember_access: "Recordar mi autorización para este servicio"
+      page_title: "Inicio de sesión a la aplicación"
+    confirm_mobile: 
+      cancel: Cancelar
+      details: 
+        allow_application: "%{app_name} está solicitando acceso a su cuenta."
+        email: "Su correo electrónico es %{email}."
+        login_name: "Está iniciando sesión en esta aplicación como %{user_name}."
+      login: "Iniciar sesión"
+      page_title: "Inicio de sesión a la aplicación"
+      remember_auth: "Recordar mi autorización para este servicio"
   observees: 
     add_observee_button: "Agregar alumno"
     being_observed: "Alumnos en observación"
@@ -9933,6 +9947,7 @@ es:
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Una vez que haya cambiado la respuesta, deberá elegir una opción para poder actualizar la pregunta."
   one_per_line_format_name_value_79647700: "Uno por línea. Formato: nombre=valor"
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} a tiempo, %{late} tarde, %{missing} sin entregar"
+  open_title_in_a_new_window_b29fed77: "Abrir %{title} en una nueva ventana"
   options: 
     ? "no"
     : "No"
@@ -10346,15 +10361,6 @@ es:
     kaltura_settings: 
       account_settings: "Estos valores pueden encontrarse en la Consola de Manejo Kaltura bajo “Configuraciones -> Configuraciones de Integración\""
       cache_explanation: "Vacío significa memoria indefinida, 0 significa sin memoria."
-      description: |
-          Necesitará una cuenta en [Kaltura.com](%{kaltura_url}) o con una instancia auto organizada de Kaltura.
-          
-          **Nota: ** una vez que tiene Kaltura configurado dentro de Canvas, debe ir a la Consola de Manejo de Kaltura y bajo “Configuraciones -> 
-          Configuraciones de Integración” permite notificaciones del servido con un URL de notificación de:
-          
-          %{notification_url}
-          
-          Luego marque las cajas para “Agregar Entrada” y “Borrar Entrada” en la columna de “Envío por Servidor”.
       headers: 
         account_settings: "Configuraciones de Cuenta"
         canvas_settings: "Configuración de Canvas"
@@ -10383,7 +10389,6 @@ es:
         secret_key: "Secreto de Administrador"
         subpartner_id: "ID Sub Partner"
         upload_ui_conf: "ID de Configuración Uploader UI"
-        use_alt_record_widget: "Utilizar el widget de grabación de flash alternativo"
         user_secret_key: "Secreto de Usuario"
       ui_conf_ids: "Para clientes alojados en Kaltura, puede pedirle a Kaltura que le provea estas identidades. En casos no alojados, puede encontrar estos valores en la tabla de configuración_ui."
     linked_in: 
@@ -10898,26 +10903,6 @@ es:
       page_title: "Ingresar a Canvas"
     notices: 
       mfa_complete: "Autenticación de factores múltiples configurada"
-    oauth2_auth: 
-      oauth2_complete: "La aplicación ha finalizado el flujo de trabajo de inicio de sesión, y debería reactivarse pronto"
-    oauth2_confirm: 
-      cancel: Cancelar
-      details: 
-        allow_application: "%{app_name} está solicitando acceso a su cuenta."
-        email: "Su correo electrónico es %{email}."
-        login_name: "Está iniciando sesión en esta aplicación como %{user_name}."
-      labels: 
-        remember_access: "Recordar mi autorización para este servicio"
-      page_title: "Inicio de sesión en la aplicación"
-    oauth2_confirm_mobile: 
-      cancel: Cancelar
-      details: 
-        allow_application: "%{app_name} está solicitando acceso a su cuenta."
-        email: "Su correo electrónico es %{email}."
-        login_name: "Está iniciando sesión en esta aplicación como %{user_name}."
-      login: "Iniciar sesión"
-      page_title: "Inicio de sesión a la aplicación"
-      remember_auth: "Recordar mi autorización para este servicio"
     otp_login: 
       buttons: 
         send: Enviar
@@ -11308,6 +11293,7 @@ es:
       generating: Generando...
       generating_combinations_progress: "Generando... (%{done}/%{total})"
       save: Guardar
+      save_and_publish: "Guardar y publicar"
       saved: ¡Guardado!
       saving: Guardando...
       update_group: "Actualizar Grupo"
@@ -11845,6 +11831,7 @@ es:
           not_published: "No publicado"
           published: Publicado
           save: Guardar
+          save_and_publish: "Guardar y publicar"
         cant_go_back: "Bloquear las preguntas después de contestar"
         default_page_title: "Nueva evaluación"
         group: "Grupo de trabajo"
@@ -13972,7 +13959,6 @@ es:
       entry_no_image: "Recuerde que esta página puede haber cambiado desde que ocurrió el envío original."
       entry_with_image: "Hemos incluído una vista previa de cómo se miraba la pagina cuando fue enviada. O puede hacer click para ver el envío original."
       external_url_submission: "Este envío fue una URL hacia una página externa."
-      file_uploads_for_user: "Cargas de Archivos para **%{user}**"
       group_discussion_submission_description: "Los envíos de esta tarea son publicaciones del foro de la tarea dentro del grupo. A continuación aparecen las publicaciones del foro de %{user}. También puede *ver toda el foro de grupo*."
       group_discussion_submission_description_without_link: "Los envíos de esta tarea son publicaciones en el foro  de la tarea para este grupo. A continuación aparecen las publicaciones de foro de %{user}."
       media_comment_link: "Este envío es una grabación. *Haga clic aquí para verlo*."
@@ -14928,6 +14914,7 @@ es:
       buttons: 
         cancel: Cancelar
         save: Guardar
+        save_and_publish: "Guardar y publicar"
       course_editing_roles: 
         anyone: Cualquiera
         only_teachers: "Solo profesores"
