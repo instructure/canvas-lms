@@ -1439,12 +1439,6 @@ define([
           $rubric_assessments_select.append('<option value="' + htmlEscape(this.id) + '">' + htmlEscape(this.assessor_name) + '</option>');
         });
 
-        // show a new option if there is not an assessment by me
-        // or, if I can :manage_course, there is not an assessment already with assessment_type = 'grading'
-        if( !assessmentsByMe.length || (ENV.RUBRIC_ASSESSMENT.assessment_type == 'grading' && !gradingAssessments.length) ) {
-          $rubric_assessments_select.append('<option value="new">' + htmlEscape(I18n.t('new_assessment', '[New Assessment]')) + '</option>');
-        }
-
         //select the assessment that meets these rules:
         // 1. the assessment by me
         // 2. the assessment with assessment_type = 'grading'
