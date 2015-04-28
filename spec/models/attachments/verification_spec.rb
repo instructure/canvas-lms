@@ -127,5 +127,28 @@ describe Attachments::Verification do
         expect(v2.valid_verifier_for_permission?(token, :download)).to eq(false)
       end
     end
+
+    it "supports session-based permissions" do
+      att2 = attachment_model(context: student)
+      eportfolio = student.eportfolios.create! public: false
+      v2 = Attachments::Verification.new(att2)
+      other_user = user_model
+      token = v2.verifier_for_user(other_user, context: eportfolio.asset_string, permission_map_id: :r_rd)
+      expect(v2.valid_verifier_for_permission?(token, :read)).to eq(false)
+      expect(v2.valid_verifier_for_permission?(token, :download)).to eq(false)
+      expect(v2.valid_verifier_for_permission?(token, :read, {eportfolio_ids: [eportfolio.id]})).to eq(true)
+      expect(v2.valid_verifier_for_permission?(token, :download, {eportfolio_ids: [eportfolio.id]})).to eq(true)
+    end
+
+    it "should support custom permissions checks on nil (public) user" do
+      att2 = attachment_model(context: student)
+      eportfolio = student.eportfolios.create! public: false
+      v2 = Attachments::Verification.new(att2)
+      token = v2.verifier_for_user(nil, context: eportfolio.asset_string, permission_map_id: :r_rd)
+      expect(v2.valid_verifier_for_permission?(token, :read)).to eq(false)
+      expect(v2.valid_verifier_for_permission?(token, :download)).to eq(false)
+      expect(v2.valid_verifier_for_permission?(token, :read, {eportfolio_ids: [eportfolio.id]})).to eq(true)
+      expect(v2.valid_verifier_for_permission?(token, :download, {eportfolio_ids: [eportfolio.id]})).to eq(true)
+    end
   end
 end
