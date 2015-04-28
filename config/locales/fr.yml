@@ -12,7 +12,7 @@ fr:
   2_highest_score_4_3b4bc250: "2 - Meilleure note : 4"
   2_most_recent_score_3_766dbf4e: "2 - Note la plus récente : 3"
   2_the_rest_item_average_4_3_2_3_3_d05f04e2: "2 - Moyenne 'du reste' de l'élément : (4 + 3 + 2) / 3 = 3"
-  3_calculated_mastery_score_5_0_75_3_0_25_4_5_c88c3a7b: "3 - Note de maîtrise calculée : 5(0.75) + 3(0.25) = 4.5"
+  3_calculated_mastery_score_5_0_75_3_0_25_4_5_c88c3a7b: "3 - Note de maîtrise calculée : 5(0,75) + 3(0,25) = 4,5"
   451_message: 
     description: "Vous n’êtes pas autorisé à accéder à ce site, parce que vous vous trouvez dans un pays soumis aux restrictions américaines sur les échanges commerciaux."
     headings: 
@@ -1281,11 +1281,6 @@ fr:
       messages: 
         record_invalid: "Échec de validation : %{errors}"
         taken: "a déjà été pris"
-      template: 
-        body: "Un problème s’est produit avec les champs suivants :"
-        header: 
-          one: "1 erreur a empêché l’enregistrement de ce %{model}"
-          other: "%{count} erreurs ont empêché l’enregistrement de ce %{model}"
   activity_13915493: Activité
   activity_by_category_9c2033d1: "Activité par catégorie"
   activity_by_date_878c5b49: "Activité par date"
@@ -1693,6 +1688,8 @@ fr:
       assignment_name: "Nom :"
       assignment_points: "Points :"
       assignment_type: "Type :"
+      buttons: 
+        save_and_publish: "Enregistrer et publier"
       cancel: Annuler
       differentiated_due_dates: "Échéance différenciée"
       discussion_type: Discussion
@@ -1765,7 +1762,8 @@ fr:
     edit_view: 
       assignment_name: "Nom de la tâche"
       buttons: 
-        update: "Mettre à jour une tâche"
+        save: Enregistrer
+        save_and_publish: "Enregistrer et publier"
       description: Description
       freeze_properties: "Verrouiller les propriétés de la tâche lors de la copie"
       notify_content_change: "Informer les utilisateurs que ce contenu a changé"
@@ -2234,7 +2232,6 @@ fr:
   between_1_and_99_d421a4c0: "Entre 1% et 99%"
   between_2_and_5_c34f5152: "Entre 2 et 5"
   big_blue_button_conference: 
-    conference_is_recorded: "Cette conférence est en cours d’enregistrement."
     recording_setting: Enregistrement
     recording_setting_enabled_description: "Autoriser l'enregistrement pour cette conférence"
   blackboard: 
@@ -2754,10 +2751,10 @@ fr:
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Impossible de supprimer les alignements d’après des associations de barème. Pour supprimer ces associations, vous devez enlever la ligne du barème des contenus."
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Ne peut effectuer de comparaison sur plus d'un seul fichier du même type"
   cancel_caeb1e68: Annuler
-  cannot_be_nil_when_account_id_is_nil_be6d1d60: "ne peut être nul lorsque l'account_id est nulle"
-  cannot_be_nil_when_course_id_is_nil_f539388: "ne peut être nul lorsque l'id. de cours est nulle"
+  cannot_be_nil_when_account_id_is_nil_be6d1d60: "ne peut être nul lorsque account_id est nulle"
+  cannot_be_nil_when_course_id_is_nil_f539388: "ne peut être nul lorsque course_id est nulle"
   cannot_be_present_when_account_id_is_present_f7d9b51f: "ne peut être présent lorsque l'account_id est présent"
-  cannot_be_present_when_course_id_is_present_785e6a59: "ne peut être présent lorsque la course_id est présente"
+  cannot_be_present_when_course_id_is_present_785e6a59: "ne peut être présent lorsque course_id est présente"
   canvas: 
     migration: 
       errors: 
@@ -3693,8 +3690,6 @@ fr:
       edit_item: "Modifier les informations de l’élément"
     url_show: 
       new_tab: "Ce site doit être ouvert dans une nouvelle fenêtre du navigateur."
-      open_url_button: "Ouvrir %{title} dans une nouvelle fenêtre"
-      tool_insecure_warning: "Vous essayez de lancer un contenu peu sûr depuis un site sécurisé (Canvas). Certains navigateurs Internet peuvent empêcher le chargement de ce contenu."
   context_modules_api: 
     invalid_position: "Position non valide"
   continue_ac067716: Continuer
@@ -4743,6 +4738,7 @@ fr:
         count: "Nombre d’étudiants ayant donné des réponses erronées"
         ratio: "Ratio d’étudiants ayant donné des réponses erronées"
   current_3ce5414a: "Actuelle :"
+  current_mastery_score_score_out_of_mastery_points_fedd343f: "Score actuel de maîtrise : %{score} sur %{mastery_points} "
   current_score_6c81792: "Note actuelle"
   current_total_67bf5f72: "Total actuel :"
   curve_grades_dialog: 
@@ -5118,6 +5114,7 @@ fr:
       buttons: 
         not_published: "Non publiés"
         published: Publiés
+        save_and_publish: "Enregistrer et publier"
       delay_posting: "Retarder la publication"
       enable_podcast_feed: "Activer le flux podcast"
       include_replies_in_podcast_feed: "Inclure les réponses d'étudiants dans le flux de la baladodiffusion"
@@ -5473,7 +5470,6 @@ fr:
   ember_modules_description: "Modules réécrits dans Ember. L’API glisser-déposer native est utilisée, ce qui permet de faire glisser des éléments depuis des emplacements externes."
   enable_6f5d1328: Activer
   enable_gradebook_list_students_by_sortable_name: "Affichez la liste des étudiants triée d’après leur nom dans le relevé de notes. Par défaut, le tri s’effectue d’après les données « Nom, prénom », mais vous pouvez modifier ces paramètres."
-  enable_multiple_grading_periods: "Activez la gestion de plusieurs périodes de notation dans le compte admin, et utilisez cette fonction dans le relevé de notes."
   end_date_e0093ed7: "Date de fin"
   ends_on_date_320e0c26: "Se termine à la date"
   enrollment: 
@@ -5775,7 +5771,6 @@ fr:
   errors: 
     bad_navigation_config: "Configuration d’onglet de cours non valide"
     blank: Requis
-    dynamic_format: "%{message}"
     failed: Échec
     format: "%{attribute} %{message}"
     index: 
@@ -5982,6 +5977,7 @@ fr:
     wiki_page_menu_configured: "Menu des pages Wiki configuré"
   external_url_e9b87215: "URL externe"
   failed_to_create_zip_file_1a943d06: "Échec de création de fichier zip"
+  failed_to_import_media_objects_4c1fcb4f: "Échec de l’importation des objets multimédias"
   fair_use_bee47d77: "Usage loyal"
   favicon_6e658914: Favicon
   feature_flags: 
@@ -6000,6 +5996,7 @@ fr:
     feature_flag_admin_view: 
       feature_options: "Options de la fonction "
       no_features_available: "Il n’y a aucune fonctionnalité disponible actuellement."
+  feature_options_37a2c317: "Options de la fonction "
   features: 
     allow_opt_out_of_inbox: "Autoriser les utilisateurs à sortir de la boîte de réception"
     better_file_browsing: "Meilleure navigation dans les fichiers"
@@ -7324,7 +7321,6 @@ fr:
     account_grading_standard_warning: "Impossible de trouver le critère de notation du compte pour le cours."
     copied_grading_standard_warning: "Impossible de trouver le critère de notation copié pour le cours."
     due_dates_warning: "Impossible de rectifier les dates d’échéance."
-    failed_import_media_objects: "Échec de l’importation des objets multimédias"
     file_import_warning: "Le fichier %{file} est introuvable"
   importers/learning_outcome_group_importer: 
     no_global_permission: "Vous ne disposez pas de l’autorisation requise pour gérer les acquis globaux. Impossible d’ajouter %{title}."
@@ -7354,6 +7350,7 @@ fr:
   instructions: 
     authorize_google_docs: "Avant de collaborer sur des documents, vous devez autoriser Canvas à accéder à votre compte Google Docs :"
     authorize_google_drive: "Pour pouvoir travailler en collaboration sur des documents, vous devez autoriser Canvas à accéder à votre compte Google Drive :"
+  instructions_2f88ee72: Instructions
   instructors_4b491a07: instructeurs
   instructure: 
     alerts: 
@@ -7423,6 +7420,7 @@ fr:
   invalid_utf_8_13c76a6: "UTF-8 non valide"
   invalid_xml_syntax: "Syntaxe XMLl incorrecte"
   invite_5b1fcbcd: Invitation
+  it_looks_like_your_content_might_not_load_you_can__dfb85860: "Il semblerait que votre contenu ne se charge pas. Vous pouvez utiliser ce bouton pour essayer de le lancer dans un nouvel onglet"
   item_complete_d334fd43: "(élément complété)"
   item_incomplete_d6a16040: "(élément incomplet)"
   item_type_assignment_13a1132e: "Type d'élément : Travail à faire"
@@ -7684,8 +7682,6 @@ fr:
       new_tab: "Cet outil doit être ouvert dans une nouvelle fenêtre du navigateur"
       new_tab_expired: "La session de cet outil a expiré. Rechargez cette page pour accéder de nouveau à l’outil."
       new_tab_loaded: "Cet outil a bien été ouvert dans une nouvelle fenêtre du navigateur. Rechargez cette page pour accéder de nouveau à l’outil."
-      tool_insecure_warning: "Vous essayez de lancer un contenu peu sûr depuis un site sécurisé (Canvas). Certains navigateurs Internet peuvent empêcher le chargement de ce contenu."
-      tool_load_failure: "Il semblerait que votre contenu ne se charge pas. Vous pouvez utiliser ce bouton pour essayer de le lancer dans un nouvel onglet"
   lti2: 
     register_tool: "Enregistrer un outil"
   m2c_file_description: "Moodle 1.9/2.x"
@@ -7738,7 +7734,6 @@ fr:
     loading: "Chargement du support..."
     media_still_converting: "Conversion du support... Veuillez réessayer ultérieurement."
     messages: 
-      file_failed_to_load: "Échec de chargement du fichier multimédia"
       flash_required_record_audio: "Flash est requis pour l’enregistrement audio."
       flash_required_upload_audio: "Flash est requis pour le téléchargement audio."
       flash_required_upload_video: "Flash est requis pour le téléchargement vidéo."
@@ -9666,7 +9661,6 @@ fr:
   no_due_date_44271c53: "Pas d’échéance"
   no_due_date_6e6a23c1: "(pas d’échéance)"
   no_e16d9132: Non
-  no_grading_periods_to_display_ad25c8f3: "Aucune période de notation à afficher"
   no_grading_schemes_to_display_8b0e92e7: "Aucun système de notation à afficher"
   no_migration_file: "Fichier requis pour la migration de ce contenu."
   no_score_yet_c94e919b: "Pas encore de résultat"
@@ -9948,6 +9942,27 @@ fr:
           kb: Ko
           mb: Mo
           tb: To
+  oauth2_provider: 
+    auth: 
+      oauth2_complete: "L’application a terminé le flux de travail de connexion et va se réactiver d’ici peu."
+    confirm: 
+      cancel: Annuler
+      details: 
+        allow_application: "%{app_name} demande à accéder à votre compte."
+        email: "Votre adresse e-mail est %{email}."
+        login_name: "Vous vous connectez à cette application en tant que %{user_name}."
+      labels: 
+        remember_access: "Mémoriser mon autorisation pour ce service"
+      page_title: "Connexion à l’application"
+    confirm_mobile: 
+      cancel: Annuler
+      details: 
+        allow_application: "%{app_name} demande à accéder à votre compte."
+        email: "Votre adresse e-mail est %{email}."
+        login_name: "Vous vous connectez à cette application en tant que %{user_name}."
+      login: Connexion
+      page_title: "Connexion à l’application"
+      remember_auth: "Mémoriser mon autorisation pour ce service"
   observees: 
     add_observee_button: "Ajouter un étudiant"
     being_observed: "Étudiants observés"
@@ -9962,6 +9977,7 @@ fr:
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Une fois que vous avez changé une réponse, vous devez choisir une option avant d’actualiser la question."
   one_per_line_format_name_value_79647700: "Un par ligne. Format : name=value"
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} à temps, %{late} en retard, %{missing} manquant(s)"
+  open_title_in_a_new_window_b29fed77: "Ouvrir %{title} dans une nouvelle fenêtre"
   options: 
     ? "no"
     : Non
@@ -10377,18 +10393,6 @@ fr:
     kaltura_settings: 
       account_settings: "Ces valeurs se trouvent dans la console de gestion Kaltura sous Paramètres -> Paramètres d’intégration."
       cache_explanation: "L’absence de paramètre indique une mise en cache sans limites, 0 indique qu’il n’y a pas de mise en cache."
-      description: |-
-          Vous aurez besoin d’un compte soit sur [Kaltura.com](%{kaltura_url})
-          ou avec une instance auto-hébergée de Kaltura.
-          
-          **Note :** une fois que vous avez configuré Kaltura dans Canvas,
-          accédez à la console de gestion Kaltura puis sous « Paramètres-> 
-          Paramètres d’intégration », activez les notifications du serveur avec une 
-          URL de notification :
-          
-          %{notification_url}
-          
-          Puis, cochez les cases « Ajouter une entrée » et « Supprimer l’entrée » dans la colonne « Envoyé par serveur ».
       headers: 
         account_settings: "Paramètres de compte"
         canvas_settings: "Paramètres Canvas"
@@ -10417,7 +10421,6 @@ fr:
         secret_key: "Secret de l’administrateur"
         subpartner_id: "ID du sous-partenaire"
         upload_ui_conf: "ID de configuration de l’IU du télépartageur"
-        use_alt_record_widget: "Utiliser un autre widget d’enregistrement Flash"
         user_secret_key: "Secret de l’utilisateur"
       ui_conf_ids: "Pour les clients hébergés sur Kaltura, vous pouvez demander à Kaltura de vous fournir ces ID. Les instances auto-hébergées peuvent trouver ces valeurs dans le tableau ui_confs."
     linked_in: 
@@ -10948,26 +10951,6 @@ fr:
       page_title: "Connexion à Canvas"
     notices: 
       mfa_complete: "Authentification multifacteur configurée"
-    oauth2_auth: 
-      oauth2_complete: "L’application a terminé le flux de travail de connexion et va se réactiver d’ici peu."
-    oauth2_confirm: 
-      cancel: Annuler
-      details: 
-        allow_application: "%{app_name} demande à accéder à votre compte."
-        email: "Votre adresse e-mail est %{email}."
-        login_name: "Vous vous connectez à cette application en tant que %{user_name}."
-      labels: 
-        remember_access: "Mémoriser mon autorisation pour ce service"
-      page_title: "Connexion à l’application"
-    oauth2_confirm_mobile: 
-      cancel: Annuler
-      details: 
-        allow_application: "%{app_name} demande à accéder à votre compte."
-        email: "Votre adresse e-mail est %{email}."
-        login_name: "Vous vous connectez à cette application en tant que %{user_name}."
-      login: Connexion
-      page_title: "Connexion à l’application"
-      remember_auth: "Mémoriser mon autorisation pour ce service"
     otp_login: 
       buttons: 
         send: Envoyer
@@ -11362,6 +11345,7 @@ fr:
       generating: "Génération en cours..."
       generating_combinations_progress: "Génération en cours... (%{done}/%{total})"
       save: Enregistrer
+      save_and_publish: "Enregistrer et publier"
       saved: "Enregistrement terminé."
       saving: "Enregistrement en cours..."
       update_group: "Mettre à jour un groupe"
@@ -11905,6 +11889,7 @@ fr:
           not_published: "Non publiés"
           published: Publiés
           save: Enregistrer
+          save_and_publish: "Enregistrer et publier"
         cant_go_back: "Verrouiller les questions après les réponses"
         default_page_title: "Nouveau questionnaire"
         group: "Groupe de travaux"
@@ -13031,7 +13016,7 @@ fr:
         recaptcha_public_key: "Clé publique ReCAPTCHA"
     service_cloud_settings: 
       labels: 
-        api_url: "Hôte de l'API Salesforce (https://quelquechose.salesforce.com)"
+        api_url: "Hôte de l'API Salesforce (https://something.salesforce.com)"
         consumer_key: "Code client Salesforce"
         consumer_secret: "Secret de consommateur Salesforce"
         is_sandbox: "Ceci est un compte test de Salesforce"
@@ -14042,7 +14027,6 @@ fr:
       entry_no_image: "Gardez à l’esprit que cette page peut avoir été modifiée depuis l’envoi d’origine."
       entry_with_image: "Nous avons inclus une image représentant la page au moment de l’envoi. Vous pouvez également cliquer pour afficher l’envoi d’origine."
       external_url_submission: "Cet envoi correspond à une URL vers une page externe."
-      file_uploads_for_user: "Téléchargements de fichiers pour **%{user}**"
       group_discussion_submission_description: "Les envois relatifs à cette tâche sont publiés dans la discussion du groupe associé à cette tâche. Vous voyez ci-dessous les contributions destinées à  %{user}, mais vous pouvez aussi *afficher la discussion complète du groupe*."
       group_discussion_submission_description_without_link: "Les envois concernant ce travail sont publiés dans la discussion associée et pour ce groupe. Ci-dessous figurent les contributions à la discussion publiées pour %{user}."
       media_comment_link: "Cet envoi est un enregistrement multimédia. *cliquez ici pour afficher*."
@@ -15006,6 +14990,7 @@ fr:
       buttons: 
         cancel: Annuler
         save: Enregistrer
+        save_and_publish: "Enregistrer et publier"
       course_editing_roles: 
         anyone: Tous
         only_teachers: "Uniquement les enseignants"
