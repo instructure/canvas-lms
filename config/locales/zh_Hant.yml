@@ -1272,11 +1272,6 @@ zh_Hant:
       messages: 
         record_invalid: "驗證失敗：%{errors}"
         taken: 已採用
-      template: 
-        body: 以下欄位有問題：
-        header: 
-          one: "%{count} 個錯誤禁止儲存此 %{model}"
-          other: "%{count} 個錯誤禁止儲存此 %{model}"
   activity_13915493: 活動
   activity_by_category_9c2033d1: 按類別劃分的活動
   activity_by_date_878c5b49: 按日期劃分的活動
@@ -1684,6 +1679,8 @@ zh_Hant:
       assignment_name: 名稱：
       assignment_points: 點：
       assignment_type: 類型：
+      buttons: 
+        save_and_publish: 儲存並發佈
       cancel: 取消
       differentiated_due_dates: 差異化到期日
       discussion_type: 討論
@@ -1756,7 +1753,8 @@ zh_Hant:
     edit_view: 
       assignment_name: 任務名稱
       buttons: 
-        update: 更新任務
+        save: 儲存
+        save_and_publish: 儲存並發佈
       description: 說明
       freeze_properties: 複製時鎖定任務屬性
       notify_content_change: 通知使用者該內容已更改
@@ -2219,7 +2217,6 @@ zh_Hant:
   between_1_and_99_d421a4c0: "在 1% 和 99% 之間"
   between_2_and_5_c34f5152: "在 2 和 5 之間"
   big_blue_button_conference: 
-    conference_is_recorded: 這次會議被記錄。
     recording_setting: 記錄
     recording_setting_enabled_description: 啟用針對此次會議的記錄
   blackboard: 
@@ -3677,8 +3674,6 @@ zh_Hant:
       edit_item: 編輯項目詳細資料
     url_show: 
       new_tab: 此網站需要在新的瀏覽器視窗中打開。
-      open_url_button: "在新視窗中打開 %{title}。"
-      tool_insecure_warning: 您正在嘗試在一個安全的網站（canvas）內推出不安全內容。一些網際網路瀏覽器可能會阻止載入此內容。
   context_modules_api: 
     invalid_position: 無效的位置
   continue_ac067716: 繼續
@@ -5102,6 +5097,7 @@ zh_Hant:
       buttons: 
         not_published: 未發佈
         published: 已發佈
+        save_and_publish: 儲存並發佈
       delay_posting: 延遲公佈
       enable_podcast_feed: 啟用播客摘要
       include_replies_in_podcast_feed: 包含學生在播客評論中的回復
@@ -5455,7 +5451,6 @@ zh_Hant:
   ember_modules_description: "在 Ember 中重寫的模組。使用本機拖放 API，允許從外部位置拖曳。"
   enable_6f5d1328: 啟用
   enable_gradebook_list_students_by_sortable_name: 將學生按其各自可排序姓名列入成績冊。可排序姓名預設為‘姓氏，名字’，而且可以在設定中進行更改。
-  enable_multiple_grading_periods: "在帳戶管理員中啟用多評分階段管理，并在 Gradebook 中使用。"
   end_date_e0093ed7: 結束日期
   ends_on_date_320e0c26: 結束日期
   enrollment: 
@@ -5754,7 +5749,6 @@ zh_Hant:
   errors: 
     bad_navigation_config: 無效的課程標籤設定
     blank: 必需的
-    dynamic_format: "%{message}"
     failed: 失敗
     format: "%{attribute} %{message}"
     index: 
@@ -5961,6 +5955,7 @@ zh_Hant:
     wiki_page_menu_configured: "Wiki 頁面功能表已設定"
   external_url_e9b87215: "外部 URI"
   failed_to_create_zip_file_1a943d06: 無法創建壓縮檔案
+  failed_to_import_media_objects_4c1fcb4f: 無法匯出媒體物件
   fair_use_bee47d77: 公平使用
   favicon_6e658914: Favicon
   feature_flags: 
@@ -5979,6 +5974,7 @@ zh_Hant:
     feature_flag_admin_view: 
       feature_options: 功能選項
       no_features_available: 目前無可用功能。
+  feature_options_37a2c317: 功能選項
   features: 
     allow_opt_out_of_inbox: 允許使用者退出收件箱
     better_file_browsing: 更好的檔案瀏覽
@@ -7295,7 +7291,6 @@ zh_Hant:
     account_grading_standard_warning: 找不到該課程的帳戶評分標準。
     copied_grading_standard_warning: 找不到該課程的複製的評分標準。
     due_dates_warning: 無法調整截止日期。
-    failed_import_media_objects: 無法匯出媒體物件
     file_import_warning: "找不到檔案 %{file} "
   importers/learning_outcome_group_importer: 
     no_global_permission: "你不能管理全域成果，不能 『%{title}』"
@@ -7394,6 +7389,7 @@ zh_Hant:
   invalid_utf_8_13c76a6: "無效的 UTF-8"
   invalid_xml_syntax: "無效的 XML 語法"
   invite_5b1fcbcd: 邀請
+  it_looks_like_your_content_might_not_load_you_can__dfb85860: 看起來您的內容可能無法載入。您可以使用該按鈕來嘗試在新標籤中啟動它。
   item_complete_d334fd43: (項目完成)
   item_incomplete_d6a16040: (項目未完成)
   item_type_assignment_13a1132e: 項目類型：任務
@@ -7650,8 +7646,6 @@ zh_Hant:
       new_tab: 該工具需要在新流瀏覽器視窗中載入
       new_tab_expired: 該工具的會話已到期。請重新載入頁面以再次存取工具
       new_tab_loaded: 該工具已在新流瀏覽器視窗中成功載入。重新載入頁面以再次存取工具。
-      tool_insecure_warning: 您正在嘗試在一個安全的網站（canvas）內推出不安全內容。一些網際網路瀏覽器可能會阻止載入此內容。
-      tool_load_failure: 看起來您的內容可能無法載入。您可以使用該按鈕來嘗試在新標籤中啟動它。
   lti2: 
     register_tool: 註冊工具
   m2c_file_description: "Moodle 1.9/2.x"
@@ -7704,7 +7698,6 @@ zh_Hant:
     loading: 正在載入媒體...
     media_still_converting: 媒體目前正在轉換，請稍後再試一次。
     messages: 
-      file_failed_to_load: 該媒體檔案載入失敗
       flash_required_record_audio: "錄製音訊需要的 Flash。"
       flash_required_upload_audio: "上傳音訊需要的 Flash。"
       flash_required_upload_video: "上傳視訊需要的 Flash。"
@@ -9603,7 +9596,6 @@ zh_Hant:
   no_due_date_44271c53: 無截止日期
   no_due_date_6e6a23c1: （無截止日期）
   no_e16d9132: 否
-  no_grading_periods_to_display_ad25c8f3: 沒有可顯示的評分時段
   no_grading_schemes_to_display_8b0e92e7: 沒有可顯示的評分配置
   no_migration_file: 內容遷移所需的檔案。
   no_score_yet_c94e919b: 尚無分數
@@ -9886,6 +9878,27 @@ zh_Hant:
           kb: KB
           mb: MB
           tb: TB
+  oauth2_provider: 
+    auth: 
+      oauth2_complete: 該應用程式已經完成了登入工作流程，並且很快就會重新啟動。
+    confirm: 
+      cancel: 取消
+      details: 
+        allow_application: "%{app_name} 正在要求存取您的帳戶。"
+        email: "您的電子郵件地址為 %{email}。"
+        login_name: "您正在作為 %{user_name} 登入此應用程式。"
+      labels: 
+        remember_access: 記住我對此項服務的授權
+      page_title: 應用程式登入
+    confirm_mobile: 
+      cancel: 取消
+      details: 
+        allow_application: "%{app_name} 正在要求存取您的帳戶。"
+        email: "您的電子郵件地址為 %{email}。"
+        login_name: "您正在作為 %{user_name} 登入此應用程式。"
+      login: 登入
+      page_title: 應用程式登入
+      remember_auth: 記住我對此項服務的授權
   observees: 
     add_observee_button: 新增學生
     being_observed: 將被觀察的學生
@@ -9900,6 +9913,7 @@ zh_Hant:
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: 一旦您更改了答案，則需要在更新問題之前，選擇一個選項。
   one_per_line_format_name_value_79647700: 每行一個。格式：名稱=值
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} 按時提交，%{late} 遲交，%{missing} 未交"
+  open_title_in_a_new_window_b29fed77: "在新視窗中打開 %{title}。"
   options: 
     ? "no"
     : 否
@@ -10315,14 +10329,6 @@ zh_Hant:
     kaltura_settings: 
       account_settings: "這些值可以在『設定 - >集成設定』下的 Kaltura 管理主控台中找到"
       cache_explanation: "空白表示快取無限期，0 表示不快取。"
-      description: |-
-          您將需要一個在 [Kaltura.com](%{kaltura_url}) 上或 Kaltura自託管的執行個體的帳戶。
-          
-          **注：**一旦您在 Canvas 內設定了 Kaltura，則需要轉至 Kaltura 管理主控台，並在『設定 - >集成設定』下啟用伺服器通知，通知 URL 為：
-          
-          %{notification_url}
-          
-          然後核取『由伺服器傳送』欄中的『新增條目』和『刪除條目』核取方塊。
       headers: 
         account_settings: 帳戶設定
         canvas_settings: "Canvas 設定"
@@ -10351,7 +10357,6 @@ zh_Hant:
         secret_key: 管理員密碼
         subpartner_id: "子合作夥伴 ID"
         upload_ui_conf: "上傳程式 UI Conf ID"
-        use_alt_record_widget: 使用其他快閃記憶體記錄部件
         user_secret_key: 使用者密碼
       ui_conf_ids: "對於 Kaltura 託管的客戶，您可以要求 Kaltura 為您提供這些ID。自託管的執行個體可以在ui_confs表中發現這些值。"
     linked_in: 
@@ -10870,26 +10875,6 @@ zh_Hant:
       page_title: "登入 Canvas"
     notices: 
       mfa_complete: 多因素驗證已設定
-    oauth2_auth: 
-      oauth2_complete: 該應用程式已經完成了登入工作流程，並且很快就會重新啟動。
-    oauth2_confirm: 
-      cancel: 取消
-      details: 
-        allow_application: "%{app_name} 正在要求存取您的帳戶。"
-        email: "您的電子郵件地址為 %{email}。"
-        login_name: "您正在作为 %{user_name} 登入该应用程序。"
-      labels: 
-        remember_access: 記住我對此項服務的授權
-      page_title: 應用程式登入
-    oauth2_confirm_mobile: 
-      cancel: 取消
-      details: 
-        allow_application: "%{app_name} 正在要求存取您的帳戶。"
-        email: "您的電子郵件地址為 %{email}。"
-        login_name: "您正在作為 %{user_name} 登入此應用程式。"
-      login: 登入
-      page_title: 應用程式登入
-      remember_auth: 記住我對此項服務的授權
     otp_login: 
       buttons: 
         send: 傳送
@@ -11278,6 +11263,7 @@ zh_Hant:
       generating: 正在生成…
       generating_combinations_progress: "正在生成…(%{done}/%{total})"
       save: 儲存
+      save_and_publish: 儲存並發佈
       saved: 已儲存！
       saving: 正在儲存...
       update_group: 更新群組
@@ -11804,6 +11790,7 @@ zh_Hant:
           not_published: 未發佈
           published: 已發佈
           save: 儲存
+          save_and_publish: 儲存並發佈
         cant_go_back: 回答後鎖定問題
         default_page_title: 新測驗
         group: 任務群組
@@ -13933,7 +13920,6 @@ zh_Hant:
       entry_no_image: 謹記，自從最初提交時此頁面可能已更改。
       entry_with_image: 我們提供了頁面提交時的快照。或者您可以按一下以檢視原始提交件。
       external_url_submission: 此提交是至外部頁面的URL。
-      file_uploads_for_user: "針對**%{user}**的檔案上傳"
       group_discussion_submission_description: "此任務的提交件在任務的討論中公佈。下面是%{user}的討論帖，或者您也可以*檢視完整的討論*。"
       group_discussion_submission_description_without_link: "該任務的提交件是該群組對該任務的討論帖。以下為 %{user} 的討論帖。"
       media_comment_link: 此提交件是媒體記錄。*按一下此處以檢視。*
@@ -14893,6 +14879,7 @@ zh_Hant:
       buttons: 
         cancel: 取消
         save: 儲存
+        save_and_publish: 儲存並發佈
       course_editing_roles: 
         anyone: 任何人
         only_teachers: 僅教師
