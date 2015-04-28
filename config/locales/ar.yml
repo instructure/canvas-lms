@@ -1306,15 +1306,6 @@ ar:
       messages: 
         record_invalid: "فشل التحقق: %{errors}"
         taken: "تم أخذها بالفعل"
-      template: 
-        body: "كانت هناك مشكلات مع الحقول التالية:"
-        header: 
-          few: "منع %{count} من الأخطاء أن يتم حفظ %{model} هذا"
-          many: "منع %{count} من الأخطاء أن يتم حفظ %{model} هذا"
-          one: "منع خطأ واحد أن يتم حفظ %{model} هذا"
-          other: "منع %{count} من الأخطاء أن يتم حفظ %{model} هذا"
-          two: "منع %{count} من الأخطاء أن يتم حفظ %{model} هذا"
-          zero: "منع %{count} من الأخطاء أن يتم حفظ %{model} هذا"
   activity_13915493: النشاط
   activity_by_category_9c2033d1: "النشاط حسب الفئة"
   activity_by_date_878c5b49: "النشاط حسب التاريخ"
@@ -1742,6 +1733,8 @@ ar:
       assignment_name: "الاسم:"
       assignment_points: "النقاط:"
       assignment_type: "النوع:"
+      buttons: 
+        save_and_publish: "حفظ ونشر"
       cancel: إلغاء
       differentiated_due_dates: "تاريخ استحقاق تمييزي"
       discussion_type: المناقشة
@@ -1822,7 +1815,8 @@ ar:
     edit_view: 
       assignment_name: "اسم المهمة"
       buttons: 
-        update: "تحديث المهمة"
+        save: حفظ
+        save_and_publish: "حفظ ونشر"
       description: الوصف
       freeze_properties: "تأمين خصائص التعيين عند النسخ"
       notify_content_change: "إعلام المستخدمين بأن هذا المحتوى قد تغير"
@@ -2303,7 +2297,6 @@ ar:
   between_1_and_99_d421a4c0: "بين 1% و 99%"
   between_2_and_5_c34f5152: "بين 2 و 5"
   big_blue_button_conference: 
-    conference_is_recorded: "يتم تسجيل هذا المؤتمر."
     recording_setting: تسجيل
     recording_setting_enabled_description: "تمكين التسجيل لهذا المؤتمر"
   blackboard: 
@@ -3770,8 +3763,6 @@ ar:
       edit_item: "تحرير تفاصيل العنصر"
     url_show: 
       new_tab: "يجب فتح هذا الموقع في نافذة مستعرض جديدة."
-      open_url_button: "عرض %{title} في نافذة جديدة"
-      tool_insecure_warning: "أنت تحاول تشغيل محتوى غير آمن من موقع آمن (canvas). بعض مستعرضات الإنترنت تمنع هذا المحتوى من التحميل."
   context_modules_api: 
     invalid_position: "وضع غير صالح"
   continue_ac067716: متابعة
@@ -5344,6 +5335,7 @@ ar:
       buttons: 
         not_published: "لم يتم النشر"
         published: "تم النشر"
+        save_and_publish: "حفظ ونشر"
       delay_posting: "تأخير النشر"
       enable_podcast_feed: "تمكين موجز بودكاست"
       include_replies_in_podcast_feed: "تضمين ردود الطلاب في موجز Podcast"
@@ -5719,7 +5711,6 @@ ar:
   ember_modules_description: "تم كتابة الوحدات في Ember. استخدم واجهة برمجة التطبيقات الأصلية للسحب والإفلات للسماح بالسحب من المواقع الخارجية."
   enable_6f5d1328: تمكين
   enable_gradebook_list_students_by_sortable_name: "سجل الطلاب بأسمائهم القابلة للفرز في دفتر الدرجات. الإعدادات الافتراضية للأسماء القابلة للفرز هي \"الاسم الأخير\"، \"الاسم الأول\" ويمكن تغييرها في الإعدادات."
-  enable_multiple_grading_periods: "تمكين إدارة فترات حساب الدرجات المتعدد في مسؤول الحساب، واستخدامها في دفتر الدرجات."
   end_date_e0093ed7: "تاريخ الانتهاء"
   ends_on_date_320e0c26: "تاريخ الانتهاء"
   enrollment: 
@@ -6031,7 +6022,6 @@ ar:
   errors: 
     bad_navigation_config: "تكوين غير صالح لعلامة تبويب المساق"
     blank: مطلوب
-    dynamic_format: "%{message}"
     failed: فشل
     format: "%{attribute} %{message}"
     index: 
@@ -6238,6 +6228,7 @@ ar:
     wiki_page_menu_configured: "تم تكوين قائمة صفحات Wiki "
   external_url_e9b87215: "عنوان URL خارجي"
   failed_to_create_zip_file_1a943d06: "فشل إنشاء ملف zip"
+  failed_to_import_media_objects_4c1fcb4f: "فشل استيراد كائنات الوسائط"
   fair_use_bee47d77: "الاستخدام العادل"
   favicon_6e658914: "أيقونة المفضلة"
   feature_flags: 
@@ -6256,6 +6247,7 @@ ar:
     feature_flag_admin_view: 
       feature_options: "خيارات الميزة"
       no_features_available: "لا توجد ميزات متاحة حاليًا."
+  feature_options_37a2c317: "خيارات الميزة"
   features: 
     allow_opt_out_of_inbox: "السماح للمستخدمين بإلغاء الاشتراك في صندوق الوارد"
     better_file_browsing: "استعراض أفضل للملفات"
@@ -7651,7 +7643,6 @@ ar:
     account_grading_standard_warning: "تعذر العثور على معيار تقدير درجات الحساب للمساق."
     copied_grading_standard_warning: "تعذر العثور على معيار تقدير الدرجات المنسوخ للمساق."
     due_dates_warning: "تعذر تعديل تواريخ الاستحقاق."
-    failed_import_media_objects: "فشل استيراد كائنات الوسائط"
     file_import_warning: "تعذر العثور على الملف %{file}"
   importers/learning_outcome_group_importer: 
     no_global_permission: "غير مسموح لك بإدارة النتائج العامة، لا يمكن إضافة \"%{title}\""
@@ -7681,6 +7672,7 @@ ar:
   instructions: 
     authorize_google_docs: "قبل أن تستطيع التعاون في العمل مع المستندات، يلزم تخويلك من Canvas للوصول إلى حساب Google Docs:"
     authorize_google_drive: "قبل أن تتمكن من التعاون على المستندات، ستحتاج إلى تخويل Canvas للوصول إلى حساب Google Drive."
+  instructions_2f88ee72: إرشادات
   instructors_4b491a07: معلمون
   instructure: 
     alerts: 
@@ -7750,6 +7742,7 @@ ar:
   invalid_utf_8_13c76a6: "UTF-8 غير صالح"
   invalid_xml_syntax: "بناء جملة xml غير صالح"
   invite_5b1fcbcd: دعوة
+  it_looks_like_your_content_might_not_load_you_can__dfb85860: "يبدو أنه لن يتم تحميل المحتوى. يمكنك استخدام هذا الزر لمحاولة تشغيله في علامة تبويب جديدة."
   item_complete_d334fd43: "(عنصر كامل)"
   item_incomplete_d6a16040: "(عنصر غير كامل)"
   item_type_assignment_13a1132e: "نوع العنصر: مهمة"
@@ -8016,8 +8009,6 @@ ar:
       new_tab: "تحتاج هذه الأداة للتحميل في نافذة مستعرض جديدة"
       new_tab_expired: "انتهى وقت الجلسة الخاصة بهذه الأداة. الرجاء إعادة تحميل الصفحة للوصول إلى الأداة مرة أخرى."
       new_tab_loaded: "تم تحميل هذه الأداة بنجاح في نافذة مستعرض جديدة. أعد تحميل الصفحة للوصول إلى الأداة مرة أخرى."
-      tool_insecure_warning: "أنت تحاول تشغيل محتوى غير آمن من موقع آمن (canvas). قد تمنع بعض مستعرضات الإنترنت هذا المحتوى من التحميل."
-      tool_load_failure: "يبدو أنه لن يتم تحميل المحتوى. يمكنك استخدام هذا الزر لمحاولة تشغيله في علامة تبويب جديدة."
   lti2: 
     register_tool: "أداة التسجيل"
   m2c_file_description: "Moodle 1.9/2.x"
@@ -8070,7 +8061,6 @@ ar:
     loading: "جارٍ تحميل الوسائط..."
     media_still_converting: "جارٍ حاليًا تحويل الوسائط، الرجاء إعادة المحاولة بعد قليل."
     messages: 
-      file_failed_to_load: "فشل تحميل ملف الوسائط هذا"
       flash_required_record_audio: "مطلوب Flash لتسجيل الصوت."
       flash_required_upload_audio: "مطلوب Flash لتحميل الصوت."
       flash_required_upload_video: "مطلوب Flash لتحميل الفيديو."
@@ -10049,7 +10039,6 @@ ar:
   no_due_date_44271c53: "بلا تاريخ استحقاق"
   no_due_date_6e6a23c1: "(لا يوجد تاريخ استحقاق)"
   no_e16d9132: لا
-  no_grading_periods_to_display_ad25c8f3: "لا توجد فترات تقييم درجات لعرضها"
   no_grading_schemes_to_display_8b0e92e7: "لا توجد مخططات تقييم درجات لعرضها"
   no_migration_file: "الملف مطلوب لترحيل المحتوى."
   no_score_yet_c94e919b: "لا توجد درجة حتى الآن"
@@ -10346,6 +10335,27 @@ ar:
           kb: كيلوبايت
           mb: ميجابايت
           tb: تيرابايت
+  oauth2_provider: 
+    auth: 
+      oauth2_complete: "أنهى التطبيق سير عمل تسجيل الدخول، وينبغي أن يعيد التنشيط بعد قليل."
+    confirm: 
+      cancel: إلغاء
+      details: 
+        allow_application: "يطلب %{app_name} الوصول إلى حسابك."
+        email: "عنوان بريدك الإلكتروني هو %{email}."
+        login_name: "لقد قمت بتسجيل الدخول إلى هذا التطبيق باسم %{user_name}."
+      labels: 
+        remember_access: "تذكر تخويلي لهذه الخدمة"
+      page_title: "تسجيل الدخول إلى التطبيق"
+    confirm_mobile: 
+      cancel: إلغاء
+      details: 
+        allow_application: "يطلب %{app_name} الوصول إلى حسابك."
+        email: "عنوان بريدك الإلكتروني هو %{email}."
+        login_name: "لقد قمت بتسجيل الدخول إلى هذا التطبيق باسم %{user_name}."
+      login: "تسجيل الدخول"
+      page_title: "تسجيل الدخول إلى التطبيق"
+      remember_auth: "تذكر تخويلي لهذه الخدمة"
   observees: 
     add_observee_button: "إضافة طالب"
     being_observed: "الطلاب قيد الملاحظة"
@@ -10360,6 +10370,7 @@ ar:
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "بمجرد تغيير إجابة، يجب عليك تحديد خيار قبل تحديث السؤال."
   one_per_line_format_name_value_79647700: "واحد في السطر. التنسيق: الاسم=القيمة"
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} في الموعد المحدد، %{late} متأخرة، %{missing} مفقودة"
+  open_title_in_a_new_window_b29fed77: "عرض %{title} في نافذة جديدة"
   options: 
     ? "no"
     : لا
@@ -10778,16 +10789,6 @@ ar:
     kaltura_settings: 
       account_settings: "يمكن العثور على هذه القيم في وحدة التحكم بالإدارة لـ Kaltura ضمن \"إعدادات -> إعدادات التكامل\""
       cache_explanation: "تقوم الوسائل الفارغة بالتخزين المؤقت بشكل غير محدود. لا تقوم الوسائل 0 بالتخزين المؤقت."
-      description: |-
-          سيلزم وجود حساب إما على [Kaltura.com](%{kaltura_url})
-          أو باستخدام مثيل تمت استضافته ذاتيًا خاص بـ Kaltura.
-          
-          **Note:** بمجرد تكوين Kaltura من 	Canvas،          سيلزمك الانتقال إلى وحدة التحكم بالإدارة لـ Kaltura وفي "إعدادات -> إعدادات التكامل"، قم بتمكين إعلامات الخادم من خلال 
-          عنوان URL للإعلام الخاص بـ: 
-          
-          %{notification_url}
-          
-          ثم حدد المربعات لـ "إضافة إدخال" و"حذف إدخال" في العمود "تم الإرسال بواسطة الخادم".
       headers: 
         account_settings: "إعدادات الحساب"
         canvas_settings: "إعدادات Canvas"
@@ -10816,7 +10817,6 @@ ar:
         secret_key: "كلمة سر المسؤول"
         subpartner_id: "معرف الشريك الفرعي"
         upload_ui_conf: "معرف UI Conf لبرنامج التحميل"
-        use_alt_record_widget: "استخدم عنصر واجهة مستخدم بديلة لتسجيل flash"
         user_secret_key: "كلمة سر المستخدم"
       ui_conf_ids: "بالنسبة للعملاء المستضافين من قبل Kaltura، يمكنك مطالبة Kaltura بتوفير هذه المعرفات لك. وتستطيع المثيلات المستضافة ذاتيًا العثور على هذه القيم في الجدول ui_confs."
     linked_in: 
@@ -11338,26 +11338,6 @@ ar:
       page_title: "تسجيل الدخول إلى Canvas"
     notices: 
       mfa_complete: "تم تكوين المصادقة متعددة العوامل"
-    oauth2_auth: 
-      oauth2_complete: "أنهى التطبيق سير عمل تسجيل الدخول، وينبغي أن يعيد التنشيط بعد قليل."
-    oauth2_confirm: 
-      cancel: إلغاء
-      details: 
-        allow_application: "يطلب %{app_name} الوصول إلى حسابك."
-        email: "عنوان بريدك الإلكتروني هو %{email}."
-        login_name: "لقد قمت بتسجيل الدخول إلى هذا التطبيق باسم %{user_name}."
-      labels: 
-        remember_access: "تذكر تخويلي لهذه الخدمة"
-      page_title: "تسجيل الدخول إلى التطبيق"
-    oauth2_confirm_mobile: 
-      cancel: إلغاء
-      details: 
-        allow_application: "يطلب %{app_name} الوصول إلى حسابك."
-        email: "عنوان بريدك الإلكتروني هو %{email}."
-        login_name: "لقد قمت بتسجيل الدخول إلى هذا التطبيق باسم %{user_name}."
-      login: الدخول
-      page_title: "تسجيل الدخول إلى التطبيق"
-      remember_auth: "تذكر تخويلي لهذه الخدمة"
     otp_login: 
       buttons: 
         send: إرسال
@@ -11792,6 +11772,7 @@ ar:
       generating: "جارٍ الإنشاء..."
       generating_combinations_progress: "جارٍ الإنشاء... (%{done}/%{total})"
       save: حفظ
+      save_and_publish: "حفظ ونشر"
       saved: "تم الحفظ!"
       saving: "جارٍ الحفظ..."
       update_group: "تحديث المجموعة"
@@ -12336,6 +12317,7 @@ ar:
           not_published: "لم يتم النشر"
           published: "تم النشر"
           save: حفظ
+          save_and_publish: "حفظ ونشر"
         cant_go_back: "تأمين الأسئلة بعد الإجابة"
         default_page_title: "الاختبار الجديد"
         group: "مجموعة المهام"
@@ -14646,7 +14628,6 @@ ar:
       entry_no_image: "ضع في اعتبارك أن هذه الصفحة ربما قد تغيرت منذ حدوث الإرسال الأصلي."
       entry_with_image: "لقد قمنا بتضمين لقطة توضح كيف كانت تبدو الصفحة عندما تم إرسالها. أو يمكنك النقر لعرض الإرسال الأصلي."
       external_url_submission: "كان هذا الإرسال هو عنوان URL المؤدي إلى صفحة خارجية."
-      file_uploads_for_user: "عمليات تحميل الملف لـ **%{user}**"
       group_discussion_submission_description: "إرسالات هذا التعيين تعد نشرات في مناقشة التعيين لهذه المجموعة. فيما يلي نشرات المناقشة لـ %{user}، أو يمكنك *عرض مناقشة المجموعة الكاملة*."
       group_discussion_submission_description_without_link: "يتم نشر عمليات الإرسال لهذه المهمة في مناقشة المهمة لهذه المجموعة. فيما يلي منشورات المناقشة للمستخدم %{user}."
       media_comment_link: "يعد هذا الإرسال تسجيلاً للوسائط. *انقر هنا لعرضه*."
@@ -15662,6 +15643,7 @@ ar:
       buttons: 
         cancel: إلغاء
         save: حفظ
+        save_and_publish: "حفظ ونشر"
       course_editing_roles: 
         anyone: "أي شخص"
         only_teachers: "المعلمون فقط"
