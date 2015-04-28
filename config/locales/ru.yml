@@ -1281,12 +1281,6 @@ ru:
       messages: 
         record_invalid: "Ошибка подтверждения: %{errors}"
         taken: "уже использовано"
-      template: 
-        body: "Возникли проблемы со следующими полями:"
-        header: 
-          few: "%{count} ошибки запрещают данную %{model} от сохранения"
-          one: "1 ошибка запрещает данную %{model} от сохранения"
-          other: "%{count} ошибки запрещают данную %{model} от сохранения"
   activity_13915493: Активность
   activity_by_category_9c2033d1: "Активность по категориям"
   activity_by_date_878c5b49: "Активность по дате"
@@ -1699,6 +1693,8 @@ ru:
       assignment_name: "Имя:"
       assignment_points: "Баллы:"
       assignment_type: "Тип:"
+      buttons: 
+        save_and_publish: "Сохранить & Опубликовать"
       cancel: Отменить
       differentiated_due_dates: "Дифференцировано по дате выполнения"
       discussion_type: Обсуждение
@@ -1773,7 +1769,8 @@ ru:
     edit_view: 
       assignment_name: "Имя задания"
       buttons: 
-        update: "Обновить задание"
+        save: Сохранить
+        save_and_publish: "Сохранить & Опубликовать"
       description: Описание
       freeze_properties: "Блокировка свойств задания при копировании"
       notify_content_change: "Уведомлять пользователей об изменении этого содержания"
@@ -2247,7 +2244,6 @@ ru:
   between_1_and_99_d421a4c0: "Между 1% aи 99%"
   between_2_and_5_c34f5152: "Между 2 и 5"
   big_blue_button_conference: 
-    conference_is_recorded: "Эта конференция записывается."
     recording_setting: Запись
     recording_setting_enabled_description: "Невозможно записать эту конференцию"
   blackboard: 
@@ -3708,8 +3704,6 @@ ru:
       edit_item: "Редактировать сведения об элементе"
     url_show: 
       new_tab: "Этот сайт необходимо открыть в новом окне браузера."
-      open_url_button: "Открыть %{title} в новом окне"
-      tool_insecure_warning: "Вы пытаетесь запустить небезопасное содержимое, находясь внутри защищенного сайта (canvas). Некоторые интернет-браузеры могут помешать загрузке такого содержимого."
   context_modules_api: 
     invalid_position: "Неверная позиция"
   continue_ac067716: Продолжить
@@ -5172,6 +5166,7 @@ ru:
       buttons: 
         not_published: "Не опубликовано"
         published: Опубликовано
+        save_and_publish: "Сохранить & Опубликовать"
       delay_posting: "Отложить размещение сообщения"
       enable_podcast_feed: "Включить канал подкастов"
       include_replies_in_podcast_feed: "Включить ответы студентов в веб-канал подкаста"
@@ -5532,7 +5527,6 @@ ru:
   ember_modules_description: "Модули переписаны в Ember. Используйте собственный API перетаскивания, чтобы позволить перетаскивание из внешних источников."
   enable_6f5d1328: Включить
   enable_gradebook_list_students_by_sortable_name: "Список студентов по сортируемым именам в табеле успеваемости. По умолчанию, сортируемое имя идет в порядке \"Фамилия, Имя\" и может быть изменено в настройках."
-  enable_multiple_grading_periods: "Включить в учетной записи администратора управление несколькими периодами выставления оценок и использовать их в Журнале успеваемости."
   end_date_e0093ed7: "Дата окончания"
   ends_on_date_320e0c26: "Завершение на дату"
   enrollment: 
@@ -5836,7 +5830,6 @@ ru:
   errors: 
     bad_navigation_config: "Недействительная конфигурация табуляции курса"
     blank: Требуется
-    dynamic_format: "%{message}"
     failed: Ошибка
     format: "%{attribute} %{message}"
     index: 
@@ -6043,6 +6036,7 @@ ru:
     wiki_page_menu_configured: "Меню вики-страницы настроено"
   external_url_e9b87215: "Сторонний Url"
   failed_to_create_zip_file_1a943d06: "Не удалось создать файл zip"
+  failed_to_import_media_objects_4c1fcb4f: "Не удалось импортировать мультимедийные объекты"
   fair_use_bee47d77: "Добросовестное использование"
   favicon_6e658914: "Иконка веб-сайта"
   feature_flags: 
@@ -6061,6 +6055,7 @@ ru:
     feature_flag_admin_view: 
       feature_options: "Опции функции"
       no_features_available: "На данный момент доступные функции отсутствуют."
+  feature_options_37a2c317: "Опции функции"
   features: 
     allow_opt_out_of_inbox: "Разрешить пользователям отказаться от ящика входящих сообщений"
     better_file_browsing: "Просмотр лучшего файла"
@@ -7409,7 +7404,6 @@ ru:
     account_grading_standard_warning: "Не удается найти стандарт оценки учетной записи для курса."
     copied_grading_standard_warning: "Не удается найти скопированный стандарт оценки для курса."
     due_dates_warning: "Не удается настроить сроки выполнения."
-    failed_import_media_objects: "Не удалось импортировать мультимедийные объекты"
     file_import_warning: "Не удается найти файл %{file}"
   importers/learning_outcome_group_importer: 
     no_global_permission: "Вы не можете управлять общими результатами, невозможно добавить \"%{title}\""
@@ -7439,6 +7433,7 @@ ru:
   instructions: 
     authorize_google_docs: "Для совместной работы с документами необходимо предоставить Canvas доступ к учетной записи Google Docs:"
     authorize_google_drive: "Прежде чем вам будет доступна совместная работа над документами, вы должны предоставить Canvas возможность доступа к вашей учетной записи Диска Google:"
+  instructions_2f88ee72: Инструкции
   instructors_4b491a07: инструкторы
   instructure: 
     alerts: 
@@ -7508,6 +7503,7 @@ ru:
   invalid_utf_8_13c76a6: "Недопустимый UTF-8"
   invalid_xml_syntax: "Неверный синтаксис xml"
   invite_5b1fcbcd: Пригласить
+  it_looks_like_your_content_might_not_load_you_can__dfb85860: "Похоже, ваше содержимое могло быть не загружено. Вы можете использовать эту кнопку, чтобы попытаться запустить его в новой вкладке."
   item_complete_d334fd43: "(Полный элемент)"
   item_incomplete_d6a16040: "(Неполный элемент)"
   item_type_assignment_13a1132e: "Тип элемента: Задание"
@@ -7773,8 +7769,6 @@ ru:
       new_tab: "Этот инструмент должен быть загружен в новом окне браузера"
       new_tab_expired: "Сессия для этого инструмента истекла. Для повторного доступа к инструменту перезагрузите страницу"
       new_tab_loaded: "Этот инструмент успешно загружен в новом окне браузера. Перезагрузите страницу для повторного доступа к инструменту."
-      tool_insecure_warning: "Вы пытаетесь запустить небезопасное содержимое, находясь внутри защищенного сайта (canvas). Некоторые интернет-браузеры могут помешать загрузке такого содержимого."
-      tool_load_failure: "Похоже, ваше содержимое могло быть не загружено. Вы можете использовать эту кнопку, чтобы попытаться запустить его в новой вкладке."
   lti2: 
     register_tool: "Зарегистрировать инструмент"
   m2c_file_description: "Moodle 1.9/2.x"
@@ -7827,7 +7821,6 @@ ru:
     loading: "Загрузка данных..."
     media_still_converting: "Данные в настоящий момент конвертируются, попробуйте позже."
     messages: 
-      file_failed_to_load: "Ошибка загрузки этого файла мультимедиа"
       flash_required_record_audio: "Для записи звука требуется Flash."
       flash_required_upload_audio: "Для загрузки звука требуется Flash."
       flash_required_upload_video: "Для загрузки видео требуется Flash."
@@ -9773,7 +9766,6 @@ ru:
   no_due_date_44271c53: "Нет даты выполнения"
   no_due_date_6e6a23c1: "(нет даты выполнения)"
   no_e16d9132: Нет
-  no_grading_periods_to_display_ad25c8f3: "Отсутствуют периоды выставления оценок для отображения"
   no_grading_schemes_to_display_8b0e92e7: "Отсутствуют схемы оценок для отображения"
   no_migration_file: "Файл, необходимый для перемещения содержимого."
   no_score_yet_c94e919b: "Оценок пока нет"
@@ -10059,6 +10051,27 @@ ru:
           kb: Кбайт
           mb: Мбайт
           tb: ТБ
+  oauth2_provider: 
+    auth: 
+      oauth2_complete: "Приложение завершило процесс входа в систему и скоро возобновит работу."
+    confirm: 
+      cancel: Отменить
+      details: 
+        allow_application: "%{app_name} запрашивает доступ к вашей учетной записи."
+        email: "Адрес вашей электронной почты — %{email}."
+        login_name: "Вы вошли в это приложение как %{user_name}."
+      labels: 
+        remember_access: "Запомнить мою авторизацию для данной службы"
+      page_title: "Вход в приложение"
+    confirm_mobile: 
+      cancel: Отменить
+      details: 
+        allow_application: "%{app_name} запрашивает доступ к вашей учетной записи."
+        email: "Адрес вашей электронной почты — %{email}."
+        login_name: "Вы вошли в это приложение как %{user_name}."
+      login: "Вход в систему"
+      page_title: "Вход в приложение"
+      remember_auth: "Запомнить мою авторизацию для данной службы"
   observees: 
     add_observee_button: "Добавить студента"
     being_observed: "Наблюдаемые студенты"
@@ -10073,6 +10086,7 @@ ru:
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "После того, как вы изменили ответ, вы должны выбрать вариант, прежде чем обновлять вопрос."
   one_per_line_format_name_value_79647700: "По одному на строку. Формат: имя=значение"
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} вовремя, %{late} с опозданием, %{missing} отсутствует"
+  open_title_in_a_new_window_b29fed77: "Открыть %{title} в новом окне"
   options: 
     ? "no"
     : Нет
@@ -10488,18 +10502,6 @@ ru:
     kaltura_settings: 
       account_settings: "Эти значения находятся в консоли управления Kaltura в разделе \"Настройки-> Настройки интеграции\""
       cache_explanation: "Пустое поле означает неограниченное кэширование, 0 означает отсутствие кэширования."
-      description: |-
-          Потребуется учетная запись на [Kaltura.com](%{kaltura_url})
-          или на экземпляре Kaltura с самостоятельным размещением.
-          
-          **Note:** после настройки Kaltura в Canvas
-          потребуется перейти в консоль управления Kaltura и в разделе "Настройки-> 
-          Настройки интеграции" включить уведомления сервера с 
-          URL-адресом уведомления:
-          
-          %{notification_url}
-          
-          Затем установите флажки "Добавить запись" и "Удалить запись" в столбце "Отправлено сервером".
       headers: 
         account_settings: "Настройки учетной записи"
         canvas_settings: "Настройки Canvas"
@@ -10528,7 +10530,6 @@ ru:
         secret_key: "Секретный ключ администратора"
         subpartner_id: "Идентификатор дополнительного партнера"
         upload_ui_conf: "Идентификатор конфигурации UI загрузчика"
-        use_alt_record_widget: "Используйте другой виджет записи флэш"
         user_secret_key: "Секретный ключ пользователя"
       ui_conf_ids: "Для клиентов с размещением Kaltura можно запросить Kaltura предоставить эти идентификаторы. Для экземпляров с самостоятельным размещением эти значения доступны в таблице ui_confs."
     linked_in: 
@@ -11060,26 +11061,6 @@ ru:
       page_title: "Войти в систему Canvas"
     notices: 
       mfa_complete: "Многофакторная аутентификация настроена"
-    oauth2_auth: 
-      oauth2_complete: "Приложение завершило процесс входа в систему и скоро возобновит работу."
-    oauth2_confirm: 
-      cancel: Отменить
-      details: 
-        allow_application: "%{app_name} запрашивает доступ к вашей учетной записи."
-        email: "Ваш электронный адрес %{email}."
-        login_name: "Вы вошли в это приложение как %{user_name}."
-      labels: 
-        remember_access: "Запомнить мою авторизацию для данной службы"
-      page_title: "Вход в приложение"
-    oauth2_confirm_mobile: 
-      cancel: Отменить
-      details: 
-        allow_application: "%{app_name} запрашивает доступ к вашей учетной записи."
-        email: "Адрес вашей электронной почты — %{email}."
-        login_name: "Вы вошли в это приложение как %{user_name}."
-      login: Вход
-      page_title: "Вход в приложение"
-      remember_auth: "Запомнить мою авторизацию для данной службы"
     otp_login: 
       buttons: 
         send: Отправить
@@ -11487,6 +11468,7 @@ ru:
       generating: Создание...
       generating_combinations_progress: "Создание... (%{done}/%{total})"
       save: Сохранить
+      save_and_publish: "Сохранить & Опубликовать"
       saved: Сохранено!
       saving: Сохранение...
       update_group: "Обновить группу"
@@ -12019,6 +12001,7 @@ ru:
           not_published: "Не опубликовано"
           published: Опубликовано
           save: Сохранить
+          save_and_publish: "Сохранить & Опубликовать"
         cant_go_back: "Заблокировать вопросы после ответа на них"
         default_page_title: "Новая контрольная работа"
         group: "Группа заданий"
@@ -14200,7 +14183,6 @@ ru:
       entry_no_image: "Имейте в виду, что после первоначальной отправки эта страница могла измениться."
       entry_with_image: "Мы включили снимок страницы после отправки. Или можно щелкнуть для просмотра исходной отправки."
       external_url_submission: "Эта отправка была URL-адресом на внешнюю страницу."
-      file_uploads_for_user: "Загрузки файлов для **%{user}**"
       group_discussion_submission_description: "Отправки для данного задания опубликованы в обсуждении задания для данной группы. Ниже приводятся посты обсуждения для %{user}, или вы можете *просмотреть все групповое обсуждение*."
       group_discussion_submission_description_without_link: "Отправки для данного задания размещаются в обсуждении задания для данной группы. Ниже приведены сообщения обсуждения для %{user}:"
       media_comment_link: "Эта отправка — мультимедийная запись. *Щелкните здесь для просмотра.*"
@@ -15174,6 +15156,7 @@ ru:
       buttons: 
         cancel: Отменить
         save: Сохранить
+        save_and_publish: "Сохранить & Опубликовать"
       course_editing_roles: 
         anyone: Все
         only_teachers: "Только учителя"
