@@ -724,7 +724,7 @@ CanvasRails::Application.routes.draw do
 
   get '' => 'users#user_dashboard', as: 'dashboard'
   get 'dashboard-sidebar' => 'users#dashboard_sidebar', as: :dashboard_sidebar
-  post 'toggle_dashboard' => 'users#toggle_dashboard'
+  post 'users/toggle_recent_activity_dashboard' => 'users#toggle_recent_activity_dashboard'
   get 'styleguide' => 'info#styleguide'
   get 'old_styleguide' => 'info#old_styleguide'
   root to: 'users#user_dashboard', as: 'root', via: :get

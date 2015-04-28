@@ -2296,6 +2296,7 @@ class Course < ActiveRecord::Base
         :label => t('#tabs.announcements', "Announcements"),
         :css_class => 'announcements',
         :href => :course_announcements_path,
+        :screenreader => t("Course Announcements"),
         :icon => 'icon-announcement'
       }, {
         :id => TAB_ASSIGNMENTS,
@@ -2309,6 +2310,7 @@ class Course < ActiveRecord::Base
         :label => t('#tabs.discussions', "Discussions"),
         :css_class => 'discussions',
         :href => :course_discussion_topics_path,
+        :screenreader => t("Course Discussions"),
         :icon => 'icon-discussion'
       }, {
         :id => TAB_GRADES,
@@ -2331,6 +2333,7 @@ class Course < ActiveRecord::Base
         :label => t('#tabs.files', "Files"),
         :css_class => 'files',
         :href => :course_files_path,
+        :screenreader => t("Course Files"),
         :icon => 'icon-collection'
       }, {
         :id => TAB_SYLLABUS,
@@ -2423,6 +2426,8 @@ class Course < ActiveRecord::Base
           tab[:args] = default_tab[:args]
           tab[:visibility] = default_tab[:visibility]
           tab[:external] = default_tab[:external]
+          tab[:icon] = default_tab[:icon]
+          tab[:screenreader] = default_tab[:screenreader]
           default_tabs.delete_if {|t| t[:id] == tab[:id] }
           external_tabs.delete_if {|t| t[:id] == tab[:id] }
           tab

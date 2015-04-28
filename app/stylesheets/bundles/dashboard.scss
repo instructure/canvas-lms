@@ -1,2 +1,24 @@
 @import "pages/dashboard/dashboard_messages";
 @import "pages/dashboard/dashboard_activity";
+
+@if $use_new_styles {
+  .ic-Dashboard-content--align-right {
+    align-items: flex-end;
+  }
+  .ic-Dashboard-header {
+    border-bottom: 1px solid $ic-border-light;
+    margin: 0 $ic-sp $ic-sp $ic-sp;
+    padding-bottom: $ic-sp;
+    > div {
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .ic-Dashboard-header_title {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+  }
+  .ic-Dashboard-Activity {
+    padding: $ic-sp;
+  }
+}

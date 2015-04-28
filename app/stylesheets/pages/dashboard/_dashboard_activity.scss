@@ -10,17 +10,18 @@
     border-bottom: 1px solid $ic-border-light;
     line-height: 1.2;
     padding-bottom: $ic-sp;
+    font-size: 1.5em;
   }
   @else {
     padding: 10px;
     border-bottom: 1px solid #b3b3b3;
-  } 
+  }
 }
 
 .recent_activity > li {
   position: relative;
   border-bottom: 1px solid #ddd;
-  .title { 
+  .title {
     font-weight: normal;
     @if $use_new_styles and $use_high_contrast == false {
       font-weight: 300;
@@ -61,7 +62,7 @@
     padding: $ic-sp;
     .image-block {
       flex: 1;
-      align-items: center; 
+      align-items: center;
     }
   }
   @else {
