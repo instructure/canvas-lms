@@ -1283,11 +1283,6 @@ nb:
       messages: 
         record_invalid: "Validering feilet: %{errors}"
         taken: "er opptatt"
-      template: 
-        body: "Det var problemer med følgende felt:"
-        header: 
-          one: "1 feil forhindret denne %{model} fra å bli lagret"
-          other: "%{count} feil forhindret denne %{model} fra å bli lagret"
   activity_13915493: Aktivitet
   activity_by_category_9c2033d1: "Aktivitet etter Kategori"
   activity_by_date_878c5b49: "Aktivitet etter Dato"
@@ -1695,6 +1690,8 @@ nb:
       assignment_name: "Navn:"
       assignment_points: "Poeng:"
       assignment_type: "Type:"
+      buttons: 
+        save_and_publish: "Lagre & publiser"
       cancel: Avbryt
       differentiated_due_dates: "Differensiert forfallsdato"
       discussion_type: Diskusjon
@@ -1767,7 +1764,8 @@ nb:
     edit_view: 
       assignment_name: Oppgavenavn
       buttons: 
-        update: "Oppdater oppgave"
+        save: Lagre
+        save_and_publish: "Lagre & publiser"
       description: Beskrivelse
       freeze_properties: "Lås oppgaveegenskaper når de blir kopiert"
       notify_content_change: "Varsle brukere om at dette innholdet er endret"
@@ -2236,7 +2234,6 @@ nb:
   between_1_and_99_d421a4c0: "Mellom 1% og 99%"
   between_2_and_5_c34f5152: "Mellom 2 og 5"
   big_blue_button_conference: 
-    conference_is_recorded: "Denne konferansen tas opp."
     recording_setting: "Spiller inn"
     recording_setting_enabled_description: "Aktiver innspilling for denne konferansen"
   blackboard: 
@@ -3700,8 +3697,6 @@ nb:
       edit_item: "Rediger elementet"
     url_show: 
       new_tab: "Dette området må åpnes i et nytt nettleser-vindu"
-      open_url_button: "Åpne %{title} i et nytt vindu."
-      tool_insecure_warning: "Du forsøker å åpne usikkert innhold inne i et sikkert nettsted (canvas). Enkelte nettlesere vil forhindre dette innholdet fra å lastes inn."
   context_modules_api: 
     invalid_position: "Ugyldig posisjon"
   continue_ac067716: Fortsett
@@ -5126,6 +5121,7 @@ nb:
       buttons: 
         not_published: "Ikke publisert"
         published: Publisert
+        save_and_publish: "Lagre & publiser"
       delay_posting: "Avvent posting"
       enable_podcast_feed: "Slå på podkaststrøm"
       include_replies_in_podcast_feed: "Inkluder svar fra studenter i podcastfeed"
@@ -5481,7 +5477,6 @@ nb:
   ember_modules_description: "Moduler omskrevet i Ember. Bruker den innfødte dra og slipp API for å tillate å dra fra eksterne steder."
   enable_6f5d1328: "Slå på"
   enable_gradebook_list_students_by_sortable_name: "Liste studenter ved deres sorterbar navnene i karakterboken. Sorterbar navn som standard til 'Etternavn, Fornavn' og kan endres i innstillinger."
-  enable_multiple_grading_periods: "Aktivere flere gradering perioder styring i admin kontoen, og bruke i karakterboken."
   end_date_e0093ed7: Sluttdato
   ends_on_date_320e0c26: "Slutter på dato"
   enrollment: 
@@ -5783,7 +5778,6 @@ nb:
   errors: 
     bad_navigation_config: "Ugyldig konfigurasjon av kursfane"
     blank: Obligatorisk
-    dynamic_format: "%{message}"
     failed: Feilet
     format: "%{attribute} %{message}"
     index: 
@@ -5990,6 +5984,7 @@ nb:
     wiki_page_menu_configured: "Wiki side menyen konfigurert"
   external_url_e9b87215: "Ekstern URL"
   failed_to_create_zip_file_1a943d06: "Mislyktes å opprette zip-arkiv"
+  failed_to_import_media_objects_4c1fcb4f: "Feil ved import av medieobjekter"
   fair_use_bee47d77: "Virkelig Bruk"
   favicon_6e658914: Favicon
   feature_flags: 
@@ -6008,6 +6003,7 @@ nb:
     feature_flag_admin_view: 
       feature_options: Funksjonsvalg
       no_features_available: "Ingen funksjoner er tilgjengelige for tiden."
+  feature_options_37a2c317: Funksjonsvalg
   features: 
     allow_opt_out_of_inbox: "Tillate brukerne til å melde seg ut av innboksen"
     better_file_browsing: "Bedre filsøk"
@@ -7345,7 +7341,6 @@ nb:
     account_grading_standard_warning: "Finner ikke kontoens retningslinjer for karaktersetting i kurset."
     copied_grading_standard_warning: "Finner ikke kopierte retningslinjer for karaktersetting i kurset."
     due_dates_warning: "Kunne ikke justere fristene."
-    failed_import_media_objects: "Feil ved import av medieobjekter"
     file_import_warning: "Fil %{file} ble ikke funnet"
   importers/learning_outcome_group_importer: 
     no_global_permission: "Du har ikke tillatelse til å behandle globale resultater, kan ikke legge til \"%{title}\""
@@ -7444,6 +7439,7 @@ nb:
   invalid_utf_8_13c76a6: "Ugyldig UTF-8"
   invalid_xml_syntax: "ugyldig XML-syntaks"
   invite_5b1fcbcd: Inviter
+  it_looks_like_your_content_might_not_load_you_can__dfb85860: "Det ser ut som om ditt innhold muligens ikke blir lastet inn. Du kan benytte denne knappen for å forsøke å laste det i en ny fane."
   item_complete_d334fd43: "(Item Complete)"
   item_incomplete_d6a16040: "(Item Incomplete)"
   item_type_assignment_13a1132e: "Elementtype: Innlevering"
@@ -7706,8 +7702,6 @@ nb:
       new_tab: "Dette verktøyet må lastes i et nytt nettleservindu"
       new_tab_expired: "Sesjonen for dette verktøyet er utløpt. Last siden på nytt for å få tilgang til verktøyet igjen."
       new_tab_loaded: "Dette verktøyet ble suksessfullt lastet i et nytt nettleservindu. Last siden på nytt for å få tilgang til verktøyet igjen."
-      tool_insecure_warning: "Du forsøker å åpne usikkert innhold inne i et sikkert nettsted (canvas). Enkelte nettlesere vil forhindre dette innholdet fra å lastes inn."
-      tool_load_failure: "Det ser ut som om ditt innhold muligens ikke blir lastet inn. Du kan benytte denne knappen for å forsøke å laste det i en ny fane."
   lti2: 
     register_tool: "Registrere verktøy"
   m2c_file_description: "Moodle 1.9/2.x"
@@ -7760,7 +7754,6 @@ nb:
     loading: "Laster media …"
     media_still_converting: "Media blir konvertert, prøv igjen om en liten stund."
     messages: 
-      file_failed_to_load: "Denne mediefilen ble ikke lastet"
       flash_required_record_audio: "Flash kreves for opptak av lyd"
       flash_required_upload_audio: "Flash kreves for å laste opp lyd."
       flash_required_upload_video: "Flash kreves for å laste opp video."
@@ -9690,7 +9683,6 @@ nb:
   no_due_date_44271c53: "Ingen frist"
   no_due_date_6e6a23c1: "(no due date)"
   no_e16d9132: Nei
-  no_grading_periods_to_display_ad25c8f3: "Ingen gradering perioder til å vise"
   no_grading_schemes_to_display_8b0e92e7: "Ingen gradering ordninger for å vise"
   no_migration_file: "En fil er påkrevet for innholdsflytting."
   no_score_yet_c94e919b: "Ingen poengsum ennå"
@@ -9972,6 +9964,27 @@ nb:
           kb: KB
           mb: MB
           tb: TB
+  oauth2_provider: 
+    auth: 
+      oauth2_complete: "Applikasjonen har fullført innloggingsprosessen, og burde reaktiveres straks."
+    confirm: 
+      cancel: Avbryt
+      details: 
+        allow_application: "%{app_name} spør om tilgang til kontoen din."
+        email: "Din epostadresse er %{email}."
+        login_name: "Du logger inn på denne appen som %{user_name}."
+      labels: 
+        remember_access: "Husk autoriseringen min av denne tjenesten"
+      page_title: App-innlogging
+    confirm_mobile: 
+      cancel: Avbryt
+      details: 
+        allow_application: "%{app_name} spør om tilgang til kontoen din."
+        email: "Din epostadresse er %{email}."
+        login_name: "Du logger inn på denne appen som %{user_name}."
+      login: "Logg inn"
+      page_title: App-innlogging
+      remember_auth: "Husk autoriseringen min av denne tjenesten"
   observees: 
     add_observee_button: "Legg til Student"
     being_observed: "Studenter blir observert"
@@ -9986,6 +9999,7 @@ nb:
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Når du har endret et svar må du gjøre et valg før du oppdaterer spørsmålet."
   one_per_line_format_name_value_79647700: "Én per linje. Format: navn=verdi"
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} på tid, %{late} sent, %{missing} mangler"
+  open_title_in_a_new_window_b29fed77: "Åpne %{title} i et nytt vindu."
   options: 
     ? "no"
     : Nei
@@ -10395,18 +10409,6 @@ nb:
     kaltura_settings: 
       account_settings: "Disse verdiene finner du i Kaltura Management Console under \"Settings -> Integration Settings\""
       cache_explanation: "Tom betyr buffre uendelig, 0 betyr ikke buffre."
-      description: |-
-          Du må ha en brukerkonto enten hos [Kaltura.com](%{kaltura_url})
-          eller en egen installasjon av Kaltura.
-          
-          **Merk:** når Kaltura er konfigurert i Canvas,
-          må du gå til Kaltura Management Console og under "Settings -> 
-          Integration Settings" enable server notifications with a 
-          Notification URL of:
-          
-          %{notification_url}
-          
-          Then check the boxes for "Add Entry" and "Delete Entry" in the "Sent by Server" column.
       headers: 
         account_settings: Kontoinnstillinger
         canvas_settings: Canvas-innstillinger
@@ -10435,7 +10437,6 @@ nb:
         secret_key: Administratorhemmelighet
         subpartner_id: "Sub Partner ID"
         upload_ui_conf: "Uploader UI Conf ID"
-        use_alt_record_widget: "Benytt en alternativ løsning for opptak av flash"
         user_secret_key: Brukerhemmelighet
       ui_conf_ids: "Kunder hos Kaltura kan be om å få oppgitt disse id'ene. De som har egne installasjoner av Kaltura vil finne disse verdiene i ui_confs tabellen."
     linked_in: 
@@ -10959,26 +10960,6 @@ nb:
       page_title: "Logg inn på Canvas"
     notices: 
       mfa_complete: "Flerfaktors autentisering konfigurert"
-    oauth2_auth: 
-      oauth2_complete: "Applikasjonen har fullført innloggingsprosessen, og burde reaktiveres straks."
-    oauth2_confirm: 
-      cancel: Avbryt
-      details: 
-        allow_application: "%{app_name} spør om tilgang til kontoen din."
-        email: "Din epostadresse er %{email}."
-        login_name: "Du logger inn på denne appen som %{user_name}."
-      labels: 
-        remember_access: "Husk autoriseringen min av denne tjenesten"
-      page_title: App-innlogging
-    oauth2_confirm_mobile: 
-      cancel: Avbryt
-      details: 
-        allow_application: "%{app_name} spør om tilgang til kontoen din."
-        email: "Den epostadresse er %{email}."
-        login_name: "Du logger inn på denne appen som %{user_name}."
-      login: "Logg inn"
-      page_title: App-innlogging
-      remember_auth: "Husk autoriseringen min av denne tjenesten"
     otp_login: 
       buttons: 
         send: Send
@@ -11369,6 +11350,7 @@ nb:
       generating: "Genererer …"
       generating_combinations_progress: "Generer … (%{done}/%{total})"
       save: Lagre
+      save_and_publish: "Lagre & publiser"
       saved: Lagret!
       saving: Lagrer...
       update_group: "Oppdater gruppe"
@@ -11894,6 +11876,7 @@ nb:
           not_published: "Ikke publisert"
           published: Publisert
           save: Lagre
+          save_and_publish: "Lagre & publiser"
         cant_go_back: "Lås spørsmål etter svar er avgitt"
         default_page_title: "Ny prøve"
         group: Oppgavegruppe
@@ -14030,7 +14013,6 @@ nb:
       entry_no_image: "Husk at denne siden kan ha endret seg siden innleveringen opprinnelig skjedde."
       entry_with_image: "Vi har inkludert et øyeblikksbilde av hva siden så ut som da den ble levert. Du kan også klikke for å se den opprinnelige innleveringen."
       external_url_submission: "Denne innleveringen var en URL til en ekstern side."
-      file_uploads_for_user: "Filopplastinger for **%{user}**"
       group_discussion_submission_description: "Innleveringene for denne oppgaven er poster i oppgavens diskusjon for denne gruppen. Nedenfor er diskusjonspostene for %{user}. Du kan også *se hele gruppediskusjonen*."
       group_discussion_submission_description_without_link: "Innleveringer for dette oppdraget er innlegg i oppdragets diskusjon for denne gruppen. Nedenfor er diskusjons innlegg for %{user}."
       media_comment_link: "Denne innleveringen er en medieinnspilling. *Klikk her for å se den.*"
@@ -14990,6 +14972,7 @@ nb:
       buttons: 
         cancel: Avbryt
         save: Lagre
+        save_and_publish: "Lagre & publiser"
       course_editing_roles: 
         anyone: "Hvem som helst"
         only_teachers: "Kun forelesere"
