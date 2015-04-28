@@ -96,7 +96,7 @@ gem 'foreigner', '0.9.2'
 gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'hey', '1.3.0', require: false
 gem 'aroi', '0.0.2'
-gem 'sentry-raven', '0.12.3', require: false
+gem 'sentry-raven', '0.13.1', require: false
 
 gem 'active_polymorph', path: 'gems/active_polymorph'
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'
