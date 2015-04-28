@@ -1280,12 +1280,6 @@ pl:
       messages: 
         record_invalid: "Sprawdzanie poprawności nie powiodło się: %{errors}"
         taken: "istnieje już w systemie"
-      template: 
-        body: "Wystąpiły problemy z następującymi polami:"
-        header: 
-          few: " %{count} błędy powstrzymują ten %{model} przed zapisaniem"
-          one: "1 błąd powstrzymuje ten %{model} przed zapisaniem"
-          other: " %{count} błędów powstrzymuje ten %{model} przed zapisaniem"
   activity_13915493: Aktywność
   activity_by_category_9c2033d1: "Aktywność według kategorii"
   activity_by_date_878c5b49: "Aktywność według daty"
@@ -1698,6 +1692,8 @@ pl:
       assignment_name: "Nazwa:"
       assignment_points: "Punkty:"
       assignment_type: "Typ:"
+      buttons: 
+        save_and_publish: "Zapisz i opublikuj"
       cancel: Anuluj
       differentiated_due_dates: "Zróżnicowany termin dostarczenia"
       discussion_type: Dyskusja
@@ -1772,7 +1768,8 @@ pl:
     edit_view: 
       assignment_name: "Nazwa zadania"
       buttons: 
-        update: "Aktualizuj zadanie"
+        save: Zapisz
+        save_and_publish: "Zapisz i opublikuj"
       description: Opis
       freeze_properties: "Zablokuj właściwości zadania podczas kopiowania"
       notify_content_change: "Powiadom użytkowników o zmianie tej zawartości"
@@ -2245,7 +2242,6 @@ pl:
   between_1_and_99_d421a4c0: "Pomiędzy 1% a 99%"
   between_2_and_5_c34f5152: "Pomiędzy 2 a 5"
   big_blue_button_conference: 
-    conference_is_recorded: "Ta konferencja jest nagrywana."
     recording_setting: Nagrywanie
     recording_setting_enabled_description: "Włącz nagrywanie tej konferencji"
   blackboard: 
@@ -3705,8 +3701,6 @@ pl:
       edit_item: "Edytuj szczegółowe informacje dot. elementu"
     url_show: 
       new_tab: "Tę stronę należy otworzyć w nowym oknie przeglądarki."
-      open_url_button: "Otwórz %{title} w nowym oknie"
-      tool_insecure_warning: "Próbujesz połączyć się z niezabezpieczoną zawartością z poziomu zabezpieczonej strony (canvas). W niektórych przeglądarkach otwarcie tej zawartości może nie być możliwe."
   context_modules_api: 
     invalid_position: "Nieprawidłowa pozycja"
   continue_ac067716: Kontynuuj
@@ -3898,7 +3892,7 @@ pl:
   correct_answers_will_be_available_from_to_5762e8c6: "Poprawne odpowiedzi będą dostępne od %{from} do %{to}."
   correct_answers_will_be_available_on_date_48137: "Poprawne odpowiedzi będą dostępne %{date}."
   couldn_t_find_canvas_csv_import_headers_487f1b6c: "Nie odnaleziono nagłówków importowania plików CSV w systemie Canvas "
-  couldn_t_generate_diff_message_a0528b20: "Nie można wygenerować diffu:%{message}"
+  couldn_t_generate_diff_message_a0528b20: "Nie można wygenerować diffu: %{message}"
   count_assignments_with_errors_e8f3c18c: 
     one: "1 zadanie z błędami"
     other: "%{count} zadań z błędami"
@@ -5168,6 +5162,7 @@ pl:
       buttons: 
         not_published: "Nie opublikowane"
         published: Opublikowane
+        save_and_publish: "Zapisz i opublikuj"
       delay_posting: "Opóźnij ogłaszanie"
       enable_podcast_feed: "Uaktywnij kanał informacyjny"
       include_replies_in_podcast_feed: "Włącz odpowiedzi uczniów do źródła podkastów"
@@ -5526,7 +5521,6 @@ pl:
   ember_modules_description: "Moduły ponownie zapisane w systemie Ember. Użyto macierzystej opcji Przeciągnij i upuść API w celu przeciągania elementów z lokalizacji zewnętrznych."
   enable_6f5d1328: Uaktywnij
   enable_gradebook_list_students_by_sortable_name: "Wyświetl listę uczestników według sortowalnych nazw w dzienniczku. Wartość domyślna nazwy to „Nazwisko, Imię” i można ją zmienić w ustawieniach."
-  enable_multiple_grading_periods: "Włącz wielokrotne zarządzanie okresem rozliczeniowym na koncie administratora i użyj tej opcji w dzienniczku."
   end_date_e0093ed7: "Data zakończenia"
   ends_on_date_320e0c26: "Data zakończenia"
   enrollment: 
@@ -5830,7 +5824,6 @@ pl:
   errors: 
     bad_navigation_config: "NIeprawidłowa konfiguracja zakładki kursu"
     blank: Wymagany
-    dynamic_format: "%{message}"
     failed: Niepowodzenie
     format: "%{attribute} %{message}"
     index: 
@@ -6037,6 +6030,7 @@ pl:
     wiki_page_menu_configured: "Skonfigurowano menu strony Wiki"
   external_url_e9b87215: "Zewnętrzny adres URL"
   failed_to_create_zip_file_1a943d06: "Nie udało się utworzyć pliku zip"
+  failed_to_import_media_objects_4c1fcb4f: "Import obiektów multimedialnych zakończony niepowodzeniem"
   fair_use_bee47d77: "Dozwolony użytek"
   favicon_6e658914: Favicon
   feature_flags: 
@@ -6055,6 +6049,7 @@ pl:
     feature_flag_admin_view: 
       feature_options: "Opcje funkcji"
       no_features_available: "Obecnie nie są dostępne żadne funkcje."
+  feature_options_37a2c317: "Opcje funkcji"
   features: 
     allow_opt_out_of_inbox: "Pozwól użytkownikom wypisać się ze skrzynki"
     better_file_browsing: "Lepsze przeglądanie pliku"
@@ -7403,7 +7398,6 @@ pl:
     account_grading_standard_warning: "Nie można odnaleźć standardów oceniania konta dla tego kursu."
     copied_grading_standard_warning: "Nie można odnaleźć skopiowanych standardów oceniania dla tego kursu."
     due_dates_warning: "Nie można ustawić terminów dostarczenia."
-    failed_import_media_objects: "Import obiektów multimedialnych zakończony niepowodzeniem"
     file_import_warning: "Nie można odnaleźć pliku %{file}"
   importers/learning_outcome_group_importer: 
     no_global_permission: "Brak uprawnień, aby zarządzać globalnymi wynikami, nie można dodać \"%{title}\""
@@ -7433,6 +7427,7 @@ pl:
   instructions: 
     authorize_google_docs: "Aby rozpocząć współpracę związaną z dokumentami, należy zezwolić systemowi Canvas na dostęp do konta Google Docs użytkownika:"
     authorize_google_drive: "Zanim będzie możliwa współpraca nad dokumentami, konieczne jest autoryzowanie systemu Canvas w zakresie dostępu do konta na dysku Google:"
+  instructions_2f88ee72: Instrukcje
   instructors_4b491a07: instruktorzy
   instructure: 
     alerts: 
@@ -7502,6 +7497,7 @@ pl:
   invalid_utf_8_13c76a6: "Nieprawidłowe kodowanie UTF-8"
   invalid_xml_syntax: "Nieprawidłowa składnia xml"
   invite_5b1fcbcd: Zaproś
+  it_looks_like_your_content_might_not_load_you_can__dfb85860: "Wygląda, że treść nie może się załadować. Możesz użyć tego przycisku, aby spróbować ją załadować w nowej karcie. "
   item_complete_d334fd43: "(Poz Kompletna)"
   item_incomplete_d6a16040: "(Poz Niekompletna)"
   item_type_assignment_13a1132e: "Rodzaj pozycji: Przydział"
@@ -7767,8 +7763,6 @@ pl:
       new_tab: "Narzędzie musi zostać załadowane w nowym oknie przeglądarki"
       new_tab_expired: "Wygasła sesja dla tego narzędzia. Ponownie załaduj stronę, uzyskać dostęp do narzędzia"
       new_tab_loaded: "Ładowane narzędzia w nowym oknie przeglądarki zostało pomyślnie zakończone. Ponownie załaduj stronę, aby uzyskać dostęp do narzędzia."
-      tool_insecure_warning: "Próbujesz połączyć się z niezabezpieczoną zawartością z poziomu zabezpieczonej strony (canvas). W niektórych przeglądarkach otwarcie tej zawartości może nie być możliwe."
-      tool_load_failure: "Wygląda, że treść nie może się załadować. Możesz użyć tego przycisku, aby spróbować ją załadować w nowej karcie. "
   lti2: 
     register_tool: "Zarejestruj narzędzie"
   m2c_file_description: " Moodle 1.9/2.x"
@@ -7821,7 +7815,6 @@ pl:
     loading: "Trwa ładowanie multimediów..."
     media_still_converting: "Multimedia są teraz przetwarzane, spróbuj nieco później."
     messages: 
-      file_failed_to_load: "Ładowanie pliku multimedialnego nie powiodło się"
       flash_required_record_audio: "Do nagrywania dźwięku wymagana jest wtyczka Flash."
       flash_required_upload_audio: "Do przekazania dźwięku wymagana jest wtyczka Flash."
       flash_required_upload_video: "Do przekazania nagrania wideo wymagana jest wtyczka Flash."
@@ -9774,7 +9767,6 @@ pl:
   no_due_date_44271c53: "Brak terminu dostarczenia"
   no_due_date_6e6a23c1: "(brak terminu dostarczenia)"
   no_e16d9132: Nie
-  no_grading_periods_to_display_ad25c8f3: "Brak okresów oceniania do wyświetlenia"
   no_grading_schemes_to_display_8b0e92e7: "Brak schematów oceniania do wyświetlenia"
   no_migration_file: "Wymagany plik do migracji zawartości."
   no_score_yet_c94e919b: "Jeszcze nie ma wyniku punktowego"
@@ -10060,6 +10052,27 @@ pl:
           kb: KB
           mb: MB
           tb: TB
+  oauth2_provider: 
+    auth: 
+      oauth2_complete: "Aplikacja zakończyła proces logowania i powinna ponownie się aktywować wkrótce."
+    confirm: 
+      cancel: Anuluj
+      details: 
+        allow_application: "%{app_name} żąda dostępu do Twojego konta."
+        email: "Twój adres email to %{email}."
+        login_name: "Jesteś zalogowany/-a do tej aplikacji jako %{user_name}."
+      labels: 
+        remember_access: "Zapamiętaj moją autoryzację do tej usługi"
+      page_title: "Login Aplikacji"
+    confirm_mobile: 
+      cancel: Anuluj
+      details: 
+        allow_application: "%{app_name} żąda dostępu do Twojego konta."
+        email: "Twój adres email to %{email}."
+        login_name: "Jesteś zalogowany/-a do tej aplikacji jako %{user_name}."
+      login: Zaloguj
+      page_title: "Login Aplikacji"
+      remember_auth: "Zapamiętaj moją autoryzację do tej usługi"
   observees: 
     add_observee_button: "Dodaj uczestnika"
     being_observed: "Obserwowani uczestnicy"
@@ -10074,6 +10087,7 @@ pl:
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Po zmianie odpowiedzi trzeba wybrać jakąś opcję, a następnie zaktualizować pytanie."
   one_per_line_format_name_value_79647700: "Pojedynczo w linii. Format: nazwa=wartość"
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} na czas, %{late} spóźnione, %{missing} brakujące"
+  open_title_in_a_new_window_b29fed77: "Otwórz %{title} w nowym oknie"
   options: 
     ? "no"
     : Nie
@@ -10482,18 +10496,6 @@ pl:
     kaltura_settings: 
       account_settings: "Wartości te można znaleźć w Konsoli zarządzania platformy Kaltura w zakładce \"Settings (Ustawienia) -> Integration Settings (Ustawienia integracji)\""
       cache_explanation: "Puste oznacza nieokreślone buforowanie, wartość 0 oznacza brak buforowania. "
-      description: |-
-          Niezbędne jest konto w platformie [Kaltura.com](%{kaltura_url})
-          lub w wersji pochodnej platformy Kaltura.
-          
-          **Note:** po skonfigurowaniu platformy Kaltura z systemem Canvas,
-          należy przejść do Konsoli konfiguracji platformy Kaltura i w zakładce „Settings (Ustawienia) -> 
-          Integration Settings (Ustawienia integracji)” włączyć powiadomienia serwera za pomocą 
-          adresu URL powiadomień:
-          
-          %{notification_url}
-          
-          Następnie należy zaznaczyć pola wyboru „Add Entry (Dodaj wpis)” i „Delete Entry (Usuń wpis)” w kolumnie „Sent by Server (Wysyłane przez serwer)”.
       headers: 
         account_settings: "Ustawienia konta"
         canvas_settings: "Ustawienia systemu Canvas"
@@ -10522,7 +10524,6 @@ pl:
         secret_key: "Klucz tajny administratora"
         subpartner_id: "Dodatkowy identyfikator partnera"
         upload_ui_conf: "Identyfikatory konfiguracji interfejsu użytkownika w przekazywarce"
-        use_alt_record_widget: "Skorzystaj z alternatywnego widgetu nagrywania flash"
         user_secret_key: "Klucz tajny użytkownika"
       ui_conf_ids: "Klienci korzystający z platformy Kaltura mogą poprosić o przesłanie tych identyfikatorów. W przypadku wersji pochodnych wartości te można znaleźć w tabeli ui_confs."
     linked_in: 
@@ -11049,26 +11050,6 @@ pl:
       page_title: "Zaloguj w systemie Canvas"
     notices: 
       mfa_complete: "Skonfigurowano wieloskładnikowe uwierzytelnianie"
-    oauth2_auth: 
-      oauth2_complete: "Aplikacja zakończyła proces logowania i powinna ponownie się aktywować wkrótce."
-    oauth2_confirm: 
-      cancel: Anuluj
-      details: 
-        allow_application: "%{app_name} żąda dostępu do Twojego konta."
-        email: "Twój adres email to %{email}."
-        login_name: "Jesteś zalogowany do tej aplikacji jako użytkownik o nazwie %{user_name}."
-      labels: 
-        remember_access: "Zapamiętaj moją autoryzację do tej usługi"
-      page_title: "Login Aplikacji"
-    oauth2_confirm_mobile: 
-      cancel: Anuluj
-      details: 
-        allow_application: "%{app_name} żąda dostępu do Twojego konta."
-        email: "Twój adres email to %{email}."
-        login_name: "Jesteś zalogowany/-a do tej aplikacji jako %{user_name}."
-      login: Zaloguj
-      page_title: "Login Aplikacji"
-      remember_auth: "Zapamiętaj moją autoryzację do tej usługi"
     otp_login: 
       buttons: 
         send: Wyślij
@@ -11474,6 +11455,7 @@ pl:
       generating: "Trwa generowanie..."
       generating_combinations_progress: "Trwa generowanie... (%{done}/%{total})"
       save: Zapisz
+      save_and_publish: "Zapisz i opublikuj"
       saved: Zapisano!
       saving: "Trwa zapisywanie..."
       update_group: "Aktualizuj grupę"
@@ -12025,6 +12007,7 @@ pl:
           not_published: "Nie opublikowane"
           published: Opublikowane
           save: Zapisz
+          save_and_publish: "Zapisz i opublikuj"
         cant_go_back: "Zablokuj pytania po udzieleniu odpowiedzi"
         default_page_title: "Nowy test"
         group: "Grupa zadań"
@@ -14199,7 +14182,6 @@ pl:
       entry_no_image: "Pamiętaj, że strona mogła ulec zmianie od czasu przesłania zadania."
       entry_with_image: "Zamieściliśmy migawkę przedstawiająca stronę w momencie przesłania zadania. Możesz również kliknąć, aby wyświetlić oryginał przesłanego zadania."
       external_url_submission: "To przesłane zadanie było adresem URL do zewnętrznej strony."
-      file_uploads_for_user: "Pliki przekazane przez użytkownika **%{user}**"
       group_discussion_submission_description: "Zaliczeniem tego zadania są wiadomości wysłane do grupy, w dyskusji do tego zadania. Poniżej znajdują się wiadomości użytkownika %{user}, lub możesz *przejrzeć dyskusję całej grupy*."
       group_discussion_submission_description_without_link: "Przesłane zadania do tego polecenia są wpisami w dyskusji o zadaniach dla tej grupy. Poniżej znajdują się wpisy dyskusji dla użytkownika %{user}. "
       media_comment_link: "To przesłane zadanie jest nagraniem multimedialnym. *kliknij tutaj, aby wyświetlić*."
@@ -15173,6 +15155,7 @@ pl:
       buttons: 
         cancel: Anuluj
         save: Zapisz
+        save_and_publish: "Zapisz i opublikuj"
       course_editing_roles: 
         anyone: Wszyscy
         only_teachers: "Tylko instruktorzy"
