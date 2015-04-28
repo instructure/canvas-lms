@@ -10,6 +10,7 @@ settings = ConfigFile.load("raven")
 if settings.present?
   require "raven/base"
   Raven.configure do |config|
+    config.silence_ready = true
     config.dsn = settings[:dsn]
   end
 
