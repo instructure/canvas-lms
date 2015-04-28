@@ -87,16 +87,27 @@ module IncomingMailProcessor
         text_part =  incoming_message.text_part
 
         html_body = self.class.utf8ify(html_part.body.decoded, html_part.charset) if html_part
-        body = self.class.utf8ify(text_part.body.decoded, text_part.charset)
+        text_body = self.class.utf8ify(text_part.body.decoded, text_part.charset) if text_part
       else
-        body = self.class.utf8ify(incoming_message.body.decoded, incoming_message.charset)
+        case incoming_message.mime_type
+        when 'text/plain'
+          text_body = self.class.utf8ify(incoming_message.body.decoded, incoming_message.charset)
+        when 'text/html'
+          html_body = self.class.utf8ify(incoming_message.body.decoded, incoming_message.charset)
+        else
+          raise "Unrecognized Content-Type: #{incoming_message.mime_type.inspect}"
+        end
       end
 
-      if !html_body
-        html_body = self.class.format_message(body).first
+      if html_body && !text_body
+        text_body = self.class.html_to_text(html_body)
       end
 
-      return body, html_body
+      if text_body && !html_body
+        html_body = self.class.format_message(text_body).first
+      end
+
+      return text_body, html_body
     end
 
     def self.mailbox_keys
