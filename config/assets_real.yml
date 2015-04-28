@@ -158,6 +158,8 @@ stylesheets:
     - public/stylesheets/compiled/bundles/all_courses.css
   external_tool_full_width:
     - public/stylesheets/compiled/bundles/external_tool_full_width.css
+  dashboard_card:
+    - public/stylesheets/compiled/bundles/dashboard_card.css
   terms:
     - public/stylesheets/compiled/bundles/terms.css
   wiki_page:

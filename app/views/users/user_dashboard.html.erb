@@ -1,6 +1,7 @@
 <% content_for :page_title do %><%= t('user_dashboard', 'User Dashboard') %><% end %>
 <% jammit_css :dashboard %>
 <% js_bundle :dashboard %>
+
 <% content_for :auto_discovery do %>
   <% if @current_user %>
       <%= auto_discovery_link_tag(:atom, feeds_user_format_path(@current_user.feed_code, :atom), {:title => t('user_atom_feed', "User Atom Feed (All Courses)")}) %>
@@ -11,12 +12,36 @@
   <div class="placeholder"></div>
 <% end %>
 
-<% content_for :leading_content do %>
-  <h1 class='screenreader-only'> <%= t('user_dashboard', 'User Dashboard') %> </h1>
-<% end %>
+<% unless use_new_styles? -%>
+  <% content_for :leading_content do %>
+    <h1 class='screenreader-only'> <%= t('user_dashboard', 'User Dashboard') %> </h1>
+  <% end %>
+<% end -%>
 
 <div id="dashboard">
-<%= render :partial => 'shared/dashboard_invitation', :collection => @pending_invitations %>
-<%= render :partial => 'shared/dashboard_messages' %>
-<%= render :partial => 'shared/recent_activity' %>
+  <%= render :partial => 'shared/dashboard_invitation', :collection => @pending_invitations %>
+  <%= render :partial => 'shared/dashboard_messages' %>
+
+  <% if use_new_styles? %>
+    <div class="ic-Dashboard-header">
+      <div class="grid-row middle-xs">
+      <div class="col-xs-10">
+        <h1 class="ic-Dashboard-header_title"><%= t :dashboard, "Dashboard" %></h1>
+      </div>
+      <div id="RecentActivityToggle_Container"
+        class="col-xs-2 ic-Dashboard-content--align-right">
+      </div>
+      </div>
+    </div>
+
+    <% if @current_user.preferences[:recent_activity_dashboard].present? %>
+      <div class="ic-Dashboard-Activity">
+        <%= render :partial => 'shared/recent_activity' %>
+      </div>
+    <% else %>
+      <%= render :partial => 'shared/dashboard_card' %>
+    <% end %>
+  <% else %>
+    <%= render :partial => 'shared/recent_activity' %>
+  <% end %>
 </div>

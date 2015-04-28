@@ -12,6 +12,11 @@
 .global-message {
   padding: 10px;
   border-bottom: 1px solid #b3b3b3;
+  @if $use_new_styles {
+    padding: $ic-sp;
+    margin-bottom: $ic-sp;
+    border: none;
+  }
   .title {
     font-weight: bold;
   }
