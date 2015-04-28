@@ -118,6 +118,27 @@ describe "context modules" do
       expect(f('#module_prerequisites_list')).to be_displayed
     end
 
+    it "should validate that a student can't get to locked external items" do
+      external_tool = @course.context_external_tools.create!(:url => "http://example.com/ims/lti",
+          :consumer_key => "asdf", :shared_secret => "hjkl", :name => "external tool")
+
+      @module_2.reload
+      tag_1 = @module_2.add_item(:id => external_tool.id, :type => "external_tool", :url => external_tool.url)
+      tag_2 = @module_2.add_item(:type => 'external_url', :url => 'http://example.com/lolcats',
+                                  :title => 'pls view', :indent => 1)
+
+      tag_1.publish!
+      tag_2.publish!
+
+      get "/courses/#{@course.id}/modules/items/#{tag_1.id}"
+      expect(f('#content')).to include_text("hasn't been unlocked yet")
+      expect(f('#module_prerequisites_list')).to be_displayed
+
+      get "/courses/#{@course.id}/modules/items/#{tag_2.id}"
+      expect(f('#content')).to include_text("hasn't been unlocked yet")
+      expect(f('#module_prerequisites_list')).to be_displayed
+    end
+
     it "should validate that a student can't get to an unpublished context module" do
       @module_2.workflow_state = 'unpublished'
       @module_2.save!

@@ -1187,10 +1187,19 @@ class ApplicationController < ActionController::Base
       @tag = tag
       @module = tag.context_module
       log_asset_access(@tag, "external_urls", "external_urls")
-      tag.context_module_action(@current_user, :read) unless tag.locked_for? @current_user
-      render 'context_modules/url_show'
+      if tag.locked_for? @current_user
+        render 'context_modules/lock_explanation'
+      else
+        tag.context_module_action(@current_user, :read)
+        render 'context_modules/url_show'
+      end
     elsif tag.content_type == 'ContextExternalTool'
       @tag = tag
+
+      if tag.locked_for? @current_user
+        return render 'context_modules/lock_explanation'
+      end
+
       if @tag.context.is_a?(Assignment)
         @assignment = @tag.context
         @resource_title = @assignment.title
