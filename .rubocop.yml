@@ -94,6 +94,8 @@ Style/AlignParameters:
   Enabled: false
 Style/Lambda:
   Enabled: false
+Style/WhileUntilModifier:
+  Enabled: false
 
 # Rails style changes
 Rails/TimeZone:
