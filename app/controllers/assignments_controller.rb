@@ -174,22 +174,22 @@ class AssignmentsController < ApplicationController
       begin
         docs = google_service_connection.list_with_extension_filter(assignment.allowed_extensions)
       rescue GoogleDocs::NoTokenError => e
-        CanvasErrors.capture_exception(:oauth, e)
+        Canvas::Errors.capture_exception(:oauth, e)
       rescue ArgumentError => e
-        CanvasErrors.capture_exception(:oauth, e)
+        Canvas::Errors.capture_exception(:oauth, e)
       rescue => e
-        CanvasErrors.capture_exception(:oauth, e)
+        Canvas::Errors.capture_exception(:oauth, e)
         raise e
       end
       respond_to do |format|
-        format.json { render :json => docs.to_hash }
+        format.json { render json: docs.to_hash }
       end
     else
-      error_object = {:errors =>
-        {:base => t('errors.google_docs_masquerade_rejected', "Unable to connect to Google Docs as a masqueraded user.")}
+      error_object = {errors:
+        {base: t('errors.google_docs_masquerade_rejected', "Unable to connect to Google Docs as a masqueraded user.")}
       }
       respond_to do |format|
-        format.json { render :json => error_object, :status => :bad_request }
+        format.json { render json: error_object, status: :bad_request }
       end
     end
   end

@@ -334,4 +334,19 @@ describe AssignmentsController do
       expect(assigns[:assignment]).to be_deleted
     end
   end
+
+  describe "GET list_google_docs" do
+    it "passes errors through to Canvas::Errors" do
+      user_session(@teacher)
+      connection = stub()
+      connection.stubs(:list_with_extension_filter).raises(ArgumentError)
+      controller.stubs(:google_service_connection).returns(connection)
+      Assignment.any_instance.stubs(:allow_google_docs_submission?).returns(true)
+      Canvas::Errors.expects(:capture_exception)
+      params = {course_id: @course.id, id: @assignment.id, format: 'json' }
+      get 'list_google_docs', params
+      expect(response.code).to eq("200")
+    end
+  end
+
 end
