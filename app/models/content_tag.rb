@@ -375,7 +375,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def progression_for_user(user)
-    context_module.context_module_progressions.where(user_id: user.id)
+    context_module.context_module_progressions.where(user_id: user.id).first
   end
   
   def content_asset_string
