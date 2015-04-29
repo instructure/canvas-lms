@@ -9,13 +9,22 @@ define([
 ],
 function(React, $, I18n, _) {
 
+  var types = React.PropTypes;
   var GradingPeriod = React.createClass({
+
+    propTypes: {
+      title: types.string.isRequired,
+      startDate: types.instanceOf(Date).isRequired,
+      endDate: types.instanceOf(Date).isRequired,
+      permissions: types.object.isRequired,
+      id: types.string.isRequired
+    },
 
     getInitialState: function(){
       return {
         title: this.props.title,
-        startDate: this.parseDateTime(this.props.startDate),
-        endDate: this.parseDateTime(this.props.endDate),
+        startDate: this.props.startDate,
+        endDate: this.props.endDate,
         weight: this.props.weight,
         permissions: this.props.permissions,
         id: this.props.id,
@@ -37,19 +46,9 @@ function(React, $, I18n, _) {
       if (this.isNewGradingPeriod()) {
         this.refs.title.getDOMNode().focus();
       }
-      var dateNode = $(this.getDOMNode()).find('.date_field');
-      dateNode.datetime_field();
-      dateNode.on('change', this.handleDateChange)
-    },
-
-    handleDateChange: function(event){
-      var updatedState = {};
-      updatedState[event.target.name] = this.parseDateTime(event.target.value);
-      this.setState(updatedState, function() {
-        this.replaceInputWithDate(this.refs[event.target.name]);
-        this.checkFormForUpdates();
-        this.props.updateGradingPeriodCollection(this.state, this.props.permissions);
-      });
+      var dateField = $(this.getDOMNode()).find('.date_field');
+      dateField.datetime_field();
+      dateField.on('change', this.handleDateChange)
     },
 
     formatDataForSubmission: function () {
@@ -58,6 +57,35 @@ function(React, $, I18n, _) {
         start_date: this.state.startDate,
         end_date: this.state.endDate
       };
+    },
+
+    handleTitleChange: function(event) {
+      this.setState({title: event.target.value}, function () {
+        this.setUpdateButtonState();
+        this.props.updateGradingPeriodCollection(this.state, this.props.permissions);
+      });
+    },
+
+    handleDateChange: function(event) {
+      var validDateInput = !!$.datetime.parse(event.target.value);
+      var dateNode = this.refs[event.target.name].getDOMNode();
+      var updatedDate = validDateInput ? $(dateNode).data('unfudged-date') : new Date('invalid date');
+      var updatedState = {};
+      updatedState[event.target.name] = updatedDate;
+      this.setState(updatedState, function() {
+        this.replaceInputWithDate(this.refs[event.target.name]);
+        this.setUpdateButtonState();
+        this.props.updateGradingPeriodCollection(this.state, this.props.permissions);
+      });
+    },
+
+    formatDateForDisplay: function(date) {
+      return $.datetimeString(date, { format: 'medium', localized: false, timezone: ENV.CONTEXT_TIMEZONE });
+    },
+
+    replaceInputWithDate: function(dateRef) {
+      var date = this.state[dateRef.getDOMNode().name];
+      dateRef.getDOMNode().value = this.formatDateForDisplay(date);
     },
 
     saveGradingPeriod: function () {
@@ -108,58 +136,25 @@ function(React, $, I18n, _) {
     },
 
     isStartDateBeforeEndDate: function() {
-      var startDate = Date.parse(this.state.startDate);
-      var endDate = Date.parse(this.state.endDate);
-      return startDate < endDate;
+      return this.state.startDate < this.state.endDate;
     },
 
     isNewGradingPeriod: function() {
       return this.state.id.indexOf('new') > -1;
     },
 
-    checkFormForUpdates: function() {
-      var shouldUpdateBeDisabled = !this.formIsComplete() || !this.inputsHaveChanged();
+    setUpdateButtonState: function() {
+      var shouldUpdateBeDisabled = !this.formIsComplete();
       this.setState({shouldUpdateBeDisabled: shouldUpdateBeDisabled});
     },
 
     formIsComplete: function() {
       var titleCompleted = (this.state.title).trim().length > 0;
-      var startDateCompleted = (this.state.startDate).trim().length > 0;
-      var endDateCompleted = (this.state.endDate).trim().length > 0;
-      return titleCompleted && startDateCompleted && endDateCompleted;
+      return titleCompleted && this.datesAreValid();
     },
 
-    inputsHaveChanged: function() {
-      return (this.state.title !== this.props.title) ||
-             (this.state.startDate !== this.parseDateTime(this.props.startDate)) ||
-             (this.state.endDate !== this.parseDateTime(this.props.endDate))
-    },
-
-    parseDateTime: function(inputDate) {
-      return $.datetime.process(inputDate);
-    },
-
-    formatDateForDisplay: function(uglyDate) {
-      return $.datetimeString(uglyDate, { format: 'medium' });
-    },
-
-    handleTitleChange: function(event) {
-      this.setState({title: event.target.value}, function () {
-        this.checkFormForUpdates();
-        this.props.updateGradingPeriodCollection(this.state, this.props.permissions);
-      });
-    },
-
-    replaceInputWithDate: function(dateRef) {
-      var dateInput = dateRef.getDOMNode().value
-      if(this.isValidDateInput(dateInput)){
-        var inputAsDate = this.parseDateTime(dateInput)
-        dateRef.getDOMNode().value = this.formatDateForDisplay(inputAsDate);
-      }
-    },
-
-    isValidDateInput: function(dateInput) {
-      return this.parseDateTime(dateInput) !== "";
+    datesAreValid: function() {
+      return !isNaN(this.state.startDate) && !isNaN(this.state.endDate);
     },
 
     triggerDeleteGradingPeriod: function() {

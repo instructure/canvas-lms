@@ -26,7 +26,7 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
       var self = this;
       $.getJSON(ENV.GRADING_PERIODS_URL)
       .done(function(periods){
-        self.gotPeriods(periods, idToExclude);
+        self.gotPeriods(self.formatPeriods(periods), idToExclude);
       })
     },
 
@@ -35,11 +35,19 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
       if (this.state.periods) {
         unsavedPeriods = _.filter(this.state.periods, period => period.id.indexOf('new') > -1 && period.id !== idToExclude);
       }
-      var camelizedPeriods = _.map(periods.grading_periods, period => ConvertCase.camelize(period));
       this.setState({
-        periods: camelizedPeriods.concat(unsavedPeriods),
-        needsToCopy: !this.canManageAtLeastOnePeriod(camelizedPeriods) && camelizedPeriods.length > 0,
+        periods: periods.concat(unsavedPeriods),
+        needsToCopy: !this.canManageAtLeastOnePeriod(periods) && periods.length > 0,
         disabled: false,
+      });
+    },
+
+    formatPeriods: function(periods) {
+      return _.map(periods.grading_periods, period => {
+        var newPeriod = ConvertCase.camelize(period);
+        newPeriod.startDate = new Date(period.start_date);
+        newPeriod.endDate = new Date(period.end_date);
+        return newPeriod;
       });
     },
 
@@ -126,7 +134,7 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
     },
 
     createNewGradingPeriod: function() {
-      var newPeriod = { title: '', startDate: '', endDate: '', id: _.uniqueId('new'),
+      var newPeriod = { title: '', startDate: new Date(""), endDate: new Date(""), id: _.uniqueId('new'),
         permissions: { read: true, manage: true } };
       var periods = update(this.state.periods, {$push: [newPeriod]});
       this.setState({periods: periods});
