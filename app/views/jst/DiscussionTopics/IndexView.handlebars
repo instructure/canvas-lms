@@ -5,9 +5,13 @@
 {{#ifAll atLeastOnePageFetched length}}
   <div class="headerBar clearfix">
     <div class="pull-left form-inline index_view_filter_form">
+      <span id="searchTermDescription" class="screenreader-only">
+        {{#t}}As you type in this field, the list of results will be automatically updated.{{/t}}
+      </span>
       <input id="searchTerm"
              placeholder="{{t "Search title, body, or author"}}"
              aria-label="{{t "Search title, body, or author"}}"
+             aria-describedby="searchTermDescription"
              value="{{searchTerm}}"
              type="search">
       <span id="discussionsFilter">
