@@ -217,19 +217,19 @@ describe ContextModuleProgression do
     expect(progression3).to be_locked
   end
 
-  describe "#delete_requirement" do
-    it "should delete the requirement" do
+  describe "#uncomplete_requirement" do
+    it "should uncomplete the requirement" do
       setup_modules
       progression = @tag.context_module_action(@user, :read)
-      progression.delete_requirement(@tag.id)
+      progression.uncomplete_requirement(@tag.id)
       expect(progression.requirements_met.length).to be(0)
-      
+
     end
 
-    it "should not delete anything when given an ID that does not exist" do
+    it "should not change anything when given an ID that does not exist" do
       setup_modules
       progression = @tag.context_module_action(@user, :read)
-      progression.delete_requirement(-1)
+      progression.uncomplete_requirement(-1)
       expect(progression.requirements_met.length).to be(1)
     end
   end

@@ -504,7 +504,7 @@ class ContextModuleItemsApiController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       user = @student || @current_user
       if (progression = _module_item(user).progression_for_user(@current_user))
-        progression.delete_requirement(params[:id].to_i)
+        progression.uncomplete_requirement(params[:id].to_i)
         progression.evaluate
       end
       render :json => { :message => t('OK') }

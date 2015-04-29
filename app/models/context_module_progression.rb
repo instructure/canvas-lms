@@ -53,7 +53,7 @@ class ContextModuleProgression < ActiveRecord::Base
     self.save
   end
 
-  def delete_requirement(id)
+  def uncomplete_requirement(id)
     requirement = requirements_met.find {|r| r[:id] == id}
     requirements_met.delete(requirement)
     mark_as_outdated
