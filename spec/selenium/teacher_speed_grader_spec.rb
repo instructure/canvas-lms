@@ -143,7 +143,7 @@ describe "speed grader" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       in_frame 'speedgrader_iframe' do
-        expect(f('.not_external')).to include_text("User")
+        expect(f('.open_in_a_new_tab')).to include_text("User")
       end
 
       f("#settings_link").click
@@ -153,7 +153,7 @@ describe "speed grader" do
       wait_for_ajaximations
 
       in_frame 'speedgrader_iframe' do
-        expect(f('.not_external')).to include_text("This Student")
+        expect(f('.open_in_a_new_tab')).to include_text("This Student")
       end
     end
   end

@@ -239,20 +239,25 @@ describe "student groups" do
         wait_for_ajaximations
 
         # add the first student that isn't the current student
-        ffj(".checkbox:visible")[1].click
-        wait_for_ajaximations
+        second_student_checkbox = ffj(".checkbox:visible")[1]
+        second_student_checkbox.click
+        wait_for_animations
 
         fj('button.confirm-dialog-confirm-btn').click
         wait_for_ajaximations
 
         # expect plural of the word 'student'
-        keep_trying_until(2) { expect(f(".student-group-students")).to include_text("students") }
+        keep_trying_until(2) do
+          expect(f(".student-group-students")).to include_text("students")
+        end
 
         # leave the group
         fj(".student-group-join a").click
         wait_for_ajaximations
 
-        keep_trying_until(2) { expect(fj(".student-group-students")).to include_text("1 student") }
+        keep_trying_until(2) do
+          expect(fj(".student-group-students")).to include_text("1 student")
+        end
       end
     end
   end
