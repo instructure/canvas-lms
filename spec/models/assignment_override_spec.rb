@@ -636,4 +636,35 @@ describe AssignmentOverride do
       expect(hash[:id]).to eq id
     end
   end
+
+  describe "applies_to_students" do
+    before do
+      student_in_course
+    end
+
+    it "returns the right students for ADHOC" do
+      @override = assignment_override_model(:course => @course)
+      @override.set_type = 'ADHOC'
+
+      expect(@override.applies_to_students).to eq []
+
+      @override_student = @override.assignment_override_students.build
+      @override_student.user = @student
+      @override_student.save!
+
+      expect(@override.set).to eq @override.applies_to_students
+    end
+
+    it "returns the right students for a section" do
+      @override = assignment_override_model(:course => @course)
+      @override.set = @course.default_section
+      @override.save!
+
+      expect(@override.applies_to_students).to eq []
+
+      @course.enroll_student(@student,:enrollment_state => 'active', :section => @override.set)
+
+      expect(@override.applies_to_students).to eq [@student]
+    end
+  end
 end
