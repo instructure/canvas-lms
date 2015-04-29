@@ -183,7 +183,7 @@ describe "gradebook2" do
 
       it "should allow editing grades" do
         cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
-        expect(cell.text).to eq '10'
+        expect(f('.gradebook-cell', cell).text).to eq '10'
         cell.click
         expect(ff('.grade', cell)).to_not be_blank
       end
@@ -197,7 +197,7 @@ describe "gradebook2" do
 
       it "should not allow editing grades" do
         cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
-        expect(cell.text).to eq '10'
+        expect(f('.gradebook-cell', cell).text).to eq '10'
         cell.click
         expect(ff('.grade', cell)).to be_blank
       end
