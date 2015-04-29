@@ -310,32 +310,34 @@ class ContextModuleProgression < ActiveRecord::Base
   # calculates and saves the progression state
   # raises a StaleObjectError if there is a conflict
   def evaluate(as_prerequisite_for=nil)
-    return self unless outdated?
+    self.shard.activate do
+      return self unless outdated?
 
-    # there is no valid progression state for unpublished modules
-    return self if context_module.unpublished?
+      # there is no valid progression state for unpublished modules
+      return self if context_module.unpublished?
 
-    self.evaluated_at = Time.now.utc
-    self.current = true
-    self.requirements_met ||= []
+      self.evaluated_at = Time.now.utc
+      self.current = true
+      self.requirements_met ||= []
 
-    if check_prerequisites
-      evaluate_requirements_met
+      if check_prerequisites
+        evaluate_requirements_met
+      end
+      completion_changed = self.workflow_state_changed? && self.workflow_state_change.include?('completed')
+
+      evaluate_current_position
+
+      Shackles.activate(:master) do
+        self.save
+      end
+
+      if completion_changed
+        trigger_reevaluation_of_dependent_progressions(as_prerequisite_for)
+        trigger_completion_events if self.completed?
+      end
+
+      self
     end
-    completion_changed = self.workflow_state_changed? && self.workflow_state_change.include?('completed')
-
-    evaluate_current_position
-
-    Shackles.activate(:master) do
-      self.save
-    end
-
-    if completion_changed
-      trigger_reevaluation_of_dependent_progressions(as_prerequisite_for)
-      trigger_completion_events if self.completed?
-    end
-
-    self
   end
 
   def trigger_reevaluation_of_dependent_progressions(dependent_module_to_skip=nil)
