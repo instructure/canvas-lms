@@ -492,8 +492,6 @@ class ContextModuleItemsApiController < ApplicationController
   #     curl https://<canvas>/api/v1/courses/<course_id>/modules/<module_id>/items/<item_id>/done \
   #       -X Put \
   #       -H 'Authorization: Bearer <token>'
-  #
-  # @returns ModuleItem
   def mark_as_done
     if authorized_action(@context, @current_user, :read)
       user = @student || @current_user
