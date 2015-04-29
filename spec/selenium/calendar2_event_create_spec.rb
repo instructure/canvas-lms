@@ -55,6 +55,19 @@ describe "calendar2" do
         expect(event_content).to include_text(location_name)
         expect(event_content).to include_text(location_address)
       end
+
+      it "should go to calendar event modal when a syllabus link is clicked", priority: "1", test_id: 186581 do
+        event_title = "Test Event"
+        make_event(title: event_title, context: @course)
+
+        # Verifies we are taken to the event in Calendar after clicking on it in Syllabus
+        get "/courses/#{@course.id}/assignments/syllabus"
+        fj("a:contains('#{event_title}')").click
+        wait_for_ajaximations
+
+        keep_trying_until(5) {expect(fj('.event-details-header:visible')).to be_displayed}
+        expect(f('.view_event_link')).to include_text(event_title)
+      end
     end
   end
 end
