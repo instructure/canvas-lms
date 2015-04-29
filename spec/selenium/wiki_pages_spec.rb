@@ -187,6 +187,26 @@ describe "Navigating to wiki pages" do
 
   end
 
+  describe "Show Page" do
+    it "shows lock information with prerequisites" do
+      account_model
+      course_with_student_logged_in account: @account
+      foo = @course.wiki.wiki_pages.create! title: "foo"
+      bar = @course.wiki.wiki_pages.create! title: "bar"
+      mod = @course.context_modules.create! name: "teh_mod", require_sequential_progress: true
+      foo_item = mod.add_item id: foo.id, type: 'wiki_page'
+      bar_item = mod.add_item id: bar.id, type: 'wiki_page'
+      mod.completion_requirements = {foo_item.id => {type: 'must_view'}, bar_item.id => {type: 'must_view'}}
+      mod.save!
+
+      get "/courses/#{@course.id}/pages/bar"
+      wait_for_ajaximations
+
+      lock_explanation = f('.lock_explanation').text
+      expect(lock_explanation).to include "This page is part of the module teh_mod and hasn't been unlocked yet"
+      expect(lock_explanation).to match /foo\s+must view the page/
+    end
+  end
 
   describe "Permissions" do
     before do

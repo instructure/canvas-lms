@@ -85,8 +85,8 @@ define([
         html += "<a href='" + htmlEscape($("#context_modules_url").attr('href')) + "'>";
         html += htmlEscape(I18n.t('messages.visit_modules_page_for_details', "Visit the modules page for information on how to unlock this content."));
         html += "</a>";
-        return $.raw(html);
       }
+      return $.raw(html);
     }
     else {
       switch(type) {
