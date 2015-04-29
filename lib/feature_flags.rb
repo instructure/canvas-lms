@@ -111,6 +111,7 @@ module FeatureFlags
     accounts = feature_flag_account_ids.map do |id|
       account = Account.new
       account.id = id
+      account.shard = Shard.shard_for(id, self.shard)
       account.readonly!
       account
     end
