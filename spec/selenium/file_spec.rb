@@ -40,7 +40,7 @@ describe "shared files tests" do
       user_with_pseudonym :username => "nobody2@example.com",
                           :password => "asdfasdf2"
       course_with_teacher_logged_in :user => @user
-      create_session(@pseudonym, false)
+      create_session(@pseudonym)
       add_file(fixture_file_upload('files/html-editing-test.html', 'text/html'),
                @course, "html-editing-test.html")
       get "/courses/#{@course.id}/files"

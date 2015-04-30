@@ -18,6 +18,15 @@ class AccountAuthorizationConfigsPresenter
       configs.any?{|c| !c.is_a?(AccountAuthorizationConfig::LDAP) }
   end
 
+  def login_url_options(aac)
+    options = { controller: "login/#{aac.auth_type}", action: :new }
+    if !aac.is_a?(AccountAuthorizationConfig::LDAP) &&
+      configs.many? { |other| other.auth_type == aac.auth_type }
+      options[:id] = aac
+    end
+    options
+  end
+
   def auth?
     configs.any?
   end

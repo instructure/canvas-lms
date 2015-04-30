@@ -479,7 +479,7 @@ shared_examples_for "all selenium tests" do
 
   alias_method :login, :login_as
 
-  def create_session(pseudonym, real_login)
+  def create_session(pseudonym, real_login = false)
     if real_login
       login_as(pseudonym.unique_id, pseudonym.password)
     else

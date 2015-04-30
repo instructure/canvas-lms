@@ -600,16 +600,43 @@ CanvasRails::Application.routes.draw do
   put 'images/users/:user_id' => 'users#update_avatar_image', as: :update_avatar_image
   get 'all_menu_courses' => 'users#all_menu_courses'
   get 'grades' => 'users#grades'
-  get 'login' => 'pseudonym_sessions#new'
-  post 'login' => 'pseudonym_sessions#create'
-  delete 'logout' => 'pseudonym_sessions#destroy'
-  get 'logout' => 'pseudonym_sessions#logout_confirm'
-  get 'login/cas' => 'pseudonym_sessions#new', as: :cas_login
-  post 'login/cas' => 'pseudonym_sessions#cas_logout', as: :cas_logout
-  match 'login/otp' => 'pseudonym_sessions#otp_login', as: :otp_login, via: [:get, :post]
-  get 'login/:account_authorization_config_id' => 'pseudonym_sessions#new', as: :aac_login
-  delete 'users/:user_id/mfa' => 'pseudonym_sessions#disable_otp_login', as: :disable_mfa
-  get 'file_session/clear' => 'pseudonym_sessions#clear_file_session', as: :clear_file_session
+
+  get 'login' => 'login#new'
+  delete 'logout' => 'login#destroy'
+  get 'logout' => 'login#logout_confirm'
+
+  get 'login/canvas' => 'login/canvas#new', as: :canvas_login
+  post 'login/canvas' => 'login/canvas#create'
+  # deprecated alias
+  post 'login' => 'login/canvas#create'
+
+  get 'login/ldap' => 'login/ldap#new'
+  post 'login/ldap' => 'login/ldap#create'
+
+  get 'login/cas' => 'login/cas#new'
+  get 'login/cas/:id' => 'login/cas#new', as: :cas_login
+  post 'login/cas' => 'login/cas#destroy', as: :cas_logout
+  post 'login/cas/:id' => 'login/cas#destroy'
+
+  get 'login/saml' => 'login/saml#new'
+  get 'login/saml/logout' => 'login/saml#destroy'
+  # deprecated alias
+  get 'saml_logout' => 'login/saml#destroy'
+  get 'login/saml/:id' => 'login/saml#new', as: :saml_login
+  post 'login/saml' => 'login/saml#create'
+  # deprecated alias
+  post 'saml_consume' => 'login/saml#create'
+
+  get 'login/otp' => 'login/otp#new', as: :otp_login
+  post 'login/otp/sms' => 'login/otp#send_via_sms', as: :send_otp_via_sms
+  post 'login/otp' => 'login/otp#create'
+
+  # deprecated redirect
+  get 'login/:id' => 'login#new'
+
+  delete 'users/:user_id/mfa' => 'login/otp#destroy', as: :disable_mfa
+  get 'file_session/clear' => 'login#clear_file_session', as: :clear_file_session
+
   get 'register' => 'users#new'
   get 'register_from_website' => 'users#new'
   get 'enroll/:self_enrollment_code' => 'self_enrollments#new', as: :enroll
@@ -678,7 +705,6 @@ CanvasRails::Application.routes.draw do
 
   get 'about/:id' => 'profile#show', as: :user_profile
   resources :communication_channels
-  resource :pseudonym_session
 
   get '' => 'users#user_dashboard', as: 'dashboard'
   get 'dashboard-sidebar' => 'users#dashboard_sidebar', as: :dashboard_sidebar
@@ -730,8 +756,6 @@ CanvasRails::Application.routes.draw do
   get 'browserconfig.xml', to: 'info#browserconfig', defaults: { format: 'xml' }
 
   post 'object_snippet' => 'context#object_snippet'
-  post 'saml_consume' => 'pseudonym_sessions#saml_consume'
-  get 'saml_logout' => 'pseudonym_sessions#saml_logout'
   get 'saml_meta_data' => 'accounts#saml_meta_data'
 
   # Routes for course exports

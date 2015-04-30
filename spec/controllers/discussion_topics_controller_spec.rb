@@ -161,7 +161,7 @@ describe DiscussionTopicsController do
     it "should not display announcements in private courses to users who aren't logged in" do
       announcement = @course.announcements.create!(title: 'Test announcement', message: 'Message')
       get('show', course_id: @course.id, id: announcement.id)
-      expect(response.code).to eq '401'
+      assert_unauthorized
     end
 
     context "discussion topic with assignment with overrides" do

@@ -16,9 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require_relative '../../spec_helper'
 
-describe PseudonymSessionsHelper do
+describe Login::CanvasHelper do
   describe "#session_timeout_enabled" do
     context "when the sessions plugin is enabled" do 
       before do 
@@ -26,7 +26,7 @@ describe PseudonymSessionsHelper do
       end
 
       it "returns true" do
-        expect(helper.session_timeout_enabled).to be_truthy
+        expect(helper.session_timeout_enabled?).to be_truthy
       end
     end
 
@@ -36,7 +36,7 @@ describe PseudonymSessionsHelper do
       end
 
       it "returns false" do 
-        expect(helper.session_timeout_enabled).to be_falsey
+        expect(helper.session_timeout_enabled?).to be_falsey
       end
     end
   end

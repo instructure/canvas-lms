@@ -15,7 +15,7 @@ describe "announcements" do
     teacher = user_with_pseudonym(:unique_id => 'teacher@example.com', :password => password, :active_user => true)
     @course.enroll_user(student, 'StudentEnrollment').accept!
     @course.enroll_user(teacher, 'TeacherEnrollment').accept!
-    login_as(teacher.primary_pseudonym.unique_id, password)
+    create_session(teacher.primary_pseudonym)
 
     get "/courses/#{@course.id}/announcements"
     expect_new_page_load { f('.btn-primary').click }
@@ -29,7 +29,7 @@ describe "announcements" do
     student_2 = student_in_course.user
     announcement.discussion_entries.create!(:user => student_2, :message => student_2_entry)
 
-    login_as(student.primary_pseudonym.unique_id, password)
+    create_session(student.primary_pseudonym)
     get "/courses/#{@course.id}/announcements/#{announcement.id}"
     expect(f('#discussion_subentries span').text).to eq "Replies are only visible to those who have posted at least one reply."
     ff('.discussion_entry').each { |entry| expect(entry).not_to include_text(student_2_entry) }

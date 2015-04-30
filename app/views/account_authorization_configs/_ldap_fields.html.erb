@@ -19,7 +19,7 @@
   <% end %>
 
   <%= render partial: "form_header",
-             locals: { auth_type: t("LDAP"), account: account, aac: aac } %>
+             locals: { auth_type: t("LDAP"), presenter: presenter, aac: aac } %>
 
   <%= fields_for :account_authorization_config, aac do |f| %>
     <%= f.hidden_field :disabled, value: '0' %>

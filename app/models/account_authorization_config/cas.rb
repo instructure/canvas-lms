@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'casclient'
+
 class AccountAuthorizationConfig::CAS < AccountAuthorizationConfig::Delegated
 
   def self.sti_name
@@ -26,4 +28,14 @@ class AccountAuthorizationConfig::CAS < AccountAuthorizationConfig::Delegated
     [ :auth_type, :auth_base, :log_in_url, :unknown_user_url, :position ]
   end
 
+  def client
+    @client ||= CASClient::Client.new(
+      cas_base_url: auth_base,
+      encode_extra_attributes_as: :raw
+    )
+  end
+
+  def user_logout_redirect(controller, _current_user)
+    client.logout_url(controller.cas_login_url(id: self), nil, controller.cas_login_url(id: self))
+  end
 end

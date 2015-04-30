@@ -42,7 +42,7 @@ describe "locale_selection" do
   it "should set the locale when not authenticated" do
     account = Account.default
     account.update_attribute :default_locale, 'fr'
-    get login_url
+    get canvas_login_url
     expect(response).to be_success
     expect(I18n.locale).to eql(:fr)
   end

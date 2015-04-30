@@ -298,7 +298,7 @@ class ApplicationController < ActionController::Base
   end
 
   def check_pending_otp
-    if session[:pending_otp] && !(params[:action] == 'otp_login' && request.post?)
+    if session[:pending_otp] && params[:controller] != 'login/otp'
       reset_session
       redirect_to login_url
     end
@@ -376,9 +376,6 @@ class ApplicationController < ActionController::Base
 
   def render_unauthorized_action
     respond_to do |format|
-      @needs_login = (!@current_user && !@files_domain)
-      run_login_hooks if @needs_login
-
       @show_left_side = false
       clear_crumbs
       params = request.path_parameters
@@ -387,7 +384,8 @@ class ApplicationController < ActionController::Base
       @files_domain = @account_domain && @account_domain.host_type == 'files'
       format.html {
         store_location
-        return if !@current_user && initiate_delegated_login(request.host_with_port)
+        return redirect_to login_url if !@files_domain && !@current_user
+
         if @context.is_a?(Course) && @context_enrollment
           start_date = @context_enrollment.enrollment_dates.map(&:first).compact.min if @context_enrollment.state_based_on_date == :inactive
           if @context.claimed?
@@ -399,7 +397,6 @@ class ApplicationController < ActionController::Base
           end
         end
 
-        @is_delegated = delegated_authentication_url?
         render "shared/unauthorized", status: :unauthorized
       }
       format.zip { redirect_to(url_for(params)) }
@@ -411,8 +408,7 @@ class ApplicationController < ActionController::Base
 
   def delegated_authentication_url?
     @domain_root_account.delegated_authentication? &&
-    !@domain_root_account.ldap_authentication? &&
-    !params[:canvas_login]
+    !@domain_root_account.ldap_authentication?
   end
 
   # To be used as a before_filter, requires controller or controller actions

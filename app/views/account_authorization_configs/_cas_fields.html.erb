@@ -3,7 +3,7 @@
   <%= f.hidden_field :id %>
   <table class="formtable" style="margin-left: 20px;">
     <%= render partial: "form_header",
-               locals: { auth_type: t("CAS"), account: account, aac: aac } %>
+               locals: { auth_type: t("CAS"), presenter: presenter, aac: aac } %>
     <tr>
       <td><%= f.blabel :auth_base, en: "CAS URL" %></td>
       <td class="nobr">
@@ -18,7 +18,7 @@
         <%= f.text_field :unknown_user_url,
               class: "auth_form",
               style: "width: 300px;",
-              placeholder: cas_login_url(no_auto: 'true') %>
+              placeholder: login_url %>
         <span class="auth_form" style="font-size: smaller;">
           <br/>
           <%= t(:unknown_user_url_description,

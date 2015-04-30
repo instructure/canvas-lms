@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,8 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module PseudonymSessionsHelper
-  def session_timeout_enabled
-    PluginSetting.settings_for_plugin 'sessions'
-  end
+module Login
+  LDAPController = CanvasController
 end

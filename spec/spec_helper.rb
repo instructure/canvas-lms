@@ -452,6 +452,7 @@ RSpec.configure do |config|
     config = AccountAuthorizationConfig::SAML.new
     config.auth_type = "saml"
     config.log_in_url = opts[:saml_log_in_url] if opts[:saml_log_in_url]
+    config.log_out_url = opts[:saml_log_out_url] if opts[:saml_log_out_url]
     @account.account_authorization_configs << config
     @account
   end
@@ -1044,11 +1045,13 @@ RSpec.configure do |config|
   end
 
   def assert_unauthorized
-    assert_status(401) #unauthorized
-    expect(response).to render_template("shared/unauthorized")
+    # we allow either a raw unauthorized or a redirect to login
+    unless response.status == 401
+       expect(response).to redirect_to(login_url)
+    end
   end
 
-  def assert_page_not_found(&block)
+  def assert_page_not_found
     yield
     assert_status(404)
   end

@@ -191,10 +191,10 @@ describe "API Authentication", type: :request do
 
       it "should execute for password/ldap login" do
         flow do
-          get response['Location']
-          expect(response).to be_success
+          follow_redirect!
+          expect(response).to redirect_to(canvas_login_url)
           Account.any_instance.stubs(:trusted_referer?).returns(true)
-          post "/login", :pseudonym_session => { :unique_id => 'test1@example.com', :password => 'test123' }
+          post canvas_login_url, :pseudonym_session => { :unique_id => 'test1@example.com', :password => 'test123' }
         end
       end
 
@@ -230,10 +230,12 @@ describe "API Authentication", type: :request do
           end
           CASClient::Client.stubs(:new).returns(cas)
 
-          get response['Location']
-          expect(response).to redirect_to(controller.delegated_auth_redirect_uri(cas.add_service_to_login_url(cas_login_url)))
+          follow_redirect!
+          expect(response).to redirect_to("/login/cas")
+          follow_redirect!
+          expect(response).to redirect_to(controller.delegated_auth_redirect_uri(cas.add_service_to_login_url(url_for(controller: 'login/cas', action: :new))))
 
-          get '/login', :ticket => 'ST-abcd'
+          get "/login/cas", :ticket => 'ST-abcd'
           expect(response).to be_redirect
         end
       end
@@ -280,6 +282,8 @@ describe "API Authentication", type: :request do
         expect(response).to redirect_to(login_url)
 
         follow_redirect!
+        expect(response).to be_redirect
+        follow_redirect!
         expect(response).to be_success
 
         user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
@@ -318,7 +322,9 @@ describe "API Authentication", type: :request do
             get "/login/oauth2/auth", :response_type => 'code', :client_id => @key.id, :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob'
             expect(response).to redirect_to(login_url)
 
-            get response['Location']
+            follow_redirect!
+            expect(response).to be_redirect
+            follow_redirect!
             expect(response).to be_success
             Account.any_instance.stubs(:trusted_referer?).returns(true)
             post "/login", :pseudonym_session => { :unique_id => 'test1@example.com', :password => 'test123' }
@@ -383,7 +389,9 @@ describe "API Authentication", type: :request do
               get "/login/oauth2/auth", :response_type => 'code', :client_id => @client_id, :redirect_uri => "http://www.example.com/my_uri"
               expect(response).to redirect_to(login_url)
 
-              get response['Location']
+              follow_redirect!
+              expect(response).to be_redirect
+              follow_redirect!
               expect(response).to be_success
               Account.any_instance.stubs(:trusted_referer?).returns(true)
               post "/login", :pseudonym_session => {:unique_id => 'test1@example.com', :password => 'test123'}

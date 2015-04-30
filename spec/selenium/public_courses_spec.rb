@@ -71,7 +71,7 @@ describe "public courses" do
     it "should should prompt must be logged in message when accessing permission based pages" do
       get "/grades"
       assert_flash_warning_message /You must be logged in to access this page/
-      expect(driver.current_url).to eq app_host + "/login"
+      expect(driver.current_url).to eq app_host + "/login/canvas"
     end
 
   end

@@ -798,7 +798,7 @@ describe CoursesController do
         @course.save!
 
         get 'show', :id => @course.id, :invitation => @enrollment.uuid
-        assert_status(401)
+        assert_unauthorized
         expect(assigns[:unauthorized_message]).not_to be_nil
 
         # unpublished course with invited student in account that disallows previews
@@ -809,7 +809,7 @@ describe CoursesController do
 
         controller.instance_variable_set(:@js_env, nil)
         get 'show', :id => @course.id, :invitation => @enrollment.uuid
-        assert_status(401)
+        assert_unauthorized
         expect(assigns[:unauthorized_message]).not_to be_nil
       end
 
@@ -846,7 +846,7 @@ describe CoursesController do
       it "should ignore invitations that have been accepted (not logged in)" do
         @enrollment.accept!
         get 'show', :id => @course.id, :invitation => @enrollment.uuid
-        assert_status(401)
+        assert_unauthorized
       end
 
       it "should ignore invitations that have been accepted (logged in)" do

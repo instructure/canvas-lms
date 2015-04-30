@@ -16,8 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'casclient'
-
 module AuthenticationMethods
 
   def authorized(*groups)
@@ -130,8 +128,7 @@ module AuthenticationMethods
 
         if @current_pseudonym &&
            session[:cas_session] &&
-           @current_pseudonym.cas_ticket_expired?(session[:cas_session]) &&
-           @domain_root_account.cas_authentication?
+           @current_pseudonym.cas_ticket_expired?(session[:cas_session])
 
           logger.info "Invalidating session: CAS ticket expired - #{session[:cas_session]}."
           destroy_session
@@ -277,7 +274,7 @@ module AuthenticationMethods
         flash[:warning] = I18n.t('lib.auth.errors.not_authenticated', "You must be logged in to access this page") unless request.path == '/'
         opts = {}
         opts[:canvas_login] = 1 if params[:canvas_login]
-        redirect_to login_url(opts) # should this have :no_auto => 'true' ?
+        redirect_to login_url(opts)
       }
       format.json { render_json_unauthorized }
     end
@@ -314,71 +311,9 @@ module AuthenticationMethods
     saved.each_pair { |k, v| session[k] = v }
   end
 
-  def reset_session_for_login
-    reset_session_saving_keys(:return_to, :oauth2, :confirm, :enrollment, :expected_user_id, :masquerade_return_to)
-  end
-
-  def initiate_delegated_login(current_host=nil)
-    if cookies['canvas_sa_delegated'] && !params[:canvas_login]
-      @domain_root_account = Account.site_admin
-    end
-    is_delegated = @domain_root_account.delegated_authentication? && !params[:canvas_login]
-    is_cas = is_delegated && @domain_root_account.cas_authentication?
-    is_saml = is_delegated && @domain_root_account.saml_authentication?
-    if is_cas
-      initiate_cas_login
-      return true
-    elsif is_saml
-
-      if @domain_root_account.auth_discovery_url
-        redirect_to @domain_root_account.auth_discovery_url
-      else
-        initiate_saml_login(current_host)
-      end
-
-      return true
-    end
-    false
-  end
-
-  def cas_client(account = @domain_root_account)
-    @cas_client ||= CASClient::Client.new(
-      cas_base_url: account.account_authorization_config.auth_base,
-      encode_extra_attributes_as: :raw
-    )
-  end
-
-  def initiate_cas_login(client = nil)
-    reset_session_for_login
-    client ||= cas_client
-    delegated_auth_redirect(client.add_service_to_login_url(cas_login_url))
-  end
-
-  def initiate_saml_login(current_host=nil, aac=nil)
-    increment_saml_stat("login_attempt")
-    reset_session_for_login
-    aac ||= @domain_root_account.account_authorization_config
-    settings = aac.saml_settings(current_host)
-    request = Onelogin::Saml::AuthRequest.new(settings)
-    forward_url = request.generate_request
-    if aac.debugging? && !aac.debug_get(:request_id)
-      aac.debug_set(:request_id, request.id)
-      aac.debug_set(:to_idp_url, forward_url)
-      aac.debug_set(:to_idp_xml, request.request_xml)
-      aac.debug_set(:debugging, "Forwarding user to IdP for authentication")
-    end
-    delegated_auth_redirect(forward_url)
-  end
-
-  def delegated_auth_redirect(uri)
-    redirect_to(delegated_auth_redirect_uri(uri))
-  end
-
+  # this really belongs on Login::Shared, but is left here for plugins that
+  # have always overridden it here
   def delegated_auth_redirect_uri(uri)
     uri
-  end
-
-  def increment_saml_stat(key)
-    CanvasStatsd::Statsd.increment("saml.#{CanvasStatsd::Statsd.escape(request.host)}.#{key}")
   end
 end

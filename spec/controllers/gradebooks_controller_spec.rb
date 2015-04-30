@@ -375,7 +375,7 @@ describe GradebooksController do
 
     it "renders the unauthorized page without gradebook authorization" do
       get "show", :course_id => @course.id
-      expect(response).to render_template("shared/unauthorized")
+      assert_unauthorized
     end
   end
 

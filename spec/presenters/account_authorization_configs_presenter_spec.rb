@@ -309,4 +309,35 @@ describe AccountAuthorizationConfigsPresenter do
       expect(options).to eq([["Last",nil],[1,1],[2,2],[3,3],[4,4]])
     end
   end
+
+  describe "#login_url" do
+    it "never includes id for LDAP" do
+      config = Account.default.account_authorization_configs.create!(auth_type: 'ldap')
+      config2 = Account.default.account_authorization_configs.create!(auth_type: 'ldap')
+      presenter = described_class.new(Account.default)
+      expect(presenter.login_url_options(config)).to eq(controller: 'login/ldap',
+                                                        action: :new)
+      expect(presenter.login_url_options(config2)).to eq(controller: 'login/ldap',
+                                                         action: :new)
+    end
+
+    it "doesn't include id if there is only one SAML config" do
+      config = Account.default.account_authorization_configs.create!(auth_type: 'saml')
+      presenter = described_class.new(Account.default)
+      expect(presenter.login_url_options(config)).to eq(controller: 'login/saml',
+                                                        action: :new)
+    end
+
+    it "includes id if there are multiple SAML configs" do
+      config = Account.default.account_authorization_configs.create!(auth_type: 'saml')
+      config2 = Account.default.account_authorization_configs.create!(auth_type: 'saml')
+      presenter = described_class.new(Account.default)
+      expect(presenter.login_url_options(config)).to eq(controller: 'login/saml',
+                                                        action: :new,
+                                                        id: config)
+      expect(presenter.login_url_options(config2)).to eq(controller: 'login/saml',
+                                                         action: :new,
+                                                         id: config2)
+    end
+  end
 end

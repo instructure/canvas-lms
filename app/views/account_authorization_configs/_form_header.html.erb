@@ -6,9 +6,9 @@
     <%= auth_type %>
   </th>
 </tr>
-<% if account.multi_auth? && !aac.new_record? %>
+<% if aac.account.multi_auth? && !aac.new_record? %>
   <tr>
     <td><%= t :auth_url, "Login url for this config" %></td>
-    <td><%= aac_login_url(aac.id || '') %></td>
+    <td><%= url_for(presenter.login_url_options(aac)) %></td>
   </tr>
 <% end %>

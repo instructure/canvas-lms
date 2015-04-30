@@ -203,31 +203,6 @@ describe AccountsController do
     end
   end
 
-  describe "authentication" do
-    it "should redirect to CAS if CAS is enabled" do
-      account = account_with_cas({:account => Account.default})
-      config = { :cas_base_url => account.account_authorization_config.auth_base }
-      cas_client = CASClient::Client.new(config)
-      get 'show', :id => account.id
-      expect(response).to redirect_to(controller.delegated_auth_redirect_uri(cas_client.add_service_to_login_url(cas_login_url)))
-    end
-
-    it "should respect canvas_login=1" do
-      account = account_with_cas({:account => Account.default})
-      get 'show', :id => account.id, :canvas_login => '1'
-      expect(response).to render_template("shared/unauthorized")
-    end
-
-    it "should set @is_delegated correctly for ldap/non-canvas" do
-      Account.default.account_authorization_configs.create!(:auth_type =>'ldap')
-      Account.default.settings[:canvas_authentication] = false
-      Account.default.save!
-      get 'show', :id => Account.default.id
-      expect(response).to render_template("shared/unauthorized")
-      expect(assigns['is_delegated']).to eq false
-    end
-  end
-
   describe "courses" do
     it "should count total courses correctly" do
       account = Account.create!

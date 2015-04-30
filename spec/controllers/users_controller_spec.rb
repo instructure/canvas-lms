@@ -143,7 +143,7 @@ describe UsersController do
       state = Canvas::Security.create_jwt({'return_to_url' => 'http://localhost.com/return', 'nonce' => 'abc123'})
       get :oauth_success, state: state, service: "google_drive", code: "some_code"
 
-      expect(response.code).to eq "401"
+      assert_unauthorized
       expect(session[:oauth_gdrive_access_token]).to be_nil
       expect(session[:oauth_gdrive_refresh_token]).to be_nil
     end

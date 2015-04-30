@@ -3,7 +3,7 @@
   <%= f.hidden_field :id %>
   <table class="formtable" style="margin-left: 20px;">
     <%= render partial: "form_header",
-               locals: { auth_type: t("SAML"), account: account, aac: aac } %>
+               locals: { auth_type: t("SAML"), presenter: presenter, aac: aac } %>
 
     <tr>
       <td><%= f.blabel :idp_entity_id, en: "IdP Entity ID" %></td>
@@ -55,7 +55,7 @@
       <td>
         <%= f.text_field(:unknown_user_url,
                          class: "input-xlarge",
-                         placeholder: login_url(no_auto: 'true')) %>
+                         placeholder: login_url) %>
         <span class="auth_form" style="font-size: smaller;">
           <br/>
           <%= t(:unknown_user_url_description,

@@ -20,7 +20,7 @@ describe "concluded/unconcluded" do
     @course.enroll_student(@student).accept
     @group = @course.assignment_groups.create!(:name => "default")
     @assignment = @course.assignments.create!(:submission_types => 'online_quiz', :title => 'quiz assignment', :assignment_group => @group)
-    login_as(username, password)
+    create_session(u.pseudonym)
   end
 
   it "should let the teacher edit the gradebook by default" do

@@ -35,7 +35,7 @@ describe "profile" do
 
   it "should give error - wrong old password" do
     user_with_pseudonym({:active_user => true})
-    login_as
+    create_session(@pseudonym)
     get '/profile/settings'
     wrong_old_password = 'wrongoldpassword'
     new_password = 'newpassword'
@@ -54,7 +54,7 @@ describe "profile" do
 
   it "should change the password" do
     user_with_pseudonym({:active_user => true})
-    login_as
+    create_session(@pseudonym)
     get '/profile/settings'
     old_password = 'asdfasdf'
     new_password = 'newpassword'
@@ -66,7 +66,7 @@ describe "profile" do
     submit_form(edit_form)
     wait_for_ajaximations
     #login with new password
-    keep_trying_until { login_as('nobody@example.com', new_password) }
+    expect(@pseudonym.reload).to be_valid_password(new_password)
   end
 
   context "non password tests" do

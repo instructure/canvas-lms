@@ -1,5 +1,5 @@
 <% content_for :page_title do %>
-  <% if !@files_domain && (!@current_user || @unauthorized_user)  %>
+  <% if !@files_domain && !@unauthorized_user  %>
     <%= t('titles.log_in', %{Please Log In}) %>
   <% else %>
     <%= t('titles.unauthorized_action', %{Unauthorized}) %>
@@ -9,12 +9,11 @@
 <% @show_left_side = false %>
 <% @show_embedded_chat = false %>
 <div id="unauthorized_holder">
-<% if (@unauthorized_user && @current_user && @current_user != @unauthorized_user) || @unauthorized_user || @unauthorized_message || @context || @needs_cookies %>
-  <div id="unauthorized_message" class="<%= 'ui-state-error' if @needs_login %>">
-    <h2 class="<%= 'ui-state-error' unless @needs_login %>">
+  <div id="unauthorized_message">
+    <h2 class="ui-state-error">
       <% if @needs_cookies -%>
         <%= t('headings.needs_cookies', %{Cookies Required}) %>
-      <% elsif !@files_domain && (!@current_user || @unauthorized_user) -%>
+      <% elsif !@files_domain && @unauthorized_user %>
         <%= t('headings.needs_login', %{Please Log In}) %>
       <% elsif @unauthorized_reason == :unpublished %>
         <%= t('headings.unpublished', %{Not Yet Available}) %>
@@ -22,12 +21,12 @@
         <%= t('headings.unauthorized_action', %{Unauthorized}) %>
       <% end -%>
     </h2>
-    <% if @unauthorized_user && @current_user && @current_user != @unauthorized_user %>
+    <% if @unauthorized_user && @current_user != @unauthorized_user %>
       <p><%= mt 'unauthorized_user_is_other', "%{current_user}, you are not authorized to view this page.  The link you followed to get here was for **%{unauthorized_user} (%{unauthorized_user_email})**.  If that's you, you may want to log out and log back in with that email address to gain access to this page.", :current_user => @current_user.name, :unauthorized_user => @unauthorized_user.name, :unauthorized_user_email => @unauthorized_user.email %>
       </p>
     <% elsif @unauthorized_user %>
       <p>
-        <%= t 'unauthorized_user', %[%{user_name}, you'll need to log in before you can view that page.  Click "Forgot Password" if you forgot or don't know your password.], :user_name => @unauthorized_user.name %>
+        <%= t "%{user_name}, you'll need to *log in* before you can view that page.", user_name: @unauthorized_user.name, wrapper: link_to(login_url, '\1') %>
       </p>
     <% elsif @unauthorized_message %>
       <p><%= @unauthorized_message %></p>
@@ -35,8 +34,6 @@
       <p><%= t('needs_cookies', %{Cookies are not enabled on your browser. Please adjust this in your security preferences before continuing.}) %></p>
     <% elsif @files_domain %>
       <p><%= t('needs_login', %{Access to this page is limited to authorized users.  You do not have currently have permission to view this page.}) %></p>
-    <% elsif !@current_user %>
-      <p><%= t('unauthorized_action', %{You need to log in before you can view this page.}) %></p>
     <% elsif @context %>
       <p>
         <% if @context.try_rescue(:is_public) %>
@@ -49,8 +46,4 @@
       </p>
     <% end %>
   </div>
-<% end %>
-<% if @needs_login %>
-  <%= render :partial => "shared/login", :locals => {:hide_self_reg_banner => true} %>
-<% end %>
 </div>

@@ -93,8 +93,8 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     domains = HostUrl.context_hosts(account, current_host)
 
     settings = Onelogin::Saml::Settings.new
-    settings.sp_slo_url = "#{HostUrl.protocol}://#{domains.first}/saml_logout"
-    settings.assertion_consumer_service_url = domains.map { |domain| "#{HostUrl.protocol}://#{domain}/saml_consume" }
+    settings.sp_slo_url = "#{HostUrl.protocol}://#{domains.first}/login/saml/logout"
+    settings.assertion_consumer_service_url = domains.map { |domain| "#{HostUrl.protocol}://#{domain}/login/saml" }
     settings.tech_contact_name = app_config[:tech_contact_name] || 'Webmaster'
     settings.tech_contact_email = app_config[:tech_contact_email] || ''
 
@@ -172,5 +172,26 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
 
   def debug_expire
     Setting.get('aac_debug_expire_minutes', 30).to_i.minutes
+  end
+
+  def user_logout_redirect(controller, current_user)
+    settings = saml_settings(controller.request.host_with_port)
+    session = controller.session
+
+    saml_request = Onelogin::Saml::LogoutRequest.generate(
+      session[:name_qualifier],
+      session[:name_id],
+      session[:session_index],
+      settings
+    )
+
+    if debugging? && debug_get(:logged_in_user_id) == current_user.id
+      debug_set(:logout_request_id, saml_request.id)
+      debug_set(:logout_to_idp_url, saml_request.forward_url)
+      debug_set(:logout_to_idp_xml, saml_request.xml)
+      debug_set(:debugging, t('debug.logout_redirect', "LogoutRequest sent to IdP"))
+    end
+
+    saml_request.forward_url
   end
 end
