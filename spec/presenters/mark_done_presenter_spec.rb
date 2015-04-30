@@ -31,8 +31,8 @@ describe MarkDonePresenter do
     the_module.add_item(:id => wiki_page.id, :type => 'wiki_page')
   end
 
-  def create_presenter
-    MarkDonePresenter.new(nil, @course, wiki_page, @user)
+  def create_presenter(tag)
+    MarkDonePresenter.new(nil, @course, tag.id, @user)
   end
 
   def add_mark_done_requirement(tag)
@@ -49,15 +49,15 @@ describe MarkDonePresenter do
   describe "#has_requirement?" do
 
     it "should be false when there is no mark as done requirement" do
-      add_wiki_page_to_module
-      subject = create_presenter
+      tag = add_wiki_page_to_module
+      subject = create_presenter tag
       expect(subject).not_to have_requirement
     end
 
     it "should be true when there is a mark as done requirement" do
       tag = add_wiki_page_to_module
       add_mark_done_requirement tag
-      subject = create_presenter
+      subject = create_presenter tag
       expect(subject).to have_requirement
     end
   end
@@ -68,14 +68,14 @@ describe MarkDonePresenter do
       tag = add_wiki_page_to_module
       add_mark_done_requirement tag
       mark_page_as_done tag
-      subject = create_presenter
+      subject = create_presenter tag
       expect(subject).to be_checked
     end
 
     it "should be false when the mark as done requirement is not fulfilled" do
       tag = add_wiki_page_to_module
       add_mark_done_requirement tag
-      subject = create_presenter
+      subject = create_presenter tag
 
       expect(subject).not_to be_checked
     end

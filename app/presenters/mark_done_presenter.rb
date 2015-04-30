@@ -18,22 +18,12 @@
 
 class MarkDonePresenter
 
-  def initialize(ctrl, context, content, user)
+  def initialize(ctrl, context, module_item_id, user)
     @ctrl = ctrl
     @context = context
-    @content = content
-    @item = _find_item
+    @item = ContentTag.find(module_item_id.to_i) if module_item_id
     @module = @item.context_module if @item
     @user = user
-  end
-
-  def _find_item
-    return nil unless @context.respond_to? :context_modules
-    @context.context_modules.map do |modules|
-      modules.content_tags.find do |tag|
-        tag.content_id == @content.id && tag.content_type == @content.class.name
-      end
-    end.find(&:present?)
   end
 
   def has_requirement?

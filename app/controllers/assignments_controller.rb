@@ -149,7 +149,7 @@ class AssignmentsController < ApplicationController
       @assignment_menu_tools = external_tools_display_hashes(:assignment_menu)
 
 
-      @mark_done = MarkDonePresenter.new(self, @context, @assignment, @current_user)
+      @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user)
 
       respond_to do |format|
         if @assignment.submission_types == 'online_quiz' && @assignment.quiz

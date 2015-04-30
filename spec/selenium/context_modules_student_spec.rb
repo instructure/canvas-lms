@@ -392,8 +392,8 @@ describe "context_modules" do
       def setup
         @mark_done_module = create_context_module('Mark Done Module')
         page = @course.wiki.wiki_pages.create!(:title => "The page", :body => 'hi')
-        tag = @mark_done_module.add_item({:id => page.id, :type => 'wiki_page'})
-        @mark_done_module.completion_requirements = {tag.id => {:type => 'must_mark_done'}}
+        @tag = @mark_done_module.add_item({:id => page.id, :type => 'wiki_page'})
+        @mark_done_module.completion_requirements = {@tag.id => {:type => 'must_mark_done'}}
         @mark_done_module.save!
       end
 
@@ -416,6 +416,8 @@ describe "context_modules" do
         go_to_modules
         el = f "#context_modules .context_module[data-module-id='#{@mark_done_module.id}']"
         expect(f('.progression_state', el).text).to eq "completed"
+        expect(f("#context_module_item_#{@tag.id} .requirement-description .must_mark_done_requirement .fulfilled")).to be_displayed
+        expect(f("#context_module_item_#{@tag.id} .requirement-description .must_mark_done_requirement .unfulfilled")).to_not be_displayed
       end
     end
   end
