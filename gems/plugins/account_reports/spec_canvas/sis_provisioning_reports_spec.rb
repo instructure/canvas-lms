@@ -203,6 +203,9 @@ describe "Default Account Reports" do
     @enrollment11 = @course2.enroll_user(@user4,'DesignerEnrollment',
                                          :role => @role,
                                          :enrollment_state => :active)
+    @enrollment12 = @course4.enroll_user(@user4,'StudentEnrollment',
+                                         :enrollment_state => :active)
+    Enrollment.where(id: @enrollment12).update_all(workflow_state: 'creation_pending')
   end
 
   def create_some_groups()
@@ -652,6 +655,7 @@ describe "Default Account Reports" do
         parameters = {}
         parameters["enrollments"] = true
         parsed = read_report("sis_export_csv",{params: parameters, order: [1,0]})
+        # should ignore creation pending enrollments on sis_export
         expect(parsed.length).to eq 8
 
         expect(parsed[0]).to eq ["SIS_COURSE_ID_1","user_sis_id_01","observer",observer_role.id.to_s,nil,"active",nil]
@@ -711,9 +715,14 @@ describe "Default Account Reports" do
         expect(parsed[9]).to eq [@course2.id.to_s ,"SIS_COURSE_ID_2",@user4.id.to_s,"user_sis_id_04",
                               "Pixel Engineer",@role.id.to_s,@enrollment11.course_section_id.to_s,
                               nil,"active",nil,nil]
-        expect(parsed[10]).to eq [@course4.id.to_s ,nil,@user5.id.to_s,"user_sis_id_05","teacher",teacher_role.id.to_s,
+        expect(parsed[10]).to eq [@course4.id.to_s, nil, @user4.id.to_s,
+                                  "user_sis_id_04", "student",
+                                  student_role.id.to_s,
+                                  @enrollment12.course_section_id.to_s, nil,
+                                  "invited", nil, nil]
+        expect(parsed[11]).to eq [@course4.id.to_s ,nil,@user5.id.to_s,"user_sis_id_05","teacher",teacher_role.id.to_s,
                              @enrollment8.course_section_id.to_s,nil,"active",nil,nil]
-        expect(parsed.length).to eq 11
+        expect(parsed.length).to eq 12
 
       end
 

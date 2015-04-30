@@ -410,6 +410,7 @@ module AccountReports
                   pseudonyms.sis_user_id AS pseudonym_sis_id,
                   ob.sis_user_id AS ob_sis_id,
                   CASE WHEN enrollments.workflow_state = 'invited' THEN 'invited'
+                       WHEN enrollments.workflow_state = 'creation_pending' THEN 'invited'
                        WHEN enrollments.workflow_state = 'active' THEN 'active'
                        WHEN enrollments.workflow_state = 'completed' THEN 'concluded'
                        WHEN enrollments.workflow_state = 'deleted' THEN 'deleted'
@@ -438,7 +439,7 @@ module AccountReports
 
         if @sis_format
           enrol = enrol.where("pseudonyms.sis_user_id IS NOT NULL
-                               AND enrollments.workflow_state NOT IN ('rejected', 'invited')
+                               AND enrollments.workflow_state NOT IN ('rejected', 'invited', 'creation_pending')
                                AND (courses.sis_source_id IS NOT NULL
                                  OR cs.sis_source_id IS NOT NULL)")
         end
