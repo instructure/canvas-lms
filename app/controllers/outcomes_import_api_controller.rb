@@ -1,0 +1,132 @@
+#
+# Copyright (C) 2012 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+class OutcomesImportApiController < ApplicationController
+  include Api::V1::Outcome
+
+  before_filter :require_user, :require_account_context,
+                :can_manage_global_outcomes, :has_api_config
+
+  def available
+    render json: list_of_available_guids
+  end
+
+  def create
+    return render json: { error: "must specify a guid to import" } unless params[:guid]
+    return unless valid_guid(params[:guid])
+
+    begin
+      err_msg = "Import failed to queue"
+      migration = AcademicBenchmark.import(Array(params[:guid])).first
+      raise RuntimeError.new(err_msg) unless migration
+      render json: { migration_id: migration.id, guid: params[:guid] }
+    rescue StandardError => e
+      render json: { error: "#{err_msg}: #{e.message}" }
+    end
+  end
+
+  protected
+
+  def can_manage_global_outcomes
+    authorized_action(Account.site_admin, @current_user, :manage_global_outcomes)
+  end
+
+  def has_api_config
+    err = "The AcademicBenchmark API is not configured"
+    if !AcademicBenchmark.config
+      render json: { error: "#{err} (needs api_key and api_url)" }
+      return false
+    elsif !AcademicBenchmark.config["api_key"]
+      render json: { error: "#{err} (needs api_key)" }
+      return false
+    elsif !AcademicBenchmark.config["api_url"]
+      render json: { error: "#{err} (needs api_url)" }
+      return false
+    end
+    true
+  end
+
+  ##
+  # valid guids can only contain hex digits (letters all upper case),
+  # and must be separated between a '-' [8-4-4-4-12]
+  #
+  #   example:  A833C528-901A-11DF-A622-0C319DFF4B22
+  ##
+  def valid_guid(guid)
+    unless guid =~ /[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}/
+      render json: { error: "GUID is invalid" }
+      return false
+    end
+    true
+  end
+
+  ##
+  # Extract the national standards from the list of authorities
+  # National Standards are also known as Common Core and NGSS
+  ##
+  def nat_stds_guid(authorities)
+    authorities.find{|a| a["title"] == "National Standards"}["guid"]
+  end
+
+  def api_connection
+    # The api credentials for accessing the Academic Benchmarks API
+    # are stored in the database.  This retrieves them
+    config = AcademicBenchmark.config
+
+    # create a new api connection.  Note that this does not actually
+    # make a request to the API
+    AcademicBenchmark::Api.new(config["api_key"], base_url: config["api_url"])
+  end
+
+  ##
+  # get a list of all of the available authorities,
+  # and sort them alphabetically by title.
+  #
+  # Academic Benchmarks authorities are generally State Standards,
+  # although "National Statndards" is an authority which must be
+  # browsed in order to retrieve specifics like NGSS and Common Core
+  ##
+  def retrieve_authorities(api)
+    authorities = api.list_available_authorities.select { |a| a.key?("title") }
+    authorities.sort{ |a, b| a["title"] <=> b["title"] }
+  end
+
+  def extract_common_core_and_ngss(api, nat_stds_guid)
+    api.browse_guid(nat_stds_guid).first["itm"].first["itm"]
+  end
+
+  ##
+  # Get a list of all of the available guids that users can import.
+  # These can be passed to the `create` action
+  ##
+  def list_of_available_guids
+    api = api_connection
+    auth_list = retrieve_authorities(api)
+
+    # prepend the common core and next gen science standards to the list
+    auth_list.unshift(extract_common_core_and_ngss(api, nat_stds_guid(auth_list)))
+
+    # append the UK standards to the end of the list and flatten it down
+    auth_list.push(uk_guid(api)).flatten
+  end
+
+  # The UK standards are now available to us as well,
+  def uk_guid(api)
+    api.browse.find{ |a| a["title"] == "United Kingdom" }
+  end
+end
