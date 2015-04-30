@@ -205,21 +205,23 @@ define [
         ""
       else if @invalid
         @parseError
-      else if @showDate and @showTime
-        tz.format(@datetime, "%a %b %-d, %Y %-l:%M%P")
-      else if @showDate
-        tz.format(@datetime, "%a %b %-d, %Y")
       else
-        tz.format(@datetime, "%-l:%M%P")
+        tz.format(@datetime, @formatString())
 
     formatSuggestCourse: ->
       if @blank
         ""
       else if @invalid
         ""
-      else if @showDate and @showTime
-        tz.format(@datetime, "%a %b %-d, %Y %-l:%M%P", @courseTimezone)
       else if @showTime
-        tz.format(@datetime, "%-l:%M%P", @courseTimezone)
+        tz.format(@datetime, @formatString(), @courseTimezone)
       else
         ""
+
+    formatString: ->
+      if @showDate and @showTime
+        I18n.t("#date.formats.full_with_weekday")
+      else if @showDate
+        I18n.t("#date.formats.medium_with_weekday")
+      else
+        I18n.t("#time.formats.tiny")

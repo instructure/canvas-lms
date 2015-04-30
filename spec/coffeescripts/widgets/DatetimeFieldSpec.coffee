@@ -5,9 +5,9 @@ define [
   'vendor/timezone/America/Detroit'
   'vendor/timezone/America/Juneau'
   'vendor/timezone/pt_PT'
-  'i18nObj'
+  'helpers/I18nStubber'
   'helpers/fakeENV'
-], (DatetimeField, $, tz, detroit, juneau, portuguese, I18n, fakeENV) ->
+], (DatetimeField, $, tz, detroit, juneau, portuguese, I18nStubber, fakeENV) ->
 
   moonwalk = tz.parse('1969-07-21T02:56:00Z')
 
@@ -443,7 +443,15 @@ define [
 
   test 'returns time only if @showDate false', ->
     @field.showDate = false
-    equal @field.formatSuggest(), '9:56pm'
+    equal @field.formatSuggest(), ' 9:56pm'
+
+  test 'localizes formatting of dates and times', ->
+    tz.changeLocale(portuguese, 'pt_PT')
+    I18nStubber.pushFrame()
+    I18nStubber.setLocale 'pt_PT'
+    I18nStubber.stub 'pt_PT', 'date.formats.full_with_weekday': "%a, %-d %b %Y %k:%M"
+    equal @field.formatSuggest(), 'Dom, 20 Jul 1969 21:56'
+    I18nStubber.popFrame()
 
   module 'formatSuggestCourse',
     setup: ->
@@ -476,7 +484,7 @@ define [
 
   test 'returns time only if @showDate false', ->
     @field.showDate = false
-    equal @field.formatSuggestCourse(), '7:56pm'
+    equal @field.formatSuggestCourse(), ' 7:56pm'
 
   module 'normalizeValue',
     setup: ->

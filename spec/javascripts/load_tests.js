@@ -7,6 +7,13 @@ tests = tests.map(function(test) {
   return test.indexOf('spec/javascripts') === 0 ? '../../' + test : test;
 });
 
+// include the english translations by default, same as would happen in
+// production via common.js. this saves the test writer from having to stub
+// translations anytime they need to use code that uses a no-default
+// translation call (e.g. I18n.t('#date.formats.medium')) with the default
+// locale
+tests.push('translations/_core_en');
+
 window.addEventListener("DOMContentLoaded",function() {
   if(!document.getElementById('fixtures')) {
     var fixturesDiv = document.createElement('div');
