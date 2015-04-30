@@ -1,0 +1,350 @@
+[
+  {
+    "title": "Common Core State Standards",
+    "guid": "89c8ea94",
+    "type": "document",
+    "chld": "2"
+  },
+  {
+    "title": "NGSS Arranged by Topic",
+    "guid": "138c9cb7",
+    "type": "document",
+    "chld": "1"
+  },
+  {
+    "title": "Next Generation Science Standards NGSS Arranged by Disciplinary Core Idea (DCI)",
+    "guid": "923ce7bf",
+    "type": "document",
+    "chld": "1"
+  },
+  {
+    "title": "Alabama",
+    "guid": "46bb3879",
+    "type": "authority",
+    "chld": "3"
+  },
+  {
+    "title": "Alaska",
+    "guid": "21f67573",
+    "type": "authority",
+    "chld": "4"
+  },
+  {
+    "title": "Arizona",
+    "guid": "55fb05de",
+    "type": "authority",
+    "chld": "4"
+  },
+  {
+    "title": "Arkansas",
+    "guid": "9fadba9f",
+    "type": "authority",
+    "chld": "2"
+  },
+  {
+    "title": "Australia",
+    "guid": "24d23683",
+    "type": "authority",
+    "chld": "1"
+  },
+  {
+    "title": "California",
+    "guid": "51a90b1c",
+    "type": "authority",
+    "chld": "7"
+  },
+  {
+    "title": "Colorado",
+    "guid": "87740e39",
+    "type": "authority",
+    "chld": "3"
+  },
+  {
+    "title": "Connecticut",
+    "guid": "ebf5916a",
+    "type": "authority",
+    "chld": "5"
+  },
+  {
+    "title": "Delaware",
+    "guid": "6de6b316",
+    "type": "authority",
+    "chld": "5"
+  },
+  {
+    "title": "District of Columbia",
+    "guid": "7063136c",
+    "type": "authority",
+    "chld": "5"
+  },
+  {
+    "title": "Florida",
+    "guid": "33ed68e9",
+    "type": "authority",
+    "chld": "5"
+  },
+  {
+    "title": "Georgia",
+    "guid": "6eca1d5b",
+    "type": "authority",
+    "chld": "6"
+  },
+  {
+    "title": "Hawaii",
+    "guid": "c4e475d5",
+    "type": "authority",
+    "chld": "4"
+  },
+  {
+    "title": "Idaho",
+    "guid": "c4d27bbf",
+    "type": "authority",
+    "chld": "2"
+  },
+  {
+    "title": "Illinois",
+    "guid": "c52909fe",
+    "type": "authority",
+    "chld": "7"
+  },
+  {
+    "title": "Indiana",
+    "guid": "5405f7cd",
+    "type": "authority",
+    "chld": "3"
+  },
+  {
+    "title": "Iowa",
+    "guid": "a1408ccf",
+    "type": "authority",
+    "chld": "5"
+  },
+  {
+    "title": "Kansas",
+    "guid": "d9e92a00",
+    "type": "authority",
+    "chld": "3"
+  },
+  {
+    "title": "Kentucky",
+    "guid": "e935b719",
+    "type": "authority",
+    "chld": "4"
+  },
+  {
+    "title": "Louisiana",
+    "guid": "6b6ab39f",
+    "type": "authority",
+    "chld": "3"
+  },
+  {
+    "title": "Maine",
+    "guid": "7aa35836",
+    "type": "authority",
+    "chld": "3"
+  },
+  {
+    "title": "Maryland",
+    "guid": "ab7c9a74",
+    "type": "authority",
+    "chld": "8"
+  },
+  {
+    "title": "Massachusetts",
+    "guid": "e47b1fd7",
+    "type": "authority",
+    "chld": "4"
+  },
+  {
+    "title": "Michigan",
+    "guid": "f674f704",
+    "type": "authority",
+    "chld": "4"
+  },
+  {
+    "title": "Minnesota",
+    "guid": "49412237",
+    "type": "authority",
+    "chld": "4"
+  },
+  {
+    "title": "Mississippi",
+    "guid": "16e8ef83",
+    "type": "authority",
+    "chld": "3"
+  },
+  {
+    "title": "Missouri",
+    "guid": "7eb6d9c1",
+    "type": "authority",
+    "chld": "4"
+  },
+  {
+    "title": "Montana",
+    "guid": "f8b810b0",
+    "type": "authority",
+    "chld": "4"
+  },
+  {
+    "title": "National Standards",
+    "guid": "be4ae687",
+    "type": "authority",
+    "chld": "3"
+  },
+  {
+    "title": "Nebraska",
+    "guid": "1d80aef1",
+    "type": "authority",
+    "chld": "3"
+  },
+  {
+    "title": "Nevada",
+    "guid": "4ac3bf40",
+    "type": "authority",
+    "chld": "2"
+  },
+  {
+    "title": "New Hampshire",
+    "guid": "b879cab0",
+    "type": "authority",
+    "chld": "5"
+  },
+  {
+    "title": "New Jersey",
+    "guid": "28ccaa7f",
+    "type": "authority",
+    "chld": "4"
+  },
+  {
+    "title": "New Mexico",
+    "guid": "62d48dfb",
+    "type": "authority",
+    "chld": "4"
+  },
+  {
+    "title": "New South Wales",
+    "guid": "dc11940b",
+    "type": "authority",
+    "chld": "1"
+  },
+  {
+    "title": "New York",
+    "guid": "5ba1414e",
+    "type": "authority",
+    "chld": "5"
+  },
+  {
+    "title": "North Carolina",
+    "guid": "60d9162b",
+    "type": "authority",
+    "chld": "5"
+  },
+  {
+    "title": "North Dakota",
+    "guid": "3a254e65",
+    "type": "authority",
+    "chld": "4"
+  },
+  {
+    "title": "Ohio",
+    "guid": "3cad1282",
+    "type": "authority",
+    "chld": "4"
+  },
+  {
+    "title": "Oklahoma",
+    "guid": "75e44c01",
+    "type": "authority",
+    "chld": "4"
+  },
+  {
+    "title": "Oregon",
+    "guid": "b73ef744",
+    "type": "authority",
+    "chld": "4"
+  },
+  {
+    "title": "Pennsylvania",
+    "guid": "f049b761",
+    "type": "authority",
+    "chld": "6"
+  },
+  {
+    "title": "Rhode Island",
+    "guid": "182583c5",
+    "type": "authority",
+    "chld": "5"
+  },
+  {
+    "title": "South Carolina",
+    "guid": "dbe6080d",
+    "type": "authority",
+    "chld": "4"
+  },
+  {
+    "title": "South Dakota",
+    "guid": "e4279125",
+    "type": "authority",
+    "chld": "3"
+  },
+  {
+    "title": "Tennessee",
+    "guid": "02becaac",
+    "type": "authority",
+    "chld": "5"
+  },
+  {
+    "title": "Texas",
+    "guid": "ce3b417f",
+    "type": "authority",
+    "chld": "4"
+  },
+  {
+    "title": "Utah",
+    "guid": "33eb23e4",
+    "type": "authority",
+    "chld": "3"
+  },
+  {
+    "title": "Vermont",
+    "guid": "56164380",
+    "type": "authority",
+    "chld": "6"
+  },
+  {
+    "title": "Virginia",
+    "guid": "7ff76448",
+    "type": "authority",
+    "chld": "4"
+  },
+  {
+    "title": "Washington",
+    "guid": "fd5eab70",
+    "type": "authority",
+    "chld": "7"
+  },
+  {
+    "title": "West Virginia",
+    "guid": "7f9edddc",
+    "type": "authority",
+    "chld": "3"
+  },
+  {
+    "title": "Wisconsin",
+    "guid": "8b18ea97",
+    "type": "authority",
+    "chld": "4"
+  },
+  {
+    "title": "Wyoming",
+    "guid": "7121df7d",
+    "type": "authority",
+    "chld": "2"
+  },
+  {
+    "title": "United Kingdom",
+    "guid": "e13189f3",
+    "type": "country",
+    "chld": "1"
+  }
+]

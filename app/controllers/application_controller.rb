@@ -439,10 +439,25 @@ class ApplicationController < ActionController::Base
   end
 
   def require_context_and_read_access
-    return require_context && authorized_action(@context, @current_user, :read)
+    require_context && authorized_action(@context, @current_user, :read)
   end
 
   helper_method :clean_return_to
+
+  def require_account_context
+    require_context_type(Account)
+  end
+
+  def require_course_context
+    require_context_type(Course)
+  end
+
+  def require_context_type(klass)
+    unless require_context && @context.is_a?(klass)
+      raise ActiveRecord::RecordNotFound.new("Context must be of type '#{klass}'")
+    end
+    true
+  end
 
   MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS = 3
 

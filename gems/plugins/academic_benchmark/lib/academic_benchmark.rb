@@ -15,22 +15,23 @@ module AcademicBenchmark
   def self.import(guid_or_guids)
     unless AcademicBenchmark.config[:api_key]
       puts "Not importing academic benchmark data because no API key is set"
-      return
+      return []
     end
 
     # need a user with global outcome management rights
     user_id = Setting.get("academic_benchmark_migration_user_id", nil)
     unless user_id
       puts "Not importing academic benchmark data because no user id set"
-      return
+      return []
     end
 
-    if (permissionful_user = User.where(id: user_id).first)
-      Array(guid_or_guids).each do |guid|
-        AcademicBenchmark.queue_migration_for_guid(guid, permissionful_user)
-      end
-    else
+    unless (permissionful_user = User.where(id: user_id).first)
       puts "Not importing academic benchmark data because no user found"
+      return []
+    end
+
+    Array(guid_or_guids).map do |guid|
+      AcademicBenchmark.queue_migration_for_guid(guid, permissionful_user).first
     end
   end
 

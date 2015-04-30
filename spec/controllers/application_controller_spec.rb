@@ -469,6 +469,24 @@ describe ApplicationController do
     end
   end
 
+  context 'require_context' do
+    it "properly requires account context" do
+      controller.instance_variable_set(:@context, Account.default)
+      expect(controller.send(:require_account_context)).to be_truthy
+      course_model
+      controller.instance_variable_set(:@context, @course)
+      expect{controller.send(:require_account_context)}.to raise_error
+    end
+
+    it "properly requires course context" do
+      course_model
+      controller.instance_variable_set(:@context, @course)
+      expect(controller.send(:require_course_context)).to be_truthy
+      controller.instance_variable_set(:@context, Account.default)
+      expect{controller.send(:require_course_context)}.to raise_error
+    end
+  end
+
   describe 'rescue_action_in_public' do
     context 'sharding' do
       specs_require_sharding
