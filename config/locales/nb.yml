@@ -1506,6 +1506,7 @@ nb:
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Er du sikker på at du vil slette denne kunngjøringen?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Er du sikker på at du vil slette dette gradering periode?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Er du sikker på at du vil slette denne karaktersettingsplanen?"
+  are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Er du sikker på at du vil fjerne denne vurderingsperioden?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Er du sikker på at du vil fjerne dette verktøyet?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Er du sikker på at du vil rapportere dette profilbildet?"
   aria_labels: 
@@ -2904,6 +2905,13 @@ nb:
       started_by: "Startet av *%{user}*, %{at}"
       titles: 
         current: "Gjeldende samarbeid"
+    show: 
+      error_cause_1: "Google Drive-kontoen til oppretteren skiller seg fra kontoen brukt til å opprette samarbeidet."
+      error_summary: "Det ser ut at dette samarbeidet ikke fungerer. Mulige årsaker:"
+      error_title: "Google Drive samarbeidsfeil"
+      headings: 
+        page: "Google Drive samarbeidsfeil"
+      resolution: "Ta kontakt med oppretteren og la dem vite."
     titles: 
       delete: "Slette samarbeid?"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Kollapse liste over medlemmene i gruppen for %{groupName}"
@@ -5115,6 +5123,7 @@ nb:
       new_quiz: "Ny prøve"
     edit_crumb: Rediger
     edit_view: 
+      allow_liking: "Tillat liking"
       allow_threaded_replies: "Tillat trådede svar"
       attachment: Vedlegg
       available_from: "Tilgjengelig fra"
@@ -5125,6 +5134,7 @@ nb:
       delay_posting: "Avvent posting"
       enable_podcast_feed: "Slå på podkaststrøm"
       include_replies_in_podcast_feed: "Inkluder svar fra studenter i podcastfeed"
+      only_graders_can_like: "Kun de som setter karakterer kan like"
       only_visible_to_overrides_note: "Merk: Diskusjonen er *bare* synlig for seksjonen(s) spesifisert nedenfor:"
       options: Muligheter
       page_header_title: "Ny diskusjon"
@@ -5132,6 +5142,7 @@ nb:
       post_at: Post
       save: Lagre
       saving: Lagrer...
+      sort_by_likes: "Sorter etter liker"
       topic_title: Tematittel
       until: Til
       use_for_grading: Vurdert
@@ -5292,6 +5303,7 @@ nb:
       edited_comment: "Redigert av *%{editor.display_name}* %{edited_at}"
       go_to_parent: "Gå til opphav"
       go_to_topic: "Gå til tema"
+      like_entry: "Like oppføring"
       manage_discussion_entry: "Behandle diskusjonsoppføring"
       open_in_speedgrader: "Åpne i SpeedGrader"
       unknown_author: ">Ukjent Forfatter"
@@ -5300,6 +5312,9 @@ nb:
       show_more: "Vis mer"
     hide_due_dates: "Skjul frister"
     initial_post_required_to_subscribe: "Du må skrive et svar før du abonnerer"
+    like_count: 
+      one: "(1 liker)"
+      other: "(%{count} liker)"
     mark_as_read: "Merk som lest"
     mark_as_unread: "Merk som ulest"
     no_content: "Uten innhold"
@@ -5875,6 +5890,7 @@ nb:
       remove_feed: "Fjern %{display_name}"
   external_integration_keys_8b4f4548: "Eksterne Integrasjons Taster"
   external_tool_c5a6410a: "Eksternt verktøy"
+  external_tool_url_cannot_be_left_blank_a34b6bb2: "Eksternt verktøy URL kan ikke stå tomt"
   external_tools: 
     account_navigation_configured: "Kontonavigering konfigurert"
     app_full_view: 
@@ -6026,6 +6042,7 @@ nb:
     quiz_log_auditing: "Spørrekonkurranse Logg Revisjon"
     student_groups: "Ny side for studentgrupper"
     student_outcome_gradebook: "Karakterbok for studentens mestringsbaserte læring"
+  field_name_31fff38e: Feltnavn
   file_list_updated_38e2a5ad: "Fil listen oppdatert"
   file_not_found_9eec054c: "Finner ikke filen"
   file_preview: 
@@ -7277,6 +7294,7 @@ nb:
       submit: "Lagre %{model}"
       update: "Oppdater %{model}"
   here_are_your_assignments_listed_by_due_date_7d8e98e6: "Her er dine Oppgaver, listet etter forfallsdato."
+  here_f44564ee: her.
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Her er en flott mulighet til å bli kjent med kalenderen og legge til ikke-oppgave hendelser du kanskje har til kurset. Ikke bekymre deg, vi vil hjelpe deg gjennom det."
   hidden_available_with_a_link_click_to_modify_184990e7: "Skjult. Tilgjengelig med en link - Klikk for å modifisere"
   hidden_files_inside_will_be_available_with_links_9bdf702b: "Skjult, filer inne vil være tilgjengelig med linker."
@@ -7306,6 +7324,7 @@ nb:
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "Hvis aktivert, vil brukerne kunne konfigurere LTI 2 verktøy."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Hvis du endrer oppdragets poeng mulig må du gi karakter oppdraget på nytt."
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Hvis du ikke velger bruksrettigheter nå, vil denne filen være upublisert etter at den er lastet opp."
+  if_you_enable_this_feature_be_sure_that_your_sales_566967e6: "Om du tillater denne funksjonen, se til at din salesforce-konto har disse tilpassede feltene lagt til nøyaktig med navnene i den venstre kolonnen i tabellen"
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "Hvis du forlate, vil zip filen nedlasting under utarbeidelse bli kansellert."
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Om du har brukt en annen læringsplattform har du sikkert saker der som du ønsker å flytte over til Canvas. Vi kan vise deg prosessen med hvordan man enkelt flytter innholdet over til Canvas."
   ignore_91750df8: Ignorer
@@ -7370,6 +7389,7 @@ nb:
   instructions: 
     authorize_google_docs: "Før du kan samarbeide om dokumenter må du la Canvas få tilgang til Google Docs-kontoen din:"
     authorize_google_drive: "Før du kan samarbeide om dokumenter, må du autorisere Canvas til å få tilgang til Google Drive konto:"
+  instructions_2f88ee72: Instruksjoner
   instructors_4b491a07: instruktører
   instructure: 
     alerts: 
@@ -7767,6 +7787,7 @@ nb:
     track_uploaded_successfully: "Spor lastet opp; Vennligst oppdater nettleser."
     upload: "Last opp"
     uploading: "Laster opp..."
+  media_has_been_queued_for_conversion_please_try_ag_74343bbd: "Medier venter på konvertering, prøv igjen litt senere."
   media_recordings_749aef6d: Medieinnspillinger
   median_score_4657e907: "Median: %{score}"
   meets_mastery_754e1c06: "Oppfyller Mestring"
@@ -11484,6 +11505,8 @@ nb:
       no_quizzes: "Ingen prøver tilgjengelig"
     notices: 
       message_sent: "Beskjed sendt."
+    question: 
+      positive_points: "Må være lik null eller større"
     question_colon: "Spørsmål:"
     question_count: 
       one: "1 spørsmål"
@@ -12472,6 +12495,7 @@ nb:
   reply_to_comment_72d96728: "Svar til Kommentar"
   reply_to_main_discussion_29823888: "Reply to Main Discussion"
   require_usage_rights_for_uploaded_files_4507865b: "Krev bruksrettigheter for opplastede filer"
+  respondus_lockdown_browser_support_413352eb: "Respondus LockDown Browser support"
   respondus_soap_endpoint: 
     plugin_settings: 
       labels: 
@@ -12697,6 +12721,7 @@ nb:
   salesforce_account_id_eb5c78ad: "Salesforce Konto ID"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce har en annen innloggingsvert for sandkassekontoer enn den har for produksjonskontoer, så hvis du bruker en Salesforce sandkassekonto og du ikke haker av dette feltet, vil det ikke være i stand til å godkjenne (og dette fungerer omvendt også, hvis du har en produksjonskonto og du krysser av denne boksen, vil det ikke godkjenne)"
   salesforce_ticketing_webtocase_connector_80f75716: "Salesforce Ticketing WebToCase Connector"
+  same_value_as_canvas_url__c_will_probably_be_going_37027686: "Samme verdi som 'Canvas_URL__c', vil kanskje gå vekk snart"
   save_11a80ec3: Lagre
   saving_d55dd90e: Lagrer…
   score_muted_82eef66: "Resultat: (muted)"
@@ -13781,6 +13806,7 @@ nb:
     users: 
       user_search_label: Brukersøk
       users_matching_label: "Matchende brukere"
+  skipped_file_filename_due_to_error_94f0194: "Hoppet over fil %{filename} på grunn av en feil"
   skipping_unknown_file_type_cd1086ee: "Hopper over ukjent fil type"
   slideshow: 
     titles: 
@@ -14155,6 +14181,7 @@ nb:
       timespan: "%{start_at} *til* %{end_at}"
   text_document_eacbcdb7: "Tekst dokument"
   text_entry_submission_cannot_be_empty_3d187cae: "Dette tekstfeltet kan ikke stå tomt"
+  the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "Konto-ID til denne kontoen rapporteringsbrukeren tilhører"
   the_app_was_activated_a84e055f: "Appen var aktivert"
   the_app_was_added_58e2836a: "App ble lagt"
   the_app_was_added_successfully_3f785a23: "App ble lagt til"
@@ -14183,6 +14210,7 @@ nb:
   there_was_an_error_in_processing_your_request_6513a49a: "En feil oppsto under behandling av forespørselen din"
   there_was_an_error_setting_usage_rights_53739e1d: "Det oppstod en feil innstilling bruksrettigheter."
   there_were_errors_with_the_form_errors_ab5b559a: "Det var feilene med skjemaet: %{errors}"
+  this_conference_may_be_recorded_f76deeeb: "Denne konferansen kan bli tatt opp"
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "Dette kurset kan ikke legges til kurs menyen på dette tidspunktet."
   this_course_is_claimed_and_ready_but_you_ll_need_t_25b95a0a: "Dette kurset er hevdet og klar, men du trenger å fullføre registrerings prosessen før du kan publisere kurset. Du skal ha mottatt en epost fra Canvas med en link for å fullføre prosessen. Husk å sjekke spam boksen."
   this_course_is_visible_only_to_teachers_until_it_i_ce972f0: "Dette kurset er bare synlig for lærere før det er publisert."
@@ -15078,7 +15106,10 @@ nb:
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Har du lyst til å la studenter fortsette i kurset eller ønsker du å låse opp igjen disse modulene til de nye kravene er fullført?"
   xml_configuration_5ea1b942: "XML Konfigurasjon"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "Du er logget inn på %{institution1} ved hjelp av legitimasjonen fra %{institution2}"
+  you_are_subscribed_and_will_be_notified_of_new_com_60b5b62b: "Du er abonnert og blir varslet om nye kommentarer. Klikk for å avslutte abonnement"
   you_are_the_group_leader_for_this_group_b8629b70: "du er gruppeleder for denne gruppen"
+  you_are_unsubscribed_and_will_not_be_notified_of_n_bf4b96a2: "Du har avsluttet abonnementet og blir ikke varslet om nye kommentarer. Klikk for å abonnere"
+  you_can_disable_this_feature_d5e61373: "Du kan deaktivere denne funksjonen"
   you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: "Du kan skjule eller vise en kursets oppgaver ved veksling dem på eller av."
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "Du kan nå gjøre valg for ny vurdering av studenter som allerede har tatt prøven."
   you_have_changed_the_progression_requirements_for__6772bc89: "Du har endret progresjonskrav for en aktiv kurs. Det kan være elever som allerede har kommet til denne modulen, og til andre som er avhengige av det."
