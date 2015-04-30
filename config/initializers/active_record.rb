@@ -110,7 +110,7 @@ class ActiveRecord::Base
 
   def self.parse_asset_string(str)
     code = asset_string_components(str)
-    [code.first.classify, code.last.try(:to_i)]
+    [convert_class_name(code.first), code.last.try(:to_i)]
   end
 
   def self.asset_string_components(str)
@@ -119,11 +119,10 @@ class ActiveRecord::Base
     [components.join('_'), id.presence]
   end
 
-  def self.initialize_by_asset_string(string, asset_types)
-    type, id = asset_string_components(string)
-    res = type.classify.constantize rescue nil
-    res.id = id if res
-    res
+  def self.convert_class_name(str)
+    namespaces = str.split(':')
+    class_name = namespaces.pop
+    (namespaces.map(&:camelize) + [class_name.try(:classify)]).join('::')
   end
 
   def asset_string
