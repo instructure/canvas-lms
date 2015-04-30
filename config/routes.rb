@@ -192,6 +192,8 @@ CanvasRails::Application.routes.draw do
         post :speed_grader_settings
         get :history
         post :update_submission
+        post :change_gradebook_column_size
+        post :save_gradebook_column_order
       end
     end
 

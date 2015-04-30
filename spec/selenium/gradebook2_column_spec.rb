@@ -134,18 +134,14 @@ describe "assignment column headers" do
   end
 
   it "should load custom column ordering" do
-    # since drag and drop doesn't work, we'll just have to store a fake configuration and make sure it gets loaded.
-
-    script = <<-JS
-      sortOrder = {
-        sortType: 'custom',
-        customOrder: [#{@third_assignment.id}, #{@second_assignment.id}, #{@first_assignment.id}] };
-      localStorage.setItem('_#{@user.id}_course_#{@course.id}_sort_grade_columns_by', JSON.stringify(sortOrder));
-    JS
-    driver.execute_script(script)
+    @user.preferences[:gradebook_column_order] = {}
+    @user.preferences[:gradebook_column_order][@course.id] = {
+      sortType: 'custom',
+      customOrder: ["#{@third_assignment.id}", "#{@second_assignment.id}", "#{@first_assignment.id}"]
+    }
+    @user.save!
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
-
     first_row_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
     validate_cell_text(first_row_cells[0], '-')
     validate_cell_text(first_row_cells[1], @assignment_2_points)
@@ -159,14 +155,12 @@ describe "assignment column headers" do
   end
 
   it "should put new assignments at the end when columns have custom order" do
-    script = <<-JS
-      sortOrder = {
-        sortType: 'custom',
-        customOrder: [#{@third_assignment.id}, #{@second_assignment.id}, #{@first_assignment.id}] };
-      localStorage.setItem('_#{@user.id}_course_#{@course.id}_sort_grade_columns_by', JSON.stringify(sortOrder));
-    JS
-    driver.execute_script(script)
-
+    @user.preferences[:gradebook_column_order] = {}
+    @user.preferences[:gradebook_column_order][@course.id] = {
+      sortType: 'custom',
+      customOrder: ["#{@third_assignment.id}", "#{@second_assignment.id}", "#{@first_assignment.id}"]
+    }
+    @user.save!
     @fourth_assignment = assignment_model({
       :course => @course,
       :name => "new assignment",
@@ -187,13 +181,13 @@ describe "assignment column headers" do
   end
 
   it "should maintain order of remaining assignments if an assignment is destroyed" do
-    script = <<-JS
-      sortOrder = {
-        sortType: 'custom',
-        customOrder: [#{@third_assignment.id}, #{@second_assignment.id}, #{@first_assignment.id}] };
-      localStorage.setItem('_#{@user.id}_course_#{@course.id}_sort_grade_columns_by', JSON.stringify(sortOrder));
-    JS
-    driver.execute_script(script)
+    @user.preferences[:gradebook_column_order] = {}
+    @user.preferences[:gradebook_column_order][@course.id] = {
+      sortType: 'custom',
+      customOrder: ["#{@third_assignment.id}", "#{@second_assignment.id}", "#{@first_assignment.id}"]
+    }
+    @user.save!
+
     @first_assignment.destroy
 
     get "/courses/#{@course.id}/gradebook2"
