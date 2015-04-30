@@ -265,7 +265,7 @@ define [
         if event.calendarEvent.reserved == true
           status = "Reserved" # TODO: i18n
         $element.find('.fc-event-title').text(status)
-      
+
       # TODO: i18n
       timeString = if !event.endDate() || event.startDate().getTime() == event.endDate().getTime()
           @calendar.fullCalendar('formatDate', event.startDate(), 'h:mmtt')
@@ -591,14 +591,14 @@ define [
         replaceState: !_.has(@dataFromDocumentHash(), 'view_name') # use replaceState if view_name wasn't set before
 
       @currentView = view
-      userSettings.set('calendar_view', view)
+      userSettings.set('calendar_view', view) unless view is 'scheduler'
 
     getCurrentView: ->
       if @currentView
         @currentView
       else if (data = @dataFromDocumentHash()) && data.view_name
         data.view_name
-      else if userSettings.get('calendar_view')
+      else if userSettings.get('calendar_view') and userSettings.get('calendar_view') isnt 'scheduler'
         userSettings.get('calendar_view')
       else
         'month'
