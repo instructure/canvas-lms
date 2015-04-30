@@ -273,10 +273,17 @@ class SubmissionsApiController < ApplicationController
       end
     else
       # can view observees
-      allowed_student_ids = @context.observer_enrollments.where(:user_id => @current_user.id, :workflow_state => 'active').where("associated_user_id IS NOT NULL").pluck(:associated_user_id)
-      # can view self, if a student
-      allowed_student_ids << @current_user.id if @context.grants_right?(@current_user, session, :participate_as_student)
+      allowed_student_ids = @context.observer_enrollments
+        .where(:user_id => @current_user.id, :workflow_state => 'active')
+        .where("associated_user_id IS NOT NULL")
+        .pluck(:associated_user_id)
+
+      # can view self?
+      if @context.grants_right?(@current_user, session, :read_grades)
+        allowed_student_ids << @current_user.id
+      end
       return render_unauthorized_action if allowed_student_ids.empty?
+
       if all
         student_ids = allowed_student_ids
       else
@@ -287,8 +294,8 @@ class SubmissionsApiController < ApplicationController
       end
     end
 
-    if Array === student_ids
-      return render json: { error: 'too many students' }, status: 400 if student_ids.length > Api.max_per_page
+    if student_ids.is_a?(Array) && student_ids.length > Api.max_per_page
+      return render json: { error: 'too many students' }, status: 400
     end
 
     includes = Array(params[:include])

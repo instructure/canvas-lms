@@ -1591,9 +1591,12 @@ describe 'Submissions API', type: :request do
                         { :controller => 'submissions_api', :action => 'for_students',
                           :format => 'json', :course_id => @course.to_param },
                         { :student_ids => [@student1.to_param] })
-        expect(json.map { |entry| entry.slice('user_id', 'assignment_id', 'score') }.sort_by { |entry| entry['assignment_id'] }).to eq [
-            { 'user_id' => @student1.id, 'assignment_id' => @assignment1.id, 'score' => 15 },
-            { 'user_id' => @student1.id, 'assignment_id' => @assignment2.id, 'score' => 25 } ]
+        sub_json = json.map{ |entry| entry.slice('user_id', 'assignment_id', 'score') }
+          .sort_by { |entry| entry['assignment_id'] }
+        expect(sub_json).to eq [
+          { 'user_id' => @student1.id, 'assignment_id' => @assignment1.id, 'score' => 15 },
+          { 'user_id' => @student1.id, 'assignment_id' => @assignment2.id, 'score' => 25 }
+        ]
       end
 
       it "should assume the calling user if student_ids is not provided" do
@@ -1602,9 +1605,12 @@ describe 'Submissions API', type: :request do
                         "/api/v1/courses/#{@course.id}/students/submissions.json",
                         { :controller => 'submissions_api', :action => 'for_students',
                           :format => 'json', :course_id => @course.to_param } )
-        expect(json.map { |entry| entry.slice('user_id', 'assignment_id', 'score') }.sort_by { |entry| entry['assignment_id'] }).to eq [
-            { 'user_id' => @student2.id, 'assignment_id' => @assignment1.id, 'score' => 10 },
-            { 'user_id' => @student2.id, 'assignment_id' => @assignment2.id, 'score' => 20 } ]
+        sub_json = json.map{ |entry| entry.slice('user_id', 'assignment_id', 'score') }
+          .sort_by { |entry| entry['assignment_id'] }
+        expect(sub_json).to eq [
+          { 'user_id' => @student2.id, 'assignment_id' => @assignment1.id, 'score' => 10 },
+          { 'user_id' => @student2.id, 'assignment_id' => @assignment2.id, 'score' => 20 }
+        ]
       end
 
       it "should show all possible if student_ids is ['all']" do
@@ -1614,9 +1620,12 @@ describe 'Submissions API', type: :request do
                         { :controller => 'submissions_api', :action => 'for_students',
                           :format => 'json', :course_id => @course.to_param },
                         { :student_ids => ['all'] })
-        expect(json.map { |entry| entry.slice('user_id', 'assignment_id', 'score') }.sort_by { |entry| entry['assignment_id'] }).to eq [
-            { 'user_id' => @student2.id, 'assignment_id' => @assignment1.id, 'score' => 10 },
-            { 'user_id' => @student2.id, 'assignment_id' => @assignment2.id, 'score' => 20 } ]
+        sub_json = json.map{ |entry| entry.slice('user_id', 'assignment_id', 'score') }
+          .sort_by { |entry| entry['assignment_id'] }
+        expect(sub_json).to eq [
+          { 'user_id' => @student2.id, 'assignment_id' => @assignment1.id, 'score' => 10 },
+          { 'user_id' => @student2.id, 'assignment_id' => @assignment2.id, 'score' => 20 }
+        ]
       end
 
       it "should support the 'grouped' argument" do
@@ -1650,6 +1659,24 @@ describe 'Submissions API', type: :request do
                  { :controller => 'submissions_api', :action => 'for_students',
                    :format => 'json', :course_id => @course.to_param },
                  { :student_ids => [@student1.to_param] }, {}, expected_status: 400)
+      end
+
+      it "allows concluded students to view their submission" do
+        enrollment = @course.student_enrollments.where(user_id: @student1).first
+        enrollment.conclude
+
+        @user = @student1
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/students/submissions.json",
+                        { :controller => 'submissions_api', :action => 'for_students',
+                          :format => 'json', :course_id => @course.to_param },
+                        { :student_ids => [@student1.to_param] })
+        sub_json = json.map{ |entry| entry.slice('user_id', 'assignment_id', 'score') }
+          .sort_by { |entry| entry['assignment_id'] }
+        expect(sub_json).to eq [
+          { 'user_id' => @student1.id, 'assignment_id' => @assignment1.id, 'score' => 15 },
+          { 'user_id' => @student1.id, 'assignment_id' => @assignment2.id, 'score' => 25 }
+        ]
       end
     end
 
