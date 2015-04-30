@@ -415,8 +415,7 @@ describe "assignments" do
         end
 
         it "should not overwrite overrides if published twice from the index page" do
-          get("/courses/#{@course.id}/assignments", false)
-          wait_for_ajaximations
+          get "/courses/#{@course.id}/assignments"
 
           f("#assignment_#{@assignment.id} .publish-icon").click
           wait_for_ajaximations
