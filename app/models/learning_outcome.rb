@@ -295,7 +295,11 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   def assessed?
-    learning_outcome_results.exists?
+    if learning_outcome_results.loaded?
+      learning_outcome_results.any?
+    else
+      learning_outcome_results.exists?
+    end
   end
 
   def tie_to(context)
