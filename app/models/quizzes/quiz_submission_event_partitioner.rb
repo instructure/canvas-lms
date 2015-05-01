@@ -20,7 +20,9 @@ class Quizzes::QuizSubmissionEventPartitioner < ActiveRecord::Base
         end
       end
 
-      [ 5.months.ago(Time.now.utc.beginning_of_month) ].each do |date|
+      # on 5/1, we want to drop 10/1
+      # (keeping 11, 12, 1, 2, 3, and 4 - 6 months of data)
+      [ 7.months.ago(Time.now.utc.beginning_of_month) ].each do |date|
         log "Looking for old partition table (#{date.strftime('%Y/%m')})..."
 
         if partman.partition_exists?(date)
