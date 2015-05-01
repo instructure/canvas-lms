@@ -116,10 +116,12 @@ Rails.configuration.after_initialize do
     end
   end
 
-  # Create a partition 1 month in advance every month:
-  Delayed::Periodic.cron 'Quizzes::QuizSubmissionEventPartitioner.process', '0 0 1 * *' do
+  # Create a partition 1 month in advance every day:
+  Delayed::Periodic.cron 'Quizzes::QuizSubmissionEventPartitioner.process', '0 0 * * *' do
     Shard.with_each_shard do
-      Quizzes::QuizSubmissionEventPartitioner.process
+      Quizzes::QuizSubmissionEventPartitioner.send_later_enqueue_args(:process,
+        strand: "QuizSubmissionEventPartitioner:#{Shard.current.database_server.id}",
+        max_attempts: 1)
     end
   end
 
