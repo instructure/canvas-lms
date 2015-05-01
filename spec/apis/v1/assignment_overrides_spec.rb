@@ -716,7 +716,7 @@ describe AssignmentOverridesController, type: :request do
       end
 
       it "should allow changing the title" do
-        @new_title = "new #@title"
+        @new_title = "new #{@title}"
         api_update_override(@course, @assignment, @override, :assignment_override => { :title => @new_title })
         @override.reload
         expect(@override.title).to eq @new_title
