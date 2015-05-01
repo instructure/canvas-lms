@@ -1,7 +1,0 @@
-<% define_content :link do %>
-  <%= dashboard_url %>
-<% end %>
-
-<%= t :subject, "New Account Admin for %{account}", :account => asset.account.name %>
-  
-<%= mt :body, "A new admin **%{user}** has been added for the account **%{account}**.", :user => asset.user.name, :account => asset.account.name %>

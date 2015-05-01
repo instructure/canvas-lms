@@ -235,6 +235,92 @@ describe ExternalToolsController do
     end
   end
 
+  describe "GET 'show'" do
+    context 'ContentItemSelectionRequest' do
+      before :once do
+        @tool = new_valid_tool(@course)
+        @tool.migration_selection = { message_type: 'ContentItemSelectionRequest' }
+        @tool.resource_selection = { message_type: 'ContentItemSelectionRequest' }
+        @tool.homework_submission = { message_type: 'ContentItemSelectionRequest' }
+        @tool.editor_button = { message_type: 'ContentItemSelectionRequest', icon_url: 'http://example.com/icon.png' }
+        @tool.save!
+
+        @course.name = 'a course'
+        @course.save!
+      end
+
+      it "generates launch params for a ContentItemSelectionRequest message" do
+        user_session(@teacher)
+        get :show, course_id: @course.id, id: @tool.id, launch_type: 'migration_selection'
+        expect(response).to be_success
+
+        lti_launch = assigns[:lti_launch]
+        expect(lti_launch.params['lti_message_type']).to eq 'ContentItemSelectionRequest'
+        expect(lti_launch.params['content_item_return_url']).to eq "http://test.host/courses/#{@course.id}/content_migrations"
+        expect(lti_launch.params['accept_multiple']).to eq 'false'
+      end
+
+      it "sets proper return data for migration_selection" do
+        user_session(@teacher)
+        get :show, course_id: @course.id, id: @tool.id, launch_type: 'migration_selection'
+        expect(response).to be_success
+
+        lti_launch = assigns[:lti_launch]
+        expect(lti_launch.params['accept_copy_advice']).to eq 'true'
+        expect(lti_launch.params['accept_presentation_document_targets']).to eq 'download'
+        expect(lti_launch.params['accept_media_types']).to eq 'application/vnd.ims.imsccv1p1,application/vnd.ims.imsccv1p2,application/vnd.ims.imsccv1p3,application/zip,application/xml'
+      end
+
+      it "sets proper return data for resource_selection" do
+        user_session(@teacher)
+        get :show, course_id: @course.id, id: @tool.id, launch_type: 'resource_selection'
+        expect(response).to be_success
+
+        lti_launch = assigns[:lti_launch]
+        expect(lti_launch.params['accept_copy_advice']).to eq nil
+        expect(lti_launch.params['accept_presentation_document_targets']).to eq 'frame,window'
+        expect(lti_launch.params['accept_media_types']).to eq 'application/vnd.ims.lti.v1.launch+json'
+      end
+
+      it "sets proper return data for homework_submission" do
+        user_session(@teacher)
+        assignment = @course.assignments.create!(name: 'an assignment')
+        get :show, course_id: @course.id, id: @tool.id, launch_type: 'homework_submission', assignment_id: assignment.id
+        expect(response).to be_success
+
+        lti_launch = assigns[:lti_launch]
+        expect(lti_launch.params['accept_copy_advice']).to eq 'true'
+        expect(lti_launch.params['accept_presentation_document_targets']).to eq 'none'
+        expect(lti_launch.params['accept_media_types']).to eq '*/*'
+      end
+
+      it "sets proper accept_media_types for homework_submission with extension restrictions" do
+        user_session(@teacher)
+        assignment = @course.assignments.create!(name: 'an assignment')
+        assignment.allowed_extensions += ['pdf', 'jpeg']
+        assignment.save!
+        get :show, course_id: @course.id, id: @tool.id, launch_type: 'homework_submission', assignment_id: assignment.id
+        expect(response).to be_success
+
+        lti_launch = assigns[:lti_launch]
+        expect(lti_launch.params['accept_media_types']).to eq 'application/pdf,image/jpeg'
+      end
+
+
+      it "sets proper return data for editor_button" do
+        user_session(@teacher)
+        get :show, course_id: @course.id, id: @tool.id, launch_type: 'editor_button'
+        expect(response).to be_success
+
+        lti_launch = assigns[:lti_launch]
+        expect(lti_launch.params['accept_copy_advice']).to eq nil
+        expect(lti_launch.params['accept_presentation_document_targets']).to eq 'embed,frame,iframe,window'
+        expect(lti_launch.params['accept_media_types']).to eq 'image/*,text/html,application/vnd.ims.lti.v1.launch+json,*/*'
+      end
+
+    end
+  end
+
   describe "GET 'retrieve'" do
     it "should require authentication" do
       user_model

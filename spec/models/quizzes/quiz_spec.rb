@@ -1297,6 +1297,14 @@ describe Quizzes::Quiz do
         end
       end
 
+      context 'and the course is hard-concluded' do
+        let(:conclude_at){10.minutes.from_now}
+        it "should be true" do
+          course.workflow_state = 'completed'
+          expect(quiz.restrict_answers_for_concluded_course?).to be(true)
+        end
+      end
+
       context 'and the course does not have a conclude_at date but has a concluded enrollment_term' do
         let(:enrollment_term){EnrollmentTerm.new(end_at: 10.minutes.ago)}
         let(:conclude_at){nil}

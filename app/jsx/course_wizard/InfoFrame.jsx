@@ -3,7 +3,7 @@
 define([
   'jquery',
   'underscore',
-  'old_unsupported_dont_use_react',
+  'react',
   'i18n!course_wizard',
   './ListItems',
   /* SFU MOD */ '../sfu_copyright_compliance_notice/SFUCopyrightComplianceNotice' /* END SFU MOD */

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2012 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -25,6 +25,12 @@ class UserObserver < ActiveRecord::Base
   EXPORTABLE_ASSOCIATIONS = [:user, :observer]
 
   after_create :create_linked_enrollments
+
+  validate :not_same_user, :if => lambda { |uo| uo.changed? }
+
+  def not_same_user
+    self.errors.add(:observer_id, "Cannot observe yourself") if self.user_id == self.observer_id
+  end
 
   def create_linked_enrollments
     user.student_enrollments.active_or_pending.each do |enrollment|

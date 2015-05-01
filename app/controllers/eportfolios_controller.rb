@@ -32,7 +32,7 @@ class EportfoliosController < ApplicationController
     add_crumb(@current_user.short_name, user_profile_url(@current_user))
     add_crumb(t(:crumb, "ePortfolios"))
     @portfolios = @current_user.eportfolios.active.order(:updated_at).all
-    render :action => 'user_index'
+    render :user_index
   end
   
   def create
@@ -45,7 +45,7 @@ class EportfoliosController < ApplicationController
           format.html { redirect_to eportfolio_url(@portfolio) }
           format.json { render :json => @portfolio.as_json(:permissions => {:user => @current_user, :session => session}) }
         else
-          format.html { render :action => "new" }
+          format.html { render :new }
           format.json { render :json => @portfolio.errors, :status => :bad_request }
         end
       end
@@ -92,7 +92,6 @@ class EportfoliosController < ApplicationController
         js_env :folder_id => Folder.unfiled_folder(@current_user).id,
                :context_code => @current_user.asset_string
       end
-      render :template => "eportfolios/show"
     end
   end
   
@@ -106,7 +105,7 @@ class EportfoliosController < ApplicationController
           format.html { redirect_to eportfolio_url(@portfolio) }
           format.json { render :json => @portfolio.as_json(:permissions => {:user => @current_user, :session => session}) }
         else
-          format.html { render :action => "edit" }
+          format.html { render :edit }
           format.json { render :json => @portfolio.errors, :status => :bad_request }
         end
       end
@@ -122,7 +121,7 @@ class EportfoliosController < ApplicationController
           format.html { redirect_to user_profile_url(@current_user) }
           format.json { render :json => @portfolio }
         else
-          format.html { render :action => "delete" }
+          format.html { render :delete }
           format.json { render :json => @portfolio.errors, :status => :bad_request }
         end
       end

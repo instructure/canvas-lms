@@ -61,6 +61,14 @@ class Folder < ActiveRecord::Base
   validate :protect_root_folder_name, :if => :name_changed?
   validate :reject_recursive_folder_structures, on: :update
 
+  def file_attachments_visible_to(user)
+    if self.context.grants_right?(user, :manage_files)
+      self.active_file_attachments
+    else
+      self.visible_file_attachments.not_locked
+    end
+  end
+
   def protect_root_folder_name
     if self.parent_folder_id.blank? && self.name != Folder.root_folder_name_for_context(context)
       if self.new_record?
@@ -444,6 +452,9 @@ class Folder < ActiveRecord::Base
   set_policy do
     given { |user, session| self.visible? && self.context.grants_right?(user, session, :read) }#students.include?(user) }
     can :read
+
+    given { |user, session| self.context.grants_right?(user, session, :read_as_admin) }
+    can :read_contents
 
     given { |user, session| self.visible? && !self.locked? && self.context.grants_right?(user, session, :read) && !(self.context.is_a?(Course) && self.context.tab_hidden?(Course::TAB_FILES)) }#students.include?(user) }
     can :read_contents

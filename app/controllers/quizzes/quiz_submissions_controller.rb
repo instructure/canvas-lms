@@ -68,6 +68,8 @@ class Quizzes::QuizSubmissionsController < ApplicationController
         @submission.record_answer(params_hash.dup)
         flash[:notice] = t('errors.late_quiz', "You submitted this quiz late, and your answers may not have been recorded.") if @submission.overdue?
         Quizzes::SubmissionGrader.new(@submission).grade_submission
+
+        Canvas::LiveEvents.quiz_submitted(@submission)
       end
     end
     if session.delete('lockdown_browser_popup')

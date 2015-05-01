@@ -1,3 +1,16 @@
+{{#if self_signup}}
+  <p class="pull-left">
+    {{#t "self_signup_blurb"}}Self sign-up is enabled for these groups.{{/t}}
+    {{#ifEqual self_signup "restricted"}}
+      <span>{{#t "restricted_self_signup_blurb"}}All students in a group are required to be in the same section.{{/t}}</span>
+    {{/ifEqual}}
+    {{> [groups/manage/selfSignupHelp]}}
+  </p>
+  {{#if group_limit}}
+    <p>{{#t "group_limit_blurb"}}Groups are limited to <strong>{{group_limit}}</strong> members.{{/t}}</p>
+  {{/if}}
+{{/if}}
+
 {{#unless randomlyAssignStudentsInProgress}}
 <div class="pull-right group-category-actions">
   {{#unless locked}}
@@ -49,19 +62,6 @@
       SIS.
     {{/t}}
   </div>
-{{/if}}
-
-{{#if self_signup}}
-  <p>
-    {{#t "self_signup_blurb"}}Self sign-up is enabled for these groups.{{/t}}
-    {{#ifEqual self_signup "restricted"}}
-      <span>{{#t "restricted_self_signup_blurb"}}All students in a group are required to be in the same section.{{/t}}</span>
-    {{/ifEqual}}
-    {{> [groups/manage/selfSignupHelp]}}
-  </p>
-  {{#if group_limit}}
-    <p>{{#t "group_limit_blurb"}}Groups are limited to <strong>{{group_limit}}</strong> members.{{/t}}</p>
-  {{/if}}
 {{/if}}
 
 {{#ifEqual role "student_organized"}}

@@ -165,11 +165,11 @@ describe GroupCategory do
       expect{ GroupCategory.find(category.id) }.not_to raise_error
     end
 
-    it "should set deleted_at" do
+    it "should set deleted_at upon destroy" do
       category = GroupCategory.create(name: "foo")
       category.destroy
       category.reload
-      expect(category.deleted_at).not_to be_nil
+      expect(category.deleted_at?).to eq true
     end
 
     it "should destroy dependent groups" do

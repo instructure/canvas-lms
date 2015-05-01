@@ -1,0 +1,17 @@
+<table>
+  <caption>
+    {{#t}}
+      The most recent scores for user {{ current_user_name }} and outcome {{ outcome_name }}.
+    {{/t}}
+  </caption>
+  <tr>
+    <th scope="col">Date</th>
+    <th scope="col">Score</th>
+  </tr>
+  {{#each data}}
+    <tr>
+      <td scope="row">{{ tTimeToString (fudge date) "medium" }}</td>
+      <td>{{ y }}</td>
+    </tr>
+  {{/each}}
+</table>

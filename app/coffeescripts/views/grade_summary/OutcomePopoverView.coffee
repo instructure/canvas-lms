@@ -3,8 +3,9 @@ define [
   'underscore'
   'Backbone'
   'compiled/util/Popover'
+  'compiled/views/grade_summary/OutcomeLineGraphView'
   'jst/outcomes/outcomePopover'
-], (I18n, _, Backbone, Popover, template) ->
+], (I18n, _, Backbone, Popover, OutcomeLineGraphView, template) ->
   class OutcomePopoverView extends Backbone.View
     TIMEOUT_LENGTH: 50
 
@@ -19,6 +20,9 @@ define [
 
     initialize: ->
       super
+      @outcomeLineGraphView = new OutcomeLineGraphView({
+        model: @model
+      })
 
     # Overrides
     render: ->
@@ -48,3 +52,6 @@ define [
           verticalSide: 'bottom'
           manualOffset: 14
         })
+      @outcomeLineGraphView.setElement(@popover.el.find("div.line-graph"))
+      @outcomeLineGraphView.render()
+

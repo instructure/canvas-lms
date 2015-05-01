@@ -140,8 +140,10 @@
         </div>
       </div>
       <div class="equation_content variables_specified formulas_specified">
-        <%= t(:offer_combinations, "Offer %{how_many} possible value combinations (max %{max_combinations})", :how_many => raw('<input type="text" class="combination_count combinations_option" style="width: 30px;"/>'), :max_combinations => @js_env[:quiz_max_combination_count]) %><br/>
-        <%= t(:allow_tolerance, "allow an error margin of +/- %{tolerance}", :tolerance => raw('<input type="text" placeholder="2.0 or 10%" class="combination_answer_tolerance" style="width: 30px;" value="0"/>')) %>
+        <label class="screenreader-only" for="combinations_input"><%= t("Possible combination count") %></label>
+        <%= t(:offer_combinations, "Offer %{how_many} possible value combinations (max %{max_combinations})", :how_many => raw('<input id="combinations_input" type="text" class="combination_count combinations_option" style="width: 30px;"/>'), :max_combinations => @js_env[:quiz_max_combination_count]) %><br/>
+        <label class="screenreader-only" for="tolerance_input"><%= t("Tolerance value") %></label>
+        <%= t(:allow_tolerance, "allow an error margin of +/- %{tolerance}", :tolerance => raw('<input id="tolerance_input" type="text" placeholder="2.0 or 10%" class="combination_answer_tolerance" style="width: 30px;" value="0"/>')) %>
         <button type="button" class="btn compute_combinations combinations_option"><%= t('buttons.generate', "Generate") %></button>
       </div>
       <div class="formulas_specified combinations_holder">

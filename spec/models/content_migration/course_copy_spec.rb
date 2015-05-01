@@ -127,6 +127,20 @@ describe ContentMigration do
       expect(page_to.body).to eq body % [@copy_to.id, tag_to.id]
     end
 
+    it "should translate links to modules in quiz content" do
+      skip unless Qti.qti_enabled?
+
+      mod1 = @copy_from.context_modules.create!(:name => "some module")
+      body = %{<p>Link to module: <a href="/courses/%s/modules/%s">some module</a></p>}
+      quiz = @copy_from.quizzes.create!(:title => "some page", :description => body % [@copy_from.id, mod1.id])
+
+      run_course_copy
+
+      mod1_to = @copy_to.context_modules.where(migration_id: mig_id(mod1)).first
+      quiz_to = @copy_to.quizzes.where(migration_id: mig_id(quiz)).first
+      expect(quiz_to.description).to eq body % [@copy_to.id, mod1_to.id]
+    end
+
     it "should be able to copy links to files in folders with html entities and unicode in path" do
       root_folder = Folder.root_folders(@copy_from).first
       folder1 = root_folder.sub_folders.create!(:context => @copy_from, :name => "mol&eacute;")

@@ -650,6 +650,38 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       expect(decoy_assignment_group.reload.name).not_to eql group.name
     end
 
+    it "should round numeric answer margins sanely" do
+      q = @copy_from.quizzes.create!(:title => "blah")
+      # this one targets rounding errors in gems/plugins/qti_exporter/lib/qti/numeric_interaction.rb (import side)
+      data1 = {:question_type => "numerical_question",
+               :question_text => "what is the optimal matter/antimatter intermix ratio",
+               :answers => [{
+                 :text => "answer_text",
+                 :weight => 100,
+                 :numerical_answer_type => "exact_answer",
+                 :answer_exact => 1,
+                 :answer_error_margin => 0.0001
+               }]}.with_indifferent_access
+      # this one targets rounding errors in lib/cc/qti/qti_items.rb (export side)
+      data2 = {:question_type => "numerical_question",
+               :question_text => "what is the airspeed velocity of an unladed African swallow",
+               :answers => [{
+                 :text => "answer_text",
+                 :weight => 100,
+                 :numerical_answer_type => "exact_answer",
+                 :answer_exact => 2.0009,
+                 :answer_error_margin => 0.0001
+               }]}.with_indifferent_access
+
+      q.quiz_questions.create!(:question_data => data1)
+      q.quiz_questions.create!(:question_data => data2)
+      run_course_copy
+
+      q2 = @copy_to.quizzes.where(migration_id: mig_id(q)).first
+      expect(q2.quiz_questions[0].question_data["answers"][0]["margin"].to_s).to eq "0.0001"
+      expect(q2.quiz_questions[1].question_data["answers"][0]["margin"].to_s).to eq "0.0001"
+    end
+
     it "should not combine when copying question banks with the same title" do
       data = {'question_name' => 'test question 1', 'question_type' => 'essay_question', 'question_text' => 'blah'}
 
@@ -685,7 +717,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       expect(group2_copy.assessment_question_bank_id).to eq bank2_copy.id
     end
 
-    it "hould copy stuff" do
+    it "should copy stuff" do
       data1 = {:question_type => "file_upload_question",
                :points_possible => 10,
                :question_text => "why is this question terrible"

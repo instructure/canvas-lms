@@ -25,7 +25,7 @@ This is a common UI pattern in Canvas, made much easier with flexbox.
 ```html
 <div class="ic-Form-control">
   <label for="demo-text-input-3" class="ic-Label">Favorite 2 colors</label>
-  <div class="ic-Form-control__Multi-input">
+  <div class="ic-Multi-input">
     <input type="text" id="demo-text-input-3" class="ic-Input" placeholder="e.g., purple">
     <span>and</span>
     <input type="text" id="demo-text-input-4" class="ic-Input" placeholder="e.g., purple">
@@ -40,7 +40,7 @@ Also works with ``.ic-Input-group`` (see more about ``.ic-Input-group`` below)
 <div class="ic-Form-control">
   <label for="demo-text-input-5" class="ic-Label">Enter 2 friends' email addresses</label>
   
-  <div class="ic-Form-control__Multi-input">
+  <div class="ic-Multi-input">
     
     <div class="ic-Input-group">
       <div class="ic-Input-group__add-on" role="presentation" aria-hidden="true" tabindex="-1">
@@ -527,7 +527,7 @@ Put ``.ic-Label`` inside ``ic-Input-group`` to make an inline label. Yes, it eve
       
       <div class="ic-Form-control">
         <label for="demo-responsive-8" class="ic-Label">Preferred working hours</label>
-        <div class="ic-Form-control__Multi-input">
+        <div class="ic-Multi-input">
           <input type="time" class="ic-Input" id="demo-responsive-8" aria-label="Start time" placeholder="Start time">
           <span>to</span>
           <input type="time" class="ic-Input" aria-label="End time" placeholder="End time">
@@ -992,7 +992,8 @@ input[type="tel"], input[type="color"], .uneditable-input {
     // Overwrite legacy forms styles from Bootstrap 2.
     width: 100%; height: auto;
     display: block;
-    margin: 0;
+    margin-top: 0;
+    margin-bottom: 0;
     box-shadow: none;
     box-sizing: border-box;
 
@@ -1004,6 +1005,9 @@ input[type="tel"], input[type="color"], .uneditable-input {
     outline-offset: -$ic-sp;
     background: $ic-color-light;
     padding: 8px 12px;
+    min-height: 38px;
+
+    // Remove the webkit gloss in iOS
     -webkit-appearance: none;
     
     @include ic-input-variant;
@@ -1120,7 +1124,7 @@ select.ic-Input {
 
         .ic-Input,
         .ic-Input-group,
-        .ic-Form-control__Multi-input { flex: 1; }
+        .ic-Multi-input { flex: 1; }
 
         .ic-Toggle {
           label {
@@ -1274,22 +1278,21 @@ form.ic-Form-group { margin: 0; }
     .ic-Input-group__add-on,
     .ic-Toggle__label-text { color: $ic-color-success; }
   }
+}
 
-  .ic-Form-control__Multi-input {
-    @include breakpoint(mini-tablet) {
-      display: flex;
-      align-items: center;
+.ic-Multi-input {
+  @include breakpoint(mini-tablet) {
+    display: flex;
+    align-items: center;
 
-      > .ic-Input, 
-      > .ic-Input-group {
-        margin: 0 $ic-sp/3;
-        flex: 1;
-        &:first-child { margin-left: 0; }
-        &:last-child { margin-right: 0; }
-      }
+    > .ic-Input,
+    > .ic-Input-group {
+      margin: 0 $ic-sp/3;
+      flex: 1;
+      &:first-child { margin-left: 0; }
+      &:last-child { margin-right: 0; }
     }
   }
- 
 }
 
 .ic-Label {
@@ -1562,21 +1565,21 @@ form.ic-Form-group { margin: 0; }
 
     .ic-Action-header__Primary {
       flex: 1;
-      display: flex;
       margin-bottom: 0;
       box-sizing: border-box;
     }
 
     .ic-Action-header__Secondary {
-      display: flex;
       flex: 1;
-      justify-content: flex-end;
       box-sizing: border-box;
-      .Button { margin-left: $ic-sp/3; }
+      text-align: right;
+      > .Button,
+      > .btn,
+      > .ui-button { margin-left: $ic-sp/4; }
     }
 
     .ic-Action-header__Primary + .ic-Action-header__Secondary {
-      flex: 0.64;
+      flex: 1;
       padding-left: $ic-sp*2;
     }
   }

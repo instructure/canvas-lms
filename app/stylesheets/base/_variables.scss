@@ -48,8 +48,8 @@ $ic-brand-primary:                  #0096db !default; // light blue
 $ic-brand-secondary:                #5b6c79 !default; // dark blue
 @if $use_high_contrast { $ic-brand-secondary: #343c44; }
 
-$ic-color-success:                  #00ad18; // green
-@if $use_high_contrast { $ic-color-success: #008a14; }
+$ic-color-success:                  #008a14; // green
+@if $use_high_contrast { $ic-color-success: #007a12; }
 
 $ic-color-neutral:                  hsl(0,0,90%);
 
@@ -59,8 +59,8 @@ $ic-color-action:                   #ba3fa5; // magenta
 $ic-color-danger:                   #ad393a; // red
 @if $use_high_contrast { $ic-color-danger: #a03536; }
 
-$ic-color-alert:                    #c48506; // gold
-@if $use_high_contrast { $ic-color-alert: #9e6b05; }
+$ic-color-alert:                    #bc8006; // gold
+@if $use_high_contrast { $ic-color-alert: #946405; }
 
 $ic-color-light:                    #fff; // white
 
@@ -101,14 +101,14 @@ $ic-list-item-background--selected:   #d9edf9;
 $ic-bg-light-neutral:     lighten($ic-color-neutral, 6%);
 $ic-bg-light-primary:     lighten($ic-brand-primary, 54%);
 @if $use_high_contrast { 
-$ic-bg-light-primary:     lighten($ic-brand-primary, 64%); 
+  $ic-bg-light-primary:   lighten($ic-brand-primary, 64%); 
 }
-$ic-bg-light-success:     lighten($ic-color-success, 60%); // No high contrast color exists for legacy $ic-color-success
-$ic-bg-light-alert:       lighten($ic-color-alert, 50%);
+$ic-bg-light-success:     lighten($ic-color-success, 67%); 
+$ic-bg-light-alert:       lighten($ic-color-alert, 57%);
 @if $use_high_contrast { 
-$ic-bg-light-alert:       lighten($ic-color-alert, 66%); 
+  $ic-bg-light-alert:     lighten($ic-color-alert, 66%); 
 }
-$ic-bg-light-danger:      lighten($ic-color-danger, 48%); // No high contrast color exists for legacy $ic-color-danger
+$ic-bg-light-danger:      lighten($ic-color-danger, 48%); 
 
 //============================
 // List Functional Variables

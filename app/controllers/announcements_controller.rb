@@ -23,20 +23,20 @@ class AnnouncementsController < ApplicationController
   before_filter { |c| c.active_tab = "announcements" }
 
   def index
-    if authorized_action(@context, @current_user, :read)
-      return if @context.class.const_defined?('TAB_ANNOUNCEMENTS') && !tab_enabled?(@context.class::TAB_ANNOUNCEMENTS)
-      log_asset_access("announcements:#{@context.asset_string}", "announcements", "other")
-      respond_to do |format|
-        format.html do
-          add_crumb(t(:announcements_crumb, "Announcements"))
-          can_create = @context.announcements.scoped.new.grants_right?(@current_user, session, :create)
-          js_env :permissions => {
-            :create => can_create,
-            :moderate => can_create
-          }
-          js_env :is_showing_announcements => true
-          js_env :atom_feed_url => feeds_announcements_format_path((@context_enrollment || @context).feed_code, :atom)
-        end
+    return unless authorized_action(@context, @current_user, :read)
+    return if @context.class.const_defined?('TAB_ANNOUNCEMENTS') && !tab_enabled?(@context.class::TAB_ANNOUNCEMENTS)
+
+    log_asset_access("announcements:#{@context.asset_string}", "announcements", "other")
+    respond_to do |format|
+      format.html do
+        add_crumb(t(:announcements_crumb, "Announcements"))
+        can_create = @context.announcements.scoped.new.grants_right?(@current_user, session, :create)
+        js_env :permissions => {
+          :create => can_create,
+          :moderate => can_create
+        }
+        js_env :is_showing_announcements => true
+        js_env :atom_feed_url => feeds_announcements_format_path((@context_enrollment || @context).feed_code, :atom)
       end
     end
   end
@@ -47,7 +47,8 @@ class AnnouncementsController < ApplicationController
 
   def public_feed
     return unless get_feed_context
-    announcements = @context.announcements.active.order(:posted_at).limit(15).reject{|a| a.locked_for?(@current_user, :check_policies => true) }
+    announcements = @context.announcements.active.order('posted_at DESC').limit(15).reject{|a| a.locked_for?(@current_user, :check_policies => true) }
+
     respond_to do |format|
       format.atom {
         feed = Atom::Feed.new do |f|
@@ -83,5 +84,4 @@ class AnnouncementsController < ApplicationController
       }
     end
   end
-
 end

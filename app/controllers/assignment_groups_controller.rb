@@ -91,7 +91,7 @@ class AssignmentGroupsController < ApplicationController
   # Returns the list of assignment groups for the current context. The returned
   # groups are sorted by their position field.
   #
-  # @argument include[] [String, "assignments"|"discussion_topic"|"all_dates"|"assignment_visibility"]
+  # @argument include[] [String, "assignments"|"discussion_topic"|"all_dates"|"assignment_visibility"|"overrides"]
   #  Associations to include with the group. "discussion_topic", "all_dates"
   #  "assignment_visibility" are only valid are only valid if "assignments" is also included.
   #  The "assignment_visibility" option additionally requires that the Differentiated Assignments course feature be turned on.
@@ -159,11 +159,20 @@ class AssignmentGroupsController < ApplicationController
         end
       end
 
+      include_overrides = params[:include].include? 'overrides'
+
       respond_to do |format|
         format.json {
           json = @groups.map { |g|
             g.context = @context
             assignments = assignments_by_group[g.id] || []
+            overrides = []
+            if include_overrides
+              ActiveRecord::Associations::Preloader.new(assignments, :assignment_overrides).run
+              assignments.select{ |a| a.assignment_overrides.size == 0 }.
+                  each { |a| a.has_no_overrides = true }
+              overrides = assignments.map{|assignment| assignment.assignment_overrides.active}
+            end
             assignment_group_json(g, @current_user, session, params[:include],
                                   stringify_json_ids: stringify_json_ids?,
                                   override_assignment_dates: override_dates,
@@ -171,7 +180,8 @@ class AssignmentGroupsController < ApplicationController
                                   assignments: assignments,
                                   assignment_visibilities: assignment_visibilities,
                                   differentiated_assignments_enabled: da_enabled,
-                                  exclude_descriptions: !!params[:exclude_descriptions]
+                                  exclude_descriptions: !!params[:exclude_descriptions],
+                                  overrides: overrides.flatten
                                   )
           }
           render :json => json

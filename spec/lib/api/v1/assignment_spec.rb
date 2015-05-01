@@ -10,6 +10,9 @@ class AssignmentApiHarness
     "assignment/url/#{context_id}/#{assignment.id}"
   end
 
+  def session
+    Object.new
+  end
 end
 
 describe "Api::V1::Assignment" do
@@ -68,5 +71,4 @@ describe "Api::V1::Assignment" do
       expect(json['description']).to eq(api.api_user_content("Foobers", @course, @user, {}))
     end
   end
-
 end

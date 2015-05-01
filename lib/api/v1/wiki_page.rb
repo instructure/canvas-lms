@@ -33,7 +33,10 @@ module Api::V1::WikiPage
     hash['front_page'] = wiki_page.is_front_page?
     hash['html_url'] = polymorphic_url([wiki_page.context, wiki_page])
     locked_json(hash, wiki_page, current_user, 'page')
-    hash['body'] = api_user_content(wiki_page.body) if include_body && !hash['locked_for_user'] && !hash['lock_info']
+    if include_body && !hash['locked_for_user'] && !hash['lock_info']
+      hash['body'] = api_user_content(wiki_page.body)
+      wiki_page.increment_view_count(current_user, wiki_page.context)
+    end
     hash
   end
 

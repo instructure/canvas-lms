@@ -19,7 +19,7 @@
 # @API CommMessages
 # @beta
 # 
-# API for accessing the messages (emails, sms, facebook, twitter, etc) that have 
+# API for accessing the messages (emails, sms, twitter, etc) that have
 # been sent to a user. 
 #
 # @model CommMessage

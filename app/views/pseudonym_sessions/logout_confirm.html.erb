@@ -13,7 +13,7 @@
   <%= form_tag logout_path, method: :delete do %>
     <div class="button_box">
       <%= link_to(t(:cancel, "Cancel"), '/', :class => "btn") %>
-      <%= submit_tag("Log Out", :class => "btn btn-primary") %>
+      <%= submit_tag(t("Log Out"), :class => "btn btn-primary") %>
     </div>
   <% end %>
 </div>

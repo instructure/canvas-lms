@@ -1,7 +1,0 @@
-<% define_content :link do %>
-  <%= polymorphic_url([asset.context, :rubric], id: asset.rubric_id) %>
-<% end %>
-
-<%= t :body, "A new assessment has been created for %{context}:", :context => asset.context.name %>
-<br/>
-<b><a href="<%= content :link %>"><%= asset.title %></a></b>

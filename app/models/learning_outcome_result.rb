@@ -89,6 +89,10 @@ class LearningOutcomeResult < ActiveRecord::Base
     end
   end
 
+  def submitted_or_assessed_at
+    submitted_at || assessed_at
+  end
+
   scope :for_context_codes, lambda { |codes|
     if codes == 'all'
       scoped

@@ -64,7 +64,7 @@ module Lti
           module_sequence(message_handler)
           tool_setting_ids = prep_tool_settings(message_handler.parameters, tool_proxy, message.resource_link_id)
           message.add_custom_params(custom_params(message_handler.parameters, tool_setting_ids.merge(tool: tool_proxy)))
-
+          message.add_custom_params(ToolSetting.custom_settings(tool_proxy.id, @context, message.resource_link_id))
           @lti_launch.params = message.signed_post_params(tool_proxy.shared_secret)
 
           render template: 'lti/framed_launch' and return
@@ -143,7 +143,7 @@ module Lti
       if parameters && (parameters.map {|p| p['variable']}.compact & (%w( LtiLink.custom.url ToolProxyBinding.custom.url ToolProxy.custom.url ))).any?
         link = ToolSetting.where(tool_proxy_id: tool_proxy.id, context_id: @context.id, context_type: @context.class.name, resource_link_id: resource_link_id).first_or_create
         binding = ToolSetting.where(tool_proxy_id: tool_proxy.id, context_id: @context.id, context_type: @context.class.name, resource_link_id: nil).first_or_create
-        proxy = tool_proxy_settings(tool_proxy)
+        proxy = ToolSetting.where(tool_proxy_id: tool_proxy.id, context_id: nil, context_type: nil, resource_link_id: nil).first_or_create
         {
           tool_setting_link_id: link.id,
           tool_setting_binding_id: binding.id,
@@ -152,14 +152,6 @@ module Lti
       else
         {}
       end
-    end
-
-    def tool_proxy_settings(tool_proxy)
-      unless tool_proxy_settings = ToolSetting.where(tool_proxy_id: tool_proxy.id, context_id: nil, resource_link_id: nil).first
-        custom = tool_proxy.raw_data['custom'] || {}
-        tool_proxy_settings = ToolSetting.create!(tool_proxy: tool_proxy, context_id: nil, resource_link_id: nil, custom: custom)
-      end
-      tool_proxy_settings
     end
 
   end

@@ -24,7 +24,9 @@ module Lti
     let(:account) { Account.new(root_account: root_account) }
     let(:course) { Course.new(account: account) }
     let(:user) { User.new }
+    let(:assignment) { Assignment.new }
     let(:substitution_helper) { stub_everything }
+    let(:right_now) { DateTime.now }
     let(:tool) do
       m = mock('tool')
       m.stubs(:id).returns(1)
@@ -233,6 +235,55 @@ module Lti
           subject.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq '5a,6b'
         end
+      end
+
+      context 'context is a course with an assignment' do
+        subject { described_class.new(root_account, course, controller, current_user: user, assignment: assignment) }
+
+        it 'has substitution for $Canvas.assignment.id' do
+          assignment.stubs(:id).returns(2015)
+          exp_hash = {test: '$Canvas.assignment.id'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 2015
+        end
+
+        it 'has substitution for $Canvas.assignment.title' do
+          assignment.title = 'Buy as many ducks as you can'
+          exp_hash = {test: '$Canvas.assignment.title'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'Buy as many ducks as you can'
+        end
+
+        it 'has substitution for $Canvas.assignment.pointsPossible' do
+          assignment.stubs(:points_possible).returns(10)
+          exp_hash = {test: '$Canvas.assignment.pointsPossible'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 10
+        end
+
+
+
+        it 'has substitution for $Canvas.assignment.unlockAt' do
+          assignment.stubs(:unlock_at).returns(right_now.to_s)
+          exp_hash = {test: '$Canvas.assignment.unlockAt'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq right_now.to_s
+        end
+
+        it 'has substitution for $Canvas.assignment.lockAt' do
+          assignment.stubs(:lock_at).returns(right_now.to_s)
+          exp_hash = {test: '$Canvas.assignment.lockAt'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq right_now.to_s
+        end
+
+        it 'has substitution for $Canvas.assignment.dueAt' do
+          assignment.stubs(:due_at).returns(right_now.to_s)
+          exp_hash = {test: '$Canvas.assignment.dueAt'}
+          subject.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq right_now.to_s
+        end
+
       end
 
       context 'user is logged in' do

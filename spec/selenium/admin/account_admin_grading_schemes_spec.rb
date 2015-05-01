@@ -46,6 +46,10 @@ describe "account admin grading schemes" do
       it "should delete a grading scheme item" do
         should_delete_a_grading_scheme_item
       end
+
+      it "should not update when invalid scheme input is given" do
+        should_not_update_invalid_grading_scheme_input
+      end
     end
   end
 

@@ -261,7 +261,7 @@ class ConversationsController < ApplicationController
         hash[:CAN_ADD_NOTES_FOR_COURSES] = course_note_permissions
       end
       js_env(CONVERSATIONS: hash)
-      return render :template => 'conversations/index_new'
+      return render :index_new
     end
   end
 

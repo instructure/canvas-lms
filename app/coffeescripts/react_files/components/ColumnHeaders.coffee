@@ -76,7 +76,7 @@ define [
       })
 
       header className:'ef-directory-header', role: 'row',
-        div className: selectAllCheckboxClass, role: 'columnheader',
+        div className: selectAllCheckboxClass, role: 'gridcell',
           label {htmlFor: "selectAllCheckbox", className: selectAllLabelClass },
             I18n.t('select_all', 'Select All')
           input {

@@ -36,4 +36,8 @@ body, td, pre {
   min-width: 20px;
 }
 
+body#tinymce{
+  height: 100vh;
+}
+
 @import "our_custom_tiny_mce_stuff/_tinymce.editor_box.scss";

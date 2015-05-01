@@ -106,7 +106,7 @@ module Exporters
       folder.sub_folders.active.each do |sub_folder|
         process_folder(sub_folder)
       end
-      folder.attachments.not_deleted.each do |att|
+      folder.file_attachments_visible_to(@user).each do |att|
         process_file(att)
       end
     end

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2012 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -20,6 +20,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe UserObserver do
   let_once(:student) { user }
+
+  it "should not allow a user to observe oneself" do
+    expect { student.observers << student}.to raise_error(ActiveRecord::RecordInvalid)
+  end
+
   it "should enroll the observer in all pending/active courses" do
     c1 = course(:active_all => true)
     e1 = student_in_course(:course => c1, :user => student)

@@ -154,6 +154,7 @@ class Auditors::GradeChange
     return unless submission
     submission.shard.activate do
       record = Auditors::GradeChange::Record.generate(submission, event_type)
+      Canvas::LiveEvents.grade_changed(submission, record.attributes['grade_before'])
       Auditors::GradeChange::Stream.insert(record)
     end
   end

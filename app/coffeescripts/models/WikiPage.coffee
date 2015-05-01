@@ -81,11 +81,11 @@ define [
       @save attrs, attrs: attrs, wait: true
 
     # Uses the api to set the page as the front page
-    setFrontPage: ->
+    setFrontPage: (callback) ->
       attrs =
         wiki_page:
           front_page: true
-      @save attrs, attrs: attrs, wait: true
+      @save attrs, attrs: attrs, wait: true, complete: callback
 
     # Uses the api to unset the page as the front page
     unsetFrontPage: ->

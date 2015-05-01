@@ -83,7 +83,7 @@ describe "calendar2" do
       expect(assignment2.assignment_group).to eq group2
     end
 
-    it "editing an existing assignment should preserve more options link" do
+    it "editing an existing assignment should preserve more options link", :priority => "1", :test_id => 138854 do
       assignment = @course.active_assignments.create!(:name => "to edit", :due_at => Time.zone.now)
       get "/calendar2"
       f('.fc-event').click
@@ -122,7 +122,7 @@ describe "calendar2" do
       expect(f('.undated_event_title').text).to include_text("undate me")
     end
 
-    context "event editing" do
+    context "event editing", :priority => "1", :test_id => 138853 do
       it "should allow editing appointment events" do
         create_appointment_group
         ag = AppointmentGroup.first
@@ -194,9 +194,6 @@ describe "calendar2" do
         f('.fc-event').click
         expect(f('.event-details-timestring').text).to include override_start.strftime("%b %e")
       end
-
-
-
     end
 
     it "should test the today button" do
@@ -228,6 +225,72 @@ describe "calendar2" do
         expect(f("#context-list li[data-context=course_#{@course.id}]")).to have_class('not-checked')
         expect(f("#context-list li[data-context=user_#{@user.id}]")).to have_class('not-checked')
       end
+    end
+
+    it "tooltip is correct for creating new event", :priority => "1", :test_id => 138852 do
+     load_month_view
+
+      driver.mouse.move_to f("#create_new_event_link")
+      wait_for_animations
+      tooltip = fj('.ui-tooltip:visible')
+      tooltip = fj('.ui-tooltip:visible')
+      expect(tooltip).to include_text 'Create New Event'
+    end
+
+    it "graded discussion appears on all calendars", :priority => "1", :test_id => 138851 do
+      create_graded_discussion
+
+      load_agenda_view
+      expect(f(".ig-title")).to include_text('Graded Discussion')
+
+      load_week_view
+      expect(f(".fc-event-title")).to include_text('Graded Discussion')
+
+      load_month_view
+      expect(f(".fc-event-title")).to include_text('Graded Discussion')
+    end
+
+    it "event appears on all calendars", :priority => "1" do
+      title = "loom"
+      @course.calendar_events.create!(title: title, start_at: 5.minute.from_now)
+
+
+      load_agenda_view
+      expect(f(".ig-title")).to include_text(title)
+
+      load_week_view
+      expect(f(".fc-event-inner")).to include_text(title)
+
+      load_month_view
+      expect(f(".fc-event-title")).to include_text(title)
+    end
+
+    it "assignment appears on all calendars", :priority => "1" do
+      title = "Zak McKracken"
+      @assignment = @course.assignments.create!(:name => title,:due_at => 5.minute.from_now)
+
+
+      load_agenda_view
+      expect(f(".ig-title")).to include_text(title)
+
+      load_week_view
+      expect(f(".fc-event-title")).to include_text(title)
+
+      load_month_view
+      expect(f(".fc-event-title")).to include_text(title)
+    end
+
+    it "quiz appears on all calendars", :priority => "1" do
+      create_quiz
+
+      load_agenda_view
+      expect(f(".ig-title")).to include_text('Test Quiz')
+
+      load_week_view
+      expect(f(".fc-event-title")).to include_text('Test Quiz')
+
+      load_month_view
+      expect(f(".fc-event-title")).to include_text('Test Quiz')
     end
   end
 end

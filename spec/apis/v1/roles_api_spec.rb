@@ -74,6 +74,27 @@ describe "Roles API", type: :request do
         expect(json.find{|role| role['role'] == "NewRole"}['workflow_state']).to eq 'active'
       end
 
+      it "should include inherited roles if requested" do
+        role = @account.roles.new(:name => 'inherited role')
+        role.base_role_type = 'StudentEnrollment'
+        role.save!
+
+        sub_account = @account.sub_accounts.create!
+        account_admin_user(:account => sub_account, :active_user => true)
+
+        json = api_call(:get, "/api/v1/accounts/#{sub_account.id}/roles?show_inherited=1",
+                        { :controller => 'role_overrides', :action => 'api_index', :format => 'json',
+                          :account_id => sub_account.id.to_param, :show_inherited => '1' })
+
+        expect(json.map{|r| r['id']}).to match_array ([role.id] + Role.visible_built_in_roles.map(&:id))
+        expect(json.detect{|r| r['id'] == role.id}['account']['id']).to eq @account.id
+
+        json2 = api_call(:get, "/api/v1/accounts/#{sub_account.id}/roles",
+                        { :controller => 'role_overrides', :action => 'api_index', :format => 'json',
+                          :account_id => sub_account.id.to_param })
+        expect(json2.map{|r| r['id']}).to match_array (Role.visible_built_in_roles.map(&:id))
+      end
+
       it "should paginate" do
         api_call_with_settings(:explicit => '1', :enabled => '1')
         json = api_call(:get, "/api/v1/accounts/#{@account.id}/roles?per_page=5",
@@ -424,7 +445,6 @@ describe "Roles API", type: :request do
           'explicit'      => true })
         expect(json['id']).to eql teacher_role.id
         expect(json['role']).to eql 'TeacherEnrollment'
-        expect(json['account']['id']).to eq Account.default.id
       end
 
       it "should not be able to edit read-only permissions" do

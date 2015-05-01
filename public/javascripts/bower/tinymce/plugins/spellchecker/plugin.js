@@ -325,7 +325,7 @@ define("tinymce/spellcheckerplugin/DomTextMatcher", [], function() {
 		function getWrappersByIndex(index) {
 			var elements = node.getElementsByTagName('*'), wrappers = [];
 
-			index = typeof(index) == "number" ? "" + index : null;
+			index = typeof index == "number" ? "" + index : null;
 
 			for (var i = 0; i < elements.length; i++) {
 				var element = elements[i], dataIndex = element.getAttribute('data-mce-index');
@@ -830,7 +830,7 @@ define("tinymce/spellcheckerplugin/Plugin", [
 		function getElmIndex(elm) {
 			var value = elm.getAttribute('data-mce-index');
 
-			if (typeof(value) == "number") {
+			if (typeof value == "number") {
 				return "" + value;
 			}
 

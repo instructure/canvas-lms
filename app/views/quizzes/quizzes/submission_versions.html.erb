@@ -5,11 +5,11 @@
     <thead>
       <tr>
         <td>&nbsp;</td>
-        <td><%= t 'attempt', 'Attempt' %></td>
-        <td><%= t 'time', 'Time' %></td>
-        <td><%= t 'score', 'Score' %></td>
+        <th scope="col"><%= t 'attempt', 'Attempt' %></th>
+        <th  scope="col"><%= t 'time', 'Time' %></th>
+        <th scope="col"><%= t 'score', 'Score' %></th>
         <% if submission_has_regrade?(@submission) %>
-        <td class="regraded"><%= t 'regraded', 'Regraded' %></td>
+        <th  scope="col" class="regraded"><%= t 'regraded', 'Regraded' %></th>
         <% end %>
       </tr>
     </thead>

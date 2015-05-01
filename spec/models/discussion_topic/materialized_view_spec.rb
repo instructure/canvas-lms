@@ -72,12 +72,12 @@ describe DiscussionTopic::MaterializedView do
     expect(deleted['deleted']).to eq true
     expect(deleted['user_id']).to be_nil
     expect(deleted['message']).to be_nil
-    expect(json[0]['replies'][1]['replies'][0]['attachment']['url']).to eq "http://localhost/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}"
+    expect(json[0]['replies'][1]['replies'][0]['attachment']['url']).to eq "https://placeholder.invalid/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}"
     # verify the api_user_content functionality in a non-request context
     html_message = json[0]['replies'][1]['message']
     html = Nokogiri::HTML::DocumentFragment.parse(html_message)
-    expect(html.at_css('a')['href']).to eq "http://localhost/courses/#{@course.id}/files/#{@reply2_attachment.id}/download"
-    expect(html.at_css('video')['src']).to eq "http://localhost/courses/#{@course.id}/media_download?entryId=0_abcde&media_type=video&redirect=1"
+    expect(html.at_css('a')['href']).to eq "https://placeholder.invalid/courses/#{@course.id}/files/#{@reply2_attachment.id}/download"
+    expect(html.at_css('video')['src']).to eq "https://placeholder.invalid/courses/#{@course.id}/media_download?entryId=0_abcde&media_type=video&redirect=1"
 
     # the deleted entry will be marked deleted and have no summary
     simple_json = map_to_ids_and_replies(json)

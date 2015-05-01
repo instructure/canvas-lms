@@ -149,22 +149,11 @@ class DiscussionEntriesController < ApplicationController
     @topic = @context.discussion_topics.active.find(params[:discussion_topic_id])
     if !@topic.podcast_enabled && request.format == :rss
       @problem = t :disabled_podcasts_notice, "Podcasts have not been enabled for this topic."
-      render :template => "shared/unauthorized_feed", :layout => "layouts/application", :status => :bad_request, :formats => [:html] # :template => "shared/unauthorized_feed", :status => :bad_request
+      render "shared/unauthorized_feed", status: :bad_request, :formats => [:html]
       return
     end
     if authorized_action(@context, @current_user, :read) && authorized_action(@topic, @current_user, :read)
-      @all_discussion_entries = @topic.discussion_entries.active
-      @discussion_entries = @all_discussion_entries
-      if request.format == :rss && !@topic.podcast_has_student_posts
-        @admins = @context.admins
-        @discussion_entries = @discussion_entries.where(id: @admins).to_a
-      end
-      if !@topic.user_can_see_posts?(@current_user)
-        @discussion_entries = []
-      end
-      if @topic.locked_for?(@current_user) && !@topic.grants_right?(@current_user, :update)
-        @discussion_entries = []
-      end
+      @discussion_entries = @topic.entries_for_feed(@current_user, request.format == :rss)
       respond_to do |format|
         format.atom {
           feed = Atom::Feed.new do |f|

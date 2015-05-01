@@ -3,6 +3,7 @@ define [
   'jquery'
   'compiled/fn/preventDefault'
   'Backbone'
+  'jqueryui/tooltip'
 ], (I18n, $, preventDefault, {View}) ->
 
   class ToggleableSubscriptionIconView extends View
@@ -25,7 +26,7 @@ define [
       position: my: 'center bottom', at: 'center top-10', collision: 'none'
       tooltipClass: 'center bottom vertical'
 
-    events: { 'click', 'hover' }
+    events: { 'click', 'hover', 'focus', 'blur' }
 
     initialize: ->
       @model.on('change:subscribed', @render)
@@ -34,9 +35,12 @@ define [
       super
 
     hover: ({type}) ->
-      @hovering = type is 'mouseenter'
+      @hovering = type in [ 'mouseenter', 'focus' ]
       @displayStateDuringHover = false
       @render()
+
+    blur: @::hover
+    focus: @::hover
 
     click: (e) ->
       e.preventDefault()

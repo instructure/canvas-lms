@@ -441,6 +441,7 @@ describe ContentExportsApiController, type: :request do
         @sub_folder = t_course.folders.create! name: 'teh_folder', parent_folder: @root_folder, locked: true
         @file2 = attachment_model context: t_course, display_name: 'file2.txt', folder: @sub_folder, uploaded_data: stub_file_data('file2.txt', 'file2', 'text/plain')
         @empty_folder = t_course.folders.create! name: 'empty_folder', parent_folder: @sub_folder
+        @hiddenfile = attachment_model context: t_course, display_name: 'hidden.txt', folder: @root_folder, uploaded_data: stub_file_data('hidden.txt', 'hidden', 'text/plain'), hidden: true
       end
 
       it "should download course files" do
@@ -453,7 +454,7 @@ describe ContentExportsApiController, type: :request do
         expect(export.attachment.display_name).to eql 'course_files_export.zip'
         tf = export.attachment.open need_local_file: true
         Zip::File.open(tf) do |zf|
-          expect(zf.entries.select{ |entry| entry.ftype == :file }.map(&:name)).to match_array %w(file1.txt teh_folder/file2.txt)
+          expect(zf.entries.select{ |entry| entry.ftype == :file }.map(&:name)).to match_array %w(file1.txt hidden.txt teh_folder/file2.txt)
           expect(zf.entries.select{ |entry| entry.ftype == :directory }.map(&:name)).to match_array %w(teh_folder/ teh_folder/empty_folder/)
         end
       end
@@ -499,7 +500,7 @@ describe ContentExportsApiController, type: :request do
                            {}, {}, {expected_status: 401})
         end
 
-        it "should exclude locked and deleted folders and files from archive" do
+        it "should exclude locked, deleted, and hidden folders and files from archive" do
           file3 = attachment_model context: t_course, display_name: 'file3.txt', folder: @root_folder, uploaded_data: stub_file_data('file3.txt', 'file3', 'text/plain'), locked: true
           del_file0 = attachment_model context: t_course, display_name: 'del_file0.txt', folder: @root_folder, uploaded_data: stub_file_data('del_file0.txt', 'del_file0', 'text/plain'), file_state: 'deleted'
           del_folder = t_course.folders.create! name: 'del_folder', parent_folder: @root_folder

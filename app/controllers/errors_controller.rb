@@ -43,7 +43,7 @@ class ErrorsController < ApplicationController
 
   def show
     @reports = [ErrorReport.find(params[:id])]
-    render :action => 'index'
+    render :index
   end
 
   def error_search_enabled?

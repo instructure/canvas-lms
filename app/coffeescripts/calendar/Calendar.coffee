@@ -670,7 +670,7 @@ define [
     $styleContainer = $('<div />').appendTo('body')
 
     colorizeContexts: =>
-      colors = colorSlicer.getColors(@contextCodes.length, 275, {unsafe: !ENV.SETTINGS.use_high_contrast})
+      colors = colorSlicer.getColors(@contextCodes.length, 275, {unsafe: !ENV.use_high_contrast})
       html = (for contextCode, index in @contextCodes
         color = colors[index]
         ".group_#{contextCode}{

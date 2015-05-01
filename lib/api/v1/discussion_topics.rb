@@ -171,7 +171,9 @@ module Api::V1::DiscussionTopics
   # Returns a hash.
   def discussion_entry_attachment(entry, user, context)
     return {} unless entry.attachment
-    json = {attachment: attachment_json(entry.attachment, user, host: HostUrl.context_host(context))}
+    url_options = {}
+    url_options.merge!(host: Api::PLACEHOLDER_HOST, protocol: Api::PLACEHOLDER_PROTOCOL) if respond_to?(:use_placeholder_host?) && use_placeholder_host? unless respond_to?(:request)
+    json = {attachment: attachment_json(entry.attachment, user, url_options)}
     json[:attachments] = [json[:attachment]]
 
     json

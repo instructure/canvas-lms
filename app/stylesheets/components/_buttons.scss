@@ -69,7 +69,13 @@ By adding on a modifier class, you can get the style of the button you need.
       <td><button class="Button Button--link" type="button">.Button--link</button></td>
       <td><button class="Button Button--link Button--active" type="button" style="pointer-events: none">&.Button--active</button></td>
       <td><button class="Button Button--link" type="button" disabled>&[disabled]</button></td>
-    </tr>  
+    </tr>
+    <tr>
+      <td>.Button--icon-action</td>
+      <td><button class="Button Button--icon-action" type="button"><i class="icon-edit"></i></button></td>
+      <td><button class="Button Button--icon-action Button--active" type="button" style="pointer-events: none"><i class="icon-trash"></i></button></td>
+      <td><button class="Button Button--icon-action" type="button" disabled><i class="icon-x"></i></button></td>
+    </tr> 
   </tbody>
 </table>
 
@@ -307,6 +313,12 @@ $ic-brand-button--secondary-text: $ic-color-light !default;
   &:hover, &:focus {
     background: transparent;
     color: $ic-icon-link-color-hover;  
+  }
+  &.active, &.Button--active, &:active {
+    background: transparent;
+    box-shadow: none;
+    border-color: transparent;
+    color: $ic-link-color;
   }
 }
 

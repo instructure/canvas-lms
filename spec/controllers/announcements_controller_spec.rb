@@ -71,5 +71,15 @@ describe AnnouncementsController do
       expect(feed.entries).not_to be_empty
       expect(feed.entries.all?{|e| e.authors.present?}).to be_truthy
     end
+
+    it "shows the 15 most recent announcements" do
+      announcements = []
+      16.times { announcements << course_announcement.id }
+      announcements.shift # Drop first announcement so we have the 15 most recent
+      get 'public_feed', :format => 'atom', :feed_code => @enrollment.feed_code
+      feed_entries = Atom::Feed.load_feed(response.body).entries
+      feed_entries.map!{ |e| e.id.gsub(/.*topic_/, "").to_i }
+      expect(feed_entries).to match_array(announcements)
+    end
   end
 end

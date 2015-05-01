@@ -2,7 +2,7 @@ require [
   'jquery'
   'underscore'
   'Backbone'
-  'old_unsupported_dont_use_react'
+  'react'
   'sfu_course_form/compiled/models/User'
   'sfu_course_form/compiled/models/Term'
   'sfu_course_form/compiled/models/Course'

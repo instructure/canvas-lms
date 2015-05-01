@@ -924,23 +924,35 @@ describe "Pages API", type: :request do
                {:controller=>'wiki_pages_api', :action=>'show', :format=>'json', :course_id=>"#{other_course.id}", :url=>'front-page'})
     end
     
-    it "should fulfill module progression requirements" do
-      mod = @course.context_modules.create!(:name => "some module")
-      tag = mod.add_item(:id => @front_page.id, :type => 'wiki_page')
-      mod.completion_requirements = { tag.id => {:type => 'must_view'} }
-      mod.save!
+    describe "module progression" do
+      before :once do
+        @mod = @course.context_modules.create!(:name => "some module")
+        @tag = @mod.add_item(:id => @front_page.id, :type => 'wiki_page')
+        @mod.completion_requirements = { @tag.id => {:type => 'must_view'} }
+        @mod.save!
+      end
 
-      # index should not affect anything
-      api_call(:get, "/api/v1/courses/#{@course.id}/pages",
-               {:controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>"#{@course.id}"})
-      expect(mod.evaluate_for(@user).workflow_state).to eq "unlocked"
+      it "should not fulfill requirements with index" do
+        api_call(:get, "/api/v1/courses/#{@course.id}/pages",
+                 {:controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>"#{@course.id}"})
+        expect(@mod.evaluate_for(@user).requirements_met).not_to include({id: @tag.id, type: 'must_view'})
+      end
 
-      # show should count as a view
-      api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@front_page.url}",
-               {:controller=>'wiki_pages_api', :action=>'show', :format=>'json', :course_id=>"#{@course.id}", :url=>@front_page.url})
-      expect(mod.evaluate_for(@user).workflow_state).to eq "completed"
+      it "should fulfill requirements with view on an unlocked page" do
+        api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@front_page.url}",
+                 {:controller=>'wiki_pages_api', :action=>'show', :format=>'json', :course_id=>"#{@course.id}", :url=>@front_page.url})
+        expect(@mod.evaluate_for(@user).requirements_met).to include({id: @tag.id, type: 'must_view'})
+      end
+
+      it "should not fulfill requirements with view on a locked page" do
+        @mod.unlock_at = 1.year.from_now
+        @mod.save!
+        api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@front_page.url}",
+                 {:controller=>'wiki_pages_api', :action=>'show', :format=>'json', :course_id=>"#{@course.id}", :url=>@front_page.url})
+        expect(@mod.evaluate_for(@user).requirements_met).not_to include({id: @tag.id, type: 'must_view'})
+      end
     end
-    
+
     it "should not allow editing a page" do
       api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@front_page.url}",
                { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,

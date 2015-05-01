@@ -87,7 +87,7 @@ class ContextModule < ActiveRecord::Base
   def invalidate_progressions
     connection.after_transaction_commit do
       context_module_progressions.update_all(current: false)
-      send_later_if_production(:evaluate_all_progressions)
+      send_later_if_production_enqueue_args(:evaluate_all_progressions, {:strand => "module_reeval_#{self.global_context_id}"})
     end
   end
 
@@ -213,7 +213,7 @@ class ContextModule < ActiveRecord::Base
     given {|user, session| self.context.grants_right?(user, session, :read_as_admin) }
     can :read_as_admin
 
-    given {|user, session| self.context.grants_right?(user, session, :read) }
+    given {|user, session| self.context.grants_right?(user, session, :read) && self.active? }
     can :read
   end
 

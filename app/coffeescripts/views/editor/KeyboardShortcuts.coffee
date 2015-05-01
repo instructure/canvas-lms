@@ -6,8 +6,7 @@ define [
   'jst/editor/KeyboardShortcuts'
 ], (_, I18n, $, Backbone, Template) ->
   HELP_KEYCODES = [
-    48 # regular 0
-    96 # numpad 0
+    48 # regular 0 (not numpad 0)
     119 # F8
   ]
 
@@ -23,6 +22,10 @@ define [
       'click': 'openDialog'
 
     keybindings: [
+      {
+        key: 'ALT+F9',
+        description: I18n.t('keybindings.open_menubar', 'Open the editor\'s menubar')
+      },
       {
         key: 'ALT+F10',
         description: I18n.t('keybindings.open_toolbar', 'Open the editor\'s toolbar')
@@ -64,6 +67,11 @@ define [
         autoOpen: false
       })
 
+      @bindEvents()
+
+      return this
+
+    bindEvents: ()->
       $(document).on('keyup.tinymce_keyboard_shortcuts', @openDialogByKeybinding.bind(this))
 
       #special event for keyups in the editor iframe, fired from "tinymce.editor_box.js"
@@ -71,7 +79,6 @@ define [
         @openDialogByKeybinding(originalEvent)
       ).bind(this))
 
-      return this
 
     remove: () ->
       $(document).off('keyup.tinymce_keyboard_shortcuts')

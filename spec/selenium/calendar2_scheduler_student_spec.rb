@@ -22,7 +22,7 @@ describe "scheduler" do
       wait_for_ajax_requests
     end
 
-    it "should let me reserve appointment groups for contexts I am in" do
+    it "should let me reserve appointment groups for contexts I am in", :priority  => "1", :test_id => 140195 do
       my_course = @course
       course_with_student(:active_all => true)
       other_course = @course
@@ -38,7 +38,8 @@ describe "scheduler" do
       expect(f('.fc-event')).to include_text "Reserved"
     end
 
-    it "should allow me to cancel existing reservation and sign up for the appointment group from the calendar" do
+    it "should allow me to cancel existing reservation and sign up for the appointment group from the calendar",
+          :priority  => "1", :test_id => 140200 do
       tomorrow = (Date.today + 1).to_s
       create_appointment_group(:max_appointments_per_participant => 1,
                                :new_appointments => [
@@ -98,7 +99,7 @@ describe "scheduler" do
       expect(ff('#reservations').size).to be_zero
     end
 
-    it "should check index page for correct element", :priority => "1", :test_id => 85933 do
+    it "should check index page for correct element", :priority => "1", :test_id => 140217 do
       title = "blarg"
       location = "brighton"
 

@@ -13,14 +13,49 @@
       </tr>
       <tr>
         <td style="vertical-align: top;"><label for="calendar_event_date">{{#t "date"}}Date:{{/t}}</label></td>
-        <td><input id="calendar_event_date"type="text" name="date" style="width: 100px;" class="date_field"/></td>
+        <td>
+          <div class='date_field_container'>
+            <label class='screenreader-only' id='calendar_event_date_accessible_label'>
+              {{#t}}Event Date:{{/t}}
+              {{datepickerScreenreaderPrompt 'date'}}
+            </label>
+            <input id="calendar_event_date" type="text" 
+              name="date" style="width: 100px;" class="date_field"
+              aria-labelledby='calendar_event_date_accessible_label'
+              data-tooltip title="{{accessibleDateFormat 'date'}}"/>
+          </div>
+        </td>
       </tr>
       <tr>
         <td style="vertical-align: top;"><label for="calendar_event_start_time">{{#t "from"}}From:{{/t}}</label></td>
         <td>
-          <div style="float: left;"><input id="calendar_event_start_time" type="text" name="start_time" style="width: 60px;" class="time_field start_time"/></div>
+          <div style="float: left;">
+            <div class='date_field_container'>
+              <label class='screenreader-only' id='calendar_event_start_time_accessible_label'>
+                {{#t}}Event Start Time{{/t}}
+                {{datepickerScreenreaderPrompt 'time'}}
+              </label>
+              <input id="calendar_event_start_time" type="text"
+                name="start_time" style="width: 60px;"
+                class="time_field start_time"
+                aria-labelledby='calendar_event_start_time_accessible_label'
+                data-tooltip title="{{accessibleDateFormat 'time'}}"/>
+            </div>
+          </div>
           <div style="float: left; margin: 5px"><label for="calendar_event_end_time">{{#t "timespan_separator"}} to {{/t}}</label></div>
-          <div style="float: left;"><input id="calendar_event_end_time" type="text" name="end_time" style="width: 60px;" class="time_field end_time"/></div>
+          <div style="float: left;">
+            <div class='date_field_container'>
+              <label class='screenreader-only' id='calendar_event_end_time_accessible_label'>
+                {{#t}}Event End Time{{/t}}
+                {{datepickerScreenreaderPrompt 'time'}}
+              </label>
+              <input id="calendar_event_end_time" type="text"
+                name="end_time" style="width: 60px;"
+                class="time_field end_time"
+                aria-labelledby='calendar_event_end_time_accessible_label'
+                data-tooltip title="{{accessibleDateFormat 'time'}}"/>
+            </div>
+          </div>
           <div class="clear"></div>
         </td>
       </tr>

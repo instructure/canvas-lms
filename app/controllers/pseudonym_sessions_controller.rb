@@ -17,7 +17,7 @@
 #
 
 class PseudonymSessionsController < ApplicationController
-  protect_from_forgery :except => [:create, :destroy, :saml_logout, :saml_consume, :oauth2_token, :oauth2_logout, :cas_logout]
+  protect_from_forgery :except => [:create, :saml_logout, :saml_consume, :oauth2_token, :oauth2_logout, :cas_logout]
   before_filter :forbid_on_files_domain, :except => [ :clear_file_session ]
   before_filter :require_password_session, :only => [ :otp_login, :disable_otp_login ]
   before_filter :require_user, :only => [ :otp_login ]
@@ -32,7 +32,7 @@ class PseudonymSessionsController < ApplicationController
 
     if params[:needs_cookies] == '1'
       @needs_cookies = true
-      return render(:template => 'shared/unauthorized', :layout => 'application', :status => :unauthorized)
+      return render 'shared/unauthorized', :layout => 'application', :status => :unauthorized
     end
 
     session[:expected_user_id] = params[:expected_user_id].to_i if params[:expected_user_id]
@@ -132,10 +132,10 @@ class PseudonymSessionsController < ApplicationController
         :RESET_SENT =>  t("password_confirmation_sent", "Password confirmation sent. Make sure you check your spam box."),
         :RESET_ERROR =>  t("password_confirmation_error", "Error sending request.")
       )
-      render :template => 'pseudonym_sessions/mobile_login', :layout => 'mobile_auth', :status => status
+      render :mobile_login, :layout => 'mobile_auth', :status => status
     else
       @request = request
-      render :action => 'new', :status => status
+      render :new, :status => status
     end
   end
 
@@ -218,25 +218,7 @@ class PseudonymSessionsController < ApplicationController
 
   # DELETE /logout
   def destroy
-    # Only allow DELETE method for all logout requests except for SAML.
-    if saml_response? || saml_request?
-      saml_logout
-    else
-      # We can't verify the authenticity token for saml, so we do it in
-      # this branch rather than in the before filter.
-      #
-      # This also allows us to show the logout confirmation screen rather than
-      # an error if the token is invalid -- this can happen, for example, if
-      # they log out and back in on a 2nd tab, and then click logout on the 1st
-      # tab.
-      begin
-        return unless verify_authenticity_token
-      rescue ActionController::InvalidAuthenticityToken
-        return redirect_to(logout_url)
-      end
-
-      logout_user_action
-    end
+    logout_user_action
   end
 
   # GET /logout
@@ -477,7 +459,7 @@ class PseudonymSessionsController < ApplicationController
     end
   end
 
-  # POST /logout
+  # GET /saml_logout
   def saml_logout
     if saml_response?
       increment_saml_stat("logout_response_received")
@@ -534,7 +516,7 @@ class PseudonymSessionsController < ApplicationController
     else
       @message = 'SAML Logout request requires a SAMLResponse parameter on a SAML enabled account.'
       respond_to do |format|
-        format.html { render :template => 'shared/errors/400_message', :status => :bad_request }
+        format.html { render 'shared/errors/400_message', :status => :bad_request }
         format.json { render :json => { message: @message }, :status => :bad_request }
       end
     end
@@ -590,7 +572,7 @@ class PseudonymSessionsController < ApplicationController
       @cc.try(:send_later_if_production_enqueue_args, :send_otp!, { :priority => Delayed::HIGH_PRIORITY, :max_attempts => 1 }, ROTP::TOTP.new(secret_key).now)
     end
 
-    return render :action => 'otp_login' unless params[:otp_login].try(:[], :verification_code)
+    return render :otp_login unless params[:otp_login].try(:[], :verification_code)
 
     verification_code = params[:otp_login][:verification_code]
     if Canvas.redis_enabled?
@@ -661,6 +643,12 @@ class PseudonymSessionsController < ApplicationController
     CanvasBreachMitigation::MaskingSecrets.reset_authenticity_token!(cookies)
     Auditors::Authentication.record(@current_pseudonym, 'login')
 
+    # Since the user just logged in, we'll reset the context to include their info.
+    setup_live_events_context
+    # TODO: Only send this if the current_pseudonym's root account matches the current root
+    # account?
+    Canvas::LiveEvents.logged_in(session)
+
     otp_passed ||= @current_user.validate_otp_secret_key_remember_me_cookie(cookies['canvas_otp_remember_me'], request.remote_ip)
     if !otp_passed
       mfa_settings = @current_user.mfa_settings
@@ -730,6 +718,7 @@ class PseudonymSessionsController < ApplicationController
   def logout_current_user
     CanvasBreachMitigation::MaskingSecrets.reset_authenticity_token!(cookies)
     Auditors::Authentication.record(@current_pseudonym, 'logout')
+    Canvas::LiveEvents.logged_out
     Lti::LogoutService.queue_callbacks(@current_pseudonym)
     super
   end

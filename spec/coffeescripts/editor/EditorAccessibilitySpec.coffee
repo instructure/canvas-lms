@@ -31,3 +31,23 @@ define [
     acc = new EditorAccessibility(tinymce.activeEditor)
     acc.accessiblize()
     equal($(acc.$iframe).attr('title'), "Rich Text Area. Press ALT+F8 for help")
+
+  test "accessibilize() hides the menubar, Alt+F9 shows it", ->
+    editor = tinymce.activeEditor
+    acc = new EditorAccessibility(editor)
+    acc.accessiblize()
+    $menu = $(".mce-menubar")
+    equal($menu.is(":visible"), false)
+    event = {
+      isDefaultPrevented: (-> false),
+      altKey: true,
+      ctrlKey: false,
+      metaKey: false,
+      shiftKey: false,
+      keyCode: 120, #<- this is F9
+      preventDefault: (->),
+      isImmediatePropagationStopped: (-> false)
+    }
+
+    editor.fire("keydown", event)
+    equal($menu.is(":visible"), true)

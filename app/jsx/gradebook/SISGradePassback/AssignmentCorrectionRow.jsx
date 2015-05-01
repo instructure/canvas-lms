@@ -12,11 +12,16 @@ define([
       this.initDueAtDateTimeField()
     },
 
+    handleDateChanged(e) {
+      //send date chosen in jquery date-picker so that
+      //the assignment or assignment override due_at is set
+      var $picker = $(this.refs.due_at.getDOMNode())
+      this.props.onDateChanged($picker.data('date'))
+    },
+
     initDueAtDateTimeField() {
       var $picker = $(this.refs.due_at.getDOMNode())
-      $picker.datetime_field().change((e) => {
-        this.props.updateAssignment({due_at: $picker.data('date'), please_ignore: false})
-      })
+      $picker.datetime_field().change(this.handleDateChanged)
     },
 
     ignoreAssignment(e) {
@@ -28,13 +33,29 @@ define([
     // but we need to check a couple of things during keypress events to
     // maintain assignment state consistency
     checkDueAtChange(e) {
-      if (e.target.value == "") {
-        $picker = $(this.refs.due_at.getDOMNode()).data("date", null)
-        this.props.updateAssignment({due_at: null})
+      if(this.props.assignment.overrideForThisSection != undefined) {
+        if (e.target.value == "") {
+          $picker = $(this.refs.due_at.getDOMNode()).data("date", null)
+          this.props.assignment.due_at = null
+        }
+        // When a user edits the due_at datetime field, we should reset any
+        // previous "please_ignore" request
+        this.props.updateAssignment({please_ignore: false})
       }
-      // When a user edits the due_at datetime field, we should reset any
-      // previous "please_ignore" request
-      this.props.updateAssignment({please_ignore: false})
+      else {
+        if (e.target.value == "") {
+          $picker = $(this.refs.due_at.getDOMNode()).data("date", null)
+          this.props.updateAssignment({due_at: null})
+        }
+        // When a user edits the due_at datetime field, we should reset any
+        // previous "please_ignore" request
+        this.props.updateAssignment({please_ignore: false})
+      }
+
+    },
+
+    updateAssignmentName(e) {
+      this.props.updateAssignment({name: e.target.value, please_ignore: false})
     },
 
     updateAssignmentName(e) {
@@ -52,6 +73,24 @@ define([
       var nameTooLongError = assignmentUtils.nameTooLong(assignment) && !assignment.please_ignore
       var nameError = assignmentUtils.notUniqueName(assignmentList, assignment) && !assignment.please_ignore
       var dueAtError = !assignment.due_at && !assignment.please_ignore
+      var default_value = null
+      var place_holder = null
+
+      //dueAtError will always return true when assignments have overrides so we want to check and see if the
+      //assignment override in the section has a due_at date
+      if(assignment.overrideForThisSection != undefined && assignment.overrideForThisSection.due_at != null){
+        dueAtError = false
+      }
+
+      //handles data being filled in the inputs if there are name issues on an assignment with an assignment override
+      if(assignment.overrideForThisSection != undefined){
+        default_value = assignment.overrideForThisSection.due_at ? assignment.overrideForThisSection.due_at.toString($.datetime.defaultFormat) : null
+        place_holder = assignment.overrideForThisSection.due_at ? null : I18n.t('No Due Date')
+      }
+      else{
+        default_value = assignment.due_at ? assignment.due_at.toString($.datetime.defaultFormat) : null
+        place_holder = assignment.due_at ? null : I18n.t("No Due Date")
+      }
       var anyError = nameError || dueAtError || nameTooLongError
       return (
         <div className={rowClass}>
@@ -90,8 +129,8 @@ define([
               type="text"
               aria-label={I18n.t("Due Date")}
               className="input-medium assignment-due-at"
-              placeholder={assignment.due_at ? null : I18n.t("No Due Date")}
-              defaultValue={assignment.due_at ? assignment.due_at.toString($.datetime.defaultFormat) : null}
+              placeholder={place_holder}
+              defaultValue={default_value}
               onChange={this.checkDueAtChange}
             />
             <button

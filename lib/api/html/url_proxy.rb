@@ -53,9 +53,9 @@ module Api
         %r{^/users/(#{ID})/files$} => ['Folder', :api_v1_user_folder_url, :user_id, {:id => 'root'}],
 
         # Get file
-        %r{^/courses/#{ID}/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
-        %r{^/groups/#{ID}/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
-        %r{^/users/#{ID}/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
+        %r{^/courses/(#{ID})/files/(#{ID})/} => ['File', :api_v1_course_attachment_url, :course_id, :id],
+        %r{^/groups/(#{ID})/files/(#{ID})/} => ['File', :api_v1_group_attachment_url, :group_id, :id],
+        %r{^/users/(#{ID})/files/(#{ID})/} => ['File', :api_v1_user_attachment_url, :user_id, :id],
         %r{^/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
 
         # List quizzes

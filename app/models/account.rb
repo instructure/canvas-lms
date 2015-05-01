@@ -750,9 +750,7 @@ class Account < ActiveRecord::Base
   end
 
   def available_custom_account_roles(include_inactive=false)
-    account_roles = include_inactive ? self.roles.for_accounts.not_deleted : self.roles.for_accounts.active
-    account_roles += self.parent_account.available_custom_account_roles(include_inactive) if self.parent_account
-    account_roles
+    available_custom_roles(include_inactive).for_accounts
   end
 
   def available_account_roles(include_inactive=false, user = nil)
@@ -765,15 +763,20 @@ class Account < ActiveRecord::Base
   end
 
   def available_custom_course_roles(include_inactive=false)
-    course_roles = include_inactive ? self.roles.for_courses.not_deleted : self.roles.for_courses.active
-    course_roles += self.parent_account.available_custom_course_roles(include_inactive) if self.parent_account
-    course_roles
+    available_custom_roles(include_inactive).for_courses
   end
 
   def available_course_roles(include_inactive=false)
     course_roles = available_custom_course_roles(include_inactive)
     course_roles += Role.built_in_course_roles
     course_roles
+  end
+
+  def available_custom_roles(include_inactive=false)
+    @role_chain_ids ||= self.account_chain.map(&:id)
+    scope = Role.where(:account_id => @role_chain_ids)
+    scope = include_inactive ? scope.not_deleted : scope.active
+    scope
   end
 
   def available_roles(include_inactive=false)
@@ -1349,11 +1352,6 @@ class Account < ActiveRecord::Base
         :description => "",
         :expose_to_ui => :service
       },
-      :facebook => {
-        :name => t("account_settings.facebook", "Facebook"),
-        :description => "",
-        :expose_to_ui => (Facebook::Connection.config ? :service : false)
-      },
       :skype => {
         :name => t("account_settings.skype", "Skype"),
         :description => "",
@@ -1566,14 +1564,6 @@ class Account < ActiveRecord::Base
 
   def canvas_network_enabled?
     false
-  end
-
-  def calendar2_only?
-    true
-  end
-
-  def enable_scheduler?
-    true
   end
 
   def change_root_account_setting!(setting_name, new_value)

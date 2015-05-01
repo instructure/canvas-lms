@@ -27,7 +27,7 @@
             <ul class="wiki_pages page_list">
               <% (@wiki_sidebar_data[:wiki_pages]).each do |wiki_page|  %>
                 <% if can_do(@wiki, @current_user, :manage) || wiki_page.published? %>
-                  <li title="<%= t('insert.wiki_pages', %{Click to insert a link to this page}) %>"><%= link_to wiki_page.title.titleize, polymorphic_path([@context, wiki_page]), :role => "button"%></li>
+                  <li title="<%= t('insert.wiki_pages', %{Click to insert a link to this page}) %>"><%= link_to wiki_page.title, polymorphic_path([@context, wiki_page]), :role => "button"%></li>
                 <% end %>
               <% end %>
             </ul>

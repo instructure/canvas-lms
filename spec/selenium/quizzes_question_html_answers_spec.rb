@@ -36,6 +36,14 @@ describe "quizzes question with html answers" do
     expect(html).to eq '<p>HTML</p>'
   end
 
+  it "should set focus back to the edit button after editing" do
+    quiz_with_new_questions
+    click_questions_tab
+    edit_first_html_answer
+    close_first_html_answer
+    check_element_has_focus(fj('.edit_html:visible'))
+  end
+
   def check_for_no_edit_button(option)
     click_option('.question_form:visible .question_type', option)
     driver.execute_script "$('.answer').addClass('hover');"

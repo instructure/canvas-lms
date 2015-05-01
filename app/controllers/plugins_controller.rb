@@ -46,7 +46,7 @@ class PluginsController < ApplicationController
       else
         @settings = @plugin.settings
         flash[:error] = t('errors.setting_update_failed', "There was an error saving the plugin settings.")
-        render :action => 'show'
+        render :show
       end
     else
       flash[:error] = t('errors.plugin_doesnt_exist', "The plugin %{id} doesn't exist.", :id => params[:id])

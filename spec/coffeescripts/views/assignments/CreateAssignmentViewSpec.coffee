@@ -21,19 +21,22 @@ define [
   assignment3 = ->
     new Assignment(buildAssignment3())
 
+  assignment4 = ->
+    new Assignment(buildAssignment4())
+
   buildAssignment1 = ->
     date1 =
-      "due_at":"2013-08-28T23:59:00-06:00"
+      "due_at": new Date("August 28, 2013").toISOString()
       "title":"Summer Session"
     date2 =
-      "due_at":"2013-08-28T23:59:00-06:00"
+      "due_at": new Date("August 28, 2013").toISOString()
       "title":"Winter Session"
 
     buildAssignment(
       "id":1
       "name":"History Quiz"
       "description":"test"
-      "due_at":"2013-08-21T23:59:00-06:00"
+      "due_at": new Date("August 21, 2013").toISOString()
       "points_possible":2
       "position":1
       "all_dates":[date1, date2]
@@ -43,7 +46,7 @@ define [
     buildAssignment(
       "id":3
       "name":"Math Quiz"
-      "due_at":"2013-08-23T23:59:00-06:00"
+      "due_at": new Date("August 23, 2013").toISOString()
       "points_possible":10
       "position":2
     )
@@ -52,9 +55,20 @@ define [
     buildAssignment(
       "id":4
       "name":""
-      "due_at":"2013-08-23T23:59:00-06:00"
+      "due_at": ""
       "points_possible":10
       "position":3
+    )
+
+  buildAssignment4 = ->
+    buildAssignment(
+      "id":5
+      "name":""
+      "due_at": ""
+      "unlock_at": new Date("August 1, 2013").toISOString()
+      "lock_at": new Date("August 30, 2013").toISOString()
+      "points_possible":10
+      "position":4
     )
 
   buildAssignment = (options) ->
@@ -96,7 +110,14 @@ define [
       @assignment1 = assignment1()
       @assignment2 = assignment2()
       @assignment3 = assignment3()
+      @assignment4 = assignment4()
       @group       = assignmentGroup()
+
+    teardown: ->
+      ENV.VALID_DATE_RANGE = {
+        start_at: {date: null, date_context: null}
+        end_at: {date: null, date_context: null}
+      }
 
   test "initialize generates a new assignment for creation", ->
     view = createView(@group)
@@ -239,3 +260,40 @@ define [
     view = createView(@group)
     data = view.getFormData()
     equal data.submission_types, 'none'
+
+  test 'validates due date against date range', ->
+    ENV.VALID_DATE_RANGE = {
+      start_at: {date: new Date("August 20, 2013").toISOString(), date_context: "term"}
+      end_at: {date: new Date("August 30, 2013").toISOString(), date_context: "course"}
+    }
+    view = createView(@assignment3)
+    data =
+      name: "Example"
+      due_at: new Date("September 1, 2013").toISOString()
+    errors = view.validateBeforeSave(data, [])
+    equal errors['due_at'][0]['message'], 'Due date cannot be after course end'
+
+    data =
+      name: "Example"
+      due_at: new Date("July 1, 2013").toISOString()
+    errors = view.validateBeforeSave(data, [])
+    ok errors["due_at"]
+    equal errors['due_at'][0]['message'], 'Due date cannot be before term start'
+
+  test 'validates due date for lock and unlock', ->
+    view = createView(@assignment4)
+
+    data =
+      name: "Example"
+      due_at: new Date("September 1, 2013").toISOString()
+    errors = view.validateBeforeSave(data, [])
+    ok errors["due_at"]
+    equal errors['due_at'][0]['message'], 'Due date cannot be after lock date'
+
+    data =
+      name: "Example"
+      due_at: new Date("July 1, 2013").toISOString()
+    errors = view.validateBeforeSave(data, [])
+    ok errors["due_at"]
+    equal errors['due_at'][0]['message'], 'Due date cannot be before unlock date'
+

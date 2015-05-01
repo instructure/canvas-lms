@@ -20,8 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe DiscussionTopic do
   before :once do
-    course_with_teacher(:active_all => 1)
-    student_in_course(:active_all => 1)
+    course_with_teacher(:active_all => true)
+    student_in_course(:active_all => true)
   end
 
   it "should santize message" do
@@ -1601,6 +1601,46 @@ describe DiscussionTopic do
         @topic.reply_from(user: @student, text: "huttah!")
         expect(@student.context_module_progressions.where(context_module_id: @module).first.requirements_met).to include({id: @topic_tag.id, type: 'must_contribute'})
       end
+    end
+  end
+
+  describe 'entries_for_feed' do
+    before(:once) do
+      @topic = @course.discussion_topics.create!(user: @teacher, message: 'topic')
+      @entry1 = @topic.discussion_entries.create!(user: @teacher, message: 'hi from teacher')
+      @entry2 = @topic.discussion_entries.create!(user: @student, message: 'hi')
+    end
+
+    it 'returns active entries by default' do
+      expect(@topic.entries_for_feed(@student)).to_not be_empty
+    end
+
+    it 'returns empty if user cannot see posts' do
+      expect(@topic.entries_for_feed(nil)).to be_empty
+    end
+
+    it 'returns empty if the topic is locked for the user' do
+      @topic.lock!
+      expect(@topic.entries_for_feed(@student)).to be_empty
+    end
+
+    it 'returns student entries if specified' do
+      @topic.update_attributes(podcast_has_student_posts: true)
+      expect(@topic.entries_for_feed(@student, true)).to match_array([@entry1, @entry2])
+    end
+
+    it 'only returns admin entries if specified' do
+      @topic.update_attributes(podcast_has_student_posts: false)
+      expect(@topic.entries_for_feed(@student, true)).to match_array([@entry1])
+    end
+
+    it 'returns student entries for group discussions even if not specified' do
+      group_category
+      membership = group_with_user(group_category: @group_category, user: @student)
+      @topic = @group.discussion_topics.create(title: "group topic", user: @teacher)
+      @topic.discussion_entries.create(message: "some message", user: @student)
+      @topic.update_attributes(podcast_has_student_posts: false)
+      expect(@topic.entries_for_feed(@student, true)).to_not be_empty
     end
   end
 end

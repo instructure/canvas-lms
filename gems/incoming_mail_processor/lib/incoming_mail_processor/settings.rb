@@ -17,5 +17,5 @@
 #
 
 module IncomingMailProcessor
-  Settings = Struct.new(:run_periodically)
+  Settings = Struct.new(:run_periodically, :workers)
 end
