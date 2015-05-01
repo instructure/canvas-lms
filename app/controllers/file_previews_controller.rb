@@ -80,6 +80,9 @@ class FilePreviewsController < ApplicationController
       # media files
       elsif @file.content_type =~ %r{\A(audio|video)/}
         return render template: 'file_previews/media_preview', layout: false
+      # html files
+      elsif @file.content_type == 'text/html'
+        return redirect_to context_url(@context, :context_file_preview_url, @file.id)
       # no preview available
       else
         @accessed_asset = nil # otherwise it will double-log when they download the file
