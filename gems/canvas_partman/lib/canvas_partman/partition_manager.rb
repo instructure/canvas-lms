@@ -13,6 +13,36 @@ module CanvasPartman
       @base_class = base_class
     end
 
+    # Ensure the current partition, and n future partitions exist
+    #
+    # @param [Fixnum] advance
+    #   The number of partitions to create in advance
+    def ensure_partitions(advance = 1)
+      current = Time.now.utc.send("beginning_of_#{base_class.partitioning_interval.to_s.singularize}")
+      (advance + 1).times do
+        unless partition_exists?(current)
+          create_partition(current)
+        end
+        current += 1.send(base_class.partitioning_interval)
+      end
+    end
+
+    # Prune old partitions
+    #
+    # @param [Fixnum] number_to_keep
+    #   The number of partitions to keep (excluding the current partition)
+    def prune_partitions(number_to_keep = 6)
+      min_to_keep = Time.now.utc.send("beginning_of_#{base_class.partitioning_interval.to_s.singularize}")
+      # on 5/1, we want to drop 10/1
+      # (keeping 11, 12, 1, 2, 3, and 4 - 6 months of data)
+      min_to_keep -= number_to_keep.send(base_class.partitioning_interval)
+
+      partition_tables.each do |table|
+        partition_date = date_from_partition_name(table)
+        base_class.connection.drop_table(table) if partition_date < min_to_keep
+      end
+    end
+
     # Create a new partition table.
     #
     # @param [Hash] options
@@ -47,7 +77,7 @@ module CanvasPartman
           INHERITS (#{master_table});
         SQL
 
-        find_and_load_migrations(master_table).each do |migration|
+        find_and_load_migrations.each do |migration|
           migration.restrict_to_partition(partition_table) do
             migration.migrate(:up)
           end
@@ -55,6 +85,10 @@ module CanvasPartman
 
         partition_table
       end
+    end
+
+    def partition_tables
+      base_class.connection.tables.grep(table_regex)
     end
 
     def partition_exists?(date_or_name)
@@ -75,6 +109,15 @@ module CanvasPartman
 
     protected
 
+    def table_regex
+      @table_regex ||= case base_class.partitioning_interval
+                       when :months
+                         /^#{Regexp.escape(base_class.table_name)}_(?<year>\d{4,})_(?<month>\d{1,2})$/.freeze
+                       when :years
+                         /^#{Regexp.escape(base_class.table_name)}_(?<year>\d{4,})$/.freeze
+                       end
+    end
+
     def generate_name_for_partition(date)
       date_attr = Arel::Attributes::Attribute.new(nil, base_class.partitioning_field)
 
@@ -82,6 +125,12 @@ module CanvasPartman
       attributes[date_attr] = date
 
       base_class.infer_partition_table_name(attributes)
+    end
+
+    def date_from_partition_name(name)
+      match = table_regex.match(name)
+      return nil unless match
+      Time.utc(*match[1..-1])
     end
 
     def generate_date_constraint_range(date)
@@ -104,14 +153,14 @@ module CanvasPartman
       end
     end
 
-    def find_and_load_migrations(master_table)
+    def find_and_load_migrations
       ActiveRecord::Migrator.migrations(CanvasPartman.migrations_path).reduce([]) do |migrations, proxy|
         if proxy.scope == CanvasPartman.migrations_scope
           require(File.expand_path(proxy.filename))
 
           migration_klass = proxy.name.constantize
 
-          if migration_klass.master_table == master_table
+          if migration_klass.base_class == base_class
             migrations << migration_klass.new
           end
         end

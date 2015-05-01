@@ -1,4 +1,4 @@
-class Quizzes::QuizSubmissionEventPartitioner < ActiveRecord::Base
+class Quizzes::QuizSubmissionEventPartitioner
   cattr_accessor :logger
 
   def self.process
@@ -8,29 +8,9 @@ class Quizzes::QuizSubmissionEventPartitioner < ActiveRecord::Base
 
       partman = CanvasPartman::PartitionManager.new(Quizzes::QuizSubmissionEvent)
 
-      [ Time.now.utc, 1.month.from_now(Time.now.utc) ].each do |date|
-        log "Looking for a table for partition #{date.strftime('%Y/%m')}..."
+      partman.ensure_partitions(Setting.get('quiz_events_partitions_precreate_months', 2).to_i)
 
-        if partman.partition_exists?(date)
-          log "\tPartition table exists, nothing to do. [OK]"
-        else
-          log "\tPartition table does not exist, creating..."
-          partition_table_name = partman.create_partition(date)
-          log "\tPartition table created: '#{partition_table_name}'. [OK]"
-        end
-      end
-
-      # on 5/1, we want to drop 10/1
-      # (keeping 11, 12, 1, 2, 3, and 4 - 6 months of data)
-      [ 7.months.ago(Time.now.utc.beginning_of_month) ].each do |date|
-        log "Looking for old partition table (#{date.strftime('%Y/%m')})..."
-
-        if partman.partition_exists?(date)
-          log "\tPartition table exists, dropping..."
-          partman.drop_partition(date)
-          log "\tPartition table dropped. [OK]"
-        end
-      end
+      partman.prune_partitions(Setting.get("quiz_events_partitions_keep_months", 6).to_i)
 
       log 'Done. Bye!'
       log '*' * 80
