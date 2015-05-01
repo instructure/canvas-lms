@@ -16,9 +16,17 @@ HEREDOC
 <a href="#" class="external_link" target="_blank" style="display: none;">&nbsp;</a>
 
 <header class="collaborations-header clearfix">
+  <% if @sunsetting_etherpad && @has_etherpad_collaborations %>
+    <div class="alert"><%= mt <<-HEREDOC, :google_collab_help_url => "http://community.canvaslms.com/docs/DOC-2641"
+Access to the Etherpad collaborations below will be discontinued on August 8, 2015. If you wish to save this content, please migrate this content before this date.
+
+For instructions on how to create a collaboration with Google, [click here](%{google_collab_help_url}).
+HEREDOC
+  %></div>
+  <% end %>
   <h1><%= t 'titles.current', "Current Collaborations" %></h1>
 
-  <% if can_do(@context, @current_user, :create_collaborations) %>
+  <% if can_do(@context, @current_user, :create_collaborations) && !@hide_create_ui %>
     <a role="button" href="#" class="btn add_collaboration_link">
       <i class="icon-add" aria-hidden="true"></i>
       <%= t('links.new', 'Start a new collaboration') %>
@@ -48,7 +56,7 @@ up without having to swap emails.
 HEREDOC
         %></p>
   <% end %>
-  <% if can_do(@context, @current_user, :create_collaborations) %>
+  <% if can_do(@context, @current_user, :create_collaborations) && !@hide_create_ui %>
     <p>
       <%= t :how_to_start_a_new_collaboration, 'To find out more about a particular type of collaboration, click "Start a New Collaboration" and then choose that type in the dropdown list.' %>
     </p>
@@ -97,6 +105,6 @@ HEREDOC
   <% end %>
 <% end %>
 </div>
-<% if can_do(@context, @current_user, :create_collaborations) %>
+<% if can_do(@context, @current_user, :create_collaborations) && !@hide_create_ui %>
   <%= render :partial => 'collaborations/forms' %>
 <% end %>

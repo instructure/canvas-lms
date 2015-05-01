@@ -9,6 +9,7 @@
     <td style="width: 90%;">
       <select id="collaboration_collaboration_type" name="collaboration[collaboration_type]">
         <% Collaboration.collaboration_types.each do |collab_type| %>
+          <% next if collab_type['type'] == 'etherpad' && @sunsetting_etherpad %>
           <% if collab_type['type'] == 'google_docs' %>
             <% if @domain_root_account && feature_and_service_enabled?(:google_docs) %>
               <option value="<%= collab_type['name'] %>"><%= collab_type['name'] %></option>
