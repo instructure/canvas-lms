@@ -54,9 +54,9 @@ define([
 
     render() {
       return (
-        <span className="ConfigureExternalToolButton">
-          <a href="#" ref="btnTriggerModal" role="button" aria-label={I18n.t('Configure %{toolName} App', { toolName: this.props.tool.name })} className="lm" onClick={this.openModal}>
-            <i className="icon-settings btn"></i>
+        <li role="presentation" className="ConfigureExternalToolButton">
+          <a href="#" tabindex="-1" ref="btnTriggerModal" role="menuitem" aria-label={I18n.t('Configure %{toolName} App', { toolName: this.props.tool.name })} className="icon-settings-2" onClick={this.openModal}>
+            {I18n.t('Configure')}
           </a>
           <Modal className="ReactModal__Content--canvas"
             overlayClassName="ReactModal__Overlay--canvas"
@@ -64,7 +64,6 @@ define([
             onRequestClose={this.closeModal}>
 
             <div className="ReactModal__Layout">
-
               <div className="ReactModal__InnerSection ReactModal__Header ReactModal__Header--force-no-corners">
                 <div className="ReactModal__Header-Title">
                   <h4>{I18n.t('Configurate %{tool} App?', {tool: this.props.tool.name})}</h4>
@@ -88,7 +87,7 @@ define([
               </div>
             </div>
           </Modal>
-        </span>
+        </li>
       )
     }
   });

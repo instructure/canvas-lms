@@ -51,9 +51,9 @@ define([
 
     render() {
       return (
-        <span className="DeleteExternalToolButton">
-          <a href="#" ref="btnTriggerDelete" role="button" aria-label={I18n.t('Delete %{toolName} App', { toolName: this.props.tool.name })} className="delete_tool_link lm" onClick={this.openModal}>
-            <i className="icon-trash btn"></i>
+        <li role="presentation" className="DeleteExternalToolButton">
+          <a href="#" tabindex="-1" ref="btnTriggerDelete" role="button" aria-label={I18n.t('Delete %{toolName} App', { toolName: this.props.tool.name })} className="icon-trash" onClick={this.openModal}>
+            {I18n.t('Delete')}
           </a>
           <Modal className="ReactModal__Content--canvas ReactModal__Content--mini-modal"
             overlayClassName="ReactModal__Overlay--canvas"
@@ -86,7 +86,7 @@ define([
               </div>
             </div>
           </Modal>
-        </span>
+        </li>
       )
     }
   });
