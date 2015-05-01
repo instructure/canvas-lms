@@ -1706,13 +1706,12 @@ class Course < ActiveRecord::Base
       e.end_at = end_at
       if e.changed?
         transaction do
-          if connection.adapter_name == 'PostgreSQL' && connection.send(:postgresql_version) < 90300
-            # without this, inserting/updating on enrollments will share lock the course, but then
-            # it tries to touch the course, which will deadlock with another transaction doing the
-            # same thing. on 9.3, it will KEY SHARE lock, which doesn't conflict with the NO KEY
-            # UPDATE needed to touch it
-            self.lock!
-          end
+          lock_type = true
+          lock_type = 'FOR NO KEY UPDATE' if connection.adapter_name == 'PostgreSQL' && connection.send(:postgresql_version) >= 90300
+          # without this, inserting/updating on enrollments will share lock the course, but then
+          # it tries to touch the course, which will deadlock with another transaction doing the
+          # same thing. on 9.3, we need to use "FOR NO KEY UPDATE" instead
+          self.lock!(lock_type)
           if opts[:no_notify]
             e.save_without_broadcasting
           else
