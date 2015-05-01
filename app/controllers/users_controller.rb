@@ -981,7 +981,7 @@ class UsersController < ApplicationController
     @resource_type = 'user_navigation'
 
     success_url = user_profile_url(@current_user)
-    @return_url = external_content_success_url('external_tool_redirect')
+    @return_url = named_context_url(@current_user, :context_external_content_success_url, 'external_tool_redirect', {include_host: true})
     @redirect_return = true
     js_env(:redirect_return_success_url => success_url,
            :redirect_return_cancel_url => success_url)

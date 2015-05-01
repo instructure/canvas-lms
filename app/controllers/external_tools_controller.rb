@@ -321,7 +321,7 @@ class ExternalToolsController < ApplicationController
 
         log_asset_access(@tool, "external_tools", "external_tools")
 
-        @return_url = external_content_success_url('external_tool_redirect')
+        @return_url = named_context_url(@context, :context_external_content_success_url, 'external_tool_redirect', {include_host: true})
         @redirect_return = true
 
         success_url = tool_return_success_url(placement)
@@ -374,12 +374,12 @@ class ExternalToolsController < ApplicationController
 
   def resource_selection
     add_crumb(@context.name, named_context_url(@context, :context_url))
-
-    selection_type = params[:launch_type] || 'resource_selection'
+    placement = params[:placement] || params[:launch_type]
+    selection_type = placement || 'resource_selection'
     selection_type = 'editor_button' if params[:editor]
     selection_type = 'homework_submission' if params[:homework]
 
-    @return_url = external_content_success_url('external_tool_dialog')
+    @return_url = named_context_url(@context, :context_external_content_success_url, 'external_tool_dialog', {include_host: true})
     @headers = false
 
     tool = find_tool(params[:external_tool_id], selection_type)
@@ -477,32 +477,32 @@ class ExternalToolsController < ApplicationController
   # Do an official content-item request as specified: http://www.imsglobal.org/LTI/services/ltiCIv1p0pd/ltiCIv1p0pd.html
   def content_item_selection_request(tool, placement)
     extra_params = {}
-    return_url = external_content_success_url('external_tool_dialog')
+    return_url = named_context_url(@context, :context_external_content_success_url, 'external_tool_dialog', {include_host: true})
 
     # choose accepted return types based on placement
     # todo, make return types configurable at installation?
     case placement
-      when 'migration_selection'
-        accept_media_types = 'application/vnd.ims.imsccv1p1,application/vnd.ims.imsccv1p2,application/vnd.ims.imsccv1p3,application/zip,application/xml'
-        return_url = course_content_migrations_url(@context)
-        accept_presentation_document_targets = 'download'
-        extra_params[:accept_copy_advice] = true
-        extra_params[:ext_content_file_extensions] = 'zip,imscc,mbz,xml'
-      when 'editor_button'
-        accept_media_types = 'image/*,text/html,application/vnd.ims.lti.v1.launch+json,*/*'
-        accept_presentation_document_targets = 'embed,frame,iframe,window'
-      when 'resource_selection'
-        accept_media_types = 'application/vnd.ims.lti.v1.launch+json'
-        accept_presentation_document_targets = 'frame,window'
-      when 'homework_submission'
-        assignment = @context.assignments.active.find(params[:assignment_id])
-        accept_media_types = '*/*'
-        accept_presentation_document_targets = 'none'
-        extra_params[:accept_copy_advice] = true
-        accept_media_types = assignment.allowed_extensions.map{ |ext| MimetypeFu::EXTENSIONS[ext] }.compact.join(',') if assignment.allowed_extensions.present?
-      else
-        # todo: we _could_, if configured, have any other placements return to the content migration page...
-        raise "Content-Item not supported at this placement"
+    when 'migration_selection'
+      accept_media_types = 'application/vnd.ims.imsccv1p1,application/vnd.ims.imsccv1p2,application/vnd.ims.imsccv1p3,application/zip,application/xml'
+      return_url = course_content_migrations_url(@context)
+      accept_presentation_document_targets = 'download'
+      extra_params[:accept_copy_advice] = true
+      extra_params[:ext_content_file_extensions] = 'zip,imscc,mbz,xml'
+    when 'editor_button'
+      accept_media_types = 'image/*,text/html,application/vnd.ims.lti.v1.launch+json,*/*'
+      accept_presentation_document_targets = 'embed,frame,iframe,window'
+    when 'resource_selection', 'link_selection', 'assignment_selection'
+      accept_media_types = 'application/vnd.ims.lti.v1.launch+json'
+      accept_presentation_document_targets = 'frame,window'
+    when 'homework_submission'
+      assignment = @context.assignments.active.find(params[:assignment_id])
+      accept_media_types = '*/*'
+      accept_presentation_document_targets = 'none'
+      extra_params[:accept_copy_advice] = true
+      accept_media_types = assignment.allowed_extensions.map { |ext| MimetypeFu::EXTENSIONS[ext] }.compact.join(',') if assignment.allowed_extensions.present?
+    else
+      # todo: we _could_, if configured, have any other placements return to the content migration page...
+      raise "Content-Item not supported at this placement"
     end
 
     params = default_lti_params.merge({

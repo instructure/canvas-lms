@@ -221,6 +221,7 @@ class ApplicationController < ActionController::Base
     end
     self.send name, *opts
   end
+  helper_method :named_context_url
 
   protected
 
@@ -1256,7 +1257,7 @@ class ApplicationController < ActionController::Base
           @lti_launch.launch_type = 'window'
           @return_url = success_url
         else
-          @return_url = external_content_success_url('external_tool_redirect')
+          @return_url = named_context_url(@context, :context_external_content_success_url, 'external_tool_redirect')
           @redirect_return = true
           js_env(:redirect_return_success_url => success_url,
                  :redirect_return_cancel_url => success_url)

@@ -300,7 +300,7 @@
       <% end %>
       <% if equella_enabled? %>
         <a id="equella_endpoint_url" href="<%= @equella_settings.endpoint %>">&nbsp;</a>
-        <a id="equella_callback_url" href="<%= external_content_success_url('equella') %>">&nbsp;</a>
+        <a id="equella_callback_url" href="<%= named_context_url(@context, :context_external_content_success_url, 'equella') %>">&nbsp;</a>
         <a id="equella_cancel_url" href="<%= external_content_cancel_url('equella') %>">&nbsp;</a>
         <a id="equella_action" href="<%= @equella_settings.default_action %>">&nbsp;</a>
         <% if @equella_settings.teaser %>

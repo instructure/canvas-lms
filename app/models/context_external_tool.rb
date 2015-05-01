@@ -47,10 +47,10 @@ class ContextExternalTool < ActiveRecord::Base
     :editor_button, :homework_submission, :migration_selection, :course_home_sub_navigation,
     :course_settings_sub_navigation, :global_navigation,
     :assignment_menu, :file_menu, :discussion_topic_menu, :module_menu, :quiz_menu, :wiki_page_menu,
-    :tool_configuration
-  ]
+    :tool_configuration, :link_selection, :assignment_selection
+  ].freeze
 
-  CUSTOM_EXTENSION_KEYS = {:file_menu => [:accept_media_types]}
+  CUSTOM_EXTENSION_KEYS = {:file_menu => [:accept_media_types].freeze}.freeze
 
   EXTENSION_TYPES.each do |type|
     class_eval <<-RUBY, __FILE__, __LINE__ + 1

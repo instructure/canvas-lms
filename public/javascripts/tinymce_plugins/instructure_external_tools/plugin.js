@@ -71,7 +71,7 @@ define([
     },
 
     /**
-     * convert the button clump configuration to 
+     * convert the button clump configuration to
      * an associative array where the key is an image tag
      * with the name and the value is the thing to do
      * when that button gets clicked.  This gives us
@@ -166,59 +166,44 @@ define([
             })
         }
         $(window).unbind("externalContentReady");
-        $(window).bind("externalContentReady", function(event, data){
+        $(window).bind("externalContentReady", function (event, data) {
           var editor = $dialog.data('editor') || ed;
-          if(data.return_type == 'lti_launch_url') {
-            if($("#external_tool_retrieve_url").attr('href')) {
-              var external_url = $.replaceTags($("#external_tool_retrieve_url").attr('href'), 'url', data.url);
-              $("#" + ed.id).editorBox('create_link', {
-                url: external_url,
-                title: data.title,
-                text: data.text
-              });
-            } else {
-              console.log("cannot embed basic lti links in this context");
-            }
-          } else if(data.return_type == 'image_url') {
-            var html = $("<div/>").append($("<img/>", {
-              src: data.url,
-              alt: data.alt
-            }).css({
-              width: data.width,
-              height: data.height
-            })).html();
-            $("#" + editor.id).editorBox('insert_code', html);
-          } else if(data.return_type == 'url') {
-            $("#" + editor.id).editorBox('create_link', {
-              url: data.url,
-              title: data.title,
-              text: data.text,
-              target: data.target == '_blank' ? '_blank' : null
-            });
-          } else if(data.return_type == 'file') {
-            $("#" + editor.id).editorBox('create_link', {
-              url: data.url,
-              title: data.filename,
-              text: data.filename
-            });
-          } else if(data.return_type == 'iframe') {
+          var item = data.contentItems[0];
+          var placementAdvice = item.placementAdvice;
+          var presentationDocTarget = placementAdvice.presentationDocumentTarget;
+          var url = item.mediaType === 'application/vnd.ims.lti.v1.launch+json' ? item.canvasURL : item.url
+          if (presentationDocTarget === 'iframe') {
             var html = $("<div/>").append($("<iframe/>", {
-              src: data.url,
-              title: data.title,
-              allowfullscreen: "true",
-              webkitallowfullscreen: "true",
-              mozallowfullscreen: "true"
+              src: url,
+              title: item.title,
+              allowfullscreen: 'true',
+              webkitallowfullscreen: 'true',
+              mozallowfullscreen: 'true'
             }).css({
-              width: data.width,
-              height: data.height
+              width: placementAdvice.displayWidth,
+              height: placementAdvice.displayHeight
             })).html();
             $("#" + editor.id).editorBox('insert_code', html);
-          } else if(data.return_type == 'rich_content') {
-            $("#" + editor.id).editorBox('insert_code', data.html);
-          } else if(data.return_type == 'error' && data.message) {
-            alert(data.message);
-          } else {
-            console.log("unrecognized embed type: " + data.return_type);
+          } else if (presentationDocTarget === 'embed') {
+            if (item.mediaType && item.mediaType.indexOf('image') == 0) {
+              var html = $("<div/>").append($("<img/>", {
+                src: url,
+                alt: item.text
+              }).css({
+                width: placementAdvice.displayWidth,
+                height: placementAdvice.displayHeight
+              })).html();
+              $("#" + editor.id).editorBox('insert_code', html);
+            } else {
+              $("#" + editor.id).editorBox('insert_code', item.text);
+            }
+          } else { //create a link to the content
+            $("#" + editor.id).editorBox('create_link', {
+              url: url,
+              title: item.title,
+              text: item.text,
+              target: placementAdvice.presentationDocumentTarget == 'window' ? '_blank' : null
+            });
           }
           $dialog.find('iframe').attr('src', 'about:blank');
           $dialog.dialog('close')
