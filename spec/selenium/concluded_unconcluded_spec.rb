@@ -50,7 +50,7 @@ describe "concluded/unconcluded" do
     expect(entry).to be_displayed
     driver.execute_script("$('.slick-cell.l2.r2').mouseover();")
     entry.find_element(:css, ".gradebook-cell-comment").click
-    wait_for_animations
+    wait_for_ajaximations
     expect(f(".submission_details_dialog")).to be_displayed
     expect(f(".submission_details_dialog #add_a_comment")).to be_displayed
   end
