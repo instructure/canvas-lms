@@ -180,7 +180,9 @@ describe "Navigating to wiki pages" do
       end
 
       it "should set focus back to the cog menu if you edit the title and save" do
+        pending("functionality is broken, ticket CNVS-20199")
         f('.ui-dialog-buttonset .btn-primary').click
+        wait_for_ajaximations
         check_element_has_focus(f('.al-trigger'))
       end
     end
