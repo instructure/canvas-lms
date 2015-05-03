@@ -52,6 +52,7 @@ zh_Hant:
   _section_not_synced_yet_cd07d0dd: "-- 章節尚未同步"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: 此計算方法未使用計算值
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "一個名為 %{itemName} 的檔案已存在此文件夾之中。"
+  a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: 匯報用戶用於處理大量有趣環境信息的一個快捷鍵/定值傾印
   a_message_is_required_129e1814: 需要訊息
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: 一個包含評分配置名稱與編輯或刪除該配置之圖示的表格。
   a_table_that_contains_the_grading_scheme_data_each_d461c205: 一個包含評分配置數據的表格。每一行均包含一個名稱、一個最大百分比以及一個最小百分比。此外，每一行均包含一個用於在下方添加新的一行的圖示以及一個用於刪除當前行的圖示。
@@ -1495,6 +1496,7 @@ zh_Hant:
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: 是否確定要刪除此宣告？
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: 是否確定要刪除此評分時段？
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: 是否確定要刪除此評分配置？
+  are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: 您確定要刪除此評分時段嗎？
   are_you_sure_you_want_to_remove_this_tool_7363f90b: 是否確定要移除此工具？
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: 您確定要報告該個人檔案圖片嗎？
   aria_labels: 
@@ -2881,6 +2883,14 @@ zh_Hant:
       started_by: "由 *%{user}* 開始於 %{at}"
       titles: 
         current: 當前協作
+    show: 
+      error_cause_1: "創立者的 Google Drive 帳戶不同於用於創建協作的帳戶。"
+      error_cause_2: 該協作的創立者不再是該谷歌文件的一位作者。
+      error_summary: 看起來該協作行不通。可能的原因是：
+      error_title: "Google Drive 協作錯誤"
+      headings: 
+        page: "Google Drive 協作錯誤"
+      resolution: 聯繫創立者并讓他們知道。
     titles: 
       delete: 刪除協作？
   collapse_list_of_group_members_for_groupname_d6c66fa0: "收起 %{groupName} 群組成員列表"
@@ -5091,6 +5101,7 @@ zh_Hant:
       new_quiz: 新測驗
     edit_crumb: 編輯
     edit_view: 
+      allow_liking: 讓喜歡
       allow_threaded_replies: 允許執行緒回復
       attachment: 附件
       available_from: 自…可用
@@ -5101,6 +5112,7 @@ zh_Hant:
       delay_posting: 延遲公佈
       enable_podcast_feed: 啟用播客摘要
       include_replies_in_podcast_feed: 包含學生在播客評論中的回復
+      only_graders_can_like: 僅評分者能喜歡
       only_visible_to_overrides_note: 注意：*僅*以下指定的章節可見此討論：
       options: 選項
       page_header_title: 新討論
@@ -5108,6 +5120,7 @@ zh_Hant:
       post_at: 公佈於
       save: 儲存
       saving: 正在儲存...
+      sort_by_likes: 按喜好分類
       topic_title: 主題標題
       until: 直到
       use_for_grading: 已評分
@@ -5268,6 +5281,7 @@ zh_Hant:
       edited_comment: "由 *%{editor.display_name}* 於 %{edited_at} 編輯"
       go_to_parent: 移至上層
       go_to_topic: 移至主題
+      like_entry: 喜歡輸入項目
       manage_discussion_entry: 管理討論輸入項目
       open_in_speedgrader: "在 SpeedGrader 中開啟"
       unknown_author: ">未知作者"
@@ -5276,6 +5290,9 @@ zh_Hant:
       show_more: 顯示更多
     hide_due_dates: 隱藏截止日期
     initial_post_required_to_subscribe: 訂閱之前必須先公佈回覆
+    like_count: 
+      one: "(%{count} 個喜歡)"
+      other: "(%{count} 個喜歡)"
     mark_as_read: 標記為已讀取
     mark_as_unread: 標記為未讀取
     no_content: 無內容
@@ -5451,6 +5468,7 @@ zh_Hant:
   ember_modules_description: "在 Ember 中重寫的模組。使用本機拖放 API，允許從外部位置拖曳。"
   enable_6f5d1328: 啟用
   enable_gradebook_list_students_by_sortable_name: 將學生按其各自可排序姓名列入成績冊。可排序姓名預設為‘姓氏，名字’，而且可以在設定中進行更改。
+  enable_multiple_grading_periods: 多重評分時段讓教師和管理員能夠用設定的截止日期來創建評分時段。任務能夠按成績冊中的這些評分時段加以過濾。
   end_date_e0093ed7: 結束日期
   ends_on_date_320e0c26: 結束日期
   enrollment: 
@@ -5846,6 +5864,7 @@ zh_Hant:
       remove_feed: "移除 %{display_name}"
   external_integration_keys_8b4f4548: 外部整合金鑰
   external_tool_c5a6410a: 外部工具
+  external_tool_url_cannot_be_left_blank_a34b6bb2: "外部工具 URL 無法留空白"
   external_tools: 
     account_navigation_configured: 帐户瀏覽已設定
     app_full_view: 
@@ -5997,6 +6016,7 @@ zh_Hant:
     quiz_log_auditing: 測驗記錄稽核
     student_groups: 新學生群組頁面
     student_outcome_gradebook: 學生學習精通成績冊
+  field_name_31fff38e: 欄位名稱
   file_list_updated_38e2a5ad: 檔案清單已更新
   file_not_found_9eec054c: 檔案未找到
   file_preview: 
@@ -7229,6 +7249,7 @@ zh_Hant:
       submit: "儲存 %{model}"
       update: "更新 %{model}"
   here_are_your_assignments_listed_by_due_date_7d8e98e6: 這是您的任務，已按截止日期列表。
+  here_f44564ee: 這裡。
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: 這是一個非常好的機會，讓您能夠了解月曆并將您可能有的任何非任務事件添加到課程之中。請勿擔心，我們將全程幫助您。
   hidden_available_with_a_link_click_to_modify_184990e7: "已隱藏。通過一個連結可用 — 點擊進行修改"
   hidden_files_inside_will_be_available_with_links_9bdf702b: 通過連結可獲取裡面隱藏的文件。
@@ -7256,6 +7277,7 @@ zh_Hant:
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "如啟用，用戶將能夠對 LTI 2工具進行配置。"
   if_you_change_an_assignment_s_points_possible_you__25a0edad: 如果您更改一項任務的分數，有可能您必須對該任務重新進行評分。
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: 如果您現在不選擇使用權，那麼該檔案在其上傳之後將被撤銷發佈。
+  if_you_enable_this_feature_be_sure_that_your_sales_566967e6: 若您啟用此功能，請確保您的銷售人員帳戶用表格中左欄中的名稱準確添加了這些自定義欄位
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: 如果您離開，目前正在準備進行的壓縮檔案下載將取消。
   if_you_ve_been_using_another_course_management_sys_67edfab1: "如果您已經使用了其他的課程管理系統，其中可能有您想移動至 Canvas 的資料。我們可以引導您輕鬆遷移您的內容到 Canvas 的過程。"
   ignore_91750df8: 忽略
@@ -7320,6 +7342,7 @@ zh_Hant:
   instructions: 
     authorize_google_docs: "在可以協作處理文件之前，需要授權 Canvas 存取您的 Google Docs 帳戶："
     authorize_google_drive: "您需要授權 Canvas 存取您的 Google Drive 帳戶，然後才能在文件上進行協作："
+  instructions_2f88ee72: 說明
   instructors_4b491a07: 導師
   instructure: 
     alerts: 
@@ -7711,6 +7734,7 @@ zh_Hant:
     track_uploaded_successfully: 音軌已成功上傳，請刷新瀏覽器。
     upload: 上傳
     uploading: 正在上傳...
+  media_has_been_queued_for_conversion_please_try_ag_74343bbd: 媒體已佇列等候轉換，請稍後重試。
   media_recordings_749aef6d: 媒體記錄
   median_score_4657e907: "中值：%{score}"
   meets_mastery_754e1c06: 達到精通
@@ -10329,6 +10353,17 @@ zh_Hant:
     kaltura_settings: 
       account_settings: "這些值可以在『設定 - >集成設定』下的 Kaltura 管理主控台中找到"
       cache_explanation: "空白表示快取無限期，0 表示不快取。"
+      description: |-
+          您将需要一个帐户，該帳戶要么在[Kaltura.com](%{kaltura_url})，
+          要么带有 Kaltura 的一个自我托管執行個體。
+          
+          **備註：** 一旦您在 Canvas 系統內對
+          您需要前往 Kaltura 管理主控臺并在 “Settings ->
+          Integration Settings” 項下啟用帶有如下通知 URL 的伺服器通知：
+          
+          %{notification_url}
+          
+          然後在 “已按伺服器發送” 欄中核對 “添加輸入項目” 和 “刪除輸入項目” 的方塊。
       headers: 
         account_settings: 帳戶設定
         canvas_settings: "Canvas 設定"
@@ -11397,6 +11432,8 @@ zh_Hant:
       no_quizzes: 沒有可用的測驗
     notices: 
       message_sent: 郵件已傳送！
+    question: 
+      positive_points: 必須為零或更大
     question_colon: 問題：
     question_count: 
       one: "%{count} 個問題"
