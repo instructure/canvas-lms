@@ -49,6 +49,7 @@ define [
         cannotDelete: -> false
         onDeleteGradingPeriod: ->
         updateGradingPeriodCollection: ->
+        isOverlapping: ->
       @gradingPeriod = TestUtils.renderIntoDocument(GradingPeriod(@props))
       @server.respond()
     teardown: ->
@@ -68,7 +69,7 @@ define [
     deepEqual @gradingPeriod.state.endDate, @props.endDate
     deepEqual @gradingPeriod.state.weight, @props.weight
     deepEqual @gradingPeriod.state.permissions, @props.permissions
-    deepEqual @gradingPeriod.state.shouldUpdateBeDisabled, true
+    ok @gradingPeriod.state.shouldUpdateBeDisabled
 
   test 'handleDateChange changes the state of the respective date passed in', ->
     startDateInput = @gradingPeriod.refs.startDate.getDOMNode()
@@ -104,57 +105,59 @@ define [
       end_date: @gradingPeriod.state.endDate
     deepEqual @gradingPeriod.formatDataForSubmission(), expectedOutput
 
-  test 'isStartDateBeforeEndDate returns true if the start date is before the end date', ->
-    deepEqual @gradingPeriod.isStartDateBeforeEndDate(), true
+  test 'isEndDateBeforeStartDate returns true if the end date is before the start date', ->
+    @gradingPeriod.setState({startDate: new Date("2015-01-30T00:00:00Z")})
+    @gradingPeriod.setState({endDate:   new Date("2015-01-01T00:00:00Z")})
+    ok @gradingPeriod.isEndDateBeforeStartDate()
 
-  test 'isStartDateBeforeEndDate returns false if the start date is equal to the end date', ->
+  test 'isEndDateBeforeStartDate returns false if the start date is equal to the end date', ->
     @gradingPeriod.setState({startDate: @gradingPeriod.state.endDate})
-    deepEqual @gradingPeriod.isStartDateBeforeEndDate(), false
+    ok !@gradingPeriod.isEndDateBeforeStartDate()
 
-  test 'isStartDateBeforeEndDate returns false if the start date is after the end date', ->
-    startDate = new Date("2020-06-01T00:00:00Z")
-    @gradingPeriod.setState({startDate: startDate})
-    deepEqual @gradingPeriod.isStartDateBeforeEndDate(), false
+  test 'isEndDateBeforeStartDate returns false if the end date is after the start date', ->
+    @gradingPeriod.setState({startDate: new Date("2015-01-01T00:00:00Z")})
+    @gradingPeriod.setState({endDate:   new Date("2015-01-30T00:00:00Z")})
+    ok !@gradingPeriod.isEndDateBeforeStartDate()
 
   test 'isNewGradingPeriod returns false if the id does not contain "new"', ->
-    deepEqual @gradingPeriod.isNewGradingPeriod(), false
+    ok !@gradingPeriod.isNewGradingPeriod()
 
   test 'isNewGradingPeriod returns true if the id contains "new"', ->
     @gradingPeriod.setState({id: "new1"})
-    deepEqual @gradingPeriod.isNewGradingPeriod(), true
+    ok @gradingPeriod.isNewGradingPeriod()
 
   test 'setUpdateButtonState sets shouldUpdateBeDisabled to false if the form is complete', ->
     @sandbox.stub(@gradingPeriod, 'formIsComplete', -> true)
-    deepEqual @gradingPeriod.state.shouldUpdateBeDisabled, true
+    ok @gradingPeriod.state.shouldUpdateBeDisabled
     @gradingPeriod.setUpdateButtonState()
-    deepEqual @gradingPeriod.state.shouldUpdateBeDisabled, false
+    ok !@gradingPeriod.state.shouldUpdateBeDisabled
 
   test 'setUpdateButtonState sets shouldUpdateBeDisabled to true if the form is not complete', ->
     @sandbox.stub(@gradingPeriod, 'formIsComplete', -> false)
     @gradingPeriod.setState({shouldUpdateBeDisabled: false})
     @gradingPeriod.setUpdateButtonState()
-    deepEqual @gradingPeriod.state.shouldUpdateBeDisabled, true
+    ok @gradingPeriod.state.shouldUpdateBeDisabled
 
   test 'formIsComplete returns true if title, startDate, and endDate are all non-blank', ->
-    deepEqual @gradingPeriod.formIsComplete(), true
+    ok @gradingPeriod.formIsComplete()
 
   test 'formIsComplete returns false if the title is blank, or only spaces', ->
     @gradingPeriod.setState({title: ""})
-    deepEqual @gradingPeriod.formIsComplete(), false
+    ok !@gradingPeriod.formIsComplete()
     @gradingPeriod.setState({title: "            "})
-    deepEqual @gradingPeriod.formIsComplete(), false
+    ok !@gradingPeriod.formIsComplete()
 
   test 'formIsComplete returns false if the startDate is not a valid date', ->
     @gradingPeriod.setState({startDate: new Date("i love lamp")})
-    deepEqual @gradingPeriod.formIsComplete(), false
+    ok !@gradingPeriod.formIsComplete()
     @gradingPeriod.setState({startDate: new Date("2010-15-28T00:00:00Z")})
-    deepEqual @gradingPeriod.formIsComplete(), false
+    ok !@gradingPeriod.formIsComplete()
 
   test 'formIsComplete returns false if the endDate is not a valid date', ->
     @gradingPeriod.setState({endDate: new Date("big gulps, huh?")})
-    deepEqual @gradingPeriod.formIsComplete(), false
+    ok !@gradingPeriod.formIsComplete()
     @gradingPeriod.setState({endDate: new Date("2030-15-28T00:00:00Z")})
-    deepEqual @gradingPeriod.formIsComplete(), false
+    ok !@gradingPeriod.formIsComplete()
 
   test 'handleTitleChange changes the title state', ->
     fakeEvent = { target: { name: "title", value: "MXP: Most Xtreme Primate" } }
@@ -184,33 +187,33 @@ define [
     ok deletePeriod.calledOnce
 
   test 'saveGradingPeriod makes an AJAX call if the start date is before the end date', ->
-    @sandbox.stub(@gradingPeriod, 'isStartDateBeforeEndDate', -> true)
+    @sandbox.stub(@gradingPeriod, 'isEndDateBeforeStartDate', -> false)
     ajax = @sandbox.spy($, 'ajax')
     @gradingPeriod.saveGradingPeriod()
     ok ajax.calledOnce
 
   test 'saveGradingPeriod does not make an AJAX call if the start date is not before the end date', ->
-    @sandbox.stub(@gradingPeriod, 'isStartDateBeforeEndDate', -> false)
+    @sandbox.stub(@gradingPeriod, 'isEndDateBeforeStartDate', -> true)
     ajax = @sandbox.spy($, 'ajax')
     @gradingPeriod.saveGradingPeriod()
     ok ajax.notCalled
 
   test 'saveGradingPeriod should re-assign the id if the period is new', ->
-    @sandbox.stub(@gradingPeriod, 'isStartDateBeforeEndDate', -> true)
+    @sandbox.stub(@gradingPeriod, 'isEndDateBeforeStartDate', -> false)
     @gradingPeriod.setState({id: "new1"})
     @gradingPeriod.saveGradingPeriod()
     @server.respond()
     deepEqual @gradingPeriod.state.id, '3'
 
   test 'saveGradingPeriod should not re-assign the id if the period is not new', ->
-    @sandbox.stub(@gradingPeriod, 'isStartDateBeforeEndDate', -> true)
+    @sandbox.stub(@gradingPeriod, 'isEndDateBeforeStartDate', -> false)
     idBeforeSaving = @gradingPeriod.state.id
     @gradingPeriod.saveGradingPeriod()
     @server.respond()
     deepEqual @gradingPeriod.state.id, idBeforeSaving
 
   test 'saveGradingPeriod calls updateGradingPeriodCollection for new periods', ->
-    @sandbox.stub(@gradingPeriod, 'isStartDateBeforeEndDate', -> true)
+    @sandbox.stub(@gradingPeriod, 'isEndDateBeforeStartDate', -> false)
     update = @sandbox.stub(@gradingPeriod.props, 'updateGradingPeriodCollection')
     @gradingPeriod.setState({id: "new1"})
     @gradingPeriod.saveGradingPeriod()
@@ -218,8 +221,23 @@ define [
     ok update.calledOnce
 
   test 'saveGradingPeriod calls updateGradingPeriodCollection for existing periods', ->
-    @sandbox.stub(@gradingPeriod, 'isStartDateBeforeEndDate', -> true)
+    @sandbox.stub(@gradingPeriod, 'isEndDateBeforeStartDate', -> false)
     update = @sandbox.stub(@gradingPeriod.props, 'updateGradingPeriodCollection')
     @gradingPeriod.saveGradingPeriod()
     @server.respond()
     ok update.calledOnce
+
+  test 'saveGradingPeriod calls isOverlapping', ->
+    overlapping = @sandbox.stub(@gradingPeriod.props, 'isOverlapping')
+    @gradingPeriod.saveGradingPeriod()
+    @server.respond()
+    ok overlapping.calledOnce
+
+  test 'saveGradingPeriod no ajax call if overlapping grading periods', ->
+    overlapping = @sandbox.stub(@gradingPeriod.props, 'isOverlapping', -> true)
+    ajax = @sandbox.stub($, 'ajax')
+    flashError = @sandbox.spy($, 'flashError')
+    @gradingPeriod.saveGradingPeriod()
+    @server.respond()
+    ok ajax.notCalled
+    ok flashError.calledOnce

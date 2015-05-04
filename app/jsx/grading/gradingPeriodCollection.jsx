@@ -14,8 +14,12 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
   var update = React.addons.update;
   var GradingPeriodCollection = React.createClass({
 
+    propTypes: {
+      // no props
+    },
+
     getInitialState: function() {
-      return {periods: null, needsToCopy: false, disabled: false};
+      return { periods: null, needsToCopy: false, disabled: false };
     },
 
     componentWillMount: function() {
@@ -144,6 +148,18 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
       return _.find(this.state.periods, period => period.id === id);
     },
 
+    isOverlapping: function(id) {
+      var newGradingPeriod = this.getPeriodById(id);
+      var existingGradingPeriods = _.reject(this.state.periods, p => (p.id === id));
+      return _.any(existingGradingPeriods, function(gradingPeriod) {
+        // http://c2.com/cgi/wiki?TestIfDateRangesOverlap
+        return (
+          newGradingPeriod.startDate <= gradingPeriod.endDate &&
+          gradingPeriod.startDate <= newGradingPeriod.endDate
+        );
+      });
+    },
+
     updateGradingPeriodCollection: function(updatedGradingPeriod, permissions, previousStateId) {
       if (this.state.needsToCopy && previousStateId) {
         var periodsToCopy = _.reject(this.state.periods, p => (p.id === previousStateId) || isNaN(p.id));
@@ -183,7 +199,7 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
                                endDate={period.endDate} weight={period.weight} permissions={period.permissions}
                                onDeleteGradingPeriod={this.deleteGradingPeriod} cannotDelete={this.cannotDeleteLastPeriod}
                                updateGradingPeriodCollection={this.updateGradingPeriodCollection}
-                               disabled={this.state.disabled}/>);
+                               disabled={this.state.disabled} isOverlapping={this.isOverlapping}/>);
       });
     },
 

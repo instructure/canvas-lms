@@ -88,12 +88,25 @@ function(React, $, I18n, _) {
       dateRef.getDOMNode().value = this.formatDateForDisplay(date);
     },
 
-    saveGradingPeriod: function () {
-      if (this.isStartDateBeforeEndDate()) {
-        var isNewGradingPeriod = this.isNewGradingPeriod();
-        var requestType = (!isNewGradingPeriod && this.props.permissions.manage) ? 'PUT' : 'POST';
-        var url = ENV.GRADING_PERIODS_URL + ((!isNewGradingPeriod && this.props.permissions.manage) ? ('/' + this.state.id) : '');
-        var self = this;
+    saveGradingPeriod: function() {
+      var self = this;
+      var url = ENV.GRADING_PERIODS_URL;
+      var requestType;
+
+      if (this.isEndDateBeforeStartDate()) {
+        var message = I18n.t('Start date must be before end date');
+        $('#period_start_date_' + this.state.id).errorBox(message);
+      } else if (this.props.isOverlapping(this.state.id)) {
+        var message = I18n.t('This Grading Period overlaps');
+        $.flashError(message);
+      } else {
+        if (!this.isNewGradingPeriod() && this.props.permissions.manage) {
+          requestType = 'PUT';
+          url = url + '/' + this.state.id;
+        } else {
+          requestType = 'POST';
+        }
+
         $('#period_start_date_' + this.state.id).hideErrors();
 
         $.ajax({
@@ -115,7 +128,6 @@ function(React, $, I18n, _) {
                   startDate: new Date(updatedGradingPeriod.start_date),
                   endDate: new Date(updatedGradingPeriod.end_date)
                 };
-
               self.setState(newState, function () {
                  self.props.updateGradingPeriodCollection(self.state, updatedGradingPeriod.permissions, oldId);
               });
@@ -129,14 +141,11 @@ function(React, $, I18n, _) {
           .error(function (error) {
             $.flashError(I18n.t('There was a problem saving the grading period'));
           });
-      } else {
-        var message = I18n.t('Start date must be before end date');
-        $('#period_start_date_' + this.state.id).errorBox(message);
       }
     },
 
-    isStartDateBeforeEndDate: function() {
-      return this.state.startDate < this.state.endDate;
+    isEndDateBeforeStartDate: function() {
+      return this.state.startDate > this.state.endDate;
     },
 
     isNewGradingPeriod: function() {
