@@ -1,7 +1,7 @@
 @import "base/environment";
 
-#wrapper-container {
-  min-width: 1150px;
+@if $use_new_styles == false {
+  #wrapper-container { min-width: 1150px; }
 }
 
 .scheduler-mode {
