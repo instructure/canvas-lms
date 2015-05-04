@@ -164,6 +164,9 @@ define [
         showInline(id)
 
     show: (id, mediaType) ->
+      # if a media comment is still open, close it.
+      $(".play_media_comment").find('.ui-dialog-titlebar-close').click()
+
       $this = $(this)
 
       if dialog = $this.data('media_comment_dialog')
@@ -183,12 +186,18 @@ define [
         $dialog.css('padding-top', '120px') if mediaType is 'audio'
 
         $dialog.dialog
+          dialogClass: "play_media_comment"
           title: I18n.t('titles.play_comment', "Play Media Comment")
           width: width
           height: height
           modal: false
           resizable: false
-          close: -> $this.data('mediaelementplayer').pause()
+          close: ->
+            $mediaPlayer = $this.data('mediaelementplayer')
+            $mediaPlayer.pause() if $mediaPlayer
+          open: (ev) -> $(ev.currentTarget).parent()
+                          .find('.ui-dialog-titlebar-close')
+                          .focus()
 
         # Populate dialog box with a video
         $dialog.disableWhileLoading getSourcesAndTracks(id).done (sourcesAndTracks) ->
