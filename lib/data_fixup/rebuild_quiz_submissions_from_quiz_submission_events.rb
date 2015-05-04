@@ -3,14 +3,14 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
     submission = Submission.find(submission_id)
 
     # Run build script
-    quiz_submission = build_new_submission_from_quiz_sub_events(submission)
+    quiz_submission = build_new_submission_from_quiz_submission_events(submission)
 
     # save the result
     quiz_submission.save_with_versioning!
   end
 
   private
-    def grade_with_new_submission_data(qs, finished_at, submission_data=nil)
+    def self.grade_with_new_submission_data(qs, finished_at, submission_data=nil)
       qs.manually_scored = false
       tally = 0
       submission_data ||= qs.submission_data
@@ -35,7 +35,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
       qs
     end
 
-    def build_new_submission_from_quiz_sub_events(submission)
+    def self.build_new_submission_from_quiz_submission_events(submission)
       if submission.submission_type != "online_quiz"
         $stderr.puts "Skipping because this isn't a quiz!\tsubmission_id: #{submission.id}"
         return false
