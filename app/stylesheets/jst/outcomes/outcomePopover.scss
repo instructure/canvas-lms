@@ -113,7 +113,11 @@
     background-color: $ic-color-neutral;
     margin-bottom: 0px;
     margin-top: 10px;
-    div {
+    dt {
+      width: 140px;
+    }
+    dd {
+      margin-left: 160px;
       padding-bottom: 10px;
     }
     span {
@@ -123,12 +127,6 @@
     .example {
       color: $grayLight;
       font-size: $fontSizeSmall;
-    }
-    .left-content {
-      float: left;
-    }
-    .right-content {
-      padding-left: 10px;
     }
     .method-description {
       width: 320px;
