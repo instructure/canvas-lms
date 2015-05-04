@@ -511,16 +511,18 @@ class SubmissionsController < ApplicationController
 
     # process the file and create an attachment
     filename = "google_doc_#{Time.now.strftime("%Y%m%d%H%M%S")}#{@current_user.id}.#{file_extension}"
-    path     = File.join("tmp", filename)
-    File.open(path, 'wb') do |f|
-      f.write(document_response.body)
-    end
+    Dir.mktmpdir do |dirname|
+      path     = File.join(dirname, filename)
+      File.open(path, 'wb') do |f|
+        f.write(document_response.body)
+      end
 
-    @attachment = @assignment.attachments.new(
-      uploaded_data: Rack::Test::UploadedFile.new(path, document_response.content_type, true),
-      display_name: display_name, user: @current_user
-    )
-    @attachment.save!
+      @attachment = @assignment.attachments.new(
+        uploaded_data: Rack::Test::UploadedFile.new(path, document_response.content_type, true),
+        display_name: display_name, user: @current_user
+      )
+      @attachment.save!
+    end
     @attachment
   end
   protected :submit_google_doc
