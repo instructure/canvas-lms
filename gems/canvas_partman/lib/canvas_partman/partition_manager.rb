@@ -3,7 +3,7 @@ module CanvasPartman
     attr_reader :base_class
 
     def initialize(base_class)
-      unless base_class.respond_to?(:partitioned?)
+      unless base_class < Concerns::Partitioned
         raise ArgumentError.new <<-ERROR
           PartitionManager can only work on models that are Partitioned.
           See CanvasPartman::Concerns::Partitioned.
