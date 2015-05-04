@@ -1,8 +1,33 @@
 <h1 class="screenreader-only">{{#t "progression_header"}}Module Progression{{/t}}</h1>
-<div class="row-fluid">
-  <div id="progression_modules" class="span9" aria-busy="true" aria-live="polite" aria-relevant="additions" aria-atomic="false">
+<div
+  {{#if ENV.use_new_styles}}
+    class="module-progress-view"
+  {{else}}
+    class="row-fluid"
+  {{/if}}
+>
+  <div
+    {{#if ENV.use_new_styles}}
+      class="module-progress-view__modules"
+    {{else}}
+      class="span9"
+    {{/if}}
+    id="progression_modules"
+    aria-busy="true"
+    aria-live="polite"
+    aria-relevant="additions" 
+    aria-atomic="false"
+  >
   </div>
-  <div id="progression_students" class="span3" aria-busy="true">
+  <div
+    {{#if ENV.use_new_styles}}
+      class="module-progress-view__students"
+    {{else}}
+      class="span3"
+    {{/if}}
+    id="progression_students"
+    aria-busy="true"
+  >
     <div class="header">
       <h3>{{#t "student_progress"}}Student Progress{{/t}}</h3>
       <a title="{{#t "back_to_modules"}}Back to Modules Page{{/t}}" href="{{ modules_url }}">

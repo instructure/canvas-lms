@@ -561,9 +561,9 @@ body.ie {
 }
 
 @media screen and (max-width: 1024px) {
-  .with-left-side.modules {
-    min-width: 700px;
-  }
+  @if $use_new_styles == false {
+    .with-left-side.modules { min-width: 700px; }
+  }  
   #context_modules {
     .student-view {
       .due_date_display {
