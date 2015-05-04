@@ -366,6 +366,11 @@ describe AppointmentGroup do
       expect(@ag.messages_sent["Appointment Group Deleted"].map(&:user_id).sort.uniq).to eql [@student.id]
     end
 
+    it "should not notify participants when unpublished" do
+      @ag.destroy
+      expect(@ag.messages_sent).to be_empty
+    end
+
     it "should not notify participants in an unpublished course" do
       @unpublished_course = course
       @unpublished_course.enroll_user(@student, 'StudentEnrollment')
