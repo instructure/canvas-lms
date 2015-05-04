@@ -25,10 +25,10 @@ module TextHelper
 
   def self.date_string(start_date, *args)
     return nil unless start_date
-    start_date = start_date.in_time_zone.to_date rescue start_date.to_date
+    start_date = start_date.in_time_zone.beginning_of_day
     style = args.last.is_a?(Symbol) ? args.pop : :normal
     end_date = args.pop
-    end_date = end_date.in_time_zone.to_date rescue end_date.to_date if end_date
+    end_date = end_date.in_time_zone.beginning_of_day if end_date
     start_date_display = Utils::DatePresenter.new(start_date).as_string(style)
     if end_date.nil? || start_date == end_date
       start_date_display
