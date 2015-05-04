@@ -77,7 +77,6 @@ define [
   # enable the playback speed selector
   mejs.MepDefaults.features.splice(positionAfterSubtitleSelector, 0, 'speed')
 
-
   getSourcesAndTracks = (id) ->
     dfd = new $.Deferred
     $.getJSON "/media_objects/#{id}/info", (data) ->
@@ -166,16 +165,23 @@ define [
 
     show: (id, mediaType) ->
       $this = $(this)
+
       if dialog = $this.data('media_comment_dialog')
         dialog.dialog('open')
       else
         # Create a dialog box
-        spaceNeededForControls = 35
         mediaType = mediaType || 'video'
-        height = if mediaType is'video' then 426 else 180
-        width = if mediaType is 'video' then VIDEO_WIDTH else 400
+
+        if mediaType is 'video'
+          height = 426
+          width  = VIDEO_WIDTH
+        else
+          height = 180
+          width  = 400
+
         $dialog = $('<div style="overflow: hidden; padding: 0;" />')
         $dialog.css('padding-top', '120px') if mediaType is 'audio'
+
         $dialog.dialog
           title: I18n.t('titles.play_comment', "Play Media Comment")
           width: width
@@ -192,6 +198,7 @@ define [
               mediaCommentId: id
               googleAnalyticsTitle: id
 
+            spaceNeededForControls = 35
             $mediaTag = createMediaTag({sourcesAndTracks, mediaPlayerOptions, mediaType, height: height-spaceNeededForControls, width})
             $mediaTag.appendTo($dialog.html(''))
 
