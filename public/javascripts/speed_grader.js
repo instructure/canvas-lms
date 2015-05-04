@@ -1284,7 +1284,7 @@ define([
       var gradedStudents = $.grep(jsonData.studentsWithSubmissions, function(s) {
         return (s.submission &&
                 s.submission.workflow_state === 'graded' &&
-                s.submission.from_enrollment_type === "StudentEnrollment"
+                _.contains(["StudentEnrollment", "StudentViewEnrollment"], s.submission.from_enrollment_type)
         );
       });
 

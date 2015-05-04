@@ -31,7 +31,7 @@ describe "speed grader" do
       @submission2 = @assignment.submit_homework(@student2, :submission_type => "online_text_entry", :body => "there")
     end
 
-    it "should list the correct number of students", :priority => "2" do
+    it "lists the correct number of students", :priority => "2" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       expect(f("#x_of_x_students")).to include_text("1 of 1")
@@ -39,7 +39,7 @@ describe "speed grader" do
     end
   end
 
-  it "should hide answers of anonymous graded quizzes" do
+  it "hides answers of anonymous graded quizzes" do
     @assignment.points_possible = 10
     @assignment.submission_types = 'online_quiz'
     @assignment.title = 'Anonymous Graded Quiz'
@@ -56,7 +56,7 @@ describe "speed grader" do
     }
   end
 
-  it "should update quiz grade automatically when the update button is clicked" do
+  it "updates quiz grade automatically when the update button is clicked" do
     expected_points = "6"
     student = student_in_course(:active_user => true).user
     @assignment.points_possible = 10
@@ -83,7 +83,7 @@ describe "speed grader" do
     keep_trying_until { expect(f('#grade_container input')).to have_attribute('value', expected_points) }
   end
 
-  it "should properly display student quiz results when the teacher also has a student enrollment" do
+  it "properly displays student quiz results when the teacher also has a student enrollment" do
     student = student_in_course(:active_user => true).user
     @course.enroll_student(@teacher).accept!
 
@@ -126,7 +126,7 @@ describe "speed grader" do
       @assignment.submit_homework(@student, :submission_type => "online_url", :workflow_state => "submitted", :url => "http://www.instructure.com")
     end
 
-    it "should properly show and hide student name when name hidden toggled" do
+    it "properly shows and hides student name when name hidden toggled" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       in_frame 'speedgrader_iframe' do
@@ -187,7 +187,7 @@ describe "speed grader" do
       end
     end
 
-    it "should hide student's name from quiz if hide student names is enabled" do
+    it "hides student's name from quiz if hide student names is enabled" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       f("#settings_link").click
@@ -242,7 +242,7 @@ describe "speed grader" do
       entry_2.context_module_action
     end
 
-    it "should display discussion entries for only one student" do
+    it "displays discussion entries for only one student" do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       #check for correct submissions in speed grader iframe
@@ -263,7 +263,7 @@ describe "speed grader" do
     end
 
     context "when student names hidden" do
-      it "should hide name of student on discussion iframe" do
+      it "hides the name of student on discussion iframe" do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
         f("#settings_link").click
@@ -278,7 +278,7 @@ describe "speed grader" do
         end
       end
 
-      it "should hide student names and show name of grading teacher entries " +
+      it "hides student names and shows name of grading teacher entries " +
         "on both discussion links" do
         teacher = @course.teachers.first
         teacher_message = "why did the taco cross the road?"
@@ -317,7 +317,7 @@ describe "speed grader" do
         end
       end
 
-      it "should hide avatars on entries on both discussion links" do
+      it "hides avatars on entries on both discussion links" do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
         f("#settings_link").click
@@ -343,7 +343,7 @@ describe "speed grader" do
     end
   end
 
-  it "should grade assignment using rubric" do
+  it "grades assignment using rubric" do
     student_submission
     @association.use_for_grading = true
     @association.save!
@@ -379,7 +379,7 @@ describe "speed grader" do
     expect(f('#grade_container input')).to have_attribute(:value, '8')
   end
 
-  it "should allow commenting using rubric" do
+  it "allows commenting using rubric" do
     student_submission
     @association.use_for_grading = true
     @association.save!
@@ -403,7 +403,7 @@ describe "speed grader" do
     expect(saved_comment.text).to eq to_comment
   end
 
-  it "should create a comment on assignment" do
+  it "creates a comment on assignment" do
     #pending("failing because it is dependant on an external kaltura system")
 
     student_submission
@@ -438,7 +438,7 @@ describe "speed grader" do
     expect(fj('body.grades')).to be_displayed
   end
 
-  it "should show comment post time" do
+  it "shows comment post time" do
     @submission = student_submission
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
@@ -461,7 +461,7 @@ describe "speed grader" do
     expect(f('#comments > .comment .posted_at')).to include_text(expected_posted_at)
   end
 
-  it "should properly show avatar images only if avatars are enabled on the account" do
+  it "properly shows avatar images only if avatars are enabled on the account" do
     # enable avatars
     @account = Account.default
     @account.enable_service(:avatars)
@@ -498,7 +498,7 @@ describe "speed grader" do
     expect(ff("#comments > .comment .avatar")[0]).to have_attribute('style', "display: none\;")
   end
 
-  it "should hide student names and avatar images if Hide student names is checked" do
+  it "hides student names and avatar images if Hide student names is checked" do
     # enable avatars
     @account = Account.default
     @account.enable_service(:avatars)
@@ -535,7 +535,7 @@ describe "speed grader" do
     expect(ff('#comments > .comment .author_name')[1]).to include_text('nobody@example.com')
   end
 
-  it "should not show students in other sections if visibility is limited" do
+  it "does not show students in other sections if visibility is limited" do
     @enrollment.update_attribute(:limit_privileges_to_course_section, true)
     student_submission
     student_submission(:username => 'otherstudent@example.com', :section => @course.course_sections.create(:name => "another section"))
@@ -558,14 +558,14 @@ describe "speed grader" do
                                            :allow_multiple_enrollments => true)
     end
 
-    it "should not duplicate students" do
+    it "does not duplicate students" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       wait_for_ajaximations
 
       expect(ff("#students_selectmenu option").length).to eq 1
     end
 
-    it "should filter by section properly" do
+    it "filters by section properly" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       wait_for_ajaximations
 
@@ -596,7 +596,7 @@ describe "speed grader" do
     expect(fj("#students_selectmenu option[value=#{s3.id}]")[:selected]).to be_truthy
   end
 
-  it "should be able to change sorting and hide student names" do
+  it "allows the user to change sorting and hide student names" do
     student_submission(name: 'student@example.com')
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
@@ -627,7 +627,7 @@ describe "speed grader" do
     keep_trying_until { expect(f('#combo_box_container .ui-selectmenu .ui-selectmenu-item-header').text).to eq "student@example.com" }
   end
 
-  it "should ignore rubric lines for grading" do
+  it "ignores rubric lines for grading" do
     student_submission
     @association.use_for_grading = true
     @association.save!
@@ -682,15 +682,28 @@ describe "speed grader" do
     expect(f("#rubric_summary_container tr.summary .rubric_total").text).to eq '3'
   end
 
-  it "should included the student view student for grading" do
-    @fake_student = @course.student_view_student
+  it "includes the student view student for grading" do
+    @course.student_view_student
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
 
     expect(ff("#students_selectmenu option").length).to eq 1
   end
 
-  it "should mark the checkbox of students for graded assignments" do
+  it "includes fake student (Student View Student) submissions in 'X/Y Graded' text" do
+    fake_student = @course.student_view_student
+    submission = @assignment.find_or_create_submission(fake_student)
+    submission.submission_type = 'online_quiz'
+    submission.workflow_state = 'submitted'
+    submission.save!
+    @assignment.grade_student(fake_student, grade: 8, grader: @teacher)
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajaximations
+
+    expect(f("#x_of_x_graded").text).to eq "1 / 1 Graded"
+  end
+
+  it "marks the checkbox of students for graded assignments" do
     student_submission
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
@@ -710,7 +723,7 @@ describe "speed grader" do
 
   context "grading display" do
 
-    it "should display the score on the sidebar" do
+    it "displays the score on the sidebar" do
       create_and_enroll_students(1)
       submit_and_grade_homework(@students[0], 3)
 
@@ -720,7 +733,7 @@ describe "speed grader" do
       expect(f('#grade_container input[type=text]')).to have_attribute("value", "3")
     end
 
-    it "should display total number of graded assignments to students" do
+    it "displays total number of graded assignments to students" do
       create_and_enroll_students(2)
       submit_and_grade_homework(@students[0], 3)
 
@@ -730,7 +743,7 @@ describe "speed grader" do
       expect(f("#x_of_x_graded")).to include_text("1 / 2 Graded")
     end
 
-    it "should display average submission grade for total assignment submissions" do
+    it "displays average submission grade for total assignment submissions" do
       skip('testbot fragile')
       create_and_enroll_students(2)
 
@@ -745,7 +758,7 @@ describe "speed grader" do
   end
 
 
-    it "should only display 2 decimal points on a quiz submission" do
+    it "only displays 2 decimal points on a quiz submission" do
       # generate a proper teacher and student in the course, then switch sessions to the teacher
       course_with_teacher_logged_in
       course_with_student(:course => @course, :active_all => true)
