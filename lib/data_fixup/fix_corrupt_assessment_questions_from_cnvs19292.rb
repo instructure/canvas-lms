@@ -103,7 +103,8 @@ DataFixup::FixCorruptAssessmentQuestionsFromCnvs19292 = Struct.new(:question_typ
               .where('assessment_questions.updated_at < ?', bug_end_date)
     end
 
-    Shackles.activate(:slave) do
+    env = Shackles.environment == :master ? :slave : Shackles.environment
+    Shackles.activate(env) do
       query.readonly(false).find_each do |aq|
         Shackles.activate(:master) do
           Rails.logger.info "#{LOG_PREFIX} incrementing version for assessment question #{aq.global_id} from #{aq.version_number}"
