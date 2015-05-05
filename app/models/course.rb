@@ -1859,7 +1859,9 @@ class Course < ActiveRecord::Base
     pairs.uniq.each do |context_type, id|
       context = Context.find_by_asset_string("#{context_type}_#{id}") rescue nil
       if context
+        next if context.respond_to?(:context) && to_context == context.context
         next if to_context.respond_to?(:context) && context == to_context.context
+
         if context.grants_right?(user, :manage_content)
           html = self.migrate_content_links(html, context, to_context, content_types_to_copy)
         else
