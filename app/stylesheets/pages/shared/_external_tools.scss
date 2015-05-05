@@ -30,8 +30,8 @@ $app_height: 143px;
   }
 }
 
-#wrapper-container {
-  min-width: 1280px;
+@if $use_new_styles == false {
+  #wrapper-container { min-width: 1280px; }
 }
 
 #external_tools {
