@@ -259,7 +259,11 @@
     margin: 5px 0px;
     width: 100%;
     td, tbody th {
-      background-color: #e6e7e9;
+      @if $use_new_styles { background-color: $lightBackground; }
+      @else { background-color: #e6e7e9; }
+    }
+    @if $use_new_styles {
+      tbody th { font-weight: 500; }
     }
   }
   table.notifications {
@@ -436,19 +440,36 @@ table.summary {
     text-align: left;
   }
   th, td, caption {
-    padding: 2px 8px;
-    vertical-align: top;
+    @if $use_new_styles {
+      padding: $ic-sp/2;
+    }
+    @else {
+      padding: 2px 8px;
+      vertical-align: top;
+    }
   }
   thead th, caption {
-    background-color: #4d4d4d;
-    color: #fff;
-    font-weight: normal;
-    border-top: 1px solid #4d4d4d;
+    @if $use_new_styles {
+      font-weight: 500;
+      border-bottom: 1px solid $ic-border-dark;
+    }
+    @else {
+      background-color: #4d4d4d;
+      color: #fff;
+      font-weight: normal;
+      border-bottom: 1px solid #4d4d4d;
+    }
   }
   td, tbody th {
-    border-top: 1px dotted #aaa;
-    background-color: #f2f3f5;
-    color: #595959;
+    @if $use_new_styles {
+      border-bottom: 1px solid $ic-border-light;
+      background-color: $ic-color-light;
+    }
+    @else {
+      border-top: 1px dotted #aaa;
+      background-color: #f2f3f5;
+      color: #595959;
+    }
   }
   table.subtable {
     th, td {
