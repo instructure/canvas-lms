@@ -11,6 +11,7 @@ if settings.present?
   require "raven/base"
   Raven.configure do |config|
     config.dsn = settings[:dsn]
+    config.tags = settings[:tags] if settings[:tags]
   end
 
   Canvas::Errors.register!(:sentry_notification) do |exception, data|
