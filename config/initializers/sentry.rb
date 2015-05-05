@@ -13,6 +13,8 @@ if settings.present?
     config.silence_ready = true
     config.dsn = settings[:dsn]
     config.tags = settings[:tags] if settings[:tags]
+    config.sanitize_fields += Rails.application.config.filter_parameters.map(&:to_s)
+    config.sanitize_credit_cards = false
   end
 
   Canvas::Errors.register!(:sentry_notification) do |exception, data|
