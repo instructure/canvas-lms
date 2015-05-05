@@ -2604,12 +2604,12 @@ describe Assignment do
     context "group assignments" do
       before :once do
         course_with_teacher(active_all: true)
-        gc = @course.group_categories.create! name: "Assignment Groups"
-        @groups = 2.times.map { |i| gc.groups.create! name: "Group #{i}", context: @course }
+        @gc = @course.group_categories.create! name: "Assignment Groups"
+        @groups = 2.times.map { |i| @gc.groups.create! name: "Group #{i}", context: @course }
         students = create_users_in_course(@course, 4, return_type: :record)
         students.each_with_index { |s, i| @groups[i % @groups.size].add_user(s) }
         @assignment = @course.assignments.create!(
-          group_category_id: gc.id,
+          group_category_id: @gc.id,
           grade_group_students_individually: false,
           submission_types: %w(text_entry)
         )
@@ -2667,6 +2667,18 @@ describe Assignment do
       it "includes users who aren't in a group" do
         student_in_course active_all: true
         expect(@assignment.representatives(@teacher).last).to eq @student
+      end
+
+      it "doesn't include deleted groups" do
+        student_in_course active_all: true
+        deleted_group = @gc.groups.create! name: "DELETE ME", context: @course
+        deleted_group.add_user(@student)
+        rep_names = @assignment.representatives(@teacher).map(&:name)
+        expect(rep_names).to include "DELETE ME"
+
+        deleted_group.destroy
+        rep_names = @assignment.representatives(@teacher).map(&:name)
+        expect(rep_names).not_to include "DELETE ME"
       end
     end
 

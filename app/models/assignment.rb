@@ -1446,7 +1446,7 @@ class Assignment < ActiveRecord::Base
 
   def groups_and_ungrouped(user)
     groups_and_users = group_category.
-      groups.includes(:group_memberships => :user).
+      groups.active.includes(:group_memberships => :user).
       map { |g| [g.name, g.users] }
     users_in_group = groups_and_users.flat_map { |_,users| users }
     groupless_users = visible_students_for_speed_grader(user) - users_in_group
