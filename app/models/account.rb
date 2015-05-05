@@ -300,7 +300,7 @@ class Account < ActiveRecord::Base
   end
 
   def require_acceptance_of_terms?(user)
-    soc2_start_date = Setting.get('SOC2_start_date', Time.new(2015, 5, 5, 0, 0, 0).utc)
+    soc2_start_date = Setting.get('SOC2_start_date', Time.new(2015, 5, 16, 0, 0, 0).utc).to_datetime
 
     return false if !terms_required?
     return true if user.nil? || user.new_record?
