@@ -1150,7 +1150,7 @@ class Account < ActiveRecord::Base
   end
 
   def course_count
-    self.child_courses.not_deleted.count('DISTINCT course_id')
+    self.courses.active.count
   end
 
   def sub_account_count
