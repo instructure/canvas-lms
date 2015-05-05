@@ -168,7 +168,7 @@ class WebConference < ActiveRecord::Base
     p.dispatch :web_conference_invitation
     p.to do
       @new_participants.select do |participant|
-        context.membership_for_user(participant).active?
+        context.membership_for_user(participant).try(:active?)
       end
     end
     p.whenever { @new_participants && !@new_participants.empty? }

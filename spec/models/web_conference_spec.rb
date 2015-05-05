@@ -173,13 +173,17 @@ describe WebConference do
                            :category => "TestImmediately")
       Notification.create!(:name => 'Web Conference Recording Ready',
                            :category => "TestImmediately")
-      course_with_student(:active_all => 1)
-      @student.communication_channels.create(:path => "test_channel_email_#{user.id}",
-                                             :path_type => "email").confirm
+      course_with_teacher(active_all: true)
+      @student = user_with_communication_channel(active_all: true)
+      student_in_course(user: @student, active_all: true)
     end
 
     it "should send invitation notifications" do
-      conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => @course)
+      conference = WimbaConference.create!(
+        :title => "my conference",
+        :user => @teacher,
+        :context => @course
+      )
       conference.add_attendee(@student)
       conference.save!
       expect(conference.messages_sent['Web Conference Invitation']).not_to be_empty
@@ -190,22 +194,41 @@ describe WebConference do
       @course.start_at = 2.days.from_now
       @course.conclude_at = 4.days.from_now
       @course.save!
-      conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => @course)
+
+      conference = WimbaConference.create!(
+        :title => "my conference",
+        :user => @teacher,
+        :context => @course
+      )
       conference.add_attendee(@student)
       conference.save!
       expect(conference.messages_sent['Web Conference Invitation']).to be_blank
     end
 
     it "should send recording ready notifications, but only once" do
-      conference = WimbaConference.create!(:title => "my conference",
-                                           :user => @student,
-                                           :context => @course)
+      conference = WimbaConference.create!(
+        :title => "my conference",
+        :user => @student,
+        :context => @course
+      )
       conference.recording_ready!
       expect(conference.messages_sent['Web Conference Recording Ready'].length).to eq(2)
 
       # check that it won't send the notification again when saved again.
       conference.save!
       expect(conference.messages_sent['Web Conference Recording Ready'].length).to eq(2)
+    end
+
+    it "should not send notifications to users that don't belong to the context" do
+      non_course_user = user_with_communication_channel(active_all: true)
+      conference = WimbaConference.create!(
+        :title => "my conference",
+        :user => @teacher,
+        :context => @course
+      )
+      conference.add_attendee(non_course_user)
+      conference.save!
+      expect(conference.messages_sent['Web Conference Invitation']).to be_blank
     end
   end
 
