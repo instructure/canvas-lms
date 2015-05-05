@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -28,7 +28,7 @@ class Setting < ActiveRecord::Base
     if @@cache.has_key?(name)
       @@cache[name]
     else
-      @@cache[name] = Setting.where(name: name).first.try(:value) || default
+      @@cache[name] = Setting.where(name: name).first.try(:value) || default.try(:to_s)
     end
   end
 
@@ -36,27 +36,26 @@ class Setting < ActiveRecord::Base
   def self.set(name, value)
     @@cache.delete(name)
     s = Setting.where(name: name).first_or_initialize
-    s.value = value
+    s.value = value.try(:to_s)
     s.save!
   end
-  
 
   def self.get_or_set(name, new_val)
     Setting.where(name: name).first_or_create(value: new_val).value
   end
-  
+
   # this cache doesn't get invalidated by other rails processes, obviously, so
   # use this only for relatively unchanging data
 
   def self.clear_cache(name)
     @@cache.delete(name)
   end
-  
+
   def self.reset_cache!
     @@cache = {}
     @@yaml_cache = {}
   end
-  
+
   def self.remove(name)
     @@cache.delete(name)
     Setting.where(name: name).delete_all

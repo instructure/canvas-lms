@@ -167,6 +167,6 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
   end
 
   def debug_expire
-    Setting.get('aac_debug_expire_minutes', 30).minutes
+    Setting.get('aac_debug_expire_minutes', 30).to_i.minutes
   end
 end

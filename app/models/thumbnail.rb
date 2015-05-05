@@ -31,7 +31,7 @@ class Thumbnail < ActiveRecord::Base
       :path_prefix => Attachment.file_store_config['path_prefix'],
       :s3_access => :private,
       :keep_profile => true,
-      :thumbnail_max_image_size_pixels => Setting.get('thumbnail_max_image_size_pixels', 100_000_000)
+      :thumbnail_max_image_size_pixels => Setting.get('thumbnail_max_image_size_pixels', 100_000_000).to_i
   )
 
   before_save :set_namespace
