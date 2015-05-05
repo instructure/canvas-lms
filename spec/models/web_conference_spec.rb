@@ -186,7 +186,12 @@ describe WebConference do
       @course.start_at = 2.days.from_now
       @course.conclude_at = 4.days.from_now
       @course.save!
-      conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => @course)
+
+      conference = WimbaConference.create!(
+        :title => "my conference",
+        :user => @teacher,
+        :context => @course
+      )
       conference.add_attendee(@student)
       conference.save!
       expect(conference.messages_sent['Web Conference Invitation']).to be_blank

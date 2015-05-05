@@ -166,7 +166,7 @@ class WebConference < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :web_conference_invitation
-    p.to { @new_participants.select { |p| context.membership_for_user(p).active? } }
+    p.to { @new_participants.select { |p| context.membership_for_user(p).try(:active?) } }
     p.whenever { |record|
       @new_participants && !@new_participants.empty?
     }
