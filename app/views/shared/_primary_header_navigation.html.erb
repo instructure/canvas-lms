@@ -55,7 +55,7 @@
             <% end %>
             <div class="menu-item__text"><%= t 'links.inbox', "Inbox" %></div>
           </a>
-        </li>  
+        </li>
       <% end %>
     <% end %>
     <%= render(:partial => 'external_tools/global_nav_menu_items') %>
@@ -65,11 +65,11 @@
       <li class="ic-app-header__menu-list-item">
         <%= link_to settings_profile_path, class: "ic-app-header__menu-list-link" do %>
           <div class="menu-item-icon-container">
-            <div class="ic-avatar">              
-                <%= image_tag("panda-profile-placeholder.jpg", class: "ic-avatar__image", alt:"") %>              
+            <div class="ic-avatar">
+                <%= image_tag("panda-profile-placeholder.jpg", class: "ic-avatar__image", alt:"") %>
             </div>
           </div>
-          <div class="menu-item__text"><%= t('Settings') %></div>
+          <div class="menu-item__text"><%= t('Profile') %></div>
         <% end %>
       </li>
     <% end %>
