@@ -216,4 +216,21 @@ describe ContextModuleProgression do
     expect(progression2).to be_locked
     expect(progression3).to be_locked
   end
+
+  describe "#uncomplete_requirement" do
+    it "should uncomplete the requirement" do
+      setup_modules
+      progression = @tag.context_module_action(@user, :read)
+      progression.uncomplete_requirement(@tag.id)
+      expect(progression.requirements_met.length).to be(0)
+
+    end
+
+    it "should not change anything when given an ID that does not exist" do
+      setup_modules
+      progression = @tag.context_module_action(@user, :read)
+      progression.uncomplete_requirement(-1)
+      expect(progression.requirements_met.length).to be(1)
+    end
+  end
 end

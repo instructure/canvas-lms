@@ -327,8 +327,8 @@ class ContextModule < ActiveRecord::Base
 
     tags = self.content_tags.not_deleted.index_by(&:id)
     requirements.select do |req|
-      if req[:id] && tag = tags[req[:id]]
-        if %w(must_view must_contribute).include?(req[:type])
+      if req[:id] && (tag = tags[req[:id]])
+        if %w(must_view must_mark_done must_contribute).include?(req[:type])
           true
         elsif %w(must_submit min_score max_score).include?(req[:type])
           true if tag.scoreable?
@@ -520,6 +520,8 @@ class ContextModule < ActiveRecord::Base
       case requirement[:type]
       when 'must_view'
         action == :read || action == :contributed
+      when 'must_mark_done'
+        action == :done
       when 'must_contribute'
         action == :contributed
       when 'must_submit'
@@ -538,6 +540,8 @@ class ContextModule < ActiveRecord::Base
     case req[:type]
     when 'must_view'
       t('requirements.must_view', "must view the page")
+    when 'must_mark_done'
+      t("must mark as done")
     when 'must_contribute'
       t('requirements.must_contribute', "must contribute to the page")
     when 'must_submit'

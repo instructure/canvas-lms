@@ -1,0 +1,8 @@
+<% if @mark_done and @mark_done.has_requirement? %>
+  <div id="mark-as-done-container">
+    <div id="mark-as-done-checkbox" class="btn <%= @mark_done.checked? ? "btn-success" : '' %>"
+         data-url="<%= @mark_done.api_url %>" data-is-checked="<%= @mark_done.checked? %>">
+      <i class="<%= @mark_done.checked? ? "icon-complete" : "icon-empty"%>"></i> <%= t('Mark as done') %>
+    </div>
+  </div>
+<% end %>
