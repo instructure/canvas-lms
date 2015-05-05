@@ -11,8 +11,8 @@ describe "announcements" do
 
     course
     @course.offer
-    student = user_with_pseudonym({:unique_id => 'student@example.com', :password => password})
-    teacher = user_with_pseudonym({:unique_id => 'teacher@example.com', :password => password})
+    student = user_with_pseudonym(:unique_id => 'student@example.com', :password => password, :active_user => true)
+    teacher = user_with_pseudonym(:unique_id => 'teacher@example.com', :password => password, :active_user => true)
     @course.enroll_user(student, 'StudentEnrollment').accept!
     @course.enroll_user(teacher, 'TeacherEnrollment').accept!
     login_as(teacher.primary_pseudonym.unique_id, password)

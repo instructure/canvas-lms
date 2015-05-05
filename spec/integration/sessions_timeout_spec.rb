@@ -26,7 +26,7 @@ describe "Session Timeout" do
 
     context "when a user logs in" do 
       before do
-        course_with_student(:active_all => true, :user => user_with_pseudonym)
+        course_with_student(:active_all => true, :user => user_with_pseudonym(:active_user => true))
         login_as
       end
 
