@@ -12,6 +12,7 @@ if settings.present?
   Raven.configure do |config|
     config.silence_ready = true
     config.dsn = settings[:dsn]
+    config.tags = settings[:tags] if settings[:tags]
   end
 
   Canvas::Errors.register!(:sentry_notification) do |exception, data|
