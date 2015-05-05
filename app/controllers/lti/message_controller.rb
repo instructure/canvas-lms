@@ -33,7 +33,8 @@ module Lti
         @lti_launch.link_text = I18n.t('lti2.register_tool', 'Register Tool')
         @lti_launch.launch_type = message.launch_presentation_document_target
 
-        render ExternalToolsController::TOOL_DISPLAY_TEMPLATES['borderless']
+        render ExternalToolsController.display_template('borderless')
+
       end
     end
 
