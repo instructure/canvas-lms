@@ -2981,7 +2981,7 @@ ar:
       error_title: "خطأ في تعاون Google Drive"
       headings: 
         page: "خطأ في تعاون Google Drive"
-      resolution: "اتصل بالمنشِئ واخبره."
+      resolution: "الاتصال بالمنشِئ وإخباره."
     titles: 
       delete: "هل تريد حذف التعاون؟"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "طي قائمة أعضاء مجموعة %{groupName}"
@@ -5350,7 +5350,7 @@ ar:
       delay_posting: "تأخير النشر"
       enable_podcast_feed: "تمكين موجز بودكاست"
       include_replies_in_podcast_feed: "تضمين ردود الطلاب في موجز Podcast"
-      only_graders_can_like: "المقيمون فقط يستطيعون الإعجاب"
+      only_graders_can_like: "المقيّمون فقط يستطيعون الإعجاب"
       only_visible_to_overrides_note: "ملاحظة: لا يمكن مشاهدة هذه المناقشة *إلا* بواسطة القسم (الأقسام) المحدد أدناه:"
       options: خيارات
       page_header_title: "نقاش جديد"
@@ -6143,7 +6143,7 @@ ar:
       remove_feed: "إزالة %{display_name}"
   external_integration_keys_8b4f4548: "مفاتيح التكامل الخارجية"
   external_tool_c5a6410a: "الأداة الخارجية"
-  external_tool_url_cannot_be_left_blank_a34b6bb2: "لا يمكن ترك عنوان URL الأداة الخارجية فارغًا"
+  external_tool_url_cannot_be_left_blank_a34b6bb2: "لا يمكن ترك عنوان URL الخاص بالأداة الخارجية فارغًا"
   external_tools: 
     account_navigation_configured: "تم تكوين التنقل في الحساب"
     app_full_view: 
@@ -10372,7 +10372,7 @@ ar:
       details: 
         allow_application: "يطلب %{app_name} الوصول إلى حسابك."
         email: "عنوان بريدك الإلكتروني هو %{email}."
-        login_name: "لقد قمت بتسجيل الدخول إلى هذا التطبيق باسم %{user_name}."
+        login_name: "أنت تقوم بتسجيل الدخول إلى هذا التطبيق باسم %{user_name}."
       labels: 
         remember_access: "تذكر تخويلي لهذه الخدمة"
       page_title: "تسجيل الدخول إلى التطبيق"
@@ -10381,7 +10381,7 @@ ar:
       details: 
         allow_application: "يطلب %{app_name} الوصول إلى حسابك."
         email: "عنوان بريدك الإلكتروني هو %{email}."
-        login_name: "لقد قمت بتسجيل الدخول إلى هذا التطبيق باسم %{user_name}."
+        login_name: "أنت تقوم بتسجيل الدخول إلى هذا التطبيق باسم %{user_name}."
       login: "تسجيل الدخول"
       page_title: "تسجيل الدخول إلى التطبيق"
       remember_auth: "تذكر تخويلي لهذه الخدمة"
@@ -10399,7 +10399,7 @@ ar:
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "بمجرد تغيير إجابة، يجب عليك تحديد خيار قبل تحديث السؤال."
   one_per_line_format_name_value_79647700: "واحد في السطر. التنسيق: الاسم=القيمة"
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} في الموعد المحدد، %{late} متأخرة، %{missing} مفقودة"
-  open_title_in_a_new_window_b29fed77: "عرض %{title} في نافذة جديدة"
+  open_title_in_a_new_window_b29fed77: "فتح %{title} في نافذة جديدة"
   options: 
     ? "no"
     : لا
@@ -10825,7 +10825,7 @@ ar:
           **ملاحظة:** بعد قيامك بتكوين Katura في Canvas،
           عليك بالذهاب إلى وحدة تحكم إدارة Katura وضمن "إعدادات
            -> إعدادات التكامل" قم بتمكين إخطارات الخادم بواسطة
-          عنوان URL إخطار:
+          عنوان URL للإخطار:
           %{notification_url}
           ثم قم باختيار الخانات "إضافة إدخال" و "حذف إدخال" في عمود "أرسلها الخادم".
       headers: 
@@ -14842,13 +14842,16 @@ ar:
   the_material_is_licensed_under_creative_commons_3242cb5e: "المادة مرخصة بموجب المشاع الإبداعي"
   the_material_is_subject_to_fair_use_exception_41bc6a4b: "تخضع المادة إلى استثناء الاستخدام العادل"
   the_module_item_is_locked_27fe420b: "تم تأمين عنصر الوحدة"
-  the_most_recent_scores_for_user_current_user_name__ea82f0b6: "أحدث درجات المستخدم %{current_user_name} والنتيجة %{outcome_name}."
+  the_most_recent_scores_for_user_current_user_name__ea82f0b6: "أحدث درجات المستخدم %{current_user_name} ونتيجة %{outcome_name}."
   the_profile_picture_has_been_reported_d609d6dd: "تم الإبلاغ عن صورة ملف التعريف"
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "أدوار المستخدم الذي يقوم بالإبلاغ (طالب، معلم، مسؤول، إلخ)"
-  the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "حدة المشكلة، حسب ما حدده المستخدم في القائمة المنسدلة."
+  the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "حدّة المشكلة، حسب ما حدده المستخدم في القائمة المنسدلة."
   the_shortcut_icon_for_ios_android_devices_180x180__f87fa178: "أيقونة الاختصار لأجهزة iOS/Android. بحجم 180x180 بتنسيق png أو svg"
   the_state_parameter_is_required_ffadf213: "معلمة الحالة مطلوبة"
   the_top_track_represents_days_on_which_the_student_2a347099: "يمثل المسار العلوي الأيام التي *أرسل الطالب رسائل* خلالها إلى معلمي المساق. بينما يمثل المسار السفلي **الرسائل المرسلة من المعملين** إلى الطالب."
+  the_unique_id_used_for_representing_the_specific_r_3bdf5870: "المعرف الوحيد المستخدَم في تمثيل دورة الطلب/الاستجابة المحددة التي حدث حولها هذا الإبلاغ"
+  the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "عنوان URL الذي يمكن أن يستعمله مستخدم يتمتع بما يكفي من الامتيازات لانتحال شخصية المستخدم الذي يقوم بالإبلاغ في نفس الصفحة من أجل تجريب المشكلة وإعادة إنشائها"
+  the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "عنوان URL الخاص بالصفحة التي كان يستعملها المستخدم أثناء قيامه بالإبلاغ عن الخطأ"
   there_are_count_results_in_the_list_e74f6e36: 
     few: "توجد %{count} من النتائج في القائمة"
     many: "توجد %{count} من النتائج في القائمة"
@@ -14863,6 +14866,8 @@ ar:
   there_was_an_error_in_processing_your_request_6513a49a: "حدث خطأ أثناء معالجة طلبك"
   there_was_an_error_setting_usage_rights_53739e1d: "كان هناك خطأ في إعداد حقوق الاستخدام."
   there_were_errors_with_the_form_errors_ab5b559a: "كانت هناك أخطاء في النموذج: %{errors}"
+  these_grading_periods_were_created_for_you_by_an_a_e977c2b5: "قام مسؤول بإنشاء فترات تقييم الدرجات هذه من أجلك."
+  this_conference_may_be_recorded_f76deeeb: "قد يتم تسجيل هذا المؤتمر."
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "يتعذر في هذه المرة إضافة هذا المساق إلى قائمة المساقات."
   this_course_is_claimed_and_ready_but_you_ll_need_t_25b95a0a: "تم طلب هذا المساق وهو جاهز ولكن يتعين عليك إنهاء عملية التسجيل قبل نشر المساق. من المفترض استلامك بريد إلكتروني من Canvas به ارتباط لإنهاء العملية. تأكد من مراجعة صندوق البريد العشوائي."
   this_course_is_visible_only_to_teachers_until_it_i_ce972f0: "يكون هذا المساق متاحًا للمدرسين فقط إلى أن يتم نشره."
@@ -15802,7 +15807,11 @@ ar:
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "هل ترغب في ترك الطلاب متابعة المساق أم ترغب في إعادة قفل هذه الوحدات حتى يتم إكمال المتطلبات الجديدة؟"
   xml_configuration_5ea1b942: "تكوين XML"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "قمت بتسجيل الدخول إلى %{institution1} باستخدام بيانات اعتماد من %{institution2}"
+  you_are_subscribed_and_will_be_notified_of_new_com_60b5b62b: "أنت مشترك وسيتم إعلامك بالتعليقات الجديدة. انقر لإلغاء الاشتراك"
   you_are_the_group_leader_for_this_group_b8629b70: "أنت قائد المجموعة لهذه المجموعة"
+  you_are_trying_to_launch_insecure_content_from_wit_5c1c692b: "أنت تحاول تشغيل محتوى غير آمن من داخل موقع آمن (Canvas). قد تمنع بعض مستعرضات الويب تحميل هذا المحتوى."
+  you_are_unsubscribed_and_will_not_be_notified_of_n_bf4b96a2: "أنت غير مشترك ولن يتم إعلامك بالتعليقات الجديدة. انقر للاشتراك"
+  you_can_disable_this_feature_d5e61373: "يمكنك تعطيل هذه الميزة"
   you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: "يمكنك إخفاء مهام المساق أو إظهارها من خلال تبديل إظهارها أو إخفائها."
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "يمكنك الآن تعيين خيارات إعادة التقييم للطلاب الذين حلوا الاختبار بالفعل."
   you_have_changed_the_progression_requirements_for__6772bc89: "لقد قمت بتغيير متطلبات التقدم لمساق نشط. من المحتمل وجود طلاب تقدموا بالفعل إلى هذه الوحدة وإلى وحدات أخرى تعتمد عليها."
