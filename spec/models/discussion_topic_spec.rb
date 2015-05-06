@@ -1658,6 +1658,7 @@ describe DiscussionTopic do
     end
   end
 
+
   context "announcements" do
     context "scopes" do
       context "by_posted_at" do
@@ -1671,22 +1672,11 @@ describe DiscussionTopic do
           end
         end
 
-        it "sorts by the posted_at field descending" do
+        it "properly sorts collections by delayed_post_at and posted_at" do
           anns = 10.times.map do |i|
             ann = new_ann.call
-            ann.posted_at = i.days.ago
-            ann.position = 1
-            ann.save!
-            ann
-          end
-          expect(c.announcements.by_posted_at).to eq(anns)
-        end
-
-        it "secondarily sorts by the delayed_post_at field descending" do
-          anns = 10.times.map do |i|
-            ann = new_ann.call
-            ann.delayed_post_at = i.days.ago
-            ann.posted_at = nil
+            setter = [:delayed_post_at=, :posted_at=][i % 2]
+            ann.send(setter, i.days.ago)
             ann.position = 1
             ann.save!
             ann

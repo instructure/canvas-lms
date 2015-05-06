@@ -483,7 +483,12 @@ class DiscussionTopic < ActiveRecord::Base
   scope :by_position_legacy, -> { order("discussion_topics.position DESC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
   scope :by_last_reply_at, -> { order("discussion_topics.last_reply_at DESC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
 
-  scope :by_posted_at, -> { order("discussion_topics.posted_at DESC, discussion_topics.delayed_post_at DESC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
+  scope :by_posted_at, -> { order(<<-SQL)
+      COALESCE(discussion_topics.delayed_post_at, discussion_topics.posted_at) DESC,
+      discussion_topics.created_at DESC,
+      discussion_topics.id DESC
+    SQL
+  }
 
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
     without_assignment_in_course(course_ids).union(joins_assignment_student_visibilities(user_ids, course_ids))
