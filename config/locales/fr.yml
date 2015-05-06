@@ -52,7 +52,7 @@ fr:
   _section_not_synced_yet_cd07d0dd: "-- Section pas encore synchronisée"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Une valeur de calcul n’est pas utilisée avec cette méthode de calcul"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "Un fichier nommé %{itemName} existe déjà dans ce dossier."
-  a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Une clé/valeur pratique de dépôt d'un serveur d'information intéressante d'environnement pour l'utilisateur effectuant une observation"
+  a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Un dépôt de valeur/clé pratique d'un serveur d'information intéressante sur l'environnement de l'utilisateur effectuant une observation"
   a_message_is_required_129e1814: "Message obligatoire"
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "Un tableau avec le nom du système de notation et des icônes permettant de modifier ou supprimer ce système."
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "Un tableau qui contient les données du système de notation. Chaque ligne comporte un nom, un pourcentage maximum et un pourcentage minimum, ainsi qu’une icône pour ajouter une ligne en dessous et une icône pour supprimer la ligne actuelle."
@@ -1691,7 +1691,7 @@ fr:
       assignment_points: "Points :"
       assignment_type: "Type :"
       buttons: 
-        save_and_publish: "Enregistrer et publier"
+        save_and_publish: "Sauvegarder et publier"
       cancel: Annuler
       differentiated_due_dates: "Échéance différenciée"
       discussion_type: Discussion
@@ -5298,7 +5298,7 @@ fr:
       edited_comment: "Modifié par *%{editor.display_name}* le %{edited_at}"
       go_to_parent: "Accéder au dossier parent"
       go_to_topic: "Aller à la rubrique"
-      like_entry: "Laisser un « J'aime » à cette entrée"
+      like_entry: "Laisser une rétroaction de type « J'aime » à cette entrée"
       manage_discussion_entry: "Gérer l’entrée de discussion"
       open_in_speedgrader: "Ouvrir dans SpeedGrader"
       unknown_author: ">Auteur inconnu"
@@ -5998,7 +5998,7 @@ fr:
     wiki_page_menu_configured: "Menu des pages Wiki configuré"
   external_url_e9b87215: "URL externe"
   failed_to_create_zip_file_1a943d06: "Échec de création de fichier zip"
-  failed_to_import_media_objects_4c1fcb4f: "Échec de l’importation des objets multimédias"
+  failed_to_import_media_objects_4c1fcb4f: "Échec d'importation des objets multimédias"
   fair_use_bee47d77: "Usage loyal"
   favicon_6e658914: Favicon
   feature_flags: 
@@ -6017,7 +6017,7 @@ fr:
     feature_flag_admin_view: 
       feature_options: "Options de la fonction "
       no_features_available: "Il n’y a aucune fonctionnalité disponible actuellement."
-  feature_options_37a2c317: "Options de la fonction "
+  feature_options_37a2c317: "Options de fonction "
   features: 
     allow_opt_out_of_inbox: "Autoriser les utilisateurs à sortir de la boîte de réception"
     better_file_browsing: "Meilleure navigation dans les fichiers"
@@ -9982,8 +9982,8 @@ fr:
     confirm_mobile: 
       cancel: Annuler
       details: 
-        allow_application: "%{app_name} demande à accéder à votre compte."
-        email: "Votre adresse e-mail est %{email}."
+        allow_application: "%{app_name} demande un accès à votre compte."
+        email: "Votre courriel est %{email}."
         login_name: "Vous vous connectez à cette application en tant que %{user_name}."
       login: Connexion
       page_title: "Connexion à l’application"
