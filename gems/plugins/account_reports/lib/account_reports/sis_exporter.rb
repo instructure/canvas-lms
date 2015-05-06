@@ -103,19 +103,30 @@ module AccountReports
         users = add_user_sub_account_scope(users)
 
         Shackles.activate(:slave) do
-          users.find_each do |u|
-            row = []
-            row << u.user_id unless @sis_format
-            row << u.sis_user_id
-            row << u.unique_id
-            row << nil if @sis_format
-            # build a user object to be able to call methods on it
-            user = User.send(:instantiate, 'id' => u.user_id, 'sortable_name' => u.sortable_name, 'updated_at' => u.user_updated_at)
-            row << user.first_name
-            row << user.last_name
-            row << user.email
-            row << u.workflow_state
-            csv << row
+          users.find_in_batches do |batch|
+            emails = Shard.partition_by_shard(batch.map(&:user_id)) do |user_ids|
+                CommunicationChannel.
+                  email.
+                  unretired.
+                  select([:user_id, :path]).
+                  where(user_id: user_ids).
+                  order('user_id, position ASC').
+                  distinct_on(:user_id)
+            end.index_by(&:user_id)
+
+            batch.each do |u|
+              row = []
+              row << u.user_id unless @sis_format
+              row << u.sis_user_id
+              row << u.unique_id
+              row << nil if @sis_format
+              name_parts = User.name_parts(u.sortable_name)
+              row << name_parts[0] || '' # first name
+              row << name_parts[1] || '' # last name
+              row << emails[u.user_id].try(:path)
+              row << u.workflow_state
+              csv << row
+            end
           end
         end
       end
