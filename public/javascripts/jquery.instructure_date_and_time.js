@@ -17,68 +17,17 @@
  */
 define([
   'i18n!instructure',
-  'jquery' /* jQuery, $ */,
+  'jquery',
   'timezone',
   'str/htmlEscape',
   'compiled/widget/DatetimeField',
+  'compiled/util/parseDatetime',
   'jquery.keycodes' /* keycodes */,
   'vendor/date' /* Date.parse, Date.UTC, Date.today */,
   'jqueryui/datepicker' /* /\.datepicker/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/widget' /* /\.widget/ */
-], function(I18n, $, tz, htmlEscape, DatetimeField) {
-  $.parseDateTime = function(date, time) {
-    var date = $.datepicker.parseDate('mm/dd/yy', date);
-    if(time) {
-      var times = time.split(":");
-      var hr = parseInt(times[0], 10);
-      if(hr == 12) { hr = 0; }
-      if(time.match(/pm/i)) {
-        hr += 12;
-      }
-      var min = 0;
-      if(times[1]) {
-        min = times[1].replace(/(am|pm)/gi, "");
-      }
-      date.setHours(hr);
-      date.setMinutes(min);
-    } else {
-      date.setHours(0);
-      date.setMinutes(0);
-    }
-    date.date = date;
-    return date;
-  };
-
-  $.formatDateTime = function(date, options) {
-    var head = "", tail = "";
-    if(date) {
-      date.date = date.date || date;
-    }
-    if(options.object_name) {
-      head += options.object_name + "[";
-      tail = "]" + tail;
-    }
-    if(options.property_name) {
-      head += options.property_name;
-    }
-    var result = {};
-    if(date && !isNaN(date.date.getFullYear())) {
-      result[head + "(1i)" + tail] = date.getFullYear();
-      result[head + "(2i)" + tail] = (date.getMonth() + 1);
-      result[head + "(3i)" + tail] = date.getDate();
-      result[head + "(4i)" + tail] = date.getHours();
-      result[head + "(5i)" + tail] = date.getMinutes();
-    } else {
-      result[head + "(1i)" + tail] = "";
-      result[head + "(2i)" + tail] = "";
-      result[head + "(3i)" + tail] = "";
-      result[head + "(4i)" + tail] = "";
-      result[head + "(5i)" + tail] = "";
-    }
-    return result;
-  };
-
+], function(I18n, $, tz, htmlEscape, DatetimeField, parseDatetime) {
   // fudgeDateForProfileTimezone is used to apply an offset to the date which represents the
   // difference between the user's configured timezone in their profile, and the timezone
   // of the browser. We want to display times in the timezone of their profile. Use
@@ -198,40 +147,9 @@ define([
     return I18n.l('#date.formats.medium', date);
   };
 
-  $.datetime = {};
-  $.datetime.shortFormat = "MMM d, yyyy";
-  $.datetime.defaultFormat = "MMM d, yyyy h:mmtt";
-  $.datetime.sortableFormat = "yyyy-MM-ddTHH:mm:ss";
-  $.datetime.parse = function(text, /* optional */ intermediate_format) {
-    return Date.parse((text || "").toString(intermediate_format).replace(/ (at|by)/, ""))
-  }
-  $.datetime.clean = function(text) {
-    var date = $.datetime.parse(text, $.datetime.sortableFormat) || text;
-    var result = "";
-    if(date) {
-      if(date.getHours() || date.getMinutes()) {
-        result = date.toString($.datetime.defaultFormat);
-      } else {
-        result = date.toString($.datetime.shortFormat);
-      }
-    }
-    return result;
-  };
-  $.datetime.process = function(text) {
-    var date = text;
-    if(typeof(text) == "string") {
-      date = $.datetime.parse(text);
-    }
-    var result = "";
-    if(date) {
-      result = date.toString($.datetime.sortableFormat);
-    }
-    return result;
-  };
-
   $.datepicker.oldParseDate = $.datepicker.parseDate;
   $.datepicker.parseDate = function(format, value, settings) {
-    return $.datetime.parse(value) || $.datepicker.oldParseDate(format, value, settings);
+    return parseDatetime(value) || $.datepicker.oldParseDate(format, value, settings);
   };
   $.datepicker._generateDatepickerHTML = $.datepicker._generateHTML;
   $.datepicker._generateHTML = function(inst) {

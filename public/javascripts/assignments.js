@@ -125,7 +125,7 @@ define([
     var id = $assignment.attr('id');
     data.due_at = "";
     if(due_at) {
-      data.due_at = due_at.toString($.datetime.defaultFormat);
+      data.due_at = $.datetimeString(due_at, {localized: false});
     }
     if (id == 'assignment_new') {
       if(defaultShowDateOptions) {

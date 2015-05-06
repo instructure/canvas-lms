@@ -2,8 +2,9 @@ define [
   'i18n!instructure'
   'jquery'
   'timezone'
-  'jquery.instructure_date_and_time' # $.datetime.parse, $.unfudgeDateForProfileTimezone, $.midnight
-], (I18n, $, tz) ->
+  'compiled/util/parseDatetime'
+  'jquery.instructure_date_and_time' # $.unfudgeDateForProfileTimezone, $.midnight
+], (I18n, $, tz, parseDatetime) ->
 
   # adds datepicker and suggest functionality to the specified $field
   class DatetimeField
@@ -122,7 +123,7 @@ define [
 
     parseValue: ->
       value = @normalizeValue(@$field.val())
-      @fudged = $.datetime.parse(value)
+      @fudged = parseDatetime(value)
       @datetime = $.unfudgeDateForProfileTimezone(@fudged)
       @showTime = @alwaysShowTime or (@allowTime and not $.midnight(@datetime))
       @blank = not value
