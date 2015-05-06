@@ -34,8 +34,7 @@ MAX_SERVER_START_TIME = 60
 #NEED BETTER variable handling
 THIS_ENV = ENV['TEST_ENV_NUMBER'].to_i
 THIS_ENV = 1 if ENV['TEST_ENV_NUMBER'].blank?
-ENV['WEBSERVER'].nil? ? WEBSERVER = 'webrick' : WEBSERVER = ENV['WEBSERVER']
-#set WEBSERVER ENV to webrick to change webserver
+WEBSERVER = (ENV['WEBSERVER'] || 'thin').freeze
 
 $server_port = nil
 $app_host_and_port = nil
