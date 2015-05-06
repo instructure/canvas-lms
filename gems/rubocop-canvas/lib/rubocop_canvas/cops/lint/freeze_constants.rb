@@ -9,6 +9,7 @@ module RuboCop
 
         def check_for_unfrozen_structures(node, safe_at_this_level=false)
           return if node.nil?
+          return if node.children.last == :to_i
           safe_at_next_level = false
           if node.type == :send
             safe_at_next_level = send_is_safe?(node)
@@ -22,8 +23,16 @@ module RuboCop
         private
         def send_is_safe?(node)
           return true if node.children.include?(:freeze)
+          return true if env_access?(node)
           mark_offense!(node)
           false
+        end
+
+        def env_access?(node)
+          target = node.children.first
+          target.const_type? &&
+            target.children.last == :ENV &&
+            node.children.last.str_type?
         end
 
         def check_children(node, safe_at_next_level)
