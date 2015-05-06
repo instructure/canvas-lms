@@ -55,7 +55,7 @@ module Alerts
         end
 
         it "should not trigger any alerts when there are no teachers in the class" do
-          course_with_student(:active_course => 1)
+          course_with_student(:active_course => true)
           @course.alerts.create!(:recipients => [:student], :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
           Notification.any_instance.expects(:create_message).never
 
@@ -63,15 +63,45 @@ module Alerts
         end
 
         it "should not trigger any alerts in subsequent courses" do
-          course_with_teacher(:active_all => 1)
-          student_in_course(:active_all => 1)
+          course_with_teacher(:active_all => true)
+          student_in_course(:active_all => true)
           @course.alerts.create!(:recipients => [:student], :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
-          @course.start_at = Time.now - 30.days
+          @course.start_at = Time.zone.now - 30.days
           account_alerts = []
 
           DelayedAlertSender.evaluate_for_course(@course, account_alerts)
 
           expect(account_alerts).to eq []
+        end
+
+        it "should not trigger to rejected teacher enrollments" do
+          course_with_teacher(:active_course => true)
+          student_in_course(:active_all => true)
+          @teacher.enrollments.first.reject!
+          @course.alerts.create!(
+            :recipients => [:teachers],
+            :criteria => [{:criterion_type => 'Interaction', :threshold => 7}]
+          )
+          @course.reload
+          @course.start_at = Time.zone.now - 30.days
+
+          Notification.any_instance.expects(:create_message).never
+          DelayedAlertSender.evaluate_for_course(@course, [])
+        end
+
+        it "should not trigger to rejected student enrollments" do
+          course_with_teacher(:active_course => true)
+          student_in_course(:active_all => true)
+          @student.enrollments.first.reject!
+          @course.alerts.create!(
+            :recipients => [:teachers],
+            :criteria => [{:criterion_type => 'Interaction', :threshold => 7}]
+          )
+          @course.reload
+          @course.start_at = Time.zone.now - 30.days
+
+          Notification.any_instance.expects(:create_message).never
+          DelayedAlertSender.evaluate_for_course(@course, [])
         end
       end
 
@@ -81,7 +111,7 @@ module Alerts
             course_with_teacher(:active_all => 1)
             student_in_course(:active_all => 1)
             @course.alerts.create!(:recipients => [:student], :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
-            @course.start_at = Time.now - 30.days
+            @course.start_at = Time.zone.now - 30.days
             @mock_notification.expects(:create_message).with(anything, [@user.id], anything).once
 
             DelayedAlertSender.evaluate_for_course(@course, nil)
@@ -94,7 +124,7 @@ module Alerts
             course_with_teacher(:active_all => 1)
             student_in_course(:active_all => 1)
             @course.alerts.create!(:recipients => [:student], :repetition => 1, :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
-            @course.start_at = Time.now - 30.days
+            @course.start_at = Time.zone.now - 30.days
             @mock_notification.expects(:create_message).with(anything, [@user.id], anything).once
 
             DelayedAlertSender.evaluate_for_course(@course, nil)
@@ -107,13 +137,13 @@ module Alerts
             course_with_teacher(:active_all => 1)
             student_in_course(:active_all => 1)
             alert = @course.alerts.create!(:recipients => [:student], :repetition => 1, :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
-            @course.start_at = Time.now - 30.days
+            @course.start_at = Time.zone.now - 30.days
 
             @mock_notification.expects(:create_message).with(anything, [@user.id], anything).twice
 
             DelayedAlertSender.evaluate_for_course(@course, nil)
             # update sent_at
-            Rails.cache.write([alert, @user.id].cache_key, (Time.now - 1.day).beginning_of_day)
+            Rails.cache.write([alert, @user.id].cache_key, (Time.zone.now - 1.day).beginning_of_day)
             DelayedAlertSender.evaluate_for_course(@course, nil)
           end
         end
@@ -126,7 +156,7 @@ module Alerts
           alert = @course.alerts.build(:recipients => [:student])
           alert.criteria.build(:criterion_type => 'Interaction', :threshold => 7)
           alert.save!
-          @course.start_at = Time.now - 30.days
+          @course.start_at = Time.zone.now - 30.days
           @mock_notification.expects(:create_message).with(anything, [@user.id], anything)
 
           DelayedAlertSender.evaluate_for_course(@course, nil)
@@ -143,13 +173,13 @@ module Alerts
         @assignment.save
         @submission = @assignment.submit_homework(@user)
         SubmissionComment.create!(:submission => @submission, :comment => 'some comment', :author => @teacher, :recipient => @user) do |sc|
-          sc.created_at = Time.now - 30.days
+          sc.created_at = Time.zone.now - 30.days
         end
 
         alert = @course.alerts.build(:recipients => [:student])
         alert.criteria.build(:criterion_type => 'Interaction', :threshold => 7)
         alert.save!
-        @course.start_at = Time.now - 30.days
+        @course.start_at = Time.zone.now - 30.days
 
         mock_interaction = stub(should_not_receive_message?: true)
         Alerts::Interaction.expects(:new).once.returns(mock_interaction)
@@ -188,7 +218,7 @@ module Alerts
           @assignment.workflow_state = "published"
           @assignment.save
           @submission = @assignment.submit_homework(@user, :body => 'body')
-          @submission.update_attribute(:submitted_at, Time.now - 30.days);
+          @submission.update_attribute(:submitted_at, Time.zone.now - 30.days)
 
           alert = @course.alerts.build(:recipients => [:student])
           alert.criteria.build(:criterion_type => 'UngradedTimespan', :threshold => 7)
@@ -210,7 +240,7 @@ module Alerts
           alert = @course.alerts.build(:recipients => [:student])
           alert.criteria.build(:criterion_type => 'UserNote', :threshold => 7)
           alert.save!
-          @course.start_at = Time.now - 30.days
+          @course.start_at = Time.zone.now - 30.days
           @mock_notification.expects(:create_message).with(anything, [@user.id], anything)
 
           DelayedAlertSender.evaluate_for_course(@course, nil)
@@ -239,12 +269,12 @@ module Alerts
         end
 
         it "should tell you what the alert is about timespan" do
-          @submission.update_attribute(:submitted_at, Time.now - 30.days);
+          @submission.update_attribute(:submitted_at, Time.zone.now - 30.days)
           alert = @course.alerts.build(:recipients => [:student])
           alert.criteria.build(:criterion_type => 'UngradedTimespan', :threshold => 7)
           alert.save!
-          @mock_notification.expects(:create_message).with do |alert, _, _|
-            expect(alert.criteria.first.criterion_type).to eq 'UngradedTimespan'
+          @mock_notification.expects(:create_message).with do |alert_in, _, _|
+            expect(alert_in.criteria.first.criterion_type).to eq 'UngradedTimespan'
           end
 
           DelayedAlertSender.evaluate_for_course(@course, nil)
@@ -254,8 +284,8 @@ module Alerts
           alert = @course.alerts.build(:recipients => [:student])
           alert.criteria.build(:criterion_type => 'UngradedCount', :threshold => 1)
           alert.save!
-          @mock_notification.expects(:create_message).with do |alert, _, _|
-            expect(alert.criteria.first.criterion_type).to eq 'UngradedCount'
+          @mock_notification.expects(:create_message).with do |alert_in, _, _|
+            expect(alert_in.criteria.first.criterion_type).to eq 'UngradedCount'
           end
 
           DelayedAlertSender.evaluate_for_course(@course, nil)
@@ -266,13 +296,13 @@ module Alerts
           root_account.enable_user_notes = true
           root_account.save!
 
-          ::UserNote.create!(:creator => @teacher, :user => @user) { |un| un.created_at = Time.now - 30.days }
+          ::UserNote.create!(:creator => @teacher, :user => @user) { |un| un.created_at = Time.zone.now - 30.days }
           alert = @course.alerts.build(:recipients => [:student])
           alert.criteria.build(:criterion_type => 'UserNote', :threshold => 7)
           alert.save!
-          @course.start_at = Time.now - 30.days
-          @mock_notification.expects(:create_message).with do |alert, _, _|
-            expect(alert.criteria.first.criterion_type).to eq 'UserNote'
+          @course.start_at = Time.zone.now - 30.days
+          @mock_notification.expects(:create_message).with do |alert_in, _, _|
+            expect(alert_in.criteria.first.criterion_type).to eq 'UserNote'
           end
 
           DelayedAlertSender.evaluate_for_course(@course, nil)
@@ -282,9 +312,9 @@ module Alerts
           alert = @course.alerts.build(:recipients => [:student])
           alert.criteria.build(:criterion_type => 'Interaction', :threshold => 7)
           alert.save!
-          @course.start_at = Time.now - 30.days
-          @mock_notification.expects(:create_message).with do |alert, _, _|
-            expect(alert.criteria.first.criterion_type).to eq 'Interaction'
+          @course.start_at = Time.zone.now - 30.days
+          @mock_notification.expects(:create_message).with do |alert_in, _, _|
+            expect(alert_in.criteria.first.criterion_type).to eq 'Interaction'
           end
 
           DelayedAlertSender.evaluate_for_course(@course, nil)
@@ -302,7 +332,7 @@ module Alerts
       alert = @course.alerts.build(:recipients => [:student])
       alert.criteria.build(:criterion_type => 'Interaction', :threshold => 7)
       alert.save!
-      @course.start_at = Time.now - 30.days
+      @course.start_at = Time.zone.now - 30.days
 
       expect {
         DelayedAlertSender.evaluate_for_course(@course, nil)
