@@ -131,23 +131,32 @@ define([
     var equella_button = INST && INST.equellaEnabled ? ",instructure_equella" : "";
     instructure_buttons = instructure_buttons + equella_button;
 
-    var buttons1 = "bold,italic,underline,forecolor,backcolor,removeformat,justifyleft,justifycenter,justifyright,bullist,outdent,indent,sup,sub,numlist,table,instructure_links,unlink" + instructure_buttons + ",fontsizeselect,formatselect";
+    var buttons1 = "bold,italic,underline,forecolor,backcolor,removeformat,justifyleft,justifycenter,justifyright,bullist,outdent,indent,sup,sub,numlist,table,instructure_links,unlink" + instructure_buttons + ",formatselect,styleselect";
     var buttons2 = "";
     var buttons3 = "";
 
     if (width < 359 && width > 0) {
       buttons1 = "bold,italic,underline,forecolor,backcolor,removeformat,justifyleft,justifycenter,justifyright";
       buttons2 = "outdent,indent,sup,sub,bullist,numlist,table,instructure_links,unlink" + instructure_buttons;
-      buttons3 = "fontsizeselect,formatselect";
+      buttons3 = "fontsizeselect,formatselect,styleselect";
     } else if (width < 600) {
       buttons1 = "bold,italic,underline,forecolor,backcolor,removeformat,justifyleft,justifycenter,justifyright,outdent,indent,sup,sub,bullist,numlist";
-      buttons2 = "table,instructure_links,unlink" + instructure_buttons + ",fontsizeselect,formatselect";
+      buttons2 = "table,instructure_links,unlink" + instructure_buttons + ",formatselect,styleselect";
     }
 
     var editor_css = "/javascripts/tinymce/jscripts/tiny_mce/themes/advanced/skins/default/ui.css,/stylesheets_compiled/legacy_normal_contrast/tiny_like_ck_with_external_tools.css";
 
     var tinyOptions = $.extend({
       mode : "exact",
+      style_formats: [
+	{title: 'Intro', inline: 'span', classes: 'intro'},
+	{title: 'Helpful Tip', inline: 'span', classes: 'tip'},
+	{title: 'Watch out!', inline: 'span', classes: 'warning'},
+	{title: 'To-do item', inline: 'span', classes: 'to-do'},
+	{title: 'Pullout', inline: 'span', classes: 'pullout'},
+	{title: 'Resource', inline: 'span', classes: 'resource'},
+	{title: 'Spoiler', inline: 'span', classes: 'spoiler'}
+      ],
       elements: id,
       theme : "advanced",
       plugins: "autolink,instructure_external_tools,instructure_contextmenu,instructure_links," +
@@ -165,7 +174,7 @@ define([
 
       theme_advanced_resize_horizontal : false,
       theme_advanced_resizing : true,
-      theme_advanced_blockformats : "p,h2,h3,h4,pre",
+      theme_advanced_blockformats : "p,h3,h4,h5,blockquote",
       theme_advanced_more_colors: false,
       extended_valid_elements : "iframe[src|width|height|name|align|style|class|sandbox]",
       content_css: "/stylesheets_compiled/legacy_normal_contrast/instructure_style.css,/stylesheets_compiled/legacy_normal_contrast/tinymce.editor_box.css",
@@ -251,6 +260,16 @@ define([
             });
           }
         });
+
+        /*
+        ed.addButton('test', {
+          text: 'TEST',
+          icon: false,
+          onclick: function() {
+            ed.insertContent('<span class="foo">TEST</span>');
+          }
+	});
+        */
       }
     }, options.tinyOptions || {});
 
