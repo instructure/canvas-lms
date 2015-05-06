@@ -1,7 +1,7 @@
-DataFixup::FixCorruptAssessmentQuestionsFromCnvs19292 = Struct.new(:bug_start_date, :bug_end_date) do
+DataFixup::FixCorruptAssessmentQuestionsFromCnvs19292 = Struct.new(:question_types, :bug_start_date, :bug_end_date) do
   LOG_PREFIX = "FIX_19292_CORRUPTION - "
 
-  def self.run(bug_start_date = false, bug_end_date = false, noop = false)
+  def self.run(question_types, bug_start_date = false, bug_end_date = false, noop = false)
     if noop
       # Dangerous, but noop should only be executed in isolation.
       connection = ActiveRecord::Base.connection
@@ -24,7 +24,7 @@ DataFixup::FixCorruptAssessmentQuestionsFromCnvs19292 = Struct.new(:bug_start_da
       end
     end
 
-    runner = self.new(bug_start_date, bug_end_date)
+    runner = self.new(question_types, bug_start_date, bug_end_date)
 
     result = runner.fix_assessment_questions
 
@@ -87,13 +87,15 @@ DataFixup::FixCorruptAssessmentQuestionsFromCnvs19292 = Struct.new(:bug_start_da
   # Update each AssessmentQuestion to increment version_number, this will
   # cause associated QuizQuestions to update on next Quiz take
   def fix_assessment_questions
+    return false unless question_types.present?
+
+    question_type_queries = question_types.map do |qt|
+      "assessment_questions.question_data LIKE '%#{qt}%'"
+    end.join(" or ")
+
     query = AssessmentQuestion
             .joins(:assessment_question_bank => {:quiz_groups => :quiz})
-            .where("
-               assessment_questions.question_data LIKE '%calculated_question%' or
-               assessment_questions.question_data LIKE '%numerical_question%' or
-               assessment_questions.question_data LIKE '%matching_question%'
-            ")
+            .where(question_type_queries)
 
     if bug_start_date && bug_end_date
       query = query
