@@ -13221,6 +13221,7 @@ fa-IR:
       grading_alt: "نمره گذاری"
       submission_comment: "نظر درباره مورد ارسالی"
     terms_required: 
+      terms_have_changed: "ضوابط استفاده تغییر کرده است. لطفا قبل از استفاده از کانواس، آنها را بازبینی کنید."
       updated_terms_of_use: "ضوابط استفاده بهنگام سازی شده"
     unauthorized: 
       headings: 
