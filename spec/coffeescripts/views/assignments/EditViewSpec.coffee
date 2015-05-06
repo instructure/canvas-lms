@@ -135,6 +135,15 @@ define [
     errors = view._validateExternalTool(data, [])
     equal errors["external_tool_tag_attributes[url]"][0]['message'], 'External Tool URL cannot be left blank'
 
+  test 'removes group_category_id if an external tool is selected', ->
+    view = editView()
+    data = {
+      submission_type: 'external_tool'
+      group_category_id: '1'
+    }
+    data = view._unsetGroupsIfExternalTool(data)
+    equal data.group_category_id, null
+
   test 'renders escaped angle brackets properly', ->
     desc = "<p>&lt;E&gt;</p>"
     view = editView description: "<p>&lt;E&gt;</p>"

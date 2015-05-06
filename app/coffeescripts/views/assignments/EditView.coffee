@@ -226,6 +226,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       data = super
       data = @_inferSubmissionTypes data
       data = @_filterAllowedExtensions data
+      data = @_unsetGroupsIfExternalTool data
       unless ENV?.IS_LARGE_ROSTER
         data = @groupCategorySelector.filterFormData data
       # should update the date fields.. pretty hacky.
@@ -296,6 +297,11 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
           $.trim(ext.toString()).length > 0
       else
         data.allowed_extensions = null
+      data
+
+    _unsetGroupsIfExternalTool: (data) =>
+      if data.submission_type == 'external_tool'
+        data.group_category_id = null
       data
 
     # -- Pre-Save Validations --
