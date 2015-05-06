@@ -6,6 +6,15 @@ GIT
       launchy (>= 2.2.0)
 
 GIT
+  remote: https://github.com/eac/mocha.git
+  revision: bb8813fbb4cc589d7c58073d93983722d61b6919
+  ref: bb8813fbb4cc589d7c58073d93983722d61b6919
+  branch: eac/alias_method_fix
+  specs:
+    mocha (1.1.0)
+      metaclass (~> 0.0.1)
+
+GIT
   remote: https://github.com/kreynolds/cassandra-cql.git
   revision: beed72e249d02cebc850a4b92b468c8b64b12257
   ref: beed72e249d02cebc850a4b92b468c8b64b12257
@@ -453,8 +462,6 @@ GEM
     mime-types (1.17.2)
     mini_magick (1.3.2)
       subexec (~> 0.0.4)
-    mocha (1.1.0)
-      metaclass (~> 0.0.1)
     moodle2cc (0.2.10)
       builder
       happymapper
@@ -703,7 +710,7 @@ DEPENDENCIES
   metaclass (= 0.0.2)
   mime-types (= 1.17.2)
   mini_magick (= 1.3.2)
-  mocha (= 1.1.0)
+  mocha!
   moodle2cc (= 0.2.10)
   multi_json (= 1.8.2)
   multipart!
