@@ -171,12 +171,19 @@ module LtiOutbound
       end
 
       consumer = OAuth::Consumer.new(key, secret, {
-          :site => "#{uri.scheme}://#{host}",
-          :signature_method => 'HMAC-SHA1'
-      })
+                                            :site => "#{uri.scheme}://#{host}",
+                                            :signature_method => 'HMAC-SHA1'
+                                        })
 
       path = uri.path
       path = '/' if path.empty?
+      if uri.query && uri.query != ''
+        CGI.parse(uri.query).each do |query_key, query_values|
+          unless params[query_key]
+            params[query_key] = query_values.first
+          end
+        end
+      end
       options = {
           :scheme           => 'body',
           :timestamp        => @timestamp,
