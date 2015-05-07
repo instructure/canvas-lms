@@ -63,9 +63,19 @@ Rails.configuration.after_initialize do
     Delayed::Periodic.cron 'IncomingMailProcessor::IncomingMessageProcessor#process', '*/1 * * * *' do
       imp = IncomingMailProcessor::IncomingMessageProcessor.new(IncomingMail::MessageHandler.new, ErrorReport::Reporter.new)
       IncomingMailProcessor::IncomingMessageProcessor.workers.times do |worker_id|
-        imp.send_later_enqueue_args(:process,
-                                    {singleton: "IncomingMailProcessor::IncomingMessageProcessor#process:#{worker_id}", max_attempts: 1},
-                                    {worker_id: worker_id})
+        if IncomingMailProcessor::IncomingMessageProcessor.dedicated_workers_per_mailbox
+          # Launch one per mailbox
+          IncomingMailProcessor::IncomingMessageProcessor.mailbox_accounts.each do |account|
+            imp.send_later_enqueue_args(:process,
+                                        {singleton: "IncomingMailProcessor::IncomingMessageProcessor#process:#{worker_id}:#{account.address}", max_attempts: 1},
+                                        {worker_id: worker_id, mailbox_account_address: account.address})
+          end
+        else
+          # Just launch the one
+          imp.send_later_enqueue_args(:process,
+                                      {singleton: "IncomingMailProcessor::IncomingMessageProcessor#process:#{worker_id}", max_attempts: 1},
+                                      {worker_id: worker_id})
+        end
       end
     end
   end
