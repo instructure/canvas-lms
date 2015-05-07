@@ -64,7 +64,7 @@ Rails.configuration.after_initialize do
       imp = IncomingMailProcessor::IncomingMessageProcessor.new(IncomingMail::MessageHandler.new, ErrorReport::Reporter.new)
       IncomingMailProcessor::IncomingMessageProcessor.workers.times do |worker_id|
         imp.send_later_enqueue_args(:process,
-                                    {strand: "IncomingMailProcessor::IncomingMessageProcessor#process:#{worker_id}", max_attempts: 1},
+                                    {singleton: "IncomingMailProcessor::IncomingMessageProcessor#process:#{worker_id}", max_attempts: 1},
                                     {worker_id: worker_id})
       end
     end
