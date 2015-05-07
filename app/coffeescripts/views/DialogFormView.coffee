@@ -45,6 +45,10 @@ define [
 
       height: null
 
+      minWidth: null
+
+      minHeight: null
+
       fixDialogButtons: true
 
     $dialogAppendTarget: $ 'body'
@@ -176,6 +180,8 @@ define [
         open: => @trigger 'open'
       opts.width = @options.width
       opts.height = @options.height
+      opts.minWidth = @options.minWidth
+      opts.minHeight = @options.minHeight
       @$el.dialog(opts)
       @$el.fixDialogButtons() if @options.fixDialogButtons
       @dialog = @$el.data 'dialog'
