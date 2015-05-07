@@ -1439,9 +1439,9 @@ class User < ActiveRecord::Base
       course_ids = Shackles.activate(:slave) do
         if opts[:contexts]
           (Array(opts[:contexts]).map(&:id) &
-           current_student_course_ids)
+           participating_student_course_ids)
         else
-          current_student_course_ids
+          participating_student_course_ids
         end
       end
 
@@ -1478,9 +1478,9 @@ class User < ActiveRecord::Base
       course_ids = Shackles.activate(:slave) do
         if opts[:contexts]
           (Array(opts[:contexts]).map(&:id) &
-          current_instructor_course_ids)
+          participating_instructor_course_ids)
         else
-          current_instructor_course_ids
+          participating_instructor_course_ids
         end
       end
 
@@ -1510,9 +1510,9 @@ class User < ActiveRecord::Base
     course_ids = Shackles.activate(:slave) do
       if opts[:contexts]
         (Array(opts[:contexts]).map(&:id) &
-        current_student_course_ids)
+        participating_student_course_ids)
       else
-        current_student_course_ids
+        participating_student_course_ids
       end
     end
 
@@ -1766,18 +1766,20 @@ class User < ActiveRecord::Base
     end
   end
 
-  def current_student_course_ids
-    @current_student_course_ids ||= Rails.cache.fetch([self, 'current_student_course_ids'].cache_key) do
-      self.enrollments.with_each_shard { |scope| scope.student.select(:course_id) }.map(&:course_id)
-    end
-    @current_student_course_ids.map{|id| Shard.relative_id_for(id, self.shard, Shard.current)}
+  def participating_student_course_ids
+    participating_enrollments.select(&:student?).map(&:course_id).uniq
   end
 
-  def current_instructor_course_ids
-    @current_instructor_course_ids ||= Rails.cache.fetch([self, 'current_instructor_course_ids'].cache_key) do
-      self.enrollments.with_each_shard { |scope| scope.instructor.select(:course_id) }.map(&:course_id)
+  def participating_instructor_course_ids
+    participating_enrollments.select(&:instructor?).map(&:course_id).uniq
+  end
+
+  def participating_enrollments
+    @participating_enrollments ||= self.shard.activate do
+      Rails.cache.fetch([self, 'participating_enrollments'].cache_key) do
+        self.cached_current_enrollments.select(&:participating?)
+      end
     end
-    @current_instructor_course_ids.map{|id| Shard.relative_id_for(id, self.shard, Shard.current)}
   end
 
   def submissions_for_context_codes(context_codes, opts={})
@@ -1835,7 +1837,7 @@ class User < ActiveRecord::Base
     context_codes ||= if opts[:contexts]
         setup_context_lookups(opts[:contexts])
       else
-        self.current_student_course_ids.map { |id| "course_#{id}" }
+        self.participating_student_course_ids.map { |id| "course_#{id}" }
       end
     submissions_for_context_codes(context_codes, opts)
   end
