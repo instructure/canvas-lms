@@ -15,6 +15,6 @@ define [
         GooglePlayParams: null,
         icon: '/images/android/logo.png',
         button: I18n.t('android_banner_view_button', 'VIEW'),
-        daysHidden: 0,
-        daysReminder: 0,
+        daysHidden: null,
+        daysReminder: null,
         layer: true
