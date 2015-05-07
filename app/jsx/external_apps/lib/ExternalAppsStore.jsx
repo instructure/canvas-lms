@@ -172,7 +172,7 @@ define([
           } else {
               var pairs = (data.customFields || '').split('\n');
             _.forEach(pairs, function(pair) {
-              var vals = pair.trim().split('=');
+              var vals = pair.trim().split(/=(.+)?/);
               params['custom_fields[' + vals[0] + ']'] = vals[1];
             });
           }
