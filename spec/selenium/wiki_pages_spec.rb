@@ -28,12 +28,16 @@ describe "Navigating to wiki pages" do
       check_element_has_focus(f("[data-sort-field='#{attribute}']"))
     end
 
-    before :each do
+    before :once do
       account_model
-      course_with_teacher_logged_in :account => @account
+      course_with_teacher :account => @account
       @course.wiki.wiki_pages.create!(:title => "Foo")
       @course.wiki.wiki_pages.create!(:title => "Bar")
       @course.wiki.wiki_pages.create!(:title => "Baz")
+    end
+
+    before :each do
+      user_session(@user)
     end
 
     it "returns focus to the header item clicked while sorting" do
@@ -187,6 +191,59 @@ describe "Navigating to wiki pages" do
       end
     end
 
+    describe "Revisions Page" do
+      before :once do
+        account_model
+        course_with_teacher :account => @account, :active_all => true
+        @timestamps = %w(2015-01-01 2015-01-02 2015-01-03).map { |d| Time.zone.parse(d) }
+
+        Timecop.freeze(@timestamps[0]) do      # rev 1
+          @vpage = @course.wiki.wiki_pages.build :title => 'bar'
+          @vpage.workflow_state = 'unpublished'
+          @vpage.body = 'draft'
+          @vpage.save!
+        end
+
+        Timecop.freeze(@timestamps[1]) do      # rev 2
+          @vpage.workflow_state = 'active'
+          @vpage.body = 'published by teacher'
+          @vpage.user = @teacher
+          @vpage.save!
+        end
+
+        Timecop.freeze(@timestamps[2]) do      # rev 3
+          @vpage.body = 'revised by teacher'
+          @vpage.user = @teacher
+          @vpage.save!
+        end
+        @user = @teacher
+      end
+
+      before :each do
+        user_session(@user)
+        get "/courses/#{@course.id}/pages/#{@vpage.url}/revisions"
+      end
+
+      it "should let the revisions be focused" do
+        driver.execute_script("$('.close-button').focus();")
+        f('.close-button').send_keys(:tab)
+        all_revisions = ff('.revision')
+        all_revisions.each do |revision|
+          check_element_has_focus(revision)
+          revision.send_keys(:tab)
+        end
+      end
+
+      it "should focus on the 'restore this revision link' after selecting a revision" do
+        driver.execute_script("$('.revision:nth-child(2)').focus();")
+        element = fj('.revision:nth-child(2)')
+        element.send_keys(:enter)
+        wait_for_ajaximations
+        element.send_keys(:tab)
+        check_element_has_focus(f('.restore-link'))
+      end
+
+    end
   end
 
   describe "Show Page" do
