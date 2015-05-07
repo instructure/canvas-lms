@@ -260,16 +260,6 @@ define([
             });
           }
         });
-
-        /*
-        ed.addButton('test', {
-          text: 'TEST',
-          icon: false,
-          onclick: function() {
-            ed.insertContent('<span class="foo">TEST</span>');
-          }
-	});
-        */
       }
     }, options.tinyOptions || {});
 
