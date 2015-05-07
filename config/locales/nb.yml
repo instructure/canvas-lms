@@ -52,6 +52,7 @@ nb:
   _section_not_synced_yet_cd07d0dd: "-- Seksjon synkroniseres ikke ennå"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "En beregnede verdien brukes ikke med denne beregningsmetoden"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "En fil med navnet %{itemName} finnes allerede i denne mappen."
+  a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Et praktisk nøkkel/verdi utslipp av mye interessant miljøinfo for rapporteringsbrukeren"
   a_message_is_required_129e1814: "En melding kreves"
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "En tabell som inneholder navnet på gradering ordningen og ikoner for å redigere eller slette ordningen."
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "En tabell som inneholder gradering ordningen data. Hver rad inneholder et navn, en maksimal prosent, og en minimum prosent. I tillegg inneholder hver rad et ikon for å legge til en ny rad under, og et ikon for å slette gjeldende rad."
@@ -2907,6 +2908,7 @@ nb:
         current: "Gjeldende samarbeid"
     show: 
       error_cause_1: "Google Drive-kontoen til oppretteren skiller seg fra kontoen brukt til å opprette samarbeidet."
+      error_cause_2: "Samarbeidets skaper er ikke lenger en forfatter i google doc."
       error_summary: "Det ser ut at dette samarbeidet ikke fungerer. Mulige årsaker:"
       error_title: "Google Drive samarbeidsfeil"
       headings: 
@@ -5492,6 +5494,9 @@ nb:
   ember_modules_description: "Moduler omskrevet i Ember. Bruker den innfødte dra og slipp API for å tillate å dra fra eksterne steder."
   enable_6f5d1328: "Slå på"
   enable_gradebook_list_students_by_sortable_name: "Liste studenter ved deres sorterbar navnene i karakterboken. Sorterbar navn som standard til 'Etternavn, Fornavn' og kan endres i innstillinger."
+  enable_multiple_grading_periods: |-
+      Flere vurderingsperioder tillater lærere og administratorer opprette vurderingsperioder med valgte
+      datoer. Innleveringer kan filtreres etter disse vurderingsperiodene i vurderingsboken.
   end_date_e0093ed7: Sluttdato
   ends_on_date_320e0c26: "Slutter på dato"
   enrollment: 
@@ -10430,6 +10435,15 @@ nb:
     kaltura_settings: 
       account_settings: "Disse verdiene finner du i Kaltura Management Console under \"Settings -> Integration Settings\""
       cache_explanation: "Tom betyr buffre uendelig, 0 betyr ikke buffre."
+      description: |-
+          Du vil trenge en konto på enten [Kaltura.com](%{kaltura_url})
+          eller med en instans av Kaltura.
+          
+          **Merk:** etter at du har konfigurert Kaltura med Canvas, må du gå til Kaltura-administreringskonsoll og under "Innstillinger -> Integreringsinnstillinger" aktivere servervarsler med en Varsel-URL:
+          
+          %{notification_url}
+          
+          Således sjekk feltene for "Legg til oppføring" og "Slett oppføring" i "Sendt av server"-kolonnen.
       headers: 
         account_settings: Kontoinnstillinger
         canvas_settings: Canvas-innstillinger
@@ -12996,6 +13010,7 @@ nb:
         go_to_course: "Gå til kurset"
         go_to_dashboard: "Gå til kontrollpanelet ditt"
       not_available_yet: "Vi vil sende deg en epost kort tid før kurset starter."
+  send_custom_fields_uncheck_unless_using_canvas_zen_67e83666: "Send tilpassede felt (avmarker med mindre du bruker Canvas zendesk)"
   send_e3bd0ed0: Send
   sequence_footer: 
     next_module: "Neste modul:"
@@ -13033,6 +13048,7 @@ nb:
         consumer_secret: "Salesforce Consumer Secret"
         is_sandbox: "Dette er en salesforce-sandboxkonto"
         refresh_token: "Oppdater token"
+        send_custom_fields: "Send tilpassede felt listet nedenfor med hver ticket"
     web_to_case_settings: 
       labels: 
         api_url: "Salesforce API Endpoint URL"
@@ -13728,6 +13744,7 @@ nb:
       titles: 
         uploading: "Laster opp. Vennligst vent."
   shared_secret_892c88f2: "Delt hemmelighet"
+  should_be_self_evident_the_canvas_id_of_the_report_44378262: "bør være selvforklarende, Canvas ID til rapporterende brukeren"
   show_by_date_e3967761: "Vis etter dato"
   show_by_type_c5d61732: "Vis etter type"
   show_correct_answers_at_a5475aa3: "Vis riktige svar på"
@@ -14187,8 +14204,10 @@ nb:
   the_app_was_added_successfully_3f785a23: "App ble lagt til"
   the_app_was_deactivated_573520ab: "Appen ble deaktivert"
   the_app_was_updated_successfully_3d71cd1b: "App ble oppdatert"
+  the_error_stack_trace_if_there_is_one_b7e008a1: "Feil stakksporing, hvis det finnes noen"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "Files kategorien er stedet til å dele forelesnings lysbilder, eksempel dokumenter, studie hjelper -- noe som helst elevene vil ønske å laste ned. Laste opp og organisere filene dine er lett med Canvas. Vi viser deg hvordan."
   the_following_fields_are_invalid_fields_b3565800: "Følgende felt er ugyldige: %{fields}"
+  the_full_hostname_for_the_account_instance_somethi_e325da1f: "Fulle vertsnavnet for kontoen (noe.instructure.com f.eks.)"
   the_grading_period_was_deleted_7814a349: "Vurderingsperioden ble slettet"
   the_grading_period_was_saved_4a504c5: "Vurderingsperioden ble lagret"
   the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "Logobildet øverst til høyre Canvas toppen. 200x200 svg eller png"
@@ -14196,10 +14215,16 @@ nb:
   the_material_is_licensed_under_creative_commons_3242cb5e: "Materialet er lisensiert under Creative Commons"
   the_material_is_subject_to_fair_use_exception_41bc6a4b: "Materialet er underlagt til rimelig bruk unntak"
   the_module_item_is_locked_27fe420b: "Modulen element er låst."
+  the_most_recent_scores_for_user_current_user_name__ea82f0b6: "De nyligste poengsummene for brukeren %{current_user_name} og utfallet %{outcome_name}."
   the_profile_picture_has_been_reported_d609d6dd: "Den profilbildet har blitt rapportert"
+  the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "rollene til den rapporterende brukeren (elev, lærer, admin, osv.)"
+  the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "Problemets alvorlighetsgrad, slik som valgt i en rullegardinsliste."
   the_shortcut_icon_for_ios_android_devices_180x180__f87fa178: "Snarveisikonet for iOS/Android enheter. 180x180 png eller svg"
   the_state_parameter_is_required_ffadf213: "Staten parameteren er nødvendig"
   the_top_track_represents_days_on_which_the_student_2a347099: "Den øverste spor representerer dager hvor *student sendte meldinger* til kursinstruktører. Den nederste sporet er for **meldinger fra instruktørene** til studenter."
+  the_unique_id_used_for_representing_the_specific_r_3bdf5870: "Unik ID brukt for representasjon av den spesifikke forespørsel/respons-syklusen denne feilrapporten skjedde rundt"
+  the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "URL-adressen til en tilstrekkelig priviligert bruker kan brukes som maskerade som rapporteringsbrukeren på den samme siden for å redusere problemet"
+  the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "URL-adressen av siden brukeren var på da den rapporterte feilen"
   there_are_count_results_in_the_list_e74f6e36: 
     one: "Det er en resultat i listen"
     other: "Det er %{count} resultater i listen"
@@ -14210,6 +14235,7 @@ nb:
   there_was_an_error_in_processing_your_request_6513a49a: "En feil oppsto under behandling av forespørselen din"
   there_was_an_error_setting_usage_rights_53739e1d: "Det oppstod en feil innstilling bruksrettigheter."
   there_were_errors_with_the_form_errors_ab5b559a: "Det var feilene med skjemaet: %{errors}"
+  these_grading_periods_were_created_for_you_by_an_a_e977c2b5: "Disse vurderingsperiodene ble opprettet for deg av en administrator."
   this_conference_may_be_recorded_f76deeeb: "Denne konferansen kan bli tatt opp"
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "Dette kurset kan ikke legges til kurs menyen på dette tidspunktet."
   this_course_is_claimed_and_ready_but_you_ll_need_t_25b95a0a: "Dette kurset er hevdet og klar, men du trenger å fullføre registrerings prosessen før du kan publisere kurset. Du skal ha mottatt en epost fra Canvas med en link for å fullføre prosessen. Husk å sjekke spam boksen."
@@ -15108,6 +15134,7 @@ nb:
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "Du er logget inn på %{institution1} ved hjelp av legitimasjonen fra %{institution2}"
   you_are_subscribed_and_will_be_notified_of_new_com_60b5b62b: "Du er abonnert og blir varslet om nye kommentarer. Klikk for å avslutte abonnement"
   you_are_the_group_leader_for_this_group_b8629b70: "du er gruppeleder for denne gruppen"
+  you_are_trying_to_launch_insecure_content_from_wit_5c1c692b: "Du prøver å lansere usikkert innhold innenfra en sikker side (canvas). Noen nettlesere kan hindre dette innholdet i innlasting."
   you_are_unsubscribed_and_will_not_be_notified_of_n_bf4b96a2: "Du har avsluttet abonnementet og blir ikke varslet om nye kommentarer. Klikk for å abonnere"
   you_can_disable_this_feature_d5e61373: "Du kan deaktivere denne funksjonen"
   you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: "Du kan skjule eller vise en kursets oppgaver ved veksling dem på eller av."
