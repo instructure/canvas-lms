@@ -2255,7 +2255,7 @@ class Course < ActiveRecord::Base
 
   def invited_count_visible_to(user)
     scope = users_visible_to(user).
-      where("enrollments.workflow_state = 'invited' AND enrollments.type != 'StudentViewEnrollment'")
+      where("enrollments.workflow_state in ('invited', 'creation_pending') AND enrollments.type != 'StudentViewEnrollment'")
     scope.select('users.id').uniq.count
   end
 
