@@ -1294,10 +1294,6 @@ class Account < ActiveRecord::Base
     Canvas::Help.default_links + (settings[:custom_help_links] || [])
   end
 
-  def self.register_service(service_name, info_hash)
-    AccountServices.register_service(service_name, info_hash)
-  end
-
   def set_service_availability(service, enable)
     service = service.to_sym
     raise "Invalid Service" unless AccountServices.allowable_services[service]
