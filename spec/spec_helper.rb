@@ -165,7 +165,11 @@ Mocha::ObjectMethods.instance_methods.each do |m|
   RUBY
 end
 
-Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
+factories = "#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb"
+Dir.glob(factories).each { |file| require file }
+
+examples = "#{File.dirname(__FILE__).gsub(/\\/, "/")}/shared_examples/*.rb"
+Dir.glob(examples).each { |file| require file }
 
 def pend_with_bullet
   if defined?(Bullet) && Bullet.enable?
