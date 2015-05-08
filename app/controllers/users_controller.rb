@@ -26,6 +26,36 @@ require 'atom'
 # `users/:user_id/page_views` can be accessed as `users/self/page_views` to
 # access the current user's page views.
 #
+# @model UserDisplay
+#     {
+#       "id": "UserDisplay",
+#       "description": "This mini-object is used for secondary user responses, when we just want to provide enough information to display a user.",
+#       "properties": {
+#         "id": {
+#           "description": "The ID of the user.",
+#           "example": 2,
+#           "type": "integer",
+#           "format": "int64"
+#         },
+#         "short_name": {
+#           "description": "A short name the user has selected, for use in conversations or other less formal places through the site.",
+#           "example": "Shelly",
+#           "type": "string"
+#         },
+#         "avatar_image_url": {
+#           "description": "If avatars are enabled, this field will be included and contain a url to retrieve the user's avatar.",
+#           "example": "https://en.gravatar.com/avatar/d8cb8c8cd40ddf0cd05241443a591868?s=80&r=g",
+#           "type": "string"
+#         },
+#         "html_url": {
+#           "description": "URL to access user, either nested to a context or directly.",
+#           "example": "https://school.instructure.com/courses/:course_id/users/:user_id",
+#           "type": "string"
+#         }
+#       }
+#     }
+#
+#
 # @model User
 #     {
 #       "id": "User",
@@ -111,6 +141,9 @@ require 'atom'
 #         }
 #       }
 #     }
+#
+#
+#
 class UsersController < ApplicationController
   include Delicious
   include SearchHelper

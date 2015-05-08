@@ -48,7 +48,15 @@ module Api::V1::Submission
         sc_hash['attachments'] = sc.attachments.map do |a|
           attachment_json(a, user)
         end unless sc.attachments.blank?
-        sc_hash['author'] = user_display_json(sc.author, sc.context)
+        if sc.grants_right?(@current_user, :read_author)
+          sc_hash['author'] = user_display_json(sc.author, sc.context)
+        else
+          sc_hash.merge!({
+            author: {},
+            author_id: nil,
+            author_name: I18n.t("Anonymous User")
+          })
+        end
         sc_hash
       end
     end

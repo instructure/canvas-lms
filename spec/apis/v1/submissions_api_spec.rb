@@ -497,6 +497,45 @@ describe 'Submissions API', type: :request do
     })
   end
 
+  it 'should not return user display info with anonymous submission comments' do
+    reviewed = student_in_course({
+      :active_all => true
+    }).user
+    reviewer = student_in_course({
+      :active_all => true,
+      :course => @course
+    }).user
+    assignment = assignment_model(course: @course)
+    assignment.update_attribute(:anonymous_peer_reviews, true)
+    expect(assignment.reload.anonymous_peer_reviews?).to be_truthy, 'precondition'
+
+    submission = assignment.submit_homework(reviewed, body: "My Submission")
+    submission_comment = submission.add_comment({
+      author: reviewer,
+      comment: "My comment"
+    })
+    expect(submission_comment.grants_right?(reviewed, :read_author)).to be_falsey,
+      'precondition'
+
+    @user = reviewed
+    url = "/api/v1/courses/#{@course.id}/students/submissions.json"
+    json = api_call(:get, url, {
+      :controller => 'submissions_api',
+      :action => 'for_students',
+      :format => 'json',
+      :course_id => @course.to_param,
+      :assignment_ids => [ @assignment.to_param ],
+      :student_ids => [ reviewed.to_param ]
+    }, {
+      :include => %w(submission_comments)
+    })
+
+    comment_json = json.first['submission_comments'].first
+    expect(comment_json['author_id']).to be_nil
+    expect(comment_json['author_name']).to match(/Anonymous/)
+    expect(comment_json['author']).to be_empty
+  end
+
   it "should return comment id along with submission comments" do
 
     submission_with_comment

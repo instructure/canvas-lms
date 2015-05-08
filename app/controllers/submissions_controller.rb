@@ -65,6 +65,11 @@ require 'action_controller_test_process'
 #           "example": "Toph Beifong",
 #           "type": "string"
 #         },
+#         "author": {
+#           "description": "Abbreviated user object UserDisplay (see users API).",
+#           "example": "{}",
+#           "type": "string"
+#         },
 #         "comment": {
 #           "example": "Well here's the thing...",
 #           "type": "string"
