@@ -22,17 +22,15 @@ module RuboCop
 
         private
         def send_is_safe?(node)
+          return true if target_isnt_structure_or_string(node)
           return true if node.children.include?(:freeze)
-          return true if env_access?(node)
           mark_offense!(node)
           false
         end
 
-        def env_access?(node)
+        def target_isnt_structure_or_string(node)
           target = node.children.first
-          target.const_type? &&
-            target.children.last == :ENV &&
-            node.children.last.str_type?
+          ![:hash, :array, :string].include?(target.type)
         end
 
         def check_children(node, safe_at_next_level)

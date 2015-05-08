@@ -53,8 +53,38 @@ describe RuboCop::Cop::Lint::FreezeConstants do
     expect(cop.offenses.size).to eq(0)
   end
 
+  it "doesnt care about regex literal" do
+    inspect_source(cop, "REGEX = /someregex/")
+    expect(cop.offenses.size).to eq(0)
+  end
+
+  it "doesnt care about regex object" do
+    inspect_source(cop, "REGEX = Regexp.new('^someregex$')")
+    expect(cop.offenses.size).to eq(0)
+  end
+
+  it "will not flag regexes with a non-string value as the last param" do
+    inspect_source(cop, "R = Regexp.new('case-insensitive value', true)")
+    expect(cop.offenses.size).to eq(0)
+  end
+
+  it "doesnt care about frozen regex literal" do
+    inspect_source(cop, "REGEX = /someregex/.freeze")
+    expect(cop.offenses.size).to eq(0)
+  end
+
+  it "doesnt care about frozen regex object" do
+    inspect_source(cop, "REGEX = Regexp.new('^someregex$').freeze")
+    expect(cop.offenses.size).to eq(0)
+  end
+
   it "recognizes freezing the result of a ||" do
     inspect_source(cop, "WEBSERVER = (ENV['WEBSERVER'] || 'thin').freeze")
+    expect(cop.offenses.size).to eq(0)
+  end
+
+  it "doesnt care about regular classes" do
+    inspect_source(cop, "STRUCT = Struct.new(:grading_type)")
     expect(cop.offenses.size).to eq(0)
   end
 
