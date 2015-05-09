@@ -54,6 +54,7 @@ pl:
   _section_not_synced_yet_cd07d0dd: "-- Sekcja jeszcze niezsynchronizowana"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Wartość obliczenia nie jest używana przy tej metodzie obliczania"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "Folder o nazwie %{itemName} już istnieje."
+  a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Poręczny kluczowy/wartościowy zrzut wielku ciekawych informacji środowiskowych dla zgłaszającego użytkownika"
   a_message_is_required_129e1814: "Wymagana jest wiadomość"
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "Tabela zawierająca nazwę schematu oceniana i ikony do edytowania lub usuwania schematu. "
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "Tabela, która zawiera dane schematu oceniania. Każdy rząd zawiera nazwę, maksymalną wartość procentową i minimalną wartość procentową. Ponadto każdy rząd zawiera ikonę pozwalającą dodać nowy rząd poniżej, a także ikonę pozwalającą usunąć bieżący rząd."
@@ -1505,6 +1506,7 @@ pl:
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Czy na pewno chcesz usunąć to ogłoszenie?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Czy na pewno chcesz usunąć ten okres oceniania?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Czy na pewno chcesz usunąć ten schemat oceniania?"
+  are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Czy jesteś pewny, że chcesz usunąć dany okres klasyfikacyjny?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Czy na pewno chcesz usunąć to narzędzie?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Napewno chcesz zgłosić to zdjęcie profilowe?"
   aria_labels: 
@@ -2911,6 +2913,14 @@ pl:
       started_by: "Rozpoczęta przez*%{user}*, %{at}"
       titles: 
         current: "Bieżące projekty współpracy"
+    show: 
+      error_cause_1: "Konto Google Drive kreatora jest inne niż konto używane do tworzenia współpracy."
+      error_cause_2: "Kreator współpracy juz nie jest autorem na google doc."
+      error_summary: "Wygląda na to, że współpraca nie funkcjonuje. Możliwe przyczyny:"
+      error_title: "Błąd współpracy z Google Drive"
+      headings: 
+        page: "Błąd współpracy z Google Drive"
+      resolution: "Skontaktuj się z kreatorem aby złożyć zawiadomienie."
     titles: 
       delete: "Usunąć współpracę?"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Zwiń listę członków grupy dla %{groupName}"
@@ -5156,6 +5166,7 @@ pl:
       new_quiz: "Nowy test"
     edit_crumb: Edytuj
     edit_view: 
+      allow_liking: "Zezwól na polubienia"
       allow_threaded_replies: "Zezwalaj na odpowiedzi złożone z wątków"
       attachment: Załącznik
       available_from: "Dostępne od"
@@ -5166,6 +5177,7 @@ pl:
       delay_posting: "Opóźnij ogłaszanie"
       enable_podcast_feed: "Uaktywnij kanał informacyjny"
       include_replies_in_podcast_feed: "Włącz odpowiedzi uczniów do źródła podkastów"
+      only_graders_can_like: "Tylko osoby oceniające mogą 'lubić to'"
       only_visible_to_overrides_note: "Uwaga: ta dyskusja widoczna jest *jedynie* dla sekcji określonych poniżej:"
       options: Opcje
       page_header_title: "Nowa dyskusja"
@@ -5173,6 +5185,7 @@ pl:
       post_at: "Wysłano o"
       save: Zapisz
       saving: "Trwa zapisywanie..."
+      sort_by_likes: "Sortuj według polubień"
       topic_title: "Tytuł tematu"
       until: Do
       use_for_grading: Ocenione
@@ -5335,6 +5348,7 @@ pl:
       edited_comment: "Edytowane przez *%{editor.display_name}* w następującym dniu: %{edited_at}"
       go_to_parent: "Przejdź do nadrzędnego"
       go_to_topic: "Przejdź do tematu"
+      like_entry: "'Lubię' wpis"
       manage_discussion_entry: "Zarządzaj wpisami do dyskusji"
       open_in_speedgrader: "Otwórz w SpeedGrader"
       unknown_author: ">Autor nieznany"
@@ -5521,6 +5535,9 @@ pl:
   ember_modules_description: "Moduły ponownie zapisane w systemie Ember. Użyto macierzystej opcji Przeciągnij i upuść API w celu przeciągania elementów z lokalizacji zewnętrznych."
   enable_6f5d1328: Uaktywnij
   enable_gradebook_list_students_by_sortable_name: "Wyświetl listę uczestników według sortowalnych nazw w dzienniczku. Wartość domyślna nazwy to „Nazwisko, Imię” i można ją zmienić w ustawieniach."
+  enable_multiple_grading_periods: |-
+      Wielokrotne Okresy Klasyfikacyjne pozwalają nauczycielom i administratorom na tworzenie okresów klasyfikacyjnych z ustalonymi
+       data końcowymi. Zadania mogą być filtrowane przez te okresy klasyfikacyjne w Dzienniku Ocen.
   end_date_e0093ed7: "Data zakończenia"
   ends_on_date_320e0c26: "Data zakończenia"
   enrollment: 
@@ -5921,6 +5938,7 @@ pl:
       remove_feed: "Usuń nazwę %{display_name}"
   external_integration_keys_8b4f4548: "Zewnętrzne klucze integracji"
   external_tool_c5a6410a: "Narzędzie zewnętrzne"
+  external_tool_url_cannot_be_left_blank_a34b6bb2: "Zewnętrzne narzędzie URL nie może być puste."
   external_tools: 
     account_navigation_configured: "Skonfigurowano nawigację konta"
     app_full_view: 
@@ -6073,6 +6091,7 @@ pl:
     quiz_log_auditing: "Inspekcja dziennika testów"
     student_groups: "Strona z nowymi grupami uczestników"
     student_outcome_gradebook: "Dzienniczek nauki poziomu biegłości uczestnika"
+  field_name_31fff38e: "Nazw pola"
   file_list_updated_38e2a5ad: "Zaktualizowano listę plików"
   file_not_found_9eec054c: "Nie znaleziono pliku"
   file_preview: 
@@ -7334,6 +7353,7 @@ pl:
       submit: "Zapisz %{model} "
       update: "Aktualizuj %{model}"
   here_are_your_assignments_listed_by_due_date_7d8e98e6: "Oto zadania użytkownika, podane według terminu dostarczenia."
+  here_f44564ee: tutaj.
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Oto wspaniała okazja, aby zapoznać się z kalendarzem i dodać do kursu wszelkie wydarzenia, które nie są zadaniami. Nie obawiaj się — pomożemy Ci w tym."
   hidden_available_with_a_link_click_to_modify_184990e7: "Ukryty. Dostępny z linkiem - Kliknij aby zmienić"
   hidden_files_inside_will_be_available_with_links_9bdf702b: "Ukryte, zawarte pliki będą dostępne za pomocą łączy."
@@ -7363,6 +7383,7 @@ pl:
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "W przypadku włączenia tej opcji użytkownicy będą mogli skonfigurować narzędzia LTI 2."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Jeśli zmienisz maksymalną możliwą liczbę punktów za zadanie, musisz ponownie je ocenić."
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Jeśli nie wybierzesz teraz praw użytkowania, ten plik nie zostanie opublikowany po jego przekazaniu."
+  if_you_enable_this_feature_be_sure_that_your_sales_566967e6: "Jesli włączysz tą funkcję, upewnij się, że twoje konto salesforce posiada te niestandardowe pola dokładnie dodane z nazwami w lewej kolumnie tabeli."
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "Jeśli wyjdziesz z programu, aktualnie przygotowywany do pobrania plik zip zostanie anulowany."
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Możliwe, że chcesz przenieść swoje materiały z innego systemu zarządzania kursami do programu Canvas. Pomożemy Ci w łatwy sposób przenieść zawartość do systemu Canvas."
   ignore_91750df8: Ignoruj
@@ -7828,6 +7849,7 @@ pl:
     track_uploaded_successfully: "Aktualizacja ścieżki zakończona pomyślnie; odśwież, aby zobaczyć."
     upload: Przekaż
     uploading: "Trwa przekazywanie..."
+  media_has_been_queued_for_conversion_please_try_ag_74343bbd: "Multimedia stoją w kolejce do konwersji, spróbuj ponownie później."
   media_recordings_749aef6d: "Nagrania multimedialne"
   median_score_4657e907: "Mediana: %{score}"
   meets_mastery_754e1c06: "Spełnia poziom biegłości"
@@ -10496,6 +10518,18 @@ pl:
     kaltura_settings: 
       account_settings: "Wartości te można znaleźć w Konsoli zarządzania platformy Kaltura w zakładce \"Settings (Ustawienia) -> Integration Settings (Ustawienia integracji)\""
       cache_explanation: "Puste oznacza nieokreślone buforowanie, wartość 0 oznacza brak buforowania. "
+      description: |-
+          Potrzebujesz konta na  [Kaltura.com](%{kaltura_url})
+          lub instancji Kaltura w własnym hostem.
+          
+          **Uwaga** gdy skonfigurujesz Kaltura z programem Canvas,
+          musisz udać się do Konsoli Zarządzającej Kalgura i w "Ustawieniach"-
+          Ustawienia Integracji" włączyć powiadomienia serwerów z
+          Powiadomienie URL o:
+          
+          %{notification_url}
+          
+          Następnie zaznacz pole "Dodaj Wpis" i "Usuń Wpis" w kolumnie "Wysłane przez serwer".
       headers: 
         account_settings: "Ustawienia konta"
         canvas_settings: "Ustawienia systemu Canvas"
@@ -11590,6 +11624,8 @@ pl:
       no_quizzes: "Brak dostępnych testów"
     notices: 
       message_sent: "Wiadomość wysłana!"
+    question: 
+      positive_points: "Musi wynosić zero lub więcej"
     question_colon: "Pytanie:"
     question_count: 
       few: "Liczba pytań: %{count}"
@@ -12633,6 +12669,7 @@ pl:
   reply_to_comment_72d96728: "Odpowiedz na komentarz"
   reply_to_main_discussion_29823888: "Odpowiedz na dyskusję główną"
   require_usage_rights_for_uploaded_files_4507865b: "Wymagaj praw użytkowania do przekazywanych plików"
+  respondus_lockdown_browser_support_413352eb: "Wsparcie przeglądarki Respondus LockDown"
   respondus_soap_endpoint: 
     plugin_settings: 
       labels: 
@@ -12860,6 +12897,7 @@ pl:
   salesforce_account_id_eb5c78ad: "Identyfikator konta Salesforce"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce posiada inny host logowania dla kont sandbox niż w przypadku kont produkcji, więc jeśli używasz konta Salesforce sandbox i nie zaznaczysz tego pola, nie będzie w stanie uwierzytelnić (działa to również w drugą stronę - jeśli posiadasz konto produkcyjne i zaznaczysz to pole - nie będzie mógł uwierzytelnić)"
   salesforce_ticketing_webtocase_connector_80f75716: "Łącznik biletów WebToCase Salesforce"
+  same_value_as_canvas_url__c_will_probably_be_going_37027686: "Ta sama wartość jak 'Canvas_URL__c', prawdopodobnie wkrótce zniknie"
   save_11a80ec3: Zapisz
   saving_d55dd90e: "Trwa zapisywanie..."
   score_muted_82eef66: "Wynik: (wyłączony)"
@@ -13137,6 +13175,7 @@ pl:
         go_to_course: "Przejdź do kursu"
         go_to_dashboard: "Przejdź do pulpitu nawigacyjnego"
       not_available_yet: "Na chwilę przed rozpoczęciem kursu wyślemy Ci wiadomość e-mail."
+  send_custom_fields_uncheck_unless_using_canvas_zen_67e83666: "Wyślij Niestandardowe Pola (odznacz, chyba że używasz Canvas zendesk)"
   send_e3bd0ed0: Wyślij
   sequence_footer: 
     next_module: "Następny moduł:"
@@ -13167,6 +13206,7 @@ pl:
         consumer_secret: "Tajemnica konsumencka Salesforce"
         is_sandbox: "To jest konto sandbox salesforce"
         refresh_token: "Odśwież token"
+        send_custom_fields: "Wyślij poniższe niestandardowe pola z każdym biletem"
     web_to_case_settings: 
       labels: 
         api_url: "Końcowy adres URL dla API Salesforce"
@@ -13867,6 +13907,7 @@ pl:
       titles: 
         uploading: "Trwa przekazywanie, czekaj."
   shared_secret_892c88f2: "Wspólny klucz"
+  should_be_self_evident_the_canvas_id_of_the_report_44378262: "powinno być oczywiste, canvas ID użytkownika zgłaszającego"
   show_by_date_e3967761: "Pokaż według daty"
   show_by_type_c5d61732: "Pokaż według typu"
   show_correct_answers_at_a5475aa3: "Pokaż poprawne odpowiedzi na"
@@ -13945,6 +13986,7 @@ pl:
     users: 
       user_search_label: "Wyszukiwanie użytkownika"
       users_matching_label: "Dopasowywanie użytkowników"
+  skipped_file_filename_due_to_error_94f0194: "Plik pominięty %{filename}  z powodu błędu"
   skipping_unknown_file_type_cd1086ee: "Pomijanie nieznanego typu pliku"
   slideshow: 
     titles: 
@@ -14326,13 +14368,16 @@ pl:
       timespan: "%{start_at} *do* %{end_at}"
   text_document_eacbcdb7: "Dokument tekstowy"
   text_entry_submission_cannot_be_empty_3d187cae: "Zgłoszenie z wprowadzonym tekstem nie może być puste"
+  the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "ID konta do którego należy użytkownik zgłaszający"
   the_app_was_activated_a84e055f: "Aplikacja została aktywowana"
   the_app_was_added_58e2836a: "Aplikacja została dodana"
   the_app_was_added_successfully_3f785a23: "Aplikacja została pomyślnie dodana"
   the_app_was_deactivated_573520ab: "Aplikacja została zdezaktywowana"
   the_app_was_updated_successfully_3d71cd1b: "Aplikacja została pomyślnie zaktualizowana"
+  the_error_stack_trace_if_there_is_one_b7e008a1: "Błąd śladu, jeśli istnieje"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "Zakładka Pliki służy do udostępniania materiałów związanych z wykładami, np. dokumentów, pomocy naukowych — wszystkiego, co uczestnicy mogliby pobrać. Program Canvas zapewnia łatwy sposób przekazywania i organizacji plików. Wszystko zostanie dokładnie przedstawione."
   the_following_fields_are_invalid_fields_b3565800: "Poniższe pola są nieprawidłowe: %{fields}"
+  the_full_hostname_for_the_account_instance_somethi_e325da1f: "Pełna nazwa hosta dla instancji konta (cokolwiek.instructure.com, na przykład)"
   the_grading_period_was_deleted_7814a349: "Okres klasyfikacyjny został usunięty"
   the_grading_period_was_saved_4a504c5: "Okres klasyfikacynjy została zapisany"
   the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "Obraz logo w prawym górnym nagłówku programu Canvas. 200x200 svg lub png"
@@ -14340,10 +14385,16 @@ pl:
   the_material_is_licensed_under_creative_commons_3242cb5e: "Materiał jest objęty licencją Creative Commons"
   the_material_is_subject_to_fair_use_exception_41bc6a4b: "Materiał podlega wyjątkowi dozwolonego użytku"
   the_module_item_is_locked_27fe420b: "Element modułu jest zablokowany."
+  the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Najnowsze wyniki użytkownika %{current_user_name} i rezultat %{outcome_name}."
   the_profile_picture_has_been_reported_d609d6dd: "Zdjęcie profilowe zostało zgłoszone"
+  the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "role posiadane przez użytkownika zgłaszającego ( uczeń, nauczyciel, administrator, itp)"
+  the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "Waga problemu, wybrana przez użytkownika z rozwijającego menu."
   the_shortcut_icon_for_ios_android_devices_180x180__f87fa178: "Ikona skrótu dla urządzeń iOS/Android. 180x180 png lub svg"
   the_state_parameter_is_required_ffadf213: "Wymagany jest parametr stanu."
   the_top_track_represents_days_on_which_the_student_2a347099: "Górna ścieżka reprezentuje dni, w których *uczestnik wysłał wiadomości* do instruktorów kursu. Dolna ścieżka jest przeznaczona na **wiadomości od instruktorów** do uczestników."
+  the_unique_id_used_for_representing_the_specific_r_3bdf5870: "Unikalny identyfikator używany do przedstawiania specyficznego wniosku/cykl reakcji w trakcie którego wystąpił ten raport błędu"
+  the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "Url, które może zostać wykorzystane przez uprzywilejowanego użytkownika aby uchodzić za użytkownika zgłaszającego na tej samej stronie aby odtworzyć problem"
+  the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "Adres url strony na której był obecny użytkownik, gdy błąd został zgłoszony"
   there_are_count_results_in_the_list_e74f6e36: 
     few: "Na liście są %{count} wyniki"
     one: "Na liście jest 1 wynik"
@@ -14355,6 +14406,8 @@ pl:
   there_was_an_error_in_processing_your_request_6513a49a: "Wystąpił błąd podczas przetwarzania żądania"
   there_was_an_error_setting_usage_rights_53739e1d: "Wystąpił błąd podczas nadawania praw użytkowania"
   there_were_errors_with_the_form_errors_ab5b559a: "Wystąpiły błędy w formularzu: %{errors}"
+  these_grading_periods_were_created_for_you_by_an_a_e977c2b5: "Poniższe okresy klasyfikacyjne zostały stworzone dla ciebie przez administratora."
+  this_conference_may_be_recorded_f76deeeb: "Konferencja może zostać nagrana."
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "W tej chwili kurs nie może być dodany do menu kursów."
   this_course_is_claimed_and_ready_but_you_ll_need_t_25b95a0a: "Ten kurs jest zgłoszony i gotowy, ale przed jego opublikowaniem musisz ukończyć proces rejestracji. Powinieneś otrzymać wiadomość e-mail z systemu Canvas zawierającą łącze do ukończenia procesu. Pamiętaj, aby sprawdzić skrzynkę ze spamem."
   this_course_is_visible_only_to_teachers_until_it_i_ce972f0: "Ten kurs jest widoczny tylko dla nauczycieli do chwili jego opublikowania."
@@ -15261,7 +15314,11 @@ pl:
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Czy chcesz pozwolić uczestnikom kontynuować udział w kursie, czy może chcesz ponownie zablokować te moduły do czasu ukończenia nowych wymagań?"
   xml_configuration_5ea1b942: "Konfiguracja XML "
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "Użytkownik jest zalogowany w %{institution1} przy użyciu informacji uwierzytelniających od %{institution2}"
+  you_are_subscribed_and_will_be_notified_of_new_com_60b5b62b: "Jesteś zarejestrowany i będziesz powiadamiany o nowych komentarzach. Kliknij aby się wypisać."
   you_are_the_group_leader_for_this_group_b8629b70: "jesteś liderem tej grupy"
+  you_are_trying_to_launch_insecure_content_from_wit_5c1c692b: "Próbujesz uruchomić niezabezpieczone treści z bezpiecznej strony (canvas). Niektóre przeglądarki mogą nie zezwolić na załadowanie treści."
+  you_are_unsubscribed_and_will_not_be_notified_of_n_bf4b96a2: "Subskrypcja została anulowana i nie będziesz otrzymywał powiadomień o nowych komentarzach. Kliknij aby się zarejestrować."
+  you_can_disable_this_feature_d5e61373: "Możesz wyłączyć tę funkcję."
   you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: "Możesz ukryć lub pokazać zadania kursu, włączając je lub wyłączając."
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "Możesz teraz ustawić opcję ponownego oceniania dla studentów, którzy napisali już test."
   you_have_changed_the_progression_requirements_for__6772bc89: "Zmieniono wymagania postępu dotyczące aktywnego kursu. Być może są uczestnicy, którzy już przeszli do tego modułu i do innych, które są z nim powiązane."
