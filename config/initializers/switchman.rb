@@ -87,7 +87,7 @@ Rails.application.config.to_prepare do
 
     def delayed_jobs_shard
       shard = Shard.lookup(self.delayed_jobs_shard_id) if self.read_attribute(:delayed_jobs_shard_id)
-      shard || self.database_server.delayed_jobs_shard(self)
+      shard || self.database_server.try(:delayed_jobs_shard, self)
     end
 
     delegate :in_current_region?, to: :database_server
