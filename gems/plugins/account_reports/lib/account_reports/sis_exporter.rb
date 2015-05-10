@@ -69,7 +69,8 @@ module AccountReports
       CSV.open(filename, "w") do |csv|
         if @sis_format
           # headers are not translated on sis_export to maintain import compatibility
-          headers = ['user_id', 'login_id', 'password', 'first_name', 'last_name', 'email', 'status']
+          headers = ['user_id', 'login_id', 'password', 'first_name', 'last_name',
+                     'full_name', 'sortable_name', 'short_name', 'email', 'status']
         else #provisioning_report
           headers = []
           headers << I18n.t('#account_reports.report_header_canvas_user_id', 'canvas_user_id')
@@ -77,6 +78,9 @@ module AccountReports
           headers << I18n.t('#account_reports.report_header_login_id', 'login_id')
           headers << I18n.t('#account_reports.report_header_first_name', 'first_name')
           headers << I18n.t('#account_reports.report_header_last_name', 'last_name')
+          headers << I18n.t('#account_reports.report_header_full_name', 'full_name')
+          headers << I18n.t('#account_reports.report_header_sortable_name', 'sortable_name')
+          headers << I18n.t('#account_reports.report_header_user_short_name', 'short_name')
           headers << I18n.t('#account_reports.report_header_email', 'email')
           headers << I18n.t('#account_reports.report_header_status', 'status')
         end
@@ -84,11 +88,11 @@ module AccountReports
         users = root_account.pseudonyms.except(:includes).joins(:user).select(
           "pseudonyms.id, pseudonyms.sis_user_id, pseudonyms.user_id,
            pseudonyms.unique_id, pseudonyms.workflow_state, users.sortable_name,
-           users.updated_at AS user_updated_at").where(
-          "NOT EXISTS (SELECT user_id
-                       FROM enrollments e
-                       WHERE e.type = 'StudentViewEnrollment'
-                       AND e.user_id = pseudonyms.user_id)")
+           users.updated_at AS user_updated_at, users.name, users.short_name").
+          where("NOT EXISTS (SELECT user_id
+                             FROM enrollments e
+                             WHERE e.type = 'StudentViewEnrollment'
+                             AND e.user_id = pseudonyms.user_id)")
 
         if @sis_format
           users = users.where("sis_user_id IS NOT NULL")
@@ -105,13 +109,13 @@ module AccountReports
         Shackles.activate(:slave) do
           users.find_in_batches do |batch|
             emails = Shard.partition_by_shard(batch.map(&:user_id)) do |user_ids|
-                CommunicationChannel.
-                  email.
-                  unretired.
-                  select([:user_id, :path]).
-                  where(user_id: user_ids).
-                  order('user_id, position ASC').
-                  distinct_on(:user_id)
+              CommunicationChannel.
+                email.
+                unretired.
+                select([:user_id, :path]).
+                where(user_id: user_ids).
+                order('user_id, position ASC').
+                distinct_on(:user_id)
             end.index_by(&:user_id)
 
             batch.each do |u|
@@ -123,6 +127,9 @@ module AccountReports
               name_parts = User.name_parts(u.sortable_name)
               row << name_parts[0] || '' # first name
               row << name_parts[1] || '' # last name
+              row << u.name
+              row << u.sortable_name
+              row << u.short_name
               row << emails[u.user_id].try(:path)
               row << u.workflow_state
               csv << row
