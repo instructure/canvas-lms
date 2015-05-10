@@ -1616,6 +1616,13 @@ CanvasRails::Application.routes.draw do
       end
     end
 
+    scope(controller: 'bookmarks/bookmarks') do
+      get 'users/self/bookmarks/', action: :index, as: :bookmarks
+      get 'users/self/bookmarks/:id', action: :show
+      post 'users/self/bookmarks', action: :create
+      delete 'users/self/bookmarks/:id', action: :destroy
+      put 'users/self/bookmarks/:id', action: :update
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented
