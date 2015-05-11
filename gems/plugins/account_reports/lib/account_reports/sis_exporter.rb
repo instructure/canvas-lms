@@ -26,7 +26,7 @@ module AccountReports
 
     def initialize(account_report, params = {})
       @account_report = account_report
-      @reports = SIS_CSV_REPORTS & @account_report.parameters.keys
+      @reports = SIS_CSV_REPORTS & @account_report.parameters.select { |_k, v| value_to_boolean(v) }.keys
       @sis_format = params[:sis_format]
       extra_text_term(@account_report)
 
