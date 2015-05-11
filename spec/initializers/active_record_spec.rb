@@ -128,6 +128,42 @@ module ActiveRecord
   end
 
   describe Relation do
+    describe "lock_with_exclusive_smarts" do
+      let(:scope){ User.active }
+
+      context "with postgres 90300" do
+        before do
+          scope.connection.stubs(:postgresql_version).returns(90300)
+        end
+
+        it "uses FOR UPDATE on a normal exclusive lock" do
+          scope.expects(:lock_without_exclusive_smarts).with(true)
+          scope.lock(true)
+        end
+
+        it "substitutes 'FOR NO KEY UPDATE' if specified" do
+          scope.expects(:lock_without_exclusive_smarts).with("FOR NO KEY UPDATE")
+          scope.lock(:no_key_update)
+        end
+      end
+
+      context "with postgres 90299" do
+        before do
+          scope.connection.stubs(:postgresql_version).returns(90299)
+        end
+
+        it "uses FOR UPDATE on a normal exclusive lock" do
+          scope.expects(:lock_without_exclusive_smarts).with(true)
+          scope.lock(true)
+        end
+
+        it "ignores 'FOR NO KEY UPDATE' if specified" do
+          scope.expects(:lock_without_exclusive_smarts).with(true)
+          scope.lock(:no_key_update)
+        end
+      end
+    end
+
     describe "union" do
       shared_examples_for "query creation" do
         it "should include conditions after the union inside of the subquery" do
