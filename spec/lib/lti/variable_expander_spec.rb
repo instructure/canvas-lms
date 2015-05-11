@@ -539,15 +539,19 @@ module Lti
         end
 
         it 'has substitution for $Canvas.masqueradingUser.id' do
-          logged_in_user = User.new
-          logged_in_user.stubs(:id).returns(7878)
-          subject.instance_variable_set("@current_pseudonym", logged_in_user)
+          masquerading_user = User.new
+          masquerading_user.stubs(:id).returns(7878)
+          user.stubs(:id).returns(42)
+          subject.instance_variable_set("@current_user", masquerading_user)
           exp_hash = {test: '$Canvas.masqueradingUser.id'}
           subject.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to eq 7878
+          expect(exp_hash[:test]).to eq 42
         end
 
         it 'has substitution for $Canvas.masqueradingUser.userId' do
+          masquerading_user = User.new
+          masquerading_user.stubs(:id).returns(7878)
+          subject.instance_variable_set("@current_user", masquerading_user)
           exp_hash = {test: '$Canvas.masqueradingUser.userId'}
           subject.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq '6cd2e0d65bd5aef3b5ee56a64bdcd595e447bc8f'

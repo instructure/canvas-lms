@@ -48,6 +48,7 @@ module Lti
     USAGE_RIGHTS_GUARD = -> { @attachment && @attachment.usage_rights}
     MEDIA_OBJECT_ID_GUARD = -> {@attachment && (@attachment.media_object || @attachment.media_entry_id )}
     LTI1_GUARD = -> { @tool.is_a? ContextExternalTool }
+    MASQUERADING_GUARD = -> { @controller.logged_in_user != @current_user }
 
     def initialize(root_account, context, controller, opts = {})
       @root_account = root_account
@@ -230,12 +231,12 @@ module Lti
                        -> { @current_pseudonym && @tool }
 
     register_expansion 'Canvas.masqueradingUser.id', [],
-                       -> { @current_pseudonym.id },
-                       -> { @current_pseudonym != @current_user }
+                       -> { @controller.logged_in_user.id },
+                       MASQUERADING_GUARD
 
     register_expansion 'Canvas.masqueradingUser.userId', [],
                        -> { @tool.opaque_identifier_for(@controller.logged_in_user) },
-                       USER_GUARD
+                       MASQUERADING_GUARD
 
     register_expansion 'Canvas.xapi.url', [],
                        -> { @controller.lti_xapi_url(Lti::AnalyticsService.create_token(@tool, @current_user, @context)) },
