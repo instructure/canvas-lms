@@ -19,37 +19,35 @@
 require 'atom'
 
 class ExternalFeedAggregator
-  SUCCESS_WAIT_SECONDS = 1.hour     # time to refresh on a successful feed load with new entries
-  NO_ENTRIES_WAIT_SECONDS = 2.hours # time to refresh on a successful feed load with NO new entries
-  FAILURE_WAIT_SECONDS = 30.minutes # time to refresh on a failed feed load
-  
   def self.process
     ExternalFeedAggregator.new.process
   end
-  
+
   def initialize
     @logger = Rails.logger
   end
-  
+
   def process
     Shackles.activate(:slave) do
       start = Time.now.utc
-      begin
+      loop do
         feeds = ExternalFeed.to_be_polled(start).limit(1000).preload(context: :root_account).to_a
+        break if feeds.empty?
+
         feeds.each do |feed|
           Shackles.activate(:master) do
             if !feed.context || feed.context.root_account.deleted?
-              feed.update_attribute(:refresh_at, Time.now.utc + NO_ENTRIES_WAIT_SECONDS)
+              feed.update_attribute(:refresh_at, success_wait_seconds.from_now)
               next
             end
 
             process_feed(feed)
           end
         end
-      end while (!feeds.empty?)
+      end
     end
   end
-  
+
   def parse_entries(feed, body)
     begin
       require 'rss/1.0'
@@ -83,29 +81,35 @@ class ExternalFeedAggregator
       @logger.info("feed found: #{feed.url}")
       @logger.info('requesting entries')
       require 'net/http'
+
       response = CanvasHttp.get(feed.url)
       case response
       when Net::HTTPSuccess
         success = parse_entries(feed, response.body)
         @logger.info(success ? 'successful response' : '200 with no data returned')
         feed.consecutive_failures = 0 if success
-        feed.update_attribute(:refresh_at, Time.now.utc + ((!@entries || @entries.empty?) ? NO_ENTRIES_WAIT_SECONDS : SUCCESS_WAIT_SECONDS))
+        feed.update_attribute(:refresh_at, success_wait_seconds.from_now)
       else
         @logger.info("request failed #{response.class}")
-        feed.increment(:consecutive_failures)
-        feed.increment(:failures)
-        feed.update_attribute(:refresh_at, Time.now.utc + (FAILURE_WAIT_SECONDS))
+        handle_failure(feed)
       end
-    rescue => e
-      feed.increment(:consecutive_failures)
-      feed.increment(:failures)
-      feed.update_attribute(:refresh_at, Time.now.utc + (FAILURE_WAIT_SECONDS))
-      Canvas::Errors.capture(e, {
-        message: "External Feed aggregation failed",
-        feed_url: feed.url,
-        feed_id: feed.id,
-        user_id: feed.user_id,
-      })
+    rescue CanvasHttp::Error, Timeout::Error => e
+      @logger.info("request error: #{e}")
+      handle_failure(feed)
     end
+  end
+
+  def handle_failure(feed)
+    feed.increment(:failures)
+    feed.increment(:consecutive_failures)
+    feed.update_attribute(:refresh_at, failure_wait_seconds.from_now)
+  end
+
+  def success_wait_seconds
+    Setting.get('external_feed_success_wait_seconds', 2.hours.to_s).to_f
+  end
+
+  def failure_wait_seconds
+    Setting.get('external_feed_failure_wait_seconds', 30.minutes.to_s).to_f
   end
 end
