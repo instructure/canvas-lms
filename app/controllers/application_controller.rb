@@ -1728,7 +1728,7 @@ class ApplicationController < ActionController::Base
   helper_method :flash_notices
 
   def unsupported_browser
-    t("Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Guides* for a complete list of supported browsers.", :wrapper => view_context.link_to('\1', 'http://guides.instructure.com/s/2204/m/4214/l/41056-which-browsers-does-canvas-support'))
+    t("Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Community* for a complete list of supported browsers.", :wrapper => view_context.link_to('\1', 'https://community.canvaslms.com/docs/DOC-1284'))
   end
 
   def browser_supported?
