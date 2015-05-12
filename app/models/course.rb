@@ -1488,7 +1488,7 @@ class Course < ActiveRecord::Base
     exported_gradebook.course_id = self.id
     exported_gradebook.save!
 
-    progress.process_job(self, :generate_csv, options, attachment)
+    progress.process_job(self, :generate_csv, {preserve_method_args: true}, options, attachment)
     {attachment_id: attachment.id, progress_id: progress.id}
   end
 
