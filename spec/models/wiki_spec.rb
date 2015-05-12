@@ -92,6 +92,17 @@ describe Wiki do
       expect(@course.wiki.grants_right?(@admin, :manage)).to be_truthy
     end
 
+    it 'should give publish page rights to admins' do
+      account_admin_user
+      expect(@course.wiki.grants_right?(@admin, :publish_page)).to be_truthy
+    end
+
+    it 'should not give publish page rights to admins when the context is a group' do
+      account_admin_user
+      group
+      expect(@group.wiki.grants_right?(@admin, :publish_page)).to be_falsey
+    end
+
     context 'allow student wiki edits' do
       before :once do
         course_with_student :course => @course, :user => @user, :active_all => true
@@ -113,6 +124,15 @@ describe Wiki do
 
       it 'should give create_page rights to students' do
         expect(@course.wiki.grants_right?(@user, :create_page)).to be_truthy
+      end
+
+      it 'should not give publish page rights to students' do
+        expect(@course.wiki.grants_right?(@user, :publish_page)).to be_falsey
+      end
+
+      it 'should not give publish page rights to students when the context is a group' do
+        group
+        expect(@group.wiki.grants_right?(@user, :publish_page)).to be_falsey
       end
 
       it 'should not give delete_page rights to students' do

@@ -147,6 +147,10 @@ class Wiki < ActiveRecord::Base
 
     given {|user, session| self.context.grants_right?(user, session, :manage_wiki)}
     can :manage and can :read and can :update and can :create_page and can :delete_page and can :delete_unpublished_page and can :update_page and can :update_page_content
+
+    given {|user, session| self.context.grants_right?(user, session, :manage_wiki) && !self.context.is_a?(Group)}
+    # Pages created by a user without this permission will be automatically published
+    can :publish_page
   end
 
   def self.wiki_for_context(context)

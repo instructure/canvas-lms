@@ -392,10 +392,11 @@ class WikiPage < ActiveRecord::Base
   end
 
   def initialize_wiki_page(user)
-    is_privileged_user = wiki.grants_right?(user, :manage)
-    if is_privileged_user && !context.is_a?(Group)
+    if wiki.grants_right?(user, :publish_page)
+      # Leave the page unpublished if the user is allowed to publish it later
       self.workflow_state = 'unpublished'
     else
+      # If they aren't, publish it automatically
       self.workflow_state = 'active'
     end
 
