@@ -422,10 +422,14 @@ define([
     var id = this.attr('id');
     var editbox = tinyMCE.get(id)
     $instructureEditorBoxList._getTextArea(id).val(val);
-    if(editbox &&
-      $.isFunction(editbox.execCommand) &&
-      $(editbox.container).is(":visible")) {
+    if(editbox && $.isFunction(editbox.execCommand)) {
       editbox.execCommand('mceSetContent', false, val);
+      // the refocusing check fixes a keyboard only nav issue in chrome and
+      // safari that causes the focus to become trapped in the html editor
+      var refocusing = (typeof(event) != 'undefined') && event.relatedTarget
+      if(refocusing) {
+        $(event.relatedTarget).focus()
+      }
     }
   };
 

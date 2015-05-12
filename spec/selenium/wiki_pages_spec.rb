@@ -1,4 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
 
 describe "Navigating to wiki pages" do
   include_examples "in-process server selenium tests"
@@ -152,7 +153,7 @@ describe "Navigating to wiki pages" do
       end
     end
 
-    describe "Edit Page" do
+    describe "Cog menu" do
       before :each do
         get "/courses/#{@course.id}/pages"
         f('.al-trigger').click
@@ -244,6 +245,29 @@ describe "Navigating to wiki pages" do
       end
 
     end
+
+    describe "Edit Page" do
+      before :each do
+        get "/courses/#{@course.id}/pages/bar/edit"
+        wait_for_ajaximations
+      end
+
+      it "should alert user if navigating away from page with unsaved RCE changes" do
+        add_text_to_tiny("derp")
+        f('.home').click()
+        expect(driver.switch_to.alert.text).to be_present
+        driver.switch_to.alert.accept
+      end
+
+      it "should alert user if navigating away from page with unsaved html changes" do
+        fj('a.switch_views:visible').click
+        f('textarea').send_keys("derp")
+        f('.home').click()
+        expect(driver.switch_to.alert.text).to be_present
+        driver.switch_to.alert.accept
+      end
+    end
+
   end
 
   describe "Show Page" do
