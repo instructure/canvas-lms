@@ -41,7 +41,7 @@ HEREDOC
     </td>
   </tr><tr class="collaborate_data">
     <td style="white-space: nowrap; vertical-align: top;">
-      <%= f.label :description, t('labels.description', 'Description') %>
+      <%= f.label :description, t('labels.description', 'Description:') %>
     </td>
     <td>
       <%= f.text_area :description, :style => "width: 400px; height: 50px;" %>
@@ -90,7 +90,7 @@ HEREDOC
     <%= text_field :collaboration, :title, :style => "width: 300px;", :value => t('collaboration_name', "%{course_or_group_name} Collaboration", :course_or_group_name => @context.name) %>
   </div>
   <div class="content">
-  <%= before_label :description, "Description" %><br>
+  <%= before_label :description, "Description:" %><br>
   <%= text_area :collaboration, :description, :style => "width: 400px; height: 50px;" %>
   </div>
   <div class="footer">

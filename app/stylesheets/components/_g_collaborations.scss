@@ -5,10 +5,17 @@ $green: #f5fbf7;
 $highlight-blue: #00b5fe;
 
 .collaborations-header {
+  display: block;
   overflow: hidden;
+  margin-bottom: 14px;
 
-  h1, .h1    { float: left; }
-  a.btn { float: right; }
+  h1, .h1 {
+    float: left;
+    margin: 0;
+  }
+  .add_collaboration_link {
+    float: right;
+  }
 }
 
 .collaboration {
@@ -23,15 +30,48 @@ $highlight-blue: #00b5fe;
     padding: 10px 10px 10px 85px;
   }
 
-  .links {
-    float: right;
-    line-height: 0.8em;
+  .collaboration-header {
+    h2, .h2 {
+      float: left;
+      font-family: arial, sans-serif;
+      font-size: 1.2em;
+      line-height: inherit;
+      margin: 0;
+      border-bottom: 1px solid #cccccc;
+    }
+
+    .links {
+      float: right;
+      line-height: 0.8em;
+    }
   }
 
-  h3, .h3 {
-    font-family: arial, sans-serif;
-    font-size: 1.2em;
-    border-bottom: 1px solid #cccccc;
+  .description {
+    margin-bottom: 5px;
+  }
+
+  .edit_collaboration {
+    .header, .content, .footer {
+      margin: 0;
+      padding: 0;
+    }
+
+    .header {
+      input[name='collaboration[title]'] {
+        width: 300px;
+      }
+    }
+
+    .content {
+      label {
+        margin-bottom: 0;
+      }
+      textarea {
+        display: block;
+        height: 50px;
+        width: 400px;
+      }
+    }
   }
 }
 
