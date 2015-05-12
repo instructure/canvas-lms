@@ -311,32 +311,36 @@ class PseudonymsController < ApplicationController
       return false
     end
 
-    # perform the updates they have permission for. silently ignore
-    # unrecognized fields or fields they don't have permission to. note: make
-    # sure sis_user_id is updated (if happening) before password, since it may
-    # affect the :change_password permissions
-    update = false
+    # perform updates (if they have permission
+    # to make them). silently ignore unrecognized fields.
+    # note: make sure sis_user_id is updated (if happening)
+    # before password, since it may affect the :change_password permissions
 
-    if params[:pseudonym].has_key?(:unique_id) && @pseudonym.grants_right?(@current_user, :update)
+    has_right_if_requests_change(:unique_id, :update) do
       @pseudonym.unique_id = params[:pseudonym][:unique_id]
-      updated = true
-    end
+    end or return false
 
-    if params[:pseudonym].has_key?(:sis_user_id) && @pseudonym.grants_right?(@current_user, :manage_sis)
+    has_right_if_requests_change(:sis_user_id, :manage_sis) do
       # convert "" -> nil for sis_user_id
       @pseudonym.sis_user_id = params[:pseudonym][:sis_user_id].presence
-      updated = true
-    end
+    end or return false
 
-    if params[:pseudonym].has_key?(:password) && @pseudonym.grants_right?(@current_user, :change_password)
+    has_right_if_requests_change(:password, :change_password) do
       @pseudonym.password = params[:pseudonym][:password]
       @pseudonym.password_confirmation = params[:pseudonym][:password_confirmation]
-      updated = true
-    end
+    end or return false
+  end
 
-    # if we didn't actually update anything, it's because of permissions (we
-    # already checked for nothing attempted), so 401
-    render_unauthorized_action unless updated
-    return updated
+  private
+  def has_right_if_requests_change(key, right)
+    return true unless params[:pseudonym].key?(key.to_sym)
+
+    if @pseudonym.grants_right?(@current_user, right.to_sym)
+      yield
+      true
+    else
+      render_unauthorized_action
+      false
+    end
   end
 end
