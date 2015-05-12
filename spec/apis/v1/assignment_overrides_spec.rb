@@ -381,12 +381,14 @@ describe AssignmentOverridesController, type: :request do
         expect_error("unknown student ids: [\"#{@bad_id}\"]")
       end
 
-      it "should error if the assignment is a group assignment" do
+      it "should not error if the assignment is a group assignment" do
         @assignment.group_category = @course.group_categories.create!(name: "foo")
         @assignment.save!
 
         raw_api_create_override(@course, @assignment, :assignment_override => { :student_ids => [@student.id], :title => @title })
-        expect_error('student_ids are not valid for group assignments')
+        @override = @assignment.assignment_overrides(true).first
+        expect(@override).not_to be_nil
+        expect(@override.set).to eq [@student]
       end
 
       context "title" do

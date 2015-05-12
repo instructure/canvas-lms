@@ -87,12 +87,7 @@ module Api::V1::AssignmentOverride
     errors = []
 
     if !set_type && data[:student_ids]
-      if assignment.group_category_id
-        # don't recognize student_ids for group assignments
-        errors << "student_ids are not valid for group assignments"
-      else
-        set_type = 'ADHOC'
-      end
+      set_type = 'ADHOC'
     end
 
     if set_type == 'ADHOC' && data[:student_ids]
