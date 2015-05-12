@@ -26,7 +26,11 @@ class GradebookCsvsController < ApplicationController
       name = t('grades_filename', "Grades") + "-" + @context.name.to_s
       filename = "#{current_time}_#{name}.csv".gsub(/ /, '_')
 
-      attachment_progress = @context.gradebook_to_csv_in_background(filename, @current_user)
+      csv_options = {
+        include_sis_id: @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis)
+      }
+
+      attachment_progress = @context.gradebook_to_csv_in_background(filename, @current_user, csv_options)
       render json: attachment_progress, status: :ok
     end
   end
