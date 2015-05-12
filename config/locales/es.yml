@@ -4777,10 +4777,10 @@ es:
       other: "Expandir %{count} mensajes de conversaciones"
     disable_dashboard: "Regresar al antiguo panel de control"
     discussions_collapse: 
-      one: "Contraer %{count} debate"
+      one: "Contraer %{count} foro"
       other: "Contraer %{count} foros"
     discussions_expand: 
-      one: "Expandir %{count} debate"
+      one: "Expandir %{count} foro"
       other: "Expandir %{count} foros"
     enable_dashboard: "Pruebe el nuevo panel de control"
     show_more_link: 
@@ -5033,7 +5033,7 @@ es:
       calculará sin esos puntos.
   disable_a5c05db3: Deshabilitar
   disabled_18c33a73: (deshabilitado)
-  discussion_6719c51d: Debate
+  discussion_6719c51d: Foro
   discussion_entries: 
     created_entry_notice: "Contribución creada con éxito."
     deleted_entry_notice: "Contribución ha sido borrada"
@@ -5050,7 +5050,7 @@ es:
     atom_no_author: "Sin Autor"
     default_title: "Sin Título"
     empty_message: "Sin mensajes"
-  discussion_topic_dc85ad4c: "Tema de Debate"
+  discussion_topic_dc85ad4c: "Tema de Foro"
   discussion_topics: 
     assignment_details: 
       available_from: "Disponible desde"
@@ -5058,7 +5058,7 @@ es:
       due_date: "fecha límite %{date}"
       for: Para
       graded_discussion_and_points: 
-        one: "Este es un debate con calificación: *vale 1 punto*"
+        one: "Este es un foro con calificación: *vale 1 punto*"
         other: "Este es un foro con calificación: *vale %{count} puntos*"
       show_due_dates: "Mostrar fechas de vencimiento"
       until: Hasta
@@ -5067,7 +5067,7 @@ es:
       one: "¿Está seguro de que quiere borrar este anuncio?"
       other: "¿Está seguro de que quiere borrar estos %{count} anuncios?"
     confirm_delete_discussion_topic: 
-      one: "¿Está seguro de que quiere borrar este tema de debate?"
+      one: "¿Está seguro de que quiere borrar este tema de foro?"
       other: "¿Está seguro de que quiere borrar estos %{count} temas de foro?"
     create_new_crumb: "Crear nuevo"
     default_discussion_title: "Sin Título"
@@ -5089,7 +5089,7 @@ es:
     discussion_feed_title: "Canal de Foro %{title}"
     discussion_list: 
       no_pinned_discussions: "Actualmente no tiene foros anclados"
-      pinned_instructions: "Para anclar un foro en la parte superior de la página, arrastre un debate aquí o seleccione Anclar en el menú de configuración de debates."
+      pinned_instructions: "Para anclar un foro en la parte superior de la página, arrastre un foro aquí o seleccione Anclar en el menú de configuración de foros."
       there_are_no_discussions_show: "No hay foros que mostrar en esta sección."
     discussions_settings_view: 
       allow_student_discussion_editing: "Editar y eliminar sus propias publicaciones"
@@ -7248,7 +7248,7 @@ es:
         one: "*1* mensaje de conversación"
         other: "*%{count}* mensajes de conversación"
       x_new_in_discussions: 
-        one: "*1* debate"
+        one: "*1* Foro"
         other: "*%{count}* Foros"
       x_new_in_peer_reviews: 
         one: "*1* revisión por pares"
