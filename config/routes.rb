@@ -387,6 +387,7 @@ CanvasRails::Application.routes.draw do
   post 'media_objects/:media_object_id/media_tracks' => 'media_tracks#create', as: :create_media_tracks
   delete 'media_objects/:media_object_id/media_tracks/:media_track_id' => 'media_tracks#destroy', as: :delete_media_tracks
 
+  get 'external_content/success/:service' => 'external_content#success', as: :external_content_success
   get 'external_content/retrieve/oembed' => 'external_content#oembed_retrieve', as: :external_content_oembed_retrieve
   get 'external_content/cancel/:service' => 'external_content#cancel', as: :external_content_cancel
 
