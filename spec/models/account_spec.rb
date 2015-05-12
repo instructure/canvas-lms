@@ -1077,7 +1077,7 @@ describe Account do
 
   describe "#update_account_associations" do
     it "should update associations for all courses" do
-      account = Account.create!
+      account = Account.default.sub_accounts.create!
       c1 = account.courses.create!
       c2 = account.courses.create!
       account.course_account_associations.scoped.delete_all

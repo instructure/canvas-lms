@@ -436,8 +436,12 @@ class Account < ActiveRecord::Base
   end
 
   def associated_courses
-    shard.activate do
-      Course.where("EXISTS (SELECT 1 FROM course_account_associations WHERE course_id=courses.id AND account_id=?)", self)
+    if root_account?
+      all_courses
+    else
+      shard.activate do
+        Course.where("EXISTS (SELECT 1 FROM course_account_associations WHERE course_id=courses.id AND account_id=?)", self)
+      end
     end
   end
 
