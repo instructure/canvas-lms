@@ -345,8 +345,14 @@ class UsersController < ApplicationController
   #   The partial name or full ID of the users to match and return in the
   #   results list. Must be at least 3 characters.
   #
+  #   Note that the API will prefer matching on canonical user ID if the ID has
+  #   a numeric form. It will only search against other fields if non-numeric
+  #   in form, or if the numeric value doesn't yield any matches. Queries by
+  #   administrative users will search on SIS ID, name, or email address; non-
+  #   administrative queries will only be compared against name.
+  #
   #  @example_request
-  #    curl https://<canvas>/api/v1/accounts/self/users?search_term=<sis_user_id> \
+  #    curl https://<canvas>/api/v1/accounts/self/users?search_term=<search value> \
   #       -X GET \
   #       -H 'Authorization: Bearer <token>'
   #
