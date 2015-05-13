@@ -5315,6 +5315,9 @@ en-GB:
       show_more: "Show more"
     hide_due_dates: "Hide due dates"
     initial_post_required_to_subscribe: "You must post a reply before subscribing"
+    like_count: 
+      one: "(1 like)"
+      other: "(%{count} likes)"
     mark_as_read: "Mark as read"
     mark_as_unread: "Mark as unread"
     no_content: "No Content"
@@ -10446,23 +10449,14 @@ en-GB:
       cache_explanation: "Empty means cache indefinitely, 0 means don't cache."
       description: |-
           You will need an account either at [Kaltura.com](%{kaltura_url})
-          
           or with a self-hosted instance of Kaltura.
           
-          
           **Note:** once you have Kaltura configured within Canvas,
-          
           you need to go to the Kaltura Management Console and under 'Settings ->
-          
           Integration Settings' enable server notifications with a
-          
           Notification URL of:
           
-          
-          
           %{notification_url}
-          
-          
           
           Then check the boxes for 'Add Entry' and 'Delete Entry' in the 'Sent by Server' column.
       headers: 
