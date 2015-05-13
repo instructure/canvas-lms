@@ -10439,7 +10439,8 @@ ja:
       account_settings: "これらの値は、\"設定 -> 統合設定\" のKaltura 管理コンソールにあります。"
       cache_explanation: "空欄は無限キャッシュ、0 はキャッシュしないことを意味します。"
       description: |-
-          [Kaltura.com](%{kaltura_url})内に、またはKalturaの自己ホスト型インスタンスと共に、アカウントが必要です。
+          [Kaltura.com](%{kaltura_url})内に、または
+          Kalturaの自己ホスト型インスタンスと共に、アカウントが必要です。
           
           **注意:** 一旦KalturaをCanvas内に設定したら、
           管理コンソールに移動して、「設定->
