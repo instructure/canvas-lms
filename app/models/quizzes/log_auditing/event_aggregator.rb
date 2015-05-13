@@ -58,31 +58,36 @@ module Quizzes::LogAuditing
         time: timestamp
       }).order("created_at ASC")
       filtered_events, final_answers = pick_latest_distinct_events_and_answers(events)
-      build_submission_data_from_events_and_answers(filtered_events, final_answers)
+      submission_data_hash = build_submission_data_from_events(filtered_events)
+      submission_data_hash.merge build_submission_data_from_answers(final_answers)
     end
 
     private
     # constructs submission data from events, including the parsing of flagged
     # to indicate that they are 'marked' or 'flagged'
-    def build_submission_data_from_events_and_answers(events, answers)
+    def build_submission_data_from_events(events)
       events.reduce({}) do |submission_data, event|
-        response = {}
         case event.event_type
         when Quizzes::QuizSubmissionEvent::EVT_QUESTION_FLAGGED
-          response = {"question_#{event.event_data['quiz_question_id']}_marked"=> event.event_data['flagged'] }
-        when Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED
-          answers.each do |question_id, answer|
-            question = Quizzes::QuizQuestion.where(id: question_id).first
-            if question.question_data["question_type"] != "text_only_question"
-              serializer = Quizzes::QuizQuestion::AnswerSerializers.serializer_for(question)
-              thing = serializer.serialize(answer).answer
-              response.merge! thing
-            end
-          end
+          submission_data["question_#{event.event_data['quiz_question_id']}_marked"] = event.event_data['flagged']
         end
-        submission_data.merge! response if response
         submission_data
       end
+    end
+
+    # constructs submission data from events, including the parsing of flagged
+    # to indicate that they are 'marked' or 'flagged'
+    def build_submission_data_from_answers(answers)
+      submission_data = {}
+      answers.each do |question_id, answer|
+        question = Quizzes::QuizQuestion.where(id: question_id).first
+        if question.question_data["question_type"] != "text_only_question"
+          serializer = Quizzes::QuizQuestion::AnswerSerializers.serializer_for(question)
+          thing = serializer.serialize(answer).answer
+          submission_data.merge! thing
+        end
+      end
+      submission_data
     end
 
     # Filter out the redundant or overwritten events, creating a minimal set
