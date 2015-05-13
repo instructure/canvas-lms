@@ -2087,7 +2087,7 @@ nb:
         uploaded_data: Fil
         url: Nettstedsadresse
       links: 
-        add_another_file: "Legg til en ny fil"
+        add_another_file: "Legg til flere filer"
         authorize_google_docs: "Autoriser Google Docs-tilgang"
         authorize_google_drive: "Autorisere Google Drive Access"
         find_file: "Klikk her for å finne en fil du har lastet opp tidligere"
@@ -2717,14 +2717,14 @@ nb:
     show2: 
       calendar_feed: Kalenderstrøm
       calendar_feed_instructions: "Kopier lenken nedenfor og lim den inn i hvilket som helst kalenderprogram som aksepterer iCal strøm (Google Calendar, iCal, Outlook, etc.)"
-      calendars: Kalendre
+      calendars: Kalendere
       feed_dialog_title: Kalenderstrøm
       feed_title: "Kurskalender Atom-strøm"
       links: 
         feed: "klikk her for å se strømmen"
       page_title_header: Kalender
       skip_to_calendar: "Til kalender"
-      toggle_calendars: "Slå kalendre av/på"
+      toggle_calendars: "Slå kalendere av/på"
       toggle_undated_items: "Slå udaterte elementer av/på"
       undated_items: "Udaterte elementer"
     titles: 
@@ -3767,7 +3767,7 @@ nb:
         delete: Slett
         mark_as_read: "Merk som lest"
         mark_as_unread: "Merk som ulest"
-        subscribe: Abbonner
+        subscribe: Abonner
         unarchive: "Fjern arkivering"
         unstar: "Merk med stjerne"
         unsubscribe: "Avslutt abonnement"
@@ -5249,11 +5249,11 @@ nb:
       reply_to_message: "Svar på denne meldingen"
       reply_to_topic: "Svar på temaet"
       retrieved_from_feed: "Hentet fra %{feed}"
-      show_rubric: "Vis vurderingsveiledning"
+      show_rubric: Vurderingsskjema
       speed_grader: SpeedGrader™
       topic: Tema
       topic_podcast_feed_link: "Podkast-strøm for tema"
-      topic_subscribe: Abbonner
+      topic_subscribe: Abonner
       topic_subscribe_tooltip: "Abonnementet ditt er avsluttet, og du vil ikke få varsler om nye kommentarer"
       topic_subscribed_tooltip: "Du abonnerer og vil få varsler når det kommer nye kommentarer"
       topic_time_locked: "Dette temaet er låst til %{time}"
@@ -11944,7 +11944,7 @@ nb:
           find_questions: "Finn spørsmål"
           new_question: "Nytt spørsmål"
           new_question_group: "Ny spørsmålsgruppe"
-          show_assignment_rubric: "Vis vurderingsveiledning"
+          show_assignment_rubric: Vurderingsskjema
         manage: Behandle
         minutes: Minutter
         new_assignment: "Ny oppgave"
@@ -12177,7 +12177,7 @@ nb:
           preview: Forhåndsvisning
           quiz_statistics: Prøvestatistikk
           see_full_quiz: "Se hele prøven"
-          show_assignment_rubric: "Vis vurderingsveiledning"
+          show_assignment_rubric: Vurderingsskjema
           show_student_quiz_results: "Vis studentens prøveresultater"
           show_student_survey_results: "Vis resultater fra studentundersøkelsen"
           survey_statistics: Undersøkelsesstatistikk
@@ -14043,7 +14043,7 @@ nb:
       peer_review_not_done_rubric: "**Denne hverandrevurderingen er ikke ferdig enda.**  For at den skal anses som ferdig, må du legge inn minst en kommentar og fylle ut skjemaet for vurderingsskjemaet til høyre."
       peer_review_steps_complete: "Du har fullført de nødvendige trinnene for denne hverandrevurderingen."
       sent_to_whole_group: "Send kommentar til hele gruppen"
-      show_rubric: "Vis vurderingsveiledning"
+      show_rubric: Vurderingsskjema
       speedgrader: SpeedGrader™
       student_mute_notification: "Karakterene er utilgjengelige fordi instruktøren jobber med dem."
       submission_details: "Detaljer om innlevering"
