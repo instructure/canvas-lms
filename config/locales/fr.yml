@@ -10429,7 +10429,7 @@ fr:
           
            %{notification_url} 
           
-           Puis, cochez les cases d'« Ajout d'entrée » et  de « Suppression d'entrée » dans la colonne « Envoyé par le serveur ».
+          Puis, cochez les cases d'« Ajout d'entrée » et  de « Suppression d'entrée » dans la colonne « Envoyé par le serveur ».
       headers: 
         account_settings: "Paramètres de compte"
         canvas_settings: "Paramètres Canvas"
