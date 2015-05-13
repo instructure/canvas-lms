@@ -748,8 +748,7 @@ CanvasRails::Application.routes.draw do
 
   resources :appointment_groups, only: [:index, :show]
 
-  post 'errors' => 'info#record_error'
-  resources :errors, only: [:show, :index], path: :error_reports
+  resources :errors, only: [:show, :index, :create], path: :error_reports
 
   get 'health_check' => 'info#health_check'
 
@@ -1660,6 +1659,10 @@ CanvasRails::Application.routes.draw do
       post 'users/self/bookmarks', action: :create
       delete 'users/self/bookmarks/:id', action: :destroy
       put 'users/self/bookmarks/:id', action: :update
+    end
+
+    scope(controller: :errors) do
+      post "error_reports", action: :create
     end
   end
 

@@ -109,6 +109,35 @@ describe 'Canvas::RequestThrottle' do
   end
 
   describe "cost throttling" do
+    describe "#calculate_cost" do
+      let(:throttle){ Canvas::RequestThrottle.new(nil) }
+
+      it "sums cpu and db time when extra cost is nil" do
+        cost = throttle.calculate_cost(40, 2, {'extra-request-cost' => nil})
+        expect(cost).to eq(42)
+      end
+
+      it "doesnt care if extra cost key doesnt exist" do
+        cost = throttle.calculate_cost(40, 2, {})
+        expect(cost).to eq(42)
+      end
+
+      it "adds arbitrary cost if in the env" do
+        cost = throttle.calculate_cost(40, 2, {'extra-request-cost' => 8})
+        expect(cost).to eq(50)
+      end
+
+      it "doesn't bomb when the extra cost is something nonsensical" do
+        cost = throttle.calculate_cost(40, 2, {'extra-request-cost' => 'hai'})
+        expect(cost).to eq(42)
+      end
+
+      it "sanity checks range of extra cost" do
+        cost = throttle.calculate_cost(40, 2, {'extra-request-cost' => -100})
+        expect(cost).to eq(42)
+      end
+    end
+
     before do
       throttler.stubs(:whitelisted?).returns(false)
       throttler.stubs(:blacklisted?).returns(false)

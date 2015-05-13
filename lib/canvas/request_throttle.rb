@@ -68,18 +68,24 @@ class RequestThrottle
       account = env["canvas.domain_root_account"]
       db_runtime = (self.db_runtime(request) || 0.0)
       report_on_stats(db_runtime, account, starting_mem, ending_mem, user_cpu, system_cpu)
-
-      # currently we define cost as the amount of user cpu time plus the amount
-      # of time spent in db queries
-      cost = user_cpu + db_runtime
+      cost = calculate_cost(user_cpu, db_runtime, env)
       cost
     end
+
     if client_identifier(request) && !client_identifier(request).starts_with?('session')
       headers['X-Request-Cost'] = cost.to_s unless throttled
       headers['X-Rate-Limit-Remaining'] = bucket.remaining.to_s if subject_to_throttling?(request)
     end
 
     [status, headers, response]
+  end
+
+  # currently we define cost as the amount of user cpu time plus the amount
+  # of time spent in db queries, plus any arbitrary cost the app assigns
+  def calculate_cost(user_time, db_time, env)
+    extra_time = env.fetch("extra-request-cost", 0)
+    extra_time = 0 unless extra_time.is_a?(Numeric) && extra_time >= 0
+    user_time + db_time + extra_time
   end
 
   def subject_to_throttling?(request)
