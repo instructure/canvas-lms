@@ -20,6 +20,57 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe UsersController do
 
+ describe "external_tool" do
+
+   let :account do
+     Account.default
+   end
+
+   let :tool do
+     tool = account.context_external_tools.new(
+         name: "bob",
+         consumer_key: "bob",
+         shared_secret: "bob",
+         tool_id: 'some_tool',
+         privacy_level: 'public'
+     )
+     tool.url = "http://www.example.com/basic_lti?first=john&last=smith"
+     tool.resource_selection = {
+         :url => "http://#{HostUrl.default_host}/selection_test",
+         :selection_width => 400,
+         :selection_height => 400}
+     tool.save!
+     tool
+   end
+
+   it "removes query string when post_only = true" do
+     u = user(:active_all => true)
+     account.account_users.create!(user: u)
+     user_session(@user)
+     tool.user_navigation = {
+         :text => "example"
+     }
+     tool.settings['post_only'] = 'true'
+     tool.save!
+
+     get :external_tool, {id:tool.id, user_id:u.id}
+     expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti'
+   end
+
+   it "does not remove query string from url" do
+     u = user(:active_all => true)
+     account.account_users.create!(user: u)
+     user_session(@user)
+     tool.user_navigation = {
+         :text => "example"
+     }
+     tool.save!
+
+     get :external_tool, {id:tool.id, user_id:u.id}
+     expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti?first=john&last=smith'
+   end
+ end
+
   describe "index" do
     before :each do
       @a = Account.default

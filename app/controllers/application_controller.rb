@@ -1238,7 +1238,7 @@ class ApplicationController < ActionController::Base
         log_asset_access(@tool, "external_tools", "external_tools")
         @opaque_id = @tool.opaque_identifier_for(@tag)
 
-        @lti_launch = Lti::Launch.new
+        @lti_launch = @tool.settings['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
 
         success_url = case tag_type
         when :assignments

@@ -121,7 +121,7 @@ class ExternalToolsController < ApplicationController
     end
     add_crumb(@context.name, named_context_url(@context, :context_url))
 
-    @lti_launch = Lti::Launch.new
+    @lti_launch = @tool.settings['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
 
     opts = {
         resource_type: @resource_type,
@@ -262,7 +262,7 @@ class ExternalToolsController < ApplicationController
 
     launch_settings = JSON.parse(launch_settings)
 
-    @lti_launch = Lti::Launch.new
+    @lti_launch = launch_settings['tool_settings']['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
     @lti_launch.params = launch_settings['tool_settings']
     @lti_launch.resource_url = launch_settings['launch_url']
     @lti_launch.link_text =  launch_settings['tool_name']
@@ -419,7 +419,7 @@ class ExternalToolsController < ApplicationController
   protected :lti_launch
 
   def basic_lti_launch_request(tool, selection_type)
-    lti_launch = Lti::Launch.new
+    lti_launch = @tool.settings['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
 
     opts = {
         resource_type: selection_type,
@@ -451,7 +451,7 @@ class ExternalToolsController < ApplicationController
         tool_consumer_instance_contact_email: HostUrl.outgoing_email_address,
       }).merge(variable_expander(tool: tool, attachment: content_item_response.file).expand_variables!(tool.set_custom_fields(placement)))
 
-    lti_launch = Lti::Launch.new
+    lti_launch = @tool.settings['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
     lti_launch.resource_url = tool.extension_setting(placement, :url)
     lti_launch.params = LtiOutbound::ToolLaunch.generate_params(params, lti_launch.resource_url, tool.consumer_key, tool.shared_secret)
     lti_launch.link_text = tool.label_for(placement.to_sym)
@@ -517,7 +517,7 @@ class ExternalToolsController < ApplicationController
         context_title: @context.name,
     }).merge(extra_params).merge(variable_expander(tool:tool).expand_variables!(tool.set_custom_fields(placement)))
 
-    lti_launch = Lti::Launch.new
+    lti_launch = @tool.settings['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
     lti_launch.resource_url = tool.extension_setting(placement, :url)
     lti_launch.params = LtiOutbound::ToolLaunch.generate_params(params, lti_launch.resource_url, tool.consumer_key, tool.shared_secret)
     lti_launch.link_text = tool.label_for(placement.to_sym)
