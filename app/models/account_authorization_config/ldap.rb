@@ -30,6 +30,8 @@ class AccountAuthorizationConfig::LDAP < AccountAuthorizationConfig
       :identifier_format, :position ]
   end
 
+  SENSITIVE_PARAMS = [ :auth_password ].freeze
+
   def clear_last_timeout_failure
     unless self.last_timeout_failure_changed?
       self.last_timeout_failure = nil

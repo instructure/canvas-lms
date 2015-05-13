@@ -72,6 +72,13 @@ describe LoginController do
       get 'new'
       expect(response).to redirect_to(controller.url_for(controller: 'login/cas', action: :new))
     end
+
+    it "redirects to Facebook if it's the default" do
+      Account.default.account_authorization_configs.create!(auth_type: 'facebook')
+
+      get 'new'
+      expect(response).to redirect_to(facebook_login_url)
+    end
   end
 
   describe "#logout" do

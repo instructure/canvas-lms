@@ -1,6 +1,12 @@
 module Login::Shared
   def reset_session_for_login
-    reset_session_saving_keys(:return_to, :oauth2, :confirm, :enrollment, :expected_user_id, :masquerade_return_to)
+    reset_session_saving_keys(:return_to,
+                              :oauth2,
+                              :confirm,
+                              :enrollment,
+                              :expected_user_id,
+                              :masquerade_return_to,
+                              :oauth2_state)
   end
 
   def successful_login(user, pseudonym, otp_passed = false)

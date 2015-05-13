@@ -627,6 +627,14 @@ CanvasRails::Application.routes.draw do
   # deprecated alias
   post 'saml_consume' => 'login/saml#create'
 
+  # the callback URL for all OAuth2 based SSO
+  get 'login/oauth2/callback' => 'login/oauth2#create', as: :oauth2_login_callback
+  # ActionController::TestCase can't deal with aliased controllers when finding
+  # routes, so we let this route exist only for tests
+  get 'login/oauth2' => 'login/oauth2#new' if Rails.env.test?
+
+  get 'login/facebook' => 'login/facebook#new', as: :facebook_login
+
   get 'login/otp' => 'login/otp#new', as: :otp_login
   post 'login/otp/sms' => 'login/otp#send_via_sms', as: :send_otp_via_sms
   post 'login/otp' => 'login/otp#create'

@@ -41,9 +41,19 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     case type_name
     when 'cas', 'ldap', 'saml'
       const_get(type_name.upcase)
+    when 'facebook'
+      const_get(type_name.classify)
     else
       super
     end
+  end
+
+  def self.singleton?
+    false
+  end
+
+  def self.enabled?
+    true
   end
 
   belongs_to :account
@@ -54,9 +64,10 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     :log_in_url, :log_out_url, :identifier_format,
     :certificate_fingerprint, :entity_id,
     :ldap_filter, :auth_filter, :requested_authn_context,
-    :login_attribute, :idp_entity_id, :unknown_user_url
+    :login_attribute, :idp_entity_id, :unknown_user_url,
+    :app_id, :app_secret
 
-  VALID_AUTH_TYPES = %w[cas ldap saml].freeze
+  VALID_AUTH_TYPES = %w[cas facebook ldap saml].freeze
   validates_inclusion_of :auth_type, in: VALID_AUTH_TYPES, message: "invalid auth_type, must be one of #{VALID_AUTH_TYPES.join(',')}"
   validates_presence_of :account_id
 
@@ -69,6 +80,8 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   def self.deprecated_params
     []
   end
+
+  SENSITIVE_PARAMS = [].freeze
 
   def auth_password=(password)
     return if password.blank?
@@ -96,7 +109,6 @@ class AccountAuthorizationConfig < ActiveRecord::Base
       self.account.save!
     end
   end
-
 end
 
 # so it doesn't get mixed up with ::CAS

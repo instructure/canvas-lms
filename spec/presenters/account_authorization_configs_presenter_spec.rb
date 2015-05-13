@@ -1,4 +1,4 @@
-require 'spec_helper'
+ require 'spec_helper'
 
 describe AccountAuthorizationConfigsPresenter do
   describe "initialization" do
@@ -138,14 +138,16 @@ describe AccountAuthorizationConfigsPresenter do
   describe "#sso_options" do
     it "always has cas and ldap" do
       AccountAuthorizationConfig::SAML.stubs(:enabled?).returns(false)
-      presenter = described_class.new(stub)
-      expect(presenter.sso_options).to eq([[:CAS, 'cas'], [:LDAP, 'ldap']])
+      presenter = described_class.new(stub(account_authorization_configs: []))
+      expect(presenter.sso_options).to eq([['CAS', 'cas'],
+                                           ['Facebook', 'facebook'],
+                                           ['LDAP', 'ldap']])
     end
 
     it "includes saml if saml enabled" do
       AccountAuthorizationConfig::SAML.stubs(:enabled?).returns(true)
-      presenter = described_class.new(stub)
-      expect(presenter.sso_options).to include([:SAML, 'saml'])
+      presenter = described_class.new(stub(account_authorization_configs: []))
+      expect(presenter.sso_options).to include(['SAML', 'saml'])
     end
   end
 
@@ -338,6 +340,15 @@ describe AccountAuthorizationConfigsPresenter do
       expect(presenter.login_url_options(config2)).to eq(controller: 'login/saml',
                                                          action: :new,
                                                          id: config2)
+    end
+  end
+
+  describe "#new_auth_types" do
+    it "excludes singletons that have a config" do
+      AccountAuthorizationConfig::Facebook.stubs(:enabled?).returns(true)
+      Account.default.account_authorization_configs.create!(auth_type: 'facebook')
+      presenter = described_class.new(Account.default)
+      expect(presenter.new_auth_types).to_not be_include(AccountAuthorizationConfig::Facebook)
     end
   end
 end

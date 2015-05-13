@@ -9,8 +9,13 @@ class AccountAuthorizationConfigsPresenter
     account.account_authorization_configs.to_a
   end
 
-  def auth_types
-    AccountAuthorizationConfig::VALID_AUTH_TYPES
+  def new_auth_types
+    AccountAuthorizationConfig::VALID_AUTH_TYPES.map do |auth_type|
+      klass = AccountAuthorizationConfig.find_sti_class(auth_type)
+      next unless klass.enabled?
+      next if klass.singleton? && configs.any? { |aac| aac.is_a?(klass) }
+      klass
+    end.compact
   end
 
   def needs_discovery_url?
@@ -62,9 +67,9 @@ class AccountAuthorizationConfigsPresenter
   end
 
   def sso_options
-    options = [[:CAS, 'cas'], [:LDAP, 'ldap']]
-    options << [:SAML, 'saml'] if saml_enabled?
-    options
+    new_auth_types.map do |auth_type|
+      [auth_type.name.sub(/^AccountAuthorizationConfig::/, ''), auth_type.sti_name]
+    end
   end
 
   def position_options(config)

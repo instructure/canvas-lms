@@ -87,12 +87,12 @@
   <% end %>
 <% end %>
 
-<% @presenter.auth_types.each do |auth_type| %>
+<% @presenter.new_auth_types.each do |auth_type| %>
   <%= render partial: "aac_settings",
              locals: {
                account: @account,
                presenter: @presenter,
-               aac: @presenter.new_config(auth_type: auth_type)
+               aac: @presenter.new_config(auth_type: auth_type.sti_name)
              } %>
 <% end %>
 
@@ -110,6 +110,5 @@
   <%= render partial: 'sso_settings_form',
              locals: { presenter: @presenter, account: @account }%>
 <% end %>
-
 
 <% js_bundle :account_authorization_configs %>

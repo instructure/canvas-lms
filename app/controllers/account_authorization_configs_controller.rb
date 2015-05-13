@@ -174,18 +174,20 @@ class AccountAuthorizationConfigsController < ApplicationController
   # @API Create Authorization Config
   #
   # Add external account authentication service(s) for the account.
-  # Services may be CAS, SAML, or LDAP.
+  # Services may be CAS, Facebook, LDAP, or SAML.
   #
   # Each authentication service is specified as a set of parameters as
   # described below. A service specification must include an 'auth_type'
-  # parameter with a value of 'cas', 'saml', or 'ldap'. The other recognized
-  # parameters depend on this auth_type; unrecognized parameters are discarded.
-  # Service specifications not specifying a valid auth_type are ignored.
+  # parameter with a value of 'cas', 'facebook', 'ldap', or 'saml'. The
+  # other recognized parameters depend on this auth_type; unrecognized
+  # parameters are discarded. Service specifications not specifying a
+  # valid auth_type are ignored.
   #
-  # _Deprecated_[2015-05-08] Any service specification may include an optional 'login_handle_name'
-  # parameter. This parameter specifies the label used for unique login
-  # identifiers; for example: 'Login', 'Username', 'Student ID', etc. The
-  # default is 'Email'. _Deprecated_ [Use update_sso_settings instead]
+  # _Deprecated_[2015-05-08] Any service specification may include an
+  # optional 'login_handle_name' parameter. This parameter specifies the
+  # label used for unique login identifiers; for example: 'Login',
+  # 'Username', 'Student ID', etc. The default is 'Email'.
+  # _Deprecated_ [Use update_sso_settings instead]
   #
   # You can set the 'position' for any configuration. The config in the 1st position
   # is considered the default.
@@ -205,6 +207,64 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   #   A url to redirect to when a user is authorized through CAS but is not
   #   found in Canvas.
+  #
+  # For Facebook, the additional recognized parameters are:
+  #
+  # - app_id [Required]
+  #
+  #   The Facebook App ID. Not available if configured globally for Canvas.
+  #
+  # - app_secret [Required]
+  #
+  #   The Facebook App Secret. Not available if configured globally for Canvas.
+  #
+  # - unknown_user_url [Optional]
+  #
+  #   A url to redirect to when a user is authorized through Facebook but is
+  #   not found in Canvas.
+  #
+  # For LDAP authentication services, the additional recognized parameters are:
+  #
+  # - auth_host
+  #
+  #   The LDAP server's URL.
+  #
+  # - auth_port [Optional, Integer]
+  #
+  #   The LDAP server's TCP port. (default: 389)
+  #
+  # - auth_over_tls [Optional]
+  #
+  #   Whether to use TLS. Can be '', 'simple_tls', or 'start_tls'. For backwards
+  #   compatibility, booleans are also accepted, with true meaning simple_tls.
+  #   If not provided, it will default to start_tls.
+  #
+  # - auth_base [Optional]
+  #
+  #   A default treebase parameter for searches performed against the LDAP
+  #   server.
+  #
+  # - auth_filter
+  #
+  #   LDAP search filter. Use !{{login}} as a placeholder for the username
+  #   supplied by the user. For example: "(sAMAccountName=!{{login}})".
+  #
+  # - identifier_format [Optional]
+  #
+  #   The LDAP attribute to use to look up the Canvas login. Omit to use
+  #   the username supplied by the user.
+  #
+  # - auth_username
+  #
+  #   Username
+  #
+  # - auth_password
+  #
+  #   Password
+  #
+  # - change_password_url [Optional] _Deprecated_ [2015-05-08: use update_sso_settings instead]
+  #
+  #   Forgot Password URL. Leave blank for default Canvas behavior.
   #
   # For SAML authentication services, the additional recognized parameters are:
   #
@@ -250,49 +310,6 @@ class AccountAuthorizationConfigsController < ApplicationController
   # - requested_authn_context
   #
   #   The SAML AuthnContext
-  #
-  # For LDAP authentication services, the additional recognized parameters are:
-  #
-  # - auth_host
-  #
-  #   The LDAP server's URL.
-  #
-  # - auth_port [Optional, Integer]
-  #
-  #   The LDAP server's TCP port. (default: 389)
-  #
-  # - auth_over_tls [Optional]
-  #
-  #   Whether to use TLS. Can be '', 'simple_tls', or 'start_tls'. For backwards
-  #   compatibility, booleans are also accepted, with true meaning simple_tls.
-  #   If not provided, it will default to start_tls.
-  #
-  # - auth_base [Optional]
-  #
-  #   A default treebase parameter for searches performed against the LDAP
-  #   server.
-  #
-  # - auth_filter
-  #
-  #   LDAP search filter. Use !{{login}} as a placeholder for the username
-  #   supplied by the user. For example: "(sAMAccountName=!{{login}})".
-  #
-  # - identifier_format [Optional]
-  #
-  #   The LDAP attribute to use to look up the Canvas login. Omit to use
-  #   the username supplied by the user.
-  #
-  # - auth_username
-  #
-  #   Username
-  #
-  # - auth_password
-  #
-  #   Password
-  #
-  # - change_password_url [Optional] _Deprecated_ [2015-05-08: use update_sso_settings instead]
-  #
-  #   Forgot Password URL. Leave blank for default Canvas behavior.
   #
   # - account_authorization_config[n] (deprecated)
   #   The nth service specification as described above. For instance, the
