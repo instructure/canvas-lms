@@ -5540,7 +5540,6 @@ ar:
       few: "(%{count} إعجابات)"
       many: "(%{count} إعجابًا)"
       one: "إعجاب واحد"
-      other: "(%{count} إعجابًا)"
       two: إعجابين
       zero: "دون إعجاب"
     mark_as_read: "وضع علامة كمقروء"
@@ -10369,19 +10368,11 @@ ar:
       oauth2_complete: "أنهى التطبيق سير عمل تسجيل الدخول، وينبغي أن يعيد التنشيط بعد قليل."
     confirm: 
       cancel: إلغاء
-      details: 
-        allow_application: "يطلب %{app_name} الوصول إلى حسابك."
-        email: "عنوان بريدك الإلكتروني هو %{email}."
-        login_name: "أنت تقوم بتسجيل الدخول إلى هذا التطبيق باسم %{user_name}."
       labels: 
         remember_access: "تذكر تخويلي لهذه الخدمة"
       page_title: "تسجيل الدخول إلى التطبيق"
     confirm_mobile: 
       cancel: إلغاء
-      details: 
-        allow_application: "يطلب %{app_name} الوصول إلى حسابك."
-        email: "عنوان بريدك الإلكتروني هو %{email}."
-        login_name: "أنت تقوم بتسجيل الدخول إلى هذا التطبيق باسم %{user_name}."
       login: "تسجيل الدخول"
       page_title: "تسجيل الدخول إلى التطبيق"
       remember_auth: "تذكر تخويلي لهذه الخدمة"
@@ -10399,7 +10390,6 @@ ar:
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "بمجرد تغيير إجابة، يجب عليك تحديد خيار قبل تحديث السؤال."
   one_per_line_format_name_value_79647700: "واحد في السطر. التنسيق: الاسم=القيمة"
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} في الموعد المحدد، %{late} متأخرة، %{missing} مفقودة"
-  open_title_in_a_new_window_b29fed77: "فتح %{title} في نافذة جديدة"
   options: 
     ? "no"
     : لا
@@ -10827,6 +10817,7 @@ ar:
            -> إعدادات التكامل" قم بتمكين إخطارات الخادم بواسطة
           عنوان URL للإخطار:
           %{notification_url}
+          
           ثم قم باختيار الخانات "إضافة إدخال" و "حذف إدخال" في عمود "أرسلها الخادم".
       headers: 
         account_settings: "إعدادات الحساب"
@@ -14422,7 +14413,6 @@ ar:
     users: 
       user_search_label: "البحث عن مستخدم"
       users_matching_label: "مطابقة المستخدمين"
-  skipped_file_filename_due_to_error_94f0194: "تم تخطي الملف %{filename} بسبب خطأ"
   skipping_unknown_file_type_cd1086ee: "تخطي نوع الملف غير المعروف"
   slideshow: 
     titles: 
@@ -14842,7 +14832,6 @@ ar:
   the_material_is_licensed_under_creative_commons_3242cb5e: "المادة مرخصة بموجب المشاع الإبداعي"
   the_material_is_subject_to_fair_use_exception_41bc6a4b: "تخضع المادة إلى استثناء الاستخدام العادل"
   the_module_item_is_locked_27fe420b: "تم تأمين عنصر الوحدة"
-  the_most_recent_scores_for_user_current_user_name__ea82f0b6: "أحدث درجات المستخدم %{current_user_name} ونتيجة %{outcome_name}."
   the_profile_picture_has_been_reported_d609d6dd: "تم الإبلاغ عن صورة ملف التعريف"
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "أدوار المستخدم الذي يقوم بالإبلاغ (طالب، معلم، مسؤول، إلخ)"
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "حدّة المشكلة، حسب ما حدده المستخدم في القائمة المنسدلة."
