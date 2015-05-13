@@ -147,7 +147,7 @@ class GradebooksController < ApplicationController
 
   def show
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
-      @last_exported_gradebook_csv = @current_user.gradebook_csvs.where(course_id: @context.id).first
+      @last_exported_gradebook_csv = @context.gradebook_csvs.where(user_id: @current_user).first
       set_current_grading_period if multiple_grading_periods?
       set_js_env
       case @current_user.preferred_gradebook_version
