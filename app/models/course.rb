@@ -219,6 +219,7 @@ class Course < ActiveRecord::Base
   has_many :usage_rights, as: :context, class_name: 'UsageRights', dependent: :destroy
 
   has_many :sis_post_grades_statuses
+  has_many :gradebook_csvs, inverse_of: :course
 
   include Profile::Association
 
@@ -1476,8 +1477,7 @@ class Course < ActiveRecord::Base
     progress = user.progresses.build(tag: 'gradebook_to_csv')
     progress.save!
 
-    exported_gradebook = user.gradebook_csvs.where(course_id: self.id).first
-    exported_gradebook ||= user.gradebook_csvs.build
+    exported_gradebook = gradebook_csvs.where(user_id: user).first_or_initialize
     attachment = user.attachments.build
     attachment.filename = filename
     attachment.content_type = 'text/csv'
@@ -1485,7 +1485,6 @@ class Course < ActiveRecord::Base
     attachment.save!
     exported_gradebook.attachment = attachment
     exported_gradebook.progress = progress
-    exported_gradebook.course_id = self.id
     exported_gradebook.save!
 
     progress.process_job(self, :generate_csv, {preserve_method_args: true}, options, attachment)
