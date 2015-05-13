@@ -78,7 +78,7 @@ describe "student groups" do
 
         # expand the group
         fj(".student-group-title").click
-        wait_for_animations
+        wait_for_ajaximations
 
         # first item in the array is the group name
         students = ff("[role=listitem]")
@@ -91,7 +91,7 @@ describe "student groups" do
 
         # expand the group
         fj(".student-group-title").click
-        wait_for_animations
+        wait_for_ajaximations
 
         expected_student_list = ["nobody@example.com","Test Student 1","Test Student 2",
                                  "Test Student 3","Test Student 4","Test Student 5"]
@@ -109,7 +109,7 @@ describe "student groups" do
 
     describe "student group index page" do
       before(:each) do
-        create_group_with_student(group_name:group_name)
+        create_student_group(group_name:group_name)
         get "/courses/#{@course.id}/groups"
       end
 
@@ -117,14 +117,14 @@ describe "student groups" do
         expect(f(".student-group-students")).to include_text("1 student")
 
         f(".student-group-join a").click
-        wait_for_animations
+        wait_for_ajaximations
 
         keep_trying_until {expect(f(".student-group-students")).to include_text("0 students") }
       end
 
       it "leaving the group should change the dialog to join", priority:"2", test_id:180683 do
         f(".student-group-join a").click
-        wait_for_animations
+        wait_for_ajaximations
 
         keep_trying_until { expect(f(".student-group-join a")).to include_text("JOIN") }
       end
@@ -135,25 +135,25 @@ describe "student groups" do
 
         # leave group and verify leaving
         f(".student-group-join a").click
-        wait_for_animations
+        wait_for_ajaximations
         keep_trying_until { expect(f(".student-group-join a")).to include_text("JOIN") }
 
         # rejoin group
         f(".student-group-join a").click
-        wait_for_animations
+        wait_for_ajaximations
         keep_trying_until { expect(f(".student-group-join a")).to include_text("LEAVE") }
       end
 
       it "should visit the group", priority:"1", test_id:180680 do
         fln('Visit').click
-        wait_for_animations
+        wait_for_ajaximations
 
         expect(f("#breadcrumbs")).to include_text(group_name.to_s)
       end
 
       it "student group leader can manage group", priority:"2", test_id:180702 do
         fln('Manage').click
-        wait_for_animations
+        wait_for_ajaximations
 
         expect(f(".ui-dialog-titlebar")).to include_text("Manage Student Group")
       end
@@ -161,38 +161,38 @@ describe "student groups" do
 
     describe "student who is not in the group", priority:"2", test_id:184465 do
       it "should allow the student to join a student group they did not create" do
-        create_group_with_student(group_name:group_name,enroll_student_count:0,add_student:false)
+        create_student_group(group_name:group_name,enroll_student_count:0,add_self_to_group:false)
         get "/courses/#{@course.id}/groups"
 
         # join group
         f(".student-group-join a").click
-        wait_for_animations
+        wait_for_ajaximations
         keep_trying_until { expect(f(".student-group-join a")).to include_text("LEAVE") }
       end
     end
 
     describe "Manage Student Group Page" do
       before(:each) do
-        create_group_with_student(group_name:group_name, enroll_student_count:2)
+        create_student_group(group_name:group_name, enroll_student_count:2)
         get "/courses/#{@course.id}/groups"
       end
 
       it "should populate dialog with current group name", priority:"2", test_id:180711 do
         fln('Manage').click
-        wait_for_animations
+        wait_for_ajaximations
 
         expect(f("#group_name")).to have_attribute(:value, group_name.to_s)
       end
 
       it "should change group name", priority:"2", test_id:180714 do
         fln('Manage').click
-        wait_for_animations
+        wait_for_ajaximations
 
         addition = "CRIT"
         f("#group_name").send_keys(addition.to_s)
-        wait_for_animations
+        wait_for_ajaximations
         fj('button.confirm-dialog-confirm-btn').click
-        wait_for_animations
+        wait_for_ajaximations
 
         new_group_name = group_name.to_s + addition.to_s
         keep_trying_until(3) {expect(fj(".student-group-title")).to include_text(new_group_name.to_s) }
@@ -201,7 +201,7 @@ describe "student groups" do
       it "should add users to group", priority:"1", test_id:180718 do
         # expand the group
         fj(".student-group-title").click
-        wait_for_animations
+        wait_for_ajaximations
 
         # verify that there is only one student
         # first item in the array is the group name
@@ -210,7 +210,7 @@ describe "student groups" do
         expect(students[1]).to include_text("nobody@example.com")
 
         fln('Manage').click
-        wait_for_animations
+        wait_for_ajaximations
 
         students = ffj(".checkbox")
         students.each do |student|
@@ -218,7 +218,7 @@ describe "student groups" do
         end
 
         fj('button.confirm-dialog-confirm-btn').click
-        wait_for_animations
+        wait_for_ajaximations
 
         expected_student_list = ["nobody@example.com","Test Student 1", "Test Student 2"]
         student_list = ff("[role=listitem]")
@@ -240,17 +240,17 @@ describe "student groups" do
 
         # add the first student that isn't the current student
         ffj(".checkbox:visible")[1].click
-        wait_for_animations
+        wait_for_ajaximations
 
         fj('button.confirm-dialog-confirm-btn').click
-        wait_for_animations
+        wait_for_ajaximations
 
         # expect plural of the word 'student'
         keep_trying_until(2) { expect(f(".student-group-students")).to include_text("students") }
 
         # leave the group
         fj(".student-group-join a").click
-        wait_for_animations
+        wait_for_ajaximations
 
         keep_trying_until(2) { expect(fj(".student-group-students")).to include_text("1 student") }
       end
