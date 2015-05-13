@@ -12,6 +12,16 @@ Canvas::Plugin.register('facebook', nil,
   settings_partial: 'plugins/facebook_settings',
   encrypted_settings: [:app_secret]
                        )
+Canvas::Plugin.register('github', nil,
+  name: 'GitHub',
+  description: -> { t :description, 'Github Login' },
+  website: 'https://github.com',
+  author: 'Instructure',
+  author_website: 'http://www.instructure.com',
+  version: '1.0.0',
+  settings_partial: 'plugins/github_settings',
+  encrypted_settings: [:client_secret]
+                       )
 Canvas::Plugin.register('linked_in', nil, {
   :name => lambda{ t :name, 'LinkedIn' },
   :description => lambda{ t :description, 'LinkedIn integration' },

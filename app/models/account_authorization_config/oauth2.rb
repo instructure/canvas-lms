@@ -34,7 +34,6 @@ class AccountAuthorizationConfig::Oauth2 < AccountAuthorizationConfig::Delegated
   alias_method :client_secret=, :auth_password=
   alias_method :client_secret, :auth_decrypted_password
 
-
   def client
     @client ||= OAuth2::Client.new(client_id, client_secret, client_options)
   end

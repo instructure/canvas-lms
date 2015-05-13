@@ -43,6 +43,8 @@ class AccountAuthorizationConfig < ActiveRecord::Base
       const_get(type_name.upcase)
     when 'facebook'
       const_get(type_name.classify)
+    when 'github'
+      GitHub
     else
       super
     end
@@ -65,9 +67,10 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     :certificate_fingerprint, :entity_id,
     :ldap_filter, :auth_filter, :requested_authn_context,
     :login_attribute, :idp_entity_id, :unknown_user_url,
-    :app_id, :app_secret
+    :app_id, :app_secret,
+    :client_id, :client_secret, :domain
 
-  VALID_AUTH_TYPES = %w[cas facebook ldap saml].freeze
+  VALID_AUTH_TYPES = %w[cas facebook github ldap saml].freeze
   validates_inclusion_of :auth_type, in: VALID_AUTH_TYPES, message: "invalid auth_type, must be one of #{VALID_AUTH_TYPES.join(',')}"
   validates_presence_of :account_id
 

@@ -174,12 +174,12 @@ class AccountAuthorizationConfigsController < ApplicationController
   # @API Create Authorization Config
   #
   # Add external account authentication service(s) for the account.
-  # Services may be CAS, Facebook, LDAP, or SAML.
+  # Services may be CAS, Facebook, GitHub, LDAP, or SAML.
   #
   # Each authentication service is specified as a set of parameters as
   # described below. A service specification must include an 'auth_type'
-  # parameter with a value of 'cas', 'facebook', 'ldap', or 'saml'. The
-  # other recognized parameters depend on this auth_type; unrecognized
+  # parameter with a value of 'cas', 'facebook', 'github', 'ldap', or 'saml'.
+  # The other recognized parameters depend on this auth_type; unrecognized
   # parameters are discarded. Service specifications not specifying a
   # valid auth_type are ignored.
   #
@@ -221,6 +221,29 @@ class AccountAuthorizationConfigsController < ApplicationController
   # - unknown_user_url [Optional]
   #
   #   A url to redirect to when a user is authorized through Facebook but is
+  #   not found in Canvas.
+  #
+  # For GitHub, the additional recognized parameters are:
+  #
+  # - domain [Optional]
+  #
+  #   The domain of a GitHub Enterprise installation. I.e.
+  #   github.mycompany.com. If not set, it will default to the public
+  #   github.com.
+  #
+  # - client_id [Required]
+  #
+  #   The GitHub application's Client ID. Not available if configured globally
+  #   for Canvas.
+  #
+  # - client_secret [Required]
+  #
+  #   The GitHub application's Client Secret. Not available if configured
+  #   globally for Canvas.
+  #
+  # - unknown_user_url [Optional]
+  #
+  #   A url to redirect to when a user is authorized through GitHub but is
   #   not found in Canvas.
   #
   # For LDAP authentication services, the additional recognized parameters are:

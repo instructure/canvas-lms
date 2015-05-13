@@ -94,7 +94,9 @@ class LoginController < ApplicationController
     if session[:login_aac]
       # The AAC could have been deleted since the user logged in
       aac = AccountAuthorizationConfig.where(id: session[:login_aac]).first
-      redirect = aac.user_logout_redirect(self, @current_user) if aac
+      if aac && aac.respond_to?(:user_logout_redirect)
+        redirect = aac.user_logout_redirect(self, @current_user)
+      end
     end
 
     redirect ||= login_url

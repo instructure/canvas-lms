@@ -141,6 +141,7 @@ describe AccountAuthorizationConfigsPresenter do
       presenter = described_class.new(stub(account_authorization_configs: []))
       expect(presenter.sso_options).to eq([['CAS', 'cas'],
                                            ['Facebook', 'facebook'],
+                                           ['GitHub', 'github'],
                                            ['LDAP', 'ldap']])
     end
 

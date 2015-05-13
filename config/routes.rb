@@ -634,6 +634,7 @@ CanvasRails::Application.routes.draw do
   get 'login/oauth2' => 'login/oauth2#new' if Rails.env.test?
 
   get 'login/facebook' => 'login/facebook#new', as: :facebook_login
+  get 'login/github' => 'login/github#new', as: :github_login
 
   get 'login/otp' => 'login/otp#new', as: :otp_login
   post 'login/otp/sms' => 'login/otp#send_via_sms', as: :send_otp_via_sms
