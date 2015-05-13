@@ -17,7 +17,6 @@
 #
 
 class InfoController < ApplicationController
-  skip_before_filter :verify_authenticity_token, :only => :record_error
   skip_before_filter :load_account, :only => :health_check
   skip_before_filter :load_user, :only => [:health_check, :browserconfig]
 
@@ -37,45 +36,6 @@ class InfoController < ApplicationController
 
   def help_links
     render :json => @domain_root_account && @domain_root_account.help_links
-  end
-
-  def record_error
-    error = params[:error] || {}
-    error[:user_agent] = request.headers['User-Agent']
-    begin
-      report_id = error.delete(:id)
-      @report = ErrorReport.where(id: report_id.to_i).first if report_id.present? && report_id.to_i != 0
-      @report ||= ErrorReport.where(id: session.delete(:last_error_id)).first if session[:last_error_id].present?
-      @report ||= ErrorReport.new
-      error.delete(:category) if @report.category.present?
-      @report.user = @current_user
-      @report.account ||= @domain_root_account
-      backtrace = params[:error].delete(:backtrace) rescue nil
-      backtrace ||= ""
-      if @report.backtrace
-        backtrace += "\n\n-----------------------------------------\n\n"
-        backtrace += @report.backtrace
-      end
-      @report.backtrace = backtrace
-      @report.http_env ||= Canvas::Errors::Info.useful_http_env_stuff_from_request(request)
-      @report.request_context_id = RequestContextGenerator.request_id
-      @report.assign_data(error)
-      @report.save
-      @report.send_later(:send_to_external)
-    rescue => e
-      @exception = e
-      Canvas::Errors.capture(
-        e,
-        message: "Error Report Creation failed",
-        user_email: error[:email],
-        user_id: @current_user.try(:id)
-      )
-    end
-    respond_to do |format|
-      flash[:notice] = t('notices.error_reported', "Thanks for your help!  We'll get right on this")
-      format.html { redirect_to root_url }
-      format.json { render :json => {:logged => true, :id => @report.try(:id) } }
-    end
   end
 
   def health_check
