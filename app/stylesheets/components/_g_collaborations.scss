@@ -1,5 +1,4 @@
 
-
 $dark-blue: #edf4fc;
 $green: #f5fbf7;
 $highlight-blue: #00b5fe;
@@ -112,7 +111,16 @@ $highlight-blue: #00b5fe;
   }
 
   .ui-state-active i {
-    color: #00b5fe !important;
+    color: $highlight-blue !important;
+  }
+
+  .filters {
+    display: inline-block;
+    padding-right: 5px;
+  }
+
+  .radio-group-outline {
+    outline: $ic-brand-primary solid 2px;
   }
 }
 
