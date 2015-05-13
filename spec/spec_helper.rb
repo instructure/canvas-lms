@@ -461,20 +461,6 @@ RSpec.configure do |config|
     @account
   end
 
-  def grading_periods(opts = {})
-    Account.default.set_feature_flag! :multiple_grading_periods, 'on'
-    ctx = opts[:context] || @course || course
-    count = opts[:count] || 2
-
-    gpg = ctx.grading_period_groups.create!
-    now = Time.zone.now
-    count.times.map { |n|
-      gpg.grading_periods.create! start_date: n.months.since(now),
-        end_date: (n+1).months.since(now),
-        weight: 1
-    }
-  end
-
   def course(opts={})
     account = opts[:account] || Account.default
     account.shard.activate do
@@ -503,22 +489,26 @@ RSpec.configure do |config|
     context.root_account.enable_feature!(:multiple_grading_periods) if opts[:mgp_flag_enabled]
     gp_group = context.grading_period_groups.create!
     class_name = context.class.name.demodulize
-    periods = opts[:grading_periods] || [:current]
-    periods.each.with_index(1) do |timeframe, index|
-      cutoff_dates = {
-        current: { start_date: index.months.ago,
-                   end_date: index.months.from_now },
-        old:     { start_date: (index + 1).months.ago,
-                   end_date: index.months.ago },
-        future:  { start_date: index.months.from_now,
-                   end_date: (index + 1).months.from_now }
+    timeframes = opts[:grading_periods] || [:current]
+    now = Time.zone.now
+    period_fixtures = {
+      old: {
+        start_date: 5.months.ago(now),
+        end_date:   2.months.ago(now)
+      },
+      current: {
+        start_date: 2.months.ago(now),
+        end_date:   2.months.from_now(now)
+      },
+      future: {
+        start_date: 2.months.from_now(now),
+        end_date:   5.months.from_now(now)
       }
-      period_params = cutoff_dates[timeframe].merge(title: "#{class_name} Period #{index}: #{timeframe} period")
-      new_period = gp_group.grading_periods.create!(period_params)
-      new_period[:workflow_state] = 'active'
-      new_period.save!
+    }
+    timeframes.map.with_index(1) do |timeframe, index|
+      period_params = period_fixtures[timeframe].merge(title: "#{class_name} Period #{index}: #{timeframe} period")
+      gp_group.grading_periods.create!(period_params)
     end
-    gp_group.grading_periods
   end
 
   def account_with_role_changes(opts={})

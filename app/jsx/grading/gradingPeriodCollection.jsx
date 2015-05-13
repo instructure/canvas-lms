@@ -154,8 +154,8 @@ function(React, GradingPeriod, $, I18n, _, ConvertCase) {
       return _.any(existingGradingPeriods, function(gradingPeriod) {
         // http://c2.com/cgi/wiki?TestIfDateRangesOverlap
         return (
-          newGradingPeriod.startDate <= gradingPeriod.endDate &&
-          gradingPeriod.startDate <= newGradingPeriod.endDate
+          newGradingPeriod.startDate < gradingPeriod.endDate &&
+          gradingPeriod.startDate < newGradingPeriod.endDate
         );
       });
     },
