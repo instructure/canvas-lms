@@ -503,9 +503,7 @@ describe ApplicationController do
       controller.expects(:named_context_url).with(Account.default, :context_basic_lti_launch_request_url, 44, {:module_item_id => 42, resource_link_fragment: 'ContentTag:42'}).returns('nil')
       controller.stubs(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
-
     end
-
   end
 
   describe 'external_tools_display_hashes' do
