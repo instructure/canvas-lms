@@ -60,7 +60,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
     quiz_submission = build_new_submission_from_quiz_submission_events(submission)
 
     # save the result
-    quiz_submission.save_with_versioning!
+    quiz_submission.save_with_versioning! if quiz_submission
   end
 
   def self.find_missing_submissions_on_current_shard
@@ -74,13 +74,15 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
     end
     ids.map do |id|
       begin
-        Rails.logger.info "#{id} data fix starting..."
+        Rails.logger.info LOG_PREFIX + "#{id} data fix starting..."
         success = run(id)
+      rescue => e
+        Rails.logger.warn LOG_PREFIX + "#{id} failed with error: #{e}"
       ensure
         if success
-          Rails.logger.info "#{id} completed successfully"
+          Rails.logger.info LOG_PREFIX + "#{id} completed successfully"
         else
-          Rails.logger.warn "#{id} failed"
+          Rails.logger.warn LOG_PREFIX + "#{id} failed"
         end
       end
     end
