@@ -192,16 +192,18 @@
       transform: translate3d(0,0,0);
       transition: all 0.3s $ic-transition; 
       display: block;
-      margin: 0 auto;
     }
 
     .canvas-logomark {
       width: $ic-sp*3; height: $ic-sp*3;
-      padding: $ic-sp*1.5 0 $ic-sp;
+      margin: $ic-sp*1.5 auto $ic-sp;
     }
 
     // let customer logo fit nav width
-    .ic-app-header__logomark_image { max-width: 100%; }
+    .ic-app-header__logomark_image {
+      max-width: 100%;
+      margin: 0 auto;
+    }
 
     // scale up customer or canvas logo on hover/focus
     &:hover, &:focus {
