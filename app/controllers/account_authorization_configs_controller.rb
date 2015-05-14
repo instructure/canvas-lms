@@ -174,14 +174,14 @@ class AccountAuthorizationConfigsController < ApplicationController
   # @API Create Authorization Config
   #
   # Add external account authentication service(s) for the account.
-  # Services may be CAS, Facebook, GitHub, LDAP, SAML, or Twitter.
+  # Services may be CAS, Facebook, GitHub, LDAP, LinkedIn, SAML, or Twitter.
   #
   # Each authentication service is specified as a set of parameters as
   # described below. A service specification must include an 'auth_type'
-  # parameter with a value of 'cas', 'facebook', 'github', 'ldap', 'saml', or
-  # 'twitter'. The other recognized parameters depend on this auth_type;
-  # unrecognized parameters are discarded. Service specifications not
-  # specifying a valid auth_type are ignored.
+  # parameter with a value of 'cas', 'facebook', 'github', 'ldap', 'linkedin',
+  # 'saml', or 'twitter'. The other recognized parameters depend on this
+  # auth_type; unrecognized parameters are discarded. Service specifications
+  # not specifying a valid auth_type are ignored.
   #
   # _Deprecated_[2015-05-08] Any service specification may include an
   # optional 'login_handle_name' parameter. This parameter specifies the
@@ -288,6 +288,23 @@ class AccountAuthorizationConfigsController < ApplicationController
   # - change_password_url [Optional] _Deprecated_ [2015-05-08: use update_sso_settings instead]
   #
   #   Forgot Password URL. Leave blank for default Canvas behavior.
+  #
+  # For LinkedIn, the additional recognized parameters are:
+  #
+  # - client_id [Required]
+  #
+  #   The LinkedIn application's Client ID. Not available if configured globally
+  #   for Canvas.
+  #
+  # - client_secret [Required]
+  #
+  #   The LinkedIn application's Client Secret. Not available if configured
+  #   globally for Canvas.
+  #
+  # - unknown_user_url [Optional]
+  #
+  #   A url to redirect to when a user is authorized through GitHub but is
+  #   not found in Canvas.
   #
   # For SAML authentication services, the additional recognized parameters are:
   #

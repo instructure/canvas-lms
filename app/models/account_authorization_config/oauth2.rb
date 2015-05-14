@@ -38,11 +38,19 @@ class AccountAuthorizationConfig::Oauth2 < AccountAuthorizationConfig::Delegated
     @client ||= OAuth2::Client.new(client_id, client_secret, client_options)
   end
 
+  def authorize_url(redirect_uri, state)
+    client.auth_code.authorize_url({ redirect_uri: redirect_uri, state: state }.merge(authorize_options))
+  end
+
   def get_token(code, redirect_uri)
     client.auth_code.get_token(code, { redirect_uri: redirect_uri }.merge(token_options))
   end
 
   protected
+
+  def authorize_options
+    {}
+  end
 
   def token_options
     {}

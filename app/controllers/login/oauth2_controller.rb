@@ -20,7 +20,7 @@ class Login::Oauth2Controller < Login::OauthBaseController
   def new
     super
     state = session[:oauth2_state] = SecureRandom.hex(24)
-    redirect_to @aac.client.auth_code.authorize_url(redirect_uri: redirect_uri, state: state)
+    redirect_to @aac.authorize_url(redirect_uri, state)
   end
 
   def create

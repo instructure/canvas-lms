@@ -102,12 +102,13 @@ describe "default plugins" do
     multiple_accounts_select
     f("#plugin_setting_disabled").click
     wait_for_ajaximations
-    f("#settings_api_key").send_keys("asdf")
-    f("#settings_secret_key").send_keys("asdf")
+    f("#settings_client_id").send_keys("asdf")
+    f("#settings_client_secret").send_keys("asdf")
     submit_form('#new_plugin_setting')
 
     assert_flash_error_message /There was an error/
 
+    f("#settings_client_secret").send_keys("asdf")
     LinkedIn::Connection.stubs(:config_check).returns(nil)
     submit_form('#new_plugin_setting')
     wait_for_ajax_requests
@@ -116,8 +117,8 @@ describe "default plugins" do
 
     settings = Canvas::Plugin.find(:linked_in).try(:settings)
     expect(settings).not_to be_nil
-    expect(settings[:api_key]).to eq 'asdf'
-    expect(settings[:secret_key]).to eq 'asdf'
+    expect(settings[:client_id]).to eq 'asdf'
+    expect(settings[:client_secret_dec]).to eq 'asdf'
   end
 
   def multiple_accounts_select

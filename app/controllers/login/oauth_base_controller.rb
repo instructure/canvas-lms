@@ -46,7 +46,7 @@ class Login::OauthBaseController < ApplicationController
   protected
 
   def timeout_protection
-    default_timeout = Setting.get('oauth_timelimit', 5.seconds.to_s).to_f
+    default_timeout = Setting.get('oauth_timelimit', 10.seconds.to_s).to_f
 
     timeout_options = { raise_on_timeout: true, fallback_timeout_length: default_timeout }
 

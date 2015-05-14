@@ -22,16 +22,17 @@ Canvas::Plugin.register('github', nil,
   settings_partial: 'plugins/github_settings',
   encrypted_settings: [:client_secret]
                        )
-Canvas::Plugin.register('linked_in', nil, {
-  :name => lambda{ t :name, 'LinkedIn' },
-  :description => lambda{ t :description, 'LinkedIn integration' },
-  :website => 'http://www.linkedin.com',
-  :author => 'Instructure',
-  :author_website => 'http://www.instructure.com',
-  :version => '1.0.0',
-  :settings_partial => 'plugins/linked_in_settings',
-  :validator => 'LinkedInValidator'
-})
+Canvas::Plugin.register('linked_in', nil,
+  name: 'LinkedIn',
+  description: -> { t :description, 'LinkedIn integration' },
+  website: 'http://www.linkedin.com',
+  author: 'Instructure',
+  author_website: 'http://www.instructure.com',
+  version: '1.0.0',
+  settings_partial: 'plugins/linked_in_settings',
+  validator: 'LinkedInValidator',
+  encrypted_settings: [:client_secret]
+                       )
 Canvas::Plugin.register('diigo', nil, {
   :name => lambda{ t :name, 'Diigo' },
   :description => lambda{ t :description, 'Diigo integration' },

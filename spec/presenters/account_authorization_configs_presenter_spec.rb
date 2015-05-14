@@ -150,6 +150,7 @@ describe AccountAuthorizationConfigsPresenter do
                                            ['Facebook', 'facebook'],
                                            ['GitHub', 'github'],
                                            ['LDAP', 'ldap'],
+                                           ['LinkedIn', 'linkedin'],
                                            ['Twitter', 'twitter']])
     end
 
