@@ -16,6 +16,34 @@ describe "assignments" do
       @course.require_assignment_group
     end
 
+    context "save and publish button" do
+
+      def create_assignment(publish = true, params = {name: "Test Assignment"})
+        @assignment = @course.assignments.create(params)
+        @assignment.unpublish unless publish
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+      end
+
+      it "can save and publish an assignment", priority: "1", test_id: 193784 do
+        create_assignment false
+
+        expect(f("#assignment-draft-state")).to be_displayed
+
+        expect_new_page_load {f(".save_and_publish").click}
+        expect(f("#assignment_publish_button.btn-published")).to be_displayed
+
+        # Check that the list of quizzes is also updated
+        get "/courses/#{@course.id}/assignments"
+        expect(f("#assignment_#{@assignment.id} .icon-publish")).to be_displayed
+      end
+
+      it "should not exist in a published assignment", priority: "1", test_id: 140648 do
+        create_assignment
+
+        expect(f(".save_and_publish")).to be_nil
+      end
+    end
+
     it "should edit an assignment" do
       assignment_name = 'first test assignment'
       due_date = Time.now.utc + 2.days
