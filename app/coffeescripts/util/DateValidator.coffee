@@ -77,7 +77,7 @@ define [
       @_validateDateSequences(datesToValidate, errs)
 
     getSectionRange:(section) ->
-      return @dateRange unless section
+      return @dateRange unless section.override_course_and_term_dates
 
       if section.start_at
         @dateRange.start_at = {date: section.start_at, date_context: "section" }
