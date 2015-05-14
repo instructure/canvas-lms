@@ -277,7 +277,7 @@ class Quizzes::QuizzesController < ApplicationController
             :name => section.name,
             :start_at => section.start_at,
             :end_at => section.end_at,
-            :override_course_dates => section.restrict_enrollments_to_section_dates
+            :override_course_and_term_dates => section.restrict_enrollments_to_section_dates
           }
         },
         :QUIZZES_URL => course_quizzes_url(@context),
