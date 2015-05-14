@@ -52,6 +52,7 @@ pt-BR:
   _section_not_synced_yet_cd07d0dd: "-- Seção ainda não sincronizada"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Um valor de cálculo não é usado com este método de cálculo"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "Um arquivo com o nome %{itemName} já existe nesta pasta."
+  a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Um depósito útil de chaves/valores de um hospede de dados ambientais interessantes para o usuário relatante."
   a_message_is_required_129e1814: "Uma mensagem é necessária"
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "Uma tabela contendo o nome do esquema de avaliação e ícones para editar ou excluir o esquema."
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "Uma tabela que contém dados do esquema de avaliação. Cada linha contém um nome, uma porcentagem máxima e uma porcentagem mínima. Além disso, cada linha contém um ícone para adicionar uma nova linha abaixo e um ícone para excluir a linha atual."
@@ -1506,6 +1507,7 @@ pt-BR:
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Tem certeza de que deseja excluir este anúncio?"
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: "Tem certeza de que deseja excluir este período de avaliação?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Tem certeza de que deseja excluir este esquema de avaliação?"
+  are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Tem certeza de que deseja remover este período de classificação?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Tem certeza de que deseja remover esta ferramenta?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Tem certeza de que quer denunciar esta foto de perfil?"
   aria_labels: 
@@ -2907,6 +2909,14 @@ pt-BR:
       started_by: "Iniciado por *%{user}*, %{at}"
       titles: 
         current: "Colaborações atuais"
+    show: 
+      error_cause_1: "A conta de Google Drive do criador é diferente da conta usada para criar a colaboração."
+      error_cause_2: "O criador da colaboração não é mais um autor no google doc."
+      error_summary: "Parece que esta colaboração não está funcionando. Possíveis causas:"
+      error_title: "Erro de Colaboração no Google Drive"
+      headings: 
+        page: "Erro de Colaboração no Google Drive"
+      resolution: "Contacte o criador e informe-o."
     titles: 
       delete: "Excluir colaboração?"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Reduzir lista de membros do grupo para %{groupName}"
@@ -5118,6 +5128,7 @@ pt-BR:
       new_quiz: "Novo teste"
     edit_crumb: Editar
     edit_view: 
+      allow_liking: "Permitir curtidas"
       allow_threaded_replies: "Permitir respostas ligadas"
       attachment: Anexo
       available_from: "Disponível de"
@@ -5128,6 +5139,7 @@ pt-BR:
       delay_posting: "Atraso ao publicar"
       enable_podcast_feed: "Ativar feed de podcast"
       include_replies_in_podcast_feed: "Incluir respostas de estudantes em feed do podcast"
+      only_graders_can_like: "Apenas classificadores podem curtir"
       only_visible_to_overrides_note: "Observação: a discussão *apenas* é visível para as seções especificadas abaixo:"
       options: Opções
       page_header_title: "Nova discussão"
@@ -5135,6 +5147,7 @@ pt-BR:
       post_at: "Publicar em"
       save: Salvar
       saving: Salvando...
+      sort_by_likes: "Classificar por curtidas"
       topic_title: "Título do tópico"
       until: Até
       use_for_grading: Avaliado
@@ -5295,6 +5308,7 @@ pt-BR:
       edited_comment: "Editado por *%{editor.display_name}* em %{edited_at}"
       go_to_parent: "Ir para o principal"
       go_to_topic: "Ir para o tópico"
+      like_entry: "Curtir submissão"
       manage_discussion_entry: "Gerenciar entrada de discussão"
       open_in_speedgrader: "Abrir no SpeedGrader"
       unknown_author: ">Autor desconhecido"
@@ -5303,6 +5317,9 @@ pt-BR:
       show_more: "Mostrar mais"
     hide_due_dates: "Ocultar as datas de entrega"
     initial_post_required_to_subscribe: "Você deve publicar uma resposta antes de assinar"
+    like_count: 
+      one: "(1 curtida)"
+      other: "(%{count} curtidas)"
     mark_as_read: "Marcar como lido"
     mark_as_unread: "Marcar como não lido"
     no_content: "Sem conteúdo"
@@ -5478,6 +5495,7 @@ pt-BR:
   ember_modules_description: "Módulos regravados em Ember. Usa a API nativa de arrastar e soltar para permitir arrastar de locais externos."
   enable_6f5d1328: Ativar
   enable_gradebook_list_students_by_sortable_name: "Lista os alunos pelos nomes ordenados no Livro de Notas. O nome ordenável é padronizado para 'Sobrenome, Nome' e pode ser alterado nas configurações."
+  enable_multiple_grading_periods: "Vários períodos de classificação permite que os professores e administradores criem períodos de classificação com datas fixas do prazo de entregar tarefas. Atribuições podem ser filtrados por esses períodos de classificação no Boletim."
   end_date_e0093ed7: "Data de término"
   ends_on_date_320e0c26: "Termina na data"
   enrollment: 
@@ -5876,6 +5894,7 @@ pt-BR:
       remove_feed: "Remover %{display_name}"
   external_integration_keys_8b4f4548: "Chaves de integração externa"
   external_tool_c5a6410a: "Ferramentas externas"
+  external_tool_url_cannot_be_left_blank_a34b6bb2: "O URL da ferramenta externa não pode permanecer em branco."
   external_tools: 
     account_navigation_configured: "Navegação de conta configurada"
     app_full_view: 
@@ -6029,6 +6048,7 @@ pt-BR:
     quiz_log_auditing: "Auditoria do log de teste"
     student_groups: "Página de novos grupos de alunos"
     student_outcome_gradebook: "Livro de notas de domínio da aprendizagem do aluno"
+  field_name_31fff38e: "Nome do Campo"
   file_list_updated_38e2a5ad: "Lista de arquivo atualizada"
   file_not_found_9eec054c: "Arquivo não localizado"
   file_preview: 
@@ -7279,6 +7299,7 @@ pt-BR:
       submit: "Salvar %{model}"
       update: "Atualizar %{model}"
   here_are_your_assignments_listed_by_due_date_7d8e98e6: "Aqui estão suas tarefas, listadas por data de vencimento."
+  here_f44564ee: aqui.
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Aqui está uma grande chance de tomar conhecimento do calendário e adicionar qualquer evento que não seja tarefa que você possa ter para o curso. Não se preocupe, nós ajudaremos você no caminho."
   hidden_available_with_a_link_click_to_modify_184990e7: "Escondido. Disponível com um link - Clique para modificar"
   hidden_files_inside_will_be_available_with_links_9bdf702b: "Ocultos, os arquivos internos ficarão disponíveis com links."
@@ -7308,6 +7329,7 @@ pt-BR:
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "Se ativado, os usuários serão capazes de configurar ferramentas LTI 2."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "Se você alterar os pontos de uma tarefa, possivelmente deverá reavaliar a tarefa."
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "Se você não selecionar os direitos de uso agora, esse arquivo terá a publicação cancelada depois de ser realizado seu upload."
+  if_you_enable_this_feature_be_sure_that_your_sales_566967e6: "Se você ativar esse recurso, certifique-se de que a sua conta Salesforce tem esses campos personalizados adicionados exatamente com os nomes na coluna da esquerda da tabela"
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "Se você sair, o download do arquivo zip atualmente sendo preparado será cancelado"
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Se você estava usando outro sistema de gerenciamento de curso, você deve ter coisas lá que gostaria de mover para o Canvas. Nós podemos ajudar durante todo o processo de migração de seu conteúdo para o Canvas."
   ignore_91750df8: Ignorar
