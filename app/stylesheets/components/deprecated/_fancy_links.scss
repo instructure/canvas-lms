@@ -96,12 +96,6 @@ a.download {
   background-image: url(/images/download.png);
 }
 
-a.download-small {
-  @include icon_link;
-  padding-left: 15px;
-  background-image: url(/images/download-small.png);
-}
-
 a.edit {
   @include icon_link;
   background-image: url(/images/edit.png);
