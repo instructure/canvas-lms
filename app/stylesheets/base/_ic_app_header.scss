@@ -19,10 +19,6 @@
     width: $ic-header-primary-width - $ic-sp;
     z-index: 100;
     @include breakpoint(wide) { width: $ic-header-primary-width; }
-
-    // when the secondary nav is active, cover the entire app width
-    body.secondary-nav-expanded & { width: 100%; }
-
   }
 
   .ic-app-header__layout {
@@ -37,7 +33,6 @@
     top: 0; left: 0;
     width: 100%; height: 100%;
     opacity: 0;
-    body.secondary-nav-expanded & { opacity: 1; }
   }
 
   .ic-app-header__main-navigation { flex: 1; }
@@ -214,4 +209,36 @@
   // set to block to avoid any exta inline spacing at bottom
   .ic-app-header__uploaded-logo { display: block; }
 
+  // react-tray component styles
+  .ReactTrayPortal {
+    position: relative;
+    z-index: 10;
+  }
+  
+  .ReactTray__Overlay {
+    background: rgba(0, 0, 0, 0.65);
+  } 
+
+  .ReactTray__Content {
+    background: #fff;
+    padding: 10px;
+    box-shadow: 1px 0 5px #333;
+    overflow-x: hidden;
+    white-space: nowrap;
+    width: 0;
+    top: 0;
+    bottom: 0;
+    left: $ic-header-primary-width - $ic-sp;
+    @include breakpoint(wide) { left: $ic-header-primary-width; }
+  }
+
+  .ReactTray__Content--after-open {
+    width: 250px;
+    transition: width 150ms ease-in;
+  }
+
+  .ReactTray__Content--before-close {
+    width: 0;
+    transition: width 150ms ease-in;
+  }
 }
