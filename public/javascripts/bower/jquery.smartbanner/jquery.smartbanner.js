@@ -2,7 +2,6 @@
  * jQuery Smart Banner
  * Copyright (c) 2012 Arnold Daniels <arnold@jasny.net>
  * Based on 'jQuery Smart Web App Banner' by Kurt Zenisek @ kzeni.com
- * License: https://github.com/jasny/jquery.smartbanner/blob/master/LICENSE
  */
 !function ($) {
     var SmartBanner = function (options) {
@@ -135,7 +134,7 @@
 
             if (this.options.layer) {
                 banner.animate({top: 0, display: 'block'}, this.options.speedIn).addClass('shown').show();
-                $('html').animate({marginTop: this.origHtmlMargin + (this.bannerHeight * this.scale)}, this.options.speedIn, 'swing', callback);
+                $(this.pushSelector).animate({paddingTop: this.origHtmlMargin + (this.bannerHeight * this.scale)}, this.options.speedIn, 'swing', callback);
             } else {
                 if ($.support.transition) {
                     banner.animate({top:0},this.options.speedIn).addClass('shown');
@@ -145,7 +144,7 @@
                             callback();
                         }
                     };
-                    $('html').addClass('sb-animation').one($.support.transition.end, transitionCallback).emulateTransitionEnd(this.options.speedIn).css('margin-top', this.origHtmlMargin+(this.bannerHeight*this.scale));
+                    $(this.pushSelector).addClass('sb-animation').one($.support.transition.end, transitionCallback).emulateTransitionEnd(this.options.speedIn).css('margin-top', this.origHtmlMargin+(this.bannerHeight*this.scale));
                 } else {
                     banner.slideDown(this.options.speedIn).addClass('shown');
                 }
@@ -158,7 +157,7 @@
 
             if (this.options.layer) {
                 banner.animate({top: -1 * this.bannerHeight * this.scale, display: 'block'}, this.options.speedIn).removeClass('shown');
-                $('html').animate({marginTop: this.origHtmlMargin}, this.options.speedIn, 'swing', callback);
+                $(this.pushSelector).animate({paddingTop: this.origHtmlMargin}, this.options.speedIn, 'swing', callback);
             } else {
                 if ($.support.transition) {
                     banner.css('top', -1*this.bannerHeight*this.scale).removeClass('shown');
@@ -168,7 +167,7 @@
                             callback();
                         }
                     };
-                    $('html').addClass('sb-animation').one($.support.transition.end, transitionCallback).emulateTransitionEnd(this.options.speedOut).css('margin-top', this.origHtmlMargin);
+                    $(this.pushSelector).addClass('sb-animation').one($.support.transition.end, transitionCallback).emulateTransitionEnd(this.options.speedOut).css('margin-top', this.origHtmlMargin);
                 } else {
                     banner.slideUp(this.options.speedOut).removeClass('shown');
                 }
@@ -256,7 +255,8 @@
         hideOnInstall: true, // Hide the banner after "VIEW" is clicked.
         layer: false, // Display as overlay layer or slide down the page
         iOSUniversalApp: true, // If the iOS App is a universal app for both iPad and iPhone, display Smart Banner to iPad users, too.
-        appendToSelector: 'body' //Append the banner to a specific selector
+        appendToSelector: 'body', //Append the banner to a specific selector
+		pushSelector: 'html' // What element is going to push the site content down; this is where the banner append animation will start.
     }
 
     $.smartbanner.Constructor = SmartBanner;

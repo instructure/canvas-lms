@@ -1,7 +1,7 @@
 define [
   'i18n!smartbanner',
   'jquery',
-  'vendor/jquery.smartbanner'
+  'bower/jquery.smartbanner/jquery.smartbanner'
 ], (I18n, $) ->
   $ ->
     # we only care about the android functionality of this library, so pull out
