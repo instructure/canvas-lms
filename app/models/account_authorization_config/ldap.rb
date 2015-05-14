@@ -57,6 +57,12 @@ class AccountAuthorizationConfig::LDAP < AccountAuthorizationConfig
     raise "Not an LDAP config" unless self.auth_type == 'ldap'
     require 'net/ldap'
     ldap = Net::LDAP.new(:encryption => self.auth_over_tls.try(:to_sym))
+    if self.requested_authn_context.present?
+      ldap.encryption({
+        method: self.auth_over_tls.try(:to_sym),
+        tls_options: { ssl_version: self.requested_authn_context }
+      })
+    end
     ldap.host = self.auth_host
     ldap.port = self.auth_port
     ldap.base = self.auth_base
