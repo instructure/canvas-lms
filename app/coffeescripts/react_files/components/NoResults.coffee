@@ -10,7 +10,7 @@ define [
 
      render: withReactElement ->
         div {},
-          p {}, I18n.t('errors.no_match.your_search', 'Your search - "%{search_term}" - did not match any files.', {search_term: @props.search_term})
+          p {ref: "yourSearch"}, I18n.t('errors.no_match.your_search', 'Your search - "%{search_term}" - did not match any files.', {search_term: @props.search_term})
           p {}, I18n.t('errors.no_match.suggestions', 'Suggestions:')
           ul {},
             li {}, I18n.t('errors.no_match.spelled', 'Make sure all words are spelled correctly.')
