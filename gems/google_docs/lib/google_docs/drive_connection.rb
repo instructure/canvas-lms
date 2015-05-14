@@ -51,9 +51,13 @@ module GoogleDocs
         result.define_singleton_method(:content_type) do
           result.headers['Content-Type'].sub(/; charset=[^;]+/, '')
         end
+        file_name = file['title']
+        name_extension = file_name[/\.([a-z]+$)/, 1]
+        file_extension = name_extension || file_extension_from_header(result.headers, entry)
 
-        # TODO: get extension from response header
-        [result, file['title'],  entry.extension]
+        # file_name should contain the file_extension
+        file_name += ".#{file_extension}" unless name_extension
+        [result, file_name, file_extension]
       else
         raise DriveConnectionException, result.error_message
       end
@@ -207,6 +211,15 @@ module GoogleDocs
       api_client.discovered_api('drive', 'v2')
     end
 
+    def file_extension_from_header(headers, entry)
+      file_extension = entry.extension && !entry.extension.empty? && entry.extension || 'unknown'
+
+      if headers['content-disposition'] && headers['content-disposition'].match(/filename=[\"\']?[^;\"\'\.]+\.(?<file_extension>[^;\"\']+)[\"\']?/)
+        file_extension =  Regexp.last_match[:file_extension]
+      end
+
+      file_extension
+    end
   end
 end
 

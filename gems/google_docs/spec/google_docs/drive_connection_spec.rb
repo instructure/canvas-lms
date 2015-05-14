@@ -33,6 +33,55 @@ describe GoogleDocs::DriveConnection do
     end
   end
 
+  describe "#file_extension from headers" do
+    it "should pull the file extension from the response header" do
+      google_docs = GoogleDocs::DriveConnection.new(token, secret)
+
+      headers = {
+        'content-disposition' => 'attachment;filename="Testing.docx"'
+      }
+
+      entry = stub('DriveEntry', extension: "not")
+      file_extension  = google_docs.send(:file_extension_from_header, headers, entry)
+
+      expect(file_extension).to eq("docx")
+    end
+
+    it "should pull the file extension from the entry if its not in the response header" do
+      google_docs = GoogleDocs::DriveConnection.new(token, secret)
+
+      headers = {
+        'content-disposition' => 'attachment"'
+      }
+
+      entry = stub('DriveEntry', extension: "not")
+      file_extension  = google_docs.send(:file_extension_from_header, headers, entry)
+      expect(file_extension).to eq("not")
+    end
+
+    it "should use unknown as a last resort file extension" do
+      google_docs = GoogleDocs::DriveConnection.new(token, secret)
+
+      headers = {
+        'content-disposition' => 'attachment"'
+      }
+
+      entry = stub('DriveEntry', extension: "")
+      file_extension  = google_docs.send(:file_extension_from_header, headers, entry)
+      expect(file_extension).to eq("unknown")
+    end
+
+    it "should use unknown as file extension when extension is nil" do
+      google_docs = GoogleDocs::DriveConnection.new(token, secret)
+
+      headers = {}
+      entry = stub('DriveEntry', extension: nil)
+
+      file_extension  = google_docs.send(:file_extension_from_header, headers, entry)
+      expect(file_extension).to eq("unknown")
+    end
+  end
+
   describe "#normalize_document_id" do
     it "should remove prefixes" do
       google_docs = GoogleDocs::DriveConnection.new(token, secret)
