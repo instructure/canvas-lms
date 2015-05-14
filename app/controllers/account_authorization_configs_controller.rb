@@ -174,14 +174,14 @@ class AccountAuthorizationConfigsController < ApplicationController
   # @API Create Authorization Config
   #
   # Add external account authentication service(s) for the account.
-  # Services may be CAS, Facebook, GitHub, LDAP, or SAML.
+  # Services may be CAS, Facebook, GitHub, LDAP, SAML, or Twitter.
   #
   # Each authentication service is specified as a set of parameters as
   # described below. A service specification must include an 'auth_type'
-  # parameter with a value of 'cas', 'facebook', 'github', 'ldap', or 'saml'.
-  # The other recognized parameters depend on this auth_type; unrecognized
-  # parameters are discarded. Service specifications not specifying a
-  # valid auth_type are ignored.
+  # parameter with a value of 'cas', 'facebook', 'github', 'ldap', 'saml', or
+  # 'twitter'. The other recognized parameters depend on this auth_type;
+  # unrecognized parameters are discarded. Service specifications not
+  # specifying a valid auth_type are ignored.
   #
   # _Deprecated_[2015-05-08] Any service specification may include an
   # optional 'login_handle_name' parameter. This parameter specifies the
@@ -333,6 +333,21 @@ class AccountAuthorizationConfigsController < ApplicationController
   # - requested_authn_context
   #
   #   The SAML AuthnContext
+  #
+  # For Twitter, the additional recognized parameters are:
+  #
+  # - consumer_key [Required]
+  #
+  #   The Twitter Consumer Key. Not available if configured globally for Canvas.
+  #
+  # - consumer_secret [Required]
+  #
+  #   The Twitter Consumer Secret. Not available if configured globally for Canvas.
+  #
+  # - unknown_user_url [Optional]
+  #
+  #   A url to redirect to when a user is authorized through Facebook but is
+  #   not found in Canvas.
   #
   # - account_authorization_config[n] (deprecated)
   #   The nth service specification as described above. For instance, the

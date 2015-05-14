@@ -627,6 +627,8 @@ CanvasRails::Application.routes.draw do
   # deprecated alias
   post 'saml_consume' => 'login/saml#create'
 
+  # the callback URL for all OAuth1.0a based SSO
+  get 'login/oauth/callback' => 'login/oauth#create', as: :oauth_login_callback
   # the callback URL for all OAuth2 based SSO
   get 'login/oauth2/callback' => 'login/oauth2#create', as: :oauth2_login_callback
   # ActionController::TestCase can't deal with aliased controllers when finding
@@ -635,6 +637,7 @@ CanvasRails::Application.routes.draw do
 
   get 'login/facebook' => 'login/facebook#new', as: :facebook_login
   get 'login/github' => 'login/github#new', as: :github_login
+  get 'login/twitter' => 'login/twitter#new', as: :twitter_login
 
   get 'login/otp' => 'login/otp#new', as: :otp_login
   post 'login/otp/sms' => 'login/otp#send_via_sms', as: :send_otp_via_sms

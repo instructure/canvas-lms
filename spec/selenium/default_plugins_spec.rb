@@ -18,12 +18,13 @@ describe "default plugins" do
     multiple_accounts_select
     f("#plugin_setting_disabled").click
     wait_for_ajaximations
-    f("#settings_api_key").send_keys("asdf")
-    f("#settings_secret_key").send_keys("asdf")
+    f("#settings_consumer_key").send_keys("asdf")
+    f("#settings_consumer_secret").send_keys("asdf")
     submit_form('#new_plugin_setting')
 
     assert_flash_error_message /There was an error/
 
+    f("#settings_consumer_secret").send_keys("asdf")
     Twitter::Connection.stubs(:config_check).returns(nil)
 
     submit_form('#new_plugin_setting')
@@ -33,8 +34,8 @@ describe "default plugins" do
 
     settings = Canvas::Plugin.find(:twitter).try(:settings)
     expect(settings).not_to be_nil
-    expect(settings[:api_key]).to eq 'asdf'
-    expect(settings[:secret_key]).to eq 'asdf'
+    expect(settings[:consumer_key]).to eq 'asdf'
+    expect(settings[:consumer_secret_dec]).to eq 'asdf'
   end
 
   it "should allow configuring etherpad plugin" do

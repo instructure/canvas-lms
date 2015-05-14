@@ -41,7 +41,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     case type_name
     when 'cas', 'ldap', 'saml'
       const_get(type_name.upcase)
-    when 'facebook'
+    when 'facebook', 'twitter'
       const_get(type_name.classify)
     when 'github'
       GitHub
@@ -68,9 +68,10 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     :ldap_filter, :auth_filter, :requested_authn_context,
     :login_attribute, :idp_entity_id, :unknown_user_url,
     :app_id, :app_secret,
-    :client_id, :client_secret, :domain
+    :client_id, :client_secret, :domain,
+    :consumer_key, :consumer_secret
 
-  VALID_AUTH_TYPES = %w[cas facebook github ldap saml].freeze
+  VALID_AUTH_TYPES = %w[cas facebook github ldap saml twitter].freeze
   validates_inclusion_of :auth_type, in: VALID_AUTH_TYPES, message: "invalid auth_type, must be one of #{VALID_AUTH_TYPES.join(',')}"
   validates_presence_of :account_id
 
@@ -114,5 +115,6 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   end
 end
 
-# so it doesn't get mixed up with ::CAS
+# so it doesn't get mixed up with ::CAS and ::Twitter
 require_dependency 'account_authorization_config/cas'
+require_dependency 'account_authorization_config/twitter'

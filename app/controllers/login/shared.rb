@@ -1,6 +1,7 @@
 module Login::Shared
   def reset_session_for_login
     reset_session_saving_keys(:return_to,
+                              :oauth,
                               :oauth2,
                               :confirm,
                               :enrollment,

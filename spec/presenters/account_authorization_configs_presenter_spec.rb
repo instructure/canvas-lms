@@ -142,7 +142,8 @@ describe AccountAuthorizationConfigsPresenter do
       expect(presenter.sso_options).to eq([['CAS', 'cas'],
                                            ['Facebook', 'facebook'],
                                            ['GitHub', 'github'],
-                                           ['LDAP', 'ldap']])
+                                           ['LDAP', 'ldap'],
+                                           ['Twitter', 'twitter']])
     end
 
     it "includes saml if saml enabled" do
