@@ -549,11 +549,16 @@ class Quizzes::Quiz < ActiveRecord::Base
     published? ? question_count : unpublished_question_count
   end
 
+  # Lists all the question types available in this quiz
   def question_types
     return [] unless quiz_data
     quiz_data.map do |question|
       question["question_type"]
     end.uniq
+  end
+
+  def has_access_code
+    access_code.present?
   end
 
   # Returns data for the SAVED version of the quiz.  That is, not
