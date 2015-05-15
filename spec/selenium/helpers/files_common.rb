@@ -20,12 +20,12 @@ def download_from_toolbar
 end
 
 # This method downloads the file using the Download option on Cog menu button
-def download_from_cog
+def download_from_cog_icon
   ff('.al-trigger')[0].click
   ff('.al-options .ui-menu-item')[0].click
 end
 
-def edit_name_from_cog(file_name_new)
+def edit_name_from_cog_icon(file_name_new)
   ff('.al-trigger')[0].click
   fln("Rename").click
   expect(f(".ef-edit-name-cancel")).to be_displayed
@@ -40,7 +40,7 @@ def download_from_preview
   f('.icon-download').click
 end
 
-def delete_from_cog
+def delete_from_cog_icon
   ff('.al-trigger')[0].click
   fln("Delete").click
   confirm_delete_on_dialog
@@ -52,7 +52,7 @@ def delete_from_toolbar
   confirm_delete_on_dialog
 end
 
-def move_using_cog(file_name, offset = 0)
+def move_using_cog_icon(file_name, offset = 0)
   ff('.al-trigger')[offset].click
   fln("Move").click
   wait_for_ajaximations
