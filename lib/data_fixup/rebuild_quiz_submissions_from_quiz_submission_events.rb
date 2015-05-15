@@ -143,7 +143,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
 
       times = events.map(&:created_at).sort
 
-      aggregator = Quizzes::LogAuditing::EventAggregator.new
+      aggregator = Quizzes::LogAuditing::EventAggregator.new(submission.assignment.quiz)
       submission_data_hash = aggregator.run(qs_id, attempt, submission.updated_at)
 
       # Put it all together
