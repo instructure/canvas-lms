@@ -390,7 +390,6 @@ describe "profile" do
       Account.default.settings[:enable_profiles] = true
       Account.default.save!
       get "/courses/#{@course.id}/users/#{@other_student.id}"
-      debugger
       f('.report_avatar_link').click
       expect(alert_present?).to be_truthy
       accept_alert
