@@ -1979,4 +1979,8 @@ class Assignment < ActiveRecord::Base
   def quiz?
     self.submission_types == 'online_quiz' && self.quiz.present?
   end
+
+  def self.show_sis_grade_export_option?(context)
+    context.feature_enabled?(:post_grades) || context.root_account.feature_enabled?(:bulk_sis_grade_export)
+  end
 end

@@ -316,7 +316,7 @@ class Quizzes::QuizzesController < ApplicationController
         params[:quiz][:assignment_id] = nil unless @assignment
         params[:quiz][:title] = @assignment.title if @assignment
       end
-      if params[:assignment].present? && @context.feature_enabled?(:post_grades) && @quiz.assignment
+      if params[:assignment].present? && Assignment.show_sis_grade_export_option?(@context) && @quiz.assignment
         @quiz.assignment.post_to_sis = params[:assignment][:post_to_sis]
         @quiz.assignment.save
       end
@@ -372,7 +372,7 @@ class Quizzes::QuizzesController < ApplicationController
             old_assignment = @quiz.assignment.clone
             old_assignment.id = @quiz.assignment.id
 
-            if params[:assignment] && @context.feature_enabled?(:post_grades)
+            if params[:assignment] && Assignment.show_sis_grade_export_option?(@context)
               @quiz.assignment.post_to_sis = params[:assignment][:post_to_sis]
               @quiz.assignment.save
             end

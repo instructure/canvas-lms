@@ -329,7 +329,16 @@ END
         state: 'hidden',
         beta: true,
         root_opt_in: true
-      }
+      },
+    'bulk_sis_grade_export' =>
+      {
+      display_name: -> { I18n.t('Allow Bulk Grade Export to SIS') },
+      description:  -> { I18n.t('Allows teachers to mark grade data to be exported in bulk to SIS integrations.') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      root_opt_in: true,
+      beta: true
+    }
   )
 
   def self.definitions
