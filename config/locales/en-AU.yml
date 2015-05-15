@@ -5318,7 +5318,7 @@ en-AU:
     hide_due_dates: "Hide Due Dates"
     initial_post_required_to_subscribe: "You must post a reply before subscribing"
     like_count: 
-      one: "(1 like)"
+      one: "(%{count} likes)"
       other: "(%{count} likes)"
     mark_as_read: "Mark as Read"
     mark_as_unread: "Mark as Unread"
