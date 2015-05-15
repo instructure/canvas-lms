@@ -22,6 +22,11 @@ module Quizzes::LogAuditing
   # Generate submission_data ready for use by a submission from a bunch of
   # answer-related events.
   class EventAggregator
+    attr_reader :quiz
+
+    def initialize(quiz)
+      @quiz = quiz
+    end
 
     # Main API for aggregating QuizSubmissionEvents
     #
@@ -80,7 +85,7 @@ module Quizzes::LogAuditing
     def build_submission_data_from_answers(answers)
       submission_data = {}
       answers.each do |question_id, answer|
-        question = Quizzes::QuizQuestion.where(id: question_id).first
+        question = quiz.quiz_questions.find { |qq| qq.id == question_id }
         if question.question_data["question_type"] != "text_only_question"
           serializer = Quizzes::QuizQuestion::AnswerSerializers.serializer_for(question)
           thing = serializer.serialize(answer).answer
