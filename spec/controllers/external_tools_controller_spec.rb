@@ -337,6 +337,15 @@ describe ExternalToolsController do
         expect(lti_launch.params['accept_media_types']).to eq 'image/*,text/html,application/vnd.ims.lti.v1.launch+json,*/*'
       end
 
+      it "does not copy query params to POST if disable_lti_post_only feature flag is set" do
+        user_session(@teacher)
+        @course.root_account.enable_feature!(:disable_lti_post_only)
+        @tool.url = 'http://www.instructure.com/test?first=rory&last=williams'
+        @tool.save!
+
+        get :show, course_id: @course.id, id: @tool.id, launch_type: 'migration_selection'
+        expect(assigns[:lti_launch].resource_url).to eq 'http://www.instructure.com/test?first=rory&last=williams'
+      end
     end
   end
 

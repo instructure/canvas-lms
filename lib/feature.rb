@@ -321,6 +321,15 @@ END
         state: 'hidden',
         beta: true,
         root_opt_in: true
+      },
+    'disable_lti_post_only' =>
+      {
+        display_name: -> { I18n.t('Don\'t move LTI query params to POST body') },
+        description: -> { I18n.t('If enabled, query parameters will not be copied to the POST body during an LTI launch.') },
+        applies_to: 'RootAccount',
+        state: 'hidden',
+        beta: true,
+        root_opt_in: true
       }
   )
 
