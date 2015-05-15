@@ -5539,7 +5539,6 @@ ar:
     like_count: 
       few: "(%{count} إعجابات)"
       many: "(%{count} إعجابًا)"
-      one: "إعجاب واحد"
       two: إعجابين
       zero: "دون إعجاب"
     mark_as_read: "وضع علامة كمقروء"
