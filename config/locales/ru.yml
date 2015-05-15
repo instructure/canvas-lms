@@ -5421,7 +5421,7 @@ ru:
     initial_post_required_to_subscribe: "Вы должны отправить ответ, прежде чем подписаться"
     like_count: 
       few: "(%{count} лайка)"
-      one: "(1 лайк)"
+      one: "(%{count} лайков)"
       other: "(%{count} лайков)"
     mark_as_read: "Отметить как прочитанное"
     mark_as_unread: "Отметить как непрочитанное"
