@@ -5315,7 +5315,7 @@ nb:
     hide_due_dates: "Skjul frister"
     initial_post_required_to_subscribe: "Du må skrive et svar før du abonnerer"
     like_count: 
-      one: "(1 liker)"
+      one: "(%{count} liker)"
       other: "(%{count} liker)"
     mark_as_read: "Merk som lest"
     mark_as_unread: "Merk som ulest"
