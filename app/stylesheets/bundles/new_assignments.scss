@@ -50,27 +50,7 @@
 }
 
 .assignment {
-  .ig-title {
-    right: 630px;
-    min-width: 120px;
-  }
-  .ig-details { width: 590px; }
   .default-dates .status-description { font-weight: bold; }
-}
-
-#course_home_content {
-  .assignment {
-    .ig-title {
-      right: 335px;
-      min-width: 90px;
-      max-width: 260px;
-      padding-right: 30px;
-    }
-    .ig-details {
-      text-align: right;
-      width: 545px;
-    }
-  }
 }
 
 @media screen and (max-width: 1280px) {

@@ -164,6 +164,12 @@
 
 */
 
+@mixin item-group-ellipses {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .item-group {
   @if $use_new_styles {
     border: 1px solid $ic-border-light;
@@ -272,11 +278,7 @@
     text-decoration: none;
   }
 
-  .ellipses {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
+  .ellipses { @include item-group-ellipses; }
 
   &:hover {
     background-color: $ic-list-item-background--hover;
@@ -322,9 +324,7 @@
 }
 
 .ig-title {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  @include item-group-ellipses;
   display: block;
   flex: 1;
   box-sizing: border-box;
@@ -350,6 +350,7 @@
       padding: 0 $ic-sp/2;
       flex: 1;
     }
+    @if $use_new_styles == false { body.ff & { @include item-group-ellipses; } }
   }
 }
 
