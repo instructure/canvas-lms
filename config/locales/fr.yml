@@ -5308,7 +5308,7 @@ fr:
     hide_due_dates: "Masquer les dates d’échéance"
     initial_post_required_to_subscribe: "Vous devez publier une réponse avant de vous abonner"
     like_count: 
-      one: "(1 « J'aime »)"
+      one: "(%{count} « J'aime »)"
       other: "(%{count} « J'aime »)"
     mark_as_read: "Marquer comme lu"
     mark_as_unread: "Marquer comme non lu"
