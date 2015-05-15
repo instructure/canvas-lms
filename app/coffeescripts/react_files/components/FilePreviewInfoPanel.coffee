@@ -25,46 +25,46 @@ define [
             tr {},
               th {scope: 'row'},
                 I18n.t('file_preview_infotable_name', 'Name')
-              td {},
+              td {ref: 'displayName'},
                 @props.displayedItem.displayName()
             tr {},
               th {scope: 'row'},
                 I18n.t('file_preview_infotable_status', 'Status')
-              td {},
+              td {ref: 'status'},
                 getFileStatus(@props.displayedItem)
             tr {},
               th {scope: 'row'},
                 I18n.t('file_preview_infotable_kind', 'Kind')
-              td {},
+              td {ref: 'contentType'},
                 mimeClass.displayName(@props.displayedItem.get('content-type'))
             tr {},
               th {scope: 'row'},
                 I18n.t('file_preview_infotable_size', 'Size')
-              td {},
+              td {ref: 'size'},
                 friendlyBytes @props.displayedItem.get('size')
             tr {},
               th {scope: 'row'},
                 I18n.t('file_preview_infotable_datemodified', 'Date Modified')
-              td {},
+              td {ref: 'dateModified', id: 'dateModified'},
                 FriendlyDatetime datetime: @props.displayedItem.get('updated_at')
             if user = @props.displayedItem.get('user')
               tr {},
                 th {scope: 'row'},
                   I18n.t('file_preview_infotable_modifiedby', 'Last Modified By')
-                td {},
+                td {ref: 'modifedBy'},
                   a {href: user.html_url},
                     user.display_name
             tr {},
               th {scope: 'row'},
                 I18n.t('file_preview_infotable_datecreated', 'Date Created')
-              td {},
+              td {id: 'dateCreated'},
                 FriendlyDatetime datetime: @props.displayedItem?.get('created_at')
             if (@props.usageRightsRequiredForContext)
               tr {className: 'FilePreviewInfoPanel__usageRights'},
                 th {scope: 'row'},
                   I18n.t('Usage Rights')
                 td {},
-                  div {},
+                  div {ref: 'licenseName'},
                     @props.displayedItem?.get('usage_rights')?.license_name
-                  div {},
+                  div {ref: 'legalCopyright'},
                     @props.displayedItem?.get('usage_rights')?.legal_copyright
