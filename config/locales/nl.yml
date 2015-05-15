@@ -5295,7 +5295,7 @@ nl:
     hide_due_dates: "inleverdata verbergen"
     initial_post_required_to_subscribe: "Je moet een antwoord posten voordat je je kunt aanmelden"
     like_count: 
-      one: "(1 like)"
+      one: "(%{count} likes)"
       other: "(%{count} likes)"
     mark_as_read: "Als gelezen markeren"
     mark_as_unread: "Als ongelezen markeren"
