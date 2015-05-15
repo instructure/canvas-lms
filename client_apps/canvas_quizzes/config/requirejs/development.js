@@ -31,7 +31,8 @@ requirejs.config({
 
     // ========================================================================
     // Internal, for package providers only:
-    'canvas': '../../../vendor/canvas/public/javascripts',
+    'canvas': '../../../vendor/canvas_public/javascripts',
+    'canvas_app': '../../../vendor/canvas_app'
   },
 
   shim: {
