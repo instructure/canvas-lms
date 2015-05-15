@@ -810,7 +810,7 @@ define([
   //  numbers: list of strings, elements that must be blank or a valid number
   //  property_validations: hash, where key names are form element names
   //    and key values are functions to call on the given data.  The function
-  //    should return true if valid, false otherwise.
+  //    should return nothing if valid, an error message for display otherwise.
   $.fn.validateForm = function(options) {
     if (this.length === 0) {
       return false;
