@@ -55,7 +55,10 @@ header:not(.ic-app-header) {
 }
 
 .ig-list .ig-row .ellipses {
-  color: #737373;
+  color: $ic-font-color--subdued;
+  // Fix for strange Firefox-only bug where white-space: no-wrap was blowing out the layout
+  // on conferences index page
+  body.ff & { @include firefox-white-space-bug-fix; }
 }
 
 #add_conference_form {
@@ -83,4 +86,8 @@ header:not(.ic-app-header) {
   flex: 0 0 200px;
   @include breakpoint(desktop) { flex: 0 0 34%; }
   @include breakpoint(wide) { flex: 0 0 40%; }
+}
+
+.ig-details {
+  flex: 1;
 }

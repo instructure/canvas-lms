@@ -23,6 +23,9 @@ $announcements_disscussion-summary-color: $ic-color-dark;
       background-color: $ic-color-light;
       display: flex;
       align-items: center;
+      body.ff & {
+        .ellipsis { @include firefox-white-space-bug-fix; }  
+      } 
     }
     @else {
       background-color: white;
@@ -33,7 +36,12 @@ $announcements_disscussion-summary-color: $ic-color-dark;
     }
     @if $use_high_contrast == false {
       &:nth-child(odd) { 
-        @if $use_new_styles { background-color: $lightBackground; }
+        @if $use_new_styles { 
+          background-color: $lightBackground;
+          body.ff & {
+            .ellipsis::after { background: linear-gradient(to right, rgba(255,255,255,0) 0%,$lightBackground 75%); }  
+          }
+        }
         @else { background-color: $tableBackgroundAccent; }
       }
     }
