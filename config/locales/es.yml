@@ -5293,7 +5293,7 @@ es:
     hide_due_dates: "Ocultar las fechas de vencimiento"
     initial_post_required_to_subscribe: "Debe publicar una respuesta antes de suscribirse"
     like_count: 
-      one: "(1 me gusta)"
+      one: "(%{count} me gusta)"
       other: "(%{count} me gusta)"
     mark_as_read: "Marcar como leído"
     mark_as_unread: "Marcar como no leído"
