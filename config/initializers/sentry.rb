@@ -12,7 +12,7 @@ if settings.present?
   Raven.configure do |config|
     config.silence_ready = true
     config.dsn = settings[:dsn]
-    config.tags = settings[:tags] if settings[:tags]
+    config.tags = settings.fetch(:tags, {}).merge('canvas_revision' => Canvas.revision)
     config.sanitize_fields += Rails.application.config.filter_parameters.map(&:to_s)
     config.sanitize_credit_cards = false
   end
