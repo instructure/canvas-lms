@@ -1629,6 +1629,7 @@ class Course < ActiveRecord::Base
 
   def create_attachment(attachment, csv)
     attachment.uploaded_data = StringIO.new(csv)
+    attachment.content_type = 'text/csv'
     attachment.save!
   end
 
