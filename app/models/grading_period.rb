@@ -39,11 +39,6 @@ class GradingPeriod < ActiveRecord::Base
     self.for(context).detect { |grading_period| grading_period.id == id.to_i }
   end
 
-  def current?
-    now = Time.zone.now
-    start_date <= now && end_date >= now
-  end
-
   def assignments(assignment_scope)
     # TODO: avoid wasteful queries
     assignments = assignment_scope.where( "due_at BETWEEN ? AND ?", start_date, end_date)
@@ -55,10 +50,17 @@ class GradingPeriod < ActiveRecord::Base
     end
   end
 
+  def current?
+    in_date_range?(Time.zone.now)
+  end
+
+  def in_date_range?(date)
+    start_date <= date && end_date >= date
+  end
+
   def is_closed?
     Time.now > end_date
   end
-
 
   def last?
     grading_period_group
@@ -74,6 +76,17 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   private
+  scope :overlaps, ->(from, to) do
+    # sourced: http://c2.com/cgi/wiki?TestIfDateRangesOverlap
+    where('((start_date < ?) and (end_date > ?))', to, from)
+  end
+
+  def not_overlapping
+    if overlapping?
+      errors.add(:base, t('errors.overlap_message',
+        "Grading period cannot overlap with existing grading periods in group"))
+    end
+  end
 
   def overlaps
     siblings.overlaps(start_date, end_date)
@@ -90,23 +103,10 @@ class GradingPeriod < ActiveRecord::Base
     end
   end
 
-  scope :overlaps, ->(from, to) do
-    # sourced: http://c2.com/cgi/wiki?TestIfDateRangesOverlap
-    where('((start_date < ?) and (end_date > ?))', to, from)
-  end
-
   def start_date_is_before_end_date
     if start_date && end_date && end_date < start_date
       errors.add(:end_date, t('errors.invalid_grading_period_end_date',
                               'Grading period end date precedes start date'))
     end
   end
-
-  def not_overlapping
-    if overlapping?
-      errors.add(:base, t('errors.overlap_message',
-        "Grading period cannot overlap with existing grading periods in group"))
-    end
-  end
-
 end
