@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/api_spec_helper')
 
+require 'nokogiri'
+
 describe UserContent, type: :request do
   before :once do
     course_with_teacher(:active_all => true)

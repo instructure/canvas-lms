@@ -84,6 +84,7 @@ describe "Accounts API", type: :request do
               'root_account_id' => nil,
               'parent_account_id' => nil,
               'workflow_state' => 'active',
+              'default_time_zone' => 'Etc/UTC',
           },
           {
               'id' => @a2.id,
@@ -91,6 +92,7 @@ describe "Accounts API", type: :request do
               'root_account_id' => @a1.id,
               'parent_account_id' => @a1.id,
               'workflow_state' => 'active',
+              'default_time_zone' => 'America/Juneau',
           },
       ]
     end
@@ -200,6 +202,7 @@ describe "Accounts API", type: :request do
               'root_account_id' => nil,
               'parent_account_id' => nil,
               'workflow_state' => 'active',
+              'default_time_zone' => 'Etc/UTC',
           }
       )
     end

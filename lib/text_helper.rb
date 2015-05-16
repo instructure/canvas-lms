@@ -15,6 +15,9 @@
 # Copied from http://pastie.textmate.org/342485,
 # based on http://henrik.nyh.se/2008/01/rails-truncate-html-helper
 
+require 'nokogiri'
+require 'rdiscount'
+
 module TextHelper
   def force_zone(time)
     (time.in_time_zone(@time_zone || Time.zone) rescue nil) || time

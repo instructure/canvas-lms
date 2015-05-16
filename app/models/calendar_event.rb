@@ -16,7 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
 require 'date'
+require 'icalendar'
+
+Icalendar::Event.ical_property  :x_alt_desc
 
 class CalendarEvent < ActiveRecord::Base
   include CopyAuthorizedLinks
@@ -356,7 +360,7 @@ class CalendarEvent < ActiveRecord::Base
     dispatch :appointment_reserved_by_user
     to { appointment_group.instructors }
     whenever {
-      appointment_group && parent_event &&
+      user && appointment_group && parent_event &&
       just_created &&
       context == appointment_group.participant_for(user)
     }

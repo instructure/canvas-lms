@@ -13,7 +13,7 @@ ActionController::DataStreaming.class_eval do
   alias_method_chain :send_file, :content_length
 
   def send_data_with_content_length(data, options = {})
-    headers.merge!('Content-Length' => data.length.to_s) if data.respond_to?(:length)
+    headers.merge!('Content-Length' => data.bytesize.to_s) if data.respond_to?(:bytesize)
     send_data_without_content_length(data, options)
   end
   alias_method_chain :send_data, :content_length

@@ -1,3 +1,5 @@
+require 'nokogiri'
+
 module Qti
 class AssessmentTestConverter
   include Canvas::Migration::XMLHelper

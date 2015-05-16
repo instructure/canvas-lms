@@ -118,11 +118,11 @@ function(React, $, I18n, _) {
     },
 
     checkFormForUpdates: function() {
-      var shouldUpdateBeDisabled = !this.formIsCompleted() || !this.inputsHaveChanged();
+      var shouldUpdateBeDisabled = !this.formIsComplete() || !this.inputsHaveChanged();
       this.setState({shouldUpdateBeDisabled: shouldUpdateBeDisabled});
     },
 
-    formIsCompleted: function() {
+    formIsComplete: function() {
       var titleCompleted = (this.state.title).trim().length > 0;
       var startDateCompleted = (this.state.startDate).trim().length > 0;
       var endDateCompleted = (this.state.endDate).trim().length > 0;
@@ -130,10 +130,9 @@ function(React, $, I18n, _) {
     },
 
     inputsHaveChanged: function() {
-      if(this.state.title !== this.props.title) return true;
-      if(this.state.startDate !== this.parseDateTime(this.props.startDate)) return true;
-      if(this.state.endDate !== this.parseDateTime(this.props.endDate)) return true;
-      return false;
+      return (this.state.title !== this.props.title) ||
+             (this.state.startDate !== this.parseDateTime(this.props.startDate)) ||
+             (this.state.endDate !== this.parseDateTime(this.props.endDate))
     },
 
     parseDateTime: function(inputDate) {
@@ -163,8 +162,8 @@ function(React, $, I18n, _) {
       return this.parseDateTime(dateInput) !== "";
     },
 
-    triggerDeleteGradingPeriod: function(event) {
-      this.props.onDeleteGradingPeriod(event, this.state.id);
+    triggerDeleteGradingPeriod: function() {
+      this.props.onDeleteGradingPeriod(this.state.id);
     },
 
     renderSaveUpdateButton: function() {
@@ -208,7 +207,7 @@ function(React, $, I18n, _) {
 
     render: function () {
       return (
-        <div className="grading-period pad-box-mini border border-trbl border-round">
+        <div id={"grading-period-" + this.state.id} className="grading-period pad-box-mini border border-trbl border-round">
           <div className="grid-row pad-box-micro">
             <div className="col-xs-12 col-sm-6 col-lg-3">
               <label htmlFor={"period_title_" + this.state.id}>

@@ -32,6 +32,10 @@ class Feature
     @root_opt_in = true if @applies_to == 'RootAccount'
   end
 
+  def clone_for_cache
+    Feature.new(feature: @feature, state: @state)
+  end
+
   def default?
     true
   end

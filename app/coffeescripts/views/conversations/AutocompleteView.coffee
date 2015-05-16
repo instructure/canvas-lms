@@ -115,6 +115,7 @@ define [
       # inject some hackery to prevent focus/blur issues
       @parentContexts = []
       @currentContext = null
+      @recipientCounts = {}
       $(document).on("mousedown", @_onDocumentMouseDown.bind(this))
 
       @render() # to initialize els
@@ -355,6 +356,11 @@ define [
 
       return if @currentContext.id.match(/course_\d+_(group|section)/)
 
+      unless @currentContext.peopleCount
+        @currentContext.peopleCount = _.reduce(actual_results,
+          (count, result) -> count + (result.attributes.user_count || 0),
+          0)
+
       tag =
         id:       @currentContext.id
         name:     name
@@ -556,6 +562,13 @@ define [
       @_fetchResults(true)
       @$input.focus()
 
+    checkRecipientTotal: ->
+      total = _.reduce(@recipientCounts, ((sum, c) -> sum + c), 0)
+      if total > ENV.CONVERSATIONS.MAX_GROUP_CONVERSATION_SIZE
+        @trigger('recipientTotalChange', true)
+      else
+        @trigger('recipientTotalChange', false)
+
     # Internal: Add the given model to the token list.
     #
     # model - Result model (user or course)
@@ -566,6 +579,10 @@ define [
       model.name = @_formatTokenName(model)
       @tokens.push(model.id)
       @$tokenList.append(tokenTemplate(model))
+
+      @recipientCounts[model.id] = (model.people || 1)
+      @checkRecipientTotal()
+
       unless keepOpen
         @toggleResultList(false)
         @selectedModel = null
@@ -576,6 +593,7 @@ define [
         @$input.prop('disabled', true)
         @$searchBtn.prop('disabled', true)
         @trigger('disabled')
+
       @trigger('changeToken', @tokenParams())
       @_refreshRecipientList()
 
@@ -606,6 +624,10 @@ define [
         @$input.prop('disabled', false)
         @$searchBtn.prop('disabled', false)
         @trigger('enabled')
+
+      @recipientCounts[id] = 0
+      @checkRecipientTotal()
+
       @trigger('changeToken', @tokenParams()) unless silent
       @_refreshRecipientList()
 
@@ -642,6 +664,8 @@ define [
       @currentContext     = context
       @hasExternalContext = !!context
       @tokens             = []
+      @recipientCounts = {}
+      @checkRecipientTotal()
       @$tokenList.find('li.ac-token').remove()
 
     disable: (value = true) ->

@@ -7,12 +7,15 @@ define [
   'compiled/react_files/routes'
 ], ($, React, Router, SearchResults, FilesCollection, routes) ->
 
-  module 'SearchResults#render'
+  module 'SearchResults#render',
+    setup: ->
+    teardown: ->
+      $("#fixtures").empty()
 
   # asyncTest 'when collection is loaded and empty display no matches found', ->
   #   expect(1)
 
-  #   container = $('<div>').appendTo(document.body)[0]
+  #   container = $('<div>').appendTo("#fixtures")[0]
   #   renderedRoutes = React.renderComponent(routes, container)
 
   #   @server = sinon.fakeServer.create()

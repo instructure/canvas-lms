@@ -24,7 +24,7 @@ describe Api::V1::Collaborator do
   before(:once) do
     @current_user  = user_with_pseudonym(:active_all => true)
     @collaboration = Collaboration.new(:title => 'Test collaboration')
-    @collaboration.type = 'EtherPad'
+    @collaboration.type = 'EtherpadCollaboration'
     @collaboration.save!
   end
 

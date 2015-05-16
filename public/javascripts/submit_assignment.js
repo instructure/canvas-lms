@@ -210,11 +210,20 @@ define([
             $el = $("#submit_online_text_entry_form textarea:first");
             if (!$el.editorBox('exists?')) { $el.editorBox(); }
           }
+
+          if (ui.newTab.attr("aria-controls") === "submit_google_doc_form") {
+            listGoogleDocs();
+          }
         },
         create: function(event, ui) {
           if (ui.tab.find('a').hasClass('submit_online_text_entry_option')) {
             $el = $("#submit_online_text_entry_form textarea:first");
             if (!$el.editorBox('exists?')) { $el.editorBox(); }
+          }
+
+          //list Google Docs if Google Docs tab is active
+          if (ui.tab.attr("aria-controls") === "submit_google_doc_form") {
+            listGoogleDocs();
           }
         }
       });
@@ -271,17 +280,6 @@ define([
         });
 
       }, 'json');
-    }
-
-    $(".submit_online_url_option").click(function(event) {
-      if($(this).attr("href") == '#submit_google_doc_form'){
-        listGoogleDocs();
-      }
-    });
-
-    //list Google Docs if Google Docs tab is active
-    if(window.location.hash == "#submit_google_doc_form"){
-      listGoogleDocs();
     }
 
     $("#auth-google").live('click', function(e){

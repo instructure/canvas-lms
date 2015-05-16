@@ -139,6 +139,9 @@ a.ef-file-preview-button, button.ef-file-preview-button div {
 
 /// __File Preview Content
 ////////////////////////////////
+#media_preview {
+  color: $preview-font-color;
+}
 .ef-file-not-found{
   display: flex;
   justify-content: center;

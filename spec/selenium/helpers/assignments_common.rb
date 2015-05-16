@@ -139,3 +139,24 @@ def setup_sections_and_overrides_all_future
                                         :lock_at => @lock_at + 12.days,
                                         :unlock_at => Time.now.utc + 3.days)
 end
+
+def create_file_list
+  {
+    name: '/',
+    folders: [
+      {
+        name: 'TestFolder',
+        files: [
+          {
+            name: 'nested.mydoc'
+          }
+        ]
+      }
+    ],
+    files: [
+      {
+        name: 'test.mydoc'
+      }
+    ]
+  }
+end

@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+
 # @API Users
 # API for accessing information on the current and other users.
 #
@@ -238,9 +240,9 @@ class UsersController < ApplicationController
         end
 
         flash[:notice] = t('google_drive_added', "Google Drive account successfully added!")
-        redirect_to json['return_to_url'] and return
+        return redirect_to(json['return_to_url'])
       rescue => e
-        ErrorReport.log_exception(:oauth, e)
+        Canvas::Errors.capture_exception(:oauth, e)
         flash[:error] = t('google_drive_fail', "Google Drive authorization failed. Please try again")
       end
     end
@@ -274,7 +276,7 @@ class UsersController < ApplicationController
 
           flash[:notice] = t('google_docs_added', "Google Docs access authorized!")
         rescue => e
-          ErrorReport.log_exception(:oauth, e)
+          Canvas::Errors.capture_exception(:oauth, e)
           flash[:error] = t('google_docs_fail', "Google Docs authorization failed. Please try again")
         end
       elsif params[:service] == "linked_in"
@@ -302,7 +304,7 @@ class UsersController < ApplicationController
 
           flash[:notice] = t('linkedin_added', "LinkedIn account successfully added!")
         rescue => e
-          ErrorReport.log_exception(:oauth, e)
+          Canvas::Errors.capture_exception(:oauth, e)
           flash[:error] = t('linkedin_fail', "LinkedIn authorization failed. Please try again")
         end
       else
@@ -327,7 +329,7 @@ class UsersController < ApplicationController
 
           flash[:notice] = t('twitter_added', "Twitter access authorized!")
         rescue => e
-          ErrorReport.log_exception(:oauth, e)
+          Canvas::Errors.capture_exception(:oauth, e)
           flash[:error] = t('twitter_fail_whale', "Twitter authorization failed. Please try again")
         end
       end
@@ -1665,7 +1667,7 @@ class UsersController < ApplicationController
     # the encrypted version. We can't do it right away because there are
     # a bunch of places that will have cached fragments using the old
     # style.
-    return redirect_to(params[:fallback] || '/images/no_pic.gif') unless service_enabled?(:avatars)
+    return redirect_to(User.default_avatar_fallback) unless service_enabled?(:avatars)
     user_id = params[:user_id].to_i
     if params[:user_id].present? && params[:user_id].match(/-/)
       user_id = User.user_id_from_avatar_key(params[:user_id])
@@ -1683,9 +1685,9 @@ class UsersController < ApplicationController
         end
       end
     end
-    fallback = User.avatar_fallback_url(params[:fallback], request)
+    fallback = User.avatar_fallback_url(nil, request)
     redirect_to (url.blank? || url == "%{fallback}") ?
-      fallback :
+      User.default_avatar_fallback :
       url.sub(CGI.escape("%{fallback}"), CGI.escape(fallback))
   end
 

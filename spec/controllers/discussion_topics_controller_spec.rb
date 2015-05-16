@@ -42,6 +42,7 @@ describe DiscussionTopicsController do
     @topic.save
     @topic
   end
+
   def topic_entry
     @entry = @topic.discussion_entries.create(:message => "some message", :user => @user)
   end
@@ -89,6 +90,7 @@ describe DiscussionTopicsController do
         @assignment.only_visible_to_overrides = true
         @assignment.save!
       end
+
       it "should return graded and visible group discussions properly" do
         cs = @student.enrollments.first.course_section
         create_section_override_for_assignment(@assignment, {course_section: cs})

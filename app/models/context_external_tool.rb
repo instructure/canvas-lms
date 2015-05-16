@@ -454,7 +454,6 @@ class ContextExternalTool < ActiveRecord::Base
       []
     end
   end
-  private_class_method :contexts_to_search
 
   LOR_TYPES = [:course_home_sub_navigation, :course_settings_sub_navigation, :global_navigation,
                :assignment_menu, :file_menu, :discussion_topic_menu, :module_menu, :quiz_menu,
@@ -565,14 +564,10 @@ class ContextExternalTool < ActiveRecord::Base
       end
     end
 
+    context = context.context if context.is_a?(Group)
+
     tool = context.context_external_tools.having_setting(type).where(id: id).first
-    if !tool && context.is_a?(Group)
-      context = context.context
-      tool = context.context_external_tools.having_setting(type).where(id: id).first
-    end
-    if !tool
-      tool = ContextExternalTool.having_setting(type).where(context_type: 'Account', context_id: context.account_chain, id: id).first
-    end
+    tool ||= ContextExternalTool.having_setting(type).where(context_type: 'Account', context_id: context.account_chain, id: id).first
     raise ActiveRecord::RecordNotFound if !tool && raise_error
 
     tool

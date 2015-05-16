@@ -72,54 +72,61 @@
     <%= user_content(@submission.body) %>
   </div>
 <% elsif @submission.submission_type == "online_upload" %>
-  <div class="centered-block">
-    <div class="centered-block-wrap">
-      <div class="centered-block-inner">
-        <ul class="ui-listview" style="margin-top: 30px">
-          <li class="ui-listview-header"><%= mt('file_uploads_for_user', 'File Uploads for **%{user}**', :user => user_name) %></li>
-          <% if @submission.attachments.empty? %>
-            <li>
-              <div class="ui-listview-text ui-listview-right"></div>
-              <span class="ui-listview-text">
-                <%= t('no_files', 'No files were uploaded for this submission') %>
-              </span>
-            </li>
-          <% else %>
-            <% @submission.attachments.each do |attachment| %>
-              <li>
-                <div class="ui-listview-text ui-listview-right" style="padding-left:5px; padding-right:5px;">
-                  <% if can_do(@submission, @current_user, :view_turnitin_report) && (turnitin_score = @submission.turnitin_data[attachment.asset_string]) && turnitin_score[:similarity_score] %>
-                    <span class="turnitin_score_container">
-                      <span class="turnitin_score_container_caret <%= turnitin_score[:state] %>_score"></span>
-                      <a href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @submission.assignment_id, @submission.user_id, attachment.asset_string) %>" target="_blank" class="not_external turnitin_similarity_score <%= turnitin_score[:state] %>_score"><%= turnitin_score[:similarity_score] %>%</a>
-                    </span>
-                  <% end %>
-                  <span><%= number_to_human_size(attachment.size) %></span>
-                </div>
-                <% preview_url = context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :download => attachment.id) %>
-                <% if attachment.crocodoc_available? %>
-                  <% preview_document = t('preview_crocodoc_document', 'Preview your submission and view teacher feedback, if available')
-                     button_text = t('view_feedback_button', 'View Feedback')
-                  %>
-                <% elsif attachment.canvadocable? %>
-                  <% preview_document = t('preview_submission', 'Preview your submission')
-                     button_text = t('view_preview_button', 'Preview')
-                  %>
-                <% end %>
-                <% if attachment.crocodoc_available? || attachment.canvadocable? %>
-                  <div class="ui-listview-text ui-listview-right" style="padding: 4px 5px 0px 5px;">
-                    <a href=<%= preview_url %> data-tooltip title="<%= preview_document %>" class="modal_preview_link btn" role="button" aria-hidden="true" tabindex="-1" data-attachment_id="<%= attachment.id %>" data-submission_id="<%= @submission.id %>" data-dialog-title="<%= attachment.display_name %>" <%= doc_preview_attributes(attachment) %>><%= button_text %></a>
-                  </div>
-                <% end %>
-                <a href="<%= preview_url %>" class="ui-listview-text comment_attachment_link <%= attachment.mime_class %>">
-                  <%= attachment.display_name %>
-                </a>
-              </li>
-            <% end %>
-          <% end %>
-        </ul>
+
+  <div class="content-box">
+
+    <% if @submission.attachments.empty? %>
+      <div class="pad-box-mini border border-trbl border-round grid-row center" style="margin-left:0; margin-right: 0; background-color: white;">
+        <span>
+          <%= t('no_files', 'No files were uploaded for this submission') %>
+        </span>
       </div>
-    </div>
+    <% else %>
+
+      <% @submission.attachments.each do |attachment| %>
+        <div class="pad-box-mini border border-trbl border-round grid-row" style="margin-left:0; margin-right: 0; background-color: white;">
+
+          <div class="col-xs-3">
+            <% preview_url = context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :download => attachment.id) %>
+            <a href="<%= preview_url %>" class="<%= attachment.mime_class %>">
+              <%= attachment.display_name %>
+            </a>
+          </div>
+
+          <div class="col-xs-2">
+            <%= number_to_human_size(attachment.size) %>
+          </div>
+
+          <div class="col-xs-2">
+          <% if can_do(@submission, @current_user, :view_turnitin_report) && (turnitin_score = @submission.turnitin_data[attachment.asset_string]) && turnitin_score[:similarity_score] %>
+            <span class="turnitin_score_container">
+              <span class="turnitin_score_container_caret <%= turnitin_score[:state] %>_score"></span>
+              <a href="<%= context_url(@context, :context_assignment_submission_turnitin_report_url, @submission.assignment_id, @submission.user_id, attachment.asset_string) %>" target="_blank" class="not_external turnitin_similarity_score <%= turnitin_score[:state] %>_score"><%= turnitin_score[:similarity_score] %>%</a>
+            </span>
+          <% end %>
+          </div>
+
+          <div class="col-xs-5 align-right">
+            <% if attachment.crocodoc_available? %>
+              <% preview_document = t('preview_crocodoc_document', 'Preview your submission and view teacher feedback, if available')
+                 button_text = t('view_feedback_button', 'View Feedback')
+              %>
+            <% elsif attachment.canvadocable? %>
+              <% preview_document = t('preview_submission', 'Preview your submission')
+                 button_text = t('view_preview_button', 'Preview')
+              %>
+            <% end %>
+            <% if attachment.crocodoc_available? || attachment.canvadocable? %>
+              <a href=<%= preview_url %> data-tooltip title="<%= preview_document %>" class="modal_preview_link Button--link" role="button" data-attachment_id="<%= attachment.id %>" data-submission_id="<%= @submission.id %>" data-dialog-title="<%= attachment.display_name %>" <%= doc_preview_attributes(attachment) %>><%= button_text %></a>
+            <% end %>
+          </div>
+
+        </div>
+        <br/>
+      <% end %>
+
+    <% end %>
+
   </div>
 
   <% js_bundle 'legacy/submissions_show_preview_upload' %>

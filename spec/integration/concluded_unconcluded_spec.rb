@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+require 'nokogiri'
+
 describe "concluded/unconcluded courses" do
   before(:each) do
     username = "nobody@example.com"

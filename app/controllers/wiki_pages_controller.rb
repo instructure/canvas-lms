@@ -69,7 +69,7 @@ class WikiPagesController < ApplicationController
 
   def index
     if authorized_action(@context.wiki, @current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
-      log_asset_access("pages:#{@context.asset_string}", "pages", "other")
+      log_asset_access([ "pages", @context ], "pages", "other")
       js_env :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu)
       @padless = true
     end

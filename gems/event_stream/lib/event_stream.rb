@@ -3,7 +3,6 @@ require 'active_record'
 require 'bookmarked_collection'
 require 'canvas_cassandra'
 require 'canvas_statsd'
-require 'canvas_uuid'
 
 module EventStream
   require 'event_stream/attr_config'

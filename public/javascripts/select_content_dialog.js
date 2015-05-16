@@ -337,10 +337,10 @@ $(document).ready(function() {
   var $tool_template = $("#context_external_tools_select .tools .tool:first").detach();
   $("#add_module_item_select").change(function() {
     $("#select_context_content_dialog .module_item_option").hide();
-    $("#" + $(this).val() + "s_select").show().find(".module_item_select").change();
     if ($(this).val() === 'attachment') {
       React.render(React.createFactory(FileSelectBox)({contextString: ENV.context_asset_string}), $('#module_item_select_file')[0]);
     }
+    $("#" + $(this).val() + "s_select").show().find(".module_item_select").change();
     if($(this).val() == 'context_external_tool') {
       var $select = $("#context_external_tools_select");
       if(!$select.hasClass('loaded')) {

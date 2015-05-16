@@ -1643,4 +1643,57 @@ describe DiscussionTopic do
       expect(@topic.entries_for_feed(@student, true)).to_not be_empty
     end
   end
+
+  describe 'to_podcast' do
+    it "includes media extension in enclosure url even though it is a redirect (for itunes)" do
+      @topic = @course.discussion_topics.create!(
+        user: @teacher,
+        message: 'topic'
+      )
+      attachment_model(:context => @course, :filename => 'test.mp4', :content_type => 'video')
+      @attachment.podcast_associated_asset = @topic
+
+      rss = DiscussionTopic.to_podcast([@attachment])
+      expect(rss.first.enclosure.url).to match(%r{download.mp4})
+    end
+  end
+
+  context "announcements" do
+    context "scopes" do
+      context "by_posted_at" do
+        let(:c) { Course.create! }
+        let(:new_ann) do
+          lambda do
+            Announcement.create!({
+              context: c,
+              message: "Test Message",
+            })
+          end
+        end
+
+        it "sorts by the posted_at field descending" do
+          anns = 10.times.map do |i|
+            ann = new_ann.call
+            ann.posted_at = i.days.ago
+            ann.position = 1
+            ann.save!
+            ann
+          end
+          expect(c.announcements.by_posted_at).to eq(anns)
+        end
+
+        it "secondarily sorts by the delayed_post_at field descending" do
+          anns = 10.times.map do |i|
+            ann = new_ann.call
+            ann.delayed_post_at = i.days.ago
+            ann.posted_at = nil
+            ann.position = 1
+            ann.save!
+            ann
+          end
+          expect(c.announcements.by_posted_at).to eq(anns)
+        end
+      end
+    end
+  end
 end

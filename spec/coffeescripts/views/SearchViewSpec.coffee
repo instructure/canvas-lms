@@ -39,6 +39,7 @@ define [
       clock.restore()
       server.restore()
       searchView.remove()
+      $("#fixtures").empty()
 
   # asserts match and order of rendered items
   assertRenderedItems = (names=[]) ->

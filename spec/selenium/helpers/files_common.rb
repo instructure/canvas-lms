@@ -52,6 +52,17 @@ def delete_from_toolbar
   confirm_delete_on_dialog
 end
 
+def move_using_cog(file_name)
+  ff('.al-trigger')[0].click
+  fln("Move").click
+  wait_for_ajaximations
+  expect(f(".ui-dialog-title").text).to eq "Where would you like to move #{file_name}?"
+  ff(".treeLabel span")[3].click
+  driver.action.send_keys(:return).perform
+  wait_for_ajaximations
+  ff(".btn-primary")[1].click
+end
+
 #This method sets permissions on files/folders
 def set_item_permissions(permission_type = :publish, restricted_access_option = nil)
   f('.btn-link.published-status').click

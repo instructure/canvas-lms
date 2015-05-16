@@ -38,6 +38,5 @@ describe DiscussionTopicsApiController do
       expect(page_view.url).to match %r{^http://test\.host/api/v1/courses/\d+/discussion_topics}
       expect(page_view.participated).to be_truthy
     end
-
   end
 end

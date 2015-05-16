@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+require 'nokogiri'
+
 RSpec::configure do |c|
   # rspec-rails 3 will no longer automatically infer an example group's spec type
   # from the file location. You can explicitly opt-in to the feature using this

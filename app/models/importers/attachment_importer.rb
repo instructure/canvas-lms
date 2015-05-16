@@ -69,6 +69,7 @@ module Importers
         item.file_state = 'hidden' if hash[:hidden]
         item.display_name = hash[:display_name] if hash[:display_name]
         item.usage_rights_id = find_or_create_usage_rights(context, hash[:usage_rights], created_usage_rights_map) if hash[:usage_rights]
+        item.set_publish_state_for_usage_rights unless hash[:locked]
         item.save_without_broadcasting!
         migration.add_imported_item(item) if migration
       end

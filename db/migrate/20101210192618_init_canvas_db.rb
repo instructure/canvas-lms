@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# rubocop:disable Migration/PrimaryKey
 class InitCanvasDb < ActiveRecord::Migration
   def self.up
     create_table "abstract_courses", :force => true do |t|

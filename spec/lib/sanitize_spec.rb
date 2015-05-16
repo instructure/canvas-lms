@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
+require 'sanitize'
+
 describe Sanitize do
   it "should sanitize style attributes width invalid url protocols" do
     str = "<div style='width: 200px; background: url(httpx://www.google.com) no-repeat left center; height: 10px;'></div>"

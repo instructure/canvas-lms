@@ -29,6 +29,11 @@ module BroadcastPolicies
       published_on_create? || just_published?
     end
 
+    def should_dispatch_assignment_unmuted?
+      assignment.context.available? &&
+        assignment.recently_unmuted
+    end
+
     private
 
     def context_sendable?

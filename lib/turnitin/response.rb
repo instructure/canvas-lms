@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'nokogiri'
+
 module Turnitin
   class Response
     SUCCESSFUL_RETURN_CODES = (1..99)

@@ -152,8 +152,13 @@
   <button type="button" class="btn cancel_button">
     {{#t "#buttons.cancel"}}Cancel{{/t}}
   </button>
+  {{#unless published}}
+    <button type="button" class="btn btn-default save_and_publish">
+      {{#t "buttons.save_and_publish"}}Save & Publish{{/t}}
+    </button>
+  {{/unless}}
   <button type="submit" class="btn btn-primary">
-    {{#t "buttons.update"}}Update Assignment{{/t}}
+    {{#t "buttons.save"}}Save{{/t}}
   </button>
 
 </div>

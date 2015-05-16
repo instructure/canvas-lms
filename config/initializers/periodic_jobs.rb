@@ -15,7 +15,8 @@ Rails.configuration.after_initialize do
     expire_after ||= 1.day
 
     Delayed::Periodic.cron 'ActiveRecord::SessionStore::Session.delete_all', '*/5 * * * *' do
-      Shard.with_each_shard(exception: -> { ErrorReport.log_exception(:periodic_job, $!) }) do
+      callback = -> { Canvas::Errors.capture_exception(:periodic_job, $ERROR_INFO) }
+      Shard.with_each_shard(exception: callback) do
         ActiveRecord::SessionStore::Session.delete_all(['updated_at < ?', expire_after.ago])
       end
     end
@@ -115,10 +116,12 @@ Rails.configuration.after_initialize do
     end
   end
 
-  # Create a partition 1 month in advance every month:
-  Delayed::Periodic.cron 'Quizzes::QuizSubmissionEventPartitioner.process', '0 0 1 * *' do
+  # Create a partition 1 month in advance every day:
+  Delayed::Periodic.cron 'Quizzes::QuizSubmissionEventPartitioner.process', '0 0 * * *' do
     Shard.with_each_shard do
-      Quizzes::QuizSubmissionEventPartitioner.process
+      Quizzes::QuizSubmissionEventPartitioner.send_later_enqueue_args(:process,
+        strand: "QuizSubmissionEventPartitioner:#{Shard.current.database_server.id}",
+        max_attempts: 1)
     end
   end
 

@@ -477,9 +477,11 @@ module Api
   end
 
   def self.invalid_time_stamp_error(attribute, message)
-    ErrorReport.log_error('invalid_date_time',
-                          message: "invalid #{attribute}",
-                          exception_message: message)
+    Canvas::Errors.capture(
+      'invalid_date_time',
+      message: "invalid #{attribute}",
+      exception_message: message
+    )
   end
 
   # regex for valid iso8601 dates

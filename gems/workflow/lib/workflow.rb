@@ -28,19 +28,20 @@ module Workflow
  
   class Specification
     
-    attr_accessor :states, :initial_state, :meta, :on_transition_proc
+    attr_accessor :states, :initial_state, :on_transition_proc
     
-    def initialize(meta = {}, &specification)
+    def initialize
       @states = Hash.new
-      @meta = meta
+    end
+
+    def add(&specification)
       instance_eval(&specification)
     end
-    
+
     private
   
-    def state(name, meta = {:meta => {}}, &events_and_etc)
-      # meta[:meta] to keep the API consistent..., gah
-      new_state = State.new(name, meta[:meta])
+    def state(name, &events_and_etc)
+      new_state = @states[name.to_sym] || State.new(name)
       @initial_state = new_state if @states.empty?
       @states[name.to_sym] = new_state
       @scoped_state = new_state
@@ -50,7 +51,7 @@ module Workflow
     
     def event(name, args = {}, &action)
       @scoped_state.events[name.to_sym] =
-        Event.new(name, args[:transitions_to], (args[:meta] or {}), &action)
+        Event.new(name, args[:transitions_to], &action)
     end
     
     def on_entry(&proc)
@@ -81,10 +82,10 @@ module Workflow
  
   class State
     
-    attr_accessor :name, :events, :meta, :on_entry, :on_exit
+    attr_accessor :name, :events, :on_entry, :on_exit
     
-    def initialize(name, meta = {})
-      @name, @events, @meta = name, Hash.new, meta
+    def initialize(name)
+      @name, @events = name, Hash.new
     end
     
     def to_s
@@ -98,22 +99,26 @@ module Workflow
   
   class Event
     
-    attr_accessor :name, :transitions_to, :meta, :action
+    attr_accessor :name, :transitions_to, :action
     
-    def initialize(name, transitions_to, meta = {}, &action)
-      @name, @transitions_to, @meta, @action = name, transitions_to.to_sym, meta, action
+    def initialize(name, transitions_to, &action)
+      @name, @transitions_to, @action = name, transitions_to.to_sym, action
     end
     
   end
   
   module WorkflowClassMethods
     def self.extended(klass)
-      klass.send(:class_attribute, :workflow_spec)
+      klass.send(:class_attribute, :workflow_spec) unless klass.method_defined?(:workflow_spec)
     end
  
     def workflow(&specification)
-      workflow_methods = Module.new
-      self.workflow_spec = Specification.new(Hash.new, &specification)
+      unless const_defined?(:WorkflowMethods, false)
+        const_set(:WorkflowMethods, Module.new)
+      end
+      workflow_methods = const_get(:WorkflowMethods, false)
+      self.workflow_spec ||= Specification.new
+      self.workflow_spec.add(&specification)
       self.workflow_spec.states.values.each do |state|
         state_name = state.name
         workflow_methods.module_eval do

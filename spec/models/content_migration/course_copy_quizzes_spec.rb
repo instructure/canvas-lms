@@ -538,6 +538,39 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       expect(aq.question_data[:answers][1][:left_html]).to eq data2[:answers][1][:left_html]
     end
 
+    it "should correctly copy matching question fields with html-lookalike text" do
+      @bank = @copy_from.assessment_question_banks.create!(:title => 'Test Bank')
+      data = {:question_type => "matching_question",
+              :points_possible => 10,
+              :question_text => "text",
+              :matches => [{:match_id=>4835, :text=>"<i>aasdf</i>"},
+                           {:match_id=>6247, :text=>"<p>not good"}],
+              :answers => [{:id => 2939, :text => "<p>srsly is all text</p> <img totes & bork", :match_id=>4835},
+                           {:id => 2940, :html => "<img src=\"http://example.com\">good ol html", :match_id=>6247}]
+      }.with_indifferent_access
+      aq_from = @bank.assessment_questions.create!(:question_data => data)
+
+      quiz = @copy_from.quizzes.create!(:title => "survey pub", :quiz_type => "survey")
+      qq_from = quiz.quiz_questions.new(:assessment_question => aq_from)
+      qq_from.write_attribute(:question_data, data)
+      qq_from.save!
+      quiz.generate_quiz_data
+      quiz.save!
+
+      run_course_copy
+
+      aq = @copy_to.assessment_questions.where(migration_id: mig_id(aq_from)).first
+      qq = @copy_to.quizzes.first.quiz_questions.first
+
+      [aq, qq].each do |q|
+        expect(q.question_data[:question_text]).to eq data[:question_text]
+        expect(q.question_data[:matches][0][:text]).to eq data[:matches][0][:text]
+        expect(q.question_data[:matches][1][:text]).to eq data[:matches][1][:text]
+        expect(q.question_data[:answers][0][:text]).to eq data[:answers][0][:text]
+        expect(q.question_data[:answers][1][:html]).to eq data[:answers][1][:html]
+      end
+    end
+
     it "should copy file_upload_questions" do
       bank = @copy_from.assessment_question_banks.create!(:title => 'Test Bank')
       data = {:question_type => "file_upload_question",
@@ -773,6 +806,37 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
         # should re-link them
         expect(qq.assessment_question_id).to_not be_nil
       end
+    end
+
+    it "should not try to restore deleted quizzes to an unpublished state if unable to" do
+      quiz_from = @copy_from.quizzes.create!(:title => "ruhroh")
+      quiz_from.did_edit
+      quiz_from.offer!
+      a_from = quiz_from.assignment
+
+      run_course_copy
+
+      a_from.unpublish!
+      quiz_from.unpublish!
+
+      @copy_to.offer!
+      student_in_course(:course => @copy_to, :active_user => true)
+
+      quiz_to = @copy_to.quizzes.where(:migration_id => mig_id(quiz_from)).first
+      Quizzes::QuizSubmission.create!(:quiz => quiz_to, :user => @student)
+      expect(quiz_to.can_unpublish?).to be_falsey
+
+      a_to = @copy_to.assignments.where(:migration_id => mig_id(a_from)).first
+      a_to.destroy
+      quiz_to.destroy
+
+      run_course_copy
+
+      quiz_to.reload
+      a_to.reload
+      expect(quiz_to).to be_published
+      expect(quiz_to.assignment).to eq a_to
+      expect(a_to).to be_published
     end
   end
 end

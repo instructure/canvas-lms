@@ -41,6 +41,10 @@ define [
       wait: true
 
     ##
+    # Default options to pass to disableWhileLoading when submitting
+    disableWhileLoadingOpts: {}
+
+    ##
     # Sets the model data from the form and saves it. Called when the form
     # submits, or can be called programatically.
     # set @saveOpts in your view to to pass opts to Backbone.sync (like multipart: true if you have
@@ -70,7 +74,7 @@ define [
         unless @dontRenableAfterSaveSuccess
           saveDfd.done -> disablingDfd.resolve()
 
-        @$el.disableWhileLoading disablingDfd
+        @$el.disableWhileLoading disablingDfd, @disableWhileLoadingOpts
         @trigger 'submit'
         saveDfd
       else

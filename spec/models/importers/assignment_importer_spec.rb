@@ -88,5 +88,48 @@ describe "Importing assignments" do
     assignment = @course.assignments.where(migration_id: 'ib4834d160d180e2e91572e8b9e3b1bc6').first
     expect(assignment.title).to eq 'untitled assignment'
   end
+
+  it "should schedule auto peer reviews if dates are not shifted " do
+    course_model
+    assign_hash = {
+      "migration_id" => "ib4834d160d180e2e91572e8b9e3b1bc6",
+      "assignment_group_migration_id" => "i2bc4b8ea8fac88f1899e5e95d76f3004",
+      "workflow_state" => "published",
+      "title" => "auto peer review assignment",
+      "grading_type" => "points",
+      "submission_types" => "none",
+      "peer_reviews" => true,
+      "automatic_peer_reviews" => true,
+      "due_at" => 1401947999000,
+      "peer_reviews_due_at" => 1401947999000
+    }
+    expects_job_with_tag('Assignment#do_auto_peer_review') {
+      Importers::AssignmentImporter.import_from_migration(assign_hash, @course)
+    }
+  end
+
+  it "should not schedule auto peer reviews if dates are shifted (it'll be scheduled later)" do
+    course_model
+    assign_hash = {
+      "migration_id" => "ib4834d160d180e2e91572e8b9e3b1bc6",
+      "assignment_group_migration_id" => "i2bc4b8ea8fac88f1899e5e95d76f3004",
+      "workflow_state" => "published",
+      "title" => "auto peer review assignment",
+      "grading_type" => "points",
+      "submission_types" => "none",
+      "peer_reviews" => true,
+      "automatic_peer_reviews" => true,
+      "due_at" => 1401947999000,
+      "peer_reviews_due_at" => 1401947999000
+    }
+    migration = mock()
+    migration.stubs(:for_course_copy?)
+    migration.stubs(:add_missing_content_links)
+    migration.stubs(:add_imported_item)
+    migration.stubs(:date_shift_options).returns(true)
+    expects_job_with_tag('Assignment#do_auto_peer_review', 0) {
+      Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
+    }
+  end
   
 end

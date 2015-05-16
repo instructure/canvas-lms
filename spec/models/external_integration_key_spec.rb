@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2014 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -61,6 +61,23 @@ describe ExternalIntegrationKey do
       expect(ExternalIntegrationKey.label_for(:external_key1)).to eq 'External Key 1'
       expect(ExternalIntegrationKey.label_for(:external_key2)).to be_nil
       expect(ExternalIntegrationKey.label_for(:external_key3)).to be_nil
+    end
+  end
+
+  context "keys of type" do
+    it "returns scoped external integration keys of a type" do
+      eik = ExternalIntegrationKey.new
+      eik.context = account
+      eik.key_type = 'external_key2'
+      eik.key_value = '12345a'
+      eik.save!
+      eik2 = ExternalIntegrationKey.new
+      eik2.context = account
+      eik2.key_type = 'external_key3'
+      eik2.key_value = '12345b'
+      eik2.save!
+      expect(ExternalIntegrationKey.of_type('external_key3').count).to eq 1
+      expect(ExternalIntegrationKey.of_type('external_key3').first.id).to eq eik2.id
     end
   end
 

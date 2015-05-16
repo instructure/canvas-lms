@@ -243,7 +243,7 @@ body.with-right-side.with-left-side {
   left: -32px;
 }
 
-.discussion-reply-action {
+.discussion-reply-action, .discussion-rate-action {
   @if $use_high_contrast { color: #666; }
   @else {
     text-decoration: none;
@@ -254,6 +254,22 @@ body.with-right-side.with-left-side {
     text-decoration: none;
     color: #444;
   }
+}
+
+.discussion-rate-action {
+  margin-left: 12px;
+}
+
+.discussion-rate-action--checked {
+  color: $linkColor;
+  &:hover, &:focus {
+    color: $linkColor;
+  }
+}
+
+.discussion-rating {
+  @if $use_high_contrast { color: #666; }
+  @else {color: #888;}
 }
 
 .entry, .discussion_entry {
@@ -436,10 +452,6 @@ body.with-right-side.with-left-side {
     float: left;
     margin: 0;
   }
-}
-
-.side_comment_discussion .entry-controls {
-  display: none;
 }
 
 .topic {

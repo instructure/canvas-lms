@@ -334,14 +334,14 @@ describe "quizzes" do
         }
         wait_for_ajaximations
 
-        driver.find_element(:link, 'Quizzes').click
+        fln('Quizzes').click
         wait_for_ajaximations
 
         driver.switch_to.alert.accept
         wait_for_ajaximations
 
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-        f(:link, "Resume Quiz").click
+        fln("Resume Quiz").click
 
         # there's some initial setTimeout stuff that happens, so things won't
         # be ready right when the page loads

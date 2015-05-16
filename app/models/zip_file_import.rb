@@ -75,10 +75,10 @@ class ZipFileImport < ActiveRecord::Base
     self.workflow_state = :imported
     self.save
   rescue => e
-    ErrorReport.log_exception(:zip_file_import, e)
+    Canvas::Errors.capture_exception(:zip_file_import, e)
 
     self.data[:error_message] = e.to_s
-    self.data[:stack_trace] = "#{e.to_s}\n#{e.backtrace.join("\n")}"
+    self.data[:stack_trace] = "#{e}\n#{e.backtrace.join("\n")}"
     self.workflow_state = "failed"
     self.save
   end

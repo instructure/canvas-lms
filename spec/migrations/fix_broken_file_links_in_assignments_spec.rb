@@ -1,6 +1,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'db/migrate/20130405213030_fix_broken_file_links_in_assignments.rb'
 
+require 'nokogiri'
+
 describe 'DataFixup::FixBrokenFileLinksInAssignments' do
   
   it "should find assignments without verifiers" do

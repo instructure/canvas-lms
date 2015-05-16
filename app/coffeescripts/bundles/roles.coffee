@@ -66,6 +66,7 @@ require [
     container = $('.btn-group')
     if (container.has(event.target).length is 0 and !$(event.target).hasClass('.btn'))
       container.removeClass 'open'
+    return true
 
   $(document).on 'click', '.btn.dropdown-toggle', (event) ->
     event.preventDefault()

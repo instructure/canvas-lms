@@ -53,12 +53,16 @@
                   '#' => '<input class="float_value long" type="text" style="width: 50px;" name="answer_range_end" aria-label="\1"/>' }) %>
           </span>
         </div>
-        <div class="answer_comments empty">
+        <div class="answer_comments comment empty">
           <div class="comment_top"></div>
-          <a href="#" class="comment_focus" title="<%= t('titles.click_to_enter_answer_comments', "Click to enter comments, if the student chooses this answer") %>">...</a>
-          <span id="comments_header" class="comments_header"><%= before_label(:answer_comments, "Comments, if the student chooses this answer") %></span>
-          <textarea style="width: 95%;" name="answer_comment" class="comments answer_comment_box" aria-labelledby="comments_header"></textarea>
-          <span class="answer_comment_html" style="display:none"></span>
+          <% edit_comment_text = t('titles.click_to_enter_answer_comments', "Click to enter comments, if the student chooses this answer") %>
+          <a href="#" class="comment_focus" title="<%= edit_comment_text %>">
+            <span class="ellipsis">...</span>
+            <i class="icon-edit standalone-icon"><span class="screenreader-only"><%= edit_comment_text %></span></i>
+          </a>
+          <span id="comments_header" class="details"><%= before_label(:answer_comments, "Comments, if the student chooses this answer") %></span>
+          <input type="hidden" name="answer_comment_html" />
+          <div class="answer_comment_html comment_html"></div>
         </div>
         <div style="display: none;">
           <span class="blank_id">&nbsp;</span>

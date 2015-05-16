@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
+require 'nokogiri'
+
 describe DiscussionTopic::MaterializedView do
   def map_to_ids_and_replies(list)
     list.map { |l| l = l.slice('id', 'replies'); l['replies'] = map_to_ids_and_replies(l['replies'] || []); l }

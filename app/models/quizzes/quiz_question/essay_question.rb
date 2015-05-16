@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'sanitize'
+
 class Quizzes::QuizQuestion::EssayQuestion < Quizzes::QuizQuestion::Base
   def requires_manual_scoring?(user_answer)
     true

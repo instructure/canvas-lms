@@ -44,10 +44,17 @@ each import, rather than just sending what has changed, you can speed up
 the import process by enabling diffing mode. In diffing mode, a
 preprocessing step in Canvas will compare the current SIS import against
 the last successful SIS import with the same *data set identifier*, and
-only apply the difference between the two imports. For instance, if user
-A is created by import 1, and the exact same information is specified
-for user A in import 2, Canvas will mark that nothing has changed for
-that CSV row and skip looking up user A entirely. This can greatly speed
+only apply the difference between the two imports.
+
+For instance, If user A is created by import 1, and then the name is changed for
+user A on import 2, Canvas will apply the new information for user A.
+
+If user B is created by import 1, and then user B is omitted from import 2,
+Canvas will mark the user as deleted.
+
+If user C is created by import 1, and the exact same information
+is specified for user C in import 2, Canvas will mark that nothing has changed
+for that CSV row and skip looking up user C entirely. This can greatly speed
 up SIS imports with thousands of rows that change rarely.
 
 It is important to note that if any SIS data was changed outside of that

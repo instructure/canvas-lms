@@ -732,23 +732,9 @@ describe UsersController do
     it "should redirect to no-pic if avatars are disabled" do
       course_with_student_logged_in(:active_all => true)
       get 'avatar_image', :user_id  => @user.id
-      expect(response).to redirect_to 'http://test.host/images/no_pic.gif'
+      expect(response).to redirect_to User.default_avatar_fallback
     end
-    it "should handle passing an absolute fallback if avatars are disabled" do
-      course_with_student_logged_in(:active_all => true)
-      get 'avatar_image', :user_id  => @user.id, :fallback => "http://foo.com/my/custom/fallback/url.png"
-      expect(response).to redirect_to 'http://foo.com/my/custom/fallback/url.png'
-    end
-    it "should handle passing an absolute fallback if avatars are enabled" do
-      course_with_student_logged_in(:active_all => true)
-      @account = Account.default
-      @account.enable_service(:avatars)
-      @account.settings[:avatars] = 'enabled_pending'
-      @account.save!
-      expect(@account.service_enabled?(:avatars)).to be_truthy
-      get 'avatar_image', :user_id  => @user.id, :fallback => "http://foo.com/my/custom/fallback/url.png"
-      expect(response).to redirect_to 'http://foo.com/my/custom/fallback/url.png'
-    end
+
     it "should redirect to avatar silhouette if no avatar is set and avatars are enabled" do
       course_with_student_logged_in(:active_all => true)
       @account = Account.default
@@ -757,13 +743,9 @@ describe UsersController do
       @account.save!
       expect(@account.service_enabled?(:avatars)).to be_truthy
       get 'avatar_image', :user_id  => @user.id
-      expect(response).to redirect_to '/images/messages/avatar-50.png'
+      expect(response).to redirect_to User.default_avatar_fallback
     end
-    it "should handle passing a host-relative fallback" do
-      course_with_student_logged_in(:active_all => true)
-      get 'avatar_image', :user_id  => @user.id, :fallback => "/my/custom/fallback/url.png"
-      expect(response).to redirect_to 'http://test.host/my/custom/fallback/url.png'
-    end
+
     it "should pass along the default fallback to gravatar" do
       course_with_student_logged_in(:active_all => true)
       @account = Account.default
@@ -773,24 +755,7 @@ describe UsersController do
       get 'avatar_image', :user_id  => @user.id
       expect(response).to redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI.escape("http://test.host/images/messages/avatar-50.png")}"
     end
-    it "should handle passing an absolute fallback when avatars are enabled" do
-      course_with_student_logged_in(:active_all => true)
-      @account = Account.default
-      @account.enable_service(:avatars)
-      @account.save!
-      expect(@account.service_enabled?(:avatars)).to be_truthy
-      get 'avatar_image', :user_id  => @user.id, :fallback => "https://test.domain/my/custom/fallback/url.png"
-      expect(response).to redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI.escape("https://test.domain/my/custom/fallback/url.png")}"
-    end
-    it "should handle passing a host-relative fallback when avatars are enabled" do
-      course_with_student_logged_in(:active_all => true)
-      @account = Account.default
-      @account.enable_service(:avatars)
-      @account.save!
-      expect(@account.service_enabled?(:avatars)).to be_truthy
-      get 'avatar_image', :user_id  => @user.id, :fallback => "/my/custom/fallback/url.png"
-      expect(response).to redirect_to "https://secure.gravatar.com/avatar/000?s=50&d=#{CGI.escape("http://test.host/my/custom/fallback/url.png")}"
-    end
+
     it "should take an invalid id and return silhouette" do
       @account = Account.default
       @account.enable_service(:avatars)
@@ -799,6 +764,7 @@ describe UsersController do
       get 'avatar_image', :user_id  => 'a'
       expect(response).to redirect_to 'http://test.host/images/messages/avatar-50.png'
     end
+
     it "should take an invalid id with a hyphen and return silhouette" do
       @account = Account.default
       @account.enable_service(:avatars)

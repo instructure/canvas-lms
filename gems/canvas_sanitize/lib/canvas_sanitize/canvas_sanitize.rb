@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'sanitize'
+
 module CanvasSanitize #:nodoc:
   def self.included(klass)
     klass.extend(ClassMethods)

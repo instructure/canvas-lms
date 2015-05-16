@@ -240,19 +240,22 @@ class RubricAssociation < ActiveRecord::Base
     end
 
     ratings = []
-    score = 0
+    score = nil
     replace_ratings = false
+    has_score = false
     self.rubric.criteria_object.each do |criterion|
       data = params["criterion_#{criterion.id}".to_sym]
       rating = {}
       if data
         replace_ratings = true
-        rating[:points] = [criterion.points, data[:points].to_f].min || 0
+        has_score = (data[:points]).present?
+        rating[:points] = [criterion.points, data[:points].to_f].min if has_score
         rating[:criterion_id] = criterion.id
         rating[:learning_outcome_id] = criterion.learning_outcome_id
         if criterion.ignore_for_scoring
           rating[:ignore_for_scoring] = true
-        else
+        elsif has_score
+          score ||= 0
           score += rating[:points]
         end
         rating[:description] = data[:description]

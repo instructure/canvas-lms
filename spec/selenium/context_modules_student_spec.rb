@@ -1,31 +1,11 @@
 require File.expand_path(File.dirname(__FILE__) + "/common")
+require File.expand_path(File.dirname(__FILE__) + '/helpers/context_modules_common')
 
-describe "context_modules" do
+describe "context modules" do
   include_examples "in-process server selenium tests"
 
-  context "as a student" do
-    def create_context_module(module_name)
-      context_module = @course.context_modules.create!(:name => module_name, :require_sequential_progress => true)
-      context_module
-    end
-
-    def go_to_modules
-      get "/courses/#{@course.id}/modules"
-      wait_for_ajaximations
-    end
-
-    def validate_context_module_status_text(module_num, text_to_validate)
-      context_modules_status = ff('.context_module .progression_container')
-      expect(context_modules_status[module_num]).to include_text(text_to_validate)
-    end
-
-    def navigate_to_module_item(module_num, link_text)
-      context_modules = ff('.context_module')
-      expect_new_page_load { context_modules[module_num].find_element(:link, link_text).click }
-      go_to_modules
-    end
-
-    before (:each) do
+  context "as a student", :priority => "1" do
+    before(:each) do
       @locked_text = 'locked'
       @completed_text = 'completed'
       @in_progress_text = 'in progress'
@@ -121,7 +101,7 @@ describe "context_modules" do
       validate_context_module_status_text(1, @completed_text)
       validate_context_module_status_text(2, @completed_text)
     end
-    
+
     it "should show progression in large_roster courses" do
       @course.large_roster = true
       @course.save!
@@ -132,7 +112,6 @@ describe "context_modules" do
 
     it "should validate that a student can't get to a locked context module" do
       go_to_modules
-
       #sequential error validation
       get "/courses/#{@course.id}/assignments/#{@assignment_2.id}"
       expect(f('#content')).to include_text("hasn't been unlocked yet")
@@ -211,7 +190,6 @@ describe "context_modules" do
 
       #sequential error validation
       get "/courses/#{@course.id}/assignments/#{@assignment_2.id}"
-      wait_for_ajaximations
       expect(f('#content')).to include_text("hasn't been unlocked yet")
       expect(f('#module_prerequisites_list')).to be_displayed
 
@@ -285,7 +263,7 @@ describe "context_modules" do
         @module.add_item :type => 'assignment', :id => @assignment3.id
       end
 
-      before (:each) do
+      before(:each) do
         module_setup
       end
 
@@ -330,14 +308,12 @@ describe "context_modules" do
         @after2 = @module_2.add_item(:type => "external_url", :title => "url2", :url => "http://example.com/2")
         @after2.publish!
         get "/courses/#{@course.id}/modules/items/#{@atag1.id}"
-        wait_for_ajaximations
         prev = f('.module-sequence-footer a.pull-left')
         expect(URI.parse(prev.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{@tag_1.id}"
         nxt = f('.module-sequence-footer a.pull-right')
         expect(URI.parse(nxt.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{@after1.id}"
 
         get "/courses/#{@course.id}/modules/items/#{@atag2.id}"
-        wait_for_ajaximations
         prev = f('.module-sequence-footer a.pull-left')
         expect(URI.parse(prev.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{@tag_2.id}"
         nxt = f('.module-sequence-footer a.pull-right')
@@ -346,7 +322,6 @@ describe "context_modules" do
         # if the user didn't get here from a module link, we show no nav,
         # because we can't know which nav to show
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        wait_for_ajaximations
         prev = f('.module-sequence-footer a.pull-left')
         expect(prev).to be_nil
         nxt = f('.module-sequence-footer a.pull-right')
@@ -359,7 +334,6 @@ describe "context_modules" do
         @after1 = @module_1.add_item(:type => "external_url", :title => "url1", :url => "http://example.com/1")
         @after1.publish!
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        wait_for_ajaximations
         prev = f('.module-sequence-footer a.pull-left')
         expect(URI.parse(prev.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{@tag_1.id}"
         nxt = f('.module-sequence-footer a.pull-right')
@@ -378,7 +352,6 @@ describe "context_modules" do
         i3 = @module.content_tags.create!(:context => @course, :content => @page, :tag_type => 'context_module')
         @module2 = ContextModule.create!(:context => @course, :name => 'second module')
         get "/courses/#{@course.id}/modules/items/#{i2.id}"
-        wait_for_ajaximations
 
         prev = f('.module-sequence-footer a.pull-left')
         expect(URI.parse(prev.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{i1.id}"

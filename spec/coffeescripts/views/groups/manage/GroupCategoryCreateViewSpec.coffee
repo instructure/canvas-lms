@@ -14,11 +14,12 @@ define [
       groupCategory = new GroupCategory()
       view = new GroupCategoryCreateView({model: groupCategory})
       view.render()
-      view.$el.appendTo($(document.body))
+      view.$el.appendTo($("#fixtures"))
 
     teardown: ->
       fakeENV.teardown()
       view.remove()
+      document.getElementById("fixtures").innerHTML = ""
 
   test 'toggling auto group leader enables and disables accompanying controls', ->
     $('.auto-group-leader-toggle').prop( "checked", true )

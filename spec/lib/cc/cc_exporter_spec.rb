@@ -1,5 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/cc_spec_helper')
 
+require 'nokogiri'
+
 describe "Common Cartridge exporting" do
   it "should collect errors and finish running" do
     course = course_model

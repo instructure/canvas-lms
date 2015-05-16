@@ -88,16 +88,16 @@ ActionView::Helpers::FormBuilder.class_eval do
 end
 
 I18n.send(:extend, Module.new {
-  attr_writer :localizer
+  attr_accessor :localizer
 
   # Public: If a localizer has been set, use it to set the locale and then
   # delete it.
   #
   # Returns nothing.
   def set_locale_with_localizer
-    if @localizer
-      self.locale = @localizer.call
-      @localizer = nil
+    if localizer
+      self.locale = localizer.call
+      self.localizer = nil
     end
   end
 

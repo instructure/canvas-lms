@@ -41,7 +41,11 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
   # load_user checks masquerading permissions, so this needs to be cleared first
   before_filter :clear_cached_contexts
-  before_filter :load_account, :load_user
+  prepend_before_filter :load_user, :load_account
+  # make sure authlogic is before load_user
+  skip_before_filter :activate_authlogic
+  prepend_before_filter :activate_authlogic
+
   before_filter ::Filters::AllowAppProfiling
   before_filter :check_pending_otp
   before_filter :set_user_id_header
@@ -223,7 +227,7 @@ class ApplicationController < ActionController::Base
   def assign_localizer
     I18n.localizer = lambda {
       infer_locale :context => @context,
-                   :user => @current_user,
+                   :user => logged_in_user,
                    :root_account => @domain_root_account,
                    :session_locale => session[:locale],
                    :accept_language => request.headers['Accept-Language']
@@ -261,10 +265,11 @@ class ApplicationController < ActionController::Base
 
   # scopes all time objects to the user's specified time zone
   def set_time_zone
-    if @current_user && !@current_user.time_zone.blank?
-      Time.zone = @current_user.time_zone
-      if Time.zone && Time.zone.name == "UTC" && @current_user.time_zone && @current_user.time_zone.name.match(/\s/)
-        Time.zone = @current_user.time_zone.name.split(/\s/)[1..-1].join(" ") rescue nil
+    user = logged_in_user
+    if user && !user.time_zone.blank?
+      Time.zone = user.time_zone
+      if Time.zone && Time.zone.name == "UTC" && user.time_zone && user.time_zone.name.match(/\s/)
+        Time.zone = user.time_zone.name.split(/\s/)[1..-1].join(" ") rescue nil
       end
     else
       Time.zone = @domain_root_account && @domain_root_account.default_time_zone
@@ -676,7 +681,7 @@ class ApplicationController < ActionController::Base
   end
 
   def log_course(course)
-    log_asset_access("assignments:#{course.asset_string}", "assignments", "other")
+    log_asset_access([ "assignments", course ], "assignments", "other")
   end
 
   def requesting_main_assignments_page?
@@ -750,8 +755,8 @@ class ApplicationController < ActionController::Base
       @current_user = @membership.user unless @problem
     else
       @context_type = pieces[0].classify
-      if Context::ContextTypes.const_defined?(@context_type)
-        @context_class = Context::ContextTypes.const_get(@context_type)
+      if Context::CONTEXT_TYPES.include?(@context_type.to_sym)
+        @context_class = Object.const_get(@context_type, false)
         @context = @context_class.where(uuid: pieces[1]).first if pieces[1]
       end
       if !@context
@@ -850,19 +855,43 @@ class ApplicationController < ActionController::Base
   # viewed this wiki page".  We can then after-the-fact build statistics
   # and reports from these accesses.  This is currently being used
   # to generate access reports per student per course.
+  #
+  # If asset is an AR model, then its asset_string will be used. If it's an array,
+  # it should look like [ "subtype", context ], like [ "pages", course ].
   def log_asset_access(asset, asset_category, asset_group=nil, level=nil, membership_type=nil)
     user = @current_user
     user ||= User.where(id: session['file_access_user_id']).first if session['file_access_user_id'].present?
     return unless user && @context && asset
     return if asset.respond_to?(:new_record?) && asset.new_record?
+
+    code = if asset.is_a?(Array)
+             "#{asset[0]}:#{asset[1].asset_string}"
+           else
+             asset.asset_string
+           end
+
+    membership_type ||= @context_membership && @context_membership.class.to_s
+
+    group_code = if asset_group.is_a?(String)
+                   asset_group
+                 elsif asset_group.respond_to?(:asset_string)
+                   asset_group.asset_string
+                 else
+                   'unknown'
+                 end
+
     @accessed_asset = {
       :user => user,
-      :code => asset.is_a?(String) ? asset : asset.asset_string,
-      :group_code => asset_group.is_a?(String) ? asset_group : (asset_group.asset_string rescue 'unknown'),
+      :code => code,
+      :group_code => group_code,
       :category => asset_category,
-      :membership_type => membership_type || (@context_membership && @context_membership.class.to_s rescue nil),
+      :membership_type => membership_type,
       :level => level
     }
+
+    Canvas::LiveEvents.asset_access(asset, asset_category, membership_type, level)
+
+    @accessed_asset
   end
 
   def log_page_view
@@ -931,7 +960,7 @@ class ApplicationController < ActionController::Base
       logger.fatal("#{message}\n\n")
     end
 
-    if config.consider_all_requests_local || local_request?
+    if config.consider_all_requests_local
       rescue_action_locally(exception)
     else
       rescue_action_in_public(exception)
@@ -970,23 +999,11 @@ class ApplicationController < ActionController::Base
       type = '404' if status == '404 Not Found'
 
       unless exception.respond_to?(:skip_error_report?) && exception.skip_error_report?
-        error_info = {
-          :url => request.url,
-          :user => @current_user,
-          :user_agent => request.headers['User-Agent'],
-          :request_context_id => RequestContextGenerator.request_id,
-          :account => @domain_root_account,
-          :request_method => request.request_method_symbol,
-          :format => request.format,
-        }.merge(ErrorReport.useful_http_env_stuff_from_request(request))
-
-        error = if @domain_root_account
-          @domain_root_account.shard.activate do
-            ErrorReport.log_exception(type, exception, error_info)
-          end
-        else
-          ErrorReport.log_exception(type, exception, error_info)
-        end
+        opts = {type: type}
+        info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts)
+        error_info = info.to_h
+        capture_outputs = Canvas::Errors.capture(exception, error_info)
+        error = ErrorReport.find(capture_outputs[:error_report])
       end
 
       if api_request?
@@ -996,8 +1013,8 @@ class ApplicationController < ActionController::Base
       end
     rescue => e
       # error generating the error page? failsafe.
+      Canvas::Errors.capture(e)
       render_optional_error_file response_code_for_rescue(exception)
-      ErrorReport.log_exception(:default, e)
     end
   end
 
@@ -1023,22 +1040,21 @@ class ApplicationController < ActionController::Base
       request.format = :html
       template = exception.error_template if exception.respond_to?(:error_template)
       unless template
-        erbfile = "#{status.to_s[0,3]}_message.html.erb"
-        erbpath = File.join('app', 'views', 'shared', 'errors', erbfile)
-        erbfile = "500_message.html.erb" unless File.exists?(erbpath)
-        template = "shared/errors/#{erbfile}"
+        template = "shared/errors/#{status.to_s[0,3]}_message"
+        erbpath = Rails.root.join('app', 'views', "#{template}.html.erb")
+        template = "shared/errors/500_message" unless erbpath.file?
       end
 
       @status_code = status_code
       message = exception.is_a?(RequestError) ? exception.message : nil
-      render :template => template,
-        :layout => 'application',
-        :status => status,
-        :locals => {
-          :error => error,
-          :exception => exception,
-          :status => status,
-          :message => message,
+      render template: template,
+        layout: 'application',
+        status: status,
+        locals: {
+          error: error,
+          exception: exception,
+          status: status,
+          message: message,
         }
     end
   end
@@ -1093,10 +1109,6 @@ class ApplicationController < ActionController::Base
     else
       super
     end
-  end
-
-  def local_request?
-    false
   end
 
   def claim_session_course(course, user, state=nil)
@@ -1159,7 +1171,6 @@ class ApplicationController < ActionController::Base
   # the page title.
   def get_wiki_page
     @wiki = @context.wiki
-    @wiki.check_has_front_page
 
     @page_name = params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title])
     if(params[:format] && !['json', 'html'].include?(params[:format]))
@@ -1505,8 +1516,9 @@ class ApplicationController < ActionController::Base
   end
   helper_method :page_views_enabled?
 
-  def verified_file_download_url(attachment, context = nil, *opts)
-    verifier = Attachments::Verification.new(attachment).verifier_for_user(@current_user, context.try(:asset_string))
+  def verified_file_download_url(attachment, context = nil, permission_map_id = nil, *opts)
+    verifier = Attachments::Verification.new(attachment).verifier_for_user(@current_user,
+        context: context.try(:asset_string), permission_map_id: permission_map_id)
     file_download_url(attachment, { :verifier => verifier }, *opts)
   end
   helper_method :verified_file_download_url
