@@ -1011,6 +1011,7 @@ class ApplicationController < ActionController::Base
         opts = {type: type}
         info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts)
         error_info = info.to_h
+        error_info[:tags][:response_code] = response_code
         capture_outputs = Canvas::Errors.capture(exception, error_info)
         error = ErrorReport.find(capture_outputs[:error_report])
       end
