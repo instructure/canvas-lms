@@ -690,6 +690,8 @@ describe "speed grader" do
     expect(f("#rubric_summary_container tr:nth-child(3) .editing")).not_to be_displayed
     expect(f("#rubric_summary_container tr:nth-child(3) .ignoring")).to be_displayed
     expect(f("#rubric_summary_container tr.summary .rubric_total").text).to eq '3'
+    # check that null scores do not show a criterion level
+    expect(f("#rubric_summary_container tr:nth-child(2) .description").text).to be_empty
 
     # check again that initial page load has the same data.
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
@@ -700,6 +702,7 @@ describe "speed grader" do
     expect(f("#rubric_summary_container tr:nth-child(3) .editing")).not_to be_displayed
     expect(f("#rubric_summary_container tr:nth-child(3) .ignoring")).to be_displayed
     expect(f("#rubric_summary_container tr.summary .rubric_total").text).to eq '3'
+    expect(f("#rubric_summary_container tr:nth-child(2) .description").text).to be_empty
   end
 
   it "includes the student view student for grading" do

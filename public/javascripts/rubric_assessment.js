@@ -265,8 +265,6 @@ window.rubricAssessment = {
           });
         }
         $criterion
-          .find(".criterion_description").addClass('original_completed').end()
-          .find("#rating_" + rating.id).addClass('original_selected').addClass('selected').end()
           .find(".custom_rating_field").val(comments).end()
           .find(".custom_rating_comments").html(comments_html).end()
           .find(".criterion_points").val(rating.points).change().end()
@@ -275,6 +273,11 @@ window.rubricAssessment = {
           .find(".custom_rating").text(comments).end()
           .find(".criterion_comments").toggleClass('empty', !comments).end()
           .find(".save_custom_rating").attr('checked', false);
+        if(ratingHasScore(rating)){
+          $criterion
+            .find(".criterion_description").addClass('original_completed').end()
+            .find("#rating_" + rating.id).addClass('original_selected').addClass('selected').end()
+        }
         if(comments) $criterion.find('.criterion_comments').show();
         if(rating.points && !rating.ignore_for_scoring) {
           total += rating.points;
@@ -295,10 +298,13 @@ window.rubricAssessment = {
         var rating = assessment.data[idx];
         $rubricSummary.find("#criterion_" + rating.criterion_id)
           .find(".rating").hide().end()
-          .find(".rating.description").showIf(!$rubricSummary.hasClass('free_form')).text(rating.description).end()
           .find(".rating_" + rating.id).show().end()
           .find(".criterion_points").text(rating.points).end()
           .find(".ignore_for_scoring").showIf(rating.ignore_for_scoring);
+        if(ratingHasScore(rating) && !$rubricSummary.hasClass('free_form')){
+          $rubricSummary.find("#criterion_" + rating.criterion_id)
+            .find(".rating.description").show().text(rating.description).end()
+        }
         if(rating.comments_enabled && rating.comments) {
           $rubricSummary.find("#criterion_" + rating.criterion_id).find(".rating_custom").show().text(rating.comments);
         }
@@ -314,6 +320,10 @@ window.rubricAssessment = {
     }
   }
 };
+
+function ratingHasScore(rating) {
+  return (rating.points || rating.points === 0);
+}
 
 $(rubricAssessment.init);
 

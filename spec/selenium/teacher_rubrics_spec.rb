@@ -134,7 +134,7 @@ describe "course rubrics" do
                                           :assessment => {
                                               :assessment_type => 'grading',
                                               :criterion_crit1 => {
-                                                  :points => 5,
+                                                  :points => nil,
                                                   :comments => comment,
                                               }
                                           }
@@ -152,5 +152,53 @@ describe "course rubrics" do
     wait_for_ajaximations
     expect(f('.rubric .criterion .custom_rating_comments').text).to eq comment
     expect(f('.rubric .criterion .custom_rating_comments a')).to have_attribute('href', 'http://www.example.com/')
+  end
+
+  it "should highlight a criterion level if score is 0" do
+    assignment_model
+    rubric_model(:context => @course)
+    course_with_student(:course => @course, :active_all => true)
+    @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
+    @assessment = @association.assess({
+                                          :user => @student,
+                                          :assessor => @teacher,
+                                          :artifact => @assignment.find_or_create_submission(@student),
+                                          :assessment => {
+                                              :assessment_type => 'grading',
+                                              :criterion_crit1 => {
+                                                  :points => 0
+                                              }
+                                          }
+                                      })
+    user_logged_in(:user => @student)
+
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
+    f('.assess_submission_link').click
+    wait_for_ajaximations
+    expect(f('table .ratings tbody td:nth-child(3)')).to have_class('original_selected')
+  end
+
+  it "should not highlight a criterion level if score is nil" do
+    assignment_model
+    rubric_model(:context => @course)
+    course_with_student(:course => @course, :active_all => true)
+    @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
+    @assessment = @association.assess({
+                                          :user => @student,
+                                          :assessor => @teacher,
+                                          :artifact => @assignment.find_or_create_submission(@student),
+                                          :assessment => {
+                                              :assessment_type => 'grading',
+                                              :criterion_crit1 => {
+                                                  :points => nil
+                                              }
+                                          }
+                                      })
+    user_logged_in(:user => @student)
+
+    get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
+    f('.assess_submission_link').click
+    wait_for_ajaximations
+    expect(f('table .ratings tbody td:nth-child(3)')).not_to have_class('original_selected')
   end
 end
