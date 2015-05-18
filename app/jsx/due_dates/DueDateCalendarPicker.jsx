@@ -105,4 +105,4 @@ define([
     }
   })
   return DueDateCalendarPicker
-})
+});

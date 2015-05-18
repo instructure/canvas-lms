@@ -1,11 +1,12 @@
 define [
   'Backbone'
   'underscore'
+  'react'
   'jst/assignments/DueDateOverride'
   'compiled/util/DateValidator'
   'i18n!overrides'
   'jsx/due_dates/DueDates'
-], (Backbone, _, template, DateValidator, I18n, DueDates) ->
+], (Backbone, _, React, template, DateValidator, I18n, DueDates) ->
 
   class DueDateOverrideView extends Backbone.View
 
