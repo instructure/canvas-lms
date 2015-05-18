@@ -5,6 +5,10 @@ module Canvas
     describe JobInfo do
       let(:job) do
         stub(
+          id: 42,
+          source: "controller:discussion_topics_api,action:add_entry,"\
+                  "hostname:app010001063068-vpc.us-east-1.canvas.insops.net,"\
+                  "pid:8949,context_id:c5ec694d-1c0d-4744-a97a-cae44c477837",
           attempts: 1,
           strand: 'thing',
           priority: 1,
@@ -37,6 +41,15 @@ module Canvas
 
         it "includes the worker name" do
           expect(hash[:extra][:worker_name]).to eq('workername')
+        end
+
+        it "includes the job id in the extras hash" do
+          expect(hash[:extra][:id]).to eq(42)
+        end
+
+        it 'includes the source, which has the request context id' do
+          expect(hash[:extra][:source]).
+            to match(/c5ec694d-1c0d-4744-a97a-cae44c477837/)
         end
       end
 
