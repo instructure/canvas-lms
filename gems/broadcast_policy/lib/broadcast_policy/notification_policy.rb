@@ -40,12 +40,12 @@ module BroadcastPolicy
       notification = BroadcastPolicy.notification_finder.by_name(self.dispatch)
       return if notification.nil?
 
-      to_list = record.instance_eval &self.to
-      to_list = Array[to_list].flatten
+      to_list = record.instance_eval(&self.to)
+      to_list = Array(to_list).flatten
       return if to_list.empty?
 
-      asset_context = record.instance_eval &self.context if self.context
-      data = record.instance_eval &self.data if self.data
+      asset_context = record.instance_eval(&self.context) if self.context
+      data = record.instance_eval(&self.data) if self.data
 
       BroadcastPolicy.notifier.send_notification(
         record,

@@ -1,15 +1,15 @@
 #!/bin/bash
 result=0
 
-echo "################ canvas_ext ################"
+echo "################ broadcast_policy ################"
 bundle check || bundle install
 bundle exec rspec spec
 let result=$result+$?
 
 if [ $result -eq 0 ]; then
-  echo "SUCCESS"
+	echo "SUCCESS"
 else
-  echo "FAILURE"
+	echo "FAILURE"
 fi
 
 exit $result
