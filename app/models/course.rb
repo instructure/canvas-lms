@@ -570,7 +570,10 @@ class Course < ActiveRecord::Base
     p.to { participating_students }
     p.whenever { |record|
       (record.available? && @grade_weight_changed) ||
-      record.changed_in_state(:available, :fields => :group_weighting_scheme)
+      (
+        record.prior_version.present? &&
+        record.changed_in_state(:available, :fields => :group_weighting_scheme)
+      )
     }
 
     p.dispatch :new_course
