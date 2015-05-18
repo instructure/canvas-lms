@@ -7,7 +7,7 @@ module Login::Shared
                               :enrollment,
                               :expected_user_id,
                               :masquerade_return_to,
-                              :oauth2_state)
+                              :oauth2_nonce)
   end
 
   def successful_login(user, pseudonym, otp_passed = false)

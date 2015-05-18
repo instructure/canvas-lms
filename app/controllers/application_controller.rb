@@ -1887,7 +1887,12 @@ class ApplicationController < ActionController::Base
   end
 
   def google_drive_client(refresh_token=nil, access_token=nil)
-    client_secrets = Canvas::Plugin.find(:google_drive).try(:settings)
+    settings = Canvas::Plugin.find(:google_drive).try(:settings) || {}
+    client_secrets = {
+      client_id: settings[:client_id],
+      client_secret: settings[:client_secret_dec],
+      redirect_uri: settings[:redirect_uri]
+    }.with_indifferent_access
     GoogleDrive::Client.create(client_secrets, refresh_token, access_token)
   end
 

@@ -23,22 +23,28 @@ class AccountAuthorizationConfig::Oauth2 < AccountAuthorizationConfig::Delegated
   SENSITIVE_PARAMS = [ :client_secret ].freeze
 
   # rename DB fields to something that makes sense for OAuth2
-  def client_id=(val)
-    self.entity_id = val
-  end
-
-  def client_id
-    entity_id
-  end
-
   alias_method :client_secret=, :auth_password=
   alias_method :client_secret, :auth_decrypted_password
+  { client_id: :entity_id,
+    site: :auth_host,
+    authorize_url: :log_in_url,
+    token_url: :auth_base }.each do |(new_name, old_name)|
+    class_eval <<-RUBY, __FILE__, __LINE__ + 1
+      def #{new_name}=(val)
+        self.#{old_name} = val
+      end
+
+      def #{new_name}
+        #{old_name}
+      end
+    RUBY
+  end
 
   def client
     @client ||= OAuth2::Client.new(client_id, client_secret, client_options)
   end
 
-  def authorize_url(redirect_uri, state)
+  def generate_authorize_url(redirect_uri, state)
     client.auth_code.authorize_url({ redirect_uri: redirect_uri, state: state }.merge(authorize_options))
   end
 
@@ -47,6 +53,14 @@ class AccountAuthorizationConfig::Oauth2 < AccountAuthorizationConfig::Delegated
   end
 
   protected
+
+  def client_options
+    {
+      site: site,
+      authorize_url: authorize_url,
+      token_url: token_url
+    }
+  end
 
   def authorize_options
     {}

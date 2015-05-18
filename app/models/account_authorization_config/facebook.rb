@@ -21,10 +21,6 @@ class AccountAuthorizationConfig::Facebook < AccountAuthorizationConfig::Oauth2
     true
   end
 
-  def self.sti_name
-    'facebook'
-  end
-
   def self.recognized_params
     if globally_configured?
       [ :auth_type ].freeze

@@ -30,40 +30,39 @@ describe Login::Oauth2Controller do
       get :new, auth_type: 'facebook'
       expect(response).to be_redirect
       expect(response.location).to match(%r{^https://www.facebook.com/dialog/oauth\?})
-      expect(session[:oauth2_state]).to_not be_blank
+      expect(session[:oauth2_nonce]).to_not be_blank
     end
   end
 
   describe "#create" do
     it "checks the OAuth2 CSRF token" do
-      session[:oauth2_state] = 'bob'
-      get :create, id: aac
-      # it could be a 422, or 0 if error handling isn't enabled properly in specs
-      expect(response).to_not be_success
-      expect(response).to_not be_redirect
-
-      get :create, id: aac, state: 'garbage'
+      session[:oauth2_nonce] = 'bob'
+      jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: 'different')
+      get :create, state: jwt
       # it could be a 422, or 0 if error handling isn't enabled properly in specs
       expect(response).to_not be_success
       expect(response).to_not be_redirect
     end
 
     it "works" do
-      session[:oauth2_state] = 'bob'
+      session[:oauth2_nonce] = 'bob'
       aac.any_instantiation.expects(:get_token).returns('token')
       aac.any_instantiation.expects(:unique_id).with('token').returns('user')
       user_with_pseudonym(username: 'user', active_all: 1)
 
-      get :create, id: aac, state: 'bob'
+      jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: 'bob')
+      get :create, state: jwt
       expect(response).to redirect_to(dashboard_url(login_success: 1))
     end
 
     it "redirects to login if no user found" do
       aac.any_instantiation.expects(:get_token).returns('token')
       aac.any_instantiation.expects(:unique_id).with('token').returns('user')
-      controller.expects(:check_csrf)
 
-      get :create, id: aac
+      session[:oauth2_nonce] = 'bob'
+      jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: 'bob')
+
+      get :create, state: jwt
       expect(response).to redirect_to(login_url)
       expect(flash[:delegated_message]).to_not be_blank
     end

@@ -637,7 +637,10 @@ CanvasRails::Application.routes.draw do
 
   get 'login/facebook' => 'login/facebook#new', as: :facebook_login
   get 'login/github' => 'login/github#new', as: :github_login
+  get 'login/google' => 'login/google#new', as: :google_login
   get 'login/linkedin' => 'login/linkedin#new', as: :linkedin_login
+  get 'login/openid_connect' => 'login/openid_connect#new'
+  get 'login/openid_connect/:id' => 'login/openid_connect#new', as: :openid_connect_login
   get 'login/twitter' => 'login/twitter#new', as: :twitter_login
 
   get 'login/otp' => 'login/otp#new', as: :otp_login

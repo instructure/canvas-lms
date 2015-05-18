@@ -37,12 +37,6 @@ class Login::OauthBaseController < ApplicationController
     reset_session_for_login
   end
 
-  def create
-    reset_session_for_login
-
-    @aac = @domain_root_account.account_authorization_configs.find(params[:id])
-  end
-
   protected
 
   def timeout_protection

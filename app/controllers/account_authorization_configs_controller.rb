@@ -179,14 +179,15 @@ class AccountAuthorizationConfigsController < ApplicationController
   # @API Create Authorization Config
   #
   # Add external account authentication service(s) for the account.
-  # Services may be CAS, Facebook, GitHub, LDAP, LinkedIn, SAML, or Twitter.
+  # Services may be CAS, Facebook, GitHub, Google, LDAP, OpenID Connect,
+  # LinkedIn, SAML, or Twitter.
   #
   # Each authentication service is specified as a set of parameters as
   # described below. A service specification must include an 'auth_type'
-  # parameter with a value of 'cas', 'facebook', 'github', 'ldap', 'linkedin',
-  # 'saml', or 'twitter'. The other recognized parameters depend on this
-  # auth_type; unrecognized parameters are discarded. Service specifications
-  # not specifying a valid auth_type are ignored.
+  # parameter with a value of 'cas', 'facebook', 'github', 'google', 'ldap',
+  # 'linkedin', 'openid_connect', 'saml', or 'twitter'. The other recognized
+  # parameters depend on this auth_type; unrecognized parameters are discarded.
+  # Service specifications not specifying a valid auth_type are ignored.
   #
   # _Deprecated_[2015-05-08] Any service specification may include an
   # optional 'login_handle_name' parameter. This parameter specifies the
@@ -244,6 +245,18 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   The GitHub application's Client Secret. Not available if configured
   #   globally for Canvas.
   #
+  # For Google, the additional recognized parameters are:
+  #
+  # - client_id [Required]
+  #
+  #   The Google application's Client ID. Not available if configured globally
+  #   for Canvas.
+  #
+  # - client_secret [Required]
+  #
+  #   The Google application's Client Secret. Not available if configured
+  #   globally for Canvas.
+  #
   # For LDAP authentication services, the additional recognized parameters are:
   #
   # - auth_host
@@ -298,6 +311,25 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   #   The LinkedIn application's Client Secret. Not available if configured
   #   globally for Canvas.
+  #
+  # For OpenID Connect, the additional recognized parameters are:
+  #
+  # - client_id [Required]
+  #
+  #   The application's Client ID.
+  #
+  # - client_secret [Required]
+  #
+  #   The application's Client Secret.
+  #
+  # - authorize_url [Required]
+  #
+  #   The URL for getting starting the OAuth 2.0 web flow
+  #
+  # - token_url [Required]
+  #
+  #   The URL for exchanging the OAuth 2.0 authorization code for an access
+  #   token and id token
   #
   # For SAML authentication services, the additional recognized parameters are:
   #

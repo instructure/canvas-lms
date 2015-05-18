@@ -16,52 +16,46 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AccountAuthorizationConfig::Twitter < AccountAuthorizationConfig::Oauth
+class AccountAuthorizationConfig::Google < AccountAuthorizationConfig::OpenIDConnect
   def self.singleton?
     true
   end
 
   def self.recognized_params
     if globally_configured?
-      [ :auth_type ].freeze
+      [ :auth_type ]
     else
-      [ :auth_type, :consumer_key, :consumer_secret ].freeze
+      [ :auth_type, :client_id, :client_secret ].freeze
     end
   end
 
-  SENSITIVE_PARAMS = [ :consumer_secret ].freeze
-
   def self.globally_configured?
-    Canvas::Plugin.find(:twitter).enabled?
+    Canvas::Plugin.find(:google_drive).enabled?
   end
 
-  # Rename db field
-  def consumer_key
-    self.class.globally_configured? ? settings[:consumer_key] : super
+  def client_id
+    self.class.globally_configured? ? settings[:client_id] : super
   end
 
-  def consumer_secret
+  def client_secret
     if self.class.globally_configured?
-      settings[:consumer_secret_dec]
+      settings[:client_secret_dec]
     else
       super
     end
   end
 
-  def unique_id(token)
-    token.params[:user_id]
-  end
-
   protected
 
   def settings
-    Canvas::Plugin.find(:twitter).settings
+    Canvas::Plugin.find(:google_drive).settings
   end
 
-  def consumer_options
+  def client_options
     {
-      site: 'https://api.twitter.com'.freeze,
-      authorize_path: '/oauth/authenticate'.freeze
+      site: 'https://accounts.google.com'.freeze,
+      authorize_url: '/o/oauth2/auth'.freeze,
+      token_url: '/o/oauth2/token'.freeze
     }
   end
 end

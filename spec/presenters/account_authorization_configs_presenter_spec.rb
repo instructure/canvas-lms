@@ -149,8 +149,10 @@ describe AccountAuthorizationConfigsPresenter do
       expect(presenter.sso_options).to eq([['CAS', 'cas'],
                                            ['Facebook', 'facebook'],
                                            ['GitHub', 'github'],
+                                           ['Google', 'google'],
                                            ['LDAP', 'ldap'],
                                            ['LinkedIn', 'linkedin'],
+                                           ['OpenID Connect', 'openid_connect'],
                                            ['Twitter', 'twitter']])
     end
 

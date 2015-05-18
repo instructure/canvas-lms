@@ -19,19 +19,24 @@
 class Login::Oauth2Controller < Login::OauthBaseController
   def new
     super
-    state = session[:oauth2_state] = SecureRandom.hex(24)
-    redirect_to @aac.authorize_url(redirect_uri, state)
+    nonce = session[:oauth2_nonce] = SecureRandom.hex(24)
+    jwt = Canvas::Security.create_jwt(aac_id: @aac.global_id, nonce: nonce)
+    redirect_to @aac.generate_authorize_url(oauth2_login_callback_url, jwt)
   end
 
   def create
-    super
-    raise ActiveRecord::RecordNotFound unless @aac.is_a?(AccountAuthorizationConfig::Oauth2)
+    reset_session_for_login
 
-    check_csrf
+    if jwt['nonce'] != session.delete(:oauth2_nonce)
+      raise ActionController::InvalidAuthenticityToken
+    end
+
+    @aac = AccountAuthorizationConfig.find(jwt['aac_id'])
+    raise ActiveRecord::RecordNotFound unless @aac.is_a?(AccountAuthorizationConfig::Oauth2)
 
     unique_id = nil
     return unless timeout_protection do
-      token = @aac.get_token(params[:code], redirect_uri)
+      token = @aac.get_token(params[:code], oauth2_login_callback_url)
       unique_id = @aac.unique_id(token)
     end
 
@@ -40,13 +45,11 @@ class Login::Oauth2Controller < Login::OauthBaseController
 
   protected
 
-  def check_csrf
-    if params[:state].blank? || params[:state] != session.delete(:oauth2_state)
-      raise ActionController::InvalidAuthenticityToken
-    end
-  end
-
-  def redirect_uri
-    oauth2_login_callback_url(id: @aac)
+  def jwt
+    @jwt ||= if params[:state].present?
+               Canvas::Security.decode_jwt(params[:state])
+             else
+               {}
+             end
   end
 end

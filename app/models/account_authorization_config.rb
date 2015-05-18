@@ -41,15 +41,21 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     case type_name
     when 'cas', 'ldap', 'saml'
       const_get(type_name.upcase)
-    when 'facebook', 'twitter'
+    when 'facebook', 'google', 'twitter'
       const_get(type_name.classify)
     when 'github'
       GitHub
     when 'linkedin'
       LinkedIn
+    when 'openid_connect'
+      OpenIDConnect
     else
       super
     end
+  end
+
+  def self.sti_name
+    display_name.underscore
   end
 
   def self.singleton?
@@ -58,6 +64,10 @@ class AccountAuthorizationConfig < ActiveRecord::Base
 
   def self.enabled?
     true
+  end
+
+  def self.display_name
+    name.demodulize
   end
 
   belongs_to :account
@@ -73,7 +83,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     :client_id, :client_secret, :domain,
     :consumer_key, :consumer_secret
 
-  VALID_AUTH_TYPES = %w[cas facebook github ldap linkedin saml twitter].freeze
+  VALID_AUTH_TYPES = %w[cas facebook github google ldap linkedin openid_connect saml twitter].freeze
   validates_inclusion_of :auth_type, in: VALID_AUTH_TYPES, message: "invalid auth_type, must be one of #{VALID_AUTH_TYPES.join(',')}"
   validates_presence_of :account_id
 
@@ -119,5 +129,6 @@ end
 
 # so it doesn't get mixed up with ::CAS, ::LinkedIn and ::Twitter
 require_dependency 'account_authorization_config/cas'
+require_dependency 'account_authorization_config/google'
 require_dependency 'account_authorization_config/linked_in'
 require_dependency 'account_authorization_config/twitter'

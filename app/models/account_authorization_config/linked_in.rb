@@ -45,7 +45,7 @@ class AccountAuthorizationConfig::LinkedIn < AccountAuthorizationConfig::Oauth2
     if self.class.globally_configured?
       settings[:client_secret_dec]
     else
-      auth_decrypted_password
+      super
     end
   end
 
