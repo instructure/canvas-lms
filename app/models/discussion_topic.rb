@@ -672,7 +672,9 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   on_update_send_to_streams do
-    if should_send_to_stream && (@content_changed || changed_state(:active, !is_announcement ? :unpublished : :post_delayed))
+    check_state = !is_announcement ? 'unpublished' : 'post_delayed'
+    became_active = workflow_state_was == check_state && workflow_state == 'active'
+    if should_send_to_stream && (@content_changed || became_active)
       self.active_participants
     end
   end
