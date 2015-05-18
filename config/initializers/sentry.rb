@@ -17,14 +17,17 @@ if settings.present?
     config.sanitize_credit_cards = false
   end
 
-  Canvas::Errors.register!(:sentry_notification) do |exception, data|
-    setting = Setting.get("sentry_error_logging_enabled", 'true')
-    if setting == 'true'
-      if exception.is_a?(String) || exception.is_a?(Symbol)
-        Raven.capture_message(exception, data)
-      else
-        Raven.capture_exception(exception, data)
+  Rails.configuration.to_prepare do
+    Canvas::Errors.register!(:sentry_notification) do |exception, data|
+      setting = Setting.get("sentry_error_logging_enabled", 'true')
+      if setting == 'true'
+        if exception.is_a?(String) || exception.is_a?(Symbol)
+          Raven.capture_message(exception, data)
+        else
+          Raven.capture_exception(exception, data)
+        end
       end
     end
   end
+
 end
