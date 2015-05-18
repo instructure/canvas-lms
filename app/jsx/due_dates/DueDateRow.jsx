@@ -129,4 +129,4 @@ define([
   })
 
   return DueDateRow
-})
+});

@@ -122,4 +122,4 @@ define([
   }
 
   return TokenActions
-})
+});

@@ -74,4 +74,4 @@ define([
 
   })
   return DueDateCalendars
-})
+});
