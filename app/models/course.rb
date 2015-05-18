@@ -219,6 +219,8 @@ class Course < ActiveRecord::Base
   has_many :usage_rights, as: :context, class_name: 'UsageRights', dependent: :destroy
 
   has_many :sis_post_grades_statuses
+
+  has_many :progresses, as: :context
   has_many :gradebook_csvs, inverse_of: :course
 
   include Profile::Association
@@ -1474,7 +1476,7 @@ class Course < ActiveRecord::Base
   private :enrollments_for_csv
 
   def gradebook_to_csv_in_background(filename, user, options = {})
-    progress = user.progresses.build(tag: 'gradebook_to_csv')
+    progress = progresses.build(tag: 'gradebook_to_csv')
     progress.save!
 
     exported_gradebook = gradebook_csvs.where(user_id: user).first_or_initialize
