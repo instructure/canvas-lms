@@ -384,6 +384,29 @@ describe ContentMigration do
         expect(@copy_to.grading_standard.title).to eql gs.title
       end
 
+      it "should not copy grading standards if nothing is selected (export/import)" do
+        gs = make_grading_standard(@copy_from, title: 'What')
+        @copy_from.update_attribute(:grading_standard, gs)
+        @cm.copy_options = { 'everything' => '0' }
+        @cm.migration_ids_to_import = { 'copy' => { 'everything' => '0' } }
+        @cm.save!
+        run_export_and_import
+        expect(@cm.warnings).to be_empty
+        expect(@copy_to.grading_standards).to be_empty
+      end
+
+      it "should copy the course's grading standard (once) if course_settings are selected (export/import)" do
+        gs = make_grading_standard(@copy_from, title: 'What')
+        @copy_from.update_attribute(:grading_standard, gs)
+        @cm.copy_options = { 'everything' => '0', 'all_course_settings' => '1' }
+        @cm.migration_ids_to_import = { 'copy' => { 'all_course_settings' => '1' } }
+        @cm.save!
+        run_export_and_import
+        expect(@cm.warnings).to be_empty
+        expect(@copy_to.grading_standards.count).to eql 1 # no dupes
+        expect(@copy_to.grading_standard.title).to eql gs.title
+      end
+
       it "should copy grading standards referenced by exported assignments" do
         gs1, gs2 = make_grading_standard(@copy_from, title: 'One'), make_grading_standard(@copy_from, title: 'Two')
         assign = @copy_from.assignments.build
