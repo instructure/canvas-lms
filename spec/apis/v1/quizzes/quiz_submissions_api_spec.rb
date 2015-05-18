@@ -46,19 +46,23 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
   module Helpers
     def enroll_student
       last_user = @teacher = @user
-      student_in_course
+      student_in_course(active_all: true)
       @student = @user
       @user = last_user
     end
 
     def enroll_student_and_submit(submission_data = {})
       enroll_student
-
       @quiz_submission = @quiz.generate_submission(@student)
       @quiz_submission.submission_data = submission_data
       @quiz_submission.mark_completed
       Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
       @quiz_submission.reload
+    end
+
+    def make_second_attempt
+      @quiz_submission.attempt = 2
+      @quiz_submission.with_versioning(true, &:save!)
     end
 
     def normalize(value)
@@ -188,6 +192,27 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       json = qs_api_index
       expect(json.has_key?('quiz_submissions')).to be_truthy
       expect(json['quiz_submissions'].length).to eq 1
+    end
+
+    it 'should show multiple attempts of the same quiz' do
+      enroll_student_and_submit
+      make_second_attempt
+
+      @user = @student
+
+      json = qs_api_index
+      expect(json.key?('quiz_submissions')).to be_truthy
+      expect(json['quiz_submissions'].length).to eq 2
+    end
+
+    it 'should show most recent attemps of quiz to teacher' do
+      enroll_student_and_submit
+      make_second_attempt
+
+      json = qs_api_index
+      expect(json.key?('quiz_submissions')).to be_truthy
+      expect(json['quiz_submissions'].length).to eq 1
+      expect(json['quiz_submissions'].first["attempt"]).to eq 2
     end
 
     it 'should restrict access to itself' do

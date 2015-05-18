@@ -167,7 +167,7 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
         api_v1_course_quiz_submissions_url(@context, @quiz)
     elsif @quiz.grants_right?(@current_user, session, :submit)
       # students have access only to their own
-      @quiz.quiz_submissions.where(:user_id => @current_user)
+      @quiz.quiz_submissions.where(:user_id => @current_user).flat_map(&:submitted_attempts)
     end
 
     if !quiz_submissions
