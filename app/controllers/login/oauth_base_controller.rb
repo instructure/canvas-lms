@@ -57,8 +57,8 @@ class Login::OauthBaseController < ApplicationController
   rescue => e
     Canvas::Errors.capture(e,
                            type: :oauth_consumer,
-                           aac: @aac.global_id,
-                           account: @aac.global_account_id)
+                           aac_id: @aac.global_id,
+                           account_id: @aac.global_account_id)
     flash[:delegated_message] = t("There was a problem logging in at %{institution}",
                                   institution: @domain_root_account.display_name)
     redirect_to login_url
