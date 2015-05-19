@@ -28,11 +28,13 @@ module IncomingMail
       raise IncomingMail::Errors::SilentIgnore unless original_message && original_message.notification_id
       raise IncomingMail::Errors::SilentIgnore unless valid_secure_id?(original_message, secure_id)
 
+      from_channel = nil
       original_message.shard.activate do
-
         context = original_message.context
         user = original_message.user
         raise IncomingMail::Errors::UnknownAddress unless valid_user_and_context?(context, user)
+        from_channel = sent_from_channel(user, incoming_message)
+        raise IncomingMail::Errors::UnknownSender unless from_channel
         context.reply_from({
                                :purpose => 'general',
                                :user => user,
@@ -42,15 +44,15 @@ module IncomingMail
                            })
       end
     rescue IncomingMail::Errors::ReplyFrom => error
-      bounce_message(original_message, incoming_message, error, outgoing_from_address)
+      bounce_message(original_message, incoming_message, error, outgoing_from_address, from_channel)
     rescue IncomingMail::Errors::SilentIgnore
       #do nothing
     end
 
     private
 
-    def bounce_message(original_message, incoming_message, error, outgoing_from_address)
-      incoming_from = incoming_message.from.try(:first)
+    def bounce_message(original_message, incoming_message, error, outgoing_from_address, from_channel)
+      incoming_from = from_channel.try(:path) || incoming_message.from.try(:first)
       incoming_subject = incoming_message.subject
       return unless incoming_from
 
@@ -69,7 +71,7 @@ module IncomingMail
       outgoing_message_delivered = false
 
       original_message.shard.activate do
-        comch = CommunicationChannel.active.email.by_path(incoming_from).first
+        comch = from_channel || CommunicationChannel.active.email.by_path(incoming_from).first
         outgoing_message.communication_channel = comch
         outgoing_message.user = comch.try(:user)
         if outgoing_message.communication_channel
@@ -101,6 +103,14 @@ module IncomingMail
           Thank you,
           Canvas Support
           BODY
+        when IncomingMail::Errors::UnknownSender
+          ndr_subject = I18n.t("Message Reply Failed: %{subject}", :subject => subject)
+          ndr_body = I18n.t(<<-BODY, :subject => subject).gsub(/^ +/, '')
+          The message titled "%{subject}" could not be delivered.  The message was sent from an address that is not linked with your Canvas account.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
+
+          Thank you,
+          Canvas Support
+          BODY
         else # including IncomingMessageProcessor::UnknownAddressError
           ndr_subject = I18n.t('lib.incoming_message_processor.failure_message.subject', "Message Reply Failed: %{subject}", :subject => subject)
           ndr_body = I18n.t('lib.incoming_message_processor.failure_message.body', <<-BODY, :subject => subject).gsub(/^ +/, '')
@@ -120,6 +130,11 @@ module IncomingMail
 
     def valid_user_and_context?(context, user)
       user && context && context.respond_to?(:reply_from)
+    end
+
+    def sent_from_channel(user, incoming_message)
+      from_addresses = ((incoming_message.from || []) + (incoming_message.reply_to || [])).uniq
+      user && from_addresses.lazy.map {|addr| user.communication_channels.active.email.by_path(addr).first}.first
     end
 
     # MOVE!

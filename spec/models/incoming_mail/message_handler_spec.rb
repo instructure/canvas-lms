@@ -25,13 +25,18 @@ describe IncomingMail::MessageHandler do
   let(:original_message_id) { 1 }
   let(:secure_id) { "123abc" }
   let(:tag) { "#{secure_id}-#{original_message_id}" }
-    let(:shard) do
+  let(:shard) do
     stub("shard").tap do |shard|
       shard.stubs(:activate).yields
     end
   end
-  let(:user) { stub("user") }
-  let(:context) { stub("context", reply_from: "reply-from@example.com") }
+  let_once(:user) do
+    user_model
+    channel = @user.communication_channels.create!(:path => "lucy@example.com", :path_type => "email")
+    channel.confirm!
+    @user
+  end
+  let(:context) { stub("context") }
 
   let(:original_message_attributes) {
     {
@@ -39,7 +44,8 @@ describe IncomingMail::MessageHandler do
         :shard => shard,
         :context => context,
         :user => user,
-        :global_id => 1
+        :global_id => 1,
+        :to => "lucy@example.com"
     }
   }
 
@@ -49,7 +55,8 @@ describe IncomingMail::MessageHandler do
         header: {
             :subject => stub("subject", :charset => "utf8")
         },
-        from: ["lucy@example.com"]
+        from: ["lucy@example.com"],
+        reply_to: ["lucy@example.com"]
     }
   }
 
@@ -89,6 +96,7 @@ describe IncomingMail::MessageHandler do
         end
 
         it "silently fails on invalid secure id" do
+          Message.stubs(:where).with(id: original_message_id).returns(stub(first: original_message))
           Canvas::Security.stubs(:verify_hmac_sha1).returns(false)
 
           Mailer.expects(:create_message).never
@@ -109,16 +117,23 @@ describe IncomingMail::MessageHandler do
           Message.any_instance.expects(:deliver).never
           subject.handle(outgoing_from_address, body, html_body, incoming_message, "#{secure_id}-not-an-id")
         end
+
+        it "silently fails if the message is not from one of the original recipient's email addresses" do
+          Message.stubs(:where).with(id: original_message_id).returns(stub(first: original_message))
+          Message.any_instance.expects(:deliver).never
+          original_message.context.expects(:reply_from).never
+          message = stub("incoming message with bad from",
+                         incoming_message_attributes.merge(:from => ['not_lucy@example.com'],
+                                                           :reply_to => ['also_not_lucy@example.com']))
+          subject.handle(outgoing_from_address, body, html_body, message, tag)
+        end
       end
 
       context "bounced messages" do
-        it "bounces the message if user is missing" do
+        it "bounces if user is missing" do
           message = stub("original message without user", original_message_attributes.merge(:user => nil))
           Message.stubs(:where).with(id: original_message_id).returns(stub(first: message))
-
-          Message.any_instance.expects(:deliver).never
-          Mailer.expects(:create_message)
-
+          Message.any_instance.expects(:deliver)
           subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
         end
 
@@ -126,16 +141,13 @@ describe IncomingMail::MessageHandler do
           message = stub("original message with invalid context", original_message_attributes.merge({context: stub("context")}))
           Message.stubs(:where).with(id: original_message_id).returns(stub(first: message))
 
-          Message.any_instance.expects(:deliver).never
-          Mailer.expects(:create_message)
+          Message.any_instance.expects(:save)
+          Message.any_instance.expects(:deliver)
 
           subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
         end
 
         it "saves and delivers the message with proper input" do
-          user_model
-          channel = @user.communication_channels.create!(:path => "lucy@example.com", :path_type => "email")
-          channel.confirm!
           message = stub("original message with invalid context", original_message_attributes.merge({context: stub("context")}))
           Message.stubs(:where).with(id: original_message_id).returns(stub(first: message))
 
@@ -156,7 +168,7 @@ describe IncomingMail::MessageHandler do
 
         context "with a generic generic_error" do
           it "constructs the message correctly" do
-            message = stub("original message without user", original_message_attributes.merge(:user => nil))
+            message = stub("original message without user", original_message_attributes.merge(:context => nil))
             Message.stubs(:where).with(id: original_message_id).returns(stub(first: message))
 
             email_subject = "Message Reply Failed: some subject"
@@ -247,12 +259,14 @@ describe IncomingMail::MessageHandler do
         context "when there is no communication channel" do
           it "bounces the message back to the incoming from address" do
             Message.stubs(:where).with(id: original_message_id).returns(stub(first: original_message))
-            context.expects(:reply_from).raises(IncomingMail::Errors::ReplyToLockedTopic.new)
 
             Message.any_instance.expects(:deliver).never
             Mailer.expects(:create_message)
 
-            subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
+            message = stub("incoming message with bad from",
+                           incoming_message_attributes.merge(:from => ['not_lucy@example.com'],
+                                                             :reply_to => ['also_not_lucy@example.com']))
+            subject.handle(outgoing_from_address, body, html_body, message, tag)
           end
         end
       end
