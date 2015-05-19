@@ -393,7 +393,7 @@ class Pseudonym < ActiveRecord::Base
     end
     self.save
     if old_user_id
-      CommunicationChannel.where(:path => self.unique_id, :user_id => old_user_id).update_all(:user_id => user)
+      CommunicationChannel.by_path(self.unique_id).where(:user_id => old_user_id).update_all(:user_id => user)
       User.where(:id => [old_user_id, user]).update_all(:update_at => Time.now.utc)
     end
     if User.find(old_user_id).pseudonyms.empty? && migrate

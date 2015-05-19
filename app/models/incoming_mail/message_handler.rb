@@ -69,7 +69,7 @@ module IncomingMail
       outgoing_message_delivered = false
 
       original_message.shard.activate do
-        comch = CommunicationChannel.active.where(path: incoming_from, path_type: 'email').first
+        comch = CommunicationChannel.active.email.by_path(incoming_from).first
         outgoing_message.communication_channel = comch
         outgoing_message.user = comch.try(:user)
         if outgoing_message.communication_channel

@@ -802,7 +802,8 @@ class User < ActiveRecord::Base
     if e.is_a?(CommunicationChannel) and e.user_id == self.id
       cc = e
     else
-      cc = self.communication_channels.where(path: e, path_type: 'email').first_or_create
+      cc = self.communication_channels.email.by_path(e).first ||
+           self.communication_channels.email.create(path: e)
       cc.user = self
     end
     cc.move_to_top
