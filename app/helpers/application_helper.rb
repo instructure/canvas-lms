@@ -284,62 +284,6 @@ module ApplicationHelper
     include_stylesheets variant_name_for(:vendor), variant_name_for(:common), media: "all"
   end
 
-  def section_tabs
-    @section_tabs ||= begin
-      if @context
-        html = []
-        tabs = Rails.cache.fetch([@context, @current_user, @domain_root_account, Lti::NavigationCache.new(@domain_root_account),  "section_tabs_hash", I18n.locale].cache_key, expires_in: 1.hour) do
-          if @context.respond_to?(:tabs_available) && !(tabs = @context.tabs_available(@current_user, :session => session, :root_account => @domain_root_account)).empty?
-            tabs.select do |tab|
-              if (tab[:id] == @context.class::TAB_COLLABORATIONS rescue false)
-                tab[:href] && tab[:label] && Collaboration.any_collaborations_configured?
-              elsif (tab[:id] == @context.class::TAB_CONFERENCES rescue false)
-                tab[:href] && tab[:label] && feature_enabled?(:web_conferences)
-              else
-                tab[:href] && tab[:label]
-              end
-            end
-          else
-            []
-          end
-        end
-        return '' if tabs.empty?
-
-        inactive_element = "<span id='inactive_nav_link' class='screenreader-only'>#{I18n.t('* No content has been added')}</span>"
-
-        html << '<nav role="navigation" aria-label="context"><ul id="section-tabs">'
-        tabs.each do |tab|
-          path = nil
-          if tab[:args]
-            path = tab[:args].instance_of?(Array) ? send(tab[:href], *tab[:args]) : send(tab[:href], tab[:args])
-          elsif tab[:no_args]
-            path = send(tab[:href])
-          else
-            path = send(tab[:href], @context)
-          end
-          hide = tab[:hidden] || tab[:hidden_unused]
-          class_name = tab[:css_class].downcase.replace_whitespace("-")
-          class_name += ' active' if @active_tab == tab[:css_class]
-
-          if hide
-            tab[:label] += inactive_element
-          end
-
-          if tab[:screenreader]
-            link = "<a href='#{path}' class='#{class_name}' aria-label='#{tab[:screenreader]}'>#{tab[:label]}</a>"
-          else
-            link = "<a href='#{path}' class='#{class_name}'>#{tab[:label]}</a>"
-          end
-
-          html << "<li class='section #{"section-tab-hidden" if hide }'>" + link + "</li>" if tab[:href]
-        end
-        html << "</ul></nav>"
-        html.join("")
-      end
-    end
-    raw(@section_tabs)
-  end
-
   def sortable_tabs
     tabs = @context.tabs_available(@current_user, :for_reordering => true, :root_account => @domain_root_account)
     tabs.select do |tab|
@@ -598,21 +542,8 @@ module ApplicationHelper
 
   def map_courses_for_menu(courses)
     mapped = courses.map do |course|
-      term = course.enrollment_term.name if !course.enrollment_term.default_term?
-      role = Role.get_role_by_id(course.primary_enrollment_role_id) || Enrollment.get_built_in_role_for_type(course.primary_enrollment_type)
-      subtitle = (course.primary_enrollment_state == 'invited' ?
-                  before_label('#shared.menu_enrollment.labels.invited_as', 'Invited as') :
-                  before_label('#shared.menu_enrollment.labels.enrolled_as', "Enrolled as")
-                 ) + " " + role.label
-      {
-        :longName => "#{course.name} - #{course.short_name}",
-        :shortName => course.name,
-        :courseCode => course.course_code,
-        :href => course_path(course, :invitation => course.read_attribute(:invitation)),
-        :term => term || nil,
-        :subtitle => subtitle,
-        :id => course.id
-      }
+      presenter = CourseForMenuPresenter.new(course, available_section_tabs(course))
+      presenter.to_h
     end
 
     mapped
@@ -621,6 +552,7 @@ module ApplicationHelper
   def menu_courses_locals
     courses = @current_user.menu_courses
     all_courses_count = @current_user.courses_with_primary_enrollment.size
+
     {
       :collection             => map_courses_for_menu(courses),
       :collection_size        => all_courses_count,

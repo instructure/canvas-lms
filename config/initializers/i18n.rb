@@ -25,9 +25,9 @@ module I18nUtilities
   def before_label(text_or_key, default_value = nil, *args)
     if default_value
       text_or_key = "labels.#{text_or_key}" unless text_or_key.to_s =~ /\A#/
-      text_or_key = t(text_or_key, default_value, *args)
+      text_or_key = I18n.t(text_or_key, default_value, *args)
     end
-    t("#before_label_wrapper", "%{text}:", :text => text_or_key)
+    I18n.t("#before_label_wrapper", "%{text}:", :text => text_or_key)
   end
 
   def _label_symbol_translation(method, text, options)
