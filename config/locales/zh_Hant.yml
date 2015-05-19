@@ -74,18 +74,6 @@ zh_Hant:
         api_url: "API URL"
         common_core_guid: "共同核心 GUID（可選）"
   account: 
-    account_settings: 
-      account_surveys: 帳戶調查
-      avatars: 使用者頭像
-      delicious: 美味
-      diigo: Diigo
-      google_docs: "Google Docs"
-      google_docs_preview: "Google Docs 預覽"
-      google_drive: "Google Drive"
-      linked_in: LinkedIn
-      skype: Skype
-      twitter: Twitter
-      yo: Yo
     ask_canvas_network: "諮詢 Canvas 網路社區"
     default_account_name: 預設帳戶
     default_site_administrator_account_name: 網站管理員
@@ -118,60 +106,46 @@ zh_Hant:
     tab_users: 使用者
     turnitin_pledge: 這個任務提交件是我自己的原創作品
   account_authorization_config: 
-    debug: 
-      wait_for_login: 正在等待嘗試登入
     default_delegated_login_handle_name: 登入
     default_login_handle_name: 電子郵件
-    saml_eppn_domain_stripped: "%{eppn}（網域已去除）"
+  account_authorization_config/ldap: 
     test_bind_failed: "無法綁定以下錯誤：%{error}"
     test_connection_timeout: 連接逾時
     test_host_unknown: "未知主機：%{host}"
     test_login_auth_exception: "登入異常：%{error}"
     test_login_auth_failed: 驗證失敗
     test_search_failed: "搜索失敗，出現以下錯誤：%{error}"
+  account_authorization_config/saml: 
+    debug: 
+      logout_redirect: "LogoutRequest 發送至 IdP"
+      wait_for_login: 正在等待嘗試登入
+    saml_eppn_domain_stripped: "%{eppn}（網域已去除）"
   account_authorization_configs: 
     account_required: "必須為 LDAP 驗證"
-    cas_settings: 
+    cas_fields: 
       labels: 
         auth_base: "CAS URL"
-        auth_type: 類型
-        login_handle_name: 登入標籤
         unknown_user_url: "未知使用者 URL"
-      login_handle_name_description: 用於唯一登入識別符的標籤。例如：登入、使用者名稱、學號等。
-      save_button: 儲存驗證設定
       unknown_user_url_description: "在 Canvas 中找不到已驗證的使用者時重定向到的 URL。"
+    form_footer: 
+      labels: 
+        position: 位置
+      save_button: 儲存驗證設定
+    form_header: 
+      auth_type_label: 類型
+      auth_url: "此設定的登入 URL"
     index: 
       add_auth_desc: 添加一個身份識別提供者至此帳戶：
-      canvas_login_tip: |-
-          如果組態設定會導致無法登入，則可以新增 *%{url1}* 
-          至登入 URL 的末尾。這將允許使用正常的 Canvas 
-          登入過程。此帳戶的 URL 將為 %{url2}。
       choose_auth_type_option: 選擇驗證服務
       current_settings_title: 當前整合
       delete_auth_confirmation: 是否確定？如果移除，則使用者可能無法登入。
-      delete_auth_link: 移除驗證
-      edit_auth_link: 編輯詳細資料
       ip_address_list_description: "如果您正在使用需要 Canvas 伺服器直接連接您的伺服器的驗證服務，如 LDAP，則需要確保您的伺服器可以接受來自這些 IP 位址的連接："
       no_auth_type_description: 此帳戶目前無法與身份識別提供者整合。
       page_title: 驗證設定
       profile_page_link_example: "例如，這就是您的個人檔案頁：[%{friendlyname}](%{url})"
       settings_description: "為了讓使用者能夠透過外部身份識別提供者 (IdP) 進行驗證，使用者必須擁有連接至該帳戶並與 IdP 返回的唯一的識別符匹配的登入識別符。要查看使用者的當前登入，請參閱使用者的個人檔案頁面中的『登入資訊』部分。（通過在『使用者』選項卡上搜尋索找到。）"
       settings_title: 驗證設定
-      test_ldap_link: 測試驗證
-    ldap_settings: 
-      add_secondary_ldap_server_link: "添加輔助 LDAP 伺服器"
-      auth_type_label: 類型
-      change_password_url_help: "為預設的 Canvas 行為留空"
-      change_password_url_not_specified: 沒有指定
-      labels: 
-        change_password_url: "忘記密碼 URL"
-        login_handle_name: 登入標籤
-      login_handle_name_description: 用於唯一登入識別符的標籤。例如：登入、使用者名稱、學號等。
-      remove_secondary_ldap_link: （移除）
-      save_button: "儲存 LDAP 設定"
-      secondary_ldap_label: "輔助 LDAP"
-      setting_type_ldap: LDAP
-    ldap_settings_fields: 
+    ldap_fields: 
       auth_filter_description: "使用 *%{placeholder}* 作為使用者提供的使用者名稱的預留位置。例如：*(sAMAccountName=%{placeholder})*"
       auth_password_description: 留空以繼續使用當前密碼。
       identifer_format_description: "LDAP 屬性用來查看 Canvas 登入。留空以使用由使用者提供的使用者名稱。"
@@ -187,9 +161,8 @@ zh_Hant:
         auth_port: 連接埠
         auth_username: 使用者名稱
         identifier_format: "登入 ID 屬性"
-        no_tls: "沒有 TLS"
-        simple_tls: "簡單的 TLS"
-        start_tls: "啟動 TLS"
+      last_ldap_timeout_failure: 最後逾時失敗
+      ldap_timeout_failure_help2: "如果 Canvas 與 LDAP 伺服器通信時逾時次數過多，則會阻止使用 LDAP 伺服器 %{time} 的進一步的登入嘗試。"
     ldap_settings_test: 
       labels: 
         pass: 密碼
@@ -217,50 +190,27 @@ zh_Hant:
       test_ldap_search_help_fixes_3: "驗證 LDAP 中的使用者物件是否有所提供的搜尋基礎的搜尋權限。"
       test_ldap_search_help_header: "Canvas 無法搜尋您的 LDAP 執行個體"
       test_ldap_search_label: "正在測試 LDAP 搜尋..."
-    ldap_timeout_error: 
-      last_ldap_timeout_failure: 最後逾時失敗
-      ldap_timeout_failure_help2: "如果 Canvas 與 LDAP 伺服器通信時逾時次數過多，則會阻止使用 LDAP 伺服器 %{time} 的進一步的登入嘗試。"
     login_required: 必須提供
     no_changing_auth_types: 無法更改授權設定的類型，請刪除和創建新的設定。
-    no_discovery_url: 無設定
     password_required: 必須提供
-    saml_required: "需要 SAML 設定來測試 SAML"
-    saml_settings: 
-      auth_type: 類型
-      auth_url: "此設定的登入 URL"
-      certificate_fingerprint: 憑證指紋
-      change_password_url: 更改密碼連結
-      discovery_url: "探索 URL："
-      discovery_url_description: "如果設置了探索 URL，則 canvas 會將所有需要進行驗證的使用者轉發到該 URL。該頁面將需要再説明使用者弄清楚需要在哪裡登入。如果沒有設定 URL，則第一個 SAML 設定將被用於嘗試驗證使用者。"
-      identifier_format: 識別碼格式
-      idp_entity_id: "IdP 實體識別碼"
+    saml_fields: 
       labels: 
         certificate_fingerprint: 憑證指紋
-        change_password_url: 更改密碼連結
         identifier_format: 識別碼格式
         idp_entity_id: "IdP 實體識別碼"
         log_in_url: "登入 URL"
         log_out_url: "註銷 URL"
         login_attribute: 登入屬性
-        login_handle_name: 登入標籤
-        position: 位置
         requested_authn_context: 驗證內容
         unknown_user_url: "未知使用者 URL"
-      log_in_url: "登入 URL"
-      log_out_url: "註銷 URL"
-      login_attribute: 登入屬性
-      login_handle_name: 登入標籤
-      login_handle_name_description: 用於唯一登入識別符的標籤。例如：登入、使用者名稱、學號等。
-      no_discovery_url: 無設定
-      position: 位置
+      unknown_user_url_description: "在 Canvas 中找不到已驗證的使用者時重定向到的 URL。"
+    saml_required: "需要 SAML 設定來測試 SAML"
+    saml_settings_test: 
       refresh_debugging: 重新整理
-      requested_authn_context: 驗證內容
       saml_debug_instructions: "一旦開始偵錯，有關下一個嘗試的 SAML 登入嘗試的所有資訊將被收集。按一下“重新整理”，以瞭解是否有更多的資料被收集，或“停止偵錯”，以清除所收集的資料，並停止當前的偵錯嘗試。"
-      saml_debugging: 偵錯
-      save_button: 儲存驗證設定
+      saml_required: "需要 SAML 設定來測試 SAML"
       start_debugging: 開始偵錯
       stop_debugging: 停止偵錯
-      unknown_user_url_description: "在 Canvas 中找不到已驗證的使用者時重定向到的 URL。"
     saml_testing: 
       auth_request_to_idp: "AuthnRequest發送至 IdP"
       auth_response_from_idp: "AuthnResponse 來自於 IdP"
@@ -289,7 +239,12 @@ zh_Hant:
         to_idp_xml: "LoginRequest XML 發送至 IdP"
       logout_request_to_idp: "LogoutRequest 發送至 IdP"
       logout_response_from_idp: "LogoutResponse 來自於 IdP"
-      saml_required: "需要 SAML 設定來測試 SAML"
+    sso_settings_form: 
+      change_password_url_help: "為預設的 Canvas 行為留空"
+      labels: 
+        change_password_url: "忘記密碼 URL"
+        login_handle_name: 登入標籤
+      login_handle_name_description: 用於唯一登入識別符的標籤。例如：登入、使用者名稱、學號等。
   account_notification: 
     errors: 
       invalid_account_notification_end_at: 帳戶通知結束時間在開始時間之前
@@ -392,6 +347,7 @@ zh_Hant:
     report_header_user__id: user_id
     report_header_user_id: "使用者 ID"
     report_header_user_name: 使用者名稱
+    report_header_user_short_name: short_name
     report_header_user_sis_id: "使用者 SIS ID"
     report_header_xlist_course_id: xlist_course_id
     sis_exporter: 
@@ -421,6 +377,7 @@ zh_Hant:
       open_registration_delegated_warning_dialog: 外部身份識別提供者已啟用
       what_are_quiz_ip_filters: "Quiz IP Filter（測驗 IP 篩選器）是什麼？"
     user: 使用者
+  account_surveys_b0039876: 帳戶調查
   account_user: 
     types: 
       account_admin: 帳戶管理員
@@ -451,16 +408,13 @@ zh_Hant:
         sis_user_id: "SIS ID"
         sortable_name: 可排序的名稱
       sortable_name_help: 該名稱出現在已排序清單中。
-      unique_id_label: "%{label}:*"
     add_user_button: 新增使用者
     add_user_dialog_title: 新增新使用者
     adding_course_message: 正在新增課程...
     adding_user_message: 正在新增使用者...
     additional_settings: 
-      account_domains: 帳戶網域
       account_status: 帳戶狀態
       add_new_domain: 新增新網域
-      external_status: 外部狀態
       license: 授權
       license_type: 授權類型
       new_account_domain_title: 新帳戶網域
@@ -1276,6 +1230,7 @@ zh_Hant:
   activity_13915493: 活動
   activity_by_category_9c2033d1: 按類別劃分的活動
   activity_by_date_878c5b49: 按日期劃分的活動
+  add_8523c19b: 新增
   add_app_baf540f: 新增應用程式
   add_attachment_93868828: 新增附件
   add_course_assignments_628ed6d0: 新增課程任務
@@ -1442,7 +1397,6 @@ zh_Hant:
       invalid_external_tool: 無法找到此連結的有效設定
       invalid_external_tool_id: 無法找到此工具的有效設定
       invalid_feed_parameters: 無效的摘要參數。
-      invalid_oembed_url: 抓取該資源時出現問題。外部工具提供有關資源的無效資訊。
       invalid_tag_type: 未識別該標籤的項目類型
       invalid_verification_code: 驗證碼是無效的。
       mismatched_verification_code: 驗證碼與當前註冊的任何使用者都不相符。
@@ -1473,6 +1427,7 @@ zh_Hant:
         suspended: 被暫停的機構
     wiki_front_page_default_content_course: "歡迎來到您的新課程 wiki！"
     wiki_front_page_default_content_group: "歡迎來到您的新群組 wiki！"
+  apply_781a2546: 套用
   appointment_group: 
     errors: 
       invalid_end_at: 約會結束時間在開始時間之前
@@ -1733,12 +1688,6 @@ zh_Hant:
       one: "降低最低 %{count} 分"
       other: "降低最低 %{count} 分"
     drop_lowest_scores: "降低最低 %{number} 分"
-    due_date_override: 
-      overrides: 
-        available_from: 自…可用
-        due_date: 截止日期
-        for: 對於
-      until: 直到
     due_date_view: 
       overrides: 
         remove_these_dates: 移除這些日期
@@ -1760,7 +1709,6 @@ zh_Hant:
       description: 說明
       freeze_properties: 複製時鎖定任務屬性
       notify_content_change: 通知使用者該內容已更改
-      only_visible_to_overrides_note: 注：此任務*僅*針對以下指定的章節可見。
       points_possible: 點
       post_to_sis: 包含當發佈到您所在學校學生資訊系統上時該任務的評分
       warnings: 
@@ -2202,6 +2150,7 @@ zh_Hant:
   available_from_587ce92f: 自…可用
   available_from_date_43b5e11d: 可供使用的起始日期
   available_from_date_afc594fa: 可供使用的起始日期：
+  available_from_f84e4611: 自…可用
   available_until_date_2c0ccec3: 可供使用的截止日期：
   available_until_date_cd125c62: 可供使用的截止日期
   available_until_f3b9c4ed: 可用，直至
@@ -2673,30 +2622,9 @@ zh_Hant:
     ics_title: "%{course_or_group_name} 月曆 (Canvas)"
     invalid_date_or_time: "%{attr} 的無效日期或無效日期時間"
   calendars: 
-    assignment_details: 任務詳細資料
-    default_title: 事件
     event: 
       due: 截止日期
       event_title: "截止日期：%{event_title}"
-    event_details: 事件詳細資料
-    feed_dialog_title: 月曆摘要
-    keycodes: 
-      delete: d
-      edit: e
-      new: "n"
-      next_day: "Ctrl + 向右鍵"
-      next_event: j
-      next_week: "Ctrl + 向下鍵"
-      open: o
-      previous_day: "Ctrl + 向左鍵"
-      previous_event: k
-      previous_week: "Ctrl + 向上鍵"
-      refresh: r
-    notices: 
-      event_moved: "%{event} 移至 %{day}"
-    prompts: 
-      delete_assignment: 是否確定要刪除此任務？
-      delete_event: 是否確定要刪除此事件？
     show2: 
       calendar_feed: 月曆摘要
       calendar_feed_instructions: "複製下面的連結並將其粘貼到任何一個攜帶 iCal 摘要的月曆應用程式（Google Calendar、iCal、Outlook等）"
@@ -2710,11 +2638,6 @@ zh_Hant:
       toggle_calendars: 切換月曆
       toggle_undated_items: 切換未注日期的項目
       undated_items: 未注日期的項目
-    titles: 
-      add_new_assignment: 新增新任務
-      add_new_event: 新增新事件
-      edit_assignment: 編輯任務
-      edit_event: 編輯事件
     wizard_box: 
       descriptions: 
         assignment: 好極了。現在按一下對話方塊中的『任務』選項卡以建立一個任務，而不是月曆事件。
@@ -2763,6 +2686,8 @@ zh_Hant:
   canvas_cartridge_display: "Canvas 通用墨水匣"
   canvas_cartridge_file_description: "Canvas 課程匯出封裝"
   canvas_cartridge_name: "Canvas 墨水匣匯入程式"
+  canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas 未能識別您的身份識別提供者"
+  canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas 沒有下述使用者的帳戶：%{user}"
   canvas_error_report_ff678539: "Canvas 的錯誤報告"
   canvas_revision_unknown: 未知
   canvas_ticketing_email_connector_27e253ae: "Canvas 票務電子郵件連接器"
@@ -2821,7 +2746,7 @@ zh_Hant:
         cancel: 取消
         update: 更新協作
       labels: 
-        description: 說明
+        description: 說明：
         title: 協作標題
     errors: 
       cannot_load_collaboration: 無法載入協作
@@ -2848,7 +2773,7 @@ zh_Hant:
             **警告**：您（以及您所有的協作者）將需要一個 Google 帳戶才能參與任何 Google Docs 協作。
       labels: 
         collaboration_type: 協作，使用：
-        description: 說明
+        description: 說明：
         document_name: 文件名稱
       messages: 
         delete_google_doc_as_well: "這一協作將被作為 Google Doc 儲存。是否只想從 Canvas 中將其刪除，或者也從 Google Doc 中將其刪除？"
@@ -3060,7 +2985,7 @@ zh_Hant:
       message: 
         export_started: 匯出過程已經開始。對於大課，這可能需要一段時間。*你可以離開此頁面*，當匯出完成後，您會收到一封電子郵件。
       no_submissions: 您目前沒有要匯出的提交件。
-      user_data_exports: 使用者資料匯出
+      user_data_exports: 下載提交件
     labels: 
       new_export: 新匯出：
     links: 
@@ -3283,17 +3208,6 @@ zh_Hant:
     titles: 
       tag_external_web_page: 標籤外部網頁
   context: 
-    communication: 
-      headings: 
-        discussions: 討論
-      links: 
-        feeds: 
-          course_discussions: "課程討論 Atom 摘要"
-        start_collaboration: 開始協作
-        start_conference: "開始 Web 會議"
-        start_topic: 開始新主題
-      titles: 
-        communication: 通訊
     deleted_item: 
       created: 已建立
       last_updated: 上次更新日期
@@ -4080,12 +3994,14 @@ zh_Hant:
       wiki_id: "Wiki ID"
       workflow_state: 工作流程狀態
   course_members_are_free_to_join_9b2603d4: 課程成員可自由加入
+  course_navigation_dd035109: 課程導覽
   course_restore: 
     restore_error: 嘗試還原課程時出現錯誤。課程沒有還原。
   course_search: 
     cant_be_blank: 不能為空
   course_section: 
     sis_id_taken: "SIS ID \"%{sis_id}\" 已在使用中"
+  course_section_7a988066: 課程章節
   course_settings: 
     buttons: 
       add_section: 新增章節
@@ -4910,6 +4826,7 @@ zh_Hant:
   delete_survey_56fddbbd: 刪除調查
   delete_tool_app_9c9f6d35: "要刪除 %{tool} 應用程式？"
   delete_toolname_app_85f9d4ee: "刪除 %{toolName} 應用程式"
+  delicious_7f9ac66f: 美味
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "展示網站要求對 Recaptcha 設定進行配置。請參見您網站管理員對該 Canvas 執行個體的說明。"
   demos: 
     _register: 
@@ -5029,6 +4946,7 @@ zh_Hant:
   differentiated_assignments_description: |-
       差異化任務是*測試版*功能，能夠選擇適用任務的章節。
       未提供任務的章節將不會在他們的課程內容中看到它，並且他們的最終成績將被計算，而不包括這些點。
+  diigo_993c4646: Diigo
   disable_a5c05db3: 停用
   disabled_18c33a73: (已停用)
   discussion_6719c51d: 討論
@@ -5113,7 +5031,6 @@ zh_Hant:
       enable_podcast_feed: 啟用播客摘要
       include_replies_in_podcast_feed: 包含學生在播客評論中的回復
       only_graders_can_like: 僅評分者能喜歡
-      only_visible_to_overrides_note: 注意：*僅*以下指定的章節可見此討論：
       options: 選項
       page_header_title: 新討論
       points_possible: 可能的點
@@ -5290,9 +5207,6 @@ zh_Hant:
       show_more: 顯示更多
     hide_due_dates: 隱藏截止日期
     initial_post_required_to_subscribe: 訂閱之前必須先公佈回覆
-    like_count: 
-      one: "(%{count} 個喜歡)"
-      other: "(%{count} 個喜歡)"
     mark_as_read: 標記為已讀取
     mark_as_unread: 標記為未讀取
     no_content: 無內容
@@ -5341,6 +5255,8 @@ zh_Hant:
   domain_3b54c511: 網域
   don_t_show_again_15d8253e: 不再顯示
   done_8af51c9b: 完成
+  download_submissions_7454665f: 下載提交件
+  due_a73610f6: 截止日期
   due_at_5e18eeac: 截止於：
   due_by_c263dc10: 到期時間
   due_date_5d0a953c: 截止日期：
@@ -5373,6 +5289,7 @@ zh_Hant:
   ecollege_file_description: Ecollege
   ecollege_name: "Ecollege 轉換器"
   edit_app_b0cc1c17: 編輯應用程式
+  edit_c5fbea07: 編輯
   edit_grading_scheme_53091236: 編輯評分配置
   edit_permissions_for_count_items_d65e3855: 
     one: "編輯 %{count} 個項目的權限"
@@ -5813,6 +5730,7 @@ zh_Hant:
   event_end_time_ef830e66: 事件結束時間
   event_start_time_441b491f: 事件開始時間
   everyone_854554dd: 每個人
+  everyone_else_6c6dc7b6: 其他所有人
   example_84698b7d: 範例
   example_final_score_355aff0f: 最終分數範例
   example_final_score_a92b30b9: "最終分數範例]]"
@@ -5826,6 +5744,7 @@ zh_Hant:
   expand_or_collapse_undated_items_b901de09: 展開或摺疊未注日期的項目
   expand_subdiscussion_cd226ed4: 展開分組討論
   expires_on_date_18efe4e2: 到期日期
+  export_de71cd8e: 匯出
   external_apps_f5490181: 外部應用程式
   external_content: 
     cancel: 
@@ -5980,8 +5899,6 @@ zh_Hant:
   feature_flags: 
     feature_flag: 
       allow: 允許
-      disabled: 已停用
-      enabled: 已啟用
       estimated_release: 估計發行：
       no_description: 無說明
       ? "off"
@@ -6251,7 +6168,6 @@ zh_Hant:
     only_one_folder: "無法設定資料夾路徑和資料夾 ID"
   for: 對於
   for_all_devices_1f603968: 針對所有設備
-  for_section_8503af93: 對於章節
   from_fdd4956d: 自
   from_from_to_to_e31f6422: "自 %{from} 至 %{to}"
   get_the_following_from_your_salesforce_connected_a_881fc9a3: 讓如下銷售人員連接應用程式
@@ -6265,7 +6181,10 @@ zh_Hant:
     invitation: 邀請
     question: 問題
     warning: 警告
+  google_docs_40374e65: "Google Docs"
   google_docs_domain_restriction_description: "Google Docs 網域限制允許 Google Docs 提交與協作被限制於單個網域。嘗試提交任務或加入未經批准的網域上的協作的學生將收到一條錯誤訊息，通知他們將需要更新其 Google Docs 整合。"
+  google_docs_preview_9f41b23c: "Google Docs 預覽"
+  google_drive_7cb003c9: "Google Drive"
   grade_display_warning_dialog: 
     grade_display_warning: 
       checkbox: 不再為此課程顯示。
@@ -6312,7 +6231,6 @@ zh_Hant:
     hide_all_details_button: 隱藏所有詳細資料
     mic_blocked_message: "已屏蔽麥克風使用權限。前往 chrome://settings/contentExceptions#media-stream 修改權限"
     mute_assignment: 靜音任務
-    new_assessment: "[新任務]"
     no_submission_time: 沒有提交時間
     nodetect_message: 未檢測到任何語音。您可能需要調整麥克風設定。
     not_graded: 未評分
@@ -6445,6 +6363,8 @@ zh_Hant:
       switch_to_percent: 切換至百分比
       switch_to_points: 切換至點
     ungraded: 不計入評分
+  gradebook_csvs: 
+    grades_filename: 成績
   gradebook_uploads: 
     new: 
       titles: 
@@ -6584,6 +6504,7 @@ zh_Hant:
       arrange_columns_by_due_date: 按截止日期排列欄
       arrange_columns_by_group: 按任務群組排列欄
       download_scores: 匯出
+      export_current_gradebook: 當前
       filter_by_student: "按學生名稱或助理 ID 篩選"
       grades: 成績
       hide_student_names: 隱藏學生名稱
@@ -6599,7 +6520,6 @@ zh_Hant:
     grades: 
       complete: 完成
       incomplete: 未完成
-    grades_filename: 成績
     grading_box_extended: 
       labels: 
         grade: 成績
@@ -6692,7 +6612,6 @@ zh_Hant:
         show_all_sections: 顯示所有章節
         submit_same_score: 為重新提交使用同樣的成績
       loading: 正在載入...
-      new_assessment_option: "[新任務]"
       no_annotation: 注釋不適用於本文件
       not_newest_notice: 注釋：這不是最近的提交件
       page_header_title: SpeedGrader
@@ -7282,7 +7201,6 @@ zh_Hant:
   if_you_ve_been_using_another_course_management_sys_67edfab1: "如果您已經使用了其他的課程管理系統，其中可能有您想移動至 Canvas 的資料。我們可以引導您輕鬆遷移您的內容到 Canvas 的過程。"
   ignore_91750df8: 忽略
   ignore_assignment_738b3c99: 忽略任務
-  ignore_forever_dd4a6cdf: 永遠忽略
   ignore_name_55edc6fe: "忽略 %{name}"
   ignore_these_3940f6f5: 忽略這些
   ignore_this_assignment_b7a71f80: 忽略此任務
@@ -7326,6 +7244,7 @@ zh_Hant:
     warnings: 
       truncated_wiki_title: "以下 Wiki 頁面的標題被截斷：%{title}"
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: 包含當發佈到您所在學校學生資訊系統上時該任務的評分
+  incorrect_username_and_or_password_2de73abb: 不正確的使用者名稱和/或密碼
   incremental_update_successfully_generated_against__db3f3f06: "增量更新針對之前的一個 SIS 匯入而成功生成。"
   info: 
     notices: 
@@ -7503,10 +7422,7 @@ zh_Hant:
   launch_url_e150bd41: "啟動 URL"
   layouts: 
     application: 
-      ? "User Research"
-      : 使用者研究
       bouncing_communication_channels: "您的聯絡方式可能存在問題。請檢查您的 *設定頁*。 "
-      by_instructure: "由 Instructure"
       group_switch: 切換
       javascript_required: "需要啟用 JavaScript，然後才能存取此網站。"
       keyboard_navigation: 
@@ -7515,7 +7431,6 @@ zh_Hant:
         close: 關閉
         dashboard: 我的儀表板
         skip_to_content: 跳到內容
-      open_source_learning_management_system: "開源 LMS"
     fixed_bottom: 
       masquerading: 
         stop: 停止偽裝
@@ -7535,6 +7450,7 @@ zh_Hant:
       log_in_to_canvas: "登入 Canvas"
     styleguide: 
       default_page_title: "Canvas LMS"
+  ldap_e1e0a916: LDAP
   learning_mastery_gradebook_description: 學習精通成績冊提供了一種方法，教師可以快速檢視課程的學習成果中的學生和課程進度。成果以成績冊般的形式呈現，學生的進步以數值評分顯示，以及以精通/接近精通/補修的形式顯示。
   learning_outcome: 
     no_comment: 無註解
@@ -7640,6 +7556,7 @@ zh_Hant:
   linked_assignment_message: "與任務「%{title}」連結"
   linked_discussion_topic_message: "與討論主題「%{title}」連結"
   linked_quiz_message: "與測驗「%{title}」連結"
+  linkedin_5726caca: LinkedIn
   links: 
     dashboard: 我的儀表板
     errors: 
@@ -7659,6 +7576,68 @@ zh_Hant:
   lock_until_date_62ce1b5c: 鎖定截止時間
   log_out_379ba28a: 登出
   logged_out_user: "已登出的使用者 %{user_counter}"
+  login: 
+    canvas: 
+      mobile_login: 
+        back_to_login: 返回登入
+        buttons: 
+          request_password: 要求密碼
+        dont_know_password: 我不知道我的密碼
+        log_in: 登入
+        login_handle: "輸入您的%{login_handle_name}，我們會向您傳送一個連結以更改您的密碼。"
+        password: 密碼
+        sending: 正在傳送...
+      new: 
+        back_to_login: 返回登入
+        browse_courses: 瀏覽課程
+        buttons: 
+          request_password: 要求密碼
+        coenrollment_banner: "*Canvas 使用者的家長？* **按一下此處以申請一個帳戶**"
+        dont_know_password: 不知道您的密碼？
+        labels: 
+          password: 密碼
+          remember_me: 保持登入
+        log_in: 登入
+        login_handle: "輸入您的%{login_handle_name}，我們會向您傳送一個連結以更改您的密碼。"
+        page_title: "登入 Canvas"
+        register_for_canvas: "*需要一個 Canvas 帳戶？* **按一下此處，它是免費的！**"
+    logout_confirm: 
+      cancel: 取消
+      details: 
+        log_out: "您確定要登出 Canvas？"
+      log_out: 登出
+      page_title: 登出
+    otp: 
+      errors: 
+        invalid_otp: 無效的驗證碼，請再試一次
+      new: 
+        buttons: 
+          send: 傳送
+          verify: 驗證
+        details: 
+          mfa_enrollment: "多因素驗證透過要求除了知道您的密碼，您還實際佔有某物，以便登入 Canvas，從而提高安全性。這可能是一個可以生成驗證碼的設備，或者一個可以接收簡訊的行動電話。針對 [iPhone](%{iphone_url}) 或 [Android](%{android_url}) 的 Google 驗證器應用程式可以透過過掃描以下的 QR 碼進行設定。其他權杖可以透過輸入金鑰**%{secret_key}**進行設定。"
+          mfa_required: 您需要設定多因素驗證。
+          otp_on_device: 請輸入您的權杖顯示的驗證碼。
+          otp_sent_to_phone: 驗證碼已傳送到您的行動電話。請在此輸入。
+          send_to_sms: "傳送簡訊至 %{phone_number}"
+        labels: 
+          carrier: 承運人
+          phone_number: 電話號碼
+          remember_me: 記住這台電腦
+          verification_code: 驗證碼
+        links: 
+          choose_number: 選擇一個現有行動電話
+        page_title: 多因素驗證
+        select: 
+          new_number: 新行動電話
+        titles: 
+          mfa: 多因素驗證
+    saml: 
+      debug: 
+        logout_request_redirect_from_idp: "接收到來自 IdP 的 LogoutRequest"
+        logout_response_redirect_from_idp: "接收到的來自 IdP 的 LogoutResponse"
+        logout_response_redirect_to_idp: "向 IdP 傳送 LogoutResponse"
+        redirect_from_idp: "接收到的來自 IdP 的 LogoutResponse"
   logo_a040ae0e: 標誌
   looks_great_e4d883ed: 看上去非常棒！
   low_score_4eeb95b2: "低：%{score}"
@@ -9394,6 +9373,13 @@ zh_Hant:
         subject: "網路會議邀請：%{name}"
       twitter: 
         tweet: "Canvas 警示 – 邀請：參加 %{title}，%{name}"
+    web_conference_recording_ready: 
+      email: 
+        details_link: "您可以在此處查看詳細資料：%{link}"
+        html: 
+          details_link: 按一下此處以查看詳細資料
+      sms: 
+        link_message: "在 %{url} 上有更多資訊"
   migration: 
     announcement_type: 宣告
     assignment_group_type: 任務群組
@@ -9571,6 +9557,7 @@ zh_Hant:
   more_courses_5ebbe998: 更多課程
   most_recent_score_13a87e8c: 最近的分數
   most_recent_score_counts_as_75_of_mastery_weight_a_f1e3e6c2: "大部分近期分數占 75% 的精通分數權重，所有其他分數的平均分占 25% 的權重。"
+  move_abf00365: 移動
   move_dialog: 
     cancel: 取消
     save: 儲存
@@ -9580,6 +9567,8 @@ zh_Hant:
     move_to_end: "-- 在底部 --"
   move_outcome_ce497e6c: 移動成果
   move_outcome_group_cfa1a505: 移動成果群組
+  moving_a4d552df: 正在移動…
+  multi_factor_authentication_configured_865b1bde: 多因素驗證已設定
   must_achieve_mastery_at_least_2_times_must_also_co_b2ae7688: "必須至少 2 次達到精通水平。還必須完成兩個計算項目。高於精通水平的分數將求取平均分以計算最終分數。"
   must_achieve_mastery_at_least_2_times_scores_above_57077a88: "必須至少 2 次達到精通分數。高於精通分數的分數將求取平均分，以計入最終分數。"
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "必須提供「檔案 ID」和/或「檔案 ID」參數 "
@@ -9622,6 +9611,8 @@ zh_Hant:
   no_e16d9132: 否
   no_grading_schemes_to_display_8b0e92e7: 沒有可顯示的評分配置
   no_migration_file: 內容遷移所需的檔案。
+  no_password_was_given_472222e5: 沒有提供密碼
+  no_results_found_58717065: 找不到結果
   no_score_yet_c94e919b: 尚無分數
   no_students_have_taken_the_quiz_yet_e667644b: 還沒有學生參加該測驗
   no_students_have_taken_the_survey_yet_d378cd35: 還沒有學生參加該調查
@@ -9855,6 +9846,7 @@ zh_Hant:
       admin: 管理
       alerts: 警示
       communication: 交談
+      conferences: 會議
       course: 課程活動
       discussions: 討論
       groups: 群組
@@ -10097,7 +10089,6 @@ zh_Hant:
     everyone_else: 其他所有人
     overrides: 
       everyone: 每個人
-      everyone_else: 其他所有人
   own_copyright_cc59db55: 自有版權
   page_comment: 
     default_user_name: 匿名
@@ -10832,6 +10823,7 @@ zh_Hant:
     yo_select: 
       yo: Yo
     you_have_no_services: 您還沒有註冊任何服務，您可以在*設定*頁面新增一些。
+  profile_6bd2baed: 個人檔案
   profiles: 
     avatar_dialog: 
       from_gravatar: "來自 Gravatar"
@@ -10870,70 +10862,7 @@ zh_Hant:
       too_long: "不能超過 %{max} 個字元"
       too_short: "必須至少為 %{min} 個字元"
   pseudonym_sessions: 
-    debug: 
-      logout_redirect: "LogoutRequest 發送至 IdP"
-      logout_request_redirect_from_idp: "接收到來自 IdP 的 LogoutRequest"
-      logout_response_redirect_from_idp: "接收到的來自 IdP 的 LogoutResponse"
-      logout_response_redirect_to_idp: "向 IdP 傳送 LogoutResponse"
-      redirect_from_idp: "接收到的來自 IdP 的 LogoutResponse"
     default_app_name: 第三方應用程式
-    errors: 
-      blank_password: 沒有提供密碼
-      invalid_credentials: 不正確的使用者名稱和/或密碼
-      invalid_otp: 無效的驗證碼，請再試一次
-      login_error: "登入 %{institution} 時出現問題"
-      login_errors: 
-        no_config_for_id: "該 Canvas 帳戶沒有具有該 ID 的驗證設定"
-        no_idp_set: 您登入的機構未在該帳戶中設定。
-        unrecognized_idp: "Canvas 未能識別您的身份識別提供者"
-      logout_errors: 
-        no_idp_found: "Canvas 無法讓您登出您的身份識別提供者"
-      max_attempts: 太多失敗的登入嘗試。請稍後再試或者聯繫您的系統管理員。
-      no_matching_user: "Canvas 沒有下述使用者的帳戶：%{user}"
-      user_deleted: 該使用者帳戶已被刪除。請與您的系統管理員連絡，以將帳戶重新啟動。
-    logout_confirm: 
-      cancel: 取消
-      details: 
-        log_out: "您確定要登出 Canvas？"
-      log_out: 登出
-      page_title: 登出
-    mobile_login: 
-      back_to_login: 返回至登入
-      buttons: 
-        request_password: 要求密碼
-      dont_know_password: 我不知道我的密碼
-      log_in: 登入
-      login_handle: "請輸入您的 %{login_handle_name}，我們會向您傳送一個連結用於更改您的密碼。"
-      password: 密碼
-      sending: 正在傳送...
-    new: 
-      page_title: "登入 Canvas"
-    notices: 
-      mfa_complete: 多因素驗證已設定
-    otp_login: 
-      buttons: 
-        send: 傳送
-        verify: 驗證
-      details: 
-        mfa_enrollment: "多因素驗證透過要求除了知道您的密碼，您還實際佔有某物，以便登入 Canvas，從而提高安全性。這可能是一個可以生成驗證碼的設備，或者一個可以接收簡訊的行動電話。針對 [iPhone](%{iphone_url}) 或 [Android](%{android_url}) 的 Google 驗證器應用程式可以透過過掃描以下的 QR 碼進行設定。其他權杖可以透過輸入金鑰**%{secret_key}**進行設定。"
-        mfa_required: 您需要設定多因素驗證。
-        otp_on_device: 請輸入您的權杖顯示的驗證碼。
-        otp_sent_to_phone: 驗證碼已傳送到您的行動電話。請在此輸入。
-        send_to_sms: "傳送簡訊至 %{phone_number}"
-      labels: 
-        carrier: 承運人
-        phone_number: 電話號碼
-        remember_me: 記住這台電腦
-        verification_code: 驗證碼
-      links: 
-        choose_number: 選擇一個現有行動電話
-      page_title: 多因素驗證
-      select: 
-        new_number: 新行動電話
-      titles: 
-        mfa: 多因素驗證
-    password_confirmation_error: 傳送要求時發生錯誤。
-    password_confirmation_sent: 密碼確認已傳送。請務必檢查您的垃圾郵件箱。
   pseudonyms: 
     confirm_change_password: 
       buttons: 
@@ -11865,7 +11794,6 @@ zh_Hant:
         new_discussion: 新討論
         one_question_at_a_time: 每次顯示一個問題
         one_time_results: 每次嘗試之後僅一次
-        only_visible_to_overrides_note: 注：此測驗**僅**對下麵指定的章節可見：
         points_possible: "點 %{n}"
         post_to_sis: "公佈成績至 SIS"
         quiz_access_code: 需要存取代碼
@@ -12341,7 +12269,6 @@ zh_Hant:
     move_success: 
       one: "%{count} 個項目移動到 %{destinationFolder}"
       other: "%{count} 個項目移動到 %{destinationFolder}"
-    moving: 正在移動…
     name: 名稱
     progress_error: 嘗試準備下載時發生錯誤，請再試一次。
     progress_message: "準備下載：%{percent}% 完成"
@@ -12418,6 +12345,7 @@ zh_Hant:
   remove_recipient_name_a6b83cef: "移除收件人 %{name}"
   remove_row_c198da5a: 移除行
   remove_row_f9d59cba: 移除行
+  remove_these_dates_48453a81: 移除這些日期
   rename_45608f54: 重命名
   reply_from_name: "%{name} 透過 Canvas 通知"
   reply_to_comment_72d96728: 回復評論
@@ -13040,6 +12968,11 @@ zh_Hant:
     canvas-user-nav: 
       navigation: 
         user_menu: 使用者功能表
+    canvas_footer: 
+      ? "User Research"
+      : 使用者研究
+      by_instructure: "由 Instructure"
+      open_source_learning_management_system: "開源 LMS"
     components: 
       ic_submission-download-dialog: 
         click_to_download: 按一下此處下載
@@ -13229,21 +13162,6 @@ zh_Hant:
     locale_warning: 
       crowdsourced_warning_message: "您所選擇的語言透過眾包翻譯。Instructure 沒有檢閱或驗證翻譯的準確性，並就您對此語言設定的使用不承擔任何責任。請您自行決定使用。"
       crowdsourced_warning_title: 眾包語言
-    login: 
-      back_to_login: 返回登入
-      browse_courses: 瀏覽課程
-      buttons: 
-        request_password: 要求密碼
-      coenrollment_banner: "*Canvas 使用者的家長？* **按一下此處以申請一個帳戶**"
-      default_login_message: 登入您的機構
-      dont_know_password: 不知道您的密碼？
-      labels: 
-        password: 密碼
-        remember_me: 保持登入
-      log_in: 登入
-      login_at_account: "登入%{school_name}"
-      login_handle: "輸入您的%{login_handle_name}，我們會向您傳送一個連結以更改您的密碼。"
-      register_for_canvas: "*需要一個 Canvas 帳戶？* **按一下此處，它是免費的！**"
     menu_assignment: 
       labels: 
         due: 截止日期
@@ -13517,7 +13435,6 @@ zh_Hant:
       grading_alt: 評分
       submission_comment: 提交件註解
     terms_required: 
-      terms_have_changed: "*使用條款*發生了變化。請花一點時間檢閱其，然後再繼續使用 Canvas。"
       updated_terms_of_use: 已更新的使用條款
     unauthorized: 
       headings: 
@@ -13533,8 +13450,6 @@ zh_Hant:
         unauthorized_action: 未授權
       unauthorized_1: 看來您沒有權限存取此頁面。請確保您已被授權檢視此內容。
       unauthorized_2: 如果您認為您應該能夠檢視此頁面，請使用『説明』連結，以通知問題的支援部。
-      unauthorized_action: "您需要 登入，然後才可以檢視此頁面。"
-      unauthorized_user: "%{user_name}，您需要先登入，然後才可以檢視該頁面。如果您忘記或不知道您的密碼，按一下『忘記密碼』。"
       unauthorized_user_is_other: "%{current_user}，您無權檢視該頁面。您來到此處所跟隨的連結是針對**%{unauthorized_user} (%{unauthorized_user_email})**的。如果這是您，您可能想登出並使用該電子郵件地址重新登入，以獲得存取此页面的權限。"
     unauthorized_feed: 
       bad_params: 您試圖存取的摘要的參數是無效的。
@@ -13738,6 +13653,7 @@ zh_Hant:
       users_matching_label: 使用者相符
   skipped_file_filename_due_to_error_94f0194: "由於錯誤，跳過文件 %{filename}"
   skipping_unknown_file_type_cd1086ee: 跳過未知檔案類型
+  skype_18850ba7: Skype
   slideshow: 
     titles: 
       back: 返回
@@ -13759,6 +13675,7 @@ zh_Hant:
       submitted: "*已提交：* %{submittedAt}"
   spreadsheet_6d622119: 試算表
   sr_gradebook: 
+    all_grading_periods: 所有評分時段
     all_sections: 所有章節
     assignment_muted: 按一下以取消靜音。
     assignment_order_alpha: 按字母順序
@@ -14031,6 +13948,7 @@ zh_Hant:
     files: 檔案
     grades: 成績
     home: 首頁
+    logout: 登出
     modules: 模組
     observees: 觀察
     outcomes: 結果
@@ -14105,6 +14023,7 @@ zh_Hant:
       timespan: "%{start_at} *至* %{end_at}"
   text_document_eacbcdb7: 文字文件
   text_entry_submission_cannot_be_empty_3d187cae: 文字輸入的提交不能為空白
+  that_user_account_has_been_deleted_please_contact__350e0e0: 該使用者帳戶已被刪除。請與您的系統管理員連絡，以將帳戶重新啟動。
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "匯報用戶所屬帳戶的帳戶 ID"
   the_app_was_activated_a84e055f: 應用程式已激活
   the_app_was_added_58e2836a: 該應用程式已添加
@@ -14117,6 +14036,7 @@ zh_Hant:
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "帳戶實例的完整主機名稱 (例如，something.instructure.com)"
   the_grading_period_was_deleted_7814a349: 評分時段已刪除
   the_grading_period_was_saved_4a504c5: 評分時段已保存
+  the_institution_you_logged_in_from_is_not_configur_5ceac41: 您登入的機構未在該帳戶中設定。
   the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "Canvas 右上角標題中的標誌影像。200x200 svg 或 png"
   the_material_is_in_the_public_domain_279c39a3: 該材料在公用網域中。
   the_material_is_licensed_under_creative_commons_3242cb5e: 該材料在創意共享項下獲得授權
@@ -14137,6 +14057,7 @@ zh_Hant:
     other: "列表中有 %{count} 個結果"
   there_was_a_problem_deleting_the_grading_period_50ce07c5: 刪除評分時段時遇到問題
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: 在刪除評分配置時發生了一個問題
+  there_was_a_problem_logging_in_at_institution_5a298155: "登入 %{institution} 時出現問題"
   there_was_a_problem_saving_the_grading_period_243bed6c: 在保存評分時段時出現了一個問題
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: 在儲存評分配置時發生了一個問題
   there_was_an_error_in_processing_your_request_6513a49a: 處理您的要求時發生錯誤
@@ -14371,6 +14292,7 @@ zh_Hant:
   to_minscore_43e5452e: "至 %{minScore}%"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "要檢視任務，請確保 *議程* 檢視處於活動狀態。"
   tolerance_value_9e96573c: 公差值
+  too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: 太多失敗的登入嘗試。請稍後再試或者聯繫您的系統管理員。
   too_many_members_b8b15069: 成員太多
   tooltips: 
     finished: 已完成
@@ -14398,8 +14320,10 @@ zh_Hant:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "重新提交至 Turnitin"
+  twitter_fcef6b54: Twitter
   unable_to_remove_app_4293cb53: 無法移除應用程式
   unarchive_selected_e0c4bd3d: 已選取消存檔
+  unauthorized: 未授權
   unchanged_aca18e02: "[不變]"
   ungraded_submissions_44efb0ec: 未評分的提交件
   ungraded_survey_ad7de790: 未評分的調查
@@ -14447,8 +14371,8 @@ zh_Hant:
       terms: 您必須同意條款
       too_long: "不能超過 %{max} 個字元"
     registration: 
-      agree_to_terms_and_privacy_policy: 您同意*使用條款*並承認**隱私權政策**。
       agree_to_terms_with_code_of_conduct: 您同意*使用條款*和**管理辦法**。
+  user_avatars_e4fc4ed3: 使用者頭像
   user_date_range_search: 
     cant_be_blank: "Canvas 使用者 ID 不能為空。"
     cant_come_before_from: 「終止日期」不能在「開始日期」之前
@@ -14714,11 +14638,6 @@ zh_Hant:
           您將能夠進行任何操作，就好像您就是此使用者，並且其他使用者也會認為是此使用者執行了操作。然而，審計日誌會記錄事實，即**您**是代表此使用者實際執行操作的人。
       masquerade_as: "偽裝成 %{user_name}"
       page_title_header: 非授權使用者
-    merge: 
-      login_to_merge_different_account: "要將帳戶 %{current_user_name} (%{current_user_email}) 合併進另一個帳戶，請登入新帳戶："
-      merge_definition: 由於這樣或者那樣的原因，您可能最終有兩個登入，而不是只有一個。如果發生這種情況，您可以將兩個登入合併在一起，以及合併來自它們的資訊。
-      titles: 
-        merge_accounts: 合併使用者帳戶
     merge_results: 
       action: 操作
       emails: 電子郵件
@@ -14915,10 +14834,6 @@ zh_Hant:
       delete_wiki: 刪除
       labels: 
         front_page: 標題版
-      page_locked: 此頁面已鎖定
-      page_locked_by_modules: 一旦您完成了如下這些模組，此頁面即可用：
-      page_locked_by_modules_until: "如果您完成了如下這些模組，此頁面將於 %{lock_info.unlock_at} 可用："
-      page_locked_until: "此頁面將於 %{lock_info.unlock_at} 可用"
       published_indicator: 已發佈
       toolbar_menu: 
         settings: 設定
@@ -15038,6 +14953,7 @@ zh_Hant:
   would_you_like_to_enable_this_app_ccdf735d: 是否要啟用此應用程式？
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: 您要讓學生繼續學習該課程，還是希望重新鎖定這些模組，直至新要求設定完畢？
   xml_configuration_5ea1b942: "XML 配置"
+  yo_e4ee15a4: Yo
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "您使用您來自 %{institution2} 的認證登入了 %{institution1} "
   you_are_subscribed_and_will_be_notified_of_new_com_60b5b62b: 您接受訂閱，并將被告知以新的評論。點擊以退訂
   you_are_the_group_leader_for_this_group_b8629b70: 您是本群組的群組領導者
@@ -15062,7 +14978,6 @@ zh_Hant:
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "您的任務列表現在可以在 *月曆* 頁面上找到。"
   your_assignments_list_has_improved_3eded80e: "您的 *任務* 列表已改進！"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: 您的任務將顯示在此處，按截止日期列出。
-  your_browser_does_not_meet_the_minimum_requirement_7a7022db: "您的瀏覽器不符合 Canvas 的最低要求。請瀏覽*CanvasGuides*，以查看受支持的瀏覽器的完整清單。"
   your_content_has_been_exported_bbb57764: 您的內容已匯出。
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: "您的檔案正被上傳到成績冊，您可以在任何時候離開這個頁面。如果您又一個大的 CSV 文件，您的更改可能需要幾分鐘來更新。為了避免覆蓋任何數據，請在進行任何額外更改之前確認上傳已完成而且您的成績冊是正確的。"
   your_message_has_been_sent_thank_you_e0284316: 您的訊息已發送。謝謝您！
