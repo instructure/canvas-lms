@@ -74,18 +74,6 @@ pt-BR:
         api_url: "URL do API"
         common_core_guid: "GUID fundamental comum (opcional)"
   account: 
-    account_settings: 
-      account_surveys: "Questionários de conta"
-      avatars: "Usar avatar"
-      delicious: Delicious
-      diigo: Diigo
-      google_docs: "Google Docs"
-      google_docs_preview: "Visualização do Google Docs"
-      google_drive: "Google Drive"
-      linked_in: LinkedIn
-      skype: Skype
-      twitter: Twitter
-      yo: Yo
     ask_canvas_network: "Perguntar à Comunidade da Rede Canvas"
     default_account_name: "Conta padrão"
     default_site_administrator_account_name: "Administrador do site"
@@ -118,60 +106,46 @@ pt-BR:
     tab_users: Usuários
     turnitin_pledge: "Esta tarefa enviada é meu trabalho próprio e original"
   account_authorization_config: 
-    debug: 
-      wait_for_login: "Aguardando tentativa de login"
     default_delegated_login_handle_name: Login
     default_login_handle_name: Email
-    saml_eppn_domain_stripped: "%{eppn} (domínio removido)"
+  account_authorization_config/ldap: 
     test_bind_failed: "Falha na circulação com o seguinte erro: %{error}"
     test_connection_timeout: "Tempo limite excedido ao conectar"
     test_host_unknown: "Host desconhecido: %{host}"
     test_login_auth_exception: "Exceção durante o login: %{error}"
     test_login_auth_failed: "Falha na autenticação"
     test_search_failed: "Falha na busca com o seguinte erro: %{error}"
+  account_authorization_config/saml: 
+    debug: 
+      logout_redirect: "LogoutRequest enviado para IdP"
+      wait_for_login: "Aguardando tentativa de login"
+    saml_eppn_domain_stripped: "%{eppn} (domínio removido)"
   account_authorization_configs: 
     account_required: "deve ter autenticação LDAP"
-    cas_settings: 
+    cas_fields: 
       labels: 
         auth_base: "URL do CAS"
-        auth_type: Tipo
-        login_handle_name: "Rótulo de login"
         unknown_user_url: "URL de usuário desconhecido"
-      login_handle_name_description: "O rótulo usado para identificadores exclusivos de login. Exemplos: Login, nome de usuário, ID do aluno, etc."
-      save_button: "Salvar configurações de autenticação"
       unknown_user_url_description: "A URL para redirecionar quando um usuário autenticado não é encontrado no Canvas"
+    form_footer: 
+      labels: 
+        position: Posição
+      save_button: "Salvar configurações de autenticação"
+    form_header: 
+      auth_type_label: Tipo
+      auth_url: "URL de login para esta configuração"
     index: 
       add_auth_desc: "Adicionar um provedor de identidade a esta conta:"
-      canvas_login_tip: |-
-          Se ajustar configurações que façam com que você não possa fazer o login, você poderá adicionar
-            *%{url1}* ao final da sua URL de login. Isto permitirá que você faça o login
-            usando o procedimento normal de login do Canvas. Para esta conta a URL seria %{url2}
       choose_auth_type_option: "Escolha um serviço de autenticação"
       current_settings_title: "Integração atual"
       delete_auth_confirmation: "Você tem certeza? Os usuários poderão não conseguir fazer o login se isto for removido."
-      delete_auth_link: "Remover autenticação"
-      edit_auth_link: "Editar detalhes"
       ip_address_list_description: "Se estiver usando um serviço de autenticação que exige que os servidores do Canvas entrem em contato com seus servidores diretamente, como LDAP, será necessário assegurar que seus servidores possam aceitar conexões destes endereços IP:"
       no_auth_type_description: "Esta conta não está integrada com um provedor de identidade no momento."
       page_title: "Configurações de autenticação"
       profile_page_link_example: "Por exemplo, esta é sua página de perfil: [%{friendlyname}](%{url})"
       settings_description: "Para que um usuário faça a autenticação através de um provedor de identidade externo (IdP), ele deve ter um identificador de login que esteja vinculado a esta conta e que corresponda ao identificador exclusivo retornado pelo IdP. Para ver os logins atuais do usuário, veja a seção \"Informações de login\" na página de perfil do usuário. (Encontrado através da busca do usuário na guia \"Usuários\".)"
       settings_title: "Configurações de autenticação"
-      test_ldap_link: "Autenticação do teste"
-    ldap_settings: 
-      add_secondary_ldap_server_link: "Adicionar servidor LDAP secundário"
-      auth_type_label: Tipo
-      change_password_url_help: "Deixar em branco para comportamento padrão do Canvas"
-      change_password_url_not_specified: "Nenhum especificado"
-      labels: 
-        change_password_url: "URL de Esqueci a senha"
-        login_handle_name: "Rótulo de login"
-      login_handle_name_description: "O rótulo usado para identificadores exclusivos de login. Exemplos: Login, nome de usuário, ID do aluno, etc."
-      remove_secondary_ldap_link: (Remover)
-      save_button: "Salvar configurações LDAP"
-      secondary_ldap_label: "LDAP secundário"
-      setting_type_ldap: LDAP
-    ldap_settings_fields: 
+    ldap_fields: 
       auth_filter_description: "Use *%{placeholder}* como placeholder do nome de usuário fornecido pelo usuário. Por exemplo: *(sAMAccountName=%{placeholder})*"
       auth_password_description: "Deixe em branco para continuar usando a senha atual."
       identifer_format_description: "O atributo LDAP a ser utilizado para procurar o login Canvas. Deixar em branco para utilizar o nome de usuário fornecido pelo usuário."
@@ -187,9 +161,8 @@ pt-BR:
         auth_port: Porta
         auth_username: "Nome de Usuário"
         identifier_format: "Atributo de ID de login"
-        no_tls: "Nenhum TLS"
-        simple_tls: "TLS simples"
-        start_tls: "Iniciar TLS"
+      last_ldap_timeout_failure: "Última falha de tempo limite"
+      ldap_timeout_failure_help2: "Se o tempo de comunicação entre o Canvas e o servidor LDAP expirar várias vezes, o Canvas bloqueará tentativas de login posteriores de usar esse servidor LDPA por %{time}."
     ldap_settings_test: 
       labels: 
         pass: Senha
@@ -217,50 +190,27 @@ pt-BR:
       test_ldap_search_help_fixes_3: "Verifique se o objeto do usuário no LDAP tem privilégios de pesquisa para a base de pesquisa fornecida."
       test_ldap_search_help_header: "O Canvas não consegue pesquisar sua instância LDAP"
       test_ldap_search_label: "Testando a pesquisa LDAP..."
-    ldap_timeout_error: 
-      last_ldap_timeout_failure: "Última falha de tempo limite"
-      ldap_timeout_failure_help2: "Se o tempo de comunicação entre o Canvas e o servidor LDAP expirar várias vezes, o Canvas bloqueará tentativas de login posteriores de usar esse servidor LDPA por %{time}."
     login_required: "deve ser fornecido"
     no_changing_auth_types: "Não é possível alterar tipo de configuração de autorização. Exclua e crie uma nova configuração."
-    no_discovery_url: "Nenhuma configuração"
     password_required: "deve ser fornecido"
-    saml_required: "A configuração SAML é necessária para realizar teste SAML"
-    saml_settings: 
-      auth_type: Tipo
-      auth_url: "URL de login para esta configuração"
-      certificate_fingerprint: "Impressão digital certificada"
-      change_password_url: "Alterar link da senha"
-      discovery_url: "URL de descoberta:"
-      discovery_url_description: "Se uma URL de descoberta estiver configurado, o Canvas encaminhará todos os usuários para aquela URL quando eles precisarem ser autenticados. Portanto, aquela página terá de ajudar os usuários a descobrirem aonde precisam ir para fazer login. Se nenhuma URL de descoberta estiver configurado, a primeira configuração de SAML será utilizada para tentar autenticar os usuários."
-      identifier_format: "Formato do identificador"
-      idp_entity_id: "ID de entidade IdP"
+    saml_fields: 
       labels: 
         certificate_fingerprint: "Impressão digital certificada"
-        change_password_url: "Alterar link da senha"
         identifier_format: "Formato do identificador"
         idp_entity_id: "ID de entidade IdP"
         log_in_url: "URL de log on"
         log_out_url: "URL de log out"
         login_attribute: "Atributo do Login"
-        login_handle_name: "Rótulo de login"
-        position: Posição
         requested_authn_context: "Contexto da autenticação"
         unknown_user_url: "URL de usuário desconhecido"
-      log_in_url: "URL de log on"
-      log_out_url: "URL de log out"
-      login_attribute: "Atributo do Login"
-      login_handle_name: "Rótulo de login"
-      login_handle_name_description: "O rótulo usado para identificadores exclusivos de login. Exemplos: Login, nome de usuário, ID do aluno, etc."
-      no_discovery_url: "Nenhuma configuração"
-      position: Posição
+      unknown_user_url_description: "A URL para redirecionar quando um usuário autenticado não é encontrado no Canvas"
+    saml_required: "A configuração SAML é necessária para realizar teste SAML"
+    saml_settings_test: 
       refresh_debugging: Atualizar
-      requested_authn_context: "Contexto da autenticação"
       saml_debug_instructions: "Uma vez iniciada a depuração de todas as informações sobre a próxima tentativa de login SAML, o login será coletado. Clique em \"Atualizar\" para ver se mais dados foram coletados ou \"Parar depuração\" para limpar os dados coletados e parar a tentativa de depuração atual."
-      saml_debugging: Depuração
-      save_button: "Salvar configurações de autenticação"
+      saml_required: "A configuração SAML é necessária para realizar teste SAML"
       start_debugging: "Iniciar Depuração"
       stop_debugging: "Parar Depuração"
-      unknown_user_url_description: "A URL para redirecionar quando um usuário autenticado não é encontrado no Canvas"
     saml_testing: 
       auth_request_to_idp: "AuthnRequest enviado para ldP"
       auth_response_from_idp: "AuthnResponse de ldP"
@@ -289,7 +239,12 @@ pt-BR:
         to_idp_xml: "XML do LoginRequest enviado para IdP"
       logout_request_to_idp: "LogoutRequest enviado para IdP"
       logout_response_from_idp: "LogoutResponse de IdP"
-      saml_required: "A configuração SAML é necessária para realizar teste SAML"
+    sso_settings_form: 
+      change_password_url_help: "Deixar em branco para comportamento padrão do Canvas"
+      labels: 
+        change_password_url: "URL de Esqueci a senha"
+        login_handle_name: "Rótulo de login"
+      login_handle_name_description: "O rótulo usado para identificadores exclusivos de login. Exemplos: Login, nome de usuário, ID do aluno, etc."
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "O tempo de finalização da notificação de conta precede o tempo de início"
@@ -392,6 +347,7 @@ pt-BR:
     report_header_user__id: user_id
     report_header_user_id: "id do usuário"
     report_header_user_name: "nome do usuário"
+    report_header_user_short_name: short_name
     report_header_user_sis_id: "id do sis do usuário"
     report_header_xlist_course_id: xlist_course_id
     sis_exporter: 
@@ -421,6 +377,7 @@ pt-BR:
       open_registration_delegated_warning_dialog: "Provedor de identidade externa ativado"
       what_are_quiz_ip_filters: "O que são filtros de IP de teste?"
     user: Usuário
+  account_surveys_b0039876: "Questionários de conta"
   account_user: 
     types: 
       account_admin: "Administrador de conta"
@@ -451,16 +408,13 @@ pt-BR:
         sis_user_id: "ID do SIS"
         sortable_name: "Nome ordenável"
       sortable_name_help: "Este nome aparece em listas ordenadas."
-      unique_id_label: "%{label}:*"
     add_user_button: "Adicionar usuário"
     add_user_dialog_title: "Adicionar um novo usuário"
     adding_course_message: "Adicionando curso..."
     adding_user_message: "Adicionando usuário..."
     additional_settings: 
-      account_domains: "Domínios de conta"
       account_status: "Status da conta"
       add_new_domain: "Adicionar um novo domínio"
-      external_status: "Status externo"
       license: Licença
       license_type: "Tipo de licença"
       new_account_domain_title: "Novo domínio de conta"
@@ -1287,6 +1241,7 @@ pt-BR:
   activity_13915493: Atividade
   activity_by_category_9c2033d1: "Atividade por categoria"
   activity_by_date_878c5b49: "Atividade por data"
+  add_8523c19b: Adicionar
   add_app_baf540f: "Adicionar aplicativo"
   add_attachment_93868828: "Adicionar anexo"
   add_course_assignments_628ed6d0: "Adicionar tarefas do curso"
@@ -1453,7 +1408,6 @@ pt-BR:
       invalid_external_tool: "Não foi possível encontrar configurações válidas para este link"
       invalid_external_tool_id: "Não foi possível encontrar configurações válidas para esta ferramenta"
       invalid_feed_parameters: "Parâmetros de feed inválidos."
-      invalid_oembed_url: "Houve um problema com a recuperação deste recurso. A ferramenta externa forneceu informações inválidas sobre o recurso."
       invalid_tag_type: "O tipo de item para este tag não foi reconhecido"
       invalid_verification_code: "O código de verificação é inválido."
       mismatched_verification_code: "O código de verificação não corresponde a nenhum usuário inscrito atualmente."
@@ -1484,6 +1438,7 @@ pt-BR:
         suspended: "Instituição suspensa"
     wiki_front_page_default_content_course: "Bem-vindo ao wiki do seu novo curso!"
     wiki_front_page_default_content_group: "Bem-vindo ao wiki do seu novo grupo!"
+  apply_781a2546: Aplicar
   appointment_group: 
     errors: 
       invalid_end_at: "Hora de término de compromisso precede hora de início"
@@ -1744,12 +1699,6 @@ pt-BR:
       one: "Eliminar a pontuação mais baixa"
       other: "Eliminar as pontuações %{count} mais baixas"
     drop_lowest_scores: "Eliminar as %{number} pontuações mais baixas"
-    due_date_override: 
-      overrides: 
-        available_from: "Disponível de"
-        due_date: "Data de entrega"
-        for: Para
-      until: Até
     due_date_view: 
       overrides: 
         remove_these_dates: "Remover essas datas"
@@ -1771,7 +1720,6 @@ pt-BR:
       description: Descrição
       freeze_properties: "Bloquear as propriedades da tarefa quando copiada"
       notify_content_change: "Notificar os usuários que esse conteúdo foi alterado"
-      only_visible_to_overrides_note: "Observação: essa tarefa *apenas* está visível para as seções especificadas abaixo:"
       points_possible: Pontos
       post_to_sis: "Inclua as notas desta tarefa ao postar o Sistema de Informações do Aluno de sua escola"
       warnings: 
@@ -2218,6 +2166,7 @@ pt-BR:
   available_from_587ce92f: "Disponível de"
   available_from_date_43b5e11d: "Disponível a partir da data"
   available_from_date_afc594fa: "Disponível a Partir da Data:"
+  available_from_f84e4611: "Disponível de"
   available_until_date_2c0ccec3: "Disponível Até a Data::"
   available_until_date_cd125c62: "Disponível até a data"
   available_until_f3b9c4ed: "Disponível até"
@@ -2692,30 +2641,9 @@ pt-BR:
     ics_title: "%{course_or_group_name} Calendário (Canvas)"
     invalid_date_or_time: "Data inválida ou datetime inválido para %{attr}"
   calendars: 
-    assignment_details: "Detalhes da tarefa"
-    default_title: evento
     event: 
       due: vencimento
       event_title: "vencimento: %{event_title}"
-    event_details: "Detalhes do evento"
-    feed_dialog_title: "Feed do calendário"
-    keycodes: 
-      delete: d
-      edit: e
-      new: "n"
-      next_day: ctrl+direita
-      next_event: j
-      next_week: ctrl+baixo
-      open: o
-      previous_day: ctrl+esquerda
-      previous_event: k
-      previous_week: ctrl+cima
-      refresh: r
-    notices: 
-      event_moved: "%{event} foi movido para %{day}"
-    prompts: 
-      delete_assignment: "Tem certeza que deseja excluir esta tarefa?"
-      delete_event: "Tem certeza que deseja excluir este evento?"
     show2: 
       calendar_feed: "Feed do calendário"
       calendar_feed_instructions: "Copie o link abaixo e cole em qualquer aplicativo de calendário que use feeds iCal (Google Calendar, iCal, Outlook, etc.)"
@@ -2729,11 +2657,6 @@ pt-BR:
       toggle_calendars: "Ligar calendários"
       toggle_undated_items: "Ligar itens não datados"
       undated_items: "Itens não datados"
-    titles: 
-      add_new_assignment: "Adicionar nova tarefa"
-      add_new_event: "Adicionar novo evento"
-      edit_assignment: "Editar tarefa"
-      edit_event: "Editar evento"
     wizard_box: 
       descriptions: 
         assignment: "Legal. Agora, clique na guia \"Tarefa\" no diálogo para criar uma tarefa ao invés de um evento do calendário."
@@ -2782,6 +2705,8 @@ pt-BR:
   canvas_cartridge_display: "Common Cartridge do Canvas"
   canvas_cartridge_file_description: "Pacote de exportação de curso do Canvas"
   canvas_cartridge_name: "Importador Canvas Cartridge"
+  canvas_did_not_recognize_your_identity_provider_cb0e50fc: "O Canvas não reconheceu seu provedor de identidade"
+  canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "O Canvas não tem uma conta para o usuário: %{user}"
   canvas_error_report_ff678539: "Relatório de Erros do Canvas"
   canvas_revision_unknown: Desconhecido
   canvas_ticketing_email_connector_27e253ae: "Conector de Emails de Gerenciamento de Incidentes do Canvas"
@@ -2840,7 +2765,7 @@ pt-BR:
         cancel: Cancelar
         update: "Atualizar colaboração"
       labels: 
-        description: Descrição
+        description: "Descrição:"
         title: "Título da colaboração"
     errors: 
       cannot_load_collaboration: "Não foi possível carregar colaboração"
@@ -2871,7 +2796,7 @@ pt-BR:
             **Aviso**: você (e todos os seus colaboradores) precisarão de uma conta no Google para poder participar em qualquer colaboração no Google Docs.
       labels: 
         collaboration_type: "Colabore usando:"
-        description: Descrição
+        description: "Descrição:"
         document_name: "Nome do documento"
       messages: 
         delete_google_doc_as_well: "Esta colaboração está sendo armazenada como um Google Doc. Você deseja excluí-la apenas do Canvas, ou também remover do Google Docs?"
@@ -3055,6 +2980,7 @@ pt-BR:
   config_url_e96ceaf3: "URL de configuração"
   configurate_tool_app_5a721f2c: "Configurar aplicativo %{tool}?"
   configuration_type_25a084a4: "Tipo de configuração"
+  configure_ecb97e30: Configurar
   configure_toolname_app_651371be: "Configurar aplicativo %{toolName}"
   confirm_dialog: 
     cancel: Cancelar
@@ -3086,7 +3012,7 @@ pt-BR:
       message: 
         export_started: "O processo de exportação foi iniciado. Isso pode levar algum tempo para cursos grandes. *Você pode sair da página* e receberá um email quando a exportação for concluída."
       no_submissions: "Você atualmente não tem envios para exportar."
-      user_data_exports: "Exportações de dados do usuário"
+      user_data_exports: "Baixar envios"
     labels: 
       new_export: "Nova exportação:"
     links: 
@@ -3309,17 +3235,6 @@ pt-BR:
     titles: 
       tag_external_web_page: "Marcar (tag) uma página web externa"
   context: 
-    communication: 
-      headings: 
-        discussions: Discussões
-      links: 
-        feeds: 
-          course_discussions: "Feed Atom das discussões do curso"
-        start_collaboration: "Iniciar uma colaboração"
-        start_conference: "Iniciar uma webconferência"
-        start_topic: "Iniciar um novo tópico"
-      titles: 
-        communication: Comunicação
     deleted_item: 
       created: criado
       last_updated: "última atualização"
@@ -4106,12 +4021,14 @@ pt-BR:
       wiki_id: "ID Wiki"
       workflow_state: "Estado de fluxo de trabalho"
   course_members_are_free_to_join_9b2603d4: "Membros do curso são livres para participar"
+  course_navigation_dd035109: "Navegação do curso"
   course_restore: 
     restore_error: "Ocorreu um erro ao tentar restaurar o curso. O curso não foi restaurado."
   course_search: 
     cant_be_blank: "Não pode ficar em branco"
   course_section: 
     sis_id_taken: "ID do SIS \"%{sis_id}\" já está em uso"
+  course_section_7a988066: "Seção do curso"
   course_settings: 
     buttons: 
       add_section: "Adicionar turma"
@@ -4936,6 +4853,7 @@ pt-BR:
   delete_survey_56fddbbd: "Excluir questionário"
   delete_tool_app_9c9f6d35: "Excluir %{tool} App?"
   delete_toolname_app_85f9d4ee: "Excluir %{toolName} App"
+  delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Sites demo requerem que configurações Recaptcha sejam definidas. Consulte o administrador do seu site para esta instância do Canvas."
   demos: 
     _register: 
@@ -5056,6 +4974,7 @@ pt-BR:
       Tarefas diferenciadas é um recurso *beta* que permite escolher à qual ou quais seções uma tarefa se aplica.
       Seções que não recebem uma tarefa não a verão em seu conteúdo de curso e sua nota final será
       calculada sem esses pontos.
+  diigo_993c4646: Diigo
   disable_a5c05db3: Desativar
   disabled_18c33a73: (desativado)
   discussion_6719c51d: Discussão
@@ -5140,7 +5059,6 @@ pt-BR:
       enable_podcast_feed: "Ativar feed de podcast"
       include_replies_in_podcast_feed: "Incluir respostas de estudantes em feed do podcast"
       only_graders_can_like: "Apenas classificadores podem curtir"
-      only_visible_to_overrides_note: "Observação: a discussão *apenas* é visível para as seções especificadas abaixo:"
       options: Opções
       page_header_title: "Nova discussão"
       points_possible: "Pontos possíveis"
@@ -5317,9 +5235,6 @@ pt-BR:
       show_more: "Mostrar mais"
     hide_due_dates: "Ocultar as datas de entrega"
     initial_post_required_to_subscribe: "Você deve publicar uma resposta antes de assinar"
-    like_count: 
-      one: "(%{count} curtidas)"
-      other: "(%{count} curtidas)"
     mark_as_read: "Marcar como lido"
     mark_as_unread: "Marcar como não lido"
     no_content: "Sem conteúdo"
@@ -5368,6 +5283,8 @@ pt-BR:
   domain_3b54c511: Domínio
   don_t_show_again_15d8253e: "não mostrar novamente"
   done_8af51c9b: Concluido(a).
+  download_submissions_7454665f: "Baixar envios"
+  due_a73610f6: Vencimento
   due_at_5e18eeac: "Prazo de Entrega Vai Até:"
   due_by_c263dc10: "vencido em"
   due_date_5d0a953c: "Prazo de Entrega:"
@@ -5400,6 +5317,7 @@ pt-BR:
   ecollege_file_description: ECollege
   ecollege_name: "Conversor ECollege"
   edit_app_b0cc1c17: "Editar aplicativo"
+  edit_c5fbea07: Editar
   edit_grading_scheme_53091236: "Editar esquema de avaliação"
   edit_permissions_for_count_items_d65e3855: 
     one: "Editar permissões para: %{itemName}"
@@ -5845,6 +5763,7 @@ pt-BR:
   event_end_time_ef830e66: "Hora de Encerramento do Evento"
   event_start_time_441b491f: "Hora de Início do Evento"
   everyone_854554dd: Todos
+  everyone_else_6c6dc7b6: "Todos os demais"
   example_84698b7d: Exemplo
   example_final_score_355aff0f: "Exemplo de nota final "
   example_final_score_a92b30b9: "Exemplo de pontuação final]]"
@@ -5858,6 +5777,7 @@ pt-BR:
   expand_or_collapse_undated_items_b901de09: "Expandir ou recolher os itens Sem data"
   expand_subdiscussion_cd226ed4: "Expandir Sub Discussão"
   expires_on_date_18efe4e2: "Expira na data"
+  export_de71cd8e: Exportar
   external_apps_f5490181: "Aplicativos externos"
   external_content: 
     cancel: 
@@ -6012,8 +5932,6 @@ pt-BR:
   feature_flags: 
     feature_flag: 
       allow: Permitir
-      disabled: Desativado
-      enabled: Ativado
       estimated_release: "Lançamento estimado:"
       no_description: "sem descrição"
       ? "off"
@@ -6287,7 +6205,6 @@ pt-BR:
     only_one_folder: "Não é possível definir um caminho de pasta e uma ID de pasta"
   for: para
   for_all_devices_1f603968: "Para todos os dispositivos"
-  for_section_8503af93: "Para Seção"
   from_fdd4956d: De
   from_from_to_to_e31f6422: "De %{from} a %{to}"
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "Obtenha o seguinte do seu aplicativo de Salesforce Connected"
@@ -6301,11 +6218,14 @@ pt-BR:
     invitation: Convite
     question: pergunta
     warning: aviso
+  google_docs_40374e65: "Google Docs"
   google_docs_domain_restriction_description: |-
       A restrição de domínio do Google Docs permite que os envios e as colaborações
       do Google Docs sejam restringidas a um único domínio. As tentativas dos alunos em enviar tarefas ou
       participar de colaborações em um domínio não aprovado receberão uma mensagem de erro notificando-os
       que eles precisarão atualizar sua integração Google Docs.
+  google_docs_preview_9f41b23c: "Visualização do Google Docs"
+  google_drive_7cb003c9: "Google Drive"
   grade_display_warning_dialog: 
     grade_display_warning: 
       checkbox: "Não mostrar para este curso novamente."
@@ -6354,7 +6274,6 @@ pt-BR:
     hide_all_details_button: "Ocultar todos os detalhes"
     mic_blocked_message: "A permissão para usar microfone está bloqueada. Para alterar isso, vá para chrome://settings/contentExceptions#media-stream"
     mute_assignment: "Silenciar tarefa"
-    new_assessment: "[Nova avaliação]"
     no_submission_time: "Sem hora de envio"
     nodetect_message: "Nenhuma voz foi detectada. É necessário ajustar as configurações do microfone."
     not_graded: "não avaliado"
@@ -6487,6 +6406,8 @@ pt-BR:
       switch_to_percent: "Alternar para porcentagem"
       switch_to_points: "Alternar para pontos"
     ungraded: "Não considerado na pontuação"
+  gradebook_csvs: 
+    grades_filename: Notas
   gradebook_uploads: 
     new: 
       titles: 
@@ -6626,6 +6547,7 @@ pt-BR:
       arrange_columns_by_due_date: "Organizar colunas por data de entrega"
       arrange_columns_by_group: "Organizar colunas por grupo de tarefa"
       download_scores: Exportar
+      export_current_gradebook: Atual
       filter_by_student: "Filtrar por nome de aluno ou ID secundária"
       grades: Notas
       hide_student_names: "Ocultar nomes dos alunos"
@@ -6641,7 +6563,6 @@ pt-BR:
     grades: 
       complete: Completo
       incomplete: Incompleto
-    grades_filename: Notas
     grading_box_extended: 
       labels: 
         grade: Nota
@@ -6734,7 +6655,6 @@ pt-BR:
         show_all_sections: "Exibir todas as seções"
         submit_same_score: "Usar esta mesma nota para o reenvio"
       loading: carregando...
-      new_assessment_option: "[Nova avaliação]"
       no_annotation: "As anotações não estão disponíveis para este documento"
       not_newest_notice: "Observação: Este não é o envio mais recente"
       page_header_title: SpeedGrader
@@ -7336,7 +7256,6 @@ pt-BR:
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Se você estava usando outro sistema de gerenciamento de curso, você deve ter coisas lá que gostaria de mover para o Canvas. Nós podemos ajudar durante todo o processo de migração de seu conteúdo para o Canvas."
   ignore_91750df8: Ignorar
   ignore_assignment_738b3c99: "Ignorar tarefa"
-  ignore_forever_dd4a6cdf: "Ignorar para sempre"
   ignore_name_55edc6fe: "Ignorar %{name}"
   ignore_these_3940f6f5: "Ignorar esse"
   ignore_this_assignment_b7a71f80: "Ignorar esta tarefa"
@@ -7380,6 +7299,7 @@ pt-BR:
     warnings: 
       truncated_wiki_title: "O título da página do wiki a seguir foi truncada: %{title}"
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Inclua as notas da tarefa ao postar no Sistema de Informações do Aluno de sua escola"
+  incorrect_username_and_or_password_2de73abb: "Nome de usuário e/ou senha incorreto"
   incremental_update_successfully_generated_against__db3f3f06: "Atualização incremental gerado com sucesso contra uma Importação anterior do SIS (Sistema Informacional do Aluno) ."
   info: 
     notices: 
@@ -7557,10 +7477,7 @@ pt-BR:
   launch_url_e150bd41: "Iniciar URL"
   layouts: 
     application: 
-      ? "User Research"
-      : "Pesquisa do usuário"
       bouncing_communication_channels: "Parece haver um problema com um de seus métodos de contato. Verifique sua *Página de configurações*."
-      by_instructure: "Por Instructure"
       group_switch: Alterar
       javascript_required: "É necessário ter JavaScript habilitado para acessar esse site."
       keyboard_navigation: 
@@ -7569,7 +7486,6 @@ pt-BR:
         close: Fechar
         dashboard: "Meu painel"
         skip_to_content: "Pular para conteúdo"
-      open_source_learning_management_system: "LMS Open Source"
     fixed_bottom: 
       masquerading: 
         stop: "Parar de se mascarar"
@@ -7589,6 +7505,7 @@ pt-BR:
       log_in_to_canvas: "Fazer login no Canvas"
     styleguide: 
       default_page_title: "LMS do Canvas"
+  ldap_e1e0a916: LDAP
   learning_mastery_gradebook_description: "O Livro de Notas de Domínio do Aprendizado fornece uma maneira de os professores visualizarem rapidamente o progresso dos alunos e do curso nos resultados de aprendizado do curso. Os resultados são apresentados em um formato semelhante ao livro de notas e o progresso do aluno é exibido como uma pontuação numérica e como dominado/quase dominado/recuperação."
   learning_outcome: 
     no_comment: "Nenhum comentário"
@@ -7696,6 +7613,7 @@ pt-BR:
   linked_assignment_message: "Vinculado com o teste '%{title}'"
   linked_discussion_topic_message: "Vinculado com tópico de discussão \"%{title}\""
   linked_quiz_message: "Vinculado com teste \"%{title}\""
+  linkedin_5726caca: LinkedIn
   links: 
     dashboard: "Meu painel"
     errors: 
@@ -7715,6 +7633,70 @@ pt-BR:
   lock_until_date_62ce1b5c: "Bloquear até a data"
   log_out_379ba28a: "Log Out"
   logged_out_user: "Usuário desconectado %{user_counter}"
+  login: 
+    canvas: 
+      mobile_login: 
+        back_to_login: "Voltar ao login"
+        buttons: 
+          request_password: "Solicitar senha"
+        dont_know_password: "Eu não sei minha senha"
+        log_in: "Fazer Login"
+        login_handle: "Insira seu %{login_handle_name} e enviaremos um link para alterar sua senha."
+        password: Senha
+        sending: Enviando...
+      new: 
+        back_to_login: "Voltar ao login"
+        browse_courses: "Procurar cursos"
+        buttons: 
+          request_password: "Solicitar senha"
+        coenrollment_banner: "*Pai de um usuário User?* **Clique aqui para uma conta**"
+        labels: 
+          password: Senha
+        log_in: "Fazer Login"
+        login_handle: "Insira seu %{login_handle_name} e enviaremos um link para alterar sua senha."
+        page_title: "Fazer login no Canvas"
+        register_for_canvas: "*Precisa de uma conta Canvas?* **Clique aqui. É gratuito!**"
+    logout_confirm: 
+      cancel: Cancelar
+      details: 
+        log_out: "Tem certeza que deseja efetuar log out do Canvas?"
+      log_out: "Log Out"
+      page_title: "Log Out"
+    otp: 
+      errors: 
+        invalid_otp: "Código de verificação inválido. Tente novamente."
+      new: 
+        buttons: 
+          send: Enviar
+          verify: Verificar
+        details: 
+          mfa_enrollment: |-
+              A autenticação multifator aumenta a segurança exigindo que você tenha em sua posse um dispositivo físico,
+              além de conhecer sua senha, para fazer login no Canvas. Pode ser um dispositivo que gere
+              códigos de verificação ou um telefone que possa receber mensagens de texto. O aplicativo Google Authenticator para [iPhone](%{iphone_url}) ou
+              [Android](%{android_url}) pode ser configurado através de escaneamento do código QR Code abaixo. Outros tokens podem ser configurados pela inserção da chave secreta **%{secret_key}**.
+          mfa_required: "É necessário configurar a autenticação multifator"
+          otp_on_device: "Insira o código de verificação mostrado pelo seu token."
+          otp_sent_to_phone: "Um código de verificação foi enviado para seu telefone. Insira-o aqui."
+          send_to_sms: "Enviar mensagens de texto para %{phone_number}"
+        labels: 
+          carrier: Operadora
+          phone_number: "Número de telefone"
+          remember_me: "Lembrar deste computador"
+          verification_code: "Código de verificação"
+        links: 
+          choose_number: "Escolher um telefone existente"
+        page_title: "Autenticação multifator"
+        select: 
+          new_number: "um novo telefone"
+        titles: 
+          mfa: "Autenticação multifator"
+    saml: 
+      debug: 
+        logout_request_redirect_from_idp: "LogoutResponse recebido de IdP"
+        logout_response_redirect_from_idp: "LogoutResponse recebido de IdP"
+        logout_response_redirect_to_idp: "Enviando LogoutResponse para IdP"
+        redirect_from_idp: "LoginResponse recebido de IdP"
   logo_a040ae0e: Logotipo
   looks_great_e4d883ed: "Parece ótimo!"
   low_score_4eeb95b2: "Baixa: %{score}"
@@ -9490,6 +9472,13 @@ pt-BR:
         subject: "Convite da webconferência: %{name}"
       twitter: 
         tweet: "Alerta do Canvas - convite: participar de %{title}, %{name}"
+    web_conference_recording_ready: 
+      email: 
+        details_link: "Você pode visualizar os detalhes aqui %{link}"
+        html: 
+          details_link: "Clique aqui para ver os detalhes"
+      sms: 
+        link_message: "Mais informações em %{url}"
   migration: 
     announcement_type: Anúncio
     assignment_group_type: "Grupo de tarefa"
@@ -9667,6 +9656,7 @@ pt-BR:
   more_courses_5ebbe998: "Mais cursos"
   most_recent_score_13a87e8c: "Pontuação Mais Recente"
   most_recent_score_counts_as_75_of_mastery_weight_a_f1e3e6c2: "A pontuação mais recentes conta como 75% do peso do domínio, a média de todas as outras pontuações conta como 25% do peso."
+  move_abf00365: Mover
   move_dialog: 
     cancel: Cancelar
     save: Salvar
@@ -9676,6 +9666,8 @@ pt-BR:
     move_to_end: "-- Em posição baixa --"
   move_outcome_ce497e6c: "Mover resultado"
   move_outcome_group_cfa1a505: "Mover grupo de resultados"
+  moving_a4d552df: Movendo...
+  multi_factor_authentication_configured_865b1bde: "Autenticação multifator configurada"
   must_achieve_mastery_at_least_2_times_must_also_co_b2ae7688: "Deve conseguir o domínio pelo menos 2 vezes. Também deve completar 2 itens para o cálculo. Uma média será tirada das pontuações acima de domínio  para calcular a pontuação final."
   must_achieve_mastery_at_least_2_times_scores_above_57077a88: "Deve alcançar o domínio pelo menos 2 vezes. Pontuações acima do domínio serão a média para calcular a pontuação final."
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "Deve fornecer 'file_ids' e/ou parâmetro 'folder_ids'"
@@ -9721,6 +9713,8 @@ pt-BR:
   no_e16d9132: Não
   no_grading_schemes_to_display_8b0e92e7: "Não há esquemas de pontuação a serem exibidos"
   no_migration_file: "Arquivo necessário para migração de conteúdo."
+  no_password_was_given_472222e5: "Nenhuma senha foi dada"
+  no_results_found_58717065: "Nenhum resultado encontrado"
   no_score_yet_c94e919b: "Sem pontuação ainda"
   no_students_have_taken_the_quiz_yet_e667644b: "Nenhum aluno fez ainda o teste"
   no_students_have_taken_the_survey_yet_d378cd35: "Nenhum aluno fez ainda o questionário"
@@ -9953,6 +9947,7 @@ pt-BR:
       admin: Administrativo
       alerts: Alertas
       communication: Conversas
+      conferences: Conferências
       course: "Atividades de curso"
       discussions: Discussões
       groups: Grupos
@@ -10195,7 +10190,6 @@ pt-BR:
     everyone_else: "Todos os demais"
     overrides: 
       everyone: Todos
-      everyone_else: "Todos os demais"
   own_copyright_cc59db55: "Copyright próprio"
   page_comment: 
     default_user_name: Anônimo
@@ -10942,6 +10936,7 @@ pt-BR:
     yo_select: 
       yo: Yo
     you_have_no_services: "Você não registrou nenhum serviço. Você pode adicionar alguns na página *settings*."
+  profile_6bd2baed: Perfil
   profiles: 
     avatar_dialog: 
       from_gravatar: "De Gravatar"
@@ -10980,74 +10975,7 @@ pt-BR:
       too_long: "Não pode exceder %{max} caracteres"
       too_short: "Deve ter pelo menos %{min} caracteres"
   pseudonym_sessions: 
-    debug: 
-      logout_redirect: "LogoutRequest enviado para IdP"
-      logout_request_redirect_from_idp: "LogoutResponse recebido de IdP"
-      logout_response_redirect_from_idp: "LogoutResponse recebido de IdP"
-      logout_response_redirect_to_idp: "Enviando LogoutResponse para IdP"
-      redirect_from_idp: "LoginResponse recebido de IdP"
     default_app_name: "Aplicativo de terceiro"
-    errors: 
-      blank_password: "Nenhuma senha foi dada"
-      invalid_credentials: "Nome de usuário e/ou senha incorreto"
-      invalid_otp: "Código de verificação inválido. Tente novamente."
-      login_error: "Houve um problema com o login em %{institution}"
-      login_errors: 
-        no_config_for_id: "A conta Canvas não tem configuração de autenticação com essa ID"
-        no_idp_set: "A instituição da qual você fez login não está configurada nesta conta."
-        unrecognized_idp: "O Canvas não reconheceu seu provedor de identidade"
-      logout_errors: 
-        no_idp_found: "O Canvas não conseguiu desconectar você do seu provedor de identidade"
-      max_attempts: "Ocorreram muitas falhas de tentativa de login. Tente novamente mais tarde ou entre em contato com seu administrador de sistemas.."
-      no_matching_user: "O Canvas não tem uma conta para o usuário: %{user}"
-      user_deleted: "Esta conta de usuário foi excluída.  Entre em contato com seu administrador de sistema para reativar sua conta."
-    logout_confirm: 
-      cancel: Cancelar
-      details: 
-        log_out: "Tem certeza que deseja efetuar log out do Canvas?"
-      log_out: "Log Out"
-      page_title: "Log Out"
-    mobile_login: 
-      back_to_login: "Voltar ao login"
-      buttons: 
-        request_password: "Solicitar senha"
-      dont_know_password: "Eu não sei minha senha"
-      log_in: "Log In"
-      login_handle: "Insira seu %{login_handle_name} e enviaremos um link para alterar sua senha."
-      password: Senha
-      sending: Enviando...
-    new: 
-      page_title: "Fazer login no Canvas"
-    notices: 
-      mfa_complete: "Autenticação multifator configurada"
-    otp_login: 
-      buttons: 
-        send: Enviar
-        verify: Verificar
-      details: 
-        mfa_enrollment: |-
-            A autenticação multifator aumenta a segurança exigindo que você tenha em sua posse um dispositivo físico,
-            além de conhecer sua senha, para fazer login no Canvas. Pode ser um dispositivo que gere
-            códigos de verificação ou um telefone que possa receber mensagens de texto. O aplicativo Google Authenticator para [iPhone](%{iphone_url}) ou
-            [Android](%{android_url}) pode ser configurado através de escaneamento do código QR Code abaixo. Outros tokens podem ser configurados pela inserção da chave secreta **%{secret_key}**.
-        mfa_required: "É necessário configurar a autenticação multifator"
-        otp_on_device: "Insira o código de verificação mostrado pelo seu token."
-        otp_sent_to_phone: "Um código de verificação foi enviado para seu telefone. Insira-o aqui."
-        send_to_sms: "Enviar mensagens de texto para %{phone_number}"
-      labels: 
-        carrier: Operadora
-        phone_number: "Número de telefone"
-        remember_me: "Lembrar deste computador"
-        verification_code: "Código de verificação"
-      links: 
-        choose_number: "Escolher um telefone existente"
-      page_title: "Autenticação multifator"
-      select: 
-        new_number: "um novo telefone"
-      titles: 
-        mfa: "Autenticação multifator"
-    password_confirmation_error: "Erro ao enviar solicitação."
-    password_confirmation_sent: "Confirmação de senha enviada. Verifique sua caixa de spam."
   pseudonyms: 
     confirm_change_password: 
       buttons: 
@@ -12003,7 +11931,6 @@ pt-BR:
         new_discussion: "Nova discussão"
         one_question_at_a_time: "Exibir uma pergunta por vez"
         one_time_results: "Apenas uma vez após cada tentativa"
-        only_visible_to_overrides_note: "Observação: esse teste **apenas** está visível para as seções especificadas abaixo:"
         points_possible: "Pontos %{n}"
         post_to_sis: "Postar notas no SIS"
         quiz_access_code: "Código de acesso obrigatório"
@@ -12479,7 +12406,6 @@ pt-BR:
     move_success: 
       one: "%{item} movido para %{destinationFolder}"
       other: "%{count} items moved to %{destinationFolder}"
-    moving: Movendo...
     name: Nome
     progress_error: "Ocorreu um erro ao tentar preparar o download, tente novamente."
     progress_message: "Preparando o download: %{percent}% concluído"
@@ -12556,6 +12482,7 @@ pt-BR:
   remove_recipient_name_a6b83cef: "Remover destinatário %{name}"
   remove_row_c198da5a: "Remover linha"
   remove_row_f9d59cba: "Remover linha"
+  remove_these_dates_48453a81: "Remover essas datas"
   rename_45608f54: Renomear
   reply_from_name: "%{name} por meio de Notificações do Canvas"
   reply_to_comment_72d96728: "Responder comentário"
@@ -13177,6 +13104,11 @@ pt-BR:
     canvas-user-nav: 
       navigation: 
         user_menu: "Menu do usuário"
+    canvas_footer: 
+      ? "User Research"
+      : "Pesquisa do usuário"
+      by_instructure: "Por Instructure"
+      open_source_learning_management_system: "LMS Open Source"
     components: 
       ic_submission-download-dialog: 
         click_to_download: "Clique aqui para baixar"
@@ -13366,21 +13298,6 @@ pt-BR:
     locale_warning: 
       crowdsourced_warning_message: "O idioma que você selecionou foi traduzido via crowdsourcing. A Instructure não revisou ou verificou a precisão da tradução e não se responsabiliza pelo uso que você fizer desta definição de idioma. Utilize a seu próprio critério."
       crowdsourced_warning_title: "Idioma traduzido via crowdsource"
-    login: 
-      back_to_login: "Voltar ao login"
-      browse_courses: "Procurar cursos"
-      buttons: 
-        request_password: "Solicitar senha"
-      coenrollment_banner: "*Pai de um usuário User?* **Clique aqui para uma conta**"
-      default_login_message: "Faça login em sua instituição"
-      dont_know_password: "Eu não sei minha senha"
-      labels: 
-        password: Senha
-        remember_me: "Permanecer conectado"
-      log_in: "Log In"
-      login_at_account: "Login em %{school_name}"
-      login_handle: "Insira seu %{login_handle_name} e enviaremos um link para alterar sua senha."
-      register_for_canvas: "*Precisa de uma conta Canvas?* **Clique aqui. É gratuito!**"
     menu_assignment: 
       labels: 
         due: vencimento
@@ -13655,7 +13572,6 @@ pt-BR:
       grading_alt: avaliação
       submission_comment: "Comentário de envio"
     terms_required: 
-      terms_have_changed: "Os *termos de uso* foram alterados. Tire um tempo para revê-los antes de continuar utilizando o Canvas."
       updated_terms_of_use: "Termos de Uso atualizados"
     unauthorized: 
       headings: 
@@ -13671,8 +13587,6 @@ pt-BR:
         unauthorized_action: "Não autorizado"
       unauthorized_1: "Parece que você não tem permissão para acessar esta página. Verifique se você está autorizado a exibir este conteúdo."
       unauthorized_2: "Se achar que deveria exibir esta página, use o link \"Ajuda\" para notificar o problema ao suporte."
-      unauthorized_action: "O acesso a esta página é limitado a usuários autorizados. Será necessário fazer login antes de exibir o conteúdo desta página."
-      unauthorized_user: "%{user_name}, será necessário fazer login antes de exibir está página. Clique em \"Esqueci a senha\" se você se esqueceu ou não se lembra da senha."
       unauthorized_user_is_other: "%{current_user}, você não está autorizado a visualizar esta página  O link que você seguiu para chegar aqui era para **%{unauthorized_user} (%{unauthorized_user_email})**.  Se for você, é possível obter acesso a esta página fazendo log out e login novamente com este endereço de email."
     unauthorized_feed: 
       bad_params: "Os parâmetros do feed que está tentando acessar são inválidos."
@@ -13876,6 +13790,7 @@ pt-BR:
       users_matching_label: "Usuários correspondentes"
   skipped_file_filename_due_to_error_94f0194: "Pulou por arquivo %{filename} devido a erro"
   skipping_unknown_file_type_cd1086ee: "Ignorando o tipo de arquivo desconhecimento"
+  skype_18850ba7: Skype
   slideshow: 
     titles: 
       back: Voltar
@@ -13897,6 +13812,7 @@ pt-BR:
       submitted: "*Enviado:* %{submittedAt}"
   spreadsheet_6d622119: Planilha
   sr_gradebook: 
+    all_grading_periods: "Todos os períodos de classificação"
     all_sections: "Todas as seções"
     assignment_muted: "Clique para retirar do silêncio"
     assignment_order_alpha: Alfabética
@@ -14173,6 +14089,7 @@ pt-BR:
     files: Arquivos
     grades: Notas
     home: "Página inicial"
+    logout: Logout
     modules: Módulos
     observees: Observando
     outcomes: Resultados
@@ -14247,6 +14164,7 @@ pt-BR:
       timespan: "%{start_at} *para* %{end_at}"
   text_document_eacbcdb7: "Documento de texto"
   text_entry_submission_cannot_be_empty_3d187cae: "Submissão de entrada de texto não pode estar vazio"
+  that_user_account_has_been_deleted_please_contact__350e0e0: "Esta conta de usuário foi excluída.  Entre em contato com seu administrador de sistema para reativar sua conta."
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "O ID de conta da conta ao qual pertence o usuário relatante"
   the_app_was_activated_a84e055f: "O aplicativo foi ativado"
   the_app_was_added_58e2836a: "O app foi adicionado"
@@ -14259,6 +14177,7 @@ pt-BR:
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "O nome completo do host para a instância da conta (something.instructure.com, por exemplo)"
   the_grading_period_was_deleted_7814a349: "O período de avaliação foi excluido"
   the_grading_period_was_saved_4a504c5: "O período de avaliação foi salvo"
+  the_institution_you_logged_in_from_is_not_configur_5ceac41: "A instituição da qual você fez login não está configurada nesta conta."
   the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "A imagem do logotipo no cabeçalho superior direito do Canvas. 200x200 svg ou png"
   the_material_is_in_the_public_domain_279c39a3: "O material está no domínio público"
   the_material_is_licensed_under_creative_commons_3242cb5e: "O material está licenciado sob Creative Commons"
@@ -14279,6 +14198,7 @@ pt-BR:
     other: "Há %{count} resultados na lista"
   there_was_a_problem_deleting_the_grading_period_50ce07c5: "Houve um problema ao excluir o período de pontuação"
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: "Ocorreu um problema ao excluir o esquema de avaliação"
+  there_was_a_problem_logging_in_at_institution_5a298155: "Houve um problema com o login em %{institution}"
   there_was_a_problem_saving_the_grading_period_243bed6c: "Houve um problema ao salvar o período de avaliação"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "Ocorreu um problema ao salvar o esquema de avaliação"
   there_was_an_error_in_processing_your_request_6513a49a: "Ocorreu um erro ao processar seu pedido"
@@ -14513,6 +14433,7 @@ pt-BR:
   to_minscore_43e5452e: "para %{minScore}%"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "Para visualizar as tarefas, certifique-se de que a visualização *Agenda * esteja ativa."
   tolerance_value_9e96573c: "Valor de tolerância"
+  too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "Ocorreram muitas falhas de tentativa de login. Tente novamente mais tarde ou entre em contato com seu administrador de sistemas.."
   too_many_members_b8b15069: "Demasiados membros"
   tooltips: 
     finished: finalizado
@@ -14540,8 +14461,10 @@ pt-BR:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "Reenviar para Turnitin"
+  twitter_fcef6b54: Twitter
   unable_to_remove_app_4293cb53: "Não foi possível remover o app"
   unarchive_selected_e0c4bd3d: "Desarquivar Selecionado"
+  unauthorized: "não autorizada"
   unchanged_aca18e02: "[Inalterado]"
   ungraded_submissions_44efb0ec: "Envios não avaliados"
   ungraded_survey_ad7de790: "Questionário sem avaliação"
@@ -14589,8 +14512,8 @@ pt-BR:
       terms: "Você deve concordar com os termos"
       too_long: "Não pode exceder %{max} caracteres"
     registration: 
-      agree_to_terms_and_privacy_policy: "Você concorda com os *termos de uso* e reconhece a **política de privacidade**."
       agree_to_terms_with_code_of_conduct: "Você concorda com os *termos de uso* e o **código de conduta**."
+  user_avatars_e4fc4ed3: "Usar avatar"
   user_date_range_search: 
     cant_be_blank: "A ID de Usuário Canvas não pode estar em branco"
     cant_come_before_from: "\"Até data\" não pode vir antes de \"De data\""
@@ -14858,11 +14781,6 @@ pt-BR:
           era **você** que realizava estas ações em nome desse usuário.
       masquerade_as: "Mascarar-se como %{user_name}"
       page_title_header: "Mascarado como Usuário"
-    merge: 
-      login_to_merge_different_account: "Para mesclar a conta, %{current_user_name} (%{current_user_email}) com outra conta, faça login na nova conta."
-      merge_definition: "Por um motivo ou outro, pode ser que você termine com dois logins ao invés de um. Se isso acontecer, é possível mesclar os dois logins e consolidar as informações neles contidas."
-      titles: 
-        merge_accounts: "Mesclar contas de usuário"
     merge_results: 
       action: Ação
       emails: Emails
@@ -15061,10 +14979,6 @@ pt-BR:
       delete_wiki: Excluir
       labels: 
         front_page: "Página frontal"
-      page_locked: "Esta página está bloqueada"
-      page_locked_by_modules: "Esta página estará disponível uma vez que você concluir esses módulos:"
-      page_locked_by_modules_until: "Esta página estará disponível em %{lock_info.unlock_at} se você tiver concluído esses módulos:"
-      page_locked_until: "Esta página estará disponível em %{lock_info.unlock_at}"
       published_indicator: Publicado
       toolbar_menu: 
         settings: Configurações
@@ -15184,6 +15098,7 @@ pt-BR:
   would_you_like_to_enable_this_app_ccdf735d: "Deseja ativar esse aplicativo?"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Gostaria de deixar os alunos continuarem no curso ou deseja voltar a bloquear esses módulos até que os novos requisitos sejam concluídos?"
   xml_configuration_5ea1b942: "Configuração XML"
+  yo_e4ee15a4: Yo
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "Você efetuou login na %{institution1} usando suas credenciais da %{institution2}"
   you_are_subscribed_and_will_be_notified_of_new_com_60b5b62b: "Você está inscrito e será notificado de novos comentários. Clique para cancelar a inscrição"
   you_are_the_group_leader_for_this_group_b8629b70: "você é o líder do grupo para este grupo"
@@ -15208,7 +15123,6 @@ pt-BR:
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "A sua lista de Tarefas pode agora ser encontrada na página *Calendário* ."
   your_assignments_list_has_improved_3eded80e: "A sua lista de *Tarefas* foi melhorada!"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: "Suas tarefas aparecerão listadas aqui por data de vencimento."
-  your_browser_does_not_meet_the_minimum_requirement_7a7022db: "Seu navegador não atende aos requisitos mínimos do Canvas. Visite os *Guias do Canvas* para obter uma lista completa de navegadores compatíveis."
   your_content_has_been_exported_bbb57764: "Seu conteúdo foi exportado."
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: "O seu arquivo está sendo enviado para o Livro de Notas, e você pode sair desta página em qualquer momento. Se você tiver um grande arquivo CSV, as alterações podem demorar alguns minutos para atualizar. Para evitar a substituição de quaisquer dados, por favor confirme que o carregamento foi concluído e o seu livro de notas está correto antes de fazer alterações adicionais."
   your_message_has_been_sent_thank_you_e0284316: "Sua mensagem foi enviada. Obrigado!"
