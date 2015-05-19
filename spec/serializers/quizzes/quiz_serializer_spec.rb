@@ -23,7 +23,7 @@ describe Quizzes::QuizSerializer do
   before do
     @context = Course.new
     @context.id = 1
-    @quiz = Quizzes::Quiz.new title: 'test quiz'
+    @quiz = Quizzes::Quiz.new title: 'test quiz', description: 'default quiz description'
     @quiz.id = 1
     @quiz.context = @context
     @user = User.new
@@ -38,8 +38,8 @@ describe Quizzes::QuizSerializer do
   end
 
   [
-    :title, :description, :quiz_type, :hide_results,
-    :time_limit, :shuffle_answers, :show_correct_answers, :scoring_policy,
+    :title, :quiz_type, :hide_results, :time_limit,
+    :shuffle_answers, :show_correct_answers, :scoring_policy,
     :allowed_attempts, :one_question_at_a_time, :question_count,
     :points_possible, :cant_go_back, :access_code, :ip_filter, :due_at,
     :lock_at, :unlock_at, :published, :show_correct_answers_at,
@@ -58,6 +58,22 @@ describe Quizzes::QuizSerializer do
 
   it "serializes html_url" do
     expect(json[:html_url]).to eq 'http://example.com/courses/1/quizzes/1'
+  end
+
+  describe "description" do
+    it "serializes description with a formatter if given" do
+      @serializer = quiz_serializer(
+        serializer_options: {
+          description_formatter: -> (_) {return "description from formatter"}
+        }
+      )
+      @json = @serializer.as_json[:quiz]
+
+      expect(json[:description]).to eq "description from formatter"
+    end
+    it "returns desctiption otherwise" do
+      expect(json[:description]).to eq quiz.description
+    end
   end
 
   it "serializes speed_grader_url" do

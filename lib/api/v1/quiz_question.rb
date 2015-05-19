@@ -66,6 +66,9 @@ module Api::V1::QuizQuestion
       end
     end
 
+    user ||= @current_user
+    hsh = add_verifiers_to_question(hsh, @context, user)
+
     if includes.include?(:assessment_question)
       hsh[:assessment_question] = api_json(question.assessment_question, user, session)
       if censored
@@ -88,6 +91,19 @@ module Api::V1::QuizQuestion
   end
 
   private
+
+  def add_verifiers_to_question(question_hash, context, user)
+    if question_hash["question_text"]
+      question_hash["question_text"] = api_user_content(question_hash["question_text"], context, user)
+    end
+
+    question_hash["answers"].each do |a|
+      next unless a["text"].present?
+      a["text"] = api_user_content(a["text"], context, user)
+    end
+
+    question_hash
+  end
 
   # Delete sensitive question data that students shouldn't get to see.
   #
