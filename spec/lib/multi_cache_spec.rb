@@ -49,4 +49,13 @@ describe MultiCache do
       expect(node.gets).to eq node.sets
     end
   end
+
+  it "should delete from _all_ nodes" do
+    ring = [mock, mock]
+    ring[0].expects(:del).with('key').returns(true)
+    ring[1].expects(:del).with('key').returns(false)
+    store = MultiCache.new(ring)
+
+    expect(store.delete('key')).to eq true
+  end
 end

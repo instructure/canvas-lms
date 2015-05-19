@@ -70,11 +70,11 @@ class MultiCache < ActiveSupport::Cache::Store
 
   def delete_entry(key, options)
     nodes = options[:node] ? [options[:node]] : @ring
-    nodes.any? do |node|
+    nodes.inject(false) do |result, node|
       begin
-        node.del key
+        node.del(key) || result
       rescue Errno::ECONNREFUSED, Redis::CannotConnectError
-        false
+        result
       end
     end
   end
