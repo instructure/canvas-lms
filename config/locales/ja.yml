@@ -74,18 +74,6 @@ ja:
         api_url: "API の URL"
         common_core_guid: "共通コア GUID (オプション)"
   account: 
-    account_settings: 
-      account_surveys: "アカウント サーベイ"
-      avatars: ユーザのアバター
-      delicious: Delicious
-      diigo: Diigo
-      google_docs: "Google ドキュメント"
-      google_docs_preview: "Google ドキュメントのプレビュー"
-      google_drive: "Google ドライブ"
-      linked_in: LinkedIn
-      skype: Skype
-      twitter: Twitter
-      yo: Yo
     ask_canvas_network: "Canvas ネットワーク コミュニティに質問する"
     default_account_name: デフォルトのアカウント
     default_site_administrator_account_name: サイト管理者
@@ -118,60 +106,46 @@ ja:
     tab_users: ユーザ
     turnitin_pledge: この課題提出物は私自身のものであり、オリジナルの研究結果です
   account_authorization_config: 
-    debug: 
-      wait_for_login: ログイン中です
     default_delegated_login_handle_name: ログイン
     default_login_handle_name: "電子メール アドレス"
-    saml_eppn_domain_stripped: "%{eppn} (ドメインは除去)"
+  account_authorization_config/ldap: 
     test_bind_failed: "バインドに失敗しました: %{error}"
     test_connection_timeout: 接続がタイムアウトしました
     test_host_unknown: "不明なホスト: %{host}"
     test_login_auth_exception: "ログインでの例外: %{error}"
     test_login_auth_failed: 認証に失敗しました
     test_search_failed: "次のエラーにより検索に失敗しました: %{error}"
+  account_authorization_config/saml: 
+    debug: 
+      logout_redirect: "LogoutRequest が IdP に送信されました"
+      wait_for_login: ログイン中です
+    saml_eppn_domain_stripped: "%{eppn} (ドメインは除去)"
   account_authorization_configs: 
     account_required: "LDAP で認証される必要があります"
-    cas_settings: 
+    cas_fields: 
       labels: 
         auth_base: "CAS URL"
-        auth_type: タイプ
-        login_handle_name: "ログイン ラベル"
         unknown_user_url: "不明なユーザの URL"
-      login_handle_name_description: "一意のログイン ID に使用されるラベル。例:ログイン、ユーザ名、受講生 ID、など。"
-      save_button: 認証設定の保存
       unknown_user_url_description: "認証されたユーザが Canvas で見つからないときにリダイレクトする URL。"
+    form_footer: 
+      labels: 
+        position: 職位
+      save_button: 認証設定の保存
+    form_header: 
+      auth_type_label: タイプ
+      auth_url: "この設定のログイン URL"
     index: 
       add_auth_desc: "このアカウントに ID プロバイダーを追加:"
-      canvas_login_tip: |-
-          ログインできなくなる問題を引き起こす設定を構成する場合は
-          *%{url1}* をログイン URL の末尾に追加できます。こうすることで、
-          Canvas への通常のログイン手順でログインできるようになります。このアカウントの場合、URL は %{url2} です。
       choose_auth_type_option: 認証サービスを選択してください
       current_settings_title: 現在の統合
       delete_auth_confirmation: よろしいですか?これを削除すると、ユーザはログインできない場合があります。
-      delete_auth_link: 認証の削除
-      edit_auth_link: 詳細の編集
       ip_address_list_description: "Canvas サーバを必要とする認証サービス (LDAP など) を使用して、ご利用のサーバと直接通信している場合は、これらの IP アドレスからの接続をサーバが確実に受け入れることができるようにする必要があります。"
       no_auth_type_description: "このアカウントは現在、ID プロバイダーと統合されていません。"
       page_title: 認証設定
       profile_page_link_example: "例えば、プロフィール ページは次のようになっています。 [%{friendlyname}](%{url})"
       settings_description: "ユーザが外部の ID プロバイダー (IdP) を通して認証されるためには、ユーザが持っているログイン ID がこのアカウントにリンクされていて、かつ、IdP から返される一意の識別子と一致している必要があります。ユーザの現在のログイン情報を確認するには、ユーザのプロフィール ページにある \"Login Information\" セクションを参照します。(\"Users\" タブでそのユーザを検索すると見つかります。)"
       settings_title: 認証設定
-      test_ldap_link: 認証テスト
-    ldap_settings: 
-      add_secondary_ldap_server_link: "セカンダリ LDAP サーバの追加"
-      auth_type_label: タイプ
-      change_password_url_help: "Canvas のデフォルトの動作でよい場合は、空白のままにします"
-      change_password_url_not_specified: 何も指定されていません
-      labels: 
-        change_password_url: "パスワード URL を忘れた場合"
-        login_handle_name: "ログイン ラベル"
-      login_handle_name_description: "一意のログイン ID に使用されるラベル。例:ログイン、ユーザ名、受講生 ID、など。"
-      remove_secondary_ldap_link: (削除)
-      save_button: "LDAP 設定の保存"
-      secondary_ldap_label: "セカンダリ LDAP"
-      setting_type_ldap: LDAP
-    ldap_settings_fields: 
+    ldap_fields: 
       auth_filter_description: "ユーザが入力するユーザ名のプレースホルダーとして *%{placeholder}* を使用します。例:  *(sAMAccountName=%{placeholder})*"
       auth_password_description: 現在のパスワードを引き続き使用する場合は、空白のままにします。
       identifer_format_description: "Canvas ログインの参照に使用する LDAP 属性。ユーザによって指定されたユーザ名を使用する場合は、空白のままにします。"
@@ -187,9 +161,8 @@ ja:
         auth_port: ポート
         auth_username: ユーザ名
         identifier_format: "ログイン ID 属性"
-        no_tls: "TLS なし"
-        simple_tls: "簡易 TLS"
-        start_tls: StartTLS
+      last_ldap_timeout_failure: 前回のタイムアウト
+      ldap_timeout_failure_help2: "Canvas は、特定の LDAP サーバーとの通信が一定回数以上タイムアウトした場合、それ以降の %{time} 間は、ログイン試行の際にその LDAP サーバーを使用しなくなります。"
     ldap_settings_test: 
       labels: 
         pass: パスワード
@@ -217,50 +190,27 @@ ja:
       test_ldap_search_help_fixes_3: "LDAP のユーザ オブジェクトに、提供された検索ベースに対する検索特権があることを確認してください。"
       test_ldap_search_help_header: "Canvas は LDAP インスタンスを検索できません"
       test_ldap_search_label: "LDAP 検索をテストしています..."
-    ldap_timeout_error: 
-      last_ldap_timeout_failure: 前回のタイムアウト
-      ldap_timeout_failure_help2: "Canvas は、特定の LDAP サーバーとの通信が一定回数以上タイムアウトした場合、それ以降の %{time} 間は、ログイン試行の際にその LDAP サーバーを使用しなくなります。"
     login_required: 入力が必要です
     no_changing_auth_types: 認証設定の種類は変更できません。削除した後、新しい設定を作成してください。
-    no_discovery_url: 何も設定されていません
     password_required: 入力が必要です
-    saml_required: "SAML をテストするには SAML の設定が必要です"
-    saml_settings: 
-      auth_type: タイプ
-      auth_url: "この設定のログイン URL"
-      certificate_fingerprint: 証明書の指紋
-      change_password_url: パスワード変更のリンク
-      discovery_url: "検出 URL:"
-      discovery_url_description: "検出 URL を設定すると、Canvas は認証の必要なすべてのユーザをその URL に転送します。そのページでは、ログインのためにアクセスする必要のある場所をユーザに指示する必要があります。検出 URL を設定しないと、最初の SAML 設定がユーザの認証の試行に使用されます。"
-      identifier_format: 識別子の形式
-      idp_entity_id: "IdP エンティティ ID"
+    saml_fields: 
       labels: 
         certificate_fingerprint: 証明書の指紋
-        change_password_url: パスワード変更のリンク
         identifier_format: 識別子の形式
         idp_entity_id: "IdP エンティティ ID"
         log_in_url: "ログオンの URL"
         log_out_url: "ログアウトの URL"
         login_attribute: ログイン属性
-        login_handle_name: "ログイン ラベル"
-        position: 職位
         requested_authn_context: 認証コンテキスト
         unknown_user_url: "不明なユーザの URL"
-      log_in_url: "ログオンの URL"
-      log_out_url: "ログアウトの URL"
-      login_attribute: ログイン属性
-      login_handle_name: "ログイン ラベル"
-      login_handle_name_description: "一意のログイン ID に使用されるラベル。例:ログイン、ユーザ名、受講生 ID、など。"
-      no_discovery_url: 何も設定されていません
-      position: 職位
+      unknown_user_url_description: "認証されたユーザが Canvas で見つからないときにリダイレクトする URL。"
+    saml_required: "SAML をテストするには SAML の設定が必要です"
+    saml_settings_test: 
       refresh_debugging: 更新
-      requested_authn_context: 認証コンテキスト
       saml_debug_instructions: "デバッグを開始すると、次に試みられる SAML ログインに関するすべての情報が収集されます。収集されたデータが他にもあるかどうかを確認するには、[更新] をクリックします。収集されたデータをクリアし、現在のデバッグを停止するには、[デバッグを停止] をクリックします。"
-      saml_debugging: デバッグ
-      save_button: 認証設定の保存
+      saml_required: "SAML をテストするには SAML の設定が必要です"
       start_debugging: デバッグを開始
       stop_debugging: デバッグを停止
-      unknown_user_url_description: "認証されたユーザが Canvas で見つからないときにリダイレクトする URL。"
     saml_testing: 
       auth_request_to_idp: "IdP に送信された AuthnRequest"
       auth_response_from_idp: "IdP からの AuthnResponse"
@@ -289,7 +239,12 @@ ja:
         to_idp_xml: "IdP に送信された LoginRequest XML"
       logout_request_to_idp: "IdP に送信された LogoutRequest"
       logout_response_from_idp: "IdP からの LogoutResponse"
-      saml_required: "SAML をテストするには SAML の設定が必要です"
+    sso_settings_form: 
+      change_password_url_help: "Canvas のデフォルトの動作でよい場合は、空白のままにします"
+      labels: 
+        change_password_url: "パスワード URL を忘れた場合"
+        login_handle_name: "ログイン ラベル"
+      login_handle_name_description: "一意のログイン ID に使用されるラベル。例:ログイン、ユーザ名、受講生 ID、など。"
   account_notification: 
     errors: 
       invalid_account_notification_end_at: アカウントのお知らせの終了時刻が開始時刻よりも前になっています
@@ -392,6 +347,7 @@ ja:
     report_header_user__id: user_id
     report_header_user_id: "ユーザ ID"
     report_header_user_name: ユーザ名
+    report_header_user_short_name: short_name
     report_header_user_sis_id: "ユーザ SIS ID"
     report_header_xlist_course_id: xlist_course_id
     sis_exporter: 
@@ -421,6 +377,7 @@ ja:
       open_registration_delegated_warning_dialog: "外部 ID プロバイダーが有効です"
       what_are_quiz_ip_filters: "クイズ IP フィルタとは何ですか?"
     user: ユーザ
+  account_surveys_b0039876: "アカウント サーベイ"
   account_user: 
     types: 
       account_admin: アカウント管理者
@@ -451,16 +408,13 @@ ja:
         sis_user_id: "SIS ID"
         sortable_name: 並べ替え可能な名前
       sortable_name_help: 並べ替え後のリストには、この名前が表示されます。
-      unique_id_label: "%{label}:*"
     add_user_button: ユーザの追加
     add_user_dialog_title: 新しいユーザの追加
     adding_course_message: コースを追加しています...
     adding_user_message: ユーザを追加しています...
     additional_settings: 
-      account_domains: "アカウント ドメイン"
       account_status: "アカウント ステータス"
       add_new_domain: 新規ドメインの追加
-      external_status: 外部ステータス
       license: 使用許諾
       license_type: 使用許諾タイプ
       new_account_domain_title: "新規アカウント ドメイン"
@@ -1286,6 +1240,7 @@ ja:
   activity_13915493: アクティビティ
   activity_by_category_9c2033d1: カテゴリ別のアクティビティ
   activity_by_date_878c5b49: 日付別のアクティビティ
+  add_8523c19b: 追加
   add_app_baf540f: アプリの追加
   add_attachment_93868828: 添付ファイルの追加
   add_course_assignments_628ed6d0: コースの課題の追加
@@ -1452,7 +1407,6 @@ ja:
       invalid_external_tool: このリンクについての有効な設定が見つかりませんでした
       invalid_external_tool_id: このツールについての有効な設定が見つかりませんでした
       invalid_feed_parameters: "無効なフィード パラメータです。"
-      invalid_oembed_url: このリソースの検索中に問題が発生しました。外部ツールにより提供された、リソースに関する情報が無効です。
       invalid_tag_type: このタグのアイテムのタイプを認識しませんでした
       invalid_verification_code: 検証コードが無効です。
       mismatched_verification_code: 検証コードは、現在登録しているどのユーザとも一致しません。
@@ -1483,6 +1437,7 @@ ja:
         suspended: 教育機関のアカウントが一時停止されました
     wiki_front_page_default_content_course: "新しいコースの Wiki へようこそ!"
     wiki_front_page_default_content_group: "新しいグループの Wiki へようこそ!"
+  apply_781a2546: 適用
   appointment_group: 
     errors: 
       invalid_end_at: 予定の終了時刻が開始時刻より前になっています
@@ -1743,12 +1698,6 @@ ja:
       one: "下位 %{count} 個のスコアを除外する"
       other: "下位 %{count} 個のスコアを除外する"
     drop_lowest_scores: "最低スコア %{number} を下げる"
-    due_date_override: 
-      overrides: 
-        available_from: 次から使用可能
-        due_date: 期日
-        for: 対象
-      until: 次の日時まで
     due_date_view: 
       overrides: 
         remove_these_dates: これらの日付を削除
@@ -1770,7 +1719,6 @@ ja:
       description: 説明
       freeze_properties: コピーされるときに課題のプロパティをロック
       notify_content_change: この内容が変更になったことをユーザに通知する
-      only_visible_to_overrides_note: "注: この課題は、以下の指定されたセクションに*のみ*表示されます。"
       points_possible: 点数
       post_to_sis: 学校の受講生情報システムに投稿する際にこの課題の成績を含める
       warnings: 
@@ -2217,6 +2165,7 @@ ja:
   available_from_587ce92f: 次の日付から使用可能
   available_from_date_43b5e11d: 利用可能期間の開始日付
   available_from_date_afc594fa: "日付から利用可能:"
+  available_from_f84e4611: 次から使用可能
   available_until_date_2c0ccec3: "日付まで利用可能:"
   available_until_date_cd125c62: 利用可能期間の終了日付
   available_until_f3b9c4ed: 次の日付まで利用可能
@@ -2691,30 +2640,9 @@ ja:
     ics_title: "%{course_or_group_name} のカレンダー (Canvas)"
     invalid_date_or_time: "%{attr} の日付または日時が無効です"
   calendars: 
-    assignment_details: 課題の詳細
-    default_title: イベント
     event: 
       due: 期限
       event_title: "期限: %{event_title}"
-    event_details: イベントの詳細
-    feed_dialog_title: "カレンダー フィード"
-    keycodes: 
-      delete: d
-      edit: e
-      new: "n"
-      next_day: Ctrl+Right
-      next_event: j
-      next_week: Ctrl+Down
-      open: o
-      previous_day: Ctrl+Left
-      previous_event: k
-      previous_week: Ctrl+Up
-      refresh: r
-    notices: 
-      event_moved: "%{event} は次の場所に移動されました: %{day}"
-    prompts: 
-      delete_assignment: この課題を削除してもよろしいですか?
-      delete_event: このイベントを削除してもよろしいですか?
     show2: 
       calendar_feed: "カレンダー フィード"
       calendar_feed_instructions: "下のリンクをコピーして、iCal フィードを取得する任意のカレンダー アプリ (Google カレンダー、iCal、Outlook) に貼り付けます。"
@@ -2728,11 +2656,6 @@ ja:
       toggle_calendars: カレンダーの切り替え
       toggle_undated_items: 日付のないアイテムの切り替え
       undated_items: 日付のないアイテム
-    titles: 
-      add_new_assignment: 新しい課題の追加
-      add_new_event: 新しいイベントの追加
-      edit_assignment: 課題の編集
-      edit_event: イベントの編集
     wizard_box: 
       descriptions: 
         assignment: "よくできました。ここでダイアログの \"課題\" タブをクリックして、カレンダー イベントではなく課題を作成します。"
@@ -2781,6 +2704,8 @@ ja:
   canvas_cartridge_display: "Canvas コモン カートリッジ"
   canvas_cartridge_file_description: "Canvas コース エクスポート パッケージ"
   canvas_cartridge_name: "Canvas カートリッジ インポーター"
+  canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas は使用されている ID プロバイダーを認識しませんでした"
+  canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas に、次のユーザのアカウントがありません: %{user}"
   canvas_error_report_ff678539: キャンバス・エラー・レポート
   canvas_revision_unknown: 不明
   canvas_ticketing_email_connector_27e253ae: キャンバス・チケット・メールコネクタ
@@ -2839,7 +2764,7 @@ ja:
         cancel: キャンセル
         update: 共同作業の更新
       labels: 
-        description: 説明
+        description: "説明:"
         title: 共同作業のタイトル
     errors: 
       cannot_load_collaboration: 共同作業を読み込めません
@@ -2870,7 +2795,7 @@ ja:
             **警告**:Google ドキュメントの共同作業に参加するためには、ご自分も (すべての共同作業者も) Google アカウントを持つ必要があります。
       labels: 
         collaboration_type: "次のものを使用した共同作業:"
-        description: 説明
+        description: "説明:"
         document_name: "文書名:"
       messages: 
         delete_google_doc_as_well: "この共同作業は Google ドキュメントとして保存されています。Canvas だけから削除しますか? または Google ドキュメントからも削除しますか?"
@@ -3054,6 +2979,7 @@ ja:
   config_url_e96ceaf3: "URL 設定"
   configurate_tool_app_5a721f2c: "%{tool} アプリを設定しますか?"
   configuration_type_25a084a4: 設定のタイプ
+  configure_ecb97e30: 設定
   configure_toolname_app_651371be: "%{toolName} アプリの設定"
   confirm_dialog: 
     cancel: キャンセル
@@ -3085,7 +3011,7 @@ ja:
       message: 
         export_started: エクスポートの処理が開始されました。大きいコースの場合は時間がかかります。*他のページに移動して構いません*。エクスポートが完了すると電子メールが送信されます。
       no_submissions: 現在、エクスポートする提出物はありません。
-      user_data_exports: "ユーザ データのエクスポート"
+      user_data_exports: 提出物のダウンロード
     labels: 
       new_export: "新しいエクスポート:"
     links: 
@@ -3308,17 +3234,6 @@ ja:
     titles: 
       tag_external_web_page: "外部の Web ページにタグ付け"
   context: 
-    communication: 
-      headings: 
-        discussions: ディスカッション
-      links: 
-        feeds: 
-          course_discussions: "コース ディスカッションの Atom フィード"
-        start_collaboration: 共同作業の開始
-        start_conference: "Web 会議の開始"
-        start_topic: 新しいトピックの開始
-      titles: 
-        communication: コミュニケーション
     deleted_item: 
       created: 作成日時
       last_updated: 最終更新日時
@@ -4105,12 +4020,14 @@ ja:
       wiki_id: "Wiki ID"
       workflow_state: ワークフロー状態
   course_members_are_free_to_join_9b2603d4: "コース メンバーは自由に参加可"
+  course_navigation_dd035109: "コース ナビゲーション"
   course_restore: 
     restore_error: コースを復元する際にエラーが発生しました。コースは復元されませんでした。
   course_search: 
     cant_be_blank: 空白にはできません
   course_section: 
     sis_id_taken: "SIS ID \"%{sis_id}\" は既に使用されています"
+  course_section_7a988066: "コース セクション"
   course_settings: 
     buttons: 
       add_section: セクションの追加
@@ -4935,6 +4852,7 @@ ja:
   delete_survey_56fddbbd: サーベイの削除
   delete_tool_app_9c9f6d35: "%{tool} アプリを削除しますか?"
   delete_toolname_app_85f9d4ee: "%{toolName} アプリを削除"
+  delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "デモ サイトでは Recaptcha 設定を行う必要があります。この Canvas インスタンスのサイト管理者に連絡してください。"
   demos: 
     _register: 
@@ -5055,6 +4973,7 @@ ja:
       分化課題とは、課題の適用先セクションを選択できる *ベータ* 機能です。
       課題が割り当てられていないセクションでは、コースの内容に課題が表示されず、
       最終的な成績は課題の点数なしで計算されます。
+  diigo_993c4646: Diigo
   disable_a5c05db3: 無効
   disabled_18c33a73: (無効)
   discussion_6719c51d: ディスカッション
@@ -5139,7 +5058,6 @@ ja:
       enable_podcast_feed: "ポッドキャスト フィードを使用可能にする"
       include_replies_in_podcast_feed: ポッドキャスト内の受講生の返信を含む
       only_graders_can_like: 採点者のみがいいねをつけられます
-      only_visible_to_overrides_note: "注: このディスカッションは、以下の指定されたセクションに*のみ*表示されます。"
       options: オプション
       page_header_title: 新しいディスカッション
       points_possible: 配点
@@ -5316,9 +5234,6 @@ ja:
       show_more: 詳細
     hide_due_dates: 期日を非表示
     initial_post_required_to_subscribe: 購読する前に返信を投稿する必要があります
-    like_count: 
-      one: "(%{count} いいね)"
-      other: "(%{count} いいね)"
     mark_as_read: 既読にする
     mark_as_unread: 未読にする
     no_content: コンテンツなし
@@ -5369,6 +5284,8 @@ ja:
   domain_3b54c511: ドメイン
   don_t_show_again_15d8253e: 再度表示しない
   done_8af51c9b: 終了。
+  download_submissions_7454665f: 提出物のダウンロード
+  due_a73610f6: 期限
   due_at_5e18eeac: "期限:"
   due_by_c263dc10: 期限
   due_date_5d0a953c: "期日:"
@@ -5401,6 +5318,7 @@ ja:
   ecollege_file_description: ECollege
   ecollege_name: "ECollege コンバータ"
   edit_app_b0cc1c17: アプリの編集
+  edit_c5fbea07: 編集
   edit_grading_scheme_53091236: 採点スキームの編集
   edit_permissions_for_count_items_d65e3855: 
     one: "%{count} 個のアイテムの権限を編集"
@@ -5846,6 +5764,7 @@ ja:
   event_end_time_ef830e66: イベントの終了時間
   event_start_time_441b491f: イベントの開始時間
   everyone_854554dd: 全員
+  everyone_else_6c6dc7b6: 他の全員
   example_84698b7d: 例
   example_final_score_355aff0f: 最終スコアの例
   example_final_score_a92b30b9: "最終スコアの例]]"
@@ -5859,6 +5778,7 @@ ja:
   expand_or_collapse_undated_items_b901de09: 日付のないアイテムの展開と折りたたみ
   expand_subdiscussion_cd226ed4: サブディスカッションを展開する
   expires_on_date_18efe4e2: 有効期限が切れる日付
+  export_de71cd8e: エクスポート
   external_apps_f5490181: 外部アプリ
   external_content: 
     cancel: 
@@ -6013,8 +5933,6 @@ ja:
   feature_flags: 
     feature_flag: 
       allow: 許可
-      disabled: 無効
-      enabled: 使用可能
       estimated_release: "リリース予定:"
       no_description: 説明なし
       ? "off"
@@ -6288,7 +6206,6 @@ ja:
     only_one_folder: "フォルダ パスおよびフォルダ ID を設定できません"
   for: ための
   for_all_devices_1f603968: すべてのデバイス
-  for_section_8503af93: セクションへ
   from_fdd4956d: 変更前
   from_from_to_to_e31f6422: "%{from} ～ %{to}"
   get_the_following_from_your_salesforce_connected_a_881fc9a3: あなたのセールスフォースに接続されたアプリからフォロー獲得
@@ -6302,11 +6219,14 @@ ja:
     invitation: 招待
     question: 問題
     warning: 警告
+  google_docs_40374e65: "Google ドキュメント"
   google_docs_domain_restriction_description: |-
       Google ドキュメントのドメイン制限を使用すると、Google ドキュメントの提出や共同作業を
       単一のドメインに制限できます。承認されていないドメインで受講生が課題の提出や共同作業への
       参加を試みると、Google ドキュメント統合の設定を更新する必要があるというエラー メッセージが
       表示されます。
+  google_docs_preview_9f41b23c: "Google ドキュメントのプレビュー"
+  google_drive_7cb003c9: "Google ドライブ"
   grade_display_warning_dialog: 
     grade_display_warning: 
       checkbox: このコースでは再度表示しません。
@@ -6354,7 +6274,6 @@ ja:
     hide_all_details_button: 詳細をすべて非表示
     mic_blocked_message: "マイクの使用権限がブロックされています。変更するには、chrome://settings/contentExceptions#media-stream にアクセスしてください"
     mute_assignment: 課題をミュートにする
-    new_assessment: "[新しいアセスメント]"
     no_submission_time: 提出の時間がない
     nodetect_message: 音声が検出されませんでした。必要に応じて、マイクの設定を調整しれください。
     not_graded: 未採点
@@ -6487,6 +6406,8 @@ ja:
       switch_to_percent: パーセントに切り替え
       switch_to_points: 点数に切り替え
     ungraded: 採点に考慮されない
+  gradebook_csvs: 
+    grades_filename: 成績
   gradebook_uploads: 
     new: 
       titles: 
@@ -6626,6 +6547,7 @@ ja:
       arrange_columns_by_due_date: 期日で列を並べ替え
       arrange_columns_by_group: 課題グループで列を並べ替え
       download_scores: エクスポート
+      export_current_gradebook: 現在
       filter_by_student: "受講生名またはセカンダリ ID でフィルタする"
       grades: 成績
       hide_student_names: 受講生の名前を非表示
@@ -6641,7 +6563,6 @@ ja:
     grades: 
       complete: 完了
       incomplete: 未完了
-    grades_filename: 成績
     grading_box_extended: 
       labels: 
         grade: 成績
@@ -6734,7 +6655,6 @@ ja:
         show_all_sections: すべてのセクションを表示
         submit_same_score: 再提出物に対して、この同じ成績を使用する
       loading: 読み込んでいます...
-      new_assessment_option: "[新しいアセスメント]"
       no_annotation: このドキュメントには注釈を使用できません
       not_newest_notice: "注:これは最新の提出物ではありません"
       page_header_title: SpeedGrader
@@ -7331,7 +7251,6 @@ ja:
   if_you_ve_been_using_another_course_management_sys_67edfab1: "別のコース管理システムをご利用になっていた場合は、そのシステム上のコンテンツを Canvas に移動したいとお考えでしょう。そのようなご希望をお持ちの方のために、コンテンツを簡単に Canvas に移行するためのプロセスを、順を追ってご説明します。"
   ignore_91750df8: 無視する
   ignore_assignment_738b3c99: 課題を無視
-  ignore_forever_dd4a6cdf: 絶えず無視
   ignore_name_55edc6fe: "%{name} を無視"
   ignore_these_3940f6f5: これらを無視
   ignore_this_assignment_b7a71f80: この課題を無視
@@ -7375,6 +7294,7 @@ ja:
     warnings: 
       truncated_wiki_title: "次の Wiki ページのタイトルは切り詰められました: %{title}"
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: 学校の受講生情報システムに投稿する際にこの課題の成績を含める
+  incorrect_username_and_or_password_2de73abb: ユーザ名またはパスワード、またはその両方が間違っています
   incremental_update_successfully_generated_against__db3f3f06: 増分更新が正常に以前のSISインポートに対して行われました。
   info: 
     notices: 
@@ -7554,10 +7474,7 @@ ja:
   launch_url_e150bd41: "URL を起動"
   layouts: 
     application: 
-      ? "User Research"
-      : ユーザ研究
       bouncing_communication_channels: "連絡方法のいずれかに問題があるようです。*設定ページ* を確認してください。"
-      by_instructure: "By Instructure"
       group_switch: 切り替え
       javascript_required: "このサイトにアクセスするには、JavaScript を有効にする必要があります。"
       keyboard_navigation: 
@@ -7566,7 +7483,6 @@ ja:
         close: 閉じる
         dashboard: "マイ ダッシュボード"
         skip_to_content: コンテンツまでスキップする
-      open_source_learning_management_system: "オープン ソース LMS"
     fixed_bottom: 
       masquerading: 
         stop: マスカレードの停止
@@ -7586,6 +7502,7 @@ ja:
       log_in_to_canvas: "Canvas へのログイン"
     styleguide: 
       default_page_title: "Canvas LMS"
+  ldap_e1e0a916: LDAP
   learning_mastery_gradebook_description: 講師は、学習の達成度の成績表を使用して、コース学習成果における受講生およびコースの進捗を簡単に表示できます。成果は成績表のような形式で表示され、受講生の進捗が、数字のスコアや達成/ほぼ達成/補習として表示されます。
   learning_outcome: 
     no_comment: コメントなし
@@ -7693,6 +7610,7 @@ ja:
   linked_assignment_message: "課題 '%{title}' とリンクされています"
   linked_discussion_topic_message: "ディスカッション トピック '%{title}' とリンクされています"
   linked_quiz_message: "クイズ '%{title}' とリンクされています"
+  linkedin_5726caca: LinkedIn
   links: 
     dashboard: "マイ ダッシュボード"
     errors: 
@@ -7712,6 +7630,66 @@ ja:
   lock_until_date_62ce1b5c: ロック終了日付
   log_out_379ba28a: ログアウト
   logged_out_user: "ログアウトしたユーザ %{user_counter}"
+  login: 
+    canvas: 
+      mobile_login: 
+        back_to_login: ログインに戻る
+        buttons: 
+          request_password: パスワードの要求
+        dont_know_password: パスワードが分かりません
+        log_in: ログイン
+        login_handle: "%{login_handle_name} を入力してください。パスワード変更用のリンクをお送りします。"
+        password: パスワード
+        sending: 送信しています...
+      new: 
+        back_to_login: ログインに戻る
+        browse_courses: コースの参照
+        buttons: 
+          request_password: パスワードの要求
+        coenrollment_banner: "*Canvas ユーザの親ですか?* **アカウントはこちらをクリックしてください**"
+        labels: 
+          password: パスワード
+        log_in: ログイン
+        login_handle: "%{login_handle_name} を入力してください。パスワード変更用のリンクをお送りします。"
+        page_title: "Canvas にログイン"
+        register_for_canvas: "*Canvas アカウントが必要ですか?* **こちらをクリックしてください (登録無料)。**"
+    logout_confirm: 
+      cancel: キャンセル
+      details: 
+        log_out: "Canvas からログアウトしてもよろしいですか?"
+      log_out: ログアウト
+      page_title: ログアウト
+    otp: 
+      errors: 
+        invalid_otp: 検証コードが無効です。もう一度やり直してください
+      new: 
+        buttons: 
+          send: 送信
+          verify: 検証
+        details: 
+          mfa_enrollment: "マルチファクタ認証は、Canvas にログインするために、パスワードの確認に加えて、物理的なものの所有を要求することにより、セキュリティを強化します。例えば、検証コードを生成できるデバイスや、テキスト メッセージを受信できる電話機などを使用できます。下の QR コードをスキャンすることで、[iPhone](%{iphone_url}) 用の Google Authenticator アプリまたは [Android](%{android_url}) を設定できます。シークレット鍵 **%{secret_key}** を入力することで、他のトークンを設定することもできます。"
+          mfa_required: マルチファクタ認証を設定する必要があります。
+          otp_on_device: トークンによって示される検証コードを入力してください。
+          otp_sent_to_phone: 電話機に送信された検証コードをここに入力してください。
+          send_to_sms: "%{phone_number} にテキスト メッセージを送信する"
+        labels: 
+          carrier: 通信事業者
+          phone_number: 電話番号
+          remember_me: このコンピュータの情報を保存する
+          verification_code: 検証コード
+        links: 
+          choose_number: 既存の電話を選択する
+        page_title: マルチファクタ認証
+        select: 
+          new_number: 新しい電話
+        titles: 
+          mfa: マルチファクタ認証
+    saml: 
+      debug: 
+        logout_request_redirect_from_idp: "IdP から LogoutRequest を受信"
+        logout_response_redirect_from_idp: "IdP から LogoutResponse を受信"
+        logout_response_redirect_to_idp: "IdP に LogoutResponse を送信"
+        redirect_from_idp: "IdP から LoginResponse を受け取りました"
   logo_a040ae0e: ロゴ
   looks_great_e4d883ed: 素晴らしいです！
   low_score_4eeb95b2: "低: %{score}"
@@ -9479,6 +9457,13 @@ ja:
         subject: "Web 会議への招待: %{name}"
       twitter: 
         tweet: "Canvas アラート - 招待:%{title}、%{name} に参加"
+    web_conference_recording_ready: 
+      email: 
+        details_link: "詳細はここで確認できます: %{link}"
+        html: 
+          details_link: 詳細を表示するにはここをクリック
+      sms: 
+        link_message: "詳細は %{url} をご覧ください"
   migration: 
     announcement_type: アナウンス
     assignment_group_type: 課題グループ
@@ -9656,6 +9641,7 @@ ja:
   more_courses_5ebbe998: その他のコース
   most_recent_score_13a87e8c: 最新のスコア
   most_recent_score_counts_as_75_of_mastery_weight_a_f1e3e6c2: "最近のスコアが熟達スコアの 75% のウエイトを占め、その他すべてのスコアの平均が 25% のウエイトを占めています。"
+  move_abf00365: 移動
   move_dialog: 
     cancel: キャンセル
     save: 保存
@@ -9665,6 +9651,8 @@ ja:
     move_to_end: "-- 下へ --"
   move_outcome_ce497e6c: 成果の移動
   move_outcome_group_cfa1a505: 成果グループの移動
+  moving_a4d552df: 移動しています...
+  multi_factor_authentication_configured_865b1bde: マルチファクタ認証が設定されました
   must_achieve_mastery_at_least_2_times_must_also_co_b2ae7688: "熟達を2 回以上達成する必要があります。また、計算のため、2項目以上を完了する必要があります。熟達以上のスコアを平均したものが最終スコアとなります。"
   must_achieve_mastery_at_least_2_times_scores_above_57077a88: "熟達を2 回以上達成する必要があります。熟達以上のスコアを平均したものが最終スコアとなります。"
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "'file_ids' か 'folder_ids' のいずれか、または両方のパラメータを指定する必要があります"
@@ -9710,6 +9698,8 @@ ja:
   no_e16d9132: いいえ
   no_grading_schemes_to_display_8b0e92e7: 表示する採点スキームがありません
   no_migration_file: コンテンツ移行にはファイルが必要です。
+  no_password_was_given_472222e5: パスワードが指定されていません
+  no_results_found_58717065: 結果が見つかりません
   no_score_yet_c94e919b: まだスコアがありません
   no_students_have_taken_the_quiz_yet_e667644b: "受講生がまだ 1 人もこのクイズに回答していません"
   no_students_have_taken_the_survey_yet_d378cd35: "受講生がまだ 1 人もこのサーベイに回答していません"
@@ -9942,6 +9932,7 @@ ja:
       admin: 管理
       alerts: アラート
       communication: 会話
+      conferences: 会議
       course: コースのアクティビティ
       discussions: ディスカッション
       groups: グループ
@@ -10184,7 +10175,6 @@ ja:
     everyone_else: 他の全員
     overrides: 
       everyone: 全員
-      everyone_else: 他の全員
   own_copyright_cc59db55: 著作権保有
   page_comment: 
     default_user_name: 匿名
@@ -10926,6 +10916,7 @@ ja:
     yo_select: 
       yo: Yo
     you_have_no_services: "どのサービスにも登録していません。*設定* ページで追加できます。"
+  profile_6bd2baed: プロフィール
   profiles: 
     avatar_dialog: 
       from_gravatar: "Gravatar から"
@@ -10964,70 +10955,7 @@ ja:
       too_long: "%{max} 文字以内にしてください"
       too_short: "%{min} 文字以上にしてください"
   pseudonym_sessions: 
-    debug: 
-      logout_redirect: "LogoutRequest が IdP に送信されました"
-      logout_request_redirect_from_idp: "IdP から LogoutRequest を受信"
-      logout_response_redirect_from_idp: "IdP から LogoutResponse を受信"
-      logout_response_redirect_to_idp: "IdP に LogoutResponse を送信"
-      redirect_from_idp: "IdP から LoginResponse を受け取りました"
     default_app_name: サードパーティのアプリケーション
-    errors: 
-      blank_password: パスワードが指定されていません
-      invalid_credentials: ユーザ名またはパスワード、またはその両方が間違っています
-      invalid_otp: 検証コードが無効です。もう一度やり直してください
-      login_error: "%{institution} にログインする際に問題が発生しました"
-      login_errors: 
-        no_config_for_id: "Canvas アカウントにはその ID での認証設定はありません"
-        no_idp_set: ログイン元の団体は、このアカウントに設定されていません。
-        unrecognized_idp: "Canvas は使用されている ID プロバイダーを認識しませんでした"
-      logout_errors: 
-        no_idp_found: "Canvas は使用されている ID プロバイダーでユーザをログアウトさせられませんでした"
-      max_attempts: ログインの試行回数が多すぎます。後でもう一度、試してください。または、システム管理者までご連絡ください。
-      no_matching_user: "Canvas に、次のユーザのアカウントがありません: %{user}"
-      user_deleted: "そのユーザ アカウントは削除されました。システム管理者に連絡の上、アカウントを再アクティブ化してください。"
-    logout_confirm: 
-      cancel: キャンセル
-      details: 
-        log_out: "Canvas からログアウトしてもよろしいですか?"
-      log_out: ログアウト
-      page_title: ログアウト
-    mobile_login: 
-      back_to_login: ログインに戻る
-      buttons: 
-        request_password: パスワードの要求
-      dont_know_password: パスワードが分かりません
-      log_in: ログイン
-      login_handle: "%{login_handle_name} を入力してください。パスワード変更用のリンクをお送りします。"
-      password: パスワード
-      sending: 送信しています...
-    new: 
-      page_title: "Canvas にログイン"
-    notices: 
-      mfa_complete: マルチファクタ認証が設定されました
-    otp_login: 
-      buttons: 
-        send: 送信
-        verify: 検証
-      details: 
-        mfa_enrollment: "マルチファクタ認証は、Canvas にログインするために、パスワードの確認に加えて、物理的なものの所有を要求することにより、セキュリティを強化します。例えば、検証コードを生成できるデバイスや、テキスト メッセージを受信できる電話機などを使用できます。下の QR コードをスキャンすることで、[iPhone](%{iphone_url}) 用の Google Authenticator アプリまたは [Android](%{android_url}) を設定できます。シークレット鍵 **%{secret_key}** を入力することで、他のトークンを設定することもできます。"
-        mfa_required: マルチファクタ認証を設定する必要があります。
-        otp_on_device: トークンによって示される検証コードを入力してください。
-        otp_sent_to_phone: 電話機に送信された検証コードをここに入力してください。
-        send_to_sms: "%{phone_number} にテキスト メッセージを送信する"
-      labels: 
-        carrier: 通信事業者
-        phone_number: 電話番号
-        remember_me: このコンピュータの情報を保存する
-        verification_code: 検証コード
-      links: 
-        choose_number: 既存の電話を選択する
-      page_title: マルチファクタ認証
-      select: 
-        new_number: 新しい電話
-      titles: 
-        mfa: マルチファクタ認証
-    password_confirmation_error: 要求を送信する際にエラーが発生しました。
-    password_confirmation_sent: パスワードの確認が送信されました。スパム用の受信箱も確認してみてください。
   pseudonyms: 
     confirm_change_password: 
       buttons: 
@@ -11966,7 +11894,6 @@ ja:
         new_discussion: 新しいディスカッション
         one_question_at_a_time: "一度に 1 つの問題を表示する"
         one_time_results: 各試行の後一度のみ
-        only_visible_to_overrides_note: "注: このクイズは以下の指定されたセクションに**のみ**表示されます。"
         points_possible: "点数 %{n}"
         post_to_sis: "成績表を SIS に投稿"
         quiz_access_code: 必須アクセスコード
@@ -12441,7 +12368,6 @@ ja:
     move_success: 
       one: "%{count} 個のアイテムを %{destinationFolder} に移動しました"
       other: "%{count} 個のアイテムを %{destinationFolder} に移動しました"
-    moving: 移動しています...
     name: 名前
     progress_error: ダウンロードの準備中にエラーが発生しました。もう一度やり直してください。
     progress_message: "ダウンロードの準備中: %{percent}% 完了"
@@ -12518,6 +12444,7 @@ ja:
   remove_recipient_name_a6b83cef: "受信者%{name}を削除する"
   remove_row_c198da5a: 行を削除
   remove_row_f9d59cba: 行を削除
+  remove_these_dates_48453a81: これらの日付を削除
   rename_45608f54: 名前変更
   reply_from_name: "%{name} (Canvas のお知らせから)"
   reply_to_comment_72d96728: コメントに返信
@@ -13140,6 +13067,11 @@ ja:
     canvas-user-nav: 
       navigation: 
         user_menu: "ユーザ メニュー"
+    canvas_footer: 
+      ? "User Research"
+      : ユーザ研究
+      by_instructure: "By Instructure"
+      open_source_learning_management_system: "オープン ソース LMS"
     components: 
       ic_submission-download-dialog: 
         click_to_download: ここをクリックしてダウンロード
@@ -13329,21 +13261,6 @@ ja:
     locale_warning: 
       crowdsourced_warning_message: 選択した言語は、クラウドソーシングによって翻訳されています。教育機関では、翻訳の正確性を確認または検証しておらず、この言語設定を使用することについての責任を負いません。ご自身の判断で使用してください。
       crowdsourced_warning_title: クラウドソーシングで翻訳された言語
-    login: 
-      back_to_login: ログインに戻る
-      browse_courses: コースの参照
-      buttons: 
-        request_password: パスワードの要求
-      coenrollment_banner: "*Canvas ユーザの親ですか?* **アカウントはこちらをクリックしてください**"
-      default_login_message: ご利用の教育機関でログインしてください
-      dont_know_password: パスワードが分かりません
-      labels: 
-        password: パスワード
-        remember_me: ログイン状態を保つ
-      log_in: ログイン
-      login_at_account: "%{school_name} でログイン"
-      login_handle: "%{login_handle_name} を入力してください。パスワード変更用のリンクをお送りします。"
-      register_for_canvas: "*Canvas アカウントが必要ですか?* **こちらをクリックしてください (登録無料)。**"
     menu_assignment: 
       labels: 
         due: 期限
@@ -13618,7 +13535,6 @@ ja:
       grading_alt: 採点
       submission_comment: 提出コメント
     terms_required: 
-      terms_have_changed: "*利用規約* が変更されました。利用規約を確認してから Canvas の使用を続行してください。"
       updated_terms_of_use: 更新された利用規約
     unauthorized: 
       headings: 
@@ -13634,8 +13550,6 @@ ja:
         unauthorized_action: 権限がありません
       unauthorized_1: このページにアクセスする権限がないようです。このコンテンツを表示する権限があるか、確認してください。
       unauthorized_2: "このページを表示できるはずである場合は、\"ヘルプ\" リンクを使用して、この問題をサポートにお知らせください。"
-      unauthorized_action: このページへのアクセスは、認証されたユーザに制限されています。このページのコンテンツを表示するには、その前に、ログインする必要があります。
-      unauthorized_user: "%{user_name} さんがこのページを表示するには、ログインする必要があります。パスワードを忘れた場合、またはパスワードが分からない場合は、\"パスワードを忘れた場合\" をクリックしてください。"
       unauthorized_user_is_other: "%{current_user} さん、このページを表示する権限がありません。このページへのアクセスに使用されたリンクは、**%{unauthorized_user} (%{unauthorized_user_email})** さん用のものです。これがご自分であれば、一度ログアウトし、その電子メールに書かれているアドレスでログインし直すことで、このページにアクセスできます。"
     unauthorized_feed: 
       bad_params: アクセスしようとしたフィードのパラメータが無効です。
@@ -13839,6 +13753,7 @@ ja:
       users_matching_label: 一致するユーザ
   skipped_file_filename_due_to_error_94f0194: "エラーのため、%{filename}ファイルをとばします。"
   skipping_unknown_file_type_cd1086ee: "不明なファイル タイプをスキップ"
+  skype_18850ba7: Skype
   slideshow: 
     titles: 
       back: 戻る
@@ -13860,6 +13775,7 @@ ja:
       submitted: "*提出済み:* %{submittedAt}"
   spreadsheet_6d622119: スプレッドシート
   sr_gradebook: 
+    all_grading_periods: すべての採点期間
     all_sections: すべてのセクション
     assignment_muted: クリックしてミュート解除します。
     assignment_order_alpha: アルファベット順
@@ -14137,6 +14053,7 @@ ja:
     files: ファイル
     grades: 成績
     home: ホーム
+    logout: ログアウト
     modules: モジュール
     observees: 監視中
     outcomes: 成果
@@ -14211,6 +14128,7 @@ ja:
       timespan: "%{start_at} *至* %{end_at}"
   text_document_eacbcdb7: テキスト文書
   text_entry_submission_cannot_be_empty_3d187cae: テキスト入力送信は、空にすることはできません
+  that_user_account_has_been_deleted_please_contact__350e0e0: "そのユーザ アカウントは削除されました。システム管理者に連絡の上、アカウントを再アクティブ化してください。"
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: レポートユーザが所有するアカウントのアカウントID
   the_app_was_activated_a84e055f: アプリがアクティブ化されました
   the_app_was_added_58e2836a: アプリが追加されました
@@ -14225,6 +14143,7 @@ ja:
       (例、なんとか.instructure.com)
   the_grading_period_was_deleted_7814a349: 採点期間は削除されました
   the_grading_period_was_saved_4a504c5: 採点期間は保存されました
+  the_institution_you_logged_in_from_is_not_configur_5ceac41: ログイン元の団体は、このアカウントに設定されていません。
   the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "Canvas ヘッダの右上のロゴ画像。200x200 svg または png"
   the_material_is_in_the_public_domain_279c39a3: "この資料はパブリック ドメインです"
   the_material_is_licensed_under_creative_commons_3242cb5e: "この資料はクリエイティブ コモンズ ライセンスの対象となります"
@@ -14245,6 +14164,7 @@ ja:
     other: "リストには、%{count} 件の結果があります"
   there_was_a_problem_deleting_the_grading_period_50ce07c5: 採点期間を削除する際に問題が発生しました
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: 採点スキームを削除する際に問題が発生しました
+  there_was_a_problem_logging_in_at_institution_5a298155: "%{institution} にログインする際に問題が発生しました"
   there_was_a_problem_saving_the_grading_period_243bed6c: "採点期間を保存する\b際に問題が発生しました"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: 採点スキームを保存する際に問題が発生しました
   there_was_an_error_in_processing_your_request_6513a49a: 要求を処理する際にエラーが発生しました
@@ -14479,6 +14399,7 @@ ja:
   to_minscore_43e5452e: "%{minScore}% まで"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "課題を表示するには、*アジェンダ* ビューがアクティブであることを確認します。"
   tolerance_value_9e96573c: 公差値
+  too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: ログインの試行回数が多すぎます。後でもう一度、試してください。または、システム管理者までご連絡ください。
   too_many_members_b8b15069: メンバーが多すぎます
   tooltips: 
     finished: 完了
@@ -14506,8 +14427,10 @@ ja:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "Turnitin に再提出"
+  twitter_fcef6b54: Twitter
   unable_to_remove_app_4293cb53: アプリを削除できません
   unarchive_selected_e0c4bd3d: アーカイブ解除が選択されました
+  unauthorized: 権限がありません
   unchanged_aca18e02: "[Unchanged]"
   ungraded_submissions_44efb0ec: 未採点の提出物
   ungraded_survey_ad7de790: 未採点のサーベイ
@@ -14555,8 +14478,8 @@ ja:
       terms: 利用規約に同意する必要があります
       too_long: "%{max} 文字以内にしてください"
     registration: 
-      agree_to_terms_and_privacy_policy: "*利用規約*と**プライバシー ポリシー**に同意します。"
       agree_to_terms_with_code_of_conduct: "*利用規約*と**行動規則**に同意します。"
+  user_avatars_e4fc4ed3: ユーザのアバター
   user_date_range_search: 
     cant_be_blank: "Canvas ユーザ ID を空欄にはできません"
     cant_come_before_from: "'終了日付' を '開始日付' より前にすることはできません"
@@ -14824,11 +14747,6 @@ ja:
           このユーザの代理で実際に操作を実行したのは **あなた** である、という事実です。
       masquerade_as: "%{user_name} をマスカレード"
       page_title_header: ユーザとしてマスカレード
-    merge: 
-      login_to_merge_different_account: "アカウント「%{current_user_name} (%{current_user_email})」を別のアカウントに結合するには、その新しいアカウントにログインしてください:"
-      merge_definition: "さまざまな理由により、最終的にログインが 1 つではなく 2 つになった可能性があります。この場合、2 つのログインを結合して、両方の情報を統合することができます。"
-      titles: 
-        merge_accounts: "ユーザ アカウントの結合"
     merge_results: 
       action: 処理
       emails: 電子メール
@@ -15023,10 +14941,6 @@ ja:
       delete_wiki: 削除
       labels: 
         front_page: "トップ ページ"
-      page_locked: このページはロックされています
-      page_locked_by_modules: "このページは、次のモジュールを完了した後に利用できます:"
-      page_locked_by_modules_until: "このページは、次のモジュールの完了後、%{lock_info.unlock_at} に利用可能になります:"
-      page_locked_until: "このページは、%{lock_info.unlock_at} に利用可能になります"
       published_indicator: 公開済み
       toolbar_menu: 
         settings: 設定
@@ -15146,6 +15060,7 @@ ja:
   would_you_like_to_enable_this_app_ccdf735d: このアプリを有効にしますか?
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "受講生がコースを続行できるようにしますか? または、新しい要件が完了するまで、これらのモジュールを再度ロックしますか?"
   xml_configuration_5ea1b942: "XML 設定"
+  yo_e4ee15a4: Yo
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "%{institution2} からの資格情報を使用して %{institution1} にログインしています"
   you_are_subscribed_and_will_be_notified_of_new_com_60b5b62b: あなたは登録されているので、新しいコメントの通知を受け取ります。クリックして、登録を抹消
   you_are_the_group_leader_for_this_group_b8629b70: "あなたはこのグループのグループ リーダーです"
@@ -15170,7 +15085,6 @@ ja:
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "課題リストは、*カレンダー* ページにあります。"
   your_assignments_list_has_improved_3eded80e: "*課題* リストが改良されました。"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: 課題は、ここに期日ごとに表示されます。
-  your_browser_does_not_meet_the_minimum_requirement_7a7022db: "ご利用のブラウザは Canvas の最小要件を満たしていません。サポートされるブラウザについては *Canvas ガイド* を参照してください。"
   your_content_has_been_exported_bbb57764: コンテンツがエクスポートされました。
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: あなたのファイルは、成績表にアップロードされました。そして、いつでもこのページから出ることができます。大きなCSVファイルを所持している場合は、あなたの変更の更新に数分かかることがあります。データの重複を避けるため、更に変更する前に、アップロードが完了したことと、成績表が正しいことを確認してください。
   your_message_has_been_sent_thank_you_e0284316: メッセージが送信されました。ありがとうございます!
