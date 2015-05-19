@@ -6,9 +6,14 @@ require [
   'compiled/views/PublishButtonView',
   'compiled/views/assignments/SpeedgraderLinkView',
   'compiled/util/vddTooltip',
+  'compiled/util/markAsDone'
   'compiled/jquery/ModuleSequenceFooter'
   'jquery.instructure_forms'
-], (INST, I18n, $, Assignment, PublishButtonView, SpeedgraderLinkView, vddTooltip) ->
+], (INST, I18n, $, Assignment, PublishButtonView, SpeedgraderLinkView, vddTooltip, MarkAsDone) ->
+
+  $ ->
+    $('#mark-as-done-checkbox').click ->
+      MarkAsDone.toggle(this)
 
   $ ->
     $el = $('#assignment_publish_button')

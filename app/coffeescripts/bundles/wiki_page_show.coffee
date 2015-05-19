@@ -2,8 +2,13 @@ require [
   'jquery'
   'compiled/models/WikiPage'
   'compiled/views/wiki/WikiPageView'
+  'compiled/util/markAsDone'
   'compiled/jquery/ModuleSequenceFooter'
-], ($, WikiPage, WikiPageView) ->
+], ($, WikiPage, WikiPageView, MarkAsDone) ->
+
+  $ ->
+    $('#mark-as-done-checkbox').click ->
+      MarkAsDone.toggle(this)
 
   $('body').addClass('show')
 

@@ -328,6 +328,12 @@ $context_module_bg_color: #f2f3f4;
       display: block;
     }
   }
+  &.must_mark_done_requirement {
+    .completion_requirement,
+    .must_mark_done_requirement {
+      display: block;
+    }
+  }
   &.must_contribute_requirement {
     .completion_requirement,
     .must_contribute_requirement {

@@ -481,6 +481,42 @@ class ContextModuleItemsApiController < ApplicationController
     end
   end
 
+
+  # @API Mark module item as done/not done
+  #
+  # Mark a module item as done/not done. Use HTTP method PUT to mark as done,
+  # and DELETE to mark as not done.
+  #
+  # @example_request
+  #
+  #     curl https://<canvas>/api/v1/courses/<course_id>/modules/<module_id>/items/<item_id>/done \
+  #       -X Put \
+  #       -H 'Authorization: Bearer <token>'
+  def mark_as_done
+    if authorized_action(@context, @current_user, :read)
+      user = @student || @current_user
+      _module_item(user).context_module_action(user, :done)
+      render :json => { :message => t('OK') }
+    end
+  end
+
+  def mark_as_not_done
+    if authorized_action(@context, @current_user, :read)
+      user = @student || @current_user
+      if (progression = _module_item(user).progression_for_user(@current_user))
+        progression.uncomplete_requirement(params[:id].to_i)
+        progression.evaluate
+      end
+      render :json => { :message => t('OK') }
+    end
+  end
+
+  def _module_item(user)
+    mod = @context.modules_visible_to(user).find(params[:module_id])
+    mod.content_tags_visible_to(user).find(params[:id])
+  end
+
+
   MAX_SEQUENCES = 10
 
   # @API Get module item sequence
