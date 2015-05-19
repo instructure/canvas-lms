@@ -27,13 +27,6 @@ module ApplicationHelper
     BeyondZConfiguration.url(path)
   end
 
-  def bitly_shorten(url)
-    access_token = BeyondZConfiguration.bitly_access_token
-    data = Net::HTTP.get(URI.parse("https://api-ssl.bitly.com//v3/shorten?access_token=#{access_token}&longUrl=#{URI::escape(url)}"))
-    data = JSON::parse(data)
-    data['data']['url']
-  end
-
   def context_user_name(context, user)
     return nil unless user
     return user.short_name if !context && user.respond_to?(:short_name)
