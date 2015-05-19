@@ -80,18 +80,6 @@ ar:
         api_url: "عنوان Url لواجهة Api"
         common_core_guid: "المعرف الأساسي المشترك GUID (اختياري)"
   account: 
-    account_settings: 
-      account_surveys: "استطلاعات الحساب"
-      avatars: "الصور المجسمة للمستخدم"
-      delicious: Delicious
-      diigo: Diigo
-      google_docs: "Google Docs"
-      google_docs_preview: "معاينة Google Docs"
-      google_drive: "Google Drive"
-      linked_in: LinkedIn
-      skype: Skype
-      twitter: Twitter
-      yo: Yo
     ask_canvas_network: "طرح سؤال على مجتمع شبكة Canvas"
     default_account_name: "حساب افتراضي"
     default_site_administrator_account_name: "مسؤول الموقع"
@@ -124,59 +112,46 @@ ar:
     tab_users: المستخدمون
     turnitin_pledge: "يعد إرسال هذه المهمة هو عملي الخاص والأصلي"
   account_authorization_config: 
-    debug: 
-      wait_for_login: "الانتظار لمحاولة تسجيل الدخول"
     default_delegated_login_handle_name: "تسجيل الدخول"
     default_login_handle_name: "البريد الإلكتروني"
-    saml_eppn_domain_stripped: "%{eppn} (تم تجريد المجال)"
+  account_authorization_config/ldap: 
     test_bind_failed: "فشل الربط مع ظهور الخطأ التالي: %{error}"
     test_connection_timeout: "المهلة أثناء الاتصال"
     test_host_unknown: "مضيف غير معروف: %{host}"
     test_login_auth_exception: "استثناء عند تسجيل الدخول: %{error}"
     test_login_auth_failed: "فشلت المصادقة"
     test_search_failed: "فشل البحث نتيحة لوجود الخطأ التالي: %{error}"
+  account_authorization_config/saml: 
+    debug: 
+      logout_redirect: "تم إرسال LogoutRequest إلى IdP"
+      wait_for_login: "الانتظار لمحاولة تسجيل الدخول"
+    saml_eppn_domain_stripped: "%{eppn} (تم تجريد المجال)"
   account_authorization_configs: 
     account_required: "يجب أن تتم المصادقة من قِبل LDAP"
-    cas_settings: 
+    cas_fields: 
       labels: 
         auth_base: "عنوان URL لـ CAS"
-        auth_type: النوع
-        login_handle_name: "تسمية تسجيل الدخول"
         unknown_user_url: "Url لمستخدم غير معروف"
-      login_handle_name_description: "التسمية المستخدمة لمعرّفات تسجيل الدخول الفريدة. الأمثلة: تسجيل الدخول، اسم المستخدم، معرف الطالب، إلخ"
-      save_button: "حفظ إعدادات المصادقة"
       unknown_user_url_description: "عنوان url مخصص لإعادة التوجيه في حالة عدم العثور على مستخدم مصدق في Canvas."
+    form_footer: 
+      labels: 
+        position: الموضع
+      save_button: "حفظ إعدادات المصادقة"
+    form_header: 
+      auth_type_label: النوع
+      auth_url: "عنوان URL لتسجيل الدخول لهذه التهيئة"
     index: 
       add_auth_desc: "إضافة موفر الهوية لهذا الحساب:"
-      canvas_login_tip: |-
-          إذا قمت بتكوين إعدادات جعلتك غير قادر على تسجيل الدخول فيمكنك إضافة
-            *%{url1}* إلى نهاية عنوان url لتسجيل الدخول. سيتيح لك ذلك تسجيل الدخول            باستخدام إجراء تسجيل الدخول العادي لـ Canvas. بالنسبة لهذا الحساب يمكن أن يكون عنوان url هو %{url2}
       choose_auth_type_option: "اختيار خدمة مصادقة"
       current_settings_title: "التكامل الحالي"
       delete_auth_confirmation: "هل أنت متأكد؟ قد لا يتمكن المستخدمون من تسجيل الدخول إذا تمت إزالة هذا."
-      delete_auth_link: "إزالة المصادقة"
-      edit_auth_link: "تحرير التفاصيل"
       ip_address_list_description: "إذا كنت تستخدم خدمة مصادقة تتطلب من خوادم Canvas الاتصال بخوادمك مباشرةً؛ مثل LDAP، فستحتاج للتأكد أن خوادمك يمكنها قبول الاتصلات من عناوين IP تلك:"
       no_auth_type_description: "لا يتكامل هذا الحساب حاليًا مع موفر الهوية."
       page_title: "إعدادات المصادقة"
       profile_page_link_example: "على سبيل المثال، فيما يلي صفحة ملف التعريف الخاصة بك: [%{friendlyname}](%{url})"
       settings_description: "لقيام مستخدم بالمصادقة من خلال موفر هوية خارجي (IdP)، يجب على المستخدم أن يكون لديه معرّف تسجيل دخول مرتبط بهذا الحساب ويطابق المعرّف الفريد الذي يرجعه IdP (موفر الهوية). لمشاهدة تسجيلات دخول المستخدم الحالية، راجع قسم \"معلومات تسجيل الدخول\" في صفحة ملف تعريف المستخدم. (يتم العثور عليه بالبحث عن المستخدم في علامة التبويب \"المستخدمون\".)"
       settings_title: "إعدادات المصادقة"
-      test_ldap_link: "اختبار المصادقة"
-    ldap_settings: 
-      add_secondary_ldap_server_link: "إضافة خادم LDAP ثانوي"
-      auth_type_label: النوع
-      change_password_url_help: "ترك فراغ لسلوك Canvas الافتراضي"
-      change_password_url_not_specified: "لم يتم تحديد URL"
-      labels: 
-        change_password_url: "نسيت عنوان URL لكلمة المرور"
-        login_handle_name: "تسمية تسجيل الدخول"
-      login_handle_name_description: "التسمية المستخدمة لمعرّفات تسجيل الدخول الفريدة. الأمثلة: تسجيل الدخول، اسم المستخدم، معرف الطالب، إلخ"
-      remove_secondary_ldap_link: (إزالة)
-      save_button: "حفظ إعدادات LDAP"
-      secondary_ldap_label: "LDAP الثانوي"
-      setting_type_ldap: LDAP
-    ldap_settings_fields: 
+    ldap_fields: 
       auth_filter_description: "استخدم *%{placeholder}* كعنصر نائب لاسم المستخدم الذي يوفره المستخدم. على سبيل المثال: *(sAMAccountName=%{placeholder})*"
       auth_password_description: "اتركه فارغًا للمتابعة باستخدام كلمة المرور الحالية."
       identifer_format_description: "السمة LDAP تستخدم للبحث في تسجيل دخول Canvas. اتركها فارغة لاستخدام اسم المستخدم الذي قام المستخدم بتوفيره."
@@ -192,9 +167,8 @@ ar:
         auth_port: المنفذ
         auth_username: "اسم المستخدم"
         identifier_format: "سمة معرف تسجيل الدخول"
-        no_tls: "بلا TLS"
-        simple_tls: "TLS بسيطة"
-        start_tls: StartTLS
+      last_ldap_timeout_failure: "فشل آخر مهلة"
+      ldap_timeout_failure_help2: "إذا انتهت مهلة اتصال Canvas لمرات كثيرة للغاية بخادم LDAP، فإنه سيمنع أي محاولات دخول أخرى من استخدام خادم LDAP ذلك لمدة %{time}."
     ldap_settings_test: 
       labels: 
         pass: "كلمة المرور"
@@ -222,50 +196,27 @@ ar:
       test_ldap_search_help_fixes_3: "تحقق من أن كائن المستخدم في LDAP يحتوي على امتيازات البحث لأساس البحث الذي تم توفيره."
       test_ldap_search_help_header: "لا يمكن لـ Canvas البحث عن مثيل LDAP الخاص بك"
       test_ldap_search_label: "جارٍ اختبار بحث LDAP..."
-    ldap_timeout_error: 
-      last_ldap_timeout_failure: "فشل آخر مهلة"
-      ldap_timeout_failure_help2: "إذا انتهت مهلة اتصال Canvas لمرات كثيرة للغاية بخادم LDAP، فإنه سيمنع أي محاولات دخول أخرى من استخدام خادم LDAP ذلك لمدة %{time}."
     login_required: "يجب أن يتم التزويد"
     no_changing_auth_types: "لا يمكن تغيير نوع تهيئة التفويض، ولذا يرجى حذف وإنشاء تهيئة جديدة."
-    no_discovery_url: "لم يتم التعيين"
     password_required: "يجب أن يتم التزويد"
-    saml_required: "مطلوب تكوين SAML لاختبار SAML"
-    saml_settings: 
-      auth_type: النوع
-      auth_url: "عنوان URL لتسجيل الدخول لهذه التهيئة"
-      certificate_fingerprint: "بصمة الشهادة"
-      change_password_url: "ارتباط تغيير كلمة المرور"
-      discovery_url: "عنوان URL الخاص بالاكتشاف:"
-      discovery_url_description: "إذا تم تعيين عنوان URL الخاص بالاكتشاف، فستقوم canvas بتوجيه جميع المستخدمين لهذا العنوان عند رغبتهم في المصادقة. وستقوم تلك الصفحة بمساعدة المستخدم في معرفة المكان الذي يجب عليه الذهاب إليه لتسجيل الدخول. إذا لم يتم تهيئة عنوان URL الخاص بالاكتشاف، فسيتم استخدام التهيئة الجديدة لـ SAML لمحاولة مصادقة المستخدم."
-      identifier_format: "تنسيق المعرف"
-      idp_entity_id: "معرف كيان موفر الهوية"
+    saml_fields: 
       labels: 
         certificate_fingerprint: "بصمة الشهادة"
-        change_password_url: "ارتباط تغيير كلمة المرور"
         identifier_format: "تنسيق المعرف"
         idp_entity_id: "معرف كيان موفر الهوية"
         log_in_url: "عنوان URL لتسجيل الدخول"
         log_out_url: "عنوان URL لتسجيل الخروج"
         login_attribute: "سمة تسجيل الدخول"
-        login_handle_name: "تسمية تسجيل الدخول"
-        position: الموضع
         requested_authn_context: "سياق المصادقة"
         unknown_user_url: "Url لمستخدم غير معروف"
-      log_in_url: "عنوان URL لتسجيل الدخول"
-      log_out_url: "عنوان URL لتسجيل الخروج"
-      login_attribute: "سمة تسجيل الدخول"
-      login_handle_name: "تسمية تسجيل الدخول"
-      login_handle_name_description: "التسمية المستخدمة لمعرّفات تسجيل الدخول الفريدة. أمثلة تسجيل الدخول، اسم المستخدم، معرف الطالب، إلخ"
-      no_discovery_url: "لم يتم تعيين شيء"
-      position: الموضع
+      unknown_user_url_description: "عنوان url مخصص لإعادة التوجيه في حالة عدم العثور على مستخدم مصدق في Canvas."
+    saml_required: "مطلوب تكوين SAML لاختبار SAML"
+    saml_settings_test: 
       refresh_debugging: تحديث
-      requested_authn_context: "سياق المصادقة"
       saml_debug_instructions: "بمجرد البدء في التصحيح سيتم جمع كل المعلومات المتصلة بالمحاولة التالية لتسجيل الدخول إلى SAML. انقر فوق الزر \"تحديث\" لمعرفة ما إذا تم جمع المزيد من البيانات أو \"إيقاف التصحيح\" لمسح البيانات التي تم جمعها ووقف محاولة التصحيح الحالية."
-      saml_debugging: التصحيح
-      save_button: "حفظ إعدادات المصادقة"
+      saml_required: "مطلوب تكوين SAML لاختبار SAML"
       start_debugging: "بدء التصحيح"
       stop_debugging: "إيقاف التصحيح"
-      unknown_user_url_description: "عنوان url مخصص لإعادة التوجيه في حالة عدم العثور على مستخدم مصدق في Canvas."
     saml_testing: 
       auth_request_to_idp: "تم إرسال AuthnRequest إلى IdP"
       auth_response_from_idp: "AuthnResponse من IdP"
@@ -294,7 +245,12 @@ ar:
         to_idp_xml: "تم إرسال LoginRequest XML إلى IdP"
       logout_request_to_idp: "تم إرسال LogoutRequest إلى IdP"
       logout_response_from_idp: "LogoutResponse من IdP"
-      saml_required: "مطلوب تكوين SAML لاختبار SAML"
+    sso_settings_form: 
+      change_password_url_help: "ترك فراغ لسلوك Canvas الافتراضي"
+      labels: 
+        change_password_url: "نسيت عنوان URL لكلمة المرور"
+        login_handle_name: "تسمية تسجيل الدخول"
+      login_handle_name_description: "التسمية المستخدمة لمعرّفات تسجيل الدخول الفريدة. أمثلة تسجيل الدخول، اسم المستخدم، معرف الطالب، إلخ"
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "وقت نهاية إشعار الحساب يسبق وقت البداية"
@@ -397,6 +353,7 @@ ar:
     report_header_user__id: user_id
     report_header_user_id: "معرف المستخدم"
     report_header_user_name: "اسم المستخدم"
+    report_header_user_short_name: short_name
     report_header_user_sis_id: "معرف sis للمستخدم"
     report_header_xlist_course_id: xlist_course_id
     sis_exporter: 
@@ -426,6 +383,7 @@ ar:
       open_registration_delegated_warning_dialog: "تم تمكين موفر الهوية الخارجي"
       what_are_quiz_ip_filters: "ما المقصود بعوامل تصفية IP للاختبار؟"
     user: مستخدم
+  account_surveys_b0039876: "استطلاعات الحساب"
   account_user: 
     types: 
       account_admin: "مسؤول الحساب"
@@ -456,16 +414,13 @@ ar:
         sis_user_id: "معرّف SIS"
         sortable_name: "الاسم القابل للفرز"
       sortable_name_help: "يظهر هذا الاسم في القوائم المفروزة."
-      unique_id_label: "%{label}:*"
     add_user_button: "إضافة مستخدم"
     add_user_dialog_title: "إضافة مستخدم جديد"
     adding_course_message: "جارٍ إضافة مساق..."
     adding_user_message: "جارٍ إضافة مستخدم..."
     additional_settings: 
-      account_domains: "مجالات الحساب"
       account_status: "حالة الحساب"
       add_new_domain: "إضافة مجال جديد"
-      external_status: "الحالة الخارجية"
       license: الترخيص
       license_type: "نوع الترخيص"
       new_account_domain_title: "مجال حساب جديد"
@@ -1310,6 +1265,7 @@ ar:
   activity_13915493: النشاط
   activity_by_category_9c2033d1: "النشاط حسب الفئة"
   activity_by_date_878c5b49: "النشاط حسب التاريخ"
+  add_8523c19b: إضافة
   add_app_baf540f: "إضافة تطبيق"
   add_attachment_93868828: "إضافة مرفق"
   add_course_assignments_628ed6d0: "إضافة مهام المساق"
@@ -1480,7 +1436,6 @@ ar:
       invalid_external_tool: "تعذر العثور على إعدادات صالحة لهذا الارتباط"
       invalid_external_tool_id: "تعذر العثور على إعدادات صالحة لهذه الأداة"
       invalid_feed_parameters: "معلمات الموجز غير صالحة."
-      invalid_oembed_url: "حدثت مشكلة أثناء استرداد هذا المورد. وفرت الأداة الخارجية معلومات غير صالحة حول المورد."
       invalid_tag_type: "لم يتعرف على نوع المصطلح الخاص بهذه العلامة"
       invalid_verification_code: "رمز التحقق غير صالح."
       mismatched_verification_code: "لا يتطابق رمز التحقق مع أي مستخدم تم تسجيله حاليًا."
@@ -1511,6 +1466,7 @@ ar:
         suspended: "تم إيقاف المعهد مؤقتًا"
     wiki_front_page_default_content_course: "مرحبًا إلى مساق wiki الجديد!"
     wiki_front_page_default_content_group: "مرحبًا إلى مجموعة wiki الجديدة!"
+  apply_781a2546: تطبيق
   appointment_group: 
     errors: 
       invalid_end_at: "وقت نهاية الموعد يسبق وقت البدء"
@@ -1528,6 +1484,7 @@ ar:
     update: تحديث
   archive_3f794d7e: أرشيف
   archive_selected_d64506ca: "أرشيف محدد"
+  are_you_sure_26795d3c: "هل أنت متأكد؟"
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     few: "هل تريد بالفعل حذف هذا العدد من العناصر البالغ %{count}؟"
     many: "هل تريد بالفعل حذف هذا العدد من العناصر البالغ %{count}؟"
@@ -1795,12 +1752,6 @@ ar:
       two: نقطتان
       zero: نقطة
     drop_lowest_scores: "إسقاط أقل %{number} نقطة/نقاط"
-    due_date_override: 
-      overrides: 
-        available_from: "متاح من"
-        due_date: "تاريخ الاستحقاق"
-        for: "بالنسبة لـ"
-      until: حتى
     due_date_view: 
       overrides: 
         remove_these_dates: "حذف هذه التواريخ"
@@ -1822,7 +1773,6 @@ ar:
       description: الوصف
       freeze_properties: "تأمين خصائص التعيين عند النسخ"
       notify_content_change: "إعلام المستخدمين بأن هذا المحتوى قد تغير"
-      only_visible_to_overrides_note: "ملاحظة: يمكن رؤية هذه المهمة *فقط* بواسطة القسم (الأقسام) المحددة أدناه:"
       points_possible: النقاط
       post_to_sis: "إدراج تقديرات المهمة هذه عند الإرسال إلى نظام معلومات الطالب في مدرستك"
       warnings: 
@@ -2279,6 +2229,7 @@ ar:
   available_from_587ce92f: "متوفر من"
   available_from_date_43b5e11d: "متاح من تاريخ"
   available_from_date_afc594fa: "متاح من تاريخ:"
+  available_from_f84e4611: "متوفر بدءًا من"
   available_until_date_2c0ccec3: "متاح إلى غاية تاريخ:"
   available_until_date_cd125c62: "متاح حتى تاريخ"
   available_until_f3b9c4ed: "متاح حتى"
@@ -2757,30 +2708,9 @@ ar:
     ics_title: "تقويم %{course_or_group_name} (Canvas)"
     invalid_date_or_time: "تاريخ أو تاريخ/وقت غير صالح لـ %{attr}"
   calendars: 
-    assignment_details: "تفاصيل المهمة"
-    default_title: حدث
     event: 
       due: "موعد الاستحقاق"
       event_title: "موعد الاستحقاق: %{event_title}"
-    event_details: "تفاصيل الحدث"
-    feed_dialog_title: "موجز التقويم"
-    keycodes: 
-      delete: d
-      edit: e
-      new: "n"
-      next_day: "ctrl+سهم لليمين"
-      next_event: j
-      next_week: "ctrl+سهم لأسفل"
-      open: o
-      previous_day: "ctrl+سهم لليسار"
-      previous_event: k
-      previous_week: "ctrl+سهم لأعلى"
-      refresh: r
-    notices: 
-      event_moved: "%{event} تم نقله إلى %{day}"
-    prompts: 
-      delete_assignment: "هل ترغب بالتأكيد في حذف هذه المهمة؟"
-      delete_event: "هل ترغب بالتأكيد في حذف هذا الحدث؟"
     show2: 
       calendar_feed: "موجز التقويم"
       calendar_feed_instructions: "انسخ الارتباط أدناه وألصقه في أي تطبيق من تطبيقات التقويم التي تقبل موجزات iCal (تقويم Google وiCal وOutlook إلخ)"
@@ -2794,11 +2724,6 @@ ar:
       toggle_calendars: "تبديل التقويمات"
       toggle_undated_items: "تبديل العناصر غير المؤرخة"
       undated_items: "العناصر غير المؤرخة"
-    titles: 
-      add_new_assignment: "إضافة مهمة جديدة"
-      add_new_event: "إضافة حدث جديد"
-      edit_assignment: "تحرير المهمة"
-      edit_event: "تحرير الحدث"
     wizard_box: 
       descriptions: 
         assignment: "حسنًا. والآن انقر فوق علامة تبويب \"المهمة\" في مربع الحوار لإنشاء مهمة بدلاً من حدث التقويم."
@@ -2847,6 +2772,8 @@ ar:
   canvas_cartridge_display: "كارتريدج Canvas المشتركة"
   canvas_cartridge_file_description: "حزمة تصدير مساق Canvas"
   canvas_cartridge_name: "مستورد كارتريدج Canvas"
+  canvas_did_not_recognize_your_identity_provider_cb0e50fc: "لم يتعرف Canvas على موفر الهوية"
+  canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "لا يحتوي Canvas على حساب للمستخدم: %{user}"
   canvas_error_report_ff678539: "تقرير خطأ Canvas"
   canvas_revision_unknown: "غير معروف"
   canvas_ticketing_email_connector_27e253ae: "رابط تذاكر البريد الإلكتروني لـ Canvas"
@@ -2909,7 +2836,7 @@ ar:
         cancel: إلغاء
         update: "تحديث التعاون"
       labels: 
-        description: الوصف
+        description: "الوصف:"
         title: "عنوان التعاون"
     errors: 
       cannot_load_collaboration: "تعذر تحميل التعاون"
@@ -2940,7 +2867,7 @@ ar:
             **تحذير**: ستحتاج (أنت ومن يتعاونون معك) إلى حساب Google من أجل المشاركة في أية علاقات تعاون لـ Google Docs.
       labels: 
         collaboration_type: "التعاون باستخدام:"
-        description: الوصف
+        description: "الوصف:"
         document_name: "اسم المستند:"
       messages: 
         delete_google_doc_as_well: "تم تخزين هذا التعاون كـ Google Doc. هل رغبت في حذفه من موقع Canvas، أو إزالته كذلك من Google Docs؟"
@@ -3118,6 +3045,7 @@ ar:
   config_url_e96ceaf3: "تكوين URL"
   configurate_tool_app_5a721f2c: "تكوين تطبيق %{tool}؟"
   configuration_type_25a084a4: "نوع التكوين"
+  configure_ecb97e30: التكوين
   configure_toolname_app_651371be: "تكوين تطبيق %{toolName}"
   confirm_dialog: 
     cancel: إلغاء
@@ -3149,7 +3077,7 @@ ar:
       message: 
         export_started: "بدأت عملية التصدير. قد يستغرق ذلك بعض الوقت مع المساقات الكبيرة. *يمكنك ترك الصفحة* وستتلقى بريدًا إلكترونيًا عند احجبال التصدير."
       no_submissions: "ليس لديك عمليات إرسال حاليًا للتصدير."
-      user_data_exports: "عمليات تصدير بيانات المستخدم"
+      user_data_exports: "تنزيل الإرسالات"
     labels: 
       new_export: "تصدير جديد:"
     links: 
@@ -3372,17 +3300,6 @@ ar:
     titles: 
       tag_external_web_page: "صفحة الويب الخارجية للعلامة"
   context: 
-    communication: 
-      headings: 
-        discussions: المناقشات
-      links: 
-        feeds: 
-          course_discussions: "موجز Atom لمناقشات المساق"
-        start_collaboration: "بدء علاقة تعاون"
-        start_conference: "بدء مؤتمر عبر الويب"
-        start_topic: "بدء موضوع جديد"
-      titles: 
-        communication: الاتصالات
     deleted_item: 
       created: "تم الإنشاء"
       last_updated: "تم التحديث الأخير"
@@ -4217,12 +4134,14 @@ ar:
       wiki_id: "معرّف Wiki"
       workflow_state: "حالة سير العمل"
   course_members_are_free_to_join_9b2603d4: "لأعضاء المساق الحرية في الانضمام"
+  course_navigation_dd035109: "التنقل عبر المساق"
   course_restore: 
     restore_error: "حدثت مشكلة أثناء محاولة استرداد المساق. لم يتم استرداد المساق."
   course_search: 
     cant_be_blank: "لا يمكن أن يكون فارغًا"
   course_section: 
     sis_id_taken: "معرف SIS \"%{sis_id}\" قيد الاستخدام بالفعل"
+  course_section_7a988066: "قسم المساق"
   course_settings: 
     buttons: 
       add_section: "إضافة قسم"
@@ -5135,6 +5054,7 @@ ar:
   delete_survey_56fddbbd: "حذف الاستطلاع"
   delete_tool_app_9c9f6d35: "أتريد حذف تطبيق %{tool}؟"
   delete_toolname_app_85f9d4ee: "حذف تطبيق %{toolName}"
+  delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "تتطلب المواقع التجريبية تكوين إعدادات Recaptcha. يرجى استشارة مسؤول الموقع لديك لمعرفة مثيل Canvas. "
   demos: 
     _register: 
@@ -5255,6 +5175,7 @@ ar:
       تعد التعيينات التمييزية ميزة *إصدار تجريبي* تقوم بتمكين اختيار القسم (الأقسام) الذي ينطبق عليه التعيين.
       أما الأقسام التي لم يتم إعطاؤها أي تعيين فلن تراها في محتوى مساقها وسيتم حساب
       درجتها النهائية بدون هذه النقاط.
+  diigo_993c4646: Diigo
   disable_a5c05db3: تعطيل
   disabled_18c33a73: (معطل)
   discussion_6719c51d: المناقشة
@@ -5351,7 +5272,6 @@ ar:
       enable_podcast_feed: "تمكين موجز بودكاست"
       include_replies_in_podcast_feed: "تضمين ردود الطلاب في موجز Podcast"
       only_graders_can_like: "المقيّمون فقط يستطيعون الإعجاب"
-      only_visible_to_overrides_note: "ملاحظة: لا يمكن مشاهدة هذه المناقشة *إلا* بواسطة القسم (الأقسام) المحدد أدناه:"
       options: خيارات
       page_header_title: "نقاش جديد"
       points_possible: "النقاط المحتملة"
@@ -5536,11 +5456,6 @@ ar:
       show_more: "عرض المزيد"
     hide_due_dates: "إخفاء تواريخ الاستحقاق"
     initial_post_required_to_subscribe: "يجب عليك نشر رد قبل الاشتراك"
-    like_count: 
-      few: "(%{count} إعجابات)"
-      many: "(%{count} إعجابًا)"
-      two: إعجابين
-      zero: "دون إعجاب"
     mark_as_read: "وضع علامة كمقروء"
     mark_as_unread: "وضع علامة كغير مقروء"
     no_content: "لا يوجد محتوى"
@@ -5595,6 +5510,8 @@ ar:
   domain_3b54c511: المجال
   don_t_show_again_15d8253e: "عدم إظهار مرة أخرى"
   done_8af51c9b: انتهاء.
+  download_submissions_7454665f: "تنزيل الإرسالات"
+  due_a73610f6: مستحق
   due_at_5e18eeac: "الاستحقاق في:"
   due_by_c263dc10: "مستحق بحلول"
   due_date_5d0a953c: "تاريخ الاستحقاق:"
@@ -5627,6 +5544,7 @@ ar:
   ecollege_file_description: Ecollege
   ecollege_name: "محول Ecollege"
   edit_app_b0cc1c17: "تحرير التطبيق"
+  edit_c5fbea07: تحرير
   edit_grading_scheme_53091236: "تحرير نظام التقييم"
   edit_permissions_for_count_items_d65e3855: 
     few: "تحرير أذونات لـ  %{count} من العناصر"
@@ -6090,6 +6008,7 @@ ar:
   event_end_time_ef830e66: "وقت نهاية الحدث"
   event_start_time_441b491f: "وقت بداية الحدث"
   everyone_854554dd: الجميع
+  everyone_else_6c6dc7b6: "أي شخص آخر"
   example_84698b7d: مثال
   example_final_score_355aff0f: "نموذج لدرجة نهائية"
   example_final_score_a92b30b9: "نموذج لدرجة نهائية]]"
@@ -6103,6 +6022,7 @@ ar:
   expand_or_collapse_undated_items_b901de09: "توسعة العناصر المحدثة أو طيها"
   expand_subdiscussion_cd226ed4: "توسيع المناقشة الفرعية"
   expires_on_date_18efe4e2: "تاريخ انتهاء الصلاحية"
+  export_de71cd8e: تصدير
   external_apps_f5490181: "التطبيقات الخارجية"
   external_content: 
     cancel: 
@@ -6257,8 +6177,6 @@ ar:
   feature_flags: 
     feature_flag: 
       allow: سماح
-      disabled: معطل
-      enabled: ممكَّن
       estimated_release: "الإصدار المقدر:"
       no_description: "بدون وصف"
       ? "off"
@@ -6538,7 +6456,6 @@ ar:
     only_one_folder: "يتعذر تعيين مسار مجلد ومعرف المجلد"
   for: لـ
   for_all_devices_1f603968: "لكل الأجهزة"
-  for_section_8503af93: للقسم
   from_fdd4956d: من
   from_from_to_to_e31f6422: "من %{from} إلى %{to}"
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "احصل على ما يلي من التطبيق المتصل Salesforce الخاص بك"
@@ -6552,7 +6469,10 @@ ar:
     invitation: دعوة
     question: سؤال
     warning: تحذير
+  google_docs_40374e65: "Google Docs"
   google_docs_domain_restriction_description: "القيد على مجال Google Docs يسمح بقصر عمليات الإرسال والتعاون في Google Docs على نطاق واحد فقط. وبالنسبة للطلاب الذين يحاولون إرسال فروض دراسية أو المشاركة في عمليات تعاون في مجال غير معتمد، فسيتلقون رسالة خطأ تبلغهم بضرورة تحديث تكامل Google Docs."
+  google_docs_preview_9f41b23c: "معاينة Google Docs"
+  google_drive_7cb003c9: "Google Drive"
   grade_display_warning_dialog: 
     grade_display_warning: 
       checkbox: "عدم إظهار لهذا المساق مرة أخرى."
@@ -6601,7 +6521,6 @@ ar:
     hide_all_details_button: "إخفاء كل التفاصيل"
     mic_blocked_message: "تم حظر الإذن باستخدام الميكروفون. لتغيير هذا، انتقل إلى chrome://settings/contentExceptions#media-stream"
     mute_assignment: "إخفاء المهمة"
-    new_assessment: "[المهمة الجديدة]"
     no_submission_time: "لا يوجد وقت للإرسال"
     nodetect_message: "لم يتم اكتشاف أي كلام. قد تحتاج إلى ضبط إعدادات الميكروفون."
     not_graded: "لم يتم تقييم الدرجات"
@@ -6742,6 +6661,8 @@ ar:
       switch_to_percent: "تبديل إلى النسبة المئوية"
       switch_to_points: "تبديل إلى النقاط"
     ungraded: "لم توضع في الحسبان عند التصحيح"
+  gradebook_csvs: 
+    grades_filename: الدرجات
   gradebook_uploads: 
     new: 
       titles: 
@@ -6885,6 +6806,7 @@ ar:
       arrange_columns_by_due_date: "ترتيب الأعمدة حسب موعد الاستحقاق"
       arrange_columns_by_group: "ترتيب الأعمدة حسب مجموعة المهام"
       download_scores: تصدير
+      export_current_gradebook: الحالي
       filter_by_student: "التصفية حسب اسم الطالب أو المعرف الثانوي"
       grades: الدرجات
       hide_student_names: "إخفاء أسماء الطلاب"
@@ -6900,7 +6822,6 @@ ar:
     grades: 
       complete: مكتمل
       incomplete: "غير كامل"
-    grades_filename: الدرجات
     grading_box_extended: 
       labels: 
         grade: الدرجة
@@ -7005,7 +6926,6 @@ ar:
         show_all_sections: "إظهار كل الأقسام"
         submit_same_score: "استخدام نفس الدرجة هذه لإعادة الإرسال"
       loading: "جارٍ التحميل..."
-      new_assessment_option: "[المهمة الجديدة]"
       no_annotation: "لا تتوافر تعليقات توضيحية لهذا المستند"
       not_newest_notice: "ملاحظة: هذا ليس أحدث إرسال"
       page_header_title: SpeedGrader
@@ -7638,7 +7558,6 @@ ar:
   if_you_ve_been_using_another_course_management_sys_67edfab1: "إذا كنت تستخدم نظام إدارة مساق آخر، فربما يكون لديك بعض الأشياء تريد نقلها إلى Canvas. يمكننا إرشادك عبر عملية ترحيل المحتوى بسهولة إلى داخل موقع Canvas."
   ignore_91750df8: تجاهل
   ignore_assignment_738b3c99: "تجاهل المهمة"
-  ignore_forever_dd4a6cdf: "تجاهل للأبد"
   ignore_name_55edc6fe: "تجاهل %{name}"
   ignore_these_3940f6f5: "تجاهل هذه"
   ignore_this_assignment_b7a71f80: "تجاهل هذه المهمة"
@@ -7682,6 +7601,7 @@ ar:
     warnings: 
       truncated_wiki_title: "تم اقتطاع عنوان صفحة wiki التالية: %{title}"
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "إدراج تقديرات المهمة هذه عند الإرسال إلى نظام معلومات الطالب في مدرستك"
+  incorrect_username_and_or_password_2de73abb: "اسم مستخدم و/أو كلمة مرور غير صحيحة"
   incremental_update_successfully_generated_against__db3f3f06: "تم إنشاء التحديث التزايدي بنجاح مقابل تصدير SIS."
   info: 
     notices: 
@@ -7861,10 +7781,7 @@ ar:
   launch_url_e150bd41: "تشغيل URL"
   layouts: 
     application: 
-      ? "User Research"
-      : "بحث المستخدم"
       bouncing_communication_channels: "يبدو أن هناك مشكلة في أحد وسائل الاتصال لديك. يرجى التحقق من *صفحة الإعدادات*."
-      by_instructure: "بواسطة Instructure"
       group_switch: تبديل
       javascript_required: "يجب أن يكون لديك JavaScript للوصول إلى هذا الموقع."
       keyboard_navigation: 
@@ -7873,7 +7790,6 @@ ar:
         close: إغلاق
         dashboard: "لوحة معلوماتي"
         skip_to_content: "التخطي إلى المحتوى"
-      open_source_learning_management_system: "نظام LMS مفتوح المصدر"
     fixed_bottom: 
       masquerading: 
         stop: "إيقاف إخفاء الأسماء"
@@ -7893,6 +7809,7 @@ ar:
       log_in_to_canvas: "تسجيل الدخول إلى Canvas"
     styleguide: 
       default_page_title: "Canvas LMS"
+  ldap_e1e0a916: LDAP
   learning_mastery_gradebook_description: |-
       يوفر "دفتر درجات نتيجة إتقان التعلم" طريقة للمدرسين لعرض تقدم الطلاب والمساق بسرعة
       في نتائج التعلم للمساق. ويتم عرض النتائج بتنسيق يشبه دفتر الدرجات ويتم عرض تقدم
@@ -8006,6 +7923,7 @@ ar:
   linked_assignment_message: "تم الربط بالمهمة '%{title}'"
   linked_discussion_topic_message: "تم الربط بموضوع المناقشة '%{title}'"
   linked_quiz_message: "تم الربط بالاختبار '%{title}'"
+  linkedin_5726caca: LinkedIn
   links: 
     dashboard: "لوحة معلوماتي"
     errors: 
@@ -8025,6 +7943,66 @@ ar:
   lock_until_date_62ce1b5c: "قفل حتى تاريخ"
   log_out_379ba28a: "تسجيل الخروج"
   logged_out_user: "المستخدم الذي قام بتسجيل الخروج %{user_counter}"
+  login: 
+    canvas: 
+      mobile_login: 
+        back_to_login: "عودة إلى تسجيل الدخول"
+        buttons: 
+          request_password: "طلب كلمة المرور"
+        dont_know_password: "لا أعرف كلمة مروري"
+        log_in: "تسجيل الدخول"
+        login_handle: "أدخل %{login_handle_name} وسنرسل لك ارتباطًا لتغيير كلمة المرور لديك."
+        password: "كلمة المرور"
+        sending: "جارٍ الإرسال..."
+      new: 
+        back_to_login: "عودة إلى تسجيل الدخول"
+        browse_courses: "استعراض المساقات"
+        buttons: 
+          request_password: "طلب كلمة المرور"
+        coenrollment_banner: "*هل أنت ولي أمر أحد مستخدمي Canvas؟* **انقر هنا للحصول على حساب**"
+        labels: 
+          password: "كلمة المرور"
+        log_in: "تسجيل الدخول"
+        login_handle: "أدخل %{login_handle_name} وسنرسل لك ارتباطًا لتغيير كلمة المرور لديك."
+        page_title: "تسجيل الدخول إلى Canvas"
+        register_for_canvas: "*هل تحتاج إلى حساب Canvas؟* **انقر هنا، فهو مجاني!**"
+    logout_confirm: 
+      cancel: إلغاء
+      details: 
+        log_out: "هل تريد بالتأكيد تسجيل الخروج من Canvas؟"
+      log_out: "تسجيل الخروج"
+      page_title: "تسجيل الخروج"
+    otp: 
+      errors: 
+        invalid_otp: "كود تحقق غير صالح، الرجاء إعادة المحاولة"
+      new: 
+        buttons: 
+          send: إرسال
+          verify: التحقق
+        details: 
+          mfa_enrollment: "إن المصادقة متعددة العوامل تزيد الأمان من خلال مطالبتك بتوفر جهاز في حوزتك، ⏎ بالإضافة إلى معرفة كلمة المرور الخاصة بك، وذلك لتسجيل الدخول إلى Canvas. وهذا قد يكون جهازًا يقوم بإنشاء أكواد التحقق ⏎، أو هاتفًا يمكنه استقبال الرسائل النصية. إن تطبيق Google Authenticator لـ [iPhone](%{iphone_url}) أو ⏎ [Android](%{android_url}) يمكن تكوينه عبر فحص QR Code أدناه. يمكن تكوين الرموز المميزة tokens بواسطة إدخال ⏎ المفتاح السري **%{secret_key}**."
+          mfa_required: "مطلوب منك إعداد مصادقة متعددة العوامل."
+          otp_on_device: "الرجاء إدخال كود التحقق المعروض بواسطة الرمز المميز token الخاص بك."
+          otp_sent_to_phone: "تم إرسال كود تحقق إلى هاتفك. الرجاء إدخاله هنا."
+          send_to_sms: "إرسال رسائل نصية إلى %{phone_number}"
+        labels: 
+          carrier: الحامل
+          phone_number: "رقم الهاتف"
+          remember_me: "تذكر هذا الكمبيوتر"
+          verification_code: "كود التحقق"
+        links: 
+          choose_number: "اختيار هاتف موجود"
+        page_title: "مصادقة متعددة العوامل"
+        select: 
+          new_number: "هاتف جديد"
+        titles: 
+          mfa: "مصادقة متعددة العوامل"
+    saml: 
+      debug: 
+        logout_request_redirect_from_idp: "تم استلام LogoutRequest من IdP"
+        logout_response_redirect_from_idp: "تم استلام LogoutResponse من IdP"
+        logout_response_redirect_to_idp: "إرسال LogoutResponse إلى IdP"
+        redirect_from_idp: "تم استلام LoginResponse من IdP"
   logo_a040ae0e: شعار
   looks_great_e4d883ed: "يبدو جيداً!"
   low_score_4eeb95b2: "الدرجة المنخفضة: %{score}"
@@ -9829,6 +9807,13 @@ ar:
         subject: "دعوة لمؤتمر عبر الويب: %{name}"
       twitter: 
         tweet: "تنبيه Canvas - دعوة: حضور %{title}, %{name}"
+    web_conference_recording_ready: 
+      email: 
+        details_link: "يمكنك الاطلاع على التفاصيل هنا: %{link}"
+        html: 
+          details_link: "انقر هنا لعرض التفاصيل"
+      sms: 
+        link_message: "مزيد من المعلومات على %{url}"
   migration: 
     announcement_type: الإعلان
     assignment_group_type: "مجموعة المهام"
@@ -10014,6 +9999,7 @@ ar:
   more_courses_5ebbe998: "مزيد من المساقات"
   most_recent_score_13a87e8c: "أحدث درجة"
   most_recent_score_counts_as_75_of_mastery_weight_a_f1e3e6c2: "تساوي أحدث درجة 75% من درجة الإتقان، بينما يساوي متوسط كل الدرجات الأخرى 25% من الدرجة."
+  move_abf00365: نقل
   move_dialog: 
     cancel: إلغاء
     save: حفظ
@@ -10023,6 +10009,8 @@ ar:
     move_to_end: "-- في الأسفل --"
   move_outcome_ce497e6c: "نقل النتيجة"
   move_outcome_group_cfa1a505: "نقل مجموعة النتائج"
+  moving_a4d552df: "جارٍ النقل..."
+  multi_factor_authentication_configured_865b1bde: "تم تكوين المصادقة متعددة العوامل"
   must_achieve_mastery_at_least_2_times_must_also_co_b2ae7688: "يجب تحقيق درجة الإتقان مرتين على الأقل. كما يجب إكمال عنصرين للحساب. سيتم تحديد متوسط الدرجات التي تفوق درجة الإتقان لحساب الدرجة النهائية."
   must_achieve_mastery_at_least_2_times_scores_above_57077a88: "يجب تحقيق درجة إتقان مضاعفة على الأقل. سيتم تحديد متوسط الدرجات التي أعلى من درجة الإتقان لحساب الدرجة النهائية."
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "يجب تزويد معلمة 'file_ids' و/أو معلمة 'folder_ids'"
@@ -10068,6 +10056,8 @@ ar:
   no_e16d9132: لا
   no_grading_schemes_to_display_8b0e92e7: "لا توجد مخططات تقييم درجات لعرضها"
   no_migration_file: "الملف مطلوب لترحيل المحتوى."
+  no_password_was_given_472222e5: "لم يتم إعطاء كلمة مرور"
+  no_results_found_58717065: "لم يتم العثور على نتائج"
   no_score_yet_c94e919b: "لا توجد درجة حتى الآن"
   no_students_have_taken_the_quiz_yet_e667644b: "لم يؤدِ الاختبار أي طالب حتى الآن"
   no_students_have_taken_the_survey_yet_d378cd35: "لم يشارك أي طالب في الاستطلاع حتى الآن"
@@ -10299,6 +10289,7 @@ ar:
       admin: إداري
       alerts: تنبيهات
       communication: المحادثات
+      conferences: المؤتمرات
       course: "أنشطة المساق"
       discussions: المناقشات
       groups: المجموعات
@@ -10556,7 +10547,6 @@ ar:
     everyone_else: "أي شخص آخر"
     overrides: 
       everyone: الجميع
-      everyone_else: "أي شخص آخر"
   own_copyright_cc59db55: "امتلاك حقوق النشر"
   page_comment: 
     default_user_name: مجهول
@@ -11289,6 +11279,7 @@ ar:
     yo_select: 
       yo: Yo
     you_have_no_services: "لم تقم بتسجيل أي خدمات، يمكنك إضافة بعض على صفحة *الإعدادات*."
+  profile_6bd2baed: "ملف التعريف"
   profiles: 
     avatar_dialog: 
       from_gravatar: "من Gravatar"
@@ -11327,70 +11318,7 @@ ar:
       too_long: "لا يمكن أن يتجاوز %{max} حرفًا"
       too_short: "يجب أن يكون %{min} حرفًا على الأقل"
   pseudonym_sessions: 
-    debug: 
-      logout_redirect: "تم إرسال LogoutRequest إلى IdP"
-      logout_request_redirect_from_idp: "تم استلام LogoutRequest من IdP"
-      logout_response_redirect_from_idp: "تم استلام LogoutResponse من IdP"
-      logout_response_redirect_to_idp: "إرسال LogoutResponse إلى IdP"
-      redirect_from_idp: "تم استلام LoginResponse من IdP"
     default_app_name: "تطبيق جهة خارجية"
-    errors: 
-      blank_password: "لم يتم إعطاء كلمة مرور"
-      invalid_credentials: "اسم مستخدم و/أو كلمة مرور غير صحيحة"
-      invalid_otp: "كود تحقق غير صالح، الرجاء إعادة المحاولة"
-      login_error: "حدثت مشكلة أثناء تسجيل الدخول إلى %{institution}"
-      login_errors: 
-        no_config_for_id: "ليس لدى حساب Canvas تهيئة مصادقة مع هذا المعرف"
-        no_idp_set: "لم يتم تهيئة المؤسسة التي تم تسجيل الدخول منها على هذا الحساب."
-        unrecognized_idp: "لم يتعرف Canvas على موفر الهوية"
-      logout_errors: 
-        no_idp_found: "لم يتمكن Canvas من تسجيل خروجك من موفر الهوية\n"
-      max_attempts: "عدد كبير للغاية من محاولات تسجيل الدخول الفاشلة. الرجاء المحاولة مرة أخرى لاحقًا أو اتصل بمسؤول النظام."
-      no_matching_user: "لا يحتوي Canvas على حساب للمستخدم: %{user}"
-      user_deleted: "لقد تم حذف حساب المستخدم ذاك.  الرجاء الاتصال بمسؤول النظام لإعادة تنشيط حسابك."
-    logout_confirm: 
-      cancel: إلغاء
-      details: 
-        log_out: "هل تريد بالتأكيد تسجيل الخروج من Canvas؟"
-      log_out: "تسجيل الخروج"
-      page_title: "تسجيل الخروج"
-    mobile_login: 
-      back_to_login: "عودة إلى تسجيل الدخول"
-      buttons: 
-        request_password: "طلب كلمة المرور"
-      dont_know_password: "لا أعرف كلمة مروري"
-      log_in: "تسجيل الدخول"
-      login_handle: "أدخل %{login_handle_name} وسنرسل لك ارتباطًا لتغيير كلمة المرور لديك."
-      password: "كلمة المرور"
-      sending: "جارٍ الإرسال..."
-    new: 
-      page_title: "تسجيل الدخول إلى Canvas"
-    notices: 
-      mfa_complete: "تم تكوين المصادقة متعددة العوامل"
-    otp_login: 
-      buttons: 
-        send: إرسال
-        verify: التحقق
-      details: 
-        mfa_enrollment: "إن المصادقة متعددة العوامل تزيد الأمان من خلال مطالبتك بتوفر جهاز في حوزتك، ⏎ بالإضافة إلى معرفة كلمة المرور الخاصة بك، وذلك لتسجيل الدخول إلى Canvas. وهذا قد يكون جهازًا يقوم بإنشاء أكواد التحقق ⏎، أو هاتفًا يمكنه استقبال الرسائل النصية. إن تطبيق Google Authenticator لـ [iPhone](%{iphone_url}) أو ⏎ [Android](%{android_url}) يمكن تكوينه عبر فحص QR Code أدناه. يمكن تكوين الرموز المميزة tokens بواسطة إدخال ⏎ المفتاح السري **%{secret_key}**."
-        mfa_required: "مطلوب منك إعداد مصادقة متعددة العوامل."
-        otp_on_device: "الرجاء إدخال كود التحقق المعروض بواسطة الرمز المميز token الخاص بك."
-        otp_sent_to_phone: "تم إرسال كود تحقق إلى هاتفك. الرجاء إدخاله هنا."
-        send_to_sms: "إرسال رسائل نصية إلى %{phone_number}"
-      labels: 
-        carrier: الحامل
-        phone_number: "رقم الهاتف"
-        remember_me: "تذكر هذا الكمبيوتر"
-        verification_code: "كود التحقق"
-      links: 
-        choose_number: "اختيار هاتف موجود"
-      page_title: "مصادقة متعددة العوامل"
-      select: 
-        new_number: "هاتف جديد"
-      titles: 
-        mfa: "مصادقة متعددة العوامل"
-    password_confirmation_error: "خطأ أثناء إرسال الطلب."
-    password_confirmation_sent: "تم إرسال تأكيد كلمة المرور. وتأكد من مراجعة صندوق البريد العشوائي ربما يصل البريد هناك."
   pseudonyms: 
     confirm_change_password: 
       buttons: 
@@ -12386,7 +12314,6 @@ ar:
         new_discussion: "نقاش جديد"
         one_question_at_a_time: "عرض سؤال واحد في كل مرة"
         one_time_results: "مرة واحدة فقط بعد كل محاولة"
-        only_visible_to_overrides_note: "ملاحظة: لا يمكن مشاهدة هذا الاختبار **إلا** بواسطة القسم (الأقسام) المحدد أدناه:"
         points_possible: "%{n} نقطة (نقاط)"
         post_to_sis: "نشر الدرجات في SIS"
         quiz_access_code: "رمز الوصول مطلوب"
@@ -12970,7 +12897,6 @@ ar:
       other: "تم نقل %{count} من العناصر إلى %{destinationFolder}"
       two: "تم نقل %{count} من العناصر إلى %{destinationFolder}"
       zero: "لم يتم نقل أي عنصر"
-    moving: "جارٍ النقل..."
     name: الاسم
     progress_error: "حدث خطأ أثناء محاولة تحضير التنزيل، الرجاء المحاولة مرة أخرى."
     progress_message: "تحضير التنزيل: اكتمل %{percent}%"
@@ -13059,6 +12985,7 @@ ar:
   remove_recipient_name_a6b83cef: "إزالة المستلم %{name}"
   remove_row_c198da5a: "إزالة صف"
   remove_row_f9d59cba: "إزالة صف"
+  remove_these_dates_48453a81: "إزالة هذه التواريخ"
   rename_45608f54: "إعادة تسمية"
   reply_from_name: "%{name} عبر إعلامات Canvas"
   reply_to_comment_72d96728: "رد على التعليق"
@@ -13703,6 +13630,11 @@ ar:
     canvas-user-nav: 
       navigation: 
         user_menu: "قائمة المستخدم"
+    canvas_footer: 
+      ? "User Research"
+      : "بحث المستخدم"
+      by_instructure: "بواسطة Instructure"
+      open_source_learning_management_system: "نظام LMS مفتوح المصدر"
     components: 
       ic_submission-download-dialog: 
         click_to_download: "انقر هنا للتنزيل"
@@ -13892,21 +13824,6 @@ ar:
     locale_warning: 
       crowdsourced_warning_message: "تمت ترجمة اللغة التي قمت بتحديدها عن طريق التعهيد الجماعي. لم تقم Instructure بمراجعة ولا التحقق من دقة الترجمة، ولا تتحمل أي مسؤولية عن استخدامك لإعداد هذه اللغة. الرجاء استخدامها على مسؤوليتك."
       crowdsourced_warning_title: "لغة تعهيد جماعي"
-    login: 
-      back_to_login: "عودة إلى تسجيل الدخول"
-      browse_courses: "استعراض المساقات"
-      buttons: 
-        request_password: "طلب كلمة المرور"
-      coenrollment_banner: "*هل أنت ولي أمر أحد مستخدمي Canvas؟* **انقر هنا للحصول على حساب**"
-      default_login_message: "تسجيل الدخول إلى المؤسسة"
-      dont_know_password: "لا أعرف كلمة مروري"
-      labels: 
-        password: "كلمة المرور"
-        remember_me: "استمر في تسجيل الدخول"
-      log_in: الدخول
-      login_at_account: "تسجيل الدخول إلى %{school_name}"
-      login_handle: "أدخل %{login_handle_name} وسنرسل لك ارتباطًا لتغيير كلمة المرور لديك."
-      register_for_canvas: "*هل تحتاج إلى حساب Canvas؟* **انقر هنا، فهو مجاني!**"
     menu_assignment: 
       labels: 
         due: "موعد الاستحقاق"
@@ -14193,7 +14110,6 @@ ar:
       grading_alt: "تقييم الدرجات"
       submission_comment: "تعليق الإرسال"
     terms_required: 
-      terms_have_changed: "تم تغيير *شروط الاستخدام*. يرجى قضاء دقيقة لمراجعتها قبل متابعة استخدام Canvas."
       updated_terms_of_use: "تم تحديث شروط الاستخدام"
     unauthorized: 
       headings: 
@@ -14209,8 +14125,6 @@ ar:
         unauthorized_action: "غير مخوَّل"
       unauthorized_1: "يبدو أنه ليس لديك إذن للوصول إلى هذه الصفحة. الرجاء التأكد من أنك مخول لعرض هذا المحتوى."
       unauthorized_2: "إذا اعتقدت أنه يجب أن تكون قادرًا على عرض هذه الصفحة، فالرجاء استخدام الارتباط \"تعليمات\" لإعلامك بدعم المشكلة."
-      unauthorized_action: "يتم تحديد الوصول إلى هذه الصفحة للمستخدمين المخولين. وسيلزم تسجيل الدخول قبل أن تتمكن من عرض المحتوى الموجود على هذه الصفحة."
-      unauthorized_user: "%{user_name}, سيلزم تسجيل الدخول قبل أن تتمكن من عرض تلك الصفحة. انقر فوق \"نسيت كلمة المرور\" إذا نسيت كلمة المرور أو لم تعد تعرفها."
       unauthorized_user_is_other: "%{current_user}, غير مُصرح لك بعرض هذه الصفحة.  الارتباط الذي اتبعته للوصول إلى هنا كان من أجل **%{unauthorized_user} (%{unauthorized_user_email})**.  إذا كنت أنت هذا الشخص، فربما تريد تسجيل الخروج وإعادة تسجيل الدخول باستخدام عنوان البريد الإلكتروني ذلك للحصول على حق الوصول إلى هذه الصفحة."
     unauthorized_feed: 
       bad_params: "تعد المعلمات الخاصة بالموجز الذي تحاول الوصول إليه غير صالحة."
@@ -14413,6 +14327,7 @@ ar:
       user_search_label: "البحث عن مستخدم"
       users_matching_label: "مطابقة المستخدمين"
   skipping_unknown_file_type_cd1086ee: "تخطي نوع الملف غير المعروف"
+  skype_18850ba7: Skype
   slideshow: 
     titles: 
       back: عودة
@@ -14434,6 +14349,7 @@ ar:
       submitted: "*تم الإرسال:* %{submittedAt}"
   spreadsheet_6d622119: "جدول بيانات"
   sr_gradebook: 
+    all_grading_periods: "كل فترات تقييم الدرجات"
     all_sections: "كل الأقسام"
     assignment_muted: "انقر لإلغاء كتم الصوت."
     assignment_order_alpha: أبجديًا
@@ -14732,6 +14648,7 @@ ar:
     files: الملفات
     grades: الدرجات
     home: المنزل
+    logout: "تسجيل الخروج"
     modules: الوحدات
     observees: ملاحظة
     outcomes: النتائج
@@ -14814,6 +14731,7 @@ ar:
       timespan: "%{start_at} *إلى* %{end_at}"
   text_document_eacbcdb7: "مستند نصي"
   text_entry_submission_cannot_be_empty_3d187cae: "لا يمكن أن يكون إرسال إدخال النص فارغاً"
+  that_user_account_has_been_deleted_please_contact__350e0e0: "لقد تم حذف حساب المستخدم ذاك.  الرجاء الاتصال بمسؤول النظام لإعادة تنشيط حسابك."
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "معرف الحساب التابع للمستخدم الذي يقوم بالإبلاغ"
   the_app_was_activated_a84e055f: "تم تنشيط التطبيق"
   the_app_was_added_58e2836a: "تمت إضافة التطبيق"
@@ -14826,6 +14744,7 @@ ar:
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "اسم المضيف بأكمله لمثيل الحساب (على ىسبيل المثال، something.instructure.com)"
   the_grading_period_was_deleted_7814a349: "تم حذف فترة تقييم الدرجات"
   the_grading_period_was_saved_4a504c5: "تم حفظ فترة تقييم الدرجات"
+  the_institution_you_logged_in_from_is_not_configur_5ceac41: "لم يتم تهيئة المؤسسة التي تم تسجيل الدخول منها على هذا الحساب."
   the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "صورة الشعار في الرأس العلوي الأيمن لصفحة Canvas. بحجم 200x200 بتنسيق svg أو png"
   the_material_is_in_the_public_domain_279c39a3: "توجد المادة في المجال العام"
   the_material_is_licensed_under_creative_commons_3242cb5e: "المادة مرخصة بموجب المشاع الإبداعي"
@@ -14849,6 +14768,7 @@ ar:
     zero: "توجد %{count} من النتائج في القائمة"
   there_was_a_problem_deleting_the_grading_period_50ce07c5: "حدثت مشكلة أثناء حذف فترة تقييم الدرجات"
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: "كانت هناك مشكلة في حذف نظام التقييم"
+  there_was_a_problem_logging_in_at_institution_5a298155: "حدثت مشكلة أثناء تسجيل الدخول إلى %{institution}"
   there_was_a_problem_saving_the_grading_period_243bed6c: "حدثت مشكلة أثناء حفظ فترة تقييم الدرجات"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "كانت هناك مشكلة في حفظ نظام التقييم"
   there_was_an_error_in_processing_your_request_6513a49a: "حدث خطأ أثناء معالجة طلبك"
@@ -15091,6 +15011,7 @@ ar:
   to_minscore_43e5452e: "إلى %{minScore}%"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "لعرض المهام، تأكد من أن طريقة عرض *جدول الأعمال* نشطة."
   tolerance_value_9e96573c: "فيمة التفاوت المسموح به"
+  too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "عدد كبير للغاية من محاولات تسجيل الدخول الفاشلة. الرجاء المحاولة مرة أخرى لاحقًا أو اتصل بمسؤول النظام."
   too_many_members_b8b15069: "أعضاء كثيرون"
   tooltips: 
     finished: "تم الانتهاء"
@@ -15118,8 +15039,10 @@ ar:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "إعادة الإرسال إلى Turnitin"
+  twitter_fcef6b54: Twitter
   unable_to_remove_app_4293cb53: "يتعذر إزالة التطبيق"
   unarchive_selected_e0c4bd3d: "إلغاء أرشفة التحديد"
+  unauthorized: "غير مخوّل"
   unchanged_aca18e02: "[دون تغيير]"
   ungraded_submissions_44efb0ec: "إرسالات لم يتم تقييمها"
   ungraded_survey_ad7de790: "استطلاع لم يتم تقييم درجاته"
@@ -15167,8 +15090,8 @@ ar:
       terms: "يجب أن توافق على الشروط"
       too_long: "يتعذر تجاوز %{max} حرفًَا"
     registration: 
-      agree_to_terms_and_privacy_policy: "أنت توافق على *شروط الاستخدام* وتقر **بسياسة الخصوصية**."
       agree_to_terms_with_code_of_conduct: "أنت توافق على *شروط الاستخدام* و**مدونة قواعد السلوك**."
+  user_avatars_e4fc4ed3: "الصور المجسمة للمستخدم"
   user_date_range_search: 
     cant_be_blank: "لا يمكن ترك معرف مستخدم Canvas فارغًا"
     cant_come_before_from: "لا يمكن أن يكون \"إلى تاريخ\" قبل \"من تاريخ\""
@@ -15468,11 +15391,6 @@ ar:
           **بأنك** كنت الشخص الذي قام فعليًا بهذه الأفعال نيابة عن هذا المستخدم.
       masquerade_as: "إخفاء الأسماء باعتبارك %{user_name}"
       page_title_header: "التخفي كمستخدم"
-    merge: 
-      login_to_merge_different_account: "لدمج الحساب، %{current_user_name} (%{current_user_email}) في حساب آخر، الرجاء تسجيل الدخول في الحساب الجديد:"
-      merge_definition: "لسبب ما أو لآخر، قد ينتهي بك الأمر بتسجيل الدخول مرتين بدلاً من تسجيل دخول واحد فقط. وإذا حدث ذلك، يمكنك دمج عمليتي تسجيل الدخول معًا ودمج المعلومات الواردة منهما."
-      titles: 
-        merge_accounts: "دمج حسابات المستخدمين"
     merge_results: 
       action: الإجراء
       emails: "رسائل البريد الإلكتروني"
@@ -15671,10 +15589,6 @@ ar:
       delete_wiki: حذف
       labels: 
         front_page: "الصفحة الأمامية"
-      page_locked: "هذه الصفحة مُؤَمّنة"
-      page_locked_by_modules: "ستتم إتاحة هذه الصفحة بمجرد إكمال هذه الوحدات:"
-      page_locked_by_modules_until: "ستتم إتاحة هذه الصفحة على %{lock_info.unlock_at} في حالة إكمال هذه الوحدات:"
-      page_locked_until: "ستتم إتاحة هذه الصفحة على %{lock_info.unlock_at}"
       published_indicator: منشور
       toolbar_menu: 
         settings: إعدادات
@@ -15794,6 +15708,7 @@ ar:
   would_you_like_to_enable_this_app_ccdf735d: "هل ترغب في تمكين هذا التطبيق؟"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "هل ترغب في ترك الطلاب متابعة المساق أم ترغب في إعادة قفل هذه الوحدات حتى يتم إكمال المتطلبات الجديدة؟"
   xml_configuration_5ea1b942: "تكوين XML"
+  yo_e4ee15a4: Yo
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "قمت بتسجيل الدخول إلى %{institution1} باستخدام بيانات اعتماد من %{institution2}"
   you_are_subscribed_and_will_be_notified_of_new_com_60b5b62b: "أنت مشترك وسيتم إعلامك بالتعليقات الجديدة. انقر لإلغاء الاشتراك"
   you_are_the_group_leader_for_this_group_b8629b70: "أنت قائد المجموعة لهذه المجموعة"
@@ -15818,7 +15733,6 @@ ar:
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "يمكن الآن العثور على قائمة المهام الخاصة بك في صفحة *التقويم*."
   your_assignments_list_has_improved_3eded80e: "تم تحسين قائمة *المهام* الخاصة بك!"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: "ستظهر المهام الخاصة بك هنا معروضة حسب التاريخ."
-  your_browser_does_not_meet_the_minimum_requirement_7a7022db: "لا يفي مستعرضك بالحد الأدنى من متطلبات Canvas. يرجى زيارة *أدلة Canvas* للاطلاع على قائمة كاملة بالمستعرضات المدعومة."
   your_content_has_been_exported_bbb57764: "تم تصدير المحتوى الخاص بك."
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: "يتم تحميل ملفك إلى دفتر تقديرات المساق، ويمكنك مغادرة هذه الصفحة في أي وقت. إذا كان لديك ملف CSV كبير الحجم، قد يستغرق تحديث التغييرات التي أجريتها بعض الدقائق. لمنع الكتابة فوق أي بيانات، يرجى التأكد من إنتهاء عملية التحميل ومن صحة دفتر تقديرات المساق قبل القيام بأي تغييرات إضافية."
   your_message_has_been_sent_thank_you_e0284316: "تم إرسال رسالتك. شكرًا لك."
