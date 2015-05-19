@@ -83,7 +83,8 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
           user: @current_user,
           session: session,
           includes: extract_includes,
-          censored: censored?
+          censored: censored?,
+          shuffle_answers: @quiz.shuffle_answers_for_user?(@current_user)
         })
     end
   end

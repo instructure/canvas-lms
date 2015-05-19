@@ -60,4 +60,32 @@ describe Api::V1::QuizSubmissionQuestion do
       is_expected.to be_a Hash
     end
   end
+
+  describe "quiz_submissions_questions_json shuffle_answers" do
+    before{ Array.any_instance.stubs(:shuffle!) }
+    let(:quiz_questions) do
+      [create_question("multiple_choice")]
+    end
+
+    let(:submission_data) do
+      {}
+    end
+
+    describe "shuffle_answers true" do
+      subject { api.quiz_submission_questions_json(quiz_questions, @quiz_submission, {shuffle_answers: true}) }
+      it "shuffles answers when opt is given" do
+        Array.any_instance.expects(:shuffle!).at_least_once
+        subject[:quiz_submission_questions].first["answers"].map{|a| a["text"]}
+      end
+    end
+
+    describe "shuffle_answers false" do
+      subject { api.quiz_submission_questions_json(quiz_questions, @quiz_submission, {shuffle_answers: false}) }
+      it "shuffles answers when opt is given" do
+        Array.any_instance.expects(:shuffle!).never
+        answer_text = subject[:quiz_submission_questions].first["answers"].map{|a| a["text"]}
+        expect(answer_text).to eq(["a","b","c","d"])
+      end
+    end
+  end
 end

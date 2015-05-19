@@ -1089,6 +1089,10 @@ class Quizzes::Quiz < ActiveRecord::Base
     !non_shuffled_questions.include?(question_type)
   end
 
+  def shuffle_answers_for_user?(user)
+    self.shuffle_answers? && !self.grants_right?(user, :manage)
+  end
+
   def access_code_key_for_user(user)
     # user might be nil (practice quiz in public course) and isn't really
     # necessary for this key anyway, but maintain backwards compat
