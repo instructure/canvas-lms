@@ -51,17 +51,6 @@ fa-IR:
         api_url: "نشانی اینترنتی Api"
         common_core_guid: "هسته مشترک GUID (اختیاری)"
   account: 
-    account_settings: 
-      account_surveys: "نظرسنجی های حساب"
-      avatars: "آواتارهای کاربر"
-      delicious: Delicious
-      diigo: Diigo
-      google_docs: "Google Docs"
-      google_docs_preview: "پیش نمایش Google Docs"
-      linked_in: لینکدین
-      skype: اسکایپ
-      twitter: توییتر
-      yo: Yo
     ask_canvas_network: "پرسیدن از انجمن شبکه کانواس"
     default_account_name: "حساب پیش‌فرض"
     default_site_administrator_account_name: "مدیر تارنما"
@@ -94,57 +83,46 @@ fa-IR:
     tab_users: کاربران
     turnitin_pledge: "این تکلیف ارسالی نتیجه کار اصیل و شخصی من است"
   account_authorization_config: 
-    debug: 
-      wait_for_login: "در انتظار تلاش برای ورود"
     default_delegated_login_handle_name: ورود
     default_login_handle_name: "پست الکترونیکی"
-    saml_eppn_domain_stripped: "%{eppn} (دامنه حذف شد)"
+  account_authorization_config/ldap: 
     test_bind_failed: "اتصال با بروز این خطا انجام نشد: %{error}"
     test_connection_timeout: "به پایان رسیدن زمان در هنگام اتصال"
     test_host_unknown: "میزبان ناشناس: %{host}"
     test_login_auth_exception: "استثناء در ورود: %{error}"
     test_login_auth_failed: "اعتبارسنجی انجام نشد"
     test_search_failed: "جستجو با بروز این خطا انجام نشد: %{error}"
+  account_authorization_config/saml: 
+    debug: 
+      logout_redirect: "درخواست خروج برای IdP ارسال شد"
+      wait_for_login: "در انتظار تلاش برای ورود"
+    saml_eppn_domain_stripped: "%{eppn} (دامنه حذف شد)"
   account_authorization_configs: 
     account_required: "باید با LDAP اعتبارسنجی شود"
-    cas_settings: 
+    cas_fields: 
       labels: 
         auth_base: "نشانی اینترنتی سرور مرکزی اعتبارسنجی"
-        auth_type: نوع
-        login_handle_name: "برچسب ورود"
         unknown_user_url: "نشانی اینترنتی کاربر ناشناس"
-      login_handle_name_description: "برچسب استفاده شده برای شناسه های یکتای ورود. به عنوان مثال: ورود، نام کاربری، شناسه دانشجویی و غیره."
-      save_button: "ذخیره سازی تنظیمات اعتبارسنجی"
       unknown_user_url_description: "نشانی اینترنتی برای تغییر مسیر به آن در هنگامی که کاربر اعتبارسنجی شده در کانواس موجود نیست."
+    form_footer: 
+      labels: 
+        position: موقعیت
+      save_button: "ذخیره سازی تنظیمات اعتبارسنجی"
+    form_header: 
+      auth_type_label: نوع
+      auth_url: "نشانی اینترنتی ورود برای این پیکربندی"
     index: 
       add_auth_desc: "افزودن یک ارائه دهنده هویت به این حساب:"
-      canvas_login_tip: "اگر تنظیماتی را پیکربندی کنید که موجب شود نتوانید وارد شوید، می توانید *%{url1}* را به انتهای نشانی اینترنتی ورود خود بیفزایید. با انجام این کار، اجازه ورود با استفاده از روش معمولی ورود به کانواس را خواهید داشت. برای این حساب، نشانی اینترنتی %{url2} است"
       choose_auth_type_option: "یک سرویس اعتبارسنجی را انتخاب کنید"
       current_settings_title: "یکپارچه‌سازی فعلی"
       delete_auth_confirmation: "آیا مطمئنید؟ ممکن است در صورت حذف، کاربران نتوانند وارد شوند"
-      delete_auth_link: "حذف اعتبارسنجی"
-      edit_auth_link: "ویرایش اطلاعات"
       ip_address_list_description: "اگر از یک سرویس اعتبارسنجی استفاده می‌کنید که نیازمند اتصال مستقیم سرورهای کانواس به سرورهای شماست، مانند LDAP، باید مطمئن شوید که سرورهای شما می‌توانند مستقیما از این نشانی های آی‌پی ارتباط قبول کنند:"
       no_auth_type_description: "این حساب در حال حاضر با ارائه دهنده هویت یکپارچه نمی شود."
       page_title: "تنظیمات اعتبارسنجی"
       profile_page_link_example: "به عنوان مثال، صفحه رخ نمای شما اینجاست: [%{friendlyname}](%{url})"
       settings_description: "برای اینکه کاربر از طریق یک ارائه دهنده بیرونی هویت (IdP) اعتبارسنجی را انجام دهد، باید یک شناسه ورود داشته باشد که هم به این حساب مرتبط شده باشد و هم با شناسه یکتایی که توسط IdP بازگردانده می شود، مطابقت داشته باشد. برای مشاهده ورودهای فعلی یک کاربر، به بخش «اطلاعات ورود» در صفحه رخ نمای کاربر مراجعه کنید. (که از طریق جستجوی کاربر در زبانه «کاربران» قابل دسترسی است)."
       settings_title: "تنظیمات اعتبارسنجی"
-      test_ldap_link: "آزمون اعتبارسنجی"
-    ldap_settings: 
-      add_secondary_ldap_server_link: "افزودن سرور ثانویه LDAP"
-      auth_type_label: نوع
-      change_password_url_help: "برای رفتار پیش‌فرض کانواس خالی بگذارید"
-      change_password_url_not_specified: "چیزی مشخص نشده است"
-      labels: 
-        change_password_url: "لینک فراموشی رمز"
-        login_handle_name: "برچسب ورود"
-      login_handle_name_description: "برچسب استفاده شده برای شناساننده‌های یکتای لاگین. به‌عنوان مثال، لاگین، نام کاربری، شماره دانشجو و ... "
-      remove_secondary_ldap_link: (حذف)
-      save_button: "ذخیره سازی تنظیمات LDAP"
-      secondary_ldap_label: "LDAP ثانویه"
-      setting_type_ldap: LDAP
-    ldap_settings_fields: 
+    ldap_fields: 
       auth_filter_description: "از *%{placeholder}* به عنوان جای نام کاربری ارائه شده توسط کاربر استفاده کنید. برای مثال: *(sAMAccountName=%{placeholder})*"
       auth_password_description: "برای اینکه همچنان از رمز عبور فعلی استفاده کنید، آن جا را خالی بگذارید."
       identifer_format_description: "ویزگی LDAP جهت استفاده برای جستجوی ورود کانواس. برای استفاده از نام کاربری فراهم شده توسط کاربر، خالی بگذارید."
@@ -160,9 +138,8 @@ fa-IR:
         auth_port: درگاه
         auth_username: "نام کاربری"
         identifier_format: "ویژگی شناسه ورود"
-        no_tls: "TLS موجود نیست"
-        simple_tls: "TLS ساده"
-        start_tls: "شروع TLS"
+      last_ldap_timeout_failure: "آخرین خطای به پایان رسیدن زمان"
+      ldap_timeout_failure_help2: "اگر زمان برقراری ارتباط کانواس با سرور LDAP  برای دفعات زیاد به پایان برسد، مانع از استفاده از این سرور LDAP برای %{time} از طریق تلاش های دیگر برای ورود خواهد شد."
     ldap_settings_test: 
       labels: 
         pass: "رمز عبور"
@@ -190,50 +167,27 @@ fa-IR:
       test_ldap_search_help_fixes_3: "تأیید کنید که شیء کاربر موجود در LDAP دارای مجوزهای جستجو برای مبنای جستجوی ارائه شده باشد."
       test_ldap_search_help_header: "کانواس نمی تواند نمونه LDAP شما را جستجو کند"
       test_ldap_search_label: "در حال آزمایش جستجوی LDAP..."
-    ldap_timeout_error: 
-      last_ldap_timeout_failure: "آخرین خطای به پایان رسیدن زمان"
-      ldap_timeout_failure_help2: "اگر زمان برقراری ارتباط کانواس با سرور LDAP  برای دفعات زیاد به پایان برسد، مانع از استفاده از این سرور LDAP برای %{time} از طریق تلاش های دیگر برای ورود خواهد شد."
     login_required: "باید ارائه شود"
     no_changing_auth_types: "نمی توان نوع پیکربندی تأیید اعتبار را تغییر داد، لطفا حذف کنید و پیکربندی جدید را ایجاد نمایید."
-    no_discovery_url: "هیچ یک تعیین نشده است"
     password_required: "باید ارائه شود"
-    saml_required: "یک پیکربندی SAML برای آزمون SAML لازم است"
-    saml_settings: 
-      auth_type: نوع
-      auth_url: "نشانی اینترنتی ورود برای این پیکربندی"
-      certificate_fingerprint: "گواهی اثر انگشت"
-      change_password_url: "لینک تغییر رمز"
-      discovery_url: "نشانی اینترنتی کشف خودکار:"
-      discovery_url_description: "اگر یک نشانی اینترنتی کشف خودکار تنظیم شده باشد، کانواس همه کاربران را در هنگام نیاز به اعتبارسنجی به این نشانی هدایت خواهد کرد. سپس این صفحه به کاربر کمک می کند جایی که باید برای ورود برود را پیدا کند. اگر نشانی اینترنتی کشف خودکار پیکربندی نشود، اولین پیکربندی SAML برای تلاش جهت اعتبارسنجی کاربر استفاده خواهد شد."
-      identifier_format: "قالب شناسه"
-      idp_entity_id: "شناسه موجودیت IdP"
+    saml_fields: 
       labels: 
         certificate_fingerprint: "اثر انگشت گواهی"
-        change_password_url: "پیوند تغییر رمز عبور"
         identifier_format: "قالب شناسه"
         idp_entity_id: "شناسه موجودیت IdP"
         log_in_url: "نشانی اینترنتی ورود"
         log_out_url: "نشانی اینترنتی خروج"
         login_attribute: "ویژگی ورود"
-        login_handle_name: "برچسب ورود"
-        position: موقعیت
         requested_authn_context: "زمینه اعتبارسنجی"
         unknown_user_url: "نشانی اینترنتی کاربر ناشناس"
-      log_in_url: "نشانی اینترنتی ورود"
-      log_out_url: "نشانی اینترنتی خروج"
-      login_attribute: "ویژگی ورود"
-      login_handle_name: "برچسب ورود"
-      login_handle_name_description: "برچسب استفاده شده برای شناسه های یکتای ورود. به‌عنوان مثال: ورود، نام کاربری، شناسه دانشجو و غیره."
-      no_discovery_url: "هیچ یک تعیین نشده است"
-      position: موقعیت
+      unknown_user_url_description: "نشانی اینترنتی برای تغییر مسیر به آن در هنگامی که کاربر اعتبارسنجی شده در کانواس موجود نیست."
+    saml_required: "یک پیکربندی SAML برای آزمون SAML لازم است"
+    saml_settings_test: 
       refresh_debugging: "تازه سازی"
-      requested_authn_context: "زمینه‌ی نشخیص هویت"
       saml_debug_instructions: "به محض اینکه شروع به اشکال زدایی کردید، همه اطلاعات مربوط به ورود بعدی SAML گردآوری خواهد شد. روی «تازه‌سازی» کلیک کنید تا ببینید که آیا اطلاعات بیشتری گردآوری شده است یا خیر، یا روی «توقف اشکال زدایی» کلیک کنید تا اطلاعات گردآوری شده پاک شود و فرایند جاری اشکال زدایی متوقف گردد."
-      saml_debugging: "اشکال زدایی"
-      save_button: "ذخیره سازی تنظیمات اعتبارسنجی"
+      saml_required: "یک پیکربندی SAML برای آزمون SAML لازم است"
       start_debugging: "آغاز اشکال زدایی"
       stop_debugging: "توقف اشکال زدایی"
-      unknown_user_url_description: "نشانی اینترنتی برای تغییر مسیر به آن در هنگامی که کاربر اعتبارسنجی شده در کانواس موجود نیست."
     saml_testing: 
       auth_request_to_idp: "درخواست اعتبارسنجی برای IdP فرستاده شد"
       auth_response_from_idp: "پاسخ اعتبارسنجی از IdP"
@@ -262,7 +216,12 @@ fa-IR:
         to_idp_xml: "XML درخواست ورود برای IdP ارسال شد"
       logout_request_to_idp: "درخواست خروج برای IdP ارسال شد"
       logout_response_from_idp: "درخواست خروج از IdP"
-      saml_required: "یک پیکربندی SAML برای آزمون SAML لازم است"
+    sso_settings_form: 
+      change_password_url_help: "برای رفتار پیش‌فرض کانواس خالی بگذارید"
+      labels: 
+        change_password_url: "لینک فراموشی رمز"
+        login_handle_name: "برچسب ورود"
+      login_handle_name_description: "برچسب استفاده شده برای شناسه های یکتای ورود. به‌عنوان مثال: ورود، نام کاربری، شناسه دانشجو و غیره."
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "زمان پایان اطلاعیه حساب قبل از زمان شروع است"
@@ -362,6 +321,7 @@ fa-IR:
     report_header_user__id: شناسه_کاربر
     report_header_user_id: "شناسه کاربر"
     report_header_user_name: "نام کاربری"
+    report_header_user_short_name: نام_کوتاه
     report_header_user_sis_id: "شناسه کاربر در سامانه اطلاعات دانشجو"
     report_header_xlist_course_id: شناسه_درس_xlist
     sis_exporter: 
@@ -391,6 +351,7 @@ fa-IR:
       open_registration_delegated_warning_dialog: "یک ارائه دهنده بیرونی هویت فعال شده است"
       what_are_quiz_ip_filters: "فیلترهای آی پی آزمون چه هستند؟"
     user: کاربر
+  account_surveys_b0039876: "نظرسنجی های حساب"
   account_user: 
     types: 
       account_admin: "مدیر حساب"
@@ -421,16 +382,13 @@ fa-IR:
         sis_user_id: "شناسه سامانه اطلاعات دانشجو"
         sortable_name: "نام قابل مرتب کردن"
       sortable_name_help: "این نام در فهرست های مرتب شده ظاهر می شود."
-      unique_id_label: "%{label}:*"
     add_user_button: "افزودن کاربر"
     add_user_dialog_title: "افزودن کاربر جدید"
     adding_course_message: "در حال افزودن درس..."
     adding_user_message: "در حال افزودن کاربر..."
     additional_settings: 
-      account_domains: "دامنه های حساب"
       account_status: "وضعیت حساب"
       add_new_domain: "افزودن دامنه جدید"
-      external_status: "وضعیت بیرونی"
       license: مجوز
       license_type: "نوع مجوز"
       new_account_domain_title: "دامنه حساب جدید"
@@ -1240,6 +1198,7 @@ fa-IR:
         record_invalid: "تأیید اعتبار انجام نشد: %{errors}"
         taken: "قبلا انتخاب شده است"
   activity_13915493: فعالیت
+  add_8523c19b: افزودن
   add_app_baf540f: "افزودن برنامه"
   add_attachment_93868828: "افزودن پیوست"
   add_course_assignments_628ed6d0: "افزودن تکلیف های درس"
@@ -1398,7 +1357,6 @@ fa-IR:
       invalid_external_tool: "تنظیمات معتبری برای این پیوند یافت نشد"
       invalid_external_tool_id: "تنظیمات معتبری برای این ابزار یافت نشد"
       invalid_feed_parameters: "پارامترهای خوراک خبری معتبر نیست."
-      invalid_oembed_url: "در بازیابی این منبع مشکل وجود داشت. ابزار خارجی اطلاعات نامعتبری درباره این منبع ارائه داد."
       invalid_tag_type: "نوع مورد را برای این برچسب شناسایی نکرد"
       invalid_verification_code: "رمز تأیید معتبر نیست."
       mismatched_verification_code: "رمز تأیید با هیچ یک از کاربرانی که در حال حاضر ثبت نام شده اند، مطابقت ندارد."
@@ -1429,6 +1387,7 @@ fa-IR:
         suspended: "دانشگاه به حالت تعلیق در آمد"
     wiki_front_page_default_content_course: "به ویکی درس جدید خود خوش آمدید!"
     wiki_front_page_default_content_group: "به ویکی گروه جدید خود خوش آمدید!"
+  apply_781a2546: اعمال
   appointment_group: 
     errors: 
       invalid_end_at: "زمان خاتمه قرار ملاقات قبل از زمان شروع است"
@@ -1682,12 +1641,6 @@ fa-IR:
       one: "حذف %{count} نمره پایین تر"
       other: "حذف %{count} نمره پایین تر"
     drop_lowest_scores: "حذف پایین ترین %{number} نمره"
-    due_date_override: 
-      overrides: 
-        available_from: "قابل دسترسی از طریق"
-        due_date: "تاریخ مهلت"
-        for: برای
-      until: تا
     due_date_view: 
       overrides: 
         remove_these_dates: "حذف این تاریخ ها:"
@@ -1709,7 +1662,6 @@ fa-IR:
       description: شرح
       freeze_properties: "قفل کردن مشخصات تکلیف پس از کپی شدن"
       notify_content_change: "به کاربران اطلاع داده شود که این محتوا تغییر یافته است"
-      only_visible_to_overrides_note: "نکته: این تکلیف *فقط* برای بخش های تعیین شده در زیر قابل مشاهده است:"
       points_possible: امتیازها
       post_to_sis: "نمره های این تکلیف در هنگام ارسال به سامانه اطلاعات دانشجو در دانشکده تان درج شود"
       warnings: 
@@ -2149,6 +2101,7 @@ fa-IR:
   available_after_unlock_at_b5682224: "بعد از %{unlock_at} در دسترس است"
   available_after_unlock_at_until_lock_at_499e8092: "بعد از %{unlock_at} تا %{lock_at} در دسترس است"
   available_from_587ce92f: "قابل دسترسی از طریق"
+  available_from_f84e4611: "قابل دسترسی از"
   available_until_f3b9c4ed: "قابل دسترسی تا"
   available_until_lock_at_ab022445: "تا %{lock_at} قابل دسترسی است"
   back_to_app_center_95420d83: "بازگشت به مرکز برنامه"
@@ -2609,30 +2562,9 @@ fa-IR:
     ics_title: "تقویم %{course_or_group_name} (کانواس)"
     invalid_date_or_time: "تاریخ یا تاریخ و زمان برای %{attr} معتبر نیست"
   calendars: 
-    assignment_details: "اطلاعات تکلیف"
-    default_title: رویداد
     event: 
       due: مهلت
       event_title: "مهلت: %{event_title} "
-    event_details: "اطلاعات رویداد"
-    feed_dialog_title: "خوراک خبری تقویم"
-    keycodes: 
-      delete: d
-      edit: e
-      new: "n"
-      next_day: ctrl+right
-      next_event: j
-      next_week: ctrl+down
-      open: o
-      previous_day: ctrl+left
-      previous_event: k
-      previous_week: ctrl+up
-      refresh: r
-    notices: 
-      event_moved: "%{event} به %{day} انتقال یافت"
-    prompts: 
-      delete_assignment: "مطمئنید که می خواهید این تکلیف حذف شود؟"
-      delete_event: "مطمئنید که می خواهید این رویداد حذف شود؟"
     show2: 
       calendar_feed: "خوراک خبری تقویم"
       calendar_feed_instructions: "پیوند زیر را کپی کرده و در هر برنامه تقویم که خوراک های خبری iCal را می گیرد (نظیر تقویم گوگل، iCal، Outlook و غیره) بچسبانید"
@@ -2646,11 +2578,6 @@ fa-IR:
       toggle_calendars: "تغییر دادن تقویم ها"
       toggle_undated_items: "تغییر دادن موردهای بدون تاریخ"
       undated_items: "بخش های بدون تاریخ"
-    titles: 
-      add_new_assignment: "افزودن تکلیف جدید"
-      add_new_event: "افزودن رویداد جدید"
-      edit_assignment: "ویرایش تکلیف"
-      edit_event: "ویرایش رویداد"
     wizard_box: 
       descriptions: 
         assignment: "خوبه. حالا روی زبانه \"تکلیف\" در کادر گفتگو کلیک کنید تا یک تکلیف به جای یک رویداد تقویم ایجاد شود."
@@ -2689,6 +2616,8 @@ fa-IR:
   canvas_cartridge_display: " کارتریج رایج کانواس"
   canvas_cartridge_file_description: "بسته صدور درس کانواس"
   canvas_cartridge_name: "وارد کننده کارتریج کانواس"
+  canvas_did_not_recognize_your_identity_provider_cb0e50fc: "کانواس ارائه دهنده هویت شما را به رسمیت نشناخت"
+  canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "کانواس برای این کاربر، حساب ندارد: %{user}"
   canvas_revision_unknown: ناشناس
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "کانواس همه موردهای ارسالی شما را پس از اینکه آزمون را ذخیره کردید، دوباره نمره گذاری می کند. این کار ممکن است چند دقیقه طول بکشد."
   cc: 
@@ -2739,7 +2668,7 @@ fa-IR:
         cancel: لغو
         update: "بهنگام سازی همکاری"
       labels: 
-        description: شرح
+        description: "شرح:"
         title: "عنوان همکاری"
     errors: 
       cannot_load_collaboration: "قادر به بارگذاری همکاری نیست"
@@ -2770,7 +2699,7 @@ fa-IR:
             **هشدار**: شما (و همه همکاران شما) برای شرکت در برنامه های مشارکتی Google Docs به یک حساب گوگل نیاز خواهید داشت.
       labels: 
         collaboration_type: "همکاری با استفاده از:"
-        description: شرح
+        description: "شرح:"
         document_name: "نام سند:"
       messages: 
         delete_google_doc_as_well: "این همکاری به عنوان یک Google Doc ذخیره شده است. می خواهید از کانواس حذف شود یا از Google Docs هم حذف شود؟"
@@ -2966,7 +2895,7 @@ fa-IR:
       message: 
         export_started: "فرایند صدور شروع شده است. این فرایند ممکن است برای درس های حجیم مدتی طول بکشد. *می توانید از صفحه خارج شوید* و وقتی فرایند صدور کامل شد، یک نامه الکترونیکی دریافت کنید."
       no_submissions: "در حال حاضر هیچ مورد ارسالی برای صدور ندارید."
-      user_data_exports: "صدور داده های کاربر"
+      user_data_exports: "بارگیری موردهای ارسالی"
     labels: 
       new_export: "صدور جدید:"
     links: 
@@ -3188,17 +3117,6 @@ fa-IR:
     titles: 
       tag_external_web_page: "برچسب زدن صفحه وب بیرونی"
   context: 
-    communication: 
-      headings: 
-        discussions: "بحث ها"
-      links: 
-        feeds: 
-          course_discussions: "تک خوراک خبری بحث های درس"
-        start_collaboration: "شروع یک همکاری"
-        start_conference: "راه اندازی یک کنفرانس مجازی"
-        start_topic: "شروع یک موضوع جدید"
-      titles: 
-        communication: ارتباط
     deleted_item: 
       created: "ایجاد شد"
       last_updated: "آخرین بهنگام سازی"
@@ -3970,12 +3888,14 @@ fa-IR:
       wiki_id: "شناسه ویکی"
       workflow_state: "وضعیت گردش کار"
   course_members_are_free_to_join_9b2603d4: "پیوستن اعضای درس آزاد است"
+  course_navigation_dd035109: "پیمایش درس"
   course_restore: 
     restore_error: "در هنگام تلاش برای بازیابی درس، خطایی رخ داد. درس بازیابی نشد.."
   course_search: 
     cant_be_blank: "نمی تواند خالی باشد"
   course_section: 
     sis_id_taken: "شناسه سامانه اطلاعات دانشجو \"%{sis_id}\"در حال استفاده است"
+  course_section_7a988066: "بخش درس"
   course_settings: 
     buttons: 
       add_section: "افزودن بخش"
@@ -4786,6 +4706,7 @@ fa-IR:
   delete_survey_56fddbbd: "حذف نظرسنجی"
   delete_tool_app_9c9f6d35: "برنامه %{tool} حذف شود؟"
   delete_toolname_app_85f9d4ee: "حذف برنامه %{toolName}"
+  delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "تارنماهای آزمایشی برای پیکربندی به تنظیمات تصویر امنیتی نیاز دارند. لطفا برای این مورد کانواس، به مدیر تارنما مراجعه کنید."
   demos: 
     _register: 
@@ -4906,6 +4827,7 @@ fa-IR:
       تکلیف های متمایز یک ویژگی *بتا* است که امکان انتخاب اینکه یک تکلیف در کدام بخش (ها) کاربرد دارد را میسر می سازد.
       بخش هایی که تکلیف به آن اختصاص داده نشده است، آن را در محتوای درس خود نمی ببینند و نمره نهایی آنها
       بدون این امتیازها محاسبه می شود.
+  diigo_993c4646: Diigo
   disable_a5c05db3: "غیر فعال سازی"
   discussion_6719c51d: بحث
   discussion_entries: 
@@ -4985,7 +4907,6 @@ fa-IR:
         save_and_publish: "ذخیره سازی و انتشار"
       delay_posting: "ارسال با تأخیر"
       enable_podcast_feed: "فعال سازی خوراک خبری پادکست"
-      only_visible_to_overrides_note: "نکته: این بحث *فقط* برای بخش(های) تعیین شده در زیر قابل مشاهده است:"
       options: "گزینه ها"
       page_header_title: "بحث جدید"
       points_possible: "امتیازهای ممکن"
@@ -5202,6 +5123,8 @@ fa-IR:
     unsubscribed_hint: "شما در این موضوع مشترک نیستید. برای اشتراک، کلیک کنید."
   display_course_catalog: "فهرست قابل جستجوی درس های موجود در این حساب ریشه را در حالی که پرچم «شامل سازی این درس در فهرست عمومی درس» فعال شده است»، نمایش دهید."
   domain_3b54c511: دامنه
+  download_submissions_7454665f: "بارگیری موردهای ارسالی"
+  due_a73610f6: مهلت
   due_date_6a281fe3: "مهلت: %{date}"
   due_date_822625d8: "تاریخ مهلت"
   due_date_cannot_be_after_course_end_fd128a14: "تاریخ مهلت نمی تواند بعد از خاتمه درس باشد"
@@ -5219,6 +5142,7 @@ fa-IR:
   e_mail_only_2cc5e513: "فقط پست الکترونیکی"
   ecollege_file_description: Ecollege
   ecollege_name: "مبدل Ecollege"
+  edit_c5fbea07: ویرایش
   edit_grading_scheme_53091236: "ویرایش طرح نمره گذاری"
   edit_permissions_for_count_items_d65e3855: 
     one: "ویرایش مجوزها برای %{count} مورد"
@@ -5644,6 +5568,7 @@ fa-IR:
     unsaved_changes: "ذخیره سازی تغییرات را لغو کرده اید."
     wrong_file_extension: "فایلی که با پسوند \"%{extension}\" انتخاب کردید، برای ارسال مجاز نیست"
   everyone_854554dd: همه
+  everyone_else_6c6dc7b6: "هر کس دیگر"
   example_84698b7d: مثال
   example_https_example_com_config_xml_be5f36ac: "مثال: https://example.com/config.xml"
   expand_or_collapse_calendars_9854b0d0: "باز کردن یا جمع کردن تقویم ها"
@@ -5798,8 +5723,6 @@ fa-IR:
   feature_flags: 
     feature_flag: 
       allow: "اجازه دادن"
-      disabled: "غیر فعال شده"
-      enabled: "فعال شده"
       estimated_release: "نسخه تخمینی:"
       no_description: "شرح موجود نیست"
       ? "off"
@@ -6080,10 +6003,12 @@ fa-IR:
     invitation: "دعوت نامه"
     question: پرسش
     warning: هشدار
+  google_docs_40374e65: "Google Docs"
   google_docs_domain_restriction_description: |-
       محدودیت دامنه Google Docs امکان محدود شدن موردهای ارسالی و همکاری ها به یک دامنه را فراهم می کند. دانشجویانی
       که تلاش می کنند در یک دامنه تأیید نشده تکلیف ها را ارسال کنند یا به همکاری ها بپیوندند، یک پیام خطا دریافت خواهند
       کرد که آنها را از اینکه باید یکپارچه سازی Google Docs خود را بهنگام سازی کنند، مطلع خواهد ساخت.
+  google_docs_preview_9f41b23c: "پیش نمایش Google Docs"
   grade_display_warning_dialog: 
     grade_display_warning: 
       checkbox: "دوباره برای این درس نمایش داده نشود."
@@ -6131,7 +6056,6 @@ fa-IR:
     hide_all_details_button: "مخفی کردن همه اطلاعات"
     mic_blocked_message: "مجوز استفاده از میکروفن مسدود شده است. برای تغییر دادن، به chrome://settings/contentExceptions#media-stream مراجعه کنید"
     mute_assignment: "غیر فعال کردن تکلیف"
-    new_assessment: "[ارزیابی جدید]"
     no_submission_time: "زمان ارسال موجود نیست"
     nodetect_message: "هیچ گفتاری حذف نشده است. ممکن است لازم باشد تنظیمات میکروفن خود را تغییر دهید."
     not_graded: "نمره گذاری نشده"
@@ -6261,6 +6185,8 @@ fa-IR:
       switch_to_percent: "تبدیل به درصد"
       switch_to_points: "تبدیل به امتیاز"
     ungraded: "در نمره گذاری لحاظ نشده است"
+  gradebook_csvs: 
+    grades_filename: "نمره ها"
   gradebook_uploads: 
     new: 
       titles: 
@@ -6398,6 +6324,7 @@ fa-IR:
       accessibility_warning: "هشدار: نمای شبکه ای دفتر نمره قابل دسترسی نیست. در عوض، برای استفاده از نمای منفرد، اینجا کلیک کنید."
       arrange_columns_by_due_date: "مرتب کردن ستون ها بر اساس تاریخ مهلت"
       arrange_columns_by_group: "مرتب کردن ستون ها بر اساس گروه تکلیف"
+      export_current_gradebook: فعلی
       filter_by_student: "فیلتر کردن بر اساس نام یا شناسه ثانویه دانشجو"
       grades: "نمره ها"
       hide_student_names: "مخفی کردن نام دانشجویان"
@@ -6413,7 +6340,6 @@ fa-IR:
     grades: 
       complete: کامل
       incomplete: ناقص
-    grades_filename: "نمره ها"
     grading_box_extended: 
       labels: 
         grade: نمره
@@ -6506,7 +6432,6 @@ fa-IR:
         show_all_sections: "نمایش همه بخش ها"
         submit_same_score: "استفاده از همان نمره برای مورد دوباره ارسال شده"
       loading: "درحال بارگذاری..."
-      new_assessment_option: "[ارزیابی جدید]"
       no_annotation: "حاشیه نویسی برای این سند موجود نیست"
       not_newest_notice: "نکته: این مورد جدیدترین مورد ارسالی نیست"
       page_header_title: "برنامه نمره گذاری سریع"
@@ -7094,7 +7019,6 @@ fa-IR:
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "اگر اینجا را ترک کنید، بارگیری فایل زیپ که اکنون در حال آماده سازی است، لغو خواهد شد."
   if_you_ve_been_using_another_course_management_sys_67edfab1: "اگر از یک سیستم مدیریت درس دیگر استفاده می کنید، احتمالا چیزهایی دارید که می خواهید به کانواس منتقل کنید. می توانیم شما را در فرایند انتقال آسان محتوای خود به کانواس همراهی کنیم."
   ignore_assignment_738b3c99: "صرفنظر کردن از تکلیف"
-  ignore_forever_dd4a6cdf: "صرفنظر برای همیشه"
   ignore_name_55edc6fe: "صرفنظر کردن از %{name}"
   ignore_these_3940f6f5: "صرفنظر کردن از اینها"
   ignore_this_assignment_b7a71f80: "صرفنظر کردن از این تکلیف"
@@ -7137,6 +7061,7 @@ fa-IR:
     warnings: 
       truncated_wiki_title: "عنوان صفحه ویکی زیر کوتاه شد: %{title}"
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "نمره های این تکلیف در هنگام ارسال به سامانه اطلاعات دانشجو در دانشکده شما درج شود"
+  incorrect_username_and_or_password_2de73abb: "نام کاربری و/یا رمز عبور اشتباه است"
   info: 
     notices: 
       error_reported: "از کمک شما سپاسگزاریم! مشکل را برطرف خواهیم کرد"
@@ -7295,10 +7220,7 @@ fa-IR:
   launch_url_e150bd41: "راه اندازی نشانی اینترنتی"
   layouts: 
     application: 
-      ? "User Research"
-      : "پژوهش کاربر"
       bouncing_communication_channels: "یکی از روش های تماس شما ظاهرا اشکال دارد. لطفا *صفحه تنظیمات* خود را بازبینی کنید."
-      by_instructure: "توسط شرکت Instructure"
       group_switch: تغییر
       javascript_required: "برای دسترسی به این تارنما، جاوااسکریپت باید فعال باشد."
       keyboard_navigation: 
@@ -7307,7 +7229,6 @@ fa-IR:
         close: بستن
         dashboard: "داشبورد من"
         skip_to_content: "رفتن به محتوا"
-      open_source_learning_management_system: "سامانه مدیریت یادگیری منبع باز"
     fixed_bottom: 
       masquerading: 
         stop: "متوقف کردن تغییر عنوان"
@@ -7329,6 +7250,7 @@ fa-IR:
       log_in_to_canvas: "ورود به کانواس"
     styleguide: 
       default_page_title: "سیستم مدیریت آموزش کانواس"
+  ldap_e1e0a916: LDAP
   learning_mastery_gradebook_description: |-
       دفتر نمره تسلط یادگیری روشی را به اساتید ارائه می دهد که بتوانند پیشرفت دانشجو و درس را در نتایج یادگیری 
       درس به سرعت مشاهده کنند. نتایج در قالبی 
@@ -7436,6 +7358,7 @@ fa-IR:
   linked_assignment_message: "پیوند داده شده به تکلیف '%{title}' "
   linked_discussion_topic_message: "مرتبط با موضوع بحث '%{title}' "
   linked_quiz_message: "پیوند داده شده به آزمون '%{title}'"
+  linkedin_5726caca: لینکدین
   links: 
     dashboard: "داشبورد من"
     errors: 
@@ -7453,6 +7376,77 @@ fa-IR:
   lock_date_cannot_be_before_due_date_ac30f54: "تاریخ قفل کردن نمی تواند قبل تاریخ مهلت باشد"
   log_out_379ba28a: خروج
   logged_out_user: "کاربر خارج شده %{user_counter}"
+  login: 
+    canvas: 
+      mobile_login: 
+        back_to_login: "بازگشت به صفحه ورود"
+        buttons: 
+          request_password: "درخواست رمز عبور"
+        dont_know_password: "رمز عبور خود را نمی دانم"
+        log_in: ورود
+        login_handle: "%{login_handle_name} خود را وارد کنید تا برای شما پیوندی را ارسال کنیم که رمز عبور خود را تغییر دهید."
+        password: "رمز عبور"
+        sending: "در حال ارسال..."
+      new: 
+        back_to_login: "بازگشت به صفحه ورود"
+        browse_courses: "مرور کردن درس ها"
+        buttons: 
+          request_password: "درخواست رمز عبور"
+        coenrollment_banner: "*والدین یک کاربر کانواس هستید؟* **برای یک حساب، اینجا کلیک کنید**"
+        dont_know_password: "رمز عبور خود را نمی دانید؟"
+        labels: 
+          password: "رمز عبور"
+          remember_me: "ماندن در حالت ورود"
+        log_in: ورود
+        login_handle: "%{login_handle_name} خود را وارد کنید تا برای شما پیوندی را ارسال کنیم که رمز عبور خود را تغییر دهید."
+        page_title: "ورود به کانواس"
+        register_for_canvas: "*به حساب کانواس نیاز دارید؟* **اینجا کلیک کنید, رایگان است!**"
+    logout_confirm: 
+      cancel: لغو
+      details: 
+        log_out: "مطمئنید که می خواهید از کانواس خارج شوید؟"
+      log_out: خروج
+      page_title: خروج
+    otp: 
+      errors: 
+        invalid_otp: "رمز تأیید معتبر نیست، لطفا دوباره تلاش کنید"
+      new: 
+        buttons: 
+          send: ارسال
+          verify: تأیید
+        details: 
+          mfa_enrollment: |-
+              اعتبارسنجی چند عاملی با لازم شمردن این مسئله که برای ورود به کانواس
+              علاوه بر دانستن رمز عبور خود چیزی
+              را تحت مالکیت فیزیکی خود دارید، امنیت را افزایش می دهد. ممکن است
+              یک دستگاه باشد که می تواند
+              رمزهای تأیید ایجاد کند یا یک تلفن باشد که می تواند پیام های متنی دریافت کند. برنامه
+              اعتبارسنجی گوگل برای [iPhone](%{iphone_url}) یا
+              [Android](%{android_url}) را می توان با اسکن کردن رمز QR زیر پیکربندی کرد.
+              نشانه های دیگر را می توان با وارد کردن کلید رمز
+              **%{secret_key}** پیکربندی نمود.
+          mfa_required: "لازم است که اعتبارسنجی چند عاملی را راه اندازی کنید."
+          otp_on_device: "لطفا رمز تأیید نشان داده شده توسط نشانه خود را وارد کنید."
+          otp_sent_to_phone: "یک رمز تأیید برای تلفن شما ارسال شده است. لطفا آن را در اینجا وارد کنید."
+          send_to_sms: "ارسال پیام های متنی به  %{phone_number}"
+        labels: 
+          carrier: حامل
+          phone_number: "شماره تلفن"
+          remember_me: "این رایانه به خاطر سپرده شود"
+          verification_code: "رمز تأیید"
+        links: 
+          choose_number: "یک تلفن موجود را انتخاب کنید"
+        page_title: "اعتبارسنجی چند عاملی"
+        select: 
+          new_number: "یک تلفن جدید"
+        titles: 
+          mfa: "اعتبارسنجی چند عاملی"
+    saml: 
+      debug: 
+        logout_request_redirect_from_idp: "از IdP درخواست خروج دریافت شد"
+        logout_response_redirect_from_idp: "پاسخ به خروج را از IdP دریافت کرد"
+        logout_response_redirect_to_idp: "ارسال درخواست خروج به IdP"
+        redirect_from_idp: "پاسخ به ورود را از IdP دریافت کرد"
   logo_a040ae0e: نماد
   low_score_4eeb95b2: "پایین: %{score}"
   lower_limit_of_range_6ddd4983: "حد پایین تر محدوده"
@@ -9209,6 +9203,13 @@ fa-IR:
         subject: "دعوت نامه کنفرانس مجازی: %{name}"
       twitter: 
         tweet: "هشدار کانواس  - دعوت: شرکت در %{title}، %{name}"
+    web_conference_recording_ready: 
+      email: 
+        details_link: "در اینجا می توانید اطلاعات بیشتر را مشاهده کنید: %{link}"
+        html: 
+          details_link: "برای مشاهده اطلاعات بیشتر، کلیک کنید"
+      sms: 
+        link_message: "اطلاعات بیشتر در %{url}"
   migration: 
     announcement_type: اطلاعیه
     assignment_group_type: "گروه تکلیف"
@@ -9380,6 +9381,7 @@ fa-IR:
   moodle_formula_many_warning_title: "%{count} پرسش فرمولی در این مخزن وجود دارد که پاسخ های احتمالی آنها باید از نو ایجاد شوند"
   moodle_formula_warning_title: "پاسخ های احتمالی باید برای پرسش فرمولی از نو ایجاد شوند"
   more_courses_5ebbe998: "درس های دیگر"
+  move_abf00365: انتقال
   move_dialog: 
     cancel: لغو
     save: "ذخیره سازی"
@@ -9387,6 +9389,8 @@ fa-IR:
     where_to_move: "می خواهید *%{name}* به کجا انتقال یابد؟"
   move_dialog_select: 
     move_to_end: "-- در پایین --"
+  moving_a4d552df: "در حال انتقال..."
+  multi_factor_authentication_configured_865b1bde: "اعتبارسنجی چند عاملی پیکربندی شد"
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "پارامتر «شناسه های_فایل» و/یا «شناسه های_پوشه» باید فراهم شود"
   mute_dialog: 
     curving_assignments: "در حال روی منحنی بردن تکلیف ها"
@@ -9424,6 +9428,8 @@ fa-IR:
   no_due_date_6e6a23c1: "(تاریخ مهلت موجود نیست)"
   no_e16d9132: خیر
   no_migration_file: "برای انتقال محتوا، فایل لازم است."
+  no_password_was_given_472222e5: "هیچ رمز عبوری ارائه نشد"
+  no_results_found_58717065: "نتیجه ای یافت نشد"
   no_students_have_taken_the_quiz_yet_e667644b: "هیچ دانشجویی هنوز آزمون نداده است"
   no_students_have_taken_the_survey_yet_d378cd35: "هیچ دانشجویی هنوز نظرسنجی را انجام نداده است"
   no_usage_rights_object_supplied_304b8d40: "هیچ شیء «حقوق_استفاده» فراهم نشده است"
@@ -9653,6 +9659,7 @@ fa-IR:
       admin: مدیریتی
       alerts: گفتگوها
       communication: گفتگوها
+      conferences: "همایش ها"
       course: "فعالیت های درس"
       discussions: "بحث ها"
       groups: "گروه ها"
@@ -9889,7 +9896,6 @@ fa-IR:
     everyone_else: "هر کس دیگر"
     overrides: 
       everyone: همه
-      everyone_else: "هر کس دیگر"
   own_copyright_cc59db55: "حق نشر من"
   page_comment: 
     default_user_name: ناشناس
@@ -10570,6 +10576,7 @@ fa-IR:
     yo_select: 
       yo: Yo
     you_have_no_services: "هیچ یک از سرویس ها را ثبت نام نکرده اید. می توانید تعدادی از آنها را در صفحه *تنظیمات* اضافه کنید."
+  profile_6bd2baed: "رخ نما"
   profiles: 
     avatar_dialog: 
       from_gravatar: "از گرآواتار"
@@ -10608,79 +10615,7 @@ fa-IR:
       too_long: "نمی تواند از %{max}  نویسه فراتر رود"
       too_short: "باید حداقل %{min} نویسه باشد"
   pseudonym_sessions: 
-    debug: 
-      logout_redirect: "درخواست خروج برای IdP ارسال شد"
-      logout_request_redirect_from_idp: "از IdP درخواست خروج دریافت شد"
-      logout_response_redirect_from_idp: "پاسخ به خروج را از IdP دریافت کرد"
-      logout_response_redirect_to_idp: "ارسال درخواست خروج به IdP"
-      redirect_from_idp: "پاسخ به ورود را از IdP دریافت کرد"
     default_app_name: "برنامه شخص ثالث"
-    errors: 
-      blank_password: "هیچ رمز عبوری ارائه نشد"
-      invalid_credentials: "نام کاربری و/یا رمز عبور اشتباه است"
-      invalid_otp: "رمز تأیید معتبر نیست، لطفا دوباره تلاش کنید"
-      login_error: "در هنگام ورود به %{institution} اشکالی رخ داد"
-      login_errors: 
-        no_config_for_id: "حساب کانواس هیچ گونه پیکربندی اعتبارسنجی با این شناسه ندارد"
-        no_idp_set: "دانشگاهی که از آن وارد شده اید در این حساب پیکربندی نشده است."
-        unrecognized_idp: "کانواس ارائه دهنده هویت شما را به رسمیت نشناخت"
-      logout_errors: 
-        no_idp_found: "کانواس قادر به خارج کردن شما از ارائه دهنده هویت نبود"
-      max_attempts: "تعداد تلاش های ناموفق برای ورود زیاد است. لطفا بعدا دوباره تلاش کنید، یا با مدیر سیستم خود تماس بگیرید."
-      no_matching_user: "کانواس برای این کاربر، حساب ندارد: %{user}"
-      user_deleted: "این حساب کاربری حذف شده است. لطفا با مدیر سیستم خود تماس بگیرید تا حساب شما دوباره فعال شود."
-    logout_confirm: 
-      cancel: لغو
-      details: 
-        log_out: "مطمئنید که می خواهید از کانواس خارج شوید؟"
-      log_out: خروج
-      page_title: خروج
-    mobile_login: 
-      back_to_login: "بازگشت به صفحه ورود"
-      buttons: 
-        request_password: "درخواست رمز عبور"
-      dont_know_password: "رمز عبور خود را نمی دانم"
-      log_in: ورود
-      login_handle: "%{login_handle_name} خود را وارد کنید تا برای شما پیوندی را ارسال کنیم که از طریق آن رمز عبور خود را تغییر دهید."
-      password: "رمز عبور"
-      sending: "درحال ارسال..."
-    new: 
-      page_title: "ورود به کانواس"
-    notices: 
-      mfa_complete: "اعتبارسنجی چند عاملی پیکربندی شد"
-    otp_login: 
-      buttons: 
-        send: ارسال
-        verify: تأیید
-      details: 
-        mfa_enrollment: |-
-            اعتبارسنجی چند عاملی با لازم شمردن این مسئله که برای ورود به کانواس
-            علاوه بر دانستن رمز عبور خود چیزی
-            را تحت مالکیت فیزیکی خود دارید، امنیت را افزایش می دهد. ممکن است
-            یک دستگاه باشد که می تواند
-            رمزهای تأیید ایجاد کند یا یک تلفن باشد که می تواند پیام های متنی دریافت کند. برنامه
-            اعتبارسنجی گوگل برای [iPhone](%{iphone_url}) یا
-            [Android](%{android_url}) را می توان با اسکن کردن رمز QR زیر پیکربندی کرد.
-            نشانه های دیگر را می توان با وارد کردن کلید رمز
-            **%{secret_key}** پیکربندی نمود.
-        mfa_required: "لازم است که اعتبارسنجی چند عاملی را راه اندازی کنید."
-        otp_on_device: "لطفا رمز تأیید نشان داده شده توسط نشانه خود را وارد کنید."
-        otp_sent_to_phone: "یک رمز تأیید برای تلفن شما ارسال شده است. لطفا آن را در اینجا وارد کنید."
-        send_to_sms: "ارسال پیام های متنی به  %{phone_number}"
-      labels: 
-        carrier: حامل
-        phone_number: "شماره تلفن"
-        remember_me: "این رایانه به خاطر سپرده شود"
-        verification_code: "رمز تأیید"
-      links: 
-        choose_number: "یک تلفن موجود را انتخاب کنید"
-      page_title: "اعتبارسنجی چند عاملی"
-      select: 
-        new_number: "یک تلفن جدید"
-      titles: 
-        mfa: "اعتبارسنجی چند عاملی"
-    password_confirmation_error: "خطا در ارسال درخواست."
-    password_confirmation_sent: "تأییدیه رمز عبور ارسال شد. حتما صندوق هرزنامه خود را بازبینی کنید."
   pseudonyms: 
     confirm_change_password: 
       buttons: 
@@ -11604,7 +11539,6 @@ fa-IR:
         new_discussion: "بحث جدید"
         one_question_at_a_time: "نمایش یک پرسش در هر بار"
         one_time_results: "فقط یک بار بعد از هر تلاش"
-        only_visible_to_overrides_note: "نکته: این آزمون **فقط** برای بخش(های) تعیین شده در زیر قابل مشاهده است:"
         points_possible: "امتیاز %{n}"
         post_to_sis: "ارسال نمره ها به سامانه اطلاعات دانشجو"
         quiz_title: "عنوان آزمون"
@@ -12078,7 +12012,6 @@ fa-IR:
     move_success: 
       one: "%{count} مورد به %{destinationFolder} انتقال یافت"
       other: "%{count} مورد به %{destinationFolder} انتقال یافت"
-    moving: "در حال انتقال..."
     name: نام
     progress_error: "در هنگام اقدام برای آماده سازی بارگیری، خطایی رخ داد، لطفا دوباره سعی کنید."
     progress_message: "در حال آماده سازی بارگیری: %{percent}% انجام شده است"
@@ -12150,6 +12083,7 @@ fa-IR:
   remove_f47dc62a: حذف
   remove_row_c198da5a: "حذف ردیف"
   remove_row_f9d59cba: "حذف ردیف"
+  remove_these_dates_48453a81: "حذف این تاریخ ها"
   rename_45608f54: "تغییر نام"
   reply_from_name: "%{name} از طریق اطلاعیه های کانواس "
   require_usage_rights_for_uploaded_files_4507865b: "لازم دانستن حقوق استفاده برای فایل های بارگذاری شده"
@@ -12746,6 +12680,11 @@ fa-IR:
     canvas-user-nav: 
       navigation: 
         user_menu: "منوی کاربر"
+    canvas_footer: 
+      ? "User Research"
+      : "پژوهش کاربر"
+      by_instructure: "توسط شرکت Instructure"
+      open_source_learning_management_system: "سامانه مدیریت یادگیری منبع باز"
     components: 
       ic_submission-download-dialog: 
         click_to_download: "برای بارگیری کلیک کنید"
@@ -12935,21 +12874,6 @@ fa-IR:
     locale_warning: 
       crowdsourced_warning_message: "زبانی که انتخاب کرده اید از طریق جمع سپاری ترجمه شده است. Instructure دقت ترجمه را بازبینی یا تأیید نکرده است، و هیچ مسئولیتی را برای استفاده شما از تنظیمات این زبان نمی پذیرد. لطفا با صلاحدید خود از آن استفاده کنید."
       crowdsourced_warning_title: "زبان جمع سپاری شده"
-    login: 
-      back_to_login: "بازگشت به صفحه ورود"
-      browse_courses: "مرور کردن درس ها"
-      buttons: 
-        request_password: "درخواست رمز عبور"
-      coenrollment_banner: "*والدین یک کاربر کانواس هستید؟* **برای یک حساب، اینجا کلیک کنید**"
-      default_login_message: "به سامانه دانشگاه خود وارد شوید"
-      dont_know_password: "رمز عبور خود را نمی دانید؟"
-      labels: 
-        password: "رمز عبور"
-        remember_me: "ماندن در حالت ورود"
-      log_in: ورود
-      login_at_account: "به سامانه %{school_name} وارد شوید"
-      login_handle: "%{login_handle_name} خود را وارد کنید تا برای شما پیوندی را ارسال کنیم که رمز عبور خود را تغییر دهید."
-      register_for_canvas: "*به حساب کانواس نیاز دارید؟* **اینجا کلیک کنید, رایگان است!**"
     menu_assignment: 
       labels: 
         due: مهلت
@@ -13221,7 +13145,6 @@ fa-IR:
       grading_alt: "نمره گذاری"
       submission_comment: "نظر درباره مورد ارسالی"
     terms_required: 
-      terms_have_changed: "ضوابط استفاده تغییر کرده است. لطفا قبل از استفاده از کانواس، آنها را بازبینی کنید."
       updated_terms_of_use: "ضوابط استفاده بهنگام سازی شده"
     unauthorized: 
       headings: 
@@ -13237,8 +13160,6 @@ fa-IR:
         unauthorized_action: "غیر مجاز"
       unauthorized_1: "به نظر می‌رسد مجوز دسترسی به این صفحه را ندارید. لطفا اطمینان حاصل کنید که مجاز به دیدن این صفحه هستید."
       unauthorized_2: "اگر فکر می کنید باید قادر به مشاهده این صفحه باشید، لطفا از پیوند \"راهنما\" استفاده کنید تا پشتیبانی را از این مشکل آگاه سازید."
-      unauthorized_action: "قبل از اینکه بتوانید این صفحه را مشاهده کنید، باید وارد شوید."
-      unauthorized_user: "%{user_name}، برای مشاهده این صفحه ابتدا باید وارد شوید. اگر رمز عبور خود را فراموش کرده اید یا نمی دانید، روی «فراموشی رمز عبور» کلیک کنید."
       unauthorized_user_is_other: "%{current_user}، شما مجاز به مشاهده این صفحه نیستید. لینکی که شما را به این صفحه آورد **%{unauthorized_user} (%{unauthorized_user_email})** است. اگر خودتان هستید، ممکن است بخواهید با این نشانی پست الکترونیکی خارج شوید و دوباره وارد شوید تا دسترسی به این صفحه را بدست آورید."
     unauthorized_feed: 
       bad_params: "پارامترهای خوراک خبری که می خواستید به آن دسترسی پیدا کنید معتبر نیستند."
@@ -13433,6 +13354,7 @@ fa-IR:
       user_search_label: "جستجوی کاربر"
       users_matching_label: "کاربران نظیر"
   skipping_unknown_file_type_cd1086ee: "صرفنظر از نوع فایل ناشناس"
+  skype_18850ba7: اسکایپ
   slideshow: 
     titles: 
       back: "به عقب"
@@ -13718,6 +13640,7 @@ fa-IR:
     files: "فایل ها"
     grades: "نمره ها"
     home: "صفحه اصلی"
+    logout: خروج
     modules: "ماژول ها"
     observees: "در حال مشاهده"
     outcomes: نتایج
@@ -13791,15 +13714,18 @@ fa-IR:
         unspecified: "هر زمان"
       timespan: "%{start_at} *تا* %{end_at}"
   text_document_eacbcdb7: "سند متنی"
+  that_user_account_has_been_deleted_please_contact__350e0e0: "این حساب کاربری حذف شده است. لطفا با مدیر سیستم خود تماس بگیرید تا حساب شما دوباره فعال شود."
   the_app_was_added_58e2836a: "برنامه افزوده شد"
   the_app_was_added_successfully_3f785a23: "برنامه با موفقیت افزوده شد"
   the_app_was_updated_successfully_3d71cd1b: "برنامه با موفقیت بهنگام سازی شد"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "زبانه فایل ها، محلی برای به اشتراک گذاشتن اسلایدهای سخنرانی، اسناد نمونه، راهنماهای مطالعه -- و هر چیزی است که دانشجویان شما می خواهند بارگیری کنند. بارگذاری و سازمان دهی فایل های شما با استفاده از کانواس آسان است. شیوه کار را به شما نشان خواهیم داد."
+  the_institution_you_logged_in_from_is_not_configur_5ceac41: "دانشگاهی که از آن وارد شده اید در این حساب پیکربندی نشده است."
   the_material_is_in_the_public_domain_279c39a3: "مطلب در دامنه عمومی است"
   the_material_is_licensed_under_creative_commons_3242cb5e: "مطلب تحت مجوز کریتیو کامنز است"
   the_material_is_subject_to_fair_use_exception_41bc6a4b: "مطلب مشمول استثناء استفاده منصفانه است"
   the_module_item_is_locked_27fe420b: "مورد ماژول قفل شده است."
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: "در هنگام حذف طرح نمره گذاری، اشکالی رخ داد"
+  there_was_a_problem_logging_in_at_institution_5a298155: "در هنگام ورود به %{institution} اشکالی رخ داد"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "در هنگام ذخیره سازی طرح نمره گذاری، اشکالی رخ داد"
   there_was_an_error_in_processing_your_request_6513a49a: "در هنگام پردازش درخواست شما خطایی رخ داد"
   there_was_an_error_setting_usage_rights_53739e1d: "در هنگام تعیین حقوق استفاده، خطایی رخ داد."
@@ -14023,6 +13949,7 @@ fa-IR:
   to_51406be9: گیرنده
   to_c4c44f4b: تا
   to_minscore_43e5452e: "به %{minScore}%"
+  too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "تعداد تلاش های ناموفق برای ورود زیاد است. لطفا بعدا دوباره تلاش کنید، یا با مدیر سیستم خود تماس بگیرید."
   too_many_members_b8b15069: "تعداد عضو زیاد است"
   tooltips: 
     finished: "پایان یافت"
@@ -14050,7 +13977,9 @@ fa-IR:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "ارسال دوباره به turnitin "
+  twitter_fcef6b54: توییتر
   unable_to_remove_app_4293cb53: "قادر به حذف برنامه نیست"
+  unauthorized: "غیر مجاز"
   ungraded_submissions_44efb0ec: "موردهای ارسالی نمره گذاری نشده"
   ungraded_survey_ad7de790: "نظرسنجی نمره گذاری نشده"
   unknown: نامعلوم
@@ -14091,8 +14020,8 @@ fa-IR:
       terms: "باید ضوابط را بپذیرید"
       too_long: "نمی تواند از %{max} نویسه فراتر رود"
     registration: 
-      agree_to_terms_and_privacy_policy: "با *ضوابط استفاده* موافق هستید و **سیاست حریم خصوصی** را تصدیق می کنید."
       agree_to_terms_with_code_of_conduct: "شما با *ضوابط استفاده* و **آیین نامه اجرایی** موافق هستید."
+  user_avatars_e4fc4ed3: "آواتارهای کاربر"
   user_date_range_search: 
     cant_be_blank: "شناسه کاربر کانواس نمی تواند خالی باشد"
     cant_come_before_from: "«تا تاریخ» نمی تواند قبل از «از تاریخ» بیاید"
@@ -14357,11 +14286,6 @@ fa-IR:
           **شما** این اقدامات را از طرف این کاربر انجام داده اید.
       masquerade_as: "ورود به عنوان %{user_name}"
       page_title_header: "تغییر عنوان کاربر"
-    merge: 
-      login_to_merge_different_account: "برای ادغام حساب %{current_user_name} (%{current_user_email}) با یک حساب دیگر، لطفا وارد حساب جدید شوید:"
-      merge_definition: "به دلایلی ممکن است به جای یک ورود، دو ورود داشته باشید. در این صورت، می توانید این دو ورود را با یکدیگر ادغام کنید و اطلاعات آنها را یکی کنید."
-      titles: 
-        merge_accounts: "ادغام حساب های کاربری"
     merge_results: 
       action: اقدام
       emails: "نامه های الکترونیکی"
@@ -14556,10 +14480,6 @@ fa-IR:
       delete_wiki: حذف
       labels: 
         front_page: "صفحه آغازین"
-      page_locked: "این صفحه قفل شده است"
-      page_locked_by_modules: "این صفحه زمانی قابل دسترسی خواهد بود که این ماژول ها را کامل کنید:"
-      page_locked_by_modules_until: "اگر این ماژول ها را تکمیل کنید، این صفجه در %{lock_info.unlock_at} قابل دسترسی خواهد بود:"
-      page_locked_until: "این صفحه در %{lock_info.unlock_at}  قابل دسترسی خواهد بود"
       published_indicator: "منتشر شده"
       toolbar_menu: 
         settings: تنظیمات
@@ -14673,6 +14593,7 @@ fa-IR:
       archive: بایگانی
       archive_link: "مشاهده بایگانی(ها)"
   xml_configuration_5ea1b942: "پیکربندی XML"
+  yo_e4ee15a4: Yo
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "شما با استفاده از اعتبارنامه های خود از طرف %{institution2}، وارد %{institution1} شده اید"
   you_are_the_group_leader_for_this_group_b8629b70: "شما سرگروه این گروه هستید"
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "اکنون می توانید گزینه های نمره گذاری دوباره را برای دانشجویانی که در حال حاضر آزمون را داده اند، تنظیم کنید."
@@ -14683,7 +14604,6 @@ fa-IR:
   you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "ممکن است بخواهید برخی از دستیارهای آموزشی تعیین کنید تا به شما در این درس کمک کنند. دستیارهای آموزشی می توانند موردهای ارسالی دانشجو را نمره گذاری کنند، به مدیریت بحث ها کمک کنند و حتی تاریخ های مهلت و اطلاعات تکلیف را برای شما بهنگام سازی کنند."
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "باید آن را به عددی بزرگتر یا مساوی %{min} تنظیم کنید"
   you_must_specify_a_usage_right_5eb57f87: "باید حقوق استفاده را تعیین کنید."
-  your_browser_does_not_meet_the_minimum_requirement_7a7022db: "مرورگر شما با حداقل الزامات مربوط به کانواس مطابقت ندارد. لطفا برای مشاهده فهرست کامل مرورگرهای پشتیبانی شده، از *راهنماهای کانواس* بازدید نمایید."
   your_content_has_been_exported_bbb57764: "محتوای شما صادر شده است."
   your_message_has_been_sent_thank_you_e0284316: "پیام شما ارسال شده است. از شما سپاسگزاریم!"
   your_search_encountered_the_following_errors_fc3e5e7f: 
