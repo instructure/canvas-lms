@@ -17,5 +17,5 @@
 #
 
 module Login
-  LDAPController = CanvasController
+  LdapController = CanvasController
 end
