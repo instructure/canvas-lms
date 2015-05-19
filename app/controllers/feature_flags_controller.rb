@@ -245,17 +245,15 @@ class FeatureFlagsController < ApplicationController
         prior_state = 'hidden'
       end
 
-      # create or update flag
-      new_flag = @context.feature_flags.find(current_flag) if current_flag && !current_flag.default? && !current_flag.new_record? && current_flag.context_type == @context.class.name && current_flag.context_id == @context.id
-      new_flag ||= @context.feature_flags.build
-
-      new_flag.feature = params[:feature]
-      new_flag.state = params[:state] if params.has_key?(:state)
+      new_attrs = { feature: params[:feature] }
 
       # check transition
-      transitions = Feature.transitions(new_flag.feature, @current_user, @context, prior_state)
-      if transitions[new_flag.state] && transitions[new_flag.state]['locked']
-        return render json: { message: "state change not allowed" }, status: :forbidden
+      if params[:state].present?
+        transitions = Feature.transitions(params[:feature], @current_user, @context, prior_state)
+        if transitions[params[:state]] && transitions[params[:state]]['locked']
+          return render json: { message: "state change not allowed" }, status: :forbidden
+        end
+        new_attrs[:state] = params[:state]
       end
 
       # check locking account
@@ -265,10 +263,11 @@ class FeatureFlagsController < ApplicationController
           return render json: { message: "locking account not found" }, status: :bad_request unless locking_account
           return render json: { message: "locking account access denied" }, status: :forbidden unless locking_account.grants_right?(@current_user, session, :manage_feature_flags)
         end
-        new_flag.locking_account = locking_account
+        new_attrs[:locking_account] = locking_account
       end
 
-      if new_flag.save
+      new_flag, saved = create_or_update_feature_flag(new_attrs, current_flag)
+      if saved
         if prior_state != new_flag.state && feature_def.after_state_change_proc.is_a?(Proc)
           feature_def.after_state_change_proc.call(@context, prior_state, new_flag.state)
         end
@@ -299,6 +298,20 @@ class FeatureFlagsController < ApplicationController
       return render json: { message: "flag is locked" }, status: :forbidden if flag.locked?(@context, @current_user)
       flag.destroy
       render json: feature_flag_json(flag, @context, @current_user, session)
+    end
+  end
+
+  private
+
+  def create_or_update_feature_flag(attributes, current_flag = nil)
+    FeatureFlag.unique_constraint_retry do
+      new_flag = @context.feature_flags.find(current_flag) if current_flag &&
+          !current_flag.default? && !current_flag.new_record? &&
+          current_flag.context_type == @context.class.name && current_flag.context_id == @context.id
+      new_flag ||= @context.feature_flags.build
+      new_flag.assign_attributes(attributes)
+      result = new_flag.save
+      [new_flag, result]
     end
   end
 
