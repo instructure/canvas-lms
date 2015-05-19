@@ -1,1 +1,1 @@
-(BZ) <%- asset.title %> <%= HostUrl.context_host(asset.context) %>
+(BZ) <%= truncate(asset.title) %>: <%= HtmlTextHelper.strip_and_truncate(asset.message, :max_length => 100) %> <%= bitly_shorten(HostUrl.context_host(asset.context)) %>
