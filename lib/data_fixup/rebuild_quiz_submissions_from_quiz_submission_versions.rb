@@ -72,13 +72,13 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionVersions
       models = Version.where(
         versionable_type: "Quizzes::QuizSubmission",
         versionable_id: qs_id
-      ).map(&:model)
+      ).order("id ASC").map(&:model)
 
       # Filter by attempt
       models.select! {|qs| qs.attempt = submission.attempt}
 
       # Find the latest version before the data fix ran.  So, maybe 5/8/2015
-      qs = models.reverse.detect {|s| s.created_at < timestamp}
+      qs = models.detect {|s| s.created_at < timestamp}
 
       if qs
         persisted_qs = Quizzes::QuizSubmission.where(id: qs_id).first || Quizzes::QuizSubmission.new
