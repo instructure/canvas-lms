@@ -44,13 +44,6 @@ ko:
         api_url: "API URL"
         common_core_guid: "공통 핵심 GUID (선택 사항)"
   account: 
-    account_settings: 
-      delicious: Delicious
-      diigo: Diigo
-      google_docs: "Google Docs"
-      linked_in: LinkedIn
-      skype: Skype
-      twitter: Twitter
     ask_canvas_network: "Canvas Network 커뮤니티에 묻기"
     default_account_name: "기본 계정"
     default_site_administrator_account_name: "사이트 관리자"
@@ -83,55 +76,44 @@ ko:
     tab_users: 사용자
     turnitin_pledge: "이 과제 제출물은 자신의 원작임"
   account_authorization_config: 
-    debug: 
-      wait_for_login: "로그인 대기 중"
     default_delegated_login_handle_name: 로그인
     default_login_handle_name: 이메일
-    saml_eppn_domain_stripped: "%{eppn} (도메인 생략)"
+  account_authorization_config/ldap: 
     test_bind_failed: "다음 오류로 인해 바인딩 실패: %{error}"
     test_connection_timeout: "연결 시간 초과"
     test_host_unknown: "알 수 없는 호스트: %{host}"
     test_login_auth_exception: "로그인 예외: %{error}"
     test_login_auth_failed: "인증 실패"
     test_search_failed: "다음 오류로 인해 검색 실패: %{error}"
+  account_authorization_config/saml: 
+    debug: 
+      logout_redirect: "IdP로 전송한 LogoutRequest"
+      wait_for_login: "로그인 대기 중"
+    saml_eppn_domain_stripped: "%{eppn} (도메인 생략)"
   account_authorization_configs: 
     account_required: "LDAP으로 인증되어야 함"
-    cas_settings: 
+    cas_fields: 
       labels: 
         auth_base: "CAS URL"
-        auth_type: 유형
-        login_handle_name: "로그인 레이블"
-      login_handle_name_description: "레이블은 고유한 로그인 식별자에 사용됩니다. 예: 로그인, 사용자 이름, 학생 ID 등."
+    form_footer: 
+      labels: 
+        position: 위치
       save_button: "인증 설정 저장"
+    form_header: 
+      auth_type_label: 유형
+      auth_url: "이 구성의 로그인 URL"
     index: 
       add_auth_desc: "이 계정에 ID 공급자 추가:"
-      canvas_login_tip: "구성한 설정 때문에 로그인을 할 수 없는 경우에는 로그인 URL 끝에 *%{url1}*를 추가할 수 있습니다. 그러면 일반적인 Canvas 로그인 절차에 따라 로그인할 수 있게 됩니다. 이 계정에 대한 해당 URL은 %{url2}입니다."
       choose_auth_type_option: "인증 서비스 선택"
       current_settings_title: "현재 통합"
       delete_auth_confirmation: "계속하시겠습니까? 삭제하면 사용자가 로그인을 할 수 없게 됩니다."
-      delete_auth_link: "인증 제거"
-      edit_auth_link: "세부 정보 편집"
       ip_address_list_description: "LDAP과 같이 Canvas 서버가 해당 서버에 직접 접속해야 하는 인증 서비스를 사용 중이라면 해당 서버가 아래 IP 주소에서 연결을 수락하는지 확인해야 합니다."
       no_auth_type_description: "현재 이 계정은 ID 공급자와 통합되어 있지 않습니다."
       page_title: "인증 설정"
       profile_page_link_example: "예를 들어, 여기에 프로필 페이지가 있습니다: [%{friendlyname}](%{url})"
       settings_description: "사용자가 외부 ID 공급자(IdP)를 통해서 인증하려면 사용자는 이 계정에 연결되어 있으면서 IdP가 반환하는 고유 식별자와 일치하는 로그인 식별자를 가지고 있어야 합니다. 사용자의 현재 로그인은 (\"사용자\" 탭에서 사용자 검색으로 찾을 수 있는) 사용자 프로필 페이지의 \"로그인 정보\" 섹션에서 확인할 수 있습니다."
       settings_title: "인증 설정"
-      test_ldap_link: "테스트 인증"
-    ldap_settings: 
-      add_secondary_ldap_server_link: "보조 LDAP 서버 추가"
-      auth_type_label: 유형
-      change_password_url_help: "기본 Canvas 동작을 사용하려면 비워 둠"
-      change_password_url_not_specified: "지정하지 않음"
-      labels: 
-        change_password_url: "암호 URL 잊음"
-        login_handle_name: "로그인 레이블"
-      login_handle_name_description: "레이블은 고유한 로그인 식별자에 사용됩니다. 예: 로그인, 사용자 이름, 학생 ID 등."
-      remove_secondary_ldap_link: (제거)
-      save_button: "LDAP 설정 저장"
-      secondary_ldap_label: "보조 LDAP"
-      setting_type_ldap: LDAP
-    ldap_settings_fields: 
+    ldap_fields: 
       auth_filter_description: "사용자가 제시한 사용자 이름에 대한 자리 표시자로 *%{placeholder}*를 사용하십시오. 예: *(sAMAccountName=%{placeholder})*"
       auth_password_description: "현재 암호를 사용해서 계속하려면 비워두시기 바랍니다."
       identifer_format_description: "Canvas 로그인을 찾기 위한 LDAP 속성입니다. 사용자가 입력한 사용자 이름을 사용하려면 공백으로 남겨 두십시오."
@@ -147,9 +129,8 @@ ko:
         auth_port: 포트
         auth_username: "사용자 이름"
         identifier_format: "로그인 ID 속성"
-        no_tls: "TLS 사용 안 함"
-        simple_tls: "단순 TLS"
-        start_tls: StartTLS
+      last_ldap_timeout_failure: "마지막 시간 초과 오류"
+      ldap_timeout_failure_help2: "Canvas에서 LDAP 서버와 통신하는 데 너무 잦은 횟수의 시간 초과가 발생하면 %{time} 동안 해당 LDAP 서버를 이용하는 로그인 시도를 차단하게 됩니다."
     ldap_settings_test: 
       labels: 
         pass: 암호
@@ -177,46 +158,23 @@ ko:
       test_ldap_search_help_fixes_3: "제공된 검색 기준에 대해서 LDAP에 있는 사용자 개체가 검색 권한을 가지고 있는지 확인하십시오."
       test_ldap_search_help_header: "Canvas가 LDAP 인스턴스를 찾을 수 없음"
       test_ldap_search_label: "LDAP 검색 테스트 중..."
-    ldap_timeout_error: 
-      last_ldap_timeout_failure: "마지막 시간 초과 오류"
-      ldap_timeout_failure_help2: "Canvas에서 LDAP 서버와 통신하는 데 너무 잦은 횟수의 시간 초과가 발생하면 %{time} 동안 해당 LDAP 서버를 이용하는 로그인 시도를 차단하게 됩니다."
     login_required: 필수임
     no_changing_auth_types: "인증 구성의 유형을 바꿀 수 없습니다. 삭제하고 새로운 구성을 만드시기 바랍니다."
-    no_discovery_url: "설정 안 됨"
     password_required: 필수임
-    saml_required: "SAML을 테스트하려면 SAML 구성이 필요"
-    saml_settings: 
-      auth_type: 유형
-      auth_url: "이 구성의 로그인 URL"
-      certificate_fingerprint: "인증서 지문"
-      change_password_url: "암호 링크 변경"
-      discovery_url: "검색 URL:"
-      discovery_url_description: "검색 URL을 설정하면 Canvas가 인증이 필요할 때 모든 사용자를 해당 URL로 전달합니다. 그러면 해당 페이지는 사용자가 어디로 로그인해야 하는지 알 수있도록 도와야 합니다. 검색 URL을 구성하지 않으면 사용자를 인증하기 위해서 첫 번째 SAML 구성을 사용합니다."
-      identifier_format: "식별자 형식"
-      idp_entity_id: "IdP 항목 ID"
+    saml_fields: 
       labels: 
         certificate_fingerprint: "인증서 지문"
-        change_password_url: "암호 링크 변경"
         identifier_format: "식별자 형식"
         idp_entity_id: "IdP 항목 ID"
         log_in_url: "로그온 URL"
         log_out_url: "로그아웃 URL"
         login_attribute: "로그인 속성"
-        login_handle_name: "로그인 레이블"
-        position: 위치
         requested_authn_context: "인증 컨텍스트"
-      log_in_url: "로그온 URL"
-      log_out_url: "로그아웃 URL"
-      login_attribute: "로그인 속성"
-      login_handle_name: "로그인 레이블"
-      login_handle_name_description: "레이블은 고유한 로그인 식별자에 사용됩니다. 예: 로그인, 사용자 이름, 학생 ID 등."
-      no_discovery_url: "설정 안 됨"
-      position: 위치
+    saml_required: "SAML을 테스트하려면 SAML 구성이 필요"
+    saml_settings_test: 
       refresh_debugging: "새로 고침"
-      requested_authn_context: "인증 컨텍스트"
       saml_debug_instructions: "디버깅을 시작하면 이후에 시도하는 모든 SAML 로그인에 대한 모든 정보를 수집합니다. 수집한 자료를 확인하기 위해 \"새로 고침\"을 클릭하거나 \"디버깅 중지\"를 클릭해서 수집한 자료를 지우고 현재의 디버깅을 시도를 중지할 수 있습니다."
-      saml_debugging: 디버깅
-      save_button: "인증 설정 저장"
+      saml_required: "SAML을 테스트하기 위해서 SAML 구성이 필요합니다."
       start_debugging: "디버깅 시작"
       stop_debugging: "디버깅 중지"
     saml_testing: 
@@ -247,7 +205,12 @@ ko:
         to_idp_xml: "IdP로 전송된 LoginRequest XML"
       logout_request_to_idp: "IdP로 전송된 LogoutRequest "
       logout_response_from_idp: "IdP에서 반환된 LogoutResponse"
-      saml_required: "SAML을 테스트하기 위해서 SAML 구성이 필요합니다."
+    sso_settings_form: 
+      change_password_url_help: "기본 Canvas 동작을 사용하려면 비워 둠"
+      labels: 
+        change_password_url: "암호 URL 잊음"
+        login_handle_name: "로그인 레이블"
+      login_handle_name_description: "레이블은 고유한 로그인 식별자에 사용됩니다. 예: 로그인, 사용자 이름, 학생 ID 등."
   account_notifications: 
     announcement_created_notice: "공지 사항을 성공적으로 등록함"
     announcement_creation_failed_notice: "공지 사항 등록 실패함"
@@ -756,6 +719,7 @@ ko:
         help_link_subtext: "하위 텍스트"
         help_link_text: "링크에 표시할 텍스트"
         help_link_url: URL
+        login_handle_name: "로그인 레이블"
         message: 메시지
         mfa_settings: "다단계 인증"
         name: "계정 이름"
@@ -1045,6 +1009,7 @@ ko:
         record_invalid: "유효성 검사 실패: %{errors}"
         taken: "이미 사용 중임"
   activity_13915493: 활동
+  add_8523c19b: 추가
   add_app_baf540f: "앱 추가"
   add_course_assignments_628ed6d0: "과목 과제 추가"
   add_course_calendar_events_146154a5: "과목 행사 추가"
@@ -1183,7 +1148,6 @@ ko:
       invalid_external_tool: "이 링크에 대한 유효한 설정을 찾을 수 없음"
       invalid_external_tool_id: "이 도구에 대한 유효한 설정을 찾을 수 없음"
       invalid_feed_parameters: "잘못된 피드 매개변수입니다."
-      invalid_oembed_url: "이 리소스를 찾아오는 데 문제가 있습니다. 외부 도구가 리소스에 대해 유효하지 않은 정보를 제공했습니다."
       invalid_tag_type: "이 태그에 대한 항목 유형을 인식하지 못함"
       invalid_verification_code: "확인 코드가 유효하지 않습니다."
       mismatched_verification_code: "현재 등록된 사용자와 일치하는 확인 코드가 없습니다."
@@ -1213,6 +1177,7 @@ ko:
         suspended: "기관 일시 중단됨"
     wiki_front_page_default_content_course: "새 과목 위키에 오신 것을 환영합니다!"
     wiki_front_page_default_content_group: "새 그룹 위키에 오신 것을 환영합니다!"
+  apply_781a2546: 적용
   appointment_group: 
     errors: 
       invalid_end_at: "약속 끝 시간이 시작 시간보다 앞섬"
@@ -1229,6 +1194,7 @@ ko:
     title: "%{name} 편집"
     update: 업데이트
   archive_3f794d7e: 저장소
+  are_you_sure_26795d3c: 확실합니까?
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: "이 공지 사항을 삭제하시겠습니까?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "이 평가 구성표를 삭제하시겠습니까?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "이 도구를 제거하시겠습니까?"
@@ -1448,12 +1414,6 @@ ko:
       one: "최저 점수 %{count}개 제외"
       other: "최저 점수 %{count}개 제외"
     drop_lowest_scores: "최저 점수 %{number}개 제외"
-    due_date_override: 
-      overrides: 
-        available_from: "다음부터 사용 가능"
-        due_date: 기한
-        for: 과제
-      until: "다음 시간까지"
     due_date_view: 
       overrides: 
         remove_these_dates: "이 날짜 제거"
@@ -1870,6 +1830,7 @@ ko:
     login: 로그인
     logout: 로그아웃
   available_from_587ce92f: "다음부터 사용 가능"
+  available_from_f84e4611: "다음부터 사용 가능"
   back_to_app_center_95420d83: "앱 센터로 돌아가기"
   bb_display: "Blackboard 학습"
   bb_file_description: "Blackboard 6/7/8/9 내보내기 .zip 파일"
@@ -2300,30 +2261,9 @@ ko:
     ics_description_user: "%{user_name} 사용자의 행사"
     ics_title: "%{course_or_group_name} 달력 (Canvas)"
   calendars: 
-    assignment_details: "과제 세부 정보"
-    default_title: 행사
     event: 
       due: 기한
       event_title: "기한: %{event_title}"
-    event_details: "행사 세부 정보"
-    feed_dialog_title: "달력 피드"
-    keycodes: 
-      delete: d
-      edit: e
-      new: "n"
-      next_day: ctrl+오른쪽
-      next_event: j
-      next_week: ctrl+아래쪽
-      open: o
-      previous_day: ctrl+왼쪽
-      previous_event: k
-      previous_week: ctrl+위쪽
-      refresh: r
-    notices: 
-      event_moved: "%{event}를 %{day}로 옮김"
-    prompts: 
-      delete_assignment: "이 과제를 삭제하시겠습니까?"
-      delete_event: "이 행사를 삭제하시겠습니까?"
     show2: 
       calendar_feed: "달력 피드"
       calendar_feed_instructions: "아래 링크를 복사하여 iCal 피드를 사용할 수 있는 달력 앱(Google Calendar, iCal, Outlook 등)에 붙여넣습니다."
@@ -2337,11 +2277,6 @@ ko:
       toggle_calendars: "달력 토글"
       toggle_undated_items: "날짜 없는 항목 토글"
       undated_items: "날짜 없는 항목"
-    titles: 
-      add_new_assignment: "새 과제 추가"
-      add_new_event: "새 행사 추가"
-      edit_assignment: "과제 편집"
-      edit_event: "행사 편집"
     wizard_box: 
       descriptions: 
         assignment: "좋습니다. 이제 대화 상자에서 \"과제\" 탭을 클릭하고 달력 행사 대신 과제를 만드십시오."
@@ -2380,6 +2315,8 @@ ko:
   canvas_cartridge_display: "Canvas Common Cartridge"
   canvas_cartridge_file_description: "Canvas 과목 내보내기 패키지"
   canvas_cartridge_name: "Canvas Cartridge 가져오기"
+  canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas에서 ID 공급자를 인식할 수 없음"
+  canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas에 다음 사용자를 위한 계정이 없습니다: %{user}"
   canvas_revision_unknown: "알 수 없음"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "퀴즈를 저장한 후에 제출물을 다시 평가게 되며, 이 작업에는 수 분이 걸립니다."
   cc: 
@@ -2428,7 +2365,7 @@ ko:
         cancel: 취소
         update: "협업 업데이트"
       labels: 
-        description: 설명
+        description: "설명:"
         title: "협업 제목"
     errors: 
       cannot_load_collaboration: "협업을 로드할 수 없음"
@@ -2459,7 +2396,7 @@ ko:
             **주의**: Google Docs 협업에 참여하려면 여러분과 협업자 모두 Google 계정이 필요합니다.
       labels: 
         collaboration_type: "협업에 사용:"
-        description: 설명
+        description: "설명:"
         document_name: "문서 이름"
       messages: 
         delete_google_doc_as_well: "이 협업은 Google Doc으로 저장됩니다. Canvas에서만 삭제하시겠습니까, Google Docs에서도 제거하시겠습니까?"
@@ -2620,6 +2557,7 @@ ko:
         join: "지금 참여"
     type_disabled_error: "이 Canvas 사이트에서 더 이상 이 유형의 회의를 사용하지 않음"
   configuration_type_25a084a4: "구성 유형"
+  configure_ecb97e30: 구성
   confirm_dialog: 
     cancel: 취소
     submit: 제출
@@ -2645,6 +2583,7 @@ ko:
         download_qti: "%{date}부터 QTI 내보내기: *다운로드하려면 여기를 클릭*"
       message: 
         export_started: "내보내기 작업을 시작했습니다. 과목이 크면 시간이 오래 걸릴 수도 있습니다. *페이지에서 나가도 되며* 내보내기를 마치면 이메일을 받게 됩니다."
+      user_data_exports: "제출물 다운로드"
     labels: 
       new_export: "새 내보내기:"
     links: 
@@ -2852,17 +2791,6 @@ ko:
     titles: 
       tag_external_web_page: "태그 외부 웹 페이지"
   context: 
-    communication: 
-      headings: 
-        discussions: 토론
-      links: 
-        feeds: 
-          course_discussions: "과목 토론 Atom 피드"
-        start_collaboration: "협업 시작"
-        start_conference: "웹 회의 시작"
-        start_topic: "새 주제 시작"
-      titles: 
-        communication: 통신
     deleted_item: 
       created: "만든 날짜"
       last_updated: "마지막 업데이트"
@@ -3509,12 +3437,14 @@ ko:
       name: 이름
       turnitin_comments: "Turnitin 설명"
   course_members_are_free_to_join_9b2603d4: "과목 구성원은 자유롭게 참여"
+  course_navigation_dd035109: "과목 탐색"
   course_restore: 
     restore_error: "과목 복원을 시도하는 중에 오류가 발생했습니다. 과목이 복원되지 않았습니다."
   course_search: 
     cant_be_blank: "값이 있어야 함"
   course_section: 
     sis_id_taken: "SIS ID \"%{sis_id}\"이(가) 이미 사용 중임"
+  course_section_7a988066: "과목 섹션"
   course_settings: 
     buttons: 
       add_section: "섹션 추가"
@@ -4265,6 +4195,7 @@ ko:
   delete_my_account_41060aad: "내 계정 삭제"
   delete_quiz_142b8099: "퀴즈 삭제"
   delete_survey_56fddbbd: "설문 삭제"
+  delicious_7f9ac66f: Delicious
   demos: 
     _register: 
       add_site: "사이트 추가"
@@ -4345,6 +4276,7 @@ ko:
     cancel: 취소
     save_settings: "설정 저장"
     saving: "저장 중..."
+  diigo_993c4646: Diigo
   disable_a5c05db3: "사용 안 함"
   discussion_6719c51d: 토론
   discussion_entries: 
@@ -4597,6 +4529,8 @@ ko:
     unsubscribed: "구독 해제함"
     unsubscribed_hint: "이 주제를 구독하고 있지 않습니다. 구독하려면 클릭합니다."
   domain_3b54c511: 도메인
+  download_submissions_7454665f: "제출물 다운로드"
+  due_a73610f6: 기한
   due_date_822625d8: 기한
   due_dates: 
     due_at: "기한: %{assignment_due_date_time}"
@@ -4605,6 +4539,7 @@ ko:
   e_mail_only_2cc5e513: 이메일만
   ecollege_file_description: Ecollege
   ecollege_name: "Ecollege 변환기"
+  edit_c5fbea07: 편집
   edit_grading_scheme_53091236: "평가 구성표 편집"
   edit_quiz_ededddd8: "퀴즈 편집"
   edit_rubric: 
@@ -5006,6 +4941,7 @@ ko:
     required: "필수 사항"
     sis_id_in_use: "SIS ID \"%{sis_id}\"이(가) 이미 사용 중임"
   everyone_854554dd: 모두
+  everyone_else_6c6dc7b6: "나머지 모든 사람"
   example_84698b7d: 예
   external_apps_f5490181: "외부 앱"
   external_content: 
@@ -5140,8 +5076,6 @@ ko:
   feature_flags: 
     feature_flag: 
       allow: 허용
-      disabled: "사용 안 함"
-      enabled: 사용함
       no_description: "설명 없음"
       ? "off"
       : 끄기
@@ -5154,6 +5088,7 @@ ko:
     google_docs_domain_restriction: "Google Docs 도메인 제한"
   file_preview: 
     file_preview_headerbutton_close: 닫기
+    file_preview_infotable_kind: 유형
     file_preview_infotable_name: 이름
     file_preview_infotable_status: 상태
   file_preview_eedb43f2: "파일 미리 보기"
@@ -5361,6 +5296,7 @@ ko:
     invitation: 초대
     question: 문제
     warning: 경고
+  google_docs_40374e65: "Google Docs"
   google_docs_domain_restriction_description: "Google Docs 도메인 제한을 이용하면 Google Docs 제출물과 협업을 단일 도메인으로 제한할 수 있습니다. 승인되지 않은 도메인에서 과제를 제출하거나 협업에 참여하려는 학생은 Google Docs 통합을 업데이트할 필요가 있다는 것을 알리는 오류 메시지를 받게 됩니다."
   grade_display_warning_dialog: 
     grade_display_warning: 
@@ -5395,7 +5331,6 @@ ko:
     gradee_index_of_total: "%{gradee} %{x} / %{y}"
     group: 그룹
     mute_assignment: "과제 평점 비공개"
-    new_assessment: "[새 과제]"
     no_submission_time: "제출 시간 없음"
     not_graded: "평가 안 됨"
     not_submitted: "제출 안 됨"
@@ -5500,6 +5435,8 @@ ko:
       switch_to_percent: "백분률로 전환"
       switch_to_points: "점수로 전환"
     ungraded: "평가 요인이 아님"
+  gradebook_csvs: 
+    grades_filename: 평점
   gradebook_uploads: 
     new: 
       titles: 
@@ -5628,6 +5565,7 @@ ko:
     gradebook2: 
       arrange_columns_by_due_date: "기한으로 열 정렬"
       arrange_columns_by_group: "과제 그룹으로 열 정렬"
+      export_current_gradebook: 현재
       filter_by_student: "학생 이름이나 보조 ID로 학생 필터링"
       grades: 평점
       hide_student_names: "학생 이름 숨기기"
@@ -5640,7 +5578,6 @@ ko:
     grades: 
       complete: 완료
       incomplete: "완료 안 됨"
-    grades_filename: 평점
     grading_box_extended: 
       labels: 
         grade: 평점
@@ -5728,7 +5665,6 @@ ko:
         show_all_sections: "모든 섹션 보기"
         submit_same_score: "다시 제출한 것에 대해 같은 평점 사용"
       loading: "로드 중..."
-      new_assessment_option: "[새 평가]"
       no_annotation: "이 문서에 주석을 사용할 수 없음"
       not_newest_notice: "참고: 이는 가장 최근 제출물이 아님"
       page_header_title: SpeedGrader
@@ -6221,7 +6157,6 @@ ko:
     quiz_submission: "퀴즈 제출물"
     text_entry_submission: "텍스트 항목 제출물"
   if_you_ve_been_using_another_course_management_sys_67edfab1: "다른 과목 관리 시스템을 사용했다면 Canvas로 옮기고 싶은 자료가 있을 지도 모릅니다. 여러분의 자료를 Canvas로 손쉽게 이전할 수 있는 과정을 안내해 드리겠습니다."
-  ignore_forever_dd4a6cdf: "계속 무시"
   ignore_this_assignment_b7a71f80: "이 과제 무시"
   ignore_until_new_submission_87f32b4: "새로 제출할 때까지 무시"
   image_8ad06: 이미지
@@ -6255,6 +6190,7 @@ ko:
     title_for_topics_category: "%{category} 주제"
     warnings: 
       truncated_wiki_title: "다음 위키 페이지의 제목이 잘렸습니다: %{title}"
+  incorrect_username_and_or_password_2de73abb: "유효하지 않은 사용자 이름이나 암호"
   info: 
     notices: 
       error_reported: "도와주셔서 감사합니다. 곧바로 확인하겠습니다."
@@ -6401,7 +6337,6 @@ ko:
         close: 닫기
         dashboard: "내 대시보드"
         skip_to_content: "내용으로 건너 뛰기"
-      open_source_learning_management_system: "오픈 소스 LMS"
     fixed_bottom: 
       masquerading: 
         stop: "가장 중지"
@@ -6419,6 +6354,7 @@ ko:
       log_in_to_canvas: "Canvas에 로그인"
     styleguide: 
       default_page_title: "Canvas LMS"
+  ldap_e1e0a916: LDAP
   learning_outcome: 
     no_comment: "의견 없음"
     no_description: "설명 없음"
@@ -6515,6 +6451,7 @@ ko:
   linked_assignment_message: "과제 '%{title}'와(과) 연결됨"
   linked_discussion_topic_message: "토론 주제'%{title}'와(과) 연결됨"
   linked_quiz_message: "퀴즈 '%{title}'와(과) 연결됨"
+  linkedin_5726caca: LinkedIn
   links: 
     dashboard: "내 대시보드"
     errors: 
@@ -6528,6 +6465,65 @@ ko:
     ko: "한국말 (crowd-sourced)"
   lock_date_cannot_be_before_due_date_ac30f54: "잠금 해제 날짜는 기한 이전일 수 없음"
   logged_out_user: "사용자 %{user_counter} 로그 아웃"
+  login: 
+    canvas: 
+      mobile_login: 
+        back_to_login: "로그인으로 돌아가기"
+        buttons: 
+          request_password: "암호 요청"
+        dont_know_password: "암호를 잊어버렸습니다."
+        log_in: 로그인
+        login_handle: "%{login_handle_name}를 입력하면 암호를 바꾸기 위한 링크를 보내드립니다."
+        password: 암호
+        sending: "보내는 중..."
+      new: 
+        back_to_login: "로그인으로 돌아가기"
+        buttons: 
+          request_password: "암호 요청"
+        coenrollment_banner: "*Canvas 사용자 부모입니까?* **계정을 만드시려면 여기를 클릭하십시오**"
+        dont_know_password: "암호를 모르십니까?"
+        labels: 
+          password: 암호
+          remember_me: "로그인 상태 유지"
+        log_in: 로그인
+        login_handle: "%{login_handle_name}를 입력하면 암호를 바꾸기 위한 링크를 보내드립니다."
+        page_title: "Canvas에 로그인"
+        register_for_canvas: "*Canvas 계정이 필요하십니까?* **여기를 클릭합시오. 무료입니다!**"
+    logout_confirm: 
+      cancel: 취소
+    otp: 
+      errors: 
+        invalid_otp: "유효하지 않은 인증코드입니다. 다시 시도하시기 바랍니다."
+      new: 
+        buttons: 
+          send: 보내기
+          verify: 확인
+        details: 
+          mfa_enrollment: |-
+              다단계 인증은 Canvas에 로그인하기 위해서 암호를 아는 것 이외에 물리적으로 소유하고 있는 어떤 것을 요구함으로써 보안을 강화합니다.
+              이는 인증 코드를 생성하는 장치나 문자 메시지를 받는 전화일 수 있습니다. 아래 QR 코드를 스캔하면
+              [iPhone](%{iphone_url})이나 [Android](%{android_url})를 위한 Google 인증 앱을 구성할 수 있습니다. 
+              다른 토큰은 시크릿 키 **%{secret_key}**을(를) 입력해서 구성할 수 있습니다.
+          mfa_required: "다단계 인증을 설정해야 합니다."
+          otp_on_device: "토큰에 의해 표시되는 인증 코드를 입력하시기 바랍니다."
+          otp_sent_to_phone: "인증코드를 전화로 전송했습니다. 전송된 코드를 여기에 입력하시기 바랍니다."
+          send_to_sms: "%{phone_number}로 문자 메시지 전송"
+        labels: 
+          carrier: 통신사
+          phone_number: "전화 번호"
+          remember_me: "이 컴퓨터 기억하기"
+          verification_code: "인증 코드"
+        links: 
+          choose_number: "기존 전화 선택"
+        page_title: "다단계 인증"
+        select: 
+          new_number: "새 전화"
+        titles: 
+          mfa: "다단계 인증"
+    saml: 
+      debug: 
+        logout_response_redirect_from_idp: "IdP에서 받은 LogoutResponse"
+        redirect_from_idp: "IdP에서 받은 LoginResponse"
   logo_a040ae0e: 로고
   lower_limit_of_range_6ddd4983: "범위의 하한"
   lti: 
@@ -8190,6 +8186,13 @@ ko:
         subject: "웹 회의 초대: %{name}"
       twitter: 
         tweet: "Canvas 알림 - 초대: %{title}, %{name}에 참여"
+    web_conference_recording_ready: 
+      email: 
+        details_link: "세부 정보는 여기에서 볼 수 있습니다: %{link}"
+        html: 
+          details_link: "세부 정보를 보려면 여기를 클릭"
+      sms: 
+        link_message: "자세한 정보는 %{url}에서 확인"
   migration: 
     announcement_type: "공지 사항"
     assignment_group_type: "과제 그룹"
@@ -8321,6 +8324,7 @@ ko:
     must_view_incomplete: "페이지를 봐야 함"
   moodle_dropdown_warning_title: "다시 선다 문제를 올바르게 가져오지 못함"
   more_courses_5ebbe998: "다른 과목"
+  move_abf00365: 이동
   move_dialog: 
     cancel: 취소
     save: 저장
@@ -8328,6 +8332,7 @@ ko:
     where_to_move: "*%{name}*을(를) 어디로 이동하시겠습니까?"
   move_dialog_select: 
     move_to_end: "-- 아래에 --"
+  multi_factor_authentication_configured_865b1bde: "다단계 인증 구성"
   mute_dialog: 
     curving_assignments: "과제 상대 평가"
     grade_change_notifications: "평점 변경 알림"
@@ -8350,6 +8355,8 @@ ko:
   no_due_date_44271c53: "기한 없음"
   no_e16d9132: 아니요
   no_migration_file: "내용 마이그레이션을 위해 필요한 파일입니다."
+  no_password_was_given_472222e5: "암호가 없음"
+  no_results_found_58717065: "결과 없음"
   no_students_have_taken_the_quiz_yet_e667644b: "어떤 학생도 이 퀴즈를 치르지 않음"
   no_students_have_taken_the_survey_yet_d378cd35: "어떤 학생도 이 설문을 치르지 않음"
   not_installed_37a21a76: "설치 안 됨"
@@ -8541,6 +8548,7 @@ ko:
       admin: 관리
       alerts: 알림
       communication: 대화
+      conferences: 회의
       course: "과목 활동"
       discussions: 토론
       groups: 그룹
@@ -8737,7 +8745,6 @@ ko:
     everyone_else: "다른 모든 사람"
     overrides: 
       everyone: 모두
-      everyone_else: "나머지 모든 사람"
   page_comment: 
     default_user_name: 익명
   page_comments: 
@@ -9314,6 +9321,7 @@ ko:
         should_be_10_digits: "10자리 숫자이어야 함"
     ways_to_contact_me: "연락 방법"
     you_have_no_services: "아직 등록한 서비스가 없으며 *설정* 페이지에서 추가할 수 있습니다."
+  profile_6bd2baed: 프로필
   profiles: 
     gravatar_view: 
       button: 
@@ -9340,68 +9348,7 @@ ko:
       too_long: "%{max}글자를 초과할 수 없음"
       too_short: "%{min}글자 이상 되어야 함"
   pseudonym_sessions: 
-    debug: 
-      logout_redirect: "IdP로 전송한 LogoutRequest"
-      logout_response_redirect_from_idp: "IdP에서 받은 LogoutResponse"
-      redirect_from_idp: "IdP에서 받은 LoginResponse"
     default_app_name: "타사 응용 프로그램"
-    errors: 
-      blank_password: "암호가 없음"
-      invalid_credentials: "유효하지 않은 사용자 이름이나 암호"
-      invalid_otp: "유효하지 않은 인증코드입니다. 다시 시도하시기 바랍니다."
-      login_error: "%{institution}에 로그인하는 데 문제가 있습니다."
-      login_errors: 
-        no_config_for_id: "Canvas 계정에 해당 ID에 해당하는 인증 구성이 없음"
-        no_idp_set: "이 계정에 구성되어 있지 않은 기관에서 로그인했습니다."
-        unrecognized_idp: "Canvas에서 ID 공급자를 인식할 수 없음"
-      logout_errors: 
-        no_idp_found: "Canvas가 ID 공급자에서 로그아웃할 수 없음"
-      max_attempts: "로그인을 너무 많이 실패했습니다. 다시 시도하시거나 시스템 관리자에게 문의하십시오."
-      no_matching_user: "Canvas에 다음 사용자를 위한 계정이 없습니다: %{user}"
-      user_deleted: "해당 사용자 계정은 삭제되었습니다.  계정을 다시 활성화하려면 시스템 관리자에게 문의하시기 바랍니다."
-    logout_confirm: 
-      cancel: 취소
-    mobile_login: 
-      back_to_login: "로그인으로 돌아가기"
-      buttons: 
-        request_password: "암호 요청"
-      dont_know_password: "암호를 잊어버렸습니다."
-      log_in: 로그인
-      login_handle: "%{login_handle_name}을(를) 입력하면 암호를 변경할 수 있는 링크를 보냅니다."
-      password: 암호
-      sending: "전송 중..."
-    new: 
-      page_title: "Canvas에 로그인"
-    notices: 
-      mfa_complete: "다단계 인증 구성"
-    otp_login: 
-      buttons: 
-        send: 전송
-        verify: 확인
-      details: 
-        mfa_enrollment: |-
-            다단계 인증은 Canvas에 로그인하기 위해서 암호를 아는 것 이외에 물리적으로 소유하고 있는 어떤 것을 요구함으로써 보안을 강화합니다.
-            이는 인증 코드를 생성하는 장치나 문자 메시지를 받는 전화일 수 있습니다. 아래 QR 코드를 스캔하면
-            [iPhone](%{iphone_url})이나 [Android](%{android_url})를 위한 Google 인증 앱을 구성할 수 있습니다. 
-            다른 토큰은 시크릿 키 **%{secret_key}**을(를) 입력해서 구성할 수 있습니다.
-        mfa_required: "다단계 인증을 설정해야 합니다."
-        otp_on_device: "토큰에 의해 표시되는 인증 코드를 입력하시기 바랍니다."
-        otp_sent_to_phone: "인증코드를 전화로 전송했습니다. 전송된 코드를 여기에 입력하시기 바랍니다."
-        send_to_sms: "%{phone_number}로 문자 메시지 전송"
-      labels: 
-        carrier: 통신사
-        phone_number: 전화번호
-        remember_me: "이 컴퓨터 기억하기"
-        verification_code: "인증 코드"
-      links: 
-        choose_number: "기존 전화 선택"
-      page_title: "다단계 인증"
-      select: 
-        new_number: "새 전화"
-      titles: 
-        mfa: "다단계 인증"
-    password_confirmation_error: "요청 전송 중 오류입니다."
-    password_confirmation_sent: "암호 확인을 전송했습니다. 스팸 상자를 확인하는 것을 잊지 마십시오."
   pseudonyms: 
     confirm_change_password: 
       buttons: 
@@ -10518,6 +10465,7 @@ ko:
         suggestions: "제안:"
     files: 파일
     files_heading: 파일
+    move: 이동
     name: 이름
     select_all: "모두 선택"
     view: 보기
@@ -10573,6 +10521,7 @@ ko:
   remove_attachment_ceae0973: "첨부 제거"
   remove_f47dc62a: 제거
   remove_row_c198da5a: "행 삭제"
+  remove_these_dates_48453a81: "이 날짜 제거"
   rename_45608f54: "이름 바꾸기"
   restrict_student_access: 
     button_text: 
@@ -11051,6 +11000,8 @@ ko:
         available: "사용 가능"
       quiz_available_after: "%{start_time} 이후"
       quiz_available_until: "%{end_time}까지"
+    canvas_footer: 
+      open_source_learning_management_system: "오픈 소스 LMS"
     components: 
       ic_submission-download-dialog: 
         click_to_download: "다운로드하려면 여기를 클릭"
@@ -11217,20 +11168,6 @@ ko:
     locale_warning: 
       crowdsourced_warning_message: "선택하신 언어는 클라우드소싱을 통해 번역되었습니다. Instructure에서 검토하거나 번역의 정확성을 검증한 것이 아니며, 이 언어 설정을 사용하는 것에 대해 책임지지 않습니다. 신중하게 사용해 주시기 바랍니다."
       crowdsourced_warning_title: "클라우드소싱 언어"
-    login: 
-      back_to_login: "로그인으로 돌아가기"
-      buttons: 
-        request_password: "암호 요청"
-      coenrollment_banner: "*Canvas 사용자 부모입니까?* **계정을 만드시려면 여기를 클릭하십시오**"
-      default_login_message: "여러분의 기관에서 로그인"
-      dont_know_password: "암호를 모르십니까?"
-      labels: 
-        password: 암호
-        remember_me: "로그인 상태 유지"
-      log_in: 로그인
-      login_at_account: "%{school_name}에서 로그인"
-      login_handle: "%{login_handle_name}를 입력하면 암호를 바꾸기 위한 링크를 보내드립니다."
-      register_for_canvas: "*Canvas 계정이 필요하십니까?* **여기를 클릭합시오. 무료입니다!**"
     menu_assignment: 
       labels: 
         due: 기한
@@ -11485,7 +11422,6 @@ ko:
       grading_alt: 평가
       submission_comment: "제출물 의견"
     terms_required: 
-      terms_have_changed: "*사용 조건*이 변경되었습니다. Canvas를 계속 사용하시기 전에 잠시 시간을 들여 검토해 주시기 바랍니다."
       updated_terms_of_use: "업데이트된 사용 조건"
     unauthorized: 
       headings: 
@@ -11501,8 +11437,6 @@ ko:
         unauthorized_action: "권한이 없음"
       unauthorized_1: "이 페이지를 액세스할 수 있는 권한이 없습니다. 이 내용을 볼 수 있도록 승인 받았는지 확인하시기 바랍니다."
       unauthorized_2: "이 페이지를 볼 수 있어야 한다고 생각하시면 \"도움말\" 링크를 사용해서 문제를 알려주시기 바랍니다."
-      unauthorized_action: "이 페이지를 보기 전에 로그인을 해야 합니다."
-      unauthorized_user: "%{user_name}님, 이 페이지를 보기 전에 로그인을 해야 합니다. 암호를 잊어버렸거나 모르는 경우에는 \"암호 분실\"을 클릭하십시오."
       unauthorized_user_is_other: "%{current_user}님, 이 페이지를 볼 권한이 없습니다. 방문한 링크는 **%{unauthorized_user} (%{unauthorized_user_email})**를 위한 것입니다.  여러분이 맞다면 로그아웃한 후 해당 이메일로 다시 로그인해서 이 페이지에 액세스하십시오."
     unauthorized_feed: 
       bad_params: "액세스하려는 피드에 대한 매개 변수가 유효하지 않습니다."
@@ -11676,6 +11610,7 @@ ko:
     users: 
       user_search_label: "사용자 검색"
       users_matching_label: "일치하는 사용자"
+  skype_18850ba7: Skype
   slideshow: 
     titles: 
       back: 뒤로
@@ -11898,6 +11833,7 @@ ko:
     files: 파일
     grades: 평점
     home: 홈
+    logout: 로그아웃
     modules: 모듈
     outcomes: 성과
     pages: 페이지
@@ -11967,6 +11903,9 @@ ko:
         term_start: "학기 시작"
         unspecified: 항상
       timespan: "%{start_at}*부터* %{end_at}까지"
+  that_user_account_has_been_deleted_please_contact__350e0e0: "해당 사용자 계정은 삭제되었습니다.  계정을 다시 활성화하려면 시스템 관리자에게 문의하시기 바랍니다."
+  the_institution_you_logged_in_from_is_not_configur_5ceac41: "이 계정에 구성되어 있지 않은 기관에서 로그인했습니다."
+  there_was_a_problem_logging_in_at_institution_5a298155: "%{institution}에 로그인하는 데 문제가 있습니다."
   there_was_an_error_in_processing_your_request_6513a49a: "요청을 처리하는 중 오류 발생"
   this_field_is_required_fa58c4a: "이 필드가 필요함"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*이 퀴즈를 게시하지 않았습니다.* 게시하기 전까지 교사만 이 퀴즈를 볼 수 있습니다."
@@ -12027,6 +11966,7 @@ ko:
     view_in_separate_window: "별도 창에 보기"
   to_51406be9: "받는 사람"
   to_c4c44f4b: "다음 요일로"
+  too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "로그인을 너무 많이 실패했습니다. 다시 시도하시거나 시스템 관리자에게 문의하십시오."
   tooltips: 
     finished: 완료됨
     incomplete: "완료 안 됨"
@@ -12050,6 +11990,8 @@ ko:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "Turnitin에 다시 제출"
+  twitter_fcef6b54: Twitter
+  unauthorized: "권한이 없음"
   ungraded_survey_ad7de790: "평가 안 된 설문"
   unknown: "알 수 없음"
   unknown_47a3b725: "알 수 없음"
@@ -12074,7 +12016,6 @@ ko:
       terms: "조건에 동의해야 합니다."
       too_long: "%{max}글자를 초과할 수 없습니다."
     registration: 
-      agree_to_terms_and_privacy_policy: "*사용 조건*에 동의하고 **개인 정보 보호 정책**을 승인합니다."
       agree_to_terms_with_code_of_conduct: "*사용 조건*과 **준수 사항**에 동의합니다."
   user_date_range_search: 
     cant_be_blank: "Canvas 사용자 ID는 공란일 수 없음"
@@ -12333,11 +12274,6 @@ ko:
           이 사용자가 수행하는 것처럼 보입니다. 하지만 감사 로그에는
           이 사용자를 대신해서 **여러분**이 실제 동작을 수행했다는 사실이 기록됩니다.
       masquerade_as: "%{user_name}(으)로 가장"
-    merge: 
-      login_to_merge_different_account: "%{current_user_name} (%{current_user_email}) 계정을 다른 계정으로 병합하려면 새 계정으로 로그인하시기 바랍니다:"
-      merge_definition: "이런 저런 이유로 하나가 아닌 두 개의 로그인을 갖게 될 수 있습니다. 그런 경우에는 두 로그인을 병합하고 정보를 통합할 수 있습니다."
-      titles: 
-        merge_accounts: "사용자 계정 병합"
     merge_results: 
       action: 동작
       emails: 이메일
@@ -12519,10 +12455,6 @@ ko:
       delete_wiki: 삭제
       labels: 
         front_page: "첫 페이지"
-      page_locked: "이 페이지가 잠겨 있습니다."
-      page_locked_by_modules: "다음 모듈을 완료하고 나면 이 페이지를 사용할 수 있습니다:"
-      page_locked_by_modules_until: "다음 모듈을 완료하고 나면 %{lock_info.unlock_at}에 이 페이지를 이용할 수 있습니다:"
-      page_locked_until: "이 페이지는 %{lock_info.unlock_at}에 이용할 수 있음"
       published_indicator: 게시됨
       toolbar_menu: 
         settings: 설정
@@ -12615,7 +12547,6 @@ ko:
       archive: 저장소
       archive_link: "저장소 보기"
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "이제 이 퀴즈를 이미 치른 학생을 위한 다시 평가하기 옵션을 설정할 수 있습니다."
-  your_browser_does_not_meet_the_minimum_requirement_7a7022db: "브라우저가 Canvas를 위한 최소 요구 사항에 미치지 못합니다. 지원하는 브라우저의 전체 목록을 보려면 *Canvas 설명서*를 방문하시기 바랍니다."
   zip_argument_error: ".zip 업로드는 업로드할 대상 폴더가 필요합니다."
   zip_file_display: "파일 가져오기"
   zip_file_file_description: ".zip 파일을 폴더에 압축 해제"
