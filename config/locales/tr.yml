@@ -73,18 +73,6 @@ tr:
         api_url: "Api Url"
         common_core_guid: "Ortak Çekirdek GUID (opsiyonel)"
   account: 
-    account_settings: 
-      account_surveys: "Kullanıcı Anketleri"
-      avatars: "Kullanıcı Avatarları"
-      delicious: Delicious
-      diigo: Diigo
-      google_docs: "Google Docs"
-      google_docs_preview: "Google Docs Önizlemesi"
-      google_drive: "Google Drive"
-      linked_in: LinkedIn
-      skype: Skype
-      twitter: Twitter
-      yo: Yo
     ask_canvas_network: "Canvas Ağ Topluluğuna Sor"
     default_account_name: "Varsayılan Hesap"
     default_site_administrator_account_name: "Site Yöneticisi"
@@ -117,66 +105,52 @@ tr:
     tab_users: Kullanıcılar
     turnitin_pledge: "Bu ödev bana ait orijinal bir çalışmadır"
   account_authorization_config: 
-    debug: 
-      wait_for_login: "Oturum açma girişimi bekleniyor"
     default_delegated_login_handle_name: "Oturum Aç"
     default_login_handle_name: Eposta
-    saml_eppn_domain_stripped: "%{eppn} (ayrılmış etki alanı)"
+  account_authorization_config/ldap: 
     test_bind_failed: "Birleştirme başarısız: %{error}"
     test_connection_timeout: "Bağlanırken zaman aşımına uğradı"
     test_host_unknown: "Bilinmeyen sağlayıcı: %{host}"
     test_login_auth_exception: "Oturum açma hatası: %{error}"
     test_login_auth_failed: "Kimlik doğrulama başarısız oldu"
     test_search_failed: "Arama başarısız: %{error}"
+  account_authorization_config/saml: 
+    debug: 
+      logout_redirect: "LogoutRequest IdP'ye Gönderildi"
+      wait_for_login: "Oturum açma girişimi bekleniyor"
+    saml_eppn_domain_stripped: "%{eppn} (ayrılmış etki alanı)"
   account_authorization_configs: 
     account_required: "LDAP kimlik doğrulaması olmalıdır"
-    cas_settings: 
+    cas_fields: 
       labels: 
         auth_base: "CAS URL"
-        auth_type: Tür
-        login_handle_name: "Oturum Açma Etiketi"
         unknown_user_url: "Bilinmeyen Kullanıcı URL'si"
-      login_handle_name_description: "Etiket herkese özel oturum açma tanımlamaları için kullanılır. Örneğin: Oturum Aç, Kullanıcı Adı, Öğrenci ID, vs."
-      save_button: "Kimlik Doğrulama Ayarlarını Kaydet"
       unknown_user_url_description: "Canvas'ta bulunamayan yetkilendirilmiş bir kullanıcı olması durumunda yönlendirilecek url."
+    form_footer: 
+      labels: 
+        position: Pozisyon
+      save_button: "Kimlik Doğrulama Ayarlarını Kaydet"
+    form_header: 
+      auth_type_label: Tür
+      auth_url: "Bu ayar için oturum açma bağlantısı"
     index: 
       add_auth_desc: "Bu hesaba bir kimlik sağlayıcı ekleyin:"
-      canvas_login_tip: |-
-          Ayarları düzenledikten sonra oturum açamıyorsanız oturum açma url'nizin
-          sonuna *%{url1}* ekleyin. Bu sayede normal Canvas oturum
-          açma sürecini kullanarak oturum açabilirsiniz. Bu hesap için url %{url2}.
       choose_auth_type_option: "Kimlik doğrulama hizmeti seç"
       current_settings_title: "Geçerli Entegrasyon"
       delete_auth_confirmation: "Bu kaldırılırsa, kullanıcıların oturum açmaları mümkün olmayabilir. Emin misiniz?"
-      delete_auth_link: "Kimlik Doğrulamayı Kaldır"
-      edit_auth_link: "Ayrıntıları Düzenle"
       ip_address_list_description: "Eğer LDAP gibi, doğrudan sunucuya bağlantı gerektiren bir kimlik doğrulama hizmetini kullanıyorsanız, sunucunun bu IP adreslerinden gelen bağlantıları kabul edebildiğinden emin olmanız gerekir:"
       no_auth_type_description: "Bu hesap, şu anda bir kimlik sağlayıcı ile entegre değildir."
       page_title: "Kimlik Doğrulama Ayarları"
       profile_page_link_example: "Profil sayfası örneği: [%{friendlyname}](%{url})"
       settings_description: "Bir kullanıcının harici bir kimlik sağlayıcı (IdP) kullanarak kimlik doğrulaması yapılabilmesi için, kullanıcının hesabına bağlı ve bu IdP tarafından döndürülen benzersiz tanımlayıcı ile eşleşen bir oturum tanımlayıcısı olması gerekir. Bir kullanıcının geçerli oturum açma olaylarını görmek için, kullanıcının profil sayfasında \"Oturum Açma Bilgileri\" bölümüne bakın."
       settings_title: "Kimlik Doğrulama Ayarları"
-      test_ldap_link: "Kimlik Doğrulamayı Test et"
-    ldap_settings: 
-      add_secondary_ldap_server_link: "İkincil LDAP Sunucusu Ekle"
-      auth_type_label: Tür
-      change_password_url_help: "Varsayılan Canvas davranışı için boş bırakın"
-      change_password_url_not_specified: Belirtilmemiş
-      labels: 
-        change_password_url: "Parola Hatırlatma URL'si"
-        login_handle_name: "Oturum Açma Etiketi"
-      login_handle_name_description: "Özel oturum açma tanımlayıcıları için kullanılan etiket. Örnek: Oturum Aç, Kullanıcı Adı, Öğrenci Numasası, vs."
-      remove_secondary_ldap_link: (Kaldır)
-      save_button: "LDAP Ayarlarını Kaydet"
-      secondary_ldap_label: "İkincil LDAP"
-      setting_type_ldap: LDAP
-    ldap_settings_fields: 
+    ldap_fields: 
       auth_filter_description: "*%{placeholder}*'ı kullanıcı tarafından sağlanan kullanıcı adı için yer tutucu olarak kullan. Örneğin: *(sAMAccountName=%{placeholder})*"
       auth_password_description: "Geçerli şifrenin kullanılması için boş bırakın."
       identifer_format_description: "Bu LDAP seçeneği, kullanıcının Canvasta oturum açması için kullanılır. Kullanıcı tarafından sağlanan kullanıcı adını kullanmak için boş bırakılmalıdır."
       labels: 
         auth_base: Temel
-        auth_filter: Filtre
+        auth_filter: Filtrele
         auth_host: Host
         auth_over_tls: "TLS Üzerinden?"
         auth_over_tls_false: "TLS Yok"
@@ -186,9 +160,8 @@ tr:
         auth_port: Port
         auth_username: "Kullanıcı Adı"
         identifier_format: "Oturum Açma ID'si Özelliği"
-        no_tls: "TLS Yok"
-        simple_tls: "Basit TLS"
-        start_tls: "TLS'yi Başlat"
+      last_ldap_timeout_failure: "Son zaman aşımı hatası"
+      ldap_timeout_failure_help2: "LDAP sunucusu ile iletişimdeyken Canvas çok fazla zaman aşımı hata verirse bu durum gelecekteki oturum açma denemelerini bu LDAP sunucusundan %{time} süreliğine engelleyecektir."
     ldap_settings_test: 
       labels: 
         pass: Şifre
@@ -216,50 +189,27 @@ tr:
       test_ldap_search_help_fixes_3: "Sağlanan arama tabanı için LDAP kullanıcı nesnesinin arama ayrıcalıklarına sahip olduğunu doğrulayın."
       test_ldap_search_help_header: "Canvas bu LDAP durumunu arayamaz"
       test_ldap_search_label: "LDAP araması test ediliyor..."
-    ldap_timeout_error: 
-      last_ldap_timeout_failure: "Son zaman aşımı hatası"
-      ldap_timeout_failure_help2: "LDAP sunucusu ile iletişimdeyken Canvas çok fazla zaman aşımı hata verirse bu durum gelecekteki oturum açma denemelerini bu LDAP sunucusundan %{time} süreliğine engelleyecektir."
     login_required: sağlanmalıdır
     no_changing_auth_types: "İzin verme yapılandırma türü değiştirilemiyor, lütfen silip yeni yapılandırma oluşturun."
-    no_discovery_url: Ayarlanmadı
     password_required: sağlanmalıdır
-    saml_required: "SAML konfigürasyonunu test etmek için, SAML gereklidir"
-    saml_settings: 
-      auth_type: Tür
-      auth_url: "Bu ayar için oturum açma bağlantısı"
-      certificate_fingerprint: "Sertifika Parmakizi"
-      change_password_url: "Parola Linkini Değiştir"
-      discovery_url: "Keşif Bağlantısı:"
-      discovery_url_description: "Bir bildirme url'si ayarlanırsa kimlik doğrulama gerektiğinde canvas tüm kullanıcıları bu URL'ye yönlendirecek. Bu sayfada kullanıcı oturum açmak için nereye gitmesi gerektiğini bulabilecek. Eğer bildirme url'si yapılandırılmazsa kullanıcının kimliğini doğrulamak için ilk SAML yapılandırılması kullanılacak."
-      identifier_format: "Tanımlayıcı Biçimi"
-      idp_entity_id: "IdP Entity ID"
+    saml_fields: 
       labels: 
-        certificate_fingerprint: "Sertifika Takip Bilgisi"
-        change_password_url: "Şifre Linkini Değiştir"
+        certificate_fingerprint: "Sertifika Parmakizi"
         identifier_format: "Tanımlayıcı Biçimi"
         idp_entity_id: "IdP Entity ID"
-        log_in_url: "Oturum Açma URL'si"
+        log_in_url: "Hesap Oluşturma URL'si"
         log_out_url: "Oturum Kapatma URL'si"
         login_attribute: "Oturum Açma Özelliği"
-        login_handle_name: "Oturum Açma Etiketi"
-        position: Pozisyon
         requested_authn_context: "Kimlik Doğrulama Bağlamı"
         unknown_user_url: "Bilinmeyen Kullanıcı URL'si"
-      log_in_url: "Hesap Oluşturma URL'si"
-      log_out_url: "Oturum Kapatma URL'si"
-      login_attribute: "Oturum Açma Özelliği"
-      login_handle_name: "Oturum Açma Etiketi"
-      login_handle_name_description: "Özel oturum açma tanımlamaları için kullanılan etiket. Örneğin: Oturum Açma, Kullanıcı Adı, Öğrenci ID, vs."
-      no_discovery_url: Ayarlanmadı
-      position: Pozisyon
+      unknown_user_url_description: "Canvas'ta bulunamayan yetkilendirilmiş bir kullanıcı olması durumunda yönlendirilecek url."
+    saml_required: "SAML konfigürasyonunu test etmek için, SAML gereklidir"
+    saml_settings_test: 
       refresh_debugging: Yenile
-      requested_authn_context: "Kimlik Doğrulama Bağlamı"
       saml_debug_instructions: "Hata ayıklamaya başladığınızda sonraki SAML oturum açma girişimleri hakkındaki tüm bilgiler toplanacaktır. Toplanan veri veya toplanan verilerin temizlemek ve geçerli hata ayıklama girişimini durdurmak için \"Hata Ayıklamayı Durdur\" ya da toplanan verileri görüntülemek için \"Yenile\" düğmesini tıklayın."
-      saml_debugging: "Hata  Ayıklaması"
-      save_button: "Kimlik Doğrulama Ayarlarını Kaydet"
+      saml_required: "SAML Yapılandırması için SAML'ın test edilmesi gereklidir"
       start_debugging: "Hata  Ayıklamayı Başlat"
       stop_debugging: "Hata  Ayıklamayı Durdur"
-      unknown_user_url_description: "Canvas'ta bulunamayan yetkilendirilmiş bir kullanıcı olması durumunda yönlendirilecek url."
     saml_testing: 
       auth_request_to_idp: "AuthnRequest IdP'ye gönderildi"
       auth_response_from_idp: "IdP'den AuthnResponse"
@@ -288,7 +238,12 @@ tr:
         to_idp_xml: "LoginRequest XML'ini IdP'ye Gönderildi"
       logout_request_to_idp: "LogoutRequest IdP'ye Gönderildi"
       logout_response_from_idp: "IdP'den LogoutResponse"
-      saml_required: "SAML Yapılandırması için SAML'ın test edilmesi gereklidir"
+    sso_settings_form: 
+      change_password_url_help: "Varsayılan Canvas davranışı için boş bırakın"
+      labels: 
+        change_password_url: "Parola Hatırlatma URL'si"
+        login_handle_name: "Oturum Açma Etiketi"
+      login_handle_name_description: "Özel oturum açma tanımlamaları için kullanılan etiket. Örneğin: Oturum Açma, Kullanıcı Adı, Öğrenci ID, vs."
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "Hesap onay son tarihi başlangıç tarihinden sonra olamaz"
@@ -391,6 +346,7 @@ tr:
     report_header_user__id: user_id
     report_header_user_id: "kullanıcı id"
     report_header_user_name: "kullanıcı adı"
+    report_header_user_short_name: short_name
     report_header_user_sis_id: "kullanıcı sis id"
     report_header_xlist_course_id: xlist_course_id
     sis_exporter: 
@@ -420,6 +376,7 @@ tr:
       open_registration_delegated_warning_dialog: "Harici Kimlik Sağlayıcı Etkinleştirildi"
       what_are_quiz_ip_filters: "Kısa Sınav IP Filtreleri Nelerdir?"
     user: Kullanıcı
+  account_surveys_b0039876: "Kullanıcı Anketleri"
   account_user: 
     types: 
       account_admin: "Hesap Yöneticisi"
@@ -450,16 +407,13 @@ tr:
         sis_user_id: "ÖBS ID"
         sortable_name: "Listede Görünen Ad"
       sortable_name_help: "Bu ad sıralama kriteri listelerinde görünür."
-      unique_id_label: "%{label}:*"
     add_user_button: "Kullanıcı Ekle"
     add_user_dialog_title: "Yeni Kullanıcı Ekle"
     adding_course_message: "Ders Ekleniyor..."
     adding_user_message: "Kullanıcı Ekleniyor.."
     additional_settings: 
-      account_domains: "Hesap Alan Adları"
       account_status: "Hesap Durumu"
       add_new_domain: "Yeni Alan Adı Ekle"
-      external_status: "Harici Durum"
       license: Lisans
       license_type: "Lisans Türü"
       new_account_domain_title: "Yeni Hesap Alan Adı"
@@ -1284,6 +1238,7 @@ tr:
   activity_13915493: Etkinlik
   activity_by_category_9c2033d1: "Kategoriye göre Etkinlik"
   activity_by_date_878c5b49: "Güne göre Etkinlik"
+  add_8523c19b: Ekle
   add_app_baf540f: "Uygulama Ekle"
   add_attachment_93868828: "Dosya Ekle"
   add_course_assignments_628ed6d0: "Ödev Ekle"
@@ -1447,7 +1402,6 @@ tr:
       invalid_external_tool: "Bu bağlantı için geçerli ayarlar bulunmadı"
       invalid_external_tool_id: "Bu araç için geçerli ayarlar bulunamadı"
       invalid_feed_parameters: "Geçersiz akış parametreleri."
-      invalid_oembed_url: "Bu kaynak alınırken bir sorun oluştu. Harici araç, kaynak hakkında geçersiz bilgiler sağladı."
       invalid_tag_type: "Bu etiket için girilen öğe türü tanınmıyor"
       invalid_verification_code: "Doğrulama kodu geçersiz."
       mismatched_verification_code: "Doğrulama kodu herhangi bir kayıtlı kullanıcı koduyla eşleşmiyor."
@@ -1478,6 +1432,7 @@ tr:
         suspended: "Enstitü Askıya Alınmıştır"
     wiki_front_page_default_content_course: "Dersin yeni wiki sayfasına hoş geldiniz!"
     wiki_front_page_default_content_group: "Grubun yeni wiki sayfasına hoş geldiniz!"
+  apply_781a2546: Uygula
   appointment_group: 
     errors: 
       invalid_end_at: "Randevu bitiş saati, başlangıç ​​saatinden önce"
@@ -1736,12 +1691,6 @@ tr:
       one: "En düşük puanı düşür"
       other: "En düşük %{count} puanı düşür"
     drop_lowest_scores: "En Düşük %{number} Puanı Düşür"
-    due_date_override: 
-      overrides: 
-        available_from: Kullanılabilen
-        due_date: "Bitiş Tarihi"
-        for: "Kim için"
-      until: "Şu zamana kadar"
     due_date_view: 
       overrides: 
         remove_these_dates: "Bu Tarihlerde Sil"
@@ -1763,7 +1712,6 @@ tr:
       description: Açıklama
       freeze_properties: "Kopyalandığında ödev ayarlarını kitlitle"
       notify_content_change: "Bu içerik değişiminden kullanıcıları bilgilendir"
-      only_visible_to_overrides_note: "Not: Bu ödev *yalnızca* aşağıda belirtilmiş bölüm(ler)de görülebilir:"
       points_possible: Puanlar
       post_to_sis: "Okulunuzun Öğrenc Bilgi Sistemine göderirken bu ödevin notlarını da dahil et"
       warnings: 
@@ -2208,6 +2156,7 @@ tr:
   available_after_unlock_at_until_lock_at_499e8092: "%{unlock_at} tarihinden sonra %{lock_at} tarihine kadar geçerli"
   available_from_587ce92f: "Etkin Olduğu Tarih"
   available_from_date_43b5e11d: "Etkin Olduğu Tarih"
+  available_from_f84e4611: "Tarihinden itibaren kullanılabilir"
   available_until_date_cd125c62: "Son Geçerlilik Tarihi"
   available_until_f3b9c4ed: "Şu tarihe kadar geçerli"
   available_until_lock_at_ab022445: "%{lock_at} tarihine kadar geçerli"
@@ -2679,30 +2628,9 @@ tr:
     ics_title: "%{course_or_group_name} Takvim (Canvas)"
     invalid_date_or_time: "%{attr} için geçersiz tarih veya zaman"
   calendars: 
-    assignment_details: "Ödev Ayrıntıları"
-    default_title: olay
     event: 
       due: bitiş
       event_title: "bitiş: %{event_title}"
-    event_details: "Olay Ayrıntıları"
-    feed_dialog_title: "Takvim Akış Verisi"
-    keycodes: 
-      delete: d
-      edit: e
-      new: "n"
-      next_day: "ctrl+sağ ok"
-      next_event: j
-      next_week: "ctrl+alt ok"
-      open: o
-      previous_day: "ctrl+sol ok"
-      previous_event: k
-      previous_week: "ctrl+yukarı ok"
-      refresh: r
-    notices: 
-      event_moved: "%{event} olayı %{day} gününe taşındı"
-    prompts: 
-      delete_assignment: "Bu ödevi silmek isteğinize emin misiniz?"
-      delete_event: "Bu olayı silmek istediğinize emin misiniz?"
     show2: 
       calendar_feed: "Takvim Akış Verisi"
       calendar_feed_instructions: "Aşağıdaki linki kopyalayıp iCal beslemesi alan (Google Takvim, iCal, Outlook vb.) herhangi bir takvim uygulamasına yapıştırın."
@@ -2716,11 +2644,6 @@ tr:
       toggle_calendars: "Takvimleri değiştir"
       toggle_undated_items: "Zamanlanmamış öğeleri değiştir"
       undated_items: "Zamanlanmamış öğeler"
-    titles: 
-      add_new_assignment: "Yeni Ödev Ekle"
-      add_new_event: "Yeni Olay Ekle"
-      edit_assignment: "Ödevi Düzenle"
-      edit_event: "Olayı Düzenle"
     wizard_box: 
       descriptions: 
         assignment: "Güzel. Şimdi, takvimde gösterilecek olay yerine bir ödev oluşturmak için diyalog kutusundaki \"Ödev\" sekmesine tıklayın. "
@@ -2761,6 +2684,8 @@ tr:
   canvas_cartridge_display: "Genel Canvas Cartridge"
   canvas_cartridge_file_description: "Canvas Dersi Dışarı Aktarma Paketi"
   canvas_cartridge_name: "Canvas Kartuş İçe Aktarıcı"
+  canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas sizin kimlik saylayıcınızı tanımlayamadı"
+  canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "%{user} kullanıcı Canvas üzerinde kayıtlı değil"
   canvas_revision_unknown: Bilinmiyor
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas şu anda gönderilerinizi kaydetme sonrası tekrardan notlandırıyor, bu biraz zaman alabilir."
   cc: 
@@ -2815,7 +2740,7 @@ tr:
         cancel: İptal
         update: "Çalışma ekibini güncelle"
       labels: 
-        description: Açıklama
+        description: "Açıklama:"
         title: "Çalışma ekibi başlığı"
     errors: 
       cannot_load_collaboration: "İşbirliği yüklenemiyor"
@@ -2844,7 +2769,7 @@ tr:
             **Uyarı**: Google Docs da işbirliği yaparak çalışmak için (işbirliği yaptığınız kişilerin) ve sizin Google hesabınız olmalı. "
       labels: 
         collaboration_type: "Şunu kullanarak işbirliği yap:"
-        description: Açıklama
+        description: "Açıklama:"
         document_name: "Belge Adı:"
       messages: 
         delete_google_doc_as_well: "Bu işbirliği çalışması Google Doc belgesi olarak kaydediliyor. Bu belgenin sadece Canvas'tan mı yoksa Google Docs'dan da mı silinmesini istediniz?"
@@ -3054,7 +2979,7 @@ tr:
       message: 
         export_started: "Aktarma işlemi başladı. Büyük dersler için bu biraz zaman alabilir. *Sayfayı terkedebilirsiniz* aktarım tamamlandığında bilgilendirme epostası alacaksınız."
       no_submissions: "Şu anda dışarı aktaracak gönderiniz bulunmamakta."
-      user_data_exports: "Kullanıcı Verisi Aktarımları"
+      user_data_exports: "Gönderileri İndir"
     labels: 
       new_export: "Yeni Dışa Aktarım:"
     links: 
@@ -3277,17 +3202,6 @@ tr:
     titles: 
       tag_external_web_page: "Etiket Web Sayfası - Harici"
   context: 
-    communication: 
-      headings: 
-        discussions: Tartışmalar
-      links: 
-        feeds: 
-          course_discussions: "Ders Tartışmaları Atom Beslemesi"
-        start_collaboration: "İşbirliği Başlat"
-        start_conference: "Bir Web Konferansı Başlat"
-        start_topic: "Yeni bir Konu Başlat"
-      titles: 
-        communication: İletişim
     deleted_item: 
       created: oluşturuldu
       last_updated: "En son güncelleme"
@@ -4071,12 +3985,14 @@ tr:
       wiki_id: "Wiki Idsi"
       workflow_state: "İş akış Durumu"
   course_members_are_free_to_join_9b2603d4: "Ders üyeleri katılabilir"
+  course_navigation_dd035109: "Ders Gezinme Menüsü"
   course_restore: 
     restore_error: "Ders onarımı denemesi başarısız oldu. Ders onarılamıyor."
   course_search: 
     cant_be_blank: "Boş bırakılamaz"
   course_section: 
     sis_id_taken: "ÖBS ID \"%{sis_id}\" zaten kullanılıyor"
+  course_section_7a988066: "Ders Bölümü"
   course_settings: 
     buttons: 
       add_section: "Bölüm Ekle"
@@ -4898,6 +4814,7 @@ tr:
   delete_survey_56fddbbd: "Anket Sil"
   delete_tool_app_9c9f6d35: "%{tool} Uygulaması Silinsin mi?"
   delete_toolname_app_85f9d4ee: "%{toolName} Uygulamasını Sil"
+  delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Demo siteler için Recaptcha ayarları yapılmış olmalıdır. Canvas'ın bu uygulaması için lütfen site yöneticiniz ile görüşün."
   demos: 
     _register: 
@@ -5017,6 +4934,7 @@ tr:
   differentiated_assignments_description: |-
       Farklılaşmış Ödevler ödevin hangi bölüm(ler) için geçerli olacağını seçmeyi sağlayan *beta* bir özelliktir.
       Ödev içermeyen bölümlerde ders içeriğinde bu görünmez ve finla notları bu notlar olmadan hesaplanır.
+  diigo_993c4646: Diigo
   disable_a5c05db3: "Devre Dışı"
   disabled_18c33a73: "(devre dışı)"
   discussion_6719c51d: Tartışma
@@ -5098,7 +5016,6 @@ tr:
         save_and_publish: "Kaydet & Yayınla"
       delay_posting: "Sonra gönder"
       enable_podcast_feed: "PodCast yayınları aktif"
-      only_visible_to_overrides_note: "Not: Bu tartışma *yalnızca* aşağıda belirtilen kısım(lar)'da görülebilir. "
       options: Seçenekler
       page_header_title: "Yeni Tartışma"
       points_possible: "Olası Puanlar"
@@ -5321,6 +5238,8 @@ tr:
       notların dağılımı.
   domain_3b54c511: Alan
   don_t_show_again_15d8253e: "bir daha gösterme"
+  download_submissions_7454665f: "Gönderileri İndir"
+  due_a73610f6: Bitiş
   due_by_c263dc10: "son tarih"
   due_date_6a281fe3: "Bitiş Tarihi: %{date}"
   due_date_822625d8: "Bitiş Tarihi"
@@ -5349,6 +5268,7 @@ tr:
   ecollege_file_description: Ecollege
   ecollege_name: "Ecollege Dönüştürücü"
   edit_app_b0cc1c17: "Uygulamayı Düzenle"
+  edit_c5fbea07: Düzenle
   edit_grading_scheme_53091236: "Notlandırma Şemasını Düzenle"
   edit_permissions_for_count_items_d65e3855: 
     one: "Şunun için izinleri düzenle: %{itemName}"
@@ -5785,6 +5705,7 @@ tr:
     unsaved_changes: "Kaydedilmemiş değişiklikler var."
     wrong_file_extension: "Seçmiş olduğunuz \"%{extension}\" uzantılı dosyanın gönderilmesine onay verilmemiş."
   everyone_854554dd: Herkes
+  everyone_else_6c6dc7b6: "Geri kalan herkes"
   example_84698b7d: Örnek
   example_final_score_a92b30b9: "Örnek final puanı]]"
   example_https_example_com_config_xml_be5f36ac: "Örneğin: https://example.com/config.xml"
@@ -5797,6 +5718,7 @@ tr:
   expand_or_collapse_undated_items_b901de09: "Tarihi belirlenmemiş öğeleri genişlet veya topla"
   expand_subdiscussion_cd226ed4: "Alt tartışmaları Göster"
   expires_on_date_18efe4e2: "Şu gün sona eriyor"
+  export_de71cd8e: "Dışa Aktar"
   external_apps_f5490181: "Harici Uygulamalar"
   external_content: 
     cancel: 
@@ -5948,8 +5870,6 @@ tr:
   feature_flags: 
     feature_flag: 
       allow: "İzin Ver"
-      disabled: "Devre Dışı"
-      enabled: Etkin
       estimated_release: "Tahmini Yayınlama:"
       no_description: "açıklama yok"
       ? "off"
@@ -6232,11 +6152,14 @@ tr:
     invitation: davet
     question: soru
     warning: uyarı
+  google_docs_40374e65: "Google Docs"
   google_docs_domain_restriction_description: |-
       Google Docs Alan Adı Sınırlaması Google Docs gönderileri ve işbirliklerinin tek bir alan
       adı altında toplanmasına izin verir. Onaylanmamış alan adı üzerinden ödev göndermeye 
       çalışan ya da işbirliğine katılmaya çalışan öğrenciler, Google Docs entegrasyonlarını güncellemeleri
       gerektiği yönünde bir uyarı mesajı alacaklar.
+  google_docs_preview_9f41b23c: "Google Docs Önizlemesi"
+  google_drive_7cb003c9: "Google Drive"
   grade_display_warning_dialog: 
     grade_display_warning: 
       checkbox: "Bu dersi tekrar gösterme."
@@ -6284,7 +6207,6 @@ tr:
     group: Grup
     hide_all_details_button: "Tüm Ayrıntıları Gizle"
     mute_assignment: "Ödevi Beklet"
-    new_assessment: "[Yeni Ödev]"
     no_submission_time: "ödev gönderme zamanı yok"
     nodetect_message: "Herhangi bir konuşma algılanmadı. Mikrofon ayarlarını yapmanız gerekebilir."
     not_graded: Notlandırılmamış
@@ -6417,6 +6339,8 @@ tr:
       switch_to_percent: "Yüzdeye geç"
       switch_to_points: "Puanlara geç"
     ungraded: "Notlandırma katsayısına dahil edilmedi"
+  gradebook_csvs: 
+    grades_filename: Notlar
   gradebook_uploads: 
     new: 
       titles: 
@@ -6556,6 +6480,7 @@ tr:
       arrange_columns_by_due_date: "Sütunları son teslim tarihine göre düzenle"
       arrange_columns_by_group: "Sütunları ödev grubuna göre düzenle"
       download_scores: "Dışa Aktar"
+      export_current_gradebook: Güncel
       filter_by_student: "Öğrenci ismine veya ikincil kimliğe göre filtrele"
       grades: Notlar
       hide_student_names: "Öğrenci İsimlerini Gösterme"
@@ -6571,7 +6496,6 @@ tr:
     grades: 
       complete: Tamam
       incomplete: Eksik
-    grades_filename: Notlar
     grading_box_extended: 
       labels: 
         grade: Not
@@ -6664,7 +6588,6 @@ tr:
         show_all_sections: "Bütün bölümleri göster"
         submit_same_score: "Tekrar gönderimde aynı notu kullan"
       loading: yükleniyor...
-      new_assessment_option: "[Yeni Ödev]"
       no_annotation: "Bu belge için açıklama mevcut değil"
       not_newest_notice: "Not: Bu en güncel gönderim değil"
       page_header_title: SpeedGrader
@@ -7257,7 +7180,6 @@ tr:
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "Çıkarsanız, şu anda hazırlanan zip'li dosya indirmesi iptal edilecek."
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Başka bir öğrenme yönetim sistemi kullanıyorsanız buradaki malzemelerinizi Canvas'a taşımak isteyebilirsiniz. İçeriğinizi Canvas'a kolayca aktarma sürecini birlikte yapalım."
   ignore_assignment_738b3c99: "Ödevi Gözardı Et"
-  ignore_forever_dd4a6cdf: "Daima Yoksay"
   ignore_name_55edc6fe: "%{name} yoksay"
   ignore_these_3940f6f5: "Bu Geçersiz"
   ignore_this_assignment_b7a71f80: "Bu ödevi yok say"
@@ -7301,6 +7223,7 @@ tr:
     warnings: 
       truncated_wiki_title: "Şu wiki sayfanın başlığı kesildi : %{title}"
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Okulunuzun Öğrenc Bilgi Sistemine göderirken bu ödevin notlarını da dahil et"
+  incorrect_username_and_or_password_2de73abb: "Yanlış kullanıcı adı ve/veya şifre"
   incremental_update_successfully_generated_against__db3f3f06: "Önceki ÖBS içeri aktarımına karşın artış içeren güncelleme başarıyla oluşturuldu."
   info: 
     notices: 
@@ -7472,10 +7395,7 @@ tr:
   launch_url_e150bd41: "URL'i Çalıştır"
   layouts: 
     application: 
-      ? "User Research"
-      : "Kullanıcı Araştırması"
       bouncing_communication_channels: "İletişim yöntemlerinizden biri ile bir sorun var gibi görünüyor. Lütfen *Ayarlar Sayfası*nı kontrol edin."
-      by_instructure: "Instructure tarafından"
       group_switch: Değiştir
       javascript_required: "Bu siteye erişebilmek için tarayıcınızda Javascript'i etkinleştirmelisiniz."
       keyboard_navigation: 
@@ -7484,7 +7404,6 @@ tr:
         close: Kapat
         dashboard: "Kontrol Panelim"
         skip_to_content: "Bu İçeriği Atla"
-      open_source_learning_management_system: "Açık Kaynak Kod ÖYS"
     fixed_bottom: 
       masquerading: 
         stop: "Rolüme Geri Dön"
@@ -7504,6 +7423,7 @@ tr:
       log_in_to_canvas: "Canvas'ta Oturum Aç"
     styleguide: 
       default_page_title: "Canvas LMS"
+  ldap_e1e0a916: LDAP
   learning_mastery_gradebook_description: |-
       Öğrenme Yeterliliği Not Defteri öğretmenlerin dersin öğrenme çıktılarına göre öğrencileri ve 
       ders 
@@ -7616,6 +7536,7 @@ tr:
   linked_assignment_message: "Ödev '%{title}' ile bağlantılı"
   linked_discussion_topic_message: "Tartışma Başlığı '%{title}' ile bağlantılı"
   linked_quiz_message: "Kısa Sınav '%{title}' ile bağlantılı"
+  linkedin_5726caca: LinkedIn
   links: 
     dashboard: "Kontrol Panelim"
     errors: 
@@ -7635,6 +7556,74 @@ tr:
   lock_until_date_62ce1b5c: "Şu Tarihe Kadar Kilitle"
   log_out_379ba28a: "Oturumu Kapat"
   logged_out_user: "Oturum Kapatan Kullanıcı %{user_counter}"
+  login: 
+    canvas: 
+      mobile_login: 
+        back_to_login: "Oturum Aç'a dön"
+        buttons: 
+          request_password: "Şifremi Gönder"
+        dont_know_password: "Şifremi hatırlamıyorum"
+        log_in: "Oturum Aç"
+        login_handle: "%{login_handle_name}'nızı girerseniz şifrenizi değiştirebileceğiniz bağlantıyı size gönderelim."
+        password: Şifre
+        sending: Gönderiliyor...
+      new: 
+        back_to_login: "Oturum Aç'a dön"
+        browse_courses: "Kursları görüntüle"
+        buttons: 
+          request_password: "Şifremi Gönder"
+        coenrollment_banner: "*Canvas kullanıcısınının ebeveyni misiniz?* **Hesap oluşturmak için tıklayın**"
+        dont_know_password: "Şifrenizi bilmiyor musunuz?"
+        labels: 
+          password: Şifre
+          remember_me: "Oturumunuz açık kalsın"
+        log_in: "Oturum Aç"
+        login_handle: "%{login_handle_name}'nızı girerseniz şifrenizi değiştirebileceğiniz bağlantıyı size gönderelim."
+        page_title: "Canvas'ta Oturum Aç"
+        register_for_canvas: "*Hesap Oluşturmak İçin* **Buraya Tıklayın, Ücretsizdir!**"
+    logout_confirm: 
+      cancel: İptal
+      details: 
+        log_out: "Canvas'tan çıkış yapmak istediğinize emin misiniz?"
+      log_out: "Oturumu Kapat"
+      page_title: "Oturumu Kapat"
+    otp: 
+      errors: 
+        invalid_otp: "Geçersiz onaylama kodu, lütfen tekrar deneyin"
+      new: 
+        buttons: 
+          send: Gönder
+          verify: Onay
+        details: 
+          mfa_enrollment: |-
+              Çok faktörlü kimlik doğrulama, Canvas'ta oturum açmak için şifrenize ek olarak fiziksel olarak bir şeye sahip 
+              olduğunuzu gerektirdiği için güvenliği artırır. Bu şey, doğrulama kodları oluşturan bir araç ya da mesaj 
+              gönderilen bir cep telefonu olabilir. [iPhone için](%{iphone_url})  ya da 
+              [Android için](%{android_url}) 
+              Google Kimlik Doğrulayıcı aşağıdaki QR Kod taranarak yapılandırılabilir. Diğer token'lar gizli anahtar **%{secret_key}**
+              girilerek yapılandırılabilir.
+          mfa_required: "Çoklu faktör yetkilendirme ayarlamanız gerekiyor."
+          otp_on_device: "Token'da gözüken doğrulama kodunu giriniz"
+          otp_sent_to_phone: "Doğrulama kodunuz cep telefonunuza yollandı. Lütfen gelen kodu giriniz."
+          send_to_sms: "%{phone_number} telefon numarasına metin mesajı yolla"
+        labels: 
+          carrier: Taşıyıcı
+          phone_number: "Telefon Numarası"
+          remember_me: "Bu bilgisayarı hatırla"
+          verification_code: "Doğrulama Kodu"
+        links: 
+          choose_number: "Varolan bir telefon numarası seçin"
+        page_title: "Çoklu Kimlik Doğrulama"
+        select: 
+          new_number: "yeni bir telefon"
+        titles: 
+          mfa: "Çoklu Kimlik Doğrulama"
+    saml: 
+      debug: 
+        logout_request_redirect_from_idp: "IdP'den LogoutRequest Alındı"
+        logout_response_redirect_from_idp: "IdP'den LogoutRequest Alındı"
+        logout_response_redirect_to_idp: "IdP'ye LogoutResponse Gönderiliyor"
+        redirect_from_idp: "IdP'den LoginResponse alındı"
   logo_a040ae0e: Logo
   low_score_4eeb95b2: "En Düşük : %{score}"
   lower_limit_of_range_6ddd4983: "Aralık alt sınırı"
@@ -9397,6 +9386,13 @@ tr:
         subject: "Web Konferans Daveti: %{name}"
       twitter: 
         tweet: "Canvas Uyarısı - Davet: katılım %{title}, %{name}"
+    web_conference_recording_ready: 
+      email: 
+        details_link: "Ayrıntıyı buradan görebilirsiniz: %{link}"
+        html: 
+          details_link: "Ayrıntıları görmek için tıklayınız"
+      sms: 
+        link_message: "Daha fazla bilgi için %{url}"
   migration: 
     announcement_type: Duyuru
     assignment_group_type: "Ödev Grubu"
@@ -9574,6 +9570,7 @@ tr:
   more_courses_5ebbe998: "Daha Fazla Dersler"
   most_recent_score_13a87e8c: "En Güncel Puan"
   most_recent_score_counts_as_75_of_mastery_weight_a_f1e3e6c2: "En güncel puan yeterlik ağırlığının 75% olarak sayılır, diğer bütün puanların ortalaması ise ağırlığın 25% olarak sayılır."
+  move_abf00365: Taşı
   move_dialog: 
     cancel: İptal
     save: Kaydet
@@ -9583,6 +9580,8 @@ tr:
     move_to_end: "-- Alt kısımda --"
   move_outcome_ce497e6c: "Öğrenme Çıktısını Taşı"
   move_outcome_group_cfa1a505: "Öğrenme Çıktı Grubunu Taşı"
+  moving_a4d552df: Taşınıyor...
+  multi_factor_authentication_configured_865b1bde: "Çoklu kimlik doğrulama yapılandırıldı"
   must_achieve_mastery_at_least_2_times_must_also_co_b2ae7688: "Yeterlik en az 2 kere sağlanmış olmalı. Hesaplama çin ayrıca 2 öğe tamamlanmalı. Final puanını hesaplamak için yeterliğin üzerindeki puanların ortalaması alınacak."
   must_achieve_mastery_at_least_2_times_scores_above_57077a88: "Yeterlik en az 2 kere sağlanmış olmalı. Final puanını hesaplamak için yeterliğin üzerindeki puanların ortalaması alınacak."
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "'file_ids' and/or 'folder_ids' parametresi sağlanmalı"
@@ -9628,6 +9627,8 @@ tr:
   no_e16d9132: Hayır
   no_grading_schemes_to_display_8b0e92e7: "Gösterilecek notlandırma şeması yok"
   no_migration_file: "İçerik taşıma için dosya gereklidir."
+  no_password_was_given_472222e5: "Şifre verilmedi"
+  no_results_found_58717065: "Sonuç bulunamadı"
   no_score_yet_c94e919b: "Henüz puan yok"
   no_students_have_taken_the_quiz_yet_e667644b: "Henüz bu kısa sınavı alan öğrenci yok"
   no_students_have_taken_the_survey_yet_d378cd35: "Henüz anketi alan öğrenci yok"
@@ -9851,6 +9852,7 @@ tr:
       admin: "Yönetsel "
       alerts: Uyarılar
       communication: Mesajlaşmalar
+      conferences: Konferanslar
       course: "Ders Etkinlikleri"
       discussions: Tartışmalar
       groups: Gruplar
@@ -10092,7 +10094,6 @@ tr:
     everyone_else: "Geri kalan herkes"
     overrides: 
       everyone: Herkes
-      everyone_else: "Geri kalan herkes"
   own_copyright_cc59db55: Telifiniz
   page_comment: 
     default_user_name: Anonim
@@ -10807,6 +10808,7 @@ tr:
     yo_select: 
       yo: Yo
     you_have_no_services: "Herhangi bir hizmete kayıtlı değilsiniz, *ayarlar* sayfasından hizmet ekleyebilirsiniz."
+  profile_6bd2baed: Profil
   profiles: 
     avatar_dialog: 
       from_gravatar: "Gravatar'dan al"
@@ -10845,76 +10847,7 @@ tr:
       too_long: "%{max} karakteri aşamazsınız"
       too_short: "En az %{min} karakter olmalıdır"
   pseudonym_sessions: 
-    debug: 
-      logout_redirect: "LogoutRequest IdP'ye gönderildi"
-      logout_request_redirect_from_idp: "IdP'den LogoutRequest Alındı"
-      logout_response_redirect_from_idp: "IdP'den LogoutRequest Alındı"
-      logout_response_redirect_to_idp: "IdP'ye LogoutResponse Gönderiliyor"
-      redirect_from_idp: "IdP'den LoginResponse alındı"
     default_app_name: "Üçüncü Parti Uygulamalar"
-    errors: 
-      blank_password: "Şifre verilmedi"
-      invalid_credentials: "Yanlış kullanıcı adı ve/veya şifre"
-      invalid_otp: "Geçersiz onaylama kodu, lütfen tekrar deneyin"
-      login_error: "%{institution} üzerinde oturum açmada hata meydana geldi"
-      login_errors: 
-        no_config_for_id: "Bu id ile Canvas hesabınızın kimlik doğrulama yapılandırılması yok"
-        no_idp_set: "Giriş yaptığınız kurum bu hesap için ayarlanmadı."
-        unrecognized_idp: "Canvas sizin kimlik saylayıcınızı tanımlayamadı"
-      logout_errors: 
-        no_idp_found: "Canvas kimlik sağlayıcınız üzerinden oturumunuzu kapatamadı"
-      max_attempts: "Çok fazla oturum açma denemesi meydana geldi. Lütfen daha sonra tekrar deneyiniz veya sistem yönetici ile iletişime geçiniz."
-      no_matching_user: "%{user} kullanıcı Canvas üzerinde kayıtlı değil"
-      user_deleted: "Bu kullanıcı hesabı silindi. Lütfen sistem yöneticisi ile kullanıcı hesabınızın tekrardan aktive edilmesi için iletişime geçiniz."
-    logout_confirm: 
-      cancel: İptal
-      details: 
-        log_out: "Canvas'tan çıkış yapmak istediğinize emin misiniz?"
-      log_out: "Oturumu Kapat"
-      page_title: "Oturumu Kapat"
-    mobile_login: 
-      back_to_login: "Oturum Aç'a dön"
-      buttons: 
-        request_password: "Şifremi Gönder"
-      dont_know_password: "Şifremi hatırlamıyorum"
-      log_in: "Oturum Aç"
-      login_handle: "%{login_handle_name}'nızı girerseniz şifrenizi değiştirebileceğiniz bağlantıyı size gönderelim."
-      password: Şifre
-      sending: Gönderiliyor...
-    new: 
-      page_title: "Canvas'ta Oturum Aç"
-    notices: 
-      mfa_complete: "Çoklu kimlik doğrulama yapılandırıldı"
-    otp_login: 
-      buttons: 
-        send: Gönder
-        verify: Onay
-      details: 
-        mfa_enrollment: |-
-            Çok faktörlü kimlik doğrulama, Canvas'ta oturum açmak için şifrenize ek olarak fiziksel olarak bir şeye sahip 
-            olduğunuzu gerektirdiği için güvenliği artırır. Bu şey, doğrulama kodları oluşturan bir araç ya da mesaj 
-            gönderilen bir cep telefonu olabilir. [iPhone için](%{iphone_url})  ya da 
-            [Android için](%{android_url}) 
-            Google Kimlik Doğrulayıcı aşağıdaki QR Kod taranarak yapılandırılabilir. Diğer token'lar gizli anahtar **%{secret_key}**
-            girilerek yapılandırılabilir.
-        mfa_required: "Çoklu faktör yetkilendirme ayarlamanız gerekiyor."
-        otp_on_device: "Token'da gözüken doğrulama kodunu giriniz"
-        otp_sent_to_phone: "Doğrulama kodunuz cep telefonunuza yollandı. Lütfen gelen kodu giriniz."
-        send_to_sms: "%{phone_number} telefon numarasına metin mesajı yolla"
-      labels: 
-        carrier: Taşıyıcı
-        phone_number: "Telefon Numarası"
-        remember_me: "Bu bilgisayarı hatırla"
-        verification_code: "Doğrulama Kodu"
-      links: 
-        choose_number: "Varolan bir telefon numarası seçin"
-      page_title: "Çoklu Kimlik Doğrulama"
-      select: 
-        new_number: "yeni bir telefon"
-      titles: 
-        mfa: "Çoklu Kimlik Doğrulama"
-    password_confirmation_error: "İsteğin gönderilmesinde hata."
-    password_confirmation_sent: "Şifre onayı gönderildi. Gereksiz klasörünü kontrol etmeyi unutmayınız."
   pseudonyms: 
     confirm_change_password: 
       buttons: 
@@ -11846,7 +11779,6 @@ tr:
         new_discussion: "Yeni Tartışma"
         one_question_at_a_time: "Her seferinde bi soru göster"
         one_time_results: "Her Teşebbüsten Sonra Yalnızca Bir Kere"
-        only_visible_to_overrides_note: "Not: bu ısa sınav **yalnızca** aşağıda belirtilen kısım(lar)da görülebilir:"
         points_possible: "%{n} puan"
         post_to_sis: "Notları ÖBS'ye Gönder"
         quiz_title: "Kısa Sınav Başlığı"
@@ -12321,7 +12253,6 @@ tr:
     move_success: 
       one: "%{item}, %{destinationFolder}'ye taşındı"
       other: "%{count} öğe %{destinationFolder}'ye taşındı"
-    moving: Taşınıyor...
     name: İsim
     progress_error: "İndirmeye hazırlanırken bir hata oluştu, lütfen tekrar deneyin."
     progress_message: "İndirilmeye hazırlanıyor: %{percent}% complate"
@@ -12397,6 +12328,7 @@ tr:
   remove_f47dc62a: Kaldır
   remove_row_c198da5a: "Satırı sil"
   remove_row_f9d59cba: "Satırı Sil"
+  remove_these_dates_48453a81: "Bu Tarihleri Sil"
   rename_45608f54: "Yeniden adlandır"
   reply_from_name: "Canvas Bildirimleri aracılığı ile %{name}"
   reply_to_comment_72d96728: "Yoruma Cevap Yaz"
@@ -13000,6 +12932,11 @@ tr:
     canvas-user-nav: 
       navigation: 
         user_menu: "Kullanıcı Menüsü"
+    canvas_footer: 
+      ? "User Research"
+      : "Kullanıcı Araştırması"
+      by_instructure: "Instructure tarafından"
+      open_source_learning_management_system: "Açık Kaynak Kod ÖYS"
     components: 
       ic_submission-download-dialog: 
         click_to_download: "İndirmek için buraya tıklayın"
@@ -13189,21 +13126,6 @@ tr:
     locale_warning: 
       crowdsourced_warning_message: "Seçtiğiniz dil crowdsourcing yoluyla tercüme edildi. Eğitmen çeviriyi gözden geçirme veya çeviriyi doğrulama dahil dil ayarına dair hiçbir sorumluluğu kabul etmemiştir. Lütfen kendi sorumluluğunuzu üstleniniz."
       crowdsourced_warning_title: "Crowdsourced Dili"
-    login: 
-      back_to_login: "Oturum Aç'a dön"
-      browse_courses: "Kursları görüntüle"
-      buttons: 
-        request_password: "Şifremi Gönder"
-      coenrollment_banner: "*Canvas kullanıcısınının ebeveyni misiniz?* **Hesap oluşturmak için tıklayın**"
-      default_login_message: "Kurumunuzda giriş yapın "
-      dont_know_password: "Şifrenizi bilmiyor musunuz?"
-      labels: 
-        password: Şifre
-        remember_me: "Oturumunuz açık kalsın"
-      log_in: "Oturum Aç"
-      login_at_account: "%{school_name} olarak oturum aç"
-      login_handle: "%{login_handle_name}'nızı girerseniz şifrenizi değiştirebileceğiniz bağlantıyı size gönderelim."
-      register_for_canvas: "*Hesap Oluşturmak İçin* **Buraya Tıklayın, Ücretsizdir!**"
     menu_assignment: 
       labels: 
         due: bitiş
@@ -13478,7 +13400,6 @@ tr:
       grading_alt: notlandırılıyor
       submission_comment: "Gönderi Yorumu"
     terms_required: 
-      terms_have_changed: "*Kullanım şartları* değişti. Canvas'ı kullanmaya devam etmeden önce lütfen biraz zaman ayırıp bir inceleyin."
       updated_terms_of_use: "Kullanım Sözleşmesi Güncellendi"
     unauthorized: 
       headings: 
@@ -13494,8 +13415,6 @@ tr:
         unauthorized_action: Yetkilendirilmemiş
       unauthorized_1: "Bu sayfaya erişim izniniz yok görünüyor. Lütfen bu içeriği görmeye yetkiniz olduğuna emin olun."
       unauthorized_2: "Eğe bu sayfanın görüntülenmesini düşünüyorsanız, lütfen \"Yardım\" bağlantısını kullanarak problem hakkında bildirimde bulununuz."
-      unauthorized_action: "Bu sayfayı görebilmek için oturum açmalısınız."
-      unauthorized_user: "%{user_name}, bu sayfayı görebilmek için giriş yapmanız gerek. Şifreniz yoksa ya da unuttuysanız \"Şifremi Unuttum\" a tıklayın."
       unauthorized_user_is_other: "%{current_user}, Bu sayfayı görmeye yetkiniz yok.  Sizi buraya kadar getiren bağlantı **%{unauthorized_user} (%{unauthorized_user_email})** içindi.  Eğer bu sizseniz, bu sayfaya erişmek için oturumu kapatıp tekrar o eposta adresi ile giriş yapabilirsiniz."
     unauthorized_feed: 
       bad_params: "Erişmeye çalıştığınız besleme parametreleri geçersiz."
@@ -13695,6 +13614,7 @@ tr:
       user_search_label: "Kullanıcı Arama"
       users_matching_label: "Eşleşen Kullanıcılar"
   skipping_unknown_file_type_cd1086ee: "Bilinmeyen dosya türü atlanıyor"
+  skype_18850ba7: Skype
   slideshow: 
     titles: 
       back: Geri
@@ -13716,6 +13636,7 @@ tr:
       submitted: "*Gönderildi:* %{submittedAt}"
   spreadsheet_6d622119: "Elektronik Tablo"
   sr_gradebook: 
+    all_grading_periods: "Tüm Notlandırma Periyotları"
     all_sections: "Tüm Bölümler"
     assignment_muted: "Etkinleştirmek için tıklayın."
     assignment_order_alpha: Alfabetik
@@ -13991,6 +13912,7 @@ tr:
     files: Dosyalar
     grades: Notlar
     home: "Ana Sayfa"
+    logout: Çıkış
     modules: Modüller
     observees: İnceleme
     outcomes: Çıktılar
@@ -14064,12 +13986,14 @@ tr:
         unspecified: "olduğu her zaman"
       timespan: "%{start_at} *ile* %{end_at} arası"
   text_document_eacbcdb7: "Metin belgesi"
+  that_user_account_has_been_deleted_please_contact__350e0e0: "Bu kullanıcı hesabı silindi. Lütfen sistem yöneticisi ile kullanıcı hesabınızın tekrardan aktive edilmesi için iletişime geçiniz."
   the_app_was_activated_a84e055f: "Uygulama etkinleştirildi"
   the_app_was_added_58e2836a: "Uygulama eklendi"
   the_app_was_added_successfully_3f785a23: "Uygulama başarıyla eklendi"
   the_app_was_deactivated_573520ab: "Uygulama devre dışı bırakıldı"
   the_app_was_updated_successfully_3d71cd1b: "Uygulama başarıyla güncellendi"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "Dosyalar sekmesi, ders slaytlarını, örnek belgeleri, derse yardımcı malzemeleri -- öğrencilerinizin indirmek isteyeceği herşeyin paylaşıldığı yerdir. Canvas ile yükleme ve yüklenen dosyaları düzenleme kolaydır. Nasıl yapıldığını göstereceğiz."
+  the_institution_you_logged_in_from_is_not_configur_5ceac41: "Giriş yaptığınız kurum bu hesap için ayarlanmadı."
   the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "Sağ üstteki Canvas başlığındaki logo resmi. 200x200 svg veya png"
   the_material_is_in_the_public_domain_279c39a3: "Bu malzeme genel kullanıma açık"
   the_material_is_licensed_under_creative_commons_3242cb5e: "Bu malzeme Creative Commons a göre lisanslı"
@@ -14084,6 +14008,7 @@ tr:
     other: "Listede %{count} sonuç var"
   there_was_a_problem_deleting_the_grading_period_50ce07c5: "Notlandırma peryodunu silmede hata"
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: "Notlandırma şemasını silmede hata"
+  there_was_a_problem_logging_in_at_institution_5a298155: "%{institution} üzerinde oturum açmada hata meydana geldi"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "Notlandırma şemasını kaydetmede hata"
   there_was_an_error_in_processing_your_request_6513a49a: "İsteğin işlenmesinde hata ile karşılaşıldı"
   there_was_an_error_setting_usage_rights_53739e1d: "Kullanım haklarını ayarlamada hata oluştu"
@@ -14312,6 +14237,7 @@ tr:
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Ders gözlemcisi *%{name}* i bir öğrenciye bağlamak için aşağıda öğrencinin adını yazmaya başlayın ve Güncelle'ye tıklayın."
   to_minscore_43e5452e: "to %{minScore}%"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "Ödevleri görüntülemek için *Gündem* görünümünün etkin olduğundan emin olun."
+  too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "Çok fazla oturum açma denemesi meydana geldi. Lütfen daha sonra tekrar deneyiniz veya sistem yönetici ile iletişime geçiniz."
   too_many_members_b8b15069: "Çok fazla üye mevcut"
   tooltips: 
     finished: tamamlandı
@@ -14339,7 +14265,9 @@ tr:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "Turnitin'e Tekrar Gönder"
+  twitter_fcef6b54: Twitter
   unable_to_remove_app_4293cb53: "Uygulama kaldırılamıyor"
+  unauthorized: yetkilendirilmemiş
   unchanged_aca18e02: "[Değişmemiş]"
   ungraded_submissions_44efb0ec: "Değerlendirilmemiş Gönderiler"
   ungraded_survey_ad7de790: "Notlandırılmamış Kısa Sınav"
@@ -14385,8 +14313,8 @@ tr:
       terms: "Şarları kabul etmelisiniz"
       too_long: "%{max} karakteri aşamazsınız"
     registration: 
-      agree_to_terms_and_privacy_policy: "*Kullanım şartları* ve **gizlilik politikasını** Kabul Ediyorsunuz."
       agree_to_terms_with_code_of_conduct: "*Kullanım Koşulları* ve **davranış kurallarını** Kabul Ediyorsunuz."
+  user_avatars_e4fc4ed3: "Kullanıcı Avatarları"
   user_date_range_search: 
     cant_be_blank: "Canvas Kullanıcı Kodu boş bırakılamaz"
     cant_come_before_from: "'e kadar', 'den Başlayarak'tan önce gelemez"
@@ -14652,11 +14580,6 @@ tr:
           etkinlikleri yapanın aslında **siz** olduğu gerçeği kayıtlıdır.
       masquerade_as: "%{user_name} kullanıcısının yerine geç"
       page_title_header: "Kullanıcı Gibi Kullan"
-    merge: 
-      login_to_merge_different_account: "Birleştirmek istediğiniz hesap, %{current_user_name} (%{current_user_email}) farklı bir hesaptadır, lütfen yeni hesap için oturum açınız:"
-      merge_definition: "Bir şekilde, bir tane yerine iki tane oturum kimliğiniz olabilir. Bu durumda iki hesabı birleştirip bu hesapların bilgilerini bir yerde toplayabilirsiniz."
-      titles: 
-        merge_accounts: "Kullanıcı Hesaplarını Birleştir"
     merge_results: 
       action: Hareket
       emails: E-Postalar
@@ -14858,10 +14781,6 @@ tr:
       delete_wiki: Sil
       labels: 
         front_page: "Ön Sayfa"
-      page_locked: "Bu sayfa kilitlidir"
-      page_locked_by_modules: "Bu modülleri tamamladıktan sonra sayfayı görebileceksiniz:"
-      page_locked_by_modules_until: "Aşağıdaki modülleri tamamladıysanız bu sayfaya %{lock_info.unlock_at} tarihinde erişilebilecek:"
-      page_locked_until: "Bu sayfaya %{lock_info.unlock_at} tarihinde erişilebilecek"
       published_indicator: Yayınlandı
       toolbar_menu: 
         settings: Ayarlar
@@ -14981,6 +14900,7 @@ tr:
   would_you_like_to_enable_this_app_ccdf735d: "Bu uygulamayı etkinleştirmek ister misiniz?"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Öğrenciler derse devam etsinler mi yoksa yeni gereksinimler tamamlanana kadar bu modülleri yeniden kilitlemek mi istersiniz?"
   xml_configuration_5ea1b942: "XML Ayarları"
+  yo_e4ee15a4: Yo
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "%{institution1} 'a %{institution2} daki bilgilerinizi kullanarak giriş yaptınız"
   you_are_the_group_leader_for_this_group_b8629b70: "bu grubun liderisiniz"
   you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: "Aç ya da Kapat ı seçerek ders ödevlerini gizleyip gösterebilirsiniz."
@@ -14999,7 +14919,6 @@ tr:
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Ödev listeniz şimdi *Takvim* sayfasında bulunabilir."
   your_assignments_list_has_improved_3eded80e: "*Ödevler* listeniz iyileştirildi!"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: "Ödevleriniz teslim tarhilerine göre burada listelenecek."
-  your_browser_does_not_meet_the_minimum_requirement_7a7022db: "Tarayıcınız henüz Canvas'ın gerekli gördüğü minimum gereksinimleri karşılamıyor. Lütfen destekli tarayıcıların tam listesine ulaşmak için *Canvas Rehberini* ziyaret ediniz."
   your_content_has_been_exported_bbb57764: "İçeriğiniz dışarı aktarıldı."
   your_message_has_been_sent_thank_you_e0284316: "Mesajınız başarıyla gönderildi. Teşekkürler!"
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Profil resminiz yüklenemedi. Doys yükleme limitinizi aşmış olabilirsiniz."
