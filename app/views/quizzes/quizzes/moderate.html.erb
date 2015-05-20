@@ -161,7 +161,7 @@
       <div class="field extra_time">
         <label for="extra_time">
           <%= t('extra_time_on_every_attempt', 'Extra time on every attempt:') %>
-          <em class="note"><%= t(:global_extra_attempt_time, "everyone already gets %{count} minute", :count => @quiz.time_limit) %></em>
+          <em class="note"><%= t(:global_extra_attempt_time, "everyone already gets %{count} minutes", :count => @quiz.time_limit) %></em>
         </label>
         <span class="input">
           <input id="extension_extra_time" type="text" name="extra_time" title="<%= t('titles.extra_quiz_minutes', "additional minutes on each attempt") %>"/>

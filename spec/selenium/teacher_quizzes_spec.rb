@@ -244,29 +244,50 @@ describe "quizzes" do
       expect(pick_count_field).to have_attribute(:value, "999")
     end
 
-    it "should moderate quiz" do
-      student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
-      @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
-      @context = @course
-      q = quiz_model
-      q.time_limit = 20
-      q.generate_quiz_data
-      q.save!
+    describe "moderation" do
 
-      get "/courses/#{@course.id}/quizzes/#{q.id}/moderate"
-      f('.moderate_student_link').click
+      before do
+        student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
+        @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
+        @context = @course
+        @quiz = quiz_model
+        @quiz.time_limit = 20
+        @quiz.generate_quiz_data
+        @quiz.save!
+      end
 
-      # validates data
-      f('#extension_extra_attempts').send_keys('asdf')
-      submit_form('#moderate_student_form')
-      expect(f('.attempts_left').text).to eq '1'
+      it "should moderate quiz" do
+        get "/courses/#{@course.id}/quizzes/#{@quiz.id}/moderate"
+        f('.moderate_student_link').click
 
-      # valid values
-      f('#extension_extra_attempts').clear()
-      f('#extension_extra_attempts').send_keys('2')
-      submit_form('#moderate_student_form')
-      wait_for_ajax_requests
-      expect(f('.attempts_left').text).to eq '3'
+        # validates data
+        f('#extension_extra_attempts').send_keys('asdf')
+        submit_form('#moderate_student_form')
+        expect(f('.attempts_left').text).to eq '1'
+
+        # valid values
+        f('#extension_extra_attempts').clear()
+        f('#extension_extra_attempts').send_keys('2')
+        submit_form('#moderate_student_form')
+        wait_for_ajax_requests
+        expect(f('.attempts_left').text).to eq '3'
+      end
+
+      it "should preserve extra time values" do
+        get "/courses/#{@course.id}/quizzes/#{@quiz.id}/moderate"
+        f('.moderate_student_link').click
+
+        # initial data entry
+        f('#extension_extra_time').send_keys('13')
+        submit_form('#moderate_student_form')
+        wait_for_ajax_requests
+
+        # preserve values between moderation invocations
+        expect(f('.extra_time_allowed').text).to eq 'gets 13 extra minutes on each attempt'
+        f('.moderate_student_link').click
+        expect(f('#extension_extra_time').attribute('value')).to eq '13'
+      end
+
     end
 
     it "should indicate when it was last saved" do

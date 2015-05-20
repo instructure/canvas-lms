@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 define([
   'i18n!quizzes.moderate',
   'jquery' /* $ */,
@@ -229,7 +230,7 @@ define([
       var data = {
         manually_unlocked: $student.hasClass('manually_unlocked') ? '1' : '0',
         extra_attempts: parseInt($student.find(".extra_attempts").text(), 10) || "",
-        extra_time: parseInt($student.find(".extra_time").text(), 10) || ""
+        extra_time: parseInt($student.find(".extra_time_allowed").text().replace(/[^\d]/g, ''), 10) || ""
       };
       var name = $student.find(".student_name").text();
       $("#moderate_student_form").fillFormData(data);
