@@ -491,26 +491,19 @@ class ContextModule < ActiveRecord::Base
 
   def update_for(user, action, tag, points=nil)
     retry_count = 0
-    begin
-      return nil unless self.context.users.include?(user)
-      return nil unless ContextModuleProgression.prerequisites_satisfied?(user, self)
-      return nil unless progression = self.find_or_create_progression(user)
+    return nil unless self.context.users.include?(user)
+    return nil unless ContextModuleProgression.prerequisites_satisfied?(user, self)
+    return nil unless progression = self.find_or_create_progression(user)
 
-      progression.requirements_met ||= []
-      if progression.update_requirement_met(action, tag, points)
-        # not sure if this save is necessary
-        # leaving it for now as it saves the default requirements_met (set above)
-        progression.save!
-        progression.send_later_if_production(:evaluate)
-      end
-
-      progression
-
-    rescue ActiveRecord::StaleObjectError
-      raise if retry_count > 10
-      retry_count += 1
-      retry
+    progression.requirements_met ||= []
+    if progression.update_requirement_met(action, tag, points)
+      # not sure if this save is necessary
+      # leaving it for now as it saves the default requirements_met (set above)
+      progression.save!
+      progression.send_later_if_production(:evaluate!)
     end
+
+    progression
   end
 
   def completion_requirement_for(action, tag)
