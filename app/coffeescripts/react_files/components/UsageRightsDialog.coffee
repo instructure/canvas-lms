@@ -91,7 +91,7 @@ define [
         I18n.t("%{items} items selected", {items: @props.itemsToManage.length})
       else @props.itemsToManage[0]?.displayName()
 
-      span {className: 'UsageRightsDialog__fileName'},
+      span {ref: "fileName" ,className: 'UsageRightsDialog__fileName'},
         textToShow
 
     renderFolderMessage: ->
@@ -104,7 +104,7 @@ define [
           div {},
             span {},
               I18n.t("Usage rights will be set for all of the files contained in:")
-            ul {className: 'UsageRightsDialog__folderBulletList'},
+            ul {ref: "folderBulletList", className: 'UsageRightsDialog__folderBulletList'},
               foldersToShow.map (item) ->
                 li {},
                   item?.displayName()
@@ -115,6 +115,7 @@ define [
           span {
             className: 'UsageRightsDialog__andMore'
             tabIndex: '0'
+            ref: 'folderTooltip'
             title: renderedNames
             'data-tooltip': 'right'
             'data-tooltip-class': 'UsageRightsDialog__tooltip'
@@ -123,12 +124,12 @@ define [
             span {className: 'screenreader-only'},
               ul {},
                 displayNames.map (item) ->
-                  li {},
+                  li {ref: 'displayNameTooltip-screenreader'},
                     item
         hr {}
 
     renderDifferentRightsMessage: ->
-      span {className: 'UsageRightsDialog__differentRightsMessage alert'},
+      span {ref: 'differentRightsMessage', className: 'UsageRightsDialog__differentRightsMessage alert'},
         i {className: 'icon-warning UsageRightsDialog__warning'}
         I18n.t('Items selected have different usage rights.')
 
@@ -169,6 +170,7 @@ define [
             },
               I18n.t('Cancel')
             button {
+              ref: "saveButton"
               type: 'button'
               onClick: @submit
               className: 'btn btn-primary'
