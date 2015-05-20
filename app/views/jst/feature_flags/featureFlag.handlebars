@@ -20,26 +20,30 @@
 
   <div class="span5 text-right">
     {{#if threeState}}
-      <div id="ff_{{id}}" class="ui-buttonset">
-        <input type="radio" id="ff_off_{{id}}" name="ff_{{id}}" class="ff_button" {{#if isOff}}checked{{/if}} {{#if disableOff}}disabled{{/if}} data-id="{{id}}" data-action="off">
-        <label for="ff_off_{{id}}" class="ui-button ui-widget ui-button-text-only" role="button" aria-disabled="{{disableOff}}">
-            {{#t "off"}}Off{{/t}}
-        </label>
-
-        <input type="radio" id="ff_allowed_{{id}}" name="ff_{{id}}" class="ff_button" {{#if isAllowed}}checked{{/if}} {{#if disableAllow}}disabled{{/if}} data-id="{{id}}" data-action="allowed">
-        <label for="ff_allowed_{{id}}" class="ui-button ui-widget ui-button-text-only" role="button" aria-disabled="{{disableAllow}}">
-          {{#t "allow"}}Allow{{/t}}
-        </label>
-
-        {{#unless isSiteAdmin}}
-          <input type="radio" id="ff_on_{{id}}" name="ff_{{id}}" class="ff_button" {{#if isOn}}checked{{/if}} {{#if disableOn}}disabled{{/if}} data-id="{{id}}" data-action="on">
-          <label for="ff_on_{{id}}" class="ui-button ui-widget ui-button-text-only" role="button" aria-disabled="{{disableOn}}">
-            {{#t "on"}}On{{/t}}
+      <div id="ff_{{id}}" class="ui-buttonset ui-buttonset--feature-settings">
+        <div class="ff-background ff-left {{#if disableOff}}ff-disabled{{/if}}">
+          <input type="radio" id="ff_off_{{id}}" name="ff_{{id}}" class="ff_button" {{#if isOff}}checked{{/if}} {{#if disableOff}}disabled{{/if}} data-id="{{id}}" data-action="off">
+          <label for="ff_off_{{id}}" role="button" aria-disabled="{{disableOff}}">
+              {{#t "off"}}Off{{/t}}
           </label>
+        </div>
+        <div class="ff-background {{#if disableAllow}}ff-disabled{{/if}} {{#if isSiteAdmin}}ff-right{{/if}}">
+          <input type="radio" id="ff_allowed_{{id}}" name="ff_{{id}}" class="ff_button" {{#if isAllowed}}checked{{/if}} {{#if disableAllow}}disabled{{/if}} data-id="{{id}}" data-action="allowed">
+          <label for="ff_allowed_{{id}}" role="button" aria-disabled="{{disableAllow}}">
+            {{#t "allow"}}Allow{{/t}}
+          </label>
+        </div>
+        {{#unless isSiteAdmin}}
+          <div class="ff-background ff-right {{#if disableOn}}ff-disabled{{/if}}">
+            <input type="radio" id="ff_on_{{id}}" name="ff_{{id}}" class="ff_button" {{#if isOn}}checked{{/if}} {{#if disableOn}}disabled{{/if}} data-id="{{id}}" data-action="on">
+            <label for="ff_on_{{id}}" role="button" aria-disabled="{{disableOn}}">
+              {{#t "on"}}On{{/t}}
+            </label>
+           </div>
         {{/unless}}
       </div>
     {{else}}
-      <div class="ic-Toggle">
+      <div class="ic-Toggle ic-Toggle--feature-settings">
         <input id="ff_toggle_{{id}}" class="ff_toggle" type="checkbox" {{#if isOn}}checked{{/if}} {{#if disableToggle}}disabled{{/if}} data-id="{{id}}">
         <label for="ff_toggle_{{id}}">
           <div class="ic-Toggle__label-text"><span class="screenreader-only">{{#t}}Enable feature: {{title}}{{/t}}</span></div>

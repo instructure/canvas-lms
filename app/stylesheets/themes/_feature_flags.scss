@@ -1,5 +1,6 @@
 @import 'base/environment';
 @import 'vendor/bootstrap/button-groups';
+@import 'components/_ic-toggle.scss';
 
 $border-dark:  #c1c7cf;
 $border-light: #e1e3e4;
@@ -81,4 +82,86 @@ $left-offset:  16px;
   bottom: 0;
   position: absolute;
   right: 0;
+}
+
+$switch-background: lighten($ic-color-dark, 15%);
+$switch-background-disabled: lighten($switch-background, 40%);
+$switch-text: rgba($ic-color-light, 0.6);
+
+.ic-Toggle--feature-settings {
+  @include ic-Toggle-appearance (
+          115px, // Toggle width
+          35px,  // Toggle height
+          35px,  // Toggle border radius
+          3px,   // Offset (distance btw switch and box)
+          14px,  // Label font size
+          12px,  // Switch font size
+          0px 2px 6px rgba(black, 0.4), // Switch shadow on hover/focus
+          1px // Bottom padding on main element to make sure switch shadow always shows
+  );
+  @include ic-Toggle-branding (
+          $switch-background,
+          $switch-background,
+          $switch-text
+  );
+}
+
+.ff-background {
+  display: inline-block;
+  background-color: $switch-background;
+  margin: 0px -2px;
+  &.ff-disabled {
+    background-color: $switch-background-disabled;
+  }
+  &.ff-left {
+    border-radius: 20px 0 0 20px;
+  }
+  &.ff-right{
+    border-radius: 0 20px 20px 0;
+  }
+}
+
+.ui-buttonset--feature-settings {
+  .ui-button {
+    background-color: $switch-background;
+    color: $switch-text;
+    border-color: $switch-background;
+    border-width: 3px;
+    margin: 0px;
+    text-transform: uppercase;
+    font-size: 12px;
+    border-radius: 20px;
+    height: 15px;
+    line-height: 15px;
+    font-weight: 500;
+    &.ui-corner-left {
+      border-radius: 20px;
+    }
+    &.ui-corner-right {
+      border-radius: 20px;
+    }
+    &.ui-state-active {
+      background-color: $ic-color-light;
+      color: $switch-background;
+      border-color: $switch-background;
+    }
+    &.ui-state-disabled {
+      opacity: 1;
+      background-color: $switch-background-disabled;
+      border-color: $switch-background-disabled;
+      &.ui-state-active {
+        background-color: $ic-color-light;
+        color: $switch-background-disabled;
+      }
+    }
+    &.ui-state-hover {
+      border-color: $switch-background;
+      color: white;
+      background-color: $switch-background;
+      &.ui-state-active {
+        background-color: $ic-color-light;
+        color: $ic-color-dark;
+      }
+    }
+  }
 }
