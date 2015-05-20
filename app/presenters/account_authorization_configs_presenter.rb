@@ -6,7 +6,7 @@ class AccountAuthorizationConfigsPresenter
   end
 
   def configs
-    account.account_authorization_configs.to_a
+    @configs ||= account.account_authorization_configs.to_a
   end
 
   def new_auth_types

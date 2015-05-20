@@ -25,6 +25,13 @@ describe AccountAuthorizationConfigsPresenter do
       presenter = described_class.new(account)
       expect(presenter.configs.class).to eq(Array)
     end
+
+    it "only pulls from the db connection one time" do
+      account = stub()
+      account.expects(:account_authorization_configs).times(1).returns([])
+      presenter = described_class.new(account)
+      5.times{ presenter.configs }
+    end
   end
 
   describe "SAML view helpers" do
