@@ -645,8 +645,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     if self.quiz && self.user
       if self.score
         self.quiz.context_module_action(self.user, :scored, self.kept_score)
-      end
-      if self.finished_at
+      elsif self.finished_at
         self.quiz.context_module_action(self.user, :submitted)
       end
     end
