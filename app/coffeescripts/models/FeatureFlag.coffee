@@ -79,7 +79,7 @@ define ['jquery', 'underscore', 'Backbone'], ($, _, Backbone) ->
 
     toJSON: ->
       _.extend(super, isAllowed: @isAllowed(), isHidden: @isHidden(),
-        isOff: @isOff(), isOn: @isOn(), isSiteAdmin: @isSiteAdmin(),
+        isOff: @isOff(), isOn: @isOn(), isSiteAdmin: @isSiteAdmin() && !@isOn() && !@isLocked(),
         currentContextIsAccount: @isContext('account'),
         threeState: @currentContextIsAccount() && !@transitionLocked('allowed'),
         disableOn: @isLocked() || @isSiteAdmin() || @transitionLocked('on'),
