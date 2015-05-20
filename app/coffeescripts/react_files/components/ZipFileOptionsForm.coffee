@@ -37,7 +37,7 @@ define [
         title: I18n.t('zip_options', 'Zip file options'),
         onRequestClose: @props.onClose,
           ModalContent {},
-            p {}, @buildMessage()
+            p {className: "modalMessage"}, @buildMessage()
           ModalButtons {},
             button
               className: 'btn'
