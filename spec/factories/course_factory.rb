@@ -18,20 +18,10 @@
 
 def course_model(opts={})
   allow_reusable = opts.delete :reusable
-  # if !@course && ReusableCourse.reusable_course && allow_reusable && opts.empty?
-    # @course = ReusableCourse.reusable_course 
-  # else
-    @course = factory_with_protected_attributes(Course, course_valid_attributes.merge(opts))
-    # ReusableCourse.reusable_course ||= @course
-  # end
-  # if @course == ReusableCourse.reusable_course && ReusableCourse.reusable_teacher && allow_reusable
-    # @teacher = ReusableCourse.reusable_teacher
-  # else
-    @teacher = user_model
-    e = @course.enroll_teacher(@teacher)
-    e.accept
-    # ReusableCourse.reusable_teacher ||= @teacher
-  # end
+  @course = factory_with_protected_attributes(Course, course_valid_attributes.merge(opts))
+  @teacher = user_model
+  e = @course.enroll_teacher(@teacher)
+  e.accept
   @user = @teacher
   @course
 end
