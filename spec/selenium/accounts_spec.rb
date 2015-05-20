@@ -115,13 +115,15 @@ describe "account" do
       it "should be able to set unknown user url option" do
         get "/accounts/#{Account.default.id}/account_authorization_configs"
         click_option('#add_auth_select', 'cas', :value)
-        expect(f("#account_authorization_config_unknown_user_url")).to be_displayed
 
-        unknown_user_url = 'https://example.com/unknown_user'
-        f("#account_authorization_config_unknown_user_url").send_keys(unknown_user_url)
         expect_new_page_load { submit_form('#cas_form form') }
 
-        expect(Account.default.account_authorization_configs.first.unknown_user_url).to eq unknown_user_url
+        unknown_user_url = 'https://example.com/unknown_user'
+        f("#sso_settings_unknown_user_url").send_keys(unknown_user_url)
+
+        expect_new_page_load { submit_form('#sso_settings_form') }
+
+        expect(Account.default.unknown_user_url).to eq unknown_user_url
       end
     end
 
@@ -130,15 +132,16 @@ describe "account" do
         get "/accounts/#{Account.default.id}/account_authorization_configs"
         click_option('#add_auth_select', 'saml', :value)
 
-        saml_div = f('#saml_form')
         expect(f("#account_authorization_config_idp_entity_id")).to be_displayed
 
-        unknown_user_url = 'https://example.com/unknown_user'
-        saml_div.find_element(:css, "#saml_form #account_authorization_config_unknown_user_url").
-          send_keys(unknown_user_url)
         expect_new_page_load { submit_form('#saml_form form') }
 
-        expect(Account.default.account_authorization_configs.first.unknown_user_url).to eq unknown_user_url
+        unknown_user_url = 'https://example.com/unknown_user'
+        f("#sso_settings_unknown_user_url").send_keys(unknown_user_url)
+
+        expect_new_page_load { submit_form('#sso_settings_form') }
+
+        expect(Account.default.unknown_user_url).to eq unknown_user_url
       end
     end
 

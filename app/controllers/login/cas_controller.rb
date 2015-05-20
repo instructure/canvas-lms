@@ -39,7 +39,7 @@ class Login::CasController < ApplicationController
   def create
     reset_session_for_login
 
-    logger.info "Attempting CAS login with ticket #{params[:ticket]} in @domain_root_ #{@domain_root_account.id}"
+    logger.info "Attempting CAS login with ticket #{params[:ticket]} in account #{@domain_root_account.id}"
     st = CASClient::ServiceTicket.new(params[:ticket], cas_login_url)
     begin
       default_timeout = Setting.get('cas_timelimit', 5.seconds.to_s).to_f
@@ -67,7 +67,7 @@ class Login::CasController < ApplicationController
 
         successful_login(pseudonym.user, pseudonym)
       else
-        unknown_user_url = aac.unknown_user_url.presence || login_url
+        unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
         logger.warn "Received CAS login for unknown user: #{st.user}, redirecting to: #{unknown_user_url}."
         flash[:delegated_message] = t "Canvas doesn't have an account for user: %{user}", :user => st.user
         redirect_to unknown_user_url

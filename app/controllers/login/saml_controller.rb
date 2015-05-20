@@ -132,7 +132,7 @@ class Login::SamlController < ApplicationController
 
           successful_login(user, pseudonym)
         else
-          unknown_user_url = aac.unknown_user_url.presence || login_url
+          unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
           increment_saml_stat("errors.unknown_user")
           message = "Received SAML login request for unknown user: #{unique_id} redirecting to: #{unknown_user_url}."
           logger.warn message

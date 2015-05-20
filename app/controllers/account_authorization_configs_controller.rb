@@ -108,7 +108,7 @@
 #           "type": "string"
 #         },
 #         "unknown_user_url": {
-#           "description": "Valid for SAML and CAS authorization.",
+#           "description": "_Deprecated_[2015-05-08: This is moving to an account setting] Valid for SAML and CAS authorization.",
 #           "example": "https://canvas.instructure.com/login",
 #           "type": "string"
 #         }
@@ -145,6 +145,11 @@
 #        "auth_discovery_url": {
 #           "description": "If a discovery url is set, canvas will forward all users to that URL when they need to be authenticated. That page will need to then help the user figure out where they need to go to log in. If no discovery url is configured, the first configuration will be used to attempt to authenticate the user.",
 #           "example": "https://example.com/which_account",
+#           "type": "string"
+#        },
+#        "unknown_user_url": {
+#           "description": "If an unknown user url is set, Canvas will forward to that url when a service authenticates a user, but that user does not exist in Canvas. The default behavior is to present an error.",
+#           "example": "https://example.com/register_for_canvas",
 #           "type": "string"
 #        }
 #       }
@@ -187,6 +192,9 @@ class AccountAuthorizationConfigsController < ApplicationController
   # optional 'login_handle_name' parameter. This parameter specifies the
   # label used for unique login identifiers; for example: 'Login',
   # 'Username', 'Student ID', etc. The default is 'Email'.
+  # _Deprecated_[2015-05-20] Any service specification besides LDAP may include
+  # an optional 'unknown_user_url' parameters. This parameters specifies a url
+  # to redirect to when a user is authorized but is not found in Canvas.
   # _Deprecated_ [Use update_sso_settings instead]
   #
   # You can set the 'position' for any configuration. The config in the 1st position
@@ -203,7 +211,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   An alternate SSO URL for logging into CAS. You probably should not set
   #   this.
   #
-  # - unknown_user_url [Optional]
+  # - unknown_user_url [Optional] _Deprecated_ [2015-05-20: use update_sso_settings instead]
   #
   #   A url to redirect to when a user is authorized through CAS but is not
   #   found in Canvas.
@@ -217,11 +225,6 @@ class AccountAuthorizationConfigsController < ApplicationController
   # - app_secret [Required]
   #
   #   The Facebook App Secret. Not available if configured globally for Canvas.
-  #
-  # - unknown_user_url [Optional]
-  #
-  #   A url to redirect to when a user is authorized through Facebook but is
-  #   not found in Canvas.
   #
   # For GitHub, the additional recognized parameters are:
   #
@@ -240,11 +243,6 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   #   The GitHub application's Client Secret. Not available if configured
   #   globally for Canvas.
-  #
-  # - unknown_user_url [Optional]
-  #
-  #   A url to redirect to when a user is authorized through GitHub but is
-  #   not found in Canvas.
   #
   # For LDAP authentication services, the additional recognized parameters are:
   #
@@ -301,11 +299,6 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   The LinkedIn application's Client Secret. Not available if configured
   #   globally for Canvas.
   #
-  # - unknown_user_url [Optional]
-  #
-  #   A url to redirect to when a user is authorized through GitHub but is
-  #   not found in Canvas.
-  #
   # For SAML authentication services, the additional recognized parameters are:
   #
   # - idp_entity_id
@@ -329,7 +322,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   #   Forgot Password URL. Leave blank for default Canvas behavior.
   #
-  # - unknown_user_url [Optional]
+  # - unknown_user_url [Optional] _Deprecated_ [2015-05-20: use update_sso_settings instead]
   #
   #   A url to redirect to when a user is authorized through SAML but is not
   #   found in Canvas.
@@ -360,11 +353,6 @@ class AccountAuthorizationConfigsController < ApplicationController
   # - consumer_secret [Required]
   #
   #   The Twitter Consumer Secret. Not available if configured globally for Canvas.
-  #
-  # - unknown_user_url [Optional]
-  #
-  #   A url to redirect to when a user is authorized through Facebook but is
-  #   not found in Canvas.
   #
   # - account_authorization_config[n] (deprecated)
   #   The nth service specification as described above. For instance, the
@@ -660,6 +648,17 @@ class AccountAuthorizationConfigsController < ApplicationController
   end
 
 
+  def sso_settings_json(account)
+    {
+      sso_settings: {
+        login_handle_name: account.login_handle_name,
+        change_password_url: account.change_password_url,
+        auth_discovery_url: account.auth_discovery_url,
+        unknown_user_url: account.unknown_user_url,
+      }
+    }
+  end
+
   # @API show account auth settings
   #
   # The way to get the current state of each account level setting
@@ -676,13 +675,7 @@ class AccountAuthorizationConfigsController < ApplicationController
     respond_to do |format|
       format.html { redirect_to(account_account_authorization_configs_path(@account)) }
       format.json do
-        render json: {
-          sso_settings: {
-            login_handle_name: @account.login_handle_name,
-            change_password_url: @account.change_password_url,
-            auth_discovery_url: @account.auth_discovery_url
-          }
-        }
+        render json: sso_settings_json(@account)
       end
     end
   end
@@ -693,10 +686,10 @@ class AccountAuthorizationConfigsController < ApplicationController
   # configuration at the account level to handle the particulars of your
   # setup.
   #
-  # This endpoint accepts a PUT request to set 3 possible account settings.
-  # All 3 are optional on each request, any that are not provided at all
-  # are simply retained as is.  Any that provide the key but a null-ish value
-  # (blank string, null, undefined) will be UN-set.
+  # This endpoint accepts a PUT request to set several possible account
+  # settings. All setting are optional on each request, any that are not
+  # provided at all are simply retained as is.  Any that provide the key but
+  # a null-ish value (blank string, null, undefined) will be UN-set.
   #
   # You can list the current state of each setting with "show_sso_settings"
   #
@@ -711,19 +704,14 @@ class AccountAuthorizationConfigsController < ApplicationController
   def update_sso_settings
     sets = strong_params.require(:sso_settings).permit(:login_handle_name,
                                                        :change_password_url,
-                                                       :auth_discovery_url)
+                                                       :auth_discovery_url,
+                                                       :unknown_user_url)
     update_account_settings_from_hash(sets)
 
     respond_to do |format|
       format.html { redirect_to(account_account_authorization_configs_path(@account)) }
       format.json do
-        render json: {
-          sso_settings: {
-            login_handle_name: @account.login_handle_name,
-            change_password_url: @account.change_password_url,
-            auth_discovery_url: @account.auth_discovery_url
-          }
-        }
+        render json: sso_settings_json(@account)
       end
     end
   end

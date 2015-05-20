@@ -23,6 +23,10 @@ class AccountAuthorizationConfigsPresenter
       configs.any?{|c| !c.is_a?(AccountAuthorizationConfig::LDAP) }
   end
 
+  def needs_unknown_user_url?
+    configs.any? { |c| c.is_a?(AccountAuthorizationConfig::Delegated) }
+  end
+
   def login_url_options(aac)
     options = { controller: "login/#{aac.auth_type}", action: :new }
     if !aac.is_a?(AccountAuthorizationConfig::LDAP) &&

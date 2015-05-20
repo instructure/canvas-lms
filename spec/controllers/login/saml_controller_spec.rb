@@ -91,9 +91,8 @@ describe Login::SamlController do
     expect(flash[:delegated_message]).to_not be_nil
     expect(session[:saml_unique_id]).to be_nil
 
-    aac = account.account_authorization_configs.first
-    aac.unknown_user_url = ''
-    aac.save!
+    account.unknown_user_url = ''
+    account.save!
     controller.instance_variable_set(:@aac, nil)
     post :create, :SAMLResponse => "foo"
     expect(response).to redirect_to(login_url)
@@ -102,8 +101,8 @@ describe Login::SamlController do
 
     # Redirect to a specifiec url
     unknown_user_url = "https://example.com/unknown_user"
-    aac.unknown_user_url = unknown_user_url
-    aac.save!
+    account.unknown_user_url = unknown_user_url
+    account.save!
     controller.instance_variable_set(:@aac, nil)
     post :create, :SAMLResponse => "foo"
     expect(response).to redirect_to(unknown_user_url)

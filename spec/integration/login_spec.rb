@@ -109,9 +109,8 @@ describe 'login' do
 
     it "should redirect to a custom url if the user CAS account doesn't exist" do
       redirect_url = 'http://google.com/'
-      aac = Account.default.account_authorization_config
-      aac.unknown_user_url = redirect_url
-      aac.save
+      Account.default.unknown_user_url = redirect_url
+      Account.default.save!
 
       stubby("yes\nnonexistentuser\n")
 

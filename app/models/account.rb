@@ -164,6 +164,7 @@ class Account < ActiveRecord::Base
   add_setting :prevent_course_renaming_by_teachers, :boolean => true, :root_only => true
   add_setting :login_handle_name, root_only: true
   add_setting :change_password_url, root_only: true
+  add_setting :unknown_user_url, root_only: true
 
   add_setting :restrict_student_future_view, :boolean => true, :default => false, :inheritable => true
   add_setting :restrict_student_past_view, :boolean => true, :default => false, :inheritable => true
@@ -1001,6 +1002,14 @@ class Account < ActiveRecord::Base
 
   def change_password_url
     self.settings[:change_password_url]
+  end
+
+  def unknown_user_url=(unknown_user_url)
+    self.settings[:unknown_user_url] = unknown_user_url
+  end
+
+  def unknown_user_url
+    self.settings[:unknown_user_url]
   end
 
   def validate_auth_discovery_url

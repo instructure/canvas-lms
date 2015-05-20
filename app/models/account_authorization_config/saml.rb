@@ -35,11 +35,11 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
   def self.recognized_params
     [ :auth_type, :log_in_url, :log_out_url, :requested_authn_context,
       :certificate_fingerprint, :identifier_format,
-      :login_attribute, :idp_entity_id, :position, :unknown_user_url ]
+      :login_attribute, :idp_entity_id, :position ]
   end
 
   def self.deprecated_params
-    [:change_password_url, :login_handle_name]
+    [:change_password_url, :login_handle_name, :unknown_user_url]
   end
 
   before_validation :set_saml_defaults

@@ -25,7 +25,11 @@ class AccountAuthorizationConfig::CAS < AccountAuthorizationConfig::Delegated
   end
 
   def self.recognized_params
-    [ :auth_type, :auth_base, :log_in_url, :unknown_user_url, :position ]
+    [ :auth_type, :auth_base, :log_in_url, :position ]
+  end
+
+  def self.deprecated_params
+    [:unknown_user_url]
   end
 
   def client

@@ -68,7 +68,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     :log_in_url, :log_out_url, :identifier_format,
     :certificate_fingerprint, :entity_id,
     :ldap_filter, :auth_filter, :requested_authn_context,
-    :login_attribute, :idp_entity_id, :unknown_user_url,
+    :login_attribute, :idp_entity_id,
     :app_id, :app_secret,
     :client_id, :client_secret, :domain,
     :consumer_key, :consumer_secret
