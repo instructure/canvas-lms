@@ -17,45 +17,17 @@
 #
 
 class AccountAuthorizationConfig::Google < AccountAuthorizationConfig::OpenIDConnect
-  def self.singleton?
-    true
-  end
-
-  def self.recognized_params
-    if globally_configured?
-      [].freeze
-    else
-      [ :client_id, :client_secret ].freeze
-    end
-  end
-
-  def self.globally_configured?
-    Canvas::Plugin.find(:google_drive).enabled?
-  end
-
-  def client_id
-    self.class.globally_configured? ? settings[:client_id] : super
-  end
-
-  def client_secret
-    if self.class.globally_configured?
-      settings[:client_secret_dec]
-    else
-      super
-    end
-  end
+  include AccountAuthorizationConfig::PluginSettings
+  self.plugin = :google_drive
+  plugin_settings :client_id, client_secret: :client_secret_dec
 
   protected
 
-  def settings
-    Canvas::Plugin.find(:google_drive).settings
+  def authorize_url
+    'https://accounts.google.com/o/oauth2/auth'.freeze
   end
 
-  def client_options
-    {
-      site: 'https://accounts.google.com'.freeze,
-      authorize_url: '/o/oauth2/auth'.freeze,
-      token_url: '/o/oauth2/token'.freeze
-    }
+  def token_url
+    'https://accounts.google.com/o/oauth2/token'.freeze
   end
 end

@@ -55,7 +55,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   end
 
   def self.sti_name
-    display_name.underscore
+    display_name.try(:underscore)
   end
 
   def self.singleton?
@@ -67,7 +67,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   end
 
   def self.display_name
-    name.demodulize
+    name.try(:demodulize)
   end
 
   belongs_to :account

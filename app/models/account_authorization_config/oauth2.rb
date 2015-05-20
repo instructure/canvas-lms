@@ -26,7 +26,6 @@ class AccountAuthorizationConfig::Oauth2 < AccountAuthorizationConfig::Delegated
   alias_method :client_secret=, :auth_password=
   alias_method :client_secret, :auth_decrypted_password
   { client_id: :entity_id,
-    site: :auth_host,
     authorize_url: :log_in_url,
     token_url: :auth_base }.each do |(new_name, old_name)|
     class_eval <<-RUBY, __FILE__, __LINE__ + 1
@@ -56,7 +55,6 @@ class AccountAuthorizationConfig::Oauth2 < AccountAuthorizationConfig::Delegated
 
   def client_options
     {
-      site: site,
       authorize_url: authorize_url,
       token_url: token_url
     }

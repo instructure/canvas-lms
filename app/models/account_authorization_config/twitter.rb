@@ -17,46 +17,15 @@
 #
 
 class AccountAuthorizationConfig::Twitter < AccountAuthorizationConfig::Oauth
-  def self.singleton?
-    true
-  end
-
-  def self.recognized_params
-    if globally_configured?
-      [].freeze
-    else
-      [ :consumer_key, :consumer_secret ].freeze
-    end
-  end
-
-  SENSITIVE_PARAMS = [ :consumer_secret ].freeze
-
-  def self.globally_configured?
-    Canvas::Plugin.find(:twitter).enabled?
-  end
-
-  # Rename db field
-  def consumer_key
-    self.class.globally_configured? ? settings[:consumer_key] : super
-  end
-
-  def consumer_secret
-    if self.class.globally_configured?
-      settings[:consumer_secret_dec]
-    else
-      super
-    end
-  end
+  include AccountAuthorizationConfig::PluginSettings
+  self.plugin = :twitter
+  plugin_settings :consumer_key, consumer_secret: :consumer_secret_dec
 
   def unique_id(token)
     token.params[:user_id]
   end
 
   protected
-
-  def settings
-    Canvas::Plugin.find(:twitter).settings
-  end
 
   def consumer_options
     {

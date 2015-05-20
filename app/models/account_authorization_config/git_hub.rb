@@ -17,24 +17,11 @@
 #
 
 class AccountAuthorizationConfig::GitHub < AccountAuthorizationConfig::Oauth2
-  def self.singleton?
-    true
-  end
+  include AccountAuthorizationConfig::PluginSettings
+  self.plugin = :github
 
   def self.sti_name
     'github'.freeze
-  end
-
-  def self.recognized_params
-    if globally_configured?
-      [].freeze
-    else
-      [ :client_id, :client_secret, :domain ].freeze
-    end
-  end
-
-  def self.globally_configured?
-    Canvas::Plugin.find(:github).enabled?
   end
 
   # Rename db field
@@ -43,20 +30,10 @@ class AccountAuthorizationConfig::GitHub < AccountAuthorizationConfig::Oauth2
   end
 
   def domain
-    self.class.globally_configured? ? settings[:domain] : auth_host
+    auth_host
   end
 
-  def client_id
-    self.class.globally_configured? ? settings[:client_id] : super
-  end
-
-  def client_secret
-    if self.class.globally_configured?
-      settings[:client_secret_dec]
-    else
-      auth_decrypted_password
-    end
-  end
+  plugin_settings :domain, :client_id, client_secret: :client_secret_dec
 
   def unique_id(token)
     token.options[:mode] = :query
@@ -64,10 +41,6 @@ class AccountAuthorizationConfig::GitHub < AccountAuthorizationConfig::Oauth2
   end
 
   protected
-
-  def settings
-    Canvas::Plugin.find(:github).settings
-  end
 
   def client_options
     {

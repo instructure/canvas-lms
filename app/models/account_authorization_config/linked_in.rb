@@ -17,36 +17,12 @@
 #
 
 class AccountAuthorizationConfig::LinkedIn < AccountAuthorizationConfig::Oauth2
-  def self.singleton?
-    true
-  end
+  include AccountAuthorizationConfig::PluginSettings
+  self.plugin = :linked_in
+  plugin_settings :client_id, client_secret: :client_secret_dec
 
   def self.sti_name
     'linkedin'
-  end
-
-  def self.recognized_params
-    if globally_configured?
-      [].freeze
-    else
-      [ :client_id, :client_secret ].freeze
-    end
-  end
-
-  def self.globally_configured?
-    Canvas::Plugin.find(:linked_in).enabled?
-  end
-
-  def client_id
-    self.class.globally_configured? ? settings[:client_id] : super
-  end
-
-  def client_secret
-    if self.class.globally_configured?
-      settings[:client_secret_dec]
-    else
-      super
-    end
   end
 
   def unique_id(token)
@@ -54,10 +30,6 @@ class AccountAuthorizationConfig::LinkedIn < AccountAuthorizationConfig::Oauth2
   end
 
   protected
-
-  def settings
-    Canvas::Plugin.find(:linked_in).settings
-  end
 
   def client_options
     {

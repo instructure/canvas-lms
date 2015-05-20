@@ -17,43 +17,26 @@
 #
 
 class AccountAuthorizationConfig::Facebook < AccountAuthorizationConfig::Oauth2
-  def self.singleton?
-    true
-  end
-
-  def self.recognized_params
-    if globally_configured?
-      [].freeze
-    else
-      [ :app_id, :app_secret ].freeze
-    end
-  end
+  include AccountAuthorizationConfig::PluginSettings
+  self.plugin = :facebook
 
   SENSITIVE_PARAMS = [ :app_secret ].freeze
 
-  def self.globally_configured?
-    Canvas::Plugin.find(:facebook).enabled?
-  end
-
-  def client_id
-    if self.class.globally_configured?
-      Canvas::Plugin.find(:facebook).settings[:app_id]
-    else
-      super
-    end
-  end
   alias_method :app_id=, :client_id=
   alias_method :app_id, :client_id
 
-  def client_secret
-    if self.class.globally_configured?
-      Canvas::Plugin.find(:facebook).settings[:app_secret_dec]
-    else
-      super
-    end
-  end
   alias_method :app_secret=, :client_secret=
   alias_method :app_secret, :client_secret
+
+  plugin_settings :app_id, app_secret: :app_secret_dec
+
+  def client_id
+    self.class.globally_configured? ? app_id : super
+  end
+
+  def client_secret
+    self.class.globally_configured? ? app_secret : super
+  end
 
   def unique_id(token)
     token.get('me').parsed['id']
