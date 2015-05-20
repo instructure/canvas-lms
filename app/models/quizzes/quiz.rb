@@ -416,7 +416,6 @@ class Quizzes::Quiz < ActiveRecord::Base
         a.submission_types = "online_quiz"
         a.assignment_group_id = self.assignment_group_id
         a.saved_by = :quiz
-        a.workflow_state = 'published' if a.deleted?
         unless deleted?
           a.workflow_state = self.published? ? 'published' : 'unpublished'
         end
