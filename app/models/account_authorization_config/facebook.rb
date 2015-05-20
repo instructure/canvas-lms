@@ -23,9 +23,9 @@ class AccountAuthorizationConfig::Facebook < AccountAuthorizationConfig::Oauth2
 
   def self.recognized_params
     if globally_configured?
-      [ :auth_type ].freeze
+      [].freeze
     else
-      [ :auth_type, :app_id, :app_secret ].freeze
+      [ :app_id, :app_secret ].freeze
     end
   end
 

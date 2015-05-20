@@ -489,9 +489,9 @@ class AccountAuthorizationConfigsController < ApplicationController
         update_all
       end
     else
-      aac_data = params.has_key?(:account_authorization_config) ? params[:account_authorization_config] : params
+      aac_data = strong_params.fetch(:account_authorization_config, strong_params)
+      position = aac_data.delete(:position)
       data = filter_data(aac_data)
-      position = data.delete :position
       account_config = @account.account_authorization_configs.build(data)
       update_deprecated_account_settings_data(aac_data, account_config)
 
@@ -521,9 +521,10 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   # @returns AccountAuthorizationConfig
   def update
-    aac_data = params.has_key?(:account_authorization_config) ? params[:account_authorization_config] : params
+    aac_data = strong_params.fetch(:account_authorization_config, strong_params)
     aac = @account.account_authorization_configs.find params[:id]
     update_deprecated_account_settings_data(aac_data, aac)
+    position = aac_data.delete(:position)
     data = filter_data(aac_data)
 
     if aac.auth_type != data[:auth_type]
@@ -536,7 +537,6 @@ class AccountAuthorizationConfigsController < ApplicationController
       return
     end
 
-    position = data.delete :position
     aac.update_attributes(data)
 
     if position.present?
@@ -584,11 +584,11 @@ class AccountAuthorizationConfigsController < ApplicationController
   def update_all
     account_configs_to_delete = @account.account_authorization_configs.to_a.dup
     account_configs = []
-    (params[:account_authorization_config] || {}).sort_by {|k,v| k }.each do |idx, data|
+    (params[:account_authorization_config] || {}).sort_by {|k,_| k }.each do |_idx, data|
       id = data.delete :id
       disabled = data.delete :disabled
       next if disabled == '1'
-      data = filter_data(data)
+      data = filter_data(ActionController::Parameters.new(data))
       next if data.empty?
 
       if id.to_i == 0
@@ -873,8 +873,9 @@ class AccountAuthorizationConfigsController < ApplicationController
 
   protected
   def filter_data(data)
-    data ||= {}
-    data = data.slice(*AccountAuthorizationConfig.find_sti_class(data[:auth_type]).recognized_params)
+    auth_type = data.delete(:auth_type)
+    data = data.permit(*AccountAuthorizationConfig.find_sti_class(auth_type).recognized_params)
+    data[:auth_type] = auth_type
     if data[:auth_type] == 'ldap'
       data[:auth_over_tls] = 'start_tls' unless data.has_key?(:auth_over_tls)
       data[:auth_over_tls] = AccountAuthorizationConfig::LDAP.auth_over_tls_setting(data[:auth_over_tls])

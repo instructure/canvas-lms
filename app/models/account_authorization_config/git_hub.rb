@@ -27,9 +27,9 @@ class AccountAuthorizationConfig::GitHub < AccountAuthorizationConfig::Oauth2
 
   def self.recognized_params
     if globally_configured?
-      [ :auth_type ].freeze
+      [].freeze
     else
-      [ :auth_type, :client_id, :client_secret, :domain ].freeze
+      [ :client_id, :client_secret, :domain ].freeze
     end
   end
 

@@ -18,7 +18,7 @@
 
 class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
   def self.sti_name
-    'saml'
+    'saml'.freeze
   end
 
   def self.enabled?
@@ -33,13 +33,13 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
   end
 
   def self.recognized_params
-    [ :auth_type, :log_in_url, :log_out_url, :requested_authn_context,
+    [ :log_in_url, :log_out_url, :requested_authn_context,
       :certificate_fingerprint, :identifier_format,
-      :login_attribute, :idp_entity_id, :position ]
+      :login_attribute, :idp_entity_id ].freeze
   end
 
   def self.deprecated_params
-    [:change_password_url, :login_handle_name, :unknown_user_url]
+    [:change_password_url, :login_handle_name, :unknown_user_url].freeze
   end
 
   before_validation :set_saml_defaults

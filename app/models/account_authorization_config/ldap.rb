@@ -18,16 +18,16 @@
 
 class AccountAuthorizationConfig::LDAP < AccountAuthorizationConfig
   def self.sti_name
-    'ldap'
+    'ldap'.freeze
   end
 
   # if the config changes, clear out last_timeout_failure so another attempt can be made immediately
   before_save :clear_last_timeout_failure
 
   def self.recognized_params
-    [ :auth_type, :auth_host, :auth_port, :auth_over_tls, :auth_base,
+    [ :auth_host, :auth_port, :auth_over_tls, :auth_base,
       :auth_filter, :auth_username, :auth_password,
-      :identifier_format, :position ]
+      :identifier_format ].freeze
   end
 
   SENSITIVE_PARAMS = [ :auth_password ].freeze

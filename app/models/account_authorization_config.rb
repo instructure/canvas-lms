@@ -73,16 +73,6 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   belongs_to :account
   acts_as_list scope: :account
 
-  attr_accessible :account, :auth_port, :auth_host, :auth_base, :auth_username,
-    :auth_password, :auth_password_salt, :auth_type, :auth_over_tls,
-    :log_in_url, :log_out_url, :identifier_format,
-    :certificate_fingerprint, :entity_id,
-    :ldap_filter, :auth_filter, :requested_authn_context,
-    :login_attribute, :idp_entity_id,
-    :app_id, :app_secret,
-    :client_id, :client_secret, :domain,
-    :consumer_key, :consumer_secret
-
   VALID_AUTH_TYPES = %w[cas facebook github google ldap linkedin openid_connect saml twitter].freeze
   validates_inclusion_of :auth_type, in: VALID_AUTH_TYPES, message: "invalid auth_type, must be one of #{VALID_AUTH_TYPES.join(',')}"
   validates_presence_of :account_id

@@ -21,15 +21,15 @@ require 'casclient'
 class AccountAuthorizationConfig::CAS < AccountAuthorizationConfig::Delegated
 
   def self.sti_name
-    'cas'
+    'cas'.freeze
   end
 
   def self.recognized_params
-    [ :auth_type, :auth_base, :log_in_url, :position ]
+    [ :auth_base, :log_in_url ].freeze
   end
 
   def self.deprecated_params
-    [:unknown_user_url]
+    [ :unknown_user_url ].freeze
   end
 
   def client

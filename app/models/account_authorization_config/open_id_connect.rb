@@ -26,7 +26,7 @@ class AccountAuthorizationConfig::OpenIDConnect < AccountAuthorizationConfig::Oa
   end
 
   def self.recognized_params
-    [ :auth_type, :client_id, :client_secret, :authorize_url, :token_url ].freeze
+    [ :client_id, :client_secret, :authorize_url, :token_url ].freeze
   end
 
   def unique_id(token)

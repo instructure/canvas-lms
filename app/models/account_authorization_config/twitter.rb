@@ -23,9 +23,9 @@ class AccountAuthorizationConfig::Twitter < AccountAuthorizationConfig::Oauth
 
   def self.recognized_params
     if globally_configured?
-      [ :auth_type ].freeze
+      [].freeze
     else
-      [ :auth_type, :consumer_key, :consumer_secret ].freeze
+      [ :consumer_key, :consumer_secret ].freeze
     end
   end
 

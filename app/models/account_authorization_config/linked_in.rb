@@ -27,9 +27,9 @@ class AccountAuthorizationConfig::LinkedIn < AccountAuthorizationConfig::Oauth2
 
   def self.recognized_params
     if globally_configured?
-      [ :auth_type ]
+      [].freeze
     else
-      [ :auth_type, :client_id, :client_secret ].freeze
+      [ :client_id, :client_secret ].freeze
     end
   end
 
