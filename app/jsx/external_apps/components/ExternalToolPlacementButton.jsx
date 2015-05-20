@@ -15,6 +15,16 @@ define([
   return React.createClass({
     displayName: 'ExternalToolPlacementButton',
 
+    componentDidUpdate: function() {
+      var _this = this;
+      window.requestAnimationFrame(function() {
+        var node = _this.getDOMNode();
+        if (node !== undefined) {
+          document.getElementById('close' + _this.state.tool.name).focus();
+        }
+      });
+    },
+
     propTypes: {
       tool: React.PropTypes.object.isRequired
     },
@@ -76,14 +86,14 @@ define([
       var appliedPlacements = _.map(allPlacements, function(value, key){
         if (tool[key]) {
           hasPlacements = true;
-          return <div aria-label={ value } >{ value }</div>;
+          return <li>{ value }</li>;
         }
       });
 
       return (
-        <div className="app_placements">
+        <ul id={ this.state.tool.name.replace(/\s/g,'') + 'Placements' } >
           { hasPlacements ? appliedPlacements : I18n.t('No Placements Enabled') }
-        </div>
+        </ul>
       );
     },
 
@@ -99,24 +109,32 @@ define([
                  overlayClassName="ReactModal__Overlay--canvas"
                  isOpen={this.state.modalIsOpen}
                  onRequestClose={this.closeModal}>
-            <div className="ReactModal__Layout">
+            <div id={this.state.tool.name + "Heading"}
+                 className="ReactModal__Layout"
+              >
               <div className="ReactModal__InnerSection ReactModal__Header ReactModal__Header--force-no-corners">
                 <div className="ReactModal__Header-Title">
-                  <h4>{I18n.t('App Placements')}</h4>
+                  <h4 tabindex="-1">{I18n.t('App Placements')}</h4>
                 </div>
                 <div className="ReactModal__Header-Actions">
-                  <button className="Button Button--icon-action" type="button" onClick={this.closeModal}>
+                  <button  className="Button Button--icon-action" type="button"  onClick={this.closeModal} >
                     <i className="icon-x"></i>
                     <span className="screenreader-only">Close</span>
                   </button>
                 </div>
               </div>
-              <div className="ReactModal__InnerSection ReactModal__Body">
+              <div tabindex="-1" className="ReactModal__InnerSection ReactModal__Body" >
                 {this.placements()}
               </div>
               <div className="ReactModal__InnerSection ReactModal__Footer">
                 <div className="ReactModal__Footer-Actions">
-                  <button ref="btnClose" type="button" className="btn btn-default" onClick={this.closeModal}>{I18n.t('Close')}</button>
+                  <button
+                          ref="btnClose" type="button" className="btn btn-default"
+                          id={ 'close' + this.state.tool.name }
+                          aria-describedby={ this.state.tool.name.replace(/\s/g,'') + 'Placements' }
+                          onClick={this.closeModal}>
+                    {I18n.t('Close')}
+                  </button>
                 </div>
               </div>
             </div>
