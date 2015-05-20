@@ -119,6 +119,9 @@ module ApplicationHelper
 
   def message_user_path(user, context = nil)
     context = context || @context
+    # If context is a group that belongs to a course, use the course as the context instead
+    context = context.context if context.is_a?(Group) && context.context.is_a?(Course)
+    # Then weed out everything else
     context = nil unless context.is_a?(Course)
     conversations_path(user_id: user.id, user_name: user.name,
                        context_id: context.try(:asset_string))
