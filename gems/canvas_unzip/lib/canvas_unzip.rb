@@ -56,6 +56,7 @@ class CanvasUnzip
   # returns a hash of lists of entries that were skipped by reason
   #   { :unsafe => [list of entries],
   #     :already_exists => [list of entries],
+  #     :filename_too_long => [list of entries],
   #     :unknown_compression_method => [list of entries] }
 
   def self.extract_archive(archive_filename, dest_folder = nil, limits = nil, &block)
@@ -89,6 +90,8 @@ class CanvasUnzip
           add_warning(warnings, entry, :already_exists)
         rescue Zip::CompressionMethodError
           add_warning(warnings, entry, :unknown_compression_method)
+        rescue Errno::ENAMETOOLONG
+          add_warning(warnings, entry, :filename_too_long)
         end
       end
     end
