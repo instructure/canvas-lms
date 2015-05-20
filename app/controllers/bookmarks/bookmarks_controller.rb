@@ -5,6 +5,10 @@
 #       "id": "Bookmark",
 #       "description": "",
 #       "properties": {
+#         "id": {
+#           "example": 1,
+#           "type": "integer"
+#         },
 #         "name": {
 #           "example": "Biology 101",
 #           "type": "string"
@@ -148,7 +152,7 @@ class Bookmarks::BookmarksController < ApplicationController
   end
 
   def set_position
-    params[:position] ? @bookmark.insert_at(params[:position]) : true
+    params[:position] ? @bookmark.insert_at(params[:position].to_i) : true
   end
 
   def render_errors

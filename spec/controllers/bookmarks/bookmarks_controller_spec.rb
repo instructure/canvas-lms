@@ -10,7 +10,7 @@ describe Bookmarks::BookmarksController do
 
   context "when user is logged in" do
     let(:u) { user }
-    let(:bookmark) { Bookmarks::Bookmark.create(user_id: u.id, name: 'bio 101', url: '/courses/1') }
+    let!(:bookmark) { Bookmarks::Bookmark.create(user_id: u.id, name: 'bio 101', url: '/courses/1') }
 
     before(:each) do
       user_session(u)
@@ -67,14 +67,17 @@ describe Bookmarks::BookmarksController do
       end
 
       it "should append by default" do
-        bookmark
         post 'create', params
         expect(Bookmarks::Bookmark.order(:id).last).to be_last
       end
 
       it "should set position" do
-        bookmark
         post 'create', params.merge(position: 1)
+        expect(Bookmarks::Bookmark.order(:id).last).to_not be_last
+      end
+
+      it "should handle position strings" do
+        post 'create', params.merge(position: "1")
         expect(Bookmarks::Bookmark.order(:id).last).to_not be_last
       end
     end
