@@ -80,7 +80,7 @@ module Api::V1::ContextModule
           course_context_modules_item_redirect_url(:id => content_tag.id, :course_id => context_module.context.id)
       end
     end
-    
+
     # add content_id, if applicable
     # (note that wiki page ids are not exposed by the api)
     unless %w(WikiPage ContextModuleSubHeader ExternalUrl).include? content_tag.content_type
@@ -104,9 +104,9 @@ module Api::V1::ContextModule
         api_url = polymorphic_url([:api_v1, context_module.context, content_tag.content])
       when 'ContextExternalTool'
         if content_tag.content && content_tag.content.tool_id
-          api_url = sessionless_launch_url(context_module.context, :id => content_tag.content.id, :url => content_tag.content.url)
+          api_url = sessionless_launch_url(context_module.context, :id => content_tag.content.id, :url => (content_tag.url || content_tag.content.url))
         elsif content_tag.content
-          api_url = sessionless_launch_url(context_module.context, :url => content_tag.content.url)
+          api_url = sessionless_launch_url(context_module.context, :url => (content_tag.url || content_tag.content.url))
         else
           api_url = sessionless_launch_url(context_module.context, :url => content_tag.url)
         end
@@ -129,10 +129,10 @@ module Api::V1::ContextModule
     end
 
     has_update_rights = if opts.has_key? :has_update_rights
-      opts[:has_update_rights]
-    else
-      context_module.grants_right?(current_user, :update)
-    end
+                          opts[:has_update_rights]
+                        else
+                          context_module.grants_right?(current_user, :update)
+                        end
     hash['published'] = content_tag.active? if has_update_rights
 
     hash['content_details'] = content_details(content_tag, current_user) if includes.include?('content_details')
@@ -154,19 +154,19 @@ module Api::V1::ContextModule
     end
 
     item_type = case content_tag.content_type
-      when 'Quiz', 'Quizzes::Quiz'
-        'quiz'
-      when 'Assignment'
-        'assignment'
-      when 'DiscussionTopic'
-        'topic'
-      when 'Attachment'
-        'file'
-      when 'WikiPage'
-        'page'
-      else
-        ''
-    end
+                  when 'Quiz', 'Quizzes::Quiz'
+                    'quiz'
+                  when 'Assignment'
+                    'assignment'
+                  when 'DiscussionTopic'
+                    'topic'
+                  when 'Attachment'
+                    'file'
+                  when 'WikiPage'
+                    'page'
+                  else
+                    ''
+                end
     lock_item = item && item.respond_to?(:locked_for?) ? item : content_tag
     locked_json(details, lock_item, current_user, item_type)
 
