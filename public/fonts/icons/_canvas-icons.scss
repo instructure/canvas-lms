@@ -2,7 +2,7 @@
   /// How to update Icons
   //
   // Add your new svg(s) to app/icons/ 
-  // Edit the template file. Important!! Edit file in public/font/_canvas-icons.scss 
+  // Edit the template file. Important!! Edit file in public/fonts/_canvas-icons.scss
   // Compile your fonts. In your project in terminal run: bundle exec rake icons:compile
   // Check the styleguide to make sure they're pulling in /styleguide
   // Done!
@@ -291,10 +291,10 @@ Either use `<a>` with icon desired icon class added or insert `<i>` inside `<but
 
 @font-face { 
   font-family: "canvas-icons";  
-  src:  url('/font/canvas/canvas-icons.eot');    
-  src:  url('/font/canvas/canvas-icons.eot?#iefix') format('embedded-opentype'),   
-        url('/font/canvas/canvas-icons.woff') format('woff'),   
-        url('/font/canvas/canvas-icons.ttf') format('truetype');
+  src:  url('/fonts/canvas/canvas-icons.eot');
+  src:  url('/fonts/canvas/canvas-icons.eot?#iefix') format('embedded-opentype'),
+        url('/fonts/canvas/canvas-icons.woff') format('woff'),
+        url('/fonts/canvas/canvas-icons.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
