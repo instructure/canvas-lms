@@ -20,12 +20,13 @@ define([
   'jquery' /* $ */,
   'str/htmlEscape',
   'compiled/str/TextHelper',
+  'compiled/util/round',
   'jquery.instructure_forms' /* fillFormData */,
   'jqueryui/dialog',
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
-], function(I18n, $, htmlEscape, TextHelper) {
+], function(I18n, $, htmlEscape, TextHelper, round) {
 
 // TODO: stop managing this in the view and get it out of the global scope submissions/show.html.erb
 window.rubricAssessment = {
@@ -85,7 +86,7 @@ window.rubricAssessment = {
         $rubric_criterion_comments_dialog.find("textarea.criterion_comments").focus();
       })
       // cant use a .delegate because up above when we delegate '.rating' 'click' it calls .change() and that doesnt bubble right so it doesen't get caught
-      .find(".criterion_points").bind('keypress change blur', function(event) {
+      .find(".criterion_points").bind('keyup change blur', function(event) {
         var $obj = $(event.target);
         if($obj.parents(".rubric").hasClass('assessing')) {
           var val = parseFloat($obj.val(), 10);
@@ -109,6 +110,7 @@ window.rubricAssessment = {
             if(isNaN(val)) { val = 0; }
             total += val;
           });
+          total = round(total, round.DEFAULT)
           $obj.parents(".rubric").find(".rubric_total").text(total);
         }
       });
@@ -283,6 +285,7 @@ window.rubricAssessment = {
           total += rating.points;
         }
       }
+      total = round(total, round.DEFAULT)
       $rubric.find(".rubric_total").text(total);
     }
   },
@@ -312,6 +315,7 @@ window.rubricAssessment = {
           total += rating.points;
         }
       }
+      total = round(total, round.DEFAULT)
       $rubricSummary.show().find(".rubric_total").text(total);
       $rubricSummary.closest(".edit").show();
     }
