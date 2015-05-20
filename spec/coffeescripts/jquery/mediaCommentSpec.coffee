@@ -68,11 +68,11 @@ define [
     equal($media.attr("width"), null)
     equal($media.attr("height"), null)
 
-  test "getElement adds preload='none' to both types", ->
+  test "getElement adds preload='metadata' to both types", ->
     $video = MediaUtils.getElement("video", "", 100, 200)
     $audio = MediaUtils.getElement("audio", "", 100, 200)
-    equal($video.attr("preload"), "none")
-    equal($audio.attr("preload"), "none")
+    equal($video.attr("preload"), "metadata")
+    equal($audio.attr("preload"), "metadata")
 
   test "getElement puts source tags inside the element", ->
     st_tag = "<source src='something'></source>"
