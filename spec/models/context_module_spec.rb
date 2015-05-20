@@ -566,44 +566,6 @@ describe ContextModule do
       expect(@module2.evaluate_for(@user)).to be_completed
       expect(@module.evaluate_for(@user)).to be_completed
     end
-
-    it "should not unlock assignment must_submit requirement on manual zero grade" do
-      course_module
-      student_in_course course: @course, active_all: true
-
-      @teacher = User.create!(:name => "some teacher")
-      @course.enroll_teacher(@teacher)
-
-      @assign = @course.assignments.create!(title: 'how many roads must a man walk down?', submission_types: 'online_text_entry')
-      @tag = @module.add_item({id: @assign.id, type: 'assignment'})
-      @module.completion_requirements = {@tag.id => {type: 'must_submit'}}
-      @module.save!
-
-      expect(@module.evaluate_for(@student)).to be_unlocked
-
-      @assign.reload
-      @assign.grade_student(@student, :grade => "0", :grader => @teacher)
-
-      expect(@module.evaluate_for(@student)).to be_unlocked
-    end
-
-    it "should not unlock quiz must_submit requirement on manual zero grade" do
-      course_module
-      student_in_course course: @course, active_all: true
-
-      @teacher = User.create!(:name => "some teacher")
-      @course.enroll_teacher(@teacher)
-
-      @quiz = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :scoring_policy => 'keep_highest')
-      @quiz.workflow_state = 'available'
-      @quiz.save!
-      @tag = @module.add_item({:id => @quiz.id, :type => 'quiz'})
-      @module.completion_requirements = {@tag.id => {:type => 'must_submit'}}
-      @module.save!
-
-      @quiz.assignment.grade_student(@student, :grade => "0", :grader => @teacher)
-      expect(@module.evaluate_for(@student)).to be_unlocked
-    end
     
     it "should mark progression completed for min_score on discussion topic assignment" do
       asmnt = assignment_model(:submission_types => "discussion_topic", :points_possible => 10)
