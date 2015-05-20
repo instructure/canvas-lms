@@ -1,36 +1,64 @@
+$ic-left-side-width: $ic-sp*15;
+
 .ic-app {
   box-sizing: border-box;
   min-height: 100vh;
 }
 
-.ic-app-layout {
+.ic-app-container {
   box-sizing: border-box;
   min-height: 100vh;  
 }
 
-.ic-app-layout__rows {
+.ic-app-main-layout-vertical {
   box-sizing: border-box;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-.ic-app-layout__columns {
-  box-sizing: border-box;
-  display: flex;
+.ic-app-main-layout-horizontal {
+  transition: all 0.1s ease-out;
+  transform: translate3d(0,0,0);
   flex: 1 0 auto;
+  position: relative;
+  body.course-menu-expanded & { transform: translate3d($ic-left-side-width,0,0); }
+  @include breakpoint(wide) {
+    display: flex;
+    position: static;
+    body.course-menu-expanded & { 
+      transform: none;
+      transition: none;
+    }
+  }
 }
 
-.ic-app-secondary-menu {
+.ic-app-main-and-right-side {
   box-sizing: border-box;
-  flex: 0 0 $ic-sp*13;
-  @include breakpoint(desktop) {
-    flex: 0 0 $ic-sp*14;
-    padding: $ic-sp*2 $ic-sp $ic-sp*2 $ic-sp*2; 
+  flex: 1;
+}
+
+.ic-app-course-menu {
+  transition: transform 0.2s ease-out, opacity 0.2s;
+  transition-delay: 0.1s;
+  transform: translate3d(0,25%,0);
+  box-sizing: border-box;
+  position: absolute;
+  top: 0; right: 100%;
+  width: $ic-left-side-width;
+  padding: (($ic-sp*2) - 4) $ic-sp $ic-sp $ic-sp*2;
+  opacity: 0;
+  body.course-menu-expanded & { 
+    opacity: 1;
+    transform: translate3d(0,0,0);
   }
   @include breakpoint(wide) {
-    flex: 0 0 $ic-sp*16;
-    padding-right: $ic-sp*2; 
+    position: static;
+    top: auto; right: auto; width: auto;
+    flex: 0 0 $ic-left-side-width;
+    opacity: 1;
+    transition: none;
+    transform: none;
   }
 }
 
@@ -86,6 +114,34 @@
   }
 }
 
-.ic-app-secondary-menu__course-group-name {
+.ic-app-nav-toggle-and-crumbs {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid $ic-border-light;
+  margin: 0 $ic-sp*2;
+  padding: $ic-sp 0;
+  @include breakpoint(wide) { padding: $ic-sp*1.5 0; }
+}
 
+.ic-app-course-nav-toggle {
+  transform: translateY(1px);
+  margin-right: $ic-sp*1.5;
+  padding: 0;
+  width: $ic-sp*3; height: ($ic-sp*3) - ($ic-sp/2);
+  @include breakpoint(wide) { display: none; }
+  i[class*=icon-], i[class^=icon-] {
+    width: auto; height: auto;
+    line-height: 1;
+    &:before {
+      font-size: 22px;
+      top: 0;
+    }
+  }
+}
+
+.ic-app-crumbs {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
 }

@@ -601,8 +601,16 @@ module ApplicationHelper
     css_classes = []
     css_classes << "support_url" if url
     css_classes << "help_dialog_trigger" if show_feedback_link
+    css_classes << 'ic-app-header__menu-list-link' if use_new_styles?
     if url || show_feedback_link
-      link_to t('#links.help', "Help"), url || '#',
+      link_content = if use_new_styles?
+                        '<div class="menu-item-icon-container" role="presentation">' +
+                        render(:partial => "shared/svg/svg_icon_help.svg") +
+                        '</div><div class="menu-item__text">' + t('Help') + '</div>'
+                     else
+                        t('Help')
+                     end
+      link_to link_content.html_safe, url || '#',
         :class => css_classes.join(" "),
         'data-track-category' => "help system",
         'data-track-label' => 'help button'
@@ -812,5 +820,10 @@ module ApplicationHelper
         join("\n").
         html_safe
     end
+  end
+
+  # Returns true if the parameter matches with the active url
+  def active_path?(to_test)
+    request.fullpath.include? to_test
   end
 end

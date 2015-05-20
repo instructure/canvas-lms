@@ -1,16 +1,4 @@
 <% @current_user.set_menu_data(session[:enrollment_uuid]) %>
-
-<%# Temporary for new styles. This link needs to be wired up with the future sliding secondary nav %>
-<% if use_new_styles? %>
-  <a href="<%= courses_path %>" class="ic-app-header__menu-list-link">
-    <div class="menu-item-icon-container"><%= render(:partial => 'shared/svg/svg_icon_courses_new_styles.svg') %></div>
-    <div class="menu-item__text">
-      <%= @current_user.menu_data[:group_memberships_count].zero? ? t('links.courses', "Courses") : t('links.courses_and_groups', "Courses & Groups") -%>
-    </div>
-  </a>
-
-<%# If default/k-12 UI, the regular courses dropdown appears %>
-<% else %>
   <a href="<%= courses_path %>" class="menu-item-title">
   <% if k12? %>
     <%= render(:partial => 'shared/svg/svg_icon_courses') %>
@@ -31,5 +19,3 @@
     </table>
     <% if k12? %></div><% end %>
   </div>
-
-<% end %>

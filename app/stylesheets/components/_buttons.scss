@@ -283,7 +283,10 @@ $ic-brand-button--secondary-text: $ic-color-light !default;
     color: $ic-link-color-hover;
     text-decoration: underline;
     background: transparent;
+    &:focus { color: $ic-link-color; }
   }
+
+  &:focus { color: $ic-link-color; }
 
   &.active, &.Button--active, &:active {
     background: rgba($ic-color-dark, 0.05);

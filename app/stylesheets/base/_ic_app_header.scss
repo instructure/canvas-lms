@@ -35,11 +35,30 @@
     opacity: 0;
   }
 
-  .ic-app-header__main-navigation { flex: 1; }
+  .ic-app-header__main-navigation {
+    flex: 1 0 auto;
+    box-sizing: border-box;
+  }
+
+  .ic-app-header__secondary-navigation {
+    box-sizing: border-box;
+    background: darken($ic-brand-global-nav-bgd, 5%);
+  }
 
   .ic-app-header__menu-list { @include reset-list; }
 
-  .ic-app-header__menu-list-item { box-sizing: border-box; }
+  .ic-app-header__menu-list-item { 
+    box-sizing: border-box;
+    &.ic-app-header__menu-list-item--active {
+      .ic-app-header__menu-list-link {
+        background: $ic-color-light;
+      }
+      .menu-item__text { color: $ic-link-color; }
+      .ic-icon-svg path { fill: $ic-brand-primary; }
+      .ic-avatar { border-color: $ic-border-light; }
+      .menu-item-icon-container .menu-item__badge { border-color: $ic-color-light; }
+    }
+  }
 
   button.ic-app-header__menu-list-link {
     background: transparent;
@@ -50,25 +69,28 @@
 
   .ic-app-header__menu-list-link {
     transition: background-color 0.2s ease-out;
-    padding: $ic-sp 0;
+    padding: ($ic-sp*0.75) 0;
     text-align: center;
     display: block;
     position: relative;
-    
+
     @include breakpoint(short) {
       padding-top: $ic-sp/2;
-      padding-bottom: $ic-sp/2;  
+      padding-bottom: $ic-sp/2;
     }
-    
+
     &:hover, &:focus {
       background-color: $ic-brand-global-nav-link-hover;
-      @if $use_high_contrast == false { text-decoration: none; }
-      .ic-icon-svg, .ic-avatar { transform: scale(1.1); } 
+      @if $use_high_contrast == false {
+        text-decoration: none;
+        outline: none;
+      }
+      .ic-icon-svg, .ic-avatar { transform: scale(1.075); }
       .ic-avatar { border-color: $ic-brand-global-nav-avatar-border; }
       &:active { .ic-icon-svg, .ic-avatar { transform: scale(1); } }
       .menu-item__badge { border-color: $ic-brand-global-nav-menu-item__badge-border; }
     }
-    
+
     &:active {
       background-color: $ic-brand-global-nav-link-active;
       box-shadow: inset 0 1px 1px rgba(black, 0.3);
@@ -85,13 +107,14 @@
 
     // Need to provide heights for IE10 and 11
     .ic-icon-svg--dashboard { height: 20px; }
-    .ic-icon-svg--calendar, 
+    .ic-icon-svg--calendar,
     .ic-icon-svg--inbox,
     .ic-icon-svg--apps { height: 28px; }
     .ic-icon-svg--courses { height: 26px; }
     .ic-icon-svg--grades { height: 30px; }
     .ic-icon-svg--commons { height: 21px; }
     .ic-icon-svg--arrow-right { width: 24px; height: 24px; }
+    .ic-icon-svg--groups { width: 32px; height: 21.6px; }
   }
 
   .ic-app-header__secondary {
@@ -110,9 +133,9 @@
     left: $ic-header-primary-width - $ic-sp;
     @include breakpoint(wide) { left: $ic-header-primary-width; }
 
-    body.secondary-nav-expanded & { 
-      transform: translate3d(0,0,0); 
-      opacity: 1; 
+    body.secondary-nav-expanded & {
+      transform: translate3d(0,0,0);
+      opacity: 1;
     }
   }
 
@@ -158,9 +181,11 @@
   }
 
   .menu-item__text {
-    margin-top: $ic-sp/4;
+    margin-top: $ic-sp/3;
     box-sizing: border-box;
     color: $ic-brand-global-nav-menu-item__text-color;
+    line-height: 1.1;
+    font-size: ($baseFontSize - 2);
   }
 
   .menu-item__badge {
@@ -185,13 +210,13 @@
 
     .canvas-logomark, .ic-app-header__logomark_image {
       transform: translate3d(0,0,0);
-      transition: all 0.3s $ic-transition; 
+      transition: all 0.3s $ic-transition;
       display: block;
     }
 
     .canvas-logomark {
       width: $ic-sp*3; height: $ic-sp*3;
-      margin: $ic-sp*1.5 auto $ic-sp;
+      margin: $ic-sp auto $ic-sp;
     }
 
     // let customer logo fit nav width
@@ -202,7 +227,7 @@
 
     // scale up customer or canvas logo on hover/focus
     &:hover, &:focus {
-      .canvas-logomark, 
+      .canvas-logomark,
       .ic-app-header__logomark_image { transform: scale(1.15); }
     }
   }
@@ -214,31 +239,87 @@
     position: relative;
     z-index: 10;
   }
-  
+
   .ReactTray__Overlay {
-    background: rgba(0, 0, 0, 0.65);
-  } 
+    background: rgba( darken($ic-brand-secondary, 10%), 0.8 );
+    opacity: 0;
+    &.ReactTray__Overlay--after-open {
+      transition: opacity 0.4s;
+      opacity: 1;
+    }
+  }
 
   .ReactTray__Content {
-    background: #fff;
-    padding: 10px;
-    box-shadow: 1px 0 5px #333;
+    box-sizing: border-box;
+    transform: translate3d(-100%,0,0);
+    background: $ic-color-light;
+    padding: $ic-sp*1.5 $ic-sp*2;
     overflow-x: hidden;
-    white-space: nowrap;
-    width: 0;
-    top: 0;
-    bottom: 0;
+    width: $ic-sp*28;
+    top: 0; bottom: 0;
     left: $ic-header-primary-width - $ic-sp;
     @include breakpoint(wide) { left: $ic-header-primary-width; }
+    @if $use_high_contrast == false {
+      &:focus { outline: none; }
+    }
   }
 
   .ReactTray__Content--after-open {
-    width: 250px;
-    transition: width 150ms ease-in;
+    transition: all 0.2s ease-out;
+    transform: translate3d(0,0,0);
   }
 
   .ReactTray__Content--before-close {
-    width: 0;
-    transition: width 150ms ease-in;
+    transition: all 0.2s ease-in;
+    transform: translate3d(-100%,0,0);
+    opacity: 0;
   }
+
+  .ReactTray__layout {
+    box-sizing: border-box;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ReactTray__primary-content {
+    flex: 1 0 auto;
+  }
+
+  .ReactTray__link-list {
+    @include reset-list;
+    font-size: 14px;
+    li {
+      line-height: 1.3;
+      margin-bottom: $ic-sp;
+      @include breakpoint(short) { margin-bottom: $ic-sp/2; }
+      &:last-of-type { margin-bottom: 0; }
+      &.ReactTray__feature-list-item {
+        border-top: 1px solid $ic-border-light;
+        padding-top: $ic-sp;
+        @include breakpoint(short) { padding-top: $ic-sp/2; }
+      }
+    }
+    a {
+      display: inline-block;
+      i[class*=icon-],
+      i[class^=icon-] { margin-right: $ic-sp/3; }
+    }
+  }
+
+  .ReactTray__header {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid $ic-border-light;
+    padding-bottom: $ic-sp;
+    margin-bottom: $ic-sp;
+  }
+
+  .ReactTray__headline {
+    box-sizing: border-box;
+    margin: 0;
+    line-height: 1.1;
+    flex: 1;
+  }
+
 }
