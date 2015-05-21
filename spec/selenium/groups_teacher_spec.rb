@@ -144,11 +144,7 @@ describe "new groups" do
       expect(f('.group-category-summary')).to include_text("Groups are limited to 2 members.")
 
       # Creates a group and checks to see if group set's limit is inherited by its groups
-      f('.btn.add-group').click
-      wait_for_ajaximations
-      f('#group_name').send_keys("Test Group")
-      f('#groupEditSaveButton').click
-      wait_for_ajaximations
+      manually_create_group
       expect(f('.group-summary')).to include_text("0 / 2 students")
     end
 
@@ -156,13 +152,7 @@ describe "new groups" do
       group_test_setup(3,1,0)
       get "/courses/#{@course.id}/groups"
 
-      f('.btn.add-group').click
-      wait_for_ajaximations
-      f('#group_name').send_keys("Test Group")
-      f('#group_max_membership').send_keys("2")
-      wait_for_ajaximations
-      f('#groupEditSaveButton').click
-      wait_for_ajaximations
+      manually_create_group(has_max_membership:true, member_count:2)
       expect(f('.group-summary')).to include_text("0 / 2 students")
     end
   end

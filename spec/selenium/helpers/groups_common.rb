@@ -93,6 +93,25 @@ def create_student_group_as_a_teacher(group_name = "Windfury", enroll_student_co
   group
 end
 
+def manually_create_group(params={})
+  default_params = {
+    group_name:'Test Group',
+    has_max_membership:false,
+    member_count:0,
+  }
+  params = default_params.merge(params)
+
+  f('.btn.add-group').click
+  wait_for_ajaximations
+  f('#group_name').send_keys(params[:group_name])
+  if params[:has_max_membership]
+    f('#group_max_membership').send_keys(params[:member_count])
+    wait_for_ajaximations
+  end
+  f('#groupEditSaveButton').click
+  wait_for_ajaximations
+end
+
 def delete_group
   f(".icon-settings").click
   wait_for_animations
