@@ -14,4 +14,8 @@ class BeyondZConfiguration
     @config[:google_analytics_account]
   end
 
+  def self.bitly_access_token
+    @config[:bitly_access_token]
+  end
+
 end

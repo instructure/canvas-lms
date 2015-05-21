@@ -37,6 +37,8 @@ class Quizzes::QuizSubmissionsController < ApplicationController
 
   # submits the quiz as final
   def create
+    url_params = previewing_params
+    url_params[:module_item_id] = params[:module_item_id]
     if @quiz.access_code.present?
       session.delete(@quiz.access_code_key_for_user(@current_user))
     end
@@ -53,7 +55,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
         @submission ||= @quiz.generate_submission(@current_user, is_previewing?)
         if @submission.present? && !@submission.valid_token?(params[:validation_token])
           flash[:error] = t('errors.invalid_submissions', "This quiz submission could not be verified as belonging to you.  Please try again.")
-          return redirect_to course_quiz_url(@context, @quiz, previewing_params)
+          return redirect_to course_quiz_url(@context, @quiz, url_params)
         end
       end
 
@@ -72,7 +74,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
     if session.delete('lockdown_browser_popup')
       return render(:action => 'close_quiz_popup_window')
     end
-    redirect_to course_quiz_url(@context, @quiz, previewing_params)
+    redirect_to course_quiz_url(@context, @quiz, url_params)
   end
 
   def backup

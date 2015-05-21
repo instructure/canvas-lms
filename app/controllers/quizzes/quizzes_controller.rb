@@ -707,6 +707,7 @@ class Quizzes::QuizzesController < ApplicationController
   # use this for all redirects while taking a quiz -- it'll add params to tell
   # the lockdown browser that it's ok to follow the redirect
   def quiz_redirect_params(opts = {})
+    opts[:module_item_id] = params[:module_item_id]
     return opts if !@quiz.require_lockdown_browser? || @quiz.grants_right?(@current_user, session, :grade)
     plugin = Canvas::LockdownBrowser.plugin.base
     plugin.redirect_params(self, opts)

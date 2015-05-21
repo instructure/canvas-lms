@@ -2,6 +2,9 @@
   @locale = raw I18n.locale.to_json
   @body_classes ||= []
   @body_classes << "context-#{@context.asset_string}" if @context
+  if @current_user && @context && !can_do(@context, @current_user, :manage)
+    @body_classes << "student-logged-in"
+  end
   yield :pre_html
 
 -%><!DOCTYPE html>
@@ -37,5 +40,6 @@
       document.addEventListener('click', _earlyClick);
   </script>
   <%= render 'shared/google_analytics' %>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700,300,600,400' rel='stylesheet' type='text/css'>
 </head>
 <body class="<%= (@body_classes).uniq.join(" ") %>">
