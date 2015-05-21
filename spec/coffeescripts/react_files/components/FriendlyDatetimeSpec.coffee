@@ -8,7 +8,7 @@ define [
   module 'FriendlyDatetime',
   test "parses datetime from a string", ->
     fDT = React.createFactory(FriendlyDatetime)
-    rendered = TestUtils.renderIntoDocument(fDT(datetime:1431570574))
+    rendered = TestUtils.renderIntoDocument(fDT(datetime:'1431570574'))
     equal $(rendered.getDOMNode()).find('.visible-desktop').text(), "Jan 17, 1970", "converts to readable format"
     equal $(rendered.getDOMNode()).find('.hidden-desktop').text(), "1/17/1970", "converts to readable format"
 
