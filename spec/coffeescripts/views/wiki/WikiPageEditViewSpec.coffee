@@ -15,6 +15,7 @@ define [
       @scrollSidebarStub.restore()
       @initStub.restore()
       @attachWikiEditorStub.restore()
+      $(window).off('beforeunload')
 
   test 'init wiki sidebar during render', ->
     wikiPageEditView = new WikiPageEditView
@@ -141,7 +142,6 @@ define [
     errors = view.validateFormData title: '', body: 'blah'
     ok errors['title'], 'error when title is present, but blank'
     ok errors['title'][0].message, 'error message when title is present, but blank'
-
 
   module 'WikiPageEditView:JSON'
 
