@@ -234,7 +234,20 @@ describe GradebookImporter do
     course_model
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
     importer_with_rows(
-        "Student,ID,Section,Assignment 1"
+      "Student,ID,Section,Assignment 1"
+    )
+    expect(@gi.assignments).to eq []
+    expect(@gi.missing_assignments).to eq []
+  end
+
+  it "doesn't include readonly assignments" do
+    course_model
+    @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
+    @assignment1 = @course.assignments.create!(:name => 'Assignment 2', :points_possible => 10)
+    importer_with_rows(
+      'Student,ID,Section,Assignment 1,Readonly,Assignment 2',
+      '    Points Possible,,,,(read only),'
+
     )
     expect(@gi.assignments).to eq []
     expect(@gi.missing_assignments).to eq []
