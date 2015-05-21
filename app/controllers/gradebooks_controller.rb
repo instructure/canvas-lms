@@ -232,6 +232,7 @@ class GradebooksController < ApplicationController
       :change_gradebook_version_url => context_url(@context, :change_gradebook_version_context_gradebook_url, :version => 2),
       :export_gradebook_csv_url => course_gradebook_csv_url,
       :gradebook_csv_progress => @last_exported_gradebook_csv.try(:progress),
+      :attachment_url => @last_exported_gradebook_csv.try(:attachment).try(:download_url),
       :attachment => @last_exported_gradebook_csv.try(:attachment),
       :sis_app_url => Setting.get('sis_app_url', nil),
       :sis_app_token => Setting.get('sis_app_token', nil),
