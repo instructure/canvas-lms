@@ -220,36 +220,6 @@ describe AccountAuthorizationConfigsPresenter do
     end
   end
 
-  describe "#form_id" do
-    it "is auth_type_form for a new record" do
-      config = AccountAuthorizationConfig::CAS.new
-      form_id = described_class.new(stub).form_id(config)
-      expect(form_id).to eq('cas_form')
-    end
-
-    it "is generalized for an existing config" do
-      config = AccountAuthorizationConfig::LDAP.new
-      config.stubs(:new_record?).returns(false)
-      presenter = described_class.new(stub)
-      expect(presenter.form_id(config)).to eq('auth_form')
-    end
-  end
-
-  describe "#form_class" do
-    it "is active for an existing config" do
-      config = AccountAuthorizationConfig::SAML.new
-      config.stubs(:new_record?).returns(false)
-      presenter = described_class.new(stub)
-      expect(presenter.form_class(config)).to eq('class="active"')
-    end
-
-    it "is blank for a new record" do
-      cas_config = AccountAuthorizationConfig::CAS.new
-      form_id = described_class.new(stub).form_class(cas_config)
-      expect(form_id).to eq('')
-    end
-  end
-
   describe "#login_placeholder" do
     it "wraps AAC.default_delegated_login_handle_name" do
       expect(described_class.new(stub).login_placeholder).to eq(

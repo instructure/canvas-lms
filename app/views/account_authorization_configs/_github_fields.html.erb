@@ -1,53 +1,13 @@
-<%= fields_for(:account_authorization_config, aac) do |f| %>
-  <%= f.hidden_field :auth_type, value: 'github' %>
-  <%= f.hidden_field :id %>
-  <table class="formtable" style="margin-left: 20px;">
-    <%= render partial: "form_header",
-               locals: { auth_type: t("GitHub"), presenter: presenter, aac: aac } %>
-    <% unless AccountAuthorizationConfig::GitHub.globally_configured? %>
-      <tr>
-        <td></td>
-        <td>
-          <%= mt(<<-TEXT, github_url: "https://github.com/settings/developers", callback_url: oauth2_login_callback_url)
+<% unless AccountAuthorizationConfig::GitHub.globally_configured? %>
+  <p><%= mt(<<-TEXT, github_url: "https://github.com/settings/developers", callback_url: oauth2_login_callback_url)
 You will need to [register an application on GitHub](%{github_url}).
 You should configure %{callback_url} as the Authorization callback URL.
 After you create your app, make a note of the Client ID and Client Secret, and enter them here.
 TEXT
-          %>
-        </td>
-      </tr>
-      <tr>
-        <td style="vertical-align: top; width: 200px;">
-          <%= f.blabel :domain, en: "Domain" %>
-        </td>
-        <td style="vertical-align: top;" class="nobr">
-          <%= f.text_field :domain, class: "auth_form", style: "width: 300px;", placeholder: 'github.com' %>
-        </td>
-      </tr>
-      <tr>
-        <td style="vertical-align: top; width: 200px;">
-          <%= f.blabel :client_id, en: "Client ID" %>
-        </td>
-        <td style="vertical-align: top;" class="nobr">
-          <%= f.text_field :client_id, class: "auth_form", style: "width: 300px;" %>
-        </td>
-      </tr>
-      <tr>
-        <td style="vertical-align: top; width: 200px;">
-          <%= f.blabel :client_secret, en: "Client Secret" %>
-        </td>
-        <td style=" vertical-align: top;" class="nobr">
-          <%= f.text_field :client_secret, value: '', class: "auth_form" %>
-          <% if aac.auth_crypted_password -%>
-            <span class="auth_form" style="font-size: smaller;">
-              <br/>
-              <%= t("Leave blank to continue using the current client secret.") %>
-            </span>
-          <% end %>
-        </td>
-      </tr>
-    <% end %>
-    <%= render partial: "form_footer",
-               locals: { presenter: presenter, account: account, aac: aac, f: f } %>
-  </table>
+          %></p>
+  <div class="ic-Form-control">
+    <%= f.label :domain, t('Domain'), class: 'ic-Label' %>
+    <%= f.text_field :domain, placeholder: 'github.com', class: 'ic-Input' %>
+  </div>
+  <%= render partial: 'oauth2_fields', locals: { f: f } %>
 <% end %>

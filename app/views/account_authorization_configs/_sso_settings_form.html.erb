@@ -1,86 +1,65 @@
-<div id='account_settings'>
-  <%= form_tag(
-          account_update_sso_settings_path(account),
-          method: :put,
-          id: 'sso_settings_form',
-          class: "form-horizontal bootstrap-form well") do %>
-    <table>
-      <%= fields_for :sso_settings, account do |f| %>
-        <tr>
-          <td style="vertical-align: top; width: 200px;">
-            <%= f.blabel :login_handle_name, en: "Login Label" %>
-          </td>
-          <td style="vertical-align: top;" class="nobr">
-            <%= f.text_field :login_handle_name,
-                  style: "width: 300px;",
-                  placeholder: presenter.login_placeholder %>
-            <span class="auth_form" style="font-size: smaller;">
-              <br/>
-              <%= t(:login_handle_name_description,
-                    "The label used for unique login identifiers. Examples: "\
-                    "Login, Username, Student ID, etc.") %>
-            </span>
-          </td>
-        </tr>
-        <tr>
-          <td style="vertical-align: top; width: 200px; white-space: nowrap;">
-            <%= f.blabel :change_password_url, en: "Forgot Password URL" %>
-          </td>
-          <td style="vertical-align: top;" class="nobr">
-            <%= f.text_field :change_password_url,
-                             class: "auth_form",
-                             style: "width: 300px;" %>
-            <div style="font-size: 0.8em;">
-              <span class="auth_form">
-                <%= t(:change_password_url_help,
-                      "Leave blank for default Canvas behavior") %>
-              </span>
-            </div>
-          </td>
-        </tr>
+<h2><%= t 'SSO Settings' %></h2>
+<div class="content-box">
+  <div class="grid-row">
+    <div class="col-xs-12 col-md-8 off-md-2">
+      <%= form_for(account, as: :sso_settings,
+                   url: account_update_sso_settings_path(account),
+                   method: :put,
+                   html: { class: "ic-Form ic-Form--horizontal" }) do |f| %>
+        <div class="ic-Form-control">
+          <%= f.label :login_handle_name, t("Login Label"),
+                      class: 'ic-Label' %>
+          <%= f.text_field :login_handle_name,
+                           placeholder: presenter.login_placeholder,
+                           class: 'ic-Input' %>
+          <div class="help-box">
+            <%= t(:login_handle_name_description,
+                  "The label used for unique login identifiers. Examples: "\
+                  "Login, Username, Student ID, etc.") %>
+          </div>
+        </div>
+        <div class="ic-Form-control">
+          <%= f.label :change_password_url, t("Forgot Password URL"),
+                      class: 'ic-Label' %>
+          <%= f.text_field :change_password_url, class: 'ic-Input' %>
+          <div class="help-box">
+            <%= t(:change_password_url_help,
+                  "Leave blank for default Canvas behavior") %>
+          </div>
+        </div>
         <% if presenter.needs_discovery_url? %>
-          <tr>
-            <td style="vertical-align: top; width: 200px;">
-              <%= f.blabel :auth_discovery_url, en: "Discovery URL" %>
-            </td>
-            <td style="vertical-align: top;">
-              <%= f.text_field :auth_discovery_url,
-                             class: "auth_form",
-                             style: "width: 300px;" %>
-              <div style="font-size: 0.8em;">
-                <span class="auth_form">
-                  <%= t('discovery_url_description', <<-TEXT)
-                  If a discovery url is set, canvas will forward all users to that URL when they need to be authenticated.
-                  That page will need to then help the user figure out where they need to go to log in.
-                  If no discovery url is configured, the first configuration will be used to attempt to authenticate the user.
+          <div class="ic-Form-control">
+            <%= f.label :auth_discovery_url, t("Discovery URL"),
+                        class: 'ic-Label' %>
+            <%= f.text_field :auth_discovery_url, class: 'ic-Input' %>
+            <div class="help-box">
+              <%= t('discovery_url_description', <<-TEXT)
+If a discovery URL is set, Canvas will forward all users to that URL when they need to be authenticated.
+That page will need to then help the user figure out where they need to go to log in.
+If no discovery URL is configured, the first configuration will be used to attempt to authenticate the user.
                   TEXT
-                  %>
-                </span>
-              </div>
-            </td>
-          </tr>
+              %>
+            </div>
+          </div>
         <% end %>
-          <% if presenter.needs_unknown_user_url? %>
-            <tr>
-              <td style="vertical-align: top; width: 200px;">
-                <%= f.blabel :unknown_user_url, en: "Unknown User Url" %>
-              </td>
-              <td style="vertical-align: top;" class="nobr">
-                <%= f.text_field :unknown_user_url,
-                                 class: "auth_form",
-                                 style: "width: 300px;",
-                                 placeholder: login_url %>
-                <span class="auth_form" style="font-size: smaller;">
-                 <br/>
-                    <%= t(:unknown_user_url_description,
-                          "The url to redirect to when an authenticated user is not "\
-                "found in Canvas.") %>
-                </span>
-              </td>
-            </tr>
-          <% end %>
-    <% end %>
-    </table>
-    <button type="submit" class="btn btn-primary">Submit</button>
-  <% end %>
+        <% if presenter.needs_unknown_user_url? %>
+          <div class="ic-Form-control">
+            <%= f.label :unknown_user_url, t("Unknown User URL"),
+                        class: 'ic-Label' %>
+            <%= f.text_field :unknown_user_url,
+                             placeholder: login_url,
+                             class: 'ic-Input' %>
+            <div class="help-box">
+              <%= t(:unknown_user_url_description,
+                    "The url to redirect to when an authenticated user is not "\
+                    "found in Canvas.") %>
+            </div>
+          </div>
+        <% end %>
+        <div class="ic-Form-actions">
+          <%= f.button t('Save'), class: "Button Button--primary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
 </div>

@@ -1,16 +1,4 @@
-<%= fields_for(:account_authorization_config, aac) do |f| %>
-  <%= f.hidden_field :auth_type, value: 'cas' %>
-  <%= f.hidden_field :id %>
-  <table class="formtable" style="margin-left: 20px;">
-    <%= render partial: "form_header",
-               locals: { auth_type: t("CAS"), presenter: presenter, aac: aac } %>
-    <tr>
-      <td><%= f.blabel :auth_base, en: "CAS URL" %></td>
-      <td class="nobr">
-        <%= f.text_field :auth_base, class: "auth_form" %>
-      </td>
-    </tr>
-    <%= render partial: "form_footer",
-               locals: { presenter: presenter, account: account, aac: aac, f: f } %>
-  </table>
-<% end %>
+<div class="ic-Form-control">
+  <%= f.label :auth_base, t('CAS URL'), class: 'ic-Label' %>
+  <%= f.text_field :auth_base, class: 'ic-Input' %>
+</div>

@@ -1,60 +1,17 @@
-<%= fields_for(:account_authorization_config, aac) do |f| %>
-    <%= f.hidden_field :auth_type, value: 'openid_connect' %>
-    <%= f.hidden_field :id %>
-    <table class="formtable" style="margin-left: 20px;">
-      <%= render partial: "form_header",
-                 locals: { auth_type: 'OpenID Connect', presenter: presenter, aac: aac } %>
-          <tr>
-            <td></td>
-            <td>
-              <%= mt(<<-TEXT, callback_url: oauth2_login_callback_url)
+<p><%= mt(<<-TEXT, callback_url: oauth2_login_callback_url)
 To configure an OpenID Connect provider you need the authorize and token urls, and
 obtain a Client ID and Client Secret.
 
 If the provider can configure valid callback or redirect URIs, use %{callback_url}.
                   TEXT
-              %>
-            </td>
-          </tr>
-          <tr>
-            <td style="vertical-align: top; width: 200px;">
-              <%= f.blabel :client_id, en: "Client ID" %>
-            </td>
-            <td style="vertical-align: top;" class="nobr">
-              <%= f.text_field :client_id, class: "auth_form", style: "width: 300px;" %>
-            </td>
-          </tr>
-          <tr>
-            <td style="vertical-align: top; width: 200px;">
-              <%= f.blabel :client_secret, en: "Client Secret" %>
-            </td>
-            <td style=" vertical-align: top;" class="nobr">
-              <%= f.text_field :client_secret, value: '', class: "auth_form" %>
-              <% if aac.auth_crypted_password -%>
-            <span class="auth_form" style="font-size: smaller;">
-              <br/>
-              <%= t("Leave blank to continue using the current client secret.") %>
-            </span>
-              <% end %>
-            </td>
-          </tr>
-          <tr>
-            <td style="vertical-align: top; width: 200px;">
-              <%= f.blabel :authorize_url, en: "Authorize URL" %>
-            </td>
-            <td style="vertical-align: top;" class="nobr">
-              <%= f.text_field :authorize_url, class: "auth_form", style: "width: 300px;" %>
-            </td>
-          </tr>
-          <tr>
-            <td style="vertical-align: top; width: 200px;">
-              <%= f.blabel :token_url, en: "Token URL" %>
-            </td>
-            <td style="vertical-align: top;" class="nobr">
-              <%= f.text_field :token_url, class: "auth_form", style: "width: 300px;" %>
-            </td>
-          </tr>
-      <%= render partial: "form_footer",
-                 locals: { presenter: presenter, account: account, aac: aac, f: f } %>
-    </table>
-<% end %>
+              %></p>
+  <%= render partial: 'oauth2_fields', locals: { f: f } %>
+<div class="ic-Form-control">
+  <%= f.label :authorize_url, 'Authorize URL', class: 'ic-Label' %>
+  <%= f.text_field :authorize_url, class: 'ic-Input' %>
+</div>
+<div class="ic-Form-control">
+  <%= f.label :token_url, 'Token URL', class: 'ic-Label' %>
+  <%= f.password_field :token_url, class: 'ic-Input' %>
+</div>
+

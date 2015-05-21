@@ -60,15 +60,6 @@ class AccountAuthorizationConfigsPresenter
     configs.select{|c| c.is_a?(AccountAuthorizationConfig::CAS) }
   end
 
-  def form_id(config)
-    return "#{config.auth_type}_form" if config.new_record?
-    'auth_form'
-  end
-
-  def form_class(config)
-    return 'class="active"' unless config.new_record?
-    ''
-  end
 
   def sso_options
     new_auth_types.map do |auth_type|

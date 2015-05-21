@@ -63,16 +63,19 @@
 
 <% if @presenter.canvas_auth_only? %>
   <p>
-    <%= mt(:canvas_login_tip, "If you configure settings that cause you to "\
-           "not be able to log in you can add *%{url1}* to the end of your login"\
-           " url. This will let you login using the normal Canvas login "\
-           "procedure. For this account the url would be %{url2}",
-           url1: "?canvas_login=1",
-           url2: "http://#{@account.domain}/login?canvas_login=1") %>
+    <%= mt("If you configure settings that cause you to "\
+           "not be able to log in you can directly access regular Canvas "\
+           "login at %{url}",
+           url: canvas_login_url) %>
   </p>
 <% end %>
 
-<h2><%= t(:current_settings_title, "Current Integration") %></h2>
+<% if @presenter.configs.size >= 1 %>
+    <%= render partial: 'sso_settings_form',
+               locals: { presenter: @presenter, account: @account }%>
+<% end %>
+
+<h2><%= t("Current Provider") %></h2>
 
 
 <% if @presenter.configs.empty? %>
@@ -104,11 +107,6 @@
 <% if @presenter.saml_enabled? && @presenter.saml_configs.size > 0 %>
   <%= render partial: 'saml_settings_test',
              locals: { account: @account, presenter: @presenter } %>
-<% end %>
-
-<% if @presenter.configs.size >= 1 %>
-  <%= render partial: 'sso_settings_form',
-             locals: { presenter: @presenter, account: @account }%>
 <% end %>
 
 <% js_bundle :account_authorization_configs %>

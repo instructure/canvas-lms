@@ -1,45 +1,9 @@
-<%= fields_for(:account_authorization_config, aac) do |f| %>
-    <%= f.hidden_field :auth_type, value: 'linkedin' %>
-    <%= f.hidden_field :id %>
-    <table class="formtable" style="margin-left: 20px;">
-      <%= render partial: "form_header",
-                 locals: { auth_type: t("LinkedIn"), presenter: presenter, aac: aac } %>
-      <% unless AccountAuthorizationConfig::LinkedIn.globally_configured? %>
-          <tr>
-            <td></td>
-            <td>
-              <%= mt(:description, <<-TEXT, :linkedin_url => 'https://www.linkedin.com/secure/developer', :callback_url => raw('<span class="nobr">https://&lt; ' + t(:domain_name, 'domain') + ' &gt;/oauth_success?service=linked_in</span>'))
+<% unless AccountAuthorizationConfig::LinkedIn.globally_configured? %>
+  <p><%= mt(:description, <<-TEXT, linkedin_url: 'https://www.linkedin.com/secure/developer', callback_url: oauth2_login_callback_url)
 You will need to [register an application on LinkedIn](%{linkedin_url}).
 You should add %{callback_url} as an OAuth 2.0 authorized redirect URL, and set the Application Status to Live
 After you create your application, make a note of the Client ID and Client Secret, and enter them here.
 TEXT
-              %>
-            </td>
-          </tr>
-          <tr>
-            <td style="vertical-align: top; width: 200px;">
-              <%= f.blabel :client_id, en: "Client ID" %>
-            </td>
-            <td style="vertical-align: top;" class="nobr">
-              <%= f.text_field :client_id, class: "auth_form", style: "width: 300px;" %>
-            </td>
-          </tr>
-          <tr>
-            <td style="vertical-align: top; width: 200px;">
-              <%= f.blabel :client_secret, en: "Client Secret" %>
-            </td>
-            <td style=" vertical-align: top;" class="nobr">
-              <%= f.text_field :client_secret, value: '', class: "auth_form" %>
-              <% if aac.auth_crypted_password -%>
-            <span class="auth_form" style="font-size: smaller;">
-              <br/>
-              <%= t("Leave blank to continue using the current client secret.") %>
-            </span>
-              <% end %>
-            </td>
-          </tr>
-      <% end %>
-      <%= render partial: "form_footer",
-                 locals: { presenter: presenter, account: account, aac: aac, f: f } %>
-    </table>
+      %></p>
+  <%= render partial: 'oauth2_fields', locals: { f: f } %>
 <% end %>
