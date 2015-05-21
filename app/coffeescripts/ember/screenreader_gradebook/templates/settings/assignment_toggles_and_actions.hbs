@@ -86,9 +86,17 @@
     </div>
 
     <div class="pad-box bottom-only">
-      <a class="btn" role="button" href="{{ unbound downloadCsvUrl }}">
-        <i class="icon-download"></i> {{#t 'download_scores'}}Download Scores (.csv){{/t}}
-      </a>
+      <button class="btn" {{action "exportGradebookCsv"}} id="gradebook-export">
+        <i class="icon-download"></i> {{#t 'download_current_scores'}}Download Current Scores (.csv){{/t}}
+      </button>
+      {{#if lastGeneratedCsvAttachmentUrl}}
+        <a aria-label="{{unbound lastGeneratedCsvLabel}}" href="{{unbound lastGeneratedCsvAttachmentUrl}}" id="last-exported-gradebook">
+          {{unbound lastGeneratedCsvLabel}}
+        </a>
+      {{/if}}
+    </div>
+
+    <div class="pad-box bottom-only">
       <a
         id="upload"
         class="btn"
@@ -97,7 +105,7 @@
         <i class="icon-upload"></i> {{#t 'upload_scores'}}Upload Scores (.csv){{/t}}
       </a>
     </div>
-
+    <iframe style="display:none" id="gradebook-export-iframe"></iframe>
     <div class="pad-box bottom-only">
       <div>
         {{#if publishToSisEnabled}}
