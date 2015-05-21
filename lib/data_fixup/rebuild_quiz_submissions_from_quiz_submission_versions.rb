@@ -11,7 +11,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionVersions
     quiz_submission.save_with_versioning! if quiz_submission
   end
 
-# Time.zone.parse("2015-05-08")
+  # Time.zone.parse("2015-05-08")
   def self.run_on_array(submission_ids, timestamp = Time.zone.now)
     base_url = "#{Shard.current.id}/api/v1/"
     submission_ids.map do |id|
@@ -67,6 +67,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionVersions
       end
 
       qs_id = submission.quiz_submission_id
+      old_submission_grading_data = [submission.score, submission.grader_id]
 
       # Get versions
       models = Version.where(
@@ -101,7 +102,18 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionVersions
         persisted_qs
       else
         Rails.logger.warn LOG_PREFIX + "Versions contained ungraded data: submission_id: #{submission.id} version:#{model.version_number} qs:#{qs_id}"
-        grade_with_new_submission_data(qs, qs.finished_at)
+        grade_with_new_submission_data(persisted_qs, persisted_qs.finished_at)
       end
+
+      if submission.reload.workflow_state == "pending_review"
+        if old_submission_grading_data.first != submission.score
+          Rails.logger.warn LOG_PREFIX + "GRADING REPORT - " +
+            "score-- #{old_submission_grading_data.first}:#{submission.score} " +
+            "grader_id-- #{old_submission_grading_data[1]}:#{submission.grader_id} "
+        else
+          Rails.logger.warn LOG_PREFIX + "GRADING REPORT - " + "Grading required for quiz_submission: #{persisted_qs.id}"
+        end
+      end
+      persisted_qs
     end
 end
