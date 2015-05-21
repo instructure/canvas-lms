@@ -7,7 +7,7 @@
 		exports["TokenInput"] = factory(require("react"));
 	else
 		root["TokenInput"] = factory(root["React"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_3__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_2__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -55,7 +55,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var TokenInput = __webpack_require__(1)
-	TokenInput.Option = __webpack_require__(2)
+	TokenInput.Option = __webpack_require__(5)
 	
 	module.exports = TokenInput
 
@@ -64,14 +64,14 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(3);
-	var Combobox = React.createFactory(__webpack_require__(4));
-	var Token = React.createFactory(__webpack_require__(5));
+	var React = __webpack_require__(2);
+	var Combobox = React.createFactory(__webpack_require__(3));
+	var Token = React.createFactory(__webpack_require__(6));
 	
 	var ul = React.createFactory('ul');
 	var li = React.createFactory('li');
 	
-	module.exports = React.createClass({displayName: "exports",
+	module.exports = React.createClass({displayName: "module.exports",
 	  propTypes: {
 	    onInput: React.PropTypes.func,
 	    onSelect: React.PropTypes.func.isRequired,
@@ -147,69 +147,23 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(3);
-	var addClass = __webpack_require__(6);
-	var div = React.createFactory('div');
-	
-	module.exports = React.createClass({displayName: "exports",
-	
-	  propTypes: {
-	
-	    /**
-	     * The value that will be sent to the `onSelect` handler of the
-	     * parent Combobox.
-	    */
-	    value: React.PropTypes.any.isRequired,
-	
-	    /**
-	     * What value to put into the input element when this option is
-	     * selected, defaults to its children coerced to a string.
-	    */
-	    label: React.PropTypes.string
-	  },
-	
-	  getDefaultProps: function() {
-	    return {
-	      role: 'option',
-	      tabIndex: '-1',
-	      className: 'ic-tokeninput-option',
-	      isSelected: false
-	    };
-	  },
-	
-	  render: function() {
-	    var props = this.props;
-	    if (props.isSelected) {
-	      props.className = addClass(props.className, 'ic-tokeninput-selected');
-	      props.ariaSelected = true;
-	    }
-	    return div(props);
-	  }
-	
-	});
-
+	module.exports = __WEBPACK_EXTERNAL_MODULE_2__;
 
 /***/ },
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_3__;
-
-/***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(3);
+	var React = __webpack_require__(2);
 	var guid = 0;
 	var k = function(){};
-	var addClass = __webpack_require__(6);
-	var ComboboxOption = React.createFactory(__webpack_require__(2));
+	var addClass = __webpack_require__(4);
+	var ComboboxOption = React.createFactory(__webpack_require__(5));
 	
 	var div = React.createFactory('div');
 	var span = React.createFactory('span');
 	var input = React.createFactory('input');
 	
-	module.exports = React.createClass({displayName: "exports",
+	module.exports = React.createClass({displayName: "module.exports",
 	
 	  propTypes: {
 	    /**
@@ -349,6 +303,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 	
 	  handleInputFocus: function() {
+	    this.maybeShowList();
+	  },
+	
+	  handleInputClick: function() {
+	    this.maybeShowList();
+	  },
+	
+	  maybeShowList: function(){
 	    if (this.props.showListOnFocus){
 	      this.showList()
 	    }
@@ -395,7 +357,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 	
 	  hideList: function() {
-	    this.setState({isOpen: false});
+	    this.setState({
+	      isOpen: false,
+	      focusedIndex: null
+	    });
 	  },
 	
 	  hideOnEscape: function(event) {
@@ -578,6 +543,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        id: this.props.id,
 	        className: 'ic-tokeninput-input',
 	        onFocus: this.handleInputFocus,
+	        onClick: this.handleInputClick,
 	        onChange: this.handleInputChange,
 	        onBlur: this.handleInputBlur,
 	        onKeyDown: this.handleKeydown,
@@ -615,14 +581,73 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = addClass;
+	
+	function addClass(existing, added) {
+	  if (!existing) return added;
+	  if (existing.indexOf(added) > -1) return existing;
+	  return existing + ' ' + added;
+	}
+
+
+/***/ },
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var React = __webpack_require__(3);
+	var React = __webpack_require__(2);
+	var addClass = __webpack_require__(4);
+	var div = React.createFactory('div');
+	
+	module.exports = React.createClass({displayName: "module.exports",
+	
+	  propTypes: {
+	
+	    /**
+	     * The value that will be sent to the `onSelect` handler of the
+	     * parent Combobox.
+	    */
+	    value: React.PropTypes.any.isRequired,
+	
+	    /**
+	     * What value to put into the input element when this option is
+	     * selected, defaults to its children coerced to a string.
+	    */
+	    label: React.PropTypes.string
+	  },
+	
+	  getDefaultProps: function() {
+	    return {
+	      role: 'option',
+	      tabIndex: '-1',
+	      className: 'ic-tokeninput-option',
+	      isSelected: false
+	    };
+	  },
+	
+	  render: function() {
+	    var props = this.props;
+	    if (props.isSelected) {
+	      props.className = addClass(props.className, 'ic-tokeninput-selected');
+	      props.ariaSelected = true;
+	    }
+	    return div(props);
+	  }
+	
+	});
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(2);
 	var span = React.DOM.span;
 	var li = React.createFactory('li');
 	
-	module.exports = React.createClass({displayName: "exports",
+	module.exports = React.createClass({displayName: "module.exports",
 	  handleClick: function() {
 	    this.props.onRemove(this.props.value)
 	  },
@@ -650,19 +675,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    )
 	  }
 	})
-
-
-/***/ },
-/* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = addClass;
-	
-	function addClass(existing, added) {
-	  if (!existing) return added;
-	  if (existing.indexOf(added) > -1) return existing;
-	  return existing + ' ' + added;
-	}
 
 
 /***/ }

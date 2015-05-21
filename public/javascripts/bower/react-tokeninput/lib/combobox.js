@@ -148,6 +148,14 @@ module.exports = React.createClass({
   },
 
   handleInputFocus: function() {
+    this.maybeShowList();
+  },
+
+  handleInputClick: function() {
+    this.maybeShowList();
+  },
+
+  maybeShowList: function(){
     if (this.props.showListOnFocus){
       this.showList()
     }
@@ -194,7 +202,10 @@ module.exports = React.createClass({
   },
 
   hideList: function() {
-    this.setState({isOpen: false});
+    this.setState({
+      isOpen: false,
+      focusedIndex: null
+    });
   },
 
   hideOnEscape: function(event) {
@@ -377,6 +388,7 @@ module.exports = React.createClass({
         id: this.props.id,
         className: 'ic-tokeninput-input',
         onFocus: this.handleInputFocus,
+        onClick: this.handleInputClick,
         onChange: this.handleInputChange,
         onBlur: this.handleInputBlur,
         onKeyDown: this.handleKeydown,
