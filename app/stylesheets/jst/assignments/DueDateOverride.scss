@@ -18,6 +18,12 @@ $assign-border-color: #ccc;
   }
 }
 
+.quiz-overrides-column-right{
+  display: inline-block;
+  margin-left: 20px;
+  margin-top: -15px;
+}
+
 .Button.Button--add-row {
   text-align: center;
   border: 1px dashed $assign-border-color; // color matching legacy code
@@ -31,7 +37,7 @@ $assign-border-color: #ccc;
   font-weight: 500;
 }
 .ContainerDueDate {
-  max-width: 500px;
+  width: 500px;
   margin: 20px 0; // matches legacy margins
 }
 

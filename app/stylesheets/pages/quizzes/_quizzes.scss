@@ -1260,6 +1260,9 @@ ul#quiz_versions {
       min-width: 125px;
     }
   }
+  #options_tab{
+    overflow-x: scroll;
+  }
   #quiz_tabs {
     margin-top: 0.7em;
     #questions_tab {
