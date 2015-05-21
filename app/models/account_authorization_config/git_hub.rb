@@ -19,6 +19,7 @@
 class AccountAuthorizationConfig::GitHub < AccountAuthorizationConfig::Oauth2
   include AccountAuthorizationConfig::PluginSettings
   self.plugin = :github
+  plugin_settings :domain, :client_id, client_secret: :client_secret_dec
 
   def self.sti_name
     'github'.freeze
@@ -40,8 +41,6 @@ class AccountAuthorizationConfig::GitHub < AccountAuthorizationConfig::Oauth2
   def domain
     auth_host
   end
-
-  plugin_settings :domain, :client_id, client_secret: :client_secret_dec
 
   def unique_id(token)
     token.options[:mode] = :query

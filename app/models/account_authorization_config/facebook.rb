@@ -19,6 +19,7 @@
 class AccountAuthorizationConfig::Facebook < AccountAuthorizationConfig::Oauth2
   include AccountAuthorizationConfig::PluginSettings
   self.plugin = :facebook
+  plugin_settings :app_id, app_secret: :app_secret_dec
 
   SENSITIVE_PARAMS = [ :app_secret ].freeze
 
@@ -27,8 +28,6 @@ class AccountAuthorizationConfig::Facebook < AccountAuthorizationConfig::Oauth2
 
   alias_method :app_secret=, :client_secret=
   alias_method :app_secret, :client_secret
-
-  plugin_settings :app_id, app_secret: :app_secret_dec
 
   def login_button?
     true
