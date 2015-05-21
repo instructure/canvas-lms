@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+
+require 'securerandom'
+
 class EventStream::Record < Struct.new(:attributes)
   def self.attributes(*attribute_names)
     attribute_names.each do |attribute_name|
@@ -35,7 +38,7 @@ class EventStream::Record < Struct.new(:attributes)
       attributes['request_id'] = request_id.to_s
     end
 
-    attributes['id'] ||= CanvasUUID.generate
+    attributes['id'] ||= SecureRandom.uuid
     attributes['created_at'] ||= Time.zone.now
     attributes['created_at'] = Time.zone.at(attributes['created_at'].to_i)
     attributes['event_type'] ||= self.class.name.gsub("::#{self.class.name.demodulize}", '').demodulize.underscore

@@ -3,11 +3,14 @@ define [
   'underscore'
   'timezone'
   'vendor/timezone/America/Denver'
+  'vendor/timezone/America/Juneau'
+  'vendor/timezone/fr_FR'
   'compiled/views/calendar/AgendaView'
   'compiled/calendar/EventDataSource'
   'helpers/ajax_mocks/api/v1/calendarEvents'
   'helpers/ajax_mocks/api/v1/calendarAssignments'
-], ($, _, tz, denver, AgendaView, EventDataSource, eventResponse, assignmentResponse) ->
+  'helpers/I18nStubber'
+], ($, _, tz, denver, juneau, french, AgendaView, EventDataSource, eventResponse, assignmentResponse, I18nStubber) ->
   loadEventPage = (server, includeNext = false) ->
     sendCustomEvents(server, eventResponse, assignmentResponse, includeNext)
 
@@ -28,11 +31,13 @@ define [
       @server = sinon.fakeServer.create()
       @snapshot = tz.snapshot()
       tz.changeZone(denver, 'America/Denver')
+      I18nStubber.pushFrame()
 
     teardown: ->
       @container.remove()
       @server.restore()
       tz.restore(@snapshot)
+      I18nStubber.popFrame()
 
   test 'should render results', ->
     view = new AgendaView(el: @container, dataSource: @dataSource)
@@ -57,6 +62,11 @@ define [
     ok @container.find('.agenda-load-btn').length
 
   test 'toJSON should properly serialize results', ->
+    I18nStubber.stub 'en',
+      'date.formats.short_with_weekday': '%a, %b %-d'
+      'date.abbr_day_names.1': 'Mon'
+      'date.abbr_month_names.10': 'Oct'
+
     view = new AgendaView(el: @container, dataSource: @dataSource)
     view.fetch(@contextCodes, @startDate)
     loadEventPage(@server)
@@ -101,3 +111,53 @@ define [
     sendCustomEvents(@server, JSON.stringify(events), JSON.stringify([]), false, 2)
 
     ok @container.find('.ig-row').length == 60, 'finds 60 ig-rows'
+
+  test 'renders non-assignment events with locale-appropriate format string', ->
+    tz.changeLocale(french, 'fr_FR')
+    I18nStubber.setLocale 'fr_FR'
+    I18nStubber.stub 'fr_FR', 'time.formats.tiny': '%k:%M'
+
+    view = new AgendaView(el: @container, dataSource: @dataSource)
+    view.fetch(@contextCodes, @startDate)
+    loadEventPage(@server)
+
+    # this event has a start_at of 2013-10-08T20:30:00Z, or 1pm MDT
+    ok @container.find('.ig-details').slice(2, 3).text().match(/13:00/), 'formats according to locale'
+
+  test 'renders assignment events with locale-appropriate format string', ->
+    tz.changeLocale(french, 'fr_FR')
+    I18nStubber.setLocale 'fr_FR'
+    I18nStubber.stub 'fr_FR', 'time.formats.tiny': '%k:%M'
+
+    view = new AgendaView(el: @container, dataSource: @dataSource)
+    view.fetch(@contextCodes, @startDate)
+    loadEventPage(@server)
+
+    # this event has a start_at of 2013-10-13T05:59:59Z, or 11:59pm MDT
+    ok @container.find('.ig-details').slice(12, 13).text().match(/23:59/), 'formats according to locale'
+
+  test 'renders non-assignment events in appropriate timezone', ->
+    tz.changeZone(juneau, 'America/Juneau')
+    I18nStubber.stub 'en',
+      'time.formats.tiny': '%l:%M%P'
+      'date': {}
+
+    view = new AgendaView(el: @container, dataSource: @dataSource)
+    view.fetch(@contextCodes, @startDate)
+    loadEventPage(@server)
+
+    # this event has a start_at of 2013-10-08T20:30:00Z, or 11:00am AKDT
+    ok @container.find('.ig-details').slice(2, 3).text().match(/11:00am/), 'formats in correct timezone'
+
+  test 'renders assignment events in appropriate timezone', ->
+    tz.changeZone(juneau, 'America/Juneau')
+    I18nStubber.stub 'en',
+      'time.formats.tiny': '%l:%M%P'
+      'date': {}
+
+    view = new AgendaView(el: @container, dataSource: @dataSource)
+    view.fetch(@contextCodes, @startDate)
+    loadEventPage(@server)
+
+    # this event has a start_at of 2013-10-13T05:59:59Z, or 9:59pm AKDT
+    ok @container.find('.ig-details').slice(12, 13).text().match(/9:59pm/), 'formats in correct timezone'

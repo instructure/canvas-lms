@@ -20,11 +20,12 @@ define [
       groupCategory = new GroupCategory()
       view = new GroupCreateView({groupCategory: groupCategory, model: group})
       view.render()
-      view.$el.appendTo($(document.body))
+      view.$el.appendTo($("#fixtures"))
 
     teardown: ->
       fakeENV.teardown()
       view.remove()
+      document.getElementById("fixtures").innerHTML = ""
 
   test 'renders join level in add group dialog for student organized group categories', ->
     view.groupCategory.set('role': 'student_organized')
@@ -43,11 +44,12 @@ define [
       groupCategory = new GroupCategory()
       view = new GroupCreateView({groupCategory: groupCategory, model: group})
       view.render()
-      view.$el.appendTo($(document.body))
+      view.$el.appendTo($("#fixtures"))
 
     teardown: ->
       fakeENV.teardown()
       view.remove()
+      document.getElementById("fixtures").innerHTML = ""
 
   test 'set focus on the group edit save button', ->
     view.setFocusAfterError()

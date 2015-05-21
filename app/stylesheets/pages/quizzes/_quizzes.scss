@@ -1037,40 +1037,14 @@ form.question_form {
       left: 0;
     }
     .answer_comments {
-      -moz-border-radius: 5px;
-      border: 2px solid #faa;
-      font-size: 0.8em;
       margin-left: 30px;
       padding: 10px 5px;
       margin-top: 5px;
-      position: relative;
-      .comment_focus {
-        display: none;
-      }
-      .comment_top {
-        position: absolute;
-        top: -8px;
-        left: 10px;
-        width: 19px;
-        height: 8px;
-        background-repeat: no-repeat;
-        background-image: url(/images/comment_top.png);
-      }
       .answer_comment_box {
         height: 2.5em;
       }
       &.empty {
-        width: 50px;
         padding: 0;
-        opacity: 0.5;
-        .comment_focus {
-          display: block;
-          text-align: center;
-          font-size: 1.2em;
-        }
-        .comments_header, textarea {
-          display: none;
-        }
       }
     }
     .answer.correct_answer {
@@ -1083,18 +1057,50 @@ form.question_form {
     }
   }
   .question_comment {
-    font-size: 0.8em;
-    position: relative;
-    float: left;
+    float: none;
+    display: inline-block;
     width: 40%;
     min-width: 50px;
-    border: 2px solid #faa;
-    -moz-border-radius: 5px;
     padding: 3px 5px;
     margin: 5px 10px;
-    .comment_focus {
-      display: none;
+    vertical-align: top;
+
+    &.question_correct_comment {
+      border-color: #4a4;
+      color: #080;
+      .comment_top {
+        background-image: url(/images/comment_top_correct.png);
+      }
     }
+  }
+  .question.selectable {
+    .answer.correct_answer {
+      color: #080;
+    }
+  }
+
+  .comment {
+    position: relative;
+    border: 2px solid #faa;
+    -moz-border-radius: 5px;
+
+    .details {
+      font-size: 0.8em;
+    }
+
+    .comment_focus {
+      position: relative;
+      left: -100000px;
+      float: right;
+      .ellipsis {
+        display: none;
+      }
+    }
+
+    &.hover .comment_focus, .comment_focus:focus {
+      left: 0;
+    }
+
     .comment_top {
       position: absolute;
       display: block;
@@ -1105,32 +1111,37 @@ form.question_form {
       background-repeat: no-repeat;
       background-image: url(/images/comment_top.png);
     }
-    &.question_correct_comment {
-      border-color: #4a4;
-      color: #080;
-      .comment_top {
-        background-image: url(/images/comment_top_correct.png);
-      }
-    }
+
     &.empty {
       width: 50px;
       opacity: 0.5;
       .comment_focus {
+        left: 0;
+        float: none;
         display: block;
         text-align: center;
         font-size: 1.2em;
+        .ellipsis {
+          display: block;
+        }
+        .icon-edit {
+          display: none;
+        }
       }
       .details {
         display: none;
       }
-      textarea {
+    }
+
+    &.editing {
+      display: block;
+      width: auto;
+      .mce-container-body {
+        overflow: inherit;
+      }
+      .comment_focus {
         display: none;
       }
-    }
-  }
-  .question.selectable {
-    .answer.correct_answer {
-      color: #080;
     }
   }
 }
@@ -1628,8 +1639,8 @@ ul#quiz_versions {
   max-width: 100%;
 }
 
-.edit-html-done {
-  float: right;
+.edit_html_done_wrapper {
+  text-align: right;
 }
 
 .question_actions .edit_html {

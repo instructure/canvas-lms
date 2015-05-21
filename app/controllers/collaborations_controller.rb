@@ -66,11 +66,22 @@ class CollaborationsController < ApplicationController
     add_crumb(t('#crumbs.collaborations', "Collaborations"), polymorphic_path([@context, :collaborations]))
 
     @collaborations = @context.collaborations.active
-    log_asset_access("collaborations:#{@context.asset_string}", "collaborations", "other")
-    @google_drive_upgrade = logged_in_user && Canvas::Plugin.find(:google_drive).try(:settings) &&
-      (!logged_in_user.user_services.where(service: 'google_drive').first || !(google_drive_connection.verify_access_token rescue false))
+    log_asset_access([ "collaborations", @context ], "collaborations", "other")
 
-    @google_docs_authorized = !@google_drive_upgrade && google_service_connection.verify_access_token rescue false
+    safe_token_valid = lambda do |service|
+      begin
+        self.send(service).verify_access_token
+      rescue => e
+        Canvas::Errors.capture(e, { source: 'rescue nil' })
+        false
+      end
+    end
+
+    @google_drive_upgrade = logged_in_user && Canvas::Plugin.find(:google_drive).try(:settings) &&
+      (!logged_in_user.user_services.where(service: 'google_drive').first ||
+      !safe_token_valid.call(:google_drive_connection))
+
+    @google_docs_authorized = !@google_drive_upgrade && safe_token_valid.call(:google_service_connection)
 
     js_env :TITLE_MAX_LEN => Collaboration::TITLE_MAX_LENGTH,
            :CAN_MANAGE_GROUPS => @context.grants_right?(@current_user, session, :manage_groups),
@@ -190,4 +201,3 @@ class CollaborationsController < ApplicationController
   end
 
 end
-

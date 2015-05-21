@@ -8,6 +8,8 @@ define [
   clock = null
   view = null
   categories = null
+  wrapper = null
+  sanbox = null
 
   module 'GroupCategoriesView',
     setup: ->
@@ -18,16 +20,19 @@ define [
         {id: 1, name: "group set 1"}
         {id: 2, name: "group set 2"}
       ]
+      sinon.stub(categories, "fetch").returns([])
       view = new GroupCategoriesView
         collection: categories
       view.render()
-      view.$el.appendTo($(document.body))
+      wrapper = document.getElementById("fixtures")
+      wrapper.innerHTML = ""
+      view.$el.appendTo($("#fixtures"))
 
     teardown: ->
       fakeENV.teardown()
       clock.restore()
       view.remove()
-      $('.group_categories_area').remove()
+      wrapper.innerHTML = ""
 
   test 'render tab and panel elements', ->
     # find the tabs

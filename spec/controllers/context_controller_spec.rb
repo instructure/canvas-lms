@@ -36,7 +36,7 @@ describe ContextController do
       @group.add_user(@student, 'accepted')
       get 'roster', :group_id => @group.id
       expect(assigns[:primary_users].each_value.first.collect(&:id)).to eq [@student.id]
-      expect(assigns[:secondary_users].each_value.first.collect(&:id)).to eq @course.admins.map(&:id)
+      expect(assigns[:secondary_users].each_value.first.collect(&:id)).to match_array @course.admins.map(&:id)
     end
   end
 

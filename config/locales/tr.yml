@@ -3,12 +3,15 @@
 --- 
 tr: 
   1_item_scores_1_2_2_3_5_5_3_39f6c397: "1 - Öğe puanları: 1, 2, 2, 3, 5, 5, 3"
+  1_item_scores_1_3_2_4_5_3_6_mastery_score_set_at_5_70ff296a: "1- Öğe Puanları: 1, 3, 2, 4, 5, 3, 6. Yeterlilik puanı 5'e ayarlı."
   1_item_scores_3_2_2_4_1_3_4_e0de3073: "1 - Öğe puanları: 3, 2, 2, 4, 1, 3, 4"
+  1_item_scores_4_3_2_5_3e2933a0: "1 - Öğe puanları: 4, 3, 2, 5"
   1_item_scores_5512cd03: "1- Öğe puanları"
   2_final_score_5_5_8418d475: "2- Final puanı: 5.5"
   2_final_score_7b0fd15e: "2- Final puanı"
   2_highest_score_4_3b4bc250: "2 - En yüksek puan: 4"
   2_most_recent_score_3_766dbf4e: "2 - En güncel puan: 3"
+  2_the_rest_item_average_4_3_2_3_3_d05f04e2: "2 - 'Geri kalan' öğe ortalaması: (4 + 3 + 2) / 3 = 3"
   3_calculated_mastery_score_5_0_75_3_0_25_4_5_c88c3a7b: "3 - Hesaplanmış yeterlik puanı: 5(0.75) + 3(0.25) = 4.5"
   451_message: 
     description: "Birleşik Devletler ticari sınırlılıkları uygulanan bir ülkede bulunduğunuz için bu siteye erişme yetkiniz yok."
@@ -1278,11 +1281,6 @@ tr:
       messages: 
         record_invalid: "Doğrulama başarısız: %{errors}"
         taken: "önceden alınmış"
-      template: 
-        body: "Aşağıdaki alanlar ile ilgili sorunlar var:"
-        header: 
-          one: "1 hata bu %{model} nin kaydedilmesini engelledi"
-          other: "%{count} kadar hata bu %{model} nin kaydedilmesini engelledi"
   activity_13915493: Etkinlik
   activity_by_category_9c2033d1: "Kategoriye göre Etkinlik"
   activity_by_date_878c5b49: "Güne göre Etkinlik"
@@ -1686,6 +1684,8 @@ tr:
       assignment_name: "İsim:"
       assignment_points: "Puanlar:"
       assignment_type: "Tip:"
+      buttons: 
+        save_and_publish: "Kaydet & Yayınla"
       cancel: İptal
       differentiated_due_dates: "Sınıflandırılmıl teslim tarihi"
       discussion_type: Tartışma
@@ -1758,7 +1758,8 @@ tr:
     edit_view: 
       assignment_name: "Ödev Adı"
       buttons: 
-        update: "Ödev Güncelle"
+        save: Kaydet
+        save_and_publish: "Kaydet & Yayınla"
       description: Açıklama
       freeze_properties: "Kopyalandığında ödev ayarlarını kitlitle"
       notify_content_change: "Bu içerik değişiminden kullanıcıları bilgilendir"
@@ -2226,7 +2227,6 @@ tr:
   between_1_and_99_d421a4c0: "1% ile 99% Arasında"
   between_2_and_5_c34f5152: "2 ile 5 Arasında"
   big_blue_button_conference: 
-    conference_is_recorded: "Bu konferans kaydedilmektedir."
     recording_setting: Kaydediliyor
     recording_setting_enabled_description: "Bu konferans için kaydı etkinleştir"
   blackboard: 
@@ -3675,8 +3675,6 @@ tr:
       edit_item: "Öğe ayrıntılarını düzenle"
     url_show: 
       new_tab: "Bu sitenin yeni tarayıcı penceresinde açılması gerekiyor."
-      open_url_button: "%{title} 'ı yeni pencerede aç"
-      tool_insecure_warning: "Güvenli bir site (canvas) içinden güvensiz bir içeriğe erişmeye çalışıyorsunuz. Bazı internet tarayıcıları bu içeriğin yüklenmesine izin vermeyebilir."
   context_modules_api: 
     invalid_position: "Geçersiz konum"
   continue_ac067716: Devam
@@ -5097,6 +5095,7 @@ tr:
       buttons: 
         not_published: Yayınlanmadı
         published: Yayınlandı
+        save_and_publish: "Kaydet & Yayınla"
       delay_posting: "Sonra gönder"
       enable_podcast_feed: "PodCast yayınları aktif"
       only_visible_to_overrides_note: "Not: Bu tartışma *yalnızca* aşağıda belirtilen kısım(lar)'da görülebilir. "
@@ -5443,7 +5442,6 @@ tr:
   ember_modules_description: "Ember'de yeniden yazılan Modüller. Harici konumlardan sürüklemeyi etkinleştirmek için gömülü sürükle bırak API'sini kullanır."
   enable_6f5d1328: Etkin
   enable_gradebook_list_students_by_sortable_name: "Öğrencileri Not Defterinde sıralanmış isimleri ile listeleyin. Sıralanmış isimler varsayılan olarak 'Soy adı, Adı' şeklindedir fakat ayarlarda değiştirilebilir."
-  enable_multiple_grading_periods: "Hesap yöneticisinde çoklu notlandırma periyotlarını etkinleştirip Not Defterinde kullanın."
   end_date_e0093ed7: "Bitiş Tarihi"
   ends_on_date_320e0c26: "Şu gün Bitiyor"
   enrollment: 
@@ -5745,7 +5743,6 @@ tr:
   errors: 
     bad_navigation_config: "Geçersiz ders sekme yapılandırması"
     blank: Zorunlu
-    dynamic_format: "%{message}"
     failed: Başarısız
     format: "%{attribute} %{message}"
     index: 
@@ -5945,6 +5942,7 @@ tr:
     submit: Gönder
     user_navigation_configured: "Kullanıcı gezinme menüsü yapılandırıldı"
     wiki_page_menu_configured: "Wiki sayfa menüsü ayarlandı"
+  failed_to_import_media_objects_4c1fcb4f: "Ortam nesnelerinin içe aktarımı başarısız"
   fair_use_bee47d77: "Adil Kullanım"
   favicon_6e658914: "Site ikonu"
   feature_flags: 
@@ -5963,6 +5961,7 @@ tr:
     feature_flag_admin_view: 
       feature_options: "Özellik Seçenekleri"
       no_features_available: "Şu anda kullanılabilir özellik yok"
+  feature_options_37a2c317: "Özellik Seçenekleri"
   features: 
     allow_opt_out_of_inbox: "Kullanıcıların gelen kutusunda ayrılmalarına izin ver"
     better_file_browsing: "Daha İyi Dosya Arama"
@@ -7289,7 +7288,6 @@ tr:
     account_grading_standard_warning: "Ders için hesap notlandırma standardı bulunamadı."
     copied_grading_standard_warning: "Ders için kopyalanmış notlandırma standardı bulunamadı."
     due_dates_warning: "Bitiş tarihleri ayarlanamadı."
-    failed_import_media_objects: "Ortam nesnelerinin içe aktarımı başarısız"
     file_import_warning: "%{file} dosyası bulunamadı"
   importers/learning_outcome_group_importer: 
     no_global_permission: "Toplu öğrenme çıktılarını yönetme izniniz yok, \"%{title}\" ekleyemezsiniz"
@@ -7387,6 +7385,7 @@ tr:
   invalid_utf_8_13c76a6: "UTF-8 Geçersiz"
   invalid_xml_syntax: "Geçersiz XML yazımı"
   invite_5b1fcbcd: "Davet et"
+  it_looks_like_your_content_might_not_load_you_can__dfb85860: "İçeriğiniz yüklenmemiş gibi görünüyor. Yeni bir sekmede içeriğinize erişmek için bu butonu kullanabilirsiniz."
   item_complete_d334fd43: "(Tamamlanan Öğe)"
   item_incomplete_d6a16040: "(Tamamlanmayan Öğe)"
   items_299a7626: "Öğeler:"
@@ -7645,8 +7644,6 @@ tr:
       new_tab: "Bu aracın yeni bir tarayıcı penceresinde yüklenmesi gerekiyor"
       new_tab_expired: "Bu araç için oturum süresi doldu. Araca tekrar erişmek için lütfen sayfayı yeniden yükleyin"
       new_tab_loaded: "Bu araç başarılı bir şekilde yeni tarayıcı penceresinde yüklendi. Araca tekrar erişmek için sayfayı yeniden yükleyin."
-      tool_insecure_warning: "Güvenli bir site (canvas) içinden güvensiz bir içeriğe erişmeye çalışıyorsunuz. Bazı internet tarayıcıları bu içeriğin yüklenmesine izin vermeyebilir."
-      tool_load_failure: "İçeriğiniz yüklenmemiş gibi görünüyor. Yeni bir sekmede içeriğinize erişmek için bu butonu kullanabilirsiniz."
   lti2: 
     register_tool: "Kayıt Aracı"
   m2c_file_description: "Moodle 1.9/2.x"
@@ -7698,7 +7695,6 @@ tr:
     loading: "Medya yükleniyor..."
     media_still_converting: "Medya şu anda dönüştürülüyor, lütfen kısa bir süre sonra tekrar deneyiniz."
     messages: 
-      file_failed_to_load: "Bu medya dosyasının yüklenmesi başarısız"
       flash_required_record_audio: "Ses kaydı için Flash gerekiyor."
       flash_required_upload_audio: "Ses dosyası yüklemek için Flash gerekiyor."
       flash_required_upload_video: "Video dosyası yüklemek için Flash gerekiyor."
@@ -9630,7 +9626,6 @@ tr:
   no_due_date_44271c53: "Bitiş Tarihi Yok"
   no_due_date_6e6a23c1: "(bitiş tarihi yok)"
   no_e16d9132: Hayır
-  no_grading_periods_to_display_ad25c8f3: "Gösterilecek notlandırma peryodu yok"
   no_grading_schemes_to_display_8b0e92e7: "Gösterilecek notlandırma şeması yok"
   no_migration_file: "İçerik taşıma için dosya gereklidir."
   no_score_yet_c94e919b: "Henüz puan yok"
@@ -9903,6 +9898,27 @@ tr:
           kb: KB
           mb: MB
           tb: TB
+  oauth2_provider: 
+    auth: 
+      oauth2_complete: "Uygulama oturum açma iş akışını tamamladı ve kısa süre sonra yeniden etkinleşecek."
+    confirm: 
+      cancel: İptal
+      details: 
+        allow_application: "%{app_name} hesabınıza erişmek istiyor."
+        email: "Eposta adresiniz %{email}."
+        login_name: "Bu uygulamaya %{user_name} olarak giriş yapıyorsunuz."
+      labels: 
+        remember_access: "Bu servis için yetkilendirmemi hatırla"
+      page_title: "Uygulama İçin Oturum Aç"
+    confirm_mobile: 
+      cancel: İptal
+      details: 
+        allow_application: "%{app_name} hesabınıza erişmek istiyor."
+        email: "Eposta adresiniz %{email}."
+        login_name: "Bu uygulamaya %{user_name} olarak giriş yapıyorsunuz."
+      login: "Oturum Aç"
+      page_title: "Uygulama İçin Oturum Aç"
+      remember_auth: "Bu servis için yetkilendirmemi hatırla"
   observees: 
     add_observee_button: "Öğrenci Ekle"
     being_observed: "Gözlemlenen Öğrenciler"
@@ -9917,6 +9933,7 @@ tr:
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Cevabı bir kere değiştirdiniz mi soruyu güncellemeden önce bir seçim yapmak zorunda kalacaksınız."
   one_per_line_format_name_value_79647700: "Her bir satır. Format: isim=değer"
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} zamanında, %{late} geç, %{missing} gönderilmedi"
+  open_title_in_a_new_window_b29fed77: "%{title} 'ı yeni pencerede aç"
   options: 
     ? "no"
     : Hayır
@@ -10323,20 +10340,6 @@ tr:
     kaltura_settings: 
       account_settings: "Bu değerleri Kaltura Yönetim Konsolu altında bulabilirsiniz \"Ayarlar -> Entegrasyon Ayarları\""
       cache_explanation: "Boşun anlamı süresiz önbellek, 0'ın anlamı önbellek yok"
-      description: |-
-          Ya [Kaltura.com](%{kaltura_url})'da ya da kendi kurduğunuz Kaltura
-          sunucusunda bir hesaba ihtiyacınız var.
-          
-          **Not:** Canvas'ta Kaltura'yı yapılandırdıktan sonra,
-          Kaltura Yönetim Paneline gidip "Ayarlar -> Entegrasyon Ayarları" 
-          altında
-          
-          %{notification_url}
-          
-          'yi bir Bildirim Bağlantı adresi ile sunucu bildirimlerini 
-          etkinleştirmeniz gerek
-          
-          Sonra "Sunucu tarafından Gönderilen" sütununda "Girdi Ekle" ve "Girdiyi Sil" kutularına tik atın.
       headers: 
         account_settings: "Hesap Ayarları"
         canvas_settings: "Canvas Ayarları"
@@ -10365,7 +10368,6 @@ tr:
         secret_key: "Administrator Secret"
         subpartner_id: "Sub Partner ID"
         upload_ui_conf: "UI Conf ID Yükleyicisi"
-        use_alt_record_widget: "Alternatif flash kayıt bileşeni kullanın"
         user_secret_key: "User Secret"
       ui_conf_ids: "Kaltura'da hesabı olan müşterile için, Kaltura'dan size bu id'leri vermesini isteyebilirsiniz. Kendi kaltura sunucusu olanlar bu değerleri ui_confs tablosunda bulabilirler."
     linked_in: 
@@ -10883,26 +10885,6 @@ tr:
       page_title: "Canvas'ta Oturum Aç"
     notices: 
       mfa_complete: "Çoklu kimlik doğrulama yapılandırıldı"
-    oauth2_auth: 
-      oauth2_complete: "Uygulama oturum açma iş akışını tamamladı ve kısa süre sonra yeniden etkinleşecek."
-    oauth2_confirm: 
-      cancel: İptal
-      details: 
-        allow_application: "%{app_name} hesabınıza erişmek istiyor."
-        email: "Eposta adresiniz %{email}."
-        login_name: "Bu uygulamaya %{user_name} olarak giriş yapıyorsunuz."
-      labels: 
-        remember_access: "Bu servis için yetkilendirmemi hatırla"
-      page_title: "Uygulama İçin Oturum Aç"
-    oauth2_confirm_mobile: 
-      cancel: İptal
-      details: 
-        allow_application: "%{app_name} hesabınıza erişmek istiyor."
-        email: "Eposta adresiniz %{email}."
-        login_name: "Bu uygulamaya %{user_name} olarak giriş yapıyorsunuz."
-      login: "Oturum Aç"
-      page_title: "Uygulama İçin Oturum Aç"
-      remember_auth: "Bu servis için yetkilendirmemi hatırla"
     otp_login: 
       buttons: 
         send: Gönder
@@ -11298,6 +11280,7 @@ tr:
       generating: Üretiliyor...
       generating_combinations_progress: "Üretiliyor...(%{done}/%{total})"
       save: Kaydet
+      save_and_publish: "Kaydet & Yayınla"
       saved: Kaydedildi!
       saving: Kaydediliyor...
       update_group: "Grubu Güncelle"
@@ -11826,6 +11809,7 @@ tr:
           not_published: Yayınlanmadı
           published: Yayınlandı
           save: Kaydet
+          save_and_publish: "Kaydet & Yayınla"
         cant_go_back: "Cevaplandırma sonrası soruları kilitle"
         default_page_title: "Yeni Kısa Sınav"
         group: "Ödev Grubu"
@@ -13940,7 +13924,6 @@ tr:
       entry_no_image: "Unutmayın, orijinal gönderiden sonra bu sayfa değişmiş olabilir."
       entry_with_image: "Sayfanın ilk gönderildiğindeki şeklinin bir görüntüsü de dahil ettik. Ya da orijinal gönderiyi görmek için yıklayabilirsiniz. "
       external_url_submission: "Bu gönderi harici sayfa bağlantısıyla gerçekleşti."
-      file_uploads_for_user: "**%{user}** Dosya Yüklemeleri"
       group_discussion_submission_description: "Bu ödev için gönderiler bu grup için ödevin tartışmasına yazılan yazılardır. Aşağıda %{user} için tartışma yazıları var, ya da *tüm grup yazışmalarını görebilirsiniz*."
       group_discussion_submission_description_without_link: "Bu ödev için gönderiler bu grup için ödevin tartışma bölümüne yazılanlardır. Aşağıda %{user} için tartışma yazıları vardır."
       media_comment_link: "Bu bir medya yorumudur, *görmek için tıklayın*."
@@ -14893,6 +14876,7 @@ tr:
       buttons: 
         cancel: İptal
         save: Kaydet
+        save_and_publish: "Kaydet & Yayınla"
       course_editing_roles: 
         anyone: Herkes
         only_teachers: "Sadece öğretmenler"

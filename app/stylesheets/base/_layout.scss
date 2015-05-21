@@ -1,9 +1,19 @@
 @import "mixins/blue";
 
+$body-bg-color:                     $ic-color-light; 
+$embedded-bg:                       $ic-color-light;
+$embedded-footer-bg:                $ic-color-neutral;
+$embedded-footer-border-color:      $ic-border-color;
+$embedded-footer-box-shadow:        $ic-color-light;
+$layout-modal-bg:                   $ic-color-light;
+$layout-modal-font-color:           $ic-color-dark;
+$footer-links-color:                lighten($ic-color-dark, 16);
+$footer-links-border-color:         lighten($ic-color-dark, 16);
+
+
 body, html {
   height: 100%;
 }
-
 body {
   min-width: $min_main_width;
   @if $use_high_contrast {
@@ -72,9 +82,9 @@ body {
       width: 100%;
       padding: 14px 0 15px;
       margin: 0 -1em !important;
-      background-color: #EFEFEF;
-      border-top: 1px solid #DDD;
-      box-shadow: inset 0 1px 0 white;
+      background-color: $embedded-footer-bg;
+      border-top: 1px solid $embedded-footer-border-color;
+      box-shadow: inset 0 1px 0 $embedded-footer-box-shadow;
       text-align: right;
       .footer-info {
         position: absolute;
@@ -87,11 +97,11 @@ body {
       }
     }
     #modal-box {
-      background: #fff !important;
-      color: #333 !important;
+      background: $layout-modal-bg !important;
+      color: $layout-modal-font-color !important;
       height: auto !important;
     }
-    background: #fff;
+    background: $embedded-bg;
   }
 }
 
@@ -109,7 +119,7 @@ body {
 #main {
   position: relative;
   z-index: 10;
-  background-color: $bodyBackground;
+  background-color: $body-bg-color;
   border: none;
   border-top: none;
   margin-bottom: 40px;
@@ -207,8 +217,8 @@ body {
 
 #footer-links {
   a {
-    border-left: 1px solid #5C5C5C;
-    color: #5C5C5C;
+    border-left: 1px solid $footer-links-border-color;
+    color: $footer-links-color;
     padding-right: 2px;
     padding-left: 5px;
     &:hover, &:focus {

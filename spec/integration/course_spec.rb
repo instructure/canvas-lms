@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+require 'nokogiri'
+
 describe "course" do
 
   # normally this would be a controller test, but there is a some code in the

@@ -253,6 +253,7 @@ describe Quizzes::Quiz do
   it "should send a message if notify_of_update is set" do
     Notification.create!(:name => 'Assignment Changed')
     @course.offer
+    student_in_course(active_all: true)
     a = @course.assignments.create!(:title => "some assignment", :points_possible => 5)
     expect(a.points_possible).to eql(5.0)
     expect(a.submission_types).not_to eql("online_quiz")
@@ -316,6 +317,7 @@ describe Quizzes::Quiz do
   it "should send a message when quiz is published" do
     Notification.create!(:name => 'Assignment Created')
     @course.offer
+    student_in_course(active_all: true)
 
     q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment")
     q.save!

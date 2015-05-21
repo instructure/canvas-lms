@@ -1,4 +1,4 @@
-<% user_name = (params[:hide_student_name] || (@quiz.survey? && @quiz.anonymous_submissions)) ? t(:anonymous_username, "Student") : context_user_name(@context, @user) %>
+<% user_name = ((params[:hide_student_name] && !params[:hide_student_name].to_i.zero?) || (@quiz.survey? && @quiz.anonymous_submissions)) ? t(:anonymous_username, "Student") : context_user_name(@context, @user) %>
 <% user_name = t(:logged_out_user, "Logged Out User %{index}", :index => @logged_out_user_index) if !user_name && !@submission.user_id %>
 <% content_for :page_title, (@quiz.survey? ?
      join_title(t(:page_title_survey, "%{user}'s Survey History", :user => user_name), @quiz.quiz_title || t(:default_survey_name, "Survey %{course_name}", :course_name => @context.name)) :
@@ -145,6 +145,8 @@
 <% else %>
   <%= form_tag context_url(@context, :context_quiz_quiz_submission_url, @quiz.id, @submission.id), {:method => :put, :id => "update_history_form"} do %>
     <input type="hidden" name="override_scores" value="true"/>
+    <input type="hidden" name="hide_student_name" value="<%= params[:hide_student_name] || 0 %>"/>
+
     <% if params[:headless] %>
       <input type="hidden" name="headless" value="1"/>
     <% end %>

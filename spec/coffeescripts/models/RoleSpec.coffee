@@ -4,23 +4,26 @@ define [
   'compiled/models/Role'
   'compiled/models/Account'
   'compiled/util/BaseRoleTypes'
-], (Backbone,_, Role, Account, BASE_ROLE_TYPES) ->
+  'helpers/fakeENV'
+], (Backbone,_, Role, Account, BASE_ROLE_TYPES, fakeENV) ->
   module 'RoleModel',
     setup: -> 
       @account = new Account id: 4
       @role = new Role account: @account
       @server = sinon.fakeServer.create()
+      fakeENV.setup(CURRENT_ACCOUNT: {account: {id: 3}})
 
-    teardown: -> 
+    teardown: ->
       @server.restore()
       @role = null
       @account_id = null
+      fakeENV.teardown()
 
   test 'generates the correct url for existing and non-existing roles', 2, -> 
-    equal @role.url(), "/api/v1/accounts/#{@account.get('id')}/roles", "non-existing role url"
+    equal @role.url(), "/api/v1/accounts/3/roles", "non-existing role url"
     
     @role.fetch success: =>
-      equal @role.url(), "/api/v1/accounts/#{@account.get('id')}/roles/1", "existing role url"
+      equal @role.url(), "/api/v1/accounts/3/roles/1", "existing role url"
 
     @server.respond 'GET', @role.url(), [200, {
       'Content-Type': 'application/json'

@@ -34,6 +34,7 @@ describe EnrollmentTerm do
       I18n.backend.stub(translations) do
         begin
           old_locale = I18n.locale
+          I18n.config.available_locales_set << :test_locale
           I18n.locale = :test_locale
 
           expect(term.name).to eq "mreT tluafeD"

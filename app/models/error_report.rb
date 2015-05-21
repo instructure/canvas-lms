@@ -53,11 +53,11 @@ class ErrorReport < ActiveRecord::Base
       @opts = opts
       # sanitize invalid encodings
       @opts[:message] = Utf8Cleaner.strip_invalid_utf8(@opts[:message]) if @opts[:message]
-      @opts[:exception_message] = Utf8Cleaner.strip_invalid_utf8(@opts[:exception_message]) if @opts[:exception_message]
+      if @opts[:exception_message]
+        @opts[:exception_message] = Utf8Cleaner.strip_invalid_utf8(@opts[:exception_message])
+      end
       @opts[:hostname] = self.class.hostname
       @opts[:pid] = Process.pid
-      CanvasStatsd::Statsd.increment("errors.all")
-      CanvasStatsd::Statsd.increment("errors.#{category}")
       run_callbacks :on_log_error
       create_error_report(opts)
     end
@@ -100,6 +100,32 @@ class ErrorReport < ActiveRecord::Base
   def self.log_exception(category, exception, opts = {})
     Reporter.new.log_exception(category, exception, opts)
   end
+
+  def self.log_captured(type, exception, error_report_info)
+    if exception.is_a?(String) || exception.is_a?(Symbol)
+      log_error(exception, error_report_info)
+    else
+      type = exception.class.name if type == :default
+      log_exception(type, exception, error_report_info)
+    end
+  end
+
+  def self.log_exception_from_canvas_errors(exception, data)
+    tags = data.fetch(:tags, {})
+    account_id = tags[:account_id]
+    domain_root_account = account_id ? Account.where(id: account_id).first : nil
+    error_report_info = tags.merge(data[:extra])
+    type = tags.fetch(:type, :default)
+
+    if domain_root_account
+      domain_root_account.shard.activate do
+        ErrorReport.log_captured(type, exception, error_report_info)
+      end
+    else
+      ErrorReport.log_captured(type, exception, error_report_info)
+    end
+  end
+
 
   # assigns data attributes to the column if there's a column with that name,
   # otherwise goes into the general data hash
@@ -151,33 +177,6 @@ class ErrorReport < ActiveRecord::Base
   # returns the number of destroyed error reports
   def self.destroy_error_reports(before_date)
     self.where("created_at<?", before_date).delete_all
-  end
-
-  USEFUL_ENV = [
-    "HTTP_ACCEPT",
-    "HTTP_ACCEPT_ENCODING",
-    "HTTP_HOST",
-    "HTTP_REFERER",
-    "HTTP_USER_AGENT",
-    "PATH_INFO",
-    "QUERY_STRING",
-    "REMOTE_HOST",
-    "REQUEST_METHOD",
-    "REQUEST_PATH",
-    "REQUEST_URI",
-    "SERVER_NAME",
-    "SERVER_PORT",
-    "SERVER_PROTOCOL",
-  ]
-  def self.useful_http_env_stuff_from_request(request)
-    stuff = request.env.slice(*USEFUL_ENV)
-    stuff['REMOTE_ADDR'] = request.remote_ip # ActionDispatch::Request#remote_ip has proxy smarts
-    stuff['QUERY_STRING'] = LoggingFilter.filter_query_string("?" + stuff['QUERY_STRING'])
-    stuff['REQUEST_URI'] = LoggingFilter.filter_uri(request.url)
-    stuff['path_parameters'] = LoggingFilter.filter_params(request.path_parameters.dup).inspect # params rails picks up from the url
-    stuff['query_parameters'] = LoggingFilter.filter_params(request.query_parameters.dup).inspect # params rails picks up from the query string
-    stuff['request_parameters'] = LoggingFilter.filter_params(request.request_parameters.dup).inspect # params from forms
-    Marshal.load(Marshal.dump(stuff))
   end
 
   def self.categories

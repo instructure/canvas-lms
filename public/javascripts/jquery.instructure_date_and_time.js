@@ -133,7 +133,7 @@ var speakMessage = function ($this, message) {
     if (date == null) return "";
     var timezone = options && options.timezone;
     var format = options && options.format;
-    format = (format !== 'medium') && $.sameYear(date, new Date()) ? '%b %-d' : '%b %-d, %Y';
+    format = (format !== 'medium') && $.sameYear(date, new Date()) ? 'date.formats.short' : 'date.formats.medium';
     if (typeof timezone == 'string' || timezone instanceof String) {
       return tz.format(date, format, timezone) || '';
     } else {
@@ -144,13 +144,10 @@ var speakMessage = function ($this, message) {
   $.timeString = function(date, options) {
     if (date == null) return "";
     var timezone = options && options.timezone;
-    // lookup format according to locale, and then turn %l or %k into %-l or
-    // %-k, respectively, to avoid extra unnecessary space characters
-    var fmt = I18n.t("#time.formats.tiny").replace(/^%([kl])/, "%-$1");
     if (typeof timezone == 'string' || timezone instanceof String) {
-      return tz.format(date, fmt, timezone) || '';
+      return tz.format(date, 'time.formats.tiny', timezone) || '';
     } else {
-      return tz.format(date, fmt) || '';
+      return tz.format(date, 'time.formats.tiny') || '';
     }
   };
   $.datetimeString = function(datetime, options) {

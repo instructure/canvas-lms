@@ -1,3 +1,5 @@
+require 'nokogiri'
+
 module DataFixup::FixBrokenFileLinksInAssignments
 
   def self.broken_assignment_scope

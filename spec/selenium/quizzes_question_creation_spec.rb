@@ -19,17 +19,19 @@ describe "quizzes question creation" do
     expect(question_data[:answers].length).to eq 4
     expect(question_data[:answers][0][:text]).to eq "Correct Answer"
     expect(question_data[:answers][0][:weight]).to eq 100
+    expect(question_data[:answers][0][:comments_html]).to eq "<p>Good job!</p>"
     expect(question_data[:answers][1][:text]).to eq "Wrong Answer #1"
     expect(question_data[:answers][1][:weight]).to eq 0
+    expect(question_data[:answers][1][:comments_html]).to eq "<p>Bad job :(</p>"
     expect(question_data[:answers][2][:text]).to eq "Second Wrong Answer"
     expect(question_data[:answers][2][:weight]).to eq 0
     expect(question_data[:answers][3][:text]).to eq "Wrongest Answer"
     expect(question_data[:answers][3][:weight]).to eq 0
     expect(question_data[:points_possible]).to eq 1
     expect(question_data[:question_type]).to eq "multiple_choice_question"
-    expect(question_data[:correct_comments]).to eq "Good job on the question!"
-    expect(question_data[:incorrect_comments]).to eq "You know what they say - study long study wrong."
-    expect(question_data[:neutral_comments]).to eq "Pass or fail you are a winner!"
+    expect(question_data[:correct_comments_html]).to eq "<p>Good job on the question!</p>"
+    expect(question_data[:incorrect_comments_html]).to eq "<p>You know what they say - study long study wrong.</p>"
+    expect(question_data[:neutral_comments_html]).to eq "<p>Pass or fail you are a winner!</p>"
   end
 
 
@@ -38,6 +40,10 @@ describe "quizzes question creation" do
     create_true_false_question
     quiz.reload
     keep_trying_until { expect(f("#question_#{quiz.quiz_questions[0].id}")).to be_displayed }
+
+    quiz.reload
+    question_data = quiz.quiz_questions[0].question_data
+    expect(question_data[:answers][1][:comments_html]).to eq "<p>Good job!</p>"
   end
 
   it "should create a quiz question with a fill in the blank question" do
@@ -348,6 +354,19 @@ describe "quizzes question creation" do
     expect(quiz.quiz_questions.first.question_data["answers"].detect { |a| a["text"] == "" }).to be_nil
   end
 
+  it "doesn't allow negative question points" do
+    quiz = @last_quiz
+    question = fj(".question_form:visible")
+    click_option('.question_form:visible .question_type', 'essay_question', :value)
+
+    replace_content(question.find_element(:css, "input[name='question_points']"), '-4')
+    submit_form(question)
+
+    wait_for_ajaximations
+    expect(question).to be_displayed
+    assert_error_box(".question_form:visible input[name='question_points']")
+  end
+
   it "respects character limits on short answer questions" do
     quiz = @last_quiz
     question = fj(".question_form:visible")
@@ -432,118 +451,6 @@ describe "quizzes question creation" do
       expect(new_data[0][:id]).to eq old_data[2][:id]
       expect(new_data[1][:id]).to eq old_data[0][:id]
       expect(new_data[2][:id]).to eq old_data[1][:id]
-    end
-  end
-
-  context "html answers" do
-
-    def edit_first_html_answer(question_type=nil)
-      edit_first_question
-      click_option('.question_form:visible .question_type', question_type) if question_type
-      driver.execute_script "$('.answer').addClass('hover');"
-      fj('.edit_html:visible').click
-    end
-
-    def close_first_html_answer
-      f('.edit-html-done').click
-    end
-
-    it "should allow HTML answers for multiple choice" do
-      quiz_with_new_questions
-      click_questions_tab
-      edit_first_html_answer
-      type_in_tiny '.answer:eq(3) textarea', 'HTML'
-      close_first_html_answer
-      html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
-      expect(html).to eq '<p>HTML</p>'
-      submit_form('.question_form')
-      refresh_page
-      click_questions_tab
-      edit_first_question
-      html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
-      expect(html).to eq '<p>HTML</p>'
-    end
-
-    def check_for_no_edit_button(option)
-      click_option('.question_form:visible .question_type', option)
-      driver.execute_script "$('.answer').addClass('hover');"
-      expect(fj('.edit_html:visible')).to be_nil
-    end
-
-    it "should not show the edit html button for question types besides multiple choice and multiple answers" do
-      quiz_with_new_questions
-      click_questions_tab
-      edit_first_question
-
-      check_for_no_edit_button 'True/False'
-      check_for_no_edit_button 'Fill In the Blank'
-      check_for_no_edit_button 'Fill In Multiple Blanks'
-      check_for_no_edit_button 'Multiple Dropdowns'
-      check_for_no_edit_button 'Matching'
-      check_for_no_edit_button 'Numerical Answer'
-    end
-
-    it "should restore normal input when html answer is empty" do
-      quiz_with_new_questions
-      click_questions_tab
-      edit_first_html_answer
-      type_in_tiny '.answer:eq(3) textarea', 'HTML'
-
-      # clear tiny
-      driver.execute_script "$('.answer:eq(3) textarea')._setContentCode('')"
-      close_first_html_answer
-      input_length = driver.execute_script "return $('.answer:eq(3) input[name=answer_text]:visible').length"
-      expect(input_length).to eq 1
-    end
-
-    it "should populate the editor and input elements properly" do
-      quiz_with_new_questions
-      click_questions_tab
-
-      # add text to regular input
-      edit_first_question
-      input = fj('input[name=answer_text]:visible')
-      input.click
-      input.send_keys 'ohai'
-      submit_form('.question_form')
-      wait_for_ajax_requests
-
-      # open it up in the editor, make sure the text matches the input
-      edit_first_html_answer
-      content = driver.execute_script "return $('.answer:eq(3) textarea')._justGetCode()"
-      expect(content).to eq '<p>ohai</p>'
-
-      # clear it out, make sure the original input is empty also
-      driver.execute_script "$('.answer:eq(3) textarea')._setContentCode('')"
-      close_first_html_answer
-      value = driver.execute_script "return $('input[name=answer_text]:visible')[0].value"
-      expect(value).to eq ''
-    end
-
-    it "should save open html answers when the question is submitted for multiple choice" do
-      quiz_with_new_questions
-      click_questions_tab
-      edit_first_html_answer
-      type_in_tiny '.answer:eq(3) textarea', 'HTML'
-      submit_form('.question_form')
-      refresh_page
-      click_questions_tab
-      edit_first_question
-      html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
-      expect(html).to eq '<p>HTML</p>'
-    end
-
-    it "should save open html answers when the question is submitted for multiple answers" do
-      quiz_with_new_questions
-      click_questions_tab
-      edit_first_html_answer 'Multiple Answers'
-      type_in_tiny '.answer:eq(3) textarea', 'HTML'
-      submit_form('.question_form')
-      refresh_page
-      click_questions_tab
-      edit_first_question
-      html = driver.execute_script "return $('.answer:eq(3) .answer_html').html()"
-      expect(html).to eq '<p>HTML</p>'
     end
   end
 

@@ -369,6 +369,8 @@ describe 'Submissions API', type: :request do
         'created_at' => se1.created_at.as_json,
         'updated_at' => se1.updated_at.as_json,
         'user_name' => 'User',
+        'rating_sum' => nil,
+        'rating_count' => nil,
       },
       {
         'id' => se2.id,
@@ -380,6 +382,8 @@ describe 'Submissions API', type: :request do
         'created_at' => se2.created_at.as_json,
         'updated_at' => se2.updated_at.as_json,
         'user_name' => 'User',
+        'rating_sum' => nil,
+        'rating_count' => nil,
       }].sort_by { |h| h['user_id'] }
     )
 
@@ -437,6 +441,8 @@ describe 'Submissions API', type: :request do
         'parent_id' => e1.id,
         'created_at' => se1.created_at.as_json,
         'updated_at' => se1.updated_at.as_json,
+        'rating_sum' => nil,
+        'rating_count' => nil,
       },
       {
         'id' => se2.id,
@@ -448,6 +454,8 @@ describe 'Submissions API', type: :request do
         'parent_id' => nil,
         'created_at' => se2.created_at.as_json,
         'updated_at' => se2.updated_at.as_json,
+        'rating_sum' => nil,
+        'rating_count' => nil,
       }].sort_by { |h| h['user_id'] }
     )
   end

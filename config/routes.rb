@@ -195,6 +195,7 @@ CanvasRails::Application.routes.draw do
       end
     end
 
+    resource :gradebook_csv, only: [:show]
     get 'gradebook2' => "gradebooks#gradebook2"
 
     get 'attendance' => 'gradebooks#attendance'
@@ -463,6 +464,14 @@ CanvasRails::Application.routes.draw do
 
     resources :collaborations
     get 'calendar' => 'calendars#show2', as: :old_calendar
+
+    resources :external_tools do
+      get :finished
+      get :resource_selection
+      collection do
+        get :retrieve
+      end
+    end
   end
 
   resources :accounts do
@@ -954,6 +963,8 @@ CanvasRails::Application.routes.draw do
         delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/read_all", action: :mark_all_unread, as: "#{context}_discussion_topic_mark_all_unread"
         put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries/:entry_id/read", action: :mark_entry_read, as: "#{context}_discussion_topic_discussion_entry_mark_read"
         delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries/:entry_id/read", action: :mark_entry_unread, as: "#{context}_discussion_topic_discussion_entry_mark_unread"
+        post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries/:entry_id/rating",
+             action: :rate_entry, as: "#{context}_discussion_topic_discussion_entry_rate"
         put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/subscribed", action: :subscribe_topic, as: "#{context}_discussion_topic_subscribe"
         delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/subscribed", action: :unsubscribe_topic, as: "#{context}_discussion_topic_unsubscribe"
       end
@@ -1601,12 +1612,12 @@ CanvasRails::Application.routes.draw do
   # system, so we can't put it in the api uri namespace.
   post 'files_api' => 'files#api_create', as: :api_v1_files_create
 
-  get 'login/oauth2/auth' => 'pseudonym_sessions#oauth2_auth', as: :oauth2_auth
-  post 'login/oauth2/token' => 'pseudonym_sessions#oauth2_token', as: :oauth2_token
-  get 'login/oauth2/confirm' => 'pseudonym_sessions#oauth2_confirm', as: :oauth2_auth_confirm
-  post 'login/oauth2/accept' => 'pseudonym_sessions#oauth2_accept', as: :oauth2_auth_accept
-  get 'login/oauth2/deny' => 'pseudonym_sessions#oauth2_deny', as: :oauth2_auth_deny
-  delete 'login/oauth2/token' => 'pseudonym_sessions#oauth2_logout', as: :oauth2_logout
+  get 'login/oauth2/auth' => 'oauth2_provider#auth', as: :oauth2_auth
+  post 'login/oauth2/token' => 'oauth2_provider#token', as: :oauth2_token
+  get 'login/oauth2/confirm' => 'oauth2_provider#confirm', as: :oauth2_auth_confirm
+  post 'login/oauth2/accept' => 'oauth2_provider#accept', as: :oauth2_auth_accept
+  get 'login/oauth2/deny' => 'oauth2_provider#deny', as: :oauth2_auth_deny
+  delete 'login/oauth2/token' => 'oauth2_provider#destroy', as: :oauth2_logout
 
   ApiRouteSet.draw(self, "/api/lti/v1") do
     post "tools/:tool_id/grade_passback", controller: :lti_api, action: :grade_passback, as: "lti_grade_passback_api"

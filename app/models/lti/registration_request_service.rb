@@ -1,3 +1,5 @@
+require 'ims/lti'
+
 module Lti
   class RegistrationRequestService
 

@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
+require 'nokogiri'
+
 describe Announcement do
   it "should create a new instance given valid attributes" do
     @context = Course.create

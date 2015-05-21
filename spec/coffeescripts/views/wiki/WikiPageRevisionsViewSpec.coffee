@@ -4,7 +4,10 @@ define [
   'compiled/views/wiki/WikiPageRevisionsView'
 ], ($, WikiPageRevisionsCollection, WikiPageRevisionsView) ->
 
-  module 'WikiPageRevisionsView'
+  module 'WikiPageRevisionsView',
+    setup: ->
+    teardown: ->
+      document.getElementById("fixtures").innerHTML = ""
 
   test 'selecting a model/view sets the selected attribute on the model', ->
     fixture = $('<div id="main"><div id="content"></div></div>').appendTo('#fixtures')

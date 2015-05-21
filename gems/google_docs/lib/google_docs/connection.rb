@@ -16,6 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+require 'oauth'
+
 # See Google Docs API documentation here:
 # http://code.google.com/apis/documents/docs/2.0/developers_guide_protocol.html
 module GoogleDocs

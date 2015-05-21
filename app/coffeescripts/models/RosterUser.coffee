@@ -1,4 +1,4 @@
-define ['compiled/models/User', 'compiled/util/secondsToTime'], (User, secondsToTime) ->
+define ['compiled/models/User', 'compiled/util/secondsToTime', 'underscore'], (User, secondsToTime, _) ->
 
   class RosterUser extends User
 
@@ -24,7 +24,7 @@ define ['compiled/models/User', 'compiled/util/secondsToTime'], (User, secondsTo
       user_sections
 
     total_activity_string: ->
-      if time = @get('enrollments')[0].total_activity_time
+      if time = _.max(_.map(@get('enrollments'), (e) -> e.total_activity_time))
         secondsToTime(time)
       else
         ''

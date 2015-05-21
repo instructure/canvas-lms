@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+
 class User < ActiveRecord::Base
   # this has to be before include Context to prevent a circular dependency in Course
   def self.sortable_name_order_by_clause(table = nil)
@@ -144,6 +146,8 @@ class User < ActiveRecord::Base
   has_many :content_migrations, :as => :context
   has_many :content_exports, :as => :context
   has_many :usage_rights, as: :context, class_name: 'UsageRights', dependent: :destroy
+
+  has_many :gradebook_csvs, dependent: :destroy
 
   has_one :profile, :class_name => 'UserProfile'
   alias :orig_profile :profile
@@ -2053,6 +2057,17 @@ class User < ActiveRecord::Base
     end
   end
 
+  # don't instantiate a buttload of objects if we can help it
+  def self.pluck_global_id_rows(relation)
+    rows = ActiveRecord::Base.connection.select_all(relation.to_sql)
+    rows.each do |row|
+      row.each do |k, id|
+        row[k] = Shard.relative_id_for(id, Shard.current, Shard.birth)
+      end
+    end
+    rows
+  end
+
   def self.preload_conversation_context_codes(users)
     users = users.reject { |u| u.instance_variable_get(:@conversation_context_codes) }
     return if users.length < Setting.get("min_users_for_conversation_context_codes_preload", 5).to_i
@@ -2061,45 +2076,51 @@ class User < ActiveRecord::Base
     users.each do |user|
       shards.merge(user.associated_shards)
     end
-    courses = []
-    concluded_courses = []
-    groups = []
+
+    active_contexts = {}
+    concluded_contexts = {}
+
     Shard.with_each_shard(shards.to_a) do
-      courses.concat(
+      course_rows = pluck_global_id_rows(
           Enrollment.joins(:course).
-              where(enrollment_conditions(:active)).
+              where(User.enrollment_conditions(:active)).
               where(user_id: users).
               select([:user_id, :course_id]).
-              uniq.
-              all)
+              uniq)
+      course_rows.each do |r|
+        active_contexts[r['user_id']] ||= []
+        active_contexts[r['user_id']] << "course_#{r['course_id']}"
+      end
 
-      concluded_courses.concat(
+      cc_rows = pluck_global_id_rows(
           Enrollment.joins(:course).
-              where(enrollment_conditions(:completed)).
+              where(User.enrollment_conditions(:completed)).
               where(user_id: users).
               select([:user_id, :course_id]).
-              uniq.
-              all)
+              uniq)
+      cc_rows.each do |r|
+        concluded_contexts[r['user_id']] ||= []
+        concluded_contexts[r['user_id']] << "course_#{r['course_id']}"
+      end
 
-      groups.concat(
+      group_rows = pluck_global_id_rows(
           GroupMembership.joins(:group).
               where(User.reflections[:current_group_memberships].options[:conditions]).
               where(user_id: users).
               select([:user_id, :group_id]).
-              uniq.
-              all)
+              uniq)
+      group_rows.each do |r|
+        active_contexts[r['user_id']] ||= []
+        active_contexts[r['user_id']] << "group_#{r['group_id']}"
+      end
     end
     Shard.birth.activate do
-      courses = courses.group_by(&:user_id)
-      concluded_courses = concluded_courses.group_by(&:user_id)
-      groups = groups.group_by(&:user_id)
       users.each do |user|
-        active_contexts = (courses[user.id] || []).map { |e| "course_#{e.course_id}" } +
-            (groups[user.id] || []).map { |gm| "group_#{gm.group_id}" }
-        concluded_courses = (concluded_courses[user.id] || []).map { |e| "course_#{e.course_id}" }
+        active = active_contexts[user.id] || []
+        concluded = concluded_contexts[user.id] || []
         user.instance_variable_set(:@conversation_context_codes, {
-          true => (active_contexts + concluded_courses).uniq,
-          false => active_contexts
+          true => (active + concluded).uniq,
+          false => active
         })
       end
     end

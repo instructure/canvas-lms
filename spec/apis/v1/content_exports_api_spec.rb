@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
+require 'nokogiri'
+
 describe ContentExportsApiController, type: :request do
   let_once(:t_teacher) do
     user(active_all: true)
@@ -481,6 +483,19 @@ describe ContentExportsApiController, type: :request do
                                 { export_type: 'zip', select: {'files' => [@file1.id]} })
         ce = ContentExport.find(json['id'])
         expect(ce.export_object?(@file1)).to be true
+      end
+
+      it "should log an error report and skip unreadable files" do
+        @file1.update_attribute(:filename, 'nonexistent_file')
+        json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=zip",
+                           { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'zip' })
+        run_jobs
+        export = t_course.content_exports.where(id: json['id']).first
+        expect(export.settings["errors"].map(&:first)).to include("Skipped file file1.txt due to error")
+        tf = export.attachment.open need_local_file: true
+        Zip::File.open(tf) do |zf|
+          expect(zf.entries.select{ |entry| entry.ftype == :file }.map(&:name)).to match_array %w(hidden.txt teh_folder/file2.txt)
+        end
       end
 
       context "as a student" do

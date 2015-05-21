@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'securerandom'
+
 class EportfolioEntriesController < ApplicationController
   include EportfolioPage
   def create
@@ -43,7 +45,7 @@ class EportfolioEntriesController < ApplicationController
     if params[:verifier] == @portfolio.uuid
       session[:eportfolio_ids] ||= []
       session[:eportfolio_ids] << @portfolio.id
-      session[:permissions_key] = CanvasUUID.generate
+      session[:permissions_key] = SecureRandom.uuid
     end
     if authorized_action(@portfolio, @current_user, :read)
       if params[:category_name]
@@ -111,7 +113,7 @@ class EportfolioEntriesController < ApplicationController
       @attachment = @portfolio.user.all_attachments.where(uuid: params[:attachment_id]).first
       # @entry.check_for_matching_attachment_id
       begin
-        redirect_to verified_file_download_url(@attachment, @portfolio)
+        redirect_to file_download_url(@attachment, { :verifier => @attachment.uuid })
       rescue
         raise t('errors.not_found', "Not Found")
       end

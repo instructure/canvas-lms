@@ -19,7 +19,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'bookmarked_collection'
   spec.add_dependency 'canvas_cassandra'
   spec.add_dependency 'canvas_statsd'
-  spec.add_dependency 'canvas_uuid'
   spec.add_dependency 'json_token'
   spec.add_dependency 'paginated_collection'
 

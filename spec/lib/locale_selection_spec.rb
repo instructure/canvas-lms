@@ -89,7 +89,8 @@ describe LocaleSelection do
 
   context "locale matching" do
     before do
-      I18n.stubs(:available_locales).returns([:en, :it, :es, :fr, :de, :pt, :zh])
+      I18n.config.stubs(:available_locales).returns([:en, :it, :es, :fr, :de, :pt, :zh])
+      I18n.config.clear_available_locales_set
       @root_account = Account.create
       @account = Account.create(:parent_account => @root_account)
       user

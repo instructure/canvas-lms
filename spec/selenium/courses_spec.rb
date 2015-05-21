@@ -33,6 +33,7 @@ describe "courses" do
 
       it "should allow publishing of the course through the course status actions" do
         @course.workflow_state = 'claimed'
+        @course.lock_all_announcements = true
         @course.save!
         get "/courses/#{@course.id}"
         course_status_buttons = ff('#course_status_actions button')
@@ -44,6 +45,9 @@ describe "courses" do
         expect_new_page_load { course_status_buttons.last.click }
         expect(f('.publish_course_in_wizard_link')).to be_nil
         validate_action_button(:last, 'Published')
+
+        @course.reload
+        expect(@course.lock_all_announcements).to be_truthy
       end
 
       it "should allow unpublishing of a course through the course status actions" do

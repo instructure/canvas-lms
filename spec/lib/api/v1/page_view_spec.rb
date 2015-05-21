@@ -22,7 +22,7 @@ describe Api::V1::PageView do
   include Api::V1::PageView
 
   before do
-    @request_id = CanvasUUID.generate
+    @request_id = SecureRandom.uuid
     RequestContextGenerator.stubs( :request_id => @request_id )
 
     @domain_root_account = Account.default

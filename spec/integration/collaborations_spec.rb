@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+require 'nokogiri'
+
 describe CollaborationsController, type: :request do
 
   it 'should properly link to the user who posted the collaboration' do

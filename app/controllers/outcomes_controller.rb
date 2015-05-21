@@ -25,10 +25,10 @@ class OutcomesController < ApplicationController
   def index
     return unless authorized_action(@context, @current_user, :read)
     return unless tab_enabled?(@context.class::TAB_OUTCOMES)
-    log_asset_access("outcomes:#{@context.asset_string}", "outcomes", "other")
+    log_asset_access([ "outcomes", @context ], "outcomes", "other")
 
     @root_outcome_group = @context.root_outcome_group
-    if common_core_group_id = Setting.get(AcademicBenchmark.common_core_setting_key, nil)
+    if (common_core_group_id = Setting.get(AcademicBenchmark.common_core_setting_key, nil))
       common_core_group_id = common_core_group_id.to_i
       common_core_group_url = polymorphic_path([:api_v1, :global, :outcome_group], :id => common_core_group_id)
     end

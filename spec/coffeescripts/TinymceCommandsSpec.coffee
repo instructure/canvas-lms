@@ -11,7 +11,7 @@ define [
   module "Tinymce Commands -> removing an editor",
     setup: ->
       testbed = $("<div id='command-testbed'></div>")
-      $("body").append(testbed)
+      $("#fixtures").append(testbed)
       textarea = $("<textarea id='42' data-rich_text='true'></textarea>")
       testbed.append(textarea)
       list = new EditorBoxList()
@@ -19,6 +19,7 @@ define [
     teardown: ->
       textarea.remove()
       $("#command-testbed").remove()
+      $("#fixtures").empty()
 
   test 'it un-rich-texts the DOM element', ->
     EditorCommands.remove(textarea, list)

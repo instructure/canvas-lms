@@ -4,9 +4,9 @@ define [
   'vendor/timezone/America/Detroit'
   'vendor/timezone/America/Juneau'
   'vendor/timezone/pt_PT'
-  'i18nObj'
+  'helpers/I18nStubber'
   'jquery.instructure_date_and_time'
-], ($, tz, detroit, juneau, portuguese, I18n) ->
+], ($, tz, detroit, juneau, portuguese, I18nStubber) ->
   module 'fudgeDateForProfileTimezone',
     setup: ->
       @snapshot = tz.snapshot()
@@ -137,65 +137,73 @@ define [
     ok !$.midnight(date3)
 
   module 'dateString',
-    setup: -> @snapshot = tz.snapshot()
-    teardown: -> tz.restore(@snapshot)
+    setup: ->
+      @snapshot = tz.snapshot()
+      I18nStubber.pushFrame()
+
+    teardown: ->
+      tz.restore(@snapshot)
+      I18nStubber.popFrame()
 
   test 'should format in profile timezone', ->
+    I18nStubber.stub 'en', 'date.formats.medium': "%b %-d, %Y"
     tz.changeZone(detroit, 'America/Detroit')
     equal $.dateString(new Date(0)), 'Dec 31, 1969'
 
   module 'timeString',
     setup: ->
       @snapshot = tz.snapshot()
-      @localeWas = I18n.locale
-      @translationsWas = I18n.translations
-      I18n.translations =
-        'en': {'time': {'formats': {'tiny': "%l:%M%P"}}}
-        'en-GB': {'time': {'formats': {'tiny': "%k:%M"}}}
+      I18nStubber.pushFrame()
+
     teardown: ->
       tz.restore(@snapshot)
-      I18n.locale = @localeWas
-      I18n.translations = @translationsWas
+      I18nStubber.popFrame()
 
   test 'should format in profile timezone', ->
+    I18nStubber.stub 'en', 'time.formats.tiny': "%l:%M%P"
     tz.changeZone(detroit, 'America/Detroit')
     equal $.timeString(new Date(0)), '7:00pm'
 
   test 'should format according to profile locale', ->
-    I18n.locale = 'en-GB'
+    I18nStubber.setLocale 'en-GB'
+    I18nStubber.stub 'en-GB', 'time.formats.tiny': "%k:%M"
     equal $.timeString(new Date(46800000)), '13:00'
 
   module 'datetimeString',
     setup: ->
       @snapshot = tz.snapshot()
-      @localeWas = I18n.locale
-      @translationsWas = I18n.translations
-      I18n.translations =
-        'en': {'time': {'formats': {'tiny': "%l:%M%P"}}}
-        'pt': {'time': {'event': "%{date} em %{time}"}}
+      I18nStubber.pushFrame()
+
     teardown: ->
       tz.restore(@snapshot)
-      I18n.locale = @localeWas
-      I18n.translations = @translationsWas
+      I18nStubber.popFrame()
 
   test 'should format in profile timezone', ->
     tz.changeZone(detroit, 'America/Detroit')
+    I18nStubber.stub 'en',
+      'date.formats.medium': "%b %-d, %Y"
+      'time.formats.tiny': "%l:%M%P"
+      'time.event': "%{date} at %{time}"
     equal $.datetimeString(new Date(0)), 'Dec 31, 1969 at 7:00pm'
 
   test 'should translate into the profile locale', ->
     tz.changeLocale(portuguese, 'pt_PT')
-    I18n.locale = 'pt'
-    equal $.datetimeString('1970-01-01 15:00:00Z'), "Jan 1, 1970 em 15:00"
+    I18nStubber.setLocale 'pt'
+    I18nStubber.stub 'pt',
+      'date.formats.medium': "%-d %b %Y"
+      'time.formats.tiny': "%k:%M"
+      'time.event': "%{date} em %{time}"
+    equal $.datetimeString('1970-01-01 15:00:00Z'), "1 Jan 1970 em 15:00"
 
   # TODO: remove these second argument specs once the pickers know how to parse
   # localized datetimes
   test 'should not localize if second argument is false', ->
     tz.changeLocale(portuguese, 'pt_PT')
-    I18n.locale = 'pt'
+    I18nStubber.setLocale 'pt'
     equal $.datetimeString('1970-01-01 15:00:00Z', {localized: false}), "Jan 1, 1970 at 3:00pm"
 
   test 'should still apply profile timezone when second argument is false', ->
     tz.changeZone(detroit, 'America/Detroit')
     tz.changeLocale(portuguese, 'pt_PT')
-    I18n.locale = 'pt'
+    I18nStubber.setLocale 'pt'
     equal $.datetimeString(new Date(0), {localized: false}), 'Dec 31, 1969 at 7:00pm'

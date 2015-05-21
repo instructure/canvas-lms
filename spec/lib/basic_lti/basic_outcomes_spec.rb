@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
+require 'nokogiri'
+
 describe BasicLTI::BasicOutcomes do
   before(:each) do
     course_model

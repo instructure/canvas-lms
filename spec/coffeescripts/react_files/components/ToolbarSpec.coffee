@@ -12,9 +12,10 @@ define [
   #   setup: ->
   #     @routes = React.addons.TestUtils.renderIntoDocument(routes)
   #     debugger
-  #     @toolbar = React.render(Toolbar({params: 'foo', query:'', selectedItems: '', contextId: "1", contextType: "courses"}), $('<div>').appendTo('body')[0])
+  #     @toolbar = React.render(Toolbar({params: 'foo', query:'', selectedItems: '', contextId: "1", contextType: "courses"}), $('<div>').appendTo('#fixtures')[0])
   #   teardown: ->
   #     React.unmountComponentAtNode(@toolbar.getDOMNode().parentNode)
+  #     $("#fixtures).empty()
 
 
   # test 'transitions to a search url when search form is submitted', ->
@@ -27,10 +28,14 @@ define [
   #   ok Router.transitionTo.calledWith('search', 'foo', {search_term: 'foo'}), 'transitions to correct url when search is submitted'
   #   stubbedTransitionTo.restore()
 
-  # module 'Toolbar Rendering'
+  # module 'Toolbar Rendering',
+  #   setup: ->
+  #   teardown: ->
+  #     React.unmountComponentAtNode(@toolbar.getDOMNode().parentNode)
+  #     $("#fixtures).empty()
 
   # test 'renders multi select action items when there is more than one item selected', ->
-  #   toolbar = React.render(Toolbar({params: 'foo', query:'', selectedItems: ['foo'], contextId: "1", contextType: "courses"}), $('<div>').appendTo('body')[0])
+  #   toolbar = React.render(Toolbar({params: 'foo', query:'', selectedItems: ['foo'], contextId: "1", contextType: "courses"}), $('<div>').appendTo('#fixtures')[0])
   #   ok $(toolbar.getDOMNode()).find('.ui-buttonset .ui-button').length, 'shows multiple select action items'
   #   React.unmountComponentAtNode(toolbar.getDOMNode().parentNode)
 
@@ -45,6 +50,8 @@ define [
   #         else
   #           valid = false
   #       valid
+  #   teardown: ->
+  #     $("#fixtures).empty()
 
   #     @toolbarComponent = require 'compiled/react_files/components/Toolbar'
   #     Folder = require 'compiled/models/Folder'
@@ -70,9 +77,9 @@ define [
   #       ".btn-upload": true
 
   # test 'renders only view and download buttons for limited users', ->
-  #   toolbar = React.render(@toolbarComponent({params: 'foo', query:'', selectedItems: ['foo'], currentFolder: @userFolder, contextId: "2", contextType: "users", userCanManageFilesForContext: false}), $('<div>').appendTo('body')[0])
+  #   toolbar = React.render(@toolbarComponent({params: 'foo', query:'', selectedItems: ['foo'], currentFolder: @userFolder, contextId: "2", contextType: "users", userCanManageFilesForContext: false}), $('<div>').appendTo('#fixtures')[0])
   #   ok @buttonsEnabled($(toolbar.getDOMNode()), @readConfig), "only view and download buttons are shown"
 
   # test 'renders all buttons for users with manage_files permissions', ->
-  #   toolbar = React.render(@toolbarComponent({params: 'foo', query:'', selectedItems: ['foo'], currentFolder: @courseFolder, contextId: "1", contextType: "courses", userCanManageFilesForContext: true}), $('<div>').appendTo('body')[0])
+  #   toolbar = React.render(@toolbarComponent({params: 'foo', query:'', selectedItems: ['foo'], currentFolder: @courseFolder, contextId: "1", contextType: "courses", userCanManageFilesForContext: true}), $('<div>').appendTo('#fixtures')[0])
   #   ok @buttonsEnabled($(toolbar.getDOMNode()), @manageConfig), "move, restrict access, delete, add folder, and upload file buttons are additionally shown for users with manage_files permissions"

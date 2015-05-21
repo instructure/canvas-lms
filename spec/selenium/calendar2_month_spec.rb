@@ -63,6 +63,7 @@ describe "calendar2" do
         expect(fj('.popover-links-holder:visible')).not_to be_nil
         driver.execute_script("$('.edit_event_link').hover().click()")
         expect_new_page_load { driver.execute_script("$('#edit_calendar_event_form .more_options_link').hover().click()") }
+        expect(f('#editCalendarEventFull .btn-primary').text).to eq "Update Event"
         expect(f('#breadcrumbs').text).to include 'Calendar Events'
       end
 

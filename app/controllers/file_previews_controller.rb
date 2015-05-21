@@ -50,6 +50,7 @@ class FilePreviewsController < ApplicationController
   # canvadocs, crocodoc, inline image, etc.
   def show
     @file = @context.attachments.not_deleted.find_by_id(params[:file_id])
+    jammit_css :react_files
     unless @file
       @headers = false
       @show_left_side = false

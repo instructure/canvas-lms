@@ -597,7 +597,7 @@ class SubmissionsController < ApplicationController
       begin
         @submissions = @assignment.update_submission(@user, params[:submission])
       rescue => e
-        ErrorReport.log_exception(:submissions, e)
+        Canvas::Errors.capture_exception(:submissions, e)
         logger.error(e)
       end
       respond_to do |format|

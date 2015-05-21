@@ -95,8 +95,8 @@ describe "LTI integration tests" do
     adapter = Lti::LtiOutboundAdapter.new(canvas_tool, canvas_user, canvas_course)
 
     variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller, {
-                                                                        current_user: canvas_user,
-                                                                        current_pseudonym: pseudonym})
+                                                                  current_user: canvas_user,
+                                                                  current_pseudonym: pseudonym})
 
     adapter.prepare_tool_launch(return_url, variable_expander)
     post_payload = adapter.generate_post_payload

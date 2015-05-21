@@ -6,8 +6,6 @@ define [
   class Role extends Model
     initialize: ->
       super
-      if ENV.CURRENT_ACCOUNT
-        @set('account', ENV.CURRENT_ACCOUNT.account)
 
     isNew: ->
       not @get('id')?
@@ -16,7 +14,7 @@ define [
     #   urlRoot is used in url to generate the a restful url
     #
     # @api override backbone
-    urlRoot: -> "/api/v1/accounts/#{@get('account').id}/roles"
+    urlRoot: -> "/api/v1/accounts/#{ENV.CURRENT_ACCOUNT.account.id}/roles"
 
     # Method Summary
     #   ResourceName is used by a collection to help determin the url

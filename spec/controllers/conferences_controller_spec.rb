@@ -27,6 +27,11 @@ describe ConferencesController do
     student_in_course(active_all: true, user: user_with_pseudonym(active_all: true))
   end
 
+  before :each do
+    WimbaConference.any_instance.stubs(:send_request).returns('')
+    WimbaConference.any_instance.stubs(:get_auth_token).returns('abc123')
+  end
+
   describe "GET 'index'" do
     it "should require authorization" do
       get 'index', :course_id => @course.id
@@ -121,8 +126,6 @@ describe ConferencesController do
     end
 
     it "should let admins join a conference" do
-      WimbaConference.any_instance.stubs(:send_request).returns('')
-      WimbaConference.any_instance.stubs(:get_auth_token).returns('abc123')
       user_session(@teacher)
       @conference = @course.web_conferences.create!(:conference_type => 'Wimba', :duration => 60, :user => @teacher)
       post 'join', :course_id => @course.id, :conference_id => @conference.id
@@ -131,8 +134,6 @@ describe ConferencesController do
     end
 
     it "should let students join an inactive long running conference" do
-      WimbaConference.any_instance.stubs(:send_request).returns('')
-      WimbaConference.any_instance.stubs(:get_auth_token).returns('abc123')
       user_session(@student)
       @conference = @course.web_conferences.create!(:conference_type => 'Wimba', :user => @teacher)
       @conference.update_attribute :start_at, 1.month.ago
@@ -165,8 +166,6 @@ describe ConferencesController do
       describe 'when the conference is active' do
         before do
           Setting.set('enable_page_views', 'db')
-          WimbaConference.any_instance.stubs(:send_request).returns('')
-          WimbaConference.any_instance.stubs(:get_auth_token).returns('abc123')
           WimbaConference.any_instance.expects(:active?).returns(true)
           post 'join', :course_id => @course.id, :conference_id => @conference.id
         end

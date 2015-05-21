@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+require 'nokogiri'
+
 describe "assignments" do
   def multiple_section_submissions
     course_with_student(:active_all => true); @student1 = @student

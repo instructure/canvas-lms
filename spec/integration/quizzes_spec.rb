@@ -1,5 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+require 'nokogiri'
+
 describe Quizzes::QuizzesController do
 
   def create_section_override(section, due_at)

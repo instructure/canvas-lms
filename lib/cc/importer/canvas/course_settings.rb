@@ -21,7 +21,7 @@ module CC::Importer::Canvas
     include LearningOutcomesConverter
     include RubricsConverter
     include ModuleConverter
-    
+
     def settings_doc(file, html = false)
       path = File.join(@unzipped_file_path, COURSE_SETTINGS_DIR, file)
       return nil unless File.exists? path
@@ -31,7 +31,7 @@ module CC::Importer::Canvas
         open_file_xml path
       end
     end
-    
+
     def convert_all_course_settings
       @course[:course] = convert_course_settings(settings_doc(COURSE_SETTINGS))
       if doc = settings_doc(SYLLABUS, true)
@@ -61,9 +61,9 @@ module CC::Importer::Canvas
       end
       ['is_public', 'public_syllabus', 'indexed', 'allow_student_wiki_edits',
        'allow_student_assignment_edits', 'show_public_context_messages',
-       'allow_student_forum_attachments', 'allow_student_organized_groups',
+       'allow_student_forum_attachments', 'allow_student_organized_groups', 'lock_all_announcements',
        'show_all_discussion_entries', 'open_enrollment', 'allow_wiki_comments',
-       'self_enrollment', 'hide_final_grade', 'grading_standard_enabled', 
+       'self_enrollment', 'hide_final_grade', 'grading_standard_enabled',
        'hide_distribution_graphs', 'allow_student_discussion_topics',
        'allow_student_discussion_editing'].each do |bool_val|
         val = get_bool_val(doc, bool_val)
@@ -91,7 +91,7 @@ module CC::Importer::Canvas
 
       course
     end
-    
+
     def convert_syllabus(doc)
       get_html_title_and_body(doc).last
     end
@@ -113,10 +113,10 @@ module CC::Importer::Canvas
           rule['assignment_migration_id'] = get_node_val(r_node, 'identifierref')
           group['rules'] << rule
         end
-        
+
         groups << group
       end
-      
+
       groups
     end
 
@@ -132,7 +132,7 @@ module CC::Importer::Canvas
         tool['domain'] = get_node_val(node, 'domain')
         tool['url'] = get_node_val(node, 'url')
         tool['privacy_level'] = get_node_val(node, 'privacy_level')
-        
+
         tools << tool
       end
 
@@ -149,7 +149,7 @@ module CC::Importer::Canvas
         feed['url'] = get_node_val(node, 'url')
         feed['verbosity'] = get_node_val(node, 'verbosity')
         feed['header_match'] = get_node_val(node, 'header_match')
-        
+
         feeds << feed
       end
 

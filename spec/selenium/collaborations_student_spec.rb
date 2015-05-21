@@ -1,6 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/collaborations_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/collaborations_specs_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/google_drive_common')
 
 describe "collaborations" do
   include_examples "in-process server selenium tests"
@@ -10,7 +11,7 @@ describe "collaborations" do
       context "#{title} collaboration" do
         before(:each) do
           course_with_student_logged_in
-          set_up_google_docs(type)
+          set_up_google_docs
         end
 
         if type == 'etherpad' then test_id = 158506 end
@@ -42,7 +43,7 @@ describe "collaborations" do
     context "Google Docs collaborations with google docs not having access" do
       before(:each) do
         course_with_teacher_logged_in
-        set_up_google_docs('google_docs', false)
+        set_up_google_docs(false)
       end
 
       it 'should not be editable if google drive does not have access to your account', :priority => "1", :test_id => 162363 do

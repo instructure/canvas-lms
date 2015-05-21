@@ -16,6 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+require 'securerandom'
+
 class EportfoliosController < ApplicationController
   include EportfolioPage
   before_filter :require_user, :only => [:index, :user_index]
@@ -57,7 +60,7 @@ class EportfoliosController < ApplicationController
     if params[:verifier] == @portfolio.uuid
       session[:eportfolio_ids] ||= []
       session[:eportfolio_ids] << @portfolio.id
-      session[:permissions_key] = CanvasUUID.generate
+      session[:permissions_key] = SecureRandom.uuid
     end
     if authorized_action(@portfolio, @current_user, :read)
       @portfolio.ensure_defaults

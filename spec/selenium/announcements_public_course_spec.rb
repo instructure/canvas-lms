@@ -4,7 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/announcements_common
 describe "announcements public course" do
   include_examples "in-process server selenium tests"
 
-  context "does not display replies on announcements" do
+  context "replies on announcements" do
     before :each do
       course_with_teacher(active_all: true, is_public: true) # sets @teacher and @course
       expect(@course.is_public).to be_truthy

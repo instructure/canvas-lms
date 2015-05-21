@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+
 # == Schema Information
 #
 # Table name: wikis
@@ -40,7 +42,7 @@ class Wiki < ActiveRecord::Base
   DEFAULT_FRONT_PAGE_URL = 'front-page'
 
   def set_has_no_front_page_default
-    if self.has_no_front_page.nil? && self.id && context
+    if self.has_no_front_page.nil?
       self.has_no_front_page = true
     end
   end
@@ -68,15 +70,6 @@ class Wiki < ActiveRecord::Base
         p.save
       end
     end
-  end
-
-  def check_has_front_page
-    return unless self.has_no_front_page.nil?
-
-    url = DEFAULT_FRONT_PAGE_URL
-    self.has_no_front_page = !self.wiki_pages.not_deleted.where(:url => url).exists?
-    self.front_page_url = url unless self.has_no_front_page
-    self.save
   end
 
   def front_page
@@ -127,7 +120,7 @@ class Wiki < ActiveRecord::Base
 
   def context
     shard.activate do
-      @context ||= Course.where(wiki_id: self).first || Group.where(wiki_id: self).first
+      @context ||= self.id && (Course.where(wiki_id: self).first || Group.where(wiki_id: self).first)
     end
   end
 
@@ -154,6 +147,10 @@ class Wiki < ActiveRecord::Base
 
     given {|user, session| self.context.grants_right?(user, session, :manage_wiki)}
     can :manage and can :read and can :update and can :create_page and can :delete_page and can :delete_unpublished_page and can :update_page and can :update_page_content
+
+    given {|user, session| self.context.grants_right?(user, session, :manage_wiki) && !self.context.is_a?(Group)}
+    # Pages created by a user without this permission will be automatically published
+    can :publish_page
   end
 
   def self.wiki_for_context(context)

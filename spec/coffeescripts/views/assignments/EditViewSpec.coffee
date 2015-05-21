@@ -129,6 +129,12 @@ define [
     view.$('#has_group_category').click()
     equal view.getFormData()['groupCategoryId'], null
 
+  test 'does not allow blank external tool url', ->
+    view = editView()
+    data = submission_type: 'external_tool'
+    errors = view._validateExternalTool(data, [])
+    equal errors["external_tool_tag_attributes[url]"][0]['message'], 'External Tool URL cannot be left blank'
+
   test 'renders escaped angle brackets properly', ->
     desc = "<p>&lt;E&gt;</p>"
     view = editView description: "<p>&lt;E&gt;</p>"

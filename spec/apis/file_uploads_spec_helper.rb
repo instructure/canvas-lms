@@ -18,9 +18,13 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/api_spec_helper')
 
+RSpec.configure do |config|
+  config.include ApplicationHelper
+end
+
 shared_examples_for "file uploads api" do
-  def attachment_json(attachment)
-    {
+  def attachment_json(attachment, options = {})
+    json = {
       'id' => attachment.id,
       'folder_id' => attachment.folder_id,
       'url' => file_download_url(attachment, :verifier => attachment.uuid, :download => '1', :download_frd => '1'),
@@ -38,6 +42,12 @@ shared_examples_for "file uploads api" do
       'updated_at' => attachment.updated_at.as_json,
       'thumbnail_url' => attachment.thumbnail_url
     }
+
+    if options[:include] && options[:include].include?("enhanced_preview_url") && (attachment.context.is_a?(Course) || attachment.context.is_a?(User))
+      json.merge!({ 'preview_url' => context_url(attachment.context, :context_file_file_preview_url, attachment, annotate: 0) })
+    end
+
+    json
   end
 
   it "should upload (local files)" do
@@ -68,25 +78,30 @@ shared_examples_for "file uploads api" do
     expect(response).to be_success
     attachment.reload
     json = json_parse(response.body)
-    expect(json).to eq({
-      'id' => attachment.id,
-      'folder_id' => attachment.folder_id,
-      'url' => file_download_url(attachment, :verifier => attachment.uuid, :download => '1', :download_frd => '1'),
-      'content-type' => attachment.content_type,
-      'display_name' => attachment.display_name,
-      'filename' => attachment.filename,
-      'size' => tmpfile.size,
-      'unlock_at' => nil,
-      'locked' => false,
-      'hidden' => false,
-      'lock_at' => nil,
-      'locked_for_user' => false,
-      'hidden_for_user' => false,
-      'created_at' => attachment.created_at.as_json,
-      'updated_at' => attachment.updated_at.as_json,
-      'thumbnail_url' => attachment.thumbnail_url
-    })
+    expected_json = {
+        'id' => attachment.id,
+        'folder_id' => attachment.folder_id,
+        'url' => file_download_url(attachment, :verifier => attachment.uuid, :download => '1', :download_frd => '1'),
+        'content-type' => attachment.content_type,
+        'display_name' => attachment.display_name,
+        'filename' => attachment.filename,
+        'size' => tmpfile.size,
+        'unlock_at' => nil,
+        'locked' => false,
+        'hidden' => false,
+        'lock_at' => nil,
+        'locked_for_user' => false,
+        'hidden_for_user' => false,
+        'created_at' => attachment.created_at.as_json,
+        'updated_at' => attachment.updated_at.as_json,
+        'thumbnail_url' => attachment.thumbnail_url
+    }
 
+    if attachment.context.is_a?(User) || attachment.context.is_a?(Course)
+      expected_json.merge!({ 'preview_url' => context_url(attachment.context, :context_file_file_preview_url, attachment, annotate: 0) })
+    end
+
+    expect(json).to eq(expected_json)
     expect(attachment.file_state).to eq 'available'
     expect(attachment.content_type).to eq "application/msword"
     expect(attachment.open.read).to eq content
@@ -121,7 +136,7 @@ shared_examples_for "file uploads api" do
     expect(response).to be_success
     attachment.reload
     json = json_parse(response.body)
-    expect(json).to eq attachment_json(attachment)
+    expect(json).to eq attachment_json(attachment, { include: %w(enhanced_preview_url) })
 
     expect(attachment.file_state).to eq 'available'
     expect(attachment.content_type).to eq "application/msword"

@@ -549,6 +549,30 @@ describe LearningOutcome do
         @outcome.alignments.count
       }.from(1).to(0)
     end
+
+    it "returns #data[:rubric_criterion] when #rubric_criterion is called" do
+      @outcome.rubric_criterion = {
+        description: "Thoughtful description",
+        mastery_points: 5,
+        ratings: [
+          {
+            description: "Strong work",
+            points: 5
+          },
+          {
+            description: "Weak sauce",
+            points: 1
+          }
+        ],
+      }
+      mpoints = { mastery_points: 77 }
+      expect(@outcome).to respond_to(:rubric_criterion)
+      expect(@outcome.data).not_to be_nil
+      expect(@outcome.rubric_criterion).to eq(@outcome.data[:rubric_criterion])
+      expect {
+        @outcome.rubric_criterion = @outcome.rubric_criterion.merge(mpoints)
+      }.to change{@outcome.rubric_criterion}.to(@outcome.rubric_criterion.merge(mpoints))
+    end
   end
 
   context "Don't create outcomes with illegal values" do

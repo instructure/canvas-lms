@@ -36,7 +36,7 @@ class AssignmentsController < ApplicationController
 
     if authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_ASSIGNMENTS)
-      log_asset_access("assignments:#{@context.asset_string}", 'assignments', 'other')
+      log_asset_access([ "assignments", @context ], 'assignments', 'other')
 
       add_crumb(t('#crumbs.assignments', "Assignments"), named_context_url(@context, :context_assignments_url))
 
@@ -173,12 +173,12 @@ class AssignmentsController < ApplicationController
       docs = {}
       begin
         docs = google_service_connection.list_with_extension_filter(assignment.allowed_extensions)
-      rescue GoogleDocs::NoTokenError
-        #do nothing
-      rescue ArgumentError
-        #do nothing
+      rescue GoogleDocs::NoTokenError => e
+        CanvasErrors.capture_exception(:oauth, e)
+      rescue ArgumentError => e
+        CanvasErrors.capture_exception(:oauth, e)
       rescue => e
-        ErrorReport.log_exception(:oauth, e)
+        CanvasErrors.capture_exception(:oauth, e)
         raise e
       end
       respond_to do |format|
@@ -301,7 +301,7 @@ class AssignmentsController < ApplicationController
       append_sis_data(hash)
       js_env(hash)
 
-      log_asset_access("syllabus:#{@context.asset_string}", "syllabus", 'other')
+      log_asset_access([ "syllabus", @context ], "syllabus", 'other')
       respond_to do |format|
         format.html
       end

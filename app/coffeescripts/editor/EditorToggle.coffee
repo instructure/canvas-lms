@@ -106,15 +106,16 @@ define [
     # creates the "done" button used to exit the editor
     # @api private
     createDone: ->
-      $('<a/>')
+      $('<div/>').addClass('edit_html_done_wrapper').append(
+        $('<a/>')
         .text(@options.doneText)
         .attr('href', '#')
-        .addClass('btn edit-html-done edit_html_done')
+        .addClass('btn edit_html_done')
         .attr('title', I18n.t('done.title', 'Click to finish editing the rich text area'))
         .click preventDefault =>
           @display()
           @editButton.focus()
-
+      )
     ##
     # create the switch views links to go between rich text and a textarea
     # @api private

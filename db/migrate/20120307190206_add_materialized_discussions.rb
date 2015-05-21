@@ -2,6 +2,8 @@ class AddMaterializedDiscussions < ActiveRecord::Migration
   tag :predeploy
 
   def self.up
+    # this is fixed in a later migration
+    # rubocop:disable Migration/PrimaryKey
     create_table :discussion_topic_materialized_views, :id => false do |t|
       t.integer :discussion_topic_id, :limit => 8
       t.text :json_structure, :limit => 10.megabytes
