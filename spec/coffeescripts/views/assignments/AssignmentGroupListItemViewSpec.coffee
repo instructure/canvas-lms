@@ -10,9 +10,7 @@ define [
   'helpers/fakeENV'
   'helpers/jquery.simulate'
   'compiled/behaviors/elementToggler'
-], (Backbone, AssignmentGroupCollection, AssignmentGroup, Assignment, AssignmentGroupListItemView, AssignmentListItemView, AssignmentGroupListView, $, fakeENV) ->
-  fixtures = $('#fixtures')
-
+], (Backbone, AssignmentGroupCollection, AssignmentGroup, Assignment, AssignmentGroupListItemView, AssignmentListItemView, AssignmentGroupListView, $, fakeENV, simulate, elementToggler) ->
   assignment1 = ->
     date1 =
       "due_at":"2013-08-28T23:59:00-06:00"
@@ -130,6 +128,8 @@ define [
     setup: ->
       fakeENV.setup()
       @model = createAssignmentGroup()
+      $(document).off()
+      elementToggler.bind()
 
     teardown: ->
       fakeENV.teardown()
@@ -144,7 +144,7 @@ define [
     view = createCollectionView()
     assignmentGroups = {
       item: view.$el.find('.search_show'),
-    };
+    }
     view.$el.find('#assignment_1').trigger('sortstart', assignmentGroups)
     dragHandle = view.$("#assignment_1").find("i").attr('class')
     equal dragHandle, "icon-drag-handle"
@@ -223,8 +223,11 @@ define [
 
   test "toggleCollapse toggles expansion", ->
     view = createView(@model)
+    $toggle_el = view.$el.find(".element_toggler")
     #make sure the cache starts at true
     view.toggleCache() unless view.shouldBeExpanded()
+
+    ok(view.currentlyExpanded())
 
     view.toggleCollapse()
     ok !view.currentlyExpanded()

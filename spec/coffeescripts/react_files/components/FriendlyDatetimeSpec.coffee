@@ -1,11 +1,16 @@
 define [
   'react'
   'compiled/react_files/components/FriendlyDatetime'
-], (React, FriendlyDatetime) ->
+  'i18nObj'
+  'helpers/I18nStubber'
+], (React, FriendlyDatetime, I18n, I18nStubber) ->
 
   TestUtils = React.addons.TestUtils
 
   module 'FriendlyDatetime',
+    setup: ->
+      I18nStubber.clear()
+
   test "parses datetime from a string", ->
     fDT = React.createFactory(FriendlyDatetime)
     rendered = TestUtils.renderIntoDocument(fDT(datetime:'1431570574'))

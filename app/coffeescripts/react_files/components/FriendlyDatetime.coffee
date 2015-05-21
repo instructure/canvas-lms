@@ -1,4 +1,5 @@
 define [
+  'i18nObj'
   'react'
   'timezone'
   'underscore'
@@ -6,7 +7,7 @@ define [
   'compiled/object/assign'
   'jquery'
   'jquery.instructure_date_and_time'
-], (React, tz, _, withReactElement, ObjectAssign, $) ->
+], (I18n, React, tz, _, withReactElement, ObjectAssign, $) ->
 
 
   slowRender = withReactElement ->
@@ -14,6 +15,7 @@ define [
     return time() unless datetime?
     datetime = tz.parse(datetime) unless _.isDate datetime
     fudged = $.fudgeDateForProfileTimezone(datetime)
+    friendly = $.friendlyDatetime(fudged)
 
     time ObjectAssign(@props, {
       title: $.datetimeString(datetime)
@@ -21,7 +23,7 @@ define [
     }),
       span className: 'visible-desktop',
         # something like: Mar 6, 2014
-        $.friendlyDatetime(fudged)
+        friendly
 
 
       span className: 'hidden-desktop',

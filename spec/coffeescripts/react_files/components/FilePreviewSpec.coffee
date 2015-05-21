@@ -13,6 +13,7 @@ define [
   '../mockFilesENV'
   '../TestLocation'
   '../../helpers/stubRouterContext'
+  'vendor/date'
 ], ($, React, Router, Modal, RolesBundle, FilesApp, filesEnv, FilePreviewComponent, Folder, File, FilesCollection, mockFilesENV, TestLocation, stubRouterContext) ->
 
   Simulate = React.addons.TestUtils.Simulate

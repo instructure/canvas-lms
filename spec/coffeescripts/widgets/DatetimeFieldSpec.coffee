@@ -16,6 +16,9 @@ define [
       @$field = $('<input type="text" name="due_at">')
       @field = new DatetimeField(@$field, {})
 
+    teardown: ->
+      I18nStubber.clear()
+
   test 'should include date and time, but not always time, by default', ->
     @field.processTimeOptions({})
     ok @field.showDate, 'showDate is true'
