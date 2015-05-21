@@ -12,7 +12,9 @@ $ef-thumbnail-size: 36px;
   }
 }
 
-
+body.files #content {
+  padding-top: 0;
+}
 
 .ef-main-buttons{
   .ui-buttonset, .ui-button {
@@ -21,17 +23,61 @@ $ef-thumbnail-size: 36px;
 }
 
 .ef-header{
-  padding: $ic-content-padding $ic-content-padding 8px;
-  border-bottom: 1px solid $ic-border-color;
-  > * {
-    display: block;
-    margin-bottom: 0
+  @if $use_new_styles {
+    padding: $ic-sp 0;
+    border-bottom: 1px solid $ic-border-light;
   }
-  input[type='search'] {
-    box-sizing: border-box;
-    width: 100%;
-    height: auto;
+  @else {
+    padding: $ic-sp;
+    border-bottom: 1px solid $ic-border-color;
   }
+  @include breakpoint(desktop) {
+    display: flex;
+    align-items: center;
+  }
+  .ui-buttonset { margin: 0; }
+}
+
+.ef-search-form {
+  margin-bottom: $ic-sp/2;
+  @include breakpoint(desktop) {
+    margin-bottom: 0;
+    flex: 0 0 $ic-sp*31;
+    &.ef-search-form--showing-buttons {
+      @if $use_new_styles { flex: 0 0 $ic-sp*19; }
+      @else { flex: 0 0 $ic-sp*20; }
+    }
+  }
+  @include breakpoint(wide) {
+    flex: 0 0 $ic-sp*34;
+    &.ef-search-form--showing-buttons {
+      flex: 0 0 $ic-sp*26;  
+    }
+  }
+}
+
+.ef-selected-count {
+  font-size: 12px;
+  font-style: italic;
+  white-space: nowrap;
+  padding-left: $ic-sp;
+}
+
+.ef-header__secondary {
+  display: flex;
+  align-items: center;
+  @include breakpoint(desktop) {
+    flex: 1;
+    margin-left: $ic-sp;
+  }
+  @include breakpoint(wide) { margin-left: $ic-sp*2; }
+}
+
+.ef-actions {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  > * { margin-left: $ic-sp/4; }
 }
 
 .ef-main{
@@ -39,12 +85,13 @@ $ef-thumbnail-size: 36px;
   display: flex;
 
   .ef-folder-content{
-    border-right: 1px solid $ic-border-color;
     display: flex;
     flex-direction: column;
     flex: 1 1 0;
-    padding: 0px;
-
+    padding: 0;
+    @if $use_new_styles { border-right: 1px solid $ic-border-light; }
+    @else { border-right: 1px solid $ic-border-color; }
+    
     .tree {
       margin: 10px
     }
@@ -55,8 +102,14 @@ $ef-thumbnail-size: 36px;
     }
 
     .ef-folder-header{
-      padding-top: 5px;
-      padding-bottom: 5px;
+      @if $use_new_styles {
+        padding-top: $ic-sp/3;
+        padding-bottom: $ic-sp/3;
+      }
+      @else {
+        padding-top: 5px;
+        padding-bottom: 5px;  
+      }
 
       &:hover{
         background-color: #f2f2f2;
@@ -91,13 +144,18 @@ $ef-thumbnail-size: 36px;
 }
 .ef-directory-header{
   display: flex;
-  padding: 5px;
-  border-bottom: 1px solid $ic-border-color;
   align-items: center;
+  @if $use_new_styles { 
+    border-bottom: 1px solid $ic-border-light;
+    padding: $ic-sp/3;
+  }
+  @else { 
+    border-bottom: 1px solid $ic-border-color;
+    padding: 5px;
+  }
 }
 
 .ef-plain-link, .ef-plain-link:hover { color: $ic-font-color-dark; }
-
 
 .ef-item-row{
   display: flex;
@@ -223,7 +281,6 @@ $ef-thumbnail-size: 36px;
   }
 }
 
-
 .file-rename-form__form-label {
   float: left;
   margin-top: 5px;
@@ -297,7 +354,9 @@ $ef-thumbnail-size: 36px;
 
 // Hack, Hack, Hack!
 // to make sure that there is space for the ItemCog menu to appear below the bottom thing in the list of files
-#footer { min-height: 80px }
+@if $use_new_styles == false {
+  #footer { min-height: 80px }
+}
 
 .form-controls {
   .btn {
