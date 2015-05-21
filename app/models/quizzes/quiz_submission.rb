@@ -363,6 +363,16 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     self.quiz_data || {}
   end
 
+  def quiz_question_ids
+    questions_as_object.map{ |question|
+      question["id"]
+    }.compact
+  end
+
+  def quiz_questions
+    Quizzes::QuizQuestion.where(id: quiz_question_ids).all
+  end
+
   def update_quiz_points_possible
     self.quiz_points_possible = self.quiz && self.quiz.points_possible
   end

@@ -168,6 +168,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
         create_question_set
       end
       it 'should list all items' do
+        Quizzes::QuizSubmission.any_instance.stubs(:quiz_questions).returns([@qq1,@qq2])
         json = api_index
         expect(json['quiz_submission_questions'].size).to eq 2
       end

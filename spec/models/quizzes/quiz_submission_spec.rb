@@ -1255,6 +1255,34 @@ describe Quizzes::QuizSubmission do
 
   end
 
+  describe "quiz_question_ids" do
+    before do
+      @quiz = @course.quizzes.create! title: 'Test Quiz'
+      @submission = @quiz.quiz_submissions.build
+    end
+    it "takes ids from questions_as_object" do
+      @submission.stubs(:questions_as_object).returns [{"id" => 2}, {"id" => 3}]
+
+      expect(@submission.quiz_question_ids).to eq [2, 3]
+    end
+  end
+
+  describe "quiz_questions" do
+    before do
+      @quiz = @course.quizzes.create! title: 'Test Quiz'
+      @submission = @quiz.quiz_submissions.build
+    end
+    it "fetches questions based on quiz_question_ids" do
+      @submission.stubs(:quiz_question_ids).returns [2, 3]
+      Quizzes::QuizQuestion.expects(:where)
+        .with(id: [2, 3])
+        .returns(User.where(id: [2, 3]))
+        .at_least_once
+
+      @submission.quiz_questions
+    end
+  end
+
   it "does not put a graded survey submission in teacher's todos" do
     questions = [
       { question_data: { name: 'question 1', question_type: 'essay_question' } }
