@@ -132,8 +132,8 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
     end
 
     answers = params.fetch(:quiz_questions, []).reduce({}) do |hsh, p|
-      if p[:id].present? && p[:answer].present?
-        hsh[p[:id].to_i] = p[:answer]
+      if p[:id].present?
+        hsh[p[:id].to_i] = p[:answer] || []
       end
 
       hsh

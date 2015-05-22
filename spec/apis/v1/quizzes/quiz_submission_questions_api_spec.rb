@@ -398,21 +398,32 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
           }.with_indifferent_access)
         end
 
-        it 'should answer a MultipleAnswers question' do
+        it 'should answer a MultipleAnswers question and allow deseleciton' do
           question = create_question 'multiple_answers', {
             answer_parser_compatibility: true
           }
 
-          json = api_answer({
+          first_json = api_answer({
             quiz_questions: [{
               id: question.id,
               answer: [ 9761, 5194 ]
             }]
           })
 
-          expect(json['quiz_submission_questions']).to be_present
-          expect(json['quiz_submission_questions'][0]['answer'].include?('9761')).to be_truthy
-          expect(json['quiz_submission_questions'][0]['answer'].include?('5194')).to be_truthy
+          expect(first_json['quiz_submission_questions']).to be_present
+          expect(first_json['quiz_submission_questions'][0]['answer'].include?('9761')).to be_truthy
+          expect(first_json['quiz_submission_questions'][0]['answer'].include?('5194')).to be_truthy
+
+          second_json = api_answer({
+            quiz_questions: [{
+              id: question.id,
+              answer: []
+            }]
+          })
+
+          expect(second_json['quiz_submission_questions']).to be_present
+          expect(second_json['quiz_submission_questions'][0]['answer'].include?('9761')).to be_falsey
+          expect(second_json['quiz_submission_questions'][0]['answer'].include?('5194')).to be_falsey
         end
 
         it 'should answer an Essay question' do
