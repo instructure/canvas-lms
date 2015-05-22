@@ -10458,15 +10458,6 @@ fr:
       description: "Intégration avec LinkedIn"
       name: LinkedIn
     linked_in_settings: 
-      description: |-
-          Vous devrez enregistrer une [nouvelle application sur LinkedIn](%{linkedin_url}).
-          Définissez les options de configuration suivantes pour garantir un fonctionnement correct
-          de votre intégration avec LinkedIn :
-          
-          * **Application Type :** défini sur Application Web
-          * **Live Status :** défini sur En direct
-          * **OAuth Redirect URL :** défini sur %{oauth_url}
-          * Après avoir enregistré votre application, prenez note de la clé API et de la clé secrète.
       domain_name: domaine
       labels: 
         api_key: "Clé API"
