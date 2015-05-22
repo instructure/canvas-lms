@@ -10421,12 +10421,6 @@ es:
       description: "Integración con LinkedIn"
       name: LinkedIn
     linked_in_settings: 
-      description: "Necesitará registrar una [aplicación nueva en LinkedIn](%{linkedin_url}).\n\
-          Establecer las siguientes opciones de configuración para asegurar que su integración de LinkedIn funciona correctamente:\n\n\
-          * **Application Type:** ajustar a \"Aplicación de Web\"\n\
-          * **Live Status:**  ajustar a \"En Vivo\"\n\
-          * **OAuth Redirect URL:** ajustar a %{oauth_url}\n\
-          * Después de guardar su aplicación, hacer una nota del código API y las etiquetas de código secreto: \n"
       domain_name: dominio
       labels: 
         api_key: "Código API"
