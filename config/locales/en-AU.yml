@@ -10495,15 +10495,6 @@ en-AU:
       description: "LinkedIn integration"
       name: LinkedIn
     linked_in_settings: 
-      description: |-
-          You will need to register a [new app on LinkedIn](%{linkedin_url}).
-          Set the following configuration options to ensure your LinkedIn integration
-          works correctly:
-          
-          * **Application Type:** set to "Web Application"
-          * **Live Status:** set to "Live"
-          * **OAuth Redirect URL:** set to %{oauth_url}
-          * After you save your app, make a note of the API Key and Secret Key
       domain_name: domain
       labels: 
         api_key: "API Key"
