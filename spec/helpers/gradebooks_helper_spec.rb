@@ -22,12 +22,12 @@ require 'nokogiri'
 
 describe GradebooksHelper do
   describe '#student_score_display_for(submission, can_manage_grades)' do
+    FakeAssignment = Struct.new(:grading_type).freeze
     FakeSubmission = Struct.new(:assignment, :score, :grade, :submission_type,
                                 :workflow_state, :excused?).freeze
-    FakeAssignment = Struct.new(:grading_type).freeze
 
-    let(:submission) { FakeSubmission.new(assignment) }
     let(:assignment) { FakeAssignment.new }
+    let(:submission) { FakeSubmission.new(assignment) }
 
     let(:score_display) { helper.student_score_display_for(submission) }
     let(:parsed_display) { Nokogiri::HTML.parse(score_display) }
@@ -90,11 +90,32 @@ describe GradebooksHelper do
         end
       end
 
-      context 'and the grade field matches the score field' do
+      context 'and the assignment is a point grade' do
         it 'must output the grade rounded to two decimal points' do
+          assignment.grading_type = 'points'
           submission.grade = '42.3542'
           submission.score = 42.3542
           expect(score_display).to eq 42.35
+        end
+      end
+
+      context 'and the assignment is a letter grade' do
+        # clearly this code needs to change; just look at this nonsensical expectation:
+        it 'has no score_display' do
+          assignment.grading_type = 'letter_grade'
+          submission.grade = 'B'
+          submission.score = 83
+          expect(score_display).to be_nil
+        end
+      end
+
+      context 'and the assignment is a gpa scaled grade' do
+        # clearly this code needs to change; just look at this nonsensical expectation:
+        it 'has no score_display' do
+          assignment.grading_type = 'gpa_scale'
+          submission.grade = 'B'
+          submission.score = 83
+          expect(score_display).to be_nil
         end
       end
     end

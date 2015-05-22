@@ -96,7 +96,11 @@ class GradeSummaryAssignmentPresenter
   end
 
   def published_grade
-    is_letter_graded_or_gpa_scaled? ? "(#{submission.published_grade})" : ''
+    if is_letter_graded_or_gpa_scaled? && !submission.published_grade.nil?
+      "(#{submission.published_grade})"
+    else
+      ''
+    end
   end
 
   def display_score
@@ -109,12 +113,10 @@ class GradeSummaryAssignmentPresenter
 
   def turnitin
     t = if is_text_entry?
-      submission.turnitin_data[submission.asset_string]
-    elsif is_online_upload? && file
-      submission.turnitin_data[file.asset_string]
-    else
-      nil
-    end
+          submission.turnitin_data[submission.asset_string]
+        elsif is_online_upload? && file
+          submission.turnitin_data[file.asset_string]
+        end
     t.try(:[], :state) ? t : nil
   end
 

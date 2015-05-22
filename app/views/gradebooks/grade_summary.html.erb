@@ -215,25 +215,30 @@
                 <%= student_score_display_for(submission, !can_do(@context, @current_user, :manage_grades)) %>
               <% end %>
             </span>
-            <% if assignment_presenter.is_letter_graded? || assignment_presenter.is_gpa_scaled?%>
+            <% if assignment_presenter.is_letter_graded_or_gpa_scaled? %>
               <span class="score_value">
                 <%= assignment_presenter.display_score %>
               </span>
             <% end %>
           </span>
           <div style="display: none;">
+            <!-- Store the original score so that we can retrieve it after any "What-If" calculations -->
             <span class="original_score">
               <%= assignment_presenter.display_score %>
             </span>
-            <span class="submission_status">
-              <%= submission.blank? ? 'none' : submission.workflow_state %>
-            <span class="score">
+            <!-- Store the current score so that it can persist between multiple "What-If" calculations -->
+            <span class="what_if_score">
               <%= assignment_presenter.display_score %>
             </span>
+            <!-- Load any previously saved "What-If" scores -->
+            <span class="student_entered_score">
+              <%= submission.student_entered_score rescue "" %>
+            </span>
+            <span class="submission_status">
+              <%= submission.blank? ? 'none' : submission.workflow_state %>
             <span class="assignment_group_id"><%= assignment.assignment_group_id rescue "" %></span>
             <span class="assignment_id"><%= assignment.id.to_s %></span>
             <span class="group_weight"><%= assignment.group_weight rescue "" %></span>
-            <span class="student_entered_score"><%= submission.student_entered_score rescue "" %></span>
             <span class="rules"><%= assignment.rules rescue "" %></span>
           </div>
         </div>

@@ -13,9 +13,7 @@ module Api::V1
           date_hash[:graders].each { |grader| compress(grader, :assignments) }
         end
 
-      day_hash.inject([]) do |memo, (date, hash)|
-        memo << hash.merge(:date => date)
-      end.sort_by { |a| a[:date] }.reverse
+      day_hash.map { |date, hash| hash.merge(:date => date) }.sort_by { |a| a[:date] }.reverse
     end
 
     def json_for_date(date, course, api_context)
