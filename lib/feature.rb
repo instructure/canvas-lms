@@ -222,8 +222,7 @@ goes to the personal files page for a user ('/files') then you need to turn it o
 END
 
       applies_to: 'Course',
-      state: 'allowed',
-      beta: true
+      state: 'on'
     },
     'modules_next' =>
     {

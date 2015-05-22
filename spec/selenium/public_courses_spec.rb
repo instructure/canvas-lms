@@ -25,7 +25,7 @@ describe "public courses" do
 
     it "should display course files" do
       get "/courses/#{public_course.id}/files"
-      expect(f('#files_structure_list')).to be_displayed
+      expect(f('div.ef-main[data-reactid]')).to be_displayed
     end
 
     it "should display course syllabus" do
@@ -79,17 +79,6 @@ describe "public courses" do
   describe 'course' do
     before :each do
       ensure_logged_out
-    end
-
-    context 'with draft state disabled' do
-      let!(:public_course) do
-        course(active_course: true)
-        @course.is_public = true
-        @course.save!
-        @course
-      end
-
-      include_examples 'a public course'
     end
 
     context 'with draft state enabled' do

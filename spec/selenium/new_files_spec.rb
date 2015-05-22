@@ -6,7 +6,6 @@ describe "better_file_browsing" do
   context "As a teacher", priority: 1 do
     before(:each) do
       course_with_teacher_logged_in
-      Account.default.enable_feature!(:better_file_browsing)
       add_file(fixture_file_upload('files/example.pdf', 'application/pdf'),
                @course, "example.pdf")
       get "/courses/#{@course.id}/files"
@@ -84,7 +83,6 @@ describe "better_file_browsing" do
   context "Search textbox" do
     before(:each) do
       course_with_teacher_logged_in
-      Account.default.enable_feature!(:better_file_browsing)
       txt_files = ["a_file.txt", "b_file.txt", "c_file.txt"]
       txt_files.map do |text_file|
         add_file(fixture_file_upload("files/#{text_file}", 'text/plain'), @course, text_file)
@@ -106,7 +104,6 @@ describe "better_file_browsing" do
   context "Move dialog" do
     before(:each) do
       course_with_teacher_logged_in
-      Account.default.enable_feature!(:better_file_browsing)
       txt_files = ["a_file.txt", "b_file.txt"]
       txt_files.map { |text_file| add_file(fixture_file_upload("files/#{text_file}", 'text/plain'), @course, text_file) }
       get "/courses/#{@course.id}/files"
@@ -154,7 +151,6 @@ describe "better_file_browsing" do
   context "Publish Cloud Dialog" do
     before(:each) do
       course_with_teacher_logged_in
-      Account.default.enable_feature!(:better_file_browsing)
       add_file(fixture_file_upload('files/a_file.txt', 'text/plain'),
                @course, "a_file.txt")
       get "/courses/#{@course.id}/files"
@@ -194,7 +190,6 @@ describe "better_file_browsing" do
 
     before :each do
       course_with_teacher_logged_in
-      Account.default.enable_feature!(:better_file_browsing)
       Account.default.enable_feature!(:usage_rights_required)
       add_file(fixture_file_upload('files/a_file.txt', 'text/plan'),
                @course, "a_file.txt")
@@ -247,7 +242,6 @@ describe "better_file_browsing" do
 
     before :each do
       course_with_teacher_logged_in
-      Account.default.enable_feature!(:better_file_browsing)
       Account.default.enable_feature!(:usage_rights_required)
       add_file(fixture_file_upload('files/a_file.txt', 'text/plan'),
                @course, "a_file.txt")

@@ -5,9 +5,8 @@ describe "better_file_browsing, folders" do
    include_examples "in-process server selenium tests"
 
   context "Folders" do
-    before (:each) do
+    before(:each) do
       course_with_teacher_logged_in
-      Account.default.enable_feature!(:better_file_browsing)
       get "/courses/#{@course.id}/files"
       folder_name = "new test folder"
       add_folder(folder_name)
@@ -82,9 +81,8 @@ describe "better_file_browsing, folders" do
   end
 
   context "Folder Tree" do
-     before (:each) do
+     before(:each) do
        course_with_teacher_logged_in
-       Account.default.enable_feature!(:better_file_browsing)
        get "/courses/#{@course.id}/files"
      end
 
