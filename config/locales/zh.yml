@@ -10463,15 +10463,6 @@ zh:
       description: "LinkedIn 集成"
       name: LinkedIn
     linked_in_settings: 
-      description: |-
-          您将需要注册 [LinkedIn 上的新应用程序](%{linkedin_url})。
-          设置以下配置可选功能以确保您的 LinkedIn 集成
-          正常工作:
-          
-          * **应用程序类型:** 设置为\"Web 应用程序"
-          * **实时状态:** 设置为"实时"
-          * **OAuth 重定向 URL:** 设置为 %{oauth_url}
-          * 保存应用程序之后，记下 API 密钥和加密密钥
       domain_name: 域
       labels: 
         api_key: "API 密钥"
