@@ -321,6 +321,44 @@ describe SectionsController, type: :request do
         expect(section.sis_source_id).to eq 'fail'
         expect(section.sis_batch_id).to eq nil
       end
+
+      it "should allow reactivating deleting sections using sis_section_id" do
+        old_section = @course.course_sections.create!
+        old_section.sis_source_id = 'fail'
+        old_section.save!
+        old_section.destroy
+
+        json = api_call(:post, @path_prefix, @path_params, { :course_section =>
+            { :name => 'Name', :start_at => '2011-01-01T01:00Z',
+              :end_at => '2011-07-01T01:00Z', :sis_section_id => 'fail' },
+            :enable_sis_reactivation => '1'})
+
+        expect(old_section).to eq @course.active_course_sections.find(json['id'].to_i)
+        old_section.reload
+        expect(old_section).to be_active
+        expect(old_section.sis_source_id).to eq 'fail'
+      end
+
+      it "should raise an error trying to reactivate an active section" do
+        old_section = @course.course_sections.create!
+        old_section.sis_source_id = 'fail'
+        old_section.save!
+
+        json = api_call(:post, @path_prefix, @path_params, { :course_section =>
+            { :name => 'Name', :start_at => '2011-01-01T01:00Z',
+              :end_at => '2011-07-01T01:00Z', :sis_section_id => 'fail' },
+            :enable_sis_reactivation => '1'}, {}, {:expected_status => 400})
+      end
+
+      it "should carry on if there's no section to reactivate" do
+        json = api_call(:post, @path_prefix, @path_params, { :course_section =>
+            { :name => 'Name', :start_at => '2011-01-01T01:00Z',
+              :end_at => '2011-07-01T01:00Z', :sis_section_id => 'fail' },
+            :enable_sis_reactivation => '1'})
+
+        section = @course.active_course_sections.find(json['id'].to_i)
+        expect(section.sis_source_id).to eq 'fail'
+      end
     end
   end
 

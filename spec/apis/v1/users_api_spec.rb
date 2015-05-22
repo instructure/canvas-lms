@@ -622,6 +622,56 @@ describe "Users API", type: :request do
         })
       end
 
+      context "sis reactivation" do
+        it "should allow reactivating deleting users using sis_user_id" do
+          other_user = user_with_pseudonym(:active_all => true)
+          @pseudonym.sis_user_id = "12345"
+          @pseudonym.save!
+          other_user.remove_from_root_account(Account.default)
+
+          @user = @site_admin
+          json = api_call(:post, "/api/v1/accounts/#{Account.default.id}/users",
+            { :controller => 'users', :action => 'create', :format => 'json', :account_id => Account.default.id.to_s },
+            { :enable_sis_reactivation => '1', :user => { :name => "Test User" },
+              :pseudonym => { :unique_id => "test@example.com", :password => "password123", :sis_user_id => "12345"},
+            }
+          )
+
+          expect(other_user).to eq User.find(json['id'])
+          other_user.reload
+          @pseudonym.reload
+          expect(other_user).to be_registered
+          expect(other_user.user_account_associations.where(:account_id => Account.default).first).to_not be_nil
+          expect(@pseudonym).to be_active
+        end
+
+        it "should raise an error trying to reactivate an active section" do
+          other_user = user_with_pseudonym(:active_all => true)
+          @pseudonym.sis_user_id = "12345"
+          @pseudonym.save!
+
+          @user = @site_admin
+          json = api_call(:post, "/api/v1/accounts/#{Account.default.id}/users",
+            { :controller => 'users', :action => 'create', :format => 'json', :account_id => Account.default.id.to_s },
+            { :enable_sis_reactivation => '1', :user => { :name => "Test User" },
+              :pseudonym => { :unique_id => "test@example.com", :password => "password123", :sis_user_id => "12345"},
+            }, {}, {:expected_status => 400}
+          )
+        end
+
+        it "should carry on if there's no section to reactivate" do
+          json = api_call(:post, "/api/v1/accounts/#{Account.default.id}/users",
+            { :controller => 'users', :action => 'create', :format => 'json', :account_id => Account.default.id.to_s },
+            { :enable_sis_reactivation => '1', :user => { :name => "Test User" },
+              :pseudonym => { :unique_id => "test@example.com", :password => "password123", :sis_user_id => "12345"},
+            }
+          )
+
+          user = User.find(json['id'])
+          expect(user.pseudonym.sis_user_id).to eq '12345'
+        end
+      end
+
       it "should catch invalid dates before passing to the database" do
         json = api_call(:post, "/api/v1/accounts/#{@site_admin.account.id}/users",
                         { :controller => 'users', :action => 'create', :format => 'json', :account_id => @site_admin.account.id.to_s },

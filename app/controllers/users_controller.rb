@@ -1140,13 +1140,40 @@ class UsersController < ApplicationController
   #   'require_presence_of_name' are not enforced. Use this parameter to return helpful json
   #   errors while building users with an admin request.
   #
+  # @argument enable_sis_reactivation [Boolean]
+  #   When true, will first try to re-activate a deleted user with matching sis_user_id if possible.
+  #
   # @returns User
   def create
     run_login_hooks
     # Look for an incomplete registration with this pseudonym
-    @pseudonym = @context.pseudonyms.active.by_unique_id(params[:pseudonym][:unique_id]).first
-    # Setting it to nil will cause us to try and create a new one, and give user the login already exists error
-    @pseudonym = nil if @pseudonym && !['creation_pending', 'pending_approval'].include?(@pseudonym.user.workflow_state)
+
+    sis_user_id = nil
+    if @context.grants_right?(@current_user, session, :manage_sis)
+      sis_user_id = params[:pseudonym].delete(:sis_user_id)
+    end
+
+    @pseudonym = nil
+    @user = nil
+    if sis_user_id && value_to_boolean(params[:enable_sis_reactivation])
+      @pseudonym = @context.pseudonyms.where(:sis_user_id => sis_user_id, :workflow_state => 'deleted').first
+      if @pseudonym
+        @pseudonym.workflow_state = 'active'
+        @pseudonym.save!
+        @user = @pseudonym.user
+        @user.workflow_state = 'registered'
+        @user.update_account_associations
+      end
+    end
+
+    if @pseudonym.nil?
+      @pseudonym = @context.pseudonyms.active.by_unique_id(params[:pseudonym][:unique_id]).first
+      # Setting it to nil will cause us to try and create a new one, and give user the login already exists error
+      @pseudonym = nil if @pseudonym && !['creation_pending', 'pending_approval'].include?(@pseudonym.user.workflow_state)
+    end
+
+    @user ||= @pseudonym && @pseudonym.user
+    @user ||= User.new
 
     force_validations = value_to_boolean(params[:force_validations])
     manage_user_logins = @context.grants_right?(@current_user, session, :manage_user_logins)
@@ -1180,11 +1207,6 @@ class UsersController < ApplicationController
       cc_addr = params[:pseudonym].delete(:path) || params[:pseudonym][:unique_id]
     end
 
-    sis_user_id = params[:pseudonym].delete(:sis_user_id)
-    sis_user_id = nil unless @context.grants_right?(@current_user, session, :manage_sis)
-
-    @user = @pseudonym && @pseudonym.user
-    @user ||= User.new
     if params[:user]
       if self_enrollment && params[:user][:self_enrollment_code]
         params[:user][:self_enrollment_code].strip!
