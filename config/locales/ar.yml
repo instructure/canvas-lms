@@ -10842,15 +10842,6 @@ ar:
       description: "تكامل LinkedIn"
       name: LinkedIn
     linked_in_settings: 
-      description: |-
-          سيلزم تسجيل [تطبيق جديد على LinkedIn](%{linkedin_url}).
-          قم بتعيين خيارات التكوين التالية لضمان عمل تكامل LinkedIn
-          بشكل صحيح:
-          
-          * **Application Type:** تم التعيين إلى "تطبيق الويب"
-          * **Live Status:** تم التعيين إلى "Live"
-          * **OAuth Redirect URL:** تم التعيين إلى %{oauth_url}
-          * بعد حفظ التطبيق، قم بتدوين ملاحظة عن مفتاح API والمفتاح السري
       domain_name: مجال
       labels: 
         api_key: "مفتاح واجهة برمجة التطبيقات (API)"
