@@ -10469,15 +10469,6 @@ nb:
       description: LinkedIn-integrering
       name: LinkedIn
     linked_in_settings: 
-      description: |-
-          Du må registrere en [new app on LinkedIn](%{linkedin_url}).
-          Sett følgende konfigurasjonsvalg for å sikre at din LinkedIn integrasjon
-          fungerer korrekt:
-          
-          * **Application Type:** set to "Web Application"
-          * **Live Status:** set to "Live"
-          * **OAuth Redirect URL:** set to %{oauth_url}
-          * After you save your app, make a note of the API Key and Secret Key
       domain_name: domene
       labels: 
         api_key: API-nøkkel
