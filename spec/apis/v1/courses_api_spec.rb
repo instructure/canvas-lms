@@ -427,6 +427,47 @@ describe CoursesController, type: :request do
         expect(new_course.sis_source_id).to eq '9999'
       end
 
+      context "sis reactivation" do
+        it "should allow reactivating deleting courses using sis_course_id" do
+          old_course = @account.courses.build(:name => "Test")
+          old_course.sis_source_id = '9999'
+          old_course.save!
+          old_course.destroy
+
+          json = api_call(:post, @resource_path,
+            @resource_params,
+            { :account_id => @account.id, :course => { :name => 'Test Course', :sis_course_id => '9999' },
+              :enable_sis_reactivation => '1' }
+          )
+          expect(old_course).to eq Course.find(json['id'])
+          old_course.reload
+          expect(old_course).to be_claimed
+          expect(old_course.sis_source_id).to eq '9999'
+        end
+
+        it "should raise an error trying to reactivate an active course" do
+          old_course = @account.courses.build(:name => "Test")
+          old_course.sis_source_id = '9999'
+          old_course.save!
+
+          api_call(:post, @resource_path,
+            @resource_params,
+            { :account_id => @account.id, :course => { :name => 'Test Course', :sis_course_id => '9999' },
+              :enable_sis_reactivation => '1' }, {}, {:expected_status => 400}
+          )
+        end
+
+        it "should carry on if there's no course to reactivate" do
+          json = api_call(:post, @resource_path,
+            @resource_params,
+            { :account_id => @account.id, :course => { :name => 'Test Course', :sis_course_id => '9999' },
+              :enable_sis_reactivation => '1'}
+          )
+          new_course = Course.find(json['id'])
+          expect(new_course.sis_source_id).to eq '9999'
+        end
+      end
+
       it "should set the apply_assignment_group_weights flag" do
         json = api_call(:post, @resource_path,
           @resource_params,

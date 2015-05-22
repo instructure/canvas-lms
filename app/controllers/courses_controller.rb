@@ -528,6 +528,9 @@ class CoursesController < ApplicationController
   # @argument course[course_format] [String]
   #   Optional. Specifies the format of the course. (Should be either 'on_campus' or 'online')
   #
+  # @argument enable_sis_reactivation [Boolean]
+  #   When true, will first try to re-activate a deleted course with matching sis_course_id if possible.
+  #
   # @returns Course
   def create
     @account = params[:account_id] ? api_find(Account, params[:account_id]) : @domain_root_account.manually_created_courses_account
@@ -563,8 +566,18 @@ class CoursesController < ApplicationController
         params[:course].delete :storage_quota_mb
       end
 
-      @course = (@sub_account || @account).courses.build(params[:course])
-      if api_request? && @account.grants_right?(@current_user, :manage_sis)
+      can_manage_sis = api_request? && @account.grants_right?(@current_user, :manage_sis)
+      if can_manage_sis && value_to_boolean(params[:enable_sis_reactivation])
+        @course = @domain_root_account.all_courses.where(
+          :sis_source_id => sis_course_id, :workflow_state => 'deleted').first
+        if @course
+          @course.workflow_state = 'claimed'
+          @course.account = @sub_account if @sub_account
+        end
+      end
+      @course ||= (@sub_account || @account).courses.build(params[:course])
+
+      if can_manage_sis
         @course.sis_source_id = sis_course_id
       end
 
