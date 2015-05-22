@@ -122,6 +122,20 @@ module Canvas::Oauth
       end
     end
 
+    describe '#create_access_token_if_needed' do
+      it 'deletes existing tokens for the same key when requested' do
+        old_token = user.access_tokens.create! :developer_key => key
+        token.create_access_token_if_needed(true)
+        expect(AccessToken.exists?(old_token.id)).to be(false)
+      end
+
+      it 'does not delete existing tokens for the same key when not requested' do
+        old_token = user.access_tokens.create! :developer_key => key
+        token.create_access_token_if_needed
+        expect(AccessToken.exists?(old_token.id)).to be(true)
+      end
+    end
+
     describe '#as_json' do
       let(:json) { token.as_json }
 

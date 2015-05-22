@@ -46,6 +46,7 @@ define [
       'canModerate'
       'canReply'
       'hiddenName'
+      'canRate'
       'speedgraderUrl'
       'inlineReplyLink'
       { name: 'allowsSideComments', deps: ['parent_id', 'deleted'] }
@@ -121,6 +122,13 @@ define [
         else
           I18n.t('discussion_participant', "Discussion Participant")
 
+    ratingString: ->
+      return '' unless sum = @get('rating_sum')
+      I18n.t 'like_count', {
+        one: '(1 like)'
+        other: '(%{count} likes)'
+      }, count: sum
+
     ##
     # Computed attribute to determine if the entry can be moderated
     # by the current user
@@ -135,6 +143,12 @@ define [
       return no if @get 'deleted'
       return no unless ENV.DISCUSSION.PERMISSIONS.CAN_REPLY
       yes
+
+    ##
+    # Computed attribute to determine if the entry can be liked
+    # by the current user
+    canRate: ->
+      ENV.DISCUSSION.PERMISSIONS.CAN_RATE
 
     ##
     # Computed attribute to determine if an inlineReplyLink should be
@@ -193,6 +207,14 @@ define [
       @set(read_state: 'unread', forced_read_state: true)
       url = ENV.DISCUSSION.MARK_UNREAD_URL.replace /:id/, @get 'id'
       $.ajaxJSON url, 'DELETE', forced_read_state: true
+
+    toggleLike: ->
+      rating = if @get('rating') then 0 else 1
+      @set(rating: rating)
+      sum = (@get('rating_sum') || 0) + (if rating then 1 else -1)
+      @set('rating_sum', sum)
+      url = ENV.DISCUSSION.RATE_URL.replace /:id/, @get 'id'
+      $.ajaxJSON url, 'POST', rating: rating
 
     hasChildren: ->
       @get('replies').length > 0

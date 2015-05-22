@@ -30,7 +30,9 @@ define [
       {calendar_event: @_filterAttributes(super)}
 
     present: ->
-      Backbone.Model::toJSON.call(this)
+      result = Backbone.Model::toJSON.call(this)
+      result.newRecord = !result.id
+      result
 
     fetch: (options = {}) ->
       options =  _.clone(options)

@@ -1044,11 +1044,6 @@ ko:
       messages: 
         record_invalid: "유효성 검사 실패: %{errors}"
         taken: "이미 사용 중임"
-      template: 
-        body: "다음 필드에 문제가 있습니다:"
-        header: 
-          one: "%{count}개의 오류가 발생하여 %{model}을 저장할 수 없음"
-          other: "%{count}개의 오류가 발생하여 %{model}을 저장할 수 없음"
   activity_13915493: 활동
   add_app_baf540f: "앱 추가"
   add_course_assignments_628ed6d0: "과목 과제 추가"
@@ -1402,6 +1397,8 @@ ko:
       assignment_name: "이름:"
       assignment_points: "점수:"
       assignment_type: "유형:"
+      buttons: 
+        save_and_publish: "저장 & 게시"
       cancel: 취소
       discussion_type: 토론
       external_tool_type: "외부 도구"
@@ -1472,7 +1469,8 @@ ko:
     edit_view: 
       assignment_name: "과제 이름"
       buttons: 
-        update: "과제 업데이트"
+        save: 저장
+        save_and_publish: "저장 & 게시"
       description: 설명
       freeze_properties: "복사할 때 과제 속성 잠금"
       notify_content_change: "이 내용이 바뀐 것을 사용자에게 알림"
@@ -4417,6 +4415,7 @@ ko:
       buttons: 
         not_published: "게시 안 됨"
         published: 게시됨
+        save_and_publish: "저장 & 게시"
       delay_posting: "지연 게시"
       enable_podcast_feed: "Podcast 피드 사용"
       options: 옵션
@@ -6267,6 +6266,7 @@ ko:
   installed_7b284a91: 설치됨
   instructions: 
     authorize_google_docs: "문서에 대해 협업하기 전에 Canvas가 Google Docs 계정을 접근할 수 있도록 권한을 부여해야 합니다."
+  instructions_2f88ee72: 교사
   instructure: 
     alerts: 
       file_previews_disabled: "이 Canvas 사이트에는 파일 미리 보기 사용 안 함"
@@ -6577,7 +6577,6 @@ ko:
     loading: "미디어 로드 중..."
     media_still_converting: "현재 미디어를 변환 중입니다. 잠시 후에 다시 시도하시기 바랍니다."
     messages: 
-      file_failed_to_load: "미디어 파일 로드 실패"
       flash_required_record_audio: "음성을 녹음하려면 Flash가 필요합니다."
       flash_required_upload_audio: "음성을 업로드하려면 Flash가 필요합니다."
       flash_required_upload_video: "비디오를 업로드하려면 Flash가 필요합니다."
@@ -8572,6 +8571,27 @@ ko:
           kb: KB
           mb: MB
           tb: TB
+  oauth2_provider: 
+    auth: 
+      oauth2_complete: "응용 프로그램이 로그인 워크플로를 마쳤으며 곧 다시 활성화됩니다."
+    confirm: 
+      cancel: 취소
+      details: 
+        allow_application: "%{app_name}이(가) 여러분의 계정에 액세스를 요청하고 있습니다."
+        email: "이메일 주소가 %{email}입니다."
+        login_name: "이 앱에 %{user_name}로 로그인 중입니다."
+      labels: 
+        remember_access: "이 서비스에 대한 인증을 저장"
+      page_title: "앱 로그인"
+    confirm_mobile: 
+      cancel: 취소
+      details: 
+        allow_application: "%{app_name}이(가) 여러분의 계정에 액세스를 요청하고 있습니다."
+        email: "이메일 주소가 %{email}입니다."
+        login_name: "이 앱에 %{user_name}로 로그인 중입니다."
+      login: 로그인
+      page_title: "앱 로그인"
+      remember_auth: "이 서비스에 대한 인증을 저장"
   observees: 
     new_observee_password: 암호
     new_observee_username: "사용자 이름"
@@ -8909,17 +8929,6 @@ ko:
     kaltura_settings: 
       account_settings: "이 값은 Kaltura 관리 콘솔의 \"Settings -> Integration Settings\"에서 찾을 수 있습니다."
       cache_explanation: "공란은 무기한 캐시하는 것을 의미하고 0은 캐시를 안하는 것을 의미합니다."
-      description: |-
-          [Kaltura.com](%{kaltura_url})에 있는 계정이나
-          직접 호스팅한 Kaltura 인스턴스가 필요합니다.
-          
-          **참고:** Canvas에서 Kaltura를 구성하고 나면
-          Kaltura 관리 콘솔에서 "Settings -> Integration Settings"으로 가서
-          다음 알림 URL로 서버 알림을 사용하도록 해야 합니다:
-          
-          %{notification_url}
-          
-          그리고 나서 "Sent by Server" 열에 있는 "Add Entry"와 "Delete Entry" 상자를 체크해야 합니다.
       headers: 
         account_settings: "계정 설정"
         canvas_settings: "Canvas 설정"
@@ -9365,26 +9374,6 @@ ko:
       page_title: "Canvas에 로그인"
     notices: 
       mfa_complete: "다단계 인증 구성"
-    oauth2_auth: 
-      oauth2_complete: "응용 프로그램이 로그인 워크플로를 마쳤으며 곧 다시 활성화됩니다."
-    oauth2_confirm: 
-      cancel: 취소
-      details: 
-        allow_application: "%{app_name}이(가) 여러분의 계정에 액세스를 요청하고 있습니다."
-        email: "이메일 주소는 %{email}입니다."
-        login_name: "이 앱에 %{user_name}로 로그인 중입니다."
-      labels: 
-        remember_access: "이 서비스에 대한 인증을 저장"
-      page_title: "앱 로그인"
-    oauth2_confirm_mobile: 
-      cancel: 취소
-      details: 
-        allow_application: "%{app_name}이(가) 여러분의 계정에 액세스를 요청하고 있습니다."
-        email: "이메일 주소가 %{email}입니다."
-        login_name: "이 앱에 %{user_name}로 로그인 중입니다."
-      login: 로그인
-      page_title: "앱 로그인"
-      remember_auth: "이 서비스에 대한 인증을 저장"
     otp_login: 
       buttons: 
         send: 전송
@@ -9622,6 +9611,7 @@ ko:
       generating: "만드는 중..."
       generating_combinations_progress: "만드는 중... (%{done}/%{total})"
       save: 저장
+      save_and_publish: "저장 & 게시"
       saved: 저장되었습니다!
       saving: "저장 중..."
       update_group: "그룹 업데이트"
@@ -10105,6 +10095,7 @@ ko:
           not_published: "게시 안 됨"
           published: 게시됨
           save: 저장
+          save_and_publish: "저장 & 게시"
         cant_go_back: "답변 후에 문제 잠금"
         default_page_title: "새 퀴즈"
         group: "과제 그룹"
@@ -11855,7 +11846,6 @@ ko:
       entry_no_image: "이 페이지가 제출 이후에 바뀌었다는 것을 염두에 두십시오."
       entry_with_image: "제출할 때 페이지가 어떻게 보였는지에 대한 스냅숏을 포함했습니다. 클릭하면 원본 제출물을 볼 수도 있습니다."
       external_url_submission: "이 제출물을 외부 페이지를 가리키는 URL입니다."
-      file_uploads_for_user: "**%{user}**의 파일 업로드"
       group_discussion_submission_description: "이 과제의 제출물은 그룹에 대한 과제 토론의 게시글입니다. 아래는 %{user}의 토론 게시글이며 *전체 그룹 토론*을 볼 수도 있습니다."
       media_comment_link: "이 제출물은 미디어 녹음/녹화입니다. *보려면 여기를 클릭하십시오*."
       no_files: "이 제출물에 대해 업로드한 파일 없음"
@@ -12547,6 +12537,7 @@ ko:
       buttons: 
         cancel: 취소
         save: 저장
+        save_and_publish: "저장 & 게시"
       course_editing_roles: 
         anyone: 모두
         only_teachers: 교사만

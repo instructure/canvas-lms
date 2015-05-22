@@ -16,7 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
 require 'set'
+require 'securerandom'
 
 # @API Courses
 # API for accessing course information.
@@ -361,7 +363,13 @@ class CoursesController < ApplicationController
         @current_enrollments = []
         @future_enrollments  = []
         Canvas::Builders::EnrollmentDateBuilder.preload(all_enrollments)
-        all_enrollments.each do |e|
+        all_enrollments.group_by{|e| [e.course_id, e.type]}.values.each do |enrollments|
+          e = enrollments.first
+          if enrollments.count > 1
+            e.course_section = nil
+            e.readonly!
+          end
+
           state = e.state_based_on_date
           if [:completed, :rejected].include?(state)
             @past_enrollments << e unless e.workflow_state == "invited" || e.restrict_past_view?
@@ -1091,7 +1099,7 @@ class CoursesController < ApplicationController
 
   def roster
     if authorized_action(@context, @current_user, :read_roster)
-      log_asset_access("roster:#{@context.asset_string}", "roster", "other")
+      log_asset_access([ "roster", @context ], "roster", "other")
       @students = @context.participating_students.order_by_sortable_name
       @teachers = @context.instructors.order_by_sortable_name
       @groups = @context.groups.active
@@ -1174,7 +1182,7 @@ class CoursesController < ApplicationController
     end
 
     session.delete(:enrollment_uuid)
-    session[:permissions_key] = CanvasUUID.generate
+    session[:permissions_key] = SecureRandom.uuid
 
     redirect_to(@current_user ? dashboard_url : root_url)
   end
@@ -1218,7 +1226,7 @@ class CoursesController < ApplicationController
 
       session[:enrollment_uuid] = enrollment.uuid
       session[:enrollment_uuid_course_id] = enrollment.course_id
-      session[:permissions_key] = CanvasUUID.generate
+      session[:permissions_key] = SecureRandom.uuid
 
       @pending_enrollment = enrollment
 
@@ -1243,7 +1251,7 @@ class CoursesController < ApplicationController
 
       if session[:enrollment_uuid] == session[:accepted_enrollment_uuid]
         session.delete(:enrollment_uuid)
-        session[:permissions_key] = CanvasUUID.generate
+        session[:permissions_key] = SecureRandom.uuid
       end
       session.delete(:accepted_enrollment_uuid)
       session.delete(:enrollment_uuid_course_id)
@@ -1442,7 +1450,7 @@ class CoursesController < ApplicationController
 
     @context_enrollment ||= @pending_enrollment
     if @context.grants_right?(@current_user, session, :read)
-      log_asset_access("home:#{@context.asset_string}", "home", "other")
+      log_asset_access([ "home", @context ], "home", "other")
 
       check_incomplete_registration
 
@@ -1490,7 +1498,6 @@ class CoursesController < ApplicationController
 
       # make sure the wiki front page exists
       if @course_home_view == 'wiki'
-        @context.wiki.check_has_front_page
         @course_home_view = 'feed' if @context.wiki.front_page.nil?
       end
 
@@ -1794,7 +1801,7 @@ class CoursesController < ApplicationController
   #
   # Arguments are the same as Courses#create, with a few exceptions (enroll_me).
   #
-  # @argument course[account_id] [Required, Integer]
+  # @argument course[account_id] [Integer]
   #   The unique ID of the account to create to course under.
   #
   # @argument course[name] [String]
@@ -1964,12 +1971,14 @@ class CoursesController < ApplicationController
       params[:course][:event] = :offer if params[:offer].present?
 
       lock_announcements = params[:course].delete(:lock_all_announcements)
-      if value_to_boolean(lock_announcements)
-        @course.lock_all_announcements = true
-        Announcement.where(:context_type => 'Course', :context_id => @course, :workflow_state => 'active').
-            update_all(:locked => true)
-      elsif @course.lock_all_announcements
-        @course.lock_all_announcements = false
+      unless lock_announcements.nil?
+        if value_to_boolean(lock_announcements)
+          @course.lock_all_announcements = true
+          Announcement.where(:context_type => 'Course', :context_id => @course, :workflow_state => 'active').
+              update_all(:locked => true)
+        elsif @course.lock_all_announcements
+          @course.lock_all_announcements = false
+        end
       end
 
       if params[:course].has_key?(:locale) && params[:course][:locale].blank?

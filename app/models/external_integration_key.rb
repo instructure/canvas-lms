@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2014 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -34,6 +34,8 @@ class ExternalIntegrationKey < ActiveRecord::Base
   def key_type
     attributes['key_type'].try(:to_sym)
   end
+
+  scope :of_type, ->(type) { where(key_type: type) }
 
   def grants_right_for?(user, sought_right)
     rights = self.class.key_type_rights[key_type]

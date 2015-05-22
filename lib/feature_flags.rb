@@ -101,7 +101,7 @@ module FeatureFlags
     is_site_admin = self.is_a?(Account) && self.site_admin?
 
     # inherit the feature definition as a default unless it's a hidden feature
-    retval = feature_def unless feature_def.hidden? && !is_site_admin && !override_hidden
+    retval = feature_def.clone_for_cache unless feature_def.hidden? && !is_site_admin && !override_hidden
 
     @feature_flag_cache ||= {}
     return @feature_flag_cache[feature] if @feature_flag_cache.key?(feature)

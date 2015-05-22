@@ -76,6 +76,36 @@ module Canvas::Oauth
       uri == OAUTH2_OOB_URI
     end
 
+    def self.confirmation_redirect(controller, provider, current_user)
+      # skip the confirmation page if access is already (or automatically) granted
+      if provider.authorized_token?(current_user)
+        final_redirect(controller, final_redirect_params(controller.session[:oauth2], current_user))
+      else
+        controller.oauth2_auth_confirm_url
+      end
+    end
+
+    def self.final_redirect_params(oauth_session, current_user, options = {})
+      options = {:scopes => oauth_session[:scopes], :remember_access => options[:remember_access], :purpose => oauth_session[:purpose]}
+      code = Canvas::Oauth::Token.generate_code_for(current_user.global_id, oauth_session[:client_id], options)
+      redirect_params = { :code => code }
+      redirect_params[:state] = oauth_session[:state] if oauth_session[:state]
+      redirect_params
+    end
+
+    def self.final_redirect(controller, opts = {})
+      session = controller.session
+      redirect_uri = session[:oauth2][:redirect_uri]
+      session.delete(:oauth2)
+
+      if is_oob?(redirect_uri)
+        controller.oauth2_auth_url(opts)
+      else
+        has_params = redirect_uri =~ %r{\?}
+        redirect_uri + (has_params ? "&" : "?") + opts.to_query
+      end
+    end
+
     private
     def default_app_name
       I18n.translate('pseudonym_sessions.default_app_name', 'Third-Party Application')

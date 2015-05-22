@@ -16,6 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'net-ldap'
+require 'net_ldap_extensions'
+
 class AccountAuthorizationConfig < ActiveRecord::Base
   cattr_accessor :saml_enabled
   begin
@@ -86,6 +89,12 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     raise "Not an LDAP config" unless self.auth_type == 'ldap'
     require 'net/ldap'
     ldap = Net::LDAP.new(:encryption => self.auth_over_tls.try(:to_sym))
+    if self.requested_authn_context.present?
+      ldap.encryption({
+        method: self.auth_over_tls.try(:to_sym),
+        tls_options: { ssl_version: self.requested_authn_context }
+      })
+    end
     ldap.host = self.auth_host
     ldap.port = self.auth_port
     ldap.base = self.auth_base
@@ -382,17 +391,16 @@ class AccountAuthorizationConfig < ActiveRecord::Base
 
     default_timeout = Setting.get('ldap_timelimit', 5.seconds.to_s).to_f
 
-    Canvas.timeout_protection("ldap:#{self.global_id}",
-                              raise_on_timeout: true,
-                              fallback_timeout_length: default_timeout) do
-                                ldap = self.ldap_connection
-                                filter = self.ldap_filter(unique_id)
-                                ldap.bind_as(:base => ldap.base, :filter => filter, :password => password_plaintext)
-                              end
+    timeout_options = { raise_on_timeout: true, fallback_timeout_length: default_timeout }
+    Canvas.timeout_protection("ldap:#{self.global_id}", timeout_options) do
+      ldap = self.ldap_connection
+      filter = self.ldap_filter(unique_id)
+      ldap.bind_as(base: ldap.base, filter: filter, password: password_plaintext)
+    end
   rescue => e
-    ErrorReport.log_exception(:ldap, e, :account => self.account)
+    Canvas::Errors.capture(e, type: :ldap, account: self.account)
     if e.is_a?(Timeout::Error)
-      self.update_attribute(:last_timeout_failure, Time.now)
+      self.update_attribute(:last_timeout_failure, Time.zone.now)
     end
     return nil
   end

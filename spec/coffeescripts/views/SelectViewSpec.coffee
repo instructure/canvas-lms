@@ -19,6 +19,7 @@ define [
       view.$el.appendTo $('#fixtures')
     teardown: ->
       view.remove()
+      $("#fixtures").empty()
 
   test 'onChange it updates the model', ->
     view.model = new Backbone.Model

@@ -40,6 +40,8 @@ define [
       '.replies:first': '$replies'
       '.headerBadges:first': '$headerBadges'
       '.discussion-read-state-btn:first': '$readStateToggle'
+      '.discussion-rate-action': '$rateLink'
+      '.discussion-rating': '$ratingSum'
 
     events:
       'click .loadDescendants': 'loadDescendants'
@@ -72,6 +74,8 @@ define [
           delete @treeView
         else
           @renderTree()
+      @model.on 'change:rating', @renderRating
+      @model.on 'change:rating_sum', @renderRatingSum
 
     toggleRead: (e) ->
       e.preventDefault()
@@ -161,6 +165,8 @@ define [
       super
       @collapse() if @options.collapsed
       @setToggleTooltip()
+      @renderRating()
+      @renderRatingSum()
       if @model.get('read_state') is 'unread' and !@model.get('forced_read_state') and !ENV.DISCUSSION.MANUAL_MARK_AS_READ
         @readMarker ?= new MarkAsReadWatcher this
         # this is throttled so calling it here is okay
@@ -240,6 +246,17 @@ define [
         @model.get('replies').push entry.attributes
         @trigger 'addReply'
         EntryView.trigger 'addReply', entry
+
+    toggleLike: (e) ->
+      e.preventDefault()
+      @model.toggleLike()
+
+    renderRating: =>
+      @$rateLink.toggleClass('discussion-rate-action--checked', !!@model.get('rating'))
+      @$rateLink.attr('aria-checked', if @model.get('rating') then 'true' else 'false')
+
+    renderRatingSum: =>
+      @$ratingSum.text(@model.ratingString())
 
     addReplyAttachment: (event, $el) ->
       event.preventDefault()

@@ -61,6 +61,14 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
     updated_at.present? && updated_at >= discussion_topic.updated_at && json_structure.present?
   end
 
+  def all_entries
+    if self.discussion_topic.sort_by_rating
+      self.discussion_topic.rated_discussion_entries
+    else
+      self.discussion_topic.discussion_entries
+    end
+  end
+
   # this view is eventually consistent -- once we've generated the view, we
   # continue serving the view to clients even once it's become outdated, while
   # the background job runs to generate the new view. this is preferred over
@@ -79,7 +87,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
       entry_ids = self.entry_ids_array
 
       if opts[:include_new_entries]
-        new_entries = discussion_topic.discussion_entries.where("updated_at >= ?", (self.generation_started_at || self.updated_at)).all
+        new_entries = all_entries.where("updated_at >= ?", (self.generation_started_at || self.updated_at)).all
         participant_ids = (Set.new(participant_ids) + new_entries.map(&:user_id).compact + new_entries.map(&:editor_id).compact).to_a
         entry_ids = (Set.new(entry_ids) + new_entries.map(&:id)).to_a
         new_entries_json_structure = discussion_entry_api_json(new_entries, discussion_topic.context, nil, nil, [])
@@ -111,8 +119,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
     view = []
     user_ids = Set.new
     Shackles.activate(:slave) do
-      discussion_entries = self.discussion_topic.discussion_entries
-      discussion_entries.find_each do |entry|
+      all_entries.find_each do |entry|
         json = discussion_entry_api_json([entry], discussion_topic.context, nil, nil, []).first
         entry_lookup[entry.id] = json
         user_ids << entry.user_id

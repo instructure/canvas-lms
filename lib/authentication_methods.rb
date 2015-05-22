@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'casclient'
+
 module AuthenticationMethods
 
   def authorized(*groups)
@@ -65,7 +67,7 @@ module AuthenticationMethods
   end
 
   def load_pseudonym_from_access_token
-    return unless api_request? || params[:action] == 'oauth2_logout'
+    return unless api_request? || (params[:controller] == 'oauth2_provider' && params[:action] == 'destroy')
 
     token_string = AuthenticationMethods.access_token(request)
 
@@ -80,6 +82,9 @@ module AuthenticationMethods
         raise AccessTokenError
       end
       @access_token.used!
+
+      RequestContextGenerator.add_meta_header('at', @access_token.global_id)
+      RequestContextGenerator.add_meta_header('dk', @access_token.developer_key.global_id) if @access_token.developer_key
     end
   end
 

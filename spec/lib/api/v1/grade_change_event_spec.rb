@@ -48,7 +48,7 @@ describe Api::V1::GradeChangeEvent do
   before do
     skip("needs auditors cassandra keyspace configured") unless Auditors::GradeChange::Stream.available?
 
-    @request_id = CanvasUUID.generate
+    @request_id = SecureRandom.uuid
     RequestContextGenerator.stubs( :request_id => @request_id )
 
     @domain_root_account = Account.default

@@ -448,6 +448,9 @@
         <%= link_to context_url(@context, :context_quiz_url, @quiz), :class => 'btn', :id => 'cancel_button' do %>
           <%= t('links.cancel', "Cancel") %>
         <% end %>
+        <% unless @quiz.published %>
+          <button type="submit" class="save_and_publish btn btn-publish"><%= t('buttons.save_and_publish', "Save & Publish") %></button>
+        <% end %>
         <button type="submit" class="save_quiz_button btn btn-primary"><%= t('buttons.save', "Save") %></button>
       </div>
     </div>

@@ -19,6 +19,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
+RSpec.configure do |config|
+  config.include ApplicationHelper
+end
+
 describe "Files API", type: :request do
   context 'locked api item' do
     let(:item_type) { 'file' }
@@ -89,6 +93,7 @@ describe "Files API", type: :request do
         'hidden' => false,
         'lock_at' => nil,
         'locked_for_user' => false,
+        'preview_url' => context_url(@attachment.context, :context_file_file_preview_url, @attachment, annotate: 0),
         'hidden_for_user' => false,
         'created_at' => @attachment.created_at.as_json,
         'updated_at' => @attachment.updated_at.as_json,
@@ -120,6 +125,7 @@ describe "Files API", type: :request do
         'hidden' => false,
         'lock_at' => nil,
         'locked_for_user' => false,
+        'preview_url' => context_url(@attachment.context, :context_file_file_preview_url, @attachment, annotate: 0),
         'hidden_for_user' => false,
         'created_at' => @attachment.created_at.as_json,
         'updated_at' => @attachment.updated_at.as_json,
@@ -621,7 +627,7 @@ describe "Files API", type: :request do
       expect(json['unlock_at']).to eq one_month_ago.as_json
       expect(json['lock_at']).to eq one_month_from_now.as_json
     end
-    
+
     it "should not be locked/hidden for a teacher" do
       att2 = Attachment.create!(:filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('file'), :folder => @root, :context => @course, :locked => true)
       att2.hidden = true

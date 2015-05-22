@@ -17,7 +17,7 @@
 #
 
 module Lti
-  class MessageHandler< ActiveRecord::Base
+  class MessageHandler < ActiveRecord::Base
 
     BASIC_LTI_LAUNCH_REQUEST = 'basic-lti-launch-request'
 

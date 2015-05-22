@@ -256,6 +256,7 @@ describe CommunicationChannelsController do
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         # not a full user session; just @current_user is set
         controller.instance_variable_set(:@current_user, @user)
+        @domain_root_account = Account.default
 
         post 'confirm', :nonce => @cc.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
         expect(response).to be_redirect
@@ -448,6 +449,8 @@ describe CommunicationChannelsController do
         user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1)
         @logged_user = @user
         user_session(@logged_user, @pseudonym)
+
+        @domain_root_account = Account.default
 
         get 'confirm', :nonce => @not_logged_user.email_channel.confirmation_code, :confirm => 1
         expect(response).to redirect_to(dashboard_url)

@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'aws-sdk'
+
 class NotificationEndpoint < ActiveRecord::Base
   attr_accessible :token, :arn
 

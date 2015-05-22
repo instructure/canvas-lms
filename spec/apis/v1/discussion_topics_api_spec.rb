@@ -19,6 +19,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
+require 'nokogiri'
+
 class DiscussionTopicsTestCourseApi
   include Api
   include Api::V1::DiscussionTopics
@@ -299,6 +301,9 @@ describe DiscussionTopicsController, type: :request do
                   "permissions" => { "delete"=>true, "attach"=>true, "update"=>true },
                   "group_category_id" => nil,
                   "can_group" => true,
+                  "allow_rating" => nil,
+                  "only_graders_can_rate" => nil,
+                  "sort_by_rating" => nil,
       }
     end
 
@@ -1124,6 +1129,9 @@ describe DiscussionTopicsController, type: :request do
       "author" => user_display_json(gtopic.user, gtopic.context).stringify_keys!,
       "group_category_id" => nil,
       "can_group" => true,
+      "allow_rating" => nil,
+      "only_graders_can_rate" => nil,
+      "sort_by_rating" => nil,
     }
     expect(json).to eq expected
   end
@@ -1252,6 +1260,8 @@ describe DiscussionTopicsController, type: :request do
         "message" => @message,
         "created_at" => @entry.created_at.utc.iso8601,
         "updated_at" => @entry.updated_at.as_json,
+        "rating_sum" => nil,
+        "rating_count" => nil,
       })
     end
 
@@ -1916,6 +1926,28 @@ describe DiscussionTopicsController, type: :request do
     end
   end
 
+  context "rating" do
+    before(:once) do
+      @topic = create_topic(@course, title: "topic", message: "topic", allow_rating: true)
+      @entry = create_entry(@topic, message: "top-level entry")
+      @reply = create_reply(@entry, message: "first reply")
+    end
+
+    def call_rate_entry(course, topic, entry, rating)
+      raw_api_call(:post,
+                   "/api/v1/courses/#{course.id}/discussion_topics/#{topic.id}/entries/#{entry.id}/rating.json",
+                   { controller: 'discussion_topics_api', action: 'rate_entry', format: 'json',
+                     course_id: course.id.to_s, topic_id: topic.id.to_s, entry_id: entry.id.to_s, rating: rating })
+    end
+
+    it "should rate an entry" do
+      student_in_course(active_all: true)
+      call_rate_entry(@course, @topic, @entry, 1)
+      assert_status(204)
+      expect(@entry.rating(@user)).to eq 1
+    end
+  end
+
   context "subscribing" do
     before :once do
       student_in_course(:active_all => true)
@@ -2264,6 +2296,8 @@ describe DiscussionTopicsController, type: :request do
           'message' => 'root1',
           'created_at' => @root1.created_at.as_json,
           'updated_at' => @root1.updated_at.as_json,
+          'rating_sum' => nil,
+          'rating_count' => nil,
         ]
 
         # it's important that these are returned in created_at order
@@ -2275,6 +2309,8 @@ describe DiscussionTopicsController, type: :request do
             'message' => 'reply1',
             'parent_id' => @root1.id,
             'user_id' => @teacher.id,
+            'rating_sum' => nil,
+            'rating_count' => nil,
           },
           {
             'id' => @reply2.id,
@@ -2283,6 +2319,8 @@ describe DiscussionTopicsController, type: :request do
             'message' => 'reply2',
             'parent_id' => @root1.id,
             'user_id' => @teacher.id,
+            'rating_sum' => nil,
+            'rating_count' => nil,
           },
         ]
       ensure
@@ -2322,11 +2360,9 @@ describe DiscussionTopicsController, type: :request do
   context "public courses" do
     let(:announcements_view_api) {
       ->(user, course_id, announcement_id, status = 200) do
-        args = []
-        m = user ? method(:api_call_as_user) : method(:api_call)
-        args.push(user) if user
-        @user = nil unless user # this is required because of api_call :-(
-        args.push(
+        old_at_user = @user
+        @user = user # this is required because of api_call :-(
+        json = api_call(
           :get,
           "/api/v1/courses/#{course_id}/discussion_topics/#{announcement_id}/view?include_new_entries=1",
           {
@@ -2343,8 +2379,7 @@ describe DiscussionTopicsController, type: :request do
             expected_status: status
           }
         )
-        json = m.call(*args)
-        @user = user unless @user # this is required because of api_call :-(
+        @user = old_at_user
         json
       end
     }
@@ -2363,7 +2398,7 @@ describe DiscussionTopicsController, type: :request do
       @announcement.discussion_entries.create!(:user => @student2, :parent_entry => s1e, :message => "Hello I'm student 2!")
     end
 
-    context "does show" do
+    context "should be shown" do
       let(:check_access) {
         ->(json) do
           expect(json["new_entries"]).not_to be_nil
@@ -2373,20 +2408,20 @@ describe DiscussionTopicsController, type: :request do
         end
       }
 
-      it "does show student comments to students" do
+      it "shows student comments to students" do
         check_access.call(announcements_view_api.call(@student1, @course.id, @announcement.id))
       end
 
-      it "does show student comments to teachers" do
+      it "shows student comments to teachers" do
         check_access.call(announcements_view_api.call(@teacher, @course.id, @announcement.id))
       end
 
-      it "does show student comments to admins" do
+      it "shows student comments to admins" do
         check_access.call(announcements_view_api.call(@admin, @course.id, @announcement.id))
       end
     end
 
-    context "doesn't show" do
+    context "should not be shown" do
       let(:check_access) {
         ->(json) do
           expect(json["new_entries"]).to be_nil
@@ -2401,18 +2436,49 @@ describe DiscussionTopicsController, type: :request do
         @course = prev_course
       end
 
-      it "doesn't show student comments to unauthenticated users" do
+      it "does not show student comments to unauthenticated users" do
         check_access.call(announcements_view_api.call(nil, @course.id, @announcement.id, 401))
       end
 
-      it "doesn't show student comments to other students not in the course" do
+      it "does not show student comments to other students not in the course" do
         check_access.call(announcements_view_api.call(@student, @course.id, @announcement.id, 401))
       end
 
-      it "doesn't show student comments to other teachers not in the course" do
+      it "does not show student comments to other teachers not in the course" do
         check_access.call(announcements_view_api.call(@teacher, @course.id, @announcement.id, 401))
       end
     end
+  end
+
+  it "should order Announcement items by posted_at rather than by position" do
+    course_with_teacher(:active_all => true)
+    account_admin_user(account: @course.account) # sets @admin
+
+    ann_ids_ordered_by_posted_at  = 10.times.map do |i|
+      ann = Announcement.create!({
+        context: @course,
+        message: "Test Message",
+      })
+      ann.posted_at = i.days.ago
+      ann.position = 1
+      ann.save!
+      ann.id
+    end
+
+    json = api_call(
+      :get,
+      "/api/v1/courses/#{@course.id}/discussion_topics?only_announcements=1",
+      {
+        controller: "discussion_topics",
+        action: "index",
+        format: "json",
+        course_id: @course.id.to_s,
+        only_announcements: 1,
+      },
+      {}
+    )
+
+    expect(json.map{ |j| j["id"] }).to eq(ann_ids_ordered_by_posted_at)
   end
 end
 

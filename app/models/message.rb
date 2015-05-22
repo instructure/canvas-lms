@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'hey'
+
 class Message < ActiveRecord::Base
   # Included modules
   include Rails.application.routes.url_helpers
@@ -692,10 +694,12 @@ class Message < ActiveRecord::Base
       raise_error = @exception.to_s !~ /^450/
       log_error = raise_error && !@exception.is_a?(Timeout::Error)
       if log_error
-        ErrorReport.log_exception(:default, @exception, {
-          :message => 'Message delivery failed',
-          :to => to,
-          :object => inspect.to_s })
+        Canvas::Errors.capture(
+          @exception,
+          message: 'Message delivery failed',
+          to: to,
+          object: inspect.to_s
+        )
       end
 
       self.errored_dispatch

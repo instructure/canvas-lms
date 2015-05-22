@@ -5,7 +5,7 @@ define [
 
   module 'MissingDateDialogView',
     setup: ->
-      $('body').append('<label for="date">Section one</label><input type="text" id="date" name="date" />')
+      $('#fixtures').append('<label for="date">Section one</label><input type="text" id="date" name="date" />')
       @dialog = new MissingDateDialogView
         validationFn: ->
           invalidFields = []
@@ -18,6 +18,7 @@ define [
       $('input[name=date]').remove()
       $('label[for=date]').remove()
       $('.ui-dialog').remove()
+      $("#fixtures").empty()
 
   test 'should display a dialog if the given fields are invalid', ->
     ok @dialog.render()

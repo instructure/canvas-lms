@@ -17,13 +17,13 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../lib/validates_as_url.rb')
 
 describe Submission do
   before(:once) do
-    @user = factory_with_protected_attributes(User, :name => "some student", :workflow_state => "registered")
-    @course = @context = factory_with_protected_attributes(Course, :name => "some course", :workflow_state => "available")
-    @context.enroll_student(@user)
+    course_with_student(active_all: true)
+    @context = @course
     @assignment = @context.assignments.new(:title => "some assignment")
     @assignment.workflow_state = "published"
     @assignment.save
@@ -164,10 +164,7 @@ describe Submission do
         Notification.create(:name => 'Assignment Submitted Late')
         Notification.create(:name => 'Group Assignment Submitted Late')
 
-        @teacher = User.create(:name => "some teacher")
-        @student = User.create(:name => "a student")
-        @context.enroll_teacher(@teacher)
-        @context.enroll_student(@student)
+        course_with_teacher(course: @course, active_all: true)
       end
 
       it "should send the correct message when an assignment is turned in on-time" do
@@ -965,6 +962,9 @@ describe Submission do
 
   describe "cached_due_date" do
     it "should get initialized during submission creation" do
+      # create an invited user, so that the submission is not automatically
+      # created by the DueDateCacher
+      student_in_course
       @assignment.update_attribute(:due_at, Time.zone.now - 1.day)
 
       override = @assignment.assignment_overrides.build

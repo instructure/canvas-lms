@@ -153,7 +153,7 @@ define [
       if id is 'maybe'
         detailsUrl = downloadUrl.replace /\/download.*/, ""
         onError = ->
-          $holder.text I18n.t 'messages.file_failed_to_load', "This media file failed to load"
+          $holder.text I18n.t "Media has been queued for conversion, please try again in a little bit."
         onSuccess = (data) ->
           if data.attachment?.media_entry_id isnt 'maybe'
             $holder.text ''
@@ -187,7 +187,7 @@ define [
         # Populate dialog box with a video
         $dialog.disableWhileLoading getSourcesAndTracks(id).done (sourcesAndTracks) ->
           if sourcesAndTracks.sources.length
-            mediaPlayerOptions = 
+            mediaPlayerOptions =
               can_add_captions: sourcesAndTracks.can_add_captions
               mediaCommentId: id
               googleAnalyticsTitle: id

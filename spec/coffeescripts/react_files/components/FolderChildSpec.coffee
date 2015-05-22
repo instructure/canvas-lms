@@ -12,12 +12,14 @@ define [
 
   # module 'FolderChild',
   #   setup: ->
-  #     @div =  $('<div>').appendTo('body')[0]
+  #     @div =  $('<div>').appendTo('#fixtures')[0]
 
   #     # React.addons.TestUtils.renderIntoDocument(routes)
   #     @currentFolder = new Folder()
   #     @currentFolder.folders.url = TEST_FOLDERS_COLLECTION_URL
   #     thisFolder = @currentFolder.folders.add({})
+  #   teardown: ->
+  #     $("#fixtures").empty()
 
   #     @sampleProps = (canManageFiles = false) ->
   #       model: thisFolder

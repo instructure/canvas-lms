@@ -164,15 +164,19 @@ define([
     if (data.sharedSecret && data.sharedSecret.length > 0) {
       params['shared_secret'] = data.sharedSecret;
     }
-
     switch(configurationType) {
       case 'manual':
         // Convert custom fields into kv pair
-        var pairs = (data.customFields || '').split('\n');
-        _.forEach(pairs, function(pair) {
-          var vals = pair.trim().split('=');
-          params['custom_fields[' + vals[0] + ']'] = vals[1];
-        });
+          if (data.customFields === '' || typeof data.customFields === 'undefined') {
+            params['custom_fields_string'] = '';
+          } else {
+              var pairs = (data.customFields || '').split('\n');
+            _.forEach(pairs, function(pair) {
+              var vals = pair.trim().split('=');
+              params['custom_fields[' + vals[0] + ']'] = vals[1];
+            });
+          }
+
         params['domain'] = data.domain;
         params['privacy_level'] = data.privacyLevel;
         params['url'] = data.url;
@@ -187,7 +191,6 @@ define([
         params['config_xml'] = data.xml;
         break;
     }
-
     return params;
   };
 

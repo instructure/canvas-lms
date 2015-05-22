@@ -151,10 +151,10 @@ window.rubricAssessment = {
     $rubric_criterion_comments_dialog.find(".cancel_button").click(function(event) {
       $rubric_criterion_comments_dialog.dialog('close');
     });
-    
+
     setInterval(rubricAssessment.sizeRatings, 2500);
   },
-  
+
   sizeRatings: function() {
     var $visibleCriteria = $(".rubric .criterion:visible");
     if ($visibleCriteria.length) {
@@ -169,13 +169,13 @@ window.rubricAssessment = {
                 $this.find(".criterion_description .container").height()
               );
           // the -10 here is the padding on the .container.
-          $ratingsContainers.css('height', (maxHeight - 10) + 'px');        
+          $ratingsContainers.css('height', (maxHeight - 10) + 'px');
         }
       });
       $("html,body").scrollTop(scrollTop); 
     }
   },
-  
+
   assessmentData: function($rubric) {
     $rubric = rubricAssessment.findRubric($rubric);
     var data = {};
@@ -184,7 +184,8 @@ window.rubricAssessment = {
     $rubric.find(".criterion:not(.blank)").each(function() {
       var id = $(this).attr('id');
       var pre = "rubric_assessment[" + id + "]";
-      data[pre + "[points]"] = $(this).find(".criterion_points").val();
+      var points = $(this).find(".criterion_points").val();
+      data[pre + "[points]"] = !isNaN(points) ? points : undefined
       if($(this).find(".rating.selected")) {
         data[pre + "[description]"] = $(this).find(".rating.selected .description").text();
         data[pre + "[comments]"] = $(this).find(".custom_rating").text();
@@ -196,7 +197,7 @@ window.rubricAssessment = {
     });
     return data;
   },
-  
+
   findRubric: function($rubric) {
     if(!$rubric.hasClass('rubric')) {
       $new_rubric = $rubric.closest('.rubric');
@@ -207,7 +208,7 @@ window.rubricAssessment = {
     }
     return $rubric;
   },
-  
+
   updateRubricAssociation: function($rubric, data) {
     var summary_data = data.summary_data;
     if (summary_data && summary_data.saved_comments) {
@@ -215,7 +216,7 @@ window.rubricAssessment = {
         var comments = summary_data.saved_comments[id],
             $holder = $rubric.find("#criterion_" + id).find(".saved_custom_rating_holder").hide(),
             $saved_custom_rating = $holder.find(".saved_custom_rating");
-            
+
         $saved_custom_rating.find(".comment").remove();
         $saved_custom_rating.empty().append('<option value="">' + htmlEscape(I18n.t('options.select', '[ Select ]')) + '</option>');
         for(var jdx in comments) {
@@ -224,16 +225,16 @@ window.rubricAssessment = {
             $holder.show();
           }
         }
-      } 
+      }
     }
-  },  
-  
+  },
+
   populateRubric: function($rubric, data) {
     $rubric = rubricAssessment.findRubric($rubric);
     var id = $rubric.attr('id').substring(7);
     $rubric.find(".user_id").text(ENV.RUBRIC_ASSESSMENT.assessment_user_id || data.user_id).end()
       .find(".assessment_type").text(ENV.RUBRIC_ASSESSMENT.assessment_type || data.assessment_type);
-    
+
     $rubric.find(".criterion_description").removeClass('completed').removeClass('original_completed').end()
       .find(".rating").removeClass('selected').removeClass('original_selected').end()
       .find(".custom_rating_field").val("").end()
@@ -282,7 +283,7 @@ window.rubricAssessment = {
       $rubric.find(".rubric_total").text(total);
     }
   },
-  
+
   populateRubricSummary: function($rubricSummary, data) {
     $rubricSummary.find(".criterion_points").text("").end()
       .find(".rating_custom").text("");

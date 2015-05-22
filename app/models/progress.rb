@@ -22,7 +22,7 @@ class Progress < ActiveRecord::Base
 
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['ContentMigration', 'Course', 'User',
-    'Quizzes::QuizStatistics', 'Account', 'GroupCategory', 'ContentExport', 'Assignment']
+    'Quizzes::QuizStatistics', 'Account', 'GroupCategory', 'ContentExport', 'Assignment', 'Attachment']
   belongs_to :user
   attr_accessible :context, :tag, :completion, :message
 
@@ -79,7 +79,7 @@ class Progress < ActiveRecord::Base
   # so that you can update the completion percentage on it as the job runs.
   def process_job(target, method, enqueue_args = {}, *method_args)
     enqueue_args = enqueue_args.reverse_merge(max_attempts: 1, priority: Delayed::LOW_PRIORITY)
-    method_args = method_args.unshift(self)
+    method_args = method_args.unshift(self) unless enqueue_args.delete(:preserve_method_args)
     work = Progress::Work.new(self, target, method, method_args)
     Delayed::Job.enqueue(work, enqueue_args)
   end
@@ -97,8 +97,8 @@ class Progress < ActiveRecord::Base
     end
 
     def on_permanent_failure(error)
-      error_report = ErrorReport.log_exception("Progress::Work", error)
-      @progress.message = "Unexpected error, ID: #{error_report.id rescue "unknown"}"
+      er_id = Canvas::Errors.capture_exception("Progress::Work", error)[:error_report]
+      @progress.message = "Unexpected error, ID: #{er_id || 'unknown'}"
       @progress.save
       @progress.fail
     end

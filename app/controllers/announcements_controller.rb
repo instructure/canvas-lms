@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+
 class AnnouncementsController < ApplicationController
   include Api::V1::DiscussionTopics
 
@@ -26,7 +28,7 @@ class AnnouncementsController < ApplicationController
     return unless authorized_action(@context, @current_user, :read)
     return if @context.class.const_defined?('TAB_ANNOUNCEMENTS') && !tab_enabled?(@context.class::TAB_ANNOUNCEMENTS)
 
-    log_asset_access("announcements:#{@context.asset_string}", "announcements", "other")
+    log_asset_access([ "announcements", @context ], "announcements", "other")
     respond_to do |format|
       format.html do
         add_crumb(t(:announcements_crumb, "Announcements"))
@@ -47,7 +49,8 @@ class AnnouncementsController < ApplicationController
 
   def public_feed
     return unless get_feed_context
-    announcements = @context.announcements.active.order('posted_at DESC').limit(15).reject{|a| a.locked_for?(@current_user, :check_policies => true) }
+    announcements = @context.announcements.active.order('posted_at DESC').limit(15).
+      select{|a| a.visible_for?(@current_user) }
 
     respond_to do |format|
       format.atom {

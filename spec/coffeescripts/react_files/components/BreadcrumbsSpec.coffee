@@ -12,7 +12,10 @@ define [
   Simulate = React.addons.TestUtils.Simulate
   {Route} = Router
 
-  module 'Breadcrumbs'
+  module 'Breadcrumbs',
+    setup: ->
+    teardown: ->
+      $("#fixtures").empty()
 
   test 'generates the home, rootFolder, and other links', ->
 
@@ -25,12 +28,12 @@ define [
       contextType: 'courses'
 
 
-    location = new TestLocation([ '/courses/1/files/folder/test_folder_name' ]);
+    location = new TestLocation([ '/courses/1/files/folder/test_folder_name' ])
     routes = [
       Route path: "#{filesEnv.baseUrl}/folder/*", name: "folder", handler: BreadcrumbsComponent
       Route path: "#{filesEnv.baseUrl}/?", name: "rootFolder", handler: BreadcrumbsComponent
     ]
-    div = $('<div>').appendTo('body')[0]
+    div = $('<div>').appendTo('#fixtures')[0]
 
     Router.run routes, location, (Handler) ->
       React.render Handler(sampleProps), div, ->

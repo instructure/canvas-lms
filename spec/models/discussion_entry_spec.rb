@@ -401,6 +401,40 @@ describe DiscussionEntry do
     end
   end
 
+  context "rating" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+      @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher)
+      @entry = @topic.discussion_entries.create!(message: "entry", user: @s1)
+    end
+
+    it "should allow being rated" do
+      expect(@entry.rating(@teacher)).to be_nil
+      @entry.change_rating(1, @teacher)
+      expect(@entry.rating(@teacher)).to eq 1
+    end
+
+    it "should update rating_count and rating_sum" do
+      @entry.change_rating(1, @teacher)
+      @entry.reload
+      expect(@entry.rating_count).to eq 1
+      expect(@entry.rating_sum).to eq 1
+
+      student_in_course(active_all: true)
+      @s2 = @student
+
+      @entry.change_rating(1, @s2)
+      @entry.reload
+      expect(@entry.rating_count).to eq 2
+      expect(@entry.rating_sum).to eq 2
+      @entry.change_rating(0, @teacher)
+      @entry.reload
+      expect(@entry.rating_count).to eq 2
+      expect(@entry.rating_sum).to eq 1
+    end
+  end
+
   context "threaded discussions" do
     before :once do
       course_with_teacher

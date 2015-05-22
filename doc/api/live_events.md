@@ -18,7 +18,7 @@ Live Events is currently an invite-only, experimental feature.
 
 ### Event Format
 
-#### Attributes
+#### Event Attributes
 
 Events are delivered with attributes and a body. The attributes are:
 
@@ -198,3 +198,23 @@ should be null in the body.
 | `wiki_page_id` | The Canvas id of the delete wiki page. |
 | `title` | The title of the deleted wiki page (possibly truncated). |
 
+
+#### `asset_accessed`
+
+`asset_accessed` events are triggered for viewing various objects in
+Canvas. Viewing a quiz, a wiki page, the list of quizzes, etc, all
+generate `asset_access` events. The item being accessed is identified by
+`asset_type`, `asset_id`, and `asset_subtype`. If `asset_subtype` is
+set, then it refers to a list of items in the asset. For example, if
+`asset_type` is `course`, and `asset_subtype` is `quizzes`, then this is
+referring to viewing the list of quizzes in the course.
+
+If `asset_subtype` is not set, then the access is on the asset described
+by `asset_type` and `asset_id`.
+
+
+| Field | Description |
+| ----- | ----------- |
+| `asset_type` | The type of asset being accessed. |
+| `asset_id` | The Canvas id of the asset. |
+| `asset_subtype` | See above. |

@@ -23,6 +23,7 @@ define [
 
       @url = @options.change_grade_url.replace(":assignment", @assignment.id).replace(":submission", @student.id)
       @submission = $.extend {}, @student["assignment_#{@assignment.id}"],
+        label: "student_grading_#{@assignment.id}"
         inputName: 'submission[posted_grade]'
         assignment: @assignment
         speedGraderUrl: speedGraderUrl
@@ -76,7 +77,7 @@ define [
         for comment in submission.submission_comments || []
           comment.url = "#{@options.context_url}/users/#{comment.author_id}"
           urlPrefix = "#{location.protocol}//#{location.host}"
-          comment.image_url = "#{urlPrefix}/images/users/#{comment.author_id}?fallback=#{encodeURIComponent(urlPrefix+'/images/messages/avatar-50.png')}"
+          comment.image_url = "#{urlPrefix}/images/users/#{comment.author_id}"
         submission.turnitin = extractDataFor(submission, "submission_#{submission.id}", @options.context_url)
         for attachment in submission.attachments || []
           attachment.turnitin = extractDataFor(submission, "attachment_#{attachment.id}", @options.context_url)

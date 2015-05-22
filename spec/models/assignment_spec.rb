@@ -847,6 +847,17 @@ describe Assignment do
       }
     end
 
+    it "should not schedule auto_assign when skip_schedule_peer_reviews is set" do
+      @a.peer_reviews = true
+      @a.automatic_peer_reviews = true
+      @a.due_at = Time.zone.now
+      @a.skip_schedule_peer_reviews = true
+
+      expects_job_with_tag('Assignment#do_auto_peer_review', 0) {
+        @a.save!
+      }
+    end
+
     it "should reset peer_reviews_assigned when the assign_at time changes" do
       @a.peer_reviews = true
       @a.automatic_peer_reviews = true

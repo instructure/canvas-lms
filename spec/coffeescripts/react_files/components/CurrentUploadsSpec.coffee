@@ -20,10 +20,11 @@ define [
 
   module 'CurrentUploads',
     setup: ->
-      @uploads = React.render(CurrentUploads(), $('<div>').appendTo('body')[0])
+      @uploads = React.render(CurrentUploads(), $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       React.unmountComponentAtNode(@uploads.getDOMNode().parentNode)
+      $("#fixtures").empty()
 
   test 'announces upload progress to screen reader when queue changes', ->
     sinon.stub($, 'screenReaderFlashMessage')

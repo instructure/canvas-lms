@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'securerandom'
+
 class EportfolioCategoriesController < ApplicationController
   include EportfolioPage
   
@@ -61,7 +63,7 @@ class EportfolioCategoriesController < ApplicationController
       if params[:verifier] == @portfolio.uuid
         session[:eportfolio_ids] ||= []
         session[:eportfolio_ids] << @portfolio.id
-        session[:permissions_key] = CanvasUUID.generate
+        session[:permissions_key] = SecureRandom.uuid
       end
       if authorized_action(@portfolio, @current_user, :read)
         if params[:id]

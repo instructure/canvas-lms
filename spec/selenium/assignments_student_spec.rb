@@ -1,5 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignments_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/google_drive_common')
 
 describe "assignments" do
   include_examples "in-process server selenium tests"
@@ -177,6 +178,79 @@ describe "assignments" do
           expect(ext_error).to be_displayed
           expect(submit_file_button).to have_attribute(:disabled, "true")
         end
+      end
+    end
+
+    context "google drive" do
+      before(:each) do
+        PluginSetting.create!(:name => 'google_docs', :settings => {})
+        PluginSetting.create!(:name => 'google_drive', :settings => {})
+        set_up_google_docs()
+      end
+
+      it "should have a google doc tab if google docs is enabled", :priority => "1", :test_id => 161884 do
+        @assignment.update_attributes(:submission_types => 'online_upload')
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        f('.submit_assignment_link').click
+        wait_for_animations
+
+        expect(f("a[href*='submit_google_doc_form']")).to_not be_nil
+      end
+
+      context "select file or folder" do
+        before(:each) do
+          # mock out function calls
+          google_service_connection = mock()
+          google_service_connection.stubs(:service_type).returns('google_drive')
+          google_service_connection.stubs(:retrieve_access_token).returns('access_token')
+          google_service_connection.stubs(:verify_access_token).returns(true)
+
+          # mock files to show up from "google drive"
+          file_list = create_file_list
+          google_service_connection.stubs(:list_with_extension_filter).returns(file_list)
+
+          ApplicationController.any_instance.stubs(:google_service_connection).returns(google_service_connection)
+
+          # create assignment
+          @assignment.update_attributes(:submission_types => 'online_upload')
+          get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+          f('.submit_assignment_link').click
+          f("a[href*='submit_google_doc_form']").click
+          wait_for_animations
+        end
+
+        it "should select a file from google drive", :priority => "1", :test_id => 161886 do
+          # find file in list
+          # the file we are looking for is created as the second file in the list
+          expect(ff(".filename")[1]).to include_text("test.mydoc")
+        end
+
+        it "should select a file in a folder from google drive", :priority => "1", :test_id => 161885 do
+          # open folder
+          f(".folder").click
+          wait_for_animations
+
+          # find file in list
+          expect(f(".filename")).to include_text("nested.mydoc")
+        end
+      end
+
+      it "forces users to authenticate", :priority => "1", :test_id => 161892 do
+        # stub out google drive
+        google_service_connection = mock()
+        google_service_connection.stubs(:service_type).returns('google_drive')
+        google_service_connection.stubs(:retrieve_access_token).returns(nil)
+        google_service_connection.stubs(:verify_access_token).returns(nil)
+        ApplicationController.any_instance.stubs(:google_service_connection).returns(google_service_connection)
+
+        @assignment.update_attributes(:submission_types => 'online_upload')
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        f('.submit_assignment_link').click
+        f("a[href*='submit_google_doc_form']").click
+        wait_for_animations
+
+        # button that forces users to authenticate if they want to use google drive
+        expect(fln("Authorize Google Drive Access")).to be_truthy
       end
     end
 

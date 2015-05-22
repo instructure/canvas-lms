@@ -19,7 +19,7 @@ describe "links", :priority => "2" do
     end
 
     it "should navigate user to home page after home link is clicked" do
-      expect_new_page_load { driver.find_element(:link, 'Home').click }
+      expect_new_page_load { fln('Home').click }
 			expect(f("#course_home_content")).to be_displayed
     end
 
@@ -120,9 +120,9 @@ describe "links", :priority => "2" do
       end
 
       it "should navigate user to the calendar page after calender link is clicked" do
-        expect_new_page_load { driver.find_element(:link, 'Calendar').click }
-				expect(f('.calendar_header')).to be_displayed
-			end
-		end
+        expect_new_page_load { fln('Calendar').click }
+        expect(f('.calendar_header')).to be_displayed
+      end
+    end
   end
 end

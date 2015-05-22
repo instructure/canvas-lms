@@ -68,6 +68,17 @@ class Enrollment
           recent_activity.record!(now + 30.minutes)
           expect(@enrollment.total_activity_time).to eq 3.minutes.to_i
         end
+
+        it "should update total_activity_time based on the maximum" do
+          section2 = @course.course_sections.create!
+          enrollment2 = @course.enroll_student(@student, :allow_multiple_enrollments => true, :section => section2)
+          Enrollment.where(:id => enrollment2).update_all(:total_activity_time => 39.minutes.to_i)
+
+          expect(@enrollment.total_activity_time).to eq 0
+          recent_activity.record!(now)
+          recent_activity.record!(now + 3.minutes)
+          expect(@enrollment.total_activity_time).to eq 42.minutes.to_i
+        end
       end
 
       describe "#record_for_access" do

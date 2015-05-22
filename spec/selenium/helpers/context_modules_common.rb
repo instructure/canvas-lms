@@ -4,6 +4,60 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     fixture_file_upload('scribd_docs/txt.txt', 'text/plain', true)
   end
 
+
+  def create_modules(number_to_create, published=false)
+    modules = []
+    number_to_create.times do |i|
+      m = @course.context_modules.create!(:name => "module #{i}")
+      m.unpublish! unless published
+      modules << m
+    end
+    modules
+  end
+
+  def publish_module
+    fj('#context_modules .publish-icon-publish').click
+    wait_for_ajaximations
+  end
+
+  def unpublish_module
+    fj('#context_modules .publish-icon-published').click
+    wait_for_ajaximations
+  end
+
+  def test_relock
+    wait_for_ajaximations
+    expect(f('#relock_modules_dialog')).to be_displayed
+    ContextModule.any_instance.expects(:relock_progressions).once
+    fj(".ui-dialog:visible .ui-button:first-child").click
+    wait_for_ajaximations
+  end
+
+  def create_context_module(module_name)
+    context_module = @course.context_modules.create!(:name => module_name, :require_sequential_progress => true)
+    context_module
+  end
+
+  def go_to_modules
+    get "/courses/#{@course.id}/modules"
+  end
+
+  def validate_context_module_status_text(module_num, text_to_validate)
+    context_modules_status = ff('.context_module .progression_container')
+    expect(context_modules_status[module_num]).to include_text(text_to_validate)
+  end
+
+  def navigate_to_module_item(module_num, link_text)
+    context_modules = ff('.context_module')
+    expect_new_page_load { context_modules[module_num].find_element(:link, link_text).click }
+    go_to_modules
+  end
+
+  def assert_page_loads
+    get "/courses/#{@course.id}/modules"
+    expect(f('.name').text).to eq "some module"
+  end
+
   def add_existing_module_item(item_select_selector, module_name, item_name)
     add_module(module_name + 'Module')
     f('.ig-header-admin .al-trigger').click
@@ -98,4 +152,15 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     yield edit_form
     submit_form(edit_form)
     wait_for_ajaximations
+  end
+
+  def verify_persistence(title)
+    refresh_page
+    expect(f('#context_modules')).to include_text(title)
+  end
+
+  def wait_for_modules_ui
+    # context_modules.js has some setTimeout(..., 1000) calls
+    # before it adds click handlers and drag/drop
+    sleep 2
   end

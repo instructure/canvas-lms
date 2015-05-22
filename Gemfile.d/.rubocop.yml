@@ -1,0 +1,10 @@
+inherit_from: ../.rubocop.yml
+
+Metrics/LineLength:
+  Enabled: false
+Style/IndentationConsistency:
+  Enabled: false
+Metrics/MethodLength:
+  Enabled: false
+Metrics/ClassLength:
+  Enabled: false

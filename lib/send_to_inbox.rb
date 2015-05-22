@@ -59,15 +59,11 @@ module SendToInbox
         end
       end
     rescue => e
-      ErrorReport.log_exception(:default, e, {
-        :message => "SendToInbox failure",
-      })
+      Canvas::Errors.capture(e, {message: "SendToInbox failure"})
       nil
     end
 
-    def inbox_item_recipient_ids
-      @inbox_item_recipient_ids
-    end
+    attr_reader :inbox_item_recipient_ids
 
   end
 

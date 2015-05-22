@@ -287,6 +287,67 @@ describe ContentMigration do
     end
   end
 
+  it "should not overwrite deleted quizzes unless overwrite_quizzes is true" do
+    skip unless Qti.qti_enabled?
+
+    course_with_teacher
+    cm = ContentMigration.new(:context => @course, :user => @teacher)
+    cm.migration_type = 'qti_converter'
+    cm.migration_settings['import_immediately'] = true
+
+    # having this set used to always prepend the id, and it would get set it there were any other imported quizzes/questions
+    cm.migration_settings['id_prepender'] = 'thisusedtobreakstuff'
+    cm.save!
+
+    package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/quiz_qti.zip")
+    attachment = Attachment.new
+    attachment.context = cm
+    attachment.uploaded_data = File.open(package_path, 'rb')
+    attachment.filename = 'file.zip'
+    attachment.save!
+
+    cm.attachment = attachment
+    cm.save!
+
+    cm.queue_migration
+    run_jobs
+
+    expect(@course.quizzes.count).to eq 1
+    orig_quiz = @course.quizzes.first
+    qq = orig_quiz.quiz_questions.first
+    qq.question_data[:question_text] = "boooring"
+    qq.save!
+    orig_quiz.destroy
+
+    cm.migration_settings['id_prepender'] = 'somethingelse'
+    cm.save!
+    # run again, should create a new quiz
+    cm.queue_migration
+    run_jobs
+
+    @course.reload
+    expect(@course.quizzes.count).to eq 2
+    expect(@course.quizzes.active.count).to eq 1
+
+    new_quiz = @course.quizzes.active.first
+
+    cm.migration_settings['overwrite_quizzes'] = true
+    cm.migration_settings['id_prepender'] = 'somethingelse_again'
+    cm.save!
+    # run again, but this time restore the deleted quiz
+    cm.queue_migration
+    run_jobs
+
+    @course.reload
+    expect(@course.quizzes.count).to eq 2
+    expect(@course.quizzes.active.count).to eq 2
+
+    orig_quiz.reload
+    # should overwrite the old quiz question data
+    expect(orig_quiz.quiz_questions.first.question_data[:question_text]).to eq(
+      new_quiz.quiz_questions.first.question_data[:question_text])
+  end
+
   it "should identify and import compressed tarball archives" do
     skip unless Qti.qti_enabled?
 

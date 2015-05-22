@@ -1,9 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/discussions_common')
 
-context "threaded discussions" do
+describe "threaded discussions" do
   include_examples "in-process server selenium tests"
 
-  before (:each) do
+  before(:each) do
     @topic_title = 'threaded discussion topic'
     course_with_teacher_logged_in
     @topic = create_discussion(@topic_title, 'threaded')
@@ -61,6 +61,32 @@ context "threaded discussions" do
     wait_for_ajaximations
 
     expect(fj('.al-options:visible').text).to_not include("Edit")
+  end
+
+  it "should show a reply time that is different from the creation time", priority: "2", test_id: 113813 do
+    # Reset discussion created_at time to two minutes ago
+    @topic.update_attribute(:posted_at, Time.zone.now - 2.minute)
+
+    # Create reply message and reset created_at to one minute ago
+    @topic.reply_from(user: @student, html: "New test reply")
+    reply = DiscussionEntry.last
+    reply.update_attribute(:created_at, Time.zone.now - 1.minute)
+
+    # Navigate to discussion URL
+    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+
+    replied_at = f('.discussion-pubdate.hide-if-collapsed > time').attribute("data-html-tooltip-title")
+
+    edit_entry(reply, "Reply edited")
+    edited_at = (reply[:updated_at].to_time.strftime('%b %-d at %-l:%M') << reply[:updated_at].to_time.strftime('%p').downcase).to_s
+    displayed_edited_at = f('.discussion-fyi').text
+
+    # Verify displayed edit time includes object update time
+    expect(displayed_edited_at).to include(edited_at)
+
+    # Verify edit time is later than reply time
+    expect(replied_at).to be < (edited_at)
+
   end
 
   it "should delete a reply" do

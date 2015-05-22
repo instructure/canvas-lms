@@ -9,6 +9,7 @@ describe I18n do
 
     it 'should return en-US for a locale without a qualified locale' do
       I18n.backend.stub lolz: {key: "text"} do
+        I18n.config.available_locales_set << :lolz
         I18n.locale = :lolz
         expect(I18n.qualified_locale).to eq 'en-US'
       end

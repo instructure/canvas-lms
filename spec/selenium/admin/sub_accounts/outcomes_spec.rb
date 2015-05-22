@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../common')
 require File.expand_path(File.dirname(__FILE__) + '/../../helpers/outcome_common')
 
-describe "sub account outcomes" do
+describe "sub account outcomes", priority: 2 do
   include_examples "in-process server selenium tests"
 
     describe "account outcome specs" do
@@ -33,6 +33,18 @@ describe "sub account outcomes" do
 
         it "should validate mastery points" do
           should_validate_mastery_points
+        end
+
+        it "should_validate_calculation_method_dropdown", test_id: 162376 do
+          should_validate_calculation_method_dropdown
+        end
+
+        it "should validate decaying average", test_id: 162377 do
+          should_validate_decaying_average
+        end
+
+        it "should validate n mastery", test_id: 162378 do
+          should_validate_n_mastery
         end
       end
 

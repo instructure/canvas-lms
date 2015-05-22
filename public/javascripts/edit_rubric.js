@@ -123,6 +123,7 @@ define([
       $criterion.find(".criterion_description").val(outcome.get('title')).focus().select();
 
       $criterion.find(".mastery_points").text(outcome.get('mastery_points'));
+      $criterion.find(".links").remove();
     },
     hideCriterionAdd: function($rubric) {
       $rubric.find('.add_right, .add_left, .add_column').removeClass('add_left add_right add_column');
@@ -438,6 +439,9 @@ define([
           $rating.fillTemplateData({data: rating});
           $criterion.find(".ratings").append($rating);
         });
+        if (criterion.learning_outcome_id) {
+          $criterion.find(".links").remove();
+        }
         $rubric.find(".summary").before($criterion);
         $criterion.find(".criterion_points").val(criterion.points).blur();
       });
@@ -706,6 +710,7 @@ define([
         }
         var rubric = data.rubric;
         rubric.rubric_association_id = data.rubric_association.id;
+        rubric.use_for_grading = data.rubric_association.use_for_grading;
         rubric.permissions = rubric.permissions || {};
         if(data.rubric_association.permissions) {
           rubric.permissions.update_association = data.rubric_association.permissions.update;
@@ -792,6 +797,7 @@ define([
         var rubric = data.rubric;
         $rubric.loadingImage('remove');
         rubric.rubric_association_id = data.rubric_association.id;
+        rubric.use_for_grading = data.rubric_association.use_for_grading;
         rubric.permissions = rubric.permissions || {};
         if(data.rubric_association.permissions) {
           rubric.permissions.update_association = data.rubric_association.permissions.update;

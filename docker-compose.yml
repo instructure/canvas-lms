@@ -34,7 +34,7 @@ web:
     - kinesis
   environment:
     RACK_ENV: development
-    VIRTUAL_HOST: canvas.docker
+    VIRTUAL_HOST: .canvas.docker
 
 jobs:
   build: ./docker-compose

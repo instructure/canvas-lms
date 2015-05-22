@@ -37,8 +37,9 @@ class Enrollment
     def record!(as_of = Time.zone.now)
       return unless record_worthwhile?(as_of, last_threshold)
       if increment_total_activity?(as_of)
-        enrollment.total_activity_time= total_activity_interval(as_of)
-        update_with(total_activity_time: total_activity_time, last_activity_at: as_of)
+        new_total = total_activity_interval(as_of)
+        enrollment.total_activity_time = new_total
+        update_with(total_activity_time: new_total, last_activity_at: as_of)
       else
         update_with(last_activity_at: as_of)
       end
@@ -51,7 +52,7 @@ class Enrollment
     end
 
     def update_with(options)
-      enrollment.class.where(id: enrollment).update_all(options)
+      all_enrollments_scope.update_all(options)
     end
 
     def increment_total_activity?(as_of)
@@ -79,8 +80,11 @@ class Enrollment
     end
 
     def total_activity_time
-      enrollment.total_activity_time
+      all_enrollments_scope.maximum(:total_activity_time) || 0
     end
 
+    def all_enrollments_scope
+      Enrollment.where(:course_id => enrollment.course_id, :user_id => enrollment.user_id)
+    end
   end
 end

@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'aws-sdk'
+
 class BounceNotificationProcessor
   attr_reader :config
 

@@ -1,8 +1,10 @@
+require 'net/http'
+require 'net/https'
+require 'nokogiri'
+require 'uri'
+
 module Delicious
-  require 'net/http'
-  require 'net/https'
-  require 'uri'
-  
+
   def delicious_generate_request(url, method, user_name, password)
     rootCA = '/etc/ssl/certs'
     

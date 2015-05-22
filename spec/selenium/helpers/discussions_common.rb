@@ -31,7 +31,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     click_entry_option(entry, '.al-options:visible li:eq(1) a')
     wait_for_ajaximations
     type_in_tiny 'textarea', text
-    f('.edit-html-done').click
+    f('.edit_html_done').click
     wait_for_ajaximations
     validate_entry_text(entry, text)
   end

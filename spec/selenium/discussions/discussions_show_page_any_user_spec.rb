@@ -1,5 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/discussions_common')
 
+require 'nokogiri'
+
 describe "discussions" do
   include_examples "in-process server selenium tests"
 

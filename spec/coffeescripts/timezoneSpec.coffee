@@ -3,15 +3,20 @@ define [
   'vendor/timezone/America/Detroit'
   'vendor/timezone/fr_FR'
   'vendor/timezone/pt_PT'
-], (tz, detroit, french, portuguese)->
+  'helpers/I18nStubber'
+], (tz, detroit, french, portuguese, I18nStubber)->
+
   module 'timezone',
     setup: ->
       @snapshot = tz.snapshot()
+      I18nStubber.pushFrame()
 
     teardown: ->
       tz.restore(@snapshot)
+      I18nStubber.popFrame()
 
   moonwalk = new Date(Date.UTC(1969, 6, 21, 2, 56))
+  epoch = new Date(Date.UTC(1970, 0, 1, 0, 0))
 
   test 'parse(valid datetime string)', ->
     equal +tz.parse(moonwalk.toISOString()), +moonwalk
@@ -67,6 +72,32 @@ define [
     equal tz.format(time, '%-l%P'), "15"
     equal tz.format(time, '%I%P'), "15"
     equal tz.format(time, '%r'), "15:00:00"
+
+  test "format() should recognize date.formats.*", ->
+    I18nStubber.stub 'en', 'date.formats.short': '%b %-d'
+    equal tz.format(moonwalk, 'date.formats.short'), "Jul 21"
+
+  test "format() should recognize time.formats.*", ->
+    I18nStubber.stub 'en', 'time.formats.tiny': '%-l:%M%P'
+    equal tz.format(epoch, 'time.formats.tiny'), "12:00am"
+
+  test "format() should localize when given a localization key", ->
+    tz.changeLocale(french, 'fr_FR')
+    I18nStubber.setLocale 'fr_FR'
+    I18nStubber.stub 'fr_FR', 'date.formats.full': '%-d %b %Y %-l:%M%P'
+    equal tz.format(moonwalk, 'date.formats.full'), "21 juil. 1969 2:56"
+
+  test "format() should automatically convert %l to %-l when given a localization key", ->
+    I18nStubber.stub 'en', 'time.formats.tiny': '%l:%M%P'
+    equal tz.format(moonwalk, 'time.formats.tiny'), "2:56am"
+
+  test "format() should automatically convert %k to %-k when given a localization key", ->
+    I18nStubber.stub 'en', 'time.formats.tiny': '%k:%M'
+    equal tz.format(moonwalk, 'time.formats.tiny'), "2:56"
+
+  test "format() should automatically convert %e to %-e when given a localization key", ->
+    I18nStubber.stub 'en', 'date.formats.short': '%b %e'
+    equal tz.format(epoch, 'date.formats.short'), "Jan 1"
 
   test 'shift() should adjust the date as appropriate', ->
     equal +tz.shift(moonwalk, '-1 day'), moonwalk - 86400000

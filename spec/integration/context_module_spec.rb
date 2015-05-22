@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+require 'nokogiri'
+
 describe ContextModule do
   def course_module
     course_with_student_logged_in(:active_all => true)

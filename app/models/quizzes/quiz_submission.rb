@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'sanitize'
+
 class Quizzes::QuizSubmission < ActiveRecord::Base
   self.table_name = 'quiz_submissions'
 
@@ -643,7 +645,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     if self.quiz && self.user
       if self.score
         self.quiz.context_module_action(self.user, :scored, self.kept_score)
-      elsif self.finished_at
+      end
+      if self.finished_at
         self.quiz.context_module_action(self.user, :submitted)
       end
     end
@@ -780,15 +783,15 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     p.dispatch :submission_graded
     p.to { user }
     p.whenever { |q_sub|
-      policy = BroadcastPolicies::QuizSubmissionPolicy.new(q_sub)
-      policy.should_dispatch_submission_graded?
+      BroadcastPolicies::QuizSubmissionPolicy.new(q_sub).
+        should_dispatch_submission_graded?
     }
 
     p.dispatch :submission_grade_changed
     p.to { user }
     p.whenever { |q_sub|
-      policy = BroadcastPolicies::QuizSubmissionPolicy.new(q_sub)
-      policy.should_dispatch_submission_grade_changed?
+      BroadcastPolicies::QuizSubmissionPolicy.new(q_sub).
+        should_dispatch_submission_grade_changed?
     }
 
     p.dispatch :submission_needs_grading

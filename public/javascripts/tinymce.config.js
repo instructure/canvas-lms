@@ -46,9 +46,9 @@ define([], function(){
     return {
       selector: "#" + this.idAttribute,
       toolbar: this.toolbar(),
-      theme : "modern",
-      skin : "light",
-      skin_url : "/vendor/tinymce_themes/light",
+      theme: "modern",
+      skin: "light",
+      skin_url: "/vendor/tinymce_themes/light",
       plugins: "autolink,media,paste,table,textcolor,link,directionality",
       external_plugins: {
         "instructure_image": "/javascripts/tinymce_plugins/instructure_image/plugin.js",
@@ -66,11 +66,11 @@ define([], function(){
       resize: true,
       block_formats: "Paragraph=p;Header 2=h2;Header 3=h3;Header 4=h4;Preformatted=pre",
 
-      extended_valid_elements : "@[id|accesskey|class|dir|lang|style|tabindex|title|contenteditable|contextmenu|draggable|dropzone|hidden|spellcheck|translate|align|role|aria-labelledby|aria-atomic|aria-busy|aria-controls|aria-describedby|aria-disabled|aria-dropeffect|aria-flowto|aria-grabbed|aria-haspopup|aria-hidden|aria-invalid|aria-label|aria-labelledby|aria-live|aria-owns|aria-relevant|aria-autocomplete|aria-checked|aria-disabled|aria-expanded|aria-haspopup|aria-hidden|aria-invalid|aria-label|aria-level|aria-multiline|aria-multiselectable|aria-orientation|aria-pressed|aria-readonly|aria-required|aria-selected|aria-sort|aria-valuemax|aria-valuemin|aria-valuenow|aria-valuetext],iframe[src|width|height|name|align|style|class|sandbox|allowfullscreen|webkitallowfullscreen|mozallowfullscreen],i[iclass],a[hidden|href|target|rel|media|hreflang|type|charset|name|rev|shape|coords|download],div,#p,h2,h3,h4,h5,h6,header,ul,ol,li[value],ol[reversed|start|type|compact],pre[width],table[border|summary|width|frame|rules|cellspacing|cellpadding|bgcolor],tbody[char|charoff|valign],td[colspan|rowspan|headers|abbr|axis|scope|align|char|charoff|valign|nowrap|bgcolor|width|height],tfoot[char|charoff|valign],th[colspan|rowspan|headers|scope|abbr|axis|align|char|charoff|valign|nowrap|bgcolor|width|height],thead[char|charoff|valign],title,tr[char|charoff|valign|bgcolor],ul[compact]",
+      extended_valid_elements: "@[id|accesskey|class|dir|lang|style|tabindex|title|contenteditable|contextmenu|draggable|dropzone|hidden|spellcheck|translate|align|role|aria-labelledby|aria-atomic|aria-busy|aria-controls|aria-describedby|aria-disabled|aria-dropeffect|aria-flowto|aria-grabbed|aria-haspopup|aria-hidden|aria-invalid|aria-label|aria-labelledby|aria-live|aria-owns|aria-relevant|aria-autocomplete|aria-checked|aria-disabled|aria-expanded|aria-haspopup|aria-hidden|aria-invalid|aria-label|aria-level|aria-multiline|aria-multiselectable|aria-orientation|aria-pressed|aria-readonly|aria-required|aria-selected|aria-sort|aria-valuemax|aria-valuemin|aria-valuenow|aria-valuetext],iframe[src|width|height|name|align|style|class|sandbox|allowfullscreen|webkitallowfullscreen|mozallowfullscreen],i[iclass],a[hidden|href|target|rel|media|hreflang|type|charset|name|rev|shape|coords|download],div,span,#p,h2,h3,h4,h5,h6,header,ul,ol,li[value],ol[reversed|start|type|compact],pre[width],table[border|summary|width|frame|rules|cellspacing|cellpadding|bgcolor],tbody[char|charoff|valign],td[colspan|rowspan|headers|abbr|axis|scope|align|char|charoff|valign|nowrap|bgcolor|width|height],tfoot[char|charoff|valign],th[colspan|rowspan|headers|scope|abbr|axis|align|char|charoff|valign|nowrap|bgcolor|width|height],thead[char|charoff|valign],title,tr[char|charoff|valign|bgcolor],ul[compact]",
 
-      non_empty_elements: 'td th iframe video audio object script a i area base basefont br col frame hr img input isindex link meta param embed source wbr track',
+      non_empty_elements: "td th iframe video audio object script a i area base basefont br col frame hr img input isindex link meta param embed source wbr track",
       content_css: "/stylesheets_compiled/legacy_normal_contrast/bundles/what_gets_loaded_inside_the_tinymce_editor.css",
-      browser_spellcheck : true
+      browser_spellcheck: true
     };
   };
 
@@ -84,7 +84,7 @@ define([], function(){
    * @return {String} comma delimited set of external buttons
    */
   EditorConfig.prototype.external_buttons = function(){
-    var externals = ""
+    var externals = "";
     for(var idx in this.extraButtons) {
       if(this.extraButtons.length <= this.maxButtons || idx < this.maxButtons - 1) {
         externals = externals + ",instructure_external_button_" + this.extraButtons[idx].id;
@@ -119,9 +119,9 @@ define([], function(){
    * name doesn't need to happen 3 places or not work.
    * @private
    */
-  EditorConfig.prototype.formatBtnGroup = 'bold,italic,underline,forecolor,backcolor,removeformat,alignleft,aligncenter,alignright';
-  EditorConfig.prototype.positionBtnGroup = 'outdent,indent,superscript,subscript,bullist,numlist';
-  EditorConfig.prototype.fontBtnGroup = 'ltr,rtl,fontsizeselect,formatselect';
+  EditorConfig.prototype.formatBtnGroup = "bold,italic,underline,forecolor,backcolor,removeformat,alignleft,aligncenter,alignright";
+  EditorConfig.prototype.positionBtnGroup = "outdent,indent,superscript,subscript,bullist,numlist";
+  EditorConfig.prototype.fontBtnGroup = "ltr,rtl,fontsizeselect,formatselect";
 
 
   /**
@@ -148,7 +148,7 @@ define([], function(){
     } else {
       buttons1 = this.formatBtnGroup + "," + this.positionBtnGroup + "," + instBtnGroup + "," + this.fontBtnGroup;
     }
-    return [buttons1,buttons2,buttons3];
+    return [buttons1, buttons2, buttons3];
   };
 
 
@@ -162,7 +162,7 @@ define([], function(){
    */
   EditorConfig.prototype.toolbar = function(){
     var instructure_buttons = this.buildInstructureButtons();
-    return this.balanceButtons(instructure_buttons)
+    return this.balanceButtons(instructure_buttons);
   };
 
   return EditorConfig;

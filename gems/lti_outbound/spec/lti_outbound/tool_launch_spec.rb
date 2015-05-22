@@ -116,6 +116,9 @@ describe LtiOutbound::ToolLaunch do
 
   describe '#generate' do
     it 'generates correct parameters' do
+      I18n.config.available_locales_set << :en
+      I18n.stub(:localizer).and_return(-> { :en })
+
       hash = tool_launch.generate
 
       expect(hash['lti_message_type']).to eq 'basic-lti-launch-request'
@@ -189,11 +192,11 @@ describe LtiOutbound::ToolLaunch do
     end
 
     it 'sets the locale if I18n.localizer exists' do
-      I18n.localizer = lambda { :es }
+      I18n.config.available_locales_set << :es
+      I18n.stub(:localizer).and_return(-> { :es })
       hash = tool_launch.generate
 
       expect(hash['launch_presentation_locale']).to eq 'es'
-      I18n.localizer = lambda { :en }
     end
 
     it 'adds account info in launch data for account navigation' do
@@ -256,13 +259,13 @@ describe LtiOutbound::ToolLaunch do
     it 'includes custom fields' do
       tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_ANONYMOUS
       tool.settings = {:custom_fields => {
-        'custom_bob' => 'bob',
-        'custom_fred' => 'fred',
-        'john' => 'john',
-        '@$TAA$#$#' => 123}}
+          'custom_bob' => 'bob',
+          'custom_fred' => 'fred',
+          'john' => 'john',
+          '@$TAA$#$#' => 123}}
       hash = tool_launch.generate
       expect(hash.keys.select { |k| k.match(/^custom_/) }.sort).to eq(
-                                                                     ['custom___taa____', 'custom_bob', 'custom_canvas_enrollment_state', 'custom_fred', 'custom_john'])
+                                                                       ['custom___taa____', 'custom_bob', 'custom_canvas_enrollment_state', 'custom_fred', 'custom_john'])
       expect(hash['custom_bob']).to eql('bob')
       expect(hash['custom_fred']).to eql('fred')
       expect(hash['custom_john']).to eql('john')
@@ -387,20 +390,20 @@ describe LtiOutbound::ToolLaunch do
       explicit_signature_settings('1251600739', 'c8350c0e47782d16d2fa48b2090c1d8f')
 
       hash = LtiOutbound::ToolLaunch.send(:generate_params, {
-                                                            :resource_link_id => '120988f929-274612',
-                                                            :user_id => '292832126',
-                                                            :roles => 'Instructor',
-                                                            :lis_person_name_full => 'Jane Q. Public',
-                                                            :lis_person_contact_email_primary => 'user@school.edu',
-                                                            :lis_person_sourced_id => 'school.edu:user',
-                                                            :context_id => '456434513',
-                                                            :context_title => 'Design of Personal Environments',
-                                                            :context_label => 'SI182',
-                                                            :lti_version => 'LTI-1p0',
-                                                            :lti_message_type => 'basic-lti-launch-request',
-                                                            :tool_consumer_instance_guid => 'lmsng.school.edu',
-                                                            :tool_consumer_instance_description => 'University of School (LMSng)',
-                                                            :lti_submit => 'Launch Endpoint with LTI Data'
+                                                              :resource_link_id => '120988f929-274612',
+                                                              :user_id => '292832126',
+                                                              :roles => 'Instructor',
+                                                              :lis_person_name_full => 'Jane Q. Public',
+                                                              :lis_person_contact_email_primary => 'user@school.edu',
+                                                              :lis_person_sourced_id => 'school.edu:user',
+                                                              :context_id => '456434513',
+                                                              :context_title => 'Design of Personal Environments',
+                                                              :context_label => 'SI182',
+                                                              :lti_version => 'LTI-1p0',
+                                                              :lti_message_type => 'basic-lti-launch-request',
+                                                              :tool_consumer_instance_guid => 'lmsng.school.edu',
+                                                              :tool_consumer_instance_description => 'University of School (LMSng)',
+                                                              :lti_submit => 'Launch Endpoint with LTI Data'
                                                           }, 'http://dr-chuck.com/ims/php-simple/tool.php', '12345', 'secret')
 
       expect(hash['oauth_signature']).to eql('l1ZTsn1HjGXzqeaTQMPbjrqvjLU=')
@@ -409,20 +412,20 @@ describe LtiOutbound::ToolLaunch do
     it 'generate a correct signature with URL query parameters' do
       explicit_signature_settings('1251600739', 'c8350c0e47782d16d2fa48b2090c1d8f')
       hash = LtiOutbound::ToolLaunch.send(:generate_params, {
-                                                            :resource_link_id => '120988f929-274612',
-                                                            :user_id => '292832126',
-                                                            :roles => 'Instructor',
-                                                            :lis_person_name_full => 'Jane Q. Public',
-                                                            :lis_person_contact_email_primary => 'user@school.edu',
-                                                            :lis_person_sourced_id => 'school.edu:user',
-                                                            :context_id => '456434513',
-                                                            :context_title => 'Design of Personal Environments',
-                                                            :context_label => 'SI182',
-                                                            :lti_version => 'LTI-1p0',
-                                                            :lti_message_type => 'basic-lti-launch-request',
-                                                            :tool_consumer_instance_guid => 'lmsng.school.edu',
-                                                            :tool_consumer_instance_description => 'University of School (LMSng)',
-                                                            :lti_submit => 'Launch Endpoint with LTI Data'
+                                                              :resource_link_id => '120988f929-274612',
+                                                              :user_id => '292832126',
+                                                              :roles => 'Instructor',
+                                                              :lis_person_name_full => 'Jane Q. Public',
+                                                              :lis_person_contact_email_primary => 'user@school.edu',
+                                                              :lis_person_sourced_id => 'school.edu:user',
+                                                              :context_id => '456434513',
+                                                              :context_title => 'Design of Personal Environments',
+                                                              :context_label => 'SI182',
+                                                              :lti_version => 'LTI-1p0',
+                                                              :lti_message_type => 'basic-lti-launch-request',
+                                                              :tool_consumer_instance_guid => 'lmsng.school.edu',
+                                                              :tool_consumer_instance_description => 'University of School (LMSng)',
+                                                              :lti_submit => 'Launch Endpoint with LTI Data'
                                                           }, 'http://dr-chuck.com/ims/php-simple/tool.php?a=1&b=2&c=3%20%26a', '12345', 'secret')
       expect(hash['oauth_signature']).to eql('k/+aMdax1Jm5kuGF6DG/ptN5VfY=')
       expect(hash['c']).to eq '3 &a'

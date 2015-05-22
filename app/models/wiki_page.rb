@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+
 class WikiPage < ActiveRecord::Base
   attr_accessible :title, :body, :url, :user_id, :editing_roles, :notify_of_update
   attr_readonly :wiki_id
@@ -178,6 +180,7 @@ class WikiPage < ActiveRecord::Base
     true
   end
 
+  attr_reader :wiki_page_changed
   def notify_of_update=(val)
     @wiki_page_changed = Canvas::Plugin.value_to_boolean(val)
   end
@@ -322,9 +325,9 @@ class WikiPage < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :updated_wiki_page
     p.to { participants }
-    p.whenever do |record|
-      return false unless record.created_at < Time.now - 30.minutes
-      (record.published? && @wiki_page_changed && record.prior_version) || record.changed_state(:active)
+    p.whenever do |wiki_page|
+      BroadcastPolicies::WikiPagePolicy.new(wiki_page).
+        should_dispatch_updated_wiki_page?
     end
   end
 
@@ -389,10 +392,11 @@ class WikiPage < ActiveRecord::Base
   end
 
   def initialize_wiki_page(user)
-    is_privileged_user = wiki.grants_right?(user, :manage)
-    if is_privileged_user && !context.is_a?(Group)
+    if wiki.grants_right?(user, :publish_page)
+      # Leave the page unpublished if the user is allowed to publish it later
       self.workflow_state = 'unpublished'
     else
+      # If they aren't, publish it automatically
       self.workflow_state = 'active'
     end
 

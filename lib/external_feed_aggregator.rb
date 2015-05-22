@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+
 class ExternalFeedAggregator
   SUCCESS_WAIT_SECONDS = 1.hour     # time to refresh on a successful feed load with new entries
   NO_ENTRIES_WAIT_SECONDS = 2.hours # time to refresh on a successful feed load with NO new entries
@@ -98,11 +100,11 @@ class ExternalFeedAggregator
       feed.increment(:consecutive_failures)
       feed.increment(:failures)
       feed.update_attribute(:refresh_at, Time.now.utc + (FAILURE_WAIT_SECONDS))
-      ErrorReport.log_exception(:default, e, {
-        :message => "External Feed aggregation failed",
-        :feed_url => feed.url,
-        :feed_id => feed.id,
-        :user_id => feed.user_id,
+      Canvas::Errors.capture(e, {
+        message: "External Feed aggregation failed",
+        feed_url: feed.url,
+        feed_id: feed.id,
+        user_id: feed.user_id,
       })
     end
   end

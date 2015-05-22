@@ -178,27 +178,43 @@
       <textarea style="width: 90%; height: 70px;" name="text_after_answers" class="text_after_answers"></textarea>
       </div>
     </div>
-    <div class="question_comment question_correct_comment">
+
+    <div class="question_comment question_correct_comment comment empty">
       <div class="comment_top"></div>
-      <a href="#" class="comment_focus" title="<%= t('titles.click_to_enter_correct_answer_comments', "Click to enter comments for a correct answer") %>">...</a>
-      <div id="correct_label" class="details"><%= t(:correct_answer_comments, "Correct answer comments") %></div>
-      <textarea style="width: 90%; height: 75px;" class="comments" name="correct_comments" aria-labelledby="correct_label"></textarea>
-      <span class="correct_comments_html" style="display:none;"></span>
+      <% edit_correct_comment_text = t('titles.click_to_enter_correct_answer_comments', "Click to enter comments for a correct answer") %>
+      <a href="#" class="comment_focus" title="<%= edit_correct_comment_text %>">
+        <span class="ellipsis">...</span>
+        <i class="icon-edit standalone-icon"><span class="screenreader-only"><%= edit_correct_comment_text %></span></i>
+      </a>
+      <span id="correct_label" class="details"><%= t(:correct_answer_comments, "Correct answer comments") %></span>
+      <input type="hidden" name="correct_comments_html" />
+      <div class="correct_comments_html comment_html"></div>
     </div>
-    <div class="question_comment question_incorrect_comment">
+
+    <div class="question_comment question_incorrect_comment comment empty">
       <div class="comment_top"></div>
-      <a href="#" class="comment_focus" title="<%= t('titles.click_to_enter_wrong_answer_comments', "Click to enter comments for a wrong answer") %>">...</a>
-      <div id="wrong_label" class="details"><%= t(:wrong_answer_comments, "Wrong answer comments") %></div>
-      <textarea style="width: 90%; height: 75px;" class="comments" name="incorrect_comments" aria-labelledby="wrong_label"></textarea>
-      <span class="incorrect_comments_html" style="display:none;"></span>
+      <% edit_incorrect_comment_text = t('titles.click_to_enter_wrong_answer_comments', "Click to enter comments for a wrong answer") %>
+      <a href="#" class="comment_focus" title="<%= edit_incorrect_comment_text %>">
+        <span class="ellipsis">...</span>
+        <i class="icon-edit standalone-icon"><span class="screenreader-only"><%= edit_incorrect_comment_text %></span></i>
+      </a>
+      <span id="wrong_label" class="details"><%= t(:wrong_answer_comments, "Wrong answer comments") %></span>
+      <input type="hidden" name="incorrect_comments_html" />
+      <div class="incorrect_comments_html comment_html"></div>
     </div>
-    <div class="question_comment question_neutral_comment">
+
+    <div class="question_comment question_neutral_comment comment empty">
       <div class="comment_top"></div>
-      <a href="#" class="comment_focus" title="<%= t('titles.click_to_enter_general_answer_comments', "Click to enter general comments") %>">...</a>
-      <div id="general_label" class="details"><%= t(:general_answer_comments, "General answer comments") %></div>
-      <textarea style="width: 90%; height: 75px;" class="comments" name="neutral_comments" aria-labelledby="general_label"></textarea>
-      <span class="neutral_comments_html" style="display:none;"></span>
+      <% edit_neutral_comment_text = t('titles.click_to_enter_general_answer_comments', "Click to enter general comments") %>
+      <a href="#" class="comment_focus" title="<%= edit_neutral_comment_text %>">
+        <span class="ellipsis">...</span>
+        <i class="icon-edit standalone-icon"><span class="screenreader-only"><%= edit_neutral_comment_text %></span></i>
+      </a>
+      <span id="general_label" class="details"><%= t(:general_answer_comments, "General answer comments") %></span>
+      <input type="hidden" name="neutral_comments_html" />
+      <div class="neutral_comments_html comment_html"></div>
     </div>
+
     <div class="clear"></div>
     <div class="button-container">
       <button type="button" class="btn btn-small cancel_link"><%= t('#buttons.cancel', "Cancel") %></button>

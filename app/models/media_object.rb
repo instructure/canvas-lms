@@ -197,12 +197,12 @@ class MediaObject < ActiveRecord::Base
   def retrieve_details_ensure_codecs(attempt=0)
     retrieve_details
     if (!self.data || !self.data[:extensions] || !self.data[:extensions][:flv]) && self.created_at > 6.hours.ago
-      if(attempt < 10)
+      if attempt < 10
         send_at((5 * attempt).minutes.from_now, :retrieve_details_ensure_codecs, attempt + 1)
       else
-        ErrorReport.log_error(:default, {
-          :message => "Kaltura flavor retrieval failed",
-          :object => self.inspect.to_s,
+        Canvas::Errors.capture(:media_object_failure, {
+          message: "Kaltura flavor retrieval failed",
+          object: self.inspect.to_s,
         })
       end
     end

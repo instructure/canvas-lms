@@ -15,6 +15,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'ims/lti'
+
 module Lti
   module Ims
     class ToolSettingController < ApplicationController

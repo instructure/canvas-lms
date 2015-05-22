@@ -55,7 +55,7 @@ define [
         @model.on('change:published', @updatePublishState)
 
         # re-render for attributes we are showing
-        attrs = ["name", "points_possible", "due_at", "lock_at", "unlock_at", "modules"]
+        attrs = ["name", "points_possible", "due_at", "lock_at", "unlock_at", "modules", "published"]
         observe = _.map(attrs, (attr) -> "change:#{attr}").join(" ")
         @model.on(observe, @render)
       @model.on 'change:submission', @updateScore

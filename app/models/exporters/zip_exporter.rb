@@ -121,10 +121,18 @@ module Exporters
     def add_file(zipstream, file)
       path = file.full_display_path
       path = path[@common_prefix.length..-1] if path.starts_with?(@common_prefix)
-      zipstream.put_next_entry(path)
-      file.open do |chunk|
-        zipstream.write(chunk)
-        update_progress(chunk.size)
+      wrote_header = false
+      begin
+        file.open do |chunk|
+          unless wrote_header
+            zipstream.put_next_entry(path)
+            wrote_header = true
+          end
+          zipstream.write(chunk)
+          update_progress(chunk.size)
+        end
+      rescue => e
+        @export.add_error(I18n.t('Skipped file %{filename} due to error', filename: file.display_name), e)
       end
     end
 

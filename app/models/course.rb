@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
 require 'csv'
 
 class Course < ActiveRecord::Base
@@ -218,6 +219,7 @@ class Course < ActiveRecord::Base
   has_many :usage_rights, as: :context, class_name: 'UsageRights', dependent: :destroy
 
   has_many :sis_post_grades_statuses
+  has_many :gradebook_csvs, inverse_of: :course
 
   include Profile::Association
 
@@ -1468,7 +1470,31 @@ class Course < ActiveRecord::Base
       enrollment.type != "StudentViewEnrollment"
     }.flatten
   end
+
   private :enrollments_for_csv
+
+  def gradebook_to_csv_in_background(filename, user, options = {})
+    progress = user.progresses.build(tag: 'gradebook_to_csv')
+    progress.save!
+
+    exported_gradebook = gradebook_csvs.where(user_id: user).first_or_initialize
+    attachment = user.attachments.build
+    attachment.filename = filename
+    attachment.content_type = 'text/csv'
+    attachment.file_state = 'hidden'
+    attachment.save!
+    exported_gradebook.attachment = attachment
+    exported_gradebook.progress = progress
+    exported_gradebook.save!
+
+    progress.process_job(self, :generate_csv, {preserve_method_args: true}, options, attachment)
+    {attachment_id: attachment.id, progress_id: progress.id}
+  end
+
+  def generate_csv(options, attachment)
+    csv = gradebook_to_csv(options)
+    create_attachment(attachment, csv)
+  end
 
   def gradebook_to_csv(options = {})
     student_enrollments = enrollments_for_csv(options)
@@ -1599,6 +1625,11 @@ class Course < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def create_attachment(attachment, csv)
+    attachment.uploaded_data = StringIO.new(csv)
+    attachment.save!
   end
 
   # included to make it easier to work with api, which returns
@@ -2046,7 +2077,7 @@ class Course < ActiveRecord::Base
   def self.clonable_attributes
     [ :group_weighting_scheme, :grading_standard_id, :is_public, :public_syllabus,
       :allow_student_wiki_edits, :show_public_context_messages,
-      :syllabus_body, :allow_student_forum_attachments,
+      :syllabus_body, :allow_student_forum_attachments, :lock_all_announcements,
       :default_wiki_editing_roles, :allow_student_organized_groups,
       :default_view, :show_total_grade_as_points,
       :show_all_discussion_entries, :open_enrollment,

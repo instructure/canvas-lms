@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'nokogiri'
+
 module Canvas::Migration
 module XMLHelper
   def convert_to_timestamp(string)

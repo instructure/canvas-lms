@@ -247,6 +247,10 @@ class LearningOutcome < ActiveRecord::Base
     end
   end
 
+  def rubric_criterion
+    data && data[:rubric_criterion]
+  end
+
   def rubric_criterion=(hash)
     self.data ||= {}
 

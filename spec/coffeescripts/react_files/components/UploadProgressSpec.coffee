@@ -20,11 +20,12 @@ define [
   module 'UploadProgress',
     setup: ->
       @uploader = mockUploader('filename', 35)
-      @prog = React.render(UploadProgress(uploader: @uploader), $('<div>').appendTo('body')[0])
+      @prog = React.render(UploadProgress(uploader: @uploader), $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
       resetUploader(@uploader)
       React.unmountComponentAtNode(@prog.getDOMNode().parentNode)
+      $("#fixtures").empty()
 
   test 'getLabel displays file name', ->
     equal(@prog.refs.fileName.getDOMNode().textContent, 'filename')

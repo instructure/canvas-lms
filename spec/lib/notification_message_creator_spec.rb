@@ -365,6 +365,7 @@ describe NotificationMessageCreator do
 
     it "should respect browser locales" do
       I18n.backend.stub(piglatin: {messages: {test_name: {email: {subject: "Isthay isay ivefay!"}}}}) do
+        I18n.config.available_locales_set.merge([:piglatin, 'piglatin'])
         @user.browser_locale = 'piglatin'
         @user.save(validate: false) # the validation was declared before :piglatin was added, so we skip it
         messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
@@ -375,6 +376,7 @@ describe NotificationMessageCreator do
 
     it "should respect user locales" do
       I18n.backend.stub(shouty: {messages: {test_name: {email: {subject: "THIS IS *5*!!!!?!11eleventy1"}}}}) do
+        I18n.config.available_locales_set.merge([:shouty, 'shouty'])
         @user.locale = 'shouty'
         @user.save(validate: false)
         messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
@@ -386,6 +388,7 @@ describe NotificationMessageCreator do
     it "should respect course locales" do
       course
       I18n.backend.stub(es: {messages: {test_name: {email: {subject: 'El Tigre Chino'}}}}) do
+        I18n.config.available_locales_set.merge([:es, 'es'])
         @course.enroll_teacher(@user).accept!
         @course.update_attribute(:locale, 'es')
         messages = NotificationMessageCreator.new(@notification, @course, :to_list => @user).create_message
@@ -397,6 +400,7 @@ describe NotificationMessageCreator do
     it "should respect account locales" do
       course
       I18n.backend.stub(es: {messages: {test_name: {email: {subject: 'El Tigre Chino'}}}}) do
+        I18n.config.available_locales_set.merge([:es, 'es'])
         @course.account.update_attribute(:default_locale, 'es')
         @course.enroll_teacher(@user).accept!
         messages = NotificationMessageCreator.new(@notification, @course, :to_list => @user).create_message

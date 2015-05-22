@@ -50,6 +50,7 @@ define [
       '.media_comment':                 '$mediaComment'
       'input[name=media_comment_id]':   '$mediaCommentId'
       'input[name=media_comment_type]': '$mediaCommentType'
+      '#bulk_message':                  '$bulkMessage'
       '.ac':                            '$recipients'
       '.attachment_list':               '$attachments'
       '.attachments-pane':              '$attachmentsPane'
@@ -175,6 +176,8 @@ define [
         disabled: @model?.get('private')
       ).render()
       @recipientView.on('changeToken', @recipientIdsChanged)
+      @recipientView.on('recipientTotalChange', @recipientTotalChanged)
+
       unless _.include(ENV.current_user_roles, 'admin')
         @$messageCourse.attr('aria-required', true)
         @recipientView.disable(true)
@@ -315,6 +318,17 @@ define [
         canAddNotes = _.map @recipientView.tokenModels(), (tokenModel) =>
           @canAddNotesFor(tokenModel)
         @toggleUserNote(_.every(canAddNotes))
+
+    recipientTotalChanged: (lockBulkMessage) =>
+      if lockBulkMessage && !@bulkMessageLocked
+        @oldBulkMessageVal = @$bulkMessage.prop('checked')
+        @$bulkMessage.prop('checked', true)
+        @$bulkMessage.prop('disabled', true)
+        @bulkMessageLocked = true
+      else if !lockBulkMessage && @bulkMessageLocked
+        @$bulkMessage.prop('checked', @oldBulkMessageVal)
+        @$bulkMessage.prop('disabled', false)
+        @bulkMessageLocked = false
 
     canAddNotesFor: (user) =>
       return false unless ENV.CONVERSATIONS.NOTES_ENABLED

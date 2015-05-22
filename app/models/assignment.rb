@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
 require 'set'
 require 'canvas/draft_state_validations'
 require 'bigdecimal'
@@ -256,18 +257,25 @@ class Assignment < ActiveRecord::Base
   end
 
   def schedule_do_auto_peer_review_job_if_automatic_peer_review
+    return unless needs_auto_peer_reviews_scheduled?
+
     reviews_due_at = self.peer_reviews_assign_at || self.due_at
-    if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && reviews_due_at
-      self.send_later_enqueue_args(:do_auto_peer_review, {
-        :run_at => reviews_due_at,
-        :singleton => Shard.birth.activate { "assignment:auto_peer_review:#{self.id}" }
-      })
-    end
-    true
+    return if reviews_due_at.blank?
+
+    self.send_later_enqueue_args(:do_auto_peer_review, {
+      :run_at => reviews_due_at,
+      :singleton => Shard.birth.activate { "assignment:auto_peer_review:#{self.id}" }
+    })
+  end
+
+  attr_accessor :skip_schedule_peer_reviews
+  alias_method :skip_schedule_peer_reviews?, :skip_schedule_peer_reviews
+  def needs_auto_peer_reviews_scheduled?
+    !skip_schedule_peer_reviews? && peer_reviews? && automatic_peer_reviews? && !peer_reviews_assigned?
   end
 
   def do_auto_peer_review
-    assign_peer_reviews if peer_reviews && automatic_peer_reviews && !peer_reviews_assigned && overdue?
+    assign_peer_reviews if needs_auto_peer_reviews_scheduled? && overdue?
   end
 
   def touch_assignment_group
@@ -499,22 +507,22 @@ class Assignment < ActiveRecord::Base
       participants(include_observers: true, excluded_user_ids: excluded_ids)
     }
     p.whenever { |assignment|
-      policy = BroadcastPolicies::AssignmentPolicy.new( assignment )
-      policy.should_dispatch_assignment_due_date_changed?
+      BroadcastPolicies::AssignmentPolicy.new(assignment).
+        should_dispatch_assignment_due_date_changed?
     }
 
     p.dispatch :assignment_changed
     p.to { participants(include_observers: true) }
     p.whenever { |assignment|
-      policy = BroadcastPolicies::AssignmentPolicy.new( assignment )
-      policy.should_dispatch_assignment_changed?
+      BroadcastPolicies::AssignmentPolicy.new(assignment).
+        should_dispatch_assignment_changed?
     }
 
     p.dispatch :assignment_created
     p.to { participants(include_observers: true) }
     p.whenever { |assignment|
-      policy = BroadcastPolicies::AssignmentPolicy.new( assignment )
-      policy.should_dispatch_assignment_created?
+      BroadcastPolicies::AssignmentPolicy.new(assignment).
+        should_dispatch_assignment_created?
     }
     p.filter_asset_by_recipient { |assignment, user|
       assignment.overridden_for(user)
@@ -523,7 +531,8 @@ class Assignment < ActiveRecord::Base
     p.dispatch :assignment_unmuted
     p.to { participants(include_observers: true) }
     p.whenever { |assignment|
-      assignment.context.available? && assignment.recently_unmuted
+      BroadcastPolicies::AssignmentPolicy.new(assignment).
+        should_dispatch_assignment_unmuted?
     }
 
   end
@@ -1382,7 +1391,7 @@ class Assignment < ActiveRecord::Base
                                .map(&:user)
       users_with_turnitin_data = if turnitin_enabled?
                                    submissions
-                                   .where("turnitin_data IS NOT NULL")
+                                   .where("turnitin_data IS NOT NULL AND turnitin_data <> ?", {}.to_yaml)
                                    .map(&:user)
                                  else
                                    []
@@ -1915,6 +1924,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def can_unpublish?
+    return true if new_record?
     !has_student_submissions?
   end
 

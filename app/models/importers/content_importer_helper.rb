@@ -25,11 +25,11 @@ module Importers
 
     def self.existing_migration_ids(context)
       existing_ids = {}
-      existing_ids[:assessments] = context.quizzes.active.
+      existing_ids[:assessments] = context.quizzes.
           where("quizzes.migration_id IS NOT NULL").pluck(:migration_id) if context.respond_to?(:quizzes)
-      existing_ids[:assessment_questions] = context.assessment_questions.active.
+      existing_ids[:assessment_questions] = context.assessment_questions.
           where("assessment_questions.migration_id IS NOT NULL").pluck(:migration_id) if context.respond_to?(:assessment_questions)
-      existing_ids[:assessment_question_banks] = context.assessment_question_banks.active.
+      existing_ids[:assessment_question_banks] = context.assessment_question_banks.
           where("assessment_question_banks.migration_id IS NOT NULL").pluck(:migration_id) if context.respond_to?(:assessment_question_banks)
       existing_ids
     end

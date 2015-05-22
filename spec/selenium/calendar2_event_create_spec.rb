@@ -46,6 +46,7 @@ describe "calendar2" do
         replace_content(title, event_title)
         expect_new_page_load { f('.more_options_link').click }
         expect(f('.title').attribute('value')).to eq event_title
+        expect(f('#editCalendarEventFull .btn-primary').text).to eq "Create Event"
         replace_content(f('#calendar_event_location_name'), location_name)
         replace_content(f('#calendar_event_location_address'), location_address)
         expect_new_page_load { submit_form(f('#editCalendarEventFull')) }

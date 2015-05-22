@@ -19,9 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/support/onceler/sharding')
 
-SHARDING_ENABLED = defined?(ShardRSpecHelper)
-
-unless SHARDING_ENABLED
+unless defined?(Switchman::RSpecHelper)
   module ShardRSpecHelper
     def self.included(klass)
       klass.before do
@@ -38,9 +36,13 @@ unless SHARDING_ENABLED
       Shard.default(true)
     end
   end
-end
 
-def specs_require_sharding
-  include ShardRSpecHelper
-  include Onceler::Sharding if SHARDING_ENABLED
+  def specs_require_sharding
+    include ShardRSpecHelper
+  end
+else
+  def specs_require_sharding
+    include Switchman::RSpecHelper
+    include Onceler::Sharding
+  end
 end

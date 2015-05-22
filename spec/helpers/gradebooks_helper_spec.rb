@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+require 'nokogiri'
+
 describe GradebooksHelper do
   describe '#student_score_display_for(submission, can_manage_grades)' do
     FakeSubmission = Struct.new(:assignment, :score, :grade, :submission_type, :workflow_state)

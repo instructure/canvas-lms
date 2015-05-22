@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+
 class GoogleDocsCollaboration < Collaboration
   GOOGLE_DOC_SERVICE = "google.com"
   GOOGLE_DRIVE_SERVICE = "drive.google.com"

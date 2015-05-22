@@ -14,11 +14,12 @@ define [
       groupCategory = new GroupCategory()
       view = new GroupCategoryEditView({model: groupCategory})
       view.render()
-      view.$el.appendTo($(document.body))
+      view.$el.appendTo($("#fixtures"))
 
     teardown: ->
       fakeENV.teardown()
       view.remove()
+      document.getElementById("fixtures").innerHTML = ""
 
   test 'auto leadership is unset without model state', ->
     groupCategory.set('auto_leader', null)

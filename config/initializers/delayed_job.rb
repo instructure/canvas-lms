@@ -101,5 +101,11 @@ Delayed::Worker.lifecycle.before(:perform) do |job|
 end
 
 Delayed::Worker.lifecycle.before(:exceptional_exit) do |worker, exception|
-  ErrorReport.log_exception(:delayed_jobs, exception) rescue nil
+  info = Canvas::Errors::JobInfo.new(nil, worker)
+  Canvas::Errors.capture(exception, info.to_h)
+end
+
+Delayed::Worker.lifecycle.before(:error) do |worker, job, exception|
+  info = Canvas::Errors::JobInfo.new(job, worker)
+  Canvas::Errors.capture(exception, info.to_h)
 end

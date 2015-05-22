@@ -127,7 +127,7 @@ class Quizzes::QuizzesController < ApplicationController
         @context)
     end
 
-    log_asset_access("quizzes:#{@context.asset_string}", "quizzes", 'other')
+    log_asset_access([ "quizzes", @context ], "quizzes", 'other')
   end
 
   def show
@@ -403,6 +403,8 @@ class Quizzes::QuizzesController < ApplicationController
           end
           @quiz.reload
           @quiz.update_quiz_submission_end_at_times if params[:quiz][:time_limit].present?
+
+          @quiz.publish! if params[:publish]
         end
         flash[:notice] = t('notices.quiz_updated', "Quiz successfully updated")
         format.html { redirect_to named_context_url(@context, :context_quiz_url, @quiz) }
@@ -795,7 +797,7 @@ class Quizzes::QuizzesController < ApplicationController
   def quiz_redirect_params(opts = {})
     return opts if !@quiz.require_lockdown_browser? || @quiz.grants_right?(@current_user, session, :grade)
     plugin = Canvas::LockdownBrowser.plugin.base
-    plugin.redirect_params(self, opts)
+    plugin.redirect_params(opts)
   end
   helper_method :quiz_redirect_params
 

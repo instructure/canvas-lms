@@ -178,7 +178,7 @@ class ConferencesController < ApplicationController
     @new_conferences, @concluded_conferences = conferences.partition { |conference|
       conference.ended_at.nil?
     }
-    log_asset_access("conferences:#{@context.asset_string}", "conferences", "other")
+    log_asset_access([ "conferences", @context ], "conferences", "other")
     scope = @context.users
     if @context.respond_to?(:participating_typical_users)
       scope = @context.participating_typical_users
@@ -287,6 +287,10 @@ class ConferencesController < ApplicationController
 
   def close
     if authorized_action(@conference, @current_user, :close)
+      unless @conference.active?
+        return render :json => { :message => 'conference is not active', :status => :bad_request }
+      end
+
       if @conference.close
         render :json => @conference.as_json(:permissions => {:user => @current_user, :session => session},
                                             :url => named_context_url(@context, :context_conference_url, @conference))

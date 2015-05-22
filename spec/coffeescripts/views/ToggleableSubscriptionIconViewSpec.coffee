@@ -16,7 +16,6 @@ define [
       }))
 
   test 'hover', ->
-    console.log @view.el
     spy = sinon.spy(@view, 'render')
 
     @view.$el.trigger(@e('focus'))

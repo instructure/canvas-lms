@@ -194,6 +194,7 @@ define([
 
     errorMessage: function() {
       if (this.state.errorMessage) {
+       $.screenReaderFlashMessage(this.state.errorMessage);
         return <div className="alert alert-error">{this.state.errorMessage}</div>;
       }
     },

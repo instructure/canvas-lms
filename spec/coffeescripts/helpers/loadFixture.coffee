@@ -1,5 +1,4 @@
 define [ "jquery" ], (jQuery) ->
-  $body = jQuery("body")
   $fixtures = jQuery("#fixtures")
   fixtures = {}
   fixtureId = 1

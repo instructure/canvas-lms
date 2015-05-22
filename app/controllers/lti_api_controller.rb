@@ -16,7 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'oauth'
 require 'oauth/client/action_pack'
+require 'nokogiri'
 
 class LtiApiController < ApplicationController
   skip_before_filter :require_user

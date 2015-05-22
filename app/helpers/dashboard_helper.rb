@@ -73,7 +73,7 @@ module DashboardHelper
 
     contexts.map do |name, url|
       url = nil if category == 'Conversation'
-      url.present? ? "<a href=\"#{url}\" aria-label=\"#{accessibility_category_label(category)}\">#{h(name)}</a>" : h(name)
+      url.present? ? "<a href=\"#{url}\" aria-label=\"#{accessibility_category_label(category)} for #{h(name)}\">#{h(name)}</a>" : h(name)
     end.to_sentence.html_safe
   end
 

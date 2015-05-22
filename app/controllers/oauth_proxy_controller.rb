@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+
+require 'jwt'
+
 class OauthProxyController < ApplicationController
   skip_before_filter :require_user
   skip_before_filter :load_user

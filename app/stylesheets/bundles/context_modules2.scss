@@ -1,3 +1,4 @@
+@import "base/environment";
 @import "pages/react_files/DialogPreview";
 
 
@@ -35,7 +36,7 @@
     }
 
     &.disabled {
-     color: #999999; 
+     color: #999999;
     }
 
     &.disabled span,
@@ -246,4 +247,13 @@ tbody.sortable.empty2 {
   min-height: 30px;
   display: block;
   width: 100%;
+}
+
+.drag_and_drop_warning {
+  @include accessibility-prompt;
+  display: none;
+  z-index: 2;
+  position: absolute;
+  top: -28px;
+  left: -1px;
 }

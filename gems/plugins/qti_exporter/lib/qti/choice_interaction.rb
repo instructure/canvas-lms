@@ -1,3 +1,5 @@
+require 'nokogiri'
+
 module Qti
 class ChoiceInteraction < AssessmentItemConverter
   extend Canvas::Migration::XMLHelper
