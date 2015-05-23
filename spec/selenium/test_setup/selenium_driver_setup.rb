@@ -1,4 +1,4 @@
-module SeleniumTestsHelperMethods
+module SeleniumDriverSetup
   def setup_selenium
 
     browser = $selenium_config[:browser].try(:to_sym) || :firefox
@@ -126,6 +126,12 @@ module SeleniumTestsHelperMethods
     driver
   end
 
+  def selenium_driver;
+    $selenium_driver
+  end
+
+  alias_method :driver, :selenium_driver
+
   def firefox_profile
     profile = Selenium::WebDriver::Firefox::Profile.new
     profile.load_no_focus_lib=(true)
@@ -145,46 +151,6 @@ module SeleniumTestsHelperMethods
 
   def set_native_events(setting)
     driver.instance_variable_get(:@bridge).instance_variable_get(:@capabilities).instance_variable_set(:@native_events, setting)
-  end
-
-  # f means "find" this is a shortcut to finding elements
-  def f(selector, scope = nil)
-    (scope || driver).find_element :css, selector
-  rescue
-    nil
-  end
-
-  # short for find with link
-  def fln(link_text, scope = nil)
-    (scope || driver).find_element :link, link_text
-  rescue
-    nil
-  end
-
-  # short for find with jquery
-  def fj(selector, scope = nil)
-    find_with_jquery selector, scope
-  rescue
-    nil
-  end
-
-  # same as `f` except tries to find several elements instead of one
-  def ff(selector, scope = nil)
-    (scope || driver).find_elements :css, selector
-  rescue
-    []
-  end
-
-  # same as find with jquery but tries to find several elements instead of one
-  def ffj(selector, scope = nil)
-    find_all_with_jquery selector, scope
-  rescue
-    []
-  end
-
-  #this is needed for using the before_label function in I18nUtilities
-  def t(*a, &b)
-    I18n.t(*a, &b)
   end
 
   def app_host
@@ -298,7 +264,7 @@ module SeleniumTestsHelperMethods
   end
 
   def self.start_in_process_thin_server
-    require File.expand_path(File.dirname(__FILE__) + '/../servers/thin_server')
+    require File.expand_path(File.dirname(__FILE__) + '/servers/thin_server')
     server = SpecFriendlyThinServer
     app = self.rack_app
     server.run(app, :BindAddress => BIND_ADDRESS, :Port => $server_port, :AccessLog => [])
@@ -307,78 +273,11 @@ module SeleniumTestsHelperMethods
   end
 
   def self.start_in_process_webrick_server
-    require File.expand_path(File.dirname(__FILE__) + '/../servers/webrick_server')
+    require File.expand_path(File.dirname(__FILE__) + '/servers/webrick_server')
     server = SpecFriendlyWEBrickServer
     app = self.rack_app
     server.run(app, :BindAddress => BIND_ADDRESS, :Port => $server_port, :AccessLog => [])
     shutdown = self.shutdown_webserver(server)
     return shutdown
-  end
-
-  def exec_cs(script, *args)
-    driver.execute_script(CoffeeScript.compile(script), *args)
-  end
-
-# a varable named `callback` is injected into your function for you, just call it to signal you are done.
-  def exec_async_cs(script, *args)
-    to_compile = "var callback = arguments[arguments.length - 1]; #{CoffeeScript.compile(script)}"
-    driver.execute_async_script(script, *args)
-  end
-
-  # usage
-  # require_exec 'compiled/util/foo', 'bar', <<-CS
-  #   foo('something')
-  #   # optionally I should be able to do
-  #   bar 'something else', ->
-  #     "stuff"
-  #     callback('i made it')
-  #
-  # CS
-  #
-  # simple usage
-  # require_exec 'i18n!messages', 'i18n.t("foobar")'
-  def require_exec(*args)
-    code = args.last
-    things_to_require = {}
-    args[0...-1].each do |file_path|
-      things_to_require[file_path] = file_path.split('/').last.split('!').first
-    end
-
-    # make sure the code you pass is at least as intented as it should be
-    code = code.gsub(/^/, '          ')
-    coffee_source = <<-CS
-      _callback = arguments[arguments.length - 1];
-      cancelCallback = false
-
-      callback = ->
-        _callback.apply(this, arguments)
-        cancelCallback = true
-
-      require #{things_to_require.keys.to_json}, (#{things_to_require.values.join(', ')}) ->
-        res = do ->
-#{code}
-        _callback(res) unless cancelCallback
-    CS
-    # make it `bare` because selenium already wraps it in a function and we need to get
-    # the arguments for our callback
-    js = CoffeeScript.compile(coffee_source, :bare => true)
-    driver.execute_async_script(js)
-  end
-
-  # add some JS translations to the current page; they'll be merged in at
-  # the root level, so the top-most key should be the locale, e.g.
-  #
-  #   set_translations fr: {key: "Bonjour"}
-  def set_translations(translations)
-    add_translations = "$.extend(true, I18n, {translations: #{translations.to_json}});"
-    if ENV['USE_OPTIMIZED_JS']
-      driver.execute_script <<-JS
-        define('translations/test', ['i18nObj', 'jquery'], function(I18n, $) {
-          #{add_translations}
-        });
-      JS
-    else
-      driver.execute_script add_translations
-    end
   end
 end

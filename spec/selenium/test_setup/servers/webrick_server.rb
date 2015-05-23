@@ -13,7 +13,11 @@ class SpecFriendlyWEBrickServer < ::WEBrick::HTTPServlet::AbstractServlet
     @server.mount "/", Rack::Handler::WEBrick, app
     Thread.new { @server.start }
     for i in 0..MAX_SERVER_START_TIME
-      s = TCPSocket.open('127.0.0.1', options[:Port]) rescue nil
+      begin
+        s = TCPSocket.open('127.0.0.1', options[:Port])
+      rescue
+        nil
+      end
       break if s
       sleep 1
     end
@@ -26,7 +30,7 @@ class SpecFriendlyWEBrickServer < ::WEBrick::HTTPServlet::AbstractServlet
 
   def service(req, res)
     env = req.meta_vars
-    env.delete_if { |k, v| v.nil? }
+    env.delete_if { |_k, v| v.nil? }
 
     rack_input = StringIO.new(req.body.to_s)
     rack_input.set_encoding(Encoding::BINARY) if rack_input.respond_to?(:set_encoding)

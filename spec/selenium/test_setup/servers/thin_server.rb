@@ -8,7 +8,11 @@ class SpecFriendlyThinServer
     @server = Thin::Server.new(bind_address, port, app)
     Thread.new {@server.start}
     for i in 0..MAX_SERVER_START_TIME
-      s = TCPSocket.open(bind_address, port) rescue nil
+      begin
+        s = TCPSocket.open(bind_address, port)
+      rescue StandardError
+        nil
+      end
       break if s
       sleep 1
     end
