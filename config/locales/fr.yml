@@ -109,17 +109,17 @@ fr:
     default_delegated_login_handle_name: Connexion
     default_login_handle_name: E-mail
   account_authorization_config/ldap: 
-    test_bind_failed: "Échec de liaison avec l’erreur suivante : %{error}"
+    test_bind_failed: "Échec de rapprochement avec l’erreur suivante : %{error}"
     test_connection_timeout: "Expiration du délai de connexion"
     test_host_unknown: "Hôte inconnu : %{host}"
     test_login_auth_exception: "Exception lors de la connexion : %{error}"
-    test_login_auth_failed: "Échec de l’authentification"
+    test_login_auth_failed: "Échec d'authentification"
     test_search_failed: "La recherche a échoué avec l’erreur suivante : %{error}"
   account_authorization_config/saml: 
     debug: 
-      logout_redirect: "LogoutRequest envoyée au fournisseur d’identités"
+      logout_redirect: "Requête de déconnexion envoyée au fournisseur d’identités"
       wait_for_login: "En attente d’identification"
-    saml_eppn_domain_stripped: "%{eppn}(domaine enlevé)"
+    saml_eppn_domain_stripped: "%{eppn} (domaine dépouillé)"
   account_authorization_configs: 
     account_required: "authentification avec LDAP nécessaire"
     cas_fields: 
@@ -197,17 +197,17 @@ fr:
       labels: 
         certificate_fingerprint: "Empreinte digitale du certificat"
         identifier_format: "Format de l’identifiant"
-        idp_entity_id: "ID d’entité IdP"
-        log_in_url: "URL de connexion"
-        log_out_url: "URL de déconnexion"
+        idp_entity_id: "ID de l'entité fournisseuse d'identités"
+        log_in_url: "Connexion sur l'URL"
+        log_out_url: "Déconnexion de l'URL"
         login_attribute: "Attribut de connexion"
         requested_authn_context: "Contexte d’authentification"
-        unknown_user_url: "URL de l’utilisateur inconnue"
+        unknown_user_url: "URL d’utilisateur inconnue"
       unknown_user_url_description: "L’URL à utiliser pour la redirection lorsqu’un utilisateur authentifié est introuvable dans Canvas."
     saml_required: "Une configuration SAML est nécessaire pour tester SAML."
     saml_settings_test: 
       refresh_debugging: Actualiser
-      saml_debug_instructions: "Dès que vous commencez le débogage, toutes les informations  concernant la prochaine tentative de connexion SAML seront recueillies. Cliquez sur « Actualiser » pour voir si des données supplémentaires ont été recueillies ou sur « Arrêter le débogage » pour effacer les données collectées et arrêter la tentative de débogage en cours."
+      saml_debug_instructions: "Dès que vous commencez le débogage, toutes les informations  concernant la prochaine tentative de connexion SAML seront recueillies. Cliquez sur \"Actualiser\" pour voir si des données supplémentaires ont été recueillies ou sur \"Arrêter le débogage\" pour effacer les données collectées et arrêter la tentative de débogage en cours."
       saml_required: "Une configuration SAML est nécessaire pour tester SAML."
       start_debugging: "Commencer le débogage"
       stop_debugging: "Arrêter le débogage"
@@ -244,7 +244,7 @@ fr:
       labels: 
         change_password_url: "URL de mot de passe oublié"
         login_handle_name: "Libellé de connexion"
-      login_handle_name_description: "Libellé utilisé pour les identifiants de connexion uniques. Exemples : Nom de connexion, Nom d’utilisateur, ID d’étudiant, etc."
+      login_handle_name_description: "Le libellé utilisé comme identifiants uniques de connexion. Exemples : nom de connexion, nom d’utilisateur, ID d’étudiant, etc."
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "L’heure de fin est antérieure à l’heure de début pour les notifications du compte"
@@ -3002,7 +3002,7 @@ fr:
       message: 
         export_started: "Le processus d’exportation a commencé. Cette opération peut prendre un certain temps avec les cours volumineux. *Vous pouvez quitter la page* et vous recevrez un e-mail lorsque l’exportation sera terminée."
       no_submissions: "Vous n’avez actuellement aucun envoi à exporter."
-      user_data_exports: "Télécharger les tâches"
+      user_data_exports: "Télécharger les devoirs"
     labels: 
       new_export: "Nouvelle exportation :"
     links: 
@@ -4011,7 +4011,7 @@ fr:
       wiki_id: "ID de Wiki"
       workflow_state: "État du flux de travail"
   course_members_are_free_to_join_9b2603d4: "Adhésion libre pour les membres du cours"
-  course_navigation_dd035109: "Navigation dans les cours"
+  course_navigation_dd035109: "Navigation du cours"
   course_restore: 
     restore_error: "Une erreur s’est produite lors de la restauration du cours. Celui-ci n’a pas été restauré."
   course_search: 
@@ -5275,7 +5275,7 @@ fr:
   domain_3b54c511: Domaine
   don_t_show_again_15d8253e: "Ne plus afficher "
   done_8af51c9b: Terminé.
-  download_submissions_7454665f: "Télécharger les tâches"
+  download_submissions_7454665f: "Télécharger les devoirs"
   due_a73610f6: Échéance
   due_at_5e18eeac: "Dû(-ue) à :"
   due_by_c263dc10: "À rendre pour le"
@@ -6535,7 +6535,7 @@ fr:
       arrange_columns_by_due_date: "Organiser les colonnes par date d’échéance"
       arrange_columns_by_group: "Organiser les colonnes par groupe de travaux"
       download_scores: Exporter
-      export_current_gradebook: Actuelle
+      export_current_gradebook: Actuel(-le)
       filter_by_student: "Filtrer par nom d’étudiant ou ID secondaire"
       grades: Notes
       hide_student_names: "Masquer les noms des étudiants"
@@ -7277,7 +7277,7 @@ fr:
     warnings: 
       truncated_wiki_title: "Le titre de la page Wiki suivante a été tronqué : %{title}"
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Inclure les notes de ce travail lors de la publication dans le système d’informations sur les étudiants (SIS) de votre établissement"
-  incorrect_username_and_or_password_2de73abb: "Nom d’utilisateur ou mot de passe incorrect"
+  incorrect_username_and_or_password_2de73abb: "Nom d’utilisateur et/ou mot de passe incorrect"
   incremental_update_successfully_generated_against__db3f3f06: "La mise à jour incrémentielle a bien été générée contre un import SIS précédent."
   info: 
     notices: 
@@ -7622,27 +7622,27 @@ fr:
           request_password: "Demander un mot de passe"
         dont_know_password: "Je ne connais pas mon mot de passe"
         log_in: Connexion
-        login_handle: "Entrez votre %{login_handle_name} et nous vous enverrons un lien pour modifier votre mot de passe."
+        login_handle: "Précisez votre %{login_handle_name} et nous vous enverrons un lien pour modifier votre mot de passe."
         password: "Mot de passe"
         sending: "Envoi en cours..."
       new: 
         back_to_login: "Revenir à la connexion"
-        browse_courses: "Parcourir les cours"
+        browse_courses: "Explorer les cours"
         buttons: 
           request_password: "Demander un mot de passe"
         coenrollment_banner: "*Parent d’un utilisateur Canvas ?* **Cliquez ici pour ouvrir un compte**"
         labels: 
           password: "Mot de passe"
         log_in: Connexion
-        login_handle: "Entrez votre %{login_handle_name} et nous vous enverrons un lien pour modifier votre mot de passe."
-        page_title: "Connexion à Canvas"
+        login_handle: "Précisez votre %{login_handle_name} et nous vous enverrons un lien pour modifier votre mot de passe."
+        page_title: "Connectez-vous à Canvas"
         register_for_canvas: "*Vous avez besoin d’un compte Canvas ?* **Cliquez ici, c’est gratuit !**"
     logout_confirm: 
       cancel: Annuler
       details: 
-        log_out: "Voulez-vous vraiment quitter Canvas ?"
+        log_out: "Voulez-vous vraiment vous déconnecter de Canvas ?"
       log_out: Déconnexion
-      page_title: Déconnexion
+      page_title: Déconnectez-vous
     otp: 
       errors: 
         invalid_otp: "Code de vérification erroné. Veuillez réessayer."
@@ -7652,13 +7652,13 @@ fr:
           verify: Vérifier
         details: 
           mfa_enrollment: |-
-              L’authentification multifacteur améliore la sécurité en exigeant que vous disposiez d’un outil spécifique
-              en plus de votre mot de passe pour vous connecter à Canvas. Il peut s’agir d’un appareil qui génère
+              L’authentification multifacteur améliore la sécurité en exigeant que vous ayez quelquechose de réel en votre possession
+              en plus de votre mot de passe, afin de pouvoir vous connecter à Canvas. Il peut s’agir d’un appareil qui génère
               des codes de vérification ou d’un téléphone capable de recevoir des messages texte. Vous pouvez configurer l’application Google Authenticator pour [iPhone](%{iphone_url}) ou
-              [Android](%{android_url}) en lisant le code QR ci-dessous. Vous pouvez configurer d’autres jetons en saisissant la clé secrète **%{secret_key}**.
-          mfa_required: "Vous êtes invité à configurer l’authentification multifacteur."
+              [Android](%{android_url}) en scannant le code QR ci-dessous. Vous pouvez configurer d’autres jetons en saisissant la clé secrète **%{secret_key}**.
+          mfa_required: "Il vous est requis de configurer l’authentification multifacteur."
           otp_on_device: "Veuillez saisir le code de vérification affiché par votre jeton."
-          otp_sent_to_phone: "Un code de vérification a été envoyé sur votre téléphone. Veuillez le saisir ici."
+          otp_sent_to_phone: "Un code de vérification a été envoyé à votre téléphone. Veuillez le saisir ici."
           send_to_sms: "Envoyer des messages texte à %{phone_number}"
         labels: 
           carrier: Opérateur
@@ -7674,10 +7674,10 @@ fr:
           mfa: "Authentification multifacteur"
     saml: 
       debug: 
-        logout_request_redirect_from_idp: "LogoutRequest reçue du fournisseur d’identités"
-        logout_response_redirect_from_idp: "LogoutResponse reçue du fournisseur d’identités"
-        logout_response_redirect_to_idp: "Envoi de LogoutResponse au fournisseur d’identités"
-        redirect_from_idp: "LoginResponse reçue du fournisseur d’identités"
+        logout_request_redirect_from_idp: "Requête de déconnexion reçue du fournisseur d’identités"
+        logout_response_redirect_from_idp: "Réponse de déconnexion reçue du fournisseur d’identités"
+        logout_response_redirect_to_idp: "Envoi de la réponse de déconnexion au fournisseur d’identités"
+        redirect_from_idp: "Réponse de connexion reçue du fournisseur d’identités"
   logo_a040ae0e: Logo
   looks_great_e4d883ed: "Cela semble excellent !"
   low_score_4eeb95b2: "Faible : %{score}"
@@ -9441,7 +9441,7 @@ fr:
         tweet: "Alerte Canvas - Invitation : participer à %{title}, %{name}"
     web_conference_recording_ready: 
       email: 
-        details_link: "Pour plus d’informations, cliquez ici : %{link}"
+        details_link: "Vous pouvez accéder aux détails ici : %{link}"
         html: 
           details_link: "Cliquez ici pour afficher les détails"
       sms: 
@@ -9633,7 +9633,7 @@ fr:
     move_to_end: "-- Tout en bas --"
   move_outcome_ce497e6c: "Déplacer le résultat"
   move_outcome_group_cfa1a505: "Déplacer le groupe de résultats"
-  moving_a4d552df: Déplacement...
+  moving_a4d552df: "Déplacement en cours..."
   multi_factor_authentication_configured_865b1bde: "Authentification multifacteur configurée"
   must_achieve_mastery_at_least_2_times_must_also_co_b2ae7688: "Doit atteindre le niveau de maîtrise au moins 2 fois. Doit aussi terminer 2 éléments pour avoir un calcul. Les scores supérieurs au niveau de maîtrise seront pris en compte, sous forme de moyenne, pour calculer la note finale."
   must_achieve_mastery_at_least_2_times_scores_above_57077a88: "Doit atteindre le niveau de maîtrise au moins 2 fois. Les notes supérieures à ce niveau seront intégrées dans le calcul de la note finale sous forme de moyenne."
@@ -9680,7 +9680,7 @@ fr:
   no_e16d9132: Non
   no_grading_schemes_to_display_8b0e92e7: "Aucun système de notation à afficher"
   no_migration_file: "Fichier requis pour la migration de ce contenu."
-  no_password_was_given_472222e5: "Aucun mot de passe n’a été donné"
+  no_password_was_given_472222e5: "Aucun mot de passe n’a été précisé"
   no_results_found_58717065: "Aucun résultat trouvé"
   no_score_yet_c94e919b: "Pas encore de résultat"
   no_students_have_taken_the_quiz_yet_e667644b: "Aucun étudiant n’a encore répondu au questionnaire"
@@ -14156,7 +14156,7 @@ fr:
     other: "Il y a %{count} résultats dans la liste"
   there_was_a_problem_deleting_the_grading_period_50ce07c5: "Un problème s’est produit lors de la suppression de la période de notation"
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: "Un problème s’est produit lors de la suppression du système de notation"
-  there_was_a_problem_logging_in_at_institution_5a298155: "Problème de connexion à %{institution}"
+  there_was_a_problem_logging_in_at_institution_5a298155: "Il y a eu un problème de connexion à %{institution}"
   there_was_a_problem_saving_the_grading_period_243bed6c: "Un problème s’est produit lors de la sauvegarde de la période de notation"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "Un problème s’est produit lors de l’enregistrement du système de notation"
   there_was_an_error_in_processing_your_request_6513a49a: "Erreur lors du traitement de votre demande"
@@ -14391,7 +14391,7 @@ fr:
   to_minscore_43e5452e: "à %{minScore}%"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "Pour voir les travaux, assurez-vous que la vue *Agenda* est active."
   tolerance_value_9e96573c: "Valeur de tolérance"
-  too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "Trop d’échecs de connexion. Réessayez ultérieurement ou contactez votre administrateur système."
+  too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "Trop de tentatives de connexion infructueuses. Veuillez réessayer ultérieurement ou contactez votre administrateur système."
   too_many_members_b8b15069: "Trop de membres"
   tooltips: 
     finished: terminé
