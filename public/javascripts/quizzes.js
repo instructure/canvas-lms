@@ -104,25 +104,25 @@ define([
     return $('#quiz_one_time_results').prop('checked');
   };
 
-  if (ENV.QUIZ && ENV.ASSIGNMENT_OVERRIDES != null) {
+  var renderDueDates = function(){
+    if (ENV.QUIZ && ENV.ASSIGNMENT_OVERRIDES != null) {
 
-    ENV.QUIZ.assignment_overrides = ENV.ASSIGNMENT_OVERRIDES;
-    quizModel = new Quiz(ENV.QUIZ);
+      ENV.QUIZ.assignment_overrides = ENV.ASSIGNMENT_OVERRIDES;
+      quizModel = new Quiz(ENV.QUIZ);
 
-    sectionList = new SectionList(ENV.SECTION_LIST);
+      sectionList = new SectionList(ENV.SECTION_LIST);
 
-    dueDateList = new DueDateList(quizModel.get('assignment_overrides'),
-                                  sectionList, quizModel);
+      dueDateList = new DueDateList(quizModel.get('assignment_overrides'),
+                                    sectionList, quizModel);
 
-    overrideView = window.overrideView = new DueDateOverrideView({
-      el: '.js-assignment-overrides',
-      model: dueDateList,
-      views: {}
-    });
-
-    overrideView.render();
-  }
-
+      overrideView = window.overrideView = new DueDateOverrideView({
+        el: '.js-assignment-overrides',
+        model: dueDateList,
+        views: {}
+      });
+      overrideView.render()
+    }
+  }.bind(this);
 
   var clickSetCorrect = I18n.t('titles.click_to_set_as_correct', "Click to set this answer as correct"),
       isSetCorrect = I18n.t('titles.set_as_correct', "This answer is set as correct"),
@@ -1386,6 +1386,7 @@ define([
     quiz.init().updateDisplayComments();
     correctAnswerVisibility.init();
     scoreValidation.init();
+    renderDueDates();
 
     $('#quiz_tabs').tabs();
     $('#editor_tabs').show();
