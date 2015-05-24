@@ -109,7 +109,7 @@ zh:
     default_delegated_login_handle_name: 登录
     default_login_handle_name: 电子邮件
   account_authorization_config/ldap: 
-    test_bind_failed: "无法与以下错误绑定: %{error}"
+    test_bind_failed: "无法绑定以下错误: %{error}"
     test_connection_timeout: 连接超时
     test_host_unknown: "未知主机: %{host}"
     test_login_auth_exception: "登录发生例外：%{error}"
@@ -117,8 +117,8 @@ zh:
     test_search_failed: "搜索失败，错误如下: %{error}"
   account_authorization_config/saml: 
     debug: 
-      logout_redirect: "已向 IdP 发送 LogoutRequest"
-      wait_for_login: 正等待执行登录尝试
+      logout_redirect: "已向 IdP 发送 退出要求"
+      wait_for_login: 正等待尝试登录
     saml_eppn_domain_stripped: "%{eppn} (域名去除)"
   account_authorization_configs: 
     account_required: "必须经过 LDAP 身份验证"
@@ -126,14 +126,14 @@ zh:
       labels: 
         auth_base: "CAS URL"
         unknown_user_url: "未知用户 Url"
-      unknown_user_url_description: "在 Canvas 中未找到通过身份验证的用户时要重定向到的 url。"
+      unknown_user_url_description: "url 重新定向到在 Canvas 中未找的已验证身份的用户。"
     form_footer: 
       labels: 
         position: 位置
-      save_button: 保存身份验证设置
+      save_button: 保存身份验证的设置
     form_header: 
       auth_type_label: 类型
-      auth_url: "此配置的登录 URL"
+      auth_url: "登录 URL为此配置"
     index: 
       add_auth_desc: "添加身份提供商到此帐户:"
       choose_auth_type_option: 选择一个身份认证服务
@@ -148,21 +148,21 @@ zh:
     ldap_fields: 
       auth_filter_description: "使用 *%{placeholder}* 作为用户所提供的用户名的占位符。ÀýÈç: *(sAMAccountName=%{placeholder})*"
       auth_password_description: 留空则继续使用当前密码。
-      identifer_format_description: "LDAP 属性用于查看 Canvas 登录。保留为空可使用用户提供的用户名。"
+      identifer_format_description: "LDAP 属性用于查看 Canvas 登录。保留空白以使用用户提供用户名。"
       labels: 
         auth_base: 库
-        auth_filter: 过滤
+        auth_filter: 过滤器
         auth_host: 主机
         auth_over_tls: "通过 TLS?"
         auth_over_tls_false: "无 TLS"
         auth_over_tls_simple_tls: "简单的 TLS"
-        auth_over_tls_start_tls: StartTLS
+        auth_over_tls_start_tls: 开始TLS
         auth_password: 密码
         auth_port: 端口
         auth_username: 用户名
         identifier_format: "登录 ID 属性"
       last_ldap_timeout_failure: 上次超时失效
-      ldap_timeout_failure_help2: "如果 Canvas 与 LDAP 服务器通信超时太多次，那么它就会封锁接下来尝试登陆使用 LDAP 服务器 %{time} 分钟。"
+      ldap_timeout_failure_help2: "如果 Canvas 与 LDAP 服务器的通信超时太多次，那么它就会限制接下来尝试登陆使用 LDAP 服务器 的%{time} 。"
     ldap_settings_test: 
       labels: 
         pass: 密码
@@ -203,11 +203,11 @@ zh:
         login_attribute: 登录属性
         requested_authn_context: 上下文认证
         unknown_user_url: "未知用户 Url"
-      unknown_user_url_description: "在 Canvas 中未找到通过身份验证的用户时要重定向到的 url。"
+      unknown_user_url_description: "url 重新定向到在 Canvas 中未找的已验证身份的用户。"
     saml_required: "如果要测试 SAML，需要先配置 SAML。"
     saml_settings_test: 
       refresh_debugging: 刷新
-      saml_debug_instructions: "一旦您开始纠错，将会收集所有下一次尝试登陆 SAML 的信息。您可以点击“刷新” 查看收集了多少数据或者点击 “停止纠错” 以清空收集的数据并停止当前纠错。"
+      saml_debug_instructions: "一旦您开始纠错，将会收集所有下一次尝试登陆 SAML 的信息。点击“刷新” ，查看已收集了多少数据，或点击 “停止纠错”， 清空收集的数据并停止当前纠错。"
       saml_required: "如果要测试 SAML，需要先配置 SAML。"
       start_debugging: 开始纠错
       stop_debugging: 停止纠错
@@ -240,11 +240,11 @@ zh:
       logout_request_to_idp: "已向 IdP 发送 LogoutRequest"
       logout_response_from_idp: "来自 IdP 的 LogoutResponse"
     sso_settings_form: 
-      change_password_url_help: "留空则采用默认的 Canvas 行为"
+      change_password_url_help: "为默认的 Canvas行为而留空"
       labels: 
         change_password_url: "忘记密码 URL"
         login_handle_name: 登录标签
-      login_handle_name_description: "用于唯一登录标识符的标签。示例:登录名、用户名、学生 ID 等"
+      login_handle_name_description: "标签用作唯一登录的标识符。示例: 登录名、用户名、学生 ID 等"
   account_notification: 
     errors: 
       invalid_account_notification_end_at: 帐户通知结束时间早于开始时间
@@ -2705,7 +2705,7 @@ zh:
   canvas_cartridge_display: "Canvas Common Cartridge"
   canvas_cartridge_file_description: "Canvas 课程导出包"
   canvas_cartridge_name: "Canvas Cartridge 导入器"
-  canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas 未识别您的身份提供程序"
+  canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas 无法识别您的身份提供者"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas 没有以下用户的帐户: %{user}"
   canvas_error_report_ff678539: "Canvas 的错误报告"
   canvas_revision_unknown: 未知
@@ -3011,7 +3011,7 @@ zh:
       message: 
         export_started: 导出过程已开始。大型课程可能需要一段时间。*您可以离开页面*，在导出完成时您会收到电子邮件。
       no_submissions: 您当前没有可导出的提交项。
-      user_data_exports: 下载作业
+      user_data_exports: 下载提交
     labels: 
       new_export: "新导出:"
     links: 
@@ -5284,7 +5284,7 @@ zh:
   domain_3b54c511: 域
   don_t_show_again_15d8253e: 不再显示
   done_8af51c9b: 完成
-  download_submissions_7454665f: 下载作业
+  download_submissions_7454665f: 下载提交
   due_a73610f6: 截止时间
   due_at_5e18eeac: 截止在：
   due_by_c263dc10: 到期时间
@@ -7648,19 +7648,19 @@ zh:
         browse_courses: 浏览课程
         buttons: 
           request_password: 请求密码
-        coenrollment_banner: "*Canvas 用户的父级?* **单击此处以获得帐户**"
+        coenrollment_banner: "*Canvas 的主用户?* **点击此处以获得帐户**"
         labels: 
           password: 密码
         log_in: 登录
         login_handle: "输入您的 %{login_handle_name}，我们将向您发送更改密码的链接。"
         page_title: "登录到 Canvas"
-        register_for_canvas: "*需要 Canvas 帐户?* **单击此处免费获取!**"
+        register_for_canvas: "*需要 Canvas 帐户?* **点击此处免费获取!**"
     logout_confirm: 
       cancel: 取消
       details: 
-        log_out: "是否确实要注销 Canvas？"
-      log_out: 注销
-      page_title: 注销
+        log_out: "是否确定要退出 Canvas？"
+      log_out: 退出
+      page_title: 退出
     otp: 
       errors: 
         invalid_otp: 验证码无效，请重试
@@ -7670,8 +7670,8 @@ zh:
           verify: 验证
         details: 
           mfa_enrollment: |-
-              除密码外，多重身份验证还要求您拥有物理设备，才能登录到 Canvas，因而提高了安全性。这可以是能生成验证码的设备，也可以是能接收短信的手机。用于 [iPhone](%{iphone_url}) 或
-              [Android](%{android_url}) 的 Google Authenticator  应用程序的配置方法是扫描以下的 QR 代码。其它令牌的配置方法是输入密钥 **%{secret_key}**。
+              为增加安全性，除密码外，您还需拥有具体设备进行多重身份验证，才能登录到 Canvas。这可能是生成验证码的设备，也可能是能接收短信的手机。使用 [iPhone](%{iphone_url}) 或
+              [Android](%{android_url}) 的 Google Authenticator 的应用程序可以通过扫描以下的 QR 代码而配置。其它令牌则可以通过输入密钥 **%{secret_key}**而配置。
           mfa_required: 您需要设置多重身份验证。
           otp_on_device: 请输入您的令牌显示的验证码。
           otp_sent_to_phone: 验证码已发送到您的手机。请在此输入。
@@ -9463,7 +9463,7 @@ zh:
       email: 
         details_link: "您可在此处查看详细信息: %{link}"
         html: 
-          details_link: 单击此处查看详细信息
+          details_link: 点击此处查看详细信息
       sms: 
         link_message: "更多信息请访问 %{url}"
   migration: 
@@ -13074,7 +13074,7 @@ zh:
       ? "User Research"
       : 用户调查
       by_instructure: "由 Instructure 提供"
-      open_source_learning_management_system: "开源 LMS"
+      open_source_learning_management_system: "打开 LMS 资源"
     components: 
       ic_submission-download-dialog: 
         click_to_download: 单击此处下载
@@ -14146,7 +14146,7 @@ zh:
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "为帐户实例的完整名称 (例如，something.instructure.com)"
   the_grading_period_was_deleted_7814a349: 删除评分期限
   the_grading_period_was_saved_4a504c5: 保存评分期限
-  the_institution_you_logged_in_from_is_not_configur_5ceac41: 您登录的学校未在此帐户上配置。
+  the_institution_you_logged_in_from_is_not_configur_5ceac41: 您登录的机构未在此帐户上配置。
   the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "Canvas 右上角标题中的徽标图像。200x200 svg 或 png"
   the_material_is_in_the_public_domain_279c39a3: 材料在公开域中
   the_material_is_licensed_under_creative_commons_3242cb5e: "材料已根据 Creative Commons 许可"
@@ -14402,7 +14402,7 @@ zh:
   to_minscore_43e5452e: "至 %{minScore}%"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "要查看作业，请确保 *议程* 视图处于活动状态。"
   tolerance_value_9e96573c: 公差值
-  too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: 登录尝试失败次数过多。请稍后重试或联系您的系统管理员。
+  too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: 多次登录尝试失败。请稍后重试或联系您的系统管理员。
   too_many_members_b8b15069: 过多成员
   tooltips: 
     finished: 已完成
