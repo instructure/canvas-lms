@@ -636,12 +636,16 @@ class Enrollment < ActiveRecord::Base
   end
 
   def state_based_on_date
-    unless [:invited, :active].include?(state)
-      if state == :completed && self.restrict_past_view?
+    if state == :completed || ([:invited, :active].include?(state) && self.course.completed?)
+      if self.restrict_past_view?
         return :inactive
       else
-        return state
+        return :completed
       end
+    end
+
+    unless [:invited, :active].include?(state)
+      return state
     end
 
     ranges = self.enrollment_dates
