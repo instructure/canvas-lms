@@ -19,6 +19,6 @@ if settings.present?
 
   Canvas::Errors.register!(:sentry_notification) do |exception, data|
     setting = Setting.get("sentry_error_logging_enabled", 'true')
-    SentryProxy.capture(exception, data) if setting == 'true
+    SentryProxy.capture(exception, data) if setting == 'true'
   end
 end
