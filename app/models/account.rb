@@ -210,7 +210,7 @@ class Account < ActiveRecord::Base
   add_setting :dashboard_url, root_only: true
   add_setting :product_name, root_only: true
   add_setting :author_email_in_notifications, boolean: true, root_only: true, default: false
-  add_setting :include_students_in_global_survey, boolean: true, root_only: true, default: true
+  add_setting :include_students_in_global_survey, boolean: true, root_only: true, default: false
   add_setting :trusted_referers, root_only: true
 
   BRANDING_SETTINGS = [:header_image, :favicon, :apple_touch_icon,
