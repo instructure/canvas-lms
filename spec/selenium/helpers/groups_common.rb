@@ -48,10 +48,20 @@ def create_group_and_add_all_students(group_name = "Windfury")
   wait_for_ajaximations
 end
 
-def create_category(category_name)
-  category1 = @course.group_categories.create!(name:category_name)
+def create_category(params={})
+  default_params = {
+    category_name:'category1',
+    has_max_membership:false,
+    member_limit:0,
+  }
+  params = default_params.merge(params)
+
+  options = {name: params[:category_name]}
+  options[:group_limit] = params[:member_limit] if params[:has_max_membership]
+  category1 = @course.group_categories.create!(options)
   category1.configure_self_signup(true, false)
   category1.save!
+
   category1
 end
 
@@ -67,7 +77,7 @@ def create_student_group(params={})
 
   group = @course.groups.create!(
       name:params[:group_name],
-      group_category:create_category(params[:category_name]))
+      group_category:create_category(category_name:params[:category_name]))
 
   if params[:add_self_to_group] == true
     add_user_to_group(@student, group, params[:is_leader])
@@ -97,7 +107,7 @@ def manually_create_group(params={})
   default_params = {
     group_name:'Test Group',
     has_max_membership:false,
-    member_count:0,
+    member_limit:0,
   }
   params = default_params.merge(params)
 
@@ -105,7 +115,7 @@ def manually_create_group(params={})
   wait_for_ajaximations
   f('#group_name').send_keys(params[:group_name])
   if params[:has_max_membership]
-    f('#group_max_membership').send_keys(params[:member_count])
+    f('#group_max_membership').send_keys(params[:member_limit])
     wait_for_ajaximations
   end
   f('#groupEditSaveButton').click

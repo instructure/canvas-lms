@@ -152,7 +152,7 @@ describe "new groups" do
       group_test_setup(3,1,0)
       get "/courses/#{@course.id}/groups"
 
-      manually_create_group(has_max_membership:true, member_count:2)
+      manually_create_group(has_max_membership:true, member_limit:2)
       expect(f('.group-summary')).to include_text("0 / 2 students")
     end
   end
