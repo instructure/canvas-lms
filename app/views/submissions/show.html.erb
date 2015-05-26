@@ -39,7 +39,13 @@
           <% if can_do(@assignment, @current_user, :grade) %>
             <%= render :partial => "gradebooks/grading_box", :object => @assignment, :locals => {:submission => @submission} %>
           <% elsif can_do(@submission, @current_user, :read_grade) %>
-            <span class="published_grade"><%= @submission.published_grade %></span>
+            <span class="published_grade">
+              <% if @submission.excused? %>
+                <%= t "Excused" %>
+              <% else %>
+                <%= @submission.published_grade %>
+              <% end %>
+            </span>
           <% end %>
           <br/>
         <% if can_do(@assignment, @current_user, :grade) %>
