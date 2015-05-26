@@ -51,7 +51,7 @@ describe LearningOutcome do
               :id => 3
             }
           ],
-          :learning_outcome_id => @outcome.id
+          :learning_outcome_id => outcome.id
         }
       ]
       @rubric.save!
