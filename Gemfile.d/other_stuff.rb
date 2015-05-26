@@ -34,8 +34,8 @@ gem 'bcrypt-ruby', '3.0.1'
 gem 'canvas_connect', '0.3.7'
   gem 'adobe_connect', '1.0.3', require: false
 gem 'canvas_webex', '0.15'
-gem 'canvas-jobs', '0.9.12'
-
+gem 'canvas-jobs', '0.9.13'
+  gem 'rufus-scheduler', '3.1.2', require: false
 gem 'ffi', '1.1.5', require: false
 gem 'hairtrigger', '0.2.12'
   gem 'ruby2ruby', '2.0.8', require: false

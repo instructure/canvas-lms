@@ -70,7 +70,7 @@ Rails.configuration.after_initialize do
     end
   end
 
-  Delayed::Periodic.cron 'ErrorReport.destroy_error_reports', '35 */1 * * *' do
+  Delayed::Periodic.cron 'ErrorReport.destroy_error_reports', '2-59/5 * * * *' do
     cutoff = Setting.get('error_reports_retain_for', 3.months.to_s).to_i
     if cutoff > 0
       with_each_shard_by_database(ErrorReport, :destroy_error_reports, cutoff.ago)
