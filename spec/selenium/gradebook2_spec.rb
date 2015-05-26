@@ -792,8 +792,33 @@ describe "gradebook2" do
     end
   end
 
+  context 'excused assignment' do
+    it 'is not included in grade calculations', priority: '1', test_id: 196596 do
+      skip 'waiting for CNVS-17552'
+      init_course_with_students
+
+      a1 = create_and_publish_assignment({title: 'Excuse Me', points_possible: 20})
+      a2 = create_and_publish_assignment({title: 'Don\'t Excuse Me'})
+
+      a1.grade_student(students[0], {grade: 20})
+      a2.grade_student(students[0], {grade: 5})
+
+      a2.grade_student(students[0], {excuse: 1})
+
+      get "/courses/#{@course.id}/gradebook/"
+      row = ff('#gradebook_grid .container_1 .slick-row .slick-cell')
+
+      expect(row[0].text).to eq '20'
+      # this should show 'EX'
+      expect(row[1].text).to eq '-'
+      # cell should have striped shading
+      expect(f('#gradebook_grid .container_1 .slick-row .dropped')).to eq row[1]
+      expect(row[2].text).to eq '100%'
+    end
+  end
+
   context "as an observer" do
-    before (:each) do
+    before(:each) do
       data_setup_as_observer
     end
 
