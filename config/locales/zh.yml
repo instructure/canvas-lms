@@ -112,12 +112,12 @@ zh:
     test_bind_failed: "无法绑定以下错误: %{error}"
     test_connection_timeout: 连接超时
     test_host_unknown: "未知主机: %{host}"
-    test_login_auth_exception: "登录发生例外：%{error}"
+    test_login_auth_exception: "登录发生异常：%{error}"
     test_login_auth_failed: 身份验证失败
     test_search_failed: "搜索失败，错误如下: %{error}"
   account_authorization_config/saml: 
     debug: 
-      logout_redirect: "已向 IdP 发送 退出要求"
+      logout_redirect: "已向 IdP 发送 LogoutRequest"
       wait_for_login: 正等待尝试登录
     saml_eppn_domain_stripped: "%{eppn} (域名去除)"
   account_authorization_configs: 
@@ -136,7 +136,7 @@ zh:
       auth_url: "登录 URL为此配置"
     index: 
       add_auth_desc: "添加身份提供商到此帐户:"
-      canvas_login_tip: "如果您配置会引起不能登录的设置，您可以在您的登录网址后面添加*%{url1}* 。 这将让您使用正常的Canvas登录程序登录。 对于该账户，网址是%{url2}"
+      canvas_login_tip: "如果配置引起不能登录的设置，您可以在您的登录网址后面添加*%{url1}* 。 这将让您使用正常的Canvas登录程序登录。 对于该账户，网址是%{url2}"
       choose_auth_type_option: 选择一个身份认证服务
       current_settings_title: 当前集成
       delete_auth_confirmation: 是否确定?如果删除，用户可能无法登录。
@@ -245,7 +245,7 @@ zh:
       logout_response_from_idp: "来自 IdP 的 LogoutResponse"
     sso_settings_form: 
       change_password_url_help: "为默认的 Canvas行为而留空"
-      discovery_url_description: "如果设置了一个发现网址，当需要认证，Canvas会把所有用户转发到那个URL。 那个页面将需要帮助用户查出他们要去那里登录。　如果没有已配置的发现网址，第一个配置将使用于尝试认证用户。"
+      discovery_url_description: "如果设置一个发现的网址，当需要认证时，Canvas会把所有用户转发到该URL。 该页面将需要帮助用户查出他们要在哪里登录。　如果没有配置发现网址，第一个配置将使用于尝试认证用户。"
       labels: 
         auth_discovery_url: 发现网址
         change_password_url: "忘记密码 URL"
@@ -1265,7 +1265,7 @@ zh:
     add_quiz_to: "添加测验到 %{module}"
     add_topic_to: "添加讨论主题到 %{module}"
   add_new_group_7ac49f31: 添加新组
-  add_new_set_of_due_dates_e8e240f: 添加新列的截止日期
+  add_new_set_of_due_dates_e8e240f: 添加新的截止日期
   add_students_to_the_course_874be8fb: 向课程添加学生
   add_tas_to_the_course_2aac6e02: 向课程添加助教
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "添加您的作业。您可以只列一个长列表，或者将其分为几组 - 甚至可以为每个作业组指定权重。"
@@ -2013,7 +2013,7 @@ zh:
       advanced_turnitin_settings: "高级 Turnitin 设置"
       descriptions: 
         allowed_extensions: "输入接受的扩展名列表，例如: doc,xls,txt"
-      external_tool_group_warning: 小组作业不可以使用外部工具。当您保存时，小组设置会是未选择。
+      external_tool_group_warning: 小组作业不可以使用外部工具。当您保存时，小组设置将显示为未勾选。
       external_tool_options: 外部工具选项
       label: 
         external_tool_new_tab: 在新选项卡中加载此工具
@@ -2727,7 +2727,7 @@ zh:
   canvas_cartridge_name: "Canvas Cartridge 导入器"
   canvas_cloud_information_fdd404f2: Canvas云的信息
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas 无法识别您的身份提供者"
-  canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas 没有以下用户的帐户: %{user}"
+  canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "以下用户没有Canvas 的帐户: %{user}"
   canvas_error_report_ff678539: "Canvas 的错误报告"
   canvas_revision_unknown: 未知
   canvas_ticketing_email_connector_27e253ae: "Canvas 的票务电子邮件连接器"
@@ -4620,9 +4620,9 @@ zh:
     url: URL
   create_users_view: 
     required: 请输入一些电子邮件地址
-  created_by_b39b9c8b: 创建者
+  created_by_b39b9c8b: 创建者为
   created_group_group_name_2097306b: "已创建组 %{group_name}"
-  creating_a_submission_export_will_allow_you_to_dow_b4b1a658: 创建一个提交导出将允许您下载一个有您的所有目前与先前课程的作业提交的压缩文件。这可能是一个大文件，所以可能需要一段时间。您可以导航离开页面并稍后在回来。
+  creating_a_submission_export_will_allow_you_to_dow_b4b1a658: 创建一个提交导出将允许您下载一个有您的所有目前与先前课程作业提交的压缩文件。这可能是一个大文件，所以可能需要一段时间。您可以导航离开页面并稍后在回来。
   creative_commons_714a065f: "Creative Commons"
   creative_commons_license_725584ae: "Creative Commons 许可证："
   crumbs: 
@@ -5499,7 +5499,7 @@ zh:
       delete_default_term: 无法删除默认学期
       delete_term_with_courses: 无法删除含活动课程的学期
       not_unique: "学号 \"%{sis_source_id}\" 已在使用中"
-  enter_a_hexcode_here_to_use_a_custom_color_51ecccce: 在此处输入十六进制代码来使用一个自定义颜色。
+  enter_a_hexcode_here_to_use_a_custom_color_51ecccce: 在此处输入十六进制代码以使用一个自定义颜色。
   eportfolio: 
     buttons: 
       done_editing: 完成编辑
@@ -7284,7 +7284,7 @@ zh:
       默认情况下，Canvas 将首先尝试使用 Flash 来播放视频。启用此项可首先尝试使用 HTML5，
       然后返回到 Flash。
   html_editor_fb2ab713: "HTML 编辑器"
-  i_agree_to_the_terms_of_use_and_privacy_policy_f41760cc: 我对*使用条件*和**隐私政策**同意。
+  i_agree_to_the_terms_of_use_and_privacy_policy_f41760cc: 我同意*使用条件*和**隐私政策**。
   i_have_obtained_permission_to_use_this_file_6386f087: 我已获得使用此文件的权限。
   i_hold_the_copyright_71ee91b1: 我持有版权
   ic_actions: 
@@ -7715,7 +7715,7 @@ zh:
         log_in: 登录
         login_handle: "输入您的 %{login_handle_name}，我们将向您发送更改密码的链接。"
         page_title: "登录到 Canvas"
-        register_for_canvas: "*需要 Canvas 帐户?* **点击此处免费获取!**"
+        register_for_canvas: "*需要 一个Canvas 帐户吗?* **点击此处免费获取!**"
     logout_confirm: 
       cancel: 取消
       details: 
@@ -7743,7 +7743,7 @@ zh:
           remember_me: 记住这台计算机
           verification_code: 验证码
         links: 
-          choose_number: 选择已有电话号码
+          choose_number: 选择已有的电话号码
         page_title: 多重身份验证
         select: 
           new_number: 新电话号码
@@ -9524,18 +9524,18 @@ zh:
         tweet: "Canvas 警报 - 邀请:参加 %{title}，%{name}"
     web_conference_recording_ready: 
       email: 
-        body: "您的%{name}的%{title}的录制准备好了。"
+        body: "为%{name}而录制的%{title}准备好了。"
         details_link: "您可在此处查看详细信息: %{link}"
         html: 
-          body: "您的%{name}的%{title}的录制准备好了。"
+          body: "为%{name}的%{title}录制准备好了。"
           details_link: 点击此处查看详细信息
           subject: "网站会议的录制准备好：%{name}"
         subject: "网站会议的录制准备好：%{name}"
       sms: 
-        body: "您的%{name}的%{title}的录制准备好了。"
+        body: "为%{name}的%{title}录制准备好了。"
         link_message: "更多信息请访问 %{url}"
       summary: 
-        body: "您的%{name}的%{title}的录制准备好了。"
+        body: "为%{name}的%{title}录制准备好了。"
         subject: "网站会议的录制准备好：%{name}"
       twitter: 
         tweet: "Canvas通知－录制准备：%{title}, %{name}"
@@ -10254,7 +10254,7 @@ zh:
         latest_score: 最新分数
         outcome: 成果
   overrides: 
-    blank_override: 您必须有学生或选项选择
+    blank_override: 您必须有学生或选择的班级
     everyone: 所有人
     everyone_else: 其他所有人
     overrides: 
@@ -10517,11 +10517,11 @@ zh:
       description: |-
           您必须在[Kaltura.com](%{kaltura_url})有账户
           或有Kaltura的自托管实例。
-          **注意：**一旦您在Canvas中配置Kaltura，
+          **注意：**一旦在Canvas中配置了Kaltura，
           您需要在Kaltura的管理控制台，在”设置->
-          整合设置“启用服务器的与通知网站的通知：
+          整合设置“之下启用服务器与通知网站的通知：
           %{notification_url}
-          然后勾选在”通过服务器发送“栏的”添加输入“和”删除输入“的复选框。
+          然后勾选在”通过服务器发送“栏中的”添加输入“和”删除输入“的复选框。
       headers: 
         account_settings: 帐户设置
         canvas_settings: "Canvas 设置"
@@ -13880,7 +13880,7 @@ zh:
       submitted: "*已提交：* %{submittedAt}"
   spreadsheet_6d622119: 电子表格
   sr_gradebook: 
-    all_grading_periods: 所有评分时段
+    all_grading_periods: 所有评分期限
     all_sections: 所有班级
     assignment_muted: 单击以取消静音。
     assignment_order_alpha: 按字母顺序
@@ -14539,7 +14539,7 @@ zh:
     buttons: 
       resubmit_to_turnitin: "重新提交到 Turnitin"
   twitter_fcef6b54: Twitter
-  type_more_to_find_additional_students_d5211cd5: 输入更多查找另外学生
+  type_more_to_find_additional_students_d5211cd5: 输入更多以找查其余学生
   unable_to_remove_app_4293cb53: 无法删除应用程序
   unarchive_selected_e0c4bd3d: 取消存档选择
   unauthorized: 未授权
@@ -14658,7 +14658,7 @@ zh:
       updating_user_details: 正在更新用户详细信息...
     notices: 
       image_reported: 此图像已报告
-  user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}，您可以查看页面前，您将需要*登录*。"
+  user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}，在可以查看页面之前，您将需要*登录*。"
   user_navigation_a097be0f: 用户导航
   user_notes: 
     confirms: 
