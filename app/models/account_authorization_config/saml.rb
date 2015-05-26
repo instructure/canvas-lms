@@ -45,6 +45,10 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
   before_validation :set_saml_defaults
   validates_presence_of :entity_id
 
+  def auth_provider_filter
+    [nil, self]
+  end
+
   def set_saml_defaults
     self.entity_id ||= saml_default_entity_id
     self.requested_authn_context = nil if self.requested_authn_context.blank?

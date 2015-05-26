@@ -27,6 +27,7 @@ class Pseudonym < ActiveRecord::Base
   has_many :communication_channels, :order => 'position'
   belongs_to :communication_channel
   belongs_to :sis_communication_channel, :class_name => 'CommunicationChannel'
+  belongs_to :authentication_provider, class_name: 'AccountAuthorizationConfig'
   MAX_UNIQUE_ID_LENGTH = 100
 
   CAS_TICKET_EXPIRED = 'expired'
@@ -134,13 +135,18 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def self.custom_find_by_unique_id(unique_id)
-    self.active.by_unique_id(unique_id).first if unique_id
+    self.for_auth_configuration(unique_id, nil) if unique_id
   end
-  
+
+  def self.for_auth_configuration(unique_id, aac)
+    auth_id = aac.try(:auth_provider_filter)
+    active.by_unique_id(unique_id).where(authentication_provider_id: auth_id).first
+  end
+
   def set_password_changed
     @password_changed = self.password && self.password_confirmation == self.password
   end
-  
+
   def password=(new_pass)
     self.password_auto_generated = false
     super(new_pass)

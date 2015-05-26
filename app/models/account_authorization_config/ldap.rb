@@ -100,6 +100,10 @@ class AccountAuthorizationConfig::LDAP < AccountAuthorizationConfig
     return nil
   end
 
+  def auth_provider_filter
+    [nil, self]
+  end
+
   def test_ldap_connection
     begin
       timeout(5) do

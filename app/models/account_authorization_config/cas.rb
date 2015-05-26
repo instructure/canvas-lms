@@ -32,6 +32,10 @@ class AccountAuthorizationConfig::CAS < AccountAuthorizationConfig::Delegated
     [ :unknown_user_url ].freeze
   end
 
+  def auth_provider_filter
+    [nil, self]
+  end
+
   def client
     @client ||= CASClient::Client.new(
       cas_base_url: auth_base,

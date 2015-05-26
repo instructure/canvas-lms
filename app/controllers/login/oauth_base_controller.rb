@@ -60,7 +60,7 @@ class Login::OauthBaseController < ApplicationController
   end
 
   def find_pseudonym(unique_id)
-    pseudonym = @domain_root_account.pseudonyms.active.by_unique_id(unique_id).first
+    pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_id, @aac)
     if pseudonym
       # Successful login and we have a user
       @domain_root_account.pseudonym_sessions.create!(pseudonym, false)

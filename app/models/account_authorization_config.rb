@@ -71,7 +71,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   end
 
   belongs_to :account
-  has_many :pseudonyms
+  has_many :pseudonyms, foreign_key: :authentication_provider_id
   acts_as_list scope: :account
 
   VALID_AUTH_TYPES = %w[cas facebook github google ldap linkedin openid_connect saml twitter].freeze
@@ -79,6 +79,18 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   validates_presence_of :account_id
 
   after_destroy :enable_canvas_authentication
+
+  # create associate model find to accept auth types, and just return the first one of that
+  # type
+  module FindWithType
+    def find(*args)
+      if VALID_AUTH_TYPES.include?(args.first)
+        where(auth_type: args.first).first!
+      else
+        super
+      end
+    end
+  end
 
   def self.recognized_params
     []
@@ -100,6 +112,10 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     Canvas::Security.decrypt_password(self.auth_crypted_password, self.auth_password_salt, 'instructure_auth')
   end
 
+  def auth_provider_filter
+    self
+  end
+
   def self.default_login_handle_name
     t(:default_login_handle_name, "Email")
   end
@@ -111,6 +127,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   def self.serialization_excludes; [:auth_crypted_password, :auth_password_salt]; end
 
   def enable_canvas_authentication
+    return if account.non_canvas_auth_configured?
     if self.account.settings[:canvas_authentication] == false
       self.account.settings[:canvas_authentication] = true
       self.account.save!

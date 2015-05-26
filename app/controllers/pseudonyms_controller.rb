@@ -34,10 +34,22 @@ class PseudonymsController < ApplicationController
   # @response_field sis_user_id The login's unique SIS id.
   # @response_field unique_id The unique ID for the login.
   # @response_field user_id The unique ID of the login's user.
+  # @response_field authentication_provider_id The ID of the authentication
+  #                 provider that this login is associated with
+  # @response_field authentication_provider_type The type of the authentication
+  #                 provider that this login is associated with
   #
   # @example_response
   #   [
-  #      { "account_id": 1, "id" 2, "sis_user_id": null, "unique_id": "belieber@example.com", "user_id": 2 }
+  #     {
+  #       "account_id": 1,
+  #       "id" 2,
+  #       "sis_user_id": null,
+  #       "unique_id": "belieber@example.com",
+  #       "user_id": 2,
+  #       "authentication_provider_id": 1,
+  #       "authentication_provider_type": "facebook"
+  #     }
   #   ]
   def index
     return unless get_user && authorized_action(@user, @current_user, :read)
@@ -167,6 +179,15 @@ class PseudonymsController < ApplicationController
   # @argument login[sis_user_id] [String]
   #   SIS ID for the login. To set this parameter, the caller must be able to
   #   manage SIS permissions on the account.
+  #
+  # @argument login[authentication_provider_id] [String]
+  #   The authentication provider this login is associated with. Logins
+  #   associated with a specific provider can only be used with that provider.
+  #   Legacy providers (LDAP, CAS, SAML) will search for logins associated with
+  #   them, or unassociated logins. New providers will only search for logins
+  #   explicitly associated with them. This can be the integer ID of the
+  #   provider, or the type of the provider (in which case, it will find the
+  #   first matching provider)
   def create
     return unless get_user
 
@@ -184,6 +205,7 @@ class PseudonymsController < ApplicationController
 
     @pseudonym = @account.pseudonyms.build(user: @user)
     return unless authorized_action(@pseudonym, @current_user, :create)
+    return unless find_authentication_provider
     return unless update_pseudonym_from_params
 
     @pseudonym.generate_temporary_password if !params[:pseudonym][:password]
@@ -304,9 +326,14 @@ class PseudonymsController < ApplicationController
     end
   end
 
+  def find_authentication_provider
+    return true unless params[:pseudonym][:authentication_provider_id]
+    params[:pseudonym][:authentication_provider] = @domain_root_accounts.account_authorization_configs.find(params[:pseudonym][:authentication_provider_id])
+  end
+
   def update_pseudonym_from_params
     # you have to at least attempt something recognized...
-    if params[:pseudonym].slice(:unique_id, :password, :sis_user_id).blank?
+    if params[:pseudonym].slice(:unique_id, :password, :sis_user_id, :authentication_provider).blank?
       render json: nil, status: :bad_request
       return false
     end
@@ -318,6 +345,10 @@ class PseudonymsController < ApplicationController
 
     has_right_if_requests_change(:unique_id, :update) do
       @pseudonym.unique_id = params[:pseudonym][:unique_id]
+    end or return false
+
+    has_right_if_requests_change(:authentication_provider, :update) do
+      @pseudonym.authentication_provider = params[:pseudonym][:authentication_provider]
     end or return false
 
     has_right_if_requests_change(:sis_user_id, :manage_sis) do

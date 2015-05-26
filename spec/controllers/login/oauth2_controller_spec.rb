@@ -49,6 +49,8 @@ describe Login::Oauth2Controller do
       aac.any_instantiation.expects(:get_token).returns('token')
       aac.any_instantiation.expects(:unique_id).with('token').returns('user')
       user_with_pseudonym(username: 'user', active_all: 1)
+      @pseudonym.authentication_provider = aac
+      @pseudonym.save!
 
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: 'bob')
       get :create, state: jwt

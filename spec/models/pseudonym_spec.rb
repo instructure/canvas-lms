@@ -627,5 +627,47 @@ describe Pseudonym do
       end
     end
   end
+
+  describe ".for_auth_configuration" do
+    let!(:bob){ user_model }
+    let!(:new_pseud) { Account.default.pseudonyms.create!(user: bob, unique_id: "BobbyRicky") }
+
+    context "with legacy auth types" do
+      let!(:aac){ Account.default.account_authorization_configs.create!(auth_type: 'ldap') }
+
+      it "filters down by unique ID" do
+        pseud = Account.default.pseudonyms.for_auth_configuration("BobbyRicky", aac)
+        expect(pseud).to eq(new_pseud)
+      end
+
+      it "excludes inactive pseudonyms" do
+        new_pseud.destroy
+        pseud = Account.default.pseudonyms.for_auth_configuration("BobbyRicky", aac)
+        expect(pseud).to be_nil
+      end
+    end
+
+    context "with contemporary auth types" do
+
+      let!(:aac){ Account.default.account_authorization_configs.create!(auth_type: 'facebook') }
+
+      before do
+        new_pseud.authentication_provider_id = aac.id
+        new_pseud.save!
+      end
+
+      it "finds the first related pseudonym" do
+        pseud = Account.default.pseudonyms.for_auth_configuration("BobbyRicky", aac)
+        expect(pseud).to eq(new_pseud)
+      end
+
+      it "will not load an AAC related pseudonym if you don't provide an AAC" do
+        pseud = Account.default.pseudonyms.for_auth_configuration("BobbyRicky", nil)
+        expect(pseud).to be_nil
+      end
+    end
+
+  end
+
 end
 

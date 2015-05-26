@@ -888,11 +888,21 @@ describe Account do
   end
 
   describe "canvas_authentication?" do
-    it "should be true if there's not an AAC" do
+    before do
+      Account.default.account_authorization_configs.destroy_all
       Account.default.settings[:canvas_authentication] = false
+      Account.default.save!
       expect(Account.default.canvas_authentication?).to be_truthy
-      Account.default.account_authorization_configs.create!(:auth_type => 'ldap')
+      Account.default.account_authorization_configs.create!(auth_type: 'ldap')
+    end
+
+    it "should be true if there's not an AAC" do
       expect(Account.default.canvas_authentication?).to be_falsey
+    end
+
+    it "is true after AACs are destroyed" do
+      Account.default.account_authorization_configs.destroy_all
+      expect(Account.default.reload.canvas_authentication?).to be_truthy
     end
   end
 

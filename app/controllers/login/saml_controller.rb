@@ -106,8 +106,7 @@ class Login::SamlController < ApplicationController
       aac.debug_set(:is_valid_login_response, 'true') if debugging
 
       if response.success_status?
-        pseudonym = @domain_root_account.pseudonyms.active.by_unique_id(unique_id).first
-
+        pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_id, aac)
         if pseudonym
           # We have to reset the session again here -- it's possible to do a
           # SAML login without hitting the #new action, depending on the
