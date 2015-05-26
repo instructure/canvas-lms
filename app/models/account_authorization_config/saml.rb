@@ -94,7 +94,12 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
 
     settings = Onelogin::Saml::Settings.new
     settings.sp_slo_url = "#{HostUrl.protocol}://#{domains.first}/login/saml/logout"
-    settings.assertion_consumer_service_url = domains.map { |domain| "#{HostUrl.protocol}://#{domain}/login/saml" }
+    settings.assertion_consumer_service_url = domains.flat_map do |domain|
+      [
+        "#{HostUrl.protocol}://#{domain}/saml_consume",
+        "#{HostUrl.protocol}://#{domain}/login/saml"
+      ]
+    end
     settings.tech_contact_name = app_config[:tech_contact_name] || 'Webmaster'
     settings.tech_contact_email = app_config[:tech_contact_email] || ''
 
