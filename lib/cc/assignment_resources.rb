@@ -190,6 +190,7 @@ module CC
       end
       node.quiz_identifierref CCHelper.create_key(assignment.quiz) if assignment.quiz
       node.allowed_extensions assignment.allowed_extensions.join(',') unless assignment.allowed_extensions.blank?
+      node.has_group_category assignment.has_group_category?
       atts = [:points_possible, :grading_type,
               :all_day, :submission_types, :position, :turnitin_enabled, :peer_review_count,
               :peer_reviews, :automatic_peer_reviews,

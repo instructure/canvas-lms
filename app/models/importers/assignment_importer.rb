@@ -166,6 +166,10 @@ module Importers
         item.send"#{key}=", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[key]) unless hash[key].nil?
       end
 
+      if hash[:has_group_category]
+        item.group_category ||= context.group_categories.active.where(:name => t("Project Groups")).first_or_create
+      end
+
       [:turnitin_enabled, :peer_reviews,
        :automatic_peer_reviews, :anonymous_peer_reviews,
        :grade_group_students_individually, :allowed_extensions,
