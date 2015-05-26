@@ -47,7 +47,7 @@ class ContextExternalTool < ActiveRecord::Base
     :editor_button, :homework_submission, :migration_selection, :course_home_sub_navigation,
     :course_settings_sub_navigation, :global_navigation,
     :assignment_menu, :file_menu, :discussion_topic_menu, :module_menu, :quiz_menu, :wiki_page_menu,
-    :tool_configuration, :link_selection, :assignment_selection
+    :tool_configuration, :link_selection, :assignment_selection, :post_grades
   ].freeze
 
   CUSTOM_EXTENSION_KEYS = {:file_menu => [:accept_media_types].freeze}.freeze

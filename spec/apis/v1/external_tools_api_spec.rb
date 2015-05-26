@@ -608,7 +608,8 @@ describe ExternalToolsController, type: :request do
           "selection_height"=>400,
           "selection_width"=>800},
      "link_selection"=>nil,
-     "assignment_selection"=>nil
+     "assignment_selection"=>nil,
+     "post_grades"=>nil
     }
   end
 end

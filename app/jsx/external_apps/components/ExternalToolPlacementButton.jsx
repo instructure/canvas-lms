@@ -62,6 +62,7 @@ define([
         "homework_submission":I18n.t("Homework Submission"),
         "migration_selection":I18n.t("Migration Selection"),
         "module_menu":I18n.t("Module Menu"),
+        "post_grades":I18n.t("Post Grades"),
         "quiz_menu":I18n.t("Quiz Menu"),
         "user_navigation":I18n.t("User Navigation"),
         "assignment_selection":I18n.t("Assignment Selection"),
