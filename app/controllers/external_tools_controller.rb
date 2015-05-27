@@ -427,7 +427,7 @@ class ExternalToolsController < ApplicationController
     }
     assignment = selection_type == 'homework_submission' && @context.assignments.active.find(params[:assignment_id])
 
-    adapter = Lti::LtiOutboundAdapter.new(tool, @current_user, @context).prepare_tool_launch(@return_url, variable_expander(assignemnt: assignment, tool: tool), opts)
+    adapter = Lti::LtiOutboundAdapter.new(tool, @current_user, @context).prepare_tool_launch(@return_url, variable_expander(assignment: assignment, tool: tool), opts)
     lti_launch.params = assignment ? adapter.generate_post_payload_for_homework_submission(assignment) : adapter.generate_post_payload
 
     lti_launch.resource_url = adapter.launch_url
