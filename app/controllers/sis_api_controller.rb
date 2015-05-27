@@ -33,8 +33,8 @@ class SisApiController < ApplicationController
 
     account_ids = [account.id] + Account.sub_account_ids_recursive(account.id)
     course_asmt_ids = []
-    Course.where(:account_id => account_ids).find_ids_in_batches do |course_ids|
-      course_asmts = Assignment.where(:context_type => "Course", :context_id => course_ids,
+    Course.not_deleted.where(:account_id => account_ids).find_ids_in_batches do |course_ids|
+      course_asmts = Assignment.active.where(:context_type => "Course", :context_id => course_ids,
         :post_to_sis => true).select([:id, :context_id]).group_by(&:context_id)
       course_asmts.each do |course_id, assignments|
         course_asmt_ids << {:course_id => course_id, :assignment_ids => assignments.map(&:id)}
