@@ -72,7 +72,18 @@ describe CommunicationChannel do
     @cc.re_activate
     expect(@cc.state).to eql(:active)
   end
-  
+
+  it "should reset the bounce count when being reactivated" do
+    communication_channel_model
+    @cc.confirm
+    @cc.retire
+    @cc.bounce_count = 2
+    @cc.save!
+    @cc.re_activate
+    @cc.reload
+    expect(@cc.bounce_count).to eq(0)
+  end
+
   it "should set a confirmation code unless one has been set" do
     CanvasSlug.expects(:generate).at_least(1).returns('abc123')
     communication_channel_model
