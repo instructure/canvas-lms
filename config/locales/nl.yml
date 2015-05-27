@@ -73,6 +73,10 @@ nl:
         api_key: API-sleutel
         api_url: Api-URL
         common_core_guid: "Common Core GUID (optioneel)"
+  access_to_the_etherpad_collaborations_below_will_b_b6a0a288: |-
+      Toegang tot de onderstaande Etherpad samenwerkingen zal op 8 augustus 2015 beëindigd worden. Als je deze content wil bewaren, migreer deze content dan voor die datum.
+      
+      Voor instructies over het creëren van een samenwerking met Google, [klik hier](%{google_collab_help_url}).
   account: 
     ask_canvas_network: "De Canvas Netwerk Community vragen"
     default_account_name: Standaardaccount
@@ -136,6 +140,7 @@ nl:
       auth_url: "Aanmeldings-url voor deze configuratie"
     index: 
       add_auth_desc: "Een identiteit van provider toevoegen aan dit account: "
+      canvas_login_tip: "Als je instellingen configureert, waarmee je je niet kunt aanmelden, kun je *%{url1}* aan het eind van je aanmeldings-URL toevoegen. Hiermee kun je je aanmelden via de normale Canvas aanmeldingsprocedure. Voor deze account is de URL %{url2}"
       choose_auth_type_option: "Een verificatieservice kiezen"
       current_settings_title: "Huidige integratie"
       delete_auth_confirmation: "Weet je het zeker? Gebruikers kunnen zich mogelijk niet aanmelden als dit wordt verwijderd"
@@ -209,8 +214,8 @@ nl:
     saml_required: "Een SAML configuratie is nodig om het te testen."
     saml_settings_test: 
       refresh_debugging: Vernieuwen
-      saml_debug_instructions: "Zodra je met foutopsporing begint zal alle info over de volgende SAML-aanmeldingspoging verzameld worden. Klikken op \"Vernieuwen\" om te zien of er al meer informatie/data verzameld is/zijn, of klikken op \"Foutopsporing stoppen\" om de verzamelde gegevens te wissen en te stoppen met de huidige foutopsporing poging."
-      saml_debugging: SAMLFoutopsporting
+      saml_debug_instructions: "Zodra je met foutopsporing begint zal alle info over de volgende SAML-aanmeldingspoging verzameld worden. Klik op \"Vernieuwen\" om te zien of er al meer informatie/data verzameld is/zijn, of klik op \"Foutopsporing stoppen\" om de verzamelde gegevens te wissen en te stoppen met de huidige foutopsporing poging."
+      saml_debugging: "SAML Foutopsporting"
       saml_required: "Een SAML-configuratie is nodig om SAML te testen"
       start_debugging: "Foutopsporing starten"
       stop_debugging: "Foutopsporing stoppen"
@@ -2179,7 +2184,7 @@ nl:
   available_until_date_cd125c62: "Beschikbaar tot datum"
   available_until_f3b9c4ed: "Beschikbaar tot en met "
   available_until_lock_at_ab022445: "Beschikbaar tot en met %{lock_at} "
-  availible_from_format_like_yyyy_mm_dd_hh_mm_f101e0dd: "Beschikbaar vanaf - Formaat als JJJJ-MM-DD uu;mm"
+  availible_from_format_like_yyyy_mm_dd_hh_mm_f101e0dd: "Beschikbaar vanaf - Formaat als JJJJ-MM-DD uu:mm"
   availible_to_format_like_yyyy_mm_dd_hh_mm_f2611528: "Beschikbaar vanaf - Formaat als JJJJ-MM-DD uu:mm"
   average_49c63f9b: Gemiddeld
   back_to_app_center_95420d83: "Terug naar App Center "
@@ -2717,13 +2722,14 @@ nl:
   canvas_cartridge_file_description: "Exportpakket voor canvas-cursus"
   canvas_cartridge_name: "Canvas Cartridge Importer"
   canvas_cloud_information_fdd404f2: "Canvas Cloud Informatie"
-  canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas herkent jouw identiteitsprovider niet"
+  canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas herkent je identiteitsprovider niet"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas heeft geen account voor gebruiker: %{user}"
   canvas_error_report_ff678539: "Canvas foutmelding"
   canvas_revision_unknown: Onbekend
   canvas_ticketing_email_connector_27e253ae: "Canvas Ticketing E-mail Connector"
   canvas_ticketing_web_post_connector_11158897: "Canvas Ticketing Web Post Connector"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas zal alle inzendingen herberekenen nadat je de toets opslaat; dit kan een paar minuten duren."
+  cas_d6e9601d: CAS
   cc: 
     by: "CC Bijdrage"
     by_nc: "CC bijdrage, niet-commercieel"
@@ -4599,6 +4605,7 @@ nl:
     required: "Enkele e-mailadressen invoeren"
   created_by_b39b9c8b: "Gecreëerd door"
   created_group_group_name_2097306b: "%{group_name} groep gemaakt "
+  creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Door een Submission Export te creëren kun je een zip-bestand downloaden met al je ingezonden opdrachten in al je huidige en vorige cursussen. Dit kan een groot bestand zijn, het kan dus even duren. Je kunt van de pagina weg navigeren en later terugkomen."
   creative_commons_714a065f: "Creative Commons "
   creative_commons_license_725584ae: "Creative Commons licentie: "
   crowdsourced: false
@@ -5248,6 +5255,9 @@ nl:
       show_more: "Meer tonen"
     hide_due_dates: "inleverdata verbergen"
     initial_post_required_to_subscribe: "Je moet een antwoord posten voordat je je kunt aanmelden"
+    like_count: 
+      one: "(%{count} like)"
+      other: "(%{count} likes)"
     mark_as_read: "Als gelezen markeren"
     mark_as_unread: "Als ongelezen markeren"
     no_content: "Geen inhoud"
@@ -5318,7 +5328,7 @@ nl:
     multiple_due_dates: "inleverdatum: meerdere inleverdatums"
     no_due_date: "inleverdatum: geen inleverdatum"
   due_datetime_f5a81b81: "Inleverdatum: %{dateTime} "
-  due_format_like_yyyy_mm_dd_hh_mm_ef30a9ef: "Verschuldigd - Formaat als JJJJ-MM-DD uu:mm"
+  due_format_like_yyyy_mm_dd_hh_mm_ef30a9ef: "Inleverdatum - Formaat als JJJJ-MM-DD uu:mm"
   due_multiple_dates_cc0ee3f5: "Inleverdatum: meerdere data "
   due_on_date_aa4725cd: "Verschuldigd op datum:"
   e_mail_only_2cc5e513: "Alleen e-mail "
@@ -5420,6 +5430,7 @@ nl:
       font_size: "Tekengrootte, er op drukken om een optie te selecteren"
       formatting: "Opmaak, er op drukken om een optie te selecteren"
       rte_help: "Rich Text Area. Druk ALT+F8 voor help"
+  editor_button_6647db9c: Editorknop
   either_the_url_or_domain_should_be_set_c29cf8c1: "Ofwel de URL of het domein dient ingesteld te worden. "
   either_you_re_a_new_user_or_the_terms_of_use_have__14f0d0d0: |-
       Of je bent een nieuwe gebruiker, of de *gebruiksvoorwaarden* zijn gewijzigd sinds de laatste keer dat je er akkoord mee ging.
@@ -7670,7 +7681,7 @@ nl:
           request_password: "Wachtwoord opvragen"
         dont_know_password: "Ik weet mijn wachtwoord niet"
         log_in: Aanmelden/Inloggen
-        login_handle: "Jouw %{login_handle_name} invoeren  en we zullen je een link sturen om jouw wachtwoord te wijzigen."
+        login_handle: "Je %{login_handle_name} invoeren  en we zullen je een link sturen om je wachtwoord te wijzigen."
         password: Wachtwoord
         sending: "Bezig met Versturen..."
       new: 
@@ -7684,7 +7695,7 @@ nl:
           password: Wachtwoord
           remember_me: "Ingeschreven blijven"
         log_in: Aanmelden/Inloggen
-        login_handle: "Jouw %{login_handle_name} invoeren  en we zullen je een link sturen om jouw wachtwoord te wijzigen."
+        login_handle: "Je %{login_handle_name} invoeren  en we zullen je een link sturen om je wachtwoord te wijzigen."
         page_title: "Aanmelden op Canvas"
         register_for_canvas: "*Heb je een Canvas-account nodig?* **Hier klikken, het is gratis!**"
     logout_confirm: 
@@ -7702,14 +7713,14 @@ nl:
           verify: Verifieren
         details: 
           mfa_enrollment: |-
-              Multi-Factor-verificatie verhoogt de beveiliging door iets physiek in uw bezit toe te voegen aan het wachtwoordom op Canvas aan te melden. 
+              Multi-Factor-verificatie verhoogt de beveiliging door iets physieks in je bezit toe te voegen aan het wachtwoord om op Canvas aan te melden. 
               Dit kan een apparaat zijn dat verificatiescodes genereert, maar ook een mobiele telefoon die tekstberichten
               kan ontvangen. De Google-verificatie-app voor [iPhone](%{iphone_url}) of [Android](%{android_url}) kan
               geconfigureerd worden door de onderstaande QR-code te scannen. Andere tokens kunnen geconfigureerd worden door
               de geheime sleutel **%{secret_key}}** in te voeren.
           mfa_required: "Je bent verplicht om de Multi-Factor-verificatie in te stellen."
-          otp_on_device: "Voer de verificatiecode in zoals  door jouw token tonen."
-          otp_sent_to_phone: "Er is een verificatiecode verstuurd naar jouw telefoon. Voer deze hier in."
+          otp_on_device: "Voer de verificatiecode in zoals  door je token getoond wordt."
+          otp_sent_to_phone: "Er is een verificatiecode verstuurd naar je telefoon. Voer deze hier in."
           send_to_sms: "SMS-berichten versturen naar %{phone_number}"
         labels: 
           carrier: Provider
@@ -10221,7 +10232,7 @@ nl:
         latest_score: "Laatste score"
         outcome: Leerresultaat
   overrides: 
-    blank_override: "Je meot een cursist of sectie geselecteerd hebben"
+    blank_override: "Je moet een cursist of sectie geselecteerd hebben"
     everyone: Iedereen
     everyone_else: "Alle anderen"
     overrides: 
@@ -14169,7 +14180,7 @@ nl:
       timespan: "%{start_at} *tot* %{end_at}"
   text_document_eacbcdb7: "Tekstdocument "
   text_entry_submission_cannot_be_empty_3d187cae: "Tekstinvoer inzending mag niet leeg zijn"
-  that_user_account_has_been_deleted_please_contact__350e0e0: "Dit gebruikersaccount is verwijderd. Neem contact op met jouw systeembeheerder om het account opnieuw te activeren."
+  that_user_account_has_been_deleted_please_contact__350e0e0: "Dit gebruikersaccount is verwijderd. Neem contact op met je systeembeheerder om het account opnieuw te activeren."
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "Het account ID van de account waar de rapporterende gebruiker bijhoort"
   the_app_was_activated_a84e055f: "De app is geactiveerd"
   the_app_was_added_58e2836a: "De app werd toegevoegd "
@@ -14590,6 +14601,7 @@ nl:
       updating_user_details: "Bezig met bijwerken van gebruikersgegevens..."
     notices: 
       image_reported: "Deze foto is overgezet"
+  user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}, je moet je *aanmelden* om die pagina te bekijken."
   user_navigation_a097be0f: Gebruikersnavigatie
   user_notes: 
     confirms: 
@@ -15120,6 +15132,7 @@ nl:
   you_can_disable_this_feature_d5e61373: "Je kunt deze functie uitschakelen"
   you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: "Je kunt de opdrachten van een cursus verbergen of tonen door ze in of uit te schakelen."
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "Je kunt nu de opties voor het herberekenen instellen voor cursisten die de toets al gemaakt hebben."
+  you_can_try_to_log_in_again_2b23ef0f: "Je kunt *nogmaals aanmelden* proberen."
   you_have_changed_the_progression_requirements_for__6772bc89: "Je hebt de voortgangsvereisten voor een actieve cursus veranderd. Er kunnen cursisten zijn die al naar deze module door zijn gegaan en anderen die ervan afhankelijk zijn."
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Je hebt wijzigingen aangebracht  in de vragen van deze toets .* Deze wijzigingen zullen voor cursisten pas verschijnen als je de toets hebt opgeslagen."
   you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Je hebt geen resultaten. *Klik hier* om er een te creëren."
