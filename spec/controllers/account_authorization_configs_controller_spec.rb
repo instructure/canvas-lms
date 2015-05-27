@@ -2,8 +2,14 @@ require 'spec_helper'
 
 RSpec.describe AccountAuthorizationConfigsController, type: :controller do
 
+  let!(:account) { Account.create! }
+
+  before do
+    admin = account_admin_user(account: account)
+    user_session(admin)
+  end
+
   describe "GET #index" do
-    let!(:account) { Account.create! }
 
     let(:saml_hash) do
       {
@@ -28,11 +34,6 @@ RSpec.describe AccountAuthorizationConfigsController, type: :controller do
       }
     end
 
-    before do
-      admin = account_admin_user(account: account)
-      user_session(admin)
-    end
-
     context "with no aacs" do
       it "renders ok" do
         get 'index', account_id: account.id
@@ -50,4 +51,11 @@ RSpec.describe AccountAuthorizationConfigsController, type: :controller do
 
   end
 
+  describe "saml_testing" do
+    it "requires saml configuration to test" do
+      get "saml_testing", account_id: account.id, format: :json
+      expect(response).to be_success
+      expect(response.body).to match("A SAML configuration is required to test SAML")
+    end
+  end
 end

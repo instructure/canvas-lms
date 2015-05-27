@@ -869,6 +869,24 @@ describe Account do
     end
   end
 
+  describe "delegated_authentication?" do
+    let(:account){ Account.default }
+
+    before do
+      expect(account.delegated_authentication?).to be_falsey
+    end
+
+    it "is false for LDAP" do
+      account.account_authorization_configs.create!(auth_type: 'ldap')
+      expect(account.delegated_authentication?).to be_falsey
+    end
+
+    it "is true for CAS" do
+      account.account_authorization_configs.create!(auth_type: 'cas')
+      expect(account.delegated_authentication?).to be_truthy
+    end
+  end
+
   describe "canvas_authentication?" do
     it "should be true if there's not an AAC" do
       Account.default.settings[:canvas_authentication] = false

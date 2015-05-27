@@ -605,7 +605,7 @@ RSpec.configure do |config|
 
   def managed_pseudonym(user, opts={})
     other_account = opts[:account] || account_with_saml
-    if other_account.password_authentication?
+    if other_account.canvas_authentication?
       config = other_account.account_authorization_configs.build
       config.auth_type = "saml"
       config.log_in_url = opts[:saml_log_in_url] if opts[:saml_log_in_url]

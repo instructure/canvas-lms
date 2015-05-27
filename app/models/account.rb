@@ -276,8 +276,12 @@ class Account < ActiveRecord::Base
     settings[:mfa_settings].try(:to_sym) || :disabled
   end
 
+  def non_canvas_auth_configured?
+    account_authorization_configs.exists?
+  end
+
   def canvas_authentication?
-    settings[:canvas_authentication] != false || !self.account_authorization_config
+    settings[:canvas_authentication] != false || !non_canvas_auth_configured?
   end
 
   def open_registration?
@@ -789,13 +793,6 @@ class Account < ActiveRecord::Base
     role && (role.built_in? || (self.id == role.account_id) || self.account_chain.map(&:id).include?(role.account_id))
   end
 
-  def account_authorization_config
-    # We support multiple auth configs per account, but several places we assume there is only one.
-    # This is for compatibility with those areas. TODO: migrate everything to supporting multiple
-    # auth configs
-    self.account_authorization_configs.first
-  end
-
   def login_handle_name_is_customized?
     self.login_handle_name.present?
   end
@@ -953,28 +950,12 @@ class Account < ActiveRecord::Base
     Canvas::PasswordPolicy.default_policy.merge(settings[:password_policy] || {})
   end
 
-  def password_authentication?
-    !self.account_authorization_config
-  end
-
   def delegated_authentication?
-    !canvas_authentication? || !!(self.account_authorization_config && self.account_authorization_config.is_a?(AccountAuthorizationConfig::Delegated))
+    account_authorization_configs.first.is_a?(AccountAuthorizationConfig::Delegated)
   end
 
   def forgot_password_external_url
     self.change_password_url
-  end
-
-  def cas_authentication?
-    !!(self.account_authorization_config && self.account_authorization_config.is_a?(AccountAuthorizationConfig::CAS))
-  end
-
-  def ldap_authentication?
-    self.account_authorization_configs.any? { |aac| aac.is_a?(AccountAuthorizationConfig::LDAP) }
-  end
-
-  def saml_authentication?
-    !!(self.account_authorization_config && self.account_authorization_config.is_a?(AccountAuthorizationConfig::SAML)) && AccountAuthorizationConfig::SAML.enabled?
   end
 
   def multi_auth?

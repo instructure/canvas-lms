@@ -419,11 +419,6 @@ class ApplicationController < ActionController::Base
     response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
   end
 
-  def delegated_authentication_url?
-    @domain_root_account.delegated_authentication? &&
-    !@domain_root_account.ldap_authentication?
-  end
-
   # To be used as a before_filter, requires controller or controller actions
   # to have their urls scoped to a context in order to be valid.
   # So /courses/5/assignments or groups/1/assignments would be valid, but

@@ -79,7 +79,7 @@ class PseudonymsController < ApplicationController
       else
         cc.pseudonym ||= cc.user.pseudonym rescue nil
         cc.save if cc.changed?
-        !cc.user.pseudonyms.active.empty? && cc.user.pseudonyms.active.any?{|p| p.account_id == @domain_root_account.id || (p.works_for_account?(@domain_root_account) && p.account && p.account.password_authentication?) }
+        !cc.user.pseudonyms.active.empty? && cc.user.pseudonyms.active.any?{|p| p.account_id == @domain_root_account.id || (p.works_for_account?(@domain_root_account) && p.account && p.account.canvas_authentication?) }
       end
     end
     respond_to do |format|
@@ -107,7 +107,7 @@ class PseudonymsController < ApplicationController
       flash[:error] = t 'errors.cant_change_password', "Cannot change the password for that login, or login does not exist"
       redirect_to root_url
     else
-      @password_pseudonyms = @cc.user.pseudonyms.active.select{|p| p.account.password_authentication? }
+      @password_pseudonyms = @cc.user.pseudonyms.active.select{|p| p.account.canvas_authentication? }
       js_env :PASSWORD_POLICY => @domain_root_account.password_policy,
              :PASSWORD_POLICIES => Hash[@password_pseudonyms.map{ |p| [p.id, p.account.password_policy]}]
     end

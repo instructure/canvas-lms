@@ -156,7 +156,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
 
     it "should use the first config as the default" do
       update_saml
-      expect(@account.account_authorization_config.idp_entity_id).to eq 'http://example.com/saml1'
+      expect(@account.account_authorization_configs.first.idp_entity_id).to eq 'http://example.com/saml1'
     end
 
     it "should create new configs if they are reordered" do

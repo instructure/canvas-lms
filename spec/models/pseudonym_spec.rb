@@ -246,10 +246,10 @@ describe Pseudonym do
 
   it "should determine if the password is managed" do
     u = User.create!
-    p = Pseudonym.create!(:unique_id => 'jt@instructure.com', :user => u)
+    p = Pseudonym.create!(unique_id: 'jt@instructure.com', user: u)
     p.sis_user_id = 'jt'
     expect(p).not_to be_managed_password
-    p.account.account_authorization_configs.create!(:auth_type => 'ldap')
+    p.account.account_authorization_configs.create!(auth_type: 'ldap')
     expect(p).to be_managed_password
     p.sis_user_id = nil
     expect(p).not_to be_managed_password

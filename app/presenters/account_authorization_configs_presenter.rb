@@ -118,7 +118,7 @@ class AccountAuthorizationConfigsPresenter
   end
 
   def canvas_auth_only?
-    account.canvas_authentication? && !account.ldap_authentication?
+    !account.non_canvas_auth_configured?
   end
 
   def login_placeholder

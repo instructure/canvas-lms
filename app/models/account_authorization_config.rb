@@ -71,6 +71,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   end
 
   belongs_to :account
+  has_many :pseudonyms
   acts_as_list scope: :account
 
   VALID_AUTH_TYPES = %w[cas facebook github google ldap linkedin openid_connect saml twitter].freeze

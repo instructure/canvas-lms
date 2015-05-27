@@ -310,7 +310,7 @@ describe Login::SamlController do
       @pseudonym.account = @account
       @pseudonym.save!
 
-      @aac = @account.account_authorization_config
+      @aac = @account.account_authorization_configs.first
     end
 
     it "should use the eduPersonPrincipalName attribute with the domain stripped" do
@@ -363,7 +363,7 @@ describe Login::SamlController do
     unique_id = 'foo'
 
     account = account_with_saml
-    @aac = @account.account_authorization_config
+    @aac = @account.account_authorization_configs.first
     @aac.login_attribute = 'eduPersonPrincipalName_stripped'
     @aac.save
 
@@ -421,7 +421,7 @@ describe Login::SamlController do
 
     account_with_saml
 
-    @aac = @account.account_authorization_config
+    @aac = @account.account_authorization_configs.first
     @aac.login_attribute = 'eduPersonPrincipalName'
     @aac.certificate_fingerprint = 'AF:E7:1C:28:EF:74:0B:C8:74:25:BE:13:A2:26:3D:37:97:1D:A1:F9'
     @aac.save

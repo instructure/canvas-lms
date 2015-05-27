@@ -66,7 +66,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
 
     it "should create a saml aac" do
       json = call_create(@saml_hash)
-      aac = @account.account_authorization_config
+      aac = @account.account_authorization_configs.first
       expect(aac.auth_type).to eq 'saml'
       expect(aac.idp_entity_id).to eq 'http://example.com/saml1'
       expect(aac.log_in_url).to eq 'http://example.com/saml1/sli'
@@ -78,7 +78,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
 
     it "should work with rails form style params" do
       call_create({:account_authorization_config => @saml_hash})
-      aac = @account.account_authorization_config
+      aac = @account.account_authorization_configs.first
       expect(aac.auth_type).to eq 'saml'
       expect(aac.idp_entity_id).to eq 'http://example.com/saml1'
     end
@@ -98,7 +98,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
 
     it "should create an ldap aac" do
       call_create(@ldap_hash)
-      aac = @account.account_authorization_config
+      aac = @account.account_authorization_configs.first
       expect(aac.auth_type).to eq 'ldap'
       expect(aac.auth_host).to eq '127.0.0.1'
       expect(aac.auth_filter).to eq 'filter1'
@@ -118,13 +118,13 @@ describe "AccountAuthorizationConfigs API", type: :request do
     end
     it "should default ldap auth_over_tls to 'start_tls'" do
       call_create(@ldap_hash)
-      expect(@account.account_authorization_config.auth_over_tls).to eq 'start_tls'
+      expect(@account.account_authorization_configs.first.auth_over_tls).to eq 'start_tls'
     end
 
     it "should create a cas aac" do
       call_create(@cas_hash)
 
-      aac = @account.account_authorization_config
+      aac = @account.account_authorization_configs.first
       expect(aac.auth_type).to eq 'cas'
       expect(aac.auth_base).to eq '127.0.0.1'
       expect(aac.position).to eq 1
@@ -139,7 +139,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
       call_create(@ldap_hash)
       call_create(@ldap_hash.merge('auth_host' => '127.0.0.2', 'position' => 1))
 
-      expect(@account.account_authorization_config.auth_host).to eq '127.0.0.2'
+      expect(@account.account_authorization_configs.first.auth_host).to eq '127.0.0.2'
 
       call_create(@ldap_hash.merge('auth_host' => '127.0.0.3', 'position' => 2))
 
@@ -290,7 +290,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
       @ldap_hash['position'] = 1
       call_update(aac2.id, @ldap_hash)
 
-      expect(@account.account_authorization_config.id).to eq aac2.id
+      expect(@account.account_authorization_configs.first.id).to eq aac2.id
     end
 
     it "should 404" do
@@ -316,7 +316,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
       aac = @account.account_authorization_configs.create!(@saml_hash)
       call_destroy(aac.id)
 
-      expect(@account.account_authorization_config).to be_nil
+      expect(@account.non_canvas_auth_configured?).to be_falsey
     end
 
     it "should reposition correctly" do
@@ -330,7 +330,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
       aac3.reload
       aac4.reload
       expect(@account.account_authorization_configs.count).to eq 3
-      expect(@account.account_authorization_config.id).to eq aac2.id
+      expect(@account.account_authorization_configs.first.id).to eq aac2.id
       expect(aac2.position).to eq 1
       expect(aac3.position).to eq 2
       expect(aac4.position).to eq 3
@@ -339,7 +339,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
       aac2.reload
       aac4.reload
       expect(@account.account_authorization_configs.count).to eq 2
-      expect(@account.account_authorization_config.id).to eq aac2.id
+      expect(@account.account_authorization_configs.first.id).to eq aac2.id
       expect(aac2.position).to eq 1
       expect(aac4.position).to eq 2
     end

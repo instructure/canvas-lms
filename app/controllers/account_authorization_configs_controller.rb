@@ -787,12 +787,6 @@ class AccountAuthorizationConfigsController < ApplicationController
 
   def test_ldap_login
     results = []
-    unless @account.ldap_authentication?
-      return render(
-        :json => {:errors => {:account => t(:account_required, 'must be LDAP-authenticated')}},
-        :status_code => 400
-      )
-    end
     unless params[:username]
       return render(
         :json => {:errors => {:login => t(:login_required, 'must be supplied')}},
@@ -805,13 +799,22 @@ class AccountAuthorizationConfigsController < ApplicationController
         :status_code => 400
       )
     end
-    @account.account_authorization_configs.each do |config|
+
+    @account.account_authorization_configs.where(auth_type: 'ldap').each do |config|
       h = {
         :account_authorization_config_id => config.id,
         :ldap_login_test => config.test_ldap_login(params[:username], params[:password])
       }
       results << h.merge({:errors => config.errors.map {|attr,msg| {attr => msg}}})
     end
+
+    if results.empty?
+      return render(
+          :json => {:errors => {:account => t(:account_required, 'must be LDAP-authenticated')}},
+          :status_code => 400
+      )
+    end
+
     render(
       :json => results,
       :status_code => 200
@@ -826,47 +829,39 @@ class AccountAuthorizationConfigsController < ApplicationController
   end
 
   def saml_testing
-    if @account.saml_authentication?
-      @account_config = @account.account_authorization_config
-      @account_config.start_debugging if params[:start_debugging]
+    @account_config = @account.account_authorization_configs.where(auth_type: 'saml').first
 
-      respond_to do |format|
-        format.html do
-          render partial: 'saml_testing',
-                 locals: { config: @account_config },
-                 layout: false
-        end
-        format.json do
-          render json: {
-            debugging: @account_config.debugging?,
-            debug_data: render_to_string(partial: 'saml_testing',
-                                         locals: { config: @account_config },
-                                         formats: [:html],
-                                         layout: false)
-          }
-        end
+    unless @account_config
+      render json: {
+                 errors: {
+                     account: t(:saml_required,
+                                "A SAML configuration is required to test SAML")
+                 }
+             }
+      return
+    end
+    @account_config.start_debugging if params[:start_debugging]
+
+    respond_to do |format|
+      format.html do
+        render partial: 'saml_testing',
+               locals: { config: @account_config },
+               layout: false
       end
-    else
-      respond_to do |format|
-        format.html do
-          render partial: 'saml_testing',
-                 locals: { config: @account_config },
-                 layout: false
-        end
-        format.json do
-          render json: {
-            errors: {
-              account: t(:saml_required,
-                         "A SAML configuration is required to test SAML")
-            }
-          }
-        end
+      format.json do
+        render json: {
+          debugging: @account_config.debugging?,
+          debug_data: render_to_string(partial: 'saml_testing',
+                                       locals: { config: @account_config },
+                                       formats: [:html],
+                                       layout: false)
+        }
       end
     end
   end
 
   def saml_testing_stop
-    account_config = @account.account_authorization_config
+    account_config = @account.account_authorization_configs.where(auth_type: "saml").first
     account_config.finish_debugging if account_config.present?
     render json: { status: "ok" }
   end

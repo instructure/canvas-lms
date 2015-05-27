@@ -207,20 +207,14 @@ describe AccountAuthorizationConfigsPresenter do
   end
 
   describe "#canvas_auth_only?" do
-    it "is true for canvas_auth" do
-      account = stub(canvas_authentication?: true, ldap_authentication?: false)
+    it "is true if no auth provider exists" do
+      account = stub(non_canvas_auth_configured?: false)
       presenter = described_class.new(account)
       expect(presenter.canvas_auth_only?).to eq(true)
     end
 
-    it "is false if ldap is also on" do
-      account = stub(canvas_authentication?: true, ldap_authentication?: true)
-      presenter = described_class.new(account)
-      expect(presenter.canvas_auth_only?).to eq(false)
-    end
-
-    it "is false if canvas_auth is off" do
-      account = stub(canvas_authentication?: false, ldap_authentication?: false)
+    it "is false if an auth provider exists" do
+      account = stub(non_canvas_auth_configured?: true)
       presenter = described_class.new(account)
       expect(presenter.canvas_auth_only?).to eq(false)
     end
