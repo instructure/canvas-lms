@@ -21,6 +21,10 @@ class AccountAuthorizationConfig::Twitter < AccountAuthorizationConfig::Oauth
   self.plugin = :twitter
   plugin_settings :consumer_key, consumer_secret: :consumer_secret_dec
 
+  def login_button?
+    true
+  end
+
   def unique_id(token)
     token.params[:user_id]
   end

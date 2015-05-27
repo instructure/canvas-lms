@@ -30,6 +30,10 @@ class AccountAuthorizationConfig::Facebook < AccountAuthorizationConfig::Oauth2
 
   plugin_settings :app_id, app_secret: :app_secret_dec
 
+  def login_button?
+    true
+  end
+  
   def client_id
     self.class.globally_configured? ? app_id : super
   end

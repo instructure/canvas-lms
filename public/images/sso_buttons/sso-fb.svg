@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="21px" height="21px" viewBox="0 0 21 21" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.3.2 (12043) - http://www.bohemiancoding.com/sketch -->
+    <title>sso-fb</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="sso-fb" sketch:type="MSArtboardGroup" transform="translate(-26.000000, -26.000000)">
+            <g id="Imported-Layers" sketch:type="MSLayerGroup" transform="translate(26.000000, 26.000000)">
+                <g id="sso-fb" sketch:type="MSShapeGroup">
+                    <path d="M19.8409962,21 C20.4810842,21 21,20.4810861 21,19.8410005 L21,1.15899945 C21,0.51875651 20.4810842,0 19.8409962,0 L1.15908248,0 C0.518758454,0 0,0.51875651 0,1.15899945 L0,19.8410005 C0,20.4810861 0.518758454,21 1.15908248,21 L19.8409962,21" id="Fill-1" fill="#FFFFFF"></path>
+                    <path d="M14.4874157,21 L14.4874157,12.8692032 L17.2154402,12.8692032 L17.6237829,9.70043061 L14.4874157,9.70043061 L14.4874157,7.67730932 C14.4874157,6.7598757 14.7420303,6.13469606 16.0570933,6.13469606 L17.7343413,6.13390937 L17.7343413,3.29979313 C17.4441058,3.2612455 16.4486084,3.174946 15.2902615,3.174946 C12.8721308,3.174946 11.2165857,4.65163495 11.2165857,7.36357881 L11.2165857,9.70043061 L8.48164147,9.70043061 L8.48164147,12.8692032 L11.2165857,12.8692032 L11.2165857,21 L14.4874157,21" id="Fill-2" fill="#395185"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -21,6 +21,10 @@ class AccountAuthorizationConfig::Google < AccountAuthorizationConfig::OpenIDCon
   self.plugin = :google_drive
   plugin_settings :client_id, client_secret: :client_secret_dec
 
+  def login_button?
+    true
+  end
+
   protected
 
   def authorize_url

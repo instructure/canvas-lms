@@ -64,6 +64,7 @@
       &larr; <%= link_to t('back_to_login', "Back to Login"), login_path, :class => "login_link" %>
     <% end %>
   </div>
+  <%= render partial: "sso_buttons", locals: { aacs: @aacs_with_buttons } %>
 </div>
 <%= # for plugin use
     render "shared/login_trailer" %>

@@ -24,6 +24,10 @@ class AccountAuthorizationConfig::GitHub < AccountAuthorizationConfig::Oauth2
     'github'.freeze
   end
 
+  def login_button?
+    true
+  end
+
   # Rename db field
   def domain=(val)
     self.auth_host = val

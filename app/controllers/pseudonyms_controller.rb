@@ -188,6 +188,15 @@ class PseudonymsController < ApplicationController
   #   explicitly associated with them. This can be the integer ID of the
   #   provider, or the type of the provider (in which case, it will find the
   #   first matching provider)
+  #
+  # @example_request
+  #
+  #   #create a facebook login for user with ID 123
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/logins' \
+  #        -F 'user[id]=123' \
+  #        -F 'login[unique_id]=112233445566' \
+  #        -F 'login[authentication_provider_id]=facebook' \
+  #        -H 'Authorization: Bearer <token>'
   def create
     return unless get_user
 
@@ -328,7 +337,7 @@ class PseudonymsController < ApplicationController
 
   def find_authentication_provider
     return true unless params[:pseudonym][:authentication_provider_id]
-    params[:pseudonym][:authentication_provider] = @domain_root_accounts.account_authorization_configs.find(params[:pseudonym][:authentication_provider_id])
+    params[:pseudonym][:authentication_provider] = @domain_root_account.account_authorization_configs.find(params[:pseudonym][:authentication_provider_id])
   end
 
   def update_pseudonym_from_params

@@ -102,6 +102,12 @@ class AccountAuthorizationConfig < ActiveRecord::Base
 
   SENSITIVE_PARAMS = [].freeze
 
+  # will always be false unless some subclass wants to have a "Login With X"
+  # button on the login page
+  def login_button?
+    false
+  end
+
   def auth_password=(password)
     return if password.blank?
     self.auth_crypted_password, self.auth_password_salt = Canvas::Security.encrypt_password(password, 'instructure_auth')

@@ -25,6 +25,10 @@ class AccountAuthorizationConfig::LinkedIn < AccountAuthorizationConfig::Oauth2
     'linkedin'
   end
 
+  def login_button?
+    true
+  end
+
   def unique_id(token)
     token.get('/v1/people/~:(id)?format=json').parsed['id']
   end
