@@ -4,47 +4,54 @@ describe "Converting Angel QTI" do
 
   it "should convert multiple_choice" do
     qti_data = file_as_string(angel_question_dir, 'p_multiple_choice.xml')
-    hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data, :interaction_type=>'multiple_choice_question', :custom_type=>'angel')
+    hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data,
+      :interaction_type=>'multiple_choice_question', :custom_type=>'angel', :flavor=>Qti::Flavors::ANGEL)
     hash[:answers].each { |a| a.delete(:id) }
     expect(hash).to eq AngelPropExpected::MULTIPLE_CHOICE
   end
 
   it "should convert multiple answer" do
     qti_data = file_as_string(angel_question_dir, 'p_multiple_answers.xml')
-    hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data, :interaction_type=>'multiple_answers_question', :custom_type=>'angel')
+    hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data,
+      :interaction_type=>'multiple_answers_question', :custom_type=>'angel', :flavor=>Qti::Flavors::ANGEL)
     hash[:answers].each { |a| a.delete(:id) }
     expect(hash).to eq AngelPropExpected::MULTIPLE_ANSWER
   end
 
   it "should convert true false" do
     qti_data = file_as_string(angel_question_dir, 'p_true_false.xml')
-    hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data, :interaction_type=>'true_false_question', :custom_type=>'angel')
+    hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data,
+      :interaction_type=>'true_false_question', :custom_type=>'angel', :flavor=>Qti::Flavors::ANGEL)
     hash[:answers].each { |a| a.delete(:id) }
     expect(hash).to eq AngelPropExpected::TRUE_FALSE
   end
 
   it "should convert essay" do
     qti_data = file_as_string(angel_question_dir, 'p_essay.xml')
-    hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data, :interaction_type=>'essay_question', :custom_type=>'angel')
+    hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data,
+      :interaction_type=>'essay_question', :custom_type=>'angel', :flavor=>Qti::Flavors::ANGEL)
     expect(hash).to eq AngelPropExpected::ESSAY
   end
 
   it "should convert short answer" do
     qti_data = file_as_string(angel_question_dir, 'p_short_answer.xml')
-    hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data, :interaction_type=>'short_answer_question', :custom_type=>'angel')
+    hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data,
+      :interaction_type=>'short_answer_question', :custom_type=>'angel', :flavor=>Qti::Flavors::ANGEL)
     hash[:answers].each { |a| a.delete(:id) }
     expect(hash).to eq AngelPropExpected::SHORT_ANSWER
   end
 
   it "should convert short answer with no correct answers into essay" do
     qti_data = file_as_string(angel_question_dir, 'p_short_answer_as_essay.xml')
-    hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data, :interaction_type=>'short_answer_question', :custom_type=>'angel')
+    hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data,
+      :interaction_type=>'short_answer_question', :custom_type=>'angel', :flavor=>Qti::Flavors::ANGEL)
     expect(hash).to eq AngelPropExpected::SHORT_ANSWER_AS_ESSAY
   end
 
   it "should convert matching questions" do
     qti_data = file_as_string(angel_question_dir, 'p_matching.xml')
-    hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data, :interaction_type=>'matching_question', :custom_type=>'angel')
+    hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data,
+      :interaction_type=>'matching_question', :custom_type=>'angel', :flavor=>Qti::Flavors::ANGEL)
 
     # make sure the ids are correctly referencing each other
     matches = []
@@ -57,10 +64,11 @@ describe "Converting Angel QTI" do
     hash[:matches].each {|m|m.delete(:match_id)}
     expect(hash).to eq AngelPropExpected::MATCHING
   end
-  
+
   it "should convert ordering questions into matching questions" do
     qti_data = file_as_string(angel_question_dir, 'p_ordering.xml')
-    hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data, :interaction_type=>'ordering_question', :custom_type=>'angel')
+    hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data,
+      :interaction_type=>'ordering_question', :custom_type=>'angel', :flavor=>Qti::Flavors::ANGEL)
     matches = []
     hash[:matches].each {|m| matches << m[:match_id]}
     hash[:answers].each do |a|
@@ -74,20 +82,23 @@ describe "Converting Angel QTI" do
 
   it "should convert file response questions" do
     qti_data = file_as_string(angel_question_dir, 'p_offline.xml')
-    hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data, :interaction_type=>'file_upload_question', :custom_type=>'angel')
+    hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data,
+      :interaction_type=>'file_upload_question', :custom_type=>'angel', :flavor=>Qti::Flavors::ANGEL)
     expect(hash).to eq AngelPropExpected::FILE_RESPONSE
   end
 
   it "should convert fill in the blank questions" do
     qti_data = file_as_string(angel_question_dir, 'p_fib.xml')
-    hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data, :interaction_type=>'fill_in_multiple_blanks_question', :custom_type=>'angel')
+    hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data,
+      :interaction_type=>'fill_in_multiple_blanks_question', :custom_type=>'angel', :flavor=>Qti::Flavors::ANGEL)
     hash[:answers].each { |a| a.delete(:id) }
     expect(hash).to eq AngelPropExpected::FIB
   end
 
   it "should convert likert scale" do
     qti_data = file_as_string(angel_question_dir, 'p_likert_scale.xml')
-    hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data, :interaction_type=>'stupid_likert_scale_question', :custom_type=>'angel')
+    hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data=>qti_data,
+      :interaction_type=>'stupid_likert_scale_question', :custom_type=>'angel', :flavor=>Qti::Flavors::ANGEL)
     hash[:answers].each { |a| a.delete(:id) }
     expect(hash).to eq AngelPropExpected::LIKERT
   end
@@ -110,7 +121,8 @@ module AngelPropExpected
 
   MULTIPLE_CHOICE =
       {
-          :incorrect_comments=>"",
+          :incorrect_comments_html=>"<p>You wrong!</p><br><p>so wrong</p>",
+          :incorrect_comments=>"You wrong!so wrong",
           :question_type=>"multiple_choice_question",
           :migration_id=>"",
           :question_text=>"<div>What is an LMS</div>",
@@ -167,10 +179,10 @@ module AngelPropExpected
                {:migration_id=>"answerChoice3", :text=>"c", :weight=>0, :comments=>"feedback - c"},
                {:migration_id=>"answerChoice4", :text=>"d", :weight=>0, :comments=>"feedback - d"},
                {:migration_id=>"answerChoice5", :text=>"e", :weight=>100}],
-          :incorrect_comments=>"",
+          :incorrect_comments=>"You are wrong!",
           :points_possible=>1,
           :question_type=>"multiple_answers_question",
-          :correct_comments=>"",
+          :correct_comments=>"ok ok",
           :migration_id=>"",
           :question_text=>"<div>go!</div>"}
 
@@ -183,7 +195,7 @@ module AngelPropExpected
        :points_possible=>1,
        :question_type=>"short_answer_question",
        :question_text=>"<div>What is your answer</div>"}
-  
+
   SHORT_ANSWER_AS_ESSAY =
       {
           :incorrect_comments=>"",
@@ -212,9 +224,9 @@ module AngelPropExpected
            [{:text=>"1", :comments=>""},
             {:text=>"2", :comments=>""},
             {:text=>"3", :comments=>""}],
-       :correct_comments=>"",
+       :correct_comments=>"jkl;",
        :question_name=>"Ordering question",
-       :incorrect_comments=>"",
+       :incorrect_comments=>"asdf",
        :migration_id=>"",
        :points_possible=>1,
        :question_type=>"matching_question",

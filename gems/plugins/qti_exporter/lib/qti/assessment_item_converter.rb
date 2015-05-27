@@ -24,7 +24,7 @@ class AssessmentItemConverter
       @sorted_paths = opts[:sorted_file_paths]
       @sorted_paths ||= @path_map.keys.sort_by { |v| v.length }
     end
-    
+
     if @manifest_node
       @base_dir = opts[:base_dir]
       @identifier = @manifest_node['identifier']
@@ -128,7 +128,7 @@ class AssessmentItemConverter
       @question[:question_type] = "Error"
       @log.error "#{e}: #{e.backtrace}"
     end
-    
+
     @question
   end
 
@@ -139,7 +139,7 @@ class AssessmentItemConverter
     'trueFalse' => 'true_false_question',
     'multiple_dropdowns' => 'multiple_dropdowns_question'
   }
-  
+
   def parse_instructure_metadata
     if meta = @doc.at_css('instructureMetadata')
       if bank =  get_node_att(meta, 'instructureField[name=question_bank]',  'value')
@@ -206,7 +206,7 @@ class AssessmentItemConverter
   end
 
   def get_feedback
-    @doc.search('modalFeedback[outcomeIdentifier=FEEDBACK]').each do |f|
+    @doc.search('modalFeedback').each do |f|
       id = f['identifier']
       if id =~ /wrong|incorrect|(_IC$)/i
         extract_feedback!(@question, :incorrect_comments, f)
@@ -236,7 +236,7 @@ class AssessmentItemConverter
     end
 
     text = clear_html(node.text.gsub(/\s+/, " ")).strip
-    html_node = node.at_css('div.html') || (node.name.downcase == 'div' && node['class'] =~ /\bhtml\b/)
+    html_node = node.at_css('div.html') || (node.name.downcase == 'div' && node['class'] =~ /\bhtml\b/) || @flavor == Qti::Flavors::ANGEL
     is_html = false
     # heuristic for detecting html: the sanitized html node is more than just a container for a single text node
     sanitized = sanitize_html!(html_node ? Nokogiri::HTML::DocumentFragment.parse(node.text) : node, true) { |s| is_html = !(s.children.size == 1 && s.children.first.is_a?(Nokogiri::XML::Text)) }
@@ -326,7 +326,7 @@ class AssessmentItemConverter
           break unless child.text? && child.text =~ /\A\s+\z/ || child.element? && child.name.downcase == 'br'
           child.remove
         end
-  
+
         node.children.reverse_each do |child|
           break unless child.text? && child.text =~ /\A\s+\z/ || child.element? && child.name.downcase == 'br'
           child.remove
@@ -350,12 +350,12 @@ class AssessmentItemConverter
     return false unless node.attributes['class']
     KNOWN_META_CLASSES.member?(node.attributes['class'].value)
   end
-  
+
   def self.get_interaction_type(manifest_node)
-    manifest_node.at_css('interactionType') || 
-      manifest_node.at_css('xmlns|interactionType', 'xmlns' => Qti::Converter::QTI_2_1_URL) || 
-      manifest_node.at_css('xmlns|interactionType', 'xmlns' => Qti::Converter::QTI_2_0_URL) || 
-      manifest_node.at_css('xmlns|interactionType', 'xmlns' => Qti::Converter::QTI_2_1_ITEM_URL) || 
+    manifest_node.at_css('interactionType') ||
+      manifest_node.at_css('xmlns|interactionType', 'xmlns' => Qti::Converter::QTI_2_1_URL) ||
+      manifest_node.at_css('xmlns|interactionType', 'xmlns' => Qti::Converter::QTI_2_0_URL) ||
+      manifest_node.at_css('xmlns|interactionType', 'xmlns' => Qti::Converter::QTI_2_1_ITEM_URL) ||
       manifest_node.at_css('xmlns|interactionType', 'xmlns' => Qti::Converter::QTI_2_0_ITEM_URL)
   end
 
@@ -428,16 +428,16 @@ class AssessmentItemConverter
 
     q.create_instructure_question if q
   end
-  
+
   # Sets the actual feedback values and clears the feedback ids
   def attach_feedback_values(answers)
     feedback_hash = {}
-    @doc.search('modalFeedback[outcomeIdentifier=FEEDBACK]').each do |feedback|
+    @doc.search('modalFeedback').each do |feedback|
       id = feedback['identifier']
       node = feedback.at_css('p') || feedback.at_css('div')
       feedback_hash[id] = node if node
     end
-    
+
     #clear extra entries
     @question.delete :feedback_id
     answers.each do |answer|
