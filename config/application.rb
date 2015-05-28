@@ -158,6 +158,7 @@ module CanvasRails
     # See the tests in spec/lib/safe_yaml_spec.rb
         YAML.whitelist.add(*%w[
       tag:ruby.yaml.org,2002:symbol
+      tag:yaml.org,2002:timestamp
       tag:yaml.org,2002:map:HashWithIndifferentAccess
       tag:yaml.org,2002:map:ActiveSupport::HashWithIndifferentAccess
       tag:ruby.yaml.org,2002:object:OpenStruct
