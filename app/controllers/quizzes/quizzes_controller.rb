@@ -184,7 +184,9 @@ class Quizzes::QuizzesController < ApplicationController
 
       @just_graded = false
       if @submission && @submission.needs_grading?(!!params[:take])
-        Quizzes::SubmissionGrader.new(@submission).grade_submission(:finished_at => @submission.end_at)
+        Quizzes::SubmissionGrader.new(@submission).grade_submission(
+          finished_at: @submission.finished_at_fallback
+        )
         @submission.reload
         @just_graded = true
       end
@@ -589,7 +591,9 @@ class Quizzes::QuizzesController < ApplicationController
       @submission = nil if @submission && @submission.settings_only?
       @user = @submission && @submission.user
       if @submission && @submission.needs_grading?
-        Quizzes::SubmissionGrader.new(@submission).grade_submission(:finished_at => @submission.end_at)
+        Quizzes::SubmissionGrader.new(@submission).grade_submission(
+          finished_at: @submission.finished_at_fallback
+        )
         @submission.reload
       end
       setup_attachments

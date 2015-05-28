@@ -668,8 +668,6 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     end
 
-    # Make sure the submission gets graded when it becomes overdue (if applicable)
-    submission.grade_when_overdue if submission && submission.end_at && !preview
     submission
   end
 

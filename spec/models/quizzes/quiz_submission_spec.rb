@@ -85,6 +85,29 @@ describe Quizzes::QuizSubmission do
     end
   end
 
+  describe '#finished_at_fallback' do
+    it "should select the earlier time" do
+      Timecop.freeze(5.minutes.ago) do
+        now = Time.zone.now
+        later = now + 5.minutes
+        earlier = now - 5.minutes
+
+        subject.end_at = earlier
+        expect(subject.finished_at_fallback).to eq(earlier)
+
+        subject.end_at = later
+        expect(subject.finished_at_fallback).to eq(now)
+      end
+    end
+    it "should work with no end_at time" do
+      Timecop.freeze(5.minutes.ago) do
+        now = Time.zone.now
+        subject.end_at = nil
+        expect(subject.finished_at_fallback).to eq(now)
+      end
+    end
+  end
+
   it "should copy the quiz's points_possible whenever it's saved" do
     Quizzes::Quiz.where(:id => @quiz).update_all(:points_possible => 1.1)
     q = @quiz.quiz_submissions.create!

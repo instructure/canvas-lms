@@ -37,7 +37,7 @@ module Quizzes
         .needs_grading
         .each do |quiz_submission|
           Quizzes::SubmissionGrader.new(quiz_submission).grade_submission({
-            finished_at: quiz_submission.end_at
+            finished_at: quiz_submission.finished_at_fallback
           })
         end
     end
@@ -46,7 +46,7 @@ module Quizzes
       quiz_submissions = @quiz.quiz_submissions.where(id: quiz_submission_ids)
       quiz_submissions.select(&:needs_grading?).each do |quiz_submission|
         Quizzes::SubmissionGrader.new(quiz_submission).grade_submission({
-          finished_at: quiz_submission.end_at
+          finished_at: quiz_submission.finished_at_fallback
         })
       end
     end
