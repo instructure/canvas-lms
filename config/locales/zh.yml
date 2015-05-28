@@ -313,7 +313,7 @@ zh:
     report_header_enrollment_state: 注册状态
     report_header_final_score: 最终分数
     report_header_first_name: first_name
-    report_header_full_name: 全名
+    report_header_full_name: full_name
     report_header_group_id: group_id
     report_header_id: id
     report_header_last_access_at: 上次访问位置
@@ -339,7 +339,7 @@ zh:
     report_header_short__name: short_name
     report_header_short_name: 简称
     report_header_sis_id: "sis id"
-    report_header_sortable_name: 可排序名
+    report_header_sortable_name: sortable_name
     report_header_start__date: start_date
     report_header_start_date: 开始日期
     report_header_status: 状态
