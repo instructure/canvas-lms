@@ -218,7 +218,10 @@ define [
         @assignmentIsDueBeforeEndDate(a, latestEndDate)
 
     assignmentIsDueBeforeEndDate: (assignment, gradingPeriodEndDate) ->
-      new Date(assignment.due_at) <= gradingPeriodEndDate
+      if assignment.due_at
+        new Date(assignment.due_at) <= gradingPeriodEndDate
+      else
+        false
 
     onShow: ->
       $(".post-grades-placeholder").show();
