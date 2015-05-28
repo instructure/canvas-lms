@@ -98,7 +98,7 @@ class AssignmentGroupsApiController < ApplicationController
   #
   # Deletes the assignment group with the given id.
   #
-  # @argument move_assignment_to [String]
+  # @argument move_assignments_to [Integer]
   #   The ID of an active Assignment Group to which the assignments that are
   #   currently assigned to the destroyed Assignment Group will be assigned.
   #   NOTE: If this argument is not provided, any assignments in this Assignment
