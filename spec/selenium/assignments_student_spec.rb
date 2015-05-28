@@ -106,6 +106,28 @@ describe "assignments" do
       expect(f("#assignment_group_upcoming #assignment_#{due_date_assignment.id}")).to be_displayed
     end
 
+    it "should show assignment data if locked by due date or lock date" do
+      assignment = @course.assignments.create!(:name => 'locked assignment',
+                                               :due_at => 5.days.ago,
+                                               :lock_at => 3.days.ago)
+      driver.current_url
+      get "/courses/#{@course.id}/assignments/#{assignment.id}"
+      wait_for_ajaximations
+      expect(f('.submit_assignment_link')).to be_nil
+      expect(f(".student-assignment-overview")).to be_displayed
+    end
+
+
+    it "should still not show assignment data if locked by unlock date" do
+      assignment = @course.assignments.create!(:name => 'not unlocked assignment',
+                                               :due_at => 5.days.from_now,
+                                               :unlock_at => 3.days.from_now)
+      driver.current_url
+      get "/courses/#{@course.id}/assignments/#{assignment.id}"
+      wait_for_ajaximations
+      expect(f(".student-assignment-overview")).to be_nil
+    end
+
     context "overridden lock_at" do
       before :each do
         setup_sections_and_overrides_all_future
