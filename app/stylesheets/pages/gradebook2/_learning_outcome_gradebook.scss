@@ -17,7 +17,7 @@ $page-dark: #ebeff2;
   @else {
     color: #585e63;
     padding-bottom: 5px;
-    padding-top: 6px;  
+    padding-top: 6px;
   }
 }
 
@@ -29,7 +29,7 @@ $page-dark: #ebeff2;
     font-size: 14px;
     margin: $header-child-margin;
   }
-}  
+}
 
 
 /* page overrides */
@@ -179,7 +179,6 @@ $page-dark: #ebeff2;
 }
 
 .gradebook-header {
-  
   @if $use_new_styles {
     @include clearfix;
     padding: $ic-sp 0 $ic-sp/2;
@@ -188,7 +187,6 @@ $page-dark: #ebeff2;
     }
     .gradebook-navigation { margin-top: 3px; }
   }
-  
   .section-button-placeholder {
     position: relative;
     float: right;
@@ -197,9 +195,7 @@ $page-dark: #ebeff2;
       top: 1px;
       .section-select-button { padding: 3px 12px 3px 12px; }
     }
-    
   }
-
 }
 
 .gradebook-navigation {
@@ -363,7 +359,8 @@ $page-dark: #ebeff2;
 }
 
 .outcome-cell-wrapper {
-  text-align: center;
+  text-align: right;
+  padding-right: 10px;
 }
 
 .outcome-score {
