@@ -317,7 +317,7 @@ fr:
     report_header_enrollment_state: "État de l’inscription"
     report_header_final_score: "Résultat final"
     report_header_first_name: first_name
-    report_header_full_name: nom_complet
+    report_header_full_name: full_name
     report_header_group_id: group_id
     report_header_id: ID
     report_header_last_access_at: "Dernier accès le"
@@ -343,7 +343,7 @@ fr:
     report_header_short__name: short_name
     report_header_short_name: "Nom abrégé"
     report_header_sis_id: "ID SIS"
-    report_header_sortable_name: nom_triable
+    report_header_sortable_name: sortable_name
     report_header_start__date: start_date
     report_header_start_date: "Date de début"
     report_header_status: statut
