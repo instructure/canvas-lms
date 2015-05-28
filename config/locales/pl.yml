@@ -75,6 +75,10 @@ pl:
         api_key: "Klucz API"
         api_url: "Api Url"
         common_core_guid: "Podstawa Common Core (opcjonalnie)"
+  access_to_the_etherpad_collaborations_below_will_b_b6a0a288: |-
+      Dostęp do funkcji Etherpad zostanie zakończony z dniem 8 sierpnia 2015r. Jeśli chcesz zapisać tę zawartość, należy ją przenieść przed wskazaną datą.
+      
+      Instrukcje dotyczące sposobu tworzenia kolaboracji z Google, [kliknij tutaj](%{google_collab_help_url}).
   account: 
     ask_canvas_network: "Zapytaj społeczność sieci Canvas"
     default_account_name: "Konto domyślne"
@@ -138,15 +142,18 @@ pl:
       auth_url: "Adres URL logowania dla tej konfiguracji"
     index: 
       add_auth_desc: "Dodaj dostawcę tożsamości do tego konta:"
+      canvas_login_tip: "W przypadku konfigurowania ustawień, które powodują, że nie możesz się zalogować, możesz dodać  *%{url1}* na koniec swojego adresu url do logowania. To pozwoli ci się zaologować przy użyciu normalnej procedury logowania Canvas. Dla takiego konta adres url to %{url2}"
       choose_auth_type_option: "Wybierz usługę uwierzytelniania"
       current_settings_title: "Bieżąca integracja"
       delete_auth_confirmation: "Na pewno? Usunięcie tego elementu może uniemożliwić logowanie użytkownikom."
+      delete_auth_link: "Usuń wszystkie uwierzytelnienia"
       ip_address_list_description: "W przypadku korzystania z usługi uwierzytelniania wymagającej bezpośredniego połączenia serwerów Canvas z serwerem użytkownika (np. protokołu LDAP) należy upewnić się, że serwery przyjmują połączenia z następujących adresów IP:"
       no_auth_type_description: "Konto nie jest obecnie zintegrowane z żadnym dostawcą tożsamości."
       page_title: "Ustawienia uwierzytelniania"
       profile_page_link_example: "Oto przykładowa strona profilu użytkownika: [%{friendlyname}](%{url})"
       settings_description: "Aby użytkownik mógł zostać uwierzytelniony przez zewnętrznego dostawcę tożsamości (IdP), powinien posiadać identyfikator logowania połączony ze swoim kontem oraz odpowiadający unikatowemu identyfikatorowi wysyłanemu przez dostawcę IdP. Aby zobaczyć bieżące loginy użytkownika, przejdź do sekcji \"Informacje dot. logowania\" znajdującej się na stronie profilu użytkownika. (Odnaleziono przez wyszukiwanie użytkownika w zakładce \"Użytkownicy\")."
       settings_title: "Ustawienia uwierzytelniania"
+      test_ldap_link: "Sprawdź uwierzytelnienie LDAP"
     ldap_fields: 
       auth_filter_description: "Użyj *%{placeholder}* jako symbolu zastępczego dla nazwy użytkownika podanej przez użytkownika. Na przykład: *(sAMAccountName=%{placeholder})*"
       auth_password_description: "Pozostaw puste pole, aby zachować bieżące hasło."
@@ -210,6 +217,7 @@ pl:
     saml_settings_test: 
       refresh_debugging: Odśwież
       saml_debug_instructions: "Kiedy rozpoczniesz debugowanie wszystkich informacji o kolejnej próbie usiłowania logowania  SAML, informacje te będą zbierane. Kliknij Odśwież, aby zobaczyć, czy więcej danych zostało zebranych lub Stop Debuging, aby usunąć zgromadzone dane i zatrzymać bieżącą próbę debugowania."
+      saml_debugging: "Usuwanie błędów SAML"
       saml_required: "Konfiguracja SAML jest wymagana, aby testować SAML"
       start_debugging: "Rozpocznij debugowanie"
       stop_debugging: "Zatrzymaj debugowanie"
