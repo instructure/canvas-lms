@@ -318,7 +318,7 @@ de:
     report_header_enrollment_state: Einschreibungsstatus
     report_header_final_score: Gesamtpunktzahl
     report_header_first_name: first_name
-    report_header_full_name: vollständiger_Name
+    report_header_full_name: full_name
     report_header_group_id: group_id
     report_header_id: ID
     report_header_last_access_at: "letzter Zugriff am"
@@ -344,7 +344,7 @@ de:
     report_header_short__name: short_name
     report_header_short_name: Kurzbezeichnung
     report_header_sis_id: SIS-ID
-    report_header_sortable_name: sortierfähiger_Name
+    report_header_sortable_name: sortable_name
     report_header_start__date: start_date
     report_header_start_date: Startdatum
     report_header_status: Status
@@ -361,7 +361,7 @@ de:
     report_header_user__id: user_id
     report_header_user_id: Benutzer-ID
     report_header_user_name: Benutzername
-    report_header_user_short_name: kurzer_Name
+    report_header_user_short_name: short_name
     report_header_user_sis_id: "SIS-ID für Benutzer"
     report_header_xlist_course_id: xlist_course_id
     sis_exporter: 
