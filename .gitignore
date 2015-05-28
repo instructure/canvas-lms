@@ -31,7 +31,6 @@ Gemfile.lock3
 Gemfile.lock4
 /log/
 /node_modules
-/public/app/
 /public/assets/
 /public/doc/api/
 /public/javascripts/compiled/
