@@ -184,6 +184,8 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
       json = qs_api_index
       expect(json['quiz_submissions'].size).to eq 1
+      # checking for the new field added in JSON response as part of fix CNVS-19664
+      expect(json['quiz_submissions'].first["overdue_and_needs_submission"]).to eq false
     end
 
     it 'should be accessible by the owner student' do

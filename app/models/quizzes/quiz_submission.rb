@@ -261,6 +261,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     end
   end
 
+  alias_method :overdue_and_needs_submission, :needs_grading?
+
   def has_seen_results?
     !!self.has_seen_results
   end
