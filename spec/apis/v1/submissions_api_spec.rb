@@ -797,6 +797,7 @@ describe 'Submissions API', type: :request do
              'created_at' => sub1.attachments.first.reload.created_at.as_json,
              'updated_at' => sub1.attachments.first.updated_at.as_json,
              'preview_url' => nil,
+             'modified_at' => sub1.attachments.first.modified_at.as_json,
              'thumbnail_url' => sub1.attachments.first.thumbnail_url },
          ],
         "submission_history"=>
@@ -869,6 +870,7 @@ describe 'Submissions API', type: :request do
                 'created_at' => sub1.attachments.first.created_at.as_json,
                 'updated_at' => sub1.attachments.first.updated_at.as_json,
                 'preview_url' => nil,
+                'modified_at' => sub1.attachments.first.modified_at.as_json,
                 'thumbnail_url' => sub1.attachments.first.thumbnail_url },
             ],
            "body"=>"test!",
@@ -957,7 +959,8 @@ describe 'Submissions API', type: :request do
                'created_at' => sub2a1.created_at.as_json,
                'updated_at' => sub2a1.updated_at.as_json,
                'preview_url' => nil,
-               'thumbnail_url' => sub2a1.thumbnail_url
+               'thumbnail_url' => sub2a1.thumbnail_url,
+               'modified_at' => sub2a1.modified_at.as_json
               },
             ],
            "score"=>9,
@@ -985,6 +988,7 @@ describe 'Submissions API', type: :request do
            'updated_at' => sub2a1.updated_at.as_json,
            'preview_url' => nil,
            'thumbnail_url' => sub2a1.thumbnail_url,
+           'modified_at' => sub2a1.modified_at.as_json
           },
          ],
         "submission_comments"=>[],

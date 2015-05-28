@@ -796,7 +796,8 @@ describe ConversationsController, type: :request do
                                              'locked_for_user' => false,
                                              'hidden_for_user' => false,
                                              'created_at' => attachment.created_at.as_json,
-                                             'updated_at' => attachment.updated_at.as_json, 
+                                             'updated_at' => attachment.updated_at.as_json,
+                                             'modified_at' => attachment.updated_at.as_json,
                                              'thumbnail_url' => attachment.thumbnail_url }], "participating_user_ids" => [@me.id, @bob.id].sort
                   }
                 ]
@@ -978,7 +979,8 @@ describe ConversationsController, type: :request do
                 'hidden_for_user' => false,
                 'created_at' => attachment.created_at.as_json,
                 'updated_at' => attachment.updated_at.as_json,
-                'thumbnail_url' => attachment.thumbnail_url
+                'thumbnail_url' => attachment.thumbnail_url,
+                'modified_at' => attachment.updated_at.as_json
               }
             ],
             "participating_user_ids" => [@me.id, @bob.id].sort
