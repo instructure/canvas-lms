@@ -946,19 +946,38 @@ describe Course, "gradebook_to_csv" do
     expect(assignments).to eq ["Assignment 01", "Assignment 02"]
   end
 
-  it "should alphabetize by sortable name with the test student at the end" do
-    course
-    ["Ned Ned", "Zed Zed", "Aardvark Aardvark"].each{|name| student_in_course(:name => name)}
-    test_student_enrollment = student_in_course(:name => "Test Student")
-    test_student_enrollment.type = "StudentViewEnrollment"
-    test_student_enrollment.save!
+  context "sort order" do
+    before :once do
+      course
+      _, zed, _ = ["Ned Ned", "Zed Zed", "Aardvark Aardvark"].map { |name|
+        student_in_course(:name => name)
+        @student
+      }
+      zed.update_attribute :sortable_name, "aaaaaa zed"
 
-    csv = @course.gradebook_to_csv
-    rows = CSV.parse(csv)
-    expect([rows[2][0],
-     rows[3][0],
-     rows[4][0],
-     rows[5][0]]).to eq ["Aardvark, Aardvark", "Ned, Ned", "Zed, Zed", "Student, Test"]
+      test_student_enrollment = student_in_course(:name => "Test Student")
+      test_student_enrollment.type = "StudentViewEnrollment"
+      test_student_enrollment.save!
+    end
+
+    it "should alphabetize by sortable name with the test student at the end" do
+      csv = @course.gradebook_to_csv
+      rows = CSV.parse(csv)
+      expect([rows[2][0],
+       rows[3][0],
+       rows[4][0],
+       rows[5][0]]).to eq ["Zed Zed", "Aardvark Aardvark", "Ned Ned", "Test Student"]
+    end
+
+    it "can show students by sortable name" do
+      @course.enable_feature! :gradebook_list_students_by_sortable_name
+      csv = @course.gradebook_to_csv
+      rows = CSV.parse(csv)
+      expect([rows[2][0],
+       rows[3][0],
+       rows[4][0],
+       rows[5][0]]).to eq ["aaaaaa zed", "Aardvark, Aardvark", "Ned, Ned", "Student, Test"]
+    end
   end
 
   it "should include all section names in alphabetical order" do

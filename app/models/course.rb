@@ -1579,6 +1579,8 @@ class Course < ActiveRecord::Base
       row << read_only if self.grading_standard_enabled?
       csv << row
 
+      name_method = list_students_by_sortable_name? ?  :sortable_name : :name
+
       student_enrollments.each_slice(100) do |student_enrollments_batch|
 
         if da_enabled = feature_enabled?(:differentiated_assignments)
@@ -1598,8 +1600,7 @@ class Course < ActiveRecord::Base
                 submission.try(:score)
             end
           end
-          #Last Row
-          row = [student.last_name_first, student.id]
+          row = [student.send(name_method), student.id]
           if options[:include_sis_id]
             pseudonym = student.sis_pseudonym_for(self.root_account, include_root_account)
             row << pseudonym.try(:sis_user_id)
@@ -2873,5 +2874,9 @@ class Course < ActiveRecord::Base
       self.wiki.touch
       self.wiki.wiki_pages.update_all(:updated_at => Time.now.utc)
     end
+  end
+
+  def list_students_by_sortable_name?
+    feature_enabled?(:gradebook_list_students_by_sortable_name)
   end
 end
