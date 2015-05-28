@@ -3,17 +3,88 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 describe "gradebook2" do
   include_examples "in-process server selenium tests"
 
-  context "as a teacher" do
-    before(:each) do
-      gradebook_data_setup
+  describe "multiple grading periods" do
+    let!(:enable_mgp_and_navigate_to_gradebook) do
+      course_with_admin_logged_in
+      student_in_course
+      @course.root_account.enable_feature!(:multiple_grading_periods)
+      group = @course.root_account.grading_period_groups.create
+      group.grading_periods.create  start_date: 4.months.ago,
+                                    end_date:   2.months.ago,
+                                    title: "Period in the Past"
+      group.grading_periods.create  start_date: 1.month.ago,
+                                    end_date:   2.months.from_now,
+                                    title: "Current Period"
     end
 
-    it "should load the gradebook when the multiple grading periods feature is enabled and no grading periods have been created" do
-      @course.root_account.enable_feature!(:multiple_grading_periods)
+    let(:select_period_in_the_past) do
+      f(".grading-period-select-button").click
+      f("#ui-id-4").click # The id of the Period in the Past
+    end
+
+    let(:sign_in_as_a_teacher) do
+      teacher_in_course
+      user_session(@teacher)
+    end
+
+    let(:uneditable_cells) { f('.cannot_edit') }
+    let(:gradebook_header) { f('#gradebook_grid .container_1 .slick-header') }
+
+    it "should load gradebook when no grading periods have been created" do
       get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
       expect(f('#gradebook-grid-wrapper')).to be_displayed
     end
+
+    context "assignments in past grading periods" do
+      let!(:assignment_in_the_past) do
+        @course.assignments.create! due_at: 3.months.ago,
+                                    title: "past-due assignment"
+      end
+
+      it "admins should be able to edit" do
+        get "/courses/#{@course.id}/gradebook2"
+
+        select_period_in_the_past
+        expect(gradebook_header).to include_text("past-due assignment")
+        expect(uneditable_cells).to_not be_present
+      end
+
+      it "teachers should not be able to edit" do
+        sign_in_as_a_teacher
+
+        get "/courses/#{@course.id}/gradebook2"
+
+        select_period_in_the_past
+        expect(gradebook_header).to include_text("past-due assignment")
+        expect(uneditable_cells).to be_present
+      end
+    end
+
+    context "assignments with no due_at" do
+      let!(:assignment_without_due_at) do
+        @course.assignments.create! title: "No Due Date"
+      end
+
+      it "admins should be able to edit" do
+        get "/courses/#{@course.id}/gradebook2"
+
+        expect(gradebook_header).to include_text("No Due Date")
+        expect(uneditable_cells).to_not be_present
+      end
+
+      it "teachers should be able to edit" do
+        sign_in_as_a_teacher
+
+        get "/courses/#{@course.id}/gradebook2"
+
+        expect(gradebook_header).to include_text("No Due Date")
+        expect(uneditable_cells).to_not be_present
+      end
+    end
+  end
+
+  context "as a teacher" do
+    let!(:setup) { gradebook_data_setup }
 
     it "hides unpublished/shows published assignments" do
       assignment = @course.assignments.create! title: 'unpublished'
