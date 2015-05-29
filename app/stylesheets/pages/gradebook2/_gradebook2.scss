@@ -688,6 +688,16 @@ $gradebook_checkbox_width: 16px;
   }
 }
 
+.post-grades-menu {
+  li.external-tools-dialog,
+  li.post-grades-placeholder {
+    cursor: pointer;
+  }
+  li.external-tools-dialog.ellip {
+    cursor: default;
+  }
+}
+
 #export_progress {
   background-color: gray;
   width: 100px;

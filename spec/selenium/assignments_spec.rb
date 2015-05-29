@@ -505,5 +505,54 @@ describe "assignments" do
         end
       end
     end
+
+    context 'save to sis' do
+      def create_post_grades_tool(opts = {})
+        post_grades_tool = @course.context_external_tools.create!(
+          name: opts[:name] || 'test tool',
+          domain: 'example.com',
+          url: 'http://example.com/lti',
+          consumer_key: 'key',
+          shared_secret: 'secret',
+          settings: {
+            post_grades: {
+              url: 'http://example.com/lti/post_grades'
+            }
+          }
+        )
+        post_grades_tool.context_external_tool_placements.create!(placement_type: 'post_grades')
+        post_grades_tool
+      end
+
+      it 'should not show when no passback configured' do
+        get "/courses/#{@course.id}/assignments/new"
+        wait_for_ajaximations
+        expect(f('#assignment_post_to_sis')).to be_nil
+      end
+
+      it 'should show when powerschool is enabled' do
+        Account.default.set_feature_flag!('post_grades', 'on')
+        @course.sis_source_id = 'xyz'
+        @course.save
+
+        get "/courses/#{@course.id}/assignments/new"
+        wait_for_ajaximations
+        expect(f('#assignment_post_to_sis')).to_not be_nil
+      end
+
+      it 'should show when post_grades lti tool installed' do
+        Account.default.set_feature_flag!('post_grades', 'off')
+
+        get "/courses/#{@course.id}/assignments/new"
+        wait_for_ajaximations
+        expect(f('#assignment_post_to_sis')).to be_nil
+
+        create_post_grades_tool
+
+        get "/courses/#{@course.id}/assignments/new"
+        wait_for_ajaximations
+        expect(f('#assignment_post_to_sis')).to_not be_nil
+      end
+    end
   end
 end

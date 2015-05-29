@@ -8,6 +8,23 @@ describe SisApiController, type: :request do
       @account.enable_feature!(:bulk_sis_grade_export)
     end
 
+    def create_post_grades_tool(opts = {})
+      post_grades_tool = @account.context_external_tools.create!(
+        name: opts[:name] || 'test tool',
+        domain: 'example.com',
+        url: 'http://example.com/lti',
+        consumer_key: 'key',
+        shared_secret: 'secret',
+        settings: {
+          post_grades: {
+            url: 'http://example.com/lti/post_grades'
+          }
+        }
+      )
+      post_grades_tool.context_external_tool_placements.create!(placement_type: 'post_grades')
+      post_grades_tool
+    end
+
     before :each do
       user_session(@user)
     end
@@ -27,6 +44,14 @@ describe SisApiController, type: :request do
 
       expect(response.status).to eq 400
       expect(json_parse['error']).to include("feature not on")
+    end
+
+    it "should be allowed if post_grades lti tool installed" do
+      @account.disable_feature!(:bulk_sis_grade_export)
+      create_post_grades_tool
+
+      get "/api/sis/grade_export/accounts/#{@account.id}/assignments", :account_id => @account.id
+      expect(response).to be_success
     end
 
     it "should return assignments with post_to_sis marked" do

@@ -925,5 +925,119 @@ describe "gradebook2" do
       get "/courses/#{@course.id}/gradebook2"
       expect(ff('.post-grades-placeholder').length).to eq 1
     end
+
+    it "should not be displayed if viewing outcome gradebook" do
+      Account.default.set_feature_flag!('post_grades', 'on')
+      Account.default.set_feature_flag!('outcome_gradebook', 'on')
+
+      get "/courses/#{@course.id}/gradebook2"
+
+      f('a[data-id=outcome]').click
+      wait_for_ajaximations
+      expect(f('.post-grades-placeholder')).not_to be_displayed
+
+      f('a[data-id=assignment]').click
+      wait_for_ajaximations
+
+      expect(f('.post-grades-placeholder')).to be_displayed
+    end
+
+    it "should display post grades button when powerschool is configured" do
+      Account.default.set_feature_flag!('post_grades', 'on')
+      @course.sis_source_id = 'xyz'
+      @course.save
+      @assignment.post_to_sis = true
+      @assignment.save
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+      expect(f('.post-grades-placeholder > button')).to be_displayed
+      f('.post-grades-placeholder > button').click
+      wait_for_ajaximations
+      expect(f('.post-grades-dialog')).to be_displayed
+    end
+
+    context 'post grades button' do
+      def create_post_grades_tool(opts={})
+        post_grades_tool = @course.context_external_tools.create!(
+          name: opts[:name] || 'test tool',
+          domain: 'example.com',
+          url: 'http://example.com/lti',
+          consumer_key: 'key',
+          shared_secret: 'secret',
+          settings: {
+            post_grades: {
+              url: 'http://example.com/lti/post_grades'
+            }
+          }
+        )
+        post_grades_tool.context_external_tool_placements.create!(placement_type: 'post_grades')
+        post_grades_tool
+      end
+
+      it "should show when a post_grades lti tool is installed" do
+        create_post_grades_tool
+
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+        expect(f('button.external-tools-dialog')).to be_displayed
+        f('button.external-tools-dialog').click
+        wait_for_ajaximations
+        expect(f('iframe.post-grades-frame')).to be_displayed
+      end
+
+      it "should show as drop down menu when multiple tools are installed" do
+        (0...10).each do |i|
+          create_post_grades_tool(name: "test tool #{i}")
+        end
+
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+        expect(ff('li.external-tools-dialog').count).to eq(10)
+        f('button#post_grades').click
+        wait_for_ajaximations
+        ff('li.external-tools-dialog > a').first.click
+        wait_for_ajaximations
+        expect(f('iframe.post-grades-frame')).to be_displayed
+      end
+
+      it "should show as drop down menu with an ellipsis when too many tools are installed" do
+        (0...11).each do |i|
+          create_post_grades_tool(name: "test tool #{i}")
+        end
+
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+        expect(ff('li.external-tools-dialog').count).to eq(11)
+        # check for ellipsis (we only display top 10 added tools)
+        expect(ff('li.external-tools-dialog.ellip').count).to eq(1)
+      end
+
+      it "should show as drop down menu when powerschool is configured and an lti tool is installed" do
+        Account.default.set_feature_flag!('post_grades', 'on')
+        @course.sis_source_id = 'xyz'
+        @course.save
+        @assignment.post_to_sis = true
+        @assignment.save
+
+        create_post_grades_tool
+
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+        expect(f('li.post-grades-placeholder > a')).to be_present
+        expect(f('li.external-tools-dialog')).to be_present
+
+        f('button#post_grades').click
+        wait_for_ajaximations
+        f('li.post-grades-placeholder > a').click
+        wait_for_ajaximations
+        expect(f('.post-grades-dialog')).to be_displayed
+
+        f('button#post_grades').click
+        wait_for_ajaximations
+        ff('li.external-tools-dialog > a').first.click
+        wait_for_ajaximations
+        expect(f('iframe.post-grades-frame')).to be_displayed
+      end
+    end
   end
 end

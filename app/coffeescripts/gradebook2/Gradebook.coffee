@@ -20,6 +20,7 @@ define [
   'compiled/SubmissionDetailsDialog'
   'compiled/gradebook2/AssignmentGroupWeightsDialog'
   'compiled/gradebook2/GradeDisplayWarningDialog'
+  'compiled/gradebook2/PostGradesFrameDialog'
   'compiled/gradebook2/SubmissionCell'
   'compiled/gradebook2/GradebookHeaderMenu'
   'compiled/util/NumberCompare'
@@ -39,6 +40,7 @@ define [
   'jqueryui/dialog'
   'jqueryui/tooltip'
   'compiled/behaviors/tooltip'
+  'compiled/behaviors/activate'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
@@ -48,7 +50,7 @@ define [
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
 ], (React, LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS,
-  $, _, Backbone, tz, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog,
+  $, _, Backbone, tz, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, PostGradesFrameDialog,
   SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, PostGradesStore, PostGradesApp, columnHeaderTemplate,
   groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav) ->
 
@@ -116,6 +118,13 @@ define [
       , $.ajaxJSON(@options.assignment_groups_url, "GET", assignmentGroupsParams, @gotAssignmentGroups)
       , $.ajaxJSON( @options.sections_url, "GET", {}, @gotSections)
       ]
+
+      $('li.external-tools-dialog > a[data-url], button.external-tools-dialog').on 'click keyclick', (event) ->
+        postGradesDialog = new PostGradesFrameDialog({
+          returnFocusTo: $('#post_grades'),
+          baseUrl: $(event.target).attr('data-url')
+        })
+        postGradesDialog.open()
 
       if(@options.post_grades_feature_enabled)
         ajax_calls.push($.ajaxJSON( @options.course_url, "GET", {}, @gotCourse))
@@ -917,9 +926,13 @@ define [
 
 
     showPostGradesButton: ->
-      app = new PostGradesApp store: @postGradesStore
       $placeholder = $('.post-grades-placeholder')
-      if ($placeholder.length > 0)
+      if $placeholder.length > 0
+        app = new PostGradesApp
+          store: @postGradesStore
+          renderAsButton: !$placeholder.hasClass('in-menu')
+          labelText: if $placeholder.hasClass('in-menu') then I18n.t 'PowerSchool' else I18n.t 'Post Grades',
+          returnFocusTo: $('#post_grades')
         React.renderComponent(app, $placeholder[0])
 
     initHeader: =>
@@ -951,6 +964,7 @@ define [
 
       $('#gradebook_settings').kyleMenu()
       $('#download_csv').kyleMenu()
+      $('#post_grades').kyleMenu()
 
       $settingsMenu.find('.student_names_toggle').click(@studentNamesToggle)
 

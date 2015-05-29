@@ -150,6 +150,7 @@ class GradebooksController < ApplicationController
       @last_exported_gradebook_csv = @context.gradebook_csvs.where(user_id: @current_user).first
       set_current_grading_period if multiple_grading_periods?
       set_js_env
+      @external_tools = external_tools
       case @current_user.preferred_gradebook_version
       when "2"
         render :gradebook2
@@ -163,6 +164,39 @@ class GradebooksController < ApplicationController
 
   def gradebook2
     redirect_to action: :show
+  end
+
+  def external_tools
+    bookmarked_collection = Lti::AppLaunchCollator.bookmarked_collection(@context, [:post_grades])
+    tools = bookmarked_collection.paginate(per_page: 10 + 1).to_a # one more than a full page
+    launch_definitions = Lti::AppLaunchCollator.launch_definitions(tools, [:post_grades])
+    launch_definitions.each do |launch_definition|
+      case launch_definition[:definition_type]
+      when 'ContextExternalTool'
+        url = external_tool_url_for_lti1(launch_definition)
+      when 'MessageHandler'
+        url = external_tool_url_for_lti2(launch_definition)
+      end
+      launch_definition[:placements][:post_grades][:canvas_launch_url] = url
+    end
+    launch_definitions
+  end
+
+  def external_tool_url_for_lti1(launch_definition)
+    polymorphic_url(
+      [@context, :external_tool],
+      id: launch_definition[:definition_id],
+      display: 'borderless',
+      launch_type: 'post_grades',
+    )
+  end
+
+  def external_tool_url_for_lti2(launch_definition)
+    polymorphic_url(
+      [@context, :basic_lti_launch_request],
+      message_handler_id: launch_definition[:definition_id],
+      display: 'borderless',
+    )
   end
 
   def set_current_grading_period

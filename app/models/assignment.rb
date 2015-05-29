@@ -1981,6 +1981,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.show_sis_grade_export_option?(context)
-    context.feature_enabled?(:post_grades) || context.root_account.feature_enabled?(:bulk_sis_grade_export)
+    context.feature_enabled?(:post_grades) ||
+      context.root_account.feature_enabled?(:bulk_sis_grade_export) ||
+      Lti::AppLaunchCollator.any?(context, [:post_grades])
   end
 end

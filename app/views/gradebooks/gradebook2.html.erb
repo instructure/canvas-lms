@@ -46,10 +46,28 @@
         <input type="text" class="search-query" placeholder="<%= placeholder %>" aria-label="<%= placeholder %>">
       </div>
       <div class="gradebook_menu">
-        <% if @context.feature_enabled?(:post_grades) %>
-          <div class="post-grades-placeholder"></div>
-        <% end %>
         <span class="ui-buttonset">
+
+          <% if @external_tools and @external_tools.any? and (@external_tools.length > 1 or @context.feature_enabled?(:post_grades)) %>
+            <button id="post_grades" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><%= t('Post Grades') %></button>
+            <ul style="display: none;" class="post-grades-menu ui-kyle-menu">
+              <% external_tool_limit = @context.feature_enabled?(:post_grades) ? 9 : 10 %>
+              <% @external_tools[0...external_tool_limit].each do |tool| %>
+                <li class="external-tools-dialog"><a aria-controls="post_grades_frame_dialog" role="button" data-url="<%= tool[:placements][:post_grades][:canvas_launch_url]%>"><%= tool[:name]%></a></li>
+              <% end %>
+              <% if @context.feature_enabled?(:post_grades) %>
+                <li class="post-grades-placeholder in-menu"></li>
+              <% end %>
+              <% if @external_tools.length > external_tool_limit %>
+                <li class="external-tools-dialog ellip"><a>&hellip;</a></li>
+              <% end %>
+            </ul>
+          <% elsif @external_tools and @external_tools.any? and @external_tools.length == 1 %>
+            <button class="external-tools-dialog ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" data-url="<%= @external_tools[0][:placements][:post_grades][:canvas_launch_url]%>"><%= @external_tools[0][:name]%></button>
+          <% elsif @context.feature_enabled?(:post_grades )%>
+            <span class="post-grades-placeholder"></span>
+          <% end %>
+
           <% if @gradebook_is_editable && @context.allows_gradebook_uploads? %>
             <%= link_to(new_course_gradebook_upload_path(@context), class: "ui-button") do %>
               <i class="icon-import"></i>
