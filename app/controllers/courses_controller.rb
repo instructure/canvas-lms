@@ -2195,14 +2195,13 @@ class CoursesController < ApplicationController
       # but first, remove all existing quiz submissions / submissions
 
       AssessmentRequest.for_assessee(@fake_student).destroy_all
-      @fake_student.quiz_submissions.destroy_all
 
-      fake_submissions = @fake_student.submissions
       @fake_student.destroy
 
       # destroy these after enrollment so
       # needs_grading_count callbacks work
-      fake_submissions.destroy_all
+      @fake_student.submissions.destroy_all
+      @fake_student.quiz_submissions.destroy_all
 
       flash[:notice] = t('notices.reset_test_student', "The test student has been reset successfully.")
       enter_student_view
