@@ -12,7 +12,7 @@ module AttachmentFu # :nodoc:
         # Yields a block containing an MiniMagick Image for the given binary data.
         def with_image(file, &block)
           begin
-            binary_data = file.is_a?(MiniMagick::Image) ? file : MiniMagick::Image.from_file(file) unless !Object.const_defined?(:MiniMagick)
+            binary_data = file.is_a?(MiniMagick::Image) ? file : MiniMagick::Image.open(file) unless !Object.const_defined?(:MiniMagick)
           rescue
             # Log the failure to load the image.
             logger.debug("Exception working with image: #{$!}")
@@ -43,10 +43,10 @@ module AttachmentFu # :nodoc:
           commands.strip unless attachment_options[:keep_profile]
 
           # gif are not handled correct, this is a hack, but it seems to work.
-          if img.output =~ / GIF /
+          if img[:format] =~ /GIF/
             img.format("png")
-          end           
-          
+          end
+
           if size.is_a?(Fixnum) || (size.is_a?(Array) && size.first.is_a?(Fixnum))
             if size.is_a?(Fixnum)
               size = [size, size]

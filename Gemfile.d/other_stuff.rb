@@ -58,9 +58,7 @@ gem 'mail', '2.5.4', require: false
     gem 'polyglot', '0.3.5', require: false
 gem 'marginalia', '1.3.0', require: false
 gem 'mime-types', '1.17.2', require: 'mime/types'
-# attachment_fu (even the current technoweenie one on github) does not work
-# with mini_magick 3.1
-gem 'mini_magick', '1.3.2'
+gem 'mini_magick', '4.2.7'
   gem 'subexec', '0.0.4', require: false
 gem 'multi_json', '1.10.1'
 gem 'netaddr', '1.5.0', require: false
