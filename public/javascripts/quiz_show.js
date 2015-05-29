@@ -37,7 +37,9 @@ define([
 
 
   $(document).ready(function () {
-    QuizLogAuditingEventDumper(true);
+    if(ENV.QUIZ_SUBMISSION_EVENTS_URL) {
+      QuizLogAuditingEventDumper(true);
+    }
 
     function ensureStudentsLoaded(callback) {
       if ($('#quiz_details').length) {

@@ -756,10 +756,10 @@ define([
         $timer.text($timeRunningTimeRemaining.text());
       }
     });
-    if(location.href.indexOf("preview=1") == -1){
+    if(ENV.QUIZ_SUBMISSION_EVENTS_URL) {
       QuizLogAuditing.start();
+      QuizLogAuditingEventDumper(false);
     }
-    QuizLogAuditingEventDumper(false);
   });
 
   $('.essay_question .answers').before((new KeyboardShortcuts()).render().el);
