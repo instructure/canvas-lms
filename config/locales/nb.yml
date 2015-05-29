@@ -7274,6 +7274,7 @@ nb:
       Som standard vil Canvas primært forsøke Flash til å spille av videoer. Slå på dette for å sette HTML5 som primæralternativ,
       for deretter å falle tilbake til Flash.
   html_editor_fb2ab713: HTML-redigering
+  i_agree_to_the_terms_of_use_and_privacy_policy_f41760cc: "Jeg godtar *bruksvilkår* og **personvern**."
   i_have_obtained_permission_to_use_this_file_6386f087: "Jeg har fått tillatelse til å bruke denne filen."
   i_hold_the_copyright_71ee91b1: "Jeg har opphavsretten"
   ic_actions: 
