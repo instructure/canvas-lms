@@ -113,9 +113,9 @@ ru:
     default_delegated_login_handle_name: Вход
     default_login_handle_name: "Электронная почта"
   account_authorization_config/ldap: 
-    test_bind_failed: "Ошибка связывания: %{error}"
-    test_connection_timeout: "Тайм-аут соединения"
-    test_host_unknown: "Неизвестный узел: %{host}"
+    test_bind_failed: "Не удалось связать из-за следующей ошибки: %{error}"
+    test_connection_timeout: "Тайм-аут при подключении"
+    test_host_unknown: "Неизвестный хост: %{host}"
     test_login_auth_exception: "Исключение при входе в систему: %{error}"
     test_login_auth_failed: "Сбой аутентификации"
     test_search_failed: "Ошибка поиска, получена следующая ошибка: %{error}"
@@ -130,7 +130,7 @@ ru:
       labels: 
         auth_base: "URL-адрес CAS"
         unknown_user_url: "Url-адрес неизвестного пользователя"
-      unknown_user_url_description: "Url-адрес для переадресации, когда аутентифицированный пользователь не найден в системе Canvas."
+      unknown_user_url_description: "Url-адрес для переадресации, если аутентифицированный пользователь не найден в системе Canvas."
     form_footer: 
       labels: 
         position: Позиция
@@ -151,12 +151,12 @@ ru:
       settings_title: "Настройки аутентификации"
     ldap_fields: 
       auth_filter_description: "Используйте *%{placeholder}* в качестве заполнителя для имени пользователя, указанного пользователем. Например: *(sAMAccountName=%{placeholder})*"
-      auth_password_description: "Оставьте пустым для настройки с использованием текущего пароля."
+      auth_password_description: "Оставьте пустым для продолжения использования текущего пароля."
       identifer_format_description: "Атрибут LDAP используется для поиска входа в систему Canvas. Не заполняйте, чтобы использовать имя пользователя, предоставленное пользователем."
       labels: 
         auth_base: "Базовая система"
         auth_filter: Фильтр
-        auth_host: Узел
+        auth_host: Хост
         auth_over_tls: "Через TLS?"
         auth_over_tls_false: "Отсутствует TLS"
         auth_over_tls_simple_tls: "Простой TLS"
@@ -165,7 +165,7 @@ ru:
         auth_port: Порт
         auth_username: "Имя пользователя"
         identifier_format: "Атрибут идентификатора входа"
-      last_ldap_timeout_failure: "Последняя неудача из-за истечения времени"
+      last_ldap_timeout_failure: "Последняя ошибка таймаута"
       ldap_timeout_failure_help2: "Если Canvas слишком часто прерывает соединение с LDAP-сервером, он будет блокировать дальнейшие попытки входа в систему с использованием LDAP-сервера в течение %{time}."
     ldap_settings_test: 
       labels: 
@@ -207,12 +207,12 @@ ru:
         login_attribute: "Атрибуты входа в систему"
         requested_authn_context: "Проверка подлинности контекста"
         unknown_user_url: "Url-адрес неизвестного пользователя"
-      unknown_user_url_description: "Url-адрес для переадресации, когда аутентифицированный пользователь не найден в системе Canvas."
+      unknown_user_url_description: "Url-адрес для переадресации, если аутентифицированный пользователь не найден в системе Canvas."
     saml_required: "Конфигурация SAML необходима для тестрирования SAML"
     saml_settings_test: 
       refresh_debugging: Обновить
-      saml_debug_instructions: "Как только вы начинаете отладку всей информации о следующем, неудачная SAML попытка вхождения в систему будет собрана. Нажмите кнопку \"Обновить\", чтобы увидеть, если больше данных было собрано или \"Остановить отладку\", чтобы удалить собранные данные и оставновить текущую попытку отладки. "
-      saml_required: "SAML конфигурация необходима для тестрирования "
+      saml_debug_instructions: "Как только вы начинаете отладку всей информации о следующей неудачной SAML попытке входа в систему, эта попытка попадет в данные. Нажмите кнопку \"Обновить\", чтобы увидеть, если большее количество данных было собрано или \"Остановить отладку\", чтобы удалить собранные данные и оставновить текущую попытку отладки. "
+      saml_required: "SAML конфигурация необходима для тестирования SAML"
       start_debugging: "Начать отладку"
       stop_debugging: "Остановить отладку"
     saml_testing: 
@@ -2732,7 +2732,7 @@ ru:
   canvas_cartridge_display: "Общий картридж Canvas"
   canvas_cartridge_file_description: "Пакет экспорта курса Canvas"
   canvas_cartridge_name: "Импортер Canvas Cartridge"
-  canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas не удалось распознать вашего поставщика идентификации"
+  canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas не удалось распознать провайдера вашей идентификации"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "В Canvas отсутствует учетная запись для пользователя: %{user}"
   canvas_error_report_ff678539: "Отчет об ошибках Canvas"
   canvas_revision_unknown: Неизвестно
@@ -4069,7 +4069,7 @@ ru:
       wiki_id: "Идентификатор вики"
       workflow_state: "Состояние рабочего процесса"
   course_members_are_free_to_join_9b2603d4: "Члены курса могут вступать свободно"
-  course_navigation_dd035109: "Навигация курса"
+  course_navigation_dd035109: "Навигация по курсу"
   course_restore: 
     restore_error: "Произошла ошибка при попытке восстановить курс. Курс не был восстановлен."
   course_search: 
