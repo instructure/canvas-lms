@@ -21,8 +21,9 @@ gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
 gem 'switchman', '1.2.37'
-gem 'folio-pagination', '0.0.7', require: 'folio/rails'
-gem 'will_paginate', '3.0.4', require: false
+gem 'folio-pagination', '0.0.9', require: 'folio/rails'
+  # for folio, see the folio README
+  gem 'will_paginate', '3.0.7', require: false
 
 gem "after_transaction_commit", '1.0.1'
 gem "aws-sdk", '1.63.0', require: false
