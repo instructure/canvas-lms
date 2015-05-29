@@ -251,10 +251,12 @@ pl:
       logout_response_from_idp: "LogoutResponse from IdP"
     sso_settings_form: 
       change_password_url_help: "Pozostaw puste w przypadku domyślnych ustawień programu Canvas"
+      discovery_url_description: "Jeśli ustawione jest discovery url, canvas wyśle wszystkich użytkowników do podanego adresu URL w celu uwierzytelnienia. Ta strona będzie musiała następnie pomóc użytkownikowi dotrzeć do panelu logowania. Jesli discovery url nie zostało skonfigurowane, pierwsza konfiguracja zostanie wykorzystana w celu próby uwierzytelnienia użytkownika."
       labels: 
         change_password_url: "Adres URL, gdy użytkownik nie pamięta hasła"
         login_handle_name: "Etykieta logowania"
       login_handle_name_description: "Etykieta używana do unikatowych identyfikatorów logowania. Przykłady: Login, nazwa użytkownika, identyfikator uczestnika itp."
+  account_navigation_80bbefd4: "Nawigacja konta"
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "Czas zakończenia powiadomienia konta jest wcześniejszy od czasu rozpoczęcia"
@@ -318,6 +320,7 @@ pl:
     report_header_enrollment_state: "stan zapisu"
     report_header_final_score: "wynik końcowy"
     report_header_first_name: pierwszę_imię
+    report_header_full_name: full_name
     report_header_group_id: identyfikator_grupy
     report_header_id: identyfikator
     report_header_last_access_at: "ostatni dostęp o"
@@ -343,6 +346,7 @@ pl:
     report_header_short__name: krótka_nazwa
     report_header_short_name: "krótka nazwa"
     report_header_sis_id: "identyfikator systemu sis"
+    report_header_sortable_name: sortable_name
     report_header_start__date: data_rozpoczęcia
     report_header_start_date: "data rozpoczęcia"
     report_header_status: status
@@ -1261,6 +1265,7 @@ pl:
     add_quiz_to: "Dodaj testy do modułu %{module}"
     add_topic_to: "Dodaj tematy dyskusji do modułu %{module}"
   add_new_group_7ac49f31: "Dodaj nową grupę"
+  add_new_set_of_due_dates_e8e240f: "Dodaj nowy zestaw terminów"
   add_students_to_the_course_874be8fb: "Dodaj uczestników do kursu"
   add_tas_to_the_course_2aac6e02: "Dodaj asystentów do kursu"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Dodaj swoje zadania. Możesz po prostu utworzyć długą listę albo podzielić je na grupy, a nawet określić wagi dla każdej grupy zadań."
@@ -1402,6 +1407,7 @@ pl:
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Po ostatnim podejściu zostaną pokazane odpowiedzi"
   api_url_3ee7cb0a: "API URL"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "Centrum aplikacji zostanie wyświetlone w zakładce „Aplikacje” znajdującej się na stronie ustawień kursu lub konta. Adres URL podany poniżej powinien wskazywać ważny punkt końcowy Centrum aplikacji (na przykład %{url} — należy pominąć ukośnik kończący"
+  app_placements_6d877225: "Umieszczenie aplikacji"
   apple_touch_icon_2c258bb3: "Ikona dotykowa Apple"
   application: 
     errors: 
@@ -1462,6 +1468,7 @@ pl:
     update: Aktualizuj
   archive_3f794d7e: Archiwum
   archive_selected_d64506ca: "Wybrane Archiwum"
+  are_you_sure_26795d3c: "Czy jesteś pewien?"
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     few: "Czy na pewno chcesz usunąć te %{count} elementy?"
     one: "Czy na pewno chcesz usunąć %{name}?"
@@ -1475,12 +1482,14 @@ pl:
   aria_labels: 
     unlock_at_date: "Odblokuj w dniu"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Podczas uzupełniania tego pola lista grup będzie automatycznie filtrowana i zostaną pokazane jedynie nazwy odpowiadające wpisowi."
+  as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "Podczas wpisywania w tym polu, lista wyników będzie automatycznie aktualizowana."
   assessment_question: 
     default_question_name: Pytanie
   assessment_question_bank: 
     default_imported_title: "Zaimportowane pytania"
     default_title: "Brak nazwy — %{course}"
     default_unfiled_title: "Nieprzyporządkowane pytania"
+  assign_eedf72bb: Przydziel
   assign_reviews_on_date_7e48ec50: "Przypisz recenzje w dniu"
   assignment: 
     assignment_group_must_have_group: "Wybierz grupę przypisania do tego zadania"
@@ -1554,6 +1563,7 @@ pl:
   assignment_groups_api: 
     errors: 
       frozen_assignments_error: "Nie możesz usunąć grupy z zablokowanym zadaniem."
+  assignment_menu_91fe3716: "Menu zadań"
   assignment_muter: 
     mute_assignment: "Ukryj zadanie"
     muting_assignment: "Ukrywanie zadania"
@@ -2011,6 +2021,7 @@ pl:
       advanced_turnitin_settings: "Ustawienia zaawansowane programu Turnitin"
       descriptions: 
         allowed_extensions: "Wprowadź listę dozwolonych rozszerzeń, na przykład: .doc, .xls, .txt"
+      external_tool_group_warning: "Zadania grupowe mogą wykorzystywać Narzędzia zewnętrzne. Ustawienie grupowe będzie odznaczone podczas zapisywania"
       external_tool_options: "Opcje narzędzi zewnętrznych"
       label: 
         external_tool_new_tab: "Załaduj to narzędzie w nowej karcie"
@@ -2185,6 +2196,8 @@ pl:
   available_until_date_cd125c62: "Dostępne do dnia"
   available_until_f3b9c4ed: "Dostępne do"
   available_until_lock_at_ab022445: "Dostępne do %{lock_at}"
+  availible_from_format_like_yyyy_mm_dd_hh_mm_f101e0dd: "Dostępne od - Format RRRR-MM-DD gg:mm"
+  availible_to_format_like_yyyy_mm_dd_hh_mm_f2611528: "Dostępne do - Format RRRR-MM-DD gg:mm"
   average_49c63f9b: Średnio
   back_to_app_center_95420d83: "Powrót do centrum aplikacji"
   bb_display: "Nauka w systemie Blackboard"
@@ -2205,6 +2218,7 @@ pl:
     recording_setting_enabled_description: "Włącz nagrywanie tej konferencji"
   blackboard: 
     no_manifest: "Plik Blackboard w formacie .zip nie zawiera pliku imsmanifest.xml w katalogu źródłowym."
+  blue_daf8fea9: Niebieski
   bookmark_service: 
     default_title: "Brak tytułu"
   broccoli_cloud: 
@@ -2720,6 +2734,7 @@ pl:
   canvas_cartridge_display: "Canvas Common Cartridge"
   canvas_cartridge_file_description: "Paczka eksportu kursu Canvas"
   canvas_cartridge_name: "Canvas Cartridge Importer"
+  canvas_cloud_information_fdd404f2: "Informacje dot. chmury Canvas"
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "System Canvas nie rozpoznał dostawcy tożsamości"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "W systemie Canvas nie ma konta użytkownika: %{user}"
   canvas_error_report_ff678539: "Zgłoś błąd Canvas"
@@ -2727,6 +2742,7 @@ pl:
   canvas_ticketing_email_connector_27e253ae: "Canvas łącznik biletów Email "
   canvas_ticketing_web_post_connector_11158897: "Canvas łącznik biletów posty internetowe"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Program Canvas oceni wszystkie przesłane zadania po zapisaniu testu, może to zająć kilka minut."
+  cas_d6e9601d: CAS
   cc: 
     by: "Przypisanie CC"
     by_nc: "Niekomercyjne przypisanie CC"
@@ -2751,6 +2767,7 @@ pl:
   click_to_report_profile_picture_370f9625: "Kliknij aby zgłosić zdjęcie profilowe"
   close_and_return_to_canvas_80544344: "Zamknij i powróc do systemu Canvas"
   close_d634289d: Zamknij
+  close_picker_256aca8a: "Zamknij Menu przewijane"
   collaboration: 
     default_title: "Współpraca bez nazwy"
   collaborations: 
@@ -2926,6 +2943,7 @@ pl:
       notices: 
         contact_registered: "Metoda kontaku zarejestrowana!"
   concluded_courses_94782e21: "Zakończone kursy"
+  conference_36b50fda: Konferencja
   conferences: 
     concluded_conference: 
       delete: Usuń
@@ -2958,6 +2976,7 @@ pl:
     inactive_error: "Konferencja nie jest teraz aktywna"
     index: 
       concluded_conferences: "Zakończone konferencje"
+      conference: Konferencja
       conference_header: Konferencje
       new_conference: "Nowa konferencja"
       new_conferences: "Nowe konferencje"
