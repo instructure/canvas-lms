@@ -72,7 +72,6 @@ define [
     allSubmissionsLoaded: $.Deferred()
 
     constructor: (@options) ->
-      @chunk_start = 0
       @students = {}
       @studentViewStudents = {}
       @rows = []
@@ -511,22 +510,26 @@ define [
       @sortRowsBy (a, b) => @localeSort(a.sortable_name, b.sortable_name)
 
     getSubmissionsChunks: =>
+      @submissionChunkCount = 0
+
       @withAllStudents (allStudentsObj) =>
         allStudents = (s for k, s of allStudentsObj)
           .sort (a, b) => @localeSort(a.sortable_name, b.sortable_name)
         loop
-          students = allStudents[@chunk_start...(@chunk_start+@options.chunk_size)]
-          unless students.length
-            @allSubmissionsLoaded.resolve()
-            break
+          chunkStart = @submissionChunkCount * @options.chunk_size
+          students = allStudents[chunkStart...(chunkStart+@options.chunk_size)]
+          break if students.length == 0
           params =
             student_ids: (student.id for student in students)
             response_fields: ['id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission', 'attachments', 'late', 'workflow_state', 'excused']
           params['grading_period_id'] = @gradingPeriodToShow if @mgpEnabled && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
           $.ajaxJSON(@options.submissions_url, "GET", params, @gotSubmissionsChunk)
-          @chunk_start += @options.chunk_size
+          @submissionChunkCount++
 
     gotSubmissionsChunk: (student_submissions) =>
+      @gotSubmissionChunkCount ||= 0
+      @gotSubmissionChunkCount++
+
       for data in student_submissions
         student = @student(data.user_id)
         for submission in data.submissions
@@ -535,6 +538,10 @@ define [
         student.loaded = true
         @grid.invalidateRow(student.row)
         @calculateStudentGrade(student)
+
+      if @gotSubmissionChunkCount == @submissionChunkCount
+        @allSubmissionsLoaded.resolve()
+
       @grid.render()
 
     student: (id) =>
