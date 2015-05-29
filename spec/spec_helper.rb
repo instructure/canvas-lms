@@ -663,6 +663,15 @@ RSpec.configure do |config|
     student
   end
 
+  def ta_in_section(section, opts={})
+    ta = opts.fetch(:user) { user }
+    enrollment = section.course.enroll_user(ta, 'TaEnrollment', :section => section, :force_update => true)
+    ta.save!
+    enrollment.workflow_state = 'active'
+    enrollment.save!
+    ta
+  end
+
   def teacher_in_course(opts={})
     opts[:course] = @course if @course && !opts[:course]
     course_with_teacher(opts)
