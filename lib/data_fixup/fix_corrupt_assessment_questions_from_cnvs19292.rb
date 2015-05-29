@@ -42,48 +42,53 @@ DataFixup::FixCorruptAssessmentQuestionsFromCnvs19292 = Struct.new(:question_typ
     return result
   end
 
-  # SQL
-  #   SELECT
-  #     "assessment_questions".*
-  #   FROM
-  #     "assessment_questions"
-  #   INNER JOIN
-  #     "assessment_question_banks"
-  #   ON
-  #     "assessment_question_banks"."id" = "assessment_questions"."assessment_question_bank_id"
-  #   INNER JOIN
-  #     "quiz_groups"
-  #   ON
-  #     "quiz_groups"."assessment_question_bank_id" = "assessment_question_banks"."id"
-  #   INNER JOIN
-  #     "quizzes"
-  #   ON
-  #     "quizzes"."id" = "quiz_groups"."quiz_id"
-  #   WHERE (
-  #     "quizzes"."updated_at" BETWEEN '2015-03-14 00:00:00.000000' AND '2015-03-18 23:59:59.999999'
-  #   ) AND (
-  #     assessment_questions.updated_at < '2015-03-18 23:59:59.999999'
-  #   ) AND (
-  #     assessment_questions.question_data LIKE '%calculated_question%' or
-  #     assessment_questions.question_data LIKE '%numerical_question%' or
-  #     assessment_questions.question_data LIKE '%matching_question%'
-  #   );
-  #
-  # Explain
-  #   Nested Loop  (cost=10.95..368.36 rows=1 width=1604)
-  #     ->  Nested Loop  (cost=10.95..79.50 rows=5 width=16)
-  #           ->  Hash Join  (cost=10.95..72.84 rows=15 width=8)
-  #                 Hash Cond: (quizzes.id = quiz_groups.quiz_id)
-  #                 ->  Seq Scan on quizzes  (cost=0.00..60.52 rows=35 width=8)
-  #                       Filter: ((updated_at >= '2015-03-14 00:00:00'::timestamp without time zone) AND (updated_at <= '2015-03-18 23:59:59.999999'::timestamp without time zone))
-  #                 ->  Hash  (cost=8.20..8.20 rows=220 width=16)
-  #                       ->  Seq Scan on quiz_groups  (cost=0.00..8.20 rows=220 width=16)
-  #           ->  Index Scan using assessment_question_banks_pkey on assessment_question_banks  (cost=0.00..0.43 rows=1 width=8)
-  #                 Index Cond: (id = quiz_groups.assessment_question_bank_id)
-  #     ->  Index Scan using question_bank_id_and_position on assessment_questions  (cost=0.00..57.76 rows=1 width=1604)
-  #           Index Cond: (assessment_question_bank_id = assessment_question_banks.id)
-  #           Filter: ((updated_at < '2015-03-18 23:59:59.999999'::timestamp without time zone) AND ((question_data ~~ '%calculated_question%'::text) OR (question_data ~~ '%numerical_question%'::text) OR (question_data ~~ '%matching_question%'::text)))
 
+  # From beta-slave cluster1:canvas
+  #
+  # SELECT "assessment_questions".*
+  # FROM "assessment_questions"
+  # INNER JOIN "assessment_question_banks"
+  #   ON "assessment_question_banks"."id" = "assessment_questions"."assessment_question_bank_id"
+  # INNER JOIN "quiz_groups"
+  #   ON "quiz_groups"."assessment_question_bank_id" = "assessment_question_banks"."id"
+  # INNER JOIN "quizzes"
+  #   ON "quizzes"."id" = "quiz_groups"."quiz_id"
+  # INNER JOIN quiz_questions
+  #   ON quiz_questions.assessment_question_id = assessment_questions.id
+  #   AND quiz_questions.quiz_id = quizzes.id
+  # WHERE (
+  #   quiz_questions.updated_at > assessment_questions.updated_at
+  # ) AND (
+  #   assessment_questions.question_data LIKE '%calculated_question%'
+  #   or assessment_questions.question_data LIKE '%numerical_question%'
+  #   or assessment_questions.question_data LIKE '%matching_question%'
+  #   or assessment_questions.question_data LIKE '%multiple_dropdowns_question%'
+  # ) AND (
+  #   "quiz_questions"."updated_at" BETWEEN '2015-03-14 00:00:00.000000' AND '2015-03-18 23:59:59.999999'
+  # ) /*hostname:perfjob01-vpc.us-east-1.test.insops.net,pid:25167*/  [shard 1 slave]
+  #
+  # Nested Loop  (cost=407129.00..5724084.55 rows=1 width=1208)
+  #   Join Filter: ((quiz_questions.updated_at > assessment_questions.updated_at) AND (assessment_question_banks.id = assessment_questions.assessment_question_bank_id))
+  #   ->  Hash Join  (cost=407129.00..4856412.29 rows=61094 width=32)
+  #         Hash Cond: (quizzes.id = quiz_groups.quiz_id)
+  #         ->  Hash Join  (cost=199980.18..4617145.44 rows=166925 width=32)
+  #               Hash Cond: (quiz_questions.quiz_id = quizzes.id)
+  #               ->  Seq Scan on quiz_questions  (cost=0.00..4405912.76 rows=166925 width=24)
+  #                     Filter: ((updated_at >= '2015-03-14 00:00:00'::timestamp without time zone) AND (updated_at <= '2015-03-18 23:59:59.999999'::timestamp without time zone))
+  #               ->  Hash  (cost=174965.19..174965.19 rows=1524719 width=8)
+  #                     ->  Seq Scan on quizzes  (cost=0.00..174965.19 rows=1524719 width=8)
+  #         ->  Hash  (cost=200173.28..200173.28 rows=558043 width=24)
+  #               ->  Hash Join  (cost=122692.85..200173.28 rows=558043 width=24)
+  #                     Hash Cond: (quiz_groups.assessment_question_bank_id = assessment_question_banks.id)
+  #                     ->  Seq Scan on quiz_groups  (cost=0.00..36016.07 rows=1348907 width=16)
+  #                     ->  Hash  (cost=76883.71..76883.71 rows=2792171 width=8)
+  #                           ->  Seq Scan on assessment_question_banks  (cost=0.00..76883.71 rows=2792171 width=8)
+  #   ->  Index Scan using assessment_questions_pkey on assessment_questions  (cost=0.00..14.18 rows=1 width=1208)
+  #         Index Cond: (id = quiz_questions.assessment_question_id)
+  #         Filter: ((question_data ~~ '%calculated_question%'::text) OR (question_data ~~ '%numerical_question%'::text) OR (question_data ~~ '%matching_question%'::text) OR (question_data ~~ '%multiple_dropdowns_question%'::text))
+  #
+  # SELECT COUNT(*) gives 1616 records in 306503.2ms
+  #
   # Update each AssessmentQuestion to increment version_number, this will
   # cause associated QuizQuestions to update on next Quiz take
   def fix_assessment_questions
@@ -95,12 +100,16 @@ DataFixup::FixCorruptAssessmentQuestionsFromCnvs19292 = Struct.new(:question_typ
 
     query = AssessmentQuestion
             .joins(:assessment_question_bank => {:quiz_groups => :quiz})
+            .joins('INNER JOIN quiz_questions
+                      ON quiz_questions.assessment_question_id = assessment_questions.id
+                      AND quiz_questions.quiz_id = quizzes.id
+                  ')
+            .where("quiz_questions.updated_at > assessment_questions.updated_at")
             .where(question_type_queries)
 
     if bug_start_date && bug_end_date
       query = query
-              .where(quizzes: {updated_at: bug_start_date..bug_end_date})
-              .where('assessment_questions.updated_at < ?', bug_end_date)
+              .where(quiz_questions: {updated_at: bug_start_date..bug_end_date})
     end
 
     Shackles.activate(:slave) do
