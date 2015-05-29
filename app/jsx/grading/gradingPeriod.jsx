@@ -60,6 +60,11 @@ function(React, $, I18n, _) {
     handleDateChange: function(event) {
       var dateNode = this.refs[event.target.name].getDOMNode();
       var updatedDate = $(dateNode).data('invalid') ? new Date('invalid date') : $(dateNode).data('unfudged-date');
+      // If it's the end date, make sure the date goes _through_ the minute, not
+      // just to the minute.
+      if (dateNode.id.match(/period_end_date/)){
+        updatedDate.setSeconds(59);
+      }
       var updatedState = {};
       updatedState[event.target.name] = updatedDate;
       this.setState(updatedState, function() {
