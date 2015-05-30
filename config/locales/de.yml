@@ -5251,6 +5251,9 @@ de:
       show_more: "Weitere anzeigen"
     hide_due_dates: "Abgabetermine ausblenden"
     initial_post_required_to_subscribe: "Sie müssen eine Anwort veröffentlichen, bevor Sie sich anmelden"
+    like_count: 
+      one: "(%{count} Like)"
+      other: "(%{count} Likes)"
     mark_as_read: "Als gelesen markieren"
     mark_as_unread: "Als ungelesen markieren"
     no_content: "Keine Inhalte vorhanden"
