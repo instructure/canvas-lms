@@ -1840,6 +1840,18 @@ describe 'Submissions API', type: :request do
             {}, { :expected_status => 401 })
       end
     end
+
+    context "logged out user" do
+      it "should render api unauthenticated" do
+        @user = nil
+        api_call(:get,
+          "/api/v1/courses/#{@course.id}/students/submissions",
+          { :controller => 'submissions_api', :action => 'for_students',
+            :format => 'json', :course_id => @course.to_param },
+          { :student_ids => [@student1.id, @student2.id] },
+          {}, { :expected_status => 401 })
+      end
+    end
   end
 
   describe '#update' do

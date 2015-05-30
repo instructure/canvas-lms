@@ -142,7 +142,7 @@
 #     }
 #
 class SubmissionsApiController < ApplicationController
-  before_filter :get_course_from_section, :require_context
+  before_filter :get_course_from_section, :require_context, :require_user
   batch_jobs_in_actions :only => [:update], :batch => { :priority => Delayed::LOW_PRIORITY }
 
   include Api::V1::Progress
