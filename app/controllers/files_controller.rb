@@ -496,7 +496,7 @@ class FilesController < ApplicationController
     params[:download] ||= params[:preview]
     add_crumb(t('#crumbs.files', "Files"), named_context_url(@context, :context_files_url)) unless @skip_crumb
     if @attachment.deleted?
-      unless @attachment.user_id == @current_user.id
+      if @current_user.nil? || @attachment.user_id != @current_user.id
         @not_found_message = t('could_not_find_file', "This file has been deleted")
         render status: 404, template: "shared/errors/404_message"
         return
