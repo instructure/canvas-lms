@@ -5426,6 +5426,7 @@ zh_Hant:
       rte_help: "富文本區域。按 ALT+F8 求助"
   editor_button_6647db9c: 編輯器按鈕
   either_the_url_or_domain_should_be_set_c29cf8c1: "應該設定 URL 或網域。"
+  either_you_re_a_new_user_or_the_terms_of_use_have__14f0d0d0: "您可能是新用戶，或您上次同意的 *服務條款 *目前已更新。在繼續使用前，請同意新的 *服務條款* 和**隱私條款**。"
   element_option_missing_error_an_element_to_attach__be433478: "`因素` 選項缺失錯誤：在將 TreeBrowserView 的呈現選項設定為「正確」時，必須指定 TreeBrowserView 將附加在其之上的一個因素"
   email: 
     default_from_name: "Instructure Canvas"
@@ -14534,6 +14535,7 @@ zh_Hant:
       updating_user_details: 正在更新使用者詳細資料…
     notices: 
       image_reported: 此影像已報告
+  user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}，流覽本頁內容前請先 *登錄*。"
   user_navigation_a097be0f: 用戶導航
   user_notes: 
     confirms: 
@@ -15064,6 +15066,7 @@ zh_Hant:
   you_can_disable_this_feature_d5e61373: 您可以停用此功能
   you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: 您可以隱藏或顯示課程的任務，方法是將其切換為打開或關閉。
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: 現在，您可以為已參加測驗的學生設定重新評分選項。
+  you_can_try_to_log_in_again_2b23ef0f: "您可以嘗試 *稍後登錄*。"
   you_have_changed_the_progression_requirements_for__6772bc89: 您已更改某一活動課程的進度要求。可能有些學生的進度已達到此模組以及依賴此模組的其他模組。
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*您已對此測驗中的問題進行了更改。*在儲存此測驗之前，學生將不會看到這些更改。"
   you_have_no_outcomes_click_here_to_create_one_ebf262a3: "您沒有成果。*點擊此處* 創建一個成果。"
@@ -15080,6 +15083,7 @@ zh_Hant:
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "您的任務列表現在可以在 *月曆* 頁面上找到。"
   your_assignments_list_has_improved_3eded80e: "您的 *任務* 列表已改進！"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: 您的任務將顯示在此處，按截止日期列出。
+  your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "您的瀏覽器不符合 Canvas 的最低要求。請瀏覽 *Canvas社區*，以查看受支持的瀏覽器的完整清單。"
   your_content_has_been_exported_bbb57764: 您的內容已匯出。
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: "您的檔案正被上傳到成績冊，您可以在任何時候離開這個頁面。如果您又一個大的 CSV 文件，您的更改可能需要幾分鐘來更新。為了避免覆蓋任何數據，請在進行任何額外更改之前確認上傳已完成而且您的成績冊是正確的。"
   your_message_has_been_sent_thank_you_e0284316: 您的訊息已發送。謝謝您！
