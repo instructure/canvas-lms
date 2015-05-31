@@ -80,9 +80,15 @@ define [
       return unless date and time
       date = $.fudgeDateForProfileTimezone(date)
       time = $.fudgeDateForProfileTimezone(time)
-      time.setFullYear(date.getFullYear())
-      time.setMonth(date.getMonth())
-      time.setDate(date.getDate())
+
+      # set all three values at once to handle potential
+      # conflicts in how month rollover happens
+      time.setFullYear(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate()
+      )
+
       return time
 
     startAt: ->
