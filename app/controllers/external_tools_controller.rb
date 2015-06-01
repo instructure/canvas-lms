@@ -490,10 +490,10 @@ class ExternalToolsController < ApplicationController
       extra_params[:accept_copy_advice] = true
       extra_params[:ext_content_file_extensions] = 'zip,imscc,mbz,xml'
     when 'editor_button'
-      accept_media_types = 'image/*,text/html,application/vnd.ims.lti.v1.launch+json,*/*'
+      accept_media_types = 'image/*,text/html,application/vnd.ims.lti.v1.ltilink,*/*'
       accept_presentation_document_targets = 'embed,frame,iframe,window'
     when 'resource_selection', 'link_selection', 'assignment_selection'
-      accept_media_types = 'application/vnd.ims.lti.v1.launch+json'
+      accept_media_types = 'application/vnd.ims.lti.v1.ltilink'
       accept_presentation_document_targets = 'frame,window'
     when 'homework_submission'
       assignment = @context.assignments.active.find(params[:assignment_id])

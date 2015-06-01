@@ -171,7 +171,7 @@ define([
           var item = data.contentItems[0];
           var placementAdvice = item.placementAdvice;
           var presentationDocTarget = placementAdvice.presentationDocumentTarget;
-          var url = item.mediaType === 'application/vnd.ims.lti.v1.launch+json' ? item.canvasURL : item.url
+          var url = item.mediaType === 'application/vnd.ims.lti.v1.ltilink' || item.mediaType === 'application/vnd.ims.lti.v1.launch+json' ? item.canvasURL : item.url
           if (presentationDocTarget === 'iframe') {
             var html = $("<div/>").append($("<iframe/>", {
               src: url,

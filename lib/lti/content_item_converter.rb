@@ -101,7 +101,7 @@ module Lti
       when 'image_url'
         lookup_mime(opts[:text], opts[:url]) || 'image'
       when 'lti_launch_url'
-        'application/vnd.ims.lti.v1.launch+json'
+        'application/vnd.ims.lti.v1.ltilink'
       else # used for the following return_types url, iframe, default
         'text/html'
       end
