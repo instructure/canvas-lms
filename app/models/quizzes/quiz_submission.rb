@@ -229,10 +229,14 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       # prevents the student from starting to take the quiz for the last
       # time, then opening a new tab and looking at the results from
       # a prior attempt)
-      !quiz.allowed_attempts || quiz.allowed_attempts < 1 || attempt > quiz.allowed_attempts || (completed? && attempt == quiz.allowed_attempts)
+      !quiz.allowed_attempts || quiz.allowed_attempts < 1 || attempt > quiz.allowed_attempts || last_attempt_completed?
     else
       true
     end
+  end
+
+  def last_attempt_completed?
+    completed? && quiz.allowed_attempts && attempt >= quiz.allowed_attempts
   end
 
   def self.needs_grading

@@ -5,8 +5,8 @@
 
 <% if correct_answers_protected? %>
   <div class="alert">
-    <i class="icon-warning" aria-label="<%= render_correct_answer_protection(@quiz) %>"></i>
-    <span><%= render_correct_answer_protection(@quiz) %></span>
+    <i class="icon-warning" aria-label="<%= render_correct_answer_protection(@quiz, (@current_submission || @submission)) %>"></i>
+    <span><%= render_correct_answer_protection(@quiz, (@current_submission || @submission)) %></span>
   </div>
 <% end %>
 

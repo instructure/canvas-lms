@@ -122,8 +122,10 @@ module QuizzesHelper
     end
   end
 
-  def render_correct_answer_protection(quiz)
-    return I18n.t('Answers will be shown after your last attempt') if quiz.show_correct_answers_last_attempt
+  def render_correct_answer_protection(quiz, submission)
+    if quiz.show_correct_answers_last_attempt && !submission.last_attempt_completed?
+      return I18n.t('Answers will be shown after your last attempt')
+    end
     show_at = quiz.show_correct_answers_at
     hide_at = quiz.hide_correct_answers_at
     now = Time.now
