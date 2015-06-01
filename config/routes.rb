@@ -1414,6 +1414,7 @@ CanvasRails::Application.routes.draw do
       put "courses/:course_id/quizzes/:id", action: :update, as: 'course_quiz_update'
       delete "courses/:course_id/quizzes/:id", action: :destroy, as: 'course_quiz_destroy'
       post "courses/:course_id/quizzes/:id/reorder", action: :reorder, as: 'course_quiz_reorder'
+      post "courses/:course_id/quizzes/:id/validate_access_code", action: :validate_access_code, as: 'course_quiz_validate_access_code'
     end
 
     scope(controller: 'quizzes/quiz_submission_users') do

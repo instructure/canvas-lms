@@ -280,7 +280,7 @@ class Quizzes::QuizzesApiController < ApplicationController
   include Filters::Quizzes
 
   before_filter :require_context
-  before_filter :require_quiz, :only => [:show, :update, :destroy, :reorder]
+  before_filter :require_quiz, :only => [:show, :update, :destroy, :reorder, :validate_access_code]
   before_filter :check_differentiated_assignments, :only => [:show]
 
   # @API List quizzes in a course
@@ -527,6 +527,26 @@ class Quizzes::QuizzesApiController < ApplicationController
       Quizzes::QuizSortables.new(:quiz => @quiz, :order => params[:order]).reorder!
 
       head :no_content
+    end
+  end
+
+  # @API Validate quiz access code
+  # @beta
+  #
+  # Accepts an access code and returns a boolean indicating whether that access code is correct
+  #
+  # @argument access_code [Required, String]
+  #   The access code being validated
+  #
+  # @returns boolean
+  def validate_access_code
+    if authorized_action(@quiz, @current_user, :read)
+      correct = if @quiz.access_code.present?
+                  @quiz.access_code == params[:access_code]
+                else
+                  false
+                end
+      render json: correct
     end
   end
 

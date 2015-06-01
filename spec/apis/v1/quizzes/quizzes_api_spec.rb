@@ -613,8 +613,58 @@ describe Quizzes::QuizzesApiController, type: :request do
     end
   end
 
+  describe "POST /courses/:course_id/quizzes/:id/validate_access_code" do
+    before :once do
+      teacher_in_course(:active_all => true)
+      @quiz = @course.quizzes.create!
+    end
+
+    it "should return false if no access code" do
+      raw_api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/validate_access_code",
+                  {
+                    :controller=>"quizzes/quizzes_api",
+                    :action => "validate_access_code",
+                    :format => "json", :course_id => "#{@course.id}",
+                    :id => "#{@quiz.id}"
+                  },
+                  {:access_code => "TMNT" })
+      expect(response.body).to eq "false"
+    end
+
+    it "should return false on an incorrect access code" do
+      @quiz.access_code = "TMNT"
+      @quiz.save!
+      raw_api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/validate_access_code",
+                  {
+                    :controller=>"quizzes/quizzes_api",
+                    :action => "validate_access_code",
+                    :format => "json",
+                    :course_id => "#{@course.id}",
+                    :id => "#{@quiz.id}"
+                  },
+                  {:access_code => "Leonardo" })
+      expect(response.body).to eq "false"
+    end
+
+    it "should return true on a correct access code" do
+      @quiz.access_code = "TMNT"
+      @quiz.save!
+      raw_api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/validate_access_code",
+                  {
+                    :controller=>"quizzes/quizzes_api",
+                    :action => "validate_access_code",
+                    :format => "json",
+                    :course_id => "#{@course.id}",
+                    :id => "#{@quiz.id}"
+                  },
+                  {:access_code => "TMNT" })
+      expect(response.body).to eq "true"
+    end
+
+  end
+
   describe "differentiated assignments" do
-    def calls_display_quiz(quiz, opts={except: []})
+    def calls_display_quiz(quiz, _opts={except: []})
       get_index(quiz.context)
       expect(JSON.parse(response.body).to_s).to include("#{quiz.title}")
       get_show(quiz)
