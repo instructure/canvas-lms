@@ -70,6 +70,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   .context_list_context {
+    overflow: inherit;
     list-style: none;
     margin: 0;
     padding: 3px 0;
