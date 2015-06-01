@@ -22,7 +22,7 @@ define [
   ,
     displayNameShort: I18n.t('updated_at_short', 'Modified')
     displayName: I18n.t('updated_at', 'Date Modified')
-    property: 'updated_at'
+    property: 'modified_at'
     className: 'ef-date-modified-col'
   ,
     displayName: I18n.t('modified_by', 'Modified By')
