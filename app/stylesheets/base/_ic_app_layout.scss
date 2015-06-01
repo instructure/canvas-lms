@@ -120,7 +120,7 @@ $ic-left-side-width: $ic-sp*15;
   border-bottom: 1px solid $ic-border-light;
   margin: 0 $ic-sp*2;
   padding: $ic-sp 0;
-  @include breakpoint(wide) { padding: $ic-sp*1.5 0; }
+  @include breakpoint(wide) { padding: 16px 0; }
 }
 
 .ic-app-course-nav-toggle {

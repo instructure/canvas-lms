@@ -12,8 +12,18 @@ $ef-thumbnail-size: 36px;
   }
 }
 
-body.files #content {
-  padding-top: 0;
+body.files {
+  #content { padding-top: 0; }
+  @if $use_new_styles {
+    .ic-app-nav-toggle-and-crumbs {
+      /* display: none; */
+      &.ic-app-nav-toggle-and-crumbs--files { display: flex; }
+    }
+  }
+}
+
+.ic-app-nav-toggle-and-crumbs.ic-app-nav-toggle-and-crumbs--files {
+  margin-left: 0; margin-right: 0;
 }
 
 .ef-main-buttons{
@@ -24,7 +34,7 @@ body.files #content {
 
 .ef-header{
   @if $use_new_styles {
-    padding: $ic-sp 0;
+    padding: $ic-sp*2 0 $ic-sp;
     border-bottom: 1px solid $ic-border-light;
   }
   @else {
@@ -51,7 +61,7 @@ body.files #content {
   @include breakpoint(wide) {
     flex: 0 0 $ic-sp*34;
     &.ef-search-form--showing-buttons {
-      flex: 0 0 $ic-sp*26;  
+      flex: 0 0 $ic-sp*26;
     }
   }
 }
@@ -91,7 +101,7 @@ body.files #content {
     padding: 0;
     @if $use_new_styles { border-right: 1px solid $ic-border-light; }
     @else { border-right: 1px solid $ic-border-color; }
-    
+
     .tree {
       margin: 10px
     }
@@ -108,7 +118,7 @@ body.files #content {
       }
       @else {
         padding-top: 5px;
-        padding-bottom: 5px;  
+        padding-bottom: 5px;
       }
 
       &:hover{
@@ -145,11 +155,11 @@ body.files #content {
 .ef-directory-header{
   display: flex;
   align-items: center;
-  @if $use_new_styles { 
+  @if $use_new_styles {
     border-bottom: 1px solid $ic-border-light;
     padding: $ic-sp/3;
   }
-  @else { 
+  @else {
     border-bottom: 1px solid $ic-border-color;
     padding: 5px;
   }
@@ -166,18 +176,18 @@ body.files #content {
   line-height: $ef-thumbnail-size;
   box-sizing: border-box;
   @if $use_high_contrast { border: 1px solid transparent; }
-  
+
   // :hover style needs to be before 'selected' so item that is both hovered and selected gets selected color
   &:hover {
-    @if $use_high_contrast { 
+    @if $use_high_contrast {
       border-color: $ic-color-dark;
       border-style: dotted;
     }
     @else { background-color: $ic-bg-light-primary; }
   }
-  &.ef-item-selected { 
+  &.ef-item-selected {
     @if $use_high_contrast { border-color: $ic-brand-primary; }
-    @else { background-color: darken($ic-bg-light-primary, 4%); } 
+    @else { background-color: darken($ic-bg-light-primary, 4%); }
   }
 
   .al-trigger { opacity: 0 }

@@ -27,11 +27,6 @@ define([
         event.stopPropagation();
       }
     });
-
-    // new styles only - show and hide the courses vertical menu when the user clicks the hamburger button
-    $("#courseMenuToggle").click(function() {
-      $("body").toggleClass("course-menu-expanded");
-    });
   });
 });
 
