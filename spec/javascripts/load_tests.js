@@ -1,5 +1,4 @@
-tests = shuffle(__TESTS__);
-// tests = __TESTS__
+tests = __TESTS__;
 // tests = tests.slice(0,50);
 // console.log(tests);
 
@@ -39,17 +38,4 @@ if(window.__karma__) {
       QUnit.start();
     }
   });
-}
-
-// Fisher-Yates shuffle
-// http://jsperf.com/fisher-yates-compare-shuffle/12
-function shuffle(array) {
-  var tmp, current, top = array.length;
-  if (top) while (top) {
-    current = (Math.random() * (top--)) | 0;
-    tmp = array[current];
-    array[current] = array[top];
-    array[top] = tmp;
-  }
-  return array;
 }

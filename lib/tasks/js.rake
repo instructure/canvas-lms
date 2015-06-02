@@ -38,6 +38,17 @@ namespace :js do
     build_requirejs_config
   end
 
+  def generate_prng
+    if ENV["seed"]
+      seed = ENV["seed"].to_i
+    else
+      srand
+      seed = rand(1 << 20)
+    end
+    puts "--> randomized with seed #{seed}"
+    Random.new(seed)
+  end
+
   def build_requirejs_config
     require 'canvas/require_js'
     require 'erubis'
@@ -52,7 +63,7 @@ namespace :js do
       "spec/plugins/*/javascripts/compiled/#{matcher}"
     ].map{ |file| file.sub(/\.js$/, '').sub(/public\/javascripts\//, '') }
     File.open("#{Rails.root}/spec/javascripts/tests.js", 'w') { |f|
-      f.write("window.__TESTS__ = #{JSON.pretty_generate(tests)}")
+      f.write("window.__TESTS__ = #{JSON.pretty_generate(tests.shuffle(random: generate_prng))}")
     }
   end
 
@@ -85,7 +96,7 @@ namespace :js do
   end
 
   def test_suite(reporter=nil)
-    if test_js_with_timeout(300,reporter) != 0 && !ENV['JS_SPEC_MATCHER']
+    if test_js_with_timeout(300,reporter) != 0 && !ENV['JS_SPEC_MATCHER'] && ENV['retry'] != 'false'
       puts "--> Karma tests failed." # retrying karma...
       raise "Karma tests failed on second attempt." if test_js_with_timeout(400,reporter) != 0
     end
