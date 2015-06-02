@@ -169,7 +169,7 @@ define [
           data['mastery_points'] ||= 0
           @$el.html outcomeTemplate _.extend data,
             readOnly: @readOnly(),
-            native: @model.outcomeLink.outcome.context_id == @model.outcomeLink.context_id && @model.outcomeLink.outcome.context_type == @model.outcomeLink.context_type
+            native: @model.isNative(),
             setQuizMastery: @setQuizMastery,
             useForScoring: @useForScoring,
             isLargeRoster: ENV.IS_LARGE_ROSTER,

@@ -59,6 +59,9 @@ define [
     name: ->
       @get 'title'
 
+    isNative: ->
+      @outcomeLink && (@get('context_id') == @outcomeLink.context_id && @get('context_type') == @outcomeLink.context_type)
+
     # The api returns abbreviated data by default
     # which in most cases means there's no description.
     # Run fetch() to get all the data.

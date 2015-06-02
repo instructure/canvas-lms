@@ -20,7 +20,7 @@ define [
   test 'assign instance of ProgressBarView on init', ->
     ok @outcomeView.progress instanceof ProgressBarView
 
-  test 'have after render beheavior', ->
+  test 'have after render behavior', ->
     ok _.isUndefined(@outcomeView.popover, 'precondition')
 
     @outcomeView.render()
