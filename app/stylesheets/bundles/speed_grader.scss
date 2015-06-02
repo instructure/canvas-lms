@@ -757,4 +757,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 #grading-box-extended {
   width: 35px;
   margin-bottom: 0;
+  &.pass_fail_grading_type {
+    width: 105px;
+  }
 }
