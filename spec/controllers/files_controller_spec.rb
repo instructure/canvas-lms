@@ -19,6 +19,23 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+def new_valid_tool(course)
+  tool = course.context_external_tools.new(
+      name: "bob",
+      consumer_key: "bob",
+      shared_secret: "bob",
+      tool_id: 'some_tool',
+      privacy_level: 'public'
+  )
+  tool.url = "http://www.example.com/basic_lti"
+  tool.resource_selection = {
+      :url => "http://#{HostUrl.default_host}/selection_test",
+      :selection_width => 400,
+      :selection_height => 400}
+  tool.save!
+  tool
+end
+
 describe FilesController do
   def course_folder
     @folder = @course.folders.create!(:name => "a folder", :workflow_state => "visible")
@@ -164,6 +181,15 @@ describe FilesController do
       group_with_user_logged_in(:group_context => Account.default)
       get 'index', :group_id => @group.id
       expect(response).to be_success
+    end
+
+    it "should not show external tools in a group context" do
+      group_with_user_logged_in(:group_context => Account.default)
+      new_valid_tool(@course)
+      user_file
+      @file.context = @group
+      get 'index', :group_id => @group.id
+      expect(assigns[:js_env]['FILES_CONTEXTS'][0]['file_menu_tools']).to eq []
     end
 
     describe 'across shards' do

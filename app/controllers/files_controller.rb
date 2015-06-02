@@ -339,7 +339,11 @@ class FilesController < ApplicationController
         elsif context.is_a?(Group)
           context.context
         end
-        file_menu_tools = (tool_context ? external_tools_display_hashes(:file_menu, tool_context, [:accept_media_types]) : [])
+
+        has_external_tools = !context.is_a?(Group) && tool_context
+
+        file_menu_tools = (has_external_tools ? external_tools_display_hashes(:file_menu, tool_context, [:accept_media_types]) : [])
+
         {
           asset_string: context.asset_string,
           name: context == @current_user ? t('my_files', 'My Files') : context.name,
