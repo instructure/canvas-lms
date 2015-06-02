@@ -13862,6 +13862,7 @@ zh:
     users: 
       user_search_label: 用户搜索
       users_matching_label: 用户匹配
+  skipped_file_filename_due_to_error_94f0194: "由于错误，跳过文件的 %{filename} "
   skipping_unknown_file_type_cd1086ee: 跳过未知的文件类型
   skype_18850ba7: Skype
   slideshow: 
