@@ -165,6 +165,10 @@ class UsersController < ApplicationController
     @user = User.where(id: params[:user_id]).first if params[:user_id].present?
     @user ||= @current_user
     if authorized_action(@user, @current_user, :read)
+      crumb_url = polymorphic_url([@current_user]) if @user.grants_right?(@current_user, session, :view_statistics)
+      add_crumb(@current_user.short_name, crumb_url)
+      add_crumb(t('crumbs.grades', 'Grades'), grades_path)
+
       current_active_enrollments = @user.enrollments.current.includes(:course).shard(@user).to_a
 
       @presenter = GradesPresenter.new(current_active_enrollments)

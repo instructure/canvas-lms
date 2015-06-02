@@ -1,7 +1,5 @@
-<% 
+<%
   content_for :page_title, join_title(t(:page_title, "Grades"), @current_user.name)
-  add_crumb(@current_user.short_name, context_url(@current_user, :context_url))
-  add_crumb(t('crumbs.grades', 'Grades'), grades_path) 
   jammit_css :user_grades
 %>
 
