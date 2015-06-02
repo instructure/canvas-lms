@@ -425,6 +425,7 @@ pl:
         sis_user_id: "Identyfikator systemu SIS"
         sortable_name: "Nazwa na liście"
       sortable_name_help: "Ta nazwa pojawia się na posortowanych listach."
+      unique_id_label_1: "%{label}:"
     add_user_button: "Dodaj użytkownika"
     add_user_dialog_title: "Dodaj nowego użytkownika"
     adding_course_message: "Trwa dodawanie kursu..."
@@ -5492,6 +5493,7 @@ pl:
       rte_help: "Obszar Rich Text. Wciśnij ALT+F8 po pomoc"
   editor_button_6647db9c: "Przycisk edytora"
   either_the_url_or_domain_should_be_set_c29cf8c1: "Musisz ustawić url albo domenę"
+  either_you_re_a_new_user_or_the_terms_of_use_have__14f0d0d0: "Albo jesteś nowym użytkownikiem albo *warunki użytkowania* uległy zmianie od Twojego ostatniego wyrażenia zgody. Należy zgodzić się na *warunki użytkowania* i **politykę prywatnośći** aby kontynuować."
   element_option_missing_error_an_element_to_attach__be433478: "Błąd braku opcji `element`: element, do którego ma być dołączony widok TreeBrowserView musi zostać określony podczas ustawiania opcji renderowania na wartość 'true' dla widoku BBTreeBrowserView"
   email: 
     default_from_name: "Instructure Canvas"
@@ -5499,6 +5501,7 @@ pl:
   email_is_invalid_e0d982eb: "Adres e-mail jest nieprawidłowy!"
   ember_modules_description: "Moduły ponownie zapisane w systemie Ember. Użyto macierzystej opcji Przeciągnij i upuść API w celu przeciągania elementów z lokalizacji zewnętrznych."
   enable_6f5d1328: Uaktywnij
+  enable_feature_title_987d8e9a: "Włącz funkcję: %{title}"
   enable_gradebook_list_students_by_sortable_name: "Wyświetl listę uczestników według sortowalnych nazw w dzienniczku. Wartość domyślna nazwy to „Nazwisko, Imię” i można ją zmienić w ustawieniach."
   enable_multiple_grading_periods: |-
       Wielokrotne Okresy Klasyfikacyjne pozwalają nauczycielom i administratorom na tworzenie okresów klasyfikacyjnych z ustalonymi
@@ -6333,6 +6336,7 @@ pl:
     graph_title: "Średnia %{mean}, Wysoka %{high}, Niska %{low}"
     outcome: 
       alignment_count: "*%{count}* Wyrównań"
+      alignment_count_summary: "*8* z *%{count}* Zestawień"
   gradebook: 
     alerts: 
       no_active_students: "Niestety nie ma żadnych aktywnych uczestników dla tego kursu lub nie oceniasz żadnego z uczestników."
@@ -7343,6 +7347,7 @@ pl:
       Program Canvas domyślnie będzie próbował najpierw używać wtyczki Flash w celu odtworzenia plików wideo. Włącz ją, aby korzystać z programu HTML5,
       następnie wróć do wtyczki Flash.
   html_editor_fb2ab713: "Edytor HTML"
+  i_agree_to_the_terms_of_use_and_privacy_policy_f41760cc: "Wyrażam zgodę na *warunki użytkowania* i **politykę prywatnośći**"
   i_have_obtained_permission_to_use_this_file_6386f087: "Mam uprawnienie do korzystania z tego pliku."
   i_hold_the_copyright_71ee91b1: "Posiadam prawa autorskie"
   ic_actions: 
@@ -9609,11 +9614,20 @@ pl:
         tweet: "Alert systemu Canvas — zaproszenie: weź udział w konferencji %{title}, %{name}"
     web_conference_recording_ready: 
       email: 
+        body: "Twój zapis %{title} dla %{name} jest gotowy."
         details_link: "Szczegóły można zobaczyć tutaj: %{link}"
         html: 
+          body: "Twój zapis %{title} dla %{name} jest gotowy."
           details_link: "Kliknij tutaj, aby zobaczyć szczegółowe informacje"
+          subject: "Zapis konferencji internetowej gotowy: %{name}"
+        subject: "Zapis konferencji internetowej gotowy: %{name}"
       sms: 
+        body: "Twój zapis %{title} dla %{name} jest gotowy."
         link_message: "Więcej informacji pod adresem %{url}"
+      summary: 
+        subject: "Zapis konferencji internetowej gotowy: %{name}"
+      twitter: 
+        tweet: "Alarm Canvas - Zapis gotowy: %{title}, %{name}"
   migration: 
     announcement_type: Ogłoszenie
     assignment_group_type: "Grupa zadań"
@@ -10781,6 +10795,8 @@ pl:
     labels: 
       requirements_must_be_completed: "Strona zostanie odblokowana po spełnieniu poniższych wymogów"
   presentation_2d9387ca: Prezentacja
+  previous_time_cc96b361: "Poprzedni (%{time})"
+  previous_timestamp_19343a58: "Poprzedni (%{timestamp})"
   privacy_290109ea: Prywatność
   product_name: "System Canvas"
   profile: 
@@ -15116,6 +15132,7 @@ pl:
   view_course_analytics_eefe6b2: "Wyświetl dane analityczne kursu"
   view_name_app_62a2ad8e: "Pokaż aplikację %{name}"
   view_student_analytics_6b8ccd42: "Wyświetl dane analityczne uczestników"
+  view_toolname_placements_4a5724d1: "Przeglądaj miejsca docelowe %{toolName} "
   visit_864b4060: Odwiedź
   visit_group_group_name_7a816081: "Odwiedź grupę %{group_name}"
   warning_for_improved_accessibility_in_moving_files_71e1028b: "Ostrzeżenie: Aby poprawić dostępność w przenoszeniu plików, skorzystaj z opcji Przenieś do dialogu znajdującej się w menu."
