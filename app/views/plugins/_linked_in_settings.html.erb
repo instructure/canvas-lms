@@ -1,7 +1,7 @@
 <%= fields_for :settings, OpenObject.new(settings) do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
-      <td colspan="2"><%= mt(:description, <<-TEXT, :linkedin_url => 'https://www.linkedin.com/secure/developer', :callback_url => raw('<span class="nobr">https://&lt; ' + t(:domain_name, 'domain') + ' &gt;/oauth_success?service=linked_in</span>'))
+      <td colspan="2"><%= mt(<<-TEXT, :linkedin_url => 'https://www.linkedin.com/secure/developer', :callback_url => raw('<span class="nobr">https://&lt; ' + t(:domain_name, 'domain') + ' &gt;/oauth_success?service=linked_in</span>'))
 You will need to [register an application on LinkedIn](%{linkedin_url}).
 You should add %{callback_url} as an OAuth 2.0 authorized redirect URL, and set the Application Status to Live
 After you create your application, make a note of the Client ID and Client Secret, and enter them here.
