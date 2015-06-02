@@ -793,12 +793,21 @@ define([
         if (isNaN(val) || val < 0) { val = 0; }
         tally += val;
       });
-      $("#questions .group_top:not(#group_top_new)").each(function() {
+      $("#questions .group_top:not(#group_top_new)").each(function(){
         var val = parseFloat($(this).find(".question_points").text());
         if (isNaN(val) || val < 0) { val = 0; }
-        var cnt = parseInt($(this).find(".pick_count").text(), 10);
-        if (isNaN(cnt)) { cnt = 0; }
-        tally += val * cnt;
+        var pickCount = parseInt($(this).find(".pick_count").text(), 10);
+        if (isNaN(pickCount)) { pickCount = 0; }
+        var groupId = this.id.replace("group_top_","")
+        questionCount = $(this.parentElement).find("[data-group-id='" + groupId + "']").length
+
+        // unless it is a question bank, make sure
+        // enough questions are in the group
+        if(!$(this).hasClass("question_bank_top")){
+          pickCount = Math.min(pickCount, questionCount)
+        }
+
+        tally += val * pickCount;
       });
       tally = Math.round(tally * 100.0) / 100.0;
       $(".points_possible").text(tally);
@@ -2239,6 +2248,10 @@ define([
       $(".question_form:visible,.group_top.editing .quiz_group_form:visible").submit();
       var $question = makeQuestion();
       if ($(this).parents(".group_top").length > 0) {
+
+        groupID = $(this).parents(".group_top")[0].id.replace("group_top_","")
+        $($question[0]).attr("data-group-id", groupID)
+
         var $bottom = $(this).parents(".group_top").next();
         while($bottom.length > 0 && !$bottom.hasClass('group_bottom')) {
           $bottom = $bottom.next();
