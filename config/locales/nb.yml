@@ -5452,6 +5452,7 @@ nb:
       rte_help: "Rik Tekst Område. Trykk ALT+F8 for hjelp"
   editor_button_6647db9c: Editor-knapp
   either_the_url_or_domain_should_be_set_c29cf8c1: "Enten URL-en eller domenet må angis."
+  either_you_re_a_new_user_or_the_terms_of_use_have__14f0d0d0: "Enten er du en ny bruker, eller har *bruksvilkårene* endret seg siden du godtok dem sist. Vennligst godta *bruksvilkår* og **personvern** før du fortsetter."
   element_option_missing_error_an_element_to_attach__be433478: "`element` alternativ manglende feil: Et element for å feste TreeBrowserView må oppgis når du setter den gjengi muligheten til å 'true' for BBTreeBrowserView"
   email: 
     default_from_name: "Instructure Canvas"
