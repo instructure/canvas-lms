@@ -73,6 +73,10 @@ es:
         api_key: "Código API"
         api_url: "URL API"
         common_core_guid: "GUID principal común (optativo)"
+  access_to_the_etherpad_collaborations_below_will_b_b6a0a288: |-
+      El acceso a las colaboraciones de Etherpad de más abajo se suspenderán el 8 de agosto de 2015. Si desea guardar este contenido, por favor migre este contenido antes de esta fecha.
+      
+      Para obtener instrucciones sobre cómo crear una colaboración con Google, [haga clic aquí](%{google_collab_help_url}).
   account: 
     ask_canvas_network: "Preguntar a la comunidad Canvas Network"
     default_account_name: "Cuenta Predeterminada"
