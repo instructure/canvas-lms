@@ -55,6 +55,36 @@ describe "screenreader gradebook" do
       fj('.ui-icon-closethick:visible').click
       check_element_has_focus(f "#set_default_grade")
     end
+
+    describe "Download Submissions Button" do
+      let!(:change_first_assignment_to_media_recording) do
+        @first_assignment.submission_types = "media_recording"
+        @first_assignment.save
+      end
+
+      let!(:get_screenreader_gradebook) do
+        get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=srgb"
+      end
+
+      let(:assignment_selector) do
+        Selenium::WebDriver::Support::Select.new(f("#assignment_select"))
+      end
+
+      # The Download Submission button should be displayed for online_upload,
+      # online_text_entry, online_url, and online_quiz assignments. It should
+      # not be displayed for any other types.
+      it "is displayed for online assignments" do
+        assignment_selector.select_by(:text, 'second assignment')
+
+        expect(f("#submissions_download_button")).to be_present
+      end
+
+      it "is not displayed for assignments which are not submitted online" do
+        assignment_selector.select_by(:text, @first_assignment.name)
+
+        expect(f("#submissions_download_button")).to_not be_present
+      end
+    end
   end
 end
 
