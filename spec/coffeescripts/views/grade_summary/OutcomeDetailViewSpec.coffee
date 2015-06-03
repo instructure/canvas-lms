@@ -57,4 +57,5 @@ define [
 
     equal JSON.parse(@response).linked.alignments.length, 10, 'precondition; response should have 10 records'
     equal @outcomeDetailView.$('.alignment').length, 8, 'should only render last 8 alignments'
+    @outcomeDetailView.close()
 
