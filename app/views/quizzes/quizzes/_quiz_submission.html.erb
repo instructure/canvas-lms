@@ -124,7 +124,7 @@
     <input id="fudge_points_entry" type="text" name="fudge_points" value="<%= (!@submission.fudge_points || @submission.fudge_points == 0 ? '--' : @submission.fudge_points) %>"/>
     <%
       fudge_text = begin
-        if @submission.quiz_points_possible == @quiz.points_possible || !@submission.quiz_points_possible
+        if @submission.quiz_points_possible == @quiz.points_possible || !@submission.quiz_points_possible || !@quiz.points_possible
           t('labels.fudge_points_generic_explanation', "You can manually adjust the score by adding positive or negative points to this box.")
         elsif @quiz.survey?
           t('labels.fudge_points_changed_points_survey', <<-TEXT,
