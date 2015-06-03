@@ -44,7 +44,7 @@ describe "student groups" do
 
     describe "new student group" do
       before(:each) do
-        seed_users(5)
+        seed_students(5)
         get "/courses/#{@course.id}/groups"
         f(".icon-plus").click
         wait_for_ajaximations

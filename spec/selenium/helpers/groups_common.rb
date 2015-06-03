@@ -1,9 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
-def seed_users(count)
+def seed_students(count)
+  @students = []
   count.times do |n|
-    @student = User.create!(:name => "Test Student #{n+1}")
-    @course.enroll_student(@student).accept!
+    @students << User.create!(:name => "Test Student #{n+1}")
+    @course.enroll_student(@students.last).accept!
   end
 end
 
@@ -22,7 +23,7 @@ end
 
 # Sets up groups and users for testing. Default is 1 user, 1 groupset, and 1 group per groupset.
 def group_test_setup(user_count = 1, groupset_count = 1, groups_per_set = 1)
-  seed_users(user_count)
+  seed_students(user_count)
   seed_groups(groupset_count, groups_per_set)
 end
 
@@ -56,11 +57,11 @@ def create_category(params={})
   }
   params = default_params.merge(params)
 
-  options = {name: params[:category_name]}
-  options[:group_limit] = params[:member_limit] if params[:has_max_membership]
-  category1 = @course.group_categories.create!(options)
+  category1 = @course.group_categories.create!(name: params[:category_name])
   category1.configure_self_signup(true, false)
-  category1.save!
+  if params[:has_max_membership]
+    category1.update_attribute(:group_limit,params[:member_limit])
+  end
 
   category1
 end
@@ -83,7 +84,7 @@ def create_student_group(params={})
     add_user_to_group(@student, group, params[:is_leader])
   end
 
-  seed_users(params[:enroll_student_count])
+  seed_students(params[:enroll_student_count])
 end
 
 def create_student_group_as_a_teacher(group_name = "Windfury", enroll_student_count = 0)
@@ -119,6 +120,13 @@ def manually_create_group(params={})
     wait_for_ajaximations
   end
   f('#groupEditSaveButton').click
+  wait_for_ajaximations
+end
+
+# Used to set group_limit field manually. Assumes you are on Edit Group Set page and self-sign up is checked
+def manually_set_groupset_limit(member_limit = "2")
+  replace_content(fj('input[name="group_limit"]:visible'), member_limit)
+  fj('.btn.btn-primary[type=submit]').click
   wait_for_ajaximations
 end
 
