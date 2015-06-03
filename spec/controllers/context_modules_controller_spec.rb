@@ -386,6 +386,29 @@ describe ContextModulesController do
     end
   end
 
+  describe "POST 'add_item'" do
+    before :once do
+      course_with_teacher(:active_all => true)
+      @module = @course.context_modules.create!
+    end
+
+    it "should set position" do
+      user_session @teacher
+      @module.add_item({ :type => 'context_module_sub_header', :title => 'foo!' }, nil, position: 1)
+      post 'add_item', :course_id => @course.id, :context_module_id => @module.id, :item =>
+                         { :type => 'context_module_sub_header', :title => 'bar!', :position => 3 }
+      expect(@module.content_tags.map {|tag| [tag.title, tag.position]}).to match_array([['foo!', 1], ['bar!', 3]])
+    end
+
+    it "shouldn't duplicate an existing position" do
+      user_session @teacher
+      @module.add_item({ :type => 'context_module_sub_header', :title => 'foo!' }, nil, position: 3)
+      post 'add_item', :course_id => @course.id, :context_module_id => @module.id, :item =>
+                       { :type => 'context_module_sub_header', :title => 'bar!', :position => 3 }
+      expect(@module.content_tags.map {|tag| [tag.title, tag.position]}).to match_array([['foo!', 3], ['bar!', 4]])
+    end
+  end
+
   describe "PUT 'update_item'" do
     before :once do
       course_with_teacher(:active_all => true)
