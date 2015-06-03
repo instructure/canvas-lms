@@ -79,6 +79,14 @@ describe LoginController do
       get 'new'
       expect(response).to redirect_to(facebook_login_url)
     end
+
+    it "redirects based on authentication_provider param" do
+      Account.default.account_authorization_configs.create!(auth_type: 'facebook')
+      account_with_cas(account: Account.default)
+
+      get 'new', authentication_provider: 'cas'
+      expect(response).to redirect_to(controller.url_for(controller: 'login/cas', action: :new))
+    end
   end
 
   describe "#logout" do

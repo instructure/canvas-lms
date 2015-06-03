@@ -391,13 +391,13 @@ class ApplicationController < ActionController::Base
     respond_to do |format|
       @show_left_side = false
       clear_crumbs
-      params = request.path_parameters
-      params[:format] = nil
+      path_params = request.path_parameters
+      path_params[:format] = nil
       @headers = !!@current_user if @headers != false
       @files_domain = @account_domain && @account_domain.host_type == 'files'
       format.html {
         store_location
-        return redirect_to login_url if !@files_domain && !@current_user
+        return redirect_to login_url(params.slice(:authentication_provider)) if !@files_domain && !@current_user
 
         if @context.is_a?(Course) && @context_enrollment
           start_date = @context_enrollment.enrollment_dates.map(&:first).compact.min if @context_enrollment.state_based_on_date == :inactive
@@ -412,7 +412,7 @@ class ApplicationController < ActionController::Base
 
         render "shared/unauthorized", status: :unauthorized
       }
-      format.zip { redirect_to(url_for(params)) }
+      format.zip { redirect_to(url_for(path_params)) }
       format.json { render_json_unauthorized }
     end
     response.headers["Pragma"] = "no-cache"
