@@ -29,7 +29,8 @@ describe "terms/_term.html.erb" do
       assigns[:context] = @account
       assigns[:account] = @account
       assigns[:root_account] = @account
-      
+      assigns[:course_counts_by_term] = EnrollmentTerm.course_counts([@term])
+      assigns[:user_counts_by_term] = EnrollmentTerm.user_counts(@account, [@term])
     end
 
     it "should show to sis admin" do
