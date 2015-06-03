@@ -227,6 +227,11 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   #   The Facebook App Secret. Not available if configured globally for Canvas.
   #
+  # - login_attribute [Optional]
+  #
+  #   The attribute to use to look up the user's login in Canvas. Either
+  #   'id' (the default), or 'email'
+  #
   # For GitHub, the additional recognized parameters are:
   #
   # - domain [Optional]
@@ -245,6 +250,11 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   The GitHub application's Client Secret. Not available if configured
   #   globally for Canvas.
   #
+  # - login_attribute [Optional]
+  #
+  #   The attribute to use to look up the user's login in Canvas. Either
+  #   'id' (the default), or 'login'
+  #
   # For Google, the additional recognized parameters are:
   #
   # - client_id [Required]
@@ -256,6 +266,11 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   #   The Google application's Client Secret. Not available if configured
   #   globally for Canvas.
+  #
+  # - login_attribute [Optional]
+  #
+  #   The attribute to use to look up the user's login in Canvas. Either
+  #   'sub' (the default), or 'email'
   #
   # For LDAP authentication services, the additional recognized parameters are:
   #
@@ -312,6 +327,11 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   The LinkedIn application's Client Secret. Not available if configured
   #   globally for Canvas.
   #
+  # - login_attribute [Optional]
+  #
+  #   The attribute to use to look up the user's login in Canvas. Either
+  #   'id' (the default), or 'emailAddress'
+  #
   # For OpenID Connect, the additional recognized parameters are:
   #
   # - client_id [Required]
@@ -330,6 +350,15 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   #   The URL for exchanging the OAuth 2.0 authorization code for an access
   #   token and id token
+  #
+  # - scope [Optional]
+  #
+  #   Space separated additional scopes to request for the token.
+  #
+  # - login_attribute [Optional]
+  #
+  #   The attribute of the ID token to look up the user's login in Canvas.
+  #   Defaults to 'sub'.
   #
   # For SAML authentication services, the additional recognized parameters are:
   #
@@ -385,6 +414,11 @@ class AccountAuthorizationConfigsController < ApplicationController
   # - consumer_secret [Required]
   #
   #   The Twitter Consumer Secret. Not available if configured globally for Canvas.
+  #
+  # - login_attribute [Optional]
+  #
+  #   The attribute to use to look up the user's login in Canvas. Either
+  #   'user_id' (the default), or 'screen_name'
   #
   # - account_authorization_config[n] (deprecated)
   #   The nth service specification as described above. For instance, the

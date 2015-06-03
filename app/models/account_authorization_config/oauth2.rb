@@ -27,7 +27,8 @@ class AccountAuthorizationConfig::Oauth2 < AccountAuthorizationConfig::Delegated
   alias_method :client_secret, :auth_decrypted_password
   { client_id: :entity_id,
     authorize_url: :log_in_url,
-    token_url: :auth_base }.each do |(new_name, old_name)|
+    token_url: :auth_base,
+    scope: :requested_authn_context }.each do |(new_name, old_name)|
     class_eval <<-RUBY, __FILE__, __LINE__ + 1
       def #{new_name}=(val)
         self.#{old_name} = val

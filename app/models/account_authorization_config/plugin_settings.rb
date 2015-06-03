@@ -28,7 +28,7 @@ module AccountAuthorizationConfig::PluginSettings
 
     def recognized_params
       if globally_configured?
-        [].freeze
+        @recognized_params
       else
         @plugin_settings
       end
@@ -43,7 +43,7 @@ module AccountAuthorizationConfig::PluginSettings
           settings_hash[setting] = setting
         end
       end
-      @plugin_settings = settings_hash.keys
+      @plugin_settings = settings_hash.keys + @recognized_params
 
       # force attribute methods to be created so that we can alias them
       # also rescue nil, cause the db may not exist yet
@@ -67,6 +67,7 @@ module AccountAuthorizationConfig::PluginSettings
   end
 
   def self.included(klass)
+    klass.instance_variable_set(:@recognized_params, klass.recognized_params)
     klass.extend(ClassMethods)
     klass.cattr_accessor(:plugin)
   end

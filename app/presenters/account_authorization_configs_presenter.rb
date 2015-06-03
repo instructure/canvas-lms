@@ -86,11 +86,6 @@ class AccountAuthorizationConfigsPresenter
     Onelogin::Saml::NameIdentifiers::ALL_IDENTIFIERS
   end
 
-  def saml_login_attributes
-    return {} unless saml_enabled?
-    AccountAuthorizationConfig::SAML.login_attributes
-  end
-
   def saml_debugging?
      !saml_configs.empty? && saml_configs.any?(&:debugging?)
   end

@@ -14,3 +14,4 @@ TEXT
       <%= f.password_field :app_secret, class: 'ic-Input' %>
     </div>
 <% end %>
+<%= render partial: 'login_attribute_dropdown', locals: { f: f, aac: aac } %>

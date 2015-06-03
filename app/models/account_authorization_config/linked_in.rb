@@ -22,7 +22,20 @@ class AccountAuthorizationConfig::LinkedIn < AccountAuthorizationConfig::Oauth2
   plugin_settings :client_id, client_secret: :client_secret_dec
 
   def self.sti_name
-    'linkedin'
+    'linkedin'.freeze
+  end
+
+  def self.recognized_params
+    [ :login_attribute ].freeze
+  end
+
+  def self.login_attributes
+    ['id'.freeze, 'emailAddress'.freeze].freeze
+  end
+  validates :login_attribute, inclusion: login_attributes
+
+  def login_attribute
+    super || 'id'.freeze
   end
 
   def login_button?
@@ -30,7 +43,7 @@ class AccountAuthorizationConfig::LinkedIn < AccountAuthorizationConfig::Oauth2
   end
 
   def unique_id(token)
-    token.get('/v1/people/~:(id)?format=json').parsed['id']
+    token.get("/v1/people/~:(#{login_attribute})?format=json").parsed[login_attribute]
   end
 
   protected
@@ -44,6 +57,14 @@ class AccountAuthorizationConfig::LinkedIn < AccountAuthorizationConfig::Oauth2
   end
 
   def authorize_options
-    { scope: 'r_basicprofile' }
+    { scope: scope }
+  end
+
+  def scope
+    if login_attribute == 'emailAddress'.freeze
+      'r_basicprofile r_emailaddress'.freeze
+    else
+      'r_basicprofile'.freeze
+    end
   end
 end

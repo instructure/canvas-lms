@@ -25,7 +25,20 @@ class AccountAuthorizationConfig::Google < AccountAuthorizationConfig::OpenIDCon
     true
   end
 
+  def self.recognized_params
+    [ :login_attribute ].freeze
+  end
+
+  def self.login_attributes
+    ['sub'.freeze, 'email'.freeze].freeze
+  end
+  validates :login_attribute, inclusion: login_attributes
+
   protected
+
+  def scope
+    'email'.freeze if login_attribute == 'email'.freeze
+  end
 
   def authorize_url
     'https://accounts.google.com/o/oauth2/auth'.freeze

@@ -28,6 +28,10 @@ class AccountAuthorizationConfig::GitHub < AccountAuthorizationConfig::Oauth2
     true
   end
 
+  def self.recognized_params
+    [ :login_attribute ].freeze
+  end
+
   # Rename db field
   def domain=(val)
     self.auth_host = val
@@ -41,7 +45,16 @@ class AccountAuthorizationConfig::GitHub < AccountAuthorizationConfig::Oauth2
 
   def unique_id(token)
     token.options[:mode] = :query
-    token.get('user').parsed['id'].to_s
+    token.get('user').parsed[login_attribute].to_s
+  end
+
+  def self.login_attributes
+    ['id'.freeze, 'login'.freeze].freeze
+  end
+  validates :login_attribute, inclusion: login_attributes
+
+  def login_attribute
+    super || 'id'.freeze
   end
 
   protected

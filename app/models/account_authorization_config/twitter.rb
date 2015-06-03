@@ -25,8 +25,21 @@ class AccountAuthorizationConfig::Twitter < AccountAuthorizationConfig::Oauth
     true
   end
 
+  def self.recognized_params
+    [ :login_attribute ].freeze
+  end
+
+  def self.login_attributes
+    ['user_id'.freeze, 'screen_name'.freeze].freeze
+  end
+  validates :login_attribute, inclusion: login_attributes
+
+  def login_attribute
+    super || 'user_id'.freeze
+  end
+
   def unique_id(token)
-    token.params[:user_id]
+    token.params[login_attribute.to_sym]
   end
 
   protected

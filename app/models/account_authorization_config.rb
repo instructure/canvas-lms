@@ -93,11 +93,11 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   end
 
   def self.recognized_params
-    []
+    [].freeze
   end
 
   def self.deprecated_params
-    []
+    [].freeze
   end
 
   SENSITIVE_PARAMS = [].freeze

@@ -26,16 +26,28 @@ class AccountAuthorizationConfig::OpenIDConnect < AccountAuthorizationConfig::Oa
   end
 
   def self.recognized_params
-    [ :client_id, :client_secret, :authorize_url, :token_url ].freeze
+    [ :client_id, :client_secret, :authorize_url, :token_url, :scope, :login_attribute ].freeze
+  end
+
+  def login_attribute
+    super || 'sub'.freeze
   end
 
   def unique_id(token)
-    JWT.decode(token.params['id_token'], nil, false).first['sub']
+    JWT.decode(token.params['id_token'.freeze], nil, false).first[login_attribute]
   end
 
   protected
 
   def authorize_options
-    { scope: 'openid' }
+    { scope: scope_for_options }
+  end
+
+  private
+
+  def scope_for_options
+    result = (scope || ''.freeze).split(' '.freeze)
+    result.unshift('openid'.freeze) unless result.include?('openid'.freeze)
+    result.join(' '.freeze)
   end
 end

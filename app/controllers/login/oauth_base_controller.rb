@@ -59,8 +59,12 @@ class Login::OauthBaseController < ApplicationController
     false
   end
 
-  def find_pseudonym(unique_id)
-    pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_id, @aac)
+  def find_pseudonym(unique_ids)
+    pseudonym = nil
+    unique_ids = Array(unique_ids)
+    unique_ids.any? do |unique_id|
+      pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_id, @aac)
+    end
     if pseudonym
       # Successful login and we have a user
       @domain_root_account.pseudonym_sessions.create!(pseudonym, false)
@@ -69,8 +73,8 @@ class Login::OauthBaseController < ApplicationController
       successful_login(pseudonym.user, pseudonym)
     else
       unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
-      logger.warn "Received OAuth2 login for unknown user: #{unique_id}, redirecting to: #{unknown_user_url}."
-      flash[:delegated_message] = t "Canvas doesn't have an account for user: %{user}", :user => unique_id
+      logger.warn "Received OAuth2 login for unknown user: #{unique_ids.inspect}, redirecting to: #{unknown_user_url}."
+      flash[:delegated_message] = t "Canvas doesn't have an account for user: %{user}", :user => unique_ids.first
       redirect_to unknown_user_url
     end
   end

@@ -14,13 +14,7 @@
   <%= f.label :certificate_fingerprint, t('Certificate Fingerprint'), class: 'ic-Label' %>
   <%= f.text_field :certificate_fingerprint, class: 'ic-Input' %>
 </div>
-<div class="ic-Form-control">
-  <%= f.label :login_attribute, 'Login Attribute', class: 'ic-Label' %>
-  <%= f.select(:login_attribute,
-               presenter.saml_login_attributes,
-               {},
-               class: 'ic-Input') %>
-</div>
+<%= render partial: 'login_attribute_dropdown', locals: { f: f, aac: aac } %>
 <div class="ic-Form-control">
   <%= f.label :identifier_format, 'Identifier Format', class: 'ic-Label' %>
   <%= f.select(:identifier_format,

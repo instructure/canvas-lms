@@ -42,11 +42,32 @@ class AccountAuthorizationConfig::Facebook < AccountAuthorizationConfig::Oauth2
     self.class.globally_configured? ? app_secret : super
   end
 
+  def self.recognized_params
+    [ :login_attribute ].freeze
+  end
+
+  def self.login_attributes
+    ['id'.freeze, 'email'.freeze].freeze
+  end
+  validates :login_attribute, inclusion: login_attributes
+
+  def login_attribute
+    super || 'id'.freeze
+  end
+
   def unique_id(token)
-    token.get('me').parsed['id']
+    token.get('me'.freeze).parsed[login_attribute]
   end
 
   protected
+
+  def authorize_options
+    if login_attribute == 'email'.freeze
+      { scope: 'email'.freeze }.freeze
+    else
+      {}.freeze
+    end
+  end
 
   def client_options
     {

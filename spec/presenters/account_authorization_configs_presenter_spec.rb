@@ -50,19 +50,6 @@ describe AccountAuthorizationConfigsPresenter do
       end
     end
 
-    describe "#saml_login_attributes" do
-      it "is empty when saml disabled" do
-        AccountAuthorizationConfig::SAML.stubs(:enabled?).returns(false)
-        expect(presenter.saml_login_attributes).to be_empty
-      end
-
-      it "pulls the attributes from AAC" do
-        AccountAuthorizationConfig::SAML.stubs(:enabled?).returns(true)
-        expected = AccountAuthorizationConfig::SAML.login_attributes
-        expect(presenter.saml_login_attributes).to eq(expected)
-      end
-    end
-
     describe "#saml_authn_contexts" do
       it "is empty when saml disabled" do
         AccountAuthorizationConfig::SAML.stubs(:enabled?).returns(false)
