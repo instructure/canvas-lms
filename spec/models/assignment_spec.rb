@@ -2655,6 +2655,15 @@ describe Assignment do
         expect(@assignment.representatives(@teacher)).to include g1rep
       end
 
+      it "prefers people who aren't excused" do
+        g1, _ = @groups
+        g1rep, *others = g1.users.all.shuffle
+        others.each { |u|
+          @assignment.grade_student(u, excuse: true)
+        }
+        expect(@assignment.representatives(@teacher)).to include g1rep
+      end
+
       it "includes users who aren't in a group" do
         student_in_course active_all: true
         expect(@assignment.representatives(@teacher).last).to eq @student

@@ -266,6 +266,7 @@ class GradebooksController < ApplicationController
     end
   end
 
+  # TODO: stop using this for speedgrader
   def update_submission
     if authorized_action(@context, @current_user, :manage_grades)
       if params[:submissions].blank? && params[:submission].blank?

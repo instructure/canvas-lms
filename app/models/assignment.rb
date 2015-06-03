@@ -1250,7 +1250,7 @@ class Assignment < ActiveRecord::Base
     submission_fields = [ :user_id, :id, :submitted_at, :workflow_state,
                           :grade, :grade_matches_current_submission,
                           :graded_at, :turnitin_data, :submission_type, :score,
-                          :assignment_id, :submission_comments ]
+                          :assignment_id, :submission_comments, :excused ]
 
     comment_fields = [:comment, :id, :author_name, :created_at, :author_id,
                       :media_comment_type, :media_comment_id,
@@ -1408,6 +1408,7 @@ class Assignment < ActiveRecord::Base
       submissions = self.submissions.includes(:user)
       users_with_submissions = submissions
                                .select(&:has_submission?)
+                               .reject(&:excused?)
                                .map(&:user)
       users_with_turnitin_data = if turnitin_enabled?
                                    submissions
