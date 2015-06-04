@@ -33,7 +33,7 @@ describe "account_authorization_configs/index" do
   it "should list the auth ips" do
     Setting.set('account_authorization_config_ip_addresses', "192.168.0.1,192.168.0.2")
     presenter = AccountAuthorizationConfigsPresenter.new(account)
-    account.account_authorization_configs = [
+    account.authentication_providers = [
       presenter.new_config(auth_type: 'saml'),
       presenter.new_config(auth_type: 'saml')
     ]
@@ -43,21 +43,25 @@ describe "account_authorization_configs/index" do
   end
 
   it "should display the last_timeout_failure" do
-    account.account_authorization_configs = [
-      account.account_authorization_configs.create!(auth_type: 'ldap'),
+    timed_out_aac = account.account_authorization_configs.create!(auth_type: 'ldap')
+    account.authentication_providers = [
+      timed_out_aac,
       account.account_authorization_configs.create!(auth_type: 'ldap')
     ]
-    account.account_authorization_configs.first.last_timeout_failure = 1.minute.ago
-    assigns[:presenter] = AccountAuthorizationConfigsPresenter.new(account)
+    timed_out_aac.last_timeout_failure = 1.minute.ago
+    timed_out_aac.save!
+    presenter = AccountAuthorizationConfigsPresenter.new(account)
+    expect(presenter.configs).to include(timed_out_aac)
+    assigns[:presenter] = presenter
     render 'account_authorization_configs/index'
     doc = Nokogiri::HTML(response.body)
     expect(doc.css('.last_timeout_failure').length).to eq 1
   end
 
   it "should display more than 2 LDAP configs" do
-    account.account_authorization_configs.each(&:destroy)
+    account.authentication_providers.each(&:destroy)
     4.times do
-      account.account_authorization_configs.create!(auth_type: 'ldap')
+      account.authentication_providers.create!(auth_type: 'ldap')
     end
     assigns[:presenter] = AccountAuthorizationConfigsPresenter.new(account)
     render 'account_authorization_configs/index'

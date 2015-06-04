@@ -6,7 +6,7 @@ class AccountAuthorizationConfigsPresenter
   end
 
   def configs
-    @configs ||= account.account_authorization_configs.to_a
+    @configs ||= account.authentication_providers.active.to_a
   end
 
   def new_auth_types
@@ -116,7 +116,7 @@ class AccountAuthorizationConfigsPresenter
   end
 
   def new_config(auth_type)
-    account.account_authorization_configs.new(auth_type)
+    account.authentication_providers.new(auth_type)
   end
 
   def parent_reg_selected

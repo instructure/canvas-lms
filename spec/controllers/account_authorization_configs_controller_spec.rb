@@ -43,7 +43,7 @@ RSpec.describe AccountAuthorizationConfigsController, type: :controller do
 
     context "with an AAC" do
       it "renders ok" do
-        account.account_authorization_configs.create!(saml_hash)
+        account.authentication_providers.create!(saml_hash)
         get 'index', account_id: account.id
         expect(response).to be_success
       end

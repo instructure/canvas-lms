@@ -19,7 +19,7 @@
 require_relative '../../spec_helper'
 
 describe Login::Oauth2Controller do
-  let(:aac) { Account.default.account_authorization_configs.create!(auth_type: 'facebook') }
+  let(:aac) { Account.default.authentication_providers.create!(auth_type: 'facebook') }
   before do
     aac
     Canvas::Plugin.find(:facebook).stubs(:settings).returns({})

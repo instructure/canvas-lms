@@ -69,10 +69,14 @@ class LoginController < ApplicationController
         # canvas isn't an actual type, so we have to _not_ look for it
         auth_type = 'canvas'
       else
-        auth_type = @domain_root_account.account_authorization_configs.find(params[:authentication_provider]).auth_type
+        auth_type = @domain_root_account.
+          authentication_providers.
+          active.
+          find(params[:authentication_provider]).
+          auth_type
       end
     else
-      auth_type = @domain_root_account.account_authorization_configs.first.try(:auth_type)
+      auth_type = @domain_root_account.authentication_providers.active.first.try(:auth_type)
       auth_type ||= 'canvas'
     end
 

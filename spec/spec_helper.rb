@@ -448,7 +448,7 @@ RSpec.configure do |config|
     config.auth_type = "cas"
     config.auth_base = cas_url
     config.log_in_url = opts[:cas_log_in_url] if opts[:cas_log_in_url]
-    @account.account_authorization_configs << config
+    @account.authentication_providers << config
     @account
   end
 
@@ -459,7 +459,7 @@ RSpec.configure do |config|
     config.auth_type = "saml"
     config.log_in_url = opts[:saml_log_in_url] if opts[:saml_log_in_url]
     config.log_out_url = opts[:saml_log_out_url] if opts[:saml_log_out_url]
-    @account.account_authorization_configs << config
+    @account.authentication_providers << config
     @account
   end
 
@@ -598,7 +598,7 @@ RSpec.configure do |config|
   def managed_pseudonym(user, opts={})
     other_account = opts[:account] || account_with_saml
     if other_account.canvas_authentication?
-      config = other_account.account_authorization_configs.build
+      config = other_account.authentication_providers.build
       config.auth_type = "saml"
       config.log_in_url = opts[:saml_log_in_url] if opts[:saml_log_in_url]
       config.save!

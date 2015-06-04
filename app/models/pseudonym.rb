@@ -415,7 +415,7 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def ldap_bind_result(password_plaintext)
-    self.account.account_authorization_configs.where(auth_type: 'ldap').each do |config|
+    account.authentication_providers.active.where(auth_type: 'ldap').find_each do |config|
       res = config.ldap_bind_result(self.unique_id, password_plaintext)
       return res if res
     end

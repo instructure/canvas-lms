@@ -1458,7 +1458,7 @@ describe User do
       user2 = User.create!
       @account1.pseudonyms.create!(:user => user2, :unique_id => 'preferred@example.com', :password => 'abcdef', :password_confirmation => 'abcdef')
       @user.pseudonyms.detect { |p| p.account == Account.site_admin }.update_attribute(:password_auto_generated, true)
-      Account.default.account_authorization_configs.create!(:auth_type => 'cas')
+      Account.default.authentication_providers.create!(:auth_type => 'cas')
       new_pseudonym = @user.find_or_initialize_pseudonym_for_account(@account1, @account3)
       expect(new_pseudonym).not_to be_nil
       expect(new_pseudonym).to be_new_record
@@ -1477,7 +1477,7 @@ describe User do
       expect(@user.find_or_initialize_pseudonym_for_account(@account1)).to be_nil
 
       # delegated auth
-      @account3.account_authorization_configs.create!(:auth_type => 'cas')
+      @account3.authentication_providers.create!(:auth_type => 'cas')
       expect(@account3).to be_delegated_authentication
       @user.pseudonyms.create!(:account => @account3, :unique_id => 'jacob@instructure.com', :password => 'abcdef', :password_confirmation => 'abcdef')
       expect(@user.find_or_initialize_pseudonym_for_account(@account1)).to be_nil

@@ -3448,7 +3448,7 @@ describe Course do
     it "should be preferred if delegated authentication is configured" do
       account = Account.default
       account.settings = { :open_registration => true }
-      account.account_authorization_configs.create!(:auth_type => 'cas')
+      account.authentication_providers.create!(:auth_type => 'cas')
       account.save!
       course
       expect(@course.user_list_search_mode_for(nil)).to eq :preferred

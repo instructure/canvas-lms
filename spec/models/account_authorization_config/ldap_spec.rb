@@ -21,7 +21,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 describe AccountAuthorizationConfig::LDAP do
   it "should not escape auth_filter" do
     @account = Account.new
-    @account_config = @account.account_authorization_configs.build(auth_type: 'ldap', ldap_filter: '(&(!(userAccountControl:1.2.840.113556.1.4.803:=2))(sAMAccountName={{login}}))')
+    @account_config = @account.authentication_providers.build(
+      auth_type: 'ldap',
+      ldap_filter: '(&(!(userAccountControl:1.2.840.113556.1.4.803:=2))(sAMAccountName={{login}}))'
+    )
+
     @account_config.save
     expect(@account_config.auth_filter).to eql("(&(!(userAccountControl:1.2.840.113556.1.4.803:=2))(sAMAccountName={{login}}))")
   end

@@ -9,11 +9,15 @@ describe AccountAuthorizationConfigsPresenter do
     end
   end
 
+  def stubbed_account(providers=[])
+    stub(authentication_providers: stub(active: providers))
+  end
+
   describe "#configs" do
 
     it "pulls configs from account" do
       config2 = stub
-      account = stub(account_authorization_configs: [stub, config2])
+      account = stubbed_account([stub, config2])
       presenter = described_class.new(account)
       expect(presenter.configs[1]).to eq(config2)
     end
@@ -21,14 +25,14 @@ describe AccountAuthorizationConfigsPresenter do
     it "wraps them in an array" do
       class NotArray < Array
       end
-      account = stub(account_authorization_configs: NotArray.new([]))
+      account = stubbed_account(NotArray.new([]))
       presenter = described_class.new(account)
       expect(presenter.configs.class).to eq(Array)
     end
 
     it "only pulls from the db connection one time" do
       account = stub()
-      account.expects(:account_authorization_configs).times(1).returns([])
+      account.expects(:authentication_providers).times(1).returns(stub(active: []))
       presenter = described_class.new(account)
       5.times{ presenter.configs }
     end
@@ -84,19 +88,19 @@ describe AccountAuthorizationConfigsPresenter do
 
   describe "#auth?" do
     it "is true for one aac" do
-      account = stub(account_authorization_configs: [stub])
+      account = stubbed_account([stub])
       presenter = described_class.new(account)
       expect(presenter.auth?).to be(true)
     end
 
     it "is true for many aacs" do
-      account = stub(account_authorization_configs: [stub, stub])
+      account = stubbed_account([stub, stub])
       presenter = described_class.new(account)
       expect(presenter.auth?).to be(true)
     end
 
     it "is false for no aacs" do
-      account = stub(account_authorization_configs: [])
+      account = stubbed_account
       presenter = described_class.new(account)
       expect(presenter.auth?).to be(false)
     end
@@ -104,26 +108,19 @@ describe AccountAuthorizationConfigsPresenter do
 
   describe "#ldap_config?" do
     it "is true if theres at least one ldap aac" do
-      account = stub(
-        account_authorization_configs: [AccountAuthorizationConfig::LDAP.new]
-      )
+      account = stubbed_account([AccountAuthorizationConfig::LDAP.new])
       presenter = described_class.new(account)
       expect(presenter.ldap_config?).to be(true)
     end
 
     it "is false for no aacs" do
-      account = stub(account_authorization_configs: [])
+      account = stubbed_account
       presenter = described_class.new(account)
       expect(presenter.ldap_config?).to be(false)
     end
 
     it "is false for aacs which are not ldap" do
-      account = stub(
-        account_authorization_configs: [
-          stub(auth_type: 'saml'),
-          stub(auth_type: 'cas')
-        ]
-      )
+      account = stubbed_account( [ stub(auth_type: 'saml'), stub(auth_type: 'cas') ] )
       presenter = described_class.new(account)
       expect(presenter.ldap_config?).to be(false)
     end
@@ -132,7 +129,7 @@ describe AccountAuthorizationConfigsPresenter do
   describe "#sso_options" do
     it "always has cas and ldap" do
       AccountAuthorizationConfig::SAML.stubs(:enabled?).returns(false)
-      presenter = described_class.new(stub(account_authorization_configs: []))
+      presenter = described_class.new(stubbed_account)
       expect(presenter.sso_options).to eq([['CAS', 'cas'],
                                            ['Facebook', 'facebook'],
                                            ['GitHub', 'github'],
@@ -145,7 +142,7 @@ describe AccountAuthorizationConfigsPresenter do
 
     it "includes saml if saml enabled" do
       AccountAuthorizationConfig::SAML.stubs(:enabled?).returns(true)
-      presenter = described_class.new(stub(account_authorization_configs: []))
+      presenter = described_class.new(stubbed_account)
       expect(presenter.sso_options).to include(['SAML', 'saml'])
     end
   end
@@ -234,7 +231,7 @@ describe AccountAuthorizationConfigsPresenter do
     it "selects out all ldap configs" do
       config = AccountAuthorizationConfig::LDAP.new
       config2 = AccountAuthorizationConfig::LDAP.new
-      account = stub(account_authorization_configs: [stub, config, stub, config2])
+      account = stubbed_account([stub, config, stub, config2])
       presenter = described_class.new(account)
       expect(presenter.ldap_configs).to eq([config, config2])
     end
@@ -246,7 +243,7 @@ describe AccountAuthorizationConfigsPresenter do
       config2 = AccountAuthorizationConfig::SAML.new
       pre_configs = [stub, config, stub, config2]
       pre_configs.stubs(:scoped).returns(AccountAuthorizationConfig)
-      account = stub(account_authorization_configs: pre_configs)
+      account = stubbed_account(pre_configs)
       configs = described_class.new(account).saml_configs
       expect(configs[0]).to eq(config)
       expect(configs[1]).to eq(config2)
@@ -257,7 +254,7 @@ describe AccountAuthorizationConfigsPresenter do
   describe "#position_options" do
     let(:config){ AccountAuthorizationConfig::SAML.new }
     let(:configs){ [config, config, config, config] }
-    let(:account){ stub(account_authorization_configs: configs) }
+    let(:account){ stubbed_account(configs) }
 
     before do
       configs.stubs(:scoped).returns(AccountAuthorizationConfig)
@@ -277,8 +274,8 @@ describe AccountAuthorizationConfigsPresenter do
 
   describe "#login_url" do
     it "never includes id for LDAP" do
-      config = Account.default.account_authorization_configs.create!(auth_type: 'ldap')
-      config2 = Account.default.account_authorization_configs.create!(auth_type: 'ldap')
+      config = Account.default.authentication_providers.create!(auth_type: 'ldap')
+      config2 = Account.default.authentication_providers.create!(auth_type: 'ldap')
       presenter = described_class.new(Account.default)
       expect(presenter.login_url_options(config)).to eq(controller: 'login/ldap',
                                                         action: :new)
@@ -287,15 +284,15 @@ describe AccountAuthorizationConfigsPresenter do
     end
 
     it "doesn't include id if there is only one SAML config" do
-      config = Account.default.account_authorization_configs.create!(auth_type: 'saml')
+      config = Account.default.authentication_providers.create!(auth_type: 'saml')
       presenter = described_class.new(Account.default)
       expect(presenter.login_url_options(config)).to eq(controller: 'login/saml',
                                                         action: :new)
     end
 
     it "includes id if there are multiple SAML configs" do
-      config = Account.default.account_authorization_configs.create!(auth_type: 'saml')
-      config2 = Account.default.account_authorization_configs.create!(auth_type: 'saml')
+      config = Account.default.authentication_providers.create!(auth_type: 'saml')
+      config2 = Account.default.authentication_providers.create!(auth_type: 'saml')
       presenter = described_class.new(Account.default)
       expect(presenter.login_url_options(config)).to eq(controller: 'login/saml',
                                                         action: :new,
@@ -309,7 +306,7 @@ describe AccountAuthorizationConfigsPresenter do
   describe "#new_auth_types" do
     it "excludes singletons that have a config" do
       AccountAuthorizationConfig::Facebook.stubs(:enabled?).returns(true)
-      Account.default.account_authorization_configs.create!(auth_type: 'facebook')
+      Account.default.authentication_providers.create!(auth_type: 'facebook')
       presenter = described_class.new(Account.default)
       expect(presenter.new_auth_types).to_not be_include(AccountAuthorizationConfig::Facebook)
     end

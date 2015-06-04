@@ -27,8 +27,7 @@ class Login::CanvasController < ApplicationController
   def new
     @pseudonym_session = PseudonymSession.new
     @headers = false
-    @aacs_with_buttons = @domain_root_account.account_authorization_configs.
-                           select(&:login_button?)
+    @aacs_with_buttons = @domain_root_account.authentication_providers.active.select(&:login_button?)
 
     maybe_render_mobile_login
   end
@@ -65,7 +64,7 @@ class Login::CanvasController < ApplicationController
 
     # look for LDAP pseudonyms where we get the unique_id back from LDAP
     if !found && !@pseudonym_session.attempted_record
-      found = @domain_root_account.account_authorization_configs.where(auth_type: 'ldap').any? do |aac|
+      found = @domain_root_account.authentication_providers.active.where(auth_type: 'ldap').any? do |aac|
         next unless aac.identifier_format.present?
         res = aac.ldap_bind_result(params[:pseudonym_session][:unique_id], params[:pseudonym_session][:password])
         unique_id = res.first[aac.identifier_format].first if res

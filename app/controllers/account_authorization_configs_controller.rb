@@ -170,7 +170,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   # @returns [AccountAuthorizationConfig]
   def index
     if api_request?
-      render json: aacs_json(@account.account_authorization_configs)
+      render json: aacs_json(@account.authentication_providers.active)
     else
       @presenter = AccountAuthorizationConfigsPresenter.new(@account)
     end
@@ -533,8 +533,7 @@ class AccountAuthorizationConfigsController < ApplicationController
       position = aac_data.delete(:position)
       data = filter_data(aac_data)
       deselect_parent_registration(data)
-
-      account_config = @account.account_authorization_configs.build(data)
+      account_config = @account.authentication_providers.build(data)
       update_deprecated_account_settings_data(aac_data, account_config)
 
       if position.present?
@@ -564,7 +563,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   # @returns AccountAuthorizationConfig
   def update
     aac_data = strong_params.fetch(:account_authorization_config, strong_params)
-    aac = @account.account_authorization_configs.find params[:id]
+    aac = @account.authentication_providers.active.find params[:id]
     update_deprecated_account_settings_data(aac_data, aac)
     position = aac_data.delete(:position)
     data = filter_data(aac_data)
@@ -603,7 +602,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   # @returns AccountAuthorizationConfig
   #
   def show
-    aac = @account.account_authorization_configs.find params[:id]
+    aac = @account.authentication_providers.active.find params[:id]
     render json: aac_json(aac)
   end
 
@@ -614,7 +613,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   curl -XDELETE 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs/<id>' \
   #        -H 'Authorization: Bearer <token>'
   def destroy
-    aac = @account.account_authorization_configs.find params[:id]
+    aac = @account.authentication_providers.active.find params[:id]
     aac.destroy
 
     respond_to do |format|
@@ -625,7 +624,7 @@ class AccountAuthorizationConfigsController < ApplicationController
 
   # deprecated version of the AAC API
   def update_all
-    account_configs_to_delete = @account.account_authorization_configs.to_a.dup
+    account_configs_to_delete = @account.authentication_providers.active.to_a.dup
     account_configs = []
     (params[:account_authorization_config] || {}).sort_by {|k,_| k }.each do |_idx, data|
       id = data.delete :id
@@ -635,10 +634,10 @@ class AccountAuthorizationConfigsController < ApplicationController
       next if data.empty?
 
       if id.to_i == 0
-        account_config = @account.account_authorization_configs.build(data)
+        account_config = @account.authentication_providers.build(data)
         account_config.save!
       else
-        account_config = @account.account_authorization_configs.find(id)
+        account_config = @account.authentication_providers.active.find(id)
         account_configs_to_delete.delete(account_config)
         account_config.update_attributes!(data)
       end
@@ -651,14 +650,14 @@ class AccountAuthorizationConfigsController < ApplicationController
 
     @account.reload
 
-    if @account.account_authorization_configs.count > 1 && params[:discovery_url] && params[:discovery_url] != ''
+    if @account.authentication_providers.active.count > 1 && params[:discovery_url] && params[:discovery_url] != ''
       @account.auth_discovery_url = params[:discovery_url]
     else
       @account.auth_discovery_url = nil
     end
     @account.save!
 
-    render :json => aacs_json(@account.account_authorization_configs)
+    render :json => aacs_json(@account.authentication_providers.active)
   end
 
   # @API GET discovery url _Deprecated_[2015-05-08]
@@ -793,7 +792,7 @@ class AccountAuthorizationConfigsController < ApplicationController
 
   def test_ldap_connection
     results = []
-    @account.account_authorization_configs.each do |config|
+    ldap_providers(@account).each do |config|
       h = {
         :account_authorization_config_id => config.id,
         :ldap_connection_test => config.test_ldap_connection
@@ -805,7 +804,7 @@ class AccountAuthorizationConfigsController < ApplicationController
 
   def test_ldap_bind
     results = []
-    @account.account_authorization_configs.each do |config|
+    ldap_providers(@account).each do |config|
       h = {
         :account_authorization_config_id => config.id,
         :ldap_bind_test => config.test_ldap_bind
@@ -817,7 +816,7 @@ class AccountAuthorizationConfigsController < ApplicationController
 
   def test_ldap_search
     results = []
-    @account.account_authorization_configs.each do |config|
+    ldap_providers(@account).each do |config|
       res = config.test_ldap_search
       h = {
         :account_authorization_config_id => config.id,
@@ -843,7 +842,7 @@ class AccountAuthorizationConfigsController < ApplicationController
       )
     end
 
-    @account.account_authorization_configs.where(auth_type: 'ldap').each do |config|
+    ldap_providers(@account).each do |config|
       h = {
         :account_authorization_config_id => config.id,
         :ldap_login_test => config.test_ldap_login(params[:username], params[:password])
@@ -865,14 +864,12 @@ class AccountAuthorizationConfigsController < ApplicationController
   end
 
   def destroy_all
-    @account.account_authorization_configs.each do |c|
-      c.destroy
-    end
+    @account.authentication_providers.active.each(&:destroy)
     redirect_to :account_account_authorization_configs
   end
 
   def saml_testing
-    @account_config = @account.account_authorization_configs.where(auth_type: 'saml').first
+    @account_config = @account.authentication_providers.active.where(auth_type: 'saml').first
 
     unless @account_config
       render json: {
@@ -904,7 +901,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   end
 
   def saml_testing_stop
-    account_config = @account.account_authorization_configs.where(auth_type: "saml").first
+    account_config = @account.authentication_providers.active.where(auth_type: "saml").first
     account_config.finish_debugging if account_config.present?
     render json: { status: "ok" }
   end
@@ -943,7 +940,11 @@ class AccountAuthorizationConfigsController < ApplicationController
 
   def deselect_parent_registration(data)
     if data[:parent_registration] == 'true' || data[:parent_registration] == '1'
-      @account.account_authorization_configs.update_all(parent_registration: false)
+      @account.authentication_providers.update_all(parent_registration: false)
     end
+  end
+
+  def ldap_providers(account)
+    account.authentication_providers.active.where(auth_type: 'ldap')
   end
 end

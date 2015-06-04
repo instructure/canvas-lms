@@ -21,8 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 describe Account do
 
   it "should provide a list of courses" do
-    @account = Account.new
-    expect{@account.courses}.not_to raise_error
+    expect{ Account.new.courses }.not_to raise_error
   end
 
   context "equella_settings" do
@@ -584,15 +583,15 @@ describe Account do
     account = Account.default
     expect(account.login_handle_name_with_inference).to eq "Email"
 
-    config = account.account_authorization_configs.create!(auth_type: 'cas')
+    config = account.authentication_providers.create!(auth_type: 'cas')
     expect(account.login_handle_name_with_inference).to eq "Login"
 
     config.destroy
-    config = account.account_authorization_configs.create!(auth_type: 'saml')
+    config = account.authentication_providers.create!(auth_type: 'saml')
     expect(account.reload.login_handle_name_with_inference).to eq "Login"
 
     config.destroy
-    account.account_authorization_configs.create!(auth_type: 'ldap')
+    account.authentication_providers.create!(auth_type: 'ldap')
     expect(account.reload.login_handle_name_with_inference).to eq "Email"
     account.login_handle_name = "LDAP Login"
     account.save!
@@ -869,6 +868,20 @@ describe Account do
     end
   end
 
+  describe "authentication_providers.active" do
+    let(:account){ Account.default }
+    let!(:aac){ account.authentication_providers.create!(auth_type: 'facebook') }
+
+    it "pulls active AACS" do
+      expect(account.authentication_providers.active).to include(aac)
+    end
+
+    it "ignores deleted AACs" do
+      aac.destroy
+      expect(account.authentication_providers.active).to_not include(aac)
+    end
+  end
+
   describe "delegated_authentication?" do
     let(:account){ Account.default }
 
@@ -877,23 +890,42 @@ describe Account do
     end
 
     it "is false for LDAP" do
-      account.account_authorization_configs.create!(auth_type: 'ldap')
+      account.authentication_providers.create!(auth_type: 'ldap')
       expect(account.delegated_authentication?).to be_falsey
     end
 
     it "is true for CAS" do
-      account.account_authorization_configs.create!(auth_type: 'cas')
+      account.authentication_providers.create!(auth_type: 'cas')
       expect(account.delegated_authentication?).to be_truthy
+    end
+  end
+
+  describe "#non_canvas_auth_configured?" do
+    let(:account) { Account.default }
+
+    it "is false for no aacs" do
+      expect(account.non_canvas_auth_configured?).to be_falsey
+    end
+
+    it "is true for having aacs" do
+      Account.default.authentication_providers.create!(auth_type: 'ldap')
+      expect(account.non_canvas_auth_configured?).to be_truthy
+    end
+
+    it "is false after aacs deleted" do
+      Account.default.authentication_providers.create!(auth_type: 'ldap')
+      account.authentication_providers.destroy_all
+      expect(account.non_canvas_auth_configured?).to be_falsey
     end
   end
 
   describe "canvas_authentication?" do
     before do
-      Account.default.account_authorization_configs.destroy_all
+      Account.default.authentication_providers.destroy_all
       Account.default.settings[:canvas_authentication] = false
       Account.default.save!
       expect(Account.default.canvas_authentication?).to be_truthy
-      Account.default.account_authorization_configs.create!(auth_type: 'ldap')
+      Account.default.authentication_providers.create!(auth_type: 'ldap')
     end
 
     it "should be true if there's not an AAC" do
@@ -901,7 +933,7 @@ describe Account do
     end
 
     it "is true after AACs are destroyed" do
-      Account.default.account_authorization_configs.destroy_all
+      Account.default.authentication_providers.destroy_all
       expect(Account.default.reload.canvas_authentication?).to be_truthy
     end
   end
