@@ -10375,6 +10375,15 @@ tr:
       description: "LinkedIn entegrasyonu"
       name: LinkedIn
     linked_in_settings: 
+      description: |-
+          [LinkedIn de yeni uygulama](%{linkedin_url}) kaydolmalısınız.
+          LinkedIn entegrasyonuzun doğru çalışması için aşağıdaki yapılandırma 
+          seçeneklerini ayarlayın:
+          
+          * **Uygulama Türü:** "Web Application" olarak ayarlayın
+          * **Live Status:** "Live" olarak ayarlayın
+          * **OAuth Redirect URL:** %{oauth_url} e ayarlayın
+          * Uygulamanızı kaydettikten sonra, API Key ve Secret Key'i not alın
       domain_name: "alan adı"
       labels: 
         api_key: "API Key"
