@@ -4,6 +4,7 @@ define [
   'underscore'
   'jsx/grading/gradingPeriodCollection'
   'jquery.instructure_misc_plugins'
+  'compiled/jquery.rails_flash_notifications'
 ], (React, $, _, GradingPeriodCollection) ->
 
   TestUtils = React.addons.TestUtils
@@ -77,55 +78,6 @@ define [
     @gradingPeriodCollection.getPeriods()
     ok $.ajax.calledOnce
 
-  test 'getPeriods calls gotPeriods once the data is received', ->
-    @stub(@gradingPeriodCollection, 'gotPeriods')
-    @gradingPeriodCollection.getPeriods()
-    @server.respond()
-    ok @gradingPeriodCollection.gotPeriods.calledOnce
-
-  test 'gotPeriods sets disabled state to false', ->
-    @gradingPeriodCollection.setState({disabled: true})
-    ok @gradingPeriodCollection.state.disabled
-    @gradingPeriodCollection.gotPeriods(@formattedIndexData.grading_periods)
-    ok !@gradingPeriodCollection.state.disabled
-
-  test 'gotPeriods concatenates the index returned from the ajax call with any new, unsaved grading periods, and sets the result to the periods state', ->
-    unsavedPeriods = [
-      {
-        "id":"new1", "startDate": new Date("2029-03-01T06:00:00Z"), "endDate": new Date("2030-05-31T05:00:00Z"),
-        "weight":null, "title":"New Period. I'm not saved yet!",
-        "permissions": { "read":true, "manage":true }
-      },
-      {
-        "id":"new2", "startDate": new Date("2039-03-01T06:00:00Z"), "endDate": new Date("2042-05-31T05:00:00Z"),
-        "weight":null, "title":"Another New Period. Also not saved yet!",
-        "permissions": { "read":true, "manage":true }
-      }
-    ]
-    @gradingPeriodCollection.setState({periods: unsavedPeriods})
-    @gradingPeriodCollection.gotPeriods(@formattedIndexData.grading_periods)
-    newPeriods = @formattedIndexData.grading_periods.concat(unsavedPeriods)
-    deepEqual @gradingPeriodCollection.state.periods, newPeriods
-
-  test 'gotPeriods excludes the grading period with the id matching idToExclude when setting state', ->
-    idToExclude = 'new2'
-    unsavedPeriods = [
-      {
-        "id":"new1", "startDate": new Date("2029-03-01T06:00:00Z"), "endDate": new Date("2030-05-31T05:00:00Z"),
-        "weight":null, "title":"New Period. I'm not saved yet!",
-        "permissions": { "read":true, "manage":true }
-      },
-      {
-        "id":"new2", "startDate": new Date("2039-03-01T06:00:00Z"), "endDate": new Date("2042-05-31T05:00:00Z"),
-        "weight":null, "title":"Another New Period. Also not saved yet! I won't be in the new state.",
-        "permissions": { "read":true, "manage":true }
-      }
-    ]
-    @gradingPeriodCollection.setState({periods: unsavedPeriods})
-    @gradingPeriodCollection.gotPeriods(@formattedIndexData.grading_periods, idToExclude)
-    newPeriods = @formattedIndexData.grading_periods.concat(unsavedPeriods[0])
-    deepEqual @gradingPeriodCollection.state.periods, newPeriods
-
   test 'lastRemainingPeriod returns false if there is more than one period left', ->
     ok !@gradingPeriodCollection.lastRemainingPeriod()
 
@@ -171,22 +123,17 @@ define [
     ok confirmDelete.calledOnce
 
   test 'updateGradingPeriodCollection correctly updates the periods state', ->
-    updatedPeriodData = {
+    updatedPeriodComponent = {}
+    updatedPeriodComponent.state= {
       "id":"1", "startDate": new Date("2069-03-01T06:00:00Z"), "endDate": new Date("2070-05-31T05:00:00Z"),
       "weight":null, "title":"Updating an existing period!"
     }
-    updatedPermissions = { "read":true, "manage":true }
-    @gradingPeriodCollection.updateGradingPeriodCollection(updatedPeriodData, updatedPermissions)
+    updatedPeriodComponent.props = {permissions: {read: true, manage: true}}
+    @gradingPeriodCollection.updateGradingPeriodCollection(updatedPeriodComponent)
     updatedPeriod = _.find(@gradingPeriodCollection.state.periods, (p) => p.id == "1")
-    deepEqual updatedPeriod.title, updatedPeriodData.title
+    deepEqual updatedPeriod.title, updatedPeriodComponent.state.title
 
-  test 'updateGradingPeriodCollection calls getPeriods if a previousStateId is passed in', ->
-    @stub(@gradingPeriodCollection, 'getPeriods')
-    @gradingPeriodCollection.updateGradingPeriodCollection({}, {}, '1')
-    ok @gradingPeriodCollection.getPeriods.calledOnce
-
-
-  test 'getPeriodById retuns the period with the matching id (if one exists)', ->
+  test 'getPeriodById returns the period with the matching id (if one exists)', ->
     period = @gradingPeriodCollection.getPeriodById('1')
     deepEqual period.id, '1'
 
@@ -209,10 +156,8 @@ define [
 
   module 'GradingPeriodCollection without read or manage permissions for any periods',
     setup: ->
-      @fMessage = $.flashMessage
-      @fError = $.flashError
-      $.flashMessage = ->
-      $.flashError = ->
+      @stub($, 'flashMessage', ->)
+      @stub($, 'flashError', ->)
       @stub(window, 'confirm', -> true)
       @server = sinon.fakeServer.create()
       ENV.current_user_roles = ["teacher"]
@@ -252,8 +197,6 @@ define [
       React.unmountComponentAtNode(@gradingPeriodCollection.getDOMNode().parentNode)
       ENV.current_user_roles = null
       ENV.GRADING_PERIODS_URL = null
-      $.flashMessage = @fMessage
-      $.flashError = @fError
       @server.restore()
 
   test 'gets the grading periods from the grading periods controller', ->
@@ -270,6 +213,9 @@ define [
     @server.respond()
     ok @gradingPeriodCollection.state.disabled
 
+  test 'gets the grading periods from the grading periods controller', ->
+    deepEqual @gradingPeriodCollection.state.periods, @formattedIndexData.grading_periods
+
   test 'copyTemplatePeriods calls getPeriods', ->
     @stub(@gradingPeriodCollection, 'getPeriods')
     @gradingPeriodCollection.copyTemplatePeriods(@gradingPeriodCollection.state.periods)
@@ -279,11 +225,6 @@ define [
   test 'deleteGradingPeriod calls copyTemplatePeriods if periods need to be copied (cannot manage any periods and there is at least 1)', ->
     copyPeriods = @stub(@gradingPeriodCollection, 'copyTemplatePeriods')
     @gradingPeriodCollection.deleteGradingPeriod('1')
-    ok copyPeriods.calledOnce
-
-  test 'updateGradingPeriodCollection calls copyTemplatePeriods if periods need to be copied (cannot manage any periods and there is at least 1)', ->
-    copyPeriods = @stub(@gradingPeriodCollection, 'copyTemplatePeriods')
-    @gradingPeriodCollection.updateGradingPeriodCollection({}, {}, '1')
     ok copyPeriods.calledOnce
 
   test 'cannotDeleteLastPeriod returns true if there is one period left and manage permission is false', ->
@@ -300,10 +241,10 @@ define [
   test 'an admin created periods message is displayed since the user does not have manage permission for the periods', ->
     ok @gradingPeriodCollection.refs.adminPeriodsMessage
 
-  test "given two grading periods that don't overlap, isOverlapping returns false", ->
-    ok !@gradingPeriodCollection.isOverlapping('2')
+  test "given two grading periods that don't overlap, areNoDatesOverlapping returns true", ->
+    ok @gradingPeriodCollection.areNoDatesOverlapping(@gradingPeriodCollection.state.periods[0])
 
-  test 'given two overlapping grading periods, isOverlapping returns true', ->
+  test 'given two overlapping grading periods, areNoDatesOverlapping returns false', ->
     startDate = new Date("2015-03-01T06:00:00Z")
     endDate = new Date("2015-05-31T05:00:00Z")
     formattedIndexData = [
@@ -317,4 +258,98 @@ define [
       }
     ]
     @gradingPeriodCollection.setState({periods: formattedIndexData})
-    ok @gradingPeriodCollection.isOverlapping('2')
+    ok !@gradingPeriodCollection.areNoDatesOverlapping(@gradingPeriodCollection.state.periods[0])
+
+  test 'serializeDataForSubmission serializes periods by snake casing keys', ->
+    firstPeriod  = @gradingPeriodCollection.state.periods[0]
+    secondPeriod = @gradingPeriodCollection.state.periods[1]
+    expectedOutput =
+      grading_periods: [{
+        id: firstPeriod.id,
+        title: firstPeriod.title,
+        start_date: firstPeriod.startDate,
+        end_date: firstPeriod.endDate
+      }, {
+        id: secondPeriod.id,
+        title: secondPeriod.title,
+        start_date: secondPeriod.startDate,
+        end_date: secondPeriod.endDate
+      }]
+    deepEqual @gradingPeriodCollection.serializeDataForSubmission(), expectedOutput
+
+  test 'batchUpdatePeriods makes an AJAX call if validations pass', ->
+    @sandbox.stub(@gradingPeriodCollection, 'areGradingPeriodsValid', -> true)
+    ajax = @sandbox.spy($, 'ajax')
+    @gradingPeriodCollection.batchUpdatePeriods()
+    ok ajax.calledOnce
+
+  test 'batchUpdatePeriods does not make an AJAX call if validations fail', ->
+    @sandbox.stub(@gradingPeriodCollection, 'areGradingPeriodsValid', -> false)
+    ajax = @sandbox.spy($, 'ajax')
+    @gradingPeriodCollection.batchUpdatePeriods()
+    ok ajax.notCalled
+
+  test 'isTitleCompleted checks for a title being present', ->
+    period = {title: 'Spring'}
+    ok @gradingPeriodCollection.isTitleCompleted(period)
+
+  test 'isTitleCompleted fails blank titles', ->
+    period = {title: ' '}
+    ok !@gradingPeriodCollection.isTitleCompleted(period)
+
+  test 'isStartDateBeforeEndDate passes', ->
+    period = { startDate: new Date("2015-03-01T06:00:00Z"), endDate: new Date("2015-05-31T05:00:00Z") }
+    ok @gradingPeriodCollection.isStartDateBeforeEndDate(period)
+
+  test 'isStartDateBeforeEndDate fails', ->
+    period = { startDate: new Date("2015-05-31T05:00:00Z"), endDate: new Date("2015-03-01T06:00:00Z") }
+    ok !@gradingPeriodCollection.isStartDateBeforeEndDate(period)
+
+  test 'areDatesValid passes', ->
+    period = { startDate: new Date("2015-03-01T06:00:00Z"), endDate: new Date("2015-05-31T05:00:00Z") }
+    ok @gradingPeriodCollection.areDatesValid(period)
+
+  test 'areDatesValid fails', ->
+    period = { startDate: new Date("foo"), endDate: new Date("foo") }
+    ok !@gradingPeriodCollection.areDatesValid(period)
+    period = { startDate: new Date("foo"), endDate: new Date("2015-05-31T05:00:00Z") }
+    ok !@gradingPeriodCollection.areDatesValid(period)
+    period = { startDate: ("2015-03-01T06:00:00Z"), endDate: new Date("foo") }
+    ok !@gradingPeriodCollection.areDatesValid(period)
+
+  test 'areNoDatesOverlapping periods are not overlapping when endDate of earlier period is the same as start date for the latter', ->
+    periodOne = {
+      'id': '1', startDate: new Date("2029-03-01T06:00:00Z"), endDate: new Date("2030-05-31T05:00:00Z"),
+      weight: null, title: "Spring", permissions: { read:true, manage:true }
+    }
+    periodTwo = {
+      'id': 'new2', startDate: new Date("2030-05-31T05:00:00Z"), endDate: new Date("2031-05-31T05:00:00Z"),
+      weight: null, title: "Spring", permissions: { read:true, manage:true }
+    }
+    @gradingPeriodCollection.setState({periods: [periodOne, periodTwo]})
+    ok @gradingPeriodCollection.areNoDatesOverlapping(periodTwo)
+
+  test 'areNoDatesOverlapping periods are overlapping when a period falls within another', ->
+    periodOne = {
+      'id': '1', startDate: new Date("2029-01-01T00:00:00Z"), endDate: new Date("2030-01-01T00:00:00Z"),
+      weight: null, title: "Spring", permissions: { read:true, manage:true }
+    }
+    periodTwo = {
+      'id': 'new2', startDate: new Date("2029-01-01T00:00:00Z"), endDate: new Date("2030-01-01T00:00:00Z"),
+      weight: null, title: "Spring", permissions: { read:true, manage:true }
+    }
+    @gradingPeriodCollection.setState({periods: [periodOne, periodTwo]})
+    ok !@gradingPeriodCollection.areNoDatesOverlapping(periodTwo)
+
+  test 'areDatesOverlapping adding two periods at the same time that overlap returns true', ->
+    existingPeriod = @gradingPeriodCollection.state.periods[0]
+    periodOne = {
+      id: 'new1', startDate: new Date("2029-01-01T00:00:00Z"), endDate: new Date("2030-01-01T00:00:00Z"), title: "Spring", permissions: {manage: true}
+    }
+    periodTwo = {
+      id: 'new2', startDate: new Date("2029-01-01T00:00:00Z"), endDate: new Date("2030-01-01T00:00:00Z"), title: "Spring", permissions: {manage: true}
+    }
+    @gradingPeriodCollection.setState({periods: [existingPeriod, periodOne, periodTwo]})
+    ok !@gradingPeriodCollection.areDatesOverlapping(existingPeriod)
+    ok @gradingPeriodCollection.areDatesOverlapping(periodOne)
+    ok @gradingPeriodCollection.areDatesOverlapping(periodTwo)

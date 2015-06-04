@@ -21,7 +21,7 @@ describe "interaction with multiple grading periods" do
     end
 
     it "should display the current grading period without a GET param" do
-      current_grading_period = @course.grading_periods.current.first
+      current_grading_period = @course.grading_periods.first
       get "/courses/#{@course.id}/gradebook"
       expect(f('.grading-period-select-button')).to include_text(current_grading_period.title)
     end

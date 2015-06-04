@@ -26,7 +26,11 @@ describe GradingPeriod do
   let(:now) { Time.zone.now }
 
   let(:params) do
-    { start_date: now, end_date: 1.day.from_now(now) }
+    {
+      title: 'A Grading Period',
+      start_date: now,
+      end_date: 1.day.from_now(now)
+    }
   end
 
   it { is_expected.to be_valid }
@@ -42,8 +46,13 @@ describe GradingPeriod do
   end
 
   it "requires start_date to be before end_date" do
-    subject.update_attributes(start_date: Time.zone.now, end_date: 1.day.ago)
+    subject.assign_attributes(start_date: Time.zone.now, end_date: 1.day.ago)
     is_expected.to_not be_valid
+  end
+
+  it "requires a title" do
+    grading_period = GradingPeriod.new(params.except(:title))
+    expect(grading_period).to_not be_valid
   end
 
   describe "#destroy" do
@@ -110,12 +119,14 @@ describe GradingPeriod do
 
     let(:first_grading_period) do
         grading_period_group.grading_periods.create!(
+          title:      '1st period',
           start_date: 2.months.from_now(now),
           end_date:   3.months.from_now(now)
         )
     end
     let(:second_grading_period) do
       grading_period_group.grading_periods.create!(
+        title:      '2nd period',
         start_date: 3.months.from_now(now),
         end_date:   4.months.from_now(now)
       )
@@ -128,25 +139,25 @@ describe GradingPeriod do
     end
   end
 
-  describe "#current" do
-    let(:grading_period) { GradingPeriod.new }
+  describe "#current?" do
+    subject(:grading_period) { GradingPeriod.new }
 
     it "returns false for a grading period in the past" do
-      grading_period.start_date = 2.months.ago
-      grading_period.end_date = 1.month.ago
-      expect(grading_period.current?).to be false
+      grading_period.assign_attributes(start_date: 2.months.ago,
+                                       end_date:   1.month.ago)
+      expect(grading_period).to_not be_current
     end
 
     it "returns true if the current time falls between the start date and end date (inclusive)" do
-      grading_period.start_date = 1.month.ago
-      grading_period.end_date = 1.month.from_now
-      expect(grading_period.current?).to be true
+      grading_period.assign_attributes(start_date: 1.month.ago,
+                                       end_date:   1.month.from_now)
+      expect(grading_period).to be_current
     end
 
     it "returns false for a grading period in the future" do
-      grading_period.start_date = 1.month.from_now
-      grading_period.end_date = 2.months.from_now
-      expect(grading_period.current?).to be false
+      grading_period.assign_attributes(start_date: 1.month.from_now,
+                                       end_date:   2.months.from_now)
+      expect(grading_period).to_not be_current
     end
   end
 
@@ -155,6 +166,7 @@ describe GradingPeriod do
     let(:grading_period_group) { course.grading_period_groups.create! }
     let(:existing_grading_period) do
       grading_period_group.grading_periods.create!(
+        title: 'a title',
         start_date: now,
         end_date: 2.days.from_now(now)
       )

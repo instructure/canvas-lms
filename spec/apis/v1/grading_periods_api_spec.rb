@@ -34,7 +34,7 @@ describe GradingPeriodsController, type: :request do
         let(:weight) { 99 }
         let(:start_date) { 5.months.since(now) }
         let(:end_date) { 8.months.since(now) }
-        let(:now) { Time.zone.now }
+        let(:now) { Time.zone.now.change(usec: 0) }
 
         def post_create(params, raw=false)
           helper = method(raw ? :raw_api_call : :api_call)
@@ -48,13 +48,13 @@ describe GradingPeriodsController, type: :request do
         context "creates a grading period successfully" do
           subject(:account_grading_periods) { @account.grading_periods }
           before do
-            post_create(weight: weight, start_date: start_date, end_date: end_date)
+            post_create(title: 'a title', weight: weight, start_date: start_date, end_date: end_date)
           end
 
           it { expect(account_grading_periods.count).to eql 4 }
           it { expect(account_grading_periods.last.weight).to eq weight }
-          it { expect(account_grading_periods.last.start_date).to eq start_date.change(usec: 0) }
-          it { expect(account_grading_periods.last.end_date).to eq end_date.change(usec: 0) }
+          it { expect(account_grading_periods.last.start_date).to eq start_date }
+          it { expect(account_grading_periods.last.end_date).to eq end_date }
         end
       end
 

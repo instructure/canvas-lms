@@ -1570,8 +1570,18 @@ describe 'Submissions API', type: :request do
 
       @course.account.enable_feature!(:multiple_grading_periods)
       gpg = @course.grading_period_groups.create!
-      @gp1 = gpg.grading_periods.create!(workflow_state: "active", weight: 50, start_date: 2.days.ago, end_date: 1.day.from_now)
-      @gp2 = gpg.grading_periods.create!(workflow_state: "active", weight: 50, start_date: 2.days.from_now, end_date: 1.month.from_now)
+      @gp1 = gpg.grading_periods.create!(
+        title: 'first',
+        weight: 50,
+        start_date: 2.days.ago,
+        end_date: 1.day.from_now
+      )
+      @gp2 = gpg.grading_periods.create!(
+        title: 'second',
+        weight: 50,
+        start_date: 2.days.from_now,
+        end_date: 1.month.from_now
+      )
       a1 = @course.assignments.create!(due_at: 1.minute.from_now, :submission_types => 'online_text_entry')
       a2 = @course.assignments.create!(due_at: 1.week.from_now, :submission_types => 'online_text_entry')
 

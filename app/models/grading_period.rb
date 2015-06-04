@@ -3,10 +3,10 @@ class GradingPeriod < ActiveRecord::Base
 
   attr_accessible :weight, :start_date, :end_date, :title
 
-  belongs_to :grading_period_group, :inverse_of => :grading_periods
+  belongs_to :grading_period_group, inverse_of: :grading_periods
   has_many :grading_period_grades, dependent: :destroy
 
-  validates :start_date, :end_date, :grading_period_group_id, presence: true
+  validates :title, :start_date, :end_date, :grading_period_group_id, presence: true
   validate :start_date_is_before_end_date
   validate :not_overlapping
 
