@@ -8966,6 +8966,15 @@ ko:
       description: "LinkedIn 통합"
       name: LinkedIn
     linked_in_settings: 
+      description: |-
+          [LinkedIn에 새 앱](%{linkedin_url})을 등록해야 합니다.
+          LinkedIn 통합이 올바르게 동작하도록 하려면
+          다음 구성 옵션을 설정하십시오:
+          
+          * **응용 프로그램 유형:** "웹 응용 프로그램"으로 지정
+          * **라이브 상태:** "라이브"로 지정
+          * **OAuth 리디렉션 URL:** %{oauth_url}로 지정
+          * 앱을 저장한 후에 API 키와 시크릿 키를 기록해 두십시오.
       domain_name: 도메인
       labels: 
         api_key: "API 키"
