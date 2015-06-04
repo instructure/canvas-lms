@@ -10650,6 +10650,15 @@ pl:
       description: "Integracja z witryną LinkedIn"
       name: LinkedIn
     linked_in_settings: 
+      description: |-
+          Konieczne będzie utworzenie [nowej aplikacji w witrynie LinkedIn](%{linkedin_url}).
+          Aby zapewnić prawidłową integrację z witryną LinkedIn,
+          należy wprowadzić poniższe ustawienia:
+          
+          * **Application Type:** ustawione na "Aplikacja w sieci WWW"
+          * **Live Status:** ustawione na "Live"
+          * **OAuth Redirect URL:** ustawione na %{oauth_url}
+          * Po zapisaniu aplikacji, należy zanotować klucz API i klucz tajny
       domain_name: domena
       labels: 
         api_key: "Klucz API"
