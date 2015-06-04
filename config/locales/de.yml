@@ -10505,6 +10505,15 @@ de:
       description: LinkedIn-integration
       name: LinkedIn
     linked_in_settings: 
+      description: |-
+          Sie müssen eine [neue Applikation auf LinkedIn registrieren](%{linkedin_url}).
+          Definieren Sie die folgenden Konfigurationsoptionen, um zu gewährleisten, dass Ihre LinkedIn-integration 
+          korrekt funktioniert:
+          
+          * **Application Type:** auf "Webanwendung" gesetzt
+          * **Live Status:** auf "Live" gesetzt
+          * **OAuth Redirect URL:** gesetzt auf %{oauth_url}
+          * Nachdem Sie Ihre Applikation gespeichert haben, notieren Sie API Key und Secret Key
       domain_name: Domain
       labels: 
         api_key: API-key
