@@ -10565,6 +10565,15 @@ ja:
       description: "LinkedIn との統合"
       name: LinkedIn
     linked_in_settings: 
+      description: |-
+          [LinkedIn 上で新しいアプリ](%{linkedin_url}) を登録することが必要になります。
+          ご自分の LinkedIn 統合が正しく動作することを保証するには、
+          次の構成オプションを設定します:
+          
+          * **申請タイプ:** を "Web 申請" に設定
+          * **ライブ ステータス:** を "ライブ" に設定
+          * **OAuth リダイレクト URL:** を %{oauth_url} に設定
+          * アプリを保存後、API 鍵とシークレット鍵をメモしてください
       domain_name: ドメイン
       labels: 
         api_key: "API 鍵"
