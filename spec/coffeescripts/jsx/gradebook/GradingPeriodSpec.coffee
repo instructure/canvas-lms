@@ -4,20 +4,15 @@ define [
   'underscore'
   'jsx/grading/gradingPeriod'
   'jquery.instructure_misc_plugins'
+  'compiled/jquery.rails_flash_notifications'
 ], (React, $, _, GradingPeriod) ->
 
   TestUtils = React.addons.TestUtils
 
   module 'GradingPeriod',
     setup: ->
-      @fMessage = $.flashMessage
-      @fError = $.flashError
-      @hErrors = $.fn.hideErrors
-      @eBox = $.fn.errorBox
-      $.flashMessage = ->
-      $.flashError = ->
-      $.fn.hideErrors = ->
-      $.fn.errorBox = ->
+      @stub($, 'flashMessage', -> )
+      @stub($, 'flashError', -> )
       @server = sinon.fakeServer.create()
       @sandbox = sinon.sandbox.create()
       ENV.GRADING_PERIODS_URL = "api/v1/courses/1/grading_periods"
@@ -55,10 +50,6 @@ define [
     teardown: ->
       React.unmountComponentAtNode(@gradingPeriod.getDOMNode().parentNode)
       ENV.GRADING_PERIODS_URL = null
-      $.flashMessage = @fMessage
-      $.flashError = @fError
-      $.fn.hideErrors = @hErrors
-      $.fn.errorBox = @eBox
       @server.restore()
       @sandbox.restore()
 
@@ -86,38 +77,11 @@ define [
     @gradingPeriod.handleDateChange(fakeEvent)
     ok replaceInputWithDate.calledOnce
 
-  test 'handleDateChange calls setUpdateButtonState', ->
-    fakeEvent = { target: { name: "startDate", value: "Feb 20, 2015 2:55 am" } }
-    setUpdateButton = @sandbox.stub(@gradingPeriod, 'setUpdateButtonState')
-    @gradingPeriod.handleDateChange(fakeEvent)
-    ok setUpdateButton.calledOnce
-
   test 'handleDateChange calls updateGradingPeriodCollection', ->
     fakeEvent = { target: { name: "startDate", value: "Feb 20, 2015 2:55 am" } }
     update = @sandbox.stub(@gradingPeriod.props, 'updateGradingPeriodCollection')
     @gradingPeriod.handleDateChange(fakeEvent)
     ok update.calledOnce
-
-  test 'formatDataForSubmission returns the title, startDate, and endDate with keys snake cased', ->
-    expectedOutput =
-      title: @gradingPeriod.state.title
-      start_date: @gradingPeriod.state.startDate
-      end_date: @gradingPeriod.state.endDate
-    deepEqual @gradingPeriod.formatDataForSubmission(), expectedOutput
-
-  test 'isEndDateBeforeStartDate returns true if the end date is before the start date', ->
-    @gradingPeriod.setState({startDate: new Date("2015-01-30T00:00:00Z")})
-    @gradingPeriod.setState({endDate:   new Date("2015-01-01T00:00:00Z")})
-    ok @gradingPeriod.isEndDateBeforeStartDate()
-
-  test 'isEndDateBeforeStartDate returns false if the start date is equal to the end date', ->
-    @gradingPeriod.setState({startDate: @gradingPeriod.state.endDate})
-    ok !@gradingPeriod.isEndDateBeforeStartDate()
-
-  test 'isEndDateBeforeStartDate returns false if the end date is after the start date', ->
-    @gradingPeriod.setState({startDate: new Date("2015-01-01T00:00:00Z")})
-    @gradingPeriod.setState({endDate:   new Date("2015-01-30T00:00:00Z")})
-    ok !@gradingPeriod.isEndDateBeforeStartDate()
 
   test 'isNewGradingPeriod returns false if the id does not contain "new"', ->
     ok !@gradingPeriod.isNewGradingPeriod()
@@ -126,49 +90,10 @@ define [
     @gradingPeriod.setState({id: "new1"})
     ok @gradingPeriod.isNewGradingPeriod()
 
-  test 'setUpdateButtonState sets shouldUpdateBeDisabled to false if the form is complete', ->
-    @sandbox.stub(@gradingPeriod, 'formIsComplete', -> true)
-    ok @gradingPeriod.state.shouldUpdateBeDisabled
-    @gradingPeriod.setUpdateButtonState()
-    ok !@gradingPeriod.state.shouldUpdateBeDisabled
-
-  test 'setUpdateButtonState sets shouldUpdateBeDisabled to true if the form is not complete', ->
-    @sandbox.stub(@gradingPeriod, 'formIsComplete', -> false)
-    @gradingPeriod.setState({shouldUpdateBeDisabled: false})
-    @gradingPeriod.setUpdateButtonState()
-    ok @gradingPeriod.state.shouldUpdateBeDisabled
-
-  test 'formIsComplete returns true if title, startDate, and endDate are all non-blank', ->
-    ok @gradingPeriod.formIsComplete()
-
-  test 'formIsComplete returns false if the title is blank, or only spaces', ->
-    @gradingPeriod.setState({title: ""})
-    ok !@gradingPeriod.formIsComplete()
-    @gradingPeriod.setState({title: "            "})
-    ok !@gradingPeriod.formIsComplete()
-
-  test 'formIsComplete returns false if the startDate is not a valid date', ->
-    @gradingPeriod.setState({startDate: new Date("i love lamp")})
-    ok !@gradingPeriod.formIsComplete()
-    @gradingPeriod.setState({startDate: new Date("2010-15-28T00:00:00Z")})
-    ok !@gradingPeriod.formIsComplete()
-
-  test 'formIsComplete returns false if the endDate is not a valid date', ->
-    @gradingPeriod.setState({endDate: new Date("big gulps, huh?")})
-    ok !@gradingPeriod.formIsComplete()
-    @gradingPeriod.setState({endDate: new Date("2030-15-28T00:00:00Z")})
-    ok !@gradingPeriod.formIsComplete()
-
   test 'handleTitleChange changes the title state', ->
     fakeEvent = { target: { name: "title", value: "MXP: Most Xtreme Primate" } }
     @gradingPeriod.handleTitleChange(fakeEvent)
     deepEqual @gradingPeriod.state.title, "MXP: Most Xtreme Primate"
-
-  test 'handleTitleChange calls setUpdateButtonState', ->
-    fakeEvent = { target: { name: "title", value: "MXP: Most Xtreme Primate" } }
-    setUpdateButton = @sandbox.stub(@gradingPeriod, 'setUpdateButtonState')
-    @gradingPeriod.handleTitleChange(fakeEvent)
-    ok setUpdateButton.calledOnce
 
   test 'handleTitleChange calls updateGradingPeriodCollection', ->
     fakeEvent = { target: { name: "title", value: "MXP: Most Xtreme Primate" } }
@@ -186,58 +111,3 @@ define [
     @gradingPeriod.triggerDeleteGradingPeriod()
     ok deletePeriod.calledOnce
 
-  test 'saveGradingPeriod makes an AJAX call if the start date is before the end date', ->
-    @sandbox.stub(@gradingPeriod, 'isEndDateBeforeStartDate', -> false)
-    ajax = @sandbox.spy($, 'ajax')
-    @gradingPeriod.saveGradingPeriod()
-    ok ajax.calledOnce
-
-  test 'saveGradingPeriod does not make an AJAX call if the start date is not before the end date', ->
-    @sandbox.stub(@gradingPeriod, 'isEndDateBeforeStartDate', -> true)
-    ajax = @sandbox.spy($, 'ajax')
-    @gradingPeriod.saveGradingPeriod()
-    ok ajax.notCalled
-
-  test 'saveGradingPeriod should re-assign the id if the period is new', ->
-    @sandbox.stub(@gradingPeriod, 'isEndDateBeforeStartDate', -> false)
-    @gradingPeriod.setState({id: "new1"})
-    @gradingPeriod.saveGradingPeriod()
-    @server.respond()
-    deepEqual @gradingPeriod.state.id, '3'
-
-  test 'saveGradingPeriod should not re-assign the id if the period is not new', ->
-    @sandbox.stub(@gradingPeriod, 'isEndDateBeforeStartDate', -> false)
-    idBeforeSaving = @gradingPeriod.state.id
-    @gradingPeriod.saveGradingPeriod()
-    @server.respond()
-    deepEqual @gradingPeriod.state.id, idBeforeSaving
-
-  test 'saveGradingPeriod calls updateGradingPeriodCollection for new periods', ->
-    @sandbox.stub(@gradingPeriod, 'isEndDateBeforeStartDate', -> false)
-    update = @sandbox.stub(@gradingPeriod.props, 'updateGradingPeriodCollection')
-    @gradingPeriod.setState({id: "new1"})
-    @gradingPeriod.saveGradingPeriod()
-    @server.respond()
-    ok update.calledOnce
-
-  test 'saveGradingPeriod calls updateGradingPeriodCollection for existing periods', ->
-    @sandbox.stub(@gradingPeriod, 'isEndDateBeforeStartDate', -> false)
-    update = @sandbox.stub(@gradingPeriod.props, 'updateGradingPeriodCollection')
-    @gradingPeriod.saveGradingPeriod()
-    @server.respond()
-    ok update.calledOnce
-
-  test 'saveGradingPeriod calls isOverlapping', ->
-    overlapping = @sandbox.stub(@gradingPeriod.props, 'isOverlapping')
-    @gradingPeriod.saveGradingPeriod()
-    @server.respond()
-    ok overlapping.calledOnce
-
-  test 'saveGradingPeriod no ajax call if overlapping grading periods', ->
-    overlapping = @sandbox.stub(@gradingPeriod.props, 'isOverlapping', -> true)
-    ajax = @sandbox.stub($, 'ajax')
-    flashError = @sandbox.spy($, 'flashError')
-    @gradingPeriod.saveGradingPeriod()
-    @server.respond()
-    ok ajax.notCalled
-    ok flashError.calledOnce

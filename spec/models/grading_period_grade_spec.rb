@@ -20,13 +20,16 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe GradingPeriodGrade do
   context "Soft deletion" do
-    let(:student) { User.create.student_enrollments.create course: course }
+    let(:student) { User.create.student_enrollments.create! course: course }
 
     let(:account) { Account.create }
-    let(:group) { account.grading_period_groups.create }
+    let(:group) { account.grading_period_groups.create! }
     let(:period) do
-      group.grading_periods.create  start_date: 1.week.ago,
-                                    end_date: 2.weeks.from_now
+      group.grading_periods.create!(
+        title: 'a period',
+        start_date: 1.week.ago,
+        end_date: 2.weeks.from_now,
+      )
     end
 
     let(:creation_arguments) { { grading_period_id: period.id } }

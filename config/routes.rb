@@ -1661,6 +1661,8 @@ CanvasRails::Application.routes.draw do
         get prefix, action: :index, as: "#{context}_grading_periods"
         get "#{prefix}/:id", action: :show, as: "#{context}_grading_period"
         post prefix, action: :create, as: "#{context}_grading_period_create"
+        # FIXME: should be PATCH in upcoming Rails 4
+        put "#{prefix}/batch_update", action: :batch_update, as: "#{context}_grading_period_batch_update"
         put "#{prefix}/:id", action: :update, as: "#{context}_grading_period_update"
         delete "#{prefix}/:id", action: :destroy, as: "#{context}_grading_period_destroy"
       end
