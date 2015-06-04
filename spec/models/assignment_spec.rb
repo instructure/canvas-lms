@@ -421,6 +421,33 @@ describe Assignment do
       expect(@submission.user_id).to eql(@user.id)
     end
 
+    describe "#grading_standard_or_default" do
+      before do
+        @gs1 = @course.grading_standards.create! standard_data: {
+          a: {name: "OK", value: 100},
+          b: {name: "Bad", value: 80},
+        }
+        @gs2 = @course.grading_standards.create! standard_data: {
+          a: {name: "🚀", value: 100},
+          b: {name: "🚽", value: 80},
+        }
+      end
+
+      it "returns the assignment-specific grading standard if there is one" do
+        @assignment.update_attribute :grading_standard, @gs1
+        expect(@assignment.grading_standard_or_default).to eql @gs1
+      end
+
+      it "uses the course default if there is one" do
+        @course.update_attribute :default_grading_standard, @gs2
+        expect(@assignment.grading_standard_or_default).to eql @gs2
+      end
+
+      it "uses the canvas default" do
+        expect(@assignment.grading_standard_or_default.title).to eql "Default Grading Standard"
+      end
+    end
+
     it "should preserve gpa scale grades with zero points possible" do
       @assignment.grading_type = 'gpa_scale'
       @assignment.points_possible = 0.0

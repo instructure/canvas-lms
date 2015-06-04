@@ -622,11 +622,7 @@ class Assignment < ActiveRecord::Base
   protected :process_if_quiz
 
   def grading_scheme
-    if self.grading_standard
-      self.grading_standard.grading_scheme
-    else
-      GradingStandard.default_grading_scheme
-    end
+    grading_standard_or_default.grading_scheme
   end
 
   def infer_grading_type
@@ -645,7 +641,9 @@ class Assignment < ActiveRecord::Base
   end
 
   def grading_standard_or_default
-    grading_standard || GradingStandard.default_instance
+    grading_standard ||
+      context.default_grading_standard ||
+      GradingStandard.default_instance
   end
 
   def score_to_grade(score=0.0, given_grade=nil)
