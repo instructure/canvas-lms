@@ -472,7 +472,6 @@ class ExternalToolsController < ApplicationController
     case placement
     when 'migration_selection'
       accept_media_types = 'application/vnd.ims.imsccv1p1,application/vnd.ims.imsccv1p2,application/vnd.ims.imsccv1p3,application/zip,application/xml'
-      return_url = course_content_migrations_url(@context)
       accept_presentation_document_targets = 'download'
       extra_params[:accept_copy_advice] = true
       extra_params[:ext_content_file_extensions] = 'zip,imscc,mbz,xml'
