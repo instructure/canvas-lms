@@ -58,6 +58,10 @@
   }
 }
 
+li[id$=service_google_docs] {
+  display: none;
+}
+
 #unregistered_services {
   .btn {
     margin: 3px;
