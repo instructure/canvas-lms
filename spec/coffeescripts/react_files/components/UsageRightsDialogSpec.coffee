@@ -20,7 +20,7 @@ define [
     modalClosed = false
     props = {
       closeModal: -> modalClosed = true
-      itemsToManage: [new File(usage_rights: usage_rights)]
+      itemsToManage: [new File(thumbnail_url: 'blah', usage_rights: usage_rights)]
     }
 
     uRD = TestUtils.renderIntoDocument(UsageRightsDialog(props))
@@ -37,7 +37,7 @@ define [
     modalClosed = false
     props = {
       closeModal: -> modalClosed = true
-      itemsToManage: [new File(usage_rights: usage_rights)]
+      itemsToManage: [new File(thumbnail_url: 'blah', usage_rights: usage_rights)]
     }
 
     uRD = TestUtils.renderIntoDocument(UsageRightsDialog(props))
@@ -54,7 +54,7 @@ define [
 
     props = {
       closeModal: ->
-      itemsToManage: [new File(usage_rights: usage_rights), new File(usage_rights: usage_rights)]
+      itemsToManage: [new File(thumbnail_url: 'blah', usage_rights: usage_rights), new File(thumbnail_url: 'blah', usage_rights: usage_rights)]
     }
 
     uRD = TestUtils.renderIntoDocument(UsageRightsDialog(props))
@@ -68,7 +68,7 @@ define [
       use_justification: 'choose'
     }
 
-    file = new File(usage_rights: usage_rights)
+    file = new File(thumbnail_url: 'blah', usage_rights: usage_rights)
     file.displayName = -> "cats"
 
     props = {
@@ -87,7 +87,7 @@ define [
       use_justification: 'choose'
     }
 
-    file = new File(usage_rights: usage_rights)
+    file = new File(thumbnail_url: 'blah', usage_rights: usage_rights)
     file.displayName = -> "cats"
 
     props = {
@@ -147,7 +147,7 @@ define [
       use_justification: 'choose'
     }
 
-    file = new File(usage_rights: usage_rights)
+    file = new File(thumbnail_url: 'blah', usage_rights: usage_rights)
     file.displayName = -> "hello"
 
     props = {
