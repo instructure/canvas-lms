@@ -10762,6 +10762,15 @@ ru:
       description: "Интеграция LinkedIn"
       name: LinkedIn
     linked_in_settings: 
+      description: |-
+          Потребуется интеграция [нового приложения в LinkedIn](%{linkedin_url}).
+          Установить следующие параметры конфигурации для обеспечения правильности работы
+          интеграции LinkedIn:
+          
+          * **Application Type:** установите "Веб-приложение"
+          * **Live Status:** установите "Live"
+          * **OAuth Redirect URL:** установите %{oauth_url}
+          * После сохранения приложения запишите ключ API и секретный ключ приложения
       domain_name: домен
       labels: 
         api_key: "Ключ API"
