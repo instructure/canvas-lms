@@ -10538,6 +10538,15 @@ nl:
       description: "Integratie met Linkedin"
       name: LinkedIn
     linked_in_settings: 
+      description: |-
+          Je moet een [nieuwe applicatie op LinkedIn](%{linkedin_url}) registreren.
+          Stel de volgende instellingen om ervoor te zorgen dat jouw de LinkedIn-integratie
+          juist werkt:
+          
+          * **Applicatietype:** instellen als "Webapplicatie"
+          * **Livestatus:** instellen als "Live"
+          * **OAuth-doorstuur-URL:** instellen als %{oauth_url}
+          * Noteer, na het opslaan van de app, de API-sleutel en de geheime sleutel
       domain_name: domein
       labels: 
         api_key: API-sleutel
