@@ -34,13 +34,12 @@ li.quiz {
     color: darken($ic-color-neutral, 40);
   }
   .ig-title {
-    flex: 0 0 $ic-sp*17;
+    flex: 1;
     @include breakpoint(desktop) { flex: 0 0 25%; }
     @include breakpoint(wide) { flex: 0 0 30%; }
   }
-  .default-dates .status-description {
-    font-weight: bold;
-  }
+  .ig-details { flex: 1; }
+  .default-dates .status-description { font-weight: bold; }
 }
 
 #quiz_show {
