@@ -208,6 +208,31 @@ define [
 
     ENV.context_asset_string = old_asset_string
 
+  test "delete calls screenreader message", ->
+
+    old_asset_string = ENV.context_asset_string
+    ENV.context_asset_string = "course_1"
+    server = sinon.fakeServer.create()
+    server.respondWith('DELETE', '/api/v1/courses/1/assignments/1',
+      [200, { 'Content-Type': 'application/json' }, JSON.stringify({
+      "description":"",
+      "due_at":null,
+      "grade_group_students_individually":false,
+      "grading_standard_id":null,
+      "grading_type":"points",
+      "group_category_id":null,
+      "id":"1",
+      "unpublishable":true,
+      "only_visible_to_overrides":false,
+      "locked_for_user":false})])
+
+    view = createView(@model)
+    view.delete()
+    @spy($, 'screenReaderFlashMessage')
+    server.respond()
+    equal $.screenReaderFlashMessage.callCount, 1
+    ENV.context_asset_string = old_asset_string
+
   test "show score if score is set", ->
     @submission.set 'score': 1.5555, 'grade': '1.5555'
     @model.set 'submission', @submission
