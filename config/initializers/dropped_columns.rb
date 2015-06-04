@@ -20,7 +20,7 @@ class ActiveRecord::Base
   DROPPED_COLUMNS = {
     'abstract_courses' => %w(sis_name sis_course_code),
     'accounts' => %w(type sis_name account_code authentication_type ldap_host ldap_domain),
-    'account_authorization_configs' => %w(auth_uid login_handle_name change_password_url),
+    'account_authorization_configs' => %w(auth_uid login_handle_name change_password_url unknown_user_url),
     'account_notification_roles' => %w(role_type),
     'account_users' => %w(membership_type),
     'access_tokens' => %w(token),
