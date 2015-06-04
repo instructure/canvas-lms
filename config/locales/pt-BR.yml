@@ -10582,6 +10582,15 @@ pt-BR:
       description: "Integração com LinkedIn"
       name: LinkedIn
     linked_in_settings: 
+      description: |-
+          Será necessário registrar um [novo aplicativo no LinkedIn](%{linkedin_url}).
+          Defina as seguintes opções de configuração para garantir que sua integração com o LinkedIn
+          funcione corretamente:
+          
+          * **Application Type:** definido para "Aplicativo Web"
+          * **Live Status:** definido para "Ao vivo"
+          * **OAuth Redirect URL:** definido para %{oauth_url}
+          * Após salvar seu aplicativo, anote a chave API e chave secreta
       domain_name: domínio
       labels: 
         api_key: "Chave API"
