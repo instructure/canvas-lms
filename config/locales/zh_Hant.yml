@@ -10478,6 +10478,15 @@ zh_Hant:
       description: "LinkedIn 整合"
       name: LinkedIn
     linked_in_settings: 
+      description: |-
+          您將需要註冊[在 LinkedIn 上的新應用程式](%{linkedin_url})。
+          設定以下設定選項，以確保您的 LinkedIn 
+          整合正常工作：
+          
+          * **應用程式類型：** 設定為『Web 應用程式』
+          * ** Live 狀態：**設定為『Live』
+          * **OAuth 重定向 URL：** 設定為 %{oauth_url}
+          * 儲存您的應用程式之後，請記下 API 金鑰和祕密金鑰
       domain_name: 網域
       labels: 
         api_key: "API 金鑰"
