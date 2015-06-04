@@ -98,6 +98,17 @@ describe "people" do
       check_element_has_focus(fj('.group-categories-actions .btn-primary'))
     end
 
+    it "should make sure focus is set to the 'Done' button when adding users" do
+      f('#addUsers').click
+      wait_for_ajaximations
+      f('#user_list_textarea').send_keys('student2@test.com')
+      f('#next-step').click
+      wait_for_ajaximations
+      f('#createUsersAddButton').click
+      wait_for_ajaximations
+      check_element_has_focus(f('.dialog_closer'))
+    end
+
     it "should validate the main page" do
       users = ff('.roster_user_name')
       expect(users[1].text).to match @student_1.name

@@ -94,5 +94,7 @@ define [
       @$('[placeholder]').placeholder()
       @maybeShowPrivileges()
       $('#user_email_errors').focus()
+      if @model.get('step') == 3
+        @$('button.dialog_closer').focus()
 
 
