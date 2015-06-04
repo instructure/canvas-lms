@@ -50,7 +50,6 @@ def get_import_data(sub_folder, hash_name)
 end
 
 def import_example_questions(context)
-  migration = context.content_migrations.new
   questions = []
   QUESTIONS.each do |question|
     if import_data_exists?(['vista', 'quiz'], question[0])
@@ -59,12 +58,12 @@ def import_example_questions(context)
     end
   end
   hash = {'assessment_questions' => {'assessment_questions' => questions}}
-  Importers::AssessmentQuestionImporter.process_migration(hash, migration)
+  Importers::AssessmentQuestionImporter.process_migration(hash, @migration)
 end
 
 def get_import_context(system=nil)
   context = course_model
   context.import_source == :webct if system == 'vista'
-  
+
   context
 end

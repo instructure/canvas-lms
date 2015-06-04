@@ -229,7 +229,7 @@ class ApplicationController < ActionController::Base
   # time or resources that are not well represented by simple time/cpu
   # benchmarks, so you can use this method to increase the perceived cost
   # of a request by an arbitrary amount.  For an anchor, rate limiting
-  # kicks in when a user has exceeded 600 arbitrary units of cost (it's 
+  # kicks in when a user has exceeded 600 arbitrary units of cost (it's
   # a leaky bucket, go see Canvas::RequestThrottle), so using an 'amount'
   # param of 600, for example, would max out the bucket immediately
   def increment_request_cost(amount)

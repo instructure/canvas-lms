@@ -18,7 +18,7 @@
 class Canvas::Migration::Worker::CourseCopyWorker < Struct.new(:migration_id)
   def perform(cm=nil)
     cm ||= ContentMigration.find migration_id
-    
+
     cm.workflow_state = :pre_processing
     cm.reset_job_progress
     cm.migration_settings[:skip_import_notification] = true

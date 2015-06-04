@@ -838,5 +838,69 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       expect(quiz_to.assignment).to eq a_to
       expect(a_to).to be_published
     end
+
+    it "should correctly copy links to quizzes inside assessment questions" do
+      link_quiz = @copy_from.quizzes.create!(:title => "linked quiz")
+
+      html = "<a href=\"/courses/%s/quizzes/%s\">linky</a>"
+
+      bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
+      data = {'question_name' => 'test question', 'question_type' => 'essay_question',
+        'question_text' => (html % [@copy_from.id, link_quiz.id])}
+      aq = bank.assessment_questions.create!(:question_data => data)
+
+      other_quiz = @copy_from.quizzes.create!(:title => "other quiz")
+      qq = other_quiz.quiz_questions.create!(:question_data => data)
+      other_quiz.generate_quiz_data
+      other_quiz.published_at = Time.now
+      other_quiz.workflow_state = 'available'
+      other_quiz.save!
+
+      run_course_copy
+
+      link_quiz2 = @copy_to.quizzes.where(migration_id: mig_id(link_quiz)).first
+      expected_html = (html % [@copy_to.id, link_quiz2.id])
+
+      other_quiz2 = @copy_to.quizzes.where(migration_id: mig_id(other_quiz)).first
+      aq2 = @copy_to.assessment_questions.where(migration_id: mig_id(aq)).first
+      qq2 = other_quiz2.quiz_questions.first
+
+      expect(aq2.question_data['question_text']).to eq expected_html
+      expect(qq2.question_data['question_text']).to eq expected_html
+      expect(other_quiz2.quiz_data.first['question_text']).to eq expected_html
+    end
+
+    it "should correctly copy links to quizzes inside standalone quiz questions" do
+      # i.e. quiz questions imported independently from their original assessment question
+      link_quiz = @copy_from.quizzes.create!(:title => "linked quiz")
+
+      html = "<a href=\"/courses/%s/quizzes/%s\">linky</a>"
+
+      bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
+      data = {'question_name' => 'test question', 'question_type' => 'essay_question',
+        'question_text' => (html % [@copy_from.id, link_quiz.id])}
+      aq = bank.assessment_questions.create!(:question_data => data)
+
+      other_quiz = @copy_from.quizzes.create!(:title => "other quiz")
+      qq = other_quiz.quiz_questions.create!(:question_data => data)
+      other_quiz.generate_quiz_data
+      other_quiz.published_at = Time.now
+      other_quiz.workflow_state = 'available'
+      other_quiz.save!
+
+      @cm.copy_options = {
+        :quizzes => {mig_id(link_quiz) => "1", mig_id(other_quiz) => "1"}
+      }
+      run_course_copy
+
+      link_quiz2 = @copy_to.quizzes.where(migration_id: mig_id(link_quiz)).first
+      expected_html = (html % [@copy_to.id, link_quiz2.id])
+
+      other_quiz2 = @copy_to.quizzes.where(migration_id: mig_id(other_quiz)).first
+      qq2 = other_quiz2.quiz_questions.first
+
+      expect(qq2.question_data['question_text']).to eq expected_html
+      expect(other_quiz2.quiz_data.first['question_text']).to eq expected_html
+    end
   end
 end
