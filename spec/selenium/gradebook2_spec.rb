@@ -865,25 +865,31 @@ describe "gradebook2" do
 
   context 'excused assignment' do
     it 'is not included in grade calculations', priority: '1', test_id: 196596 do
-      skip 'waiting for CNVS-17552'
       init_course_with_students
 
-      a1 = create_and_publish_assignment({title: 'Excuse Me', points_possible: 20})
-      a2 = create_and_publish_assignment({title: 'Don\'t Excuse Me'})
+      a1 = @course.assignments.create! title: 'Excuse Me', points_possible: 20
+      a2 = @course.assignments.create! title: 'Don\'t Excuse Me', points_possible: 20
 
-      a1.grade_student(students[0], {grade: 20})
-      a2.grade_student(students[0], {grade: 5})
-
-      a2.grade_student(students[0], {excuse: 1})
+      a1.grade_student(@students[0], {grade: 20})
+      a2.grade_student(@students[0], {grade: 5})
 
       get "/courses/#{@course.id}/gradebook/"
+      excused = f('#gradebook_grid .container_1 .slick-row .slick-cell:nth-child(2)')
+      excused.click
+      replace_content excused.find_element(:css, '.grade'), "EX\n"
+
       row = ff('#gradebook_grid .container_1 .slick-row .slick-cell')
 
       expect(row[0].text).to eq '20'
-      # this should show 'EX'
-      expect(row[1].text).to eq '-'
-      # cell should have striped shading
-      expect(f('#gradebook_grid .container_1 .slick-row .dropped')).to eq row[1]
+      # this should show 'EX' and have dropped class
+      expect(row[1].text).to eq('EX')
+      expect(row[1]).to have_class 'dropped'
+
+      # only one cell should have 'dropped' class
+      dropped = ff('#gradebook_grid .container_1 .slick-row .dropped')
+      expect(dropped.length).to eq 1
+
+      # 'EX' should only affect that one cell
       expect(row[2].text).to eq '100%'
     end
   end
