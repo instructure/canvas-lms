@@ -801,6 +801,7 @@ define [
     ).property('hideStudentNames')
 
     fetchCorrectEnrollments: (->
+      return if (@get('enrollments.isLoading'))
       if @get('showConcludedEnrollments')
         url = ENV.GRADEBOOK_OPTIONS.students_url_with_concluded_enrollments
       else
