@@ -1,15 +1,15 @@
-require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
+require File.expand_path(File.dirname(__FILE__) + '/../helpers/quizzes_common')
 
-describe "quizzes question creation edge cases" do
+describe 'quizzes question creation edge cases' do
 
-  include_examples "quizzes selenium tests"
+  include_examples 'quizzes selenium tests'
 
   before (:each) do
     course_with_teacher_logged_in
     @last_quiz = start_quiz_question
   end
 
-  it "should create a quiz with a variety of quiz questions" do
+  it 'should create a quiz with a variety of quiz questions', priority: '1', test_id: 197489 do
     quiz = @last_quiz
 
     create_multiple_choice_question
@@ -25,16 +25,16 @@ describe "quizzes question creation edge cases" do
       keep_trying_until(100) {expect(f("#question_#{quiz.quiz_questions[i].id}")).to be_displayed}
     end
     questions = ff('.display_question')
-    expect(questions[0]).to have_class("multiple_choice_question")
-    expect(questions[1]).to have_class("true_false_question")
-    expect(questions[2]).to have_class("short_answer_question")
+    expect(questions[0]).to have_class('multiple_choice_question')
+    expect(questions[1]).to have_class('true_false_question')
+    expect(questions[2]).to have_class('short_answer_question')
   end
 
-  it "should not create an extra, blank, correct answer when you use [answer] as a placeholder" do
+  it 'should not create an extra, blank, correct answer when you use [answer] as a placeholder', priority: '1', test_id: 197490 do
     quiz = @last_quiz
 
     # be a multiple dropdown question
-    question = fj(".question_form:visible")
+    question = fj('.question_form:visible')
     click_option('.question_form:visible .question_type', 'Multiple Dropdowns')
 
     # set up a placeholder (this is the bug)
@@ -47,8 +47,8 @@ describe "quizzes question creation edge cases" do
     expect(options[0].text).to eq 'answer'
 
     # input answers for the blank input
-    answers = question.find_elements(:css, ".form_answers > .answer")
-    answers[0].find_element(:css, ".select_answer_link").click
+    answers = question.find_elements(:css, '.form_answers > .answer')
+    answers[0].find_element(:css, '.select_answer_link').click
 
     # make up some answers
     replace_content(answers[0].find_element(:css, '.select_answer input'), 'a')
@@ -65,19 +65,19 @@ describe "quizzes question creation edge cases" do
     expect(finished_question).to be_displayed
 
     # check to make sure extra answers were not generated
-    expect(quiz.quiz_questions.first.question_data["answers"].count).to eq 2
-    expect(quiz.quiz_questions.first.question_data["answers"].detect{|a| a["text"] == ""}).to be_nil
+    expect(quiz.quiz_questions.first.question_data['answers'].count).to eq 2
+    expect(quiz.quiz_questions.first.question_data['answers'].detect{|a| a['text'] == ''}).to be_nil
   end
 
-  it "respects character limits on short answer questions" do
+  it 'respects character limits on short answer questions', priority: '1', test_id: 197493 do
     quiz = @last_quiz
-    question = fj(".question_form:visible")
+    question = fj('.question_form:visible')
     click_option('.question_form:visible .question_type', 'Fill In the Blank')
 
     replace_content(question.find_element(:css, "input[name='question_points']"), '4')
 
-    answers = question.find_elements(:css, ".form_answers > .answer")
-    answer = answers[0].find_element(:css, ".short_answer input")
+    answers = question.find_elements(:css, '.form_answers > .answer')
+    answer = answers[0].find_element(:css, '.short_answer input')
 
     short_answer_field = lambda {
       replace_content(answer, 'a'*100)
@@ -93,7 +93,7 @@ describe "quizzes question creation edge cases" do
     alert.dismiss
   end
 
-  it "should show errors for graded quizzes but not surveys" do
+  it 'should show errors for graded quizzes but not surveys', priority: '1', test_id: 197491 do
     quiz_with_new_questions
     change_quiz_type_to 'Graded Survey'
     expect_new_page_load {

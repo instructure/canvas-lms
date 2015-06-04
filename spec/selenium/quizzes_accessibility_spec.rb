@@ -1,15 +1,15 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
-describe "quizzes attempts" do
+describe 'quizzes accessibility' do
 
-  include_examples "quizzes selenium tests"
+  include_examples 'quizzes selenium tests'
 
   before (:each) do
     course_with_teacher_logged_in
     @last_quiz = start_quiz_question
   end
 
-  it "should render all answer arrows accessible to a screen reader" do
+  it 'should render all answer arrows accessible to a screen reader' do
     # -------------------------------------------------------------------------
     # adapted from:
     #   file: quizzes_question_creation_spec
@@ -39,10 +39,10 @@ describe "quizzes attempts" do
     end
 
     questions = ff('.display_question')
-    expect(questions[0]).to have_class("multiple_choice_question")
-    expect(questions[1]).to have_class("multiple_choice_question")
-    expect(questions[2]).to have_class("true_false_question")
-    expect(questions[3]).to have_class("short_answer_question")
+    expect(questions[0]).to have_class('multiple_choice_question')
+    expect(questions[1]).to have_class('multiple_choice_question')
+    expect(questions[2]).to have_class('true_false_question')
+    expect(questions[3]).to have_class('short_answer_question')
 
     #
     # end of adapted code
@@ -52,7 +52,7 @@ describe "quizzes attempts" do
     # snippet from:
     #   file: teacher_quizzes_statistics_spec
     #   symbol: publish_the_quiz
-    quiz.workflow_state = "available"
+    quiz.workflow_state = 'available'
     quiz.generate_quiz_data
     quiz.published_at = Time.now
     quiz.save!
@@ -64,7 +64,7 @@ describe "quizzes attempts" do
     @fake_student = @course.student_view_student
     enter_student_view
     get "/courses/#{@course.id}/quizzes/#{quiz.id}"
-    f("#take_quiz_link").click
+    f('#take_quiz_link').click
     wait_for_ajaximations
     # --
 
@@ -76,7 +76,7 @@ describe "quizzes attempts" do
     q = quiz.stored_questions[1]
     f("#question_#{q[:id]}_answer_#{q[:answers][1][:id]}").click
 
-    f("#submit_quiz_button").click
+    f('#submit_quiz_button').click
     accept_alert # it will warn about having unanswered questions
     wait_for_ajaximations
 
