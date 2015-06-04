@@ -101,7 +101,7 @@ require 'securerandom'
 #
 class FilesController < ApplicationController
   before_filter :require_user, :only => :create_pending
-  before_filter :require_context, :except => [:full_index,:assessment_question_show,:image_thumbnail,:show_thumbnail,:preflight,:create_pending,:s3_success,:show,:api_create,:api_create_success,:api_show,:api_index,:destroy,:api_update,:api_file_status,:public_url]
+  before_filter :require_context, :except => [:assessment_question_show,:image_thumbnail,:show_thumbnail,:preflight,:create_pending,:s3_success,:show,:api_create,:api_create_success,:api_show,:api_index,:destroy,:api_update,:api_file_status,:public_url]
   before_filter :check_file_access_flags, :only => [:show_relative, :show]
   prepend_around_filter :load_pseudonym_from_policy, :only => :create
   skip_before_filter :verify_authenticity_token, :only => :api_create
@@ -209,9 +209,7 @@ class FilesController < ApplicationController
         end
       end
     else
-      # to turn :better_file_browsing on for user files, turn it on for the account they are a part of.
-      return react_files if (@context.is_a?(User) ? @domain_root_account : @context).feature_enabled?(:better_file_browsing)
-      full_index
+      return react_files
     end
   end
 
@@ -366,47 +364,6 @@ class FilesController < ApplicationController
       })
 
       render :text => "".html_safe, :layout => true
-    end
-  end
-
-
-  def full_index
-    get_context
-    get_quota
-    add_crumb(t('#crumbs.files', "Files"), named_context_url(@context, :context_files_url))
-    @contexts = [@context]
-    if !@context.is_a?(User) || (@context == @current_user && params[:show_all_contexts])
-      get_all_pertinent_contexts(include_groups: true)
-    end
-    @too_many_contexts = @contexts.length > 15
-    @contexts = @contexts[0,15]
-    if @contexts.length <= 1 && !authorized_action(@context.attachments.build, @current_user, :read)
-      return
-    end
-
-    return unless tab_enabled?(@context.class::TAB_FILES)
-    log_asset_access([ "files", @context ], "files", 'other') if @context
-    respond_to do |format|
-      if @contexts.empty?
-        format.html do
-          url = !@context || @context == @current_user ? dashboard_url : named_context_url(@context, :context_url)
-          redirect_to url
-        end
-      else
-        js_env(:contexts =>
-           @contexts.to_json(:permissions =>
-                                 {:user => @current_user,
-                                  :policies =>
-                                      [:manage_files,
-                                       :update,
-                                       :manage_grades,
-                                       :read_roster]
-                                 },
-                             :methods => :asset_string,
-                             :include_root => false))
-        format.html { render :full_index }
-      end
-      format.json { render :json => @file_structures }
     end
   end
 
@@ -1060,7 +1017,7 @@ class FilesController < ApplicationController
       end
 
       @attachment.attributes = process_attachment_params(params)
-      if !@attachment.locked? && @attachment.locked_changed? && @attachment.usage_rights_id.nil? && @context.respond_to?(:feature_enabled?) && context.feature_enabled?(:better_file_browsing) && @context.feature_enabled?(:usage_rights_required)
+      if !@attachment.locked? && @attachment.locked_changed? && @attachment.usage_rights_id.nil? && @context.respond_to?(:feature_enabled?)  && @context.feature_enabled?(:usage_rights_required)
         return render :json => { :message => I18n.t('This file must have usage_rights set before it can be published.') }, :status => :bad_request
       end
       if (@attachment.folder_id_changed? || @attachment.display_name_changed?) && @attachment.folder.active_file_attachments.where(display_name: @attachment.display_name).where("id<>?", @attachment.id).exists?
