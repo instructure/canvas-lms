@@ -108,6 +108,7 @@ describe "gradebook uploads" do
 
     assignment_count = @course.assignments.count
     submit_form('#gradebook_grid_form')
+    accept_alert
     wait_for_ajaximations
     run_jobs
     expect(@course.assignments.count).to eql (assignment_count + 1)
