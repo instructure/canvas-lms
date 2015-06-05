@@ -9,7 +9,7 @@ define([
     propTypes: {
       id: React.PropTypes.string.isRequired,
       href: React.PropTypes.string.isRequired,
-      icon: React.PropTypes.string.isRequired,
+      icon: React.PropTypes.string,
       text: React.PropTypes.string.isRequired,
       haspopup: React.PropTypes.bool,
       onClick: React.PropTypes.func,
@@ -65,7 +65,7 @@ define([
              onMouseOver={this.props.onHover}
           >
             <div className="menu-item-icon-container">
-              {!this.props.avatar && (
+              {!this.props.avatar && !!this.props.icon && (
                 <SVGWrapper url={this.props.icon}/>
               )}
 

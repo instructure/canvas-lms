@@ -88,6 +88,7 @@
             <% unless @current_user.nil? %>
               <%= render(:partial => 'external_tools/global_nav_menu_items') %>
             <% end %>
+            <% if @current_user %>
             <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('profile') %>">
               <a href="/profile" class="ic-app-header__menu-list-link">
                 <div class="menu-item-icon-container">
@@ -100,6 +101,18 @@
                 </div>
               </a>
             </li>
+            <% else %>
+              <li class="menu-item ic-app-header__menu-list-item">
+                <a href="/login" class="ic-app-header__menu-list-link">
+                  <div class="menu-item-icon-container">
+                    <%= render(:partial => "shared/svg/svg_icon_arrow_right.svg") %>
+                  </div>
+                  <div class="menu-item__text">
+                    <%= t('Login') %>
+                  </div>
+                </a>
+              </li>
+            <% end %>
           </ul>
         </div>
         <div role="navigation" class="ic-app-header__secondary-navigation">

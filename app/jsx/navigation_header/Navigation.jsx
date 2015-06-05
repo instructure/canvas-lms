@@ -37,17 +37,20 @@ define([
         unread_count: 0,
         isTrayOpen: false,
         type: null,
-        activeItem: null
+        activeItem: null,
+        userLoggedIn: this.props.current_user && this.props.current_user.id
       };
     },
 
     componentWillMount() {
       this.determineActiveLink();
-      $.get('/api/v1/conversations/unread_count', (data) => {
-        this.setState({
-          unread_count: parseInt(data.unread_count, 10)
+      if (this.state.userLoggedIn) {
+        $.get('/api/v1/conversations/unread_count', (data) => {
+          this.setState({
+            unread_count: parseInt(data.unread_count, 10)
+          });
         });
-      });
+      }
     },
 
     determineActiveLink () {
@@ -146,15 +149,19 @@ define([
 
     renderGlobalNavTools () {
       var globalNavTools = window.ENV.GLOBAL_NAV_MENU_ITEMS;
-      return globalNavTools.map((tool) => {
-        var icon = (tool.tool_data.context_external_tool.name === 'Commons') ? "/images/svg-icons/svg_commons_logo.svg" : ''
-        return (
-          <MenuItem id={`external_tool_${tool.tool_data.context_external_tool.id}`}
-                    href={tool.link} text={tool.tool_data.context_external_tool.name}
-                    icon={icon}
-                    isActive={this.state.activeItem === 'external_tools'} />
-        );
-      });
+      if (globalNavTools) {
+        return globalNavTools.map((tool) => {
+          var icon = (tool.tool_data.context_external_tool.name === 'Commons') ? "/images/svg-icons/svg_commons_logo.svg" : ''
+          return (
+            <MenuItem id={`external_tool_${tool.tool_data.context_external_tool.id}`}
+                      href={tool.link} text={tool.tool_data.context_external_tool.name}
+                      icon={icon}
+                      isActive={this.state.activeItem === 'external_tools'} />
+          );
+        });
+      } else {
+        return null;
+      }
     },
 
     render() {
@@ -214,12 +221,19 @@ define([
 
           {this.renderGlobalNavTools()}
 
-          <MenuItem id="profile_menu_item" href="/profile" text={I18n.t('Profile')}
-                    isActive={this.state.activeItem === 'profile'}
-                    onClick={this.handleMenuClick.bind(this, 'profile')}
-                    onKeyPress={this.handleMenuKeyPress.bind(this, 'profile')}
-                    avatar={current_user.avatar_image_url} />
+          {!this.state.userLoggedIn && (
+            <MenuItem id="login_menu_item" href="/login" text={I18n.t('Login')}
+                      icon="/images/svg-icons/svg_icon_arrow_right.svg"
+                      isActive={false} />
+          )}
 
+          {this.state.userLoggedIn && (
+            <MenuItem id="profile_menu_item" href="/profile" text={I18n.t('Profile')}
+                      isActive={this.state.activeItem === 'profile'}
+                      onClick={this.handleMenuClick.bind(this, 'profile')}
+                      onKeyPress={this.handleMenuKeyPress.bind(this, 'profile')}
+                      avatar={current_user.avatar_image_url} />
+          )}
         </ul>
       );
     }
