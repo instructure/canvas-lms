@@ -381,8 +381,9 @@ module QuizzesHelper
   def question_comment(user_answer, question)
     correct_text   = (hash_get(user_answer, :correct) == true) ? comment_get(question, :correct_comments) : nil
     incorrect_text = (hash_get(user_answer, :correct) == false) ? comment_get(question, :incorrect_comments) : nil
-    neutral_text   = (hash_get(question, :neutral_comments).present?) ? comment_get(question, :neutral_comments) : nil
-
+    neutral_text   = if hash_get(question, :neutral_comments).present? || hash_get(question, :neutral_comments_html).present?
+      comment_get(question, :neutral_comments)
+    end
     text = []
     text << content_tag(:p, correct_text, {:class => 'correct_comments'}) if correct_text.present?
     text << content_tag(:p, incorrect_text, {:class => 'incorrect_comments'}) if incorrect_text.present?
