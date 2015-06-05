@@ -79,10 +79,6 @@ ar:
         api_key: "مفتاح واجهة API"
         api_url: "عنوان Url لواجهة Api"
         common_core_guid: "المعرف الأساسي المشترك GUID (اختياري)"
-  access_to_the_etherpad_collaborations_below_will_b_b6a0a288: |-
-      سيتم تعطيل الوصول إلى تعاونات Etherpad يوم 8 أغسطس 2015. إذا كنت ترغب في حفظ هذا المحتوى، يرجى ترحيله قبل ذلك التاريخ.
-      
-      للحصول على تعليمات بشأن إنشاء علاقة تعاون مع Google، [انقر هنا](%{google_collab_help_url}).
   account: 
     ask_canvas_network: "طرح سؤال على مجتمع شبكة Canvas"
     default_account_name: "حساب افتراضي"
@@ -119,17 +115,12 @@ ar:
     default_delegated_login_handle_name: "تسجيل الدخول"
     default_login_handle_name: "البريد الإلكتروني"
   account_authorization_config/ldap: 
-    test_bind_failed: "فشل الربط مع ظهور الخطأ التالي: %{error}"
     test_connection_timeout: "المهلة أثناء الاتصال"
-    test_host_unknown: "مضيف غير معروف: %{host}"
-    test_login_auth_exception: "استثناء عند تسجيل الدخول: %{error}"
     test_login_auth_failed: "فشلت المصادقة"
-    test_search_failed: "فشل البحث نتيحة لوجود الخطأ التالي: %{error}"
   account_authorization_config/saml: 
     debug: 
       logout_redirect: "تم إرسال LogoutRequest إلى IdP"
       wait_for_login: "الانتظار لمحاولة تسجيل الدخول"
-    saml_eppn_domain_stripped: "%{eppn} (تم تجريد المجال)"
   account_authorization_configs: 
     account_required: "يجب أن تتم المصادقة من قِبل LDAP"
     cas_fields: 
@@ -146,7 +137,6 @@ ar:
       auth_url: "عنوان URL لتسجيل الدخول لهذا التكوين"
     index: 
       add_auth_desc: "إضافة موفر الهوية لهذا الحساب:"
-      canvas_login_tip: "في حال قيامك بتمكين إعدادات تؤدي إلى منعك من تسجيل الدخول، يمكنك إضافة *%{url1}* إلى نهاية عنوان URL لتسجيل الدخول. سيسمح لك ذلك بتسجيل الدخول باستخدام إجراء دخول Canvas. سيصبح عنوان URL لذلك الحساب %{url2}"
       choose_auth_type_option: "اختيار خدمة مصادقة"
       current_settings_title: "التكامل الحالي"
       delete_auth_confirmation: "هل أنت متأكد؟ قد لا يتمكن المستخدمون من تسجيل الدخول إذا تمت إزالة هذا."
@@ -175,7 +165,6 @@ ar:
         auth_username: "اسم المستخدم"
         identifier_format: "سمة معرف تسجيل الدخول"
       last_ldap_timeout_failure: "فشل آخر مهلة"
-      ldap_timeout_failure_help2: "إذا انتهت مهلة اتصال Canvas بخادم LDAP لمرات كثيرة للغاية، فإنه سيمنع أي محاولات دخول أخرى من استخدام خادم LDAP ذلك لمدة %{time}."
     ldap_settings_test: 
       labels: 
         pass: "كلمة المرور"
@@ -427,7 +416,6 @@ ar:
         sis_user_id: "معرّف SIS"
         sortable_name: "الاسم القابل للفرز"
       sortable_name_help: "يظهر هذا الاسم في القوائم المفروزة."
-      unique_id_label_1: "%{label}:"
     add_user_button: "إضافة مستخدم"
     add_user_dialog_title: "إضافة مستخدم جديد"
     adding_course_message: "جارٍ إضافة مساق..."
@@ -2798,7 +2786,6 @@ ar:
   canvas_cartridge_name: "مستورد كارتريدج Canvas"
   canvas_cloud_information_fdd404f2: "معلومات Canvas Cloud"
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "لم يتعرف Canvas على موفر الهوية"
-  canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "لا يحتوي Canvas على حساب للمستخدم: %{user}"
   canvas_error_report_ff678539: "تقرير خطأ Canvas"
   canvas_revision_unknown: "غير معروف"
   canvas_ticketing_email_connector_27e253ae: "رابط تذاكر البريد الإلكتروني لـ Canvas"
@@ -5697,7 +5684,6 @@ ar:
   email_is_invalid_e0d982eb: "البريد الإلكتروني غير صالح!"
   ember_modules_description: "تم كتابة الوحدات في Ember. استخدم واجهة برمجة التطبيقات الأصلية للسحب والإفلات للسماح بالسحب من المواقع الخارجية."
   enable_6f5d1328: تمكين
-  enable_feature_title_987d8e9a: "تمكين الميزة: %{title}"
   enable_gradebook_list_students_by_sortable_name: "سجل الطلاب بأسمائهم القابلة للفرز في دفتر الدرجات. الإعدادات الافتراضية للأسماء القابلة للفرز هي \"الاسم الأخير\"، \"الاسم الأول\" ويمكن تغييرها في الإعدادات."
   enable_multiple_grading_periods: |-
       تسمح فترات تقييم الدرجات المتعددة للمعلمين والمسؤولين بإنشاء فترات تقييم مع
@@ -6493,7 +6479,6 @@ ar:
       no_rubric_outcomes_found: "لم يتم العثور على نتائج تم تكوينها بواسطة العنوان"
     titles: 
       find_outcome: "العثور على نتيجة"
-  first_two_students_and_others_count_others_bb0a212a: "%{first_two_students} و %{others_count} آخرين"
   flash_6afbf65a: Flash
   folder: 
     course_content_folder_name: "محتوى المساق"
@@ -6540,7 +6525,6 @@ ar:
     graph_title: "متوسط %{mean}، مرتفع %{high}، منخفض %{low}"
     outcome: 
       alignment_count: "*%{count}* من المهام"
-      alignment_count_summary: "*8* من أصل *%{count}* توفيقات"
   gradebook: 
     alerts: 
       no_active_students: "عذرًا، لا يوجد طلاب نشطون في المساق أو لا يوجد شخص قابل للتقييم من قِبلك."
@@ -8017,7 +8001,6 @@ ar:
           request_password: "طلب كلمة المرور"
         dont_know_password: "لا أعرف كلمة مروري"
         log_in: "تسجيل الدخول"
-        login_handle: "أدخل %{login_handle_name} وسنرسل لك ارتباطًا لتغيير كلمة مرورك."
         password: "كلمة المرور"
         sending: "جارٍ الإرسال..."
       new: 
@@ -8031,7 +8014,6 @@ ar:
           password: "كلمة المرور"
           remember_me: "الاحتفاظ بتسجيل الدخول"
         log_in: "تسجيل الدخول"
-        login_handle: "أدخل %{login_handle_name} وسنرسل لك ارتباطًا لتغيير كلمة المرور لديك."
         page_title: "تسجيل الدخول إلى Canvas"
         register_for_canvas: "*هل تحتاج إلى حساب Canvas؟* **انقر هنا، إنه مجاني!**"
     logout_confirm: 
@@ -8048,16 +8030,9 @@ ar:
           send: إرسال
           verify: التحقق
         details: 
-          mfa_enrollment: |-
-              إن المصادقة متعددة العوامل تزيد الأمان من خلال مطالبتك بتوفر جهاز في حوزتك،
-              بالإضافة إلى معرفة كلمة المرور الخاصة بك، وذلك لتسجيل الدخول إلى Canvas. وهذا قد يكون جهازًا يقوم بإنشاء أكواد التحقق،
-              أو هاتفًا يمكنه استقبال الرسائل النصية. يمكن تكوين تطبيق Google Authenticator لـ [iPhone](%{iphone_url}) أو
-              [Android](%{android_url}) عبر فحص QR Code أدناه. يمكن تكوين الرموز المميزة tokens بواسطة إدخال
-              المفتاح السري **%{secret_key}**.
           mfa_required: "مطلوب منك إعداد مصادقة متعددة العوامل."
           otp_on_device: "الرجاء إدخال كود التحقق المعروض بواسطة الرمز المميز token الخاص بك."
           otp_sent_to_phone: "تم إرسال كود تحقق إلى هاتفك. الرجاء إدخاله هنا."
-          send_to_sms: "إرسال رسائل نصية إلى %{phone_number}"
         labels: 
           carrier: الحامل
           phone_number: "رقم الهاتف"
@@ -9884,21 +9859,8 @@ ar:
         tweet: "تنبيه Canvas - دعوة: حضور %{title}, %{name}"
     web_conference_recording_ready: 
       email: 
-        body: "تسجيل %{title} الخاص بـ %{name} جاهز."
-        details_link: "يمكنك الاطلاع على التفاصيل هنا: %{link}"
         html: 
-          body: "تسجيل %{title} الخاص بـ %{name} جاهز."
           details_link: "انقر هنا لعرض التفاصيل"
-          subject: "تسجيل المؤتمر عبر الويب جاهز: %{name}"
-        subject: "تسجيل المؤتمر عبر الويب جاهز: %{name}"
-      sms: 
-        body: "تسجيل %{title} الخاص بـ %{name} جاهز."
-        link_message: "مزيد من المعلومات على %{url}"
-      summary: 
-        body: "تسجيل %{title} الخاص بـ %{name} جاهز."
-        subject: "تسجيل المؤتمر عبر الويب جاهز: %{name}"
-      twitter: 
-        tweet: "تنبيه Canvas - التسجيل جاهز: %{title}، %{name}"
   migration: 
     announcement_type: الإعلان
     assignment_group_type: "مجموعة المهام"
@@ -11093,8 +11055,6 @@ ar:
     labels: 
       requirements_must_be_completed: "يلزم إكمال المتطلبات التالية قبل إلغاء تأمين هذه الصفحة"
   presentation_2d9387ca: "عرض تقديمي"
-  previous_time_cc96b361: "السابق (%{time})"
-  previous_timestamp_19343a58: "السابق (%{timestamp})"
   privacy_290109ea: الخصوصية
   product_name: Canvas
   profile: 
@@ -14878,7 +14838,6 @@ ar:
   there_was_a_problem_deleting_the_grading_period_50ce07c5: "حدثت مشكلة أثناء حذف فترة تقييم الدرجات"
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: "كانت هناك مشكلة في حذف نظام التقييم"
   there_was_a_problem_exporting_c33dc250: "حدث مشكل أثناء التصدير."
-  there_was_a_problem_logging_in_at_institution_5a298155: "حدث مشكل أثناء تسجيل الدخول إلى %{institution}"
   there_was_a_problem_saving_the_grading_period_243bed6c: "حدثت مشكلة أثناء حفظ فترة تقييم الدرجات"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "كانت هناك مشكلة في حفظ نظام التقييم"
   there_was_an_error_in_processing_your_request_6513a49a: "حدث خطأ أثناء معالجة طلبك"
@@ -15295,7 +15254,6 @@ ar:
       updating_user_details: "جارٍ تحديث تفاصيل المستخدم..."
     notices: 
       image_reported: "لقد تم الإبلاغ عن هذه الصورة"
-  user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}، عليك بـ *تسجيل الدخول* قبل أن تتمكن من عرض الصفحة."
   user_navigation_a097be0f: "تصفح المستخدم"
   user_notes: 
     confirms: 
@@ -15626,7 +15584,6 @@ ar:
   view_course_analytics_eefe6b2: "عرض المعلومات التحليلية للمساق"
   view_name_app_62a2ad8e: "عرض التطبيق %{name}"
   view_student_analytics_6b8ccd42: "عرض المعلومات التحليلية للطلاب"
-  view_toolname_placements_4a5724d1: "عرض مواضع %{toolName}"
   visit_864b4060: زيارة
   visit_group_group_name_7a816081: "زيارة المجموعة %{group_name}"
   warning_for_improved_accessibility_in_moving_files_71e1028b: "تحذير: للحصول على إمكانية وصول محسنة في نقل الملفات، يرجى استخدام الخيار Move To Dialog الموجود في القائمة."
