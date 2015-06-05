@@ -31,6 +31,9 @@ $ic-left-side-width: $ic-sp*15;
       transition: none;
     }
   }
+  // HACK workaround for IE10 and IE11 flexbox bug
+  // https://connect.microsoft.com/IE/feedback/details/802625/min-height-and-flexbox-flex-direction-column-dont-work-together-in-ie-10-11-preview
+  @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) { min-height: 93.5vh; }
 }
 
 .ic-app-main-and-right-side {
@@ -87,6 +90,7 @@ $ic-left-side-width: $ic-sp*15;
 }
 
 .ic-app-footer {
+  box-sizing: border-box;
   padding: $ic-sp 0;
   margin: $ic-sp*2 $ic-sp*2 0;
   border-top: 1px solid $ic-border-light;
