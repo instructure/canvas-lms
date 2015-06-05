@@ -208,7 +208,7 @@ define([
           {!current_user.fake_student && (
             <MenuItem id="inbox_menu_item" href="/conversations" text={I18n.t('Inbox')}
                       icon="/images/svg-icons/svg_icon_inbox.svg"
-                      isActive={this.state.activeItem === 'inbox'}
+                      isActive={this.state.activeItem === 'conversations'}
                       showBadge={!current_user.disabled_inbox} badgeCount={unread_count} />
           )}
 
