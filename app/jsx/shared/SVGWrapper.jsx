@@ -33,7 +33,7 @@ define([
           }
 
           if (this.svg.nodeType !== ELEMENT_NODE && this.svg.nodeName !== 'SVG') {
-            throw new Exception('SVGWrapper: SVG Element must be returned by request to ' + this.props.url);
+            throw new Error('SVGWrapper: SVG Element must be returned by request to ' + this.props.url);
           }
 
           this.svg.setAttribute('focusable', false);
