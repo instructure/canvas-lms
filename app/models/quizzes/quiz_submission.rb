@@ -524,6 +524,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     self.score = final_score
     to_be_kept_score = final_score
     self.fudge_points = new_fudge
+    mark_completed
 
     if self.quiz && self.quiz.scoring_policy == "keep_highest"
       # exclude the score of the version we're curretly overwriting

@@ -1158,6 +1158,22 @@ describe Quizzes::QuizSubmission do
     end
   end
 
+  describe "set_final_score" do
+    it "marks a quiz_submission as complete" do
+      quiz_with_graded_submission([
+        {:question_data => {
+          :name => 'question 1',
+          :points_possible => 1,
+          'question_type' => 'essay_question'
+          }
+        }
+      ])
+      @quiz_submission.set_final_score(2)
+      @quiz_submission.reload
+      expect(@quiz_submission.workflow_state).to eq("complete")
+    end
+  end
+
   describe "#needs_grading?" do
     before :once do
       student_in_course

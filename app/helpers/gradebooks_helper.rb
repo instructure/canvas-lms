@@ -73,11 +73,9 @@ module GradebooksHelper
   def student_score_display_for(submission, show_student_view = false)
     return '-' if submission.blank?
     score, grade = score_and_grade_for(submission, show_student_view)
-
-    # Squelched icon placement for pending review items, until DB dependencies are resolved
     if submission.try(:excused?)
       "EX"
-    elsif submission && grade #&& submission.workflow_state != 'pending_review'
+    elsif submission && grade && submission.workflow_state != 'pending_review'
       graded_submission_display(grade, score, submission.assignment.grading_type)
     elsif submission.submission_type
       ungraded_submission_display(submission.submission_type)
