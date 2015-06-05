@@ -254,18 +254,14 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   # There is also a needs_grading scope which needs to replicate this logic
   def needs_grading?(strict=false)
-    if strict && self.untaken? && self.overdue?(true)
-      true
-    elsif self.untaken? && self.end_at && self.end_at < Time.now
-      true
-    elsif self.completed? && !graded?
-      true
-    else
-      false
-    end
+    overdue_and_needs_submission?(strict) || (self.completed? && !graded?)
   end
 
-  alias_method :overdue_and_needs_submission, :needs_grading?
+  def overdue_and_needs_submission?(strict=false)
+    (strict && self.untaken? && self.overdue?(true)) ||
+    (self.untaken? && self.end_at && self.end_at < Time.now)
+  end
+  alias_method :overdue_and_needs_submission, :overdue_and_needs_submission?
 
   def has_seen_results?
     !!self.has_seen_results
