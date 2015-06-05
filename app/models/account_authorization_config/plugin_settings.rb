@@ -46,7 +46,8 @@ module AccountAuthorizationConfig::PluginSettings
       @plugin_settings = settings_hash.keys
 
       # force attribute methods to be created so that we can alias them
-      self.new
+      # also rescue nil, cause the db may not exist yet
+      self.new rescue nil
 
       settings_hash.each do |(accessor, setting)|
         super_method = 'super'
