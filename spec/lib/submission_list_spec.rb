@@ -25,9 +25,6 @@ describe SubmissionList do
     expect(@sl).to be_is_a(SubmissionList)
     expect(@sl.course).to eql(@course)
 
-    expect{@sl = SubmissionList.new(@course)}.not_to raise_error
-    expect(@sl.course).to eql(@course)
-
     expect{@sl = SubmissionList.new(-1)}.to raise_error(ArgumentError, "Must provide a course.")
   end
 
@@ -221,6 +218,67 @@ describe SubmissionList do
       expect(regrades.include?(5.0)).to be_truthy
     end
   end
+
+  context "remembers the most recent grade change" do
+    let(:grader)  { User.create name: 'some_grader' }
+    let(:student) { User.create name: "some student", workflow_state: "registered" }
+    let(:course)  { Course.create name: "some course", workflow_state: "available" }
+    let(:list)    { SubmissionList.new course }
+
+    let(:assignment) do
+      course.assignments.create title: "some assignment",
+      points_possible: 10,
+      workflow_state: "published"
+    end
+
+    let(:submission) do
+      list.days.first.
+        graders.first.
+        assignments.first.
+        submissions.first
+    end
+
+    let!(:enroll_teacher_and_student) do
+      course.enroll_teacher(grader).accept
+      course.enroll_student student
+    end
+
+    context "when the grade is not blank" do
+      let!(:grade_assignment) do
+        assignment.grade_student student, {grade: 5, grader: grader}
+        assignment.grade_student student, {grade: 3, grader: grader}
+      end
+
+      it "remembers the 'Before' grade " do
+        expect(submission.previous_grade).to eq "5"
+      end
+      it "remembers the 'After' grade" do
+        expect(submission.new_grade).to eq "3"
+      end
+      it "remembers the 'Current' grade" do
+        expect(submission.current_grade).to eq "3"
+      end
+    end
+
+    context "when the grade is blank" do
+      let!(:grade_assignment) do
+        assignment.grade_student student, {grade: 6, grader: grader}
+        assignment.grade_student student, {grade: 7, grader: grader}
+        assignment.grade_student student, {grade: "", grader: grader}
+      end
+
+      it "remembers the 'Before' grade" do
+       expect(submission.previous_grade).to eq "7"
+      end
+      it "remembers the 'After' grade" do
+       expect(submission.new_grade).to be_blank
+      end
+      it "remembers the 'Current' grade" do
+       expect(submission.current_grade).to be_blank
+      end
+    end
+  end
+
 end
 
 def interesting_submission_list(opts={})
