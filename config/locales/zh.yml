@@ -7289,7 +7289,7 @@ zh:
       默认情况下，Canvas 将首先尝试使用 Flash 来播放视频。启用此项可首先尝试使用 HTML5，
       然后返回到 Flash。
   html_editor_fb2ab713: "HTML 编辑器"
-  i_agree_to_the_terms_of_use_and_privacy_policy_f41760cc: 我同意*使用条件*和**隐私政策**。
+  i_agree_to_the_terms_of_use_and_privacy_policy_f41760cc: "我同意 *使用条件* 和 **隐私政策**。"
   i_have_obtained_permission_to_use_this_file_6386f087: 我已获得使用此文件的权限。
   i_hold_the_copyright_71ee91b1: 我持有版权
   ic_actions: 
