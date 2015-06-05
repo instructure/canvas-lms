@@ -142,7 +142,7 @@ pl:
       auth_url: "Adres URL logowania dla tej konfiguracji"
     index: 
       add_auth_desc: "Dodaj dostawcę tożsamości do tego konta:"
-      canvas_login_tip: "W przypadku konfigurowania ustawień, które powodują, że nie możesz się zalogować, możesz dodać  *%{url1}* na koniec swojego adresu url do logowania. To pozwoli ci się zaologować przy użyciu normalnej procedury logowania Canvas. Dla takiego konta adres url to %{url2}"
+      canvas_login_tip: "W przypadku konfigurowania ustawień, które powodują, że nie możesz się zalogować, możesz dodać *%{url1}* na koniec swojego adresu url do logowania. To pozwoli ci się zaologować przy użyciu normalnej procedury logowania Canvas. Dla takiego konta adres url to %{url2}"
       choose_auth_type_option: "Wybierz usługę uwierzytelniania"
       current_settings_title: "Bieżąca integracja"
       delete_auth_confirmation: "Na pewno? Usunięcie tego elementu może uniemożliwić logowanie użytkownikom."
@@ -9625,6 +9625,7 @@ pl:
         body: "Twój zapis %{title} dla %{name} jest gotowy."
         link_message: "Więcej informacji pod adresem %{url}"
       summary: 
+        body: "Twój zapis %{title} dla %{name} jest gotowy."
         subject: "Zapis konferencji internetowej gotowy: %{name}"
       twitter: 
         tweet: "Alarm Canvas - Zapis gotowy: %{title}, %{name}"
