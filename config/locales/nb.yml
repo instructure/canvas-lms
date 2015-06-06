@@ -169,7 +169,6 @@ nb:
         auth_username: Brukernavn
         identifier_format: ID-innloggingsattributt
       last_ldap_timeout_failure: "Siste tidsavbruddsfeil"
-      ldap_timeout_failure_help2: "Om Canvas har for mange tidsavbrudd mens den kommuniserer med LDAP-tjeneren vil den blokkere innloggingsforsøk fra den LDAP-tjeneren i %{time}."
     ldap_settings_test: 
       labels: 
         pass: Passord
