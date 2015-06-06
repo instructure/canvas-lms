@@ -169,7 +169,6 @@ es:
         auth_username: "Nombre de usuario"
         identifier_format: "Atributo de ID de inicio de sesión"
       last_ldap_timeout_failure: "Fallo de la última expiración"
-      ldap_timeout_failure_help2: "Si la página de Canvas expira demasiadas veces al comunicarse con el servidor LDAP, Canvas bloqueará cualquier otro intento de inicio de sesión a través de ese servidor LDAP durante %{time}."
     ldap_settings_test: 
       labels: 
         pass: Contraseña
