@@ -139,7 +139,6 @@ fa-IR:
         auth_username: "نام کاربری"
         identifier_format: "ویژگی شناسه ورود"
       last_ldap_timeout_failure: "آخرین خطای به پایان رسیدن زمان"
-      ldap_timeout_failure_help2: "اگر زمان برقراری ارتباط کانواس با سرور LDAP  برای دفعات زیاد به پایان برسد، مانع از استفاده از این سرور LDAP برای %{time} از طریق تلاش های دیگر برای ورود خواهد شد."
     ldap_settings_test: 
       labels: 
         pass: "رمز عبور"
