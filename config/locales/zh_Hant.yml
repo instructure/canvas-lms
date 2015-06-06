@@ -169,7 +169,6 @@ zh_Hant:
         auth_username: 使用者名稱
         identifier_format: "登入 ID 屬性"
       last_ldap_timeout_failure: 最後逾時失敗
-      ldap_timeout_failure_help2: "如果 Canvas 與 LDAP 伺服器通信時逾時次數過多，則會阻止使用 LDAP 伺服器 %{time} 的進一步的登入嘗試。"
     ldap_settings_test: 
       labels: 
         pass: 密碼
