@@ -169,7 +169,6 @@ nl:
         auth_username: Gebruikersnaam
         identifier_format: "Kenmerk op Aanmeldings-ID"
       last_ldap_timeout_failure: "Laatste time-out mislukt"
-      ldap_timeout_failure_help2: "Als Canvas te vaak een time-out ondervindt bij het communiceren met de LDAP-server dan zullen verdere aanmelding pogingen om die LDAP-server te gebruiken blokkeren voor %{time}."
     ldap_settings_test: 
       labels: 
         pass: Wachtwoord
