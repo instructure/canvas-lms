@@ -1,7 +1,7 @@
 <% @current_user.set_menu_data(session[:enrollment_uuid]) %>
   <a href="<%= courses_path %>" class="menu-item-title">
   <% if k12? %>
-    <%= render(:partial => 'shared/svg/svg_icon_courses') %>
+    <%= render(:partial => 'shared/svg/svg_icon_courses.svg') %>
     <div class="menu-item__text">
   <% end %>
     <%= @current_user.menu_data[:group_memberships_count].zero? ? t('links.courses', "Courses") : t('links.courses_and_groups', "Courses & Groups") -%>
