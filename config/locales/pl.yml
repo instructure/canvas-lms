@@ -171,7 +171,6 @@ pl:
         auth_username: "Nazwa użytkownika"
         identifier_format: "Właściwości identyfikatora logowania"
       last_ldap_timeout_failure: "Ostatnie błędy przekroczenia czasu"
-      ldap_timeout_failure_help2: "Jeśli system Canvas podczas komunikacji z serwerem LDAP przekroczy czas zbyt wiele razy, spowoduje to, że kolejne próby logowania nie będą mogły odbywać się za pomocą serwera LDAP przez okres %{time}."
     ldap_settings_test: 
       labels: 
         pass: Hasło
