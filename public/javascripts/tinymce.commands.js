@@ -39,6 +39,12 @@ define([
       }
     },
 
+    isOnlyText: function(maybeHtml){
+      return !(/</.test(maybeHtml) &&
+              (!/^<a [^>]+>[^<]+<\/a>$/.test(maybeHtml) ||
+              maybeHtml.indexOf('href=') == -1));
+    },
+
     /**
      * Provide a means for inputting a link at the cursor point, after
      * re-establishing focus (important for IE11, which apparently hates
@@ -54,9 +60,13 @@ define([
     insertLink: function(id, content, linkAttrs){
       var editor = tinymce.get(id);
       editor.focus();
-      var linkContent = editor.dom.encode(content);
-      var linkHtml = editor.dom.createHTML("a", linkAttrs, linkContent);
-      editor.insertContent(linkHtml);
+      if (EditorCommands.isOnlyText(content)) {
+        var linkContent = editor.dom.encode(content);
+        var linkHtml = editor.dom.createHTML("a", linkAttrs, linkContent);
+        editor.insertContent(linkHtml);
+      } else {
+        editor.execCommand('mceInsertLink', false, linkAttrs);
+      }
     }
 
   };
