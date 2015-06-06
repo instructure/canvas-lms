@@ -130,7 +130,6 @@ ko:
         auth_username: "사용자 이름"
         identifier_format: "로그인 ID 속성"
       last_ldap_timeout_failure: "마지막 시간 초과 오류"
-      ldap_timeout_failure_help2: "Canvas에서 LDAP 서버와 통신하는 데 너무 잦은 횟수의 시간 초과가 발생하면 %{time} 동안 해당 LDAP 서버를 이용하는 로그인 시도를 차단하게 됩니다."
     ldap_settings_test: 
       labels: 
         pass: 암호
