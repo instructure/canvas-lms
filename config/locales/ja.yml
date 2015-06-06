@@ -169,7 +169,6 @@ ja:
         auth_username: ユーザ名
         identifier_format: "ログイン ID 属性"
       last_ldap_timeout_failure: 前回のタイムアウト
-      ldap_timeout_failure_help2: "Canvas は、特定の LDAP サーバーとの通信が一定回数以上タイムアウトした場合、それ以降の %{time} 間は、ログイン試行の際にその LDAP サーバーを使用しなくなります。"
     ldap_settings_test: 
       labels: 
         pass: パスワード
