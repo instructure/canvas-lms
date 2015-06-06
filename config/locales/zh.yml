@@ -169,7 +169,6 @@ zh:
         auth_username: 用户名
         identifier_format: "登录 ID 属性"
       last_ldap_timeout_failure: 上次超时失效
-      ldap_timeout_failure_help2: "如果 Canvas 与 LDAP 服务器的通信超时太多次，那么它就会限制接下来尝试登陆使用 LDAP 服务器 的%{time} 。"
     ldap_settings_test: 
       labels: 
         pass: 密码
