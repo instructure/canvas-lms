@@ -9,7 +9,7 @@
         <a class='menu-item-no-drop' href="<%= account_external_tool_path(@domain_root_account, tool, :launch_type => 'global_navigation') %>">
           <% if k12? %>
             <%# Hardcoding Commons logo in to help K-12 sales demos, until a way to give the nav items logos is built out %>
-            <%= render(:partial => 'shared/svg/svg_commons_logo') %>
+            <%= render(:partial => 'shared/svg/svg_commons_logo.svg') %>
             <div class="menu-item__text">
           <% end %>
           <%= tool.label_for(:global_navigation) %>
