@@ -170,7 +170,6 @@ de:
         auth_username: Benutzername
         identifier_format: "Anmeldungs-ID Attribut"
       last_ldap_timeout_failure: "Letzter Timeoutfehler"
-      ldap_timeout_failure_help2: "Wenn bei der Kommunikation zwischen Canvas und dem LDAP-Server zu häufig ein Timeout auftritt, wird die Verwendung dieses LDAP-Servers für weitere Anmeldeversuche für %{time} blockiert."
     ldap_settings_test: 
       labels: 
         pass: Passwort
