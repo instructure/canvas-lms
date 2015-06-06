@@ -161,7 +161,6 @@ tr:
         auth_username: "Kullanıcı Adı"
         identifier_format: "Oturum Açma ID'si Özelliği"
       last_ldap_timeout_failure: "Son zaman aşımı hatası"
-      ldap_timeout_failure_help2: "LDAP sunucusu ile iletişimdeyken Canvas çok fazla zaman aşımı hata verirse bu durum gelecekteki oturum açma denemelerini bu LDAP sunucusundan %{time} süreliğine engelleyecektir."
     ldap_settings_test: 
       labels: 
         pass: Şifre
