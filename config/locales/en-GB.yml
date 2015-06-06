@@ -169,7 +169,6 @@ en-GB:
         auth_username: Username
         identifier_format: "Login ID attribute"
       last_ldap_timeout_failure: "Last time-out failure"
-      ldap_timeout_failure_help2: "If Canvas times out too many times communicating with the LDAP server, it will block further log-in attempts from using that LDAP server for %{time}."
     ldap_settings_test: 
       labels: 
         pass: Password
