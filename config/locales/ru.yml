@@ -173,7 +173,6 @@ ru:
         auth_username: "Имя пользователя"
         identifier_format: "Атрибут идентификатора входа"
       last_ldap_timeout_failure: "Последняя ошибка таймаута"
-      ldap_timeout_failure_help2: "Если Canvas слишком часто прерывает соединение с LDAP-сервером, он будет блокировать дальнейшие попытки входа в систему с использованием LDAP-сервера в течение %{time}."
     ldap_settings_test: 
       labels: 
         pass: Пароль
