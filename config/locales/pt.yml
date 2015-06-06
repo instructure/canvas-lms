@@ -140,6 +140,7 @@ pt:
       auth_url: "URL de início de sessão para esta configuração"
     index: 
       add_auth_desc: "Adicionar um provedor de identidade a esta conta:"
+      canvas_login_tip: "Se configurar as definições que o impedem de não ser capaz de registar, pode adicionar *{url1}* no fim da sua ligação de registo url. Isto permite que registe utilizando o procedimento de registo normal Canvas. Para esta conta o url seria %{url2}"
       choose_auth_type_option: "Escolha um serviço de autenticação"
       current_settings_title: "Integração atual"
       delete_auth_confirmation: "Tem a certeza? Os utilizadores poderão não conseguir iniciar sessão se isto for removido."
@@ -168,7 +169,6 @@ pt:
         auth_username: "Nome de utilizador"
         identifier_format: "Atributo de ID de início de sessão"
       last_ldap_timeout_failure: "Último timeout falhou"
-      ldap_timeout_failure_help2: "Se o Canvas ficar inativo demasiadas vezes durante a comunicação com o servidor LDAP, irá impedir que tentativas adicionais de início de sessão utilizem o servidor LDAP durante %{time}."
     ldap_settings_test: 
       labels: 
         pass: Senha
@@ -5275,6 +5275,9 @@ pt:
       show_more: "Mostrar mais"
     hide_due_dates: "Ocultar datas de entrega"
     initial_post_required_to_subscribe: "Tem de publicar uma resposta antes de se inscrever"
+    like_count: 
+      one: "(%{count} gosto)"
+      other: "(%{count} gostos)"
     mark_as_read: "Marcar como lido"
     mark_as_unread: "Marcar como não lido"
     no_content: "Sem conteúdo"
