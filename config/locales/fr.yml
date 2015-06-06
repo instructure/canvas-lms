@@ -169,7 +169,6 @@ fr:
         auth_username: "Nom d’utilisateur"
         identifier_format: "Attribut de l’ID de connexion"
       last_ldap_timeout_failure: "Dernière expiration de délai"
-      ldap_timeout_failure_help2: "En cas de fréquentes expirations de délai alors que Canvas communique avec le serveur LDAP, toutes les autres tentatives d’utilisation de ce serveur seront bloquées pendant %{time}."
     ldap_settings_test: 
       labels: 
         pass: "Mot de passe"
