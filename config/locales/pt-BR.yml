@@ -169,7 +169,6 @@ pt-BR:
         auth_username: "Nome de Usuário"
         identifier_format: "Atributo de ID de login"
       last_ldap_timeout_failure: "Última falha de limite de tempo "
-      ldap_timeout_failure_help2: "Se o tempo de comunicação entre o Canvas e o servidor LDAP expirar várias vezes, o Canvas bloqueará tentativas de login posteriores de usar esse servidor LDPA por %{time}."
     ldap_settings_test: 
       labels: 
         pass: Senha
