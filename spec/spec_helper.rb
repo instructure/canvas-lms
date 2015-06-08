@@ -456,6 +456,7 @@ RSpec.configure do |config|
     @account = opts[:account]
     @account ||= Account.create!
     config = AccountAuthorizationConfig::SAML.new
+    config.idp_entity_id = "saml_entity"
     config.auth_type = "saml"
     config.log_in_url = opts[:saml_log_in_url] if opts[:saml_log_in_url]
     config.log_out_url = opts[:saml_log_out_url] if opts[:saml_log_out_url]

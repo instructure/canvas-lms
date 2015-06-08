@@ -43,7 +43,8 @@ describe Login::SamlController do
            name_id: unique_id,
            name_qualifier: nil,
            session_index: nil,
-           process: nil
+           process: nil,
+           issuer: "saml_entity"
           )
     )
 
@@ -77,7 +78,8 @@ describe Login::SamlController do
            name_id: unique_id,
            name_qualifier: nil,
            session_index: nil,
-           process: nil
+           process: nil,
+           issuer: "saml_entity"
           )
     )
 
@@ -128,7 +130,7 @@ describe Login::SamlController do
           :name_id => @unique_id,
           :name_qualifier => nil,
           :session_index => nil,
-          :process => nil
+          :process => nil,
       }
     end
 
@@ -325,6 +327,7 @@ describe Login::SamlController do
              name_qualifier: nil,
              session_index: nil,
              process: nil,
+             issuer: "saml_entity",
              saml_attributes: {
                  'eduPersonPrincipalName' => "#{@unique_id}@example.edu"
              }
@@ -348,7 +351,8 @@ describe Login::SamlController do
              name_id: @unique_id,
              name_qualifier: nil,
              session_index: nil,
-             process: nil
+             process: nil,
+             issuer: "saml_entity"
             )
       )
 
@@ -379,6 +383,7 @@ describe Login::SamlController do
            name_qualifier: nil,
            session_index: nil,
            process: nil,
+           issuer: "saml_entity",
            saml_attributes: {
              'eduPersonPrincipalName' => "#{unique_id}@example.edu"
            }
@@ -406,7 +411,8 @@ describe Login::SamlController do
            name_id: unique_id,
            name_qualifier: nil,
            session_index: nil,
-           process: nil
+           process: nil,
+           issuer: "saml_entity"
           )
     )
 
@@ -422,6 +428,7 @@ describe Login::SamlController do
     account_with_saml
 
     @aac = @account.authentication_providers.first
+    @aac.idp_entity_id = 'http://phpsite/simplesaml/saml2/idp/metadata.php'
     @aac.login_attribute = 'eduPersonPrincipalName'
     @aac.certificate_fingerprint = 'AF:E7:1C:28:EF:74:0B:C8:74:25:BE:13:A2:26:3D:37:97:1D:A1:F9'
     @aac.save

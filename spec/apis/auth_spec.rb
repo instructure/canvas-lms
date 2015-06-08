@@ -200,7 +200,7 @@ describe "API Authentication", type: :request do
 
       it "should execute for saml login" do
         skip("requires SAML extension") unless AccountAuthorizationConfig::SAML.enabled?
-        account = account_with_saml(:account => Account.default)
+        account_with_saml(account: Account.default)
         flow do
           Onelogin::Saml::Response.any_instance.stubs(:settings=)
           Onelogin::Saml::Response.any_instance.stubs(:logger=)
@@ -209,6 +209,7 @@ describe "API Authentication", type: :request do
           Onelogin::Saml::Response.any_instance.stubs(:name_id).returns('test1@example.com')
           Onelogin::Saml::Response.any_instance.stubs(:name_qualifier).returns(nil)
           Onelogin::Saml::Response.any_instance.stubs(:session_index).returns(nil)
+          Onelogin::Saml::Response.any_instance.stubs(:issuer).returns("saml_entity")
 
           post 'saml_consume', :SAMLResponse => "foo"
         end
