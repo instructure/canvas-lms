@@ -27,11 +27,12 @@ class ContextModule < ActiveRecord::Base
   acts_as_list scope: { context: self, workflow_state: ['active', 'unpublished'] }
 
   EXPORTABLE_ATTRIBUTES = [
-    :id, :context_id, :context_type, :name, :position, :prerequisites, :completion_requirements, :created_at, :updated_at, :workflow_state, :deleted_at,
-    :unlock_at, :start_at, :end_at, :require_sequential_progress, :cloned_item_id, :completion_events
-  ]
+    :id, :context_id, :context_type, :name, :position, :prerequisites, :completion_requirements, :created_at,
+    :updated_at, :workflow_state, :deleted_at, :unlock_at, :start_at, :end_at, :require_sequential_progress,
+    :cloned_item_id, :completion_events, :requirement_count
+  ].freeze
 
-  EXPORTABLE_ASSOCIATIONS = [:context, :context_module_prograssions, :content_tags]
+  EXPORTABLE_ASSOCIATIONS = [:context, :context_module_progressions, :content_tags].freeze
 
   serialize :prerequisites
   serialize :completion_requirements
