@@ -27,6 +27,7 @@ describe Quizzes::LogAuditing::EventAggregator do
     end
     @qs = @quiz.generate_submission(student_in_course.user)
   end
+
   def build_an_event(event_type, event_data, time_step=0)
     Quizzes::QuizSubmissionEvent.create do |event|
       event.quiz_submission_id = @qs.id
@@ -36,6 +37,7 @@ describe Quizzes::LogAuditing::EventAggregator do
       event.attempt = @qs.attempt
     end
   end
+
   def build_out_database_events
     event_types = [
       Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED,

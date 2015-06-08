@@ -91,7 +91,12 @@ describe "outcomes as a teacher" do
       num = 20
       course_bulk_outcome_groups_course(num, num)
       get outcome_url
-      ff(".outcome-group")[0].click
+
+      # the way these outcomes are built, `wait_for_ajaximations` is not
+      # able to detect when they're done. this is a hacky way to get around
+      # the race condition that is caused by attempting to click on an outcome
+      # group while they're still getting rendered.
+      keep_trying_until { ff(".outcome-group")[0].click; true }
       wait_for_ajaximations
       keep_trying_until { expect(ff(".outcome-link").length).to eq 20 }
     end
@@ -186,12 +191,12 @@ describe "outcomes as a teacher" do
     end
 
     it "should move a learning outcome group via tree modal" do
-      group1 = outcome_group_model
-      group2 = outcome_group_model
+      group1 = outcome_group_model(title: 'outcome group 1')
+      group2 = outcome_group_model(title: 'outcome group 2')
       get outcome_url
       wait_for_ajaximations
 
-      fj('.outcomes-sidebar .outcome-group:last').click
+      fj(".outcomes-sidebar .outcome-group[data-id = '#{group1.id}']").click
       wait_for_ajaximations
 
       # bring up modal
@@ -199,13 +204,13 @@ describe "outcomes as a teacher" do
       wait_for_ajaximations
 
       # should show modal tree
-      expect(fj('.ui-dialog-titlebar span').text).to eq "Where would you like to move new outcome group?"
+      expect(fj('.ui-dialog-titlebar span').text).to eq "Where would you like to move #{group1.title}?"
       expect(ffj('.ui-dialog-content').length).to eq 1
 
       # move the outcome group
       fj('.treeLabel').click
       wait_for_ajaximations
-      ff('[role=treeitem] a span')[1].click
+      f("[role=treeitem][data-id='#{group2.id}'] a span").click
       wait_for_ajaximations
       fj('.form-controls .btn-primary').click
       wait_for_ajaximations
@@ -222,7 +227,8 @@ describe "outcomes as a teacher" do
       expect(ffj('.outcomes-sidebar .outcome-level:last li').length).to eq 1
 
       # confirm move in db
-      expect(LearningOutcomeGroup.where(id: group2.id).first.child_outcome_groups.first.id).to eq group1.id
+      group2.reload
+      expect(group2.child_outcome_groups.first.id).to eq group1.id
 
       # check that modal window properly updated
       fj('.outcomes-sidebar .outcome-group').click

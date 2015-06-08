@@ -521,6 +521,14 @@ define [
       }[status] or 'x'
       new Handlebars.SafeString "<i aria-hidden='true' class='icon-#{htmlEscape iconType}'></i>"
 
+    # Public: Render `fn` or `inverse` depending on whether firstArg is greater than secondArg
+    #
+    ifGreaterThan: (x, y, options) ->
+      if x > y
+        options.fn @
+      else
+        options.inverse @
+
   }
 
   return Handlebars

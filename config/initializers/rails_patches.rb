@@ -36,7 +36,7 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
           if value.infinite? && column && column.type == :datetime
             "'#{value.to_s.downcase}'"
           elsif value.infinite? || value.nan?
-            "'#{value.to_s}'"
+            "'#{value}'"
           else
             quote_without_infinity_and_nan(value, column)
           end

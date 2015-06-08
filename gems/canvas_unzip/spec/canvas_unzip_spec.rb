@@ -54,9 +54,9 @@ describe "CanvasUnzip" do
         Dir.mkdir(subdir)
         warnings = CanvasUnzip.extract_archive(fixture_filename("evil.#{extension}"), subdir)
         expect(warnings[:unsafe].sort).to eq ["../outside.txt", "evil_symlink", "tricky/../../outside.txt"]
-        expect(File.exists?(File.join(tmpdir, 'outside.txt'))).to be false
-        expect(File.exists?(File.join(subdir, 'evil_symlink'))).to be false
-        expect(File.exists?(File.join(subdir, 'inside.txt'))).to be true
+        expect(File.exist?(File.join(tmpdir, 'outside.txt'))).to be false
+        expect(File.exist?(File.join(subdir, 'evil_symlink'))).to be false
+        expect(File.exist?(File.join(subdir, 'inside.txt'))).to be true
       end
     end
 

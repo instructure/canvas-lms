@@ -34,8 +34,7 @@ MAX_SERVER_START_TIME = 60
 #NEED BETTER variable handling
 THIS_ENV = ENV['TEST_ENV_NUMBER'].to_i
 THIS_ENV = 1 if ENV['TEST_ENV_NUMBER'].blank?
-ENV['WEBSERVER'].nil? ? WEBSERVER = 'webrick' : WEBSERVER = ENV['WEBSERVER']
-#set WEBSERVER ENV to webrick to change webserver
+WEBSERVER = (ENV['WEBSERVER'] || 'thin').freeze
 
 $server_port = nil
 $app_host_and_port = nil
@@ -480,7 +479,7 @@ shared_examples_for "all selenium tests" do
 
   alias_method :login, :login_as
 
-  def create_session(pseudonym, real_login)
+  def create_session(pseudonym, real_login = false)
     if real_login
       login_as(pseudonym.unique_id, pseudonym.password)
     else
@@ -561,7 +560,7 @@ shared_examples_for "all selenium tests" do
   end
 
   def expect_new_page_load(accept_alert = false)
-    driver.execute_script("INST.still_on_old_page = true;")
+    driver.execute_script("window.INST = window.INST || {}; INST.still_on_old_page = true;")
     yield
     keep_trying_until do
       begin
@@ -918,12 +917,23 @@ shared_examples_for "all selenium tests" do
 
   # you can pass an array to use the rails polymorphic_path helper, example:
   # get [@course, @announcement] => "http://10.0.101.75:65137/courses/1/announcements/1"
-  def get(link, waitforajaximations=true)
+  def get(link)
     link = polymorphic_path(link) if link.is_a? Array
-    driver.get(app_host + link)
-    #handles any modals prompted by navigating from the current page
-    close_modal_if_present
-    wait_for_ajaximations if waitforajaximations
+
+    # If the new link is identical to the old link except for the hash, we don't
+    # want to actually expect a new page load.
+    current_uri = driver.execute_script("return window.location")
+    new_uri = URI.parse(link)
+
+    if current_uri['pathname'] == new_uri.path && (current_uri['query'] || '') == (new_uri.query || '')
+      driver.get(app_host + link)
+      close_modal_if_present
+      wait_for_ajaximations
+    else
+      expect_new_page_load(true) do
+        driver.get(app_host + link)
+      end
+    end
   end
 
   def close_modal_if_present
@@ -1036,7 +1046,7 @@ shared_examples_for "all selenium tests" do
   end
 
   def flash_message_present?(type=:warning, message_regex=nil)
-    messages = ff("#flash_message_holder .ic-flash-#{type.to_s}")
+    messages = ff("#flash_message_holder .ic-flash-#{type}")
     return false if messages.length == 0
     if message_regex
       text = messages.map(&:text).join('\n')

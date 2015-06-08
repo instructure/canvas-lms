@@ -32,6 +32,7 @@ describe 'Submissions Comment API', type: :request do
 
     include_examples "file uploads api"
     def has_query_exemption?; false; end
+
     def preflight(preflight_params)
       api_call :post,
         "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/comments/files",

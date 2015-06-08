@@ -29,12 +29,16 @@ describe "Navigating to wiki pages" do
       check_element_has_focus(f("[data-sort-field='#{attribute}']"))
     end
 
-    before :each do
+    before :once do
       account_model
-      course_with_teacher_logged_in :account => @account
+      course_with_teacher :account => @account
       @course.wiki.wiki_pages.create!(:title => "Foo")
       @course.wiki.wiki_pages.create!(:title => "Bar")
       @course.wiki.wiki_pages.create!(:title => "Baz")
+    end
+
+    before :each do
+      user_session(@user)
     end
 
     it "returns focus to the header item clicked while sorting" do
@@ -181,7 +185,9 @@ describe "Navigating to wiki pages" do
       end
 
       it "should set focus back to the cog menu if you edit the title and save" do
+        pending("functionality is broken, ticket CNVS-20199")
         f('.ui-dialog-buttonset .btn-primary').click
+        wait_for_ajaximations
         check_element_has_focus(f('.al-trigger'))
       end
     end
@@ -261,8 +267,29 @@ describe "Navigating to wiki pages" do
         driver.switch_to.alert.accept
       end
     end
+
   end
 
+  describe "Show Page" do
+    it "shows lock information with prerequisites" do
+      account_model
+      course_with_student_logged_in account: @account
+      foo = @course.wiki.wiki_pages.create! title: "foo"
+      bar = @course.wiki.wiki_pages.create! title: "bar"
+      mod = @course.context_modules.create! name: "teh_mod", require_sequential_progress: true
+      foo_item = mod.add_item id: foo.id, type: 'wiki_page'
+      bar_item = mod.add_item id: bar.id, type: 'wiki_page'
+      mod.completion_requirements = {foo_item.id => {type: 'must_view'}, bar_item.id => {type: 'must_view'}}
+      mod.save!
+
+      get "/courses/#{@course.id}/pages/bar"
+      wait_for_ajaximations
+
+      lock_explanation = f('.lock_explanation').text
+      expect(lock_explanation).to include "This page is part of the module teh_mod and hasn't been unlocked yet"
+      expect(lock_explanation).to match /foo\s+must view the page/
+    end
+  end
 
   describe "Permissions" do
     before do

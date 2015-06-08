@@ -16,7 +16,7 @@ module QuestionHelpers
   def self.fixture(question_type)
     path = File.join(FixturePath, "#{question_type}_data.json")
 
-    unless File.exists?(path)
+    unless File.exist?(path)
       raise '' <<
         "Missing question data fixture for question of type #{question_type}" <<
         ", expected file to be located at #{path}"

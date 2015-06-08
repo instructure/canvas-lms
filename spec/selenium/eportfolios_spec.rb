@@ -195,7 +195,7 @@ describe "eportfolios file upload" do
   end
 
   it "should upload a file" do
-    create_session(@student.pseudonym, false)
+    create_session(@student.pseudonym)
     get "/eportfolios/#{@eportfolio.id}"
     filename, fullpath, data = get_file("testfile5.zip")
     expect_new_page_load { f(".icon-arrow-right").click }

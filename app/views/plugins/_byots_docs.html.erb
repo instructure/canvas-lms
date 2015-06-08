@@ -1,0 +1,28 @@
+<section>
+  <h3><%= t("Sample Data") %></h3>
+  <pre>
+    {
+      subject: "Cannot access a file",
+      description: "I need to access the \"Some Document\" from the Home page of \"Some Course\" (course 5555555) but Canvas says I do not have permission. Can you look into this? Thanks, Some Guy",
+      report_type: "ERROR",
+      error_message: "No such file",
+      perceived_severity: "blocks_what_i_need_to_do",
+      account_id: 99999,
+      account_domain: "institution.canvas.com",
+      report_origin_url: "https://institution.canvas.com/courses/1270724/assignments/4724423",
+      reporter: {
+        canvas_id: 5111127,
+        email: "some_address@institution.canvas.com",
+        name: "Some O'Person",
+        role: "user,student",
+        become_user_uri: "https://institution.canvas.com/courses/1270724/assignments/4724423?become_user_id=5111127",
+        environment: { ... }
+      },
+      canvas_details: {
+        request_context_id: ...,
+        error_report_id: 96730690,
+        sub_account: "subaccount_131266",
+      }
+    }
+  </pre>
+</section>

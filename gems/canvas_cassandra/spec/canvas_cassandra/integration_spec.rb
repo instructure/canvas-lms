@@ -26,7 +26,7 @@ end
 describe "execute and update" do
   let(:config_path) { File.expand_path("../../../../../config/cassandra.yml", __FILE__) }
   let(:cassandra_configured?) do
-    File.exists?(config_path) &&
+    File.exist?(config_path) &&
         YAML.load(ERB.new(File.read(config_path)).result) &&
         YAML.load(ERB.new(File.read(config_path)).result)['test']
   end

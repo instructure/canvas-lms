@@ -102,6 +102,8 @@ define [
     removeAll: (e) ->
       e.preventDefault()
       @collection.remove(@collection.models)
+      @currentIndex = 0
+      @updateFocus()
 
     # Internal: Show/hide the remove all btn based on collection size.
     #

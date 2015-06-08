@@ -73,19 +73,11 @@ zh:
         api_key: "API 密钥"
         api_url: "API URL"
         common_core_guid: "共同核心 GUID（可选）"
+  access_to_the_etherpad_collaborations_below_will_b_b6a0a288: |-
+      下方的Etherpad协作访问将在2015年8月8日中止。 如果您希望保存该内容，请在该日期前把内容转移。
+      
+      要如何在谷歌创建协作，[点击此处](%{google_collab_help_url})。
   account: 
-    account_settings: 
-      account_surveys: 帐户调查
-      avatars: 用户头像
-      delicious: Delicious
-      diigo: Diigo
-      google_docs: "Google Docs"
-      google_docs_preview: "Google Docs Preview"
-      google_drive: "Google Drive"
-      linked_in: LinkedIn
-      skype: Skype
-      twitter: Twitter
-      yo: Yo
     ask_canvas_network: "询问 Canvas 网络社区"
     default_account_name: 默认帐户
     default_site_administrator_account_name: 网站管理员
@@ -118,78 +110,65 @@ zh:
     tab_users: 用户
     turnitin_pledge: 此作业是我原创的
   account_authorization_config: 
-    debug: 
-      wait_for_login: 正等待执行登录尝试
     default_delegated_login_handle_name: 登录
     default_login_handle_name: 电子邮件
-    saml_eppn_domain_stripped: "%{eppn} (域名去除)"
-    test_bind_failed: "无法与以下错误绑定: %{error}"
+  account_authorization_config/ldap: 
+    test_bind_failed: "无法绑定以下错误: %{error}"
     test_connection_timeout: 连接超时
     test_host_unknown: "未知主机: %{host}"
-    test_login_auth_exception: "登录发生例外：%{error}"
+    test_login_auth_exception: "登录发生异常：%{error}"
     test_login_auth_failed: 身份验证失败
     test_search_failed: "搜索失败，错误如下: %{error}"
+  account_authorization_config/saml: 
+    debug: 
+      logout_redirect: "已向 IdP 发送 LogoutRequest"
+      wait_for_login: 正等待尝试登录
+    saml_eppn_domain_stripped: "%{eppn} (域名去除)"
   account_authorization_configs: 
     account_required: "必须经过 LDAP 身份验证"
-    cas_settings: 
+    cas_fields: 
       labels: 
         auth_base: "CAS URL"
-        auth_type: 类型
-        login_handle_name: 登录标签
         unknown_user_url: "未知用户 Url"
-      login_handle_name_description: "用于唯一登录标识符的标签。示例:登录名、用户名、学生 ID 等"
-      save_button: 保存身份验证设置
-      unknown_user_url_description: "在 Canvas 中未找到通过身份验证的用户时要重定向到的 url。"
+      unknown_user_url_description: "url 重新定向到在 Canvas 中未找的已验证身份的用户。"
+    form_footer: 
+      labels: 
+        position: 位置
+      save_button: 保存身份验证的设置
+    form_header: 
+      auth_type_label: 类型
+      auth_url: "登录 URL为此配置"
     index: 
       add_auth_desc: "添加身份提供商到此帐户:"
-      canvas_login_tip: |-
-          如果您配置的设置导致您无法登录，可以在登录 URL 末尾添加
-          *%{url1}*。这会让您
-          使用一般的 Canvas 登录步骤进行登录。对于此帐户，URL 为 %{url2}
+      canvas_login_tip: "如果配置引起不能登录的设置，您可以在您的登录网址后面添加*%{url1}* 。 这将让您使用正常的Canvas登录程序登录。 对于该账户，网址是%{url2}"
       choose_auth_type_option: 选择一个身份认证服务
       current_settings_title: 当前集成
       delete_auth_confirmation: 是否确定?如果删除，用户可能无法登录。
-      delete_auth_link: 删除身份验证
-      edit_auth_link: 编辑详细信息
+      delete_auth_link: 移除所有认证
       ip_address_list_description: "如果使用的身份验证服务要求 Canvas 服务器与您的服务器直接连接，例如 LDAP，则需确保您的服务器可以接受来自以下 IP 地址的连接:"
       no_auth_type_description: 此帐户目前未与身份提供商集成。
       page_title: 身份验证设置
       profile_page_link_example: "例如，下面是您的配置文件页面: [%{friendlyname}](%{url})"
       settings_description: "为了让用户通过外部身份提供商 (IdP) 进行身份验证，用户必须具有链接到此帐户并且与 IdP 返回的唯一标识符匹配的登录标识符。要查看用户的当前登录，请参阅用户配置文件页面上的\"登录信息\"部分。（可通过在\"用户\"选项卡上搜索用户来查找。）"
       settings_title: 身份验证设置
-      test_ldap_link: 测试身份验证
-    ldap_settings: 
-      add_secondary_ldap_server_link: "添加第二 LDAP 服务器"
-      auth_type_label: 类型
-      change_password_url_help: "留空则采用默认的 Canvas 行为"
-      change_password_url_not_specified: 未指定
-      labels: 
-        change_password_url: "忘记密码 URL"
-        login_handle_name: 登录标签
-      login_handle_name_description: "用于唯一登录标识符的标签。示例:登录名、用户名、学生 ID 等"
-      remove_secondary_ldap_link: （删除）
-      save_button: "保存 LDAP 设置"
-      secondary_ldap_label: "第二 LDAP"
-      setting_type_ldap: LDAP
-    ldap_settings_fields: 
+      test_ldap_link: "测试 LDAP 认证"
+    ldap_fields: 
       auth_filter_description: "使用 *%{placeholder}* 作为用户所提供的用户名的占位符。ÀýÈç: *(sAMAccountName=%{placeholder})*"
       auth_password_description: 留空则继续使用当前密码。
-      identifer_format_description: "LDAP 属性用于查看 Canvas 登录。保留为空可使用用户提供的用户名。"
+      identifer_format_description: "LDAP 属性用于查看 Canvas 登录。保留空白以使用用户提供用户名。"
       labels: 
         auth_base: 库
-        auth_filter: 过滤
+        auth_filter: 过滤器
         auth_host: 主机
         auth_over_tls: "通过 TLS?"
         auth_over_tls_false: "无 TLS"
         auth_over_tls_simple_tls: "简单的 TLS"
-        auth_over_tls_start_tls: StartTLS
+        auth_over_tls_start_tls: 开始TLS
         auth_password: 密码
         auth_port: 端口
         auth_username: 用户名
         identifier_format: "登录 ID 属性"
-        no_tls: "无 TLS"
-        simple_tls: "简单的 TLS"
-        start_tls: StartTLS
+      last_ldap_timeout_failure: 上次超时失效
     ldap_settings_test: 
       labels: 
         pass: 密码
@@ -217,50 +196,28 @@ zh:
       test_ldap_search_help_fixes_3: "验证 LDAP 中对提供的搜索库具有搜索权限的用户对象。"
       test_ldap_search_help_header: "Canvas 无法搜索 LDAP 实例"
       test_ldap_search_label: "正在测试 LDAP 搜索..."
-    ldap_timeout_error: 
-      last_ldap_timeout_failure: 上次超时失效
-      ldap_timeout_failure_help2: "如果 Canvas 与 LDAP 服务器通信超时太多次，那么它就会封锁接下来尝试登陆使用 LDAP 服务器 %{time} 分钟。"
     login_required: 必须提供
     no_changing_auth_types: 无法更改授权配置类型，请删除，然后创建新的配置。
-    no_discovery_url: 未设置
     password_required: 必须提供
-    saml_required: "如果要测试 SAML，需要先配置 SAML。"
-    saml_settings: 
-      auth_type: 类型
-      auth_url: "此配置的登录 URL"
-      certificate_fingerprint: 证书指纹
-      change_password_url: 更改密码链接
-      discovery_url: "发现 URL:"
-      discovery_url_description: "如果设置了发现 URL，当需要对用户进行身份验证时，Canvas 会将所有用户转到该 URL。之后该页面需要帮助用户了解去哪里才能登录。如果没有配置发现 URL，则将使用第一个 SAML 配置尝试对用户进行身份验证。"
-      identifier_format: 标识符格式
-      idp_entity_id: "IdP 实体 ID"
+    saml_fields: 
       labels: 
         certificate_fingerprint: 证书指纹
-        change_password_url: 更改密码链接
         identifier_format: 标识符格式
         idp_entity_id: "IdP 实体 ID"
         log_in_url: "登录 URL"
         log_out_url: "注销 URL"
         login_attribute: 登录属性
-        login_handle_name: 登录标签
-        position: 职位
         requested_authn_context: 上下文认证
         unknown_user_url: "未知用户 Url"
-      log_in_url: "登录 URL"
-      log_out_url: "注销 URL"
-      login_attribute: 登录属性
-      login_handle_name: 登录标签
-      login_handle_name_description: "用于唯一登录标识符的标签。示例:登录名、用户名、学生 ID 等"
-      no_discovery_url: 未设置
-      position: 职位
+      unknown_user_url_description: "url 重新定向到在 Canvas 中未找的已验证身份的用户。"
+    saml_required: "如果要测试 SAML，需要先配置 SAML。"
+    saml_settings_test: 
       refresh_debugging: 刷新
-      requested_authn_context: 上下文认证
-      saml_debug_instructions: "一旦您开始纠错，将会收集所有下一次尝试登陆 SAML 的信息。您可以点击“刷新” 查看收集了多少数据或者点击 “停止纠错” 以清空收集的数据并停止当前纠错。"
-      saml_debugging: 正在纠错
-      save_button: 保存身份验证设置
+      saml_debug_instructions: "一旦您开始纠错，将会收集所有下一次尝试登陆 SAML 的信息。点击“刷新” ，查看已收集了多少数据，或点击 “停止纠错”， 清空收集的数据并停止当前纠错。"
+      saml_debugging: "SAML 调试"
+      saml_required: "如果要测试 SAML，需要先配置 SAML。"
       start_debugging: 开始纠错
       stop_debugging: 停止纠错
-      unknown_user_url_description: "在 Canvas 中未找到通过身份验证的用户时要重定向到的 url。"
     saml_testing: 
       auth_request_to_idp: "已向 IdP 发送 AuthnRequest"
       auth_response_from_idp: "来自 IdP 的 AuthnResponse"
@@ -289,7 +246,15 @@ zh:
         to_idp_xml: "已向 IdP 发送 LogoutRequest XML"
       logout_request_to_idp: "已向 IdP 发送 LogoutRequest"
       logout_response_from_idp: "来自 IdP 的 LogoutResponse"
-      saml_required: "如果要测试 SAML，需要先配置 SAML。"
+    sso_settings_form: 
+      change_password_url_help: "为默认的 Canvas行为而留空"
+      discovery_url_description: "如果设置一个发现的网址，当需要认证时，Canvas会把所有用户转发到该URL。 该页面将需要帮助用户查出他们要在哪里登录。　如果没有配置发现网址，第一个配置将使用于尝试认证用户。"
+      labels: 
+        auth_discovery_url: 发现网址
+        change_password_url: "忘记密码 URL"
+        login_handle_name: 登录标签
+      login_handle_name_description: "标签用作唯一登录的标识符。示例: 登录名、用户名、学生 ID 等"
+  account_navigation_80bbefd4: 账户导航
   account_notification: 
     errors: 
       invalid_account_notification_end_at: 帐户通知结束时间早于开始时间
@@ -351,6 +316,7 @@ zh:
     report_header_enrollment_state: 注册状态
     report_header_final_score: 最终分数
     report_header_first_name: first_name
+    report_header_full_name: full_name
     report_header_group_id: group_id
     report_header_id: id
     report_header_last_access_at: 上次访问位置
@@ -376,6 +342,7 @@ zh:
     report_header_short__name: short_name
     report_header_short_name: 简称
     report_header_sis_id: "sis id"
+    report_header_sortable_name: sortable_name
     report_header_start__date: start_date
     report_header_start_date: 开始日期
     report_header_status: 状态
@@ -392,6 +359,7 @@ zh:
     report_header_user__id: user_id
     report_header_user_id: "用户 id"
     report_header_user_name: 用户名
+    report_header_user_short_name: short_name
     report_header_user_sis_id: "用户 sis id"
     report_header_xlist_course_id: xlist_course_id
     sis_exporter: 
@@ -421,6 +389,7 @@ zh:
       open_registration_delegated_warning_dialog: 已启用外部身份提供程序
       what_are_quiz_ip_filters: "什么是测验 IP 过滤器?"
     user: 用户
+  account_surveys_b0039876: 帐户调查
   account_user: 
     types: 
       account_admin: 帐户管理员
@@ -451,16 +420,14 @@ zh:
         sis_user_id: 学号
         sortable_name: 用于排序的名称
       sortable_name_help: 此名称出现在分类的列表中。
-      unique_id_label: "%{label}:*"
+      unique_id_label_1: "%{label}:"
     add_user_button: 添加用户
     add_user_dialog_title: 新增用户
     adding_course_message: 正在添加课程...
     adding_user_message: 正在添加用户...
     additional_settings: 
-      account_domains: 帐户域
       account_status: 帐户状态
       add_new_domain: 添加新域
-      external_status: 外部状态
       license: 许可证
       license_type: 许可类型
       new_account_domain_title: 新建帐户域
@@ -1286,6 +1253,7 @@ zh:
   activity_13915493: 活动
   activity_by_category_9c2033d1: 按类别划分的活动
   activity_by_date_878c5b49: 按日期划分的活动
+  add_8523c19b: 添加
   add_app_baf540f: 添加应用程序
   add_attachment_93868828: 添加附件
   add_course_assignments_628ed6d0: 添加课程作业
@@ -1300,6 +1268,7 @@ zh:
     add_quiz_to: "添加测验到 %{module}"
     add_topic_to: "添加讨论主题到 %{module}"
   add_new_group_7ac49f31: 添加新组
+  add_new_set_of_due_dates_e8e240f: 添加新的截止日期
   add_students_to_the_course_874be8fb: 向课程添加学生
   add_tas_to_the_course_2aac6e02: 向课程添加助教
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "添加您的作业。您可以只列一个长列表，或者将其分为几组 - 甚至可以为每个作业组指定权重。"
@@ -1440,6 +1409,7 @@ zh:
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: 最后一次尝试后将显示答案
   api_url_3ee7cb0a: 应用程式界面的网址
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "App Center 将出现在课程或帐户的设置页上的“应用程序”选项卡中。下面提供的 URL 应指向有效的 App Center 终端（例如，%{url} -- 确保略去末尾斜杠）"
+  app_placements_6d877225: 应用程序安置
   apple_touch_icon_2c258bb3: "Apple 触控图标"
   application: 
     errors: 
@@ -1452,7 +1422,6 @@ zh:
       invalid_external_tool: 找不到此链接的有效设置。
       invalid_external_tool_id: 找不到此工具的有效设置。
       invalid_feed_parameters: 馈送参数无效。
-      invalid_oembed_url: 检索此资源时发生问题。外部工具提供了关于资源的无效信息。
       invalid_tag_type: 无法识别此标记的项目类型
       invalid_verification_code: 验证代码无效。
       mismatched_verification_code: 验证代码与当前注册的任何用户都不匹配。
@@ -1483,6 +1452,7 @@ zh:
         suspended: 机构已挂起
     wiki_front_page_default_content_course: 欢迎使用新课程维基！
     wiki_front_page_default_content_group: 欢迎使用新小组维基！
+  apply_781a2546: 应用
   appointment_group: 
     errors: 
       invalid_end_at: 约会结束时间早于开始时间
@@ -1500,6 +1470,7 @@ zh:
     update: 更新
   archive_3f794d7e: 存档
   archive_selected_d64506ca: 归档选择
+  are_you_sure_26795d3c: 是否确定？
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     one: "是否确实要删除这 %{count} 项？"
     other: "是否确实要删除这 %{count} 项？"
@@ -1512,12 +1483,14 @@ zh:
   aria_labels: 
     unlock_at_date: 解锁日期
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: 当您在此字段中输入时，组列表将自动过滤，以便仅包括名称与您的输入内容相匹配的组。
+  as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: 当您在该栏输入，结果列表将自动地更新。
   assessment_question: 
     default_question_name: 问题
   assessment_question_bank: 
     default_imported_title: 导入的问题
     default_title: "无名称 - %{course}"
     default_unfiled_title: 未归档的问题
+  assign_eedf72bb: 分配
   assign_reviews_on_date_7e48ec50: 分配审阅日期
   assignment: 
     assignment_group_must_have_group: 请为此作业选择作业小组
@@ -1590,6 +1563,7 @@ zh:
   assignment_groups_api: 
     errors: 
       frozen_assignments_error: 您无法删除一个含有已锁定作业的小组。
+  assignment_menu_91fe3716: 作业菜单
   assignment_muter: 
     mute_assignment: 屏蔽作业
     muting_assignment: 正在屏蔽作业...
@@ -1598,6 +1572,7 @@ zh:
     unmute_dialog: 此作业当前被屏蔽。这意味着学生无法看到其计分和反馈。是否要立即取消屏蔽?
     unmuting_assignment: 正在取消屏蔽作业...
   assignment_name_b2d87383: 作业名称
+  assignment_selection_6bff05c4: 作业选项
   assignments: 
     assignment_count: 
       one: "%{count} 份作业"
@@ -1743,12 +1718,6 @@ zh:
       one: "去掉 %{count} 个最低分"
       other: "去掉 %{count} 个最低分"
     drop_lowest_scores: "去掉最低的 %{number} 分"
-    due_date_override: 
-      overrides: 
-        available_from: 开始时间
-        due_date: 截止时间
-        for: 适用人群
-      until: 结束时间
     due_date_view: 
       overrides: 
         remove_these_dates: 删除这些日期
@@ -1770,7 +1739,6 @@ zh:
       description: 说明
       freeze_properties: 复制时锁定作业属性
       notify_content_change: 通知用户此内容已更改
-      only_visible_to_overrides_note: "注意：此作业 *仅* 对下面指定的章节显示："
       points_possible: 得分
       post_to_sis: 当发布到您学校的学生信息系统时，包括此作业的评分
       warnings: 
@@ -2048,6 +2016,7 @@ zh:
       advanced_turnitin_settings: "高级 Turnitin 设置"
       descriptions: 
         allowed_extensions: "输入接受的扩展名列表，例如: doc,xls,txt"
+      external_tool_group_warning: 小组作业不可以使用外部工具。当您保存时，小组设置将显示为未勾选。
       external_tool_options: 外部工具选项
       label: 
         external_tool_new_tab: 在新选项卡中加载此工具
@@ -2217,10 +2186,13 @@ zh:
   available_from_587ce92f: 开始时间
   available_from_date_43b5e11d: 可供使用的起始日期
   available_from_date_afc594fa: 有效日期从：
+  available_from_f84e4611: 开始时间
   available_until_date_2c0ccec3: 有效日期直至：
   available_until_date_cd125c62: 可供使用的截止日期
   available_until_f3b9c4ed: 可供使用的截止日期
   available_until_lock_at_ab022445: "%{lock_at} 之前可供使用"
+  availible_from_format_like_yyyy_mm_dd_hh_mm_f101e0dd: "有效从－格式像YYYY-MM-DD hh:mm"
+  availible_to_format_like_yyyy_mm_dd_hh_mm_f2611528: "有效到－格式像YYYY-MM-DD hh:mm"
   average_49c63f9b: 平均分
   back_to_app_center_95420d83: "返回 App Center"
   bb_display: "Blackboard 学习"
@@ -2241,6 +2213,7 @@ zh:
     recording_setting_enabled_description: 启用记录本次会议
   blackboard: 
     no_manifest: "该 Blackboard .zip 在根目录下没有 imsmanifest.xml 文件。"
+  blue_daf8fea9: 蓝色
   bookmark_service: 
     default_title: 无标题
   broccoli_cloud: 
@@ -2691,30 +2664,9 @@ zh:
     ics_title: "%{course_or_group_name} 日历 (Canvas)"
     invalid_date_or_time: "%{attr} 的日期或日期时间无效"
   calendars: 
-    assignment_details: 作业详细信息
-    default_title: 事件
     event: 
       due: 截止时间
       event_title: "截止时间: %{event_title}"
-    event_details: 事件详细信息
-    feed_dialog_title: 日历馈送
-    keycodes: 
-      delete: d
-      edit: e
-      new: "n"
-      next_day: ctrl+向右键
-      next_event: j
-      next_week: ctrl+向下键
-      open: o
-      previous_day: ctrl+向左键
-      previous_event: k
-      previous_week: ctrl+向上键
-      refresh: r
-    notices: 
-      event_moved: "%{event} 已移至 %{day}"
-    prompts: 
-      delete_assignment: 是否确定要删除此作业?
-      delete_event: 是否确定要删除此事件?
     show2: 
       calendar_feed: 日历馈送
       calendar_feed_instructions: "复制以下链接并将其粘贴到提取 iCal 馈送的任何日历应用程序（Google Calendar、iCal、Outlook 等）"
@@ -2728,11 +2680,6 @@ zh:
       toggle_calendars: 切换日历
       toggle_undated_items: 切换未注明日期的项目
       undated_items: 未注明日期的项目
-    titles: 
-      add_new_assignment: 添加新作业
-      add_new_event: 添加新事件
-      edit_assignment: 编辑作业
-      edit_event: 编辑事件
     wizard_box: 
       descriptions: 
         assignment: 很好。现在单击对话框中的"作业"选项卡以创建作业而非日历事件。
@@ -2781,11 +2728,15 @@ zh:
   canvas_cartridge_display: "Canvas Common Cartridge"
   canvas_cartridge_file_description: "Canvas 课程导出包"
   canvas_cartridge_name: "Canvas Cartridge 导入器"
+  canvas_cloud_information_fdd404f2: Canvas云的信息
+  canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas 无法识别您的身份提供者"
+  canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "以下用户没有Canvas 的帐户: %{user}"
   canvas_error_report_ff678539: "Canvas 的错误报告"
   canvas_revision_unknown: 未知
   canvas_ticketing_email_connector_27e253ae: "Canvas 的票务电子邮件连接器"
   canvas_ticketing_web_post_connector_11158897: "Canvas 的票务网站后连接器"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas 将在您保存测验后对您的所有提交项重新评分，此过程可能需要几分钟。"
+  cas_d6e9601d: 课程访问系统
   cc: 
     by: "CC Attribution"
     by_nc: "CC Attribution Non-Commercial"
@@ -2810,6 +2761,7 @@ zh:
   click_to_report_profile_picture_370f9625: 点击报告资料图片
   close_and_return_to_canvas_80544344: "关闭并返回 Canvas"
   close_d634289d: 关闭
+  close_picker_256aca8a: 关闭选择器
   collaboration: 
     default_title: 未命名的协作
   collaborations: 
@@ -2839,7 +2791,7 @@ zh:
         cancel: 取消
         update: 更新协作
       labels: 
-        description: 说明
+        description: "说明:"
         title: 协作标题
     errors: 
       cannot_load_collaboration: 无法加载协作
@@ -2870,7 +2822,7 @@ zh:
             **警告**: 您（及您的协作人员）必须具有 Google 帐户才可参与任何 Google Docs 协作。
       labels: 
         collaboration_type: "协作时使用:"
-        description: 说明
+        description: "说明:"
         document_name: "文档名称:"
       messages: 
         delete_google_doc_as_well: "此协作将存储为 Google Doc。您是仅将其从 Canvas 删除，还是同时将其从 Google Docs 删除?"
@@ -2990,6 +2942,7 @@ zh:
       notices: 
         contact_registered: 联系方式已注册!
   concluded_courses_94782e21: 已结束课程
+  conference_36b50fda: 会议
   conferences: 
     concluded_conference: 
       delete: 删除
@@ -3022,6 +2975,7 @@ zh:
     inactive_error: 该会议当前未活动
     index: 
       concluded_conferences: 已结束的会议
+      conference: 会议
       conference_header: 会议
       new_conference: 新会议
       new_conferences: 新会议
@@ -3053,6 +3007,7 @@ zh:
   config_url_e96ceaf3: "配置 URL"
   configurate_tool_app_5a721f2c: "配置 %{tool} 应用程序？"
   configuration_type_25a084a4: 配置类型
+  configure_ecb97e30: 配置
   configure_toolname_app_651371be: "配置 %{toolName} 应用程序"
   confirm_dialog: 
     cancel: 取消
@@ -3084,7 +3039,7 @@ zh:
       message: 
         export_started: 导出过程已开始。大型课程可能需要一段时间。*您可以离开页面*，在导出完成时您会收到电子邮件。
       no_submissions: 您当前没有可导出的提交项。
-      user_data_exports: 用户数据导出
+      user_data_exports: 下载提交
     labels: 
       new_export: "新导出:"
     links: 
@@ -3307,17 +3262,6 @@ zh:
     titles: 
       tag_external_web_page: 标记外部网页
   context: 
-    communication: 
-      headings: 
-        discussions: 讨论
-      links: 
-        feeds: 
-          course_discussions: "课程讨论 Atom 馈送"
-        start_collaboration: 开始协作
-        start_conference: 开始网络会议
-        start_topic: 开始新主题
-      titles: 
-        communication: 通信
     deleted_item: 
       created: 创建时间
       last_updated: 最近更新时间
@@ -3887,6 +3831,8 @@ zh:
     unarchive: 取消存档
     unstar: 取消标记
     unstar_conversation: 取消标记会话
+  copy_to_folder_32ecc3c3: 复制到文件夹
+  copying_628a9607: 正在复制...
   copyright_holder_66ee111: 版权持有者：
   correct_answer: 这是正确答案。
   correct_answers_are_available_until_date_df01cc5f: "正确答案到 %{date} 才提供。"
@@ -4027,6 +3973,7 @@ zh:
       file: 未知文件
       topic: 未知主题
       wiki_page: 未知维基页面
+  course_home_sub_navigation_b1ee6b03: 课程主页的子导航
   course_list: 
     favorited_tooltip: 单击可从课程菜单中删除。
     nonfavorited_tooltip: 单击可添加到课程菜单。
@@ -4104,12 +4051,14 @@ zh:
       wiki_id: "Wiki ID"
       workflow_state: 工作流状态
   course_members_are_free_to_join_9b2603d4: 学员可自由加入
+  course_navigation_dd035109: 课程导航
   course_restore: 
     restore_error: 尝试恢复课程时出现错误。课程未恢复。
   course_search: 
     cant_be_blank: 不能为空
   course_section: 
     sis_id_taken: "学号 \"%{sis_id}\" 已在使用中"
+  course_section_7a988066: 课程班级
   course_settings: 
     buttons: 
       add_section: 添加班级
@@ -4153,6 +4102,7 @@ zh:
       move_course: 移动课程
       reset_course_content_dialog_help: 重置课程内容
       section_enrollments: 班级注册
+  course_settings_sub_navigation_b95deae: 课程设置的子导航
   course_setup_wizard_is_showing_a7c087c1: 课程设置向导正在显示。
   course_statistics: 
     unknown: 未知
@@ -4339,6 +4289,7 @@ zh:
         email: 电子邮件
         email_field_label: 输入您希望添加的用户电子邮件地址，以逗号隔开
         email_field_place_holder: "\"示例学生\" <student@example.com>, \"姓, 名\" <firstlast@example.com>, justAnEmailAddress@example.com"
+        email_or_login: 电子邮件／登录
         example_formats: "示例：user@example.com, \"名, 姓\" <user@example.com>, \"姓, 名\" <user@example.com>"
         form_instructions: 键入或粘贴下面的电子邮件地址列表：
         go_back: 重新开始
@@ -4369,6 +4320,7 @@ zh:
       link_to_students_view: 
         link_student_desc: 观察员在链接至某个学生后，就可访问该学生的评分和课程交互。
       resend_invitations: 
+        pending_invitation: 1个邀请还未被接受。
         pending_invitations: "%{pendingInvitationsCount} 个邀请尚未接受。"
         re_send_invitations: 重新发送
         re_sending_invitations: 正在重新发送...
@@ -4671,7 +4623,9 @@ zh:
     url: URL
   create_users_view: 
     required: 请输入一些电子邮件地址
+  created_by_b39b9c8b: 创建者为
   created_group_group_name_2097306b: "已创建组 %{group_name}"
+  creating_a_submission_export_will_allow_you_to_dow_b4b1a658: 创建一个提交导出将允许您下载一个有您的所有目前与先前课程作业提交的压缩文件。这可能是一个大文件，所以可能需要一段时间。您可以导航离开页面并稍后在回来。
   creative_commons_714a065f: "Creative Commons"
   creative_commons_license_725584ae: "Creative Commons 许可证："
   crumbs: 
@@ -4771,6 +4725,7 @@ zh:
     out_of_points_possible: "满分 %{assignment.points_possible} 分"
     this_is_permanent: 曲线评分无法撤消。将提供预先进行曲线计算的评分历史记录，但曲线计算操作不可逆。
   custom_fields_fc3e55af: 自定义字段
+  cyan_c1d5f68a: 青色
   d2l_display: Desire2Learn
   d2l_file_description: "D2L export .zip 格式"
   d2l_name: "D2L 转换器"
@@ -4922,6 +4877,8 @@ zh:
       second: 秒
       year: 年
   decaying_average_8bf6a0dd: 平均衰减
+  deep_orange_4c7eea99: 深橙色
+  deep_purple_bb3e2907: 深紫色
   default_conference_title: "%{course_name} 会议"
   default_question_name: 问题
   default_question_text: 问题文本
@@ -4934,6 +4891,8 @@ zh:
   delete_survey_56fddbbd: 删除调查
   delete_tool_app_9c9f6d35: "删除 %{tool} 应用程序？"
   delete_toolname_app_85f9d4ee: "删除 %{toolName} 应用程序"
+  deleting_6421031e: 删除...
+  delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "演示站点要求配置 Recaptcha 设置。请联系您的站点管理员获取此 Canvas 实例。"
   demos: 
     _register: 
@@ -5054,6 +5013,7 @@ zh:
       差异化作业是一项*测试版*功能，允许选择某个作业应用于哪些班级。
       没有分配某个作业的班级将不会在其课程内容中看到此作业，其最终计分将
       在不使用那些分数的情况下计算出来。
+  diigo_993c4646: Diigo
   disable_a5c05db3: 禁用
   disabled_18c33a73: （已禁用）
   discussion_6719c51d: 讨论
@@ -5074,6 +5034,7 @@ zh:
     default_title: 无标题
     empty_message: 无消息
   discussion_topic_dc85ad4c: 讨论主题
+  discussion_topic_menu_3d4684c6: 讨论主题菜单
   discussion_topics: 
     assignment_details: 
       available_from: 开始时间
@@ -5138,7 +5099,6 @@ zh:
       enable_podcast_feed: 启用播客动态消息
       include_replies_in_podcast_feed: 包括学生在播客馈赠的回复
       only_graders_can_like: 只有评分者能够像
-      only_visible_to_overrides_note: "注意：此讨论 *仅* 对下面指定的章节显示："
       options: 可选功能
       page_header_title: 新讨论
       points_possible: 最高得分
@@ -5368,6 +5328,8 @@ zh:
   domain_3b54c511: 域
   don_t_show_again_15d8253e: 不再显示
   done_8af51c9b: 完成
+  download_submissions_7454665f: 下载提交
+  due_a73610f6: 截止时间
   due_at_5e18eeac: 截止在：
   due_by_c263dc10: 到期时间
   due_date_5d0a953c: 截止日：
@@ -5386,6 +5348,7 @@ zh:
     multiple_due_dates: "截止时间: 多个截止时间"
     no_due_date: "截止时间: 无截止时间"
   due_datetime_f5a81b81: "到期日期：%{dateTime}"
+  due_format_like_yyyy_mm_dd_hh_mm_ef30a9ef: "截止－格式像YYYY-MM-DD hh:mm"
   due_multiple_dates_cc0ee3f5: 到期日期：多个日期
   due_on_date_aa4725cd: 到期日期：
   e_mail_only_2cc5e513: 仅限电子邮件
@@ -5400,6 +5363,7 @@ zh:
   ecollege_file_description: Ecollege
   ecollege_name: "Ecollege 转换器"
   edit_app_b0cc1c17: 编辑应用程序
+  edit_c5fbea07: 编辑
   edit_grading_scheme_53091236: 编辑评分方案
   edit_permissions_for_count_items_d65e3855: 
     one: "编辑 %{count} 项的权限"
@@ -5486,7 +5450,9 @@ zh:
       font_size: 字体大小，按下即可选择
       formatting: 格式，按下即可选择
       rte_help: "要富文本区域，按 Alt+ F8 求助"
+  editor_button_6647db9c: 编辑按钮
   either_the_url_or_domain_should_be_set_c29cf8c1: "应设置 URL 或域名。"
+  either_you_re_a_new_user_or_the_terms_of_use_have__14f0d0d0: "您是新用户或您上次同意的 *使用条件* 改变了。请同意 *使用条件* 和 **隐私政策**"
   element_option_missing_error_an_element_to_attach__be433478: "`element` 选项缺失错误：针对 BBTreeBrowserView 将渲染选项设置为 'true' 时，必须指定 TreeBrowserView 附加到的一个元素"
   email: 
     default_from_name: "Instructure Canvas"
@@ -5494,6 +5460,7 @@ zh:
   email_is_invalid_e0d982eb: 电子邮件无效！
   ember_modules_description: "单元已在 Ember 中重新编写。使用本机拖放 API 可从外部位置进行拖动。"
   enable_6f5d1328: 启用
+  enable_feature_title_987d8e9a: "启用功能：%{title}"
   enable_gradebook_list_students_by_sortable_name: "在评分册中按可排序名称列出学生。可排序名称默认为“名, 姓”并且可以在设置中进行更改。"
   enable_multiple_grading_periods: |-
       多重评分期限让教师和管理员来创建设置
@@ -5536,6 +5503,7 @@ zh:
       delete_default_term: 无法删除默认学期
       delete_term_with_courses: 无法删除含活动课程的学期
       not_unique: "学号 \"%{sis_source_id}\" 已在使用中"
+  enter_a_hexcode_here_to_use_a_custom_color_51ecccce: 在此处输入十六进制代码以使用一个自定义颜色。
   eportfolio: 
     buttons: 
       done_editing: 完成编辑
@@ -5845,6 +5813,7 @@ zh:
   event_end_time_ef830e66: 活动结束时间
   event_start_time_441b491f: 活动开始时间
   everyone_854554dd: 所有人
+  everyone_else_6c6dc7b6: 其他所有人
   example_84698b7d: 示例
   example_final_score_355aff0f: 最后的得分例子
   example_final_score_a92b30b9: "最终分数示例]]"
@@ -5858,6 +5827,8 @@ zh:
   expand_or_collapse_undated_items_b901de09: 展开或折叠未注明日期的项
   expand_subdiscussion_cd226ed4: 扩展分组讨论
   expires_on_date_18efe4e2: 到期日期
+  export_de71cd8e: 导出
+  exporting_b1eab154: 正在导出
   external_apps_f5490181: 外部应用程序
   external_content: 
     cancel: 
@@ -6007,13 +5978,12 @@ zh:
   external_url_e9b87215: "外部 URL"
   failed_to_create_zip_file_1a943d06: 无法创建压缩文件
   failed_to_import_media_objects_4c1fcb4f: 导入媒体对象失败
+  failed_to_log_in_7ceec561: 登录失败
   fair_use_bee47d77: 公正使用
   favicon_6e658914: Favicon
   feature_flags: 
     feature_flag: 
       allow: 允许
-      disabled: 已禁用
-      enabled: 已启用
       estimated_release: "预计发行版:"
       no_description: 无说明
       ? "off"
@@ -6052,6 +6022,7 @@ zh:
     student_outcome_gradebook: 学生学习掌握程度评分册
   field_name_31fff38e: 栏目名称
   file_list_updated_38e2a5ad: 文件列表已更新
+  file_menu_cc0ca54: 文件菜单
   file_not_found_9eec054c: 未找到文件
   file_preview: 
     file_preview_headerbutton_close: 关闭
@@ -6269,6 +6240,7 @@ zh:
       no_rubric_outcomes_found: 找不到评分标准配置的成果
     titles: 
       find_outcome: 查找评分标准
+  first_two_students_and_others_count_others_bb0a212a: "%{first_two_students}，和另外的%{others_count}"
   flash_6afbf65a: Flash
   folder: 
     course_content_folder_name: 课程内容
@@ -6287,7 +6259,6 @@ zh:
     only_one_folder: "无法设置文件夹的路径和 ID"
   for: 针对
   for_all_devices_1f603968: 针对所有设备
-  for_section_8503af93: 对于班级
   from_fdd4956d: 从
   from_from_to_to_e31f6422: "从 %{from} 到 %{to}"
   get_the_following_from_your_salesforce_connected_a_881fc9a3: 从您的销售团队连接如下的应用程序
@@ -6301,11 +6272,15 @@ zh:
     invitation: 邀请
     question: 问题
     warning: 警告
+  global_navigation_8bee3501: 全局导航
+  google_docs_40374e65: "Google Docs"
   google_docs_domain_restriction_description: |-
       Google Docs 域限制允许 Google Docs 作业和协作
       仅限于单个域。尝试在未经批准的域上提交作业或
       加入协作的学生将收到一条错误消息，告知他们
       需要更新其 Google Docs 集成。
+  google_docs_preview_9f41b23c: "Google Docs Preview"
+  google_drive_7cb003c9: "Google Drive"
   grade_display_warning_dialog: 
     grade_display_warning: 
       checkbox: 不要再显示此课程。
@@ -6316,6 +6291,7 @@ zh:
     graph_title: "平均 %{mean}，高 %{high}，低 %{low}"
     outcome: 
       alignment_count: "*%{count}* 项作业"
+      alignment_count_summary: "*%{count}*对齐中的*8* "
   gradebook: 
     alerts: 
       no_active_students: 对不起，课程中没有活动学生或可评分的学生。
@@ -6354,7 +6330,6 @@ zh:
     hide_all_details_button: 隐藏所有详细信息
     mic_blocked_message: "使用麦克风的权限已被阻止。要更改，请转至 chrome://settings/contentExceptions#media-stream"
     mute_assignment: 屏蔽作业
-    new_assessment: "[新测验]"
     no_submission_time: 无提交时间
     nodetect_message: 未检测到语音。您可能需要调整您的麦克风设置。
     not_graded: 未计分
@@ -6487,6 +6462,8 @@ zh:
       switch_to_percent: 切换到百分比
       switch_to_points: 切换到得分
     ungraded: 不影响评分
+  gradebook_csvs: 
+    grades_filename: 评分
   gradebook_uploads: 
     new: 
       titles: 
@@ -6626,6 +6603,7 @@ zh:
       arrange_columns_by_due_date: 按截止时间排列列
       arrange_columns_by_group: 按作业小组排列列
       download_scores: 导出
+      export_current_gradebook: 当前
       filter_by_student: 按学生姓名或第二类身份证筛选
       grades: 评分
       hide_student_names: 隐藏学生姓名
@@ -6641,7 +6619,6 @@ zh:
     grades: 
       complete: 完成
       incomplete: 未完成
-    grades_filename: 评分
     grading_box_extended: 
       labels: 
         grade: 评分
@@ -6734,7 +6711,6 @@ zh:
         show_all_sections: 显示所有班级
         submit_same_score: 对重新提交的文件使用此相同评分
       loading: 正在加载...
-      new_assessment_option: "[新测验]"
       no_annotation: 本文档的注释不可用
       not_newest_notice: "注:这不是最近的提交文件"
       page_header_title: 快速评分器
@@ -6836,6 +6812,7 @@ zh:
     titles: 
       grading_scheme_info: 查看/编辑评分方案
   great_so_you_ve_got_a_course_now_what_well_before__38cfba67: 很好，您已经有了一个课程。现在怎么做？在您向大众发布该课程之前，您可能想核实一下，确保基本内容都已安排妥当。检查一遍左侧的列表，确保您的课程已准备就绪，可供使用。
+  green_15af4778: 绿色
   group: 
     greater_than_1: "必须大于 1"
     memeber: 成员
@@ -7306,10 +7283,12 @@ zh:
   high_score_47924c1a: "高分：%{score}"
   highest_28ad71e6: 最高
   highest_score_e080551e: 最高分
+  homework_submission_172e8354: 作业提交
   html5_first_videos_description: |-
       默认情况下，Canvas 将首先尝试使用 Flash 来播放视频。启用此项可首先尝试使用 HTML5，
       然后返回到 Flash。
   html_editor_fb2ab713: "HTML 编辑器"
+  i_agree_to_the_terms_of_use_and_privacy_policy_f41760cc: "我同意 *使用条件* 和 **隐私政策**。"
   i_have_obtained_permission_to_use_this_file_6386f087: 我已获得使用此文件的权限。
   i_hold_the_copyright_71ee91b1: 我持有版权
   ic_actions: 
@@ -7330,7 +7309,6 @@ zh:
   if_you_ve_been_using_another_course_management_sys_67edfab1: "如果您曾使用其他课程管理系统，则可能需要将其中的材料转移到 Canvas 中。我们可以引导您轻松将内容迁移到 Canvas。"
   ignore_91750df8: 忽略
   ignore_assignment_738b3c99: 忽略作业
-  ignore_forever_dd4a6cdf: 总是忽略
   ignore_name_55edc6fe: "忽略 %{name}"
   ignore_these_3940f6f5: 忽略这些
   ignore_this_assignment_b7a71f80: 忽略此作业
@@ -7374,7 +7352,9 @@ zh:
     warnings: 
       truncated_wiki_title: "以下维基页面的标题被截断：%{title}"
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: 当发布到您学校的学生信息系统时，包括此作业的评分
+  incorrect_username_and_or_password_2de73abb: 用户名和/或密码不正确
   incremental_update_successfully_generated_against__db3f3f06: 增量更新针对以前的SIS导入成功生成。
+  indigo_2035fc55: 靛青色
   info: 
     notices: 
       error_reported: 感谢您的帮助！我们马上解决。
@@ -7553,10 +7533,7 @@ zh:
   launch_url_e150bd41: "启动 URL"
   layouts: 
     application: 
-      ? "User Research"
-      : 用户调查
       bouncing_communication_channels: "您的联系方式之一似乎有问题。请检查您的 *设置页面*。"
-      by_instructure: "由 Instructure 提供"
       group_switch: 切换
       javascript_required: "您需要启用 JavaScript 才能访问此站点。"
       keyboard_navigation: 
@@ -7565,7 +7542,6 @@ zh:
         close: 关闭
         dashboard: 我的面板
         skip_to_content: 跳至内容
-      open_source_learning_management_system: "开源 LMS"
     fixed_bottom: 
       masquerading: 
         stop: 停止仿冒
@@ -7585,6 +7561,7 @@ zh:
       log_in_to_canvas: "登录到 Canvas"
     styleguide: 
       default_page_title: "Canvas LMS"
+  ldap_e1e0a916: LDAP
   learning_mastery_gradebook_description: |-
       学习掌握程度评分册为教师提供了一种方法来快速查看有关
       课程学习结果的学生进度和课程进度。
@@ -7676,6 +7653,9 @@ zh:
       word_separator: " "
   license_help: 
     content_license_help: 内容授权帮助
+  light_blue_5374f600: 浅蓝色
+  light_green_c1cd020d: 浅绿色
+  light_pink_e1214d62: 浅粉红色
   link_enrollment: 
     buttons: 
       link: 链接至学生
@@ -7689,11 +7669,13 @@ zh:
       no_link: "[无链接]"
     titles: 
       link_to_student: 链接至学生
+  link_selection_1486c5d0: 链接选择
   link_title_d959a7b3: 链接标题
   link_url_cf96376: "链接 Url"
   linked_assignment_message: "与作业“%{title}”链接"
   linked_discussion_topic_message: "与讨论主题“%{title}”链接"
   linked_quiz_message: "与测验“%{title}”链接"
+  linkedin_5726caca: LinkedIn
   links: 
     dashboard: 我的面板
     errors: 
@@ -7713,6 +7695,72 @@ zh:
   lock_until_date_62ce1b5c: 锁定截止时间
   log_out_379ba28a: 注销
   logged_out_user: "注销的用户 %{user_counter}"
+  login: 
+    canvas: 
+      mobile_login: 
+        back_to_login: 返回登录
+        buttons: 
+          request_password: 请求密码
+        dont_know_password: 我不知道我的密码
+        log_in: 登录
+        login_handle: "输入您的 %{login_handle_name}，我们将向您发送更改密码的链接。"
+        password: 密码
+        sending: 正在发送...
+      new: 
+        back_to_login: 返回登录
+        browse_courses: 浏览课程
+        buttons: 
+          request_password: 请求密码
+        coenrollment_banner: "*Canvas 的主用户?* **点击此处以获得帐户**"
+        dont_know_password: 不知道您的密码吗？
+        labels: 
+          password: 密码
+          remember_me: 保持登录状态
+        log_in: 登录
+        login_handle: "输入您的 %{login_handle_name}，我们将向您发送更改密码的链接。"
+        page_title: "登录到 Canvas"
+        register_for_canvas: "*需要 一个Canvas 帐户吗?* **点击此处免费获取!**"
+    logout_confirm: 
+      cancel: 取消
+      details: 
+        log_out: "是否确定要退出 Canvas？"
+      log_out: 退出
+      page_title: 退出
+    otp: 
+      errors: 
+        invalid_otp: 验证码无效，请重试
+      new: 
+        buttons: 
+          send: 发送
+          verify: 验证
+        details: 
+          mfa_enrollment: |-
+              为增加安全性，除密码外，您还需拥有具体设备进行多重身份验证，才能登录到 Canvas。这可能是生成验证码的设备，也可能是能接收短信的手机。使用 [iPhone](%{iphone_url}) 或
+              [Android](%{android_url}) 的 Google Authenticator 的应用程序可以通过扫描以下的 QR 代码而配置。其它令牌则可以通过输入密钥 **%{secret_key}**而配置。
+          mfa_required: 您需要设置多重身份验证。
+          otp_on_device: 请输入您的令牌显示的验证码。
+          otp_sent_to_phone: 验证码已发送到您的手机。请在此输入。
+          send_to_sms: "发短信到 %{phone_number}"
+        labels: 
+          carrier: 运营商
+          phone_number: 电话号码
+          remember_me: 记住这台计算机
+          verification_code: 验证码
+        links: 
+          choose_number: 选择已有的电话号码
+        page_title: 多重身份验证
+        select: 
+          new_number: 新电话号码
+        titles: 
+          mfa: 多重身份验证
+    saml: 
+      debug: 
+        logout_request_redirect_from_idp: "已从 IdP 收到 LogoutRequest"
+        logout_response_redirect_from_idp: "已从 IdP 收到 LogoutResponse"
+        logout_response_redirect_to_idp: "正向 IdP 发送 LogoutResponse"
+        redirect_from_idp: "已从 IdP 收到 LoginResponse"
+  login_is_invalid_must_be_alphanumeric_or_an_email__ae4499b3: 登录无效：必须是字母数字或电子邮件地址
+  login_is_too_long_25373f95: 登录太长
   logo_a040ae0e: 徽标
   looks_great_e4d883ed: 好极！
   low_score_4eeb95b2: "低分：%{score}"
@@ -9478,6 +9526,23 @@ zh:
         subject: "网络会议邀请: %{name}"
       twitter: 
         tweet: "Canvas 警报 - 邀请:参加 %{title}，%{name}"
+    web_conference_recording_ready: 
+      email: 
+        body: "为%{name}而录制的%{title}准备好了。"
+        details_link: "您可在此处查看详细信息: %{link}"
+        html: 
+          body: "为%{name}的%{title}录制准备好了。"
+          details_link: 点击此处查看详细信息
+          subject: "网站会议的录制准备好：%{name}"
+        subject: "网站会议的录制准备好：%{name}"
+      sms: 
+        body: "为%{name}的%{title}录制准备好了。"
+        link_message: "更多信息请访问 %{url}"
+      summary: 
+        body: "为%{name}的%{title}录制准备好了。"
+        subject: "网站会议的录制准备好：%{name}"
+      twitter: 
+        tweet: "Canvas通知－录制准备：%{title}, %{name}"
   migration: 
     announcement_type: 通告
     assignment_group_type: 作业小组
@@ -9502,6 +9567,7 @@ zh:
   migration_issues: 
     errors: 
       valid_workflow_state: 必须发送有效的工作流状态
+  migration_selection_5f1c5f55: 转移选项
   missing_percent_94534638: "缺少：%{percent}"
   model_is_already_located_in_newgroup_e5cea361: "%{model} 已位于 %{newGroup} 中"
   module_item_types: 
@@ -9513,6 +9579,7 @@ zh:
     page: 页面
     quiz: 测验
     sub_header: 副标题
+  module_menu_3201af4e: 单元菜单
   modules: 
     add: 
       assignment: 
@@ -9655,6 +9722,7 @@ zh:
   more_courses_5ebbe998: 更多课程
   most_recent_score_13a87e8c: 最近的得分
   most_recent_score_counts_as_75_of_mastery_weight_a_f1e3e6c2: "大部分近期分数占 75% 的掌握分数权重，所有其他分数的平均分占 25% 的权重。"
+  move_abf00365: 移动
   move_dialog: 
     cancel: 取消
     save: 保存
@@ -9664,6 +9732,8 @@ zh:
     move_to_end: "-- 在底部 --"
   move_outcome_ce497e6c: 移动结果
   move_outcome_group_cfa1a505: 移动结果组
+  moving_a4d552df: 正在移动...
+  multi_factor_authentication_configured_865b1bde: 多重身份验证已配置
   must_achieve_mastery_at_least_2_times_must_also_co_b2ae7688: 必须至少两次达到掌握。还必须完成两个项目的计算。得分在掌握以上将被用作平均计算最终的得分。
   must_achieve_mastery_at_least_2_times_scores_above_57077a88: "必须至少 2 次达到掌握分数。高于掌握分数的分数将求平均分，以计入最终分数。"
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: 必须提供“file_ids”和/或“folder_ids”参数
@@ -9709,6 +9779,9 @@ zh:
   no_e16d9132: 否
   no_grading_schemes_to_display_8b0e92e7: 没有可显示的评分方案
   no_migration_file: 内容迁移需要文件
+  no_password_was_given_472222e5: 未提供密码
+  no_placements_enabled_f705f28: 没有启用的安置
+  no_results_found_58717065: 未找到结果
   no_score_yet_c94e919b: 尚无分数
   no_students_have_taken_the_quiz_yet_e667644b: 学生尚未参加测验
   no_students_have_taken_the_survey_yet_d378cd35: 学生尚未参加调查
@@ -9765,6 +9838,7 @@ zh:
       migration: 迁移
       one: 其它
       other: 其它
+      recording_ready: 录制准备
       registration: 注册
       reminder: 提醒
       student_appointment_signups: 学生约会注册
@@ -9893,6 +9967,7 @@ zh:
       summaries: 总结
       updated_wiki_page: 更新的维基页面
       web_conference_invitation: 网络会议邀请
+      web_conference_recording_ready: 网络会议录制准备
     no_subject: 无主题
     other_description: |-
         *仅适用于导师和管理员：*
@@ -9904,6 +9979,7 @@ zh:
         * 新帐户用户
         * 新学生组
     other_display: 管理通知
+    recording_ready_display: 录制准备
     reminder_display: 提醒
     student_appointment_description: |-
         *仅适用于导师和管理员：*⏎
@@ -9912,6 +9988,7 @@ zh:
     student_appointment_display: 学生约会注册
     submission_comment_description: 作业提交评论
     submission_comment_display: 提交评论
+    web_conference_recording_ready: 一个会议的录制准备
   notification_preferences: 
     communication: 
       email: 
@@ -9940,6 +10017,7 @@ zh:
       admin: 管理
       alerts: 警报
       communication: 会话
+      conferences: 会议
       course: 课程活动
       discussions: 讨论
       groups: 小组
@@ -10022,12 +10100,14 @@ zh:
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: 您更改答案之后，在更新问题前需要选择一个选项。
   one_per_line_format_name_value_79647700: "每行一个。格式:姓名=值"
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} 按时提交，%{late} 迟交，%{missing} 未交"
+  open_color_picker_f117df0a: 打开颜色选择器
   open_title_in_a_new_window_b29fed77: "在新窗口中打开 %{title}"
   options: 
     ? "no"
     : 否
     ? "yes"
     : 是
+  orange_81386a62: 橙色
   orbis_report_header_assignment_id: "作业 id"
   orbis_report_header_assignment_title: 作业标题
   orbis_report_header_canvas_course_id: "课程 id"
@@ -10178,11 +10258,11 @@ zh:
         latest_score: 最新分数
         outcome: 成果
   overrides: 
+    blank_override: 您必须有学生或选择的班级
     everyone: 所有人
     everyone_else: 其他所有人
     overrides: 
       everyone: 所有人
-      everyone_else: 其他所有人
   own_copyright_cc59db55: 拥有版权
   page_comment: 
     default_user_name: 匿名
@@ -10247,6 +10327,8 @@ zh:
     manage_webhooks: 管理网勾
   pick_a_destination_we_ll_send_you_errors_fa0cb0e0: 选择一个目的地，我们会告诉您误差。
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: 选择一个终端，我们将在那发布您的错误报告。
+  pink_68ad45cb: 粉红色
+  placements_5b5e056b: 安置
   plain_text_e3ab33aa: 纯文本
   please_add_at_least_one_non_blank_answer_213c2c8e: 请至少添加一个非空白答案。
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: 请至少为每个变量添加一个非空白答案。
@@ -10436,6 +10518,14 @@ zh:
     kaltura_settings: 
       account_settings: "这些值可在 Kaltura 管理控制台中\"设置 -> 集成设置\"下找到"
       cache_explanation: "空表示无限缓存，0 表示不缓存。"
+      description: |-
+          您必须在[Kaltura.com](%{kaltura_url})有账户
+          或有Kaltura的自托管实例。
+          **注意：**一旦在Canvas中配置了Kaltura，
+          您需要在Kaltura的管理控制台，在”设置->
+          整合设置“之下启用服务器与通知网站的通知：
+          %{notification_url}
+          然后勾选在”通过服务器发送“栏中的”添加输入“和”删除输入“的复选框。
       headers: 
         account_settings: 帐户设置
         canvas_settings: "Canvas 设置"
@@ -10625,6 +10715,8 @@ zh:
     labels: 
       requirements_must_be_completed: 需要完成以下要求，然后才能解锁此页面
   presentation_2d9387ca: 展示
+  previous_time_cc96b361: "(%{time})之前"
+  previous_timestamp_19343a58: "(%{timestamp})之前"
   privacy_290109ea: 隐私
   product_name: Canvas
   profile: 
@@ -10917,6 +11009,7 @@ zh:
     yo_select: 
       yo: Yo
     you_have_no_services: 您尚未注册任何服务，您可以在*设置*页面添加一些服务。
+  profile_6bd2baed: 个人资料
   profiles: 
     avatar_dialog: 
       from_gravatar: "来自 Gravatar"
@@ -10955,72 +11048,7 @@ zh:
       too_long: "不能超过 %{max} 个字符"
       too_short: "必须至少包含 %{min} 个字符"
   pseudonym_sessions: 
-    debug: 
-      logout_redirect: "已向 IdP 发送 LogoutRequest"
-      logout_request_redirect_from_idp: "已从 IdP 收到 LogoutRequest"
-      logout_response_redirect_from_idp: "已从 IdP 收到 LogoutResponse"
-      logout_response_redirect_to_idp: "正向 IdP 发送 LogoutResponse"
-      redirect_from_idp: "已从 IdP 收到 LoginResponse"
     default_app_name: 第三方应用程序
-    errors: 
-      blank_password: 未提供密码
-      invalid_credentials: 用户名和/或密码不正确
-      invalid_otp: 验证码无效，请重试
-      login_error: "在 %{institution} 登录时出现问题"
-      login_errors: 
-        no_config_for_id: "Canvas 帐户没有具有该 ID 的身份验证配置"
-        no_idp_set: 您登录的学校未在此帐户上配置。
-        unrecognized_idp: "Canvas 未识别您的身份提供程序"
-      logout_errors: 
-        no_idp_found: "Canvas 无法退出您的身份提供程序"
-      max_attempts: 登录尝试失败次数过多。请稍后重试或联系您的系统管理员。
-      no_matching_user: "Canvas 没有以下用户的帐户: %{user}"
-      user_deleted: 该用户帐户已被删除。请联系您的系统管理员以重新激活您的帐户。
-    logout_confirm: 
-      cancel: 取消
-      details: 
-        log_out: "是否确实要注销 Canvas？"
-      log_out: 注销
-      page_title: 注销
-    mobile_login: 
-      back_to_login: 返回登录
-      buttons: 
-        request_password: 请求密码
-      dont_know_password: 我不知道我的密码
-      log_in: 登录
-      login_handle: "输入您的 %{login_handle_name}，我们将向您发送更改密码的链接。"
-      password: 密码
-      sending: 正在发送...
-    new: 
-      page_title: "登录到 Canvas"
-    notices: 
-      mfa_complete: 多重身份验证已配置
-    otp_login: 
-      buttons: 
-        send: 发送
-        verify: 验证
-      details: 
-        mfa_enrollment: |-
-            除密码外，多重身份验证还要求您拥有物理设备，才能登录到 Canvas，因而提高了安全性。这可以是能生成验证码的设备，也可以是能接收短信的手机。用于 [iPhone](%{iphone_url}) 或
-            [Android](%{android_url}) 的 Google Authenticator  应用程序的配置方法是扫描以下的 QR 代码。其它令牌的配置方法是输入密钥 **%{secret_key}**。
-        mfa_required: 您需要设置多重身份验证。
-        otp_on_device: 请输入您的令牌显示的验证码。
-        otp_sent_to_phone: 验证码已发送到您的手机。请在此输入。
-        send_to_sms: "发短信到 %{phone_number}"
-      labels: 
-        carrier: 运营商
-        phone_number: 电话号码
-        remember_me: 记住这台计算机
-        verification_code: 验证码
-      links: 
-        choose_number: 选择已有电话号码
-      page_title: 多重身份验证
-      select: 
-        new_number: 新电话号码
-      titles: 
-        mfa: 多重身份验证
-    password_confirmation_error: 发送请求时出错。
-    password_confirmation_sent: 密码确认已发送。确保检查您的垃圾邮件箱。
   pseudonyms: 
     confirm_change_password: 
       buttons: 
@@ -11079,6 +11107,7 @@ zh:
   purchases: 
     new: 
       payment_info: 付款信息
+  purple_7678a9fc: 紫色
   qti_display: QTI
   qti_file_description: "QTI .zip 文件"
   qti_img_matching_question: 导入的匹配问题在两端包含图像，这不受支持
@@ -11257,6 +11286,7 @@ zh:
       对测验提交项启用活动跟踪功能，以及
             一旦提交即可查看这些活动的日志的功能。
   quiz_lti_plugin_a189607f: "测验 LTI 插件"
+  quiz_menu_4fcd5e61: 测验菜单
   quiz_reports: 
     cancel_generation: 取消
     download_item_analysis: " 下载项目分析报告。"
@@ -11974,7 +12004,6 @@ zh:
         new_discussion: 新建讨论
         one_question_at_a_time: 一次显示一个问题
         one_time_results: 每次尝试后仅一次
-        only_visible_to_overrides_note: "注意：此测验 **仅** 对下面指定的章节显示："
         points_possible: "得分 %{n}"
         post_to_sis: "发布评分到 SIS"
         quiz_access_code: 需要访问代码
@@ -12450,7 +12479,6 @@ zh:
     move_success: 
       one: "%{count} 个项目已移到 %{destinationFolder}"
       other: "%{count} 个项目已移到 %{destinationFolder}"
-    moving: 正在移动...
     name: 姓名
     progress_error: 尝试准备下载时出错，请重试。
     progress_message: "正在准备下载：%{percent}% 已完成"
@@ -12486,6 +12514,7 @@ zh:
     sections_count: 
       one: "%{count} 班级"
       other: "%{count} 班级"
+  red_8258edf3: 红色
   registration: 
     get_started: 开始
     incomplete_registration_warning: 
@@ -12527,6 +12556,7 @@ zh:
   remove_recipient_name_a6b83cef: "删除收件人的 %{name}"
   remove_row_c198da5a: 移除行
   remove_row_f9d59cba: 删除行
+  remove_these_dates_48453a81: 删除这些日期
   rename_45608f54: 重命名
   reply_from_name: "%{name}，借助 Canvas 通知"
   reply_to_comment_72d96728: 回复评论
@@ -12759,6 +12789,8 @@ zh:
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: 销售团队有一个与它的产品账户不同的登录主机砂盒的帐户，因此，如果您使用的是销售团队的砂盒帐户，而您又没有勾选此复选框，那将无法进行身份验证（相反，这也同样起作用，如果您有一个产品帐户，以及勾选了不会验证的复选框）。
   salesforce_ticketing_webtocase_connector_80f75716: 销售团队的票务WebToCase连接器
   same_value_as_canvas_url__c_will_probably_be_going_37027686: " 与“Canvas_URL__c' 相同的价值将可能很快消失。"
+  saml_57e53f77: SAML
+  sample_data_e4fd01ff: 样本数据
   save_11a80ec3: 保存
   saving_d55dd90e: 正在保存...
   score_muted_82eef66: 分数：（静音）
@@ -12889,6 +12921,7 @@ zh:
   search_entries_or_author_63fb0a86: 搜索条目或作者
   search_groups_or_people_6c15d6ad: 搜索组或人员
   search_title_body_or_author_1d26711f: 搜索标题、正文或作者
+  searching_b0207e7f: 正在搜索
   section: 
     confirms: 
       delete_enrollment: 是否确定要永久删除此注册?
@@ -12968,6 +13001,7 @@ zh:
         current_enrollments: 当前注册
         decrosslist_section: 取消交叉列出此班级
   see_some_lti_tools_that_work_great_with_canvas_you_3c27bc7b: "*查看某些 LTI 工具*，这些工具与 Canvas 完美搭配使用。您还可以查看 **有关 LTI 工具的 Canvas 社区主题**。"
+  select_a_grading_period_aab25483: 选择评分期限
   select_content: 选择内容
   select_content_checkbox: 
     select_content_error: 您必须选择内容选项
@@ -12985,6 +13019,7 @@ zh:
       add_item_to_module: 添加项目到单元
       find_links_using_service: "使用 %{service} 查找链接"
   select_course_a_selection_is_required_before_recip_f622d9df: 选择课程：选择需要在收件人栏目将变得可用之前。
+  select_course_color_cad8e62b: 选择课程颜色
   select_itemname_f70db487: "选择 %{itemName}"
   select_navigation_links_68e1e924: 选择导航链接
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: 选择您要关联的文件，或者通过选择“新文件”来添加文件。
@@ -13151,6 +13186,11 @@ zh:
     canvas-user-nav: 
       navigation: 
         user_menu: 用户菜单
+    canvas_footer: 
+      ? "User Research"
+      : 用户调查
+      by_instructure: "由 Instructure 提供"
+      open_source_learning_management_system: "打开 LMS 资源"
     components: 
       ic_submission-download-dialog: 
         click_to_download: 单击此处下载
@@ -13340,21 +13380,6 @@ zh:
     locale_warning: 
       crowdsourced_warning_message: "您所选择的语言通过众包方式翻译而来。Instructure 尚未审阅或验证翻译内容的准确性，并且对于您使用该语言设置不承担任何责任。请酌情使用。"
       crowdsourced_warning_title: 众包语言
-    login: 
-      back_to_login: 返回登录
-      browse_courses: 浏览课程
-      buttons: 
-        request_password: 请求密码
-      coenrollment_banner: "*Canvas 用户的父级?* **单击此处以获得帐户**"
-      default_login_message: 在您的机构登录
-      dont_know_password: 我不知道我的密码
-      labels: 
-        password: 密码
-        remember_me: 保持登录状态
-      log_in: 登录
-      login_at_account: "在 %{school_name} 登录"
-      login_handle: "输入您的 %{login_handle_name}，我们将向您发送更改密码的链接。"
-      register_for_canvas: "*需要 Canvas 帐户?* **单击此处免费获取!**"
     menu_assignment: 
       labels: 
         due: 截止时间
@@ -13629,7 +13654,6 @@ zh:
       grading_alt: 评分
       submission_comment: 提交评论
     terms_required: 
-      terms_have_changed: "*使用条款*已发生更改。请在继续使用 Canvas 之前花点时间查看这些条款。"
       updated_terms_of_use: 更新的使用条款
     unauthorized: 
       headings: 
@@ -13645,8 +13669,6 @@ zh:
         unauthorized_action: 未授权
       unauthorized_1: 您似乎没有访问此页面的权限。请确保您已获得查看此内容的授权。
       unauthorized_2: 如果您认为自己应该能够查看此页面，请使用"帮助"链接通知支持团队该问题。
-      unauthorized_action: 此页面仅限授权用户访问。您将需要登录，然后才能查看此页面的内容。
-      unauthorized_user: "%{user_name}，您将需要登录，然后才能查看该页面。如果您忘记或不知道密码，请单击\"忘记密码\"。"
       unauthorized_user_is_other: "%{current_user}，您没有获得查看此页面的授权。您跟随到达此处的链接适用于 **%{unauthorized_user} (%{unauthorized_user_email})**。如果是您本人，您可能想要注销并再次使用该电子邮件地址登录以获取此页面的访问权限。"
     unauthorized_feed: 
       bad_params: 您尝试访问的源的参数无效。
@@ -13848,7 +13870,9 @@ zh:
     users: 
       user_search_label: 用户搜索
       users_matching_label: 用户匹配
+  skipped_file_filename_due_to_error_94f0194: "由于错误，跳过文件的 %{filename} "
   skipping_unknown_file_type_cd1086ee: 跳过未知的文件类型
+  skype_18850ba7: Skype
   slideshow: 
     titles: 
       back: 返回
@@ -13870,6 +13894,7 @@ zh:
       submitted: "*已提交：* %{submittedAt}"
   spreadsheet_6d622119: 电子表格
   sr_gradebook: 
+    all_grading_periods: 所有评分期限
     all_sections: 所有班级
     assignment_muted: 单击以取消静音。
     assignment_order_alpha: 按字母顺序
@@ -14150,6 +14175,7 @@ zh:
     files: 文件
     grades: 评分
     home: 主页
+    logout: 登出
     modules: 单元
     observees: 正在观察
     outcomes: 成果
@@ -14166,6 +14192,7 @@ zh:
   take_the_survey_ada59508: 参加调查
   take_the_survey_again_24ce22c2: 再次参加调查
   teachers_52e2423f: 教师
+  teal_f729a294: 蓝绿色
   terms: 
     index: 
       date: 
@@ -14224,6 +14251,7 @@ zh:
       timespan: "%{start_at} *到* %{end_at}"
   text_document_eacbcdb7: 文本文档
   text_entry_submission_cannot_be_empty_3d187cae: 文字输入的提交不能为空白。
+  that_user_account_has_been_deleted_please_contact__350e0e0: 该用户帐户已被删除。请联系您的系统管理员以重新激活您的帐户。
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: 帐户报告用户所属的帐户ID
   the_app_was_activated_a84e055f: 应用程序已激活
   the_app_was_added_58e2836a: 已添加应用程序
@@ -14236,6 +14264,8 @@ zh:
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "为帐户实例的完整名称 (例如，something.instructure.com)"
   the_grading_period_was_deleted_7814a349: 删除评分期限
   the_grading_period_was_saved_4a504c5: 保存评分期限
+  the_institution_you_logged_in_from_is_not_configur_5ceac41: 您登录的机构未在此帐户上配置。
+  the_list_of_results_has_been_updated_46e3c733: 结果列表已被更新。
   the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "Canvas 右上角标题中的徽标图像。200x200 svg 或 png"
   the_material_is_in_the_public_domain_279c39a3: 材料在公开域中
   the_material_is_licensed_under_creative_commons_3242cb5e: "材料已根据 Creative Commons 许可"
@@ -14256,6 +14286,8 @@ zh:
     other: "列表中有 %{count} 个结果"
   there_was_a_problem_deleting_the_grading_period_50ce07c5: 删除评分时段时遇到问题
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: 删除评分方案时遇到问题
+  there_was_a_problem_exporting_c33dc250: 导出有问题。
+  there_was_a_problem_logging_in_at_institution_5a298155: "在 %{institution} 登录时出现问题"
   there_was_a_problem_saving_the_grading_period_243bed6c: 有保存评分期限的问题
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: 保存评分方案时遇到问题
   there_was_an_error_in_processing_your_request_6513a49a: 处理您的请求时出错
@@ -14271,6 +14303,7 @@ zh:
   this_field_name_is_required_b9196401: 此字段“name”必填。
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "此文件必须先设置 usage_rights，然后才能发布。"
   this_folder_is_currently_locked_and_unavailable_to_f85c451: 此文件夹目前已锁定并且无法查看。
+  this_grading_period_overlaps_16332589: 该评分期限覆盖
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "这是一个受信任 URL的逗号分隔列表。登录 Canvas 时，信任此列表中的任何 URL 将绕过 CSRF 令牌。"
   this_most_likely_happened_because_you_imported_cou_a78ea880: 这很可能发生，因为您导入了不带关联文件的课程内容。
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: 此成果已经用来评估学生，而且不可以被编辑或删除
@@ -14490,7 +14523,9 @@ zh:
   to_minscore_43e5452e: "至 %{minScore}%"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "要查看作业，请确保 *议程* 视图处于活动状态。"
   tolerance_value_9e96573c: 公差值
+  too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: 多次登录尝试失败。请稍后重试或联系您的系统管理员。
   too_many_members_b8b15069: 过多成员
+  tool_configuration_63cd43b0: 工具配置
   tooltips: 
     finished: 已完成
     incomplete: 未完成
@@ -14517,8 +14552,12 @@ zh:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "重新提交到 Turnitin"
+  twitter_fcef6b54: Twitter
+  type_more_to_find_additional_students_d5211cd5: 输入更多以找查其余学生
   unable_to_remove_app_4293cb53: 无法删除应用程序
   unarchive_selected_e0c4bd3d: 取消存档选择
+  unauthorized: 未授权
+  unauthorized_message: JWT签名无效
   unchanged_aca18e02: "[不变]"
   ungraded_submissions_44efb0ec: 未评分提交项
   ungraded_survey_ad7de790: 非评分调查
@@ -14532,6 +14571,8 @@ zh:
   unlock_date_cannot_be_before_course_start_9c7b8524: 解锁日期不能早于课程开始日期
   unlock_date_cannot_be_before_section_start_793ddc66: 解锁日期不能早于章节开始日期
   unlock_date_cannot_be_before_term_start_d3c01813: 解锁日期不能早于学期开始日期
+  unprocessable_entity: 不能处理的实体
+  unprocessable_entity_message: 签署会议id无效
   unpublished_click_to_modify_60f9051: "未发布 - 点击修改"
   unpublished_courses_title: 未发布的课程
   unstarted_932f2990: 未开始
@@ -14566,8 +14607,8 @@ zh:
       terms: 您必须同意这些条款
       too_long: "不能超过 %{max} 个字符"
     registration: 
-      agree_to_terms_and_privacy_policy: 您同意*使用条款*并承认**隐私政策**。
       agree_to_terms_with_code_of_conduct: 您同意*使用条款*和**行为准则**。
+  user_avatars_e4fc4ed3: 用户头像
   user_date_range_search: 
     cant_be_blank: "Canvas 用户 ID 不能为空"
     cant_come_before_from: “结束日期”不能早于“开始日期”
@@ -14631,6 +14672,8 @@ zh:
       updating_user_details: 正在更新用户详细信息...
     notices: 
       image_reported: 此图像已报告
+  user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}，在可以查看页面之前，您将需要*登录*。"
+  user_navigation_a097be0f: 用户导航
   user_notes: 
     confirms: 
       delete_journal_entry: 是否确定要删除此日志条目?
@@ -14835,11 +14878,6 @@ zh:
           **您**是代表此用户实际执行操作的人员的事实。
       masquerade_as: "仿冒 %{user_name}"
       page_title_header: 仿冒用户
-    merge: 
-      login_to_merge_different_account: "要将帐户 %{current_user_name} (%{current_user_email}) 合并到另一个帐户，请登录到新帐户:"
-      merge_definition: 出于各种原因，您可能会最终有两个登录而不是一个。如果出现这种情况，您可以将两个登录合并到一起并合并它们的信息。
-      titles: 
-        merge_accounts: 合并用户帐户
     merge_results: 
       action: 操作
       emails: 电子邮件
@@ -14957,6 +14995,7 @@ zh:
   view_course_analytics_eefe6b2: 查看课程分析
   view_name_app_62a2ad8e: "查看 %{name} 应用程序"
   view_student_analytics_6b8ccd42: 查看学生分析
+  view_toolname_placements_4a5724d1: "查看%{toolName} 的安置"
   visit_864b4060: 访问
   visit_group_group_name_7a816081: "访问组 %{group_name}"
   warning_for_improved_accessibility_in_moving_files_71e1028b: 警告：为改善移动文件的可访问性，请使用位于菜单中的“移动到对话框”选项。
@@ -15034,10 +15073,6 @@ zh:
       delete_wiki: 删除
       labels: 
         front_page: 首页
-      page_locked: 此页面已锁定
-      page_locked_by_modules: "此页面将在您完成这些单元后可用:"
-      page_locked_by_modules_until: "此页面将在 %{lock_info.unlock_at} 可用，如果您已经完成这些单元:"
-      page_locked_until: "此页面将在 %{lock_info.unlock_at} 可用"
       published_indicator: 已发布
       toolbar_menu: 
         settings: 设置
@@ -15107,6 +15142,7 @@ zh:
       title_too_long: "标题不能超过 %{max_characters} 个字符"
     unknown_user_name: 未知
   wiki_page_6c11ee20: 维基页面
+  wiki_page_menu_4a17fe3e: Wiki页面菜单
   wiki_pages: 
     edit: 
       page_header_title: "编辑 %{page_name}"
@@ -15157,6 +15193,8 @@ zh:
   would_you_like_to_enable_this_app_ccdf735d: 是否要启用此应用程序？
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: 您要让学生继续学习该课程，还是希望重新锁定这些单元，直到新要求设定完毕？
   xml_configuration_5ea1b942: "XML 配置"
+  yellow_4cf93785: 黄色
+  yo_e4ee15a4: Yo
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "您使用来自 %{institution2} 的凭据登录到 %{institution1}"
   you_are_subscribed_and_will_be_notified_of_new_com_60b5b62b: 您接受订阅，新的评论将通报。点击退订。
   you_are_the_group_leader_for_this_group_b8629b70: 您是此组的组长
@@ -15165,6 +15203,7 @@ zh:
   you_can_disable_this_feature_d5e61373: 您可以禁用此功能
   you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: 您可以隐藏或显示课程的作业，方法是将其切换为打开或关闭。
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: 您现在可以为已经参加测验的学生设置重新评分选项。
+  you_can_try_to_log_in_again_2b23ef0f: 您可以尝试*再次登录*。
   you_have_changed_the_progression_requirements_for__6772bc89: 您已更改某个活动课程的进度要求。可能有些学生的进度已达到此单元以及依赖此单元的其他单元。
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*您已对此测验中的问题进行了更改。* 这些更改将不会对学生显示，直到您保存测验。"
   you_have_no_outcomes_click_here_to_create_one_ebf262a3: "您没有结果。*单击此处* 创建一个结果。"
@@ -15181,7 +15220,7 @@ zh:
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "您的作业列表现在可以在 *日历* 页面上找到。"
   your_assignments_list_has_improved_3eded80e: "您的 *作业* 列表已改进！"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: 您的作业将显示在此处，按到期日期列出。
-  your_browser_does_not_meet_the_minimum_requirement_7a7022db: "您的浏览器不符合 Canvas 的最低要求。请访问 *Canvas 指南* 查看受支持浏览器的完整列表。"
+  your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: 您的浏览器不符合Canvas的最低要求。请访问*Canvas社区*查看支持浏览器的完整列表。
   your_content_has_been_exported_bbb57764: 您的内容已被导出。
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: 您的文件正被上传到评分册。您可以在任何时候离开这个页面。如果您有一个大的CSV文件，您的更改可能需要几分钟来更新。为了避免覆盖任何数据，请确认上载完成与您的评分册是正确才进行任何另外的更改。
   your_message_has_been_sent_thank_you_e0284316: 您的消息已发送。谢谢！

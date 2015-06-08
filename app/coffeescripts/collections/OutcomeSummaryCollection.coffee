@@ -8,8 +8,7 @@ define [
   'compiled/collections/PaginatedCollection'
   'compiled/collections/WrappedCollection'
   'compiled/util/natcompare'
-  'timezone'
-], ($, _, {Collection}, Section, Group, Outcome, PaginatedCollection, WrappedCollection, natcompare, tz) ->
+], ($, _, {Collection}, Section, Group, Outcome, PaginatedCollection, WrappedCollection, natcompare) ->
   class GroupCollection extends PaginatedCollection
     @optionProperty 'course_id'
     model: Group
@@ -25,20 +24,6 @@ define [
     key: 'rollups'
     url: -> "/api/v1/courses/#{@course_id}/outcome_rollups?user_ids[]=#{@user_id}"
 
-  class ResultCollection extends WrappedCollection
-    @optionProperty 'course_id'
-    @optionProperty 'user_id'
-    key: 'outcome_results'
-    url: -> "/api/v1/courses/#{@course_id}/outcome_results?user_ids[]=#{@user_id}"
-
-    scoresFor: (outcome) ->
-      @chain().map((result) ->
-        if result.get('links').learning_outcome == outcome.id
-          assessed_at: tz.parse(result.get('submitted_or_assessed_at'))
-          score: result.get('score')
-      ).compact().value()
-
-
   class OutcomeSummaryCollection extends Collection
     @optionProperty 'course_id'
     @optionProperty 'user_id'
@@ -50,7 +35,6 @@ define [
       @rawCollections =
         groups: new GroupCollection([], course_id: @course_id)
         links: new LinkCollection([], course_id: @course_id)
-        results: new ResultCollection([], course_id: @course_id, user_id: @user_id)
         rollups: new RollupCollection([], course_id: @course_id, user_id: @user_id)
       @outcomeCache = new Collection()
 
@@ -73,7 +57,6 @@ define [
         parent = @rawCollections.groups.get(link.get('outcome_group').id)
         rollup = rollups[outcome.id]
         outcome.set('score', rollup?.score)
-        outcome.set('scores', @rawCollections.results.scoresFor(outcome))
         outcome.set('result_title', rollup?.title)
         outcome.set('submission_time', rollup?.submitted_at)
         outcome.set('count', rollup?.count || 0)

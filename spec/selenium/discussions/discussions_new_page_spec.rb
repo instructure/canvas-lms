@@ -63,14 +63,20 @@ describe "discussions" do
           due_at1 = Time.zone.now + 3.days
           due_at2 = Time.zone.now + 4.days
 
-          click_option('.due-date-row:first select', default_section.name)
-          fj('.due-date-overrides:first [name="due_at"]').send_keys(due_at1.strftime('%b %-d, %y'))
+          fj('.ic-tokeninput-input:first').send_keys(default_section.name)
+          wait_for_ajaximations
+          fj(".ic-tokeninput-option:visible:first").click
+          wait_for_ajaximations
+          fj(".datePickerDateField[data-date-type='due_at']:first").send_keys(due_at1.strftime('%b %-d, %y'))
 
           f('#add_due_date').click
           wait_for_ajaximations
 
-          click_option('.due-date-row:last select', new_section.name)
-          ff('.due-date-overrides [name="due_at"]')[1].send_keys(due_at2.strftime('%b %-d, %y'))
+          fj('.ic-tokeninput-input:last').send_keys(new_section.name)
+          wait_for_ajaximations
+          fj(".ic-tokeninput-option:visible:first").click
+          wait_for_ajaximations
+          fj(".datePickerDateField[data-date-type='due_at']:last").send_keys(due_at2.strftime('%b %-d, %y'))
 
           expect_new_page_load { f('.form-actions button[type=submit]').click }
           topic = DiscussionTopic.last

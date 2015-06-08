@@ -83,6 +83,11 @@ class CollaborationsController < ApplicationController
 
     @google_docs_authorized = !@google_drive_upgrade && safe_token_valid.call(:google_service_connection)
 
+    @sunsetting_etherpad = EtherpadCollaboration.config.try(:[], :domain) == "etherpad.instructure.com/p"
+    @has_etherpad_collaborations = @collaborations.any? {|c| c.collaboration_type == 'EtherPad'}
+    @etherpad_only = Collaboration.collaboration_types.length == 1 &&
+                     Collaboration.collaboration_types[0]['type'] == "etherpad"
+    @hide_create_ui = @sunsetting_etherpad && @etherpad_only
     js_env :TITLE_MAX_LEN => Collaboration::TITLE_MAX_LENGTH,
            :CAN_MANAGE_GROUPS => @context.grants_right?(@current_user, session, :manage_groups),
            :collaboration_types => Collaboration.collaboration_types

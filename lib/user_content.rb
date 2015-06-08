@@ -82,7 +82,7 @@ module UserContent
       # no value, non-numeric value, or 0 value (whether "0", "0px", "0%",
       # etc.); ignore
       nil
-    elsif val == "#{val.to_f.to_s}%" || val == "#{val.to_f.to_s}px"
+    elsif val == "#{val.to_f}%" || val == "#{val.to_f}px"
       # numeric percentage or specific px value; use as is
       val
     elsif val.to_f.to_s == val

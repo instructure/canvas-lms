@@ -697,7 +697,7 @@ class AccountsController < ApplicationController
       if @account.grants_right?(@current_user, :read_roster)
         @recently_logged_users = @account.all_users.recently_logged_in
       end
-      @counts_report = @account.report_snapshots.detailed.last.try(:data)
+      @counts_report = @account.report_snapshots.detailed.order(:created_at).last.try(:data)
     end
   end
 
@@ -814,7 +814,7 @@ class AccountsController < ApplicationController
     # This needs to be publicly available since external SAML
     # servers need to be able to access it without being authenticated.
     # It is used to disclose our SAML configuration settings.
-    settings = AccountAuthorizationConfig.saml_settings_for_account(@domain_root_account, request.host_with_port)
+    settings = AccountAuthorizationConfig::SAML.saml_settings_for_account(@domain_root_account, request.host_with_port)
     render :xml => Onelogin::Saml::MetaData.create(settings)
   end
 

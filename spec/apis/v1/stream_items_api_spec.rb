@@ -392,7 +392,6 @@ describe UsersController, type: :request do
       'html_url' => "http://www.example.com/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}",
       'workflow_state' => 'unsubmitted',
       'late' => false,
-
       'assignment' => assign_json,
       'assignment_id' => @assignment.id,
       'attempt' => nil,

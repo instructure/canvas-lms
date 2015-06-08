@@ -50,4 +50,37 @@ describe CanvasPartman::PartitionManager do
       end
     end
   end
+
+  describe "#ensure_partitions" do
+    it "should create the proper number of partitions" do
+      expect(subject).to receive(:partition_exists?).at_least(:once).and_return(false)
+      expect(Time).to receive(:now).and_return(Time.utc(2015, 05, 02))
+      expect(subject).to receive(:create_partition).with(Time.utc(2015, 05, 01))
+      expect(subject).to receive(:create_partition).with(Time.utc(2015, 06, 01))
+
+      subject.ensure_partitions(1)
+    end
+  end
+
+  describe "#prune_partitions" do
+    it "should prune the proper number of partitions" do
+      expect(Time).to receive(:now).and_return(Time.utc(2015, 05, 02))
+      expect(subject).to receive(:partition_tables).and_return(%w{
+        partman_animals_2014_9
+        partman_animals_2014_10
+        partman_animals_2014_11
+        partman_animals_2014_12
+        partman_animals_2015_1
+        partman_animals_2015_2
+        partman_animals_2015_3
+        partman_animals_2015_4
+        partman_animals_2015_5
+        partman_animals_2015_6
+      })
+
+      expect(subject.base_class.connection).to receive(:drop_table).with('partman_animals_2014_9')
+      expect(subject.base_class.connection).to receive(:drop_table).with('partman_animals_2014_10')
+      subject.prune_partitions(6)
+    end
+  end
 end

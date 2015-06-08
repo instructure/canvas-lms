@@ -46,6 +46,7 @@ $ic-brand-primary:                  #0096db !default; // light blue
 @if $use_high_contrast { $ic-brand-primary: #0073ac; }
 
 $ic-brand-secondary:                #5b6c79 !default; // dark blue
+@if $use_new_styles { $ic-brand-secondary: #384a58; }
 @if $use_high_contrast { $ic-brand-secondary: #343c44; }
 
 $ic-color-success:                  #008a14; // green
@@ -78,6 +79,20 @@ $gray:                   lighten(#000, 33.5%); // #555
 $gray-light:             lighten(#000, 60%);   // #999
 $gray-lighter:           lighten(#000, 93.5%); // #eee
 
+//==================
+// Layout Variables
+//==================
+$right_side_width:          286px;
+$right_side_margin:         13px;
+$left_side_width:           175px;
+$min_main_width:            510px;
+$max_main_width:            1100px;
+$ic-sp:                     12px;
+$ic-border-radius:          $ic-sp/2;
+$spacing-width:             20px; // TODO - would be nice to phase this one out for $ic-sp
+$borderRadius:              4px;
+$contentBoxPadding:         8px;
+
 //============================
 // Layout Functional Variables
 //============================
@@ -85,6 +100,8 @@ $ic-body-background-color:      lighten($ic-color-neutral, 4);
 $ic-content-background-color:   $ic-color-light;
 $ic-content-padding:            15px;
 $ic-header-background:          $ic-brand-secondary;
+$ic-header-primary-width:       $ic-sp*8;
+$ic-header-primary-expanded-width: $ic-sp*15;
 
 //============================
 // List Functional Variables
@@ -198,20 +215,6 @@ $iconWhiteSpritePath: $iconSpritePath !default;
 // We will be phasing these out
 @import 'vendor/bootstrap/variables';
 @import 'vendor/jqueryui/variables';
-
-//==================
-// Layout Variables
-//==================
-$right_side_width:          286px;
-$right_side_margin:         13px;
-$left_side_width:           175px;
-$min_main_width:            510px;
-$max_main_width:            1100px;
-$ic-sp:                     12px;
-$ic-border-radius:          $ic-sp/2;
-$spacing-width:             20px; // TODO - would be nice to phase this one out for $ic-sp
-$borderRadius:              4px;
-$contentBoxPadding:         8px;
 
 //==============================
 // Legacy Global Color Variables - DO NOT USE

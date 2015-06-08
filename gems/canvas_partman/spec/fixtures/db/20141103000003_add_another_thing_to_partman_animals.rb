@@ -3,7 +3,6 @@ module CanvasPartmanTest
 end
 
 class AddAnotherThingToPartmanAnimals < CanvasPartman::Migration
-  self.master_table = 'partman_animals'
   self.base_class = CanvasPartmanTest::AnimalAlias
 
   def self.up

@@ -59,7 +59,7 @@ module BroadcastPolicy
     def broadcast_notifications
       return if @broadcasted
       @broadcasted = true
-      raise ArgumentError, "Broadcast Policy block not supplied for #{self.class.to_s}" unless self.class.broadcast_policy_list
+      raise ArgumentError, "Broadcast Policy block not supplied for #{self.class}" unless self.class.broadcast_policy_list
       self.class.broadcast_policy_list.broadcast(self)
     end
 

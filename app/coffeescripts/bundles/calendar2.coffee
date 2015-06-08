@@ -22,6 +22,7 @@ require [
     viewStart:     ENV.CALENDAR.VIEW_START
     showScheduler: ENV.CALENDAR.SHOW_SCHEDULER
     header:        @header
+    userId:        ENV.current_user_id
     )
   new MiniCalendar("#minical", @calendar)
   new UndatedEventsList("#undated-events", @eventDataSource, @calendar)
@@ -46,4 +47,4 @@ require [
 
 
 
-  
+

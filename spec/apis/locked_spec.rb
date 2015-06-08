@@ -36,7 +36,7 @@ shared_examples_for 'a locked api item' do
     lock_info = json['lock_info']
     expect(lock_info).not_to be_nil, 'expected lock_info to be present'
     expect(lock_info['asset_string']).not_to be_nil, "expected lock_info to contain 'asset_string'"
-    lock_info_extra.each { |attribute| expect(lock_info[attribute.to_s]).not_to be_nil, "expected lock_info to contain '#{attribute.to_s}'" }
+    lock_info_extra.each { |attribute| expect(lock_info[attribute.to_s]).not_to be_nil, "expected lock_info to contain '#{attribute}'" }
   end
 
   before(:once) do

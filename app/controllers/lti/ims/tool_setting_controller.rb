@@ -45,7 +45,7 @@ module Lti
         if %w(all distinct).include?(bubble)
           graph = []
           distinct = bubble == 'distinct' ? [] : nil
-          while tool_setting do
+          while tool_setting
             graph << collect_tool_settings(tool_setting, distinct)
             distinct |= graph.last.custom.keys if distinct
             case tool_setting_type(tool_setting)
@@ -64,7 +64,7 @@ module Lti
           elsif bubble == 'distinct' && request.headers['accept'].include?('application/vnd.ims.lti.v2.toolsettings.simple+json')
             @content_type = 'application/vnd.ims.lti.v2.toolsettings.simple+json'
             custom = {}
-            graph.reverse.each { |tool_setting| custom.merge!(tool_setting.custom) }
+            graph.reverse_each { |tool_setting| custom.merge!(tool_setting.custom) }
             custom
           end
         else

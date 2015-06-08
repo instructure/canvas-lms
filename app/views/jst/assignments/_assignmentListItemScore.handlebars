@@ -5,12 +5,12 @@
       {{#with submission}}
         {{#if notYetGraded}}
 
-          <span class="score-display span5 text-right ellipsis">
+          <span class="score-display text-right ellipsis">
           {{#t "empty_points_possible"}}
           -/{{pointsPossible}} pts
           {{/t}}
           </span>
-          <span class="grade-display span6 text-left ellipsis">
+          <span class="grade-display text-left ellipsis">
           {{#t "not_yet_graded"}}
             <em>Not Yet Graded</em>
           {{/t}}
@@ -18,12 +18,12 @@
 
         {{else}}
 
-          <span class="score-display span5 text-right ellipsis">
+          <span class="score-display text-right ellipsis">
               {{#t "score_with_points_possible"}}
               <b>{{score}}</b>/{{pointsPossible}} pts
               {{/t}}
           </span>
-          <span class="grade-display span6 text-left ellipsis">
+          <span class="grade-display text-left ellipsis">
             <strong>
               {{gradeDisplay}}
             </strong>
@@ -34,7 +34,7 @@
 
     {{else}}
 
-      <span data-tooltip="" class="span5 score-display ellipsis text-right" title='{{#t "no_submission"}}No Submission{{/t}}'>
+      <span data-tooltip="" class="score-display ellipsis text-right" title='{{#t "no_submission"}}No Submission{{/t}}'>
         {{#t "empty_points_possible"}}
         -/{{pointsPossible}} pts
         {{/t}}

@@ -15,7 +15,7 @@ class EmberBundle
     @paths = files.map { |file| parse_require_path(file) }
     @objects = files.map { |file| parse_object_name(file) }
     @assigns = @objects.map { |object| "#{object}: #{object}" }.join("\n    ")
-    if File.exists?("#{@root}/config/routes.coffee")
+    if File.exist?("#{@root}/config/routes.coffee")
       @routes = "
   App.initializer
     name: 'routes'

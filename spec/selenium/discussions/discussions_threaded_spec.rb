@@ -78,6 +78,7 @@ describe "threaded discussions" do
     replied_at = f('.discussion-pubdate.hide-if-collapsed > time').attribute("data-html-tooltip-title")
 
     edit_entry(reply, "Reply edited")
+    reply.reload
     edited_at = (reply[:updated_at].to_time.strftime('%b %-d at %-l:%M') << reply[:updated_at].to_time.strftime('%p').downcase).to_s
     displayed_edited_at = f('.discussion-fyi').text
 

@@ -23,11 +23,11 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
     end
 
     events_data = [{
-      "created_at" => Time.now.iso8601,
+      "client_timestamp" => Time.zone.now.iso8601,
       "event_type" => "question_answered",
       "event_data" => {"question_id"=>1, "answer"=>"1"}
     }, {
-      "created_at" => Time.now.iso8601,
+      "client_timestamp" => Time.zone.now.iso8601,
       "event_type" => "question_flagged",
       "event_data" => {"question_id"=>2, "flagged"=>true}
     }]
@@ -73,6 +73,22 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
           question_id: '1',
           answer: '1'
         }.as_json)
+      end
+    end
+    it "should store both client_timestamp and created_at" do
+      scope = Quizzes::QuizSubmissionEvent
+
+      @quiz_submission = @quiz.quiz_submissions.last
+      @user = User.find @quiz_submission.user_id
+
+      expect(scope.count).to eq 0
+      api_create({raw:true}, {"quiz_submission_events" => events_data })
+      expect(scope.count).to eq 2
+
+      scope.where(event_type: 'question_answered').first.tap do |event|
+        expect(event.client_timestamp == events_data.first["client_timestamp"]).to be_truthy
+        expect(event.created_at != events_data.first["client_timestamp"]).to be_truthy
+        expect(event.created_at).to be_within(100).of(Time.zone.now)
       end
     end
   end

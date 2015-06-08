@@ -232,11 +232,16 @@ class GradebooksController < ApplicationController
       :change_gradebook_version_url => context_url(@context, :change_gradebook_version_context_gradebook_url, :version => 2),
       :export_gradebook_csv_url => course_gradebook_csv_url,
       :gradebook_csv_progress => @last_exported_gradebook_csv.try(:progress),
+      :attachment_url => @last_exported_gradebook_csv.try(:attachment).try(:download_url),
       :attachment => @last_exported_gradebook_csv.try(:attachment),
       :sis_app_url => Setting.get('sis_app_url', nil),
       :sis_app_token => Setting.get('sis_app_token', nil),
       :post_grades_feature_enabled => @context.feature_enabled?(:post_grades),
-      :list_students_by_sortable_name_enabled => @context.feature_enabled?(:gradebook_list_students_by_sortable_name)
+      :list_students_by_sortable_name_enabled => @context.feature_enabled?(:gradebook_list_students_by_sortable_name),
+      :gradebook_column_size_settings => @current_user.preferences[:gradebook_column_size],
+      :gradebook_column_size_settings_url => change_gradebook_column_size_course_gradebook_url,
+      :gradebook_column_order_settings => @current_user.preferences[:gradebook_column_order].try(:[], @context.id),
+      :gradebook_column_order_settings_url => save_gradebook_column_order_course_gradebook_url
     }
   end
 
@@ -403,6 +408,30 @@ class GradebooksController < ApplicationController
 
   def blank_submission
     @headers = false
+  end
+
+  def change_gradebook_column_size
+    if authorized_action(@context, @current_user, :manage_grades)
+      unless @current_user.preferences.key?(:gradebook_column_size)
+        @current_user.preferences[:gradebook_column_size] = {}
+      end
+
+      @current_user.preferences[:gradebook_column_size][params[:column_id]] = params[:column_size]
+      @current_user.save!
+      render json: nil
+    end
+  end
+
+  def save_gradebook_column_order
+    if authorized_action(@context, @current_user, :manage_grades)
+      unless @current_user.preferences.key?(:gradebook_column_order)
+        @current_user.preferences[:gradebook_column_order] = {}
+      end
+
+      @current_user.preferences[:gradebook_column_order][@context.id] = params[:column_order]
+      @current_user.save!
+      render json: nil
+    end
   end
 
   def change_gradebook_version

@@ -41,7 +41,8 @@ module.exports = React.createClass({
       autocomplete: 'both',
       onInput: k,
       onSelect: k,
-      value: null
+      value: null,
+      showListOnFocus: false
     };
   },
 
@@ -146,6 +147,20 @@ module.exports = React.createClass({
     }.bind(this));
   },
 
+  handleInputFocus: function() {
+    this.maybeShowList();
+  },
+
+  handleInputClick: function() {
+    this.maybeShowList();
+  },
+
+  maybeShowList: function(){
+    if (this.props.showListOnFocus){
+      this.showList()
+    }
+  },
+
   handleInputBlur: function() {
     var focusedAnOption = this.state.focusedIndex != null;
     if (focusedAnOption)
@@ -158,6 +173,7 @@ module.exports = React.createClass({
     // don't want to hide the list if we focused another option
     this.blurTimer = setTimeout(this.hideList, 0);
   },
+
 
   handleOptionFocus: function() {
     // see `handleOptionBlur`
@@ -186,7 +202,10 @@ module.exports = React.createClass({
   },
 
   hideList: function() {
-    this.setState({isOpen: false});
+    this.setState({
+      isOpen: false,
+      focusedIndex: null
+    });
   },
 
   hideOnEscape: function(event) {
@@ -368,6 +387,8 @@ module.exports = React.createClass({
         'aria-owns': this.state.listId,
         id: this.props.id,
         className: 'ic-tokeninput-input',
+        onFocus: this.handleInputFocus,
+        onClick: this.handleInputClick,
         onChange: this.handleInputChange,
         onBlur: this.handleInputBlur,
         onKeyDown: this.handleKeydown,

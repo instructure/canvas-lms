@@ -113,6 +113,14 @@ define [
       dateGroups = @get("all_dates")
       dateGroups && dateGroups.length > 1
 
+    nonBaseDates: =>
+      dateGroups = @get("all_dates")
+      return false unless dateGroups
+      withouBase = _.filter(dateGroups, (dateGroup) ->
+        dateGroup && !dateGroup.get("base")
+      )
+      withouBase.length > 0
+
     allDates: =>
       groups = @get("all_dates")
       models = (groups and groups.models) or []
@@ -127,7 +135,7 @@ define [
 
     toView: =>
       fields = [
-        'htmlUrl', 'multipleDueDates', 'allDates', 'dueAt', 'lockAt', 'unlockAt', 'singleSectionDueDate'
+        'htmlUrl', 'multipleDueDates', 'nonBaseDates', 'allDates', 'dueAt', 'lockAt', 'unlockAt', 'singleSectionDueDate'
       ]
       hash = id: @get 'id'
       for field in fields

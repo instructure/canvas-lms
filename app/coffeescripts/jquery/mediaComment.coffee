@@ -77,7 +77,6 @@ define [
   # enable the playback speed selector
   mejs.MepDefaults.features.splice(positionAfterSubtitleSelector, 0, 'speed')
 
-
   getSourcesAndTracks = (id) ->
     dfd = new $.Deferred
     $.getJSON "/media_objects/#{id}/info", (data) ->
@@ -133,22 +132,25 @@ define [
       $holder = $(this).closest('.instructure_file_link_holder').andSelf().first()
       $holder.text I18n.t('loading', 'Loading media...')
 
-      showInline = (id) ->
-        width = Math.min ($holder.closest("div,p,table").width() || VIDEO_WIDTH), VIDEO_WIDTH
+      showInline = (id, holder) ->
+        width = Math.min (holder.closest("div,p,table").width() || VIDEO_WIDTH), VIDEO_WIDTH
         height = Math.round width / 336 * 240
         getSourcesAndTracks(id).done (sourcesAndTracks) ->
           if sourcesAndTracks.sources.length
             mediaPlayerOptions =
-               can_add_captions: sourcesAndTracks.can_add_captions
-               mediaCommentId: id
-               googleAnalyticsTitle: id
+              can_add_captions: sourcesAndTracks.can_add_captions
+              mediaCommentId: id
+              googleAnalyticsTitle: id
+              success: (media)->
+                holder.focus()
+                media.play()
 
             $mediaTag = createMediaTag({sourcesAndTracks, mediaPlayerOptions, mediaType, height, width})
-            $mediaTag.appendTo($holder.html(''))
+            $mediaTag.appendTo(holder.html(''))
             player = new MediaElementPlayer $mediaTag, mediaPlayerOptions
             $mediaTag.data('mediaelementplayer', player)
           else
-            $holder.text I18n.t('media_still_converting', 'Media is currently being converted, please try again in a little bit.')
+            holder.text I18n.t('media_still_converting', 'Media is currently being converted, please try again in a little bit.')
 
       if id is 'maybe'
         detailsUrl = downloadUrl.replace /\/download.*/, ""
@@ -157,32 +159,48 @@ define [
         onSuccess = (data) ->
           if data.attachment?.media_entry_id isnt 'maybe'
             $holder.text ''
-            showInline data.attachment.media_entry_id
+            showInline(data.attachment.media_entry_id, $holder)
           else
             onError()
         $.ajaxJSON detailsUrl, 'GET', {}, onSuccess, onError
       else
-        showInline(id)
+        showInline(id, $holder)
 
     show: (id, mediaType) ->
+      # if a media comment is still open, close it.
+      $(".play_media_comment").find('.ui-dialog-titlebar-close').click()
+
       $this = $(this)
+
       if dialog = $this.data('media_comment_dialog')
         dialog.dialog('open')
       else
         # Create a dialog box
-        spaceNeededForControls = 35
         mediaType = mediaType || 'video'
-        height = if mediaType is'video' then 426 else 180
-        width = if mediaType is 'video' then VIDEO_WIDTH else 400
+
+        if mediaType is 'video'
+          height = 426
+          width  = VIDEO_WIDTH
+        else
+          height = 180
+          width  = 400
+
         $dialog = $('<div style="overflow: hidden; padding: 0;" />')
         $dialog.css('padding-top', '120px') if mediaType is 'audio'
+
         $dialog.dialog
+          dialogClass: "play_media_comment"
           title: I18n.t('titles.play_comment', "Play Media Comment")
           width: width
           height: height
           modal: false
           resizable: false
-          close: -> $this.data('mediaelementplayer').pause()
+          close: ->
+            $mediaPlayer = $this.data('mediaelementplayer')
+            $mediaPlayer.pause() if $mediaPlayer
+          open: (ev) -> $(ev.currentTarget).parent()
+                          .find('.ui-dialog-titlebar-close')
+                          .focus()
 
         # Populate dialog box with a video
         $dialog.disableWhileLoading getSourcesAndTracks(id).done (sourcesAndTracks) ->
@@ -192,6 +210,7 @@ define [
               mediaCommentId: id
               googleAnalyticsTitle: id
 
+            spaceNeededForControls = 35
             $mediaTag = createMediaTag({sourcesAndTracks, mediaPlayerOptions, mediaType, height: height-spaceNeededForControls, width})
             $mediaTag.appendTo($dialog.html(''))
 

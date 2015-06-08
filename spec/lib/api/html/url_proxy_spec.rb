@@ -35,7 +35,7 @@ module Api
 
       private
       def as_url(base, options={})
-        base_url = "#{options.delete(:protocol)}://#{options.delete(:host)}/#{base.to_s}"
+        base_url = "#{options.delete(:protocol)}://#{options.delete(:host)}/#{base}"
         "#{base_url}?#{options.map{|k,v| "#{k}=#{v}"}.join("&")}"
       end
     end

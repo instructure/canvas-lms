@@ -86,6 +86,54 @@ describe "scheduler" do
       expect(f('.fc-event:nth-child(3)')).to include_text "Available"
     end
 
+    it "should allow other users to fill up available timeslots" do
+      tomorrow = Time.zone.today.advance(days: 1).to_s
+      create_appointment_group(:max_appointments_per_participant => 1,
+                               :min_appointments_per_participant => 1,
+                               :participants_per_appointment => 2,
+                               :new_appointments => [
+                                 [tomorrow + ' 12:00:00', tomorrow + ' 13:00:00'],
+                                 [tomorrow + ' 14:00:00', tomorrow + ' 15:00:00']
+                               ])
+
+      # create some users to work with
+      @student1, @student2, @student3 = create_users_in_course(@course, 3, return_type: :record)
+
+      # first student grabs first seat in first timeslot
+      user_session @student1
+      @user = @student1
+
+      get "/calendar2"
+      click_scheduler_link
+      click_appointment_link
+      reserve_appointment_manual(0)
+
+      # second student grabs second seat in first timeslot
+      user_session @student2
+      @user = @student2
+
+      get "/calendar2"
+      click_scheduler_link
+      click_appointment_link
+      reserve_appointment_manual(0)
+
+      # third student should see second timeslot as available
+      user_session @student3
+      @user = @student3
+
+      # signup link should still show up
+      get "/calendar2"
+      click_scheduler_link
+      requiring_action = ff('.requiring-action')
+      expect(requiring_action).to_not be_empty
+
+      # first slot full, but second available
+      click_appointment_link
+      e1, e2 = ff('.fc-event')
+      expect(e1).to include_text "Filled"
+      expect(e2).to include_text "Available"
+    end
+
     it "should not allow me to cancel reservations from the attendees list" do
       create_appointment_group
       ag = AppointmentGroup.first

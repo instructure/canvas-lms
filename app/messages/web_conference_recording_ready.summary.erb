@@ -1,0 +1,9 @@
+<% define_content :link do %>
+  <%= polymorphic_url([asset.context, :conferences]) %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t :subject, "Web Conference Recording Ready: %{name}", :name => asset.context.name %>
+<% end %>
+
+<%= t :body, "Your recording of %{title} for %{name} is ready.", :title => asset.title, :name => asset.context.name %>

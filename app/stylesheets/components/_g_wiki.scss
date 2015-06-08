@@ -3,21 +3,45 @@
 
 $subdued-text-color: #696969;
 $darkened-text-color: #4d4d4d;
-$published-text-color: #33802a;
-$unpublished-text-color: $subdued-text-color;
+@if $use_new_styles {
+  $published-text-color: $ic-color-success;
+  $unpublished-text-color: $ic-font-color--subdued;
+  $published-icon-color: $ic-color-success;
+  $unpublished-icon-color: $ic-font-color--subdued;
+}
+@else {
+  $published-text-color: #33802a;
+  $unpublished-text-color: $subdued-text-color;
+  $published-icon-color: #33802a;
+  $unpublished-icon-color: #b4b7ba;
+}
 
-$published-icon-color: #33802a;
-$unpublished-icon-color: #b4b7ba;
 
-$border-color: #c1c7cf;
-$border-radius: 3px;
+@if $use_new_styles { $border-color: $ic-border-light; }
+@else { $border-color: #c1c7cf; }
 
-$pages-border: 1px solid #c1c7cf;
-$pages-dashed-border: 1px dashed #c1c7cf;
-$pages-inner-border: 1px solid #e1e3e4;
+@if $use_new_styles { $border-radius: $baseBorderRadius; }
+@else { $border-radius: 3px; }
 
-$index-background: #e8ecef;
-$item-background: #ffffff;
+@if $use_new_styles {
+  $pages-border: 1px solid $ic-border-light;
+  $pages-dashed-border: 1px dashed $ic-border-light;
+  $pages-inner-border: 1px solid $ic-border-light;
+}
+@else {
+  $pages-border: 1px solid #c1c7cf;
+  $pages-dashed-border: 1px dashed #c1c7cf;
+  $pages-inner-border: 1px solid #e1e3e4;  
+}
+
+@if $use_new_styles {
+  $index-background: $ic-color-light;
+  $item-background: $lightBackground;
+}
+@else {
+  $index-background: #e8ecef;
+  $item-background: #ffffff;  
+}
 
 $shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
 $table-shadow: 0 1px 0 #dde0e4;
@@ -51,9 +75,11 @@ $revision-button-hover-color: $ic-brand-primary;
   margin-right: $right_side_width + 1px;
 }
 
-.pages:not(.revisions) {
-  #breadcrumbs {
-    border-bottom: $pages-border;
+@if $use_new_styles == false {
+  .pages:not(.revisions) {
+    #breadcrumbs {
+      border-bottom: $pages-border;
+    }
   }
 }
 
@@ -88,8 +114,8 @@ $revision-button-hover-color: $ic-brand-primary;
       .page-changed-alert .alert {
         border-radius: 0;
       }
-      .header-bar {
-        box-shadow: $shadow;
+      @if $use_new_styles == false {
+        .header-bar { box-shadow: $shadow; }
       }
       .header-left-flex {
         flex: 1;
@@ -128,8 +154,8 @@ $revision-button-hover-color: $ic-brand-primary;
 }
 
 .pages.index {
-  #main {
-    background: $index-background;
+  @if $use_new_styles == false {
+    #main { background: $index-background; }
   }
   .index-content-container {
     margin-top: 1px;
@@ -150,7 +176,7 @@ $revision-button-hover-color: $ic-brand-primary;
     }
   }
   .index-content {
-    padding: 0 1em 1em;
+    @if $use_new_styles == false { padding: 0 1em 1em; }
     .table {
       margin-bottom: 0;
       border-collapse: separate;
@@ -194,6 +220,7 @@ $revision-button-hover-color: $ic-brand-primary;
       }
       th {
         vertical-align: middle;
+        @if $use_new_styles { font-weight: 500; }
       }
     }
     .table tbody {
@@ -203,8 +230,8 @@ $revision-button-hover-color: $ic-brand-primary;
       .front-page {
         margin: auto 0.5em;
       }
-      .al-trigger {
-        color: $ic-icon-link-color;
+      @if $use_new_styles == false {
+        .al-trigger { color: $ic-icon-link-color; }
       }
       tr {
         background: $item-background;
@@ -236,7 +263,7 @@ $revision-button-hover-color: $ic-brand-primary;
       tr:last-child {
         td {
           border-bottom: $pages-border;
-          box-shadow: $table-shadow;
+          @if $use_new_styles == false { box-shadow: $table-shadow; }
         }
         td:first-child {
           border-bottom-left-radius: $border-radius;
@@ -249,10 +276,15 @@ $revision-button-hover-color: $ic-brand-primary;
         font-size: 11px;
         color: $subdued-text-color;
         border-top: $pages-inner-border;
+        @if $use_new_styles { 
+          vertical-align: middle;
+          line-height: 1.5;
+        }
         .wiki-page-link {
           font-size: 13px;
-          font-weight: bold;
           color: $darkened-text-color;
+          @if $use_new_styles { font-weight: 500; }
+          @else { font-weight: bold; }
         }
         .wiki-page-link.published {
           color: $published-text-color;
@@ -325,7 +357,11 @@ $revision-button-hover-color: $ic-brand-primary;
     margin: 4px 0 6px 25px;
   }
   .show-content {
-    padding: 15px 25px;
+    @if $use_new_styles {
+      padding: 0 $ic-sp;
+      @include breakpoint(desktop) { padding: 0 $ic-sp*3 0 $ic-sp*2; } 
+    }
+    @else { padding: 15px 25px; }
   }
   .floating_links {
     margin-right: 15px;
@@ -387,34 +423,77 @@ $revision-button-hover-color: $ic-brand-primary;
 .pages.show.revisions {
   #wiki_page_revisions {
     position: relative;
-    min-height: 502px;
+    @if $use_new_styles {
+      @include breakpoint(desktop) {
+        min-height: 502px;  
+      }
+    }
+    @else { min-height: 502px; }
   }
   .show-content {
-    float: left;
-    margin-right: $revision-sidebar-width + 1px;
+    @if $use_new_styles {
+      @include breakpoint(desktop) {
+        float: left;
+        margin-right: $revision-sidebar-width - 60px;
+      }
+      @include breakpoint(wide) { margin-right: $revision-sidebar-width; }
+    }
+    @else {
+      float: left;
+      margin-right: $revision-sidebar-width + 1px;
+    }
   }
   .show-revisions {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    width: $revision-sidebar-width;
-    background-color: $revision-sidebar-background-color;
-    aside {
-      width: $revision-sidebar-width;
-      position: fixed;
+    @if $use_new_styles {
+      border-bottom: 1px solid $ic-border-light;
+      @include breakpoint(desktop) {
+        border-bottom: none;
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: $revision-sidebar-width - 60px;
+        aside {
+          width: $revision-sidebar-width - 60px;
+          position: fixed;
+          padding-top: $ic-sp*2;
+        }
+      }
+      @include breakpoint(wide) { 
+        width: $revision-sidebar-width;
+        aside { width: $revision-sidebar-width; }
+      }  
     }
+    @else {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      width: $revision-sidebar-width;
+      background-color: $revision-sidebar-background-color;
+      aside {
+        width: $revision-sidebar-width;
+        position: fixed;
+      }
+    }
+    
     .revision-history {
-      text-transform: uppercase;
-      font-size: 14px;
-      font-weight: bold;
-      line-height: 40px;
-      padding: 4px 11px;
-      margin-top: -1px;
-      margin-left: -1px;
-      border-bottom: none;
-      color: $subdued-text-color;
       position: relative;
+      @if $use_new_styles {
+        font-weight: 500;
+        margin-bottom: $ic-sp;
+        font-size: 14px;
+      }
+      @else {
+        text-transform: uppercase;
+        font-size: 14px;
+        font-weight: bold;
+        line-height: 40px;
+        padding: 4px 11px;
+        margin-top: -1px;
+        margin-left: -1px;
+        border-bottom: none;
+        color: $subdued-text-color;  
+      }  
     }
     .revision-history .close-button {
       position: absolute;
@@ -435,39 +514,58 @@ $revision-button-hover-color: $ic-brand-primary;
       }
     }
     ul.revisions-list {
-      margin: 0 0 0 -1px;
-      height: 400px;
+      @if $use_new_styles {
+        margin: 0;
+        overflow-y: auto;
+      }
+      @else {
+        margin: 0 0 0 -1px;
+        height: 400px;
+      }
     }
   }
   .revision {
     list-style-type: none;
     overflow: hidden;
-    width: $revision-sidebar-width + 1px;
-    margin-top: -1px;
-    border-left: none;
-    border-right: none;
-    border-top: 1px solid transparent;
-    border-bottom: 1px solid transparent;
     // height and transitions
     height: 34px;
     transition: height 400ms;
+    
+    @if $use_new_styles {
+      border-left: 2px solid transparent;
+    }
+    @else {
+      width: $revision-sidebar-width + 1px;
+      margin-top: -1px;
+      border-left: none;
+      border-right: none;
+      border-top: 1px solid transparent;
+      border-bottom: 1px solid transparent;
+    }
+    
     &.selected, &.latest {
       height: 56px;
       transition: height 400ms;
     }
     .revision-content {
-      margin-left: 1px;
       padding: 7px 8px;
+      @if $use_new_styles { font-size: 12px; }
+      @else { margin-left: 1px; }
+
       .revision-details {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
       }
     }
-    &:not(.selected):hover .revision-content {
-      background-color: $revision-sidebar-hover-color;
-      cursor: pointer;
+    &:not(.selected):hover {
+      @if $use_new_styles { border-left-color: $ic-link-color; }
+      .revision-content {
+        cursor: pointer;
+        @if $use_new_styles == false { background-color: $revision-sidebar-hover-color; }
+      }
     }
+
     .revision-actions {
       margin-top: 2px;
       font-style: italic;
@@ -478,22 +576,37 @@ $revision-button-hover-color: $ic-brand-primary;
       cursor: pointer;
     }
     &.selected {
-      background-color: $revision-sidebar-selected-color;
+      @if $use_new_styles { 
+        border-left-color: $ic-link-color;
+        background: $ic-bg-light-primary; 
+      }
+      @else { background-color: $revision-sidebar-selected-color; }
     }
   }
   .revision-nav-buttons {
     position: relative;
-    padding: 0;
-    height: 40px;
-    margin-top: 14px;
-    border-top: $pages-inner-border;
+    @if $use_new_styles {
+      height: $ic-sp*3;
+    }
+    @else {
+      padding: 0;
+      height: 40px;
+      margin-top: 14px;
+      border-top: $pages-inner-border;  
+    }
+    
     a {
       user-select: none;
-      font-weight: bold;
-      font-size: 12px;
       text-transform: uppercase;
-      padding: 10px 10px;
-      color: $revision-button-color;
+      @if $use_new_styles {
+        font-weight: 500;
+      }
+      @else {
+        font-size: 12px;
+        font-weight: bold;
+        padding: 10px 10px;
+        color: $revision-button-color;
+      }
     }
     a:hover {
       text-decoration: none;
@@ -503,15 +616,27 @@ $revision-button-hover-color: $ic-brand-primary;
     }
     .prev-button {
       position: absolute;
-      left: 3px;
-      top: 3px;
-      padding: 7px 10px 7px 5px;
+      @if $use_new_styles {
+        left: 0;
+        top: 0
+      }
+      @else {
+        left: 3px;
+        top: 3px;
+        padding: 7px 10px 7px 5px;  
+      }
     }
     .next-button {
       position: absolute;
-      right: 3px;
-      top: 3px;
-      padding: 7px 5px 7px 10px;
+      @if $use_new_styles {
+        right: 0;
+        top: 0;
+      }
+      @else {
+        right: 3px;
+        top: 3px;
+        padding: 7px 5px 7px 10px;
+      }
     }
   }
 }

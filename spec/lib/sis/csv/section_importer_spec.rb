@@ -618,12 +618,14 @@ describe SIS::CSV::SectionImporter do
     def with_section(&block)
       CourseSection.where(root_account_id: @account, sis_source_id: 'S001').first.tap(&block)
     end
+
     def check_section_crosslisted(sis_id)
       with_section do |s|
         expect(s.course.sis_source_id).to eq sis_id
         expect(s.nonxlist_course.sis_source_id).to eq 'C001'
       end
     end
+
     def check_section_not_crosslisted
       with_section do |s|
         expect(s.course.sis_source_id).to eq 'C001'
@@ -689,12 +691,14 @@ describe SIS::CSV::SectionImporter do
     def with_section(&block)
       CourseSection.where(root_account_id: @account, sis_source_id: 'S001').first.tap(&block)
     end
+
     def check_section_crosslisted(sis_id)
       with_section do |s|
         expect(s.course.sis_source_id).to eq sis_id
         expect(s.nonxlist_course.sis_source_id).to eq 'C001'
       end
     end
+
     def check_section_not_crosslisted
       with_section do |s|
         expect(s.course.sis_source_id).to eq 'C001'

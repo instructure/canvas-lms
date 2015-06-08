@@ -57,6 +57,25 @@ describe ExternalToolsController do
         @course.save!
       end
 
+      it "should remove query params when post_only is set" do
+        user_session(@teacher)
+        tool = @tool
+        tool.settings['post_only'] = 'true'
+        tool.url = "http://www.example.com/basic_lti?first=john&last=smith"
+        tool.save!
+        get :show, course_id: @course.id, id: tool.id
+        expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti'
+      end
+
+      it "should not remove query params when post_only is not set" do
+        user_session(@teacher)
+        tool = @tool
+        tool.url = "http://www.example.com/basic_lti?first=john&last=smith"
+        tool.save!
+        get :show, course_id: @course.id, id: tool.id
+        expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti?first=john&last=smith'
+      end
+
       it "generates launch params for a ContentItemSelectionResponse message" do
         user_session(@teacher)
         Lti::Asset.stubs(:opaque_identifier_for).returns('ABC123')
@@ -322,6 +341,27 @@ describe ExternalToolsController do
   end
 
   describe "GET 'retrieve'" do
+      let :account do
+        Account.default
+      end
+
+      let :tool do
+        tool = account.context_external_tools.new(
+            name: "bob",
+            consumer_key: "bob",
+            shared_secret: "bob",
+            tool_id: 'some_tool',
+            privacy_level: 'public'
+        )
+        tool.url = "http://www.example.com/basic_lti?first=john&last=smith"
+        tool.resource_selection = {
+            :url => "http://#{HostUrl.default_host}/selection_test",
+            :selection_width => 400,
+            :selection_height => 400}
+        tool.save!
+        tool
+      end
+
     it "should require authentication" do
       user_model
       user_session(@user)
@@ -354,6 +394,27 @@ describe ExternalToolsController do
       get 'retrieve', :course_id => @course.id, :url => "http://www.example.com"
       expect(response).to be_redirect
       expect(flash[:error]).to eq "Couldn't find valid settings for this link"
+    end
+
+    it "should remove query params when post_only is set" do
+        u = user(:active_all => true)
+        account.account_users.create!(user: u)
+        user_session(@user)
+
+        tool.settings['post_only'] = 'true'
+        tool.save!
+        get :retrieve, {url: tool.url, account_id:account.id}
+        expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti'
+    end
+
+    it "should not remove query params when post_only is not set" do
+      u = user(:active_all => true)
+      account.account_users.create!(user: u)
+      user_session(@user)
+
+      tool.save!
+      get :retrieve, {url: tool.url, account_id:account.id}
+      expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti?first=john&last=smith'
     end
   end
 
@@ -488,7 +549,7 @@ describe ExternalToolsController do
     </blti:extensions>
     <cartridge_bundle identifierref="BLTI001_Bundle"/>
     <cartridge_icon identifierref="BLTI001_Icon"/>
-</cartridge_basiclti_link>  
+</cartridge_basiclti_link>
       XML
       post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}, :format => "json"
       expect(response).not_to be_success
@@ -523,7 +584,7 @@ describe ExternalToolsController do
     </blti:extensions>
     <cartridge_bundle identifierref="BLTI001_Bundle"/>
     <cartridge_icon identifierref="BLTI001_Icon"/>
-</cartridge_basiclti_link>  
+</cartridge_basiclti_link>
       XML
       post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}, :format => "json"
       expect(response).to be_success
@@ -565,7 +626,7 @@ describe ExternalToolsController do
     </blti:extensions>
     <cartridge_bundle identifierref="BLTI001_Bundle"/>
     <cartridge_icon identifierref="BLTI001_Icon"/>
-</cartridge_basiclti_link>  
+</cartridge_basiclti_link>
       XML
       post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}, :format => "json"
       expect(response).to be_success
@@ -608,7 +669,7 @@ describe ExternalToolsController do
     </blti:extensions>
     <cartridge_bundle identifierref="BLTI001_Bundle"/>
     <cartridge_icon identifierref="BLTI001_Icon"/>
-</cartridge_basiclti_link>  
+</cartridge_basiclti_link>
       XML
       obj = OpenStruct.new({:body => xml})
       Net::HTTP.any_instance.stubs(:request).returns(obj)
@@ -795,5 +856,4 @@ describe ExternalToolsController do
       expect(tool_settings['custom_canvas_user_id']).to eq @user.id.to_s
     end
   end
-
 end

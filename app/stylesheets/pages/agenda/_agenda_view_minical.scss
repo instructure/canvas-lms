@@ -1,18 +1,22 @@
+@import "base/environment";
+
 #minical {
   background-color: #fff;
   text-shadow: none;
-  border: 1px solid #ccc;
-  border-radius: 3px;
+  @if $use_new_styles { border: 1px solid $ic-border-light; }
+  @else {
+    border: 1px solid #ccc;
+    border-radius: 3px;
+  }
 
   .fc-header {
     background: none;
     border-top: none;
     color: #666;
     text-shadow: none;
-    border-bottom: 1px solid #ccc;
-    h2, .h2 {
-      color: #666;
-    }
+    h2, .h2 { color: #666; }
+    @if $use_new_styles { border-bottom: 1px solid $ic-border-light; }
+    @else { border-bottom: 1px solid #ccc; }
   }
 
   thead {
@@ -54,9 +58,11 @@
   }
 
   .event {
-    background-color: #e4e8ed;
-    .fc-day-content {
-      display:none;
+    @if $use_new_styles { 
+      background-color: $lightBackground;
+      border: 1px solid $ic-border-light;
     }
+    @else { background-color: #e4e8ed; }
+    .fc-day-content { display:none; }
   }
 }

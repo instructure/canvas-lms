@@ -5,11 +5,12 @@ define([
   'i18n!external_tools',
   'react',
   'jsx/external_apps/components/EditExternalToolButton',
+  'jsx/external_apps/components/ExternalToolPlacementButton',
   'jsx/external_apps/components/DeleteExternalToolButton',
   'jsx/external_apps/components/ConfigureExternalToolButton',
   'jsx/external_apps/lib/classMunger',
   'jquery.instructure_misc_helpers'
-], function(_, I18n, React, EditExternalToolButton, DeleteExternalToolButton, ConfigureExternalToolButton, classMunger) {
+], function(_, I18n, React, EditExternalToolButton, ExternalToolPlacementButton, DeleteExternalToolButton, ConfigureExternalToolButton, classMunger) {
 
   return React.createClass({
     displayName: 'ExternalToolsTableRow',
@@ -26,9 +27,19 @@ define([
         }
         return (
           <td className="links text-right" nowrap="nowrap">
-            {configureButton}
-            <EditExternalToolButton ref="editExternalToolButton" tool={this.props.tool} />
-            <DeleteExternalToolButton ref="deleteExternalToolButton" tool={this.props.tool} />
+            <div className={"al-dropdown__container"} >
+              <a className={"al-trigger btn"} role="button" href="#">
+                <i className={"icon-settings"}></i>
+                <i className={"icon-mini-arrow-down"}></i>
+                <span className={"screenreader-only"}>Settings</span>
+              </a>
+              <ul className={"al-options"} role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="toolbar-2">
+                {configureButton}
+                <EditExternalToolButton ref="editExternalToolButton" tool={this.props.tool} />
+                <ExternalToolPlacementButton ref="externalToolPlacementButton" tool={this.props.tool} />
+                <DeleteExternalToolButton ref="deleteExternalToolButton" tool={this.props.tool} />
+              </ul>
+            </div>
           </td>
         )
       } else {

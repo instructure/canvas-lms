@@ -15,7 +15,7 @@ module AssetSignature
   private
 
   def self.generate_hmac(klass, id)
-    data = "#{klass.to_s}#{id}"
+    data = "#{klass}#{id}"
     Canvas::Security.hmac_sha1(data)[0,8]
   end
 end

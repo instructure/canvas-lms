@@ -26,6 +26,36 @@ require 'atom'
 # `users/:user_id/page_views` can be accessed as `users/self/page_views` to
 # access the current user's page views.
 #
+# @model UserDisplay
+#     {
+#       "id": "UserDisplay",
+#       "description": "This mini-object is used for secondary user responses, when we just want to provide enough information to display a user.",
+#       "properties": {
+#         "id": {
+#           "description": "The ID of the user.",
+#           "example": 2,
+#           "type": "integer",
+#           "format": "int64"
+#         },
+#         "short_name": {
+#           "description": "A short name the user has selected, for use in conversations or other less formal places through the site.",
+#           "example": "Shelly",
+#           "type": "string"
+#         },
+#         "avatar_image_url": {
+#           "description": "If avatars are enabled, this field will be included and contain a url to retrieve the user's avatar.",
+#           "example": "https://en.gravatar.com/avatar/d8cb8c8cd40ddf0cd05241443a591868?s=80&r=g",
+#           "type": "string"
+#         },
+#         "html_url": {
+#           "description": "URL to access user, either nested to a context or directly.",
+#           "example": "https://school.instructure.com/courses/:course_id/users/:user_id",
+#           "type": "string"
+#         }
+#       }
+#     }
+#
+#
 # @model User
 #     {
 #       "id": "User",
@@ -111,10 +141,14 @@ require 'atom'
 #         }
 #       }
 #     }
+#
+#
+#
 class UsersController < ApplicationController
   include Delicious
   include SearchHelper
   include I18nUtilities
+  include CustomColorHelper
 
   before_filter :require_user, :only => [:grades, :merge, :kaltura_session,
     :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
@@ -344,8 +378,14 @@ class UsersController < ApplicationController
   #   The partial name or full ID of the users to match and return in the
   #   results list. Must be at least 3 characters.
   #
+  #   Note that the API will prefer matching on canonical user ID if the ID has
+  #   a numeric form. It will only search against other fields if non-numeric
+  #   in form, or if the numeric value doesn't yield any matches. Queries by
+  #   administrative users will search on SIS ID, name, or email address; non-
+  #   administrative queries will only be compared against name.
+  #
   #  @example_request
-  #    curl https://<canvas>/api/v1/accounts/self/users?search_term=<sis_user_id> \
+  #    curl https://<canvas>/api/v1/accounts/self/users?search_term=<search value> \
   #       -X GET \
   #       -H 'Authorization: Bearer <token>'
   #
@@ -980,12 +1020,12 @@ class UsersController < ApplicationController
     @resource_type = 'user_navigation'
 
     success_url = user_profile_url(@current_user)
-    @return_url = external_content_success_url('external_tool_redirect')
+    @return_url = named_context_url(@current_user, :context_external_content_success_url, 'external_tool_redirect', {include_host: true})
     @redirect_return = true
     js_env(:redirect_return_success_url => success_url,
            :redirect_return_cancel_url => success_url)
 
-    @lti_launch = Lti::Launch.new
+    @lti_launch = @tool.settings['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
     opts = {
         resource_type: @resource_type,
         link_code: @opaque_id
@@ -1003,7 +1043,7 @@ class UsersController < ApplicationController
 
     @active_tab = @tool.asset_string
     add_crumb(@current_user.short_name, user_profile_path(@current_user))
-    render ExternalToolsController::TOOL_DISPLAY_TEMPLATES['default']
+    render ExternalToolsController.display_template('default')
   end
 
   def new
@@ -1100,13 +1140,40 @@ class UsersController < ApplicationController
   #   'require_presence_of_name' are not enforced. Use this parameter to return helpful json
   #   errors while building users with an admin request.
   #
+  # @argument enable_sis_reactivation [Boolean]
+  #   When true, will first try to re-activate a deleted user with matching sis_user_id if possible.
+  #
   # @returns User
   def create
     run_login_hooks
     # Look for an incomplete registration with this pseudonym
-    @pseudonym = @context.pseudonyms.active.by_unique_id(params[:pseudonym][:unique_id]).first
-    # Setting it to nil will cause us to try and create a new one, and give user the login already exists error
-    @pseudonym = nil if @pseudonym && !['creation_pending', 'pending_approval'].include?(@pseudonym.user.workflow_state)
+
+    sis_user_id = nil
+    if @context.grants_right?(@current_user, session, :manage_sis)
+      sis_user_id = params[:pseudonym].delete(:sis_user_id)
+    end
+
+    @pseudonym = nil
+    @user = nil
+    if sis_user_id && value_to_boolean(params[:enable_sis_reactivation])
+      @pseudonym = @context.pseudonyms.where(:sis_user_id => sis_user_id, :workflow_state => 'deleted').first
+      if @pseudonym
+        @pseudonym.workflow_state = 'active'
+        @pseudonym.save!
+        @user = @pseudonym.user
+        @user.workflow_state = 'registered'
+        @user.update_account_associations
+      end
+    end
+
+    if @pseudonym.nil?
+      @pseudonym = @context.pseudonyms.active.by_unique_id(params[:pseudonym][:unique_id]).first
+      # Setting it to nil will cause us to try and create a new one, and give user the login already exists error
+      @pseudonym = nil if @pseudonym && !['creation_pending', 'pending_approval'].include?(@pseudonym.user.workflow_state)
+    end
+
+    @user ||= @pseudonym && @pseudonym.user
+    @user ||= User.new
 
     force_validations = value_to_boolean(params[:force_validations])
     manage_user_logins = @context.grants_right?(@current_user, session, :manage_user_logins)
@@ -1140,11 +1207,6 @@ class UsersController < ApplicationController
       cc_addr = params[:pseudonym].delete(:path) || params[:pseudonym][:unique_id]
     end
 
-    sis_user_id = params[:pseudonym].delete(:sis_user_id)
-    sis_user_id = nil unless @context.grants_right?(@current_user, session, :manage_sis)
-
-    @user = @pseudonym && @pseudonym.user
-    @user ||= User.new
     if params[:user]
       if self_enrollment && params[:user][:self_enrollment_code]
         params[:user][:self_enrollment_code].strip!
@@ -1289,6 +1351,113 @@ class UsersController < ApplicationController
             render(json: user.errors, status: :bad_request)
           end
         }
+      end
+    end
+  end
+
+  # @API Get custom colors
+  # Returns all custom colors that have been saved for a user.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/users/<user_id>/colors/ \
+  #     -X GET \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #   {
+  #     "custom_colors": {
+  #       "course_42": "#abc123",
+  #       "course_88": "#123abc"
+  #     }
+  #   }
+  #
+  def get_custom_colors
+    user = api_find(User, params[:id])
+    return unless authorized_action(user, @current_user, :read)
+    render(json: {custom_colors: user.custom_colors})
+  end
+
+  # @API Get custom color
+  # Returns the custom colors that have been saved for a user for a given context.
+  #
+  # The asset_string parameter should be in the format 'context_id', for example
+  # 'course_42'.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/users/<user_id>/colors/<asset_string> \
+  #     -X GET \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #   {
+  #     "hexcode": "#abc123"
+  #   }
+  def get_custom_color
+    user = api_find(User, params[:id])
+
+    return unless authorized_action(user, @current_user, :read)
+
+    if user.custom_colors[params[:asset_string]].nil?
+      raise(ActiveRecord::RecordNotFound, "Asset does not have an associated color.")
+    end
+    render(json: { hexcode: user.custom_colors[params[:asset_string]]})
+  end
+
+
+
+  # @API Update custom color
+  # Updates a custom color for a user for a given context.  This allows
+  # colors for the calendar and elsewhere to be customized on a user basis.
+  #
+  # The asset string parameter should be in the format 'context_id', for example
+  # 'course_42'
+  #
+  # @argument hexcode [String]
+  #   The hexcode of the color to set for the context.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/users/<user_id>/colors/<asset_string> \
+  #     -X PUT \
+  #     -F 'hexcode=fffeee'
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #   {
+  #     "hexcode": "#abc123"
+  #   }
+  def set_custom_color
+    user = api_find(User, params[:id])
+
+    return unless authorized_action(user, @current_user, [:manage, :manage_user_details])
+
+    # Make sure the user has rights to the actual context used.
+    context = Context.find_by_asset_string(params[:asset_string])
+
+    if context.nil?
+      raise(ActiveRecord::RecordNotFound, "Asset does not exist")
+    end
+
+    return unless authorized_action(context, @current_user, :read)
+
+    # Check if the hexcode is valid
+    unless valid_hexcode?(params[:hexcode])
+      return render(json: { :message => "Invalid Hexcode Provided" }, status: :bad_request)
+    end
+
+    unless params[:hexcode].nil?
+      user.custom_colors[params[:asset_string]] = normalize_hexcode(params[:hexcode])
+    end
+
+    respond_to do |format|
+      format.json do
+        if user.save
+          render(json: { hexcode: user.custom_colors[params[:asset_string]]})
+        else
+          render(json: user.errors, status: :bad_request)
+        end
       end
     end
   end

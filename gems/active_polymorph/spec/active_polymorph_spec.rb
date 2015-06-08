@@ -112,7 +112,7 @@ describe ActiveRecord do
       it "should prefer custom finder_sql if provided" do
         NormalContext.class_eval do 
           has_many :things, :as => :context, :finder_sql =>
-            proc{ "SELECT * FROM things WHERE context_id = #{id} AND context_type = '#{self.class.base_class.name.to_s}'" }
+            proc{ "SELECT * FROM things WHERE context_id = #{id} AND context_type = '#{self.class.base_class.name}'" }
         end
 
         @namespaced_context.reload.things.should == [@thing_a, @thing_b]
@@ -122,7 +122,7 @@ describe ActiveRecord do
       it "should prefer custom counter_sql if provided" do
         NormalContext.class_eval do 
           has_many :things, :as => :context, :counter_sql =>
-            proc{ "SELECT COUNT(*) FROM things WHERE context_id = #{id} AND context_type = '#{self.class.base_class.name.to_s}'" }
+            proc{ "SELECT COUNT(*) FROM things WHERE context_id = #{id} AND context_type = '#{self.class.base_class.name}'" }
         end
 
         @namespaced_context.reload.things.count.should == 2

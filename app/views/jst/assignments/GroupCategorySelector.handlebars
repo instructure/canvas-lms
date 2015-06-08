@@ -46,7 +46,7 @@
               {{name}}
             </option>
           {{/each}}
-          <option value="new">
+          <option value="new" {{selectedIf originalGroupRemoved}}>
             [ {{#t "group_category_options"}}New Group Category{{/t}} ]
           </option>
         </select>

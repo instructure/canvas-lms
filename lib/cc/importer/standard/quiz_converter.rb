@@ -38,7 +38,7 @@ module CC::Importer::Standard
           File.open(full_path, 'w') {|f| f << qti_node.to_xml} # write to file so we can convert with qti exporter
         end
 
-        if File.exists?(full_path)
+        if File.exist?(full_path)
           qti_converted_dir = File.join(conversion_dir, id)
           if run_qti_converter(full_path, qti_converted_dir, id)
             # get quizzes/questions

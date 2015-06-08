@@ -48,7 +48,7 @@ class ActiveRecord::Base
 
   def feed_code
     id = self.uuid rescue self.id
-    "#{self.class.reflection_type_name}_#{id.to_s}"
+    "#{self.class.reflection_type_name}_#{id}"
   end
 
   def self.all_models
@@ -68,7 +68,11 @@ class ActiveRecord::Base
       "#{Rails.root}/vendor/plugins/*/app/models/**/*.rb",
       "#{Rails.root}/gems/plugins/*/app/models/**/*.rb",
     ].sort.collect { |file|
-      model = file.sub(%r{.*/app/models/(.*)\.rb$}, '\1').camelize.constantize
+      model = begin
+          file.sub(%r{.*/app/models/(.*)\.rb$}, '\1').camelize.constantize
+        rescue NameError, LoadError
+          next
+        end
       next unless model < ActiveRecord::Base
       model
     }
@@ -106,7 +110,7 @@ class ActiveRecord::Base
 
   def self.parse_asset_string(str)
     code = asset_string_components(str)
-    [code.first.classify, code.last.try(:to_i)]
+    [convert_class_name(code.first), code.last.try(:to_i)]
   end
 
   def self.asset_string_components(str)
@@ -115,11 +119,10 @@ class ActiveRecord::Base
     [components.join('_'), id.presence]
   end
 
-  def self.initialize_by_asset_string(string, asset_types)
-    type, id = asset_string_components(string)
-    res = type.classify.constantize rescue nil
-    res.id = id if res
-    res
+  def self.convert_class_name(str)
+    namespaces = str.split(':')
+    class_name = namespaces.pop
+    (namespaces.map(&:camelize) + [class_name.try(:classify)]).join('::')
   end
 
   def asset_string
@@ -817,7 +820,7 @@ ActiveRecord::Relation.class_eval do
           join_conditions.each { |join| scope = scope.where(join) }
           sql.concat(scope.arel.where_sql.to_s)
         when 'MySQL', 'Mysql2'
-          sql = "DELETE #{quoted_table_name} FROM #{quoted_table_name} #{arel.join_sql.to_s} #{arel.where_sql.to_s}"
+          sql = "DELETE #{quoted_table_name} FROM #{quoted_table_name} #{arel.join_sql} #{arel.where_sql}"
         else
           raise "Joins in delete not supported!"
         end
@@ -835,7 +838,7 @@ ActiveRecord::Relation.class_eval do
       case connection.adapter_name
       when 'MySQL', 'Mysql2'
         v = arel.visitor
-        sql = "DELETE #{quoted_table_name} FROM #{quoted_table_name} #{arel.where_sql.to_s}
+        sql = "DELETE #{quoted_table_name} FROM #{quoted_table_name} #{arel.where_sql}
             ORDER BY #{arel.orders.map { |x| v.send(:visit, x) }.join(', ')} LIMIT #{v.send(:visit, arel.limit)}"
         return connection.delete(sql, "#{name} Delete all")
       else
@@ -846,6 +849,17 @@ ActiveRecord::Relation.class_eval do
     delete_all_without_limit(conditions)
   end
   alias_method_chain :delete_all, :limit
+
+  def lock_with_exclusive_smarts(lock_type = true)
+    if lock_type == :no_key_update
+      postgres_9_3_or_above = connection.adapter_name == 'PostgreSQL' &&
+        connection.send(:postgresql_version) >= 90300
+      lock_type = true
+      lock_type = 'FOR NO KEY UPDATE' if postgres_9_3_or_above
+    end
+    lock_without_exclusive_smarts(lock_type)
+  end
+  alias_method_chain :lock, :exclusive_smarts
 
   def with_each_shard(*args)
     scope = self
@@ -916,9 +930,7 @@ ActiveRecord::Relation.class_eval do
 
     relation
   end
-end
 
-ActiveRecord::Relation.class_eval do
   # if this sql is constructed on one shard then executed on another it wont work
   # dont use it for cross shard queries
   def union(*scopes)
@@ -1200,6 +1212,7 @@ if defined?(ActiveRecord::ConnectionAdapters::SQLiteAdapter)
     def quoted_true
       '1'
     end
+
     def quoted_false
       '0'
     end

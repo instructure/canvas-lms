@@ -265,7 +265,7 @@ define [
         if event.calendarEvent.reserved == true
           status = "Reserved" # TODO: i18n
         $element.find('.fc-event-title').text(status)
-      
+
       # TODO: i18n
       timeString = if !event.endDate() || event.startDate().getTime() == event.endDate().getTime()
           @calendar.fullCalendar('formatDate', event.startDate(), 'h:mmtt')
@@ -591,14 +591,14 @@ define [
         replaceState: !_.has(@dataFromDocumentHash(), 'view_name') # use replaceState if view_name wasn't set before
 
       @currentView = view
-      userSettings.set('calendar_view', view)
+      userSettings.set('calendar_view', view) unless view is 'scheduler'
 
     getCurrentView: ->
       if @currentView
         @currentView
       else if (data = @dataFromDocumentHash()) && data.view_name
         data.view_name
-      else if userSettings.get('calendar_view')
+      else if userSettings.get('calendar_view') and userSettings.get('calendar_view') isnt 'scheduler'
         userSettings.get('calendar_view')
       else
         'month'
@@ -669,20 +669,30 @@ define [
 
     # we use a <div> (with a <style> inside it) because you cant set .innerHTML directly on a
     # <style> node in ie8
-    $styleContainer = $('<div />').appendTo('body')
+    $styleContainer = $('<div id="calendar_color_style_overrides" />').appendTo('body')
 
     colorizeContexts: =>
-      colors = colorSlicer.getColors(@contextCodes.length, 275, {unsafe: !ENV.use_high_contrast})
-      html = (for contextCode, index in @contextCodes
-        color = colors[index]
-        ".group_#{contextCode}{
-           color: #{color};
-           border-color: #{color};
-           background-color: #{color};
-        }"
-      ).join('')
+      # Get any custom colors that have been set
+      $.getJSON(
+          '/api/v1/users/' + @options.userId + '/colors/'
+          (data) =>
+            customColors = data.custom_colors
 
-      $styleContainer.html "<style>#{html}</style>"
+            colors = colorSlicer.getColors(@contextCodes.length, 275, {unsafe: !ENV.use_high_contrast})
+            html = (for contextCode, index in @contextCodes
+              # Use a custom color if found.
+              color = if customColors[contextCode] then customColors[contextCode] else colors[index]
+              color = htmlEscape(color)
+              contextCode = htmlEscape(contextCode)
+              ".group_#{contextCode}{
+                 color: #{color};
+                 border-color: #{color};
+                 background-color: #{color};
+              }"
+            ).join('')
+
+            $styleContainer.html "<style>#{html}</style>"
+      )
 
     dataFromDocumentHash: () =>
       data = {}

@@ -117,17 +117,15 @@ define([
       var editAriaLabel = I18n.t('Edit %{toolName} App', { toolName: this.state.tool.name });
 
       return (
-        <span className="EditExternalToolButton">
-          <a href="#" ref="editButton" role="button" aria-label={editAriaLabel} className="edit_tool_link lm" onClick={this.openModal}>
-            <i className="icon-edit btn"></i>
+        <li role="presentation" className="EditExternalToolButton">
+          <a href="#" ref="editButton" tabindex="-1" role="menuitem" aria-label={editAriaLabel} className="icon-edit" onClick={this.openModal}>
+            {I18n.t('Edit')}
           </a>
           <Modal className="ReactModal__Content--canvas"
             overlayClassName="ReactModal__Overlay--canvas"
             isOpen={this.state.modalIsOpen}
             onRequestClose={this.closeModal}>
-
             <div className="ReactModal__Layout">
-
               <div className="ReactModal__InnerSection ReactModal__Header ReactModal__Header--force-no-corners">
                 <div className="ReactModal__Header-Title">
                   <h4>{I18n.t('Edit App')}</h4>
@@ -143,7 +141,7 @@ define([
               {this.form()}
             </div>
           </Modal>
-        </span>
+        </li>
       )
     }
   });

@@ -19,6 +19,8 @@
 require 'nokogiri'
 
 class BigBlueButtonConference < WebConference
+  include ActionDispatch::Routing::PolymorphicRoutes
+  include CanvasRails::Application.routes.url_helpers
   after_destroy :end_meeting
   after_destroy :delete_all_recordings
 
@@ -51,11 +53,19 @@ class BigBlueButtonConference < WebConference
       :moderatorPW => settings[:admin_key],
       :logoutURL => (settings[:default_return_url] || "http://www.instructure.com"),
       :record => settings[:record] ? "true" : "false",
-      :welcome => settings[:record] ? t("This conference may be recorded.") : ""
+      :welcome => settings[:record] ? t("This conference may be recorded.") : "",
+      "meta_canvas-recording-ready-url" => recording_ready_url
     }) or return nil
     @conference_active = true
     save
     conference_key
+  end
+
+  def recording_ready_url
+    polymorphic_url([:api_v1, context, :conferences, :recording_ready],
+                    conference_id: self.id,
+                    protocol: HostUrl.protocol,
+                    host: HostUrl.context_host(self))
   end
 
   def conference_status

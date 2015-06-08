@@ -1,5 +1,5 @@
 class AddBarToPartmanAnimals < CanvasPartman::Migration
-  self.master_table = :partman_animals
+  self.base_class = Animal
 
   def change
     with_each_partition do |table_name|

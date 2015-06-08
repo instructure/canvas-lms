@@ -52,7 +52,7 @@ module Canvas
         def load_config_file(app_name, file_name)
           config_file = base_path(app_name, 'dist', "#{app_name}.#{file_name}")
 
-          if File.exists?(config_file)
+          if File.exist?(config_file)
             JSON.parse(File.read(config_file))
           end
         end

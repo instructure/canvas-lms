@@ -63,11 +63,11 @@ module CC::Importer::Standard
           next if zipfile.entries.include?(val[:path_name])
 
           file_path = File.join(@unzipped_file_path, val[:path_name])
-          if File.exists?(file_path)
+          if File.exist?(file_path)
             zipfile.add(val[:path_name], file_path) if !File.directory?(file_path)
           else
             web_file_path = File.join(@unzipped_file_path, WEB_RESOURCES_FOLDER, val[:path_name])
-            if File.exists?(web_file_path)
+            if File.exist?(web_file_path)
               zipfile.add(val[:path_name], web_file_path) if !File.directory?(web_file_path)
             else
               val[:errored] = true

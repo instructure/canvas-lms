@@ -189,6 +189,7 @@ define [
       $course_syllabus_details.hide()
       $course_syllabus_body.val($course_syllabus.data('syllabus_body'))
       $course_syllabus_body.editorBox()
+      $('.jump_to_today_link').focus() # a11y: Set focus so it doesn't get lost.
       if wikiSidebar
         wikiSidebar.attachToEditor $course_syllabus_body
         wikiSidebar.show()

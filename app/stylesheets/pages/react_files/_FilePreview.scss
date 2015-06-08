@@ -8,6 +8,7 @@ $preview-font-color: $ic-color-light;
 $spacing-width: 0;
 $preview-footer-height: 140px;
 $preview-header-height: 9vh;
+$preview-html-background: whitesmoke;
 
 .ReactModal__Overlay.ReactModal__Overlay--ef-file-preview {
   background: rgba(black, 0.9);
@@ -247,4 +248,9 @@ a.ef-file-preview-button, button.ef-file-preview-button div {
 
 .FilePreviewInfoPanel__usageRights {
   vertical-align: top;
+}
+
+// so previews of unstyled HTML will not feature black-on-black text
+.ef-file-preview-frame-html {
+  background-color: $preview-html-background;
 }

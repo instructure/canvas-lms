@@ -48,7 +48,8 @@ $cell_height: 33px;
 
 .gradebook2 #content {
   position: relative;
-  padding: 0;
+  @if $use_new_styles { padding: 0 $ic-sp*2; }
+  @else { padding: 0; }
 }
 
 #gradebook-grid-wrapper {
@@ -564,11 +565,21 @@ $gradebook_checkbox_width: 16px;
 
 // STUFF FOR HEADER
 #gradebook-toolbar {
-  height: 38px;
-  padding: 6px 10px;
   position: relative;
-  border-left: none;
-  border-right: none;
+  @if $use_new_styles {
+    padding: $ic-sp;
+    border-top: none;
+    @include breakpoint(desktop) {
+      display: flex;
+      align-items: center;
+    }
+  }
+  @else {
+    height: 38px;
+    padding: 6px 10px;
+    border-left: none;
+    border-right: none;  
+  }
 }
 
 .gradebook_dropdowns {
@@ -578,14 +589,31 @@ $gradebook_checkbox_width: 16px;
 .gradebook_filter {
   display: inline-block;
   input {
-    width: 300px;
+    width: 248px;
+    @include breakpoint(wide) { width: 300px; }
+  }
+  @if $use_new_styles {
+    @include breakpoint(desktop) {
+      margin-left: $ic-sp/3;
+    }
   }
 }
 
 .gradebook_menu {
-  position: absolute;
-  right: 10px;
-  top: 6px;
+  @if $use_new_styles {
+    margin-top: $ic-sp/3;
+    @include breakpoint(desktop) {
+      white-space: nowrap;
+      margin-top: 0;
+      flex: 1;
+      text-align: right;
+    }
+  }
+  @else {
+    position: absolute;
+    right: 10px;
+    top: 6px;
+  }
 }
 
 @mixin gradebook_menu_label($fontsize) {
@@ -608,6 +636,10 @@ $gradebook_checkbox_width: 16px;
   .ui-state-focus:last-child {
     margin: 0 !important;
   }
+}
+
+.post-grades-placeholder {
+  display: inline-block;
 }
 
 .submission_type_icon {
@@ -677,3 +709,4 @@ $gradebook_checkbox_width: 16px;
     opacity: 0.8;
   }
 }
+

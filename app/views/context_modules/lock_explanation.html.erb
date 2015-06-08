@@ -1,0 +1,10 @@
+<%
+   content_for :page_title, @tag.title
+   add_crumb @tag.context_module.name, context_url(@context, :context_context_modules_url)
+   add_crumb @tag.title
+   js_bundle 'module_sequence_footer'
+%>
+<h2><%= @tag.title %></h2>
+<%= lock_explanation({:context_module => @tag.context_module, :asset_string => "content_tag_#{@tag.id}"}, nil, @context) %>
+
+<%= render :partial => 'shared/sequence_footer', :locals => {:asset => @tag} %>

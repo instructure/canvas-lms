@@ -67,7 +67,7 @@ module FeatureFlags
   # (helper method.  use lookup_feature_flag to test policy.)
   def feature_flag(feature)
     self.shard.activate do
-      result = MultiCache.fetch(feature_flag_cache_key(feature), copies: MultiCache.copies('feature_flags')) do
+      result = MultiCache.fetch(feature_flag_cache_key(feature)) do
         self.feature_flags.where(feature: feature.to_s).first || :nil
       end
       result = nil if result == :nil
@@ -111,6 +111,7 @@ module FeatureFlags
     accounts = feature_flag_account_ids.map do |id|
       account = Account.new
       account.id = id
+      account.shard = Shard.shard_for(id, self.shard)
       account.readonly!
       account
     end

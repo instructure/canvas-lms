@@ -51,4 +51,8 @@ module AssignmentsHelper
       send("#{format}_string", assignment.due_at, :short)
     end
   end
+
+  def assignment_publishing_enabled?(assignment, user)
+    assignment.grants_right?(user, :update) && !assignment.has_student_submissions?
+  end
 end

@@ -15,6 +15,30 @@ describe "quizzes" do
       @course.reload
     end
 
+    context "save and publish button" do
+
+      it "should save and publish a quiz", priority: "1", test_id: 193785 do
+        @quiz = course_quiz
+        get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
+
+        expect(f("#quiz-draft-state")).to be_displayed
+
+        expect_new_page_load {f(".save_and_publish").click}
+        expect(f("#quiz-publish-link.btn-published")).to be_displayed
+
+        # Check that the list of quizzes is also updated
+        get "/courses/#{@course.id}/quizzes"
+        expect(f("#summary_quiz_#{@quiz.id} .icon-publish")).to be_displayed
+      end
+
+      it "should not exist in a published quiz" do
+        @quiz = course_quiz true
+        get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
+
+        expect(f(".save_and_publish")).to be_nil
+      end
+    end
+
     it "should show a summary of due dates if there are multiple" do
       create_quiz_with_default_due_dates
       get "/courses/#{@course.id}/quizzes"
@@ -115,7 +139,7 @@ describe "quizzes" do
       expect(f('#quiz_details')).to be_displayed
     end
 
-    
+
     it "should republish on save" do
       get "/courses/#{@course.id}/quizzes"
       expect_new_page_load { f(".new-quiz-link").click }
@@ -274,7 +298,7 @@ describe "quizzes" do
         input.send_keys(:tab)
         wait_for_ajaximations
         keep_trying_until {
-          expect(input[:value]).to be_blank  
+          expect(input[:value]).to be_blank
         }
 
         input.click
@@ -330,7 +354,7 @@ describe "quizzes" do
 
         # marked as answer
         keep_trying_until {
-          expect(ff('#question_list .answered').size).to eq 2 
+          expect(ff('#question_list .answered').size).to eq 2
         }
         wait_for_ajaximations
 

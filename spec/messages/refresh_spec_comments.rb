@@ -23,7 +23,7 @@ Dir.glob("../../app/messages/*.erb") do |filename|
   filename = File.split(filename)[-1]
   event_name = filename.split(".")[0]
   event_type = filename.split(".")[1]
-  if File.exists?(filename + "_spec.rb")
+  if File.exist?(filename + "_spec.rb")
     text = File.read(filename + "_spec.rb")
     text = text.split("\n\n#")[0]
     f = File.open(filename + "_spec.rb", 'w')

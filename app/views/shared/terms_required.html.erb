@@ -11,9 +11,11 @@
 <form id="modal-box" class="reaccept_terms clearfix" action="/api/v1/users/self" method="PUT">
   <h2><%= t 'updated_terms_of_use', 'Updated Terms of Use' %></h2>
   <p>
-    <%= t 'terms_have_changed',
-          'The *terms of use* have changed. Please take a moment to review them before you continue using Canvas.',
-          wrapper: link_to('\1', terms_of_use_url, target: '_blank')
+    <%= t "Either you're a new user or the *terms of use* have changed since you last agreed to them.  Please agree to the *terms of use* and **privacy policy** before you continue.",
+          wrapper: {
+              '*' => link_to('\1', terms_of_use_url, target: '_blank'),
+              '**' => link_to('\1', privacy_policy_url, target: '_blank')
+          }
     %>
   </p>
   <p>

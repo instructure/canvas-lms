@@ -24,7 +24,7 @@ module CC::Importer::Canvas
 
     def settings_doc(file, html = false)
       path = File.join(@unzipped_file_path, COURSE_SETTINGS_DIR, file)
-      return nil unless File.exists? path
+      return nil unless File.exist? path
       if html
         open_file path
       else

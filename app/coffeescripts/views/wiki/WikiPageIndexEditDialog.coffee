@@ -10,8 +10,10 @@ define [
   dialogDefaults =
     fixDialogButtons: false
     title: I18n.t 'edit_dialog_title', 'Edit Wiki Page'
-    width: 400
-    height: 190
+    width: 450
+    height: 230
+    minWidth: 450
+    minHeight: 230
 
 
   class WikiPageIndexEditDialog extends DialogFormView

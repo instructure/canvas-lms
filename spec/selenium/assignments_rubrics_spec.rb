@@ -199,6 +199,29 @@ describe "assignment rubrics" do
       wait_for_ajaximations
     end
 
+    it "should properly manage rubric focus on submission preview page" do
+      student_in_course(:active_all => true)
+      outcome_with_rubric
+      @assignment = @course.assignments.create(:name => 'assignment with rubric')
+      @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
+      @submission = @assignment.submit_homework(@student, {:url => "http://www.instructure.com/"})
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
+      wait_for_ajaximations
+      f(".assess_submission_link").click
+      wait_for_ajaximations
+      check_element_has_focus(f(".hide_rubric_link"))
+      driver.action.key_down(:shift)
+        .send_keys(:tab)
+        .key_up(:shift)
+        .perform
+      check_element_has_focus(f(".save_rubric_button"))
+      driver.action.send_keys(:tab).perform
+      check_element_has_focus(f(".hide_rubric_link"))
+      f(".hide_rubric_link").click
+      wait_for_ajaximations
+      check_element_has_focus(f(".assess_submission_link"))
+    end
+
     it "should allow multiple rubric associations for grading" do
       outcome_with_rubric
       @assignment1 = @course.assignments.create!(:name => "assign 1", :points_possible => @rubric.points_possible)

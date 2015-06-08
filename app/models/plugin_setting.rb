@@ -100,7 +100,7 @@ class PluginSetting < ActiveRecord::Base
   end
 
   def self.cached_plugin_setting(name)
-    plugin_setting = MultiCache.fetch(settings_cache_key(name), copies: MultiCache.copies("plugin_settings")) do
+    plugin_setting = MultiCache.fetch(settings_cache_key(name)) do
       PluginSetting.find_by_name(name.to_s) || :nil
     end
     plugin_setting = nil if plugin_setting == :nil
@@ -126,7 +126,7 @@ class PluginSetting < ActiveRecord::Base
 
   def clear_cache
     connection.after_transaction_commit do
-      MultiCache.delete(PluginSetting.settings_cache_key(self.name), copies: MultiCache.copies("plugin_settings"))
+      MultiCache.delete(PluginSetting.settings_cache_key(self.name))
     end
   end
 

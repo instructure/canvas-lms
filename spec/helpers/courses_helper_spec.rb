@@ -25,7 +25,7 @@ describe CoursesHelper do
 
   context "a view with a 'Coming Up' sidebar" do
     before(:once) do
-      course_with_teacher
+      course_with_teacher(:active_all => true)
       @assignment = factory_with_protected_attributes(@course.assignments, assignment_valid_attributes.merge({ :points_possible => 10, :submission_types => "online_text_entry" }))
     end
 

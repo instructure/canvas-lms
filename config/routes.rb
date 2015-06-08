@@ -192,6 +192,8 @@ CanvasRails::Application.routes.draw do
         post :speed_grader_settings
         get :history
         post :update_submission
+        post :change_gradebook_column_size
+        post :save_gradebook_column_order
       end
     end
 
@@ -389,6 +391,10 @@ CanvasRails::Application.routes.draw do
   get 'external_content/retrieve/oembed' => 'external_content#oembed_retrieve', as: :external_content_oembed_retrieve
   get 'external_content/cancel/:service' => 'external_content#cancel', as: :external_content_cancel
 
+  %w(account course group user).each do |context|
+    match "#{context.pluralize}/:#{context}_id/external_content/success/:service" => 'external_content#success', as: "#{context}_external_content_success", via: [:get, :post]
+  end
+
   # We offer a bunch of atom and ical feeds for the user to get
   # data out of Instructure.  The :feed_code attribute is keyed
   # off of either a user, and enrollment, a course, etc. based on
@@ -517,6 +523,11 @@ CanvasRails::Application.routes.draw do
     resources :submissions
     put 'account_authorization_configs' => 'account_authorization_configs#update_all', as: :update_all_authorization_configs
     delete 'account_authorization_configs' => 'account_authorization_configs#destroy_all', as: :remove_all_authorization_configs
+    get 'sso_settings' => 'account_authorization_configs#show_sso_settings',
+        as: :sso_settings
+    put 'sso_settings' => 'account_authorization_configs#update_sso_settings',
+        as: :update_sso_settings
+
     resources :account_authorization_configs
     get 'test_ldap_connections' => 'account_authorization_configs#test_ldap_connection'
     get 'test_ldap_binds' => 'account_authorization_configs#test_ldap_bind'
@@ -589,16 +600,43 @@ CanvasRails::Application.routes.draw do
   put 'images/users/:user_id' => 'users#update_avatar_image', as: :update_avatar_image
   get 'all_menu_courses' => 'users#all_menu_courses'
   get 'grades' => 'users#grades'
-  get 'login' => 'pseudonym_sessions#new'
-  post 'login' => 'pseudonym_sessions#create'
-  delete 'logout' => 'pseudonym_sessions#destroy'
-  get 'logout' => 'pseudonym_sessions#logout_confirm'
-  get 'login/cas' => 'pseudonym_sessions#new', as: :cas_login
-  post 'login/cas' => 'pseudonym_sessions#cas_logout', as: :cas_logout
-  match 'login/otp' => 'pseudonym_sessions#otp_login', as: :otp_login, via: [:get, :post]
-  get 'login/:account_authorization_config_id' => 'pseudonym_sessions#new', as: :aac_login
-  delete 'users/:user_id/mfa' => 'pseudonym_sessions#disable_otp_login', as: :disable_mfa
-  get 'file_session/clear' => 'pseudonym_sessions#clear_file_session', as: :clear_file_session
+
+  get 'login' => 'login#new'
+  delete 'logout' => 'login#destroy'
+  get 'logout' => 'login#logout_confirm'
+
+  get 'login/canvas' => 'login/canvas#new', as: :canvas_login
+  post 'login/canvas' => 'login/canvas#create'
+  # deprecated alias
+  post 'login' => 'login/canvas#create'
+
+  get 'login/ldap' => 'login/ldap#new'
+  post 'login/ldap' => 'login/ldap#create'
+
+  get 'login/cas' => 'login/cas#new'
+  get 'login/cas/:id' => 'login/cas#new', as: :cas_login
+  post 'login/cas' => 'login/cas#destroy', as: :cas_logout
+  post 'login/cas/:id' => 'login/cas#destroy'
+
+  get 'login/saml' => 'login/saml#new'
+  get 'login/saml/logout' => 'login/saml#destroy'
+  # deprecated alias
+  get 'saml_logout' => 'login/saml#destroy'
+  get 'login/saml/:id' => 'login/saml#new', as: :saml_login
+  post 'login/saml' => 'login/saml#create'
+  # deprecated alias
+  post 'saml_consume' => 'login/saml#create'
+
+  get 'login/otp' => 'login/otp#new', as: :otp_login
+  post 'login/otp/sms' => 'login/otp#send_via_sms', as: :send_otp_via_sms
+  post 'login/otp' => 'login/otp#create'
+
+  # deprecated redirect
+  get 'login/:id' => 'login#new'
+
+  delete 'users/:user_id/mfa' => 'login/otp#destroy', as: :disable_mfa
+  get 'file_session/clear' => 'login#clear_file_session', as: :clear_file_session
+
   get 'register' => 'users#new'
   get 'register_from_website' => 'users#new'
   get 'enroll/:self_enrollment_code' => 'self_enrollments#new', as: :enroll
@@ -667,7 +705,6 @@ CanvasRails::Application.routes.draw do
 
   get 'about/:id' => 'profile#show', as: :user_profile
   resources :communication_channels
-  resource :pseudonym_session
 
   get '' => 'users#user_dashboard', as: 'dashboard'
   get 'dashboard-sidebar' => 'users#dashboard_sidebar', as: :dashboard_sidebar
@@ -711,16 +748,13 @@ CanvasRails::Application.routes.draw do
 
   resources :appointment_groups, only: [:index, :show]
 
-  post 'errors' => 'info#record_error'
-  resources :errors, only: [:show, :index], path: :error_reports
+  resources :errors, only: [:show, :index, :create], path: :error_reports
 
   get 'health_check' => 'info#health_check'
 
   get 'browserconfig.xml', to: 'info#browserconfig', defaults: { format: 'xml' }
 
   post 'object_snippet' => 'context#object_snippet'
-  post 'saml_consume' => 'pseudonym_sessions#saml_consume'
-  get 'saml_logout' => 'pseudonym_sessions#saml_logout'
   get 'saml_meta_data' => 'accounts#saml_meta_data'
 
   # Routes for course exports
@@ -1054,6 +1088,10 @@ CanvasRails::Application.routes.draw do
       get 'users/:id/settings', controller: 'users', action: 'settings'
       put 'users/:id/settings', controller: 'users', action: 'settings', as: 'user_settings'
 
+      get 'users/:id/colors', controller: 'users', action: 'get_custom_colors'
+      get 'users/:id/colors/:asset_string', controller: 'users', action: 'get_custom_color'
+      put 'users/:id/colors/:asset_string', controller: 'users', action: 'set_custom_color'
+
       put 'users/:id/merge_into/:destination_user_id', controller: 'users', action: 'merge_into'
       put 'users/:id/merge_into/accounts/:destination_account_id/users/:destination_user_id', controller: 'users', action: 'merge_into'
 
@@ -1124,6 +1162,15 @@ CanvasRails::Application.routes.draw do
       get 'accounts/:account_id/account_authorization_configs/discovery_url', action: :show_discovery_url
       put 'accounts/:account_id/account_authorization_configs/discovery_url', action: :update_discovery_url, as: 'account_update_discovery_url'
       delete 'accounts/:account_id/account_authorization_configs/discovery_url', action: :destroy_discovery_url, as: 'account_destroy_discovery_url'
+
+      get 'accounts/:account_id/sso_settings',
+          action: :show_sso_settings,
+          as: 'account_show_sso_settings_url'
+
+      put 'accounts/:account_id/sso_settings',
+          action: :update_sso_settings,
+          as: 'account_update_sso_settings_url'
+
 
       get 'accounts/:account_id/account_authorization_configs', action: :index
       get 'accounts/:account_id/account_authorization_configs/:id', action: :show
@@ -1219,8 +1266,8 @@ CanvasRails::Application.routes.draw do
       delete "groups/:group_id/followers/self", action: :unfollow
 
       scope(controller: :group_memberships) do
-        resources :memberships, path: "groups/:group_id/memberships", name_prefix: "group_", controller: :group_memberships, except: :show
-        resources :users, path: "groups/:group_id/users", name_prefix: "group_", controller: :group_memberships, except: [:index, :show, :create]
+        resources :memberships, path: "groups/:group_id/memberships", name_prefix: "group_", controller: :group_memberships
+        resources :users, path: "groups/:group_id/users", name_prefix: "group_", controller: :group_memberships, except: [:index, :create]
       end
 
       get  'groups/:group_id/files', controller: :files, action: :api_index, as: 'group_files'
@@ -1376,6 +1423,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: 'quizzes/quiz_submissions_api') do
       get 'courses/:course_id/quizzes/:quiz_id/submissions', action: :index, as: 'course_quiz_submissions'
       get 'courses/:course_id/quizzes/:quiz_id/submissions/:id', action: :show, as: 'course_quiz_submission'
+      get 'courses/:course_id/quizzes/:quiz_id/submissions/:id/time', action: :time, as: 'course_quiz_submission_time'
       post 'courses/:course_id/quizzes/:quiz_id/submissions', action: :create, as: 'course_quiz_submission_create'
       put 'courses/:course_id/quizzes/:quiz_id/submissions/:id', action: :update, as: 'course_quiz_submission_update'
       post 'courses/:course_id/quizzes/:quiz_id/submissions/:id/complete', action: :complete, as: 'course_quiz_submission_complete'
@@ -1544,6 +1592,7 @@ CanvasRails::Application.routes.draw do
       %w(course group).each do |context|
         prefix = "#{context}s/:#{context}_id/conferences"
         get prefix, action: :index, as: "#{context}_conferences"
+        post "#{prefix}/:conference_id/recording_ready", action: :recording_ready, as: "#{context}_conferences_recording_ready"
       end
     end
 
@@ -1604,6 +1653,17 @@ CanvasRails::Application.routes.draw do
       end
     end
 
+    scope(controller: 'bookmarks/bookmarks') do
+      get 'users/self/bookmarks/', action: :index, as: :bookmarks
+      get 'users/self/bookmarks/:id', action: :show
+      post 'users/self/bookmarks', action: :create
+      delete 'users/self/bookmarks/:id', action: :destroy
+      put 'users/self/bookmarks/:id', action: :update
+    end
+
+    scope(controller: :errors) do
+      post "error_reports", action: :create
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented

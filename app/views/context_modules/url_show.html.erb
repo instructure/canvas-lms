@@ -6,10 +6,6 @@
   js_bundle 'module_sequence_footer'
 %>
 
-<% if @tag.locked_for? @current_user %>
-  <h2><%= @tag.title %></h2>
-  <%= lock_explanation({:context_module => @tag.context_module, :asset_string => "content_tag_#{@tag.id}"}, nil, @context) %>
-<% else %>
   <% if @tag.try(:new_tab) %>
     <%= t :new_tab, "This site needs to be opened in a new browser window." %>
     <div>
@@ -44,5 +40,5 @@
       </li>
     </ul>
   <% end %>
-<% end %>
+
 <%= render :partial => 'shared/sequence_footer', :locals => {:asset => @tag} %>
