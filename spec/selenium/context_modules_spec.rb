@@ -5,7 +5,7 @@ describe "context modules" do
   context "as a teacher", :priority => "1" do
     before(:each) do
       course_with_teacher_logged_in
-      #have to add quiz and assignment to be able to add them to a new module
+      # have to add quiz and assignment to be able to add them to a new module
       @quiz = @course.assignments.create!(:title => 'quiz assignment', :submission_types => 'online_quiz')
       @assignment = @course.assignments.create!(:title => 'assignment 1', :submission_types => 'online_text_entry')
       @assignment2 = @course.assignments.create!(:title => 'assignment 2',
@@ -113,7 +113,7 @@ describe "context modules" do
     it "should add and remove completion criteria" do
       get "/courses/#{@course.id}/modules"
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
-
+      
       @course.reload
       smodule = @course.context_modules.first
       smodule.publish!
@@ -174,7 +174,7 @@ describe "context modules" do
       f('.edit_module_link').click
       edit_form = f('#add_context_module_form')
       expect(edit_form).to be_displayed
-      expect(ff('.completion_entry .delete_criterion_link', edit_form)).to be_empty
+      expect(ff('.completion_entry .delete_criterion_link:visible', edit_form)).to be_empty
     end
 
     it "should delete a module item" do
@@ -389,38 +389,75 @@ describe "context modules" do
 
     it "should add 2 modules with the first one as a prerequisite" do
       get "/courses/#{@course.id}/modules"
-
       first_module_name = 'First Module'
       second_module_name = 'Second Module'
+      third_module_name = 'Third Module'
       add_module(first_module_name)
+      add_module(second_module_name)
+      
       #adding second module - can't use add_module method because a prerequisite needs to be added to this module
       add_form = new_module_form
-      replace_content(add_form.find_element(:id, 'context_module_name'), second_module_name)
+      replace_content(add_form.find_element(:id, 'context_module_name'), third_module_name)
+      # add first prerequisite
       f('.ui-dialog .add_prerequisite_link').click
       wait_for_ajaximations
-      #have to do it this way because the select has no css attributes on it
-      click_option('.criterion select', "the module, #{first_module_name}")
-      submit_form(add_form)
+      click_option('.criterion select', "#{first_module_name}")
+      # add second prerequisite
+      f('.ui-dialog .add_prerequisite_link').click
       wait_for_ajaximations
+      click_option('.criterion select:last', "#{second_module_name}")
+      submit_form(add_form)
+
+      wait_for_ajaximations
+      expect(fj('.prerequisites_message:first').text).to eq "Prerequisites: First Module, Second Module"
+
       mod1 = @course.context_modules.where(:name => first_module_name).first
-      mod2 = @course.context_modules.where(:name => second_module_name).first
-      context_module = f("#context_module_#{mod2.id}")
+      mod3 = @course.context_modules.where(:name => third_module_name).first
+      context_module = f("#context_module_#{mod3.id}")
       driver.action.move_to(context_module).perform
-      f("#context_module_#{mod2.id} .ig-header-admin .al-trigger").click
-      f("#context_module_#{mod2.id} .edit_module_link").click
+      f("#context_module_#{mod3.id} .ig-header-admin .al-trigger").click
+      f("#context_module_#{mod3.id} .edit_module_link").click
       expect(add_form).to be_displayed
       wait_for_ajaximations
       prereq_select = fj('.criterion select')
       option = first_selected_option(prereq_select)
-      expect(option.text).to eq 'the module, ' + first_module_name
+      expect(option.text).to eq first_module_name
 
       ff('.cancel_button.ui-button', dialog_for(add_form)).last.click
       wait_for_ajaximations
-      mod2.publish!
+      mod3.publish!
 
       # should bring up relock dialog on publish
       f("#context_module_#{mod1.id} .publish-icon").click
       test_relock
+    end
+
+    it "should save the requirement count chosen in the Edit Module form" do
+      @course.enable_feature!(:nc_or)
+      get "/courses/#{@course.id}/modules"
+      add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
+    
+      @course.reload
+
+      # add completion criterion
+      f('.ig-header-admin .al-trigger').click
+      wait_for_ajaximations
+      f('.edit_module_link').click
+      wait_for_ajaximations
+      edit_form = f('#add_context_module_form')
+      expect(edit_form).to be_displayed
+      f('.add_completion_criterion_link', edit_form).click
+      wait_for_ajaximations
+
+      # Select other radio button
+      fj('#context_module_requirement_count_1').click
+      submit_form(edit_form)
+      wait_for_ajaximations
+
+      # Test that pill now says Complete One Item right after change and one reload
+      expect(fj('.pill li').text).to eq "Complete One Item"
+      @course.reload
+      expect(fj('.pill li').text).to eq "Complete One Item"
     end
 
     it "should rearrange modules" do
@@ -443,15 +480,15 @@ describe "context modules" do
 
     it "should validate locking a module item display functionality" do
       get "/courses/#{@course.id}/modules"
-
+      
       add_form = new_module_form
       lock_check = add_form.find_element(:id, 'unlock_module_at')
       lock_check.click
       wait_for_ajaximations
-      expect(add_form.find_element(:css, 'tr.unlock_module_at_details')).to be_displayed
+      expect(add_form.find_element(:css, '.unlock_module_at_details')).to be_displayed
       lock_check.click
       wait_for_ajaximations
-      expect(add_form.find_element(:css, 'tr.unlock_module_at_details')).not_to be_displayed
+      expect(add_form.find_element(:css, '.unlock_module_at_details')).not_to be_displayed
     end
 
     it "should prompt relock when adding an unlock_at date" do
@@ -572,7 +609,6 @@ describe "context modules" do
 
     it "should still display due date and points possible after indent change" do
       get "/courses/#{@course.id}/modules"
-
       module_item = add_existing_module_item('#assignments_select', 'Assignment', @assignment2.title)
       tag = ContentTag.last
 

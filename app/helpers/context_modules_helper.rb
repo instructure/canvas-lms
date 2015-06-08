@@ -51,6 +51,10 @@ module ContextModulesHelper
     true
   end
 
+  def prerequisite_list(prerequisites)
+    prerequisites.map {|p| p[:name]}.join(', ')
+  end
+
   def module_item_unpublishable?(item)
     return true if item.nil? || !item.content || !item.content.respond_to?(:can_unpublish?)
     item.content.can_unpublish?

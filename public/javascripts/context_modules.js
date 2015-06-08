@@ -322,18 +322,21 @@ define([
       editModule: function($module) {
         var $form = $("#add_context_module_form");
         $form.data('current_module', $module);
-        var data = $module.getTemplateData({textValues: ['name', 'unlock_at', 'require_sequential_progress', 'publish_final_grade']});
+        var data = $module.getTemplateData({textValues: ['name', 'unlock_at', 'require_sequential_progress', 'publish_final_grade', 'requirement_count']});
         $form.fillFormData(data, {object_name: 'context_module'});
         var isNew = false;
         if($module.attr('id') == 'context_module_new') {
           isNew = true;
           $form.attr('action', $form.find(".add_context_module_url").attr('href'));
           $form.find(".completion_entry").hide();
+          $form.find(".require-sequential").hide();
           $form.attr('method', 'POST');
           $form.find(".submit_button").text(I18n.t('buttons.add', "Add Module"));
         } else {
           $form.attr('action', $module.find(".edit_module_link").attr('href'));
           $form.find(".completion_entry").show();
+          $form.find(".require-sequential").children().hide().end()
+          $form.find(".requirement-count-radio .ic-Radio").children().hide().end()
           $form.attr('method', 'PUT');
           $form.find(".submit_button").text(I18n.t('buttons.update', "Update Module"));
         }
@@ -342,9 +345,10 @@ define([
         $form.find("#publish_final_grade").attr('checked', data.publish_final_grade == "true" || data.publish_final_grade == "1");
         $form.find(".prerequisites_entry").showIf($("#context_modules .context_module").length > 1);
         var prerequisites = [];
-        $module.find(".prerequisites .criterion").each(function() {
+        $module.find(".prerequisites .prerequisite_criterion").each(function() {
           prerequisites.push($(this).getTemplateData({textValues: ['id', 'name', 'type']}));
         });
+      
         $form.find(".prerequisites_list .criteria_list").empty();
         for(var idx in prerequisites) {
           var pre = prerequisites[idx];
@@ -353,11 +357,11 @@ define([
             $form.find(".prerequisites_list .criteria_list .criterion:last select").val(pre.id);
           }
         }
-        $form.find(".completion_criteria_list .criteria_list").empty();
+        $form.find(".completion_entry .criteria_list").empty();
         $module.find(".content .context_module_item .criterion.defined").each(function() {
           var data = $(this).parents(".context_module_item").getTemplateData({textValues: ['id', 'criterion_type', 'min_score']});
           $form.find(".add_completion_criterion_link").click();
-          $form.find(".completion_criteria_list .criteria_list .criterion:last")
+          $form.find(".criteria_list .criterion:last")
             .find(".id").val(data.id || "").change().end()
             .find(".type").val(data.criterion_type || "").change().end()
             .find(".min_score").val(data.min_score || "");
@@ -367,10 +371,23 @@ define([
         $form.find(".prerequisites_list .no_prerequisites_message").showIf(prerequisites.length === 0).end()
           .find(".prerequisites_list .criteria_list").showIf(prerequisites.length != 0).end()
           .find(".add_prerequisite_link").showIf(!no_prereqs).end()
-          .find(".completion_criteria_list .no_items_message").showIf(no_items).end()
-          .find(".completion_criteria_list .no_criteria_message").showIf(!no_items && $module.find(".content .context_module_item .criterion.defined").length === 0).end()
-          .find(".completion_criteria_list .criteria_list").showIf(!no_items).end()
+          .find(".completion_entry .criteria_list").showIf(!no_items).end()
+          
+          .find(".completion_entry .no_items_message").hide().end()
           .find(".add_completion_criterion_link").showIf(!no_items);
+
+        // Set no items or criteria message plus diasable elements if there are no items or no requirements
+        if (no_items) {
+          $form.find(".completion_entry .no_items_message").show();
+          
+        } else if ($module.find(".content .context_module_item .criterion.defined").length !== 0) {
+          $(".require-sequential").children().show();
+          $(".requirement-count-radio .ic-Radio").children().show();
+        } 
+
+        var $requirmentCount = $module.find('.pill li').data("requirement-count");
+        $requirmentCount == 1 ? $('#context_module_requirement_count_1').prop('checked', true) : $('#context_module_requirement_count_0').prop('checked', true);
+
         $module.fadeIn('fast', function() {
         });
         $module.addClass('dont_remove');
@@ -461,14 +478,15 @@ define([
         $("#module_list").find(".context_module_option").remove();
         $("#context_modules .context_module").each(function() {
           $this = $(this);
-          var data = $this.find(".header").getTemplateData({textValues: ['name', 'id']});
+          var data = $this.find(".header").getTemplateData({textValues: ['name']});
+          data.id = $this.find(".header").attr('id');
           $this.find('.name').attr('title', data.name);
           var $option = $(document.createElement('option'));
           $option.val(data.id);
 
           // data.id could come back as undefined, so calling $option.val(data.id) would return an "", which is not chainable, so $option.val(data.id).text... would die.
           $option.attr('role', 'option')
-                 .text("the module, " + data.name)
+                 .text(data.name)
                  .addClass('context_module_' + data.id)
                  .addClass('context_module_option');
 
@@ -563,6 +581,30 @@ define([
     };
   })();
 
+  var updatePrerequisites = function($module, prereqs) {
+    var $prerequisitesDiv = $module.find(".prerequisites");
+    var prereqsList = '';
+    $prerequisitesDiv.empty();
+
+    if (prereqs.length > 0) {
+      for(var i in prereqs) {
+        var $div = $('<div />', {'class': 'prerequisite_criterion ' + prereqs[i].type + '_criterion', 'style': "float: left;"});
+        var $spanID = $('<span />', {text: htmlEscape(prereqs[i].id), 'class': 'id', 'style': "display: none;"});
+        var $spanType = $('<span />', {text: htmlEscape(prereqs[i].type), 'class': 'type', 'style': "display: none;"});
+        var $spanName = $('<span />', {text: htmlEscape(prereqs[i].name), 'class': 'name', 'style': "display: none;"});
+        $div.append($spanID);
+        $div.append($spanType);
+        $div.append($spanName);
+        $prerequisitesDiv.append($div);
+
+        prereqsList += prereqs[i].name + ', ';
+      }
+      prereqsList = prereqsList.slice(0, -2)
+      var $prerequisitesMessage = $('<div />', {text: 'Prerequisites: ' + htmlEscape(prereqsList),'class': 'prerequisites_message'});
+      $prerequisitesDiv.append($prerequisitesMessage);
+
+    }
+  }
 
   modules.initModuleManagement = function() {
     // Create the context modules backbone view to manage the publish button.
@@ -583,7 +625,7 @@ define([
         if(!$context_module_unlocked_at.val()){
           $context_module_unlocked_at.val(valCache);
         }
-      }else{
+      } else{
         valCache = $context_module_unlocked_at.val();
         $context_module_unlocked_at.val('').triggerHandler('change');
       }
@@ -600,20 +642,20 @@ define([
         hrefValues: ['id']
       });
 
+      $module.find('.header').attr('id', data.context_module.id);
       $module.find(".footer").fillTemplateData({
         data: data.context_module,
         hrefValues: ['id']
       });
 
       $module.find(".unlock_details").showIf(data.context_module.unlock_at && Date.parse(data.context_module.unlock_at) > new Date());
-      $module.find(".footer .prerequisites").empty();
+      updatePrerequisites($module, data.context_module.prerequisites);
 
-      for(var idx in data.context_module.prerequisites) {
-        var pre = data.context_module.prerequisites[idx];
-        var $pre = $("#display_criterion_blank").clone(true).removeAttr('id');
-        $pre.fillTemplateData({data: pre});
-        $module.find(".footer .prerequisites").append($pre.show());
-      }
+      // Update requirement message pill
+      var $pillMessage = $module.find('.pill li');
+      var newPillMessage = data.context_module.requirement_count && data.context_module.requirement_count !== 0 ? I18n.t("Complete One Item") : I18n.t("Complete All Items");
+      $pillMessage.text(newPillMessage);
+      $pillMessage.data("requirement-count", data.context_module.requirement_count);
 
       $module.find(".context_module_items .context_module_item")
         .removeClass('progression_requirement')
@@ -653,9 +695,11 @@ define([
             prereqs.push("module_" + id);
           }
         });
+        data['context_module[requirement_count]'] = $('input[name="context_module[requirement_count]"]:checked').val();
+"0";
         data['context_module[prerequisites]'] = prereqs.join(",");
         data['context_module[completion_requirements][none]'] = "none";
-        $(this).find(".completion_criteria_list .criteria_list .criterion").each(function() {
+        $(this).find(".criteria_list .criterion").each(function() {
           var id = $(this).find(".id").val();
           data["context_module[completion_requirements][" + id + "][type]"] = $(this).find(".type").val();
           data["context_module[completion_requirements][" + id + "][min_score]"] = $(this).find(".min_score").val();
@@ -700,6 +744,7 @@ define([
           fixLink('span.expand_module_link', 'href');
           fixLink('.reorder_items_url', 'href');
           fixLink('.add_module_item_link', 'rel');
+          fixLink('.add_module_item_link', 'rel');
           var publishData = {
             moduleType: 'module',
             id: data.context_module.id,
@@ -723,18 +768,17 @@ define([
       var $form = $(this).parents("#add_context_module_form");
       var $module = $form.data('current_module');
       var $select = $("#module_list").clone(true).removeAttr('id');
-      var $pre = $form.find("#criterion_blank").clone(true).removeAttr('id');
+      var $pre = $form.find("#criterion_blank_prereq").clone(true).removeAttr('id');
       $select.find("." + $module.attr('id')).remove();
       var afters = [];
-
+      
       $("#context_modules .context_module").each(function() {
         if($(this)[0] == $module[0] || afters.length > 0) {
-          afters.push($(this).getTemplateData({textValues: ['id']}).id);
+          afters.push($(this).attr('id'));
         }
       });
-
       for(var idx in afters) {
-        $select.find(".context_module_" + afters[idx]).attr('disabled', true);
+        $select.find("." + afters[idx]).attr('disabled', true);
       }
 
       $pre.find(".option").empty().append($select.show());
@@ -750,7 +794,7 @@ define([
       var $module = $form.data('current_module');
       var $option = $("#completion_criterion_option").clone(true).removeAttr('id');
       var $select = $option.find("select.id");
-      var $pre = $form.find("#criterion_blank").clone(true).removeAttr('id');
+      var $pre = $form.find("#criterion_blank_req").clone(true).removeAttr('id');
       $pre.find(".prereq_desc").remove();
       var prereqs = modules.prerequisites();
       var $optgroups = {};
@@ -784,9 +828,10 @@ define([
       });
       $pre.find(".option").empty().append($option);
       $option.slideDown();
-      $form.find(".completion_criteria_list .criteria_list").append($pre).show();
+      $form.find(".completion_entry .criteria_list").append($pre).show();
       $pre.slideDown();
-      $form.find(".no_criteria_message").hide();
+      $(".require-sequential").children().show();
+      $(".requirement-count-radio .ic-Radio").children().show();
       $select.change().focus();
     });
     $("#completion_criterion_option .id").change(function() {
@@ -803,10 +848,13 @@ define([
     });
     $("#completion_criterion_option .type").change(function() {
       var $option = $(this).parents(".completion_criterion_option");
-      $option.find(".min_score_box").showIf($(this).val() == 'min_score');
+
+      // Show score text box and do some resizing of drop down to get it to stay on one line
+      $option.find(".min_score_box").showIf($(this).val() == 'min_score'); 
+
       var id = $option.find(".id").val();
       var points_possible = $.trim($("#context_module_item_" + id + " .points_possible_display").text().split(' ')[0]);
-      if(points_possible.length > 0) {
+      if(points_possible.length > 0 && $(this).val() == 'min_score') {
         $option.find(".points_possible").text(points_possible);
         $option.find(".points_possible_parent").show();
       } else {
@@ -815,9 +863,16 @@ define([
     });
     $("#add_context_module_form .delete_criterion_link").click(function(event) {
       event.preventDefault();
+      var $elem = $(this).closest(".criteria_list");
+
       $(this).parents(".criterion").slideUp(function() {
         $(this).remove();
-      });
+        // Hides radio button and checkbox if there are no requirements
+        if ($elem.html().length === 0) {
+          $(".require-sequential").children().fadeOut("fast");
+          $(".requirement-count-radio .ic-Radio").children().fadeOut("fast");
+        }
+      })
     });
 
 
@@ -1040,13 +1095,14 @@ define([
         return;
       }
       if(INST && INST.selectContentDialog) {
-        var module = $(this).parents(".context_module").find(".header").getTemplateData({textValues: ['name', 'id']});
+        var id = $(this).parents(".context_module").find(".header").attr("id");
+        var name = $(this).parents(".context_module").find(".name").attr("title");
         var options = {for_modules: true};
         options.select_button_text = I18n.t('buttons.add_item', "Add Item");
-        options.holder_name = module.name;
+        options.holder_name = name;
         options.height = 550;
         options.width = 770;
-        options.dialog_title = I18n.t('titles.add_item', "Add Item to %{module}", {'module': module.name});
+        options.dialog_title = I18n.t('titles.add_item', "Add Item to %{module}", {'module': name});
         options.close = function () {
           $trigger.focus();
         };
@@ -1054,7 +1110,7 @@ define([
         options.submit = function(item_data) {
           item_data.content_details = ['items']
           item_data['item[position]'] = nextPosition++;
-          var $module = $("#context_module_" + module.id);
+          var $module = $("#context_module_" + id);
           var $item = modules.addItemToModule($module, item_data);
           $module.find(".context_module_items.ui-sortable").sortable('refresh').sortable('disable');
           var url = $module.find(".add_module_item_link").attr('rel');

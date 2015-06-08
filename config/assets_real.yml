@@ -38,6 +38,8 @@ stylesheets:
     - public/stylesheets/compiled/bundles/context_modules.css
   context_modules2:
     - public/stylesheets/compiled/bundles/context_modules2.css
+  content_next:
+    - public/stylesheets/compiled/bundles/content_next.css
   modules_next:
     - public/stylesheets/compiled/bundles/modules_next.css
   context_module_progressions:

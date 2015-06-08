@@ -1,0 +1,229 @@
+.context_module .items {
+  min-height: 10px; /* sortable on empty */
+}
+
+#no_context_modules_message {
+  padding: 10px;
+}
+
+.context_module_item {
+  border: none !important;
+}
+
+.al-options a {
+  display: block !important;
+}
+
+.item-group-container {
+  min-height: 450px;
+}
+
+.header .publish-icon {
+  position: relative;
+  bottom: 7px;
+}
+
+.context_module .header {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.collapse_module_link, .expand_module_link {
+  cursor: pointer;
+}
+
+.ig-header .icon-lock {
+  display: none;
+}
+
+.locked_module .ig-header .icon-lock {
+  display: inline;
+}
+
+.unlock_at_text {
+  font-weight: normal;
+  font-size: 12px;
+}
+
+.add_module_item_link {
+  display: inline-block !important;
+  margin-left: 10px;
+}
+
+.ig-header {
+  position: relative;
+  display: flex;
+
+  .sortable-handle.reorder_module_link {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+  }
+
+  .ig-header-title {
+    flex: 1 1 auto;
+  }
+
+  .prerequisites {
+    display: flex;
+    padding: 0 20px;
+
+    .prerequisites_message {
+      display: flex;
+      flex: 0 0 auto;
+      align-items: center;
+      font-size: 12px;
+    }
+  }
+
+  .requirements_message {
+    display: flex;
+    align-items: center;
+
+    ul {
+      display: flex;
+      flex: 0 0 auto;
+      align-items: center;
+      font-weight: bold;
+    }
+  }
+
+  .ig-header-admin {
+    flex: 0 0 auto;
+
+    .icon-publish {
+      display: flex;
+      align-items: center;
+    }
+  }
+}
+
+.context-modules-main-header {
+  height: 33px;
+  padding: 15px;
+}
+
+.context_module .context_module_items.manageable .context_module_item .move_item_link {
+  display: inline !important;
+  visibility: visible !important;
+}
+
+.context_module {
+  border-top: none;
+  background-color: transparent;
+  min-width: auto;
+  margin-bottom: 0;
+}
+
+.context_module .header {
+  background-color: transparent;
+  border-bottom: none;
+  padding: auto;
+  color: #3d454c;
+}
+.sortable-handle a, .draggable-handle a {
+  color: #b4b7ba;
+}
+.context_module .links a, .context_module .reorder_module_link, .context_module .move_item_link {
+  opacity: 1;
+}
+
+.context_module_item .completion_requirement {
+  font-size: inherit;
+  padding-left: 0;
+  margin-top: auto;
+  color: inherit;
+}
+
+.context_module_item.context_module_item_hover {
+  background: #fff;
+}
+
+.draggable-handle {
+  /* shared with assignments, dry it up */
+  color: #b4b7ba;
+  margin: 0 4px 0 -15px;
+  padding: 0 0px 0 10px !important;
+}
+
+.sortable-handle,
+.draggable-handle,
+.draggable-handle a {
+  /* not working on headers >:| */
+  cursor: move !important;
+}
+
+.context_module_item .type_icon i {
+  color: inherit;
+}
+
+.context_module_item .item_name .title {
+  padding: 0;
+  color: inherit;
+  font-size: 13px;
+}
+
+.context_module_placeholder {
+  height: 40px !important;
+  border: none !important;
+}
+
+input.move-module-label-spacer {
+  margin-right: 10px;
+}
+
+.move-module-or {
+  display: inline-block;
+  width: 60px;
+  margin-left: 20px;
+
+}
+
+.move-module-select-spacer {
+  margin-top: 10px;
+}
+
+.form-element {
+  padding: 5px 0 5px 0;
+}
+
+.criterion {
+  display: flex;
+}
+
+.prereq-req-item {
+  flex: 1 1 1;
+  padding-right: 5px;
+}
+
+.points_possible {
+  padding-right: 5px;
+}
+
+.prereq-req-item-delete {
+  padding-top: calc((38px - 20px) / 2 );
+  position: absolute;
+  right: 5px;
+}
+
+.add-item {
+  //font-size: 0.9em;
+  cursor: pointer;
+}
+
+.icon-add {
+  padding: 0 5px 0 5px;
+}
+
+.form-section {
+  padding: 10px 0 15px 0;
+}
+
+#add_context_module_form {
+ padding: 10px 40px 0 40px;
+}
+
+.ui-dialog-titlebar.ui-widget-header.ui-corner-all.ui-helper-clearfix {
+  padding-right: 40px;
+  padding-left: 40px;
+}

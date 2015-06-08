@@ -1,3 +1,4 @@
+
 <%
   context_module_next ||= nil
   context_module = context_module_next
@@ -20,7 +21,7 @@
     style="<%= hidden unless context_module %>"
 >
   <a name="module_<%= context_module.id if context_module %>"></a>
-  <div class="ig-header header">
+  <div class="ig-header header" id="<%= context_module.id if context_module %>">
     <span
       class="sortable-handle reorder_module_link"
       title="<%= t('reorder_modules', %{Drag to reorder modules}) %>"
@@ -62,6 +63,22 @@
       <span class="name"><%= context_module.try_rescue(:name) || nbsp %></span>
     </span>
 
+    <%= render :partial => "context_modules/prerequisites_message", :locals => {:editable => editable, :context_module => context_module} %>
+
+    <% if @context.feature_enabled?(:nc_or) %>
+      <div class="requirements_message">
+        <ul class="pill">
+          <li aria-label="<%= context_module && context_module.requirement_count == 1 ? t("Complete One Item") : t("Complete All Items") %>" data-requirement-count="<%= ((context_module && context_module.requirement_count) || 0) %>" tabindex="0">
+            <% if context_module && context_module.requirement_count == 1 %>
+              <%=  t("Complete One Item") %>
+            <% else %>
+              <%=  t("Complete All Items") %>
+            <% end %>
+          </li>
+        </ul>
+      </div>
+    <% end %>
+    
     <div class="ig-header-admin">
       <span class="completion_status" style="<%= "visibility: hidden;" if !context_module || (context_module.completion_requirements || []).empty? %>">
         <i class="icon-check complete_icon"><span class="screenreader-only"><%= t('images.title.complete', "Module Completed") %></span></i>
@@ -150,8 +167,6 @@
           <%= t 'module_will_unlock_at', 'Will unlock *%{unlock_date}*', :wrapper => "<span class=\"displayed_unlock_at\" #{context_sensitive_datetime_title(context_module.try_rescue(:unlock_at), @context)}>\\1</span>", :unlock_date => (datetime_string(context_module.try_rescue(:unlock_at)) || nbsp) %>
         </div>
       </div><!-- progression_container -->
-
-      <%= render :partial => "context_modules/prerequisites_footer", :locals => {:editable => editable, :context_module => context_module} %>
     </div><!-- footer -->
   </div>
 </div>

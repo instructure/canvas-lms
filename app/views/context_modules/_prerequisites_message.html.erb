@@ -1,0 +1,30 @@
+<%
+  hide_footer = true
+  prerequisites = []
+
+  if editable
+    hide_footer = context_module && context_module.prerequisites && !context_module.prerequisites.empty?
+    prerequisites = (context_module.prerequisites || []) if context_module
+  else
+    hide_footer = context_module && context_module.active_prerequisites && !context_module.active_prerequisites.empty?
+    prerequisites = (context_module.active_prerequisites || []) if context_module
+  end
+%>
+
+<div class="prerequisites">
+  <% if context_module %>
+    <% prerequisites.each do |pre| %>
+      <div class="prerequisite_criterion <%= pre[:type] %>_criterion" style="float: left;">
+        <span class="id" style="display: none;"><%= pre[:id] %></span>
+        <span class="type" style="display: none;"><%= pre[:type] %></span>
+        <span class="name" style="display: none;"><%= pre[:name] %></span>
+      </div>
+    <% end %>
+  <% end %>
+
+  <div class="prerequisites_message" tabindex="0" style="<%= hidden unless hide_footer%>">
+
+    <%= before_label('prerequisites', %{Prerequisites}) %> 
+    <%= prerequisite_list(prerequisites) %>
+  </div>
+</div>

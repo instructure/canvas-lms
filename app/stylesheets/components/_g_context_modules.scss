@@ -549,7 +549,11 @@ $context_module_bg_color: #f2f3f4;
 
 div.completion_criterion_option {
   select.assignment_picker {
-    width: 160px;
+    width: 175px;
+  }
+
+  select.assignment_requirement_picker {
+    width: 175px;
   }
 }
 

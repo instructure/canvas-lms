@@ -19,7 +19,8 @@
 class ContextModule < ActiveRecord::Base
   include Workflow
   include SearchTermHelper
-  attr_accessible :context, :name, :unlock_at, :require_sequential_progress, :completion_requirements, :prerequisites, :publish_final_grade
+  attr_accessible :context, :name, :unlock_at, :require_sequential_progress, 
+                  :completion_requirements, :prerequisites, :publish_final_grade, :requirement_count
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
   has_many :context_module_progressions, :dependent => :destroy
