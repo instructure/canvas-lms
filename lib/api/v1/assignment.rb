@@ -409,7 +409,12 @@ module Api::V1::Assignment
     end
 
     if assignment_params.key? "muted"
-      assignment.muted = value_to_boolean(assignment_params.delete("muted"))
+      muted = value_to_boolean(assignment_params.delete("muted"))
+      if muted
+        assignment.mute!
+      else
+        assignment.unmute!
+      end
     end
 
     if assignment.context.grants_right?(user, :manage_sis)

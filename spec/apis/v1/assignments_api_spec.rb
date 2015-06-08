@@ -2486,6 +2486,7 @@ describe AssignmentsApiController, type: :request do
   context "update_from_params" do
     before :once do
       course_with_teacher(:active_all => true)
+      student_in_course(active_all: true)
       @assignment = @course.assignments.create!(:title => "some assignment")
     end
 
@@ -2504,6 +2505,17 @@ describe AssignmentsApiController, type: :request do
         :role_changes => {:manage_sis => true})
       update_from_params(@assignment, params, @admin)
       expect(@assignment.integration_data).to eq({"key" => "value"})
+    end
+
+    it "unmuting publishes hidden comments" do
+      @assignment.mute!
+      @assignment.grade_student @student, comment: "blah blah blah"
+      sub = @assignment.submission_for_student(@student)
+      comment = sub.submission_comments.first
+      expect(comment.hidden?).to eql true
+
+      update_from_params(@assignment, {"muted" => "false"}, @teacher)
+      expect(comment.reload.hidden?).to eql false
     end
   end
 end
