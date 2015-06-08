@@ -552,9 +552,16 @@ class Quizzes::Quiz < ActiveRecord::Base
   # Lists all the question types available in this quiz
   def question_types
     return [] unless quiz_data
-    quiz_data.map do |question|
-      question["question_type"]
-    end.uniq
+
+    all_question_types = quiz_data.flat_map do |datum|
+      if datum["entry_type"] == "quiz_group"
+        datum["questions"].map{|q| q["question_type"]}
+      else
+        datum["question_type"]
+      end
+    end
+
+    all_question_types.uniq
   end
 
   def has_access_code

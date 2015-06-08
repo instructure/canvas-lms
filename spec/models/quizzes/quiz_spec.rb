@@ -1066,6 +1066,25 @@ describe Quizzes::Quiz do
     end
   end
 
+  describe "#question_types" do
+    before :once do
+      @quiz = @course.quizzes.build :title => "test quiz", :hide_results => 'invalid'
+    end
+
+    it "returns an empty array when no quiz data" do
+      @quiz.stubs(:quiz_data).returns nil
+      expect(@quiz.question_types).to eq([])
+    end
+
+    it "returns quiz types of question in quiz groups" do
+      @quiz.stubs(:quiz_data).returns([
+        {"question_type" => "foo"},
+        {"entry_type" => "quiz_group", "questions" => [{"question_type" => "bar"},{"question_type" => "baz"}]}
+      ])
+      expect(@quiz.question_types).to eq(["foo", "bar", "baz"])
+    end
+  end
+
   describe "#has_file_upload_question?" do
 
     let(:quiz) { @course.quizzes.build title: 'File Upload Quiz' }
