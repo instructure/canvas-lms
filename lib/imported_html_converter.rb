@@ -189,7 +189,10 @@ class ImportedHtmlConverter
 
   def self.replace_relative_file_url(rel_path, context)
     new_url = nil
-    rel_path, qs = rel_path.split('?', 2)
+    split = rel_path.split('?')
+    qs = split.pop if split.length > 1
+    rel_path = split.join('?')
+
     rel_path_parts = Pathname.new(rel_path).each_filename.to_a
 
     # e.g. start with "a/b/c.txt" then try "b/c.txt" then try "c.txt"

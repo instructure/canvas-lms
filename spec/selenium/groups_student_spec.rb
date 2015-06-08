@@ -232,11 +232,11 @@ describe "student groups" do
         end
       end
 
-      it "add/remove plurality to the word 'student' if one student", prioirity:"2", test_id:180723 do
+      it "add/remove plurality to the word 'student' if one student", priority:"2", test_id:180723 do
         expect(f(".student-group-students")).to include_text("1 student")
 
         fln('Manage').click
-        wait_for_animations
+        wait_for_ajaximations
 
         # add the first student that isn't the current student
         ffj(".checkbox:visible")[1].click

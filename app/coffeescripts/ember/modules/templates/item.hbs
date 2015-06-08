@@ -24,17 +24,17 @@
       </span>
     </div>
 
-    <div class="ig-details row-fluid">
-      <div class="span4">
+    <div class="ig-details">
+      <div>
         {{#if completion_requirement.completed}}<i class="icon-check"></i>{{/if}}
         {{completionRequirement}}
       </div>
-      <div class="span4 due_date_display" style="text-align: right">
+      <div class="due_date_display" style="text-align: right">
         {{#if due}}
           {{format-date due '%b %d, %Y'}}
         {{/if}}
       </div>
-      <div class="span4 points_possible_display">
+      <div class="points_possible_display">
         {{#if pointsPossible}}
           {{pointsPossible}} {{#t "points_possible"}}pts{{/t}}
         {{/if}}

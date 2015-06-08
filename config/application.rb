@@ -48,7 +48,7 @@ module CanvasRails
     # Run "rake -D time" for a list of tasks for finding time zone names. Comment line to use default local time.
     config.time_zone = 'UTC'
 
-    log_config = File.exists?(Rails.root+"config/logging.yml") && YAML.load_file(Rails.root+"config/logging.yml")[Rails.env]
+    log_config = File.exist?(Rails.root+"config/logging.yml") && YAML.load_file(Rails.root+"config/logging.yml")[Rails.env]
     log_config = { 'logger' => 'rails', 'log_level' => 'debug' }.merge(log_config || {})
     opts = {}
     require 'canvas_logger'
@@ -158,6 +158,7 @@ module CanvasRails
     # See the tests in spec/lib/safe_yaml_spec.rb
         YAML.whitelist.add(*%w[
       tag:ruby.yaml.org,2002:symbol
+      tag:yaml.org,2002:timestamp
       tag:yaml.org,2002:map:HashWithIndifferentAccess
       tag:yaml.org,2002:map:ActiveSupport::HashWithIndifferentAccess
       tag:ruby.yaml.org,2002:object:OpenStruct

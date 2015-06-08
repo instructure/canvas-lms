@@ -65,6 +65,11 @@ require 'action_controller_test_process'
 #           "example": "Toph Beifong",
 #           "type": "string"
 #         },
+#         "author": {
+#           "description": "Abbreviated user object UserDisplay (see users API).",
+#           "example": "{}",
+#           "type": "string"
+#         },
 #         "comment": {
 #           "example": "Well here's the thing...",
 #           "type": "string"
@@ -206,11 +211,11 @@ class SubmissionsController < ApplicationController
   end
 
   API_SUBMISSION_TYPES = {
-    "online_text_entry" => ["body"],
-    "online_url" => ["url"],
-    "online_upload" => ["file_ids"],
-    "media_recording" => ["media_comment_id", "media_comment_type"],
-  }
+    "online_text_entry" => ["body"].freeze,
+    "online_url" => ["url"].freeze,
+    "online_upload" => ["file_ids"].freeze,
+    "media_recording" => ["media_comment_id", "media_comment_type"].freeze,
+  }.freeze
 
   # @API Submit an assignment
   #
@@ -511,16 +516,18 @@ class SubmissionsController < ApplicationController
 
     # process the file and create an attachment
     filename = "google_doc_#{Time.now.strftime("%Y%m%d%H%M%S")}#{@current_user.id}.#{file_extension}"
-    path     = File.join("tmp", filename)
-    File.open(path, 'wb') do |f|
-      f.write(document_response.body)
-    end
+    Dir.mktmpdir do |dirname|
+      path     = File.join(dirname, filename)
+      File.open(path, 'wb') do |f|
+        f.write(document_response.body)
+      end
 
-    @attachment = @assignment.attachments.new(
-      uploaded_data: Rack::Test::UploadedFile.new(path, document_response.content_type, true),
-      display_name: display_name, user: @current_user
-    )
-    @attachment.save!
+      @attachment = @assignment.attachments.new(
+        uploaded_data: Rack::Test::UploadedFile.new(path, document_response.content_type, true),
+        display_name: display_name, user: @current_user
+      )
+      @attachment.save!
+    end
     @attachment
   end
   protected :submit_google_doc

@@ -17,12 +17,22 @@ define [
       '.element_toggler i': '$detailToggle'
 
     events:
-      'click button':           'onToggleValue'
+      'change .ff_button': 'onClickThreeState'
+      'change .ff_toggle': 'onClickToggle'
       'click .element_toggler': 'onToggleDetails'
       'keyclick .element_toggler': 'onToggleDetails'
 
-    onToggleValue: (e) ->
-      @toggleValue($(e.currentTarget))
+    afterRender: ->
+      @$('.ui-buttonset').buttonset()
+
+    onClickThreeState: (e) ->
+      $target = $(e.currentTarget)
+      action = $target.data('action')
+      @applyAction(action)
+
+    onClickToggle: (e) ->
+      $target = $(e.currentTarget)
+      @applyAction(if $target.is(':checked') then 'on' else 'off')
 
     onToggleDetails: (e) ->
       @toggleDetailsArrow()
@@ -31,15 +41,13 @@ define [
       @$detailToggle.toggleClass('icon-mini-arrow-right')
       @$detailToggle.toggleClass('icon-mini-arrow-down')
 
-    shouldDelete: (action) ->
-      @model.get('hidden') && action == 'off'
-
-    toggleValue: ($target) ->
-      action = $target.data('action')
-      $.when(@canUpdate(action)).then =>
-        $target.siblings().removeClass('active').attr('aria-checked', false)
-        $target.addClass('active').attr('aria-checked', true)
-        if @shouldDelete(action) then @deleteFlag() else @updateFlag(action)
+    applyAction: (action) ->
+      $.when(@canUpdate(action)).then(
+        =>
+          @model.updateState(action)
+        =>
+          @render() # undo UI change if user cancels
+      )
 
     canUpdate: (action) ->
       deferred = $.Deferred()
@@ -53,9 +61,3 @@ define [
       view.render()
       view.show()
       deferred
-
-    deleteFlag: ->
-      @model.destroy(silent: true)
-
-    updateFlag: (action) ->
-      @model.save(state: action).then(@model.updateTransitions)

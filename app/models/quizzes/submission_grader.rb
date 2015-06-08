@@ -7,7 +7,7 @@ module Quizzes
 
     def grade_submission(opts={})
       if @submission.submission_data.is_a?(Array)
-        raise(AlreadyGradedError,"Can't grade an already-submitted submission: #{@submission.workflow_state} #{@submission.submission_data.class.to_s}")
+        raise(AlreadyGradedError,"Can't grade an already-submitted submission: #{@submission.workflow_state} #{@submission.submission_data.class}")
       end
       @submission.manually_scored = false
       tally = 0

@@ -54,14 +54,18 @@ end
 #
 # Returns a boolean.
 def create_collaboration!(type, title = 'New collaboration')
-  PluginSetting.create!(:name => type, :settings => {})
-  if (type == "google_docs")
-    PluginSetting.create!(:name => 'google_drive', :settings => {})
+  unless PluginSetting.where(:name => type).exists?
+    PluginSetting.create!(:name => type, :settings => {})
+    if (type == "google_docs")
+      PluginSetting.create!(:name => 'google_drive', :settings => {})
+    end
   end
   #PluginSetting.where(:name => type).destroy_all
   #PluginSetting.where(:name => 'google_drive').destroy_all
 
-  @collaboration         = Collaboration.typed_collaboration_instance(title)
+  name = Collaboration.collaboration_types.detect{|t| t[:type] == type}[:name]
+
+  @collaboration         = Collaboration.typed_collaboration_instance(name)
   @collaboration.context = @course
   @collaboration.title   = title
   @collaboration.user = @user

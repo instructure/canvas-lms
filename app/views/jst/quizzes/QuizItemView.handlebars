@@ -9,45 +9,47 @@
     class="ig-row"
   {{/if}}
 >
-  <a href="{{url}}" class="ig-title ellipses">
-    <i class="icon-quiz"></i> {{title_label}}
-  </a>
+  <div class="ig-row__layout">
+    <a href="{{url}}" class="ig-title ellipses">
+      <i class="icon-quiz"></i> {{title_label}}
+    </a>
 
-  <div class="ig-details row-fluid">
-    <div class="span4 ellipses date-available" data-view="date-available"></div>
-    <div class="span4 ellipses date-due" data-view="date-due"></div>
-    <div class="span2 ellipses">{{possible_points_label}}</div>
-    <div class="span2 ellipses">{{question_count_label}}</div>
-  </div>
-
-  {{#if can_update}}
-  <div class="ig-admin">
-    <span data-view="publish-icon" class="publish-icon"></span>
-
-    <div class="inline-block">
-      <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="ui-id-{{id}}-1" href="#">
-        <i class="icon-settings"></i>
-        <i class="icon-mini-arrow-down"></i>
-        <span class="screenreader-only">{{#t "settings"}}Settings{{/t}}</span>
-      </a>
-
-      <ul id="ui-id-{{id}}-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="ui-id-{{id}}-2">
-        <li role="presentation">
-          <a href="{{edit_url}}" id="ui-id-{{id}}-2" class="icon-edit" tabindex="-1" role="menuitem" title='{{#t "title_edit"}}Edit Quiz{{/t}}'>{{#t "links.edit"}}Edit{{/t}}</a>
-        </li>
-        <li role="presentation">
-          <a href="{{url}}" id="ui-id-{{id}}-3" class="delete-item icon-trash" tabindex="-1" role="menuitem" title='{{#t "title_delete"}}Delete Quiz{{/t}}'>{{#t "links.delete"}}Delete{{/t}}</a>
-        </li>
-        {{#each quiz_menu_tools}}
-          <li role="presentation">
-            <a class="menu_tool_link" href="{{url}}">
-              {{#if icon_url}}<img class="icon" src="{{icon_url}}" />{{/if}}
-              {{title}}
-            </a>
-          </li>
-        {{/each}}
-      </ul>
+    <div class="ig-details">
+      <div class="ellipses date-available" data-view="date-available"></div>
+      <div class="ellipses date-due" data-view="date-due"></div>
+      <div class="ellipses">{{possible_points_label}}</div>
+      <div class="ellipses">{{question_count_label}}</div>
     </div>
+
+    {{#if can_update}}
+    <div class="ig-admin">
+      <span data-view="publish-icon" class="publish-icon"></span>
+
+      <div class="inline-block">
+        <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="ui-id-{{id}}-1" href="#">
+          <i class="icon-settings"></i>
+          <i class="icon-mini-arrow-down"></i>
+          <span class="screenreader-only">{{#t "settings"}}Settings{{/t}}</span>
+        </a>
+
+        <ul id="ui-id-{{id}}-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="ui-id-{{id}}-2">
+          <li role="presentation">
+            <a href="{{edit_url}}" id="ui-id-{{id}}-2" class="icon-edit" tabindex="-1" role="menuitem" title='{{#t "title_edit"}}Edit Quiz{{/t}}'>{{#t "links.edit"}}Edit{{/t}}</a>
+          </li>
+          <li role="presentation">
+            <a href="{{url}}" id="ui-id-{{id}}-3" class="delete-item icon-trash" tabindex="-1" role="menuitem" title='{{#t "title_delete"}}Delete Quiz{{/t}}'>{{#t "links.delete"}}Delete{{/t}}</a>
+          </li>
+          {{#each quiz_menu_tools}}
+            <li role="presentation">
+              <a class="menu_tool_link" href="{{url}}">
+                {{#if icon_url}}<img class="icon" src="{{icon_url}}" />{{/if}}
+                {{title}}
+              </a>
+            </li>
+          {{/each}}
+        </ul>
+      </div>
+    </div>
+    {{/if}}
   </div>
-  {{/if}}
 </div>

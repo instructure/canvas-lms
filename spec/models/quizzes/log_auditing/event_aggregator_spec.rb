@@ -27,6 +27,7 @@ describe Quizzes::LogAuditing::EventAggregator do
     end
     @qs = @quiz.generate_submission(student_in_course.user)
   end
+
   def build_an_event(event_type, event_data, time_step=0)
     Quizzes::QuizSubmissionEvent.create do |event|
       event.quiz_submission_id = @qs.id
@@ -36,6 +37,7 @@ describe Quizzes::LogAuditing::EventAggregator do
       event.attempt = @qs.attempt
     end
   end
+
   def build_out_database_events
     event_types = [
       Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED,
@@ -69,9 +71,10 @@ describe Quizzes::LogAuditing::EventAggregator do
   context "without events" do
     before :once do
       build_course_quiz_qs
+      @aggregator = Quizzes::LogAuditing::EventAggregator.new(@quiz)
     end
     it "returns no events gracefully" do
-      @aggregated_submission_data = subject.run(@qs.id, @qs.attempt, Time.now)
+      @aggregated_submission_data = @aggregator.run(@qs.id, @qs.attempt, Time.zone.now)
       expect(@aggregated_submission_data).to be_a(Hash)
       expect(@aggregated_submission_data).to eq({})
     end
@@ -81,18 +84,19 @@ describe Quizzes::LogAuditing::EventAggregator do
     before :once do
       build_course_quiz_qs
       build_out_database_events
+      @aggregator = Quizzes::LogAuditing::EventAggregator.new(@quiz)
     end
     it "reduces all events to submission_data" do
-      @aggregated_submission_data = subject.run(@qs.id, @qs.attempt, @events.last.created_at)
+      @aggregated_submission_data = @aggregator.run(@qs.id, @qs.attempt, @events.last.created_at)
       expect(@aggregated_submission_data).to eq(latest_submission_data)
     end
     it "builds submission_data up to the specified timestamp, inclusive" do
-      submission_data = subject.run(@qs.id, @qs.attempt, @events[0].created_at)
-      expect(submission_data).to eq ({"question_#{@questions[0].id}"=>"hello"})
+      submission_data = @aggregator.run(@qs.id, @qs.attempt, @events[0].created_at)
+      expect(submission_data).to eq({"question_#{@questions[0].id}"=>"hello"})
     end
     it "replaces previous content in submission_data build" do
-      submission_data = subject.run(@qs.id, @qs.attempt, @events[2].created_at)
-      expect(submission_data).to eq ({"question_#{@questions[0].id}"=>"goodbye", "question_#{@questions[0].id}_marked"=>true})
+      submission_data = @aggregator.run(@qs.id, @qs.attempt, @events[2].created_at)
+      expect(submission_data).to eq({"question_#{@questions[0].id}"=>"goodbye", "question_#{@questions[0].id}_marked"=>true})
     end
   end
 end

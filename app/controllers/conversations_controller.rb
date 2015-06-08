@@ -136,7 +136,7 @@ class ConversationsController < ApplicationController
   # batch up all delayed jobs to make this more responsive to the user
   batch_jobs_in_actions :only => :create
 
-  API_ALLOWED_FIELDS = %w{workflow_state subscribed starred scope filter}
+  API_ALLOWED_FIELDS = %w{workflow_state subscribed starred scope filter}.freeze
 
   # @API List conversations
   # Returns the list of conversations for the current user, most recent ones first.
@@ -248,6 +248,7 @@ class ConversationsController < ApplicationController
       hash = {
         :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id,
         :ACCOUNT_CONTEXT_CODE => "account_#{@domain_root_account.id}",
+        :MAX_GROUP_CONVERSATION_SIZE => Conversation.max_group_conversation_size
       }
 
       notes_enabled_accounts = @current_user.associated_accounts.where(enable_user_notes: true)
@@ -291,7 +292,8 @@ class ConversationsController < ApplicationController
   # @argument group_conversation [Boolean]
   #   Defaults to false. If true, this will be a group conversation (i.e. all
   #   recipients may see all messages and replies). If false, individual private
-  #   conversations will be started with each recipient.
+  #   conversations will be started with each recipient. Must be set false if the
+  #   number of recipients is over the set maximum (default is 100).
   #
   # @argument attachment_ids[] [String]
   #   An array of attachments ids. These must be files that have been previously
@@ -354,6 +356,10 @@ class ConversationsController < ApplicationController
     batch_private_messages = !group_conversation && @recipients.size > 1
     batch_group_messages   = group_conversation && value_to_boolean(params[:bulk_message])
     message                = build_message
+
+    if !batch_group_messages && @recipients.size > Conversation.max_group_conversation_size
+      return render_error('recipients', 'too many for group conversation')
+    end
 
     if batch_private_messages || batch_group_messages
       mode = params[:mode] == 'async' ? :async : :sync
@@ -752,36 +758,43 @@ class ConversationsController < ApplicationController
   def add_message
     get_conversation(true)
     if params[:body].present?
-
       # allow responses to be sent to anyone who is already a conversation participant.
       params[:from_conversation_id] = @conversation.conversation_id
       # not a before_filter because we need to set the above parameter.
       normalize_recipients
-
-      message = build_message
       # find included_messages
       message_ids = params[:included_messages]
       message_ids = message_ids.split(/,/) if message_ids.is_a?(String)
-      messages = ConversationMessage.where(:id => message_ids) if message_ids
 
       # these checks could be folded into the initial ConversationMessage lookup for better efficiency
-      if messages
-        # sanity check: can the user see the included messages?
-        return render_error('included_messages', 'not a participant') unless messages.all? { |m| m.conversation_message_participants.where(:user_id => @current_user.id).exists? }
+      if message_ids
+
         # sanity check: are the messages part of this conversation?
-        return render_error('included_messages', 'not for this conversation') unless messages.all? { |m| m.conversation_id == @conversation.conversation.id }
+        db_ids = ConversationMessage.where(:id => message_ids, :conversation_id => @conversation.conversation_id).pluck(:id)
+        unless db_ids.count == message_ids.count
+          return render_error('included_messages', 'not for this conversation')
+        end
+        message_ids = db_ids
+
+        # sanity check: can the user see the included messages?
+        unless ConversationMessageParticipant.where(:conversation_message_id => message_ids,
+            :user_id => @current_user.id).count == message_ids.count
+          return render_error('included_messages', 'not a participant')
+        end
       end
 
-      unless @conversation.private?
-        @conversation.add_participants @recipients, no_messages: true if @recipients
+      message_args = build_message_args
+      if @conversation.should_process_immediately?
+        message = @conversation.process_new_message(message_args, @recipients, message_ids, @tags)
+        render :json => conversation_json(@conversation.reload, @current_user, session, :messages => [message])
+      else
+        @conversation.send_later_enqueue_args(:process_new_message,
+          {:strand => "add_message_#{@conversation.global_conversation_id}", :max_attempts => 1},
+          message_args, @recipients, message_ids, @tags)
+        return render :json => [], :status => :accepted
       end
-      @conversation.reload
-      messages.each { |msg| @conversation.conversation.add_message_to_participants msg, new_message: false, only_users: @recipients, reset_unread_counts: false } if messages
-      @conversation.add_message message, :tags => @tags, :update_for_sender => false, only_users: @recipients
-
-      render :json => conversation_json(@conversation.reload, @current_user, session, :messages => [message])
     else
-      render :json => {}, :status => :bad_request
+      render :json => {}, :status => :bad_reqquest
     end
   end
 
@@ -1011,15 +1024,21 @@ class ConversationsController < ApplicationController
   end
 
   def build_message
-    Conversation.build_message(
+    Conversation.build_message(*build_message_args)
+  end
+
+  def build_message_args
+    [
       @current_user,
       params[:body],
-      :attachment_ids => params[:attachment_ids],
-      :forwarded_message_ids => params[:forwarded_message_ids],
-      :root_account_id => @domain_root_account.id,
-      :media_comment => infer_media_comment,
-      :generate_user_note => value_to_boolean(params[:user_note])
-    )
+      {
+        :attachment_ids => params[:attachment_ids],
+        :forwarded_message_ids => params[:forwarded_message_ids],
+        :root_account_id => @domain_root_account.id,
+        :media_comment => infer_media_comment,
+        :generate_user_note => value_to_boolean(params[:user_note])
+      }
+    ]
   end
 
   def infer_media_comment

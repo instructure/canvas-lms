@@ -35,24 +35,30 @@ define [
           name: "first session"
           start_at: Date.parse "September 12, 2012"
           end_at: Date.parse "November 12, 2016"
-          override_course_dates: true
+          override_course_and_term_dates: true
         },
         {
           id: 2
           name: "second session"
           start_at: Date.parse "September 12, 2012"
           end_at: null
-          override_course_dates: false
+          override_course_and_term_dates: true
         },
         {
           id: 3
           name: "third session"
           start_at: null
           end_at: null
-          override_course_dates: true
+          override_course_and_term_dates: true
+        },
+        {
+          id: 4
+          name: "fourth session"
+          start_at: Date.parse "September 12, 2012"
+          end_at: Date.parse "November 12, 2016"
+          override_course_and_term_dates: false
         }
       ]
-      #@dueDateView['section-list'] = new SectionDropdownView(sections: @sections, override: @override).render()
       @dueDateView.render()
       $('#fixtures').append @dueDateView.$el
 
@@ -61,6 +67,7 @@ define [
       $('#fixtures').empty()
       tz.restore(@tzSnapshot)
       @override.course_section_id = 0
+      ENV.VALID_DATE_RANGE = {}
 
   test "#getFormValues unfudges for user timezone offset", ->
     formValues = @dueDateView.getFormValues()
@@ -148,7 +155,12 @@ define [
     @dueDateView.$el.hideErrors()
 
   test "#validateBeforeSave validates dates by section when date range set for
-    custom section and section set to override course dates", ->
+    custom section and section set to override course and term dates", ->
+
+    ENV.VALID_DATE_RANGE = {
+      start_at: {date: Date.parse("October 12, 2012"), date_context: "term"}
+      end_at: {date: Date.parse("October 12, 2016"), date_context: "course"}
+    }
 
     day1 = Date.parse "December 16, 2016"
     day2 = Date.parse "December 31, 1999"
@@ -190,7 +202,7 @@ define [
     @dueDateView.$el.hideErrors()
 
   test "#validateBeforeSave validates dates by term when no date range is
-    set for custom section or course dates", ->
+    set for section or course with date override enabled", ->
 
     ENV.VALID_DATE_RANGE = {
       start_at: {date: Date.parse("October 12, 2012"), date_context: "term"}
@@ -201,7 +213,7 @@ define [
     day2 = Date.parse "December 31, 1999"
 
     data =
-      {lock_at: day1}
+      {lock_at: day1, course_section_id: 2}
     errors = {}
 
     errs = @dueDateView.validateBeforeSave(data,errors)
@@ -210,34 +222,16 @@ define [
     @dueDateView.$el.hideErrors()
 
     data =
-      {unlock_at: day2}
+      {unlock_at: day2, course_section_id: 2}
     errors = {}
 
     errs = @dueDateView.validateBeforeSave(data,errors)
     error = errs.assignmentOverrides.unlock_at
-    strictEqual error, 'Unlock date cannot be before term start'
+    strictEqual error, 'Unlock date cannot be before section start'
     @dueDateView.$el.hideErrors()
 
-    errors = {}
-    data =
-      {due_at: day1}
-
-    errs = @dueDateView.validateBeforeSave(data,errors)
-    error = errs.assignmentOverrides.due_at
-    strictEqual error, 'Due date cannot be after term end'
-    @dueDateView.$el.hideErrors()
-
-    errors = {}
-    data =
-      {due_at: day2}
-
-    errs = @dueDateView.validateBeforeSave(data,errors)
-    error = errs.assignmentOverrides.due_at
-    strictEqual error, 'Due date cannot be before term start'
-    @dueDateView.$el.hideErrors()
-
-  test "#validateBeforeSave validates dates properly navigates through date
-    priorities when null values exist", ->
+  test "#validateBeforeSave properly navigates through date priorities when null
+    values exist", ->
     ENV.VALID_DATE_RANGE = {
       start_at: {date: Date.parse("October 12, 2012"), date_context: "term"}
       end_at: {date: Date.parse("October 12, 2016"), date_context: "course"}
@@ -275,11 +269,11 @@ define [
 
     errors = {}
     data =
-      {due_at: day2, course_section_id: 2}
+      {due_at: day2, course_section_id: 3}
 
     errs = @dueDateView.validateBeforeSave(data,errors,false)
     error = errs.assignmentOverrides.due_at
-    strictEqual error, 'Due date cannot be before section start'
+    strictEqual error, 'Due date cannot be before term start'
     @dueDateView.$el.hideErrors()
 
     ENV.VALID_DATE_RANGE.start_at.date = null
@@ -308,4 +302,32 @@ define [
 
     errs = @dueDateView.validateBeforeSave(data,errors)
     strictEqual errs.assignmentOverrides, undefined
+    @dueDateView.$el.hideErrors()
+
+  test "#validateBeforeSave ignores section dates if section's date override
+    is not tooggled on", ->
+    ENV.VALID_DATE_RANGE = {
+      start_at: {date: Date.parse("October 12, 2012"), date_context: "term"}
+      end_at: {date: Date.parse("October 12, 2016"), date_context: "term"}
+    }
+
+    day1 = Date.parse "December 16, 2016"
+    day2 = Date.parse "December 31, 1999"
+
+    data =
+      {lock_at: day1, course_section_id: 4}
+    errors = {}
+
+    errs = @dueDateView.validateBeforeSave(data,errors)
+    error = errs.assignmentOverrides.lock_at
+    strictEqual error, 'Lock date cannot be after term end'
+    @dueDateView.$el.hideErrors()
+
+    data =
+      {unlock_at: day2, course_section_id: 4}
+    errors = {}
+
+    errs = @dueDateView.validateBeforeSave(data,errors)
+    error = errs.assignmentOverrides.unlock_at
+    strictEqual error, 'Unlock date cannot be before term start'
     @dueDateView.$el.hideErrors()

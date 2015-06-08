@@ -44,7 +44,7 @@ class FilePreviewsController < ApplicationController
    application/postscript
    application/pdf
    application/vnd.ms-powerpoint
-}
+  }.freeze
 
   # renders (or redirects to) appropriate content for the file, such as
   # canvadocs, crocodoc, inline image, etc.
@@ -80,6 +80,9 @@ class FilePreviewsController < ApplicationController
       # media files
       elsif @file.content_type =~ %r{\A(audio|video)/}
         return render template: 'file_previews/media_preview', layout: false
+      # html files
+      elsif @file.content_type == 'text/html'
+        return redirect_to context_url(@context, :context_file_preview_url, @file.id)
       # no preview available
       else
         @accessed_asset = nil # otherwise it will double-log when they download the file

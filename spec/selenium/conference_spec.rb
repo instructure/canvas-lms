@@ -22,9 +22,9 @@ describe "web conference" do
       end
       headers = ff('.element_toggler')
       expect(headers[0]).to include_text("New Conferences")
-      expect(f'#new-conference-list').to include_text("There are no new conferences")
+      expect(f('#new-conference-list')).to include_text("There are no new conferences")
       expect(headers[1]).to include_text("Concluded Conferences")
-      expect(f'#concluded-conference-list').to include_text("There are no concluded conferences")
+      expect(f('#concluded-conference-list')).to include_text("There are no concluded conferences")
     end
 
     it "should create a web conference", :priority => "1", :test_id => 118489 do
@@ -65,7 +65,7 @@ describe "web conference" do
       f('.icon-settings').click
       wait_for_ajaximations
       delete_conference
-      expect(f'#new-conference-list').to include_text("There are no new conferences")
+      expect(f('#new-conference-list')).to include_text("There are no new conferences")
     end
 
     it "should delete concluded conferences", :priority => "2", :test_id => 163991 do
@@ -78,7 +78,37 @@ describe "web conference" do
       f('.icon-settings').click
       wait_for_ajaximations
       delete_conference
-      expect(f'#concluded-conference-list').to include_text("There are no concluded conferences")
+      expect(f('#concluded-conference-list')).to include_text("There are no concluded conferences")
+    end
+
+    describe "Keyboard Accessibility" do
+      it "should set focus to the preceding conference's cog when deleting" do
+        @cc2 = WimbaConference.create!(:title => "test conference", :user => @user, :context => @course)
+        get url
+
+        settings_triggers = ff('.al-trigger')
+        settings_triggers.last.click
+        delete_conference
+        check_element_has_focus(settings_triggers.first)
+      end
+
+      it "should set focus to the Add Conference button if there are no preceeding conferences" do
+        get url
+
+        settings_triggers = f('.al-trigger')
+        settings_triggers.click
+        delete_conference
+        check_element_has_focus(f('.new-conference-btn'))
+      end
+
+      it "should set focus to the cog menu if the delete was cancelled" do
+        get url
+
+        f('.al-trigger').click
+        f('.delete_conference_link').click
+        driver.switch_to.alert.dismiss
+        check_element_has_focus(f('.al-trigger'))
+      end
     end
   end
 end

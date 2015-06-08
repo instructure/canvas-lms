@@ -58,7 +58,7 @@ module AvatarHelper
     if participants.size == 1
       avatar_url_for_user(participants.first)
     elsif participants.size == 2
-      avatar_url_for_user(participants.select{ |u| u.id != conversation.user_id }.first)
+      avatar_url_for_user(participants.find{ |u| u.id != conversation.user_id })
     else
       avatar_url_for_group
     end

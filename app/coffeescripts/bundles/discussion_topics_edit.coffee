@@ -4,7 +4,6 @@ require [
   'compiled/models/Announcement'
   'compiled/models/DueDateList'
   'compiled/views/DiscussionTopics/EditView'
-  'compiled/views/assignments/DueDateList'
   'compiled/views/assignments/DueDateOverride'
   'compiled/collections/AssignmentGroupCollection'
   'compiled/collections/SectionCollection'
@@ -12,7 +11,7 @@ require [
   'grading_standards'
   'manage_groups'
 ], ($, DiscussionTopic, Announcement, DueDateList, EditView,
-DueDateListView, OverrideView, AssignmentGroupCollection, SectionCollection,
+OverrideView, AssignmentGroupCollection, SectionCollection,
 splitAssetString) ->
 
   is_announcement = ENV.DISCUSSION_TOPIC.ATTRIBUTES?.is_announcement
@@ -31,8 +30,7 @@ splitAssetString) ->
     views:
       'js-assignment-overrides': new OverrideView
         model: dueDateList
-        views:
-          'due-date-overrides': new DueDateListView(model: dueDateList)
+        views: {}
 
   if contextType is 'courses' && !is_announcement && ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT
     (view.assignmentGroupCollection = new AssignmentGroupCollection).contextAssetString = ENV.context_asset_string

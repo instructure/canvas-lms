@@ -18,24 +18,18 @@ define([
 
     render () {
       var navClass = React.addons.classSet({
-        "gradebook-navigation": true,
-        "nav_style": true,
         "hidden": !this.props.store.isEnabled() || !this.props.store.hasAssignments()
       });
       return (
         <nav className={navClass}>
-          <ul className="nav nav-pills gradebook-navigation-pills pull-right">
-            <li>
-              <button
-                 className="btn"
-                 onClick={this.openDialog}
-                 type="button"
-                 id="post-grades-button"
-              >
-                {I18n.t("Post Grades")}
-              </button>
-            </li>
-          </ul>
+          <button
+             className="btn"
+             onClick={this.openDialog}
+             type="button"
+             id="post-grades-button"
+          >
+            {I18n.t("Post Grades")}
+          </button>
         </nav>
       );
     },

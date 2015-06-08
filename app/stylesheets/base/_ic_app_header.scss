@@ -1,0 +1,215 @@
+@if $use_new_styles {
+
+  $ic-brand-global-nav-bgd: $ic-brand-secondary !default;
+  $ic-brand-global-nav-link-hover: darken($ic-brand-global-nav-bgd, 5%) !default;
+  $ic-brand-global-nav-link-active: darken($ic-brand-global-nav-bgd, 8%) !default;
+  $ic-brand-global-nav-avatar-border: $ic-color-light !default;
+  $ic-brand-global-nav-menu-item__badge-bgd: $ic-brand-primary !default;
+  $ic-brand-global-nav-menu-item__badge-border: darken($ic-brand-global-nav-bgd, 5%) !default;
+  $ic-brand-global-nav-ic-icon-svg-fill: $ic-color-light !default;
+  $ic-brand-global-nav-menu-item__text-color: $ic-color-light !default;
+  $ic-brand-global-nav-logo-bgd: transparent !default;
+  $ic-brand-nav-panel-bgd: $ic-color-light !default;
+
+  .ic-app-header {
+    box-sizing: border-box;
+    position: fixed;
+    top: 0; left: 0;
+    height: 100%;
+    width: $ic-header-primary-width - $ic-sp;
+    z-index: 100;
+    @include breakpoint(wide) { width: $ic-header-primary-width; }
+
+    // when the secondary nav is active, cover the entire app width
+    body.secondary-nav-expanded & { width: 100%; }
+
+  }
+
+  .ic-app-header__layout {
+    position: relative;
+    height: 100%;
+  }
+
+  .ic-app-header__overlay {
+    transition: all 0.3s;
+    background: $ic-brand-global-nav-bgd;
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    opacity: 0;
+    body.secondary-nav-expanded & { opacity: 1; }
+  }
+
+  .ic-app-header__main-navigation { flex: 1; }
+
+  .ic-app-header__menu-list { @include reset-list; }
+
+  .ic-app-header__menu-list-item { box-sizing: border-box; }
+
+  button.ic-app-header__menu-list-link {
+    background: transparent;
+    border: none;
+    width: 100%;
+    outline: none;
+  }
+
+  .ic-app-header__menu-list-link {
+    transition: background-color 0.2s ease-out;
+    padding: $ic-sp 0;
+    text-align: center;
+    display: block;
+    position: relative;
+    
+    @include breakpoint(short) {
+      padding-top: $ic-sp/2;
+      padding-bottom: $ic-sp/2;  
+    }
+    
+    &:hover, &:focus {
+      background-color: $ic-brand-global-nav-link-hover;
+      @if $use_high_contrast == false { text-decoration: none; }
+      .ic-icon-svg, .ic-avatar { transform: scale(1.1); } 
+      .ic-avatar { border-color: $ic-brand-global-nav-avatar-border; }
+      &:active { .ic-icon-svg, .ic-avatar { transform: scale(1); } }
+      .menu-item__badge { border-color: $ic-brand-global-nav-menu-item__badge-border; }
+    }
+    
+    &:active {
+      background-color: $ic-brand-global-nav-link-active;
+      box-shadow: inset 0 1px 1px rgba(black, 0.3);
+    }
+
+    .ic-icon-svg {
+      transition: all 0.2s ease-out;
+      transform: translate3d(0,0,0);
+      width: 26px;
+      display: inline-block;
+      vertical-align: middle;
+      path { fill: $ic-brand-global-nav-ic-icon-svg-fill; }
+    }
+
+    // Need to provide heights for IE10 and 11
+    .ic-icon-svg--dashboard { height: 20px; }
+    .ic-icon-svg--calendar, 
+    .ic-icon-svg--inbox,
+    .ic-icon-svg--apps { height: 28px; }
+    .ic-icon-svg--courses { height: 26px; }
+    .ic-icon-svg--grades { height: 30px; }
+    .ic-icon-svg--commons { height: 21px; }
+    .ic-icon-svg--arrow-right { width: 24px; height: 24px; }
+  }
+
+  .ic-app-header__secondary {
+    transition: all 0.2s ease-out;
+    transform: translate3d(-101%,0,0);
+    box-sizing: border-box;
+    background: $ic-brand-nav-panel-bgd;
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%;
+    z-index: 1;
+    opacity: 0;
+    overflow: hidden;
+    width: $ic-header-primary-expanded-width + ($ic-header-primary-expanded-width * 1.3);
+    padding: $ic-sp*1.5 $ic-sp*2;
+    left: $ic-header-primary-width - $ic-sp;
+    @include breakpoint(wide) { left: $ic-header-primary-width; }
+
+    body.secondary-nav-expanded & { 
+      transform: translate3d(0,0,0); 
+      opacity: 1; 
+    }
+  }
+
+  .ic-app-header__primary {
+    box-sizing: border-box;
+    background: $ic-brand-global-nav-bgd;
+    height: 100%;
+    position: absolute;
+    top: 0; left: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    width: $ic-header-primary-width - $ic-sp;
+    @include breakpoint(wide) { width: $ic-header-primary-width; }
+  }
+
+  .ic-avatar {
+    transition: all 0.2s ease-out;
+    overflow: hidden;
+    border-radius: 100%;
+    border: 2px solid $ic-brand-global-nav-avatar-border;
+    width: $ic-sp*4; height: $ic-sp*4;
+    box-sizing: border-box;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .menu-item-icon-container {
+    transform: translate3d(0,0,0);
+    position: relative;
+    z-index: 1;
+    width: $ic-sp*4;
+    margin: 0 auto;
+    .menu-item__badge {
+      position: absolute;
+      top: -($ic-sp/2); right: 0;
+      border-color: $ic-brand-global-nav-bgd;
+    }
+    .ic-avatar {
+      transform: translate3d(0,0,0);
+      width: $ic-sp*3; height: $ic-sp*3;
+    }
+  }
+
+  .menu-item__text {
+    margin-top: $ic-sp/4;
+    box-sizing: border-box;
+    color: $ic-brand-global-nav-menu-item__text-color;
+  }
+
+  .menu-item__badge {
+    transition: all 0.3s ease-out;
+    box-sizing: border-box;
+    width: $ic-sp*2; height: $ic-sp*2;
+    background: $ic-brand-global-nav-menu-item__badge-bgd;
+    color: $ic-brand-global-nav-menu-item__text-color;
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    border: 2px solid transparent;
+  }
+
+  .ic-app-header__logomark {
+    display: block;
+    overflow: hidden;
+    margin-bottom: $ic-sp;
+    background: $ic-brand-global-nav-logo-bgd;
+
+    .canvas-logomark, .ic-app-header__logomark_image {
+      transform: translate3d(0,0,0);
+      transition: all 0.3s $ic-transition; 
+      display: block;
+      margin: 0 auto;
+    }
+
+    .canvas-logomark {
+      width: $ic-sp*3; height: $ic-sp*3;
+      padding: $ic-sp*1.5 0 $ic-sp;
+    }
+
+    // let customer logo fit nav width
+    .ic-app-header__logomark_image { max-width: 100%; }
+
+    // scale up customer or canvas logo on hover/focus
+    &:hover, &:focus {
+      .canvas-logomark, 
+      .ic-app-header__logomark_image { transform: scale(1.15); }
+    }
+  }
+  // set to block to avoid any exta inline spacing at bottom
+  .ic-app-header__uploaded-logo { display: block; }
+
+}

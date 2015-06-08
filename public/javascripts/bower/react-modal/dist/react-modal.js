@@ -215,6 +215,7 @@ var ModalPortal = module.exports = React.createClass({
       },
         div({
           ref: "content",
+          style: this.props.style,
           className: cx(this.buildClassName('content'), this.props.className),
           tabIndex: "-1",
           onClick: stopPropagation,

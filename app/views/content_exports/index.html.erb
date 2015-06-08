@@ -1,15 +1,25 @@
-<% title = @context.is_a?(Course) ? t('content_exports', "Content Exports") : t('user_data_exports', "User Data Exports") %>
+<%
+  title = @context.is_a?(Course) ? t('content_exports', "Content Exports") : t('user_data_exports', "Download Submissions")
+  friendly_message = @context.is_a?(Course) ? nil : t("Creating a Submission Export will allow you to download a zip file of all your assignment submissions in all of your present and past courses. This could be a big file, so it may take a while. You can navigate away from the page and come back later.")
+%>
+
 
 <% add_crumb title %>
 <% content_for :page_title do %><%= title %><% end %>
 
 <div>
   <h1><%= title %></h1>
-  
+
+  <% if friendly_message %>
+    <p><%= friendly_message %></p>
+  <% end %>
+
   <div class="export_messages" style="<%= hidden %>">
     <div class="ui-state-error error_message"></div>
   </div>
-  
+
+  <hr />
+
   <div id="export_files">
     <% @exports.each do |export| %>
       <% unless export.running? %>
@@ -31,6 +41,8 @@
       <% end %>
     <% end %>
   </div>
+
+  <hr />
 
   <div class="form" style="<%= hidden if @current_export_id %>">
     <% if @context.is_a?(Course) %>
@@ -67,7 +79,7 @@
       <% end %>
     <% end %>
   </div>
-  
+
   <div class="progress_bar_holder" style="<%= hidden unless @current_export_id %> margin-top: 10px;">
       <div class="export_progress"></div>
       <% if @context.is_a?(Course) %>

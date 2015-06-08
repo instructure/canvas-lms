@@ -20,10 +20,11 @@ define([
   'compiled/editor/stocktiny',
   'jquery',
   'str/htmlEscape',
+  'tinymce_plugins/instructure_links/linkable_editor',
   'jquery.instructure_misc_helpers',
   'jqueryui/dialog',
   'jquery.instructure_misc_plugins',
-], function(tinymce, $, htmlEscape) {
+], function(tinymce, $, htmlEscape, LinkableEditor) {
 
   var lastLookup = null;
 
@@ -41,7 +42,7 @@ define([
   var Links = {
 
     /**
-     * Finds the closes img tag and extracts the 'src' attribute,
+     * Finds the closest img tag and extracts the 'src' attribute,
      * which then gets pulled into a new string as the src attribute
      * for an img tag to be written through into a tinymce IFrame editor.
      *
@@ -52,7 +53,92 @@ define([
     buttonToImg: function(target){
       var src = target.closest('img').attr('src');
       return "<img src='" + htmlEscape(src) + "'/>";
+    },
+
+    /**
+     * snapshots the current state of the editor (nodeChanged) so that a refocus
+     * later will git the right selection involved, then wraps the editor
+     * in a linkable editor which knows some of the selection state
+     * at the time of link activation and can proxy the actual link call
+     * through to our custom linkification method in tinymce.editor_box
+     *
+     * @param {tinymce.Editor} editor the instance we want to linkify something
+     *   within
+     *
+     * @returns {LinkableEditor}
+     */
+    prepEditorForDialog: function(editor){
+      editor.nodeChanged();
+      return new LinkableEditor(editor);
+    },
+
+    /**
+     * When inserting a link into the editor, we only want to have control
+     * classes on them if they've been explicitly asked for through
+     * the UI checkboxes.  This function is used to transform
+     * link attributes at the time of edit/insertion. It strips off any
+     * control classes that are prexisting, and then only adds them on
+     * if the checkboxes are populated.
+     *
+     * @param {String} priorClasses existing class list from the link
+     *   element (which would be empty for new links, populated for editing
+     *   links)
+     *
+     * @param {JQuery Object} box the dialog box the UI for creating a link
+     *   is within
+     *
+     * @returns {String} a transformed class list based on the rules listed
+     *   above
+     */
+    buildLinkClasses: function(priorClasses, $box){
+      var classes = priorClasses.replace(/(auto_open|inline_disabled)/g, "");
+      if($box.find(".auto_show_inline_content").attr("checked")) {
+        classes = classes + " auto_open";
+      }
+      if($box.find(".disable_inline_content").attr('checked')) {
+        classes = classes + " inline_disabled";
+      }
+      return classes;
+    },
+
+    /**
+     * this takes the dialog box that provides the form for inputting
+     * a link target, clears off any submit callbacks that are currently
+     * attached to it, and attaches a *new* submit callback to populate
+     * link data into the correct editor.
+     *
+     * @param {JQuery Object} box this is the dialog box div we want to address
+     *
+     * @param {LinkableEditor} linkableEditor the wrapped editor that knows how
+     *  to attach links to selected content
+     *
+     * @param {function} fetchClasses I hate that we need this parameter.
+     *   the priorClasses state is maintained in a pseudo-global string
+     *   that gets modulated throughout the life of this plugin.  That
+     *   means just passing it in at the time we do the binding gives us
+     *   a blank value.  The callback delays the query until the submit
+     *   button fires, by which time priorClasses might be populated.  The
+     *   real solution here is to de-global-ify the priorClasses variable,
+     *   but that refactor is for another day.
+     *
+     * @param {function} done any behavior you want to happen after the link
+     *   has been inserted into the editor
+     */
+    bindLinkSubmit: function($box, linkableEditor, fetchClasses, done){
+      var $form = $box.find("#instructure_link_prompt_form");
+      $form.off('submit');
+      $form.on('submit', function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        var $editor = $box.data('editor');
+        var text = $(this).find(".prompt").val();
+        var classes = Links.buildLinkClasses(fetchClasses.call(), $box);
+        $box.dialog("close");
+        linkableEditor.createLink(text, classes);
+        done.call();
+      });
     }
+
   };
 
   // hack for circular dependency
@@ -67,16 +153,14 @@ define([
         // TODO: Allow disabling of inline media as well.  Right now
         // the link is just '#' so disabling it actually ruins it.  It'd
         // be nice if the link were a URL to download the media file.
-        var inlineContentClasses = ['instructure_scribd_file'];
+        var inlineContentClasses = ["instructure_scribd_file"];
         // Only allow non-intrusive types to be auto-opened (i.e. don't
         // allow auto-playing of video files on page load)
-        var autoShowContentClasses = ['instructure_scribd_file'];
+        var autoShowContentClasses = ["instructure_scribd_file"];
+
         ed.addCommand('instructureLinks', function() {
-          var $editor = $("#" + ed.id);
-          if ($editor.data('enable_bookmarking')) {
-            var bookmark = ed.selection && ed.selection.getBookmark();
-            $editor.data('last_bookmark', bookmark);
-          }
+          var linkableEditor = Links.prepEditorForDialog(ed);
+          var $editor = linkableEditor.getEditor();
           var $box = $("#instructure_link_prompt");
           var priorClasses = '';
           $box.removeClass('for_inline_content')
@@ -129,31 +213,6 @@ define([
                 $box.find(".auto_show_inline_content").attr('checked', false);
               }
               $box.find(".auto_show").showIf(!$(this).attr('checked') && $box.hasClass('for_inline_content_can_auto_show'));
-            });
-            $box.find("#instructure_link_prompt_form").submit(function(event) {
-              var $editor = $box.data('editor');
-              event.preventDefault();
-              event.stopPropagation();
-              var text = $(this).find(".prompt").val();
-              if(!text.match(/^[a-zA-Z]+:\/\//) && !text.match(/^[0-9a-zA-Z]+\.[0-9a-zA-Z]+/) && text.match(/^[0-9a-zA-Z\s]+$/)) {
-                wiki_url = $("#wiki_sidebar_wiki_url").attr('href');
-                if(wiki_url) {
-                  text = $.replaceTags(wiki_url, 'page_url', text.replace(/\s/, '-').toLowerCase());
-                }
-              }
-              var classes = priorClasses.replace(/(auto_open|inline_disabled)/g, "");
-              if($box.find(".auto_show_inline_content").attr('checked')) {
-                classes = classes + " auto_open";
-              }
-              if($box.find(".disable_inline_content").attr('checked')) {
-                classes = classes + " inline_disabled";
-              }
-              $editor.editorBox('create_link', {
-                url: text,
-                classes: classes
-              });
-              $box.dialog('close');
-              updateLinks(true);
             });
             $box.find(".actions").delegate('.embed_image_link', 'click', function(event) {
               var $editor = $box.data('editor');
@@ -242,7 +301,15 @@ define([
             });
             $box.attr('id', 'instructure_link_prompt');
             $("body").append($box);
-          }
+          } // END of if($box.length == 0), everything above only happens once
+
+
+          // Bind in the callback to fire when the user has entered
+          // the link target they want and hit "submit"
+          var fetchClasses = function(){ return priorClasses; };
+          var done = function(){ updateLinks(true); };
+          Links.bindLinkSubmit($box, linkableEditor, fetchClasses, done);
+
           $box.data('editor', $editor);
           $box.data('original_data', null);
           var e = ed.selection.getNode();
@@ -397,7 +464,6 @@ define([
         });
         ed.on('change', function() { updateLinks(); });
         ed.on('SetContent', function() {updateLinks("contentJustSet");} );
-
 
       },
 

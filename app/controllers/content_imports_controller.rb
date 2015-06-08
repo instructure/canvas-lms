@@ -25,14 +25,16 @@ class ContentImportsController < ApplicationController
   include Api::V1::Course
   include ContentImportsHelper
 
-  COPY_TYPES = %w{assignment_groups assignments context_modules learning_outcomes
-                quizzes assessment_question_banks folders attachments wiki_pages discussion_topics
-                calendar_events context_external_tools learning_outcome_groups rubrics}
+  COPY_TYPES = %w{assignment_groups assignments context_modules
+                  learning_outcomes quizzes assessment_question_banks folders
+                  attachments wiki_pages discussion_topics calendar_events
+                  context_external_tools learning_outcome_groups rubrics}.freeze
 
   # these are deprecated, but leaving them for a while so existing links get redirected
   def index
     redirect_to course_content_migrations_url(@context)
   end
+
   def intro
     redirect_to course_content_migrations_url(@context)
   end
@@ -160,7 +162,7 @@ class ContentImportsController < ApplicationController
           "topics" => "discussion_topics",
           "modules" => "context_modules",
           "outcomes" => "learning_outcomes"
-  }
+  }.freeze
   # convert types selected in API to expected format
   def convert_to_table_name(selections)
     selections.map{|s| SELECTION_CONVERSIONS[s] || s}

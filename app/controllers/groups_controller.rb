@@ -141,7 +141,10 @@ class GroupsController < ApplicationController
   include Api::V1::Group
   include Api::V1::GroupCategory
 
-  SETTABLE_GROUP_ATTRIBUTES = %w(name description join_level is_public group_category avatar_attachment storage_quota_mb max_membership leader)
+  SETTABLE_GROUP_ATTRIBUTES = %w(
+    name description join_level is_public group_category avatar_attachment
+    storage_quota_mb max_membership leader
+  ).freeze
 
   include TextHelper
 

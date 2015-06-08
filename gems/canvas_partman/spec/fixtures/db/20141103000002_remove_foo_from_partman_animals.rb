@@ -1,5 +1,5 @@
 class RemoveFooFromPartmanAnimals < CanvasPartman::Migration
-  self.master_table = :partman_animals
+  self.base_class = Animal
 
   def self.up
     with_each_partition do |partition_table_name|

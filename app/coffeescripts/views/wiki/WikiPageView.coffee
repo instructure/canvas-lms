@@ -10,7 +10,10 @@ define [
   'compiled/views/wiki/WikiPageReloadView'
   'compiled/views/PublishButtonView'
   'i18n!pages'
-], ($, tz, _, Backbone, splitAssetString, template, StickyHeaderMixin, WikiPageDeleteDialog, WikiPageReloadView, PublishButtonView, I18n) ->
+  'str/htmlEscape'
+  'prerequisites_lookup'
+  'content_locks'
+], ($, tz, _, Backbone, splitAssetString, template, StickyHeaderMixin, WikiPageDeleteDialog, WikiPageReloadView, PublishButtonView, I18n, htmlEscape) ->
 
   class WikiPageView extends Backbone.View
 
@@ -48,6 +51,14 @@ define [
       @$sequenceFooter?.detach()
 
       super
+
+      if @model.get('locked_for_user')
+        lock_info = @model.get('lock_info')
+        $(".lock_explanation").html(htmlEscape(INST.lockExplanation(lock_info, 'page')))
+        if lock_info.context_module && lock_info.context_module.id
+          prerequisites_lookup = "#{ENV.MODULES_PATH}/#{lock_info.context_module.id}/prerequisites/wiki_page_#{@model.get('page_id')}"
+          $('<a id="module_prerequisites_lookup_link" style="display: none;">').attr('href', prerequisites_lookup).appendTo($(".lock_explanation"))
+          INST.lookupPrerequisites()
 
       # attach/re-attach the publish button
       unless @publishButtonView

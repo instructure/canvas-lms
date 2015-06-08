@@ -116,7 +116,7 @@ module Api::V1::Attachment
     @attachment = Attachment.new
     @attachment.shard = context.shard
     @attachment.context = context
-    @attachment.filename = params[:name]
+    @attachment.filename = params[:name]  || params[:filename]
     atts = process_attachment_params(params)
     atts.delete(:display_name)
     @attachment.attributes = atts

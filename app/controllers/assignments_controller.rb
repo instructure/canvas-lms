@@ -36,7 +36,7 @@ class AssignmentsController < ApplicationController
 
     if authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_ASSIGNMENTS)
-      log_asset_access("assignments:#{@context.asset_string}", 'assignments', 'other')
+      log_asset_access([ "assignments", @context ], 'assignments', 'other')
 
       add_crumb(t('#crumbs.assignments', "Assignments"), named_context_url(@context, :context_assignments_url))
 
@@ -174,22 +174,22 @@ class AssignmentsController < ApplicationController
       begin
         docs = google_service_connection.list_with_extension_filter(assignment.allowed_extensions)
       rescue GoogleDocs::NoTokenError => e
-        CanvasErrors.capture_exception(:oauth, e)
+        Canvas::Errors.capture_exception(:oauth, e)
       rescue ArgumentError => e
-        CanvasErrors.capture_exception(:oauth, e)
+        Canvas::Errors.capture_exception(:oauth, e)
       rescue => e
-        CanvasErrors.capture_exception(:oauth, e)
+        Canvas::Errors.capture_exception(:oauth, e)
         raise e
       end
       respond_to do |format|
-        format.json { render :json => docs.to_hash }
+        format.json { render json: docs.to_hash }
       end
     else
-      error_object = {:errors =>
-        {:base => t('errors.google_docs_masquerade_rejected', "Unable to connect to Google Docs as a masqueraded user.")}
+      error_object = {errors:
+        {base: t('errors.google_docs_masquerade_rejected', "Unable to connect to Google Docs as a masqueraded user.")}
       }
       respond_to do |format|
-        format.json { render :json => error_object, :status => :bad_request }
+        format.json { render json: error_object, status: :bad_request }
       end
     end
   end
@@ -273,7 +273,7 @@ class AssignmentsController < ApplicationController
                         @context.students_visible_to(@current_user)
                       end
 
-      @students = student_scope.uniq.order_by_sortable_name
+      @students = student_scope.not_fake_student.uniq.order_by_sortable_name
       @submissions = @assignment.submissions.include_assessment_requests
     end
   end
@@ -301,7 +301,7 @@ class AssignmentsController < ApplicationController
       append_sis_data(hash)
       js_env(hash)
 
-      log_asset_access("syllabus:#{@context.asset_string}", "syllabus", 'other')
+      log_asset_access([ "syllabus", @context ], "syllabus", 'other')
       respond_to do |format|
         format.html
       end
@@ -403,7 +403,7 @@ class AssignmentsController < ApplicationController
             :name => section.name,
             :start_at => section.start_at,
             :end_at => section.end_at,
-            :override_course_dates => section.restrict_enrollments_to_section_dates
+            :override_course_and_term_dates => section.restrict_enrollments_to_section_dates
           }
         }),
         :ASSIGNMENT_OVERRIDES =>

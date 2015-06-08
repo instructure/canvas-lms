@@ -365,7 +365,7 @@ describe LearningOutcome do
       @outcome.reload
       expect(@outcome.learning_outcome_results).not_to be_empty
       expect(@outcome.learning_outcome_results.length).to eql(1)
-      @result = @outcome.learning_outcome_results.select{|r| r.artifact_type == 'RubricAssessment'}.first
+      @result = @outcome.learning_outcome_results.find{|r| r.artifact_type == 'RubricAssessment'}
       expect(@result).not_to be_nil
       expect(@result.user_id).to eql(@user.id)
       expect(@result.score).to eql(2.0)
@@ -430,7 +430,7 @@ describe LearningOutcome do
       })
       expect(@outcome.learning_outcome_results).not_to be_empty
       expect(@outcome.learning_outcome_results.length).to eql(1)
-      @result = @outcome.learning_outcome_results.select{|r| r.artifact_type == 'RubricAssessment'}.first
+      @result = @outcome.learning_outcome_results.find{|r| r.artifact_type == 'RubricAssessment'}
       expect(@result).not_to be_nil
       expect(@result.user_id).to eql(@user.id)
       expect(@result.score).to eql(2.0)

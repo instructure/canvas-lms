@@ -171,7 +171,7 @@ class StreamItem < ActiveRecord::Base
     when AssessmentRequest
       res = object.attributes
     else
-      raise "Unexpected stream item type: #{object.class.to_s}"
+      raise "Unexpected stream item type: #{object.class}"
     end
     if self.context_type
       res['context_short_name'] = Rails.cache.fetch(['short_name_lookup', self.context_type, self.context_id].cache_key) do
@@ -267,10 +267,9 @@ class StreamItem < ActiveRecord::Base
 
       # touch all the users to invalidate the cache
       User.transaction do
-        lock_type = true
-        lock_type = 'FOR NO KEY UPDATE' if User.connection.adapter_name == 'PostgreSQL' && User.connection.send(:postgresql_version) >= 90300
         # lock the rows in a predefined order to prevent deadlocks
-        ids_to_touch = User.where(id: user_ids_subset).not_recently_touched.lock(lock_type).order(:id).pluck(:id)
+        ids_to_touch = User.where(id: user_ids_subset).not_recently_touched.
+          lock(:no_key_update).order(:id).pluck(:id)
         User.where(id: ids_to_touch).update_all(updated_at: Time.now.utc)
       end
     end

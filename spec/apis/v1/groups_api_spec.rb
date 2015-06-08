@@ -426,6 +426,48 @@ describe "Groups API", type: :request do
       expect(json.first).to eq membership_json(@community.group_memberships.where(:workflow_state => 'invited').first)
     end
 
+    context "with a membership" do
+      before do
+        @membership = @community.has_member?(@member)
+        @membership_path_options = @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param)
+        @alternate_membership_path_options = @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @member.to_param)
+      end
+
+      it "should allow a member to read their membership by membership id" do
+        @user = @member
+        json = api_call(:get, "#{@memberships_path}/#{@membership.id}", @membership_path_options.merge(:action => :show))
+        expect(json).to eq membership_json(@membership)
+      end
+
+      it "should allow a moderator to read a membership by membership id" do
+        @user = @moderator
+        json = api_call(:get, "#{@memberships_path}/#{@membership.id}", @membership_path_options.merge(:action => :show))
+        expect(json).to eq membership_json(@membership)
+      end
+
+      it "should not allow an unrelated user to read a membership by membership id" do
+        @user = user_model
+        api_call(:get, "#{@memberships_path}/#{@membership.id}", @membership_path_options.merge(:action => :show), {}, {}, :expected_status => 401)
+      end
+
+      it "should allow a member to read their membership by user id" do
+        @user = @member
+        json = api_call(:get, "#{@alternate_memberships_path}/#{@member.id}", @alternate_membership_path_options.merge(:action => :show))
+        expect(json).to eq membership_json(@membership)
+      end
+
+      it "should allow a moderator to read a membership by user id" do
+        @user = @moderator
+        json = api_call(:get, "#{@alternate_memberships_path}/#{@member.id}", @alternate_membership_path_options.merge(:action => :show))
+        expect(json).to eq membership_json(@membership)
+      end
+
+      it "should not allow an unrelated user to read a membership by user id" do
+        @user = user_model
+        api_call(:get, "#{@alternate_memberships_path}/#{@member.id}", @alternate_membership_path_options.merge(:action => :show), {}, {}, :expected_status => 401)
+      end
+    end
+
     it "should allow someone to request to join a group" do
       @user = user_model
       @community.join_level = "parent_context_request"

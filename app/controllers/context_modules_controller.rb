@@ -59,7 +59,7 @@ class ContextModulesController < ApplicationController
 
   def index
     if authorized_action(@context, @current_user, :read)
-      log_asset_access("modules:#{@context.asset_string}", "modules", "other")
+      log_asset_access([ "modules", @context ], "modules", "other")
       load_modules
 
       if @context.grants_right?(@current_user, session, :participate_as_student)
@@ -203,10 +203,8 @@ class ContextModulesController < ApplicationController
   protected :prerequisites_needing_finishing_for
   
   def content_tag_prerequisites_needing_finishing
-    code = params[:code].split("_")
-    id = code.pop
-    raise ActiveRecord::RecordNotFound if id !~ Api::ID_REGEX
-    type = code.join("_").classify
+    type, id = ActiveRecord::Base.parse_asset_string params[:code]
+    raise ActiveRecord::RecordNotFound if id == 0
     if type == 'ContentTag'
       @tag = @context.context_module_tags.active.where(id: id).first
     else

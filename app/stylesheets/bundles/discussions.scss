@@ -4,9 +4,11 @@ $border: #C1C7CF;
 $borderRadius: 3px;
 $discussion-dark-text: $ic-color-dark;
 
-body.with-right-side.with-left-side {
-  // toolbar needs it to be this wide
-  min-width: 1110px;
+@if $use_new_styles == false {
+  body.with-right-side.with-left-side {
+    // toolbar needs it to be this wide
+    min-width: 1110px;
+  }  
 }
 
 .hidden {
@@ -40,12 +42,21 @@ body.with-right-side.with-left-side {
   padding: 0;
 
   .entry {
-    background: white;
-    border: 1px solid $border;
-    border-radius: $borderRadius;
-    padding: $borderRadius 0 0 0;
-    margin: 16px 0 16px 18px;
-    box-shadow: 0 1px 0 #DDE0E4;
+    
+    @if $use_new_styles {
+      background: $ic-color-light;
+      border: 1px solid $ic-border-light;
+      padding: 0;
+      margin: $ic-sp 0 $ic-sp*2 $ic-sp*2;
+    }
+    @else {
+      background: white;
+      border: 1px solid $border;
+      border-radius: $borderRadius;
+      padding: $borderRadius 0 0 0;
+      margin: 16px 0 16px 18px;
+      box-shadow: 0 1px 0 #DDE0E4;
+    }
 
     &.collapsed, .entry {
       margin: 16px 0 16px 18px;
@@ -103,8 +114,8 @@ body.with-right-side.with-left-side {
   position: relative;
   margin: 0;
   background: white;
-  border-radius: $borderRadius;
   padding: 6px;
+  @if $use_new_styles == false { border-radius: $borderRadius; }
   .al-trigger {
     margin-left: 10px;
     margin-right: 0px;
@@ -118,8 +129,8 @@ body.with-right-side.with-left-side {
 
 .discussion-section {
   padding: 4px 10px 3px 10px;
-  a {
-    color: #396eb2;
+  @if $use_new_styles == false {
+    a { color: #396eb2; }
   }
 }
 
@@ -216,12 +227,14 @@ body.with-right-side.with-left-side {
 .discussion-read-state-btn {
   position: absolute;
   top: 4px;
-  left: -32px;
+  
   bottom: 0;
   width: 10px;
   height: 10px;
   padding: 12px;
   display: block;
+  @if $use_new_styles { left: -($ic-sp*3); }
+  @else { left: -32px; }
 }
 
 .discussion-read-state {
@@ -231,7 +244,7 @@ body.with-right-side.with-left-side {
   width: 10px;
   height: 10px;
   background: #46aaf9;
-  background: linear-gradient(to bottom, #73d6fc, #2489f7);
+  @if $use_new_styles == false { background: linear-gradient(to bottom, #73d6fc, #2489f7); }
 }
 
 .read .discussion-read-state {
@@ -247,7 +260,7 @@ body.with-right-side.with-left-side {
   @if $use_high_contrast { color: #666; }
   @else {
     text-decoration: none;
-    color: #888; 
+    @if $use_new_styles == false { color: #888; }
   }
   
   &:hover, &:focus {
@@ -288,16 +301,23 @@ body.with-right-side.with-left-side {
 }
 
 .discussion-entry-reply-area {
-  background: #fff;
   padding: 0 0.8em;
-  border-top: 1px solid $border;
+  @if $use_new_styles == false {
+    background: #fff;
+    border-top: 1px solid $border;
+  }
 }
 
 .discussion_entry > .discussion-entry-reply-area {
   padding: 0 0.8em;
-  border: 1px solid #d4d5d7;
-  margin: 10px;
-  border-radius: 3px;
+  @if $use_new_styles {
+    border: 1px solid $ic-border-light;
+  }
+  @else {
+    border: 1px solid #d4d5d7;
+    margin: 10px;
+    border-radius: 3px;
+  }
 }
 
 
@@ -331,7 +351,9 @@ body.with-right-side.with-left-side {
   padding: 0;
   background: transparent;
   > .discussion-entry-reply-area {
-    margin: 16px 10px 0 28px;
+    @if $use_new_styles == false {
+      margin: 16px 10px 0 28px;
+    }
   }
 }
 
@@ -459,8 +481,15 @@ body.with-right-side.with-left-side {
   overflow: auto;
 
   .entry-content {
-    padding: 10px;
-    background: white;
+    @if $use_new_styles {
+      padding: $ic-sp;
+      border-left: 1px solid $ic-border-light;
+      border-right: 1px solid $ic-border-light;
+    }
+    @else {
+      padding: 10px;
+      background: white;  
+    }
   }
 }
 
@@ -468,16 +497,14 @@ body.with-right-side.with-left-side {
   border-bottom: none;
 }
 
-#content {
-  padding: 0;
-}
-
-#main {
-  background: #E8ECEF;
+@if $use_new_styles == false {
+  #content { padding: 0; }
+  #main { background: #E8ECEF; }
 }
 
 .discussion_subentries {
-  padding: 10px;
+  @if $use_new_styles { padding: $ic-sp 0 $ic-sp $ic-sp; }
+  @else { padding: 10px; }
 }
 
 .discussion-page-nav {
@@ -521,16 +548,25 @@ body.with-right-side.with-left-side {
   $bg-color: #fdfdfd;
   display: block;
   background-color: $bg-color;
-  font-size: 11px;
-  padding: 3px 10px;
   cursor: text;
   border: 1px solid #d4d5d7;
   margin: 15px 0;
   @if $use_high_contrast { color: #666; }
-  @else { color: #888; }
+  @else {   
+    @if $use_new_styles == false { color: #888; }
+  }
+  @if $use_new_styles {
+    transition: border-color 0.2s;
+    padding: $ic-sp/2 $ic-sp;
+  }
+  @else {
+    padding: 3px 10px;
+    font-size: 11px;
+  }
   &:hover, &:focus {
     color: #444;
     text-decoration: none;
+    @if $use_new_styles { border-color: lighten($ic-link-color, 5%); }
   }
 }
 
@@ -625,9 +661,14 @@ body.with-right-side.with-left-side {
   background: white;
   min-height: 50px;
   &#discussion-toolbar {
-    .headerBar {
-      background: #e3e7ec;
-      border-top: solid 1px $border;
+    @if $use_new_styles {
+      + .discussion-entry-reply-area { margin-top: -1px; }
+    }
+    @else {
+      .headerBar {
+        background: #e3e7ec;
+        border-top: solid 1px $border;  
+      }
     }
   }
   .admin-links {
@@ -639,11 +680,18 @@ body.with-right-side.with-left-side {
     margin-left: 4px;
   }
   .headerBar {
-    padding: 10px 10px 6px 14px;
-    border-bottom: solid 1px $border;
     min-height: 53px;
     overflow: visible;
     box-sizing: border-box;
+    @if $use_new_styles {
+      padding: $ic-sp;
+      background: $lightBackground;
+      border: 1px solid $ic-border-light;
+    }
+    @else {
+      padding: 10px 10px 6px 14px;
+      border-bottom: solid 1px $border;  
+    }
   }
   .headerBar:after {
     clear: both;
@@ -652,17 +700,28 @@ body.with-right-side.with-left-side {
   }
   .sticky {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    margin-left: $left_side_width + 1;
-    margin-right: $right_side_width + 1;
+    top: 0; left: 0; right: 0;
     z-index: 3;
-    background: white;
-    height: 53px;
-    min-width: 647px;
-    max-width: 1100px;
     border-color: $ic-border-light;
+    @if $use_new_styles {
+      background: $lightBackground;
+      min-height: 53px;
+      margin-left: $ic-header-primary-width;
+      margin-right: $ic-sp;
+      box-shadow: 0 2px 3px rgba(black, 0.1);
+      @include breakpoint(wide) {
+        margin-left: $ic-header-primary-width + ($ic-sp*2);
+        margin-right: $ic-sp*2;
+      }
+    }
+    @else {
+      min-width: 647px;
+      max-width: 1100px;
+      margin-left: $left_side_width + 1;
+      margin-right: $right_side_width + 1;
+      background: white;
+      height: 53px;
+    }
   }
   [disabled] {
     display: none;

@@ -81,9 +81,10 @@ describe "discussions" do
           lock_at = Time.zone.now + 4.days
 
           # set due_at, lock_at, unlock_at
-          f('.due-date-overrides [name="due_at"]').send_keys(due_at.strftime('%b %-d, %y'))
-          f('.due-date-overrides [name="unlock_at"]').send_keys(unlock_at.strftime('%b %-d, %y'))
-          f('.due-date-overrides [name="lock_at"]').send_keys(lock_at.strftime('%b %-d, %y'))
+          ffj(".date_field[data-date-type='due_at']")[0].send_keys(due_at.strftime('%b %-d, %y'))
+          ffj(".date_field[data-date-type='unlock_at']")[0].send_keys(unlock_at.strftime('%b %-d, %y'))
+          ffj(".date_field[data-date-type='lock_at']")[0].send_keys(lock_at.strftime('%b %-d, %y'))
+          wait_for_ajaximations
 
           expect_new_page_load { f('.form-actions button[type=submit]').click }
 
@@ -123,6 +124,16 @@ describe "discussions" do
 
           expect(f("#assignment_group_category_id").attribute('disabled')).to be_present
           expect(get_value("#assignment_group_category_id")).to eq topic.group_category.id.to_s
+        end
+
+        it "should revert to [ New Group Category ] if original group is deleted with no submissions" do
+          topic.group_category = @gc
+          topic.save!
+          @gc.destroy
+          get url
+          wait_for_ajaximations
+
+          expect(f("#assignment_group_category_id option[selected]")).to include_text "New Group Category"
         end
 
         context "graded" do

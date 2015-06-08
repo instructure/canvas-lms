@@ -26,7 +26,7 @@ class SelfEnrollmentsController < ApplicationController
     js_env :PASSWORD_POLICY => @domain_root_account.password_policy
     @login_label_name = t("email")
 
-    login_handle_name = @domain_root_account.login_handle_name
+    login_handle_name = @domain_root_account.login_handle_name_with_inference
     @login_label_name = login_handle_name if login_handle_name
 
     if !@current_user && delegated_authentication_url?

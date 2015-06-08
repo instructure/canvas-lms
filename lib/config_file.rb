@@ -40,7 +40,7 @@ module ConfigFile
 
     config = nil
     path = File.join(Rails.root, 'config', "#{config_name}.yml")
-    if File.exists?(path)
+    if File.exist?(path)
       config_string = ERB.new(File.read(path))
       config = YAML.load(config_string.result)
 

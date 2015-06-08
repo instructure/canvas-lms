@@ -40,9 +40,14 @@ class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
     # The extra serialized data for this event.
     :event_data,
 
-    # @property [Integer] attempt
+    # @property [DateTime] client_timestamp
     #
-    # The quiz submission attempt in which the event was recorded.
+    # The timestamp at which the event was recorded at the client.
+    :client_timestamp,
+
+    # @property [DateTime] created_at
+    #
+    # The timestamp at which the event was recorded to the database.
     :created_at,
 
     # @property [AnswerRecord[]]
@@ -53,7 +58,7 @@ class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
     # field.
     #
     # This is present only for EVT_QUESTION_ANSWERED events.
-    :answers,
+    :answers
   ]
 
   # An event describing the student choosing an answer to a question.

@@ -133,15 +133,18 @@ TEXT
                   </tr>
 
                   <% unless @account.account_authorization_config
-                    #if the account has a account_authorization_config, we'll use it's login_handle_name, and this is irrelevant
+                    # if the account has a account_authorization_config,
+                    # we'll control this setting from that page
                   %>
                     <tr>
-                      <td><%= settings.blabel :login_handle_name, :en => "Login Label" %></td>
+                      <td>
+                        <%= settings.blabel :login_handle_name, en: "Login Label" %>
+                      </td>
                       <td>
                         <%= settings.text_field :login_handle_name,
-                                                :value => @account.settings[:login_handle_name],
-                                                :class => 'same-width-as-select',
-                                                :placeholder => t(:login_handle_name_placeholder, "ex: Login, Username, or Student ID") %>
+                                                value: @account.login_handle_name,
+                                                class: 'same-width-as-select',
+                                                placeholder: t(:login_handle_name_placeholder, "ex: Login, Username, or Student ID") %>
                       </td>
                     </tr>
                   <% end %>
@@ -485,7 +488,7 @@ as needed)") %>
                     <div id="open_registration_delegated_warning_dialog" style="display: none;">
                         <%= t(:open_registration_delegated_warning_message,
                         "An external identity provider is enabled, and users created via open registration may not be able to log in unless
-                        the external identity provider's login form has a link back to %{url}.", :url => login_url(:canvas_login => 1)) %>
+                        the external identity provider's login form has a link back to %{url}.", :url => canvas_login_url) %>
                     </div>
                   <% end %>
                 </div>
@@ -934,7 +937,7 @@ acknowledge that you have read and agreed to the
             </div>
             <% if announcement.required_account_service %>
               <div>
-                <%= Account.allowable_services[announcement.required_account_service.to_sym].try(:[], :name) %>
+                <%= AccountServices.allowable_services[announcement.required_account_service.to_sym].try(:[], :name) %>
               </div>
             <% end %>
             <% unless announcement.account_notification_roles.empty? %>

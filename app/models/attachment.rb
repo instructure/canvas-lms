@@ -399,7 +399,7 @@ class Attachment < ActiveRecord::Base
     self.folder_id ||= Folder.root_folders(context).first.id rescue nil
     if self.root_attachment && self.new_record?
       [:md5, :size, :content_type].each do |key|
-        self.send("#{key.to_s}=", self.root_attachment.send(key))
+        self.send("#{key}=", self.root_attachment.send(key))
       end
       self.workflow_state = 'processed'
       self.write_attribute(:filename, self.root_attachment.filename)
@@ -621,7 +621,8 @@ class Attachment < ActiveRecord::Base
       self.shard.activate do
         while !valid_name
           existing_names = self.folder.active_file_attachments.where("id <> ?", self.id).pluck(:display_name)
-          self.display_name = Attachment.make_unique_filename(self.display_name, existing_names)
+          new_name = opts[:name] || self.display_name
+          self.display_name = Attachment.make_unique_filename(new_name, existing_names)
 
           if Attachment.where("id = ? AND NOT EXISTS (SELECT 1 FROM attachments WHERE id <> ? AND display_name = ? AND folder_id = ? AND file_state <> ?)",
                               self.id, self.id, self.display_name, self.folder_id, 'deleted').limit(1).update_all(:display_name => self.display_name) > 0
@@ -996,7 +997,8 @@ class Attachment < ActiveRecord::Base
     given { |user, session|
         session && session['file_access_user_id'].present? &&
         (u = User.where(id: session['file_access_user_id']).first) &&
-        (self.context.grants_right?(u, session, :read) || self.context.is_public_to_auth_users?) &&
+        (self.context.grants_right?(u, session, :read) ||
+          (self.context.respond_to?(:is_public_to_auth_users?) && self.context.is_public_to_auth_users?)) &&
         session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
     }
     can :read
@@ -1004,7 +1006,8 @@ class Attachment < ActiveRecord::Base
     given { |user, session|
         session && session['file_access_user_id'].present? &&
         (u = User.where(id: session['file_access_user_id']).first) &&
-        (self.context.grants_right?(u, session, :read) || self.context.is_public_to_auth_users?) &&
+        (self.context.grants_right?(u, session, :read) ||
+          (self.context.respond_to?(:is_public_to_auth_users?) && self.context.is_public_to_auth_users?)) &&
         (self.context.grants_right?(u, session, :manage_files) || !self.locked_for?(u)) &&
         session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
     }

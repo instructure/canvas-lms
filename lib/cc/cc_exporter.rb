@@ -62,7 +62,7 @@ module CC
         copy_all_to_zip
         @zip_file.close
         
-        if @content_export && File.exists?(@zip_path)
+        if @content_export && File.exist?(@zip_path)
           att = Attachment.new
           att.context = @content_export
           att.user = @content_export.user
@@ -129,7 +129,7 @@ module CC
 
       @export_dir = File.join(folder, slug)
       i = 1
-      while File.exists?(@export_dir) && File.directory?(@export_dir)
+      while File.exist?(@export_dir) && File.directory?(@export_dir)
         i += 1
         @export_dir = File.join(folder, "#{slug}_attempt_#{i}")
       end

@@ -323,8 +323,7 @@ class FilesController < ApplicationController
   end
 
   def react_files
-    raise ActiveRecord::RecordNotFound unless (@context.is_a?(User) ? @domain_root_account : @context).feature_enabled?(:better_file_browsing)
-    if tab_enabled?(@context.class::TAB_FILES)
+    if authorized_action(@context, @current_user, :read) && tab_enabled?(@context.class::TAB_FILES)
       @contexts = [@context]
       get_all_pertinent_contexts(include_groups: true) if @context == @current_user
       files_contexts = @contexts.map do |context|
@@ -376,10 +375,13 @@ class FilesController < ApplicationController
     end
 
     return unless tab_enabled?(@context.class::TAB_FILES)
-    log_asset_access("files:#{@context.asset_string}", "files", 'other') if @context
+    log_asset_access([ "files", @context ], "files", 'other') if @context
     respond_to do |format|
       if @contexts.empty?
-        format.html { redirect_to !@context || @context == @current_user ? dashboard_url : named_context_url(@context, :context_url) }
+        format.html do
+          url = !@context || @context == @current_user ? dashboard_url : named_context_url(@context, :context_url)
+          redirect_to url
+        end
       else
         js_env(:contexts =>
            @contexts.to_json(:permissions =>
@@ -511,14 +513,14 @@ class FilesController < ApplicationController
     end
 
     verifier_checker = Attachments::Verification.new(@attachment)
-    if (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :read)) ||
+    if (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :read, session)) ||
         @attachment.attachment_associations.where(:context_type => 'Submission').any? { |aa| aa.context.grants_right?(@current_user, session, :read) } ||
         authorized_action(@attachment, @current_user, :read)
 
       @attachment.ensure_media_object
 
       if params[:download]
-        if (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download)) ||
+        if (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, session)) ||
             (@attachment.grants_right?(@current_user, session, :download))
           disable_page_views if params[:preview]
           begin
@@ -568,7 +570,7 @@ class FilesController < ApplicationController
         json[:attachment][:media_entry_id] = attachment.media_entry_id if attachment.media_entry_id
 
         verifier_checker = Attachments::Verification.new(@attachment)
-        if (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download)) ||
+        if (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, session)) ||
             attachment.grants_right?(@current_user, session, :download)
           # Right now we assume if they ask for json data on the attachment
           # then that means they have viewed or are about to view the file in

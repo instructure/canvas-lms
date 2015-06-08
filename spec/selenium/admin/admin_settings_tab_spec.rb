@@ -38,7 +38,7 @@ describe "admin settings tab" do
       features.each do |feature|
         check_state = Account.default.service_enabled?(feature)
         state_checker checker, !check_state
-        default_selectors.push("#account_services_#{feature.to_s}")
+        default_selectors.push("#account_services_#{feature}")
       end
       css_selectors = default_selectors
     end
@@ -57,7 +57,7 @@ describe "admin settings tab" do
         features.each do |feature|
           check_state = Account.default.service_enabled?(feature)
           state_checker checker, check_state
-          default_selectors.push("#account_services_#{feature.to_s}")
+          default_selectors.push("#account_services_#{feature}")
         end
         if (checker)
           default_selectors += css_selectors
@@ -312,14 +312,14 @@ describe "admin settings tab" do
     end
 
     it "should enable and disable a plugin service (setting)" do
-      Account.register_service(:myplugin, {:name => "My Plugin", :description => "", :expose_to_ui => :setting, :default => false})
+      AccountServices.register_service(:myplugin, {:name => "My Plugin", :description => "", :expose_to_ui => :setting, :default => false})
       get "/accounts/#{Account.default.id}/settings"
       check_box_verifier("#account_services_myplugin", {:allowed_services => :myplugin})
       check_box_verifier("#account_services_myplugin", {:allowed_services => :myplugin}, false)
     end
 
     it "should enable and disable a plugin service (service)" do
-      Account.register_service(:myplugin, {:name => "My Plugin", :description => "", :expose_to_ui => :service, :default => false})
+      AccountServices.register_service(:myplugin, {:name => "My Plugin", :description => "", :expose_to_ui => :service, :default => false})
       get "/accounts/#{Account.default.id}/settings"
       check_box_verifier("#account_services_myplugin", {:allowed_services => :myplugin})
       check_box_verifier("#account_services_myplugin", {:allowed_services => :myplugin}, false)

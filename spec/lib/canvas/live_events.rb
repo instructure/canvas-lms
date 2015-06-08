@@ -100,4 +100,36 @@ describe Canvas::LiveEvents do
       Canvas::LiveEvents.grade_changed(submission, 0)
     end
   end
+
+  describe ".asset_access" do
+    it "should trigger a live event without an asset subtype" do
+      course
+
+      LiveEvents.expects(:post_event).with('asset_accessed', {
+        asset_type: 'course',
+        asset_id: @course.global_id,
+        asset_subtype: nil,
+        category: 'category',
+        role: 'role',
+        level: 'participation'
+      }).once
+
+      Canvas::LiveEvents.asset_access(@course, 'category', 'role', 'participation')
+    end
+
+    it "should trigger a live event with an asset subtype" do
+      course
+
+      LiveEvents.expects(:post_event).with('asset_accessed', {
+        asset_type: 'course',
+        asset_id: @course.global_id,
+        asset_subtype: 'assignments',
+        category: 'category',
+        role: 'role',
+        level: 'participation'
+      }).once
+
+      Canvas::LiveEvents.asset_access([ "assignments", @course ], 'category', 'role', 'participation')
+    end
+  end
 end

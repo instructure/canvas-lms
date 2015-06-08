@@ -37,6 +37,8 @@ define [
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
   'jqueryui/dialog'
+  'jqueryui/tooltip'
+  'compiled/behaviors/tooltip'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
@@ -61,8 +63,8 @@ define [
         default_max: 200
         max: 400
       total:
-        min: 85
-        max: 100
+        min: 95
+        max: 110
 
     DISPLAY_PRECISION = 2
 
@@ -86,7 +88,9 @@ define [
       @numberOfFrozenCols = if @totalColumnInFront then 3 else 2
       @mgpEnabled = ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled
       @gradingPeriods = ENV.GRADEBOOK_OPTIONS.active_grading_periods
-      @gradingPeriodToShow = userSettings.contextGet('gradebook_current_grading_period') || ENV.GRADEBOOK_OPTIONS.current_grading_period_id
+      @gradingPeriodToShow = @getGradingPeriodToShow()
+      @gradebookColumnSizeSettings = ENV.GRADEBOOK_OPTIONS.gradebook_column_size_settings
+      @gradebookColumnOrderSettings = ENV.GRADEBOOK_OPTIONS.gradebook_column_order_settings
 
       $.subscribe 'assignment_group_weights_changed', @handleAssignmentGroupWeightChange
       $.subscribe 'assignment_muting_toggled',        @handleAssignmentMutingChange
@@ -194,6 +198,17 @@ define [
     gradingPeriodIsClosed: (gradingPeriod) ->
       new Date(gradingPeriod.end_date) < new Date()
 
+    gradingPeriodIsActive: (gradingPeriodId) ->
+      activePeriodIds = _.pluck(@gradingPeriods, 'id')
+      _.contains(activePeriodIds, gradingPeriodId)
+
+    getGradingPeriodToShow: () ->
+      currentPeriodId = userSettings.contextGet('gradebook_current_grading_period')
+      if currentPeriodId && @gradingPeriodIsActive(currentPeriodId)
+        currentPeriodId
+      else
+        ENV.GRADEBOOK_OPTIONS.current_grading_period_id
+
     getAssignmentsInClosedGradingPeriods: (gradingPeriods) ->
       latestEndDate = new Date(gradingPeriods[0]?.end_date)
       for gradingPeriod in gradingPeriods
@@ -203,7 +218,10 @@ define [
         @assignmentIsDueBeforeEndDate(a, latestEndDate)
 
     assignmentIsDueBeforeEndDate: (assignment, gradingPeriodEndDate) ->
-      new Date(assignment.due_at) <= gradingPeriodEndDate
+      if assignment.due_at
+        new Date(assignment.due_at) <= gradingPeriodEndDate
+      else
+        false
 
     onShow: ->
       $(".post-grades-placeholder").show();
@@ -323,13 +341,11 @@ define [
         potential_students
 
     getStoredSortOrder: =>
-      userSettings.contextGet('sort_grade_columns_by') || { sortType: @defaultSortType }
+      @gradebookColumnOrderSettings || {sortType: @defaultSortType}
 
     setStoredSortOrder: (newSortOrder) =>
-      if newSortOrder.sortType == @defaultSortType
-        userSettings.contextRemove('sort_grade_columns_by')
-      else
-        userSettings.contextSet('sort_grade_columns_by', newSortOrder)
+      url = ENV.GRADEBOOK_OPTIONS.gradebook_column_order_settings_url
+      $.ajaxJSON(url, 'POST', {column_order: newSortOrder})
 
     onColumnsReordered: =>
       # determine if assignment columns or custom columns were reordered
@@ -363,9 +379,9 @@ define [
       @$columnArrangementTogglers.each ->
         $(this).closest('li').showIf $(this).data('arrangeColumnsBy') isnt newSortOrder.sortType
 
-    arrangeColumnsBy: (newSortOrder) =>
+    arrangeColumnsBy: (newSortOrder, isFirstArrangement) =>
       @setArrangementTogglersVisibility(newSortOrder)
-      @setStoredSortOrder(newSortOrder)
+      @setStoredSortOrder(newSortOrder) unless isFirstArrangement
 
       columns = @grid.getColumns()
       frozen = columns.splice(0, @numberOfFrozenCols)
@@ -600,10 +616,8 @@ define [
     groupTotalFormatter: (row, col, val, columnDef, student) =>
       return '' unless val?
 
-      # rounds percentage to one decimal place
-      percentage = Math.round((val.score / val.possible) * 1000) / 10
+      percentage = @calculateAndRoundGroupTotalScore val.score, val.possible
       percentage = 0 if isNaN(percentage)
-
 
       if val.possible and @options.grading_standard and columnDef.type is 'total_grade'
         letterGrade = GradeCalculator.letter_grade(@options.grading_standard, percentage)
@@ -623,6 +637,10 @@ define [
     htmlContentFormatter: (row, col, val, columnDef, student) =>
       return '' unless val?
       val
+
+    calculateAndRoundGroupTotalScore: (score, possible_points) =>
+      grade = (score / possible_points) * 100
+      round(grade, DISPLAY_PRECISION)
 
     calculateStudentGrade: (student) =>
       if student.loaded
@@ -921,39 +939,103 @@ define [
       @$columnArrangementTogglers = $('#gradebook-toolbar [data-arrange-columns-by]').bind 'click', (event) =>
         event.preventDefault()
         newSortOrder = { sortType: $(event.currentTarget).data('arrangeColumnsBy') }
-        @arrangeColumnsBy(newSortOrder)
-      @arrangeColumnsBy(@getStoredSortOrder())
+        @arrangeColumnsBy(newSortOrder, false)
+      @arrangeColumnsBy(@getStoredSortOrder(), true)
 
-      $('#gradebook_settings').show().kyleMenu()
+      $('#gradebook_settings').kyleMenu()
+      $('#download_csv').kyleMenu()
 
       $settingsMenu.find('.student_names_toggle').click(@studentNamesToggle)
 
       @userFilter = new InputFilterView el: '.gradebook_filter input'
       @userFilter.on 'input', @onUserFilterInput
 
-      @setDownloadCsvUrl()
       @renderTotalHeader()
+      @initGradebookExporter()
 
-      if !!window.chrome
-        $('.ui-menu-item').on('mouseout', @fix_chrome_render_bug)
-        $('.grading-period-select-button').click(@fix_chrome_render_bug)
-        $('#gradebook_settings').click(@fix_chrome_render_bug)
-        $(document.body).click(@fix_chrome_render_bug)
+    initGradebookExporter: () =>
+      self = this
 
-    # CNVS-18276 - chrome 40 rendering issue
-    # is fixed in chrome 42. in the meantime, force repaint
-    # when a dropdown or dropdown item is clicked, when a dropdown
-    # menu item hover occurs
-    fix_chrome_render_bug: (e) ->
-      gradebook_grid = document.getElementById('gradebook_grid')
-      gradebook_grid.style.display = 'none'
-      gradebook_grid.offsetHeight
-      gradebook_grid.style.display = 'block'
+      @initPreviousGradebookExportLink()
 
-    setDownloadCsvUrl: ->
-      if @show_concluded_enrollments
-        $("#download_csv")[0].href += "?include_priors=true"
+      current_progress = ENV.GRADEBOOK_OPTIONS.gradebook_csv_progress
+      attachment = ENV.GRADEBOOK_OPTIONS.attachment
 
+      if current_progress && current_progress.progress.workflow_state != 'completed'
+        $('#download_csv').prop('disabled', true)
+        loading_interval = self.exportingGradebookStatus()
+
+        attachment_progress =
+          progress_id: current_progress.progress.id
+          attachment_id: attachment.attachment.id
+
+        @pollProgressForCSVExport(loading_interval, attachment_progress)
+
+      $('.generate_new_csv').click ->
+        $('#download_csv').prop('disabled', true)
+        loading_interval = self.exportingGradebookStatus()
+        $.ajaxJSON(ENV.GRADEBOOK_OPTIONS.export_gradebook_csv_url, 'GET')
+          .then((attachment_progress) ->
+            self.pollProgressForCSVExport(loading_interval, attachment_progress)
+          )
+
+    pollProgressForCSVExport: (loading_interval, attachment_progress) =>
+      self = this
+      polling = setInterval(() ->
+        $.ajaxJSON("/api/v1/progress/#{attachment_progress.progress_id}", 'GET').promise()
+          .then((response) ->
+            if response.workflow_state == 'failed'
+              clearInterval polling
+              clearInterval loading_interval
+              $.flashError(I18n.t('There was a problem exporting.'))
+
+            if response.workflow_state == 'completed'
+              $.ajaxJSON("/api/v1/users/#{ENV.current_user_id}/files/#{attachment_progress.attachment_id}", 'get')
+                .then((response) ->
+                  document.getElementById('csv_download').src = response.url
+
+                  updated_date = $.datetimeString(response.created_at)
+                  updated_previous_report = "#{I18n.t('Previous (%{timestamp})', timestamp: updated_date)}"
+                  $previous_link = $('#csv_export_options').children('li').last().children('a')
+                  $previous_link.text(updated_previous_report)
+                  $previous_link.attr('href', response.url)
+                  $('#csv_export_options').children('li').last().css('display', 'block')
+                  self.initPreviousGradebookExportLink()
+
+                  $('#download_csv').prop('disabled', false)
+                  self.setExportButtonTitle(I18n.t('Export'))
+
+                  clearInterval polling
+                  clearInterval loading_interval
+               )
+          )
+      , 2000)
+
+    initPreviousGradebookExportLink: () =>
+      link = $('#csv_export_options').children('li').last().children()
+      link.on 'click', (event) ->
+        event.preventDefault()
+        document.getElementById('csv_download').src = link[0].href
+
+    exportingGradebookStatus: () =>
+      self = this
+      loading_indicator = ''
+      count = 0
+      loading = setInterval(() ->
+        count++
+
+        loading_indicator = new Array(count % 5).join('.')
+        nonBreakingSpacesCount = 3 - loading_indicator.length
+        nonBreakingSpaces = ""
+        for scale in [0..nonBreakingSpacesCount]
+          nonBreakingSpaces += "&nbsp;"
+
+        self.setExportButtonTitle("#{I18n.t("Exporting")}#{loading_indicator}#{nonBreakingSpaces}")
+      , 200)
+      loading
+
+    setExportButtonTitle: (updated_title) =>
+      $($('#download_csv').children('span').contents()[2]).replaceWith(updated_title)
 
     studentNamesToggle: (e) =>
       e.preventDefault()
@@ -1068,11 +1150,20 @@ define [
 
       @setAssignmentWarnings()
 
+      studentColumnWidth = 150
+      identifierColumnWidth = 100
+      if @gradebookColumnSizeSettings
+        if @gradebookColumnSizeSettings['student']
+          studentColumnWidth = parseInt(@gradebookColumnSizeSettings['student'])
+
+        if @gradebookColumnSizeSettings['secondary_identifier']
+          identifierColumnWidth = parseInt(@gradebookColumnSizeSettings['secondary_identifier'])
+
       @parentColumns = [
         id: 'student'
         name: htmlEscape I18n.t 'student_name', 'Student Name'
         field: 'display_name'
-        width: 150
+        width: studentColumnWidth
         cssClass: "meta-cell"
         resizable: true
         sortable: true
@@ -1081,7 +1172,7 @@ define [
         id: 'secondary_identifier'
         name: htmlEscape I18n.t 'secondary_id', 'Secondary ID'
         field: 'secondary_identifier'
-        width: 100
+        width: identifierColumnWidth
         cssClass: "meta-cell secondary_identifier_cell"
         resizable: true
         sortable: true
@@ -1095,6 +1186,11 @@ define [
                          SubmissionCell.out_of
         minWidth = if outOfFormatter then 70 else 90
         fieldName = "assignment_#{id}"
+
+        assignmentWidth = testWidth(assignment.name, minWidth, columnWidths.assignment.default_max)
+        if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings[fieldName]
+          assignmentWidth = parseInt(@gradebookColumnSizeSettings[fieldName])
+
         columnDef =
           id: fieldName
           field: fieldName
@@ -1106,7 +1202,7 @@ define [
                   SubmissionCell
           minWidth: columnWidths.assignment.min,
           maxWidth: columnWidths.assignment.max,
-          width: testWidth(assignment.name, minWidth, columnWidths.assignment.default_max),
+          width: assignmentWidth
           sortable: true
           toolTip: assignment.name
           type: 'assignment'
@@ -1123,22 +1219,33 @@ define [
         columnDef
 
       @aggregateColumns = for id, group of @assignmentGroups
+        fieldName = "assignment_group_#{id}"
+
+        aggregateWidth = testWidth(group.name, columnWidths.assignmentGroup.min, columnWidths.assignmentGroup.default_max)
+        if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings[fieldName]
+          aggregateWidth = parseInt(@gradebookColumnSizeSettings[fieldName])
+
         {
-          id: "assignment_group_#{id}"
-          field: "assignment_group_#{id}"
+          id: fieldName
+          field: fieldName
           formatter: @groupTotalFormatter
           name: @assignmentGroupHtml(group.name, group.group_weight)
           toolTip: group.name
           object: group
           minWidth: columnWidths.assignmentGroup.min,
           maxWidth: columnWidths.assignmentGroup.max,
-          width: testWidth(group.name, columnWidths.assignmentGroup.min, columnWidths.assignmentGroup.default_max)
+          width: aggregateWidth
           cssClass: "meta-cell assignment-group-cell",
           sortable: true
           type: 'assignment_group'
         }
 
       total = I18n.t "total", "Total"
+
+      totalWidth = testWidth("Total", columnWidths.total.min, columnWidths.total.max)
+      if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings['total_grade']
+        totalWidth = @gradebookColumnSizeSettings['total_grade']
+
       total_column =
         id: "total_grade"
         field: "total_grade"
@@ -1150,7 +1257,7 @@ define [
         toolTip: total
         minWidth: columnWidths.total.min
         maxWidth: columnWidths.total.max
-        width: testWidth("Total", columnWidths.total.min, columnWidths.total.max)
+        width: totalWidth
         cssClass: if @totalColumnInFront then 'meta-cell' else 'total-cell'
         sortable: true
         type: 'total_grade'
@@ -1203,10 +1310,22 @@ define [
         false
 
       @grid.onColumnsReordered.subscribe @onColumnsReordered
-
       @grid.onBeforeEditCell.subscribe @onBeforeEditCell
+      @grid.onColumnsResized.subscribe @onColumnsResized
 
       @onGridInit()
+
+    onColumnsResized: (event, obj) =>
+      grid = obj.grid
+      columns = grid.getColumns()
+
+      _.each columns, (column) =>
+        if column.previousWidth && column.width != column.previousWidth
+          @saveColumnWidthPreference(column.id, column.width)
+
+    saveColumnWidthPreference: (id, newWidth) ->
+      url = ENV.GRADEBOOK_OPTIONS.gradebook_column_size_settings_url
+      $.ajaxJSON(url, 'POST', {column_id: id, column_size: newWidth})
 
     onBeforeEditCell: (event, {row, cell}) =>
       $cell = @grid.getCellNode(row, cell)

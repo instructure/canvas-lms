@@ -52,7 +52,7 @@ class Quizzes::QuizzesController < ApplicationController
 
   QUIZ_TYPE_ASSIGNMENT = 'assignment'
   QUIZ_TYPE_PRACTICE = 'practice_quiz'
-  QUIZ_TYPE_SURVEYS = ['survey', 'graded_survey']
+  QUIZ_TYPE_SURVEYS = ['survey', 'graded_survey'].freeze
 
   def index
     return unless authorized_action(@context, @current_user, :read)
@@ -127,7 +127,7 @@ class Quizzes::QuizzesController < ApplicationController
         @context)
     end
 
-    log_asset_access("quizzes:#{@context.asset_string}", "quizzes", 'other')
+    log_asset_access([ "quizzes", @context ], "quizzes", 'other')
   end
 
   def show
@@ -277,7 +277,7 @@ class Quizzes::QuizzesController < ApplicationController
             :name => section.name,
             :start_at => section.start_at,
             :end_at => section.end_at,
-            :override_course_dates => section.restrict_enrollments_to_section_dates
+            :override_course_and_term_dates => section.restrict_enrollments_to_section_dates
           }
         },
         :QUIZZES_URL => course_quizzes_url(@context),

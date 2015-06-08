@@ -1926,6 +1926,19 @@ describe User do
       expect(@student.assignments_needing_submitting(:contexts => [@course]).count).to eq 1
     end
 
+    it "should not include assignments from soft concluded courses" do
+      course_with_student_logged_in(:active_all => true)
+      @course.enrollment_term.update_attribute(:end_at, 1.day.from_now)
+      assignment_quiz([], :course => @course, :user => @user)
+      @quiz.unlock_at = nil
+      @quiz.lock_at = nil
+      @quiz.due_at = 3.days.from_now
+      @quiz.save!
+      Timecop.travel(2.days) do
+        expect(@student.assignments_needing_submitting(:contexts => [@course]).count).to eq 0
+      end
+    end
+
     it "should always have the only_visible_to_overrides attribute" do
       course_with_student_logged_in(:active_all => true)
       assignment_quiz([], :course => @course, :user => @user)
@@ -2280,6 +2293,13 @@ describe User do
         [@studentA, @studentB].each do |student|
           assignment.submit_homework student, body: "submission for #{student.name}"
         end
+      end
+    end
+
+    it "should not count assignments in soft concluded courses" do
+      @course.enrollment_term.update_attribute(:end_at, 1.day.from_now)
+      Timecop.travel(1.week) do
+        expect(@teacher.reload.assignments_needing_grading.size).to eql(0)
       end
     end
 

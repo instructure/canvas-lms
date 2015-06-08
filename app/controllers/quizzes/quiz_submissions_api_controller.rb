@@ -351,6 +351,32 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
     serialize_and_render @quiz_submission
   end
 
+  # @API Get current quiz submission times.
+  # @beta
+  #
+  # Get the current timing data for the quiz attempt, both the end_at timestamp
+  # and the time_left parameter.
+  #
+  # <b>Responses</b>
+  #
+  # * <b>200 OK</b> if the request was successful
+  #
+  # @example_response
+  #  {
+  #    "end_at": [DateTime],
+  #    "time_left": [Integer]
+  #  }
+  def time
+    if authorized_action(@quiz_submission, @current_user, :record_events)
+      render :json =>
+      {
+        :end_at => @quiz_submission && @quiz_submission.end_at,
+        :time_left => @quiz_submission && @quiz_submission.time_left
+      }
+    end
+  end
+
+
   private
 
   def previewing?

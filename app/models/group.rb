@@ -406,10 +406,12 @@ class Group < ActiveRecord::Base
 
   def map_merge(*args)
   end
+
   def log_merge_result(text)
     @merge_results ||= []
     @merge_results << text
   end
+
   def warn_merge_result(text)
     record_merge_result(text)
   end
@@ -437,6 +439,7 @@ class Group < ActiveRecord::Base
   def account=(new_account)
     self.account_id = new_account.id
   end
+
   def account_id=(new_account_id)
     write_attribute(:account_id, new_account_id)
     if self.account_id_changed?

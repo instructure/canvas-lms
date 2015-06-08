@@ -203,7 +203,7 @@ define [
                 allowFullScreen: true
                 title: I18n.t('File Preview')
                 src: @state.displayedItem.get 'preview_url'
-                className: 'ef-file-preview-frame'
+                className: 'ef-file-preview-frame' + if @state.displayedItem.get('content-type') is 'text/html' then ' ef-file-preview-frame-html' else ''
               }
             else # file was not found
               div className: 'ef-file-not-found ef-file-preview-frame',

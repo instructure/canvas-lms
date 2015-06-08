@@ -3,8 +3,7 @@ module DataFixup
 
     def self.run
       @new_roots = Set.new
-      env = Shackles.environment == :deploy ? :deploy : :slave
-      Shackles.activate(env) do
+      Shackles.activate(:slave) do
         scope = Attachment.
           where('root_attachment_id IS NOT NULL AND
             NOT EXISTS (SELECT id
@@ -57,7 +56,7 @@ module DataFixup
     end
 
     def self.local_storage_save(rescued_orphan)
-      if File.exists? rescued_orphan.full_filename
+      if File.exist? rescued_orphan.full_filename
         finalize_attachment(rescued_orphan)
       else
         rescued_orphan.context_id = @broken_user.id

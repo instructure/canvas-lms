@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/quizzes_common')
 describe "canvas_quizzes" do
   include_examples "quizzes selenium tests"
 
-  USING_NEW_CLIENT_APP = File.exists?(Rails.root.join("client_apps", "canvas_quizzes"))
+  USING_NEW_CLIENT_APP = File.exist?(Rails.root.join("client_apps", "canvas_quizzes"))
 
   before do
     Account.default.tap do |account|

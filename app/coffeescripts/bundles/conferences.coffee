@@ -34,6 +34,11 @@ require [
       @editView = new EditConferenceView()
 
       @currentConferences = new ConferenceCollection(ENV.current_conferences)
+      @currentConferences.on('change', (event) =>
+        # focus if edit finalized (element is redrawn so we find by id)
+        if @editConferenceId
+          $("#new-conference-list div[data-id=" + @editConferenceId + "] .al-trigger").focus()
+      )
       view = @currentView = new CollectionView
         el: $("#new-conference-list")
         itemView: ConferenceView
@@ -71,6 +76,7 @@ require [
       if typeof conference == 'string'
         conference = @currentConferences.get(conference)
       return unless conference
+      @editConferenceId = conference.get('id')
       @editView.show(conference)
 
     close: (conference) =>

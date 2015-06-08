@@ -29,20 +29,15 @@ describe "one time passwords" do
 
   context "mid-login" do
     before do
-      post '/login', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' }
-      expect(response).to render_template('otp_login')
+      post '/login/canvas', :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' }
+      expect(response).to redirect_to(otp_login_url)
     end
 
     it "should not allow access to the rest of canvas" do
       get '/'
       expect(response).to redirect_to login_url
       follow_redirect!
-      expect(response).to be_success
-    end
-
-    it "should not allow re-enrolling" do
-      get '/login/otp'
-      expect(response).to redirect_to login_url
+      expect(response).to redirect_to canvas_login_url
       follow_redirect!
       expect(response).to be_success
     end

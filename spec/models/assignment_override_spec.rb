@@ -286,10 +286,32 @@ describe AssignmentOverride do
       expect(@override.title).to eq @group.name
     end
 
-    it "should not be changed for adhoc sets" do
+    it "should not be changed for adhoc sets if there are no students" do
       @override.title = 'Other Value'
       @override.valid? # trigger bookkeeping
       expect(@override.title).to eq 'Other Value'
+    end
+
+    it "should set ADHOC's title to reflect students (with few)" do
+      @override.title = nil
+      @override.set_type = "ADHOC"
+      override_student = @override.assignment_override_students.build
+      override_student.user = student_in_course(course: @override.assignment.context, name: 'Edgar Jones').user
+      override_student.save!
+      @override.valid? # trigger bookkeeping
+      expect(@override.title).to eq 'Edgar Jones'
+    end
+
+    it "should set ADHOC's name to reflect students (with many)" do
+      @override.title = nil
+      @override.set_type = "ADHOC"
+      ["A Student","B Student","C Student","D Student"].each do |student_name|
+        override_student = @override.assignment_override_students.build
+        override_student.user = student_in_course(course: @override.assignment.context, name: student_name).user
+        override_student.save!
+      end
+      @override.valid? # trigger bookkeeping
+      expect(@override.title).to eq 'A Student, B Student, and 2 others'
     end
   end
 
@@ -612,6 +634,37 @@ describe AssignmentOverride do
 
     it "includes the id" do
       expect(hash[:id]).to eq id
+    end
+  end
+
+  describe "applies_to_students" do
+    before do
+      student_in_course
+    end
+
+    it "returns the right students for ADHOC" do
+      @override = assignment_override_model(:course => @course)
+      @override.set_type = 'ADHOC'
+
+      expect(@override.applies_to_students).to eq []
+
+      @override_student = @override.assignment_override_students.build
+      @override_student.user = @student
+      @override_student.save!
+
+      expect(@override.set).to eq @override.applies_to_students
+    end
+
+    it "returns the right students for a section" do
+      @override = assignment_override_model(:course => @course)
+      @override.set = @course.default_section
+      @override.save!
+
+      expect(@override.applies_to_students).to eq []
+
+      @course.enroll_student(@student,:enrollment_state => 'active', :section => @override.set)
+
+      expect(@override.applies_to_students).to eq [@student]
     end
   end
 end

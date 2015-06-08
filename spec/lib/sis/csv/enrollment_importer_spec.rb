@@ -552,6 +552,17 @@ describe SIS::CSV::EnrollmentImporter do
         )
         expect(@user1.enrollments.first.role).to eq @role
       end
+
+      it "should associate users for custom observer roles" do
+        custom_role('ObserverEnrollment', 'step mom')
+        process_csv_data_cleanly(
+          "course_id,user_id,role,section_id,status,associated_user_id",
+          "TehCourse,user1,step mom,,active,user2"
+        )
+        expect(@user1.observer_enrollments.count).to eq 1
+        e = @user1.observer_enrollments.first
+        expect(e.associated_user_id).to eq @user2.id
+      end
     end
 
     context "in a sub-account" do

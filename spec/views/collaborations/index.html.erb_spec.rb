@@ -35,7 +35,7 @@ describe "/collaborations/index" do
     render :partial => "collaborations/forms"
     expect(response).not_to be_nil
     expect(response).to have_tag("label[for=collaboration_title]", :text => "Document name:")
-    expect(response).to have_tag("label[for=collaboration_description]", :text => "Description")
+    expect(response).to have_tag("label[for=collaboration_description]", :text => "Description:")
     expect(response).to have_tag("label[for=collaboration_collaboration_type]", :text => "Collaborate using:")
   end
 end

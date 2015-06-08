@@ -1,4 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
 
 describe "Navigating to wiki pages" do
   include_examples "in-process server selenium tests"
@@ -28,12 +29,16 @@ describe "Navigating to wiki pages" do
       check_element_has_focus(f("[data-sort-field='#{attribute}']"))
     end
 
-    before :each do
+    before :once do
       account_model
-      course_with_teacher_logged_in :account => @account
+      course_with_teacher :account => @account
       @course.wiki.wiki_pages.create!(:title => "Foo")
       @course.wiki.wiki_pages.create!(:title => "Bar")
       @course.wiki.wiki_pages.create!(:title => "Baz")
+    end
+
+    before :each do
+      user_session(@user)
     end
 
     it "returns focus to the header item clicked while sorting" do
@@ -148,7 +153,7 @@ describe "Navigating to wiki pages" do
       end
     end
 
-    describe "Edit Page" do
+    describe "Cog menu" do
       before :each do
         get "/courses/#{@course.id}/pages"
         f('.al-trigger').click
@@ -180,13 +185,111 @@ describe "Navigating to wiki pages" do
       end
 
       it "should set focus back to the cog menu if you edit the title and save" do
+        pending("functionality is broken, ticket CNVS-20199")
         f('.ui-dialog-buttonset .btn-primary').click
+        wait_for_ajaximations
         check_element_has_focus(f('.al-trigger'))
+      end
+    end
+
+    describe "Revisions Page" do
+      before :once do
+        account_model
+        course_with_teacher :account => @account, :active_all => true
+        @timestamps = %w(2015-01-01 2015-01-02 2015-01-03).map { |d| Time.zone.parse(d) }
+
+        Timecop.freeze(@timestamps[0]) do      # rev 1
+          @vpage = @course.wiki.wiki_pages.build :title => 'bar'
+          @vpage.workflow_state = 'unpublished'
+          @vpage.body = 'draft'
+          @vpage.save!
+        end
+
+        Timecop.freeze(@timestamps[1]) do      # rev 2
+          @vpage.workflow_state = 'active'
+          @vpage.body = 'published by teacher'
+          @vpage.user = @teacher
+          @vpage.save!
+        end
+
+        Timecop.freeze(@timestamps[2]) do      # rev 3
+          @vpage.body = 'revised by teacher'
+          @vpage.user = @teacher
+          @vpage.save!
+        end
+        @user = @teacher
+      end
+
+      before :each do
+        user_session(@user)
+        get "/courses/#{@course.id}/pages/#{@vpage.url}/revisions"
+      end
+
+      it "should let the revisions be focused" do
+        driver.execute_script("$('.close-button').focus();")
+        f('.close-button').send_keys(:tab)
+        all_revisions = ff('.revision')
+        all_revisions.each do |revision|
+          check_element_has_focus(revision)
+          revision.send_keys(:tab)
+        end
+      end
+
+      it "should focus on the 'restore this revision link' after selecting a revision" do
+        driver.execute_script("$('.revision:nth-child(2)').focus();")
+        element = fj('.revision:nth-child(2)')
+        element.send_keys(:enter)
+        wait_for_ajaximations
+        element.send_keys(:tab)
+        check_element_has_focus(f('.restore-link'))
+      end
+
+    end
+
+    describe "Edit Page" do
+      before :each do
+        get "/courses/#{@course.id}/pages/bar/edit"
+        wait_for_ajaximations
+      end
+
+      it "should alert user if navigating away from page with unsaved RCE changes" do
+        add_text_to_tiny("derp")
+        f('.home').click()
+        expect(driver.switch_to.alert.text).to be_present
+        driver.switch_to.alert.accept
+      end
+
+      it "should alert user if navigating away from page with unsaved html changes" do
+        fj('a.switch_views:visible').click
+        f('textarea').send_keys("derp")
+        f('.home').click()
+        expect(driver.switch_to.alert.text).to be_present
+        driver.switch_to.alert.accept
       end
     end
 
   end
 
+  describe "Show Page" do
+    it "shows lock information with prerequisites" do
+      account_model
+      course_with_student_logged_in account: @account
+      foo = @course.wiki.wiki_pages.create! title: "foo"
+      bar = @course.wiki.wiki_pages.create! title: "bar"
+      mod = @course.context_modules.create! name: "teh_mod", require_sequential_progress: true
+      foo_item = mod.add_item id: foo.id, type: 'wiki_page'
+      bar_item = mod.add_item id: bar.id, type: 'wiki_page'
+      mod.completion_requirements = {foo_item.id => {type: 'must_view'}, bar_item.id => {type: 'must_view'}}
+      mod.save!
+
+      get "/courses/#{@course.id}/pages/bar"
+      wait_for_ajaximations
+
+      lock_explanation = f('.lock_explanation').text
+      expect(lock_explanation).to include "This page is part of the module teh_mod and hasn't been unlocked yet"
+      expect(lock_explanation).to match /foo\s+must view the page/
+    end
+  end
 
   describe "Permissions" do
     before do

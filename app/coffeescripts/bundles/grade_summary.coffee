@@ -24,8 +24,6 @@ require [
       @outcomeView = new OutcomeSummaryView
         el: $('#outcomes'),
         collection: @outcomes,
-        user_id: user_id,
-        course_id: course_id,
         toggles: $('.outcome-toggles')
 
     tab: (tab, path) ->

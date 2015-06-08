@@ -144,7 +144,6 @@ define([
       }
 
       if (this.props.app.requires_secret) {
-        if(_.isEmpty(this.state.fields.shared_secret.value) || _.isEmpty(this.state.fields.consumer_key.value))
         newTool.set('consumer_key', this.state.fields.consumer_key.value);
         newTool.set('shared_secret', this.state.fields.shared_secret.value);
       } else {
@@ -157,7 +156,7 @@ define([
       newTool.set('name', this.state.fields.name.value);
 
       $(e.target).attr('disabled', 'disabled');
-
+      
       newTool.save();
     },
 

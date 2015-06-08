@@ -143,7 +143,7 @@ describe ContentMigration do
 
     it "should be able to copy links to files in folders with html entities and unicode in path" do
       root_folder = Folder.root_folders(@copy_from).first
-      folder1 = root_folder.sub_folders.create!(:context => @copy_from, :name => "mol&eacute;")
+      folder1 = root_folder.sub_folders.create!(:context => @copy_from, :name => "mol&eacute; ? i'm silly")
       att1 = Attachment.create!(:filename => "first.txt", :uploaded_data => StringIO.new('ohai'), :folder => folder1, :context => @copy_from)
       folder2 = root_folder.sub_folders.create!(:context => @copy_from, :name => "olé")
       att2 = Attachment.create!(:filename => "first.txt", :uploaded_data => StringIO.new('ohai'), :folder => folder2, :context => @copy_from)

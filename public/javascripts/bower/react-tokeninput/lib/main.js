@@ -11,7 +11,8 @@ module.exports = React.createClass({
     onSelect: React.PropTypes.func.isRequired,
     onRemove: React.PropTypes.func.isRequired,
     selected: React.PropTypes.array.isRequired,
-    menuContent: React.PropTypes.any
+    menuContent: React.PropTypes.any,
+    showListOnFocus: React.PropTypes.bool
   },
 
   getInitialState: function() {
@@ -63,6 +64,7 @@ module.exports = React.createClass({
           id: this.props.id,
           ariaLabel: this.props['combobox-aria-label'],
           onInput: this.handleInput,
+          showListOnFocus: this.props.showListOnFocus,
           onSelect: this.handleSelect,
           onRemoveLast: this.handleRemoveLast,
           value: this.state.selectedToken

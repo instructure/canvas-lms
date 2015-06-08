@@ -1,7 +1,6 @@
 class AddIndicesToQuizSubmissionEvents < CanvasPartman::Migration
   tag :predeploy
 
-  self.master_table = :quiz_submission_events
   self.base_class = Quizzes::QuizSubmissionEvent
 
   def up

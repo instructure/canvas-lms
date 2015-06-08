@@ -3,9 +3,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'nokogiri'
 
 describe FilesController do
+  before :each do
+    user_with_pseudonym(:active_all => true)
+  end
+
   context "should support Submission as a context" do
     before(:each) do
-      course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+      course_with_teacher(:active_all => true, :user => @user)
       host!("test.host")
       login_as
       @me = @user
@@ -46,7 +50,6 @@ describe FilesController do
 
   context "should support User as a context" do
     before(:each) do
-      user_with_pseudonym
       host!("test.host")
       login_as
       @me = @user
@@ -129,7 +132,7 @@ describe FilesController do
   end
 
   it "should use relative urls for safefiles in course context" do
-    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+    course_with_teacher(:active_all => true, :user => @user)
     host!("test.host")
     login_as
     a1 = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @course)
@@ -153,7 +156,7 @@ describe FilesController do
   end
 
   it "logs user access with safefiles" do
-    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+    course_with_teacher(:active_all => true, :user => @user)
     host!("test.host")
     login_as
     a1 = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @course)
@@ -173,7 +176,7 @@ describe FilesController do
   end
 
   it "should be able to use verifier in course context" do
-    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+    course_with_teacher(:active_all => true, :user => @user)
     a1 = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @course)
     HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
     get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download?verifier=#{a1.uuid}"
@@ -195,7 +198,7 @@ describe FilesController do
   end
 
   it "should be able to directly download in course context preview links with verifier" do
-    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+    course_with_teacher(:active_all => true, :user => @user)
     a1 = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @course)
     HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
     get "http://test.host/courses/#{@course.id}/files/#{a1.id}/preview?verifier=#{a1.uuid}"
@@ -218,7 +221,7 @@ describe FilesController do
 
   it "should update module progressions for html safefiles iframe" do
     HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
-    course_with_student(:active_all => true, :user => user_with_pseudonym)
+    course_with_student(:active_all => true, :user => @user)
     host!("test.host")
     login_as
     @att = @course.attachments.create(:uploaded_data => stub_file_data("ohai.html", "<html><body>ohai</body></html>", "text/html"))
@@ -248,7 +251,7 @@ describe FilesController do
 
   context "should support AssessmentQuestion as a context" do
     before do
-      course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+      course_with_teacher(:active_all => true, :user => @user)
       host!("test.host")
       login_as
       bank = @course.assessment_question_banks.create!
@@ -344,7 +347,7 @@ describe FilesController do
   end
 
   it "should reorder files" do
-    course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym)
+    course_with_teacher_logged_in(:active_all => true, :user => @user)
     att1 = attachment_model(:uploaded_data => stub_png_data, :context => @course)
     att2 = attachment_model(:uploaded_data => stub_png_data("file2.png"), :context => @course)
 

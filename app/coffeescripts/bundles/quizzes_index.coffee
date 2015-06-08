@@ -54,7 +54,7 @@ require [
         out.concat(@quizzes[quizType].collection.models)
       , []
 
-      QuizOverrideLoader(quizModels, ENV.URLS.assignment_overrides)
+      QuizOverrideLoader.loadQuizOverrides(quizModels, ENV.URLS.assignment_overrides)
 
     createQuizItemGroupView: (collection, title, type) ->
       options = @allQuizzes.options

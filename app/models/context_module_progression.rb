@@ -152,9 +152,7 @@ class ContextModuleProgression < ActiveRecord::Base
         calc.requirement_met(req, false)
       elsif req[:type] == 'must_submit'
         sub = get_submission_or_quiz_submission(tag)
-        req_met = sub && %w(submitted graded complete pending_review).include?(sub.workflow_state)
-        req_met = false if sub && sub.graded? && get_submission_score(sub) == 0
-        calc.requirement_met(req, req_met)
+        calc.requirement_met(req, sub && %w(submitted graded complete pending_review).include?(sub.workflow_state))
       elsif req[:type] == 'min_score' || req[:type] == 'max_score'
         calc.requirement_met(req, evaluate_score_requirement_met(req, tag)) if tag.scoreable?
       end
@@ -180,7 +178,8 @@ class ContextModuleProgression < ActiveRecord::Base
   end
   private :get_submission_or_quiz_submission
 
-  def get_submission_score(submission)
+  def get_submission_score(tag)
+    submission = get_submission_or_quiz_submission(tag)
     if submission.is_a?(Quizzes::QuizSubmission)
       submission.try(:kept_score)
     else
@@ -190,8 +189,7 @@ class ContextModuleProgression < ActiveRecord::Base
   private :get_submission_score
 
   def evaluate_score_requirement_met(requirement, tag)
-    sub = get_submission_or_quiz_submission(tag)
-    score = get_submission_score(sub)
+    score = get_submission_score(tag)
     if requirement[:type] == "max_score"
       score.present? && score <= requirement[:max_score].to_f
     else
@@ -207,7 +205,6 @@ class ContextModuleProgression < ActiveRecord::Base
     requirement_met = true
     requirement_met = points && points >= requirement[:min_score].to_f if requirement[:type] == 'min_score'
     requirement_met = points && points <= requirement[:max_score].to_f if requirement[:type] == 'max_score'
-    requirement_met = points > 0 if points && action == :scored && requirement[:type] == 'must_submit'
     if !requirement_met
       self.requirements_met.delete(requirement)
       self.mark_as_outdated
@@ -310,32 +307,34 @@ class ContextModuleProgression < ActiveRecord::Base
   # calculates and saves the progression state
   # raises a StaleObjectError if there is a conflict
   def evaluate(as_prerequisite_for=nil)
-    return self unless outdated?
+    self.shard.activate do
+      return self unless outdated?
 
-    # there is no valid progression state for unpublished modules
-    return self if context_module.unpublished?
+      # there is no valid progression state for unpublished modules
+      return self if context_module.unpublished?
 
-    self.evaluated_at = Time.now.utc
-    self.current = true
-    self.requirements_met ||= []
+      self.evaluated_at = Time.now.utc
+      self.current = true
+      self.requirements_met ||= []
 
-    if check_prerequisites
-      evaluate_requirements_met
+      if check_prerequisites
+        evaluate_requirements_met
+      end
+      completion_changed = self.workflow_state_changed? && self.workflow_state_change.include?('completed')
+
+      evaluate_current_position
+
+      Shackles.activate(:master) do
+        self.save
+      end
+
+      if completion_changed
+        trigger_reevaluation_of_dependent_progressions(as_prerequisite_for)
+        trigger_completion_events if self.completed?
+      end
+
+      self
     end
-    completion_changed = self.workflow_state_changed? && self.workflow_state_change.include?('completed')
-
-    evaluate_current_position
-
-    Shackles.activate(:master) do
-      self.save
-    end
-
-    if completion_changed
-      trigger_reevaluation_of_dependent_progressions(as_prerequisite_for)
-      trigger_completion_events if self.completed?
-    end
-
-    self
   end
 
   def trigger_reevaluation_of_dependent_progressions(dependent_module_to_skip=nil)

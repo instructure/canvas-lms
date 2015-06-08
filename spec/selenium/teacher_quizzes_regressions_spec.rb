@@ -28,7 +28,7 @@ describe "quizzes regressions" do
   it "should pop up calendar on top of #main" do
     get "/courses/#{@course.id}/quizzes/new"
     wait_for_ajaximations
-    fj('.due-date-row input:first + .ui-datepicker-trigger').click
+    fj(".ui-datepicker-trigger:first").click
     cal = f('#ui-datepicker-div')
     expect(cal).to be_displayed
     expect(cal.style('z-index')).to be > f('#main').style('z-index')

@@ -20,6 +20,18 @@
   background-repeat: no-repeat;
 }
 
-@mixin unselectable {
-  user-select: none;
+@mixin unselectable { user-select: none; }
+
+@mixin firefox-white-space-bug-fix {
+  white-space: normal;
+  height: $baseLineHeight;
+  position: relative;
+  &:after {
+    content: "";
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 75%);
+    position: absolute;
+    right: 0; top: 0;
+    height: $baseLineHeight; width: $ic-sp*2.5;
+    z-index: 1;
+  }
 }

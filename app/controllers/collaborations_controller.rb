@@ -66,12 +66,28 @@ class CollaborationsController < ApplicationController
     add_crumb(t('#crumbs.collaborations', "Collaborations"), polymorphic_path([@context, :collaborations]))
 
     @collaborations = @context.collaborations.active
-    log_asset_access("collaborations:#{@context.asset_string}", "collaborations", "other")
+    log_asset_access([ "collaborations", @context ], "collaborations", "other")
+
+    safe_token_valid = lambda do |service|
+      begin
+        self.send(service).verify_access_token
+      rescue => e
+        Canvas::Errors.capture(e, { source: 'rescue nil' })
+        false
+      end
+    end
+
     @google_drive_upgrade = logged_in_user && Canvas::Plugin.find(:google_drive).try(:settings) &&
-      (!logged_in_user.user_services.where(service: 'google_drive').first || !(google_drive_connection.verify_access_token rescue false))
+      (!logged_in_user.user_services.where(service: 'google_drive').first ||
+      !safe_token_valid.call(:google_drive_connection))
 
-    @google_docs_authorized = !@google_drive_upgrade && google_service_connection.verify_access_token rescue false
+    @google_docs_authorized = !@google_drive_upgrade && safe_token_valid.call(:google_service_connection)
 
+    @sunsetting_etherpad = EtherpadCollaboration.config.try(:[], :domain) == "etherpad.instructure.com/p"
+    @has_etherpad_collaborations = @collaborations.any? {|c| c.collaboration_type == 'EtherPad'}
+    @etherpad_only = Collaboration.collaboration_types.length == 1 &&
+                     Collaboration.collaboration_types[0]['type'] == "etherpad"
+    @hide_create_ui = @sunsetting_etherpad && @etherpad_only
     js_env :TITLE_MAX_LEN => Collaboration::TITLE_MAX_LENGTH,
            :CAN_MANAGE_GROUPS => @context.grants_right?(@current_user, session, :manage_groups),
            :collaboration_types => Collaboration.collaboration_types
@@ -190,4 +206,3 @@ class CollaborationsController < ApplicationController
   end
 
 end
-

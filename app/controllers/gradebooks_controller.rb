@@ -44,7 +44,7 @@ class GradebooksController < ApplicationController
     end
 
     if authorized_action(@presenter.student_enrollment, @current_user, :read_grades)
-      log_asset_access("grades:#{@context.asset_string}", "grades", "other")
+      log_asset_access([ "grades", @context ], "grades", "other")
       if @presenter.student
         add_crumb(@presenter.student_name, named_context_url(@context, :context_student_grades_url, @presenter.student_id))
 
@@ -147,34 +147,16 @@ class GradebooksController < ApplicationController
 
   def show
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
-      respond_to do |format|
-        format.html {
-          set_current_grading_period if multiple_grading_periods?
-          set_js_env
-          case @current_user.preferred_gradebook_version
-          when "2"
-            render :gradebook2
-            return
-          when "srgb"
-            render :screenreader
-            return
-          end
-        }
-        format.csv {
-          cancel_cache_buster
-          Shackles.activate(:slave) do
-            send_data(
-              @context.gradebook_to_csv(
-                :user => @current_user,
-                :include_priors => value_to_boolean(params[:include_priors]),
-                :include_sis_id => @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis)
-              ),
-              :type => "text/csv",
-              :filename => t('grades_filename', "Grades").gsub(/ /, "_") + "-" + @context.name.to_s.gsub(/ /, "_") + ".csv",
-              :disposition => "attachment"
-            )
-          end
-        }
+      @last_exported_gradebook_csv = @context.gradebook_csvs.where(user_id: @current_user).first
+      set_current_grading_period if multiple_grading_periods?
+      set_js_env
+      case @current_user.preferred_gradebook_version
+      when "2"
+        render :gradebook2
+        return
+      when "srgb"
+        render :screenreader
+        return
       end
     end
   end
@@ -248,10 +230,18 @@ class GradebooksController < ApplicationController
       :reorder_custom_columns_url => api_v1_custom_gradebook_columns_reorder_url(@context),
       :teacher_notes => teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
       :change_gradebook_version_url => context_url(@context, :change_gradebook_version_context_gradebook_url, :version => 2),
+      :export_gradebook_csv_url => course_gradebook_csv_url,
+      :gradebook_csv_progress => @last_exported_gradebook_csv.try(:progress),
+      :attachment_url => @last_exported_gradebook_csv.try(:attachment).try(:download_url),
+      :attachment => @last_exported_gradebook_csv.try(:attachment),
       :sis_app_url => Setting.get('sis_app_url', nil),
       :sis_app_token => Setting.get('sis_app_token', nil),
       :post_grades_feature_enabled => @context.feature_enabled?(:post_grades),
-      :list_students_by_sortable_name_enabled => @context.feature_enabled?(:gradebook_list_students_by_sortable_name)
+      :list_students_by_sortable_name_enabled => @context.feature_enabled?(:gradebook_list_students_by_sortable_name),
+      :gradebook_column_size_settings => @current_user.preferences[:gradebook_column_size],
+      :gradebook_column_size_settings_url => change_gradebook_column_size_course_gradebook_url,
+      :gradebook_column_order_settings => @current_user.preferences[:gradebook_column_order].try(:[], @context.id),
+      :gradebook_column_order_settings_url => save_gradebook_column_order_course_gradebook_url
     }
   end
 
@@ -388,7 +378,7 @@ class GradebooksController < ApplicationController
       format.html do
         @headers = false
         @outer_frame = true
-        log_asset_access("speed_grader:#{@context.asset_string}", "grades", "other")
+        log_asset_access([ "speed_grader", @context ], "grades", "other")
         env = {
           :CONTEXT_ACTION_SOURCE => :speed_grader,
           :settings_url => speed_grader_settings_course_gradebook_path,
@@ -418,6 +408,30 @@ class GradebooksController < ApplicationController
 
   def blank_submission
     @headers = false
+  end
+
+  def change_gradebook_column_size
+    if authorized_action(@context, @current_user, :manage_grades)
+      unless @current_user.preferences.key?(:gradebook_column_size)
+        @current_user.preferences[:gradebook_column_size] = {}
+      end
+
+      @current_user.preferences[:gradebook_column_size][params[:column_id]] = params[:column_size]
+      @current_user.save!
+      render json: nil
+    end
+  end
+
+  def save_gradebook_column_order
+    if authorized_action(@context, @current_user, :manage_grades)
+      unless @current_user.preferences.key?(:gradebook_column_order)
+        @current_user.preferences[:gradebook_column_order] = {}
+      end
+
+      @current_user.preferences[:gradebook_column_order][@context.id] = params[:column_order]
+      @current_user.save!
+      render json: nil
+    end
   end
 
   def change_gradebook_version

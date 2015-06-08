@@ -52,8 +52,8 @@ def delete_from_toolbar
   confirm_delete_on_dialog
 end
 
-def move_using_cog(file_name)
-  ff('.al-trigger')[0].click
+def move_using_cog(file_name, offset = 0)
+  ff('.al-trigger')[offset].click
   fln("Move").click
   wait_for_ajaximations
   expect(f(".ui-dialog-title").text).to eq "Where would you like to move #{file_name}?"

@@ -101,7 +101,7 @@ define [
       # when we are viewing all files we need to pad the context_asset_string on the front of the url
       # so it would be something like /files/folder/users_1/some/sub/folder
       if filesEnv.showingAllContexts
-        assetString = "#{@get('context_type').toLowerCase()}s_#{@get('context_id')}"
+        assetString = "#{@get('context_type')?.toLowerCase()}s_#{@get('context_id')}"
         relativePath = assetString + '/' + relativePath
 
       relativePath

@@ -16,6 +16,34 @@ describe "assignments" do
       @course.require_assignment_group
     end
 
+    context "save and publish button" do
+
+      def create_assignment(publish = true, params = {name: "Test Assignment"})
+        @assignment = @course.assignments.create(params)
+        @assignment.unpublish unless publish
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+      end
+
+      it "can save and publish an assignment", priority: "1", test_id: 193784 do
+        create_assignment false
+
+        expect(f("#assignment-draft-state")).to be_displayed
+
+        expect_new_page_load {f(".save_and_publish").click}
+        expect(f("#assignment_publish_button.btn-published")).to be_displayed
+
+        # Check that the list of quizzes is also updated
+        get "/courses/#{@course.id}/assignments"
+        expect(f("#assignment_#{@assignment.id} .icon-publish")).to be_displayed
+      end
+
+      it "should not exist in a published assignment", priority: "1", test_id: 140648 do
+        create_assignment
+
+        expect(f(".save_and_publish")).to be_nil
+      end
+    end
+
     it "should edit an assignment" do
       assignment_name = 'first test assignment'
       due_date = Time.now.utc + 2.days
@@ -79,13 +107,16 @@ describe "assignments" do
       ['#assignment_text_entry', '#assignment_online_url', '#assignment_online_upload'].each do |element|
         f(element).click
       end
-      driver.find_element(:name, 'due_at').send_keys(due_at)
+
+      fj(".datePickerDateField[data-date-type='due_at']").send_keys(due_at)
+
       submit_assignment_form
       #confirm all our settings were saved and are now displayed
       wait_for_ajaximations
       expect(f('h1.title')).to include_text(assignment_name)
       expect(fj('#assignment_show .points_possible')).to include_text('10')
       expect(f('#assignment_show fieldset')).to include_text('a text entry box, a website url, or a file upload')
+
       expect(f('.assignment_dates')).to include_text(due_at)
       # unfreeze time
       Timecop.return
@@ -143,7 +174,8 @@ describe "assignments" do
         expect_new_page_load { f('.more_options').click }
         expect(f('#assignment_name').attribute(:value)).to include_text(expected_text)
         expect(f('#assignment_points_possible').attribute(:value)).to include_text(points)
-        expect(driver.find_element(:name, 'due_at').attribute(:value)).to eq due_at
+        due_at_field = fj(".date_field:first[data-date-type='due_at']")
+        expect(due_at_field.attribute(:value)).to eq due_at
         click_option('#assignment_submission_type', 'No Submission')
         submit_assignment_form
         expect(@course.assignments.count).to eq 1
@@ -155,7 +187,6 @@ describe "assignments" do
         Timecop.return
       end
     end
-
 
     it "should keep erased field on more options click" do
       enable_cache do
@@ -183,8 +214,11 @@ describe "assignments" do
         expect_new_page_load { fj('.more_options:eq(1)').click }
         expect(f("#assignment_name").text).to match ""
         expect(f("#assignment_points_possible").text).to match ""
-        expect(fj('.due-date-row:first div').text).to match ""
-        expect(fj('.due-date-row:last div').text).to match expected_date
+
+        first_input_val = driver.execute_script("return $('.DueDateInput__Container:first input').val();")
+        expect(first_input_val).to match expected_date
+        second_input_val = driver.execute_script("return $('.DueDateInput__Container:last input').val();")
+        expect(second_input_val).to match ""
       end
     end
 
@@ -199,13 +233,12 @@ describe "assignments" do
       expect(f('#self_signup_help_dialog')).to be_displayed
     end
 
-
     it "should validate that a group category is selected" do
       assignment_name = 'first test assignment'
       @assignment = @course.assignments.create({
-                                                   :name => assignment_name,
-                                                   :assignment_group => @course.assignment_groups.create!(:name => "default")
-                                               })
+        :name => assignment_name,
+        :assignment_group => @course.assignment_groups.create!(:name => "default")
+      })
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
       f('#has_group_category').click
@@ -216,6 +249,19 @@ describe "assignments" do
       errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
       visBoxes, hidBoxes = errorBoxes.partition { |eb| eb.displayed? }
       expect(visBoxes.first.text).to eq "Please select a group set for this assignment"
+    end
+
+    it "shows assignment details, un-editable, for concluded teachers" do
+      @teacher.enrollments.first.conclude
+      @assignment = @course.assignments.create({
+        :name => "assignment after concluded",
+        :assignment_group => @course.assignment_groups.create!(:name => "default")
+      })
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      expect(f(".description.teacher-version")).to be_present
+      expect(ff(".edit_assignment_link")).to be_empty
     end
 
     context "group assignments" do
@@ -259,6 +305,14 @@ describe "assignments" do
         expect(f("#assignment_group_category_id")).not_to include_text @assignment2.group_category.name
         expect(f("#assignment_group_category_id").attribute('disabled')).to be_present
       end
+
+      it "should revert to [ New Group Category ] if original group is deleted with no submissions" do
+        @assignment2.group_category.destroy
+        get "/courses/#{@course.id}/assignments/#{@assignment2.id}/edit"
+        wait_for_ajaximations
+
+        expect(f("#assignment_group_category_id option[selected]")).to include_text "New Group Category"
+      end
     end
 
     context "frozen assignment", :priority => "2" do
@@ -285,7 +339,7 @@ describe "assignments" do
       it "should allow editing the due date even if completely frozen" do
         old_due_at = @frozen_assign.due_at
         run_assignment_edit(@frozen_assign) do
-          replace_content(fj('.due-date-overrides form:first input[name=due_at]'), 'Sep 20, 2012')
+          replace_content(fj(".datePickerDateField[data-date-type='due_at']"), 'Sep 20, 2012')
         end
 
         expect(f('.assignment_dates').text).to match /Sep 20, 2012/
@@ -415,8 +469,7 @@ describe "assignments" do
         end
 
         it "should not overwrite overrides if published twice from the index page" do
-          get("/courses/#{@course.id}/assignments", false)
-          wait_for_ajaximations
+          get "/courses/#{@course.id}/assignments"
 
           f("#assignment_#{@assignment.id} .publish-icon").click
           wait_for_ajaximations

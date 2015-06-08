@@ -316,7 +316,7 @@ class DiscussionTopicsController < ApplicationController
 
     respond_to do |format|
       format.html do
-        log_asset_access("topics:#{@context.asset_string}", 'topics', 'other')
+        log_asset_access([ "topics", @context ], 'topics', 'other')
 
         @active_tab = 'discussions'
         add_crumb(t('#crumbs.discussions', 'Discussions'),
@@ -441,7 +441,7 @@ class DiscussionTopicsController < ApplicationController
             name: section.name,
             start_at: section.start_at,
             end_at: section.end_at,
-            override_course_dates: section.restrict_enrollments_to_section_dates
+            override_course_and_term_dates: section.restrict_enrollments_to_section_dates
           }
         }
         js_hash['VALID_DATE_RANGE'] = CourseDateRange.new(@context)

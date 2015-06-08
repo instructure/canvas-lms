@@ -18,7 +18,7 @@
 
 module Api::V1::Account
   include Api::V1::Json
-  
+
   @@extensions = []
 
   # In order to register a module/class as an extension,
@@ -39,7 +39,7 @@ module Api::V1::Account
   def account_json(account, user, session, includes, read_only=false)
     attributes = %w(id name parent_account_id root_account_id workflow_state)
     if read_only
-      return api_json(account, user, session, :only => attributes) do |hash|
+      return api_json(account, user, session, :only => attributes).tap do |hash|
         hash['default_time_zone'] = account.default_time_zone.tzinfo.name
       end
     end
@@ -52,7 +52,7 @@ module Api::V1::Account
       hash['integration_id'] = account.integration_id if !account.root_account? && account.root_account.grants_any_right?(user, :read_sis, :manage_sis)
       hash['lti_guid'] = account.lti_guid if includes.include?('lti_guid')
       if includes.include?('registration_settings')
-        hash['registration_settings'] = {:login_handle_name => account.login_handle_name}
+        hash['registration_settings'] = {:login_handle_name => account.login_handle_name_with_inference}
         if account.root_account?
           hash['terms_required'] = account.terms_required?
           hash['terms_of_use_url'] = terms_of_use_url
@@ -69,4 +69,3 @@ module Api::V1::Account
     accounts.map{ |account| account_json(account, user, session, includes) }
   end
 end
-

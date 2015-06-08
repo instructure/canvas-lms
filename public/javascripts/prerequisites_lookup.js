@@ -26,8 +26,19 @@ define([
   'jquery.instructure_misc_helpers'
 ], function(I18n, $, htmlEscape, Spinner) {
 
-  $(document).ready(function() {
+  var lookupStarted = false;
+
+  INST.lookupPrerequisites = function() {
+    if (lookupStarted) {
+        return;
+    }
+
     var $link = $("#module_prerequisites_lookup_link");
+    if ($link.length == 0) {
+        return;
+    }
+    lookupStarted = true;
+
     var url = $link.attr('href');
 
     var spinner = new Spinner({radius: 5});
@@ -35,11 +46,10 @@ define([
     $(spinner.el).css({opacity: 0.5, top: '25px', left: '200px'}).appendTo('.spinner');
 
     $.ajaxJSON(url, 'GET', {}, function(data) {
+      spinner.stop();
       if(data.locked === false) {
-        window.reload();
         return;
       }
-      spinner.stop();
       var $ul = $("<ul/>");
       $ul.attr('id', 'module_prerequisites_list');
       for(var idx in data.modules) {
@@ -86,6 +96,7 @@ define([
       spinner.stop();
       $('.module_prerequisites_fallback').show();
     })
-  });
+  }
+  $(document).ready(INST.lookupPrerequisites);
 
 });

@@ -99,17 +99,23 @@ describe UsersController, type: :request do
     compare_json json.second, @a2_json
   end
 
-  it "should return a course-specific todo list" do
-    a1_json = api_call(:get, "/api/v1/courses/#{@student_course.id}/todo",
+  it "returns a course-specific todo list for a student" do
+    json = api_call(:get, "/api/v1/courses/#{@student_course.id}/todo",
                     :controller => "courses", :action => "todo_items",
                     :format => "json", :course_id => @student_course.to_param)
+                    .first
 
-    a2_json = api_call(:get, "/api/v1/courses/#{@teacher_course.id}/todo",
+    update_assignment_json
+    compare_json(json, @a1_json)
+  end
+
+  it "returns a course-specific todo list for a teacher" do
+    json = api_call(:get, "/api/v1/courses/#{@teacher_course.id}/todo",
                     :controller => "courses", :action => "todo_items",
                     :format => "json", :course_id => @teacher_course.to_param)
+                    .first
     update_assignment_json
-    compare_json( a1_json.first, @a1_json )
-    compare_json( a2_json.first, @a2_json )
+    compare_json(json, @a2_json)
   end
 
   it "should return a list for users who are both teachers and students" do
@@ -120,8 +126,8 @@ describe UsersController, type: :request do
     @a1_json.deep_merge!({ 'assignment' => { 'needs_grading_count' => 0 } })
     json = json.sort_by { |t| t['assignment']['id'] }
     update_assignment_json
-    compare_json( json.first, @a1_json )
-    compare_json( json.second, @a2_json )
+    compare_json(json.first, @a1_json)
+    compare_json(json.second, @a2_json)
   end
 
   it "should ignore a todo item permanently" do
@@ -159,7 +165,7 @@ describe UsersController, type: :request do
     @a2_json['needs_grading_count'] = 2
     @a2_json['assignment']['needs_grading_count'] = 2
     update_assignment_json
-    compare_json( json.first, @a2_json )
+    compare_json(json.first, @a2_json)
   end
 
   it "works correctly when turnitin is enabled" do

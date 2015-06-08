@@ -98,7 +98,7 @@ class Profile < ActiveRecord::Base
       klass.class_eval <<-CODE, __FILE__, __LINE__ + 1
         def profile_with_correct_class
           profile_without_correct_class || begin
-            profile = #{klass.to_s}Profile.new(:context => self)
+            profile = #{klass}Profile.new(:context => self)
             profile.root_account = root_account
             profile.title = name
             profile.visibility = "private"

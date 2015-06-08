@@ -92,6 +92,58 @@ describe "Conferences API", type: :request do
         merge(action: 'index', group_id: @group.to_param))
       expect(json).to eq api_conferences_json(@conferences.reverse.map{|c| WebConference.find(c.id)}, @group, @student)
     end
+  end
 
+  describe "POST 'recording_ready'" do
+    before do
+      WebConference.stubs(:plugins).returns([
+        web_conference_plugin_mock("big_blue_button", {
+          :domain => "bbb.instructure.com",
+          :secret_dec => "secret",
+        })
+      ])
+    end
+
+    let(:conference) do
+      BigBlueButtonConference.create!(context: course,
+                                      user: user,
+                                      conference_key: "conf_key")
+    end
+
+    let(:course_id) { conference.context.id }
+
+    let(:path) do
+      "api/v1/courses/#{course_id}/conferences/#{conference.id}/recording_ready"
+    end
+
+    let(:params) do
+      @category_path_options.merge(action: 'recording_ready',
+                                   course_id: course_id,
+                                   conference_id: conference.id)
+    end
+
+    it 'should mark the recording as ready' do
+      payload = {meeting_id: conference.conference_key}
+      body_params = {signed_parameters: JWT.encode(payload, conference.config[:secret_dec])}
+
+      raw_api_call(:post, path, params, body_params)
+      expect(response.status).to eq 202
+    end
+
+    it 'should error if the secret key is wrong' do
+      payload = {meeting_id: conference.conference_key}
+      body_params = {signed_parameters: JWT.encode(payload, "wrong_key")}
+
+      raw_api_call(:post, path, params, body_params)
+      expect(response.status).to eq 401
+    end
+
+    it 'should error if the conference_key is wrong' do
+      payload = {meeting_id: "wrong_conference_key"}
+      body_params = {signed_parameters: JWT.encode(payload, conference.config[:secret_dec])}
+
+      raw_api_call(:post, path, params, body_params)
+      expect(response.status).to eq 422
+    end
   end
 end

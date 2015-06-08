@@ -21,7 +21,7 @@ module Canvas::Migration
       else
         unzip_archive
         path = File.join(self.unzipped_file_path, entry)
-        File.exists?(path) && File.read(path)
+        File.exist?(path) && File.read(path)
       end
     end
 
@@ -32,7 +32,7 @@ module Canvas::Migration
         # if it's not an actual zip file
         # just extract the package (or try to) and look for the file
         unzip_archive
-        File.exists?(File.join(self.unzipped_file_path, entry))
+        File.exist?(File.join(self.unzipped_file_path, entry))
       end
     end
 
@@ -100,7 +100,7 @@ module Canvas::Migration
     end
 
     def delete_unzipped_file
-      if File.exists?(self.unzipped_file_path)
+      if File.exist?(self.unzipped_file_path)
         FileUtils::rm_rf(self.unzipped_file_path)
       end
     end

@@ -181,7 +181,7 @@ class ContextController < ApplicationController
 
   def roster
     return unless authorized_action(@context, @current_user, [:read_roster, :manage_students, :manage_admin_users])
-    log_asset_access("roster:#{@context.asset_string}", 'roster', 'other')
+    log_asset_access([ "roster", @context ], 'roster', 'other')
 
     if @context.is_a?(Course)
       if @context.concluded?

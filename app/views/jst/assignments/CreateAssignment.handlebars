@@ -37,7 +37,7 @@
         {{#t "assignment_due_at"}}Due:{{/t}}
       </label>
       <div class="controls">
-      {{#ifAny multipleDueDates isOnlyVisibleToOverrides}}
+      {{#ifAny multipleDueDates isOnlyVisibleToOverrides nonBaseDates}}
         <span class="datetime_field multiple_due_dates" title
               data-tooltip-selector="#vdd_tooltip_{{uniqLabel}}"
               aria-labelledby="vdd_tooltip_{{uniqLabel}}">

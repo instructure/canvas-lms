@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe FeatureFlags do
   let(:t_site_admin) { Account.site_admin }
@@ -252,6 +252,33 @@ describe FeatureFlags do
         end
       end
     end
+
+    context "cross-sharding" do
+      specs_require_sharding
+
+      it "should search on the correct shard" do
+        t_sub_account.feature_flags.create! feature: 'course_feature', state: 'on'
+        @other_course = t_sub_account.courses.create!
+
+        @shard1.activate do
+          flag = @other_course.lookup_feature_flag('course_feature')
+          expect(flag).to_not be_default
+          expect(@other_course.feature_enabled?('course_feature')).to be_truthy
+        end
+      end
+
+      it "should search for site admin flags on the correct shard" do
+        t_site_admin.feature_flags.create! feature: 'course_feature', state: 'on'
+
+        @shard1.activate do
+          account = Account.create!
+          @other_course = account.courses.create!
+          flag = @other_course.lookup_feature_flag('course_feature')
+          expect(flag).to_not be_default
+          expect(@other_course.feature_enabled?('course_feature')).to be_truthy
+        end
+      end
+    end
   end
 
   describe "set_feature_flag!" do
@@ -286,7 +313,7 @@ describe FeatureFlags do
   end
 
   describe "caching" do
-    let(:t_cache_key) { "#{t_root_account.feature_flag_cache_key('course_feature')}:0" }
+    let(:t_cache_key) { t_root_account.feature_flag_cache_key('course_feature') }
     before do
       t_root_account.feature_flags.create! feature: 'course_feature', state: 'allowed'
     end
@@ -301,7 +328,7 @@ describe FeatureFlags do
     it "should cache a nil result" do
       enable_cache do
         t_root_account.feature_flag('course_feature2')
-        expect(Rails.cache).to be_exist("#{t_root_account.feature_flag_cache_key('course_feature2')}:0")
+        expect(Rails.cache).to be_exist(t_root_account.feature_flag_cache_key('course_feature2'))
         t_root_account.expects(:feature_flags).never
         t_root_account.feature_flag('course_feature2')
       end

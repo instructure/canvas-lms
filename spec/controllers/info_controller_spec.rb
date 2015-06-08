@@ -20,48 +20,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe InfoController do
 
-  describe "POST 'record_error'" do
-    it "should be successful" do
-      post 'record_error'
-      assert_recorded_error
-
-      post 'record_error', :error => {:title => 'ugly', :message => 'bacon', :fried_ham => 'stupid'}
-      assert_recorded_error
-    end
-
-    it "should not choke on non-integer ids" do
-      post 'record_error', :error => {:id => 'garbage'}
-      assert_recorded_error
-      expect(ErrorReport.last.message).not_to eq "Error Report Creation failed"
-    end
-
-    it "should not return nil.id if report creation failed" do
-      ErrorReport.expects(:where).once.raises("failed!")
-      post 'record_error', :format => 'json', :error => {:id => 1}
-      expect(JSON.parse(response.body)).to eq({ 'logged' => true, 'id' => nil })
-    end
-
-    it "should not record the user as nil.id if report creation failed" do
-      ErrorReport.expects(:where).once.raises("failed!")
-      post 'record_error', :error => {:id => 1}
-      expect(ErrorReport.last.user_id).to be_nil
-    end
-
-    it "should record the user if report creation failed" do
-      user = User.create!
-      user_session(user)
-      ErrorReport.expects(:where).once.raises("failed!")
-      post 'record_error', :error => {:id => 1}
-      expect(ErrorReport.last.user_id).to eq user.id
-    end
-  end
-
-  def assert_recorded_error(msg = "Thanks for your help!  We'll get right on this")
-    expect(flash[:notice]).to eql(msg)
-    expect(response).to be_redirect
-    expect(response).to redirect_to(root_url)
-  end
-
   describe "GET 'health_check'" do
     it "should work" do
       get 'health_check'

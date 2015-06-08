@@ -24,7 +24,7 @@ if Qti.migration_executable
     end
 
     after :each do
-      if @export_folder && File.exists?(@export_folder)
+      if @export_folder && File.exist?(@export_folder)
         FileUtils::rm_rf(@export_folder)
       end
     end

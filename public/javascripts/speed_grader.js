@@ -1284,7 +1284,7 @@ define([
       var gradedStudents = $.grep(jsonData.studentsWithSubmissions, function(s) {
         return (s.submission &&
                 s.submission.workflow_state === 'graded' &&
-                s.submission.from_enrollment_type === "StudentEnrollment"
+                _.contains(["StudentEnrollment", "StudentViewEnrollment"], s.submission.from_enrollment_type)
         );
       });
 
@@ -1438,12 +1438,6 @@ define([
         $.each(this.currentStudent.rubric_assessments, function(){
           $rubric_assessments_select.append('<option value="' + htmlEscape(this.id) + '">' + htmlEscape(this.assessor_name) + '</option>');
         });
-
-        // show a new option if there is not an assessment by me
-        // or, if I can :manage_course, there is not an assessment already with assessment_type = 'grading'
-        if( !assessmentsByMe.length || (ENV.RUBRIC_ASSESSMENT.assessment_type == 'grading' && !gradingAssessments.length) ) {
-          $rubric_assessments_select.append('<option value="new">' + htmlEscape(I18n.t('new_assessment', '[New Assessment]')) + '</option>');
-        }
 
         //select the assessment that meets these rules:
         // 1. the assessment by me

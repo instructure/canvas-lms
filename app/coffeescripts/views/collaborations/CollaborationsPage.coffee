@@ -26,6 +26,7 @@ define [
   class CollaborationsPage extends View
     events:
       'click .add_collaboration_link': 'addCollaboration'
+      'keyclick .add_collaboration_link': 'addCollaboration'
 
     initialize: ->
       super
@@ -42,7 +43,6 @@ define [
         @$addLink.hide()
 
     cacheElements: ->
-      @$header  = $('h1:first')
       @$addLink = $('.add_collaboration_link')
       @$addForm = $('#new_collaboration')
       @$noCollaborationsMessage = $('#no_collaborations_message')
@@ -73,8 +73,7 @@ define [
 
     onFormHide: =>
       @$addLink.show()
-      @$header.focus()
+      @$addLink.focus()
 
     onFormError: ($input, message) =>
       $input.focus().errorBox(message)
-

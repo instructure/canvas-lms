@@ -43,10 +43,13 @@ describe Tour do
       end
       def self.before_filter(name); true; end
       def controller_name; 'controller'; end
+
       def action_name; 'action'; end
+
       def session
         {:dismissed_tours => {:dismissed => 1}}
       end
+
       def api_request?; false; end
       include Tour
     end

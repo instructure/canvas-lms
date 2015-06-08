@@ -175,7 +175,9 @@ module ApplicationHelper
       :contents => capture(&block)
     )
   end
+
   def js_blocks; @js_blocks ||= []; end
+
   def render_js_blocks
     output = js_blocks.inject('') do |str, e|
       # print file and line number for debugging in development mode.
@@ -195,7 +197,9 @@ module ApplicationHelper
     end
     hidden_dialogs[id] = capture(&block)
   end
+
   def hidden_dialogs; @hidden_dialogs ||= {}; end
+
   def render_hidden_dialogs
     output = hidden_dialogs.keys.sort.inject('') do |str, id|
       str << "<div id='#{id}' style='display: none;''>" << hidden_dialogs[id] << "</div>"
@@ -840,8 +844,7 @@ module ApplicationHelper
   def agree_to_terms
     # may be overridden by a plugin
     @agree_to_terms ||
-    t("#user.registration.agree_to_terms_and_privacy_policy",
-      "You agree to the *terms of use* and acknowledge the **privacy policy**.",
+    t("I agree to the *terms of use* and **privacy policy**.",
       wrapper: {
         '*' => link_to('\1', terms_of_use_url, target: '_blank'),
         '**' => link_to('\1', privacy_policy_url, target: '_blank')

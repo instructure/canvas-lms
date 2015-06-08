@@ -892,6 +892,59 @@ describe AssignmentsApiController, type: :request do
       expect(response.code).to eql '400'
     end
 
+    it "allows creating an assignment with overrides via the API" do
+      student_in_course(:course => @course, :active_enrollment => true)
+
+      @adhoc_due_at = 5.days.from_now
+      @section_due_at = 7.days.from_now
+
+      @user = @teacher
+
+      assignment_params = {
+        :assignment => {
+          'name' => 'some assignment',
+          'assignment_overrides' => {
+            '0' => {
+              'student_ids' => [@student.id],
+              'due_at' => @adhoc_due_at.iso8601 },
+            '1' => {
+                'course_section_id' => @course.default_section.id,
+                'due_at' => @section_due_at.iso8601
+              }
+          }
+        }
+      }
+
+      controller_params = {
+        :controller => 'assignments_api',
+        :action => 'create',
+        :format => 'json',
+        :course_id => @course.id.to_s
+      }
+
+      @json = api_call(
+        :post,
+        "/api/v1/courses/#{@course.id}/assignments.json",
+        controller_params,
+        assignment_params
+      )
+
+      @assignment = Assignment.find @json['id']
+      expect(@assignment.assignment_overrides.count).to eq 2
+
+      @adhoc_override = @assignment.assignment_overrides.where(set_type: 'ADHOC').first
+      expect(@adhoc_override).not_to be_nil
+      expect(@adhoc_override.set).to eq [@student]
+      expect(@adhoc_override.due_at_overridden).to be_truthy
+      expect(@adhoc_override.due_at.to_i).to eq @adhoc_due_at.to_i
+      expect(@adhoc_override.title).to eq @student.name
+
+      @section_override = @assignment.assignment_overrides.where(set_type: 'CourseSection').first
+      expect(@section_override).not_to be_nil
+      expect(@section_override.set).to eq @course.default_section
+      expect(@section_override.due_at_overridden).to be_truthy
+      expect(@section_override.due_at.to_i).to eq @section_due_at.to_i
+    end
 
     it 'accepts configuration argument to split needs grading by section' do
       student_in_course(:course => @course, :active_enrollment => true)

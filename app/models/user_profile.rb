@@ -30,7 +30,7 @@ class UserProfile < ActiveRecord::Base
 
   validates_length_of :title, :maximum => maximum_string_length, :allow_blank => true
 
-  TAB_PROFILE, TAB_COMMUNICATION_PREFERENCES, TAB_FILES, TAB_EPORTFOLIOS,
+  TAB_PROFILE, TAB_COMMUNICATION_PREFERENCES, TAB_FILES, TAB_EPORTFOLIOS, TAB_LOGOUT,
     TAB_HOME, TAB_PROFILE_SETTINGS, TAB_OBSERVEES = *0..10
 
   def tabs_available(user=nil, opts={})
@@ -46,6 +46,16 @@ class UserProfile < ActiveRecord::Base
       end
 
       @tabs << { :id => TAB_EPORTFOLIOS, :label => I18n.t('#tabs.eportfolios', "ePortfolios"), :css_class => 'eportfolios', :href => :dashboard_eportfolios_path, :no_args => true } if user.eportfolios_enabled?
+
+      if opts[:root_account] && opts[:root_account].feature_enabled?(:use_new_styles)
+        @tabs << {
+          :id => TAB_LOGOUT,
+          :label => I18n.t('#tabs.logout', "Logout"),
+          :css_class => 'logout',
+          :href => :logout_path,
+          :no_args => true }
+      end
+
       if user && opts[:root_account]
         opts[:root_account].context_external_tools.active.having_setting('user_navigation').each do |tool|
           @tabs << {

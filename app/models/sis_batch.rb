@@ -166,7 +166,7 @@ class SisBatch < ActiveRecord::Base
     end
   rescue => e
     self.data[:error_message] = e.to_s
-    self.data[:stack_trace] = "#{e.to_s}\n#{e.backtrace.join("\n")}"
+    self.data[:stack_trace] = "#{e}\n#{e.backtrace.join("\n")}"
     self.workflow_state = "failed"
     self.save
   end

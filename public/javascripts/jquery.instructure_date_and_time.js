@@ -105,7 +105,9 @@ var speakMessage = function ($this, message) {
     // format true date into profile timezone without tz-info, then parse in
     // browser timezone. then, as desired:
     // output.toString('yyyy-MM-dd hh:mm:ss') == tz.format(input, '%Y-%m-%d %H:%M:%S')
-    return Date.parse(tz.format(date, '%F %T'));
+    var year = tz.format(date, '%Y');
+    while (year.length < 4) year = "0" + year;
+    return Date.parse(tz.format(date, year + '-%m-%d %T'));
   }
 
   $.unfudgeDateForProfileTimezone = function(date) {

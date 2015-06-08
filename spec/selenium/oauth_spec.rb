@@ -34,7 +34,7 @@ describe "oauth2 flow" do
   
       it "should show the confirmation dialog after logging in" do
         get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=urn:ietf:wg:oauth:2.0:oob"
-        expect(driver.current_url).to match(%r{/login$})
+        expect(driver.current_url).to match(%r{/login/canvas$})
         user_element = f('#pseudonym_session_unique_id')
         user_element.send_keys("nobody@example.com")
         password_element = f('#pseudonym_session_password')

@@ -84,7 +84,7 @@ class Attachments::Verification
   # @param permission (Symbol) - Either :read or :download
   #
   # Returns a boolean
-  def valid_verifier_for_permission?(verifier, permission)
+  def valid_verifier_for_permission?(verifier, permission, session = {})
     # Support for legacy verifiers.
     if verifier == attachment.uuid
       CanvasStatsd::Statsd.increment("attachments.legacy_verifier_success")
@@ -96,29 +96,29 @@ class Attachments::Verification
       return false
     end
 
-    # tokens that don't specify a user have no further permissions checking
-    if !body[:user_id]
+    # tokens that don't specify a user or permissions map have no further permissions checking
+    if !body[:user_id] && !body[:pm]
       return true
     end
-    user = User.find(body[:user_id])
+    user = body[:user_id] && User.find(body[:user_id])
 
     if body[:ctx] && body[:pm]
-      return check_custom_permission(user, permission, body[:ctx], body[:pm].to_sym)
+      return check_custom_permission(user, session, permission, body[:ctx], body[:pm].to_sym)
     end
 
-    attachment.grants_right?(user, {}, permission)
+    attachment.grants_right?(user, session, permission)
   end
 
   private
 
-  def check_custom_permission(user, permission, context_asset_string, permission_map_id)
+  def check_custom_permission(user, session, permission, context_asset_string, permission_map_id)
     permission_map = PERMISSION_MAPS[permission_map_id]
     return false unless permission_map
 
     context = Context.find_asset_by_asset_string(context_asset_string)
     return false unless context
 
-    context.grants_right?(user, {}, permission_map[permission])
+    context.grants_right?(user, session, permission_map[permission])
   end
 end
 

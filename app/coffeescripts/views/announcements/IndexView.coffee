@@ -1,4 +1,5 @@
 define [
+  'jquery'
   'compiled/views/DiscussionTopics/DiscussionsSettingsView'
   'compiled/views/DiscussionTopics/UserSettingsView'
   'i18n!discussion_topics'
@@ -7,7 +8,7 @@ define [
   'compiled/views/PaginatedView'
   'compiled/views/DiscussionTopics/SummaryView'
   'compiled/collections/AnnouncementsCollection'
-], (DiscussionsSettingsView, UserSettingsView, I18n, _, template, PaginatedView, DiscussionTopicSummaryView, AnnouncementsCollection) ->
+], ($, DiscussionsSettingsView, UserSettingsView, I18n, _, template, PaginatedView, DiscussionTopicSummaryView, AnnouncementsCollection) ->
 
   class IndexView extends PaginatedView
 
@@ -153,6 +154,8 @@ define [
         @[input.id] = val
         @renderList()
         @collection.trigger 'aBogusEventToCauseYouToFetchNextPageIfNeeded'
+        @resultsUpdatedAccessibleAlert()
+        
 
     filters:
       onlyGraded: -> @get 'assignment_id'
@@ -183,3 +186,7 @@ define [
         showingAnnouncements: @isShowingAnnouncements()
         lastPageFetched: @lastPageFetched
       , filterProps, collectionProps
+
+    resultsUpdatedAccessibleAlert: _.debounce(->
+      $.screenReaderFlashMessage I18n.t 'The list of results has been updated.'
+    , 1000)

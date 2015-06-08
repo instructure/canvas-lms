@@ -2,9 +2,7 @@ module DataFixup::RegenerateUserThumbnails
   def self.run
     profile_pic_ids = nil
 
-    env = :slave
-    env = :deploy if Shackles.environment == :deploy
-    Shackles.activate(env) do
+    Shackles.activate(:slave) do
       profile_pic_ids = Attachment.connection.select_all <<-SQL
         SELECT DISTINCT at.id FROM users AS u
         JOIN attachments AS at ON (at.context_type = 'User' and at.context_id = u.id)

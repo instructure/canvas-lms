@@ -31,7 +31,9 @@ describe ContentTag do
         end
 
         def published?; !!@published; end
+
         def unpublished?; !@published; end
+
         def deleted?; @deleted; end
       end
 

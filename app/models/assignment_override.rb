@@ -91,6 +91,7 @@ class AssignmentOverride < ActiveRecord::Base
   private :touch_assignment
 
   def assignment?; !!assignment_id; end
+
   def quiz?; !!quiz_id; end
 
   workflow do
@@ -122,7 +123,7 @@ class AssignmentOverride < ActiveRecord::Base
       self.assignment_version = assignment.version_number if assignment
     end
 
-    self.title = set.name if set_type != 'ADHOC' && set
+    set_title_if_needed
   end
   protected :default_values
 
@@ -219,17 +220,6 @@ class AssignmentOverride < ActiveRecord::Base
     end
   end
 
-  def applies_to_students_with_visibility
-    return applies_to_students unless self.assignment.try(:differentiated_assignments_applies?) || self.quiz.try(:differentiated_assignments_applies?)
-    if self.quiz
-      applies_to_students.able_to_see_quiz_in_course_with_da(self.quiz_id, context.id)
-    elsif self.assignment
-      applies_to_students.able_to_see_assignment_in_course_with_da(self.assignment_id, context.id)
-    else
-      applies_to_students
-    end
-  end
-
   def applies_to_admins
     case set_type
     when 'CourseSection'
@@ -250,10 +240,34 @@ class AssignmentOverride < ActiveRecord::Base
       self.due_at_overridden && !Assignment.due_dates_equal?(self.due_at, self.prior_version.due_at))
   end
 
+  def set_title_if_needed
+    return if self.workflow_state == "deleted"
+
+    if set_type != 'ADHOC' && set
+      self.title = set.name
+    elsif set_type == 'ADHOC' && set.any?
+      self.title ||= title_from_students(set)
+    end
+  end
+
+  def title_from_students(students)
+    sorted_students = (students || []).sort_by(&:name)
+    if sorted_students.count > 3
+      others_count = sorted_students.count - 2
+      first_two_students = sorted_students[0..1].map(&:name).join(", ")
+      I18n.t(
+        '%{first_two_students}, and %{others_count} others',
+        {first_two_students: first_two_students, others_count: others_count}
+      )
+    elsif sorted_students.any?
+      sorted_students.map(&:name).to_sentence
+    end
+  end
+
   has_a_broadcast_policy
   set_broadcast_policy do |p|
     p.dispatch :assignment_due_date_changed
-    p.to { applies_to_students_with_visibility }
+    p.to { applies_to_students }
     p.whenever { |record| record.notify_change? }
     p.filter_asset_by_recipient { |record, user|
       # note that our asset for this message is an Assignment, not an AssignmentOverride

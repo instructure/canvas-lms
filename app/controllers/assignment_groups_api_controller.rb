@@ -45,8 +45,8 @@ class AssignmentGroupsApiController < ApplicationController
       includes = Array(params[:include])
       override_dates = value_to_boolean(params[:override_assignment_dates] || true)
       assignments = @assignment_group.visible_assignments(@current_user)
-      if params[:grading_period_id].presence && multiple_grading_periods?
-        assignments = GradingPeriod.find(params[:grading_period_id]).assignments(assignments)
+      if params[:grading_period_id].present? && multiple_grading_periods?
+        assignments = GradingPeriod.active.find(params[:grading_period_id]).assignments(assignments)
       end
       includes.delete('assignment_visibility') unless @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
       render :json => assignment_group_json(@assignment_group, @current_user, session, includes, {
@@ -98,7 +98,7 @@ class AssignmentGroupsApiController < ApplicationController
   #
   # Deletes the assignment group with the given id.
   #
-  # @argument move_assignment_to [String]
+  # @argument move_assignments_to [Integer]
   #   The ID of an active Assignment Group to which the assignments that are
   #   currently assigned to the destroyed Assignment Group will be assigned.
   #   NOTE: If this argument is not provided, any assignments in this Assignment

@@ -24,6 +24,14 @@ RUN gem uninstall bundler \
 
 RUN mkdir /app
 WORKDIR /app
-RUN bundle config path /app/vendor/bundle/docker
-RUN bundle config bin /usr/local/bin
+
+RUN mkdir /home/docker \
+ && useradd -d /home/docker docker \
+ && chown -R docker:docker /home/docker /usr/local/bundle
+
+ENV PATH /usr/local/bundle/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+USER docker
+
+RUN bundle config path /app/vendor/bundle/docker/$(ruby -e 'print RUBY_VERSION')/
+RUN bundle config bin /usr/local/bundle/bin
 ENV RAILS_ENV development

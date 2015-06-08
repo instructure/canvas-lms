@@ -11,7 +11,7 @@ module Exporters
 
       time_zone = user.time_zone.presence || user.account.default_time_zone
 
-      folder_name = "#{time_zone.today.to_s} data export"
+      folder_name = "#{time_zone.today} data export"
       filename = "#{folder_name}.zip"
       attachment = sub_folder.file_attachments.build(:display_name => filename)
       attachment.user_id = user.id

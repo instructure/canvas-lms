@@ -77,6 +77,15 @@ describe FilePreviewsController do
     expect(response.location).to match %r{\A//docs.google.com/viewer}
   end
 
+  it "should redirect to file if it's html" do
+    Attachment.any_instance.stubs(:crocodoc_url).returns(nil)
+    Attachment.any_instance.stubs(:canvadoc_url).returns(nil)
+    attachment_model content_type: 'text/html'
+    get :show, course_id: @course.id, file_id: @attachment.id
+    expect(response).to be_redirect
+    expect(response.location).to match %r{/courses/#{@course.id}/files/#{@attachment.id}/preview}
+  end
+
   it "should render a download link if no previews are available" do
     Attachment.any_instance.stubs(:crocodoc_url).returns(nil)
     Attachment.any_instance.stubs(:canvadoc_url).returns(nil)

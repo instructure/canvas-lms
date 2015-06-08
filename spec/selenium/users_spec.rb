@@ -22,7 +22,7 @@ describe "users" do
       submit_form(pseudonym_form)
       wait_for_ajaximations
 
-      new_login = ff('.login').select { |e| e.attribute(:class) !~ /blank/ }.first
+      new_login = ff('.login').find { |e| e.attribute(:class) !~ /blank/ }
       expect(new_login).not_to be_nil
       expect(new_login.find_element(:css, '.account_name').text()).not_to be_blank
       pseudonym = Pseudonym.by_unique_id('new_user').first
@@ -255,7 +255,7 @@ describe "users" do
       f('#teacher_email').send_keys('teacher@example.com')
 
       # if instructure_misc_plugin is installed, number of registration fields increase
-      if (Dir.exists?('./gems/plugins/instructure_misc_plugin') || Dir.exists?('./vendor/plugins/instructure_misc_plugin'))
+      if (Dir.exist?('./gems/plugins/instructure_misc_plugin') || Dir.exist?('./vendor/plugins/instructure_misc_plugin'))
         set_value f('#teacher_organization_type'), 'Higher Ed'
         set_value f('#teacher_school_position'), 'Dean'
         f('#teacher_phone').send_keys('1231231234')

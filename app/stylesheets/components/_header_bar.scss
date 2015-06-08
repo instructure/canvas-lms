@@ -115,10 +115,11 @@
 
 .header-bar {
   @include clearfix;
-  border-bottom: 1px solid #c1c7cf;
+  border-bottom: 1px solid $ic-border-light;
   background-color: #fff;
-  padding: 15px;
   min-height: 33px;
+  @if $use_new_styles { padding-bottom: $ic-sp; }
+  @else { padding: 15px; }
 
   &.pinned {
     position: fixed;

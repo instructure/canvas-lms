@@ -42,7 +42,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   attr_readonly :context_id, :context_type
   attr_accessor :notify_of_update
 
-  has_many :quiz_questions, :dependent => :destroy, :order => 'position', class_name: 'Quizzes::QuizQuestion'
+  has_many :quiz_questions, dependent: :destroy, order: 'position', class_name: 'Quizzes::QuizQuestion', inverse_of: :quiz
   has_many :quiz_submissions, :dependent => :destroy, :class_name => 'Quizzes::QuizSubmission'
   has_many :quiz_groups, :dependent => :destroy, :order => 'position', class_name: 'Quizzes::QuizGroup'
   has_many :quiz_statistics, :class_name => 'Quizzes::QuizStatistics', :order => 'created_at'
@@ -549,11 +549,16 @@ class Quizzes::Quiz < ActiveRecord::Base
     published? ? question_count : unpublished_question_count
   end
 
+  # Lists all the question types available in this quiz
   def question_types
     return [] unless quiz_data
     quiz_data.map do |question|
       question["question_type"]
     end.uniq
+  end
+
+  def has_access_code
+    access_code.present?
   end
 
   # Returns data for the SAVED version of the quiz.  That is, not

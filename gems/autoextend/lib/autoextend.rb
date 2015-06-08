@@ -10,7 +10,7 @@ module Autoextend
   end
 
   def self.extensions
-    @extensions ||= Hash.new
+    @extensions ||= {}
   end
 
   MethodExtension = Struct.new(:target, :feature) do
@@ -87,11 +87,11 @@ module Autoextend
     end
 
     def autoextensions
-      @autoextensions ||= Hash.new
+      @autoextensions ||= {}
     end
 
     def singleton_autoextensions
-      @autoextensions ||= Hash.new
+      @autoextensions ||= {}
     end
 
     def autoextend_singleton(method, feature)

@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/assignments/show" do
   it "should render" do
-    course_with_teacher
+    course_with_teacher(active_all: true)
     view_context(@course, @user)
     g = @course.assignment_groups.create!(:name => "some group")
     a = @course.assignments.create!(:title => "some assignment")
