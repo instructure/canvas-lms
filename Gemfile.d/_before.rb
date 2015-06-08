@@ -47,7 +47,7 @@ elsif RUBY_VERSION >= "2.2"
   warn "Ruby newer than 2.1 is very UNSUPPORTED"
   ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_VERSION
 else
-  ruby '1.9.3', :engine => 'ruby', :engine_version => '1.9.3'
+  ruby '2.1.6', :engine => 'ruby', :engine_version => '2.1.6'
 end
 
 # force a different lockfile for rails 4
