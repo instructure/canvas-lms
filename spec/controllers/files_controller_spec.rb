@@ -389,12 +389,24 @@ describe FilesController do
         expect(assigns(:attachment)).to eq new_file
       end
 
-      it "doesnt leak the name of unowned deleted files" do
+      it "does not leak the name of unowned deleted files" do
         unowned_file = @file
         unowned_file.display_name = 'holla'
         unowned_file.save
         unowned_file.destroy
 
+        get 'show', :course_id => @course.id, :id => unowned_file.id
+        expect(response.status).to eq(404)
+        expect(assigns(:not_found_message)).to eq("This file has been deleted")
+      end
+
+      it "does not blow up for logged out users" do
+        unowned_file = @file
+        unowned_file.display_name = 'holla'
+        unowned_file.save
+        unowned_file.destroy
+
+        remove_user_session
         get 'show', :course_id => @course.id, :id => unowned_file.id
         expect(response.status).to eq(404)
         expect(assigns(:not_found_message)).to eq("This file has been deleted")

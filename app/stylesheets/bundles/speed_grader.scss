@@ -145,6 +145,7 @@ $gradebook_header_height: 52px;
 
 #main {
   position: static;
+  @if $use_new_styles { z-index: 1; }
 }
 
 #full_width_container {
@@ -756,4 +757,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 #grading-box-extended {
   width: 35px;
   margin-bottom: 0;
+  &.pass_fail_grading_type {
+    width: 105px;
+  }
 }

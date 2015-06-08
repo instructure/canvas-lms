@@ -125,7 +125,7 @@ define([
     var id = $assignment.attr('id');
     data.due_at = "";
     if(due_at) {
-      data.due_at = due_at.toString($.datetime.defaultFormat);
+      data.due_at = $.datetimeString(due_at, {localized: false});
     }
     if (id == 'assignment_new') {
       if(defaultShowDateOptions) {
@@ -445,7 +445,7 @@ define([
       var data = $(this).parents("form").getFormData({object_name: 'assignment'});
       var params = {};
       if(data.title) { params['title'] = data.title; }
-      if(data.due_at) { params['due_at'] = $.datetime.process(data.due_at); }
+      if(data.due_at) { params['due_at'] = date.due_at; }
       if (data.points_possible) { params['points_possible'] = data.points_possible; }
       if(data.assignment_group_id) { params['assignment_group_id'] = data.assignment_group_id; }
       if(data.submission_types) { params['submission_types'] = data.submission_types; }
@@ -847,13 +847,6 @@ define([
     $("#add_assignment_form").formSubmit({
       object_name: 'assignment',
       required: ['title'],
-      processData: function(data) {
-        var formData = $(this).getFormData({object_name: "assignment"});
-        if(formData['assignment[due_at]']) {
-          formData['assignment[due_at]'] = $.datetime.process(formData['assignment[due_at]']);
-        }
-        return formData;
-      },
       beforeSubmit: function(data) {
         var $assignment = $(this).parents(".group_assignment");
         $assignment.fillTemplateData({ data: data });

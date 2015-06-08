@@ -2,16 +2,37 @@ Dir.glob('lib/canvas/plugins/validators/*').each do |file|
   require_dependency file
 end
 
-Canvas::Plugin.register('linked_in', nil, {
-  :name => lambda{ t :name, 'LinkedIn' },
-  :description => lambda{ t :description, 'LinkedIn integration' },
-  :website => 'http://www.linkedin.com',
-  :author => 'Instructure',
-  :author_website => 'http://www.instructure.com',
-  :version => '1.0.0',
-  :settings_partial => 'plugins/linked_in_settings',
-  :validator => 'LinkedInValidator'
-})
+Canvas::Plugin.register('facebook', nil,
+  name: 'Facebook',
+  description: -> { t :description, 'Facebook Login' },
+  website: 'http://www.facebook.com',
+  author: 'Instructure',
+  author_website: 'http://www.instructure.com',
+  version: '2.0.0',
+  settings_partial: 'plugins/facebook_settings',
+  encrypted_settings: [:app_secret]
+                       )
+Canvas::Plugin.register('github', nil,
+  name: 'GitHub',
+  description: -> { t :description, 'Github Login' },
+  website: 'https://github.com',
+  author: 'Instructure',
+  author_website: 'http://www.instructure.com',
+  version: '1.0.0',
+  settings_partial: 'plugins/github_settings',
+  encrypted_settings: [:client_secret]
+                       )
+Canvas::Plugin.register('linked_in', nil,
+  name: 'LinkedIn',
+  description: -> { t :description, 'LinkedIn integration' },
+  website: 'http://www.linkedin.com',
+  author: 'Instructure',
+  author_website: 'http://www.instructure.com',
+  version: '1.0.0',
+  settings_partial: 'plugins/linked_in_settings',
+  validator: 'LinkedInValidator',
+  encrypted_settings: [:client_secret]
+                       )
 Canvas::Plugin.register('diigo', nil, {
   :name => lambda{ t :name, 'Diigo' },
   :description => lambda{ t :description, 'Diigo integration' },
@@ -22,16 +43,17 @@ Canvas::Plugin.register('diigo', nil, {
   :settings_partial => 'plugins/diigo_settings',
   :validator => 'DiigoValidator'
 })
-Canvas::Plugin.register('twitter', nil, {
-  :name => lambda{ t :name, 'Twitter' },
-  :description => lambda{ t :description, 'Twitter notifications' },
-  :website => 'http://www.twitter.com',
-  :author => 'Instructure',
-  :author_website => 'http://www.instructure.com',
-  :version => '1.0.0',
-  :settings_partial => 'plugins/twitter_settings',
-  :validator => 'TwitterValidator'
-})
+Canvas::Plugin.register('twitter', nil,
+  name: 'Twitter',
+  description: -> { t :description, 'Twitter notifications' },
+  website: 'http://www.twitter.com',
+  author: 'Instructure',
+  author_website: 'http://www.instructure.com',
+  version: '1.0.0',
+  settings_partial: 'plugins/twitter_settings',
+  validator: 'TwitterValidator',
+  encrypted_settings: [:consumer_secret]
+                       )
 Canvas::Plugin.register('yo', nil, {
   :name => lambda{ t :name, 'Yo'},
   :description => lambda{ t :description, 'Just Yo' },
@@ -72,16 +94,17 @@ Canvas::Plugin.register('google_docs', :collaborations, {
   :settings_partial => 'plugins/google_docs_settings',
   :validator => 'GoogleDocsValidator'
 })
-Canvas::Plugin.register('google_drive', nil, {
-  :name => lambda{ t :name, 'Google Drive' },
-  :description => lambda{ t :description, 'Google Drive file sharing' },
-  :website => 'http://drive.google.com',
-  :author => 'Instructure',
-  :author_website => 'http://www.instructure.com',
-  :version => '1.0.0',
-  :settings_partial => 'plugins/google_drive_settings',
-  :validator => 'GoogleDriveValidator'
-})
+Canvas::Plugin.register('google_drive', nil,
+  name: -> { t :name, 'Google Drive' },
+  description: -> { t :description, 'Google Drive file sharing' },
+  website: 'http://drive.google.com',
+  author: 'Instructure',
+  author_website: 'http://www.instructure.com',
+  version: '1.0.0',
+  settings_partial: 'plugins/google_drive_settings',
+  validator: 'GoogleDriveValidator',
+  encrypted_settings: [:client_secret]
+                       )
 Canvas::Plugin.register('kaltura', nil, {
   :name => lambda{ t :name, 'Kaltura' },
   :description => lambda{ t :description, 'Kaltura video/audio recording and playback'},

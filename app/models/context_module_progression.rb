@@ -27,14 +27,14 @@ class ContextModuleProgression < ActiveRecord::Base
   EXPORTABLE_ASSOCIATIONS = [:context_module, :user]
 
   after_save :touch_user
-  
+
   serialize :requirements_met, Array
 
   def completion_requirements
     context_module.try(:completion_requirements) || []
   end
   private :completion_requirements
-  
+
   def set_completed_at
     if self.completed?
       self.completed_at ||= Time.now
@@ -42,15 +42,21 @@ class ContextModuleProgression < ActiveRecord::Base
       self.completed_at = nil
     end
   end
-  
+
   def finished_item?(item)
     (self.requirements_met || []).any?{|r| r[:id] == item.id}
   end
-  
+
   def uncollapse!
     return unless self.collapsed?
     self.collapsed = false
     self.save
+  end
+
+  def uncomplete_requirement(id)
+    requirement = requirements_met.find {|r| r[:id] == id}
+    requirements_met.delete(requirement)
+    mark_as_outdated
   end
 
   class CompletedRequirementCalculator
@@ -114,7 +120,7 @@ class ContextModuleProgression < ActiveRecord::Base
       end
     end
   end
-  
+
   def evaluate_requirements_met
     result = evaluate_uncompleted_requirements
     if result.completed?
@@ -148,7 +154,7 @@ class ContextModuleProgression < ActiveRecord::Base
 
       if req[:type] == 'must_view'
         calc.view_requirement(req)
-      elsif req[:type] == 'must_contribute'
+      elsif %w(must_contribute must_mark_done).include? req[:type]
         calc.requirement_met(req, false)
       elsif req[:type] == 'must_submit'
         sub = get_submission_or_quiz_submission(tag)
@@ -296,7 +302,7 @@ class ContextModuleProgression < ActiveRecord::Base
       # retry up to five times, otherwise return current (stale) data
       self.reload
       retry_count += 1
-      retry if retry_count < 5
+      retry if retry_count < 10
 
       logger.error { "Failed to evaluate stale progression: #{self.inspect}" }
     end

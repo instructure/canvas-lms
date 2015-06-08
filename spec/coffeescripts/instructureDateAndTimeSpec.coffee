@@ -143,6 +143,16 @@ define [
     ok $.midnight(date2)
     ok !$.midnight(date3)
 
+  test 'should check time relative to specific timezone if provided', ->
+    tz.changeZone(detroit, 'America/Detroit')
+    tz.preload('America/Juneau', juneau)
+    date1 = new Date(0) # 12am UTC = 16:00 AKST (in 1970)
+    date2 = new Date(8 * 3600000) # 8am UTC = 00:00 AKST
+    date3 = new Date(+date2 + 60000) # 00:01 AKST
+    ok !$.midnight(date1, timezone: 'America/Juneau')
+    ok $.midnight(date2, timezone: 'America/Juneau')
+    ok !$.midnight(date3, timezone: 'America/Juneau')
+
   module 'dateString',
     setup: ->
       @snapshot = tz.snapshot()

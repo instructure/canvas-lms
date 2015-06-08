@@ -1,4 +1,4 @@
-require([
+define([
   'i18n!pseudonyms.login' /* I18n.t */,
   'jquery' /* $ */,
   'str/htmlEscape',
@@ -9,6 +9,14 @@ require([
   'jquery.loadingImg' /* loadingImage */,
   'compiled/jquery.rails_flash_notifications'
 ], function(I18n, $, htmlEscape, signupDialog) {
+
+  var loginUtils = {
+    validResetEmail: function(email){
+      var emailRegexp = new RegExp("[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?");
+      var regexMatch = email.match(emailRegexp);
+      return regexMatch !== null;
+    }
+  };
 
   $("#coenrollment_link").click(function(event) {
     event.preventDefault();
@@ -22,6 +30,15 @@ require([
   $("#forgot_password_form").formSubmit({
     object_name: 'pseudonym_session',
     required: ['unique_id_forgot'],
+    property_validations: {
+      unique_id_forgot: function(email){
+        if(!loginUtils.validResetEmail(email)){
+          return I18n.t("invalid_user_email", "Oops! This doesn't quite look " +
+                          "like an email address, make sure you're using your " +
+                          "email address affiliated with your Canvas account.");
+        }
+      }
+    },
     beforeSubmit: function(data) {
       $(this).loadingImage();
     },
@@ -64,5 +81,6 @@ require([
     })
     .find(":text:first")
       .focus().select();
-});
 
+  return loginUtils;
+});

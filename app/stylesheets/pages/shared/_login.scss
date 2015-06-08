@@ -16,8 +16,8 @@ body.modal {
     @else {
       display: block !important;
       width: $modal_box_width + 20px;
-      margin: 20px auto;  
-    } 
+      margin: 20px auto;
+    }
   }
   #main {
     background-color: transparent;
@@ -97,7 +97,7 @@ body.modal {
       border: none;
       h1, .h1 {
         height: 107px;
-        margin: 0 0 50px;
+        margin: 0 0 30px;
         @include bg-image(canvas, png, no-repeat, 68px, 46px, transparent, 136px, 33px);
         text-indent: -999em;
       }
@@ -260,4 +260,72 @@ span.field-with-fancyplaceholder {
       font-weight: normal;
     }
   }
+}
+///
+//// SSO Login Links
+///
+@mixin shared-sso($direction) {
+  content: "";
+  flex: 1;
+  height: 1px;
+  margin: 0 1em;
+  background: linear-gradient(to $direction, darken($ic-color-neutral, 10), transparent);
+}
+.ic-Login_sso {
+  clear: both;
+  text-align: center;
+}
+.ic-Login_sso-divider {
+  padding: 10px 0;
+  margin: 0;
+  line-height: normal;
+  font-size: 11px;
+  color: darken($ic-color-neutral, 10);
+  display: flex;
+  align-items: center;
+  &:before {   @include shared-sso(left); }
+  &:after  {   @include shared-sso(right);}
+}
+.ic-Login_sso-list {
+  padding: 0;
+  margin: 0;
+}
+.ic-Login_sso-list_item {
+  list-style: none;
+  display: inline-block;
+}
+.Button.ic-Login_sso-button {
+  padding: 10px 24px 10px 24px;
+  background: transparent;
+  color: $ic-color-light;
+  border: transparent;
+  &--has-text {
+    display: flex;
+    align-items: center;
+  }
+  &:focus { color: $ic-color-light; }
+  &:hover {
+    background: $ic-brand-primary;
+    color: $ic-color-light;
+    &.ui-state-hover {
+      background: $ic-brand-primary;
+      color: $ic-color-light;
+      border-color: darken($ic-brand-primary, 15%);
+    }
+  }
+  transition: all 0.5s;
+}
+.ic-Login_icon-sso {
+  padding-right: $ic-sp;
+}
+.ic-Login_icon-sso--icon-only {
+  padding-right: 0;
+}
+
+.ic-Login_sso-button_title {
+  border-left: 1px solid $ic-color-light;
+  padding: 0 $ic-sp;
+}
+.ic-Login_sso-button_title-caps {
+  text-transform: capitalize;
 }

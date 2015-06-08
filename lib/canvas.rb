@@ -188,16 +188,14 @@ module Canvas
     return nil
   end
 
-  def self.short_circuit_timeout(redis, redis_key, timeout, cutoff, error_ttl)
+  def self.short_circuit_timeout(redis, redis_key, timeout, cutoff, error_ttl, &block)
     error_count = redis.get(redis_key)
     if error_count.to_i >= cutoff
       raise TimeoutCutoff.new(error_count)
     end
 
     begin
-      Timeout.timeout(timeout) do
-        yield
-      end
+      Timeout.timeout(timeout, &block)
     rescue Timeout::Error => e
       redis.incrby(redis_key, 1)
       redis.expire(redis_key, error_ttl)

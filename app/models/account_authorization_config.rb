@@ -41,33 +41,71 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     case type_name
     when 'cas', 'ldap', 'saml'
       const_get(type_name.upcase)
+    when 'facebook', 'google', 'twitter'
+      const_get(type_name.classify)
+    when 'github'
+      GitHub
+    when 'linkedin'
+      LinkedIn
+    when 'openid_connect'
+      OpenIDConnect
     else
       super
     end
   end
 
+  def self.sti_name
+    display_name.try(:underscore)
+  end
+
+  def self.singleton?
+    false
+  end
+
+  def self.enabled?
+    true
+  end
+
+  def self.display_name
+    name.try(:demodulize)
+  end
+
   belongs_to :account
+  has_many :pseudonyms, foreign_key: :authentication_provider_id
   acts_as_list scope: :account
 
-  attr_accessible :account, :auth_port, :auth_host, :auth_base, :auth_username,
-    :auth_password, :auth_password_salt, :auth_type, :auth_over_tls,
-    :log_in_url, :log_out_url, :identifier_format,
-    :certificate_fingerprint, :entity_id,
-    :ldap_filter, :auth_filter, :requested_authn_context,
-    :login_attribute, :idp_entity_id, :unknown_user_url
-
-  VALID_AUTH_TYPES = %w[cas ldap saml].freeze
+  VALID_AUTH_TYPES = %w[cas facebook github google ldap linkedin openid_connect saml twitter].freeze
   validates_inclusion_of :auth_type, in: VALID_AUTH_TYPES, message: "invalid auth_type, must be one of #{VALID_AUTH_TYPES.join(',')}"
   validates_presence_of :account_id
 
   after_destroy :enable_canvas_authentication
 
+  # create associate model find to accept auth types, and just return the first one of that
+  # type
+  module FindWithType
+    def find(*args)
+      if VALID_AUTH_TYPES.include?(args.first)
+        where(auth_type: args.first).first!
+      else
+        super
+      end
+    end
+  end
+
   def self.recognized_params
-    []
+    [].freeze
   end
 
   def self.deprecated_params
-    []
+    [].freeze
+  end
+
+  SENSITIVE_PARAMS = [].freeze
+
+  # will always be false unless some subclass wants to have a "Login With X"
+  # button on the login page
+  def login_button?
+    false
   end
 
   def auth_password=(password)
@@ -78,6 +116,10 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   def auth_decrypted_password
     return nil unless self.auth_password_salt && self.auth_crypted_password
     Canvas::Security.decrypt_password(self.auth_crypted_password, self.auth_password_salt, 'instructure_auth')
+  end
+
+  def auth_provider_filter
+    self
   end
 
   def self.default_login_handle_name
@@ -91,13 +133,16 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   def self.serialization_excludes; [:auth_crypted_password, :auth_password_salt]; end
 
   def enable_canvas_authentication
+    return if account.non_canvas_auth_configured?
     if self.account.settings[:canvas_authentication] == false
       self.account.settings[:canvas_authentication] = true
       self.account.save!
     end
   end
-
 end
 
-# so it doesn't get mixed up with ::CAS
+# so it doesn't get mixed up with ::CAS, ::LinkedIn and ::Twitter
 require_dependency 'account_authorization_config/cas'
+require_dependency 'account_authorization_config/google'
+require_dependency 'account_authorization_config/linked_in'
+require_dependency 'account_authorization_config/twitter'

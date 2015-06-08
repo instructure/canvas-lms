@@ -271,7 +271,7 @@ class AppointmentGroup < ActiveRecord::Base
 
     dispatch :appointment_group_deleted
     to       { possible_users }
-    whenever { contexts.any?(&:available?) && deleted? && workflow_state_changed? }
+    whenever { contexts.any?(&:available?) && changed_state(:deleted, :active) }
     data     { {:cancel_reason => @cancel_reason} }
   end
 

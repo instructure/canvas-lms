@@ -1,4 +1,4 @@
-require 'spec_helper'
+ require 'spec_helper'
 
 describe AccountAuthorizationConfigsPresenter do
   describe "initialization" do
@@ -25,6 +25,13 @@ describe AccountAuthorizationConfigsPresenter do
       presenter = described_class.new(account)
       expect(presenter.configs.class).to eq(Array)
     end
+
+    it "only pulls from the db connection one time" do
+      account = stub()
+      account.expects(:account_authorization_configs).times(1).returns([])
+      presenter = described_class.new(account)
+      5.times{ presenter.configs }
+    end
   end
 
   describe "SAML view helpers" do
@@ -40,19 +47,6 @@ describe AccountAuthorizationConfigsPresenter do
         AccountAuthorizationConfig::SAML.stubs(:enabled?).returns(true)
         expected = Onelogin::Saml::NameIdentifiers::ALL_IDENTIFIERS
         expect(presenter.saml_identifiers).to eq(expected)
-      end
-    end
-
-    describe "#saml_login_attributes" do
-      it "is empty when saml disabled" do
-        AccountAuthorizationConfig::SAML.stubs(:enabled?).returns(false)
-        expect(presenter.saml_login_attributes).to be_empty
-      end
-
-      it "pulls the attributes from AAC" do
-        AccountAuthorizationConfig::SAML.stubs(:enabled?).returns(true)
-        expected = AccountAuthorizationConfig::SAML.login_attributes
-        expect(presenter.saml_login_attributes).to eq(expected)
       end
     end
 
@@ -138,14 +132,21 @@ describe AccountAuthorizationConfigsPresenter do
   describe "#sso_options" do
     it "always has cas and ldap" do
       AccountAuthorizationConfig::SAML.stubs(:enabled?).returns(false)
-      presenter = described_class.new(stub)
-      expect(presenter.sso_options).to eq([[:CAS, 'cas'], [:LDAP, 'ldap']])
+      presenter = described_class.new(stub(account_authorization_configs: []))
+      expect(presenter.sso_options).to eq([['CAS', 'cas'],
+                                           ['Facebook', 'facebook'],
+                                           ['GitHub', 'github'],
+                                           ['Google', 'google'],
+                                           ['LDAP', 'ldap'],
+                                           ['LinkedIn', 'linkedin'],
+                                           ['OpenID Connect', 'openid_connect'],
+                                           ['Twitter', 'twitter']])
     end
 
     it "includes saml if saml enabled" do
       AccountAuthorizationConfig::SAML.stubs(:enabled?).returns(true)
-      presenter = described_class.new(stub)
-      expect(presenter.sso_options).to include([:SAML, 'saml'])
+      presenter = described_class.new(stub(account_authorization_configs: []))
+      expect(presenter.sso_options).to include(['SAML', 'saml'])
     end
   end
 
@@ -193,52 +194,16 @@ describe AccountAuthorizationConfigsPresenter do
   end
 
   describe "#canvas_auth_only?" do
-    it "is true for canvas_auth" do
-      account = stub(canvas_authentication?: true, ldap_authentication?: false)
+    it "is true if no auth provider exists" do
+      account = stub(non_canvas_auth_configured?: false)
       presenter = described_class.new(account)
       expect(presenter.canvas_auth_only?).to eq(true)
     end
 
-    it "is false if ldap is also on" do
-      account = stub(canvas_authentication?: true, ldap_authentication?: true)
+    it "is false if an auth provider exists" do
+      account = stub(non_canvas_auth_configured?: true)
       presenter = described_class.new(account)
       expect(presenter.canvas_auth_only?).to eq(false)
-    end
-
-    it "is false if canvas_auth is off" do
-      account = stub(canvas_authentication?: false, ldap_authentication?: false)
-      presenter = described_class.new(account)
-      expect(presenter.canvas_auth_only?).to eq(false)
-    end
-  end
-
-  describe "#form_id" do
-    it "is auth_type_form for a new record" do
-      config = AccountAuthorizationConfig::CAS.new
-      form_id = described_class.new(stub).form_id(config)
-      expect(form_id).to eq('cas_form')
-    end
-
-    it "is generalized for an existing config" do
-      config = AccountAuthorizationConfig::LDAP.new
-      config.stubs(:new_record?).returns(false)
-      presenter = described_class.new(stub)
-      expect(presenter.form_id(config)).to eq('auth_form')
-    end
-  end
-
-  describe "#form_class" do
-    it "is active for an existing config" do
-      config = AccountAuthorizationConfig::SAML.new
-      config.stubs(:new_record?).returns(false)
-      presenter = described_class.new(stub)
-      expect(presenter.form_class(config)).to eq('class="active"')
-    end
-
-    it "is blank for a new record" do
-      cas_config = AccountAuthorizationConfig::CAS.new
-      form_id = described_class.new(stub).form_class(cas_config)
-      expect(form_id).to eq('')
     end
   end
 
@@ -338,6 +303,15 @@ describe AccountAuthorizationConfigsPresenter do
       expect(presenter.login_url_options(config2)).to eq(controller: 'login/saml',
                                                          action: :new,
                                                          id: config2)
+    end
+  end
+
+  describe "#new_auth_types" do
+    it "excludes singletons that have a config" do
+      AccountAuthorizationConfig::Facebook.stubs(:enabled?).returns(true)
+      Account.default.account_authorization_configs.create!(auth_type: 'facebook')
+      presenter = described_class.new(Account.default)
+      expect(presenter.new_auth_types).to_not be_include(AccountAuthorizationConfig::Facebook)
     end
   end
 end

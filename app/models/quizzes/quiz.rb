@@ -416,7 +416,6 @@ class Quizzes::Quiz < ActiveRecord::Base
         a.submission_types = "online_quiz"
         a.assignment_group_id = self.assignment_group_id
         a.saved_by = :quiz
-        a.workflow_state = 'published' if a.deleted?
         unless deleted?
           a.workflow_state = self.published? ? 'published' : 'unpublished'
         end
@@ -669,8 +668,6 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     end
 
-    # Make sure the submission gets graded when it becomes overdue (if applicable)
-    submission.grade_when_overdue if submission && submission.end_at && !preview
     submission
   end
 
@@ -1088,6 +1085,10 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def self.shuffleable_question_type?(question_type)
     !non_shuffled_questions.include?(question_type)
+  end
+
+  def shuffle_answers_for_user?(user)
+    self.shuffle_answers? && !self.grants_right?(user, :manage)
   end
 
   def access_code_key_for_user(user)

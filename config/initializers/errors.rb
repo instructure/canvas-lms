@@ -7,15 +7,17 @@
 # can see big spikes in a certain kind of error.  Either can be
 # disabled individually with a setting.
 #
-Canvas::Errors.register!(:error_report) do |exception, data|
-  setting = Setting.get("error_report_exception_handling", 'true')
-  if setting == 'true'
-    report = ErrorReport.log_exception_from_canvas_errors(exception, data)
-    report.try(:global_id)
+Rails.configuration.to_prepare do
+  Canvas::Errors.register!(:error_report) do |exception, data|
+    setting = Setting.get("error_report_exception_handling", 'true')
+    if setting == 'true'
+      report = ErrorReport.log_exception_from_canvas_errors(exception, data)
+      report.try(:global_id)
+    end
   end
-end
 
-Canvas::Errors.register!(:error_stats) do |exception, data|
-  setting = Setting.get("collect_error_statistics", 'true')
-  Canvas::ErrorStats.capture(exception, data) if setting == 'true'
+  Canvas::Errors.register!(:error_stats) do |exception, data|
+    setting = Setting.get("collect_error_statistics", 'true')
+    Canvas::ErrorStats.capture(exception, data) if setting == 'true'
+  end
 end

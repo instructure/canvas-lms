@@ -26,6 +26,7 @@ module Lti
         it 'initiates a tool proxy registration request' do
           course_with_teacher_logged_in(:active_all => true)
           get 'registration', course_id: @course.id, tool_consumer_url: 'http://tool.consumer.url'
+          expect(response).to be_success
           lti_launch = assigns[:lti_launch]
           expect(lti_launch.resource_url).to eq 'http://tool.consumer.url'
           launch_params = lti_launch.params

@@ -4,7 +4,7 @@
 <% when "points", "percent", "letter_grade", "gpa_scale" %>
   <input type="text" id="grading-box-extended" maxlength="254"/>
 <% when "pass_fail" %>
-  <select id="grading-box-extended">
+  <select id="grading-box-extended" class="pass_fail_grading_type">
     <option value="">---</option>
     <option value="complete"><%= t('#gradebooks.grades.complete', "Complete") %></option>
     <option value="incomplete"><%= t('#gradebooks.grades.incomplete', "Incomplete") %></option>

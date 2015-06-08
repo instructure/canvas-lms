@@ -44,7 +44,10 @@ define [
           $(this).showIf(index == event.currentTarget.selectedIndex)
       .delegate '.submission_details_grade_form', 'submit', (event) =>
         event.preventDefault()
-        $(event.currentTarget.form).disableWhileLoading $.ajaxJSON @url, 'PUT', $(event.currentTarget).getFormData(), (data) =>
+        formData = $(event.currentTarget).getFormData()
+        if formData["submission[posted_grade]"] == "EX"
+          formData = {"submission[excuse]": true}
+        $(event.currentTarget.form).disableWhileLoading $.ajaxJSON @url, 'PUT', formData, (data) =>
           @update(data)
           $.publish 'submissions_updated', [@submission.all_submissions]
           setTimeout =>

@@ -91,9 +91,8 @@ describe Login::SamlController do
     expect(flash[:delegated_message]).to_not be_nil
     expect(session[:saml_unique_id]).to be_nil
 
-    aac = account.account_authorization_configs.first
-    aac.unknown_user_url = ''
-    aac.save!
+    account.unknown_user_url = ''
+    account.save!
     controller.instance_variable_set(:@aac, nil)
     post :create, :SAMLResponse => "foo"
     expect(response).to redirect_to(login_url)
@@ -102,8 +101,8 @@ describe Login::SamlController do
 
     # Redirect to a specifiec url
     unknown_user_url = "https://example.com/unknown_user"
-    aac.unknown_user_url = unknown_user_url
-    aac.save!
+    account.unknown_user_url = unknown_user_url
+    account.save!
     controller.instance_variable_set(:@aac, nil)
     post :create, :SAMLResponse => "foo"
     expect(response).to redirect_to(unknown_user_url)
@@ -311,7 +310,7 @@ describe Login::SamlController do
       @pseudonym.account = @account
       @pseudonym.save!
 
-      @aac = @account.account_authorization_config
+      @aac = @account.account_authorization_configs.first
     end
 
     it "should use the eduPersonPrincipalName attribute with the domain stripped" do
@@ -364,7 +363,7 @@ describe Login::SamlController do
     unique_id = 'foo'
 
     account = account_with_saml
-    @aac = @account.account_authorization_config
+    @aac = @account.account_authorization_configs.first
     @aac.login_attribute = 'eduPersonPrincipalName_stripped'
     @aac.save
 
@@ -422,7 +421,7 @@ describe Login::SamlController do
 
     account_with_saml
 
-    @aac = @account.account_authorization_config
+    @aac = @account.account_authorization_configs.first
     @aac.login_attribute = 'eduPersonPrincipalName'
     @aac.certificate_fingerprint = 'AF:E7:1C:28:EF:74:0B:C8:74:25:BE:13:A2:26:3D:37:97:1D:A1:F9'
     @aac.save

@@ -5,6 +5,7 @@
   <h2><%= t('headings.page', %{Google Drive Collaboration Error}) %></h2>
   <p><%= t('error_summary', %{It looks like this collaboration isn't working. Possible causes:}) %>
     <ul>
+      <li><%= t('error_cause_3', %{The google doc no longer exists.}) %></li>
       <li><%= t('error_cause_1', %{The creator's Google Drive account is different from the account used to create the collaboration.}) %></li>
       <li><%= t('error_cause_2', %{The collaboration's creator is no longer an author on the google doc.}) %></li>
     </ul>

@@ -71,6 +71,9 @@ define([
       groupWeightingScheme
     );
 
+    $('.dropped').attr('aria-label', "");
+    $('.dropped').attr('title', "");
+
     // mark dropped assignments
     $('.student_assignment').find('.points_possible').attr('aria-label', '');
     _.chain(calculatedGrades.group_sums).map(function(groupSum) {
@@ -78,7 +81,9 @@ define([
     }).flatten().each(function(s) {
       $('#submission_' + s.submission.assignment_id).toggleClass('dropped', !!s.drop);
     });
-    $('.dropped').attr('aria-label', I18n.t('titles.dropped_assignment_no_total', 'This assignment will not be considered in the total calculation'));
+    var droppedMessage = I18n.t('This assignment is dropped and will not be considered in the total calculation');
+    $('.dropped').attr('aria-label', droppedMessage);
+    $('.dropped').attr('title', droppedMessage);
 
     var calculateGrade = function(score, possible) {
       if (possible === 0 || isNaN(score)) {
@@ -137,13 +142,6 @@ define([
       });
       $("#.show_guess_grades.exists").show();
       updateStudentGrades();
-    });
-    $("tr.student_assignment").mouseover(function() {
-      if($(this).hasClass('dropped')) {
-        $(this).attr('title', I18n.t('titles.dropped_assignment_no_total', 'This assignment will not be considered in the total calculation'));
-      } else {
-        $(this).attr('title', '');
-      }
     });
 
     // manages toggling and screenreader focus for comments, scoring, and rubric details

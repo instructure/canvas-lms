@@ -167,6 +167,9 @@ describe Outcomes::ResultAnalytics do
   end
 
   describe '#outcome_results_rollups' do
+    before do
+      ActiveRecord::Associations::Preloader.any_instance.stubs(:run)
+    end
     it 'returns a rollup for each distinct user_id' do
       results = [
         MockOutcomeResult[MockUser[10, 'a'], MockOutcome[80], 4.0],
@@ -183,6 +186,9 @@ describe Outcomes::ResultAnalytics do
   end
 
   describe '#aggregate_outcome_results_rollup' do
+    before do
+      ActiveRecord::Associations::Preloader.any_instance.stubs(:run)
+    end
     it 'returns one rollup with the rollup averages' do
       fake_context = MockUser.new(42, 'fake')
       results = [

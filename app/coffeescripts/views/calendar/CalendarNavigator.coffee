@@ -47,7 +47,6 @@ define [
           onClose: @_onPickerClose
           onSelect: @_onPickerSelect
           showOn: "both"
-      @$dateSuggestion = @$('.datetime_suggest')
       @hidePicker()
       @hide() if @options.hide
 
@@ -79,8 +78,7 @@ define [
       @$buttons.hide()
 
     _resetPicker: ->
-      @_enterKeyPressed = false
-      @_enterKeyValue = ''
+      @_enterKeyData = null
       @_previousDateFieldValue = ''
       @$dateField.removeAttr('aria-invalid')
       @$dateField.val('')
@@ -88,16 +86,9 @@ define [
     _titleActivated: ->
       @showPicker()
 
-    _dateFieldSelect: (selectedDateText) ->
-      if @_enterKeyPressed
-        selectedDateText = @_enterKeyValue
-      return @_dateFieldEscape() unless selectedDateText
-      selectedDate = Date.parse(selectedDateText)
-      @_triggerDate(selectedDate)
-
-      @hidePicker()
-
-    _dateFieldEscape: ->
+    _dateFieldSelect: (data) ->
+      data = @_enterKeyData || data
+      @_triggerDate data.date unless data.invalid or data.blank
       @hidePicker()
 
     _triggerPrev: (event) ->
@@ -118,9 +109,9 @@ define [
 
     _onDateFieldKey: (event) =>
       if event.keyCode == 13 # enter
-        # store some values for later so we can tell the difference between this and a mouse click
-        @_enterKeyPressed = true
-        @_enterKeyValue = @_getDateText()
+        # store current field data for later so we can tell the difference
+        # between this and a mouse click
+        @_enterKeyData = @$dateField.data()
       else
         @_flashDateSuggestion()
 
@@ -129,23 +120,17 @@ define [
       return if @_previousDateFieldValue == @$dateField.val()
       @_previousDateFieldValue = @$dateField.val()
 
-      dateText = @_getDateText()
-      textInvalid = !dateText
-      flashText =
-        if textInvalid
-          @messages.invalid_date
-        else
-          @messages.screenreader_date_suggestion(dateText)
-      $.screenReaderFlashMessage(flashText)
-      @$dateField.attr("aria-invalid", if textInvalid then "true" else "false")
+      if @$dateField.data('invalid')
+        @$dateField.attr("aria-invalid", "true")
+        $.screenReaderFlashMessage(@messages.invalid_date)
+      else
+        @$dateField.attr("aria-invalid", "false")
+        message = @$dateField.data('screenreader-suggest')
+        message = @messages.screenreader_date_suggestion(message)
+        $.screenReaderFlashMessage(message)
 
     _onPickerSelect: (selectedDateText) =>
-      @_dateFieldSelect(selectedDateText)
+      @_dateFieldSelect @$dateField.data()
 
     _onPickerClose: (selectedDateText) =>
-      @_dateFieldEscape()
-
-    _getDateText: ->
-      newDate = @$dateSuggestion.text()
-      newDate = '' if @$dateSuggestion.is('.invalid_datetime')
-      newDate
+      @hidePicker()

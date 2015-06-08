@@ -106,8 +106,7 @@ class Login::SamlController < ApplicationController
       aac.debug_set(:is_valid_login_response, 'true') if debugging
 
       if response.success_status?
-        pseudonym = @domain_root_account.pseudonyms.active.by_unique_id(unique_id).first
-
+        pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_id, aac)
         if pseudonym
           # We have to reset the session again here -- it's possible to do a
           # SAML login without hitting the #new action, depending on the
@@ -132,7 +131,7 @@ class Login::SamlController < ApplicationController
 
           successful_login(user, pseudonym)
         else
-          unknown_user_url = aac.unknown_user_url.presence || login_url
+          unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
           increment_saml_stat("errors.unknown_user")
           message = "Received SAML login request for unknown user: #{unique_id} redirecting to: #{unknown_user_url}."
           logger.warn message

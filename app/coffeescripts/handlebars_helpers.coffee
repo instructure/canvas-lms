@@ -42,6 +42,16 @@ define [
 
     hiddenUnless : (condition) -> " display:none; " unless condition
 
+    hiddenIfExists : (condition) -> " display:none; " if condition?
+
+    hiddenUnlessExists : (condition) -> " display:none; " unless condition?
+
+    ifExists: (condition, options) ->
+      if condition?
+        options.fn @
+      else
+        options.inverse @
+
     semanticDateRange : ->
       new Handlebars.SafeString semanticDateRange arguments...
 

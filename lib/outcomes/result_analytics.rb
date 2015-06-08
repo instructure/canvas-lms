@@ -62,6 +62,7 @@ module Outcomes
     #
     # Returns an Array of Rollup objects.
     def outcome_results_rollups(results, users=[])
+      ActiveRecord::Associations::Preloader.new(results, :learning_outcome).run
       rollups = results.chunk(&:user_id).map do |_, user_results|
         Rollup.new(user_results.first.user, rollup_user_results(user_results))
       end
@@ -82,7 +83,9 @@ module Outcomes
       aggregate_results = outcome_results.map do |scores|
         scores.map{|score| Result.new(score.outcome, score.score, score.count)}
       end
-      aggregate_rollups = aggregate_results.map{|result| RollupScore.new(result,{aggregate_score: true})}
+      aggregate_rollups = aggregate_results.map do |result|
+        RollupScore.new(result,{aggregate_score: true})
+      end
       Rollup.new(context, aggregate_rollups)
     end
 

@@ -157,8 +157,12 @@ $(document).ready(function() {
     } else if(item_type == 'context_external_tool') {
 
       var tool = $("#context_external_tools_select .tools .tool.selected").data('tool');
-      var tool_type = tool ? $.underscore(tool.definition_type) : $("#add_module_item_select").val();
-      var tool_id = tool ? tool.definition_id : 0
+      var tool_type = 'context_external_tool';
+      var tool_id = 0;
+      if(tool){
+        if(tool.definition_type == 'Lti::MessageHandler') { tool_type = 'lti/message_handler'}
+        tool_id = tool.definition_id
+      }
       var item_data = {
         'item[type]': tool_type,
         'item[id]': tool_id,

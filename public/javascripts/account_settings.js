@@ -45,7 +45,7 @@ define([
     $("#add_notification_form .datetime_field").bind('blur change', function() {
       var date = Date.parse($(this).val());
       if(date) {
-        date = date.toString($.datetime.defaultFormat);
+        date = $.datetimeString(date, {localized: false});
       }
       $(this).val(date);
     });

@@ -27,6 +27,7 @@ class Pseudonym < ActiveRecord::Base
   has_many :communication_channels, :order => 'position'
   belongs_to :communication_channel
   belongs_to :sis_communication_channel, :class_name => 'CommunicationChannel'
+  belongs_to :authentication_provider, class_name: 'AccountAuthorizationConfig'
   MAX_UNIQUE_ID_LENGTH = 100
 
   CAS_TICKET_EXPIRED = 'expired'
@@ -134,13 +135,18 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def self.custom_find_by_unique_id(unique_id)
-    self.active.by_unique_id(unique_id).first if unique_id
+    self.for_auth_configuration(unique_id, nil) if unique_id
   end
-  
+
+  def self.for_auth_configuration(unique_id, aac)
+    auth_id = aac.try(:auth_provider_filter)
+    active.by_unique_id(unique_id).where(authentication_provider_id: auth_id).first
+  end
+
   def set_password_changed
     @password_changed = self.password && self.password_confirmation == self.password
   end
-  
+
   def password=(new_pass)
     self.password_auto_generated = false
     super(new_pass)
@@ -285,15 +291,13 @@ class Pseudonym < ActiveRecord::Base
 
     # an admin can delete any non-SIS pseudonym that they can update
     given do |user|
-      !self.system_created? &&
-      self.grants_right?(user, :update)
+      !sis_user_id && grants_right?(user, :update)
     end
     can :delete
 
     # an admin can only delete an SIS pseudonym if they also can :manage_sis
     given do |user|
-      self.system_created? &&
-      self.grants_right?(user, :manage_sis)
+      sis_user_id && grants_right?(user, :manage_sis)
     end
     can :delete
   end
@@ -354,20 +358,16 @@ class Pseudonym < ActiveRecord::Base
   end
   
   def managed_password?
-    !!(self.sis_user_id && self.account && !self.account.password_authentication?)
+    !!(self.sis_user_id && account && account.non_canvas_auth_configured?)
   end
 
-  def system_created?
-    !!(self.sis_user_id && self.account)
-  end
-  
   def valid_arbitrary_credentials?(plaintext_password)
     return false if self.deleted?
     return false if plaintext_password.blank?
     require 'net/ldap'
     account = self.account || Account.default
     res = false
-    res ||= valid_ldap_credentials?(plaintext_password) if account && account.ldap_authentication?
+    res ||= valid_ldap_credentials?(plaintext_password)
     if account.canvas_authentication?
       # Only check SIS if they haven't changed their password
       res ||= valid_ssha?(plaintext_password) if password_auto_generated?
@@ -393,7 +393,7 @@ class Pseudonym < ActiveRecord::Base
     end
     self.save
     if old_user_id
-      CommunicationChannel.where(:path => self.unique_id, :user_id => old_user_id).update_all(:user_id => user)
+      CommunicationChannel.by_path(self.unique_id).where(:user_id => old_user_id).update_all(:user_id => user)
       User.where(:id => [old_user_id, user]).update_all(:update_at => Time.now.utc)
     end
     if User.find(old_user_id).pseudonyms.empty? && migrate
@@ -412,7 +412,7 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def ldap_bind_result(password_plaintext)
-    self.account.account_authorization_configs.each do |config|
+    self.account.account_authorization_configs.where(auth_type: 'ldap').each do |config|
       res = config.ldap_bind_result(self.unique_id, password_plaintext)
       return res if res
     end

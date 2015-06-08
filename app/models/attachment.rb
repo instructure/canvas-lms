@@ -387,6 +387,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def default_values
+    self.modified_at = Time.now.utc if self.modified_at.nil?
     self.display_name = nil if self.display_name && self.display_name.empty?
     self.display_name ||= unencoded_filename
     self.file_state ||= "available"

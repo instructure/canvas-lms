@@ -59,6 +59,10 @@ require 'securerandom'
 #         "unlock_at": {
 #           "type": "datetime"
 #         },
+#         "modified_at": {
+#           "example": "2012-07-06T14:58:50Z",
+#           "type": "datetime"
+#         },
 #         "locked": {
 #           "example": false,
 #           "type": "boolean"
@@ -496,7 +500,7 @@ class FilesController < ApplicationController
     params[:download] ||= params[:preview]
     add_crumb(t('#crumbs.files', "Files"), named_context_url(@context, :context_files_url)) unless @skip_crumb
     if @attachment.deleted?
-      unless @attachment.user_id == @current_user.id
+      if @current_user.nil? || @attachment.user_id != @current_user.id
         @not_found_message = t('could_not_find_file', "This file has been deleted")
         render status: 404, template: "shared/errors/404_message"
         return
@@ -773,6 +777,7 @@ class FilesController < ApplicationController
     @attachment = @context.attachments.build
     permission_object ||= @attachment
     @attachment.user = @current_user
+    @attachment.modified_at = Time.now.utc
     if authorized_action(permission_object, @current_user, permission)
       if @context.respond_to?(:is_a_context?) && @check_quota
         get_quota
@@ -967,7 +972,12 @@ class FilesController < ApplicationController
         # Need to be careful on this one... we can't let students turn in a
         # file and then edit it after the fact...
         params[:attachment].delete(:uploaded_data) if @context.is_a?(User)
-        @attachment.user = @current_user if params[:attachment][:uploaded_data].present?
+
+        if params[:attachment][:uploaded_data].present?
+          @attachment.user = @current_user 
+          @attachment.modified_at = Time.now.utc
+        end
+
         @attachment.attributes = params[:attachment]
         if just_hide == '1'
           @attachment.locked = false

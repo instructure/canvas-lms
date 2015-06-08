@@ -2,7 +2,6 @@
 result=0
 
 echo "################ active_polymorph ################"
-echo "################ Running tests against Rails 3 ################"
 bundle check || bundle install
 bundle exec rspec spec
 let result=$result+$?

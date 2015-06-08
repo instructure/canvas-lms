@@ -197,6 +197,14 @@ describe ApplicationController do
 
     end
 
+    let(:empty_client_secrets) do
+      {
+        client_id: nil,
+        client_secret: nil,
+        redirect_uri: nil
+      }.with_indifferent_access
+    end
+
     it "uses @real_current_user first" do
       mock_real_current_user = mock()
       mock_current_user = mock()
@@ -204,7 +212,7 @@ describe ApplicationController do
       controller.instance_variable_set(:@current_user, mock_current_user)
 
       Rails.cache.expects(:fetch).with(['google_drive_tokens', mock_real_current_user].cache_key).returns(["real_current_user_refresh_token", "real_current_user_access_token"])
-      GoogleDrive::Client.expects(:create).with({},"real_current_user_refresh_token", "real_current_user_access_token")
+      GoogleDrive::Client.expects(:create).with(empty_client_secrets,"real_current_user_refresh_token", "real_current_user_access_token")
       controller.send(:google_drive_user_client)
     end
 
@@ -213,7 +221,7 @@ describe ApplicationController do
       controller.instance_variable_set(:@real_current_user, nil)
       controller.instance_variable_set(:@current_user, mock_current_user)
       Rails.cache.expects(:fetch).with(['google_drive_tokens', mock_current_user].cache_key).returns(["current_user_refresh_token", "current_user_access_token"])
-      GoogleDrive::Client.expects(:create).with({},"current_user_refresh_token", "current_user_access_token")
+      GoogleDrive::Client.expects(:create).with(empty_client_secrets,"current_user_refresh_token", "current_user_access_token")
       controller.send(:google_drive_user_client)
     end
 
@@ -228,7 +236,7 @@ describe ApplicationController do
       service_mock.stubs(first: mock(token: "user_refresh_token", access_token: "user_access_token"))
       mock_user_services.expects(:where).with(service: "google_drive").returns(service_mock)
 
-      GoogleDrive::Client.expects(:create).with({}, "user_refresh_token", "user_access_token")
+      GoogleDrive::Client.expects(:create).with(empty_client_secrets, "user_refresh_token", "user_access_token")
 
       controller.send(:google_drive_user_client)
     end
@@ -239,7 +247,7 @@ describe ApplicationController do
       session[:oauth_gdrive_access_token] = "access_token"
       session[:oauth_gdrive_refresh_token] = "refresh_token"
 
-      GoogleDrive::Client.expects(:create).with({}, "refresh_token", "access_token")
+      GoogleDrive::Client.expects(:create).with(empty_client_secrets, "refresh_token", "access_token")
       controller.send(:google_drive_user_client)
     end
   end

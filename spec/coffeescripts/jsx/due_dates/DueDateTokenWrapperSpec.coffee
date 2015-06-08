@@ -25,7 +25,7 @@ define [
           {id: "2", name: "Agrippa"},
           {id: "3", name: "Publius"},
           {id: "4", name: "Scipio"},
-          {course_section_id: "2", name: "Plebs | [ $"} # named strangely to test regex
+          {course_section_id: "2", name: "Plebs"}
         ]
         handleTokenAdd: ->
         handleTokenRemove: ->
@@ -86,7 +86,3 @@ define [
     equal foundToken["name"], "Scipio"
     foundToken = @DueDateTokenWrapper.findMatchingOption("pub")
     equal foundToken["name"], "Publius"
-
-  test 'findMatchingOption can handle strings with weird characters', ->
-    foundToken = @DueDateTokenWrapper.findMatchingOption("Plebs | [")
-    equal foundToken["name"], "Plebs | [ $"

@@ -325,6 +325,21 @@ describe LtiOutbound::ToolLaunch do
       expect(hash['launch_presentation_height']).to eq '300'
     end
 
+    it 'does not copy query params to POST body if disable_lti_post_only feature flag is set' do
+      tool.settings = {editor_button: {:selection_width => 1000, :selection_height => 300,
+                       :icon_url => 'www.example.com/icon', :url => 'www.example.com'}}
+      hash = LtiOutbound::ToolLaunch.new(:url => 'http://www.instructure.com?first=weston&last=dransfield',
+                                         :tool => tool,
+                                         :user => user,
+                                         :account => account,
+                                         :context => course,
+                                         :link_code => '123456',
+                                         :return_url => 'http://www.yahoo.com',
+                                         :resource_type => 'editor_button',
+                                         :variable_expander => variable_expander,
+                                         :disable_lti_post_only => true).generate
+      expect(hash.key?('first')).to eq false
+    end
   end
 
   describe '#for_assignment!' do
@@ -461,6 +476,27 @@ describe LtiOutbound::ToolLaunch do
       hash = LtiOutbound::ToolLaunch.send(:generate_params, {
                                                           }, 'https://dr-chuck.com:80/ims/php-simple/tool.php', '12345', 'secret')
       expect(hash['oauth_signature']).to eql('X8Aq2HXSHnr6u/6z/G9zI5aDoR0=')
+    end
+
+    it 'does not copy query params to POST body if disable_lti_post_only feature flag is set' do
+      hash = LtiOutbound::ToolLaunch.send(:generate_params, {
+                                                              :resource_link_id => '120988f929-274612',
+                                                              :user_id => '292832126',
+                                                              :roles => 'Instructor',
+                                                              :lis_person_name_full => 'Jane Q. Public',
+                                                              :lis_person_contact_email_primary => 'user@school.edu',
+                                                              :lis_person_sourced_id => 'school.edu:user',
+                                                              :context_id => '456434513',
+                                                              :context_title => 'Design of Personal Environments',
+                                                              :context_label => 'SI182',
+                                                              :lti_version => 'LTI-1p0',
+                                                              :lti_message_type => 'basic-lti-launch-request',
+                                                              :tool_consumer_instance_guid => 'lmsng.school.edu',
+                                                              :tool_consumer_instance_description => 'University of School (LMSng)',
+                                                              :lti_submit => 'Launch Endpoint with LTI Data'
+                                                          }, 'http://www.instructure.com?first=weston&last=dransfield', 'key', 'secret',
+                                                            disable_lti_post_only: true)
+      expect(hash.key?('first')).to eq false
     end
   end
 end

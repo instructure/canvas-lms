@@ -60,8 +60,12 @@ module Api::V1::OutcomeResults
   #
   # Returns a Hash containing serialized outcomes.
   def outcome_results_include_outcomes_json(outcomes)
+    ActiveRecord::Associations::Preloader.new(outcomes, [:context, :alignments]).run
+    assessed_outcomes = LearningOutcomeResult.uniq
+      .where(learning_outcome_id: outcomes.map(&:id))
+      .pluck(:learning_outcome_id)
     outcomes.map do |o|
-      hash = outcome_json(o, @current_user, session)
+      hash = outcome_json(o, @current_user, session, assessed_outcomes: assessed_outcomes)
       hash.merge!(alignments: o.alignments.map(&:content_asset_string))
       Api.recursively_stringify_json_ids(hash)
     end
@@ -78,7 +82,8 @@ module Api::V1::OutcomeResults
   #
   # Returns a Hash containing serialized outcome links.
   def outcome_results_include_outcome_links_json(outcome_links)
-    outcome_links.map { |l| Api.recursively_stringify_json_ids(outcome_link_json(l, @current_user, session)) }
+    ols_json = outcome_links_json(outcome_links, @current_user, session)
+    ols_json.map{ |ol| Api.recursively_stringify_json_ids(ol) }
   end
 
   # Public: Returns an Array of serialized Course objects for linked hash.

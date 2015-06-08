@@ -320,7 +320,25 @@ END
         state: 'hidden',
         beta: true,
         root_opt_in: true
-      }
+      },
+    'disable_lti_post_only' =>
+      {
+        display_name: -> { I18n.t('Don\'t move LTI query params to POST body') },
+        description: -> { I18n.t('If enabled, query parameters will not be copied to the POST body during an LTI launch.') },
+        applies_to: 'RootAccount',
+        state: 'hidden',
+        beta: true,
+        root_opt_in: true
+      },
+    'bulk_sis_grade_export' =>
+      {
+      display_name: -> { I18n.t('Allow Bulk Grade Export to SIS') },
+      description:  -> { I18n.t('Allows teachers to mark grade data to be exported in bulk to SIS integrations.') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      root_opt_in: true,
+      beta: true
+    }
   )
 
   def self.definitions

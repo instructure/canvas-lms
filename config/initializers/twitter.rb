@@ -1,3 +1,11 @@
 Twitter::Connection.config = Proc.new do
-  Canvas::Plugin.find(:twitter).try(:settings) || ConfigFile.load('twitter')
+  settings = Canvas::Plugin.find(:twitter).try(:settings)
+  if settings
+    {
+        api_key: settings[:consumer_key],
+        secret_key: settings[:consumer_secret_dec]
+    }
+  else
+    ConfigFile.load('twitter')
+  end
 end

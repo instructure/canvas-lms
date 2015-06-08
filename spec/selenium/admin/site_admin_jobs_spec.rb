@@ -53,6 +53,10 @@ describe "site admin jobs ui" do
     wait_for_ajax_requests
   end
 
+  def future_jobs
+    Delayed::Job.list_jobs(:future, nil)
+  end
+
   before(:each) do
     site_admin_logged_in
     track_jobs do
@@ -84,7 +88,9 @@ describe "site admin jobs ui" do
       Delayed::Job.delete_all
       job = "test".send_later_enqueue_args :to_s, no_delay: true
       load_jobs_page
-      fj('#jobs-grid .slick-row .l0.r0').click()
+      ff("#jobs-grid .slick-row .l0.r0").find do |element|
+        element.click if element.text == job.id.to_s
+      end
       expect(fj('#job-id').text).to eq job.id.to_s
       fj('#job-handler-show').click()
       wait_for_ajax_requests
@@ -102,7 +108,7 @@ describe "site admin jobs ui" do
     end
 
     context "all jobs" do
-      before (:each) do
+      before(:each) do
         load_jobs_page
       end
 
@@ -112,15 +118,14 @@ describe "site admin jobs ui" do
         validate_all_jobs_selected
         expect(f("#jobs-grid .odd")).to be_displayed
         expect(f("#jobs-grid .even")).to be_displayed
-        expect(f("#jobs-total").text).to eq "3"
-        num_of_jobs = Delayed::Job.all.count
+        expect(f("#jobs-total").text).to eq(future_jobs.count.to_s)
 
         keep_trying_until do
           fj("#delete-jobs").click
           expect(driver.switch_to.alert).not_to be_nil
           driver.switch_to.alert.accept
           wait_for_ajaximations
-          expect(Delayed::Job.count).to eq num_of_jobs - 3
+          expect(future_jobs.count).to eq(0)
         end
 
         expect(fj("#jobs-grid .odd")).to be_nil # using fj to bypass selenium cache
@@ -138,10 +143,16 @@ describe "site admin jobs ui" do
       it "should check all popular tags" do
         filter_tags(FlavorTags::ALL)
         keep_trying_until do
-          expect(f("#tags-grid .slick-row:nth-child(1) .r0").text).to eq "String#reverse"
-          expect(f("#tags-grid .slick-row:nth-child(1) .r1").text).to eq "2"
-          expect(f("#tags-grid .slick-row:nth-child(2) .r0").text).to eq "String#capitalize"
-          expect(f("#tags-grid .slick-row:nth-child(2) .r1").text).to eq "1"
+          tags = ff("#tags-grid .slick-row .r0").map(&:text)
+          expect(tags).to include("String#reverse")
+          expect(tags).to include("String#capitalize")
+          ff("#tags-grid .slick-row").each do |row|
+            if row.find_element(:css, ".r0").text == "String#reverse"
+              expect(row.find_element(:css, ".r1").text).to eq("2")
+            elsif row.find_element(:css, ".r0").text == "String#capitalize"
+              expect(row.find_element(:css, ".r1").text).to eq("1")
+            end
+          end
         end
       end
 
@@ -194,7 +205,7 @@ describe "site admin jobs ui" do
         expect(f("#jobs-grid .odd")).to be_displayed
         expect(f("#jobs-grid .even")).to be_displayed
         expect(f("#jobs-total").text).to eq "3"
-        expect(Delayed::Job.all.count).to eq 5
+        expect(future_jobs.count).to eq 3
         num_of_jobs = Delayed::Job.all.count
 
          keep_trying_until do

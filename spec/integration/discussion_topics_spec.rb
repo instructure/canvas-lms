@@ -41,6 +41,25 @@ describe "discussion_topics" do
     expect(response).to be_success
   end
   
+  it "should not allow concluded students to update topic" do
+    student_enrollment = course_with_student(:course => @course, :user => @user, :active_enrollment => true)
+    @topic = DiscussionTopic.new(:context => @course, :title => "will this work?", :user => @user)
+    @topic.save!
+    expect(@topic.grants_right?(@user, :update))
+    student_enrollment.send("conclude")
+    expect(!@topic.grants_right?(@user, :update))
+  end
+
+  it "should allow teachers to edit concluded students topics" do
+    course_with_teacher(:course => @course, :user => @teacher, :active_enrollment => true)
+    student_enrollment = course_with_student(:course => @course, :user => @student, :active_enrollment => true)
+    @topic = DiscussionTopic.new(:context => @course, :title => "will this work?", :user => @student)
+    @topic.save!
+    expect(@topic.grants_right?(@teacher, :update))
+    student_enrollment.send("conclude")
+    expect(@topic.grants_right?(@teacher, :update))
+  end
+
   it "should show speed grader button" do
     course_with_teacher_logged_in(:active_all => true)
     discussion_assignment

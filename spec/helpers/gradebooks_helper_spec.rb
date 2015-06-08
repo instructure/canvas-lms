@@ -22,8 +22,9 @@ require 'nokogiri'
 
 describe GradebooksHelper do
   describe '#student_score_display_for(submission, can_manage_grades)' do
-    FakeSubmission = Struct.new(:assignment, :score, :grade, :submission_type, :workflow_state)
-    FakeAssignment = Struct.new(:grading_type)
+    FakeSubmission = Struct.new(:assignment, :score, :grade, :submission_type,
+                                :workflow_state, :excused?).freeze
+    FakeAssignment = Struct.new(:grading_type).freeze
 
     let(:submission) { FakeSubmission.new(assignment) }
     let(:assignment) { FakeAssignment.new }

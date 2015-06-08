@@ -22,7 +22,7 @@ describe "student groups" do
     end
 
     it "if there are student groups, there should be a student groups tab", priority:"2", test_id:182051 do
-      create_group_with_student_with_a_teacher(group_name)
+      create_student_group_as_a_teacher(group_name)
       get "/courses/#{@course.id}/users"
       all_tabs = ffj(".group-category-tab-link")
 
@@ -35,7 +35,7 @@ describe "student groups" do
       let(:students_in_group){ 4 }
 
       before(:each) do
-        create_group_with_student_with_a_teacher(group_name, (students_in_group-1))
+        create_student_group_as_a_teacher(group_name, (students_in_group-1))
         get("/courses/#{@course.id}/groups")
       end
 

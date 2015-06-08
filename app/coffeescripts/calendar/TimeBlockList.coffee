@@ -56,7 +56,7 @@ define [
       valid = true
       @blocksManager.reset()
       for row in @rows
-        if row.validate()
+        if row.validate() and not row.incomplete()
           @blocksManager.add row.getData()... unless row.blank()
         else
           valid = false

@@ -1,0 +1,17 @@
+<% unless AccountAuthorizationConfig::Twitter.globally_configured? %>
+  <p><%= mt(<<-TEXT, twitter_url: "https://apps.twitter.com/", callback_url: oauth_login_callback_url)
+You will need to [register an application on Twitter](%{twitter_url}).
+You should configure %{callback_url} as the Callback URL.
+After you create your application, make a note of the Consumer Key and Consumer Secret, and enter them here.
+TEXT
+      %></p>
+  <div class="ic-Form-control">
+    <%= f.label :consumer_key, 'Consumer Key', class: 'ic-Label' %>
+    <%= f.text_field :consumer_key, class: 'ic-Input' %>
+  </div>
+  <div class="ic-Form-control">
+    <%= f.label :consumer_secret, 'Consumer Secret', class: 'ic-Label' %>
+    <%= f.password_field :consumer_secret, class: 'ic-Input' %>
+  </div>
+<% end %>
+<%= render partial: 'login_attribute_dropdown', locals: { f: f, aac: aac } %>

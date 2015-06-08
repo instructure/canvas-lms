@@ -1,7 +1,5 @@
 {{#if assignment_grading_type_is_points}}
   <input  name="{{inputName}}"
-          type="number"
-          step="any"
           value="{{ grade }}"
           class="grading_value grading_box"
           id="student_grading_{{assignment.id}}"
@@ -42,6 +40,7 @@
     <option value="">---</option>
     <option value="complete" {{selectedIf grade "complete"}}>{{#t "#gradebooks.grades.complete"}}Complete{{/t}}</option>
     <option value="incomplete" {{selectedIf grade "incomplete"}}>{{#t "#gradebooks.grades.incomplete"}}Incomplete{{/t}}</option>
+    <option value="EX" {{#if excused}}selected{{/if}}>{{#t}}Excused{{/t}}</option>
   </select>
 {{/if}}
 

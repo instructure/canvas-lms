@@ -95,6 +95,21 @@ module Api::V1::Outcome
     end
   end
 
+  def outcome_links_json(outcome_links, user, session, opts={})
+    return [] if outcome_links.empty?
+
+    #
+    # Assumption:  All of the outcome links have the same context.
+    #
+    opts[:assessed_outcomes] = LearningOutcomeResult.uniq.where(
+      context_type: outcome_links.first.context_type,
+      context_id: outcome_links.map(&:context_id),
+      learning_outcome_id: outcome_links.map(&:content_id)
+    ).pluck(:learning_outcome_id)
+
+    outcome_links.map{ |ol| outcome_link_json(ol, user, session, opts) }
+  end
+
   def outcome_link_json(outcome_link, user, session, opts={})
     opts[:outcome_style] ||= :abbrev
     opts[:outcome_group_style] ||= :abbrev
@@ -102,11 +117,27 @@ module Api::V1::Outcome
       hash['url'] = polymorphic_path [:api_v1, outcome_link.context || :global, :outcome_link],
         :id => outcome_link.associated_asset_id,
         :outcome_id => outcome_link.content_id
-      hash['outcome_group'] = outcome_group_json(outcome_link.associated_asset, user, session, opts[:outcome_group_style])
+      hash['outcome_group'] = outcome_group_json(
+        outcome_link.associated_asset,
+        user,
+        session,
+        opts[:outcome_group_style]
+      )
       # use learning_outcome_content vs. content in case
       # learning_outcome_content has been preloaded (e.g. by
       # ContentTag.order_by_outcome_title)
-      hash['outcome'] = outcome_json(outcome_link.learning_outcome_content, user, session, opts.slice(:outcome_style, :assessed_outcomes))
+      hash['outcome'] = outcome_json(
+        outcome_link.learning_outcome_content,
+        user,
+        session,
+        opts.slice(:outcome_style, :assessed_outcomes)
+      )
+
+      if opts[:assessed_outcomes]
+        hash['assessed'] = opts[:assessed_outcomes].include?(outcome_link.learning_outcome_content.id)
+      else
+        hash['assessed'] = outcome_link.learning_outcome_content.assessed?(outcome_link[:context_id])
+      end
     end
   end
 end

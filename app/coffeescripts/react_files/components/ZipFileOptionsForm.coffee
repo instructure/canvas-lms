@@ -2,14 +2,11 @@ define [
   'i18n!zip_file_options_form'
   'react'
   'compiled/react/shared/utils/withReactElement'
-  './DialogAdapter'
-  './DialogContent'
-  './DialogButtons'
-], (I18n, React, withReactElement, DialogAdapterComponent, DialogContentComponent, DialogButtonsComponent) ->
-
-  DialogAdapter = React.createFactory DialogAdapterComponent
-  DialogContent = React.createFactory DialogContentComponent
-  DialogButtons = React.createFactory DialogButtonsComponent
+  'jsx/shared/modal'
+  'jsx/shared/modal-content'
+  'jsx/shared/modal-buttons'
+], (I18n, React, withReactElement, Modal, ModalContent, ModalButtons) ->
+  Modal = React.createFactory(Modal)
 
   ZipFileOptionsForm = React.createClass
 
@@ -33,12 +30,15 @@ define [
 
     render: withReactElement ->
 
-      DialogAdapter open: @props.fileOptions?, title: I18n.t('zip_options', 'Zip file options'), onClose: @props.onClose,
-        DialogContent {},
-          div {},
-            p {}, @buildMessage()
-        DialogButtons {},
-          div {},
+      Modal
+        className: 'ReactModal__Content--canvas ReactModal__Content--mini-modal',
+        isOpen: @props.fileOptions?,
+        ref: 'canvasModal',
+        title: I18n.t('zip_options', 'Zip file options'),
+        onRequestClose: @props.onClose,
+          ModalContent {},
+            p {className: "modalMessage"}, @buildMessage()
+          ModalButtons {},
             button
               className: 'btn'
               onClick: @handleExpandClick,

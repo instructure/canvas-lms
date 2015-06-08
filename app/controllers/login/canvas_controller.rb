@@ -27,6 +27,8 @@ class Login::CanvasController < ApplicationController
   def new
     @pseudonym_session = PseudonymSession.new
     @headers = false
+    @aacs_with_buttons = @domain_root_account.account_authorization_configs.
+                           select(&:login_button?)
 
     maybe_render_mobile_login
   end

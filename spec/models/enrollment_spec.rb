@@ -449,6 +449,14 @@ describe Enrollment do
         expect(@enrollment.state).to eql(:invited)
         expect(@enrollment.state_based_on_date).to eql(:invited)
         expect(@enrollment.accept).to be_truthy
+
+        @course.complete!
+        expect(@enrollment.reload.state).to eql(:completed)
+        expect(@enrollment.state_based_on_date).to eql(:completed)
+
+        @enrollment.workflow_state = 'active'
+        @enrollment.save!
+        expect(@enrollment.state_based_on_date).to eql(:completed)
       end
 
       def enrollment_term_availability_test

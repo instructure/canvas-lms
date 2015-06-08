@@ -1,6 +1,6 @@
 @import "mixins/blue";
 
-$body-bg-color:                     $ic-color-light; 
+$body-bg-color:                     $ic-color-light;
 $embedded-bg:                       $ic-color-light;
 $embedded-footer-bg:                $ic-color-neutral;
 $embedded-footer-border-color:      $ic-border-color;
@@ -10,11 +10,11 @@ $layout-modal-font-color:           $ic-color-dark;
 $footer-links-color:                lighten($ic-color-dark, 16);
 $footer-links-border-color:         lighten($ic-color-dark, 16);
 
-@if $use_new_styles { 
-  body { 
+@if $use_new_styles {
+  body {
     min-height: 100vh;
     min-width: 768px;
-  } 
+  }
 }
 @else { body, html { height: 100%; } }
 
@@ -23,7 +23,7 @@ body {
   @if $use_high_contrast { background: white; }
   @else {
     @if $is-k12 { background: white; }
-    @else if $use_new_styles { 
+    @else if $use_new_styles {
       background: $ic-color-light;
       font-weight: 300;
     }
@@ -44,9 +44,9 @@ body {
     #wrapper {
       margin: 0;
       @if $use_new_styles == false {
-        min-width: 400px;  
+        min-width: 400px;
       }
-      
+
     }
     #main {
       margin: 0;
@@ -123,7 +123,7 @@ body {
     @include breakpoint(wide) { margin-left: $ic-header-primary-width; }
     body.primary-nav-expanded & { margin-left: $ic-header-primary-expanded-width; }
     body.no-headers & { margin-left: 0; }
-  }  
+  }
 }
 
 #wrapper {
@@ -138,7 +138,7 @@ body {
 #main {
   position: relative;
   z-index: 10;
-  
+
   @if $use_new_styles == false {
     background-color: $body-bg-color;
     border: none;
@@ -150,13 +150,7 @@ body {
 }
 
 #content {
-  @if $use_new_styles { 
-    padding: $ic-sp*2;
-    @include breakpoint(desktop) { 
-      body.with-left-side & { padding-left: $ic-sp; }
-      body.with-right-side & { padding-right: $ic-sp; } 
-    }
-  }
+  @if $use_new_styles { padding: $ic-sp*2; }
   @else { padding: 1em; }
   overflow: hidden;
 }
@@ -171,18 +165,12 @@ body {
 }
 
 .with-left-side {
-  @if $use_new_styles {
-    #left-side {
-      @include breakpoint(desktop) { display: block; }
-    }  
-  }
-  
-  @else {
+  #left-side { display: block; }
+  @if $use_new_styles == false {
     min-width: $left_side_width + $min_main_width;
-    #left-side { display: block; }
     #footer { margin-left: $left_side_width; }
     #wrapper { margin-left: 0; }
-    #main { margin-left: $left_side_width; }  
+    #main { margin-left: $left_side_width; }
     #header-inner { max-width: $left_side_width + $max_main_width; }
   }
 }
@@ -190,11 +178,11 @@ body {
 .with-right-side {
   @if $use_new_styles == false { min-width: $right_side_width + $min_main_width; }
   #right-side-wrapper {
-    display: block;    
+    display: block;
     @if $use_new_styles == false {
       float: right;
       position: absolute;
-      top: 0;  
+      top: 0;
     }
   }
   @if $use_new_styles == false {
@@ -233,9 +221,9 @@ body {
   @if $use_new_styles == false {
     color: #5c5c5c;
     font-size: 11px;
-    margin: 0 15px 34px;  
+    margin: 0 15px 34px;
   }
-  
+
   .footer-logo {
     @include bg-image("footer-logo", "png", no-repeat, left, top, transparent, 140px, 10px);
     display: inline-block;

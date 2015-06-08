@@ -145,9 +145,9 @@ describe Login::CasController do
 
     it "send to login page if unknoown_user_url is blank" do
       # Default to Login url with an empty string value
-      aac = account.account_authorization_configs.first
-      aac.unknown_user_url = ""
-      aac.save!
+      account.unknown_user_url = ''
+      account.save!
+
       get 'new', :ticket => 'ST-abcd'
       expect(response).to redirect_to(login_url)
       expect(session[:cas_session]).to be_nil
@@ -156,9 +156,8 @@ describe Login::CasController do
 
     it "uses the unknown_user_url from the aac" do
       unknown_user_url = "https://example.com/unknown_user"
-      aac = account.account_authorization_configs.first
-      aac.unknown_user_url = unknown_user_url
-      aac.save!
+      account.unknown_user_url = unknown_user_url
+      account.save!
       get 'new', :ticket => 'ST-abcd'
       expect(response).to redirect_to(unknown_user_url)
       expect(session[:cas_session]).to be_nil

@@ -1,28 +1,24 @@
 <%= fields_for :settings, OpenObject.new(settings) do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
-      <td colspan="2"><%= mt(:description, <<-TEXT, :twitter_url => 'http://dev.twitter.com', :callback_url => raw('<span class="nobr">https://&lt; ' + t(:domain_name, 'domain') + ' &gt;/oauth_success?service=twitter</span>'))
-You will need to create a [new app on Twitter](%{twitter_url}).
-Set the following configuration options to ensure your Twitter app
-works correctly:
-
-* **Application Type:** set to "Browser"
-* **Callback URL:** set to %{callback_url}
-* **Default Access type:** set to "Read, Write & Private Message"
-* After you save your app, make a note of the Consumer key and Consumer secret
+      <td colspan="2"><%= mt(<<-TEXT, twitter_url: "https://apps.twitter.com/", callback_url: oauth_login_callback_url)
+You will need to [register an application on Twitter](%{twitter_url}).
+You should configure %{callback_url} as the Callback URL, and set Access Level to
+Read, Write, and Access direct messages
+After you create your application, make a note of the Consumer Key and Consumer Secret, and enter them here.
 TEXT
       %></td>
     </tr>
     <tr>
-      <td><%= f.blabel :api_key, :en => "Consumer Key" %></td>
+      <td><%= f.blabel :consumer_key, :en => "Consumer Key" %></td>
       <td>
-        <%= f.text_field :api_key %>
+        <%= f.text_field :consumer_key %>
       </td>
     </tr>
     <tr>
-      <td><%= f.blabel :secret_key, :en => "Consumer Secret" %></td>
+      <td><%= f.blabel :consumer_secret, :en => "Consumer Secret" %></td>
       <td>
-        <%= f.text_field :secret_key %>
+        <%= f.password_field :consumer_secret %>
       </td>
     </tr>
   </table>

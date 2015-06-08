@@ -1,7 +1,7 @@
 #!/bin/bash
 result=0
 
-echo "################ Running tests against Rails 3 ################"
+echo "################ event_stream ################"
 bundle check || bundle install
 bundle exec rspec spec
 let result=$result+$?

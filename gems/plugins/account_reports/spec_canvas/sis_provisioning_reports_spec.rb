@@ -1034,5 +1034,31 @@ describe "Default Account Reports" do
       expect(parsed["group_membership.csv"]).to eq [["group_id", "user_id", "status"]]
       expect(parsed["xlist.csv"]).to eq [["xlist_course_id", "section_id", "status"]]
     end
+
+    it "should not return reports passed as false" do
+      parameters = {}
+      parameters["accounts"] = 0
+      parameters["users"] = 1
+      parameters["terms"] = true
+      parameters["courses"] = false
+      parameters["sections"] = false
+      parameters["enrollments"] = false
+      parameters["groups"] = true
+      parameters["group_membership"] = true
+      parameters["xlist"] = true
+      parsed = read_report("sis_export_csv", {params: parameters, header: true})
+
+      expect(parsed["accounts.csv"]).to eq nil
+      expect(parsed["terms.csv"]).to eq [["term_id", "name", "status", "start_date", "end_date"]]
+      expect(parsed["users.csv"]).to eq [['user_id', 'login_id', 'password', 'first_name',
+                                          'last_name', 'full_name', 'sortable_name',
+                                          'short_name', 'email', 'status']]
+      expect(parsed["courses.csv"]).to eq nil
+      expect(parsed["sections.csv"]).to eq nil
+      expect(parsed["enrollments.csv"]).to eq nil
+      expect(parsed["groups.csv"]).to eq [["group_id", "account_id", "name", "status"]]
+      expect(parsed["group_membership.csv"]).to eq [["group_id", "user_id", "status"]]
+      expect(parsed["xlist.csv"]).to eq [["xlist_course_id", "section_id", "status"]]
+    end
   end
 end

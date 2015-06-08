@@ -51,7 +51,8 @@ module Lti
               user: lti_user,
               tool: lti_tool,
               account: lti_account,
-              variable_expander: variable_expander
+              variable_expander: variable_expander,
+              disable_lti_post_only: @root_account.feature_enabled?(:disable_lti_post_only)
           }
       )
       self

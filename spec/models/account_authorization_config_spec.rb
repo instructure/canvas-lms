@@ -30,24 +30,59 @@ describe AccountAuthorizationConfig do
     end
   end
 
-  it "should enable canvas auth when destroyed" do
-    Account.default.settings[:canvas_authentication] = false
-    Account.default.save!
-    expect(Account.default.canvas_authentication?).to be_truthy
-    aac = Account.default.account_authorization_configs.create!(:auth_type => 'ldap')
-    expect(Account.default.canvas_authentication?).to be_falsey
-    aac.destroy
-    expect(Account.default.reload.canvas_authentication?).to be_truthy
-    expect(Account.default.settings[:canvas_authentication]).not_to be_falsey
-    Account.default.account_authorization_configs.create!(:auth_type => 'ldap')
-    # still true
-    expect(Account.default.reload.canvas_authentication?).to be_truthy
+  describe "enable_canvas_authentication" do
+    let(:account){ Account.default }
+
+    before do
+      account.account_authorization_configs.destroy_all
+      account.settings[:canvas_authentication] = false
+      account.save!
+      account.account_authorization_configs.create!(auth_type: 'ldap')
+      account.account_authorization_configs.create!(auth_type: 'cas')
+    end
+
+    it "leaves settings as they are after deleting one of many aacs" do
+      account.account_authorization_configs.first.destroy
+      expect(account.reload.settings[:canvas_authentication]).to be_falsey
+    end
+
+    it "enables canvas_authentication if deleting the last aac" do
+      account.account_authorization_configs.destroy_all
+      expect(account.reload.settings[:canvas_authentication]).to be_truthy
+    end
+
   end
 
   it "should disable open registration when created" do
     Account.default.settings[:open_registration] = true
     Account.default.save!
-    Account.default.account_authorization_configs.create!(:auth_type => 'cas')
+    Account.default.account_authorization_configs.create!(auth_type: 'cas')
     expect(Account.default.reload.open_registration?).to be_falsey
   end
+
+  describe "FindByType module" do
+    let!(:aac){ Account.default.account_authorization_configs.create!(auth_type: 'facebook') }
+
+    it "still reloads ok" do
+      expect { aac.reload }.to_not raise_error
+    end
+
+    it "works through associations that use the provided module" do
+      found = Account.default.account_authorization_configs.find('facebook')
+      expect(found).to eq(aac)
+    end
+  end
+
+  describe "#auth_provider_filter" do
+    it "includes nil for legacy auth types" do
+      aac = AccountAuthorizationConfig.new(auth_type: "cas")
+      expect(aac.auth_provider_filter).to eq([nil, aac])
+    end
+
+    it "is just the AAC for oauth types" do
+      aac = AccountAuthorizationConfig.new(auth_type: "facebook")
+      expect(aac.auth_provider_filter).to eq(aac)
+    end
+  end
+
 end

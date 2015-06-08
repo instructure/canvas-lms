@@ -961,7 +961,10 @@ Reduce the width of your screen to see how the example components below both sca
 
 */
 
-@mixin ic-input-variant($border-color: $ic-border-light, $color: $ic-brand-primary) {
+$ic-Input-border: lighten($ic-color-dark, 65);
+@if $use_high_contrast {$ic-Input-border: $ic-color-dark;}
+
+@mixin ic-input-variant($border-color: $ic-Input-border, $color: $ic-brand-primary) {
   border-color: $border-color;
   &:focus {
     border-color: lighten($color, 10%);
@@ -1333,7 +1336,7 @@ form.ic-Form-group { margin: 0; }
       box-sizing: border-box;
       border-radius: 100%;
       width: 16px; height: 16px;
-      border: 1px solid darken($ic-border-light, 3%);
+      border: 1px solid $ic-Input-border;
       position: absolute;
       top: 50%; left: 0;
       margin-top: -8px;
@@ -1430,7 +1433,7 @@ form.ic-Form-group { margin: 0; }
       border-radius: $baseBorderRadius;
       background: url("/images/forms/ic-checkbox-bg.svg") no-repeat center bottom $ic-color-light;
       background-size: 16px 48px;
-      border: 1px solid darken($ic-border-light, 3%);
+      border: 1px solid $ic-Input-border;
       outline: 2px solid transparent;
       outline-offset: -12px;
     }
@@ -1528,7 +1531,7 @@ form.ic-Form-group { margin: 0; }
   .ic-Label {
     height: 38px;
     background: $ic-color-light;
-    border: 1px solid $ic-border-light;
+    border: 1px solid $ic-Input-border;
     display: flex;
     align-items: center;
     padding: $ic-sp/2 ($ic-sp - 4);

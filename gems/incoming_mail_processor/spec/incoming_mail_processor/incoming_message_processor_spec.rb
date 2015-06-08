@@ -321,6 +321,31 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       imp.process(worker_id: 2)
     end
 
+    it "only processes a single account if asked to do so" do
+      IncomingMessageProcessor.configure({
+        'imap' => {
+          'server' => "fake",
+          'username' => 'should_be_overridden@fake.fake',
+          'accounts' => [
+            { 'username' => 'user1@fake.fake', 'password' => 'pass1' },
+            { 'username' => 'user2@fake.fake', 'password' => 'pass2' },
+            { 'username' => 'user3@fake.fake', 'password' => 'pass3' },
+          ],
+        },
+      })
+
+      imp = IncomingMessageProcessor
+      imp.expects(:create_mailbox).returns(@mock_mailbox).with do |account|
+        account.config[:username] == 'user2@fake.fake'
+      end
+
+      @mock_mailbox.expects(:connect)
+      @mock_mailbox.expects(:each_message)
+      @mock_mailbox.expects(:disconnect)
+
+      IncomingMessageProcessor.new(message_handler, error_reporter).process(:mailbox_account_address => 'user2@fake.fake')
+    end
+
     describe "message processing" do
       before do
         IncomingMessageProcessor.configure({

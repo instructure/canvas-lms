@@ -627,6 +627,22 @@ CanvasRails::Application.routes.draw do
   # deprecated alias
   post 'saml_consume' => 'login/saml#create'
 
+  # the callback URL for all OAuth1.0a based SSO
+  get 'login/oauth/callback' => 'login/oauth#create', as: :oauth_login_callback
+  # the callback URL for all OAuth2 based SSO
+  get 'login/oauth2/callback' => 'login/oauth2#create', as: :oauth2_login_callback
+  # ActionController::TestCase can't deal with aliased controllers when finding
+  # routes, so we let this route exist only for tests
+  get 'login/oauth2' => 'login/oauth2#new' if Rails.env.test?
+
+  get 'login/facebook' => 'login/facebook#new', as: :facebook_login
+  get 'login/github' => 'login/github#new', as: :github_login
+  get 'login/google' => 'login/google#new', as: :google_login
+  get 'login/linkedin' => 'login/linkedin#new', as: :linkedin_login
+  get 'login/openid_connect' => 'login/openid_connect#new'
+  get 'login/openid_connect/:id' => 'login/openid_connect#new', as: :openid_connect_login
+  get 'login/twitter' => 'login/twitter#new', as: :twitter_login
+
   get 'login/otp' => 'login/otp#new', as: :otp_login
   post 'login/otp/sms' => 'login/otp#send_via_sms', as: :send_otp_via_sms
   post 'login/otp' => 'login/otp#create'
@@ -1368,6 +1384,8 @@ CanvasRails::Application.routes.draw do
     scope(controller: :context_module_items_api) do
       get "courses/:course_id/modules/:module_id/items", action: :index, as: 'course_context_module_items'
       get "courses/:course_id/modules/:module_id/items/:id", action: :show, as: 'course_context_module_item'
+      put "courses/:course_id/modules/:module_id/items/:id/done", action: :mark_as_done, as: 'course_context_module_item_done'
+      delete "courses/:course_id/modules/:module_id/items/:id/done", action: :mark_as_not_done, as: 'course_context_module_item_not_done'
       get "courses/:course_id/module_item_redirect/:id", action: :redirect, as: 'course_context_module_item_redirect'
       get "courses/:course_id/module_item_sequence", action: :item_sequence
       post "courses/:course_id/modules/:module_id/items", action: :create, as: 'course_context_module_items_create'
@@ -1699,6 +1717,11 @@ CanvasRails::Application.routes.draw do
 
     #Tool Proxy Services
     get  "tool_proxy/:tool_proxy_guid", controller: 'lti/ims/tool_proxy', action: :show, as: "show_lti_tool_proxy"
+  end
 
+  ApiRouteSet.draw(self, "/api/sis") do
+    scope(controller: :sis_api) do
+      get 'grade_export/accounts/:account_id/assignments', :action => 'sis_assignments', :as => :sis_assignments
+    end
   end
 end

@@ -3,7 +3,6 @@ define [
   'react'
   'react-router'
   'react-modal'
-  'compiled/bundles/roles'
   'compiled/react_files/components/FilesApp'
   'compiled/react_files/modules/filesEnv'
   'compiled/react_files/components/FilePreview'
@@ -13,8 +12,8 @@ define [
   '../mockFilesENV'
   '../TestLocation'
   '../../helpers/stubRouterContext'
-], ($, React, Router, Modal, RolesBundle, FilesApp, filesEnv, FilePreviewComponent, Folder, File, FilesCollection, mockFilesENV, TestLocation, stubRouterContext) ->
-
+  'vendor/date'
+], ($, React, Router, Modal, FilesApp, filesEnv, FilePreviewComponent, Folder, File, FilesCollection, mockFilesENV, TestLocation, stubRouterContext) ->
   Simulate = React.addons.TestUtils.Simulate
   wrapper = null
 

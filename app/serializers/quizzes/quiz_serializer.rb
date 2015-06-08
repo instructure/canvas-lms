@@ -126,6 +126,14 @@ module Quizzes
       end
     end
 
+    def description
+      if @serializer_options[:description_formatter]
+        @serializer_options[:description_formatter].call(quiz.description)
+      else
+        quiz.description
+      end
+    end
+
     def unsubmitted_students_url
       api_v1_course_quiz_submission_users_url(context, quiz, submitted: 'false')
     end

@@ -67,9 +67,8 @@ function(React, $, I18n, _) {
     },
 
     handleDateChange: function(event) {
-      var validDateInput = !!$.datetime.parse(event.target.value);
       var dateNode = this.refs[event.target.name].getDOMNode();
-      var updatedDate = validDateInput ? $(dateNode).data('unfudged-date') : new Date('invalid date');
+      var updatedDate = $(dateNode).data('invalid') ? new Date('invalid date') : $(dateNode).data('unfudged-date');
       var updatedState = {};
       updatedState[event.target.name] = updatedDate;
       this.setState(updatedState, function() {

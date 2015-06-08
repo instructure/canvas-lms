@@ -1,22 +1,56 @@
-<div
-  <% if aac.new_record? %>
-    id="<%= aac.auth_type %>_form" class="new_auth auth_form" style="display:none;"
-  <% else %>
-    class="<%= aac.auth_type %>_form auth_form"
-  <% end %>>
+<div class="content-box"
+     id="<%= "#{aac.auth_type}_form" if aac.new_record? %>"
+     <%= hidden(true) if aac.new_record? %>>
+  <div class="grid-row">
+    <div class="col-xs-12 col-md-8 off-md-2">
+      <% url = aac.new_record? ? account_account_authorization_configs_url(account) :
+              account_account_authorization_config_url(account, aac) %>
 
-  <div <%= raw presenter.form_class(aac) %>>
+      <%= form_for(aac,
+                   as: :account_authorization_config,
+                   url: url,
+                   html: {
+                           id: "#{aac.new_record? ? 'new' : 'edit'}_#{aac.class.sti_name}#{aac.id unless aac.new_record?}",
+                           class: "ic-Form-group ic-Form-group--horizontal"
+                   }) do |f| %>
+      <%= f.hidden_field :auth_type, value: aac.auth_type %>
+      <%= f.hidden_field :id %>
+        <h3><%= aac.class.display_name %></h3>
+        <% if aac.account.multi_auth? && !aac.new_record? %>
+          <p><%= mt "You can log in directly with this provider by going to %{url}",
+                    url: url_for(presenter.login_url_options(aac)) %></p>
+        <% end %>
 
-    <% url = aac.new_record? ? account_account_authorization_configs_url(account) :
-                              account_account_authorization_config_url(account, aac) %>
-    <%= form_for(aac,
-                 url: url,
-                 id: presenter.form_id(aac),
-                 class: "auth_type #{aac.auth_type}_form") do %>
+        <%= render partial: "#{aac.auth_type}_fields",
+                 locals: {aac: aac, presenter: presenter, f: f}%>
 
-      <%= render partial: "#{aac.auth_type}_fields",
-                 locals: {account: account, aac: aac, presenter: presenter}%>
+        <% if presenter.configs.length > 1 %>
+          <div class="ic-Form-control">
+            <%= f.label :position, t('Position'), class: 'ic-Label' %>
+            <%= f.select(:position,
+                         presenter.position_options(aac),
+                         {},
+                         class: "ic-Input") %>
+          </div>
+        <% end %>
 
-    <% end %>
+        <div class="ic-Form-actions">
+          <% unless aac.new_record? %>
+              <%= link_to(account_account_authorization_config_url(account, aac),
+                method: "delete",
+                rel: 'nofollow',
+                id: "delete-aac-#{aac.id}",
+                data: {
+                  confirm: t('Are you sure?'),
+                  disable_with: t('deleting...')
+                },
+                class: 'Button Button--danger') do %>
+                <%= t("Delete") %>
+              <% end %>
+          <% end %>
+          <%= f.button t('Save'), class: "Button Button--primary" %>
+        </div>
+      <% end %>
+    </div>
   </div>
 </div>

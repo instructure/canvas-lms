@@ -18,17 +18,19 @@
 
 class AccountAuthorizationConfig::LDAP < AccountAuthorizationConfig
   def self.sti_name
-    'ldap'
+    'ldap'.freeze
   end
 
   # if the config changes, clear out last_timeout_failure so another attempt can be made immediately
   before_save :clear_last_timeout_failure
 
   def self.recognized_params
-    [ :auth_type, :auth_host, :auth_port, :auth_over_tls, :auth_base,
+    [ :auth_host, :auth_port, :auth_over_tls, :auth_base,
       :auth_filter, :auth_username, :auth_password,
-      :identifier_format, :position ]
+      :identifier_format ].freeze
   end
+
+  SENSITIVE_PARAMS = [ :auth_password ].freeze
 
   def clear_last_timeout_failure
     unless self.last_timeout_failure_changed?
@@ -96,6 +98,10 @@ class AccountAuthorizationConfig::LDAP < AccountAuthorizationConfig
     return Socket.getaddrinfo(self.auth_host, 'http', nil, Socket::SOCK_STREAM)[0][3]
   rescue SocketError
     return nil
+  end
+
+  def auth_provider_filter
+    [nil, self]
   end
 
   def test_ldap_connection

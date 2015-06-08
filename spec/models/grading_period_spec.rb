@@ -137,5 +137,13 @@ describe GradingPeriod do
       expect(grading_period.current?).to be false
     end
   end
+
+  context "Soft deletion" do
+    let(:account) { Account.create }
+    let(:group) { account.grading_period_groups.create }
+    let(:creation_arguments) { { start_date: 1.week.ago, end_date: 2.weeks.from_now } }
+    subject { group.grading_periods }
+    include_examples "soft deletion"
+  end
 end
 

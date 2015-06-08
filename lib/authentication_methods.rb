@@ -272,9 +272,7 @@ module AuthenticationMethods
       format.html {
         store_location
         flash[:warning] = I18n.t('lib.auth.errors.not_authenticated', "You must be logged in to access this page") unless request.path == '/'
-        opts = {}
-        opts[:canvas_login] = 1 if params[:canvas_login]
-        redirect_to login_url(opts)
+        redirect_to login_url(params.slice(:canvas_login, :authentication_provider))
       }
       format.json { render_json_unauthorized }
     end

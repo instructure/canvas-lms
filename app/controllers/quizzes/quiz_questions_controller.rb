@@ -446,6 +446,8 @@ class Quizzes::QuizQuestionsController < ApplicationController
       @context,
       parse_includes,
       censored?,
-      quiz_data)
+      quiz_data,
+      shuffle_answers: @quiz.shuffle_answers_for_user?(@current_user)
+    )
   end
 end

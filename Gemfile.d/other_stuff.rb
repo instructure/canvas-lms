@@ -20,7 +20,7 @@ gem 'authlogic', '3.4.2'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.2.34'
+gem 'switchman', '1.2.35'
 gem 'folio-pagination', '0.0.7', require: 'folio/rails'
 gem 'will_paginate', '3.0.4', require: false
 
@@ -34,8 +34,8 @@ gem 'bcrypt-ruby', '3.0.1'
 gem 'canvas_connect', '0.3.7'
   gem 'adobe_connect', '1.0.3', require: false
 gem 'canvas_webex', '0.15'
-gem 'canvas-jobs', '0.9.12'
-
+gem 'canvas-jobs', '0.9.13'
+  gem 'rufus-scheduler', '3.1.2', require: false
 gem 'ffi', '1.1.5', require: false
 gem 'hairtrigger', '0.2.12'
   gem 'ruby2ruby', '2.0.8', require: false
@@ -70,6 +70,7 @@ gem 'netaddr', '1.5.0', require: false
 gem 'nokogiri', '1.6.6.2', require: false
 # oauth gem, with rails3 fixes rolled in
 gem 'oauth-instructure', '0.4.10', require: false
+gem 'oauth2', '1.0.0', require: false
 gem 'rack-mini-profiler', '0.9.1', require: false
 gem 'rake', '10.4.2'
 gem 'rdoc', '3.12'
@@ -95,8 +96,8 @@ gem 'useragent', '0.10.0', require: false
 gem 'foreigner', '0.9.2'
 gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'hey', '1.3.0', require: false
-gem 'aroi', '0.0.2'
 gem 'sentry-raven', '0.13.2', require: false
+gem 'canvas_statsd', '1.0.0'
 
 gem 'active_polymorph', path: 'gems/active_polymorph'
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'
@@ -120,7 +121,6 @@ gem 'canvas_quiz_statistics', path: 'gems/canvas_quiz_statistics'
 gem 'canvas_sanitize', path: 'gems/canvas_sanitize'
 gem 'canvas_slug', path: 'gems/canvas_slug'
 gem 'canvas_sort', path: 'gems/canvas_sort'
-gem 'canvas_statsd', path: 'gems/canvas_statsd'
 gem 'canvas_stringex', path: 'gems/canvas_stringex'
 gem 'canvas_text_helper', path: 'gems/canvas_text_helper'
 gem 'canvas_time', path: 'gems/canvas_time'

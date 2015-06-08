@@ -176,6 +176,7 @@ class GradeSummaryPresenter
       # require score then add a filter when the DA feature is on
       chain.joins(:submissions)
         .where("submissions.user_id in (?)", real_and_active_student_ids)
+        .where("NOT submissions.excused OR submissions.excused IS NULL")
         .group("assignments.id")
         .select("assignments.id, max(score) max, min(score) min, avg(score) avg")
         .index_by(&:id)

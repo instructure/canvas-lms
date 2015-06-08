@@ -21,14 +21,17 @@ define [
   'jquery'
   'underscore'
   'compiled/views/outcomes/OutcomeContentBase'
+  'compiled/views/outcomes/CalculationMethodFormView'
   'jst/outcomes/outcome'
   'jst/outcomes/outcomeForm'
   'jst/outcomes/_criterion' # for outcomeForm
   'jqueryui/dialog'
-], (I18n, $, _, OutcomeContentBase, outcomeTemplate, outcomeFormTemplate, criterionTemplate) ->
+], (I18n, $, _, OutcomeContentBase, CalculationMethodFormView,
+  outcomeTemplate, outcomeFormTemplate, criterionTemplate) ->
 
   # For outcomes in the main content view.
   class OutcomeView extends OutcomeContentBase
+    @child 'calculationMethodFormView', 'div.outcome-calculation-method-form'
 
     events: _.extend
       'click .outcome_information_link': 'showRatingDialog'
@@ -37,6 +40,7 @@ define [
       'click .save_rating_link': 'saveRating'
       'click .insert_rating': 'insertRating'
       'change .calculation_method' : 'updateCalcInt'
+      'keyup .mastery_points' : 'changeMasteryPoints'
     , OutcomeContentBase::events
 
     validations: _.extend
@@ -47,13 +51,9 @@ define [
 
     constructor: ({@setQuizMastery, @useForScoring}) ->
       super
-
-    # Validate before submitting.
-    submit: (e) =>
-      # set so handlebars doesn't put in placeholder text
-      points_possible = _.max _.map(_.pluck(@getFormData().ratings, 'points'), (n) -> parseFloat n)
-      @model.set {points_possible: points_possible}, silent: true
-      super e
+      @calculationMethodFormView = new CalculationMethodFormView({
+        model: @model
+      })
 
     # overriding superclass
     getFormData: ->
@@ -107,79 +107,23 @@ define [
       $rating.find('.edit input:first').focus()
       @updateRatings()
 
-    CALC_METHODS = {
-      'decaying_average' : {
-        friendlyString: I18n.t("Decaying Average")
-        showCalcIntSettingBox: true
-        calcIntLabel: I18n.t("Last Item: ")
-        calcIntRangeInfo: I18n.t('Between 1% and 99%')
-        calcIntExample: I18n.t("Last item is 75% of mastery.  Average of 'the rest' is 25% of mastery")
-        calcIntExampleLine1: I18n.t("1 - Item scores: 4, 3, 2, 5")
-        calcIntExampleLine2: I18n.t("2 - 'The rest' item average: (4 + 3 + 2) / 3 = 3")
-        calcIntExampleLine3: I18n.t("3 - Calculated mastery score: 5(0.75) + 3(0.25) = 4.5")
-      },
-      'n_mastery' : {
-        friendlyString: I18n.t("n Number of Times")
-        showCalcIntSettingBox: true
-        calcIntLabel: I18n.t('Items: ')
-        calcIntRangeInfo: I18n.t('Between 2 and 5')
-        calcIntExample: I18n.t("Must achieve mastery at least 2 times.  Must also complete 2 items for calculation. Scores above mastery will be averaged to calculate final score.")
-        calcIntExampleLine1: I18n.t("1- Item Scores: 1, 3, 2, 4, 5, 3, 6. Mastery score set at 5.")
-        calcIntExampleLine2: I18n.t("2- Final score: 5.5")
-        calcIntExampleLine3: ""
-      },
-      'latest' : {
-        friendlyString: I18n.t("Most Recent Score")
-        showCalcIntSettingBox: false
-        calcIntLabel: ""
-        calcIntRangeInfo: ""
-        calcIntExample: I18n.t("Use the most recent score")
-        calcIntExampleLine1: I18n.t("1 - Item scores: 1, 2, 2, 3, 5, 5, 3")
-        calcIntExampleLine2: I18n.t("2 - Most recent score: 3")
-        calcIntExampleLine3: ""
-      },
-      'highest' : {
-        friendlyString: I18n.t("Highest Score")
-        showCalcIntSettingBox: false
-        calcIntLabel: ""
-        calcIntRangeInfo: ""
-        calcIntExample: I18n.t("Use the highest score")
-        calcIntExampleLine1: I18n.t("1 - Item scores: 3, 2, 2, 4, 1, 3, 4")
-        calcIntExampleLine2: I18n.t("2 - Highest score: 4")
-        calcIntExampleLine3: ""
-      }
-    }
-
     updateCalcInt: (e) =>
-      e.preventDefault() if e
+      e?.preventDefault()
+      @model.set({
+        calculation_method: $(e.target).val()
+      })
 
-      if !!@$el.find('#calculation_method').val()
-        calc_method = @$el.find('#calculation_method').val()
-      else
-        calc_method = @$el.find('#calculation_method').data('calculation-method')
-
-      intInfo = CALC_METHODS[calc_method]
-
-      if intInfo.showCalcIntSettingBox
-        @$el.find('#calculation_int_left_side').show()
-      else
-        @$el.find('#calculation_int_left_side').hide()
-      @$el.find('#calculation_int_label').text(intInfo.calcIntLabel)
-      @$el.find('#calculation_int_range_info').text(intInfo.calcIntRangeInfo)
-      @$el.find('#calculation_int_example').text(intInfo.calcIntExample)
-      @$el.find('#calculation_int_example_line_1').text(intInfo.calcIntExampleLine1)
-      @$el.find('#calculation_int_example_line_2').text(intInfo.calcIntExampleLine2)
-      @$el.find('#calculation_int_example_line_3').text(intInfo.calcIntExampleLine3)
-
-      if @state in ['edit', 'add'] && calc_method in ['n_mastery', 'decaying_average']
-        calc_int_el = @$el.find('#calculation_int')
-        calc_int = parseInt(calc_int_el.val())
-
-        switch calc_method
-          when 'n_mastery'
-            calc_int_el.val("5") if !calc_int || calc_int > 5
-          when 'decaying_average'
-            calc_int_el.val("65") if !calc_int || calc_int == 5
+    changeMasteryPoints: (e) ->
+      clearTimeout(@timeout) if @timeout
+      @timeout = setTimeout(=>
+        val = parseInt($(e.target).val())
+        return if _.isNaN(val)
+        if 0 <= val <= @model.get('points_possible')
+          @model.set({
+            mastery_points: $(e.target).val()
+          })
+          @calculationMethodFormView?.render()
+      , 500)
 
     # Update rating form field elements and the total.
     updateRatings: ->
@@ -193,6 +137,9 @@ define [
           $(i).attr 'name', i.name.replace /\[[0-9]+\]/, "[#{index}]"
       points = @$('.points_possible')
       points.html $.raw points.html().replace(/[0-9/.]+/, total)
+      @model.set({
+        points_possible: total
+      })
 
     showRatingDialog: (e) =>
       e.preventDefault()
@@ -207,29 +154,13 @@ define [
       @$(".screenreader-outcome-title").focus()
 
     render: ->
-      data = @model.toJSON()
+      data = @model.present()
       data.html_url = ENV.CONTEXT_URL_ROOT+'/outcomes/'+data.id
+      @calculationMethodFormView.state = @state
       switch @state
-        when 'edit'
+        when 'edit', 'add'
           @$el.html outcomeFormTemplate _.extend data,
-            calculationMethods: CALC_METHODS
-          @readyForm()
-        when 'add'
-          @$el.html outcomeFormTemplate _.extend data,
-            points_possible: 5
-            mastery_points: 3
-            ratings: [
-              description: I18n.t("criteria.exceeds_expectations", "Exceeds Expectations")
-              points: 5
-            ,
-              description: I18n.t("criteria.meets_expectations", "Meets Expectations")
-              points: 3
-            ,
-              description: I18n.t("criteria.does_not_meet_expectations", "Does Not Meet Expectations")
-              points: 0]
-            calculation_method: 'decaying_average'
-            calculation_int: 65
-            calculationMethods: CALC_METHODS
+            calculationMethods: @model.calculationMethods()
           @readyForm()
         when 'loading'
           @$el.empty()
@@ -242,9 +173,8 @@ define [
             setQuizMastery: @setQuizMastery,
             useForScoring: @useForScoring,
             isLargeRoster: ENV.IS_LARGE_ROSTER,
-            calc_method_str: CALC_METHODS[data.calculation_method].friendlyString
 
-      @updateCalcInt() unless @state == 'loading'
       @$('input:first').focus()
       @screenreaderTitleFocus()
+      @_afterRender()
       this

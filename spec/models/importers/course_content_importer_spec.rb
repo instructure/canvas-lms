@@ -339,6 +339,10 @@ describe Course do
       Importers::CourseContentImporter.import_content(@course, data, params, migration)
     end
   end
+
+  it 'should be able to i18n without keys' do
+    Importers::CourseContentImporter.translate('stuff')
+  end
 end
 
 def from_file_path(path, course)

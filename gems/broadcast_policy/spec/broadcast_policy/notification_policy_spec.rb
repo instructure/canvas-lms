@@ -30,29 +30,29 @@ describe BroadcastPolicy::NotificationPolicy do
 
   it "should not send if conditions are not met" do
     record = double('test object', skip_broadcasts: false)
-    subject.whenever = ->(r) { false }
+    subject.whenever = ->(_) { false }
     subject.broadcast(record)
     expect(BroadcastPolicy.notifier.messages).to be_empty
   end
 
   it "should not send if there is not a recipient list" do
     record = double('test object', skip_broadcasts: false)
-    subject.to = ->(r) { nil }
+    subject.to = ->(_) { nil }
     subject.broadcast(record)
     expect(BroadcastPolicy.notifier.messages).to be_empty
   end
 
-  it "should not send if there isn't a proper context" do
+  it "should send even if there isn't a context" do
     record = double('test object', skip_broadcasts: false)
-    subject.context = ->(r) { raise Error.new }
+    subject.context = ->(_) { nil }
     subject.broadcast(record)
-    expect(BroadcastPolicy.notifier.messages).to be_empty
+    expect(BroadcastPolicy.notifier.messages).to_not be_empty
   end
 
-  it "should not send if there isn't proper data" do
+  it "should send even if there isn't data" do
     record = double('test object', skip_broadcasts: false)
-    subject.data = ->(r) { raise Error.new }
+    subject.data = ->(_) { nil }
     subject.broadcast(record)
-    expect(BroadcastPolicy.notifier.messages).to be_empty
+    expect(BroadcastPolicy.notifier.messages).to_not be_empty
   end
 end 

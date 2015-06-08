@@ -1,0 +1,114 @@
+  <% js_bundle :navigation_header %>
+  <% load_env_data %>
+  <header id="header" class="ic-app-header no-print <%= 'no-user' unless @current_user %>">
+    <div class="ic-app-header__layout">
+      <div class="ic-app-header__primary">
+      <a href="#content" id="skip_navigation_link"><%= t 'links.skip_to_content', "Skip To Content" %></a>
+        <div role="navigation" class="ic-app-header__main-navigation">
+          <a href="<%= dashboard_url %>" class="ic-app-header__logomark">
+            <%# If image is set, allow custom logo image from admin upload %>
+            <% if @domain_root_account.settings[:header_image].present? %>
+              <img src="<%= @domain_root_account.settings[:header_image] %>" alt="<%= @domain_root_account.display_name %> logo image" class="ic-app-header__logomark_image" />
+            <% else %>
+            <%# Otherwise show Canvas logo %>
+              <%= render(:partial => 'shared/svg/svg_canvas_logomark_only.svg') %>
+            <% end %>
+            <span class="screenreader-only"><%= t 'links.dashboard', "My Dashboard" %></span>
+          </a>
+          <ul role="menu" id="menu"
+            class="ic-app-header__menu-list"
+            aria-label="<%= t('Main Navigation') %>"
+          >
+            <% if @has_courses %>
+              <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('courses') %>">
+                <a href="<%= courses_path %>" class="ic-app-header__menu-list-link">
+                  <div class="menu-item-icon-container">
+                    <%= render(:partial => "shared/svg/svg_icon_courses_new_styles.svg") %>
+                  </div>
+                  <div class="menu-item__text">
+                    <%= t('Courses') %>
+                  </div>
+                </a>
+              </li>
+            <% end %>
+            <% if @has_groups %>
+              <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('groups') %>">
+                <a href="/groups" class="ic-app-header__menu-list-link">
+                  <div class="menu-item-icon-container">
+                    <%= render(:partial => "shared/svg/svg_icon_courses_new_styles.svg") %>
+                  </div>
+                  <div class="menu-item__text">
+                    <%= t('Groups') %>
+                  </div>
+                </a>
+              </li>
+            <% end %>
+            <% if @has_accounts %>
+              <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('accounts') %>">
+                <a href="/accounts" class="ic-app-header__menu-list-link">
+                  <div class="menu-item-icon-container">
+                    <%= render(:partial => "shared/svg/svg_icon_accounts_new_styles.svg") %>
+                  </div>
+                  <div class="menu-item__text">
+                    <%= t('Accounts') %>
+                  </div>
+                </a>
+              </li>
+            <% end %>
+            <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('grades') %>">
+              <a href="<%= grades_path %>" class="ic-app-header__menu-list-link">
+                <div class="menu-item-icon-container">
+                  <%= render(:partial => "shared/svg/svg_icon_grades_new_styles.svg") %>
+                </div>
+                <div class="menu-item__text">
+                  <%= t('Grades') %>
+                </div>
+              </a>
+            </li>
+            <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('calendar') %>">
+              <a href="/calendar" class="ic-app-header__menu-list-link">
+                <div class="menu-item-icon-container">
+                  <%= render(:partial => "shared/svg/svg_icon_calendar_new_styles.svg") %>
+                </div>
+                <div class="menu-item__text">
+                  <%= t('Calendar') %>
+                </div>
+              </a>
+            </li>
+            <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('conversations') %>">
+              <a href="/conversations" class="ic-app-header__menu-list-link">
+                <div class="menu-item-icon-container">
+                  <%= render(:partial => "shared/svg/svg_icon_inbox.svg") %>
+                </div>
+                <div class="menu-item__text">
+                  <%= t('Inbox') %>
+                </div>
+              </a>
+            </li>
+            <% unless @current_user.nil? %>
+              <%= render(:partial => 'external_tools/global_nav_menu_items') %>
+            <% end %>
+            <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('profile') %>">
+              <a href="/profile" class="ic-app-header__menu-list-link">
+                <div class="menu-item-icon-container">
+                  <div class="ic-avatar">
+                    <img src="<%= @current_user.try { |usr| usr.avatar_image_url } %>" />
+                  </div>
+                </div>
+                <div class="menu-item__text">
+                  <%= t('Profile') %>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div role="navigation" class="ic-app-header__secondary-navigation">
+          <ul role="menu" class="ic-app-header__menu-list">
+            <li class="ic-app-header__menu-list-item">
+              <%= help_link %>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </header>

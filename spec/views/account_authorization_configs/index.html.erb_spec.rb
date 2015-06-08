@@ -51,7 +51,7 @@ describe "account_authorization_configs/index" do
     assigns[:presenter] = AccountAuthorizationConfigsPresenter.new(account)
     render 'account_authorization_configs/index'
     doc = Nokogiri::HTML(response.body)
-    expect(doc.css('form.edit_account_authorization_config_ldap tr.last_timeout_failure').length).to eq 1
+    expect(doc.css('.last_timeout_failure').length).to eq 1
   end
 
   it "should display more than 2 LDAP configs" do
@@ -62,6 +62,6 @@ describe "account_authorization_configs/index" do
     assigns[:presenter] = AccountAuthorizationConfigsPresenter.new(account)
     render 'account_authorization_configs/index'
     doc = Nokogiri::HTML(response.body)
-    expect(doc.css('form.edit_account_authorization_config_ldap').length).to eq(4)
+    expect(doc.css('input[value=ldap]').length).to eq(5) # 4 + 1 hidden for new
   end
 end

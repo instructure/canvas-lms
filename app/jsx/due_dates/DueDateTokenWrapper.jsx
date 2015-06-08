@@ -7,9 +7,8 @@ define([
   'jsx/due_dates/OverrideStudentStore',
   'bower/react-tokeninput/dist/react-tokeninput',
   'i18n!assignments',
-  'jquery',
-  'compiled/regexp/rEscape'
-], (_ ,React, ReactModal, OverrideStudentStore, TokenInput, I18n, $, rEscape) => {
+  'jquery'
+], (_ ,React, ReactModal, OverrideStudentStore, TokenInput, I18n, $) => {
 
   var ComboboxOption = React.createFactory(TokenInput.Option)
   var TokenInput = React.createFactory(TokenInput)
@@ -103,8 +102,7 @@ define([
     },
 
     enumerableStartsWith(userInput, enumerable){
-      var escapedInput = rEscape(userInput)
-      var filter = new RegExp('^' + escapedInput, 'i')
+      var filter = new RegExp('^'+userInput, 'i')
       return enumerable(this.props.potentialOptions, function(option){
         return filter.test(option.name)
       })

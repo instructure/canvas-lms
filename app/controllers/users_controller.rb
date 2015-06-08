@@ -147,6 +147,7 @@ require 'atom'
 class UsersController < ApplicationController
   include Delicious
   include SearchHelper
+  include SectionTabHelper
   include I18nUtilities
   include CustomColorHelper
 
@@ -479,7 +480,10 @@ class UsersController < ApplicationController
     end
     disable_page_views if @current_pseudonym && @current_pseudonym.unique_id == "pingdom@instructure.com"
 
-    js_env :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url
+    js_env({
+      :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
+      :DASHBOARD_COURSES => map_courses_for_menu(@current_user.menu_courses)
+    })
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
     @pending_invitations = @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid], :preload_courses => true).select { |e| e.invited? }

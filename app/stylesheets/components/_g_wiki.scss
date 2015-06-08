@@ -361,7 +361,10 @@ $revision-button-hover-color: $ic-brand-primary;
       padding: 0 $ic-sp;
       @include breakpoint(desktop) { padding: 0 $ic-sp*3 0 $ic-sp*2; } 
     }
-    @else { padding: 15px 25px; }
+    @else { 
+      padding: 15px 25px; 
+      overflow-x: auto;
+    }
   }
   .floating_links {
     margin-right: 15px;
@@ -428,7 +431,10 @@ $revision-button-hover-color: $ic-brand-primary;
         min-height: 502px;  
       }
     }
-    @else { min-height: 502px; }
+    @else { 
+      min-height: 502px; 
+      display: flex;
+    }
   }
   .show-content {
     @if $use_new_styles {
@@ -439,6 +445,7 @@ $revision-button-hover-color: $ic-brand-primary;
       @include breakpoint(wide) { margin-right: $revision-sidebar-width; }
     }
     @else {
+      flex: 3 3 0%;
       float: left;
       margin-right: $revision-sidebar-width + 1px;
     }
@@ -464,6 +471,7 @@ $revision-button-hover-color: $ic-brand-primary;
       }  
     }
     @else {
+      flex: 1 1 0%;
       position: absolute;
       top: 0;
       bottom: 0;
