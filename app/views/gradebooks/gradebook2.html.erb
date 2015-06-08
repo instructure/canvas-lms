@@ -4,7 +4,7 @@
   @show_left_side = false
   @show_embedded_chat = false
   add_crumb t(:individual_view, "Switch to Individual View"), context_url(@context, :change_gradebook_version_context_gradebook_url, :version => "srgb"), :id => 'change_gradebook_version_link_holder'
-  jammit_css :slickgrid, :gradebook2
+  css_bundle :slickgrid, :gradebook2
   js_bundle :gradebook2
 %>
 <div id="keyboard_navigation"></div>

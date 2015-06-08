@@ -1,5 +1,5 @@
 <% js_env :crowdsourced_locales => crowdsourced_locales %>
-<% jammit_css :locale %>
+<% css_bundle :locale %>
 <% js_bundle :locale %>
 <i style="<%= hidden %>" class="locale-warning icon-warning" data-tooltip='{"tooltipClass":"popover", "position":"right"}'
    data-html-tooltip-title="<div class='popover-title'><%= t(:crowdsourced_warning_title, "Crowdsourced Language") %></div><div class='popover-content'><p>

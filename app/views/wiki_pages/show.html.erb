@@ -1,7 +1,7 @@
 <%
   content_for :page_title, join_title(@page.title.to_s, @context.name)
   js_bundle :wiki_page_show
-  jammit_css :wiki_page
+  css_bundle :wiki_page
 %>
 
 <%= render "shared/mark_as_done" %>

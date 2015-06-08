@@ -5,7 +5,7 @@
   js_env :SELF_ENROLLMENT_OPTIONS => {:confirmEnrollmentUrl => @confirm_enrollment_url} 
 
   if !@current_user && !@embedded_view
-    jammit_css :login
+    css_bundle :login
     @headers = false
     @body_classes << "modal"
   end

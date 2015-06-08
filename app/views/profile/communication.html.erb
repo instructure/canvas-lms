@@ -1,6 +1,6 @@
 <%
    content_for :page_title, t(:page_title, 'Notification Preferences')
-   jammit_css :notification_preferences
+   css_bundle :notification_preferences
    js_bundle :notification_preferences
    add_crumb(@user.short_name, user_profile_path(@current_user) )
    add_crumb(t(:crumb_notification_preferences, 'Notification Preferences'), communication_profile_path )

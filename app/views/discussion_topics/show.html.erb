@@ -30,7 +30,7 @@
 <% end %>
 <%
   js_bundle :discussion
-  jammit_css :tinymce, :discussions, :learning_outcomes
+  css_bundle :tinymce, :discussions, :learning_outcomes
 %>
 
 <% if @unlock_at && @unlock_at > Time.now && !can_do(@context, @current_user, :moderate_forum) %>

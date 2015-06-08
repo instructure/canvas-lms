@@ -76,7 +76,7 @@
 <% end %>
 
 <% js_bundle :user_name %>
-<% jammit_css :roster_user %>
+<% css_bundle :roster_user %>
 
 <h1><%= @user.name %></h1>
 <% if can_do(@context, @current_user, :manage_students) && !@context.is_a?(Group)%>

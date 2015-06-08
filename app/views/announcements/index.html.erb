@@ -3,7 +3,7 @@
   content_for :page_title, join_title(t('#titles.announcements', "Announcements"), @context.name)
   feed_code = @context_enrollment.try(:feed_code) || (@context.available? && @context.feed_code)
   js_bundle :announcements_index
-  jammit_css :discussions_list
+  css_bundle :discussions_list
 %>
 <% content_for :auto_discovery do %>
   <% feed_key = nil

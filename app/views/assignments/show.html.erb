@@ -12,7 +12,7 @@
 <% else %>
 
 <%
-  jammit_css :assignments
+  css_bundle :assignments
   js_bundle :assignment_show
 %>
 
@@ -198,7 +198,7 @@
 <% end %>
 
 <% js_bundle :edit_rubric %>
-<% jammit_css :learning_outcomes %>
+<% css_bundle :learning_outcomes %>
 
 <% if can_do(@assignment, @current_user, :update) %>
   <%# HACK! this is here because edit_rubric.js expects there to be a #add_rubric_url on the page and sets it's <form action="..."> to it %>

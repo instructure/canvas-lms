@@ -1,4 +1,4 @@
-<% jammit_css :context_module_progressions %>
+<% css_bundle :context_module_progressions %>
 <% content_for :page_title, join_title(t('titles.student_progression', "Module Progression by Student"), @context.name) %>
 <% add_crumb t('titles.student_progress', 'Student Progress'), context_url(@context, :progressions_context_context_modules_url) %>
 <% js_env :COURSE_ID => @context.id %>

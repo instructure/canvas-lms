@@ -33,8 +33,7 @@
 </style>
 <% end %>
 
-<% jammit_css :roster_user %>
-<% jammit_css :context_list %>
+<% css_bundle :roster_user, :context_list %>
 
 <div id="user-info-fieldsets">
   <%= render :partial => 'users/name' %>

@@ -102,6 +102,6 @@
     <a href="<%= context_url(@context, :context_assignment_url, "{{ assignment_id }}") %>" class="set_default_grade_url">&nbsp;</a>
     <a href="<%= context_url(@context, :context_gradebook_url) %>" class="gradebook_url">&nbsp;</a>
   </div>
-  <% jammit_css :datagrid, :attendance %>
+  <% css_bundle :datagrid, :attendance %>
   <% js_bundle :datagrid, :attendance %>
 <% end %>

@@ -11,7 +11,7 @@
 <% content_for :right_side do %>
   <%= render "take_quiz_right_side" %>
 <% end %>
-<% jammit_css :quizzes, :tinymce %>
+<% css_bundle :quizzes, :tinymce %>
 
 <header class="quiz-header">
   <h1><%= @quiz.quiz_title || @quiz.readable_type %></h1>

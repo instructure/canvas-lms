@@ -2,7 +2,7 @@
   @active_tab = "settings"
   add_crumb t(:settings_crumb, "Settings")
   js_bundle :account_settings
-  jammit_css :account_settings, :reports, :tinymce
+  css_bundle :account_settings, :reports, :tinymce
   content_for :page_title, t(:page_title, "Account Settings")
   if can_do(@context, @current_user, :manage_storage_quotas)
     js_env :ACCOUNT => {

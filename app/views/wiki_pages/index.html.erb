@@ -1,6 +1,6 @@
 <%
   content_for :page_title, join_title(@context.name, t('titles.pages', 'Pages'))
   content_for :right_side, render(:partial => "shared/wiki_sidebar")
-  jammit_css :tinymce
+  css_bundle :tinymce
   js_bundle :wiki_page_index
 %>

@@ -1,9 +1,8 @@
-<% content_for :page_title do %>
-  <%= join_title t(:page_title, "Web Conferences"), @context.name %>
-<% end %>
-
-<% js_bundle(:conferences)  %>
-<% jammit_css(:conferences) %>
+<%
+  content_for :page_title, join_title(t(:page_title, "Web Conferences"), @context.name)
+  js_bundle :conferences
+  css_bundle :conferences
+%>
 
 <h1 class="screenreader-only"><%= t(:conference_header, 'Conferences')%></h1>
 

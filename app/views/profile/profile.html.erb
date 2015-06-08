@@ -29,7 +29,7 @@
           :PROFILE => @user_data
 %>
 <% js_bundle :profile %>
-<% jammit_css :profile_edit %>
+<% css_bundle :profile_edit %>
 
 <% if service_enabled?(:avatars) %>
   <%= avatar(@user, url: '#', edit: true, class: "profile_pic_link #{@user.avatar_state}", title: t('titles.click_to_change_profile_pic', "Click to change profile pic")) %>

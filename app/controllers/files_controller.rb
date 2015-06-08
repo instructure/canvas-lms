@@ -364,7 +364,7 @@ class FilesController < ApplicationController
       @page_title = t('files_page_title', 'Files')
       @body_classes << 'full-width padless-content'
       js_bundle :react_files
-      jammit_css :react_files
+      css_bundle :react_files
       js_env({
         :FILES_CONTEXTS => files_contexts,
         :NEW_FOLDER_TREE => @context.feature_enabled?(:use_new_tree)

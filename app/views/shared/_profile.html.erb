@@ -1,5 +1,5 @@
 <%
-  jammit_css :profile_show, :tinymce
+  css_bundle :profile_show, :tinymce
   js_bundle :profile_show
   @body_classes << 'not-editing'
   js_env PROFILE: @user_data if @user_data[:can_edit]

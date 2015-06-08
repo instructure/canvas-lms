@@ -1,6 +1,6 @@
 <%
   js_bundle :grade_summary, :rubric_assessment
-  jammit_css :grade_summary
+  css_bundle :grade_summary
   content_for :page_title, join_title(t(:page_title, "Grades for %{student}", :student => @presenter.student_name), @context.name)
 %>
 
