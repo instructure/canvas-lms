@@ -77,7 +77,7 @@ define([
 
     findMatchingOption(userInput){
       if(typeof userInput !== 'string') { return userInput }
-      return this.enumerableStartsWith(userInput, _.find)
+      return this.enumerableContainsString(userInput, _.find)
     },
 
     suppressKeys(e){
@@ -102,9 +102,9 @@ define([
       })
     },
 
-    enumerableStartsWith(userInput, enumerable){
+    enumerableContainsString(userInput, enumerable){
       var escapedInput = rEscape(userInput)
-      var filter = new RegExp('^' + escapedInput, 'i')
+      var filter = new RegExp(escapedInput, 'i')
       return enumerable(this.props.potentialOptions, function(option){
         return filter.test(option.name)
       })
@@ -116,7 +116,7 @@ define([
 
     filteredTags() {
       if (this.state.userInput === '') return this.props.potentialOptions
-      return this.enumerableStartsWith(this.state.userInput, _.filter)
+      return this.enumerableContainsString(this.state.userInput, _.filter)
     },
 
     // -------------------

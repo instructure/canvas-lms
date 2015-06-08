@@ -21,7 +21,7 @@ define [
         ]
         potentialOptions: [
           {course_section_id: "1", name: "Patricians"},
-          {id: "1", name: "Seneca"},
+          {id: "1", name: "Seneca The Elder"},
           {id: "2", name: "Agrippa"},
           {id: "3", name: "Publius"},
           {id: "4", name: "Scipio"},
@@ -69,7 +69,7 @@ define [
     equal @DueDateTokenWrapper.optionsForMenu()[1].props.value, "course_section"
     equal @DueDateTokenWrapper.optionsForMenu()[2].props.value, "Patricians"
     equal @DueDateTokenWrapper.optionsForMenu()[4].props.value, "student"
-    equal @DueDateTokenWrapper.optionsForMenu()[5].props.value, "Seneca"
+    equal @DueDateTokenWrapper.optionsForMenu()[5].props.value, "Seneca The Elder"
 
   test 'handleTokenAdd is called when a token is added', ->
     addProp = @sandbox.stub(@DueDateTokenWrapper.props, "handleTokenAdd")
@@ -90,3 +90,7 @@ define [
   test 'findMatchingOption can handle strings with weird characters', ->
     foundToken = @DueDateTokenWrapper.findMatchingOption("Plebs | [")
     equal foundToken["name"], "Plebs | [ $"
+
+  test 'findMatchingOption can match characters in the middle of a string', ->
+    foundToken = @DueDateTokenWrapper.findMatchingOption("The Elder")
+    equal foundToken["name"], "Seneca The Elder"
