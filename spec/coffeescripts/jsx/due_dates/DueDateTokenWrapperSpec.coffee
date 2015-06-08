@@ -25,7 +25,11 @@ define [
           {id: "2", name: "Agrippa"},
           {id: "3", name: "Publius"},
           {id: "4", name: "Scipio"},
-          {course_section_id: "2", name: "Plebs | [ $"} # named strangely to test regex
+          {course_section_id: "2", name: "Plebs | [ $"}, # named strangely to test regex
+          {course_section_id: "3", name: "Foo"},
+          {course_section_id: "4", name: "Bar"},
+          {course_section_id: "5", name: "Baz"},
+          {course_section_id: "6", name: "Qux"},
         ]
         handleTokenAdd: ->
         handleTokenRemove: ->
@@ -57,8 +61,8 @@ define [
     equal fetch.callCount, 2
 
   test 'if a user types handleInput filters the options', ->
-    # 1 prompt, 2 sections, 4 students, 2 headers = 8
-    equal @DueDateTokenWrapper.optionsForMenu().length, 9
+    # 1 prompt, 3 sections, 4 students, 2 headers = 10
+    equal @DueDateTokenWrapper.optionsForMenu().length, 10
 
     @DueDateTokenWrapper.handleInput("scipio")
     @clock.tick(2000)
@@ -68,8 +72,8 @@ define [
   test 'menu options are grouped by type', ->
     equal @DueDateTokenWrapper.optionsForMenu()[1].props.value, "course_section"
     equal @DueDateTokenWrapper.optionsForMenu()[2].props.value, "Patricians"
-    equal @DueDateTokenWrapper.optionsForMenu()[4].props.value, "student"
-    equal @DueDateTokenWrapper.optionsForMenu()[5].props.value, "Seneca The Elder"
+    equal @DueDateTokenWrapper.optionsForMenu()[5].props.value, "student"
+    equal @DueDateTokenWrapper.optionsForMenu()[6].props.value, "Seneca The Elder"
 
   test 'handleTokenAdd is called when a token is added', ->
     addProp = @sandbox.stub(@DueDateTokenWrapper.props, "handleTokenAdd")
@@ -94,3 +98,9 @@ define [
   test 'findMatchingOption can match characters in the middle of a string', ->
     foundToken = @DueDateTokenWrapper.findMatchingOption("The Elder")
     equal foundToken["name"], "Seneca The Elder"
+
+  test 'hidingValidMatches updates as matching tag number changes', ->
+    ok @DueDateTokenWrapper.hidingValidMatches()
+
+    @DueDateTokenWrapper.handleInput("scipio")
+    ok !@DueDateTokenWrapper.hidingValidMatches()

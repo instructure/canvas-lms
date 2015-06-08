@@ -28,8 +28,8 @@ define([
     },
 
     MINIMUM_SEARCH_LENGTH: 3,
-    MAXIMUM_STUDENTS_TO_SHOW: 10,
-    MAXIMUM_SECTIONS_TO_SHOW: 5,
+    MAXIMUM_STUDENTS_TO_SHOW: 7,
+    MAXIMUM_SECTIONS_TO_SHOW: 3,
     MS_TO_DEBOUNCE_SEARCH: 800,
 
     // -------------------
@@ -97,7 +97,6 @@ define([
 
     groupBySectionOrStudent(options){
       return _.groupBy(options, function(opt){
-
         return opt["course_section_id"] ? "course_section" : "student"
       })
     },
@@ -119,6 +118,11 @@ define([
       return this.enumerableContainsString(this.state.userInput, _.filter)
     },
 
+    filteredTagsForType(type){
+      var groupedTags = this.groupBySectionOrStudent(this.filteredTags())
+      return groupedTags && groupedTags[type] || []
+    },
+
     // -------------------
     //      Rendering
     // -------------------
@@ -137,31 +141,30 @@ define([
 
     // ---- options ----
 
-    selectableOptions(groupedOptions, type){
-      var numberToShow = type === "Student" ? this.MAXIMUM_STUDENTS_TO_SHOW : this.MAXIMUM_SECTIONS_TO_SHOW
-      return _.chain(groupedOptions[type])
-        .take(numberToShow)
-        .map((set) => this.selectableOption(set))
-        .value()
-    },
-
     optionsForMenu() {
-      var groupedOptions = this.groupBySectionOrStudent(this.filteredTags())
-      var groupHeadings = ["course_section", "student"]
-
-      var groups = groupHeadings.map((heading) => {
-        var header = this.headerOption(heading)
-        var options = groupedOptions[heading] ?
-          this.selectableOptions(groupedOptions, heading) :
-          []
-        return _.any(options) ? _.union([header], options) : []
-      })
-
       var options = this.promptText() ?
-        _.union([this.promptOption()], _.flatten(groups)) :
-        _.flatten(groups)
+        _.union([this.promptOption()], this.sectionAndStudentOptions()) :
+        this.sectionAndStudentOptions()
 
       return options
+    },
+
+    sectionAndStudentOptions(){
+      return _.union(this.sectionOptions(), this.studentOptions())
+    },
+
+    studentOptions(){
+      return this.optionsForType("student")
+    },
+
+    sectionOptions(){
+      return this.optionsForType("course_section")
+    },
+
+    optionsForType(optionType){
+      var header = this.headerOption(optionType)
+      var options = this.selectableOptions(optionType)
+      return _.any(options) ? _.union([header], options) : []
     },
 
     headerOption(heading){
@@ -169,6 +172,14 @@ define([
       return <ComboboxOption className="ic-tokeninput-header" value={heading} key={heading}>
                {headerText}
              </ComboboxOption>
+    },
+
+    selectableOptions(type){
+      var numberToShow = type === "student" ? this.MAXIMUM_STUDENTS_TO_SHOW : this.MAXIMUM_SECTIONS_TO_SHOW
+      return _.chain(this.filteredTagsForType(type))
+        .take(numberToShow)
+        .map((set) => this.selectableOption(set))
+        .value()
     },
 
     selectableOption(set){
@@ -194,8 +205,8 @@ define([
         return I18n.t("Searching")
       }
 
-      if(this.state.userInput.length < this.MINIMUM_SEARCH_LENGTH && !this.props.allStudentsFetched){
-        return I18n.t("Type more to find additional students")
+      if(this.state.userInput.length < this.MINIMUM_SEARCH_LENGTH && !this.props.allStudentsFetched || this.hidingValidMatches()){
+        return I18n.t("Continue typing to find additional sections or students.")
       }
 
       if(_.isEmpty(this.filteredTags())){
@@ -209,6 +220,16 @@ define([
           <div className="tokenInputThrobber"/>
         )
       }
+    },
+
+    hidingValidMatches(){
+      var allSectionTags = this.filteredTagsForType("course_section")
+      var hidingSections = allSectionTags && allSectionTags.length > this.MAXIMUM_SECTIONS_TO_SHOW
+
+      var allStudentTags = this.filteredTagsForType("student")
+      var hidingStudents = allStudentTags && allStudentTags.length > this.MAXIMUM_STUDENTS_TO_SHOW
+
+      return hidingSections || hidingStudents
     },
 
     // ---- render ----
