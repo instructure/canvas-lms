@@ -194,15 +194,6 @@ module SIS
               elsif role_name =~ /\Ata\z/i
                 'TaEnrollment'
               elsif role_name =~ /\Aobserver\z/i
-                if associated_sis_user_id
-                  a_pseudo = root_account.pseudonyms.where(sis_user_id: associated_sis_user_id).first
-                  if a_pseudo
-                    associated_user_id = a_pseudo.user_id
-                  else
-                    @messages << "An enrollment referenced a non-existent associated user #{associated_sis_user_id}"
-                    next
-                  end
-                end
                 'ObserverEnrollment'
               elsif role_name =~ /\Adesigner\z/i
                 'DesignerEnrollment'
@@ -214,7 +205,21 @@ module SIS
             end
 
             role ||= Role.get_built_in_role(type)
-            enrollment = @section.all_enrollments.where(:user_id => user, :type => type, :associated_user_id => associated_user_id, :role_id => role.id).first
+
+            if associated_sis_user_id && type == 'ObserverEnrollment'
+              a_pseudo = root_account.pseudonyms.where(sis_user_id: associated_sis_user_id).first
+              if a_pseudo
+                associated_user_id = a_pseudo.user_id
+              else
+                @messages << "An enrollment referenced a non-existent associated user #{associated_sis_user_id}"
+                next
+              end
+            end
+
+            enrollment = @section.all_enrollments.where(user_id: user,
+                                                        type: type,
+                                                        associated_user_id: associated_user_id,
+                                                        role_id: role.id).first
 
             unless enrollment
               enrollment = Enrollment.typed_enrollment(type).new

@@ -636,7 +636,7 @@ ActiveRecord::Relation.class_eval do
 
   def find_in_batches_with_usefulness(options = {}, &block)
     # already in a transaction (or transactions don't matter); cursor is fine
-    if (connection.adapter_name == 'PostgreSQL' && (connection.readonly? || connection.open_transactions > (Rails.env.test? ? 1 : 0))) && !options[:start]
+    if can_use_cursor? && !options[:start]
       self.activate { find_in_batches_with_cursor(options, &block) }
     elsif find_in_batches_needs_temp_table?
       raise ArgumentError.new("GROUP and ORDER are incompatible with :start, as is an explicit select without the primary key") if options[:start]
@@ -649,7 +649,14 @@ ActiveRecord::Relation.class_eval do
   end
   alias_method_chain :find_in_batches, :usefulness
 
-  def find_in_batches_with_cursor(options = {}, &block)
+  def can_use_cursor?
+    (connection.adapter_name == 'PostgreSQL' &&
+      (Shackles.environment == :slave ||
+        connection.readonly? ||
+        connection.open_transactions > (Rails.env.test? ? 1 : 0)))
+  end
+
+  def find_in_batches_with_cursor(options = {})
     batch_size = options[:batch_size] || 1000
     klass.transaction do
       begin

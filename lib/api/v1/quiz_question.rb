@@ -38,6 +38,9 @@ module Api::V1::QuizQuestion
     correct_comments
     incorrect_comments
     neutral_comments
+    correct_comments_html
+    incorrect_comments_html
+    neutral_comments_html
     answers
     variables
     formulas

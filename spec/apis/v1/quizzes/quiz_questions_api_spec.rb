@@ -106,6 +106,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
 
         it "has only the allowed question output fields" do
           question_fields = Api::V1::QuizQuestion::API_ALLOWED_QUESTION_OUTPUT_FIELDS[:only].map(&:to_sym) +  Api::V1::QuizQuestion::API_ALLOWED_QUESTION_DATA_OUTPUT_FIELDS.map(&:to_sym)
+          expect(question_fields).to include(:correct_comments_html)
           @json.keys.each { |key| expect(question_fields.to_s).to include(key.to_s) }
         end
 
