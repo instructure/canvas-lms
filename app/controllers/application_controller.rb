@@ -1260,7 +1260,7 @@ class ApplicationController < ActionController::Base
           @return_url = success_url
         else
           if @context
-            @return_url = named_context_url(@context, :context_external_content_success_url, 'external_tool_redirect')
+            @return_url = named_context_url(@context, :context_external_content_success_url, 'external_tool_redirect', include_host: true)
           else
             @return_url = external_content_success_url('external_tool_redirect')
           end
