@@ -473,10 +473,10 @@ describe QuizzesHelper do
       end
     end
 
-    it "returns -- if quiz is practice quiz or assignment" do
+    it "returns empty if quiz is practice quiz or assignment" do
       ['assignment', 'practice_quiz'].each do |quiz_type|
         @quiz.expects(:quiz_type).returns quiz_type
-        expect(point_value_for_input(user_answer, question)).to eq "--"
+        expect(point_value_for_input(user_answer, question)).to eq ""
       end
     end
 

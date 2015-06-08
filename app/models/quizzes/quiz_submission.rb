@@ -676,10 +676,15 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       answer = answer.with_indifferent_access
       score = params["question_score_#{answer["question_id"]}".to_sym]
       answer["more_comments"] = params["question_comment_#{answer["question_id"]}".to_sym] if params["question_comment_#{answer["question_id"]}".to_sym]
-      if score != "--" && score.present? # != ""
-        answer["points"] = (score.to_f rescue nil) || answer["points"] || 0
-        answer["correct"] = "defined" if answer["correct"] == "undefined" && (score.to_f rescue nil)
-      elsif score == "--"
+      if score.present?
+        begin
+          float_score = score.to_f
+        rescue
+          float_score = nil
+        end
+        answer["points"] = float_score || answer["points"] || 0
+        answer["correct"] = "defined" if answer["correct"] == "undefined" && float_score
+      elsif score && score.empty?
         answer["points"] = 0
         answer["correct"] = "undefined"
       end

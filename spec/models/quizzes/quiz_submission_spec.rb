@@ -627,7 +627,7 @@ describe Quizzes::QuizSubmission do
         'context_type' => 'Course',
         'submission_version_number' => '1',
         "question_score_#{@questions[0].id}" => '1',
-        "question_score_#{@questions[1].id}" => "--"
+        "question_score_#{@questions[1].id}" => ""
       })
       expect(@quiz_submission.submission.workflow_state).to eql 'pending_review'
     end
