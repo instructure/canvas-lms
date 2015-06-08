@@ -60,79 +60,78 @@ class ContextModuleProgression < ActiveRecord::Base
   end
 
   class CompletedRequirementCalculator
-    attr_accessor :requirements_met, :view_requirements
+    attr_accessor :actions_done, :view_requirements, :met_requirement_count
 
-    def started?
-      @started
-    end
-
-    def completed?
-      @completed
+    def all_met?
+      !@any_unmet
     end
 
     def changed?
-      @orig_keys != sorted_requirement_keys
+      @orig_keys != sorted_action_keys
     end
 
-    def initialize(requirements_met)
-      @requirements_met = requirements_met
-      @orig_keys = sorted_requirement_keys
-      @view_requirements = []
-      @started = false
-      @completed = true
+    def initialize(actions_done)
+      self.actions_done = actions_done
+      self.met_requirement_count = 0
 
-      @requirements_met = @requirements_met.reject{ |r| %w(min_score max_score).include?(r[:type]) }
+      @orig_keys = sorted_action_keys
+
+      self.view_requirements = []
+      self.actions_done.reject!{ |r| %w(min_score max_score).include?(r[:type]) }
     end
 
-    def sorted_requirement_keys
-      requirements_met.map{ |r| "#{r[:id]}_#{r[:type]}" }.sort
+    def sorted_action_keys
+      self.actions_done.map{ |r| "#{r[:id]}_#{r[:type]}" }.sort
     end
 
-    def requirement_met?(req)
-      met = requirements_met.any? {|r| r[:id] == req[:id] && r[:type] == req[:type] }
-      @started = true if met
-      met
+    def increment_met_requirement_count!
+      self.met_requirement_count += 1
     end
 
-    def requirement_met(req, is_met)
-      unless is_met
-        @completed = false
-        return
+    def requirement_met?(req, include_type = true)
+      self.actions_done.any? {|r| r[:id] == req[:id] && (include_type ? r[:type] == req[:type] : true)}
+    end
+
+    def check_action!(action, is_met)
+      if is_met
+        add_done_action!(action)
+      else
+        @any_unmet = true
       end
-
-      @started = true
-      requirements_met << req
     end
 
-    def any_requirement_met?(req)
-      met = requirements_met.any? {|r| r[:id] == req[:id] }
-      @started = true if met
-      met
+    def add_done_action!(action)
+      increment_met_requirement_count!
+      self.actions_done << action
     end
 
-    def view_requirement(req)
-      view_requirements << req
+    def add_view_requirement(req)
+      self.view_requirements << req
     end
 
     def check_view_requirements
-      view_requirements.each do |req|
-        requirement_met(req, any_requirement_met?(req))
+      self.view_requirements.each do |req|
+        # should mark a must_view as true if a completed must_submit/min_score action already exists
+        check_action!(req, requirement_met?(req, false))
       end
     end
   end
 
   def evaluate_requirements_met
     result = evaluate_uncompleted_requirements
-    if result.completed?
+
+    count_needed = self.context_module.requirement_count
+    # if no requirement_count is specified, assume all are needed
+    if (count_needed && result.met_requirement_count >= count_needed) || result.all_met?
       self.workflow_state = 'completed'
-    elsif result.started?
+    elsif result.met_requirement_count >= 1
       self.workflow_state = 'started'
     else
       self.workflow_state = 'unlocked'
     end
 
     if result.changed?
-      self.requirements_met = result.requirements_met
+      self.requirements_met = result.actions_done
     end
   end
   private :evaluate_requirements_met
@@ -150,19 +149,22 @@ class ContextModuleProgression < ActiveRecord::Base
       tag = tags_hash[req[:id]]
       next unless tag
 
-      next if calc.requirement_met?(req)
+      if calc.requirement_met?(req)
+        calc.increment_met_requirement_count!
+        next
+      end
 
       if req[:type] == 'must_view'
-        calc.view_requirement(req)
+        calc.add_view_requirement(req)
       elsif %w(must_contribute must_mark_done).include? req[:type]
-        calc.requirement_met(req, false)
+        # must_contribute is handled by ContextModule#update_for
+        calc.check_action!(req, false)
       elsif req[:type] == 'must_submit'
         sub = get_submission_or_quiz_submission(tag)
-        calc.requirement_met(req, sub && %w(submitted graded complete pending_review).include?(sub.workflow_state))
+        calc.check_action!(req, sub && %w(submitted graded complete pending_review).include?(sub.workflow_state))
       elsif req[:type] == 'min_score' || req[:type] == 'max_score'
-        calc.requirement_met(req, evaluate_score_requirement_met(req, tag)) if tag.scoreable?
+        calc.check_action!(req, evaluate_score_requirement_met(req, tag) && tag.scoreable?)
       end
-      # must_contribute is handled by ContextModule#update_for
     end
     calc.check_view_requirements
     calc
