@@ -21,12 +21,26 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'nokogiri'
 
 describe UserContent do
-  describe "find_user_content" do
+  describe ".find_user_content" do
     it "should not yield non-string width/height fields" do
       doc = Nokogiri::HTML::DocumentFragment.parse('<object width="100%" />')
-      UserContent.find_user_content(doc) do |node, uc|
+      UserContent.find_user_content(doc) do |_, uc|
         expect(uc.width).to eq '100%'
       end
+    end
+  end
+
+  describe ".find_equation_images" do
+    it "yields each equation image one at a time" do
+      html = "<div><ul><li><img class='equation_image'/></li>"\
+             "<li><img class='equation_image'/></li>"\
+             "<li><img class='nothing_special'></li></ul></div>"
+      parsed = Nokogiri::HTML::DocumentFragment.parse(html)
+      yield_count = 0
+      UserContent.find_equation_images(parsed) do
+        yield_count += 1
+      end
+      expect(yield_count).to eq(2)
     end
   end
 
@@ -99,6 +113,23 @@ describe UserContent do
       rewriter = UserContent::HtmlRewriter.new(@course, nil)
       expect(rewriter.user_can_view_content?(att1)).to be_truthy
       expect(rewriter.user_can_view_content?(att2)).to be_falsey
+    end
+  end
+
+  describe ".latex_to_mathml" do
+    it "translates valid latex string cleanly" do
+      mathml = "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\">"\
+               "<mo lspace=\"thinmathspace\" rspace=\"thinmathspace\">&Sum;</mo>"\
+               "<mn>1</mn><mo>.</mo><mo>.</mo><mi>n</mi></math>"
+      expect(UserContent.latex_to_mathml('\sum 1..n')).to eq(mathml)
+    end
+
+    it "returns a blank string for invalid latex" do
+      expect(UserContent.latex_to_mathml('1234!@#$!@#$!@#%@#%^^&!')).to eq("")
+    end
+
+    it "prefers not translating over bombing with invalid-but-understandable latex" do
+      expect(UserContent.latex_to_mathml('\sum1..n')).to eq("")
     end
   end
 end

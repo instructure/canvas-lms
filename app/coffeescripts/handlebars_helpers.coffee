@@ -9,13 +9,13 @@ define [
   'compiled/util/semanticDateRange'
   'compiled/util/dateSelect'
   'compiled/util/mimeClass'
-  'compiled/str/convertApiUserContent'
+  'compiled/str/apiUserContent'
   'compiled/str/TextHelper'
   'jquery.instructure_date_and_time'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'translations/_core_en'
-], (tz, enrollmentName, Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, mimeClass, convertApiUserContent, textHelper) ->
+], (tz, enrollmentName, Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, mimeClass, apiUserContent, textHelper) ->
 
   Handlebars.registerHelper name, fn for name, fn of {
     t : (args..., options) ->
@@ -194,7 +194,7 @@ define [
     # use this method to process any user content fields returned in api responses
     # this is important to handle object/embed tags safely, and to properly display audio/video tags
     convertApiUserContent: (html, {hash}) ->
-      content = convertApiUserContent(html, hash)
+      content = apiUserContent.convert(html, hash)
       # if the content is going to get picked up by tinymce, do not mark as safe
       # because we WANT it to be escaped again.
       content = new Handlebars.SafeString content unless hash and hash.forEditing
