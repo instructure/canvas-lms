@@ -222,8 +222,8 @@ module CanvasExpected
   SHORT_ANSWER = {:incorrect_comments=>"Incorrect overall feedback",
                   :question_type=>"short_answer_question",
                   :answers=>
-                          [{:comments=>"", :weight=>100, :text=>"short answer", :comments=>"correct feedback"},
-                           {:comments=>"", :weight=>100, :text=>"Something else", :comments=>"I guess that's technically true, but it's still wrong."}],
+                          [{:weight=>100, :text=>"short answer", :comments=>"correct feedback"},
+                           {:weight=>100, :text=>"Something else", :comments=>"I guess that's technically true, but it's still wrong."}],
                   :correct_comments=>"Correct overall Feedback",
                   :question_name=>"FIB",
                   :points_possible=>19,
