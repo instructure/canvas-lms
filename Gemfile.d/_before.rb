@@ -43,8 +43,7 @@ end
 # NOTE: this has to use 1.8.7 hash syntax to not raise a parser exception on 1.8.7
 if RUBY_VERSION >= "2.1" && RUBY_VERSION < "2.2"
   ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_VERSION
-elsif RUBY_VERSION >= "2.2"
-  warn "Ruby newer than 2.1 is very UNSUPPORTED"
+elsif RUBY_VERSION >= "2.2" && RUBY_VERSION < "2.3"
   ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_VERSION
 else
   ruby '2.1.6', :engine => 'ruby', :engine_version => '2.1.6'
