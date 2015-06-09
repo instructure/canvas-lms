@@ -2,6 +2,18 @@
   sudo: yes
   shell: curl -sL https://deb.nodesource.com/setup | bash -
 
+- name: Install python-software-properties
+  sudo: yes
+  apt: pkg=python-software-properties state=installed
+
+- name: Add brightbox ppa
+  sudo: yes
+  apt_repository: repo='ppa:brightbox/ruby-ng'
+
+- name: Update apt cache
+  sudo: yes
+  apt: update_cache=yes
+
 - name: Install dependencies
   sudo: yes
   apt: pkg={{ item }} state=installed
@@ -19,11 +31,10 @@
     - build-essential
     - openjdk-7-jre
     - unzip
-    - python-software-properties
     - nodejs
     - git
-    - ruby1.9.3
-    - ruby-dev
+    - ruby2.1
+    - ruby2.1-dev
     - redis-server
 
 - name: Remove ruby 2.0
