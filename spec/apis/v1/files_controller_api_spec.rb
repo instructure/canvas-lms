@@ -98,7 +98,7 @@ describe "Files API", type: :request do
         'created_at' => @attachment.created_at.as_json,
         'updated_at' => @attachment.updated_at.as_json,
         'thumbnail_url' => nil,
-        'modified_at' => @attachment.updated_at.as_json
+        'modified_at' => @attachment.modified_at.as_json
       })
       expect(@attachment.file_state).to eq 'available'
     end
@@ -131,7 +131,7 @@ describe "Files API", type: :request do
         'created_at' => @attachment.created_at.as_json,
         'updated_at' => @attachment.updated_at.as_json,
         'thumbnail_url' => nil,
-        'modified_at' => @attachment.updated_at.as_json
+        'modified_at' => @attachment.modified_at.as_json
       })
       expect(@attachment.reload.file_state).to eq 'available'
     end
