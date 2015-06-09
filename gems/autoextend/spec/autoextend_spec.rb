@@ -13,7 +13,7 @@ describe Autoextend::ObjectMethods do
 
   it "should autoextend a class afterwards" do
     module AutoextendSpec::MyExtension; end
-    autoextend_class(:"AutoextendSpec::Class", :"AutoextendSpec::MyExtension", :include)
+    Autoextend.hook(:"AutoextendSpec::Class", :"AutoextendSpec::MyExtension")
     defined?(AutoextendSpec::Class).must_equal nil
     class AutoextendSpec::Class; end
     AutoextendSpec::Class.ancestors.must_include AutoextendSpec::MyExtension
@@ -22,13 +22,13 @@ describe Autoextend::ObjectMethods do
   it "should autoextend an already defined class" do
     class AutoextendSpec::Class; end
     module AutoextendSpec::MyExtension; end
-    autoextend_class(:"AutoextendSpec::Class", :"AutoextendSpec::MyExtension", :include)
+    Autoextend.hook(:"AutoextendSpec::Class", :"AutoextendSpec::MyExtension")
     AutoextendSpec::Class.ancestors.must_include AutoextendSpec::MyExtension
   end
 
   it "should call a block" do
     called = 42
-    autoextend_class(:"AutoextendSpec::Class") { AutoextendSpec::Class.instance_variable_set(:@called, called) }
+    Autoextend.hook(:"AutoextendSpec::Class") { AutoextendSpec::Class.instance_variable_set(:@called, called) }
     defined?(AutoextendSpec::Class).must_equal nil
     class AutoextendSpec::Class; end
 

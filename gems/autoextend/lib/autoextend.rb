@@ -1,16 +1,61 @@
 module Autoextend
-  Extension = Struct.new(:module_name, :method, :block) do
-    def extend(klass)
+  Extension = Struct.new(:module_name, :method, :block, :singleton) do
+    def extend(const)
+      target = singleton ? const.singleton_class : const
       if block
-        block.call(klass)
+        block.call(target)
       else
-        klass.send(method, Autoextend.const_get(module_name.to_s))
+        target.send(method, Object.const_get(module_name.to_s, false))
       end
     end
   end
+  private_constant :Extension
 
   def self.extensions
     @extensions ||= {}
+  end
+
+  def self.const_added(const)
+    return [] unless const.name
+    Autoextend.extensions.fetch(const.name.to_sym, []).each do |extension|
+      extension.extend(const)
+    end
+  end
+
+  # Add a hook to automatically extend a class or module with a module,
+  # or call a block when it's defined
+  #
+  #   Autoextend.hook(:User, :MyUserExtension)
+  #
+  #   Autoextend.hook(:User, :"MyUserExtension::ClassMethods", singleton: true)
+  #
+  #   Autoextend.hook(:User) do |klass|
+  #     klass.send(:include, MyUserExtension)
+  #   end
+  #
+  # If User is already defined, it will immediately prepend
+  # the MyUserExtension module into it. It then sets up a hook
+  # to automatically prepend User as soon as it _is_ defined.
+  # Note that this hook happens before any methods have been
+  # added to it, so you cannot directly modify anything you
+  # expect to exist in the class.
+  # Instead you should either use prepend with super, or
+  # set up additional hooks to automatically modify methods
+  # as they are added (if you use :include as your method)
+  def self.hook(const_name, module_name = nil, method: :include, singleton: false, &block)
+    raise ArgumentError, "block is required if module_name is not passed" if !module_name && !block
+    raise ArgumentError, "cannot pass both a module_name and a block" if module_name && block
+
+    extension = Extension.new(module_name, method, block, singleton)
+
+    const_extensions = extensions[const_name.to_sym] ||= []
+    const_extensions << extension
+
+    # immediately extend the class if it's already defined
+    if Object.const_defined?(const_name.to_s, false)
+      extension.extend(Object.const_get(const_name.to_s, false))
+    end
+    nil
   end
 
   MethodExtension = Struct.new(:target, :feature) do
@@ -49,29 +94,10 @@ module Autoextend
   end
 
   def self.included(klass)
-    klass.extend(ClassMethods)
+    klass.extend(KlassMethods)
   end
 
-  def self.const_defined?(class_name)
-    if RUBY_VERSION >= '2.0.0'
-      Object.const_defined?(class_name, false)
-    else
-      class_name.to_s.split("::").inject(Object) do |parent, name|
-        return false unless parent.const_defined?(name, false)
-        parent.const_get(name, false)
-      end
-    end
-  end
-
-  def self.const_get(class_name)
-    if RUBY_VERSION >= '2.0.0'
-      Object.const_get(class_name, false)
-    else
-      class_name.to_s.split("::").inject(Object) { |parent, name| parent.const_get(name, false) }
-    end
-  end
-
-  module ClassMethods
+  module KlassMethods
     def singleton_method_added(method)
       singleton_autoextensions.fetch(method, []).each do |extension|
         extension.extend(self.singleton_class)
@@ -118,50 +144,34 @@ module Autoextend
 end
 
 module Autoextend::ObjectMethods
-  def self.included(klass)
-    klass.extend(ClassMethods)
-  end
-
-  module ClassMethods
-    def inherited(klass)
-      return super unless klass.name
-      Autoextend.extensions.fetch(klass.name.to_sym, []).each do |extension|
-        extension.extend(klass)
-      end
-      super
-    end
-  end
-
-  # Add a hook to automatically extend a class with a module,
-  # or a block
-  #
-  #   autoextend_class(:User, :MyUserExtension)
-  #
-  #   autoextend_class(:User) do |klass|
-  #     klass.send(:include, MyUserExtension)
-  #   end
-  #
-  # If User is already defined, it will immediately prepend
-  # the MyUserExtension module into it. It then sets up a hook
-  # to automatically prepend User as soon as it _is_ defined.
-  # Note that this hook happens before any methods have been
-  # added to it, so you cannot directly modify anything you
-  # expect to exist in the class.
-  # Instead you should either use prepend with super, or
-  # set up additional hooks to automatically modify methods
-  # as they are added (if you use :include as your method)
   def autoextend_class(klass_name, module_name = nil, method = :prepend, &block)
-    raise ArgumentError.new("block is required if module_name is not passed") if !module_name && !block
-    raise ArgumentError.new("cannot pass both a module_name and a block") if module_name && block
+    Autoextend.hook(klass_name, module_name, method: method, &block)
+  end
+end
 
-    klass_extensions = Autoextend.extensions[klass_name.to_sym] ||= []
-    klass_extensions << (extension = Autoextend::Extension.new(module_name, method, block))
-    # immediately extend the class if it's already defined
-    if (Autoextend.const_defined?(klass_name.to_s))
-      extension.extend(Autoextend.const_get(klass_name.to_s))
+module Autoextend::ClassMethods
+  def inherited(klass)
+    Autoextend.const_added(klass)
+    super
+  end
+end
+
+module Autoextend::ModuleMethods
+  def prepended(klass)
+    Autoextend.const_added(self).each do |extension|
+      extension.extend(klass)
     end
-    nil
+    super
+  end
+
+  def included(klass)
+    Autoextend.const_added(self).each do |extension|
+      extension.extend(klass)
+    end
+    super
   end
 end
 
 Object.send(:include, Autoextend::ObjectMethods)
+Module.prepend(Autoextend::ModuleMethods)
+Class.prepend(Autoextend::ClassMethods)
