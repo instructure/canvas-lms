@@ -35,7 +35,6 @@
 
   .ic-app-header__secondary-navigation {
     box-sizing: border-box;
-    background: darken($ic-brand-global-nav-bgd, 5%);
   }
 
   .ic-app-header__menu-list { @include reset-list; }
