@@ -47,7 +47,7 @@
 
   .ic-app-header__menu-list { @include reset-list; }
 
-  .ic-app-header__menu-list-item { 
+  .ic-app-header__menu-list-item {
     box-sizing: border-box;
     &.ic-app-header__menu-list-item--active {
       .ic-app-header__menu-list-link {
@@ -116,6 +116,8 @@
     .ic-icon-svg--arrow-right { width: 24px; height: 24px; }
     .ic-icon-svg--groups { width: 32px; height: 21.6px; }
     .ic-icon-svg--accounts { width: 26px; height: 29px; }
+    .ic-icon-svg--login {width: 26px; height: 29px;}
+    .ic-icon-svg--lti {width: 26px; height: 29px;}
   }
 
   .ic-app-header__secondary {

@@ -1,7 +1,7 @@
 require [
   'react',
-  'jsx/navigation_header/Header',
-], (React, Header) ->
+  'jsx/navigation_header/Navigation',
+], (React, Navigation) ->
 
-  React.render(Header, document.getElementById('header'))
+  React.render(Navigation(), document.getElementById('global_nav_tray_container'))
 
