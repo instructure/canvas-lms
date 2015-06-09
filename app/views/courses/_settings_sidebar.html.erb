@@ -1,4 +1,4 @@
-<div class="rs-margin-lr rs-margin-top">
+<div class="rs-margin-lr<% unless use_new_styles? %> rs-margin-top<% end %>">
   <% @course_settings_sub_navigation_tools.each do |tool| %>
     <a class='btn button-sidebar-wide course-settings-sub-navigation-lti'
       href="<%= course_external_tool_path(@context, tool, launch_type: 'course_settings_sub_navigation') %>">

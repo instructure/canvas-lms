@@ -63,11 +63,11 @@ class Quizzes::QuizSubmissionEventsApiController < ApplicationController
   #    "quiz_submission_events":
   #    [
   #      {
-  #        "created_at": "2014-10-08T19:29:58Z",
+  #        "client_timestamp": "2014-10-08T19:29:58Z",
   #        "event_type": "question_answered",
   #        "event_data" : {"answer": "42"}
   #      }, {
-  #        "created_at": "2014-10-08T19:30:17Z",
+  #        "client_timestamp": "2014-10-08T19:30:17Z",
   #        "event_type": "question_flagged",
   #        "event_data" : { "question_id": "1", "flagged": true }
   #      }
@@ -81,7 +81,7 @@ class Quizzes::QuizSubmissionEventsApiController < ApplicationController
           event.quiz_submission_id = @quiz_submission.id
           event.event_type = datum["event_type"]
           event.event_data = datum["event_data"]
-          event.created_at = datum["created_at"]
+          event.client_timestamp = datum["client_timestamp"]
           event.attempt = @quiz_submission.attempt
         end
       end

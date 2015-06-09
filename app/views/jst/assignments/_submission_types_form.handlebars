@@ -168,6 +168,14 @@
             disabled=submissionTypesFrozen}}
           {{#t "label.external_tool_new_tab"}}Load This Tool In A New Tab{{/t}}
         </label>
+        {{#if groupCategoryId}}
+          <div class="alert assignment-edit-external-tool-alert">
+            {{#t "external_tool_group_warning"}}
+              Group assignments can't use External Tools.
+              The group setting will be unchecked when you save
+            {{/t}}
+          </div>
+        {{/if}}
       </div>
     </div>
   </div>

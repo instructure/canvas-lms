@@ -12,7 +12,7 @@ define [
   #
   #   {{
   #     ic-submission-download-dialog
-  #     assignmentUrl=assignment_url
+  #     submissionsDownloadUrl=assignment_submissions_url
   #   }}
 
 
@@ -68,8 +68,8 @@ define [
     ).property('percentComplete', 'isOpened')
 
     url: (->
-      "#{@get('assignmentUrl')}/submissions?zip=1"
-    ).property('assignmentUrl')
+      "#{@get('submissionsDownloadUrl')}"
+    ).property('submissionsDownloadUrl')
 
     statusText: (->
       switch @get('status')

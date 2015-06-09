@@ -64,7 +64,7 @@ module Canvas::Migration::Worker
       content_migration.exported_attachment = att
       content_migration.save
     rescue => e
-      Rails.logger.warn "Error while uploading exported data for content_migration #{content_migration.id} - #{e.to_s}"
+      Rails.logger.warn "Error while uploading exported data for content_migration #{content_migration.id} - #{e}"
       raise e
     end
 
@@ -75,7 +75,7 @@ module Canvas::Migration::Worker
     begin
       config = ConfigFile.load('external_migration')
       if !config || !config[:keep_after_complete]
-        FileUtils::rm_rf(folder) if File.exists?(folder)
+        FileUtils::rm_rf(folder) if File.exist?(folder)
       end
     rescue
       Rails.logger.warn "Couldn't clear export data for content_migration #{content_migration.id}"

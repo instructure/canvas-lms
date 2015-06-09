@@ -6,15 +6,25 @@
 
 .recent-activity-header {
   margin: 0;
-  padding: 10px;
-  border-bottom: 1px solid #b3b3b3;
+  @if $use_new_styles {
+    border-bottom: 1px solid $ic-border-light;
+    line-height: 1.2;
+    padding-bottom: $ic-sp;
+  }
+  @else {
+    padding: 10px;
+    border-bottom: 1px solid #b3b3b3;
+  } 
 }
 
 .recent_activity > li {
   position: relative;
   border-bottom: 1px solid #ddd;
-  .title {
+  .title { 
     font-weight: normal;
+    @if $use_new_styles and $use_high_contrast == false {
+      font-weight: 300;
+    }
   }
   .links {
     font-size: 11px;
@@ -44,13 +54,24 @@
 }
 
 .stream_header {
-  padding: 10px 0 10px 10px;
   cursor: pointer;
-  display: table;
   user-select: none;
+  @if $use_new_styles {
+    display: flex;
+    padding: $ic-sp;
+    .image-block {
+      flex: 1;
+      align-items: center; 
+    }
+  }
+  @else {
+    padding: 10px 0 10px 10px;
+    display: table;
+  }
   .toggle-details {
     text-transform: uppercase;
-    font-size: 0.75em;
+    @if $use_new_styles { font-size: 11px; }
+    @else { font-size: 0.75em; }
   }
   &:hover {
     @if $use_high_contrast == false {
@@ -61,17 +82,24 @@
       text-align: right;
     }
   }
-  .image-block, .header-right-side {
-    display: table-cell;
+  @if $use_new_styles == false {
+    .image-block, .header-right-side { display: table-cell; }
   }
 }
 
 $ignore-col-width: 50px;
 
 .header-right-side {
-  width: 100px;
-  padding-right: $ignore-col-width;
-  vertical-align: bottom;
+  @if $use_new_styles {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+  @else {
+    width: 100px;
+    padding-right: $ignore-col-width;
+    vertical-align: bottom;
+  }
 }
 
 .toggle-details {
@@ -91,7 +119,8 @@ $ignore-col-width: 50px;
 .stream-details {
   width: 100%;
   tr {
-    border-top: 1px solid #eee;
+    @if $use_new_styles { border-top: 1px dotted $ic-border-light; }
+    @else { border-top: 1px solid #eee; }
     line-height: 250%;
     // remove hover color on high contrast and use link underlines on hover instead (a11y)
     @if $use_high_contrast == false {
@@ -132,6 +161,10 @@ $ignore-col-width: 50px;
       text-decoration: none;
     }
   }
+  @if $use_new_styles {
+    font-weight: 500;
+    font-size: 12px;
+  }
 }
 
 .fake-link {
@@ -149,7 +182,8 @@ $ignore-col-width: 50px;
   display: none;
 }
 
-$dashboardIconSize: 32px;
+@if $use_new_styles { $dashboardIconSize: 28px; }
+@else { $dashboardIconSize: 32px; }
 
 .recent_activity .image-block-image {
   width: $dashboardIconSize;

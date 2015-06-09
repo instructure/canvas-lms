@@ -62,6 +62,10 @@ define [
 
       groupCategoryId: @parentModel.groupCategoryId()
       groupCategories: @groupCategories
+      originalGroupRemoved: !_.chain(@groupCategories)
+                              .pluck('id')
+                              .contains(@parentModel.groupCategoryId())
+                              .value();
       hideGradeIndividually: @hideGradeIndividually
       gradeGroupStudentsIndividually: !@hideGradeIndividually && @parentModel.gradeGroupStudentsIndividually()
       groupCategoryLocked: groupCategoryLocked

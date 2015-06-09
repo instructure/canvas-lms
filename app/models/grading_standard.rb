@@ -192,7 +192,7 @@ class GradingStandard < ActiveRecord::Base
 
   def grading_scheme
     res = {}
-    self.data.sort_by{|_, lower_bound| lower_bound}.reverse.each do |grade_name, lower_bound|
+    self.data.sort_by{|_, lower_bound| lower_bound}.reverse_each do |grade_name, lower_bound|
       res[grade_name] = lower_bound.to_f
     end
     res

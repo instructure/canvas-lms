@@ -50,31 +50,7 @@
 }
 
 .assignment {
-  .ig-title {
-    right: 630px;
-    min-width: 120px;
-  }
-  .ig-details {
-    width: 590px;
-  }
-  .default-dates .status-description {
-    font-weight: bold;
-  }
-}
-
-#course_home_content {
-  .assignment {
-    .ig-title {
-      right: 335px;
-      min-width: 90px;
-      max-width: 260px;
-      padding-right: 30px;
-    }
-    .ig-details {
-      text-align: right;
-      width: 545px;
-    }
-  }
+  .default-dates .status-description { font-weight: bold; }
 }
 
 @media screen and (max-width: 1280px) {
@@ -106,10 +82,6 @@
   line-height: 20px;
   border-bottom: 0;
   font-weight: bold;
-}
-
-.ig-details {
-  width: 450px;
 }
 
 .show-by-label {
@@ -179,9 +151,10 @@
   margin-left: 9%;
 }
 
-.with-left-side {
-  min-width: 971px;
+@if $use_new_styles == false {
+  .with-left-side { min-width: 971px; }
 }
+
 
 .accessible-toggler {
   @include ic-focus-base;

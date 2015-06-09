@@ -132,12 +132,23 @@ class SectionsController < ApplicationController
   # @argument course_section[restrict_enrollments_to_section_dates] [Boolean]
   #   Set to true to restrict user enrollments to the start and end dates of the section.
   #
+  # @argument enable_sis_reactivation [Boolean]
+  #   When true, will first try to re-activate a deleted section with matching sis_section_id if possible.
+  #
   # @returns Section
   def create
     if authorized_action(@context.course_sections.scoped.new, @current_user, :create)
       sis_section_id = params[:course_section].try(:delete, :sis_section_id)
-      @section = @context.course_sections.build(params[:course_section])
-      @section.sis_source_id = sis_section_id if api_request? && sis_section_id.present? && @context.root_account.grants_right?(@current_user, session, :manage_sis)
+      can_manage_sis = api_request? && sis_section_id.present? &&
+        @context.root_account.grants_right?(@current_user, session, :manage_sis)
+
+      if can_manage_sis && value_to_boolean(params[:enable_sis_reactivation])
+        @section = @context.course_sections.where(:sis_source_id => sis_section_id, :workflow_state => 'deleted').first
+        @section.workflow_state = 'active' if @section
+      end
+      @section ||= @context.course_sections.build(params[:course_section])
+      @section.sis_source_id = sis_section_id if can_manage_sis
+
       respond_to do |format|
         if @section.save
           @context.touch

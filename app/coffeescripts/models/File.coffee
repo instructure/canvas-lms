@@ -26,7 +26,7 @@ define [
         # backbone would do by default.
         "/api/v1/files/#{@id}"
 
-    initialize: (attributes, options) ->
+    initialize: (attributes, options = {}) ->
       @preflightUrl = options.preflightUrl
       super
 

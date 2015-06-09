@@ -286,10 +286,32 @@ describe AssignmentOverride do
       expect(@override.title).to eq @group.name
     end
 
-    it "should not be changed for adhoc sets" do
+    it "should not be changed for adhoc sets if there are no students" do
       @override.title = 'Other Value'
       @override.valid? # trigger bookkeeping
       expect(@override.title).to eq 'Other Value'
+    end
+
+    it "should set ADHOC's title to reflect students (with few)" do
+      @override.title = nil
+      @override.set_type = "ADHOC"
+      override_student = @override.assignment_override_students.build
+      override_student.user = student_in_course(course: @override.assignment.context, name: 'Edgar Jones').user
+      override_student.save!
+      @override.valid? # trigger bookkeeping
+      expect(@override.title).to eq 'Edgar Jones'
+    end
+
+    it "should set ADHOC's name to reflect students (with many)" do
+      @override.title = nil
+      @override.set_type = "ADHOC"
+      ["A Student","B Student","C Student","D Student"].each do |student_name|
+        override_student = @override.assignment_override_students.build
+        override_student.user = student_in_course(course: @override.assignment.context, name: student_name).user
+        override_student.save!
+      end
+      @override.valid? # trigger bookkeeping
+      expect(@override.title).to eq 'A Student, B Student, and 2 others'
     end
   end
 

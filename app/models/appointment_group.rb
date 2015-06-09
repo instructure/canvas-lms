@@ -341,7 +341,9 @@ class AppointmentGroup < ActiveRecord::Base
     participant = participant_for(user_or_participant) if participant_type == 'Group' && participant.is_a?(User)
     return false unless eligible_participant?(participant)
     return false unless min_appointments_per_participant
-    return false if participants_per_appointment && appointments_participants.count >= participants_per_appointment
+    return false if participants_per_appointment \
+                  && appointments \
+                  && appointments_participants.count >= (participants_per_appointment * appointments.length)
     return reservations_for(participant).size < min_appointments_per_participant
   end
 
@@ -354,7 +356,7 @@ class AppointmentGroup < ActiveRecord::Base
         else
           # can't have more than one group_category
           group_categories = sub_contexts.find_all{|sc| sc.instance_of? GroupCategory }
-          raise %Q{inconsistent appointment group: #{self.id} #{group_categories.to_s}} if group_categories.length > 1
+          raise %Q{inconsistent appointment group: #{self.id} #{group_categories}} if group_categories.length > 1
           group_category_id = group_categories.first.id
           user.groups.detect{ |g| g.group_category_id == group_category_id }
         end

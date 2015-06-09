@@ -20,7 +20,7 @@ describe "concluded/unconcluded" do
     @course.enroll_student(@student).accept
     @group = @course.assignment_groups.create!(:name => "default")
     @assignment = @course.assignments.create!(:submission_types => 'online_quiz', :title => 'quiz assignment', :assignment_group => @group)
-    login_as(username, password)
+    create_session(u.pseudonym)
   end
 
   it "should let the teacher edit the gradebook by default" do
@@ -50,7 +50,7 @@ describe "concluded/unconcluded" do
     expect(entry).to be_displayed
     driver.execute_script("$('.slick-cell.l2.r2').mouseover();")
     entry.find_element(:css, ".gradebook-cell-comment").click
-    wait_for_animations
+    wait_for_ajaximations
     expect(f(".submission_details_dialog")).to be_displayed
     expect(f(".submission_details_dialog #add_a_comment")).to be_displayed
   end

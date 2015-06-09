@@ -27,27 +27,34 @@ define([
 $.fn.scrollToVisible = function(obj) {
   var options = {};
   var $obj = $(obj);
-  
-  var outerOffset = $("body").offset();
-  this.each(function() {
-    try {
-      outerOffset = $(this).offset();
-      return false;
-    } catch(e) {}
-  });
+
   if ($obj.length === 0) { return; }
   var innerOffset   = $obj.offset(),
       width         = $obj.outerWidth(),
       height        = $obj.outerHeight(),
-      top           = innerOffset.top - outerOffset.top,
+      top           = innerOffset.top,
       bottom        = top + height,
-      left          = innerOffset.left - outerOffset.left,
+      left          = innerOffset.left,
       right         = left + width,
       currentTop    = (this.selector == "html,body" ? $.windowScrollTop() : this.scrollTop()),
       currentLeft   = this.scrollLeft(),
       currentHeight = this.outerHeight(),
       currentWidth  = this.outerWidth();
-  
+
+  if (this.selector != "html,body") {
+    var outerOffset = $("body").offset();
+    this.each(function() {
+      try {
+        outerOffset = $(this).offset();
+        return false;
+      } catch(e) {}
+    });
+    top    -= outerOffset.top;
+    bottom -= outerOffset.top;
+    left   -= outerOffset.left;
+    right  -= outerOffset.left;
+  }
+
   if (this[0].tagName == "HTML" || this[0].tagName == "BODY") {
     currentHeight = $(window).height();
     if($("#wizard_box:visible").length > 0) {

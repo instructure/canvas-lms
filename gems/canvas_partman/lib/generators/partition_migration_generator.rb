@@ -8,15 +8,15 @@ class PartitionMigrationGenerator < ActiveRecord::Generators::MigrationGenerator
   source_root File.expand_path("../templates", __FILE__)
 
   remove_argument :attributes
-  argument :master_table, type: :string, required: false,
-    desc: 'Name of the master table whose partitions will be modified.'
+  argument :model, type: :string, required: false,
+    desc: 'Name of the model whose partitions will be modified.'
 
   def create_migration_file
     unless file_name =~ /^[_a-z0-9]+$/
       raise ActiveRecord::IllegalMigrationNameError.new(file_name)
     end
 
-    migration_template 'migration.rb',
+    migration_template 'migration.rb.erb',
       "db/migrate/#{file_name}.#{CanvasPartman.migrations_scope}.rb"
   end
 

@@ -136,7 +136,12 @@ class ConferencesController < ApplicationController
   include Api::V1::Conferences
 
   before_filter :require_context
-  add_crumb(proc{ t '#crumbs.conferences', "Conferences"}) { |c| c.send(:named_context_url, c.instance_variable_get("@context"), :context_conferences_url) }
+  skip_before_filter :load_user, :only => [:recording_ready]
+
+  add_crumb(proc{ t '#crumbs.conferences', "Conferences"}) do |c|
+    c.send(:named_context_url, c.instance_variable_get("@context"), :context_conferences_url)
+  end
+
   before_filter { |c| c.active_tab = "conferences" }
   before_filter :require_config
   before_filter :reject_student_view_student
@@ -283,6 +288,21 @@ class ConferencesController < ApplicationController
   rescue StandardError => e
     flash[:error] = t(:general_error_with_message, "There was an error joining the conference. Message: '%{message}'", :message => e.message)
     redirect_to named_context_url(@context, :context_conferences_url)
+  end
+
+  def recording_ready
+    secret = @conference.config[:secret_dec]
+    begin
+      signed_params = Canvas::Security.decode_jwt(params[:signed_parameters], [secret])
+      if signed_params[:meeting_id] == @conference.conference_key
+        @conference.recording_ready!
+        render  json: [], status: :accepted
+      else
+        render json: signed_id_invalid_json, status: :unprocessable_entity
+      end
+    rescue Canvas::Security::InvalidToken
+      render json: invalid_jwt_token_json, status: :unauthorized
+    end
   end
 
   def close

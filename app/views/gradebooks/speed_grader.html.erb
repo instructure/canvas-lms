@@ -144,7 +144,8 @@
           <div>
             <% if can_do(@context, @current_user, :manage_grades) %>
             <div id="grade_container" class="content_box">
-              <%= render :partial => "grading_box_extended", :object => @assignment %>
+              <%= render partial: "grading_box_extended",
+                         locals: { assignment: @assignment } %>
               <span class="turnitin_score_container"></span>
               <a href="#" id="submit_same_score"><br><%= t('links.submit_same_score', "Use this same grade for the resubmission") %></a>
               <a style="display: none;" title="POST" href="<%= context_url(@context, :update_submission_context_gradebook_url) %>" class="update_submission_grade_url">&nbsp;</a>
@@ -156,9 +157,7 @@
               <div id="rubric_assessments_list_and_edit_button_holder" class="content_box">
                 <span id="rubric_assessments_list">
                   <%= before_label(:show_assessment_by, "Show Assessment By") %>
-                  <select id="rubric_assessments_select">
-                    <option value="new" id="new_rubric_assessment_option"><%= t(:new_assessment_option, "[New Assessment]") %></option>
-                  </select>
+                  <select id="rubric_assessments_select"></select>
                 </span>
               </div>
               <div id="rubric_summary_container">

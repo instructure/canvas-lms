@@ -245,7 +245,7 @@ describe GradeCalculator do
       @course.save!
       @user.reload
       expect(@user.enrollments.first.computed_current_score).to eql(100.0)
-      expect(@user.enrollments.first.computed_final_score).to eql(55.6)
+      expect(@user.enrollments.first.computed_final_score).to eql(55.56)
       
       @submission2 = @assignment2.grade_student(@user, :grade => "40")
       @user.reload
@@ -337,15 +337,15 @@ describe GradeCalculator do
       nil_graded_assignment
 
       @user.reload
-      expect(@user.enrollments.first.computed_current_score).to eql(93.2)
-      expect(@user.enrollments.first.computed_final_score).to eql(75.9)
+      expect(@user.enrollments.first.computed_current_score).to eql(93.18)
+      expect(@user.enrollments.first.computed_final_score).to eql(75.93)
 
       @course.group_weighting_scheme = "percent"
       @course.save!
 
       @user.reload
-      expect(@user.enrollments.first.computed_current_score).to eql(58.3)
-      expect(@user.enrollments.first.computed_final_score).to eql(48.4)
+      expect(@user.enrollments.first.computed_current_score).to eql(58.33)
+      expect(@user.enrollments.first.computed_final_score).to eql(48.41)
     end
 
     it "should treat muted assignments as if there is no submission" do
@@ -356,15 +356,15 @@ describe GradeCalculator do
       @assignment_1.grade_student(@user, :grade => 500)
       
       @user.reload
-      expect(@user.enrollments.first.computed_current_score).to eql(93.2)
-      expect(@user.enrollments.first.computed_final_score).to eql(75.9)
+      expect(@user.enrollments.first.computed_current_score).to eql(93.18)
+      expect(@user.enrollments.first.computed_final_score).to eql(75.93)
 
       @course.group_weighting_scheme = "percent"
       @course.save!
 
       @user.reload
-      expect(@user.enrollments.first.computed_current_score).to eql(58.3)
-      expect(@user.enrollments.first.computed_final_score).to eql(48.4)
+      expect(@user.enrollments.first.computed_current_score).to eql(58.33)
+      expect(@user.enrollments.first.computed_final_score).to eql(48.41)
     end
 
     it "should not include unpublished assignments" do
@@ -462,16 +462,16 @@ describe GradeCalculator do
 
     it "should work with no drop rules" do
       set_default_grades
-      check_grades(56.0, 12.4)
+      check_grades(55.99, 12.38)
     end
 
     it "should support drop_lowest" do
       set_default_grades
       @group.update_attribute(:rules, 'drop_lowest:1')
-      check_grades(63.4, 56.0)
+      check_grades(63.41, 55.99)
 
       @group.update_attribute(:rules, 'drop_lowest:2')
-      check_grades(74.6, 63.4)
+      check_grades(74.64, 63.41)
     end
 
     it "should really support drop_lowest" do
@@ -480,19 +480,19 @@ describe GradeCalculator do
                   [30, 30], [30, 30], [30, 30], [30, 30], [29.3, 30], [30, 30],
                   [30, 30], [30, 30], [12, 0], [30, nil]]
       @group.update_attribute(:rules, 'drop_lowest:2')
-      check_grades(132.1, 132.1)
+      check_grades(132.12, 132.12)
     end
 
     it "should support drop_highest" do
       set_default_grades
       @group.update_attribute(:rules, 'drop_highest:1')
-      check_grades(32.1, 5.0)
+      check_grades(32.07, 4.98)
 
       @group.update_attribute(:rules, 'drop_highest:2')
-      check_grades(18.3, 1.6)
+      check_grades(18.28, 1.56)
 
       @group.update_attribute(:rules, 'drop_highest:3')
-      check_grades(7.9, 0.3)
+      check_grades(7.89, 0.29)
     end
 
     it "should really support drop_highest" do
@@ -503,7 +503,7 @@ describe GradeCalculator do
       check_grades(47.5, 47.5)
 
       @group.update_attribute(:rules, 'drop_highest:2')
-      check_grades(33.3, 33.3)
+      check_grades(33.33, 33.33)
 
       @group.update_attribute(:rules, 'drop_highest:3')
       check_grades(0, 0)
@@ -519,7 +519,7 @@ describe GradeCalculator do
       set_default_grades
       rules = "drop_lowest:1\nnever_drop:#{@assignments[3].id}" # 3/38
       @group.update_attribute(:rules, rules)
-      check_grades(63.3, 56.0)
+      check_grades(63.32, 55.99)
 
       Assignment.destroy_all
       Submission.destroy_all
@@ -527,7 +527,7 @@ describe GradeCalculator do
       set_grades [[10,20], [5,10], [20,40], [0,100]]
       rules = "drop_lowest:1\nnever_drop:#{@assignments[3].id}" # 0/100
       @group.update_attribute(:rules, rules)
-      check_grades(18.8, 18.8)
+      check_grades(18.75, 18.75)
 
       Assignment.destroy_all
       Submission.destroy_all
@@ -535,7 +535,7 @@ describe GradeCalculator do
       set_grades [[10,20], [5,10], [20,40], [100,100]]
       rules = "drop_lowest:1\nnever_drop:#{@assignments[3].id}" # 100/100
       @group.update_attribute(:rules, rules)
-      check_grades(88.5, 88.5)
+      check_grades(88.46, 88.46)
 
       Assignment.destroy_all
       Submission.destroy_all
@@ -543,7 +543,7 @@ describe GradeCalculator do
       set_grades [[101.9,100], [105.65,100], [103.8,100], [0,0]]
       rules = "drop_lowest:1\nnever_drop:#{@assignments[2].id}" # 103.8/100
       @group.update_attribute(:rules, rules)
-      check_grades(104.7, 104.7)
+      check_grades(104.73, 104.73)
     end
 
     it "grade dropping should work even in ridiculous circumstances" do
@@ -575,7 +575,7 @@ describe GradeCalculator do
         # NOTE: in addition to ignoring invalid assignment groups, we also
         # have to scale up the valid ones
         @course.update_attribute :group_weighting_scheme, 'percent'
-        grade = 76.7 # ((9/10)*50 + (5/10)*25) * (1/75)
+        grade = 76.67 # ((9/10)*50 + (5/10)*25) * (1/75)
         check_grades(grade, grade)
       end
 

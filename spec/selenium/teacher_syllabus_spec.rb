@@ -55,5 +55,12 @@ describe "course syllabus" do
       f('.jump_to_today_link').click
       expect(f('.mini_month .today')).to have_attribute('id', "mini_day_#{Time.now.strftime('%Y_%m_%d')}")
     end
+
+    describe "Accessibility" do
+      it "should set focus to the Jump to Today link after clicking Edit the Description" do
+        f('.edit_syllabus_link').click
+        check_element_has_focus(f('.jump_to_today_link'))
+      end
+    end
   end
 end

@@ -100,4 +100,11 @@ describe "acts_as_list" do
       expect(@course.context_modules.map{|m| [m.id, m.position]}).to eql [[module_1.id, 1], [module_2.id, 2]]
     end
   end
+
+  describe "base scope" do
+    it "scopes by the base class rather then the STI class" do
+      scope = AccountAuthorizationConfig::CAS.new.list_scope_base
+      expect(scope.to_sql).to_not(match(/auth_type/))
+    end
+  end
 end

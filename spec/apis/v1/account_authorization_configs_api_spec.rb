@@ -65,7 +65,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
     end
 
     it "should create a saml aac" do
-      call_create(@saml_hash)
+      json = call_create(@saml_hash)
       aac = @account.account_authorization_config
       expect(aac.auth_type).to eq 'saml'
       expect(aac.idp_entity_id).to eq 'http://example.com/saml1'
@@ -130,19 +130,9 @@ describe "AccountAuthorizationConfigs API", type: :request do
       expect(aac.position).to eq 1
     end
 
-    it "should not allow multiple cas aacs (for now)" do
-      call_create(@cas_hash)
-      json = call_create(@cas_hash, 422)
-      expect(json.keys.sort).to eq ['error_report_id', 'errors']
-      expect(json['errors']).to eq [
-        { "field" => "auth_type", "error_code" => "multiple_cas_configs", "message" => "Only one CAS config is supported" },
-      ]
-    end
-
-    it "should error when mixing auth_types (for now)" do
+    it "does not error when mixing auth_types (for now)" do
       call_create(@ldap_hash)
-      json = call_create(@saml_hash, 422)
-      expect(json['errors'].first['error_code']).to eq 'mixing_authentication_types'
+      call_create(@saml_hash, 200)
     end
 
     it "should update positions" do
@@ -179,7 +169,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
     end
 
     it "should disable open registration when setting delegated auth" do
-      @account.settings = { :open_registration => true }
+      @account.settings = { open_registration: true }
       @account.save!
       call_create(@cas_hash)
       expect(@account.open_registration?).to be_falsey
@@ -216,9 +206,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
       @ldap_hash['auth_port'] = nil
       @ldap_hash['auth_base'] = nil
       @ldap_hash['auth_over_tls'] = nil
-      @ldap_hash['login_handle_name'] = nil
       @ldap_hash['identifier_format'] = nil
-      @ldap_hash['change_password_url'] = nil
       @ldap_hash['position'] = 1
       expect(json).to eq @ldap_hash
     end
@@ -227,7 +215,6 @@ describe "AccountAuthorizationConfigs API", type: :request do
       aac = @account.account_authorization_configs.create!(@cas_hash)
       json = call_show(aac.id)
 
-      @cas_hash['login_handle_name'] = nil
       @cas_hash['log_in_url'] = nil
       @cas_hash['id'] = aac.id
       @cas_hash['position'] = 1
@@ -420,6 +407,92 @@ describe "AccountAuthorizationConfigs API", type: :request do
       @account.reload; @account.auth_discovery_url = "http://example.com/auth"
     end
 
+  end
+
+  describe "sso settings" do
+    let(:sso_path) do
+      "/api/v1/accounts/#{@account.id}/sso_settings"
+    end
+
+    def update_settings(settings, expected_status)
+      api_call(:put,
+               sso_path,
+               {
+                 controller: 'account_authorization_configs',
+                 action: 'update_sso_settings',
+                 account_id: @account.id.to_s,
+                 format: 'json'
+               },
+               settings,
+               {},
+               expected_status: expected_status)
+    end
+
+    it "requires authorization" do
+      course_with_student(course: @course)
+      update_settings({}, 401)
+    end
+
+    it "sets auth settings" do
+      payload = {
+        'sso_settings' => {
+          'auth_discovery_url' => 'https://www.discover.com'
+        }
+      }
+      update_settings(payload, 200)
+      expect(@account.reload.auth_discovery_url).to eq('https://www.discover.com')
+    end
+
+    it "ignores settings that don't exist" do
+      payload = {
+        'sso_settings' => {
+          'abcdefg' => 'balongna'
+        }
+      }
+      update_settings(payload, 200)
+    end
+
+    context "with login handle pre-existing on account" do
+      before do
+        @account.login_handle_name = "LoginHandleSet"
+        @account.save!
+      end
+
+      it "clears settings with a key but no value" do
+        payload = {
+          'sso_settings' => {
+            'login_handle_name' => ''
+          }
+        }
+        update_settings(payload, 200)
+        expect(@account.reload.login_handle_name).to be_nil
+      end
+
+      it "leaves unspecified settings alone" do
+        payload = {
+          'sso_settings' => {
+            'auth_discovery_url' => 'someurl'
+          }
+        }
+        update_settings(payload, 200)
+        expect(@account.reload.login_handle_name).to eq("LoginHandleSet")
+      end
+
+      it "can get the current state of settings" do
+        response = api_call(:get,
+                            sso_path,
+                            {
+                              controller: "account_authorization_configs",
+                              action: "show_sso_settings",
+                              account_id: @account.id.to_s,
+                              format: 'json'
+                            },{},{},
+                            expected_status: 200)
+
+        expect(response['sso_settings']['login_handle_name']).
+          to eq("LoginHandleSet")
+      end
+    end
   end
 
 end

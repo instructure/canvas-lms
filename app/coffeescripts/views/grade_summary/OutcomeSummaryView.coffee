@@ -7,15 +7,13 @@ define [
   'compiled/views/grade_summary/OutcomeDetailView'
 ], ($, _, Backbone, CollectionView, SectionView, OutcomeDetailView) ->
   class OutcomeSummaryView extends CollectionView
-    @optionProperty 'course_id'
-    @optionProperty 'user_id'
     @optionProperty 'toggles'
 
     itemView: SectionView
 
     initialize: ->
       super
-      @outcomeDetailView = new OutcomeDetailView(user_id: @user_id, course_id: @course_id)
+      @outcomeDetailView = new OutcomeDetailView()
       @bindToggles()
 
     show: (path) ->

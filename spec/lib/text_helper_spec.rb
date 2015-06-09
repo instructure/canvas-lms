@@ -67,6 +67,11 @@ describe TextHelper do
 
   context "date_string" do
 
+    it "should return correct date before the year 1000" do
+      old_date = Time.zone.parse("0900-01-01")
+      expect(th.date_string(old_date)).to eq "Jan 1, 0900"
+    end
+
     it "should include the year if the current year isn't the same" do
       today = Time.zone.now
       # cause we don't want to deal with day-of-the-week stuff, offset 8 days

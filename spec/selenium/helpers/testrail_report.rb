@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/testrail')
 
 config_path=File.expand_path('../../../../config/testrail.yml', __FILE__)
-if File.exists?(config_path)
+if File.exist?(config_path)
   $configuration = YAML.load_file(config_path)
 else
   $configuration = nil

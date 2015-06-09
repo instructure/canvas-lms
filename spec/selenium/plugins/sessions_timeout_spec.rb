@@ -24,26 +24,17 @@ describe "Sessions Timeout" do
     end
   end
 
-  context "when sessions timeout is set to .04 minutes" do 
-    before do 
-      plugin_setting = PluginSetting.new(:name => "sessions", :settings => {"session_timeout" => ".04"})
-      plugin_setting.save!
-    end
+  it "when sessions timeout is set to .04 minutes it logs the user out after 3 seconds" do
+    plugin_setting = PluginSetting.new(:name => "sessions", :settings => {"session_timeout" => ".04"})
+    plugin_setting.save!
+    user_with_pseudonym({:active_user => true})
+    login_as
+    expect(f('.user_name').text).to eq @user.primary_pseudonym.unique_id
 
-    context "when a user is logged in" do 
-      before do 
-        user_with_pseudonym({:active_user => true})
-        login_as
-        expect(f('.user_name').text).to eq @user.primary_pseudonym.unique_id
-      end
+    sleep 3
 
-      it "logs the user out after 3 seconds" do
-        sleep 3
+    get "/courses"
 
-        get "/courses"
-
-        assert_flash_warning_message /You must be logged in to access this page/
-      end
-    end
+    assert_flash_warning_message(/You must be logged in to access this page/)
   end
 end

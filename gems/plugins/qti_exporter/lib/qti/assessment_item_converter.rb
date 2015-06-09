@@ -124,9 +124,9 @@ class AssessmentItemConverter
       end
     rescue => e
       message = "There was an error exporting an assessment question"
-      @question[:qti_error] = "#{message} - #{e.to_s}"
+      @question[:qti_error] = "#{message} - #{e}"
       @question[:question_type] = "Error"
-      @log.error "#{e.to_s}: #{e.backtrace}"
+      @log.error "#{e}: #{e.backtrace}"
     end
     
     @question
@@ -327,7 +327,7 @@ class AssessmentItemConverter
           child.remove
         end
   
-        node.children.reverse.each do |child|
+        node.children.reverse_each do |child|
           break unless child.text? && child.text =~ /\A\s+\z/ || child.element? && child.name.downcase == 'br'
           child.remove
         end

@@ -12,20 +12,18 @@ describe "account" do
     it "should allow setting up a secondary ldap server" do
       get "/accounts/#{Account.default.id}/account_authorization_configs"
       click_option('#add_auth_select', 'ldap', :value)
-      ldap_div = f('#ldap_div')
-      ldap_form = f('form.ldap_form')
+      ldap_div = f('#ldap_form')
+      ldap_form = f('#ldap_form form')
       expect(ldap_div).to be_displayed
 
-      ldap_form.find_element(:id, 'account_authorization_config_0_auth_host').send_keys('primary.host.example.com')
-      ldap_form.find_element(:id, 'account_authorization_config_0_auth_port').send_keys('1')
-      ldap_form.find_element(:id, 'account_authorization_config_0_auth_over_tls_simple_tls').click
-      ldap_form.find_element(:id, 'account_authorization_config_0_auth_base').send_keys('primary base')
-      ldap_form.find_element(:id, 'account_authorization_config_0_auth_filter').send_keys('primary filter')
-      ldap_form.find_element(:id, 'account_authorization_config_0_auth_username').send_keys('primary username')
-      ldap_form.find_element(:id, 'account_authorization_config_0_auth_password').send_keys('primary password')
-      ldap_form.find_element(:id, 'account_authorization_config_0_login_handle_name').send_keys('login handle')
-      ldap_form.find_element(:id, 'account_authorization_config_0_change_password_url').send_keys('http://forgot.password.example.com/')
-      submit_form('#auth_form')
+      ldap_form.find_element(:id, 'account_authorization_config_auth_host').send_keys('primary.host.example.com')
+      ldap_form.find_element(:id, 'account_authorization_config_auth_port').send_keys('1')
+      ldap_form.find_element(:id, 'account_authorization_config_auth_over_tls_simple_tls').click
+      ldap_form.find_element(:id, 'account_authorization_config_auth_base').send_keys('primary base')
+      ldap_form.find_element(:id, 'account_authorization_config_auth_filter').send_keys('primary filter')
+      ldap_form.find_element(:id, 'account_authorization_config_auth_username').send_keys('primary username')
+      ldap_form.find_element(:id, 'account_authorization_config_auth_password').send_keys('primary password')
+      submit_form('#ldap_form form')
 
       keep_trying_until { expect(Account.default.account_authorization_configs.length).to eq 1 }
       config = Account.default.account_authorization_configs.first
@@ -36,21 +34,18 @@ describe "account" do
       expect(config.auth_filter).to eq 'primary filter'
       expect(config.auth_username).to eq 'primary username'
       expect(config.auth_decrypted_password).to eq 'primary password'
-      expect(config.login_handle_name).to eq 'login handle'
-      expect(config.change_password_url).to eq 'http://forgot.password.example.com/'
 
       # now add a secondary ldap config
-      f('.edit_auth_link').click
-      ldap_div = f('#ldap_div')
-      ldap_form = f('form.ldap_form')
-      ldap_div.find_element(:css, '.add_secondary_ldap_link').click
-      ldap_form.find_element(:id, 'account_authorization_config_1_auth_host').send_keys('secondary.host.example.com')
-      ldap_form.find_element(:id, 'account_authorization_config_1_auth_port').send_keys('2')
-      ldap_form.find_element(:id, 'account_authorization_config_1_auth_base').send_keys('secondary base')
-      ldap_form.find_element(:id, 'account_authorization_config_1_auth_filter').send_keys('secondary filter')
-      ldap_form.find_element(:id, 'account_authorization_config_1_auth_username').send_keys('secondary username')
-      ldap_form.find_element(:id, 'account_authorization_config_1_auth_password').send_keys('secondary password')
-      submit_form('#auth_form')
+      click_option('#add_auth_select', 'ldap', :value)
+      ldap_form = f('#ldap_form form')
+      ldap_form.find_element(:id, 'account_authorization_config_auth_host').send_keys('secondary.host.example.com')
+      ldap_form.find_element(:id, 'account_authorization_config_auth_port').send_keys('2')
+      ldap_form.find_element(:id, 'account_authorization_config_auth_base').send_keys('secondary base')
+      ldap_form.find_element(:id, 'account_authorization_config_auth_filter').send_keys('secondary filter')
+      ldap_form.find_element(:id, 'account_authorization_config_auth_username').send_keys('secondary username')
+      ldap_form.find_element(:id, 'account_authorization_config_auth_password').send_keys('secondary password')
+      ldap_form.find_element(:id, 'account_authorization_config_auth_over_tls_start_tls').click
+      submit_form('#ldap_form form')
 
       keep_trying_until { expect(Account.default.account_authorization_configs.length).to eq 2 }
       config = Account.default.account_authorization_configs.first
@@ -65,26 +60,21 @@ describe "account" do
       expect(config.auth_filter).to eq 'secondary filter'
       expect(config.auth_username).to eq 'secondary username'
       expect(config.auth_decrypted_password).to eq 'secondary password'
-      expect(config.login_handle_name).to be_nil
-      expect(config.change_password_url).to be_nil
-
-      shown_hosts = ff(".auth_info.auth_host")
-      expect(shown_hosts[0].text).to eq "primary.host.example.com"
-      expect(shown_hosts[1].text).to eq "secondary.host.example.com"
 
       # test removing the secondary config
-      f('.edit_auth_link').click
-      ldap_form = f('form.ldap_form')
-      ldap_form.find_element(:css, '.remove_secondary_ldap_link').click
-      submit_form('#auth_form')
+      config = Account.default.account_authorization_configs.last
+      scroll_page_to_bottom
+      delete_id = "#delete-aac-#{config.id}"
+      keep_trying_until { driver.find_element(css: delete_id).displayed? }
+      expect_new_page_load(true) do
+        f(delete_id).click
+      end
 
       keep_trying_until { expect(Account.default.account_authorization_configs.length).to eq 1 }
 
       # test removing the entire config
-      expect_new_page_load do
+      expect_new_page_load(true) do
         f('.delete_auth_link').click
-        driver.switch_to.alert.accept
-        driver.switch_to.default_content
       end
 
       expect(Account.default.account_authorization_configs.length).to eq 0
@@ -108,27 +98,28 @@ describe "account" do
     it "should be able to set login labels for delegated auth accounts" do
       get "/accounts/#{Account.default.id}/account_authorization_configs"
       click_option('#add_auth_select', 'cas', :value)
-      expect(f("#account_authorization_config_0_login_handle_name")).to be_displayed
+      f("#account_authorization_config_auth_base").send_keys("cas.example.com")
+      expect_new_page_load { submit_form('#cas_form form') }
 
-      f("#account_authorization_config_0_auth_base").send_keys("cas.example.com")
-      f("#account_authorization_config_0_login_handle_name").send_keys("CAS Username")
-      expect_new_page_load { submit_form('#auth_form') }
+      expect(f("#sso_settings_login_handle_name")).to be_displayed
+      f("#sso_settings_login_handle_name").send_keys("CAS Username")
+      expect_new_page_load { submit_form('#sso_settings_form') }
 
       get "/accounts/#{Account.default.id}/users"
       f(".add_user_link").click
       dialog = f("#add_user_dialog")
-      expect(dialog.find_element(:css, 'label[for="pseudonym_unique_id"]').text).to eq "CAS Username:*"
+      expect(dialog.find_element(:css, 'label[for="pseudonym_unique_id"]').text).to eq "CAS Username: *"
     end
 
     context "cas" do
       it "should be able to set unknown user url option" do
         get "/accounts/#{Account.default.id}/account_authorization_configs"
         click_option('#add_auth_select', 'cas', :value)
-        expect(f("#account_authorization_config_0_login_handle_name")).to be_displayed
+        expect(f("#account_authorization_config_unknown_user_url")).to be_displayed
 
         unknown_user_url = 'https://example.com/unknown_user'
-        f("#account_authorization_config_0_unknown_user_url").send_keys(unknown_user_url)
-        expect_new_page_load { submit_form('#auth_form') }
+        f("#account_authorization_config_unknown_user_url").send_keys(unknown_user_url)
+        expect_new_page_load { submit_form('#cas_form form') }
 
         expect(Account.default.account_authorization_configs.first.unknown_user_url).to eq unknown_user_url
       end
@@ -139,14 +130,13 @@ describe "account" do
         get "/accounts/#{Account.default.id}/account_authorization_configs"
         click_option('#add_auth_select', 'saml', :value)
 
-        saml_div = f('#saml_div')
-        saml_div.find_element(:css, 'button.element_toggler.btn').click
-
+        saml_div = f('#saml_form')
         expect(f("#account_authorization_config_idp_entity_id")).to be_displayed
 
         unknown_user_url = 'https://example.com/unknown_user'
-        f("#account_authorization_config_unknown_user_url").send_keys(unknown_user_url)
-        expect_new_page_load { submit_form('#saml_config__form') }
+        saml_div.find_element(:css, "#saml_form #account_authorization_config_unknown_user_url").
+          send_keys(unknown_user_url)
+        expect_new_page_load { submit_form('#saml_form form') }
 
         expect(Account.default.account_authorization_configs.first.unknown_user_url).to eq unknown_user_url
       end
@@ -269,17 +259,17 @@ describe "account" do
 
     it "should load/refresh SAML debug info" do
       enable_cache do
-        aac = Account.default.account_authorization_configs.create!(:auth_type => 'saml')
+        aac = Account.default.account_authorization_configs.create!(auth_type: 'saml')
         get "/accounts/#{Account.default.id}/account_authorization_configs"
 
         start = f("#start_saml_debugging")
         refresh = f("#refresh_saml_debugging")
         stop = f("#stop_saml_debugging")
-        debug_info = f("#saml_debug_info")
 
         start.click
         wait_for_ajax_requests
 
+        debug_info = f("#saml_debug_info")
         expect(debug_info.text).to match /Waiting for attempted login/
 
         aac.debugging_keys.each_with_index do |key, i|
@@ -308,23 +298,19 @@ describe "account" do
     it "should configure discovery_url" do
       auth_url = "http://example.com"
       @account = Account.default
-      @account.account_authorization_configs.create!(:auth_type => 'saml')
-      @account.account_authorization_configs.create!(:auth_type => 'saml')
+      @account.account_authorization_configs.create!(auth_type: 'saml')
+      @account.account_authorization_configs.create!(auth_type: 'saml')
       get "/accounts/#{Account.default.id}/account_authorization_configs"
-      f("#discovery_url_config .admin-links button").click
-      f("#discovery_url_config .admin-links a").click
-      f("#discovery_url_input").send_keys(auth_url)
-      expect_new_page_load { submit_form("#discovery_url_form") }
+      f("#sso_settings_auth_discovery_url").send_keys(auth_url)
+      expect_new_page_load { submit_form("#sso_settings_form") }
 
       @account.reload
       expect(@account.auth_discovery_url).to eq auth_url
 
-      f("#discovery_url_config .admin-links button").click
-      f("#discovery_url_config .delete_url").click
+      f("#sso_settings_auth_discovery_url").clear()
+      expect_new_page_load { submit_form("#sso_settings_form") }
 
-      wait_for_ajax_requests
-
-      expect(f("#discovery_url_input").attribute(:value)).to eq ''
+      expect(f("#sso_settings_auth_discovery_url").attribute(:value)).to eq ''
       @account.reload
       expect(@account.auth_discovery_url).to eq nil
     end

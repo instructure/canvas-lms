@@ -31,7 +31,7 @@ module Account::Settings
   # otherwise use the last explicitly set value
   def calculate_inherited_setting(setting)
     inherited_hash = {:locked => false, :value => self.class.account_settings_options[setting][:default]}
-    self.account_chain.reverse.each do |acc|
+    self.account_chain.reverse_each do |acc|
       current_hash = acc.settings[setting]
       next if current_hash.nil?
 

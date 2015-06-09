@@ -8,12 +8,14 @@ describe "jquery ui" do
   def active
     driver.switch_to.active_element
   end
+
   def shift_tab
     driver.action.key_down(:shift)
       .send_keys(:tab)
       .key_up(:shift)
       .perform
   end
+
   def create_simple_modal
     driver.execute_script(<<-JS)
       return $('<div><select /><input /></div>')

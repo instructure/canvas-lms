@@ -2,10 +2,11 @@ define [
   'jquery'
   'underscore'
   'Backbone'
+  'i18n!discussion_topics'
   'jst/DiscussionTopics/IndexView'
   'compiled/views/DiscussionTopics/DiscussionsSettingsView'
   'compiled/views/DiscussionTopics/UserSettingsView'
-], ($, _, {View}, template, DiscussionsSettingsView, UserSettingsView) ->
+], ($, _, {View}, I18n, template, DiscussionsSettingsView, UserSettingsView) ->
 
   class IndexView extends View
     template: template
@@ -72,6 +73,7 @@ define [
       else
         @filters[e.target.id].active = $(e.target).val().length > 0
         term = $(e.target).val()
+        @resultsUpdatedAccessibleAlert()
 
       _.each @collections(), (collection) =>
         collection.each (model) =>
@@ -137,3 +139,8 @@ define [
         length: 1,
         atLeastOnePageFetched: true
         new_topic_url: ENV.newTopicURL
+
+    resultsUpdatedAccessibleAlert: _.debounce(->
+      $.screenReaderFlashMessage I18n.t 'The list of results has been updated.'
+    , 1000)
+

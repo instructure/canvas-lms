@@ -64,12 +64,15 @@ class ApiRouteSet
   def get(path, opts = {})
     route(:get, path, opts)
   end
+
   def put(path, opts = {})
     route(:put, path, opts)
   end
+
   def post(path, opts = {})
     route(:post, path, opts)
   end
+
   def delete(path, opts = {})
     route(:delete, path, opts)
   end

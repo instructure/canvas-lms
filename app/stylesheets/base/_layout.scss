@@ -10,22 +10,24 @@ $layout-modal-font-color:           $ic-color-dark;
 $footer-links-color:                lighten($ic-color-dark, 16);
 $footer-links-border-color:         lighten($ic-color-dark, 16);
 
-
-body, html {
-  height: 100%;
+@if $use_new_styles { 
+  body { 
+    min-height: 100vh;
+    min-width: 768px;
+  } 
 }
+@else { body, html { height: 100%; } }
+
 body {
-  min-width: $min_main_width;
-  @if $use_high_contrast {
-    background: white;
-  }
+  @if $use_new_styles == false { min-width: $min_main_width; }
+  @if $use_high_contrast { background: white; }
   @else {
-    @if $is-k12 {
-      background: white;
+    @if $is-k12 { background: white; }
+    @else if $use_new_styles { 
+      background: $ic-color-light;
+      font-weight: 300;
     }
-    @else {
-      background-color: $ic-body-background-color;
-    }
+    @else { background-color: $ic-body-background-color; }
   }
   &.no-headers, &.embedded {
     #header, #topbar, #left-side, #breadcrumbs {
@@ -41,7 +43,10 @@ body {
     }
     #wrapper {
       margin: 0;
-      min-width: 400px;
+      @if $use_new_styles == false {
+        min-width: 400px;  
+      }
+      
     }
     #main {
       margin: 0;
@@ -112,66 +117,88 @@ body {
   }
 }
 
+@if $use_new_styles {
+  #wrapper-container {
+    margin-left: $ic-header-primary-width - $ic-sp;
+    @include breakpoint(wide) { margin-left: $ic-header-primary-width; }
+    body.primary-nav-expanded & { margin-left: $ic-header-primary-expanded-width; }
+    body.no-headers & { margin-left: 0; }
+  }  
+}
+
 #wrapper {
-  @include pie-clearfix;
+  @if $use_new_styles {
+    // leave for now
+  }
+  @else {
+    @include pie-clearfix;
+  }
 }
 
 #main {
   position: relative;
   z-index: 10;
-  background-color: $body-bg-color;
-  border: none;
-  border-top: none;
-  margin-bottom: 40px;
-  @include pie-clearfix;
-  min-height: 450px;
-  max-width: $max_main_width;
-  @if $is-k12 {
+  
+  @if $use_new_styles == false {
+    background-color: $body-bg-color;
     border: none;
+    margin-bottom: 40px;
+    @include pie-clearfix;
+    min-height: 450px;
+    max-width: $max_main_width;
   }
 }
 
 #content {
-  padding: 1em;
+  @if $use_new_styles { 
+    padding: $ic-sp*2;
+    @include breakpoint(desktop) { 
+      body.with-left-side & { padding-left: $ic-sp; }
+      body.with-right-side & { padding-right: $ic-sp; } 
+    }
+  }
+  @else { padding: 1em; }
   overflow: hidden;
 }
 
 // **********************************************************************************
 // all of the following are classes that should be applied to 'body' when appropriate
 
-.padless-content #content, #content.padless {
-  padding: 0;
+@if $use_new_styles == false {
+  .padless-content #content, #content.padless {
+    padding: 0;
+  }
 }
 
 .with-left-side {
-  min-width: $left_side_width + $min_main_width;
-  #footer {
-    margin-left: $left_side_width;
+  @if $use_new_styles {
+    #left-side {
+      @include breakpoint(desktop) { display: block; }
+    }  
   }
-  #wrapper {
-    margin-left: 0;
-  }
-  #left-side {
-    display: block;
-  }
-  #main {
-    margin-left: $left_side_width;
-  }
-  #header-inner {
-    max-width: $left_side_width + $max_main_width;
+  
+  @else {
+    min-width: $left_side_width + $min_main_width;
+    #left-side { display: block; }
+    #footer { margin-left: $left_side_width; }
+    #wrapper { margin-left: 0; }
+    #main { margin-left: $left_side_width; }  
+    #header-inner { max-width: $left_side_width + $max_main_width; }
   }
 }
 
 .with-right-side {
-  min-width: $right_side_width + $min_main_width;
+  @if $use_new_styles == false { min-width: $right_side_width + $min_main_width; }
   #right-side-wrapper {
-    display: block;
-    float: right;
-    position: absolute;
-    top: 0;
+    display: block;    
+    @if $use_new_styles == false {
+      float: right;
+      position: absolute;
+      top: 0;  
+    }
   }
-  #main {
-    margin-right: $right_side_width;
+  @if $use_new_styles == false {
+    #main { margin-right: $right_side_width; }
   }
   #header-inner {
     max-width: $right_side_width + $max_main_width;
@@ -179,7 +206,7 @@ body {
 }
 
 .with-right-side.with-left-side {
-  min-width: $right_side_width + $left_side_width + $min_main_width;
+  @if $use_new_styles==false { min-width: $right_side_width + $left_side_width + $min_main_width; }
   #header-inner {
     max-width: $right_side_width + $left_side_width + $max_main_width;
   }
@@ -203,9 +230,12 @@ body {
 // end classes applied to body
 
 #footer {
-  color: #5c5c5c;
-  font-size: 11px;
-  margin: 0 15px 34px;
+  @if $use_new_styles == false {
+    color: #5c5c5c;
+    font-size: 11px;
+    margin: 0 15px 34px;  
+  }
+  
   .footer-logo {
     @include bg-image("footer-logo", "png", no-repeat, left, top, transparent, 140px, 10px);
     display: inline-block;
@@ -214,19 +244,17 @@ body {
     width: 140px;
   }
 }
-
-#footer-links {
-  a {
-    border-left: 1px solid $footer-links-border-color;
-    color: $footer-links-color;
-    padding-right: 2px;
-    padding-left: 5px;
-    &:hover, &:focus {
-      text-decoration: underline;
-    }
-    // ie7 supports :first-child so this will work on everything we support.
-    &:first-child {
-      border-left: none;
+@if $use_new_styles == false {
+  #footer-links {
+    a {
+      border-left: 1px solid $footer-links-border-color;
+      color: $footer-links-color;
+      padding-right: 2px;
+      padding-left: 5px;
+      &:hover, &:focus {
+        text-decoration: underline;
+      }
+      &:first-child { border-left: none; }
     }
   }
 }

@@ -23,7 +23,7 @@ module CC::Importer::Standard
       url = ''
       if resource[:files] && resource[:files].first
         path = get_full_path(resource[:files].first[:href])
-        if File.exists?(path)
+        if File.exist?(path)
           xml = File.open(path).read
           # because of some sadness from certain vendors clear empty namespace declarations
           xml.gsub!(/xmlns=""/, '')

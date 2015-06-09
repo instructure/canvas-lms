@@ -150,7 +150,6 @@ describe ContentMigration do
         ur = @copy_from.usage_rights.create! use_justification: 'used_by_permission', legal_copyright: '(C) 2015 Wyndham Systems'
         Attachment.where(id: [attNU.id, attLU.id]).update_all(usage_rights_id: ur.id)
 
-        @copy_to.enable_feature! :better_file_browsing
         @copy_to.enable_feature! :usage_rights_required
         yield
 

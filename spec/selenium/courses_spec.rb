@@ -398,7 +398,7 @@ describe "courses" do
     it "should accept the course invitation" do
       enroll_student(@student, false)
 
-      login_as(@student.name)
+      create_session(@student.pseudonym)
       get "/courses/#{@course.id}"
       f(".global-message .btn[name='accept'] ").click
       assert_flash_notice_message /Invitation accepted!/
@@ -407,7 +407,7 @@ describe "courses" do
     it "should reject a course invitation" do
       enroll_student(@student, false)
 
-      login_as(@student.name)
+      create_session(@student.pseudonym)
       get "/courses/#{@course.id}"
       f(".global-message .btn[name=reject]").click
       assert_flash_notice_message /Invitation canceled./
@@ -418,7 +418,7 @@ describe "courses" do
       group.add_user(@student)
       enroll_student(@student, true)
 
-      login_as(@student.name)
+      create_session(@student.pseudonym)
       get '/courses'
 
       content = f('#content')

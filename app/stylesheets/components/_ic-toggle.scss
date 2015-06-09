@@ -195,6 +195,7 @@ The SCSS above would give you the toggle below.
     .ic-Toggle__switch {
       transition: background-color 0.3s $ic-Toggle-transition;
       background: $ic-Toggle-off-color;
+      cursor: pointer;
       &:before { color: $ic-Toggle-inactive-text; }
       &:after {
         // Autoprefixer choked here, so making the prefixes explicit

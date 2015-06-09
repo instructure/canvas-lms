@@ -4,6 +4,14 @@ module Lti
     attr_writer :analytics_id, :analytics_message_type
     attr_accessor :link_text, :resource_url, :params, :launch_type
 
+    def initialize(options = {})
+      @post_only = options[:post_only]
+    end
+
+    def resource_url
+      @post_only ? @resource_url.split('?').first : @resource_url
+    end
+
     def resource_path
       url = URI.parse(resource_url)
       url.path.empty? ? '/' : url.path

@@ -1,12 +1,9 @@
 <form>
   {{#with assignment_override}}
-  <span class="screenreader-only" id="overrides_course_section_accessible_label_{{uniqid}}">
-    {{#t}}For Section{{/t}}
-  </span>
-  <select class="section-list input-small" name="course_section_id"
-  aria-labelledby="overrides_course_section_accessible_label_{{uniqid}}">
-  </select>
-
+  <div class="token-input-wrapper">
+    <div class="token-input" name="course_section_id" aria-labelledby="overrides_course_section">
+    </div>
+  </div>
   <div class="date_field_container">
     <label class="screenreader-only" id="overrides_due_date_accessible_label_{{uniqid}}">
       {{#t}}Due Date:{{/t}}
@@ -44,7 +41,7 @@
       role="button"
       title='{{#t "overrides.remove_these_dates"}}Remove These Dates{{/t}}'
       aria-label='{{#t "overrides.remove_these_dates"}}Remove These Dates{{/t}}'
-    ><i class="icon-end"></i>
+    ><i class="icon-x"></i>
     </a>
   </div>
   {{/with}}

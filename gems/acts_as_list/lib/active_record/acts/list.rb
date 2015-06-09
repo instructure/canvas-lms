@@ -45,7 +45,7 @@ module ActiveRecord
             end
 
             def list_scope_base
-              self.class.scoped
+              self.class.base_class.scoped
             end
             RUBY
           else
@@ -103,7 +103,7 @@ module ActiveRecord
               end
 
               def list_scope_base
-                self.class.where(scope_condition)
+                self.class.base_class.where(scope_condition)
               end
             RUBY
           end

@@ -23,31 +23,34 @@ define [
       # if they don't currently exist (e.g. when
       # a thumbnail is being generated but not
       # immediately available after file upload)
-      intervalMultiplier = 1.5
-      delay = 2000
+      intervalMultiplier = 2.0
+      delay = 10000
       attempts = 0
-      maxAttempts = 10
+      maxAttempts = 4
 
       checkThumbnailTimeout = =>
         delay *= intervalMultiplier
         attempts++
 
         setTimeout =>
-          @checkForThumbnail()
+          @checkForThumbnail(checkThumbnailTimeout)
           return clearTimeout(checkThumbnailTimeout) if attempts >= maxAttempts
           checkThumbnailTimeout()
         , delay
 
       checkThumbnailTimeout()
 
-    checkForThumbnail: ->
+    checkForThumbnail: (timeout) ->
       return if @state.thumbnail_url or
                 @props.model?.attributes?.locked_for_user or
                 @props.model instanceof Folder or
                 @props.model?.get('content-type')?.match("audio")
 
-      @props.model?.fetch success: (model, response, options) =>
-        @setState(thumbnail_url: response.thumbnail_url) if response?.thumbnail_url
+      @props.model?.fetch
+        success: (model, response, options) =>
+          @setState(thumbnail_url: response.thumbnail_url) if response?.thumbnail_url
+        error: () ->
+          clearTimeout(timeout)
 
     render: withReactElement ->
       if @state.thumbnail_url

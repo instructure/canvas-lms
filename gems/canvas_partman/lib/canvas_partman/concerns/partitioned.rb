@@ -111,11 +111,6 @@ module CanvasPartman::Concerns
           ERROR
         end
       end
-
-      # :nodoc:
-      def partitioned?
-        true
-      end
     end
   end
 end

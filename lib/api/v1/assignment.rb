@@ -232,6 +232,10 @@ module Api::V1::Assignment
 
     locked_json(hash, assignment, user, 'assignment')
 
+    if assignment.context.present?
+      hash['submissions_download_url'] = submissions_download_url(assignment.context, assignment)
+    end
+
     hash
   end
 
@@ -466,5 +470,15 @@ module Api::V1::Assignment
     assignment.infer_times
 
     assignment
+  end
+
+  private
+
+  def submissions_download_url(context, assignment)
+    if assignment.quiz?
+      course_quiz_quiz_submissions_url(context, assignment.quiz, zip: 1)
+    else
+      course_assignment_submissions_url(context, assignment, zip: 1)
+    end
   end
 end

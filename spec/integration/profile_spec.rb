@@ -53,6 +53,6 @@ describe ProfileController do
     enter_student_view
 
     get '/profile/settings'
-    assert_unauthorized
+    expect(response.status).to eq 401
   end
 end

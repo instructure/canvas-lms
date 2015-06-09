@@ -1,0 +1,45 @@
+
+.auth_form.active {
+  display: block;
+}
+
+.auth_form {
+  max-width: 658px;
+  tr {
+    width: 658px;
+  }
+  button {
+    margin-left: 10px;
+  }
+
+  td {
+    min-width: 200px;
+  }
+}
+
+#auth-config-right-side {
+  a {
+    img {
+      margin-right: 5px;
+    }
+  }
+}
+
+#saml_debug_info {
+  .debug_xml {
+    overflow: auto;
+    font-family: monospace;
+    border: 1px solid #ccc;
+  }
+  .debug_label{
+    font-weight: bold;
+  }
+  pre {
+    margin: auto;
+    margin-left: 10px;
+    font-family: monospace;
+  }
+  h3{
+    margin-top: 10px;
+  }
+}

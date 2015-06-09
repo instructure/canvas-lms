@@ -109,7 +109,7 @@ module MigratorHelper
 
     path = create_export_dir(slug)
     i = 1
-    while File.exists?(path) && File.directory?(path)
+    while File.exist?(path) && File.directory?(path)
       i += 1
       path = create_export_dir("#{slug}_attempt_#{i}")
     end

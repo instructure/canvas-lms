@@ -823,6 +823,17 @@ describe Assignment do
         end
       end
 
+      it "should not assign peer reviews to fake students" do
+        fake_student = @course.student_view_student
+        fake_sub = @a.submit_homework(fake_student, :submission_type => "online_url", :url => "http://www.google.com")
+
+        @a.peer_review_count = 1
+        res = @a.assign_peer_reviews
+        expect(res.length).to eql(@submissions.length)
+        expect(res.map{|a| a.asset}).to_not be_include(fake_sub)
+        expect(res.map{|a| a.assessor_asset}).to_not be_include(fake_sub)
+      end
+
       it "should assign when already graded" do
         @users.each do |u|
           @a.grade_student(u, :grader => @teacher, :grade => '100')
@@ -1014,7 +1025,7 @@ describe Assignment do
         @sub.reload
         expect(@sub.score).to eql(15.2)
         expect(@sub.grade).to eql('F')
-        expect(@enrollment.reload.computed_current_score).to eq 50.7
+        expect(@enrollment.reload.computed_current_score).to eq 50.67
       end
 
       it "should accept lowercase letter grades" do
@@ -1059,7 +1070,7 @@ describe Assignment do
         @sub.reload
         expect(@sub.score).to eql(15.2)
         expect(@sub.grade).to eql('0')
-        expect(@enrollment.reload.computed_current_score).to eq 50.7
+        expect(@enrollment.reload.computed_current_score).to eq 50.67
       end
 
       it "should accept lowercase gpa grades" do
@@ -1352,6 +1363,20 @@ describe Assignment do
       expect(@a.quiz.reload).to be_published
       @a.unpublish
       expect(@a.quiz.reload).not_to be_published
+    end
+
+    context "#quiz?" do
+      it "knows that it is a quiz" do
+        @a.reload
+        expect(@a.quiz?).to be true
+      end
+
+      it "knows that an assignment is not a quiz" do
+        @a.reload
+        @a.quiz = nil
+        @a.submission_types = 'postal_delivery_of_an_elephant'
+        expect(@a.quiz?).to be false
+      end
     end
   end
 
@@ -1958,36 +1983,36 @@ describe Assignment do
   end
 
   describe "sections_with_visibility" do
-   before(:once) do
-     course_with_teacher(:active_all => true)
-     @section = @course.course_sections.create!
-     @student = student_in_section(@section, opts={})
-     @assignment, @assignment2, @assignment3 = (1..3).map{|a|@course.assignments.create!}
+    before(:once) do
+      course_with_teacher(:active_all => true)
+      @section = @course.course_sections.create!
+      @student = student_in_section(@section)
+      @assignment, @assignment2, @assignment3 = (1..3).map{ @course.assignments.create! }
 
-     @assignment.only_visible_to_overrides = true
-     create_section_override_for_assignment(@assignment, course_section: @section)
+      @assignment.only_visible_to_overrides = true
+      create_section_override_for_assignment(@assignment, course_section: @section)
 
-     @assignment2.only_visible_to_overrides = true
+      @assignment2.only_visible_to_overrides = true
 
-     @assignment3.only_visible_to_overrides = false
-     create_section_override_for_assignment(@assignment3, course_section: @section)
-     [@assignment, @assignment2, @assignment3].each(&:save!)
-   end
+      @assignment3.only_visible_to_overrides = false
+      create_section_override_for_assignment(@assignment3, course_section: @section)
+      [@assignment, @assignment2, @assignment3].each(&:save!)
+    end
 
-   it "returns active_course_sections with differentiated assignments off" do
-     @course.disable_feature!(:differentiated_assignments)
-     expect(@assignment.sections_with_visibility(@teacher)).to eq @course.course_sections
-     expect(@assignment2.sections_with_visibility(@teacher)).to eq @course.course_sections
-     expect(@assignment3.sections_with_visibility(@teacher)).to eq @course.course_sections
-   end
+    it "returns active_course_sections with differentiated assignments off" do
+      @course.disable_feature!(:differentiated_assignments)
+      expect(@assignment.sections_with_visibility(@teacher)).to eq @course.course_sections
+      expect(@assignment2.sections_with_visibility(@teacher)).to eq @course.course_sections
+      expect(@assignment3.sections_with_visibility(@teacher)).to eq @course.course_sections
+    end
 
-   it "returns only sections with overrides with differentiated assignments on" do
-     @course.enable_feature!(:differentiated_assignments)
-     expect(@assignment.sections_with_visibility(@teacher)).to eq [@section]
-     expect(@assignment2.sections_with_visibility(@teacher)).to eq []
-     expect(@assignment3.sections_with_visibility(@teacher)).to eq @course.course_sections
-   end
- end
+    it "returns only sections with overrides with differentiated assignments on" do
+      @course.enable_feature!(:differentiated_assignments)
+      expect(@assignment.sections_with_visibility(@teacher)).to eq [@section]
+      expect(@assignment2.sections_with_visibility(@teacher)).to eq []
+      expect(@assignment3.sections_with_visibility(@teacher)).to eq @course.course_sections
+    end
+  end
 
   context "modules" do
     it "should be locked when part of a locked module" do

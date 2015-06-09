@@ -55,4 +55,29 @@ describe "collaborations" do
       end
     end
   end
+
+  describe "Accessibility" do
+    before(:each) do
+      course_with_teacher_logged_in
+      create_collaboration!('etherpad', 'Collaboration 1')
+      create_collaboration!('etherpad', 'Collaboration 2')
+
+      get "/courses/#{@course.id}/collaborations"
+    end
+
+    it 'should set focus to the previous delete icon when deleting an etherpad collaboration' do
+      all_icons = ff('.delete_collaboration_link')
+      all_icons.last.click
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+      expect(check_element_has_focus(all_icons.first))
+    end
+
+    it 'should set focus to the add collaboration button if there are no previous collaborations' do
+      f('.delete_collaboration_link').click
+      driver.switch_to.alert.accept
+      wait_for_ajaximations
+      expect(check_element_has_focus(f('.add_collaboration_link')))
+    end
+  end
 end

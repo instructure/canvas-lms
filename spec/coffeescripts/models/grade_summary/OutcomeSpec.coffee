@@ -40,3 +40,12 @@ define [
   test "#masteryPercent should be master_points over points possible", ->
     outcome = new Outcome({mastery_points: 5, points_possible: 10})
     equal outcome.masteryPercent(), 50
+
+  test '#parse', ->
+    outcome = new Outcome()
+    parsed = outcome.parse({
+      submitted_or_assessed_at: '2015-04-24T19:27:54Z'
+    })
+
+    equal 'object', typeof(parsed['submitted_or_assessed_at']),
+      'is an object, not a string'

@@ -91,6 +91,60 @@ define([
     $(".score").text(submission.score != undefined && submission.score !== null ? round(submission.score, round.DEFAULT) : "");
     $(".published_score").text(submission.published_score != undefined && submission.published_score !== null ? round(submission.published_score, round.DEFAULT) : "");
   }
+  var makeRubricAccessible = function($rubric) {
+    $rubric.show()
+    var $tabs = $rubric.find(":tabbable")
+    var tabBounds = [$tabs.first()[0], $tabs.last()[0]]
+    var keyCodes = {
+      9: "tab",
+      13: "enter",
+      27: "esc"
+    }
+    $(".hide_rubric_link").keydown(function(e) {
+      if (keyCodes[e.which] == "enter") {
+        e.preventDefault();
+        $(this).click();
+      };
+    });
+    $tabs.each(function(){
+      $(this).bind('keydown', function(e){
+        if(keyCodes[e.which] == "esc")
+          $(".hide_rubric_link").click()
+      });
+    });
+    $(tabBounds).each(function(e){
+      $(this).bind('keydown', function(e){
+        if (keyCodes[e.which] == "tab"){
+          var isLeavingHolder = $(this).is($(tabBounds).first()) ? e.shiftKey : !e.shiftKey;
+          if(isLeavingHolder) {
+            e.preventDefault();
+            var thisEl = this
+            var target = $.grep(tabBounds,function(el){return el != thisEl})
+            $(target).focus();
+          };
+        };
+      });
+    });
+    $rubric.siblings().attr('data-hide_from_rubric', true).end().
+      parentsUntil("#application").siblings().not("#aria_alerts").attr('data-hide_from_rubric', true)
+    $rubric.hide()
+  }
+  var closeRubric = function() {
+    $("#rubric_holder").fadeOut(function() {
+      toggleRubric($(this));
+      $(".assess_submission_link").focus();
+    });
+  }
+  var openRubric = function() {
+    $("#rubric_holder").fadeIn(function() {
+      toggleRubric($(this));
+      $(this).find('.hide_rubric_link').focus();
+    });
+  }
+  var toggleRubric = function($rubric) {
+    ariaSetting = $rubric.is(":visible");
+    $("#application").find("[data-hide_from_rubric]").attr("aria-hidden", ariaSetting)
+  }
   $(document).ready(function() {
     $(".comments .comment_list .play_comment_link").mediaCommentThumbnail('small');
     $(window).bind('resize', function() {
@@ -98,7 +152,7 @@ define([
       var top = $frame.offset().top;
       var height = $(window).height() - top;
       $frame.height(height);
-      $("#rubric_holder").css('maxHeight', height - 50).css('overflow', 'auto').css('zIndex', 5);
+      $("#rubric_holder").css({'maxHeight': height - 50, 'overflow': 'auto', 'zIndex': 5});
       $(".comments").height(height);
     }).triggerHandler('resize');
     $(".comments_link").click(function(event) {
@@ -203,22 +257,19 @@ define([
         if (submission) {
           showGrade(submission);
         }
-        $("#rubric_holder").fadeOut();
+        closeRubric();
       });
     });
-    $("#rubric_holder .rubric").css('width', 'auto').css('marginTop', 0);
+    $("#rubric_holder .rubric").css({'width': 'auto', 'marginTop': 0});
+    makeRubricAccessible($("#rubric_holder"));
     $(".hide_rubric_link").click(function(event) {
       event.preventDefault();
-      $("#rubric_holder").fadeOut(function() {
-        $(".assess_submission_link").focus();
-      });
+      closeRubric();
     });
     $(".assess_submission_link").click(function(event) {
       event.preventDefault();
       $("#rubric_assessments_select").change();
-      $("#rubric_holder").fadeIn(function() {
-        $(this).find('.hide_rubric_link').focus();
-      });
+      openRubric();
     });
     $("#rubric_assessments_select").change(function() {
       var id = $(this).val();

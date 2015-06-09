@@ -63,11 +63,11 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
   def test_message (filename)
     message = get_processed_message(filename)
 
-    text_body =  message.body.strip!
-    text_body.should == get_expected_text(filename)
+    text_body =  message.body.strip
+    text_body.should == get_expected_text(filename).strip
 
-    html_body =  message.html_body.strip!
-    html_body.should == get_expected_html(filename)
+    html_body =  message.html_body.strip
+    html_body.should == get_expected_html(filename).strip
   end
 
   def get_processed_message(name)
@@ -128,7 +128,9 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
 
   describe "#process_single" do
     it "should not choke on invalid UTF-8" do
-      IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new { body "he\xffllo".force_encoding(Encoding::BINARY) }, '')
+      IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new {
+          content_type 'text/plain; charset=UTF-8'
+          body "he\xffllo".force_encoding(Encoding::BINARY) }, '')
 
       message_handler.body.should == "hello"
       message_handler.html_body.should == "hello"
@@ -167,6 +169,26 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       message_handler.expects(:handle).never
 
       IncomingMessageProcessor.new(message_handler, error_reporter).process_single(incoming_bounce_message, '')
+    end
+
+    it "creates text body from html only messages" do
+      IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new {
+          content_type 'text/html; charset=UTF-8'
+          body '<h1>This is HTML</h1>'
+        }, '')
+      message_handler.body.should == "************\nThis is HTML\n************"
+      message_handler.html_body.should == '<h1>This is HTML</h1>'
+    end
+
+    it "creates missing text part from html part" do
+      IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new {
+          html_part do
+            content_type 'text/html; charset=UTF-8'
+            body '<h1>This is HTML</h1>'
+          end
+        }, '')
+      message_handler.body.should == "************\nThis is HTML\n************"
+      message_handler.html_body.should == '<h1>This is HTML</h1>'
     end
 
     it "works with multipart emails with no html part" do

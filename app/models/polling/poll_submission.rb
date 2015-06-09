@@ -54,6 +54,7 @@ module Polling
         end
       end
     end
+
     def poll_choices_belong_to_poll
       if self.poll
         unless self.poll.poll_choices.include?(poll_choice)

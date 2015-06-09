@@ -20,7 +20,7 @@ gem 'authlogic', '3.4.2'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'dynamic_form', '1.1.4', require: false
 gem 'rails-patch-json-encode', '0.0.1'
-gem 'switchman', '1.2.33'
+gem 'switchman', '1.2.34'
 gem 'folio-pagination', '0.0.7', require: 'folio/rails'
 gem 'will_paginate', '3.0.4', require: false
 
@@ -48,7 +48,7 @@ gem 'i18nema', '0.0.8', platforms: [:ruby_20, :ruby_21, :ruby_22]
 gem 'i18nema19', '0.0.8', platform: :ruby_19
 gem 'i18nliner', '0.0.11'
 gem 'icalendar', '1.5.4', require: false
-gem 'ims-lti', '2.0.0.beta.18', require: false
+gem 'ims-lti', '2.0.0.beta.26', require: false
 gem 'jammit', github: 'documentcloud/jammit', ref: '98b50a67029c2860717485a72a2ff0ae8ec37840'
   gem 'cssmin', '1.0.3', require: false
   gem 'jsmin', '1.0.1', require: false
@@ -96,7 +96,7 @@ gem 'foreigner', '0.9.2'
 gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'hey', '1.3.0', require: false
 gem 'aroi', '0.0.2'
-gem 'sentry-raven', github: 'getsentry/raven-ruby', ref: '001eaf67b5f0da5e23c50159710c8d11e31c2dbc', require: false
+gem 'sentry-raven', '0.13.2', require: false
 
 gem 'active_polymorph', path: 'gems/active_polymorph'
 gem 'activesupport-suspend_callbacks', path: 'gems/activesupport-suspend_callbacks'

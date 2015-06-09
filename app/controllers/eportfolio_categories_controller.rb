@@ -25,6 +25,7 @@ class EportfolioCategoriesController < ApplicationController
     @portfolio = Eportfolio.find(params[:eportfolio_id])
     redirect_to eportfolio_url(@portfolio)
   end
+
   def create
     @portfolio = Eportfolio.find(params[:eportfolio_id])
     if authorized_action(@portfolio, @current_user, :update)

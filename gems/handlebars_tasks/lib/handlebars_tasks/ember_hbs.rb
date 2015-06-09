@@ -11,7 +11,7 @@ module HandlebarsTasks
         dest = parse_dest(path)
         precompiled = compile_template(path)
         dir = File.dirname(dest)
-        FileUtils.mkdir_p(dir) unless File.exists?(dir)
+        FileUtils.mkdir_p(dir) unless File.exist?(dir)
         File.open(dest, 'w') { |f| f.write precompiled }
       end
 

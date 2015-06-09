@@ -12,19 +12,13 @@ if settings.present?
   Raven.configure do |config|
     config.silence_ready = true
     config.dsn = settings[:dsn]
-    config.tags = settings[:tags] if settings[:tags]
+    config.tags = settings.fetch(:tags, {}).merge('canvas_revision' => Canvas.revision)
     config.sanitize_fields += Rails.application.config.filter_parameters.map(&:to_s)
     config.sanitize_credit_cards = false
   end
 
   Canvas::Errors.register!(:sentry_notification) do |exception, data|
     setting = Setting.get("sentry_error_logging_enabled", 'true')
-    if setting == 'true'
-      if exception.is_a?(String) || exception.is_a?(Symbol)
-        Raven.capture_message(exception, data)
-      else
-        Raven.capture_exception(exception, data)
-      end
-    end
+    SentryProxy.capture(exception, data) if setting == 'true'
   end
 end

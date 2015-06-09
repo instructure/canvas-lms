@@ -58,9 +58,9 @@ module Lti
             url: tool.extension_setting(p, :url) || tool.extension_default_value(p, :url),
             title: tool.label_for(p, I18n.locale || I18n.default_locale.to_s),
           }
-          if p.to_sym == :resource_selection
-            definition[:placements][:resource_selection][:selection_width] = tool.extension_setting(:resource_selection, :selection_width) || 500
-            definition[:placements][:resource_selection][:selection_height] = tool.extension_setting(:resource_selection, :selection_height) || 500
+          if p.to_sym == :resource_selection || definition[:placements][p.to_sym][:message_type] == 'ContentItemSelection'
+            definition[:placements][p.to_sym][:selection_width] = tool.extension_setting(:resource_selection, :selection_width)
+            definition[:placements][p.to_sym][:selection_height] = tool.extension_setting(:resource_selection, :selection_height)
           end
         end
       end

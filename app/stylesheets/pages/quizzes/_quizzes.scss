@@ -21,16 +21,10 @@ $answersSprite: url(/images/answers_sprite.png);
   top: -16px;
 }
 
-#wrapper-container {
-  min-width: 1100px;
-}
-
-.with_item_groups #wrapper-container {
-  min-width: 940px;
-}
-
-.quizzes-speedgrader #wrapper-container {
-  min-width: 1000px;
+@if $use_new_styles == false {
+  #wrapper-container { min-width: 1100px; }
+  .with_item_groups #wrapper-container { min-width: 940px; }
+  .quizzes-speedgrader #wrapper-container { min-width: 1000px; }
 }
 
 // quiz index
@@ -40,11 +34,9 @@ li.quiz {
     color: darken($ic-color-neutral, 40);
   }
   .ig-title {
-    right: 554px;
-  }
-  .ig-details {
-    right: 110px;
-    width: 425px;
+    flex: 0 0 $ic-sp*17;
+    @include breakpoint(desktop) { flex: 0 0 25%; }
+    @include breakpoint(wide) { flex: 0 0 30%; }
   }
   .default-dates .status-description {
     font-weight: bold;
@@ -167,13 +159,14 @@ li.quiz {
   overflow: visible;
 }
 
-div#content {
-  overflow: visible;
-  padding: 0;
-}
-
-#right-side-wrapper {
-  position: absolute;
+@if $use_new_styles == false {
+  div#content {
+    overflow: visible;
+    padding: 0;
+  }
+  #right-side-wrapper {
+    position: absolute;
+  }
 }
 
 .quiz-header {
@@ -1267,6 +1260,9 @@ ul#quiz_versions {
       min-width: 125px;
     }
   }
+  #options_tab{
+    overflow-x: scroll;
+  }
   #quiz_tabs {
     margin-top: 0.7em;
     #questions_tab {
@@ -1919,8 +1915,8 @@ ul#quiz_versions {
   }
 }
 
-#left-side {
-  position: absolute;
+@if $use_new_styles == false {
+  #left-side { position: absolute; }
 }
 
 .form-actions {

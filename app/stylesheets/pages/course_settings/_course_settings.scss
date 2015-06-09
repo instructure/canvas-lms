@@ -270,9 +270,16 @@ ul.user_list div.enrollment_type.pending {
 #right-side table.summary {
   margin-top: 20px;
   caption h3 {
-    font-size: inherit;
     line-height: inherit;
-    margin: inherit;
+    @if $use_new_styles {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    @else {
+      font-size: inherit;
+      margin: inherit;
+    }
   }
 }
 

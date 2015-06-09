@@ -4142,3 +4142,12 @@ describe Course, 'touch_root_folder_if_necessary' do
     end
   end
 end
+
+describe Course, 'invited_count_visible_to' do
+  it "counts newly created students" do
+    course_with_teacher
+    student_in_course
+    expect(@student.enrollments.where(course_id: @course).first).to be_creation_pending
+    expect(@course.invited_count_visible_to(@teacher)).to eq(2)
+  end
+end

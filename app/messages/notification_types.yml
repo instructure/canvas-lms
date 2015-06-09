@@ -246,3 +246,8 @@
   notifications:
     - name: Summaries
       delay_for: 0
+
+- category: Recording Ready
+  notifications:
+    - name: Web Conference Recording Ready
+      delay_for: 0

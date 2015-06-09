@@ -1558,6 +1558,12 @@ form.ic-Form-group { margin: 0; }
   margin-bottom: $ic-sp*2;
   box-sizing: border-box;
 
+  &.ic-Action-header--before-item-groups {
+    margin-bottom: 0;
+    padding-bottom: $ic-sp;
+    border-bottom: 1px solid $ic-border-light;
+  }
+
   @include breakpoint(tablet) {
     display: flex;
     align-items: center;

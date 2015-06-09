@@ -28,8 +28,8 @@ define([
       var contextUrl = splitAssetString(this.props.contextString).join('/');
 
       // Create the stores, and add change listeners to them.
-      this.fileStore = new FileStore(contextUrl);
-      this.folderStore = new FolderStore(contextUrl);
+      this.fileStore = new FileStore(contextUrl, {perPage: 50});
+      this.folderStore = new FolderStore(contextUrl, {perPage: 50});
       this.fileStore.addChangeListener( () => {
         this.setState({
           files: this.fileStore.getState().items
