@@ -3,6 +3,7 @@ define [
   'jquery'
   'underscore'
   'compiled/class/cache'
+  'compiled/util/hasLocalStorage'
   'compiled/views/DraggableCollectionView'
   'compiled/views/assignments/AssignmentListItemView'
   'compiled/views/assignments/CreateAssignmentView'
@@ -12,7 +13,7 @@ define [
   'compiled/fn/preventDefault'
   'jst/assignments/AssignmentGroupListItem'
   'compiled/views/assignments/AssignmentKeyBindingsMixin'
-], (I18n, $, _, Cache, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView,CreateGroupView, DeleteGroupView, MoveDialogView, preventDefault, template, AssignmentKeyBindingsMixin) ->
+], (I18n, $, _, Cache, hasLocalStorage, DraggableCollectionView, AssignmentListItemView, CreateAssignmentView,CreateGroupView, DeleteGroupView, MoveDialogView, preventDefault, template, AssignmentKeyBindingsMixin) ->
 
   class AssignmentGroupListItemView extends DraggableCollectionView
     @mixin AssignmentKeyBindingsMixin
@@ -129,7 +130,7 @@ define [
 
     initCache: ->
       $.extend true, @, Cache
-      @cache.use('localStorage')
+      @cache.use('localStorage') if hasLocalStorage
       key = @cacheKey()
       if !@cache.get(key)?
         @cache.set(key, true)
