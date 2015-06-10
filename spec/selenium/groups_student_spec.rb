@@ -109,7 +109,7 @@ describe "student groups" do
 
     describe "student group index page" do
       before(:each) do
-        create_student_group(group_name:group_name)
+       create_group(group_name:group_name)
         get "/courses/#{@course.id}/groups"
       end
 
@@ -161,7 +161,7 @@ describe "student groups" do
 
     describe "student who is not in the group", priority:"2", test_id:184465 do
       it "should allow the student to join a student group they did not create" do
-        create_student_group(group_name:group_name,enroll_student_count:0,add_self_to_group:false)
+        create_group(group_name:group_name,enroll_student_count:0,add_self_to_group:false)
         get "/courses/#{@course.id}/groups"
 
         # join group
@@ -173,7 +173,7 @@ describe "student groups" do
 
     describe "Manage Student Group Page" do
       before(:each) do
-        create_student_group(group_name:group_name, enroll_student_count:2)
+        create_group(group_name:group_name, enroll_student_count:2)
         get "/courses/#{@course.id}/groups"
       end
 
