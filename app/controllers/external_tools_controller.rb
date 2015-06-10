@@ -28,19 +28,6 @@ class ExternalToolsController < ApplicationController
 
   REDIS_PREFIX = 'external_tool:sessionless_launch:'
 
-  TOOL_DISPLAY_TEMPLATES = {
-    'borderless' => {template: 'lti/unframed_launch', layout: 'borderless_lti'}.freeze,
-    'full_width' => {template: 'lti/full_width_launch'}.freeze,
-    'in_context' => {template: 'lti/framed_launch'}.freeze,
-    'default' =>    {template: 'lti/framed_launch'}.freeze,
-  }.freeze
-
-  def self.display_template(display_type)
-    display_type = 'default' unless TOOL_DISPLAY_TEMPLATES.key?(display_type)
-    template = TOOL_DISPLAY_TEMPLATES[display_type]
-    template.dup
-  end
-
   # @API List external tools
   # Returns the paginated list of external tools for the current context.
   # See the get request docs for a single tool for a list of properties on an external tool.
@@ -134,8 +121,8 @@ class ExternalToolsController < ApplicationController
     @lti_launch.link_text =  @tool.name
     @lti_launch.analytics_id =  @tool.tool_id
 
-    display_type = params['borderless'] ? 'borderless' : params['display']
-    render self.class.display_template(display_type)
+    display_type = 'borderless' if params['borderless']
+    render Lti::AppUtil.display_template(display_type, display_override: params[:display])
   end
 
   # @API Get a sessionless launch url for an external tool.
@@ -268,7 +255,7 @@ class ExternalToolsController < ApplicationController
     @lti_launch.link_text =  launch_settings['tool_name']
     @lti_launch.analytics_id =  launch_settings['analytics_id']
 
-    render self.class.display_template('borderless')
+    render Lti::AppUtil.display_template('borderless')
   end
 
   # @API Get a single external tool
@@ -334,7 +321,7 @@ class ExternalToolsController < ApplicationController
         @show_embedded_chat = false if @tool.tool_id == 'chat'
 
         @lti_launch = lti_launch(@tool, placement)
-        render self.class.display_template(@tool.display_type(placement))
+        render Lti::AppUtil.display_template(@tool.display_type(placement), display_override: params[:display])
       end
       add_crumb(@context.name, named_context_url(@context, :context_url))
     end
@@ -385,7 +372,7 @@ class ExternalToolsController < ApplicationController
     tool = find_tool(params[:external_tool_id], selection_type)
     if tool
       @lti_launch = lti_launch(@tool, selection_type)
-      render self.class.display_template('borderless')
+      render Lti::AppUtil.display_template('borderless')
     end
   end
 
