@@ -10,8 +10,12 @@ define [
     className: 'revision clearfix'
     template: template
 
+    attributes:
+      tabindex: 0
+
     events:
       'click .restore-link': 'restore'
+      'keydown .restore-link': 'restore'
 
     initialize: ->
       super
@@ -34,10 +38,15 @@ define [
       json.edited_by = json.edited_by?.display_name
       json
 
+    windowLocation: ->
+      return window.location;
+
     restore: (ev) ->
+      if (ev?.type == 'keydown')
+        return if ev.keyCode != 13
       ev?.preventDefault()
       @model.restore().done (attrs) =>
         if @pages_path
-          window.location.href = "#{@pages_path}/#{attrs.url}/revisions"
+          @windowLocation().href = "#{@pages_path}/#{attrs.url}/revisions"
         else
-          window.location.reload()
+          @windowLocation().reload()

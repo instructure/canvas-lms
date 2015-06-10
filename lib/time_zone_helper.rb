@@ -65,6 +65,6 @@ module TimeZoneHelper
 
   def self.included(klass)
     klass.send(:extend, ClassMethods)
-    klass.send(CANVAS_RAILS2 ? :class_inheritable_hash : :class_attribute, :time_zone_attribute_defaults)
+    klass.send(:class_attribute, :time_zone_attribute_defaults)
   end
 end

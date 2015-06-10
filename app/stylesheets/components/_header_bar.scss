@@ -1,0 +1,168 @@
+/*
+@styleguide Header Bar
+
+<br/>
+
+### tl;dr
+  - Actions is the header bar should exist on the right 
+  - Cog menus should always be the most right
+  - Many actions should be grouped by related function, IE (edit/delete content) and (preview/publish content)
+  - Left side should be used for filtering and searching content
+  - Add body class `.padless-content` to the body when using `.header-bar` so that header-bar extends full width.
+  - Add padding or margin to containers below header-bar
+
+
+## Actions on the right; primary and secondary actions
+
+```html
+
+<div class="header-bar">
+  <div class="header-bar-right">
+    <a href="#" class="btn">Preview</a>
+    <a href="#" class="btn btn-primary">Add Module</a>
+  </div>
+</div>
+
+```
+
+## Actions on the right; primary, secondary and cog
+
+```html
+
+<div class="header-bar">
+  <div class="header-bar-right">
+    <a href="#" class="btn">Preview</a>
+    <a href="#" class="btn btn-primary">Add Module</a>
+    <div class="inline-block">
+      <a class="al-trigger btn" href="#" role="button">
+        <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+        <span class="screenreader-only">Settings</span>
+      </a>
+      <ul class="al-options">
+        <li><a href="#" class="icon-edit">Edit</a></li>
+        <li><a href="#" class="icon-trash">Delete</a></li>
+        <li><a href="#" class="icon-lock">Lock</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+```
+
+
+## Actions grouped by related function
+
+```html
+
+<div class="header-bar">
+  <div class="header-bar-right">
+    <div class="header-group-left">
+      <a href="#" class="btn btn-published"></a>
+      <a href="#" class="btn">Preview</a>
+    </div>
+    <div class="header-group-right">
+      <a href="#" class="btn"><i class="icon-edit"></i> Edit</a>
+      <div class="inline-block">
+        <a class="al-trigger btn" href="#" role="button">
+          <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+          <span class="screenreader-only">Settings</span>
+        </a>
+        <ul class="al-options">
+          <li><a href="#" class="icon-edit">Edit</a></li>
+          <li><a href="#" class="icon-trash">Delete</a></li>
+          <li><a href="#" class="icon-lock">Lock</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+```
+
+## Actions on the right, filters and search on the left
+
+```html
+
+<div class="header-bar row-fluid">
+  <div class="span8">
+    <input type="text" name="search_term" data-view="inputFilter" placeholder="Search people" aria-label="Search">
+    <select name="enrollment_role" data-view="roleSelect" aria-label="Limit search to role"><option value="">All Roles</option>
+      <option value="StudentEnrollment">Student (0)</option>
+      <option value="TeacherEnrollment">Teacher (1)</option>
+      <option value="TaEnrollment">TA (0)</option>
+      <option value="DesignerEnrollment">Designer (0)</option>
+      <option value="ObserverEnrollment">Observer (0)</option>
+    </select>
+  </div>
+  <div class="span4 align-right">
+    <a class="btn btn-primary"><i class="icon-add"></i> Add People</a>
+    <div class="inline-block">
+      <a class="al-trigger btn" href="#" role="button">
+        <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+        <span class="screenreader-only">Settings</span>
+      </a>
+      <ul class="al-options">
+        <li><a href="#" class="icon-edit">Edit</a></li>
+        <li><a href="#" class="icon-trash">Delete</a></li>
+        <li><a href="#" class="icon-lock">Lock</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+```
+*/
+
+.header-bar {
+  @include clearfix;
+  border-bottom: 1px solid $ic-border-light;
+  background-color: #fff;
+  min-height: 33px;
+  @if $use_new_styles { padding-bottom: $ic-sp; }
+  @else { padding: 15px; }
+
+  &.pinned {
+    position: fixed;
+    top: 0;
+    width: 1071px;
+    background-color: white;
+    box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.5);
+    margin-left: -12px;
+    padding: 15px;
+    z-index: 100;
+  }
+  // for a sticky header-bar
+  &.sticky {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin-left: $left_side_width + 1;
+    margin-right: $right_side_width + 1;
+    z-index: 3;
+    background: white;
+    height: 33px;
+    min-width: 623px;
+    border-color: #c1c7cf;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
+  // helpers for alignment, use .row-fluid and .span classes to align where possible instead of these
+  .header-bar-right {
+    float: right;
+  }
+  .header-bar-left {
+    float: left;
+  }
+}
+
+// classes for grouping buttons on the right
+.header-group-left{
+  margin-right: 10px;
+}
+.header-group-left, .header-group-right{
+  float: left;
+}
+
+#searchTerm {
+  width: 225px;
+}

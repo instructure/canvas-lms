@@ -36,7 +36,7 @@ module CC
               "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
       ) do |groups_node|
         @course.assignment_groups.active.each do |group|
-          next unless export_object?(group) || group.assignments.any?{|a| export_object?(a)}
+          next unless export_object?(group)
           migration_id = CCHelper.create_key(group)
           groups_node.assignmentGroup(:identifier=>migration_id) do |group_node|
             group_node.title group.name
@@ -52,7 +52,7 @@ module CC
                 rules.each do |rule|
                   a = nil
                   if rule.first == 'never_drop'
-                    a = @course.assignments.find_by_id(rule.last)
+                    a = @course.assignments.where(id: rule.last).first
                     next unless a
                   end
                   rules_node.rule do |rule_node|

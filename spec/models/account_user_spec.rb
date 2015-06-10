@@ -20,17 +20,22 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe AccountUser do
 
+  before :once do
+    @role1 = custom_account_role('role1', :account => Account.default)
+    @role2 = custom_account_role('role2', :account => Account.default)
+  end
+
   shared_examples_for "touching" do
     it "should recache permissions when created" do
       enable_cache do
         @user.shard.activate { User.update_all(:updated_at => 1.month.ago) }
         @user.reload
-        @account.grants_right?(@user, :read).should be_false
+        expect(@account.grants_right?(@user, :read)).to be_falsey
         @account.account_users.create!(user: @user)
         @user.reload
         RoleOverride.clear_cached_contexts
         @account.instance_variable_set(:@account_users_cache, {})
-        @account.grants_right?(@user, :read).should be_true
+        expect(@account.grants_right?(@user, :read)).to be_truthy
       end
     end
 
@@ -39,12 +44,12 @@ describe AccountUser do
         au = @account.account_users.create!(user: @user)
         @user.shard.activate { User.update_all(:updated_at => 1.month.ago) }
         @user.reload
-        @account.grants_right?(@user, :read).should be_true
+        expect(@account.grants_right?(@user, :read)).to be_truthy
         au.destroy
         @user.reload
         RoleOverride.clear_cached_contexts
         @account.instance_variable_set(:@account_users_cache, {})
-        @account.grants_right?(@user, :read).should be_false
+        expect(@account.grants_right?(@user, :read)).to be_falsey
       end
     end
   end
@@ -52,7 +57,7 @@ describe AccountUser do
   context "non-sharded" do
     include_examples "touching"
 
-    before do
+    before :once do
       @account = Account.default
       @user = User.create!
     end
@@ -62,7 +67,7 @@ describe AccountUser do
     specs_require_sharding
     include_examples "touching"
 
-    before do
+    before :once do
       @account = @shard1.activate { Account.create! }
       @user = @shard2.activate { User.create! }
     end
@@ -71,13 +76,13 @@ describe AccountUser do
   describe "all_permissions_for" do
     it "should include granted permissions from multiple roles" do
       user = User.create!
-      account_admin_user_with_role_changes(:user => user, :membership_type => 'role1', :role_changes => {:manage_sis => true})
-      account_admin_user_with_role_changes(:user => user, :membership_type => 'role2', :role_changes => {:manage_wiki => true})
+      account_admin_user_with_role_changes(:user => user, :role => @role1, :role_changes => {:manage_sis => true})
+      account_admin_user_with_role_changes(:user => user, :role => @role2, :role_changes => {:manage_wiki => true})
 
       permissions = AccountUser.all_permissions_for(user, Account.default)
-      permissions.delete(:manage_sis).should_not be_empty
-      permissions.delete(:manage_wiki).should_not be_empty
-      permissions.values.all?(&:empty?).should be_true
+      expect(permissions.delete(:manage_sis)).not_to be_empty
+      expect(permissions.delete(:manage_wiki)).not_to be_empty
+      expect(permissions.values.all?(&:empty?)).to be_truthy
     end
   end
 
@@ -85,15 +90,15 @@ describe AccountUser do
     before :once do
       @user1 = User.create!
       @user2 = User.create!
-      @ro1 = Account.default.role_overrides.create!(:enrollment_type => 'role1', :permission => 'manage_sis', :enabled => true)
-      @ro2 = Account.default.role_overrides.create!(:enrollment_type => 'role2', :permission => 'manage_sis', :enabled => true)
-      @au1 = Account.default.account_users.create!(user: @user1, membership_type: 'role1')
-      @au2 = Account.default.account_users.create!(user: @user2, membership_type: 'role2')
+      @ro1 = Account.default.role_overrides.create!(:role => @role1, :permission => 'manage_sis', :enabled => true)
+      @ro2 = Account.default.role_overrides.create!(:role => @role2, :permission => 'manage_sis', :enabled => true)
+      @au1 = Account.default.account_users.create!(user: @user1, role: @role1)
+      @au2 = Account.default.account_users.create!(user: @user2, role: @role2)
     end
 
     it "should be symmetric for applies_to everything" do
-      @au1.is_subset_of?(@user2).should be_true
-      @au2.is_subset_of?(@user1).should be_true
+      expect(@au1.is_subset_of?(@user2)).to be_truthy
+      expect(@au2.is_subset_of?(@user1)).to be_truthy
     end
 
     it "should be symmetric for applies_to self" do
@@ -101,8 +106,8 @@ describe AccountUser do
       @ro1.save!
       @ro2.applies_to_descendants = false
       @ro2.save!
-      @au1.is_subset_of?(@user2).should be_true
-      @au2.is_subset_of?(@user1).should be_true
+      expect(@au1.is_subset_of?(@user2)).to be_truthy
+      expect(@au2.is_subset_of?(@user1)).to be_truthy
     end
 
     it "should be symmetric for applies_to descendants" do
@@ -110,22 +115,22 @@ describe AccountUser do
       @ro1.save!
       @ro2.applies_to_self = false
       @ro2.save!
-      @au1.is_subset_of?(@user2).should be_true
-      @au2.is_subset_of?(@user1).should be_true
+      expect(@au1.is_subset_of?(@user2)).to be_truthy
+      expect(@au2.is_subset_of?(@user1)).to be_truthy
     end
 
     it "should properly compute differing applies_to (descendants vs. all)" do
       @ro1.applies_to_self = false
       @ro1.save!
-      @au1.is_subset_of?(@user2).should be_true
-      @au2.is_subset_of?(@user1).should be_false
+      expect(@au1.is_subset_of?(@user2)).to be_truthy
+      expect(@au2.is_subset_of?(@user1)).to be_falsey
     end
 
     it "should properly compute differing applies_to (self vs. all)" do
       @ro1.applies_to_descendants = false
       @ro1.save!
-      @au1.is_subset_of?(@user2).should be_true
-      @au2.is_subset_of?(@user1).should be_false
+      expect(@au1.is_subset_of?(@user2)).to be_truthy
+      expect(@au2.is_subset_of?(@user1)).to be_falsey
     end
 
     it "should properly compute differing applies_to (self vs. descendants)" do
@@ -133,21 +138,23 @@ describe AccountUser do
       @ro1.save!
       @ro2.applies_to_self = false
       @ro2.save!
-      @au1.is_subset_of?(@user2).should be_false
-      @au2.is_subset_of?(@user1).should be_false
+      expect(@au1.is_subset_of?(@user2)).to be_falsey
+      expect(@au2.is_subset_of?(@user1)).to be_falsey
     end
   end
 
   describe "set_policy" do
     it "should not allow a lesser admin to create" do
-      account_admin_user_with_role_changes(membership_type: 'lesser', role_changes: { manage_account_memberships: true })
-      au = Account.default.account_users.build(user: @user, membership_type: 'AccountAdmin')
-      au.grants_right?(@user, :create).should be_false
+      lesser_role = custom_account_role('lesser', :account => Account.default)
+
+      account_admin_user_with_role_changes(role: lesser_role, role_changes: { manage_account_memberships: true })
+      au = Account.default.account_users.build(user: @user, role: admin_role)
+      expect(au.grants_right?(@user, :create)).to be_falsey
       u2 = User.create!
-      au = Account.default.account_users.build(user: u2, membership_type: 'lesser')
-      au.grants_right?(@user, :create).should be_true
-      au = Account.default.account_users.build(user: u2, membership_type: 'AccountAdmin')
-      au.grants_right?(@user, :create).should be_false
+      au = Account.default.account_users.build(user: u2, role: lesser_role)
+      expect(au.grants_right?(@user, :create)).to be_truthy
+      au = Account.default.account_users.build(user: u2, role: admin_role)
+      expect(au.grants_right?(@user, :create)).to be_falsey
     end
   end
 end

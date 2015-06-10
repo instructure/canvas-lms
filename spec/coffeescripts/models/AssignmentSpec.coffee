@@ -5,7 +5,36 @@ define [
   'helpers/fakeENV'
 ], (Assignment, Submission, DateGroup, fakeENV) ->
 
-  module "Assignment"
+  module "Assignment#initialize with ENV.POST_TO_SIS set to false",
+    setup: ->
+      fakeENV.setup
+        POST_TO_SIS: false
+    teardown: -> fakeENV.teardown()
+
+  test "must not alter the post_to_sis field", ->
+    assignment = new Assignment
+    strictEqual assignment.get('post_to_sis'), undefined
+
+  module "Assignment#initalize with ENV.POST_TO_SIS set to true",
+    setup: ->
+      fakeENV.setup
+        POST_TO_SIS: true
+    teardown: -> fakeENV.teardown()
+
+  test "must default post_to_sis to true for a new assignment", ->
+    assignment = new Assignment
+    strictEqual assignment.get('post_to_sis'), true
+
+  test "must leave a false value as is", ->
+    assignment = new Assignment {post_to_sis: false}
+    strictEqual assignment.get('post_to_sis'), false
+
+  test "must leave a null value as is for an existing assignment", ->
+    assignment = new Assignment {
+      id: '1234',
+      post_to_sis: null
+    }
+    strictEqual assignment.get('post_to_sis'), null
 
   module "Assignment#isQuiz"
 

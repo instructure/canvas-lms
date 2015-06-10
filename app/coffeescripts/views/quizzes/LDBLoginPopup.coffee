@@ -2,9 +2,10 @@ define [
   "underscore"
   "Backbone"
   "jquery"
-  "jst/quizzes/LDBLoginPopup",
+  "jst/quizzes/LDBLoginPopup"
+  "str/htmlEscape"
   "jquery.toJSON"
-], (_, Backbone, $, Markup) ->
+], (_, Backbone, $, Markup, htmlEscape) ->
 
   # Consumes an event and stops it from propagating.
   consume = (e) ->
@@ -179,7 +180,7 @@ define [
 
         # Inject the stylesheets.
         _(styleSheets).each (href) ->
-          $head.append "<link rel=\"stylesheet\" href=\"" + href + "\" />"
+          $head.append "<link rel=\"stylesheet\" href=\"" + htmlEscape(href) + "\" />"
           return
 
         # Show the form.

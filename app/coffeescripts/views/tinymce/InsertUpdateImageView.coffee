@@ -52,9 +52,14 @@ define [
         when 'tabUploaded'
           loadTab (done) =>
             require [
-              'compiled/views/FileBrowserView'
-            ], (FileBrowserView) =>
-              new FileBrowserView(contentTypes: 'image').render().$el.appendTo(ui.panel)
+              'compiled/views/TreeBrowserView'
+              'compiled/views/RootFoldersFinder'
+            ], (TreeBrowserView, RootFoldersFinder) =>
+              rootFoldersFinder = new RootFoldersFinder({
+                contentTypes: 'image',
+                useVerifiers: true
+              })
+              new TreeBrowserView(rootModelsFinder: rootFoldersFinder).render().$el.appendTo(ui.panel)
               done()
         when 'tabFlickr'
           loadTab (done) =>
@@ -127,10 +132,10 @@ define [
       @setSelectedImage src: $(event.currentTarget).val()
 
     generateImageHtml: ->
-      img_tag = @editor.dom.createHTML("img", @getAttributes())
+      imgHtml = @editor.dom.createHTML("img", @getAttributes())
       if @flickr_link
-        img_tag = "<a href='#{@flickr_link}'>#{img_tag}</a>"
-      img_tag
+        imgHtml = "<a href='#{h @flickr_link}'>#{imgHtml}</a>"
+      imgHtml
         
     update: =>
       @editor.selection.moveToBookmark(@prevSelection)

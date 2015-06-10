@@ -1,0 +1,26 @@
+<form class="bootstrap-form form-inline modules-create-item-form">
+
+  {{c-icon type="discussion"}}
+
+  {{input
+    autofocus="true"
+    type="text"
+    class="span4"
+    value=model.title
+    placeholder=text.discussionName
+    aria-label=text.discussionName
+  }}
+
+  <button
+    class="btn btn-primary"
+    type="submit"
+    {{action "create"}}
+  >{{#t "create_discussion"}}Create Discussion{{/t}}</button>
+
+  <button
+    class="btn"
+    type="button"
+    {{action "cancel"}}
+  >{{#t "cancel"}}Cancel{{/t}}</button>
+</form>
+

@@ -14,19 +14,26 @@ module.exports = {
     var l, c;
     if (options.l) {
       l = options.l;
-      c = options.c;
     } else if (options.bright) {
       l = 74;
-      c = 41;
+    } else if (options.unsafe) {
+      l = 60;
     } else {
       l = 49;
-      c = 29;
+    }
+    if (options.c) {
+      c = options.c;
+    } else {
+      c = 3 + l / 2;
 
       // vary chroma to roughly match boundary of RGB-expressible colors
-      var delta = 17;
+      var delta = 5 + l/4;
       var most_constrained_hue = 210;
       var hr = (h - most_constrained_hue) / 360 * 2 * Math.PI;
-      c += delta - Math.round(delta * Math.cos(hr));
+      c += Math.floor(delta - delta * Math.cos(hr));
+
+      var overpower = Math.max(Math.floor(160 - (l * 8 / 5)), 0);
+      c = Math.min(c, overpower);
     }
     return [l, c, h]
   },

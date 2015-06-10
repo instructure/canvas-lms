@@ -1,0 +1,71 @@
+// INSTRUCTURE: This is only the parts of bootstrap _navs that we are using.
+// everything we're not actually using has been removed to have less
+// to maintain.
+
+
+//
+// Navs
+// --------------------------------------------------
+
+
+// BASE CLASS
+// ----------
+
+.nav {
+  margin-left: 0;
+  margin-bottom: $baseLineHeight;
+  list-style: none;
+}
+
+// Make links block level
+.nav > li > a {
+  display: block;
+}
+.nav > li > a:hover {
+  text-decoration: none;
+  background-color: $grayLighter;
+}
+
+// Redeclare pull classes because of specifity
+.nav > .pull-right {
+  float: right;
+}
+
+
+// TABS AND PILLS
+// -------------
+
+// Common styles
+.nav-pills {
+  @include clearfix();
+}
+.nav-pills > li {
+  float: left;
+}
+.nav-pills > li > a {
+  padding-right: 12px;
+  padding-left: 12px;
+  margin-right: 2px;
+  line-height: 14px; // keeps the overall height an even number
+  @if $use_new_styles { font-size: $baseFontSize; }
+}
+
+
+// PILLS
+// -----
+
+// Links rendered as pills
+.nav-pills > li > a {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  @include border-radius(5px);
+}
+
+// Active state
+.nav-pills > .active > a,
+.nav-pills > .active > a:hover {
+  color: $white;
+  background-color: $linkColor;
+}

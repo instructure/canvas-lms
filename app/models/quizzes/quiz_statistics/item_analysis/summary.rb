@@ -25,7 +25,7 @@ class Quizzes::QuizStatistics::ItemAnalysis::Summary
   def initialize(quiz, options = {})
     @quiz = quiz
     @items = {}
-    @attempts = quiz.quiz_submissions.where("was_preview IS NULL OR NOT was_preview").map { |qs| qs.submitted_attempts.first }.compact
+    @attempts = quiz.quiz_submissions.for_students(quiz).map { |qs| qs.submitted_attempts.first }.compact
     @options = options
     @options[:buckets] ||= [
       [:bottom, 0.27],

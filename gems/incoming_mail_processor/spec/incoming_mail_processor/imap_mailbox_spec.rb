@@ -116,6 +116,30 @@ describe IncomingMailProcessor::ImapMailbox do
       yielded_values.should eql [[1, "foo"], [2, "bar"], [3, "baz"]]
     end
 
+    it "retrieves messages uses stride and offset" do
+      @mailbox.folder = "message_folder"
+      @imap_mock.expects(:select).with("message_folder").twice
+      @imap_mock.expects(:search).with(["ALL"]).twice.returns([1, 2, 3])
+
+      fetch = sequence('fetch')
+      @imap_mock.expects(:fetch).in_sequence(fetch).with(2, "RFC822").returns(mock_fetch_response("bar"))
+      @imap_mock.expects(:fetch).in_sequence(fetch).with(1, "RFC822").returns(mock_fetch_response("foo"))
+      @imap_mock.expects(:fetch).in_sequence(fetch).with(3, "RFC822").returns(mock_fetch_response("baz"))
+      @imap_mock.expects(:expunge).with().twice
+
+      yielded_values = []
+      @mailbox.each_message(stride: 2, offset: 0) do |message_id, message_body|
+        yielded_values << [message_id, message_body]
+      end
+      yielded_values.should eql [[2, "bar"]]
+
+      yielded_values = []
+      @mailbox.each_message(stride: 2, offset: 1) do |message_id, message_body|
+        yielded_values << [message_id, message_body]
+      end
+      yielded_values.should eql [[1, "foo"], [3, "baz"]]
+    end
+
     it "should delete a retrieved message" do
       @imap_mock.expects(:search).returns([42])
       @imap_mock.expects(:fetch).returns(mock_fetch_response("body"))

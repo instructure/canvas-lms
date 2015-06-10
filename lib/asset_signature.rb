@@ -7,23 +7,15 @@ module AssetSignature
   end
 
   def self.find_by_signature(klass, signature)
-
-    #TODO: Remove this after the next release cycle
-    # it's just here for temporary backwards compatibility
-    if signature.to_i.to_s.length == signature.length
-      return klass.find_by_id(signature)
-    end
-    ###############################################
-
     id, hmac = signature.split(DELIMITER, 2)
-    return nil unless hmac == generate_hmac(klass, id)
-    klass.find_by_id(id.to_i)
+    return nil unless Canvas::Security.verify_hmac_sha1(hmac, "#{klass}#{id}", truncate: 8)
+    klass.where(id: id.to_i).first
   end
 
   private
 
   def self.generate_hmac(klass, id)
-    data = "#{klass.to_s}#{id}"
+    data = "#{klass}#{id}"
     Canvas::Security.hmac_sha1(data)[0,8]
   end
 end

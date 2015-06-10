@@ -21,7 +21,7 @@ module Api::V1::Conferences
   API_CONFERENCE_JSON_OPTS = {
     :only => %w(id title conference_type description
       duration ended_at started_at user_ids long_running
-      recordings join_url had_advanced_settings)
+      recordings join_url has_advanced_settings conference_key)
   }
 
   def api_conferences_json(conferences, user, session)
@@ -96,4 +96,15 @@ module Api::V1::Conferences
     end
   end
 
+  def signed_id_invalid_json
+    { status: I18n.t(:unprocessable_entity, 'unprocessable entity'),
+      errors: [{message: I18n.t(:unprocessable_entity_message, 'Signed meeting id invalid')}]
+    }.to_json
+  end
+
+  def invalid_jwt_token_json
+    {status: I18n.t(:unauthorized, 'unauthorized'),
+     errors: [{message: I18n.t(:unauthorized_message, 'JWT signature invalid')}]
+    }.to_json
+  end
 end

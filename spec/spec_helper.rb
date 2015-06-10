@@ -16,42 +16,35 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../config/canvas_rails3')
-if CANVAS_RAILS2
-  Spec::Example::ExampleGroupMethods.module_eval do
-    def include_examples(*args)
-      it_should_behave_like(*args)
-    end
-  end
+begin
+  require RUBY_VERSION >= '2.0.0' ? 'byebug' : 'debugger'
+rescue LoadError
 end
 
-unless CANVAS_RAILS2
-  Spec.configure do |c|
-   c.treat_symbols_as_metadata_keys_with_true_values = true
-  end
+require 'securerandom'
 
-  RSpec.configure do |c|
-    c.color_enabled = true
+RSpec.configure do |c|
+  c.raise_errors_for_deprecations!
+  c.color = true
 
-    c.around(:each) do |example|
-      attempts = 0
-      begin
-        Timeout::timeout(180) {
-          example.run
-        }
-        if ENV['AUTORERUN']
-          e = @example.instance_variable_get('@exception')
-          if !e.nil? && (attempts += 1) < 2 && !example.metadata[:no_retry]
-            puts "FAILURE: #{@example.description} \n #{e}".red
-            puts "RETRYING: #{@example.description}".yellow
-            @example.instance_variable_set('@exception', nil)
-            redo
-          elsif e.nil? && attempts != 0
-            puts "SUCCESS: retry passed for \n #{@example.description}".green
-          end
+  c.around(:each) do |example|
+    attempts = 0
+    begin
+      Timeout::timeout(180) {
+        example.run
+      }
+      if ENV['AUTORERUN']
+        e = @example.instance_variable_get('@exception')
+        if !e.nil? && (attempts += 1) < 2 && !example.metadata[:no_retry]
+          puts "FAILURE: #{@example.description} \n #{e}".red
+          puts "RETRYING: #{@example.description}".yellow
+          @example.instance_variable_set('@exception', nil)
+          redo
+        elsif e.nil? && attempts != 0
+          puts "SUCCESS: retry passed for \n #{@example.description}".green
         end
-      end until true
-    end
+      end
+    end until true
   end
 end
 
@@ -63,136 +56,98 @@ end
 ENV["RAILS_ENV"] = 'test'
 
 require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
-if CANVAS_RAILS2
-  require 'spec'
-  # require 'spec/autorun'
-  require 'spec/rails'
+require 'rspec/rails'
 
-  # integration specs were renamed to request specs in rspec 2
-  def describe_with_rspec2_types(*args, &block)
-    unless args.last.is_a?(Hash)
-      args << {}
+Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
+
+ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
+
+module RSpec::Rails
+  module ViewExampleGroup
+    module ExampleMethods
+      # normally in rspec 2, assigns returns a newly constructed hash
+      # which means that 'assigns[:key] = value' in view specs does nothing
+      def assigns
+        @assigns ||= super
+      end
+
+      alias :view_assigns :assigns
+
+      delegate :content_for, :to => :view
+
+      def render_with_helpers(*args)
+        controller_class = ("#{@controller.controller_path.camelize}Controller".constantize rescue nil) || ApplicationController
+
+        controller_class.instance_variable_set(:@js_env, nil)
+        # this extends the controller's helper methods to the view
+        # however, these methods are delegated to the test controller
+        view.singleton_class.class_eval do
+          include controller_class._helpers unless included_modules.include?(controller_class._helpers)
+        end
+
+        # so create a "real_controller"
+        # and delegate the helper methods to it
+        @controller.singleton_class.class_eval do
+          attr_accessor :real_controller
+
+          controller_class._helper_methods.each do |helper|
+            delegate helper, :to => :real_controller
+          end
+        end
+
+        real_controller = controller_class.new
+        real_controller.instance_variable_set(:@_request, @controller.request)
+        @controller.real_controller = real_controller
+
+        # just calling "render 'path/to/view'" by default looks for a partial
+        if args.first && args.first.is_a?(String)
+          file = args.shift
+          args = [{:template => file}] + args
+        end
+        render_without_helpers(*args)
+      end
+
+      alias_method_chain :render, :helpers
     end
-    raise "please use type: :request instead of type: :integration for rspec 2 compatibility" if args.last[:type] == :integration
-    if args.last[:type] == :request
-      args.last[:type] = :integration
-    end
-    args.last[:location] ||= caller(0)[1]
-    describe_without_rspec2_types(*args, &block)
   end
 
-  alias :describe_without_rspec2_types :describe
-  alias :describe :describe_with_rspec2_types
+  module Matchers
+    class HaveTag
+      include ActionDispatch::Assertions::SelectorAssertions
+      include Test::Unit::Assertions
 
-  ActionController::TestProcess.module_eval do
-    def process_with_use_route_shim(action, parameters = nil, session = nil, flash = nil, http_method = 'GET')
-      if parameters.is_a?(Hash)
-        parameters.delete(:use_route)
+      def initialize(expected)
+        @expected = expected
       end
-      process_without_use_route_shim(action, parameters, session, flash, http_method)
-    end
 
-    alias_method_chain :process, :use_route_shim
-  end
+      def matches?(html, &block)
+        @selected = [HTML::Document.new(html).root]
+        assert_select(*@expected, &block)
+        return !@failed
+      end
 
-  Spec::Rails::Example::ViewExampleGroup.class_eval do
-    alias :view :template
-
-    def content_for(name)
-      response.capture(name)
-    end
-  end
-else
-  require 'rspec/rails'
-
-  ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
-
-  module RSpec::Rails
-    module ViewExampleGroup
-      module ExampleMethods
-        # normally in rspec 2, assigns returns a newly constructed hash
-        # which means that 'assigns[:key] = value' in view specs does nothing
-        def assigns
-          @assigns ||= super
+      def assert(val, msg=nil)
+        unless !!val
+          @msg = msg
+          @failed = true
         end
+      end
 
-        alias :view_assigns :assigns
+      def failure_message
+        @msg
+      end
 
-        delegate :content_for, :to => :view
-
-        def render_with_helpers(*args)
-          controller_class = ("#{@controller.controller_path.camelize}Controller".constantize rescue nil) || ApplicationController
-
-          controller_class.instance_variable_set(:@js_env, nil)
-          # this extends the controller's helper methods to the view
-          # however, these methods are delegated to the test controller
-          view.singleton_class.class_eval do
-            include controller_class._helpers unless included_modules.include?(controller_class._helpers)
-          end
-
-          # so create a "real_controller"
-          # and delegate the helper methods to it
-          @controller.singleton_class.class_eval do
-            attr_accessor :real_controller
-
-            controller_class._helper_methods.each do |helper|
-              delegate helper, :to => :real_controller
-            end
-          end
-
-          real_controller = controller_class.new
-          real_controller.instance_variable_set(:@_request, @controller.request)
-          @controller.real_controller = real_controller
-
-          # just calling "render 'path/to/view'" by default looks for a partial
-          if args.first && args.first.is_a?(String)
-            file = args.shift
-            args = [{:template => file}] + args
-          end
-          render_without_helpers(*args)
-        end
-
-        alias_method_chain :render, :helpers
+      def failure_message_when_negated
+        @msg
       end
     end
 
-    module Matchers
-      class HaveTag
-        include ActionDispatch::Assertions::SelectorAssertions
-        include Test::Unit::Assertions
-
-        def initialize(expected)
-          @expected = expected
-        end
-
-        def matches?(html, &block)
-          @selected = [HTML::Document.new(html).root]
-          assert_select(*@expected, &block)
-          return !@failed
-        end
-
-        def assert(val, msg=nil)
-          unless !!val
-            @msg = msg
-            @failed = true
-          end
-        end
-
-        def failure_message_for_should
-          @msg
-        end
-
-        def failure_message_for_should_not
-          @msg
-        end
-      end
-
-      def have_tag(*args)
-        HaveTag.new(args)
-      end
+    def have_tag(*args)
+      HaveTag.new(args)
     end
   end
 end
+
 require 'action_controller_test_process'
 require File.expand_path(File.dirname(__FILE__) + '/mocha_rspec_adapter')
 require File.expand_path(File.dirname(__FILE__) + '/mocha_extensions')
@@ -203,20 +158,18 @@ require 'handlebars_tasks'
 
 # if mocha was initialized before rails (say by another spec), CollectionProxy would have
 # undef_method'd them; we need to restore them
-unless CANVAS_RAILS2
-  Mocha::ObjectMethods.instance_methods.each do |m|
-    ActiveRecord::Associations::CollectionProxy.class_eval <<-RUBY
-      def #{m}; end
-      remove_method #{m.inspect}
-    RUBY
-  end
+Mocha::ObjectMethods.instance_methods.each do |m|
+  ActiveRecord::Associations::CollectionProxy.class_eval <<-RUBY
+    def #{m}; end
+    remove_method #{m.inspect}
+  RUBY
 end
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
 
 def pend_with_bullet
   if defined?(Bullet) && Bullet.enable?
-    pending ('PENDING: Bullet')
+    skip ('PENDING: Bullet')
   end
 end
 
@@ -267,14 +220,20 @@ def truncate_table(model)
 end
 
 def truncate_all_tables
-  models_by_connection = ActiveRecord::Base.all_models.group_by { |m| m.connection }
-  models_by_connection.each do |connection, models|
+  model_connections = ActiveRecord::Base.descendants.map(&:connection).uniq
+  model_connections.each do |connection|
     if connection.adapter_name == "PostgreSQL"
-      table_names = connection.tables & models.map(&:table_name)
+      # use custom SQL to exclude tables from extensions
+      table_names = connection.query(<<-SQL, 'SCHEMA').map(&:first)
+         SELECT tablename
+         FROM pg_tables
+         WHERE schemaname = ANY (current_schemas(false)) AND NOT tablename IN (
+           SELECT CAST(objid::regclass AS VARCHAR) FROM pg_depend WHERE deptype='e'
+         )
+      SQL
       connection.execute("TRUNCATE TABLE #{table_names.map { |t| connection.quote_table_name(t) }.join(',')}")
     else
-      table_names = connection.tables
-      models.each { |model| truncate_table(model) if table_names.include?(model.table_name) }
+      connection.tables.each { |model| truncate_table(model) }
     end
   end
 end
@@ -327,31 +286,7 @@ Mocha::Mock.class_eval do
   alias_method_chain :respond_to?, :marshalling
 end
 
-[ActiveSupport::Cache::MemoryStore, (CANVAS_RAILS2 ? NilStore : ActiveSupport::Cache::NullStore)].each do |store|
-  store.class_eval do
-    def write_with_serialization_check(name, value, options = nil)
-      Marshal.dump(value)
-      write_without_serialization_check(name, value, options)
-    end
-
-    alias_method_chain :write, :serialization_check
-  end
-end
-
-unless CANVAS_RAILS2
-  ActiveSupport::Cache::NullStore.class_eval do
-    def fetch_with_serialization_check(name, options = {}, &block)
-      result = fetch_without_serialization_check(name, options, &block)
-      Marshal.dump(result) if result
-      result
-    end
-
-    alias_method_chain :fetch, :serialization_check
-  end
-end
-
-matchers_module = (CANVAS_RAILS2 ? Spec::Matchers : RSpec::Matchers)
-matchers_module.define :encompass do |expected|
+RSpec::Matchers.define :encompass do |expected|
   match do |actual|
     if expected.is_a?(Array) && actual.is_a?(Array)
       expected.size == actual.size && expected.zip(actual).all? { |e, a| a.slice(*e.keys) == e }
@@ -363,7 +298,7 @@ matchers_module.define :encompass do |expected|
   end
 end
 
-matchers_module.define :match_ignoring_whitespace do |expected|
+RSpec::Matchers.define :match_ignoring_whitespace do |expected|
   def whitespaceless(str)
     str.gsub(/\s+/, '')
   end
@@ -393,7 +328,7 @@ end
 # Make sure extensions will work with dynamically created shards
 if ActiveRecord::Base.connection.adapter_name == 'PostgreSQL' &&
     ActiveRecord::Base.connection.schema_search_path == 'public'
-  %w{pg_trgm pg_collkey}.each do |extension|
+  Canvas.possible_postgres_extensions.each do |extension|
     current_schema = ActiveRecord::Base.connection.select_value("SELECT nspname FROM pg_extension INNER JOIN pg_namespace ON extnamespace=pg_namespace.oid WHERE extname='#{extension}'")
     if current_schema && current_schema == 'public'
       ActiveRecord::Base.connection.execute("ALTER EXTENSION #{extension} SET SCHEMA pg_catalog") rescue nil
@@ -401,55 +336,53 @@ if ActiveRecord::Base.connection.adapter_name == 'PostgreSQL' &&
   end
 end
 
-(CANVAS_RAILS2 ? Spec::Runner : RSpec).configure do |config|
+RSpec.configure do |config|
   # If you're not using ActiveRecord you should remove these
   # lines, delete config/database.yml and disable :active_record
   # in your config/boot.rb
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures = false
   config.fixture_path = Rails.root+'spec/fixtures/'
-
-  ((config.debug = true) rescue nil) unless CANVAS_RAILS2
+  config.infer_spec_type_from_file_location!
 
   config.include Helpers
 
-  if CANVAS_RAILS2
-    require 'spec/onceler_noop'
-    config.include Onceler::Noop
-  else
-    config.include Onceler::BasicHelpers
+  config.include Onceler::BasicHelpers
 
-    # rspec 2+ only runs global before(:all)'s before the top-level
-    # groups, not before each nested one. so we need to reset some
-    # things to play nicely with its caching
-    Onceler.configure do |c|
-      c.before :record do
-        Account.clear_special_account_cache!
-        AdheresToPolicy::Cache.clear
-      end
-    end
-
-    Onceler.instance_eval do
-      # since once-ler creates potentially multiple levels of transaction
-      # nesting, we need a way to know the base level so we can compare it
-      # to AR::Conn#open_transactions. that will tell us if something is
-      # "committed" or not (from the perspective of the spec)
-      def base_transactions
-        # if not recording, it's presumed we're in a spec, in which case
-        # transactional fixtures add one more level
-        open_transactions + (recording? ? 0 : 1)
-      end
+  # rspec 2+ only runs global before(:all)'s before the top-level
+  # groups, not before each nested one. so we need to reset some
+  # things to play nicely with its caching
+  Onceler.configure do |c|
+    c.before :record do
+      Account.clear_special_account_cache!(true)
+      Role.ensure_built_in_roles!
+      AdheresToPolicy::Cache.clear
+      Folder.reset_path_lookups!
     end
   end
 
-  Notification.after_create { Notification.reset_cache! }
+  Onceler.instance_eval do
+    # since once-ler creates potentially multiple levels of transaction
+    # nesting, we need a way to know the base level so we can compare it
+    # to AR::Conn#open_transactions. that will tell us if something is
+    # "committed" or not (from the perspective of the spec)
+    def base_transactions
+      # if not recording, it's presumed we're in a spec, in which case
+      # transactional fixtures add one more level
+      open_transactions + (recording? ? 0 : 1)
+    end
+  end
+
+  Notification.after_create do
+    Notification.reset_cache!
+    BroadcastPolicy.notification_finder.refresh_cache
+  end
+
   config.before :all do
     # so before(:all)'s don't get confused
-    Account.clear_special_account_cache!
+    Account.clear_special_account_cache!(true)
+    Role.ensure_built_in_roles!
     AdheresToPolicy::Cache.clear
-
-    # allow tests to still run in non-draft state even though it's hard-coded on
-    Feature.definitions["draft_state"].send(:instance_variable_set, '@state', 'allowed')
   end
 
   def delete_fixtures!
@@ -463,7 +396,8 @@ end
   config.before :each do
     I18n.locale = :en
     Time.zone = 'UTC'
-    Account.clear_special_account_cache!
+    LoadAccount.force_special_account_reload = true
+    Account.clear_special_account_cache!(true)
     AdheresToPolicy::Cache.clear
     Setting.reset_cache!
     ConfigFile.unstub
@@ -471,10 +405,13 @@ end
     Notification.reset_cache!
     ActiveRecord::Base.reset_any_instantiation!
     Attachment.clear_cached_mime_ids
+    Folder.reset_path_lookups!
+    Role.ensure_built_in_roles!
     RoleOverride.clear_cached_contexts
     Delayed::Job.redis.flushdb if Delayed::Job == Delayed::Backend::Redis::Job
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
     Attachment.domain_namespace = nil
+    $spec_api_tokens = {}
   end
 
   # flush redis before the first spec, and before each spec that comes after
@@ -492,7 +429,7 @@ end
   end
   config.before :each do
     if Canvas.redis_enabled? && Canvas.redis_used
-      Canvas.redis.flushdb rescue nil
+      Canvas.redis.flushdb
     end
     Canvas.redis_used = false
   end
@@ -500,7 +437,7 @@ end
   def account_with_cas(opts={})
     @account = opts[:account]
     @account ||= Account.create!
-    config = AccountAuthorizationConfig.new
+    config = AccountAuthorizationConfig::CAS.new
     cas_url = opts[:cas_url] || "https://localhost/cas"
     config.auth_type = "cas"
     config.auth_base = cas_url
@@ -512,17 +449,32 @@ end
   def account_with_saml(opts={})
     @account = opts[:account]
     @account ||= Account.create!
-    config = AccountAuthorizationConfig.new
+    config = AccountAuthorizationConfig::SAML.new
     config.auth_type = "saml"
     config.log_in_url = opts[:saml_log_in_url] if opts[:saml_log_in_url]
+    config.log_out_url = opts[:saml_log_out_url] if opts[:saml_log_out_url]
     @account.account_authorization_configs << config
     @account
+  end
+
+  def grading_periods(opts = {})
+    Account.default.set_feature_flag! :multiple_grading_periods, 'on'
+    ctx = opts[:context] || @course || course
+    count = opts[:count] || 2
+
+    gpg = ctx.grading_period_groups.create!
+    now = Time.zone.now
+    count.times.map { |n|
+      gpg.grading_periods.create! start_date: n.months.since(now),
+        end_date: (n+1).months.since(now),
+        weight: 1
+    }
   end
 
   def course(opts={})
     account = opts[:account] || Account.default
     account.shard.activate do
-      @course = Course.create!(:name => opts[:course_name], :account => account)
+      @course = Course.create!(:name => opts[:course_name], :account => account, :is_public => !!opts[:is_public])
       @course.offer! if opts[:active_course] || opts[:active_all]
       if opts[:active_all]
         u = User.create!
@@ -532,30 +484,67 @@ end
         e.save!
         @teacher = u
       end
-      if opts[:draft_state]
-        account.allow_feature!(:draft_state)
-        @course.enable_feature!(:draft_state)
+      if opts[:differentiated_assignments]
+        account.allow_feature!(:differentiated_assignments)
+        @course.enable_feature!(:differentiated_assignments)
       end
+      create_grading_periods_for(@course, opts) if opts[:grading_periods]
     end
     @course
   end
 
-  def account_admin_user_with_role_changes(opts={})
+  def create_grading_periods_for(context, opts={})
+    opts = { mgp_flag_enabled: true }.merge(opts)
+    context.root_account = Account.default if !context.root_account
+    context.root_account.enable_feature!(:multiple_grading_periods) if opts[:mgp_flag_enabled]
+    gp_group = context.grading_period_groups.create!
+    class_name = context.class.name.demodulize
+    periods = opts[:grading_periods] || [:current]
+    periods.each.with_index(1) do |timeframe, index|
+      cutoff_dates = {
+        current: { start_date: index.months.ago,
+                   end_date: index.months.from_now },
+        old:     { start_date: (index + 1).months.ago,
+                   end_date: index.months.ago },
+        future:  { start_date: index.months.from_now,
+                   end_date: (index + 1).months.from_now }
+      }
+      period_params = cutoff_dates[timeframe].merge(title: "#{class_name} Period #{index}: #{timeframe} period")
+      new_period = gp_group.grading_periods.create!(period_params)
+      new_period[:workflow_state] = 'active'
+      new_period.save!
+    end
+    gp_group.grading_periods
+  end
+
+  def account_with_role_changes(opts={})
     account = opts[:account] || Account.default
     if opts[:role_changes]
       opts[:role_changes].each_pair do |permission, enabled|
-        account.role_overrides.create(:permission => permission.to_s, :enrollment_type => opts[:membership_type] || 'AccountAdmin', :enabled => enabled)
+        role = opts[:role] || admin_role
+        if ro = account.role_overrides.where(:permission => permission.to_s, :role_id => role.id).first
+          ro.update_attribute(:enabled, enabled)
+        else
+          account.role_overrides.create(:permission => permission.to_s, :enabled => enabled, :role => role)
+        end
       end
     end
     RoleOverride.clear_cached_contexts
+  end
+
+  def account_admin_user_with_role_changes(opts={})
+    account_with_role_changes(opts)
     account_admin_user(opts)
   end
 
-  def account_admin_user(opts={:active_user => true})
+  def account_admin_user(opts={})
+    opts = { active_user: true }.merge(opts)
     account = opts[:account] || Account.default
+    create_grading_periods_for(account, opts) if opts[:grading_periods]
     @user = opts[:user] || account.shard.activate { user(opts) }
     @admin = @user
-    account.account_users.create!(:user => @user, :membership_type => opts[:membership_type])
+
+    account.account_users.create!(:user => @user, :role => opts[:role])
     @user
   end
 
@@ -622,7 +611,6 @@ end
     pseudonym(user, opts)
     @pseudonym.sis_user_id = opts[:sis_user_id] || "U001"
     @pseudonym.save!
-    @pseudonym.should be_managed_password
     @pseudonym
   end
 
@@ -671,7 +659,7 @@ end
 
   def student_in_section(section, opts={})
     student = opts.fetch(:user) { user }
-    enrollment = section.course.enroll_user(student, 'StudentEnrollment', :section => section)
+    enrollment = section.course.enroll_user(student, 'StudentEnrollment', :section => section, :force_update => true)
     student.save!
     enrollment.workflow_state = 'active'
     enrollment.save!
@@ -714,6 +702,7 @@ end
   def course_with_student_submissions(opts={})
     course_with_teacher_logged_in(opts)
     student_in_course
+    @course.claim! if opts[:unpublished]
     submission_count = opts[:submissions] || 1
     submission_count.times do |s|
       assignment = @course.assignments.create!(:title => "test #{s} assignment")
@@ -722,23 +711,14 @@ end
     end
   end
 
-  def set_course_draft_state(enabled=true, opts={})
-    course = opts[:course] || @course
-    account = opts[:account] || course.account
-
-    account.allow_feature!(:draft_state)
-    course.set_feature_flag!(:draft_state, enabled ? 'on' : 'off')
-
-    enabled
-  end
-
   def add_section(section_name)
     @course_section = @course.course_sections.create!(:name => section_name)
     @course.reload
   end
 
-  def multiple_student_enrollment(user, section)
-    @enrollment = @course.enroll_student(user,
+  def multiple_student_enrollment(user, section, opts={})
+    course = opts[:course] || @course || course(opts)
+    @enrollment = course.enroll_student(user,
                                          :enrollment_state => "active",
                                          :section => section,
                                          :allow_multiple_enrollments => true)
@@ -748,18 +728,21 @@ end
     course = opts[:course] || @course || course(opts)
     @fake_student = course.student_view_student
     post "/users/#{@fake_student.id}/masquerade"
-    session[:become_user_id].should == @fake_student.id.to_s
+    expect(session[:become_user_id]).to eq @fake_student.id.to_s
   end
 
   def account_notification(opts={})
     req_service = opts[:required_account_service] || nil
-    roles = opts[:roles] || []
+    role_ids = opts[:role_ids] || []
     message = opts[:message] || "hi there"
+    subj = opts[:subject] || "this is a subject"
     @account = opts[:account] || Account.default
-    @announcement = @account.announcements.build(message: message, required_account_service: req_service)
+    @announcement = @account.announcements.build(subject: subj, message: message, required_account_service: req_service)
     @announcement.start_at = opts[:start_at] || 5.minutes.ago.utc
-    @announcement.account_notification_roles.build(roles.map { |r| {account_notification_id: @announcement.id, role_type: r} }) unless roles.empty?
+    @announcement.end_at = opts[:end_at] || 1.day.from_now.utc
+    @announcement.account_notification_roles.build(role_ids.map { |r_id| {account_notification_id: @announcement.id, role: Role.get_role_by_id(r_id)} }) unless role_ids.empty?
     @announcement.save!
+    @announcement
   end
 
   VALID_GROUP_ATTRIBUTES = [:name, :context, :max_membership, :group_category, :join_level, :description, :is_public, :avatar_attachment]
@@ -788,8 +771,7 @@ end
 
   def custom_role(base, name, opts={})
     account = opts[:account] || @account
-    role = account.roles.find_by_name(name)
-    role ||= account.roles.create :name => name
+    role = account.roles.where(name: name).first_or_initialize
     role.base_role_type = base
     role.save!
     role
@@ -816,7 +798,31 @@ end
   end
 
   def custom_account_role(name, opts={})
-    custom_role(AccountUser::BASE_ROLE_NAME, name, opts)
+    custom_role(Role::DEFAULT_ACCOUNT_TYPE, name, opts)
+  end
+
+  def student_role
+    Role.get_built_in_role("StudentEnrollment")
+  end
+
+  def teacher_role
+    Role.get_built_in_role("TeacherEnrollment")
+  end
+
+  def ta_role
+    Role.get_built_in_role("TaEnrollment")
+  end
+
+  def designer_role
+    Role.get_built_in_role("DesignerEnrollment")
+  end
+
+  def observer_role
+    Role.get_built_in_role("ObserverEnrollment")
+  end
+
+  def admin_role
+    Role.get_built_in_role("AccountAdmin")
   end
 
   def user_session(user, pseudonym=nil)
@@ -826,9 +832,10 @@ end
       # object_id should make it unique (but obviously things will fail if
       # it tries to load it from the db.)
       pseudonym.stubs(:id).returns(pseudonym.object_id)
+      pseudonym.stubs(:unique_id).returns('unique_id')
     end
 
-    session = stub('PseudonymSession', :record => pseudonym, :session_credentials => nil, :used_basic_auth? => false)
+    session = stub('PseudonymSession', :record => pseudonym, :session_credentials => nil)
 
     PseudonymSession.stubs(:find).returns(session)
   end
@@ -842,7 +849,7 @@ end
                       "pseudonym_session[unique_id]" => username,
                       "pseudonym_session[password]" => password
     assert_response :success
-    request.fullpath.should eql("/?login_success=1")
+    expect(request.fullpath).to eq "/?login_success=1"
   end
 
   def assignment_quiz(questions, opts={})
@@ -853,7 +860,7 @@ end
     @assignment.workflow_state = "published"
     @assignment.submission_types = "online_quiz"
     @assignment.save
-    @quiz = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
+    @quiz = Quizzes::Quiz.where(assignment_id: @assignment).first
     @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
     @quiz.generate_quiz_data
     @quiz.published_at = Time.now
@@ -878,7 +885,7 @@ end
     @assignment.workflow_state = "published"
     @assignment.submission_types = "online_quiz"
     @assignment.save
-    @quiz = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
+    @quiz = Quizzes::Quiz.where(assignment_id: @assignment).first
     @quiz.anonymous_submissions = true
     @quiz.quiz_type = "graded_survey"
     @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
@@ -939,7 +946,11 @@ end
 
   def outcome_with_rubric(opts={})
     @outcome_group ||= @course.root_outcome_group
-    @outcome = @course.created_learning_outcomes.create!(:description => '<p>This is <b>awesome</b>.</p>', :short_description => 'new outcome')
+    @outcome = @course.created_learning_outcomes.create!(
+      :description => '<p>This is <b>awesome</b>.</p>',
+      :short_description => 'new outcome',
+      :calculation_method => 'highest'
+    )
     @outcome_group.add_outcome(@outcome)
     @outcome_group.save!
 
@@ -1002,17 +1013,13 @@ end
   end
 
   def eportfolio(opts={})
-    user(opts)
+    user(opts) unless @user
     @portfolio = @user.eportfolios.create!
   end
 
   def eportfolio_with_user(opts={})
+    user(opts)
     eportfolio(opts)
-  end
-
-  def eportfolio_with_user_logged_in(opts={})
-    eportfolio_with_user(opts)
-    user_session(@user)
   end
 
   def conversation(*users)
@@ -1034,27 +1041,24 @@ end
   end
 
   def assert_status(status=500)
-    response.status.to_i.should eql(status)
+    expect(response.status.to_i).to eq status
   end
 
   def assert_unauthorized
-    assert_status(401) #unauthorized
-    #    response.headers['Status'].should eql('401 Unauthorized')
-    response.should render_template("shared/unauthorized")
-  end
-
-  def assert_page_not_found(&block)
-    if CANVAS_RAILS2
-      block.should raise_exception(ActiveRecord::RecordNotFound)
-    else
-      yield
-      assert_status(404)
+    # we allow either a raw unauthorized or a redirect to login
+    unless response.status == 401
+       expect(response).to redirect_to(login_url)
     end
   end
 
+  def assert_page_not_found
+    yield
+    assert_status(404)
+  end
+
   def assert_require_login
-    response.should be_redirect
-    flash[:warning].should eql("You must be logged in to access this page")
+    expect(response).to be_redirect
+    expect(flash[:warning]).to eq "You must be logged in to access this page"
   end
 
   def fixture_file_upload(path, mime_type=nil, binary=false)
@@ -1105,16 +1109,12 @@ end
 
   def process_csv_data_cleanly(*lines_or_opts)
     importer = process_csv_data(*lines_or_opts)
-    importer.errors.should == []
-    importer.warnings.should == []
+    expect(importer.errors).to eq []
+    expect(importer.warnings).to eq []
   end
 
   def enable_cache(new_cache=:memory_store)
     new_cache ||= :null_store
-    if CANVAS_RAILS2 && new_cache == :null_store
-      require 'nil_store'
-      new_cache = NilStore.new
-    end
     new_cache = ActiveSupport::Cache.lookup_store(new_cache)
     previous_cache = Rails.cache
     Rails.stubs(:cache).returns(new_cache)
@@ -1184,7 +1184,7 @@ end
 
   # inspired by http://blog.jayfields.com/2007/08/ruby-calling-methods-of-specific.html
   module AttachmentStorageSwitcher
-    BACKENDS = %w{FileSystem S3}.map { |backend| Technoweenie::AttachmentFu::Backends.const_get(:"#{backend}Backend") }.freeze
+    BACKENDS = %w{FileSystem S3}.map { |backend| AttachmentFu::Backends.const_get(:"#{backend}Backend") }.freeze
 
     class As #:nodoc:
       private *instance_methods.select { |m| m !~ /(^__|^\W|^binding$)/ }
@@ -1212,7 +1212,7 @@ end
 
       BACKENDS.map(&:instance_methods).flatten.uniq.each do |method|
         # overridden by Attachment anyway; don't re-overwrite it
-        next if Attachment.instance_method(method).owner == Attachment
+        next if base.instance_method(method).owner == base
         if method.to_s[-1..-1] == '='
           base.class_eval <<-CODE
           def #{method}(arg)
@@ -1239,35 +1239,44 @@ end
   end
 
   def s3_storage!(opts = {:stubs => true})
-    Attachment.send(:include, AttachmentStorageSwitcher) unless Attachment.ancestors.include?(AttachmentStorageSwitcher)
-    Attachment.stubs(:current_backend).returns(Technoweenie::AttachmentFu::Backends::S3Backend)
+    [Attachment, Thumbnail].each do |model|
+      model.send(:include, AttachmentStorageSwitcher) unless model.ancestors.include?(AttachmentStorageSwitcher)
+      model.stubs(:current_backend).returns(AttachmentFu::Backends::S3Backend)
 
-    Attachment.stubs(:s3_storage?).returns(true)
-    Attachment.stubs(:local_storage?).returns(false)
+      model.stubs(:s3_storage?).returns(true)
+      model.stubs(:local_storage?).returns(false)
+    end
+
     if opts[:stubs]
       conn = mock('AWS::S3::Client')
+
+      AWS::S3::S3Object.any_instance.stubs(:read).returns("i am stub data from spec helper. nom nom nom")
+      AWS::S3::S3Object.any_instance.stubs(:write).returns(true)
+      AWS::S3::S3Object.any_instance.stubs(:create_temp_file).returns(true)
       AWS::S3::S3Object.any_instance.stubs(:client).returns(conn)
       AWS::Core::Configuration.any_instance.stubs(:access_key_id).returns('stub_id')
       AWS::Core::Configuration.any_instance.stubs(:secret_access_key).returns('stub_key')
       AWS::S3::Bucket.any_instance.stubs(:name).returns('no-bucket')
     else
       if Attachment.s3_config.blank? || Attachment.s3_config[:access_key_id] == 'access_key'
-        pending "Please put valid S3 credentials in config/amazon_s3.yml"
+        skip "Please put valid S3 credentials in config/amazon_s3.yml"
       end
     end
-    Attachment.s3_storage?.should eql(true)
-    Attachment.local_storage?.should eql(false)
+    expect(Attachment.s3_storage?).to be true
+    expect(Attachment.local_storage?).to be false
   end
 
   def local_storage!
-    Attachment.send(:include, AttachmentStorageSwitcher) unless Attachment.ancestors.include?(AttachmentStorageSwitcher)
-    Attachment.stubs(:current_backend).returns(Technoweenie::AttachmentFu::Backends::FileSystemBackend)
+    [Attachment, Thumbnail].each do |model|
+      model.send(:include, AttachmentStorageSwitcher) unless model.ancestors.include?(AttachmentStorageSwitcher)
+      model.stubs(:current_backend).returns(AttachmentFu::Backends::FileSystemBackend)
 
-    Attachment.stubs(:s3_storage?).returns(false)
-    Attachment.stubs(:local_storage?).returns(true)
-    Attachment.local_storage?.should eql(true)
-    Attachment.s3_storage?.should eql(false)
-    Attachment.local_storage?.should eql(true)
+      model.stubs(:s3_storage?).returns(false)
+      model.stubs(:local_storage?).returns(true)
+    end
+
+    expect(Attachment.local_storage?).to be true
+    expect(Attachment.s3_storage?).to be false
   end
 
   def run_job(job)
@@ -1277,7 +1286,7 @@ end
   def run_jobs
     while job = Delayed::Job.get_and_lock_next_available(
         'spec run_jobs',
-        Delayed::Worker.queue,
+        Delayed::Settings.queue,
         0,
         Delayed::MAX_PRIORITY)
       run_job(job)
@@ -1296,7 +1305,7 @@ end
     track_jobs do
       yield
     end
-    created_jobs.count { |j| j.tag == tag }.should == count
+    expect(created_jobs.count { |j| j.tag == tag }).to eq count
   end
 
   # send a multipart post request in an integration spec post_params is
@@ -1336,16 +1345,16 @@ end
 
   def verify_post_matches(post_lines, expected_post_lines)
     # first lines should match
-    post_lines[0].should == expected_post_lines[0]
+    expect(post_lines[0]).to eq expected_post_lines[0]
 
     # now extract the headers
     post_headers = post_lines[1..post_lines.index("")]
     expected_post_headers = expected_post_lines[1..expected_post_lines.index("")]
     expected_post_headers << "User-Agent: Ruby"
-    post_headers.sort.should == expected_post_headers.sort
+    expect(post_headers.sort).to eq expected_post_headers.sort
 
     # now check payload
-    post_lines[post_lines.index(""), -1].should ==
+    expect(post_lines[post_lines.index(""), -1]).to eq
         expected_post_lines[expected_post_lines.index(""), -1]
   end
 
@@ -1361,9 +1370,9 @@ end
       end
     else
       if actual.is_a?(Fixnum) || actual.is_a?(Float)
-        actual.should == expected
+        expect(actual).to eq expected
       else
-        actual.to_json.should == expected.to_json
+        expect(actual.to_json).to eq expected.to_json
       end
     end
   end
@@ -1405,14 +1414,22 @@ end
     end
   end
 
+  # frd class, not a mock, so we can once-ler WebConferences (need to Marshal.dump)
+  class WebConferencePluginMock
+    attr_reader :id, :settings
+    def initialize(id, settings)
+      @id = id
+      @settings = settings
+    end
+
+    def valid_settings?; true; end
+
+    def enabled?; true; end
+
+    def base; end
+  end
   def web_conference_plugin_mock(id, settings)
-    mock = mock("WebConferencePlugin")
-    mock.stubs(:id).returns(id)
-    mock.stubs(:settings).returns(settings)
-    mock.stubs(:valid_settings?).returns(true)
-    mock.stubs(:enabled?).returns(true)
-    mock.stubs(:base).returns(nil)
-    mock
+    WebConferencePluginMock.new(id, settings)
   end
 
   def dummy_io
@@ -1439,11 +1456,7 @@ end
   end
 
   def consider_all_requests_local(value)
-    if CANVAS_RAILS2
-      ActionController::Base.consider_all_requests_local = value
-    else
-      Rails.application.config.consider_all_requests_local = value
-    end
+    Rails.application.config.consider_all_requests_local = value
   end
 
   def page_view_for(opts={})
@@ -1452,7 +1465,7 @@ end
 
     @request_id = opts[:request_id] || RequestContextGenerator.request_id
     unless @request_id
-      @request_id = CanvasUUID.generate
+      @request_id = SecureRandom.uuid
       RequestContextGenerator.stubs(:request_id => @request_id)
     end
 
@@ -1504,19 +1517,112 @@ end
         scope.pluck(:id).reverse
     end
   end
+
+  # create a bunch of courses at once, optionally enrolling a user in them
+  # records can either be the number of records to create, or an array of
+  # hashes of attributes you want to insert
+  def create_courses(records, options = {})
+    account = options[:account] || Account.default
+    records = records.times.map{ {} } if records.is_a?(Fixnum)
+    records = records.map { |record| course_valid_attributes.merge(account_id: account.id, root_account_id: account.id, workflow_state: 'available', enrollment_term_id: account.default_enrollment_term.id).merge(record) }
+    course_data = create_records(Course, records, options[:return_type])
+    course_ids = options[:return_type] == :record ?
+      course_data.map(&:id) :
+      course_data
+
+    if options[:account_associations]
+      create_records(CourseAccountAssociation, course_ids.map{ |id| {account_id: account.id, course_id: id, depth: 0}})
+    end
+    if user = options[:enroll_user]
+      section_ids = create_records(CourseSection, course_ids.map{ |id| {course_id: id, root_account_id: account.id, name: "Default Section", default_section: true}})
+      type = options[:enrollment_type] || "TeacherEnrollment"
+      create_records(Enrollment, course_ids.each_with_index.map{ |id, i| {course_id: id, user_id: user.id, type: type, course_section_id: section_ids[i], root_account_id: account.id, workflow_state: 'active', :role_id => Role.get_built_in_role(type).id}})
+    end
+    course_data
+  end
+
+  def create_users(records, options = {})
+    records = records.times.map{ {} } if records.is_a?(Fixnum)
+    records = records.map { |record| valid_user_attributes.merge(workflow_state: "registered").merge(record) }
+    create_records(User, records, options[:return_type])
+  end
+
+  # create a bunch of users at once, and enroll them all in the same course
+  def create_users_in_course(course, records, options = {})
+    user_data = create_users(records, options)
+    create_enrollments(course, user_data, options)
+
+    user_data
+  end
+
+  def create_enrollments(course, users, options = {})
+    user_ids = users.first.is_a?(User) ?
+      users.map(&:id) :
+      users
+
+    if options[:account_associations]
+      create_records(UserAccountAssociation, user_ids.map{ |id| {account_id: course.account_id, user_id: id, depth: 0}})
+    end
+
+    section_id = options[:section_id] || course.default_section.id
+    type = options[:enrollment_type] || "StudentEnrollment"
+    create_records(Enrollment, user_ids.map{ |id| {course_id: course.id, user_id: id, type: type, course_section_id: section_id, root_account_id: course.account.id, workflow_state: 'active', :role_id => Role.get_built_in_role(type).id}}, options[:return_type])
+  end
+
+  def create_assignments(course_ids, count_per_course = 1, fields = {})
+    course_ids = Array(course_ids)
+    course_ids *= count_per_course
+    create_records(Assignment, course_ids.each_with_index.map { |id, i| {context_id: id, context_type: 'Course', context_code: "course_#{id}", title: "#{id}:#{i}", grading_type: "points", submission_types: "none", workflow_state: 'published'}.merge(fields)})
+  end
+end
+
+class I18nema::Backend
+  def stub(translations)
+    @stubs = translations.with_indifferent_access
+    singleton_class.instance_eval do
+      alias_method :lookup, :lookup_with_stubs
+      alias_method :available_locales, :available_locales_with_stubs
+    end
+    yield
+  ensure
+    singleton_class.instance_eval do
+      alias_method :lookup, :lookup_without_stubs
+      alias_method :available_locales, :available_locales_without_stubs
+    end
+    @stubs = nil
+  end
+
+  def lookup_with_stubs(locale, key, scope = [], options = {})
+    init_translations unless initialized?
+    keys = normalize_keys(locale, key, scope, options[:separator])
+    keys.inject(@stubs){ |h,k| h[k] if h.respond_to?(:key) } || direct_lookup(*keys)
+  end
+  alias_method :lookup_without_stubs, :lookup
+
+  def available_locales_with_stubs
+    available_locales_without_stubs | @stubs.keys.map(&:to_sym)
+  end
+  alias_method :available_locales_without_stubs, :available_locales
 end
 
 class String
   def red; colorize(self, "\e[1m\e[31m"); end
+
   def green; colorize(self, "\e[1m\e[32m"); end
+
   def dark_green; colorize(self, "\e[32m"); end
+
   def yellow; colorize(self, "\e[1m\e[33m"); end
+
   def blue; colorize(self, "\e[1m\e[34m"); end
+
   def dark_blue; colorize(self, "\e[34m"); end
+
   def pur; colorize(self, "\e[1m\e[35m"); end
+
   def colorize(text, color_code)  "#{color_code}#{text}\e[0m" end
 end
 
-Dir[Rails.root+'vendor/plugins/*/spec_canvas/spec_helper.rb'].each do |f|
+Dir[Rails.root+'{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb'].each do |f|
   require f
 end

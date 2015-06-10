@@ -23,23 +23,23 @@ describe 'HostUrl' do
     it "should return https if domain config says ssl" do
       ConfigFile.expects(:load).with("domain").returns({})
       Attachment.stubs(:file_store_config).returns({})
-      HostUrl.protocol.should == 'http'
+      expect(HostUrl.protocol).to eq 'http'
       HostUrl.reset_cache!
       ConfigFile.expects(:load).with("domain").returns('ssl' => true)
-      HostUrl.protocol.should == 'https'
+      expect(HostUrl.protocol).to eq 'https'
     end
 
     it "should return https if file store config says secure" do
       ConfigFile.stubs(:load).with("domain").returns({})
       Attachment.stubs(:file_store_config).returns('secure' => true)
-      HostUrl.protocol.should == 'https'
+      expect(HostUrl.protocol).to eq 'https'
     end
 
     it "should return https for production" do
-      HostUrl.protocol.should == 'http'
+      expect(HostUrl.protocol).to eq 'http'
       HostUrl.reset_cache!
       Rails.env.expects(:production?).returns(true)
-      HostUrl.protocol.should == 'https'
+      expect(HostUrl.protocol).to eq 'https'
     end
   end
 end

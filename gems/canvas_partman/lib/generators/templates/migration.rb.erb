@@ -1,0 +1,15 @@
+class <%= migration_class_name %> < CanvasPartman::Migration
+  self.base_class = '<%= model || "NameOfModel" %>'
+
+  def self.up
+    with_each_partition do |partition|
+      # add_column partition, :name, :string
+    end
+  end
+
+  def self.down
+    with_each_partition do |partition|
+      # remove_column partition, :name
+    end
+  end
+end

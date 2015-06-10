@@ -1,0 +1,175 @@
+//// 
+// Note: We share this file with other Instructure projects so we can
+// maintain a consistent look feel with our styleguides.
+// If you edit something in there please throw a reference in #ui so we
+// can make sure to update this file in other projects.
+////
+////
+////// Mixins & Silent Classes needed for layout
+// Note that we've pulled in some css flex box layout classes to help alignment. 
+// Since we share this _layout file with other projects that don't have flexbox grid
+// or autoprefixer, we've turned these into silent classes to make sure that we can 
+// pull in the right prefixes needed for xbrowser support.
+/////
+%sg-flex {
+  /* 2011 */
+  display: -moz-flexbox;
+  display: -ms-flexbox;
+  display: -o-flexbox;
+  display: flexbox;
+  /* 2012 */
+  display: -webkit-flex;
+  display: flex;
+}
+%sg-flex-1 {
+  -webkit-box-flex: 1; 
+  -moz-box-flex: 1; 
+  box-flex: 1; 
+  -ms-flex: 1; 
+  -webkit-flex: 1; 
+  flex: 1;
+}
+%sg-flex-align-content-center {
+  -webkit-align-content: center;
+  -ms-flex-line-pack: center;
+  align-content: center;
+}
+%sg-flex-justify-content-center {
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+%sg-flex-align-self {
+  -webkit-align-self: center;
+  -ms-flex-item-align: center;
+  align-self: center;
+}
+/////
+////// Styles for Styleguide
+/////
+html.Sg-only {
+  margin: 0;
+  padding: 0;
+  line-height: normal;
+  font-family: $sg-font;
+  font-weight: 300;
+}
+body.Sg-only {
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+  background: $sg-background;
+}
+.Sg-header {
+  background: $sg-background-global-nav;
+  position: fixed;
+  width: 100%;
+  z-index: 999;
+}
+.Sg-header__Navigation {
+  @include sg-header-logo; 
+  @extend %sg-flex;
+  @extend %sg-flex-1;
+  @extend %sg-flex-align-content-center;
+  @extend %sg-flex-justify-content-center;  
+}
+.Sg-header__Navigation-item {
+  color: $sg-header-navigation-item;
+  font-size: 16px;
+  padding: 13px 15px;
+  text-transform: capitalize;  
+  text-decoration: none;  
+  @extend %sg-flex-align-self;  
+  &:hover {
+    text-decoration: none;
+    color: $sg-header-navigation-item--hover;
+    background: $sg-background-sub-nav;
+  }
+  &:focus {
+    text-decoration: none;  
+    color: $sg-header-navigation-item;
+  }  
+}
+.Sg-header__Navigation-item.active {
+  background: $sg-background-sub-nav;
+  color: $sg-header-navigation-item--active;
+}
+.Sg-header__Subnavigation {
+  background: $sg-background-sub-nav;
+  @extend %sg-flex;
+  @extend %sg-flex-1;
+  @extend %sg-flex-align-content-center;
+  @extend %sg-flex-justify-content-center;  
+}
+.Sg-header__Subnavigation-item {
+  &,
+  &:active,
+  &:visited,
+  &:focus {
+    font-size: 13px;
+    padding: 8px 10px;
+    font-weight: 500;
+    color: $sg-header-subnavigation-item;
+    text-decoration: none;
+  }
+  &:hover {
+    color: $sg-header-subnavigation-item--hover;
+    text-decoration: none;
+  }
+}
+.Sg-Main {
+  /// Account for fixed header
+  padding-top: 85px;
+}
+// Hologram class
+.Sg-Content,
+// Dresscode class
+.Sg-Article {
+  > h1 {
+    background: $sg-content-title-background;
+    color: $sg-content-title-font-color;
+    font-size: 48px;
+    font-weight: 100;
+    text-align: center;
+    padding: 40px 0;
+    margin: 0;
+  }
+  > h2 {
+    padding: 3px 0;
+    margin: 25px 0;
+    text-transform: capitalize;
+    font-size: 20px;
+    text-align: center;
+    border-top: 1px solid $sg-title-border;
+    border-bottom: 1px solid $sg-title-border;
+  }
+  > p {
+    font-size: 16px;
+    text-align: center;
+    margin: 0;
+  }  
+  > ul, > dl, > ol {
+    margin: 10px 20px;
+    li {
+      font-size: 16px;
+    }
+  }
+  & > hr {
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 5px 0;
+    height: 1px;
+    &.Ruler--dotted {
+      border-top: 1px dotted $sg-content-hr-border-color;
+    }
+  }
+ .sg-src-file-path {
+    text-align: center;
+    padding: 5px 0;
+    background: $sg-src-file-path-background;
+    border-top:1px solid $sg-src-file-path-border-color;
+    color: $sg-src-file-path-font-color;
+  }
+}

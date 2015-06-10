@@ -1,0 +1,8 @@
+#HTMLReporter {
+  position: relative;
+  z-index: 0;
+}
+
+.fixture {
+  position: relative;
+}

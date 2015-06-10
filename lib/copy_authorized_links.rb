@@ -45,7 +45,7 @@ module CopyAuthorizedLinks
             html.scan(re) do |match|
               ids << match[0]
             end
-            Attachment.find_all_by_id(ids).uniq.each do |file|
+            Attachment.where(id: ids.uniq).each do |file|
               html = html.gsub(Regexp.new("/#{context.class.to_s.pluralize.underscore}/#{context.id}/files/#{file.id}"), "/#{file.context_type.pluralize.underscore}/#{file.context_id}/files/#{file.id}")
             end
             self.write_attribute(column, html) if html && !html.empty?

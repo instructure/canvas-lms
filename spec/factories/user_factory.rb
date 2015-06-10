@@ -21,7 +21,7 @@ def user_model(opts={})
 end
 
 def tie_user_to_account(user, opts={})
-  user.account_users.create(:account => opts[:account] || Account.default, :membership_type => opts[:membership_type] || 'AccountAdmin')
+  user.account_users.create(:account => opts[:account] || Account.default, :role => opts[:role] || admin_role)
 end
 
 def valid_user_attributes

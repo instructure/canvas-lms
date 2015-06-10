@@ -193,10 +193,12 @@ module CC
           q_node.one_question_at_a_time quiz.one_question_at_a_time?
           q_node.cant_go_back quiz.cant_go_back?
           q_node.available quiz.available?
+          q_node.one_time_results quiz.one_time_results?
+          q_node.show_correct_answers_last_attempt quiz.show_correct_answers_last_attempt?
           if quiz.assignment && !quiz.assignment.deleted?
             assignment_migration_id = CCHelper.create_key(quiz.assignment)
             doc.assignment(:identifier=>assignment_migration_id) do |a|
-              AssignmentResources.create_canvas_assignment(a, quiz.assignment)
+              AssignmentResources.create_canvas_assignment(a, quiz.assignment, @manifest)
             end
           end
           if quiz.assignment_group_id
@@ -291,7 +293,7 @@ module CC
         pick_count = group['pick_count'].to_i
         chosen = 0
         if group[:assessment_question_bank_id]
-          if bank = @course.assessment_question_banks.find_by_id(group[:assessment_question_bank_id])
+          if bank = @course.assessment_question_banks.where(id: group[:assessment_question_bank_id]).first
             bank.assessment_questions.each do |question|
               # try adding questions until the pick count is reached
               chosen += 1 if add_cc_question(node, question)
@@ -308,7 +310,7 @@ module CC
       end
       
       def add_group(node, group)
-        id = create_key(group['id']) 
+        id = create_key("quizzes/quiz_group_#{group['id']}")
         node.section(
                 :ident => id,
                 :title => group['name']
@@ -319,9 +321,9 @@ module CC
               bank = nil
 
               if group[:assessment_question_bank_id]
-                if bank = @course.assessment_question_banks.find_by_id(group[:assessment_question_bank_id])
+                if bank = @course.assessment_question_banks.where(id: group[:assessment_question_bank_id]).first
                   sel_node.sourcebank_ref create_key(bank)
-                elsif bank = AssessmentQuestionBank.find_by_id(group[:assessment_question_bank_id])
+                elsif bank = AssessmentQuestionBank.where(id: group[:assessment_question_bank_id]).first
                   sel_node.sourcebank_ref bank.id
                   is_external = true
                 end

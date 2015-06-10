@@ -5,7 +5,8 @@ define [
   'compiled/util/deparam'
   'jst/conferences/editConferenceForm'
   'jst/conferences/userSettingOptions'
-], ($, _, DialogBaseView, deparam, template, userSettingOptionsTemplate) ->
+  'compiled/behaviors/authenticity_token'
+], ($, _, DialogBaseView, deparam, template, userSettingOptionsTemplate, authenticity_token) ->
 
   class EditConferenceView extends DialogBaseView
 
@@ -70,7 +71,7 @@ define [
           is_editing: is_editing
           is_adding: is_adding
           disable_duration_changes: ((conferenceData['long_running'] || is_editing) && conferenceData['started_at'])
-          auth_token: ENV.AUTHENTICITY_TOKEN
+          auth_token: authenticity_token()
         conferenceData: conferenceData
         users: ENV.users
         conferenceTypes: ENV.conference_type_details.map((type) ->

@@ -36,13 +36,37 @@ define [
     ok view.isEmpty()
 
 
-  test 'should rerender on :hidden change', ->
+  test 'should filter models with title that doesnt match term', ->
     collection = new QuizCollection([{id: 1}, {id: 2}])
+    view = createView(collection)
+    model = new Quiz(title: "Foo Name")
+
+    ok  view.filter(model, "name")
+    ok !view.filter(model, "zzz")
+
+  test 'should not use regexp to filter models', ->
+    collection = new QuizCollection([{id: 1}, {id: 2}])
+    view = createView(collection)
+    model = new Quiz(title: "Foo Name")
+
+    ok !view.filter(model, ".*name")
+    ok !view.filter(model, "zzz")
+
+  test 'should filter models with multiple terms', ->
+    collection = new QuizCollection([{id: 1}, {id: 2}])
+    view = createView(collection)
+    model = new Quiz(title: "Foo Name bar")
+
+    ok  view.filter(model, "name bar")
+    ok !view.filter(model, "zzz")
+
+
+  test 'should rerender on filter change', ->
+    collection = new QuizCollection([{id: 1, title: 'hey'}, {id: 2, title: 'foo'}])
     view = createView(collection)
     equal view.$el.find('.collectionViewItems li').length, 2
 
-    quiz = collection.get(1)
-    quiz.set('hidden', true)
+    view.filterResults('hey')
     equal view.$el.find('.collectionViewItems li').length, 1
 
   test 'should not render no content message if quizzes are available', ->

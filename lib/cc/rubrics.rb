@@ -47,6 +47,9 @@ module CC
             end
           end
           imported_rubrics[rubric.id] = true
+          rubric.learning_outcome_alignments.each do |align|
+            add_item_to_export(align.learning_outcome, 'learning_outcomes')
+          end
 
           migration_id = CCHelper.create_key(rubric)
           rubrics_node.rubric(:identifier=>migration_id) do |r_node|

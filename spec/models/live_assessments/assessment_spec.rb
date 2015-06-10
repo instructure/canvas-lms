@@ -42,14 +42,14 @@ describe LiveAssessments::Assessment do
   describe '#generate_submissions_for' do
     it "doesn't do anything without aligned outcomes" do
       assessment.generate_submissions_for(assessment_user)
-      assessment.submissions.count.should == 0
+      expect(assessment.submissions.count).to eq 0
     end
 
     it "doesn't create a submission for users with no results" do
       outcome.align(assessment, assessment_context, mastery_type: 'none', mastery_score: 0.6)
       assessment.results.create!(user: assessment_user, assessor: assessor, passed: true, assessed_at: Time.now)
       assessment.generate_submissions_for([assessment_user, another_assessment_user])
-      assessment.submissions.count.should == 1
+      expect(assessment.submissions.count).to eq 1
     end
 
     it "creates a submission for each given user" do
@@ -57,26 +57,26 @@ describe LiveAssessments::Assessment do
       assessment.results.create!(user: assessment_user, assessor: assessor, passed: true, assessed_at: Time.now)
       assessment.results.create!(user: another_assessment_user, assessor: assessor, passed: false, assessed_at: Time.now)
       assessment.generate_submissions_for([assessment_user, another_assessment_user])
-      assessment.submissions.count.should == 2
-      assessment.submissions[0].possible.should == 1
-      assessment.submissions[0].score.should == 1
-      assessment.submissions[1].possible.should == 1
-      assessment.submissions[1].score.should == 0
+      expect(assessment.submissions.count).to eq 2
+      expect(assessment.submissions[0].possible).to eq 1
+      expect(assessment.submissions[0].score).to eq 1
+      expect(assessment.submissions[1].possible).to eq 1
+      expect(assessment.submissions[1].score).to eq 0
     end
 
     it "updates existing submission" do
       outcome.align(assessment, assessment_context, mastery_type: 'none', mastery_score: 0.6)
       assessment.results.create!(user: assessment_user, assessor: assessor, passed: true, assessed_at: Time.now)
       assessment.generate_submissions_for([assessment_user])
-      assessment.submissions.count.should == 1
+      expect(assessment.submissions.count).to eq 1
       submission = assessment.submissions.first
-      submission.possible.should == 1
-      submission.score.should == 1
+      expect(submission.possible).to eq 1
+      expect(submission.score).to eq 1
       assessment.results.create!(user: assessment_user, assessor: assessor, passed: false, assessed_at: Time.now)
       assessment.generate_submissions_for([assessment_user])
-      assessment.submissions.count.should == 1
-      submission.reload.possible.should == 2
-      submission.score.should == 1
+      expect(assessment.submissions.count).to eq 1
+      expect(submission.reload.possible).to eq 2
+      expect(submission.score).to eq 1
     end
 
     it "creates outcome results for each alignment" do

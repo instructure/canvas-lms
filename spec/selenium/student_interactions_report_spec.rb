@@ -22,12 +22,12 @@ describe "student interactions report" do
 
   it "should have sortable columns, except the email header" do
     ths = ff(".report th")
-    ths[0].should have_class("header")
-    ths[1].should have_class("header")
-    ths[2].should have_class("header")
-    ths[3].should have_class("header")
-    ths[4].should have_class("header")
-    ths[5].should_not have_class("header")
+    expect(ths[0]).to have_class("header")
+    expect(ths[1]).to have_class("header")
+    expect(ths[2]).to have_class("header")
+    expect(ths[3]).to have_class("header")
+    expect(ths[4]).to have_class("header")
+    expect(ths[5]).not_to have_class("header")
   end
 
   it "should allow sorting by columns" do
@@ -35,37 +35,37 @@ describe "student interactions report" do
     trs = ff(".report tbody tr")
     ths[0].click
     wait_for_ajaximations
-    ths[0].should have_class("headerSortDown")
-    ff(".report tbody tr").should == [trs[0], trs[1]]
+    expect(ths[0]).to have_class("headerSortDown")
+    expect(ff(".report tbody tr")).to eq [trs[0], trs[1]]
 
     ths[0].click
     wait_for_ajaximations
-    ths[0].should have_class("headerSortUp")
-    ff(".report tbody tr").should == [trs[1], trs[0]]
+    expect(ths[0]).to have_class("headerSortUp")
+    expect(ff(".report tbody tr")).to eq [trs[1], trs[0]]
 
     ths[2].click
     wait_for_ajaximations
-    ths[2].should have_class("headerSortDown")
-    ff(".report tbody tr").should == [trs[0], trs[1]]
+    expect(ths[2]).to have_class("headerSortDown")
+    expect(ff(".report tbody tr")).to eq [trs[0], trs[1]]
 
     ths[2].click
     wait_for_ajaximations
-    ths[2].should have_class("headerSortUp")
-    ff(".report tbody tr").should == [trs[1], trs[0]]
+    expect(ths[2]).to have_class("headerSortUp")
+    expect(ff(".report tbody tr")).to eq [trs[1], trs[0]]
 
     ths[3].click
     wait_for_ajaximations
-    ths[3].should have_class("headerSortDown")
-    ff(".report tbody tr").should == [trs[0], trs[1]]
+    expect(ths[3]).to have_class("headerSortDown")
+    expect(ff(".report tbody tr")).to eq [trs[0], trs[1]]
 
     ths[3].click
     wait_for_ajaximations
-    ths[3].should have_class("headerSortUp")
-    ff(".report tbody tr").should == [trs[1], trs[0]]
+    expect(ths[3]).to have_class("headerSortUp")
+    expect(ff(".report tbody tr")).to eq [trs[1], trs[0]]
 
     ths[5].click
     wait_for_ajaximations
-    ths[5].should_not have_class("header")
+    expect(ths[5]).not_to have_class("header")
   end
 end
 end

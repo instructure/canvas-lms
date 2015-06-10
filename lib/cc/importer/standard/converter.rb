@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+
+require 'nokogiri'
+
 module CC::Importer::Standard
   class Converter < Canvas::Migration::Migrator
     include CC::Importer
@@ -25,6 +28,7 @@ module CC::Importer::Standard
     include QuizConverter
 
     MANIFEST_FILE = "imsmanifest.xml"
+    SUPPORTED_TYPES = /assessment\z|\Aassignment|\Aimswl|\Aimsbasiclti|\Aimsdt|webcontent|learning-application-resource\z/
     
     attr_accessor :resources
 
@@ -40,11 +44,12 @@ module CC::Importer::Standard
 
     # exports the package into the intermediary json
     def convert(to_export = nil)
-      prepare_cartridge_file(MANIFEST_FILE)
+      @archive.prepare_cartridge_file(MANIFEST_FILE)
       @manifest = open_file_xml(File.join(@unzipped_file_path, MANIFEST_FILE))
       @manifest.remove_namespaces!
 
       get_all_resources(@manifest)
+      process_variants
       create_file_map
 
       @course[:discussion_topics] = convert_discussions
@@ -63,6 +68,26 @@ module CC::Importer::Standard
     end
     alias_method :export, :convert
 
+    # A resource can have a "variant" that points to another resource.
+    # That means the other resource is preferred if it's supported.
+    # After this runs all migration_ids in @resources for the variant chain
+    # should point to just one object
+    def process_variants
+      @resources.values.select{|r|r[:preferred_resource_id]}.each do |res|
+        preferred = @resources[res[:preferred_resource_id]]
+        if preferred && preferred != res
+          if preferred[:type] =~ SUPPORTED_TYPES
+            # The preferred resource is supported, use it instead
+            @resources[res[:migration_id]] = preferred
+          else
+            # The preferred resource isn't supported, don't try to import it
+            @resources[preferred[:migration_id]] = res
+          end
+          res.delete :preferred_resource_id
+        end
+      end
+    end
+
     def find_file_migration_id(path)
       @file_path_migration_id[path] || @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '')] ||
         @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '').sub(WEB_RESOURCES_FOLDER + '/', '')]
@@ -74,10 +99,10 @@ module CC::Importer::Standard
           return url
         end
       end
+      path = path[1..-1] if path.start_with?('/')
       mig_id = nil
       if resource_dir
         mig_id = find_file_migration_id(File.join(resource_dir, path))
-        mig_id ||= find_file_migration_id(File.join(resource_dir, path.gsub(%r{\$[^$]*\$|\.\./}, '')))
       end
       mig_id ||= find_file_migration_id(path)
 
@@ -98,6 +123,7 @@ module CC::Importer::Standard
     def add_course_file(file, overwrite=false)
       return unless file[:path_name]
       file[:path_name].sub!(WEB_RESOURCES_FOLDER + '/', '')
+      file[:path_name] = file[:path_name][1..-1] if file[:path_name].start_with?('/')
       if @file_path_migration_id[file[:path_name]] && overwrite
         @course[:file_map].delete @file_path_migration_id[file[:path_name]]
       elsif @file_path_migration_id[file[:path_name]]

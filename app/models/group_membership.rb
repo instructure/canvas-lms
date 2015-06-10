@@ -40,8 +40,10 @@ class GroupMembership < ActiveRecord::Base
   after_save :touch_groups
   after_save :update_cached_due_dates
   after_save :update_group_leadership
+  after_save :invalidate_user_membership_cache
   after_destroy :touch_groups
   after_destroy :update_group_leadership
+  after_destroy :invalidate_user_membership_cache
 
   has_a_broadcast_policy
 
@@ -59,7 +61,7 @@ class GroupMembership < ActiveRecord::Base
       record.just_created &&
         record.accepted? &&
         record.group &&
-        record.group.context &&
+        record.group.context_available? &&
         record.sis_batch_id.blank?
     }
 
@@ -69,7 +71,7 @@ class GroupMembership < ActiveRecord::Base
       record.just_created &&
         record.invited? &&
         record.group &&
-        record.group.context &&
+        record.group.context_available? &&
         record.sis_batch_id.blank?
     }
 
@@ -185,6 +187,10 @@ class GroupMembership < ActiveRecord::Base
      enrollments.any?{ |e| e.user == self.user && e.course == self.group.context })
   end
 
+  def invalidate_user_membership_cache
+    Rails.cache.delete(self.user.group_membership_key)
+  end
+
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
@@ -200,6 +206,10 @@ class GroupMembership < ActiveRecord::Base
     # for communities, users must initiate in order to be added to a group
     given { |user, session| user && self.group && user == self.user && self.group.grants_right?(user, :join) && self.group.group_category.try(:communities?) }
     can :create
+
+    # user can read group membership if they can read its group's roster
+    given { |user, session| user && self.group && self.group.grants_right?(user, session, :read_roster) }
+    can :read
 
     given { |user, session| user && self.group && self.group.grants_right?(user, session, :manage) }
     can :update

@@ -29,7 +29,7 @@ class ContextController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       if params[:id] && params[:type] && @context.respond_to?(:media_objects)
         self.extend TextHelper
-        @media_object = @context.media_objects.find_or_initialize_by_media_id_and_media_type(params[:id], params[:type])
+        @media_object = @context.media_objects.where(media_id: params[:id], media_type: params[:type]).first_or_initialize
         @media_object.title = CanvasTextHelper.truncate_text(params[:title], :max_length => 255) if params[:title]
         @media_object.user = @current_user
         @media_object.media_type = params[:type]
@@ -115,13 +115,13 @@ class ContextController < ApplicationController
       notifications.each do |key, notification|
         if notification[:notification_type] == 'entry_add'
           entry_id = notification[:entry_id]
-          mo = MediaObject.find_or_initialize_by_media_id(entry_id)
+          mo = MediaObject.where(media_id: entry_id).first_or_initialize
           if !mo.new_record? || (notification[:partner_data] && !notification[:partner_data].empty?)
             data = JSON.parse(notification[:partner_data]) rescue nil
             if data && data['root_account_id'] && data['context_code']
               context = Context.find_by_asset_string(data['context_code'])
               context = nil unless context.respond_to?(:is_a_context?) && context.is_a_context?
-              user = User.find_by_id(data['puser_id'].split("_").first) if data['puser_id'].present?
+              user = User.where(id: data['puser_id'].split("_").first).first if data['puser_id'].present?
 
               mo.context ||= context
               mo.user ||= user
@@ -158,9 +158,8 @@ class ContextController < ApplicationController
     end
 
     @snippet = params[:object_data] || ""
-    hmac = Canvas::Security.hmac_sha1(@snippet)
 
-    if hmac != params[:s]
+    unless Canvas::Security.verify_hmac_sha1(params[:s], @snippet)
       return render :nothing => true, :status => 400
     end
 
@@ -182,15 +181,23 @@ class ContextController < ApplicationController
 
   def roster
     return unless authorized_action(@context, @current_user, [:read_roster, :manage_students, :manage_admin_users])
-    log_asset_access("roster:#{@context.asset_string}", 'roster', 'other')
+    log_asset_access([ "roster", @context ], 'roster', 'other')
 
     if @context.is_a?(Course)
-      sections = @context.course_sections.active.select([:id, :name])
+      if @context.concluded?
+        sections = @context.course_sections.active.select([:id, :course_id, :name, :end_at, :restrict_enrollments_to_section_dates]).preload(:course)
+        concluded_sections = sections.select{|s| s.concluded?}.map{|s| "section_#{s.id}"}
+      else
+        sections = @context.course_sections.active.select([:id, :name])
+        concluded_sections = []
+      end
+
       all_roles = Role.role_data(@context, @current_user)
       load_all_contexts(:context => @context)
       js_env({
         :ALL_ROLES => all_roles,
-        :SECTIONS => sections.map { |s| { :id => s.id.to_s, :name => s.name } },
+        :SECTIONS => sections.map { |s| { :id => s.id.to_s, :name => s.name} },
+        :CONCLUDED_SECTIONS => concluded_sections,
         :USER_LISTS_URL => polymorphic_path([@context, :user_lists], :format => :json),
         :ENROLL_USERS_URL => course_enroll_users_url(@context),
         :SEARCH_URL => search_recipients_url,
@@ -227,25 +234,16 @@ class ContextController < ApplicationController
 
   def prior_users
     if authorized_action(@context, @current_user, [:manage_students, :manage_admin_users, :read_prior_roster])
-      if CANVAS_RAILS2
-        @prior_users = @context.prior_users.
-          where(Enrollment.not_fake.proxy_options[:conditions]).
-          select("users.*, NULL AS prior_enrollment").
-          by_top_enrollment.
-          paginate(:page => params[:page], :per_page => 20)
-      else
-        @prior_users = @context.prior_users.
-          select("users.*, NULL AS prior_enrollment").
-          by_top_enrollment.merge(Enrollment.not_fake).
-          paginate(:page => params[:page], :per_page => 20)
-      end
+      @prior_users = @context.prior_users.
+        by_top_enrollment.merge(Enrollment.not_fake).
+        paginate(:page => params[:page], :per_page => 20)
 
       users = @prior_users.index_by(&:id)
       if users.present?
         # put the relevant prior enrollment on each user
         @context.prior_enrollments.where({:user_id => users.keys}).
           top_enrollment_by(:user_id, :student).
-          each { |e| users[e.user_id].write_attribute :prior_enrollment, e }
+          each { |e| users[e.user_id].prior_enrollment = e }
       end
     end
   end
@@ -292,21 +290,22 @@ class ContextController < ApplicationController
   def roster_user
     if authorized_action(@context, @current_user, :read_roster)
       if params[:id] !~ Api::ID_REGEX
-        # todo stop generating an error report and fix the bad input
-        ErrorReport.log_error('invalid_user_id',
-                              {message: "invalid user_id in ContextController::roster_user",
-                               current_user_id: @current_user.id,
-                               current_user_name: @current_user.sortable_name}.
-                                merge(ErrorReport.useful_http_env_stuff_from_request(request))
-        )
+        # TODO: stop generating an error report and fix the bad input
+
+        env_stuff = Canvas::Errors::Info.useful_http_env_stuff_from_request(request)
+        Canvas::Errors.capture('invalid_user_id', {
+          message: "invalid user_id in ContextController::roster_user",
+          current_user_id: @current_user.id,
+          current_user_name: @current_user.sortable_name
+        }.merge(env_stuff))
         raise ActiveRecord::RecordNotFound
       end
       user_id = Shard.relative_id_for(params[:id], Shard.current, @context.shard)
       if @context.is_a?(Course)
-        @membership = @context.enrollments.find_by_user_id(user_id)
+        @membership = @context.enrollments.where(user_id: user_id).first
         log_asset_access(@membership, "roster", "roster")
       elsif @context.is_a?(Group)
-        @membership = @context.group_memberships.find_by_user_id(user_id)
+        @membership = @context.group_memberships.where(user_id: user_id).first
       end
       @user = @membership.user rescue nil
       if !@user
@@ -323,7 +322,7 @@ class ContextController < ApplicationController
       @entries = []
       @topics.each do |topic|
         @entries << topic if topic.user_id == @user.id
-        @entries.concat topic.discussion_entries.active.find_all_by_user_id(@user.id)
+        @entries.concat topic.discussion_entries.active.where(user_id: @user)
       end
       @entries = @entries.sort_by {|e| e.created_at }
       @enrollments = @context.enrollments.for_user(@user) rescue []
@@ -337,7 +336,7 @@ class ContextController < ApplicationController
           session,
           ['links', 'user_services']
         )
-        render :action => :new_roster_user
+        render :new_roster_user
         return false
       end
       true

@@ -97,10 +97,10 @@ define [
     animateGhost: (fromElement, toElement) ->
       from          = fromElement.offset()
       to            = toElement.offset()
-      clone         = fromElement.clone()
+      $clone        = fromElement.clone()
       from.position = 'absolute'
 
-      @ghost.append(clone)
+      @ghost.append($clone)
       @ghost.appendTo(@doc).css(from).animate to, @options.animationDuration, =>
         @ghost.detach().empty()
 
@@ -147,7 +147,7 @@ define [
         args.unshift(item.id)
         @addError.apply(this, args)
 
-      url = @options.url + '/' + item.id   
+      url = @options.url + '/' + item.id
       req = jQuery.ajaxJSON(url, 'POST', {}, success, error)
 
       @requests.add[item.id] = req

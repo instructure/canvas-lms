@@ -1,6 +1,7 @@
 class CreatePollSessionsAndModifyPolls < ActiveRecord::Migration
   tag :predeploy
 
+  # rubocop:disable Migration/RemoveColumn
   def self.up
     create_table :polling_poll_sessions do |t|
       t.boolean :is_published, null: false, default: false

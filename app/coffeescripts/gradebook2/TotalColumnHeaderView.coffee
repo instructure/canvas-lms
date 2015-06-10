@@ -11,6 +11,7 @@ define [
 
     events:
       "click .toggle_percent": "togglePercent"
+      "click .move_column": "moveColumn"
 
     template: template
 
@@ -19,15 +20,16 @@ define [
       @render()
       false
 
+    moveColumn: =>
+      @options.moveTotalColumn()
+      @render()
+      false
+
     render: ->
       # the menu doesn't live in @$el, so remove it manually
       @$menu.remove() if @$menu
 
       super()
-
-      # this line goes away when there is more stuff in the menu than just
-      # points vs percent
-      return this if @options.weightedGroups()
 
       @$menu = @$el.find('.gradebook-header-menu')
       @$el.find('#total_dropdown').kyleMenu
@@ -41,3 +43,4 @@ define [
       json =
         showingPoints: @options.showingPoints
         weightedGroups: @options.weightedGroups
+        totalColumnInFront: @options.totalColumnInFront

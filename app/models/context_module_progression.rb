@@ -121,6 +121,8 @@ class ContextModuleProgression < ActiveRecord::Base
       self.workflow_state = 'completed'
     elsif result.started?
       self.workflow_state = 'started'
+    else
+      self.workflow_state = 'unlocked'
     end
 
     if result.changed?
@@ -133,8 +135,11 @@ class ContextModuleProgression < ActiveRecord::Base
     tags_hash = nil
     calc = CompletedRequirementCalculator.new(self.requirements_met || [])
     completion_requirements.each do |req|
+      # for an observer/student user we don't want to filter based on the normal observer logic,
+      # instead return vis for student enrollment only -> hence ignore_observer_logic below
+
       # create the hash inside the loop in case the completion_requirements is empty (performance)
-      tags_hash ||= context_module.cached_active_tags.index_by(&:id)
+      tags_hash ||= context_module.content_tags_visible_to(self.user, is_teacher: false, ignore_observer_logic: true).index_by(&:id)
 
       tag = tags_hash[req[:id]]
       next unless tag
@@ -160,20 +165,22 @@ class ContextModuleProgression < ActiveRecord::Base
 
   def get_submission_or_quiz_submission(tag)
     if tag.content_type_quiz?
-      Quizzes::QuizSubmission.find_by_quiz_id_and_user_id(tag.content_id, user.id)
+      sub = Quizzes::QuizSubmission.where(quiz_id: tag.content_id, user_id: user).first
+      sub ||= Submission.where(assignment_id: tag.content.assignment_id, user_id: user).first
+      sub
     elsif tag.content_type_discussion?
       if tag.content
-        Submission.find_by_assignment_id_and_user_id(tag.content.assignment_id, user.id)
+        Submission.where(assignment_id: tag.content.assignment_id, user_id: user).first
       end
     else
-      Submission.find_by_assignment_id_and_user_id(tag.content_id, user.id)
+      Submission.where(assignment_id: tag.content_id, user_id: user).first
     end
   end
   private :get_submission_or_quiz_submission
 
   def get_submission_score(tag)
     submission = get_submission_or_quiz_submission(tag)
-    if tag.content_type_quiz?
+    if submission.is_a?(Quizzes::QuizSubmission)
       submission.try(:kept_score)
     else
       submission.try(:score)
@@ -221,6 +228,8 @@ class ContextModuleProgression < ActiveRecord::Base
 
   def outdated?
     if self.current && evaluated_at.present?
+      return true if evaluated_at < context_module.updated_at
+
       # context module not locked or still to be unlocked
       return false if context_module.unlock_at.blank? || context_module.to_be_unlocked
 
@@ -264,7 +273,9 @@ class ContextModuleProgression < ActiveRecord::Base
     completion_requirements = context_module.completion_requirements || []
     requirements_met = self.requirements_met || []
 
-    context_module.cached_active_tags.each do |tag|
+    # for an observer/student combo user we don't want to filter based on the
+    # normal observer logic, instead return vis for student enrollment only
+    context_module.content_tags_visible_to(self.user, is_teacher: false, ignore_observer_logic: true).each do |tag|
       self.current_position = tag.position if tag.position
       all_met = completion_requirements.select{|r| r[:id] == tag.id }.all? do |req|
         requirements_met.any?{|r| r[:id] == req[:id] && r[:type] == req[:type] }
@@ -296,33 +307,34 @@ class ContextModuleProgression < ActiveRecord::Base
   # calculates and saves the progression state
   # raises a StaleObjectError if there is a conflict
   def evaluate(as_prerequisite_for=nil)
-    return self unless outdated?
+    self.shard.activate do
+      return self unless outdated?
 
-    # there is no valid progression state for unpublished modules
-    return self if context_module.unpublished?
+      # there is no valid progression state for unpublished modules
+      return self if context_module.unpublished?
 
-    self.evaluated_at = Time.now.utc
-    self.current = true
-    self.requirements_met ||= []
-    self.workflow_state = 'locked'
+      self.evaluated_at = Time.now.utc
+      self.current = true
+      self.requirements_met ||= []
 
-    if check_prerequisites
-      evaluate_requirements_met
+      if check_prerequisites
+        evaluate_requirements_met
+      end
+      completion_changed = self.workflow_state_changed? && self.workflow_state_change.include?('completed')
+
+      evaluate_current_position
+
+      Shackles.activate(:master) do
+        self.save
+      end
+
+      if completion_changed
+        trigger_reevaluation_of_dependent_progressions(as_prerequisite_for)
+        trigger_completion_events if self.completed?
+      end
+
+      self
     end
-    completion_changed = self.workflow_state_changed? && self.workflow_state_change.include?('completed')
-
-    evaluate_current_position
-
-    Shackles.activate(:master) do
-      self.save
-    end
-
-    if completion_changed
-      trigger_reevaluation_of_dependent_progressions(as_prerequisite_for)
-      trigger_completion_events if self.completed?
-    end
-
-    self
   end
 
   def trigger_reevaluation_of_dependent_progressions(dependent_module_to_skip=nil)
@@ -333,9 +345,7 @@ class ContextModuleProgression < ActiveRecord::Base
       # re-evaluating progressions that have requested our progression's evaluation can cause cyclic evaluation
       next false if dependent_module_to_skip && progression.context_module_id == dependent_module_to_skip.id
 
-      (progression.context_module.prerequisites || []).any? do |prereq|
-        prereq[:type] == 'context_module' && prereq[:id] == context_module.id
-      end
+      self.context_module.is_prerequisite_for?(progression.context_module)
     end
 
     # invalidate all, then re-evaluate each

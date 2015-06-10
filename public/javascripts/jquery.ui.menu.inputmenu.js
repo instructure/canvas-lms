@@ -96,7 +96,7 @@ $.extend( proto, {
 				if( parent.prev().length && !parent.prev().children( "a" ).length ) {
 					parent.prev()
 						.addClass( "ui-state-disabled" )
-						.html( "<span class='ui-menu-input-group'>" + parent.prev().text() + "</span>" )
+						.html( "<span class='ui-menu-input-group'>" + parent.prev().html() + "</span>" )
 						.bind( "click.menu", function( event ) {
 							return false;
 						}).after( "<li><hr /></li>" );

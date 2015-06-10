@@ -36,4 +36,41 @@ describe TermsController do
       }}
   end
 
+  it "should not be able to delete a default term" do
+    account_model
+    account_admin_user(:account => @account)
+    user_session(@user)
+
+    delete 'destroy', :account_id => @account.id, :id => @account.default_enrollment_term.id
+
+    expect(response).to_not be_success
+    error = json_parse(response.body)["errors"]["workflow_state"].first["message"]
+    expect(error).to eq "Cannot delete the default term"
+  end
+
+  it "should not be able to delete an enrollment term with active courses" do
+    account_model
+    account_admin_user(:account => @account)
+    user_session(@user)
+
+    @term = @account.enrollment_terms.create!
+    course account: @account
+    @course.enrollment_term = @term
+    @course.save!
+
+    delete 'destroy', :account_id => @account.id, :id => @term.id
+
+    expect(response).to_not be_success
+    error = json_parse(response.body)["errors"]["workflow_state"].first["message"]
+    expect(error).to eq "Cannot delete a term with active courses"
+
+    @course.destroy
+
+    delete 'destroy', :account_id => @account.id, :id => @term.id
+
+    expect(response).to be_success
+
+    @term.reload
+    expect(@term).to be_deleted
+  end
 end

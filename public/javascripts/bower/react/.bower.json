@@ -1,0 +1,16 @@
+{
+  "name": "react",
+  "version": "0.12.2",
+  "main": "react.js",
+  "ignore": [],
+  "homepage": "https://github.com/facebook/react-bower",
+  "_release": "0.12.2",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.12.2",
+    "commit": "364caf9482cb2abac26763f8d7f53ef532c0658b"
+  },
+  "_source": "git://github.com/facebook/react-bower.git",
+  "_target": "0.12.2",
+  "_originalSource": "react"
+}

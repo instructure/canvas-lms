@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 describe ProgressController, type: :request do
 
   describe "show" do
-    before do
+    before :once do
       @account = account_model
       account_admin_user :account => @account
       @progress = @account.progresses.build :tag => 'course_batch_update', :completion => 55.0, :message => 'hello'
@@ -35,15 +35,15 @@ describe ProgressController, type: :request do
 
     it "should show Progress" do
       json = api_call(:get, @path, @params)
-      json['completion'].should == 55.0
-      json['context_id'].should == @account.id
-      json['context_type'].should == 'Account'
-      json['user_id'].should == @user.id
-      json['id'].should == @progress.id
-      json['message'].should == 'hello'
-      json['tag'].should == 'course_batch_update'
-      json['workflow_state'].should == 'running'
-      json['url'].should == "http://www.example.com/api/v1/progress/#{@progress.id}"
+      expect(json['completion']).to eq 55.0
+      expect(json['context_id']).to eq @account.id
+      expect(json['context_type']).to eq 'Account'
+      expect(json['user_id']).to eq @user.id
+      expect(json['id']).to eq @progress.id
+      expect(json['message']).to eq 'hello'
+      expect(json['tag']).to eq 'course_batch_update'
+      expect(json['workflow_state']).to eq 'running'
+      expect(json['url']).to eq "http://www.example.com/api/v1/progress/#{@progress.id}"
     end
 
     it "should 401 if the caller does not have permission to view the context" do

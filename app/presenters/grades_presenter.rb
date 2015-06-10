@@ -13,7 +13,7 @@ class GradesPresenter
     @observed_enrollments ||= begin
       observer_enrollments.map { |e|
         e.shard.activate do
-          StudentEnrollment.active.find_by_user_id_and_course_id(e.associated_user_id, e.course_id)
+          StudentEnrollment.active.where(user_id: e.associated_user_id, course_id: e.course_id).first
         end
       }.uniq.compact
     end
@@ -34,7 +34,7 @@ class GradesPresenter
   end
 
   def teacher_enrollments
-    @teacher_enrollments ||= current_enrollments.select { |e| e.instructor? }
+    @teacher_enrollments ||= current_enrollments.select { |e| e.instructor? }.index_by { |e| e.course }.values
   end
 
   def prior_enrollments

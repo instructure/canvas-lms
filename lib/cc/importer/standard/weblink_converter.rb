@@ -23,11 +23,11 @@ module CC::Importer::Standard
       url = ''
       if resource[:files] && resource[:files].first
         path = get_full_path(resource[:files].first[:href])
-        if File.exists?(path)
-          xml = open(path).read
+        if File.exist?(path)
+          xml = File.open(path).read
           # because of some sadness from certain vendors clear empty namespace declarations
           xml.gsub!(/xmlns=""/, '')
-          doc = ::Nokogiri::XML(xml)
+          doc = create_xml_doc(xml)
           doc.remove_namespaces! unless doc.namespaces['xmlns']
           title = get_node_val(doc, 'webLink title')
           url = get_node_att(doc, 'webLink url', 'href')

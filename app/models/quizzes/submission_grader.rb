@@ -1,13 +1,13 @@
 module Quizzes
   class SubmissionGrader
-
+    class AlreadyGradedError < RuntimeError; end
     def initialize(submission)
       @submission = submission
     end
 
     def grade_submission(opts={})
       if @submission.submission_data.is_a?(Array)
-        raise "Can't grade an already-submitted submission: #{@submission.workflow_state} #{@submission.submission_data.class.to_s}"
+        raise(AlreadyGradedError,"Can't grade an already-submitted submission: #{@submission.workflow_state} #{@submission.submission_data.class}")
       end
       @submission.manually_scored = false
       tally = 0
@@ -19,7 +19,7 @@ module Quizzes
         tally += (user_answer[:points] || 0) if user_answer[:correct]
       end
       @submission.score = tally
-      @submission.score = @submission.quiz.points_possible if @submission.quiz && @submission.quiz.quiz_type == 'graded_survey'
+      @submission.score = @submission.quiz.points_possible if @submission.quiz && @submission.quiz.graded_survey?
       @submission.submission_data = user_answers
       @submission.workflow_state = "complete"
       user_answers.each do |answer|
@@ -114,7 +114,7 @@ module Quizzes
     def questions_and_alignments(question_ids)
       return [], [] if question_ids.empty?
 
-      questions = AssessmentQuestion.find_all_by_id(question_ids).compact
+      questions = AssessmentQuestion.where(id: question_ids).to_a
       bank_ids = questions.map(&:assessment_question_bank_id).uniq
       return questions, [] if bank_ids.empty?
 

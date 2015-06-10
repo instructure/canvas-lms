@@ -16,7 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'open-uri'
 module Canvas::Migration
 class Migrator
   include MigratorHelper
@@ -34,17 +33,13 @@ class Migrator
     @course = {:file_map=>{}, :wikis=>[]}
     @course[:name] = @settings[:course_name]
 
-    unless settings[:no_archive_file]
-      unless settings[:archive_file]
-        MigratorHelper::download_archive(settings)
-      end
-      if @archive_file = settings[:archive_file]
-        @archive_file_path = @archive_file.path
-      end
+    unless @settings[:no_archive_file]
+      @archive = @settings[:archive] || Canvas::Migration::Archive.new(@settings)
+      @archive_file = @archive.file
+      @unzipped_file_path = @archive.unzipped_file_path
+      @archive_file_path = @archive.path
     end
-    
-    config = ConfigFile.load('external_migration') || {}
-    @unzipped_file_path = Dir.mktmpdir(migration_type.to_s, config[:data_folder].presence)
+
     @base_export_dir = @settings[:base_download_dir] || find_export_dir
     @course[:export_folder_path] = File.expand_path(@base_export_dir)
     make_export_dir
@@ -55,43 +50,17 @@ class Migrator
   end
 
   def unzip_archive
-    command = MigratorHelper.unzip_command(@archive_file_path, @unzipped_file_path)
-    logger.debug "Running unzip command: #{command}"
-    zip_std_out = `#{command}`
-
-    if $?.exitstatus == 0
-      return true
-    elsif $?.exitstatus == 1
-      add_warning(I18n.t('canvas.migration.warning.unzip_warning', 'The content package unzipped successfully, but with a warning'), zip_std_out)
-      return true
-    elsif $?.exitstatus == 127
-      raise "unzip isn't installed on this system, exit status #{$?.exitstatus}, message: #{zip_std_out}"
-    else
-      raise "Could not unzip archive file, exit status #{$?.exitstatus}, message: #{zip_std_out}"
-    end
-  end
-
-  # If the file is a zip file, unzip it, if it's an xml file, copy
-  # it into the directory with the given file name
-  def prepare_cartridge_file(file_name='imsmanifest.xml')
-    if @archive_file_path.ends_with?('xml')
-      FileUtils::cp(@archive_file_path, File.join(@unzipped_file_path, file_name))
-    else
-      unzip_archive
+    @archive.unzip_archive
+    @archive.warnings.each do |warn|
+      add_warning(warn)
     end
   end
 
   def delete_unzipped_archive
-    delete_file(@unzipped_file_path)
-  end
-
-  def delete_file(file)
-    if File.exists?(file)
-      begin
-        FileUtils::rm_rf(file)
-      rescue
-        Rails.logger.warn "Couldn't delete #{file} for content_migration #{@settings[:content_migration_id]}"
-      end
+    begin
+      @archive.delete_unzipped_archive
+    rescue
+      Rails.logger.warn "Couldn't delete #{@unzipped_file_path} for content_migration #{@settings[:content_migration_id]}"
     end
   end
 
@@ -116,7 +85,7 @@ class Migrator
       @course[:file_map].each_value do |val|
         file_path = File.join(base_dir, val[:real_path] || val[:path_name])
         val.delete :real_path
-        if File.exists?(file_path)
+        if File.exist?(file_path)
           zipfile.add(val[:path_name], file_path)
         else
           add_warning(I18n.t('canvas.migration.errors.file_does_not_exist', 'The file "%{file_path}" did not exist in the content package and could not be imported.', :file_path => val[:path_name]))
@@ -152,6 +121,9 @@ class Migrator
       r_node.css('dependency').each do |d_node|
         resource[:dependencies] << d_node[:identifierref]
       end
+      if variant = r_node.at_css('variant')
+        resource[:preferred_resource_id] = variant['identifierref']
+      end
       @resources[id] = resource
     end
   end
@@ -166,7 +138,7 @@ class Migrator
     doc = nil
     if rel_path
       path = get_full_path(rel_path)
-      if File.exists?(path)
+      if File.exist?(path)
         doc = open_file_xml(path)
       end
     end

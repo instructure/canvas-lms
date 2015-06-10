@@ -19,6 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe Quizzes::QuizQuestion::CalculatedQuestion do
+
   let(:question_data) do
     {:answer_tolerance => 2.0, :answers => [{:id => 1, :answer => 10}]}
   end
@@ -29,7 +30,7 @@ describe Quizzes::QuizQuestion::CalculatedQuestion do
 
   describe "#initialize" do
     it "assign question data" do
-      question.question_id.should == question_data[:id]
+      expect(question.question_id).to eq question_data[:id]
     end
   end
 
@@ -41,28 +42,28 @@ describe Quizzes::QuizQuestion::CalculatedQuestion do
       answer_data = {:"question_#{question_id}" => "7.5"}
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
-      question.correct_answer_parts(user_answer).should be_false
+      expect(question.correct_answer_parts(user_answer)).to be_falsey
     end
 
     it "should calculate if answer is too far above of the answer tolerance" do
       answer_data = {:"question_#{question_id}" => "12.5"}
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
-      question.correct_answer_parts(user_answer).should be_false
+      expect(question.correct_answer_parts(user_answer)).to be_falsey
     end
 
     it "should calculate if answer is below the answer but within tolerance" do
       answer_data = {:"question_#{question_id}" => "9"}
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
-      question.correct_answer_parts(user_answer).should be_true
+      expect(question.correct_answer_parts(user_answer)).to be_truthy
     end
 
     it "should calculate if answer is above the the answer but within tolerance answer tolerance" do
       answer_data = {:"question_#{question_id}" => "11"}
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
-      question.correct_answer_parts(user_answer).should be_true
+      expect(question.correct_answer_parts(user_answer)).to be_truthy
     end
   end
 
@@ -78,28 +79,28 @@ describe Quizzes::QuizQuestion::CalculatedQuestion do
       answer_data = {:"question_#{question_id}" => "7.5"}
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
       
-      question.correct_answer_parts(user_answer).should be_false
+      expect(question.correct_answer_parts(user_answer)).to be_falsey
     end
 
     it "should calculate if answer is too far above of the answer tolerance" do
       answer_data = {:"question_#{question_id}" => "12.5"}
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
-      question.correct_answer_parts(user_answer).should be_false
+      expect(question.correct_answer_parts(user_answer)).to be_falsey
     end
 
     it "should calculate if answer is below the answer but within tolerance" do
       answer_data = {:"question_#{question_id}" => "9"}
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
-      question.correct_answer_parts(user_answer).should be_true
+      expect(question.correct_answer_parts(user_answer)).to be_truthy
     end
 
     it "should calculate if answer is above the the answer but within tolerance answer tolerance" do
       answer_data = {:"question_#{question_id}" => "11"}
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
-      question.correct_answer_parts(user_answer).should be_true
+      expect(question.correct_answer_parts(user_answer)).to be_truthy
     end
   end
 
@@ -116,14 +117,14 @@ describe Quizzes::QuizQuestion::CalculatedQuestion do
       
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
-      question.correct_answer_parts(user_answer).should be_true
+      expect(question.correct_answer_parts(user_answer)).to be_truthy
     end
 
     it "should calculate if negative answer is above the the answer but within tolerance answer tolerance" do
       answer_data = {:"question_#{question_id}" => "-11"}
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
-      question.correct_answer_parts(user_answer).should be_true
+      expect(question.correct_answer_parts(user_answer)).to be_truthy
     end
   end
 end

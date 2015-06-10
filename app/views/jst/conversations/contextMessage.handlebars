@@ -2,7 +2,9 @@
 <div class="context-author pull-left">{{author.name}}</div>
 <div class="pull-right">
   <span class="context-date">{{friendlyDatetime created_at}}</span>
-  <a class="icon-x delete-btn" href="#" aria-label="{{#t "delete_message"}}Delete message{{/t}}"></a>
+  <button type="button" class="delete-btn" href="#" aria-label="{{#t "delete_message"}}Delete message{{/t}}">
+    <i class="icon-end"></i>
+  </button>
   </ul>
 </div>
 <div class="context-body" aria-live="polite">

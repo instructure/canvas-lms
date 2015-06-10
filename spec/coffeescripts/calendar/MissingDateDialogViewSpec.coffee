@@ -5,7 +5,7 @@ define [
 
   module 'MissingDateDialogView',
     setup: ->
-      $('body').append('<label for="date">Section one</label><input type="text" id="date" name="date" />')
+      $('#fixtures').append('<label for="date">Section one</label><input type="text" id="date" name="date" />')
       @dialog = new MissingDateDialogView
         validationFn: ->
           invalidFields = []
@@ -18,6 +18,7 @@ define [
       $('input[name=date]').remove()
       $('label[for=date]').remove()
       $('.ui-dialog').remove()
+      $("#fixtures").empty()
 
   test 'should display a dialog if the given fields are invalid', ->
     ok @dialog.render()
@@ -32,13 +33,12 @@ define [
     equal @dialog.render(), false
     equal $('.ui-dialog').length, 0
 
-  test 'should close the dialog on primary button press', ->
-    @dialog.render()
-    @dialog.$dialog.find('.btn-primary').click()
-    equal $('.ui-dialog').length, 0
-
-  test 'should run the success callback on secondary button press', ->
+  test 'should close the dialog on secondary button press', ->
     @dialog.render()
     @dialog.$dialog.find('.btn:not(.btn-primary)').click()
-    ok @dialog.options.success.calledOnce
+    equal $('.ui-dialog').length, 0
 
+  test 'should run the success callback on on primary button press', ->
+    @dialog.render()
+    @dialog.$dialog.find('.btn-primary').click()
+    ok @dialog.options.success.calledOnce

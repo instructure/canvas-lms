@@ -19,17 +19,17 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe LiveAssessments::AssessmentsController, type: :request do
-  let(:assessment_course) { course(active_all: true) }
-  let(:teacher) { assessment_course.teachers.first }
-  let(:student) { course_with_student(course: assessment_course).user }
-  let(:outcome) do
+  let_once(:assessment_course) { course(active_all: true) }
+  let_once(:teacher) { assessment_course.teachers.first }
+  let_once(:student) { course_with_student(course: assessment_course).user }
+  let_once(:outcome) do
     outcome = assessment_course.created_learning_outcomes.create!(:description => 'this is a test outcome', :short_description => 'test outcome')
     assessment_course.root_outcome_group.add_outcome(outcome)
     assessment_course.root_outcome_group.save!
     assessment_course.reload
     outcome
   end
-  let(:unrelated_outcome) {course_with_teacher.course.created_learning_outcomes.create!(description: 'this outcome is in a different course', short_description: 'unrelated outcome')}
+  let_once(:unrelated_outcome) {course_with_teacher.course.created_learning_outcomes.create!(description: 'this outcome is in a different course', short_description: 'unrelated outcome')}
   let(:assessment_hash) {{key: '2014-05-28-Outcome-52', title: 'a test assessment'}}
 
   describe 'POST create' do
@@ -46,16 +46,16 @@ describe LiveAssessments::AssessmentsController, type: :request do
         create_assessments([assessment_hash])
         data = json_parse
         assessment = LiveAssessments::Assessment.find(data['assessments'][0]['id'])
-        assessment.key.should == assessment_hash[:key]
-        assessment.title.should == assessment_hash[:title]
+        expect(assessment.key).to eq assessment_hash[:key]
+        expect(assessment.title).to eq assessment_hash[:title]
       end
 
       it "aligns an assessment when given an outcome" do
         create_assessments([assessment_hash.merge(links: {outcome: outcome.id})])
         data = json_parse
         assessment = LiveAssessments::Assessment.find(data['assessments'][0]['id'])
-        assessment.learning_outcome_alignments.count.should == 1
-        assessment.learning_outcome_alignments.first.learning_outcome.should == outcome
+        expect(assessment.learning_outcome_alignments.count).to eq 1
+        expect(assessment.learning_outcome_alignments.first.learning_outcome).to eq outcome
       end
 
       it "won't align an unrelated outcome" do
@@ -66,8 +66,8 @@ describe LiveAssessments::AssessmentsController, type: :request do
         assessment = LiveAssessments::Assessment.create!(assessment_hash.merge(context: assessment_course))
         create_assessments([assessment_hash])
         data = json_parse
-        data['assessments'].count.should == 1
-        data['assessments'][0]['id'].should == assessment.id.to_s
+        expect(data['assessments'].count).to eq 1
+        expect(data['assessments'][0]['id']).to eq assessment.id.to_s
       end
     end
 
@@ -93,9 +93,9 @@ describe LiveAssessments::AssessmentsController, type: :request do
         LiveAssessments::Assessment.create!(assessment_hash.merge(context: assessment_course, key: 'another assessment'))
         index_assessments
         data = json_parse
-        data['assessments'].count.should == 2
-        data['assessments'][0]['key'].should == assessment_hash[:key]
-        data['assessments'][1]['key'].should == 'another assessment'
+        expect(data['assessments'].count).to eq 2
+        expect(data['assessments'][0]['key']).to eq assessment_hash[:key]
+        expect(data['assessments'][1]['key']).to eq 'another assessment'
       end
     end
 

@@ -1,0 +1,37 @@
+{
+	"folders": [
+		{
+			"path": ".",
+      "folder_exclude_patterns":  [
+        "node_modules",
+        "doc/api",
+        "doc/assets",
+        "doc/src",
+        "doc/vendor",
+        "doc/dist",
+        "./assets",
+        "www/apps",
+        "www/dist",
+        "www/vendor",
+        "www/src",
+        "www/fixtures",
+        ".bundle",
+        ".git",
+        ".grunt",
+        ".yardoc",
+        "vendor/canvas",
+        ".sass-cache",
+        "tmp"
+      ],
+      "file_exclude_patterns": [
+        "*.sublime-workspace"
+      ]
+		}
+	],
+  "settings": {
+    "tab_size": 2,
+    "translate_tabs_to_spaces": true,
+    "rulers": [ 80 ],
+    "trim_automatic_white_space": true
+  }
+}

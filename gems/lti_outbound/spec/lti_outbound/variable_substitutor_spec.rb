@@ -26,6 +26,13 @@ describe LtiOutbound::VariableSubstitutor do
       expect(subject.substitute!(data_hash)['canvas_course_id']).to eq '$Invalid.key'
     end
 
+    it "substitutes nil values" do
+      data_hash = {'canvas_course_id' => '$My.custom.variable'}
+      subject.add_substitution '$My.custom.variable', nil
+
+      expect(subject.substitute!(data_hash)['canvas_course_id']).to eq nil
+    end
+
     it "leaves the value unchanged for missing models" do
       data_hash = {'canvas_course_id' => '$Canvas.account.id'}
       expect(subject.substitute!(data_hash)['canvas_course_id']).to eq '$Canvas.account.id'

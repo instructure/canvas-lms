@@ -1,18 +1,24 @@
 <label class="control-label" for="courseSearchField"><strong>{{#t "search_label"}}Search for a course{{/t}}</strong></label>
 
 <div class="controls">
-  <select id="courseSelect" class="span3">
-    <option value="default">{{#t "select_default"}}Select a course{{/t}}</option>
-     {{#eachProp terms}}
-     <optgroup label="{{property}}">
-         {{#each value}}
-           <option value="{{id}}">{{label}}</option>
-         {{/each}}
-       </optgroup>
-     {{/eachProp}}
-  </select>
-  {{#t "or"}}or{{/t}}
+  {{#if show_select}}
+    <select id="courseSelect" class="span3">
+      <option value="default">{{#t "select_default"}}Select a course{{/t}}</option>
+       {{#eachProp terms}}
+       <optgroup label="{{property}}">
+           {{#each value}}
+             <option value="{{id}}">{{label}}</option>
+           {{/each}}
+         </optgroup>
+       {{/eachProp}}
+    </select>
+    {{#t "or"}}or{{/t}}
+  {{/if}}
   <input id="courseSearchField" type="text" placeholder="{{#t "course_name"}}Course name{{/t}}" name="courseSearchField" class='span3'/>
+
+  <i id="courseSelectWarning" class="course_select_warning icon-warning" data-tooltip='{"tooltipClass":"popover popover-padded", "position":"right"}'
+       title="{{#t "copy_into_self_warning"}}You have selected to copy this course into itself. Note that this will duplicate all selected content.{{/t}}">
+  </i>
   <br>
   <label class="checkbox" for="include_completed_courses">
     {{checkbox "include_completed_courses" checked=include_concluded}}

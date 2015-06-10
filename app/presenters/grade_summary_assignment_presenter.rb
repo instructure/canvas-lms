@@ -95,7 +95,7 @@ class GradeSummaryAssignmentPresenter
 
   def turnitin
     t = if is_text_entry?
-      submission.turnitin_data && submission.turnitin_data[submission.asset_string]
+      submission.turnitin_data[submission.asset_string]
     elsif is_online_upload? && file
       submission.turnitin_data[file.asset_string]
     else
@@ -106,10 +106,9 @@ class GradeSummaryAssignmentPresenter
 
   def grade_distribution
     @grade_distribution ||= begin
-      stats = @summary.assignment_stats[assignment.id]
-      [stats.max.to_f.round(1),
-       stats.min.to_f.round(1),
-       stats.avg.to_f.round(1)]
+      if stats = @summary.assignment_stats[assignment.id]
+        [stats.max, stats.min, stats.avg].map { |stat| stat.to_f.round(1) }
+      end
     end
   end
 

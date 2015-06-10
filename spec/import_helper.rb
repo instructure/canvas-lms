@@ -39,7 +39,7 @@ QUESTIONS = [
 SYSTEMS = ['vista', 'bb8', 'bb9', 'angel']
 
 def import_data_exists?(sub_folder, hash_name)
-  File.exists? File.join(IMPORT_JSON_DIR, sub_folder, "#{hash_name}.json")
+  File.exist? File.join(IMPORT_JSON_DIR, sub_folder, "#{hash_name}.json")
 end
 
 def get_import_data(sub_folder, hash_name)

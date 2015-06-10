@@ -221,6 +221,7 @@ define [
       url: 'test'
     WIKI_RIGHTS:
       manage: true
+      publish_page: true
     PAGE_RIGHTS:
       read: true
       update: true

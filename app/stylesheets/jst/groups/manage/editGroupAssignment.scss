@@ -1,4 +1,4 @@
-@import "environment";
+@import "base/environment";
 
 .single-select {
   border: {
@@ -11,4 +11,16 @@
   margin: 0;
   padding: 0;
   width: 408px;
+}
+
+.group-category-edit {
+  .auto-group-leader-controls-radio {
+    margin-left: 25px;
+  }
+}
+
+.group-category-create {
+  .auto-group-leader-controls-radio {
+    margin-left: 200px;
+  }
 }

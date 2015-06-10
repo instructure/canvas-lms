@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.assignment.context) %>/<%= asset.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.assignment.context_id %>/assignments/<%= asset.assignment_id %>
+  <%= polymorphic_url([asset.assignment.context, asset.assignment]) %>
 <% end %>
 
 <% define_content :subject do %>
@@ -9,4 +9,4 @@
 <%= t('body', "The group %{group_name} has just turned in a late submission for %{assignment_name} in the course %{course_name}.", :group_name => asset.group.name, :assignment_name => asset.assignment.title, :course_name => asset.assignment.context.name) %>
 
 <%= before_label('view_submission_here', 'You can view the submission here') %>
-<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.assignment.context) %>/<%= asset.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.assignment.context_id %>/assignments/<%= asset.assignment_id %>/submissions/<%= asset.user_id %>
+<%= polymorphic_url([asset.assignment.context, asset.assignment]) %>

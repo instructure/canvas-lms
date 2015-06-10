@@ -19,95 +19,76 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ExternalFeed do
-  it "should add ical entries" do
-    @feed = external_feed_model(:feed_purpose => 'calendar')
-    require 'icalendar'
-    cals = Icalendar.parse ical_example
-    cals[0].events.first.summary.should eql("Bastille Day Party")
-    res = @feed.add_ical_entries(cals[0])
-    res.should_not be_nil
-    res.length.should eql(1)
-    res[0].title.should eql("Bastille Day Party")
-  end
-  
-  it "should add ical entries to a course" do
-    @course = course_model
-    @feed = external_feed_model(:feed_purpose => 'calendar', :context => @course)
-    require 'icalendar'
-    cals = Icalendar.parse ical_example
-    cals[0].events.first.summary.should eql("Bastille Day Party")
-    res = @feed.add_ical_entries(cals[0])
-    res.should_not be_nil
-    res.length.should eql(1)
-    res[0].title.should eql("Bastille Day Party")
-    @course.reload
-    @course.calendar_events.length.should eql(1)
-    @course.calendar_events[0].should eql(res[0].asset)
-  end
-  
   it "should add rss entries" do
-    @feed = external_feed_model(:feed_purpose => 'announcements')
+    @feed = external_feed_model
     require 'rss/1.0'
     require 'rss/2.0'
     rss = RSS::Parser.parse rss_example
     res = @feed.add_rss_entries(rss)
-    res.should_not be_nil
-    res.length.should eql(4)
-    res[0].title.should eql("Star City")
-    res[1].title.should eql("Space Exploration")
-    res[2].title.should eql("The Engine That Does More")
-    res[3].title.should eql("Astronauts' Dirty Laundry")
+    expect(res).not_to be_nil
+    expect(res.length).to eql(4)
+    expect(res.all?{|r| r.valid?}).to be_truthy
+    expect(res[0].title).to eql("Star City")
+    expect(res[1].title).to eql("Space Exploration")
+    expect(res[2].title).to eql("The Engine That Does More")
+    expect(res[3].title).to eql("Astronauts' Dirty Laundry")
   end
-  
   
   it "should add rss entries as course announcements" do
     @course = course_model
-    @feed = external_feed_model(:feed_purpose => 'announcements', :context => @course)
+    @feed = external_feed_model(:context => @course)
     require 'rss/1.0'
     require 'rss/2.0'
     rss = RSS::Parser.parse rss_example
     res = @feed.add_rss_entries(rss)
-    res.should_not be_nil
-    res.length.should eql(4)
-    @course.announcements.length.should eql(4)
-    (res.map{|i| i.asset} - @course.announcements).should be_empty
+    expect(res).not_to be_nil
+    expect(res.length).to eql(4)
+    expect(@course.announcements.count).to eql(4)
+    expect(res.map{|i| i.asset} - @course.announcements).to be_empty
+
+    # don't create duplicates
+    @feed.add_rss_entries(rss)
+    expect(@course.announcements.count).to eql(4)
   end
   
   it "should add atom entries" do
-    @feed = external_feed_model(:feed_purpose => 'announcements')
+    @feed = external_feed_model
     require 'atom'
     atom = Atom::Feed.load_feed atom_example
     res = @feed.add_atom_entries(atom)
-    res.should_not be_nil
-    res.length.should eql(1)
-    res[0].title.should eql("Atom-Powered Robots Run Amok")
+    expect(res).not_to be_nil
+    expect(res.length).to eql(1)
+    expect(res[0].valid?).to be_truthy
+    expect(res[0].title).to eql("Atom-Powered Robots Run Amok")
   end
   
   it "should add atom entries as course announcements" do
     @course = course_model
-    @feed = external_feed_model(:feed_purpose => 'announcements', :context => @course)
+    @feed = external_feed_model(:context => @course)
     require 'atom'
     atom = Atom::Feed.load_feed atom_example
     res = @feed.add_atom_entries(atom)
-    res.should_not be_nil
-    res.length.should eql(1)
-    res[0].title.should eql("Atom-Powered Robots Run Amok")
-    @course.announcements.length.should eql(1)
-    res[0].asset.should eql(@course.announcements.first)
+    expect(res).not_to be_nil
+    expect(res.length).to eql(1)
+    expect(res[0].title).to eql("Atom-Powered Robots Run Amok")
+    expect(@course.announcements.count).to eql(1)
+    expect(res[0].asset).to eql(@course.announcements.first)
   end
-  
-end
 
-def ical_example
-%{BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//hacksw/handcal//NONSGML v1.0//EN
-BEGIN:VEVENT
-DTSTART:19970714T170000Z
-DTEND:19970715T035959Z
-SUMMARY:Bastille Day Party
-END:VEVENT
-END:VCALENDAR}
+  it "should allow deleting" do
+    @course = course_model
+    @feed = external_feed_model(:context => @course)
+    require 'rss/1.0'
+    require 'rss/2.0'
+    rss = RSS::Parser.parse rss_example
+    res = @feed.add_rss_entries(rss)
+
+    @feed.destroy
+    @course.reload
+
+    expect(@course.external_feeds.exists?).to be_falsey
+    expect(@course.announcements.count).to eq(4)
+  end
 end
 
 def atom_example

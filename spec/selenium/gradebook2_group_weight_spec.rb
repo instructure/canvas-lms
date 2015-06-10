@@ -2,25 +2,6 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 describe "group weights" do
   include_examples "in-process server selenium tests"
 
-  ASSIGNMENT_1_POINTS = "10"
-  ASSIGNMENT_2_POINTS = "5"
-  ASSIGNMENT_3_POINTS = "50"
-  ATTENDANCE_POINTS = "15"
-
-  STUDENT_NAME_1 = "student 1"
-  STUDENT_NAME_2 = "student 2"
-  STUDENT_NAME_3 = "student 3"
-  STUDENT_SORTABLE_NAME_1 = "1, student"
-  STUDENT_SORTABLE_NAME_2 = "2, student"
-  STUDENT_SORTABLE_NAME_3 = "3, student"
-  STUDENT_1_TOTAL_IGNORING_UNGRADED = "100%"
-  STUDENT_2_TOTAL_IGNORING_UNGRADED = "66.7%"
-  STUDENT_3_TOTAL_IGNORING_UNGRADED = "66.7%"
-  STUDENT_1_TOTAL_TREATING_UNGRADED_AS_ZEROS = "18.8%"
-  STUDENT_2_TOTAL_TREATING_UNGRADED_AS_ZEROS = "12.5%"
-  STUDENT_3_TOTAL_TREATING_UNGRADED_AS_ZEROS = "12.5%"
-  DEFAULT_PASSWORD = "qwerty"
-
   def get_group_points
     group_points_holder = keep_trying_until do
       group_points_holder = ff('div.assignment-points-possible')
@@ -31,7 +12,7 @@ describe "group weights" do
 
   def check_group_points(expected_weight_text)
     for i in 2..3 do
-      get_group_points[i].text.should == expected_weight_text + ' of grade'
+      expect(get_group_points[i].text).to eq expected_weight_text + ' of grade'
     end
   end
 
@@ -41,30 +22,30 @@ describe "group weights" do
     f('[aria-controls="assignment_group_weights_dialog"]').click
 
     dialog = f('#assignment_group_weights_dialog')
-    dialog.should be_displayed
+    expect(dialog).to be_displayed
 
     group_check = dialog.find_element(:id, 'group_weighting_scheme')
     keep_trying_until do
       group_check.click
-      is_checked('#group_weighting_scheme').should be_true
+      expect(is_checked('#group_weighting_scheme')).to be_truthy
     end
     group_weight_input = f("#assignment_group_#{assignment_group.id}_weight")
     set_value(group_weight_input, "")
     set_value(group_weight_input, weight_number)
     fj('.ui-button:contains("Save")').click
     wait_for_ajaximations
-    @course.reload.group_weighting_scheme.should == 'percent'
+    expect(@course.reload.group_weighting_scheme).to eq 'percent'
   end
 
   def validate_group_weight_text(assignment_groups, weight_numbers)
     assignment_groups.each_with_index do |ag, i|
       heading = fj(".slick-column-name:contains('#{ag.name}') .assignment-points-possible")
-      heading.should include_text("#{weight_numbers[i]}% of grade")
+      expect(heading).to include_text("#{weight_numbers[i]}% of grade")
     end
   end
 
   def validate_group_weight(assignment_group, weight_number)
-    assignment_group.reload.group_weight.should == weight_number
+    expect(assignment_group.reload.group_weight).to eq weight_number
   end
 
   before (:each) do
@@ -98,8 +79,8 @@ describe "group weights" do
     get "/courses/#{@course.id}/gradebook2"
     wait_for_ajaximations
 
-    group_1 = AssignmentGroup.find_by_name(@group1.name)
-    group_2 = AssignmentGroup.find_by_name(@group2.name)
+    group_1 = AssignmentGroup.where(name: @group1.name).first
+    group_2 = AssignmentGroup.where(name: @group2.name).first
 
     #set and check the group weight of the first assignment group
     set_group_weight(group_1, weight_numbers[0])
@@ -129,12 +110,11 @@ describe "group weights" do
   end
 
   it "should display group weights correctly when unsetting group weights through assignments page" do
-    pending("bug 7435 - Gradebook2 keeps weighted assignment groups, even when turned off") do
-      get "/courses/#{@course.id}/assignments"
+    skip("bug 7435 - Gradebook2 keeps weighted assignment groups, even when turned off")
+    get "/courses/#{@course.id}/assignments"
 
-      f('#class_weighting_policy').click
-      wait_for_ajaximations
-      check_group_points('0%')
-    end
+    f('#class_weighting_policy').click
+    wait_for_ajaximations
+    check_group_points('0%')
   end
 end

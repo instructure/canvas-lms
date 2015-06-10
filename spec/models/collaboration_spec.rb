@@ -21,32 +21,32 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe Collaboration do
   context "collaboration_class" do
     it "should by default not have any collaborations" do
-      Collaboration.any_collaborations_configured?.should be_false
-      Collaboration.collaboration_types.should == []
+      expect(Collaboration.any_collaborations_configured?).to be_falsey
+      expect(Collaboration.collaboration_types).to eq []
     end
 
     it "should allow google docs collaborations" do
-      Collaboration.collaboration_class('GoogleDocs').should eql(nil)
+      expect(Collaboration.collaboration_class('GoogleDocs')).to eql(nil)
       plugin_setting = PluginSetting.new(:name => "google_docs", :settings => {})
       plugin_setting.save!
-      Collaboration.collaboration_class('GoogleDocs').should eql(GoogleDocsCollaboration)
+      expect(Collaboration.collaboration_class('GoogleDocs')).to eql(GoogleDocsCollaboration)
       plugin_setting.disabled = true
       plugin_setting.save!
-      Collaboration.collaboration_class('GoogleDocs').should eql(nil)
+      expect(Collaboration.collaboration_class('GoogleDocs')).to eql(nil)
     end
 
     it "should allow etherpad collaborations" do
-      Collaboration.collaboration_class('Etherpad').should eql(nil)
+      expect(Collaboration.collaboration_class('Etherpad')).to eql(nil)
       plugin_setting = PluginSetting.new(:name => "etherpad", :settings => {})
       plugin_setting.save!
-      Collaboration.collaboration_class('Etherpad').should eql(EtherpadCollaboration)
+      expect(Collaboration.collaboration_class('Etherpad')).to eql(EtherpadCollaboration)
       plugin_setting.disabled = true
       plugin_setting.save!
-      Collaboration.collaboration_class('Etherpad').should eql(nil)
+      expect(Collaboration.collaboration_class('Etherpad')).to eql(nil)
     end
 
     it "should not allow invalid collaborations" do
-      Collaboration.collaboration_class('Bacon').should eql(nil)
+      expect(Collaboration.collaboration_class('Bacon')).to eql(nil)
     end
   end
 
@@ -57,17 +57,17 @@ describe Collaboration do
 
     it "should be able to parse the data stored as an Atom entry" do
       ae = @collaboration.parse_data
-      ae.should be_is_a(Atom::Entry)
-      ae.title.should eql('Biology 100 Collaboration')
+      expect(ae).to be_is_a(Atom::Entry)
+      expect(ae.title).to eql('Biology 100 Collaboration')
     end
 
     it "should be able to get the title from the data" do
       @collaboration.title = nil
-      @collaboration.title.should eql('Biology 100 Collaboration')
+      expect(@collaboration.title).to eql('Biology 100 Collaboration')
     end
 
     it "should have Google Docs as a default service name" do
-      @collaboration.service_name.should eql('Google Docs')
+      expect(@collaboration.service_name).to eql('Google Docs')
     end
   end
 
@@ -85,17 +85,17 @@ describe Collaboration do
 
     it "should add new collaborators" do
       @collaboration.update_members(@users[0..-2], @groups.map(&:id))
-      @collaboration.reload.collaborators.map(&:user_id).uniq.count.should == 4
-      @collaboration.collaborators.map(&:group_id).uniq.count.should == 2
+      expect(@collaboration.reload.collaborators.map(&:user_id).uniq.count).to eq 4
+      expect(@collaboration.collaborators.map(&:group_id).uniq.count).to eq 2
     end
 
     it "should update existing collaborators" do
       @collaboration.update_members(@users[0..-1], @groups.map(&:id))
       @collaboration.update_members(@users[0..-2])
       @collaboration.reload
-      @collaboration.collaborators.map(&:user_id).uniq.count.should == 3
-      @collaboration.collaborators.map(&:group_id).uniq.count.should == 1
-      @collaboration.collaborators.reload.map(&:user_id).should_not include @users.last.id
+      expect(@collaboration.collaborators.map(&:user_id).uniq.count).to eq 3
+      expect(@collaboration.collaborators.map(&:group_id).uniq.count).to eq 1
+      expect(@collaboration.collaborators.reload.map(&:user_id)).not_to include @users.last.id
     end
   end
 
@@ -104,7 +104,7 @@ describe Collaboration do
       collab = EtherpadCollaboration.new
       collab.url = "http://example.com/legacy-uri"
       collab.initialize_document
-      collab.url.should == "http://example.com/legacy-uri"
+      expect(collab.url).to eq "http://example.com/legacy-uri"
     end
   end
 end

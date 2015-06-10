@@ -27,7 +27,7 @@ module Api::V1::AuthenticationEvent
       :login => Shard.relative_id_for(event.pseudonym_id, Shard.current, Shard.current),
       :account => Shard.relative_id_for(event.account_id, Shard.current, Shard.current),
       :user => Shard.relative_id_for(event.user_id, Shard.current, Shard.current),
-      :page_view => PageView.find_by_id(event.request_id).try(:id)
+      :page_view => event.request_id && PageView.find_by_id(event.request_id).try(:id)
     }
 
     {
@@ -66,7 +66,7 @@ module Api::V1::AuthenticationEvent
   def linked_json(events, user, session)
     pseudonyms = []
     accounts = []
-    pseudonym_ids = events.map{ |event| event.pseudonym_id }.uniq
+    pseudonym_ids = events.map{ |event| event.pseudonym_id }.uniq.compact
     Shard.partition_by_shard(pseudonym_ids) do |shard_pseudonym_ids|
       shard_pseudonyms = Pseudonym.where(:id => shard_pseudonym_ids).all
       account_ids = shard_pseudonyms.map{ |pseudonym| pseudonym.account_id }.uniq
@@ -74,12 +74,12 @@ module Api::V1::AuthenticationEvent
       pseudonyms.concat shard_pseudonyms
     end
 
-    user_ids = events.map{ |event| event.user_id }.uniq
+    user_ids = events.map{ |event| event.user_id }.uniq.compact
     users = Shard.partition_by_shard(user_ids) do |shard_user_ids|
       User.where(:id => shard_user_ids).all
     end
 
-    page_view_ids = events.map{ |event| event.request_id }
+    page_view_ids = events.map{ |event| event.request_id }.compact
     page_views = PageView.find_all_by_id(page_view_ids) if page_view_ids.length > 0
     page_views ||= []
 

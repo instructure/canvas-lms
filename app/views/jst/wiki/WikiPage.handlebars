@@ -11,7 +11,7 @@
           {{/if}}
         {{/if}}
       </div>
-      <div class="header-bar-right">
+      <div class="header-bar-right header-right-flex">
         {{#unless course_home}}
           {{#if front_page}}
             <span class="front-page label">{{#t 'labels.front_page'}}Front Page{{/t}}</span>
@@ -23,7 +23,7 @@
               {{#if published}}
                 <span class='published-status published'>
                   <i class="icon-publish"></i> {{#t 'published_indicator'}}Published{{/t}}
-                </span>    
+                </span>
               {{else}}
                 <span class='published-status unpublished'>
                   <i class="icon-unpublished"></i> {{#t 'unpublished_indicator'}}Not Published{{/t}}
@@ -36,7 +36,7 @@
           <a href="{{wiki_page_edit_path}}" class="btn edit-wiki"><i class="icon-edit"></i> {{#t 'buttons.edit'}}Edit{{/t}}</a>
         {{/if}}
         {{#if CAN.ACCESS_GEAR_MENU}}
-          <div class="inline-block" role="application">
+          <div class="inline-block">
             <a class="btn al-trigger" tabindex="0" role="button" href="#">
               <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
               <span class="screenreader-only">{{#t 'toolbar_menu.settings'}}Settings{{/t}}</span>
@@ -48,6 +48,14 @@
             {{#if CAN.READ_REVISIONS}}
               <li><a href="{{wiki_page_history_path}}" class="icon-clock view_page_history">{{#t "view_page_history_wiki"}}View Page History{{/t}}</a></li>
             {{/if}}
+              {{#each wiki_page_menu_tools}}
+              <li role="presentation">
+                <a class="menu_tool_link" href="{{url}}">
+                  {{#if icon_url}}<img class="icon" src="{{icon_url}}" />{{/if}}
+                  {{title}}
+                </a>
+              </li>
+              {{/each}}
             </ul>
           </div>
         {{/if}}
@@ -59,36 +67,10 @@
 {{/if}}
 
 <div class="show-content user_content clearfix">
-  <h2 class="page-title">{{title}}</h2>
+  <h1 class="page-title">{{title}}</h1>
   {{#if locked_for_user}}
-    <div class="locked-alert alert alert-warning">
-      {{#if lock_info.context_module.prerequisites}}
-        {{#if lock_info.unlock_at}}
-          {{#t 'page_locked_by_modules_until'}}This page will be available on {{lock_info.unlock_at}} if you have completed these modules:{{/t}}
-        {{else}}
-          {{#t 'page_locked_by_modules'}}This page will be available once you have completed these modules:{{/t}}
-        {{/if}}
-        <ul>
-          {{#each lock_info.context_module.prerequisites}}{{#ifEqual this.type "context_module"}}
-            {{#if this.name}}
-              <li>
-                {{#ifAll ../../../../modules_path this.id}}
-                  <a href="{{../../../../modules_path}}/{{this.id}}">{{this.name}}</a>
-                {{else}}
-                  {{this.name}}
-                {{/ifAll}}
-              </li>
-            {{/if}}
-          {{/ifEqual}}{{/each}}
-        </ul>
-      {{else}}
-        {{#if lock_info.unlock_at}}
-          {{#t 'page_locked_until'}}This page will be available on {{lock_info.unlock_at}}{{/t}}
-        {{else}}
-          {{#t 'page_locked'}}This page is locked{{/t}}
-        {{/if}}
-      {{/if}}
-    </div>
+    <div class="spinner"></div>
+    <div class="lock_explanation"></div>
   {{else}}
     {{convertApiUserContent body}}
   {{/if}}

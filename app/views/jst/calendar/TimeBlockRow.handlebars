@@ -1,16 +1,24 @@
 <tr {{#if locked}}class="locked"{{/if}}>
   <td class="date-column">
-    <input name="date" class="date_field" value="{{tDateToString start "medium_with_weekday"}}"
-      aria-label="{{t "date_label" "Date"}}" {{#if locked}}disabled{{/if}} type="text"/>
+    <input name="date" class="date_field" 
+      value="{{tDateToString start "medium_with_weekday"}}"
+      aria-label="{{t "date_label" "Date"}}{{datepickerScreenreaderPrompt 'date'}}"
+      {{#if locked}}disabled{{/if}} type="text"
+      data-tooltip title="{{accessibleDateFormat 'date'}}"/>
+    </div>
   </td>
   <td class="start-time-column">
     <input name="start_time" class="time_field start_time" value="{{tTimeToString start "tiny"}}"
-      aria-label="{{t "start_time_label" "Start Time"}}"{{#if locked}} disabled{{/if}} type="text"/>
+      aria-label="{{t "start_time_label" "Start Time"}}{{datepickerScreenreaderPrompt 'time'}}"
+      {{#if locked}} disabled{{/if}} type="text"
+      data-tooltip title="{{accessibleDateFormat 'time'}}"/>
   </td>
   <td class="separator-column">-</td>
   <td class="end-time-column">
     <input name="end_time" class="time_field end_time" value="{{tTimeToString end "tiny"}}"
-      aria-label="{{t "end_time_label" "End Time"}}"{{#if locked}} disabled{{/if}} type="text"/>
+      aria-label="{{t "end_time_label" "End Time"}}{{datepickerScreenreaderPrompt 'time'}}"
+      {{#if locked}} disabled{{/if}} type="text"
+      data-tooltip title="{{accessibleDateFormat 'time'}}"/>
   </td>
   <td class="delete-column">
     {{#unless locked}}

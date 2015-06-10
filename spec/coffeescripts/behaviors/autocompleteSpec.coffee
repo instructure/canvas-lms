@@ -1,4 +1,4 @@
-require [
+define [
   'jquery'
   'underscore'
   'compiled/behaviors/autocomplete'
@@ -24,9 +24,10 @@ require [
 
     teardown: ->
       $el.remove()
+      $('#fixtures').empty()
 
   test 'it should create an autocomplete box by reading data attributes', ->
-    $('body').append($el)
+    $('#fixtures').append($el)
     createAutocompletes()
     keys = (key for key of $('#autocomplete-box').data())
 

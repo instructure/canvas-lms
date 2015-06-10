@@ -1,0 +1,34 @@
+// Shared between:
+// - quizzes/compiler-quizzes.scss
+// - compiler-gradebook2.scss
+
+#message_students_dialog {
+  .student_list {
+    max-height: 100px;
+    overflow: auto;
+    font-size: 0.8em;
+    padding: 5px 0;
+    margin: 0;
+    list-style-type: none;
+    li {
+      float: left;
+      padding: 2px 4px;
+      margin: 1px 2px;
+      background-color: #cdf;
+      border: 1px solid #aaa;
+      .score {
+        display: none;
+        padding-left: 5px;
+        font-size: 0.9em;
+        color: #444;
+      }
+    }
+    &.show_score {
+      li {
+        .score {
+          display: inline;
+        }
+      }
+    }
+  }
+}

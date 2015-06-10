@@ -18,6 +18,10 @@
 
 define ['underscore'], (_) ->
 
+  ###
+  xsslint xssable.receiver.whitelist builder
+  ###
+
   BlobFactory =
     fromCanvas: (canvas, type = 'image/jpeg') ->
       url    = canvas.toDataURL(type)

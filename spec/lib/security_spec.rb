@@ -24,7 +24,7 @@ describe "security" do
     msg = "sign me"
     hmac = Canvas::Security.hmac_sha1(msg)
 
-    Canvas::Security.verify_hmac_sha1(hmac, msg).should be_true
-    Canvas::Security.verify_hmac_sha1(hmac, msg + "haha").should_not be_true
+    expect(Canvas::Security.verify_hmac_sha1(hmac, msg)).to be_truthy
+    expect(Canvas::Security.verify_hmac_sha1(hmac, msg + "haha")).not_to be_truthy
   end
 end

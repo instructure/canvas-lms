@@ -37,13 +37,7 @@ class PluginSetting < ActiveRecord::Base
   before_save :encrypt_settings
   after_save :clear_cache
   after_destroy :clear_cache
-  if CANVAS_RAILS2
-    def after_initialize
-      initialize_plugin_setting
-    end
-  else
-    after_initialize :initialize_plugin_setting
-  end
+  after_initialize :initialize_plugin_setting
   
   def validate_uniqueness_of_name?
     true
@@ -106,7 +100,7 @@ class PluginSetting < ActiveRecord::Base
   end
 
   def self.cached_plugin_setting(name)
-    plugin_setting = Rails.cache.fetch(settings_cache_key(name)) do
+    plugin_setting = MultiCache.fetch(settings_cache_key(name)) do
       PluginSetting.find_by_name(name.to_s) || :nil
     end
     plugin_setting = nil if plugin_setting == :nil
@@ -132,7 +126,7 @@ class PluginSetting < ActiveRecord::Base
 
   def clear_cache
     connection.after_transaction_commit do
-      Rails.cache.delete(PluginSetting.settings_cache_key(self.name))
+      MultiCache.delete(PluginSetting.settings_cache_key(self.name))
     end
   end
 
@@ -142,5 +136,9 @@ class PluginSetting < ActiveRecord::Base
 
   def self.decrypt(text, salt)
     Canvas::Security.decrypt_password(text, salt, 'instructure_plugin_setting')
+  end
+
+  def self.find_by_name(name)
+    where(name: name).first
   end
 end

@@ -28,7 +28,9 @@ describe ActiveSupport::Callbacks::Suspension do
       include ActiveSupport::Callbacks::Suspension
 
       def validate; end
+
       def persist; end
+
       def publish; end
 
       if rails2

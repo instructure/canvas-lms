@@ -33,52 +33,52 @@ describe Canvas::PasswordPolicy do
     it "should only enforce minimum length by default" do
       pseudonym_with_policy({})
       @pseudonym.password = @pseudonym.password_confirmation = "aaaaa"
-      @pseudonym.should_not be_valid
+      expect(@pseudonym).not_to be_valid
 
       @pseudonym.password = @pseudonym.password_confirmation = "aaaaaa"
-      @pseudonym.should be_valid
+      expect(@pseudonym).to be_valid
 
       @pseudonym.password = @pseudonym.password_confirmation = "football"
-      @pseudonym.should be_valid
+      expect(@pseudonym).to be_valid
 
       @pseudonym.password = @pseudonym.password_confirmation = "abcdefgh"
-      @pseudonym.should be_valid
+      expect(@pseudonym).to be_valid
     end
 
     it "should enforce minimum length" do
       pseudonym_with_policy(:min_length => 6)
       @pseudonym.password = @pseudonym.password_confirmation = "asdfg"
-      @pseudonym.should_not be_valid
+      expect(@pseudonym).not_to be_valid
 
       @pseudonym.password = @pseudonym.password_confirmation = "asdfgh"
-      @pseudonym.should be_valid
+      expect(@pseudonym).to be_valid
     end
 
     it "should reject common passwords" do
       pseudonym_with_policy(:disallow_common_passwords => true)
       @pseudonym.password = @pseudonym.password_confirmation = "football"
-      @pseudonym.should_not be_valid
+      expect(@pseudonym).not_to be_valid
 
       @pseudonym.password = @pseudonym.password_confirmation = "lacrosse"
-      @pseudonym.should be_valid
+      expect(@pseudonym).to be_valid
     end
 
     it "should enforce repeated character limits" do
       pseudonym_with_policy(:max_repeats => 4)
       @pseudonym.password = @pseudonym.password_confirmation = "aaaaabbbb"
-      @pseudonym.should_not be_valid
+      expect(@pseudonym).not_to be_valid
 
       @pseudonym.password = @pseudonym.password_confirmation = "aaaabbbb"
-      @pseudonym.should be_valid
+      expect(@pseudonym).to be_valid
     end
 
     it "should enforce sequence limits" do
       pseudonym_with_policy(:max_sequence => 4)
       @pseudonym.password = @pseudonym.password_confirmation = "edcba1234"
-      @pseudonym.should_not be_valid
+      expect(@pseudonym).not_to be_valid
 
       @pseudonym.password = @pseudonym.password_confirmation = "dcba1234"
-      @pseudonym.should be_valid
+      expect(@pseudonym).to be_valid
     end
   end
 end

@@ -17,13 +17,13 @@
 #
 
 def assignment_model(opts={})
-  course = opts.delete(:course) || course_model(:reusable => true)
+  course = opts.delete(:course) || opts[:context] || course_model(:reusable => true)
   # turn the group_category title into a group category "object"
   group_category = opts.delete(:group_category)
   @group_category = course.group_categories.create(:name => group_category) if group_category
   opts[:group_category] = @group_category if @group_category
   @assignment = factory_with_protected_attributes(course.assignments, assignment_valid_attributes.merge(opts))
-  @assignment.context.should eql(course) rescue false
+  expect(@assignment.context).to eq course
   @a = @assignment
   @c = course
   @a
@@ -42,6 +42,16 @@ def assignment_with_override(opts={})
   assignment_model(opts)
   @override = @a.assignment_overrides.build
   @override.set = @c.default_section
+  @override.save!
+  @override
+end
+
+def differentiated_assignment(opts={})
+  @assignment = opts[:assignment] || assignment_model(opts)
+  @assignment.only_visible_to_overrides = true
+  @assignment.save!
+  @override = @assignment.assignment_overrides.build
+  @override.set = opts[:course_section] || @course.default_section
   @override.save!
   @override
 end

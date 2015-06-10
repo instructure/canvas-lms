@@ -8,16 +8,8 @@ describe "handlebars" do
     get "/"
   end
 
-  def set_translations(translations)
-    driver.execute_script <<-JS
-      define('translations/test', ['i18nObj', 'jquery'], function(I18n, $) {
-        $.extend(true, I18n, {translations: #{translations.to_json}});
-      });
-    JS
-  end
-
   def run_template(template, context, locale = 'en')
-    compiled = HandlebarsTasks::Handlebars.compile_template(template, 'test')
+    compiled = HandlebarsTasks::Handlebars.compile_template(template, 'test', 'test')
     driver.execute_script compiled
     require_exec 'jst/test', <<-CS
       I18n.locale = '#{locale}'
@@ -56,7 +48,7 @@ describe "handlebars" do
       unescaped: '<b>unescaped</b>'
     })
 
-    result.should == <<-RESULT
+    expect(result).to eq <<-RESULT
       <h1>greetings</h1>
       <p>ohai my name is katie im your <b>yoga</b> instructure!! ;) heres some tips to get you started:</p>
       <ol>
@@ -73,34 +65,50 @@ describe "handlebars" do
   end
 
   it "should require partials used within template" do
-    driver.execute_script HandlebarsTasks::Handlebars.compile_template("hi from inside partial", "_test_partial")
-    driver.execute_script HandlebarsTasks::Handlebars.compile_template("outside partial {{>test_partial}}", "test_template")
+    driver.execute_script HandlebarsTasks::Handlebars.compile_template("hi from inside partial", "_test_partial", '_test_partial')
+    driver.execute_script HandlebarsTasks::Handlebars.compile_template("outside partial {{>test_partial}}", "test_template", 'test_template')
 
     result = require_exec "jst/test_template", "test_template()"
-    result.should == "outside partial hi from inside partial"
+    expect(result).to eq "outside partial hi from inside partial"
   end
 
   it "should translate the content" do
     translations = {
-      :pigLatin => {
-        :sup => 'upsay',
-        :test => {
-          :it_should_work => 'isthay ouldshay ebay anslatedtray frday'
+      pigLatin: {
+        absolute_key: "Absoluteay eykay",
+        inferred_key_c49e3743: "Inferreday eykay",
+        inline_with_absolute_key: "Inlineay ithway absoluteay eykay",
+        inline_with_inferred_key_88e68761: "Inlineay ithway inferreday eykay",
+        test: {
+          inline_with_relative_key: "Inlineay ithway elativeray eykay",
+          relative_key: "Elativeray eykay"
         }
       }
     }
     set_translations(translations)
 
     template = <<-HTML
-      <p>{{#t "#sup"}}sup{{/t}}</p>
-      <p>{{#t 'it_should_work'}}this should be translated frd{{/t}}</p>
-      <p>{{#t "not_yet_translated"}}but this shouldn't be{{/t}}</p>
+      <p>{{#t "#absolute_key"}}Absolute key{{/t}}</p>
+      <p>{{#t "relative_key"}}Relative key{{/t}}</p>
+      <p>{{#t}}Inferred key{{/t}}</p>
+
+      <p>{{t "#inline_with_absolute_key" "Inline with absolute key"}}</p>
+      <p>{{t "inline_with_relative_key" "Inline with relative key"}}</p>
+      <p>{{t "Inline with inferred key"}}</p>
+
+      <p>{{#t "not_yet_translated"}}No translation yet{{/t}}</p>
     HTML
 
-    run_template(template, {}, 'pigLatin').should == <<-HTML
-      <p>#{translations[:pigLatin][:sup]}</p>
-      <p>#{translations[:pigLatin][:test][:it_should_work]}</p>
-      <p>but this shouldn't be</p>
+    expect(run_template(template, {}, 'pigLatin')).to eq <<-HTML
+      <p>Absoluteay eykay</p>
+      <p>Elativeray eykay</p>
+      <p>Inferreday eykay</p>
+
+      <p>Inlineay ithway absoluteay eykay</p>
+      <p>Inlineay ithway elativeray eykay</p>
+      <p>Inlineay ithway inferreday eykay</p>
+
+      <p>No translation yet</p>
     HTML
   end
 
@@ -124,12 +132,12 @@ describe "handlebars" do
       </p>
     HTML
 
-    run_template(template, {}, 'fr').should == <<-HTML
+    expect(run_template(template, {}, 'fr')).to eq <<-HTML
       <p>
-        <b> Je voudrais un croissant</b>
+        <b>Je voudrais un croissant</b>
       </p>
       <p>
-        <i> Yes, that's true, he would </i>
+        <i> Yes, that&#39;s true, he would </i>
       </p>
     HTML
   end

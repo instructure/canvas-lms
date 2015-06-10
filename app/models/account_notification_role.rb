@@ -17,7 +17,14 @@
 #
 
 class AccountNotificationRole < ActiveRecord::Base
-  attr_accessible :account_notification_id, :role_type
-  EXPORTABLE_ATRTRIBUTES = [:account_notification_id, :role_type]
+  attr_accessible :account_notification_id, :role
+  EXPORTABLE_ATTRIBUTES = [:account_notification_id, :role_id]
   belongs_to :account_notification
+
+  belongs_to :role
+  include Role::AssociationHelper
+
+  def role_name
+    self.role_id ? role.name : 'NilEnrollment'
+  end
 end

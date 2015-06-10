@@ -100,16 +100,7 @@ define [
       view.$el.draggable(_.extend({}, @dragOptions))
       view.$el.on 'dragstart', (event, ui) ->
         ui.helper.css 'width', view.$el.width()
-
-        containment = [
-          0                                                # left
-          0                                                # top
-          $(window).width() - ui.helper.outerWidth(true)   # right
-          $(window).height() - ui.helper.outerHeight(true) # bottom
-        ]
-        # Setting :containment to 'document' doesn't work; it seems to be 
-        # thrown off by the dynamically set width of ui.helper.
-        $(event.target).draggable 'option', 'containment', containment
+        $(event.target).draggable 'option', 'containment', 'document'
         $(event.target).data('draggable')._setContainment()
 
     removeItem: (model) =>

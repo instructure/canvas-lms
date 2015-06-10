@@ -604,7 +604,7 @@ var SwaggerOperation = function(nickname, path, method, parameters, summary, not
   this["do"] = __bind(this["do"], this);
 
   if (errors.length > 0)
-    this.resource.api.fail(errors);
+    console.error("Errors while initializing SwaggerOperation:", errors, nickname, path, method, parameters, summary);
 
   this.path = this.path.replace('{format}', 'json');
   this.method = this.method.toLowerCase();
@@ -626,7 +626,11 @@ var SwaggerOperation = function(nickname, path, method, parameters, summary, not
     // for 1.1 compatibility
     var type = param.type || param.dataType;
     if(type === 'array') {
-      type = 'array[' + (param.items.$ref ? param.items.$ref : param.items.type) + ']';
+      if(param.items) {
+        type = 'array[' + (param.items.$ref ? param.items.$ref : param.items.type) + ']';
+      } else {
+        console.log("Warning: " + param.name + " is array type but has no 'items'", this);
+      }
     }
 
     if(type.toLowerCase() === 'boolean') {
@@ -828,18 +832,24 @@ SwaggerOperation.prototype.urlify = function(args) {
     }
   }
 
-  var queryParams = "";
+  var queryParams = [];
   for(var i = 0; i < params.length; i ++){
     var param = params[i];
-    if(param.paramType === 'query') {
-      if(queryParams !== '')
-        queryParams += "&";
-      if(args[param.name] !== undefined)
-        queryParams += encodeURIComponent(param.name) + '=' + encodeURIComponent(args[param.name]);
+    if(param.paramType === 'query' && args[param.name] !== undefined) {
+      var value = args[param.name];
+      if(param.type === 'array') {
+        var values = value.split(",");
+        for(var j = 0; j < values.length; j++) {
+          queryParams.push(encodeURIComponent(param.name) + '[]=' + encodeURIComponent(values[j]));
+        }
+      } else {
+        queryParams.push(encodeURIComponent(param.name) + '=' + encodeURIComponent(value));
+      }
     }
   }
-  if ((queryParams != null) && queryParams.length > 0)
-    url += '?' + queryParams;
+  if (queryParams.length > 0) {
+    url += '?' + queryParams.join("&");
+  }
   return url;
 };
 

@@ -1,0 +1,88 @@
+@import "base/environment";
+/* for labels */
+div.form-column-left {
+  min-width: 150px;
+  text-align: right;
+  margin-top: 20px;
+  display: inline-block;
+  vertical-align: top;
+  padding: 5px 10px;
+  font-size: 14px;
+  line-height: 20px;
+
+  &.no-group {
+    /* for labels that correspond to an un-grouped form el */
+    margin-top: 0px;
+  }
+}
+#discussion_point_change_warning {
+  margin-top: 15px;
+  margin-bottom: 0px;
+  margin-left: 180px;
+  display: inline-block;
+  display: none;
+}
+/* for grouped and un-grouped form els */
+div.form-column-right, div.overrides-column-right {
+  display: inline-block;
+
+  /* for groups of form els ONLY */
+  .border {
+    /* parent form-column-right div should have a child */
+    /* div that applies border styles and hold content */
+    /* using bootstrap or other canvas borders */
+    border-color: #ccc;
+    padding: 15px 0px;
+    margin-top: 20px;
+    select, .subtitle {
+      margin-left: 15px;
+    }
+  }
+
+  label:hover {
+    background: #E7F4FF;
+  }
+
+  /* if form field is first item in box */
+  label.flush {
+    margin: 0px;
+  }
+
+  label:not(.ic-Label), label.date_field {
+    margin: 0px;
+    padding: 10px 0px 10px 40px;
+  }
+
+  .subtitle {
+    margin-top: 20px;
+    padding-bottom: 5px;
+    font-size: 15px;
+    font-weight: bold;
+  }
+
+  /* nested form els within a group */
+  .nested {
+    label.checkbox, label.radio {
+      padding-left: 60px;
+    }
+    select, a, .explanation {
+      margin-left: 40px;
+    }
+    input[type=text] {
+      margin-left: 60px;
+    }
+    .nest {
+      padding-left: 20px;
+    }
+  }
+}
+
+div.form-column-right {
+  width: 380px;
+}
+
+.assignment-edit-group-alert, .assignment-edit-external-tool-alert{
+  margin: 15px 20px 0;
+}
+
+

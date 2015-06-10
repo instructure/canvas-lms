@@ -107,6 +107,7 @@ class HostUrl
     def file_host=(val)
       @@file_host = val
     end
+
     def default_host=(val)
       @@default_host = val
     end

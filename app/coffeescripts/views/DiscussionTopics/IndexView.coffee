@@ -2,10 +2,11 @@ define [
   'jquery'
   'underscore'
   'Backbone'
+  'i18n!discussion_topics'
   'jst/DiscussionTopics/IndexView'
   'compiled/views/DiscussionTopics/DiscussionsSettingsView'
   'compiled/views/DiscussionTopics/UserSettingsView'
-], ($, _, {View}, template, DiscussionsSettingsView, UserSettingsView) ->
+], ($, _, {View}, I18n, template, DiscussionsSettingsView, UserSettingsView) ->
 
   class IndexView extends View
     template: template
@@ -18,6 +19,8 @@ define [
 
     events:
       'click .ig-header .element_toggler': 'toggleDiscussionList'
+      'focus .accessibility-warning': 'handleAccessibilityWarningFocus'
+      'blur .accessibility-warning': 'handleAccessibilityWarningBlur'
       'keydown .ig-header .element_toggler': 'toggleDiscussionList'
       'click .discussion-list': 'toggleDiscussionListWithVo'
       'click #edit_discussions_settings':  'toggleSettingsView'
@@ -49,8 +52,13 @@ define [
         @options.pinnedDiscussionView.collection
       ]
 
+    initialize: ->
+      super
+      @listenTo(@options.pinnedDiscussionView.collection, "add remove", @handleAddRemovePinnedDiscussion)
+
     afterRender: ->
       @$('#discussionsFilter').buttonset()
+      @setAccessibilityWarningState();
 
     activeFilters: ->
       _.select(@filters, (value, key) => value.active)
@@ -65,6 +73,7 @@ define [
       else
         @filters[e.target.id].active = $(e.target).val().length > 0
         term = $(e.target).val()
+        @resultsUpdatedAccessibleAlert()
 
       _.each @collections(), (collection) =>
         collection.each (model) =>
@@ -91,6 +100,25 @@ define [
         $icon = $currentTarget.find('i')
       return unless $icon.length
       $icon.toggleClass('icon-mini-arrow-down').toggleClass('icon-mini-arrow-right')
+
+    setAccessibilityWarningState: ->
+      if @options.pinnedDiscussionView.collection.length > 1
+        $('.accessibility-warning').show()
+      else
+        $('.accessibility-warning').hide()
+
+    handleAddRemovePinnedDiscussion: ->
+      @setAccessibilityWarningState();
+
+    handleAccessibilityWarningFocus: (e) ->
+      if @options.pinnedDiscussionView.collection.length > 1
+        $accessibilityWarning = $(e.currentTarget)
+        $accessibilityWarning.removeClass('screenreader-only')
+
+    handleAccessibilityWarningBlur: (e) ->
+      if @options.pinnedDiscussionView.collection.length > 1
+        $accessibilityWarning = $(e.currentTarget)
+        $accessibilityWarning.addClass('screenreader-only')
     
     toggleDiscussionListWithVo: (e) ->
       # if this event bubbled up from somewhere else, do nothing.
@@ -111,3 +139,8 @@ define [
         length: 1,
         atLeastOnePageFetched: true
         new_topic_url: ENV.newTopicURL
+
+    resultsUpdatedAccessibleAlert: _.debounce(->
+      $.screenReaderFlashMessage I18n.t 'The list of results has been updated.'
+    , 1000)
+

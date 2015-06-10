@@ -53,7 +53,7 @@ define [
           when 'sms' then I18n.t('communication.sms.display', 'Cell Number')
           when 'push' then I18n.t('communication.push.display', 'Push Notification')
           when 'twitter' then I18n.t('communication.twitter.display', 'Twitter')
-          when 'facebook' then I18n.t('communication.facebook.display', 'Facebook')
+          when 'yo' then I18n.t('communication.yo.display', 'Yo')
       # Setup the mappings
       @mappings = new NotificationGroupMappings()
       @$notificationSaveStatus = $('#notifications_save_status')
@@ -66,7 +66,7 @@ define [
       $buttons   = $cell.find('.event-option-buttons')
       #
       $selection.hide()
-      $buttons.show()
+      $buttons.removeClass('screenreader-only')
       if setFocus
         $radio = $cell.find('.frequency:checked')
         $labelToFocus = $cell.find("label[for=#{$radio.attr('id')}]")
@@ -78,7 +78,7 @@ define [
       $selection = $cell.find('.event-option-selection')
       $buttons   = $cell.find('.event-option-buttons')
       #
-      $buttons.hide()
+      $buttons.addClass('screenreader-only')
       $selection.show()
       $selection.find('a:first').focus() if setFocus
 
@@ -272,4 +272,3 @@ define [
     initGrid: =>
       @buildTable()
       null
-

@@ -23,7 +23,7 @@ describe 'assignment_changed.summary' do
   it "should render" do
     assignment_model(:title => "Quiz 1")
     generate_message(:assignment_changed, :summary, @assignment)
-    @message.subject.should match(/Quiz 1/)
-    @message.subject.should match(Regexp.new(@course.name))
+    expect(@message.subject).to match(/Quiz 1/)
+    expect(@message.subject).to match(Regexp.new(@course.name))
   end
 end

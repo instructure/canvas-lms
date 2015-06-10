@@ -23,22 +23,51 @@ define([
   'underscore',
   'compiled/grade_calculator',
   'compiled/util/round',
+  'str/htmlEscape',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* getFormData */,
   'jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar */,
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'media_comments' /* mediaComment, mediaCommentThumbnail */
-], function(INST, I18n, $, _, GradeCalculator, round) {
+], function(INST, I18n, $, _, GradeCalculator, round, htmlEscape) {
+
+  function removeAssignmentsNotInCurrentGradingPeriod() {
+    var gradingPeriod = ENV.grading_period;
+    var assignmentGroups = $.extend(true, [], ENV.assignment_groups);
+    var filteredAssignmentGroups;
+
+    if (gradingPeriod) {
+      _.each(assignmentGroups, function (assignmentGroup) {
+        var updatedAssignments = [];
+        _.each(assignmentGroup.assignments, function (assignment){
+          var gradingPeriodStartDate = new Date(gradingPeriod.start_date);
+          var gradingPeriodEndDate = new Date(gradingPeriod.end_date);
+          var assignmentDueDate = assignment.due_at ? new Date(assignment.due_at) : null;
+          var assignmentInGradingPeriod = gradingPeriodStartDate <= assignmentDueDate
+              && gradingPeriodEndDate >= assignmentDueDate
+
+          if(assignmentInGradingPeriod || (gradingPeriod.is_last && !assignmentDueDate)) {
+            updatedAssignments.push(assignment);
+          }
+        });
+        assignmentGroup.assignments = updatedAssignments;
+      });
+    }
+
+    return assignmentGroups;
+  }
 
   function updateStudentGrades() {
     var ignoreUngradedSubmissions = $("#only_consider_graded_assignments").attr('checked');
     var currentOrFinal = ignoreUngradedSubmissions ? 'current' : 'final';
     var groupWeightingScheme = ENV.group_weighting_scheme;
     var showTotalGradeAsPoints = ENV.show_total_grade_as_points;
+    var assignmentGroups = removeAssignmentsNotInCurrentGradingPeriod(ENV.assignment_groups);
+
     var calculatedGrades = GradeCalculator.calculate(
       ENV.submissions,
-      ENV.assignment_groups,
+      assignmentGroups,
       groupWeightingScheme
     );
 
@@ -147,8 +176,8 @@ define([
       if (!$(this).find('.grade').data('originalValue')){
         $(this).find('.grade').data('originalValue', $(this).find('.grade').html());
       }
-      var screenreader_link_clone = $(this).find('.screenreader-only').clone(true);
-      $(this).find('.grade').data("screenreader_link", screenreader_link_clone);
+      var $screenreader_link_clone = $(this).find('.screenreader-only').clone(true);
+      $(this).find('.grade').data("screenreader_link", $screenreader_link_clone);
       $(this).find('.grade').empty().append($("#grade_entry"));
       $(this).find('.score_value').hide();
       var val = $(this).parents('.student_assignment').find('.score').text();
@@ -212,10 +241,10 @@ define([
       }
       if (val === 0) { val = '0.0'; }
       if (val === originalVal) { val = originalScore; }
-      $assignment.find('.grade').html(val || $assignment.find('.grade').data('originalValue'));
+      $assignment.find('.grade').html($.raw(htmlEscape(val) || $assignment.find('.grade').data('originalValue')));
       if (!isChanged) {
-        var screenreader_link_clone = $assignment.find('.grade').data("screenreader_link");
-        $assignment.find('.grade').prepend(screenreader_link_clone);
+        var $screenreader_link_clone = $assignment.find('.grade').data("screenreader_link");
+        $assignment.find('.grade').prepend($screenreader_link_clone);
       }
 
       updateScoreForAssignment(assignment_id, val);
@@ -230,9 +259,16 @@ define([
       event.stopPropagation();
       var $assignment = $(this).parents(".student_assignment"),
           val         = $assignment.find(".original_score").text(),
-          tooltip     = $assignment.data('muted') ?
-            I18n.t('student_mute_notification', 'Instructor is working on grades') :
-            I18n.t('click_to_change', 'Click to test a different score');
+          submission_status = $assignment.find(".submission_status").text();
+      var tooltip;
+      if ($assignment.data('muted')) {
+        tooltip = I18n.t('student_mute_notification', 'Instructor is working on grades');
+      // Commented out until CNVS-16332 backend fixes are ready
+      //} else if(submission_status == 'pending_review') {
+      //  tooltip = I18n.t('grading_in_progress', "Instructor is working on grades");
+      } else {
+        tooltip = I18n.t('click_to_change', 'Click to test a different score');
+      }
       $assignment.find(".score").text(val);
       $assignment.find(".assignment_score").attr('title', I18n.t('click_to_change', 'Click to test a different score'))
         .find(".score_teaser").text(tooltip).end()
@@ -248,8 +284,8 @@ define([
       if(!skipEval) {
         updateStudentGrades();
       }
-      var screenreader_link_clone = $assignment.find('.grade').data("screenreader_link");
-      $assignment.find('.grade').prepend(screenreader_link_clone);
+      var $screenreader_link_clone = $assignment.find('.grade').data("screenreader_link");
+      $assignment.find('.grade').prepend($screenreader_link_clone);
       setTimeout(function() { $assignment.find(".grade").focus();}, 0);
     });
     $("#grades_summary:not(.editable) .assignment_score").css('cursor', 'default');
@@ -304,16 +340,17 @@ define([
     $("#show_all_details_link").click(function(event) {
       event.preventDefault();
       $button = $('#show_all_details_link');
-
-      $("tr.rubric_assessments").toggle();
-      $("tr.comments").toggle();
-      $button.toggleClass('showAll')
+      $button.toggleClass('showAll');
 
       if ($button.hasClass('showAll')) {
         $button.text(I18n.t('hide_all_details_button', 'Hide All Details'));
+        $("tr.rubric_assessments").show();
+        $("tr.comments").show();
       }
       else {
         $button.text(I18n.t('show_all_details_button', 'Show All Details'));
+        $("tr.rubric_assessments").hide();
+        $("tr.comments").hide();
       }
     });
 
@@ -329,5 +366,16 @@ define([
       ENV.submissions.push({assignment_id: assignmentId, score: score});
     }
   }
-});
 
+
+  $(document).on('change', '#grading_periods_selector', function(e){
+    var newGP = $(this).val();
+    if(matches = location.href.match(/grading_period_id=\d*/)){
+      location.href = location.href.replace(matches[0], "grading_period_id=" + newGP);
+    }else if(matches = location.href.match(/#tab-assignments/)){
+      location.href = location.href.replace(matches[0], "") + "?grading_period_id=" + newGP + matches[0];
+    }else {
+      location.href += "?grading_period_id=" + newGP;
+    }
+  });
+});

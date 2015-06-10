@@ -68,6 +68,7 @@ class ArgumentView < HashView
   def remove_outer_square_brackets(str)
     str.sub(/^\[/, '').sub(/\]$/, '')
   end
+
   def metadata_parts
     remove_outer_square_brackets(@type).
       split(/\s*[,\|]\s*/).map{ |t| t.force_encoding('UTF-8') }
@@ -112,15 +113,26 @@ class ArgumentView < HashView
   end
 
   def optional?
-    enum_and_types.last.map{ |t| t.downcase }.include?('optional')
+    not required?
   end
 
   def required?
-    not optional?
+    types = enum_and_types.last.map{ |t| t.downcase }
+    if swagger_param_type == 'path'
+      true
+    elsif types.include?('required')
+      true
+    else
+      false
+    end
   end
 
   def array?
     @name.include?('[]')
+  end
+
+  def builtin?(type)
+    ["string", "integer"].include?(type)
   end
 
   def to_swagger
@@ -133,7 +145,16 @@ class ArgumentView < HashView
       "required" => required?,
     }
     swagger['enum'] = enums unless enums.empty?
-    swagger['tags'] = {"type" => "array"} if array?
+    if array?
+      swagger["type"] = "array"
+      items = {}
+      if builtin?(swagger_type)
+        items["type"] = swagger_type
+      else
+        items["$ref"] = swagger_type
+      end
+      swagger["items"] = items
+    end
     swagger
   end
 

@@ -7,7 +7,7 @@ define [
 
   class WikiPageReloadView extends Backbone.View
     setViewProperties: false
-    template: -> "<div class='alert alert-#{if @options.warning then 'warning' else 'info'} reload-changed-page'>#{@reloadMessage}</div>"
+    template: -> "<div class='alert alert-#{$.raw if @options.warning then 'warning' else 'info'} reload-changed-page'>#{$.raw @reloadMessage}</div>"
 
     defaults:
       modelAttributes: ['title', 'url', 'body']

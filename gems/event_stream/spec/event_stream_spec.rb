@@ -21,6 +21,7 @@ require 'spec_helper'
 describe EventStream do
   before(:each) do
     EventStream.current_shard_lookup = nil
+    EventStream.get_index_ids_lookup = nil
   end
 
   describe '.current_shard' do
@@ -33,6 +34,32 @@ describe EventStream do
 
     it 'returns nil if lookup not set' do
       expect(EventStream.current_shard).to eq nil
+    end
+  end
+
+  describe '.get_index_ids' do
+    let(:index) do
+      index = double('index')
+      index.stub(:id_column).and_return(:id)
+      index
+    end
+    let(:index_ids) { (1..10).to_a }
+    let(:index_rows) do
+      index_ids.map do |i|
+        { id: i }
+      end
+    end
+
+    it 'returns the index ids' do
+      EventStream.get_index_ids_lookup = lambda { |index, rows|
+        rows.map{ |row| row[index.id_column] + 1}
+      }
+
+      expect(EventStream.get_index_ids(index, index_rows)).to eq (2..11).to_a
+    end
+
+    it 'returns id_column if lookup not set' do
+      expect(EventStream.get_index_ids(index, index_rows)).to eq index_ids
     end
   end
 end

@@ -1,4 +1,6 @@
-<% define_content :link do %><%= HostUrl.protocol %>://<%= HostUrl.default_host %>/users/<%= asset.id %><% end %>
+<% define_content :link do %>
+  <%= user_url(asset) %>
+<% end %>
 <% define_content :subject do %>
   <%= t :subject, "New User" %>
 <% end %>

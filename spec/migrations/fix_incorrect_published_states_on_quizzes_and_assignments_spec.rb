@@ -23,36 +23,36 @@ describe 'FixIncorrectPublishedStatesOnQuizzesAndAssignments' do
   it "should update the right assignments" do
     course(:active_all => true)
     a1 = @course.assignments.create!(:name => 'hi')
-    a1.workflow_state.should == "published"
+    expect(a1.workflow_state).to eq "published"
 
     a2 = @course.assignments.create!(:name => 'hi')
     Assignment.where(:id => a2.id).update_all(:workflow_state => "available")
-    a2.reload.workflow_state.should == "available"
+    expect(a2.reload.workflow_state).to eq "available"
 
     a3 = @course.assignments.create!(:name => 'hi')
     Assignment.where(:id => a3.id).update_all(:workflow_state => "active")
-    a3.reload.workflow_state.should == "active"
+    expect(a3.reload.workflow_state).to eq "active"
 
     a4 = @course.assignments.create!(:name => 'hi')
     a4.destroy
-    a4.workflow_state.should == "deleted"
+    expect(a4.workflow_state).to eq "deleted"
 
     FixIncorrectPublishedStatesForQuizzesAndAssignments.up
 
-    a1.reload.workflow_state.should == "published"
-    a2.reload.workflow_state.should == "published"
-    a3.reload.workflow_state.should == "published"
-    a4.reload.workflow_state.should == "deleted"
+    expect(a1.reload.workflow_state).to eq "published"
+    expect(a2.reload.workflow_state).to eq "published"
+    expect(a3.reload.workflow_state).to eq "published"
+    expect(a4.reload.workflow_state).to eq "deleted"
   end
 
   it "should update the right quizzes" do
     course(active_all: true)
     q1 = @course.quizzes.create! title: 'this'
-    q1.workflow_state.should == 'created'
+    expect(q1.workflow_state).to eq 'created'
 
     q2 = @course.quizzes.create! title: 'that'
     q2.publish!
-    q2.workflow_state.should == 'available'
+    expect(q2.workflow_state).to eq 'available'
 
     q3 = @course.quizzes.create! title: 'the_other'
     q3.publish!
@@ -60,13 +60,13 @@ describe 'FixIncorrectPublishedStatesOnQuizzesAndAssignments' do
 
     q4 = @course.quizzes.create!
     q4.destroy
-    q4.workflow_state.should == 'deleted'
+    expect(q4.workflow_state).to eq 'deleted'
 
     FixIncorrectPublishedStatesForQuizzesAndAssignments.up
 
-    q1.reload.workflow_state.should == 'created'
-    q2.reload.workflow_state.should == 'available'
-    q3.reload.workflow_state.should == 'available'
-    q4.reload.workflow_state.should == 'deleted'
+    expect(q1.reload.workflow_state).to eq 'created'
+    expect(q2.reload.workflow_state).to eq 'available'
+    expect(q3.reload.workflow_state).to eq 'available'
+    expect(q4.reload.workflow_state).to eq 'deleted'
   end
 end

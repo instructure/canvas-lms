@@ -33,6 +33,11 @@ define [
       @collection.once 'reset', @enableSearch, @
       @collection.on 'cancelSearch', @clearSearch, @
 
+    toJSON: ->
+      json = super
+      json.course_home = ENV.COURSE_HOME
+      json
+
     afterRender: ->
       # need to hide child views and set trigger manually
 
@@ -44,7 +49,7 @@ define [
         @assignmentSettingsView.hide()
         @assignmentSettingsView.setTrigger @$assignmentSettingsButton
 
-      @filterKeyBindings() if @userIsStudent()
+      @filterKeyBindings() if !@canManage()
 
       @ensureContentStyle()
 
@@ -103,8 +108,8 @@ define [
         unless($(e.target).is("input"))
           $(".assignment_group").filter(":visible").first().attr("tabindex",-1).focus()
 
-    userIsStudent: ->
-      _.include(ENV.current_user_roles, "student")
+    canManage: ->
+      ENV.PERMISSIONS.manage
 
     ensureContentStyle: ->
       # when loaded from homepage, need to change content style

@@ -67,6 +67,7 @@ module Importers
                 else
                   context.discussion_topics.scoped.new
                 end
+      topic.saved_by = :migration
       topic
     end
 
@@ -78,15 +79,35 @@ module Importers
        :require_initial_post].each do |attr|
         item.send("#{attr}=", options[attr])
       end
-      item.message              = options.message ? ImportedHtmlConverter.convert(options.message, context, migration, missing_links: options[:missing_links]) : I18n.t('#discussion_topic.empty_message', 'No message')
-      item.posted_at            = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options[:posted_at])
-      item.delayed_post_at      = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options.delayed_post_at)
-      item.last_reply_at        = item.posted_at if item.new_record?
-      item.workflow_state       = 'active'       if item.deleted?
-      item.workflow_state       = 'post_delayed' if item.should_not_post_yet
-      item.attachment           = context.attachments.where(migration_id: options[:attachment_migration_id]).first
-      item.external_feed        = context.external_feeds.where(migration_id: options[:external_feed_migration_id]).first
-      item.assignment           = fetch_assignment
+      missing_links = []
+      if options.message
+        item.message = ImportedHtmlConverter.convert(options.message, context, migration) do |warn, link|
+          missing_links << link if warn == :missing_link
+        end
+      else
+        item.message = I18n.t('#discussion_topic.empty_message', 'No message')
+      end
+
+      item.posted_at       = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options[:posted_at])
+      item.delayed_post_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options.delayed_post_at)
+      item.lock_at         = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options[:lock_at])
+      item.last_reply_at   = nil if item.new_record?
+
+      if options[:workflow_state].present?
+        item.workflow_state = options[:workflow_state]
+      elsif item.should_not_post_yet
+        item.workflow_state = 'post_delayed'
+      else
+        item.workflow_state = 'active'
+      end
+
+      if options[:attachment_migration_id].present?
+        item.attachment = context.attachments.where(migration_id: options[:attachment_migration_id]).first
+      end
+      if options[:external_feed_migration_id].present?
+        item.external_feed = context.external_feeds.where(migration_id: options[:external_feed_migration_id]).first
+      end
+      item.assignment = fetch_assignment
 
       if options[:attachment_ids].present?
         item.message += Attachment.attachment_list_from_migration(context, options[:attachment_ids])
@@ -94,7 +115,8 @@ module Importers
 
       item.save_without_broadcasting!
       import_migration_item
-      add_missing_content_links
+      add_missing_content_links(missing_links)
+      item.saved_by = nil
       item
     end
 
@@ -117,10 +139,10 @@ module Importers
       migration.add_imported_item(item) if migration
     end
 
-    def add_missing_content_links
+    def add_missing_content_links(missing_links)
       if migration
         migration.add_missing_content_links(class: item.class.to_s,
-          id: item.id, missing_links: options[:missing_links],
+          id: item.id, missing_links: missing_links,
           url: "/#{context.class.to_s.underscore.pluralize}/#{context.id}/#{item.class.to_s.demodulize.underscore.pluralize}/#{item.id}")
       end
     end
@@ -132,7 +154,6 @@ module Importers
 
       def initialize(options = {})
         @options = options.with_indifferent_access
-        @options[:missing_links] = []
         @options[:messages]    ||= @options[:posts]
       end
 

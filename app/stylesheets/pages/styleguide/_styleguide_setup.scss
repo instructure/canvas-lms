@@ -1,0 +1,57 @@
+//// 
+// Note: We share this file with other Instructure projects so we can
+// maintain a consistent look feel with our styleguides.
+// If you edit something in there please throw a reference in #ui so we
+// can make sure to update this file in other projects.
+////
+//// Styleguide Setup Variables
+////////
+// These variables set all the colors and styles needed to 
+// style out the styleguide itself. If there is something in 
+// _styleguide_app or styleguide_syntax that you need to edit
+// please talk to the Canvas UI dev team so we can add that as
+// a functional variable in ours. 
+////////
+$sg-background: #fff !default;
+$sg-codefont: "Monaco", "Courier", monospace !default;
+$sg-font: "Helvetica Neue", "Helvetica", Arial, sans-serif !default;
+
+$sg-background-global-nav: $ic-brand-secondary !default;
+$sg-background-sub-nav: darken($ic-brand-secondary, 10%) !default;
+$sg-background-links: $ic-brand-secondary !default;
+$sg-background-text: $ic-color-dark !default;
+
+$sg-header-navigation-item: $ic-color-light !default;
+$sg-header-navigation-item--hover: $ic-color-neutral !default; 
+$sg-header-navigation-item--active: $ic-color-light !default;
+$sg-title-border: darken($ic-color-neutral, 10) !default;
+
+$sg-header-subnavigation-item: $ic-color-light !default;
+$sg-header-subnavigation-item--hover: $ic-color-neutral !default;
+$sg-header-subnavigation-item--active: $ic-color-light !default;
+
+$sg-content-title-background: $ic-brand-primary !default;
+$sg-content-title-font-color: #fff !default;
+$sg-content-hr-border-color: $ic-brand-secondary !default;
+
+$sg-src-file-path-background: $ic-brand-primary !default;
+$sg-src-file-path-border-color: lighten($ic-brand-primary, 15%) !default;
+$sg-src-file-path-font-color: $ic-color-light !default;
+
+//// Stylesheet Examples & Syntax
+////////
+$sg-example-tag-color: $ic-brand-primary !default;
+$sg-example-string-color: $ic-color-neutral !default;
+$sg-example-border: $ic-color-neutral !default;
+$sg-example-main-color: #1E2631 !default;
+$sg-syntax-main-font-color: $ic-color-neutral !default;
+$sg-example-title-color: darken($ic-color-neutral, 10) !default;
+//// Stylesheet Logo
+////////
+// There is a logo that goes in the top left of the theme. This can
+// be taken out by commenting out the code below, or changed for a 
+// different logo by editing the path.
+@mixin sg-header-logo {
+  background: transparent url("/images/sg-logo.svg") 1% 50% no-repeat;
+  background-size: 23px;
+}

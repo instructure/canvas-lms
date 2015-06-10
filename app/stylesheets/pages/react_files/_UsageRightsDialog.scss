@@ -1,0 +1,46 @@
+
+$usage-rights-alert-background: $ic-color-alert;
+$usage-rights-alert-text: $ic-color-light;
+
+.UsageRightsDialog__fileName {
+  font-weight: bold;
+}
+
+.UsageRightsDialog__warning {
+  color: $usage-rights-alert-text;
+  margin-right: 10px;
+}
+
+.UsageRightsDialog__andMore {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.UsageRightsDialog__paddingFix {
+  padding: 10px;
+}
+
+.UsageRightsDialog__tooltip {
+  text-align: left !important; /* Important so it overides the default stuff */
+}
+
+.UsageRightsDialog__folderBulletList {
+  /* list-style-image: url(/images/mimeClassIcons/folder.svg)
+      would be better than this stuff, but sizing is hard with it. */
+  list-style: none;
+  margin-left: 0;
+  li:before {
+    content:'';
+    display:inline-block;
+    height:1em;
+    width:1em;
+    background-image:url('/images/mimeClassIcons/folder.svg');
+    background-size:contain;
+    background-repeat:no-repeat;
+  }
+}
+
+.UsageRightsDialog__differentRightsMessage {
+  background-color: $usage-rights-alert-background;
+  color: $usage-rights-alert-text;
+}

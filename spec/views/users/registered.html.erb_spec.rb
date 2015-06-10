@@ -27,7 +27,7 @@ describe "/users/registered" do
     assigns[:cc] = communication_channel(@user)
     assigns[:user] = @user
     render "users/registered"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

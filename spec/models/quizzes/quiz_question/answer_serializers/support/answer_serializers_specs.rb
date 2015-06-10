@@ -57,8 +57,8 @@ shared_examples_for 'Answer Serializers' do
     it '[auto] should serialize' do
       @inputs.each_with_index do |input, index|
         rc = subject.serialize(input)
-        rc.error.should be_nil
-        rc.answer.should == @outputs[index]
+        expect(rc.error).to be_nil
+        expect(rc.answer).to eq @outputs[index]
       end
     end
 
@@ -71,7 +71,7 @@ shared_examples_for 'Answer Serializers' do
         end
 
         out = subject.deserialize(output)
-        out.should == input
+        expect(out).to eq input
       end
     end
   end

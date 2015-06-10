@@ -53,6 +53,43 @@ define([
       rubricEditing.sizeRatings($criterion);
       return $criterion;
     },
+    addNewRatingColumn: function($this) {
+      var $rubric = $this.parents(".rubric");
+      $this.addClass('add_column');
+      if($rubric.hasClass('editing')){
+        var $td = $this.clone(true).removeClass('edge_rating'),
+            pts = parseFloat($this.find(".points").text()),
+            $criterion = $this.parents(".criterion"),
+            $criterionPoints = $criterion.find(".criterion_points"),
+            criterion_total = parseFloat($criterionPoints.val(), 10) || 5,
+            data = { description: "Rating Description" },
+            hasClassAddLeft = $this.hasClass('add_left');
+        if($this.hasClass('add_left')) {
+          var more_points = parseFloat($this.prev(".rating").find(".points").text());
+          data.points = Math.round((pts + more_points) / 2);
+          if(data.points == pts || data.points == more_points) {
+            data.points = pts;
+          }
+        } else {
+          var less_points = parseFloat($this.next(".rating").find(".points").text());
+          data.points = Math.round((pts + less_points) / 2);
+          if(data.points == pts || data.points == less_points) {
+            data.points = less_points;
+          }
+        }
+        $td.fillTemplateData({data: data});
+        if(hasClassAddLeft) {
+          $this.before($td);
+        } else {
+          $this.after($td);
+        }
+        rubricEditing.hideCriterionAdd($rubric);
+        rubricEditing.updateCriterionPoints($criterion);
+        rubricEditing.sizeRatings($criterion);
+        $td.focus();
+      }
+      return false;
+    },
     onFindOutcome: function(outcome) {
       var $rubric = $('.rubric table.rubric_table:visible:first'),
           $criterion;
@@ -86,6 +123,7 @@ define([
       $criterion.find(".criterion_description").val(outcome.get('title')).focus().select();
 
       $criterion.find(".mastery_points").text(outcome.get('mastery_points'));
+      $criterion.find(".links").remove();
     },
     hideCriterionAdd: function($rubric) {
       $rubric.find('.add_right, .add_left, .add_column').removeClass('add_left add_right add_column');
@@ -401,6 +439,9 @@ define([
           $rating.fillTemplateData({data: rating});
           $criterion.find(".ratings").append($rating);
         });
+        if (criterion.learning_outcome_id) {
+          $criterion.find(".links").remove();
+        }
         $rubric.find(".summary").before($criterion);
         $criterion.find(".criterion_points").val(criterion.points).blur();
       });
@@ -420,7 +461,7 @@ define([
 
 
   rubricEditing.init = function() {
-    var limitToOneRubric = true;
+    var limitToOneRubric = !$("#rubrics").hasClass('raw_listing');
     var $rubric_dialog = $("#rubric_dialog"),
         $rubric_long_description_dialog = $("#rubric_long_description_dialog");
 
@@ -437,8 +478,8 @@ define([
       if(editing && !isLearningOutcome) {
         $rubric_long_description_dialog
           .fillFormData(data)
-          .find('.editing').show()
-          .find(".displaying").hide();
+          .find('.editing').show().end()
+          .find(".displaying").hide().end();
       } else {
         if(!isLearningOutcome) {
           // We want to prevent XSS in this dialog but users expect to have line
@@ -464,8 +505,14 @@ define([
         .data('current_criterion', $criterion)
         .dialog({
           title: I18n.t('titles.criterion_long_description', "Criterion Long Description"),
-          width: 400
-        }).fixDialogButtons().find("textarea:visible:first").focus().select();
+          width: 400,
+          buttons: []
+        });
+
+      if(editing && !isLearningOutcome) {
+        $rubric_long_description_dialog.fixDialogButtons();
+        $rubric_long_description_dialog.find("textarea:visible:first").focus().select();
+      }
     })
     .delegate(".find_rubric_link", 'click', function(event) {
       event.preventDefault();
@@ -563,9 +610,7 @@ define([
       var $rubric = rubricEditing.addRubric();
       $("#rubrics").append($rubric.show());
       $rubric.find(":text:first").focus().select();
-      if(limitToOneRubric) {
         $(".add_rubric_link").hide();
-      }
     });
 
     $("#rubric_dialog")
@@ -665,6 +710,7 @@ define([
         }
         var rubric = data.rubric;
         rubric.rubric_association_id = data.rubric_association.id;
+        rubric.use_for_grading = data.rubric_association.use_for_grading;
         rubric.permissions = rubric.permissions || {};
         if(data.rubric_association.permissions) {
           rubric.permissions.update_association = data.rubric_association.permissions.update;
@@ -710,10 +756,16 @@ define([
               $("#edit_rubric_form").submit();
             };
             $confirmDialog.dialog({
-              buttons: {
-                "Change" : closeDialog,
-                "Leave different" : function(){ closeDialog(true); }
-              },
+              buttons: [
+                {
+                  text: I18n.t('change', 'Change'),
+                  click: closeDialog
+                },
+                {
+                  text: I18n.t('leave_different', "Leave different"),
+                  click: function() { closeDialog(true); }
+                }
+              ],
               width: 320,
               resizable: false,
               close: $confirmDialog.remove
@@ -745,6 +797,7 @@ define([
         var rubric = data.rubric;
         $rubric.loadingImage('remove');
         rubric.rubric_association_id = data.rubric_association.id;
+        rubric.use_for_grading = data.rubric_association.use_for_grading;
         rubric.permissions = rubric.permissions || {};
         if(data.rubric_association.permissions) {
           rubric.permissions.update_association = data.rubric_association.permissions.update;
@@ -757,6 +810,9 @@ define([
                                           {one: '%{count} point possible', other: '%{count} points possible' },
                                           {count: rubric.points_possible || 0})
           $(".discussion-title .discussion-points").text(discussion_points_text);
+        }
+        if(!limitToOneRubric) {
+          $(".add_rubric_link").show();
         }
         $rubric.find(".rubric_title .links:not(.locked)").show();
       }
@@ -779,13 +835,23 @@ define([
       rubricEditing.editCriterion($criterion);
       return false;
     }).delegate('.delete_criterion_link', 'click', function(event) {
-      var $criterion = $(this).parents(".criterion");
+      var $criterion = $(this).parents('.criterion');
+
+      // this is annoying, but the current code doesn't care where in the list
+      // of rows the "blank" template element is, so we have to account for the
+      // fact that it could be the previous row
+      var $prevCriterion = $criterion.prevAll('.criterion:not(.blank)').first();
+      var $target = $prevCriterion.find('.long_description_link');
+      if ($prevCriterion.length == 0) {
+        $target = $criterion.parents('.rubric_container').find('.rubric_title input');
+      }
       $criterion.fadeOut(function() {
         var $rubric = $criterion.parents(".rubric");
         $criterion.remove();
         rubricEditing.updateCriteria($rubric);
         rubricEditing.updateRubricPoints($rubric);
       });
+      $target.focus();
       return false;
     }).delegate('.rating_description_value,.edit_rating_link', 'click', function(event) {
       rubricEditing.editRating($(this).parents(".rating"));
@@ -854,6 +920,7 @@ define([
     }).delegate('.rating', 'mouseout', function(event) {
       $(this).data('hover_offset', null).data('hover_width', null);
     }).delegate('.delete_rating_link', 'click', function(event) {
+      var $target = $(this).closest('tr');
       event.preventDefault();
       rubricEditing.hideCriterionAdd($(this).parents(".rubric"));
       $(this).parents(".rating").fadeOut(function() {
@@ -861,41 +928,15 @@ define([
         $(this).remove();
         rubricEditing.sizeRatings($criterion);
       });
+      $target.focus();
+    }).delegate('.add_rating_link_after', 'click', function(event) {
+      event.preventDefault();
+      var $this = $(this).parents('td.rating');
+      $this.addClass('add_right');
+      rubricEditing.addNewRatingColumn($this);
     }).delegate('.add_column', 'click', function(event) {
-      var $this = $(this),
-          $rubric = $this.parents(".rubric");
-      if($rubric.hasClass('editing')){
-        var $td = $this.clone(true).removeClass('edge_rating'),
-            pts = parseFloat($this.find(".points").text()),
-            $criterion = $this.parents(".criterion"),
-            $criterionPoints = $criterion.find(".criterion_points"),
-            criterion_total = parseFloat($criterionPoints.val(), 10) || 5,
-            data = { description: "Rating Description" },
-            hasClassAddLeft = $this.hasClass('add_left');
-        if($this.hasClass('add_left')) {
-          var more_points = parseFloat($this.prev(".rating").find(".points").text());
-          data.points = Math.round((pts + more_points) / 2);
-          if(data.points == pts || data.points == more_points) {
-            data.points = pts;
-          }
-        } else {
-          var less_points = parseFloat($this.next(".rating").find(".points").text());
-          data.points = Math.round((pts + less_points) / 2);
-          if(data.points == pts || data.points == less_points) {
-            data.points = less_points;
-          }
-        }
-        $td.fillTemplateData({data: data});
-        if(hasClassAddLeft) {
-          $this.before($td);
-        } else {
-          $this.after($td);
-        }
-        rubricEditing.hideCriterionAdd($rubric);
-        rubricEditing.updateCriterionPoints($criterion);
-        rubricEditing.sizeRatings($criterion);
-      }
-      return false;
+      var $this = $(this);
+      rubricEditing.addNewRatingColumn($this);
     });
     $(".criterion_points").keydown(function(event) {
       if(event.keyCode == 13) {
@@ -906,9 +947,12 @@ define([
       rubricEditing.updateCriterionPoints($(this).parents(".criterion"));
     });
     $("#edit_criterion").delegate(".cancel_button", 'click', function(event) {
+      var $target = $(this).closest('td.criterion_description').find('.edit_criterion_link');
       rubricEditing.hideEditCriterion();
+      $target.focus();
     });
     $("#edit_criterion_form").submit(function(event) {
+      var $target = $(this).closest('td.criterion_description').find('.edit_criterion_link');
       event.preventDefault();
       event.stopPropagation();
       var data = $(this).parents("#edit_criterion").getFormData();
@@ -916,11 +960,15 @@ define([
       delete data['description'];
       $(this).parents(".criterion").fillTemplateData({data: data});
       rubricEditing.hideEditCriterion();
+      $target.focus();
     });
     $("#edit_rating").delegate(".cancel_button", 'click', function(event) {
+      var $target = $(this).closest('td.rating').find('.edit_rating_link');
       rubricEditing.hideEditRating();
+      $target.focus();
     });
     $("#edit_rating_form").submit(function(event) {
+      var $target = $(this).closest('td.rating').find('.edit_rating_link');
       event.preventDefault();
       event.stopPropagation();
       var data = $(this).parents("#edit_rating").getFormData();
@@ -935,6 +983,7 @@ define([
         $(this).parents(".criterion").find(".criterion_points").val(data.points);
       }
       rubricEditing.updateCriterionPoints($(this).parents(".criterion"), true);
+      $target.focus();
     });
     $("#edit_rubric_form .rubric_custom_rating").change(function() {
       $(this).parents(".rubric").find("tr.criterion")

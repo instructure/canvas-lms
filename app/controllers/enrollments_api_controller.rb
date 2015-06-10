@@ -178,13 +178,14 @@ class EnrollmentsApiController < ApplicationController
   before_filter :get_course_from_section, :require_context
 
   @@errors = {
-    :missing_parameters => 'No parameters given',
-    :missing_user_id    => "Can't create an enrollment without a user. Include enrollment[user_id] to create an enrollment",
-    :bad_type           => 'Invalid type',
-    :bad_role           => 'Invalid role',
-    :inactive_role      => 'Cannot create an enrollment with this role because it is inactive.',
-    :base_type_mismatch => 'The specified type must match the base type for the role',
-    :concluded_course   => 'Can\'t add an enrollment to a concluded course.'
+    :missing_parameters                => 'No parameters given',
+    :missing_user_id                   => "Can't create an enrollment without a user. Include enrollment[user_id] to create an enrollment",
+    :bad_type                          => 'Invalid type',
+    :bad_role                          => 'Invalid role',
+    :inactive_role                     => 'Cannot create an enrollment with this role because it is inactive.',
+    :base_type_mismatch                => 'The specified type must match the base type for the role',
+    :concluded_course                  => 'Can\'t add an enrollment to a concluded course.',
+    :multiple_grading_periods_disabled => 'Multiple Grading Periods feature is disabled. Cannot filter by grading_period_id with this feature disabled'
 
   }
 
@@ -225,6 +226,10 @@ class EnrollmentsApiController < ApplicationController
   #   independent of whether the user has permission to view other people
   #   on the roster.
   #
+  # @argument grading_period_id [Integer]
+  #   Return grades for the given grading_period.  If this parameter is not
+  #   specified, the returned grades will be for the whole course.
+  #
   # @returns [Enrollment]
   def index
     endpoint_scope = (@context.is_a?(Course) ? (@section.present? ? "section" : "course") : "user")
@@ -238,26 +243,52 @@ class EnrollmentsApiController < ApplicationController
 
     has_courses = enrollments.where_values.any? { |cond| cond.is_a?(String) && cond =~ /courses\./ }
     enrollments = enrollments.joins(:course) if has_courses
+    enrollments = enrollments.shard(@shard_scope) if @shard_scope
+    if params[:grading_period_id].present?
+      if !multiple_grading_periods?
+        render_create_errors([@@errors[:multiple_grading_periods_disabled]])
+        return false
+      end
+
+      if @context.is_a? User
+        render(
+          json: {message: "grading_period_id can't be specified for users"},
+          status: 403
+        )
+        return false
+      end
+
+      grading_period = GradingPeriod.context_find(context: @context,
+                                                  id: params[:grading_period_id])
+      unless grading_period
+        render(:json => {error: "invalid grading_period_id"}, :status => :bad_request)
+        return
+      end
+    end
 
     enrollments = Api.paginate(
       enrollments,
       self, send("api_v1_#{endpoint_scope}_enrollments_url"))
 
-    Enrollment.send(:preload_associations, enrollments, [:user, :course, :course_section])
+    ActiveRecord::Associations::Preloader.new(enrollments, [:user, :course, :course_section]).run
     includes = [:user] + Array(params[:include])
 
     user_json_preloads(enrollments.map(&:user))
-    render :json => enrollments.map { |e| enrollment_json(e, @current_user, session, includes) }
+    render :json => enrollments.map { |e|
+      enrollment_json(e, @current_user, session, includes,
+                      grading_period: grading_period)
+    }
   end
 
   # @API Enrollment by ID
   # Get an Enrollment object by Enrollment ID
   #
-  # @argument id [Integer]
+  # @argument id [Required, Integer]
   #  The ID of the enrollment object
   # @returns Enrollment
 
   def show
+    render_unauthorized_action and return false unless @current_user
     enrollment = Enrollment.find(params[:id])
     if enrollment.user_id == @current_user.id || enrollment.root_account == @context && authorized_action(@context, @current_user, [:read_roster])
       #render enrollment object if requesting user is the current_user or user is authorized to read enrollment.
@@ -267,36 +298,39 @@ class EnrollmentsApiController < ApplicationController
   # @API Enroll a user
   # Create a new user enrollment for a course or section.
   #
-  # @argument enrollment[user_id] [String]
+  # @argument enrollment[user_id] [Required, String]
   #   The ID of the user to be enrolled in the course.
   #
-  # @argument enrollment[type] [String, "StudentEnrollment"|"TeacherEnrollment"|"TaEnrollment"|"ObserverEnrollment"|"DesignerEnrollment"]
+  # @argument enrollment[type] [Required, String, "StudentEnrollment"|"TeacherEnrollment"|"TaEnrollment"|"ObserverEnrollment"|"DesignerEnrollment"]
   #   Enroll the user as a student, teacher, TA, observer, or designer. If no
   #   value is given, the type will be inferred by enrollment[role] if supplied,
   #   otherwise 'StudentEnrollment' will be used.
   #
-  # @argument enrollment[role] [Optional, String]
+  # @argument enrollment[role] [Deprecated, String]
   #   Assigns a custom course-level role to the user.
   #
-  # @argument enrollment[enrollment_state] [Optional, String, "active"|"invited"]
+  # @argument enrollment[role_id] [Integer]
+  #   Assigns a custom course-level role to the user.
+  #
+  # @argument enrollment[enrollment_state] [String, "active"|"invited"]
   #   If set to 'active,' student will be immediately enrolled in the course.
   #   Otherwise they will be required to accept a course invitation. Default is
   #   'invited.'
   #
-  # @argument enrollment[course_section_id] [Optional, Integer]
+  # @argument enrollment[course_section_id] [Integer]
   #   The ID of the course section to enroll the student in. If the
   #   section-specific URL is used, this argument is redundant and will be
   #   ignored.
   #
-  # @argument enrollment[limit_privileges_to_course_section] [Optional, Boolean]
+  # @argument enrollment[limit_privileges_to_course_section] [Boolean]
   #   If a teacher or TA enrollment, teacher/TA will be restricted to the
   #   section given by course_section_id.
   #
-  # @argument enrollment[notify] [Optional, Boolean]
+  # @argument enrollment[notify] [Boolean]
   #   If true, a notification will be sent to the enrolled user.
   #   Notifications are not sent by default.
   #
-  # @argument enrollment[self_enrollment_code] [Optional, String]
+  # @argument enrollment[self_enrollment_code] [String]
   #   If the current user is not allowed to manage enrollments in this
   #   course, but the course allows self-enrollment, the user can self-
   #   enroll as a student in the default section by passing in a valid
@@ -304,21 +338,25 @@ class EnrollmentsApiController < ApplicationController
   #   enrollment_state will be set to 'active' and all other arguments
   #   will be ignored.
   #
-  # @example_request
-  #   curl https://<canvas>/api/v1/courses/:course_id/enrollments \
-  #     -X POST \
-  #     -F 'user_id=1' \
-  #     -F 'type=StudentEnrollment' \
-  #     -F 'enrollment_state=active' \
-  #     -F 'course_section_id=1' \
-  #     -F 'limit_privileges_to_course_section=true' \
-  #     -F 'notify=false'
+  # @argument enrollment[self_enrolled] [Boolean]
+  #   If true, marks the enrollment as a self-enrollment, which gives
+  #   students the ability to drop the course if desired. Defaults to false.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/:course_id/enrollments \
   #     -X POST \
-  #     -F 'user_id=2' \
-  #     -F 'type=StudentEnrollment'
+  #     -F 'enrollment[user_id]=1' \
+  #     -F 'enrollment[type]=StudentEnrollment' \
+  #     -F 'enrollment[enrollment_state]=active' \
+  #     -F 'enrollment[course_section_id]=1' \
+  #     -F 'enrollment[limit_privileges_to_course_section]=true' \
+  #     -F 'enrollment[notify]=false'
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/:course_id/enrollments \
+  #     -X POST \
+  #     -F 'enrollment[user_id]=2' \
+  #     -F 'enrollment[type]=StudentEnrollment'
   #
   # @returns Enrollment
   def create
@@ -330,38 +368,35 @@ class EnrollmentsApiController < ApplicationController
     else
       return create_self_enrollment if params[:enrollment][:self_enrollment_code]
 
-      role_name = params[:enrollment].delete(:role)
       type = params[:enrollment].delete(:type)
-      if Enrollment.valid_type?(role_name)
-        type = role_name
-        role_name = nil
-      end
-      
-      if role_name.present?
-        params[:enrollment][:role_name] = role_name
-        course_role = @context.account.get_course_role(role_name)
-        if course_role.nil?
-          errors << @@errors[:bad_role]
-        elsif course_role.workflow_state != 'active'
-          errors << @@errors[:inactive_role]
-        else
-          if type.blank?
-            type = course_role.base_role_type
-          elsif type != course_role.base_role_type
-            errors << @@errors[:base_type_mismatch]
-          end
+
+      if role_id = params[:enrollment].delete(:role_id)
+        role = @context.account.get_role_by_id(role_id)
+      elsif role_name = params[:enrollment].delete(:role)
+        role = @context.account.get_course_role_by_name(role_name)
+      else
+        type = "StudentEnrollment" if type.blank?
+        role = Role.get_built_in_role(type)
+        if role.nil? || !role.course_role?
+          errors << @@errors[:bad_type]
         end
       end
 
-      if type.present?
-        errors << @@errors[:bad_type] unless Enrollment.valid_type?(type)
-      else
-        type = 'StudentEnrollment'
+      if role && role.course_role? && !role.deleted?
+        type = role.base_role_type if type.blank?
+        if role.inactive?
+          errors << @@errors[:inactive_role]
+        elsif type != role.base_role_type
+          errors << @@errors[:base_type_mismatch]
+        else
+          params[:enrollment][:role] = role
+        end
+      elsif errors.empty?
+        errors << @@errors[:bad_role]
       end
 
       errors << @@errors[:missing_user_id] unless params[:enrollment][:user_id].present?
     end
-    errors << @@errors[:concluded_course] if @context.concluded?
     return render_create_errors(errors) if errors.present?
 
     # create enrollment
@@ -372,11 +407,20 @@ class EnrollmentsApiController < ApplicationController
     end
     params[:enrollment][:course_section_id] = @section.id if @section.present?
     if params[:enrollment][:course_section_id].present?
-      params[:enrollment][:section] = @context.course_sections.active.find params[:enrollment].delete(:course_section_id)
+      @section = @context.course_sections.active.find params[:enrollment].delete(:course_section_id)
+      params[:enrollment][:section] = @section
     end
     api_user_id = params[:enrollment].delete(:user_id)
     user = api_find(User, api_user_id)
     raise(ActiveRecord::RecordNotFound, "Couldn't find User with API id '#{api_user_id}'") unless user.can_be_enrolled_in_course?(@context)
+
+    if @context.concluded?
+      # allow moving users already in the course to open sections
+      unless @section && user.enrollments.where(course_id: @context).exists? && !@section.concluded?
+        return render_create_errors([@@errors[:concluded_course]])
+      end
+    end
+
     @enrollment = @context.enroll_user(user, type, params[:enrollment].merge(:allow_multiple_enrollments => true))
     @enrollment.valid? ?
       render(:json => enrollment_json(@enrollment, @current_user, session)) :
@@ -458,7 +502,7 @@ class EnrollmentsApiController < ApplicationController
     if authorized_action(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
       scope = @context.enrollments_visible_to(@current_user, :type => :all, :include_priors => true).where(enrollment_index_conditions)
       unless params[:state].present?
-        scope = scope.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')")
+        scope = scope.active_or_pending
       end
       scope
     else
@@ -479,7 +523,7 @@ class EnrollmentsApiController < ApplicationController
       if params[:state].present?
         enrollments = user.enrollments.where(enrollment_index_conditions(true))
       else
-        enrollments = user.current_and_invited_enrollments.where(enrollment_index_conditions)
+        enrollments = user.enrollments.current_and_invited.where(enrollment_index_conditions)
       end
     else
       # otherwise check for read_roster rights on all of the requested
@@ -502,6 +546,8 @@ class EnrollmentsApiController < ApplicationController
       enrollments = enrollments.where(workflow_state: %w{active invited}) unless params[:state].present?
     end
 
+    @shard_scope = user
+
     enrollments
   end
 
@@ -511,13 +557,25 @@ class EnrollmentsApiController < ApplicationController
   #
   # Returns [ sql fragment string, replacement hash ]
   def enrollment_index_conditions(use_course_state = false)
-    type, state, role = params.values_at(:type, :state, :role)
+    type, state, role_names, role_ids = params.values_at(:type, :state, :role, :role_id)
     clauses = []
     replacements = {}
 
-    if role.present?
-      clauses << 'COALESCE (enrollments.role_name, enrollments.type) IN (:role)'
-      replacements[:role] = Array(role)
+    if !role_ids.present? && role_names.present?
+      role_ids = Array(role_names).map{|name| @context.account.get_course_role_by_name(name).id}
+    end
+
+    if role_ids.present?
+      role_ids = Array(role_ids).map(&:to_i)
+      condition = 'enrollments.role_id IN (:role_ids)'
+      replacements[:role_ids] = role_ids
+
+      built_in_roles = role_ids.map{|r_id| Role.built_in_roles_by_id[r_id]}.compact
+      if built_in_roles.present?
+        condition = "(#{condition} OR (enrollments.role_id IS NULL AND enrollments.type IN (:built_in_role_types)))"
+        replacements[:built_in_role_types] = built_in_roles.map(&:name)
+      end
+      clauses << condition
     elsif type.present?
       clauses << 'enrollments.type IN (:type)'
       replacements[:type] = Array(type)

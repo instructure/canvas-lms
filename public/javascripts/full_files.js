@@ -40,8 +40,7 @@ define([
   'media_comments' /* mediaComment */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/droppable' /* /\.droppable/ */,
-  'jqueryui/progressbar' /* /\.progressbar/ */,
-  'vendor/scribd.view' /* scribd */
+  'jqueryui/progressbar' /* /\.progressbar/ */
 ], function(_, INST, I18n, $, htmlEscape) {
 
   if(typeof ENV.contexts === "string"){
@@ -193,7 +192,7 @@ define([
                       importFailed(zfi.data.errors);
                     } else if(zfi && zfi.workflow_state == 'imported') {
                       $progress.progressbar('value', 100);
-                      $dialog.append(I18n.t('messages.extraction_complete', "Extraction complete!  Updating..."));
+                      $dialog.append(htmlEscape(I18n.t('messages.extraction_complete', "Extraction complete!  Updating...")));
                       files.refreshContext(folder.context_string, function() {
                         $dialog.dialog('close');
                       });
@@ -588,6 +587,7 @@ define([
           $(ui.helper).find(".header .sub_header").html("&nbsp;");
         }
       },
+      // xsslint jqueryObject.method breadcrumb
       breadcrumb: function() {
         var folders = location.hash.substring(1).replace(/\/\//g, "\\").split("/");
         var $crumbs = $("<div/>");
@@ -977,7 +977,7 @@ define([
 
           $content.find(".lock_item_link").showIf(!data.currently_locked);
           $content.find(".unlock_item_link").showIf(data.currently_locked);
-          $content.find(".preview_item_link").showIf(data.scribd_doc || data.content_type.match(/image/) || (data.content_type.match(/(video|audio)/) && data.media_entry_id));
+          $content.find(".preview_item_link").showIf(data.content_type.match(/image/) || (data.content_type.match(/(video|audio)/) && data.media_entry_id));
           // Need to be careful on this one... we can't let students turn in a
           // file and then edit it after the fact...
           $content.find(".edit_item_content_link_holder").showIf($content.hasClass('editable_folder_item') && data.context_type != 'User' && ($content.hasClass('text') || $content.hasClass('html') || $content.hasClass('code')));
@@ -1414,11 +1414,11 @@ define([
             if(node.hasClass('node')) {
               var folder_url = $.replaceTags($("." + data.context_string + "_folder_url").attr('href'), 'id', data.id);
               var cancelled = false;
-              var $no_content = $("<li class='message'>" + I18n.t('messages.folder_empty', "Nothing in this Folder") + "</li>");
+              var $no_content = $("<li class='message'>" + htmlEscape(I18n.t('messages.folder_empty', "Nothing in this Folder")) + "</li>");
               if(node.hasClass('folder')) {
                 if(!data || !data.permissions || !data.permissions.read_contents) {
                   $files_content.find(".content_panel:last")
-                                .after("<li class='message'>" + I18n.t('messages.access_denied', "You cannot read the contents of this folder.") + "</li>");
+                                .after("<li class='message'>" + htmlEscape(I18n.t('messages.access_denied', "You cannot read the contents of this folder.")) + "</li>");
                   cancelled = true;
                 } else {
                   // add a control panel to the top for adding files, folders to this
@@ -1551,7 +1551,7 @@ define([
                   $panel.addClass('panel_locked');
                 } else if (data && data.permissions && data.permissions.download && $.isPreviewable(data.content_type)) {
                   // show an inline preview
-                  $preview = $("#content_templates .file_scribd_preview").clone(true);
+                  $preview = $("#content_templates .file_preview_container").clone(true);
                   $preview.append("<div id='doc_preview_holder'/>");
                 } else {
                   // show a few more details about the file, preview if possible
@@ -1587,8 +1587,6 @@ define([
                       height: '100%',
                       crocodoc_session_url: data.crocodoc_session_url,
                       canvadoc_session_url: data.canvadoc_session_url,
-                      scribd_doc_id: data.scribd_doc && data.scribd_doc.attributes && data.scribd_doc.attributes.doc_id,
-                      scribd_access_key: data.scribd_doc && data.scribd_doc.attributes && data.scribd_doc.attributes.access_key,
                       attachment_view_inline_ping_url: files.viewInlinePingUrl(data.context_string, data.id),
                       attachment_scribd_render_url: files.scribdRenderUrl(data.context_string, data.id),
                       attachment_preview_processing: data.workflow_state == 'pending_upload' || data.workflow_state == 'processing'
@@ -1632,6 +1630,34 @@ define([
         event.preventDefault();
         INST.downloadFolderFiles($(this).find(".download_zip_link").attr('href'));
       });
+
+      /**
+       * swaps in a version of tinymce that will be *very* loose
+       * with what elements it strips out as invalid. The *[*]
+       * below basically means "any elements with any attributes are ok"
+       * for this editor.
+       *
+       * @private
+       * @param {jQuery Object} textarea the DOM element to wrap
+       *    tinymce around.
+       */
+      function initTiny(textarea){
+        textarea.editorBox({
+          tinyOptions: {
+            valid_elements: '*[*]',
+            extended_valid_elements: '*[*]',
+            plugins: "autolink,media,paste,table",
+            external_plugins: {
+              "instructure_image": "/javascripts/tinymce_plugins/instructure_image/plugin.js",
+              "instructure_links": "/javascripts/tinymce_plugins/instructure_links/plugin.js",
+              "instructure_equation": "/javascripts/tinymce_plugins/instructure_equation/plugin.js",
+              "instructure_equella": "/javascripts/tinymce_plugins/instructure_equella/plugin.js",
+              "instructure_external_tools": "/javascripts/tinymce_plugins/instructure_external_tools/plugin.js"
+            }
+          }
+        });
+        textarea.data('tinyIsVisible', !textarea.data('tinyIsVisible'));
+      }
 
       $(".folder_item .edit_item_content_link").click(function(event) {
         event.preventDefault();
@@ -1694,14 +1720,7 @@ define([
                   setTimeout(function(){
                     $dialog.find('.html_edit_warning').fadeIn();
                   }, 250);
-                  $textarea.editorBox({
-                    tinyOptions: {
-                      valid_elements: '*[*]',
-                      extended_valid_elements: '*[*]',
-                      plugins: "autolink,instructure_external_tools,instructure_contextmenu,instructure_links,instructure_image,instructure_equation,instructure_equella,media,paste,table,inlinepopups"
-                    }
-                  });
-                  $textarea.data('tinyIsVisible', !tinyIsVisible);
+                  initTiny($textarea);
                 }
               });
             }

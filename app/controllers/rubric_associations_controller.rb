@@ -57,7 +57,7 @@ class RubricAssociationsController < ApplicationController
       # and this was the last place it was being used in the course,
       # go ahead and delete the rubric from the course.
       association_count = RubricAssociation.where(:context_id => @context, :context_type => @context.class.to_s, :rubric_id => @rubric).for_grading.count
-      if !RubricAssociation.for_purpose('bookmark').find_by_rubric_id(@rubric.id) && association_count == 0
+      if !RubricAssociation.for_purpose('bookmark').where(rubric_id: @rubric).first && association_count == 0
         @rubric.destroy_for(@context)
       end
       render :json => @association

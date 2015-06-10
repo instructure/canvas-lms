@@ -30,8 +30,14 @@ class Thumbnail < ActiveRecord::Base
       :storage => (Attachment.local_storage? ? :file_system : :s3),
       :path_prefix => Attachment.file_store_config['path_prefix'],
       :s3_access => :private,
-      :keep_profile => true
+      :keep_profile => true,
+      :thumbnail_max_image_size_pixels => Setting.get('thumbnail_max_image_size_pixels', 100_000_000).to_i
   )
+
+  before_save :set_namespace
+  def set_namespace
+    self.namespace = attachment.namespace
+  end
 
   def local_storage_path
     "#{HostUrl.context_host(attachment.context)}/images/thumbnails/show/#{id}/#{uuid}"

@@ -48,7 +48,15 @@ module Api::V1::Submission
         sc_hash['attachments'] = sc.attachments.map do |a|
           attachment_json(a, user)
         end unless sc.attachments.blank?
-        sc_hash['author'] = user_display_json(sc.author, sc.context)
+        if sc.grants_right?(@current_user, :read_author)
+          sc_hash['author'] = user_display_json(sc.author, sc.context)
+        else
+          sc_hash.merge!({
+            author: {},
+            author_id: nil,
+            author_name: I18n.t("Anonymous User")
+          })
+        end
         sc_hash
       end
     end
@@ -68,11 +76,15 @@ module Api::V1::Submission
     end
 
     if includes.include?("html_url")
-      hash['html_url'] = course_assignment_submission_url(submission.context.id, assignment.id, user.id)
+      hash['html_url'] = course_assignment_submission_url(submission.context.id, assignment.id, submission.user.id)
     end
 
     if includes.include?("user")
       hash['user'] = user_json(submission.user, user, session, ['avatar_url'], submission.context, nil)
+    end
+
+    if includes.include?("visibility")
+      hash['assignment_visible'] = submission.assignment_visible_to_user?(submission.user)
     end
 
     hash
@@ -114,7 +126,7 @@ module Api::V1::Submission
       hash['media_comment'] = media_comment_json(:media_id => attempt.media_comment_id, :media_type => attempt.media_comment_type)
     end
 
-    if attempt.turnitin_data && attempt.grants_right?(@current_user, :view_turnitin_report)
+    if attempt.turnitin_data.present? && attempt.grants_right?(@current_user, :view_turnitin_report)
       turnitin_hash = attempt.turnitin_data.dup
       turnitin_hash.delete(:last_processed_attempt)
       hash['turnitin_data'] = turnitin_hash
@@ -126,7 +138,8 @@ module Api::V1::Submission
       hash['attachments'] = attachments.map do |attachment|
         attachment.skip_submission_attachment_lock_checks = true
         atjson = attachment_json(attachment, user, {},
-                                 submission_attachment: true)
+                                 submission_attachment: true,
+                                 include: ['preview_url'])
         attachment.skip_submission_attachment_lock_checks = false
         atjson
       end.compact unless attachments.blank?
@@ -139,7 +152,7 @@ module Api::V1::Submission
       # group assignments will have a child topic for each group.
       # it's also possible the student posted in the main topic, as well as the
       # individual group one. so we search far and wide for all student entries.
-      if assignment.has_group_category?
+      if assignment.discussion_topic.has_group_category?
         entries = assignment.discussion_topic.child_topics.map {|t| t.discussion_entries.active.for_user(attempt.user_id) }.flatten.sort_by{|e| e.created_at}
       else
         entries = assignment.discussion_topic.discussion_entries.active.for_user(attempt.user_id)
@@ -202,4 +215,3 @@ module Api::V1::Submission
     attachment
   end
 end
-

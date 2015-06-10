@@ -22,26 +22,29 @@ require 'csv'
 
 describe GradebookImporter do
   context "construction" do
-
     it "should require a context, usually a course" do
-      lambda{GradebookImporter.new(1)}.should raise_error(ArgumentError, "Must provide a valid context for this gradebook.")
-      lambda{GradebookImporter.new(course_model, valid_gradebook_contents)}.should_not raise_error
+      course = course_model
+      user = user_model
+      progress = Progress.create!(tag: "test", context: @user)
+
+      expect{GradebookImporter.new(1)}.to raise_error(ArgumentError, "Must provide a valid context for this gradebook.")
+      expect{GradebookImporter.new(course, valid_gradebook_contents, user, progress)}.not_to raise_error
     end
 
     it "should store the context and make it available" do
       course_model
       new_gradebook_importer
-      @gi.context.should be_is_a(Course)
+      expect(@gi.context).to be_is_a(Course)
     end
 
     it "should require the contents of an upload" do
-      lambda{GradebookImporter.new(course_model)}.should raise_error(ArgumentError, "Must provide CSV contents.")
+      expect{GradebookImporter.new(course_model)}.to raise_error(ArgumentError, "Must provide CSV contents.")
     end
 
     it "should store the contents and make them available" do
       course_model
       new_gradebook_importer
-      @gi.contents.should_not be_nil
+      expect(@gi.contents).not_to be_nil
     end
 
     it "should handle points possible being sorted in weird places" do
@@ -51,9 +54,9 @@ describe GradebookImporter do
         '"Blend, Bill",6,My Course,-,',
         'Points Possible,,,10,',
         '"Farner, Todd",4,My Course,-,')
-      @gi.assignments.length.should == 1
-      @gi.assignments.first.points_possible.should == 10
-      @gi.students.length.should == 2
+      expect(@gi.assignments.length).to eq 1
+      expect(@gi.assignments.first.points_possible).to eq 10
+      expect(@gi.students.length).to eq 2
     end
 
     it "should handle muted line and being sorted in weird places" do
@@ -64,9 +67,15 @@ describe GradebookImporter do
           'Points Possible,,,10,',
           ', ,,Muted,',
           '"Farner, Todd",4,My Course,-,')
-      @gi.assignments.length.should == 1
-      @gi.assignments.first.points_possible.should == 10
-      @gi.students.length.should == 2
+      expect(@gi.assignments.length).to eq 1
+      expect(@gi.assignments.first.points_possible).to eq 10
+      expect(@gi.students.length).to eq 2
+    end
+
+    it "creates a GradebookUpload" do
+      course_model
+      new_gradebook_importer
+      expect(GradebookUpload.where(course_id: @course, user_id: @user)).not_to be_empty
     end
   end
 
@@ -112,25 +121,25 @@ describe GradebookImporter do
       importer_with_rows(uploaded_csv)
       hash = @gi.as_json
 
-      hash[:students][0][:id].should == @u1.id
-      hash[:students][0][:previous_id].should == @u1.id
-      hash[:students][0][:name].should eql(@u1.name)
+      expect(hash[:students][0][:id]).to eq @u1.id
+      expect(hash[:students][0][:previous_id]).to eq @u1.id
+      expect(hash[:students][0][:name]).to eql(@u1.name)
 
-      hash[:students][1][:id].should == @u2.id
-      hash[:students][1][:previous_id].should == @u2.id
+      expect(hash[:students][1][:id]).to eq @u2.id
+      expect(hash[:students][1][:previous_id]).to eq @u2.id
 
-      hash[:students][2][:id].should == @u3.id
-      hash[:students][2][:previous_id].should == @u3.id
+      expect(hash[:students][2][:id]).to eq @u3.id
+      expect(hash[:students][2][:previous_id]).to eq @u3.id
 
       # Looking up by login, but there are no active pseudonyms for u4
-      hash[:students][3][:id].should < 0
-      hash[:students][3][:previous_id].should be_nil
+      expect(hash[:students][3][:id]).to be < 0
+      expect(hash[:students][3][:previous_id]).to be_nil
 
-      hash[:students][4][:id].should == @u5.id
-      hash[:students][4][:previous_id].should == @u5.id
+      expect(hash[:students][4][:id]).to eq @u5.id
+      expect(hash[:students][4][:previous_id]).to eq @u5.id
 
-      hash[:students][5][:id].should <  0
-      hash[:students][5][:previous_id].should be_nil
+      expect(hash[:students][5][:id]).to be <  0
+      expect(hash[:students][5][:previous_id]).to be_nil
     end
 
     it "should Lookup by root account" do
@@ -154,9 +163,9 @@ describe GradebookImporter do
       importer_with_rows(uploaded_csv)
       hash = @gi.as_json
 
-      hash[:students][0][:id].should == @u1.id
-      hash[:students][0][:previous_id].should == @u1.id
-      hash[:students][0][:name].should eql(@u1.name)
+      expect(hash[:students][0][:id]).to eq @u1.id
+      expect(hash[:students][0][:previous_id]).to eq @u1.id
+      expect(hash[:students][0][:name]).to eql(@u1.name)
     end
 
     it "should allow ids that look like numbers" do
@@ -185,11 +194,11 @@ describe GradebookImporter do
       importer_with_rows(uploaded_csv)
       hash = @gi.as_json
 
-      hash[:students][0][:id].should == @u0.id
-      hash[:students][0][:previous_id].should == @u0.id
+      expect(hash[:students][0][:id]).to eq @u0.id
+      expect(hash[:students][0][:previous_id]).to eq @u0.id
 
-      hash[:students][1][:id].should == @u1.id
-      hash[:students][1][:previous_id].should == @u1.id
+      expect(hash[:students][1][:id]).to eq @u1.id
+      expect(hash[:students][1][:previous_id]).to eq @u1.id
     end
   end
 
@@ -201,12 +210,12 @@ describe GradebookImporter do
         'Student,ID,Section,Assignment 1,Assignment 2',
         'Some Student,,,,'
     )
-    @gi.assignments.length.should == 2
-    @gi.assignments.first.should == @assignment1
-    @gi.assignments.last.title.should == 'Assignment 2'
-    @gi.assignments.last.should be_new_record
-    @gi.assignments.last.id.should < 0
-    @gi.missing_assignments.should == [@assignment3]
+    expect(@gi.assignments.length).to eq 2
+    expect(@gi.assignments.first).to eq @assignment1
+    expect(@gi.assignments.last.title).to eq 'Assignment 2'
+    expect(@gi.assignments.last).to be_new_record
+    expect(@gi.assignments.last.id).to be < 0
+    expect(@gi.missing_assignments).to eq [@assignment3]
   end
 
   it "should not include missing assignments if no new assignments" do
@@ -217,8 +226,8 @@ describe GradebookImporter do
         'Student,ID,Section,Assignment 1',
         'Some Student,,,'
     )
-    @gi.assignments.should == [@assignment1]
-    @gi.missing_assignments.should == []
+    expect(@gi.assignments).to eq [@assignment1]
+    expect(@gi.missing_assignments).to eq []
   end
 
   it "should not include assignments with no changes" do
@@ -227,8 +236,8 @@ describe GradebookImporter do
     importer_with_rows(
         "Student,ID,Section,Assignment 1"
     )
-    @gi.assignments.should == []
-    @gi.missing_assignments.should == []
+    expect(@gi.assignments).to eq []
+    expect(@gi.missing_assignments).to eq []
   end
 
   it "should include assignments that changed only in points possible" do
@@ -238,9 +247,9 @@ describe GradebookImporter do
         "Student,ID,Section,Assignment 1",
         "Points Possible,,,20"
     )
-    @gi.assignments.should == [@assignment1]
-    @gi.assignments.first.should be_changed
-    @gi.assignments.first.points_possible.should == 20
+    expect(@gi.assignments).to eq [@assignment1]
+    expect(@gi.assignments.first).to be_changed
+    expect(@gi.assignments.first.points_possible).to eq 20
   end
 
   it "should not try to create assignments for the totals columns" do
@@ -250,24 +259,29 @@ describe GradebookImporter do
         "Student,ID,Section,Assignment 1,Current Points,Final Points,Current Score,Final Score,Final Grade",
         "Points Possible,,,20,,,,,"
     )
-    @gi.assignments.should == [@assignment1]
-    @gi.missing_assignments.should be_empty
+    expect(@gi.assignments).to eq [@assignment1]
+    expect(@gi.missing_assignments).to be_empty
   end
 
   it "should parse new and existing users" do
     course_with_student
+    @student1 = @student
+    e = student_in_course
+    e.update_attribute :workflow_state, 'completed'
+    concluded_student = @student
     @student2 = user
     @course.enroll_student(@student2)
     importer_with_rows(
         "Student,ID,Section,Assignment 1",
-        ",#{@student.id},,10",
-        "New Student,,,12"
+        ",#{@student1.id},,10",
+        "New Student,,,12",
+        ",#{concluded_student.id},,10"
     )
-    @gi.students.length.should == 2
-    @gi.students.first.should == @student
-    @gi.students.last.should be_new_record
-    @gi.students.last.id.should < 0
-    @gi.missing_students.should == [@student2]
+    expect(@gi.students.length).to eq 2  # doesn't include concluded_student
+    expect(@gi.students.first).to eq @student1
+    expect(@gi.students.last).to be_new_record
+    expect(@gi.students.last.id).to be < 0
+    expect(@gi.missing_students).to eq [@student2]
   end
 
   it "should not include assignments that don't have any grade changes" do
@@ -278,7 +292,7 @@ describe GradebookImporter do
         "Student,ID,Section,Assignment 1",
         ",#{@student.id},,10"
     )
-    @gi.assignments.should == []
+    expect(@gi.assignments).to eq []
   end
 
   it "should include assignments that the grade changed for an existing user" do
@@ -289,11 +303,11 @@ describe GradebookImporter do
         "Student,ID,Section,Assignment 1",
         ",#{@student.id},,10"
     )
-    @gi.assignments.should == [@assignment1]
-    submission = @gi.students.first.read_attribute(:submissions).first
-    submission['original_grade'].should == '8'
-    submission['grade'].should == '10'
-    submission['assignment_id'].should == @assignment1.id
+    expect(@gi.assignments).to eq [@assignment1]
+    submission = @gi.students.first.gradebook_importer_submissions.first
+    expect(submission['original_grade']).to eq '8'
+    expect(submission['grade']).to eq '10'
+    expect(submission['assignment_id']).to eq @assignment1.id
   end
 
   context "to_json" do
@@ -304,25 +318,77 @@ describe GradebookImporter do
 
     it "should have a simplified json output" do
       hash = @gi.as_json
-      hash.keys.sort.should eql([:assignments, :missing_objects, :original_submissions, :students, :unchanged_assignments])
+      expect(hash.keys.sort).to eql([:assignments, :missing_objects, :original_submissions, :students, :unchanged_assignments])
       students = hash[:students]
-      students.should be_is_a(Array)
+      expect(students).to be_is_a(Array)
       student = students.first
-      student.keys.sort.should eql([:id, :last_name_first, :name, :previous_id, :submissions])
+      expect(student.keys.sort).to eql([:id, :last_name_first, :name, :previous_id, :submissions])
       submissions = student[:submissions]
-      submissions.should be_is_a(Array)
+      expect(submissions).to be_is_a(Array)
       submission = submissions.first
-      submission.keys.sort.should eql(["assignment_id", "grade", "original_grade"])
+      expect(submission.keys.sort).to eql(["assignment_id", "grade", "original_grade"])
       assignments = hash[:assignments]
-      assignments.should be_is_a(Array)
+      expect(assignments).to be_is_a(Array)
       assignment = assignments.first
-      assignment.keys.sort.should eql([:grading_type, :id, :points_possible, :previous_id, :title])
+      expect(assignment.keys.sort).to eql([:grading_type, :id, :points_possible, :previous_id, :title])
+    end
+  end
+
+  context "differentiated assignments" do
+    def setup_DA
+      course_with_teacher(active_all: true, differentiated_assignments: true)
+      @section_one = @course.course_sections.create!(name: 'Section One')
+      @section_two = @course.course_sections.create!(name: 'Section Two')
+
+      @student_one = student_in_section(@section_one)
+      @student_two = student_in_section(@section_two)
+
+      @assignment_one = assignment_model(course: @course, title: "a1")
+      @assignment_two = assignment_model(course: @course, title: "a2")
+
+      differentiated_assignment(assignment: @assignment_one, course_section: @section_one)
+      differentiated_assignment(assignment: @assignment_two, course_section: @section_two)
+    end
+
+    before :once do
+      setup_DA
+    end
+
+    it "should ignore submissions for students without visibility" do
+      @assignment_one.grade_student(@student_one, :grade => "3")
+      @assignment_two.grade_student(@student_two, :grade => "3")
+      importer_with_rows(
+        "Student,ID,Section,a1,a2",
+        ",#{@student_one.id},#{@section_one.id},7,9",
+        ",#{@student_two.id},#{@section_two.id},7,9"
+      )
+      json = @gi.as_json
+      expect(json[:students][0][:submissions][0]["grade"]).to eq "7"
+      expect(json[:students][0][:submissions][1]["grade"]).to eq ""
+      expect(json[:students][1][:submissions][0]["grade"]).to eq ""
+      expect(json[:students][1][:submissions][1]["grade"]).to eq "9"
+    end
+
+    it "should not break the creation of new assignments" do
+      importer_with_rows(
+          "Student,ID,Section,a1,a2,a3",
+          "#{@student_one.name},#{@student_one.id},,1,2,3"
+      )
+      expect(@gi.assignments.last.title).to eq 'a3'
+      expect(@gi.assignments.last).to be_new_record
+      expect(@gi.assignments.last.id).to be < 0
+      json = @gi.as_json
+      expect(json[:students][0][:submissions].first["grade"]).to eq "1"
+      expect(json[:students][0][:submissions].last["grade"]).to eq "3"
     end
   end
 end
 
 def new_gradebook_importer(contents = valid_gradebook_contents)
-  @gi = GradebookImporter.new(@course, contents)
+  @user = user_model
+  @progress = Progress.create!(tag: "test", context: @user)
+
+  @gi = GradebookImporter.new(@course, contents, @user, @progress)
   @gi.parse!
   @gi
 end

@@ -1,0 +1,24 @@
+<form class="bootstrap-form form-inline modules-create-item-form">
+
+  {{input
+    autofocus="true"
+    type="text"
+    class="span4"
+    value=model.title
+    placeholder=text.headerName
+    aria-label=text.headerName
+  }}
+
+  <button
+    class="btn btn-primary"
+    type="submit"
+    {{action "create"}}
+  >{{#t "create_header"}}Create Header{{/t}}</button>
+
+  <button
+    class="btn"
+    type="button"
+    {{action "cancel"}}
+  >{{#t "cancel"}}Cancel{{/t}}</button>
+</form>
+

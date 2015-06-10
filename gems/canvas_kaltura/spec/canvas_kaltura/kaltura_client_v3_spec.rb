@@ -67,6 +67,13 @@ describe CanvasKaltura::ClientV3 do
       })
       expect(url).to eq "https://www.instructuremedia.com/p/100/thumbnail/entry_id/0_123evil/width/0/height/0/bgcolor/ec/type/0/vid_sec/0"
     end
+
+    it "should allow properly formed notorious-style media ids through without mangling" do
+      url = @kaltura.thumbnail_url('m-9w7egf9e2gduowehf08dshfsd')
+      expect(url).to eq(
+        "https://www.instructuremedia.com/p/100/thumbnail/entry_id/m-9w7egf9e2gduowehf08dshfsd/width/140/height/100/bgcolor/ffffff/type/2/vid_sec/5"
+      )
+    end
   end
 
   describe "sort_source_list" do

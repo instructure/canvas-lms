@@ -42,7 +42,7 @@ module CC
           @added_attachment_ids << file.id
           path = File.join(folder_names, file.display_name)
           migration_id = CCHelper.create_key(file)
-          if file.hidden? || file.locked
+          if file.hidden? || file.locked || file.usage_rights
             files_with_metadata[:files] << [file, migration_id]
           end
           @resources.resource(
@@ -50,13 +50,28 @@ module CC
                   :identifier => migration_id,
                   :href => path
           ) do |res|
-            if file.locked
+            if file.locked || file.usage_rights
               res.metadata do |meta_node|
                 meta_node.lom :lom do |lom_node|
-                  lom_node.lom :educational do |edu_node|
-                    edu_node.lom :intendedEndUserRole do |role_node|
-                      role_node.lom :source, "IMSGLC_CC_Rolesv1p1"
-                      role_node.lom :value, "Instructor"
+                  if file.locked
+                    lom_node.lom :educational do |edu_node|
+                      edu_node.lom :intendedEndUserRole do |role_node|
+                        role_node.lom :source, "IMSGLC_CC_Rolesv1p1"
+                        role_node.lom :value, "Instructor"
+                      end
+                    end
+                  end
+                  if file.usage_rights
+                    lom_node.lom :rights do |rights_node|
+                      rights_node.lom :copyrightAndOtherRestrictions do |node|
+                        node.lom :value, (file.usage_rights.license == 'public_domain') ? "no" : "yes"
+                      end
+                      description = []
+                      description << file.usage_rights.legal_copyright if file.usage_rights.legal_copyright.present?
+                      description << file.usage_rights.license_name unless file.usage_rights.license == 'private'
+                      rights_node.lom :description do |desc|
+                        desc.lom :string, description.join('\n')
+                      end
                     end
                   end
                 end
@@ -106,6 +121,12 @@ module CC
                 file_node.locked "true" if file.locked
                 file_node.hidden "true" if file.hidden?
                 file_node.display_name file.display_name if file.display_name != file.unencoded_filename
+                if file.usage_rights
+                  file_node.usage_rights(:use_justification => file.usage_rights.use_justification) do |node|
+                    node.legal_copyright file.usage_rights.legal_copyright if file.usage_rights.legal_copyright.present?
+                    node.license file.usage_rights.license if file.usage_rights.license.present?
+                  end
+                end
               end
             end
           end
@@ -201,9 +222,11 @@ module CC
 
           path = File.join(CCHelper::WEB_RESOURCES_FOLDER, CCHelper::MEDIA_OBJECTS_FOLDER, info[:filename])
 
-          remote_stream = open(url)
-          @zip_file.get_output_stream(path) do |stream|
-            FileUtils.copy_stream(remote_stream, stream)
+          CanvasHttp.get(url) do |http_response|
+            raise CanvasHttp::InvalidResponseCodeError.new(http_response.code.to_i) unless http_response.code.to_i == 200
+            @zip_file.get_output_stream(path) do |stream|
+              http_response.read_body(stream)
+            end
           end
 
           @resources.resource(

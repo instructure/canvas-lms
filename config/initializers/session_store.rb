@@ -17,7 +17,9 @@ config = {
 # RedisSessionStore, and EncryptedCookieStore)
 config[:expire_after] ||= 1.day
 config[:expires] = nil
+config[:logger] = Rails.logger
 session_store = config.delete(:session_store).to_sym
+session_store = :redis_store if session_store == :redis_session_store # deprecated name
 
 case session_store
 when :mem_cache_store
@@ -25,7 +27,7 @@ when :mem_cache_store
   config[:namespace] ||= config[:key]
   servers = config[:memcache_servers] || ConfigFile.load("memcache") || ['localhost:11211']
   config[:cache] ||= MemCache.new(servers, config)
-when :redis_session_store
+when :redis_store
   Bundler.require 'redis'
   config[:key_prefix] ||= config[:key]
   config[:servers] ||= config[:redis_servers] if config[:redis_servers]
@@ -36,17 +38,5 @@ when :redis_session_store
   config[:db] ||= config[:database]
 end
 
-if CANVAS_RAILS2
-  ActionController::Base.session = config
-  ActionController::Base.session_store = session_store
-else
-  CanvasRails::Application.config.session_store(session_store, config)
-  CanvasRails::Application.config.secret_token = config[:secret]
-end
-
-ActionController::Flash::FlashHash.class_eval do
-  def store(session, key = "flash")
-    return session.delete(key) if self.empty?
-    session[key] = self
-  end
-end
+CanvasRails::Application.config.session_store(session_store, config)
+CanvasRails::Application.config.secret_token = config[:secret]

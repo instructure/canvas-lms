@@ -29,6 +29,7 @@ module Api::V1::Tab
     hash = {}
     hash[:id] = tab[:css_class]
     hash[:html_url] = html_url(tab)
+    hash[:full_url] = html_url(tab, true)
     hash[:position] = tab[:position]
     hash[:hidden] = true if tab[:hidden]
     hash[:unused] = true if tab[:hidden_unused]
@@ -39,15 +40,22 @@ module Api::V1::Tab
     api_json(hash, user, session)
   end
 
-  def html_url(tab)
-    if tab[:args]
-      send(tab[:href], *tab[:args])
-    elsif tab[:no_args]
-      send(tab[:href])
+  def html_url(tab, full_url=false)
+    if full_url
+      method = tab[:href].to_s.sub(/_path$/, '_url').to_sym
+      opts = {:host => HostUrl.context_host(@context, request.try(:host_with_port))}
     else
-      send(tab[:href], @context)
+      method = tab[:href]
+      opts = {}
     end
 
+    if tab[:args]
+      send(method, *tab[:args], opts)
+    elsif tab[:no_args]
+      send(method, opts)
+    else
+      send(method, @context, opts)
+    end
   end
 
   def visibility(tab, hash)

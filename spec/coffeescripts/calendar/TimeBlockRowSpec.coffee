@@ -1,4 +1,4 @@
-require [
+define [
   'jquery'
   'compiled/calendar/TimeBlockList'
   'compiled/calendar/TimeBlockRow'
@@ -10,7 +10,7 @@ require [
 
   module "TimeBlockRow",
     setup: ->
-      @$holder = $('<table />').appendTo(document.body)
+      @$holder = $('<table />').appendTo(document.getElementById("fixtures"))
       @timeBlockList = new TimeBlockList(@$holder)
 
       # fakeTimer'd because the tests with failed validations add an error box
@@ -23,6 +23,7 @@ require [
       @clock.tick 250
       @clock.restore()
       @$holder.detach()
+      document.getElementById("fixtures").innerHTML = ""
 
   test "should init properly", ->
     me = new TimeBlockRow(@timeBlockList, {start, end})
@@ -75,7 +76,7 @@ require [
   test 'validate: end before start', ->
     me = new TimeBlockRow(@timeBlockList, {start: end, end: start})
     ok !me.validate()
-    ok me.inputs.start_time.$el.data('associated_error_box').parents('body'), 'error box is visible'
+    ok me.inputs.start_time.$el.data('associated_error_box').parents('#fixtures'), 'error box is visible'
     ok me.inputs.start_time.$el.hasClass('error'), 'has error class'
 
   test 'valid if whole row is blank', ->

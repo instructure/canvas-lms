@@ -23,7 +23,7 @@ describe IncomingMail::ReplyToAddress do
 
   describe 'initialize' do
     it 'should persist the message argument' do
-      IncomingMail::ReplyToAddress.new("some message").message.should == "some message"
+      expect(IncomingMail::ReplyToAddress.new("some message").message).to eq "some message"
     end
   end
 
@@ -32,7 +32,7 @@ describe IncomingMail::ReplyToAddress do
       message = mock()
       message.expects(:path_type).returns('sms')
 
-      IncomingMail::ReplyToAddress.new(message).address.should be_nil
+      expect(IncomingMail::ReplyToAddress.new(message).address).to be_nil
     end
 
     it 'should return the message from address for error reports' do
@@ -41,7 +41,7 @@ describe IncomingMail::ReplyToAddress do
       message.expects(:context_type).returns('ErrorReport')
       message.expects(:from).returns('user@example.com')
 
-      IncomingMail::ReplyToAddress.new(message).address.should == 'user@example.com'
+      expect(IncomingMail::ReplyToAddress.new(message).address).to eq 'user@example.com'
     end
 
     it 'should generate a reply-to address for email messages' do
@@ -53,7 +53,7 @@ describe IncomingMail::ReplyToAddress do
       message.expects(:global_id).twice.returns(1000001)
       IncomingMail::ReplyToAddress.address_pool = %w{canvas@example.com}
 
-      IncomingMail::ReplyToAddress.new(message).address.should == "canvas+#{expect_secure_id}-1000001@example.com"
+      expect(IncomingMail::ReplyToAddress.new(message).address).to eq "canvas+#{expect_secure_id}-1000001@example.com"
     end
   end
 
@@ -62,7 +62,7 @@ describe IncomingMail::ReplyToAddress do
       message       = mock()
       message.expects(:global_id).returns(1000001)
 
-      IncomingMail::ReplyToAddress.new(message).secure_id.should == expect_secure_id
+      expect(IncomingMail::ReplyToAddress.new(message).secure_id).to eq expect_secure_id
     end
   end
 
@@ -71,7 +71,7 @@ describe IncomingMail::ReplyToAddress do
       pool = %w{canvas@example.com canvas2@example.com}
       IncomingMail::ReplyToAddress.address_pool = pool
 
-      IncomingMail::ReplyToAddress.instance_variable_get(:@address_pool).should == pool
+      expect(IncomingMail::ReplyToAddress.instance_variable_get(:@address_pool)).to eq pool
     end
   end
 
@@ -83,17 +83,17 @@ describe IncomingMail::ReplyToAddress do
       message2.expects(:id).twice.returns(15)
       IncomingMail::ReplyToAddress.address_pool = %w{canvas@example.com canvas2@example.com}
 
-      IncomingMail::ReplyToAddress.address_from_pool(message).should  == 'canvas@example.com'
-      IncomingMail::ReplyToAddress.address_from_pool(message2).should == 'canvas2@example.com'
+      expect(IncomingMail::ReplyToAddress.address_from_pool(message)).to  eq 'canvas@example.com'
+      expect(IncomingMail::ReplyToAddress.address_from_pool(message2)).to eq 'canvas2@example.com'
     end
 
     it 'should raise EmptyReplyAddressPool if pool is empty' do
       message = mock()
       IncomingMail::ReplyToAddress.address_pool = []
 
-      lambda {
+      expect {
         IncomingMail::ReplyToAddress.address_from_pool(message)
-      }.should raise_error(IncomingMail::ReplyToAddress::EmptyReplyAddressPool)
+      }.to raise_error(IncomingMail::ReplyToAddress::EmptyReplyAddressPool)
     end
 
     it 'should randomly select a pool address if the message has no id' do
@@ -102,7 +102,7 @@ describe IncomingMail::ReplyToAddress do
       message.expects(:id).returns(nil)
       IncomingMail::ReplyToAddress.address_pool = %w{canvas@example.com}
 
-      IncomingMail::ReplyToAddress.address_from_pool(message).should  == 'canvas@example.com'
+      expect(IncomingMail::ReplyToAddress.address_from_pool(message)).to  eq 'canvas@example.com'
     end
   end
 end

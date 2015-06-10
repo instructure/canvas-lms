@@ -1,0 +1,369 @@
+@import "base/environment";
+@import "pages/agenda/agenda_view_minical";
+
+@if $use_new_styles == false {
+  body { background: #E8ECEF; }
+}
+
+.ic-app-main-content__secondary {
+  @include breakpoint(desktop) {
+    flex: 0 0 $ic-sp*24;
+  }
+}
+
+#right-side {
+  @if $use_new_styles {
+    padding: $ic-sp;
+    background: $lightBackground;
+    border: 1px solid $ic-border-light;
+  }
+  @else {
+    margin: 0;
+    margin-left: 20px;
+    width: 240px;
+    padding: 13px;
+    background-color: #d3d9df;
+  }
+
+  .element_toggler {
+    @if $use_new_styles {
+      padding: 0;
+      font-weight: 500;
+      font-size: 14px;
+      line-height: 1.3;
+    }
+    @else {
+      padding: 5px;
+      font-size: 15px;
+      font-weight: bold;
+      &:hover, &:focus {
+        background-color: #DBE0E6;
+        border-radius: 3px;
+      }
+    }
+
+    i { vertical-align: middle; }
+  }
+}
+
+.agenda-wrapper {
+  background-color: #fff;
+  border: 1px solid #C6CDD4;
+  border-radius: 3px;
+
+  display: none;
+  &.active {
+    display: block;
+  }
+
+  .item-group-container {
+    background: none;
+    padding: 0;
+  }
+}
+
+.agenda-day {
+  border-bottom: 1px dashed #D9DBDC;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+
+  .item-group-condensed {
+    padding: 0;
+    border: none;
+  }
+
+  &.agenda-today {
+    background-color: #FEF6E8;
+  }
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.agenda-date {
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1.5;
+  margin: 0;
+  flex: 0 0 90px;
+  @include breakpoint(desktop) { flex: 0 0 125px; }
+}
+
+.agenda-events { flex: 1; }
+
+span.agendaView--no-assignments {
+  display: block;
+  padding: 10px;
+  font-size: 13px;
+}
+#calendar-app .agenda-event {
+  margin: 0;
+  outline: none;
+
+  .ig-row {
+    border: none;
+    box-shadow: none;
+    background: none;
+    border-radius: 3px;
+    padding: $ic-sp/2;
+
+    &:hover, &:focus {
+      background-color: #F2F4F6;
+      outline: none;
+    }
+  }
+  @include breakpoint(desktop) {
+    .ig-details {
+      justify-content: flex-start;
+      > * { 
+        flex: 0 1 auto;
+        padding: 0;
+        margin-right: $ic-sp/3;
+      }
+    }
+  }
+  .ig-title {
+    background: none;
+    font-weight: normal;
+    // override standard width for .ig-title or it looks too scrunched up
+    @include breakpoint(desktop) { flex: 1.34; }
+  }
+
+}
+
+.agenda-actions {
+  margin-left: 10%;
+  .agenda-load-btn {
+    margin-bottom: 20px;
+  }
+}
+
+#calendar_header {
+  .navigation_buttons {
+    bottom: 0;
+    margin-left: 6px;
+    .ui-button {
+      padding: 8px;
+      i:before {
+        font-size: 10px;
+      }
+    }
+  }
+
+  .ui-buttonset .ui-button {
+    vertical-align: middle;
+  }
+
+  .navigation_title, .appointment_group_title {
+    vertical-align: middle;
+    @if $use_new_styles { padding-left: $ic-sp/4; }
+    @else { padding-left: 12px; } 
+  }
+
+  #refresh_calendar_link {
+    display: none;
+    float: none;
+    margin-right: 8px;
+    &.loading {
+      display: inline-block;
+      cursor: default;
+    }
+  }
+}
+
+// Restore some missing drag styles from fullcalendar css
+#calendar-drag-and-drop-container .fc-event {
+  border-width: 1px;
+  border-radius: 3px;
+}
+
+#calendar-app,#calendar-drag-and-drop-container {
+  .fc-content {
+    background: none;
+  }
+
+  .fc-view-agendaWeek {
+    .fc-widget-header {
+        background: none;
+        border-left: none;
+        @if $use_new_styles { color: $ic-font-color--subdued; }
+        @else { color: #627382; }
+    }
+
+    .fc-agenda-slots td div {
+      /* this value needs to match the calculated value of .fc-agenda-axis
+       * below, or event height will be wrong will dragging to resize in
+       * week view */
+      height: 27px;
+    }
+
+    .fc-agenda-axis {
+      border-color: #DADADA;
+      padding: 3px 6px;
+    }
+
+    .fc-agenda-days {
+      thead .fc-first {
+        height: 32px;
+      }
+
+      .fc-widget-header {
+        border-right: none;
+        text-transform: uppercase;
+
+        &.fc-first {
+          border-bottom: none;
+        }
+      }
+
+      .fc-widget-content {
+        background-color: white;
+      }
+
+      .fc-widget-content.fc-state-highlight {
+        background-color: #FEF6E8;
+      }
+    }
+
+    .fc-event {
+      white-space: nowrap;
+    }
+
+    .calendar-nowline {
+      background-color: #FACE90;
+      position: absolute;
+      right: 0;
+      height: 2px;
+    }
+  }
+
+  .fc-view-month {
+    .fc-widget-header {
+      background: none;
+      text-transform: uppercase;
+      border-left: none;
+      border-right: none;
+    }
+
+    tbody {
+      background-color: white;
+    }
+  }
+
+  .fc-other-month {
+    background: none;
+  }
+
+  .fc-state-highlight {
+    background-color: #fef6e8;
+    box-shadow: none;
+  }
+
+  .fc-event {
+    background-color: white;
+    @if $use_new_styles { 
+      line-height: 1.3;
+      padding: $ic-sp/4;
+    }
+    i {
+      margin-right: 2px;
+    }
+  }
+
+  .fc-grid .fc-day-number {
+    padding: 1px 4px;
+  }
+
+  .loading-spinner {
+    display: inline-block;
+    background-image: url("/images/ajax-loader-black-on-white.gif");
+    background-position: 50% 50%;
+    height: 16px;
+    margin-left: 3px;
+    position: relative;
+    top: 8px;
+    width: 16px;
+  }
+}
+
+.rs-section {
+  border: none;
+  padding: 0;
+  @if $use_new_styles { 
+    margin: 0 0 $ic-sp*2;
+    &:last-of-type { margin-bottom: 0; } 
+  }
+  @else { margin: 13px 0; }
+}
+
+#context-list-holder, #undated-events {
+  background-color: #fff;
+  max-height: 300px;
+  overflow-y: auto;
+  @if $use_new_styles {
+    border: 1px solid $ic-border-light;
+    padding: $ic-sp/2;
+  }
+  @else {
+    border: 1px solid #C6CDD4;
+    border-radius: 3px;
+    padding: 10px;
+  }
+  ul { 
+    margin-bottom: 10px;
+    @if $use_new_styles {
+      &:last-of-type { margin-bottom: 0; }
+    }
+  }
+}
+
+#context-list {
+  padding: 0;
+  max-height: none;
+  .context_list_context {
+    @if $use_new_styles { padding: 1px $ic-sp/2; }
+    @else { padding: 3px; }
+  }
+  .context-list-toggle-box {
+    border-radius: 2px;
+    margin-left: 0;
+  }
+  label {
+    display: inline;
+    @if $use_new_styles { 
+      font-size: 13px;
+      font-weight: 500;
+    }
+  }
+  .checked label {
+    @if $use_new_styles { font-weight: 500; }
+    @else { font-weight: bold; }
+  }
+}
+
+#undated-events {
+  display: none;
+  .event {
+    background-color: #fff;
+    line-height: 24px;
+    .undated_event_title {
+      color: inherit;
+    }
+  }
+}
+
+.ig-row {
+  cursor: pointer;
+  border-bottom: none;
+  border-top: none;
+  .icon-settings {
+    color: #bbb;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    &:hover {
+      color: #444;
+    }
+  }
+}

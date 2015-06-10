@@ -1,0 +1,26 @@
+#users {
+  border-collapse: collapse;
+  width: 100%;
+  th {
+    font-weight: bold;
+  }
+  td, th {
+    border-bottom: 1px dotted #ccc;
+  }
+  .name {
+    padding: 2px 20px 2px 5px;
+  }
+  .email {
+    font-size: 0.8em;
+    color: #888;
+    padding-left: 10px;
+  }
+  .type {
+    color: #888;
+    font-size: 0.8em;
+    padding: 2px 20px 2px 0;
+  }
+  .score {
+    padding: 2px 5px 2px 20px;
+  }
+}

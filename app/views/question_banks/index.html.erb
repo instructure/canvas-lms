@@ -48,7 +48,7 @@
 <% end %>
 
 <div class="quiz-header">
-  <h2>
+  <h1>
     <% case @context.class.to_s %>
       <% when 'Course' %>
         <%= t 'course_question_banks', "Course Question Banks" %>
@@ -57,7 +57,7 @@
       <% when 'Account' %>
         <%= t 'account_question_banks', "Account Question Banks" %>
     <% end %>
-  </h2>
+  </h1>
 </div>
 <% if @context != @current_user %>
   <%= render :partial => "question_bank" %>

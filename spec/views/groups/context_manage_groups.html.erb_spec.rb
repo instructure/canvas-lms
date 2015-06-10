@@ -28,7 +28,7 @@ describe "/groups/context_manage_groups" do
     assigns[:memberships] = []
     assigns[:groups] = []
     render "groups/context_manage_groups"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

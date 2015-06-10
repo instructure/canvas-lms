@@ -2,21 +2,15 @@
 <% cc = asset.is_a?(CommunicationChannel) ? asset : (p.communication_channel || p.user.communication_channel) %>
 
 <% define_content :link do %>
-  <% if p.user.registered? %>
-    <%= HostUrl.protocol %>://<%= HostUrl.context_host((p.account rescue nil)) %>/pseudonyms/<%= p.id %>/change_password/<%= cc.confirmation_code %>
-  <% else %>
-    <%= HostUrl.protocol %>://<%= HostUrl.context_host((p.account rescue nil)) %>/register/<%= cc.confirmation_code %>
-  <% end %>
+  <%= p.user.registered? ? confirm_change_password_url(p, cc.confirmation_code) : registration_confirmation_url(cc.confirmation_code) %>
 <% end %>
 
 <% define_content :subject do %>
   <%= t :subject, "Finish Registration: Canvas" %>
 <% end %>
 
-<% define_content :footer_link do %>
-  <a href="<%= content(:link) %>">
-    <%= t :link, "Click here to finish the registration process" %>
-  </a>
-<% end %>
+<a href="<%= content(:link) %>">
+  <%= t :link, "Click here to finish the registration process" %>
+</a>
 
 <p><%= t :body, "You have been registered for a Canvas account at %{account}!  Before you can log in and start using Canvas, you'll need to finish the configuration process.", :account => p.account.display_name %></p>

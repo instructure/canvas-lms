@@ -173,10 +173,10 @@ class CourseAuditApiController < AuditorApiController
   #
   # List course change events for a given course.
   #
-  # @argument start_time [Optional, DateTime]
+  # @argument start_time [DateTime]
   #   The beginning of the time range from which you want events.
   #
-  # @argument end_time [Optional, Datetime]
+  # @argument end_time [Datetime]
   #   The end of the time range from which you want events.
   #
   # @returns [CourseEvent]

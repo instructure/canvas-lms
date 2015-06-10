@@ -1,0 +1,5 @@
+test:
+  url: https://testrails.url.com
+  username: user@email.com
+  password: password
+  run_id: 3

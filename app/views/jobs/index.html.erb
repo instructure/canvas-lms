@@ -151,7 +151,7 @@
 
 <%
 jobs_opts = {
-  :max_attempts => Delayed::Worker.max_attempts,
+  :max_attempts => Delayed::Settings.max_attempts,
   :flavor => @flavor,
   :url => jobs_url(:only => :jobs),
   :batch_update_url => batch_update_jobs_url,

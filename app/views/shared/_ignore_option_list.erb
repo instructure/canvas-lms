@@ -1,0 +1,23 @@
+<div class="IgnoreButton al-dropbown__container">
+  <a class="<%= todo_link_classes(type) %>"
+     aria-haspopup="true"
+     title="<%= t('Ignore this assignment') %>"
+     href="#"
+     data-api-href="<%= todo_ignore_api_url(type, item) %>"
+     data-popup-within="body"
+  >
+    <i class="icon-x"></i>
+    <span class="screenreader-only"><%= t('Ignore') %></span>
+  </a>
+
+  <% if type.to_sym == :grading %>
+  <ul id="ignore_dropdown" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="ignore_dropdown">
+    <li role="presentation">
+      <a href="#" id="ignore_forever" class="icon-trash disable-todo-item-link" tabindex="-1" role="menuitem" data-api-href="<%= todo_ignore_api_url(type, item, true) %>" title="<%= t('Ignore') %>"><%= t('Ignore') %></a>
+    </li>
+    <li role="presentation">
+      <a href="#" id="ignore_until_submission" class="icon-star disable-todo-item-link" tabindex="-1" role="menuitem" data-api-href="<%= todo_ignore_api_url(type, item) %>" title="<%= t('Ignore Until New Submission') %>"><%= t('Ignore Until New Submission') %></a>
+    </li>
+  </ul>
+  <% end %>
+</div>

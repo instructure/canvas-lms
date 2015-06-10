@@ -1,0 +1,5 @@
+<% if @assignment && @assignment.description.present? %>
+  <div class="description user_content" style="margin: 20px">
+    <%= user_content(@assignment.description) %>
+  </div>
+<% end %>

@@ -37,7 +37,7 @@ module Api::V1::ContextModule
     end
     has_update_rights = context_module.grants_right?(current_user, :update)
     hash['published'] = context_module.active? if has_update_rights
-    tags = context_module.content_tags_visible_to(@current_user)
+    tags = context_module.content_tags_visible_to(@current_user, assignment_visibilities: opts[:assignment_visibilities], discussion_visibilities: opts[:discussion_visibilities], quiz_visibilities: opts[:quiz_visibilities], observed_student_ids: opts[:observed_student_ids])
     count = tags.count
     hash['items_count'] = count
     hash['items_url'] = polymorphic_url([:api_v1, context_module.context, context_module, :items])
@@ -70,14 +70,14 @@ module Api::V1::ContextModule
         when 'ExternalUrl'
           if value_to_boolean(request.params[:frame_external_urls])
             # canvas UI wants external links hosted in iframe
-            course_context_modules_item_redirect_url(:id => content_tag.id)
+            course_context_modules_item_redirect_url(:id => content_tag.id, :course_id => context_module.context.id)
           else
             # API prefers to redirect to the external page, rather than host in an iframe
-            api_v1_course_context_module_item_redirect_url(:id => content_tag.id)
+            api_v1_course_context_module_item_redirect_url(:id => content_tag.id, :course_id => context_module.context.id)
           end
         else
           # otherwise we'll link to the same thing the web UI does
-          course_context_modules_item_redirect_url(:id => content_tag.id)
+          course_context_modules_item_redirect_url(:id => content_tag.id, :course_id => context_module.context.id)
       end
     end
     
@@ -101,12 +101,14 @@ module Api::V1::ContextModule
         api_url = polymorphic_url([:api_v1, context_module.context, content_tag.content])
       # no context
       when 'Attachment'
-        api_url = polymorphic_url([:api_v1, content_tag.content])
+        api_url = polymorphic_url([:api_v1, context_module.context, content_tag.content])
       when 'ContextExternalTool'
         if content_tag.content && content_tag.content.tool_id
           api_url = sessionless_launch_url(context_module.context, :id => content_tag.content.id, :url => content_tag.content.url)
-        else
+        elsif content_tag.content
           api_url = sessionless_launch_url(context_module.context, :url => content_tag.content.url)
+        else
+          api_url = sessionless_launch_url(context_module.context, :url => content_tag.url)
         end
     end
     hash['url'] = api_url if api_url
@@ -145,7 +147,7 @@ module Api::V1::ContextModule
     item = item.assignment if item.is_a?(DiscussionTopic) && item.assignment
     item = item.overridden_for(current_user) if item.respond_to?(:overridden_for)
 
-    [:due_at, :unlock_at, :lock_at, :points_possible].each do |attr|
+    [:usage_rights, :thumbnail_url, :locked, :hidden, :lock_explanation, :display_name, :due_at, :unlock_at, :lock_at, :points_possible].each do |attr|
       if item.respond_to?(attr) && val = item.try(attr)
         details[attr] = val
       end
@@ -165,7 +167,8 @@ module Api::V1::ContextModule
       else
         ''
     end
-    locked_json(details, item, current_user, item_type)
+    lock_item = item && item.respond_to?(:locked_for?) ? item : content_tag
+    locked_json(details, lock_item, current_user, item_type)
 
     details
   end

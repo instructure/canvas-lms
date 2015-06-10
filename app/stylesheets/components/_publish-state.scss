@@ -1,0 +1,121 @@
+/*
+@styleguide Publish State
+
+<br/>
+The publish button has two states on click (publish and published) and a hover state of 'Unpublish' once published.
+
+```html
+
+<p>
+  <button class="btn" id="publish"></button>
+</p>
+
+<p>
+  <button class="btn" id="published"></button>
+</p>
+
+<p>
+  <button class="btn" id="published-disabled" data-tooltip></button>
+</p>
+
+<p>
+  <span class="publish-icon"></span>
+</p>
+
+<p>
+  <span class='published-status published'>
+    <i class="icon-publish"></i> Published
+  </span>
+</p>
+
+<p>
+  <span class='published-status unpublished'>
+    <i class="icon-unpublished"></i> Not Published
+  </span>
+</p>
+
+```
+
+*/
+
+/* publish buttons */
+.btn-publish,
+.btn-published,
+.btn-unpublish {
+  transition: none;
+  padding-left: 9px;
+
+  i {
+    margin-right: 4px;
+    vertical-align: text-top;
+    line-height: 17px;
+  }
+  i:before {
+    font-size: 18px;
+  }
+}
+.btn-publish {
+  i:before {
+    color: #bbb;
+  }
+}
+
+.btn-published,
+.btn-published:hover {
+  background: $ic-color-success;
+  border: 1px solid darken($ic-color-success, 15%);
+  color: $ic-color-light;
+}
+
+.btn-published {
+  &:focus {
+    @include button-focus-dark;
+    background: darken($ic-color-success, 10%); 
+    color: $ic-color-light;  
+  } 
+}
+
+.btn-published.disabled,
+.btn-published.disabled:hover {
+  border: 1px solid #256f1e;
+  background: #35842c;
+  box-shadow: none;
+  color: #fff;
+}
+
+.btn-unpublish {
+  @include buttonBackground($btnDangerBackground, $btnDangerBackgroundHighlight);
+  box-shadow: none;
+  &:focus { @include button-focus-dark; }
+}
+
+.btn-published.disabled,
+.btn-published.disabled:hover,
+.btn-unpublish.disabled,
+.btn-unpublish.disabled:hover {
+  @if $use_high_contrast { opacity: 1; }
+}
+
+.publish-icon {
+  @include ic-focus-base;
+  display: inline-block;  
+  color: $ic-color-icon-disabled;
+  cursor: pointer;
+  &:focus { @include ic-focus-variant; }
+  &.publish-icon-unpublish { color: $ic-color-icon-disabled; }
+  &.publish-icon-published { color: $ic-color-success; }
+  .publish-text { display: none; }
+}
+
+.published-status {
+  &.published {
+    font-weight: bold;
+    @if $use_high_contrast { color: darken($ic-color-success, 4%); }
+    @else { color: $ic-color-success; }
+  }
+
+  &.unpublished {
+    font-weight: normal;
+    color: $ic-color-icon-disabled;
+  }
+}

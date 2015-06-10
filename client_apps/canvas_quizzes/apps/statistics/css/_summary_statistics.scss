@@ -1,0 +1,94 @@
+#summary-statistics {
+  $baseFontSize: 24px;
+  $baseLineHeight: 32px;
+
+  .report-generator {
+    position: relative;
+
+    &+ .report-generator {
+      margin-left: $whitespace;
+    }
+  }
+
+  table {
+    width: 100%;
+    margin: 20px 40px;
+  }
+
+  th {
+    font-weight: normal;
+    color: $muteFg;
+    width: 20%;
+    font-size: $baseFontSize * 0.75;
+    line-height: $baseLineHeight * 0.75;
+    text-align: left;
+  }
+
+  td {
+    font-size: $baseFontSize;
+    line-height: $baseLineHeight;
+
+    &.emphasized {
+      font-size: $baseFontSize * 1.25;
+      line-height: $baseLineHeight * 1.25;
+      font-weight: bold;
+    }
+  }
+
+  tbody td {
+    transition: opacity 0.5s linear 0s;
+  }
+
+  .chart {
+    margin-top: 60px;
+    width: 100%;
+
+    .bar {
+      fill: $summaryPercentileChartBarColor;
+    }
+
+    .x.axis {
+      fill: $muteFg;
+
+      line, path {
+        display: none;
+      }
+    }
+
+    .x.brush {
+      fill: rgba($contrastColor, 0.1);
+    }
+
+    text.brush-stats {
+      fill: $primaryFg;
+      transition: opacity 0.25s ease 0;
+
+      &.unused {
+        opacity: 0;
+        font-weight: bold;
+      }
+    }
+
+    &:hover {
+      text.brush-stats.unused {
+        opacity: 1;
+      }
+    }
+  }
+
+  .report-generator.busy {
+    .btn {
+      background-color: transparent;
+      color: $disabledFg;
+      opacity: 0.65;
+      cursor: default;
+      box-shadow: none;
+    }
+  }
+
+  &.loading {
+    tbody td {
+      opacity: 0.25;
+    }
+  }
+}

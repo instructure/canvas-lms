@@ -19,11 +19,7 @@ class RouteView < HashView
   end
 
   def api_path
-    if CANVAS_RAILS2
-      path = raw_route.segments.inject("") { |str,s| str << s.to_s }
-    else
-      path = remove_parentheticals(raw_route.path.spec.to_s)
-    end
+    path = remove_parentheticals(raw_route.path.spec.to_s)
     path.chop! if path.length > 1 && path[-1] == '/' # remove trailing slash
     path
   end
@@ -44,12 +40,8 @@ class RouteView < HashView
   end
 
   def verb
-    if CANVAS_RAILS2
-      raw_route.conditions[:method].to_s.upcase
-    else
-      if raw_route.verb.source =~ /\^?(\w*)\$/
-        $1.upcase
-      end
+    if raw_route.verb.source =~ /\^?(\w*)\$/
+      $1.upcase
     end
   end
 

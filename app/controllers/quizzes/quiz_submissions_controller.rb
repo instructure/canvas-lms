@@ -23,8 +23,8 @@ class Quizzes::QuizSubmissionsController < ApplicationController
 
   protect_from_forgery :except => [:create, :backup, :record_answer]
   before_filter :require_context
-  before_filter :require_quiz, :only => [ :index, :create, :extensions, :show, :update ]
-  before_filter :require_quiz_submission, :only => [ :show ]
+  before_filter :require_quiz, :only => [ :index, :create, :extensions, :show, :update, :log ]
+  before_filter :require_quiz_submission, :only => [ :show, :log ]
   batch_jobs_in_actions :only => [:update, :create], :batch => { :priority => Delayed::LOW_PRIORITY }
 
   def index
@@ -48,10 +48,10 @@ class Quizzes::QuizSubmissionsController < ApplicationController
       # If the submission is a preview, we don't add it to the user's submission history,
       # and it actually gets keyed by the temporary_user_code column instead of
       if @current_user.nil? || is_previewing?
-        @submission = @quiz.quiz_submissions.find_by_temporary_user_code(temporary_user_code(false))
+        @submission = @quiz.quiz_submissions.where(temporary_user_code: temporary_user_code(false)).first
         @submission ||= @quiz.generate_submission(temporary_user_code(false) || @current_user, is_previewing?)
       else
-        @submission = @quiz.quiz_submissions.find_by_user_id(@current_user.id) if @current_user.present?
+        @submission = @quiz.quiz_submissions.where(user_id: @current_user).first if @current_user.present?
         @submission ||= @quiz.generate_submission(@current_user, is_previewing?)
         if @submission.present? && !@submission.valid_token?(params[:validation_token])
           flash[:error] = t('errors.invalid_submissions', "This quiz submission could not be verified as belonging to you.  Please try again.")
@@ -64,11 +64,14 @@ class Quizzes::QuizSubmissionsController < ApplicationController
       if @submission.preview? || (@submission.untaken? && @submission.attempt == sanitized_params[:attempt].to_i)
         @submission.mark_completed
         hash = {}
-        hash = @submission.submission_data if @submission.submission_data.is_a?(Hash) && @submission.submission_data[:attempt] == @submission.attempt
+        hash = @submission.submission_data if !@submission.graded? && @submission.submission_data[:attempt] == @submission.attempt
         params_hash = hash.deep_merge(sanitized_params) rescue sanitized_params
         @submission.submission_data = params_hash unless @submission.overdue?
+        @submission.record_answer(params_hash.dup)
         flash[:notice] = t('errors.late_quiz', "You submitted this quiz late, and your answers may not have been recorded.") if @submission.overdue?
         Quizzes::SubmissionGrader.new(@submission).grade_submission
+
+        Canvas::LiveEvents.quiz_submitted(@submission)
       end
     end
     if session.delete('lockdown_browser_popup')
@@ -81,9 +84,9 @@ class Quizzes::QuizSubmissionsController < ApplicationController
     @quiz = require_quiz
     if authorized_action(@quiz, @current_user, :submit)
       if @current_user.nil? || is_previewing?
-        @submission = @quiz.quiz_submissions.find_by_temporary_user_code(temporary_user_code(false))
+        @submission = @quiz.quiz_submissions.where(temporary_user_code: temporary_user_code(false)).first
       else
-        @submission = @quiz.quiz_submissions.find_by_user_id(@current_user.id)
+        @submission = @quiz.quiz_submissions.where(user_id: @current_user).first
         if @submission.present? && !@submission.valid_token?(params[:validation_token])
           if params[:action] == 'record_answer'
             flash[:error] = t('errors.invalid_submissions', "This quiz submission could not be verified as belonging to you.  Please try again.")
@@ -134,12 +137,13 @@ class Quizzes::QuizSubmissionsController < ApplicationController
   end
 
   def extensions
-    @student = @context.students.find_by_id(params[:user_id])
+    @student = @context.students.where(id: params[:user_id]).first
     @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student || @current_user, nil, 'settings_only')
     if authorized_action(@submission, @current_user, :add_attempts)
       @submission.extra_attempts ||= 0
       @submission.extra_attempts = params[:extra_attempts].to_i if params[:extra_attempts]
       @submission.extra_time = params[:extra_time].to_i if params[:extra_time]
+      @submission.has_seen_results = false if params[:reset_has_seen_results] == '1'
       @submission.manually_unlocked = params[:manually_unlocked] == '1' if params[:manually_unlocked]
       if @submission.extendable? && (params[:extend_from_now] || params[:extend_from_end_at]).to_i > 0
         if params[:extend_from_now].to_i > 0
@@ -159,9 +163,9 @@ class Quizzes::QuizSubmissionsController < ApplicationController
   def update
     @submission = @quiz.quiz_submissions.find(params[:id])
     if authorized_action(@submission, @current_user, :update_scores)
-      @submission.update_scores(params)
+      @submission.update_scores(params.merge(:grader_id => @current_user.id))
       if params[:headless]
-        redirect_to named_context_url(@context, :context_quiz_history_url, @quiz, :user_id => @submission.user_id, :version => (params[:submission_version_number] || @submission.version_number), :headless => 1, :score_updated => 1)
+        redirect_to named_context_url(@context, :context_quiz_history_url, @quiz, :user_id => @submission.user_id, :version => (params[:submission_version_number] || @submission.version_number), :headless => 1, :score_updated => 1, :hide_student_name => params[:hide_student_name])
       else
         redirect_to named_context_url(@context, :context_quiz_history_url, @quiz, :user_id => @submission.user_id, :version => (params[:submission_version_number] || @submission.version_number))
       end
@@ -192,8 +196,8 @@ class Quizzes::QuizSubmissionsController < ApplicationController
     respond_to do |format|
       if attachment.zipped?
         if Attachment.s3_storage?
-          format.html { redirect_to attachment.cacheable_s3_inline_url }
-          format.zip { redirect_to attachment.cacheable_s3_inline_url }
+          format.html { redirect_to attachment.inline_url }
+          format.zip { redirect_to attachment.inline_url }
         else
           cancel_cache_buster
 

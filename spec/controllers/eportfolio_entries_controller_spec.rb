@@ -22,133 +22,117 @@ describe EportfolioEntriesController do
   def eportfolio_category
     @category = @portfolio.eportfolio_categories.create
   end
+
   def eportfolio_entry(category=nil)
     @entry = @portfolio.eportfolio_entries.new
     @entry.eportfolio_category_id = category.id if category
     @entry.save!
   end
 
+  before :once do
+    eportfolio_with_user(:active_all => true)
+    eportfolio_category
+  end
+
   describe "GET 'show'" do
+    before(:once) { eportfolio_entry(@category) }
     it "should require authorization" do
-      eportfolio_with_user(:active_all => true)
-      eportfolio_category
-      eportfolio_entry(@category)
       get 'show', :eportfolio_id => @portfolio.id, :id => @entry.id
       assert_unauthorized
     end
     
     it "should assign variables" do
-      eportfolio_with_user_logged_in(:active_all => true)
-      eportfolio_category
-      eportfolio_entry(@category)
+      user_session(@user)
       attachment = @portfolio.user.attachments.build(:filename => 'some_file.pdf')
       attachment.content_type = ''
       attachment.save!
       @entry.content = [{:section_type => 'attachment', :attachment_id => attachment.id}]
       @entry.save!
       get 'show', :eportfolio_id => @portfolio.id, :id => @entry.id
-      response.should be_success
-      assigns[:category].should eql(@category)
-      assigns[:page].should eql(@entry)
-      assigns[:entries].should_not be_nil
-      assigns[:entries].should_not be_empty
-      assigns[:attachments].should_not be_nil
-      assigns[:attachments].should_not be_empty
+      expect(response).to be_success
+      expect(assigns[:category]).to eql(@category)
+      expect(assigns[:page]).to eql(@entry)
+      expect(assigns[:entries]).not_to be_nil
+      expect(assigns[:entries]).not_to be_empty
+      expect(assigns[:attachments]).not_to be_nil
+      expect(assigns[:attachments]).not_to be_empty
     end
     
     it "should work off of category and entry names" do
-      eportfolio_with_user_logged_in(:active_all => true)
-      eportfolio_category
-      eportfolio_entry(@category)
+      user_session(@user)
       @category.name = "some category"
       @category.save!
       @entry.name = "some entry"
       @entry.save!
       get 'show', :eportfolio_id => @portfolio.id, :category_name => @category.slug, :entry_name => @entry.slug
-      assigns[:category].should eql(@category)
-      assigns[:page].should eql(@entry)
-      assigns[:entries].should_not be_nil
-      assigns[:entries].should_not be_empty
+      expect(assigns[:category]).to eql(@category)
+      expect(assigns[:page]).to eql(@entry)
+      expect(assigns[:entries]).not_to be_nil
+      expect(assigns[:entries]).not_to be_empty
     end
   end
   
   describe "POST 'create'" do
     it "should require authorization" do
-      eportfolio_with_user(:active_all => true)
-      eportfolio_category
-      eportfolio_entry(@category)
       post 'create', :eportfolio_id => @portfolio.id
       assert_unauthorized
     end
     
     it "should create entry" do
-      eportfolio_with_user_logged_in(:active_all => true)
-      eportfolio_category
+      user_session(@user)
       post 'create', :eportfolio_id => @portfolio.id, :eportfolio_entry => {:eportfolio_category_id => @category.id, :name => "some entry"}
-      response.should be_redirect
-      assigns[:category].should eql(@category)
-      assigns[:page].should_not be_nil
-      assigns[:page].name.should eql("some entry")
+      expect(response).to be_redirect
+      expect(assigns[:category]).to eql(@category)
+      expect(assigns[:page]).not_to be_nil
+      expect(assigns[:page].name).to eql("some entry")
     end
   end
   
   describe "PUT 'update'" do
+    before(:once) { eportfolio_entry(@category) }
     it "should require authorization" do
-      eportfolio_with_user(:active_all => true)
-      eportfolio_category
-      eportfolio_entry(@category)
       put 'update', :eportfolio_id => @portfolio.id, :id => @entry.id
       assert_unauthorized
     end
     
     it "should update entry" do
-      eportfolio_with_user_logged_in(:active_all => true)
-      eportfolio_category
-      eportfolio_entry(@category)
+      user_session(@user)
       put 'update', :eportfolio_id => @portfolio.id, :id => @entry.id, :eportfolio_entry => {:name => "new name"}
-      response.should be_redirect
-      assigns[:entry].should_not be_nil
-      assigns[:entry].name.should eql("new name")
+      expect(response).to be_redirect
+      expect(assigns[:entry]).not_to be_nil
+      expect(assigns[:entry].name).to eql("new name")
     end
   end
   
   describe "DELETE 'destroy'" do
+    before(:once) { eportfolio_entry(@category) }
     it "should require authorization" do
-      eportfolio_with_user(:active_all => true)
-      eportfolio_category
-      eportfolio_entry(@category)
       delete 'destroy', :eportfolio_id => @portfolio.id, :id => @entry.id
       assert_unauthorized
     end
     
     it "should delete entry" do
-      eportfolio_with_user_logged_in(:active_all => true)
-      eportfolio_category
-      eportfolio_entry(@category)
+      user_session(@user)
       delete 'destroy', :eportfolio_id => @portfolio.id, :id => @entry.id
-      response.should be_redirect
-      assigns[:entry].should_not be_nil
-      assigns[:entry].should be_frozen
+      expect(response).to be_redirect
+      expect(assigns[:entry]).not_to be_nil
+      expect(assigns[:entry]).to be_frozen
     end
   end
   
   describe "GET 'attachment'" do
+    before(:once) { eportfolio_entry(@category) }
     it "should require authorization" do
-      eportfolio_with_user(:active_all => true)
-      eportfolio_category
-      eportfolio_entry(@category)
       get 'attachment', :eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => 1
       assert_unauthorized
     end
     
     it "should redirect to page" do
-      eportfolio_with_user_logged_in(:active_all => true)
-      eportfolio_category
-      eportfolio_entry(@category)
+      user_session(@user)
       begin
-        get 'attachment', :eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => CanvasUUID.generate
+        get 'attachment', :eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => SecureRandom.uuid
       rescue => e
-        e.to_s.should eql("Not Found")
+        expect(e.to_s).to eql("Not Found")
       end
     end
   end

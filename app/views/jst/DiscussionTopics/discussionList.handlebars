@@ -5,26 +5,23 @@
      tabindex="0">
     <i class="icon-mini-arrow-down"></i>
     {{title}}
-    <a href="#" role="button" class="screenreader-only">{{toggleMessage}}</a>
+    <a href="#" role="button" class="screenreader-only" tabindex="-1">{{toggleMessage}}</a>
   </h2>
-
   {{#if titleHelp}}
     <span class="pull-right title-help">{{titleHelp}}</span>
   {{/if}}
 </div>
 
 <div id="{{listID}}">
-  <ul class="collectionViewItems ig-list">
-  </ul>
-
-<div class="no-content discussion">
-  {{#if pinned}}
-    <b>{{#t "no_pinned_discussions"}}You currently have no pinned discussions{{/t}}</b>
-    <p>{{#t "pinned_instructions"}}To pin a discussion to the top of the page, drag a discussion here, or select Pin from the discussion settings menu.{{/t}}</p>
-  {{else}}
-    {{#t "there_are_no_discussions_show"}}There are no discussions to show in this section.{{/t}}
-  {{/if}}
-</div>
+  <ul class="collectionViewItems ig-list"></ul>
+  <div class="no-content discussion">
+    {{#if pinned}}
+      <b>{{#t "no_pinned_discussions"}}You currently have no pinned discussions{{/t}}</b>
+      <p>{{#t "pinned_instructions"}}To pin a discussion to the top of the page, drag a discussion here, or select Pin from the discussion settings menu.{{/t}}</p>
+    {{else}}
+      {{#t "there_are_no_discussions_show"}}There are no discussions to show in this section.{{/t}}
+    {{/if}}
+  </div>
 
   {{#if showSpinner}}
     <div class="loader"></div>

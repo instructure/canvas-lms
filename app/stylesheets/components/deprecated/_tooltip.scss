@@ -1,0 +1,54 @@
+// .tooltip is depricated, use the tooltip behavior instead.
+// see: app/coffeescripts/behaviors/tooltip.coffee
+// code to make tooltips.
+// here is some sample html to use this:
+//
+// <a href="#" class="tooltip">
+//   <span class="tooltip_wrap">
+//     <span class="tooltip_text">The tip</span>
+//   </span>
+//   the thing to put tip on
+// </a>
+
+.tooltip {
+  position: relative;
+  z-index: 2;
+  outline: none;
+  &:hover, &:active, &:focus {
+    outline: none;
+    text-decoration: none;
+    .tooltip_wrap, .tooltip_text {
+      visibility: visible;
+    }
+  }
+  .tooltip_wrap, .tooltip_text {
+    display: block;
+    visibility: hidden;
+  }
+  .tooltip_wrap {
+    background: url(/images/tooltip_carat.png) no-repeat left bottom;
+    bottom: 15px;
+    padding-bottom: 3px;
+    position: absolute;
+    opacity: 0.9;
+    // ie puts the tooltips too low.
+    .ie & {
+      bottom: 25px;
+    }
+  }
+  .tooltip_text {
+    background-color: #444;
+    background-position: left bottom;
+    color: #fff;
+    left: 0px;
+    max-width: 250px;
+    padding: 2px 7px 2px;
+    white-space: nowrap;
+    border-radius: 5px;
+    font-weight: normal;
+  }
+  .right {
+    right: 0px;
+    background-position: right bottom;
+  }
+}

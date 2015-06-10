@@ -1,5 +1,5 @@
 <% define_content :link do -%>
-<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.group.context) %>/<%= asset.group.context.class.to_s.downcase.pluralize %>/<%= asset.group.context_id %>/groups/<%= asset.group_id %>
+  <%= polymorphic_url([asset.group.context, asset.group]) %>
 <% end -%>
 <% if asset.group.context.class.to_s == 'Account' -%>
 <%= t('account_group', "Canvas Alert - Group Membership Accepted: %{group_name} for the account %{account_name}.", :group_name => asset.group.name, :account_name => asset.group.context.name) %>

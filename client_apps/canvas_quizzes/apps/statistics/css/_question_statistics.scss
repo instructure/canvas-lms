@@ -1,0 +1,282 @@
+.question-statistics {
+  border: 1px solid $borderColor;
+  border-radius: 6px;
+  position: relative;
+
+  padding: $whitespace*2;
+
+  // Answer drilldown will provide the padding if necessary, otherwise we want
+  // the charts to be on the "baseline" of the question box:
+  padding-bottom: 0;
+
+  // Some space between questions:
+  margin-bottom: $whitespace * 2;
+
+  section {
+    display: inline-block;
+    vertical-align: top;
+    width: 310px;
+  }
+
+  .question-attempts {
+    font-size: 0.95em;
+  }
+
+  .question-text {
+    margin: $whitespace*2 0;
+    font-size: 1.25em;
+  }
+
+  aside {
+    button, a {
+      opacity: 0;
+    }
+
+    pointer-events: none;
+  }
+
+  &:hover, &.with-details {
+    background-color: $activeOrHoverQuestionBoxBg;
+
+    aside {
+      pointer-events: inherit;
+    }
+  }
+
+  // Make sure the control buttons are visible when we hover over the question
+  // box or we reach them by keyboard.
+  aside :focus,
+  &:hover aside a,
+  &:hover aside button,
+  &.with-details aside a,
+  &.with-details aside button {
+    opacity: 1
+  }
+
+  .correct-answer-ratio-section {
+    .chart, .auxiliary {
+      display: inline-block;
+      vertical-align: top;
+    }
+
+    .chart {
+      width: 80px;
+      height: 80px;
+
+      .background {
+        fill: $borderColor;
+      }
+
+      .foreground {
+        fill: $highlightColor;
+      }
+
+      text {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 125%;
+        font-weight: bold;
+      }
+    }
+
+    .auxiliary {
+      margin-left: 20px;
+      width: 160px;
+    }
+  }
+
+  .answer-distribution-section {
+    height: 120px;
+    margin-bottom: -1px;
+
+    .chart {
+      .bar {
+        fill: $contrastColor;
+
+        &.bar-highlighted {
+          fill: $highlightColor;
+        }
+
+        &.bar-striped {
+          pointer-events: none;
+        }
+      }
+
+      pattern#diagonalStripes {
+        g {
+          stroke: rgba(255,255,255,0.25);
+          stroke-width: 5;
+        }
+      }
+
+      .x.axis path {
+        display: none;
+      }
+
+      .y.axis {
+        fill: $muteFg;
+
+        path {
+          display: none;
+        }
+      }
+    }
+  }
+
+  &.stretched-answer-distribution .answer-distribution-section {
+    width: 580px;
+  }
+
+  .discrimination-index-section {
+    width: 270px;
+    position: relative;
+
+    .index {
+      font-size: 24px;
+      font-weight: bold;
+      font-style: normal;
+
+      &.negative {
+        color: $negativeColor;
+      }
+
+      &.positive {
+        .sign {
+          color: $highlightColor;
+        }
+      }
+    }
+
+    .chart {
+      .bar {
+        fill: $contrastColor;
+      }
+      .bar.correct {
+        fill: $highlightColor;
+      }
+    }
+
+    .chart-help-trigger {
+      position: absolute;
+      top: 0;
+      right: 0;
+      color: $muteFg;
+    }
+  }
+
+  .essay-score-chart-section {
+    width: 580px;
+    height: 120px;
+
+    path.score-line, circle {
+      stroke: $highlightColor;
+      shape-rendering: geometricPrecision;
+      image-rendering: optimizeQuality;
+    }
+
+    path.score-line {
+      stroke-width: 4;
+      fill: none;
+    }
+
+    .area {
+      fill: lighten($highlightColor, 35%);
+    }
+
+    circle {
+      stroke-width: 4px;
+      stroke: white;
+      fill: $highlightColor;
+    }
+  }
+
+  .answer-drilldown {
+    $tearSize: 40px;
+
+    list-style-type: none;
+    margin: 0;
+    padding: $whitespace*2 0;
+    padding-bottom: 0; // spacing is already provided by the tears
+    border-top: 1px solid $borderColor;
+
+    li {
+      display: inline-block;
+      width: 45%;
+      margin-bottom: $whitespace*2;
+      min-height: $tearSize;
+      vertical-align: top;
+
+      &.correct .answer-response-ratio {
+        background-color: $highlightColor;
+        box-shadow: none;
+        color: white;
+      }
+
+      &:nth-of-type(2n) {
+        margin-left: 5%;
+      }
+    }
+
+    .answer-text {
+      margin-left: $tearSize + $whitespace; /* for the answer response ratio label */
+    }
+
+    .answer-response-ratio {
+      display: inline-block;
+      position: absolute;
+      box-shadow: 0 0 0 2px $contrastColor inset;
+      background: transparent;
+      border-radius: 50% 0 50% 50%;
+      width: $tearSize;
+      height: $tearSize;
+      line-height: $tearSize;
+      text-align: center;
+      font-weight: bold;
+      z-index: 0; /* otherwise selecting the answer text gets crazy */
+
+      sup {
+        font-size: 0.6em;
+        position: absolute;
+        font-weight: normal;
+        top: auto;
+        margin-top: 12px;
+        line-height: 1;
+      }
+    }
+  }
+
+  .detail-section {
+    display: none;
+  }
+
+  &.with-details .detail-section {
+    display: block;
+  }
+}
+
+// Needs to be in global scope because it's placed inside a tooltip
+.answer-distribution-tooltip-content {
+  text-align: center;
+
+  .answer-response-ratio {
+    font-size: 1.5em;
+    line-height: 2em;
+    font-weight: bold;
+    display: block;
+  }
+
+  .answer-response-count {
+    display: block;
+    font-size: 1.25em;
+  }
+
+  // This might go away if design decides not to embed the answer text in the
+  // tooltip content.
+  hr {
+    height: 1px;
+    line-height: 1px;
+    margin: -5px 0 5px 0;
+    background: none;
+    border: none;
+    box-shadow: 0 1px 0 #333;
+  }
+}

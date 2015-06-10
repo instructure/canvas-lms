@@ -27,7 +27,7 @@ describe 'appointment_reserved_by_user.twitter' do
     generate_message(:appointment_reserved_by_user, :twitter, @event,
                      :data => {:updating_user => user})
 
-    @message.body.should include('some title')
-    @message.body.should include(user.name)
+    expect(@message.body).to include('some title')
+    expect(@message.body).to include(user.name)
   end
 end

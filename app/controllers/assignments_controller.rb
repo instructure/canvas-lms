@@ -32,17 +32,20 @@ class AssignmentsController < ApplicationController
   before_filter :normalize_title_param, :only => [:new, :edit]
 
   def index
-    return old_index if @context == @current_user || !@context.feature_enabled?(:draft_state)
+    return redirect_to(dashboard_url) if @context == @current_user
 
     if authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_ASSIGNMENTS)
+      log_asset_access([ "assignments", @context ], 'assignments', 'other')
+
       add_crumb(t('#crumbs.assignments', "Assignments"), named_context_url(@context, :context_assignments_url))
 
       # It'd be nice to do this as an after_create, but it's not that simple
       # because of course import/copy.
       @context.require_assignment_group
 
-      permissions = @context.rights_status(@current_user, :manage_assignments, :manage_grades)
+      rights = [:manage_assignments, :manage_grades, :read_grades]
+      permissions = @context.rights_status(@current_user, *rights)
       permissions[:manage] = permissions[:manage_assignments]
       js_env({
         :URLS => {
@@ -54,45 +57,21 @@ class AssignmentsController < ApplicationController
           :course_student_submissions_url => api_v1_course_student_submissions_url(@context)
         },
         :PERMISSIONS => permissions,
+        :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
+        :VALID_DATE_RANGE => CourseDateRange.new(@context),
+        :assignment_menu_tools => external_tools_display_hashes(:assignment_menu),
+        :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu),
+        :quiz_menu_tools => external_tools_display_hashes(:quiz_menu),
+        :current_user_has_been_observer_in_this_course => @context.user_has_been_observer?(@current_user),
+        :observed_student_ids => ObserverEnrollment.observed_student_ids(@context, @current_user)
       })
+
 
       respond_to do |format|
         format.html do
           @padless = true
-          render :action => :new_index
+          render :new_index
         end
-      end
-    end
-  end
-
-  def old_index
-    if @context == @current_user || authorized_action(@context, @current_user, :read)
-      get_all_pertinent_contexts  # NOTE: this crap is crazy.  can we get rid of it?
-      get_sorted_assignments
-      add_crumb(t('#crumbs.assignments', "Assignments"), (@just_viewing_one_course ? named_context_url(@context, :context_assignments_url) : "/assignments" ))
-      @context = (@just_viewing_one_course ? @context : @current_user)
-      return if @just_viewing_one_course && !tab_enabled?(@context.class::TAB_ASSIGNMENTS)
-
-      respond_to do |format|
-        if @contexts.empty?
-          if @context
-            format.html { redirect_to @context == @current_user ? dashboard_url : named_context_url(@context, :context_url) }
-          else
-            format.html { redirect_to root_url }
-          end
-        elsif @just_viewing_one_course && @context.assignments.scoped.new.grants_right?(@current_user, session, :update)
-          format.html {
-            render :action => :index
-          }
-        else
-          @current_user_submissions ||= @current_user && @current_user.submissions.
-              select([:id, :assignment_id, :score, :workflow_state]).
-              where(:assignment_id => @upcoming_assignments)
-          js_env(:submissions_hash => @submissions_hash)
-          format.html { render :action => :student_index }
-        end
-        # TODO: eager load the rubric associations
-        format.json { render :json => @assignments.map{ |a| a.as_json(include: [:rubric_association, :rubric]) } }
       end
     end
   end
@@ -107,19 +86,28 @@ class AssignmentsController < ApplicationController
       return
     end
     if authorized_action(@assignment, @current_user, :read)
+
+      if (da_on = @context.feature_enabled?(:differentiated_assignments)) &&
+           @current_user && @assignment &&
+           !@assignment.visible_to_user?(@current_user, differentiated_assignments: da_on)
+        respond_to do |format|
+          flash[:error] = t 'notices.assignment_not_available', "The assignment you requested is not available to your course section."
+          format.html { redirect_to named_context_url(@context, :context_assignments_url) }
+        end
+        return
+      end
+
       @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @current_user)
       @assignment.ensure_assignment_group
 
       if @assignment.submission_types.include?("online_upload") || @assignment.submission_types.include?("online_url")
-        @external_tools = ContextExternalTool.all_tools_for(@context, :user => @current_user)
-          .select(&:has_homework_submission)
+        @external_tools = ContextExternalTool.all_tools_for(@context, :user => @current_user, :type => :homework_submission)
       else
         @external_tools = []
       end
 
       js_env({
         :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session),
-        :DRAFT_STATE => @context.feature_enabled?(:draft_state),
         :COURSE_ID => @context.id,
         :ASSIGNMENT_ID => @assignment.id,
         :EXTERNAL_TOOLS => external_tools_json(@external_tools, @context, @current_user, session)
@@ -136,21 +124,29 @@ class AssignmentsController < ApplicationController
       end
 
       if @assignment.grants_right?(@current_user, session, :read_own_submission) && @context.grants_right?(@current_user, session, :read_grades)
-        @current_user_submission = @assignment.submissions.find_by_user_id(@current_user.id) if @current_user
+        @current_user_submission = @assignment.submissions.where(user_id: @current_user).first if @current_user
         @current_user_submission = nil if @current_user_submission && !@current_user_submission.grade && !@current_user_submission.submission_type
-        @current_user_rubric_assessment = @assignment.rubric_association.rubric_assessments.find_by_user_id(@current_user.id) if @current_user && @assignment.rubric_association
+        @current_user_rubric_assessment = @assignment.rubric_association.rubric_assessments.where(user_id: @current_user).first if @current_user && @assignment.rubric_association
         @current_user_submission.send_later(:context_module_action) if @current_user_submission
       end
 
       begin
-        google_docs = google_docs_connection
-        @google_docs_token = google_docs.retrieve_access_token
+        google_docs = google_service_connection
+        @google_service = google_docs.service_type
+        @google_docs_token = google_service_connection.verify_access_token && google_docs.retrieve_access_token rescue false
       rescue GoogleDocs::NoTokenError
-        #do nothing
+        # Just fail I guess.
       end
+
+      @google_drive_upgrade = !!(logged_in_user && Canvas::Plugin.find(:google_drive).try(:settings) &&
+          (!logged_in_user.user_services.where(service: 'google_drive').first || !(google_docs.verify_access_token rescue false)))
+      @google_authed = @google_docs_token and not @google_drive_upgrade
+
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
       log_asset_access(@assignment, "assignments", @assignment.assignment_group)
+
+      @assignment_menu_tools = external_tools_display_hashes(:assignment_menu)
 
       respond_to do |format|
         if @assignment.submission_types == 'online_quiz' && @assignment.quiz
@@ -160,9 +156,10 @@ class AssignmentsController < ApplicationController
         elsif @assignment.submission_types == 'attendance'
           format.html { redirect_to named_context_url(@context, :context_attendance_url, :anchor => "assignment/#{@assignment.id}") }
         elsif @assignment.submission_types == 'external_tool' && @assignment.external_tool_tag && @unlocked
-          format.html { content_tag_redirect(@context, @assignment.external_tool_tag, :context_url) }
+          tag_type = params[:module_item_id].present? ? :modules : :assignments
+          format.html { content_tag_redirect(@context, @assignment.external_tool_tag, :context_url, tag_type) }
         else
-          format.html { render :action => 'show' }
+          format.html { render }
         end
         format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}) }
       end
@@ -175,23 +172,24 @@ class AssignmentsController < ApplicationController
     if assignment.allow_google_docs_submission? && @real_current_user.blank?
       docs = {}
       begin
-        google_docs = google_docs_connection
-        docs = google_docs.list_with_extension_filter(assignment.allowed_extensions)
-      rescue GoogleDocs::NoTokenError
-        #do nothing
+        docs = google_service_connection.list_with_extension_filter(assignment.allowed_extensions)
+      rescue GoogleDocs::NoTokenError => e
+        Canvas::Errors.capture_exception(:oauth, e)
+      rescue ArgumentError => e
+        Canvas::Errors.capture_exception(:oauth, e)
       rescue => e
-        ErrorReport.log_exception(:oauth, e)
+        Canvas::Errors.capture_exception(:oauth, e)
         raise e
       end
       respond_to do |format|
-        format.json { render :json => docs.to_hash }
+        format.json { render json: docs.to_hash }
       end
     else
-      error_object = {:errors =>
-        {:base => t('errors.google_docs_masquerade_rejected', "Unable to connect to Google Docs as a masqueraded user.")}
+      error_object = {errors:
+        {base: t('errors.google_docs_masquerade_rejected', "Unable to connect to Google Docs as a masqueraded user.")}
       }
       respond_to do |format|
-        format.json { render :json => error_object, :status => :bad_request }
+        format.json { render json: error_object, status: :bad_request }
       end
     end
   end
@@ -232,7 +230,7 @@ class AssignmentsController < ApplicationController
   def remind_peer_review
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if authorized_action(@assignment, @current_user, :grade)
-      @request = AssessmentRequest.find_by_id(params[:id]) if params[:id].present?
+      @request = AssessmentRequest.where(id: params[:id]).first if params[:id].present?
       respond_to do |format|
         if @request.asset.assignment == @assignment && @request.send_reminder!
           format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
@@ -248,7 +246,7 @@ class AssignmentsController < ApplicationController
   def delete_peer_review
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if authorized_action(@assignment, @current_user, :grade)
-      @request = AssessmentRequest.find_by_id(params[:id]) if params[:id].present?
+      @request = AssessmentRequest.where(id: params[:id]).first if params[:id].present?
       respond_to do |format|
         if @request.asset.assignment == @assignment && @request.destroy
           format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
@@ -268,7 +266,14 @@ class AssignmentsController < ApplicationController
         redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
         return
       end
-      @students = @context.students_visible_to(@current_user).order_by_sortable_name
+
+      student_scope = if @assignment.differentiated_assignments_applies?
+                        @context.students_visible_to(@current_user).able_to_see_assignment_in_course_with_da(@assignment.id, @context.id)
+                      else
+                        @context.students_visible_to(@current_user)
+                      end
+
+      @students = student_scope.not_fake_student.uniq.order_by_sortable_name
       @submissions = @assignment.submissions.include_assessment_requests
     end
   end
@@ -289,14 +294,14 @@ class AssignmentsController < ApplicationController
         # the requesting user may not have :read if the course syllabus is public, in which
         # case, we pass nil as the user so verifiers are added to links in the syllabus body
         # (ability for the user to read the syllabus was checked above as :read_syllabus)
-        @syllabus_body = api_user_content(@context.syllabus_body, @context, nil)
+        @syllabus_body = api_user_content(@context.syllabus_body, @context, nil, {}, true)
       end
 
       hash = { :CONTEXT_ACTION_SOURCE => :syllabus }
       append_sis_data(hash)
       js_env(hash)
 
-      log_asset_access("syllabus:#{@context.asset_string}", "syllabus", 'other')
+      log_asset_access([ "syllabus", @context ], "syllabus", 'other')
       respond_to do |format|
         format.html
       end
@@ -321,8 +326,7 @@ class AssignmentsController < ApplicationController
     params[:assignment][:time_zone_edited] = Time.zone.name if params[:assignment]
     group = get_assignment_group(params[:assignment])
     @assignment ||= @context.assignments.build(params[:assignment])
-    @assignment.workflow_state ||= @context.feature_enabled?(:draft_state) ? "unpublished" : "published"
-    @assignment.post_to_sis ||= @context.feature_enabled?(:post_to_sis) ? true : false
+    @assignment.workflow_state ||= "unpublished"
     @assignment.updating_user = @current_user
     @assignment.content_being_saved_by(@current_user)
     @assignment.assignment_group = group if group
@@ -335,7 +339,7 @@ class AssignmentsController < ApplicationController
           format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
           format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}), :status => :created}
         else
-          format.html { render :action => "new" }
+          format.html { render :new }
           format.json { render :json => @assignment.errors, :status => :bad_request }
         end
       end
@@ -344,7 +348,7 @@ class AssignmentsController < ApplicationController
 
   def new
     @assignment ||= @context.assignments.scoped.new
-    @assignment.workflow_state = 'unpublished' if @context.feature_enabled?(:draft_state)
+    @assignment.workflow_state = 'unpublished'
     add_crumb t :create_new_crumb, "Create new"
 
     if params[:submission_types] == 'online_quiz'
@@ -377,6 +381,13 @@ class AssignmentsController < ApplicationController
         select { |c| !c.student_organized? }.
         map { |c| { :id => c.id, :name => c.name } }
 
+      # if assignment has student submissions and is attached to a deleted group category,
+      # add that category to the ENV list so it can be shown on the edit page.
+      if @assignment.group_category_deleted_with_submissions?
+        locked_category = @assignment.group_category
+        group_categories << { :id => locked_category.id, :name => locked_category.name }
+      end
+
       json_for_assignment_groups = assignment_groups.map do |group|
         assignment_group_json(group, @current_user, session, [], {stringify_json_ids: true})
       end
@@ -387,14 +398,21 @@ class AssignmentsController < ApplicationController
         :KALTURA_ENABLED => !!feature_enabled?(:kaltura),
         :POST_TO_SIS => @context.feature_enabled?(:post_grades),
         :SECTION_LIST => (@context.course_sections.active.map { |section|
-          {:id => section.id, :name => section.name }
+          {
+            :id => section.id,
+            :name => section.name,
+            :start_at => section.start_at,
+            :end_at => section.end_at,
+            :override_course_and_term_dates => section.restrict_enrollments_to_section_dates
+          }
         }),
         :ASSIGNMENT_OVERRIDES =>
           (assignment_overrides_json(
             @assignment.overrides_for(@current_user)
             )),
         :ASSIGNMENT_INDEX_URL => polymorphic_url([@context, :assignments]),
-        :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments)
+        :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
+        :VALID_DATE_RANGE => CourseDateRange.new(@context)
       }
 
       hash[:ASSIGNMENT] = assignment_json(@assignment, @current_user, session, override_dates: false)
@@ -406,7 +424,7 @@ class AssignmentsController < ApplicationController
       append_sis_data(hash)
       js_env(hash)
       @padless = true
-      render :action => "edit"
+      render :edit
     end
   end
 
@@ -449,7 +467,7 @@ class AssignmentsController < ApplicationController
           format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment) }
           format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}, :include => [:quiz, :discussion_topic]), :status => :ok }
         else
-          format.html { render :action => "edit" }
+          format.html { render :edit }
           format.json { render :json => @assignment.errors, :status => :bad_request }
         end
       end
@@ -481,15 +499,13 @@ class AssignmentsController < ApplicationController
 
   def get_assignment_group(assignment_params)
     return unless assignment_params
-    if (group_id = assignment_params.delete(:assignment_group_id)).present?
-      group = @context.assignment_groups.find(group_id)
+    if (group_id = assignment_params[:assignment_group_id]).present?
+      @context.assignment_groups.find(group_id)
     end
   end
 
   def normalize_title_param
-    if title = params.delete(:name)
-      params[:title] = title
-    end
+    params[:title] ||= params[:name]
   end
 
   def index_edit_params

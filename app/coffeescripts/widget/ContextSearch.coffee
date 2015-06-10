@@ -68,7 +68,8 @@ define [
       $name.append($b, $contextInfo)
       $span = $('<span />', class: 'details')
       if data.common_courses?
-        $span.html(@contextList(courses: data.common_courses, groups: data.common_groups))
+        contextListHtml = (@contextList(courses: data.common_courses, groups: data.common_groups))
+        $span.html contextListHtml
       else if data.user_count?
         $span.text(I18n.t('people_count', 'person', {count: data.user_count}))
       else if data.item_count?

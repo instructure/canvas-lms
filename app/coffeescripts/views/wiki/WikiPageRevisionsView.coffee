@@ -33,6 +33,7 @@ define [
       @on 'selectionChanged', (newSelection, oldSelection) =>
         oldSelection.model?.set('selected', false)
         newSelection.model?.set('selected', true)
+        newSelection.view.$el.focus()
 
       # reposition after rendering
       @on 'render renderItem', => @reposition()
@@ -69,6 +70,10 @@ define [
 
       view.pages_path = @pages_path
       view.$el.on 'click', selectModel
+      view.$el.on 'keypress', (e) =>
+        if (e.keyCode == 13 || e.keyCode == 27)
+          e.preventDefault()
+          selectModel()
 
     setSelectedModelAndView: (model, view) ->
       oldSelectedModel = @selectedModel

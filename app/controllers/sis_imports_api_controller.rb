@@ -144,12 +144,55 @@
 #           "type": "string"
 #         },
 #         "processing_warnings": {
-#           "description": "Only imports that are complete will get this data. An array of csv/warning pairs.",
-#           "example": "[['students.csv','user John Doe has already claimed john_doe's requested login information, skipping], ...]",
+#           "description": "Only imports that are complete will get this data. An array of CSV_file/warning_message pairs.",
+#           "example": "[['students.csv','user John Doe has already claimed john_doe's requested login information, skipping'], ...]",
 #           "type": "array",
 #           "items": {
-#             "$ref": "Array"
+#             "type": "string"
 #           }
+#         },
+#         "processing_errors": {
+#           "description": "An array of CSV_file/error_message pairs.",
+#           "example": "[['students.csv','Error while importing CSV. Please contact support.'], ...]",
+#           "type": "array",
+#           "items": {
+#             "type": "string"
+#           }
+#         },
+#         "batch_mode": {
+#           "description": "Whether the import was run in batch mode.",
+#           "example": "true",
+#           "type": "boolean"
+#         },
+#         "batch_mode_term_id": {
+#           "description": "The term the batch was limited to.",
+#           "example": "1234",
+#           "type": "string"
+#         },
+#         "override_sis_stickiness": {
+#           "description": "Whether UI changes were overridden.",
+#           "example": "false",
+#           "type": "boolean"
+#         },
+#         "add_sis_stickiness": {
+#           "description": "Whether stickiness was added to the batch changes.",
+#           "example": "false",
+#           "type": "boolean"
+#         },
+#         "clear_sis_stickiness": {
+#           "description": "Whether stickiness was cleared.",
+#           "example": "false",
+#           "type": "boolean"
+#         },
+#         "diffing_data_set_identifier": {
+#           "description": "The identifier of the data set that this SIS batch diffs against",
+#           "example": "account-5-enrollments",
+#           "type": "string"
+#         },
+#         "diffed_against_import_id": {
+#           "description": "The ID of the SIS Import that this import was diffed against",
+#           "example": 1,
+#           "type": "integer"
 #         }
 #       }
 #     }
@@ -167,14 +210,21 @@ class SisImportsApiController < ApplicationController
   #
   # Returns the list of SIS imports for an account
   #
-  #   Examples:
-  #     curl 'https://<canvas>/api/v1/accounts/<account_id>/sis_imports' \
-  #         -H "Authorization: Bearer <token>"
+  # @argument created_since [Optional, DateTime]
+  #   If set, only shows imports created after the specified date (use ISO8601 format)
+  #
+  # Example:
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/sis_imports' \
+  #     -H "Authorization: Bearer <token>"
   #
   # @returns [SisImport]
   def index
     if authorized_action(@account, @current_user, :manage_sis)
-      @batches = Api.paginate(@account.sis_batches.order('created_at DESC'), self, url_for({action: :index, controller: :sis_imports_api}))
+      scope = @account.sis_batches.order('created_at DESC')
+      if created_since = CanvasTime.try_parse(params[:created_since])
+        scope = scope.where("created_at > ?", created_since)
+      end
+      @batches = Api.paginate(scope, self, url_for({action: :index, controller: :sis_imports_api}))
       render :json => ({ sis_imports: @batches})
     end
   end
@@ -187,7 +237,7 @@ class SisImportsApiController < ApplicationController
   # For more information on the format that's expected here, please see the
   # "SIS CSV" section in the API docs.
   #
-  # @argument import_type [Optional, String]
+  # @argument import_type [String]
   #   Choose the data format for reading SIS data. With a standard Canvas
   #   install, this option can only be 'instructure_csv', and if unprovided,
   #   will be assumed to be so. Can be part of the query string.
@@ -225,38 +275,49 @@ class SisImportsApiController < ApplicationController
   #         -H "Authorization: Bearer <token>" \
   #         'https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv&batch_mode=1&batch_mode_term_id=15'
   #
-  # @argument extension [Optional,String]
+  # @argument extension [String]
   #   Recommended for raw post request style imports. This field will be used to
   #   distinguish between zip, xml, csv, and other file format extensions that
   #   would usually be provided with the filename in the multipart post request
   #   scenario. If not provided, this value will be inferred from the
   #   Content-Type, falling back to zip-file format if all else fails.
   #
-  # @argument batch_mode [Optional,Boolean]
+  # @argument batch_mode [Boolean]
   #   If set, this SIS import will be run in batch mode, deleting any data
   #   previously imported via SIS that is not present in this latest import.
   #   See the SIS CSV Format page for details.
   #
-  # @argument batch_mode_term_id [Optional,String]
+  # @argument batch_mode_term_id [String]
   #   Limit deletions to only this term. Required if batch mode is enabled.
   #
-  # @argument override_sis_stickiness [Optional,Boolean]
+  # @argument override_sis_stickiness [Boolean]
   #   Many fields on records in Canvas can be marked "sticky," which means that
   #   when something changes in the UI apart from the SIS, that field gets
   #   "stuck." In this way, by default, SIS imports do not override UI changes.
   #   If this field is present, however, it will tell the SIS import to ignore
   #   "stickiness" and override all fields.
   #
-  # @argument add_sis_stickiness [Optional,Boolean]
+  # @argument add_sis_stickiness [Boolean]
   #   This option, if present, will process all changes as if they were UI
   #   changes. This means that "stickiness" will be added to changed fields.
   #   This option is only processed if 'override_sis_stickiness' is also provided.
   #
-  # @argument clear_sis_stickiness [Optional,Boolean]
+  # @argument clear_sis_stickiness [Boolean]
   #   This option, if present, will clear "stickiness" from all fields touched
   #   by this import. Requires that 'override_sis_stickiness' is also provided.
   #   If 'add_sis_stickiness' is also provided, 'clear_sis_stickiness' will
   #   overrule the behavior of 'add_sis_stickiness'
+  #
+  # @argument diffing_data_set_identifier [String]
+  #   If set on a CSV import, Canvas will attempt to optimize the SIS import by
+  #   comparing this set of CSVs to the previous set that has the same data set
+  #   identifier, and only appliying the difference between the two. See the
+  #   SIS CSV Format documentation for more details.
+  #
+  # @argument diffing_remaster_data_set [Boolean]
+  #   If true, and diffing_data_set_identifier is sent, this SIS import will be
+  #   part of the data set, but diffing will not be performed. See the SIS CSV
+  #   Format documentation for details.
   #
   # @returns SisImport
   def create
@@ -316,6 +377,9 @@ class SisImportsApiController < ApplicationController
         if batch_mode_term
           batch.batch_mode = true
           batch.batch_mode_term = batch_mode_term
+        elsif params[:diffing_data_set_identifier].present?
+          batch.enable_diffing(params[:diffing_data_set_identifier],
+                               remaster: value_to_boolean(params[:diffing_remaster_data_set]))
         end
 
         batch.options ||= {}

@@ -1,8 +1,12 @@
+require 'nokogiri'
+require 'ritex'
+require 'securerandom'
+
 module UserContent
   def self.escape(str, current_host = nil)
     html = Nokogiri::HTML::DocumentFragment.parse(str)
     find_user_content(html) do |obj, uc|
-      uuid = CanvasUUID.generate
+      uuid = SecureRandom.uuid
       child = Nokogiri::XML::Node.new("iframe", html)
       child['class'] = 'user_content_iframe'
       child['name'] = uuid
@@ -78,7 +82,7 @@ module UserContent
       # no value, non-numeric value, or 0 value (whether "0", "0px", "0%",
       # etc.); ignore
       nil
-    elsif val == "#{val.to_f.to_s}%" || val == "#{val.to_f.to_s}px"
+    elsif val == "#{val.to_f}%" || val == "#{val.to_f}px"
       # numeric percentage or specific px value; use as is
       val
     elsif val.to_f.to_s == val
@@ -93,23 +97,23 @@ module UserContent
 
   class HtmlRewriter
     AssetTypes = {
-      'assignments' => Assignment,
-      'announcements' => Announcement,
-      'calendar_events' => CalendarEvent,
-      'discussion_topics' => DiscussionTopic,
-      'collaborations' => Collaboration,
-      'files' => Attachment,
-      'conferences' => WebConference,
-      'quizzes' => Quizzes::Quiz,
-      'groups' => Group,
-      'wiki' => WikiPage,
-      'pages' => WikiPage,
+      'assignments' => :Assignment,
+      'announcements' => :Announcement,
+      'calendar_events' => :CalendarEvent,
+      'discussion_topics' => :DiscussionTopic,
+      'collaborations' => :Collaboration,
+      'files' => :Attachment,
+      'conferences' => :WebConference,
+      'quizzes' => :"Quizzes::Quiz",
+      'groups' => :Group,
+      'wiki' => :WikiPage,
+      'pages' => :WikiPage,
       'grades' => nil,
       'users' => nil,
       'external_tools' => nil,
       'file_contents' => nil,
-      'modules' => ContextModule,
-      'items' => ContentTag
+      'modules' => :ContextModule,
+      'items' => :ContentTag
     }
     DefaultAllowedTypes = AssetTypes.keys
 
@@ -170,7 +174,9 @@ module UserContent
         end
 
         if asset_types.key?(type)
-          match = UriMatch.new(relative_url, type, asset_types[type], obj_id, rest)
+          klass = asset_types[type]
+          klass = klass.to_s.constantize if klass
+          match = UriMatch.new(relative_url, type, klass, obj_id, rest)
           handler = @handlers[type] || @default_handler
           (handler && handler.call(match)) || relative_url
         else

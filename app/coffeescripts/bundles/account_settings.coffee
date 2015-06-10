@@ -4,4 +4,4 @@ require [
   'compiled/bundles/modules/account_quota_settings'
 ], (FeatureFlagAdminView) ->
   featureFlags = new FeatureFlagAdminView(el: '#tab-features')
-  featureFlags.collection.fetch()
+  featureFlags.collection.fetchAll()

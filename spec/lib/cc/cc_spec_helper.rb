@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require 'webmock/rspec'
 
 CC_XML_EXPORT_DIR = File.dirname(__FILE__) + '/../../fixtures/cc/cc_export'
 

@@ -1,0 +1,120 @@
+@import "base/environment";
+
+/*
+Old Forms
+
+## Inline
+
+```html
+<form class="form-inline">
+  <input type="text" class="input-small" placeholder="Email">
+  <input type="password" class="input-small" placeholder="Password">
+  <label class="checkbox">
+    <input type="checkbox"> Remember me
+  </label>
+  <button type="submit" class="btn">Sign in</button>
+</form>
+```
+
+## Hint Text
+
+For text beneath a form elements that give further explanation about the field.
+This was added for some legacy code, not sure if it'll work well elsewhere.
+
+```html
+<input type="text" placeholder="Sortable Name"> <div class="hint-text">The name displayed in sorted lists</div>
+```
+
+## Dialog Form
+
+Add the class `form-dialog` to get the `form-controls` to display properly in a
+dialog form and proper overflow scrolling of content. No need to use
+`$.fn.fixDialogButtons`.
+
+**Note**: You must wrap your content in `.form-dialog-content` and use the
+height option for jQuery UI dialog. To get the scrolling and fixed form
+controls on the bottom required this.
+
+```html
+<button id="show-dialog-buttons-dialog" class="btn">Show Dialog</button>
+<form id="dialog-buttons-dialog" class="form-dialog">
+  <div class="form-dialog-content">
+    <p style="height: 1000px;">Aren't the form controls beautiful?<br> Scroll down</p>
+    <p>Hooray for scrolling</p>
+  </div>
+  <div class="form-controls">
+    <button class="btn btn-primary" type="button">Submit</button>
+  </div>
+</form>
+```
+
+*/
+
+input[type=text].loading {
+  background-image: url('/images/ajax-reload-animated.gif');
+  background-repeat: no-repeat;
+  background-position: 98% center;
+}
+
+.loadingIndicator, .paginatedLoadingIndicator {
+  background-image: url('/images/ajax-reload-animated.gif');
+  background-repeat: no-repeat;
+  background-position: center center;
+  height: 20px;
+}
+
+// Hint Text
+
+.hint-text {
+  font-size: 10px;
+  color: $ic-hint-text;
+}
+
+input + .hint-text {
+  /* pull up into the input */
+  margin-top: -10px;
+  /* replace the inputs margin-bottom */
+  margin-bottom: 10px;
+}
+
+// Form Table
+
+.formtable {
+  td:first-child {
+    /* lines-up label in first cell with input in second */
+    padding-top: 6px;
+  }
+}
+
+// Dialog Form
+
+.form-dialog {
+  padding-bottom: 70px !important;
+  margin-bottom: 0;
+
+  .form-controls {
+    padding: 10px;
+    margin: 0;
+    background-color: lighten($ic-color-neutral, 5%);
+    border-top: 1px solid $ic-border-light;
+    text-align: right;
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+  }
+
+  .form-dialog-content {
+    // jQuery UI handles overflow on its own, but our buttons are inside the
+    // default scroll area, this gives us our own scrollable content area
+    // while still allowing us to use the height option in $.fn.dialog
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 51px;
+    overflow: auto;
+    padding: 20px;
+  }
+}
+

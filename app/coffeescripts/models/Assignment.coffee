@@ -30,7 +30,7 @@ define [
       if (all_dates = @get('all_dates'))?
         @set 'all_dates', new DateGroupCollection(all_dates)
       if (@postToSISEnabled())
-        unless @get('post_to_sis') == true || @get('post_to_sis') == false
+        if !@get('id') && @get('post_to_sis') != false
           @set 'post_to_sis', true
 
     isQuiz: => @_hasOnlyType 'online_quiz'
@@ -67,9 +67,6 @@ define [
     name: (newName) =>
       return @get 'name' unless arguments.length > 0
       @set 'name', newName
-
-    postToSIS:  =>
-      return @get 'post_to_sis' unless arguments.length > 0
 
     pointsPossible: (points) =>
       return @get('points_possible') || 0 unless arguments.length > 0
@@ -116,6 +113,9 @@ define [
       submissionTypes = @_submissionTypes()
       @expectsSubmission() && !@get('locked_for_user') && !_.include(submissionTypes, 'online_quiz') && !_.include(submissionTypes, 'attendance')
 
+    hasSubmittedSubmissions: =>
+      @get('has_submitted_submissions')
+
     withoutGradedSubmission: =>
       sub = @get('submission')
       !sub? || sub.withoutGradedSubmission()
@@ -137,9 +137,17 @@ define [
         thing in ['online', 'online_text_entry',
           'media_recording', 'online_url', 'online_upload']
 
+    postToSIS: (postToSisBoolean) =>
+      return @get 'post_to_sis' unless arguments.length > 0
+      @set 'post_to_sis', postToSisBoolean
+
     peerReviews: (peerReviewBoolean) =>
       return @get 'peer_reviews' unless arguments.length > 0
       @set 'peer_reviews', peerReviewBoolean
+
+    anonymousPeerReviews: (anonymousPeerReviewBoolean) =>
+      return @get 'anonymous_peer_reviews' unless arguments.length > 0
+      @set 'anonymous_peer_reviews', anonymousPeerReviewBoolean
 
     automaticPeerReviews: (autoPeerReviewBoolean) =>
       return @get 'automatic_peer_reviews' unless arguments.length > 0
@@ -184,6 +192,9 @@ define [
       @set 'group_category_id', id
 
     canGroup: -> !@get('has_submitted_submissions')
+
+    differentiatedAssignmentsEnabled: ->
+      ENV?.DIFFERENTIATED_ASSIGNMENTS_ENABLED || false
 
     gradingStandardId: (id) =>
       return @get('grading_standard_id') unless arguments.length > 0
@@ -256,6 +267,14 @@ define [
       dateGroups = @get("all_dates")
       dateGroups && dateGroups.length > 1
 
+    nonBaseDates: =>
+      dateGroups = @get("all_dates")
+      return false unless dateGroups
+      withouBase = _.filter(dateGroups.models, (dateGroup) =>
+        dateGroup && !dateGroup.get("base")
+      )
+      withouBase.length > 0
+
     allDates: =>
       groups = @get("all_dates")
       models = (groups and groups.models) or []
@@ -274,7 +293,7 @@ define [
       fields = [
         'name', 'dueAt','description','pointsPossible', 'lockAt', 'unlockAt',
         'gradingType', 'notifyOfUpdate', 'peerReviews', 'automaticPeerReviews',
-        'peerReviewCount', 'peerReviewsAssignAt',
+        'peerReviewCount', 'peerReviewsAssignAt', 'anonymousPeerReviews',
         'acceptsOnlineUpload','acceptsMediaRecording', 'submissionType',
         'acceptsOnlineTextEntries', 'acceptsOnlineURL', 'allowedExtensions',
         'restrictFileExtensions', 'isOnlineSubmission', 'isNotGraded',
@@ -284,7 +303,7 @@ define [
         'frozenAttributes', 'freezeOnCopy', 'canFreeze', 'isSimple',
         'gradingStandardId', 'isLetterGraded', 'isGpaScaled', 'assignmentGroupId', 'iconType',
         'published', 'htmlUrl', 'htmlEditUrl', 'labelId', 'position', 'postToSIS',
-        'multipleDueDates', 'allDates', 'isQuiz', 'singleSectionDueDate'
+        'multipleDueDates', 'nonBaseDates', 'allDates', 'isQuiz', 'singleSectionDueDate'
       ]
       if ENV.DIFFERENTIATED_ASSIGNMENTS_ENABLED
         fields.push 'isOnlyVisibleToOverrides'

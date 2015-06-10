@@ -19,7 +19,7 @@ describe GroupLeadership do
       it "assigns the first student to join as the leader" do
         leader = user_model
         @group.group_memberships.create!(:user => leader, :workflow_state => 'accepted')
-        @group.reload.leader.should == leader
+        expect(@group.reload.leader).to eq leader
       end
 
       it "picks a new leader if the leader leaves" do
@@ -27,9 +27,9 @@ describe GroupLeadership do
         follower = user_model
         leader_membership = @group.group_memberships.create!(:user => leader, :workflow_state => 'accepted')
         follower_membership = @group.group_memberships.create!(:user => follower, :workflow_state => 'accepted')
-        @group.reload.leader.should == leader
+        expect(@group.reload.leader).to eq leader
         leader_membership.destroy
-        @group.reload.leader.should == follower
+        expect(@group.reload.leader).to eq follower
       end
     end
 
@@ -46,37 +46,37 @@ describe GroupLeadership do
 
       context "leader membership" do
         it "should revoke when deleted" do
-          @group.leader.should_not be_nil
+          expect(@group.leader).not_to be_nil
           @leader_membership.destroy!
-          @group.reload.leader.should be_nil
+          expect(@group.reload.leader).to be_nil
         end
 
         it "should revoke when soft deleted" do
-          @group.leader.should_not be_nil
+          expect(@group.leader).not_to be_nil
           @leader_membership.destroy
-          @group.reload.leader.should be_nil
+          expect(@group.reload.leader).to be_nil
         end
 
         it "should revoke when group is changed" do
-          @group.leader.should_not be_nil
+          expect(@group.leader).not_to be_nil
           group2 = @category.groups.create!(:context => @course)
           @leader_membership.update_attribute(:group_id, group2.id)
-          @group.reload.leader.should be_nil
+          expect(@group.reload.leader).to be_nil
         end
       end
 
       context "non-leader membership" do
         it "should not revoke when deleted" do
-          @group.leader.should_not be_nil
+          expect(@group.leader).not_to be_nil
           @membership.destroy!
-          @group.reload.leader.should_not be_nil
+          expect(@group.reload.leader).not_to be_nil
        end
 
         it "should not revoke when group is changed" do
-          @group.leader.should_not be_nil
+          expect(@group.leader).not_to be_nil
           group2 = @category.groups.create!(:context => @course)
           @membership.update_attribute(:group_id, group2.id)
-          @group.reload.leader.should_not be_nil
+          expect(@group.reload.leader).not_to be_nil
         end
       end
 

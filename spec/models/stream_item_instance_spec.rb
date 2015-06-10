@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe StreamItemInstance do
   describe ".update_all" do
     it "raises an exception to warn about necessary cache invalidation" do
-      lambda { StreamItemInstance.update_all }.should raise_error
+      expect { StreamItemInstance.update_all }.to raise_error
     end
   end
 

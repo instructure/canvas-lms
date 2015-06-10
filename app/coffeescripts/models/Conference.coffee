@@ -4,14 +4,11 @@ define [
 ], (_, {Model}) ->
 
   class Conference extends Model
-
-    course: ->
-      @options.course_id || @collection?.course_id
-
-    urlRoot: -> "/courses/#{@course()}/conferences"
+    urlRoot: ->
+      url = @get('url')
+      url.replace(/([^\/]*$)/, '')
 
     special_urls: ->
-      edit_url: "#{@urlRoot()}#conference_#{@id}"
       join_url: @get('url') + '/join'
       close_url: @get('url') + '/close'
 
@@ -22,7 +19,7 @@ define [
 
     permissions_data: ->
       has_actions: @get('permissions')['edit'] || @get('permissions')['delete']
-      show_end: @get('permissions')['initiate'] && @get('started_at') && @get('long_running')
+      show_end: @get('permissions')['close'] && @get('started_at') && !@get('ended_at')
 
     schedule_data: ->
       scheduled: 'scheduled_date' of @get('user_settings')

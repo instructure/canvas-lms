@@ -1,0 +1,81 @@
+#!/usr/bin/env node
+
+var fs = require('fs-extra');
+var path = require('path');
+
+var compileJSX = require('./build_scripts/compile_jsx');
+var compileApps = require('./build_scripts/compile_js');
+var copyCompiledJs = require('./build_scripts/copy_compiled_js');
+var K = require('./build_scripts/constants');
+var PKG_NAME = K.pkgName;
+var APP_NAMES = K.appNames;
+
+// ============================================================================
+// STAGE 1: Setting up the file system & staging files for processing
+// ----------------------------------------------------------------------------
+fs.removeSync('tmp');
+fs.removeSync('dist');
+
+fs.ensureDirSync('tmp/js');
+fs.ensureDirSync('tmp/dist');
+
+// Stage the common bundle under /tmp/compiled/js/PKG_NAME. This will have two
+// effects:
+//
+//  1. common bundle will be refered to simply by the name of the package, e.g:
+//     "canvas_quizzes"
+//
+//  2. apps already referencing the common bundle using the package name will
+//     simply just work, no mapping required. E.g:
+//     "canvas_quizzes/core/promise" will resolve normally
+//
+// The reason for /tmp/compiled/js is to match the hierarchy of the source which
+// is three steps below the root (/apps/*/js) - this will allow us to re-use
+// the r.js path/map configs we were using for development.
+fs.copySync('apps/common/js', 'tmp/compiled/js/' + PKG_NAME);
+
+// Stage every app into /tmp/compiled/js/PKG_NAME/apps/APP_NAME, so that the
+// built modules will look something like:
+//
+//  "canvas_quizzes/apps/events/some_module"
+APP_NAMES.forEach(function(appName) {
+  fs.copySync(
+    'apps/' + appName + '/js',
+    'tmp/compiled/js/' + PKG_NAME + '/apps/' + appName
+  );
+});
+
+// ============================================================================
+// STAGE 2: Compiling the JSX using react-tools
+// ----------------------------------------------------------------------------
+compileJSX('tmp/compiled/js/' + PKG_NAME);
+
+// ============================================================================
+// STAGE 3: Building JS bundles using r.js
+// ----------------------------------------------------------------------------
+compileApps(function(buildOutput) {
+  console.log('r.js: built');
+  console.log(buildOutput);
+
+  // ==========================================================================
+  // STAGE 4: Copying built and static assets
+  // --------------------------------------------------------------------------
+  copyCompiledJs();
+
+  fs.copySync('config/requirejs/build/map.json', 'dist/' + PKG_NAME + '.map.json');
+  fs.copySync('config/requirejs/build/paths.json', 'dist/' + PKG_NAME + '.paths.json');
+
+  {
+    var bundles;
+    var commonModules = require('./build_scripts/extract_common_modules')();
+    var commonBundle = require('./build_scripts/extract_common_bundle')(commonModules);
+
+    bundles = {};
+    bundles[PKG_NAME] = commonBundle;
+
+    fs.writeFileSync('dist/' + PKG_NAME + '.bundles.json', JSON.stringify(bundles, null, 2));
+  }
+}, function reportBuildFailureAndAbort(error) {
+  console.error('r.js build failure:', error);
+  process.exit(1);
+});

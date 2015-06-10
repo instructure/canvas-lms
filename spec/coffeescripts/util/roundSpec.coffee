@@ -1,4 +1,4 @@
-require ['compiled/util/round'], (round) ->
+define ['compiled/util/round'], (round) ->
 
   module "round"
 

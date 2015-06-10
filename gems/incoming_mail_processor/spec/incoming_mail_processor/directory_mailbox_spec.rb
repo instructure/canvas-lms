@@ -41,23 +41,52 @@ describe IncomingMailProcessor::DirectoryMailbox do
     expect { @mailbox.connect }.to raise_error
   end
 
-  it "should iterate through and yield files in a directory" do
-    folder = default_config[:folder]
-    folder_entries = %w(. .. foo bar baz)
-    @mailbox.expects(:files_in_folder).with(folder).returns(folder_entries)
-    folder_entries.each do |entry|
-      @mailbox.expects(:file?).with(folder, entry).returns(!entry.include?('.'))
+  describe ".each_message" do
+    it "should iterate through and yield files in a directory" do
+      folder = default_config[:folder]
+      folder_entries = %w(. .. foo bar baz)
+      @mailbox.expects(:files_in_folder).with(folder).returns(folder_entries)
+      folder_entries.each do |entry|
+        @mailbox.expects(:file?).with(folder, entry).returns(!entry.include?('.'))
+      end
+
+      @mailbox.expects(:read_file).with(folder, "foo").returns("foo body")
+      @mailbox.expects(:read_file).with(folder, "bar").returns("bar body")
+      @mailbox.expects(:read_file).with(folder, "baz").returns("baz body")
+
+      yielded_values = []
+      @mailbox.each_message do |*values|
+        yielded_values << values
+      end
+      yielded_values.should eql [["foo", "foo body"], ["bar", "bar body"], ["baz", "baz body"], ]
     end
 
-    @mailbox.expects(:read_file).with(folder, "foo").returns("foo body")
-    @mailbox.expects(:read_file).with(folder, "bar").returns("bar body")
-    @mailbox.expects(:read_file).with(folder, "baz").returns("baz body")
+    it "iterates with stride and offset" do
+      folder = default_config[:folder]
+      folder_entries = %w(. .. foo bar baz)
+      @mailbox.expects(:files_in_folder).with(folder).twice.returns(folder_entries)
+      folder_entries.each do |entry|
+        @mailbox.expects(:file?).with(folder, entry).returns(!entry.include?('.'))
+      end
 
-    yielded_values = []
-    @mailbox.each_message do |*values|
-      yielded_values << values
+      # the crc32 of the filename is used to determine whether a given worker picks up the file
+      # with these file and two workers, foo goes to worker 1 and foo goes to worker 0
+      @mailbox.expects(:read_file).with(folder, "foo").returns("foo body")
+      @mailbox.expects(:read_file).with(folder, "bar").returns("bar body")
+      @mailbox.expects(:read_file).with(folder, "baz").returns("baz body")
+
+      yielded_values = []
+      @mailbox.each_message(stride: 2, offset: 0) do |*values|
+        yielded_values << values
+      end
+      yielded_values.should eql [["bar", "bar body"], ["baz", "baz body"], ]
+
+      yielded_values = []
+      @mailbox.each_message(stride: 2, offset: 1) do |*values|
+        yielded_values << values
+      end
+      yielded_values.should eql [["foo", "foo body"]]
     end
-    yielded_values.should eql [["foo", "foo body"], ["bar", "bar body"], ["baz", "baz body"], ]
   end
 
   context "with simple foo file" do
@@ -101,4 +130,3 @@ describe IncomingMailProcessor::DirectoryMailbox do
 
   end
 end
-

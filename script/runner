@@ -1,4 +1,0 @@
-#!/usr/bin/env ruby
-ENV['RAILS_ENV'] ||= 'production'
-require File.expand_path('../../config/boot',  __FILE__)
-require 'commands/runner'

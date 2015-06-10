@@ -77,6 +77,22 @@ $.widget( "ui.tabs", {
 				if ( $( this ).closest( "li" ).is( ".ui-state-disabled" ) ) {
 					this.blur();
 				}
+			})
+			// Instructure: If a click is made on a tab, simulate a click on the anchor within the tab instead.
+			// Works around a Firefox bug effecting NVDA
+			.delegate( ".ui-tabs-nav > li", "click" + this.eventNamespace, function( event ) {
+				var $this = $(this);
+				if ($this.is(event.target)) {
+					var $anchor = $this.find(".ui-tabs-anchor:visible").first();
+					if ($anchor.length === 0) {
+						return;
+					}
+					event.preventDefault();
+					var newEvent = document.createEvent('MouseEvent');
+					newEvent.initEvent('click', true, true);
+					$anchor.focus();
+					$anchor[0].dispatchEvent(newEvent);
+				}
 			});
 
 		this._processTabs();

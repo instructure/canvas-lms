@@ -28,12 +28,12 @@ describe "page views" do
     @topic = @course.discussion_topics.create!
 
     post "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries", :message => 'hello'
-    response.should be_success
+    expect(response).to be_success
 
     pv = PageView.last
-    pv.context.should == @course
-    pv.controller.should == 'discussion_topics_api'
-    pv.action.should == 'add_entry'
+    expect(pv.context).to eq @course
+    expect(pv.controller).to eq 'discussion_topics_api'
+    expect(pv.action).to eq 'add_entry'
   end
 
 end

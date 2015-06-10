@@ -30,15 +30,15 @@ describe StreamItemCache do
         @teacher.cached_recent_stream_items(:contexts => [@course]) # cache the context items
         dashboard_key = StreamItemCache.recent_stream_items_key(@teacher)
         context_key   = StreamItemCache.recent_stream_items_key(@teacher, 'Course', @course.id)
-        Rails.cache.read(dashboard_key).should_not be_blank
-        Rails.cache.read(context_key).should_not be_blank
+        expect(Rails.cache.read(dashboard_key)).not_to be_blank
+        expect(Rails.cache.read(context_key)).not_to be_blank
 
         # WHEN: I create another stream item
         discussion_topic_model(:context => @course) # observer fires
 
         # EXPEXT: the cache to be cleared
-        Rails.cache.read(dashboard_key).should be_blank
-        Rails.cache.read(context_key).should be_blank
+        expect(Rails.cache.read(dashboard_key)).to be_blank
+        expect(Rails.cache.read(context_key)).to be_blank
       end
     end
   end

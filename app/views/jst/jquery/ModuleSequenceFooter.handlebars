@@ -2,14 +2,14 @@
 <div class='module-sequence-footer clearfix'>
   <div class="module-sequence-footer-content">
     {{#if previous.show}}
-      <a href="{{previous.url}}" role="button" class="pull-left" data-tooltip="right" data-tooltip-title="{{previous.tooltip}}" aria-describedby="msf{{instanceNumber}}-previous-desc">
+      <a href="{{previous.url}}" role="button" class="pull-left" data-tooltip="right" data-html-tooltip-title="{{previous.tooltip}}" aria-describedby="msf{{instanceNumber}}-previous-desc">
         <i class="icon-mini-arrow-left"></i>{{#t 'previous'}}Previous{{/t}}
         <span id="msf{{instanceNumber}}-previous-desc" class="hidden" hidden>{{previous.tooltipText}}</span>
       </a>
     {{/if}}
 
     {{#if next.show}}
-      <a href="{{next.url}}" role="button" class="pull-right bordered" data-tooltip="left" data-tooltip-title="{{next.tooltip}}" aria-describedby="msf{{instanceNumber}}-next-desc">
+      <a href="{{next.url}}" role="button" class="pull-right bordered" data-tooltip="left" data-html-tooltip-title="{{next.tooltip}}" aria-describedby="msf{{instanceNumber}}-next-desc">
         {{#t 'next'}}Next{{/t}}<i class="icon-mini-arrow-right"></i>
         <span id="msf{{instanceNumber}}-next-desc" class="hidden" hidden>{{next.tooltipText}}</span>
       </a>

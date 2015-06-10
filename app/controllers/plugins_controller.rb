@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+require 'dynamic_form'
 
 class PluginsController < ApplicationController
   before_filter :require_setting_site_admin, :set_site_admin_context, :set_navigation
@@ -46,7 +47,7 @@ class PluginsController < ApplicationController
       else
         @settings = @plugin.settings
         flash[:error] = t('errors.setting_update_failed', "There was an error saving the plugin settings.")
-        render :action => 'show'
+        render :show
       end
     else
       flash[:error] = t('errors.plugin_doesnt_exist', "The plugin %{id} doesn't exist.", :id => params[:id])
@@ -55,7 +56,7 @@ class PluginsController < ApplicationController
   end
 
   protected
-  
+
   def find_plugin_setting
     if @plugin = Canvas::Plugin.find(params[:id])
       @plugin_setting = PluginSetting.find_by_name(@plugin.id)

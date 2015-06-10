@@ -5,9 +5,18 @@ define [
   'jqueryui/popup'
 ], ($) ->
 
+  ###
+  # PLEASE READ BEFORE MODIFYING THIS FILE:
+  # This provides the 'admin cog' menus amongst other things used throughout
+  # Canvas.  It has been extensively tested for accessibility.  Before making
+  # any changes to this file, please check with someone about the accessibility
+  # repercussions of what you intend to do.
+  ###
+
   class KyleMenu
     constructor: (trigger, options) ->
       @$trigger = $(trigger).data('kyleMenu', this)
+      @$ariaMenuWrapper = @$trigger.parent()
       @opts = $.extend(true, {}, KyleMenu.defaults, options)
 
       unless @opts.noButton
@@ -52,9 +61,11 @@ define [
         popupclose: @onClose
 
     onOpen: (event) =>
+      @$ariaMenuWrapper.attr 'role', 'application'
       @adjustCarat event
       @$menu.addClass 'ui-state-open'
       @$notifyParent.addClass('menu_active') if @opts.notifyMenuActiveOnParent
+
 
     open: ->
       @$menu.popup 'open'
@@ -64,18 +75,19 @@ define [
         e.preventDefault()
         el = $target[0]
         event = document.createEvent 'MouseEvent'
-        event.initEvent 'click', true, false
+        event.initEvent 'click', true, true
         el.dispatchEvent event
       @close()
 
     onClose: =>
       @$menu.insertBefore(@$placeholder) if @opts.appendMenuTo
       @$trigger.removeClass 'ui-state-active'
+      @$ariaMenuWrapper.removeAttr 'role'
       @$menu.removeClass "ui-state-open"
       @$notifyParent.removeClass('menu_active') if @opts.notifyMenuActiveOnParent
 
     close: =>
-      @$menu.popup('close').removeClass('ui-state-open')
+      @$menu.hasClass('ui-state-open') && @$menu.popup('close').removeClass('ui-state-open')
 
     keepButtonActive: =>
       @$trigger.addClass('ui-state-active') if @$menu.is('.ui-state-open') && @$trigger.is('.btn, .ui-button')
@@ -98,9 +110,6 @@ define [
       @$carat = $('<span class="ui-menu-carat"><span /></span>')
                     .css('left', caratOffset)
                     .prependTo(@$menu)
-
-      # this, along with the webkit animation makes it bounce into place.
-      @$menu.css('-webkit-transform-origin-x', caratOffset + 'px')
 
     @defaults =
       popupOpts:

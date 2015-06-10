@@ -1,0 +1,7 @@
+<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+  <p>
+    <%= f.label :email_address, en: "email address to send error reports to (something@example.com)" %>
+    <%= f.text_field :email_address %>
+  </p>
+<% end %>
+<%= render partial: "plugins/byots_docs" %>

@@ -40,7 +40,7 @@ define [
 
     addOutcome: (e) =>
       e.preventDefault()
-      model = new Outcome title: I18n.t('new_outcome', 'New Outcome')
+      model = new Outcome title: ''
       @trigger 'add', model
 
     addGroup: (e) =>

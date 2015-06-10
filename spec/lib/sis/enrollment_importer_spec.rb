@@ -8,7 +8,7 @@ module SIS
       EnrollmentImporter.new(Account.default, {}).process(messages, 2) do |importer|
         importer.add_enrollment(1, 2, 3, 'student', 'active', Date.today, Date.today)
       end
-      messages.should_not be_empty
+      expect(messages).not_to be_empty
     end
 
   end

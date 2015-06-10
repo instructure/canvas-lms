@@ -1,0 +1,169 @@
+@import "base/environment";
+
+/* Tour Popups
+- give a `<div>` classes of `tour` and `popover`.
+- use `controls` for buttons at the bottom of the popover
+- everything else is just html
+
+(inline styles in this demo are not desired, obviously)
+
+```html
+<div class="popover tour top" style="position:static; margin-top: 10px; display: block;">
+  <div class="arrow"></div>
+  <div class="popover-content">
+    <h1 class="h4">Canvas just got better!</h1>
+    <p>
+      It’s now possible to set the read/unread status of your discussion posts manually.
+    </p>
+
+    <div class="controls clearfix">
+      <div class="pull-right">
+        <a href="#" class="btn">No thanks</a>
+        <a href="#" class="btn btn-primary">Show me how</a>
+      </div>
+    </div>
+  </div>
+</div>
+```
+*/
+.popover.tour {
+  z-index: 1000; // yeah, one thousand
+  width: 350px;
+  padding: 20px;
+  color: $gray;
+  font-weight: 200;
+  font-size: 15px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  // When a rule is used, it should have less margin in the popups
+  hr {
+    margin: 10px 0;
+  }
+}
+.popover-content {
+  padding: 0; // reset for our popovers
+}
+
+.popover.tour .controls {
+  margin: 10px 0 0 0;
+  padding: 0 10px 0 0;
+}
+.controls--buttons-only {
+  button {margin-right: 5px;}
+}
+.controls--items-align-right {
+  // Container flex
+  flex: 1;
+  // Inner content to flex
+  display: flex;
+  justify-content: flex-end;
+}
+.popover-content p {
+  margin-right: 10px;
+}
+
+i.usher-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 5px;
+  cursor: pointer;
+}
+.tour-icon {
+  padding-left: 10px;
+  // We're overwriting a bunch of stuff on the icon
+  // todo: we should evenutally fix icons so we don't have to do this
+  // 
+  i.icon-tour-info {    
+    width: 20px;
+    height: 20px;
+    &:before {
+      width: 20px !important;
+      height: 20px !important;
+      font-size: 20px !important;
+    }
+  }
+}
+.tour-content {
+  padding-left: 10px;
+  flex: 1;
+}
+.tour-content .btn-link {
+  padding: 0; // takes off button padding on btn-link styles to keep flush with side
+  color: $ic-brand-primary;
+}
+// Tour Popup Style: Notification box
+// ===================================
+// This styles the tour box look more like a notification, used
+// when you want to soft trigger a tour 
+
+.popover.tour.tour--notification {
+  width: 330px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 20px 20px 10px;
+  
+  .popover-content {padding: 0;} // reset area padding
+  
+  .tour-content {
+    padding-left: 10px;
+    flex: 1;
+  } 
+
+  i.usher-close {
+    padding: 0;
+  }
+  
+  p {
+    font-size: 14px;
+    padding-right: 5px;
+  }
+
+  .controls {
+    margin: 10px 0 0;
+    padding: 0;
+  }
+
+  .hide-tour-link {
+    text-align: right;
+    padding-right: 10px;
+    button {font-size: 12px;text-decoration: underline;}
+  }
+}
+// Tour Step Counter
+// ===================================
+// This styles the litle step dots
+// 
+.step-counter.step-counter--align-left  {
+  margin-top: 0;
+}
+.step-counter_item {  
+  color: $ic-color-neutral;
+  margin: 0 5px;      
+  font-size: 6px !important;
+}
+i.icon-tour-step-counter {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+  font-size: 6px !important;
+  color: $grayLight;
+  &:before {
+    font-size: 6px !important;
+  }
+  &.step-counter_item--current {
+    color: $ic-brand-primary;
+  }
+}
+
+// Tour Popup Style: Lists 
+// ===================================
+// This styles the tour box content when it has lists
+.tour-content__list {
+  margin: 0 15px 0 0;
+  padding: 10px 0;
+}
+.tour-content__list-item {
+  padding: 5px 0;
+  margin-left: 17px;
+}

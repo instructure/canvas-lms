@@ -33,6 +33,11 @@ module Quizzes
       # PS: this is always true for item analysis
       :includes_all_versions,
 
+      :points_possible,
+
+      :speed_grader_url,
+      :quiz_submissions_zip_url,
+
       # an aggregate of question stats from both student and item analysis
       :question_statistics,
 
@@ -41,19 +46,19 @@ module Quizzes
       #   - correct_count_average
       #   - incorrect_count_average
       #   - duration_average
-      #   - logged_out_users (id set)
       #   - score_average
       #   - score_high
       #   - score_low
       #   - score_stdev
-      #   - user_ids (id set)
-      :submission_statistics
+      :submission_statistics,
     ]
 
     def_delegators :@controller,
       :course_quiz_statistics_url,
       :api_v1_course_quiz_url,
-      :api_v1_course_quiz_statistics_url
+      :api_v1_course_quiz_statistics_url,
+      :speed_grader_course_gradebook_url,
+      :course_quiz_quiz_submissions_url
 
     has_one :quiz, embed: :ids
 
@@ -102,7 +107,10 @@ module Quizzes
           out[$1] = statistic if key =~ SubmissionStatisticsExtractor
         end
 
-        out[:unique_count] = student_analysis_report[:unique_submission_count]
+        out.delete('user_ids')
+        out.delete('logged_out_users')
+
+        out['unique_count'] = student_analysis_report[:unique_submission_count]
       end
     end
 
@@ -118,7 +126,27 @@ module Quizzes
       object[:student_analysis].includes_all_versions
     end
 
+    def points_possible
+      quiz.points_possible
+    end
+
+    def speed_grader_url
+      if show_speed_grader?
+        speed_grader_course_gradebook_url(quiz.context, {
+          assignment_id: quiz.assignment.id
+        })
+      end
+    end
+
+    def quiz_submissions_zip_url
+      course_quiz_quiz_submissions_url(quiz.context, quiz.id, zip: 1)
+    end
+
     private
+
+    def show_speed_grader?
+      quiz.assignment.present? && quiz.published? && context.allows_speed_grader?
+    end
 
     def student_analysis_report
       @student_analysis_report ||= object[:student_analysis].report.generate(false)
@@ -126,6 +154,10 @@ module Quizzes
 
     def item_analysis_report
       @item_analysis_report ||= object[:item_analysis].report.generate(false)
+    end
+
+    def quiz
+      object.quiz
     end
   end
 end

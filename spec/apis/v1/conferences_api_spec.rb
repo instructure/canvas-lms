@@ -23,25 +23,26 @@ include Api::V1::Json
 include Api
 
 describe "Conferences API", type: :request do
-  before do
+  before :once do
     # these specs need an enabled web conference plugin
-    @plugin = PluginSetting.find_or_create_by_name('wimba')
+    @plugin = PluginSetting.create!(name: 'wimba')
     @plugin.update_attribute(:settings, { :domain => 'wimba.test' })
     @category_path_options = { :controller => "conferences", :format => "json" }
+    course_with_teacher(:active_all => true)
+    student_in_course(:active_all => true)
+    @user = @teacher
   end
 
   describe "GET list of conferences" do
 
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
       @user = nil
       raw_api_call(:get, "/api/v1/courses/#{@course.to_param}/conferences", @category_path_options.
         merge(action: 'index', course_id: @course.to_param))
-      response.code.should == '401'
+      expect(response.code).to eq '401'
     end
 
     it "should list all the conferences" do
-      course_with_teacher(:active_all => true)
       @conferences = (1..2).map { |i| @course.web_conferences.create!(:conference_type => 'Wimba',
                                                                       :duration => 60,
                                                                       :user => @teacher,
@@ -49,12 +50,11 @@ describe "Conferences API", type: :request do
 
       json = api_call(:get, "/api/v1/courses/#{@course.to_param}/conferences", @category_path_options.
         merge(action: 'index', course_id: @course.to_param))
-      json.should == api_conferences_json(@conferences.reverse.map{|c| WebConference.find(c.id)}, @course, @user)
+      expect(json).to eq api_conferences_json(@conferences.reverse.map{|c| WebConference.find(c.id)}, @course, @user)
     end
 
     it "should not list conferences for disabled plugins" do
-      course_with_teacher(:active_all => true)
-      plugin = PluginSetting.find_or_create_by_name('adobe_connect')
+      plugin = PluginSetting.create!(name: 'adobe_connect')
       plugin.update_attribute(:settings, { :domain => 'adobe_connect.test' })
       @conferences = ['AdobeConnect', 'Wimba'].map {|ct| @course.web_conferences.create!(:conference_type => ct,
                                                                                          :duration => 60,
@@ -64,11 +64,11 @@ describe "Conferences API", type: :request do
       plugin.save!
       json = api_call(:get, "/api/v1/courses/#{@course.to_param}/conferences", @category_path_options.
         merge(action: 'index', course_id: @course.to_param))
-      json.should == api_conferences_json([WebConference.find(@conferences[1].id)], @course, @user)
+      expect(json).to eq api_conferences_json([WebConference.find(@conferences[1].id)], @course, @user)
     end
 
     it "should only list conferences the user is a participant of" do
-      course_with_student(:active_all => true)
+      @user = @student
       @conferences = (1..2).map { |i| @course.web_conferences.create!(:conference_type => 'Wimba',
                                                                       :duration => 60,
                                                                       :user => @teacher,
@@ -77,11 +77,11 @@ describe "Conferences API", type: :request do
       @conferences[0].save!
       json = api_call(:get, "/api/v1/courses/#{@course.to_param}/conferences", @category_path_options.
         merge(action: 'index', course_id: @course.to_param))
-      json.should == api_conferences_json([WebConference.find(@conferences[0].id)], @course, @user)
+      expect(json).to eq api_conferences_json([WebConference.find(@conferences[0].id)], @course, @user)
     end
 
     it 'should get a conferences for a group' do
-      course_with_student(:active_all => true)
+      @user = @student
       @group = @course.groups.create!(:name => "My Group")
       @group.add_user(@student, 'accepted', true)
       @conferences = (1..2).map { |i| @group.web_conferences.create!(:conference_type => 'Wimba',
@@ -90,8 +90,60 @@ describe "Conferences API", type: :request do
                                                                       :title => "Wimba #{i}")}
       json = api_call(:get, "/api/v1/groups/#{@group.to_param}/conferences", @category_path_options.
         merge(action: 'index', group_id: @group.to_param))
-      json.should == api_conferences_json(@conferences.reverse.map{|c| WebConference.find(c.id)}, @group, @student)
+      expect(json).to eq api_conferences_json(@conferences.reverse.map{|c| WebConference.find(c.id)}, @group, @student)
+    end
+  end
+
+  describe "POST 'recording_ready'" do
+    before do
+      WebConference.stubs(:plugins).returns([
+        web_conference_plugin_mock("big_blue_button", {
+          :domain => "bbb.instructure.com",
+          :secret_dec => "secret",
+        })
+      ])
     end
 
+    let(:conference) do
+      BigBlueButtonConference.create!(context: course,
+                                      user: user,
+                                      conference_key: "conf_key")
+    end
+
+    let(:course_id) { conference.context.id }
+
+    let(:path) do
+      "api/v1/courses/#{course_id}/conferences/#{conference.id}/recording_ready"
+    end
+
+    let(:params) do
+      @category_path_options.merge(action: 'recording_ready',
+                                   course_id: course_id,
+                                   conference_id: conference.id)
+    end
+
+    it 'should mark the recording as ready' do
+      payload = {meeting_id: conference.conference_key}
+      body_params = {signed_parameters: JWT.encode(payload, conference.config[:secret_dec])}
+
+      raw_api_call(:post, path, params, body_params)
+      expect(response.status).to eq 202
+    end
+
+    it 'should error if the secret key is wrong' do
+      payload = {meeting_id: conference.conference_key}
+      body_params = {signed_parameters: JWT.encode(payload, "wrong_key")}
+
+      raw_api_call(:post, path, params, body_params)
+      expect(response.status).to eq 401
+    end
+
+    it 'should error if the conference_key is wrong' do
+      payload = {meeting_id: "wrong_conference_key"}
+      body_params = {signed_parameters: JWT.encode(payload, conference.config[:secret_dec])}
+
+      raw_api_call(:post, path, params, body_params)
+      expect(response.status).to eq 422
+    end
   end
 end

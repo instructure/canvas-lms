@@ -1,0 +1,14 @@
+<%
+    content_for :page_title, t('title', 'Broken Link Error') 
+    js_bundle :file_not_found_bundle
+%>
+
+<div id="unauthorized_holder">
+  <div id="unauthorized_message">
+    <h2 class="ui-state-error"> 
+      <%= t('headings.unauthorized_action', %{Oops you’ve found a broken link!}) %>
+    </h2>
+    <div id="sendMessageForm"></div>
+  </div>
+</div>
+

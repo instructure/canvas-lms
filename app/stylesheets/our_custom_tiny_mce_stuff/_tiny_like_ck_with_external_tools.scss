@@ -1,0 +1,38 @@
+/* Functional Variables */
+$menu-item-text-hover-focus-color: $ic-color-dark;
+$menu-item-text-disabled-color: $ic-brand-secondary;
+$menu-item-keyboard-shortcut-color: $ic-brand-secondary;
+
+.mce-tinymce{
+  .mce-container-body {
+    overflow: auto;
+  }
+
+  :focus {
+    outline: dotted 1px;
+  }
+}
+
+.mce-menu-item {
+  .mce-disabled {
+    .mce-text {
+      color: $menu-item-text-disabled-color;
+    }
+  }
+  .mce-menu-shortcut {
+    color: $menu-item-keyboard-shortcut-color;
+  }
+
+  &:focus, &:hover {
+    .mce-ico, .mce-menu-shortcut, .mce-text {
+      color: $menu-item-text-hover-focus-color;
+    }
+    .mce-caret {
+      border-left-color: $menu-item-text-hover-focus-color
+    }
+  }
+}
+
+.mce-statusbar .mce-container-body {
+  overflow: hidden;
+}

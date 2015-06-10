@@ -37,15 +37,17 @@ module Importers
     def self.import_from_migration(hash, context, migration=nil, item=nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:events_to_import] && !hash[:events_to_import][hash[:migration_id]]
-      item ||= CalendarEvent.find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
-      item ||= CalendarEvent.find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
+      item ||= CalendarEvent.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first
+      item ||= CalendarEvent.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
       item ||= context.calendar_events.new
 
       item.migration_id = hash[:migration_id]
       item.workflow_state = 'active' if item.deleted?
       item.title = hash[:title] || hash[:name]
-      hash[:missing_links] = []
-      item.description = ImportedHtmlConverter.convert(hash[:description] || "", context, migration, {:missing_links => hash[:missing_links]})
+      missing_links = []
+      item.description = ImportedHtmlConverter.convert(hash[:description] || "", context, migration) do |warn, link|
+        missing_links << link if warn == :missing_link
+      end
       item.description += import_migration_attachment_suffix(hash, context)
       item.start_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:start_at] || hash[:start_date])
       item.end_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:end_at] || hash[:end_date])
@@ -55,7 +57,7 @@ module Importers
       item.save_without_broadcasting!
       if migration
         migration.add_missing_content_links(:class => item.class.to_s,
-          :id => item.id, :missing_links => hash[:missing_links],
+          :id => item.id, :missing_links => missing_links,
           :url => "/#{context.class.to_s.demodulize.underscore.pluralize}/#{context.id}/#{item.class.to_s.demodulize.underscore.pluralize}/#{item.id}")
       end
       migration.add_imported_item(item) if migration

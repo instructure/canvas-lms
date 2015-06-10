@@ -27,6 +27,9 @@ define [
       '#sending-message' : '$sendingMessage'
       '#sending-spinner' : '$sendingSpinner'
       '[role=search]'    : '$search'
+      '#conversation-actions'       : '$conversationActions'
+      '#submission-comment-actions' : '$submissionCommentActions'
+      '#submission-reply-btn'       : '$submissionReplyBtn'
 
     events:
       'click #compose-btn':       'onCompose'
@@ -40,14 +43,15 @@ define [
       'click #mark-read-btn':   'onMarkRead'
       'click #forward-btn':       'onForward'
       'click #star-toggle-btn':   'onStarToggle'
+      'click #submission-reply-btn': 'onSubmissionReply'
 
     messages:
       star: I18n.t('star', 'Star')
       unstar: I18n.t('unstar', 'Unstar')
       archive: I18n.t('archive', 'Archive')
       unarchive: I18n.t('unarchive', 'Unarchive')
-      archive_conversation: I18n.t('archive_conversation', 'Archive conversation')
-      unarchive_conversation: I18n.t('unarchive_conversation', 'Unarchive conversation')
+      archive_conversation: I18n.t('Archive Selected')
+      unarchive_conversation: I18n.t('Unarchive Selected')
 
     spinnerOptions:
       color: '#fff'
@@ -66,6 +70,7 @@ define [
       spinner = new Spinner(@spinnerOptions)
       spinner.spin(@$sendingSpinner[0])
       @toggleSending(false)
+      @updateFilterLabels()
 
     onSearch:      (tokens) => @trigger('search', tokens)
 
@@ -94,6 +99,8 @@ define [
     onStarToggle: (e) ->
       e.preventDefault()
       @trigger('star-toggle')
+
+    onSubmissionReply: (e) -> @trigger('submission-reply')
 
     onModelChange: (newModel, oldModel) ->
       @detachModelEvents(oldModel)
@@ -141,7 +148,22 @@ define [
 
     onFilterChange: (e) =>
       @searchView?.autocompleteView.setContext(@courseView.getCurrentContext())
+      if @$typeFilter.val() == 'submission_comments'
+        @$search.show()
+        @$conversationActions.hide()
+        @$submissionCommentActions.show()
+      else
+        @$search.show()
+        @$conversationActions.show()
+        @$submissionCommentActions.hide()
       @trigger('filter', @filterObj({type: @$typeFilter.val(), course: @$courseFilter.val()}))
+      @updateFilterLabels()
+
+    updateFilterLabels: ->
+      @$typeFilterSelectionLabel = $("##{@$typeFilter.attr('aria-labelledby')}").find('.current-selection-label') unless @$typeFilterSelectionLabel?.length
+      @$courseFilterSelectionLabel = $("##{@$courseFilter.attr('aria-labelledby')}").find('.current-selection-label') unless @$courseFilterSelectionLabel?.length
+      @$typeFilterSelectionLabel.text(@$typeFilter.find(':selected').text())
+      @$courseFilterSelectionLabel.text(@$courseFilter.find(':selected').text())
 
     displayState: (state) ->
       @$typeFilter.selectpicker('val', state.type)
@@ -156,10 +178,12 @@ define [
       @toggleAdminBtn(value)
       @hideForwardBtn(value)
 
-    toggleReplyBtn:    (value) -> @_toggleBtn(@$replyBtn, value)
+    toggleReplyBtn:    (value) ->
+      @_toggleBtn(@$replyBtn, value)
+      @_toggleBtn(@$submissionReplyBtn, value)
 
     toggleReplyAllBtn: (value) -> @_toggleBtn(@$replyAllBtn, value)
-    
+
     toggleArchiveBtn:  (value) -> @_toggleBtn(@$archiveBtn, value)
 
     toggleDeleteBtn:   (value) -> @_toggleBtn(@$deleteBtn, value)

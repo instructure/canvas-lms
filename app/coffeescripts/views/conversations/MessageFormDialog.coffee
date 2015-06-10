@@ -50,6 +50,7 @@ define [
       '.media_comment':                 '$mediaComment'
       'input[name=media_comment_id]':   '$mediaCommentId'
       'input[name=media_comment_type]': '$mediaCommentType'
+      '#bulk_message':                  '$bulkMessage'
       '.ac':                            '$recipients'
       '.attachment_list':               '$attachments'
       '.attachments-pane':              '$attachmentsPane'
@@ -98,6 +99,8 @@ define [
       @launchParams = _.pick(options, 'context', 'user') if options.remoteLaunch
 
       @render()
+      @appendAddAttachmentTemplate()
+
       super
       @initializeForm()
       @resizeBody()
@@ -119,6 +122,9 @@ define [
       @$fullDialog.off 'change', '.file_input'
       @$fullDialog.off 'click', '.attach-media'
       @$fullDialog.off 'click', '.media-comment .remove_link'
+
+      @launchParams = null
+
       @trigger('close')
       if @returnFocusTo
         @returnFocusTo.focus()
@@ -142,7 +148,7 @@ define [
       @$fullDialog.addClass('compose-message-dialog')
 
       # add attachment and media buttons to bottom bar
-      @$fullDialog.find('.ui-dialog-buttonpane').prepend composeButtonBarTemplate()
+      @$fullDialog.find('.ui-dialog-buttonpane').prepend composeButtonBarTemplate({isIE10: INST.browser.ie10})
 
       @$addMediaComment = @$fullDialog.find('.attach-media')
 
@@ -152,7 +158,11 @@ define [
 
     onCourse: (course) =>
       @recipientView.setContext(course, true)
-      @$contextCode.val(if course?.id then course.id else '')
+      if course?.id
+        @$contextCode.val(course.id)
+        @recipientView.disable(false)
+      else
+        @$contextCode.val('')
       @$messageCourseRO.text(if course then course.name else I18n.t('no_course','No course'))
 
     defaultCourse: null
@@ -166,6 +176,11 @@ define [
         disabled: @model?.get('private')
       ).render()
       @recipientView.on('changeToken', @recipientIdsChanged)
+      @recipientView.on('recipientTotalChange', @recipientTotalChanged)
+
+      unless _.include(ENV.current_user_roles, 'admin')
+        @$messageCourse.attr('aria-required', true)
+        @recipientView.disable(true)
 
       @$messageCourse.prop('disabled', !!@model)
       @courseView = new CourseSelectionView(
@@ -179,8 +194,10 @@ define [
           @courseView.setValue(@model.get('context_code'))
         else
           @courseView.setValue("course_" + _.keys(@model.get('audience_contexts').courses)[0])
+        @recipientView.disable(false)
       else if @launchParams
         @courseView.setValue(@launchParams.context) if @launchParams.context
+        @recipientView.disable(false)
       else
         @courseView.setValue(@defaultCourse)
       if @model
@@ -235,7 +252,7 @@ define [
         contextView.render()
 
       @$fullDialog.on 'click', '.message-body', @handleBodyClick
-      @$fullDialog.on 'click', '.attach-file', preventDefault =>
+      @$fullDialog.on 'click', '.attach-file', =>
         @addAttachment()
       @$fullDialog.on 'click', '.attachment .remove_link', preventDefault (e) =>
         @removeAttachment($(e.currentTarget))
@@ -291,6 +308,8 @@ define [
               @trigger('addMessage', message.toJSON().conversation.messages[0], response)
             else
               @trigger('newConversations', response)
+          $.when(@request).fail ->
+            dfd.reject()
 
     recipientIdsChanged: (recipientIds) =>
       if (_.isEmpty(recipientIds) || _.contains(recipientIds, /(teachers|tas|observers)$/))
@@ -299,6 +318,17 @@ define [
         canAddNotes = _.map @recipientView.tokenModels(), (tokenModel) =>
           @canAddNotesFor(tokenModel)
         @toggleUserNote(_.every(canAddNotes))
+
+    recipientTotalChanged: (lockBulkMessage) =>
+      if lockBulkMessage && !@bulkMessageLocked
+        @oldBulkMessageVal = @$bulkMessage.prop('checked')
+        @$bulkMessage.prop('checked', true)
+        @$bulkMessage.prop('disabled', true)
+        @bulkMessageLocked = true
+      else if !lockBulkMessage && @bulkMessageLocked
+        @$bulkMessage.prop('checked', @oldBulkMessageVal)
+        @$bulkMessage.prop('disabled', false)
+        @bulkMessageLocked = false
 
     canAddNotesFor: (user) =>
       return false unless ENV.CONVERSATIONS.NOTES_ENABLED
@@ -324,12 +354,25 @@ define [
       ($attachments.length * $attachments.outerWidth()) > @$attachmentsPane.width()
 
     addAttachment: ->
+      $('#file_input').attr('id', _.uniqueId('file_input'))
+      @appendAddAttachmentTemplate()
+      @updateAttachmentOverflow()
+
+      # Hacky crazyness for ie10.
+      # If you try to use javascript to 'click' on a file input element,
+      # when you go to submit the form it will give you an "access denied" error.
+      # So, for IE10, we make the paperclip icon a <label>  that references the input it automatically open the file input.
+      # But making it a <label> makes it so you can't tab to it. so for everyone else me make it a <button> and open the file
+      # input dialog with a javascript "click"
+      if INST.browser.ie10
+        @focusAddAttachment()
+      else
+        @$fullDialog.find('.file_input:last').click()
+
+    appendAddAttachmentTemplate: ->
       $attachment = $(addAttachmentTemplate())
       @$attachments.append($attachment)
       $attachment.hide()
-      $attachment.find('input').click()
-      @updateAttachmentOverflow()
-      @focusAddAttachment()
 
     setAttachmentClip: ($attachment) ->
       $name = $attachment.find( $('.attachment-name') )

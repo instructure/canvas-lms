@@ -32,9 +32,9 @@ describe AppCenterController do
 
       controller.map_tools_to_apps!(@course, apps)
 
-      apps.should include({'short_name' => tool1.tool_id, 'is_installed' => true})
-      apps.should include({'short_name' => tool2.tool_id, 'is_installed' => true})
-      apps.should include({'short_name' => 'not_installed'})
+      expect(apps).to include({'short_name' => tool1.tool_id, 'is_installed' => true})
+      expect(apps).to include({'short_name' => tool2.tool_id, 'is_installed' => true})
+      expect(apps).to include({'short_name' => 'not_installed'})
     end
   end
 end

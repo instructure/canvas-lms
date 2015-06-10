@@ -13,21 +13,11 @@ module CanvasCrummy
     # Render the list of crumbs
     def render_crumbs(options = {})
       if crumbs.length > 1
-        if CANVAS_RAILS2
-          content_tag_without_nil_return(:nav, :id => "breadcrumbs", :role => "navigation", 'aria-label' => 'breadcrumbs') do
-            content_tag_without_nil_return(:ul, nil, nil, false) do
-              crumbs.collect do |crumb|
-                content_tag(:li, crumb_to_html(crumb), crumb[2])
-              end.join.html_safe
-            end
-          end
-        else
-          content_tag(:nav, :id => "breadcrumbs", :role => "navigation", 'aria-label' => 'breadcrumbs') do
-            content_tag(:ul, nil, nil, false) do
-              crumbs.collect do |crumb|
-                content_tag(:li, crumb_to_html(crumb), crumb[2])
-              end.join.html_safe
-            end
+        content_tag(:nav, :id => "breadcrumbs", :role => "navigation", 'aria-label' => 'breadcrumbs') do
+          content_tag(:ul, nil, nil, false) do
+            crumbs.collect do |crumb|
+              content_tag(:li, crumb_to_html(crumb), crumb[2])
+            end.join.html_safe
           end
         end
       end

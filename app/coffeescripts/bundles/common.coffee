@@ -3,13 +3,11 @@ require [
 
   # true modules that we manage in this file
   'Backbone'
-  'compiled/widget/courseList'
   'compiled/helpDialog'
   'compiled/tours'
 
   # modules that do their own thing on every page that simply need to
   # be required
-  'translations/_core'
   'translations/_core_en'
   'jquery.ajaxJSON'
   'vendor/firebugx'
@@ -21,6 +19,7 @@ require [
   'ajax_errors'
   'page_views'
   'compiled/license_help'
+  'compiled/behaviors/authenticity_token'
   'compiled/behaviors/ujsLinks'
   'compiled/behaviors/admin-links'
   'compiled/behaviors/activate'
@@ -28,8 +27,6 @@ require [
   'compiled/behaviors/tooltip'
   'compiled/behaviors/instructure_inline_media_comment'
   'compiled/behaviors/ping'
-  'compiled/behaviors/favicon'
-  'compiled/behaviors/unread_conversations'
 
   # other stuff several bundles use
   'media_comments'
@@ -48,8 +45,7 @@ require [
   'vendor/jquery.pageless'
   'vendor/jquery.scrollTo'
   'compiled/badge_counts'
-], ($, Backbone, courseList, helpDialog, tours) ->
-  courseList.init()
+], ($, Backbone, helpDialog, tours) ->
   helpDialog.initTriggers()
   tours.init()
 

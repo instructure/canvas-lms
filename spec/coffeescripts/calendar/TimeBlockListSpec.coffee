@@ -1,13 +1,13 @@
 # requires jquery and date.js
-require [
+define [
   'jquery'
   'compiled/calendar/TimeBlockList'
 ], ($, TimeBlockList) ->
 
   module "TimeBlockList",
     setup: ->
-      @$holder = $('<table>').appendTo(document.body)
-      @$splitter = $('<a>').appendTo(document.body)
+      @$holder = $('<table>').appendTo("#fixtures")
+      @$splitter = $('<a>').appendTo("#fixtures")
       # make all of these dates in next year to gaurentee the are in the future
       nextYear = new Date().getFullYear() + 1
       @blocks = [
@@ -21,6 +21,7 @@ require [
     teardown: ->
       @$holder.detach()
       @$splitter.detach()
+      $("#fixtures").empty()
 
   test "should init properly", ->
     equal @me.rows.length, 3+1, 'three rows + 1 blank'

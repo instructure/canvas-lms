@@ -16,6 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path("../../../../../config/canvas_rails4", __FILE__)
+
+unless CANVAS_RAILS3
+  require 'protected_attributes'
+end
+
 class EventStream::Failure < ActiveRecord::Base
   self.table_name = :event_stream_failures
 
@@ -25,25 +31,12 @@ class EventStream::Failure < ActiveRecord::Base
   serialize :backtrace, Array
 
   def self.log!(operation, stream, record, exception)
-    raise exception if Rails.env.test?
-    log_to_statsd!(stream, exception)
+    return if stream.raise_on_error
     create!(:operation => operation.to_s,
             :event_stream => stream.identifier,
             :record_id => record.id.to_s,
             :payload => stream.operation_payload(operation, record),
             :exception => exception.message.to_s,
             :backtrace => exception.backtrace)
-  end
-
-  def self.log_to_statsd!(stream, exception)
-    CanvasStatsd::Statsd.increment("event_stream_failure.stream.#{CanvasStatsd::Statsd.escape(stream.identifier)}")
-    message = exception.message.to_s
-    if message.blank?
-      CanvasStatsd::Statsd.increment("event_stream_failure.exception.blank")
-    elsif message.include?("No live servers")
-      CanvasStatsd::Statsd.increment("event_stream_failure.exception.no_live_servers")
-    else
-      CanvasStatsd::Statsd.increment("event_stream_failure.exception.other")
-    end
   end
 end

@@ -54,7 +54,7 @@ class SubmissionComment < ActiveRecord::Base
 
   def delete_other_comments_in_this_group
     return if !self.group_comment_id || @skip_destroy_callbacks
-    SubmissionComment.for_assignment_id(submission.assignment_id).find_all_by_group_comment_id(self.group_comment_id).select{|c| c != self }.each do |comment|
+    SubmissionComment.for_assignment_id(submission.assignment_id).where(group_comment_id: self.group_comment_id).select{|c| c != self }.each do |comment|
       comment.skip_destroy_callbacks!
       comment.destroy
     end
@@ -99,6 +99,14 @@ class SubmissionComment < ActiveRecord::Base
 
     given {|user, session| self.submission.grants_right?(user, session, :grade) }
     can :read and can :delete
+
+    given { |user, session|
+      !self.anonymous? ||
+        self.author == user ||
+        self.submission.assignment.context.grants_right?(user, session, :view_all_grades) ||
+        self.submission.assignment.context.grants_right?(self.author, session, :view_all_grades)
+    }
+    can :read_author
   end
 
   set_broadcast_policy do |p|
@@ -107,6 +115,7 @@ class SubmissionComment < ActiveRecord::Base
     p.whenever {|record|
       record.just_created &&
       record.submission.assignment &&
+      record.submission.assignment.context.available? &&
       !record.submission.assignment.muted? &&
       (!record.submission.assignment.context.instructors.include?(author) || record.submission.assignment.published?)
     }
@@ -120,10 +129,10 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def update_participants
-    self.submission_comment_participants.find_or_create_by_user_id_and_participation_type(self.submission.user_id, 'submitter')
-    self.submission_comment_participants.find_or_create_by_user_id_and_participation_type(self.author_id, 'author')
+    self.submission_comment_participants.where(user_id: self.submission.user_id, participation_type: 'submitter').first_or_create
+    self.submission_comment_participants.where(user_id: self.author_id, participation_type: 'author').first_or_create
     (submission.assignment.context.participating_instructors - [author]).each do |user|
-      self.submission_comment_participants.find_or_create_by_user_id_and_participation_type(user.id, 'admin')
+      self.submission_comment_participants.where(user_id: user.id, participation_type: 'admin').first_or_create
     end
   end
 
@@ -171,6 +180,7 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def infer_details
+    self.anonymous = self.submission.assignment.anonymous_peer_reviews
     self.author_name ||= self.author.short_name rescue t(:unknown_author, "Someone")
     self.cached_attachments = self.attachments.map{|a| OpenObject.build('attachment', a.attributes) }
     self.context = self.read_attribute(:context) || self.submission.assignment.context rescue nil
@@ -181,7 +191,6 @@ class SubmissionComment < ActiveRecord::Base
     self.save
   end
 
-
   def attachments
     ids = Set.new((attachment_ids || "").split(",").map { |id| id.to_i})
     attachments = associated_attachments
@@ -190,9 +199,9 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def self.preload_attachments(comments)
-    SubmissionComment.send :preload_associations, comments, [:associated_attachments, :submission]
+    ActiveRecord::Associations::Preloader.new(comments, [:associated_attachments, :submission]).run
     submissions = comments.map(&:submission).uniq
-    Submission.send :preload_associations, submissions, :assignment => :attachments
+    ActiveRecord::Associations::Preloader.new(submissions, :assignment => :attachments).run
   end
 
   def update_submission
@@ -214,7 +223,7 @@ class SubmissionComment < ActiveRecord::Base
   def context_code
     "#{self.context_type.downcase}_#{self.context_id}"
   end
-  
+
   def avatar_path
     "/images/users/#{User.avatar_key(self.author_id)}"
   end
@@ -226,7 +235,6 @@ class SubmissionComment < ActiveRecord::Base
   scope :visible, -> { where(:hidden => false) }
 
   scope :after, lambda { |date| where("submission_comments.created_at>?", date) }
-  scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }
 
   def update_participation
     # id_changed? because new_record? is false in after_save callbacks

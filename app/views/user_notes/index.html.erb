@@ -6,14 +6,6 @@
 %>
 <% content_for :page_title do %><%= t :page_title, "Faculty Journal" %><% end %>
 
-<% content_for :page_header do %>
-  <h1><%= t :page_title, "Faculty Journal" %></h1>
-<% end %>
-
-<% content_for :page_subhead do %>
-  <h2><%= @user.name %></h2>
-<% end %>
-
 <% if can_do(@user, @current_user, :create_user_notes) %>
   <% content_for :right_side do %>
     <div class="rs-margin-lr rs-margin-top">
@@ -22,7 +14,7 @@
   <% end %>
 <% end %>
 
-<h2 class="page-header"><%= t 'titles.journal_for', "Faculty Journal for %{user}", :user => @user.name %><span id="proccessing">&nbsp;</span></h2>
+<h1 class="page-header"><%= t 'titles.journal_for', "Faculty Journal for %{user}", :user => @user.name %><span id="proccessing">&nbsp;</span></h1>
 <div id="create_entry" style="display: none; margin-bottom: 10px;">
   <%= form_for(@user_note, :url => user_user_notes_path, :html=>{:id=>'add_entry_form'}) do |f| %>
     <%= f.error_messages %>

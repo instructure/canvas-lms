@@ -28,7 +28,7 @@ describe "/assignments/redirect_page" do
     assigns[:assignment] = a
     assigns[:submission] = s
     render 'assignments/redirect_page'
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

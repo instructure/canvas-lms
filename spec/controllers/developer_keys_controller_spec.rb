@@ -19,20 +19,20 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe DeveloperKeysController do
-  before :each do
+  before :once do
     account_admin_user(:account => Account.site_admin)
   end
   
   describe "GET 'index'" do
     it 'should require authorization' do
       get 'index'
-      response.should be_redirect
+      expect(response).to be_redirect
     end
     
     it 'should return the list of developer keys' do
       user_session(@admin)
       get 'index'
-      response.should be_success
+      expect(response).to be_success
     end
   end
   

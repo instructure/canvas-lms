@@ -35,10 +35,11 @@ describe TabsController, type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
                       { :controller => 'tabs', :action => 'index', :course_id => @course.to_param, :format => 'json'},
                       { :include => ['external']})
-      json.should == [
+      expect(json).to eq [
         {
           "id" => "home",
           "html_url" => "/courses/#{@course.id}",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}",
           "position" => 1,
           "visibility" => "public",
           "label" => "Home",
@@ -47,6 +48,7 @@ describe TabsController, type: :request do
         {
           "id" => "announcements",
           "html_url" => "/courses/#{@course.id}/announcements",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/announcements",
           "position" => 2,
           "unused" => true,
           "visibility" => "admins",
@@ -56,6 +58,7 @@ describe TabsController, type: :request do
         {
           "id" => "assignments",
           "html_url" => "/courses/#{@course.id}/assignments",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments",
           "position" => 3,
           "unused" => true,
           "visibility" => "admins",
@@ -65,6 +68,7 @@ describe TabsController, type: :request do
         {
           "id" => "discussions",
           "html_url" => "/courses/#{@course.id}/discussion_topics",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/discussion_topics",
           "position" => 4,
           "visibility" => "public",
           "label" => "Discussions",
@@ -73,6 +77,7 @@ describe TabsController, type: :request do
         {
           "id" => "grades",
           "html_url" => "/courses/#{@course.id}/grades",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/grades",
           "position" => 5,
           "visibility" => "public",
           "label" => "Grades",
@@ -81,6 +86,7 @@ describe TabsController, type: :request do
         {
           "id" => "people",
           "html_url" => "/courses/#{@course.id}/users",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/users",
           "position" => 6,
           "visibility" => "public",
           "label" => "People",
@@ -89,6 +95,7 @@ describe TabsController, type: :request do
         {
           "id" => "pages",
           "html_url" => "/courses/#{@course.id}/wiki",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/wiki",
           "position" => 7,
           "unused" => true,
           "visibility" => "admins",
@@ -98,6 +105,7 @@ describe TabsController, type: :request do
         {
           "id" => "files",
           "html_url" => "/courses/#{@course.id}/files",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/files",
           "position" => 8,
           "unused" => true,
           "visibility" => "admins",
@@ -107,6 +115,7 @@ describe TabsController, type: :request do
         {
           "id" => "syllabus",
           "html_url" => "/courses/#{@course.id}/assignments/syllabus",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/assignments/syllabus",
           "position" => 9,
           "visibility" => "public",
           "label" => "Syllabus",
@@ -115,6 +124,7 @@ describe TabsController, type: :request do
         {
           "id" => "outcomes",
           "html_url" => "/courses/#{@course.id}/outcomes",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/outcomes",
           "position" => 10,
           "unused" => true,
           "visibility" => "admins",
@@ -124,6 +134,7 @@ describe TabsController, type: :request do
         {
           "id" => "quizzes",
           "html_url" => "/courses/#{@course.id}/quizzes",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/quizzes",
           "position" => 11,
           "unused" => true,
           "visibility" => "admins",
@@ -133,6 +144,7 @@ describe TabsController, type: :request do
         {
           "id" => "modules",
           "html_url" => "/courses/#{@course.id}/modules",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/modules",
           "position" => 12,
           "unused" => true,
           "visibility" => "admins",
@@ -142,6 +154,7 @@ describe TabsController, type: :request do
         {
           "id" => "settings",
           "html_url" => "/courses/#{@course.id}/settings",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/settings",
           "position" => 13,
           "visibility" => "admins",
           "label" => "Settings",
@@ -171,12 +184,12 @@ describe TabsController, type: :request do
                       { :include => ['external']})
 
       external_tabs = json.select {|tab| tab['type'] == 'external'}
-      external_tabs.length.should == 1
+      expect(external_tabs.length).to eq 1
       external_tabs.each do |tab|
-        tab.should include('url')
+        expect(tab).to include('url')
         uri = URI(tab['url'])
-        uri.path.should == "/api/v1/courses/#{@course.id}/external_tools/sessionless_launch"
-        uri.query.should include('id=')
+        expect(uri.path).to eq "/api/v1/courses/#{@course.id}/external_tools/sessionless_launch"
+        expect(uri.query).to include('id=')
       end
     end
 
@@ -184,10 +197,11 @@ describe TabsController, type: :request do
       group_with_user(:active_all => true)
       json = api_call(:get, "/api/v1/groups/#{@group.id}/tabs",
                       { :controller => 'tabs', :action => 'index', :group_id => @group.to_param, :format => 'json'})
-      json.should == [
+      expect(json).to eq [
         {
           "id" => "home",
           "html_url" => "/groups/#{@group.id}",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@group)}/groups/#{@group.id}",
           "type" => "internal",
           "label" => "Home",
           "position"=>1,
@@ -197,6 +211,7 @@ describe TabsController, type: :request do
           "id" => "announcements",
           "label" => "Announcements",
           "html_url" => "/groups/#{@group.id}/announcements",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@group)}/groups/#{@group.id}/announcements",
           "position"=>2,
           "visibility"=>"public",
           "type" => "internal"
@@ -204,6 +219,7 @@ describe TabsController, type: :request do
         {
           "id" => "pages",
           "html_url" => "/groups/#{@group.id}/wiki",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@group)}/groups/#{@group.id}/wiki",
           "label" => "Pages",
           "position"=>3,
           "visibility"=>"public",
@@ -212,6 +228,7 @@ describe TabsController, type: :request do
         {
           "id" => "people",
           "html_url" => "/groups/#{@group.id}/users",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@group)}/groups/#{@group.id}/users",
           "label" => "People",
           "position"=>4,
           "visibility"=>"public",
@@ -220,6 +237,7 @@ describe TabsController, type: :request do
         {
           "id" => "discussions",
           "html_url" => "/groups/#{@group.id}/discussion_topics",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@group)}/groups/#{@group.id}/discussion_topics",
           "label" => "Discussions",
           "position"=>5,
           "visibility"=>"public",
@@ -228,6 +246,7 @@ describe TabsController, type: :request do
         {
           "id" => "files",
           "html_url" => "/groups/#{@group.id}/files",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@group)}/groups/#{@group.id}/files",
           "label" => "Files",
           "position"=>6,
           "visibility"=>"public",
@@ -248,12 +267,12 @@ describe TabsController, type: :request do
       @course.save
       json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs", { :controller => 'tabs', :action => 'index',
                                                                     :course_id => @course.to_param, :format => 'json'})
-      json.count.should == 3
-      json.each {|t| %w{home syllabus people}.should include(t['id'])}
+      expect(json.count).to eq 3
+      json.each {|t| expect(%w{home syllabus people}).to include(t['id'])}
     end
 
     describe "teacher in a course" do
-      before :each do
+      before :once do
         course_with_teacher(active_all: true)
         @tab_ids = [0, 1, 3, 8, 5, 6, 14, 2, 11, 15, 4, 10, 13]
         @tab_lookup = {}.with_indifferent_access
@@ -270,7 +289,7 @@ describe TabsController, type: :request do
         @course.save
         json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs", {:controller => 'tabs', :action => 'index',
                                                                      :course_id => @course.to_param, :format => 'json'})
-        json.each { |t| t['position'].should == tab_order.find_index(@tab_lookup[t['id']]) + 1 }
+        json.each { |t| expect(t['position']).to eq tab_order.find_index(@tab_lookup[t['id']]) + 1 }
       end
 
       it 'should correctly label navigation items as unused' do
@@ -279,9 +298,9 @@ describe TabsController, type: :request do
                                                                      :course_id => @course.to_param, :format => 'json'})
         json.each do |t|
           if unused_tabs.include? t['id']
-            t['unused'].should be_true
+            expect(t['unused']).to be_truthy
           else
-            t['unused'].should be_false
+            expect(t['unused']).to be_falsey
           end
         end
       end
@@ -298,9 +317,9 @@ describe TabsController, type: :request do
                                                                      :course_id => @course.to_param, :format => 'json'})
         json.each do |t|
           if hidden_tabs.include? @tab_lookup[t['id']]
-            t['hidden'].should be_true
+            expect(t['hidden']).to be_truthy
           else
-            t['hidden'].should be_false
+            expect(t['hidden']).to be_falsey
           end
         end
       end
@@ -319,11 +338,11 @@ describe TabsController, type: :request do
                                                                      :course_id => @course.to_param, :format => 'json'})
         json.each do |t|
           if t['visibility'] == 'public'
-            public_visibility.should include(t['id'])
+            expect(public_visibility).to include(t['id'])
           elsif t['visibility'] == 'admins'
-            admins_visibility.should include(t['id'])
+            expect(admins_visibility).to include(t['id'])
           else
-            true.should be_false
+            expect(true).to be_falsey
           end
         end
       end
@@ -335,7 +354,7 @@ describe TabsController, type: :request do
         @course.save
         json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs", {:controller => 'tabs', :action => 'index',
                                                                      :course_id => @course.to_param, :format => 'json'})
-        json.each_with_index { |t, i| t['position'].should == i+1 }
+        json.each_with_index { |t, i| expect(t['position']).to eq i+1 }
       end
 
     end
@@ -349,8 +368,8 @@ describe TabsController, type: :request do
       json = api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", {:controller => 'tabs', :action => 'update',
                                                                    :course_id => @course.to_param, :tab_id => tab_id,
                                                                    :format => 'json', :hidden => true})
-      json['hidden'].should == true
-      @course.reload.tab_configuration[json['position'] - 1]['hidden'].should == true
+      expect(json['hidden']).to eq true
+      expect(@course.reload.tab_configuration[json['position'] - 1]['hidden']).to eq true
     end
 
     it 'changes the position of the people tab to 2' do
@@ -359,8 +378,8 @@ describe TabsController, type: :request do
       json = api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", {:controller => 'tabs', :action => 'update',
                                                                              :course_id => @course.to_param, :tab_id => tab_id,
                                                                              :format => 'json', :position => 2})
-      json['position'].should == 2
-      @course.reload.tab_configuration[1]['id'].should == @course.class::TAB_PEOPLE
+      expect(json['position']).to eq 2
+      expect(@course.reload.tab_configuration[1]['id']).to eq @course.class::TAB_PEOPLE
     end
 
     it "won't allow you to hide the home tab" do
@@ -369,7 +388,7 @@ describe TabsController, type: :request do
       result = raw_api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", {:controller => 'tabs', :action => 'update',
                                                                              :course_id => @course.to_param, :tab_id => tab_id,
                                                                              :format => 'json', :hidden => true})
-      result.should == 400
+      expect(result).to eq 400
     end
 
     it "won't allow you to move a tab to the first position" do
@@ -378,7 +397,7 @@ describe TabsController, type: :request do
       result = raw_api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", {:controller => 'tabs', :action => 'update',
                                                                              :course_id => @course.to_param, :tab_id => tab_id,
                                                                              :format => 'json', :position => 1})
-      result.should == 400
+      expect(result).to eq 400
     end
 
     it "won't allow you to move a tab to an invalid position" do
@@ -387,7 +406,7 @@ describe TabsController, type: :request do
       result = raw_api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", {:controller => 'tabs', :action => 'update',
                                                                                    :course_id => @course.to_param, :tab_id => tab_id,
                                                                                    :format => 'json', :position => 400})
-      result.should == 400
+      expect(result).to eq 400
     end
 
     it "doesn't allow a student to modify a tab" do
@@ -396,7 +415,7 @@ describe TabsController, type: :request do
       result = raw_api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", {:controller => 'tabs', :action => 'update',
                                                                                    :course_id => @course.to_param, :tab_id => tab_id,
                                                                                    :format => 'json', :position => 4})
-      result.should == 401
+      expect(result).to eq 401
     end
 
   end

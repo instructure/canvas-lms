@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe CollaborationsController, type: :request do
-  before do
+  before :once do
     PluginSetting.new(:name => 'etherpad', :settings => {}).save!
     course_with_teacher(:active_all => true)
     @members = (1..5).map do
@@ -42,26 +42,26 @@ describe CollaborationsController, type: :request do
     describe 'a group member' do
       it 'should see group members' do
         json = api_call(:get, url, url_options)
-        json.count.should == 6
+        expect(json.count).to eq 6
       end
 
       it 'should receive a paginated response' do
         json = api_call(:get, "#{url}?per_page=1", url_options.merge(:per_page => '1'))
-        json.count.should == 1
+        expect(json.count).to eq 1
       end
 
       it 'should be formatted by collaborator_json' do
         json = api_call(:get, url, url_options)
-        json.first.keys.sort.should == %w{collaborator_id id name type}
+        expect(json.first.keys.sort).to eq %w{collaborator_id id name type}
       end
 
       it 'should include groups' do
         group_model(:context => @course)
         Collaborator.create!(:user => nil, :group => @group, :collaboration => @collaboration)
         users, groups = api_call(:get, url, url_options).partition { |c| c['type'] == 'user' }
-        users.length.should == 6
-        groups.length.should == 1
-        groups.first['collaborator_id'].should == @group.id
+        expect(users.length).to eq 6
+        expect(groups.length).to eq 1
+        expect(groups.first['collaborator_id']).to eq @group.id
       end
     end
 
@@ -72,7 +72,7 @@ describe CollaborationsController, type: :request do
 
       it 'should receive a 401' do
         raw_api_call(:get, url, url_options)
-        response.code.should == '401'
+        expect(response.code).to eq '401'
       end
     end
   end

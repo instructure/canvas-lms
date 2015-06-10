@@ -26,7 +26,7 @@ define([
       $.ajaxJSON(url, 'GET', {}, function (data) {
         if (data) {
           if (data.debugging) {
-            $saml_debug_info.html(data.debug_data);
+            $saml_debug_info.html($.raw(data.debug_data));
             $saml_debug_info.show();
             refresh_timer = setTimeout(function () {load_debug_data(false);}, 30000);
           } else {

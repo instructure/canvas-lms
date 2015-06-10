@@ -16,78 +16,75 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe ConversationsController do
   def conversation(opts = {})
     num_other_users = opts[:num_other_users] || 1
     course = opts[:course] || @course
-    users = num_other_users.times.map{
-      u = User.create
-      enrollment = course.enroll_student(u)
-      enrollment.workflow_state = 'active'
-      enrollment.save
-      u
-    }
+    user_data = num_other_users.times.map{ {name: "User"} }
+    users = create_users_in_course(course, user_data, account_associations: true, return_type: :record)
     @conversation = @user.initiate_conversation(users)
     @conversation.add_message(opts[:message] || 'test')
     @conversation
   end
 
   describe "GET 'index'" do
-    it "should require login" do
+    before :once do
       course_with_student(:active_all => true)
+    end
+
+    it "should require login" do
       get 'index'
       assert_require_login
     end
 
     it "should assign variables" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       conversation
 
       term = @course.root_account.enrollment_terms.create! :name => "Fall"
       @course.update_attributes! :enrollment_term => term
 
       get 'index'
-      response.should be_success
-      assigns[:js_env].should_not be_nil
+      expect(response).to be_success
+      expect(assigns[:js_env]).not_to be_nil
     end
 
     it "should assign variables for json" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       conversation
 
       get 'index', :format => 'json'
-      response.should be_success
-      assigns[:js_env].should be_nil
-      assigns[:conversations_json].map{|c|c[:id]}.should == @user.conversations.map(&:conversation_id)
+      expect(response).to be_success
+      expect(assigns[:js_env]).to be_nil
+      expect(assigns[:conversations_json].map{|c|c[:id]}).to eq @user.conversations.map(&:conversation_id)
     end
 
     it "should work for an admin as well" do
-      course
       account_admin_user
       user_session(@user)
       conversation
 
       get 'index', :format => 'json'
-      response.should be_success
-      assigns[:conversations_json].map{|c|c[:id]}.should == @user.conversations.map(&:conversation_id)
+      expect(response).to be_success
+      expect(assigns[:conversations_json].map{|c|c[:id]}).to eq @user.conversations.map(&:conversation_id)
     end
 
     it "should return all sent conversations" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       @c1 = conversation
       @c2 = conversation
       @c3 = conversation
       @c3.update_attribute :workflow_state, 'archived'
 
       get 'index', :scope => 'sent', :format => 'json'
-      response.should be_success
-      assigns[:conversations_json].size.should eql 3
+      expect(response).to be_success
+      expect(assigns[:conversations_json].size).to eql 3
     end
 
     it "should return conversations matching the specified filter" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       @c1 = conversation
       @other_course = course(:active_all => true)
       enrollment = @other_course.enroll_student(@user)
@@ -97,13 +94,13 @@ describe ConversationsController do
       @c2 = conversation(:num_other_users => 1, :course => @other_course)
 
       get 'index', :filter => @other_course.asset_string, :format => 'json'
-      response.should be_success
-      assigns[:conversations_json].size.should eql 1
-      assigns[:conversations_json][0][:id].should == @c2.conversation_id
+      expect(response).to be_success
+      expect(assigns[:conversations_json].size).to eql 1
+      expect(assigns[:conversations_json][0][:id]).to eq @c2.conversation_id
     end
 
     it "should use the boolean operation in filter_mode when combining multiple filters" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       @course1 = @course
       @c1 = conversation(:course => @course1)
       @course2 = course(:active_all => true)
@@ -114,24 +111,24 @@ describe ConversationsController do
       @c3 = conversation(:course => @course2)
 
       get 'index', :filter => [@course1.asset_string, @course2.asset_string], :filter_mode => 'or', :format => 'json'
-      response.should be_success
-      assigns[:conversations_json].map{|c| c[:id]}.sort.should eql [@c1, @c2, @c3].map(&:conversation_id).sort
+      expect(response).to be_success
+      expect(assigns[:conversations_json].map{|c| c[:id]}.sort).to eql [@c1, @c2, @c3].map(&:conversation_id).sort
 
       get 'index', :filter => [@course2.asset_string, @user.asset_string], :filter_mode => 'or', :format => 'json'
-      response.should be_success
-      assigns[:conversations_json].map{|c| c[:id]}.sort.should eql [@c1, @c2, @c3].map(&:conversation_id).sort
+      expect(response).to be_success
+      expect(assigns[:conversations_json].map{|c| c[:id]}.sort).to eql [@c1, @c2, @c3].map(&:conversation_id).sort
 
       get 'index', :filter => [@course2.asset_string, @user.asset_string], :filter_mode => 'and', :format => 'json'
-      response.should be_success
-      assigns[:conversations_json].map{|c| c[:id]}.sort.should eql [@c2, @c3].map(&:conversation_id).sort
+      expect(response).to be_success
+      expect(assigns[:conversations_json].map{|c| c[:id]}.sort).to eql [@c2, @c3].map(&:conversation_id).sort
 
       get 'index', :filter => [@course1.asset_string, @course2.asset_string], :filter_mode => 'and', :format => 'json'
-      response.should be_success
-      assigns[:conversations_json].should eql []
+      expect(response).to be_success
+      expect(assigns[:conversations_json]).to eql []
     end
 
     it "should return conversations matching a user filter" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       @c1 = conversation
       @other_course = course(:active_all => true)
       enrollment = @other_course.enroll_student(@user)
@@ -141,8 +138,8 @@ describe ConversationsController do
       @c2 = conversation(:num_other_users => 1, :course => @other_course)
 
       get 'index', :filter => @user.asset_string, :format => 'json', :include_all_conversation_ids => 1
-      response.should be_success
-      assigns[:conversations_json].size.should eql 2
+      expect(response).to be_success
+      expect(assigns[:conversations_json].size).to eql 2
     end
 
     it "should not allow student view student to load inbox" do
@@ -155,29 +152,33 @@ describe ConversationsController do
     end
 
     context "masquerading" do
-      before do
+      before :once do
         a = Account.default
         @student = user_with_pseudonym(:active_all => true)
         course_with_student(:active_all => true, :account => a, :user => @student)
         @student.initiate_conversation([user]).add_message('test1', :root_account_id => a.id)
         @student.initiate_conversation([user]).add_message('test2') # no root account, so teacher can't see it
 
-        course_with_teacher_logged_in(:active_all => true, :account => a)
+        course_with_teacher(:active_all => true, :account => a)
         a.account_users.create!(user: @user)
+      end
+
+      before :each do
+        user_session(@teacher)
         session[:become_user_id] = @student.id
       end
 
       it "should filter conversations" do
         get 'index', :format => 'json'
-        response.should be_success
-        assigns[:conversations_json].size.should eql 1
+        expect(response).to be_success
+        expect(assigns[:conversations_json].size).to eql 1
       end
 
       it "should filter conversations when returning ids" do
         get 'index', :format => 'json', :include_all_conversation_ids => true
-        response.should be_success
-        assigns[:conversations_json][:conversations].size.should eql 1
-        assigns[:conversations_json][:conversation_ids].size.should eql 1
+        expect(response).to be_success
+        expect(assigns[:conversations_json][:conversations].size).to eql 1
+        expect(assigns[:conversations_json][:conversation_ids].size).to eql 1
       end
 
       it "should recompute inbox count" do
@@ -188,47 +189,90 @@ describe ConversationsController do
         @c1 = conversation
 
         get 'index'
-        response.should be_success
+        expect(response).to be_success
         @user.reload
-        @user.unread_conversations_count.should == 0
+        expect(@user.unread_conversations_count).to eq 0
       end
     end
   end
 
   describe "GET 'show'" do
-    it "should redirect if not xhr" do
-      course_with_student_logged_in(:active_all => true)
-      conversation
+    before :once do
+      course_with_student(:active_all => true)
+    end
 
+    before :each do
+      user_session(@student)
+      conversation
+    end
+
+    it "should redirect if not xhr" do
       get 'show', :id => @conversation.conversation_id
-      response.should be_redirect
+      expect(response).to be_redirect
     end
 
     it "should assign variables" do
-      course_with_student_logged_in(:active_all => true)
-      conversation
-
       xhr :get, 'show', :id => @conversation.conversation_id
-      response.should be_success
-      assigns[:conversation].should == @conversation
+      expect(response).to be_success
+      expect(assigns[:conversation]).to eq @conversation
     end
   end
 
   describe "POST 'create'" do
+    before :once do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+    end
+
     it "should create the conversation" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
 
       new_user = User.create
       enrollment = @course.enroll_student(new_user)
       enrollment.workflow_state = 'active'
       enrollment.save
       post 'create', :recipients => [new_user.id.to_s], :body => "yo"
-      response.should be_success
-      assigns[:conversation].should_not be_nil
+      expect(response).to be_success
+      expect(assigns[:conversation]).not_to be_nil
+    end
+
+    it "should not add the wrong tags in a certain terrible cached edge case" do
+      # tl;dr - not including the updated_at when we instantiate the users
+      # can cause us to grab stale conversation_context_codes
+      # which screws everything up
+      enable_cache do
+        course1 = course(:active_all => true)
+
+        student1 = user(:active_user => true)
+        student2 = user(:active_user => true)
+
+        Timecop.freeze(5.seconds.ago) do
+          course1.enroll_user(student1, "StudentEnrollment").accept!
+          course1.enroll_user(student2, "StudentEnrollment").accept!
+
+          user_session(student1)
+          post 'create', :recipients => [student2.id.to_s], :body => "yo", :message => "you suck", :group_conversation => true,
+               :course => course1.asset_string, :context_code => course1.asset_string
+          expect(response).to be_success
+        end
+
+        course2 = course(:active_all => true)
+        course2.enroll_user(student2, "StudentEnrollment").accept!
+        course2.enroll_user(student1, "StudentEnrollment").accept!
+
+        post 'create', :recipients => [student2.id.to_s], :body => "yo again", :message => "you still suck", :group_conversation => true,
+             :course => course2.asset_string, :context_code => course2.asset_string
+        expect(response).to be_success
+
+        c = Conversation.where(:context_type => "Course", :context_id => course2).first
+        c.conversation_participants.each do |cp|
+          expect(cp.tags).to eq [course2.asset_string]
+        end
+      end
     end
 
     it "should allow messages to be forwarded from the conversation" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       conversation.update_attribute(:workflow_state, "unread")
 
       new_user = User.create
@@ -236,16 +280,14 @@ describe ConversationsController do
       enrollment.workflow_state = 'active'
       enrollment.save
       post 'create', :recipients => [new_user.id.to_s], :body => "here's the info", :forwarded_message_ids => @conversation.messages.map(&:id)
-      response.should be_success
-      assigns[:conversation].should_not be_nil
-      assigns[:conversation].messages.first.forwarded_message_ids.should eql(@conversation.messages.first.id.to_s)
+      expect(response).to be_success
+      expect(assigns[:conversation]).not_to be_nil
+      expect(assigns[:conversation].messages.first.forwarded_message_ids).to eql(@conversation.messages.first.id.to_s)
     end
 
     context "group conversations" do
-      before do
+      before :once do
         @old_count = Conversation.count
-  
-        course_with_teacher_logged_in(:active_all => true)
   
         @new_user1 = User.create
         @course.enroll_student(@new_user1).accept!
@@ -256,46 +298,50 @@ describe ConversationsController do
         @account_id = @course.account_id
       end
 
+      before :each do
+        user_session(@teacher)
+      end
+
       ["1", "true", "yes", "on"].each do |truish|
         it "should create a conversation shared by all recipients if group_conversation=#{truish.inspect}" do
           post 'create', :recipients => [@new_user1.id.to_s, @new_user2.id.to_s], :body => "yo", :group_conversation => truish
-          response.should be_success
+          expect(response).to be_success
     
-          Conversation.count.should eql(@old_count + 1)
+          expect(Conversation.count).to eql(@old_count + 1)
         end
       end
 
       [nil, "", "0", "false", "no", "off", "wat"].each do |falsish|
         it "should create one conversation per recipient if group_conversation=#{falsish.inspect}" do
           post 'create', :recipients => [@new_user1.id.to_s, @new_user2.id.to_s], :body => "yo", :group_conversation => falsish
-          response.should be_success
+          expect(response).to be_success
     
-          Conversation.count.should eql(@old_count + 2)
+          expect(Conversation.count).to eql(@old_count + 2)
         end
       end
 
       it "should set the root account id to the participants for group conversations" do
         post 'create', :recipients => [@new_user1.id.to_s, @new_user2.id.to_s], :body => "yo", :group_conversation => "true"
-        response.should be_success
+        expect(response).to be_success
 
         json = json_parse(response.body)
         json.each do |conv|
           conversation = Conversation.find(conv['id'])
           conversation.conversation_participants.each do |cp|
-            cp.root_account_ids.should == @account_id.to_s
+            expect(cp.root_account_ids).to eq @account_id.to_s
           end
         end
       end
 
       it "should set the root account id to the participants for bulk private messages" do
         post 'create', :recipients => [@new_user1.id.to_s, @new_user2.id.to_s], :body => "yo", :mode => "sync"
-        response.should be_success
+        expect(response).to be_success
 
         json = json_parse(response.body)
         json.each do |conv|
           conversation = Conversation.find(conv['id'])
           conversation.conversation_participants.each do |cp|
-            cp.root_account_ids.should == @account_id.to_s
+            expect(cp.root_account_ids).to eq @account_id.to_s
           end
         end
       end
@@ -334,29 +380,29 @@ describe ConversationsController do
       enrollment3.save
 
       post 'create', :recipients => [@course2.asset_string + "_students", @group1.asset_string], :body => "yo", :group_conversation => true, :context_code => @group3.asset_string
-      response.should be_success
+      expect(response).to be_success
 
       c = Conversation.first
-      c.tags.sort.should eql [@course1.asset_string, @course2.asset_string, @group1.asset_string, @course3.asset_string, @group3.asset_string].sort
+      expect(c.tags.sort).to eql [@course1.asset_string, @course2.asset_string, @group1.asset_string, @course3.asset_string, @group3.asset_string].sort
       # course1 inferred from group1, course2 inferred from synthetic context,
       # group1 explicit, group2 not present (even though it's shared by everyone)
       # group3 from context_code, course3 inferred from group3
     end
 
     it "should populate subject" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
 
       new_user = User.create
       enrollment = @course.enroll_student(new_user)
       enrollment.workflow_state = 'active'
       enrollment.save
       post 'create', :recipients => [new_user.id.to_s], :body => "yo", :subject => "greetings"
-      response.should be_success
-      assigns[:conversation].conversation.subject.should_not be_nil
+      expect(response).to be_success
+      expect(assigns[:conversation].conversation.subject).not_to be_nil
     end
 
     it "should populate subject on batch conversations" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
 
       new_user1 = User.create
       enrollment1 = @course.enroll_student(new_user1)
@@ -367,31 +413,25 @@ describe ConversationsController do
       enrollment2.workflow_state = 'active'
       enrollment2.save
       post 'create', :recipients => [new_user1.id.to_s, new_user2.id.to_s], :body => "later", :subject => "farewell"
-      response.should be_success
+      expect(response).to be_success
       json = json_parse(response.body)
-      json.size.should eql 2
+      expect(json.size).to eql 2
       json.each { |c|
-        c["subject"].should_not be_nil
+        expect(c["subject"]).not_to be_nil
       }
     end
 
     context "user_notes" do
       before :each do
         Account.default.update_attribute :enable_user_notes, true
-        course_with_teacher_logged_in(:active_all => true)
+        user_session(@teacher)
 
-        @students = (1..2).map{
-          student = User.create
-          enrollment = @course.enroll_student(student)
-          enrollment.workflow_state = 'active'
-          enrollment.save
-          student
-        }
+        @students = create_users_in_course(@course, 2, account_associations: true, return_type: :record)
       end
 
       it "should create user notes" do
         post 'create', :recipients => @students.map(&:id), :body => "yo", :subject => "greetings", :user_note => '1'
-        @students.each{|x| x.user_notes.size.should be(1)}
+        @students.each{|x| expect(x.user_notes.size).to be(1)}
       end
     end
   end
@@ -402,11 +442,11 @@ describe ConversationsController do
       conversation(:num_other_users => 2).update_attribute(:workflow_state, "unread")
 
       post 'update', :id => @conversation.conversation_id, :conversation => {:subscribed => "0", :workflow_state => "archived", :starred => "1"}
-      response.should be_success
+      expect(response).to be_success
       @conversation.reload
-      @conversation.subscribed?.should be_false
-      @conversation.should be_archived
-      @conversation.starred.should be_true
+      expect(@conversation.subscribed?).to be_falsey
+      expect(@conversation).to be_archived
+      expect(@conversation.starred).to be_truthy
     end
   end
 
@@ -419,9 +459,26 @@ describe ConversationsController do
       @conversation.save!
 
       post 'add_message', :conversation_id => @conversation.conversation_id, :body => "hello world"
-      response.should be_success
-      @conversation.messages.size.should == 2
-      @conversation.reload.last_message_at.should eql expected_lma
+      expect(response).to be_success
+      expect(@conversation.messages.size).to eq 2
+      expect(@conversation.reload.last_message_at).to eql expected_lma
+    end
+
+    it "should queue a job if needed" do
+      course_with_student_logged_in(:active_all => true)
+      conversation
+      expected_lma = Time.zone.parse('2012-12-21T12:42:00Z')
+      @conversation.last_message_at = expected_lma
+      @conversation.save!
+
+      ConversationParticipant.any_instance.stubs(:should_process_immediately?).returns(false)
+
+      post 'add_message', :conversation_id => @conversation.conversation_id, :body => "hello world"
+      expect(response).to be_success
+      expect(@conversation.reload.messages.count).to eq 1
+      run_jobs
+      expect(@conversation.reload.messages.count).to eq 2
+      expect(@conversation.reload.last_message_at).to eql expected_lma
     end
 
     it "should generate a user note when requested" do
@@ -430,66 +487,67 @@ describe ConversationsController do
       conversation
 
       post 'add_message', :conversation_id => @conversation.conversation_id, :body => "hello world"
-      response.should be_success
+      expect(response).to be_success
       message = @conversation.messages.first # newest message is first
       student = message.recipients.first
-      student.user_notes.size.should == 0
+      expect(student.user_notes.size).to eq 0
 
       post 'add_message', :conversation_id => @conversation.conversation_id, :body => "make a note", :user_note => 1
-      response.should be_success
+      expect(response).to be_success
       message = @conversation.messages.first
       student = message.recipients.first
-      student.user_notes.size.should == 1
+      expect(student.user_notes.size).to eq 1
     end
   end
 
   describe "POST 'add_recipients'" do
-    it "should add recipients" do
-      course_with_student_logged_in(:active_all => true)
+    before :once do
+      course_with_student(:active_all => true)
       conversation(:num_other_users => 2)
+    end
+    before(:each) { user_session(@student) }
 
+    it "should add recipients" do
       new_user = User.create
       enrollment = @course.enroll_student(new_user)
       enrollment.workflow_state = 'active'
       enrollment.save
       post 'add_recipients', :conversation_id => @conversation.conversation_id, :recipients => [new_user.id.to_s]
-      response.should be_success
-      @conversation.reload.participants.size.should == 4 # includes @user
+      expect(response).to be_success
+      expect(@conversation.reload.participants.size).to eq 4 # includes @user
     end
 
     it "should correctly infer context tags" do
-      course_with_student_logged_in(:active_all => true)
-      conversation(:num_other_users => 2)
-
       @group = @course.groups.create!
       @conversation.participants.each{ |user| @group.users << user }
       2.times{ @group.users << User.create }
 
       post 'add_recipients', :conversation_id => @conversation.conversation_id, :recipients => [@group.asset_string]
-      response.should be_success
+      expect(response).to be_success
 
       c = Conversation.first
-      c.tags.sort.should eql [@course.asset_string, @group.asset_string]
+      expect(c.tags.sort).to eql [@course.asset_string, @group.asset_string]
       # course inferred (when created), group explicit
     end
   end
 
   describe "POST 'remove_messages'" do
+    before(:once) { course_with_student(active_all: true) }
+    before(:each) { user_session(@student) }
+
     it "should remove messages" do
-      course_with_student_logged_in(:active_all => true)
       message = conversation.add_message('another')
 
       post 'remove_messages', :conversation_id => @conversation.conversation_id, :remove => [message.id.to_s]
-      response.should be_success
-      @conversation.messages.size.should == 1
+      expect(response).to be_success
+      expect(@conversation.messages.size).to eq 1
     end
 
     it "should null a conversation_participant's last_message_at if all message_participants have been destroyed" do
-      course_with_student_logged_in(active_all: true)
       message = conversation.conversation.conversation_messages.first
 
       post 'remove_messages', conversation_id: @conversation.conversation_id, :remove => [message.id.to_s]
-      @conversation.reload.last_message_at.should be_nil
+      expect(@conversation.reload.last_message_at).to be_nil
     end
   end
 
@@ -499,89 +557,85 @@ describe ConversationsController do
       conversation
 
       delete 'destroy', :id => @conversation.conversation_id
-      response.should be_success
-      @user.conversations.should be_blank # the conversation_participant is no longer there
-      @conversation.conversation.should_not be_nil # though the conversation is
+      expect(response).to be_success
+      expect(@user.conversations).to be_blank # the conversation_participant is no longer there
+      expect(@conversation.conversation).not_to be_nil # though the conversation is
     end
   end
 
   describe "GET 'public_feed.atom'" do
+    before :once do
+      course_with_student(:course_name => "Message Course", :active_all => true)
+    end
+
     it "should require authorization" do
-      course_with_student
       conversation
       get 'public_feed', :format => 'atom', :feed_code => @student.feed_code + "x"
-      assigns[:problem].should eql("The verification code is invalid.")
+      expect(assigns[:problem]).to eql("The verification code is invalid.")
     end
 
     it "should return basic feed attributes" do
-      course_with_student
       conversation
       get 'public_feed', :format => 'atom', :feed_code => @student.feed_code
       feed = Atom::Feed.load_feed(response.body) rescue nil
-      feed.should_not be_nil
-      feed.title.should == "Conversations Feed"
-      feed.links.first.href.should match(/conversations/)
+      expect(feed).not_to be_nil
+      expect(feed.title).to eq "Conversations Feed"
+      expect(feed.links.first.href).to match(/conversations/)
     end
 
     it "should include message entries" do
-      course_with_student
       conversation
       get 'public_feed', :format => 'atom', :feed_code => @student.feed_code
-      assigns[:entries].length.should == 1
-      response.should be_success
+      expect(assigns[:entries].length).to eq 1
+      expect(response).to be_success
     end
 
     it "should not include messages the user is not a part of" do
-      course_with_student
       conversation
       student_in_course
       get 'public_feed', :format => 'atom', :feed_code => @student.feed_code
-      assigns[:entries].should be_empty
+      expect(assigns[:entries]).to be_empty
     end
 
     it "should include part the message text in the title" do
-      course_with_student
       message = "Sending a test message to some random users, in the hopes that it really works."
       conversation(:message => message)
       get 'public_feed', :format => 'atom', :feed_code => @student.feed_code
       feed = Atom::Feed.load_feed(response.body) rescue nil
-      feed.should_not be_nil
-      feed.entries.first.title.should match(/Sending a test/)
-      feed.entries.first.title.should_not match(message)
+      expect(feed).not_to be_nil
+      expect(feed.entries.first.title).to match(/Sending a test/)
+      expect(feed.entries.first.title).not_to match(message)
     end
 
     it "should include the message in the content" do
-      course_with_student
       message = "Sending a test message to some random users, in the hopes that it really works."
       conversation(:message => message)
       get 'public_feed', :format => 'atom', :feed_code => @student.feed_code
       feed = Atom::Feed.load_feed(response.body) rescue nil
-      feed.should_not be_nil
-      feed.entries.first.content.should match(message)
+      expect(feed).not_to be_nil
+      expect(feed.entries.first.content).to match(message)
     end
 
     it "should include context about the conversation" do
-      course_with_student(:course_name => "Message Course", :active_all => true)
       message = "Sending a test message to some random users, in the hopes that it really works."
       conversation(:num_other_users => 4, :message => message)
       get 'public_feed', :format => 'atom', :feed_code => @student.feed_code
       feed = Atom::Feed.load_feed(response.body) rescue nil
-      feed.should_not be_nil
-      feed.entries.first.content.should match(/Message Course/)
-      feed.entries.first.content.should match(/User/)
-      feed.entries.first.content.should match(/others/)
+      expect(feed).not_to be_nil
+      expect(feed.entries.first.content).to match(/Message Course/)
+      expect(feed.entries.first.content).to match(/User/)
+      expect(feed.entries.first.content).to match(/others/)
     end
 
     it "should include an attachment if one exists" do
-      course_with_student
       conversation
       attachment = @user.conversation_attachments_folder.attachments.create!(:filename => "somefile.doc", :context => @user, :uploaded_data => StringIO.new('test'))
       @conversation.add_message('test attachment', :attachment_ids => [attachment.id])
       HostUrl.stubs(:context_host).returns("test.host")
       get 'public_feed', :format => 'atom', :feed_code => @student.feed_code
       feed = Atom::Feed.load_feed(response.body) rescue nil
-      feed.should_not be_nil
-      feed.entries.first.content.should match(/somefile\.doc/)
+      expect(feed).not_to be_nil
+      expect(feed.entries.first.content).to match(/somefile\.doc/)
     end
   end
 
@@ -593,7 +647,7 @@ describe ConversationsController do
     it "should not disable new conversations for a user anymore" do
       post 'toggle_new_conversations'
       @user.reload
-      @user.use_new_conversations?.should be_true
+      expect(@user.use_new_conversations?).to be_truthy
     end
   end
 
@@ -629,18 +683,18 @@ describe ConversationsController do
 
         get 'index', :include_all_conversation_ids => true, :format => 'json'
 
-        response.should be_success
-        assigns[:js_env].should be_nil
+        expect(response).to be_success
+        expect(assigns[:js_env]).to be_nil
         # Should assign :conversations and :conversation_ids in json result
         json = assigns[:conversations_json][:conversations]
         ids = assigns[:conversations_json][:conversation_ids]
         # IDs should match in returned lists
-        ids.sort.should == json.map{|c| c[:id]}.sort
+        expect(ids.sort).to eq json.map{|c| c[:id]}.sort
         # IDs returned should match IDs for user's conversations
-        ids.sort.should == @logged_in_user.conversations.map(&:conversation_id).sort
+        expect(ids.sort).to eq @logged_in_user.conversations.map(&:conversation_id).sort
         # Expect 2 elements in both groups
-        json.length.should == 2
-        ids.length.should == 2
+        expect(json.length).to eq 2
+        expect(ids.length).to eq 2
       end
     end
   end

@@ -17,7 +17,7 @@ define [
       'textarea[name="review_text"]': '$reviewText'
 
     afterRender: ->
-      @$reviewText.html(@model.get('comments'))
+      @$reviewText.val(@model.get('comments'))
 
       @$rateAppStar.raty
         path     : '/images/raty/'
@@ -61,7 +61,7 @@ define [
         ,
           success: (m, r) =>
             if r.type == 'error'
-              $.flashError(htmlEscape(I18n.t('save_failed', "Unable to save review: %{message}", { message: r.message })))
+              $.flashError(I18n.t('save_failed', "Unable to save review: %{message}", { message: r.message }))
             m.trigger 'sync'
         @$el.dialog('close')
 
@@ -70,4 +70,4 @@ define [
 
     showErrorMessage: ->
       message = I18n.t 'missing_stars', 'You must select a star rating'
-      @$el.prepend("<div class='alert alert-error'>#{message}</span>")
+      @$el.prepend("<div class='alert alert-error'>#{htmlEscape(message)}</span>")

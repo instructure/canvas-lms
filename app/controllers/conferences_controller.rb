@@ -63,6 +63,11 @@
 #           "example": "AdobeConnect",
 #           "type": "string"
 #         },
+#         "conference_key": {
+#           "description": "The 3rd party's ID for the conference",
+#           "example": "abcdjoelisgreatxyz",
+#           "type": "string"
+#         },
 #         "description": {
 #           "description": "The description for the conference",
 #           "example": "Conference Description",
@@ -131,7 +136,12 @@ class ConferencesController < ApplicationController
   include Api::V1::Conferences
 
   before_filter :require_context
-  add_crumb(proc{ t '#crumbs.conferences', "Conferences"}) { |c| c.send(:named_context_url, c.instance_variable_get("@context"), :context_conferences_url) }
+  skip_before_filter :load_user, :only => [:recording_ready]
+
+  add_crumb(proc{ t '#crumbs.conferences', "Conferences"}) do |c|
+    c.send(:named_context_url, c.instance_variable_get("@context"), :context_conferences_url)
+  end
+
   before_filter { |c| c.active_tab = "conferences" }
   before_filter :require_config
   before_filter :reject_student_view_student
@@ -143,7 +153,7 @@ class ConferencesController < ApplicationController
   # This API returns a JSON object containing the list of conferences,
   # the key for the list of conferences is "conferences"
   #
-  #  Examples:
+  # @example_request
   #     curl 'https://<canvas>/api/v1/courses/<course_id>/conferences' \
   #         -H "Authorization: Bearer <token>"
   #
@@ -173,7 +183,7 @@ class ConferencesController < ApplicationController
     @new_conferences, @concluded_conferences = conferences.partition { |conference|
       conference.ended_at.nil?
     }
-    log_asset_access("conferences:#{@context.asset_string}", "conferences", "other")
+    log_asset_access([ "conferences", @context ], "conferences", "other")
     scope = @context.users
     if @context.respond_to?(:participating_typical_users)
       scope = @context.participating_typical_users
@@ -222,7 +232,7 @@ class ConferencesController < ApplicationController
           format.json { render :json => WebConference.find(@conference).as_json(:permissions => {:user => @current_user, :session => session},
                                                                                 :url => named_context_url(@context, :context_conference_url, @conference)) }
         else
-          format.html { render :action => 'index' }
+          format.html { render :index }
           format.json { render :json => @conference.errors, :status => :bad_request }
         end
       end
@@ -246,7 +256,7 @@ class ConferencesController < ApplicationController
           format.json { render :json => @conference.as_json(:permissions => {:user => @current_user, :session => session},
                                                             :url => named_context_url(@context, :context_conference_url, @conference)) }
         else
-          format.html { render :action => "edit" }
+          format.html { render :edit }
           format.json { render :json => @conference.errors, :status => :bad_request }
         end
       end
@@ -280,8 +290,27 @@ class ConferencesController < ApplicationController
     redirect_to named_context_url(@context, :context_conferences_url)
   end
 
+  def recording_ready
+    secret = @conference.config[:secret_dec]
+    begin
+      signed_params = Canvas::Security.decode_jwt(params[:signed_parameters], [secret])
+      if signed_params[:meeting_id] == @conference.conference_key
+        @conference.recording_ready!
+        render  json: [], status: :accepted
+      else
+        render json: signed_id_invalid_json, status: :unprocessable_entity
+      end
+    rescue Canvas::Security::InvalidToken
+      render json: invalid_jwt_token_json, status: :unauthorized
+    end
+  end
+
   def close
     if authorized_action(@conference, @current_user, :close)
+      unless @conference.active?
+        return render :json => { :message => 'conference is not active', :status => :bad_request }
+      end
+
       if @conference.close
         render :json => @conference.as_json(:permissions => {:user => @current_user, :session => session},
                                             :url => named_context_url(@context, :context_conference_url, @conference))
@@ -331,7 +360,7 @@ class ConferencesController < ApplicationController
       params[:user].each do |id, val|
         ids << id.to_i if val == '1'
       end
-      members += @context.users.find_all_by_id(ids).to_a
+      members += @context.users.where(id: ids)
     else
       members += @context.users.to_a
     end

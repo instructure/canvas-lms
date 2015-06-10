@@ -240,6 +240,30 @@ describe GoogleDocs::Connection do
       doc_array = google_docs.download(doc_id)
       doc_array.should == [nil, nil, nil]
     end
+
+    it "attempts as 'xlsx' if 'xls' fails" do
+      doc_id = 'spreadsheet:0AiN8C_VHrPxkdEF6YmQyc3p2Qm02ODhJWGJnUmJYY2c'
+      src = 'https://docs.google.com/feeds/download/spreadsheets/Export?key=0AiN8C_VHrPxkdEF6YmQyc3p2Qm02ODhJWGJnUmJYY2c'
+      xls_src = [src, "exportFormat=xls", "format=xls"].join('&')
+      xlsx_src = [src, "exportFormat=xlsx", "format=xlsx"].join('&')
+
+      access_token = mock_access_token
+
+      document_response = mock()
+      access_token.expects(:get).with(xlsx_src).returns(document_response)
+      bad_req = Net::HTTPBadRequest.new(1.0, 400, "Bad Request")
+      access_token.expects(:get).with(xls_src).returns(bad_req)
+
+      fetch_list_response = mock()
+      fetch_list_response.expects(:body).returns(xml_doc_list_many)
+      access_token.expects(:get).with(xml_schema_id).returns(fetch_list_response)
+
+      google_docs = GoogleDocs::Connection.new(token, secret)
+      doc_array = google_docs.download(doc_id)
+      doc_array[0].should == document_response
+      doc_array[1].should == 'Sprint Teams'
+      doc_array[2].should == 'xlsx'
+    end
   end
 
   describe "#create_doc" do

@@ -1,0 +1,64 @@
+//add variable modifications to the global _variables.scss
+//they will override bootstrap styles
+
+// CSS Reset
+@import "vendor/bootstrap/reset";
+
+// Grid system and page structure
+@import "vendor/bootstrap/scaffolding";
+@import "vendor/bootstrap/grid";
+@import "vendor/bootstrap/layouts";
+
+// Base CSS
+@import "vendor/bootstrap/type";
+@import "vendor/bootstrap/code";
+@import "vendor/bootstrap/forms";
+@import "vendor/bootstrap/tables";
+
+// Components: common
+//@import "vendor/bootstrap/sprites"; //we do our own icons
+@import "vendor/bootstrap/dropdowns";
+@import "vendor/bootstrap/wells";
+@import "vendor/bootstrap/component-animations";
+@import "vendor/bootstrap/close";
+
+// Components: Alerts
+@import "vendor/bootstrap/alerts";
+
+// Components: Nav
+@import "vendor/bootstrap/navs";
+@import "vendor/bootstrap/pagination";
+
+// Components: Popovers
+//@import "vendor/bootstrap/modals"; // use jqueryUI instead
+//@import "vendor/bootstrap/tooltip"; // we do our own
+@import "vendor/bootstrap/popovers";
+
+// Components: Misc
+@import "vendor/bootstrap/thumbnails";
+
+
+// Components: Misc
+@import "vendor/bootstrap/thumbnails";
+@import "vendor/bootstrap/labels-badges";
+@import "vendor/bootstrap/progress-bars";
+@import "vendor/bootstrap/media";
+
+// Utility classes
+@import "vendor/bootstrap/utilities"; // Has to be last to override when necessary
+
+
+// RESPONSIVE CLASSES
+// ------------------
+@import "vendor/bootstrap/responsive-utilities";
+
+// MEDIA QUERIES
+// ------------------
+
+// Large desktops
+@import "vendor/bootstrap/responsive-1200px-min";
+
+// Tablets to regular desktops
+@import "vendor/bootstrap/responsive-768px-979px";
+
+@import "bootstrap_overrides";

@@ -21,14 +21,12 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe MessagesController do
   describe "create" do
     context "an admin user" do
-      before do
-        site_admin_user
-        user_session(@user)
-      end
+      before(:once){ site_admin_user }
+      before(:each){ user_session(@user) }
 
       it "should be able to access the page" do
         post 'create', :user_id => @user.to_param
-        response.code.should == '200'
+        expect(response.code).to eq '200'
       end
 
       it "should be able to send messages" do
@@ -51,7 +49,7 @@ describe MessagesController do
 
       it "should receive a redirect" do
         post 'create', :user_id => @user.to_param
-        response.code.should == '302'
+        expect(response.code).to eq '302'
       end
     end
   end

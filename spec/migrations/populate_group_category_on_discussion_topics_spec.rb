@@ -25,9 +25,10 @@ describe DataFixup::PopulateGroupCategoryOnDiscussionTopics do
     group_category = @course.group_categories.create(:name => "category")
     @group = @course.groups.create(:name => "group", :group_category => group_category)
 
-    assignment1 = course.assignments.build(:submission_types => 'discussion_topic', :title => 'a1')
-    assignment1.group_category = group_category
-    assignment1.save!
+    assignment1 = course.assignments.create!(:submission_types => 'discussion_topic', :title => 'a1')
+    # bypass validation
+    Assignment.where(id: assignment1).update_all(group_category_id: group_category)
+    assignment1.reload
     topic1 = @course.discussion_topics.create!(:title => "topic 1")
     topic1.assignment = assignment1
     topic1.save!
@@ -43,9 +44,9 @@ describe DataFixup::PopulateGroupCategoryOnDiscussionTopics do
     DataFixup::PopulateGroupCategoryOnDiscussionTopics.run
 
     # verify the results
-    topic1.reload.group_category.should == group_category
-    topic1.assignment.reload.group_category.should == group_category
-    topic2.reload.group_category.should be_nil
-    topic3.reload.group_category.should be_nil
+    expect(topic1.reload.group_category).to eq group_category
+    expect(topic1.assignment.reload.group_category).to eq group_category
+    expect(topic2.reload.group_category).to be_nil
+    expect(topic3.reload.group_category).to be_nil
   end
 end

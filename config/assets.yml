@@ -1,13 +1,14 @@
 <%=
 =begin
 
-WHAT HAPPEND TO assets.yml? AND WHAT ARE THE $use_new_styles AND $use_high_contrast SASS VARIABLES?
+WHAT HAPPEND TO assets.yml? AND WHAT ARE THE $use_new_styles, $is-k12 AND $use_high_contrast SASS VARIABLES?
 -----------------------------------------------------------------------------
 
 TL,DR: don't add things to this file. Put css bundles in 'assets_real.yml'
 
 In order to allow accounts to opt-in to a feature flag to use the new styles
-that UI/UX is working on, and in order to allow individual users to turn on a
+that UI/UX is working on, and in order to provide a k12-specific look-and-feel
+and in order to allow individual users to turn on a
 feature flag for high-contrast styles, we do some trickery in our sass.
 
 ### What you, the developer need to know.
@@ -28,7 +29,7 @@ In any sass file, you can do things like:
 ...and those styles will show up for users depending on their own
 :use_high_contrast feature flag and the account's :use_new_styles feature flag.
 
-Make sure, if you see stuff about $use_high_contrast or $use_new_styles in a
+Make sure, if you see stuff about $use_high_contrast, $is-k12 or $use_new_styles in a
 sass file you are working on, that you test it with the feature flag both on and
 off, so your changes don't mess up the other. At least having them in the same
 file will make it easier than keeping track of some orverrides.css file floating
@@ -59,7 +60,7 @@ http://sass-lang.com/documentation/file.SASS_REFERENCE.html#_8
 The Nitty Gritty:
 We can do this because Canvas::MultiVariantCompassCompiler#compile_all
 (which is the thing that we use to compile all of our sass) compiles each sass
-file 4 times, each time adding the path 'app/stylesheets/variants/<variant>'
+file 6 times, each time adding the path 'app/stylesheets/variants/<variant>'
 to the load path so when we @import 'variant_variables', it is actually
 grabbing, for example:
 app/stylesheets/variants/new_styles_high_contrast/_variant_variables.scss
@@ -75,6 +76,9 @@ and the account's :use_new_styles flag and (assuming they were both set to true)
 tell jammit it wants the 'speedgrader_new_styles_high_contrast' bundle which will include
 things like 'public/stylesheets_compiled/new_styles_high_contrast/speed_grader.css',
 which was compiled with the $use_new_styles and $use_high_contrast variables set correctly.
+
+Note:
+If $is-k12 is turned on, then $use_new_styles will be true as well.
 
 =end
   require File.join(Jammit::ASSET_ROOT, 'lib', 'multi_variant_compass_compiler')

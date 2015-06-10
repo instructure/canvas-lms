@@ -1,0 +1,27 @@
+<div style="padding: 20px;">
+  <form class="form-horizontal" role="form">
+
+    <div class="control-group">
+      <label class="control-label">Website URL</label>
+      <div class="controls" style="padding-top: 5px;">
+        <strong>{{url}}</strong>
+        <a href="#" class="relaunch-tool btn btn-mini">change</a>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label class="control-label">{{#t 'additional_comments'}}Additional comments{{/t}}</label>
+      <div class="controls">
+        <textarea class="submission_comment" rows="3" placeholder="{{#t 'group_assignment_header'}}Comments...{{/t}}" title="{{#t 'additional_comments'}}Additional comments{{/t}}"></textarea>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="controls">
+        <button type="button" class="cancel_button btn">{{#t '#buttons.cancel'}}Cancel{{/t}}</button>
+        <button type="submit" class="submit_button btn btn-primary">{{#t 'buttons.submit_assignment'}}Submit Assignment{{/t}}</button>
+      </div>
+    </div>
+
+  </form>
+</div>

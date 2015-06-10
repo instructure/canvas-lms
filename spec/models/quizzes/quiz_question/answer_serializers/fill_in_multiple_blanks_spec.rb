@@ -3,6 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/support/answer_serializers_s
 require File.expand_path(File.dirname(__FILE__) + '/support/textual_answer_serializers_specs.rb')
 
 describe Quizzes::QuizQuestion::AnswerSerializers::FillInMultipleBlanks do
+
   include_examples 'Answer Serializers'
 
   let :input do
@@ -37,21 +38,43 @@ describe Quizzes::QuizQuestion::AnswerSerializers::FillInMultipleBlanks do
     { answer1: answer_text }
   end
 
+  describe '#deserialize (full)' do
+    it 'includes all answer/match pairs' do
+      output = subject.deserialize({
+        "question_5_#{AssessmentQuestion.variable_id 'answer1'}" => 'red',
+        "question_5_#{AssessmentQuestion.variable_id 'answer2'}" => nil,
+        "question_5_#{AssessmentQuestion.variable_id 'answer3'}" => 'green',
+        "question_5_#{AssessmentQuestion.variable_id 'answer4'}" => 'blue',
+        "question_5_#{AssessmentQuestion.variable_id 'answer5'}" => nil,
+        "question_5_#{AssessmentQuestion.variable_id 'answer6'}" => nil,
+      }.as_json, true)
+
+      expect(output).to eq({
+        answer1: 'red',
+        answer2: nil,
+        answer3: 'green',
+        answer4: 'blue',
+        answer5: nil,
+        answer6: nil,
+      }.as_json)
+    end
+  end
+
   context 'validations' do
     include_examples 'Textual Answer Serializers'
 
     it 'should reject unexpected types' do
       [ 'asdf', nil ].each do |bad_input|
         rc = subject.serialize(bad_input)
-        rc.error.should_not be_nil
-        rc.error.should match /must be of type hash/i
+        expect(rc.error).not_to be_nil
+        expect(rc.error).to match /must be of type hash/i
       end
     end
 
     it 'should reject an answer to an unknown blank' do
       rc = subject.serialize({ foobar: 'yeeeeeeeeee' })
-      rc.error.should_not be_nil
-      rc.error.should match /unknown blank/i
+      expect(rc.error).not_to be_nil
+      expect(rc.error).to match /unknown blank/i
     end
   end
 end

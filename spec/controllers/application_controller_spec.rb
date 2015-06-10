@@ -16,13 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe ApplicationController do
 
   before :each do
-    controller.stubs(:form_authenticity_token).returns('asdf')
-    controller.stubs(:request).returns(stub(:host_with_port => "www.example.com"))
+    controller.stubs(:request).returns(stub(:host_with_port => "www.example.com",
+                                            :host => "www.example.com",
+                                            :headers => {}))
   end
 
   describe "#twitter_connection" do
@@ -34,7 +35,7 @@ describe ApplicationController do
 
       mock_user_services = mock("mock_user_services")
       mock_current_user.expects(:user_services).returns(mock_user_services)
-      mock_user_services.expects(:find_by_service).with("twitter").returns(mock(token: "current_user_token", secret: "current_user_secret"))
+      mock_user_services.expects(:where).with(service: "twitter").returns(stub(first: mock(token: "current_user_token", secret: "current_user_secret")))
 
       Twitter::Connection.expects(:new).with("current_user_token", "current_user_secret")
 
@@ -90,7 +91,7 @@ describe ApplicationController do
 
       mock_user_services = mock("mock_user_services")
       mock_current_user.expects(:user_services).returns(mock_user_services)
-      mock_user_services.expects(:find_by_service).with("google_docs").returns(mock(token: "user_service_token", secret: "user_service_secret"))
+      mock_user_services.expects(:where).with(service: "google_docs").returns(stub(first: mock(token: "user_service_token", secret: "user_service_secret")))
 
       GoogleDocs::Connection.expects(:new).with("user_service_token", "user_service_secret")
 
@@ -117,7 +118,7 @@ describe ApplicationController do
 
       mock_user_services = mock("mock_user_services")
       mock_current_user.expects(:user_services).returns(mock_user_services)
-      mock_user_services.expects(:find_by_service).with("google_docs").returns(nil)
+      mock_user_services.expects(:where).with(service: "google_docs").returns(stub(first: nil))
 
       expect {
         controller.send(:google_docs_connection)
@@ -125,38 +126,175 @@ describe ApplicationController do
     end
   end
 
+  describe "#google_drive_connection" do
+    before :each do
+      settings_mock = mock()
+      settings_mock.stubs(:settings).returns({})
+      Canvas::Plugin.stubs(:find).returns(settings_mock)
+
+    end
+
+    it "uses @real_current_user first" do
+      mock_real_current_user = mock()
+      mock_current_user = mock()
+      controller.instance_variable_set(:@real_current_user, mock_real_current_user)
+      controller.instance_variable_set(:@current_user, mock_current_user)
+      session[:oauth_gdrive_refresh_token] = "session_token"
+      session[:oauth_gdrive_access_token] = "sesion_secret"
+
+      Rails.cache.expects(:fetch).with(['google_drive_tokens', mock_real_current_user].cache_key).returns(["real_current_user_token", "real_current_user_secret"])
+
+      GoogleDocs::DriveConnection.expects(:new).with("real_current_user_token", "real_current_user_secret")
+
+      controller.send(:google_drive_connection)
+    end
+
+    it "uses @current_user second" do
+      mock_current_user = mock()
+      controller.instance_variable_set(:@real_current_user, nil)
+      controller.instance_variable_set(:@current_user, mock_current_user)
+      session[:oauth_gdrive_refresh_token] = "session_token"
+      session[:oauth_gdrive_access_token] = "sesion_secret"
+
+      Rails.cache.expects(:fetch).with(['google_drive_tokens', mock_current_user].cache_key).returns(["current_user_token", "current_user_secret"])
+
+      GoogleDocs::DriveConnection.expects(:new).with("current_user_token", "current_user_secret")
+      controller.send(:google_drive_connection)
+    end
+
+    it "queries user services if token isn't in the cache" do
+      mock_current_user = mock()
+      controller.instance_variable_set(:@real_current_user, nil)
+      controller.instance_variable_set(:@current_user, mock_current_user)
+      session[:oauth_gdrive_refresh_token] = "session_token"
+      session[:oauth_gdrive_access_token] = "sesion_secret"
+
+      mock_user_services = mock("mock_user_services")
+      mock_current_user.expects(:user_services).returns(mock_user_services)
+      mock_user_services.expects(:where).with(service: "google_drive").returns(stub(first: mock(token: "user_service_token", secret: "user_service_secret")))
+
+      GoogleDocs::DriveConnection.expects(:new).with("user_service_token", "user_service_secret")
+      controller.send(:google_drive_connection)
+    end
+
+    it "uses the session values if no users are set" do
+      controller.instance_variable_set(:@real_current_user, nil)
+      controller.instance_variable_set(:@current_user, nil)
+      session[:oauth_gdrive_refresh_token] = "session_token"
+      session[:oauth_gdrive_access_token] = "sesion_secret"
+
+      GoogleDocs::DriveConnection.expects(:new).with("session_token", "sesion_secret")
+
+      controller.send(:google_drive_connection)
+    end
+  end
+
+  describe "#google_drive_user_client" do
+    before :each do
+      settings_mock = mock()
+      settings_mock.stubs(:settings).returns({})
+      Canvas::Plugin.stubs(:find).returns(settings_mock)
+
+    end
+
+    it "uses @real_current_user first" do
+      mock_real_current_user = mock()
+      mock_current_user = mock()
+      controller.instance_variable_set(:@real_current_user, mock_real_current_user)
+      controller.instance_variable_set(:@current_user, mock_current_user)
+
+      Rails.cache.expects(:fetch).with(['google_drive_tokens', mock_real_current_user].cache_key).returns(["real_current_user_refresh_token", "real_current_user_access_token"])
+      GoogleDrive::Client.expects(:create).with({},"real_current_user_refresh_token", "real_current_user_access_token")
+      controller.send(:google_drive_user_client)
+    end
+
+    it "uses @current_user second" do
+      mock_current_user = mock()
+      controller.instance_variable_set(:@real_current_user, nil)
+      controller.instance_variable_set(:@current_user, mock_current_user)
+      Rails.cache.expects(:fetch).with(['google_drive_tokens', mock_current_user].cache_key).returns(["current_user_refresh_token", "current_user_access_token"])
+      GoogleDrive::Client.expects(:create).with({},"current_user_refresh_token", "current_user_access_token")
+      controller.send(:google_drive_user_client)
+    end
+
+    it "queries user services if token isn't in the cache" do
+      mock_current_user = mock()
+      controller.instance_variable_set(:@real_current_user, nil)
+      controller.instance_variable_set(:@current_user, mock_current_user)
+
+      mock_user_services = mock("mock_user_services")
+      mock_current_user.expects(:user_services).returns(mock_user_services)
+      service_mock = mock('service')
+      service_mock.stubs(first: mock(token: "user_refresh_token", access_token: "user_access_token"))
+      mock_user_services.expects(:where).with(service: "google_drive").returns(service_mock)
+
+      GoogleDrive::Client.expects(:create).with({}, "user_refresh_token", "user_access_token")
+
+      controller.send(:google_drive_user_client)
+    end
+
+    it "uses the session values if no users are set" do
+      controller.instance_variable_set(:@real_current_user, nil)
+      controller.instance_variable_set(:@current_user, nil)
+      session[:oauth_gdrive_access_token] = "access_token"
+      session[:oauth_gdrive_refresh_token] = "refresh_token"
+
+      GoogleDrive::Client.expects(:create).with({}, "refresh_token", "access_token")
+      controller.send(:google_drive_user_client)
+    end
+  end
+
   describe "js_env" do
+    before do
+      controller.stubs(:api_request?).returns(false)
+    end
+
     it "should set items" do
       HostUrl.expects(:file_host).with(Account.default, "www.example.com").returns("files.example.com")
       controller.js_env :FOO => 'bar'
-      controller.js_env[:FOO].should == 'bar'
-      controller.js_env[:AUTHENTICITY_TOKEN].should == 'asdf'
-      controller.js_env[:files_domain].should == 'files.example.com'
+      expect(controller.js_env[:FOO]).to eq 'bar'
+      expect(controller.js_env[:files_domain]).to eq 'files.example.com'
     end
 
     it "should auto-set timezone and locale" do
       I18n.locale = :fr
       Time.zone = 'Alaska'
-      @controller.js_env[:LOCALE].should == 'fr-FR'
-      @controller.js_env[:TIMEZONE].should == 'America/Juneau'
+      expect(@controller.js_env[:LOCALE]).to eq 'fr-FR'
+      expect(@controller.js_env[:TIMEZONE]).to eq 'America/Juneau'
     end
 
     it "sets the contextual timezone from the context" do
       Time.zone = "Mountain Time (US & Canada)"
       controller.instance_variable_set(:@context, stub(time_zone: Time.zone, asset_string: ""))
       controller.js_env({})
-      controller.js_env[:CONTEXT_TIMEZONE].should == 'America/Denver'
+      expect(controller.js_env[:CONTEXT_TIMEZONE]).to eq 'America/Denver'
     end
 
     it "should allow multiple items" do
       controller.js_env :A => 'a', :B => 'b'
-      controller.js_env[:A].should == 'a'
-      controller.js_env[:B].should == 'b'
+      expect(controller.js_env[:A]).to eq 'a'
+      expect(controller.js_env[:B]).to eq 'b'
     end
 
     it "should not allow overwriting a key" do
       controller.js_env :REAL_SLIM_SHADY => 'please stand up'
       expect { controller.js_env(:REAL_SLIM_SHADY => 'poser') }.to raise_error
+    end
+
+    it 'gets appropriate settings from the root account' do
+      root_account = stub(global_id: 1, feature_enabled?: false, open_registration?: true)
+      HostUrl.stubs(file_host: 'files.example.com')
+      controller.instance_variable_set(:@domain_root_account, root_account)
+      expect(controller.js_env[:SETTINGS][:open_registration]).to be_truthy
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should set the global id for the domain_root_account" do
+        controller.instance_variable_set(:@domain_root_account, Account.default)
+        expect(controller.js_env[:DOMAIN_ROOT_ACCOUNT_ID]).to eq Account.default.global_id
+      end
     end
   end
 
@@ -167,60 +305,62 @@ describe ApplicationController do
     end
 
     it "should build from a simple path" do
-      controller.send(:clean_return_to, "/calendar").should == "https://canvas.example.com/calendar"
+      expect(controller.send(:clean_return_to, "/calendar")).to eq "https://canvas.example.com/calendar"
     end
 
     it "should build from a full url" do
       # ... but always use the request host/protocol, not the given
-      controller.send(:clean_return_to, "http://example.org/a/b?a=1&b=2#test").should == "https://canvas.example.com/a/b?a=1&b=2#test"
+      expect(controller.send(:clean_return_to, "http://example.org/a/b?a=1&b=2#test")).to eq "https://canvas.example.com/a/b?a=1&b=2#test"
     end
 
     it "should reject disallowed paths" do
-      controller.send(:clean_return_to, "ftp://example.com/javascript:hai").should be_nil
+      expect(controller.send(:clean_return_to, "ftp://example.com/javascript:hai")).to be_nil
     end
   end
 
   describe "#reject!" do
     it "sets the message and status in the error json" do
       expect { controller.reject!('test message', :not_found) }.to(raise_error(RequestError) do |e|
-        e.message.should == 'test message'
-        e.error_json[:message].should == 'test message'
-        e.error_json[:status].should == 'not_found'
-        e.response_status.should == 404
+        expect(e.message).to eq 'test message'
+        expect(e.error_json[:message]).to eq 'test message'
+        expect(e.error_json[:status]).to eq 'not_found'
+        expect(e.response_status).to eq 404
       end)
     end
 
     it "defaults status to 'bad_request'" do
       expect { controller.reject!('test message') }.to(raise_error(RequestError) do |e|
-        e.error_json[:status].should == 'bad_request'
-        e.response_status.should == 400
+        expect(e.error_json[:status]).to eq 'bad_request'
+        expect(e.response_status).to eq 400
       end)
     end
 
     it "accepts numeric status codes" do
       expect { controller.reject!('test message', 403) }.to(raise_error(RequestError) do |e|
-        e.error_json[:status].should == 'forbidden'
-        e.response_status.should == 403
+        expect(e.error_json[:status]).to eq 'forbidden'
+        expect(e.response_status).to eq 403
       end)
     end
 
     it "accepts symbolic status codes" do
       expect { controller.reject!('test message', :service_unavailable) }.to(raise_error(RequestError) do |e|
-        e.error_json[:status].should == 'service_unavailable'
-        e.response_status.should == 503
+        expect(e.error_json[:status]).to eq 'service_unavailable'
+        expect(e.response_status).to eq 503
       end)
     end
   end
 
   describe "safe_domain_file_user" do
-    before :each do
-      # safe_domain_file_url wants to use request.protocol
-      controller.stubs(:request).returns(mock(:protocol => '', :host_with_port => ''))
-
+    before :once do
       @user = User.create!
       @attachment = @user.attachments.new(:filename => 'foo.png')
       @attachment.content_type = 'image/png'
       @attachment.save!
+    end
+
+    before :each do
+      # safe_domain_file_url wants to use request.protocol
+      controller.stubs(:request).returns(mock(:protocol => '', :host_with_port => ''))
 
       @common_params = {
         :user_id => nil,
@@ -237,21 +377,21 @@ describe ApplicationController do
       HostUrl.expects(:file_host_with_shard).with(42, '').returns(['myfiles', Shard.default])
       controller.instance_variable_set(:@domain_root_account, 42)
       url = controller.send(:safe_domain_file_url, @attachment)
-      url.should match /myfiles/
+      expect(url).to match /myfiles/
     end
 
     it "should include :download=>1 in inline urls for relative contexts" do
       controller.instance_variable_set(:@context, @attachment.context)
       controller.stubs(:named_context_url).returns('')
       url = controller.send(:safe_domain_file_url, @attachment)
-      url.should match(/[\?&]download=1(&|$)/)
+      expect(url).to match(/[\?&]download=1(&|$)/)
     end
 
     it "should not include :download=>1 in download urls for relative contexts" do
       controller.instance_variable_set(:@context, @attachment.context)
       controller.stubs(:named_context_url).returns('')
       url = controller.send(:safe_domain_file_url, @attachment, nil, nil, true)
-      url.should_not match(/[\?&]download=1(&|$)/)
+      expect(url).not_to match(/[\?&]download=1(&|$)/)
     end
 
     it "should include download_frd=1 and not include inline=1 in url when specified as for download" do
@@ -275,7 +415,7 @@ describe ApplicationController do
       controller.stubs(:params).returns({:user_id => 'sis_user_id:test1'})
       controller.stubs(:api_request?).returns(true)
       controller.send(:get_context)
-      controller.instance_variable_get(:@context).should == @user
+      expect(controller.instance_variable_get(:@context)).to eq @user
     end
 
     it "should find course section with api_find for api requests" do
@@ -287,7 +427,7 @@ describe ApplicationController do
       controller.stubs(:params).returns({:course_section_id => 'sis_section_id:test1'})
       controller.stubs(:api_request?).returns(true)
       controller.send(:get_context)
-      controller.instance_variable_get(:@context).should == @section
+      expect(controller.instance_variable_get(:@context)).to eq @section
     end
 
     # this test is supposed to represent calling I18n.t before a context is set
@@ -300,11 +440,13 @@ describe ApplicationController do
       acct.save!
       controller.instance_variable_set(:@domain_root_account, acct)
       req = mock()
+
+      req.stubs(:host).returns('www.example.com')
       req.stubs(:headers).returns({})
       controller.stubs(:request).returns(req)
       controller.send(:assign_localizer)
       I18n.set_locale_with_localizer # this is what t() triggers
-      I18n.locale.to_s.should == "es"
+      expect(I18n.locale.to_s).to eq "es"
       course_model(:locale => "ru")
       controller.stubs(:named_context_url).with(@course, :context_url).returns('')
       controller.stubs(:params).returns({:course_id => @course.id})
@@ -312,18 +454,105 @@ describe ApplicationController do
       controller.stubs(:session).returns({})
       controller.stubs(:js_env).returns({})
       controller.send(:get_context)
-      controller.instance_variable_get(:@context).should == @course
+      expect(controller.instance_variable_get(:@context)).to eq @course
       I18n.set_locale_with_localizer # this is what t() triggers
-      I18n.locale.to_s.should == "ru"
+      expect(I18n.locale.to_s).to eq "ru"
     end
   end
 
-  if CANVAS_RAILS2
-    describe "#complete_request_uri" do
-      it "should filter sensitive parameters from the query string" do
-        controller.stubs(:request).returns(mock(:protocol => "https://", :host => "example.com", :fullpath => "/api/v1/courses?password=abcd&test=5&Xaccess_token=13&access_token=sekrit"))
-        controller.send(:complete_request_uri).should == "https://example.com/api/v1/courses?password=[FILTERED]&test=5&Xaccess_token=13&access_token=[FILTERED]"
+  describe 'rescue_action_in_public' do
+    context 'sharding' do
+      specs_require_sharding
+
+      before do
+        @shard2.activate do
+          @account = account_model
+        end
       end
+
+      it 'should log error reports to the domain_root_accounts shard' do
+        report = ErrorReport.new
+        ErrorReport.stubs(:log_exception).returns(report)
+        ErrorReport.stubs(:find).returns(report)
+        Canvas::Errors::Info.stubs(:useful_http_env_stuff_from_request).returns({})
+
+        req = mock()
+        req.stubs(:url).returns('url')
+        req.stubs(:headers).returns({})
+        req.stubs(:request_method_symbol).returns(:get)
+        req.stubs(:format).returns('format')
+
+        controller.stubs(:request).returns(req)
+        controller.stubs(:api_request?).returns(false)
+        controller.stubs(:render_rescue_action)
+
+        controller.instance_variable_set(:@domain_root_account, @account)
+
+        @shard2.expects(:activate)
+
+        controller.send(:rescue_action_in_public, Exception.new)
+      end
+    end
+  end
+
+  describe 'content_tag_redirect' do
+
+    it 'redirects for lti_message_handler' do
+      tag = mock()
+      tag.stubs(id: 42, content_id: 44, content_type_quiz?: false, content_type: 'Lti::MessageHandler')
+      controller.expects(:named_context_url).with(Account.default, :context_basic_lti_launch_request_url, 44, {:module_item_id => 42, resource_link_fragment: 'ContentTag:42'}).returns('nil')
+      controller.stubs(:redirect_to)
+      controller.send(:content_tag_redirect, Account.default, tag, nil)
+    end
+  end
+
+  describe 'external_tools_display_hashes' do
+    it 'returns empty array if context is group' do
+      @course = course_model
+      @group = @course.groups.create!(:name => "some group")
+      tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret", :url => "http://example.com")
+      tool.account_navigation = {:url => "http://example.com", :icon_url => "http://example.com", :enabled => true}
+      tool.save!
+
+      controller.stubs(:named_context_url).returns("http://example.com")
+      external_tools = controller.external_tools_display_hashes(:account_navigation, @group)
+
+      expect(external_tools).to eq([])
+    end
+  end
+
+  it 'returns array of tools if context is not group' do
+    @course = course_model
+    tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret", :url => "http://example.com")
+    tool.account_navigation = {:url => "http://example.com", :icon_url => "http://example.com", :enabled => true}
+    tool.save!
+
+    controller.stubs(:named_context_url).returns("http://example.com")
+    external_tools = controller.external_tools_display_hashes(:account_navigation, @course)
+
+    expect(external_tools).to eq([{:title=>"bob", :base_url=>"http://example.com", :icon_url=>"http://example.com"}])
+  end
+end
+
+describe ApplicationController do
+  describe "flash_notices" do
+    it 'should return notice text for each type' do
+      [:error, :warning, :info, :notice].each do |type|
+        flash[type] = type.to_s
+      end
+      expect(controller.send(:flash_notices)).to match_array([
+         {type: 'error', content: 'error', icon: 'warning'},
+         {type: 'warning', content: 'warning', icon: 'warning'},
+         {type: 'info', content: 'info', icon: 'info'},
+         {type: 'success', content: 'notice', icon: 'check'}
+     ])
+    end
+
+    it 'should wrap html notification text in an object' do
+      flash[:html_notice] = '<p>hello</p>'
+      expect(controller.send(:flash_notices)).to match_array([
+        {type: 'success', content: {html: '<p>hello</p>'}, icon: 'check'}
+      ])
     end
   end
 end
@@ -336,10 +565,10 @@ describe WikiPagesController do
       course_with_teacher_logged_in :active_all => true
       controller.instance_variable_set(:@context, @course)
 
-      get 'pages_index', :course_id => @course.id
+      get 'index', :course_id => @course.id
 
-      controller.js_env.should include(:WIKI_RIGHTS)
-      controller.js_env[:WIKI_RIGHTS].should == Hash[@course.wiki.check_policy(@teacher).map { |right| [right, true] }]
+      expect(controller.js_env).to include(:WIKI_RIGHTS)
+      expect(controller.js_env[:WIKI_RIGHTS]).to eq Hash[@course.wiki.check_policy(@teacher).map { |right| [right, true] }]
     end
   end
 end

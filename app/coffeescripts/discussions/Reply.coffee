@@ -7,8 +7,10 @@ define [
   'str/htmlEscape'
   'jst/discussions/_reply_attachment'
   'compiled/fn/preventDefault'
+  'compiled/views/editor/KeyboardShortcuts'
+  'str/stripTags'
   'tinymce.editor_box'
-], (Backbone, _, I18n, $, Entry, htmlEscape, replyAttachmentTemplate, preventDefault) ->
+], (Backbone, _, I18n, $, Entry, htmlEscape, replyAttachmentTemplate, preventDefault, KeyboardShortcuts, stripTags) ->
 
   class Reply
 
@@ -33,6 +35,12 @@ define [
         $(e.currentTarget).siblings('a').andSelf().toggle()
       @form.delegate '.alert .close', 'click', preventDefault @hideNotification
       @editing = false
+
+      _.defer(@attachKeyboardShortcuts)
+
+
+    attachKeyboardShortcuts: =>
+      @view.$('.toggle-wrapper').first().before((new KeyboardShortcuts()).render().$el)
 
     ##
     # Shows or hides the TinyMCE editor for a reply
@@ -80,7 +88,7 @@ define [
     submit: =>
       @hide()
       @textArea._setContentCode ''
-      @view.model.set 'notification', "<div class='alert alert-info'>#{I18n.t 'saving_reply', 'Saving reply...'}</div>"
+      @view.model.set 'notification', "<div class='alert alert-info'>#{htmlEscape I18n.t 'saving_reply', 'Saving reply...'}</div>"
       entry = new Entry @getModelAttributes()
       entry.save null,
         success: @onPostReplySuccess
@@ -105,7 +113,7 @@ define [
       now = new Date().getTime()
       # TODO: remove this summary, server should send it in create response and no further
       # work is required
-      summary: $('<div/>').html(@content).text()
+      summary: stripTags(@content)
       message: @content
       parent_id: if @options.topLevel then null else @view.model.get 'id'
       user_id: ENV.current_user_id
@@ -135,19 +143,20 @@ define [
     # Adds an attachment
     addAttachment: ($el) ->
       @form.find('ul.discussion-reply-attachments').append(replyAttachmentTemplate())
+      @form.find('ul.discussion-reply-attachments input').focus()
       @form.find('a.discussion-reply-add-attachment').hide() # TODO: when the data model allows it, tweak this to support multiple in the UI
 
     ##
     # Removes an attachment
     removeAttachment: ($el) ->
       $el.closest('ul.discussion-reply-attachments li').remove()
-      @form.find('a.discussion-reply-add-attachment').show()
+      @form.find('a.discussion-reply-add-attachment').show().focus()
 
     ##
     # Removes all attachments
     removeAttachments: ->
       @form.find('ul.discussion-reply-attachments').empty()
-      @form.find('a.discussion-reply-add-attachment').show()
+      @form.find('a.discussion-reply-add-attachment').show().focus()
 
   _.extend Reply.prototype, Backbone.Events
 

@@ -13,15 +13,18 @@ define [
 ], (I18n, $, _, {View}, Slick, Grid, CheckboxView, SectionMenuView, template, cellTemplate) ->
 
   Dictionary =
+    exceedsMastery:
+      color : '#6a843f'
+      label : I18n.t('Exceeds Mastery')
     mastery:
-      color : '#8bab58'
-      label : I18n.t('mastery', 'mastery')
+      color : '#8aac53'
+      label : I18n.t('Meets Mastery')
     nearMastery:
-      color : '#e0d679'
-      label : I18n.t('near_mastery', 'near mastery')
+      color : '#e0d773'
+      label : I18n.t('Near Mastery')
     remedial:
-      color : '#dd5c5c'
-      label : I18n.t('remedial', 'remedial')
+      color : '#df5b59'
+      label : I18n.t('Well Below Mastery')
 
   class OutcomeGradebookView extends View
 
@@ -37,9 +40,10 @@ define [
 
     # child views rendered using the {{view}} helper in the template
     checkboxes:
-      mastery:        new CheckboxView(Dictionary.mastery)
-      'near-mastery': new CheckboxView(Dictionary.nearMastery)
-      remedial:       new CheckboxView(Dictionary.remedial)
+      'exceeds':         new CheckboxView(Dictionary.exceedsMastery)
+      mastery:           new CheckboxView(Dictionary.mastery)
+      'near-mastery':    new CheckboxView(Dictionary.nearMastery)
+      remedial:          new CheckboxView(Dictionary.remedial)
 
     events:
       'click .sidebar-toggle': 'onSidebarToggle'
@@ -156,6 +160,7 @@ define [
       @$el.fillWindowWithMe({
         onResize: => @grid.resizeCanvas() if @grid
       })
+      $(".post-grades-placeholder").hide();
 
     # Public: Load all outcome results from API.
     #

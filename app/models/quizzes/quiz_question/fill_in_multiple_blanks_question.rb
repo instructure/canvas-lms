@@ -68,6 +68,7 @@ class Quizzes::QuizQuestion::FillInMultipleBlanksQuestion < Quizzes::QuizQuestio
     end
   end
 
+  # TODO: remove once new stats is on for everybody
   def stats(responses)
     stats = {:multiple_responses => true}
 

@@ -54,11 +54,12 @@ define([
     $("#equella_dialog").dialog('close');
   });
   
-  window.external_tool = {
+  window.external_tool_dialog = {
     ready: function(data) {
-      $("#external_tool_button_dialog:visible").triggerHandler('selection', data);
-      $("#resource_selection_dialog:visible").triggerHandler('selection', data);
-      $("#homework_selection_dialog:visible").triggerHandler('selection', data);
+      event = jQuery.Event( "selection" )
+      event.contentItems = data
+      $("#resource_selection_dialog:visible").triggerHandler(event);
+      $("#homework_selection_dialog:visible").triggerHandler(event);
     },
     cancel: function() {
       $("#external_tool_button_dialog").dialog('close');

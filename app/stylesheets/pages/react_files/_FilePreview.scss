@@ -1,0 +1,256 @@
+/// __File Preview
+////////////////////////////////
+$preview-bg: rgba(#0f1317, 0.9);
+$preview-info-bg: lighten($preview-bg, 5%);
+$preview-border-color: darken($ic-color-light, 45);
+$preview-toggle-border: 1px solid $preview-border-color;
+$preview-font-color: $ic-color-light;
+$spacing-width: 0;
+$preview-footer-height: 140px;
+$preview-header-height: 9vh;
+$preview-html-background: whitesmoke;
+
+.ReactModal__Overlay.ReactModal__Overlay--ef-file-preview {
+  background: rgba(black, 0.9);
+}
+
+.ReactModal__Content.ReactModal__Content--ef-file-preview {
+  height: 100%;
+  display: flex;
+}
+
+/// __File Preview Layout
+////////////////////////////////
+// Since this was a slightly complex layout I've separated this into
+// it's on area in the stylesheet to help break it out
+
+.ef-file-arrow_container {
+  flex: 0 0 auto;
+  justify-content: center;
+}
+
+.ef-file-preview-overlay {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.ef-file-preview-stretch {
+  flex: 1 1 auto;
+  display: flex;
+}
+
+/// Second container: Image/Info Area
+
+.ef-file-preview-information-container {
+  /// this is the size the info box will be when it
+  /// is visible
+  flex: 0 0 216px;
+  box-sizing: border-box;
+  @include breakpoint(desktop) { flex: 2; }
+}
+
+/// Third container: Image Preview w/ Arrows
+.ef-file-preview-viewer-content {
+  text-align: center;
+}
+
+/// __File Preview Header
+////////////////////////////////
+.ef-file-preview-header {
+  height: $preview-header-height;
+  color: $preview-font-color;
+  font-weight: 300;
+  flex: 0 0 $preview-header-height;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  * { box-sizing: border-box; }
+  border-bottom: 1px solid $preview-border-color;
+  background-color: $preview-bg;
+}
+.ef-file-preview-header-filename {
+  font-size: 18px;
+  padding: 0;
+  padding-left: 24px;
+  margin: 0;
+  flex: 1 0 264px;
+  height: $preview-header-height;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid $preview-border-color;
+}
+
+.ef-file-preview-viewer-content {
+  flex: 4 4 144px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .ef-file-preview-not-available {
+    padding: 100px 0;
+  }
+}
+.ef-file-preview-frame {
+  border: none;
+}
+
+.ef-file-preview-header-buttons {
+  display: flex;
+  height: $preview-header-height;
+  justify-content: flex-end;
+  border-bottom: 1px solid $preview-border-color;
+}
+
+.ef-file-preview-button {
+  transition: all 0.2s;
+  color: darken($preview-font-color, 45);
+  cursor: pointer;
+  padding: 0 12px;
+  font-size: 14px;
+  border: none;
+  text-align: center;
+  align-items: center;
+  background: $preview-bg;
+  white-space: nowrap;
+  @include breakpoint(desktop) { padding: 0 24px; }
+  &:hover, &:focus { color: $ic-color-light; text-decoration: none;}
+  [class^=icon-] { margin-right: 3px; }
+
+  &:hover, &:focus {
+    background: rgba(white, 0.1);
+    border-bottom-color: lighten($ic-brand-primary, 15%);
+  }
+
+  &.ef-file-preview-button--active {
+    color: $preview-font-color;
+    background: transparent;
+    background: $preview-info-bg;
+    border-bottom-color: transparent;
+    border-left: 1px solid $preview-border-color;
+    border-right: 1px solid $preview-border-color;
+  }
+}
+
+// To support flex in buttons, we need to use an internal div
+// see https://bugzilla.mozilla.org/show_bug.cgi?id=984869
+a.ef-file-preview-button, button.ef-file-preview-button div {
+  display: flex;
+}
+
+/// __File Preview Content
+////////////////////////////////
+#media_preview {
+  color: $preview-font-color;
+}
+.ef-file-not-found{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  color: white;
+  font-size: 2.5em;
+}
+.ef-file-align-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.ef-not-found-icon{
+  width: 100px;
+  height: 100px;
+  margin-bottom: 10px;
+  background-size: 70px;
+}
+.ef-file-preview-item {
+  padding: 10px;
+}
+.ef-file-preview-container-arrow-link {
+  align-self: center;
+}
+.ef-file-preview-arrow-link {
+  transition: all 0.2s;
+  display: block;
+  background: $preview-bg;
+  border: 1px solid $preview-border-color;
+  border-radius: 6px;
+  padding: 20px 10px 24px;
+  text-align: center;
+  &:hover, &:focus {
+    border-color: lighten($ic-brand-primary, 15%);
+    background: transparent;
+  }
+  i {
+    width: auto;
+    font-size: 30px;
+    line-height: normal;
+    color: $preview-font-color;
+    &:before {
+      font-size: inherit;
+      width: auto;
+    }
+  }
+}
+.ef-file-preview-arrow {
+  height: 50px;
+}
+
+.ef-file-preview-viewer-content {
+  .ef-file-preview-not-available {
+    padding: 100px 0;
+  }
+}
+.ef-file-preview-frame {
+  flex: 1 1 auto;
+  border: none;
+  height: 100vh - $preview-header-height; // IE fix for main container height
+}
+
+.ef-file-preview-frame { border: none; }
+
+// Information Tab
+////////////////////////////////
+.ef-file-preview-information-container {
+  background: $preview-info-bg;
+  border-left: 1px solid $preview-border-color;
+  padding: 24px;
+}
+.ef-file-preview-infotable {
+  transition: width 0.3s;
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  td, th, a {
+    text-align: left;
+    color: $preview-font-color;
+  }
+  th {
+    width: 40%;
+    color: darken($preview-font-color, 10%);
+    padding: 5px 0;
+    font-weight: normal;
+  }
+}
+
+.ef-file-preview-image {
+  width: 500px;
+  height: auto;
+}
+.ef-file-preview-item {
+  align-items: center;
+}
+
+.ef-file-preview-not-available {
+  color: #fff;
+  padding: 40px;
+}
+
+.FilePreviewInfoPanel__usageRights {
+  vertical-align: top;
+}
+
+// so previews of unstyled HTML will not feature black-on-black text
+.ef-file-preview-frame-html {
+  background-color: $preview-html-background;
+}

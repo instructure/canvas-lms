@@ -10,7 +10,7 @@ describe "help dialog" do
       get("/login")
       f('#footer .help_dialog_trigger').click
       wait_for_ajaximations
-      f("#help-dialog-options").should be_displayed
+      expect(f("#help-dialog-options")).to be_displayed
     end
 
     it "should no longer show a browser warning for IE" do
@@ -20,7 +20,7 @@ describe "help dialog" do
       driver.execute_script("window.INST.browser = {ie: true, version: 8}")
       f('#footer .help_dialog_trigger').click
       wait_for_ajaximations
-      flash_message_present?(:error).should be_false
+      expect(flash_message_present?(:error)).to be_falsey
     end
   end
 
@@ -31,22 +31,22 @@ describe "help dialog" do
 
     it "should show the Help dialog when help is clicked and feedback is enabled" do
       get "/dashboard"
-      element_exists("#help-dialog").should be_false
-      ff('.help_dialog_trigger').length.should == 0
+      expect(element_exists("#help-dialog")).to be_falsey
+      expect(ff('.help_dialog_trigger').length).to eq 0
 
       Setting.set('show_feedback_link', 'true')
       get "/dashboard"
-      ff('.help_dialog_trigger').length.should == 2
-      element_exists("#help-dialog").should be_false
+      expect(ff('.help_dialog_trigger').length).to eq 2
+      expect(element_exists("#help-dialog")).to be_falsey
       f('.help_dialog_trigger').click
       wait_for_ajaximations
-      f("#help-dialog").should be_displayed
-      f("#help-dialog a[href='#teacher_feedback']").should be_displayed
+      expect(f("#help-dialog")).to be_displayed
+      expect(f("#help-dialog a[href='#teacher_feedback']")).to be_displayed
 
       support_url = 'http://example.com/support'
       Account.default.update_attribute(:settings, {:support_url => support_url})
       get "/dashboard"
-      driver.execute_script("return $('.help_dialog_trigger').attr('href')").should == support_url
+      expect(driver.execute_script("return $('.help_dialog_trigger').attr('href')")).to eq support_url
 
     end
 
@@ -56,48 +56,48 @@ describe "help dialog" do
       Account.default.update_attribute(:settings, {:support_url => support_url})
       get "/dashboard"
       link = f('.support_url')
-      link['href'].should == support_url
-      link['class'].should_not match 'help_dialog_trigger'
+      expect(link['href']).to eq support_url
+      expect(link['class']).not_to match 'help_dialog_trigger'
 
       # if show_feedback_link is true hijack clicks on the footer help link to show help dialog
       Setting.set('show_feedback_link', 'true')
       get "/dashboard"
       f("#footer-links a[href='#{support_url}']").click
       wait_for_ajaximations
-      f("#help-dialog").should be_displayed
+      expect(f("#help-dialog")).to be_displayed
     end
 
     it "should allow sending the teacher a message" do
       Setting.set('show_feedback_link', 'true')
       get "/courses/#{@course.id}"
-      element_exists("#help-dialog").should be_false
+      expect(element_exists("#help-dialog")).to be_falsey
       trigger = f('.help_dialog_trigger')
-      trigger.should be_displayed
+      expect(trigger).to be_displayed
       trigger.click
       wait_for_ajaximations
-      f("#help-dialog").should be_displayed
+      expect(f("#help-dialog")).to be_displayed
       teacher_feedback_link = f("#help-dialog a[href='#teacher_feedback']")
-      teacher_feedback_link.should be_displayed
+      expect(teacher_feedback_link).to be_displayed
       teacher_feedback_link.click
       feedback_form = f("#help-dialog #teacher_feedback")
-      feedback_form.find_element(:css, '[name="recipients[]"]')['value'].should == "course_#{@course.id}_admins"
+      expect(feedback_form.find_element(:css, '[name="recipients[]"]')['value']).to eq "course_#{@course.id}_admins"
       feedback_form.find_element(:css, '[name="body"]').send_keys('test message')
       submit_form(feedback_form)
       wait_for_ajaximations
-      feedback_form.should_not be_displayed
+      expect(feedback_form).not_to be_displayed
       cm = ConversationMessage.last
-      cm.recipients.should == @course.instructors
-      cm.body.should match(/test message/)
+      expect(cm.recipients).to eq @course.instructors
+      expect(cm.body).to match(/test message/)
     end
 
     it "should allow submitting a ticket" do
-      pending('193')
+      skip('193')
       Setting.set('show_feedback_link', 'true')
       get "/dashboard"
       f('.help_dialog_trigger').click
       wait_for_ajaximations
       create_ticket_link = f("#help-dialog a[href='#create_ticket']")
-      create_ticket_link.should be_displayed
+      expect(create_ticket_link).to be_displayed
       create_ticket_link.click
       create_ticket_form = f("#help-dialog #create_ticket")
       create_ticket_form.find_element(:css, 'input[name="error[subject]"]').send_keys('test subject')
@@ -106,12 +106,12 @@ describe "help dialog" do
       set_value(create_ticket_form.find_element(:css, '[name="error[user_perceived_severity]"]'), severity)
       submit_form(create_ticket_form)
       wait_for_ajaximations
-      create_ticket_form.should_not be_displayed
+      expect(create_ticket_form).not_to be_displayed
       er = ErrorReport.last
-      er.subject.should == 'test subject'
-      er.comments.should == 'test comments'
-      er.data['user_perceived_severity'].should == severity
-      er.guess_email.should == @user.email
+      expect(er.subject).to eq 'test subject'
+      expect(er.comments).to eq 'test comments'
+      expect(er.data['user_perceived_severity']).to eq severity
+      expect(er.guess_email).to eq @user.email
     end
   end
 
@@ -125,8 +125,8 @@ describe "help dialog" do
       get "/dashboard"
       f('.help_dialog_trigger').click
       wait_for_ajaximations
-      f("#help-dialog").should be_displayed
-      element_exists("#help-dialog a[href='#teacher_feedback']").should be_false
+      expect(f("#help-dialog")).to be_displayed
+      expect(element_exists("#help-dialog a[href='#teacher_feedback']")).to be_falsey
     end
 
     it "should show the Help dialog on the speedGrader when help is clicked and feedback is enabled" do
@@ -135,7 +135,7 @@ describe "help dialog" do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       wait_for_ajaximations
-      ff('.help_dialog_trigger').length.should == 0
+      expect(ff('.help_dialog_trigger').length).to eq 0
 
       Setting.set('show_feedback_link', 'true')
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
@@ -143,11 +143,11 @@ describe "help dialog" do
       trigger = f('#gradebook_header .help_dialog_trigger')
       make_full_screen
       trigger.location_once_scrolled_into_view
-      trigger.should be_displayed
+      expect(trigger).to be_displayed
       trigger.click
       wait_for_ajaximations
-      f("#help-dialog").should be_displayed
-      f("#help-dialog a[href='#create_ticket']").should be_displayed
+      expect(f("#help-dialog")).to be_displayed
+      expect(f("#help-dialog a[href='#create_ticket']")).to be_displayed
     end
   end
 end
