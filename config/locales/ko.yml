@@ -92,20 +92,9 @@ ko:
     saml_eppn_domain_stripped: "%{eppn} (도메인 생략)"
   account_authorization_configs: 
     account_required: "LDAP으로 인증되어야 함"
-    cas_fields: 
-      labels: 
-        auth_base: "CAS URL"
-    form_footer: 
-      labels: 
-        position: 위치
-      save_button: "인증 설정 저장"
-    form_header: 
-      auth_type_label: 유형
-      auth_url: "이 구성의 로그인 URL"
     index: 
       add_auth_desc: "이 계정에 ID 공급자 추가:"
       choose_auth_type_option: "인증 서비스 선택"
-      current_settings_title: "현재 통합"
       delete_auth_confirmation: "계속하시겠습니까? 삭제하면 사용자가 로그인을 할 수 없게 됩니다."
       ip_address_list_description: "LDAP과 같이 Canvas 서버가 해당 서버에 직접 접속해야 하는 인증 서비스를 사용 중이라면 해당 서버가 아래 IP 주소에서 연결을 수락하는지 확인해야 합니다."
       no_auth_type_description: "현재 이 계정은 ID 공급자와 통합되어 있지 않습니다."
@@ -115,21 +104,7 @@ ko:
       settings_title: "인증 설정"
     ldap_fields: 
       auth_filter_description: "사용자가 제시한 사용자 이름에 대한 자리 표시자로 *%{placeholder}*를 사용하십시오. 예: *(sAMAccountName=%{placeholder})*"
-      auth_password_description: "현재 암호를 사용해서 계속하려면 비워두시기 바랍니다."
       identifer_format_description: "Canvas 로그인을 찾기 위한 LDAP 속성입니다. 사용자가 입력한 사용자 이름을 사용하려면 공백으로 남겨 두십시오."
-      labels: 
-        auth_base: 기준
-        auth_filter: 필터
-        auth_host: 호스트
-        auth_over_tls: "TLS 사용?"
-        auth_over_tls_false: "TLS 사용 안 함"
-        auth_over_tls_simple_tls: "단순 TLS"
-        auth_over_tls_start_tls: StartTLS
-        auth_password: 암호
-        auth_port: 포트
-        auth_username: "사용자 이름"
-        identifier_format: "로그인 ID 속성"
-      last_ldap_timeout_failure: "마지막 시간 초과 오류"
     ldap_settings_test: 
       labels: 
         pass: 암호
@@ -160,15 +135,6 @@ ko:
     login_required: 필수임
     no_changing_auth_types: "인증 구성의 유형을 바꿀 수 없습니다. 삭제하고 새로운 구성을 만드시기 바랍니다."
     password_required: 필수임
-    saml_fields: 
-      labels: 
-        certificate_fingerprint: "인증서 지문"
-        identifier_format: "식별자 형식"
-        idp_entity_id: "IdP 항목 ID"
-        log_in_url: "로그온 URL"
-        log_out_url: "로그아웃 URL"
-        login_attribute: "로그인 속성"
-        requested_authn_context: "인증 컨텍스트"
     saml_required: "SAML을 테스트하려면 SAML 구성이 필요"
     saml_settings_test: 
       refresh_debugging: "새로 고침"
@@ -206,9 +172,6 @@ ko:
       logout_response_from_idp: "IdP에서 반환된 LogoutResponse"
     sso_settings_form: 
       change_password_url_help: "기본 Canvas 동작을 사용하려면 비워 둠"
-      labels: 
-        change_password_url: "암호 URL 잊음"
-        login_handle_name: "로그인 레이블"
       login_handle_name_description: "레이블은 고유한 로그인 식별자에 사용됩니다. 예: 로그인, 사용자 이름, 학생 ID 등."
   account_notifications: 
     announcement_created_notice: "공지 사항을 성공적으로 등록함"
@@ -5339,7 +5302,6 @@ ko:
     student: 학생
     student_mute_notification: "교사가 평가 작업 중"
     titles: 
-      dropped_assignment_no_total: "이 과제는 합계 계산에 고려하지 않음"
       hypothetical_score: "이는 What-If 점수임"
     turnitin: 
       error_message: "Turnitin에 제출하는 중에 오류가 발생했습니다. 지원팀에 문의하기 전에 다시 제출해 보시기 바랍니다."
@@ -6191,8 +6153,6 @@ ko:
       truncated_wiki_title: "다음 위키 페이지의 제목이 잘렸습니다: %{title}"
   incorrect_username_and_or_password_2de73abb: "유효하지 않은 사용자 이름이나 암호"
   info: 
-    notices: 
-      error_reported: "도와주셔서 감사합니다. 곧바로 확인하겠습니다."
     old_styleguide: 
       create_collection: "컬렉션 만들기"
       start_a_group: "그룹 시작하기"
@@ -6353,7 +6313,6 @@ ko:
       log_in_to_canvas: "Canvas에 로그인"
     styleguide: 
       default_page_title: "Canvas LMS"
-  ldap_e1e0a916: LDAP
   learning_outcome: 
     no_comment: "의견 없음"
     no_description: "설명 없음"
@@ -6456,7 +6415,6 @@ ko:
     errors: 
       4xx_feedback: "여기를 클릭하고 찾고 계신 것을 알려주십시오."
       feedback: "여기를 클릭하고 어떤 일이 발생했는지 알려주십시오."
-    help: 도움말
     show_me_where: "위치 표시"
   links_14b70841: 링크
   loading_25990131: "로드하는 중..."
@@ -8675,7 +8633,6 @@ ko:
     missing_outcome: "해당 학습 성과를 찾을 수 없음"
     new_outcome_group: "새 성과 그룹"
     outcome: 
-      example: "예:"
       links: 
         delete_outcome: "성과 삭제"
         edit_outcome: "성과 편집"
@@ -8691,7 +8648,6 @@ ko:
       criterion_dialog: "특정 과제에 정렬된 성과 숙달도를 평가하는 손쉬운 방법으로 학습 성과를 과제 루브릭에 포함할 수 있습니다. 학습 성과를 정의할 때 과제 루브릭을 작성할 때 사용하는 기준도 정의해야 합니다. 필요한 만큼의 루브릭 열을 정의하고 이 성과의 숙달도를 정의하는 데 사용하는 점수 임계값을 지정하십시오."
       criterion_info_link: "기준 등급에 대해서 알아보려면 클릭"
       description: "이 성과의 설명"
-      example: "예:"
       mastery: "숙달 점수"
       points: "%{points_possible}점"
       title: "성과 이름"
@@ -8963,21 +8919,8 @@ ko:
       ui_conf_ids: "Kaltura 호스팅 고객은 이 ID를 Kaltura에 요청할 수 있습니다. 자체 호스팅 인스턴스는 ui_confs 테이블에서 이 값을 찾을 수 있습니다."
     linked_in: 
       description: "LinkedIn 통합"
-      name: LinkedIn
     linked_in_settings: 
-      description: |-
-          [LinkedIn에 새 앱](%{linkedin_url})을 등록해야 합니다.
-          LinkedIn 통합이 올바르게 동작하도록 하려면
-          다음 구성 옵션을 설정하십시오:
-          
-          * **응용 프로그램 유형:** "웹 응용 프로그램"으로 지정
-          * **라이브 상태:** "라이브"로 지정
-          * **OAuth 리디렉션 URL:** %{oauth_url}로 지정
-          * 앱을 저장한 후에 API 키와 시크릿 키를 기록해 두십시오.
       domain_name: 도메인
-      labels: 
-        api_key: "API 키"
-        secret_key: "시크릿 키"
     lockdown_browser: 
       labels: 
         download_url: "LockDown 브라우저 다운로드 URL"
@@ -9026,20 +8969,6 @@ ko:
         queue_for_parallel_jobs: "병렬 작업에 사용되는 작업 대기열  (기본 값은 공란)"
     twitter: 
       description: "Twitter 알림"
-      name: Twitter
-    twitter_settings: 
-      description: |-
-          [Twitter에 새로운 앱](%{twitter_url})을 만들어야 합니다.
-          Twitter 앱이 올바르게 작동하도록 다음 구성 옵션을 설정하십시오:
-          
-          * **응용 프로그램 유형:** "Browser"로 지정
-          * **콜백 URL:** %{callback_url}로 지정
-          * **기본 액세스 유형:** "Read, Write & Private Message"로 지정
-          * 앱을 저장한 후에 소비자 키와 소비자 시크릿을 기록해 두십시오.
-      domain_name: 도메인
-      labels: 
-        api_key: "소비자 키"
-        secret_key: "소비자 시크릿"
     webct_scraper_settings: 
       description: |-
           (모듈을 사용하지 않는 WebCT 4.0 이전 버전을 채택한 학교를 포함하여) 기관에서 WebCT의 "학습 모듈"을 사용하지 않는다면,
@@ -10740,7 +10669,6 @@ ko:
       assignments: 과제
     settings: 
       assignment_toggles_and_actions: 
-        download_scores: "점수 다운로드 (.csv)"
         grading_history: "평가 기록 보기"
         hide_student_names_label: "학생 이름 숨기기"
         set_group_weights: "그룹 가중치 설정"
@@ -10902,8 +10830,6 @@ ko:
     new: 
       titles: 
         course_enrollment: "%{course}에 등록"
-    notices: 
-      login_required: "이 과목에 참여하려면 로그인하시기 바랍니다."
     successfully_enrolled: 
       already_enrolled: "**%{course}**에 성공적으로 등록했습니다."
       buttons: 
@@ -11173,10 +11099,6 @@ ko:
       needs_grading_count: 
         one: "%{count}개 평가 필요함"
         other: "%{count}개 평가 필요함"
-    menu_enrollment: 
-      labels: 
-        enrolled_as: 등록
-        invited_as: 초대
     message_students: 
       buttons: 
         send_message: "메시지 보내기"
