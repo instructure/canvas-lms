@@ -387,6 +387,8 @@ RSpec.configure do |config|
     Account.clear_special_account_cache!(true)
     Role.ensure_built_in_roles!
     AdheresToPolicy::Cache.clear
+    # silence migration specs
+    ActiveRecord::Migration.verbose = false
   end
 
   def delete_fixtures!
