@@ -801,7 +801,7 @@ describe "gradebook2" do
         dropdown_link = f("#gradebook_settings")
         click_dropdown_option = lambda { |option|
           dropdown_link.click
-          ff(".gradebook_drop_down a").find { |a|
+          ff(".gradebook_dropdown a").find { |a|
             a.text == option
           }.click
           wait_for_ajaximations

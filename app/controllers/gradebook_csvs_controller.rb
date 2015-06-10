@@ -27,7 +27,8 @@ class GradebookCsvsController < ApplicationController
       filename = "#{current_time}_#{name}.csv".gsub(/ /, '_')
 
       csv_options = {
-        include_sis_id: @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis)
+        include_sis_id: @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis),
+        include_priors: Canvas::Plugin.value_to_boolean(params[:include_priors])
       }
 
       attachment_progress = @context.gradebook_to_csv_in_background(filename, @current_user, csv_options)

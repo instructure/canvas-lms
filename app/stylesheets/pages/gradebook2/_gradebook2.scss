@@ -681,7 +681,7 @@ $gradebook_checkbox_width: 16px;
   margin-left: -16px;
 }
 
-.gradebook_drop_down, .export_dropdown {
+.gradebook_dropdown, .export_dropdown {
   li, label {
     @include gradebook_menu_label(13px);
     cursor:pointer;

@@ -994,10 +994,14 @@ define [
       $('.generate_new_csv').click ->
         $('#download_csv').prop('disabled', true)
         loading_interval = self.exportingGradebookStatus()
-        $.ajaxJSON(ENV.GRADEBOOK_OPTIONS.export_gradebook_csv_url, 'GET')
-          .then((attachment_progress) ->
-            self.pollProgressForCSVExport(loading_interval, attachment_progress)
-          )
+        include_priors = $('#show_concluded_enrollments').prop('checked')
+        $.ajaxJSON(
+            ENV.GRADEBOOK_OPTIONS.export_gradebook_csv_url,
+            'GET',
+            { "include_priors": include_priors }
+        ).then((attachment_progress) ->
+          self.pollProgressForCSVExport(loading_interval, attachment_progress)
+        )
 
     pollProgressForCSVExport: (loading_interval, attachment_progress) =>
       self = this
@@ -1450,7 +1454,7 @@ define [
     xsslint jqueryObject.function showLink hideLink
     ###
     showCustomColumnDropdownOption: ->
-      linkContainer = $("<li>").appendTo(".gradebook_drop_down")
+      linkContainer = $("<li>").appendTo(".gradebook_dropdown")
 
       showLabel = I18n.t("show_notes", "Show Notes Column")
       hideLabel = I18n.t("hide_notes", "Hide Notes Column")
