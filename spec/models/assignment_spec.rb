@@ -524,22 +524,34 @@ describe Assignment do
         expect(submission).to be_excused
       end
 
-      it "doesn't mark everyone in the group excused" do
-        student1, student2 = n_students_in_course(2)
-        gc = @course.group_categories.create! name: "asdf"
-        group = gc.groups.create! name: "zxcv", context: @course
-        [student1, student2].each { |u|
-          group.group_memberships.create! user: u, workflow_state: "accepted"
-        }
-        @assignment.update_attribute :group_category, gc
-        student_in_course active_all: true
-        sub1, sub2 = @assignment.grade_student(student1,
-                                               excuse: true,
-                                               comment: "...",
-                                               group_comment: true)
-        expect(sub1).to be_excused
-        expect(sub1.user).to eq student1
-        expect(sub2).to_not be_excused
+      context "group assignments" do
+        before :once do
+          @student1, @student2 = n_students_in_course(2)
+          gc = @course.group_categories.create! name: "asdf"
+          group = gc.groups.create! name: "zxcv", context: @course
+          [@student1, @student2].each { |u|
+            group.group_memberships.create! user: u, workflow_state: "accepted"
+          }
+          @assignment.update_attribute :group_category, gc
+        end
+
+        it "doesn't mark everyone in the group excused" do
+          sub1, sub2 = @assignment.grade_student(@student1,
+                                                 excuse: true,
+                                                 comment: "...",
+                                                 group_comment: true)
+          expect(sub1).to be_excused
+          expect(sub1.user).to eq @student1
+          expect(sub2).to_not be_excused
+        end
+
+        it "doesn't overwrite excused assignments" do
+          sub1 = @assignment.grade_student(@student1, excuse: true).first
+          expect(sub1).to be_excused
+
+          sub2 = @assignment.grade_student(@student2, grade: 10).first
+          expect(sub1.reload).to be_excused
+        end
       end
     end
   end

@@ -1001,6 +1001,7 @@ class Assignment < ActiveRecord::Base
       if student == original_student || grade_group_students
         previously_graded = submission.grade.present?
         next if previously_graded && dont_overwrite_grade
+        next if student != original_student && submission.excused?
 
         did_grade = false
         submission.attributes = opts
