@@ -2,17 +2,8 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 en-GB: 
-  1_item_scores_1_2_2_3_5_5_3_39f6c397: "1 - Item scores: 1, 2, 2, 3, 5, 5, 3"
-  1_item_scores_1_3_2_4_5_3_6_mastery_score_set_at_5_70ff296a: "1- Item Scores: 1, 3, 2, 4, 5, 3, 6. Mastery score set at 5."
-  1_item_scores_3_2_2_4_1_3_4_e0de3073: "1 - Item scores: 3, 2, 2, 4, 1, 3, 4"
-  1_item_scores_4_3_2_5_3e2933a0: "1 - Item scores: 4, 3, 2, 5"
   1_item_scores_5512cd03: "1- Item scores"
-  2_final_score_5_5_8418d475: "2- Final score: 5.5"
   2_final_score_7b0fd15e: "2- Final score"
-  2_highest_score_4_3b4bc250: "2 - Highest score: 4"
-  2_most_recent_score_3_766dbf4e: "2 - Most recent score: 3"
-  2_the_rest_item_average_4_3_2_3_3_d05f04e2: "2 - 'The rest' item average: (4 + 3 + 2) / 3 = 3"
-  3_calculated_mastery_score_5_0_75_3_0_25_4_5_c88c3a7b: "3 - Calculated mastery score: 5(0.75) + 3(0.25) = 4.5"
   451_message: 
     description: "You are not authorised to access this site because you are located in a country subject to U.S. trade restrictions."
     headings: 
@@ -126,23 +117,9 @@ en-GB:
     saml_eppn_domain_stripped: "%{eppn} (domain stripped)"
   account_authorization_configs: 
     account_required: "must be LDAP-authenticated"
-    cas_fields: 
-      labels: 
-        auth_base: "CAS URL"
-        unknown_user_url: "Unknown User URL"
-      unknown_user_url_description: "The URL to redirect to when an authenticated user is not found in Canvas."
-    form_footer: 
-      labels: 
-        position: Position
-      save_button: "Save authentication settings"
-    form_header: 
-      auth_type_label: Type
-      auth_url: "Login URL for this config"
     index: 
       add_auth_desc: "Add an identity provider to this account:"
-      canvas_login_tip: "If you configure settings that cause you to be unable to log in, you can add *%{url1}* to the end of your log-in URL. This will let you log in using the normal Canvas log-in procedure. For this account, the url would be %{url2}"
       choose_auth_type_option: "Choose an authentication service"
-      current_settings_title: "Current integration"
       delete_auth_confirmation: "Are you sure? Users may not be able to log in if this is removed."
       delete_auth_link: "Remove All Authentication"
       ip_address_list_description: "If you are using an authentication service that requires the Canvas servers to contact your servers directly, such as LDAP, you'll need to make sure that your servers can accept connections from these IP addresses:"
@@ -154,21 +131,7 @@ en-GB:
       test_ldap_link: "Test LDAP Authentication"
     ldap_fields: 
       auth_filter_description: "Use *%{placeholder}* as a placeholder for the username supplied by the user. For example: *(sAMAccountName=%{placeholder})*"
-      auth_password_description: "To continue using the current password, leave blank."
       identifer_format_description: "The LDAP attribute to use to look up the Canvas login. To use the username supplied by the user, leave blank."
-      labels: 
-        auth_base: Base
-        auth_filter: Filter
-        auth_host: Host
-        auth_over_tls: "Over TLS?"
-        auth_over_tls_false: "No TLS"
-        auth_over_tls_simple_tls: "Simple TLS"
-        auth_over_tls_start_tls: StartTLS
-        auth_password: Password
-        auth_port: Port
-        auth_username: Username
-        identifier_format: "Login ID attribute"
-      last_ldap_timeout_failure: "Last time-out failure"
     ldap_settings_test: 
       labels: 
         pass: Password
@@ -199,17 +162,6 @@ en-GB:
     login_required: "must be supplied"
     no_changing_auth_types: "Cannot change type of authorisation config. Please delete and create new config."
     password_required: "must be supplied"
-    saml_fields: 
-      labels: 
-        certificate_fingerprint: "Certificate fingerprint"
-        identifier_format: "Identifier format"
-        idp_entity_id: "IdP Entity ID"
-        log_in_url: "Log on URL"
-        log_out_url: "Log out URL"
-        login_attribute: "Login attribute"
-        requested_authn_context: "Authentication context"
-        unknown_user_url: "Unknown User URL"
-      unknown_user_url_description: "The URL to redirect to when an authenticated user is not found in Canvas."
     saml_required: "A SAML configuration is required to test SAML"
     saml_settings_test: 
       refresh_debugging: Refresh
@@ -248,11 +200,6 @@ en-GB:
       logout_response_from_idp: "LogoutResponse from IdP"
     sso_settings_form: 
       change_password_url_help: "Leave blank for default Canvas behaviour"
-      discovery_url_description: "If a discovery URL is set, canvas will forward all users to that URL when they need to be authenticated. That page needs to help users figure out where they need to go to log in. If no discovery URL is configured, the first configuration will be used to attempt to authenticate the user."
-      labels: 
-        auth_discovery_url: "Discovery URL"
-        change_password_url: "Forgot password URL"
-        login_handle_name: "Log-in Label"
       login_handle_name_description: "The label used for unique log-in identifiers. Examples: Login, Username, Student ID, etc."
   account_navigation_80bbefd4: "Account Navigation"
   account_notification: 
@@ -2482,7 +2429,6 @@ en-GB:
         warning: Warning
     edit_appointment_group: 
       affect_reservations: "How will this affect reservations?"
-      appointments_per_participant_label: "Maximum number of appointments a participant can attend"
       appt_group_options_help1: "Some existing reservations are over the limit you have added. These will not be affected, this change only prevents new reservations from being made."
       appt_group_options_help2: "You can, however, manually remove any existing reservations."
       calendar: Calendar
@@ -2492,8 +2438,6 @@ en-GB:
       group_signup: "Have students sign up in groups."
       location: Location
       name: Name
-      participants_per_appointment_label: "Max users/groups per appointment"
-      slot_duration_label: "Minutes per slot"
       time_range: "Time range"
     edit_appt_calendar_event: 
       description: "Description:"
@@ -2735,7 +2679,6 @@ en-GB:
   canvas_ticketing_email_connector_27e253ae: "Canvas Ticketing Email Connector"
   canvas_ticketing_web_post_connector_11158897: "Canvas Ticketing Web Post Connector"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas will regrade all your submissions after you save the quiz, this may take a few minutes."
-  cas_d6e9601d: CAS
   cc: 
     by: "CC attribution"
     by_nc: "CC attribution non-commercial"
@@ -2753,7 +2696,6 @@ en-GB:
   choose_a_course_home_page_8059c7b: "Choose a course home page"
   choose_a_csv_file_to_upload_9644480c: "Choose a CSV file to upload:"
   choose_usage_rights_33683854: "Choose usage rights..."
-  clear_file_name_text_field_fce73840: "Clear file name text field"
   click_for_more_details_on_this_outcome_8c018d2f: "click for more details on this outcome"
   click_here_on_the_calendar_link_c9965631: "Click here on the *Calendar* link"
   click_to_modify_89fa26aa: "Click to modify"
@@ -6343,7 +6285,6 @@ en-GB:
     student_mute_notification: "Instructor is working on grades"
     titles: 
       click_to_record: "Speech to Text"
-      dropped_assignment_no_total: "This assignment will not be considered in the total calculation"
       hypothetical_score: "This is a what-If score"
     turnitin: 
       error_message: "There was an error submitting to turnitin. Please try resubmitting the file before contacting support"
@@ -7362,8 +7303,6 @@ en-GB:
   incremental_update_successfully_generated_against__db3f3f06: "Incremental update successfully generated against a previous SIS Import."
   indigo_2035fc55: Indigo
   info: 
-    notices: 
-      error_reported: "Thanks for your help!  We'll get right on this"
     old_styleguide: 
       create_collection: "Create a collection"
       start_a_group: "Start a group"
@@ -7529,7 +7468,6 @@ en-GB:
   labels: 
     lock_module_until: "Lock module until a given date"
   last_item_79583712: "Last Item:"
-  last_item_is_75_of_mastery_average_of_the_rest_is__614d41f4: "Last item is 75% of mastery. Average of 'the rest' is 25% of mastery"
   last_user_access_title: "Last User Access"
   late_percent_b91d01b3: "Late: %{percent}"
   latest_assessment_a85280ef: "Latest Assessment"
@@ -7567,7 +7505,6 @@ en-GB:
       log_in_to_canvas: "Log in to Canvas"
     styleguide: 
       default_page_title: "Canvas LMS"
-  ldap_e1e0a916: LDAP
   learning_mastery_gradebook_description: |-
       Learning Mastery Gradebook provides a way for teachers to quickly view student and course
       progress on course learning outcomes. Outcomes are presented in a Gradebook-like
@@ -7689,7 +7626,6 @@ en-GB:
     errors: 
       4xx_feedback: "Click here to tell us what you were looking for."
       feedback: "Click here to tell us what happened"
-    help: Help
     show_me_where: "Show me where"
   links_14b70841: Links
   loading_25990131: Loading...
@@ -9734,7 +9670,6 @@ en-GB:
   moodle_formula_warning_title: "Possible answers will need to be regenerated for Formula question"
   more_courses_5ebbe998: "More courses"
   most_recent_score_13a87e8c: "Most Recent Score"
-  most_recent_score_counts_as_75_of_mastery_weight_a_f1e3e6c2: "Most recent score counts as 75% of mastery weight, average of all other scores count as 25% of weight."
   move_abf00365: Move
   move_dialog: 
     cancel: Cancel
@@ -9747,8 +9682,6 @@ en-GB:
   move_outcome_group_cfa1a505: "Move outcome group"
   moving_a4d552df: moving...
   multi_factor_authentication_configured_865b1bde: "Multi-factor authentication configured"
-  must_achieve_mastery_at_least_2_times_must_also_co_b2ae7688: "Must achieve mastery at least 2 times. Must also complete 2 items for calculation. Scores above mastery will be averaged to calculate final score."
-  must_achieve_mastery_at_least_2_times_scores_above_57077a88: "Must achieve mastery at least 2 times. Scores above mastery will be averaged to calculate final score."
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "Must supply 'file_ids' and/or 'folder_ids' parameter"
   mute_dialog: 
     curving_assignments: "Curving assignments"
@@ -10201,7 +10134,6 @@ en-GB:
     missing_outcome: "Couldn't find that learning outcome"
     new_outcome_group: "New outcome group"
     outcome: 
-      example: "Example:"
       links: 
         delete_outcome: "Delete outcome"
         edit_outcome: "Edit outcome"
@@ -10220,7 +10152,6 @@ en-GB:
       criterion_info_link: "Click to learn about criterion ratings"
       description: "Describe this outcome"
       display_name: "Friendly name (optional)"
-      example: "Example:"
       mastery: "Mastery at"
       points: "%{points_possible} Points"
       title: "Name this outcome"
@@ -10576,21 +10507,8 @@ en-GB:
       ui_conf_ids: "For Kaltura-hosted customers, you can ask Kaltura to provide you with these IDs. Self-hosted instances can find these values in the ui_confs table."
     linked_in: 
       description: "LinkedIn integration"
-      name: LinkedIn
     linked_in_settings: 
-      description: |-
-          You will need to register a [new app on LinkedIn](%{linkedin_url}).
-          Set the following configuration options to ensure your LinkedIn integration
-          works correctly:
-          
-          * **Application Type:** set to "Web Application"
-          * **Live Status:** set to "Live"
-          * **OAuth Redirect URL:** set to %{oauth_url}
-          * After you save your app, make a note of the API Key and Secret Key
       domain_name: domain
-      labels: 
-        api_key: "API key"
-        secret_key: "Secret key"
     live_events: 
       description: "Service for real-time events."
       name: "Live Events"
@@ -10663,21 +10581,6 @@ en-GB:
         type: "Ticketing System type"
     twitter: 
       description: "Twitter notifications"
-      name: Twitter
-    twitter_settings: 
-      description: |-
-          You will need to create a [new app on Twitter](%{twitter_url}).
-          Set the following configuration options to ensure your Twitter app
-          works correctly:
-          
-          * **Application Type:** set to "Browser"
-          * **Callback URL:** set to %{callback_url}
-          * **Default Access type:** set to "Read, Write & Private Message"
-          * After you save your app, make a note of the Consumer key and Consumer secret
-      domain_name: domain
-      labels: 
-        api_key: "Consumer key"
-        secret_key: "Consumer secret"
     webct_scraper_settings: 
       description: |-
           If the institution does not use WebCT's "Learning Modules" (including schools who adopted WebCT
@@ -11902,7 +11805,6 @@ en-GB:
         extended_quiz_time_explanation: "You can give this student extra time on their current quiz attempt. How much time would you like to give them?"
         extra_time_on_every_attempt: "Extra time on every attempt:"
         finished_in: "finished in %{duration}"
-        global_extra_attempt_time: "everyone already gets %{count} minute"
         global_extra_attempts: "everyone already gets %{n}"
         headers: 
           attempt: Attempt
@@ -12578,8 +12480,6 @@ en-GB:
         description: Unpublish
     options_2: 
       description: "Schedule student availability"
-    title: 
-      default_title: Dialog
   resume_quiz_afeceb87: "Resume quiz"
   resume_survey_58dce775: "Resume survey"
   retrieve_timeout: "could not retrieve configuration, the server response timed out"
@@ -12785,7 +12685,6 @@ en-GB:
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce has a different login host for sandbox accounts than for production accounts. If you are using a Salesforce sandbox account and you do not check this box, it will not be able to authenticate. (This works in reverse too: if you have a production account and you DO check this box it will not authenticate.)"
   salesforce_ticketing_webtocase_connector_80f75716: "Salesforce Ticketing WebToCase Connector"
   same_value_as_canvas_url__c_will_probably_be_going_37027686: "Same value as 'Canvas_URL__c', will probably be going away soon"
-  saml_57e53f77: SAML
   sample_data_e4fd01ff: "Sample data"
   save_11a80ec3: Save
   saving_d55dd90e: Saving...
@@ -12861,7 +12760,6 @@ en-GB:
       learning_mastery: "Learning mastery"
     settings: 
       assignment_toggles_and_actions: 
-        download_scores: "Download scores (.csv)"
         grading_history: "View grading history"
         hide_student_names_label: "Hide student names"
         include_ungraded_assignments: "Treat ungraded as 0"
@@ -13056,8 +12954,6 @@ en-GB:
     new: 
       titles: 
         course_enrollment: "Enroll in %{course}"
-    notices: 
-      login_required: "Please log in to join this course."
     successfully_enrolled: 
       already_enrolled: "You have successfully enrolled in **%{course}**."
       buttons: 
@@ -13382,10 +13278,6 @@ en-GB:
       needs_grading_count: 
         one: "1 needs grading"
         other: "%{count} need grading"
-    menu_enrollment: 
-      labels: 
-        enrolled_as: "Enrolled as"
-        invited_as: "Invited as"
     message_students: 
       buttons: 
         send_message: "Send message"
@@ -14587,8 +14479,6 @@ en-GB:
   usage_rights_have_been_set_d1b433c7: "Usage rights have been set."
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Usage rights will be set for all of the files contained in:"
   use_a_single_16x16_32x32_48x48_ico_file_60bc8d91: "Use a *single 16x16, 32x32, 48x48 ico file*."
-  use_the_highest_score_eb29329d: "Use the highest score"
-  use_the_most_recent_score_9ae3742c: "Use the most recent score"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Use the new quiz LTI tool instead of regular canvas quizzes"
   used_by_permission_314a78dd: "Used by permission"
   user: 
