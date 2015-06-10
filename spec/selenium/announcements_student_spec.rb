@@ -104,5 +104,17 @@ describe "announcements" do
       get "/courses/#{@course.id}/announcements/"
       expect(f(".discussion-title")).to be_nil
     end
+
+    it "should remove notifications from unenrolled courses" do
+      enable_cache do
+        @student.enrollments.first.update_attribute(:workflow_state, 'active')
+        @course.announcements.create!(:title => 'Something', :message => 'Announcement time!')
+        get "/"
+        expect(ff('.title .count')[0].text).to eq '1'
+        @student.enrollments.first.update_attribute(:workflow_state, 'deleted')
+        get "/"
+        expect(ff('.title .count')).to eq([])
+      end
+    end
   end
 end
