@@ -612,11 +612,6 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     })
   end
 
-  def grade_submission(opts={})
-    warn '[DEPRECATED] Quizzes::QuizSubmission#grade_submission is deprecated, use Quizzes::SubmissionGrader#grade_submission'
-    Quizzes::SubmissionGrader.new(self).grade_submission(opts)
-  end
-
   # Complete (e.g, turn-in) the quiz submission by doing the following:
   #
   #  - generating a (full) snapshot of the current state along with any

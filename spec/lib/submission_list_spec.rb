@@ -195,7 +195,7 @@ describe SubmissionList do
       @answer = { :question_id => 1, :points => @points, :text => ""}
 
       @wrapper = Quizzes::QuizRegrader::Answer.new(@answer, @question_regrade)
-      @qs.grade_submission
+      Quizzes::SubmissionGrader.new(@qs).grade_submission
       @qs.score_before_regrade = 5.0
       @qs.score = 4.0
       @qs.attempt = 1
