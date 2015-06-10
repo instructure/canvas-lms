@@ -4160,6 +4160,16 @@ describe Course, 'touch_root_folder_if_necessary' do
       expect(@course.restrict_student_future_view?).to be_truthy
     end
   end
+
+  describe "notificiations" do
+    it "doesnt blow up when trying to send notifications just because there's no prior_version" do
+      course = course(account: Account.default, name: "SOME COURSE NAME")
+      course.prior_version=nil
+      course.stubs(just_created: false)
+      course.instance_variable_set(:@broadcasted, false)
+      expect { course.broadcast_notifications }.to_not raise_error
+    end
+  end
 end
 
 describe Course, 'invited_count_visible_to' do

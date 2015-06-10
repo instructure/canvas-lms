@@ -553,7 +553,10 @@ class Course < ActiveRecord::Base
     p.whenever { |record|
       record.root_account &&
       ((record.just_created && record.name != Course.default_name) ||
-      (record.prior_version.name == Course.default_name && record.name != Course.default_name))
+       (record.prior_version.present? &&
+         record.prior_version.name == Course.default_name &&
+         record.name != Course.default_name)
+      )
     }
   end
 
