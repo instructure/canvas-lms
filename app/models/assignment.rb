@@ -1403,23 +1403,24 @@ class Assignment < ActiveRecord::Base
   # name.  for non-group assignments this just returns all visible users
   def representatives(user)
     if grade_as_group?
-      submissions = self.submissions.includes(:user)
-      users_with_submissions = submissions
-                               .select(&:has_submission?)
-                               .reject(&:excused?)
-                               .map(&:user)
+      submissions = self.submissions.includes(:user).all
+      users_with_submissions = submissions.select(&:has_submission?).map(&:user)
       users_with_turnitin_data = if turnitin_enabled?
                                    submissions
-                                   .where("turnitin_data IS NOT NULL AND turnitin_data <> ?", {}.to_yaml)
+                                   .reject { |s| s.turnitin_data.blank? }
                                    .map(&:user)
                                  else
                                    []
                                  end
+      users_who_arent_excused = submissions.reject(&:excused?).map(&:user)
       reps_and_others = groups_and_ungrouped(user).map { |group_name, group_students|
         visible_group_students = group_students & visible_students_for_speed_grader(user)
-        representative   = (visible_group_students & users_with_turnitin_data).first
-        representative ||= (visible_group_students & users_with_submissions).first
-        representative ||= visible_group_students.first
+        candidate_students = visible_group_students & users_who_arent_excused
+        candidate_students = visible_group_students if candidate_students.empty?
+
+        representative   = (candidate_students & users_with_turnitin_data).first
+        representative ||= (candidate_students & users_with_submissions).first
+        representative ||= candidate_students.first
         others = visible_group_students - [representative]
         next unless representative
 
