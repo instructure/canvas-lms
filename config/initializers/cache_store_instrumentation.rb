@@ -1,6 +1,16 @@
+# In rails4, this is always true, and in rails5, this setter is removed.
+# In other words, just remove this whole block of code when we drop rails3 support.
 if CANVAS_RAILS3
-  # In rails4, this is always true, and in rails5, this setter is removed
   ActiveSupport::Cache::Store.instrument = true
+  if defined?(PhusionPassenger)
+    # For whatever reason this is a thread-local setting, so under Passenger we
+    # need to set it on each handler thread. Note that even in process mode,
+    # Passenger spins up a separate thread in each process for the actual rack
+    # handler.
+    PhusionPassenger.on_event(:starting_request_handler_thread) do
+      ActiveSupport::Cache::Store.instrument = true
+    end
+  end
 end
 
 %w[read write delete exist? generate].each do |method|
