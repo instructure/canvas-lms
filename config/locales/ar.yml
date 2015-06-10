@@ -2,17 +2,8 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 ar: 
-  1_item_scores_1_2_2_3_5_5_3_39f6c397: "1- درجات العنصر: 1، 2، 2، 3، 5، 5، 3"
-  1_item_scores_1_3_2_4_5_3_6_mastery_score_set_at_5_70ff296a: "1- درحات العنصر: 1، 3، 2، 4، 5، 3، 6. درجة الإتقان محددة في 5."
-  1_item_scores_3_2_2_4_1_3_4_e0de3073: "1- درجات العنصر: 3، 2، 2، 4، 1، 3، 4"
-  1_item_scores_4_3_2_5_3e2933a0: "1- درجات العنصر: 4، 3، 2، 5"
   1_item_scores_5512cd03: "1- درجات العنصر"
-  2_final_score_5_5_8418d475: "2- الدرجة النهائية: 5.5"
   2_final_score_7b0fd15e: "2- الدرجة النهائية"
-  2_highest_score_4_3b4bc250: "2- أعلى درجة: 4"
-  2_most_recent_score_3_766dbf4e: "2- أحدث درجة: 3"
-  2_the_rest_item_average_4_3_2_3_3_d05f04e2: "2- متوسط العنصر \"المتبقي\": (4 + 3 + 2) / 3 = 3"
-  3_calculated_mastery_score_5_0_75_3_0_25_4_5_c88c3a7b: "3- درجة الإتقان المحسوبة: 5(0.75) + 3(0.25) = 4.5"
   451_message: 
     description: "أنت لست مخوّلاً للوصول إلى هذا الموقع لأنك موجود في بلد خاضع لقيود تجارية أمريكية."
     headings: 
@@ -123,23 +114,9 @@ ar:
       wait_for_login: "الانتظار لمحاولة تسجيل الدخول"
   account_authorization_configs: 
     account_required: "يجب أن تتم المصادقة من قِبل LDAP"
-    cas_fields: 
-      labels: 
-        auth_base: "عنوان URL لـ CAS"
-        unknown_user_url: "عنوان URL لمستخدم غير معروف"
-      unknown_user_url_description: "عنوان URL مخصص لإعادة التوجيه في حالة عدم العثور على مستخدم مصدق في Canvas."
-    form_footer: 
-      labels: 
-        position: الموضع
-      save_button: "حفظ إعدادات المصادقة"
-    form_header: 
-      auth_type_label: النوع
-      auth_url: "عنوان URL لتسجيل الدخول لهذا التكوين"
     index: 
       add_auth_desc: "إضافة موفر الهوية لهذا الحساب:"
-      canvas_login_tip: "في حال قيامك بتمكين إعدادات تؤدي إلى منعك من تسجيل الدخول، يمكنك إضافة *%{url1}* إلى نهاية عنوان URL لتسجيل الدخول. سيسمح لك ذلك بتسجيل الدخول باستخدام إجراء دخول Canvas. سيصبح عنوان URL لذلك الحساب {url2}%"
       choose_auth_type_option: "اختيار خدمة مصادقة"
-      current_settings_title: "التكامل الحالي"
       delete_auth_confirmation: "هل أنت متأكد؟ قد لا يتمكن المستخدمون من تسجيل الدخول إذا تمت إزالة هذا."
       delete_auth_link: "حذف جميع المصادقات"
       ip_address_list_description: "إذا كنت تستخدم خدمة مصادقة تتطلب من خوادم Canvas الاتصال بخوادمك مباشرةً؛ مثل LDAP، فستحتاج للتأكد أن خوادمك يمكنها قبول الاتصلات من عناوين IP تلك:"
@@ -151,21 +128,7 @@ ar:
       test_ldap_link: "اختبار مصادقة LDAP"
     ldap_fields: 
       auth_filter_description: "استخدم *%{placeholder}* كعنصر نائب لاسم المستخدم الذي يوفره المستخدم. على سبيل المثال: *(sAMAccountName=%{placeholder})*"
-      auth_password_description: "اتركه فارغًا للمتابعة باستخدام كلمة المرور الحالية."
       identifer_format_description: "السمة LDAP تستخدم للبحث في تسجيل دخول Canvas. اتركها فارغة لاستخدام اسم المستخدم الذي قام المستخدم بتوفيره."
-      labels: 
-        auth_base: أساس
-        auth_filter: تصفية
-        auth_host: المضيف
-        auth_over_tls: "فوق TLS؟"
-        auth_over_tls_false: "دون TLS"
-        auth_over_tls_simple_tls: "TLS بسيطة"
-        auth_over_tls_start_tls: "بدء TLS"
-        auth_password: "كلمة المرور"
-        auth_port: المنفذ
-        auth_username: "اسم المستخدم"
-        identifier_format: "سمة معرف تسجيل الدخول"
-      last_ldap_timeout_failure: "فشل آخر مهلة"
     ldap_settings_test: 
       labels: 
         pass: "كلمة المرور"
@@ -196,17 +159,6 @@ ar:
     login_required: "يجب أن يتم التزويد"
     no_changing_auth_types: "لا يمكن تغيير نوع تهيئة التفويض، ولذا يرجى حذف وإنشاء تهيئة جديدة."
     password_required: "يجب أن يتم التزويد"
-    saml_fields: 
-      labels: 
-        certificate_fingerprint: "بصمة الشهادة"
-        identifier_format: "تنسيق المعرف"
-        idp_entity_id: "معرف كيان IdP"
-        log_in_url: "عنوان URL لتسجيل الدخول"
-        log_out_url: "عنوان URL لتسجيل الخروج"
-        login_attribute: "سمة تسجيل الدخول"
-        requested_authn_context: "سياق المصادقة"
-        unknown_user_url: "عنوان URL لمستخدم غير معروف"
-      unknown_user_url_description: "عنوان URL مخصص لإعادة التوجيه في حالة عدم العثور على مستخدم مصدق في Canvas."
     saml_required: "مطلوب تكوين SAML لاختبار SAML"
     saml_settings_test: 
       refresh_debugging: تحديث
@@ -245,11 +197,6 @@ ar:
       logout_response_from_idp: "LogoutResponse من IdP"
     sso_settings_form: 
       change_password_url_help: "ترك فراغ لسلوك Canvas الافتراضي"
-      discovery_url_description: "إذا تم تعيين عنوان URL للاكتشاف، سيقوم Canvas بتوجيه كافة المستخدمين إلى هذا العنوان عندما تتعين المصادقة عليهم. ينبغي على هذه الصفحة مساعدة المستخدم ليعرف أين يجب أن يتوجه للقيام بتسجيل الدخول. في حال عدم تمكين أي عنوان URL للاكتشاف، سيتم استخدام أول تمكين لمحاولة المصادقة على المستخدم."
-      labels: 
-        auth_discovery_url: "عنوان URL للاكتشاف"
-        change_password_url: "عنوان URL لكلمة المرور المنسية"
-        login_handle_name: "تسمية تسجيل الدخول"
       login_handle_name_description: "التسمية المستخدمة لمعرّفات تسجيل الدخول الفريدة. أمثلة: تسجيل الدخول، اسم المستخدم، معرف الطالب، إلخ"
   account_navigation_80bbefd4: "التنقل عبر الحساب"
   account_notification: 
@@ -2540,7 +2487,6 @@ ar:
         warning: تحذير
     edit_appointment_group: 
       affect_reservations: "كيف سيؤثر هذا على الحجوزات؟"
-      appointments_per_participant_label: "الحد الأقصى لعدد المواعيد التي يمكن للمشارك حضورها"
       appt_group_options_help1: "تجاوزتْ بعض الحجوزات الموجودة الحدَ الذي قمت بإضافته. وهذا لن يؤثر على الحجوزات الموجودة، فقط سيحول دون إنشاء حجوزات جديدة."
       appt_group_options_help2: "ومع هذا يمكنك إزالة أي حجوزات موجودة يدويًا."
       calendar: التقويم
@@ -2550,8 +2496,6 @@ ar:
       group_signup: "اجعل الطلاب يسجلون في مجموعات."
       location: الموقع
       name: الاسم
-      participants_per_appointment_label: "الحد الأقصى لعدد المستخدمين/المجموعات لكل موعد"
-      slot_duration_label: "الدقائق لكل فترة"
       time_range: "النطاق الزمني"
     edit_appt_calendar_event: 
       description: "الوصف:"
@@ -2792,7 +2736,6 @@ ar:
   canvas_ticketing_email_connector_27e253ae: "رابط تذاكر البريد الإلكتروني لـ Canvas"
   canvas_ticketing_web_post_connector_11158897: "رابط تذاكر منشورات Canvas"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "سيعيد Canvas تقييم درجات جميع إرسالاتك بعد حفظ الاختبار، قد يستغرق ذلك بضع دقائق."
-  cas_d6e9601d: CAS
   cc: 
     by: "سمة CC"
     by_nc: "سمة CC غير التجارية"
@@ -2810,7 +2753,6 @@ ar:
   choose_a_course_home_page_8059c7b: "اختيار الصفحة الرئيسية للمساق"
   choose_a_csv_file_to_upload_9644480c: "اختيار ملف CSV لتحميله:"
   choose_usage_rights_33683854: "اختيار حقوق الاستخدام..."
-  clear_file_name_text_field_fce73840: "مسح حقل نص اسم الملف"
   click_for_more_details_on_this_outcome_8c018d2f: "انقر للحصول على مزيد من التفاصيل عن هذه النتيجة"
   click_here_on_the_calendar_link_c9965631: "انقر هنا فوق ارتباط *التقويم*"
   click_to_modify_89fa26aa: "انقر للتعديل"
@@ -6578,7 +6520,6 @@ ar:
     student_mute_notification: "يعمل المعلم في الدرجات"
     titles: 
       click_to_record: "الكلام إلى نص"
-      dropped_assignment_no_total: "لن يتم اعتبار هذه المهمة ضمن الحساب الإجمالي"
       hypothetical_score: "هذا مجموع نقاط ماذا لو"
     turnitin: 
       error_message: "حدث خطأ أثناء الإرسال إلى turnitin. الرجاء محاولة إعادة إرسال الملف قبل الاتصال بالدعم"
@@ -7651,8 +7592,6 @@ ar:
   incremental_update_successfully_generated_against__db3f3f06: "تم إنشاء التحديث التزايدي بنجاح مقابل تصدير SIS."
   indigo_2035fc55: نيلي
   info: 
-    notices: 
-      error_reported: "شكرًا لمساعدتك!  سنتخذ اللازم فورًا"
     old_styleguide: 
       create_collection: "إنشاء مجموعة"
       start_a_group: "بدء مجموعة"
@@ -7818,7 +7757,6 @@ ar:
   labels: 
     lock_module_until: "تأمين الوحدة حتى تاريخ محدد"
   last_item_79583712: "أحدث عنصر:"
-  last_item_is_75_of_mastery_average_of_the_rest_is__614d41f4: "يساوي أحدث عنصر 75% من مقدار الإتقان. بينما يساوي متوسط العناصر \"المتبقية\" 25% من مقدار الإتقان."
   last_user_access_title: "أخر وصول للمستخدم"
   late_percent_b91d01b3: "متأخر: %{percent}"
   latest_assessment_a85280ef: "آخر تقييم"
@@ -7856,7 +7794,6 @@ ar:
       log_in_to_canvas: "تسجيل الدخول إلى Canvas"
     styleguide: 
       default_page_title: "Canvas LMS"
-  ldap_e1e0a916: LDAP
   learning_mastery_gradebook_description: |-
       يوفر "دفتر درجات نتيجة إتقان التعلم" طريقة للمدرسين لعرض تقدم الطلاب والمساق بسرعة
       في نتائج التعلم للمساق. ويتم عرض النتائج بتنسيق يشبه دفتر الدرجات ويتم عرض تقدم
@@ -7980,7 +7917,6 @@ ar:
     errors: 
       4xx_feedback: "انقر هنا لإخبارنا عما تبحث عنه."
       feedback: "انقر هنا لإخبارنا عما حدث"
-    help: تعليمات
     show_me_where: "إظهاري حيث"
   links_14b70841: ارتباطات
   loading_25990131: "جارٍ التحميل..."
@@ -10048,7 +9984,6 @@ ar:
   moodle_formula_warning_title: "ستحتاج الإجابات الممكنة إلى إعادة إنشائها لسؤال الصيغة"
   more_courses_5ebbe998: "مزيد من المساقات"
   most_recent_score_13a87e8c: "أحدث درجة"
-  most_recent_score_counts_as_75_of_mastery_weight_a_f1e3e6c2: "تساوي أحدث درجة 75% من درجة الإتقان، بينما يساوي متوسط كل الدرجات الأخرى 25% من الدرجة."
   move_abf00365: نقل
   move_dialog: 
     cancel: إلغاء
@@ -10061,8 +9996,6 @@ ar:
   move_outcome_group_cfa1a505: "نقل مجموعة النتائج"
   moving_a4d552df: "يتم الآن النقل..."
   multi_factor_authentication_configured_865b1bde: "تم تكوين المصادقة متعددة العوامل"
-  must_achieve_mastery_at_least_2_times_must_also_co_b2ae7688: "يجب تحقيق درجة الإتقان مرتين على الأقل. كما يجب إكمال عنصرين للحساب. سيتم تحديد متوسط الدرجات التي تفوق درجة الإتقان لحساب الدرجة النهائية."
-  must_achieve_mastery_at_least_2_times_scores_above_57077a88: "يجب تحقيق درجة إتقان مضاعفة على الأقل. سيتم تحديد متوسط الدرجات التي أعلى من درجة الإتقان لحساب الدرجة النهائية."
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "يجب تزويد معلمة 'file_ids' و/أو معلمة 'folder_ids'"
   mute_dialog: 
     curving_assignments: "المهام المنحنية"
@@ -10521,7 +10454,6 @@ ar:
     missing_outcome: "تعذر العثور على ناتج التعلم ذلك"
     new_outcome_group: "مجموعة نتيجة جديدة"
     outcome: 
-      example: "مثال:"
       links: 
         delete_outcome: "حذف نتيجة"
         edit_outcome: "تعديل نتيجة"
@@ -10540,7 +10472,6 @@ ar:
       criterion_info_link: "انقر للتعرف على تصنيفات المعيار"
       description: "وصف هذه النتيجة"
       display_name: "الاسم المألوف (اختياري)"
-      example: "مثال:"
       mastery: "الإتقان عند"
       points: "%{points_possible} نقاط"
       title: "تسمية هذه النتيجة"
@@ -10900,21 +10831,8 @@ ar:
       ui_conf_ids: "بالنسبة للعملاء المستضافين من قبل Kaltura، يمكنك مطالبة Kaltura بتوفير هذه المعرفات لك. وتستطيع المثيلات المستضافة ذاتيًا العثور على هذه القيم في الجدول ui_confs."
     linked_in: 
       description: "تكامل LinkedIn"
-      name: LinkedIn
     linked_in_settings: 
-      description: |-
-          سيلزم تسجيل [تطبيق جديد على ({LinkedIn](%{linkedin_url].
-          قم بتعيين خيارات التكوين التالية لضمان عمل تكامل LinkedIn
-          بشكل صحيح:
-          
-          * **Application Type:** تم التعيين إلى "تطبيق الويب"
-          * **Live Status:** تم التعيين إلى "Live"
-          * **OAuth Redirect URL:** تم التعيين إلى {oauth_url}%
-          * بعد حفظ التطبيق، قم بتدوين ملاحظة عن مفتاح API والمفتاح السري
       domain_name: مجال
-      labels: 
-        api_key: "مفتاح واجهة برمجة التطبيقات (API)"
-        secret_key: "المفتاح السري"
     live_events: 
       description: "خدمة الأحداث في الوقت الحقيقي"
       name: "الأحداث المباشرة"
@@ -10987,21 +10905,6 @@ ar:
         type: "نوع نظام التذاكر"
     twitter: 
       description: "إعلامات Twitter"
-      name: Twitter
-    twitter_settings: 
-      description: |-
-          سيلزمك إنشاء [تطبيق جديد على Twitter](%{twitter_url}).
-          قم بتعيين خيارات التكوين التالية لضمان عمل تطبيق Twitter
-          بشكل صحيح:
-          
-          * **Application Type:** تم التعيين إلى "المستعرض"
-          * **Callback URL:** تم التعيين إلى %{callback_url}
-          * **Default Access type:** تم التعيين إلى "القراءة والكتابة والرسالة الخاصة"
-          * بعد حفظ التطبيق، قم بتدوين ملاحظة عن مفتاح العميل والشفرة السرية للعميل
-      domain_name: المجال
-      labels: 
-        api_key: "مفتاح العميل"
-        secret_key: "كلمة سر العميل"
     webct_scraper_settings: 
       description: |-
           إذا كان المعهد لا يستخدم "الوحدات التعليمية" لـ WebCT (بما في ذلك المدارس التي تبنت WebCT قبل الإصدار 4.0، عندما كانت الوحدات متوفرة)، فيمكن تحسين عمليات الترحيل من خلال استيراد "محتوى المساق"
@@ -12274,7 +12177,6 @@ ar:
         extended_quiz_time_explanation: "يمكنك إعطاء هذا المستخدم وقتًا إضافيًا بخصوص محاولة الاختبار الحالية. فكم من الوقت تود إعطاءه؟"
         extra_time_on_every_attempt: "الوقت الإضافي على كل محاولة:"
         finished_in: "تم الانتهاء في %{duration}"
-        global_extra_attempt_time: "لكل شخص %{count} دقيقة بالفعل"
         global_extra_attempts: "لكل شخص %{n} بالفعل"
         headers: 
           attempt: المحاولة
@@ -13074,8 +12976,6 @@ ar:
         description: "إلغاء النشر"
     options_2: 
       description: "جدولة توفر الطلاب"
-    title: 
-      default_title: "مربع الحوار"
   resume_quiz_afeceb87: "استئناف الاختبار"
   resume_survey_58dce775: "استئناف الاستطلاع"
   retrieve_timeout: "تعذرت استعادة التكوين، انتهت مهلة استجابة الخادم"
@@ -13289,7 +13189,6 @@ ar:
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "يختلف مضيف تسجيل دخول Salesforce لحسابات sandbox عن مضيف الحسابات الإنتاجية، فإذا كنت تستخدم حساب sandbox التابع لـ Salesforce ولم تقم بتحديد هذه الخانة، ستصبح المصادقة غير ممكنة (ونفس الشيء في الاتجاه الآخر، فإذا كنت تستخدم حساب إنتاج وتقوم بتحديد هذه الخانة، ستصبح المصادقة غير ممكنة)"
   salesforce_ticketing_webtocase_connector_80f75716: "رابط تذاكر WebToCase لـ Salesforce"
   same_value_as_canvas_url__c_will_probably_be_going_37027686: "من المحتمل أن تختفي قريبًا القيمة المطابقة لـ 'Canvas_URL__c'"
-  saml_57e53f77: SAML
   sample_data_e4fd01ff: "بيانات نموذجية"
   save_11a80ec3: حفظ
   saving_d55dd90e: "جارٍ الحفظ..."
@@ -13365,7 +13264,6 @@ ar:
       learning_mastery: "إتقان التعلم"
     settings: 
       assignment_toggles_and_actions: 
-        download_scores: "تنزيل الدرجات (csv.)"
         grading_history: "عرض محفوظات التقدير"
         hide_student_names_label: "إخفاء أسماء الطلاب"
         include_ungraded_assignments: "اعتبار درجة المهام التي لم يتم تقييمها كـ 0"
@@ -13572,8 +13470,6 @@ ar:
     new: 
       titles: 
         course_enrollment: "تسجيل في %{course}"
-    notices: 
-      login_required: "الرجاء تسجيل الدخول للانضمام لهذا المساق."
     successfully_enrolled: 
       already_enrolled: "تم تسجيلك بنجاح في **%{course}**."
       buttons: 
@@ -13902,10 +13798,6 @@ ar:
         other: "%{count} بحاجة للتصنيف"
         two: "%{count} بحاجة للتصنيف"
         zero: "%{count} بحاجة للتصنيف"
-    menu_enrollment: 
-      labels: 
-        enrolled_as: "تم التسجيل كـ"
-        invited_as: "تمت الدعوة كـ"
     message_students: 
       buttons: 
         send_message: "إرسال رسالة"
@@ -15152,8 +15044,6 @@ ar:
   usage_rights_have_been_set_d1b433c7: "تم إعداد حقوق الاستخدام."
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "سيتم إعداد حقوق الاستخدام لجميع الملفات الموجودة في:"
   use_a_single_16x16_32x32_48x48_ico_file_60bc8d91: "استخدم *ملف أيقونة واحد بحجم 16x16 أو 32x32 أو 48x48*."
-  use_the_highest_score_eb29329d: "استخدام أعلى درجة"
-  use_the_most_recent_score_9ae3742c: "استخدام أحدث درجة"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "استخدام أداة اختبار LTI الجديدة بدلاً من اختبارات Canvas"
   used_by_permission_314a78dd: "تستخدم بإذن"
   user: 
