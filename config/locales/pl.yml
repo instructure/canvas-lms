@@ -2,17 +2,8 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 pl: 
-  1_item_scores_1_2_2_3_5_5_3_39f6c397: "1 - wyniki pozycji: 1, 2, 2, 3, 5, 5, 3"
-  1_item_scores_1_3_2_4_5_3_6_mastery_score_set_at_5_70ff296a: "1- Wyniki pozycji: 1, 3, 2, 4, 5, 3, 6. Wynik poziomu biegłośći ustalony na 5."
-  1_item_scores_3_2_2_4_1_3_4_e0de3073: "1 - Wyniki pozycji: 3, 2, 2, 4, 1, 3, 4"
-  1_item_scores_4_3_2_5_3e2933a0: "1 - Wyniki pozycji: 4, 3, 2, 5"
   1_item_scores_5512cd03: "1- Wyniki punktowe elementów"
-  2_final_score_5_5_8418d475: "2- Końcowy wynik: 5.5"
   2_final_score_7b0fd15e: "2- Końcowy wynik"
-  2_highest_score_4_3b4bc250: "2 - Najwyższy wynik: 4"
-  2_most_recent_score_3_766dbf4e: "2 - Ostatni wynik: 3"
-  2_the_rest_item_average_4_3_2_3_3_d05f04e2: "2 - 'Reszta' średnia pozycji: (4 + 3 + 2) / 3 = 3"
-  3_calculated_mastery_score_5_0_75_3_0_25_4_5_c88c3a7b: "3 - Obliczony wynik biegłości: 5(0.75) + 3(0.25) = 4.5"
   451_message: 
     description: "Nie masz prawa dostępu do niniejszej strony, ponieważ przebywasz w kraju podlegającym ograniczeniom handlowym Stanów Zjednoczonych."
     headings: 
@@ -128,23 +119,9 @@ pl:
     saml_eppn_domain_stripped: "%{eppn} (bez domeny)"
   account_authorization_configs: 
     account_required: "konieczność uwierzytelnienia za pomocą protokołu LDAP"
-    cas_fields: 
-      labels: 
-        auth_base: "Adres URL dla systemu CAS"
-        unknown_user_url: "Adres Url nieznanego użytkownika"
-      unknown_user_url_description: "Adres Url do przekierowania w przypadku, gdy nie odnaleziono uwierzytelnionego użytkownika w systemie Canvas."
-    form_footer: 
-      labels: 
-        position: Pozycja
-      save_button: "Zapisz ustawienia uwierzytelniania"
-    form_header: 
-      auth_type_label: Typ
-      auth_url: "Adres URL logowania dla tej konfiguracji"
     index: 
       add_auth_desc: "Dodaj dostawcę tożsamości do tego konta:"
-      canvas_login_tip: "W przypadku konfigurowania ustawień, które powodują, że nie możesz się zalogować, możesz dodać *%{url1}* na koniec swojego adresu url do logowania. To pozwoli ci się zaologować przy użyciu normalnej procedury logowania Canvas. Dla takiego konta adres url to %{url2}"
       choose_auth_type_option: "Wybierz usługę uwierzytelniania"
-      current_settings_title: "Bieżąca integracja"
       delete_auth_confirmation: "Na pewno? Usunięcie tego elementu może uniemożliwić logowanie użytkownikom."
       delete_auth_link: "Usuń wszystkie uwierzytelnienia"
       ip_address_list_description: "W przypadku korzystania z usługi uwierzytelniania wymagającej bezpośredniego połączenia serwerów Canvas z serwerem użytkownika (np. protokołu LDAP) należy upewnić się, że serwery przyjmują połączenia z następujących adresów IP:"
@@ -156,21 +133,7 @@ pl:
       test_ldap_link: "Sprawdź uwierzytelnienie LDAP"
     ldap_fields: 
       auth_filter_description: "Użyj *%{placeholder}* jako symbolu zastępczego dla nazwy użytkownika podanej przez użytkownika. Na przykład: *(sAMAccountName=%{placeholder})*"
-      auth_password_description: "Pozostaw puste pole, aby zachować bieżące hasło."
       identifer_format_description: "Właściwości protokołu LDAP używane do sprawdzania loginu Canvas. Pozostaw puste, aby użyć nazwy użytkownika podanej przez użytkownika."
-      labels: 
-        auth_base: Baza
-        auth_filter: Filtruj
-        auth_host: Host
-        auth_over_tls: "Przez protokół TLS?"
-        auth_over_tls_false: "Brak TLS"
-        auth_over_tls_simple_tls: "Prosty TLS"
-        auth_over_tls_start_tls: "Rozpocznij TLS"
-        auth_password: Hasło
-        auth_port: Port
-        auth_username: "Nazwa użytkownika"
-        identifier_format: "Właściwości identyfikatora logowania"
-      last_ldap_timeout_failure: "Ostatnie błędy przekroczenia czasu"
     ldap_settings_test: 
       labels: 
         pass: Hasło
@@ -201,17 +164,6 @@ pl:
     login_required: "należy podać"
     no_changing_auth_types: "Nie można zmienić typu uwierzytelnienia konfiguracji; usuń i utwórz nową konfigurację."
     password_required: "należy podać"
-    saml_fields: 
-      labels: 
-        certificate_fingerprint: "Odcisk certyfikatu"
-        identifier_format: "Format identyfikatora"
-        idp_entity_id: "Identyfikator jednostki IdP"
-        log_in_url: "Adres URL logowania"
-        log_out_url: "Adres URL wylogowania"
-        login_attribute: "Właściwości loginu"
-        requested_authn_context: "Kontekst uwierzytelniania"
-        unknown_user_url: "Adres Url nieznanego użytkownika"
-      unknown_user_url_description: "Adres Url do przekierowania w przypadku, gdy nie odnaleziono uwierzytelnionego użytkownika w systemie Canvas."
     saml_required: "Konfiguracja SAML jest wymagana, aby testować SAML"
     saml_settings_test: 
       refresh_debugging: Odśwież
@@ -250,11 +202,6 @@ pl:
       logout_response_from_idp: "LogoutResponse from IdP"
     sso_settings_form: 
       change_password_url_help: "Pozostaw puste w przypadku domyślnych ustawień programu Canvas"
-      discovery_url_description: "Jeśli ustawiona jest witryna, canvas wyśle wszystkich użytkowników do podanego adresu URL w celu uwierzytelnienia. Ta strona będzie musiała następnie pomóc użytkownikowi dotrzeć do panelu logowania. Jesli discovery url nie zostało skonfigurowane, pierwsza konfiguracja zostanie wykorzystana w celu próby uwierzytelnienia użytkownika."
-      labels: 
-        auth_discovery_url: "Witryna URL"
-        change_password_url: "Adres URL, gdy użytkownik nie pamięta hasła"
-        login_handle_name: "Etykieta logowania"
       login_handle_name_description: "Etykieta używana do unikatowych identyfikatorów logowania. Przykłady: Login, nazwa użytkownika, identyfikator uczestnika itp."
   account_navigation_80bbefd4: "Nawigacja konta"
   account_notification: 
@@ -2491,7 +2438,6 @@ pl:
         warning: Ostrzeżenie
     edit_appointment_group: 
       affect_reservations: "W jaki sposób będzie to dotyczyło rezerwacji?"
-      appointments_per_participant_label: "Maksymalna liczba spotkań, na które może zapisać się uczestnik"
       appt_group_options_help1: "Niektóre z istniejących rezerwacji wykraczają ponad limit, ktory stworzyłeś. Nie będzie to ich dotyczyło, ta zmiana nie pozwoli Ci tworzyć nowych rezerwacji."
       appt_group_options_help2: "Możesz, jednakże, ręcznie usunąć jakiekolwiek istniejące rezerwacje."
       calendar: Kalendarz
@@ -2501,8 +2447,6 @@ pl:
       group_signup: "Nakaż uczestnikom zarejestrowanie się w grupach."
       location: Położenie
       name: Nazwa
-      participants_per_appointment_label: "Maksymalna liczba użytkowników/grup na spotkanie"
-      slot_duration_label: "Minuty na spotkanie"
       time_range: "Zakres czasu"
     edit_appt_calendar_event: 
       description: "Opis:"
@@ -2744,7 +2688,6 @@ pl:
   canvas_ticketing_email_connector_27e253ae: "Canvas łącznik biletów Email "
   canvas_ticketing_web_post_connector_11158897: "Canvas łącznik biletów posty internetowe"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Program Canvas oceni wszystkie przesłane zadania po zapisaniu testu, może to zająć kilka minut."
-  cas_d6e9601d: CAS
   cc: 
     by: "Przypisanie CC"
     by_nc: "Niekomercyjne przypisanie CC"
@@ -2762,7 +2705,6 @@ pl:
   choose_a_course_home_page_8059c7b: "Wybierz stronę główną kursu"
   choose_a_csv_file_to_upload_9644480c: "Wybierz plik CSV, który chcesz przekazać:"
   choose_usage_rights_33683854: "Wybierz prawa użytkowania..."
-  clear_file_name_text_field_fce73840: "Wyczyść pole tekstowe nazwy pliku"
   click_for_more_details_on_this_outcome_8c018d2f: "kliknij aby uzyskać więcej szczegółów na temat tego wyniku"
   click_here_on_the_calendar_link_c9965631: "Kliknij łącze *Kalendarz*"
   click_to_modify_89fa26aa: "Kliknij aby zmienić"
@@ -5317,6 +5259,10 @@ pl:
       show_more: "Pokaż więcej"
     hide_due_dates: "Ukryj terminy dostarczenia"
     initial_post_required_to_subscribe: "Należy wysłać odpowiedź przed dokonaniem subskrypcji"
+    like_count: 
+      few: "(%{count} polubienia)"
+      one: "(%{count} polubienie)"
+      other: "(%{count} polubienia)"
     mark_as_read: "Oznacz jako przeczytane"
     mark_as_unread: "Oznacz jako nieprzeczytane"
     no_content: "Brak zawartości"
@@ -6388,7 +6334,6 @@ pl:
     student_mute_notification: "Instruktor jest w trakcie oceniania"
     titles: 
       click_to_record: "Przetwarzanie mowy na tekst"
-      dropped_assignment_no_total: "To zadanie nie zostanie uwzględnione w łącznych obliczeniach"
       hypothetical_score: "To wynik hipotetyczny"
     turnitin: 
       error_message: "Wystąpił błąd podczas przesyłania do sprawdzenia. Spróbuj wysłać ponownie, zanim skontaktujesz się z pomocą."
@@ -7414,8 +7359,6 @@ pl:
   incremental_update_successfully_generated_against__db3f3f06: "Bieżąca aktualizacja skutecznie wygenerowana wobec poprzedniego SIS Import"
   indigo_2035fc55: Indygo
   info: 
-    notices: 
-      error_reported: "Dziękujemy za poświęcony czas!  Zajmiemy się tym"
     old_styleguide: 
       create_collection: "Utwórz kolekcję"
       start_a_group: "Załóż grupę"
@@ -7581,7 +7524,6 @@ pl:
   labels: 
     lock_module_until: "Zablokuj moduł do określonej daty"
   last_item_79583712: "Ostatnia pozycja:"
-  last_item_is_75_of_mastery_average_of_the_rest_is__614d41f4: "Ostatnia pozycja to 75% biegłośći. Średnia \"reszty\" to 25% biegłości."
   last_user_access_title: "Ostatni dostęp użytkownika"
   late_percent_b91d01b3: "Po czasie: %{percent}"
   latest_assessment_a85280ef: "Najnowsza ocena"
@@ -7619,7 +7561,6 @@ pl:
       log_in_to_canvas: "Zaloguj w systemie Canvas"
     styleguide: 
       default_page_title: "Canvas LMS"
-  ldap_e1e0a916: LDAP
   learning_mastery_gradebook_description: |-
       Dzienniczek nauki poziomu biegłości umożliwia nauczycielom szybki podgląd uczestników oraz poczyniony postęp
       w wynikach nauczania. Wyniki są przedstawiane w formacie podobnym do dzienniczka
@@ -7742,7 +7683,6 @@ pl:
     errors: 
       4xx_feedback: "Kliknij tutaj, aby powiedzieć nam, czego szukasz."
       feedback: "Kliknij tutaj, aby powiedzieć nam, co się stało"
-    help: Pomoc
     show_me_where: "Pokaż, gdzie"
   links_14b70841: Łącza
   loading_25990131: "Trwa ładowanie..."
@@ -9808,7 +9748,6 @@ pl:
   moodle_formula_warning_title: "Trzeba będzie ponownie wygenerować możliwe odpowiedzi do pytania opartego na formule"
   more_courses_5ebbe998: "Więcej kursów"
   most_recent_score_13a87e8c: "Najnowszy wynik"
-  most_recent_score_counts_as_75_of_mastery_weight_a_f1e3e6c2: "Najnowszy wynik punktowy liczy się jako 75% wagi biegłości, średnia z wszystkich innych wyników punktowych liczy się jako 25% wagi."
   move_abf00365: Przenieś
   move_dialog: 
     cancel: Anuluj
@@ -9821,8 +9760,6 @@ pl:
   move_outcome_group_cfa1a505: "Przenieś grupę wyników"
   moving_a4d552df: "Trwa przenoszenie..."
   multi_factor_authentication_configured_865b1bde: "Skonfigurowano wieloskładnikowe uwierzytelnianie"
-  must_achieve_mastery_at_least_2_times_must_also_co_b2ae7688: "Musi osiągnąć wynik mistrzowski przynajmniej 2 razy. Musi również wykonać 2 pozycje do kalkulacji. Wyniki powyżej mistrzostwa zostaną uśrednione aby obliczyć ostateczny wynik."
-  must_achieve_mastery_at_least_2_times_scores_above_57077a88: "Należy osiągnąć biegłość co najmniej 2 razy. Wyniki punktowe powyżej biegłości zostaną uśrednione w celu obliczenia końcowego wyniku punktowego."
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "Należy podać parametr 'file_ids' i/lub 'folder_ids'"
   mute_dialog: 
     curving_assignments: "Tworzenie krzywej ocen dla zadań"
@@ -10278,7 +10215,6 @@ pl:
     missing_outcome: "Nie można było odnaleźć wyniku nauczania"
     new_outcome_group: "Nowa grupa wyników"
     outcome: 
-      example: "Przykład:"
       links: 
         delete_outcome: "Usuń wynik"
         edit_outcome: "Edytuj wynik"
@@ -10297,7 +10233,6 @@ pl:
       criterion_info_link: "Kliknij, aby dowiedzieć się więcej o punktacji dla danego kryterium"
       description: "Opisz ten wynik"
       display_name: "Łatwa do zapamiętania nazwa (opcjonalnie)"
-      example: "Przykład:"
       mastery: "Biegłość wynosi"
       points: "%{points_possible} punkty"
       title: "Nazwij ten wynik"
@@ -10648,21 +10583,8 @@ pl:
       ui_conf_ids: "Klienci korzystający z platformy Kaltura mogą poprosić o przesłanie tych identyfikatorów. W przypadku wersji pochodnych wartości te można znaleźć w tabeli ui_confs."
     linked_in: 
       description: "Integracja z witryną LinkedIn"
-      name: LinkedIn
     linked_in_settings: 
-      description: |-
-          Konieczne będzie utworzenie [nowej aplikacji w witrynie LinkedIn](%{linkedin_url}).
-          Aby zapewnić prawidłową integrację z witryną LinkedIn,
-          należy wprowadzić poniższe ustawienia:
-          
-          * **Application Type:** ustawione na "Aplikacja w sieci WWW"
-          * **Live Status:** ustawione na "Live"
-          * **OAuth Redirect URL:** ustawione na %{oauth_url}
-          * Po zapisaniu aplikacji, należy zanotować klucz API i klucz tajny
       domain_name: domena
-      labels: 
-        api_key: "Klucz API"
-        secret_key: "Klucz tajny"
     live_events: 
       description: "Obsługa zdarzeń w czasie rzeczywistym."
       name: "Wydarzenia na żywo"
@@ -10735,20 +10657,6 @@ pl:
         type: "Rodzaj systemu sprzedaży biletów"
     twitter: 
       description: "Powiadomienia serwisu Twitter"
-      name: Twitter
-    twitter_settings: 
-      description: |-
-          Konieczne będzie utworzenie [nowej aplikacji w serwisie Twitter](%{twitter_url}).
-          Aby zapewnić prawidłowe działanie własnej aplikacji Twitter          należy wprowadzić poniższe ustawienia:
-          
-          * **Application Type:** ustawione na "Przeglądarka"
-          * **Callback URL:** ustawione na %{callback_url}
-          * **Default Access type:** ustawione na "Read, Write & Private Message (Czytaj, pisz i wysyłaj wiadomości prywatne)"
-          * Po zapisaniu aplikacji, należy zanotować klucz klienta i klucz tajny klienta
-      domain_name: domena
-      labels: 
-        api_key: "Klucz klienta"
-        secret_key: "Klucz tajny klienta"
     webct_scraper_settings: 
       description: |-
           Jeśli instytucja nie korzysta z „Modułów nauczania” systemu WebCT (uwzględniając szkoły z wersją systemu WebCT⏎
@@ -12004,7 +11912,6 @@ pl:
         extended_quiz_time_explanation: "Możesz przydzielić więcej czasu temu uczestnikowi w trakcie bieżącej próby rozwiązania testu. Ile dodatkowego czasu chcesz przydzielić?"
         extra_time_on_every_attempt: "Dodatkowy czas do każdego podejścia"
         finished_in: "zakończono w ciągu %{duration}"
-        global_extra_attempt_time: "każdy uczestnik dostaje następującą liczbę minut: %{count}"
         global_extra_attempts: "każdy uczestnik otrzymuje %{n}"
         headers: 
           attempt: Próba
@@ -12711,8 +12618,6 @@ pl:
         description: "Cofnij publikowanie"
     options_2: 
       description: "Zaplanuj dostępność uczestnika"
-    title: 
-      default_title: Dialog
   resume_quiz_afeceb87: "Wznów test"
   resume_survey_58dce775: "Wznów ankietę"
   retrieve_timeout: "nie można pobrać konfiguracji, serwer nie odpowiadał zbyt długo"
@@ -12920,7 +12825,6 @@ pl:
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce posiada inny host logowania dla kont sandbox niż w przypadku kont produkcji, więc jeśli używasz konta Salesforce sandbox i nie zaznaczysz tego pola, nie będzie w stanie uwierzytelnić (działa to również w drugą stronę - jeśli posiadasz konto produkcyjne i zaznaczysz to pole - nie będzie mógł uwierzytelnić)"
   salesforce_ticketing_webtocase_connector_80f75716: "Łącznik biletów WebToCase Salesforce"
   same_value_as_canvas_url__c_will_probably_be_going_37027686: "Ta sama wartość jak 'Canvas_URL__c', prawdopodobnie wkrótce zniknie"
-  saml_57e53f77: SAML
   sample_data_e4fd01ff: "Przykładowe dane"
   save_11a80ec3: Zapisz
   saving_d55dd90e: "Trwa zapisywanie..."
@@ -12996,7 +12900,6 @@ pl:
       learning_mastery: "Nauka poziomu biegłości"
     settings: 
       assignment_toggles_and_actions: 
-        download_scores: "Pobierz wyniki punktowe (.csv)"
         grading_history: "Wyświetl historię oceniania"
         hide_student_names_label: "Ukryj nazwy uczestników"
         include_ungraded_assignments: "Potraktuj nieocenione jako 0"
@@ -13194,8 +13097,6 @@ pl:
     new: 
       titles: 
         course_enrollment: "Zapisz się na kurs %{course}"
-    notices: 
-      login_required: "Zaloguj się, aby uczestniczyć w kursie."
     successfully_enrolled: 
       already_enrolled: "Pomyślnie zapisałeś się na kurs **%{course}**."
       buttons: 
@@ -13514,10 +13415,6 @@ pl:
         few: "%{count} wymagają oceny"
         one: "1 wymaga oceny"
         other: "%{count} wymaga oceny"
-    menu_enrollment: 
-      labels: 
-        enrolled_as: "Zapisano jako"
-        invited_as: "Zaproszono w roli"
     message_students: 
       buttons: 
         send_message: "Wyślij wiadomość"
@@ -14731,8 +14628,6 @@ pl:
   usage_rights_have_been_set_d1b433c7: "Prawa użytkowania zostały nadane."
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Prawa użytkowania zostaną nadane dla wszystkich plików zawartych w:"
   use_a_single_16x16_32x32_48x48_ico_file_60bc8d91: "Użyj *pojedynczego pliku ico 16x16, 32x32, 48x48*."
-  use_the_highest_score_eb29329d: "Wykorzystaj najwyższy wynik"
-  use_the_most_recent_score_9ae3742c: "Wykorzystaj ostatni wynik"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Wykorzystaj nowe narżedzie LTI do testów w miejsce regularnych testów canvas"
   used_by_permission_314a78dd: "Użycie według uprawnień"
   user: 
