@@ -6,7 +6,7 @@ How to install:
 
 Follow the instructions from the [Canvas wiki](https://github.com/instructure/canvas-lms/wiki/Quick-Start)
 
-### Notes: 
+### Extra Installation Notes: 
 * On my box i had to run the i18n thing as  root individually but it should work automatically on other boxes
 
 * I was able to skip a few steps because the ruby for the main platform worked here. If you already have the BZ code running, you should also have ruby and might be able to take a shortcut too.
@@ -119,10 +119,16 @@ These instructions are for pulling changes from Instructure's cloud hosted versi
             $ git checkout stable
             $ git pull origin stable
             $ git pull upstream stable
+            $ git tag -a bz-release/<insertDate> -m "Update our fork with Canvas upstream changes"
             $ git push origin stable
 
-2. Merge changes from `stable` into `bz-staging`
-3. Test everything on the staging server!!
+2. Merge changes from `stable` into `bz-staging` (same assumption as step 1 about which repo)
+
+        $ git checkout bz-staging
+        $ git merge --no-ff stable
+        $ git push origin bz-staging
+        
+3. Do a staging deploy and test everything on the staging server!!
 4. Do a normal production release to merge the stable, tested changes back into `bz-master` (from whence it came)
 
 ## Submit Pull Request to Instructure
