@@ -7,7 +7,7 @@ gem 'simplecov-rcov', '0.2.3', :require => false
 gem 'i18n_extraction', path: '../i18n_extraction'
 gem 'utf8_cleaner', path: '../utf8_cleaner'
 
-platforms :ruby_20, :ruby_21 do
+platforms :ruby_20, :ruby_21, :ruby_22 do
   gem 'iconv', '1.0.4'
 end
 
