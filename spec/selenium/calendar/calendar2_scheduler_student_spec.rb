@@ -160,5 +160,47 @@ describe "scheduler" do
       expect(f(".ag-context").text).to include @course.name.to_s #include context
       expect(f(".ag-location").text).to include_text(location)
     end
+
+    context "when un-reserving appointments" do
+      before do
+        date = Date.today.to_s
+        create_appointment_group(
+          max_appointments_per_participant: 1,
+          new_appointments: [
+            [date + ' 12:00:00', date + ' 13:00:00'],
+            [date + ' 14:00:00', date + ' 15:00:00']
+          ]
+        )
+        get "/calendar2"
+        click_scheduler_link
+        click_appointment_link
+
+        reserve_appointment_manual(0)
+      end
+
+      it "should let me do so from the month view" do
+        load_month_view
+
+        fj('.fc-event.scheduler-event').click
+        fj('.unreserve_event_link').click
+        fj('#delete_event_dialog~.ui-dialog-buttonpane .btn-primary').click
+
+        wait_for_ajaximations
+
+        expect(fj('.fc-event.scheduler-event')).to be_nil
+      end
+
+      it "should let me do so from the week view" do
+        load_week_view
+
+        fj('.fc-event.scheduler-event').click
+        fj('.unreserve_event_link').click
+        fj('#delete_event_dialog~.ui-dialog-buttonpane .btn-primary').click
+
+        wait_for_ajaximations
+
+        expect(fj('.fc-event.scheduler-event')).to be_nil
+      end
+    end
   end
 end
