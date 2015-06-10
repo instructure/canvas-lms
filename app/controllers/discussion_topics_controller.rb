@@ -1031,7 +1031,8 @@ class DiscussionTopicsController < ApplicationController
              @assignment.grants_right?(@current_user, session, :update)
         params[:assignment][:group_category_id] = nil unless @topic.group_category_id || @assignment.has_submitted_submissions?
         params[:assignment][:published] = @topic.published?
-        update_api_assignment(@assignment, params[:assignment].merge(@topic.attributes.slice('title')), @current_user)
+        params[:assignment][:name] = @topic.title
+        update_api_assignment(@assignment, params[:assignment], @current_user)
         @assignment.submission_types = 'discussion_topic'
         @assignment.saved_by = :discussion_topic
         @topic.assignment = @assignment
