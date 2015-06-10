@@ -2,17 +2,8 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 nl: 
-  1_item_scores_1_2_2_3_5_5_3_39f6c397: "1 - Item scores: 1, 2, 2, 3, 5, 5, 3"
-  1_item_scores_1_3_2_4_5_3_6_mastery_score_set_at_5_70ff296a: "1 - Item Scores: 1, 3, 2, 4, 5, 3, 6. Meesterschap score ingesteld op 5."
-  1_item_scores_3_2_2_4_1_3_4_e0de3073: "1 - Item scores: 3, 2, 2, 4, 1, 3, 4"
-  1_item_scores_4_3_2_5_3e2933a0: "1 - Item scores: 4, 3, 2, 5"
   1_item_scores_5512cd03: "1- Item scores"
-  2_final_score_5_5_8418d475: "2- Uiteindelijke score: 5.5"
   2_final_score_7b0fd15e: "2. Uiteindelijke score"
-  2_highest_score_4_3b4bc250: "2 - Hoogste score: 4"
-  2_most_recent_score_3_766dbf4e: "2 - Meest recente score: 3"
-  2_the_rest_item_average_4_3_2_3_3_d05f04e2: "2 -'De rest' item gemiddelde: (4 + 3 + 2) / 3 = 3"
-  3_calculated_mastery_score_5_0_75_3_0_25_4_5_c88c3a7b: "3 - Berekende meesterschap score: 5(0,75) + 3(0,25) = 4,5"
   451_message: 
     description: "Je hebt geen toestemming tot deze website, omdat je in een land bent dat onderhevig is aan VS handelsbeperkingen."
     headings: 
@@ -126,23 +117,9 @@ nl:
     saml_eppn_domain_stripped: "%{eppn} (verwijderd domein)"
   account_authorization_configs: 
     account_required: "Moet via LDAP geverifieerd zijn"
-    cas_fields: 
-      labels: 
-        auth_base: CAS-URL
-        unknown_user_url: "Onbekende url gebruiker"
-      unknown_user_url_description: "De url om om te leiden wanneer een geverifieerde gebruiker niet in canvas te vinden is."
-    form_footer: 
-      labels: 
-        position: Positie
-      save_button: "Verificatie-instellingen opslaan"
-    form_header: 
-      auth_type_label: Type
-      auth_url: "Aanmeldings-url voor deze configuratie"
     index: 
       add_auth_desc: "Een identiteit van provider toevoegen aan dit account: "
-      canvas_login_tip: "Als je instellingen configureert, waarmee je je niet kunt aanmelden, kun je *%{url1}* aan het eind van je aanmeldings-URL toevoegen. Hiermee kun je je aanmelden via de normale Canvas aanmeldingsprocedure. Voor deze account is de URL %{url2}"
       choose_auth_type_option: "Een verificatieservice kiezen"
-      current_settings_title: "Huidige integratie"
       delete_auth_confirmation: "Weet je het zeker? Gebruikers kunnen zich mogelijk niet aanmelden als dit wordt verwijderd"
       delete_auth_link: "Alle Verificatie Verwijderen"
       ip_address_list_description: "Als je een verificatieservice gebruikt die nodig is om de Canvas-servers rechtstreeks verbinding te laten maken met jouw servers, zoals LDAP,  dan moet je ervoor zorgen dat jouw servers verbindingen vanuit deze IP-adressen kunnen accepteren:"
@@ -154,21 +131,7 @@ nl:
       test_ldap_link: "LDAP Verificatie Testen"
     ldap_fields: 
       auth_filter_description: " *%{placeholder}* gebruiken als tijdelijke plaatsaanduiding voor de gebruikersnaam, opgegeven door de gebruiker, bijvoorbeeld: *(sAMAccountName=%{placeholder})*"
-      auth_password_description: "Leeg laten om het huidige wachtwoord te blijven gebruiken."
       identifer_format_description: "Het LDAP kenmerk gebruiken voor het opzoeken van de Canvas-aanmelding. Dit veld leeg laten om de gebruikersnaam, door de gebruiker opgegeven, te gebruiken."
-      labels: 
-        auth_base: Basis
-        auth_filter: Filter
-        auth_host: Host
-        auth_over_tls: "Via TLS?"
-        auth_over_tls_false: "Geen TLS"
-        auth_over_tls_simple_tls: "Eenvoudige TLS"
-        auth_over_tls_start_tls: "TLS starten"
-        auth_password: Wachtwoord
-        auth_port: Poort
-        auth_username: Gebruikersnaam
-        identifier_format: "Kenmerk op Aanmeldings-ID"
-      last_ldap_timeout_failure: "Laatste time-out mislukt"
     ldap_settings_test: 
       labels: 
         pass: Wachtwoord
@@ -199,17 +162,6 @@ nl:
     login_required: "moet opgegeven worden"
     no_changing_auth_types: "Kan type autorisatieconfiguratie niet wijzigen, verwijder deze en maak een nieuwe configuratie aan."
     password_required: "moet opgegeven worden"
-    saml_fields: 
-      labels: 
-        certificate_fingerprint: " Certificaat van vingerafdruk"
-        identifier_format: ID-format
-        idp_entity_id: "ldP ID entiteit"
-        log_in_url: "Aanmelden op URL"
-        log_out_url: "Afmelden op URL"
-        login_attribute: Aanmeldings-kenmerk
-        requested_authn_context: Verificatiecontext
-        unknown_user_url: "Onbekende url gebruiker"
-      unknown_user_url_description: "De url om om te leiden wanneer een geverifieerde gebruiker niet in canvas te vinden is."
     saml_required: "Een SAML configuratie is nodig om het te testen."
     saml_settings_test: 
       refresh_debugging: Vernieuwen
@@ -248,11 +200,6 @@ nl:
       logout_response_from_idp: "LogoutResponse van IdP"
     sso_settings_form: 
       change_password_url_help: "Leeg laten voor standaardgedrag van Canvas"
-      discovery_url_description: "Als een detectie-URL is ingesteld, zal canvas alle gebruikers naar die URL doorsturen als ze geverifieerd moeten worden. Die pagina zal dan de gebruiker moeten helpen uit te zoeken waar ze naar toe moeten gaan om in te loggen. Als geen detectie-URL geconfigureerd is, zal de eerste configuratie gebruikt worden om de gebruiker proberen te verifiëren."
-      labels: 
-        auth_discovery_url: Detectie-URL
-        change_password_url: "URL-Wachtwoord vergeten"
-        login_handle_name: Aanmeldingslabel
       login_handle_name_description: "Het label dat wordt gebruikt voor unieke aanmeldings-ID's. Bijvoorbeeld: Login, Gebruikersnaam, cursist-ID, enzovoort."
   account_navigation_80bbefd4: Accountnavigatie
   account_notification: 
@@ -2475,7 +2422,6 @@ nl:
         warning: Waarschuwing
     edit_appointment_group: 
       affect_reservations: "Wat is de invloed hiervan op reserveringen?"
-      appointments_per_participant_label: "Maximum aantal afspraken dat een deelnemer kan bijwonen"
       appt_group_options_help1: "Sommige bestaande reserveringen overschrijden de limiet die je hebt ingevoerd. Dit zal geen invloed hebben op deze reserveringen, maar deze verandering voorkomt alleen dat er nieuwe reserveringen gemaakt worden."
       appt_group_options_help2: "Je kunt echter iedere bestaande reservering handmatig verwijderen."
       calendar: Kalender
@@ -2485,8 +2431,6 @@ nl:
       group_signup: "Cursisten laten inschrijven voor groepen."
       location: Locatie
       name: Naam
-      participants_per_appointment_label: "Max gebruikers/groepen per afspraak"
-      slot_duration_label: "minuten per afspraaktijd"
       time_range: Tijdbereik
     edit_appt_calendar_event: 
       description: "Beschrijving:"
@@ -2728,7 +2672,6 @@ nl:
   canvas_ticketing_email_connector_27e253ae: "Canvas Ticketing E-mail Connector"
   canvas_ticketing_web_post_connector_11158897: "Canvas Ticketing Web Post Connector"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas zal alle inzendingen herberekenen nadat je de toets opslaat; dit kan een paar minuten duren."
-  cas_d6e9601d: CAS
   cc: 
     by: "CC Bijdrage"
     by_nc: "CC bijdrage, niet-commercieel"
@@ -2746,7 +2689,6 @@ nl:
   choose_a_course_home_page_8059c7b: "Een startpagina voor de cursus kiezen  "
   choose_a_csv_file_to_upload_9644480c: "Een CSV-bestand kiezen om te uploaden:"
   choose_usage_rights_33683854: "Gebruiksrechten kiezen...  "
-  clear_file_name_text_field_fce73840: "Bestandsnaam van tekstveld wissen"
   click_for_more_details_on_this_outcome_8c018d2f: "klik voor  meer informatie over dit resultaat"
   click_here_on_the_calendar_link_c9965631: "Hier klikken op de *kalender* koppeling"
   click_to_modify_89fa26aa: "Klik om te wijzigen"
@@ -6319,7 +6261,6 @@ nl:
     student_mute_notification: "Cursusleider is bezig met nakijken"
     titles: 
       click_to_record: "Van spraak tot tekst"
-      dropped_assignment_no_total: "Deze opdracht telt niet mee voor het totaal cijfer"
       hypothetical_score: "Dit is een wat-als-score"
     turnitin: 
       error_message: "Er is een fout opgetreden tijdens het inleveren naar turnitin. Probeer het bestand opnieuw in te zenden voordat je contact gaat opnemen met de ondersteuning"
@@ -7332,8 +7273,6 @@ nl:
   incremental_update_successfully_generated_against__db3f3f06: "Tussentijdse update met succes gegenereerd tegen een eerdere SIS Import."
   indigo_2035fc55: Indigo
   info: 
-    notices: 
-      error_reported: "Bedankt voor jouw hulp! We zullen hier direct naar kijken"
     old_styleguide: 
       create_collection: "Een verzameling maken"
       start_a_group: "Een groep starten"
@@ -7499,7 +7438,6 @@ nl:
   labels: 
     lock_module_until: "Module tot een bepaalde datum vergrendelen"
   last_item_79583712: "Laatste Item:"
-  last_item_is_75_of_mastery_average_of_the_rest_is__614d41f4: "Laatste item is 75% van meesterschap. Gemiddelde van 'de rest' is 25% van meesterschap"
   last_user_access_title: "Laatste gebruikerstoegang"
   late_percent_b91d01b3: "Laat: %{percent} "
   latest_assessment_a85280ef: "Laatste Beoordeling"
@@ -7537,7 +7475,6 @@ nl:
       log_in_to_canvas: "Aanmelden op Canvas"
     styleguide: 
       default_page_title: "Canvas LMS"
-  ldap_e1e0a916: LDAP
   learning_mastery_gradebook_description: "De cijferlijst bekwaam leren biedt een manier aan docenten om snel de voortgang van cusrsist en cursus  \n\
       op het gebied van leerresultaten te bekijken. Resultaten worden in een cijferlijst-achtige \n\
       formaat gepresenteerd en voortgang van cursist wordt als een numerieke score en als bekwaam/bijna \n\
@@ -7658,7 +7595,6 @@ nl:
     errors: 
       4xx_feedback: "Hier klikken om ons te vertellen wat je zocht."
       feedback: "Hier klikken om ons te vertellen wat er gebeurd is"
-    help: Help
     show_me_where: "Aan mij tonen waar"
   links_14b70841: "Koppelingen "
   loading_25990131: "Bezig met Laden... "
@@ -9701,7 +9637,6 @@ nl:
   moodle_formula_warning_title: "Mogelijke antwoorden zullen voor formule vragen opnieuw gegenereerd moeten worden"
   more_courses_5ebbe998: "Meer cursussen"
   most_recent_score_13a87e8c: "Meest Recente Score"
-  most_recent_score_counts_as_75_of_mastery_weight_a_f1e3e6c2: "Meest recente score telt als 75% van beheersingsgewicht, gemiddelde van alle andere scores telt als 25% van het gewicht."
   move_abf00365: Verplaatsen
   move_dialog: 
     cancel: Annuleren
@@ -9714,8 +9649,6 @@ nl:
   move_outcome_group_cfa1a505: "Resultatengroep verplaatsen"
   moving_a4d552df: "Bezig met verplaatsen..."
   multi_factor_authentication_configured_865b1bde: "Multi-Factor-verificatie geconfigureerd"
-  must_achieve_mastery_at_least_2_times_must_also_co_b2ae7688: "Moet ten minste tweemaal meesterschap bereiken. Moet bovendien 2 items voltooien voor berekening. Van scores hoger dan meesterschap wordt het gemiddelde genomen om de uiteindelijke score te bereken."
-  must_achieve_mastery_at_least_2_times_scores_above_57077a88: "Moet ten minste 2 keer beheersing bereiken.Van scores boven beheersing wordt het gemiddelde genomen om de uiteindelijke score te berekenen."
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "'file_ids' and/or 'folder_ids' parameter moet geleverd worden "
   mute_dialog: 
     curving_assignments: "Cijfers van opdrachten bijstellen"
@@ -10160,7 +10093,6 @@ nl:
     missing_outcome: "Kan dit leerresultaat niet vinden"
     new_outcome_group: "Nieuwe leerresultatengroep"
     outcome: 
-      example: "Voorbeeld:"
       links: 
         delete_outcome: "Leerresultaat verwijderen"
         edit_outcome: "Leerresultaat bewerken"
@@ -10179,7 +10111,6 @@ nl:
       criterion_info_link: "Hier klikken om meer te weten te komen over standaards voor beoordelingen"
       description: "Dit leerresulaat bschrijven"
       display_name: "Gebruiksvriendelijke naam (optioneel)"
-      example: "Voorbeeld:"
       mastery: "Bekwaamheid bij"
       points: "%{points_possible} punten"
       title: "Dit leerresultaat een naam geven"
@@ -10535,21 +10466,8 @@ nl:
       ui_conf_ids: "Klanten die gebruikmaken van Kaltura-hosting kunnen Kaltura vragen om deze ids aan te leveren. Zelfgehoste instanties kunnen deze instellingen vinden in de tabel ui_confs."
     linked_in: 
       description: "Integratie met Linkedin"
-      name: LinkedIn
     linked_in_settings: 
-      description: |-
-          Je moet een [nieuwe applicatie op LinkedIn](%{linkedin_url}) registreren.
-          Stel de volgende instellingen om ervoor te zorgen dat jouw de LinkedIn-integratie
-          juist werkt:
-          
-          * **Applicatietype:** instellen als "Webapplicatie"
-          * **Livestatus:** instellen als "Live"
-          * **OAuth-doorstuur-URL:** instellen als %{oauth_url}
-          * Noteer, na het opslaan van de app, de API-sleutel en de geheime sleutel
       domain_name: domein
-      labels: 
-        api_key: API-sleutel
-        secret_key: "Geheime sleutel"
     live_events: 
       description: "Service voor real-time evenementen."
       name: "Live Evenementen"
@@ -10622,20 +10540,6 @@ nl:
         type: "Ticketing Systeemsoort"
     twitter: 
       description: "Meldingen op twitter"
-      name: Twitter
-    twitter_settings: 
-      description: |-
-          Je  moet een [nieuwe applicatie op Twitter maken](%{twitter_url}).
-          Stel de volgende configuratie in om de Twitter-app juist te laten werken:
-          
-          * **Applicatietype:** instellen als "Browser"
-          * **Callback-URL:** instellen als %{callback_url}
-          * **Standaard toegangstype:** instellen als "Lezen, schrijven en privé bericht"
-          * Nadat je jouw app hebt opgeslagen noteer de consumentensleutel en het consumentengeheim
-      domain_name: domein
-      labels: 
-        api_key: Consumentensleutel
-        secret_key: Consumentengeheim
     webct_scraper_settings: 
       description: |-
           Als de instelling geen WebCT-"leermodules" gebruikt (inclusief scholen die WebCT
@@ -11853,7 +11757,6 @@ nl:
         extended_quiz_time_explanation: "Je kunt deze cursist extra tijd geven voor hun huidige toetspoging. Hoeveel tijd wil je hem/haar geven?"
         extra_time_on_every_attempt: "Extra tijd voor iedere poging:"
         finished_in: "voltooid in %{duration}"
-        global_extra_attempt_time: "iedereen krijgt al %{count} minuut/minuten"
         global_extra_attempts: "iedereen krijgt al %{n}"
         headers: 
           attempt: Poging
@@ -12530,8 +12433,6 @@ nl:
         description: "Publicatie ongedaan maken"
     options_2: 
       description: "Schema met beschikbaarheid van cursist"
-    title: 
-      default_title: Dialoog
   resume_quiz_afeceb87: "Toets hervatten"
   resume_survey_58dce775: "Enquête hervatten"
   retrieve_timeout: "Kan configuratie niet ophalen, de server heeft niet op tijd geantwoord"
@@ -12737,7 +12638,6 @@ nl:
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce heeft een andere login host voor sandbox accounts dan voor de productie van accounts, dus als je een Salesforce Sandbox-account gebruikt,en je dit veld niet aanvinkt, zal het niet geverifieerd worden (dit werkt ook omgekeerd, als je een productie account hebt en je het vakje WEL aanvinkt, zal het niet geverifieerd worden)"
   salesforce_ticketing_webtocase_connector_80f75716: "Salesforce Ticketing WebToCase Connector"
   same_value_as_canvas_url__c_will_probably_be_going_37027686: "Zelfde waarde als 'Canvas_URL__c', zal waarschijnlijk binnenkort verdwijnen"
-  saml_57e53f77: SAML
   sample_data_e4fd01ff: "Voorbeeld Gegevens"
   save_11a80ec3: "Opslaan "
   saving_d55dd90e: "Bezig met opslaan... "
@@ -12813,7 +12713,6 @@ nl:
       learning_mastery: "Leren beheersen"
     settings: 
       assignment_toggles_and_actions: 
-        download_scores: "Scores (.csv) downloaden"
         grading_history: "Historie van het cijfer bekijken"
         hide_student_names_label: "Namen van cursisten verbergen"
         include_ungraded_assignments: "Opdrachten die niet beoordeeld zijn behandelen als een 0"
@@ -13008,8 +12907,6 @@ nl:
     new: 
       titles: 
         course_enrollment: "Inschrijven voor %{course}"
-    notices: 
-      login_required: "Je moet aanmelden om  aan deze cursus deel te nemen"
     successfully_enrolled: 
       already_enrolled: "Je  bent succesvol ingeschreven voor **%{course}**"
       buttons: 
@@ -13332,10 +13229,6 @@ nl:
       needs_grading_count: 
         one: "nog 1 te beoordelen"
         other: "%{count} nog te beoordelen"
-    menu_enrollment: 
-      labels: 
-        enrolled_as: "Ingeschreven als"
-        invited_as: "Uitgenodigd als"
     message_students: 
       buttons: 
         send_message: "Bericht sturen"
@@ -14530,8 +14423,6 @@ nl:
   usage_rights_have_been_set_d1b433c7: "Gebruiksrechten zijn ingesteld "
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Gebruiksrechten zullen ingesteld worden voor alle bestanden opgenomen in: "
   use_a_single_16x16_32x32_48x48_ico_file_60bc8d91: "Gebruik een *enkel 16x16, 32x32, 48x48 ico bestand*."
-  use_the_highest_score_eb29329d: "Gebruik de hoogste score"
-  use_the_most_recent_score_9ae3742c: "Gebruik de meest recente score"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Gebruik de nieuwe toets LTI tool in plaats van de gewone canvas toetsen"
   used_by_permission_314a78dd: "Met toestemming gebruikt "
   user: 
