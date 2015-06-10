@@ -1251,7 +1251,7 @@ define [
 
       totalWidth = testWidth("Total", columnWidths.total.min, columnWidths.total.max)
       if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings['total_grade']
-        totalWidth = @gradebookColumnSizeSettings['total_grade']
+        totalWidth = parseInt(@gradebookColumnSizeSettings['total_grade'])
 
       total_column =
         id: "total_grade"
