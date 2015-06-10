@@ -14,7 +14,7 @@ describe "conversations new" do
   end
 
   describe "message sending" do
-    it "should start a group conversation when there is only one recipient" do
+    it "should start a group conversation when there is only one recipient", priority: "2", test_id: 201499 do
       get_conversations
       compose course: @course, to: [@s1], subject: 'single recipient', body: 'hallo!'
       c = @s1.conversations.last.conversation
@@ -22,7 +22,7 @@ describe "conversations new" do
       expect(c.private?).to be_falsey
     end
 
-    it "should start a group conversation when there is more than one recipient" do
+    it "should start a group conversation when there is more than one recipient", priority: "2", test_id: 201500 do
       get_conversations
       compose course: @course, to: [@s1, @s2], subject: 'multiple recipients', body: 'hallo!'
       c = @s1.conversations.last.conversation
@@ -31,7 +31,7 @@ describe "conversations new" do
       expect(c.conversation_participants.collect(&:user_id).sort).to eq([@teacher, @s1, @s2].collect(&:id).sort)
     end
 
-    it "should allow admins to send a message without picking a context" do
+    it "should allow admins to send a message without picking a context", priority: "1", test_id: 138677 do
       user = account_admin_user
       user_logged_in({:user => user})
       get_conversations
@@ -41,14 +41,14 @@ describe "conversations new" do
       expect(c.context).to eq Account.default
     end
 
-    it "should not allow non-admins to send a message without picking a context" do
+    it "should not allow non-admins to send a message without picking a context", priority: "1", test_id: 138678 do
       get_conversations
       fj('#compose-btn').click
       wait_for_animations
       expect(fj('#recipient-row')).to have_attribute(:style, 'display: none;')
     end
 
-    it "should allow non-admins to send a message to an account-level group" do
+    it "should allow non-admins to send a message to an account-level group", priority: "2", test_id: 201506 do
       @group = Account.default.groups.create(:name => "the group")
       @group.add_user(@s1)
       @group.add_user(@s2)
@@ -61,7 +61,7 @@ describe "conversations new" do
       add_message_recipient @s2
     end
 
-    it "should allow admins to message users from their profiles" do
+    it "should allow admins to message users from their profiles", priority: "2", test_id: 201940 do
       user = account_admin_user
       user_logged_in({:user => user})
       get "/accounts/#{Account.default.id}/users"
@@ -73,7 +73,7 @@ describe "conversations new" do
       expect(f('.ac-token')).not_to be_nil
     end
 
-    it "should allow selecting multiple recipients in one search" do
+    it "should allow selecting multiple recipients in one search", priority: "2", test_id: 201941 do
       get_conversations
       fj('#compose-btn').click
       wait_for_ajaximations
@@ -86,7 +86,7 @@ describe "conversations new" do
       expect(ff('.ac-token').count).to eq 2
     end
 
-    it "should not send the message on shift-enter" do
+    it "should not send the message on shift-enter", priority: "1", test_id: 206019 do
       get_conversations
       compose course: @course, to: [@s1], subject: 'context-free', body: 'hallo!', send: false
       driver.action.key_down(:shift).perform
@@ -95,13 +95,14 @@ describe "conversations new" do
       expect(fj('#compose-new-message:visible')).not_to be_nil
     end
 
+    #
     context "bulk_message locking" do
       before do
         # because i'm too lazy to create more users
         Conversation.stubs(:max_group_conversation_size).returns(1)
       end
 
-      it "should check and lock the bulk_message checkbox when over the max size" do
+      it "should check and lock the bulk_message checkbox when over the max size", priority: "2", test_id: 206022 do
         get_conversations
         compose course: @course, subject: 'lockme', body: 'hallo!', send: false
 
@@ -123,7 +124,7 @@ describe "conversations new" do
         expect(is_checked(selector)).to be_falsey # should be unchecked
       end
 
-      it "should leave the value the same as before after unlocking" do
+      it "should leave the value the same as before after unlocking", priority: "2", test_id: 206023 do
         get_conversations
         compose course: @course, subject: 'lockme', body: 'hallo!', send: false
 
@@ -141,7 +142,6 @@ describe "conversations new" do
         expect(bulk_cb.attribute('disabled')).to be_blank
         expect(is_checked(selector)).to be_truthy # should still be checked
       end
-
     end
   end
 end
