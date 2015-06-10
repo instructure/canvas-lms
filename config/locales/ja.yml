@@ -2,17 +2,8 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 ja: 
-  1_item_scores_1_2_2_3_5_5_3_39f6c397: "1 - アイテムのスコア: 1, 2, 2, 3, 5, 5, 3"
-  1_item_scores_1_3_2_4_5_3_6_mastery_score_set_at_5_70ff296a: "1- アイテムのスコア: 1, 3, 2, 4, 5, 3, 6。5の習得スコアセット 。"
-  1_item_scores_3_2_2_4_1_3_4_e0de3073: "1 - アイテムのスコア: 3, 2, 2, 4, 1, 3, 4"
-  1_item_scores_4_3_2_5_3e2933a0: "1 - アイテムのスコア: 4, 3, 2, 5"
   1_item_scores_5512cd03: "1- アイテムのスコア"
-  2_final_score_5_5_8418d475: "2- 最終スコア: 5.5"
   2_final_score_7b0fd15e: "2- 最終スコア"
-  2_highest_score_4_3b4bc250: "2 - 最高スコア: 4"
-  2_most_recent_score_3_766dbf4e: "2 - 最新のスコア: 3"
-  2_the_rest_item_average_4_3_2_3_3_d05f04e2: "2 - 「残り」のアイテムの平均: (4 + 3 + 2) / 3 = 3"
-  3_calculated_mastery_score_5_0_75_3_0_25_4_5_c88c3a7b: "3 - 計算済み習得スコア: 5(0.75) + 3(0.25) = 4.5"
   451_message: 
     description: 米国の貿易制限が適用される国からはこのサイトにアクセスできません。
     headings: 
@@ -126,23 +117,9 @@ ja:
     saml_eppn_domain_stripped: "%{eppn} (ドメインは除去)"
   account_authorization_configs: 
     account_required: "LDAP で認証される必要があります"
-    cas_fields: 
-      labels: 
-        auth_base: "CAS URL"
-        unknown_user_url: "不明なユーザの URL"
-      unknown_user_url_description: "認証されたユーザが Canvas で見つからないときにリダイレクトする URL。"
-    form_footer: 
-      labels: 
-        position: 職位
-      save_button: 認証設定の保存
-    form_header: 
-      auth_type_label: タイプ
-      auth_url: "この設定のログイン URL"
     index: 
       add_auth_desc: "このアカウントに ID プロバイダーを追加:"
-      canvas_login_tip: "ログインができない原因となる設定を設定した場合、*%{url1}*をログインURLの最後に追加することができます。このことは、通常のCanvasログイン手順を使用して、ログインできるようにします。 このアカウントのURLは、%{url2}となります。"
       choose_auth_type_option: 認証サービスを選択してください
-      current_settings_title: 現在の統合
       delete_auth_confirmation: よろしいですか?これを削除すると、ユーザはログインできない場合があります。
       delete_auth_link: すべての承認を削除
       ip_address_list_description: "Canvas サーバを必要とする認証サービス (LDAP など) を使用して、ご利用のサーバと直接通信している場合は、これらの IP アドレスからの接続をサーバが確実に受け入れることができるようにする必要があります。"
@@ -154,21 +131,7 @@ ja:
       test_ldap_link: テストLDAPの承認
     ldap_fields: 
       auth_filter_description: "ユーザが入力するユーザ名のプレースホルダーとして *%{placeholder}* を使用します。例:  *(sAMAccountName=%{placeholder})*"
-      auth_password_description: 現在のパスワードを引き続き使用する場合は、空白のままにします。
       identifer_format_description: "Canvas ログインの参照に使用する LDAP 属性。ユーザによって指定されたユーザ名を使用する場合は、空白のままにします。"
-      labels: 
-        auth_base: ベース
-        auth_filter: フィルタ
-        auth_host: ホスト
-        auth_over_tls: "over TLS を使用しますか?"
-        auth_over_tls_false: "TLS なし"
-        auth_over_tls_simple_tls: "簡易 TLS"
-        auth_over_tls_start_tls: StartTLS
-        auth_password: パスワード
-        auth_port: ポート
-        auth_username: ユーザ名
-        identifier_format: "ログイン ID 属性"
-      last_ldap_timeout_failure: 前回のタイムアウト
     ldap_settings_test: 
       labels: 
         pass: パスワード
@@ -199,17 +162,6 @@ ja:
     login_required: 入力が必要です
     no_changing_auth_types: 認証設定の種類は変更できません。削除した後、新しい設定を作成してください。
     password_required: 入力が必要です
-    saml_fields: 
-      labels: 
-        certificate_fingerprint: 証明書の指紋
-        identifier_format: 識別子の形式
-        idp_entity_id: "IdP エンティティ ID"
-        log_in_url: "ログオンの URL"
-        log_out_url: "ログアウトの URL"
-        login_attribute: ログイン属性
-        requested_authn_context: 認証コンテキスト
-        unknown_user_url: "不明なユーザの URL"
-      unknown_user_url_description: "認証されたユーザが Canvas で見つからないときにリダイレクトする URL。"
     saml_required: "SAML をテストするには SAML の設定が必要です"
     saml_settings_test: 
       refresh_debugging: 更新
@@ -248,11 +200,6 @@ ja:
       logout_response_from_idp: "IdP からの LogoutResponse"
     sso_settings_form: 
       change_password_url_help: "Canvas のデフォルトの動作でよい場合は、空白のままにします"
-      discovery_url_description: ディスカバリーURLが設定されている場合、それらが認証される必要がある場合には、CanvasがそのURLにすべてのユーザを転送します。このページは、ユーザーがどこにログインしに行く必要があるのかを見つけることを助けます。ディスカバリーURLがない場合、最初の構成が、ユーザを認証するために使用されます。
-      labels: 
-        auth_discovery_url: ディスカバリーURL
-        change_password_url: "パスワード URL を忘れた場合"
-        login_handle_name: "ログイン ラベル"
       login_handle_name_description: "一意のログイン ID に使用されるラベル。例:ログイン、ユーザ名、受講生 ID、など。"
   account_navigation_80bbefd4: アカウントナビゲーション
   account_notification: 
@@ -2483,7 +2430,6 @@ ja:
         warning: 警告
     edit_appointment_group: 
       affect_reservations: このことは予約にどのように影響しますか?
-      appointments_per_participant_label: 参加者が出席できる予定の最大数
       appt_group_options_help1: 既存の一部の予約が、設定された上限を超えています。この変更は新しい予約にのみ適用され、既存の予約は影響を受けません。
       appt_group_options_help2: ただし、既存の予約を手動で削除することはできます。
       calendar: カレンダー
@@ -2493,8 +2439,6 @@ ja:
       group_signup: 受講生をグループにサインアップさせてください。
       location: 場所
       name: 名前
-      participants_per_appointment_label: 予定あたりの最大ユーザ/グループ数
-      slot_duration_label: "スロットあたりの時間 (分)"
       time_range: 時間の範囲
     edit_appt_calendar_event: 
       description: "説明:"
@@ -2736,7 +2680,6 @@ ja:
   canvas_ticketing_email_connector_27e253ae: キャンバス・チケット・メールコネクタ
   canvas_ticketing_web_post_connector_11158897: キャンバス・チケット・ウェブポストコネクタ
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: クイズを保存すると、すべての提出物が再評価されます。この処理には数分かかる場合があります。
-  cas_d6e9601d: CAS
   cc: 
     by: "CC 属性"
     by_nc: "CC 属性 非営利"
@@ -2754,7 +2697,6 @@ ja:
   choose_a_course_home_page_8059c7b: "コースのホーム ページの選択"
   choose_a_csv_file_to_upload_9644480c: "アップロードする CSV ファイルの選択:"
   choose_usage_rights_33683854: 使用権を選択...
-  clear_file_name_text_field_fce73840: "ファイル名のテキスト フィールドをクリア"
   click_for_more_details_on_this_outcome_8c018d2f: クリックして、結果の更なる詳細をみる
   click_here_on_the_calendar_link_c9965631: "*カレンダー* リンクのここをクリック"
   click_to_modify_89fa26aa: クリックして変更する
@@ -6344,7 +6286,6 @@ ja:
     student_mute_notification: インストラクタが採点中です
     titles: 
       click_to_record: 音声認識
-      dropped_assignment_no_total: この課題は、合計の計算で考慮されません
       hypothetical_score: "これは what-if (仮の事態を想定した) スコアです"
     turnitin: 
       error_message: "turnitin への提出の際にエラーが発生しました。サポートに問い合わせる前に、ファイルの再提出を試してください"
@@ -7357,8 +7298,6 @@ ja:
   incremental_update_successfully_generated_against__db3f3f06: 増分更新が正常に以前のSISインポートに対して行われました。
   indigo_2035fc55: インディゴ
   info: 
-    notices: 
-      error_reported: ご協力ありがとうございます!すぐに取り掛かります
     old_styleguide: 
       create_collection: コレクションを作成する
       start_a_group: グループを開始する
@@ -7524,7 +7463,6 @@ ja:
   labels: 
     lock_module_until: 特定の日付までモジュールをロック
   last_item_79583712: "最終項目:"
-  last_item_is_75_of_mastery_average_of_the_rest_is__614d41f4: "最終項目は熟達スコアの 75% oです。「残り」の平均は、熟達の25% oです。"
   last_user_access_title: "最終ユーザ アクセス"
   late_percent_b91d01b3: "遅延: %{percent}"
   latest_assessment_a85280ef: 最新の課題
@@ -7562,7 +7500,6 @@ ja:
       log_in_to_canvas: "Canvas へのログイン"
     styleguide: 
       default_page_title: "Canvas LMS"
-  ldap_e1e0a916: LDAP
   learning_mastery_gradebook_description: 講師は、学習の達成度の成績表を使用して、コース学習成果における受講生およびコースの進捗を簡単に表示できます。成果は成績表のような形式で表示され、受講生の進捗が、数字のスコアや達成/ほぼ達成/補習として表示されます。
   learning_outcome: 
     no_comment: コメントなし
@@ -7680,7 +7617,6 @@ ja:
     errors: 
       4xx_feedback: ここをクリックして、見つけようとしていたものをお知らせください。
       feedback: ここをクリックして、問題を報告
-    help: ヘルプ
     show_me_where: どこに表示するか
   links_14b70841: リンク
   loading_25990131: 読み込んでいます...
@@ -9720,7 +9656,6 @@ ja:
   moodle_formula_warning_title: 数式問題について、考えられる解答を再生成する必要があります
   more_courses_5ebbe998: その他のコース
   most_recent_score_13a87e8c: 最新のスコア
-  most_recent_score_counts_as_75_of_mastery_weight_a_f1e3e6c2: "最近のスコアが熟達スコアの 75% のウエイトを占め、その他すべてのスコアの平均が 25% のウエイトを占めています。"
   move_abf00365: 移動
   move_dialog: 
     cancel: キャンセル
@@ -9733,8 +9668,6 @@ ja:
   move_outcome_group_cfa1a505: 成果グループの移動
   moving_a4d552df: 移動しています...
   multi_factor_authentication_configured_865b1bde: マルチファクタ認証が設定されました
-  must_achieve_mastery_at_least_2_times_must_also_co_b2ae7688: "熟達を2 回以上達成する必要があります。また、計算のため、2項目以上を完了する必要があります。熟達以上のスコアを平均したものが最終スコアとなります。"
-  must_achieve_mastery_at_least_2_times_scores_above_57077a88: "熟達を2 回以上達成する必要があります。熟達以上のスコアを平均したものが最終スコアとなります。"
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "'file_ids' か 'folder_ids' のいずれか、または両方のパラメータを指定する必要があります"
   mute_dialog: 
     curving_assignments: 課題を分布曲線評価
@@ -10187,7 +10120,6 @@ ja:
     missing_outcome: その学習成果は見つかりませんでした
     new_outcome_group: 新しい成果グループ
     outcome: 
-      example: "例:"
       links: 
         delete_outcome: 成果の削除
         edit_outcome: 成果の編集
@@ -10206,7 +10138,6 @@ ja:
       criterion_info_link: クリックして基準の評価について学習する
       description: この成果を説明する
       display_name: "わかりやすい名前 (任意)"
-      example: "例:"
       mastery: 熟達日時
       points: "%{points_possible} 点"
       title: この成果の名前を指定
@@ -10562,21 +10493,8 @@ ja:
       ui_conf_ids: "Kaltura がホスティングするお客様の場合は、これらの ID を提供してくれるようKaltura に依頼してください。自己ホスティングするインスタンスは、これらの値を ui_confs 表から検索することができます。"
     linked_in: 
       description: "LinkedIn との統合"
-      name: LinkedIn
     linked_in_settings: 
-      description: |-
-          [LinkedIn 上で新しいアプリ](%{linkedin_url}) を登録することが必要になります。
-          ご自分の LinkedIn 統合が正しく動作することを保証するには、
-          次の構成オプションを設定します:
-          
-          * **申請タイプ:** を "Web 申請" に設定
-          * **ライブ ステータス:** を "ライブ" に設定
-          * **OAuth リダイレクト URL:** を %{oauth_url} に設定
-          * アプリを保存後、API 鍵とシークレット鍵をメモしてください
       domain_name: ドメイン
-      labels: 
-        api_key: "API 鍵"
-        secret_key: シークレット鍵
     live_events: 
       description: リアルタイムのイベントのためのサービス。
       name: ライブイベント
@@ -10649,21 +10567,6 @@ ja:
         type: チケットシステムのタイプ
     twitter: 
       description: "Twitter 通知"
-      name: Twitter
-    twitter_settings: 
-      description: |-
-          [Twitter 上で新しいアプリ](%{twitter_url}) を作成することが必要になります。
-          ご自分の Twitter アプリが正しく動作することを保証するには、
-          次の構成オプションを設定します:
-          
-          * **アプリケーションタイプ:** を "ブラウザ" に設定。
-          * **コールバック URL:** を %{callback_url} に設定
-          * **デフォルト アクセス タイプ:** を次に変更 "読み取り、書き込み、非公開メッセージ"
-          * アプリを保存後、コンシューマ鍵とコンシューマ シークレットをメモしてください
-      domain_name: ドメイン
-      labels: 
-        api_key: コンシューマ鍵
-        secret_key: "コンシューマ シークレット"
     webct_scraper_settings: 
       description: "WebCT の \"Learning Modules\" を使用していない教育機関の場合は (モジュールを利用可能にしたときにバージョン 4.0 より前の WebCT を採用していた学校を含む)、Canvas モジュールとして \"Learning Modules\" の代わりに \"Course Content\" をインポートすると、コース移行を効率化できます。このページでは、コンテンツ モジュールに関して WebCT マイグレータのデフォルト動作を設定できます。個別コース移行では選択が可能ですが、一括マイグレータでは常にここで設定した値が使用され、移行ごとに変更することはできません。"
       labels: 
@@ -11890,7 +11793,6 @@ ja:
         extended_quiz_time_explanation: この受講生に対して、現在行われているクイズの制限時間を延長することができます。どのくらい延長しますか?
         extra_time_on_every_attempt: "すべての試行に対する延長時間:"
         finished_in: "%{duration} で完了しました"
-        global_extra_attempt_time: "全員が既に %{count} 分延長されています"
         global_extra_attempts: "全員が既に %{n} を獲得しています"
         headers: 
           attempt: 試行回数
@@ -12277,6 +12179,7 @@ ja:
         score: スコア
         time: 時刻
       take_quiz: 
+        audible_quiz_timer_shortcut_description: "注: これは時間制限のあるクイズです。キーボードでSHIFT, ALT, T の組み合わせを押すことで、クイズの回答中にいつでも残り時間を確認できます。"
         buttons: 
           next: 次へ
           out_of_time_submit: OK
@@ -12565,8 +12468,6 @@ ja:
         description: 未公開
     options_2: 
       description: 受講生の利用可能状況をスケジュール
-    title: 
-      default_title: ダイアログ
   resume_quiz_afeceb87: クイズの再開
   resume_survey_58dce775: サーベイの再開
   retrieve_timeout: 設定を取得できませんでした。サーバの応答がタイムアウトしました
@@ -12772,7 +12673,6 @@ ja:
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: セールスフォースには、制作アカウントより、サンドボックスアカウント用の異なるログインホストがあるので、セールスフォースアカウントを使用していて、このボックスをチェックしない場合は、認証されません。(そして、これは逆の場合でも起こります。制作アカウントを所持していて、このボックスをチェックする場合は、認証されません。)
   salesforce_ticketing_webtocase_connector_80f75716: "セールスフォース・チケット WebToCase コネクタ"
   same_value_as_canvas_url__c_will_probably_be_going_37027686: "'Canvas_URL__c'と同じ値は、おそらくすぐに消失するでしょう。"
-  saml_57e53f77: SAML
   sample_data_e4fd01ff: サンプルデータ
   save_11a80ec3: 保存
   saving_d55dd90e: 保存しています...
@@ -12848,7 +12748,6 @@ ja:
       learning_mastery: 学習の達成度
     settings: 
       assignment_toggles_and_actions: 
-        download_scores: "スコアのダウンロード (.csv)"
         grading_history: 採点履歴の表示
         hide_student_names_label: 受講生の名前を非表示
         include_ungraded_assignments: "未採点を 0 として処理"
@@ -13043,8 +12942,6 @@ ja:
     new: 
       titles: 
         course_enrollment: "%{course} への登録"
-    notices: 
-      login_required: このコースに参加するには、ログインしてください。
     successfully_enrolled: 
       already_enrolled: "**%{course}** に正常に登録されました。"
       buttons: 
@@ -13367,10 +13264,6 @@ ja:
       needs_grading_count: 
         one: "%{count} 件が未採点"
         other: "%{count} 件が未採点"
-    menu_enrollment: 
-      labels: 
-        enrolled_as: 登録の役割タイプ
-        invited_as: 招待の役割タイプ
     message_students: 
       buttons: 
         send_message: メッセージの送信
@@ -14573,8 +14466,6 @@ ja:
   usage_rights_have_been_set_d1b433c7: 使用権が設定されています。
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "次に含まれるすべてのファイルに使用権が設定されます:"
   use_a_single_16x16_32x32_48x48_ico_file_60bc8d91: "*単一の 16x16、32x32、48x48 アイコン ファイル* を使用します。"
-  use_the_highest_score_eb29329d: 最高スコアを使う
-  use_the_most_recent_score_9ae3742c: 最新のスコアを使う
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: 定期的なキャンバスクイズの代わりに、新しいクイズLTIツールを使用する
   used_by_permission_314a78dd: 許諾により使用
   user: 
