@@ -2,17 +2,8 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 fr: 
-  1_item_scores_1_2_2_3_5_5_3_39f6c397: "1 - Notes de l'élément : 1, 2, 2, 3, 5, 5, 3"
-  1_item_scores_1_3_2_4_5_3_6_mastery_score_set_at_5_70ff296a: "1- Notes de l'Élément : 1, 3, 2, 4, 5, 3, 6. La note de maîtrise est fixée à 5."
-  1_item_scores_3_2_2_4_1_3_4_e0de3073: "1 - Notes de l'élément : 3, 2, 2, 4, 1, 3, 4"
-  1_item_scores_4_3_2_5_3e2933a0: "1 - Notes de l'élément : 4, 3, 2, 5"
   1_item_scores_5512cd03: "1- Notes par élément"
-  2_final_score_5_5_8418d475: "2- Note finale : 5.5"
   2_final_score_7b0fd15e: "2- Note finale"
-  2_highest_score_4_3b4bc250: "2 - Meilleure note : 4"
-  2_most_recent_score_3_766dbf4e: "2 - Note la plus récente : 3"
-  2_the_rest_item_average_4_3_2_3_3_d05f04e2: "2 - Moyenne 'du reste' de l'élément : (4 + 3 + 2) / 3 = 3"
-  3_calculated_mastery_score_5_0_75_3_0_25_4_5_c88c3a7b: "3 - Note de maîtrise calculée : 5(0,75) + 3(0,25) = 4,5"
   451_message: 
     description: "Vous n’êtes pas autorisé à accéder à ce site, parce que vous vous trouvez dans un pays soumis aux restrictions américaines sur les échanges commerciaux."
     headings: 
@@ -126,23 +117,9 @@ fr:
     saml_eppn_domain_stripped: "%{eppn} (domaine dépouillé)"
   account_authorization_configs: 
     account_required: "authentification avec LDAP nécessaire"
-    cas_fields: 
-      labels: 
-        auth_base: "URL CAS"
-        unknown_user_url: "URL de l’utilisateur inconnue"
-      unknown_user_url_description: "L’URL à utiliser pour la redirection lorsqu’un utilisateur authentifié est introuvable dans Canvas."
-    form_footer: 
-      labels: 
-        position: Position
-      save_button: "Enregistrer les paramètres d’authentification"
-    form_header: 
-      auth_type_label: Type
-      auth_url: "URL de connexion pour cette configuration"
     index: 
       add_auth_desc: "Ajouter un fournisseur d’identités à ce compte :"
-      canvas_login_tip: "Si votre configuration de paramètres vous empêchait de vous connecter, vous pouvez ajouter *%{url1}* à la fin de votre URL de connexion. Ceci vous permettra de vous connecter en utilisant la procédure normale de connexion de Canvas. Pour ce compte, l'URL serait %{url2}"
       choose_auth_type_option: "Choisir un service d’authentification"
-      current_settings_title: "Intégration actuelle"
       delete_auth_confirmation: "Êtes-vous sûr ? Les utilisateurs risquent de ne pas pouvoir se connecter si vous la supprimez."
       delete_auth_link: "Supprimer toutes les authentifications"
       ip_address_list_description: "Si vous utilisez un service d’authentification, par exemple LDAP, qui exige que les serveurs Canvas contactent directement vos serveurs, assurez-vous que vos serveurs accepteront les connexions en provenance de ces adresses IP :"
@@ -154,21 +131,7 @@ fr:
       test_ldap_link: "Tester l’authentification LDAP"
     ldap_fields: 
       auth_filter_description: "Utiliser *%{placeholder}* comme espace réservé pour le nom d’utilisateur fourni par l’utilisateur. Par exemple : *(sAMAccountName=%{placeholder})*"
-      auth_password_description: "Laisser vide pour continuer d’utiliser le mot de passe actuel."
       identifer_format_description: "Attribut LDAP à utiliser pour chercher l’ID de connexion Canvas. Laissez ce champ vide pour utiliser le nom d’utilisateur fourni par l’utilisateur."
-      labels: 
-        auth_base: Base
-        auth_filter: Filtre
-        auth_host: Hôte
-        auth_over_tls: "Sur TLS ?"
-        auth_over_tls_false: "Pas de TLS"
-        auth_over_tls_simple_tls: "TLS simple"
-        auth_over_tls_start_tls: "Démarrer TLS"
-        auth_password: "Mot de passe"
-        auth_port: Port
-        auth_username: "Nom d’utilisateur"
-        identifier_format: "Attribut de l’ID de connexion"
-      last_ldap_timeout_failure: "Dernière expiration de délai"
     ldap_settings_test: 
       labels: 
         pass: "Mot de passe"
@@ -199,17 +162,6 @@ fr:
     login_required: "est obligatoire"
     no_changing_auth_types: "Impossible de changer le type de configuration des autorisations. Veuillez supprimer celle-ci et créer une nouvelle configuration."
     password_required: "est obligatoire"
-    saml_fields: 
-      labels: 
-        certificate_fingerprint: "Empreinte digitale du certificat"
-        identifier_format: "Format de l’identifiant"
-        idp_entity_id: "ID de l'entité fournisseuse d'identités"
-        log_in_url: "Connexion sur l'URL"
-        log_out_url: "Déconnexion de l'URL"
-        login_attribute: "Attribut de connexion"
-        requested_authn_context: "Contexte d’authentification"
-        unknown_user_url: "URL d’utilisateur inconnue"
-      unknown_user_url_description: "L’URL à utiliser pour la redirection lorsqu’un utilisateur authentifié est introuvable dans Canvas."
     saml_required: "Une configuration SAML est nécessaire pour tester SAML."
     saml_settings_test: 
       refresh_debugging: Actualiser
@@ -248,11 +200,6 @@ fr:
       logout_response_from_idp: "Réponse de déconnexion du fournisseur d'identité"
     sso_settings_form: 
       change_password_url_help: "Laisser vide pour utiliser le comportement par défaut de Canvas"
-      discovery_url_description: "Si une URL Découverte est précisée, Canvas redirigera tous les utilisateurs sur cette URL lorsqu'ils doivent être authentifiés. Cette page devra alors aider les utilisateurs à déterminer où se rendre afin de se connecter. Si aucune URL Découverte n'est précisée, la première configuration sera utilisée pour essayer d'authentifier les utilisateurs."
-      labels: 
-        auth_discovery_url: "URL Découverte"
-        change_password_url: "URL de mot de passe oublié"
-        login_handle_name: "Libellé de connexion"
       login_handle_name_description: "Le libellé utilisé comme identifiants uniques de connexion. Exemples : nom de connexion, nom d’utilisateur, ID d’étudiant, etc."
   account_navigation_80bbefd4: "Navigation du compte"
   account_notification: 
@@ -2480,7 +2427,6 @@ fr:
         warning: Avertissement
     edit_appointment_group: 
       affect_reservations: "En quoi cela affectera-t-il les réservations ?"
-      appointments_per_participant_label: "Nombre maximum de rendez-vous auxquels un participant peut assister"
       appt_group_options_help1: "Certaines réservations existantes dépassent la limite que vous avez ajoutée. Celles-ci ne seront pas affectées. Cette modification empêche seulement de créer de nouvelles réservations."
       appt_group_options_help2: "Cependant, vous pouvez retirer manuellement des réservations existantes."
       calendar: Calendrier
@@ -2490,8 +2436,6 @@ fr:
       group_signup: "Demandez aux étudiants de s’inscrire dans des groupes."
       location: Lieu
       name: Nom
-      participants_per_appointment_label: "Utilisateurs/groupes max. par rendez-vous"
-      slot_duration_label: "Minutes par créneau"
       time_range: "Intervalle de temps"
     edit_appt_calendar_event: 
       description: "Description :"
@@ -2733,7 +2677,6 @@ fr:
   canvas_ticketing_email_connector_27e253ae: "Connecteur de billetterie courriel Canvas"
   canvas_ticketing_web_post_connector_11158897: "Connecteur de billetterie d'article web Canvas"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas recalculera les notes de tous vos envois après l’enregistrement de votre questionnaire. Cela peut prendre quelques minutes."
-  cas_d6e9601d: CAS
   cc: 
     by: "Licence CC Paternité"
     by_nc: "Licence CC Paternité Pas d’utilisation commerciale"
@@ -2751,7 +2694,6 @@ fr:
   choose_a_course_home_page_8059c7b: "Choisir une page d’accueil de cours"
   choose_a_csv_file_to_upload_9644480c: "Choisissez un fichier CSV à télécharger :"
   choose_usage_rights_33683854: "Choisir les droits d’utilisation..."
-  clear_file_name_text_field_fce73840: "Vider la zone de texte du nom de fichier"
   click_for_more_details_on_this_outcome_8c018d2f: "cliquer pour plus de détails sur ce résultat"
   click_here_on_the_calendar_link_c9965631: "Cliquez ici sur le lien *Calendrier*"
   click_to_modify_89fa26aa: "Cliquer pour modifier"
@@ -6332,7 +6274,6 @@ fr:
     student_mute_notification: "Le formateur travaille sur les notes"
     titles: 
       click_to_record: "Transcription écrite de la parole"
-      dropped_assignment_no_total: "Cette tâche ne sera pas prise en compte dans le calcul du total"
       hypothetical_score: "Ceci est une note hypothétique"
     turnitin: 
       error_message: "Erreur lors de l’envoi à turnitin. Essayez de renvoyer le fichier avant de contacter l’assistance technique."
@@ -7340,8 +7281,6 @@ fr:
   incremental_update_successfully_generated_against__db3f3f06: "La mise à jour incrémentielle a bien été générée contre un import SIS précédent."
   indigo_2035fc55: Indigo
   info: 
-    notices: 
-      error_reported: "Merci de votre collaboration. Nous nous en occupons."
     old_styleguide: 
       create_collection: "Créer une collection"
       start_a_group: "Commencer un groupe"
@@ -7507,7 +7446,6 @@ fr:
   labels: 
     lock_module_until: "Verrouiller le module jusqu’à une date donnée"
   last_item_79583712: "Dernier élément : "
-  last_item_is_75_of_mastery_average_of_the_rest_is__614d41f4: "L'élément le plus récent est à 75% de maîtrise. La moyenne 'du reste' est à 25% de maîtrise"
   last_user_access_title: "Dernier accès utilisateur"
   late_percent_b91d01b3: "En retard : %{percent}"
   latest_assessment_a85280ef: "Dernière évaluation"
@@ -7545,7 +7483,6 @@ fr:
       log_in_to_canvas: "Connexion à Canvas"
     styleguide: 
       default_page_title: "Canvas LMS"
-  ldap_e1e0a916: LDAP
   learning_mastery_gradebook_description: |-
       Le relevé de notes pour la maîtrise de l’apprentissage permet aux enseignants de voir rapidement 
       la progression des étudiants et du cours dans les différents apprentissages. 
@@ -7664,7 +7601,6 @@ fr:
     errors: 
       4xx_feedback: "Cliquez ici pour nous indiquer ce que vous recherchiez."
       feedback: "Cliquez ici pour nous indiquer ce qui s’est produit"
-    help: Aide
     show_me_where: "Me montrer où"
   links_14b70841: Liens
   loading_25990131: Chargement...
@@ -9702,7 +9638,6 @@ fr:
   moodle_formula_warning_title: "Les réponses possibles devront être générées à nouveau pour la question utilisant une formule"
   more_courses_5ebbe998: "Cours supplémentaires"
   most_recent_score_13a87e8c: "Note la plus récente"
-  most_recent_score_counts_as_75_of_mastery_weight_a_f1e3e6c2: "Le dernier résultat représente 75 % de l'évaluation de la maîtrise, la moyenne de tous les autres résultats intervient pour 25 %."
   move_abf00365: Déplacer
   move_dialog: 
     cancel: Annuler
@@ -9715,8 +9650,6 @@ fr:
   move_outcome_group_cfa1a505: "Déplacer le groupe de résultats"
   moving_a4d552df: "Déplacement en cours..."
   multi_factor_authentication_configured_865b1bde: "Authentification multifacteur configurée"
-  must_achieve_mastery_at_least_2_times_must_also_co_b2ae7688: "Doit atteindre le niveau de maîtrise au moins 2 fois. Doit aussi terminer 2 éléments pour avoir un calcul. Les scores supérieurs au niveau de maîtrise seront pris en compte, sous forme de moyenne, pour calculer la note finale."
-  must_achieve_mastery_at_least_2_times_scores_above_57077a88: "Doit atteindre le niveau de maîtrise au moins 2 fois. Les notes supérieures à ce niveau seront intégrées dans le calcul de la note finale sous forme de moyenne."
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "Le paramètre file_ids et/ou folder_ids est obligatoire"
   mute_dialog: 
     curving_assignments: "Courbe des tâches"
@@ -10169,7 +10102,6 @@ fr:
     missing_outcome: "Impossible de trouver ce résultat d’apprentissage"
     new_outcome_group: "Nouveau groupe de résultats"
     outcome: 
-      example: "Exemple :"
       links: 
         delete_outcome: "Supprimer le résultat"
         edit_outcome: "Modifier le résultat"
@@ -10188,7 +10120,6 @@ fr:
       criterion_info_link: "Cliquez pour en savoir plus sur les notations des critères"
       description: "Décrire ce résultat"
       display_name: "Pseudonyme (facultatif)"
-      example: "Exemple :"
       mastery: "Progression à"
       points: "%{points_possible} points"
       title: "Attribuer un nom à ce résultat"
@@ -10546,21 +10477,8 @@ fr:
       ui_conf_ids: "Pour les clients hébergés sur Kaltura, vous pouvez demander à Kaltura de vous fournir ces ID. Les instances auto-hébergées peuvent trouver ces valeurs dans le tableau ui_confs."
     linked_in: 
       description: "Intégration avec LinkedIn"
-      name: LinkedIn
     linked_in_settings: 
-      description: |-
-          Vous devrez enregistrer une [nouvelle application sur LinkedIn](%{linkedin_url}).
-          Définissez les options de configuration suivantes pour garantir un fonctionnement correct
-          de votre intégration avec LinkedIn :
-          
-          * **Application Type :** défini sur Application Web
-          * **Live Status :** défini sur En direct
-          * **OAuth Redirect URL :** défini sur %{oauth_url}
-          * Après avoir enregistré votre application, prenez note de la clé API et de la clé secrète.
       domain_name: domaine
-      labels: 
-        api_key: "Clé API"
-        secret_key: "Clé secrète"
     live_events: 
       description: "Service pour événements en direct."
       name: "Événements en direct"
@@ -10633,21 +10551,6 @@ fr:
         type: "Type de système de billetterie"
     twitter: 
       description: "Notifications Twitter"
-      name: Twitter
-    twitter_settings: 
-      description: |-
-          Vous devrez créer une [nouvelle application sur Twitter](%{twitter_url}).
-          Définissez les options de configuration suivantes pour garantir un fonctionnement correct
-          de votre application Twitter :
-          
-          * **Application Type :** défini sur Navigateur
-          * **Callback URL :** défini sur %{callback_url}
-          * **Default Access type :** défini sur Lire, Écrire et message privé
-          * Après avoir enregistré votre application, prenez note du code client et du secret client.
-      domain_name: domaine
-      labels: 
-        api_key: "Code client"
-        secret_key: "Secret client"
     webct_scraper_settings: 
       description: |-
           Les institutions qui n’utilisent pas les modules d’apprentissage de WebCT (y compris les établissements ayant adopté une version de WebCT
@@ -11890,7 +11793,6 @@ fr:
         extended_quiz_time_explanation: "Vous pouvez accorder du temps supplémentaire à cet étudiant pour sa tentative actuelle sur le questionnaire. Combien de temps souhaitez-vous lui accorder ?"
         extra_time_on_every_attempt: "Temps supplémentaire à chaque tentative :"
         finished_in: "fin dans %{duration}"
-        global_extra_attempt_time: "tout le monde a déjà %{count} minutes"
         global_extra_attempts: "tout le monde a déjà %{n}"
         headers: 
           attempt: Tentative
@@ -12566,8 +12468,6 @@ fr:
         description: "Annuler la publication"
     options_2: 
       description: "Planifier la disponibilité des étudiants"
-    title: 
-      default_title: Dialogue
   resume_quiz_afeceb87: "Reprendre le questionnaire"
   resume_survey_58dce775: "Reprendre l’enquête"
   retrieve_timeout: "impossible de récupérer la configuration, le délai d’attente de la réponse du serveur a expiré"
@@ -12773,7 +12673,6 @@ fr:
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce possède des hôtes de connexion différents pour les comptes test par rapport aux comptes de production, donc si vous utilisiez un compte test de Salesforce et que vous ne cochiez pas cette case, l'authentification deviendrait impossible (et ceci marche dans l'autre sens, si vous aviez un compte de production et que vous cochiez cette case, l'authentification serait aussi impossible)"
   salesforce_ticketing_webtocase_connector_80f75716: "Connecteur de billetterie Salesforce WebToCase"
   same_value_as_canvas_url__c_will_probably_be_going_37027686: "La valeur identique à 'Canvas_URL__c', va probablement bientôt disparaitre"
-  saml_57e53f77: SAML
   sample_data_e4fd01ff: "Échantillon de données"
   save_11a80ec3: Enregistrer
   saving_d55dd90e: Enregistrement...
@@ -12849,7 +12748,6 @@ fr:
       learning_mastery: "Maîtrise de l’apprentissage"
     settings: 
       assignment_toggles_and_actions: 
-        download_scores: "Télécharger les notes (.csv)"
         grading_history: "Afficher l’historique de notation"
         hide_student_names_label: "Masquer les noms des étudiants"
         include_ungraded_assignments: "Considérer les travaux non notés comme ayant la note 0"
@@ -13044,8 +12942,6 @@ fr:
     new: 
       titles: 
         course_enrollment: "S’inscrire à %{course}"
-    notices: 
-      login_required: "Veuillez vous connecter pour participer à ce cours."
     successfully_enrolled: 
       already_enrolled: "Vous êtes maintenant inscrit au cours **%{course}**."
       buttons: 
@@ -13370,10 +13266,6 @@ fr:
       needs_grading_count: 
         one: "1 doit être noté"
         other: "%{count} doivent être notés"
-    menu_enrollment: 
-      labels: 
-        enrolled_as: "Inscrit comme"
-        invited_as: "Invité comme"
     message_students: 
       buttons: 
         send_message: "Envoyer un message"
@@ -14574,8 +14466,6 @@ fr:
   usage_rights_have_been_set_d1b433c7: "Les droits d’utilisation ont été définis."
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Les droits d’utilisation seront définis pour tous les fichiers contenus dans :"
   use_a_single_16x16_32x32_48x48_ico_file_60bc8d91: "Utilisez un *seul fichier .ico 16 x 16, 32 x 32, 48 x 48*."
-  use_the_highest_score_eb29329d: "Utiliser la meilleure note"
-  use_the_most_recent_score_9ae3742c: "Utiliser la note la plus récente"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Utilisez le nouvel outil LTI de questionnaire à la place des questionnaires Canvas habituels "
   used_by_permission_314a78dd: "Utilisé avec autorisation"
   user: 
