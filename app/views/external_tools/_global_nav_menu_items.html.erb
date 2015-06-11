@@ -5,7 +5,20 @@
     <% tools = ContextExternalTool.global_navigation_tools(@domain_root_account, visibility) %>
     <% tools.each do |tool| %>
       <li id="<%= tool.asset_string %>_menu_item" class="menu-item <% if use_new_styles? %>ic-app-header__menu-list-item<% end %>">
-      <% unless use_new_styles? %>
+      <% if use_new_styles? %>
+        <a class='ic-app-header__menu-list-link' href="<%= account_external_tool_path(@domain_root_account, tool, :launch_type => 'global_navigation') %>">
+          <% if tool.name == 'Commons' %>
+            <%= render(:partial => 'shared/svg/svg_commons_logo.svg') %>
+          <% elsif tool.icon_url %>
+            <img src="<%= tool.icon_url %>" />
+          <% else %>
+            <%= render(:partial => 'shared/svg/svg_default_lti_new_styles.svg') %>
+          <% end %>
+          <div class="menu-item__text">
+            <%= tool.label_for(:global_navigation) %>
+          </div>
+        </a>
+      <% else %>
         <a class='menu-item-no-drop' href="<%= account_external_tool_path(@domain_root_account, tool, :launch_type => 'global_navigation') %>">
           <% if k12? %>
             <%# Hardcoding Commons logo in to help K-12 sales demos, until a way to give the nav items logos is built out %>
@@ -16,15 +29,7 @@
           <% if k12? %></div><% end %>
         </a>
       <% end %>
-      <% if use_new_styles? %>
-        <a class='ic-app-header__menu-list-link' href="<%= account_external_tool_path(@domain_root_account, tool, :launch_type => 'global_navigation') %>">
-          <%# Hardcoding Commons logo in to help K-12 sales demos, until a way to give the nav items logos is built out %>
-          <%= render(:partial => 'shared/svg/svg_commons_logo.svg') %>
-          <div class="menu-item__text">
-            <%= tool.label_for(:global_navigation) %>
-          </div>
-        </a>
-      <% end %>
+
       </li>
     <% end %>
   <% end %>
