@@ -1,11 +1,12 @@
 module Autoextend
   Extension = Struct.new(:module_name, :method, :block, :singleton) do
-    def extend(const)
+    def extend(const, from_included: false)
       target = singleton ? const.singleton_class : const
       if block
         block.call(target)
       else
-        target.send(method, Object.const_get(module_name.to_s, false))
+        target.send(from_included ? :include : method,
+                    Object.const_get(module_name.to_s, false))
       end
     end
   end
@@ -159,14 +160,14 @@ end
 module Autoextend::ModuleMethods
   def prepended(klass)
     Autoextend.const_added(self).each do |extension|
-      extension.extend(klass)
+      extension.extend(klass, from_included: true)
     end
     super
   end
 
   def included(klass)
     Autoextend.const_added(self).each do |extension|
-      extension.extend(klass)
+      extension.extend(klass, from_included: true)
     end
     super
   end

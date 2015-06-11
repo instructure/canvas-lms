@@ -34,4 +34,22 @@ describe Autoextend::ObjectMethods do
 
     AutoextendSpec::Class.instance_variable_get(:@called).must_equal 42
   end
+
+  describe "modules" do
+    it "should insert a prepended module _after_ the hooked module on first definition" do
+      module AutoextendSpec::M1; end
+      module AutoextendSpec::M2; end
+      Autoextend.hook(:"AutoextendSpec::M1", :"AutoextendSpec::M2", method: :prepend)
+      class AutoextendSpec::Class
+        singleton_class.include(AutoextendSpec::M1)
+      end
+      # M2 is _before_ M1, but _after_ Class
+      AutoextendSpec::Class.singleton_class.ancestors.must_equal [
+        AutoextendSpec::Class.singleton_class,
+        AutoextendSpec::M2,
+        AutoextendSpec::M1
+      ] + Object.singleton_class.ancestors
+
+    end
+  end
 end
