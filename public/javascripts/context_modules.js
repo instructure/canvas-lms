@@ -838,6 +838,7 @@ define([
             $(this).remove();
             modules.updateTaggedItems();
           });
+          $.flashMessage(I18n.t("Module %{module_name} was successfully deleted.", {module_name: data.context_module.name}));
         }
       });
     });
