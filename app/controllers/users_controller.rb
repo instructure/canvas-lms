@@ -1426,7 +1426,9 @@ class UsersController < ApplicationController
   # 'course_42'
   #
   # @argument hexcode [String]
-  #   The hexcode of the color to set for the context.
+  #   The hexcode of the color to set for the context, if you choose to pass the
+  #   hexcode as a query parameter rather than in the request body you should
+  #   NOT include the '#' unless you escape it first.
   #
   # @example_request
   #
