@@ -25,7 +25,8 @@ define([
   'jquery.instructure_misc_helpers',
   'jqueryui/dialog',
   'jquery.instructure_misc_plugins',
-], function(tinymce, I18n, $, htmlEscape) {
+  'underscore'
+], function(tinymce, I18n, $, htmlEscape, _) {
 
   var TRANSLATIONS = {
     embed_from_external_tool: I18n.t('embed_from_external_tool', '"Embed content from External Tool"'),
@@ -167,44 +168,90 @@ define([
         }
         $(window).unbind("externalContentReady");
         $(window).bind("externalContentReady", function (event, data) {
-          var editor = $dialog.data('editor') || ed;
-          var item = data.contentItems[0];
-          var placementAdvice = item.placementAdvice;
-          var presentationDocTarget = placementAdvice.presentationDocumentTarget;
-          var url = item.mediaType === 'application/vnd.ims.lti.v1.ltilink' || item.mediaType === 'application/vnd.ims.lti.v1.launch+json' ? item.canvasURL : item.url
-          if (presentationDocTarget === 'iframe') {
-            var html = $("<div/>").append($("<iframe/>", {
-              src: url,
-              title: item.title,
-              allowfullscreen: 'true',
-              webkitallowfullscreen: 'true',
-              mozallowfullscreen: 'true'
-            }).css({
-              width: placementAdvice.displayWidth,
-              height: placementAdvice.displayHeight
-            })).html();
-            $("#" + editor.id).editorBox('insert_code', html);
-          } else if (presentationDocTarget === 'embed') {
-            if (item.mediaType && item.mediaType.indexOf('image') == 0) {
-              var html = $("<div/>").append($("<img/>", {
+          var editor = $dialog.data('editor') || ed,
+            item = data.contentItems[0],
+            placementAdvice = item.placementAdvice,
+            presentationDocTarget = placementAdvice.presentationDocumentTarget,
+            ltiMimeTypes = [ 'application/vnd.ims.lti.v1.ltilink', 'application/vnd.ims.lti.v1.launch+json'],
+            isLtiLink = !!~ltiMimeTypes.indexOf(item.mediaType),
+            url = isLtiLink ? item.canvasURL : item.url,
+            thumbnail = item.thumbnail || item.icon || null,
+            shouldOverrideTarget = isLtiLink && thumbnail && presentationDocTarget === 'iframe',
+            linkTarget = placementAdvice.presentationDocumentTarget == 'window' ? '_blank' : null,
+            linkClassName = "",
+            codePayload;
+
+          // no monkey business here
+          url = url.replace(/^(data:text\/html|javascript:)/, "#$1")
+
+          //check to see if we should override the target to for pretty thumbnails
+          if(shouldOverrideTarget) {
+            presentationDocTarget = 'text';
+            linkTarget = JSON.stringify(placementAdvice);
+            linkClassName = "lti-thumbnail-launch";
+          }
+
+          switch(presentationDocTarget) {
+
+            case 'iframe':
+              codePayload = $("<div/>").append($("<iframe/>", {
                 src: url,
-                alt: item.text
+                title: item.title,
+                allowfullscreen: 'true',
+                webkitallowfullscreen: 'true',
+                mozallowfullscreen: 'true'
               }).css({
                 width: placementAdvice.displayWidth,
                 height: placementAdvice.displayHeight
               })).html();
-              $("#" + editor.id).editorBox('insert_code', html);
-            } else {
-              $("#" + editor.id).editorBox('insert_code', item.text);
-            }
-          } else { //create a link to the content
-            $("#" + editor.id).editorBox('create_link', {
-              url: url,
-              title: item.title,
-              text: item.text,
-              target: placementAdvice.presentationDocumentTarget == 'window' ? '_blank' : null
-            });
+              break;
+
+
+            case 'embed':
+
+              if (item.mediaType && item.mediaType.indexOf('image') == 0) {
+                codePayload = $("<div/>").append($("<img/>", {
+                  src: url,
+                  alt: item.text
+                }).css({
+                  width: placementAdvice.displayWidth,
+                  height: placementAdvice.displayHeight
+                })).html();
+              } else {
+                codePayload = item.text;
+              }
+              break;
+
+
+            default:
+
+              var $linkContainer = $("<div/>"),
+                $link = $("<a/>", {
+                  href: url,
+                  title: item.title,
+                  target: linkTarget,
+                  'class': linkClassName
+                });
+
+              $linkContainer.append($link);
+
+              if(thumbnail) {
+                $link.append($("<img />", {
+                  src: thumbnail['@id'],
+                  height: thumbnail.height || 48,
+                  width: thumbnail.width || 48,
+                  alt: item.text
+                }))
+              } else {
+                $link.text(item.text);
+              }
+
+              codePayload = $linkContainer.html();
+              break;
           }
+
+          $("#" + editor.id).editorBox('insert_code', codePayload);
+
           $dialog.find('iframe').attr('src', 'about:blank');
           $dialog.dialog('close')
         });
