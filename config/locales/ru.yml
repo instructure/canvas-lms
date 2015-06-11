@@ -2,17 +2,8 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 ru: 
-  1_item_scores_1_2_2_3_5_5_3_39f6c397: "1 - Оценки за элементы: 1, 2, 2, 3, 5, 5, 3"
-  1_item_scores_1_3_2_4_5_3_6_mastery_score_set_at_5_70ff296a: "1- Оценки за элементы: 1, 3, 2, 4, 5, 3, 6. Проходной балл равен 5."
-  1_item_scores_3_2_2_4_1_3_4_e0de3073: "1 - Оценки за элементы: 3, 2, 2, 4, 1, 3, 4"
-  1_item_scores_4_3_2_5_3e2933a0: "1 - Оценки за элементы: 4, 3, 2, 5"
   1_item_scores_5512cd03: "1 - Оценки за элементы"
-  2_final_score_5_5_8418d475: "2- Итоговая оценка: 5.5"
   2_final_score_7b0fd15e: "2- Итоговая оценка"
-  2_highest_score_4_3b4bc250: "2 - Самая высокая оценка: 4"
-  2_most_recent_score_3_766dbf4e: "2 - Самая последняя оценка: 3"
-  2_the_rest_item_average_4_3_2_3_3_d05f04e2: "2 - Средняя по \"оставшимся\" элементам: (4 + 3 + 2) / 3 = 3"
-  3_calculated_mastery_score_5_0_75_3_0_25_4_5_c88c3a7b: "3 - Подсчитанный проходной балл: 5(0.75) + 3(0.25) = 4.5"
   451_message: 
     description: "Вы не авторизованы для доступа к этому сайту, поскольку находитесь в стране, на которую распространяются торговые ограничения США."
     headings: 
@@ -130,23 +121,9 @@ ru:
     saml_eppn_domain_stripped: "%{eppn} (снятие домена)"
   account_authorization_configs: 
     account_required: "требуется проверка подлинности LDAP"
-    cas_fields: 
-      labels: 
-        auth_base: "URL-адрес CAS"
-        unknown_user_url: "Url-адрес неизвестного пользователя"
-      unknown_user_url_description: "Url-адрес для переадресации, если аутентифицированный пользователь не найден в системе Canvas."
-    form_footer: 
-      labels: 
-        position: Позиция
-      save_button: "Сохранить настройки аутентификации"
-    form_header: 
-      auth_type_label: Тип
-      auth_url: "Url-адрес входа в систему для данной конфигурации"
     index: 
       add_auth_desc: "Добавить провайдера идентификации к этой учетной записи:"
-      canvas_login_tip: "При настройке параметров, которые мешают вам войти в систему, можно добавить *%{url1}* в конце вашего URL для входа. Это позволит вам войти, используя обычную процедуру входа Canvas. Для этой учетной записи гиперссылка будет %{url2}"
       choose_auth_type_option: "Выберите службу аутентификации"
-      current_settings_title: "Текущая интеграция"
       delete_auth_confirmation: "Вы уверены? При удалении вход пользователей в систему может быть невозможен."
       delete_auth_link: "Удалить все аутентификации"
       ip_address_list_description: "При использовании службы аутентификации, требующей, чтобы серверы Canvas непосредственно подключались к серверам, таким как LDAP, необходимо убедиться, что серверы могут принимать подключение от следующих IP-адресов:"
@@ -158,21 +135,7 @@ ru:
       test_ldap_link: "Протестировать аутентификацию LDAP"
     ldap_fields: 
       auth_filter_description: "Используйте *%{placeholder}* в качестве заполнителя для имени пользователя, указанного пользователем. Например: *(sAMAccountName=%{placeholder})*"
-      auth_password_description: "Оставьте пустым для продолжения использования текущего пароля."
       identifer_format_description: "Атрибут LDAP используется для поиска входа в систему Canvas. Не заполняйте, чтобы использовать имя пользователя, предоставленное пользователем."
-      labels: 
-        auth_base: "Базовая система"
-        auth_filter: Фильтр
-        auth_host: Хост
-        auth_over_tls: "Через TLS?"
-        auth_over_tls_false: "Отсутствует TLS"
-        auth_over_tls_simple_tls: "Простой TLS"
-        auth_over_tls_start_tls: StartTLS
-        auth_password: Пароль
-        auth_port: Порт
-        auth_username: "Имя пользователя"
-        identifier_format: "Атрибут идентификатора входа"
-      last_ldap_timeout_failure: "Последняя ошибка таймаута"
     ldap_settings_test: 
       labels: 
         pass: Пароль
@@ -203,17 +166,6 @@ ru:
     login_required: "должно быть указано"
     no_changing_auth_types: "Нельзя сменить тип конфигурации аутентификации. Удалите и создайте новую конфигурацию."
     password_required: "должно быть указано"
-    saml_fields: 
-      labels: 
-        certificate_fingerprint: "Отпечаток пальца сертификата"
-        identifier_format: "Формат идентификатора"
-        idp_entity_id: "Идентификатор объекта IdP"
-        log_in_url: "URL-адрес входа в систему"
-        log_out_url: "URL-адрес выхода в систему"
-        login_attribute: "Атрибуты входа в систему"
-        requested_authn_context: "Проверка подлинности контекста"
-        unknown_user_url: "Url-адрес неизвестного пользователя"
-      unknown_user_url_description: "Url-адрес для переадресации, если аутентифицированный пользователь не найден в системе Canvas."
     saml_required: "Конфигурация SAML необходима для тестрирования SAML"
     saml_settings_test: 
       refresh_debugging: Обновить
@@ -252,11 +204,6 @@ ru:
       logout_response_from_idp: "Ответ выхода от IdP"
     sso_settings_form: 
       change_password_url_help: "Оставить пустым для поведения Canvas по умолчанию"
-      discovery_url_description: "Если установлен URL обнаружения, Canvas будет направлять всех пользователей на этот URL, когда им нужно будет пройти аутентификацию. Это страница будет нужна, чтобы помочь пользователю выяснить, куда им нужно перейти, чтобы войти в систему. Если URL обнаружения не настроен, для попытки проверить аутентификацию пользователя будет использоваться первая конфигурация. "
-      labels: 
-        auth_discovery_url: "URL обнаружения"
-        change_password_url: "URL-адрес восстановления пароля"
-        login_handle_name: "Ярлык входа в систему"
       login_handle_name_description: "Метка используется для уникальных идентификаторов входа. Примеры: Вход, имя пользователя, идентификатор учащегося и т.д."
   account_navigation_80bbefd4: "Навигация по аккаунту"
   account_notification: 
@@ -2511,7 +2458,6 @@ ru:
         warning: Предупреждение
     edit_appointment_group: 
       affect_reservations: "Как это повлияет на бронирование?"
-      appointments_per_participant_label: "Максимальное количество встреч, в которых может находиться участник"
       appt_group_options_help1: "Некоторые существующие бронирования добавлены сверх установленного вами лимита. Они не будут затронуты, это изменение предотвращает только новые бронирования."
       appt_group_options_help2: "Вы можете, однако, вручную удалить все существующие бронирования."
       calendar: Календарь
@@ -2521,8 +2467,6 @@ ru:
       group_signup: "Имеется у студентов, зарегистрированных в группах."
       location: Местоположение
       name: Имя
-      participants_per_appointment_label: "Максимальное количество пользователей/групп встречи"
-      slot_duration_label: "Минут на интервал"
       time_range: "Временной диапазон"
     edit_appt_calendar_event: 
       description: "Описание:"
@@ -2764,7 +2708,6 @@ ru:
   canvas_ticketing_email_connector_27e253ae: "Коннектор для электронной почты, генерирующий формы Canvas"
   canvas_ticketing_web_post_connector_11158897: "Коннектор для веб-публикаций, генерирующий формы Canvas"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas повторно оценит все отправки после того, как вы сохраните контрольную работу. Это может занять несколько минут."
-  cas_d6e9601d: CAS
   cc: 
     by: "Принадлежность CC"
     by_nc: "Принадлежность CC, некоммерческий"
@@ -2782,7 +2725,6 @@ ru:
   choose_a_course_home_page_8059c7b: "Выбрать домашнюю страницу курса"
   choose_a_csv_file_to_upload_9644480c: "Выберите CSV-файл для отправки:"
   choose_usage_rights_33683854: "Выбрать права на использование..."
-  clear_file_name_text_field_fce73840: "Очистите текстовое поле имени файла"
   click_for_more_details_on_this_outcome_8c018d2f: "нажмите для более подробной информации по этому результату"
   click_here_on_the_calendar_link_c9965631: "Щелкните здесь по ссылке *Календарь*"
   click_to_modify_89fa26aa: "Нажмите, чтобы изменить"
@@ -6465,7 +6407,6 @@ ru:
     student_mute_notification: "Инструктор выполняет оценку"
     titles: 
       click_to_record: "Речь в текст"
-      dropped_assignment_no_total: "Это задание не будет учитываться в итоговом подсчете"
       hypothetical_score: "Это оценка \"Что если\""
     turnitin: 
       error_message: "Произошла ошибка при отправке задания на Turnitin. Попробуйте отправить файл еще раз, прежде чем связаться со службой поддержки"
@@ -7507,8 +7448,6 @@ ru:
   incremental_update_successfully_generated_against__db3f3f06: "На основе предыдущего Импорта SIS было создано дополнительное обновление."
   indigo_2035fc55: Индиго
   info: 
-    notices: 
-      error_reported: "Благодарим за помощь!  Мы проследим за этим"
     old_styleguide: 
       create_collection: "Создать коллекцию"
       start_a_group: "Начать группу"
@@ -7674,7 +7613,6 @@ ru:
   labels: 
     lock_module_until: "Заблокировать модуль до указанной даты"
   last_item_79583712: "Последний элемент:"
-  last_item_is_75_of_mastery_average_of_the_rest_is__614d41f4: "Последний элемент составляет 75% oт проходного балла.  Среднее арифметическое 'остальных' оценок составляет 25% oт проходного балла"
   last_user_access_title: "Последний доступ пользователя"
   late_percent_b91d01b3: "Опоздавшие: %{percent}"
   latest_assessment_a85280ef: "Последнее оценивание"
@@ -7712,7 +7650,6 @@ ru:
       log_in_to_canvas: "Войти в систему Canvas"
     styleguide: 
       default_page_title: "Canvas LMS"
-  ldap_e1e0a916: LDAP
   learning_mastery_gradebook_description: |-
       Табель успеваемости по усвоению обучения позволяет учителям быстро просматривать прогресс студента
       и курса по результатам обучения. Результаты представлены в формате табеля успеваемости,
@@ -7836,7 +7773,6 @@ ru:
     errors: 
       4xx_feedback: "Щелкните здесь, чтобы сообщить, что вы искали."
       feedback: "Щелкните здесь, чтобы сообщить, что произошло"
-    help: Помощь
     show_me_where: "Показать местоположение"
   links_14b70841: Ссылки
   loading_25990131: Загрузка...
@@ -9905,7 +9841,6 @@ ru:
   moodle_formula_warning_title: "Необходимо повторно создать возможные ответы для вопроса с формулой"
   more_courses_5ebbe998: "Другие курсы"
   most_recent_score_13a87e8c: "Самая последняя оценка"
-  most_recent_score_counts_as_75_of_mastery_weight_a_f1e3e6c2: "Самая последняя оценка рассчитывается как 75% от веса усвоения, среднее значение из всех остальных оценок рассчитывается как 25% от веса."
   move_abf00365: Переместить
   move_dialog: 
     cancel: Отменить
@@ -9918,8 +9853,6 @@ ru:
   move_outcome_group_cfa1a505: "Переместить группу результатов"
   moving_a4d552df: Перемещение...
   multi_factor_authentication_configured_865b1bde: "Многофакторная аутентификация настроена"
-  must_achieve_mastery_at_least_2_times_must_also_co_b2ae7688: "Проходной балл должен быть получен хотя бы 2 раза. Необходимо также завершить 2 элемента для подсчета. Для получения итоговой оценки будет вычислено среднее значение из оценок выше проходного балла."
-  must_achieve_mastery_at_least_2_times_scores_above_57077a88: "Усвоение должно быть достигнуто хотя бы 2 раза. Для получения итоговой оценки будет вычислено среднее значение из оценок выше уровня усвоения."
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "Вы должны добавить параметр 'file_ids' и/или 'folder_ids'"
   mute_dialog: 
     curving_assignments: "Кривая оценок для заданий"
@@ -10380,7 +10313,6 @@ ru:
     missing_outcome: "Невозможно найти этот результат обучения"
     new_outcome_group: "Новая группа результатов"
     outcome: 
-      example: "Пример:"
       links: 
         delete_outcome: "Удалить результат"
         edit_outcome: "Редактировать результат"
@@ -10399,7 +10331,6 @@ ru:
       criterion_info_link: "Щелкните, чтобы узнать больше о рейтингах критерия"
       description: "Описать этот результат"
       display_name: "Понятное имя (необязательно)"
-      example: "Пример:"
       mastery: "Усвоено на"
       points: "%{points_possible} баллов"
       title: "Дать название этому результату"
@@ -10759,21 +10690,8 @@ ru:
       ui_conf_ids: "Для клиентов с размещением Kaltura можно запросить Kaltura предоставить эти идентификаторы. Для экземпляров с самостоятельным размещением эти значения доступны в таблице ui_confs."
     linked_in: 
       description: "Интеграция LinkedIn"
-      name: LinkedIn
     linked_in_settings: 
-      description: |-
-          Потребуется интеграция [нового приложения в LinkedIn](%{linkedin_url}).
-          Установить следующие параметры конфигурации для обеспечения правильности работы
-          интеграции LinkedIn:
-          
-          * **Application Type:** установите "Веб-приложение"
-          * **Live Status:** установите "Live"
-          * **OAuth Redirect URL:** установите %{oauth_url}
-          * После сохранения приложения запишите ключ API и секретный ключ приложения
       domain_name: домен
-      labels: 
-        api_key: "Ключ API"
-        secret_key: "Секретный ключ"
     live_events: 
       description: "Обслуживание событий в режиме реального времени."
       name: "Интерактивные события"
@@ -10846,21 +10764,6 @@ ru:
         type: "Тип системы отслеживания ошибок"
     twitter: 
       description: "Уведомления Twitter"
-      name: Twitter
-    twitter_settings: 
-      description: |-
-          Потребуется создать [новое приложение в Twitter](%{twitter_url}).
-          Установить следующие параметры конфигурации для обеспечения правильности работы
-          приложения Twitter:
-          
-          * **Application Type:** установите "Браузер"
-          * **Callback URL:** установите %{callback_url}
-          * **Default Access type:** установите "Чтение, запись и частное сообщение"
-          * После сохранения приложения запишите пользовательский и секретный ключи
-      domain_name: домен
-      labels: 
-        api_key: "Пользовательский ключ"
-        secret_key: "Секретный ключ пользователя"
     webct_scraper_settings: 
       description: |-
           Если организация не использует «Учебные модули» WebCT (включая школы, которые приняли WebCT
@@ -12119,7 +12022,6 @@ ru:
         extended_quiz_time_explanation: "Можно дать этому студенту дополнительное время для текущей попытки выполнения контрольной работы. Сколько времени им предоставить?"
         extra_time_on_every_attempt: "	Дополнительное время для каждой попытки:"
         finished_in: "завершено в %{duration}"
-        global_extra_attempt_time: "каждый уже получает %{count} минут"
         global_extra_attempts: "каждый уже получает %{n}"
         headers: 
           attempt: Попытка
@@ -12857,8 +12759,6 @@ ru:
         description: "Отменить публикацию"
     options_2: 
       description: "График доступности студентов"
-    title: 
-      default_title: Диалог
   resume_quiz_afeceb87: "Возобновить контрольную работу"
   resume_survey_58dce775: "Возобновить опрос"
   retrieve_timeout: "не удалось обнаружить конфигурацию, время ответа сервера истекло"
@@ -13068,7 +12968,6 @@ ru:
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce имеет другой хост входа для учетных записей тестовой среды, отличный от рабочих аккаунтов, так что если вы используете аккаунт Salesforce в тестовой среде, и вы не установите этот флажок, то будет невозможно аутентифицировать (этот принцип работает и в обратном порядке, если у вас есть рабочий аккаунт, и вы установите этот флажок, он не будет аутентифицирован)"
   salesforce_ticketing_webtocase_connector_80f75716: "Коннектор для системы отслеживания веб-элемент Salesforce"
   same_value_as_canvas_url__c_will_probably_be_going_37027686: "Значение, подобное 'Canvas_URL__c', вероятно, в ближайшее время пропадет"
-  saml_57e53f77: SAML
   sample_data_e4fd01ff: "Пример данных"
   save_11a80ec3: Сохранить
   saving_d55dd90e: Сохранение...
@@ -13144,7 +13043,6 @@ ru:
       learning_mastery: "Усвоение обучения"
     settings: 
       assignment_toggles_and_actions: 
-        download_scores: "Скачать оценки (.csv)"
         grading_history: "Просмотр истории оценок"
         hide_student_names_label: "Скрыть имена студентов"
         include_ungraded_assignments: "Считать неоцененные как 0"
@@ -13345,8 +13243,6 @@ ru:
     new: 
       titles: 
         course_enrollment: "Зарегистрироваться на %{course}"
-    notices: 
-      login_required: "Войдите в систему, чтобы присоединиться к курсу."
     successfully_enrolled: 
       already_enrolled: "Вы успешно зарегистрировались на **%{course}**."
       buttons: 
@@ -13673,10 +13569,6 @@ ru:
         many: "%{count} требуют проверки"
         one: "1 требует проверки"
         other: "%{count} требуют проверки"
-    menu_enrollment: 
-      labels: 
-        enrolled_as: "Зарегистрирован как"
-        invited_as: "Приглашен как"
     message_students: 
       buttons: 
         send_message: "Отправить сообщение"
@@ -14902,8 +14794,6 @@ ru:
   usage_rights_have_been_set_d1b433c7: "Права на использование были установлены."
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Права на использование будут установлены для всех файлов, находящихся в:"
   use_a_single_16x16_32x32_48x48_ico_file_60bc8d91: "Используйте *один файл 16x16, 32x32, 48x48 с расширением .ico*."
-  use_the_highest_score_eb29329d: "Использовать самую высокую оценку"
-  use_the_most_recent_score_9ae3742c: "Использовать самую последнюю оценку"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Использовать новый инструмент теста LTI вместо обычных тестов canvas"
   used_by_permission_314a78dd: "Используется с разрешения"
   user: 
