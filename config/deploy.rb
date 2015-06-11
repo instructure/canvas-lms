@@ -216,7 +216,7 @@ namespace :deploy do
   desc 'Restart application'
   task :restart do
     on roles(:app) do
-      execute :sudo, 'chmod g+w', release_path.join('tmp') # No clue why, but on prod the releases/XXXXX/tmp dir is created but not group writeable.
+      execute :sudo, 'chmod -R g+w', release_path.join('tmp') # No clue why, but on prod the releases/XXXXX/tmp dir is created but not group writeable.
       execute :touch, release_path.join('tmp/restart.txt')
     end
   end
