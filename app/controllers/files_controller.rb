@@ -257,20 +257,20 @@ class FilesController < ApplicationController
 
     if authorized_action(folder, @current_user, :read_contents)
       @context = folder.context unless context_index
-      can_manage_files = @context.grants_right?(@current_user, session, :manage_files)
+      can_view_hidden_files = can_view_hidden_files?(@context, @current_user, session)
       params[:sort] ||= params[:sort_by] # :sort_by was undocumented; :sort is more consistent with other APIs such as wikis
       params[:include] = Array(params[:include])
       params[:include] << 'user' if params[:sort] == 'user'
 
       if context_index
-        if can_manage_files
+        if can_view_hidden_files
           scope = @context.attachments.not_deleted
         else
           scope = @context.attachments.visible.not_hidden.not_locked.where(
               :folder_id => Folder.all_visible_folder_ids(@context))
         end
       else
-        if can_manage_files
+        if can_view_hidden_files
           scope = folder.active_file_attachments
         else
           scope = folder.visible_file_attachments.not_hidden.not_locked
@@ -306,7 +306,9 @@ class FilesController < ApplicationController
 
       url = context_index ? context_files_url : api_v1_list_files_url(folder)
       @files = Api.paginate(scope, self, url)
-      render :json => attachments_json(@files, @current_user, {}, :can_manage_files => can_manage_files, :include => params[:include], :omit_verifier_in_app => !value_to_boolean(params[:use_verifiers]))
+      render :json => attachments_json(@files, @current_user, {},
+          :can_view_hidden_files => can_view_hidden_files, :include => params[:include],
+          :omit_verifier_in_app => !value_to_boolean(params[:use_verifiers]))
     end
   end
 
@@ -978,7 +980,7 @@ class FilesController < ApplicationController
         params[:attachment].delete(:uploaded_data) if @context.is_a?(User)
 
         if params[:attachment][:uploaded_data].present?
-          @attachment.user = @current_user 
+          @attachment.user = @current_user
           @attachment.modified_at = Time.now.utc
         end
 

@@ -236,14 +236,23 @@ describe "Files API", type: :request do
     it "should not list locked file if not authed" do
       course_with_student_logged_in(:course => @course)
       json = api_call(:get, @files_path, @files_path_options, {})
-      expect(json.any?{|f|f[:id] == @a2.id}).to eq false
+      expect(json.any?{|f|f['id'] == @a2.id}).to be_falsey
     end
 
     it "should not list hidden files if not authed" do
       course_with_student_logged_in(:course => @course)
       json = api_call(:get, @files_path, @files_path_options, {})
 
-      expect(json.any?{|f|f[:id] == @a3.id}).to eq false
+      expect(json.any?{|f| f['id'] == @a3.id}).to be_falsey
+    end
+
+    it "should list hidden files with :read_as_admin rights" do
+      course_with_ta(:course => @course, :active_all => true)
+      user_session(@user)
+      @course.account.role_overrides.create!(:permission => :manage_files, :enabled => false, :role => ta_role)
+      json = api_call(:get, @files_path, @files_path_options, {})
+
+      expect(json.any?{|f| f['id'] == @a3.id}).to be_truthy
     end
 
     it "should not list locked folder if not authed" do
