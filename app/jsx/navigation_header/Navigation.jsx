@@ -107,7 +107,11 @@ define([
       var path = window.location.pathname;
       var matchData = path.match(EXTERNAL_TOOLS_REGEX) || path.match(ACTIVE_ROUTE_REGEX);
       var activeItem = matchData && matchData[1];
-      this.setState({activeItem});
+      if (!activeItem) {
+        this.setState({activeItem: 'dashboard'})
+      } else {
+        this.setState({activeItem});
+      }
     },
 
     handleMenuClick (type) {

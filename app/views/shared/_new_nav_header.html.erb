@@ -19,6 +19,12 @@
             class="ic-app-header__menu-list"
             aria-label="<%= t('Main Navigation') %>"
           >
+            <li class="ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/') && request.fullpath.length == 1 %>">
+              <a id="global_nav_dashboard_link" href="<%= dashboard_url %>" class="ic-app-header__menu-list-link">
+                <div class="menu-item-icon-container"><%= render(:partial => 'shared/svg/svg_icon_dashboard.svg') %></div>
+                <div class="menu-item__text"><%= t('Dashboard') %></div>
+              </a>
+            </li>
             <% if @has_courses %>
               <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('courses') %>">
                 <a id="global_nav_courses_link" href="<%= courses_path %>" class="ic-app-header__menu-list-link">
