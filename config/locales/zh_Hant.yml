@@ -2,17 +2,8 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 zh_Hant: 
-  1_item_scores_1_2_2_3_5_5_3_39f6c397: "1 - 項目分數：1, 2, 2, 3, 5, 5, 3"
-  1_item_scores_1_3_2_4_5_3_6_mastery_score_set_at_5_70ff296a: "1- 項目分數：1, 3, 2, 4, 5, 3, 6。精通分數設為5分。"
-  1_item_scores_3_2_2_4_1_3_4_e0de3073: "1 - 項目分數：3, 2, 2, 4, 1, 3, 4 "
-  1_item_scores_4_3_2_5_3e2933a0: "1 - 項目分數：4, 3, 2, 5"
   1_item_scores_5512cd03: "1- 項目分數"
-  2_final_score_5_5_8418d475: "2- 最終分數：5.5 "
   2_final_score_7b0fd15e: "2- 最終分數"
-  2_highest_score_4_3b4bc250: "2 - 最高分數：4 "
-  2_most_recent_score_3_766dbf4e: "2 - 最近分數：3"
-  2_the_rest_item_average_4_3_2_3_3_d05f04e2: "2 - ‘餘下’ 項目平均分：(4 + 3 + 2) / 3 = 3"
-  3_calculated_mastery_score_5_0_75_3_0_25_4_5_c88c3a7b: "3 - 已計算精通分數：5(0.75) + 3(0.25) = 4.5"
   451_message: 
     description: 因為您所在國家受美國貿易限制的約束，所以您無法獲得此網站的授權。
     headings: 
@@ -126,23 +117,9 @@ zh_Hant:
     saml_eppn_domain_stripped: "%{eppn}（網域已去除）"
   account_authorization_configs: 
     account_required: "必須為 LDAP 驗證"
-    cas_fields: 
-      labels: 
-        auth_base: "CAS URL"
-        unknown_user_url: "未知使用者 URL"
-      unknown_user_url_description: "在 Canvas 中找不到已驗證的使用者時重定向到的 URL。"
-    form_footer: 
-      labels: 
-        position: 位置
-      save_button: 儲存驗證設定
-    form_header: 
-      auth_type_label: 類型
-      auth_url: "此設定的登入 URL"
     index: 
       add_auth_desc: 添加一個身份識別提供者至此帳戶：
-      canvas_login_tip: "如果您的配置方案導致無法登錄，請在您的登錄url後增加*%{url1}*。這樣可以讓您使用普通模式登錄Canvas。本帳戶使用的url是%{url2}"
       choose_auth_type_option: 選擇驗證服務
-      current_settings_title: 當前整合
       delete_auth_confirmation: 是否確定？如果移除，則使用者可能無法登入。
       delete_auth_link: 清除所有驗證資訊
       ip_address_list_description: "如果您正在使用需要 Canvas 伺服器直接連接您的伺服器的驗證服務，如 LDAP，則需要確保您的伺服器可以接受來自這些 IP 位址的連接："
@@ -154,21 +131,7 @@ zh_Hant:
       test_ldap_link: 測試LDAP驗證資訊
     ldap_fields: 
       auth_filter_description: "使用 *%{placeholder}* 作為使用者提供的使用者名稱的預留位置。例如：*(sAMAccountName=%{placeholder})*"
-      auth_password_description: 留空以繼續使用當前密碼。
       identifer_format_description: "LDAP 屬性用來查看 Canvas 登入。留空以使用由使用者提供的使用者名稱。"
-      labels: 
-        auth_base: 基礎
-        auth_filter: 篩選器
-        auth_host: 主機
-        auth_over_tls: "透過 TLS？"
-        auth_over_tls_false: "沒有 TLS"
-        auth_over_tls_simple_tls: "簡單的 TLS"
-        auth_over_tls_start_tls: "啟動 TLS"
-        auth_password: 密碼
-        auth_port: 連接埠
-        auth_username: 使用者名稱
-        identifier_format: "登入 ID 屬性"
-      last_ldap_timeout_failure: 最後逾時失敗
     ldap_settings_test: 
       labels: 
         pass: 密碼
@@ -199,17 +162,6 @@ zh_Hant:
     login_required: 必須提供
     no_changing_auth_types: 無法更改授權設定的類型，請刪除和創建新的設定。
     password_required: 必須提供
-    saml_fields: 
-      labels: 
-        certificate_fingerprint: 憑證指紋
-        identifier_format: 識別碼格式
-        idp_entity_id: "IdP 實體識別碼"
-        log_in_url: "登入 URL"
-        log_out_url: "註銷 URL"
-        login_attribute: 登入屬性
-        requested_authn_context: 驗證內容
-        unknown_user_url: "未知使用者 URL"
-      unknown_user_url_description: "在 Canvas 中找不到已驗證的使用者時重定向到的 URL。"
     saml_required: "需要 SAML 設定來測試 SAML"
     saml_settings_test: 
       refresh_debugging: 重新整理
@@ -248,11 +200,6 @@ zh_Hant:
       logout_response_from_idp: "LogoutResponse 來自於 IdP"
     sso_settings_form: 
       change_password_url_help: "為預設的 Canvas 行為留空"
-      discovery_url_description: 在設置了發現URL之後，canvas會將所有需要驗證身份的使用者跳轉到該URL上。網頁內容會協助使用者找到登錄入口。如果沒有配置發現URL，則第一個配置將會用於試圖驗證用戶的身份。
-      labels: 
-        auth_discovery_url: 發現URL
-        change_password_url: "忘記密碼 URL"
-        login_handle_name: 登入標籤
       login_handle_name_description: 用於唯一登入識別符的標籤。例如：登入、使用者名稱、學號等。
   account_navigation_80bbefd4: 帳戶導航
   account_notification: 
@@ -2465,7 +2412,6 @@ zh_Hant:
         warning: 警告
     edit_appointment_group: 
       affect_reservations: 這將如何影響預約？
-      appointments_per_participant_label: 參與者可參加的最多約會次數
       appt_group_options_help1: 一些現有的預約超過您所新增的限制。這些將不會受到影響，這種變化僅阻礙進行新預約。
       appt_group_options_help2: 但是，可以手動移除任何現有的預約。
       calendar: 月曆
@@ -2475,8 +2421,6 @@ zh_Hant:
       group_signup: 讓學生報名加入群組。
       location: 位置
       name: 名稱
-      participants_per_appointment_label: 每次約會的最多使用者/群組
-      slot_duration_label: 分鐘/空
       time_range: 時間範圍
     edit_appt_calendar_event: 
       description: 說明：
@@ -2718,7 +2662,6 @@ zh_Hant:
   canvas_ticketing_email_connector_27e253ae: "Canvas 票務電子郵件連接器"
   canvas_ticketing_web_post_connector_11158897: "Canvas 票務網頁后連接器"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas 將在您儲存測驗後重新評分所有提交件，這可能需要幾分鐘的時間。"
-  cas_d6e9601d: CAS
   cc: 
     by: "CC 屬性"
     by_nc: "CC 屬性非商業"
@@ -2736,7 +2679,6 @@ zh_Hant:
   choose_a_course_home_page_8059c7b: 選擇課程首頁
   choose_a_csv_file_to_upload_9644480c: "選擇 CSV 檔案以上傳："
   choose_usage_rights_33683854: 選擇使用權。。。
-  clear_file_name_text_field_fce73840: 清除檔案名文本欄位
   click_for_more_details_on_this_outcome_8c018d2f: 點擊以了解關於此結果的更多詳情
   click_here_on_the_calendar_link_c9965631: "在此處點擊 *月曆* 連結"
   click_to_modify_89fa26aa: 點擊進行修改
@@ -6302,7 +6244,6 @@ zh_Hant:
     student_mute_notification: 導師正在進行評分
     titles: 
       click_to_record: 語音轉化為文字
-      dropped_assignment_no_total: 在總的計算中不會考慮此任務
       hypothetical_score: 这是「假設分析」分数
     turnitin: 
       error_message: "提交至 Turnitin 時發生錯誤。請在聯繫支援人員之前嘗試重新提交檔案"
@@ -7307,8 +7248,6 @@ zh_Hant:
   incremental_update_successfully_generated_against__db3f3f06: "增量更新針對之前的一個 SIS 匯入而成功生成。"
   indigo_2035fc55: 靛藍色
   info: 
-    notices: 
-      error_reported: 感謝您的幫助！我們會馬上使其恢復正常
     old_styleguide: 
       create_collection: 建立集合
       start_a_group: 啟動群組
@@ -7472,7 +7411,6 @@ zh_Hant:
   labels: 
     lock_module_until: 鎖定模組，直到某一特定日期
   last_item_79583712: 最後一個項目：
-  last_item_is_75_of_mastery_average_of_the_rest_is__614d41f4: "最後一個項目為精通 75%。‘餘下’ 的平均水平為精通25%"
   last_user_access_title: 上次使用者存取
   late_percent_b91d01b3: "逾期：%{percent}"
   latest_assessment_a85280ef: 最新的評估
@@ -7510,7 +7448,6 @@ zh_Hant:
       log_in_to_canvas: "登入 Canvas"
     styleguide: 
       default_page_title: "Canvas LMS"
-  ldap_e1e0a916: LDAP
   learning_mastery_gradebook_description: 學習精通成績冊提供了一種方法，教師可以快速檢視課程的學習成果中的學生和課程進度。成果以成績冊般的形式呈現，學生的進步以數值評分顯示，以及以精通/接近精通/補修的形式顯示。
   learning_outcome: 
     no_comment: 無註解
@@ -7626,7 +7563,6 @@ zh_Hant:
     errors: 
       4xx_feedback: 按一下此處告诉我们您在尋找什麼。
       feedback: 按一下此處告诉我们發生了什麼。
-    help: 說明
     show_me_where: 顯示在何處
   links_14b70841: 連結
   loading_25990131: 正在載入…
@@ -9634,7 +9570,6 @@ zh_Hant:
   moodle_formula_warning_title: 將需要為公式問題重新生成可能的答案
   more_courses_5ebbe998: 更多課程
   most_recent_score_13a87e8c: 最近的分數
-  most_recent_score_counts_as_75_of_mastery_weight_a_f1e3e6c2: "大部分近期分數占 75% 的精通分數權重，所有其他分數的平均分占 25% 的權重。"
   move_abf00365: 移動
   move_dialog: 
     cancel: 取消
@@ -9647,8 +9582,6 @@ zh_Hant:
   move_outcome_group_cfa1a505: 移動成果群組
   moving_a4d552df: 正在移動…
   multi_factor_authentication_configured_865b1bde: 多因素驗證已設定
-  must_achieve_mastery_at_least_2_times_must_also_co_b2ae7688: "必須至少 2 次達到精通水平。還必須完成兩個計算項目。高於精通水平的分數將求取平均分以計算最終分數。"
-  must_achieve_mastery_at_least_2_times_scores_above_57077a88: "必須至少 2 次達到精通分數。高於精通分數的分數將求取平均分，以計入最終分數。"
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "必須提供「檔案 ID」和/或「檔案 ID」參數 "
   mute_dialog: 
     curving_assignments: 繪製任務曲線
@@ -10099,7 +10032,6 @@ zh_Hant:
     missing_outcome: 找不到該學習成果
     new_outcome_group: 新成果群組
     outcome: 
-      example: 範例：
       links: 
         delete_outcome: 刪除成果
         edit_outcome: 編輯成果
@@ -10118,7 +10050,6 @@ zh_Hant:
       criterion_info_link: 按一下以了解標準評級
       description: 描述此成果
       display_name: 友好的名稱（可選）
-      example: 範例：
       mastery: 精通於
       points: "%{points_possible} 點"
       title: 命名此成果
@@ -10475,21 +10406,8 @@ zh_Hant:
       ui_conf_ids: "對於 Kaltura 託管的客戶，您可以要求 Kaltura 為您提供這些ID。自託管的執行個體可以在ui_confs表中發現這些值。"
     linked_in: 
       description: "LinkedIn 整合"
-      name: LinkedIn
     linked_in_settings: 
-      description: |-
-          您將需要註冊[在 LinkedIn 上的新應用程式](%{linkedin_url})。
-          設定以下設定選項，以確保您的 LinkedIn 
-          整合正常工作：
-          
-          * **應用程式類型：** 設定為『Web 應用程式』
-          * ** Live 狀態：**設定為『Live』
-          * **OAuth 重定向 URL：** 設定為 %{oauth_url}
-          * 儲存您的應用程式之後，請記下 API 金鑰和祕密金鑰
       domain_name: 網域
-      labels: 
-        api_key: "API 金鑰"
-        secret_key: 祕密金鑰
     live_events: 
       description: 實時事件服務
       name: 現場事件
@@ -10562,20 +10480,6 @@ zh_Hant:
         type: 票務系統類型
     twitter: 
       description: "Twitter 通知"
-      name: Twitter
-    twitter_settings: 
-      description: |-
-          您將需要建立[在 Twitter 上的新應用程式](%{twitter_url})。
-          設定以下設定選項，以確保您的 Twitter 應用程式正常工作：
-          
-          * **應用程式類型：**設定為『瀏覽器』
-           * **回呼 URL：**設定為%{callback_url}
-          * **預設存取類型：**設定為『讀、寫和私人訊息』
-          *儲存您的應用程式之後，請記下使用者金鑰和使用者密碼
-      domain_name: 網域
-      labels: 
-        api_key: 取用者金鑰
-        secret_key: 使用者密碼
     webct_scraper_settings: 
       description: "如果該機構不使用 WebCT 的『學習模組』(包括當模組可用時，採取 WebCT 版本 4.0 之前的版本的學校)，課程遷移可以透過匯入『課程內容』作為 Canvas 模組而不是『學習模組』加以改進。此頁面允許設定關於內容模組的 WebCT 遷移程式的預設行為。重要的是要記住，雖然個別課程遷移保留選擇的能力，但大部分遷移程式總是利用在此處設定的值，並且不能在每次遷移時更改。"
       labels: 
@@ -11788,7 +11692,6 @@ zh_Hant:
         extended_quiz_time_explanation: 可以就其當前的測驗嘗試給這個學生更多的時間。您想給他們多少時間？
         extra_time_on_every_attempt: 每次嘗試加時
         finished_in: "在 %{duration} 內完成"
-        global_extra_attempt_time: "每人已獲得 %{count} 分鐘"
         global_extra_attempts: "每人已獲得 %{n}"
         headers: 
           attempt: 嘗試
@@ -12464,8 +12367,6 @@ zh_Hant:
         description: 解除發佈
     options_2: 
       description: 排程學生可用性
-    title: 
-      default_title: 對話方塊
   resume_quiz_afeceb87: 繼續測驗
   resume_survey_58dce775: 繼續調查
   retrieve_timeout: 無法抓取設定，伺服器回應超時
@@ -12671,7 +12572,6 @@ zh_Hant:
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "銷售人員有一個與其產品帳戶不同的登錄主機砂盒的帳戶，因此，如果您使用的是銷售人員砂盒帳戶而您又沒有勾選此複選框，那麼您將無法進行身份驗證 (相反，如果您有一個產品帳戶而且您勾選了不會驗證的複選框，這也同樣起作用)"
   salesforce_ticketing_webtocase_connector_80f75716: "銷售人員票務 WebToCase 連接器"
   same_value_as_canvas_url__c_will_probably_be_going_37027686: "與 ‘Canvas_URL__c’ 相同的價值，將可能很快消失"
-  saml_57e53f77: SAML
   sample_data_e4fd01ff: 樣本資料
   save_11a80ec3: 儲存
   saving_d55dd90e: 正在儲存...
@@ -12747,7 +12647,6 @@ zh_Hant:
       learning_mastery: 學習精通
     settings: 
       assignment_toggles_and_actions: 
-        download_scores: "下載分數 (.csv)"
         grading_history: 檢視評分記錄
         hide_student_names_label: 隱藏學生名稱
         include_ungraded_assignments: "將未評分視為 0"
@@ -12942,8 +12841,6 @@ zh_Hant:
     new: 
       titles: 
         course_enrollment: "報讀 %{course}"
-    notices: 
-      login_required: 請登入以參加此課程。
     successfully_enrolled: 
       already_enrolled: "您已成功報讀**%{course}**。"
       buttons: 
@@ -13266,10 +13163,6 @@ zh_Hant:
       needs_grading_count: 
         one: "%{count} 個需要分級"
         other: "%{count} 個需要分級"
-    menu_enrollment: 
-      labels: 
-        enrolled_as: 註冊為
-        invited_as: 邀請，作為
     message_students: 
       buttons: 
         send_message: 傳送訊息
@@ -14464,8 +14357,6 @@ zh_Hant:
   usage_rights_have_been_set_d1b433c7: 使用權已設定。
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: 將為如下資料夾所包含的所有檔案設定使用權：
   use_a_single_16x16_32x32_48x48_ico_file_60bc8d91: "使用 *單個 16x16、32x32、48x48 圖示檔案*。"
-  use_the_highest_score_eb29329d: 使用最高分數
-  use_the_most_recent_score_9ae3742c: 使用最近的分數
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "使用新的測驗 LTI 工具來代替平常的 Canvas 測驗"
   used_by_permission_314a78dd: 經授權使用
   user: 
