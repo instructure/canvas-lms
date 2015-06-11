@@ -1,7 +1,7 @@
 ///
   /// How to update Icons
   //
-  // Add your new svg(s) to app/icons/ 
+  // Add your new svg(s) to app/icons/
   // Edit the template file. Important!! Edit file in public/fonts/_canvas-icons.scss
   // Compile your fonts. In your project in terminal run: bundle exec rake icons:compile
   // Check the styleguide to make sure they're pulling in /styleguide
@@ -271,26 +271,28 @@ Either use `<a>` with icon desired icon class added or insert `<i>` inside `<but
   <span class="span3"><i class="icon-quiz-stats-time"></i> icon-quiz-stats-time</span>
   <span class="span3"><i class="icon-cloud-lock"></i> icon-cloud-lock</span>
 </div>
-<div class="row-fluid">  
+<div class="row-fluid">
   <span class="span3"><i class="icon-eye"></i> icon-eye</span>
   <span class="span3"><i class="icon-files-copyright"></i> icon-files-copyright</span>
-  <span class="span3"><i class="icon-files-creative-commons"></i> icon-files-creative-commons</span>  
-  <span class="span3"><i class="icon-files-fair-use"></i> icon-files-fair-use</span>  
+  <span class="span3"><i class="icon-files-creative-commons"></i> icon-files-creative-commons</span>
+  <span class="span3"><i class="icon-files-fair-use"></i> icon-files-fair-use</span>
 </div>
 <div class="row-fluid">
-  <span class="span3"><i class="icon-files-obtained-permission"></i>icon-files-obtained-permission</span>  
-  <span class="span3"><i class="icon-files-public-domain"></i> icon-files-public-domain</span>  
+  <span class="span3"><i class="icon-files-obtained-permission"></i>icon-files-obtained-permission</span>
+  <span class="span3"><i class="icon-files-public-domain"></i> icon-files-public-domain</span>
   <span class="span3"><i class="icon-tour-info"></i> icon-tour-info</span>
-  <span class="span3"><i class="icon-import"></i> icon-import</span>  
+  <span class="span3"><i class="icon-import"></i> icon-import</span>
 </div>
 <div class="row-fluid">
   <span class="span3"><i class="icon-export"></i> icon-export</span>
+  <span class="span3"><i class="icon-equella"></i> icon-equella</span>
+  <span class="span3"><i class="icon-equation"></i> icon-equation</span>
 </div>
 */
 
 
-@font-face { 
-  font-family: "canvas-icons";  
+@font-face {
+  font-family: "canvas-icons";
   src:  url('/fonts/canvas/canvas-icons.eot');
   src:  url('/fonts/canvas/canvas-icons.eot?#iefix') format('embedded-opentype'),
         url('/fonts/canvas/canvas-icons.woff') format('woff'),

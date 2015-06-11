@@ -1,7 +1,7 @@
 {
   "checksum": {
-    "previous": "45380a21ad4888c3e12ec343210f29574bc0fee646f29bdba901f509b70eff27",
-    "current": "45380a21ad4888c3e12ec343210f29574bc0fee646f29bdba901f509b70eff27"
+    "previous": "348f51d5e794468e11a57af4c5fe610cc6c673a5e45538fb058946d99836c6ab",
+    "current": "348f51d5e794468e11a57af4c5fe610cc6c673a5e45538fb058946d99836c6ab"
   },
   "fonts": [
     "public/fonts/canvas/canvas-icons.ttf",
@@ -197,6 +197,14 @@
     "end": {
       "codepoint": 61742,
       "source": "public/fonts/icons/end.svg"
+    },
+    "equation": {
+      "codepoint": 61877,
+      "source": "public/fonts/icons/equation.svg"
+    },
+    "equella": {
+      "codepoint": 61878,
+      "source": "public/fonts/icons/equella.svg"
     },
     "expand": {
       "codepoint": 61743,
