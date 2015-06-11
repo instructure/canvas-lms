@@ -73,7 +73,7 @@ end
 Rake::Task["deploy:rollback_assets"].clear_actions
 
 # Disable for now until we get the basic Cap deploy and rollback going for code and can really test this.
-Rake::Task["deploy:migrate"].clear_actions
+#Rake::Task["deploy:migrate"].clear_actions
 
 Rake::Task["deploy:restart"].clear_actions
 
@@ -110,10 +110,10 @@ namespace :deploy do
 
   before :updated, :clone_qtimigrationtool
 
-  desc "Migrate database"
-  task :migrate do
-    # TODO: need to get this working, but for now we're just focusing on getting a code deploy and rollback flow going
-  end
+  #desc "Migrate database"
+  #task :migrate do
+  #  # TODO: need to get this working, but for now we're just focusing on getting a code deploy and rollback flow going
+  #end
 
   desc "Compile static assets"
   task :compile_assets => :set_compile_assets_vars do
@@ -206,7 +206,7 @@ namespace :deploy do
       execute :sudo, 'chown -R', "#{group}:#{group}", "#{release_path}"
       within release_path do
         execute :sudo, 'chown', "#{user}", "config/*", "Gemfile.lock", "config.ru"
-        execute :sudo, 'chmod 400', "config/*.yml"
+        execute :sudo, 'chmod 440', "config/*.yml"
       end
     end
   end
