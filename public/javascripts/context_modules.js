@@ -926,6 +926,7 @@ define([
             modules.updateTaggedItems();
             $previousCogLink.focus();
           });
+          $.flashMessage(I18n.t("Module item %{module_item_name} was successfully deleted.", {module_item_name: data.content_tag.title}));
         },
         cancelled: function () {
           $currentCogLink.focus();
