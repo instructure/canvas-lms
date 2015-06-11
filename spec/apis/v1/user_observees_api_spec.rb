@@ -232,7 +232,7 @@ describe UserObserveesController, type: :request do
         unique_id: external_student_pseudonym.unique_id,
         password: external_student_pseudonym.password,
       }
-      create_call({observee: observee}, domain_root_account: external_account, expected_status: 401)
+      create_call({observee: observee}, domain_root_account: external_account, expected_status: 422)
 
       expect(parent.reload.observed_users).to eq []
     end

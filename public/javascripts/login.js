@@ -20,7 +20,9 @@ define([
 
   $("#coenrollment_link").click(function(event) {
     event.preventDefault();
-    signupDialog('parentDialog', I18n.t("parent_signup", "Parent Signup"));
+    var template = $(this).data('template');
+    var path = $(this).data('path');
+    signupDialog(template, I18n.t("parent_signup", "Parent Signup"), path);
   });
   $("#register_link").click(function(){
     $.trackPageview("/clicked_register_on_login_form");

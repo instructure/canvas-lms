@@ -669,5 +669,14 @@ describe Pseudonym do
 
   end
 
+  it "allows duplicate unique_ids, in different providers" do
+    u = User.create!
+    aac = Account.default.account_authorization_configs.create!(auth_type: 'facebook')
+    u.pseudonyms.create!(unique_id: 'a', account: Account.default)
+    p2 = u.pseudonyms.new(unique_id: 'a', account: Account.default)
+    expect(p2).to_not be_valid
+    p2.authentication_provider = aac
+    expect(p2).to be_valid
+  end
 end
 

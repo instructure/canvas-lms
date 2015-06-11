@@ -194,6 +194,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
       @saml_hash['requested_authn_context'] = nil
       @saml_hash['login_attribute'] = 'nameid'
       @saml_hash['unknown_user_url'] = nil
+      @saml_hash['parent_registration'] = false
       expect(json).to eq @saml_hash
     end
 

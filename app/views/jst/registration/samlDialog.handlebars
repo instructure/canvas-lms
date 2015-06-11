@@ -1,0 +1,41 @@
+<div class="registration-dialog">
+    <form class="form-horizontal bootstrap-form" method="post" action="{{path}}">
+        <div class="control-group">
+            <label class="control-label" for="parent_name">{{#t}}Your Name{{/t}}</label>
+            <div class="controls">
+                <input type="text" id="parent_name" name="user[name]">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="parent_email">{{#t}}Your Email{{/t}}</label>
+            <div class="controls">
+                <input type="text" id="parent_email" name="pseudonym[unique_id]"><div id="parent_email_error" class='error_message'></div>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="parent_child_username">{{#t}}Child's Username{{/t}}</label>
+            <div class="controls">
+                <input type="text" id="parent_child_username" name="observee[unique_id]"><div id="parent_child_username_error" class='error_message'></div>
+            </div>
+        </div>
+        {{#if terms_required}}
+            <div class="control-group">
+                <div class="controls">
+                    <label class="checkbox">
+                        <input type="checkbox" name="user[terms_of_use]" value="1">
+                        {{{terms_html}}}
+                    </label>
+                </div>
+            </div>
+        {{/if}}
+        <div class="control-group">
+        <p>{{#t}}You will be redirected to a Login page where you will need to log in with your child's credentials.{{/t}}</p>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <input type="hidden" name="user[initial_enrollment_type]" value="observer">
+                <button class="btn btn-primary" type="submit">{{#t}}Start Participating{{/t}}</button>
+            </div>
+        </div>
+    </form>
+</div>

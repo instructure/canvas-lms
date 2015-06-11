@@ -97,13 +97,28 @@ body.files {
   .ef-folder-content{
     display: flex;
     flex-direction: column;
-    flex: 1 1 0;
-    padding: 0;
+    flex: 1 1 0%;
+    padding: 0px;
     @if $use_new_styles { border-right: 1px solid $ic-border-light; }
     @else { border-right: 1px solid $ic-border-color; }
+    overflow-x: auto;
 
     .tree {
-      margin: 10px
+      margin: 10px;
+
+      li {
+        a {
+        display: flex;
+
+        i {
+          flex: 0 0 auto;
+        }
+
+        span {
+          flex: 1 1 auto;
+        }
+        }
+      }
     }
 
     [aria-selected=true] > .ef-folder-header{

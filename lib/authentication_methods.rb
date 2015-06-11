@@ -314,4 +314,5 @@ module AuthenticationMethods
   def delegated_auth_redirect_uri(uri)
     uri
   end
+
 end

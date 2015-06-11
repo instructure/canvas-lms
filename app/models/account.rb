@@ -1484,4 +1484,17 @@ class Account < ActiveRecord::Base
       self.settings[:trusted_referers].split(',').include?(referer_with_port)
     end
   end
+
+  def parent_registration?
+    self.account_authorization_configs.exists?(parent_registration: true)
+  end
+
+  def parent_auth_type
+    return nil unless parent_registration?
+    parent_registration_aac.auth_type
+  end
+
+  def parent_registration_aac
+    account_authorization_configs.where(parent_registration: true).first
+  end
 end

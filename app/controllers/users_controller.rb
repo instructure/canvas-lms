@@ -153,7 +153,7 @@ class UsersController < ApplicationController
 
   before_filter :require_user, :only => [:grades, :merge, :kaltura_session,
     :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
-    :user_dashboard, :toggle_dashboard, :masquerade, :external_tool,
+    :user_dashboard, :toggle_recent_activity_dashboard, :masquerade, :external_tool,
     :dashboard_sidebar, :settings, :all_menu_courses]
   before_filter :require_registered_user, :only => [:delete_user_service,
     :create_user_service]
@@ -468,6 +468,7 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
+    session.delete(:parent_registration) if session[:parent_registration]
     check_incomplete_registration
     get_context
 
@@ -482,7 +483,10 @@ class UsersController < ApplicationController
 
     js_env({
       :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
-      :DASHBOARD_COURSES => map_courses_for_menu(@current_user.menu_courses)
+      :DASHBOARD_COURSES => map_courses_for_menu(@current_user.menu_courses),
+      :PREFERENCES => {
+        :recent_activity_dashboard => @current_user.preferences[:recent_activity_dashboard]
+      }
     })
 
     @announcements = AccountNotification.for_user_and_account(@current_user, @domain_root_account)
@@ -532,10 +536,11 @@ class UsersController < ApplicationController
     render :layout => false
   end
 
-  def toggle_dashboard
-    @current_user.preferences[:new_dashboard] = !@current_user.preferences[:new_dashboard]
+  def toggle_recent_activity_dashboard
+    @current_user.preferences[:recent_activity_dashboard] =
+      !@current_user.preferences[:recent_activity_dashboard]
     @current_user.save!
-    render :json => {}
+    render json: {}
   end
 
   include Api::V1::StreamItem
@@ -1246,9 +1251,7 @@ class UsersController < ApplicationController
 
     @invalid_observee_creds = nil
     if @user.initial_enrollment_type == 'observer'
-      # TODO: SAML/CAS support
-      if observee_pseudonym = Pseudonym.authenticate(params[:observee] || {},
-          [@domain_root_account.id] + @domain_root_account.trusted_account_ids)
+      if (observee_pseudonym = authenticate_observee)
         @observee = observee_pseudonym.user
       else
         @invalid_observee_creds = Pseudonym.new
@@ -1960,5 +1963,12 @@ class UsersController < ApplicationController
 
 
     Canvas::ICU.collate_by(data.values) { |e| e[:enrollment].user.sortable_name }
+  end
+
+  private
+
+  def authenticate_observee
+    Pseudonym.authenticate(params[:observee] || {},
+                           [@domain_root_account.id] + @domain_root_account.trusted_account_ids)
   end
 end

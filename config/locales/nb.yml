@@ -2,17 +2,8 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 nb: 
-  1_item_scores_1_2_2_3_5_5_3_39f6c397: "1 - Element poeng: 1, 2, 2, 3, 5, 5, 3"
-  1_item_scores_1_3_2_4_5_3_6_mastery_score_set_at_5_70ff296a: "1- Elementpoeng: 1, 3, 2, 4, 5, 3, 6. Masterpoeng satt til 5."
-  1_item_scores_3_2_2_4_1_3_4_e0de3073: "1 - Element poeng: 3, 2, 2, 4, 1, 3, 4"
-  1_item_scores_4_3_2_5_3e2933a0: "1 - Elementpoeng: 4, 3, 2, 5"
   1_item_scores_5512cd03: "1- Element poeng"
-  2_final_score_5_5_8418d475: "2- Sluttresultat: 5.5"
   2_final_score_7b0fd15e: "2- Sluttresultat"
-  2_highest_score_4_3b4bc250: "2 - Høyeste poengsum: 4"
-  2_most_recent_score_3_766dbf4e: "2 - Siste poengsum: 3"
-  2_the_rest_item_average_4_3_2_3_3_d05f04e2: "2 - \"Resten\" elementgjennomsnitt: (4 + 3 + 2) / 3 = 3"
-  3_calculated_mastery_score_5_0_75_3_0_25_4_5_c88c3a7b: "3 - Beregnet mestring poengsum: 5(0.75) + 3(0.25) = 4.5"
   451_message: 
     description: "Du er ikke autorisert til å få tilgang til denne siden fordi du befinner i et land underlagt U.S. handelsrestriksjoner."
     headings: 
@@ -126,23 +117,9 @@ nb:
     saml_eppn_domain_stripped: "%{eppn} (domene fjernet)"
   account_authorization_configs: 
     account_required: "må være LDAP-autentisert"
-    cas_fields: 
-      labels: 
-        auth_base: CAS-URL
-        unknown_user_url: "Ukjent Bruker URL"
-      unknown_user_url_description: "Nettadressen for å omdirigere til når en autentisert bruker finnes ikke i Canvas."
-    form_footer: 
-      labels: 
-        position: Posisjon
-      save_button: "Lagre innstillinger for autentisering"
-    form_header: 
-      auth_type_label: Type
-      auth_url: "Innloggings-URL for denne konfigurasjonen"
     index: 
       add_auth_desc: "Legg til en identitetsleverandør til denne kontoen:"
-      canvas_login_tip: "Om du konfigurer innstillinger slik at du ikke kan logge inn, kan du legge til *%{url1}* på slutten av din login-URL. Slik vil du kunne logge inn ved bruk av den vanlige Canvas innloggsprosedyren. For denne kontoen er URL-adressen %{url2}"
       choose_auth_type_option: "Velg en autentiseringstjeneste"
-      current_settings_title: "Gjeldende integrasjon"
       delete_auth_confirmation: "Er du sikker? Brukere kan muligens ikke logge inn om denne fjernes."
       delete_auth_link: "Fjern all autentisering"
       ip_address_list_description: "Hvis du benytter en autentiseringstjeneste som krever at Canvas-tjeneren kontakter din tjener direkte, f.eks. LDAP, må du forsikre deg om at din server tillater oppkobling fra disse IP-adressene:"
@@ -154,21 +131,7 @@ nb:
       test_ldap_link: "Test LDAP-autentisering"
     ldap_fields: 
       auth_filter_description: "Bruk *%{placeholder}* som variabel for brukernavnet som angis av brukeren. For eksempel: *(sAMAccountName=%{placeholder})*"
-      auth_password_description: "Ikke fyll ut for å fortsette å bruke gjeldende passord."
       identifer_format_description: "LDAP-attributtet som brukes til å sjekke Canvas-innloggingen. La den være blank for å bruke brukernavnet som angis av brukeren."
-      labels: 
-        auth_base: Grunnlag
-        auth_filter: Filtrer
-        auth_host: Vert
-        auth_over_tls: "Over TLS?"
-        auth_over_tls_false: "Ingen TLS"
-        auth_over_tls_simple_tls: "Enkel TLS"
-        auth_over_tls_start_tls: "Start TLS"
-        auth_password: Passord
-        auth_port: Port
-        auth_username: Brukernavn
-        identifier_format: ID-innloggingsattributt
-      last_ldap_timeout_failure: "Siste tidsavbruddsfeil"
     ldap_settings_test: 
       labels: 
         pass: Passord
@@ -199,17 +162,6 @@ nb:
     login_required: "må oppgis"
     no_changing_auth_types: "Kan ikke endre type autorisasjonskonfigurering, vennligst slett og lag en ny konfigurasjon."
     password_required: "må oppgis"
-    saml_fields: 
-      labels: 
-        certificate_fingerprint: "Sertifikatets \"fingeravtrykk\""
-        identifier_format: Identifikasjonsformat
-        idp_entity_id: "IdP Entity ID"
-        log_in_url: Påloggings-URL
-        log_out_url: Avloggings-URL
-        login_attribute: Innloggingsattributt
-        requested_authn_context: Autentiseringssammenheng
-        unknown_user_url: "Ukjent Bruker URL"
-      unknown_user_url_description: "Nettadressen for å omdirigere til når en autentisert bruker finnes ikke i Canvas."
     saml_required: "En SAML-konfigurering kreves for å teste SAML"
     saml_settings_test: 
       refresh_debugging: Oppdater
@@ -248,11 +200,6 @@ nb:
       logout_response_from_idp: "LogoutResponse fra IdP"
     sso_settings_form: 
       change_password_url_help: "La stå tomt for standard Canvas-oppførsel"
-      discovery_url_description: "Om en oppdagelse URL er satt, vil Canvas videresende alle brukere til den URL-adressen når de må autentiseres. Den siden skal hjelpe brukeren finne ut hvor de trenger å gå for å logge inn. Om ingen oppdagelse URL er konfigurert, blir den første konfigurasjonen brukt til å forsøke å autentisere brukeren."
-      labels: 
-        auth_discovery_url: Oppdagelse-URL
-        change_password_url: "URL for glemt passord"
-        login_handle_name: "Logg inn Etikett"
       login_handle_name_description: "Etiketten som brukes for unike innloggingsidentifikatorer. Eksempler: Innlogging, Brukernavn, Student ID, osv."
   account_navigation_80bbefd4: Kontonavigering
   account_notification: 
@@ -2482,7 +2429,6 @@ nb:
         warning: Advarsel
     edit_appointment_group: 
       affect_reservations: "Hvordan vil dette påvirke reservasjoner?"
-      appointments_per_participant_label: "Maksimalt antall avtaler en deltaker kan delta"
       appt_group_options_help1: "Noen eksisterende reservasjoner er over grensen du la inn. Disse vil ikke bli påvirket; endringen hindrer bare at nye reservasjoner kan bli gjort."
       appt_group_options_help2: "Du kan imidlertid fjerne eksisterende reservasjoner manuelt."
       calendar: Kalender
@@ -2492,8 +2438,6 @@ nb:
       group_signup: "Få studenter til å melde seg på gruppevis."
       location: Sted
       name: Navn
-      participants_per_appointment_label: "Maks brukere/grupper pr avtale"
-      slot_duration_label: "Minutter pr spor"
       time_range: Tidintervall
     edit_appt_calendar_event: 
       description: "Beskrivelse:"
@@ -2735,7 +2679,6 @@ nb:
   canvas_ticketing_email_connector_27e253ae: "Canvas ticketing e-posttilkobler"
   canvas_ticketing_web_post_connector_11158897: "Canvac ticketing webpost-tilkobler"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas vil sette karakter på nytt i alle dine innleveringer etter at du lagrer prøven, dette kan ta noen minutter."
-  cas_d6e9601d: CAS
   cc: 
     by: "CC Navngivelse BY"
     by_nc: "CC Attribution Ikke-Kommersiell"
@@ -2753,7 +2696,6 @@ nb:
   choose_a_course_home_page_8059c7b: "Velg en startside for kurset"
   choose_a_csv_file_to_upload_9644480c: "Velg en CSV-fil å laste opp:"
   choose_usage_rights_33683854: "Velg bruksrettigheter..."
-  clear_file_name_text_field_fce73840: "Klar filnavnet tekstfeltet"
   click_for_more_details_on_this_outcome_8c018d2f: "klikk for flere opplysninger om dette utfallet"
   click_here_on_the_calendar_link_c9965631: "Klikk her på *Kalender* lenken"
   click_to_modify_89fa26aa: "Klikk for å modifisere"
@@ -6341,7 +6283,6 @@ nb:
     student_mute_notification: "Læreren arbeider med karakterene"
     titles: 
       click_to_record: "Tale til tekst"
-      dropped_assignment_no_total: "Denne oppgaven vurderes ikke som en del av helheten"
       hypothetical_score: "Dette er et hva-hvis-resultat"
     turnitin: 
       error_message: "Det ble en feil ved overføring til Turnitin. Prøv å sende inn filen på nytt før du kontakter brukerstøtte"
@@ -7360,8 +7301,6 @@ nb:
   incremental_update_successfully_generated_against__db3f3f06: "Trinnvis oppdatering generert mot en forrige SIS-import."
   indigo_2035fc55: Indigo
   info: 
-    notices: 
-      error_reported: "Takk for hjelpen! Vi skal komme i gang med dette så fort som mulig"
     old_styleguide: 
       create_collection: "Opprett en samling"
       start_a_group: "Start en gruppe"
@@ -7527,7 +7466,6 @@ nb:
   labels: 
     lock_module_until: "Lås modulen inntil en gitt dato"
   last_item_79583712: "Siste Element:"
-  last_item_is_75_of_mastery_average_of_the_rest_is__614d41f4: "Siste element er 75% av mestring. Gjennomsnittet av \"resten\" er 25% av mestring."
   last_user_access_title: "Forrige brukertilgang"
   late_percent_b91d01b3: "Sent: %{percent}"
   latest_assessment_a85280ef: "Siste Vurdering"
@@ -7565,7 +7503,6 @@ nb:
       log_in_to_canvas: "Logg inn på Canvas"
     styleguide: 
       default_page_title: "Canvas læringsplattform"
-  ldap_e1e0a916: LDAP
   learning_mastery_gradebook_description: |-
       Karakterbok for mestringsbaserte læring gir lærerne en rask måte å vise studentenes og kursets
       fremdrift i forhold til på kursets læringsmål. Læringsmålene presenteres i et karakterboklignende
@@ -7685,7 +7622,6 @@ nb:
     errors: 
       4xx_feedback: "Klikk her for å fortelle oss hva du ser etter."
       feedback: "Klikk her for å fortelle oss hva som skjedde"
-    help: Hjelp
     show_me_where: "Vis meg hvor"
   links_14b70841: Lenker
   loading_25990131: Laster…
@@ -9721,7 +9657,6 @@ nb:
   moodle_formula_warning_title: "Mulige svar må lages på nytt for Formel-spørsmål"
   more_courses_5ebbe998: "Flere kurs"
   most_recent_score_13a87e8c: "Siste Poeng"
-  most_recent_score_counts_as_75_of_mastery_weight_a_f1e3e6c2: "Fleste poeng teller som 75% av mestring vekt, gjennomsnitt av alle andre poeng teller som 25% av vekt."
   move_abf00365: Flytt
   move_dialog: 
     cancel: Avbryt
@@ -9734,8 +9669,6 @@ nb:
   move_outcome_group_cfa1a505: "Flytt Utfall Gruppe"
   moving_a4d552df: Flytting...
   multi_factor_authentication_configured_865b1bde: "Flerfaktors autentisering konfigurert"
-  must_achieve_mastery_at_least_2_times_must_also_co_b2ae7688: "Må oppnå mester-karakter minst 2 ganger. Må også fullføre 2 elementer for beregning. Poengsummer over mestering vil bli snittet for å beregne sluttkarakter."
-  must_achieve_mastery_at_least_2_times_scores_above_57077a88: "Må oppnå mestring minst 2 ganger. Poeng over mestring vil bli i gjennomsnitt å beregne sluttresultatet."
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "Må oppgi 'file_ids' and/or 'folder_ids' parameter"
   mute_dialog: 
     curving_assignments: "Korrigerer oppgaver"
@@ -10188,7 +10121,6 @@ nb:
     missing_outcome: "Kunne ikke finne læringsmålet"
     new_outcome_group: "Ny resultatgruppe"
     outcome: 
-      example: "Eksempel:"
       links: 
         delete_outcome: "Slett resultat"
         edit_outcome: "Rediger resultat"
@@ -10207,7 +10139,6 @@ nb:
       criterion_info_link: "Klikk for å lære om kriterievurderinger"
       description: "Beskriv dette resultatet"
       display_name: "Kallenavn (valgfritt)"
-      example: "Eksempel:"
       mastery: "Mestring ved "
       points: "%{points_possible} points"
       title: "Gi navn til dette resultatet"
@@ -10556,21 +10487,8 @@ nb:
       ui_conf_ids: "Kunder hos Kaltura kan be om å få oppgitt disse id'ene. De som har egne installasjoner av Kaltura vil finne disse verdiene i ui_confs tabellen."
     linked_in: 
       description: LinkedIn-integrering
-      name: LinkedIn
     linked_in_settings: 
-      description: |-
-          Du må registrere en [new app on LinkedIn](%{linkedin_url}).
-          Sett følgende konfigurasjonsvalg for å sikre at din LinkedIn integrasjon
-          fungerer korrekt:
-          
-          * **Application Type:** set to "Web Application"
-          * **Live Status:** set to "Live"
-          * **OAuth Redirect URL:** set to %{oauth_url}
-          * After you save your app, make a note of the API Key and Secret Key
       domain_name: domene
-      labels: 
-        api_key: API-nøkkel
-        secret_key: "Hemmelig nøkkel"
     live_events: 
       description: "Tjeneste for hendelser i sanntid."
       name: "Live hendelser"
@@ -10643,21 +10561,6 @@ nb:
         type: "Ticketing systemtype"
     twitter: 
       description: Twitter-varslinger
-      name: Twitter
-    twitter_settings: 
-      description: |-
-          Du må etablere en [ny app på Twitter](%{twitter_url}).
-          Still inn følgende konfigurasjonsvalg for å sikre at din Twitter app
-          fungerer korrekt:
-          
-          * **Application Type:** sett til "Browser"
-          * **Callback URL:** sett til %{callback_url}
-          * **Default Access type:** sett til "Read, Write & Private Message"
-          * Etter at du har lagret din app, noter deg Consumer key og Consumer secret
-      domain_name: domene
-      labels: 
-        api_key: "Consumer Key"
-        secret_key: "Consumer Secret"
     webct_scraper_settings: 
       description: |-
           Dersom institusjonen ikke bruker WebCTs "Læringsmoduler" (inkludert institusjoner som adopterte WebCT 
@@ -11875,7 +11778,6 @@ nb:
         extended_quiz_time_explanation: "Du kan gi denne studenten mer tid på nåværende prøveforsøk. Hvor mye tid vil du gi ham/henne?"
         extra_time_on_every_attempt: "Ekstra tid på hvert forsøk:"
         finished_in: "fullført på %{duration}"
-        global_extra_attempt_time: "alle allerede får %{count} minutt"
         global_extra_attempts: "alle allerede får %{n}"
         headers: 
           attempt: Forsøk
@@ -12551,8 +12453,6 @@ nb:
         description: Avpubliser
     options_2: 
       description: "Planlegg student tilgjengelighet"
-    title: 
-      default_title: Dialogen
   resume_quiz_afeceb87: "Fortsett prøve"
   resume_survey_58dce775: "Fortsett undersøkelse"
   retrieve_timeout: "could not retrieve configuration, the server response timed out"
@@ -12758,7 +12658,6 @@ nb:
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce har en annen innloggingsvert for sandkassekontoer enn den har for produksjonskontoer, så hvis du bruker en Salesforce sandkassekonto og du ikke haker av dette feltet, vil det ikke være i stand til å godkjenne (og dette fungerer omvendt også, hvis du har en produksjonskonto og du krysser av denne boksen, vil det ikke godkjenne)"
   salesforce_ticketing_webtocase_connector_80f75716: "Salesforce Ticketing WebToCase Connector"
   same_value_as_canvas_url__c_will_probably_be_going_37027686: "Samme verdi som 'Canvas_URL__c', vil kanskje gå vekk snart"
-  saml_57e53f77: SAML
   sample_data_e4fd01ff: Prøve-data
   save_11a80ec3: Lagre
   saving_d55dd90e: Lagrer…
@@ -12834,7 +12733,6 @@ nb:
       learning_mastery: "Mestringsbasert læring"
     settings: 
       assignment_toggles_and_actions: 
-        download_scores: "Last ned resultater (.csv)"
         grading_history: "Se på karakterhistorikk"
         hide_student_names_label: "Skjul studentnavn"
         include_ungraded_assignments: "Behandle ikke karaktersatt som 0"
@@ -13029,8 +12927,6 @@ nb:
     new: 
       titles: 
         course_enrollment: "Meld deg på %{course}"
-    notices: 
-      login_required: "Logg inn for å bli med i dette kurset."
     successfully_enrolled: 
       already_enrolled: "Du har en vellykket registrering i **%{course}**."
       buttons: 
@@ -13355,10 +13251,6 @@ nb:
       needs_grading_count: 
         one: "1 må rettes"
         other: "%{count} må rettes"
-    menu_enrollment: 
-      labels: 
-        enrolled_as: "Påmeldt som"
-        invited_as: "Invitert som"
     message_students: 
       buttons: 
         send_message: "Send melding"
@@ -14558,8 +14450,6 @@ nb:
   usage_rights_have_been_set_d1b433c7: "Bruksrettigheter har blitt satt."
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Bruksretten vil bli satt for alle filene som er inneholdt i:"
   use_a_single_16x16_32x32_48x48_ico_file_60bc8d91: "Bruk en *single 16x16, 32x32, 48x48 ico file*."
-  use_the_highest_score_eb29329d: "Bruk den høyeste poengsum"
-  use_the_most_recent_score_9ae3742c: "Bruke den nyeste poengsum"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Bruk det nye test-LTI-verktøyet i stedet for vanlige canvas-prøver"
   used_by_permission_314a78dd: "Brukt med tillatelse"
   user: 

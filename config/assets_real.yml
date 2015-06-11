@@ -16,6 +16,8 @@ compress_assets: off
 
 
 stylesheets:
+  saml_fields:
+    - public/stylesheets/compiled/bundles/saml_fields.css
   course_wizard:
     - public/stylesheets/compiled/bundles/course_wizard.css
   react_files:
@@ -158,6 +160,8 @@ stylesheets:
     - public/stylesheets/compiled/bundles/all_courses.css
   external_tool_full_width:
     - public/stylesheets/compiled/bundles/external_tool_full_width.css
+  dashboard_card:
+    - public/stylesheets/compiled/bundles/dashboard_card.css
   terms:
     - public/stylesheets/compiled/bundles/terms.css
   wiki_page:

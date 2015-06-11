@@ -2,17 +2,8 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 tr: 
-  1_item_scores_1_2_2_3_5_5_3_39f6c397: "1 - Öğe puanları: 1, 2, 2, 3, 5, 5, 3"
-  1_item_scores_1_3_2_4_5_3_6_mastery_score_set_at_5_70ff296a: "1- Öğe Puanları: 1, 3, 2, 4, 5, 3, 6. Yeterlilik puanı 5'e ayarlı."
-  1_item_scores_3_2_2_4_1_3_4_e0de3073: "1 - Öğe puanları: 3, 2, 2, 4, 1, 3, 4"
-  1_item_scores_4_3_2_5_3e2933a0: "1 - Öğe puanları: 4, 3, 2, 5"
   1_item_scores_5512cd03: "1- Öğe puanları"
-  2_final_score_5_5_8418d475: "2- Final puanı: 5.5"
   2_final_score_7b0fd15e: "2- Final puanı"
-  2_highest_score_4_3b4bc250: "2 - En yüksek puan: 4"
-  2_most_recent_score_3_766dbf4e: "2 - En güncel puan: 3"
-  2_the_rest_item_average_4_3_2_3_3_d05f04e2: "2 - 'Geri kalan' öğe ortalaması: (4 + 3 + 2) / 3 = 3"
-  3_calculated_mastery_score_5_0_75_3_0_25_4_5_c88c3a7b: "3 - Hesaplanmış yeterlik puanı: 5(0.75) + 3(0.25) = 4.5"
   451_message: 
     description: "Birleşik Devletler ticari sınırlılıkları uygulanan bir ülkede bulunduğunuz için bu siteye erişme yetkiniz yok."
     headings: 
@@ -121,22 +112,9 @@ tr:
     saml_eppn_domain_stripped: "%{eppn} (ayrılmış etki alanı)"
   account_authorization_configs: 
     account_required: "LDAP kimlik doğrulaması olmalıdır"
-    cas_fields: 
-      labels: 
-        auth_base: "CAS URL"
-        unknown_user_url: "Bilinmeyen Kullanıcı URL'si"
-      unknown_user_url_description: "Canvas'ta bulunamayan yetkilendirilmiş bir kullanıcı olması durumunda yönlendirilecek url."
-    form_footer: 
-      labels: 
-        position: Pozisyon
-      save_button: "Kimlik Doğrulama Ayarlarını Kaydet"
-    form_header: 
-      auth_type_label: Tür
-      auth_url: "Bu ayar için oturum açma bağlantısı"
     index: 
       add_auth_desc: "Bu hesaba bir kimlik sağlayıcı ekleyin:"
       choose_auth_type_option: "Kimlik doğrulama hizmeti seç"
-      current_settings_title: "Geçerli Entegrasyon"
       delete_auth_confirmation: "Bu kaldırılırsa, kullanıcıların oturum açmaları mümkün olmayabilir. Emin misiniz?"
       ip_address_list_description: "Eğer LDAP gibi, doğrudan sunucuya bağlantı gerektiren bir kimlik doğrulama hizmetini kullanıyorsanız, sunucunun bu IP adreslerinden gelen bağlantıları kabul edebildiğinden emin olmanız gerekir:"
       no_auth_type_description: "Bu hesap, şu anda bir kimlik sağlayıcı ile entegre değildir."
@@ -146,21 +124,7 @@ tr:
       settings_title: "Kimlik Doğrulama Ayarları"
     ldap_fields: 
       auth_filter_description: "*%{placeholder}*'ı kullanıcı tarafından sağlanan kullanıcı adı için yer tutucu olarak kullan. Örneğin: *(sAMAccountName=%{placeholder})*"
-      auth_password_description: "Geçerli şifrenin kullanılması için boş bırakın."
       identifer_format_description: "Bu LDAP seçeneği, kullanıcının Canvasta oturum açması için kullanılır. Kullanıcı tarafından sağlanan kullanıcı adını kullanmak için boş bırakılmalıdır."
-      labels: 
-        auth_base: Temel
-        auth_filter: Filtrele
-        auth_host: Host
-        auth_over_tls: "TLS Üzerinden?"
-        auth_over_tls_false: "TLS Yok"
-        auth_over_tls_simple_tls: "Basit TLS"
-        auth_over_tls_start_tls: "TLS'yi Başlat"
-        auth_password: Şifre
-        auth_port: Port
-        auth_username: "Kullanıcı Adı"
-        identifier_format: "Oturum Açma ID'si Özelliği"
-      last_ldap_timeout_failure: "Son zaman aşımı hatası"
     ldap_settings_test: 
       labels: 
         pass: Şifre
@@ -191,17 +155,6 @@ tr:
     login_required: sağlanmalıdır
     no_changing_auth_types: "İzin verme yapılandırma türü değiştirilemiyor, lütfen silip yeni yapılandırma oluşturun."
     password_required: sağlanmalıdır
-    saml_fields: 
-      labels: 
-        certificate_fingerprint: "Sertifika Parmakizi"
-        identifier_format: "Tanımlayıcı Biçimi"
-        idp_entity_id: "IdP Entity ID"
-        log_in_url: "Hesap Oluşturma URL'si"
-        log_out_url: "Oturum Kapatma URL'si"
-        login_attribute: "Oturum Açma Özelliği"
-        requested_authn_context: "Kimlik Doğrulama Bağlamı"
-        unknown_user_url: "Bilinmeyen Kullanıcı URL'si"
-      unknown_user_url_description: "Canvas'ta bulunamayan yetkilendirilmiş bir kullanıcı olması durumunda yönlendirilecek url."
     saml_required: "SAML konfigürasyonunu test etmek için, SAML gereklidir"
     saml_settings_test: 
       refresh_debugging: Yenile
@@ -239,9 +192,6 @@ tr:
       logout_response_from_idp: "IdP'den LogoutResponse"
     sso_settings_form: 
       change_password_url_help: "Varsayılan Canvas davranışı için boş bırakın"
-      labels: 
-        change_password_url: "Parola Hatırlatma URL'si"
-        login_handle_name: "Oturum Açma Etiketi"
       login_handle_name_description: "Özel oturum açma tanımlamaları için kullanılan etiket. Örneğin: Oturum Açma, Kullanıcı Adı, Öğrenci ID, vs."
   account_notification: 
     errors: 
@@ -2446,7 +2396,6 @@ tr:
         warning: Uyarı
     edit_appointment_group: 
       affect_reservations: "Bu durum rezervasyonları nasıl etkileyecek?"
-      appointments_per_participant_label: "Bir katılımcının katılabileceği en fazla randevu sayısı"
       appt_group_options_help1: "Bazı varolan rezervasyonlar belirlemiş olduğunuz limitin üzerindedir. Bu durum etkilemeyecektir, değişikliğiniz sadece yeni rezervasyonlar üzerinde uygulanacaktır."
       appt_group_options_help2: "Ancak, elle herhangi bir mevcut rezervasyonları kaldırabilirsiniz."
       calendar: Takvim
@@ -2456,8 +2405,6 @@ tr:
       group_signup: "Gruplarda kayıtlı kullanıcılar var."
       location: Konum
       name: Ad
-      participants_per_appointment_label: "Randevu başına maksimum kullanıcı/grup"
-      slot_duration_label: "Aralık başına dakika sayısı"
       time_range: "Zaman Genişliği"
     edit_appt_calendar_event: 
       description: "Açıklama:"
@@ -2704,7 +2651,6 @@ tr:
   choose_a_course_home_page_8059c7b: "Bir Ders Ana Sayfası Seçin"
   choose_a_csv_file_to_upload_9644480c: "Yüklencek bir CSV dosyası seçin:"
   choose_usage_rights_33683854: "Kullanıcı haklarını seçin..."
-  clear_file_name_text_field_fce73840: "Dosya adı metin alanını temizle"
   click_here_on_the_calendar_link_c9965631: "*Takvim* bağlantısı üzerinde buraya tıklayın"
   click_to_modify_89fa26aa: "Değişiklik yapmak için tıklayın"
   click_to_report_profile_picture_370f9625: "Profil resmini raport etmek için tıklayın"
@@ -6220,7 +6166,6 @@ tr:
     student_mute_notification: "Öğretim elemanı notlar üzerinde çalışıyor"
     titles: 
       click_to_record: "Konuşmayı metne"
-      dropped_assignment_no_total: "Bu ödev toplam hesaplamada dikkate alınmayacaktır"
       hypothetical_score: "Bu bir ... olsaydı Ne Olurdu? puanı"
     turnitin: 
       error_message: "Turnitin'e göndermede hata oluştu. Destek birimi ile görüşmeden önce lütfen tekrar göndermeyi deneyin"
@@ -7225,8 +7170,6 @@ tr:
   incorrect_username_and_or_password_2de73abb: "Yanlış kullanıcı adı ve/veya şifre"
   incremental_update_successfully_generated_against__db3f3f06: "Önceki ÖBS içeri aktarımına karşın artış içeren güncelleme başarıyla oluşturuldu."
   info: 
-    notices: 
-      error_reported: "Yardımınız için teşekkürler! Bunu düzelteceğiz"
     old_styleguide: 
       create_collection: "Bir koleksiyon yarat"
       start_a_group: "Grup başlat"
@@ -7384,7 +7327,6 @@ tr:
   labels: 
     lock_module_until: "Belirli bir tarihe kadar modülü kilitle"
   last_item_79583712: "Son Öğe:"
-  last_item_is_75_of_mastery_average_of_the_rest_is__614d41f4: "Son öğe yeterliğin 75% o. 'geri kalanın' ortalaması yeterliğin 25% o"
   last_user_access_title: "Son Kullanıcı Erişimi"
   late_percent_b91d01b3: "Geç : %{percent}"
   latest_assessment_a85280ef: "En son Değerlendirme"
@@ -7422,7 +7364,6 @@ tr:
       log_in_to_canvas: "Canvas'ta Oturum Aç"
     styleguide: 
       default_page_title: "Canvas LMS"
-  ldap_e1e0a916: LDAP
   learning_mastery_gradebook_description: |-
       Öğrenme Yeterliliği Not Defteri öğretmenlerin dersin öğrenme çıktılarına göre öğrencileri ve 
       ders 
@@ -7541,7 +7482,6 @@ tr:
     errors: 
       4xx_feedback: "Ne aradığınızı bize bildirmek için buraya tıklayın"
       feedback: "Ne olduğunu bize bildirmek için buraya tıklayın"
-    help: Yardım
     show_me_where: "Nerede Olduğunu Göster"
   links_14b70841: Bağlantılar
   loading_25990131: Yükleniyor...
@@ -9568,7 +9508,6 @@ tr:
   moodle_formula_warning_title: "Formül sorusu için olası cevaplar yeniden oluşturulmalı"
   more_courses_5ebbe998: "Daha Fazla Dersler"
   most_recent_score_13a87e8c: "En Güncel Puan"
-  most_recent_score_counts_as_75_of_mastery_weight_a_f1e3e6c2: "En güncel puan yeterlik ağırlığının 75% olarak sayılır, diğer bütün puanların ortalaması ise ağırlığın 25% olarak sayılır."
   move_abf00365: Taşı
   move_dialog: 
     cancel: İptal
@@ -9581,8 +9520,6 @@ tr:
   move_outcome_group_cfa1a505: "Öğrenme Çıktı Grubunu Taşı"
   moving_a4d552df: Taşınıyor...
   multi_factor_authentication_configured_865b1bde: "Çoklu kimlik doğrulama yapılandırıldı"
-  must_achieve_mastery_at_least_2_times_must_also_co_b2ae7688: "Yeterlik en az 2 kere sağlanmış olmalı. Hesaplama çin ayrıca 2 öğe tamamlanmalı. Final puanını hesaplamak için yeterliğin üzerindeki puanların ortalaması alınacak."
-  must_achieve_mastery_at_least_2_times_scores_above_57077a88: "Yeterlik en az 2 kere sağlanmış olmalı. Final puanını hesaplamak için yeterliğin üzerindeki puanların ortalaması alınacak."
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "'file_ids' and/or 'folder_ids' parametresi sağlanmalı"
   mute_dialog: 
     curving_assignments: "Ödevlere çan eğrisi uygulama"
@@ -10018,7 +9955,6 @@ tr:
     missing_outcome: "Bu öğrenme çıktısı bulunamadı"
     new_outcome_group: "Yeni Öğrenme Çıktısı Grubu"
     outcome: 
-      example: "Örnek:"
       links: 
         delete_outcome: "Öğrenme Çıktısını Sil"
         edit_outcome: "Öğrenme Çıktısını Düzenle"
@@ -10037,7 +9973,6 @@ tr:
       criterion_info_link: "Kriter oranları hakkında bilgi almak için tıklayın"
       description: "Öğrenme çıktısını açıklayın"
       display_name: "Takma ad (opsiyonel)"
-      example: "Örnek:"
       mastery: "Yeterlilik düzeyi"
       points: "%{points_possible} Puan"
       title: "Bu öğrenme çıktısına isim verin"
@@ -10372,21 +10307,8 @@ tr:
       ui_conf_ids: "Kaltura'da hesabı olan müşterile için, Kaltura'dan size bu id'leri vermesini isteyebilirsiniz. Kendi kaltura sunucusu olanlar bu değerleri ui_confs tablosunda bulabilirler."
     linked_in: 
       description: "LinkedIn entegrasyonu"
-      name: LinkedIn
     linked_in_settings: 
-      description: |-
-          [LinkedIn de yeni uygulama](%{linkedin_url}) kaydolmalısınız.
-          LinkedIn entegrasyonuzun doğru çalışması için aşağıdaki yapılandırma 
-          seçeneklerini ayarlayın:
-          
-          * **Uygulama Türü:** "Web Application" olarak ayarlayın
-          * **Live Status:** "Live" olarak ayarlayın
-          * **OAuth Redirect URL:** %{oauth_url} e ayarlayın
-          * Uygulamanızı kaydettikten sonra, API Key ve Secret Key'i not alın
       domain_name: "alan adı"
-      labels: 
-        api_key: "API Key"
-        secret_key: "Secret Key"
     lockdown_browser: 
       labels: 
         download_url: "LockDown Tarayıcı İndirme Bağlantısı"
@@ -10443,21 +10365,6 @@ tr:
         queue_for_parallel_jobs: "Paralel görevleri için kullanılmak üzere iş kuyruğu (varsayılan değer boş)"
     twitter: 
       description: "Twitter bildirimleri"
-      name: Twitter
-    twitter_settings: 
-      description: |-
-          Bir [Twitter'da yeni uygulama](%{twitter_url}) oluşturmanız gerek.
-          Twitter uygulamanızın doğru çalşıtığından emin olmak için aşağıdaki
-          yapılandırma seçeneklerini ayarlayın:
-          
-          * **Uygulama Türü:**"Tarayıcı" olarak ayarlayın
-          * **Callback URL:**%{callback_url} olarak ayarlayın
-          * **Varsayılan Erişim türü:**"Okuma, Yazma + Özel Mesaj" olarak ayarlayın
-          * Uygulamanızı kaydettikten sonra Consumer key ve Consumer secret'i bir yere kaydedin
-      domain_name: "alan adı"
-      labels: 
-        api_key: "Kullanıcı Anahtarı"
-        secret_key: "Consumer Secret"
     webct_scraper_settings: 
       description: |-
           Eğer kurum WebCT'nin "Öğrenme Modülleri"ni kullanmıyorsa (WebCT'yi modüllerin kullanılmadığı
@@ -11681,7 +11588,6 @@ tr:
         extended_quiz_time_explanation: "Bu kısa sınav için öğrencilere mevcut hakları üzerinden ek süre verebilirsiniz. Ne kadar ek süre vermek istersiniz?"
         extra_time_on_every_attempt: "Her teşebbüste fazladan süre:"
         finished_in: "%{duration} sürede tamamlandı"
-        global_extra_attempt_time: "herkese zaten %{count} dakika verildi"
         global_extra_attempts: "herkese zaten %{n} verildi"
         headers: 
           attempt: Hak
@@ -12352,8 +12258,6 @@ tr:
         description: "Yayından kaldır"
     options_2: 
       description: "Öğrenci uygunluğunu ayarla"
-    title: 
-      default_title: Diyalog
   resume_quiz_afeceb87: "Kısa Sınava Devam Et"
   resume_survey_58dce775: "Ankete Devam Et"
   retrieve_timeout: "ayarlar alınamıyor, sunucu cevabı zaman aşımına uğradı"
@@ -12629,7 +12533,6 @@ tr:
       learning_mastery: "Öğrenme Yeterliği"
     settings: 
       assignment_toggles_and_actions: 
-        download_scores: "Notları İndir (.csv)"
         grading_history: "Notlandırma Geçmişini Göster"
         hide_student_names_label: "Öğrenci İsimlerini Gösterme"
         include_ungraded_assignments: "Notlandırılmamışları 0 olarak kabul et"
@@ -12820,8 +12723,6 @@ tr:
     new: 
       titles: 
         course_enrollment: "%{course}'a Kayıt Ol"
-    notices: 
-      login_required: "Bu derse katılmak için lütfen oturum açın."
     successfully_enrolled: 
       already_enrolled: "**%{course}** dersine başarıyla kayıt oldunuz."
       buttons: 
@@ -13131,10 +13032,6 @@ tr:
       needs_grading_count: 
         one: "1 ödevin notlandırılması gerek"
         other: "%{count} ödevin notlandırılması gerek"
-    menu_enrollment: 
-      labels: 
-        enrolled_as: "Şu rolde kayıt olundu"
-        invited_as: "Olarak davet et"
     message_students: 
       buttons: 
         send_message: "Mesaj Gönder"
@@ -14299,8 +14196,6 @@ tr:
   usage_rights_have_been_set_d1b433c7: "Kullanım hakları belirlendi."
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Şuradaki dosyaların tamamı için kullanım hakları ayarlanacak:"
   use_a_single_16x16_32x32_48x48_ico_file_60bc8d91: "*Tek bir 16x16, 32x32, 48x48 ico dosyası* kullanın"
-  use_the_highest_score_eb29329d: "En yüksek puanı kullan"
-  use_the_most_recent_score_9ae3742c: "En güncel puanı kullan"
   used_by_permission_314a78dd: "İzinli Kullanıldı"
   user: 
     default_user_name: Kullanıcı

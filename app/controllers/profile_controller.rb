@@ -439,6 +439,12 @@ class ProfileController < ApplicationController
   private :require_user_for_private_profile
 
   def observees
+    if session[:parent_registration] && session[:parent_registration][:logged_out]
+      session.delete(:parent_registration)
+    end
+    if @domain_root_account.parent_registration?
+      js_env(AUTH_TYPE: @domain_root_account.parent_auth_type)
+    end
     @user ||= @current_user
     @active_tab = 'observees'
     @context = @user.profile if @user == @current_user
