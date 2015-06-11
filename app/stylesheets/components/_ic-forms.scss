@@ -39,25 +39,20 @@ Also works with ``.ic-Input-group`` (see more about ``.ic-Input-group`` below)
 ```html
 <div class="ic-Form-control">
   <label for="demo-text-input-5" class="ic-Label">Enter 2 friends' email addresses</label>
-  
   <div class="ic-Multi-input">
-    
     <div class="ic-Input-group">
       <div class="ic-Input-group__add-on" role="presentation" aria-hidden="true" tabindex="-1">
         <i class="icon-email"></i>
       </div>
       <input id="demo-text-input-5" class="ic-Input" placeholder="e.g., joe@site.com" type="email">
     </div>
-    
     <span>and</span>
-    
     <div class="ic-Input-group">
       <div class="ic-Input-group__add-on" role="presentation" aria-hidden="true" tabindex="-1">
         <i class="icon-email"></i>
       </div>
       <input id="demo-text-input-6" class="ic-Input" placeholder="e.g., joe@site.com" type="email">
     </div>
-  
   </div>
 
 </div>
@@ -174,6 +169,68 @@ For these to work properly, make sure the ``for`` attribute of the ``label`` mat
 </div>
 ```
 
+## Super Toggle checkbox
+
+- Regular old checkboxes that look and feel like toggle switches
+- No javascript is required for the Super Toggle component.
+- **However, including all the right markup is important for it to function properly.**
+- The id of the checkbox input must match the "for" attribute of the label, for example.
+- This component was designed to be as accessible as a regular checkbox.
+- Supports both *:focus* and *disabled* states. Once in focus, it can be toggled via the keyboard by pressing SPACE.
+- Icons can be switched out, as you see fit. Or just use the icons in the examples below: You can use icon font characters OR simple inline SVGs!
+
+### Super Toggle type 1: **.ic-Super-toggle--on-off**
+
+The ON state is indicated by a checkmark; OFF is indicated by an X. Ideal for turning features on and off, in place of a regular checkbox.
+
+```html
+<div class="ic-Form-control">
+
+  <!-- start super toggle -->
+  <label class="ic-Super-toggle--on-off" for="super-toggle-demo1">
+    <div class="ic-Label">Enable flux capacitor</div>
+    <input type="checkbox" id="super-toggle-demo1" class="ic-Super-toggle__input">
+    <div class="ic-Super-toggle__container" aria-hidden="true" data-checked="On" data-unchecked="Off">
+      <div class="ic-Super-toggle__switch">
+        <div class="ic-Super-toggle__option--LEFT">
+          <svg class="ic-Super-toggle__svg" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" width="548.9" height="548.9" viewBox="0 0 548.9 548.9" xml:space="preserve"><polygon points="449.3 48 195.5 301.8 99.5 205.9 0 305.4 95.9 401.4 195.5 500.9 295 401.4 548.9 147.5 "/></svg>
+        </div>
+        <div class="ic-Super-toggle__option--RIGHT">
+          <svg class="ic-Super-toggle__svg" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" viewBox="0 0 28 28" xml:space="preserve"><polygon points="28 22.4 19.6 14 28 5.6 22.4 0 14 8.4 5.6 0 0 5.6 8.4 14 0 22.4 5.6 28 14 19.6 22.4 28 " fill="#030104"/></svg>
+        </div>
+      </div>
+    </div>
+  </label>
+  <!-- end super toggle -->
+
+</div>
+```
+
+### Super Toggle type 2: **.ic-Super-toggle--ui-switch**
+This is a toggle that switches between 2 states, indicated by icons on the left and right of the toggle.
+
+```html
+<div class="ic-Form-control">
+  <div class="ic-Label" aria-hidden="true">This is an optional faux label</div>
+
+  <!-- start super toggle -->
+  <label class="ic-Super-toggle--ui-switch" for="super-toggle-demo2">
+    <span class="screenreader-only">This is the real label</span>
+    <input type="checkbox" id="super-toggle-demo2" class="ic-Super-toggle__input">
+    <div class="ic-Super-toggle__container" aria-hidden="true" data-checked="Option A is selected" data-unchecked="Option B is selected">
+      <div class="ic-Super-toggle__option--LEFT">
+        <i class="icon-unlock"></i>
+      </div>
+      <div class="ic-Super-toggle__switch"></div>
+      <div class="ic-Super-toggle__option--RIGHT">
+        <i class="icon-lock"></i>
+      </div>
+     </div>
+   </label>
+  <!-- end super toggle -->
+
+</div>
+```
 
 ## Simple form example
 
@@ -181,7 +238,7 @@ For these to work properly, make sure the ``for`` attribute of the ``label`` mat
 
 <div class="grid-row">
     <div class="col-xs-12 col-md-8 off-md-2">
-      
+
       <!-- Start form markup -->
       <form class="ic-Form-group">
         <div class="ic-Form-control">
@@ -202,13 +259,22 @@ For these to work properly, make sure the ``for`` attribute of the ``label`` mat
           <textarea id="demo-input-4"class="ic-Input" placeholder="Don't be shy. Express yourself!"></textarea>
         </div>
         <div class="ic-Form-control">
-          <div class="ic-Toggle">
-            <input id="demo-input-3" type="checkbox" checked>
-            <label for="demo-input-3">
-              <div class="ic-Toggle__label-text">Do you believe in Santa Claus?</div>
-              <div class="ic-Toggle__switch" data-checked="Yes" data-unchecked="No"></div>
-            </label>
-          </div>
+          <!-- start super toggle -->
+          <label class="ic-Super-toggle--on-off" for="super-toggle-demo3">
+            <div class="ic-Label">Receive daily free breakfasts</div>
+            <input type="checkbox" id="super-toggle-demo3" class="ic-Super-toggle__input">
+            <div class="ic-Super-toggle__container" aria-hidden="true" data-checked="Yes" data-unchecked="No">
+              <div class="ic-Super-toggle__switch">
+                <div class="ic-Super-toggle__option--LEFT">
+                  <svg class="ic-Super-toggle__svg" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" width="548.9" height="548.9" viewBox="0 0 548.9 548.9" xml:space="preserve"><polygon points="449.3 48 195.5 301.8 99.5 205.9 0 305.4 95.9 401.4 195.5 500.9 295 401.4 548.9 147.5 "/></svg>
+                </div>
+                <div class="ic-Super-toggle__option--RIGHT">
+                  <svg class="ic-Super-toggle__svg" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" viewBox="0 0 28 28" xml:space="preserve"><polygon points="28 22.4 19.6 14 28 5.6 22.4 0 14 8.4 5.6 0 0 5.6 8.4 14 0 22.4 5.6 28 14 19.6 22.4 28 " fill="#030104"/></svg>
+                </div>
+              </div>
+            </div>
+          </label>
+          <!-- end super toggle -->
         </div>
         <div class="ic-Checkbox-group">
           <div class="ic-Form-control ic-Form-control--checkbox">
@@ -232,7 +298,7 @@ For these to work properly, make sure the ``for`` attribute of the ``label`` mat
         </div>
       </form>
       <!-- End form markup -->
-    
+
     </div>
 </div>
 
@@ -240,7 +306,7 @@ For these to work properly, make sure the ``for`` attribute of the ``label`` mat
 
 ### The same form with the inputs and labels displayed inline
 
-Simply add `.ic-Form-group--horizontal` to the `.ic-Form-group` element. 
+Simply add `.ic-Form-group--horizontal` to the `.ic-Form-group` element.
 
 (Collapses into a single-column form at lower screen widths.)
 
@@ -248,7 +314,7 @@ Simply add `.ic-Form-group--horizontal` to the `.ic-Form-group` element.
 <div class="content-box">
   <div class="grid-row">
       <div class="col-xs-12 col-md-8 off-md-2">
-        
+
         <!-- Start form markup -->
         <form class="ic-Form-group ic-Form-group--horizontal">
           <div class="ic-Form-control">
@@ -269,13 +335,22 @@ Simply add `.ic-Form-group--horizontal` to the `.ic-Form-group` element.
             <textarea id="demo-input-7"class="ic-Input" placeholder="Don't be shy. Express yourself!"></textarea>
           </div>
           <div class="ic-Form-control">
-            <div class="ic-Toggle">
-              <input id="demo-input-8" type="checkbox" checked>
-              <label for="demo-input-8">
-                <div class="ic-Toggle__label-text">Do you believe in Santa Claus?</div>
-                <div class="ic-Toggle__switch" data-checked="Yes" data-unchecked="No"></div>
-              </label>
+          <!-- start super toggle -->
+          <label class="ic-Super-toggle--on-off" for="super-toggle-demo4">
+            <div class="ic-Label">Receive daily free breakfasts</div>
+            <input type="checkbox" id="super-toggle-demo4" class="ic-Super-toggle__input">
+            <div class="ic-Super-toggle__container" aria-hidden="true" data-checked="Yes" data-unchecked="No">
+              <div class="ic-Super-toggle__switch">
+                <div class="ic-Super-toggle__option--LEFT">
+                  <svg class="ic-Super-toggle__svg" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" width="548.9" height="548.9" viewBox="0 0 548.9 548.9" xml:space="preserve"><polygon points="449.3 48 195.5 301.8 99.5 205.9 0 305.4 95.9 401.4 195.5 500.9 295 401.4 548.9 147.5 "/></svg>
+                </div>
+                <div class="ic-Super-toggle__option--RIGHT">
+                  <svg class="ic-Super-toggle__svg" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" viewBox="0 0 28 28" xml:space="preserve"><polygon points="28 22.4 19.6 14 28 5.6 22.4 0 14 8.4 5.6 0 0 5.6 8.4 14 0 22.4 5.6 28 14 19.6 22.4 28 " fill="#030104"/></svg>
+                </div>
+              </div>
             </div>
+          </label>
+          <!-- end super toggle -->
           </div>
           <div class="ic-Checkbox-group">
             <div class="ic-Form-control ic-Form-control--checkbox">
@@ -299,7 +374,7 @@ Simply add `.ic-Form-group--horizontal` to the `.ic-Form-group` element.
           </div>
         </form>
         <!-- End form markup -->
-      
+
       </div>
   </div>
 </div>
@@ -367,9 +442,9 @@ At tablet screen-width, this form spreads out in a single row. Simply add ``.ic-
           <div class="ic-Form-control">
             <label class="ic-Label" for="demo-react-modal-1">Custom fields</label>
             <textarea class="ic-Input" id="demo-react-modal-1" placeholder="Separated by commas"></textarea>
-          </div> 
+          </div>
         </div>
-        
+
         <div class="grid-row">
           <div class="col-xs-12 col-md-6">
             <div class="ic-Form-group">
@@ -404,13 +479,22 @@ At tablet screen-width, this form spreads out in a single row. Simply add ``.ic-
           <div class="col-xs-12 col-md-6">
             <div class="ic-Form-group">
               <div class="ic-Form-control">
-                <div class="ic-Toggle">
-                  <input id="demo-react-modal-5" type="checkbox" checked>
-                  <label for="demo-react-modal-5">
-                    <div class="ic-Toggle__label-text">Visible to public</div>
-                    <div class="ic-Toggle__switch" data-checked="Yes" data-unchecked="No"></div>
-                  </label>
-                </div>  
+                <!-- start super toggle -->
+                <label class="ic-Super-toggle--on-off" for="super-toggle-demo5">
+                  <div class="ic-Label">Visible to public</div>
+                  <input type="checkbox" id="super-toggle-demo5" class="ic-Super-toggle__input">
+                  <div class="ic-Super-toggle__container" aria-hidden="true" data-checked="Visible" data-unchecked="Not Visible">
+                    <div class="ic-Super-toggle__switch">
+                      <div class="ic-Super-toggle__option--LEFT">
+                        <svg class="ic-Super-toggle__svg" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" width="548.9" height="548.9" viewBox="0 0 548.9 548.9" xml:space="preserve"><polygon points="449.3 48 195.5 301.8 99.5 205.9 0 305.4 95.9 401.4 195.5 500.9 295 401.4 548.9 147.5 "/></svg>
+                      </div>
+                      <div class="ic-Super-toggle__option--RIGHT">
+                        <svg class="ic-Super-toggle__svg" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" viewBox="0 0 28 28" xml:space="preserve"><polygon points="28 22.4 19.6 14 28 5.6 22.4 0 14 8.4 5.6 0 0 5.6 8.4 14 0 22.4 5.6 28 14 19.6 22.4 28 " fill="#030104"/></svg>
+                      </div>
+                    </div>
+                  </div>
+                </label>
+                <!-- end super toggle -->
               </div>
             </div>
           </div>
@@ -456,7 +540,7 @@ Like Bootstrap's, but better! Combine ``.ic-Input`` -styled inputs with buttons,
     <div class="ic-Input-group__add-on" role="presentation" aria-hidden="true" tabindex="-1">
       <i class="icon-group-new-dark" role="presentation"></i>
     </div>
-    <input type="text" id="demo-group-name" class="ic-Input" placeholder="e.g., Team Awesomeness"></input> 
+    <input type="text" id="demo-group-name" class="ic-Input" placeholder="e.g., Team Awesomeness"></input>
   </div>
 </div>
 ```
@@ -498,7 +582,7 @@ Put ``.ic-Label`` inside ``ic-Input-group`` to make an inline label. Yes, it eve
 <form>
   <div class="grid-row">
     <div class="col-xs-12 col-md-6">
-      
+
       <div class="ic-Form-control">
         <label for="demo-responsive-1" class="ic-Label">Full name</label>
         <input type="text" id="demo-responsive-1" class="ic-Input" placeholder="First and last, please."></input>
@@ -524,7 +608,7 @@ Put ``.ic-Label`` inside ``ic-Input-group`` to make an inline label. Yes, it eve
 
     </div>
     <div class="col-xs-12 col-md-6">
-      
+
       <div class="ic-Form-control">
         <label for="demo-responsive-8" class="ic-Label">Preferred working hours</label>
         <div class="ic-Multi-input">
@@ -616,6 +700,33 @@ New and improved version of a common Canvas UI: a header with action buttons on 
 </div>
 ```
 
+### **.ic-Action-header** with a heading on the left side and super toggle on the right.
+
+```html
+<div class="ic-Action-header">
+  <div class="ic-Action-header__Primary">
+    <h3 class="ic-Action-header__Heading">My amazing term paper</h3>
+  </div>
+  <div class="ic-Action-header__Secondary">
+    <!-- start super toggle -->
+    <label class="ic-Super-toggle--ui-switch" for="super-toggle-demo6">
+      <span class="screenreader-only">This document is locked</span>
+      <input type="checkbox" id="super-toggle-demo6" class="ic-Super-toggle__input">
+      <div class="ic-Super-toggle__container" aria-hidden="true" data-checked="Document is locked" data-unchecked="Document is NOT locked">
+        <div class="ic-Super-toggle__option--LEFT">
+          <i class="icon-unlock"></i>
+        </div>
+        <div class="ic-Super-toggle__switch"></div>
+        <div class="ic-Super-toggle__option--RIGHT">
+          <i class="icon-lock"></i>
+        </div>
+       </div>
+     </label>
+    <!-- end super toggle -->
+  </div>
+</div>
+```
+
 ### **.ic-Action-header** with form element on the left side and buttons on the right.
 
 ```html
@@ -656,15 +767,15 @@ Reduce the width of your screen to see how the example components below both sca
 
 ```html
 <div class="ic-Form-action-box">
-  
+
   <div class="ic-Form-action-box__Form">
     <div class="ic-Form-control">
       <div class="ic-Input-group">
         <label class="ic-Label" for="demo-action-box-1">
           Name
         </label>
-        <input type="text" id="demo-action-box-1" class="ic-Input"></input>  
-      </div>  
+        <input type="text" id="demo-action-box-1" class="ic-Input"></input>
+      </div>
     </div>
     <div class="ic-Form-control">
       <div class="ic-Input-group">
@@ -684,21 +795,30 @@ Reduce the width of your screen to see how the example components below both sca
         </input>
         <button type="button" class="Button" aria-hidden="true" tabindex="-1">
           <i class="icon-calendar-month"></i>
-        </button>  
-      </div>  
+        </button>
+      </div>
     </div>
     <div class="ic-Form-control">
-      <div class="ic-Toggle">
-        <input id="demo-action-box-3" type="checkbox" checked>
-        <label for="demo-action-box-3">
-          <div class="ic-Toggle__label-text">Teaching assistant</div>
-          <div class="ic-Toggle__switch" data-checked="Yes" data-unchecked="No"></div>
-        </label>
-      </div> 
+      <!-- start super toggle -->
+      <label class="ic-Super-toggle--on-off" for="super-toggle-demo8">
+        <div class="ic-Label">Teaching assistant</div>
+        <input type="checkbox" id="super-toggle-demo8" class="ic-Super-toggle__input">
+        <div class="ic-Super-toggle__container" aria-hidden="true" data-checked="Yes" data-unchecked="No">
+          <div class="ic-Super-toggle__switch">
+            <div class="ic-Super-toggle__option--LEFT">
+              <svg class="ic-Super-toggle__svg" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" width="548.9" height="548.9" viewBox="0 0 548.9 548.9" xml:space="preserve"><polygon points="449.3 48 195.5 301.8 99.5 205.9 0 305.4 95.9 401.4 195.5 500.9 295 401.4 548.9 147.5 "/></svg>
+            </div>
+            <div class="ic-Super-toggle__option--RIGHT">
+              <svg class="ic-Super-toggle__svg" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" viewBox="0 0 28 28" xml:space="preserve"><polygon points="28 22.4 19.6 14 28 5.6 22.4 0 14 8.4 5.6 0 0 5.6 8.4 14 0 22.4 5.6 28 14 19.6 22.4 28 " fill="#030104"/></svg>
+            </div>
+          </div>
+        </div>
+      </label>
+      <!-- end super toggle -->
     </div>
 
   </div>
-  
+
   <div class="ic-Form-action-box__Actions">
     <button type="button" class="Button Button--icon-action">
       <span class="screenreader-only">Delete row</span>
@@ -709,7 +829,7 @@ Reduce the width of your screen to see how the example components below both sca
 </div>
 
 <div class="ic-Form-action-box">
-  
+
   <div class="ic-Form-action-box__Form">
 
     <div class="ic-Form-control">
@@ -784,7 +904,7 @@ Reduce the width of your screen to see how the example components below both sca
 ### Warning, Error and Success states
 
 ```html
-      
+
 <!-- Start form markup -->
 
 <div class="ic-Form-control ic-Form-control--has-error">
@@ -925,7 +1045,7 @@ Reduce the width of your screen to see how the example components below both sca
 
 ```html
 <div class="ic-Checkbox-group ic-Checkbox-group--inline">
-  
+
   <div class="ic-Form-control ic-Form-control--checkbox ic-Form-control--has-error">
     <input type="checkbox" id="demo-states-15" checked>
     <label class="ic-Label" for="demo-states-15">Super Skooool LMS</label>
@@ -1005,13 +1125,13 @@ $ic-Input-border: lighten($ic-color-dark, 65);
 }
 
 @mixin high-contrast-focus {
-  @if $use_high_contrast { 
+  @if $use_high_contrast {
     outline: 1px dotted $ic-color-dark;
     outline-offset: -1px;
   }
 }
 
-select, textarea, 
+select, textarea,
 input[type="text"], input[type="password"],
 input[type="datetime"], input[type="datetime-local"],
 input[type="date"], input[type="month"],
@@ -1019,9 +1139,9 @@ input[type="time"], input[type="week"],
 input[type="number"], input[type="email"],
 input[type="url"], input[type="search"],
 input[type="tel"], input[type="color"], .uneditable-input {
-  
+
   // .ic-Input is the base class for the updated form controls.
-  
+
   &.ic-Input {
     // Overwrite legacy forms styles from Bootstrap 2.
     width: 100%; height: auto;
@@ -1043,9 +1163,9 @@ input[type="tel"], input[type="color"], .uneditable-input {
 
     // Remove the webkit gloss in iOS
     -webkit-appearance: none;
-    
+
     @include ic-input-variant;
-    
+
     @if $use_high_contrast {
       outline-style: dotted;
       outline-width: 1px;
@@ -1110,7 +1230,7 @@ select.ic-Input {
 .ic-Form-group {
 
   &.ic-Form-group--inline {
-    
+
     @include breakpoint(tablet) {
       display: flex;
       align-items: flex-end;
@@ -1139,8 +1259,8 @@ select.ic-Input {
 
   &.ic-Form-group--horizontal {
     @include breakpoint(tablet) {
-      
-      .ic-Checkbox-group, .ic-Form-control--radio { 
+
+      .ic-Checkbox-group, .ic-Form-control--radio {
         margin-left: $ic-horizontal-form-offset;
       }
 
@@ -1175,7 +1295,7 @@ select.ic-Input {
             margin-top: $ic-sp/3;
             .ic-Form-message__Layout { margin-left: $ic-sp*2; }
           }
-  
+
         }
 
         .ic-Form-message {
@@ -1187,7 +1307,7 @@ select.ic-Input {
             display: inline-flex;
           }
         }
-        
+
       }
     }
 
@@ -1198,8 +1318,8 @@ select.ic-Input {
 @mixin form-message-variant($color) {
   .ic-Form-message__Layout {
     background: $color;
-    &:before { 
-      background: darken($color, 5%); 
+    &:before {
+      background: darken($color, 5%);
       border-right: 1px solid darken($color, 12%);
     }
     &:after { border-bottom-color: darken($color, 5%); }
@@ -1211,7 +1331,7 @@ select.ic-Input {
   margin-left: $ic-sp;
   position: relative;
   z-index: 1;
-  transition: all 0.2s $ic-transition;  
+  transition: all 0.2s $ic-transition;
   box-sizing: border-box;
   &.ic-Form-message--error { @include form-message-variant($ic-color-danger); }
   &.ic-Form-message--success { @include form-message-variant($ic-color-success); }
@@ -1258,7 +1378,7 @@ select.ic-Input {
   a {
     color: $ic-color-light;
     text-decoration: underline;
-    &:hover, &:focus { 
+    &:hover, &:focus {
       color: $ic-color-light;
       text-decoration: none;
     }
@@ -1272,7 +1392,7 @@ select.ic-Input {
     box-sizing: border-box;
     display: flex;
     justify-content: center;
-    align-items: center; 
+    align-items: center;
   }
 }
 
@@ -1290,7 +1410,7 @@ form.ic-Form-group { margin: 0; }
     flex-wrap: wrap;
     align-items: center;
     .ic-Form-message__Layout:after { display: none; }
-    
+
     &.ic-Form-control--checkbox,
     .ic-Radio { padding-right: $ic-sp*1.5; }
   }
@@ -1336,6 +1456,7 @@ form.ic-Form-group { margin: 0; }
   display: block;
   line-height: $ic-label-line-height;
   font-weight: 500;
+  font-size: $baseFontSize + 1;
 }
 
 .ic-Form-actions {
@@ -1403,8 +1524,8 @@ form.ic-Form-group { margin: 0; }
         @include high-contrast-focus;
         &:before {
           box-shadow: inset 0 0 0 2px rgba($ic-brand-primary, 0.3), inset 0 0 0 4px $ic-color-light;
-          background: $ic-brand-primary;  
-        }  
+          background: $ic-brand-primary;
+        }
       }
     }
 
@@ -1430,8 +1551,8 @@ form.ic-Form-group { margin: 0; }
         margin-right: $ic-sp*1.5;
       }
       .ic-Form-message { display: block; }
-    }  
-  } 
+    }
+  }
 
 }
 
@@ -1493,8 +1614,8 @@ form.ic-Form-group { margin: 0; }
           outline-offset: -3px;
           outline-color: rgba($ic-brand-primary, 0.2);
         }
-        
-      }  
+
+      }
     }
 
     &:checked {
@@ -1508,7 +1629,7 @@ form.ic-Form-group { margin: 0; }
       &:focus {
         ~ .ic-Label:before {
           outline-color: rgba($ic-color-light, 0.35);
-        }  
+        }
       }
     }
 
@@ -1520,7 +1641,7 @@ form.ic-Form-group { margin: 0; }
       }
     }
 
-  }  
+  }
 }
 
 .ic-Input-group {
@@ -1535,22 +1656,22 @@ form.ic-Form-group { margin: 0; }
 
     &:not(:first-child) {
       border-top-left-radius: 0;
-      border-bottom-left-radius: 0; 
-    } 
+      border-bottom-left-radius: 0;
+    }
     &:not(:last-child) {
       border-top-right-radius: 0;
-      border-bottom-right-radius: 0; 
-    }  
+      border-bottom-right-radius: 0;
+    }
   }
 
   .Button {
-    
+
     &:first-child {
       border-top-right-radius: 0;
       border-bottom-right-radius: 0;
       &:not(.Button--primary):not(.Button--secondary):not(.Button--success):not(.Button--warning):not(.Button--danger) { border-right: none; }
     }
-    
+
     &:last-child {
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;
@@ -1567,12 +1688,12 @@ form.ic-Form-group { margin: 0; }
     align-items: center;
     padding: $ic-sp/2 ($ic-sp - 4);
 
-    &:first-child { 
+    &:first-child {
       border-right: none;
       border-top-left-radius: $baseBorderRadius;
       border-bottom-left-radius: $baseBorderRadius;
     }
-    &:last-child { 
+    &:last-child {
       border-left: none;
       border-top-right-radius: $baseBorderRadius;
       border-bottom-right-radius: $baseBorderRadius;
@@ -1581,11 +1702,11 @@ form.ic-Form-group { margin: 0; }
 
   .ic-Input-group__add-on {
     color: $ic-font-color--subdued;
-    box-sizing: border-box; 
+    box-sizing: border-box;
   }
 
   .ic-Label { margin-bottom: 0; }
-  
+
 }
 
 .ic-Action-header {
@@ -1645,7 +1766,7 @@ form.ic-Form-group { margin: 0; }
   }
   .ic-Form-control {
     margin-bottom: $ic-sp/2;
-    @include breakpoint(desktop) { 
+    @include breakpoint(desktop) {
       margin: 0 $ic-sp/3;
       flex: 1;
       &:first-child { margin-left: 0; }

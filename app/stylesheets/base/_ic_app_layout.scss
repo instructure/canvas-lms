@@ -133,14 +133,7 @@ $ic-left-side-width: $ic-sp*15;
   padding: 0;
   width: $ic-sp*3; height: ($ic-sp*3) - ($ic-sp/2);
   @include breakpoint(wide) { display: none; }
-  i[class*=icon-], i[class^=icon-] {
-    width: auto; height: auto;
-    line-height: 1;
-    &:before {
-      font-size: 22px;
-      top: 0;
-    }
-  }
+  @include overwrite-default-icon-size(22px);
 }
 
 .ic-app-crumbs {
