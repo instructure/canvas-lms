@@ -1,4 +1,12 @@
 module PostgreSQLAdapterExtensions
+  def initialize(connection, logger, connection_parameters, config)
+    unless config.key?(:prepared_statements)
+      config = config.dup
+      config[:prepared_statements] = false
+    end
+    super(connection, logger, connection_parameters, config)
+  end
+
   def readonly?(table = nil, column = nil)
     return @readonly unless @readonly.nil?
     @readonly = (select_value("SELECT pg_is_in_recovery();") == "t")
