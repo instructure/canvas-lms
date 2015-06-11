@@ -205,7 +205,7 @@ namespace :deploy do
       group = fetch :group
       execute :sudo, 'chown -R', "#{group}:#{group}", "#{release_path}"
       within release_path do
-        execute :sudo, 'chown', "#{user}", "config/*", "Gemfile.lock", "config.ru"
+        execute :sudo, 'chown', "#{user}", "config/*", "Gemfile.lock", "config.ru", "tmp/"
         execute :sudo, 'chmod 440', "config/*.yml"
       end
     end
