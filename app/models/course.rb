@@ -747,13 +747,9 @@ class Course < ActiveRecord::Base
       Enrollment.where(:course_id => self).update_all(:root_account_id => self.root_account_id)
     end
 
-    case Enrollment.connection.adapter_name
-    when 'MySQL', 'Mysql2'
-      Enrollment.connection.execute("UPDATE users, enrollments SET users.updated_at=NOW(), enrollments.updated_at=NOW() WHERE users.id=enrollments.user_id AND enrollments.course_id=#{self.id}")
-    else
-      Enrollment.where(:course_id => self).update_all(:updated_at => Time.now.utc)
-      User.where("id IN (SELECT user_id FROM enrollments WHERE course_id=?)", self).update_all(:updated_at => Time.now.utc)
-    end
+    Enrollment.where(:course_id => self).update_all(:updated_at => Time.now.utc)
+    User.where("id IN (SELECT user_id FROM enrollments WHERE course_id=?)", self).
+        update_all(updated_at: Time.now.utc)
   end
 
   def self_enrollment_allowed?
@@ -2675,13 +2671,9 @@ class Course < ActiveRecord::Base
       self.course_sections.update_all(:course_id => new_course)
       # we also want to bring along prior enrollments, so don't use the enrollments
       # association
-      case Enrollment.connection.adapter_name
-      when 'MySQL', 'Mysql2'
-        Enrollment.connection.execute("UPDATE users, enrollments SET users.updated_at=#{Course.sanitize(Time.now.utc)}, enrollments.updated_at=#{Course.sanitize(Time.now.utc)}, enrollments.course_id=#{new_course.id} WHERE users.id=enrollments.user_id AND enrollments.course_id=#{self.id}")
-      else
-        Enrollment.where(:course_id => self).update_all(:course_id => new_course, :updated_at => Time.now.utc)
-        User.where("id IN (SELECT user_id FROM enrollments WHERE course_id=?)", new_course).update_all(:updated_at => Time.now.utc)
-      end
+      Enrollment.where(:course_id => self).update_all(:course_id => new_course, :updated_at => Time.now.utc)
+      User.where("id IN (SELECT user_id FROM enrollments WHERE course_id=?)", new_course).
+          update_all(updated_at: Time.now.utc)
       self.replacement_course_id = new_course.id
       self.workflow_state = 'deleted'
       self.save!
