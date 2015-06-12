@@ -1369,6 +1369,38 @@ describe Quizzes::QuizSubmission do
       expect(@submission.reload.messages_sent.keys).not_to include 'Submission Needs Grading'
     end
   end
+
+  describe 'submission creation event' do
+    before(:once) do
+      student_in_course(course: @course)
+    end
+
+    it 'should create quiz submission event on new quiz submission' do
+      quiz_submission = @quiz.generate_submission(@student)
+      event = quiz_submission.events.last
+      expect(event.event_type).to eq('submission_created')
+    end
+
+    it 'should not create quiz submission event on preview quiz submission' do
+      quiz_submission = @quiz.generate_submission(@student, true)
+      event = quiz_submission.events.last
+      expect(event).to be_nil
+    end
+
+    it 'should be able to record quiz submission creation event' do
+      quiz_submission = @quiz.quiz_submissions.create!
+      quiz_submission.attempt  = 1
+      quiz_submission.quiz_version = 1
+      quiz_submission.quiz_data = {}
+      quiz_submission.record_creation_event
+      event = quiz_submission.events.last
+      expect(event.event_type).to eq('submission_created')
+      expect(event.event_data["quiz_version"]).to eq quiz_submission.quiz_version
+      expect(event.event_data["quiz_data"]).to eq quiz_submission.quiz_data
+      expect(event.attempt).to eq quiz_submission.attempt
+    end
+  end
+
   end
 
   describe "#time_spent" do

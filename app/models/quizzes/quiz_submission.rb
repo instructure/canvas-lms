@@ -316,6 +316,16 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     extractor.create_event!(submission_data, self)
   end
 
+  def record_creation_event
+    Quizzes::QuizSubmissionEvent.new.tap do |event|
+      event.event_type = Quizzes::QuizSubmissionEvent::EVT_SUBMISSION_CREATED
+      event.event_data = {"quiz_version" => self.quiz_version, "quiz_data" => self.quiz_data}
+      event.created_at = Time.zone.now
+      event.quiz_submission = self
+      event.attempt = self.attempt
+    end.save!
+  end
+
   def sanitize_params(params)
     # if the submission has already been graded
     if graded?

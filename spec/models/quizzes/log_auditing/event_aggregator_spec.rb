@@ -95,7 +95,7 @@ describe Quizzes::LogAuditing::EventAggregator do
       expect(submission_data).to eq({"question_#{@questions[0].id}"=>"hello"})
     end
     it "replaces previous content in submission_data build" do
-      submission_data = @aggregator.run(@qs.id, @qs.attempt, @events[2].created_at)
+      submission_data = @aggregator.run(@qs.id, @qs.attempt, @events[3].created_at)
       expect(submission_data).to eq({"question_#{@questions[0].id}"=>"goodbye", "question_#{@questions[0].id}_marked"=>true})
     end
   end

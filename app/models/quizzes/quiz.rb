@@ -675,7 +675,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       end
 
     end
-
+    submission.record_creation_event unless preview
     submission
   end
 
