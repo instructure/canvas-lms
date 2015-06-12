@@ -4,49 +4,153 @@ Beyond Z Canvas LMS
 How to install:
 -----
 
-Follow the instructions from the Canvas wiki <https://github.com/instructure/canvas-lms/wiki/Quick-Start>
+Follow the instructions from the [Canvas wiki](https://github.com/instructure/canvas-lms/wiki/Quick-Start)
 
-* on my box i had to run the i18n thing as  root individually but it should work automatically on other boxes
+### Extra Installation Notes: 
+* On my box i had to run the i18n thing as  root individually but it should work automatically on other boxes
 
 * I was able to skip a few steps because the ruby for the main platform worked here. If you already have the BZ code running, you should also have ruby and might be able to take a shortcut too.
 
+* If you get:
+        
+        NameError: method `respond_to_missing?' not defined in ActiveRecord::NamedScope::Scope
 
-If you get:
-NameError: method `respond_to_missing?' not defined in ActiveRecord::NamedScope::Scope
+  Find: `canvas-lms/config/initializers/rails2.rb:127` and comment that line, uncomment the method below to create the db
 
-Find: canvas-lms/config/initializers/rails2.rb:127
-and comment that line, uncomment the method below to create the db
+* You may need to change config/domain.yml
 
-You may need to change config/domain.yml
+### Starting the server:
+1. Make sure you’re on version 1.9.3 of Ruby.
 
-To start the server, run: rails server -p 3001 (a different port is used so it won't conflict with the main application)
+        $ ruby –v
+          ruby 1.9.3p484 (2013-11-22 revision 43786) [x86_64-darwin13.0.2]
+
+2. If not, just run (assuming you have rvm setup):
+
+        $ rvm use 1.9.3
+
+3. Run the following (a different port is used so it won't conflict with the main application):
+
+        bundle exec script/server -p 3001 
 
 If you see:
-script/rails:6:in `require': cannot load such file -- rails/commands (LoadError)
+
+    script/rails:6:in `require': cannot load such file -- rails/commands (LoadError)
 
 Run:
-bundle show rails
+
+    bundle show rails
 
 Then change the line of the error (script/rails:6) to:
 
-require 'PATH_TO_RAILS/lib/commands'
+    require 'PATH_TO_RAILS/lib/commands' 
 
-where PATH_TO_RAILS is found in the bundle show command.
+where `PATH_TO_RAILS` is found in the bundle show command.
 
+BZ Git branch layout
+========
 
-My notes while looking at the source
+    instructure/stable - the cloud version of Canvas that you can signup/pay for at http://www.canvaslms.com/
+        \
+     beyond-z/stable - beyondz's forked copy
+          \
+       beyond-z/bz-master - the production branch hosted at https://portal.beyondz.org
+            \
+         beyond-z/bz-staging - the staging branch hosted at https://stagingportal.beyondz.org
+     
+## Development Process
+
+*These steps assume that your development environment is setup and working.*
+
+### Get the source code
+1. On github, fork this repository to your personal github account, such as: `https://github.com/<yourGithubHandle>/canvas-lms`
+2. On your local development environment, clone your forked repository
+
+        $ mkdir <yourSrcDir>; cd <yourSrcDir>
+        $ git clone https://github.com/<yourGithubHandle>/canvas-lms.git canvas-lms
+
+### Make a change
+1. Create a feature branch from `bz-staging`
+
+        $ git checkout bz-staging
+        $ git checkout -b <yourBranch>
+
+2. Make your code changes, test them locally, and commit them to `<yourBranch>`.
+
+### Deploy changes to staging
+1. Push your commits to github
+
+        $ git push origin <yourBranch>
+
+2. Open a pull request against `bz-staging`
+
+3. Have your pull request reviewed, merged, and pushed to the [staging](https://stagingportal.beyondz.org) server.
+   1. Command to deploy to staging if you have privileges
+
+          `bundle exec cap staging deploy`
+
+4. Have the changes tested on staging
+
+### Deploy changes to production
+
+1. When a set of changes on staging is ready for a production release, merge the `bz-staging` branch into `bz-master`
+   * E.g. assuming that you're running the merge from a clone of the `https://github.com/beyond-z/canvas-lms` repository and *not* your forked repository
+
+            $ git checkout bz-staging 
+            $ git pull origin bz-staging
+            $ git checkout bz-master
+            $ git merge --no-ff bz-staging
+              [Commit the merge]
+            $ git push origin bz-master
+         
+2. Deploy to production
+   * Command to deploy to production if you have privileges
+   
+            $ bundle exec cap production deploy --trace &> prod_deploy_<insertDate>.log
+
+## Update BZ Canvas code
+These instructions are for pulling changes from Instructure's cloud hosted version of Canvas into the Beyond Z version of Canvas hosted at (https://portal.beyondz.org)
+
+1. Pull changes from `instructure/stable` into `beyond-z/stable`
+
+   * Assuming that you're on a clone of (https://github.com/beyond-z/canvas-lms) and *not* your personal github
+
+            $ git remote add upstream https://github.com/instructure/canvas-lms.git
+            $ git checkout stable
+            $ git pull origin stable
+            $ git pull upstream stable
+            $ git tag -a bz-release/<insertDate> -m "Update our fork with Canvas upstream changes"
+            $ git push origin stable
+
+2. Merge changes from `stable` into `bz-staging` (same assumption as step 1 about which repo)
+
+        $ git checkout bz-staging
+        $ git merge --no-ff stable
+        $ git push origin bz-staging
+        
+3. Do a staging deploy and test everything on the staging server!!
+4. Do a normal production release to merge the stable, tested changes back into `bz-master` (from whence it came)
+
+## Submit Pull Request to Instructure
+1. Make our change in `bz-staging`, push to `bz-master` as usual.
+2. Pull upstream `instructure/master` into `beyond-z/master` so they are in sync.
+   * Instructure requires you to submit PRs against master, not stable
+3. Merge the change that we want from `beyond-z/bz-master` to `beyond-z/master`.  
+4. Submit the pull request from `beyond-z/master` to `instructure/master`.
+
+Notes / Tips / Tricks
 =========
 
-Plugin folders:
+* Plugin folders:
 
-canvas-lms/app/views/plugins
-canvas-lms/lib/canvas/plugins/
+        canvas-lms/app/views/plugins
+        canvas-lms/lib/canvas/plugins/
 
-testing is done in the /spec directory.
+* Testing is done in the `/spec` directory.
 
-node.js is apparently used to compile assets
+* `node.js` is apparently used to compile assets
 
-the basic setup is
+* The basic setup is
 	users have accounts in the system
 	there's courses in the system
 	user accounts are tied to courses via roles which grant them access to various parts
@@ -63,29 +167,10 @@ the basic setup is
 	Then, hopefully, we can make it automatically and always use this instead of the built in
 	login except for admin stuff, but I haven't gotten to that yet...
 
-The advantage of this oauth sso is we can then do cross-domain communication with an authenticated
-user - if we do have to iframe the resume app, for instance, we'll know which user is logged in
-without needing them to do a separate manual step.
-
-
-BZ Git branch layout
-========
-
-UPSTREAM STABLE
-* BZ stable - we should never commit to this, it just mirrors upstream stable; it is where we stage changes for upstream PRs
-  * BZ master (merges from staging)
-  * BZ staging
-    * feature branches (will also merge ones from upstream if needed)
-    * feature branches intended to go upstream (branched off stable)
-
-
-Dev wise, we need to use a different branch:
-  * stable matches upstream
-  * we branch from stable for a feature that we want to merge up
-  * our own stuff is in a BZ branch, which works as our master
-  * upstream things that work for us too are merged from the off master branch into our off BZ branch
-		(git checkout beyondz; git checkout -b integrate_that_thing_with_us; git merge that_thing)
-
+	The advantage of this oauth sso is we can then do cross-domain communication with an authenticated
+	user - if we do have to iframe the resume app, for instance, we'll know which user is logged in
+	without needing them to do a separate manual step.
+	
 # The rest is just the original Canvas README contents:
 
 Canvas LMS
