@@ -149,13 +149,25 @@ define([
     var tinyOptions = $.extend({
       mode : "exact",
       style_formats: [
-	{title: 'Intro', inline: 'span', classes: 'intro'},
-	{title: 'Helpful Tip', inline: 'span', classes: 'tip'},
-	{title: 'Watch out!', inline: 'span', classes: 'warning'},
-	{title: 'To-do item', inline: 'span', classes: 'to-do'},
-	{title: 'Pullout', inline: 'span', classes: 'pullout'},
-	{title: 'Resource', inline: 'span', classes: 'resource'},
-	{title: 'Spoiler', inline: 'span', classes: 'spoiler'}
+	{title: 'Intro', inline: 'span', classes: 'bz-intro'},
+	{title: 'Spoiler', inline: 'span', classes: 'bz-spoiler'},
+	{title: 'Video play button', inline: 'span', classes: 'bz-video-link'},
+	{title: 'Quote source', inline: 'span', classes: 'bz-quote-source'},
+	{title: 'Screen Reader Only', inline: 'span', classes: 'bz-screen-reader-text'},
+	{title: 'Hideen from students', inline: 'span', classes: 'bz-hide-from-students'},
+	{title: 'Hidden from everyone', inline: 'span', classes: 'bz-hide-from-all-users'},
+
+	{title: 'Case Study Box', block: 'div', classes: 'bz-case-study-box'},
+	{title: 'Example Box', block: 'div', classes: 'bz-example'},
+	{title: 'Watch Out Box', block: 'div', classes: 'bz-watch-out-box'},
+	{title: 'Helpful Tip Box', block: 'div', classes: 'bz-helpful-tip-box'},
+	{title: 'Diagram Box', block: 'div', classes: 'bz-diagram-box'},
+	{title: 'Resource Box', block: 'div', classes: 'bz-resource-box'},
+	{title: 'Quick Practice Box', block: 'div', classes: 'bz-practice-box'},
+
+	{title: 'To Do List', block: 'ul', classes: 'bz-to-do-item'},
+	{title: 'Pros List', block: 'ul', classes: 'bz-pros'},
+	{title: 'Cons List', block: 'ul', classes: 'bz-cons'}
       ],
       elements: id,
       theme : "advanced",
@@ -177,7 +189,7 @@ define([
       theme_advanced_blockformats : "p,h3,h4,h5,blockquote",
       theme_advanced_more_colors: false,
       extended_valid_elements : "iframe[src|width|height|name|align|style|class|sandbox]",
-      content_css: "/stylesheets_compiled/legacy_normal_contrast/instructure_style.css,/stylesheets_compiled/legacy_normal_contrast/tinymce.editor_box.css",
+      content_css: "/stylesheets_compiled/legacy_normal_contrast/instructure_style.css,/stylesheets_compiled/legacy_normal_contrast/tinymce.editor_box.css," + window.bz_custom_css_url,
       editor_css: editor_css,
       auto_focus: options.focus ? id : null,
 

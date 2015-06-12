@@ -759,6 +759,21 @@ module ApplicationHelper
     end
   end
 
+  # This does basically the same as include_account_css but returns it as a string instead
+  # of as a stylesheet link tag.
+  def custom_css_url
+    return if params[:global_includes] == '0'
+    includes = get_global_includes.inject([]) do |css_includes, global_include|
+      css_includes << global_include[:css] if global_include[:css].present?
+      css_includes
+    end
+    if includes.length > 0
+      includes[0] # just give the url
+    else
+      '' # return empty string if there's nothing so the type is consistent to the view
+    end
+  end
+
   # this should be the same as friendlyDatetime in handlebars_helpers.coffee
   def friendly_datetime(datetime, opts={}, attributes={})
     attributes[:pubdate] = true if opts[:pubdate]
