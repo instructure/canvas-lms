@@ -118,15 +118,15 @@ $ic-list-item-background--selected:   #d9edf9;
 
 $ic-bg-light-neutral:     lighten($ic-color-neutral, 6%);
 $ic-bg-light-primary:     lighten($ic-brand-primary, 54%);
-@if $use_high_contrast { 
-  $ic-bg-light-primary:   lighten($ic-brand-primary, 64%); 
+@if $use_high_contrast {
+  $ic-bg-light-primary:   lighten($ic-brand-primary, 64%);
 }
-$ic-bg-light-success:     lighten($ic-color-success, 67%); 
+$ic-bg-light-success:     lighten($ic-color-success, 67%);
 $ic-bg-light-alert:       lighten($ic-color-alert, 57%);
-@if $use_high_contrast { 
-  $ic-bg-light-alert:     lighten($ic-color-alert, 66%); 
+@if $use_high_contrast {
+  $ic-bg-light-alert:     lighten($ic-color-alert, 66%);
 }
-$ic-bg-light-danger:      lighten($ic-color-danger, 48%); 
+$ic-bg-light-danger:      lighten($ic-color-danger, 48%);
 
 //============================
 // List Functional Variables
@@ -147,20 +147,19 @@ $ic-border-dark:          darken($ic-color-neutral, 20);
 //=============================
 // Link-color-related variables
 //=============================
-$ic-link-color:             darken($ic-brand-primary, 5%);
-@if $use_high_contrast { 
-$ic-link-color:             darken($ic-brand-primary, 2%); 
+@if $use_high_contrast {
+$ic-link-color:             darken($ic-brand-primary, 2%);
 }
 $ic-link-color-hover:       darken($ic-link-color, 10%);
 
 $ic-icon-link-color-hover: lighten($ic-color-dark, 15%);
-@if $use_high_contrast { 
-$ic-icon-link-color-hover: $ic-color-dark; 
+@if $use_high_contrast {
+$ic-icon-link-color-hover: $ic-color-dark;
 }
 
 $ic-icon-link-color:       lighten($ic-color-dark, 30%);
-@if $use_high_contrast { 
-$ic-icon-link-color:       lighten($ic-color-dark, 12%); 
+@if $use_high_contrast {
+$ic-icon-link-color:       lighten($ic-color-dark, 12%);
 }
 
 // linkColor is a deprecated Bootstrap 2 variable. Please use $ic-link-color!
@@ -196,7 +195,7 @@ $ic-course-sidenav_list-item--inactive-font-color:    darken($ic-color-neutral, 
 //===============
 // Icon Variables
 //===============
-//To be used for any disabled icon states 
+//To be used for any disabled icon states
 $ic-color-icon-disabled:        darken($ic-color-neutral, 40);
 @if $use_high_contrast {
 $ic-color-icon-disabled:        darken($ic-color-neutral, 60);
@@ -221,7 +220,7 @@ $iconWhiteSpritePath: $iconSpritePath !default;
 // Legacy Global Color Variables - DO NOT USE
 //==============================
 // These variables we have reworked to use our canvas color variables for the
-// new UI, however they will need to be evaluated on a case-by-case basis of 
+// new UI, however they will need to be evaluated on a case-by-case basis of
 // their use in Canvas in order to properly phase them out
 // Nothing changes in the legacy UI.
 
@@ -250,9 +249,9 @@ $h3-font-size:  19px;
 //=====================
 // Transition Variables
 //=====================
-// This is a pleasing transition that can be used when you need 
+// This is a pleasing transition that can be used when you need
 // a transition timing function
-$ic-transition: cubic-bezier(0,1,0.5,1); 
+$ic-transition: cubic-bezier(0,1,0.5,1);
 
 //=======================
 // Form-related variables

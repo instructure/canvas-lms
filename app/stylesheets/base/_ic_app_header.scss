@@ -1,15 +1,20 @@
 @if $use_new_styles {
 
-  $ic-brand-global-nav-bgd: $ic-brand-secondary !default;
-  $ic-brand-global-nav-link-hover: darken($ic-brand-global-nav-bgd, 5%) !default;
-  $ic-brand-global-nav-link-active: darken($ic-brand-global-nav-bgd, 8%) !default;
-  $ic-brand-global-nav-avatar-border: $ic-color-light !default;
-  $ic-brand-global-nav-menu-item__badge-bgd: $ic-brand-primary !default;
-  $ic-brand-global-nav-menu-item__badge-border: darken($ic-brand-global-nav-bgd, 5%) !default;
-  $ic-brand-global-nav-ic-icon-svg-fill: $ic-color-light !default;
-  $ic-brand-global-nav-menu-item__text-color: $ic-color-light !default;
-  $ic-brand-global-nav-logo-bgd: transparent !default;
-  $ic-brand-nav-panel-bgd: $ic-color-light !default;
+  /// These are editable variables from the theme editor.
+  /// For more info view stylesheets/brandable_variables.json
+  // ic-brand-global-nav-bgd
+  // ic-brand-global-nav-ic-icon-svg-fill
+  // ic-brand-global-nav-menu-item__text-color
+  // ic-brand-global-nav-avatar-border
+  // ic-brand-global-nav-menu-item__badge-bgd
+  // ic-brand-global-nav-ic-icon-svg-fill--active
+  // ic-brand-global-nav-logo-bgd
+
+  $ic-global-nav-menu-item__badge-border: darken($ic-brand-global-nav-bgd, 5%);
+  $ic-global-nav-link-hover: darken($ic-brand-global-nav-bgd, 5%);
+  $ic-global-nav-link-active:  darken($ic-brand-global-nav-bgd, 8%);
+
+  $ic-subnav-panel-bgd: $ic-color-light;
 
   .ic-app-header {
     box-sizing: border-box;
@@ -45,8 +50,8 @@
       .ic-app-header__menu-list-link {
         background: $ic-color-light;
       }
-      .menu-item__text { color: $ic-link-color; }
-      .ic-icon-svg path { fill: $ic-brand-primary; }
+      .menu-item__text { color: $ic-brand-global-nav-menu-item__text-color--active; }
+      .ic-icon-svg path { fill: $ic-brand-global-nav-ic-icon-svg-fill--active; }
       .ic-avatar { border-color: $ic-border-light; }
       .menu-item-icon-container .menu-item__badge { border-color: $ic-color-light; }
     }
@@ -72,7 +77,7 @@
     }
 
     &:hover, &:focus {
-      background-color: $ic-brand-global-nav-link-hover;
+      background-color: $ic-global-nav-link-hover;
       @if $use_high_contrast == false {
         text-decoration: none;
         outline: none;
@@ -80,11 +85,11 @@
       .ic-icon-svg, .ic-avatar { transform: scale(1.075); }
       .ic-avatar { border-color: $ic-brand-global-nav-avatar-border; }
       &:active { .ic-icon-svg, .ic-avatar { transform: scale(1); } }
-      .menu-item__badge { border-color: $ic-brand-global-nav-menu-item__badge-border; }
+      .menu-item__badge { border-color: $ic-global-nav-menu-item__badge-border; }
     }
 
     &:active {
-      background-color: $ic-brand-global-nav-link-active;
+      background-color: $ic-global-nav-link-active;
       box-shadow: inset 0 1px 1px rgba(black, 0.3);
     }
 
@@ -116,7 +121,7 @@
     transition: all 0.2s ease-out;
     transform: translate3d(-101%,0,0);
     box-sizing: border-box;
-    background: $ic-brand-nav-panel-bgd;
+    background: $ic-subnav-panel-bgd;
     position: absolute;
     top: 0; left: 0;
     height: 100%;
@@ -199,32 +204,11 @@
 
   .ic-app-header__logomark {
     display: block;
+    height: 75px;
     overflow: hidden;
     margin-bottom: $ic-sp;
-    background: $ic-brand-global-nav-logo-bgd;
-
-    .canvas-logomark, .ic-app-header__logomark_image {
-      transform: translate3d(0,0,0);
-      transition: all 0.3s $ic-transition;
-      display: block;
-    }
-
-    .canvas-logomark {
-      width: $ic-sp*3; height: $ic-sp*3;
-      margin: $ic-sp auto $ic-sp;
-    }
-
-    // let customer logo fit nav width
-    .ic-app-header__logomark_image {
-      max-width: 100%;
-      margin: 0 auto;
-    }
-
-    // scale up customer or canvas logo on hover/focus
-    &:hover, &:focus {
-      .canvas-logomark,
-      .ic-app-header__logomark_image { transform: scale(1.15); }
-    }
+    background: $ic-brand-global-nav-logo-bgd $ic-brand-header-image 50% no-repeat;
+    background-size: 50%;
   }
   // set to block to avoid any exta inline spacing at bottom
   .ic-app-header__uploaded-logo { display: block; }

@@ -43,11 +43,14 @@ define([
                 </span>
               </label>
 
-              <div className="Theme__editor_preview-img-container">
-                <img
-                  src={this.props.chosenValue || this.props.placeholder}
-                  className="Theme__editor-placeholder--main"
-                />
+              <div className={'Theme__editor_preview-img-container Theme__editor_preview-img-container--' + this.props.varDef.variable_name}>
+            {{/* ^ this utility class is to control the background color that shows behind the images you can customize in theme editor - see theme_editor.scss */}}
+                <div className="Theme__editor_preview-img">
+                  <img
+                    src={this.props.chosenValue || this.props.placeholder}
+                    className="Theme__editor-placeholder"
+                  />
+                </div>
               </div>
               <input
                 type="hidden"
@@ -56,7 +59,7 @@ define([
               />
               <div className="Theme__editor-image_upload">
                 <label className="Theme__editor-image_upload-label">
-                  <span className="Theme__editor-button_upload Button Button--primary">Upload Image</span>
+                  <span className="Theme__editor-button_upload Button Button--link">Upload Image</span>
                   <input
                     type="file"
                     className="Theme__editor-input_upload"
@@ -65,20 +68,18 @@ define([
                     onChange={event => this.setValue(event.target)}
                     ref="fileInput"
                   />
-                  <div className="Theme__editor-input_resets">
-                    {this.props.chosenValue || (this.props.currentValue && this.props.chosenValue !== '') ? (
-                      <button
-                        type="button"
-                        className="Button Button--secondary"
-                        onClick={() => this.setValue(this.props.chosenValue ? null : '')}
-                      >
-                        {this.props.chosenValue && this.props.currentValue ? I18n.t('Undo') : I18n.t('Clear')}
-                      </button>
-                    ) : (
-                      null
-                    )}
-                  </div>
                 </label>
+                {this.props.chosenValue || (this.props.currentValue && this.props.chosenValue !== '') ? (
+                  <button
+                    type="button"
+                    className="Button Button--link"
+                    onClick={() => this.setValue(this.props.chosenValue ? null : '')}
+                  >
+                    {this.props.chosenValue && this.props.currentValue ? I18n.t('Undo') : I18n.t('Reset')}
+                  </button>
+                ) : (
+                  null
+                )}
               </div>
             </div>
           </div>

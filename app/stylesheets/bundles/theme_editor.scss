@@ -34,9 +34,9 @@ body, html {height: 100vh;margin: 0; padding: 0;}
 }
 //// Variables for theme editor
 ///////
-$theme-editor-bgd: $ic-color-dark;
-$theme-editor-content-bgd: lighten($ic-color-dark, 10);
-$theme-editor-border-color: darken($ic-color-neutral, 30);
+$te-bgd: $ic-color-neutral;
+$te-content-bgd: $ic-color-light;
+$te-border-color: darken($ic-color-neutral, 10);
 //// Layout for Theme editor
 ///////
 .Theme__container {
@@ -46,8 +46,9 @@ $theme-editor-border-color: darken($ic-color-neutral, 30);
 .Theme__editor {
   height: 100vh;
   width: 300px;
+  z-index: 10;
   box-shadow: 0 0 8px $ic-color-dark;
-  background: $theme-editor-bgd;
+  background: $te-bgd;
 }
 .Theme__preview {
   flex: 1;
@@ -69,17 +70,21 @@ $theme-editor-border-color: darken($ic-color-neutral, 30);
 ///////
 
 .Theme__editor-header {
-  background: $ic-color-light;
+  background: $ic-color-dark;
   padding: 10px 0;
   display: flex;
   align-items: center;
   .Theme__editor-header_title {
     padding: 0 0 0 $ic-sp;
     margin: 0;
+    color: $ic-color-light;
     line-height: normal;
     font-size: 18px;
-    font-weight: 500;
+    font-weight: 300;
     flex: 1;
+  }
+  .Theme__editor-header_title-icon {
+    color: #D5412F;
   }
   .Theme__editor-header_actions {
     display: flex;
@@ -91,7 +96,15 @@ $theme-editor-border-color: darken($ic-color-neutral, 30);
   .Theme__editor-header_button {
     margin: 0 $ic-sp;
   }
+}
 
+.Theme__editor-shared-themes {
+  text-align: center;
+  color: $ic-color-light;
+  background: lighten($ic-color-dark, 20);
+  padding: $ic-sp;
+  border-top: 1px solid $te-border-color;
+  border-bottom: 1px solid $te-border-color;
 }
 //// Tabs for Theme Editor
 ///////
@@ -155,22 +168,24 @@ $theme-editor-border-color: darken($ic-color-neutral, 30);
 .Theme__editor-accordion.ui-accordion {
   .ui-accordion-header {
     border: none;
-    background: $theme-editor-bgd;
+    background: $te-bgd;
     font-weight: 300;
     border-radius: 0;
+    color: $ic-color-dark;
     &:not(:first-child) {
-      border-top: 1px solid $theme-editor-border-color;
+      border-top: 1px solid $te-border-color;
     }
-
+    $te-accordion-hover: $ic-color-dark;
     // Default accordion state
     &.ui-state-default {
-      background: $theme-editor-bgd;
+      background: $te-bgd;
       box-shadow: none;
       border: none;
-      border-bottom: 1px solid $theme-editor-border-color;
+      border-bottom: 1px solid $te-border-color;
       border-radius: 0;
       padding: 8px $ic-sp;
       margin-top: 0;
+      color: $ic-color-dark;
       .Theme__editor-accordion-icon {
         transform: rotate(-90deg);
       }
@@ -179,27 +194,41 @@ $theme-editor-border-color: darken($ic-color-neutral, 30);
       }
       // Link, Link hover & Focus accordion state
       a {
-        color: $ic-color-light;
+        color: $ic-color-dark;
         transition: color 0.2s;
         border-radius: 0;
         transition: padding 0.2s;
         padding: $ic-sp/2 0;
         font-weight: 500;
         font-size: 14px;
+        &:hover {
+          color: $ic-color-light;
+        }
       }
-      &.ui-state-hover {
-        background: $ic-brand-primary;
+      &.ui-state-hover
+        {
+        background: $te-accordion-hover;
+        &,
+        a:hover,
+        &.ui-state-hover a:hover,
+        &.ui-state-hover a {
+        color: $ic-color-light;
+        }
         .Theme__editor-accordion-icon {
-
           @include animate-icon;
         }
       }
       &.ui-state-focus {
-        background: $ic-brand-primary;
+        background: $te-accordion-hover;
         border: none;
         outline: none;
         a {
-          box-shadow: inset 0 0 0 2px $ic-brand-primary;
+          color: $ic-color-light;
+          box-shadow: none;
+          outline: none;
+          @if $use_high_contrast {
+            box-shadow: inset 0 0 0 2px $te-accordion-hover;
+          }
         }
         .Theme__editor-accordion-icon {
           @include animate-icon;
@@ -208,11 +237,22 @@ $theme-editor-border-color: darken($ic-color-neutral, 30);
       // Active & Focus accordion state
       &.ui-state-active {
         border: none;
-        background: $theme-editor-bgd;
-        border-color: $theme-editor-content-bgd;
+        background: $te-bgd;
+        border-color: $te-content-bgd;
+        &,
+        &.ui-state-hover,
+        &.ui-state-hover a:hover,
+        &.ui-state-hover a {
+          color: $ic-color-dark;
+        }
         &.ui-state-focus {
-          a {
-            box-shadow: inset 0 0 0 2px $theme-editor-content-bgd;
+          a, a:hover {
+            box-shadow: none;
+            outline: none;
+            @if $use_high_contrast {
+              box-shadow: inset 0 0 0 2px $te-content-bgd;
+            }
+            color: $ic-color-dark;
           }
         }
         .Theme__editor-accordion-icon {
@@ -224,13 +264,14 @@ $theme-editor-border-color: darken($ic-color-neutral, 30);
     }
   }
   .ui-accordion-content {
-    background: $theme-editor-content-bgd;
+    background: $te-content-bgd;
     padding: 0 $ic-sp;
     color: $ic-color-light;
     border: none;
     border-radius: 0;
     &.ui-accordion-content-active {
       border-radius: 0;
+      box-shadow: inset 0px 0 5px lighten($ic-color-neutral, 0.2);
     }
   }
 }
@@ -255,7 +296,8 @@ $theme-editor-border-color: darken($ic-color-neutral, 30);
   flex: 1 80px;
   padding: 0;
   margin: 0;
-  font-size: 13px;
+  font-size: $h2-font-size;
+  color: $ic-color-dark;
 }
 .Theme__editor-color-block {
   display: flex;
@@ -284,7 +326,7 @@ $theme-editor-border-color: darken($ic-color-neutral, 30);
 
   }
   .Theme__editor-color-block_label-sample {
-    border: 1px solid $ic-color-light;
+    border: 1px solid $ic-color-neutral;
     border-radius: 3px;
     cursor: pointer;
   }
@@ -303,37 +345,72 @@ $theme-editor-border-color: darken($ic-color-neutral, 30);
   .Theme__editor-form--upload {
     width: 100%; // needed for IE to size image previews based on width of parent
   }
+  .Theme__editor-form__header {
+    display: flex;
+  }
   .Theme__editor-upload_title {
-
+    font-size: $h2-font-size;
+    color: $ic-color-dark;
   }
   .Theme__editor-image_upload {
     flex: 100%;
   }
   .Theme__editor-upload_restrictions {
-    color: $ic-color-neutral;
+    color: $ic-color-dark;
     font-style: italic;
     display: block;
     font-size: 12px;
-    font-weight: 100;
+    font-weight: normal;
     padding-top: $ic-sp/2;
   }
   .Theme__editor_preview-img-container {
     padding: $ic-sp;
     width: 100%;
-    display: flex;
-    align-items: center;
+    height: $ic-sp*10;
     border: 1px solid rgba($ic-color-neutral, 0.2);
-    background: rgba($ic-color-light, 0.1);
-    img {
+    background: $ic-color-neutral;
+    .Theme__editor_preview-img {
+      text-align: center;
+      overflow: hidden;
+      height: $ic-sp*8;
       width: 100%;
+      img {
+        max-height: 100%;
+      }
+    }
+    &.Theme__editor_preview-img-container--ic-brand-header-image {
+      background: $ic-brand-global-nav-logo-bgd;
+    }
+    &.Theme__editor_preview-img-container--ic-brand-favicon {
+      background: #ffffff; // will always be white due to xbrowsers
+    }
+    &.Theme__editor_preview-img-container--ic-brand-apple-touch-icon {
+      background: #212121;
+      .Theme__editor_preview-img {
+        img {border-radius: 15px;}
+      }
+    }
+    &.Theme__editor_preview-img-container--ic-brand-msapplication-tile-square,
+    &.Theme__editor_preview-img-container--ic-brand-msapplication-tile-wide{
+      background: $ic-brand-msapplication-tile-color;
     }
   }
+  .Theme__editor-placeholder--main {
+    align-self: center;
+  }
   .Theme__editor-image_upload {
-    margin: $ic-sp 0;
-    position: relative;
+    margin: 0;
+    border: 1px solid $ic-color-neutral;
+    border-top: none;
+    padding: $ic-sp/2 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
     .Theme__editor-image_upload-label {
-      display: flex;
-      align-items: center;
+      margin-bottom: 0;
+    }
+    .Theme__editor-button_upload {
+      width: 100%;
     }
     .Theme__editor-input_upload {
       position: absolute;
@@ -347,10 +424,6 @@ $theme-editor-border-color: darken($ic-color-neutral, 30);
       display: flex;
       align-items: flex-end;
     }
-  }
-
-  .Theme__editor-placeholder {
-
   }
 }
 

@@ -20,14 +20,17 @@ define([
 
     render() {
       return (
-        <select onChange={event => this.selectBrandConfig(event.target.value)}>
-          <option value="" disabled>{I18n.t('Start from a template')}</option>
-          {this.props.sharedBrandConfigs.map(brandConfig =>
-            <option key={brandConfig.md5} value={brandConfig.md5}>
-              {brandConfig.name}
-            </option>
-          )}
-        </select>
+        <div className="Theme__editor-shared-themes">
+          <label for="sharedThemes">Choose a Starter Theme:</label>
+          <select id="sharedThemes" onChange={event => this.selectBrandConfig(event.target.value)}>
+            <option value="" disabled selected>{I18n.t('Canvas Default')}</option>
+            {this.props.sharedBrandConfigs.map(brandConfig =>
+              <option value={brandConfig.md5}>
+                {brandConfig.name}
+              </option>
+            )}
+          </select>
+        </div>
       )
     }
   })

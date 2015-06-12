@@ -6,14 +6,7 @@
       <a href="#content" id="skip_navigation_link"><%= t 'links.skip_to_content', "Skip To Content" %></a>
         <div role="navigation" class="ic-app-header__main-navigation">
           <a href="<%= dashboard_url %>" class="ic-app-header__logomark">
-            <%# If image is set, allow custom logo image from admin upload %>
-            <% if @domain_root_account.settings[:header_image].present? %>
-              <img src="<%= @domain_root_account.settings[:header_image] %>" alt="<%= @domain_root_account.display_name %> logo image" class="ic-app-header__logomark_image" />
-            <% else %>
-            <%# Otherwise show Canvas logo %>
-              <%= render(:partial => 'shared/svg/svg_canvas_logomark_only.svg') %>
-            <% end %>
-            <span class="screenreader-only"><%= t 'links.dashboard', "My Dashboard" %></span>
+            <span class="screenreader-only"><%= t 'links.dashboard', "Dashboard" %></span>
           </a>
           <ul role="menu" id="menu"
             class="ic-app-header__menu-list"

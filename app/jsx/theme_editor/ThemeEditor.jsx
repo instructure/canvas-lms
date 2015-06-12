@@ -87,17 +87,21 @@ define([
 
     render() {
       return (
+        <div id="main">
         <form encType="multipart/form-data" acceptCharset="UTF-8" action="/brand_configs" method="POST" className="Theme__container">
           <input name="utf8" type="hidden" value="✓" />
           <input name="authenticity_token" type="hidden" value={$.cookie('_csrf_token')} />
           <div className="Theme__editor">
             <div className="Theme__editor-header">
-              <h1 className="Theme__editor-header_title">Theme Editor</h1>
+              <h1 className="Theme__editor-header_title">
+                <i className="icon-instructure Theme__editor-header_title-icon"></i>
+                {I18n.t('Theme Editor')}
+              </h1>
               <div className="Theme__editor-header_actions">
                 <div className="al-dropdown__container">
                   <a className="al-trigger Button" role="button" href="#">
                     <i className="icon-more"></i>
-                    <span className="screenreader-only">{I18n.t('Settings')}</span>
+                    <span className="screenreader-only">{I18n.t('More Options')}</span>
                   </a>
                   <ul
                     className="al-options"
@@ -135,7 +139,7 @@ define([
                   }
                   onClick={this.saveToAccount}
                 >
-                  {I18n.t('Save')}
+                  {I18n.t('Apply')}
                 </button>
               </div>
             </div>
@@ -181,7 +185,7 @@ define([
             <iframe src="/?editing_brand_config=1" style={{border: 'none', width: '100%', height: '100vh'}} />
           </div>
         </form>
-
+        </div>
       )
     }
   })

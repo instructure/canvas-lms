@@ -11,12 +11,12 @@
     "type": "color",
     "default": "#5b6c79"
   },{
-    "human_name": "Primary Button Color",
+    "human_name": "Primary Button",
     "variable_name": "ic-brand-button--primary-bgd",
     "type": "color",
     "default": "$ic-brand-primary"
   },{
-    "human_name": "Primary Button Text Color",
+    "human_name": "Primary Button Text",
     "variable_name": "ic-brand-button--primary-text",
     "type": "color",
     "default": "#ffffff"
@@ -26,40 +26,98 @@
     "type": "color",
     "default": "$ic-brand-secondary"
   },{
-    "human_name": "Secondary Button Text Color",
+    "human_name": "Secondary Button Text",
     "variable_name": "ic-brand-button--secondary-text",
     "type": "color",
     "default": "#ffffff"
   },{
-    "human_name": "Link Color",
+    "human_name": "Link",
     "variable_name": "ic-link-color",
     "type": "color",
-    "default": "$ic-brand-primary"
+    "default": "#0081bd"
   }
-]
-},{
-  "group_name": "Logos & Watermarks",
-  "variables": [{
-    "human_name": "Main Logo",
-    "helper_text": "400x400, svg, png, jpg, gif",
+]},
+{
+  "group_name": "Global Navigation",
+  "variables": [
+  {
+    "human_name": "Nav Background",
+    "variable_name": "ic-brand-global-nav-bgd",
+    "type": "color",
+    "default": "$ic-brand-secondary"
+  },
+  {
+    "human_name": "Nav Icon",
+    "variable_name": "ic-brand-global-nav-ic-icon-svg-fill",
+    "type": "color",
+    "default": "#ffffff"
+  },
+  {
+    "human_name": "Nav Icon Active",
+    "variable_name": "ic-brand-global-nav-ic-icon-svg-fill--active",
+    "type": "color",
+    "default": "$ic-brand-primary"
+  },
+  {
+    "human_name": "Nav Text",
+    "variable_name": "ic-brand-global-nav-menu-item__text-color",
+    "type": "color",
+    "default": "#ffffff"
+  },
+  {
+    "human_name": "Nav Text Active",
+    "variable_name": "ic-brand-global-nav-menu-item__text-color--active",
+    "type": "color",
+    "default": "$ic-link-color"
+  },
+  {
+    "human_name": "Nav Avatar Border",
+    "variable_name": "ic-brand-global-nav-avatar-border",
+    "type": "color",
+    "default": "#ffffff"
+  },
+  {
+    "human_name": "Nav Badge",
+    "variable_name": "ic-brand-global-nav-menu-item__badge-bgd",
+    "type": "color",
+    "default": "$ic-brand-primary"
+  },
+  {
+    "human_name": "Nav Logo",
+    "helper_text": "Accepted formats: svg, png, jpg, gif",
     "variable_name": "ic-brand-header-image",
     "type": "image",
     "accept": "image/png,image/gif,image/jpeg,image/svg",
-    "default": "/images/k-12-logo-placeholder.png"
-  },{
+    "default": "/images/svg-icons/svg_canvas_logomark_only.svg"
+  },
+  {
+    "human_name": "Nav Logo Background",
+    "variable_name": "ic-brand-global-nav-logo-bgd",
+    "type": "color",
+    "default": "$ic-brand-secondary"
+  }
+]},
+{
+  "group_name": "Watermarks & Other Images",
+  "variables": [{
     "human_name": "Favicon",
-    "helper_text": "use a single 16x16, 32x32, 48x48 ico file",
+    "helper_text": "You can use a single 16x16, 32x32, 48x48 ico file.",
     "variable_name": "ic-brand-favicon",
     "type": "image",
     "accept": "image/vnd.microsoft.icon,image/x-icon,image/png,image/gif",
-    "default": "/images/favicon.ico"
+    "default": "/favicon.ico"
   },{
     "human_name": "Mobile Homescreen Icon",
     "helper_text": "The shortcut icon for iOS/Android devices. 180x180 svg, png, jpg, gif",
     "variable_name": "ic-brand-apple-touch-icon",
     "type": "image",
     "accept": "image/png,image/svg",
-    "default": "/images/apple-touch-icon.png"
+    "default": "/apple-touch-icon.png"
+  },{
+    "human_name": "Windows Tile Color",
+    "variable_name": "ic-brand-msapplication-tile-color",
+    "type": "color",
+    "default": "$ic-brand-primary"
   },{
     "human_name": "Windows Tile: Square",
     "helper_text": "558x558 svg, png, jpg, gif (1.8x the standard tile size, so it can be scaled up or down as needed)",
@@ -74,10 +132,6 @@
     "type": "image",
     "accept": "image/png,image/gif,image/jpeg",
     "default": "/images/windows-tile-wide.png"
-  },{
-    "human_name": "Windows Tile Color",
-    "variable_name": "ic-brand-msapplication-tile-color",
-    "type": "color",
-    "default": "$ic-brand-primary"
-  }]
+  }
+  ]
 }]
