@@ -214,7 +214,6 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
       data
 
     updateAssignment: (data) =>
-      @dueDateOverrideView.updateOverrides()
       defaultDate = @dueDateOverrideView.getDefaultDueDate()
       data.lock_at = defaultDate?.get('lock_at') or null
       data.unlock_at = defaultDate?.get('unlock_at') or null
@@ -275,7 +274,7 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
         if @assignmentGroupSelector?
           errors = @assignmentGroupSelector.validateBeforeSave(data, errors)
         data2 =
-          assignment_overrides: @dueDateOverrideView.getAllDates(data.assignment.toJSON())
+          assignment_overrides: @dueDateOverrideView.getAllDates()
         errors = @dueDateOverrideView.validateBeforeSave(data2, errors)
         errors = @_validatePointsPossible(data, errors)
       else

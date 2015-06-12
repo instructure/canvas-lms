@@ -1,4 +1,4 @@
-define (require) -> 
+define (require) ->
   _ = require('underscore')
   K = require('./constants')
   generateUUID = require('../../util/generateUUID')
@@ -50,7 +50,7 @@ define (require) ->
       {
         event_type: this.type,
         event_data: this.data,
-        created_at: this.recordedAt
+        client_timestamp: this.recordedAt
       }
 
     toString: ->

@@ -70,12 +70,12 @@ describe "calendar2" do
           make_event :context => @course, :start => Time.now
           get "/calendar2"
 
-          f('.context_list_context').click
+          f('.context_list_context .context-list-toggle-box').click
           context_course_item = fj('.context_list_context:nth-child(2)')
           expect(context_course_item).to have_class('checked')
           expect(f('.fc-event')).to be_displayed
 
-          context_course_item.click
+          fj('.context_list_context:nth-child(2) .context-list-toggle-box').click
           expect(context_course_item).to have_class('not-checked')
           expect(element_exists('.fc_event')).to be_falsey
         end

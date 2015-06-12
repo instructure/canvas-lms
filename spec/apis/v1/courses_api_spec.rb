@@ -23,7 +23,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper'
 class TestCourseApi
   include Api::V1::Course
   def feeds_calendar_url(feed_code); "feed_calendar_url(#{feed_code.inspect})"; end
+
   def course_url(course, opts = {}); return "course_url(Course.find(#{course.id}), :host => #{HostUrl.context_host(@course1)})"; end
+
   def api_user_content(syllabus, course); return "api_user_content(#{syllabus}, #{course.id})"; end
 end
 
@@ -423,6 +425,47 @@ describe CoursesController, type: :request do
         )
         new_course = Course.find(json['id'])
         expect(new_course.sis_source_id).to eq '9999'
+      end
+
+      context "sis reactivation" do
+        it "should allow reactivating deleting courses using sis_course_id" do
+          old_course = @account.courses.build(:name => "Test")
+          old_course.sis_source_id = '9999'
+          old_course.save!
+          old_course.destroy
+
+          json = api_call(:post, @resource_path,
+            @resource_params,
+            { :account_id => @account.id, :course => { :name => 'Test Course', :sis_course_id => '9999' },
+              :enable_sis_reactivation => '1' }
+          )
+          expect(old_course).to eq Course.find(json['id'])
+          old_course.reload
+          expect(old_course).to be_claimed
+          expect(old_course.sis_source_id).to eq '9999'
+        end
+
+        it "should raise an error trying to reactivate an active course" do
+          old_course = @account.courses.build(:name => "Test")
+          old_course.sis_source_id = '9999'
+          old_course.save!
+
+          api_call(:post, @resource_path,
+            @resource_params,
+            { :account_id => @account.id, :course => { :name => 'Test Course', :sis_course_id => '9999' },
+              :enable_sis_reactivation => '1' }, {}, {:expected_status => 400}
+          )
+        end
+
+        it "should carry on if there's no course to reactivate" do
+          json = api_call(:post, @resource_path,
+            @resource_params,
+            { :account_id => @account.id, :course => { :name => 'Test Course', :sis_course_id => '9999' },
+              :enable_sis_reactivation => '1'}
+          )
+          new_course = Course.find(json['id'])
+          expect(new_course.sis_source_id).to eq '9999'
+        end
       end
 
       it "should set the apply_assignment_group_weights flag" do
@@ -1661,15 +1704,30 @@ describe CoursesController, type: :request do
                                                               :only => USER_API_FIELDS).sort_by{|x| x["id"]}
       end
 
+      it "returns a list of users filtered by id if user_ids is given" do
+        expected_users = [@course1.users.first, @course1.users.last]
+        json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json", {
+          :controller => 'courses',
+          :action => 'users',
+          :course_id => @course1.id.to_s,
+          :user_ids => expected_users.map(&:id),
+          :format => 'json'
+        })
+        expect(json.sort_by{|x| x["id"]}).to eq api_json_response(
+          expected_users,
+          :only => USER_API_FIELDS
+        ).sort_by{|x| x["id"]}
+      end
+
       it "excludes the test student by default" do
-        test_student = @course1.student_view_student
+        @course1.student_view_student
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json' })
         expect(json.map{ |s| s["name"] }).not_to include("Test Student")
       end
 
       it "includes the test student if told to do so" do
-        test_student = @course1.student_view_student
+        @course1.student_view_student
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => @course1.id.to_s, :format => 'json'},
                           :include => ['test_student'] )

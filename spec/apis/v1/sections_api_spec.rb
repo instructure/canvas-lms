@@ -321,6 +321,44 @@ describe SectionsController, type: :request do
         expect(section.sis_source_id).to eq 'fail'
         expect(section.sis_batch_id).to eq nil
       end
+
+      it "should allow reactivating deleting sections using sis_section_id" do
+        old_section = @course.course_sections.create!
+        old_section.sis_source_id = 'fail'
+        old_section.save!
+        old_section.destroy
+
+        json = api_call(:post, @path_prefix, @path_params, { :course_section =>
+            { :name => 'Name', :start_at => '2011-01-01T01:00Z',
+              :end_at => '2011-07-01T01:00Z', :sis_section_id => 'fail' },
+            :enable_sis_reactivation => '1'})
+
+        expect(old_section).to eq @course.active_course_sections.find(json['id'].to_i)
+        old_section.reload
+        expect(old_section).to be_active
+        expect(old_section.sis_source_id).to eq 'fail'
+      end
+
+      it "should raise an error trying to reactivate an active section" do
+        old_section = @course.course_sections.create!
+        old_section.sis_source_id = 'fail'
+        old_section.save!
+
+        json = api_call(:post, @path_prefix, @path_params, { :course_section =>
+            { :name => 'Name', :start_at => '2011-01-01T01:00Z',
+              :end_at => '2011-07-01T01:00Z', :sis_section_id => 'fail' },
+            :enable_sis_reactivation => '1'}, {}, {:expected_status => 400})
+      end
+
+      it "should carry on if there's no section to reactivate" do
+        json = api_call(:post, @path_prefix, @path_params, { :course_section =>
+            { :name => 'Name', :start_at => '2011-01-01T01:00Z',
+              :end_at => '2011-07-01T01:00Z', :sis_section_id => 'fail' },
+            :enable_sis_reactivation => '1'})
+
+        section = @course.active_course_sections.find(json['id'].to_i)
+        expect(section.sis_source_id).to eq 'fail'
+      end
     end
   end
 
@@ -339,7 +377,7 @@ describe SectionsController, type: :request do
       end
 
       it "should modify section data by id" do
-        json = api_call(:put, "#@path_prefix/#{@section.id}", @path_params.merge(:id => @section.to_param), { :course_section =>
+        json = api_call(:put, "#{@path_prefix}/#{@section.id}", @path_params.merge(:id => @section.to_param), { :course_section =>
           { :name => 'New Name', :start_at => '2012-01-01T01:00Z', :end_at => '2012-07-01T01:00Z', :restrict_enrollments_to_section_dates => '1' }})
         expect(json['id']).to eq @section.id
         @section.reload
@@ -351,7 +389,7 @@ describe SectionsController, type: :request do
       end
 
       it "should modify section data by sis id" do
-        json = api_call(:put, "#@path_prefix/sis_section_id:SISsy", @path_params.merge(:id => "sis_section_id:SISsy"), { :course_section =>
+        json = api_call(:put, "#{@path_prefix}/sis_section_id:SISsy", @path_params.merge(:id => "sis_section_id:SISsy"), { :course_section =>
           { :name => 'New Name', :start_at => '2012-01-01T01:00Z', :end_at => '2012-07-01T01:00Z' }})
         expect(json['id']).to eq @section.id
         @section.reload
@@ -362,24 +400,24 @@ describe SectionsController, type: :request do
       end
 
       it "should behave gracefully if the course_section parameter is missing" do
-        json = api_call(:put, "#@path_prefix/#{@section.id}", @path_params.merge(:id => @section.to_param))
+        json = api_call(:put, "#{@path_prefix}/#{@section.id}", @path_params.merge(:id => @section.to_param))
         expect(json['id']).to eq @section.id
       end
 
       it "should fail if the section is deleted" do
         @section.destroy
-        api_call(:put, "#@path_prefix/#{@section.id}", @path_params.merge(:id => @section.to_param),
+        api_call(:put, "#{@path_prefix}/#{@section.id}", @path_params.merge(:id => @section.to_param),
                  { :course_section => { :name => 'New Name' } }, {}, :expected_status => 404)
       end
 
       it "should fail if the context is deleted" do
         @course.destroy
-        api_call(:put, "#@path_prefix/#{@section.id}", @path_params.merge(:id => @section.to_param),
+        api_call(:put, "#{@path_prefix}/#{@section.id}", @path_params.merge(:id => @section.to_param),
                  { :course_section => { :name => 'New Name' } }, {}, :expected_status => 404)
       end
 
       it "should ignore the sis id parameter" do
-        json = api_call(:put, "#@path_prefix/#{@section.id}", @path_params.merge(:id => @section.to_param), { :course_section =>
+        json = api_call(:put, "#{@path_prefix}/#{@section.id}", @path_params.merge(:id => @section.to_param), { :course_section =>
           { :name => 'New Name', :start_at => '2012-01-01T01:00Z', :end_at => '2012-07-01T01:00Z', :sis_section_id => 'NEWSIS' }})
         expect(json['id']).to eq @section.id
         @section.reload
@@ -394,7 +432,7 @@ describe SectionsController, type: :request do
       end
 
       it "should disallow modifying a section" do
-        api_call(:put, "#@path_prefix/#{@section.id}", @path_params.merge(:id => @section.to_param),
+        api_call(:put, "#{@path_prefix}/#{@section.id}", @path_params.merge(:id => @section.to_param),
                  { :course_section => { :name => 'New Name' } }, {}, :expected_status => 401)
       end
     end
@@ -405,7 +443,7 @@ describe SectionsController, type: :request do
       end
 
       it "should set the sis id" do
-        json = api_call(:put, "#@path_prefix/#{@section.id}", @path_params.merge(:id => @section.to_param), { :course_section =>
+        json = api_call(:put, "#{@path_prefix}/#{@section.id}", @path_params.merge(:id => @section.to_param), { :course_section =>
           { :name => 'New Name', :start_at => '2012-01-01T01:00Z', :end_at => '2012-07-01T01:00Z', :sis_section_id => 'NEWSIS' }})
         expect(json['id']).to eq @section.id
         @section.reload
@@ -430,13 +468,13 @@ describe SectionsController, type: :request do
       end
 
       it "should delete a section by id" do
-        json = api_call(:delete, "#@path_prefix/#{@section.id}", @path_params.merge(:id => @section.to_param))
+        json = api_call(:delete, "#{@path_prefix}/#{@section.id}", @path_params.merge(:id => @section.to_param))
         expect(json['id']).to eq @section.id
         expect(@section.reload).to be_deleted
       end
 
       it "should delete a section by sis id" do
-        json = api_call(:delete, "#@path_prefix/sis_section_id:SISsy", @path_params.merge(:id => "sis_section_id:SISsy"))
+        json = api_call(:delete, "#{@path_prefix}/sis_section_id:SISsy", @path_params.merge(:id => "sis_section_id:SISsy"))
         expect(json['id']).to eq @section.id
         expect(@section.reload).to be_deleted
       end
@@ -444,17 +482,17 @@ describe SectionsController, type: :request do
       it "should fail to delete a section with enrollments" do
         @section.enroll_user(user_model, 'StudentEnrollment', 'active')
         @user = @teacher
-        api_call(:delete, "#@path_prefix/#{@section.id}", @path_params.merge(:id => @section.to_param), {}, {}, :expected_status => 400)
+        api_call(:delete, "#{@path_prefix}/#{@section.id}", @path_params.merge(:id => @section.to_param), {}, {}, :expected_status => 400)
       end
 
       it "should fail if the section is deleted" do
         @section.destroy
-        api_call(:delete, "#@path_prefix/#{@section.id}", @path_params.merge(:id => @section.to_param), {}, {}, :expected_status => 404)
+        api_call(:delete, "#{@path_prefix}/#{@section.id}", @path_params.merge(:id => @section.to_param), {}, {}, :expected_status => 404)
       end
 
       it "should fail if the context is deleted" do
         @course.destroy
-        api_call(:delete, "#@path_prefix/#{@section.id}", @path_params.merge(:id => @section.to_param), {}, {}, :expected_status => 404)
+        api_call(:delete, "#{@path_prefix}/#{@section.id}", @path_params.merge(:id => @section.to_param), {}, {}, :expected_status => 404)
       end
     end
 
@@ -464,7 +502,7 @@ describe SectionsController, type: :request do
       end
 
       it "should disallow deleting a section" do
-        api_call(:delete, "#@path_prefix/#{@section.id}", @path_params.merge(:id => @section.to_param), {}, {}, :expected_status => 401)
+        api_call(:delete, "#{@path_prefix}/#{@section.id}", @path_params.merge(:id => @section.to_param), {}, {}, :expected_status => 401)
       end
     end
   end

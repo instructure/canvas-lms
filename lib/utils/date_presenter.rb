@@ -49,7 +49,7 @@ module Utils
     end
 
     def i18n_date(format)
-      I18n.l(raw_date, format: format)
+      I18n.l(raw_date, format: I18n.send(:t, :"date.formats.#{format}"))
     end
 
     def special_value_type

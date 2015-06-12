@@ -65,6 +65,11 @@ require 'action_controller_test_process'
 #           "example": "Toph Beifong",
 #           "type": "string"
 #         },
+#         "author": {
+#           "description": "Abbreviated user object UserDisplay (see users API).",
+#           "example": "{}",
+#           "type": "string"
+#         },
 #         "comment": {
 #           "example": "Well here's the thing...",
 #           "type": "string"
@@ -206,11 +211,11 @@ class SubmissionsController < ApplicationController
   end
 
   API_SUBMISSION_TYPES = {
-    "online_text_entry" => ["body"],
-    "online_url" => ["url"],
-    "online_upload" => ["file_ids"],
-    "media_recording" => ["media_comment_id", "media_comment_type"],
-  }
+    "online_text_entry" => ["body"].freeze,
+    "online_url" => ["url"].freeze,
+    "online_upload" => ["file_ids"].freeze,
+    "media_recording" => ["media_comment_id", "media_comment_type"].freeze,
+  }.freeze
 
   # @API Submit an assignment
   #

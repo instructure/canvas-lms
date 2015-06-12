@@ -23,7 +23,7 @@ define [
 
     React.render(MoveDialog({
       thingsToMove: thingsToMove
-      rootFoldersToShow: [rootFolderToShow]
+      rootFoldersToShow: if filesEnv.showingAllContexts then filesEnv.rootFolders else [rootFolderToShow]
       closeDialog: -> $dialog.dialog('close')
       setTitle: (title) -> $dialog.dialog('option', 'title', title)
     }), $dialog[0])

@@ -7,7 +7,6 @@ define [
   'compiled/models/Section'
   'compiled/models/DiscussionTopic'
   'compiled/models/Announcement'
-  'compiled/views/assignments/DueDateList'
   'compiled/views/assignments/DueDateOverride'
   'compiled/views/DiscussionTopics/EditView'
   'compiled/collections/AssignmentGroupCollection'
@@ -15,8 +14,8 @@ define [
   'helpers/fakeENV'
   'helpers/jquery.simulate'
 ], ($, _, SectionCollection, Assignment, DueDateList, Section, DiscussionTopic,
-Announcement, DueDateListView, DueDateOverrideView, EditView,
-AssignmentGroupCollection, GroupCategorySelector, fakeENV) ->
+Announcement, DueDateOverrideView, EditView, AssignmentGroupCollection,
+GroupCategorySelector, fakeENV) ->
 
   editView = (opts = {}) ->
     modelClass = if opts.isAnnouncement then Announcement else DiscussionTopic
@@ -38,8 +37,7 @@ AssignmentGroupCollection, GroupCategorySelector, fakeENV) ->
       views:
         'js-assignment-overrides': new DueDateOverrideView
           model: dueDateList
-          views:
-            'due-date-overrides': new DueDateListView(model: dueDateList)
+          views: {}
 
     (app.assignmentGroupCollection = new AssignmentGroupCollection).contextAssetString = ENV.context_asset_string
     sinon.stub(app, "_initializeWikiSidebar")

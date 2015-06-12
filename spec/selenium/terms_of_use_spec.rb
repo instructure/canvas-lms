@@ -13,7 +13,7 @@ describe "terms of use test" do
   end
 
   it "should not require a user to accept the terms if already logged in when they change" do
-    login_as
+    create_session(@pseudonym)
     account = Account.default
     account.settings[:terms_changed_at] = Time.now.utc
     account.save!

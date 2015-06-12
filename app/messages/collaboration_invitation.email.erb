@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= polymorphic_url([asset.collaboration.context, asset.collaboration]) %>
+  <%= polymorphic_url([asset.collaboration.context, asset.collaboration.becomes(Collaboration)]) %>
 <% end %>
 
 <% define_content :subject do %>

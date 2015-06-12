@@ -156,5 +156,18 @@ describe ContentMigration do
 
       expect(@copy_to.syllabus_body).to eq @copy_from.syllabus_body.sub("/courses/#{@copy_from.id}/", "/courses/#{@copy_to.id}/")
     end
+
+    it "should copy message_type (and other fields)" do
+      @tool_from.course_settings_sub_navigation = {:url => "http://www.example.com", :text => "hello",
+                                    :message_type => "ContentItemSelectionResponse"}
+      @tool_from.settings[:selection_width] = 5000
+      @tool_from.save!
+
+      run_course_copy
+
+      tool = @copy_to.context_external_tools.where(migration_id: CC::CCHelper.create_key(@tool_from)).first
+      expect(tool.settings[:selection_width]).to eq 5000
+      expect(tool.course_settings_sub_navigation[:message_type]).to eq "ContentItemSelectionResponse"
+    end
   end
 end

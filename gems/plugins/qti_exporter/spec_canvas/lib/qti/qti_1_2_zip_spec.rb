@@ -24,7 +24,7 @@ if Qti.migration_executable
     after(:all) do
       truncate_all_tables
       @converter.delete_unzipped_archive
-      if File.exists?(@dir)
+      if File.exist?(@dir)
         FileUtils::rm_rf(@dir)
       end
     end

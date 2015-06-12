@@ -207,6 +207,10 @@ class GroupMembership < ActiveRecord::Base
     given { |user, session| user && self.group && user == self.user && self.group.grants_right?(user, :join) && self.group.group_category.try(:communities?) }
     can :create
 
+    # user can read group membership if they can read its group's roster
+    given { |user, session| user && self.group && self.group.grants_right?(user, session, :read_roster) }
+    can :read
+
     given { |user, session| user && self.group && self.group.grants_right?(user, session, :manage) }
     can :update
 

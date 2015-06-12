@@ -48,7 +48,7 @@ module CC::Importer
         path = res[:href] || (res[:files] && res[:files].first && res[:files].first[:href])
         path = converter.get_full_path(path)
 
-        if File.exists?(path)
+        if File.exist?(path)
           doc = open_file_xml(path)
           tool = convert_blti_link(doc)
           tool[:migration_id] = res[:migration_id]

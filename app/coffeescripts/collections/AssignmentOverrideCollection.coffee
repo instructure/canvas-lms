@@ -30,5 +30,8 @@ define [
       json = @reject ( override ) -> override.representsDefaultDueDate()
       _.map json, ( override ) -> override.toJSON().assignment_override
 
+    datesJSON: =>
+      @map ( override ) -> override.toJSON().assignment_override
+
     isSimple: =>
       _.difference(@courseSectionIDs(), [Section.defaultDueDateSectionID]).length == 0

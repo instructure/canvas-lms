@@ -1,4 +1,4 @@
-<div class="rs-margin-lr rs-margin-top">
+<div class="rs-margin-lr <% unless use_new_styles? %>rs-margin-top<% end %>">
   <% if @context.is_a?(Course) %>
     <% if can_do(@context, @current_user, :read_roster) %>
       <%= sidebar_button context_url(@context, :context_groups_url),

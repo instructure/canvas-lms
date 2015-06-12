@@ -28,11 +28,13 @@ class ExternalFeed < ActiveRecord::Base
   before_validation :infer_defaults
 
   include CustomValidations
-  validates_presence_of :url, :context_id, :context_type
+  validates :url, :context_id, :context_type, presence: true
   validates_as_url :url
-  validates_uniqueness_of :url, scope: [:context_id, :context_type, :verbosity, :header_match]
+  validates :url,
+    uniqueness: { scope: [:context_id, :context_type, :verbosity, :header_match] },
+    length: { maximum: maximum_string_length }
 
-  VERBOSITIES = %w(full link_only truncate)
+  VERBOSITIES = %w(full link_only truncate).freeze
   validates_inclusion_of :verbosity, :in => VERBOSITIES, :allow_nil => true
 
   def infer_defaults

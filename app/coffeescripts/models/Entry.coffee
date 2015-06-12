@@ -125,7 +125,7 @@ define [
     ratingString: ->
       return '' unless sum = @get('rating_sum')
       I18n.t 'like_count', {
-        one: '(1 like)'
+        one: '(%{count} like)'
         other: '(%{count} likes)'
       }, count: sum
 

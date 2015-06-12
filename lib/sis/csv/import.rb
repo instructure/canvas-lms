@@ -219,7 +219,7 @@ module SIS
       def add_warning(csv, message)
         @warnings << [ csv ? csv[:file] : "", message ]
       end
-    
+
       def update_progress
         @current_row += 1
         @current_row_for_pause_vars += 1
@@ -228,9 +228,7 @@ module SIS
         if update_progress?
           if @parallelism > 1
             SisBatch.transaction do
-              lock_type = true
-              lock_type = 'FOR NO KEY UPDATE' if SisBatch.connection.adapter_name == 'PostgreSQL' && SisBatch.connection.send(:postgresql_version) >= 90300
-              @batch.reload(:select => 'data, progress', :lock => lock_type)
+              @batch.reload(select: 'data, progress', lock: :no_key_update)
               @current_row += @batch.data[:current_row]
               @batch.data[:current_row] = @current_row
               @batch.progress = (((@current_row.to_f/@total_rows) * @progress_multiplier) + @progress_offset) * 100

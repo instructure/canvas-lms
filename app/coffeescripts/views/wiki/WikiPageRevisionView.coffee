@@ -10,8 +10,12 @@ define [
     className: 'revision clearfix'
     template: template
 
+    attributes:
+      tabindex: 0
+
     events:
       'click .restore-link': 'restore'
+      'keydown .restore-link': 'restore'
 
     initialize: ->
       super
@@ -38,6 +42,8 @@ define [
       return window.location;
 
     restore: (ev) ->
+      if (ev?.type == 'keydown')
+        return if ev.keyCode != 13
       ev?.preventDefault()
       @model.restore().done (attrs) =>
         if @pages_path

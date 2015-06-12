@@ -45,7 +45,6 @@ describe "external tool buttons" do
 
   it "should allow inserting oembed content from external tool buttons" do
     load_selection_test_tool("#oembed_link")
-
     html = driver.execute_script("return $('textarea[name=message]').editorBox('get_code')")
     expect(html).to match(/ZB8T0193/)
   end

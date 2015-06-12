@@ -743,6 +743,19 @@ describe "context modules" do
       get "/courses/#{@course.id}"
       expect(f(".context_module_item.attachment .icon-publish")).to be_displayed
     end
+
+    it "should render publish buttons in collapsed modules" do
+      @module = @course.context_modules.create! name: "collapsed"
+      tag = @module.add_item(type: 'assignment', id: @assignment2.id)
+      @progression = @module.evaluate_for(@user)
+      @progression.collapsed = true
+      @progression.save!
+      get "/courses/#{@course.id}/modules"
+      wait_for_ajaximations
+      f('.expand_module_link').click
+      wait_for_ajaximations
+      expect(f(".context_module_item.assignment .icon-publish")).to be_displayed
+    end
   end
 
   context "as a teacher", :priority => "1" do

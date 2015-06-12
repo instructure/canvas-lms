@@ -82,14 +82,15 @@ define [
       return returnView
 
     createHomeworkSubmissionView: (tool, data) ->
-      if data.return_type == 'file'
+      item = data.contentItems[0]
+      if item['@type'] == 'FileItem'
         homeworkSubmissionView = new ExternalContentFileSubmissionView
           externalTool: tool
-          model: new Backbone.Model(data)
+          model: new Backbone.Model(item)
       else
         homeworkSubmissionView = new ExternalContentUrlSubmissionView
           externalTool: tool
-          model: new Backbone.Model(data)
+          model: new Backbone.Model(item)
 
       homeworkSubmissionView.on 'relaunchTool', (tool, model) ->
         @remove()

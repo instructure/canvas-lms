@@ -36,7 +36,7 @@ describe "One Question at a Time Quizzes as a student" do
     navigate_away_and_resume_quiz
     accept_cant_go_back_warning
     it_should_be_on_second_question
-    
+
     navigate_directly_to_first_question
     it_should_be_on_second_question
   end
@@ -62,13 +62,14 @@ describe "One Question at a Time Quizzes as a student" do
     it_should_show_cant_go_back_warning
     accept_cant_go_back_warning
 
-    fj("a:contains('Quizzes')").click
-    driver.switch_to.alert.accept
+    expect_new_page_load(true) do
+      fj("a:contains('Quizzes')").click
+    end
 
-    wait_for_ajaximations
+    expect_new_page_load do
+      fj("a:contains('OQAAT quiz')").click
+    end
 
-    fj("a:contains('OQAAT quiz')").click
-    wait_for_ajaximations
     fj("#not_right_side .take_quiz_button a:contains('Resume Quiz')").click
 
     it_should_show_cant_go_back_warning

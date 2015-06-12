@@ -101,7 +101,7 @@ module DatesOverridable
 
     if all_dates
       # remove base if all sections are set
-      overrides = all_dates.select { |d| d[:set_type] == 'CourseSection' }
+      overrides = all_dates.select{ |d| d[:set_type] == 'CourseSection' }
       if overrides.count > 0 && overrides.count == context.active_course_sections.count
         all_dates.delete_if {|d| d[:base] }
       end

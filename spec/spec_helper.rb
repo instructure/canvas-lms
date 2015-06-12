@@ -62,7 +62,6 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
 
-
 module RSpec::Rails
   module ViewExampleGroup
     module ExampleMethods
@@ -438,7 +437,7 @@ RSpec.configure do |config|
   def account_with_cas(opts={})
     @account = opts[:account]
     @account ||= Account.create!
-    config = AccountAuthorizationConfig.new
+    config = AccountAuthorizationConfig::CAS.new
     cas_url = opts[:cas_url] || "https://localhost/cas"
     config.auth_type = "cas"
     config.auth_base = cas_url
@@ -450,9 +449,10 @@ RSpec.configure do |config|
   def account_with_saml(opts={})
     @account = opts[:account]
     @account ||= Account.create!
-    config = AccountAuthorizationConfig.new
+    config = AccountAuthorizationConfig::SAML.new
     config.auth_type = "saml"
     config.log_in_url = opts[:saml_log_in_url] if opts[:saml_log_in_url]
+    config.log_out_url = opts[:saml_log_out_url] if opts[:saml_log_out_url]
     @account.account_authorization_configs << config
     @account
   end
@@ -1045,11 +1045,13 @@ RSpec.configure do |config|
   end
 
   def assert_unauthorized
-    assert_status(401) #unauthorized
-    expect(response).to render_template("shared/unauthorized")
+    # we allow either a raw unauthorized or a redirect to login
+    unless response.status == 401
+       expect(response).to redirect_to(login_url)
+    end
   end
 
-  def assert_page_not_found(&block)
+  def assert_page_not_found
     yield
     assert_status(404)
   end
@@ -1419,8 +1421,11 @@ RSpec.configure do |config|
       @id = id
       @settings = settings
     end
+
     def valid_settings?; true; end
+
     def enabled?; true; end
+
     def base; end
   end
   def web_conference_plugin_mock(id, settings)
@@ -1602,12 +1607,19 @@ end
 
 class String
   def red; colorize(self, "\e[1m\e[31m"); end
+
   def green; colorize(self, "\e[1m\e[32m"); end
+
   def dark_green; colorize(self, "\e[32m"); end
+
   def yellow; colorize(self, "\e[1m\e[33m"); end
+
   def blue; colorize(self, "\e[1m\e[34m"); end
+
   def dark_blue; colorize(self, "\e[34m"); end
+
   def pur; colorize(self, "\e[1m\e[35m"); end
+
   def colorize(text, color_code)  "#{color_code}#{text}\e[0m" end
 end
 

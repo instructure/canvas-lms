@@ -9,12 +9,12 @@ module AssignmentOverridesSeleniumHelper
   end
 
   def fill_assignment_overrides
-      f('.due-date-overrides [name="due_at"]').
-        send_keys(due_at.strftime('%b %-d, %y'))
-      f('.due-date-overrides [name="unlock_at"]').
-        send_keys(unlock_at.strftime('%b %-d, %y'))
-      f('.due-date-overrides [name="lock_at"]').
-        send_keys(lock_at.strftime('%b %-d, %y'))
+      fj(".datePickerDateField[data-date-type='due_at']")
+        .send_keys(due_at.strftime('%b %-d, %y'))
+      fj(".datePickerDateField[data-date-type='unlock_at']")
+        .send_keys(unlock_at.strftime('%b %-d, %y'))
+      fj(".datePickerDateField[data-date-type='lock_at']")
+        .send_keys(lock_at.strftime('%b %-d, %y'))
   end
 
   def update_assignment!
@@ -34,12 +34,12 @@ module AssignmentOverridesSeleniumHelper
   end
 
   def compare_assignment_times(a)
-    expect(a.due_at.strftime('%b %-d, %y')).to eq due_at.to_date.
-      strftime('%b %-d, %y')
-    expect(a.unlock_at.strftime('%b %-d, %y')).to eq unlock_at.to_date.
-      strftime('%b %-d, %y')
-    expect(a.lock_at.strftime('%b %-d, %y')).to eq lock_at.to_date.
-      strftime('%b %-d, %y')
+    expect(a.due_at.strftime('%b %-d, %y')).to eq due_at.to_date
+      .strftime('%b %-d, %y')
+    expect(a.unlock_at.strftime('%b %-d, %y')).to eq unlock_at.to_date
+      .strftime('%b %-d, %y')
+    expect(a.lock_at.strftime('%b %-d, %y')).to eq lock_at.to_date
+      .strftime('%b %-d, %y')
   end
 
   def create_assignment!
@@ -55,27 +55,27 @@ module AssignmentOverridesSeleniumHelper
   end
 
   def first_due_at_element
-    fj('.due-date-row:first [name="due_at"]')
+    fj(".datePickerDateField:first[data-date-type='due_at']")
   end
 
   def first_unlock_at_element
-    fj('.due-date-row:first [name="unlock_at"]')
+    fj(".datePickerDateField:first[data-date-type='unlock_at']")
   end
 
   def first_lock_at_element
-    fj('.due-date-row:first [name="lock_at"]')
+    fj(".datePickerDateField:first[data-date-type='lock_at']")
   end
 
   def last_due_at_element
-    fj('.due-date-row:last [name="due_at"]')
+    fj(".datePickerDateField:last[data-date-type='due_at']")
   end
 
   def last_unlock_at_element
-    fj('.due-date-row:last [name="unlock_at"]')
+    fj(".datePickerDateField:last[data-date-type='unlock_at']")
   end
 
   def last_lock_at_element
-    fj('.due-date-row:last [name="lock_at"]')
+    fj(".datePickerDateField:last[data-date-type='lock_at']")
   end
 
   def add_override
@@ -84,12 +84,18 @@ module AssignmentOverridesSeleniumHelper
   end
 
   def select_last_override_section(section_name)
-    click_option('.due-date-row:last select', section_name)
+    driver.switch_to.default_content
+    fj('.ic-tokeninput-input:last').send_keys(section_name)
+    wait_for_ajaximations
+    fj(".ic-tokeninput-option:visible:last").click
     wait_for_ajaximations
   end
 
   def select_first_override_section(section_name)
-    click_option('.due-date-row:first select', section_name)
+    driver.switch_to.default_content
+    fj('.ic-tokeninput-input:first').send_keys(section_name)
+    wait_for_ajaximations
+    fj(".ic-tokeninput-option:visible:first").click
     wait_for_ajaximations
   end
 

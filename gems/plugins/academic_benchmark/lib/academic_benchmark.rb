@@ -12,7 +12,7 @@ module AcademicBenchmark
 
   class APIError < StandardError;end
 
-  def self.import(guids)
+  def self.import(guid_or_guids)
     if !AcademicBenchmark.config[:api_key]
       puts "Not importing academic benchmark data because no API key is set"
       return
@@ -25,8 +25,8 @@ module AcademicBenchmark
       return
     end
 
-    if permissionful_user = User.where(id: user_id).first
-      guids.each do |guid|
+    if (permissionful_user = User.where(id: user_id).first)
+      Array.new(guid_or_guids).each do |guid|
         AcademicBenchmark.queue_migration_for_guid(guid, permissionful_user)
       end
     else

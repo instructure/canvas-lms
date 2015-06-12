@@ -20,7 +20,7 @@
 class MediaTracksController < ApplicationController
   include Api::V1::MediaObject
 
-  TRACK_SETTABLE_ATTRIBUTES = [:kind, :locale, :content]
+  TRACK_SETTABLE_ATTRIBUTES = [:kind, :locale, :content].freeze
 
   # @{not an}API Create a media track
   #

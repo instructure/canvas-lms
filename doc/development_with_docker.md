@@ -96,7 +96,7 @@ When selenium tests run, you can open a vnc window to the container
 running firefox with:
 
 ```
-$ open vnc://secret:secret@$(docker-compose ps | grep canvaslms_selenium_ | awk '{print $1}').docker/
+$ open vnc://secret:secret@selenium.docker/
 ```
 
 

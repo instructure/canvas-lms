@@ -270,8 +270,12 @@ $(document).ready(function() {
     if($tool.hasClass('resource_selection')) {
       var tool = $tool.data('tool');
       var frameHeight = Math.max(Math.min($(window).height() - 100, 550), 100);
-      var width = tool.placements.resource_selection.selection_width;
-      var height = tool.placements.resource_selection.selection_height;
+      var placement_type = (tool.placements.resource_selection && 'resource_selection') ||
+        (tool.placements.assignment_selection && 'assignment_selection') ||
+        (tool.placements.link_selection && 'link_selection');
+      var placement = tool.placements[placement_type]
+      var width = placement.selection_width;
+      var height = placement.selection_height;
       var $dialog = $("#resource_selection_dialog");
       if($dialog.length == 0) {
         $dialog = $("<div/>", {id: 'resource_selection_dialog', style: 'padding: 0; overflow-y: hidden;'});
@@ -304,10 +308,11 @@ $(document).ready(function() {
                 .appendTo("body");
             });
           })
-          .bind('selection', function(event, data) {
-            if(data.return_type == 'lti_launch_url' && data.url) {
-              $("#external_tool_create_url").val(data.url);
-              $("#external_tool_create_title").val(data.text || tool.name);
+          .bind('selection', function(event) {
+            var item = event.contentItems[0];
+            if(item["@type"] === 'LtiLink' && item.url) {
+              $("#external_tool_create_url").val(item.url);
+              $("#external_tool_create_title").val(item.title || tool.name);
               $("#context_external_tools_select .domain_message").hide();
             } else {
               alert(I18n.t('invalid_lti_resource_selection', "There was a problem retrieving a valid link from the external tool"));
@@ -324,6 +329,7 @@ $(document).ready(function() {
         .dialog('open');
       $dialog.triggerHandler('dialogresize');
       var url = $.replaceTags($("#select_content_resource_selection_url").attr('href'), 'id', tool.definition_id);
+      url = url + '?placement=' + placement_type;
       $dialog.find("iframe").attr('src', url);
     } else {
       var placements = $tool.data('tool').placements
@@ -353,7 +359,8 @@ $(document).ready(function() {
           for(var idx in data) {
             var tool = data[idx];
             var $tool = $tool_template.clone(true);
-            $tool.toggleClass('resource_selection', 'resource_selection' in tool.placements);
+            var placement = tool.placements.assignment_selection || tool.placements.link_selection;
+            $tool.toggleClass('resource_selection', ('resource_selection' in tool.placements || placement.message_type == "ContentItemSelectionRequest"));
             $tool.fillTemplateData({
               data: tool,
               dataValues: ['definition_type', 'definition_id', 'domain', 'name', 'placements', 'description']

@@ -23,7 +23,11 @@
 </div>
 <div class="alignment-info">
   <a href="#tab-outcomes/{{id}}" role="button" aria-haspopup='true' aria-owns='outcome_detail'>
-    {{#t 'alignment_count'}}<strong>{{count}}</strong> Alignments{{/t}}
+    {{#ifGreaterThan count 8 }}
+      {{#t 'alignment_count_summary'}}<strong>8</strong> out of <strong>{{count}}</strong> Alignments{{/t}}
+    {{else}}
+      {{#t 'alignment_count'}}<strong>{{count}}</strong> Alignments{{/t}}
+    {{/ifGreaterThan}}
   </a>
   <a class="more-details"
     href="#"

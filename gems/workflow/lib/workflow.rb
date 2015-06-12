@@ -31,7 +31,7 @@ module Workflow
     attr_accessor :states, :initial_state, :on_transition_proc
     
     def initialize
-      @states = Hash.new
+      @states = {}
     end
 
     def add(&specification)
@@ -85,7 +85,7 @@ module Workflow
     attr_accessor :name, :events, :on_entry, :on_exit
     
     def initialize(name)
-      @name, @events = name, Hash.new
+      @name, @events = name, {}
     end
     
     def to_s

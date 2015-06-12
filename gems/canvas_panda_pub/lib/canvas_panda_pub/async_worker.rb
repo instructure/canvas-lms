@@ -84,7 +84,7 @@ module CanvasPandaPub
         # future flexibility for adding more modes (like pushing all updates,
         # instead of just the most recent).
         seen_channels = Set.new
-        work.reverse.each do |ary|
+        work.reverse_each do |ary|
           if seen_channels.include? ary[0]
             ary[2] = false
           else

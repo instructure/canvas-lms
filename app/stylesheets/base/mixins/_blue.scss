@@ -12,9 +12,15 @@
 }
 
 @mixin ui-widget-header-bg-and-text {
-  border: 1px solid $borderColorHeader;
-  @include header-text;
-  @include header-bg;
+  @if $use_new_styles {
+    border: 1px solid $ic-border-light;
+    background: $lightBackground;
+  }
+  @else {
+    border: 1px solid $borderColorHeader;
+    @include header-text;
+    @include header-bg;  
+  }
 }
 
 // mixin for easy retina background images

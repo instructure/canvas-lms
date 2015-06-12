@@ -133,7 +133,7 @@ class Folder < ActiveRecord::Base
     return read_attribute(:full_name) if !reload && read_attribute(:full_name)
     folder = self
     names = [self.name]
-    while folder.parent_folder_id do
+    while folder.parent_folder_id
       folder = Folder.find(folder.parent_folder_id) #folder.parent_folder
       names << folder.name if folder
     end

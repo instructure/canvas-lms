@@ -274,7 +274,7 @@ describe "submissions" do
         user_with_pseudonym :username => "nobody2@example.com",
                             :password => "asdfasdf2"
         course_with_student_logged_in :user => @user
-        create_session @pseudonym, false
+        create_session @pseudonym
         add_file(fixture_file_upload('files/html-editing-test.html', 'text/html'),
                  @user, "html-editing-test.html")
         File.read(fixture_file_path("files/html-editing-test.html"))
@@ -322,7 +322,7 @@ describe "submissions" do
         user_with_pseudonym :username => "nobody2@example.com",
                             :password => "asdfasdf2"
         course_with_student_logged_in :user => @user
-        create_session @pseudonym, false
+        create_session @pseudonym
         add_file(fixture_file_upload(FIXTURE_FN, 'application/x-sh'),
                  @user, FILENAME)
         File.read(fixture_file_path(FIXTURE_FN))

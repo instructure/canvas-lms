@@ -162,7 +162,8 @@ class Account < ActiveRecord::Base
   add_setting :error_reporting, :hash => true, :values => [:action, :email, :url, :subject_param, :body_param], :root_only => true
   add_setting :custom_help_links, :root_only => true
   add_setting :prevent_course_renaming_by_teachers, :boolean => true, :root_only => true
-  add_setting :login_handle_name, :root_only => true
+  add_setting :login_handle_name, root_only: true
+  add_setting :change_password_url, root_only: true
 
   add_setting :restrict_student_future_view, :boolean => true, :default => false, :inheritable => true
   add_setting :restrict_student_past_view, :boolean => true, :default => false, :inheritable => true
@@ -208,7 +209,7 @@ class Account < ActiveRecord::Base
   add_setting :dashboard_url, root_only: true
   add_setting :product_name, root_only: true
   add_setting :author_email_in_notifications, boolean: true, root_only: true, default: false
-  add_setting :include_students_in_global_survey, boolean: true, root_only: true, default: true
+  add_setting :include_students_in_global_survey, boolean: true, root_only: true, default: false
   add_setting :trusted_referers, root_only: true
 
   BRANDING_SETTINGS = [:header_image, :favicon, :apple_touch_icon,
@@ -793,23 +794,13 @@ class Account < ActiveRecord::Base
     self.account_authorization_configs.first
   end
 
-  # If an account uses an authorization_config, it's login_handle_name is used.
-  # Otherwise they can set it on the account settings page.
   def login_handle_name_is_customized?
-    if self.account_authorization_config
-      self.account_authorization_config.login_handle_name.present?
-    else
-      settings[:login_handle_name].present?
-    end
+    self.login_handle_name.present?
   end
 
-  def login_handle_name
+  def login_handle_name_with_inference
     if login_handle_name_is_customized?
-      if account_authorization_config
-        account_authorization_config.login_handle_name
-      else
-        settings[:login_handle_name]
-      end
+      self.login_handle_name
     elsif self.delegated_authentication?
       AccountAuthorizationConfig.default_delegated_login_handle_name
     else
@@ -961,27 +952,27 @@ class Account < ActiveRecord::Base
   end
 
   def password_authentication?
-    !!(!self.account_authorization_config || self.account_authorization_config.password_authentication?)
+    !self.account_authorization_config
   end
 
   def delegated_authentication?
-    !canvas_authentication? || !!(self.account_authorization_config && self.account_authorization_config.delegated_authentication?)
+    !canvas_authentication? || !!(self.account_authorization_config && self.account_authorization_config.is_a?(AccountAuthorizationConfig::Delegated))
   end
 
   def forgot_password_external_url
-    account_authorization_config.try(:change_password_url)
+    self.change_password_url
   end
 
   def cas_authentication?
-    !!(self.account_authorization_config && self.account_authorization_config.cas_authentication?)
+    !!(self.account_authorization_config && self.account_authorization_config.is_a?(AccountAuthorizationConfig::CAS))
   end
 
   def ldap_authentication?
-    self.account_authorization_configs.any? { |aac| aac.ldap_authentication? }
+    self.account_authorization_configs.any? { |aac| aac.is_a?(AccountAuthorizationConfig::LDAP) }
   end
 
   def saml_authentication?
-    !!(self.account_authorization_config && self.account_authorization_config.saml_authentication?) && AccountAuthorizationConfig.saml_enabled
+    !!(self.account_authorization_config && self.account_authorization_config.is_a?(AccountAuthorizationConfig::SAML)) && AccountAuthorizationConfig::SAML.enabled?
   end
 
   def multi_auth?
@@ -994,6 +985,22 @@ class Account < ActiveRecord::Base
 
   def auth_discovery_url
     self.settings[:auth_discovery_url]
+  end
+
+  def login_handle_name=(handle_name)
+    self.settings[:login_handle_name] = handle_name
+  end
+
+  def login_handle_name
+    self.settings[:login_handle_name]
+  end
+
+  def change_password_url=(change_password_url)
+    self.settings[:change_password_url] = change_password_url
+  end
+
+  def change_password_url
+    self.settings[:change_password_url]
   end
 
   def validate_auth_discovery_url
@@ -1150,7 +1157,7 @@ class Account < ActiveRecord::Base
   end
 
   def course_count
-    self.child_courses.not_deleted.count('DISTINCT course_id')
+    self.courses.active.count
   end
 
   def sub_account_count
@@ -1294,86 +1301,11 @@ class Account < ActiveRecord::Base
     Canvas::Help.default_links + (settings[:custom_help_links] || [])
   end
 
-  def self.allowable_services
-    {
-      :google_docs => {
-        :name => t("account_settings.google_docs", "Google Docs"),
-        :description => "",
-        :expose_to_ui => (GoogleDocs::Connection.config ? :service : false)
-      },
-      :google_drive => {
-        :name => t("account_settings.google_drive", "Google Drive"),
-        :description => "",
-        :expose_to_ui => false
-      },
-      :google_docs_previews => {
-        :name => t("account_settings.google_docs_preview", "Google Docs Preview"),
-        :description => "",
-        :expose_to_ui => :service
-      },
-      :skype => {
-        :name => t("account_settings.skype", "Skype"),
-        :description => "",
-        :expose_to_ui => :service
-      },
-      :linked_in => {
-        :name => t("account_settings.linked_in", "LinkedIn"),
-        :description => "",
-        :expose_to_ui => (LinkedIn::Connection.config ? :service : false)
-      },
-      :twitter => {
-        :name => t("account_settings.twitter", "Twitter"),
-        :description => "",
-        :expose_to_ui => (Twitter::Connection.config ? :service : false)
-      },
-      :yo => {
-        :name => t("account_settings.yo", "Yo"),
-        :description => "",
-        :expose_to_ui => (Canvas::Plugin.find(:yo).try(:enabled?) ? :service : false)
-      },
-      :delicious => {
-        :name => t("account_settings.delicious", "Delicious"),
-        :description => "",
-        :expose_to_ui => :service
-      },
-      :diigo => {
-        :name => t("account_settings.diigo", "Diigo"),
-        :description => "",
-        :expose_to_ui => (Diigo::Connection.config ? :service : false)
-      },
-      # TODO: move avatars to :settings hash, it makes more sense there
-      # In the meantime, we leave it as a service but expose it in the
-      # "Features" (settings) portion of the account admin UI
-      :avatars => {
-        :name => t("account_settings.avatars", "User Avatars"),
-        :description => "",
-        :default => false,
-        :expose_to_ui => :setting
-      },
-      :account_survey_notifications => {
-        :name => t("account_settings.account_surveys", "Account Surveys"),
-        :description => "",
-        :default => false,
-        :expose_to_ui => :setting,
-        :expose_to_ui_proc => proc { |user, account| user && account && account.grants_right?(user, :manage_site_settings) },
-      },
-    }.merge(@plugin_services || {}).freeze
-  end
-
-  def self.register_service(service_name, info_hash)
-    @plugin_services ||= {}
-    @plugin_services[service_name.to_sym] = info_hash.freeze
-  end
-
-  def self.default_allowable_services
-    self.allowable_services.reject {|s, info| info[:default] == false }
-  end
-
   def set_service_availability(service, enable)
     service = service.to_sym
-    raise "Invalid Service" unless Account.allowable_services[service]
+    raise "Invalid Service" unless AccountServices.allowable_services[service]
     allowed_service_names = (self.allowed_services || "").split(",").compact
-    if allowed_service_names.count > 0 and not [ '+', '-' ].member?(allowed_service_names[0][0,1])
+    if allowed_service_names.count > 0 && ![ '+', '-' ].include?(allowed_service_names[0][0,1])
       # This account has a hard-coded list of services, so handle accordingly
       allowed_service_names.reject! { |flag| flag.match("^[+-]?#{service}$") }
       allowed_service_names << service if enable
@@ -1381,10 +1313,10 @@ class Account < ActiveRecord::Base
       allowed_service_names.reject! { |flag| flag.match("^[+-]?#{service}$") }
       if enable
         # only enable if it is not enabled by default
-        allowed_service_names << "+#{service}" unless Account.default_allowable_services[service]
+        allowed_service_names << "+#{service}" unless AccountServices.default_allowable_services[service]
       else
         # only disable if it is not enabled by default
-        allowed_service_names << "-#{service}" if Account.default_allowable_services[service]
+        allowed_service_names << "-#{service}" if AccountServices.default_allowable_services[service]
       end
     end
 
@@ -1402,7 +1334,7 @@ class Account < ActiveRecord::Base
 
   def allowed_services_hash
     return @allowed_services_hash if @allowed_services_hash
-    account_allowed_services = Account.default_allowable_services
+    account_allowed_services = AccountServices.default_allowable_services
     if self.allowed_services
       allowed_service_names = self.allowed_services.split(",").compact
 
@@ -1420,7 +1352,7 @@ class Account < ActiveRecord::Base
             if flag == '-'
               account_allowed_services.delete(service_name)
             else
-              account_allowed_services[service_name] = Account.allowable_services[service_name]
+              account_allowed_services[service_name] = AccountServices.allowable_services[service_name]
             end
           end
         end
@@ -1433,10 +1365,10 @@ class Account < ActiveRecord::Base
   # if it's :service or :setting, then only services set to be exposed as that type are returned
   def self.services_exposed_to_ui_hash(expose_as = nil, current_user = nil, account = nil)
     if expose_as
-      self.allowable_services.reject { |key, setting| setting[:expose_to_ui] != expose_as }
+      AccountServices.allowable_services.reject { |_, setting| setting[:expose_to_ui] != expose_as }
     else
-      self.allowable_services.reject { |key, setting| !setting[:expose_to_ui] }
-    end.reject { |key, setting| setting[:expose_to_ui_proc] && !setting[:expose_to_ui_proc].call(current_user, account) }
+      AccountServices.allowable_services.reject { |_, setting| !setting[:expose_to_ui] }
+    end.reject { |_, setting| setting[:expose_to_ui_proc] && !setting[:expose_to_ui_proc].call(current_user, account) }
   end
 
   def service_enabled?(service)

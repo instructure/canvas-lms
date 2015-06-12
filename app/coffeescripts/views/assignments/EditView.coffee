@@ -226,18 +226,18 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       data = super
       data = @_inferSubmissionTypes data
       data = @_filterAllowedExtensions data
+      data = @_unsetGroupsIfExternalTool data
       unless ENV?.IS_LARGE_ROSTER
         data = @groupCategorySelector.filterFormData data
       # should update the date fields.. pretty hacky.
       unless data.post_to_sis
         data.post_to_sis = false
-      @dueDateOverrideView.updateOverrides()
       defaultDates = @dueDateOverrideView.getDefaultDueDate()
       data.lock_at = defaultDates?.get('lock_at') or null
       data.unlock_at = defaultDates?.get('unlock_at') or null
       data.due_at = defaultDates?.get('due_at') or null
       if ENV?.DIFFERENTIATED_ASSIGNMENTS_ENABLED
-        data.only_visible_to_overrides = @dueDateOverrideView.containsSectionsWithoutOverrides()
+        data.only_visible_to_overrides = !@dueDateOverrideView.overridesContainDefault()
       data.assignment_overrides = @dueDateOverrideView.getOverrides()
       data.published = true if @shouldPublish
       return data
@@ -248,7 +248,6 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
 
       @cacheAssignmentSettings()
 
-      @dueDateOverrideView.updateOverrides()
       if @dueDateOverrideView.containsSectionsWithoutOverrides()
         sections = @dueDateOverrideView.sectionsWithoutOverrides()
         missingDateDialog = new MissingDateDialog
@@ -298,6 +297,11 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
         data.allowed_extensions = null
       data
 
+    _unsetGroupsIfExternalTool: (data) =>
+      if data.submission_type == 'external_tool'
+        data.group_category_id = null
+      data
+
     # -- Pre-Save Validations --
 
     fieldSelectors: _.extend(
@@ -323,7 +327,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly, RCEKeyboardSho
       errors = @_validatePointsRequired(data, errors)
       errors = @_validateExternalTool(data, errors)
       data2 =
-        assignment_overrides: @dueDateOverrideView.getAllDates(data)
+        assignment_overrides: @dueDateOverrideView.getAllDates()
       errors = @dueDateOverrideView.validateBeforeSave(data2,errors)
       errors
 

@@ -22,6 +22,7 @@ describe EportfolioEntriesController do
   def eportfolio_category
     @category = @portfolio.eportfolio_categories.create
   end
+
   def eportfolio_entry(category=nil)
     @entry = @portfolio.eportfolio_entries.new
     @entry.eportfolio_category_id = category.id if category

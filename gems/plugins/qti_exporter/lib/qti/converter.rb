@@ -45,7 +45,7 @@ class Converter < Canvas::Migration::Migrator
     @course[:assessments] = convert_assessments(@course[:assessment_questions][:assessment_questions])
 
     original_manifest_path = File.join(@unzipped_file_path, MANIFEST_FILE)
-    if File.exists?(original_manifest_path)
+    if File.exist?(original_manifest_path)
       @manifest = Nokogiri::XML(File.open(original_manifest_path))
       post_process_assessments # bring in canvas metadata if available
     end
@@ -63,7 +63,7 @@ class Converter < Canvas::Migration::Migrator
   end
 
   def self.is_qti_2(manifest_path)
-    if File.exists?(manifest_path)
+    if File.exist?(manifest_path)
       xml = Nokogiri::XML(File.open(manifest_path))
       if xml.namespaces.values.any? { |v| QTI_2_NAMESPACES.any?{|ns| v.to_s.start_with?(ns)} }
         return true

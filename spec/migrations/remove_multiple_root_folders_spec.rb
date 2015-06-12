@@ -54,7 +54,7 @@ describe 'DataFixup::RemoveMultipleRootFolders' do
         subfolders = subfolders.map(&:sub_folders).flatten
         folders.concat(subfolders)
       end
-      folders.reverse.each { |f| Folder.where(id: f).delete_all }
+      folders.reverse_each { |f| Folder.where(id: f).delete_all }
       c.enrollment_terms.scoped.delete_all if c.is_a?(Account)
       c.course_account_associations.scoped.delete_all if c.is_a?(Course)
       c.delete

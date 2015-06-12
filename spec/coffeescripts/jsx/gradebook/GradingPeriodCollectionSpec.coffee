@@ -33,11 +33,11 @@ define [
       ]
       @formattedIndexData = "grading_periods":[
         {
-          "id":"1", "startDate":"2015-03-01T06:00:00Z", "endDate":"2015-05-31T05:00:00Z",
+          "id":"1", "startDate": new Date("2015-03-01T06:00:00Z"), "endDate": new Date("2015-05-31T05:00:00Z"),
           "weight":null, "title":"Spring", "permissions": { "read":true, "manage":true }
         },
         {
-          "id":"2", "startDate":"2015-06-01T05:00:00Z", "endDate":"2015-08-31T05:00:00Z",
+          "id":"2", "startDate": new Date("2015-06-01T05:00:00Z"), "endDate": new Date("2015-08-31T05:00:00Z"),
           "weight":null, "title":"Summer", "permissions": { "read":true, "manage":true }
         }
       ]
@@ -67,18 +67,18 @@ define [
 
   test 'canManageAtLeastOnePeriod returns true', ->
     periods = @gradingPeriodCollection.state.periods
-    deepEqual @gradingPeriodCollection.canManageAtLeastOnePeriod(periods), true
+    ok @gradingPeriodCollection.canManageAtLeastOnePeriod(periods)
 
   test 'cannotDeleteLastPeriod returns false if there is one period left and manage permission is true', ->
     onePeriod = [
       {
-        "id":"1", "startDate":"2029-03-01T06:00:00Z", "endDate":"2030-05-31T05:00:00Z",
+        "id":"1", "startDate": new Date("2029-03-01T06:00:00Z"), "endDate": new Date("2030-05-31T05:00:00Z"),
         "weight":null, "title":"A Lonely Grading Period with manage permission",
         "permissions": { "read":true, "manage":true }
       }
     ]
     @gradingPeriodCollection.setState({periods: onePeriod})
-    deepEqual @gradingPeriodCollection.cannotDeleteLastPeriod(), false
+    ok !@gradingPeriodCollection.cannotDeleteLastPeriod()
 
   test 'getPeriods requests the index data from the server', ->
     @sandbox.spy($, "ajax")
@@ -93,25 +93,25 @@ define [
 
   test 'gotPeriods sets disabled state to false', ->
     @gradingPeriodCollection.setState({disabled: true})
-    deepEqual @gradingPeriodCollection.state.disabled, true
-    @gradingPeriodCollection.gotPeriods(@indexData)
-    deepEqual @gradingPeriodCollection.state.disabled, false
+    ok @gradingPeriodCollection.state.disabled
+    @gradingPeriodCollection.gotPeriods(@formattedIndexData.grading_periods)
+    ok !@gradingPeriodCollection.state.disabled
 
   test 'gotPeriods concatenates the index returned from the ajax call with any new, unsaved grading periods, and sets the result to the periods state', ->
     unsavedPeriods = [
       {
-        "id":"new1", "startDate":"2029-03-01T06:00:00Z", "endDate":"2030-05-31T05:00:00Z",
+        "id":"new1", "startDate": new Date("2029-03-01T06:00:00Z"), "endDate": new Date("2030-05-31T05:00:00Z"),
         "weight":null, "title":"New Period. I'm not saved yet!",
         "permissions": { "read":true, "manage":true }
       },
       {
-        "id":"new2", "startDate":"2039-03-01T06:00:00Z", "endDate":"2042-05-31T05:00:00Z",
+        "id":"new2", "startDate": new Date("2039-03-01T06:00:00Z"), "endDate": new Date("2042-05-31T05:00:00Z"),
         "weight":null, "title":"Another New Period. Also not saved yet!",
         "permissions": { "read":true, "manage":true }
       }
     ]
     @gradingPeriodCollection.setState({periods: unsavedPeriods})
-    @gradingPeriodCollection.gotPeriods(@indexData)
+    @gradingPeriodCollection.gotPeriods(@formattedIndexData.grading_periods)
     newPeriods = @formattedIndexData.grading_periods.concat(unsavedPeriods)
     deepEqual @gradingPeriodCollection.state.periods, newPeriods
 
@@ -119,34 +119,34 @@ define [
     idToExclude = 'new2'
     unsavedPeriods = [
       {
-        "id":"new1", "startDate":"2029-03-01T06:00:00Z", "endDate":"2030-05-31T05:00:00Z",
+        "id":"new1", "startDate": new Date("2029-03-01T06:00:00Z"), "endDate": new Date("2030-05-31T05:00:00Z"),
         "weight":null, "title":"New Period. I'm not saved yet!",
         "permissions": { "read":true, "manage":true }
       },
       {
-        "id":"new2", "startDate":"2039-03-01T06:00:00Z", "endDate":"2042-05-31T05:00:00Z",
+        "id":"new2", "startDate": new Date("2039-03-01T06:00:00Z"), "endDate": new Date("2042-05-31T05:00:00Z"),
         "weight":null, "title":"Another New Period. Also not saved yet! I won't be in the new state.",
         "permissions": { "read":true, "manage":true }
       }
     ]
     @gradingPeriodCollection.setState({periods: unsavedPeriods})
-    @gradingPeriodCollection.gotPeriods(@indexData, idToExclude)
+    @gradingPeriodCollection.gotPeriods(@formattedIndexData.grading_periods, idToExclude)
     newPeriods = @formattedIndexData.grading_periods.concat(unsavedPeriods[0])
     deepEqual @gradingPeriodCollection.state.periods, newPeriods
 
   test 'lastRemainingPeriod returns false if there is more than one period left', ->
-    deepEqual @gradingPeriodCollection.lastRemainingPeriod(), false
+    ok !@gradingPeriodCollection.lastRemainingPeriod()
 
   test 'lastRemainingPeriod returns true if there is one period left', ->
     onePeriod = [
       {
-        "id":"1", "startDate":"2029-03-01T06:00:00Z", "endDate":"2030-05-31T05:00:00Z",
+        "id":"1", "startDate": new Date("2029-03-01T06:00:00Z"), "endDate": new Date("2030-05-31T05:00:00Z"),
         "weight":null, "title":"A Lonely Grading Period",
         "permissions": { "read":true, "manage":true }
       }
     ]
     @gradingPeriodCollection.setState({periods: onePeriod})
-    deepEqual @gradingPeriodCollection.lastRemainingPeriod(), true
+    ok @gradingPeriodCollection.lastRemainingPeriod()
 
   test 'createNewGradingPeriod adds a new period', ->
     deepEqual @gradingPeriodCollection.state.periods.length, 2
@@ -157,13 +157,13 @@ define [
     @gradingPeriodCollection.createNewGradingPeriod()
     newPeriod = _.find(@gradingPeriodCollection.state.periods, (p) => p.id.indexOf('new') > -1)
     deepEqual newPeriod.title, ''
-    deepEqual newPeriod.startDate, ''
-    deepEqual newPeriod.endDate, ''
+    deepEqual newPeriod.startDate.getTime(), new Date('').getTime()
+    deepEqual newPeriod.endDate.getTime(), new Date('').getTime()
 
   test 'deleteGradingPeriod does not call confirmDelete if the grading period is not saved', ->
     unsavedPeriod = [
       {
-        "id":"new1", "startDate":"2029-03-01T06:00:00Z", "endDate":"2030-05-31T05:00:00Z",
+        "id":"new1", "startDate": new Date("2029-03-01T06:00:00Z"), "endDate": new Date("2030-05-31T05:00:00Z"),
         "weight":null, "title":"New Period. I'm not saved yet!",
         "permissions": { "read":true, "manage":true }
       }
@@ -180,7 +180,7 @@ define [
 
   test 'updateGradingPeriodCollection correctly updates the periods state', ->
     updatedPeriodData = {
-      "id":"1", "startDate":"2069-03-01T06:00:00Z", "endDate":"2070-05-31T05:00:00Z",
+      "id":"1", "startDate": new Date("2069-03-01T06:00:00Z"), "endDate": new Date("2070-05-31T05:00:00Z"),
       "weight":null, "title":"Updating an existing period!"
     }
     updatedPermissions = { "read":true, "manage":true }
@@ -202,7 +202,7 @@ define [
     deepEqual @gradingPeriodCollection.refs.linkToSettings, undefined
     onePeriod = [
       {
-        "id":"1", "startDate":"2029-03-01T06:00:00Z", "endDate":"2030-05-31T05:00:00Z",
+        "id":"1", "startDate": new Date("2029-03-01T06:00:00Z"), "endDate": new Date("2030-05-31T05:00:00Z"),
         "weight":null, "title":"A Lonely Grading Period",
         "permissions": { "read":true, "manage":true }
       }
@@ -239,11 +239,11 @@ define [
       ]
       @formattedIndexData = "grading_periods":[
         {
-          "id":"1", "startDate":"2015-03-01T06:00:00Z", "endDate":"2015-05-31T05:00:00Z",
+          "id":"1", "startDate": new Date("2015-03-01T06:00:00Z"), "endDate": new Date("2015-05-31T05:00:00Z"),
           "weight":null, "title":"Spring", "permissions": { "read":false, "manage":false }
         },
         {
-          "id":"2", "startDate":"2015-06-01T05:00:00Z", "endDate":"2015-08-31T05:00:00Z",
+          "id":"2", "startDate": new Date("2015-06-01T05:00:00Z"), "endDate": new Date("2015-08-31T05:00:00Z"),
           "weight":null, "title":"Summer", "permissions": { "read":false, "manage":false }
         }
       ]
@@ -273,14 +273,14 @@ define [
 
   test 'canManageAtLeastOnePeriod returns false', ->
     periods = @gradingPeriodCollection.state.periods
-    deepEqual @gradingPeriodCollection.canManageAtLeastOnePeriod(periods), false
+    ok !@gradingPeriodCollection.canManageAtLeastOnePeriod(periods)
 
   test 'copyTemplatePeriods sets the disabled state to true while periods are being copied', ->
     @sandbox.stub(@gradingPeriodCollection, 'getPeriods')
-    deepEqual @gradingPeriodCollection.state.disabled, false
+    ok !@gradingPeriodCollection.state.disabled
     @gradingPeriodCollection.copyTemplatePeriods(@gradingPeriodCollection.state.periods)
     @server.respond()
-    deepEqual @gradingPeriodCollection.state.disabled, true
+    ok @gradingPeriodCollection.state.disabled
 
   test 'copyTemplatePeriods calls getPeriods', ->
     @sandbox.stub(@gradingPeriodCollection, 'getPeriods')
@@ -301,13 +301,32 @@ define [
   test 'cannotDeleteLastPeriod returns true if there is one period left and manage permission is false', ->
     onePeriod = [
       {
-        "id":"1", "startDate":"2029-03-01T06:00:00Z", "endDate":"2030-05-31T05:00:00Z",
+        "id":"1", "startDate": new Date("2029-03-01T06:00:00Z"), "endDate": new Date("2030-05-31T05:00:00Z"),
         "weight":null, "title":"A Lonely Grading Period without manage permission",
         "permissions": { "read":true, "manage":false }
       }
     ]
     @gradingPeriodCollection.setState({periods: onePeriod})
-    deepEqual @gradingPeriodCollection.cannotDeleteLastPeriod(), true
+    ok @gradingPeriodCollection.cannotDeleteLastPeriod()
 
   test 'an admin created periods message is displayed since the user does not have manage permission for the periods', ->
     ok @gradingPeriodCollection.refs.adminPeriodsMessage
+
+  test "given two grading periods that don't overlap, isOverlapping returns false", ->
+    ok !@gradingPeriodCollection.isOverlapping('2')
+
+  test 'given two overlapping grading periods, isOverlapping returns true', ->
+    startDate = new Date("2015-03-01T06:00:00Z")
+    endDate = new Date("2015-05-31T05:00:00Z")
+    formattedIndexData = [
+      {
+        "id":"1", "startDate": startDate, "endDate": endDate,
+        "weight":null, "title":"Spring", "permissions": { "read":false, "manage":false }
+      },
+      {
+        "id":"2", "startDate": startDate, "endDate": endDate,
+        "weight":null, "title":"Summer", "permissions": { "read":false, "manage":false }
+      }
+    ]
+    @gradingPeriodCollection.setState({periods: formattedIndexData})
+    ok @gradingPeriodCollection.isOverlapping('2')

@@ -10,7 +10,7 @@ describe Moodle::Converter do
     converter.export
     @base_course_data = converter.course.with_indifferent_access
     converter.delete_unzipped_archive
-    if File.exists?(unzipped_file_path)
+    if File.exist?(unzipped_file_path)
       FileUtils::rm_rf(unzipped_file_path)
     end
 

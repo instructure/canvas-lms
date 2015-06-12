@@ -118,8 +118,11 @@ class AssignmentGroupsController < ApplicationController
         all_visible_assignments = AssignmentGroup.visible_assignments(@current_user, @context, @groups, assignment_includes)
         .with_student_submission_count
 
-        if params[:grading_period_id].presence && multiple_grading_periods?
-          all_visible_assignments = GradingPeriod.find(params[:grading_period_id]).assignments(all_visible_assignments)
+        if params[:grading_period_id].present? && multiple_grading_periods?
+          all_visible_assignments = GradingPeriod
+            .active
+            .find(params[:grading_period_id])
+            .assignments(all_visible_assignments)
         end
 
         da_enabled = @context.feature_enabled?(:differentiated_assignments)

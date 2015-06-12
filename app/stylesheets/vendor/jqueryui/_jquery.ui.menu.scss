@@ -43,7 +43,9 @@
 $kyle-menu-bg-color: #e6e7e9;
 $kyle-menu-border-color: #b0afaf;
 $kyle-menu-carat-size: 8px;
-$kyle-menu-border-radius: 4px;
+@if $use_new_styles { $kyle-menu-border-radius: $baseBorderRadius; }
+@else { $kyle-menu-border-radius: 4px; }
+
 
 
 // the .ui-menu-carat is the outer border of the carat to make it match the border of the popup
@@ -52,20 +54,20 @@ $kyle-menu-border-radius: 4px;
   border-style: solid;
   position: absolute;
   width: 0;
-  height: 0;
-  left: 50%;
+  height: 0; left: 50%;
   content: "";
-
-  border-color: $kyle-menu-border-color transparent;
   border-width: 0px $kyle-menu-carat-size+1px $kyle-menu-carat-size+1px;
   top: -$kyle-menu-carat-size - 1px;
   margin-left: -$kyle-menu-carat-size - 1px;
+  @if $use_new_styles { border-color: darken($ic-border-light, 3%) transparent; }
+  @else { border-color: $kyle-menu-border-color transparent; }
 }
 .ui-menu-carat span {
-  border-color: $kyle-menu-bg-color transparent;
   border-width: 0px $kyle-menu-carat-size $kyle-menu-carat-size;
   top: 1px;
   margin-left: -$kyle-menu-carat-size;
+  @if $use_new_styles { border-color: $ic-color-light transparent; }
+  @else { border-color: $kyle-menu-bg-color transparent; }
 }
 .carat-bottom {
   .ui-menu-carat, .ui-menu-carat span {
@@ -80,18 +82,35 @@ $kyle-menu-border-radius: 4px;
   }
 }
 .ui-kyle-menu {
-  margin-top: $kyle-menu-carat-size;
-  background-color: $kyle-menu-bg-color;
-  border: 1px solid $kyle-menu-border-color;
-  font-size: 12px;
-  font-weight: bold;
-  color: #525252;
   position: absolute; // take it out of the "flow" so that it pops on top and doesnt push things down
   z-index: 9999;
-  border-radius:  $kyle-menu-border-radius + 1;
-  box-shadow: 0px 2px 4px -1px rgba(0,0,0,.4);
+  margin-top: $kyle-menu-carat-size;
+  font-weight: bold;
+  @if $use_new_styles {
+    text-align: left;
+    border: 1px solid $ic-border-light;
+    box-shadow: 0px 0px 6px rgba(black, 0.1);
+    background-color: $ic-color-light;
+    min-width: 
+  }
+  @else {
+    background-color: $kyle-menu-bg-color;
+    border: 1px solid $kyle-menu-border-color;
+    font-size: 12px;
+    color: #525252;
+    border-radius:  $kyle-menu-border-radius + 1;
+    box-shadow: 0px 2px 4px -1px rgba(0,0,0,.4);
+  }
 
-  a { color: #525252}
+  a {
+    @if $use_new_styles { 
+      color: #333;
+      padding: $ic-sp/2 $ic-sp;
+      min-width: $ic-sp*12;
+      line-height: 1.1;
+    }
+    @else { color: #525252; }
+  }
   hr {
     margin: 0;
     height: 0;
@@ -104,12 +123,16 @@ $kyle-menu-border-radius: 4px;
   li:first-of-type a { border-top-left-radius: $kyle-menu-border-radius; border-top-right-radius:$kyle-menu-border-radius; }
   li:last-child a { border-bottom-left-radius: $kyle-menu-border-radius; border-bottom-right-radius:$kyle-menu-border-radius; }
   .ui-state-focus {
-    @include vertical-gradient(#0abdff, #008fd6);
-    border-top: 1px solid #d5f1fe;
-    border-bottom: 1px solid #1e7eca;
-    color: white;
     font-weight: bold !important;
-    text-shadow: rgba(0,0,0,0.5) 1px 0 1px;
+    @if $use_new_styles { border: none; }
+    @else {
+      @include vertical-gradient(#0abdff, #008fd6);
+      border-top: 1px solid #d5f1fe;
+      border-bottom: 1px solid #1e7eca;
+      color: white;
+      text-shadow: rgba(0,0,0,0.5) 1px 0 1px;
+    }
+    
     .ui-icon-radio-on {
       background: url(/images/icon-checkmark-rev.svg) 0 50% no-repeat !important;
       background-size: 14px;

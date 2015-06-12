@@ -170,10 +170,10 @@ describe "Canvas Cartridge importing" do
         expect(t1.settings[type][:default]).to eq 'disabled'
         expect(t1.settings[type][:visibility]).to eq 'members'
         expect(t1.settings[type][:custom_fields]).to eq({"key3" => "value3"})
-        expect(t1.settings[type].keys.map(&:to_s).sort).to eq ['custom_fields', 'default', 'labels', 'text', 'visibility']
+        expect(t1.settings[type].keys.map(&:to_s).sort).to eq ['custom_fields', 'default', 'extra', 'labels', 'text', 'visibility']
       else
         expect(t1.settings[type][:url]).to eq "http://www.example.com"
-        expect(t1.settings[type].keys.map(&:to_s).sort).to eq ['labels', 'text', 'url']
+        expect(t1.settings[type].keys.map(&:to_s).sort).to eq ['extra', 'labels', 'text', 'url']
       end
     end
     [:resource_selection, :editor_button, :homework_submission].each do |type|
@@ -185,9 +185,9 @@ describe "Canvas Cartridge importing" do
       expect(t1.settings[type][:selection_height]).to eq 50
       if type == :editor_button
         expect(t1.settings[type][:icon_url]).to eq 'http://www.example.com'
-        expect(t1.settings[type].keys.map(&:to_s).sort).to eq ['icon_url', 'labels', 'selection_height', 'selection_width', 'text', 'url']
+        expect(t1.settings[type].keys.map(&:to_s).sort).to eq ['extra', 'icon_url', 'labels', 'selection_height', 'selection_width', 'text', 'url']
       else
-        expect(t1.settings[type].keys.map(&:to_s).sort).to eq ['labels', 'selection_height', 'selection_width', 'text', 'url']
+        expect(t1.settings[type].keys.map(&:to_s).sort).to eq ['extra', 'labels', 'selection_height', 'selection_width', 'text', 'url']
       end
     end
     expect(t1.settings[:custom_fields]).to eq({"key1"=>"value1", "key2"=>"value2"})
@@ -1330,7 +1330,7 @@ describe "cc assignment extensions" do
 
   after(:all) do
     @converter.delete_unzipped_archive
-    if File.exists?(@export_folder)
+    if File.exist?(@export_folder)
       FileUtils::rm_rf(@export_folder)
     end
     truncate_all_tables
@@ -1384,7 +1384,7 @@ describe "matching question reordering" do
 
   after(:all) do
     @converter.delete_unzipped_archive
-    if File.exists?(@export_folder)
+    if File.exist?(@export_folder)
       FileUtils::rm_rf(@export_folder)
     end
     truncate_all_tables

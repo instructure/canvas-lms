@@ -14,7 +14,11 @@
     i[class*=icon-], i[class^=icon-] {
       &:before { color: #555 }
     }
+    @if $use_new_styles { &:first-of-type { margin-top: 0; } }
     
   }
-  button.button-sidebar-wide { width: $right_side_width - $right_side_margin - $right_side_margin }
+  button.button-sidebar-wide {
+    @if $use_new_styles { width: 100%; }
+    @else { width: $right_side_width - $right_side_margin - $right_side_margin; }
+  }
 }

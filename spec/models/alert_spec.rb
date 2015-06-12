@@ -66,4 +66,25 @@ describe Alert do
       end
     end
   end
+
+  context "#resolve_recipients" do
+    it "resolves to a student based on recipients list" do
+      alert = Alert.new(:context => Account.default, :recipients => [:student])
+      recipients = alert.resolve_recipients(1, [2,3])
+      expect(recipients).to eq [1]
+    end
+
+    it "resolves to teachers based on recipients list" do
+      alert = Alert.new(:context => Account.default, :recipients => [:teachers])
+      recipients = alert.resolve_recipients(1, [2,3])
+      expect(recipients).to eq [2,3]
+    end
+
+    it "resolves to an admin based on recipients list" do
+      admin = account_admin_user
+      alert = Alert.new(:context => Account.default, :recipients => ['AccountAdmin'])
+      recipients = alert.resolve_recipients(1, [2,3])
+      expect(recipients).to eq [admin.id]
+    end
+  end
 end

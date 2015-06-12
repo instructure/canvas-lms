@@ -105,16 +105,25 @@ class SyslogWrapper
   def <<(msg); add(@level, msg); end
   
   def debug(progname=nil, &block); add(Logger::DEBUG, nil, progname, &block); end
+
   def info(progname=nil, &block); add(Logger::INFO, nil, progname, &block); end
+
   def warn(progname=nil, &block); add(Logger::WARN, nil, progname, &block); end
+
   def error(progname=nil, &block); add(Logger::ERROR, nil, progname, &block); end
+
   def fatal(progname=nil, &block); add(Logger::FATAL, nil, progname, &block); end
+
   def unknown(progname=nil, &block); add(Logger::UNKNOWN, nil, progname, &block); end
 
   def debug?; @level <= Logger::DEBUG; end
+
   def info?; @level <= Logger::INFO; end
+
   def warn?; @level <= Logger::WARN; end
+
   def error?; @level <= Logger::ERROR; end
+
   def fatal?; @level <= Logger::FATAL; end
   
 end

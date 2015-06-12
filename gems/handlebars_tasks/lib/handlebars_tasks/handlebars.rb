@@ -49,7 +49,7 @@ module HandlebarsTasks
         source   = File.read(file)
         plugin ||= compiled_path =~ /vendor\/plugins\/([^\/]*)\// ? $1 : nil
         js       = compile_template(source, file, id, plugin)
-        FileUtils.mkdir_p(dir) unless File.exists?(dir)
+        FileUtils.mkdir_p(dir) unless File.exist?(dir)
         File.open(path, 'w') { |file| file.write(js) }
       end
 

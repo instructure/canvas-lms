@@ -7,7 +7,9 @@ require [
 
   dataReady = (data) ->
     if parentWindow[callback] and parentWindow[callback].ready
-      parentWindow.$(parentWindow).trigger "externalContentReady", data
+      event = jQuery.Event( "externalContentReady" )
+      event.contentItems = data
+      parentWindow.$(parentWindow).trigger "externalContentReady", event
       parentWindow[callback].ready data
       setTimeout (->
         if callback == 'external_tool_dialog'
@@ -21,8 +23,8 @@ require [
   callback = ENV.service
   parentWindow = window.parent
   parentWindow = parentWindow.parent while parentWindow and parentWindow.parent isnt parentWindow and not parentWindow[callback]
-  if data.return_type is "oembed"
-    url = $.replaceTags($.replaceTags($("#oembed_retrieve_url").attr("href"), "endpoint", encodeURIComponent(data.endpoint)), "url", encodeURIComponent(data.url))
+  if ENV.oembed
+    url = $.replaceTags($.replaceTags($("#oembed_retrieve_url").attr("href"), "endpoint", encodeURIComponent(ENV.oembed.endpoint)), "url", encodeURIComponent(ENV.oembed.url))
     $.ajaxJSON url, "GET", {}, ((data) ->
       dataReady data
     ), ->

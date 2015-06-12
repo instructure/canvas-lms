@@ -138,4 +138,45 @@ describe Importers::ContextExternalToolImporter do
     end
   end
 
+  context "searching for existing tools" do
+    before :once do
+      course_model
+      @tool1 = Account.default.context_external_tools.create!(:name => "somethin", :domain => "example.com",
+        :shared_secret => 'secret', :consumer_key => 'test', :privacy_level => 'name_only')
+      @tool1.settings[:selection_width] = 100
+      @tool1.save!
+      @tool2 = Account.default.context_external_tools.create!(:name => "somethin else", :url => "http://notexample.com/whatever",
+        :shared_secret => 'secret', :consumer_key => 'test', :privacy_level => 'name_only')
+      @migration = @course.content_migrations.new(:migration_type => "canvas_cartridge_importer")
+      @data = [
+        {:migration_id => '1', :title => 'tool', :url => 'http://example.com/page',
+          :custom_fields => {'ihasacustomfield' => 'blah'}},
+        {:migration_id => '2', :title => 'tool', :domain => 'example.com', :selection_width => "100"},
+        {:migration_id => '3', :title => 'tool', :url => 'http://notexample.com'},
+        {:migration_id => '4', :title => 'tool', :url => 'http://notexample.com/whatever'} # should match @tool2 on exact url
+      ]
+    end
+
+    it "should not search if setting not enabled" do
+      @data.each do |hash|
+        Importers::ContextExternalToolImporter.import_from_migration(hash, @course, @migration)
+      end
+
+      expect(@course.context_external_tools.map(&:migration_id).sort).to eq ['1', '2', '3', '4']
+    end
+
+    it "should search for existing tools if setting enabled" do
+      @migration.migration_settings[:prefer_existing_tools] = true
+      @data.each do |hash|
+        Importers::ContextExternalToolImporter.import_from_migration(hash, @course, @migration)
+      end
+
+      expect(@course.context_external_tools.map(&:migration_id).sort).to eq ['3']
+
+      expect(@migration.find_external_tool_translation('1')).to eq [@tool1.id, {'ihasacustomfield' => 'blah'}]
+      expect(@migration.find_external_tool_translation('2')).to eq [@tool1.id, nil]
+      expect(@migration.find_external_tool_translation('4')).to eq [@tool2.id, nil]
+    end
+  end
+
 end

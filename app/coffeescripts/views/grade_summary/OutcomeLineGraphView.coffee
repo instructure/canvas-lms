@@ -1,10 +1,11 @@
 define [
   'underscore'
   'Backbone'
+  'compiled/collections/OutcomeResultCollection'
   'vendor/d3.v3'
   'jst/outcomes/accessibleLineGraph'
   'compiled/underscore-ext/sum'
-], (_, Backbone, d3, accessibleTemplate) ->
+], (_, Backbone, OutcomeResultCollection, d3, accessibleTemplate) ->
   # Trend class based on formulae found here:
   # http://classroom.synonym.com/calculate-trendline-2709.html
   class Trend
@@ -73,24 +74,39 @@ define [
       # 2015-02-06T17:49:08Z
       timeFormat: "%Y-%m-%dT%XZ"
 
+    initialize: ->
+      super
+      @deferred = $.Deferred()
+      @collection = new OutcomeResultCollection([], {
+        outcome: @model
+      })
+      @collection.on 'fetched:last', =>
+        @deferred.resolve()
+      @collection.fetch()
+
     render: ->
-      return @ if _.isEmpty(@model.get('scores'))
-      @_prepareScales()
-      @_prepareAxes()
-      @_prepareLines()
+      if @deferred.isResolved()
+        return @ if @collection.isEmpty()
 
-      @svg = d3.select(@el)
-        .append("svg")
-          .attr("width", @width() + @margin.left + @margin.right)
-          .attr("height", @height + @margin.top + @margin.bottom)
-          .attr("aria-hidden", true)
-        .append("g")
-          .attr("transform", "translate(#{@margin.left}, #{@margin.top})")
+        @_prepareScales()
+        @_prepareAxes()
+        @_prepareLines()
 
-      @_appendAxes()
-      @_appendLines()
+        @svg = d3.select(@el)
+          .append("svg")
+            .attr("width", @width() + @margin.left + @margin.right)
+            .attr("height", @height + @margin.top + @margin.bottom)
+            .attr("aria-hidden", true)
+          .append("g")
+            .attr("transform", "translate(#{@margin.left}, #{@margin.top})")
 
-      @$('.screenreader-only').append(accessibleTemplate(@toJSON()))
+        @_appendAxes()
+        @_appendLines()
+
+        @$('.screenreader-only').append(accessibleTemplate(@toJSON()))
+      else
+        @deferred.done(@render)
+
 
       @
 
@@ -101,14 +117,12 @@ define [
 
     # Data helpers
     data: ->
-      @_data ?= _.chain(@model.get('scores'))
-        .sortBy((score) =>
-          score.assessed_at
-        ).last(@limit)
-        .map((score, i) =>
+      @_data ?= @collection.chain()
+        .last(@limit)
+        .map((outcomeResult, i) =>
           x: i
-          y: @percentageFor(score.score)
-          date: score.assessed_at
+          y: @percentageFor(outcomeResult.get('score'))
+          date: outcomeResult.get('submitted_or_assessed_at')
         ).value()
 
     masteryPercentage: ->

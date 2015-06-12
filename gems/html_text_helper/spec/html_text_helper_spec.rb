@@ -203,6 +203,16 @@ EOS
     it "should return an empty string if passed a nil value" do
       th.html_to_text(nil).should == ''
     end
+
+    it "just uses the given link if it cannot be parsed" do
+      html_input = '<a href="http://&example.org/link">Link</a>'
+      th.html_to_text(html_input, base_url: "http://example.com").should == "[Link](http://&example.org/link)"
+    end
+
+    it "just uses the img src given if it cannot be parsed" do
+      html_input = '<img src="http://example=.org/image.png" />'
+      th.html_to_text(html_input, base_url: "http://example.com").should == "http://example=.org/image.png"
+    end
   end
 
   describe "simplify html" do

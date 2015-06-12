@@ -91,7 +91,7 @@ class ExternalFeedAggregator
         feed.consecutive_failures = 0 if success
         feed.update_attribute(:refresh_at, Time.now.utc + ((!@entries || @entries.empty?) ? NO_ENTRIES_WAIT_SECONDS : SUCCESS_WAIT_SECONDS))
       else
-        @logger.info("request failed #{response.class.to_s}")
+        @logger.info("request failed #{response.class}")
         feed.increment(:consecutive_failures)
         feed.increment(:failures)
         feed.update_attribute(:refresh_at, Time.now.utc + (FAILURE_WAIT_SECONDS))

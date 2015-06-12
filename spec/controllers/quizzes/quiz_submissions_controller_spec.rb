@@ -118,7 +118,7 @@ describe Quizzes::QuizSubmissionsController do
       Quizzes::QuizSubmission.where(:id => @qs).update_all(:updated_at => 1.hour.ago)
 
       put 'backup', :quiz_id => @quiz.id, :course_id => @course.id, :a => 'test', :validation_token => @qs.validation_token
-      assert_status(401)
+      assert_unauthorized
 
       expect(@qs.reload.submission_data[:a]).to be_nil
     end
@@ -158,7 +158,7 @@ describe Quizzes::QuizSubmissionsController do
 
     it "should require authentication" do
       post 'record_answer', :quiz_id => @quiz.id, :course_id => @course.id, :id => @qsub.id, :a => 'test'
-      assert_status(401)
+      assert_unauthorized
 
       expect(@qsub.reload.submission_data[:a]).to be_nil
     end

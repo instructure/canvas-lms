@@ -77,19 +77,11 @@ ru:
         api_key: "Ключ API"
         api_url: "Url-адрес Api"
         common_core_guid: "Общий ключевой GUID (необязательно)"
+  access_to_the_etherpad_collaborations_below_will_b_b6a0a288: |-
+      Доступ к совместным работам на EtherPad ниже будет прекращен с 8 августа 2015 Если вы хотите сохранить этот контент, пожалуйста перенесите этот контент до этой даты.
+      
+      Для получения инструкций о том, как создать сотрудничество с Google, [нажмите здесь](%{google_collab_help_url}).
   account: 
-    account_settings: 
-      account_surveys: "Опросы учетной записи"
-      avatars: "Аватары пользователя"
-      delicious: Delicious
-      diigo: Diigo
-      google_docs: "Google Docs"
-      google_docs_preview: "Функция предварительного просмотра Google Docs"
-      google_drive: "Диск Google"
-      linked_in: LinkedIn
-      skype: Skype
-      twitter: Twitter
-      yo: Yo
     ask_canvas_network: "Задать вопрос сообществу сети Canvas"
     default_account_name: "Учетная запись по умолчанию"
     default_site_administrator_account_name: "Администратор сайта"
@@ -122,67 +114,56 @@ ru:
     tab_users: Пользователи
     turnitin_pledge: "Это отправленное задание — моя собственная работа"
   account_authorization_config: 
-    debug: 
-      wait_for_login: "Ожидание попытки входа в систему"
     default_delegated_login_handle_name: Вход
     default_login_handle_name: "Электронная почта"
-    saml_eppn_domain_stripped: "%{eppn} (снятие домена)"
-    test_bind_failed: "Ошибка связывания: %{error}"
-    test_connection_timeout: "Тайм-аут соединения"
-    test_host_unknown: "Неизвестный узел: %{host}"
+  account_authorization_config/ldap: 
+    test_bind_failed: "Не удалось связать из-за следующей ошибки: %{error}"
+    test_connection_timeout: "Тайм-аут при подключении"
+    test_host_unknown: "Неизвестный хост: %{host}"
     test_login_auth_exception: "Исключение при входе в систему: %{error}"
     test_login_auth_failed: "Сбой аутентификации"
     test_search_failed: "Ошибка поиска, получена следующая ошибка: %{error}"
+  account_authorization_config/saml: 
+    debug: 
+      logout_redirect: "Запрос выхода отправлен IdP"
+      wait_for_login: "Ожидание попытки входа в систему"
+    saml_eppn_domain_stripped: "%{eppn} (снятие домена)"
   account_authorization_configs: 
     account_required: "требуется проверка подлинности LDAP"
-    cas_settings: 
+    cas_fields: 
       labels: 
         auth_base: "URL-адрес CAS"
-        auth_type: Тип
-        login_handle_name: "Метка входа"
         unknown_user_url: "Url-адрес неизвестного пользователя"
-      login_handle_name_description: "Метка используется для уникальных идентификаторов входа. Примеры: Вход, имя пользователя, идентификатор учащегося и т.д."
+      unknown_user_url_description: "Url-адрес для переадресации, если аутентифицированный пользователь не найден в системе Canvas."
+    form_footer: 
+      labels: 
+        position: Позиция
       save_button: "Сохранить настройки аутентификации"
-      unknown_user_url_description: "Url-адрес для переадресации, когда аутентифицированный пользователь не найден в системе Canvas."
+    form_header: 
+      auth_type_label: Тип
+      auth_url: "Url-адрес входа в систему для данной конфигурации"
     index: 
       add_auth_desc: "Добавить провайдера идентификации к этой учетной записи:"
-      canvas_login_tip: |-
-          Если установка настроек вызвала невозможность входа в систему, можно добавить
-            *%{url1}* к концу url-адреса для входа в систему. Это позволит входить в систему,
-            используя обычную процедура входа Canvas. Для этой учетной записи url-адрес будет %{url2}
+      canvas_login_tip: "При настройке параметров, которые мешают вам войти в систему, можно добавить *%{url1}* в конце вашего URL для входа. Это позволит вам войти, используя обычную процедуру входа Canvas. Для этой учетной записи гиперссылка будет %{url2}"
       choose_auth_type_option: "Выберите службу аутентификации"
       current_settings_title: "Текущая интеграция"
       delete_auth_confirmation: "Вы уверены? При удалении вход пользователей в систему может быть невозможен."
-      delete_auth_link: "Удалить аутентификацию"
-      edit_auth_link: "Редактировать сведения"
+      delete_auth_link: "Удалить все аутентификации"
       ip_address_list_description: "При использовании службы аутентификации, требующей, чтобы серверы Canvas непосредственно подключались к серверам, таким как LDAP, необходимо убедиться, что серверы могут принимать подключение от следующих IP-адресов:"
       no_auth_type_description: "Эта учетная запись в настоящий момент не интегрирована с провайдером идентификации."
       page_title: "Настройки аутентификации"
       profile_page_link_example: "Например, вот страница профиля: [%{friendlyname}](%{url})"
       settings_description: "Например, для аутентификации пользователей с помощью внешнего провайдера идентификации (IdP) пользователь должен иметь идентификатор входа, связанный с учетной записью и соответствующий уникальному идентификатору, возвращенному IdP. Текущие имена входа пользователя см. в разделе \"Сведения для входа\" на странице профиля пользователя. (Можно найти путем поиска пользователя на вкладке \"Пользователи\".)"
       settings_title: "Настройки аутентификации"
-      test_ldap_link: "Тест аутентификации"
-    ldap_settings: 
-      add_secondary_ldap_server_link: "Добавление дополнительного сервера LDAP"
-      auth_type_label: Тип
-      change_password_url_help: "Оставить пустым для поведения Canvas по умолчанию"
-      change_password_url_not_specified: "Ничего не указано"
-      labels: 
-        change_password_url: "URL-адрес восстановления пароля"
-        login_handle_name: "Метка входа"
-      login_handle_name_description: "Метка используется для уникальных идентификаторов входа. Примеры: Вход, имя пользователя, идентификатор учащегося и т.д."
-      remove_secondary_ldap_link: (Удалить)
-      save_button: "Сохранить настройки LDAP"
-      secondary_ldap_label: "Дополнительный LDAP"
-      setting_type_ldap: LDAP
-    ldap_settings_fields: 
+      test_ldap_link: "Протестировать аутентификацию LDAP"
+    ldap_fields: 
       auth_filter_description: "Используйте *%{placeholder}* в качестве заполнителя для имени пользователя, указанного пользователем. Например: *(sAMAccountName=%{placeholder})*"
-      auth_password_description: "Оставьте пустым для настройки с использованием текущего пароля."
+      auth_password_description: "Оставьте пустым для продолжения использования текущего пароля."
       identifer_format_description: "Атрибут LDAP используется для поиска входа в систему Canvas. Не заполняйте, чтобы использовать имя пользователя, предоставленное пользователем."
       labels: 
         auth_base: "Базовая система"
         auth_filter: Фильтр
-        auth_host: Узел
+        auth_host: Хост
         auth_over_tls: "Через TLS?"
         auth_over_tls_false: "Отсутствует TLS"
         auth_over_tls_simple_tls: "Простой TLS"
@@ -191,9 +172,7 @@ ru:
         auth_port: Порт
         auth_username: "Имя пользователя"
         identifier_format: "Атрибут идентификатора входа"
-        no_tls: "Отсутствует TLS"
-        simple_tls: "Простой TLS"
-        start_tls: StartTLS
+      last_ldap_timeout_failure: "Последняя ошибка таймаута"
     ldap_settings_test: 
       labels: 
         pass: Пароль
@@ -221,50 +200,28 @@ ru:
       test_ldap_search_help_fixes_3: "Убедитесь, что объект пользователя в LDAP имеет полномочия поиска для указанной базы поиска."
       test_ldap_search_help_header: "Canvas не может выполнить поиск экземпляра LDAP"
       test_ldap_search_label: "Тестирование поиска LDAP..."
-    ldap_timeout_error: 
-      last_ldap_timeout_failure: "Последняя неудача из-за истечения времени"
-      ldap_timeout_failure_help2: "Если Canvas слишком часто прерывает соединение с LDAP-сервером, он будет блокировать дальнейшие попытки входа в систему с использованием LDAP-сервера в течение %{time}."
     login_required: "должно быть указано"
     no_changing_auth_types: "Нельзя сменить тип конфигурации аутентификации. Удалите и создайте новую конфигурацию."
-    no_discovery_url: "Ничего не установлено"
     password_required: "должно быть указано"
-    saml_required: "Конфигурация SAML необходима для тестрирования SAML"
-    saml_settings: 
-      auth_type: Тип
-      auth_url: "Url-адрес входа в систему для данной конфигурации"
-      certificate_fingerprint: "Отпечаток пальца сертификата"
-      change_password_url: "Изменить ссылку на пароль"
-      discovery_url: "URL-адрес представления сведений:"
-      discovery_url_description: "Если установлен url-адрес представления сведений, Canvas будет направлять всех пользователей на данный URL-адрес, если им нужна будет аутентификация. На той странице, таким образом, пользователям должна быть оказана помощь в выяснении, куда им нужно обратиться, чтобы войти в систему. Если url-адрес представления сведений не настроен, первая конфигурация SAML будет использована для попытки аутентификации пользователя."
-      identifier_format: "Формат идентификатора"
-      idp_entity_id: "Идентификатор объекта IdP"
+    saml_fields: 
       labels: 
         certificate_fingerprint: "Отпечаток пальца сертификата"
-        change_password_url: "Изменить ссылку на пароль"
         identifier_format: "Формат идентификатора"
         idp_entity_id: "Идентификатор объекта IdP"
         log_in_url: "URL-адрес входа в систему"
         log_out_url: "URL-адрес выхода в систему"
-        login_attribute: "Характеристики входа в систему"
-        login_handle_name: "Метка входа"
-        position: Позиция
+        login_attribute: "Атрибуты входа в систему"
         requested_authn_context: "Проверка подлинности контекста"
         unknown_user_url: "Url-адрес неизвестного пользователя"
-      log_in_url: "URL-адрес входа в систему"
-      log_out_url: "URL-адрес выхода в систему"
-      login_attribute: "Атрибуты входа в систему"
-      login_handle_name: "Метка входа"
-      login_handle_name_description: "Метка используется для уникальных идентификаторов входа. Примеры: Вход, имя пользователя, идентификатор учащегося и т.д."
-      no_discovery_url: "Ничего не установлено"
-      position: Позиция
+      unknown_user_url_description: "Url-адрес для переадресации, если аутентифицированный пользователь не найден в системе Canvas."
+    saml_required: "Конфигурация SAML необходима для тестрирования SAML"
+    saml_settings_test: 
       refresh_debugging: Обновить
-      requested_authn_context: "Проверка подлинности контекста"
-      saml_debug_instructions: "Как только вы начинаете отладку всей информации о следующем, неудачная SAML попытка вхождения в систему будет собрана. Нажмите кнопку \"Обновить\", чтобы увидеть, если больше данных было собрано или \"Остановить отладку\", чтобы удалить собранные данные и оставновить текущую попытку отладки. "
-      saml_debugging: Отладка
-      save_button: "Сохранить настройки аутентификации"
+      saml_debug_instructions: "Как только вы начинаете отладку всей информации о следующей неудачной SAML попытке входа в систему, эта попытка попадет в данные. Нажмите кнопку \"Обновить\", чтобы увидеть, если большее количество данных было собрано или \"Остановить отладку\", чтобы удалить собранные данные и оставновить текущую попытку отладки. "
+      saml_debugging: "Отладка SAML"
+      saml_required: "SAML конфигурация необходима для тестирования SAML"
       start_debugging: "Начать отладку"
       stop_debugging: "Остановить отладку"
-      unknown_user_url_description: "Url-адрес для переадресации, когда аутентифицированный пользователь не найден в системе Canvas."
     saml_testing: 
       auth_request_to_idp: "Запрос проверки подлинности отправлен IdP"
       auth_response_from_idp: "Ответ проверки подлинности от IdP"
@@ -293,7 +250,15 @@ ru:
         to_idp_xml: "Вход в систему XML отправлен IdP"
       logout_request_to_idp: "Запрос выхода отправлен IdP"
       logout_response_from_idp: "Ответ выхода от IdP"
-      saml_required: "SAML конфигурация необходима для тестрирования "
+    sso_settings_form: 
+      change_password_url_help: "Оставить пустым для поведения Canvas по умолчанию"
+      discovery_url_description: "Если установлен URL обнаружения, Canvas будет направлять всех пользователей на этот URL, когда им нужно будет пройти аутентификацию. Это страница будет нужна, чтобы помочь пользователю выяснить, куда им нужно перейти, чтобы войти в систему. Если URL обнаружения не настроен, для попытки проверить аутентификацию пользователя будет использоваться первая конфигурация. "
+      labels: 
+        auth_discovery_url: "URL обнаружения"
+        change_password_url: "URL-адрес восстановления пароля"
+        login_handle_name: "Ярлык входа в систему"
+      login_handle_name_description: "Метка используется для уникальных идентификаторов входа. Примеры: Вход, имя пользователя, идентификатор учащегося и т.д."
+  account_navigation_80bbefd4: "Навигация по аккаунту"
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "Время окончания уведомления учетной записи предшествует времени начала"
@@ -355,6 +320,7 @@ ru:
     report_header_enrollment_state: "состояние регистрации"
     report_header_final_score: "итоговая оценка"
     report_header_first_name: first_name
+    report_header_full_name: full_name
     report_header_group_id: group_id
     report_header_id: идентификатор
     report_header_last_access_at: "последний доступ в"
@@ -380,6 +346,7 @@ ru:
     report_header_short__name: short_name
     report_header_short_name: "краткое имя"
     report_header_sis_id: "идентификатор sis"
+    report_header_sortable_name: sortable_name
     report_header_start__date: start_date
     report_header_start_date: "дата начала"
     report_header_status: состояние
@@ -396,6 +363,7 @@ ru:
     report_header_user__id: user_id
     report_header_user_id: "идентификатор пользователя"
     report_header_user_name: "имя пользователя"
+    report_header_user_short_name: short_name
     report_header_user_sis_id: "идентификатор sis пользователя"
     report_header_xlist_course_id: xlist_course_id
     sis_exporter: 
@@ -425,6 +393,7 @@ ru:
       open_registration_delegated_warning_dialog: "Провайдер внешней идентификации включен"
       what_are_quiz_ip_filters: "Что такое IP-фильтры Quiz?"
     user: Пользователь
+  account_surveys_b0039876: "Опросы учетной записи"
   account_user: 
     types: 
       account_admin: "Администратор учетной записи"
@@ -455,16 +424,14 @@ ru:
         sis_user_id: "Идентификатор SIS"
         sortable_name: "Сортируемое имя"
       sortable_name_help: "Это имя отображается в отсортированных списках."
-      unique_id_label: "%{label}:*"
+      unique_id_label_1: "%{label}:"
     add_user_button: "Добавить пользователя"
     add_user_dialog_title: "Добавить нового пользователя"
     adding_course_message: "Добавление курса..."
     adding_user_message: "Добавление пользователя..."
     additional_settings: 
-      account_domains: "Домены учетной записи"
       account_status: "Статус учетной записи"
       add_new_domain: "Добавить новый домен"
-      external_status: "Внешний статус"
       license: Лицензия
       license_type: "Тип лицензии"
       new_account_domain_title: "Новый домен учетной записи"
@@ -1292,6 +1259,7 @@ ru:
   activity_13915493: Активность
   activity_by_category_9c2033d1: "Активность по категориям"
   activity_by_date_878c5b49: "Активность по дате"
+  add_8523c19b: Добавить
   add_app_baf540f: "Добавить приложение"
   add_attachment_93868828: "Добавить вложение"
   add_course_assignments_628ed6d0: "Добавить задания курса"
@@ -1306,6 +1274,7 @@ ru:
     add_quiz_to: "Добавить контрольные работы к %{module}"
     add_topic_to: "Добавить темы для обсуждения к %{module}"
   add_new_group_7ac49f31: "Добавить новую группу"
+  add_new_set_of_due_dates_e8e240f: "Добавить новый набор установленных сроков"
   add_students_to_the_course_874be8fb: "Добавить студентов к курсу"
   add_tas_to_the_course_2aac6e02: "Добавить ассистентов к курсу"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Добавить задания. Вы можете просто создать длинный список либо разбить их на группы. Вы можете даже указать весовые критерии каждой группы заданий."
@@ -1448,6 +1417,7 @@ ru:
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Ответы будут показаны после того, как вы завершите последнюю попытку"
   api_url_3ee7cb0a: "API URL"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: " App Center появится во вкладке «Приложения» на странице настроек курса или учетной записи. Приведенный ниже URL-адрес должен вести к рабочей конечной точке в App Center (например, %{url} – не забудьте опустить завершающий слэш"
+  app_placements_6d877225: "Размещение приложений"
   apple_touch_icon_2c258bb3: "Значок Apple Touch"
   application: 
     errors: 
@@ -1460,7 +1430,6 @@ ru:
       invalid_external_tool: "Невозможно найти подходящие настройки для этой ссылки"
       invalid_external_tool_id: "Невозможно найти подходящие настройки для этого инструмента"
       invalid_feed_parameters: "Недопустимые параметры канала."
-      invalid_oembed_url: "Возникла проблема при получении этого источника. Внешний инструмент предоставил неверную информацию о ресурсе."
       invalid_tag_type: "Тип элемента для этого тега не распознан"
       invalid_verification_code: "Неверный код подтверждения."
       mismatched_verification_code: "Код подтверждения не соответствует существующим зарегистрированным пользователям."
@@ -1491,6 +1460,7 @@ ru:
         suspended: "Организация временно отключена"
     wiki_front_page_default_content_course: "Добро пожаловать в wiki нового курса!"
     wiki_front_page_default_content_group: "Добро пожаловать в wiki новой группы!"
+  apply_781a2546: Применить
   appointment_group: 
     errors: 
       invalid_end_at: "Время окончания предшествует времени начала"
@@ -1508,6 +1478,7 @@ ru:
     update: Обновить
   archive_3f794d7e: Архив
   archive_selected_d64506ca: "Архив выбран"
+  are_you_sure_26795d3c: "Вы уверены?"
   are_you_sure_you_want_to_delete_these_count_items_148e98ba: 
     few: "Вы уверены, что хотите удалить эти %{count} элемента?"
     many: "Вы уверены, что хотите удалить эти %{count} элементов?"
@@ -1522,12 +1493,14 @@ ru:
   aria_labels: 
     unlock_at_date: "Разблокировать после наступления даты"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Когда вы начнете набирать текст в этом поле, список групп будет автоматически фильтроваться, оставляя только те названия, которые соответствуют вашему вводу."
+  as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "По мере ввода текста в это поле, список результатов будет автоматически обновляться."
   assessment_question: 
     default_question_name: Вопрос
   assessment_question_bank: 
     default_imported_title: "Импортированные вопросы"
     default_title: "Нет имени - %{course}"
     default_unfiled_title: "Неотвеченные вопросы"
+  assign_eedf72bb: Назначить
   assign_reviews_on_date_7e48ec50: "Назначить рассмотрение на дату"
   assignment: 
     assignment_group_must_have_group: "Выберите группу заданий для данного задания"
@@ -1602,6 +1575,7 @@ ru:
   assignment_groups_api: 
     errors: 
       frozen_assignments_error: "Вы не можете удалить группу с заблокированным заданием."
+  assignment_menu_91fe3716: "Меню заданий"
   assignment_muter: 
     mute_assignment: "Отключить звук задания"
     muting_assignment: "Отключение звука задания..."
@@ -1610,6 +1584,7 @@ ru:
     unmute_dialog: "В настоящий момент звук в данном задании отключен. Это означает, что студенты не могут просматривать свои оценки и отзывы. Включить звук сейчас?"
     unmuting_assignment: "доступно заданиe..."
   assignment_name_b2d87383: "Имя задания"
+  assignment_selection_6bff05c4: "Выбор заданий"
   assignments: 
     assignment_count: 
       few: "%{count} задания"
@@ -1763,12 +1738,6 @@ ru:
       one: "Удалить самую низкую оценку"
       other: "Удалить %{count} самых низких оценок"
     drop_lowest_scores: "Удалить самые низкие %{number} оценки"
-    due_date_override: 
-      overrides: 
-        available_from: "Доступно с"
-        due_date: "Дата выполнения"
-        for: Для
-      until: До
     due_date_view: 
       overrides: 
         remove_these_dates: "Удалить эти даты"
@@ -1790,7 +1759,6 @@ ru:
       description: Описание
       freeze_properties: "Блокировка свойств задания при копировании"
       notify_content_change: "Уведомлять пользователей об изменении этого содержания"
-      only_visible_to_overrides_note: "Примечание. Данное задание видимо *только* для указанного ниже раздела (-ов):"
       points_possible: Баллы
       post_to_sis: "Включить эти оценки за задания при размещении в школьной Системе информации о студенте"
       warnings: 
@@ -2074,6 +2042,7 @@ ru:
       advanced_turnitin_settings: "Дополнительные настройки Turnitin"
       descriptions: 
         allowed_extensions: "Введите список принятых расширений, например: doc, xls, txt"
+      external_tool_group_warning: "Групповые задания не могут использовать Внешние Инструменты. При сохранении групповые настройки не будут отмечены"
       external_tool_options: "Опции внешних инструментов"
       label: 
         external_tool_new_tab: "Загрузить этот инструмент в новой вкладке"
@@ -2243,10 +2212,13 @@ ru:
   available_from_587ce92f: "Доступно с"
   available_from_date_43b5e11d: "Доступно с даты"
   available_from_date_afc594fa: "Доступно с даты:"
+  available_from_f84e4611: "Доступно с"
   available_until_date_2c0ccec3: "Доступно до даты:"
   available_until_date_cd125c62: "Доступно до даты"
   available_until_f3b9c4ed: "Доступно до"
   available_until_lock_at_ab022445: "Доступно до %{lock_at}"
+  availible_from_format_like_yyyy_mm_dd_hh_mm_f101e0dd: "Доступен с - Формат: ГГГГ-MM-ДД чч:мм"
+  availible_to_format_like_yyyy_mm_dd_hh_mm_f2611528: "Доступен до - Формат: ГГГГ-MM-ДД чч:мм"
   average_49c63f9b: Среднее
   back_to_app_center_95420d83: "Вернуться в App Center"
   bb_display: "Знакомство с Blackboard"
@@ -2267,6 +2239,7 @@ ru:
     recording_setting_enabled_description: "Невозможно записать эту конференцию"
   blackboard: 
     no_manifest: "Этот zip-архив системы Blackboard не содержит файла imsmanifest.xml в корневом каталоге."
+  blue_daf8fea9: Синий
   bookmark_service: 
     default_title: "Без названия"
   broccoli_cloud: 
@@ -2719,30 +2692,9 @@ ru:
     ics_title: "%{course_or_group_name} Календарь (Canvas)"
     invalid_date_or_time: "Неверно указана дата или дата и время для %{attr}"
   calendars: 
-    assignment_details: "Сведения о задании"
-    default_title: событие
     event: 
       due: окончание
       event_title: "до: %{event_title}"
-    event_details: "Подробные сведения о мероприятии"
-    feed_dialog_title: "Канал календаря"
-    keycodes: 
-      delete: d
-      edit: e
-      new: "n"
-      next_day: ctrl+вправо
-      next_event: j
-      next_week: ctrl+вниз
-      open: о
-      previous_day: ctrl+влево
-      previous_event: k
-      previous_week: ctrl+вверх
-      refresh: r
-    notices: 
-      event_moved: "%{event} было перемещено в %{day}"
-    prompts: 
-      delete_assignment: "Вы действительно хотите удалить это задание?"
-      delete_event: "Действительно хотите удалить это событие?"
     show2: 
       calendar_feed: "Канал календаря"
       calendar_feed_instructions: "Скопируйте ссылку ниже и вставьте ее в любое приложение календаря, использующее каналы iCal (Календарь Google, iCal, Outlook и т. д.)"
@@ -2756,11 +2708,6 @@ ru:
       toggle_calendars: "Переключить календари"
       toggle_undated_items: "Переключить элементы без даты"
       undated_items: "Элементы без даты"
-    titles: 
-      add_new_assignment: "Добавить новое задание"
-      add_new_event: "Добавить новое мероприятие"
-      edit_assignment: "Редактировать задание"
-      edit_event: "Редактировать событие"
     wizard_box: 
       descriptions: 
         assignment: "Отлично. Теперь нажмите вкладку \"Задание\" в диалоговом окне, чтобы создать задание вместо календарного события."
@@ -2809,11 +2756,15 @@ ru:
   canvas_cartridge_display: "Общий картридж Canvas"
   canvas_cartridge_file_description: "Пакет экспорта курса Canvas"
   canvas_cartridge_name: "Импортер Canvas Cartridge"
+  canvas_cloud_information_fdd404f2: "Облако данных Canvas"
+  canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas не удалось распознать провайдера вашей идентификации"
+  canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "В Canvas отсутствует учетная запись для пользователя: %{user}"
   canvas_error_report_ff678539: "Отчет об ошибках Canvas"
   canvas_revision_unknown: Неизвестно
   canvas_ticketing_email_connector_27e253ae: "Коннектор для электронной почты, генерирующий формы Canvas"
   canvas_ticketing_web_post_connector_11158897: "Коннектор для веб-публикаций, генерирующий формы Canvas"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas повторно оценит все отправки после того, как вы сохраните контрольную работу. Это может занять несколько минут."
+  cas_d6e9601d: CAS
   cc: 
     by: "Принадлежность CC"
     by_nc: "Принадлежность CC, некоммерческий"
@@ -2838,6 +2789,7 @@ ru:
   click_to_report_profile_picture_370f9625: "Нажмите, чтобы сообщить о фотографии профиля"
   close_and_return_to_canvas_80544344: "Закрыть и вернуться в Canvas"
   close_d634289d: Закрыть
+  close_picker_256aca8a: "Закрыть выбор"
   collaboration: 
     default_title: "Совместная работа без имени"
   collaborations: 
@@ -2869,7 +2821,7 @@ ru:
         cancel: Отменить
         update: "Обновить совместную работу"
       labels: 
-        description: Описание
+        description: "Описание:"
         title: "Название совместной работы"
     errors: 
       cannot_load_collaboration: "Невозможно загрузить совместную работу"
@@ -2900,7 +2852,7 @@ ru:
             **Внимание**: для участия во всех совместных проектах Google Docs вам (и всем участникам совместной работы) потребуется учетная запись Google.
       labels: 
         collaboration_type: "Совместная работа с использованием:"
-        description: Описание
+        description: "Описание:"
         document_name: "Имя документа:"
       messages: 
         delete_google_doc_as_well: "Эта совместная работа сохранена как документ Google Doc. Удалить ее только из Canvas или также и из Google Docs?"
@@ -3015,6 +2967,7 @@ ru:
       notices: 
         contact_registered: "Способ контакта зарегистрирован!"
   concluded_courses_94782e21: "Завершенные курсы"
+  conference_36b50fda: Конференция
   conferences: 
     concluded_conference: 
       delete: Удалить
@@ -3047,6 +3000,7 @@ ru:
     inactive_error: "Эта конференция в настоящий момент неактивна"
     index: 
       concluded_conferences: "Завершенные конференции"
+      conference: Конференция
       conference_header: Конференции
       new_conference: "Новая конференция"
       new_conferences: "Новые конференции"
@@ -3078,6 +3032,7 @@ ru:
   config_url_e96ceaf3: "Настройка URL-адреса"
   configurate_tool_app_5a721f2c: "Настроить приложение %{tool}?"
   configuration_type_25a084a4: "Тип конфигурации"
+  configure_ecb97e30: Конфигурация
   configure_toolname_app_651371be: "Настроить приложение %{toolName}"
   confirm_dialog: 
     cancel: Отменить
@@ -3109,7 +3064,7 @@ ru:
       message: 
         export_started: "Процесс экспорта запущен. Для больших курсов это может занять некоторое время. *Вы можете уйти с этой страницы*, по завершении экспорта вы получите сообщение электронной почты."
       no_submissions: "На данный момент у вас нет отправок для экспорта."
-      user_data_exports: "Экспорты данных пользователя"
+      user_data_exports: "Загрузить отправки"
     labels: 
       new_export: "Новый экспорт:"
     links: 
@@ -3332,17 +3287,6 @@ ru:
     titles: 
       tag_external_web_page: "Внешняя веб-страница тега"
   context: 
-    communication: 
-      headings: 
-        discussions: Обсуждения
-      links: 
-        feeds: 
-          course_discussions: "Канал обсуждений курса Atom "
-        start_collaboration: "Начать совместную работу"
-        start_conference: "Начать веб-конференцию"
-        start_topic: "Начать новую тему"
-      titles: 
-        communication: Связь
     deleted_item: 
       created: создано
       last_updated: "последнее обновление"
@@ -3920,6 +3864,8 @@ ru:
     unarchive: Разархивировать
     unstar: "Снять метку"
     unstar_conversation: "Снять метку с разговора"
+  copy_to_folder_32ecc3c3: "Копировать в папку"
+  copying_628a9607: Копирование...
   copyright_holder_66ee111: "Правообладатель:"
   correct_answer: "Это правильный ответ."
   correct_answers_are_available_until_date_df01cc5f: "Правильные ответы будут доступны до %{date}."
@@ -4077,6 +4023,7 @@ ru:
       file: "Неизвестный файл"
       topic: "Неизвестная тема"
       wiki_page: "Неизвестная вики-страница"
+  course_home_sub_navigation_b1ee6b03: "Субнавигация главной страницы курса"
   course_list: 
     favorited_tooltip: "Щелкните, чтобы удалить из меню курсов."
     nonfavorited_tooltip: "Щелкните, чтобы добавить в меню курсов."
@@ -4154,12 +4101,14 @@ ru:
       wiki_id: "Идентификатор вики"
       workflow_state: "Состояние рабочего процесса"
   course_members_are_free_to_join_9b2603d4: "Члены курса могут вступать свободно"
+  course_navigation_dd035109: "Навигация по курсу"
   course_restore: 
     restore_error: "Произошла ошибка при попытке восстановить курс. Курс не был восстановлен."
   course_search: 
     cant_be_blank: "Не может быть пустым"
   course_section: 
     sis_id_taken: "Идентификатор SIS \"%{sis_id}\" уже используется"
+  course_section_7a988066: "Раздел курса"
   course_settings: 
     buttons: 
       add_section: "Добавить раздел"
@@ -4203,6 +4152,7 @@ ru:
       move_course: "Переместить курс"
       reset_course_content_dialog_help: "Сбросить содержание курса"
       section_enrollments: "Ссылка на студентов"
+  course_settings_sub_navigation_b95deae: "Субнавигация настроек курса"
   course_setup_wizard_is_showing_a7c087c1: "Отображается мастер установки курса."
   course_statistics: 
     unknown: Неизвестный
@@ -4391,6 +4341,7 @@ ru:
         email: "Электронная почта"
         email_field_label: "Введите адреса электронной почты пользователей, которых вы хотели бы добавить, разделяя их запятыми."
         email_field_place_holder: "\"Студент для примера\" <student@example.com>, \"Фамилия, Имя\"<firstlast@example.com>, justAnEmailAddress@example.com"
+        email_or_login: Email/Логин
         example_formats: "Примеры: user@example.com, \"Имя Фамилия\" <user@example.com>, \"Фамилия, Имя\" <user@example.com>"
         form_instructions: "Введите или вставьте ниже список адресов электронной почты:"
         go_back: "Начать заново"
@@ -4421,6 +4372,7 @@ ru:
       link_to_students_view: 
         link_student_desc: "Когда наблюдатель связан со студентом, у них есть доступ к оценкам студента и формам взаимодействия на курсе. "
       resend_invitations: 
+        pending_invitation: "Было принято 1 приглашение."
         pending_invitations: "%{pendingInvitationsCount} приглашений не было принято."
         re_send_invitations: "Отправить повторно"
         re_sending_invitations: "Повторная отправка..."
@@ -4727,7 +4679,9 @@ ru:
     url: URL-адрес
   create_users_view: 
     required: "Введите несколько адресов электронной почты"
+  created_by_b39b9c8b: Автор
   created_group_group_name_2097306b: "Созданная группа %{group_name}"
+  creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Создание Экспорта отправленных заданий позволит вам скачать архивный файл всех ваших выполенных и отправленных заданий со всех ваших нынешних и прошлых курсов. Файл может быть большим, поэтому скачивание может занять некоторое время. Вы можете покинуть страницу и вернуться позже."
   creative_commons_714a065f: "Creative Commons"
   creative_commons_license_725584ae: "Лицензионное соглашение Creative Commons:"
   crumbs: 
@@ -4827,6 +4781,7 @@ ru:
     out_of_points_possible: "из %{assignment.points_possible}"
     this_is_permanent: "Ранжирование оценок не может быть отменено. История оценок до ранжирования будет доступна, но ранжирование необратимо."
   custom_fields_fc3e55af: "Пользовательские поля"
+  cyan_c1d5f68a: Голубой
   d2l_display: Desire2Learn
   d2l_file_description: "Экспорт D2L в .zip формат"
   d2l_name: "Конвертер D2L"
@@ -5016,6 +4971,8 @@ ru:
       second: Секунды
       year: Год
   decaying_average_8bf6a0dd: "Снижающийся средний балл"
+  deep_orange_4c7eea99: Темно-оранжевый
+  deep_purple_bb3e2907: Темно-фиолетовый
   default_conference_title: "Конференция %{course_name}"
   default_question_name: Вопрос
   default_question_text: "Текст вопроса"
@@ -5028,6 +4985,8 @@ ru:
   delete_survey_56fddbbd: "Удалить опрос"
   delete_tool_app_9c9f6d35: "Удалить приложение %{tool}?"
   delete_toolname_app_85f9d4ee: "Удалить приложение %{toolName}"
+  deleting_6421031e: удаление...
+  delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Демонстрационные сайты требуют определения настроек Recaptcha. Обратитесь к администратору сайта с вопросами о данных настройках Canvas."
   demos: 
     _register: 
@@ -5148,6 +5107,7 @@ ru:
       Дифференцированные задания — это *бета* функция, позволяющая выбирать, какие разделы задания применимы.
       Разделы, которым не назначены задания, не будут видны в содержимом курса, и их итоговая оценка будет
       рассчитываться без этих баллов.
+  diigo_993c4646: Diigo
   disable_a5c05db3: Отключить
   disabled_18c33a73: (отключено)
   discussion_6719c51d: Обсуждение
@@ -5168,6 +5128,7 @@ ru:
     default_title: "Без названия"
     empty_message: "Нет сообщения"
   discussion_topic_dc85ad4c: "Тема обсуждения"
+  discussion_topic_menu_3d4684c6: "Меню Темы обсуждений"
   discussion_topics: 
     assignment_details: 
       available_from: "Доступно с"
@@ -5238,7 +5199,6 @@ ru:
       enable_podcast_feed: "Включить канал подкастов"
       include_replies_in_podcast_feed: "Включить ответы студентов в веб-канал подкаста"
       only_graders_can_like: "Только оценивающие могут ставить лайки"
-      only_visible_to_overrides_note: "Примечание. Данное обсуждение отображается *только* для указанного ниже раздела (-ов):"
       options: Опции
       page_header_title: "Новое обсуждение"
       points_possible: "Возможные баллы"
@@ -5421,7 +5381,8 @@ ru:
     initial_post_required_to_subscribe: "Вы должны отправить ответ, прежде чем подписаться"
     like_count: 
       few: "(%{count} лайка)"
-      one: "(%{count} лайков)"
+      many: "(%{count} лайков)"
+      one: "(%{count} лайк)"
       other: "(%{count} лайков)"
     mark_as_read: "Отметить как прочитанное"
     mark_as_unread: "Отметить как непрочитанное"
@@ -5475,6 +5436,8 @@ ru:
   domain_3b54c511: Домен
   don_t_show_again_15d8253e: "больше не показывать"
   done_8af51c9b: Готово.
+  download_submissions_7454665f: "Загрузить отправки"
+  due_a73610f6: Срок
   due_at_5e18eeac: "Срок выполнения:"
   due_by_c263dc10: "выполнить до"
   due_date_5d0a953c: "Дата выполнения:"
@@ -5493,6 +5456,7 @@ ru:
     multiple_due_dates: "до: Несколько сроков выполнения"
     no_due_date: "до: Нет даты выполнения"
   due_datetime_f5a81b81: "До: %{dateTime}"
+  due_format_like_yyyy_mm_dd_hh_mm_ef30a9ef: "Срок выполнения - Формат: ГГГГ-MM-ДД чч:мм"
   due_multiple_dates_cc0ee3f5: "До: несколько дат"
   due_on_date_aa4725cd: "Выполнить до даты:"
   e_mail_only_2cc5e513: "Только электронная почта"
@@ -5507,6 +5471,7 @@ ru:
   ecollege_file_description: Ecollege
   ecollege_name: "Конвертер Ecollege"
   edit_app_b0cc1c17: "Редактировать приложение"
+  edit_c5fbea07: Редактировать
   edit_grading_scheme_53091236: "Редактировать схему оценок"
   edit_permissions_for_count_items_d65e3855: 
     few: "Редактировать разрешения для %{count} элементов"
@@ -5597,7 +5562,9 @@ ru:
       font_size: "Размер шрифта, нажмите стрелку вниз, чтобы выбрать"
       formatting: "Форматирование, нажмите стрелку вниз, чтобы выбрать"
       rte_help: "Область форматированного текста. Нажмите ALT + F8 для справки"
+  editor_button_6647db9c: "Кнопка редактора"
   either_the_url_or_domain_should_be_set_c29cf8c1: "Должен быть установлен либо URL-адрес, либо домен."
+  either_you_re_a_new_user_or_the_terms_of_use_have__14f0d0d0: "Либо вы являетесь новым пользователем, либо *Условия пользования* изменились с того момента, когда вы их приняли. Пожалуйста, примите *Условия использования* и **Политику конфиденциальности**, прежде чем продолжить."
   element_option_missing_error_an_element_to_attach__be433478: "Ошибка отсутствующего параметра `элемент`: элемент, прикрепляемый к TreeBrowserView, необходимо установить как `истинный` для BBTreeBrowserView при определении настроек параметра рендера"
   email: 
     default_from_name: "Instructure Canvas"
@@ -5605,6 +5572,7 @@ ru:
   email_is_invalid_e0d982eb: "Недопустимый адрес электронной почты!"
   ember_modules_description: "Модули переписаны в Ember. Используйте собственный API перетаскивания, чтобы позволить перетаскивание из внешних источников."
   enable_6f5d1328: Включить
+  enable_feature_title_987d8e9a: "Включить функцию: %{title}"
   enable_gradebook_list_students_by_sortable_name: "Список студентов по сортируемым именам в табеле успеваемости. По умолчанию, сортируемое имя идет в порядке \"Фамилия, Имя\" и может быть изменено в настройках."
   enable_multiple_grading_periods: |-
       Множественные Периоды Оценивания позволяют учителям и администраторам создавать периоды оценивания с установленными
@@ -5647,6 +5615,7 @@ ru:
       delete_default_term: "Нельзя удалять семестр по умолчанию"
       delete_term_with_courses: "Нельзя удалить семестр, в котором есть активные курсы"
       not_unique: "Идентификатор SIS \"%{sis_source_id}\" уже используется"
+  enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Введите hexcode здесь, чтобы использовать собственный цвет."
   eportfolio: 
     buttons: 
       done_editing: "Редактирование завершено"
@@ -5961,6 +5930,7 @@ ru:
   event_end_time_ef830e66: "Дата окончания события"
   event_start_time_441b491f: "Дата начала события"
   everyone_854554dd: Все
+  everyone_else_6c6dc7b6: "Все остальные"
   example_84698b7d: Пример
   example_final_score_355aff0f: "Пример итоговой оценки"
   example_final_score_a92b30b9: "Пример итоговой оценки]]"
@@ -5974,6 +5944,8 @@ ru:
   expand_or_collapse_undated_items_b901de09: "Развернуть или свернуть элементы без даты"
   expand_subdiscussion_cd226ed4: "Развернуть под-дискуссию"
   expires_on_date_18efe4e2: "Истекает на дату"
+  export_de71cd8e: Экспорт
+  exporting_b1eab154: Экспорт
   external_apps_f5490181: "Внешние приложения"
   external_content: 
     cancel: 
@@ -6123,13 +6095,12 @@ ru:
   external_url_e9b87215: "Сторонний Url"
   failed_to_create_zip_file_1a943d06: "Не удалось создать файл zip"
   failed_to_import_media_objects_4c1fcb4f: "Не удалось импортировать мультимедийные объекты"
+  failed_to_log_in_7ceec561: "Не удалось войти в систему"
   fair_use_bee47d77: "Добросовестное использование"
   favicon_6e658914: "Иконка веб-сайта"
   feature_flags: 
     feature_flag: 
       allow: Разрешить
-      disabled: Отключено
-      enabled: Включено
       estimated_release: "Планируемый выпуск:"
       no_description: "нет описания"
       ? "off"
@@ -6168,6 +6139,7 @@ ru:
     student_outcome_gradebook: "Табель успеваемости студента по усвоению обучения"
   field_name_31fff38e: "Имя поля"
   file_list_updated_38e2a5ad: "Список файлов обновлен"
+  file_menu_cc0ca54: "Меню Файл"
   file_not_found_9eec054c: "Файл не найден"
   file_preview: 
     file_preview_headerbutton_close: Закрыть
@@ -6389,6 +6361,7 @@ ru:
       no_rubric_outcomes_found: "Не найдены результаты с настройкой рубрик"
     titles: 
       find_outcome: "Поиск результата"
+  first_two_students_and_others_count_others_bb0a212a: "%{first_two_students}, и %{others_count} других"
   flash_6afbf65a: Flash
   folder: 
     course_content_folder_name: "содержимое курса"
@@ -6407,7 +6380,6 @@ ru:
     only_one_folder: "Невозможно задать путь к папке и установить идентификатор папки"
   for: для
   for_all_devices_1f603968: "Для всех устройств"
-  for_section_8503af93: "Для раздела"
   from_fdd4956d: От
   from_from_to_to_e31f6422: "С %{from} по %{to}"
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "Получить следующее из вашего приложения Salesforce Connected App"
@@ -6421,11 +6393,15 @@ ru:
     invitation: приглашение
     question: вопрос
     warning: предупреждение
+  global_navigation_8bee3501: "Глобальная навигация"
+  google_docs_40374e65: "Google Docs"
   google_docs_domain_restriction_description: |-
       Ограничение домена Google Docs позволяет ограничить отправки и совместные работы через 
       Google Docs одним доменом. Студенты, пытающиеся отправить задания или присоединиться 
       к совместной работе в запрещенных доменах, получат сообщение об ошибке, уведомляющее их о том, 
       что им необходимо обновить их настройки интеграции с Google Docs.
+  google_docs_preview_9f41b23c: "Функция предварительного просмотра Google Docs"
+  google_drive_7cb003c9: "Диск Google"
   grade_display_warning_dialog: 
     grade_display_warning: 
       checkbox: "Не показывать снова для этого курса."
@@ -6436,6 +6412,7 @@ ru:
     graph_title: "Средний %{mean}, высокий %{high}, низкий %{low}"
     outcome: 
       alignment_count: "*%{count}* соответствий"
+      alignment_count_summary: "*8* из *%{count}* совпадений"
   gradebook: 
     alerts: 
       no_active_students: "В курсе нет активных студентов, или нет студентов для оценки."
@@ -6474,7 +6451,6 @@ ru:
     hide_all_details_button: "Скрыть все сведения"
     mic_blocked_message: "Разрешение на использование микрофона заблокировано. Для изменения перейдите по ссылке chrome://settings/contentExceptions#media-stream"
     mute_assignment: "Отключить звук задания"
-    new_assessment: "[Новая проверка знаний]"
     no_submission_time: "нет времени передачи"
     nodetect_message: "Речь не обнаруженаВозможно, вам необходимо отрегулировать параметры микрофона. "
     not_graded: "без оценки"
@@ -6611,6 +6587,8 @@ ru:
       switch_to_percent: "Переключиться на проценты"
       switch_to_points: "Переключиться на баллы"
     ungraded: "Не учтено в процессе выставления оценки"
+  gradebook_csvs: 
+    grades_filename: Оценки
   gradebook_uploads: 
     new: 
       titles: 
@@ -6752,6 +6730,7 @@ ru:
       arrange_columns_by_due_date: "Сортировать столбцы по сроку выполнения"
       arrange_columns_by_group: "Сортировать столбцы по группе заданий"
       download_scores: Экспорт
+      export_current_gradebook: Текущие
       filter_by_student: "Фильтр по имени студента или вторичному идентификатору"
       grades: Оценки
       hide_student_names: "Скрыть имена студентов"
@@ -6767,7 +6746,6 @@ ru:
     grades: 
       complete: Завершено
       incomplete: "Не завершено"
-    grades_filename: Оценки
     grading_box_extended: 
       labels: 
         grade: Оценить
@@ -6866,7 +6844,6 @@ ru:
         show_all_sections: "Показать все разделы"
         submit_same_score: "Использовать эту же схему оценки для повторной отправки"
       loading: загрузка...
-      new_assessment_option: "[Новая проверка знаний]"
       no_annotation: "Аннотации не доступны в данном документе"
       not_newest_notice: "Примечание: Это не самая последняя отправка"
       page_header_title: SpeedGrader
@@ -6972,6 +6949,7 @@ ru:
     titles: 
       grading_scheme_info: "Просмотр/редактирование схемы оценок"
   great_so_you_ve_got_a_course_now_what_well_before__38cfba67: "Здорово, теперь у вас свой курс. Что же дальше? Ну, прежде чем вы покажете его миру, вы, возможно, хотите проверить и убедиться, что изложили основы. Пройдитесь по списку, приведенному слева, чтобы убедиться, что ваш курс готов."
+  green_15af4778: Зеленый
   group: 
     greater_than_1: "Должно быть больше 1"
     memeber: Участник
@@ -7456,10 +7434,12 @@ ru:
   high_score_47924c1a: "Высокая: %{score}"
   highest_28ad71e6: "Самая высокая"
   highest_score_e080551e: "Наивысшая оценка"
+  homework_submission_172e8354: "Сдача домашнего задания"
   html5_first_videos_description: |-
       По умолчанию, Canvas сначала пытается использовать Flash-плеер для воспроизведения видеороликов. Включите эту опцию, чтобы пытаться сначала использовать HTML5,
       а затем переходить к Flash-плееру.
   html_editor_fb2ab713: "Редактор HTML"
+  i_agree_to_the_terms_of_use_and_privacy_policy_f41760cc: "Я согласен с *Условиями использования* и **Политикой конфиденциальности**."
   i_have_obtained_permission_to_use_this_file_6386f087: "Разрешение на использование данного файла получено."
   i_hold_the_copyright_71ee91b1: "Я являюсь правообладателем"
   ic_actions: 
@@ -7480,7 +7460,6 @@ ru:
   if_you_ve_been_using_another_course_management_sys_67edfab1: "Если вы используете другую систему управления курсами, вероятно, вам потребуется переместить что-либо в Canvas. Мы поможем вам разобраться в процессе перемещения содержимого в Canvas."
   ignore_91750df8: Игнорировать
   ignore_assignment_738b3c99: "Игнорировать задание"
-  ignore_forever_dd4a6cdf: "Всегда игнорировать"
   ignore_name_55edc6fe: "Игнорировать %{name}"
   ignore_these_3940f6f5: "Игнорировать эти"
   ignore_this_assignment_b7a71f80: "Игнорировать это задание"
@@ -7524,7 +7503,9 @@ ru:
     warnings: 
       truncated_wiki_title: "Заголовок следующей вики-страницы был усечен: %{title}"
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Включить эти оценки за задания при размещении в школьной Системе информации о студенте"
+  incorrect_username_and_or_password_2de73abb: "Неверное имя пользователя и/или пароль"
   incremental_update_successfully_generated_against__db3f3f06: "На основе предыдущего Импорта SIS было создано дополнительное обновление."
+  indigo_2035fc55: Индиго
   info: 
     notices: 
       error_reported: "Благодарим за помощь!  Мы проследим за этим"
@@ -7703,10 +7684,7 @@ ru:
   launch_url_e150bd41: "URL-адрес запуска"
   layouts: 
     application: 
-      ? "User Research"
-      : "Исследования пользователя"
       bouncing_communication_channels: "Кажется, с одним из ваших способов связи возникла проблема.Посетите свою *Страницу пользовательских настроек*"
-      by_instructure: "Согласно Instructure"
       group_switch: Переключить
       javascript_required: "Чтобы получить доступ к этому сайту, вы должны разрешить использование JavaScript."
       keyboard_navigation: 
@@ -7715,7 +7693,6 @@ ru:
         close: Закрыть
         dashboard: "Моя информационная панель"
         skip_to_content: "Перейти к содержимому"
-      open_source_learning_management_system: "LMS с открытым исходным кодом."
     fixed_bottom: 
       masquerading: 
         stop: "Остановить подмену"
@@ -7735,6 +7712,7 @@ ru:
       log_in_to_canvas: "Войти в систему Canvas"
     styleguide: 
       default_page_title: "Canvas LMS"
+  ldap_e1e0a916: LDAP
   learning_mastery_gradebook_description: |-
       Табель успеваемости по усвоению обучения позволяет учителям быстро просматривать прогресс студента
       и курса по результатам обучения. Результаты представлены в формате табеля успеваемости,
@@ -7830,6 +7808,9 @@ ru:
       word_separator: " "
   license_help: 
     content_license_help: "Помощь, связанная с лицензированием содержания"
+  light_blue_5374f600: Светло-синий
+  light_green_c1cd020d: Светло-зеленый
+  light_pink_e1214d62: Светло-розовый
   link_enrollment: 
     buttons: 
       link: "Связать со студентом"
@@ -7843,11 +7824,13 @@ ru:
       no_link: "[ Нет ссылки ]"
     titles: 
       link_to_student: "Связать со студентом"
+  link_selection_1486c5d0: "Выбор ссылки"
   link_title_d959a7b3: "Заголовок ссылки"
   link_url_cf96376: "Url-адрес ссылки"
   linked_assignment_message: "связано с заданием '%{title}'"
   linked_discussion_topic_message: "связано с темой обсуждения '%{title}'"
   linked_quiz_message: "связано с контрольной работой '%{title}'"
+  linkedin_5726caca: LinkedIn
   links: 
     dashboard: "Моя информационная панель"
     errors: 
@@ -7867,6 +7850,75 @@ ru:
   lock_until_date_62ce1b5c: "Заблокировать до даты"
   log_out_379ba28a: "	Выйти "
   logged_out_user: "Вышедший из системы пользователь %{user_counter}"
+  login: 
+    canvas: 
+      mobile_login: 
+        back_to_login: "Вернуться ко входу в систему"
+        buttons: 
+          request_password: "Запросить пароль"
+        dont_know_password: "Я не знаю мой пароль"
+        log_in: "Вход в систему"
+        login_handle: "Введите %{login_handle_name}, после чего вам будет отправлена ссылка на изменение пароля."
+        password: Пароль
+        sending: Отправка...
+      new: 
+        back_to_login: "Вернуться ко входу в систему"
+        browse_courses: "Искать курсы"
+        buttons: 
+          request_password: "Запросить пароль"
+        coenrollment_banner: "*Родитель пользователя Canvas?* **Щелкните сюда для получения учетной записи**"
+        dont_know_password: "Не знаете свой пароль?"
+        labels: 
+          password: Пароль
+          remember_me: "Оставаться в системе"
+        log_in: "Вход в систему"
+        login_handle: "Введите %{login_handle_name}, после чего вам будет отправлена ссылка на изменение пароля."
+        page_title: "Войти в систему Canvas"
+        register_for_canvas: "*Нужна учетная запись в Canvas?* **Нажмите сюда, это бесплатно!**"
+    logout_confirm: 
+      cancel: Отменить
+      details: 
+        log_out: "Вы уверены, что хотите выйти из Canvas?"
+      log_out: "	Выйти "
+      page_title: "	Выйти "
+    otp: 
+      errors: 
+        invalid_otp: "Неверный код подтверждения, попробуйте еще раз"
+      new: 
+        buttons: 
+          send: Отправить
+          verify: Подтвердить
+        details: 
+          mfa_enrollment: |-
+              Многофакторная аутентификация повышает безопасность за счет требования наличия физического имущества,
+              помимо знания пароля, чтобы войти в систему Canvas. Это может быть устройство, генерирующее
+              коды подтверждения, или же телефон, принимающий текстовые сообщения. Приложение Google Authenticator для [iPhone](%{iphone_url}) или
+              [Android](%{android_url}) может быть настроено с помощью сканирования QR-кода ниже. Другие маркеры могут быть настроены путем ввода
+              секретного ключа **%{secret_key}**.
+          mfa_required: "Вам потребуется задать многофакторную аутентификацию."
+          otp_on_device: "Введите код подтверждения, указанный на вашем маркере."
+          otp_sent_to_phone: "Код подтверждения был отправлен на ваш телефон. Введите код здесь."
+          send_to_sms: "Отправить текстовые сообщения на %{phone_number}"
+        labels: 
+          carrier: Оператор
+          phone_number: "Номер телефона"
+          remember_me: "Запомнить этот компьютер"
+          verification_code: "Код подтверждения"
+        links: 
+          choose_number: "Выбрать существующий телефон"
+        page_title: "Многофакторная аутентификация"
+        select: 
+          new_number: "новый телефон"
+        titles: 
+          mfa: "Многофакторная аутентификация"
+    saml: 
+      debug: 
+        logout_request_redirect_from_idp: "Получен LogoutRequest с IdP"
+        logout_response_redirect_from_idp: "Получен LogoutResponse с IdP"
+        logout_response_redirect_to_idp: "Отправка LogoutResponse на IdP"
+        redirect_from_idp: "Получен LoginResponse с IdP"
+  login_is_invalid_must_be_alphanumeric_or_an_email__ae4499b3: "Логин недействителен: он должен состоят из букв и цифр или быть адресом электронной почты"
+  login_is_too_long_25373f95: "Логин слишком длинный"
   logo_a040ae0e: Логотип
   looks_great_e4d883ed: "Выглядит отлично!"
   low_score_4eeb95b2: "Низкая: %{score}"
@@ -9654,6 +9706,23 @@ ru:
         subject: "Приглашение на участие в веб-конференции: %{name}"
       twitter: 
         tweet: "Уведомление Canvas - пригласить: участие %{title}, %{name}"
+    web_conference_recording_ready: 
+      email: 
+        body: "Ваша запись %{title} для %{name} уже готова."
+        details_link: "Сведения можно просмотреть здесь: %{link}"
+        html: 
+          body: "Ваша запись %{title} для %{name} уже готова."
+          details_link: "Щелкните здесь для просмотра сведений"
+          subject: "Готовая запись веб-конференции: %{name}"
+        subject: "Готовая запись веб-конференции: %{name}"
+      sms: 
+        body: "Ваша запись %{title} для %{name} уже готова."
+        link_message: "Дополнительная информация доступна по адресу: %{url}"
+      summary: 
+        body: "Ваша запись %{title} для %{name} уже готова."
+        subject: "Готовая запись веб-конференции: %{name}"
+      twitter: 
+        tweet: "Уведомление от Canvas - Запись готова: %{title}, %{name}"
   migration: 
     announcement_type: Объявление
     assignment_group_type: "Группа заданий"
@@ -9678,6 +9747,7 @@ ru:
   migration_issues: 
     errors: 
       valid_workflow_state: "Должен отправить допустимое состояние процесса"
+  migration_selection_5f1c5f55: "Выбор переноса"
   missing_percent_94534638: "Отсутствующие: %{percent}"
   model_is_already_located_in_newgroup_e5cea361: "%{model} уже расположена в %{newGroup}."
   module_item_types: 
@@ -9689,6 +9759,7 @@ ru:
     page: Страница
     quiz: "Контрольная работа"
     sub_header: Подзаголовок
+  module_menu_3201af4e: "Меню Модуль"
   modules: 
     add: 
       assignment: 
@@ -9835,6 +9906,7 @@ ru:
   more_courses_5ebbe998: "Другие курсы"
   most_recent_score_13a87e8c: "Самая последняя оценка"
   most_recent_score_counts_as_75_of_mastery_weight_a_f1e3e6c2: "Самая последняя оценка рассчитывается как 75% от веса усвоения, среднее значение из всех остальных оценок рассчитывается как 25% от веса."
+  move_abf00365: Переместить
   move_dialog: 
     cancel: Отменить
     save: Сохранить
@@ -9844,6 +9916,8 @@ ru:
     move_to_end: "-- Вниз --"
   move_outcome_ce497e6c: "Переместить результат"
   move_outcome_group_cfa1a505: "Переместить группу результатов"
+  moving_a4d552df: Перемещение...
+  multi_factor_authentication_configured_865b1bde: "Многофакторная аутентификация настроена"
   must_achieve_mastery_at_least_2_times_must_also_co_b2ae7688: "Проходной балл должен быть получен хотя бы 2 раза. Необходимо также завершить 2 элемента для подсчета. Для получения итоговой оценки будет вычислено среднее значение из оценок выше проходного балла."
   must_achieve_mastery_at_least_2_times_scores_above_57077a88: "Усвоение должно быть достигнуто хотя бы 2 раза. Для получения итоговой оценки будет вычислено среднее значение из оценок выше уровня усвоения."
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "Вы должны добавить параметр 'file_ids' и/или 'folder_ids'"
@@ -9889,6 +9963,9 @@ ru:
   no_e16d9132: Нет
   no_grading_schemes_to_display_8b0e92e7: "Отсутствуют схемы оценок для отображения"
   no_migration_file: "Файл, необходимый для перемещения содержимого."
+  no_password_was_given_472222e5: "Пароль не был выдан"
+  no_placements_enabled_f705f28: "Нет включенных размещений"
+  no_results_found_58717065: "Результаты не найдены"
   no_score_yet_c94e919b: "Оценок пока нет"
   no_students_have_taken_the_quiz_yet_e667644b: "Ни один студент еще не взял контрольную работу"
   no_students_have_taken_the_survey_yet_d378cd35: "Ни один студент еще не взял опрос"
@@ -9945,6 +10022,7 @@ ru:
       migration: Перенос
       one: Другое
       other: Другое
+      recording_ready: "Запись готова"
       registration: Регистрация
       reminder: Напоминание
       student_appointment_signups: "Регистрация встреч студента"
@@ -10074,6 +10152,7 @@ ru:
       summaries: Сводки
       updated_wiki_page: "Обновленные вики-страницы"
       web_conference_invitation: "Приглашение на участие в веб-конференции"
+      web_conference_recording_ready: "Готовая запись веб-конференции"
     no_subject: "Нет темы"
     other_description: |-
         *Только инструктор и администратор:*
@@ -10085,6 +10164,7 @@ ru:
         * Новая учетная запись пользователя
         * Новая группа студентов
     other_display: "Административные предупреждения"
+    recording_ready_display: "Запись готова"
     reminder_display: Напоминание
     student_appointment_description: |-
         *Только инструктор и администратор:*
@@ -10093,6 +10173,7 @@ ru:
     student_appointment_display: "Регистрация встреч студента"
     submission_comment_description: "Комментарий к отправке задания"
     submission_comment_display: "Комментарий отправки"
+    web_conference_recording_ready: "Запись конференции готова"
   notification_preferences: 
     communication: 
       email: 
@@ -10121,6 +10202,7 @@ ru:
       admin: Административный
       alerts: Оповещения
       communication: Разговоры
+      conferences: Конференции
       course: "События курса"
       discussions: Обсуждения
       groups: Группы
@@ -10211,12 +10293,14 @@ ru:
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "После того, как вы изменили ответ, вы должны выбрать вариант, прежде чем обновлять вопрос."
   one_per_line_format_name_value_79647700: "По одному на строку. Формат: имя=значение"
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} вовремя, %{late} с опозданием, %{missing} отсутствует"
+  open_color_picker_f117df0a: "Открыть Выбор цвета"
   open_title_in_a_new_window_b29fed77: "Открыть %{title} в новом окне"
   options: 
     ? "no"
     : Нет
     ? "yes"
     : Да
+  orange_81386a62: Оранжевый
   orbis_report_header_assignment_id: "идентификатор задания"
   orbis_report_header_assignment_title: "заголовок задания"
   orbis_report_header_canvas_course_id: "идентификатор курса"
@@ -10371,11 +10455,11 @@ ru:
         latest_score: "Последняя оценка"
         outcome: Результат
   overrides: 
+    blank_override: "Вы должны выбрать студента или раздел"
     everyone: Все
     everyone_else: "Все остальные"
     overrides: 
       everyone: Все
-      everyone_else: "Все остальные"
   own_copyright_cc59db55: "Собственное авторское право"
   page_comment: 
     default_user_name: Анонимно
@@ -10440,6 +10524,8 @@ ru:
     manage_webhooks: "Управление Webhooks"
   pick_a_destination_we_ll_send_you_errors_fa0cb0e0: "выберите адресата, мы вышлем вам ошибки"
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "выберите конечную точку, мы разместим там ваши отчёты об ошибках"
+  pink_68ad45cb: Розовый
+  placements_5b5e056b: Размещения
   plain_text_e3ab33aa: "Обычный текст"
   please_add_at_least_one_non_blank_answer_213c2c8e: "Добавьте хотя бы один непустой ответ"
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Добавьте хотя бы по одному непустому ответу для каждой переменной."
@@ -10830,6 +10916,8 @@ ru:
     labels: 
       requirements_must_be_completed: "Для разблокирования этой страницы должны быть выполнены следующие требования"
   presentation_2d9387ca: Презентация
+  previous_time_cc96b361: "Предыдущий (%{time})"
+  previous_timestamp_19343a58: "Предыдущий (%{timestamp})"
   privacy_290109ea: Конфиденциальность
   product_name: Canvas
   profile: 
@@ -11122,6 +11210,7 @@ ru:
     yo_select: 
       yo: Yo
     you_have_no_services: "Вы еще не зарегистрировали какие-либо сервисы, вы можете добавить их в *Настройки* страницы"
+  profile_6bd2baed: Профиль
   profiles: 
     avatar_dialog: 
       from_gravatar: "Из Gravatar"
@@ -11160,75 +11249,7 @@ ru:
       too_long: "Не может превышать %{max}символов"
       too_short: "Должно быть не менее %{min} символов"
   pseudonym_sessions: 
-    debug: 
-      logout_redirect: "Запрос выхода отправлен IdP"
-      logout_request_redirect_from_idp: "Получен LogoutRequest с IdP"
-      logout_response_redirect_from_idp: "Получен LogoutResponse с IdP"
-      logout_response_redirect_to_idp: "Отправка LogoutResponse на IdP"
-      redirect_from_idp: "Получен LoginResponse с IdP"
     default_app_name: "Стороннее приложение"
-    errors: 
-      blank_password: "Пароль не был выдан"
-      invalid_credentials: "Неверное имя пользователя и/или пароль"
-      invalid_otp: "Неверный код подтверждения, попробуйте еще раз"
-      login_error: "При входе в %{institution} произошла ошибка"
-      login_errors: 
-        no_config_for_id: "Учетная запись Canvas не имеет конфигурации аутентификации для данного идентификационного номера"
-        no_idp_set: "Организация, через которую вы вошли в систему, не настроена для данной учетной записи"
-        unrecognized_idp: "Canvas не удалось распознать вашего поставщика идентификации"
-      logout_errors: 
-        no_idp_found: "Canvas не удалось осуществить выход из системы вашего поставщика идентификации"
-      max_attempts: "Слишком много неудачных попыток входа. Повторите попытку позже или обратитесь к системному администратору."
-      no_matching_user: "В Canvas отсутствует учетная запись для пользователя: %{user}"
-      user_deleted: "Эта учетная запись пользователя была удалена.  Обратитесь к системному администратору для повторной активации учетной записи."
-    logout_confirm: 
-      cancel: Отменить
-      details: 
-        log_out: "Вы уверены, что хотите выйти из Canvas?"
-      log_out: "Выйти "
-      page_title: "	Выйти "
-    mobile_login: 
-      back_to_login: "Вернуться ко входу в систему"
-      buttons: 
-        request_password: "Запросить пароль"
-      dont_know_password: "Я не знаю мой пароль"
-      log_in: "Вход в систему"
-      login_handle: "Введите %{login_handle_name}, после чего вам будет отправлена ссылка на изменение пароля."
-      password: Пароль
-      sending: Отправка...
-    new: 
-      page_title: "Войти в систему Canvas"
-    notices: 
-      mfa_complete: "Многофакторная аутентификация настроена"
-    otp_login: 
-      buttons: 
-        send: Отправить
-        verify: Подтвердить
-      details: 
-        mfa_enrollment: |-
-            Многофакторная аутентификация повышает безопасность за счет требования наличия физического имущества,
-            помимо знания пароля, чтобы войти в систему Canvas. Это может быть устройство, генерирующее
-            коды подтверждения, или же телефон, принимающий текстовые сообщения. Приложение Google Authenticator для [iPhone](%{iphone_url}) или
-            [Android](%{android_url}) может быть настроено с помощью сканирования QR-кода ниже. Другие маркеры могут быть настроены путем ввода
-            секретного ключа **%{secret_key}**.
-        mfa_required: "Вам потребуется задать многофакторную аутентификацию."
-        otp_on_device: "Введите код подтверждения, указанный на вашем маркере."
-        otp_sent_to_phone: "Код подтверждения был отправлен на ваш телефон. Введите код здесь."
-        send_to_sms: "Отправить текстовые сообщения на %{phone_number}"
-      labels: 
-        carrier: Оператор
-        phone_number: "Номер телефона"
-        remember_me: "Запомнить этот компьютер"
-        verification_code: "Код подтверждения"
-      links: 
-        choose_number: "Выбрать существующий телефон"
-      page_title: "Многофакторная аутентификация"
-      select: 
-        new_number: "новый телефон"
-      titles: 
-        mfa: "Многофакторная аутентификация"
-    password_confirmation_error: "Ошибка при отправке запроса."
-    password_confirmation_sent: "Отправлено подтверждение пароля. Проверьте ящик нежелательной почты."
   pseudonyms: 
     confirm_change_password: 
       buttons: 
@@ -11287,6 +11308,7 @@ ru:
   purchases: 
     new: 
       payment_info: "Информация об оплате"
+  purple_7678a9fc: Фиолетовый
   qti_display: QTI
   qti_file_description: "ZIP-файл QTI"
   qti_img_matching_question: "Импортированный соответствующий вопрос содержит изображения с обеих сторон, что не поддерживается"
@@ -11479,6 +11501,7 @@ ru:
       Разрешить отслеживание событий для отправок контрольной работы и возможность
       просматривать журнал этих событий после отправки.
   quiz_lti_plugin_a189607f: "LTI плагин для теста"
+  quiz_menu_4fcd5e61: "Меню Тесты"
   quiz_reports: 
     cancel_generation: Отменить
     download_item_analysis: "Скачать отчет об анализе элемента."
@@ -12196,7 +12219,6 @@ ru:
         new_discussion: "Новое обсуждение"
         one_question_at_a_time: "Показывать по одному вопросу за раз"
         one_time_results: "Только один раз после каждой попытки"
-        only_visible_to_overrides_note: "Примечание. Данная контрольная работа видима **только** для указанного ниже раздела (-ов):"
         points_possible: "%{n} балла (-ов)"
         post_to_sis: "Разместить оценки в SIS"
         quiz_access_code: "Требуется код доступа"
@@ -12726,7 +12748,6 @@ ru:
       many: "%{count} элементов перемещены в %{destinationFolder}"
       one: "%{item} перемещен в %{destinationFolder}"
       other: "%{count} элементов перемещены в %{destinationFolder}"
-    moving: Перемещение...
     name: Имя
     progress_error: "Произошла ошибка при подготовке к скачиванию. Пожалуйста, повторите попытку."
     progress_message: "Подготовка к скачиванию: %{percent}% завершено"
@@ -12768,6 +12789,7 @@ ru:
       many: " %{count} секции(й)"
       one: "1 секция"
       other: " %{count} секции(й)"
+  red_8258edf3: Красный
   registration: 
     get_started: "Давайте начнем!"
     incomplete_registration_warning: 
@@ -12809,6 +12831,7 @@ ru:
   remove_recipient_name_a6b83cef: "Удалить получателя %{name}"
   remove_row_c198da5a: "Удалить строку"
   remove_row_f9d59cba: "Удалить строку"
+  remove_these_dates_48453a81: "Удалить эти даты"
   rename_45608f54: Переименовать
   reply_from_name: "%{name} через уведомления Canvas"
   reply_to_comment_72d96728: "Ответить в комментарии"
@@ -13045,6 +13068,8 @@ ru:
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce имеет другой хост входа для учетных записей тестовой среды, отличный от рабочих аккаунтов, так что если вы используете аккаунт Salesforce в тестовой среде, и вы не установите этот флажок, то будет невозможно аутентифицировать (этот принцип работает и в обратном порядке, если у вас есть рабочий аккаунт, и вы установите этот флажок, он не будет аутентифицирован)"
   salesforce_ticketing_webtocase_connector_80f75716: "Коннектор для системы отслеживания веб-элемент Salesforce"
   same_value_as_canvas_url__c_will_probably_be_going_37027686: "Значение, подобное 'Canvas_URL__c', вероятно, в ближайшее время пропадет"
+  saml_57e53f77: SAML
+  sample_data_e4fd01ff: "Пример данных"
   save_11a80ec3: Сохранить
   saving_d55dd90e: Сохранение...
   score_muted_82eef66: "Оценка: (отключено)"
@@ -13175,6 +13200,7 @@ ru:
   search_entries_or_author_63fb0a86: "Поиск записей или автора"
   search_groups_or_people_6c15d6ad: "Поиск групп или людей"
   search_title_body_or_author_1d26711f: "Искать в заголовке, тексте сообщения или по автору"
+  searching_b0207e7f: "Идет поиск"
   section: 
     confirms: 
       delete_enrollment: "Удалить данную регистрацию без возможности восстановления?"
@@ -13260,6 +13286,7 @@ ru:
         current_enrollments: "Текущие регистрации"
         decrosslist_section: "Отмена перекрестного списка этого раздела"
   see_some_lti_tools_that_work_great_with_canvas_you_3c27bc7b: "*Посмотрите несколько инструментов LTI*, которые отлично работают с Canvas. Также, вы можете ознакомиться с **темами сообщества Canvas об инструментах LTI**."
+  select_a_grading_period_aab25483: "Выбрать период выставления оценок"
   select_content: "Выбрать содержимое"
   select_content_checkbox: 
     select_content_error: "Вы должны выбрать опции содержимого"
@@ -13277,6 +13304,7 @@ ru:
       add_item_to_module: "Добавить элемент в модуль"
       find_links_using_service: "Поиск ссылок с помощью %{service}"
   select_course_a_selection_is_required_before_recip_f622d9df: "Выберите курс: выбор необходимо совершить до того, как станет доступно поле получателей"
+  select_course_color_cad8e62b: "Выбрать Цвет курса"
   select_itemname_f70db487: "Выберите %{itemName}"
   select_navigation_links_68e1e924: "Выбор навигационных ссылок"
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Выберите файл, который вы хотите связать, или добавьте файл, выбрав пункт \"Новый файл\"."
@@ -13443,6 +13471,11 @@ ru:
     canvas-user-nav: 
       navigation: 
         user_menu: "Меню пользователя"
+    canvas_footer: 
+      ? "User Research"
+      : "Исследования пользователя"
+      by_instructure: "Согласно Instructure"
+      open_source_learning_management_system: "LMS с открытым исходным кодом."
     components: 
       ic_submission-download-dialog: 
         click_to_download: "Щелкните здесь, чтобы скачать"
@@ -13632,21 +13665,6 @@ ru:
     locale_warning: 
       crowdsourced_warning_message: "Выбранный вами язык был переведен с помощью краудсорсинга. В системе Instructure точность перевода не проверялась или не подтверждалась. Создатели не несут ответственности за использование вами этих языковых параметров. Пожалуйста, используйте по своему усмотрению."
       crowdsourced_warning_title: "Язык переведен с помощью краудсорсинга"
-    login: 
-      back_to_login: "Вернуться ко входу в систему"
-      browse_courses: "Искать курсы"
-      buttons: 
-        request_password: "Запросить пароль"
-      coenrollment_banner: "*Родитель пользователя Canvas?* **Щелкните сюда для получения учетной записи**"
-      default_login_message: "Вход в систему в вашей организации"
-      dont_know_password: "Я не знаю мой пароль"
-      labels: 
-        password: Пароль
-        remember_me: "Сохранять вход в систему"
-      log_in: Войти
-      login_at_account: "Войти в %{school_name}"
-      login_handle: "Введите %{login_handle_name}, после чего вам будет отправлена ссылка на изменение пароля."
-      register_for_canvas: "*Нужна учетная запись в Canvas?* **Нажмите сюда, это бесплатно!**"
     menu_assignment: 
       labels: 
         due: окончание
@@ -13927,7 +13945,6 @@ ru:
       grading_alt: оценка
       submission_comment: "Комментарий отправки"
     terms_required: 
-      terms_have_changed: "В *правила использования* были внесены изменения. Пожалуйста, уделите немного времени и ознакомьтесь с ними, прежде чем продолжить использовать Canvas."
       updated_terms_of_use: "Обновленные правила использования"
     unauthorized: 
       headings: 
@@ -13943,8 +13960,6 @@ ru:
         unauthorized_action: "Не авторизован"
       unauthorized_1: "Отсутствуют разрешения для доступа к этой странице Убедитесь, что вы авторизованы для просмотра этого содержания."
       unauthorized_2: "Вы должны иметь права на просмотр этой страницы, используйте ссылку \"Справка\", чтобы уведомить службу поддержки о проблеме."
-      unauthorized_action: "Эта страница доступна только авторизованным пользователям. Для просмотра содержания этой страницы необходимо войти в систему."
-      unauthorized_user: "%{user_name}, необходимо войти в систему для просмотра этой страницы. Щелкните \"Забыли пароль\", если вы забыли или не знаете пароль."
       unauthorized_user_is_other: "%{current_user}, вы не авторизованы для просмотра этой страницы.  Вы перешли сюда по ссылке **%{unauthorized_user} (%{unauthorized_user_email})**.  Если это так, может потребоваться выйти из системы и снова войти в нее, используя этот адрес электронной почты, для получения доступа к этой странице."
     unauthorized_feed: 
       bad_params: "Недопустимые параметры канала, к которому вы пытаетесь обратиться."
@@ -14148,6 +14163,7 @@ ru:
       users_matching_label: "Подходящие пользователи"
   skipped_file_filename_due_to_error_94f0194: "Пропущен файл %{filename} по причине ошибки"
   skipping_unknown_file_type_cd1086ee: "Пропустить неизвестный тип файла"
+  skype_18850ba7: Skype
   slideshow: 
     titles: 
       back: Назад
@@ -14169,6 +14185,7 @@ ru:
       submitted: "*Отправлено:* %{submittedAt}"
   spreadsheet_6d622119: "Динамическая таблица"
   sr_gradebook: 
+    all_grading_periods: "Все периоды выставления оценок"
     all_sections: "Все разделы"
     assignment_muted: "Щелкните, чтобы включить звук."
     assignment_order_alpha: "В алфавитном порядке"
@@ -14457,6 +14474,7 @@ ru:
     files: Файлы
     grades: Оценки
     home: "В начало"
+    logout: "Выход из системы"
     modules: Модули
     observees: Наблюдение
     outcomes: Результаты
@@ -14473,6 +14491,7 @@ ru:
   take_the_survey_ada59508: "Принять опрос"
   take_the_survey_again_24ce22c2: "Снова принять опрос"
   teachers_52e2423f: Учителя
+  teal_f729a294: Бирюзовый
   terms: 
     index: 
       date: 
@@ -14535,6 +14554,7 @@ ru:
       timespan: "%{start_at} *до* %{end_at}"
   text_document_eacbcdb7: "Текстовый документ"
   text_entry_submission_cannot_be_empty_3d187cae: "Текстовое поле не может быть пустым"
+  that_user_account_has_been_deleted_please_contact__350e0e0: "Эта учетная запись пользователя была удалена.  Обратитесь к системному администратору для повторной активации учетной записи."
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "ID аккаунта, которому принадлежит отчетный пользователь "
   the_app_was_activated_a84e055f: "Приложение активировано"
   the_app_was_added_58e2836a: "Приложение добавлено"
@@ -14547,6 +14567,8 @@ ru:
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "Полное имя хоста для экземпляра аккаунта (something.instructure.com, например)"
   the_grading_period_was_deleted_7814a349: "Период оценивания был удален"
   the_grading_period_was_saved_4a504c5: "Период оценивания был сохранен"
+  the_institution_you_logged_in_from_is_not_configur_5ceac41: "Организация, через которую вы вошли в систему, не настроена для данной учетной записи"
+  the_list_of_results_has_been_updated_46e3c733: "Список результатов был обновлен."
   the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "Изображение логотипа в правой верхней части заголовка Canvas. 200x200 svg или png"
   the_material_is_in_the_public_domain_279c39a3: "Материал находится в общедоступном домене"
   the_material_is_licensed_under_creative_commons_3242cb5e: "Материал распространяется по лицензии Creative Commons"
@@ -14569,6 +14591,8 @@ ru:
     other: "В списке представлены %{count} результатов"
   there_was_a_problem_deleting_the_grading_period_50ce07c5: "Возникла проблема при удалении схемы оценок"
   there_was_a_problem_deleting_the_grading_scheme_2a959c40: "Возникла проблема при удалении схемы оценок."
+  there_was_a_problem_exporting_c33dc250: "Возникла проблема при экспорте."
+  there_was_a_problem_logging_in_at_institution_5a298155: "При входе в %{institution} произошла ошибка"
   there_was_a_problem_saving_the_grading_period_243bed6c: "Возникла проблема при сохранении периода оценивания."
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "Возникла проблема при сохранении схемы оценок."
   there_was_an_error_in_processing_your_request_6513a49a: "Произошла ошибка при обработке вашего запроса"
@@ -14584,6 +14608,7 @@ ru:
   this_field_name_is_required_b9196401: "Необходимо заполнить поле \" name\""
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "До публикации для этого файла необходимо настроить usage_rights."
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Эта папка в данный момент заблокирована и недоступна для просмотра."
+  this_grading_period_overlaps_16332589: "Этот Период выставления оценок пересекается"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Это список надежных URL-адресов, перечисленных через запятую. Если URL-адрес находится в списке надежных, при входе с него в систему Canvas будет пропускаться использование маркера CSRF."
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Скорее всего, это произошло потому, что вы импортировали содержимое курса без связанных с ним файлов."
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Этот результат был использован для оценки студента и не может быть отредактирован или удален"
@@ -14807,7 +14832,9 @@ ru:
   to_minscore_43e5452e: "для %{minScore}"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "Чтобы просматривать задания, убедитесь, что включено представление *Повестка дня*."
   tolerance_value_9e96573c: "Значение допуска"
+  too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "Слишком много неудачных попыток входа. Повторите попытку позже или обратитесь к системному администратору."
   too_many_members_b8b15069: "Слишком много участников"
+  tool_configuration_63cd43b0: "Настройка инструментов"
   tooltips: 
     finished: готово
     incomplete: незавершенный
@@ -14834,8 +14861,12 @@ ru:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "Повторно отправить на Turnitin"
+  twitter_fcef6b54: Twitter
+  type_more_to_find_additional_students_d5211cd5: "Введите больше, чтобы найти дополнительных студентов"
   unable_to_remove_app_4293cb53: "Невозможно удалить приложение."
   unarchive_selected_e0c4bd3d: "Выбрана разархивация"
+  unauthorized: "не авторизован"
+  unauthorized_message: "Подпись JWT не действительна"
   unchanged_aca18e02: "[Без изменений]"
   ungraded_submissions_44efb0ec: "Неоцененные отправки"
   ungraded_survey_ad7de790: "Опрос без оценки"
@@ -14849,6 +14880,8 @@ ru:
   unlock_date_cannot_be_before_course_start_9c7b8524: "Дата разблокировки не может быть раньше начала курса"
   unlock_date_cannot_be_before_section_start_793ddc66: "Дата разблокировки не может быть раньше начала раздела"
   unlock_date_cannot_be_before_term_start_d3c01813: "Дата разблокировки не может быть раньше начала семестра"
+  unprocessable_entity: "Объект, который невозможно обработать"
+  unprocessable_entity_message: "Недействительное id для подписанного собрания"
   unpublished_click_to_modify_60f9051: "Неопубликовано - Нажмите, чтобы изменить"
   unpublished_courses_title: "Неопубликованные курсы"
   unstarted_932f2990: "Не начато"
@@ -14883,8 +14916,8 @@ ru:
       terms: "Вы должны согласиться с условиями"
       too_long: "Не может превышать %{max} символов"
     registration: 
-      agree_to_terms_and_privacy_policy: "Вы согласны с *правилами использования* и признаете **политику конфиденциальности**."
       agree_to_terms_with_code_of_conduct: "Вы согласны с *правилами использования* и **нормами поведения**."
+  user_avatars_e4fc4ed3: "Аватары пользователя"
   user_date_range_search: 
     cant_be_blank: "Идентификатор пользователя Canvas не может быть пустым"
     cant_come_before_from: "'Дата завершения' не может быть раньше 'Даты начала'"
@@ -14960,6 +14993,8 @@ ru:
       updating_user_details: "Обновление информации о пользователе..."
     notices: 
       image_reported: "Это изображение сообщено"
+  user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}, Вы должны будете *войти в систему*, прежде чем вы можете просмотреть эту страницу."
+  user_navigation_a097be0f: "Навигация пользователя"
   user_notes: 
     confirms: 
       delete_journal_entry: "Действительно хотите удалить эту запись журнала?"
@@ -15168,11 +15203,6 @@ ru:
           **вы** выполнили действия это имени этого пользователя.
       masquerade_as: "Подменить как %{user_name}"
       page_title_header: "Выдать себя за пользователя"
-    merge: 
-      login_to_merge_different_account: "Для объединения учетной записи %{current_user_name} (%{current_user_email}) с другой учетной записью войдите в новую учетную запись:"
-      merge_definition: "По некоторым причинам может потребоваться использовать один вход вместо двух. В этом случае можно объединить два входа и консолидировать их информацию."
-      titles: 
-        merge_accounts: "Объединить учетные записи пользователей"
     merge_results: 
       action: Действие
       emails: "Адреса электронной почты"
@@ -15290,6 +15320,7 @@ ru:
   view_course_analytics_eefe6b2: "Отобразить аналитику для курса"
   view_name_app_62a2ad8e: "Просмотреть приложение %{name}"
   view_student_analytics_6b8ccd42: "Отобразить аналитику для студента"
+  view_toolname_placements_4a5724d1: "Просмотреть размещения %{toolName}"
   visit_864b4060: Посетить
   visit_group_group_name_7a816081: "Посетить группу %{group_name}"
   warning_for_improved_accessibility_in_moving_files_71e1028b: "Предупреждение. Для улучшения доступности при перемещении файлов используйте расположенную в меню опцию «Переместить в диалог»."
@@ -15369,10 +15400,6 @@ ru:
       delete_wiki: Удалить
       labels: 
         front_page: "Титульная страница"
-      page_locked: "Данная страница заблокирована"
-      page_locked_by_modules: "Данная страница будет доступна после того, как вы завершите данные модули:"
-      page_locked_by_modules_until: "Данная страница будет доступна с %{lock_info.unlock_at}, если вы завершили данные модули:"
-      page_locked_until: "Данная страница будет доступна с %{lock_info.unlock_at}"
       published_indicator: Опубликовано
       toolbar_menu: 
         settings: Настройки
@@ -15442,6 +15469,7 @@ ru:
       title_too_long: "Заголовок не может превышать %{max_characters} символов"
     unknown_user_name: Неизвестно
   wiki_page_6c11ee20: Вики-страница
+  wiki_page_menu_4a17fe3e: "Меню Вики страницы"
   wiki_pages: 
     edit: 
       page_header_title: "Редактировать %{page_name}"
@@ -15492,6 +15520,8 @@ ru:
   would_you_like_to_enable_this_app_ccdf735d: "Вы бы хотели включить это приложение?"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Вы хотите позволить студентам продолжить обучение на курсе или вы хотите повторно заблокировать эти модули до завершения новых требований?"
   xml_configuration_5ea1b942: "Конфигурация XML"
+  yellow_4cf93785: Желтый
+  yo_e4ee15a4: Yo
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "Вы вошли в систему в %{institution1}, используя учетные данные, предоставленные вам %{institution2}"
   you_are_subscribed_and_will_be_notified_of_new_com_60b5b62b: "Вы подписаны и получаете уведомления о новых комментариях. Нажмите, чтобы отписаться"
   you_are_the_group_leader_for_this_group_b8629b70: "вы – лидер данной группы"
@@ -15500,6 +15530,7 @@ ru:
   you_can_disable_this_feature_d5e61373: "Вы можете отключить эту функцию"
   you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: "Вы можете скрыть или отобразить задания курса, переключая их в состояние вкл. или выкл."
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "Теперь вы может задать опцию повторной оценки для студентов, которые уже выполнили контрольную работу."
+  you_can_try_to_log_in_again_2b23ef0f: "Вы можете попробовать *войти еще раз*."
   you_have_changed_the_progression_requirements_for__6772bc89: "Вы изменили требования к прохождению для активного курса. На курсе могут быть студенты, которые уже продвинулись до этого модуля или других, связанных с ним."
   you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Вы внесли изменения в вопросы данной контрольной работы.* Данные изменения не будут доступны студентам до тех пор, пока вы не сохраните контрольную работу."
   you_have_no_outcomes_click_here_to_create_one_ebf262a3: "У вас нет результатов. *Щелкните здесь*, чтобы создать результат."
@@ -15516,7 +15547,7 @@ ru:
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Ваш список заданий теперь можно найти на странице *Календаря*."
   your_assignments_list_has_improved_3eded80e: "Ваш список *Заданий* был улучшен!"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: "Здесь будут отображены ваши задания, перечисленные по датам выполнения."
-  your_browser_does_not_meet_the_minimum_requirement_7a7022db: "Ваш браузер не соответствует минимальным требованиям Canvas. Перейдите к *руководству пользователя Canvas* для получения полного списка поддерживаемых браузеров."
+  your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "Ваш браузер не соответствует минимальным требованиям Canvas. Посетите *Сообщество Canvas* для получения полного списка поддерживаемых браузеров."
   your_content_has_been_exported_bbb57764: "Ваше содержимое было экспортировано."
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: "Ваш файл загружается в Зачетную книжку, и вы можете покинуть эту страницу в любое время. При наличии большого файла CSV, обновление ваших изменений может занять несколько минут. Для предотвращения перезаписи данных, пожалуйста, подтвердите завершение загрузки и правильность вашей Зачетной книжки до внесения дополнительных изменений."
   your_message_has_been_sent_thank_you_e0284316: "Ваше сообщение было отправлено. Спасибо!"

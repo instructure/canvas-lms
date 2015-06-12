@@ -149,7 +149,7 @@ class UserMerge
             scope.update_all(:user_id => target_user)
           end
         rescue => e
-          Rails.logger.error "migrating #{table} column user_id failed: #{e.to_s}"
+          Rails.logger.error "migrating #{table} column user_id failed: #{e}"
         end
       end
       from_user.all_conversations.find_each { |c| c.move_to_user(target_user) } unless Shard.current != target_user.shard
@@ -162,7 +162,7 @@ class UserMerge
         entries.update_all(user_id: target_user.id)
         DiscussionTopic.where(user_id: from_user).update_all(user_id: target_user.id, updated_at: Time.now.utc)
       rescue => e
-        Rails.logger.error "migrating discussions failed: #{e.to_s}"
+        Rails.logger.error "migrating discussions failed: #{e}"
       end
 
       updates = {}
@@ -193,7 +193,7 @@ class UserMerge
             end
           end
         rescue => e
-          Rails.logger.error "migrating #{table} column #{column} failed: #{e.to_s}"
+          Rails.logger.error "migrating #{table} column #{column} failed: #{e}"
         end
       end
 
@@ -344,7 +344,7 @@ class UserMerge
             version_ids << version.id
           end
         rescue => e
-          Rails.logger.error "migrating versions for #{table} column #{column} failed: #{e.to_s}"
+          Rails.logger.error "migrating versions for #{table} column #{column} failed: #{e}"
           raise e unless Rails.env.production?
         end
       end

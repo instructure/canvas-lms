@@ -23,11 +23,11 @@ module Alerts
       alerts.concat course.alerts.all
       return if alerts.empty?
 
-      student_enrollments = course.student_enrollments.active
+      student_enrollments = course.student_enrollments
       student_ids = student_enrollments.map(&:user_id)
       return if student_ids.empty?
 
-      teacher_enrollments = course.instructor_enrollments.active
+      teacher_enrollments = course.instructor_enrollments.active_or_pending
       teacher_ids = teacher_enrollments.map(&:user_id)
       return if teacher_ids.empty?
 

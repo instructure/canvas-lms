@@ -1,0 +1,50 @@
+<% debugging = presenter.saml_debugging? %>
+<div class="debugging">
+  <h2 style="margin-top: 10px">
+    <%= t(:saml_debugging, "SAML Debugging") %>
+  </h2>
+
+  <div id="saml_debug_console">
+    <p>
+      <%= t 'saml_debug_instructions', <<-TEXT
+          Once you start debugging all info about the next attempted SAML login attempt
+          will be collected. Click "Refresh" to see if more data has been collected or
+          "Stop Debugging" to clear the collected data and stop the current debug attempt.
+          TEXT
+       %>
+    </p>
+    <p>
+      <a href="<%= account_saml_testing_url(account) %>"
+         id="start_saml_debugging"
+         class="btn"
+         style="<%= hidden(!debugging) %>">
+        <%= t('start_debugging', 'Start Debugging') %>
+      </a>
+      <a href="<%= account_saml_testing_url(account) %>"
+         id="refresh_saml_debugging"
+         class="btn"
+         style="<%= hidden(debugging) %>">
+        <%= t('refresh_debugging', 'Refresh') %>
+      </a>
+      <a href="<%= account_saml_testing_stop_url(account) %>"
+         id="stop_saml_debugging"
+         class="btn"
+         style="<%= hidden(debugging) %>">
+        <%= t('stop_debugging', 'Stop Debugging') %>
+      </a>
+    </p>
+
+    <div id="saml_debug_info" style="<%= hidden(debugging) %>">
+      <% if debugging %>
+        <% if presenter.saml_configs.size <= 0 %>
+          <%= t(:saml_required, "A SAML configuration is required to test SAML") %>
+        <% else %>
+          <% presenter.saml_configs.each do |config| %>
+            <%= render partial: 'saml_testing',
+                       locals: { config: config } %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>

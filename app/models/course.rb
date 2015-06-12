@@ -219,6 +219,8 @@ class Course < ActiveRecord::Base
   has_many :usage_rights, as: :context, class_name: 'UsageRights', dependent: :destroy
 
   has_many :sis_post_grades_statuses
+
+  has_many :progresses, as: :context
   has_many :gradebook_csvs, inverse_of: :course
 
   include Profile::Association
@@ -1474,7 +1476,7 @@ class Course < ActiveRecord::Base
   private :enrollments_for_csv
 
   def gradebook_to_csv_in_background(filename, user, options = {})
-    progress = user.progresses.build(tag: 'gradebook_to_csv')
+    progress = progresses.build(tag: 'gradebook_to_csv')
     progress.save!
 
     exported_gradebook = gradebook_csvs.where(user_id: user).first_or_initialize
@@ -1629,6 +1631,7 @@ class Course < ActiveRecord::Base
 
   def create_attachment(attachment, csv)
     attachment.uploaded_data = StringIO.new(csv)
+    attachment.content_type = 'text/csv'
     attachment.save!
   end
 
@@ -1736,13 +1739,10 @@ class Course < ActiveRecord::Base
       e.end_at = end_at
       if e.changed?
         transaction do
-          if connection.adapter_name == 'PostgreSQL' && connection.send(:postgresql_version) < 90300
-            # without this, inserting/updating on enrollments will share lock the course, but then
-            # it tries to touch the course, which will deadlock with another transaction doing the
-            # same thing. on 9.3, it will KEY SHARE lock, which doesn't conflict with the NO KEY
-            # UPDATE needed to touch it
-            self.lock!
-          end
+          # without this, inserting/updating on enrollments will share lock the course, but then
+          # it tries to touch the course, which will deadlock with another transaction doing the
+          # same thing.
+          self.lock!(:no_key_update)
           if opts[:no_notify]
             e.save_without_broadcasting
           else
@@ -1859,7 +1859,9 @@ class Course < ActiveRecord::Base
     pairs.uniq.each do |context_type, id|
       context = Context.find_by_asset_string("#{context_type}_#{id}") rescue nil
       if context
+        next if context.respond_to?(:context) && to_context == context.context
         next if to_context.respond_to?(:context) && context == to_context.context
+
         if context.grants_right?(user, :manage_content)
           html = self.migrate_content_links(html, context, to_context, content_types_to_copy)
         else
@@ -1955,6 +1957,7 @@ class Course < ActiveRecord::Base
     logger.debug text
     @merge_results << text
   end
+
   def warn_merge_result(text)
     log_merge_result(text)
   end
@@ -2252,7 +2255,7 @@ class Course < ActiveRecord::Base
 
   def invited_count_visible_to(user)
     scope = users_visible_to(user).
-      where("enrollments.workflow_state = 'invited' AND enrollments.type != 'StudentViewEnrollment'")
+      where("enrollments.workflow_state in ('invited', 'creation_pending') AND enrollments.type != 'StudentViewEnrollment'")
     scope.select('users.id').uniq.count
   end
 

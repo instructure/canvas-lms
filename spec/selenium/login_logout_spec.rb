@@ -10,7 +10,7 @@ describe "login logout test", :priority => "2" do
   end
 
   def verify_logout
-    expected_url = app_host + "/login"
+    expected_url = app_host + "/login/canvas"
     user_with_pseudonym({:active_user => true})
     login_as
     expect_new_page_load { f('.logout a').click }

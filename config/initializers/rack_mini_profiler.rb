@@ -22,7 +22,7 @@ Rack::MiniProfiler.config.tap do |c|
     c.storage = ::Rack::MiniProfiler::RedisStore
   elsif Rails.env.development?
     tmp = Rails.root.to_s + "/tmp/miniprofiler"
-    FileUtils.mkdir_p(tmp) unless File.exists?(tmp)
+    FileUtils.mkdir_p(tmp) unless File.exist?(tmp)
     c.storage_options = {
       :path => tmp
     }

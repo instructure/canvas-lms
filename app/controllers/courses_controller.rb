@@ -528,6 +528,9 @@ class CoursesController < ApplicationController
   # @argument course[course_format] [String]
   #   Optional. Specifies the format of the course. (Should be either 'on_campus' or 'online')
   #
+  # @argument enable_sis_reactivation [Boolean]
+  #   When true, will first try to re-activate a deleted course with matching sis_course_id if possible.
+  #
   # @returns Course
   def create
     @account = params[:account_id] ? api_find(Account, params[:account_id]) : @domain_root_account.manually_created_courses_account
@@ -563,8 +566,18 @@ class CoursesController < ApplicationController
         params[:course].delete :storage_quota_mb
       end
 
-      @course = (@sub_account || @account).courses.build(params[:course])
-      if api_request? && @account.grants_right?(@current_user, :manage_sis)
+      can_manage_sis = api_request? && @account.grants_right?(@current_user, :manage_sis)
+      if can_manage_sis && value_to_boolean(params[:enable_sis_reactivation])
+        @course = @domain_root_account.all_courses.where(
+          :sis_source_id => sis_course_id, :workflow_state => 'deleted').first
+        if @course
+          @course.workflow_state = 'claimed'
+          @course.account = @sub_account if @sub_account
+        end
+      end
+      @course ||= (@sub_account || @account).courses.build(params[:course])
+
+      if can_manage_sis
         @course.sis_source_id = sis_course_id
       end
 
@@ -625,7 +638,7 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :update)
       backup_json = @context.backup_to_json
-      send_file_headers!( :length=>backup_json.length, :filename=>"#{@context.name.underscore.gsub(/\s/, "_")}_#{Time.zone.today.to_s}_backup.instructure", :disposition => 'attachment', :type => 'application/instructure')
+      send_file_headers!( :length=>backup_json.length, :filename=>"#{@context.name.underscore.gsub(/\s/, "_")}_#{Time.zone.today}_backup.instructure", :disposition => 'attachment', :type => 'application/instructure')
       render :text => proc {|response, output|
         output.write backup_json
       }
@@ -719,6 +732,11 @@ class CoursesController < ApplicationController
   #   users set, the page parameter will be modified so that the page
   #   containing user_id will be returned.
   #
+  # @argument user_ids[] [Integer]
+  #   If included, the course users set will only include users with IDs
+  #   specified by the param. Note: this will not work in conjunction
+  #   with the "user_id" argument but multiple user_ids can be included.
+  #
   # @argument enrollment_state[] [String, "active"|"invited"|"rejected"|"completed"|"inactive"]
   #  When set, only return users where the enrollment workflow state is of one of the given types.
   #  "active" and "invited" enrollments are returned by default.
@@ -746,6 +764,11 @@ class CoursesController < ApplicationController
         position = position_scope.count(:select => "users.id", :distinct => true)
         per_page = Api.per_page_for(self)
         params[:page] = (position.to_f / per_page.to_f).ceil
+      end
+
+      user_ids = params[:user_ids]
+      if user_ids.present?
+        users = users.where(id: user_ids)
       end
 
       users = Api.paginate(users, self, api_v1_course_users_url)
@@ -2170,10 +2193,16 @@ class CoursesController < ApplicationController
       # destroy the exising student
       @fake_student = @context.student_view_student
       # but first, remove all existing quiz submissions / submissions
+
+      AssessmentRequest.for_assessee(@fake_student).destroy_all
+
+      @fake_student.destroy
+
+      # destroy these after enrollment so
+      # needs_grading_count callbacks work
       @fake_student.submissions.destroy_all
       @fake_student.quiz_submissions.destroy_all
 
-      @fake_student.destroy
       flash[:notice] = t('notices.reset_test_student', "The test student has been reset successfully.")
       enter_student_view
     end

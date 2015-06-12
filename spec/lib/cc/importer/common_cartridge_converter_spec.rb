@@ -24,7 +24,7 @@ describe "Standard Common Cartridge importing" do
   
   after(:all) do
     @converter.delete_unzipped_archive
-    if File.exists?(@export_folder)
+    if File.exist?(@export_folder)
       FileUtils::rm_rf(@export_folder)
     end
     truncate_all_tables
@@ -577,7 +577,7 @@ describe "LTI tool combination" do
 
   after(:all) do
     @converter.delete_unzipped_archive
-    if File.exists?(@export_folder)
+    if File.exist?(@export_folder)
       FileUtils::rm_rf(@export_folder)
     end
     truncate_all_tables
@@ -624,7 +624,7 @@ describe "cc assignment extensions" do
 
   after(:all) do
     @converter.delete_unzipped_archive
-    if File.exists?(@export_folder)
+    if File.exist?(@export_folder)
       FileUtils::rm_rf(@export_folder)
     end
     truncate_all_tables

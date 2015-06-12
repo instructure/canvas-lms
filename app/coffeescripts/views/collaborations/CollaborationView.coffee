@@ -28,7 +28,9 @@ define [
   class CollaborationView extends View
     events:
       'click .edit_collaboration_link': 'onEdit'
+      'keyclick .edit_collaboration_link': 'onEdit'
       'click .delete_collaboration_link': 'onDelete'
+      'keyclick .delete_collaboration_link': 'onDelete'
       'click .cancel_button': 'onCloseForm'
 
     initialize: ->
@@ -46,6 +48,10 @@ define [
     formTemplate: ({action, className, data}) ->
       $form = $(editForm(extend(data, action: action, id: @id)))
       #$form.attr('class', className)
+      $form.on 'keydown', (e) =>
+        if e.which == 27
+          e.preventDefault()
+          @onCloseForm(e)
 
     # Internal: Confirm deleting of a Google Docs collaboration.
     #
@@ -71,6 +77,13 @@ define [
     delete: =>
       @$el.slideUp(=> @$el.remove())
       @trigger('delete', this)
+      otherDeleteLinks = $('.delete_collaboration_link').toArray()
+      curDeleteLink = @$el.find('.delete_collaboration_link')[0]
+      newIndex = otherDeleteLinks.indexOf(curDeleteLink)
+      if (newIndex > 0)
+        otherDeleteLinks[newIndex - 1].focus()
+      else
+        $('.add_collaboration_link').focus()
 
     # Internal: Hide collaboration and display an edit form.
     #
@@ -86,6 +99,7 @@ define [
       @$el.children().hide()
       @$el.append($form)
       @addCollaboratorPicker($form)
+      $form.find('[name="collaboration[title]"]').focus()
 
     # Internal: Delete the collaboration.
     #
@@ -108,6 +122,7 @@ define [
     onCloseForm: (e) ->
       @$el.find('form').remove()
       @$el.children().show()
+      @$el.find('.edit_collaboration_link').focus()
 
     addCollaboratorPicker: ($form) ->
       view = new CollaboratorPickerView

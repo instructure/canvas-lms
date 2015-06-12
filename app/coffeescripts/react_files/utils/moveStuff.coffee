@@ -18,8 +18,8 @@ define [
           React.render(React.createFactory(FileRenameForm)(
             closeOnResolve: true
             fileOptions: {name: item.attributes.display_name}
-            onNameConflictResolved: (options) =>
-              moveItem(item, destinationFolder, options).then(
+            onNameConflictResolved: (opts) =>
+              moveItem(item, destinationFolder, opts).then(
                 (data) => dfd.resolve(data)
                 => dfd.reject()
               )

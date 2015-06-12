@@ -65,7 +65,7 @@ module Lti
 
         it "doesn't allow non admin to register an app" do
           get 'registration', account_id: Account.default, tool_consumer_url: 'http://tool.consumer.url'
-          expect(response.code).to eq '401'
+          assert_unauthorized
         end
 
       end

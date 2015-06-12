@@ -15,7 +15,7 @@
 <p><%= t :body, "%{user} posted a new comment on the announcement: %{discussion_topic} for %{course}:", :user => asset.user.short_name, :discussion_topic => asset.title, :course => asset.context.name %></p>
 
 <p>
-  <%= html_to_text(asset.message, :base_url => dashboard_url) %>
+  <%= html_to_simple_html(asset.message, :base_url => dashboard_url) %>
 </p>
 
 <% if avatar_enabled? %>

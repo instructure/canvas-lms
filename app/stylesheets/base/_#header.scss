@@ -58,7 +58,7 @@ $masquerade-link-color: $ic-color-alert;
 }
 
 #header {
-  @if $is-k12 == false {
+  @if $is-k12 or $use_new_styles == false {
     position: relative;
     z-index: 11;
     background-color: $ic-header-background;
@@ -88,14 +88,12 @@ $masquerade-link-color: $ic-color-alert;
 
 #identity {
   @include reset-list;
-  @if $is-k12 {
-    font-size: 14px;
-  }
+  @if $is-k12 { font-size: 14px; }
   @else {
     float: right;
     font-size: 12px;
     margin-right: $right_side_margin;
-    /*make room for the drop shadow */
+    // make room for the drop shadow 
     margin-bottom: 4px;
     padding: 0 11px;
     @if $use_high_contrast {
@@ -171,74 +169,72 @@ $masquerade-link-color: $ic-color-alert;
   }
 }
 
-#menu {
-  @include pie-clearfix;
-  @include reset-list;
-  @if $is-k12 {
-    display: flex;
-    flex: 1;
-    height: $k12-header-primary-height;
-  }
-  @else {
-    padding-top: 3px;
-    margin-left: $left_side_width;
+@if $use_new_styles == false {
+  #menu {
+    @include pie-clearfix;
+    @include reset-list;
+    @if $is-k12 {  
+      display: flex;
+      flex: 1;
+      height: $k12-header-primary-height;
+    }
+    @else {
+      padding-top: 3px;
+      margin-left: $left_side_width;  
+    }
   }
 }
 
 .menu-item {
-  position: relative;
-  @if $is-k12 {
-    @include border-box;
-    border-right: 1px solid $brand-k12-dark;
-    flex: 0 0 ($k12-sp * 10);
-    display: flex;
-    @if $use_high_contrast {
-      border-color: darken($brand-k12-dark, 15%);
+  @if $use_new_styles == false {
+    position: relative;
+    @if $is-k12 {
+      @include border-box;
+      border-right: 1px solid $brand-k12-dark;
+      flex: 0 0 ($k12-sp * 10);
+      display: flex;
+      @if $use_high_contrast { border-color: darken($brand-k12-dark, 15%); }
+      @include breakpoint(desktop) { flex: 0 0 ($k12-sp * 14); }
+      @include breakpoint(wide) { flex: 0 0 ($k12-sp * 16); }
+    }  
+    @else {
+      display: block;
+      float: left;
     }
-    @include breakpoint(desktop) {
-      flex: 0 0 ($k12-sp * 14);
-    }
-
-    @include breakpoint(wide) {
-      flex: 0 0 ($k12-sp * 16);
-    }
-  }
-  @else {
-    display: block;
-    float: left;
   }
   .menu-item-title, .menu-item-no-drop {
     position: relative;
-    z-index: 100;
     text-decoration: none;
-    @if $is-k12 {
-      @include border-box;
-      transition: background 0.2s linear;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: $k12-header-text;
-      @include breakpoint(desktop) {
-        flex-direction: row;
+    @if $use_new_styles == false {
+      z-index: 100;
+      @if $is-k12 {
+        @include border-box;
+        transition: background 0.2s linear;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: $k12-header-text;
+        @include breakpoint(desktop) { flex-direction: row; }
+      }    
+      @else {
+        color: #fff;
+        border: 1px solid transparent;
+        border-bottom: 0 none;
+        display: block;
+        padding: 6px 17px 5px;
+        height: 29px;
+        color: #fff;
+        font-size: 15px;
       }
-    }
-    @else {
-      color: #fff;
-      border: 1px solid transparent;
-      border-bottom: 0 none;
-      display: block;
-      padding: 6px 17px 5px;
-      height: 29px;
-      color: #fff;
-      font-size: 15px;
     }
   }
   .menu-item-no-drop, .menu-item-title {
-    &:hover, &:focus {
-      text-decoration: underline;
+    @if $use_new_styles == false {
+      &:hover, &:focus { text-decoration: underline; }
     }
+    
     @if $is-k12 {
       &:hover, &:focus {
         background: rgba($k12-header-text, 0.15);
@@ -255,26 +251,29 @@ $masquerade-link-color: $ic-color-alert;
   &.hover {
     .menu-item-title {
       text-shadow: none;
-      @if $is-k12 {
-        background: rgba($k12-header-text, 0.1);
-        color: $k12-header-text;
-        @if $use_high_contrast == false {
-          text-decoration: none;
+      @if $use_new_styles == false {
+        @if $is-k12 {
+          background: rgba($k12-header-text, 0.1);
+          color: $k12-header-text;
+          @if $use_high_contrast == false {
+            text-decoration: none;
+          }
+        }      
+        @else {
+          color: $course-dropdown-text-color;
+          border-top-color: darken($ic-brand-secondary, 12%);
+          border-left-color: darken($ic-brand-secondary, 12%);
+          border-right-color: darken($ic-brand-secondary, 12%);
+          background-color: $courses-dropdown-menu-bg;
         }
       }
-      @else {
-        color: $course-dropdown-text-color;
-        border-top-color: darken($ic-brand-secondary, 12%);
-        border-left-color: darken($ic-brand-secondary, 12%);
-        border-right-color: darken($ic-brand-secondary, 12%);
-        background-color: $courses-dropdown-menu-bg;
-      }
     }
-    .menu-item-drop {
+    @if $use_new_styles == false {
       // bring it back on screen so you can see it
-      left: 0;
+      .menu-item-drop { left: 0; } 
     }
   }
+  
   .menu-item-drop {
     font-size: 13px;
     // hide off screen, dont do display:none, so screenreaders can see it
@@ -474,10 +473,6 @@ $masquerade-link-color: $ic-color-alert;
   }
   .customListOpen {
     font-size: 11px;
-    //float: right
-    //position: relative
-    //top: -26px
-    //right: 12px
     @if $is-k12 {
       color: ensure-contrast($brand-k12-dark, #f0f0f0);
       .name {
@@ -505,7 +500,6 @@ $masquerade-link-color: $ic-color-alert;
 }
 
 .menu-item-drop .customListOpen {
-  //line-height: 28px
   cursor: pointer;
 }
 

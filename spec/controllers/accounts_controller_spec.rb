@@ -203,31 +203,6 @@ describe AccountsController do
     end
   end
 
-  describe "authentication" do
-    it "should redirect to CAS if CAS is enabled" do
-      account = account_with_cas({:account => Account.default})
-      config = { :cas_base_url => account.account_authorization_config.auth_base }
-      cas_client = CASClient::Client.new(config)
-      get 'show', :id => account.id
-      expect(response).to redirect_to(controller.delegated_auth_redirect_uri(cas_client.add_service_to_login_url(cas_login_url)))
-    end
-
-    it "should respect canvas_login=1" do
-      account = account_with_cas({:account => Account.default})
-      get 'show', :id => account.id, :canvas_login => '1'
-      expect(response).to render_template("shared/unauthorized")
-    end
-
-    it "should set @is_delegated correctly for ldap/non-canvas" do
-      Account.default.account_authorization_configs.create!(:auth_type =>'ldap')
-      Account.default.settings[:canvas_authentication] = false
-      Account.default.save!
-      get 'show', :id => Account.default.id
-      expect(response).to render_template("shared/unauthorized")
-      expect(assigns['is_delegated']).to eq false
-    end
-  end
-
   describe "courses" do
     it "should count total courses correctly" do
       account = Account.create!
@@ -364,11 +339,14 @@ describe AccountsController do
     end
 
     it "should allow updating services that appear in the ui for the current user" do
-      Account.register_service(:test1, { name: 'test1', description: '', expose_to_ui: :setting, default: false })
-      Account.register_service(:test2, { name: 'test2', description: '', expose_to_ui: :setting, default: false, expose_to_ui_proc: proc { |user, account| false } })
+      AccountServices.register_service(:test1,
+                                       { name: 'test1', description: '', expose_to_ui: :setting, default: false })
+      AccountServices.register_service(:test2,
+                                       { name: 'test2', description: '', expose_to_ui: :setting, default: false, expose_to_ui_proc: proc { false } })
       user_session(user)
       @account = Account.create!
-      Account.register_service(:test3, { name: 'test3', description: '', expose_to_ui: :setting, default: false, expose_to_ui_proc: proc { |user, account| account == @account } })
+      AccountServices.register_service(:test3,
+                                       { name: 'test3', description: '', expose_to_ui: :setting, default: false, expose_to_ui_proc: proc { |_, account| account == @account } })
       Account.site_admin.account_users.create!(user: @user)
       post 'update', id: @account.id, account: {
         services: {

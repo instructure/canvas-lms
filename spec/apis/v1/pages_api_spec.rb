@@ -23,6 +23,7 @@ describe "Pages API", type: :request do
   def avatar_url_for_user(user, *a)
     User.avatar_fallback_url
   end
+
   def blank_fallback
     nil
   end
@@ -454,6 +455,19 @@ describe "Pages API", type: :request do
         expect(page.title).to eq 'New Wiki Page'
         expect(page.url).to eq 'new-wiki-page'
         expect(page.body).to eq 'processed content'
+      end
+
+      it 'should not point group file links to the course' do
+        group_model(:context => @course)
+        body = "<a href='/groups/#{@group.id}/files'>linky</a>"
+
+        json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
+                        { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
+                        { :wiki_page => { :title => 'New Wiki Page', :body => body } })
+        page = @course.wiki.wiki_pages.where(url: json['url']).first!
+        expect(page.title).to eq 'New Wiki Page'
+        expect(page.url).to eq 'new-wiki-page'
+        expect(page.body).to include("/groups/#{@group.id}/files")
       end
 
       it "should set as front page" do

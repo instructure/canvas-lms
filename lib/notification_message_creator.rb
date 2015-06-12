@@ -108,7 +108,7 @@ class NotificationMessageCreator
   private
 
   def no_daily_messages_in(delayed_messages)
-    !delayed_messages.any?{ |message| message.frequency = 'daily' }
+    !delayed_messages.any?{ |message| message.frequency == 'daily' }
   end
 
   def build_fallback_for(user)

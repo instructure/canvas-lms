@@ -22,9 +22,11 @@ describe AssignmentGroupsController do
   def course_assignment
     @assignment = @course.assignments.create(:title => "some assignment")
   end
+
   def course_group
     @group = @course.assignment_groups.create(:name => "some group")
   end
+
   def group_assignment
     @assignment = @group.assignments.create(:name => "some group assignment")
   end

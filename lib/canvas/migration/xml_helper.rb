@@ -88,11 +88,11 @@ module XMLHelper
   end
   
   def open_file(path)
-    File.exists?(path) ? ::Nokogiri::HTML(File.open(path)) : nil
+    File.exist?(path) ? ::Nokogiri::HTML(File.open(path)) : nil
   end
 
   def open_file_xml(path)
-    File.exists?(path) ? create_xml_doc(File.open(path)) : nil
+    File.exist?(path) ? create_xml_doc(File.open(path)) : nil
   end
 
   def create_xml_doc(string_or_io)

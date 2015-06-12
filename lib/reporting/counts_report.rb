@@ -30,7 +30,7 @@ class CountsReport
 
   def initialize
     date = Date.yesterday
-    @yesterday = Time.parse("#{date.to_s} 23:59:00 UTC")
+    @yesterday = Time.parse("#{date} 23:59:00 UTC")
     @week = date.cweek
     @timestamp = @yesterday
     @overview = {:generated_at=>@timestamp, :totals => new_counts_hash}.with_indifferent_access

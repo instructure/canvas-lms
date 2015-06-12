@@ -14,14 +14,33 @@ define [
 
     template: template
 
-    @optionProperty 'user_id'
-    @optionProperty 'course_id'
-
     dialogOptions: ->
       containerId: "outcome_detail"
       close: @onClose
       buttons: []
       width: 640
+
+    initialize: ->
+      @alignmentsForView = new Backbone.Collection([])
+      @alignmentsView = new CollectionView
+        collection: @alignmentsForView
+        itemView: AlignmentView
+      super
+
+    onClose: ->
+      window.location.hash = 'tab-outcomes'
+
+    render: ->
+      super
+      @alignmentsView.setElement @$('.alignments')
+      @allAlignments = new OutcomeResultCollection([], {
+        outcome: @model
+      })
+
+      @allAlignments.on 'fetched:last', =>
+        @alignmentsForView.reset(@allAlignments.last(8))
+
+      @allAlignments.fetch()
 
     show: (model) ->
       @model = model
@@ -30,19 +49,8 @@ define [
       @render()
       super
 
-    render: ->
-      super
-      @alignments = new OutcomeResultCollection([], user_id: @user_id, course_id: @course_id, outcome: @model)
-      @alignments.fetch()
-      @alignmentsView = new CollectionView
-        el: @$('.alignments')
-        collection: @alignments
-        itemView: AlignmentView
-
-    onClose: ->
-      window.location.hash = 'tab-outcomes'
-
     toJSON: ->
       json = super
       _.extend json,
         progress: @progress
+

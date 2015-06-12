@@ -1295,9 +1295,12 @@ define([
       moduleItems[contentKey].push({model: model, view: view});
     };
 
-    $('.publish-icon:visible').each(function(index, el) {
-      var view = initPublishButton($(el));
-      overrideModel(view.model, view);
+    $('.publish-icon').each(function(index, el) {
+      var $el = $(el);
+      if ($el.data('id')) {
+        var view = initPublishButton($el);
+        overrideModel(view.model, view);
+      }
     });
 
     $('.module-publish-link').each(function(i, element){

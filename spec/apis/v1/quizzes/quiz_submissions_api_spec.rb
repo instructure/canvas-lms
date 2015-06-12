@@ -140,6 +140,21 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
         api_call(:put, url, params, data)
       end
     end
+
+    def qs_api_time(raw = false, data = {})
+      url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}/time"
+      params = { :controller => 'quizzes/quiz_submissions_api',
+                 :action => 'time',
+                 :format => 'json',
+                 :course_id => @course.id.to_s,
+                 :quiz_id => @quiz.id.to_s,
+                 :id => @quiz_submission.id.to_s }
+      if raw
+        raw_api_call(:get, url, params, data)
+      else
+        api_call(:get, url, params, data)
+      end
+    end
   end
 
   include Helpers
@@ -506,6 +521,34 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       # make sure no score is affected
       expect(@quiz_submission.submission_data[1]['points']).to eq 45
       expect(@quiz_submission.score).to eq @original_score
+    end
+  end
+
+  describe "GET /courses/:course_id/quizzes/:quiz_id/submssions/:id/time" do
+    before :once do
+      enroll_student
+      @user = @student
+
+      @quiz_submission = @quiz.generate_submission(@student)
+      @quiz_submission.update_attribute(:end_at, Time.now + 1.hour)
+      Quizzes::QuizSubmission.where(:id => @quiz_submission).update_all(:updated_at => 1.hour.ago)
+    end
+    it "should give times for the quiz" do
+      json = qs_api_time(false)
+      expect(json).to have_key("time_left")
+      expect(json).to have_key("end_at")
+      expect(json["time_left"]).to be_within(5.0).of(60*60)
+    end
+    it "should reject a teacher other student" do
+      @user = @teacher
+      json = qs_api_time(true)
+      assert_status(401)
+    end
+    it "should reject another student" do
+      enroll_student
+      @user = @student
+      json = qs_api_time(true)
+      assert_status(401)
     end
   end
 end

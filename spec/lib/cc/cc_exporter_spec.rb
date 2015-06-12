@@ -33,7 +33,7 @@ describe "Common Cartridge exporting" do
     end
 
     after(:each) do
-      if @file_handle && File.exists?(@file_handle.path)
+      if @file_handle && File.exist?(@file_handle.path)
         FileUtils::rm_rf(@file_handle.path)
       end
     end

@@ -119,6 +119,6 @@ class MessageScrubber
   #
   # Returns nothing.
   def log(scope)
-    logger.info("#{self.class.to_s}: #{scope.count} records would be deleted (older than #{limit})")
+    logger.info("#{self.class}: #{scope.count} records would be deleted (older than #{limit})")
   end
 end
