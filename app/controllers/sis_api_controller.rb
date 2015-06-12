@@ -31,6 +31,9 @@ class SisApiController < ApplicationController
   # @argument account_id [Integer] The ID of the account to query.
   # @argument course_id [Integer] The ID of the course to query.
   #
+  # @argument starts_before [DateTime, Optional] When searching on an account, restricts to courses that start before this date (if they have a start date)
+  # @argument ends_after [DateTime, Optional] When searching on an account, restricts to courses that end after this date (if they have an end date)
+  #
   # @example_response
   #   [
   #     {
@@ -93,7 +96,22 @@ class SisApiController < ApplicationController
 
   def published_course_ids
     if context.is_a?(Account)
-      Course.published.where(account_id: [context.id] + Account.sub_account_ids_recursive(context.id))
+      course_scope = Course.published.where(account_id: [context.id] + Account.sub_account_ids_recursive(context.id))
+      if starts_before = CanvasTime.try_parse(params[:starts_before])
+        course_scope = course_scope.where("
+        (courses.start_at IS NULL AND enrollment_terms.start_at IS NULL)
+        OR courses.start_at < ? OR enrollment_terms.start_at < ?", starts_before, starts_before)
+      end
+      if ends_after = CanvasTime.try_parse(params[:ends_after])
+        course_scope = course_scope.where("
+        (courses.conclude_at IS NULL AND enrollment_terms.end_at IS NULL)
+        OR courses.conclude_at > ? OR enrollment_terms.end_at > ?", ends_after, ends_after)
+      end
+
+      if starts_before || ends_after
+        course_scope = course_scope.joins(:enrollment_term)
+      end
+      course_scope
     elsif context.is_a?(Course)
       [context.id]
     end
