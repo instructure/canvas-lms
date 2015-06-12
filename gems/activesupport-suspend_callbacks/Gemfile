@@ -3,3 +3,9 @@ gem 'simplecov', '0.8.2', :require => false
 gem 'simplecov-rcov', '0.2.3', :require => false
 # Specify your gem's dependencies in activesupport-suspend_callbacks.gemspec
 gemspec
+
+require File.expand_path("../../../config/canvas_rails4", __FILE__)
+
+if CANVAS_RAILS3
+  gem 'activesupport', '~> 3.2.0'
+end

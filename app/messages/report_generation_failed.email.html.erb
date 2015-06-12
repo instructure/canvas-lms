@@ -1,3 +1,7 @@
+<% define_content :link do %>
+  <%= account_url(asset.account) %>
+<% end %>
+
 <% define_content :subject do %><%= t :subject, "Report Generation Failed" %><% end %>
 
 <p><strong><%= t :subject, "Report Generation Failed" %></strong></p>

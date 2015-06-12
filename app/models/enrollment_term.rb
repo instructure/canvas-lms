@@ -21,7 +21,7 @@ class EnrollmentTerm < ActiveRecord::Base
   
   include Workflow
 
-  attr_accessible :name, :start_at, :end_at, :ignore_term_date_restrictions
+  attr_accessible :name, :start_at, :end_at
   belongs_to :root_account, :class_name => 'Account'
   has_many :enrollment_dates_overrides
   has_many :courses
@@ -30,16 +30,28 @@ class EnrollmentTerm < ActiveRecord::Base
 
   EXPORTABLE_ATTRIBUTES = [
     :id, :root_account_id, :name, :term_code, :sis_source_id, :sis_batch_id, :start_at, :end_at, :accepting_enrollments, :can_manually_enroll, :created_at,
-    :updated_at, :workflow_state, :ignore_term_date_restrictions
+    :updated_at, :workflow_state
   ]
   EXPORTABLE_ASSOCIATIONS = [:root_account, :enrollment_dates_overrides, :courses, :course_sections]
 
   validates_presence_of :root_account_id, :workflow_state
+  validate :check_if_deletable
+
   before_validation :verify_unique_sis_source_id
   before_save :update_courses_later_if_necessary
 
   include StickySisFields
   are_sis_sticky :name, :start_at, :end_at
+
+  def check_if_deletable
+    if self.workflow_state_changed? && self.workflow_state == "deleted"
+      if self.default_term?
+        self.errors.add(:workflow_state, t('errors.delete_default_term', "Cannot delete the default term"))
+      elsif self.courses.active.exists?
+        self.errors.add(:workflow_state, t('errors.delete_term_with_courses', "Cannot delete a term with active courses"))
+      end
+    end
+  end
 
   def update_courses_later_if_necessary
     self.update_courses_later if !self.new_record? && (self.start_at_changed? || self.end_at_changed?)
@@ -89,8 +101,7 @@ class EnrollmentTerm < ActiveRecord::Base
     params.map do |type, values|
       type = type.classify
       enrollment_type = Enrollment.typed_enrollment(type).to_s
-      override = self.enrollment_dates_overrides.find_by_enrollment_type(enrollment_type)
-      override ||= self.enrollment_dates_overrides.build(:enrollment_type => enrollment_type)
+      override = self.enrollment_dates_overrides.where(enrollment_type: enrollment_type).first_or_initialize
       # preload the reverse association - VERY IMPORTANT so that @touched_enrollments is shared
       override.enrollment_term = self
       override.start_at = values[:start_at]
@@ -103,9 +114,13 @@ class EnrollmentTerm < ActiveRecord::Base
   
   def verify_unique_sis_source_id
     return true unless self.sis_source_id
-    existing_term = self.root_account.enrollment_terms.find_by_sis_source_id(self.sis_source_id)
-    return true if !existing_term || existing_term.id == self.id 
-    
+    return true if !root_account_id_changed? && !sis_source_id_changed?
+
+    scope = root_account.enrollment_terms.where(sis_source_id: self.sis_source_id)
+    scope = scope.where("id<>?", self) unless self.new_record?
+
+    return true unless scope.exists?
+
     self.errors.add(:sis_source_id, t('errors.not_unique', "SIS ID \"%{sis_source_id}\" is already in use", :sis_source_id => self.sis_source_id))
     false
   end
@@ -113,11 +128,7 @@ class EnrollmentTerm < ActiveRecord::Base
   def users_count
     scope = Enrollment.active.joins(:course).
       where(root_account_id: root_account_id, courses: {enrollment_term_id: self})
-    if CANVAS_RAILS2
-      scope.count(:distinct => true, :select => "enrollments.user_id")
-    else
-      scope.select(:user_id).uniq.count
-    end
+    scope.select(:user_id).uniq.count
   end
   
   workflow do
@@ -126,19 +137,28 @@ class EnrollmentTerm < ActiveRecord::Base
   end
   
   def enrollment_dates_for(enrollment)
-    return [nil, nil] if ignore_term_date_restrictions
     # detect will cause the whole collection to load; that's fine, it's a small collection, and
     # we'll probably call enrollment_dates_for multiple times in a single request, so we want
     # it cached, rather than using .scoped which would force a re-query every time
     override = enrollment_dates_overrides.detect { |override| override.enrollment_type == enrollment.type.to_s}
-    [ override.try(:start_at) || start_at, override.try(:end_at) || end_at ]
+
+    # ignore the start dates as admin
+    [ override.try(:start_at) || (enrollment.admin? ? nil : start_at), override.try(:end_at) || end_at ]
   end
-  
+
+  # return the term dates applicable to the given enrollment(s)
+  def overridden_term_dates(enrollments)
+    dates = enrollments.uniq { |enrollment| enrollment.type }.map { |enrollment| enrollment_dates_for(enrollment) }
+    start_dates = dates.map(&:first)
+    end_dates = dates.map(&:last)
+    [start_dates.include?(nil) ? nil : start_dates.min, end_dates.include?(nil) ? nil : end_dates.max]
+  end
+
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     save!
   end
-  
+
   scope :active, -> { where("enrollment_terms.workflow_state<>'deleted'") }
 end

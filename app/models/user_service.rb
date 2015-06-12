@@ -35,12 +35,12 @@ class UserService < ActiveRecord::Base
   after_destroy :remove_related_channels
   
   def should_have_communication_channel?
-    [CommunicationChannel::TYPE_FACEBOOK, CommunicationChannel::TYPE_TWITTER].include?(service) && self.user
+    [CommunicationChannel::TYPE_TWITTER, CommunicationChannel::TYPE_YO].include?(service) && self.user
   end
   
   def assert_relations
     if should_have_communication_channel?
-      cc = self.user.communication_channels.find_or_create_by_path_type(service)
+      cc = self.user.communication_channels.where(path_type: service).first_or_initialize
       cc.path_type = service
       cc.workflow_state = 'active'
       cc.path = "#{self.service_user_id}@#{service}.com"
@@ -53,15 +53,17 @@ class UserService < ActiveRecord::Base
   end
   
   def remove_related_channels
-    if self.service == CommunicationChannel::TYPE_FACEBOOK && self.user
-      ccs = self.user.communication_channels.find_all_by_path_type(CommunicationChannel::TYPE_FACEBOOK)
+    # should this include twitter?
+    if [CommunicationChannel::TYPE_YO].include?(self.service) && self.user
+      ccs = self.user.communication_channels.where(path_type: self.service)
       ccs.each{|cc| cc.destroy }
     end
     true
   end
   
   def assert_communication_channel
-    self.touch if should_have_communication_channel? && !self.user.communication_channels.find_by_path_type(CommunicationChannel::TYPE_TWITTER)
+    # why is twitter getting special treatment?
+    self.touch if should_have_communication_channel? && !self.user.communication_channels.where(path_type: CommunicationChannel::TYPE_TWITTER).first
   end
   
   def infer_defaults
@@ -107,8 +109,7 @@ class UserService < ActiveRecord::Base
     domain = opts[:service_domain] || "google.com"
     service = opts[:service] || "google_docs"
     protocol = opts[:protocol] || "oauth"
-    user_service = UserService.find_by_user_id_and_service_and_protocol(opts[:user].id, service, protocol)
-    user_service ||= opts[:user].user_services.build(:service => service, :protocol => protocol)
+    user_service = opts[:user].user_services.where(service: service, protocol: protocol).first_or_initialize
     user_service.service_domain = domain
     user_service.token = token
     user_service.secret = secret
@@ -146,6 +147,11 @@ class UserService < ActiveRecord::Base
         opts[:service_user_id] = params[:user_name]
         opts[:service_user_name] = params[:user_name]
         opts[:protocol] = "skype"
+      when 'yo'
+        opts[:service_domain] = "justyo.co"
+        opts[:service_user_id] = params[:user_name]
+        opts[:service_user_name] = params[:user_name]
+        opts[:protocol] = "yo"
       else
         raise "Unknown Service Type"
     end
@@ -164,18 +170,20 @@ class UserService < ActiveRecord::Base
     case type
     when 'google_docs'
       1
+    when 'google_drive'
+      2
     when 'skype'
       3
     when CommunicationChannel::TYPE_TWITTER
       4
-    when CommunicationChannel::TYPE_FACEBOOK
-      5
-    when 'delicious'
-      7
-    when 'diigo'
-      8
     when 'linked_in'
       6
+    when CommunicationChannel::TYPE_YO
+      7
+    when 'delicious'
+      8
+    when 'diigo'
+      9
     else
       999
     end
@@ -185,12 +193,14 @@ class UserService < ActiveRecord::Base
     case type
     when 'google_docs'
       t '#user_service.descriptions.google_docs', 'Students can use Google Docs to collaborate on group projects.  Google Docs allows for real-time collaborative editing of documents, spreadsheets and presentations.'
+    when 'google_drive'
+      t '#user_service.descriptions.google_drive', 'Students can use Google Drive to collaborate on group projects.  Google Drive allows for real-time collaborative editing of documents, spreadsheets and presentations.'
     when 'google_calendar'
       ''
     when CommunicationChannel::TYPE_TWITTER
       t '#user_service.descriptions.twitter', 'Twitter is a great resource for out-of-class communication.'
-    when CommunicationChannel::TYPE_FACEBOOK
-      t '#user_service.descriptions.facebook', 'Listing your Facebook profile will let you more easily connect with friends you make in your classes and groups.'
+    when CommunicationChannel::TYPE_YO
+      t '#user_service.descriptions.yo', 'Yo is a single-tap zero character communication tool.'
     when 'delicious'
       t '#user_service.descriptions.delicious', 'Delicious is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users\' Delicious accounts to share links of similar interest.'
     when 'diigo'
@@ -208,16 +218,18 @@ class UserService < ActiveRecord::Base
     case type
     when 'google_docs'
       'http://docs.google.com'
+    when 'google_drive'
+      'https://www.google.com/drive/'
     when 'google_calendar'
       'http://calendar.google.com'
     when CommunicationChannel::TYPE_TWITTER
       'http://twitter.com/signup'
-    when CommunicationChannel::TYPE_FACEBOOK
-      'http://www.facebook.com'
+    when CommunicationChannel::TYPE_YO
+      'http://www.justyo.co'
     when 'delicious'
       'http://delicious.com/'
     when 'diigo'
-      'https://secure.diigo.com/sign-up'
+      'https://www.diigo.com/sign-up'
     when 'linked_in'
       'https://www.linkedin.com/reg/join'
     when 'skype'
@@ -227,24 +239,18 @@ class UserService < ActiveRecord::Base
     end
   end
   
-  def service_access_link
-    if service == 'facebook' && Facebook::Connection.config && Facebook::Connection.config['canvas_name']
-      "https://apps.facebook.com/#{Facebook::Connection.config['canvas_name']}"
-    else
-      service_user_link
-    end
-  end
-  
   def service_user_link
     case service
       when 'google_docs'
         'http://docs.google.com'
+      when 'google_drive'
+        'https://myaccount.google.com/?pli=1'
       when 'google_calendar'
         'http://calendar.google.com'
       when CommunicationChannel::TYPE_TWITTER
         "http://www.twitter.com/#{service_user_name}"
-      when CommunicationChannel::TYPE_FACEBOOK
-        "http://www.facebook.com/profile.php?id=#{service_user_id}"
+      when CommunicationChannel::TYPE_YO
+        "http://www.justyo.co/#{service_user_name}"
       when 'delicious'
         "http://www.delicious.com/#{service_user_name}"
       when 'diigo'
@@ -259,7 +265,7 @@ class UserService < ActiveRecord::Base
   end
   
   def self.configured_services
-    [:facebook, :google_docs, :twitter, :linked_in]
+    [:google_docs, :google_drive, :twitter, :yo, :linked_in, :diigo]
   end
   
   def self.configured_service?(service)
@@ -267,7 +273,7 @@ class UserService < ActiveRecord::Base
   end
   
   def self.service_type(type)
-    if type == 'google_docs'
+    if type == 'google_docs' || type == 'google_drive'
       'DocumentService'
     elsif type == 'delicious' || type == 'diigo'
       'BookmarkService'

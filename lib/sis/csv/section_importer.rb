@@ -25,6 +25,10 @@ module SIS
         row.include?('section_id') && row.include?('name')
       end
 
+      def self.identifying_fields
+        %w[section_id].freeze
+      end
+
       # expected columns
       # section_id,course_id,name,status,start_date,end_date
       def process(csv)

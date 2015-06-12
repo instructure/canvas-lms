@@ -69,7 +69,7 @@ module Guard
     #
     def run_all
       UI.info "Compiling all handlebars templates in #{@options[:input]} to #{@options[:output]}"
-      FileUtils.rm_r @options[:output] if File.exists?(@options[:output])
+      FileUtils.rm_r @options[:output] if File.exist?(@options[:output])
       HandlebarsTasks::Handlebars.compile @options[:input], @options[:output]
       UI.info "Successfully compiled all handlebars templates in #{@options[:input]}"
     end
@@ -84,7 +84,7 @@ module Guard
       paths.each do |file|
         javascript = file.sub(%r{\A#{Regexp.escape(@options[:input])}/(.*?)\.handlebars}, "#{@options[:output]}/\\1.js")
         UI.info "Removing: #{javascript}"
-        File.delete(javascript) if File.exists?(javascript)
+        File.delete(javascript) if File.exist?(javascript)
       end
     end
 

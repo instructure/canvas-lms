@@ -86,10 +86,10 @@ class Conversation < ActiveRecord::Base
     private_hash = private ? private_hash_for(users) : nil
     transaction do
       if private
-        conversation = users.first.all_conversations.find_by_private_hash(private_hash).try(:conversation)
+        conversation = users.first.all_conversations.where(private_hash: private_hash).first.try(:conversation)
         # for compatibility during migration, before ConversationParticipant has finished populating
         if Setting.get('populate_conversation_participants_private_hash_complete', '0') == '0'
-          conversation ||= Conversation.find_by_private_hash(private_hash)
+          conversation ||= Conversation.where(private_hash: private_hash).first
         end
       end
       unless conversation
@@ -118,6 +118,11 @@ class Conversation < ActiveRecord::Base
       end
       conversation
     end
+  end
+
+  # conversations with more recipients than this should force individual messages
+  def self.max_group_conversation_size
+    Setting.get("max_group_conversation_size", 100).to_i
   end
 
   def add_participants(current_user, users, options={})
@@ -204,7 +209,7 @@ class Conversation < ActiveRecord::Base
   # * <tt>:media_comment</tt> - The media_comment for the message. Defaults to nil.
   # * <tt>:forwarded_message_ids</tt> - Array of message IDs to forward. Only if forwardable and limited to 1.
   def add_message(current_user, body_or_obj, options = {})
-    transaction do
+    message = transaction do
       lock!
 
       options = {:generated => false,
@@ -213,12 +218,17 @@ class Conversation < ActiveRecord::Base
       options[:update_participants] = !options[:generated]         unless options.has_key?(:update_participants)
       options[:update_for_skips]    = options[:update_for_sender]  unless options.has_key?(:update_for_skips)
       options[:skip_users]        ||= [current_user]
+      options[:reset_unread_counts] = options[:update_participants] unless options.has_key?(:reset_unread_counts)
 
       message = body_or_obj.is_a?(ConversationMessage) ?
         body_or_obj :
         Conversation.build_message(current_user, body_or_obj, options)
       message.conversation = self
       message.shard = self.shard
+
+      if options[:cc_author]
+        message.cc_author = options[:cc_author]
+      end
 
       # all specified (or implicit) tags, regardless of visibility to individual participants
       users = preload_users_and_context_codes
@@ -237,11 +247,7 @@ class Conversation < ActiveRecord::Base
       save! if new_tags.present? || root_account_ids_changed?
 
       # so we can take advantage of other preloaded associations
-      if CANVAS_RAILS2
-        ConversationMessage.send :add_preloaded_record_to_collection, [message], :conversation, self
-      else
-        message.association(:conversation).target = self
-      end
+      message.association(:conversation).target = self
       message.save_without_broadcasting!
 
       add_message_to_participants(message, options.merge(
@@ -258,6 +264,16 @@ class Conversation < ActiveRecord::Base
       message.after_participants_created_broadcast
       message
     end
+    send_later_if_production(:reset_unread_counts) if options[:reset_unread_counts]
+    message
+  end
+
+  def reset_unread_counts
+    Shard.partition_by_shard(self.conversation_participants.map(&:user_id)) do |shard_user_ids|
+      User.where(id: shard_user_ids).find_each do |user|
+        user.reset_unread_conversations_counter
+      end
+    end
   end
 
   def self.build_message(current_user, body, options = {})
@@ -269,14 +285,15 @@ class Conversation < ActiveRecord::Base
       message.context_type = 'Account'
       message.context_id = options[:root_account_id]
     end
+
     message.asset = options[:asset]
     message.attachment_ids = options[:attachment_ids] if options[:attachment_ids].present?
     message.media_comment = options[:media_comment] if options[:media_comment].present?
     if options[:forwarded_message_ids].present?
-      messages = ConversationMessage.find_all_by_id(options[:forwarded_message_ids].map(&:to_i))
+      messages = ConversationMessage.where(id: options[:forwarded_message_ids].map(&:to_i))
       conversation_ids = messages.select(&:forwardable?).map(&:conversation_id).uniq
       raise "can only forward one conversation at a time" if conversation_ids.size != 1
-      raise "user doesn't have permission to forward these messages" unless current_user.all_conversations.find_by_conversation_id(conversation_ids.first)
+      raise "user doesn't have permission to forward these messages" unless current_user.all_conversations.where(conversation_id: conversation_ids.first).exists?
       # TODO: optimize me
       message.forwarded_message_ids = messages.map(&:id).join(',')
     end
@@ -285,7 +302,10 @@ class Conversation < ActiveRecord::Base
   end
 
   def preload_users_and_context_codes
-    users = conversation_participants.map { |cp| User.send(:instantiate, 'id' => cp.user_id ) }
+    users = User.select([:id, :updated_at]).where(:id => conversation_participants.map(&:user_id)).map do |u|
+      u = User.send(:instantiate, 'id' => u.id, 'updated_at' => u.updated_at) if u.shard != Shard.current
+      u
+    end
     User.preload_conversation_context_codes(users)
     users = users.index_by(&:id)
   end
@@ -316,10 +336,7 @@ class Conversation < ActiveRecord::Base
         cps = cps.where("user_id NOT IN (?)", skip_users.map(&:user_id)) if skip_users.present?
       end
 
-      if options[:only_users]
-        options[:only_users] << message.author
-        cps = cps.where(:user_id => (options[:only_users]).map(&:id))
-      end
+      cps = cps.where(:user_id => (options[:only_users]+[message.author]).map(&:id)) if options[:only_users]
 
       next unless cps.exists?
 
@@ -429,36 +446,6 @@ class Conversation < ActiveRecord::Base
       skip_ids = options[:skip_users].try(:map, &:id) || [message.author_id]
       update_for_skips = options[:update_for_skips] != false
 
-      # make sure this jumps to the top of the inbox and is marked as unread for anyone who's subscribed
-      sql = "cp.conversation_id = ? AND cp.workflow_state <> 'unread' AND (cp.last_message_at IS NULL OR cp.subscribed)"
-      params = [
-        self.id,
-      ]
-      if skip_ids.present?
-        sql += " AND cp.user_id NOT IN (?)"
-        params << skip_ids
-      end
-      if options[:only_users]
-        sql += " AND cp.user_id IN (?)"
-        params << (options[:only_users]).map(&:id)
-      end
-      cp_conditions = sanitize_sql(params.unshift(sql))
-
-      if %w{MySQL Mysql2}.include?(connection.adapter_name)
-        connection.execute <<-SQL
-          UPDATE users, conversation_participants cp
-          SET unread_conversations_count = unread_conversations_count + 1,
-            #{sanitize_sql_for_assignment(updated_at: Time.now.utc)}
-          WHERE users.id = cp.user_id AND #{cp_conditions}
-        SQL
-      else
-        lock_type = true
-        lock_type = 'FOR NO KEY UPDATE' if User.connection.adapter_name == 'PostgreSQL' && User.connection.send(:postgresql_version) >= 90300
-        # lock the rows in a predefined order to prevent deadlocks
-        ids = User.where(id: ConversationParticipant.from("conversation_participants cp").where(cp_conditions).select(:user_id)).lock(lock_type).order(:id).pluck(:id)
-        User.where(id: ids).update_all(["unread_conversations_count = unread_conversations_count + 1, updated_at = ?", Time.now.utc])
-      end
-
       conversation_participants.where("(last_message_at IS NULL OR subscribed) AND user_id NOT IN (?)", skip_ids).
           update_all(:last_message_at => message.created_at, :workflow_state => 'unread')
 
@@ -489,14 +476,14 @@ class Conversation < ActiveRecord::Base
   end
 
   def subscribed_participants
-    ConversationParticipant.send(:preload_associations, conversation_participants, :user) unless ModelCache[:users]
+    ActiveRecord::Associations::Preloader.new(conversation_participants, :user).run unless ModelCache[:users]
     conversation_participants.select(&:subscribed?).map(&:user).compact
   end
 
   def reply_from(opts)
     user = opts.delete(:user)
     message = opts.delete(:text).to_s.strip
-    participant = self.conversation_participants.find_by_user_id(user.id)
+    participant = self.conversation_participants.where(user_id: user).first
     user = nil unless user && participant
     if !user
       raise "Only message participants may reply to messages"
@@ -523,7 +510,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def self.batch_migrate_context_tags!(ids)
-    find_all_by_id(ids).each(&:migrate_context_tags!)
+    where(id: ids).each(&:migrate_context_tags!)
   end
 
   # if the participant list has changed, e.g. we merged user accounts
@@ -534,7 +521,7 @@ class Conversation < ActiveRecord::Base
     return unless private_hash_changed?
     existing = self.shard.activate do
       ConversationParticipant.send(:with_exclusive_scope) do
-        ConversationParticipant.find_by_private_hash(private_hash).try(:conversation)
+        ConversationParticipant.where(private_hash: private_hash).first.try(:conversation)
       end
     end
     if existing
@@ -622,13 +609,7 @@ class Conversation < ActiveRecord::Base
           ConversationMessageParticipant.joins(:conversation_message).
               where(:conversation_messages => { :conversation_id => self.id }).
               delete_all
-          if CANVAS_RAILS2
-            # bare scoped call avoids HasManyAssociation's delete_all, which loads
-            # all records in Rails 2
-            self.conversation_messages.scoped.delete_all
-          else
-            self.conversation_messages.delete_all
-          end
+          self.conversation_messages.delete_all
         end
       end
 
@@ -727,11 +708,7 @@ class Conversation < ActiveRecord::Base
   protected
 
   def maybe_update_timestamp(col, val, additional_conditions=[])
-    if CANVAS_RAILS2
-      condition = self.class.merge_conditions(["(#{col} IS NULL OR #{col} < ?)", val], additional_conditions)
-    else
-      condition = self.class.where(["(#{col} IS NULL OR #{col} < ?)", val]).where(additional_conditions).where_values.join(' AND ')
-    end
+    condition = self.class.where(["(#{col} IS NULL OR #{col} < ?)", val]).where(additional_conditions).where_values.join(' AND ')
     sanitize_sql ["#{col} = CASE WHEN #{condition} THEN ? ELSE #{col} END", val]
   end
 end

@@ -30,7 +30,7 @@ describe "/groups/show" do
     assigns[:context] = @group
     assigns[:stream_items] = []
     render "groups/show"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

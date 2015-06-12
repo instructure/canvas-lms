@@ -1,0 +1,38 @@
+{
+  "name": "react-modal",
+  "version": "0.1.1",
+  "homepage": "https://github.com/rackt/react-modal",
+  "authors": [
+    "Ryan Florence",
+    "Michael Jackson"
+  ],
+  "description": "Accessible modal dialog component for React.JS",
+  "main": "dist/react-modal.js",
+  "keywords": [
+    "react",
+    "modal",
+    "dialog"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "specs",
+    "modules",
+    "examples",
+    "script",
+    "CONTRIBUTING.md",
+    "karma.conf.js",
+    "package.json"
+  ],
+  "_release": "0.1.1",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.1.1",
+    "commit": "0b2028e6158654750cc3148444ec7d961adb8f91"
+  },
+  "_source": "git://github.com/rackt/react-modal.git",
+  "_target": "0.1.1",
+  "_originalSource": "react-modal"
+}

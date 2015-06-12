@@ -24,8 +24,8 @@ describe 'rubric_assessment_submission_reminder.sms' do
     user_model
     rubric_assessment_model(:user => @user)
     @object = @rubric_assessment
-    @object.rubric_association.should_not be_nil
-    @object.rubric_association.context.should_not be_nil
+    expect(@object.rubric_association).not_to be_nil
+    expect(@object.rubric_association.context).not_to be_nil
     generate_message(:rubric_assessment_submission_reminder, :sms, @object, :user => @user)
   end
 end

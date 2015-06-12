@@ -50,10 +50,6 @@ module MigratorHelper
     end
   end
 
-  def self.unzip_command(zip_file, dest_dir)
-    "unzip -qo #{Shellwords.escape(zip_file)} -d #{Shellwords.escape(dest_dir)} 2>&1"
-  end
-
   def add_error(type, message, object=nil, e=nil)
     logger.error message
     @error_count += 1
@@ -113,7 +109,7 @@ module MigratorHelper
 
     path = create_export_dir(slug)
     i = 1
-    while File.exists?(path) && File.directory?(path)
+    while File.exist?(path) && File.directory?(path)
       i += 1
       path = create_export_dir("#{slug}_attempt_#{i}")
     end
@@ -138,7 +134,6 @@ module MigratorHelper
   # Does a JSON export of the courses
   def save_to_file(file_name = nil)
     make_export_dir
-    add_assessment_id_prepend
 
     @course = @course.with_indifferent_access
     Importers::AssessmentQuestionImporter.preprocess_migration_data(@course)
@@ -152,79 +147,76 @@ module MigratorHelper
     File.open(file_name, 'w') { |file| file << @course.to_json}
     file_name
   end
-  
-  def self.download_archive(settings)
-    config = ConfigFile.load('external_migration') || {}
-    if settings[:export_archive_path]
-      settings[:archive_file] = File.open(settings[:export_archive_path], 'rb')
-    elsif settings[:course_archive_download_url].present?
-      # open-uri downloads the http response to a tempfile
-      settings[:archive_file] = open(settings[:course_archive_download_url])
-    elsif settings[:attachment_id]
-      att = Attachment.find(settings[:attachment_id])
-      settings[:archive_file] = att.open(:temp_folder => config[:data_folder], :need_local_file => true)
-    else
-      raise "No migration file found"
-    end
-
-    settings[:archive_file]
-  end
 
   def id_prepender
     @settings[:id_prepender]
   end
-  
-  def prepend_id(id, prepend_value=nil)
-    prepend_value ||= id_prepender
+
+  def self.prepend_id(id, prepend_value)
     prepend_value ? "#{prepend_value}_#{id}" : id
   end
-  
-  def add_assessment_id_prepend
-    if id_prepender && !@settings[:overwrite_quizzes]
-      if @course[:assessment_questions] && @course[:assessment_questions][:assessment_questions]
-        prepend_id_to_questions(@course[:assessment_questions][:assessment_questions])
-      end
-      if @course[:assessments] && @course[:assessments][:assessments]
-        prepend_id_to_assessments(@course[:assessments][:assessments])
-        prepend_id_to_linked_assessment_module_items(@course[:modules]) if @course[:modules]
+
+  def self.should_prepend?(type, id, existing_ids)
+    existing_ids.nil? || existing_ids[type].to_a.include?(id)
+  end
+
+  def self.prepend_id_to_assessment_question_banks(banks, prepend_value, existing_ids=nil)
+    banks.each do |b|
+      if should_prepend?(:assessment_question_banks, b[:migration_id], existing_ids)
+        b[:migration_id] = prepend_id(b[:migration_id], prepend_value)
       end
     end
   end
-  
-  def prepend_id_to_questions(questions, prepend_value=nil)
+
+  # still used by standard/quiz_converter
+  def self.prepend_id_to_questions(questions, prepend_value, existing_ids=nil)
+    key_types = {:migration_id => :assessment_questions, :question_bank_id => :assessment_question_banks,
+     :question_bank_migration_id => :assessment_question_banks, :assessment_question_migration_id => :assessment_questions}
+
     questions.each do |q|
-      q[:migration_id] = prepend_id(q[:migration_id], prepend_value)
-      q[:question_bank_id] = prepend_id(q[:question_bank_id], prepend_value) if q[:question_bank_id].present?
+      key_types.each do |key, type|
+        q[key] = prepend_id(q[key], prepend_value) if q[key].present? && should_prepend?(type, q[key], existing_ids)
+      end
     end
   end
-  
-  def prepend_id_to_assessments(assessments, prepend_value=nil)
+
+  def self.prepend_id_to_assessments(assessments, prepend_value, existing_ids=nil)
     assessments.each do |a|
-      a[:migration_id] = prepend_id(a[:migration_id], prepend_value)
-      if h = a[:assignment]
-        h[:migration_id] = prepend_id(h[:migration_id], prepend_value)
+      if a[:migration_id].present? && should_prepend?(:assessments, a[:migration_id], existing_ids)
+        a[:migration_id] = prepend_id(a[:migration_id], prepend_value)
+        if h = a[:assignment]
+          h[:migration_id] = prepend_id(h[:migration_id], prepend_value)
+        end
       end
 
       a[:questions].each do |q|
         if q[:question_type] == "question_reference"
-          q[:migration_id] = prepend_id(q[:migration_id], prepend_value)
+          if should_prepend?(:assessment_questions, q[:migration_id], existing_ids)
+            q[:migration_id] = prepend_id(q[:migration_id], prepend_value)
+          end
         elsif q[:question_type] == "question_group"
-          q[:question_bank_migration_id] = prepend_id(q[:question_bank_migration_id], prepend_value) if q[:question_bank_migration_id].present?
+          if q[:question_bank_migration_id].present? && should_prepend?(:assessment_question_banks, q[:question_bank_migration_id], existing_ids)
+            q[:question_bank_migration_id] = prepend_id(q[:question_bank_migration_id], prepend_value)
+          end
           q[:questions].each do |gq|
-            gq[:migration_id] = prepend_id(gq[:migration_id], prepend_value)
+            if should_prepend?(:assessment_questions, gq[:migration_id], existing_ids)
+              gq[:migration_id] = prepend_id(gq[:migration_id], prepend_value)
+            end
           end
         end
       end
     end
   end
 
-  def prepend_id_to_linked_assessment_module_items(modules, prepend_value=nil)
+  def self.prepend_id_to_linked_assessment_module_items(modules, prepend_value, existing_ids=nil)
     modules.each do |m|
       next unless m[:items]
       m[:items].each do |i|
         if i[:linked_resource_type] =~ /assessment|quiz/i
-          i[:item_migration_id] = prepend_id(i[:item_migration_id], prepend_value)
-          i[:linked_resource_id] = prepend_id(i[:linked_resource_id], prepend_value)
+          if should_prepend?(:assessments, i[:linked_resource_id], existing_ids)
+            i[:item_migration_id] = prepend_id(i[:item_migration_id], prepend_value)
+            i[:linked_resource_id] = prepend_id(i[:linked_resource_id], prepend_value)
+          end
         end
       end
     end

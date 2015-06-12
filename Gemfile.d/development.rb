@@ -1,15 +1,14 @@
 group :development do
   gem 'guard', '1.8.0'
   gem 'listen', '~>1.3' # pinned to fix guard error
-  gem 'rb-inotify', '~>0.9.0', :require => false
-  gem 'rb-fsevent', :require => false
-  gem 'rb-fchange', :require => false
+  gem 'rb-inotify', '~>0.9.0', require: false
+  gem 'rb-fsevent', require: false
+  gem 'rb-fchange', require: false
+  gem 'colorize', require: false
 
-  if CANVAS_RAILS3
-    gem "letter_opener"
-  else
-    gem "letter_opener", :github => 'cavi21/letter_opener'
-  end
+  gem "letter_opener"
+  gem 'spring', '>= 1.3.0'
+  gem 'spring-commands-rspec', '1.0.2'
 
   # Option to DISABLE_RUBY_DEBUGGING is helpful IDE-based debugging.
   # The ruby debug gems conflict with the IDE-based debugger gem.
@@ -17,11 +16,8 @@ group :development do
 
 
   unless ENV['DISABLE_RUBY_DEBUGGING']
-    if RUBY_VERSION >= '2.2'
-      gem 'byebug', '3.1.2'
-    end
-    gem 'byebug', '3.1.2', :platforms => [:ruby_20, :ruby_21]
-      gem 'columnize', '0.8.9', :platforms => [:ruby_20, :ruby_21]
-    gem 'debugger', '1.6.6', :platforms => :ruby_19
+    gem 'byebug', '4.0.5', platforms: [:ruby_20, :ruby_21, :ruby_22]
+      gem 'columnize', '0.9.0', platforms: [:ruby_20, :ruby_21, :ruby_22], require: false
+    gem 'debugger', '1.6.6', platforms: :ruby_19
   end
 end

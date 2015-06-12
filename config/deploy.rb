@@ -1,5 +1,5 @@
 # config valid only for Capistrano 3.1
-lock '3.2.1'
+lock '3.4.0'
 
 set :application, 'canvas'
 set :repo_url, 'git@github.com:beyond-z/canvas-lms.git'
@@ -73,7 +73,7 @@ end
 Rake::Task["deploy:rollback_assets"].clear_actions
 
 # Disable for now until we get the basic Cap deploy and rollback going for code and can really test this.
-Rake::Task["deploy:migrate"].clear_actions
+#Rake::Task["deploy:migrate"].clear_actions
 
 Rake::Task["deploy:restart"].clear_actions
 
@@ -110,10 +110,10 @@ namespace :deploy do
 
   before :updated, :clone_qtimigrationtool
 
-  desc "Migrate database"
-  task :migrate do
-    # TODO: need to get this working, but for now we're just focusing on getting a code deploy and rollback flow going
-  end
+  #desc "Migrate database"
+  #task :migrate do
+  #  # TODO: need to get this working, but for now we're just focusing on getting a code deploy and rollback flow going
+  #end
 
   desc "Compile static assets"
   task :compile_assets => :set_compile_assets_vars do
@@ -205,8 +205,8 @@ namespace :deploy do
       group = fetch :group
       execute :sudo, 'chown -R', "#{group}:#{group}", "#{release_path}"
       within release_path do
-        execute :sudo, 'chown', "#{user}", "config/*", "Gemfile.lock", "config.ru"
-        execute :sudo, 'chmod 400', "config/*.yml"
+        execute :sudo, 'chown', "#{user}", "config/*", "Gemfile.lock", "config.ru", "tmp/"
+        execute :sudo, 'chmod 440', "config/*.yml"
       end
     end
   end
@@ -216,7 +216,7 @@ namespace :deploy do
   desc 'Restart application'
   task :restart do
     on roles(:app) do
-      execute :sudo, 'chmod g+w', release_path.join('tmp') # No clue why, but on prod the releases/XXXXX/tmp dir is created but not group writeable.
+      execute :sudo, 'chmod -R g+w', release_path.join('tmp') # No clue why, but on prod the releases/XXXXX/tmp dir is created but not group writeable.
       execute :touch, release_path.join('tmp/restart.txt')
     end
   end

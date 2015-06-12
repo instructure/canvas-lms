@@ -1,0 +1,49 @@
+<% content_for :page_title do %><%= @lti_launch.link_text %><% end %>
+
+<% js_bundle 'legacy/external_tools_tool_show' %>
+<% js_bundle :external_tool_redirect if @redirect_return %>
+
+<%= render @prepend_template if @prepend_template %>
+
+<% if @lti_launch.resource_url.start_with?('http://') %>
+    <div class="alert alert-error" id="insecure_content_msg">
+        <p><%= t('You are trying to launch insecure content from within a secure site (canvas).  Some web browsers may prevent this content from loading.') %></p>
+        <p id="load_failure" class="hide"><%= t('It looks like your content might not load.  You can use this button to try launching it in a new tab.') %></p>
+    </div>
+<% end %>
+
+<div class="tool_content_wrapper">
+
+<form action="<%= @lti_launch.resource_url %>"
+      class="hide"
+      method="POST" target=tool_content
+      id="tool_form"
+      data-tool-launch-type="<%= @lti_launch.launch_type %>"
+      data-tool-id="<%= @lti_launch.analytics_id %>"
+      data-tool-path="<%= @lti_launch.resource_path %>"
+      data-message-type="<%= @lti_launch.analytics_message_type %>">
+    <% @lti_launch.params.each do |key, value| %>
+        <%= hidden_field_tag key, value %>
+    <% end %>
+    <div style="margin-bottom: 20px;">
+        <div class="load_tab">
+            <%= t :new_tab, "This tool needs to be loaded in a new browser window" %>
+            <div style="margin: 10px 0;">
+                <button class="btn" type="submit"
+                        data-expired_message="<%= t :new_tab_expired, "The session for this tool has expired. Please reload the page to access the tool again" %>">
+                    <%= t :load_tool_new_tab_button, "Load %{tool} in a new window", :tool => @lti_launch.link_text %>
+                </button>
+            </div>
+        </div>
+        <div class="tab_loaded" style="display: none;">
+            <%= t :new_tab_loaded, "This tool was successfully loaded in a new browser window. Reload the page to access the tool again." %>
+        </div>
+    </div>
+</form>
+<%= iframe("about:blank", :name => 'tool_content', :id => 'tool_content', :width => '100%', :height => '100%',
+           allowfullscreen: "true", webkitallowfullscreen: "true", mozallowfullscreen: "true", tabindex:"0") %>
+
+</div>
+
+<%= render @append_template if @append_template %>
+<div id="module_sequence_footer"></div>

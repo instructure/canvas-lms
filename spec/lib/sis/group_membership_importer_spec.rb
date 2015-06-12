@@ -42,11 +42,11 @@ module SIS
         group = create_group(:group_category => group_category)
         
         importer = GroupMembershipImporter.new(Account.default, {})
-        lambda do
+        expect do
           importer.process do |importer|
             importer.add_group_membership(12345, group.sis_source_id, 'accepted')
           end
-        end.should raise_error(SIS::ImportError)
+        end.to raise_error(SIS::ImportError)
       end
     end
   end

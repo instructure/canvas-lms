@@ -1,9 +1,9 @@
 define [
   'jquery'
   'underscore'
-  'Backbone'
+  'compiled/models/FilesystemObject'
   'jquery.ajaxJSON'
-], ($, _, {Model}) ->
+], ($, _, FilesystemObject) ->
 
   # Simple model for creating an attachment in canvas
   #
@@ -12,13 +12,26 @@ define [
   # 1. you need to pass a preflightUrl in the options
   # 2. at some point, you need to do: `model.set('file', <input>)`
   #    where <input> is the DOM node (not $-wrapped) of the file input
-  class File extends Model
+  class File extends FilesystemObject
 
-    initialize: (attributes, options) ->
+    url: ->
+      if @isNew()
+        # if it is new, fall back to Backbone's default behavior of using
+        # the url of the collection this model belongs to.
+        # aka: POST /api/v1/folders/:folder_id/files (to create)
+        super
+      else
+        # for GET, PUT, and DELETE, our API expects "/api/v1/files/:file_id"
+        # not "/api/v1/folders/:folder_id/files/:file_id" which is what
+        # backbone would do by default.
+        "/api/v1/files/#{@id}"
+
+    initialize: (attributes, options = {}) ->
       @preflightUrl = options.preflightUrl
       super
 
     save: (attrs = {}, options = {}) ->
+      return super unless @get('file')
       @set attrs
       dfrd = $.Deferred()
       el = @get('file')
@@ -39,7 +52,7 @@ define [
       @set @uploadParams
       el.name = data.file_param
       @url = -> data.upload_url
-      Model::save.call this, null,
+      FilesystemObject::save.call this, null,
         multipart: true
         success: (data) =>
           dfrd.resolve(data)
@@ -49,8 +62,18 @@ define [
           options.error?(error)
 
     toJSON: ->
+      return super unless @get('file')
       _.pick(@attributes, 'file', _.keys(@uploadParams ? {})...)
 
     present: ->
       _.clone(@attributes)
 
+    externalToolEnabled: (tool) =>
+      if tool.accept_media_types && tool.accept_media_types.length > 0
+        content_type = @get('content-type')
+        _.find(tool.accept_media_types.split(","), (t) ->
+          regex = new RegExp("^#{t.replace('*', '.*')}$")
+          content_type.match(regex)
+        )
+      else
+        true

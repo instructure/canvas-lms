@@ -29,7 +29,7 @@ class ContentTag < ActiveRecord::Base
   belongs_to :content, :polymorphic => true
   validates_inclusion_of :content_type, :allow_nil => true, :in => ['Attachment', 'Assignment', 'WikiPage',
     'ContextModuleSubHeader', 'Quizzes::Quiz', 'ExternalUrl', 'LearningOutcome', 'DiscussionTopic',
-    'Rubric', 'ContextExternalTool', 'LearningOutcomeGroup', 'AssessmentQuestionBank', 'LiveAssessments::Assessment']
+    'Rubric', 'ContextExternalTool', 'LearningOutcomeGroup', 'AssessmentQuestionBank', 'LiveAssessments::Assessment', 'Lti::MessageHandler']
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'LearningOutcomeGroup',
     'Assignment', 'Account', 'Quizzes::Quiz']
@@ -278,8 +278,8 @@ class ContentTag < ActiveRecord::Base
   end
 
   def self.delete_for(asset)
-    ContentTag.find_all_by_content_id_and_content_type(asset.id, asset.class.to_s).each{|t| t.destroy }
-    ContentTag.find_all_by_context_id_and_context_type(asset.id, asset.class.to_s).each{|t| t.destroy }
+    ContentTag.where(content_id: asset, content_type: asset.class.to_s).each{|t| t.destroy }
+    ContentTag.where(context_id: asset, context_type: asset.class.to_s).each{|t| t.destroy }
   end
 
   alias_method :destroy!, :destroy
@@ -323,6 +323,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def locked_for?(user, opts={})
+    return unless self.context_module
     self.context_module.locked_for?(user, opts.merge({:tag => self}))
   end
   
@@ -359,7 +360,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def sync_workflow_state_to_asset?
-    self.content_type_quiz? || ['Assignment', 'WikiPage', 'DiscussionTopic'].include?(self.content_type)
+    self.content_type_quiz? || ['Attachment', 'Assignment', 'WikiPage', 'DiscussionTopic'].include?(self.content_type)
   end
 
   def content_type_quiz?
@@ -385,7 +386,7 @@ class ContentTag < ActiveRecord::Base
   def content_asset_string=(val)
     vals = val.split("_")
     id = vals.pop
-    type = Context::AssetTypes.get_for_string(vals.join("_").classify)
+    type = Context::asset_type_for_string(vals.join("_").classify)
     if type && id && id.to_i > 0
       self.content_type = type.to_s
       self.content_id = id
@@ -416,6 +417,57 @@ class ContentTag < ActiveRecord::Base
   }
   scope :learning_outcome_alignments, -> { where(:tag_type => 'learning_outcome') }
   scope :learning_outcome_links, -> { where(:tag_type => 'learning_outcome_association', :associated_asset_type => 'LearningOutcomeGroup', :content_type => 'LearningOutcome') }
+
+  # Scopes For Differentiated Assignment Filtering:
+
+  scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
+    for_non_differentiable_classes(user_ids, course_ids).union(
+    for_non_differentiable_discussions(user_ids, course_ids),
+    for_differentiable_assignments(user_ids, course_ids),
+    for_differentiable_discussions(user_ids, course_ids),
+    for_differentiable_quizzes(user_ids, course_ids))
+  }
+
+  scope :for_non_differentiable_classes, lambda {|user_ids, course_ids|
+    where("content_tags.content_type NOT IN ('Assignment','DiscussionTopic', 'Quiz','Quizzes::Quiz' ) AND content_tags.context_id IN (?)",course_ids)
+  }
+
+  scope :for_non_differentiable_discussions, lambda {|user_ids, course_ids|
+    joins("JOIN discussion_topics as dt ON dt.id = content_tags.content_id").
+    where("content_tags.context_id IN (?)
+           AND content_tags.content_type = 'DiscussionTopic'
+           AND dt.assignment_id IS NULL",course_ids)
+  }
+
+  scope :for_differentiable_assignments, lambda {|user_ids, course_ids|
+    joins("JOIN quiz_student_visibilities as qsv ON qsv.quiz_id = content_tags.content_id").
+    where(" content_tags.context_id IN (?)
+           AND qsv.course_id IN (?)
+           AND content_tags.content_type in ('Quiz', 'Quizzes::Quiz')
+           AND qsv.user_id = ANY( '{?}'::INT8[] )
+      ",course_ids,course_ids,user_ids)
+  }
+
+  scope :for_differentiable_discussions, lambda {|user_ids, course_ids|
+    joins("JOIN assignment_student_visibilities as asv ON asv.assignment_id = content_tags.content_id").
+    where("content_tags.context_id IN (?)
+           AND asv.course_id IN (?)
+           AND content_tags.content_type = 'Assignment'
+           AND asv.user_id = ANY( '{?}'::INT8[] )
+      ",course_ids,course_ids,user_ids)
+  }
+
+  scope :for_differentiable_quizzes, lambda {|user_ids, course_ids|
+    joins("JOIN discussion_topics as dt ON dt.id = content_tags.content_id AND content_tags.content_type = 'DiscussionTopic'").
+    joins("JOIN assignment_student_visibilities as asv ON asv.assignment_id = dt.assignment_id").
+    where("content_tags.context_id IN (?)
+           AND asv.course_id IN (?)
+           AND content_tags.content_type = 'DiscussionTopic'
+           AND dt.assignment_id IS NOT NULL
+           AND asv.course_id IN (?)
+           AND asv.user_id = ANY( '{?}'::INT8[] )
+    ",course_ids,course_ids,course_ids,user_ids)
+  }
 
   # only intended for learning outcome links
   def self.outcome_title_order_by_clause

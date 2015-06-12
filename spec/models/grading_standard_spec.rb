@@ -38,10 +38,10 @@ describe GradingStandard do
   end
 
   def compare_schemes(subject, expected)
-    subject.size.should == expected.size
+    expect(subject.size).to eq expected.size
     subject.each_with_index do |row, i|
-      row[0].should == expected[i][0]
-      row[1].should be_close(expected[i][1], 0.001)
+      expect(row[0]).to eq expected[i][0]
+      expect(row[1]).to be_within(0.001).of(expected[i][1])
     end
   end
 
@@ -55,8 +55,8 @@ describe GradingStandard do
     input = [['A', 0.9999]]
     standard = GradingStandard.new
     standard.data = input
-    standard.data[0][1].should be_close(0.9999, 0.00001)
-    input[0][1].should be_close(0.9999, 0.00001)
+    expect(standard.data[0][1]).to be_within(0.00001).of(0.9999)
+    expect(input[0][1]).to be_within(0.00001).of(0.9999)
   end
 
   it "should upgrade in memory when accessing data" do
@@ -64,7 +64,7 @@ describe GradingStandard do
     standard.write_attribute(:data, @default_standard_v1)
     standard.write_attribute(:version, 1)
     compare_schemes(standard.data, GradingStandard.default_grading_standard)
-    standard.version.should == GradingStandard::VERSION
+    expect(standard.version).to eq GradingStandard::VERSION
   end
 
   it "should not upgrade repeatedly when accessing data repeatedly" do
@@ -76,21 +76,21 @@ describe GradingStandard do
     compare_schemes(standard.data, GradingStandard.default_grading_standard)
   end
 
-  context "standards_for" do
+  context "#for" do
     it "should return standards that match the context" do
       grading_standard_for @course
 
-      standards = GradingStandard.standards_for(@course)
-      standards.length.should == 1
-      standards[0].id.should == @standard.id
+      standards = GradingStandard.for(@course)
+      expect(standards.length).to eq 1
+      expect(standards[0].id).to eq @standard.id
     end
 
     it "should include standards made in the parent account" do
       grading_standard_for @course.root_account
 
-      standards = GradingStandard.standards_for(@course)
-      standards.length.should == 1
-      standards[0].id.should == @standard.id
+      standards = GradingStandard.for(@course)
+      expect(standards.length).to eq 1
+      expect(standards[0].id).to eq @standard.id
     end
   end
 
@@ -104,9 +104,9 @@ describe GradingStandard do
         @course.assignments.create!(:title => "hi", :grading_standard_id => gs.id)
       end
 
-      standards = GradingStandard.standards_for(@course).sorted
-      standards.length.should == 2
-      standards.map(&:id).should == [gs.id, gs2.id]
+      standards = GradingStandard.for(@course).sorted
+      expect(standards.length).to eq 2
+      expect(standards.map(&:id)).to eq [gs.id, gs2.id]
     end
 
     it "it should return standards with a title first" do
@@ -115,42 +115,43 @@ describe GradingStandard do
       gs2.title = nil
       gs2.save!
 
-      standards = GradingStandard.standards_for(@course).sorted
-      standards.length.should == 2
-      standards.map(&:id).should == [gs.id, gs2.id]
+      standards = GradingStandard.for(@course).sorted
+      expect(standards.length).to eq 2
+      expect(standards.map(&:id)).to eq [gs.id, gs2.id]
     end
   end
 
   context "score_to_grade" do
     it "should compute correct grades" do
-      input = [['A', 0.90], ['B', 0.80], ['C', 0.675], ['D', 0.55], ['M', 0.00]]
+      input = [['A', 0.90], ['B+', 0.886], ['B', 0.80], ['C', 0.695], ['D', 0.55], ['M', 0.00]]
       standard = GradingStandard.new
       standard.data = input
-      standard.score_to_grade(1005).should eql("A")
-      standard.score_to_grade(105).should eql("A")
-      standard.score_to_grade(100).should eql("A")
-      standard.score_to_grade(99).should eql("A")
-      standard.score_to_grade(90).should eql("A")
-      standard.score_to_grade(89.999).should eql("B")
-      standard.score_to_grade(89.001).should eql("B")
-      standard.score_to_grade(89).should eql("B")
-      standard.score_to_grade(88.999).should eql("B")
-      standard.score_to_grade(80).should eql("B")
-      standard.score_to_grade(79).should eql("C")
-      standard.score_to_grade(67.501).should eql("C")
-      standard.score_to_grade(67.5).should eql("C")
-      standard.score_to_grade(67.499).should eql("D")
-      standard.score_to_grade(60).should eql("D")
-      standard.score_to_grade(50).should eql("M")
-      standard.score_to_grade(0).should eql("M")
-      standard.score_to_grade(-100).should eql("M")
+      expect(standard.score_to_grade(1005)).to eql("A")
+      expect(standard.score_to_grade(105)).to eql("A")
+      expect(standard.score_to_grade(100)).to eql("A")
+      expect(standard.score_to_grade(99)).to eql("A")
+      expect(standard.score_to_grade(90)).to eql("A")
+      expect(standard.score_to_grade(89.999)).to eql("B+")
+      expect(standard.score_to_grade(88.601)).to eql("B+")
+      expect(standard.score_to_grade(88.6)).to eql("B+")
+      expect(standard.score_to_grade(88.599)).to eql("B")
+      expect(standard.score_to_grade(80)).to eql("B")
+      expect(standard.score_to_grade(79.999)).to eql("C")
+      expect(standard.score_to_grade(79)).to eql("C")
+      expect(standard.score_to_grade(69.501)).to eql("C")
+      expect(standard.score_to_grade(69.5)).to eql("C")
+      expect(standard.score_to_grade(69.499)).to eql("D")
+      expect(standard.score_to_grade(60)).to eql("D")
+      expect(standard.score_to_grade(50)).to eql("M")
+      expect(standard.score_to_grade(0)).to eql("M")
+      expect(standard.score_to_grade(-100)).to eql("M")
     end
 
     it "should assign the lowest grade to below-scale scores" do
       input = [['A', 0.90], ['B', 0.80], ['C', 0.70], ['D', 0.60], ['E', 0.50]]
       standard = GradingStandard.new
       standard.data = input
-      standard.score_to_grade(40).should eql("E")
+      expect(standard.score_to_grade(40)).to eql("E")
     end
   end
 
@@ -161,12 +162,12 @@ describe GradingStandard do
 
     it "should return a score in the proper range for letter grades" do
       score = @gs.grade_to_score('B')
-      score.should eql(86.0)
+      expect(score).to eql(86.0)
     end
 
     it "should return nil when no grade matches" do
       score = @gs.grade_to_score('Z')
-      score.should eql(nil)
+      expect(score).to eql(nil)
     end
   end
 
@@ -189,12 +190,12 @@ describe GradingStandard do
 
     it "should match alphabetical keys regardless of case" do
       idx = @gs.place_in_scheme('m')
-      idx.should eql(11)
+      expect(idx).to eql(11)
     end
 
     it "should match numeric keys" do
       idx = @gs.place_in_scheme(4)
-      idx.should eql(0)
+      expect(idx).to eql(0)
     end
 
     it "should not confuse letters and zeros" do
@@ -205,7 +206,7 @@ describe GradingStandard do
                   "1.4" => 0.5}
       [[4,0],["m",1],[0,2],["C",3],["1.4",4]].each do |grade,exp_index|
         idx = @gs.place_in_scheme(grade)
-        idx.should eql(exp_index)
+        expect(idx).to eql(exp_index)
       end
     end
   end
@@ -214,11 +215,182 @@ describe GradingStandard do
     it "should not count deleted standards in associations" do
       grading_standard_for(@course)
       grading_standard_for(@course).destroy
-      @course.grading_standards.count.should == 1
+      expect(@course.grading_standards.count).to eq 1
 
       grading_standard_for(@course.root_account)
       grading_standard_for(@course.root_account).destroy
-      @course.root_account.grading_standards.count.should == 1
+      expect(@course.root_account.grading_standards.count).to eq 1
+    end
+  end
+
+  describe "assessed_assignment?" do
+    before(:once) do
+      student_in_course active_all: true
+      @gs = grading_standard_for @course, title: "gs"
+    end
+
+    context "without assignment link" do
+      it "should be false" do
+        expect(@gs).not_to be_assessed_assignment
+      end
+    end
+
+    context "with assignment link" do
+      before(:once) do
+        @assignment = @course.assignments.create!(:title => "hi",
+          :grading_type => 'letter_grade', :grading_standard_id => @gs.id, :submission_types => ["online_text_entry"])
+      end
+
+      context "without submissions" do
+        it "should be false" do
+          expect(@gs).not_to be_assessed_assignment
+        end
+      end
+
+      context "with submissions" do
+        before(:once) do
+          @submission = @assignment.submit_homework(@student, :body => "done!")
+        end
+
+        it "should be false if no submissions are graded" do
+          expect(@gs).not_to be_assessed_assignment
+        end
+
+        it "should be true if a graded submission exists" do
+          @submission.grade_it!
+          expect(@gs).to be_assessed_assignment
+        end
+      end
+    end
+  end
+
+  describe "permissions:" do
+    context "course belonging to root account" do
+      before(:once) do
+        @root_account = Account.default
+        @sub_account = @root_account.sub_accounts.create!
+        course_with_teacher_logged_in(account: @root_account)
+        @enrollment.update_attributes(workflow_state: "active")
+        @root_account_standard = grading_standard_for(@root_account)
+        @sub_account_standard = grading_standard_for(@sub_account)
+        @course_standard = grading_standard_for(@course)
+
+      end
+
+      context "root-account admin" do
+        before(:once) do
+          account_admin_user(account: @root_account)
+        end
+
+        it "should be able to manage root-account level grading standards" do
+          expect(@root_account_standard.grants_right?(@admin, :manage)).to eq(true)
+        end
+
+        it "should be able to manage sub-account level grading standards" do
+          expect(@sub_account_standard.grants_right?(@admin, :manage)).to eq(true)
+        end
+
+
+        it "should be able to manage course level grading standards" do
+          expect(@course_standard.grants_right?(@admin, :manage)).to eq(true)
+        end
+      end
+
+      context "sub-account admin" do
+        before(:once) do
+          account_admin_user(account: @sub_account)
+        end
+
+        it "should NOT be able to manage root-account level grading standards" do
+          expect(@root_account_standard.grants_right?(@admin, :manage)).to eq(false)
+        end
+
+        it "should be able to manage sub-account level grading standards" do
+          expect(@sub_account_standard.grants_right?(@admin, :manage)).to eq(true)
+        end
+
+
+        it "should NOT be able to manage course level grading standards, when the course is under the root-account" do
+          expect(@course_standard.grants_right?(@admin, :manage)).to eq(false)
+        end
+      end
+
+      context "teacher" do
+        it "should NOT be able to manage root-account level grading standards" do
+          expect(@root_account_standard.grants_right?(@teacher, :manage)).to eq(false)
+        end
+
+        it "should NOT be able to manage sub-account level grading standards" do
+          expect(@sub_account_standard.grants_right?(@teacher, :manage)).to eq(false)
+        end
+
+        it "should be able to manage course level grading standards" do
+          expect(@course_standard.grants_right?(@teacher, :manage)).to eq(true)
+        end
+      end
+    end
+    context "course belonging to sub-account" do
+      before(:once) do
+        @root_account = Account.default
+        @sub_account = @root_account.sub_accounts.create!
+        course_with_teacher_logged_in(account: @sub_account)
+        @enrollment.update_attributes(workflow_state: "active")
+        @root_account_standard = grading_standard_for(@root_account)
+        @sub_account_standard = grading_standard_for(@sub_account)
+        @course_standard = grading_standard_for(@course)
+      end
+
+      context "root-account admin" do
+        before(:once) do
+          account_admin_user(account: @root_account)
+        end
+
+        it "should be able to manage root-account level grading standards" do
+          expect(@root_account_standard.grants_right?(@admin, :manage)).to eq(true)
+        end
+
+        it "should be able to manage sub-account level grading standards" do
+          expect(@sub_account_standard.grants_right?(@admin, :manage)).to eq(true)
+        end
+
+
+        it "should be able to manage course level grading standards" do
+          expect(@course_standard.grants_right?(@admin, :manage)).to eq(true)
+        end
+      end
+
+      context "sub-account admin" do
+        before(:once) do
+          account_admin_user(account: @sub_account)
+        end
+
+        it "should NOT be able to manage root-account level grading standards" do
+          expect(@root_account_standard.grants_right?(@admin, :manage)).to eq(false)
+        end
+
+        it "should be able to manage sub-account level grading standards" do
+          expect(@sub_account_standard.grants_right?(@admin, :manage)).to eq(true)
+        end
+
+
+        it "should be able to manage course level grading standards, when the course is under the sub-account" do
+          expect(@course_standard.grants_right?(@admin, :manage)).to eq(true)
+        end
+      end
+
+      context "teacher" do
+        it "should NOT be able to manage root-account level grading standards" do
+          expect(@root_account_standard.grants_right?(@teacher, :manage)).to eq(false)
+        end
+
+        it "should NOT be able to manage sub-account level grading standards" do
+          expect(@sub_account_standard.grants_right?(@teacher, :manage)).to eq(false)
+        end
+
+        it "should be able to manage course level grading standards" do
+          expect(@course_standard.grants_right?(@teacher, :manage)).to eq(true)
+        end
+      end
     end
   end
 end

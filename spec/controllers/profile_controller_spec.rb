@@ -19,63 +19,63 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe ProfileController do
+  before :once do
+    course_with_teacher(:active_all => true)
+    user_with_pseudonym(:active_user => true)
+  end
+
   describe "show" do
     it "should not require an id for yourself" do
-      user
       user_session(@user)
 
       get 'show'
-      response.should render_template('profile')
+      expect(response).to render_template('profile')
     end
 
     it "should chain to settings when it's the same user" do
-      user
       user_session(@user)
 
       get 'show', :user_id => @user.id
-      response.should render_template('profile')
+      expect(response).to render_template('profile')
     end
 
     it "should require a password session when chaining to settings" do
-      user
       user_session(@user)
       session[:used_remember_me_token] = true
 
       get 'show', :user_id => @user.id
-      response.should redirect_to(login_url)
+      expect(response).to redirect_to(login_url)
     end
   end
 
   describe "update" do
     it "should allow changing the default e-mail address and nothing else" do
-      user_with_pseudonym(:active_user => true)
       user_session(@user, @pseudonym)
-      @cc.position.should == 1
+      expect(@cc.position).to eq 1
       @cc2 = @user.communication_channels.create!(:path => 'email2@example.com')
-      @cc2.position.should == 2
+      expect(@cc2.position).to eq 2
       put 'update', :user_id => @user.id, :default_email_id => @cc2.id, :format => 'json'
-      response.should be_success
-      @cc2.reload.position.should == 1
-      @cc.reload.position.should == 2
+      expect(response).to be_success
+      expect(@cc2.reload.position).to eq 1
+      expect(@cc.reload.position).to eq 2
     end
 
     it "should allow changing the default e-mail address and nothing else (name changing disabled)" do
       @account = Account.default
       @account.settings = { :users_can_edit_name => false }
       @account.save!
-      user_with_pseudonym(:active_user => true)
       user_session(@user, @pseudonym)
-      @cc.position.should == 1
+      expect(@cc.position).to eq 1
       @cc2 = @user.communication_channels.create!(:path => 'email2@example.com')
-      @cc2.position.should == 2
+      expect(@cc2.position).to eq 2
       put 'update', :user_id => @user.id, :default_email_id => @cc2.id, :format => 'json'
-      response.should be_success
-      @cc2.reload.position.should == 1
-      @cc.reload.position.should == 2
+      expect(response).to be_success
+      expect(@cc2.reload.position).to eq 1
+      expect(@cc.reload.position).to eq 2
     end
 
     it "should not allow a student view student profile to be edited" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       @fake_student = @course.student_view_student
       session[:become_user_id] = @fake_student.id
 
@@ -90,21 +90,22 @@ describe ProfileController do
       # as part of throttling a user's "immediate" messages. Eventually we should fix how that
       # works, but for now we just make sure that that state does not cause an error for the
       # user when they go to their notification preferences.
-      user_model
-      @user.update_attribute :workflow_state, 'registered'
       user_session(@user)
       cc = @user.communication_channels.create!(:path => 'user@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
       cc.notification_policies.create!(:notification => nil, :frequency => 'daily')
 
       get 'communication'
-      response.should be_success
+      expect(response).to be_success
     end
   end
 
   describe "update_profile" do
-    before do
+    before :once do
       user_with_pseudonym
       @user.register
+    end
+
+    before :each do
       # reload to catch the user change
       user_session(@user, @pseudonym.reload)
     end
@@ -114,13 +115,13 @@ describe ProfileController do
           :user => {:short_name => 'Monsturd', :name => 'Jenkins'},
           :user_profile => {:bio => '...', :title => '!!!'},
           :format => 'json'
-      response.should be_success
+      expect(response).to be_success
 
       @user.reload
-      @user.short_name.should eql 'Monsturd'
-      @user.name.should_not eql 'Jenkins'
-      @user.profile.bio.should eql '...'
-      @user.profile.title.should eql '!!!'
+      expect(@user.short_name).to eql 'Monsturd'
+      expect(@user.name).not_to eql 'Jenkins'
+      expect(@user.profile.bio).to eql '...'
+      expect(@user.profile.title).to eql '!!!'
     end
 
     it "should not let you change your short_name information if you are not allowed" do
@@ -134,13 +135,13 @@ describe ProfileController do
           :user => {:short_name => 'Monsturd', :name => 'Jenkins'},
           :user_profile => {:bio => '...', :title => '!!!'},
           :format => 'json'
-      response.should be_success
+      expect(response).to be_success
 
       @user.reload
-      @user.short_name.should eql old_name
-      @user.name.should_not eql 'Jenkins'
-      @user.profile.bio.should eql '...'
-      @user.profile.title.should eql old_title
+      expect(@user.short_name).to eql old_name
+      expect(@user.name).not_to eql 'Jenkins'
+      expect(@user.profile.bio).to eql '...'
+      expect(@user.profile.title).to eql old_title
     end
 
     it "should let you set visibility on user_services" do
@@ -151,11 +152,11 @@ describe ProfileController do
         :user_profile => {:bio => '...'},
         :user_services => {:twitter => "1", :skype => "false"},
         :format => 'json'
-      response.should be_success
+      expect(response).to be_success
 
       @user.reload
-      @user.user_services.find_by_service('skype').visible?.should be_false
-      @user.user_services.find_by_service('twitter').visible?.should be_true
+      expect(@user.user_services.where(service: 'skype').first.visible?).to be_falsey
+      expect(@user.user_services.where(service: 'twitter').first.visible?).to be_truthy
     end
 
     it "should let you set your profile links" do
@@ -164,10 +165,10 @@ describe ProfileController do
         :link_urls => ['example.com', 'foo.com', ''],
         :link_titles => ['Example.com', 'Foo', ''],
         :format => 'json'
-      response.should be_success
+      expect(response).to be_success
 
       @user.reload
-      @user.profile.links.map { |l| [l.url, l.title] }.should == [
+      expect(@user.profile.links.map { |l| [l.url, l.title] }).to eq [
         %w(example.com Example.com),
         %w(foo.com Foo)
       ]

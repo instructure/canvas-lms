@@ -1,11 +1,11 @@
 define [
-  'i18n!gradebook2'
   'underscore'
   'Backbone'
   'compiled/util/Popover'
+  'compiled/models/grade_summary/Outcome'
   'vendor/d3.v3'
-  'jst/gradebook2/outcome_popover'
-], (I18n, _, {View}, Popover, d3, popover_template) ->
+  'jst/outcomes/outcomePopover'
+], (_, {View}, Popover, Outcome, d3, popover_template) ->
 
   class OutcomeColumnView extends View
 
@@ -24,7 +24,8 @@ define [
     createPopover: (e) ->
       @totalsFn()
       @pickColors()
-      popover = new Popover(e, @popover_template(@attributes), verticalSide: 'bottom')
+      attributes = new Outcome(@attributes)
+      popover = new Popover(e, @popover_template(attributes.present()), verticalSide: 'bottom', invertOffset: true)
       popover.el.on('mouseenter', @mouseenter)
       popover.el.on('mouseleave', @mouseleave)
       @renderChart()
@@ -45,6 +46,7 @@ define [
 
     pickColors: ->
       data = @attributes.ratings
+      return unless data
       last = data.length - 1
       mastery = @attributes.mastery_points
       mastery_pos = data.indexOf(

@@ -1,0 +1,68 @@
+@import "base/environment";
+
+#minical {
+  background-color: #fff;
+  text-shadow: none;
+  @if $use_new_styles { border: 1px solid $ic-border-light; }
+  @else {
+    border: 1px solid #ccc;
+    border-radius: 3px;
+  }
+
+  .fc-header {
+    background: none;
+    border-top: none;
+    color: #666;
+    text-shadow: none;
+    h2, .h2 { color: #666; }
+    @if $use_new_styles { border-bottom: 1px solid $ic-border-light; }
+    @else { border-bottom: 1px solid #ccc; }
+  }
+
+  thead {
+    display: none;
+  }
+
+  .fc-content {
+    padding: 6px;
+    table {
+      border-spacing: 8px 2px;
+    }
+  }
+
+  .fc-widget-content {
+    background: none;
+    background-radius: 3px;
+    border-radius: 3px;
+    border: 1px solid #fff;
+    div {
+      min-height: 0 !important;
+    }
+  }
+
+  .fc-day-number {
+    line-height: 20px;
+  }
+
+  .fc-other-month {
+    background-image: none;
+  }
+
+  .fc-state-highlight {
+    background: none;
+    color: #666;
+    border-color: #fa0;
+    font-weight: bold;
+    box-shadow: none;
+    text-shadow: none;
+  }
+
+  .event {
+    @if $use_new_styles { 
+      background-color: $lightBackground;
+      border: 1px solid $ic-border-light;
+    }
+    @else { background-color: #e4e8ed; }
+    .fc-day-content { display:none; }
+  }
+}

@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+require 'nokogiri'
+
 describe ProfileController do
   it "should respect account setting for editing names" do
     a = Account.create!
@@ -28,22 +30,22 @@ describe ProfileController do
     user_session(u, p)
 
     get '/profile/settings'
-    Nokogiri::HTML(response.body).css('input#user_short_name').should_not be_empty
+    expect(Nokogiri::HTML(response.body).css('input#user_short_name')).not_to be_empty
 
     put '/profile', :user => { :short_name => 'Cody' }
-    response.should be_redirect
-    u.reload.short_name.should == 'Cody'
+    expect(response).to be_redirect
+    expect(u.reload.short_name).to eq 'Cody'
 
     a.settings[:users_can_edit_name] = false
     a.save!
     p.reload
 
     get '/profile/settings'
-    Nokogiri::HTML(response.body).css('input#user_short_name').should be_empty
+    expect(Nokogiri::HTML(response.body).css('input#user_short_name')).to be_empty
 
     put '/profile', :user => { :short_name => 'JT' }
-    response.should be_redirect
-    u.reload.short_name.should == 'Cody'
+    expect(response).to be_redirect
+    expect(u.reload.short_name).to eq 'Cody'
   end
 
   it "should not show student view student edit profile or other services options" do
@@ -51,6 +53,6 @@ describe ProfileController do
     enter_student_view
 
     get '/profile/settings'
-    assert_unauthorized
+    expect(response.status).to eq 401
   end
 end

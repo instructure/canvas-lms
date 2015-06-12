@@ -51,11 +51,12 @@ define [
           group = if model instanceof Outcome then model.outcomeGroup else model
           # don't re-add to group
           return if group.id is @model.id
+          originaldir = @dir.sidebar._findLastDir()
           @triggerSelect() # select to get the directory ready
           disablingDfd = new $.Deferred()
           @dir.$el.disableWhileLoading disablingDfd
           @dir.sidebar.dirForGroup(@model).promise().done (dir) ->
-            dir.moveModelHere(model).done ->
+            dir.moveModelHere(model, originaldir).done ->
               disablingDfd.resolve()
 
     render: ->

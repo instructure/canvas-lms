@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: qtimetadata vocabulary is ignored
+Unmapped metadata field: respondusapi_qtype=multipleResponse
+Converting proprietary Blackboard metadata field respondusapi_qpoints = 1.00
+Warning: min/max constraint on outcome will generate additional rules in responseProcessing
+Warning: case-insensitive comparison of identifiers not supported in version 2
+	-->
+
+<assessmentItem
+    xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="QUE_1049"
+    title="Media Wizard"
+    adaptive="false"
+    timeDependent="false">
+  <instructureMetadata>
+    <instructureField name="max_score" value="1.00" />
+  </instructureMetadata>
+  <responseDeclaration identifier="QUE_1050_RL" cardinality="multiple" baseType="identifier"/>
+  <outcomeDeclaration identifier="QUE_SCORE" cardinality="single" baseType="integer">
+    <defaultValue><value>0</value></defaultValue></outcomeDeclaration>
+  <itemBody>
+    <div class="html"> &lt;br&gt; I&quot;m not good at xml so i&quot;m going to put in some unmatched &lt; brackets here &lt;br&gt; oh here have some more &gt; &gt; &lt;
+      </div>
+    <choiceInteraction responseIdentifier="QUE_1050_RL" shuffle="false" maxChoices="1">
+      <simpleChoice identifier="QUE_1051_A1" fixed="true">
+        <div class="html">YouTube &lt;br&gt;
+          &lt;object width=&quot;425&quot; height=&quot;344&quot;&gt;&lt;param name=&quot;movie&quot; value=&quot;http://www.youtube.com/v/fTQPCocCwJo?f=videos&amp;app=youtube_gdata&amp;rel=0&amp;autoplay=0&amp;loop=0&quot;&gt;&lt;/param&gt;&lt;embed src=&quot;http://www.youtube.com/v/fTQPCocCwJo?f=videos&amp;app=youtube_gdata&amp;rel=0&amp;autoplay=0&amp;loop=0&quot; type=&quot;application/x-shockwave-flash&quot; width=&quot;425&quot; height=&quot;344&quot;&gt;&lt;/embed&gt;&lt;/object&gt;&lt;!-- RspH:U:E --&gt;</div></simpleChoice>
+      <simpleChoice identifier="QUE_1052_A2" fixed="true">
+        <div class="html">Google Picasa&lt;br&gt;
+          &lt;span style=&quot; color:#000000;&quot;&gt;&lt;IMG src=&quot;http://lh4.ggpht.com/_U8dXqlIRHu8/Ss4167b2RzI/AAAAAAAAABs/MVyeP6FhYDM/picasa-logo.jpg&quot; width=150 height=59 border=0&gt;&lt;!-- RspH:P:I:W:150:H:59 --&gt;&lt;/span&gt;&amp;nbsp; </div></simpleChoice>
+      <simpleChoice identifier="QUE_1053_A3" fixed="true">
+        <div class="html">Facebook &lt;script&gt;alert(0xFACE)&lt;/script&gt;</div></simpleChoice>
+      <simpleChoice identifier="QUE_1054_A4" fixed="true">
+        <div class="html"> &lt;br&gt; Twitter &lt; br &gt; </div></simpleChoice>
+    </choiceInteraction>
+  </itemBody>
+  <responseProcessing>
+    <responseCondition>
+      <responseIf><member><baseValue baseType="identifier">QUE_1051_A1</baseValue><variable identifier="QUE_1050_RL"/></member>
+        <setOutcomeValue identifier="QUE_SCORE"><sum><variable identifier="QUE_SCORE"/><baseValue baseType="integer">50.00</baseValue></sum></setOutcomeValue>
+      </responseIf>
+      <responseElseIf><member><baseValue baseType="identifier">QUE_1052_A2</baseValue><variable identifier="QUE_1050_RL"/></member>
+        <setOutcomeValue identifier="QUE_SCORE"><sum><variable identifier="QUE_SCORE"/><baseValue baseType="integer">50.00</baseValue></sum></setOutcomeValue>
+      </responseElseIf>
+      <responseElseIf><member><baseValue baseType="identifier">QUE_1053_A3</baseValue><variable identifier="QUE_1050_RL"/></member>
+        <setOutcomeValue identifier="QUE_SCORE"><sum><variable identifier="QUE_SCORE"/><baseValue baseType="integer">-100.00</baseValue></sum></setOutcomeValue>
+      </responseElseIf>
+      <responseElseIf><member><baseValue baseType="identifier">QUE_1054_A4</baseValue><variable identifier="QUE_1050_RL"/></member>
+        <setOutcomeValue identifier="QUE_SCORE"><sum><variable identifier="QUE_SCORE"/><baseValue baseType="integer">-100.00</baseValue></sum></setOutcomeValue>
+      </responseElseIf>
+    </responseCondition>
+    <responseCondition>
+      <responseIf><gt><variable identifier="QUE_SCORE"/><baseValue baseType="integer">100</baseValue></gt>
+        <setOutcomeValue identifier="QUE_SCORE"><baseValue baseType="integer">100</baseValue></setOutcomeValue>
+      </responseIf>
+    </responseCondition>
+  </responseProcessing>
+</assessmentItem>

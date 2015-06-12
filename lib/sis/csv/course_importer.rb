@@ -24,6 +24,10 @@ module SIS
         row.include?('course_id') && row.include?('short_name')
       end
 
+      def self.identifying_fields
+        %w[course_id].freeze
+      end
+
       # expected columns
       # course_id,short_name,long_name,account_id,term_id,status
       def process(csv)

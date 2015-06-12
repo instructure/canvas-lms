@@ -28,6 +28,7 @@ module Quizzes::QuizQuestion::AnswerParsers
           id: fields.fetch_any([:id, :answer_id], nil).try(:to_i),
           text: fields.fetch_with_enforced_length([:answer_text, :text]),
           comments: fields.fetch_with_enforced_length([:answer_comment, :comments]),
+          comments_html: fields.fetch_with_enforced_length([:answer_comment_html, :comments_html]),
           weight: fields.fetch_any(:answer_weight, 0).to_f,
           blank_id: fields.fetch_with_enforced_length(:blank_id)
         }

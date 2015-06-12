@@ -65,18 +65,48 @@
           <label for="assignment_peer_reviews_assign_at">
             {{#t "locked_until"}}Assign Reviews{{/t}}
           </label>
-          <input id="assignment_peer_reviews_assign_at"
-            name="{{#if nested}}assignment[peer_reviews_assign_at]{{else}}peer_reviews_assign_at{{/if}}"
-            class="date_field datetime_field hasDatePicker"
-            value="{{datetimeFormatted peerReviewsAssignAt false}}"
-            type="text"
-            {{disabledIfIncludes frozenAttributes "peer_reviews"}}/>
-          <div class="explanation nest">
+          <div class='date_field_container'>
+            <label class='screenreader-only' id='assign_peer_review_at_accessible_label'>
+              {{#t}}Assign Reviews on Date{{/t}}
+              {{datepickerScreenreaderPrompt}}
+            </label>
+            <input id="assignment_peer_reviews_assign_at"
+              name="{{#if nested}}assignment[peer_reviews_assign_at]{{else}}peer_reviews_assign_at{{/if}}"
+              class="date_field datetime_field hasDatePicker"
+              value="{{datetimeFormatted peerReviewsAssignAt false}}"
+              type="text"
+              aria-labelledby="assign_peer_review_at_accessible_label"
+              aria-describedby="peer_reviews_assign_at_explanation"
+              data-tooltip
+              title="{{accessibleDateFormat}}"
+              {{disabledIfIncludes frozenAttributes "peer_reviews"}}/>
+          </div>
+          <div id="peer_reviews_assign_at_explanation" class="explanation nest">
             {{#t "peer_reviews_assign_at_explanation"}}
               Must come after due date. If blank, uses due date.
             {{/t}}
           </div>
         </div>
+      </div>
+
+      <div class="nested">
+        <div class="subtitle">
+          <strong>
+            {{#t 'anonymous_peer_reviews'}}Anonymity{{/t}}
+          </strong>
+        </div>
+
+        <label class="checkbox" for="anonymous_peer_reviews">
+          {{checkbox "anonymous_peer_reviews"
+          checked=anonymousPeerReviews
+          id="anonymous_peer_reviews"
+          aria-controls="anonymous_peer_reviews"
+          prefix=prefix
+          disabled=peerReviewsFrozen}}
+          {{#t "labels.anonymous_peer_reviews"}}
+            Peer Reviews Appear Anonymously
+          {{/t}}
+        </label>
       </div>
     </div>
   </div>

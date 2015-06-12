@@ -21,10 +21,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper'
 require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe "GradeChangeAudit API", type: :request do
-  before do
-    pending 'Audit Search is disabled.'
-  end
-
   context "not configured" do
     before do
       Canvas::Cassandra::DatabaseBuilder.stubs(:configured?).with('auditors').returns(false)
@@ -42,7 +38,7 @@ describe "GradeChangeAudit API", type: :request do
     include_examples "cassandra audit logs"
 
     before do
-      @request_id = CanvasUUID.generate
+      @request_id = SecureRandom.uuid
       RequestContextGenerator.stubs( :request_id => @request_id )
 
       @domain_root_account = Account.default
@@ -92,16 +88,16 @@ describe "GradeChangeAudit API", type: :request do
     def expect_event_for_context(context, event, options={})
       json = options.delete(:json)
       json ||= fetch_for_context(context, options)
-      json['events'].map{ |e| [e['id'], e['event_type']] }
-                    .should include([event.id, event.event_type])
+      expect(json['events'].map{ |e| [e['id'], e['event_type']] })
+                    .to include([event.id, event.event_type])
       json
     end
 
     def forbid_event_for_context(context, event, options={})
       json = options.delete(:json)
       json ||= fetch_for_context(context, options)
-      json['events'].map{ |e| [e['id'], e['event_type']] }
-                    .should_not include([event.id, event.event_type])
+      expect(json['events'].map{ |e| [e['id'], e['event_type']] })
+                    .not_to include([event.id, event.event_type])
       json
     end
 
@@ -185,7 +181,7 @@ describe "GradeChangeAudit API", type: :request do
       end
 
       it "should not authorize the endpoints with revoking the :view_grade_changes permission" do
-        RoleOverride.manage_role_override(@account_user.account, @account_user.membership_type, :view_grade_changes.to_s, :override => false)
+        RoleOverride.manage_role_override(@account_user.account, @account_user.role, :view_grade_changes.to_s, :override => false)
 
         fetch_for_context(@course, expected_status: 401)
         fetch_for_context(@assignment, expected_status: 401)
@@ -205,7 +201,7 @@ describe "GradeChangeAudit API", type: :request do
       end
 
       context "sharding" do
-       # specs_require_sharding
+        specs_require_sharding
 
         before do
           @new_root_account = @shard2.activate{ Account.create!(name: 'New Account') }
@@ -239,11 +235,11 @@ describe "GradeChangeAudit API", type: :request do
       end
 
       it "should only return one page of results" do
-        @json['events'].size.should == 2
+        expect(@json['events'].size).to eq 2
       end
 
       it "should have pagination headers" do
-        response.headers['Link'].should match(/rel="next"/)
+        expect(response.headers['Link']).to match(/rel="next"/)
       end
     end
   end

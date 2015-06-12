@@ -45,7 +45,7 @@ module LiveAssessments
       return unless learning_outcome_alignments.any?
       Assessment.transaction do
         users.each do |user|
-          submission = submissions.find_or_initialize_by_user_id(user.id)
+          submission = submissions.where(user_id: user.id).first_or_initialize
 
           user_results = results.for_user(user).all
           next unless user_results.any?

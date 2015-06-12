@@ -16,14 +16,14 @@ describe "Api::V1::CustomGradebookColumn" do
     it "works" do
       json = @col.attributes.slice(*%w(id title position teacher_notes))
       json["hidden"] = false
-      controller.custom_gradebook_column_json(@col, @teacher, nil).should == json
+      expect(controller.custom_gradebook_column_json(@col, @teacher, nil)).to eq json
     end
   end
 
   describe "custom_gradebook_column_json" do
     it "works" do
-      controller.custom_gradebook_column_datum_json(@datum, @teacher, nil)
-      .should == @datum.attributes.slice(*%w(user_id content))
+      expect(controller.custom_gradebook_column_datum_json(@datum, @teacher, nil))
+      .to eq @datum.attributes.slice(*%w(user_id content))
     end
   end
 end

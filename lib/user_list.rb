@@ -70,7 +70,7 @@ class UserList
   def users
     existing = @addresses.select { |a| a[:user_id] }
     existing_users = Shard.partition_by_shard(existing, lambda { |a| a[:shard] } ) do |shard_existing|
-      User.find_all_by_id(shard_existing.map { |a| a[:user_id] })
+      User.where(id: shard_existing.map { |a| a[:user_id] })
     end
 
     non_existing = @addresses.select { |a| !a[:user_id] }
@@ -95,10 +95,9 @@ class UserList
     # any non-word characters
     if path =~ /^([^\d\w]*\d[^\d\w]*){10}$/
       type = :sms
-    elsif path.include?('@') && (address = (CANVAS_RAILS2 ? TMail::Address.parse(path) : Mail::Address.new(path)) rescue nil)
+    elsif path.include?('@') && (email = parse_email(path))
       type = :email
-      name = address.name
-      path = address.address
+      name, path = email
     elsif path =~ Pseudonym.validates_format_of_login_field_options[:with]
       type = :pseudonym
     else
@@ -107,6 +106,23 @@ class UserList
     end
 
     @addresses << { :name => name, :address => path, :type => type }
+  end
+
+  def parse_email(email)
+    case email
+    when /^(["'])(.*?[^\\])\1\s*<(\S+?@\S+?)>/
+      a, b = $2, $3
+      a = a.gsub(/\\(["'])/, '\1')
+      [a, b]
+    when /\s*(.+?)\s*<(\S+?@\S+?)>/
+      [$1, $2]
+    when /<(\S+?@\S+?)>/
+      [nil, $1]
+    when /(\S+?@\S+)/
+      [nil, $1]
+    else
+      nil
+    end
   end
   
   def quote_ends(chars, i)
@@ -147,6 +163,7 @@ class UserList
   def resolve
     all_account_ids = [@root_account.id] + @root_account.trusted_account_ids
     associated_shards = @addresses.map {|x| Pseudonym.associated_shards(x[:address].downcase) }.flatten.to_set
+    associated_shards << @root_account.shard
     # Search for matching pseudonyms
     Shard.partition_by_shard(all_account_ids) do |account_ids|
       next if GlobalLookups.enabled? && !associated_shards.include?(Shard.current)
@@ -155,8 +172,7 @@ class UserList
           where("(LOWER(unique_id) IN (?) OR sis_user_id IN (?)) AND account_id IN (?)", @addresses.map {|x| x[:address].downcase}, @addresses.map {|x| x[:address]}, account_ids).
           map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |login|
         addresses = @addresses.select { |a| a[:address].downcase == login[:address].downcase ||
-            a[:address] ==  login[:sis_user_id]}
-        login.delete(:sis_user_id)
+            (login[:sis_user_id] && (a[:address] == login[:sis_user_id] || a[:sis_user_id] == login[:sis_user_id]))}
         addresses.each do |address|
           # already found a matching pseudonym
           if address[:user_id]
@@ -186,6 +202,7 @@ class UserList
     # create temporary users)
     emails = @addresses.select { |a| a[:type] == :email } if @search_method != :open
     associated_shards = @addresses.map {|x| CommunicationChannel.associated_shards(x[:address].downcase) }.flatten.to_set
+    associated_shards << @root_account.shard
     Shard.partition_by_shard(all_account_ids) do |account_ids|
       next if GlobalLookups.enabled? && !associated_shards.include?(Shard.current)
       Pseudonym.active.
@@ -259,6 +276,7 @@ class UserList
       # This is temporary working data
       address.delete :workflow_state
       address.delete :account_id
+      address.delete :sis_user_id
       # Only allow addresses that we found a user, or that we can implicitly create the user
       if address[:user_id].present?
         (@addresses.find { |a| a[:user_id] == address[:user_id] && a[:shard] == address[:shard] } ? @duplicate_addresses : @addresses) << address

@@ -66,7 +66,7 @@ module SIS
         raise ImportError, "No long_name given for course #{course_id}" if long_name.blank? && abstract_course_id.blank?
         raise ImportError, "Improper status \"#{status}\" for course #{course_id}" unless status =~ /\A(active|deleted|completed)/i
 
-        course = Course.find_by_root_account_id_and_sis_source_id(@root_account.id, course_id)
+        course = @root_account.all_courses.where(sis_source_id: course_id).first
         if course.nil?
           course = Course.new
           state_changes << :created
@@ -75,14 +75,14 @@ module SIS
         end
         course_enrollment_term_id_stuck = course.stuck_sis_fields.include?(:enrollment_term_id)
         if !course_enrollment_term_id_stuck && term_id
-          term = @root_account.enrollment_terms.active.find_by_sis_source_id(term_id)
+          term = @root_account.enrollment_terms.active.where(sis_source_id: term_id).first
         end
         course.enrollment_term = term if term
         course.root_account = @root_account
 
         account = nil
-        account = Account.find_by_root_account_id_and_sis_source_id(@root_account.id, account_id) if account_id.present?
-        account ||= Account.find_by_root_account_id_and_sis_source_id(@root_account.id, fallback_account_id) if fallback_account_id.present?
+        account = @root_account.all_accounts.where(sis_source_id: account_id).first if account_id.present?
+        account ||= @root_account.all_accounts.where(sis_source_id: fallback_account_id).first if fallback_account_id.present?
         course.account = account if account
         course.account ||= @root_account
 
@@ -117,7 +117,7 @@ module SIS
 
         abstract_course = nil
         if abstract_course_id.present?
-          abstract_course = AbstractCourse.find_by_root_account_id_and_sis_source_id(@root_account.id, abstract_course_id)
+          abstract_course = @root_account.root_abstract_courses.where(sis_source_id: abstract_course_id).first
           @messages << "unknown abstract course id #{abstract_course_id}, ignoring abstract course reference" unless abstract_course
         end
 

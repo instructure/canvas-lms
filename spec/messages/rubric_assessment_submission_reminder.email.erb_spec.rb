@@ -25,10 +25,10 @@ describe 'rubric_assessment_submission_reminder.email' do
     rubric_assessment_model(:user => @user)
     @submission = @course.assignments.first.submissions.create!(:user => @user)
     @object = @rubric_association.assessment_requests.create!(:user => @user, :asset => @submission, :assessor => @user, :assessor_asset => @submission)
-    @object.rubric_association.should_not be_nil
-    @object.rubric_association.context.should_not be_nil
-    @object.user.should_not be_nil
-    @object.submission.should_not be_nil
+    expect(@object.rubric_association).not_to be_nil
+    expect(@object.rubric_association.context).not_to be_nil
+    expect(@object.user).not_to be_nil
+    expect(@object.submission).not_to be_nil
     generate_message(:rubric_assessment_submission_reminder, :email, @object, :user => @user)
   end
 end

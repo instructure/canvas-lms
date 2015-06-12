@@ -15,7 +15,7 @@ module Lti
       case @canvas_context
         when Account
           create_account(@canvas_context)
-        when Course
+        when Course, Group
           create_account(@canvas_context.account)
         when User
           create_account(@root_account)

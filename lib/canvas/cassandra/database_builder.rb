@@ -29,7 +29,12 @@ module Canvas
           opts[:timeout] = config['timeout'] if config['timeout']
           fingerprint = "#{config_name}:#{environment}"
           Bundler.require 'cassandra'
-          @connections[key] = CanvasCassandra::Database.new(fingerprint, servers, opts, Rails.logger)
+          begin
+            @connections[key] = CanvasCassandra::Database.new(fingerprint, servers, opts, Rails.logger)
+          rescue Exception => exception
+            Rails.logger.error "Failed to create cassandra connection for #{key}: #{exception}"
+            nil # don't save this nil into @connections[key], so we can retry later
+          end
         end
       end
 

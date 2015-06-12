@@ -63,7 +63,7 @@ class SessionPersistenceToken < ActiveRecord::Base
   def self.find_by_pseudonym_credentials(creds)
     token_id, persistence_token, uuid = creds.split("::")
     return unless token_id.present? && persistence_token.present? && uuid.present?
-    token = self.find_by_id(token_id)
+    token = self.where(id: token_id).first
     return unless token
     return unless token.valid_token?(persistence_token, uuid)
     return token

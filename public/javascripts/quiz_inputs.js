@@ -19,26 +19,26 @@
 define(['jquery'], function($) {
   var inputMethods = {
     disableInputs: function(inputs) {
-      var body       = $('body'),
-          inputCover = $('<div />', { 'class': 'input_cover' });
+      var $body       = $('body'),
+          $inputCover = $('<div />', { 'class': 'input_cover' });
 
-      inputCover.on('mouseleave', function(e) { $(this).remove(); });
+      $inputCover.on('mouseleave', function(e) { $(this).remove(); });
 
       $(inputs).on('mouseenter', function(e) {
-        var el    = $(this),
-            cover = inputCover.clone(true);
+        var $el    = $(this),
+            $cover = $inputCover.clone(true);
 
-        cover.css({
-          height   : el.height() + 12,
-          width    : el.width() + 12,
+        $cover.css({
+          height   : $el.height() + 12,
+          width    : $el.width() + 12,
           position : 'absolute',
-          left     : el.offset().left - 6,
-          top      : el.offset().top - 6,
+          left     : $el.offset().left - 6,
+          top      : $el.offset().top - 6,
           zIndex   : 15,
           background: 'url(/images/blank.png) 0 0 repeat'
         });
 
-        body.append(cover);
+        $body.append($cover);
       });
     },
 

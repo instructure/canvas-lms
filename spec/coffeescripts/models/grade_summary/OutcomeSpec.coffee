@@ -12,6 +12,10 @@ define [
     outcome = new Outcome({score: 4, mastery_points: 3})
     equal outcome.status(), 'mastery'
 
+  test "#status should be exceeds if the score is 150% or more of mastery points", ->
+    outcome = new Outcome({score: 4.5, mastery_points: 3})
+    equal outcome.status(), 'exceeds'
+
   test "#status should be near if the score is greater than half the mastery points", ->
     outcome = new Outcome({score: 2, mastery_points: 3})
     equal outcome.status(), 'near'
@@ -36,3 +40,12 @@ define [
   test "#masteryPercent should be master_points over points possible", ->
     outcome = new Outcome({mastery_points: 5, points_possible: 10})
     equal outcome.masteryPercent(), 50
+
+  test '#parse', ->
+    outcome = new Outcome()
+    parsed = outcome.parse({
+      submitted_or_assessed_at: '2015-04-24T19:27:54Z'
+    })
+
+    equal 'object', typeof(parsed['submitted_or_assessed_at']),
+      'is an object, not a string'

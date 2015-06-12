@@ -1,9 +1,10 @@
 define [
   'i18n!rubrics'
   'jquery'
+  'str/htmlEscape'
   'jqueryui/dialog'
   'vendor/jquery.ba-tinypubsub'
-], (I18n, $) ->
+], (I18n, $, htmlEscape) ->
 
   assignmentRubricDialog =
 
@@ -16,6 +17,8 @@ define [
       if $trigger = $('.rubric_dialog_trigger')
         @noRubricExists = $trigger.data('noRubricExists')
         @url = $trigger.data('url')
+        @$focusReturnsTo = $ $trigger.data('focusReturnsTo')
+
         $trigger.click (event) ->
           event.preventDefault()
           assignmentRubricDialog.openDialog()
@@ -23,12 +26,13 @@ define [
     initDialog: ->
       @dialogInited = true
 
-      @$dialog = $("<div><h4>#{I18n.t 'loading', 'Loading...'}</h4></div>").dialog
+      @$dialog = $("<div><h4>#{htmlEscape I18n.t 'loading', 'Loading...'}</h4></div>").dialog
         title: I18n.t("titles.assignment_rubric_details", "Assignment Rubric Details")
         width: 600
         modal: false
         resizable: true
         autoOpen: false
+        close: => @$focusReturnsTo.focus()
 
       $.get @url, (html) ->
         # weird hackery because the server returns a <div id="rubrics" style="display:none">

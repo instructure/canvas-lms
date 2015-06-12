@@ -1,0 +1,46 @@
+/*
+@styleguide Button Set
+
+<br/>
+
+We use jQuery UI button set
+
+<br/>
+
+```html
+<div id="radio1" class="ui-buttonset">
+  <input type="radio" id="radio1" name="radio" class="ui-helper-hidden-accessible">
+    <label for="radio1" class="ui-button ui-widget ui-state-default ui-button-text-only ui-corner-left" role="button" aria-disabled="false">
+      <span class="ui-button-text">Choice 1</span>
+    </label>
+  <input type="radio" id="radio2" name="radio" checked="checked" class="ui-helper-hidden-accessible">
+    <label for="radio2" class="ui-state-active ui-button ui-widget ui-state-default ui-button-text-only" role="button" aria-disabled="false">
+      <span class="ui-button-text">Choice 2</span>
+    </label>
+  <input type="radio" id="radio3" name="radio" class="ui-helper-hidden-accessible">
+    <label for="radio3" class="ui-button ui-widget ui-state-default ui-button-text-only ui-corner-right" role="button" aria-disabled="false">
+      <span class="ui-button-text">Choice 3</span>
+    </label>
+</div>
+```
+
+*/
+
+.ui-buttonset {
+  margin-right: 7px;
+  .ui-button {
+    margin-left: 0;
+    margin-right: -5px;
+    border-radius: 0;
+    &.ui-corner-right { 
+      border-top-right-radius: $baseBorderRadius;
+      border-bottom-right-radius: $baseBorderRadius;
+    }
+    &.ui-corner-left { 
+      border-top-left-radius: $baseBorderRadius;
+      border-bottom-left-radius: $baseBorderRadius;
+    }
+  }
+  input[type=checkbox] + label.ui-button, input[type=radio] + label.ui-button { vertical-align: middle; }
+}
+

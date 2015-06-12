@@ -9,6 +9,7 @@
   </div>
 <% end %>
 <div style="margin: .3em">
+  <h1 class="screenreader-only"><%= t(:page_header_title, "User Profile") %></h1>
   <% if @context_account.is_a?(Account) && @context_account.has_outcomes? %>
     <div style="float: right;">
       <div>
@@ -85,15 +86,15 @@
         </ul>
       </div>
     <% end %>
-    
+
     <% if num_enrollments == 0 %>
       <div style="font-size: 1.2em;"><%= t('none_yet', 'None yet.') %></div>
     <% end %>
-    
+
     </div>
   </fieldset>
   </div>
-  
+
   <% if page_views_enabled? %>
     <h3>
       <%= t('page_views', 'Page Views') %>

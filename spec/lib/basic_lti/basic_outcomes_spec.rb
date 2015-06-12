@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
+require 'nokogiri'
+
 describe BasicLTI::BasicOutcomes do
   before(:each) do
     course_model
@@ -89,28 +91,57 @@ describe BasicLTI::BasicOutcomes do
       xml.css('resultData').remove
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
 
-      request.code_major.should == 'success'
-      request.handle_request(tool).should be_true
+      expect(request.code_major).to eq 'success'
+      expect(request.handle_request(tool)).to be_truthy
       submission = assignment.submissions.where(user_id: @user.id).first
-      submission.grade.should == (assignment.points_possible * 0.92).to_s
+      expect(submission.grade).to eq (assignment.points_possible * 0.92).to_s
+    end
+
+    it "rejects a grade for an assignment with no points possible" do
+      xml.css('resultData').remove
+      assignment.points_possible = nil
+      assignment.save!
+      request = BasicLTI::BasicOutcomes.process_request(tool, xml)
+
+      expect(request.code_major).to eq 'failure'
+      expect(request.description).to eq 'Assignment has no points possible.'
+    end
+
+    it "doesn't explode when an assignment with no points possible receives a grade for an existing submission " do
+      xml.css('resultData').remove
+      assignment.points_possible = nil
+      assignment.save!
+      BasicLTI::BasicOutcomes.process_request(tool, xml)
+      request = BasicLTI::BasicOutcomes.process_request(tool, xml)
+
+      expect(request.code_major).to eq 'failure'
+      expect(request.description).to eq 'Assignment has no points possible.'
+    end
+
+    it 'handles tools that have a url mismatch with the assignment' do
+      assignment.external_tool_tag_attributes = {url: 'http://example.com/foo'}
+      assignment.save!
+      request = BasicLTI::BasicOutcomes.process_request(tool, xml)
+      expect(request.code_major).to eq 'failure'
+      expect(request.description).to eq 'Assignment is no longer associated with this tool'
     end
 
     it "accepts a result data without grade" do
       xml.css('resultScore').remove
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
-      request.code_major.should == 'success'
-      request.handle_request(tool).should be_true
+      expect(request.code_major).to eq 'success'
+      expect(request.handle_request(tool)).to be_truthy
       submission = assignment.submissions.where(user_id: @user.id).first
-      submission.body.should == 'text data for canvas submission'
-      submission.grade.should be_nil
-      submission.workflow_state.should == 'submitted'
+      expect(submission.body).to eq 'text data for canvas submission'
+      expect(submission.grade).to be_nil
+      expect(submission.workflow_state).to eq 'submitted'
     end
 
     it "fails if neither result data or a grade is sent" do
       xml.css('resultData').remove
       xml.css('resultScore').remove
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
-      request.code_major.should == 'failure'
+      expect(request.code_major).to eq 'failure'
     end
   end
 end

@@ -18,6 +18,7 @@
 
 module Api::V1::Section
   include Api::V1::Json
+  include Api::V1::PostGradesStatus
 
   def section_json(section, user, session, includes)
     res = section.as_json(:include_root => false,
@@ -35,9 +36,19 @@ module Api::V1::Section
       else
         proxy = proxy.includes(:user)
       end
+      include_enrollments = includes.include?('enrollments')
       res['students'] = proxy.where(:type => 'StudentEnrollment').
-        map { |e| user_json(e.user, user, session, includes) }
+        map { |e|
+          enrollments = include_enrollments ? [e] : nil
+          user_json(e.user, user, session, includes, @context, enrollments)
+        }
     end
+    res['total_students'] = section.students.count if includes.include?('total_students')
+
+    if includes.include?('passback_status')
+      res['passback_status'] = post_grades_status_json(section)
+    end
+
     res
   end
 end

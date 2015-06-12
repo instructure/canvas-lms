@@ -22,14 +22,11 @@ module Api::V1::Avatar
 
   def avatars_json_for_user(user, includes={})
     avatars = []
-    if feature_enabled?(:facebook) && facebook = user.facebook
-      # TODO: add facebook picture if enabled
-    end
     avatars << avatar_json(user, user.gravatar_url(50, "/images/dotted_pic.png", request), {
       :type => 'gravatar',
       :alt => 'gravatar pic'
     })
-    user.profile_pics_folder.active_file_attachments({:include => :thumbnail}).select{|a| a.content_type.match(/\Aimage\//) && a.thumbnail}.sort_by(&:id).reverse.each do |image|
+    user.profile_pics_folder.active_file_attachments({:include => :thumbnail}).select{|a| a.content_type.match(/\Aimage\//) && a.thumbnail}.sort_by(&:id).reverse_each do |image|
       avatars << avatar_json(user, image, {
         :type => 'attachment',
         :alt => image.display_name,
@@ -59,12 +56,11 @@ module Api::V1::Avatar
   end
 
   def construct_token(user, type, url)
-    uid = user.is_a?(User) ? user.id : user
-    token = "#{uid}::#{type}::#{url}"
+    token = "#{user.id}::#{type}::#{url}"
     Canvas::Security.hmac_sha1(token)
   end
 
   def avatar_for_token(user, token)
-    avatars_json_for_user(user).select{ |j| j['token'] == token }.first
+    avatars_json_for_user(user).detect { |j| Canvas::Security.verify_hmac_sha1(token, "#{user.id}::#{j['type']}::#{j['url']}") }
   end
 end

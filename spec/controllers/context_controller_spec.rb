@@ -19,42 +19,45 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe ContextController do
+  before :once do
+    course_with_teacher(:active_all => true)
+    student_in_course(:active_all => true)
+  end
+
   describe "GET 'roster'" do
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
       get 'roster', :course_id => @course.id
       assert_unauthorized
     end
 
     it "should work when the context is a group in a course" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       @group = @course.groups.create!
       @group.add_user(@student, 'accepted')
       get 'roster', :group_id => @group.id
-      assigns[:primary_users].each_value.first.collect(&:id).should == [@student.id]
-      assigns[:secondary_users].each_value.first.collect(&:id).should == [@teacher.id]
+      expect(assigns[:primary_users].each_value.first.collect(&:id)).to eq [@student.id]
+      expect(assigns[:secondary_users].each_value.first.collect(&:id)).to match_array @course.admins.map(&:id)
     end
   end
 
   describe "GET 'roster_user'" do
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
       get 'roster_user', :course_id => @course.id, :id => @user.id
       assert_unauthorized
     end
 
     it "should assign variables" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       @enrollment = @course.enroll_student(user(:active_all => true))
       @enrollment.accept!
       @student = @enrollment.user
       get 'roster_user', :course_id => @course.id, :id => @student.id
-      assigns[:membership].should_not be_nil
-      assigns[:membership].should eql(@enrollment)
-      assigns[:user].should_not be_nil
-      assigns[:user].should eql(@student)
-      assigns[:topics].should_not be_nil
-      assigns[:entries].should_not be_nil
+      expect(assigns[:membership]).not_to be_nil
+      expect(assigns[:membership]).to eql(@enrollment)
+      expect(assigns[:user]).not_to be_nil
+      expect(assigns[:user]).to eql(@student)
+      expect(assigns[:topics]).not_to be_nil
+      expect(assigns[:entries]).not_to be_nil
     end
 
     describe 'across shards' do
@@ -78,7 +81,7 @@ describe ContextController do
         user_session(admin)
 
         get 'roster_user', :course_id => course1.id, :id => @user2.id
-        response.should be_success
+        expect(response).to be_success
       end
     end
   end
@@ -98,8 +101,8 @@ describe ContextController do
 
     it "should render given a correct HMAC" do
       post 'object_snippet', :object_data => @data, :s => @hmac
-      response.should be_success
-      response['X-XSS-Protection'].should == '0'
+      expect(response).to be_success
+      expect(response['X-XSS-Protection']).to eq '0'
     end
   end
 
@@ -112,14 +115,14 @@ describe ContextController do
         :width => 100,
         :height => 100
 
-      response.should be_redirect
-      response.location.should == "http://example.com/thumbnail_redirect"
+      expect(response).to be_redirect
+      expect(response.location).to eq "http://example.com/thumbnail_redirect"
     end
   end
 
   describe "POST '/media_objects'" do
     before :each do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
     end
 
     it "should match the create_media_object route" do
@@ -141,10 +144,10 @@ describe ContextController do
         :title => "new title"
 
       @media_object.reload
-      @media_object.title.should == "new title"
+      expect(@media_object.title).to eq "new title"
 
       @user.reload
-      @user.media_objects.count.should == @original_count
+      expect(@user.media_objects.count).to eq @original_count
     end
 
     it "should create the object if it doesn't already exist" do
@@ -157,12 +160,12 @@ describe ContextController do
         :title => "title"
 
       @user.reload
-      @user.media_objects.count.should == @original_count + 1
+      expect(@user.media_objects.count).to eq @original_count + 1
       @media_object = @user.media_objects.last
 
-      @media_object.media_id.should == "new_object"
-      @media_object.media_type.should == "audio"
-      @media_object.title.should == "title"
+      expect(@media_object.media_id).to eq "new_object"
+      expect(@media_object.media_type).to eq "audio"
+      expect(@media_object.title).to eq "title"
     end
 
     it "should truncate the title and user_entered_title" do
@@ -173,22 +176,22 @@ describe ContextController do
         :title => 'x' * 300,
         :user_entered_title => 'y' * 300
       @media_object = @user.reload.media_objects.last
-      @media_object.title.size.should <= 255
-      @media_object.user_entered_title.size.should <= 255
+      expect(@media_object.title.size).to be <= 255
+      expect(@media_object.user_entered_title.size).to be <= 255
     end
   end
 
   describe "GET 'prior_users" do
     before do
-      course_with_teacher_logged_in(:active_all => true)
-      100.times { student_in_course(:active_all => true).conclude }
-      @user = @teacher
+      user_session(@teacher)
+      create_users_in_course(@course, 21)
+      @course.student_enrollments.update_all(workflow_state: "completed")
     end
 
     it "should paginate" do
       get :prior_users, :course_id => @course.id
-      response.should be_success
-      assigns[:prior_users].size.should eql 20
+      expect(response).to be_success
+      expect(assigns[:prior_users].size).to eql 20
     end
   end
 end

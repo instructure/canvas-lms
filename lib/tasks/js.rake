@@ -6,6 +6,7 @@ namespace :js do
   desc 'run testem as you develop, can use `rake js:dev <ember app name> <browser>`'
   task :dev do
     app = ARGV[1]
+    app = nil if app == 'NA'
     #browsers = ARGV[2] || 'Firefox,Chrome,Safari'
     browsers = ARGV[2] || 'Chrome'
     if app
@@ -139,9 +140,56 @@ namespace :js do
     Canvas::RequireJs::PluginExtension.generate_all
   end
 
+  task :build_client_apps do
+    require 'config/initializers/client_app_symlinks'
+
+    Dir.glob('./client_apps/*/').each do |app_dir|
+      app_name = File.basename(app_dir)
+
+      Dir.chdir(app_dir) do
+        puts "Building client app '#{app_name}'"
+
+        if File.exists?('./package.json')
+          puts "\tRunning 'npm install'..."
+          output = `npm install` rescue `npm cache clean && npm install`
+          unless $?.exitstatus == 0
+            puts <<-MESSAGE
+            -------------------------------------------------------------------
+            INSTALL FAILURE:
+            #{output}
+            -------------------------------------------------------------------
+            MESSAGE
+
+            raise "Package installation failure for client app #{app_name}"
+          end
+        end
+
+        begin
+          puts "\tRunning 'npm run build'..."
+          output = `./script/build`
+          unless $?.exitstatus == 0
+            puts <<-MESSAGE
+            -------------------------------------------------------------------
+            BUILD FAILURE:
+            #{output}
+            -------------------------------------------------------------------
+            MESSAGE
+
+            raise "Build script failed for client app #{app_name}"
+          end
+        end
+
+        puts "Client app '#{app_name}' was built successfully."
+      end
+    end
+
+    maintain_client_app_symlinks
+  end
+
   desc "generates compiled coffeescript, handlebars templates and plugin extensions"
   task :generate do
     require 'config/initializers/plugin_symlinks'
+    require 'config/initializers/client_app_symlinks'
     require 'fileutils'
     require 'canvas'
     require 'canvas/coffee_script'
@@ -149,18 +197,26 @@ namespace :js do
     # clear out all the files in case there are any old compiled versions of
     # files that don't map to any source file anymore
     paths_to_remove = [
-      Dir.glob('public/javascripts/{compiled,jst}'),
-      Dir.glob('public/plugins/*/javascripts/{compiled,jst}'),
+      Dir.glob('public/javascripts/{compiled,jst,jsx}'),
+      Dir.glob('public/plugins/*/javascripts/{compiled,jst,jsx}'),
       'spec/javascripts/compiled',
       Dir.glob('spec/plugins/*/javascripts/compiled')
     ]
     FileUtils.rm_rf(paths_to_remove)
+
+    Rake::Task['js:build_client_apps'].invoke
 
     threads = []
     threads << Thread.new do
       puts "--> Generating plugin extensions"
       extensions_time = Benchmark.realtime { Rake::Task['js:generate_extensions'].invoke }
       puts "--> Generating plugin extensions finished in #{extensions_time}"
+    end
+
+    threads << Thread.new do
+      puts "--> Compiling React JSX"
+      jsx_time = Benchmark.realtime { Rake::Task['js:jsx'].invoke }
+      puts "--> Compiling React JSX finished in #{jsx_time}"
     end
 
     threads << Thread.new do
@@ -234,6 +290,22 @@ namespace :js do
     puts "--> Compressed JavaScript in #{optimize_time}"
   end
 
+  desc "Compile React JSX to JS"
+  task :jsx do
+    source = Rails.root + 'app/jsx'
+    dest = Rails.root + 'public/javascripts/jsx'
+    if Rails.env == 'development'
+      #npm_run "jsx -x jsx --source-map-inline --harmony #{source} #{dest} 2>&1 >/dev/null"
+      msg = `node_modules/react-tools/bin/jsx -x jsx --source-map-inline --harmony #{source} #{dest} 2>&1 >/dev/null`
+    else
+      msg = `node_modules/react-tools/bin/jsx -x jsx --harmony #{source} #{dest} 2>&1 >/dev/null`
+    end
+
+    unless $?.success?
+      raise msg
+    end
+  end
+
   desc "creates ember app bundles"
   task :bundle_ember_apps do
     require 'lib/ember_bundle'
@@ -241,5 +313,14 @@ namespace :js do
       EmberBundle.new(app).build
     end
   end
+
+  #def npm_run(command)
+    #puts "Running npm script `#{command}`"
+    #msg = `$(npm bin)/#{command} 2>&1`
+    #unless $?.success?
+      #raise msg
+    #end
+    #msg
+  #end
 
 end

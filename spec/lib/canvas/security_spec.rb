@@ -19,6 +19,67 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 describe Canvas::Security do
+  describe "JWT tokens" do
+    describe "encoding" do
+      it "should generate a token with an expiration" do
+        expires = 1.hour.from_now
+        JWT.expects(:encode).with({ a: 1, exp: expires.to_i }, Canvas::Security.encryption_key).returns("sometoken")
+        token = Canvas::Security.create_jwt({ a: 1 }, expires)
+        expect(token).to eq "sometoken"
+      end
+
+      it "should generate a token without expiration" do
+        JWT.expects(:encode).with({ a: 1 }, Canvas::Security.encryption_key).returns("sometoken")
+        token = Canvas::Security.create_jwt({ a: 1 })
+        expect(token).to eq "sometoken"
+      end
+
+      it "should encode with configured encryption key" do
+        JWT.expects(:encode).with({ a: 1 }, Canvas::Security.encryption_key).returns("sometoken")
+        Canvas::Security.create_jwt({ a: 1 })
+      end
+
+      it "should encode with the supplied key" do
+        JWT.expects(:encode).with({ a: 1 }, "mykey").returns("sometoken")
+        Canvas::Security.create_jwt({ a: 1 }, nil, "mykey")
+      end
+    end
+
+    describe "decoding" do
+      before do
+        @key = "mykey"
+        @token_no_expiration = JWT.encode({ a: 1 }, @key)
+        @token_expired = JWT.encode({ a: 1, 'exp' => 1.hour.ago.to_i }, @key)
+        @token_not_expired = JWT.encode({ a: 1, 'exp' => 1.hour.from_now.to_i }, @key)
+      end
+
+      it "should decode token" do
+        body = Canvas::Security.decode_jwt(@token_no_expiration, [ @key ])
+        expect(body).to eq({ "a" => 1 })
+      end
+
+      it "should return token body with indifferent access" do
+        body = Canvas::Security.decode_jwt(@token_no_expiration, [ @key ])
+        expect(body[:a]).to eq(1)
+        expect(body["a"]).to eq(1)
+      end
+
+      it "should check using past keys" do
+        body = Canvas::Security.decode_jwt(@token_no_expiration, [ "newkey", @key ])
+        expect(body).to eq({ "a" => 1 })
+      end
+
+      it "should raise on an expired token" do
+        expect { Canvas::Security.decode_jwt(@token_expired, [ @key ]) }.to raise_error(Canvas::Security::TokenExpired)
+      end
+
+      it "should not raise an error on a token with expiration in the future" do
+        body = Canvas::Security.decode_jwt(@token_not_expired, [ @key ])
+        expect(body[:a]).to eq(1)
+      end
+    end
+  end
+
   if Canvas.redis_enabled?
     describe "max login attempts" do
       before do
@@ -32,17 +93,17 @@ describe Canvas::Security do
       end
 
       it "should be limited for the same ip" do
-        Canvas::Security.allow_login_attempt?(@p, "5.5.5.5").should == true
+        expect(Canvas::Security.allow_login_attempt?(@p, "5.5.5.5")).to eq true
         Canvas::Security.failed_login!(@p, "5.5.5.5")
-        Canvas::Security.allow_login_attempt?(@p, "5.5.5.5").should == false
+        expect(Canvas::Security.allow_login_attempt?(@p, "5.5.5.5")).to eq false
       end
 
       it "should have a higher limit for other ips" do
         Canvas::Security.failed_login!(@p, "5.5.5.5")
-        Canvas::Security.allow_login_attempt?(@p, "5.5.5.6").should == true
+        expect(Canvas::Security.allow_login_attempt?(@p, "5.5.5.6")).to eq true
         Canvas::Security.failed_login!(@p, "5.5.5.7")
-        Canvas::Security.allow_login_attempt?(@p, "5.5.5.8").should == false # different ip but too many total failures
-        Canvas::Security.allow_login_attempt?(@p, nil).should == false # no ip but too many total failures
+        expect(Canvas::Security.allow_login_attempt?(@p, "5.5.5.8")).to eq false # different ip but too many total failures
+        expect(Canvas::Security.allow_login_attempt?(@p, nil)).to eq false # no ip but too many total failures
       end
 
       it "should not block other users with the same ip" do
@@ -51,15 +112,15 @@ describe Canvas::Security do
         # ever block the IP address as a whole
         u2 = user_with_pseudonym(:active_user => true, :username => "second@example.com", :password => "12341234")
         u2.save!
-        Canvas::Security.allow_login_attempt?(u2.pseudonym, "5.5.5.5").should == true
-        Canvas::Security.allow_login_attempt?(u2.pseudonym, "5.5.5.6").should == true
+        expect(Canvas::Security.allow_login_attempt?(u2.pseudonym, "5.5.5.5")).to eq true
+        expect(Canvas::Security.allow_login_attempt?(u2.pseudonym, "5.5.5.6")).to eq true
       end
 
       it "should timeout the login block after a waiting period" do
         Setting.set('login_attempts_ttl', 5.seconds)
         Canvas::Security.failed_login!(@p, "5.5.5.5")
-        Canvas::Security.time_until_login_allowed(@p, '5.5.5.6').should == 0
-        Canvas::Security.time_until_login_allowed(@p, '5.5.5.5').should <= 5
+        expect(Canvas::Security.time_until_login_allowed(@p, '5.5.5.6')).to eq 0
+        expect(Canvas::Security.time_until_login_allowed(@p, '5.5.5.5')).to be <= 5
       end
     end
   end

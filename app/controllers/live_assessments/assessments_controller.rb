@@ -89,7 +89,7 @@ module LiveAssessments
 
           reject! 'missing required key :title' if assessment_hash[:title].blank?
           reject! 'missing required key :key' if assessment_hash[:key].blank?
-          assessment = Assessment.find_or_initialize_by_context_id_and_context_type_and_key(@context.id, @context.class.to_s, assessment_hash[:key])
+          assessment = Assessment.where(context_id: @context.id, context_type: @context.class.to_s, key: assessment_hash[:key]).first_or_initialize
           assessment.title = assessment_hash[:title]
           assessment.save!
           if @outcome

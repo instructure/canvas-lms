@@ -71,11 +71,11 @@
 #     }
 #
 class GroupMembershipsController < ApplicationController
-  before_filter :find_group, :only => [:index, :create, :update, :destroy]
+  before_filter :find_group, :only => [:index, :show, :create, :update, :destroy]
 
   include Api::V1::Group
 
-  ALLOWED_MEMBERSHIP_FILTER = %w(accepted invited requested)
+  ALLOWED_MEMBERSHIP_FILTER = %w(accepted invited requested).freeze
 
   # @API List group memberships
   #
@@ -83,7 +83,7 @@ class GroupMembershipsController < ApplicationController
   #
   # List the members of a group.
   #
-  # @argument filter_states[] [Optional, String, "accepted"|"invited"|"requested"]
+  # @argument filter_states[] [String, "accepted"|"invited"|"requested"]
   #   Only list memberships with the given workflow_states. By default it will
   #   return all memberships.
   #
@@ -105,6 +105,27 @@ class GroupMembershipsController < ApplicationController
 
       @memberships = Api.paginate(scope, self, memberships_route)
       render :json => @memberships.map{ |gm| group_membership_json(gm, @current_user, session) }
+    end
+  end
+
+  # @API Get a single group membership
+  #
+  # @subtopic Group Memberships
+  #
+  # Returns the group membership with the given membership id or user id.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/groups/<group_id>/memberships/<membership_id> \
+  #          -H 'Authorization: Bearer <token>'
+  # @example_request
+  #     curl https://<canvas>/api/v1/groups/<group_id>/users/<user_id> \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns GroupMembership
+  def show
+    find_membership
+    if authorized_action(@membership, @current_user, :read)
+      render :json => group_membership_json(@membership, @current_user, session)
     end
   end
 
@@ -136,7 +157,7 @@ class GroupMembershipsController < ApplicationController
     end
   end
 
-  UPDATABLE_MEMBERSHIP_ATTRIBUTES = %w(workflow_state moderator)
+  UPDATABLE_MEMBERSHIP_ATTRIBUTES = %w(workflow_state moderator).freeze
 
   # @API Update a membership
   #
@@ -144,7 +165,7 @@ class GroupMembershipsController < ApplicationController
   #
   # Accept a membership request, or add/remove moderator rights.
   #
-  # @argument workflow_state [Optional, String, "accepted"]
+  # @argument workflow_state [String, "accepted"]
   #   Currently, the only allowed value is "accepted"
   #
   # @argument moderator

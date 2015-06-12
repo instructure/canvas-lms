@@ -6,7 +6,7 @@
     :SELECTED_CONTEXTS => @selected_contexts,
     :ACTIVE_EVENT => @active_event_id,
     :VIEW_START => @view_start,
-    :CAL2_ONLY => @domain_root_account.calendar2_only?,
+    :CAL2_ONLY => true,
     :SHOW_SCHEDULER => @domain_root_account.show_scheduler?
   }
   js_bundle :calendar2
@@ -15,6 +15,7 @@
   crumbs.clear
   @body_classes << "full-width no-page-block hide-content-while-scripts-not-loaded"
 %>
+<h1 class="screenreader-only"><%= t(:page_title_header, "Calendar") %></h1>
 
 <% content_for :auto_discovery do %>
   <%= auto_discovery_link_tag(:atom, @feed_url + '.atom', {:title => t(:feed_title, "Course Calendar Atom Feed")}) %>
@@ -27,17 +28,19 @@
     <div id="minical" aria-hidden="true"></div>
   </div>
   <div class="rs-section">
-    <h4 class="element_toggler" aria-controls="context-list-holder" aria-expanded="true" role="button"
-     aria-label="<%= t(:toggle_calendars, "Toggle calendars") %>" tabindex="0">
+    <h3 class="element_toggler" aria-controls="context-list-holder" aria-expanded="true"
+        aria-label="<%= t(:toggle_calendars, "Toggle calendars") %>" tabindex="-1">
       <i class="icon-mini-arrow-down auto_rotate"></i> <%= t(:calendars, "Calendars") %>
-    </h4>
+      <button class="screenreader-only" id="calendar-toggle-button"><%= t "Expand or Collapse Calendars" %></button>
+    </h3>
     <div id="context-list-holder"></div>
   </div>
   <div class="rs-section" id="undated-events-section">
-    <h4 class="element_toggler" aria-controls="undated-events" aria-expanded="false" role="button"
-     aria-label="<%= t(:toggle_undated_items, "Toggle undated items") %>" tabindex="0">
+    <h3 class="element_toggler" aria-controls="undated-events" aria-expanded="false"
+        aria-label="<%= t(:toggle_undated_items, "Toggle undated items") %>" tabindex="-1">
       <i class="icon-mini-arrow-right auto_rotate"></i> <%= t(:undated_items, "Undated items") %>
-    </h4>
+      <button class="screenreader-only" id="undated-events-button"><%= t "Expand or collapse Undated items" %></button>
+    </h3>
     <div id="undated-events"></div>
   </div>
   <div class="rs-section" id="calendar-feed">

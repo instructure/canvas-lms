@@ -1,4 +1,4 @@
 <% define_content :link do -%>
-<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/discussion_topics/<%= asset.discussion_topic_id %>
+  <%= polymorphic_url([asset.context, :discussion_topic], id: asset.discussion_topic_id) %>
 <% end -%>
 <%= t :body, "Canvas Alert - Comment: %{discussion_topic}, %{course}.", :discussion_topic => asset.title, :course => asset.context.name %>

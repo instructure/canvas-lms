@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+
+require 'atom'
+
 module GoogleDocs
   class Entry
     def self.extension_looker_upper
@@ -93,6 +96,10 @@ module GoogleDocs
         "extension" => extension,
         "alternate_url" => alternate_url
       }
+    end
+
+    def reset_extension_as_xlsx
+      @extension = 'xlsx'
     end
 
     private

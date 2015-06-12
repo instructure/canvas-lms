@@ -56,23 +56,23 @@ describe Lti::LtiAccountCreator do
   describe "#convert" do
     it 'creates an account for a Canvas Account' do
       account = Lti::LtiAccountCreator.new(canvas_account, canvas_tool).convert
-      account.id.should == 123
-      account.name.should == 'account_name'
-      account.sis_source_id.should == 'sis_id'
+      expect(account.id).to eq 123
+      expect(account.name).to eq 'account_name'
+      expect(account.sis_source_id).to eq 'sis_id'
     end
 
     it 'creates an account for a Canvas Course' do
       account = Lti::LtiAccountCreator.new(canvas_course, canvas_tool).convert
-      account.id.should == 123
-      account.name.should == 'account_name'
-      account.sis_source_id.should == 'sis_id'
+      expect(account.id).to eq 123
+      expect(account.name).to eq 'account_name'
+      expect(account.sis_source_id).to eq 'sis_id'
     end
 
     it 'creates an account for a Canvas User' do
       account = Lti::LtiAccountCreator.new(canvas_user, canvas_tool).convert
-      account.id.should == 42
-      account.name.should == 'root_account'
-      account.sis_source_id.should == 'account_sis_id'
+      expect(account.id).to eq 42
+      expect(account.name).to eq 'root_account'
+      expect(account.sis_source_id).to eq 'account_sis_id'
     end
   end
 end

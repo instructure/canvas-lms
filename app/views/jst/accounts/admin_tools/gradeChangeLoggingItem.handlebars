@@ -4,6 +4,11 @@
 <td>
   {{tTimeToString created_at "tiny"}}
 </td>
+{{#ifEqual event_type 'corrupted'}}
+<td colspan="6">
+  {{#t "event_type.corrupted"}}Details Not Available{{/t}}
+</td>
+{{else}}
 <td>
   {{#if grade_before}}
     {{grade_before}}
@@ -46,3 +51,4 @@
     {{#t "blank_placeholder"}}-{{/t}}
   {{/if}}
 </td>
+{{/ifEqual}}

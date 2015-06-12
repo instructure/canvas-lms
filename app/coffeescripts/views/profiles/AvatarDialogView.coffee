@@ -82,10 +82,7 @@ define [
 
     close: ->
       @teardown()
-      $('.select_button')
-        .prop('disabled', false)
-        .removeClass('ui-state-hover')
-        .text(@messages.selectImage)
+      @enableSelectButton()
       super
 
     getImage: ->
@@ -97,6 +94,12 @@ define [
         @viewUpdateAvatar()
       else
         @imageUpdateAvatar()
+
+    enableSelectButton: ->
+      $('.select_button')
+        .prop('disabled', false)
+        .removeClass('ui-state-hover')
+        .text(@messages.selectImage)
 
     disableSelectButton: ->
       $('.select_button').prop('disabled', true).text(@messages.selectingImage)
@@ -120,9 +123,24 @@ define [
       })
 
     onPreflight: (image, response) =>
-      @image = image
-      preflightResponse = response[0]
-      @postAvatar(preflightResponse).then(_.partial(@onPostAvatar, preflightResponse))
+      # try to get an error message out of JSON string
+      errors = try
+        JSON.parse(response[0]).errors
+      catch error
+        undefined
+
+      if errors
+        message = if errors.base
+          errors.base
+        else
+          I18n.t('Your profile photo could not be uploaded. You may have exceeded your upload limit.')
+
+        $.flashError(message)
+        @enableSelectButton()
+      else
+        @image = image
+        preflightResponse = response[0]
+        @postAvatar(preflightResponse).then(_.partial(@onPostAvatar, preflightResponse))
 
     postAvatar: (preflightResponse) =>
       image = @image
@@ -130,6 +148,9 @@ define [
 
       delete @image
 
+      ###
+      xsslint xssable.receiver.whitelist req
+      ###
       req.append(k, v) for k, v of preflightResponse.upload_params
       req.append(preflightResponse.file_param, image, 'profile.jpg')
       dataType = if preflightResponse.success_url then 'xml' else 'json'

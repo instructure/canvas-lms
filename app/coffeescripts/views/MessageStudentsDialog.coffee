@@ -8,7 +8,7 @@ define [
   'jst/_messageStudentsWhoRecipientList'
   'underscore'
   'compiled/jquery/serializeForm'
-], (I18n, $, DialogFormView, template, wrapperTemplate, Conversation, recipientList, _) ->
+], (I18n, $, DialogFormView, template, wrapperTemplate, Conversation, recipientListTemplate, _) ->
 
   class MessageStudentsDialog extends DialogFormView
 
@@ -76,7 +76,7 @@ define [
     updateListOfRecipients: =>
       groupName = @$recipientGroupName.val()
       {recipients} = @_findRecipientGroupByName groupName
-      @$messageRecipients.html recipientList recipients: recipients
+      @$messageRecipients.html recipientListTemplate recipients: recipients
 
     onSaveSuccess: ->
       @close()

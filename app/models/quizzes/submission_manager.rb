@@ -11,7 +11,7 @@ module Quizzes
       @quiz.shard.activate do
         Quizzes::QuizSubmission.unique_constraint_retry do
           if !user.is_a?(::User)
-            query_hash = { temporary_user_code: "#{user.to_s}" }
+            query_hash = { temporary_user_code: "#{user}" }
           elsif temporary
             query_hash = { temporary_user_code: "user_#{user.id}" }
           else

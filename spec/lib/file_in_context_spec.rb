@@ -39,8 +39,27 @@ describe FileInContext do
       class Attachment; def filename=(new_name); write_attribute :filename, sanitize_filename(new_name); end; end
       filename = File.expand_path(File.join(File.dirname(__FILE__), %w(.. fixtures files escaping_test[0].txt)))
       attachment = FileInContext.attach(@course, filename, nil, @folder)
-      attachment.filename.should == 'escaping_test%5B0%5D.txt'
+      expect(attachment.filename).to eq 'escaping_test%5B0%5D.txt'
+      expect(attachment).to be_published
       Attachment.send(:define_method, :filename=, unbound_method)
+    end
+
+    describe "usage rights required" do
+      before do
+        @course.enable_feature! :usage_rights_required
+        @filename = File.expand_path(File.join(File.dirname(__FILE__), %w(.. fixtures files a_file.txt)))
+      end
+
+      it "should create files in unpublished state" do
+        attachment = FileInContext.attach(@course, @filename)
+        expect(attachment).not_to be_published
+      end
+
+      it "should create files as published in non-course context" do
+        assignment = @course.assignments.create!
+        attachment = FileInContext.attach(assignment, @filename)
+        expect(attachment).to be_published
+      end
     end
   end
 end

@@ -1,6 +1,9 @@
 define [
   'jquery'
   'underscore'
+  'react'
+  'react-modal'
+  'jsx/calendar/ColorPicker'
   'compiled/userSettings'
   'jst/calendar/contextList'
   'jst/calendar/undatedEvents'
@@ -10,7 +13,8 @@ define [
   'compiled/jquery.kylemenu'
   'jquery.instructure_misc_helpers'
   'vendor/jquery.ba-tinypubsub'
-], ($, _, userSettings, contextListTemplate, undatedEventsTemplate, commonEventFactory, EditEventDetailsDialog, EventDataSource) ->
+], ($, _, React, ReactModal, ColorPickerComponent, userSettings, contextListTemplate, undatedEventsTemplate, commonEventFactory, EditEventDetailsDialog, EventDataSource) ->
+  ColorPicker = React.createFactory(ColorPickerComponent)
 
   class VisibleContextManager
     constructor: (contexts, selectedContexts, @$holder) ->
@@ -69,15 +73,36 @@ define [
 
     $holder   = $('#context-list-holder')
     $skipLink = $('.skip-to-calendar')
+    $colorPickerBtn = $('.ContextList__MoreBtn')
 
     $holder.html contextListTemplate(contexts: contexts)
 
     visibleContexts = new VisibleContextManager(contexts, selectedContexts, $holder)
 
-    $holder.on 'click keyclick', '.context_list_context', (event) ->
-      visibleContexts.toggle $(this).data('context')
+    $holder.on 'click keyclick', '.context-list-toggle-box', (event) ->
+      parent = $(this).closest('.context_list_context')
+      visibleContexts.toggle $(parent).data('context')
       userSettings.set('checked_calendar_codes',
-        _.map($(this).parent().children('.checked'), (c) -> $(c).data('context')))
+        _.map($(parent).parent().children('.checked'), (c) -> $(c).data('context')))
+
+    $holder.on 'click keyclick', '.ContextList__MoreBtn', (event) ->
+      positions =
+        top: $(this).offset().top - $(window).scrollTop()
+        left: $(this).offset().left - $(window).scrollLeft()
+
+      assetString = $(this).closest('li').data('context')
+
+      React.render(ColorPicker({
+        isOpen: true
+        positions: positions
+        assetString: assetString
+        afterUpdateColor: (color) =>
+          color = '#' + color
+          $existingStyles = $('#calendar_color_style_overrides');
+          $newStyles = $('<style>')
+          $newStyles.text ".group_#{assetString}{ color: #{color}; border-color: #{color}; background-color: #{color};}"
+          $existingStyles.append($newStyles)
+      }), $('#color_picker_holder')[0]);
 
     $skipLink.on 'click', (e) ->
       e.preventDefault()

@@ -33,7 +33,10 @@ module Api::V1::OutcomeResults
   end
 
   def outcome_result_json(result)
-    hash = api_json(result, @current_user, session, only: %w(id score))
+    hash = api_json(result, @current_user, session, {
+      methods: :submitted_or_assessed_at,
+      only: %w(id score)
+    })
     hash[:links] = {
       user: result.user.id.to_s,
       learning_outcome: result.learning_outcome_id.to_s,
@@ -158,11 +161,11 @@ module Api::V1::OutcomeResults
                          ->(user) { enrollments.select{|e| e.user_id == user.id}.map(&:course_section_id) }
                        end
 
-    serialized_rollup_pairs.map do |rollup, serialized_rollup|
+    serialized_rollup_pairs.flat_map do |rollup, serialized_rollup|
       section_ids_func.call(rollup.context).map do |section_id|
         serialized_rollup.deep_merge(links: {section: section_id.to_s})
       end
-    end.flatten(1)
+    end
   end
 
   # Internal: Returns an Array of serialized rollup scores
@@ -174,6 +177,8 @@ module Api::V1::OutcomeResults
   def serialize_rollup_score(score)
     {
       score: score.score,
+      title: score.title,
+      submitted_at: score.submitted_at,
       count: score.count,
       links: {outcome: score.outcome.id.to_s},
     }

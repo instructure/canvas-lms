@@ -4,7 +4,28 @@
 
 {{#ifAll atLeastOnePageFetched length}}
   <div class="headerBar clearfix">
-    <div class="headerBar-right form-inline">
+    <div class="pull-left form-inline index_view_filter_form">
+      <span id="searchTermDescription" class="screenreader-only">
+        {{#t}}As you type in this field, the list of results will be automatically updated.{{/t}}
+      </span>
+      <input id="searchTerm"
+             placeholder="{{t "Search title, body, or author"}}"
+             aria-label="{{t "Search title, body, or author"}}"
+             aria-describedby="searchTermDescription"
+             value="{{searchTerm}}"
+             type="search">
+      <span id="discussionsFilter">
+        <input type="checkbox"
+               id="onlyUnread"
+               aria-label="{{t "filter discussions by unread"}}"
+               {{#if onlyUnread}}checked{{/if}} /><label aria-hidden="true" for="onlyUnread">{{#t "unread"}}Unread{{/t}}</label>
+        <input type="checkbox"
+               id="onlyGraded"
+               aria-label="{{t "filter discussions by assignments"}}"
+               {{#if onlyGraded}}checked{{/if}}/><label aria-hidden="true" for="onlyGraded">{{#t "assignments"}}Assignments{{/t}}</label>
+      </span>
+    </div>
+    <div class="pull-right form-inline">
       {{#if options.atom_feed_url}}
         <a class="btn"
            href="{{options.atom_feed_url}}"
@@ -21,14 +42,14 @@
       </span>
 
       {{#if options.permissions.create}}
-        <a href="{{new_topic_url}}"
-           class="btn btn-primary icon-plus"
-           id="new-discussion-btn">
-          {{#t "new_discussion"}}
-            <span class="screenreader-only">Start a</span>
-            Discussion
-          {{/t}}
-        </a>
+        <a
+          href="{{new_topic_url}}"
+          class="btn btn-primary icon-plus"
+          id="new-discussion-btn"
+          role="button"
+          title='{{#t "title_start_a_discussion"}}Start a Discussion{{/t}}'
+          aria-label='{{#t "title_start_a_discussion"}}Start a Discussion{{/t}}'
+        >{{#t}}Discussion{{/t}}</a>
       {{/if}}
 
       <button
@@ -39,21 +60,6 @@
         <i class="icon-settings"></i>
         <span class="screenreader-only">{{#t "edit_settings"}}Edit Discussions Settings{{/t}}</span>
       </button>
-    </div>
-    <div class="headerBar-left form-inline index_view_filter_form">
-      <label class="hidden-inline-text" for="searchTerm">{{#t "search_title_body_or_author"}}Search title, body, or author{{/t}}</label>
-      <input id="searchTerm"
-             placeholder="{{#t "search_title_body_or_author"}}Search title, body, or author{{/t}}"
-             value="{{searchTerm}}"
-             type="search">
-      <span id="discussionsFilter">
-        <input type="checkbox"
-               id="onlyUnread"
-               {{#if onlyUnread}}checked{{/if}} /><label for="onlyUnread">{{#t "unread"}}Unread{{/t}}</label>
-        <input type="checkbox"
-               id="onlyGraded"
-               {{#if onlyGraded}}checked{{/if}}/><label for="onlyGraded">{{#t "assignments"}}Assignments{{/t}}</label>
-      </span>
     </div>
   </div>
 
@@ -69,6 +75,8 @@
       <li>{{#t "try_disabling_the_unread_or_assignments_filters"}}Try disabling the "Unread" or "Assignments" filters.{{/t}}</li>
     </ul>
   </div>
+
+  <span tabindex="0" class="screenreader-only accessibility-warning">Warning: For improved accessibility in re-ordering a Pinned Discussion, please use the Move To Dialog option found in the menu.</span>
 
   <div class="discussion-collections">
     <div class="pinned discussion-list item-group"></div>

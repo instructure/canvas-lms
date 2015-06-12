@@ -1,15 +1,18 @@
 class OverrideTooltipPresenter < OverrideListPresenter
 
   DEFAULT_MAX_DATES = 10
-  DEFAULT_LINK_TEXT = I18n.t('#assignments.multiple_due_dates', 'Multiple Due Dates')
 
   def initialize(assignment=nil, user=nil, opts={})
     super(assignment, user)
     @opts = opts
   end
 
+  def default_link_text
+    I18n.t('#assignments.multiple_due_dates', 'Multiple Due Dates')
+  end
+
   def link_text
-    @opts[:text] || self.class::DEFAULT_LINK_TEXT
+    @opts[:text] || default_link_text
   end
 
   def link_href

@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/eportfolios/show" do
-  it "should render" do
+  before do
     eportfolio_with_user
     view_portfolio
     assigns[:category] = @portfolio.eportfolio_categories.create!(:name => "some category")
@@ -29,8 +29,42 @@ describe "/eportfolios/show" do
     assigns[:folders] = []
     assigns[:files] = []
     assigns[:page] = @portfolio.eportfolio_entries.create!(:name => "some entry", :eportfolio_category => assigns[:category])
+  end
+
+  it "should render" do
     render "eportfolios/show"
-    response.should_not be_nil
+    expect(response).not_to be_nil
+  end
+
+  it "should not link the user name if @owner_url is not set" do
+    render "eportfolios/show"
+    expect(view.content_for(:left_side)[/<a [^>]*id="section-tabs-header-subtitle"/]).to be_nil
+    expect(view.content_for(:left_side)[/<span [^>]*id="section-tabs-header-subtitle"/]).not_to be_nil
+  end
+
+  it "should link the user name if @owner_url is set" do
+    assigns[:owner_url] = user_url(@portfolio.user)
+    render "eportfolios/show"
+    expect(view.content_for(:left_side)[assigns[:owner_url]]).not_to be_nil
+    expect(view.content_for(:left_side)[/<a [^>]*id="section-tabs-header-subtitle"/]).not_to be_nil
+    expect(view.content_for(:left_side)[/<span [^>]*id="section-tabs-header-subtitle"/]).to be_nil
+  end
+
+  it "should show the share link explicitly" do
+    assigns[:owner_view] = true
+    render "eportfolios/show"
+    doc = Nokogiri::HTML.parse(response.body)
+    expect(doc.at_css('#eportfolio_share_link').text).to match %r{https?://.*/eportfolios/#{@portfolio.id}\?verifier=.*}
+  end
+
+  it "shows the right submission preview link" do
+    course_with_student(user: @user)
+    submission_model(course: @course, user: @user)
+    assigns[:owner_view] = true
+    render "eportfolios/show"
+    doc = Nokogiri::HTML.parse(response.body)
+    expect(doc.at_css("#recent_submission_#{@submission.id} .view_submission_url").attributes['href'].value).to match(
+      %r{/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}}
+    )
   end
 end
-

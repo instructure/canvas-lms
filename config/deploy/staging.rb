@@ -4,11 +4,15 @@
 # is considered to be the first unless any hosts have the primary
 # property set.  Don't declare `role :all`, it's a meta role.
 
-role :app, %w{deploy@stagingportal.beyondz.org}
-role :web, %w{deploy@stagingportal.beyondz.org}
-role :db,  %w{deploy@stagingportal.beyondz.org}
+# TODO: temp point to staging clone.  undo this when merging back to bz-staging
+role :app, %w{deploy@52.8.33.164}
+role :web, %w{deploy@52.8.33.164}
+role :db,  %w{deploy@52.8.33.164}
 
-set :branch, 'bz-staging'
+# TODO: this branch is temporary while we test the upstream changes pulled in
+# on a Staging clone.  Once everything is good and we want to push this, we need
+# to change this to the real bz-staging branch (and get this branch merged into there)
+set :branch, 'bz-upstream-updates'
 
 
 # Extended Server Syntax

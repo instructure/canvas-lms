@@ -38,6 +38,9 @@ module Api::V1::QuizQuestion
     correct_comments
     incorrect_comments
     neutral_comments
+    correct_comments_html
+    incorrect_comments_html
+    neutral_comments_html
     answers
     variables
     formulas
@@ -45,13 +48,18 @@ module Api::V1::QuizQuestion
     matching_answer_incorrect_matches
   )
 
-  def questions_json(questions, user, session, context = nil, includes = [], censored = false)
+  # @param [Quizzes::Quiz#quiz_data] quiz_data
+  #   If you specify a quiz_data construct from a submission (or a quiz), then
+  #   the questions will be modified to use the position index found in that
+  #   data. This is needed if you're rendering questions for a submission
+  #   as each submission may position each question differently.
+  def questions_json(questions, user, session, context=nil, includes=[], censored=false, quiz_data=nil)
     questions.map do |question|
-      question_json(question, user, session, context, includes, censored)
+      question_json(question, user, session, context, includes, censored, quiz_data)
     end
   end
 
-  def question_json(question, user, session, context = nil, includes = [], censored = false)
+  def question_json(question, user, session, context=nil, includes=[], censored=false, quiz_data=nil)
     hsh = api_json(question, user, session, API_ALLOWED_QUESTION_OUTPUT_FIELDS) do |json, q|
       API_ALLOWED_QUESTION_DATA_OUTPUT_FIELDS.each do |field|
         json.send("#{field}=", q.question_data[field])
@@ -69,6 +77,13 @@ module Api::V1::QuizQuestion
     # Remove the answer weights if we're censoring the data for student access;
     # the answer weights denote the correct answer !!!!!
     hsh = censor(hsh) if censored
+
+    if quiz_data
+      if question_data = quiz_data.detect { |question| question[:id] == hsh[:id] }
+        hsh[:position] = question_data[:position]
+      end
+    end
+
     hsh
   end
 
@@ -86,7 +101,7 @@ module Api::V1::QuizQuestion
     # whitelist question details for students
     attr_whitelist = %w(
       id position quiz_group_id quiz_id assessment_question_id
-      assessment_question question_name question_type question_text answers
+      assessment_question question_name question_type question_text answers matches
     )
     question_data.keep_if {|k, v| attr_whitelist.include?(k.to_s) }
 
@@ -95,6 +110,7 @@ module Api::V1::QuizQuestion
       multiple_choice_question
       true_false_question
       multiple_answers_question
+      matching_question
     )
 
     unless allow_answer_whitelist.include?(question_data[:question_type])

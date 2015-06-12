@@ -24,6 +24,10 @@ module SIS
         row.include?('user_id') && row.include?('login_id')
       end
 
+      def self.identifying_fields
+        %w[user_id].freeze
+      end
+
       # expected columns:
       # user_id,login_id,first_name,last_name,email,status
       def process(csv)
@@ -33,7 +37,7 @@ module SIS
             update_progress
 
             begin
-              importer.add_user(row['user_id'], row['login_id'], row['status'], row['first_name'], row['last_name'], row['email'], row['password'], row['ssha_password'], nil, row['short_name'], row['full_name'], row['sortable_name'])
+              importer.add_user(row['user_id'], row['login_id'], row['status'], row['first_name'], row['last_name'], row['email'], row['password'], row['ssha_password'], row['integration_id'], row['short_name'], row['full_name'], row['sortable_name'])
             rescue ImportError => e
               messages << "#{e}"
             end

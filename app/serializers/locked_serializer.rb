@@ -1,3 +1,5 @@
+# If you set the serializer option "skip_lock_tests" to true, then this mixin
+# will not add any of its fields.
 module LockedSerializer
   include Canvas::LockExplanation
   extend Forwardable
@@ -27,7 +29,15 @@ module LockedSerializer
   end
 
   def filter(keys)
-    locked_for_hash ? keys : keys - [:lock_info, :lock_explanation]
+    excluded = if serializer_option(:skip_lock_tests)
+      [ :lock_info, :lock_explanation, :locked_for_user ]
+    elsif !locked_for_hash
+      [ :lock_info, :lock_explanation ]
+    else
+      []
+    end
+
+    keys - excluded
   end
 
 end

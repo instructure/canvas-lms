@@ -9,7 +9,7 @@ describe OverrideTooltipPresenter do
 
       presenter = OverrideTooltipPresenter.new(assignment)
 
-      presenter.selector.should == "assignment_#{assignment.id}"
+      expect(presenter.selector).to eq "assignment_#{assignment.id}"
     end
 
     it 'returns a unique selector for the assignment' do
@@ -19,7 +19,7 @@ describe OverrideTooltipPresenter do
 
       presenter = OverrideTooltipPresenter.new(quiz)
 
-      presenter.selector.should == "quiz_#{quiz.id}"
+      expect(presenter.selector).to eq "quiz_#{quiz.id}"
     end
   end
 end

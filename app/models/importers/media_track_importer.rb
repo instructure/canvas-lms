@@ -24,7 +24,7 @@ module Importers
     def self.process_migration(data, migration)
       return unless data.present?
       data.each do |file_id, track_list|
-        file = migration.context.attachments.find_by_migration_id(file_id)
+        file = migration.context.attachments.where(migration_id: file_id).first
         if file && file.media_object
           track_list.each do |track|
             import_from_migration(file.media_object, track, migration)
@@ -34,7 +34,7 @@ module Importers
     end
 
     def self.import_from_migration(media_object, track, migration)
-      file = migration.context.attachments.find_by_migration_id(track[:migration_id])
+      file = migration.context.attachments.where(migration_id: track[:migration_id]).first
       return unless file
       mt = media_object.media_tracks.build
       mt.kind = track['kind']

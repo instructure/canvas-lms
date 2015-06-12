@@ -31,6 +31,11 @@ define [
       @on('fail', @submitFail)
       super
 
+    toJSON: ->
+      data = super
+      data.root_account = @model.get('root_account')
+      data
+
     submitSuccess: ->
       $.flashMessage(I18n.t('default_account_quotas_updated', 'Default account quotas updated'))
 
@@ -69,6 +74,7 @@ define [
         messages = errors[integerField]
         control_group.toggleClass('error', messages?)
         if messages
-          helpInline = $('<span class="help-inline"></span>')
-          helpInline.html((htmlEscape(message) for {message} in messages).join('<br/>'))
-          control_group.find('.controls').append(helpInline)
+          $helpInline = $('<span class="help-inline"></span>')
+          html = (htmlEscape(message) for {message} in messages).join('<br/>')
+          $helpInline.html(html)
+          control_group.find('.controls').append($helpInline)

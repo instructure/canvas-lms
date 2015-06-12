@@ -8,9 +8,10 @@ define [
   'compiled/views/wiki/WikiPageDeleteDialog'
   'compiled/views/wiki/WikiPageReloadView'
   'i18n!pages'
+  'compiled/views/editor/KeyboardShortcuts'
   'compiled/tinymce'
   'tinymce.editor_box'
-], ($, _, Backbone, wikiSidebar, template, ValidatedFormView, WikiPageDeleteDialog, WikiPageReloadView, I18n) ->
+], ($, _, Backbone, wikiSidebar, template, ValidatedFormView, WikiPageDeleteDialog, WikiPageReloadView, I18n, KeyboardShortcuts) ->
 
   class WikiPageEditView extends ValidatedFormView
     @mixin
@@ -18,11 +19,13 @@ define [
         '[name="body"]': '$wikiPageBody'
         '.header-bar-outer-container': '$headerBarOuterContainer'
         '.page-changed-alert': '$pageChangedAlert'
+        '.help_dialog': '$helpDialog'
 
       events:
         'click a.switch_views': 'switchViews'
         'click .delete_page': 'deleteWikiPage'
         'click .form-actions .cancel': 'cancel'
+        'click .form-actions .save_and_publish': 'saveAndPublish'
 
     template: template
     className: "form-horizontal edit-form validated-form-view"
@@ -61,7 +64,11 @@ define [
         IS.TEACHER_ROLE = true
 
       json.CAN =
-        PUBLISH: !!@WIKI_RIGHTS.manage && json.contextName == "courses"
+        PUBLISH: !!@WIKI_RIGHTS.publish_page
+        # Annoying name conflict - PUBLISH means we're allowed to publish wiki
+        # pages in general, PUBLISH_NOW means we can publish this page right
+        # now (i.e. we can PUBLISH and this page is currently unpublished)
+        PUBLISH_NOW: !!@WIKI_RIGHTS.publish_page && !@model.get('published')
         DELETE: !!@PAGE_RIGHTS.delete
         EDIT_TITLE: !!@PAGE_RIGHTS.update || json.new_record
         EDIT_ROLES: !!@WIKI_RIGHTS.manage
@@ -104,6 +111,9 @@ define [
         @render()
       @reloadView.pollForChanges()
 
+      @$helpDialog.html((new KeyboardShortcuts()).render().$el)
+
+
     # Initialize the wiki sidebar
     # @api private
     initWikiSidebar: ->
@@ -139,11 +149,9 @@ define [
       errors
 
     hasUnsavedChanges: ->
-      json = @toJSON()
-      dirty = @$wikiPageBody.editorBox('is_dirty')
-      if json.CAN.EDIT_TITLE
-        dirty ||= (@model.get('title') ? '') != (@getFormData().title ? '')
-
+      dirty = @$wikiPageBody.editorBox('exists?') && @$wikiPageBody.editorBox('is_dirty')
+      if not dirty and @toJSON().CAN.EDIT_TITLE
+        dirty = (@model.get('title') || '') isnt (@getFormData().title || '')
       dirty
 
     unsavedWarning: ->
@@ -159,6 +167,19 @@ define [
 
       @reloadView?.stopPolling()
       super
+
+    saveAndPublish: (event) ->
+      @shouldPublish = true
+      @submit(event)
+
+    onSaveFail: (xhr) =>
+      @shouldPublish = false
+      super(xhr)
+
+    getFormData: ->
+      data = super
+      data.published = true if @shouldPublish
+      data
 
     cancel: (event) ->
       event?.preventDefault()

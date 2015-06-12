@@ -103,10 +103,10 @@ module Polling
     # @argument poll_choices[][text] [Required, String]
     #   The descriptive text of the poll choice.
     #
-    # @argument poll_choices[][is_correct] [Optional, Boolean]
+    # @argument poll_choices[][is_correct] [Boolean]
     #   Whether this poll choice is considered correct or not. Defaults to false.
     #
-    # @argument poll_choices[][position] [Optional, Integer]
+    # @argument poll_choices[][position] [Integer]
     #   The order this poll choice should be returned in the context it's sibling poll choices.
     #
     # @example_response
@@ -136,10 +136,10 @@ module Polling
     # @argument poll_choices[][text] [Required, String]
     #   The descriptive text of the poll choice.
     #
-    # @argument poll_choices[][is_correct] [Optional, Boolean]
+    # @argument poll_choices[][is_correct] [Boolean]
     #   Whether this poll choice is considered correct or not.  Defaults to false.
     #
-    # @argument poll_choices[][position] [Optional, Integer]
+    # @argument poll_choices[][position] [Integer]
     #   The order this poll choice should be returned in the context it's sibling poll choices.
     #
     # @example_response

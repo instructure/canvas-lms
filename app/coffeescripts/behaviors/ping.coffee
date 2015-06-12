@@ -1,5 +1,7 @@
 define ['jquery'], ($) ->
   return unless ENV.ping_url
-  setInterval(->
-    $.post(ENV.ping_url) if document.hidden == false
+  interval = setInterval(->
+    $.post(ENV.ping_url).fail((xhr) ->
+      clearInterval(interval) if xhr.status == 401
+    ) if document.hidden == false
   , 1000*180)

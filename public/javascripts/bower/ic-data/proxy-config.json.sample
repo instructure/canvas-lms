@@ -1,6 +1,0 @@
-{
-  "token": "<your token here>",
-  "host": "http://localhost:3000",
-  "port": 8080
-}
-

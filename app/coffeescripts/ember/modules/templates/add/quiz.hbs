@@ -1,0 +1,23 @@
+{{#ic-modal-title}}{{title}}{{/ic-modal-title}}
+
+<ul>
+  {{#each quiz in quizzes}}
+    <li>
+      <label>
+        <input type="checkbox" {{action "toggleSelected" quiz on="change"}}/>
+        {{quiz.title}}
+      </label>
+    </li>
+  {{/each}}
+</ul>
+
+<div class="form-controls">
+  <button type="submit" class="btn btn-primary">{{#t "add_quizzes"}}Add quizzes{{/t}}</button>
+  <ul>
+    {{#each model.selected}}
+      <li>{{title}}</li>
+    {{/each}}
+  </ul>
+</div>
+
+

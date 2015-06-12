@@ -1,14 +1,8 @@
-require 'simplecov'
-require 'simplecov-rcov'
-
-SimpleCov.use_merging
-SimpleCov.merge_timeout(10000)
-SimpleCov.command_name('event_stream-gem')
-SimpleCov.start('test_frameworks') do
-  SimpleCov.coverage_dir('../../coverage')
-  SimpleCov.at_exit {
-    SimpleCov.result
-  }
+begin
+  require '../../spec/coverage_tool.rb'
+  CoverageTool.start('event_stream-gem')
+rescue LoadError => e
+  puts "Error: #{e}"
 end
 
 require 'event_stream'
@@ -23,15 +17,3 @@ RSpec.configure do |config|
 end
 
 Time.zone = "UTC"
-
-module Rails
-  def self.env
-    @env ||= Env.new
-  end
-
-  class Env
-    def test?
-      false
-    end
-  end
-end

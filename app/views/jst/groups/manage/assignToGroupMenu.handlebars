@@ -4,19 +4,17 @@
 
 <div class='popover-content'>
   {{#if noGroups}}
-    <p>
+    <p tabindex="-1">
       {{#t "no_groups_created"}}
         Groups need to be created before users can be added.
       {{/t}}
     </p>
   {{/if}}
   {{#if allFull}}
-    <p class='separated'>
+    <p class='separated' tabindex="-1">
       {{#t "all_groups_full"}}
-        All groups are full.
+        All groups are full. <br />
       {{/t}}
-    </p>
-    <p>
       {{#t "all_groups_full_suggestion"}}
         Either change group limits or add more groups.
       {{/t}}
@@ -24,6 +22,7 @@
   {{/if}}
 
   <ul class="unstyled assign-to-groups">
+    <li class="focus-bound" tabindex="0"></li>
     {{#each groups}}
       {{#unless isFull}}
         <li>
@@ -36,5 +35,6 @@
         </li>
       {{/unless}}
     {{/each}}
+    <li class="focus-bound" tabindex="0"></li>
   </ul>
 </div>

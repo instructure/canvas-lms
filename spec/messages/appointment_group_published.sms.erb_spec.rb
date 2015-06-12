@@ -26,6 +26,6 @@ describe 'appointment_group_published.sms' do
 
     generate_message(:appointment_group_published, :sms, @appointment_group)
 
-    @message.body.should include('some title')
+    expect(@message.body).to include('some title')
   end
 end

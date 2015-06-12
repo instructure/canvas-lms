@@ -19,12 +19,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::SubmissionManager do
+
   describe '#find_or_create_submission' do
     let(:test_user) { user }
 
     before(:each) do
       course
-      @course.root_account.disable_feature!(:draft_state)
       @quiz = @course.quizzes.create! :title => "hello"
     end
 
@@ -35,7 +35,7 @@ describe Quizzes::SubmissionManager do
 
         s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(stub_user, false)
 
-        s.temporary_user_code.should == "asdf"
+        expect(s.temporary_user_code).to eq "asdf"
       end
 
       it 'uses to_s on the user to query the db when temporary is set to true' do
@@ -44,7 +44,7 @@ describe Quizzes::SubmissionManager do
 
         s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(stub_user, true)
 
-        s.temporary_user_code.should == "asdf"
+        expect(s.temporary_user_code).to eq "asdf"
       end
     end
 
@@ -54,7 +54,7 @@ describe Quizzes::SubmissionManager do
 
         s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(test_user, true)
 
-        s.temporary_user_code.should == "user_#{test_user.id}"
+        expect(s.temporary_user_code).to eq "user_#{test_user.id}"
       end
     end
 
@@ -68,8 +68,8 @@ describe Quizzes::SubmissionManager do
           s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(test_user)
         }.to_not change { Quizzes::QuizSubmission.count }
 
-        s.user.should == test_user
-        s.should == submission
+        expect(s.user).to eq test_user
+        expect(s).to eq submission
       end
     end
 
@@ -82,8 +82,8 @@ describe Quizzes::SubmissionManager do
         expect {
           s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(test_user)
         }.to_not change { Quizzes::QuizSubmission.count }
-        s.should == submission
-        s.workflow_state.should == 'graded'
+        expect(s).to eq submission
+        expect(s.workflow_state).to eq 'graded'
       end
     end
 
@@ -93,7 +93,7 @@ describe Quizzes::SubmissionManager do
         expect {
           s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(test_user, false, "preview")
         }.to change { Quizzes::QuizSubmission.count }.by(1)
-        s.workflow_state.should == "preview"
+        expect(s.workflow_state).to eq "preview"
       end
 
       it 'defaults workflow state to untaken if not set' do
@@ -101,7 +101,7 @@ describe Quizzes::SubmissionManager do
         expect {
           s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(test_user)
         }.to change { Quizzes::QuizSubmission.count }.by(1)
-        s.workflow_state.should == "untaken"
+        expect(s.workflow_state).to eq "untaken"
       end
     end
   end

@@ -236,11 +236,16 @@ module Api
   # Add [link HTTP Headers](http://www.w3.org/Protocols/9707-link-header.html) for pagination
   # The collection needs to be a will_paginate collection (or act like one)
   # a new, paginated collection will be returned
-  def self.paginate(collection, controller, base_url, pagination_args = {})
+  def self.paginate(collection, controller, base_url, pagination_args = {}, response_args = {})
     collection = paginate_collection!(collection, controller, pagination_args)
-    links = build_links(base_url, meta_for_pagination(controller, collection))
+    hash = build_links_hash(base_url, meta_for_pagination(controller, collection))
+    links = build_links_from_hash(hash)
     controller.response.headers["Link"] = links.join(',') if links.length > 0
-    collection
+    if response_args[:enhanced_return]
+      {hash: hash, collection: collection}
+    else
+      collection
+    end
   end
 
   # Returns collection as the first return value, and the meta information hash
@@ -315,6 +320,10 @@ module Api
   EXCLUDE_IN_PAGINATION_LINKS = %w(page per_page access_token api_key)
   def self.build_links(base_url, opts={})
     links = build_links_hash(base_url, opts)
+    build_links_from_hash(links)
+  end
+
+  def self.build_links_from_hash(links)
     # iterate in order, but only using the keys present from build_links_hash
     (PAGINATION_PARAMS & links.keys).map do |k|
       v = links[k]
@@ -357,8 +366,6 @@ module Api
     }
   end
 
-  # a hash of allowed html attributes that represent urls, like { 'a' => ['href'], 'img' => ['src'] }
-  UrlAttributes = CanvasSanitize::SANITIZE[:protocols].inject({}) { |h,(k,v)| h[k] = v.keys; h }
 
   def api_bulk_load_user_content_attachments(htmls, context = @context, user = @current_user)
     rewriter = UserContent::HtmlRewriter.new(context, user)
@@ -381,14 +388,30 @@ module Api
     end
   end
 
-  def api_user_content(html, context = @context, user = @current_user, preloaded_attachments = {})
+  PLACEHOLDER_PROTOCOL = 'https'
+  PLACEHOLDER_HOST = 'placeholder.invalid'
+
+  def get_host_and_protocol_from_request
+    [ request.host_with_port, request.ssl? ? 'https' : 'http' ]
+  end
+
+  def resolve_placeholders(content)
+    host, protocol = get_host_and_protocol_from_request
+    # content is a json-encoded string; slashes are escaped
+    content.gsub("#{PLACEHOLDER_PROTOCOL}:\\/\\/#{PLACEHOLDER_HOST}", "#{protocol}:\\/\\/#{host}")
+  end
+
+  def api_user_content(html, context = @context, user = @current_user, preloaded_attachments = {}, is_public=false)
     return html if html.blank?
 
-    # if we're a controller, use the host of the request, otherwise let HostUrl
-    # figure out what host is appropriate
-    if self.is_a?(ApplicationController)
-      host = request.host_with_port
-      protocol = request.ssl? ? 'https' : 'http'
+    # use the host of the request if available;
+    # use a placeholder host for pre-generated content, which we will replace with the request host when available;
+    # otherwise let HostUrl figure out what host is appropriate
+    if self.respond_to?(:request)
+      host, protocol = get_host_and_protocol_from_request
+    elsif self.respond_to?(:use_placeholder_host?) && use_placeholder_host?
+      host = PLACEHOLDER_HOST
+      protocol = PLACEHOLDER_PROTOCOL
     else
       host = HostUrl.context_host(context, @account_domain.try(:host))
       protocol = HostUrl.protocol
@@ -399,154 +422,49 @@ module Api
       if match.obj_id
         obj   = preloaded_attachments[match.obj_id]
         obj ||= if context.is_a?(User) || context.nil?
-                  Attachment.find_by_id(match.obj_id)
+                  Attachment.where(id: match.obj_id).first
                 else
                   context.attachments.find_by_id(match.obj_id)
                 end
       end
-      next unless obj && rewriter.user_can_view_content?(obj)
+
+      unless obj && ((is_public && !obj.locked_for?(user)) || obj.grants_right?(user, nil, :download))
+        if obj && obj.previewable_media? && (uri = URI.parse(match.url) rescue nil)
+          uri.query = (uri.query.to_s.split("&") + ["no_preview=1"]).join("&")
+          next uri.to_s
+        else
+          next
+        end
+      end
 
       if ["Course", "Group", "Account", "User"].include?(obj.context_type)
+        opts = {:only_path => true}
+        opts.merge!(:verifier => obj.uuid) unless respond_to?(:in_app?, true) && in_app? && !is_public
         if match.rest.start_with?("/preview")
-          url = self.send("#{obj.context_type.downcase}_file_preview_url", obj.context_id, obj.id, :verifier => obj.uuid, :only_path => true)
+          url = self.send("#{obj.context_type.downcase}_file_preview_url", obj.context_id, obj.id, opts)
         else
-          url = self.send("#{obj.context_type.downcase}_file_download_url", obj.context_id, obj.id, :verifier => obj.uuid, :download => '1', :only_path => true)
+          opts[:download] = '1'
+          opts[:wrap] = '1' if match.rest.include?('wrap=1')
+          url = self.send("#{obj.context_type.downcase}_file_download_url", obj.context_id, obj.id, opts)
         end
       else
-        url = file_download_url(obj.id, :verifier => obj.uuid, :download => '1', :only_path => true)
+        opts = {:download => '1', :only_path => true}
+        opts.merge!(:verifier => obj.uuid) unless respond_to?(:in_app?, true) && in_app? && !is_public
+        url = file_download_url(obj.id, opts)
       end
       url
     end
     html = rewriter.translate_content(html)
 
-    return html if html.blank?
-
-    # translate media comments into html5 video tags
-    doc = Nokogiri::HTML::DocumentFragment.parse(html)
-    doc.css('a.instructure_inline_media_comment').each do |anchor|
-      media_id = anchor['id'].try(:sub, /^media_comment_/, '')
-      next if media_id.blank?
-
-      media_type = anchor['class'].try(:match, /\baudio_comment\b/) ? 'audio' : 'video'
-      node = Nokogiri::XML::Node.new(media_type, doc)
-      node['data-media_comment_type'] = media_type
-      if media_type == 'video'
-        node['poster'] = media_object_thumbnail_url(media_id, :width => 550, :height => 448, :type => 3, :host => host, :protocol => protocol)
-      end
-      node['preload'] = 'none'
-      node['class'] = 'instructure_inline_media_comment'
-      node['data-media_comment_id'] = media_id
-      media_redirect = polymorphic_url([context, :media_download], :entryId => media_id, :media_type => media_type, :redirect => '1', :host => host, :protocol => protocol)
-      node['controls'] = 'controls'
-      node['src'] = media_redirect
-      node.inner_html = anchor.inner_html
-      anchor.replace(node)
-    end
-
-    UserContent.find_user_content(doc) do |node, uc|
-      node['class'] = "instructure_user_content #{node['class']}"
-      node['data-uc_width'] = uc.width
-      node['data-uc_height'] = uc.height
-      node['data-uc_snippet'] = uc.node_string
-      node['data-uc_sig'] = uc.node_hmac
-    end
-
-    # rewrite any html attributes that are urls but just absolute paths, to
-    # have the canvas domain prepended to make them a full url
-    #
-    # relative urls and invalid urls are currently ignored
-    UrlAttributes.each do |tag, attributes|
-      doc.css(tag).each do |element|
-        attributes.each do |attribute|
-          url_str = element[attribute]
-          begin
-            url = URI.parse(url_str)
-            # if the url_str is "//example.com/a", the parsed url will have a host set
-            # otherwise if it starts with a slash, it's a path that needs to be
-            # made absolute with the canvas hostname prepended
-            if !url.host && url_str[0] == '/'[0]
-              element[attribute] = "#{protocol}://#{host}#{url_str}"
-              api_endpoint_info(protocol, host, url_str).each do |att, val|
-                element[att] = val
-              end
-            end
-          rescue URI::Error => e
-            # leave it as is
-          end
-        end
-      end
-    end
-
-    return doc.to_s
+    url_helper = Html::UrlProxy.new(self, context, host, protocol)
+    Html::Content.rewrite_outgoing(html, url_helper) 
   end
 
   # This removes the verifier parameters that are added to attachment links by api_user_content
   # and adds context (e.g. /courses/:id/) if it is missing
   # exception: it leaves user-context file links alone
   def process_incoming_html_content(html)
-    return html unless html.present?
-    # shortcut html documents that definitely don't have anything we're interested in
-    return html unless html =~ %r{verifier=|['"]/files|instructure_inline_media_comment}
-
-    attrs = ['href', 'src']
-    link_regex = %r{/files/(\d+)/(?:download|preview)}
-    verifier_regex = %r{(\?)verifier=[^&]*&?|&verifier=[^&]*}
-
-    context_types = ["Course", "Group", "Account"]
-    skip_context_types = ["User"]
-
-    doc = Nokogiri::HTML(html)
-    doc.search("*").each do |node|
-      attrs.each do |attr|
-        if link = node[attr]
-          if link =~ link_regex
-            if link.start_with?('/files')
-              att_id = $1
-              att = Attachment.find_by_id(att_id)
-              if att
-                next if skip_context_types.include?(att.context_type)
-                if context_types.include?(att.context_type)
-                  link = "/#{att.context_type.underscore.pluralize}/#{att.context_id}" + link
-                end
-              end
-            end
-            if link.include?('verifier=')
-              link.gsub!(verifier_regex, '\1')
-            end
-            node[attr] = link
-          end
-        end
-      end
-    end
-
-    # translate audio and video tags generated by media comments back into anchor tags
-    # try to add the relevant attributes to media comment anchor tags to retain MediaObject info
-    doc.css('audio.instructure_inline_media_comment, video.instructure_inline_media_comment, a.instructure_inline_media_comment').each do |node|
-      if node.name == 'a'
-        media_id = node['id'].try(:sub, /^media_comment_/, '')
-      else
-        media_id = node['data-media_comment_id']
-      end
-      next if media_id.blank?
-
-      if node.name == 'a'
-        anchor = node
-        unless anchor['class'] =~ /\b(audio|video)_comment\b/
-          media_object = MediaObject.active.by_media_id(media_id).first
-          anchor['class'] += " #{media_object.media_type}_comment" if media_object
-        end
-      else
-        comment_type = "#{node.name}_comment"
-        anchor = Nokogiri::XML::Node.new('a', doc)
-        anchor['class'] = "instructure_inline_media_comment #{comment_type}"
-        anchor['id'] = "media_comment_#{media_id}"
-        node.replace(anchor)
-      end
-
-      anchor['href'] = "/media_objects/#{media_id}"
-    end
-
-    return doc.at_css('body').inner_html
+    Html::Content.process_incoming(html)
   end
 
   def value_to_boolean(value)
@@ -559,9 +477,11 @@ module Api
   end
 
   def self.invalid_time_stamp_error(attribute, message)
-    ErrorReport.log_error('invalid_date_time',
-                          message: "invalid #{attribute}",
-                          exception_message: message)
+    Canvas::Errors.capture(
+      'invalid_date_time',
+      message: "invalid #{attribute}",
+      exception_message: message
+    )
   end
 
   # regex for valid iso8601 dates
@@ -603,66 +523,6 @@ module Api
     end
     return nil unless api_type
     @inverse_map[api_type.downcase]
-  end
-
-  # maps canvas URLs to API URL helpers
-  # target array is return type, helper, name of each capture, and optionally a Hash of extra arguments
-  API_ROUTE_MAP = {
-      # list discussion topics
-      %r{^/courses/(#{ID})/discussion_topics$} => ['[Discussion]', :api_v1_course_discussion_topics_url, :course_id],
-      %r{^/groups/(#{ID})/discussion_topics$} => ['[Discussion]', :api_v1_group_discussion_topics_url, :group_id],
-
-      # get a single topic
-      %r{^/courses/(#{ID})/discussion_topics/(#{ID})$} => ['Discussion', :api_v1_course_discussion_topic_url, :course_id, :topic_id],
-      %r{^/groups/(#{ID})/discussion_topics/(#{ID})$} => ['Discussion', :api_v1_group_discussion_topic_url, :group_id, :topic_id],
-
-      # List pages
-      %r{^/courses/(#{ID})/wiki$} => ['[Page]', :api_v1_course_wiki_pages_url, :course_id],
-      %r{^/groups/(#{ID})/wiki$} => ['[Page]', :api_v1_group_wiki_pages_url, :group_id],
-
-      # Show page
-      %r{^/courses/(#{ID})/wiki/([^/]+)$} => ['Page', :api_v1_course_wiki_page_url, :course_id, :url],
-      %r{^/groups/(#{ID})/wiki/([^/]+)$} => ['Page', :api_v1_group_wiki_page_url, :group_id, :url],
-
-      # List assignments
-      %r{^/courses/(#{ID})/assignments$} => ['[Assignment]', :api_v1_course_assignments_url, :course_id],
-
-      # Get assignment
-      %r{^/courses/(#{ID})/assignments/(#{ID})$} => ['Assignment', :api_v1_course_assignment_url, :course_id, :id],
-
-      # List files
-      %r{^/courses/(#{ID})/files$} => ['Folder', :api_v1_course_folder_url, :course_id, {:id => 'root'}],
-      %r{^/groups/(#{ID})/files$} => ['Folder', :api_v1_group_folder_url, :group_id, {:id => 'root'}],
-      %r{^/users/(#{ID})/files$} => ['Folder', :api_v1_user_folder_url, :user_id, {:id => 'root'}],
-
-      # Get file
-      %r{^/courses/#{ID}/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
-      %r{^/groups/#{ID}/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
-      %r{^/users/#{ID}/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
-      %r{^/files/(#{ID})/} => ['File', :api_v1_attachment_url, :id],
-
-      # List quizzes
-      %r{^/courses/(#{ID})/quizzes$} => ['[Quiz]', :api_v1_course_quizzes_url, :course_id],
-
-      # Get quiz
-      %r{^/courses/(#{ID})/quizzes/(#{ID})$} => ['Quiz', :api_v1_course_quiz_url, :course_id, :id],
-
-      # Launch LTI tool
-      %r{^/courses/(#{ID})/external_tools/retrieve\?url=(.*)$} => ['SessionlessLaunchUrl', :api_v1_course_external_tool_sessionless_launch_url, :course_id, :url],
-  }.freeze
-
-  def api_endpoint_info(protocol, host, url)
-    API_ROUTE_MAP.each_pair do |re, api_route|
-      match = re.match(url)
-      next unless match
-      return_type = api_route[0]
-      helper = api_route[1]
-      args = { :protocol => protocol, :host => host }
-      args.merge! Hash[api_route.slice(2, match.captures.size).zip match.captures]
-      api_route.slice(match.captures.size + 2, 1).each { |opts| args.merge!(opts) }
-      return { 'data-api-endpoint' => self.send(helper, args), 'data-api-returntype' => return_type }
-    end
-    {}
   end
 
   def self.recursively_stringify_json_ids(value, opts = {})

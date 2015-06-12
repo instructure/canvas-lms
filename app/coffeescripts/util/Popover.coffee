@@ -1,4 +1,3 @@
-
 define [
   'jquery'
 ], ($) ->
@@ -19,46 +18,65 @@ define [
   activePopovers = []
 
   class Popover
-    constructor: (clickEvent, @content, @options = {}) ->
-      @trigger = $(clickEvent.currentTarget)
+    constructor: (triggerEvent, @content, @options = {}) ->
+      @trigger = $(triggerEvent.currentTarget)
+      @triggerAction = triggerEvent.type
       @el = $(@content)
               .addClass('carat-bottom')
-              .attr( "role", "dialog" )
               .data('popover', this)
-              .keyup (event) =>
-                @hide() if event.keyCode is $.ui.keyCode.ESCAPE
-      @el.delegate '.popover_close', 'click', (event) =>
+              .keydown (event) =>
+                # if the user hits the escape key, reset the focus to what it was.
+                if event.keyCode is $.ui.keyCode.ESCAPE
+                  @hide()
+                # If the user tabs or shift-tabs away, close.
+                return unless event.keyCode is $.ui.keyCode.TAB
+                tabbables = $ ":tabbable", @el
+                index = $.inArray event.target, tabbables
+                return if index == -1
+
+                if event.shiftKey
+                  @hide() if index == 0
+                else
+                  @hide() if index == tabbables.length-1
+
+      @el.delegate '.popover_close', 'keyclick click', (event) =>
         event.preventDefault()
         @hide()
 
-      @show(clickEvent)
+      @show(triggerEvent)
 
-    show: (clickEvent) ->
+    show: (triggerEvent) ->
       popoverToHide.hide() while popoverToHide = activePopovers.pop()
       activePopovers.push(this)
       id = "popover-#{idCounter++}"
       @trigger.attr
-        "aria-haspopup" : true
-        "aria-owns" : id
+        "aria-expanded" : true
+        "aria-controls" : id
+      @previousTarget = triggerEvent.currentTarget
 
       @el
-        .attr({
+        .attr(
           'id' : id
-          'aria-hidden' : false
-          'aria-expanded' : true
-        })
+        )
         .appendTo(document.body)
         .show()
-      @el.find(':tabbable').not('.popover_close').first().focus(1)
       @position()
+      unless triggerEvent.type == "mouseenter"
+        @el.find(':tabbable').first().focus()
+        setTimeout(
+          () =>
+            @el.find(':tabbable').first().focus()
+          , 100
+        )
 
       # handle sticking the carat right above where you clicked on the button, bounded by the dialog
       @el.find(".ui-menu-carat").remove()
+      additionalOffset = @options.manualOffset || 0
       differenceInOffset = @trigger.offset().left - @el.offset().left
-      actualOffset = clickEvent.pageX - @trigger.offset().left
+      actualOffset = triggerEvent.pageX - @trigger.offset().left
       leftBound = Math.max(0, @trigger.width() / 2 - @el.width() / 2) + 20
       rightBound = @trigger.width() - leftBound
-      caratOffset = Math.min(Math.max(leftBound, actualOffset), rightBound) + differenceInOffset
+      caratOffset = Math.min(Math.max(leftBound, actualOffset), rightBound) + differenceInOffset + additionalOffset
       $('<span class="ui-menu-carat"><span /></span>').css('left', caratOffset).prependTo(@el)
 
       @positionInterval = setInterval @position, 200
@@ -70,10 +88,10 @@ define [
         activePopovers.splice(index, 1) if this is popover
 
       @el.detach()
+      @trigger.attr 'aria-expanded', false
       clearInterval @positionInterval
       $(window).unbind 'click', @outsideClickHandler
-
-      @trigger.focus() if @trigger && @trigger.is(':visible')
+      @restoreFocus()
 
     ignoreOutsideClickSelector: '.ui-dialog'
 
@@ -87,7 +105,15 @@ define [
         my: 'center '+(if @options.verticalSide == 'bottom' then 'top' else 'bottom'),
         at: 'center '+(@options.verticalSide || 'top'),
         of: @trigger,
-        offset: '0 -10px',
+        offset: "0px #{@offsetPx()}px",
         within: 'body',
         collision: 'flipfit '+(if @options.verticalSide then 'none' else 'flipfit')
         using: using
+
+    offsetPx: ->
+      offset = if @options.verticalSide == 'bottom' then 10 else -10
+      if @options.invertOffset then (offset * -1) else offset
+
+    restoreFocus: ->
+      # set focus back to the previously focused item.
+      @previousTarget.focus() if @previousTarget and $(@previousTarget).is(':visible')

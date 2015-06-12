@@ -2,7 +2,7 @@
 <% jammit_css :locale %>
 <% js_bundle :locale %>
 <i style="<%= hidden %>" class="locale-warning icon-warning" data-tooltip='{"tooltipClass":"popover", "position":"right"}'
-   title="<div class='popover-title'><%= t(:crowdsourced_warning_title, "Crowdsourced Language") %></div><div class='popover-content'><p>
+   data-html-tooltip-title="<div class='popover-title'><%= t(:crowdsourced_warning_title, "Crowdsourced Language") %></div><div class='popover-content'><p>
     <%= t(:crowdsourced_warning_message, "The language you have selected was translated via crowdsourcing.
     Instructure has not reviewed or verified the accuracy of the translation, and accepts no responsibility for your use of this language setting. Please use at your own discretion.") %></p></div>">
 </i>

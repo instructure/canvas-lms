@@ -15,7 +15,7 @@
           <dd>
             {{#if dueAt}}
               <span {{contextSensitiveDatetimeTitle dueAt}}>
-                {{strftime dueAt "%b %-d"}}
+                {{tDateToString (fudge dueAt) 'short'}}
               </span>
             {{else}}
                -

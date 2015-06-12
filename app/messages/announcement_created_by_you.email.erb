@@ -1,0 +1,16 @@
+<% define_content :link do -%>
+  <%= polymorphic_url([asset.context, asset]) %>
+<% end %>
+<% define_content :subject do -%>
+  <%= before_label asset.title %> <%= asset.context.name %>
+<% end %>
+
+You created this Announcement:
+
+<%= html_to_text(asset.message, :base_url => dashboard_url) %>
+
+<% if asset.attachment %><%= before_label :file_included, "File Included" %> <%= asset.attachment.display_name %> - <%= asset.attachment.readable_size %>
+  <%= polymorphic_url([asset.context, :file_download], file_id: asset.attachment) %>
+<% end %>
+
+<%= content :link %>

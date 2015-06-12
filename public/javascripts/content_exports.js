@@ -18,10 +18,11 @@
 define([
   'i18n!content_exports',
   'jquery' /* $ */,
+  'str/htmlEscape',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* formSubmit */,
   'jqueryui/progressbar' /* /\.progressbar/ */
-], function(I18n, $) {
+], function(I18n, $, htmlEscape) {
 
 $(document).ready(function(event) {
   var state = 'nothing';
@@ -30,7 +31,7 @@ $(document).ready(function(event) {
       $exporter_form = $('#exporter_form');
 
   function startPoll() {
-    $exporter_form.html(I18n.t('messages.processing', "Processing") + "<div style='font-size: 0.8em;'>" + I18n.t('messages.this_may_take_a_bit', "this may take a bit...") + "</div>")
+    $exporter_form.html(htmlEscape(I18n.t('messages.processing', "Processing")) + "<div style='font-size: 0.8em;'>" + htmlEscape(I18n.t('messages.this_may_take_a_bit', "this may take a bit...")) + "</div>")
        .attr('disabled', true);
     $(".instruction").hide();
     $(".progress_bar_holder").slideDown();
@@ -65,14 +66,14 @@ $(document).ready(function(event) {
         if(content_export.workflow_state == 'exported') {
           $exporter_form.hide();
           $(".export_progress").progressbar('option', 'value', 100);
-          $(".progress_message").html("Your content has been exported.");
-          $("#export_files").append('<p>' + I18n.t('labels.new_export', "New Export:") + ' <a href="' + content_export.download_url + '">' + I18n.t('links.download_plain', "Click here to download") + '</a> </p>')
+          $(".progress_message").text(I18n.t("Your content has been exported."));
+          $("#export_files").append('<p>' + htmlEscape(I18n.t('labels.new_export', "New Export:")) + ' <a href="' + htmlEscape(content_export.download_url) + '">' + htmlEscape(I18n.t('links.download_plain', "Click here to download")) + '</a> </p>')
         } else if(content_export.workflow_state == 'failed') {
           code = "content_export_" + content_export.id;
           $(".progress_bar_holder").hide();
           $exporter_form.hide();
           var message = I18n.t('errors.error', "There was an error exporting your content.  Please notify your system administrator and give them the following export identifier: \"%{code}\"", {code: code});
-          $(".export_messages .error_message").html(message);
+          $(".export_messages .error_message").text(message);
           $(".export_messages").show();
         } else {
           if(progress == lastProgress) {

@@ -25,6 +25,7 @@ class Quizzes::QuizQuestion::MultipleDropdownsQuestion < Quizzes::QuizQuestion::
     answer[:id]
   end
 
+  # TODO: remove once new stats is on for everybody
   def stats(responses)
     @question_data = super
     answers = @question_data[:answer_sets]

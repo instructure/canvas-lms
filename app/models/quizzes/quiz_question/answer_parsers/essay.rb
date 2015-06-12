@@ -20,9 +20,11 @@ module Quizzes::QuizQuestion::AnswerParsers
   class Essay < AnswerParser
     def parse(question)
       comment = @answers.empty? ? "" : Quizzes::QuizQuestion::AnswerGroup::Answer.new(@answers.first).any_value_of([:answer_comments, :comments])
+      comments_html = @answers.empty? ? "" : Quizzes::QuizQuestion::AnswerGroup::Answer.new(@answers.first).any_value_of([:answer_comment_html, :comments_html])
 
-      answer = Quizzes::QuizQuestion::RawFields.new({comments: comment})
+      answer = Quizzes::QuizQuestion::RawFields.new({comments: comment, comments_html: comments_html})
       question[:comments] = answer.fetch_with_enforced_length(:comments, max_size: 5.kilobyte)
+      question[:comments_html] = answer.fetch_with_enforced_length(:comments_html, max_size: 5.kilobyte)
 
       question.answers = @answers
       question

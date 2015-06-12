@@ -38,7 +38,12 @@
 #           "type": "boolean"
 #         },
 #         "answer": {
-#           "description": "The provided answer (if any) for this question. The format of this parameter depends on the type of the question, see the Appendix for more information."
+#           "description": "The provided answer (if any) for this question. The format of this parameter depends on the type of the question, see the Appendix for more information.",
+#           "type": "string"
+#         },
+#         "answers": {
+#           "description": "The possible answers for this question when those possible answers are necessary.  The presence of this parameter is dependent on permissions.",
+#           "type": "array"
 #         }
 #       }
 #     }
@@ -67,39 +72,19 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   #    "quiz_submission_questions": [QuizSubmissionQuestion]
   #  }
   def index
-    if authorized_action(@quiz, @current_user, :update)
-      render json: quiz_submission_questions_json(@quiz.active_quiz_questions,
-        @quiz_submission.submission_data,
-        {
-          user: @current_user,
-          session: session,
-          includes: extract_includes
-        })
-    end
-  end
+    retrieve_quiz_submission_attempt!(params[:quiz_submission_attempt]) if params[:quiz_submission_attempt]
 
-  # @API Get a single quiz submission question.
-  # @beta
-  #
-  # Get a single question record.
-  #
-  # @argument include[] [String, "quiz_question"]
-  #   Associations to include with the quiz submission question.
-  #
-  # <b>200 OK</b> response code is returned if the request was successful.
-  #
-  # @example_response
-  #  {
-  #    "quiz_submission_questions": [QuizSubmissionQuestion]
-  #  }
-  def show
-    if authorized_action(@quiz, @current_user, :update)
-      render json: quiz_submission_questions_json(@question,
-        @quiz_submission.submission_data,
+    reject! 'Cannot receive one question at a time questions in the API', 401 if @quiz.one_question_at_a_time && censored?
+
+    if authorized_action(@quiz_submission, @current_user, :read)
+
+      render json: quiz_submission_questions_json(@quiz.active_quiz_questions.all,
+        @quiz_submission,
         {
           user: @current_user,
           session: session,
-          includes: extract_includes
+          includes: extract_includes,
+          censored: censored?
         })
     end
   end
@@ -109,19 +94,19 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   #
   # Provide or update an answer to one or more QuizQuestions.
   #
-  # @argument attempt [Integer]
+  # @argument attempt [Required, Integer]
   #   The attempt number of the quiz submission being taken. Note that this
   #   must be the latest attempt index, as questions for earlier attempts can
   #   not be modified.
   #
-  # @argument validation_token [String]
+  # @argument validation_token [Required, String]
   #   The unique validation token you received when the Quiz Submission was
   #   created.
   #
-  # @argument access_code [Optional, String]
+  # @argument access_code [String]
   #   Access code for the Quiz, if any.
   #
-  # @argument quiz_questions [Array]
+  # @argument quiz_questions[] [QuizSubmissionQuestion]
   #   Set of question IDs and the answer value.
   #
   #   See {Appendix: Question Answer Formats} for the accepted answer formats
@@ -140,14 +125,16 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   #      "answer": 42.0
   #    }]
   #  }
+  #
+  # @returns [QuizSubmissionQuestion]
   def answer
     unless @quiz_submission.grants_right?(@service.participant.user, :update)
       reject! 'you are not allowed to update questions for this quiz submission', 403
     end
 
     answers = params.fetch(:quiz_questions, []).reduce({}) do |hsh, p|
-      if p[:id].present? && p[:answer].present?
-        hsh[p[:id].to_i] = p[:answer]
+      if p[:id].present?
+        hsh[p[:id].to_i] = p[:answer] || []
       end
 
       hsh
@@ -166,9 +153,9 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
       hsh.merge serialization_rc.answer
     end
 
-    submission_data = @service.update_question(record, @quiz_submission, params[:attempt])
+    @service.update_question(record, @quiz_submission, params[:attempt])
 
-    render json: quiz_submission_questions_json(quiz_questions.all, submission_data)
+    render json: quiz_submission_questions_json(quiz_questions.all, @quiz_submission.reload)
   end
 
   # @API Flagging a question.
@@ -177,16 +164,16 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   # Set a flag on a quiz question to indicate that you want to return to it
   # later.
   #
-  # @argument attempt [Integer]
+  # @argument attempt [Required, Integer]
   #   The attempt number of the quiz submission being taken. Note that this
   #   must be the latest attempt index, as questions for earlier attempts can
   #   not be modified.
   #
-  # @argument validation_token [String]
+  # @argument validation_token [Required, String]
   #   The unique validation token you received when the Quiz Submission was
   #   created.
   #
-  # @argument access_code [Optional, String]
+  # @argument access_code [String]
   #   Access code for the Quiz, if any.
   #
   # @example_request
@@ -196,8 +183,12 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   #    "access_code": null
   #  }
   def flag
+    unless @quiz_submission.grants_right?(@service.participant.user, :update)
+      reject! 'you are not allowed to update questions for this quiz submission', 403
+    end
+    flag_current_question(true)
     render json: quiz_submission_questions_json([ @question ],
-      flag_current_question(true))
+      @quiz_submission.reload)
   end
 
   # @API Unflagging a question.
@@ -206,16 +197,16 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   # Remove the flag that you previously set on a quiz question after you've
   # returned to it.
   #
-  # @argument attempt [Integer]
+  # @argument attempt [Required, Integer]
   #   The attempt number of the quiz submission being taken. Note that this
   #   must be the latest attempt index, as questions for earlier attempts can
   #   not be modified.
   #
-  # @argument validation_token [String]
+  # @argument validation_token [Required, String]
   #   The unique validation token you received when the Quiz Submission was
   #   created.
   #
-  # @argument access_code [Optional, String]
+  # @argument access_code [String]
   #   Access code for the Quiz, if any.
   #
   # @example_request
@@ -225,8 +216,12 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   #    "access_code": null
   #  }
   def unflag
+    unless @quiz_submission.grants_right?(@service.participant.user, :update)
+      reject! 'you are not allowed to update questions for this quiz submission', 403
+    end
+    flag_current_question(false)
     render json: quiz_submission_questions_json([ @question ],
-      flag_current_question(false))
+      @quiz_submission.reload)
   end
 
   private
@@ -286,6 +281,10 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
 
   def serializer_for(quiz_question)
     Quizzes::QuizQuestion::AnswerSerializers.serializer_for(quiz_question)
+  end
+
+  def censored?
+    !@quiz.grants_right?(@current_user, session, :update)
   end
 
   # @!appendix Question Answer Formats

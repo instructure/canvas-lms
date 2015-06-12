@@ -1,0 +1,10 @@
+<% content_for :head, include_common_stylesheets %>
+<%= render :partial => "layouts/head" %>
+<% js_env :NEW_FILES_PREVIEW => 1 %>
+<% js_bundle :file_preview %>
+<body style="margin:0; padding: 0; background: transparent;">
+  <div id="content" class="file_preview_container">
+    <div id="media_preview" <%= media_preview_attributes(@file) %>></div>
+  </div>
+  <%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>
+</body>

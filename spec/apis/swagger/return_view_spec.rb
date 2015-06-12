@@ -12,15 +12,15 @@ describe ReturnView do
     let(:view) { ReturnView.new "Type" }
 
     it "tells its type" do
-      view.type.should == "Type"
+      expect(view.type).to eq "Type"
     end
 
     it "is not an array" do
-      view.array?.should_not be_true
+      expect(view.array?).not_to be_truthy
     end
 
     it "converts to swagger hash" do
-      view.to_swagger.should == { "type" => "Type" }
+      expect(view.to_swagger).to eq({ "type" => "Type" })
     end
   end
 
@@ -28,15 +28,15 @@ describe ReturnView do
     let(:view) { ReturnView.new "[Type]" }
 
     it "tells its type" do
-      view.type.should == "Type"
+      expect(view.type).to eq "Type"
     end
 
     it "is an array" do
-      view.array?.should be_true
+      expect(view.array?).to be_truthy
     end
 
     it "converts to swagger hash" do
-      view.to_swagger.should == { "type" => "array", "items" => { "$ref" => "Type" } }
+      expect(view.to_swagger).to eq({ "type" => "array", "items" => { "$ref" => "Type" } })
     end
   end
 end

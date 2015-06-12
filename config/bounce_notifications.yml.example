@@ -1,0 +1,7 @@
+development:
+  access_key_id: access_key
+  secret_access_key: secret_key
+  # bounce_queue_name: canvas_notifications_bounces
+  # idle_timeout: 10
+  # You can also specify the following values to be passed into the sqs queue's
+  # poll command: initial_timeout, wait_time_seconds, visibility_timeout

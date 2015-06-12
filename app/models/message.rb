@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011-2013 Instructure, Inc.
+# Copyright (C) 2011 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,13 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'hey'
+
 class Message < ActiveRecord::Base
   # Included modules
-  if CANVAS_RAILS2
-    include ActionController::UrlWriter
-  else
-    include Rails.application.routes.url_helpers
-  end
+  include Rails.application.routes.url_helpers
 
   include PolymorphicTypeOverride
   override_polymorphic_types context_type: {'QuizSubmission' => 'Quizzes::QuizSubmission',
@@ -42,7 +40,7 @@ class Message < ActiveRecord::Base
   belongs_to :asset_context, :polymorphic => true
   belongs_to :communication_channel
   belongs_to :context, :polymorphic => true
-  belongs_to :notification
+  include NotificationPreloader
   belongs_to :user
   belongs_to :root_account, :class_name => 'Account'
   has_many   :attachments, :as => :context
@@ -64,6 +62,8 @@ class Message < ActiveRecord::Base
   # Validations
   validates_length_of :body,                :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :transmission_errors, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
+  validates_length_of :to, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
+  validates_length_of :from, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
 
   # Stream policy
   on_create_send_to_streams do
@@ -136,7 +136,7 @@ class Message < ActiveRecord::Base
   # Named scopes
   scope :for_asset_context_codes, lambda { |context_codes| where(:asset_context_code => context_codes) }
 
-  scope :for, lambda { |context| where(:context_type => context.class.base_ar_class.to_s, :context_id => context) }
+  scope :for, lambda { |context| where(:context_type => context.class.base_class.to_s, :context_id => context) }
 
   scope :after, lambda { |date| where("messages.created_at>?", date) }
 
@@ -145,8 +145,6 @@ class Message < ActiveRecord::Base
   }
 
   scope :to_email, -> { where(:path_type => ['email', 'sms']) }
-
-  scope :to_facebook, -> { where(:path_type => 'facebook', :workflow_state => 'sent').order("sent_at DESC").limit(25) }
 
   scope :not_to_email, -> { where("messages.path_type NOT IN ('email', 'sms')") }
 
@@ -204,41 +202,73 @@ class Message < ActiveRecord::Base
   end
 
   def author_email_address
-    author.try(:email)
+    if context_root_account.try(:author_email_in_notifications?)
+      author.try(:email)
+    end
   end
 
   # Public: Helper to generate a URI for the given subject. Overrides Rails'
   # built-in ActionController::PolymorphicRoutes#polymorphic_url method because
   # it forces option defaults for protocol and host.
-  #
-  # Differs from the built-in method in that it doesn't accept a hash as a
-  # subject; only ActiveRecord objects and arrays.
-  #
-  # subject - An ActiveRecord object, or an array of ActiveRecord objects.
-  # options - A hash of URI options (default: {}):
-  #           :protocol - HTTP protocol string. Either 'http' or 'https'.
-  #           :host - A host string (e.g. 'canvas.instructure.com').
-  #
-  # Returns a URL string.
-  def polymorphic_url_with_context_host(subject, options = {})
-    # Force options
-    options[:protocol] = HostUrl.protocol
-    options[:host]     = if subject.is_a?(Array)
-                           HostUrl.context_host(subject.first)
-                         else
-                           HostUrl.context_host(subject)
-                         end
-
-    polymorphic_url_without_context_host(subject, options)
+  def default_url_options
+    { protocol: HostUrl.protocol, host: HostUrl.context_host(link_root_account) }
   end
-  alias_method_chain :polymorphic_url, :context_host
 
-  # the hostname for user-specific links (e.g. setting notification prefs).
-  # may be different from the asset/context host
-  def primary_host
-    primary_context = user.pseudonym.try(:account)
-    primary_context ||= context.respond_to?(:context) ? context.context : context
-    HostUrl.context_host primary_context
+  # Public: Helper to generate JSON suitable for publishing via Amazon SNS
+  #
+  # Currently pulls data from email template contents
+  #
+  # Returns a JSON string
+  def sns_json
+    @sns_json ||= begin
+      custom_data = {
+        html_url: self.url,
+        user_id: self.user.global_id
+      }
+      custom_data[:api_url] = content(:api_url) if content(:api_url) # no templates define this right now
+
+      {
+        default: self.subject,
+        GCM: {
+          data: {
+            alert: self.subject,
+          }.merge(custom_data)
+        }.to_json,
+        APNS_SANDBOX: {
+          aps: {
+            alert: self.subject
+          }
+        }.merge(custom_data).to_json,
+        APNS: {
+          aps: {
+            alert: self.subject
+          }
+        }.merge(custom_data).to_json
+      }.to_json
+    end
+  end
+
+  # infer a root account associated with the context that the user can log in to
+  def link_root_account
+    @root_account ||= begin
+      context = self.context
+      context = context.assignment if context.respond_to?(:assignment) && context.assignment
+      context = context.rubric_association.context if context.respond_to?(:rubric_association) && context.rubric_association
+      context = context.appointment_group.contexts.first if context.respond_to?(:appointment_group) && context.appointment_group
+      context = context.context if context.respond_to?(:context)
+      context = context.account if context.respond_to?(:account)
+      context = context.root_account if context.respond_to?(:root_account)
+      if context
+        p = user.sis_pseudonym_for(context)
+        p ||= user.find_pseudonym_for_account(context, true)
+        context = p.account if p
+      else
+        # nothing? okay, just something the user can log in to
+        context = user.pseudonym.try(:account)
+        context ||= self.context
+      end
+      context
+    end
   end
 
   # Internal: Store any transmission errors in the database to help with later
@@ -383,13 +413,13 @@ class Message < ActiveRecord::Base
 
     # Add the attribute 'inner_html' with the value of inner_html into the _binding
     @output_buffer = nil
-    inner_html = RailsXss::Erubis.new(template, :bufvar => '@output_buffer').result(_binding)
+    inner_html = ActionView::Template::Handlers::Erubis.new(template, :bufvar => '@output_buffer').result(_binding)
     setter = eval "inner_html = nil; lambda { |v| inner_html = v }", _binding
     setter.call(inner_html)
 
     layout_path = Canvas::MessageHelper.find_message_path('_layout.email.html.erb')
     @output_buffer = nil
-    RailsXss::Erubis.new(File.read(layout_path)).result(_binding)
+    ActionView::Template::Handlers::Erubis.new(File.read(layout_path)).result(_binding)
   ensure
     @i18n_scope = orig_i18n_scope
   end
@@ -407,18 +437,12 @@ class Message < ActiveRecord::Base
   # _binding              - Message binding
   #
   # Returns message body
-  def populate_body(message_body_template, path_type, _binding)
+  def populate_body(message_body_template, path_type, _binding, filename)
     # Build the body content based on the path type
 
-    if path_type == 'facebook'
-      # this will ensure we escape anything that's not already safe
-      @output_buffer = nil
-      self.body = RailsXss::Erubis.new(message_body_template).result(_binding)
-    else
       self.body = Erubis::Eruby.new(message_body_template,
-        :bufvar => '@output_buffer').result(_binding)
+        bufvar: '@output_buffer', filename: filename).result(_binding)
       self.html_body = apply_html_template(_binding) if path_type == 'email'
-    end
 
     # Append a footer to the body if the path type is email
     if path_type == 'email'
@@ -469,18 +493,20 @@ class Message < ActiveRecord::Base
     context, asset, user, delayed_messages, asset_context, data = [self.context,
       self.context, self.user, @delayed_messages, self.asset_context, @data]
 
-    if message_body_template.present? && path_type.present?
-      populate_body(message_body_template, path_type, binding)
+    link_root_account.shard.activate do
+      if message_body_template.present? && path_type.present?
+        populate_body(message_body_template, path_type, binding, filename)
 
-      # Set the subject and url
-      self.subject = @message_content_subject || t('#message.default_subject', 'Canvas Alert')
-      self.url     = @message_content_link || nil
-    else
-      # Message doesn't exist so we flag the message as an error
-      main_link    = Erubis::Eruby.new(self.notification.main_link || "").result(binding)
-      self.subject = Erubis::Eruby.new(subject).result(binding)
-      self.body    = Erubis::Eruby.new(body).result(binding)
-      self.transmission_errors = "couldn't find #{Canvas::MessageHelper.find_message_path(filename)}"
+        # Set the subject and url
+        self.subject = @message_content_subject || t('#message.default_subject', 'Canvas Alert')
+        self.url     = @message_content_link || nil
+      else
+        # Message doesn't exist so we flag the message as an error
+        main_link    = Erubis::Eruby.new(self.notification.main_link || "").result(binding)
+        self.subject = Erubis::Eruby.new(subject).result(binding)
+        self.body    = Erubis::Eruby.new(body).result(binding)
+        self.transmission_errors = "couldn't find #{Canvas::MessageHelper.find_message_path(filename)}"
+      end
     end
 
     self.body
@@ -534,25 +560,6 @@ class Message < ActiveRecord::Base
     message_types.to_a.sort_by { |m| m[0] == 'Other' ? CanvasSort::Last : m[0] }
   end
 
-  # Public: Format and return the body for this message.
-  #
-  # Returns a body string.
-  def formatted_body
-    # NOTE: I'm pretty sure this is only used for Facebook messages; confirm
-    # that and maybe rename the method/do something different with it?
-    case path_type
-    when 'facebook'
-      (body || '').
-        gsub(/\n/, "<br />\n").
-        gsub(/(\s\s+)/) { |str| str.gsub(/\s/, '&nbsp;') }
-    when 'email'
-      formatted_body = format_message(body).first
-      formatted_body
-    else
-      body
-    end
-  end
-
   # Public: Get the root account of this message's context.
   #
   # Returns an account.
@@ -560,7 +567,7 @@ class Message < ActiveRecord::Base
     unbounded_loop_paranoia_counter = 10
     current_context                 = context
 
-    until current_context.respond_to?(:root_account) do
+    until current_context.respond_to?(:root_account)
       return nil if unbounded_loop_paranoia_counter <= 0 || current_context.nil?
       return nil unless current_context.respond_to?(:context)
       current_context = current_context.context
@@ -568,6 +575,10 @@ class Message < ActiveRecord::Base
     end
 
     current_context.root_account
+  end
+
+  def custom_logo
+    context_root_account && context_root_account.settings[:email_logo]
   end
 
   # Internal: Set default values before save.
@@ -683,10 +694,12 @@ class Message < ActiveRecord::Base
       raise_error = @exception.to_s !~ /^450/
       log_error = raise_error && !@exception.is_a?(Timeout::Error)
       if log_error
-        ErrorReport.log_exception(:default, @exception, {
-          :message => 'Message delivery failed',
-          :to => to,
-          :object => inspect.to_s })
+        Canvas::Errors.capture(
+          @exception,
+          message: 'Message delivery failed',
+          to: to,
+          object: inspect.to_s
+        )
       end
 
       self.errored_dispatch
@@ -706,21 +719,26 @@ class Message < ActiveRecord::Base
   #
   # Returns nothing.
   def deliver_via_twitter
-    twitter_service = user.user_services.find_by_service('twitter')
+    twitter_service = user.user_services.where(service: 'twitter').first
     host = HostUrl.short_host(self.asset_context)
     msg_id = AssetSignature.generate(self)
     Twitter::Messenger.new(self, twitter_service, host, msg_id).deliver
     complete_dispatch
   end
 
-  # Internal: Deliver the message through Facebook.
+  # Internal: Deliver the message through Yo.
   #
   # Returns nothing.
-  def deliver_via_facebook
-    facebook_user_id = self.to.to_i.to_s
-    service = self.user.user_services.for_service('facebook').find_by_service_user_id(facebook_user_id)
-    Facebook::Connection.dashboard_increment_count(service.service_user_id, service.token, I18n.t(:new_facebook_message, 'You have a new message from Canvas')) if service && service.token
-    complete_dispatch
+  def deliver_via_yo
+    plugin = Canvas::Plugin.find(:yo)
+    if plugin && plugin.enabled? && plugin.setting(:api_token)
+      service = self.user.user_services.where(service: 'yo').first
+      Hey.api_token ||= plugin.setting(:api_token)
+      Hey::Yo.user(service.service_user_id, link: self.url)
+      complete_dispatch
+    else
+      cancel
+    end
   end
 
   # Internal: Send the message through SMS. Right now this just calls
@@ -729,6 +747,25 @@ class Message < ActiveRecord::Base
   # Returns nothing.
   def deliver_via_sms
     deliver_via_email
+  end
+
+  # Internal: Deliver the message using AWS SNS.
+  #
+  # Returns nothing.
+  def deliver_via_push
+    begin
+      self.user.notification_endpoints.all.each do |notification_endpoint|
+        notification_endpoint.destroy unless notification_endpoint.push_json(sns_json)
+      end
+      complete_dispatch
+    rescue StandardError => e
+      @exception = e
+      error_string = "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+      logger.error error_string
+      transmission_errors = error_string
+      cancel
+      raise e
+    end
   end
 
   private

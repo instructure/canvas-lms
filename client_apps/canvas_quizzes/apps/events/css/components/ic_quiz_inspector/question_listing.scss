@@ -1,0 +1,9 @@
+#ic-QuizInspector__QuestionListing {
+  list-style: none;
+  margin: $whitespace 0;
+
+  a.active {
+    text-decoration: none;
+    color: inherit;
+  }
+}

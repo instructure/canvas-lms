@@ -33,9 +33,7 @@ define [
       assignment:       -> "#{@baseUrl()}/assignments/#{@get('id')}"
       discussion_topic: -> "#{@baseUrl()}/discussion_topics/#{@get('id')}"
       module:           -> "#{@baseUrl()}/modules/#{@get('id')}"
-      quiz: ->
-        action = if @get('published') then 'publish' else 'unpublish'
-        "/courses/#{@get('course_id')}/quizzes/#{action}"
+      quiz:             -> "#{@baseUrl()}/quizzes/#{@get('id')}"
 
     toJSONs:
       generic: ->          module_item: @attributes
@@ -43,7 +41,7 @@ define [
       wiki_page: ->        wiki_page: @attributes
       assignment: ->       assignment: @attributes
       discussion_topic: -> @attributes
-      quiz: ->             quizzes: [@get('id')]
+      quiz: ->             quiz: @attributes
       module: ->           module: @attributes
 
     disabledMessages:

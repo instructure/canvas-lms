@@ -1,0 +1,42 @@
+/*
+@styleguide Element Toggler
+
+<br/>
+This represents current best practices around using the `.element-toggler` class.
+
+<br/>
+
+  - The current thinking on accessibility is that we should use a `<span>` for the 
+  element-toggler dom element so that it's not read as "link" like it would if we used an &lt;&gt; tag.  
+  - Use `aria-controls` and `aria-expanded` on the dom element that has class `element_toggler`.  
+  - Also include an aria-label, of the format: `[toggler-name] toggle [toggled-content-description] visibility`.  
+
+<br/>
+
+```html
+
+<span
+  class="element_toggler"
+  aria-controls="group_1"
+  aria-expanded="true"
+  aria-label="Toggler toggle list visibility"
+  role="button"
+>
+  <i class="icon-mini-arrow-down"></i> Toggler
+</span>
+<ul id="group_1">
+  <li>item 1</li>
+  <li>item 2</li>
+</ul>
+
+```
+
+See `app/coffeescripts/behaviors/elementToggler.coffee`for implementation
+
+*/
+
+.element_toggler {
+  @include ic-focus-base;
+  cursor: pointer;
+  &:focus { @include ic-focus-variant; }
+}

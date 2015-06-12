@@ -27,7 +27,7 @@ describe UsersController, type: :request do
     @a2_json['assignment'] = controller.assignment_json(@a2,@user,session)
   end
 
-  before do
+  before :once do
     @teacher = course_with_teacher(:active_all => true, :user => user_with_pseudonym(:active_all => true))
     @teacher_course = @course
     @student_course = course(:active_all => true)
@@ -43,6 +43,9 @@ describe UsersController, type: :request do
     @teacher_course.enroll_student(student).accept!
     @sub = @a2.reload.submit_homework(student, :submission_type => 'online_text_entry', :body => 'done')
     @a2.reload
+  end
+
+  before :each do
     @a1_json = 
       {
         'type' => 'submitting',
@@ -96,17 +99,23 @@ describe UsersController, type: :request do
     compare_json json.second, @a2_json
   end
 
-  it "should return a course-specific todo list" do
-    a1_json = api_call(:get, "/api/v1/courses/#{@student_course.id}/todo",
+  it "returns a course-specific todo list for a student" do
+    json = api_call(:get, "/api/v1/courses/#{@student_course.id}/todo",
                     :controller => "courses", :action => "todo_items",
                     :format => "json", :course_id => @student_course.to_param)
+                    .first
 
-    a2_json = api_call(:get, "/api/v1/courses/#{@teacher_course.id}/todo",
+    update_assignment_json
+    compare_json(json, @a1_json)
+  end
+
+  it "returns a course-specific todo list for a teacher" do
+    json = api_call(:get, "/api/v1/courses/#{@teacher_course.id}/todo",
                     :controller => "courses", :action => "todo_items",
                     :format => "json", :course_id => @teacher_course.to_param)
+                    .first
     update_assignment_json
-    compare_json( a1_json.first, @a1_json )
-    compare_json( a2_json.first, @a2_json )
+    compare_json(json, @a2_json)
   end
 
   it "should return a list for users who are both teachers and students" do
@@ -117,8 +126,8 @@ describe UsersController, type: :request do
     @a1_json.deep_merge!({ 'assignment' => { 'needs_grading_count' => 0 } })
     json = json.sort_by { |t| t['assignment']['id'] }
     update_assignment_json
-    compare_json( json.first, @a1_json )
-    compare_json( json.second, @a2_json )
+    compare_json(json.first, @a1_json)
+    compare_json(json.second, @a2_json)
   end
 
   it "should ignore a todo item permanently" do
@@ -126,28 +135,28 @@ describe UsersController, type: :request do
              :controller => "users", :action => "ignore_item",
              :format => "json", :purpose => "grading",
              :asset_string => "assignment_#{@a2.id}", :permanent => "1")
-    response.should be_success
+    expect(response).to be_success
 
     json = api_call(:get, "/api/v1/courses/#{@teacher_course.id}/todo",
                     :controller => "courses", :action => "todo_items",
                     :format => "json", :course_id => @teacher_course.to_param)
-    json.should == []
+    expect(json).to eq []
 
     # after new student submission, still ignored
     another_submission
     json = api_call(:get, "/api/v1/courses/#{@teacher_course.id}/todo",
                     :controller => "courses", :action => "todo_items", :format => "json", :course_id => @teacher_course.to_param)
-    json.should == []
+    expect(json).to eq []
   end
 
   it "should ignore a todo item until the next change" do
     api_call(:delete, @a2_json['ignore'],
              :controller => "users", :action => "ignore_item", :format => "json", :purpose => "grading", :asset_string => "assignment_#{@a2.id}", :permanent => "0")
-    response.should be_success
+    expect(response).to be_success
 
     json = api_call(:get, "/api/v1/courses/#{@teacher_course.id}/todo",
                     :controller => "courses", :action => "todo_items", :format => "json", :course_id => @teacher_course.to_param)
-    json.should == []
+    expect(json).to eq []
 
     # after new student submission, no longer ignored
     another_submission
@@ -156,7 +165,7 @@ describe UsersController, type: :request do
     @a2_json['needs_grading_count'] = 2
     @a2_json['assignment']['needs_grading_count'] = 2
     update_assignment_json
-    compare_json( json.first, @a2_json )
+    compare_json(json.first, @a2_json)
   end
 
   it "works correctly when turnitin is enabled" do
@@ -164,7 +173,7 @@ describe UsersController, type: :request do
     json = api_call(:get, "/api/v1/users/self/todo",
                     :controller => "users", :action => "todo_items",
                     :format => "json")
-    response.should be_success
+    expect(response).to be_success
   end
 
 end

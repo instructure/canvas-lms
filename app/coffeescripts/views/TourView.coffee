@@ -28,11 +28,12 @@ define [
       @render()
       @$el.appendTo $(document.body)
       @tour = new Usher @$el
+      @attachTour()
 
     start: =>
       @tour.start()
 
-    attach: ->
+    attachTour: ->
       setTimeout @start, 2000
 
     dismissSession: ->

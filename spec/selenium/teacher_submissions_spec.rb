@@ -26,7 +26,7 @@ describe "submissions" do
 
       # check that the thumbnails show up on the right sidebar
       number_of_comments = driver.execute_script("return $('.comment_list').children().length")
-      number_of_comments.should == 2
+      expect(number_of_comments).to eq 2
     end
 
     it "should display the grade in grade field" do
@@ -35,7 +35,7 @@ describe "submissions" do
       assignment.submissions.create(:user => @student)
       assignment.grade_student @student, :grade => 2
       get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
-      f('.grading_value')[:value].should == '2'
+      expect(f('.grading_value')[:value]).to eq '2'
     end
   end
 
@@ -55,7 +55,7 @@ describe "submissions" do
       enter_student_view
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-      f('.assignment .title').should include_text @assignment.title
+      expect(f('.assignment .title')).to include_text @assignment.title
       f('.submit_assignment_link').click
       assignment_form = f('#submit_online_text_entry_form')
       wait_for_tiny(assignment_form)
@@ -63,8 +63,8 @@ describe "submissions" do
       type_in_tiny('#submission_body', 'my assigment submission')
       expect_new_page_load { submit_form(assignment_form) }
 
-      @course.student_view_student.submissions.count.should == 1
-      f('#sidebar_content .details').should include_text "Turned In!"
+      expect(@course.student_view_student.submissions.count).to eq 1
+      expect(f('#sidebar_content .details')).to include_text "Turned In!"
     end
 
     it "should allow a student view student to submit file upload assignments" do
@@ -84,8 +84,8 @@ describe "submissions" do
       expect_new_page_load { f('#submit_file_button').click }
 
       keep_trying_until do
-        f('.details .header').should include_text "Turned In!"
-        f('.details .file-big').should include_text "testfile1"
+        expect(f('.details .header')).to include_text "Turned In!"
+        expect(f('.details .file-big')).to include_text "testfile1"
       end
     end
   end

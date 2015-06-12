@@ -38,7 +38,7 @@ module CC::Importer::Standard
           File.open(full_path, 'w') {|f| f << qti_node.to_xml} # write to file so we can convert with qti exporter
         end
 
-        if File.exists?(full_path)
+        if File.exist?(full_path)
           qti_converted_dir = File.join(conversion_dir, id)
           if run_qti_converter(full_path, qti_converted_dir, id)
             # get quizzes/questions
@@ -74,7 +74,7 @@ module CC::Importer::Standard
       begin
         manifest_file = File.join(out_folder, Qti::Converter::MANIFEST_FILE)
         questions = Qti.convert_questions(manifest_file, :flavor => Qti::Flavors::COMMON_CARTRIDGE)
-        prepend_id_to_questions(questions, resource_id)
+        ::Canvas::Migration::MigratorHelper.prepend_id_to_questions(questions, resource_id)
 
         #try to replace relative urls
         questions.each do |question|
@@ -98,7 +98,7 @@ module CC::Importer::Standard
       begin
         manifest_file = File.join(out_folder, Qti::Converter::MANIFEST_FILE)
         quizzes = Qti.convert_assessments(manifest_file, :flavor => Qti::Flavors::COMMON_CARTRIDGE)
-        prepend_id_to_assessments(quizzes, resource_id)
+        ::Canvas::Migration::MigratorHelper.prepend_id_to_assessments(quizzes, resource_id)
         if quiz = quizzes.first
           quiz[:migration_id] = resource_id
         end

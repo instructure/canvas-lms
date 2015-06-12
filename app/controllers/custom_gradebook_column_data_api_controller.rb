@@ -64,7 +64,7 @@ class CustomGradebookColumnDataApiController < ApplicationController
   #
   # Set the content of a custom column
   #
-  # @argument column_data[content] [String]
+  # @argument column_data[content] [Required, String]
   #   Column content.  Setting this to blank will delete the datum object.
   #
   # @returns ColumnDatum

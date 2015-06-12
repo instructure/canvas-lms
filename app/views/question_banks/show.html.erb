@@ -43,7 +43,7 @@
 <div class="quiz-header">
   <%= form_for @bank, :url => context_url(@context, :context_question_bank_url), :html => {:id => "edit_bank_form", :method => :put} do |f| %>
     <div class="displaying">
-      <h2><%= @bank.title %></h2>
+      <h1><%= @bank.title %></h1>
     </div>
     <div class="editing" style="display: none;">
       <b><%= f.label :title, :en => "Bank Name" %></b>

@@ -17,19 +17,12 @@
 #
 
 define [
-  'underscore'
-  'Backbone'
   'compiled/models/Folder'
-  'compiled/collections/PaginatedCollection'
-], (_, Backbone, Folder, PaginatedCollection) ->
+], (Folder) ->
 
-  class FoldersCollection extends PaginatedCollection
-    @optionProperty 'parentFolder'
-
-    model: Folder
-
-    parse: (response) ->
-      if response
-        _.each response, (folder) =>
-          folder.contentTypes = @parentFolder.contentTypes
-      super
+  # `FoldersCollection` is actually defined inside of 'compiled/models/Folder'
+  # because RequireJS sucks at figuring out circular dependencies.
+  # I did exactly what http://requirejs.org/docs/api.html#circular said but the
+  # load order was still completely arbitrary. By defining them in the same file
+  # we control the load order exactly and things work--consistently.
+  return Folder.FoldersCollection

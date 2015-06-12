@@ -6,7 +6,8 @@ describe ObjectView do
   let(:view) { ObjectView.new(stub('Element', :text => text)) }
 
   it "separates json into parts" do
-    view.clean_json_text_parts.should ==
+    expect(view.clean_json_text_parts).to eq(
       ["\n{ \"id\": 5 }", "{ \"start_date\": \"2012-01-01\" }"]
+    )
   end
 end

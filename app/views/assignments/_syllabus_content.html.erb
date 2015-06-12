@@ -2,12 +2,12 @@
 <% js_env :SYLLABUS_BODY => user_content(@syllabus_body || '') %>
 <% @active_tab = "syllabus" %>
 <% course_home ||= false %>
-<% if !course_home %>
-  <div style="float: right;"><a href="#" class="jump_to_today_link"><%= t 'links.jump_to_today', "Jump to Today" %></a></div>
-  <h2><%= t 'titles.course_syllabus', "Course Syllabus" %></h2>
-<% else %>
-  <div class="h2"><%= @context.name %></div>
+<% if course_home %>
+  <h2><%= @context.name %></h2>
   <div style="margin-top: -5px; margin-bottom: 10px;"><a href="#" class="jump_to_today_link"><%= t 'links.jump_to_today', "Jump to Today" %></a></div>
+<% else %>
+  <div style="float: right;"><a href="#" class="jump_to_today_link"><%= t 'links.jump_to_today', "Jump to Today" %></a></div>
+  <h1><%= t 'titles.course_syllabus', "Course Syllabus" %></h1>
 <% end %>
 <div id="course_syllabus" style="margin-bottom: 10px;" class="user_content">
   <%= user_content(@syllabus_body) %>
@@ -25,7 +25,7 @@ DOC
 <%= form_for @context.class.to_s.underscore.to_sym, :url => context_url(@context, :context_url), :html => {:id => 'edit_course_syllabus_form', :style => 'display: none; margin-bottom: 10px;', :method => :put} do |f| %>
   <div style="float: right;">
     <a href="#" class="toggle_views_link"><%= t '#editor.switch_editor_html', "HTML Editor" %></a>
-    <a href="#" class="toggle_views_link" style="display:none;"><%= t '#editor.switch_editor_visual', "Visual Editor" %></a>
+    <a href="#" class="toggle_views_link" style="display:none;"><%= t '#editor.switch_editor_rich_text', "Rich Content Editor" %></a>
   </div>
   <%= f.blabel :syllabus_body, :en => "Syllabus Description" %>
   <div class="clear"></div>
@@ -42,9 +42,8 @@ DOC
   <table id="syllabus">
     <thead>
       <tr>
-        <th scope="col" style="width: 10%;"><%= t 'headers.date', "Date" %></th>
-        <th scope="col" style="width: 10%;"><%= t 'headers.day', "Day" %></th>
-        <th scope="col" style="width: 80%;">
+        <th scope="col" style="width: 25%;"><%= t 'headers.date', "Date" %></th>
+        <th scope="col" style="width: 75%;">
         <div style="float: right;"></div>
         <%= t 'headers.details', "Details" %>
         </th>

@@ -1,0 +1,11 @@
+.ic-QuestionAnchors {
+  display: inline-block;
+}
+
+.ic-QuestionAnchors__Anchor {
+  margin-left: $whitespace / 2;
+
+  &:visited {
+    color: $visitedLinkFg;
+  }
+}

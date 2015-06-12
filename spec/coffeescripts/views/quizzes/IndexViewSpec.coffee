@@ -10,7 +10,7 @@ define [
   'helpers/jquery.simulate'
 ], (Backbone, Quiz, QuizCollection, IndexView, QuizItemGroupView, NoQuizzesView, $, fakeENV) ->
 
-  fixtures = $('#fixtures')
+  fixtures = null
 
   indexView = (assignments, open, surveys) ->
     $('<div id="content"></div>').appendTo fixtures
@@ -53,12 +53,16 @@ define [
       permissions:     permissions
       flags:           flags
       urls:            urls
-    view.$el.appendTo $('#fixtures')
+    view.$el.appendTo fixtures
     view.render()
 
   module 'IndexView',
-    setup: -> fakeENV.setup()
-    teardown: -> fakeENV.teardown()
+    setup: ->
+      fixtures = $("#fixtures")
+      fakeENV.setup()
+    teardown: ->
+      fakeENV.teardown()
+      fixtures.empty()
 
   # hasNoQuizzes
   test '#hasNoQuizzes if assignment and open quizzes are empty', ->
@@ -125,23 +129,3 @@ define [
     view.filterResults()
     equal view.$el.find('.collectionViewItems li').length, 2
 
-  test 'should filter models with title that doesnt match term', ->
-    view = indexView()
-    model = new Quiz(title: "Foo Name")
-
-    ok  view.filter(model, "name")
-    ok !view.filter(model, "zzz")
-
-  test 'should not use regexp to filter models', ->
-    view = indexView()
-    model = new Quiz(title: "Foo Name")
-
-    ok !view.filter(model, ".*name")
-    ok !view.filter(model, "zzz")
-
-  test 'should filter models with multiple terms', ->
-    view = indexView()
-    model = new Quiz(title: "Foo Name bar")
-
-    ok  view.filter(model, "name bar")
-    ok !view.filter(model, "zzz")

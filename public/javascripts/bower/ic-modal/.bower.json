@@ -36,7 +36,6 @@
     "commit": "b5b5c040d4cb49a9d39d8c3f0139250624c032fb"
   },
   "_source": "git://github.com/instructure/ic-modal.git",
-  "_target": "~0.1.1",
-  "_originalSource": "ic-modal",
-  "_direct": true
+  "_target": "0.1.1",
+  "_originalSource": "ic-modal"
 }

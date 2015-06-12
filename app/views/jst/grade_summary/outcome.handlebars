@@ -1,30 +1,41 @@
-<div class="outcome-icon {{status}}" data-tooltip="top" title="{{statusTooltip}}" aria-label="Outcome: {{title}} has a status of {{statusTooltip}}">
+<div class="outcome-icon {{status}}" data-tooltip="top" title="{{statusTooltip}}">
+  <span class="screenreader-only">
+    {{#t}}Outcome: {{title}} has a status of {{statusTooltip}}{{/t}}
+  </span>
   {{#if scoreDefined}}
-    {{#ifEqual status 'mastery'}}
-      {{addIcon 'complete'}}
-    {{else}}
-      {{#ifEqual status 'near'}}
-        {{addIcon 'partial'}}
-      {{else}}
-        {{addIcon 'trouble'}}
-      {{/ifEqual}}
-    {{/ifEqual}}
+    {{addMasteryIcon status}}
   {{else}}
-    <i class="icon-empty"></i>
+    <i aria-hidden="true" class="icon-empty"></i>
   {{/if}}
 </div>
 <div class="outcome-properties">
-  <div class="title" data-tooltip title="{{#if hover_name}}{{hover_name}}: {{/if}}{{description}}">
-    <h4>{{friendly_name}}</h4>
+  <div class="title" data-tooltip title="{{#if hover_name}}{{hover_name}}{{/if}}">
+    <h4>
+      {{friendly_name}}
+      {{#if hover_name}}
+        <span class="screenreader-only">
+          {{ hover_name }}
+        </span>
+      {{/if}}
+    </h4>
   </div>
   <div class="description">{{{description}}}</div>
 </div>
-<div class="outcome-score outcome-bar-wrapper">
-  {{view progress}}
-  <span class="score" aria-label="Score: {{roundedScore}} out of {{points_possible}} points with mastery at {{mastery_points}}">
-    <strong>{{#if scoreDefined}}{{roundedScore}}{{else}}-{{/if}}</strong>/{{mastery_points}}
-  </span>
-  <a href="#tab-outcomes/{{id}}" aria-haspopup='true' aria-owns='outcome_detail'>
-    {{#t 'alignment_count'}}<strong>{{count}}</strong> Alignments{{/t}}
+<div class="alignment-info">
+  <a href="#tab-outcomes/{{id}}" role="button" aria-haspopup='true' aria-owns='outcome_detail'>
+    {{#ifGreaterThan count 8 }}
+      {{#t 'alignment_count_summary'}}<strong>8</strong> out of <strong>{{count}}</strong> Alignments{{/t}}
+    {{else}}
+      {{#t 'alignment_count'}}<strong>{{count}}</strong> Alignments{{/t}}
+    {{/ifGreaterThan}}
+  </a>
+  <a class="more-details"
+    href="#"
+    role="button"
+    tabindex="0">
+    <i class="icon-more" role="presentation"></i>
+    <span class="screenreader-only">
+      {{#t}}click for more details on this outcome{{/t}}
+    </span>
   </a>
 </div>

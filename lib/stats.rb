@@ -56,7 +56,9 @@ module Stats
     def size; @items.size; end
     alias :count :size
     def empty?; @items.size == 0; end
+
     def sum_of_squares; @sum_of_squares; end
+
     def mean; @items.empty? ? nil : (sum.to_f / @items.size); end
     alias :avg :mean
     

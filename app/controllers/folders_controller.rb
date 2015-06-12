@@ -107,7 +107,7 @@ class FoldersController < ApplicationController
   include Api::V1::Attachment
   include AttachmentHelper
 
-  before_filter :require_context, :except => [:api_index, :show, :api_destroy, :update, :create, :create_file]
+  before_filter :require_context, :except => [:api_index, :show, :api_destroy, :update, :create, :create_file, :copy_folder, :copy_file]
 
   def index
     if authorized_action(@context, @current_user, :read)
@@ -115,14 +115,14 @@ class FoldersController < ApplicationController
     end
   end
 
-  
+
   # @API List folders
   # @subtopic Folders
   # Returns the paginated list of folders in the folder.
   #
   # @example_request
   #
-  #   curl 'https://<canvas>/api/v1/folders/<folder_id>/folders' \ 
+  #   curl 'https://<canvas>/api/v1/folders/<folder_id>/folders' \
   #        -H 'Authorization: Bearer <token>'
   #
   # @returns [Folder]
@@ -142,6 +142,38 @@ class FoldersController < ApplicationController
       end
       @folders = Api.paginate(scope, self, api_v1_list_folders_url(folder))
       render :json => folders_json(@folders, @current_user, session, :can_manage_files => can_manage_files)
+    end
+  end
+
+  # @API List all folders
+  # @subtopic Folders
+  # Returns the paginated list of all folders for the given context. This will
+  # be returned as a flat list containing all subfolders as well.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/folders' \
+  #        -H 'Authorization: Bearer <token>'
+  #
+  # @returns [Folder]
+  def list_all_folders
+    if authorized_action(@context, @current_user, :read)
+      can_manage_files = @context.grants_right?(@current_user, session, :manage_files)
+
+      url = named_context_url(@context, :api_v1_context_folders_url, include_host: true)
+
+      scope = @context.active_folders
+      unless can_manage_files
+        scope = scope.not_hidden.not_locked
+      end
+      if params[:sort_by] == 'position'
+        scope = scope.by_position
+      else
+        scope = scope.by_name
+      end
+
+      folders = Api.paginate(scope, self, url)
+      render json: folders_json(folders, @current_user, session, :can_manage_files => can_manage_files)
     end
   end
 
@@ -177,11 +209,11 @@ class FoldersController < ApplicationController
   # For example, you could get the root folder for a course like:
   #
   # @example_request
-  #   curl 'https://<canvas>/api/v1/courses/1337/folders/root' \ 
+  #   curl 'https://<canvas>/api/v1/courses/1337/folders/root' \
   #        -H 'Authorization: Bearer <token>'
   #
   # @example_request
-  #   curl 'https://<canvas>/api/v1/folders/<folder_id>' \ 
+  #   curl 'https://<canvas>/api/v1/folders/<folder_id>' \
   #        -H 'Authorization: Bearer <token>'
   #
   # @returns Folder
@@ -216,7 +248,7 @@ class FoldersController < ApplicationController
           else
             @folder.visible_file_attachments.not_hidden.not_locked.by_position_then_display_name
           end
-          files_options = {:permissions => {:user => @current_user}, :methods => [:currently_locked, :mime_class, :readable_size, :scribdable?], :only => [:id, :comments, :content_type, :context_id, :context_type, :display_name, :folder_id, :position, :media_entry_id, :scribd_doc, :filename, :workflow_state]}
+          files_options = {:permissions => {:user => @current_user}, :methods => [:currently_locked, :mime_class, :readable_size], :only => [:id, :comments, :content_type, :context_id, :context_type, :display_name, :folder_id, :position, :media_entry_id, :filename, :workflow_state]}
           folders_options = {:permissions => {:user => @current_user}, :methods => [:currently_locked, :mime_class], :only => [:id, :context_id, :context_type, :lock_at, :last_lock_at, :last_unlock_at, :name, :parent_folder_id, :position, :unlock_at]}
           sub_folders_scope = @folder.active_sub_folders
           unless can_manage_files
@@ -236,19 +268,23 @@ class FoldersController < ApplicationController
       end
     end
   end
-  
+
   def download
     if authorized_action(@context, @current_user, :read)
       @folder = @context.folders.find(params[:folder_id])
       user_id = @current_user && @current_user.id
-      
-      # Destroy any previous zip downloads that might exist for this folder, 
+
+      # Destroy any previous zip downloads that might exist for this folder,
       # except the last one (cause we might be able to use it)
       folder_filename = "#{t :folder_filename, "folder"}.zip"
-      
-      @attachments = Attachment.find_all_by_context_id_and_context_type_and_display_name_and_user_id(@folder.id, @folder.class.to_s, folder_filename, user_id).
-                                select{|a| ['to_be_zipped', 'zipping', 'zipped', 'unattached'].include?(a.workflow_state) && !a.deleted? }.
-                                sort_by{|a| a.created_at }
+
+      @attachments = Attachment.where(context_id: @folder,
+                                      context_type: @folder.class.to_s,
+                                      display_name: folder_filename,
+                                      user_id: user_id,
+                                      workflow_state: ['to_be_zipped', 'zipping', 'zipped', 'unattached', 'errored']).
+          where("file_state<>'deleted'").
+          order(:created_at).to_a
       @attachment = @attachments.pop
       @attachments.each{|a| a.destroy! }
       last_date = (@folder.active_file_attachments.map(&:updated_at) + @folder.active_sub_folders.by_position.map(&:updated_at)).compact.max
@@ -256,7 +292,7 @@ class FoldersController < ApplicationController
         @attachment.destroy!
         @attachment = nil
       end
-      
+
       if @attachment.nil?
         @attachment = @folder.file_attachments.build(:display_name => folder_filename)
         @attachment.user_id = user_id
@@ -270,8 +306,8 @@ class FoldersController < ApplicationController
         respond_to do |format|
           if @attachment.zipped?
             if Attachment.s3_storage?
-              format.html { redirect_to @attachment.cacheable_s3_inline_url }
-              format.zip { redirect_to @attachment.cacheable_s3_inline_url }
+              format.html { redirect_to @attachment.inline_url }
+              format.zip { redirect_to @attachment.inline_url }
             else
               cancel_cache_buster
               format.html { send_file(@attachment.full_filename, :type => @attachment.content_type_with_encoding, :disposition => 'inline') }
@@ -316,9 +352,9 @@ class FoldersController < ApplicationController
   #
   # @example_request
   #
-  #   curl -XPUT 'https://<canvas>/api/v1/folders/<folder_id>' \ 
-  #        -F 'name=<new_name>' \ 
-  #        -F 'locked=true' \ 
+  #   curl -XPUT 'https://<canvas>/api/v1/folders/<folder_id>' \
+  #        -F 'name=<new_name>' \
+  #        -F 'locked=true' \
   #        -H 'Authorization: Bearer <token>'
   #
   # @returns Folder
@@ -342,7 +378,7 @@ class FoldersController < ApplicationController
           folder_params[:parent_folder] = @context.folders.active.find(parent_folder_id)
         end
         if @folder.update_attributes(folder_params)
-          if !@folder.parent_folder_id || !@context.folders.find_by_id(@folder)
+          if !@folder.parent_folder_id || !@context.folders.where(id: @folder).first
             @folder.parent_folder = Folder.root_folders(@context).first
             @folder.save
           end
@@ -354,7 +390,7 @@ class FoldersController < ApplicationController
             format.json { render :json => @folder.as_json(:methods => [:currently_locked], :permissions => {:user => @current_user, :session => session}), :status => :ok }
           end
         else
-          format.html { render :action => "edit" }
+          format.html { render :edit }
           format.json { render :json => @folder.errors, :status => :bad_request }
         end
       end
@@ -365,7 +401,7 @@ class FoldersController < ApplicationController
   # @subtopic Folders
   # Creates a folder in the specified context
   #
-  # @argument name [String]
+  # @argument name [Required, String]
   #   The name of the folder
   #
   # @argument parent_folder_id [String]
@@ -435,10 +471,10 @@ class FoldersController < ApplicationController
 
     @folder = @context.folders.build(folder_params)
     if authorized_action(@folder, @current_user, :create)
-      if !@folder.parent_folder_id || !@context.folders.find_by_id(@folder.parent_folder_id)
+      if !@folder.parent_folder_id || !@context.folders.where(id: @folder.parent_folder_id).first
         @folder.parent_folder_id = Folder.unfiled_folder(@context).id
       end
-      if source_folder_id.present? && (source_folder = Folder.find_by_id(source_folder_id)) && source_folder.grants_right?(@current_user, session, :read)
+      if source_folder_id.present? && (source_folder = Folder.where(id: source_folder_id).first) && source_folder.grants_right?(@current_user, session, :read)
         @folder = source_folder.clone_for(@context, @folder, {:everything => true})
       end
       respond_to do |format|
@@ -451,7 +487,7 @@ class FoldersController < ApplicationController
             format.json { render :json => @folder.as_json(:permissions => {:user => @current_user, :session => session}) }
           end
         else
-          format.html { render :action => "new" }
+          format.html { render :new }
           format.json { render :json => @folder.errors }
         end
       end
@@ -461,11 +497,11 @@ class FoldersController < ApplicationController
   def process_folder_params(parameters, api_request)
     folder_params = (api_request ? parameters : parameters[:folder]) || {}
     folder_params.slice(:name, :parent_folder_id, :parent_folder_path, :folder_id,
-                        :source_folder_id, :lock_at, :unlock_at, :locked, 
+                        :source_folder_id, :lock_at, :unlock_at, :locked,
                         :hidden, :context, :position, :just_hide)
   end
   private :process_folder_params
-  
+
   def destroy
     @folder = Folder.find(params[:id])
     if authorized_action(@folder, @current_user, :delete)
@@ -487,7 +523,7 @@ class FoldersController < ApplicationController
   #
   # @example_request
   #
-  #   curl -XDELETE 'https://<canvas>/api/v1/folders/<folder_id>' \ 
+  #   curl -XDELETE 'https://<canvas>/api/v1/folders/<folder_id>' \
   #        -H 'Authorization: Bearer <token>'
   def api_destroy
     @folder = Folder.find(params[:id])
@@ -521,6 +557,108 @@ class FoldersController < ApplicationController
     @attachment = Attachment.new(:context => @context)
     if authorized_action(@attachment, @current_user, :create)
       api_attachment_preflight(@context, request, :check_quota => true)
+    end
+  end
+
+  # @API Copy a file
+  #
+  # Copy a file from elsewhere in Canvas into a folder.
+  #
+  # Copying a file across contexts (between courses and users) is permitted,
+  # but the source and destination must belong to the same institution.
+  #
+  # @argument source_file_id [Required, String]
+  #   The id of the source file
+  #
+  # @argument on_duplicate [Optional, String, "overwrite"|"rename"]
+  #   What to do if a file with the same name already exists at the destination.
+  #   If such a file exists and this parameter is not given, the call will fail.
+  #
+  #   "overwrite":: Replace an existing file with the same name
+  #   "rename":: Add a qualifier to make the new filename unique
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/folders/123/copy_file' \
+  #        -H 'Authorization: Bearer <token>'
+  #        -F 'source_file_id=456'
+  #
+  # @returns File
+  def copy_file
+    unless params[:source_file_id].present?
+      return render :json => {:message => "source_file_id must be provided"}, :status => :bad_request
+    end
+    @dest_folder = Folder.find(params[:dest_folder_id])
+    @context = @dest_folder.context
+    @source_file = Attachment.find(params[:source_file_id])
+    unless @source_file.shard == @dest_folder.shard
+      return render :json => {:message => "cannot copy across institutions"}, :status => :bad_request
+    end
+    if authorized_action(@source_file, @current_user, :download)
+      @attachment = @context.attachments.build(folder: @dest_folder)
+      if authorized_action(@attachment, @current_user, :create)
+        on_duplicate, name = params[:on_duplicate].presence, params[:name].presence
+        duplicate_options = (on_duplicate == 'rename' && name) ? {name: name} : {}
+        return render :json => {:message => "on_duplicate must be 'overwrite' or 'rename'"}, :status => :bad_request if on_duplicate && %w(overwrite rename).exclude?(on_duplicate)
+        if on_duplicate.nil? && @dest_folder.active_file_attachments.where(display_name: @source_file.display_name).exists?
+          return render :json => {:message => "file already exists; set on_duplicate to 'rename' or 'overwrite'"}, :status => :conflict
+        end
+        @attachment = @source_file.clone_for(@context, @attachment, force_copy: true)
+        if @attachment.save
+          # default to rename on race condition (if a file happened to be created after the check above, and on_duplicate was not given)
+          @attachment.handle_duplicates(on_duplicate == 'overwrite' ? :overwrite : :rename, duplicate_options)
+          render :json => attachment_json(@attachment, @current_user, {}, { omit_verifier_in_app: true })
+        else
+          render :json => @attachment.errors
+        end
+      end
+    end
+  end
+
+  # @API Copy a folder
+  #
+  # Copy a folder (and its contents) from elsewhere in Canvas into a folder.
+  #
+  # Copying a folder across contexts (between courses and users) is permitted,
+  # but the source and destination must belong to the same institution.
+  # If the source and destination folders are in the same context, the
+  # source folder may not contain the destination folder. A folder will be
+  # renamed at its destination if another folder with the same name already
+  # exists.
+  #
+  # @argument source_folder_id [Required, String]
+  #   The id of the source folder
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/folders/123/copy_folder' \
+  #        -H 'Authorization: Bearer <token>'
+  #        -F 'source_file_id=789'
+  #
+  # @returns Folder
+  def copy_folder
+    unless params[:source_folder_id].present?
+      return render :json => {:message => "source_folder_id must be provided"}, :status => :bad_request
+    end
+    @dest_folder = Folder.find(params[:dest_folder_id])
+    @context = @dest_folder.context
+    @source_folder = Folder.find(params[:source_folder_id])
+    unless @source_folder.shard == @dest_folder.shard
+      return render :json => {:message => "cannot copy across institutions"}, :status => :bad_request
+    end
+    if @source_folder.context == @context && (@dest_folder.full_name + '/').start_with?(@source_folder.full_name + '/')
+      return render :json => {:message => "source folder may not contain destination folder"}, :status => :bad_request
+    end
+    if authorized_action(@source_folder.context, @current_user, :manage_files)
+      @folder = @context.folders.build(parent_folder: @dest_folder)
+      if authorized_action(@folder, @current_user, :create)
+        @folder = @source_folder.clone_for(@context, @folder, everything: true, force_copy: true)
+        if @folder.save
+          render :json => folder_json(@folder, @current_user, session)
+        else
+          render :json => @folder.errors
+        end
+      end
     end
   end
 end

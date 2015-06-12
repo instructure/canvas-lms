@@ -44,11 +44,12 @@ class FileInContext
     
     def attach(context, filename, display_name=nil, folder=nil, explicit_filename=nil, allow_rename = false)
       display_name ||= File.split(filename).last
-      uploaded_data = Rack::Test::UploadedFile.new(filename, Attachment.mimetype(filename))
+      uploaded_data = Rack::Test::UploadedFile.new(filename, Attachment.mimetype(explicit_filename || filename))
 
       @attachment = context.attachments.build(:uploaded_data => uploaded_data, :display_name => display_name, :folder => folder)
       @attachment.filename = explicit_filename if explicit_filename
       @attachment.context = context
+      @attachment.set_publish_state_for_usage_rights
       @attachment.save!
 
       destroy_files(@attachment.handle_duplicates(allow_rename ? :rename : :overwrite, :caller_will_destroy => true))

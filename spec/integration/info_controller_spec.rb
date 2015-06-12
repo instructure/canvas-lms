@@ -25,17 +25,17 @@ describe InfoController do
       enable_cache do
         user
         get "/images/users/#{@user.id}"
-        response.should be_redirect
-        response['Location'].should match(%r{gravatar})
-        response['Location'].should match(%r{avatar-50})
+        expect(response).to be_redirect
+        expect(response['Location']).to match(%r{gravatar})
+        expect(response['Location']).to match(%r{avatar-50})
 
         @user.avatar_image = { 'type' => 'attachment', 'url' => '/images/thumbnails/blah' }
         @user.save!
 
         get "/images/users/#{@user.id}"
-        response.should be_redirect
-        response['Location'].should_not match(%r{gravatar})
-        response['Location'].should match(%r{/images/thumbnails/blah})
+        expect(response).to be_redirect
+        expect(response['Location']).not_to match(%r{gravatar})
+        expect(response['Location']).to match(%r{/images/thumbnails/blah})
       end
     end
   end

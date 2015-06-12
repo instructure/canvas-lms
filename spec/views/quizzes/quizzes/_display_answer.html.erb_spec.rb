@@ -20,6 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
 describe "/quizzes/quizzes/_display_answer" do
+
   it "should render" do
     course_with_student
     view_context
@@ -28,7 +29,7 @@ describe "/quizzes/quizzes/_display_answer" do
     answer[:id] = 5
     answer[:weight] = 100
     render :partial => "quizzes/quizzes/display_answer", :object => answer, :locals => {:question_type => OpenObject.new}
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

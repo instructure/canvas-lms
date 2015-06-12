@@ -28,7 +28,7 @@ describe "/assignments/syllabus" do
     assigns[:dates] = assigns[:events].map{|e| e.start_at}
     assigns[:undated_events] = [@course.assignments.create!(:title => "assignment 2"), @course.calendar_events.create!(:title => "event 2")]
     render 'assignments/syllabus'
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

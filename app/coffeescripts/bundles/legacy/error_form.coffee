@@ -19,7 +19,7 @@ require [
 
       success: (data) ->
         $(this).loadingImage "remove"
-        $.flashMessage(htmlEscape(I18n.t("message_sent", "Thank you for your help!  We'll get right on this.")))
+        $.flashMessage(I18n.t("message_sent", "Thank you for your help!  We'll get right on this."))
         $("#submit_error_form").slideToggle()
 
       error: (data) ->

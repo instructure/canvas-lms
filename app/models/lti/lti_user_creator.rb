@@ -1,13 +1,14 @@
 module Lti
   class LtiUserCreator
+    # deprecated mapping
     ENROLLMENT_MAP = {
-        StudentEnrollment => LtiOutbound::LTIRole::LEARNER,
-        TeacherEnrollment => LtiOutbound::LTIRole::INSTRUCTOR,
-        TaEnrollment => LtiOutbound::LTIRole::TEACHING_ASSISTANT,
-        DesignerEnrollment => LtiOutbound::LTIRole::CONTENT_DEVELOPER,
-        ObserverEnrollment => LtiOutbound::LTIRole::OBSERVER,
-        AccountUser => LtiOutbound::LTIRole::ADMIN,
-        StudentViewEnrollment => LtiOutbound::LTIRole::LEARNER
+        StudentEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER,
+        TeacherEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::INSTRUCTOR,
+        TaEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::TEACHING_ASSISTANT,
+        DesignerEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::CONTENT_DEVELOPER,
+        ObserverEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::OBSERVER,
+        AccountUser => LtiOutbound::LTIRoles::Institution::ADMIN,
+        StudentViewEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER
     }
 
     def initialize(canvas_user, canvas_root_account, canvas_tool, canvas_context)
@@ -19,21 +20,26 @@ module Lti
     end
 
     def convert
-      ::LtiOutbound::LTIUser.new.tap do |user|
-        user.id = @canvas_user.id
-        user.avatar_url = @canvas_user.avatar_url
-        user.email = @canvas_user.email
-        user.first_name = @canvas_user.first_name
-        user.last_name = @canvas_user.last_name
-        user.name = @canvas_user.name
-        user.opaque_identifier = @opaque_identifier
-        user.timezone = Time.zone.tzinfo.name
-        user.current_roles = -> { current_roles() }
-        user.currently_active_in_course = -> { currently_active_in_course?() }
-        user.concluded_roles = -> { concluded_roles() }
-        user.login_id = -> { pseudonym ? pseudonym.unique_id : nil }
-        user.sis_source_id = -> { pseudonym ? pseudonym.sis_user_id : nil }
-      end
+      user = ::LtiOutbound::LTIUser.new
+
+      user.id = @canvas_user.id
+      user.avatar_url = @canvas_user.avatar_url
+      user.email = @canvas_user.email
+      user.first_name = @canvas_user.first_name
+      user.last_name = @canvas_user.last_name
+      user.name = @canvas_user.name
+      user.opaque_identifier = @opaque_identifier
+      user.timezone = Time.zone.tzinfo.name
+      user.current_roles = -> { current_roles() }
+      user.currently_active_in_course = -> { currently_active_in_course?() }
+      user.concluded_roles = -> { concluded_roles() }
+      user.login_id = -> { pseudonym ? pseudonym.unique_id : nil }
+      user.sis_source_id = -> { pseudonym ? pseudonym.sis_user_id : nil }
+
+      lti_helper = Lti::SubstitutionsHelper.new(@canvas_context, @canvas_root_account, @canvas_user)
+      user.current_roles = lti_helper.current_lis_roles.split(',')
+
+      user
     end
 
     private
@@ -63,13 +69,13 @@ module Lti
     def current_course_enrollments
       return [] unless @canvas_context.is_a?(Course)
 
-      @current_course_enrollments ||= @canvas_user.current_enrollments.find_all_by_course_id(@canvas_context.id)
+      @current_course_enrollments ||= @canvas_user.enrollments.current.where(course_id: @canvas_context).to_a
     end
 
-    def current_account_enrollments
+    def current_account_enrollments()
       unless @current_account_enrollments
-        if @canvas_context.respond_to?(:account_chain) && !@canvas_context.account_chain_ids.empty?
-          @current_account_enrollments = @canvas_user.account_users.find_all_by_account_id(@canvas_context.account_chain_ids).uniq
+        if @canvas_context.respond_to?(:account_chain) && !@canvas_context.account_chain.empty?
+          @current_account_enrollments = @canvas_user.account_users.where(account_id: @canvas_context.account_chain).uniq.to_a
         else
           @current_account_enrollments = []
         end
@@ -79,7 +85,7 @@ module Lti
 
     def concluded_course_enrollments
       @concluded_course_enrollments ||=
-          @canvas_context.is_a?(Course) ? @canvas_user.concluded_enrollments.find_all_by_course_id(@canvas_context.id) : []
+          @canvas_context.is_a?(Course) ? @canvas_user.enrollments.concluded.where(course_id: @canvas_context).to_a : []
     end
   end
 end

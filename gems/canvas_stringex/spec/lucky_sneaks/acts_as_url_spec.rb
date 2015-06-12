@@ -111,6 +111,17 @@ describe "ActsAsUrl" do
     expect('stable-as-stone').to eq @blank.url
   end
 
+  it "should override only_when_blank only for instance (not class level)" do
+    @blank = Blankument.new(:title => "something Something", :url => @original_url)
+    @original_url = 'the-url-of-concrete'
+    @blank.only_when_blank = false
+    @blank.save!
+    expect('something-something').to eq @blank.url
+
+    @blank2 = Blankument.new
+    @blank2.only_when_blank.should == true
+  end
+
   it "should_mass_initialize_urls" do
     @doc_1 = Document.create!(:title => "Initial")
     @doc_2 = Document.create!(:title => "Subsequent")

@@ -1,4 +1,4 @@
-@import 'environment';
+@import 'base/environment';
 
 // #TODO move these into their own file
 .headerBar {
@@ -13,9 +13,6 @@
     margin-left: -12px;
     padding: 3px 14px;
     z-index: 100;
-  }
-  .headerBar-right {
-    float: right;
   }
 }
 #searchTerm {

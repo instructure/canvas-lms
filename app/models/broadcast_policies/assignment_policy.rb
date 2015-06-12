@@ -26,11 +26,12 @@ module BroadcastPolicies
 
     def should_dispatch_assignment_created?
       return false unless context_sendable?
-      if assignment.context.feature_enabled?(:draft_state)
-        published_on_create? || just_published?
-      else
-        assignment.just_created
-      end
+      published_on_create? || just_published?
+    end
+
+    def should_dispatch_assignment_unmuted?
+      assignment.context.available? &&
+        assignment.recently_unmuted
     end
 
     private

@@ -41,6 +41,10 @@ define [
       wait: true
 
     ##
+    # Default options to pass to disableWhileLoading when submitting
+    disableWhileLoadingOpts: {}
+
+    ##
     # Sets the model data from the form and saves it. Called when the form
     # submits, or can be called programatically.
     # set @saveOpts in your view to to pass opts to Backbone.sync (like multipart: true if you have
@@ -63,12 +67,14 @@ define [
         disablingDfd = new $.Deferred()
         saveDfd = @saveFormData(data)
         saveDfd.then(@onSaveSuccess, @onSaveFail)
-        saveDfd.fail -> disablingDfd.reject()
+        saveDfd.fail =>
+          disablingDfd.reject()
+          @setFocusAfterError() if @setFocusAfterError
 
         unless @dontRenableAfterSaveSuccess
           saveDfd.done -> disablingDfd.resolve()
 
-        @$el.disableWhileLoading disablingDfd
+        @$el.disableWhileLoading disablingDfd, @disableWhileLoadingOpts
         @trigger 'submit'
         saveDfd
       else
@@ -201,7 +207,7 @@ define [
       selector = @fieldSelectors?[field] or "[name='#{field}']"
       $el = @$(selector)
       if $el.data('rich_text')
-        $el = $el.next('.mceEditor').find(".mceIframeContainer")
+        $el = @findSiblingTinymce($el)
       if $el.length > 1 # e.g. hidden input + checkbox, show it by the checkbox
         $el = $el.not('[type=hidden]')
       $el

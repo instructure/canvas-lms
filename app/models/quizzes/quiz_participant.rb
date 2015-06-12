@@ -34,23 +34,6 @@ class Quizzes::QuizParticipant
     super()
   end
 
-  # Locate the Quiz Submission for this participant, regardless of them being
-  # enrolled students, or anonymous participants.
-  #
-  # @param [ActiveRecord::Association]
-  #   The pool of QuizSubmission instances to look in, defaults to all.
-  #
-  # @param [Hash] query_options
-  #   Options to pass to the AR query interface.
-  #
-  # @return [QuizSubmission]
-  #   The QS, if any, for the participant.
-  def find_quiz_submission(scope = Quizzes::QuizSubmission, query_options = {})
-    self.anonymous? ?
-      scope.find_by_temporary_user_code(self.user_code, query_options) :
-      scope.find_by_user_id(self.user.id, query_options)
-  end
-
   # Is this a Canvas user (enrolled student, teacher, TA, etc.) or an anonymous
   # person?
   #

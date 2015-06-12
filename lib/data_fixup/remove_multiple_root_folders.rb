@@ -5,7 +5,7 @@ module DataFixup::RemoveMultipleRootFolders
 
     while (folders = Folder.where("workflow_state<>'deleted' AND parent_folder_id IS NULL").
       select([:context_id, :context_type]).having("COUNT(*) > 1").group(:context_id, :context_type).limit(limit).all
-    ).any? do
+    ).any?
 
       context_types = folders.map(&:context_type).uniq
 

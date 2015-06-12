@@ -61,14 +61,14 @@ describe "CrummyController" do
       # first run should add crumb "A"
       a = CrummyNameController.new
       a.run_filter_blocks
-      a.crumbs.length.should == 1
-      a.crumbs[0][0].should == "A"
+      expect(a.crumbs.length).to eq 1
+      expect(a.crumbs[0][0]).to eq "A"
 
       # second run should add crumb "B"
       b = CrummyNameController.new
       b.run_filter_blocks
-      b.crumbs.length.should == 1
-      b.crumbs[0][0].should == "B"
+      expect(b.crumbs.length).to eq 1
+      expect(b.crumbs[0][0]).to eq "B"
     end
   end
 
@@ -91,14 +91,14 @@ describe "CrummyController" do
       # first run should add crumb "A"
       a = CrummyUrlController.new
       a.run_filter_blocks
-      a.crumbs.length.should == 1
-      a.crumbs[0][1].should == "http://a"
+      expect(a.crumbs.length).to eq 1
+      expect(a.crumbs[0][1]).to eq "http://a"
 
       # second run should add crumb "B"
       b = CrummyUrlController.new
       b.run_filter_blocks
-      b.crumbs.length.should == 1
-      b.crumbs[0][1].should == "http://b"
+      expect(b.crumbs.length).to eq 1
+      expect(b.crumbs[0][1]).to eq "http://b"
     end
   end
 end

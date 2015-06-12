@@ -7,15 +7,13 @@ define [
   'compiled/views/grade_summary/OutcomeDetailView'
 ], ($, _, Backbone, CollectionView, SectionView, OutcomeDetailView) ->
   class OutcomeSummaryView extends CollectionView
-    @optionProperty 'course_id'
-    @optionProperty 'user_id'
     @optionProperty 'toggles'
 
     itemView: SectionView
 
     initialize: ->
       super
-      @outcomeDetailView = new OutcomeDetailView(user_id: @user_id, course_id: @course_id)
+      @outcomeDetailView = new OutcomeDetailView()
       @bindToggles()
 
     show: (path) ->
@@ -32,7 +30,20 @@ define [
       @collection.fetch()
 
     bindToggles: ->
+      $collapseToggle = $('div.outcome-toggles a.icon-collapse')
+      $expandToggle = $('div.outcome-toggles a.icon-expand')
       @toggles.find('.icon-expand').click =>
         @$('li.group').addClass('expanded')
+        @$('div.group-description').attr('aria-expanded', "true")
+        $expandToggle.attr('disabled', 'disabled')
+        $expandToggle.attr('aria-disabled', 'true')
+        $collapseToggle.removeAttr('disabled')
+        $collapseToggle.attr('aria-disabled', 'false')
+        $("div.groups").focus()
       @toggles.find('.icon-collapse').click =>
         @$('li.group').removeClass('expanded')
+        @$('div.group-description').attr('aria-expanded', "false")
+        $collapseToggle.attr('disabled', 'disabled')
+        $collapseToggle.attr('aria-disabled', 'true')
+        $expandToggle.removeAttr('disabled')
+        $expandToggle.attr('aria-disabled', 'false')

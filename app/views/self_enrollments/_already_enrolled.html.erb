@@ -1,8 +1,15 @@
 <div class="form-horizontal bootstrap-form" id="enroll_form">
   <p><%= mt :already_enrolled, "You are already enrolled in **%{course}**.", :course => @course.name %></p>
-  
 
-  <% if params[:login_warning] %>
-    <p><%= t :switch_users, "You are currently signed in as *%{user}*. **Sign in as another user**.", :user => @current_user.name, :wrapper => {'*' => '<b>\1</b>', '**' => link_to('\1', "/logout", :method => :delete, :id => 'logout_link')} %></p>
-  <% end %>
+  <div class="control-group embedded-footer">
+    <div class="controls">
+      <% if @course.user_is_student?(@current_user)
+      # i.e. *current* student, the course has started %>
+        <a class="btn" href="<%= dashboard_url %>" target="_top"><%= t "buttons.go_to_dashboard", "Go to your Dashboard" %></a>
+        <a class="btn btn-primary" href="<%= course_url(@course) %>" target="_top"><%= t "buttons.go_to_course", "Go to the Course" %></a>
+      <% else %>
+        <a class="btn btn-primary" href="<%= dashboard_url %>" target="_top"><%= t "buttons.go_to_dashboard", "Go to your Dashboard" %></a>
+      <% end %>
+    </div>
+  </div>
 </div>

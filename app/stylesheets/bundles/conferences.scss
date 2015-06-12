@@ -1,0 +1,93 @@
+@import "base/environment";
+
+/* Helper classes */
+.align-center { text-align: center; }
+.align-right  { text-align: right; }
+.padding-r    { padding-right: 16px; }
+.table        { display: table; }
+.table-row    { display: table-row; }
+.table-cell   { display: table-cell; }
+.ellipsis     {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Page styles */
+@if $use_new_styles == false {
+  body.conferences { min-width: 960px; }
+  #main { background: #e8ecef; }
+  #content {
+    color: #434343;
+    padding: 0;
+  }
+}
+
+header:not(.ic-app-header) {
+  background: #fff;
+  border-bottom: 1px solid #b6babf;
+  padding: 16px 0;
+}
+
+/* Item box */
+.item-box {
+  color: #434343;
+
+  a {
+    &.btn-primary, &.btn-primary:hover {
+      color: #fff;
+    }
+
+    &:hover {
+      color: #434343;
+      text-decoration: none;
+    }
+  }
+
+  i[class*=icon-]:before, i[class^=icon-]:before {
+    font-size: 13px;
+  }
+
+}
+
+.ig-header-title a {
+  color: #434343;
+}
+
+.ig-list .ig-row .ellipses {
+  color: $ic-font-color--subdued;
+  // Fix for strange Firefox-only bug where white-space: no-wrap was blowing out the layout
+  // on conferences index page
+  body.ff & { @include firefox-white-space-bug-fix; }
+}
+
+#add_conference_form {
+  min-width: 700px;
+}
+
+#web_conference_title, #web_conference_description {
+  min-width: 500px;
+}
+
+#web_conference_duration {
+  width: 25px;
+}
+
+.item-group-expandable .emptyMessage {
+  color: #676b6e;
+  background: #f3f6f7;
+  text-align: center;
+  padding: 10px;
+  margin: 0;
+  border-radius: 3px;
+}
+
+.ig-title {
+  flex: 0 0 200px;
+  @include breakpoint(desktop) { flex: 0 0 34%; }
+  @include breakpoint(wide) { flex: 0 0 40%; }
+}
+
+.ig-details {
+  flex: 1;
+}

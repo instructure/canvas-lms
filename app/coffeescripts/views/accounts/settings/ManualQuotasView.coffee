@@ -85,9 +85,10 @@ define [
         messages = errors[integerField]
         control_group.toggleClass('error', messages?)
         if messages
-          helpInline = $('<span class="help-inline"></span>')
-          helpInline.html((htmlEscape(message) for {message} in messages).join('<br/>'))
-          control_group.find('.controls').append(helpInline)
+          $helpInline = $('<span class="help-inline"></span>')
+          html = (htmlEscape(message) for {message} in messages).join('<br/>')
+          $helpInline.html(html)
+          control_group.find('.controls').append($helpInline)
 
     findItem: ->
       @hideErrors()
@@ -132,7 +133,7 @@ define [
       @showErrors(errors)
 
     findSuccess: =>
-      @$link.html(@model.get('name'))
+      @$link.text(@model.get('name'))
       @$link.attr('href', @model.path + '/' + @model.get('id'))
 
       @$quota.val(@model.get('storage_quota_mb'))

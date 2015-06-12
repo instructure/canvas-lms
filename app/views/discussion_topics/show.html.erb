@@ -33,19 +33,21 @@
   jammit_css :tinymce, :discussions, :learning_outcomes
 %>
 
-<% if @topic.draft_state_enabled? && (@unlock_at && @unlock_at > Time.now) &&
-     !can_do(@context, @current_user, :moderate_forum) %>
-  <div class="topic">
-    <div class="entry-content">
-     <h1><%= @topic.title %></h1>
-
-     <div class="alert alert-info">
-       <% if @topic.is_a?(Announcement) %>
-         <%= t(:announcement_locked_until, "This announcement is locked until %{time}", time: @unlock_at.strftime('%b %d, at %l%P')) %>
-       <% else %>
-         <%= t(:topic_locked_until, "This topic is locked until %{time}", time: @unlock_at.strftime('%b %d, at %l%P')) %>
-       <% end %>
-     </div>
+<% if @unlock_at && @unlock_at > Time.now && !can_do(@context, @current_user, :moderate_forum) %>
+  <div id="discussion-managebar" class="toolbarView">
+    <div class="headerBar">
+      <div class="topic">
+        <div class="entry-content">
+         <h1 class="discussion-title"><%= @topic.title %></h1>
+         <div class="discussion-fyi">
+           <% if @topic.is_a?(Announcement) %>
+             <%= t(:announcement_locked_until, "This announcement is locked until %{time}", time: datetime_string(@unlock_at)) %>
+           <% else %>
+             <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'topic', @context) : t(:topic_time_locked, "This topic is locked until %{time}", time: datetime_string(@unlock_at)) %>
+           <% end %>
+         </div>
+        </div>
+      </div>
     </div>
   </div>
 <% else %>
@@ -53,7 +55,7 @@
     <div class="headerBar">
       <div class="row-fluid form-inline" style="overflow: visible;">
         <div class="pull-right">
-          <% if @topic.draft_state_enabled? && can_do(@context, @current_user, :moderate_forum) %>
+          <% if !@topic.is_announcement && can_do(@context, @current_user, :moderate_forum) %>
             <button
               id="topic_publish_button"
               data-id='<%= @topic.id %>'
@@ -65,17 +67,23 @@
             <a href="<%= context_url(@topic.context,
                                      :edit_context_discussion_topic_url,
                                      @topic) %>"
-               class="btn edit-btn">
-                 <i class="icon-edit" aria-hidden="hidden"></i>
+               class="btn edit-btn" role="button">
+                 <i class="icon-edit" aria-hidden="true"></i>
                  <%= t(:edit, 'Edit') %>
             </a>
           <% end %>
 
           <% if @current_user.present? %>
-            <div class="admin-links" role="application">
-              <a class="al-trigger btn" href="#">
+            <div class="admin-links">
+              <a class="al-trigger btn announcement_cog" href="#" role="button">
                 <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-                <span class="screenreader-only"><%= t :manage_discussion, 'Manage Discussion' %></span>
+                <span class="screenreader-only">
+                   <% if @topic.is_a?(Announcement) %>
+                    <%= t :manage_announcement, 'Manage Announcement' %>
+                   <% else %>
+                    <%= t :manage_discussion, 'Manage Discussion' %>
+                   <% end %>
+                  </span>
               </a>
               <ul class="al-options">
                 <li><a href="#" class="mark_all_as_read"><i class="icon-mark-as-read" aria-hidden="hidden"></i> <%= t :mark_all_as_read, 'Mark All as Read' %></a></li>
@@ -90,9 +98,10 @@
                 <% if @presenter.can_grade?(@current_user) && @presenter.allows_speed_grader? %>
                   <li><a href="<%= context_url(@topic.assignment.context,
                                                :speed_grader_context_gradebook_url,
-                                               :assignment_id => @topic.assignment.id) %>">
+                                               :assignment_id => @topic.assignment.id) %>"
+                         target="_blank">
                     <i class="icon-speed-grader" aria-hidden="hidden"></i>
-                    <%= t :speed_grader, "Speed Grader" %>
+                    <%= t :speed_grader, "SpeedGrader™" %>
                   </a></li>
                 <% end %>
 
@@ -108,12 +117,13 @@
 
                 <% if @presenter.should_show_rubric?(@current_user) %>
                   <li>
-                    <%# HACK! this is here because edit_rubric.js expects there to be a #add_rubric_url on the page and sets it's <form action="..."> to it %>
-                    <% if can_do(@topic.assignment, @current_user, :update) %>
-                      <a href="<%= context_url(@topic.assignment.context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;"></a>
-                    <% end %>
-
-                    <a class="rubric_dialog_trigger" href="#" data-no-rubric-exists="<%= !@presenter.has_attached_rubric? %>" data-url="<%= context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) %>">
+                    <a
+                      class="rubric_dialog_trigger"
+                      href="#"
+                      data-no-rubric-exists="<%= !@presenter.has_attached_rubric? %>"
+                      data-url="<%= context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) %>"
+                      data-focus-returns-to=".announcement_cog"
+                    >
                       <i class="icon-rubric" aria-hidden="hidden"></i>
                       <%= @presenter.has_attached_rubric? ? t(:show_rubric, "Show Rubric") : t(:add_rubric, "Add Rubric") %>
                     </a>
@@ -125,12 +135,29 @@
                     <% if can_do(@context, @current_user, :moderate_forum) %>
                       <li><a href="#" data-mark-locked="false" class="discussion_locked_toggler"><i class="icon-unlock"></i> <%= t(:unlock_topic, %{Open for Comments}) %></a></li>
                     <% end %>
-                  <% elsif can_do(@context, @current_user, :moderate_forum) && (!@topic.assignment.try(:due_at) || @topic.assignment.due_at <= Time.now) %>
+                  <% elsif can_do(@context, @current_user, :moderate_forum) && @topic.can_lock? %>
                     <li><a href="#" data-mark-locked="true" class="discussion_locked_toggler"><i class="icon-lock"></i> <%= t(:lock_topic, %{Close for Comments}) %></a></li>
+                  <% end %>
+                <% end %>
+
+                <% if can_do(@context, @current_user, :manage_content) %>
+                  <% (@discussion_topic_menu_tools || []).each do |tool_hash| %>
+                    <li>
+                      <a class="menu_tool_link" href="<%= tool_hash[:base_url] %>&discussion_topics[]=<%= @topic.id %>" tabindex="-1" role="menuitem">
+                        <% if tool_hash[:icon_url] %><img class="icon" src="<%= tool_hash[:icon_url] %>" /><% end %>
+                        <%= tool_hash[:title] %>
+                      </a>
+                    </li>
                   <% end %>
                 <% end %>
               </ul>
             </div>
+            <% if @presenter.should_show_rubric?(@current_user) %>
+              <%# HACK! this is here because edit_rubric.js expects there to be a #add_rubric_url on the page and sets it's <form action="..."> to it %>
+              <% if can_do(@topic.assignment, @current_user, :update) %>
+                <a href="<%= context_url(@topic.assignment.context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;"></a>
+              <% end %>
+            <% end %>
           <% end %>
         </div>
       </div>
@@ -142,6 +169,9 @@
       <div class="entry-content">
         <% if @topic.for_assignment? %>
           <%= render :partial => 'assignment_details' %>
+          <% if @presenter.has_peer_reviews?(@current_user) %>
+            <%= render :partial => 'peer_reviews' %>
+          <% end %>
         <% end %>
         <% if @topic.for_group_discussion? %>
           <%= render :partial => 'group_discussion' %>
@@ -166,7 +196,9 @@
             </div>
 
             <div class="discussion-header-right pull-right">
-              <div class="discussion-pubdate"><%= friendly_datetime @topic.posted_at, context: @topic.context %></div>
+              <% if can_do(@context, @current_user, :moderate_forum) %>
+                <div class="discussion-pubdate"><%= friendly_datetime @topic.posted_at, context: @topic.context %></div>
+              <% end %>
               <%= render :partial => 'new_and_total_badge', :locals => { :unread_count => @topic.unread_count(@current_user), :reply_count => @topic.discussion_subentry_count } %>
             </div>
           </div>
@@ -174,40 +206,19 @@
 
         <div class="discussion-section message_wrapper">
           <div data-bind="message" class="message user_content"><%= user_content(@topic.message) %></div>
-
-          <% if @topic.draft_state_enabled? %>
-            <% if @locked %>
-              <div class="discussion-fyi">
-                <% if @topic.is_a? Announcement %>
-                  <%= t 'announcement_closed', 'This announcement is closed for comments' %>
-                <% else %>
-                  <%= t 'locked', 'This topic is closed for comments' %>
-                <% end %>
-              </div>
-            <% end %>
-          <% else %>
-            <% if @topic.post_delayed? %>
-              <div class="discussion-fyi">
-                <% if @topic.is_a? Announcement %>
-                  <% if @topic.delayed_post_at %>
-                    <%= t 'announcement_locked', 'This announcement will not be visible to users until *%{date}*', :date => datetime_string(@topic.delayed_post_at) %>
-                  <% else %>
-                    <%= t 'announcement_not_visible', 'This announcement is not visible to users' %>
-                  <% end %>
-                <% else %>
-                  <% if @topic.delayed_post_at %>
-                    <%= t 'topic_locked', 'This topic will not be visible to users until *%{date}*', :date => datetime_string(@topic.delayed_post_at) %>
-                  <% else %>
-                    <%= t 'topic_not_visible', 'This topic is not visible to users' %>
-                  <% end %>
-                <% end %>
-              </div>
-            <% end %>
-            <% if @locked %>
-              <div class="discussion-fyi">
-                <%= t 'locked', 'This topic is closed for comments' %>
-              </div>
-            <% end %>
+          <% if @unlock_at && @unlock_at > Time.now && @topic.is_a?(Announcement) %>
+            <div class="discussion-fyi">
+              <%= t 'announcement_locked', 'The content of this announcement will not be visible to users until %{date}', :date => datetime_string(@unlock_at) %>
+            </div>
+          <% end %>
+          <% if @locked %>
+            <div class="discussion-fyi">
+              <% if @topic.is_a? Announcement %>
+                <%= t 'announcement_closed', 'This announcement is closed for comments' %>
+              <% else %>
+                <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'topic', @context) : t(:locked, "This topic is closed for comments") %>
+              <% end %>
+            </div>
           <% end %>
 
           <% if @topic.editor_id && @topic.user_id && @topic.editor_id != @topic.user_id %>
@@ -236,7 +247,7 @@
 
           <% if @topic.attachment %>
             <div>
-              <a href="<%= context_url(@topic.context, :context_file_download_url, @topic.attachment_id) %>" class="<%= @topic.attachment.mime_class %>"><%= @topic.attachment.display_name %></a>
+              <a href="<%= context_url(@topic.attachment.context, :context_file_download_url, @topic.attachment_id) %>" class="<%= @topic.attachment.mime_class %>"><%= @topic.attachment.display_name %></a>
             </div>
           <% end %>
         </div>
@@ -247,17 +258,18 @@
           <div class="row-fluid form-inline" style="overflow: visible;">
             <div class="span9">
               <input
-                id          = "discussion-search"
-                type        = "text"
-                aria-label  = "<%= t("filter_replies", "Filter replies by search term") %>"
-                placeholder = "<%= t("search_entries_placeholder", "Search entries or author") %>"
-                size        = 50
+                id               = "discussion-search"
+                type             = "text"
+                aria-label       = "<%= t("Search entries or author") %>"
+                placeholder      = "<%= t("Search entries or author") %>"
+                size             = 50
               >
 
               <input
                 type    = "checkbox"
                 id      = "onlyUnread"
-              ><label for="onlyUnread"><%= t('unread', 'Unread') %></label>
+                aria-label = "<%= t("filter replies by unread") %>"
+              ><label aria-hidden="true" for="onlyUnread"><%= t('unread', 'Unread') %></label>
 
               &nbsp; &nbsp;
               <button id="collapseAll" class="btn disableWhileFiltering" title="<%= t('collapse_replies', 'Collapse replies') %>" aria-label="<%= t('collapse_replies', 'Collapse replies') %>">
@@ -270,15 +282,17 @@
             </div>
 
             <div class="span3 right-align">
-              <a href='#' class='btn topic-subscribe-button' data-tooltip="bottom"
+              <a role="button" href='#' class='btn topic-subscribe-button' data-tooltip="bottom"
                  title="<%= t('topic_subscribe_tooltip', 'You are unsubscribed and will not be notified of new comments') %>"
-                 aria-label="<%= t('topic_subscribe_tooltip', 'You are unsubscribed and will not be notified of new comments') %>">
+                 role="button"
+                 aria-label="<%= t('You are unsubscribed and will not be notified of new comments. Click to subscribe') %> ">
                 <i class='icon-discussion-check' aria-hidden="hidden"></i>
                 <%= t(:topic_subscribe, 'Subscribe') %>
               </a>
-              <a href='#' class='btn topic-unsubscribe-button btn-success' data-tooltip="bottom"
+              <a href='#' class='btn topic-unsubscribe-button btn-success' data-tooltip="bottom" role="button"
                  title="<%= t('topic_subscribed_tooltip', 'You are subscribed and will be notified of new comments') %>"
-                 aria-label="<%= t('topic_subscribed_tooltip', 'You are subscribed and will be notified of new comments') %>">
+                 role="button"
+                 aria-label="<%= t('You are subscribed and will be notified of new comments. Click to unsubscribe') %> ">
                 <i class='icon-discussion-check' aria-hidden="hidden"></i>
                 <%= t(:topic_unsubscribe, 'Subscribed') %>
               </a>
@@ -300,7 +314,7 @@
 
   </div>
 
-  <% if @context.feature_enabled?(:draft_state) && @headers != false %>
+  <% if @headers != false %>
     <div id="module_sequence_footer"></div>
   <% else %>
     <%=

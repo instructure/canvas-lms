@@ -30,7 +30,7 @@ describe RubricAssessmentsController do
       course_with_teacher_logged_in(:active_all => true)
       rubric_assessment_model(:user => @user, :context => @course, :purpose => 'grading')
       post 'create', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @user.to_param, :assessment_type => "no_reason"}
-      response.should be_success
+      expect(response).to be_success
     end
 
     it "should not pass invalid ids through to the database" do
@@ -55,15 +55,15 @@ describe RubricAssessmentsController do
       course_with_teacher_logged_in(:active_all => true)
       rubric_assessment_model(:user => @user, :context => @course, :purpose => 'grading')
       put 'update', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :id => @rubric_assessment.id, :rubric_assessment => {:user_id => @user.to_param, :assessment_type => "no_reason"}
-      response.should be_success
+      expect(response).to be_success
     end
     it "should update the assessment" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_assessment_model(:user => @user, :context => @course, :purpose => 'grading')
       put 'update', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :id => @rubric_assessment.id, :rubric_assessment => {:comments => "dude!", :user_id => @user.to_param, :assessment_type => "no_reason"}
-      response.should be_success
-      assigns[:assessment].should_not be_nil
-      assigns[:assessment].comments.should eql("dude!")
+      expect(response).to be_success
+      expect(assigns[:assessment]).not_to be_nil
+      expect(assigns[:assessment].comments).to eql("dude!")
     end
   end
   
@@ -85,9 +85,9 @@ describe RubricAssessmentsController do
     it "should send reminder" do
       user_session(@teacher)
       post 'remind', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :assessment_request_id => @assessment_request.id
-      assigns[:request].should_not be_nil
-      assigns[:request].should eql(@assessment_request)
-      response.should be_success
+      expect(assigns[:request]).not_to be_nil
+      expect(assigns[:request]).to eql(@assessment_request)
+      expect(response).to be_success
     end
   end
 
@@ -102,8 +102,8 @@ describe RubricAssessmentsController do
       course_with_teacher_logged_in(:active_all => true)
       rubric_assessment_model(:user => @user, :context => @course)
       delete 'destroy', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :id => @rubric_assessment.id
-      response.should be_success
-      assigns[:assessment].should be_frozen
+      expect(response).to be_success
+      expect(assigns[:assessment]).to be_frozen
     end
   end
   
@@ -111,58 +111,58 @@ describe RubricAssessmentsController do
     it "should follow: actions from two teachers should only create one assessment" do
       setup_course_assessment
       post 'create', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student1.to_param, :assessment_type => "grading"}
-      response.should be_success
+      expect(response).to be_success
       @assessment = assigns[:assessment]
-      @assessment.should_not be_nil
+      expect(@assessment).not_to be_nil
       user_session(@teacher2)
       post 'create', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student1.to_param, :assessment_type => "grading"}
-      response.should be_success
-      assigns[:assessment].should eql(@assessment)
+      expect(response).to be_success
+      expect(assigns[:assessment]).to eql(@assessment)
     end
     
     it "should follow: multiple peer reviews for the same submission should work fine" do
       setup_course_assessment
       user_session(@student2)
       post 'create', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student1.to_param, :assessment_type => "peer_review"}
-      response.should be_success
+      expect(response).to be_success
       @assessment = assigns[:assessment]
-      @assessment.should_not be_nil
+      expect(@assessment).not_to be_nil
       
       user_session(@student3)
       post 'create', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student1.to_param, :assessment_type => "peer_review"}
-      response.should be_success
-      assigns[:assessment].should_not eql(@assessment)
+      expect(response).to be_success
+      expect(assigns[:assessment]).not_to eql(@assessment)
       
       user_session(@teacher2)
       post 'create', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student1.to_param, :assessment_type => "peer_review"}
-      response.should be_success
-      assigns[:assessment].should_not eql(@assessment)
+      expect(response).to be_success
+      expect(assigns[:assessment]).not_to eql(@assessment)
     end
     
     it "should follow: multiple peer reviews for the same submission should work fine, even with a teacher assessment in play" do
       setup_course_assessment
       user_session(@teacher2)
       post 'create', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student1.to_param, :assessment_type => "grading"}
-      response.should be_success
+      expect(response).to be_success
       @grading_assessment = assigns[:assessment]
-      @grading_assessment.should_not be_nil
+      expect(@grading_assessment).not_to be_nil
 
       user_session(@student2)
       post 'create', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student1.to_param, :assessment_type => "peer_review"}
-      response.should be_success
+      expect(response).to be_success
       @assessment = assigns[:assessment]
-      @assessment.should_not be_nil
+      expect(@assessment).not_to be_nil
       
       user_session(@student3)
       post 'create', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student1.to_param, :assessment_type => "peer_review"}
-      response.should be_success
-      assigns[:assessment].should_not eql(@assessment)
+      expect(response).to be_success
+      expect(assigns[:assessment]).not_to eql(@assessment)
       
       user_session(@teacher2)
       post 'create', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student1.to_param, :assessment_type => "peer_review"}
-      response.should be_success
-      assigns[:assessment].should_not eql(@assessment)
-      assigns[:assessment].should_not eql(@grading_assessment)
+      expect(response).to be_success
+      expect(assigns[:assessment]).not_to eql(@assessment)
+      expect(assigns[:assessment]).not_to eql(@grading_assessment)
     end
         
     it "should not allow assessing fellow students for a submission" do
@@ -176,13 +176,13 @@ describe RubricAssessmentsController do
       @assignment.submit_homework(@student3, :url => "http://www.google.com")
       @assignment.update_attributes(:peer_review_count => 2)
       res = @assignment.assign_peer_reviews
-      res.should_not be_empty
+      expect(res).not_to be_empty
       # two of the six possible combinations have already been created
-      res.length.should eql(4)
-      res.to_a.find{|r| r.assessor == @student1 && r.user == @student2}.should_not be_nil
+      expect(res.length).to eql(4)
+      expect(res.to_a.find{|r| r.assessor == @student1 && r.user == @student2}).not_to be_nil
       
       post 'create', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student2.to_param, :assessment_type => 'peer_review'}
-      response.should be_success
+      expect(response).to be_success
     end
   end
 end

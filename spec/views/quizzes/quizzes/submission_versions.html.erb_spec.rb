@@ -29,6 +29,6 @@ describe "/quizzes/quizzes/submission_versions" do
     assigns[:versions] = []
 
     render "quizzes/quizzes/submission_versions"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end

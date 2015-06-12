@@ -27,7 +27,7 @@ describe "/submissions/show_preview" do
     assigns[:assignment] = a
     assigns[:submission] = a.submit_homework(@user)
     render "submissions/show_preview"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 
   it "should give a user-friendly explaination why there's no preview" do
@@ -37,7 +37,7 @@ describe "/submissions/show_preview" do
     assigns[:assignment] = a
     assigns[:submission] = a.submit_homework(@user)
     render "submissions/show_preview"
-    response.body.should match /No Preview Available/
+    expect(response.body).to match /No Preview Available/
   end
 end
 

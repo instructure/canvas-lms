@@ -1,0 +1,156 @@
+/*
+@styleguide Accordion
+
+## Default Accordion
+
+For accessibility reasons, we use the jQuery UI accordion. 
+
+```html
+<div class="accordion" id="styleguide_demo_accordion1">
+
+  <h3><a href="#">Section 1</a></h3>
+  <div> 
+    <div class="styleguide-section__accordion-demo-element">
+      Content for Section 1
+    </div>
+  </div>
+  
+  <h3><a href="#">Section 2</a></h3>
+  <div>
+    <div class="styleguide-section__accordion-demo-element">
+      Content for Section 2
+    </div>
+  </div>
+  
+  <h3><a href="#">Section 3</a></h3>
+  <div> 
+    <div class="styleguide-section__accordion-demo-element">
+      Content for Section 3
+    </div>
+  </div>
+  
+</div>
+<br/>
+```
+
+
+```js
+$("div#styleguide_demo_accordion1").accordion({header: "h3"}) 
+```
+
+## Mini accordion
+
+Default accordion a little big for your UI needs?
+
+Simply add the **.ui-accordion--mini** class to the parent **.accordion** element, and you'll get a scaled-down version.
+
+```html
+<div class="accordion ui-accordion--mini" id="styleguide_demo_accordion2">
+
+  <h3><a href="#">Section 1</a></h3>
+  <div>
+    <div class="styleguide-section__accordion-demo-element">
+      Content for Section 1
+    </div>
+  </div>
+  
+  <h3><a href="#">Section 2</a></h3>
+  <div>
+    <div class="styleguide-section__accordion-demo-element">
+      Content for Section 2
+    </div>
+  </div>
+  
+  <h3><a href="#">Section 3</a></h3>
+  <div> 
+    <div class="styleguide-section__accordion-demo-element">
+      Content for Section 3
+    </div>
+  </div>
+
+</div>
+<br/>
+```
+
+*/
+
+// Custom Canvas branding for the accordion widget -- overwriting the defaults
+// in the jQuery UI accordion styles 
+
+.ui-accordion {
+
+  .ui-accordion-content {
+    padding: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    top: 0;
+    border-color: $ic-border-color;
+    &.ui-accordion-content-active {
+      border-bottom-left-radius: $ic-border-radius;
+      border-bottom-right-radius: $ic-border-radius;  
+    }
+  }
+
+  .ui-accordion-header {
+    transition: background 0.2s, border 0.2s, border-radius 0.2s;
+    padding: $ic-sp $ic-sp*2;
+    margin-top: $ic-sp;
+    border-radius: $ic-border-radius;
+
+    &.ui-state-default {
+      background: lighten($ic-color-neutral, 5%);
+      box-shadow: none;
+      border-color: $ic-border-light;
+      border-bottom: 1px solid $ic-border-light !important;
+      &.ui-state-focus {
+        a { @include button-focus-light; }
+      }
+      &.ui-state-hover { background: $ic-color-neutral; }
+      &.ui-state-active {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        border-color: darken($ic-brand-primary, 5%);
+        border-bottom: 1px solid darken($ic-brand-primary, 5%) !important;
+        background: $ic-brand-primary;
+        &.ui-state-focus {
+          border-color: darken($ic-brand-primary, 10%);
+          border-bottom: 1px solid darken($ic-brand-primary, 10%) !important;
+          a { @include button-focus-dark; }
+        }
+      }
+    }
+
+    a {
+      transition: color 0.2s;
+      padding: $ic-sp/2 $ic-sp;
+      font-weight: normal;
+      font-size: 16px;
+      text-shadow: none;
+      line-height: 1;
+      outline: none;
+    }
+
+    .ui-icon { left: $ic-sp - 2; }
+  }
+
+  // Style overwrites for "mini accordion", used in Pages sidebar
+  &.ui-accordion--mini {
+    .ui-accordion-header {
+      margin-top: $ic-sp/3;
+      padding: 0;
+      border-radius: $ic-border-radius/2;
+      a {
+        font-size: 13px;
+        padding: $ic-sp/2 $ic-sp $ic-sp/2 $ic-sp*2;
+
+      }
+      .ui-icon { left: $ic-sp/2 - 2; }
+    }
+    .ui-accordion-content {
+      &.ui-accordion-content-active {
+        border-bottom-left-radius: $ic-border-radius/2;
+        border-bottom-right-radius: $ic-border-radius/2;  
+      }
+    } 
+  }
+}

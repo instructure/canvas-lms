@@ -30,9 +30,9 @@ describe MediaSourceFetcher do
   describe '#fetch_preferred_source_url' do
     context 'when file extension and media_type are provided' do
       it 'raises an error' do
-        -> {
+        expect {
           fetcher.fetch_preferred_source_url(media_id: 'theMediaId', file_extension: 'mp4', media_type: 'audio')
-        }.should raise_error(ArgumentError, /file_extension and media_type should not both be present/)
+        }.to raise_error(ArgumentError, /file_extension and media_type should not both be present/)
       end
     end
 
@@ -42,7 +42,7 @@ describe MediaSourceFetcher do
 
         url = fetcher.fetch_preferred_source_url(media_id: 'theMediaId', file_extension: 'mp4')
 
-        url.should == nil
+        expect(url).to eq nil
       end
     end
 
@@ -56,7 +56,7 @@ describe MediaSourceFetcher do
 
         url = fetcher.fetch_preferred_source_url(media_id: 'theMediaId', file_extension: 'mp4')
 
-        url.should == 'http://example.com/yep.mp4'
+        expect(url).to eq 'http://example.com/yep.mp4'
       end
     end
 
@@ -70,7 +70,7 @@ describe MediaSourceFetcher do
 
         url = fetcher.fetch_preferred_source_url(media_id: 'theMediaId', media_type: 'video')
 
-        url.should == 'http://example.com/web.mp4'
+        expect(url).to eq 'http://example.com/web.mp4'
       end
     end
 
@@ -84,7 +84,7 @@ describe MediaSourceFetcher do
 
         url = fetcher.fetch_preferred_source_url(media_id: 'theMediaId', media_type: 'audio')
 
-        url.should == 'http://example.com/yep.mp3'
+        expect(url).to eq 'http://example.com/yep.mp3'
       end
 
       it 'returns an mp4 when no mp3 sources exist' do
@@ -96,7 +96,7 @@ describe MediaSourceFetcher do
 
         url = fetcher.fetch_preferred_source_url(media_id: 'theMediaId', media_type: 'audio')
 
-        url.should == 'http://example.com/butwehave.mp4'
+        expect(url).to eq 'http://example.com/butwehave.mp4'
       end
     end
   end

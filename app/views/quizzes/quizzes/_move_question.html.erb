@@ -1,0 +1,26 @@
+<form id="move_quiz_item_form" style="display:none" class="form-dialog" title="<%= t('move_item', 'Move Item') %>">
+  <div class="form-dialog-content">
+    <h2 class="move-select-header">
+      <%= t(:where_to_move, "Where would you like to move %{quiz_item}?", quiz_item: raw("<b class=\"quiz_item_name\"></b>")) %>
+    </h2>
+
+    <div class="child_container">
+      <div class="move_select move_select_group">
+        <div><label for="move_select_group"><%= t('question_group', "Into question group:") %></label></div>
+        <select id="move_select_group"></select>
+      </div>
+
+      <div class="move_select move_select_question">
+        <div><label for="move_select_question"><%= t('place', 'Place:') %></label></div>
+        <select id="move_select_question"></select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-controls">
+    <button id="move_quiz_item_cancel_btn" class="cancel_button btn dialog_closer" type="button"><%= t('cancel', 'Cancel') %></button>
+    <button id="move_quiz_item_submit_btn" class="create_group btn btn-primary" data-text-while-loading='<%= t('saving', 'Saving...') %>' type="submit">
+      <%= t('save', 'Save') %>
+    </button>
+  </div>
+</form>

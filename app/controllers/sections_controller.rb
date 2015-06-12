@@ -58,7 +58,7 @@
 #         "sis_course_id": {
 #           "description": "The unique SIS identifier for the course in which the section belongs. This field is only included if the user has permission to view SIS information.",
 #           "example": 7,
-#           "type": "integer"
+#           "type": "string"
 #         },
 #         "start_at": {
 #           "description": "the start date for the section, if applicable",
@@ -71,6 +71,11 @@
 #         },
 #         "nonxlist_course_id": {
 #           "description": "The unique identifier of the original course of a cross-listed section",
+#           "type": "integer"
+#         },
+#         "total_students": {
+#           "description": "optional: the total number of active and invited students in the section",
+#           "example": 13,
 #           "type": "integer"
 #         }
 #       }
@@ -85,15 +90,20 @@ class SectionsController < ApplicationController
   # @API List course sections
   # Returns the list of sections for this course.
   #
-  # @argument include[] [Optional, String, "students"|"avatar_url"]
+  # @argument include[] [String, "students"|"avatar_url"|"enrollments"|"total_students"|"passback_status"]
   #   - "students": Associations to include with the group. Note: this is only
   #     available if you have permission to view users or grades in the course
   #   - "avatar_url": Include the avatar URLs for students returned.
+  #   - "enrollments": If 'students' is also included, return the section
+  #      enrollment for each student
+  #   - "total_students": Returns the total amount of active and invited students
+  #      for the course section
+  #   - "passback_status": Include the grade passback status.
   #
   # @returns [Section]
   def index
     if authorized_action(@context, @current_user, [:read, :read_roster, :view_all_grades, :manage_grades])
-      if params[:include].present? && !is_authorized_action?(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
+      if params[:include].present? && !@context.grants_any_right?(@current_user, session, :read_roster, :view_all_grades, :manage_grades)
         params[:include] = nil
       end
 
@@ -110,21 +120,35 @@ class SectionsController < ApplicationController
   # @argument course_section[name] [String]
   #   The name of the section
   #
-  # @argument course_section[sis_section_id] [Optional, String]
+  # @argument course_section[sis_section_id] [String]
   #   The sis ID of the section
   #
-  # @argument course_section[start_at] [Optional, DateTime]
+  # @argument course_section[start_at] [DateTime]
   #   Section start date in ISO8601 format, e.g. 2011-01-01T01:00Z
   #
-  # @argument course_section[end_at] [Optional, DateTime]
+  # @argument course_section[end_at] [DateTime]
   #   Section end date in ISO8601 format. e.g. 2011-01-01T01:00Z
+  #
+  # @argument course_section[restrict_enrollments_to_section_dates] [Boolean]
+  #   Set to true to restrict user enrollments to the start and end dates of the section.
+  #
+  # @argument enable_sis_reactivation [Boolean]
+  #   When true, will first try to re-activate a deleted section with matching sis_section_id if possible.
   #
   # @returns Section
   def create
     if authorized_action(@context.course_sections.scoped.new, @current_user, :create)
       sis_section_id = params[:course_section].try(:delete, :sis_section_id)
-      @section = @context.course_sections.build(params[:course_section])
-      @section.sis_source_id = sis_section_id if api_request? && sis_section_id.present? && @context.root_account.grants_right?(@current_user, session, :manage_sis)
+      can_manage_sis = api_request? && sis_section_id.present? &&
+        @context.root_account.grants_right?(@current_user, session, :manage_sis)
+
+      if can_manage_sis && value_to_boolean(params[:enable_sis_reactivation])
+        @section = @context.course_sections.where(:sis_source_id => sis_section_id, :workflow_state => 'deleted').first
+        @section.workflow_state = 'active' if @section
+      end
+      @section ||= @context.course_sections.build(params[:course_section])
+      @section.sis_source_id = sis_section_id if can_manage_sis
+
       respond_to do |format|
         if @section.save
           @context.touch
@@ -156,8 +180,8 @@ class SectionsController < ApplicationController
   def crosslist_check
     course_id = params[:new_course_id]
     # cross-listing should only be allowed within the same root account
-    @new_course = @section.root_account.all_courses.not_deleted.find_by_id(course_id) if course_id =~ Api::ID_REGEX
-    @new_course ||= @section.root_account.all_courses.not_deleted.find_by_sis_source_id(course_id) if course_id.present?
+    @new_course = @section.root_account.all_courses.not_deleted.where(id: course_id).first if course_id =~ Api::ID_REGEX
+    @new_course ||= @section.root_account.all_courses.not_deleted.where(sis_source_id: course_id).first if course_id.present?
     allowed = @new_course && @section.grants_right?(@current_user, session, :update) && @new_course.grants_right?(@current_user, session, :manage_admin_users)
     res = {:allowed => !!allowed}
     if allowed

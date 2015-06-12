@@ -65,7 +65,7 @@ define [
       sendSuccess(server, "#{ENV.GRADEBOOK_OPTIONS.context_url}/assignments/#{@con.get('selectedAssignment.id')}/mute", false)
       andThen =>
         dialog = find('.ui-dialog:visible', 'body')
-        equal(dialog.length, 0, 'the dialog is closed WOOOOOO')
+        equal(dialog.length, 0, 'the dialog is closed')
         checkChecked(false)
         checkLabel(ariaUnmuted)
         equal @con.get('selectedAssignment.muted'), false
@@ -103,7 +103,7 @@ define [
       sendSuccess(server, "#{ENV.GRADEBOOK_OPTIONS.context_url}/assignments/#{@con.get('selectedAssignment.id')}/mute", true)
       andThen =>
         dialog = find('.ui-dialog:visible', 'body')
-        equal(dialog.length, 0, 'the dialog is closed WOOOOOO')
+        equal(dialog.length, 0, 'the dialog is closed')
         checkChecked(true)
         checkLabel(ariaMuted)
         equal @con.get('selectedAssignment.muted'), true

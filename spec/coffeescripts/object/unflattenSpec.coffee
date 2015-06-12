@@ -1,15 +1,15 @@
-require ['compiled/object/unflatten'], (unflatten) ->
+define ['compiled/object/unflatten'], (unflatten) ->
 
   module 'unflatten'
 
   test 'simple object', ->
-    input = 
+    input =
       foo: 1
       bar: 'baz'
     deepEqual unflatten(input), input
-  
+
   test 'nested params', ->
-    input = 
+    input =
       'a[0]': 1
       'a[1]' : 2
       'a[2]' : 3
@@ -20,7 +20,7 @@ require ['compiled/object/unflatten'], (unflatten) ->
       'c[g]' : false
       'c[h]' : ''
       'i': 7
-    
+
     expected =
       a: [ 1, 2, 3 ]
       b: 4
@@ -32,5 +32,5 @@ require ['compiled/object/unflatten'], (unflatten) ->
         g: false
         h: ''
       i: 7
-    
+
     deepEqual unflatten(input), expected

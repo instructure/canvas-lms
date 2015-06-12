@@ -40,6 +40,8 @@ define [
           json.event_type_present = I18n.t("event_type.reset_from", "Reset From")
         when "reset_to"
           json.event_type_present = I18n.t("event_type.reset_to", "Reset To")
+        when "corrupted"
+          json.event_type_present = I18n.t("event_type.corrupted", "Details Not Available")
         else
           json.event_type_present = json.event_type
 

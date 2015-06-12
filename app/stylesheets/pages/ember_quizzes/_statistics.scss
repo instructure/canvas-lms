@@ -1,0 +1,410 @@
+$highlightColor: #349e67;
+$muteTextColor: ensure-contrast(#757575, #ffffff);
+
+#quiz-statistics {
+  header {
+    line-height: 34px;
+
+    &.padded {
+      padding: 20px 0;
+    }
+  }
+
+  .inline {
+    display: inline-block;
+  }
+
+  .section-title {
+    line-height: 1;
+    font-weight: bold;
+  }
+
+  .answer-set-tabs {
+    margin-top: -10px; // negate the margin in the <p /> in the header above
+    margin-bottom: 20px;
+
+    button {
+      display: inline-block;
+      color: white;
+      background: $muteTextColor;
+      font-weight: bold;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+
+      &.active, &:hover {
+        background: #2894d1;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .erratic-statistics {
+    text-align: center;
+    margin-top: 20px;
+
+    img {
+      height: 35px;
+      width: 218px;
+    }
+
+    h3 {
+      font-weight: bold;
+      margin-bottom: 0;
+      line-height: 22px;
+      font-size: 14.5px;
+    }
+  }
+}
+
+#question-statistics-section {
+  // The sorting <ic-menu />
+  header ic-menu {
+    position: relative;
+
+    ic-menu-list {
+      top: auto;
+      right: auto;
+      z-index: 1;
+    }
+  }
+}
+
+.question-statistics {
+  border: 1px solid #CAD0D7;
+  border-radius: 6px;
+  padding: 10px 20px 0;
+  position: relative;
+  margin-bottom: 20px;
+
+  section {
+    display: inline-block;
+    vertical-align: top;
+    width: 310px;
+  }
+
+  .question-attempts {
+    font-size: 0.95em;
+  }
+
+  .question-text {
+    margin-top: -5px;
+    margin-bottom: 20px;
+    font-size: 1.25em;
+  }
+
+  aside {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease-in-out 0.1s;
+  }
+
+  &:hover, &.with-details {
+    background-color: #f4f4f4;
+
+    aside {
+      opacity: 1;
+      pointer-events: inherit;
+    }
+  }
+
+  .correct-answer-ratio-section {
+    .chart, .auxiliary {
+      display: inline-block;
+      vertical-align: top;
+    }
+
+    .chart {
+      width: 80px;
+      height: 80px;
+
+      .background {
+        fill: #ddd;
+      }
+
+      .foreground {
+        fill: $highlightColor;
+      }
+
+      text {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 125%;
+        font-weight: bold;
+      }
+    }
+
+    .auxiliary {
+      margin-left: 20px;
+      width: 160px;
+    }
+  }
+
+  .answer-distribution-section {
+    height: 120px;
+    margin-bottom: -1px;
+
+    .chart {
+      .axis path,
+      .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+      }
+
+      .bar {
+        fill: #2a333b;
+
+        &.bar-highlighted {
+          fill: $highlightColor;
+        }
+
+        &.bar-striped {
+          pointer-events: none;
+        }
+      }
+
+      pattern#diagonalStripes {
+        g {
+          stroke: rgba(255,255,255,0.25);
+          stroke-width: 5;
+        }
+      }
+
+      .x.axis path {
+        display: none;
+      }
+
+      .y.axis {
+        fill: $muteTextColor;
+
+        path {
+          display: none;
+        }
+      }
+    }
+  }
+
+  &.stretched-answer-distribution .answer-distribution-section {
+    width: 580px;
+  }
+
+  .discrimination-index-section {
+    width: 270px;
+    position: relative;
+
+    .index {
+      font-size: 24px;
+      font-weight: bold;
+      font-style: normal;
+
+      &.negative {
+        color: red;
+      }
+
+      &.positive {
+        .sign {
+          color: $highlightColor;
+        }
+      }
+    }
+
+    .chart {
+      .bar {
+        fill: #2a333b;
+      }
+      .bar.correct {
+        fill: $highlightColor;
+      }
+    }
+
+    .chart-help-trigger {
+      position: absolute;
+      top: 0;
+      right: 0;
+      color: $muteTextColor;
+    }
+  }
+
+  .essay-score-chart-section {
+    width: 580px;
+    height: 120px;
+
+    path.score-line, circle {
+      stroke: #349e67;
+      shape-rendering: geometricPrecision;
+      image-rendering: optimizeQuality;
+    }
+
+    path.score-line {
+      stroke-width: 4;
+      fill: none;
+    }
+
+    .area {
+      fill: #9ddbbb;
+    }
+
+    circle {
+      stroke-width: 4px;
+      stroke: white;
+      fill: #349e67;
+    }
+  }
+
+  .answer-drilldown {
+    list-style-type: none;
+    margin: 0;
+    padding: 20px 0;
+    border-top: 1px solid #ddd;
+
+    li {
+      display: inline-block;
+      width: 45%;
+      margin-bottom: 20px;
+      min-height: 40px;
+      vertical-align: top;
+
+      &.correct .answer-response-ratio {
+        background-color: $highlightColor;
+      }
+
+      &:nth-of-type(2n) {
+        margin-left: 5%;
+      }
+    }
+
+    .answer-text {
+      margin-left: 55px; /* for the answer response ratio label */
+    }
+
+    .answer-response-ratio {
+      background-color: #2a333b;
+      display: inline-block;
+      position: absolute;
+      background: #2a333b;
+      color: white;
+      border-radius: 50% 0 50% 50%;
+      width: 40px;
+      line-height: 40px;
+      text-align: center;
+      font-weight: bold;
+      z-index: 0; /* otherwise selecting the answer text gets crazy */
+
+      sup {
+        font-size: 0.6em;
+        position: absolute;
+        font-weight: normal;
+        top: auto;
+        margin-top: 12px;
+        line-height: 1;
+      }
+    }
+  }
+
+  .detail-section {
+    display: none;
+  }
+
+  &.with-details .detail-section {
+    display: block;
+  }
+}
+
+// Needs to be in global scope because it's placed inside a tooltip
+.answer-distribution-tooltip-content {
+  text-align: center;
+
+  .answer-response-ratio {
+    font-size: 1.5em;
+    line-height: 2em;
+    font-weight: bold;
+    display: block;
+  }
+
+  .answer-response-count {
+    display: block;
+    font-size: 1.25em;
+  }
+
+  // This might go away if design decides not to embed the answer text in the
+  // tooltip content.
+  hr {
+    height: 1px;
+    line-height: 1px;
+    margin: -5px 0 5px 0;
+    background: none;
+    border: none;
+    box-shadow: 0 1px 0 #333;
+  }
+}
+
+#summary-statistics {
+  $baseFontSize: 24px;
+  $baseLineHeight: 32px;
+
+  .report-generator {
+    .auxiliary {
+      display: none;
+    }
+  }
+
+  table {
+    width: 100%;
+    margin: 20px 40px;
+  }
+
+  th {
+    font-weight: normal;
+    color: $muteTextColor;
+    width: 20%;
+    font-size: $baseFontSize * 0.75;
+    line-height: $baseLineHeight * 0.75;
+  }
+
+  td {
+    font-size: $baseFontSize;
+    line-height: $baseLineHeight;
+
+    &.emphasized {
+      font-size: $baseFontSize * 1.25;
+      line-height: $baseLineHeight * 1.25;
+      font-weight: bold;
+    }
+  }
+
+  .chart {
+    margin-top: 60px;
+    width: 100%;
+
+    .bar {
+      fill: #bedff1;
+    }
+
+    path.median-dist-graph {
+      shape-rendering: geometricPrecision;
+      image-rendering: optimizeQuality;
+      stroke-width: 2;
+      stroke: #2894d1;
+      fill: none;
+      opacity: 0.1;
+    }
+
+    .x.axis {
+      fill: $muteTextColor;
+
+      line, path {
+        display: none;
+      }
+    }
+  }
+
+  .report-generator.busy {
+    .btn {
+      background-color: transparent;
+      color: #333;
+      opacity: 0.65;
+      cursor: default;
+      box-shadow: none;
+    }
+  }
+}

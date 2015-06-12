@@ -43,11 +43,11 @@ describe 'DataFixup::ResetUngradedCounts' do
     @assignment.reload.grade_student(@user, :grade => "0")
 
     @assignment.reload.update_attribute(:needs_grading_count, 0)
-    Submission.count.should eql 3
-    Enrollment.count.should eql 4
+    expect(Submission.count).to eql 3
+    expect(Enrollment.count).to eql 4
 
     DataFixup::ResetUngradedCounts.run
 
-    @assignment.reload.needs_grading_count.should eql 1
+    expect(@assignment.reload.needs_grading_count).to eql 1
   end
 end

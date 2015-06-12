@@ -17,8 +17,8 @@
 #
 
 def assignment_override_model(opts={})
-  assignment = opts.delete(:assignment) || opts.delete(:quiz) || assignment_model(opts)
   override_for = opts.delete(:set)
+  assignment = opts.delete(:assignment) || opts.delete(:quiz) || assignment_model(opts)
   attrs = assignment_override_valid_attributes.merge(opts)
   attrs[:due_at_overridden] = true if opts[:due_at]
   attrs[:lock_at_overridden] = true if opts[:lock_at]
@@ -30,3 +30,17 @@ end
 def assignment_override_valid_attributes
   { :title => "Some Title" }
 end
+
+def create_section_override_for_assignment(assignment_or_quiz, opts={})
+  ao = assignment_or_quiz.assignment_overrides.build
+  ao.due_at = opts[:due_at] || 2.days.from_now
+  ao.set_type = "CourseSection"
+  #make sure the default due date is overridden with our override due date
+  ao.due_at_overridden = true
+  ao.set = opts[:course_section] || assignment_or_quiz.context.default_section
+  ao.title = "test override"
+  ao.save!
+  ao
+end
+alias :create_section_override_for_quiz :create_section_override_for_assignment
+

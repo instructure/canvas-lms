@@ -1,5 +1,5 @@
 
-require [
+define [
   'compiled/userSettings'
 ], (userSettings)->
 

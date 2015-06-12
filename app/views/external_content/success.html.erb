@@ -1,3 +1,5 @@
-<h2 id="dialog_message" style="color: #666; font-size: 24px;"><%= t :retrieving_content, "Retrieving Content..." %></h2>
+<% unless @hide_message %>
+ <h2 id="dialog_message" style="color: #666; font-size: 24px;"><%= t :retrieving_content, "Retrieving Content..." %></h2>
+<% end %>
 <a href="<%= external_content_oembed_retrieve_url(:url => "{{ url }}", :endpoint => "{{ endpoint }}") %>" id="oembed_retrieve_url" style="display: none;">&nbsp;</a>
 <% js_bundle 'legacy/external_content_success' %>

@@ -6,8 +6,11 @@ Permissions.register :app_profiling,
   :available_to => %w(AccountAdmin AccountMembership),
   :true_for => %w(AccountAdmin AccountMembership)
 
+# manually initialize mini-profiler, because initialize! sets up some bad
+# defaults.
 Rack::MiniProfiler.config.tap do |c|
   c.pre_authorize_cb = lambda { |env| !Rails.env.test? }
+  c.logger = Rails.logger
   c.skip_schema_queries =  !Rails.env.production?
   c.backtrace_includes =  [/^\/?(app|config|lib|test)/]
   c.authorization_mode = :whitelist
@@ -19,7 +22,7 @@ Rack::MiniProfiler.config.tap do |c|
     c.storage = ::Rack::MiniProfiler::RedisStore
   elsif Rails.env.development?
     tmp = Rails.root.to_s + "/tmp/miniprofiler"
-    FileUtils.mkdir_p(tmp) unless File.exists?(tmp)
+    FileUtils.mkdir_p(tmp) unless File.exist?(tmp)
     c.storage_options = {
       :path => tmp
     }
@@ -27,12 +30,12 @@ Rack::MiniProfiler.config.tap do |c|
   end
 end
 
-if CANVAS_RAILS2
-  # a railtie does this all automatically in rails 3+
-  Rails.configuration.middleware.use(::Rack::MiniProfiler)
+Rails.configuration.middleware.insert(0, ::Rack::MiniProfiler)
 
-  ::Rack::MiniProfiler.profile_method(ActionController::Base, :process) {|request| "Executing action: #{request[:controller]}##{request[:action]}"}
-  # can't profile ActionView::Template#render directly, because it'll conflict
-  # with rails' own internal monkey patching of that method
-  ::Rack::MiniProfiler.profile_method(ActionView::Renderable, :render) {|x,y| respond_to?(:filename) ? "Rendering: #{filename.sub("#{Rails.root}/", '')}" : "Rendering: #{self.inspect}" }
+ActiveSupport.on_load(:action_controller) do
+  ::Rack::MiniProfiler.profile_method(ActionController::Base, :process) {|action| "Executing action: #{action}"}
 end
+ActiveSupport.on_load(:action_view) do
+  ::Rack::MiniProfiler.profile_method(ActionView::Template, :render) {|x,y| "Rendering: #{@virtual_path}"}
+end
+

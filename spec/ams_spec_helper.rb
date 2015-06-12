@@ -1,26 +1,20 @@
-require 'text_helper'
-require 'canvas/lock_explanation'
 require 'active_model_serializers'
 require 'action_controller'
 require 'active_support'
 require 'active_record'
 require 'mocha/api'
-require 'api'
+require_dependency 'canvas/lock_explanation'
+require_dependency 'api'
+require_dependency 'text_helper'
 
 # You can include just this file if your serializer doesn't need too much
 # from the whole stack to run your tests faster!
 
 module ActiveModel
   class FakeController
-    if CANVAS_RAILS2
-      include ActionController::PolymorphicRoutes
-      include ActionController::UrlWriter
-      self.default_url_options[:host] = 'example.com'
-    else
-      include Rails.application.routes.url_helpers
-      def default_url_options
-        { host: 'example.com' }
-      end
+    include Rails.application.routes.url_helpers
+    def default_url_options
+      { host: 'example.com' }
     end
 
     attr_accessor :accepts_jsonapi, :stringify_json_ids, :session, :context

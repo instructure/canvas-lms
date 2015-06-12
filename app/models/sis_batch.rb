@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -24,11 +24,12 @@ class SisBatch < ActiveRecord::Base
   serialize :processing_errors, Array
   serialize :processing_warnings, Array
   belongs_to :attachment
-  belongs_to :batch_mode_term, :class_name => 'EnrollmentTerm'
+  belongs_to :generated_diff, class_name: 'Attachment'
+  belongs_to :batch_mode_term, class_name: 'EnrollmentTerm'
   belongs_to :user
 
   EXPORTABLE_ATTRIBUTES = [
-    :id, :account_id, :batch_id, :ended_at, :errored_attempts, :workflow_state, :data, :created_at, :updated_at, :attachment_id, :processing_errors,
+    :id, :account_id, :ended_at, :errored_attempts, :workflow_state, :data, :created_at, :updated_at, :attachment_id, :processing_errors,
     :processing_warnings, :batch_mode, :options, :user_id
   ]
 
@@ -37,6 +38,7 @@ class SisBatch < ActiveRecord::Base
   before_save :limit_size_of_messages
 
   validates_presence_of :account_id, :workflow_state
+  validates_length_of :diffing_data_set_identifier, maximum: 128
 
   attr_accessor :zip_path
   attr_accessible :batch_mode, :batch_mode_term
@@ -67,13 +69,7 @@ class SisBatch < ActiveRecord::Base
     batch.user = user
     batch.save
 
-    Attachment.skip_3rd_party_submits(true)
-    att = Attachment.new
-    att.context = batch
-    att.uploaded_data = attachment
-    att.display_name = t :upload_filename, "sis_upload_%{id}.zip", :id => batch.id
-    att.save!
-    Attachment.skip_3rd_party_submits(false)
+    att = create_data_attachment(batch, attachment, t(:upload_filename, "sis_upload_%{id}.zip", :id => batch.id))
     batch.attachment = att
 
     yield batch if block_given?
@@ -81,6 +77,18 @@ class SisBatch < ActiveRecord::Base
     batch.save!
 
     batch
+  end
+
+  def self.create_data_attachment(batch, data, display_name)
+    Attachment.new.tap do |att|
+      Attachment.skip_3rd_party_submits(true)
+      att.context = batch
+      att.uploaded_data = data
+      att.display_name = display_name
+      att.save!
+    end
+  ensure
+    Attachment.skip_3rd_party_submits(false)
   end
 
   workflow do
@@ -94,15 +102,36 @@ class SisBatch < ActiveRecord::Base
   end
 
   def process
+    self.class.queue_job_for_account(self.account)
+  end
+
+  def enable_diffing(data_set_id, opts = {})
+    if data[:import_type] == "instructure_csv"
+      self.diffing_data_set_identifier = data_set_id
+      if opts[:remaster]
+        self.diffing_remaster = true
+      end
+    end
+  end
+
+  def add_errors(messages)
+    self.processing_errors = (self.processing_errors || []) + messages
+  end
+
+  def add_warnings(messages)
+    self.processing_warnings = (self.processing_warnings || []) + messages
+  end
+
+  def self.queue_job_for_account(account)
     process_delay = Setting.get('sis_batch_process_start_delay', '0').to_f
-    job_args = { :singleton => "sis_batch:account:#{Shard.birth.activate { self.account_id }}",
+    job_args = { :singleton => "sis_batch:account:#{Shard.birth.activate { account.id }}",
                  :priority => Delayed::LOW_PRIORITY,
                  :max_attempts => 1 }
     if process_delay > 0
       job_args[:run_at] = process_delay.seconds.from_now
     end
 
-    work = SisBatch::Work.new(SisBatch, :process_all_for_account, [self.account])
+    work = SisBatch::Work.new(SisBatch, :process_all_for_account, [account])
     Delayed::Job.enqueue(work, job_args)
   end
 
@@ -123,6 +152,7 @@ class SisBatch < ActiveRecord::Base
     if self.workflow_state == 'created'
       self.workflow_state = :importing
       self.progress = 0
+      self.started_at = Time.now.utc
       self.save
 
       import_scheme = SisBatch.valid_import_types[self.data[:import_type]]
@@ -136,19 +166,28 @@ class SisBatch < ActiveRecord::Base
     end
   rescue => e
     self.data[:error_message] = e.to_s
-    self.data[:stack_trace] = "#{e.to_s}\n#{e.backtrace.join("\n")}"
+    self.data[:stack_trace] = "#{e}\n#{e.backtrace.join("\n")}"
     self.workflow_state = "failed"
     self.save
   end
 
   scope :needs_processing, -> { where(:workflow_state => 'created').order(:created_at) }
   scope :importing, -> { where(:workflow_state => 'importing') }
+  scope :succeeded, -> { where(:workflow_state => %w[imported imported_with_messages]) }
 
   def self.process_all_for_account(account)
+    start_time = Time.now
     loop do
-      batches = account.sis_batches.needs_processing.limit(1000).order(:created_at).all
+      batches = account.sis_batches.needs_processing.limit(50).order(:created_at).to_a
       break if batches.empty?
-      batches.each { |batch| batch.process_without_send_later }
+      batches.each do |batch|
+        batch.process_without_send_later
+        if Time.now - start_time > Setting.get('max_time_per_sis_batch', 60).to_i
+          # requeue the job to continue processing more batches
+          queue_job_for_account(account)
+          return
+        end
+      end
     end
   end
 
@@ -164,8 +203,34 @@ class SisBatch < ActiveRecord::Base
   def process_instructure_csv_zip
     require 'sis'
     download_zip
+    generate_diff
+
     importer = SIS::CSV::Import.process(self.account, :files => [ @data_file.path ], :batch => self, :override_sis_stickiness => options[:override_sis_stickiness], :add_sis_stickiness => options[:add_sis_stickiness], :clear_sis_stickiness => options[:clear_sis_stickiness])
     finish importer.finished
+  end
+
+  def generate_diff
+    return if self.diffing_remaster # joined the chain, but don't actually want to diff this one
+    return unless self.diffing_data_set_identifier
+    previous_batch = self.account.sis_batches.
+      succeeded.where(diffing_data_set_identifier: self.diffing_data_set_identifier).order(:created_at).last
+    previous_zip = previous_batch.try(:download_zip)
+    return unless previous_zip
+
+    diffed_data_file = SIS::CSV::DiffGenerator.new(self.account, self).generate(previous_zip.path, @data_file.path)
+    return unless diffed_data_file
+
+    self.data[:diffed_against_sis_batch_id] = previous_batch.id
+
+    self.generated_diff = SisBatch.create_data_attachment(
+      self,
+      Rack::Test::UploadedFile.new(diffed_data_file.path, 'application/zip'),
+      t(:diff_filename, "sis_upload_diffed_%{id}.zip", :id => self.id)
+    )
+    self.save!
+    # Success, swap out the original update for this new diff and continue.
+    @data_file.try(:close)
+    @data_file = diffed_data_file
   end
 
   def download_zip
@@ -189,7 +254,7 @@ class SisBatch < ActiveRecord::Base
       self.workflow_state = :failed
       self.workflow_state = :failed_with_messages if messages?
     end
-    self.ended_at = Time.now
+    self.ended_at = Time.now.utc
     self.save
   end
 
@@ -211,11 +276,7 @@ class SisBatch < ActiveRecord::Base
     if data[:supplied_batches].include?(:section)
       # delete sections who weren't in this batch, whose course was in the selected term
       scope = CourseSection.where("course_sections.workflow_state='active' AND course_sections.root_account_id=? AND course_sections.sis_batch_id IS NOT NULL AND course_sections.sis_batch_id<>?", self.account, self)
-      if CANVAS_RAILS2
-        scope = scope.scoped(:joins => "INNER JOIN courses ON courses.id=COALESCE(nonxlist_course_id, course_id)", :select => "course_sections.id, course_sections.*")
-      else
-        scope = scope.joins("INNER JOIN courses ON courses.id=COALESCE(nonxlist_course_id, course_id)").readonly(false)
-      end
+      scope = scope.joins("INNER JOIN courses ON courses.id=COALESCE(nonxlist_course_id, course_id)").readonly(false)
       scope = scope.where(:courses => { :enrollment_term_id => self.batch_mode_term })
       scope.find_each do |section|
         section.destroy
@@ -225,12 +286,7 @@ class SisBatch < ActiveRecord::Base
     if data[:supplied_batches].include?(:enrollment)
       # delete enrollments for courses that weren't in this batch, in the selected term
 
-      if CANVAS_RAILS2
-        scope = Enrollment.active.scoped(joins: :course, select: "enrollments.id, enrollments.*")
-      else
-        scope = Enrollment.active.joins(:course).readonly(false)
-      end
-
+      scope = Enrollment.active.joins(:course).readonly(false)
       params = {root_account: self.account, batch: self, term: self.batch_mode_term}
       scope = scope.where("courses.root_account_id=:root_account
                            AND enrollments.sis_batch_id IS NOT NULL
@@ -244,14 +300,23 @@ class SisBatch < ActiveRecord::Base
   end
 
   def as_json(options={})
+    self.options ||= {} # set this to empty hash if it does not exist so options[:stuff] doesn't blow up
     data = {
       "created_at" => self.created_at,
+      "started_at" => self.started_at,
       "ended_at" => self.ended_at,
       "updated_at" => self.updated_at,
       "progress" => self.progress,
       "id" => self.id,
       "workflow_state" => self.workflow_state,
-      "data" => self.data
+      "data" => self.data,
+      "batch_mode" => self.batch_mode,
+      "batch_mode_term_id" => self.batch_mode_term ? self.batch_mode_term.id : nil,
+      "override_sis_stickiness" => self.options[:override_sis_stickiness],
+      "add_sis_stickiness" => self.options[:add_sis_stickiness],
+      "clear_sis_stickiness" => self.options[:clear_sis_stickiness],
+      "diffing_data_set_identifier" => self.diffing_data_set_identifier,
+      "diffed_against_import_id" => self.options[:diffed_against_sis_batch_id],
     }
     data["processing_errors"] = self.processing_errors if self.processing_errors.present?
     data["processing_warnings"] = self.processing_warnings if self.processing_warnings.present?

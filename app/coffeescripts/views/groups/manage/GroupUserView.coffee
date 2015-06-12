@@ -1,8 +1,9 @@
 define [
+  'i18n!groups'
   'underscore'
   'Backbone'
   'jst/groups/manage/groupUser'
-], (_, {View}, template) ->
+], (I18n, _, {View}, template) ->
 
   class GroupUserView extends View
 

@@ -17,6 +17,7 @@ define [
     @mixin
       events:
         'click .new_page': 'createNewPage'
+        'keyclick .new_page': 'createNewPage'
         'click .header-row a[data-sort-field]': 'sort'
 
       els:
@@ -29,6 +30,8 @@ define [
 
     @optionProperty 'default_editing_roles'
     @optionProperty 'WIKI_RIGHTS'
+
+    @lastFocusField: null
 
     initialize: (options) ->
       super
@@ -59,10 +62,9 @@ define [
       @$noPages.redirectClickTo(@$noPagesLink)
       @renderSortHeaders()
 
-    sort: (event) ->
-      event?.preventDefault()
-
-      sortField = $(event.currentTarget).data('sort-field')
+    sort: (event = {}) ->
+      event.preventDefault()
+      @lastFocusField = sortField = $(event.currentTarget).data('sort-field')
       sortOrder = @collection.sortOrders[sortField] unless @currentSortField
       @$el.disableWhileLoading @collection.sortByField(sortField, sortOrder)
 
@@ -89,6 +91,9 @@ define [
         $sortHeader.toggleClass 'sort-field-active', sortField == @currentSortField
         $i.removeClass('icon-mini-arrow-up icon-mini-arrow-down')
         $i.addClass("icon-mini-arrow-#{sortOrder}")
+
+      if @lastFocusField
+        $("[data-sort-field='#{@lastFocusField}']").focus()
 
     createNewPage: (ev) ->
       ev?.preventDefault()

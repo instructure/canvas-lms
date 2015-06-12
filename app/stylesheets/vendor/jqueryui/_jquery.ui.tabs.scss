@@ -1,0 +1,70 @@
+/*!
+ * jQuery UI Tabs 1.8.21
+ *
+ * Copyright 2012, AUTHORS.txt (http://jqueryui.com/about)
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * http://jquery.org/license
+ *
+ * http://docs.jquery.com/UI/Tabs#theming
+ */
+
+.ui-tabs { position: relative; zoom: 1; /* position: relative prevents IE scroll bug (element with position: relative inside container with overflow: auto appear as "fixed") */
+  border-radius: 0;
+  border: none !important;
+  background-color: transparent !important; //override white from .ui-widget-content
+  .ui-tabs-nav { margin: 0;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    border-width: 0 0 1px 0;
+    box-shadow: none; //override .ui-widget-header
+    li { 
+      list-style: none; 
+      float: left; 
+      position: relative; 
+      top: 1px; 
+      margin: 0 .2em 1px 0; 
+      border-bottom: 0 !important; 
+      padding: 0; 
+      white-space: nowrap;
+      a { 
+        float: left; 
+        padding: .5em .9em; 
+        text-decoration: none;
+        font-weight: bold;
+        text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+      }
+      &.ui-tabs-active { margin-bottom: 0; padding-bottom: 1px;
+        background: $bgColorContent;
+        border-color: $borderColorContent;
+        box-shadow: none;
+        a { color: $fcDefault; }
+      }
+      &.ui-tabs-active, &.ui-state-disabled, &.ui-state-processing {
+        a { cursor: text; }
+      }
+    }
+  }
+  .ui-tabs-nav li a, &.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-active a { cursor: pointer; } /* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */
+  .ui-tabs-panel { display: block; padding: 1em 1.4em;
+    background-color: $bgColorContent;
+    border-width: 0 1px 1px 1px;
+    border-radius: 0;
+
+  }
+  .ui-tabs-hide { display: none !important; }
+}
+
+// this is a custom minimal tab style added by instructure, apply this class in addition to the .ui-tabs
+// that jqueryui puts on.
+.ui-tabs-minimal {
+  .ui-tabs-nav {
+    border-bottom-color: $borderColorContent;
+  }
+  .ui-tabs-panel {
+    border-width: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+  }
+}

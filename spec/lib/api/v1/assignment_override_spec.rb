@@ -18,9 +18,9 @@ describe "Api::V1::AssignmentOverride" do
       subj.stubs(:api_find_all).returns []
       assignment = stub(:context => stub(:students_visible_to) )
       result = subj.interpret_assignment_override_data(assignment, override,'ADHOC')
-      result.first[:due_at].should == nil
-      result.first[:unlock_at].should == nil
-      result.first[:lock_at].should == nil
+      expect(result.first[:due_at]).to eq nil
+      expect(result.first[:unlock_at]).to eq nil
+      expect(result.first[:lock_at]).to eq nil
     end
   end
 end

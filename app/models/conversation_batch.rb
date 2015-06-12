@@ -34,6 +34,9 @@ class ConversationBatch < ActiveRecord::Base
     update_attribute :workflow_state, 'sending'
 
     ModelCache.with_cache(:conversations => existing_conversations, :users => {:id => user_map}) do
+
+      should_cc_author = true
+
       recipient_ids.each_slice(chunk_size) do |ids|
         ids.each do |id|
           is_group = self.group?
@@ -42,8 +45,10 @@ class ConversationBatch < ActiveRecord::Base
           @conversations << conversation
           message = root_conversation_message.clone
           message.generate_user_note = self.generate_user_note
-          conversation.add_message(message, update_for_sender: false, tags: tags)
+          conversation.add_message(message, update_for_sender: false, tags: tags, cc_author: should_cc_author)
           conversation_message_ids << message.id
+
+          should_cc_author = false
         end
         # update it in chunks, not on every message
         save! if update_progress
@@ -81,7 +86,7 @@ class ConversationBatch < ActiveRecord::Base
 
   attr_writer :user_map
   def user_map
-    @user_map ||= User.find_all_by_id(recipient_ids + [user_id]).index_by(&:id)
+    @user_map ||= User.where(id: recipient_ids + [user_id]).index_by(&:id)
   end
 
   def recipient_ids

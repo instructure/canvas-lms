@@ -5,7 +5,8 @@ define [
   'underscore'
   'jst/ExternalTools/AddAppView'
   'jquery.disableWhileLoading'
-], (Backbone, I18n, $, _, template, disableWhileLoading) ->
+  'str/htmlEscape'
+], (Backbone, I18n, $, _, template, disableWhileLoading, htmlEscape) ->
 
   class AddAppView extends Backbone.View
     template: template
@@ -104,14 +105,14 @@ define [
     addError: (input, message) ->
       input = @$(input)
       input.parents('.control-group').addClass('error')
-      input.after("<span class='help-inline'>#{message}</span>")
+      input.after("<span class='help-inline'>#{htmlEscape message}</span>")
       input.one 'keypress', ->
         $(this).parents('.control-group').removeClass('error')
         $(this).parents('.control-group').find('.help-inline').remove()
 
     onSaveFail: (model) =>
       message = I18n.t 'generic_error', 'There was an error in processing your request'
-      @$el.prepend("<div class='alert alert-error'>#{message}</span>")
+      @$el.prepend("<div class='alert alert-error'>#{htmlEscape message}</span>")
 
     onSaveSuccess: (model) =>
       @app.set('is_installed', true)

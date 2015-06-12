@@ -62,6 +62,8 @@
 <% end %>
 <% js_bundle 'legacy/user_outcome_results' %>
 
+<h1 class="screenreader-only"><%= t :outcomes_for, "Outcomes for %{user_name}", :user_name => @user.name %></h1>
+
 <table id="outcomes">
 <thead>
   <tr>

@@ -20,16 +20,16 @@ describe "course statistics" do
     f('#students_stats_tab').click
 
     users = ff('.item_list li')
-    users[0].should include_text @student2.name
-    users[0].should_not include_text "unknown"
-    users[1].should include_text @student3.name
-    users[1].should_not include_text "unknown"
-    users[2].should include_text @student1.name
-    users[2].should include_text "unknown"
+    expect(users[0]).to include_text @student2.name
+    expect(users[0]).not_to include_text "unknown"
+    expect(users[1]).to include_text @student3.name
+    expect(users[1]).not_to include_text "unknown"
+    expect(users[2]).to include_text @student1.name
+    expect(users[2]).to include_text "unknown"
 
     links = ff('.item_list li a')
-    links[0]['href'].end_with?("/courses/#{@course.id}/users/#{@student2.id}").should == true
-    links[1]['href'].end_with?("/courses/#{@course.id}/users/#{@student3.id}").should == true
-    links[2]['href'].end_with?("/courses/#{@course.id}/users/#{@student1.id}").should == true
+    expect(links[0]['href'].end_with?("/courses/#{@course.id}/users/#{@student2.id}")).to eq true
+    expect(links[1]['href'].end_with?("/courses/#{@course.id}/users/#{@student3.id}")).to eq true
+    expect(links[2]['href'].end_with?("/courses/#{@course.id}/users/#{@student1.id}")).to eq true
   end
 end

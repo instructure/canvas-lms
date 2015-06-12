@@ -68,7 +68,7 @@ define [
     showErrorMessage: (message) ->
       @hideProgBar()
       $('#media_upload_feedback').css('visibility', 'visible')
-      $("#media_upload_feedback_text").html(message)
+      $("#media_upload_feedback_text").text(message)
 
     showProgBar: ->
       $('#media_upload_progress').css('visibility', 'visible').progressbar()

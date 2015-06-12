@@ -29,9 +29,10 @@
 
 	<div class="span4 message-metadata">
 		<div class="date pull-right">
-			{{friendlyDatetime created_at}}
+			{{tEventToString created_at "long" "tiny"}}
 		</div>
 
+    {{#unless for_submission}}
     <ul class="actions pull-right unstyled">
       <li>
         <a href="#"
@@ -43,7 +44,7 @@
       </li>
 
       <li>
-        <div class="inline-block" role="application">
+        <div class="inline-block">
           <a href="#"
              data-kyle-menu-options='{"appendMenuTo": "body"}'
              role="button"
@@ -68,6 +69,7 @@
         </div>
       </li>
     </ul>
+    {{/unless}}
 	</div>
 </div>
 

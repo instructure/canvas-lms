@@ -1,0 +1,37 @@
+// use on a UL or a OL to reset
+@mixin reset-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  li {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+@mixin vertical-gradient($topColor, $bottomColor) {
+  background-image: linear-gradient(to bottom, $topColor, $bottomColor);
+}
+
+@mixin accessible_text_replacement {
+  display: inline-block;
+  text-indent: -999px;
+  overflow: hidden;
+  background-repeat: no-repeat;
+}
+
+@mixin unselectable { user-select: none; }
+
+@mixin firefox-white-space-bug-fix {
+  white-space: normal;
+  height: $baseLineHeight;
+  position: relative;
+  &:after {
+    content: "";
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 75%);
+    position: absolute;
+    right: 0; top: 0;
+    height: $baseLineHeight; width: $ic-sp*2.5;
+    z-index: 1;
+  }
+}

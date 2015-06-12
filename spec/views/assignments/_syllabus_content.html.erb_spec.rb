@@ -51,17 +51,17 @@ describe "/assignments/_syllabus_content" do
 
     example 'anonymous user (public course)' do
       setup_and_render_context :anonymous, :is_public => true
-      @controller.js_env.should include(:CAN_READ => true)
+      expect(@controller.js_env).to include(:CAN_READ => true)
     end
 
     example 'non-enrolled user (public course)' do
       setup_and_render_context :non_enrolled_user, :is_public => true
-      @controller.js_env.should include(:CAN_READ => true)
+      expect(@controller.js_env).to include(:CAN_READ => true)
     end
 
     example 'enrolled user (non-public course)' do
       setup_and_render_context :enrolled_user
-      @controller.js_env.should include(:CAN_READ => true)
+      expect(@controller.js_env).to include(:CAN_READ => true)
     end
   end
 end

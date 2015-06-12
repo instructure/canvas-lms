@@ -63,13 +63,13 @@
 #           "type": "boolean"
 #         },
 #         "beta": {
-#           "description": "Whether the feature is a beta feature",
-#           "example": false,
+#           "description": "Whether the feature is a beta feature. If true, the feature may not be fully polished and may be subject to change in the future.",
+#           "example": true,
 #           "type": "boolean"
 #         },
 #         "development": {
-#           "description": "Whether the feature is in development",
-#           "example": true,
+#           "description": "Whether the feature is in active development. Features in this state are only visible in test and beta instances and are not yet available for production use.",
+#           "example": false,
 #           "type": "boolean"
 #         },
 #         "release_notes_url": {
@@ -206,13 +206,13 @@ class FeatureFlagsController < ApplicationController
   # Set a feature flag for a given Account, Course, or User. This call will fail if a parent account sets
   # a feature flag for the same feature in any state other than "allowed".
   #
-  # @argument state [Optional, String, "off"|"allowed"|"on"]
+  # @argument state [String, "off"|"allowed"|"on"]
   #   "off":: The feature is not available for the course, user, or account and sub-accounts.
   #   "allowed":: (valid only on accounts) The feature is off in the account, but may be enabled in
   #               sub-accounts and courses by setting a feature flag on the sub-account or course.
   #   "on":: The feature is turned on unconditionally for the user, course, or account and sub-accounts.
   #
-  # @argument locking_account_id [Optional, Integer]
+  # @argument locking_account_id [Integer]
   #   If set, this FeatureFlag may only be modified by someone with administrative rights
   #   in the specified account. The locking account must be above the target object in the
   #   account chain.
@@ -232,7 +232,7 @@ class FeatureFlagsController < ApplicationController
       return render json: { message: "invalid feature" }, status: :bad_request unless feature_def
 
       # check whether the feature is locked
-      Rails.cache.delete(@context.feature_flag_cache_key(params[:feature]))
+      MultiCache.delete(@context.feature_flag_cache_key(params[:feature]))
       current_flag = @context.lookup_feature_flag(params[:feature])
       if current_flag
         return render json: { message: "higher account disallows setting feature flag" }, status: :forbidden if current_flag.locked?(@context, @current_user)
@@ -241,7 +241,7 @@ class FeatureFlagsController < ApplicationController
 
       # if this is a hidden feature, require site admin privileges to create (but not update) a root account flag
       if !current_flag && feature_def.hidden?
-        return render json: { message: "invalid feature" }, status: :bad_request unless @context.is_a?(Account) && @context.root_account? && Account.site_admin.grants_right?(@current_user, session, :read)
+        return render json: { message: "invalid feature" }, status: :bad_request unless ((@context.is_a?(Account) && @context.root_account?) || @context.is_a?(User)) && Account.site_admin.grants_right?(@current_user, session, :read)
         prior_state = 'hidden'
       end
 
@@ -295,7 +295,7 @@ class FeatureFlagsController < ApplicationController
   def delete
     if authorized_action(@context, @current_user, :manage_feature_flags)
       return render json: { message: "must specify feature" }, status: :bad_request unless params[:feature].present?
-      flag = @context.feature_flags.find_by_feature!(params[:feature])
+      flag = @context.feature_flags.where(feature: params[:feature]).first!
       return render json: { message: "flag is locked" }, status: :forbidden if flag.locked?(@context, @current_user)
       flag.destroy
       render json: feature_flag_json(flag, @context, @current_user, session)

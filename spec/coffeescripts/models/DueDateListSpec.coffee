@@ -36,14 +36,6 @@ Section, SectionList, _ ) ->
       @completeOverridesList = new DueDateList @completeOverrides, @sections, @assignment
 
   test """
-  #availableSections returns list of course sections that
-  are not being used by the AssignmentOverrideCollection
-  """, ->
-    availableSections = @partialOverridesList.availableSections()
-    strictEqual availableSections.length, 1
-    strictEqual availableSections[0].id, '3'
-
-  test """
   #containsSectionsWithoutOverrides returns true when a section's id
   does not belong to an AssignmentOverride and there isn't an
   override representing a default due date present
@@ -67,35 +59,6 @@ Section, SectionList, _ ) ->
   an assignment override
   """, ->
     strictEqual @completeOverridesList.containsSectionsWithoutOverrides(), false
-
-  test """
-  #containsBlankOverrides returns true if at least one override has a
-  falsy due_at
-  """, ->
-    strictEqual @partialOverridesList.containsBlankOverrides(), true
-
-  test """
-  #containsBlankOverrides returns false if no overrides have a falsy due_at
-  """, ->
-    @partialOverrides.forEach (override) -> override.set 'due_at', Date.now()
-    strictEqual @partialOverridesList.containsBlankOverrides(), false
-
-  test "#blankOverrides returns blank overrides in the overrides", ->
-    stub(@partialOverrides, 'blank').returns [ 1, 2, 3 ]
-    deepEqual @partialOverridesList.blankOverrides(), [1, 2, 3]
-
-  test """
-  updates name to 'everyone' or 'everyone else' when the number of overrides
-  changes
-  """, ->
-    overrides = new AssignmentOverrideCollection
-    dueDateList = new DueDateList overrides, @sections, @assignment
-    override = new AssignmentOverride id: '1'
-    defaultSection = dueDateList.findDefaultDueDateSection()
-    dueDateList.addOverride override
-    strictEqual defaultSection.get('name'), 'Everyone Else'
-    dueDateList.removeOverride override
-    strictEqual defaultSection.get('name'), 'Everyone'
 
   test """
   constructor adds an override representing the default due date using the
@@ -128,9 +91,3 @@ Section, SectionList, _ ) ->
   """, ->
     dueDateList = new DueDateList @partialOverrides, new SectionList([]), @assignment
     strictEqual dueDateList.sections.length, 1
-
-  test "#toJSON includes sections", ->
-    deepEqual @partialOverridesList.toJSON().sections, @sections.toJSON()
-
-  test "#toJSON includes overrides", ->
-    deepEqual @partialOverridesList.toJSON().overrides, @partialOverrides.toJSON()

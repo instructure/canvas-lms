@@ -33,78 +33,6 @@ if RUBY_VERSION < '2.0'
   end
 end
 
-if CANVAS_RAILS2
-  ActionView::Helpers::TagHelper.module_eval do
-    def escape_once(html)
-      # so '&#x27;' (in particular) doesn't get double-escaped (note the 'x?' in the regex)
-      ActiveSupport::Multibyte.clean(html.to_s).gsub(/[\"><]|&(?!([a-zA-Z]+|(#x?\d+));)/) { |special| ERB::Util::HTML_ESCAPE[special] }
-    end
-  end
-
-  require "active_support/core_ext/string/output_safety"
-  class ERB
-    module Util
-
-      # rails 2 uses decimal, rails 3 uses hex, so we use hex everywhere
-      HTML_ESCAPE["'"] = "&#x27;"
-
-      # see https://github.com/rails/rails/issues/7430
-      def html_escape(s)
-        s = s.to_s
-        if s.html_safe?
-          s
-        else
-          s.gsub(/[&"'><]/, HTML_ESCAPE).html_safe
-        end
-      end
- 
-      alias h html_escape
- 
-      singleton_class.send(:remove_method, :html_escape)
-      module_function :html_escape, :h
-    end
-  end
-
-  # also https://groups.google.com/forum/#!msg/rubyonrails-core/gb5woRkmDlk/iQ2G7jjNWKkJ
-  MissingSourceFile::REGEXPS << [/^cannot load such file -- (.+)$/i, 1]
-
-  # In Ruby 1.9, respond_to? (which is what proxy_respond_to? REALLY is), chains to
-  # respond_to_missing?.  However, respond_to_missing? is *not* defined on
-  # AssociationProxy because Rails removes *all* methods besides __*, send,
-  # nil?, and object_id, so it hits method_missing, and tries to load the
-  # target.
-  # See https://rails.lighthouseapp.com/projects/8994/tickets/5410-multiple-database-queries-when-chaining-named-scopes-with-rails-238-and-ruby-192
-  # (The patch in that lighthouse bug was not, in fact, merged in).
-  class ActiveRecord::Associations::AssociationProxy
-    def respond_to_missing?(meth, incl_priv)
-      false
-    end
-  end
-
-  # ActiveSupport::SafeBuffer is a subclass of String, and while string
-  # literals get the encoding of the source file,
-  #
-  # String.new always gets ascii-8bit encoding. This means that depending on
-  # the contents of a template and the data interpolated into the template,
-  # things either work great or you get an incompatible encoding error.
-  #
-  # This patch fixes the problem by giving new SafeBuffers the default encoding
-  # (which in canvas is utf-8)
-  class ActiveSupport::SafeBuffer
-    def initialize(*a)
-      super.force_encoding('utf-8')
-    end
-  end
-
-  # Get rid of the warnings in Rails 2.3 + Ruby 1.9 about unicode
-  # normalization not being supported.
-  module ActiveSupport::Inflector
-    def transliterate(string)
-      I18n.transliterate(string)
-    end
-  end
-end
-
 # This makes it so all parameters get converted to UTF-8 before they hit your
 # app.  If someone sends invalid UTF-8 to your server, raise an exception.
 class ActionController::InvalidByteSequenceErrorFromParams < Encoding::InvalidByteSequenceError; end
@@ -140,63 +68,52 @@ class ActionController::Base
   before_filter :force_utf8_params
 end
 
-class ActiveRecord::Base
-  # this is basically all potentially affected AR serialized columns that
-  # existed in the DB before Canvas was Ruby 1.9 only. We've verified that
-  # none of these columns should legitimately contain binary data, only text.
-  SERIALIZED_COLUMNS_WITH_POTENTIALLY_INVALID_UTF8 = {
-    'AssessmentQuestion'                => %w[question_data],
-    'ContextExternalTool'               => %w[settings],
-    'EportfolioEntry'                   => %w[content],
-    'ErrorReport'                       => %w[http_env data],
-    'LearningOutcome'                   => %w[data],
-    'Profile'                           => %w[data],
-    'Quizzes::Quiz'                     => %w[quiz_data],
-    'Quizzes::QuizQuestion'             => %w[question_data],
-    'Quizzes::QuizSubmission'           => %w[quiz_data submission_data],
-    'Quizzes::QuizSubmissionSnapshot'   => %w[data],
-    'Rubric'                            => %w[data],
-    'RubricAssessment'                  => %w[data],
-    'SisBatch'                          => %w[processing_errors processing_warnings],
-    'StreamItem'                        => %w[data]
-  }
+if CANVAS_RAILS3
+  module HandleInvalidUtf8
+    # this is basically all potentially affected AR serialized columns that
+    # existed in the DB before Canvas was Ruby 1.9 only. We've verified that
+    # none of these columns should legitimately contain binary data, only text.
+    SERIALIZED_COLUMNS_WITH_POTENTIALLY_INVALID_UTF8 = {
+      'AssessmentQuestion'                => %w[question_data],
+      'ContextExternalTool'               => %w[settings],
+      'EportfolioEntry'                   => %w[content],
+      'ErrorReport'                       => %w[http_env data],
+      'LearningOutcome'                   => %w[data],
+      'Profile'                           => %w[data],
+      'Quizzes::Quiz'                     => %w[quiz_data],
+      'Quizzes::QuizQuestion'             => %w[question_data],
+      'Quizzes::QuizSubmission'           => %w[quiz_data submission_data],
+      'Quizzes::QuizSubmissionSnapshot'   => %w[data],
+      'Rubric'                            => %w[data],
+      'RubricAssessment'                  => %w[data],
+      'SisBatch'                          => %w[processing_errors processing_warnings],
+      'StreamItem'                        => %w[data]
+    }
 
-  class << self
-    def strip_invalid_utf8_from_attribute(attr_name, value)
+    def attribute_cast_code(attr_name)
       if SERIALIZED_COLUMNS_WITH_POTENTIALLY_INVALID_UTF8[self.name].try(:include?, attr_name.to_s)
-        Utf8Cleaner.recursively_strip_invalid_utf8!(value, true)
+        "Utf8Cleaner.recursively_strip_invalid_utf8!(#{super}, true)"
+      else
+        super
       end
-      value
     end
   end
 
-  if CANVAS_RAILS2
-    def unserialize_attribute_with_utf8_check(attr_name)
-      value = unserialize_attribute_without_utf8_check(attr_name)
-      self.class.strip_invalid_utf8_from_attribute(attr_name, value)
-    end
-    alias_method_chain :unserialize_attribute, :utf8_check
-  else
-    class << self
-      def type_cast_attribute_with_utf8_check(attr_name, attributes, cache={})
-        value = type_cast_attribute_without_utf8_check(attr_name, attributes, cache)
-        strip_invalid_utf8_from_attribute(attr_name, value)
-      end
-      alias_method_chain :type_cast_attribute, :utf8_check
-    end
+  class ActiveRecord::Base
+    extend HandleInvalidUtf8
   end
+else
+  # For Rails 4 use Custom Types
+  # https://github.com/rails/rails/blob/08754f12e65a9ec79633a605e986d0f1ffa4b251/activerecord/lib/active_record/attributes.rb#L53?line=53
 end
 
-# Make sure the flash sets the encoding to UTF-8 as well.
-module ActionController
-  module Flash
-    class FlashHash
-      def [](k)
-        v = super
-        v.is_a?(String) ? v.force_encoding("UTF-8") : v
-      end
+unless CANVAS_RAILS3
+  module AttributeReadWithUtf8Check
+    def read_attribute(attr_name, &block)
+      self.class.strip_invalid_utf8_from_attribute(attr_name, super)
     end
   end
+  ActiveRecord::AttributeMethods::Read.send(:prepend, AttributeReadWithUtf8Check)
 end
 
 # Fix for https://bugs.ruby-lang.org/issues/7278 , which was filling up our logs with these warnings

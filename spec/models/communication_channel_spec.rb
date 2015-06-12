@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe CommunicationChannel do
   before(:each) do
@@ -31,19 +31,19 @@ describe CommunicationChannel do
 
   describe 'imported?' do
     it 'should default to false' do
-      CommunicationChannel.new.should_not be_imported
+      expect(CommunicationChannel.new).not_to be_imported
     end
 
     it 'should be false if the channel has no pseudonym' do
       communication_channel_model
-      @communication_channel.should_not be_imported
+      expect(@communication_channel).not_to be_imported
     end
 
     it 'should be false if the channel is associated with a pseudonym' do
       user_with_pseudonym(:active_all => true)
       channel = @pseudonym.communication_channel
 
-      channel.should_not be_imported
+      expect(channel).not_to be_imported
     end
 
     it "should be true if the channel is the sis_communication_channel of a pseudonym" do
@@ -51,137 +51,117 @@ describe CommunicationChannel do
       channel = @pseudonym.communication_channel
       @pseudonym.update_attribute(:sis_communication_channel_id, channel.id)
 
-      channel.should be_imported
+      expect(channel).to be_imported
     end
   end
 
   it "should have a decent state machine" do
     communication_channel_model
-    @cc.state.should eql(:unconfirmed)
+    expect(@cc.state).to eql(:unconfirmed)
     @cc.confirm
-    @cc.state.should eql(:active)
+    expect(@cc.state).to eql(:active)
     @cc.retire
-    @cc.state.should eql(:retired)
+    expect(@cc.state).to eql(:retired)
     @cc.re_activate
-    @cc.state.should eql(:active)
+    expect(@cc.state).to eql(:active)
     
     communication_channel_model(:path => "another_path@example.com")
-    @cc.state.should eql(:unconfirmed)
+    expect(@cc.state).to eql(:unconfirmed)
     @cc.retire
-    @cc.state.should eql(:retired)
+    expect(@cc.state).to eql(:retired)
     @cc.re_activate
-    @cc.state.should eql(:active)
-  end
-  
-  it "should reset the bounce count when re_activating" do
-    communication_channel_model
-    @cc.bounce_count = 1
-    @cc.confirm
-    @cc.bounce_count.should eql(1)
-    @cc.retire
-    @cc.re_activate
-    @cc.bounce_count.should eql(0)
-  end
-  
-  it "should retire the communication channel if it's been bounced 5 times" do
-    communication_channel_model
-    @cc.bounce_count = 5
-    @cc.state.should eql(:unconfirmed)
-    @cc.save
-    @cc.state.should eql(:retired)
-    
-    communication_channel_model
-    @cc.bounce_count = 4
-    @cc.save
-    @cc.state.should eql(:unconfirmed)
-
-    communication_channel_model
-    @cc.bounce_count = 6
-    @cc.save
-    @cc.state.should eql(:retired)
+    expect(@cc.state).to eql(:active)
   end
   
   it "should set a confirmation code unless one has been set" do
     CanvasSlug.expects(:generate).at_least(1).returns('abc123')
     communication_channel_model
-    @cc.confirmation_code.should eql('abc123')
+    expect(@cc.confirmation_code).to eql('abc123')
   end
   
   it "should be able to reset a confirmation code" do
     communication_channel_model
     old_cc = @cc.confirmation_code
     @cc.set_confirmation_code(true)
-    @cc.confirmation_code.should_not eql(old_cc)
+    expect(@cc.confirmation_code).not_to eql(old_cc)
   end
   
   it "should use a 15-digit confirmation code for default or email path_type settings" do
     communication_channel_model
-    @cc.path_type.should eql('email')
-    @cc.confirmation_code.size.should eql(25)
+    expect(@cc.path_type).to eql('email')
+    expect(@cc.confirmation_code.size).to eql(25)
   end
   
   it "should use a 4-digit confirmation_code for settings other than email" do
     communication_channel_model
     @cc.path_type = 'sms'
     @cc.set_confirmation_code(true)
-    @cc.confirmation_code.size.should eql(4)
+    expect(@cc.confirmation_code.size).to eql(4)
   end
   
   it "should default the path type to email" do
     communication_channel_model
-    @cc.path_type.should eql('email')
+    expect(@cc.path_type).to eql('email')
   end
-  
+
+  it "should provide a confirmation url" do
+    HostUrl.expects(:protocol).returns('https')
+    HostUrl.expects(:context_host).returns('test.canvas.com')
+    CanvasSlug.expects(:generate).returns('abc123')
+    communication_channel_model
+    expect(@cc.confirmation_url).to eql('https://test.canvas.com/register/abc123')
+  end
+
   it "should only allow email, or sms as path types" do
     communication_channel_model
     @cc.path_type = 'email'; @cc.save
-    @cc.path_type.should eql('email')
+    expect(@cc.path_type).to eql('email')
 
     @cc.path_type = 'sms'; @cc.save
-    @cc.path_type.should eql('sms')
+    expect(@cc.path_type).to eql('sms')
 
     @cc.path_type = 'not valid'; @cc.save
-    @cc.path_type.should eql('email')
+    expect(@cc.path_type).to eql('email')
   end
   
   it "should act as list" do
-    CommunicationChannel.should be_respond_to(:acts_as_list)
+    expect(CommunicationChannel).to be_respond_to(:acts_as_list)
   end
   
   it "should scope the list to the user" do
     @u1 = User.create!
     @u2 = User.create!
-    @u1.should_not eql(@u2)
-    @u1.id.should_not eql(@u2.id)
+    expect(@u1).not_to eql(@u2)
+    expect(@u1.id).not_to eql(@u2.id)
     @cc1 = @u1.communication_channels.create!(:path => 'jt@instructure.com')
     @cc2 = @u1.communication_channels.create!(:path => 'cody@instructure.com')
     @cc3 = @u2.communication_channels.create!(:path => 'brianp@instructure.com')
-    @cc1.user.should eql(@u1)
-    @cc2.user.should eql(@u1)
-    @cc3.user.should eql(@u2)
-    @cc1.user_id.should_not eql(@cc3.user_id)
-    @cc2.position.should eql(2)
+    expect(@cc1.user).to eql(@u1)
+    expect(@cc2.user).to eql(@u1)
+    expect(@cc3.user).to eql(@u2)
+    expect(@cc1.user_id).not_to eql(@cc3.user_id)
+    expect(@cc2.position).to eql(2)
     @cc2.move_to_top
     @cc2.save
     @cc2.reload
-    @cc2.position.should eql(1)
+    expect(@cc2.position).to eql(1)
     @cc1.reload
-    @cc1.position.should eql(2)
+    expect(@cc1.position).to eql(2)
     @cc3.reload
-    @cc3.position.should eql(1)
+    expect(@cc3.position).to eql(1)
   end
   
   context "can_notify?" do
     it "should normally be able to be used" do
       communication_channel_model
-      @communication_channel.should be_can_notify
+      expect(@communication_channel).to be_can_notify
     end
     
     it "should not be able to be used if it has a policy to not use it" do
       communication_channel_model
       notification_policy_model(:frequency => "never", :communication_channel => @communication_channel)
       @communication_channel.reload
-      @communication_channel.should_not be_can_notify
+      expect(@communication_channel).not_to be_can_notify
     end
   end
 
@@ -189,7 +169,7 @@ describe CommunicationChannel do
     it "should return matching ccs case-insensitively" do
       @user = User.create!
       @cc = @user.communication_channels.create!(:path => 'user@example.com')
-      @user.communication_channels.by_path('USER@EXAMPLE.COM').should == [@cc]
+      expect(@user.communication_channels.by_path('USER@EXAMPLE.COM')).to eq [@cc]
     end
   end
 
@@ -202,6 +182,15 @@ describe CommunicationChannel do
     @user.communication_channels.create!(:path => 'user1@example.com', :path_type => 'sms')
   end
 
+  context "destroy!" do
+    it "does not violate foreign key constraints" do
+      communication_channel_model
+      notification_policy_model(:frequency => "daily", :communication_channel => @communication_channel)
+      delayed_message_model(:notification_policy_id => @notification_policy.id)
+      @communication_channel.destroy!
+    end
+  end
+
   context "notifications" do
     it "should forward the root account to the message" do
       notification = Notification.create!(:name => 'Confirm Email Communication Channel', :category => 'Registration')
@@ -210,11 +199,12 @@ describe CommunicationChannel do
       @cc = @user.communication_channels.create!(:path => 'user1@example.com')
       account = Account.create!
       HostUrl.stubs(:context_host).with(account).returns('someserver.com')
+      HostUrl.stubs(:context_host).with(@cc).returns('someserver.com')
       HostUrl.stubs(:context_host).with(nil).returns('default')
       @cc.send_confirmation!(account)
       message = Message.where(:communication_channel_id => @cc, :notification_id => notification).first
-      message.should_not be_nil
-      message.body.should match /someserver.com/
+      expect(message).not_to be_nil
+      expect(message.body).to match /someserver.com/
     end
   end
 
@@ -225,52 +215,42 @@ describe CommunicationChannel do
     @user.otp_communication_channel = @cc
     @user.save!
     @cc.reload
-    @cc.destroy.should be_false
-    @cc.reload.should be_active
+    expect(@cc.destroy).to be_falsey
+    expect(@cc.reload).to be_active
   end
 
   describe "merge candidates" do
+    let_once(:user1) { User.create! }
+    let_once(:cc1) { user1.communication_channels.create!(:path => 'jt@instructure.com') }
     it "should return users with a matching e-mail address" do
-      user1 = User.create!
-      cc1 = user1.communication_channels.create!(:path => 'jt@instructure.com')
-
       user2 = User.create!
       cc2 = user2.communication_channels.create!(:path => 'jt@instructure.com')
       cc2.confirm!
       Account.default.pseudonyms.create!(:user => user2, :unique_id => 'user2')
 
-      cc1.merge_candidates.should == [user2]
-      cc1.has_merge_candidates?.should be_true
+      expect(cc1.merge_candidates).to eq [user2]
+      expect(cc1.has_merge_candidates?).to be_truthy
     end
 
     it "should not return users without an active pseudonym" do
-      user1 = User.create!
-      cc1 = user1.communication_channels.create!(:path => 'jt@instructure.com')
-
       user2 = User.create!
       cc2 = user2.communication_channels.create!(:path => 'jt@instructure.com')
       cc2.confirm!
 
-      cc1.merge_candidates.should == []
-      cc1.has_merge_candidates?.should be_false
+      expect(cc1.merge_candidates).to eq []
+      expect(cc1.has_merge_candidates?).to be_falsey
     end
 
     it "should not return users that match on an unconfirmed cc" do
-      user1 = User.create!
-      cc1 = user1.communication_channels.create!(:path => 'jt@instructure.com')
-
       user2 = User.create!
       cc2 = user2.communication_channels.create!(:path => 'jt@instructure.com')
       Account.default.pseudonyms.create!(:user => user2, :unique_id => 'user2')
 
-      cc1.merge_candidates.should == []
-      cc1.has_merge_candidates?.should be_false
+      expect(cc1.merge_candidates).to eq []
+      expect(cc1.has_merge_candidates?).to be_falsey
     end
 
     it "should only check one user for boolean result" do
-      user1 = User.create!
-      cc1 = user1.communication_channels.create!(:path => 'jt@instructure.com')
-
       user2 = User.create!
       cc2 = user2.communication_channels.create!(:path => 'jt@instructure.com')
       cc2.confirm!
@@ -281,7 +261,24 @@ describe CommunicationChannel do
       Account.default.pseudonyms.create!(:user => user3, :unique_id => 'user3')
 
       User.any_instance.expects(:all_active_pseudonyms).once.returns([true])
-      cc1.has_merge_candidates?.should be_true
+      expect(cc1.has_merge_candidates?).to be_truthy
+    end
+
+    describe ".bounce_for_path" do
+      it "flags paths with too many bounces" do
+        @cc1 = communication_channel_model(path: 'not_as_bouncy@example.edu')
+        @cc2 = communication_channel_model(path: 'bouncy@example.edu')
+
+        %w{bouncy@example.edu Bouncy@example.edu bOuNcY@Example.edu bouncy@example.edu not_as_bouncy@example.edu bouncy@example.edu}.each{|path| CommunicationChannel.bounce_for_path(path)}
+
+        @cc1.reload
+        expect(@cc1.bounce_count).to eq 1
+        expect(@cc1.bouncing?).to be_falsey
+
+        @cc2.reload
+        expect(@cc2.bounce_count).to eq 5
+        expect(@cc2.bouncing?).to be_truthy
+      end
     end
 
     context "sharding" do
@@ -289,9 +286,6 @@ describe CommunicationChannel do
 
       it "should find a match on another shard" do
         Enrollment.stubs(:cross_shard_invitations?).returns(true)
-        user1 = User.create!
-        cc1 = user1.communication_channels.create!(:path => 'jt@instructure.com')
-
         @shard1.activate do
           @user2 = User.create!
           cc2 = @user2.communication_channels.create!(:path => 'jt@instructure.com')
@@ -300,16 +294,14 @@ describe CommunicationChannel do
           account.pseudonyms.create!(:user => @user2, :unique_id => 'user2')
         end
 
-        pending if CommunicationChannel.associated_shards('jt@instructure.com') == [Shard.default]
+        skip if CommunicationChannel.associated_shards('jt@instructure.com') == [Shard.default]
 
-        cc1.merge_candidates.should == [@user2]
-        cc1.has_merge_candidates?.should be_true
+        expect(cc1.merge_candidates).to eq [@user2]
+        expect(cc1.has_merge_candidates?).to be_truthy
       end
 
       it "should search a non-default shard *only*" do
         Enrollment.stubs(:cross_shard_invitations?).returns(false)
-        user1 = User.create!
-        cc1 = user1.communication_channels.create!(:path => 'jt@instructure.com')
         cc1.confirm!
         Account.default.pseudonyms.create!(:user => user1, :unique_id => 'user1')
 
@@ -321,8 +313,37 @@ describe CommunicationChannel do
           account.pseudonyms.create!(:user => @user2, :unique_id => 'user2')
         end
 
-        cc1.merge_candidates.should == []
-        @cc2.merge_candidates.should == []
+        expect(cc1.merge_candidates).to eq []
+        expect(@cc2.merge_candidates).to eq []
+      end
+
+      describe ".bounce_for_path" do
+        it "flags paths with too many bounces" do
+          @cc1 = communication_channel_model(path: 'not_as_bouncy@example.edu')
+          @shard1.activate do
+            @cc2 = communication_channel_model(path: 'bouncy@example.edu')
+          end
+
+          skip if CommunicationChannel.associated_shards('bouncy@example.edu') == [Shard.default]
+
+          @shard2.activate do
+            @cc3 = communication_channel_model(path: 'BOUNCY@example.edu')
+          end
+
+          %w{bouncy@example.edu Bouncy@example.edu bOuNcY@Example.edu bouncy@example.edu not_as_bouncy@example.edu bouncy@example.edu}.each{|path| CommunicationChannel.bounce_for_path(path)}
+
+          @cc1.reload
+          expect(@cc1.bounce_count).to eq 1
+          expect(@cc1.bouncing?).to be_falsey
+
+          @cc2.reload
+          expect(@cc2.bounce_count).to eq 5
+          expect(@cc2.bouncing?).to be_truthy
+
+          @cc3.reload
+          expect(@cc3.bounce_count).to eq 5
+          expect(@cc3.bouncing?).to be_truthy
+        end
       end
     end
   end

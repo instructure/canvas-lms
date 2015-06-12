@@ -16,11 +16,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'nokogiri'
+
 class BigBlueButtonConference < WebConference
+  include ActionDispatch::Routing::PolymorphicRoutes
+  include CanvasRails::Application.routes.url_helpers
+  after_destroy :end_meeting
+  after_destroy :delete_all_recordings
 
   user_setting_field :record, {
     name: ->{ t('recording_setting', 'Recording') },
-    description: ->{ t('recording_setting_description', 'Record this conference') },
+    description: ->{ t('recording_setting_enabled_description', 'Enable recording for this conference') },
     type: :boolean,
     default: false,
     visible: ->{ WebConference.config(BigBlueButtonConference.to_s)[:recording_enabled] },
@@ -47,11 +53,19 @@ class BigBlueButtonConference < WebConference
       :moderatorPW => settings[:admin_key],
       :logoutURL => (settings[:default_return_url] || "http://www.instructure.com"),
       :record => settings[:record] ? "true" : "false",
-      :welcome => settings[:record] ? t(:conference_is_recorded, "This conference is being recorded.") : ""
+      :welcome => settings[:record] ? t("This conference may be recorded.") : "",
+      "meta_canvas-recording-ready-url" => recording_ready_url
     }) or return nil
     @conference_active = true
     save
     conference_key
+  end
+
+  def recording_ready_url
+    polymorphic_url([:api_v1, context, :conferences, :recording_ready],
+                    conference_id: self.id,
+                    protocol: HostUrl.protocol,
+                    host: HostUrl.context_host(self))
   end
 
   def conference_status
@@ -81,6 +95,17 @@ class BigBlueButtonConference < WebConference
     end
   end
 
+  def delete_all_recordings
+    fetch_recordings.map do |recording|
+      delete_recording recording[:recordID]
+    end
+  end
+
+  def close
+    end_meeting
+    super
+  end
+
   private
 
   def retouch?
@@ -103,6 +128,14 @@ class BigBlueButtonConference < WebConference
       :meetingID => conference_key,
       :password => settings[(type == :user ? :user_key : :admin_key)],
       :userID => user.id
+  end
+
+  def end_meeting
+    response = send_request(:end, {
+      :meetingID => conference_key,
+      :password => settings[(type == :user ? :user_key : :admin_key)],
+      })
+    response[:ended] if response
   end
 
   def fetch_recordings
@@ -129,34 +162,25 @@ class BigBlueButtonConference < WebConference
   end
 
   def send_request(action, options)
-    uri = URI.parse(generate_request(action, options))
-    res = nil
+    url_str = generate_request(action, options)
 
-    Net::HTTP.start(uri.host, uri.port) do |http|
-      http.read_timeout = 10
-      5.times do # follow redirects, but not forever
-        logger.debug "big blue button api call: #{uri.path}?#{uri.query}"
-        res = http.request_get("#{uri.path}?#{uri.query}")
-        break unless res.is_a?(Net::HTTPRedirection)
-        url = res['location']
-        uri = URI.parse(url)
-      end
+    http_response = nil
+    Canvas.timeout_protection("big_blue_button") do
+      logger.debug "big blue button api call: #{url_str}"
+      http_response = CanvasHttp.get(url_str, {}, 5)
     end
 
-    case res
+    case http_response
       when Net::HTTPSuccess
-        response = xml_to_hash(res.body)
+        response = xml_to_hash(http_response.body)
         if response[:returncode] == 'SUCCESS'
           return response
         else
           logger.error "big blue button api error #{response[:message]} (#{response[:messageKey]})"
         end
       else
-        logger.error "big blue button http error #{res}"
+        logger.error "big blue button http error #{http_response}"
     end
-    nil
-  rescue Timeout::Error
-    logger.error "big blue button timeout error"
     nil
   rescue
     logger.error "big blue button unhandled exception #{$!}"

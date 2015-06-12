@@ -16,9 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+
 # @API Discussion Topics
 class DiscussionEntriesController < ApplicationController
-  before_filter :require_context, :except => :public_feed
+  before_filter :require_context_and_read_access, :except => :public_feed
 
   def show
     @entry = @context.discussion_entries.find(params[:id]).tap{|e| e.current_user = @current_user}
@@ -149,23 +151,11 @@ class DiscussionEntriesController < ApplicationController
     @topic = @context.discussion_topics.active.find(params[:discussion_topic_id])
     if !@topic.podcast_enabled && request.format == :rss
       @problem = t :disabled_podcasts_notice, "Podcasts have not been enabled for this topic."
-      params[:format] = 'html' if CANVAS_RAILS2
-      render :template => "shared/unauthorized_feed", :layout => "layouts/application", :status => :bad_request, :formats => [:html] # :template => "shared/unauthorized_feed", :status => :bad_request
+      render "shared/unauthorized_feed", status: :bad_request, :formats => [:html]
       return
     end
-    if authorized_action(@topic, @current_user, :read)
-      @all_discussion_entries = @topic.discussion_entries.active
-      @discussion_entries = @all_discussion_entries
-      if request.format == :rss && !@topic.podcast_has_student_posts
-        @admins = @context.admins
-        @discussion_entries = @discussion_entries.find_all_by_user_id(@admins.map(&:id))
-      end
-      if !@topic.user_can_see_posts?(@current_user)
-        @discussion_entries = []
-      end
-      if @topic.locked_for?(@current_user) && !@topic.grants_right?(@current_user, :update)
-        @discussion_entries = []
-      end
+    if authorized_action(@context, @current_user, :read) && authorized_action(@topic, @current_user, :read)
+      @discussion_entries = @topic.entries_for_feed(@current_user, request.format == :rss)
       respond_to do |format|
         format.atom {
           feed = Atom::Feed.new do |f|

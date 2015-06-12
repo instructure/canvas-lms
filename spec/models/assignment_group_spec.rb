@@ -31,7 +31,53 @@ describe AssignmentGroup do
   end
 
   it "should act as list" do
-    AssignmentGroup.should be_respond_to(:acts_as_list)
+    expect(AssignmentGroup).to be_respond_to(:acts_as_list)
+  end
+
+  context "visible assignments" do
+    before(:each) do
+      @u = factory_with_protected_attributes(User, :name => "some user", :workflow_state => "registered")
+      @c = factory_with_protected_attributes(Course, :name => "some course", :workflow_state => "available")
+      @ag = @c.assignment_groups.create!(@valid_attributes)
+      @s = @c.course_sections.create!(name: "test section")
+      student_in_section(@s, user: @u)
+      assignments = (0...4).map { @c.assignments.create!({:title => "test_foo",
+                                  :assignment_group => @ag,
+                                  :points_possible => 10,
+                                  :only_visible_to_overrides => true})}
+      assignments.first.destroy
+      assignments.second.grade_student(@u, {grade: 10})
+      assignment_to_override = assignments.last
+      create_section_override_for_assignment(assignment_to_override, course_section: @s)
+      @c.reload
+      @ag.reload
+    end
+    context "with differentiated assignments and draft state on" do
+      it "should return only active assignments with overrides or grades for the user" do
+        @c.enable_feature! :differentiated_assignments
+        expect(@ag.active_assignments.count).to eq 3
+        # one with override, one with grade
+        expect(@ag.visible_assignments(@u).count).to eq 2
+        expect(AssignmentGroup.visible_assignments(@u, @c, [@ag]).count).to eq 2
+      end
+    end
+
+    context "with differentiated assignments off and draft state on" do
+      it "should return all published assignments" do
+        @c.disable_feature! :differentiated_assignments
+        expect(@ag.active_assignments.count).to eq 3
+        expect(@ag.visible_assignments(@u).count).to eq 3
+        expect(AssignmentGroup.visible_assignments(@u, @c, [@ag]).count).to eq 3
+      end
+    end
+
+    context "logged out users" do
+      it "should return published assignments for logged out users so that invited users can see them before accepting a course invite" do
+        @c.active_assignments.first.unpublish
+        expect(@ag.visible_assignments(nil).count).to eq 2
+        expect(AssignmentGroup.visible_assignments(nil, @c, [@ag]).count).to eq 2
+      end
+    end
   end
 
   context "broadcast policy" do
@@ -54,7 +100,7 @@ describe AssignmentGroup do
 
   it "should have a state machine" do
     assignment_group_model
-    @ag.state.should eql(:available)
+    expect(@ag.state).to eql(:available)
   end
 
   it "should return never_drop list as ints" do
@@ -65,7 +111,7 @@ describe AssignmentGroup do
     end
     assignment_group_model :rules => rules
     result = @ag.rules_hash()
-    result['never_drop'].should eql(expected)
+    expect(result['never_drop']).to eql(expected)
   end
 
   it "should return never_drop list as strings if `stringify_json_ids` is true" do
@@ -77,21 +123,21 @@ describe AssignmentGroup do
 
     assignment_group_model :rules => rules
     result = @ag.rules_hash({stringify_json_ids: true})
-    result['never_drop'].should eql(expected)
+    expect(result['never_drop']).to eql(expected)
   end
 
   it "should return rules that aren't never_drops as ints" do
     rules = "drop_highest:25\n"
     assignment_group_model :rules => rules
     result = @ag.rules_hash()
-    result['drop_highest'].should eql(25)
+    expect(result['drop_highest']).to eql(25)
   end
 
   it "should return rules that aren't never_drops as ints when `strigify_json_ids` is true" do
     rules = "drop_lowest:2\n"
     assignment_group_model :rules => rules
     result = @ag.rules_hash({stringify_json_ids: true})
-    result['drop_lowest'].should eql(2)
+    expect(result['drop_lowest']).to eql(2)
   end
 end
 

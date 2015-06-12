@@ -21,6 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 require 'csv'
 
 describe Quizzes::QuizStatistics do
+
   before(:once) do
     student_in_course(:active_all => true)
     @quiz = @course.quizzes.create!
@@ -45,7 +46,7 @@ describe Quizzes::QuizStatistics do
     qs = @quiz.generate_submission(@student)
 
     stats = @quiz.statistics(false)
-    stats[:multiple_attempts_exist].should be_false
+    expect(stats[:multiple_attempts_exist]).to be_falsey
   end
 
   it 'should include previous versions even if the current version is incomplete' do
@@ -57,7 +58,7 @@ describe Quizzes::QuizStatistics do
     @quiz.generate_submission(@student)
 
     stats = CSV.parse(csv(:include_all_versions => true))
-    stats.first.length.should == 12
+    expect(stats.first.length).to eq 12
   end
 
   it 'should not include previous versions by default' do
@@ -68,7 +69,7 @@ describe Quizzes::QuizStatistics do
     Quizzes::SubmissionGrader.new(qs).grade_submission
 
     stats = CSV.parse(csv)
-    stats.first.length.should == 12
+    expect(stats.first.length).to eq 12
   end
 
   it 'generates a new quiz_statistics if the quiz changed' do
@@ -87,8 +88,8 @@ describe Quizzes::QuizStatistics do
       @quiz.current_statistics_for('student_analysis') # unpublished changes don't matter
     end
 
-    stats2.should_not == stats1
-    stats3.should == stats2
+    expect(stats2).not_to eq stats1
+    expect(stats3).to eq stats2
   end
 
   it 'generates a new quiz_statistics if new submissions are in' do
@@ -99,29 +100,43 @@ describe Quizzes::QuizStatistics do
       qs.mark_completed
     end
 
-    @quiz.current_statistics_for('student_analysis').should_not == stats
+    expect(@quiz.current_statistics_for('student_analysis')).not_to eq stats
   end
 
   it 'uses the previously generated quiz_statistics if possible' do
     stats = @quiz.current_statistics_for 'student_analysis'
 
-    Timecop.freeze(5.minutes.from_now) do
+    expect(Timecop.freeze(5.minutes.from_now) do
       @quiz.current_statistics_for('student_analysis')
-    end.should == stats
+    end).to eq stats
   end
 
   it 'does not generate its CSV attachment more than necessary' do
     stats = @quiz.current_statistics_for 'student_analysis'
     attachment = stats.generate_csv
     stats.reload
-    stats.csv_attachment.should be_present
+    expect(stats.csv_attachment).to be_present
 
     stats.expects(:build_csv_attachment).never
-    stats.generate_csv.should == attachment
+    expect(stats.generate_csv).to eq attachment
+  end
+
+  it 'could possibly tell whether CSV generation has gone bananas' do
+    stats = @quiz.current_statistics_for 'student_analysis'
+
+    Quizzes::QuizStatistics::StudentAnalysis.any_instance.stubs(:to_csv) {
+      throw 'totally bananas'
+    }
+
+    stats.generate_csv_in_background
+    run_jobs
+    stats.reload
+
+    expect(stats.csv_generation_failed?).to be_truthy
   end
 
   describe 'self#large_quiz?' do
-    let :quiz_questions do
+    let :active_quiz_questions do
       Object.new.tap { |o| o.stubs(size: 50) }
     end
 
@@ -131,7 +146,7 @@ describe Quizzes::QuizStatistics do
 
     let :quiz do
       Quizzes::Quiz.new.tap do |quiz|
-        quiz.stubs(:quiz_questions).returns(quiz_questions)
+        quiz.stubs(:active_quiz_questions).returns(active_quiz_questions)
         quiz.stubs(:quiz_submissions).returns(quiz_submissions)
       end
     end
@@ -141,7 +156,7 @@ describe Quizzes::QuizStatistics do
         Setting.expects(:get).with('quiz_statistics_max_questions',
           Quizzes::QuizStatistics::DefaultMaxQuestions).returns 25
 
-        Quizzes::QuizStatistics.large_quiz?(quiz).should be_true
+        expect(Quizzes::QuizStatistics.large_quiz?(quiz)).to be_truthy
       end
 
       it 'should be false otherwise' do
@@ -151,7 +166,7 @@ describe Quizzes::QuizStatistics do
         Setting.expects(:get).with('quiz_statistics_max_submissions',
           Quizzes::QuizStatistics::DefaultMaxSubmissions).returns 25
 
-        Quizzes::QuizStatistics.large_quiz?(quiz).should be_false
+        expect(Quizzes::QuizStatistics.large_quiz?(quiz)).to be_falsey
       end
     end
 
@@ -162,7 +177,7 @@ describe Quizzes::QuizStatistics do
         Setting.expects(:get).with('quiz_statistics_max_submissions',
           Quizzes::QuizStatistics::DefaultMaxSubmissions).returns 5
 
-        Quizzes::QuizStatistics.large_quiz?(quiz).should be_true
+        expect(Quizzes::QuizStatistics.large_quiz?(quiz)).to be_truthy
       end
 
       it 'should be false otherwise' do
@@ -171,7 +186,7 @@ describe Quizzes::QuizStatistics do
         Setting.expects(:get).with('quiz_statistics_max_submissions',
           Quizzes::QuizStatistics::DefaultMaxSubmissions).returns 25
 
-        Quizzes::QuizStatistics.large_quiz?(quiz).should be_false
+        expect(Quizzes::QuizStatistics.large_quiz?(quiz)).to be_falsey
       end
     end
   end

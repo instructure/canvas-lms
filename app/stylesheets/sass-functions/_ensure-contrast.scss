@@ -1,0 +1,78 @@
+@import "./_math.scss";
+
+// simple example usage:
+// .foo {
+//   // will output '#eee' in normal contrast, but will output '#686868' for people
+//   // that $use_high_contrast so that it meets the 4.5:1 contrast requirement.
+//   color: ensure-contrast(#eee, #fff);
+// }
+
+// more thorough example showing how you should be doing it with variables:
+// $page-bg-color: white;
+// $primary-brand: blue;
+// $link-color: ensure-contrast($primary-brand, $page-bg-color);
+// a { color: $link-color }
+@function ensure-contrast($desired-color, $background-color-it-will-be-used-on, $is-header: false) {
+  $minumum-ratio: 4.5;
+  @if $is-header {
+    $minumum-ratio: 3;
+  }
+  $ratio: contrast-ratio($desired-color, $background-color-it-will-be-used-on);
+
+  @if ($ratio < 1.9) {
+    @warn "Everyone will have a hard time seeing #{$desired-color} on #{$background-color-it-will-be-used-on}. ratio: #{$ratio}";
+  }
+
+  // There is probably a more efficient way of doing this not in a while loop but brute-forcing it works for now.
+  $possible-to-reach-contrast-by-going-lighter: contrast-ratio($desired-color, white) > $minumum-ratio;
+  $should-lighten: $possible-to-reach-contrast-by-going-lighter and lightness($desired-color) > lightness($background-color-it-will-be-used-on);
+  $i: 0;
+  @while ($i < 100 and $use_high_contrast and contrast-ratio($desired-color, $background-color-it-will-be-used-on) < $minumum-ratio) {
+    $i: $i + 1;
+    @if ($should-lighten) {
+      $desired-color: lighten($desired-color, 1%);
+    } @else {
+      $desired-color: darken($desired-color, 1%);
+    }
+  }
+  @return $desired-color;
+}
+
+@function is-header($font-size, $font-weight: normal) {
+  @return $font-size > 18px or ($font-weight == 'bold' and $font-size > 14px);
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+// the following are from: https://gist.github.com/voxpelli/6304812
+
+@function contrast-ratio($color1, $color2) {
+  // Adapted from: https://github.com/LeaVerou/contrast-ratio/blob/gh-pages/color.js
+  // Formula: http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
+  $luminance1: color_luminance($color1) + .05;
+  $luminance2: color_luminance($color2) + .05;
+  $ratio: $luminance1 / $luminance2;
+
+  @if $luminance2 > $luminance1 {
+    $ratio: 1 / $ratio;
+  }
+
+  @return $ratio;
+}
+
+@function color_luminance($color) {
+  // Adapted from: https://github.com/LeaVerou/contrast-ratio/blob/gh-pages/color.js
+  // Formula: http://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef
+  $rgba: red($color), green($color), blue($color);
+  $rgba2: ();
+
+  @for $i from 1 through 3 {
+    $rgb: nth($rgba, $i);
+    $rgb: $rgb / 255;
+
+    $rgb: if($rgb < .03928, $rgb / 12.92, pow(($rgb + .055) / 1.055, 2.4));
+
+    $rgba2: append($rgba2, $rgb);
+  }
+
+  @return .2126 * nth($rgba2, 1) + .7152 * nth($rgba2, 2) + 0.0722 * nth($rgba2, 3);
+}

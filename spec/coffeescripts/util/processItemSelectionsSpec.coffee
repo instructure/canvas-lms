@@ -1,4 +1,4 @@
-require ['compiled/util/processItemSelections'], (processItemSelections)->
+define ['compiled/util/processItemSelections'], (processItemSelections)->
   module "processItemSelections"
   test 'move hash of selected items to list of selected', ->
     data = {
@@ -21,7 +21,7 @@ require ['compiled/util/processItemSelections'], (processItemSelections)->
       'copy[old_start_date]':"Fri Jan 20, 2012"
       'copy[shift_dates]':"1"
     }
-    
+
     newData = processItemSelections(data)
     deepEqual newData, {
                           "items_to_copy": [
@@ -43,5 +43,5 @@ require ['compiled/util/processItemSelections'], (processItemSelections)->
                           "copy[old_end_date]": "Fri Jan 27, 2012",
                           "copy[old_start_date]": "Fri Jan 20, 2012"
                         }
-    
-    
+
+

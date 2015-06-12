@@ -1,18 +1,19 @@
-require [
+define [
   'jquery'
   'compiled/jquery/fixDialogButtons'
   'jquery.disableWhileLoading'
   'helpers/jquery.simulate'
-], ($, elementToggler)->
+], ($) ->
 
   module 'fixDialogButtons',
-    
+
     setup: ->
       @clock = sinon.useFakeTimers()
-    
+
     teardown: ->
       @clock.restore()
-    
+      $("#fixtures").empty()
+
 
   test 'handles buttons', ->
 
@@ -30,7 +31,7 @@ require [
           </a>
         </div>
       </form>
-    """).appendTo('body').dialog().fixDialogButtons()
+    """).appendTo('#fixtures').dialog().fixDialogButtons()
 
     ok $dialog.is(':ui-dialog:visible'), 'pops up dialog'
     equal $dialog.dialog('option', 'buttons').length, 2, 'converts both buttons in .button-pane only'
@@ -64,11 +65,11 @@ require [
     $closer = $dialog.dialog('widget').find('.ui-dialog-buttonpane .ui-button:contains("This will cause the dialog to close")')
     $closer.click()
     equal $dialog.dialog('isOpen'), false, msg
-    
+
     $dialog.remove() #clean up
 
   test "enter key submits form", ->
-    $dialog = $("<form style='display:none'><input id='box' type='text'></input><div class='button-container'><button type='submit'></button></div></form>").appendTo('body').dialog()
+    $dialog = $("<form style='display:none'><input id='box' type='text'></input><div class='button-container'><button type='submit'></button></div></form>").appendTo('#fixtures').dialog()
     $dialog.fixDialogButtons()
 
     submitCount = 0
@@ -82,7 +83,7 @@ require [
     $dialog.remove()
 
   test "enter key does not duplicate submissions if fixDialogButtons invoked more than once", ->
-    $dialog = $("<form style='display:none'><input id='box' type='text'></input><div class='button-container'><button type='submit'></button></div></form>").appendTo('body').dialog()
+    $dialog = $("<form style='display:none'><input id='box' type='text'></input><div class='button-container'><button type='submit'></button></div></form>").appendTo('#fixtures').dialog()
     $dialog.fixDialogButtons()
     $dialog.fixDialogButtons()
 
@@ -91,6 +92,21 @@ require [
       e.preventDefault()
       ++submitCount
 
+    $('#box').simulate("keyup", { keyCode: $.ui.keyCode.ENTER })
+    equal submitCount, 1
+
+    $dialog.remove()
+
+  test "enter key submits form only once without preventDefault", ->
+    $dialog = $("<form style='display:none' action='#' onsubmit='return false;'><input id='box' type='text'></input><div class='button-container'><button type='submit'></button></div></form>").appendTo('#fixtures').dialog()
+    $dialog.fixDialogButtons()
+
+    submitCount = 0
+    $dialog.submit (e) ->
+      ++submitCount
+
+    $('#box').simulate("keydown", { keyCode: $.ui.keyCode.ENTER })
+    $('#box').simulate("keypress", { keyCode: $.ui.keyCode.ENTER })
     $('#box').simulate("keyup", { keyCode: $.ui.keyCode.ENTER })
     equal submitCount, 1
 

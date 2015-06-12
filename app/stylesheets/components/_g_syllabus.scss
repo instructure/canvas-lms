@@ -1,0 +1,152 @@
+@import "base/environment";
+
+#syllabus {
+  width: 100%;
+  table-layout: fixed;
+  margin-bottom: 10px;
+  thead th {
+    text-align: left;
+    @if $use_new_styles {
+      padding: $ic-sp/2;
+      border-bottom: 1px solid $ic-border-dark;
+    }
+    @else {
+      background-color: #444;
+      color: #fff;
+      padding: 3px 10px;
+      border-bottom: 1px solid #bbb;
+    }
+    a {
+      font-size: 0.8em;
+      color: #aaa;
+    }
+  }
+  tr.date {
+    td, th {
+      text-align: center;
+      @if $use_new_styles {
+        border-bottom: 1px solid $ic-border-light;
+        padding: $ic-sp/2;
+        line-height: 1.3;
+        color: $ic-font-color--subdued;
+      }
+      @else {
+        border-bottom: 1px solid #bbb;
+        padding: 4px 10px;
+        font-size: 0.9em;
+        vertical-align: top;
+        color: #666;
+      }
+    }
+    // make all dates in the past be 4% darker than normal,
+    // cant use background-color because we want them to still be zebra-striped
+    &.date_passed {
+      > td, > th {
+        background-image: url("/images/4_percent_opacity.png");
+      }
+    }
+    th.day_date {
+      white-space: nowrap;
+      text-align: left;
+    }
+    td.details {
+      text-align: left;
+      @if $use_new_styles {
+        padding: $ic-sp/2;
+        line-height: 1.3;  
+      }
+      @else {
+        font-size: 1.1em;
+        line-height: 2em;
+        padding: 0 0 0 4px;
+        color: #000;
+      }
+      td {
+        border: none;
+        background-color: transparent;
+        font-size: 1em;
+        text-align: left;
+        color: inherit;
+        @if $use_new_styles {
+          padding: $ic-sp/2;
+        }
+        @else {
+          padding: 0;
+        }
+      }
+      .dates {
+        font-size: 10px;
+        text-align: right;
+        @if $use_high_contrast {
+          color: #333;
+        }
+        @else {
+          color: #666;
+        }
+      }
+    }
+    table.detail_list {
+      width: 100%;
+      td.name {
+        padding-left: 6px;
+      }
+      td.dates {
+        padding-right: 10px;
+      }
+      tr.syllabus_assignment {
+        .name a {
+          font-weight: bold;
+          @if $use_high_contrast {
+            text-decoration: none;
+            &:hover, &:focus {
+              text-decoration: underline;
+            }
+          }
+        }
+      }
+      td.not_last {
+        @if $use_new_styles { border-bottom: 1px solid $ic-border-light; }
+        @else { border-bottom: 1px solid #ddd; }
+      }
+      tr.related_event {
+        @if $use_new_styles { background-color: $ic-bg-light-primary; }
+        @else { background-color: #e7f3ff; }
+      }
+    }
+    &.date_passed {
+      td, th {
+        background-color: #f8f8f8;
+      }
+      &.details {
+        color: #444;
+      }
+    }
+    // when you hover over a date on the mini-calendar on the right, it will add the .related
+    // class to the row that is showing the assignments for that date
+    &.related, &.selected {
+      td, th {
+        @if $use_new_styles { background-color: $ic-bg-light-primary; }
+        @else { background-color: #def; }
+      }
+    }
+  }
+  .special_date_title {
+    color: #999;
+    font-size: 11px;
+    font-weight: normal;
+  }
+}
+
+#toggle_special_dates_in_syllabus {
+  &.hidden span.hide {
+    display: none;
+  }
+  &.shown span.show {
+    display: none;
+  }
+  float: right;
+}
+
+#syllabus_links {
+  @include clearfix;
+}

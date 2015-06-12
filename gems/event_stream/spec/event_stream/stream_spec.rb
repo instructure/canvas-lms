@@ -443,21 +443,27 @@ describe EventStream::Stream do
         @exception = Exception.new
       end
 
-      shared_examples_for "recording failures" do
-        before do
-          # By default the log! method raises exceptions in test env.  Override this
-          # to log the event and not raise it for these tests.
-          Rails.env.stub(:test?).and_return(false)
-        end
-
-        it "records failed inserts" do
-          expect(EventStream::Failure).to receive(:log!).once.with(:insert, @stream, @record, @exception)
+      shared_examples_for "error callbacks" do
+        it "triggers callbacks on failed inserts" do
+          spy = double('spy')
+          @stream.on_error{ |*args| spy.capture(*args) }
+          expect(spy).to receive(:capture).once.with(:insert, @record, @exception)
           @stream.insert(@record)
         end
 
-        it "records failed updates" do
-          expect(EventStream::Failure).to receive(:log!).once.with(:update, @stream, @record, @exception)
+        it "triggers callbacks on failed updates" do
+          spy = double('spy')
+          @stream.on_error{ |*args| spy.capture(*args) }
+          expect(spy).to receive(:capture).once.with(:update, @record, @exception)
           @stream.update(@record)
+        end
+
+        it "raises error if raises_on_error is true, but still calls callbacks" do
+          spy = double('spy')
+          @stream.raise_on_error = true
+          @stream.on_error{ spy.trigger }
+          expect(spy).to receive(:trigger).once
+          expect{ @stream.insert(@record) }.to raise_exception
         end
       end
 
@@ -466,7 +472,7 @@ describe EventStream::Stream do
           @database.stub(:batch).and_raise(@exception)
         end
 
-        include_examples "recording failures"
+        include_examples "error callbacks"
       end
 
       context "failing callbacks" do
@@ -491,7 +497,7 @@ describe EventStream::Stream do
           @stream.update(@record)
         end
 
-        include_examples "recording failures"
+        include_examples "error callbacks"
       end
     end
   end

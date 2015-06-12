@@ -38,7 +38,8 @@ module CC::Importer::Canvas
       ['could_be_locked','anonymous_submissions','show_correct_answers',
        'require_lockdown_browser','require_lockdown_browser_for_results',
        'shuffle_answers','available', 'cant_go_back', 'one_question_at_a_time',
-       'require_lockdown_browser_monitor'
+       'require_lockdown_browser_monitor',
+       'one_time_results', 'show_correct_answers_last_attempt'
       ].each do |bool_val|
         val = get_bool_val(doc, bool_val)
         quiz[bool_val] = val unless val.nil?

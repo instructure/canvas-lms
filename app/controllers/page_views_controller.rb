@@ -163,10 +163,10 @@ class PageViewsController < ApplicationController
   # available CSV download. Pagination is used as described in API basics
   # section. Page views are returned in descending order, newest to oldest.
   #
-  # @argument start_time [Optional, DateTime]
+  # @argument start_time [DateTime]
   #   The beginning of the time range from which you want page views.
   #
-  # @argument end_time [Optional, DateTime]
+  # @argument end_time [DateTime]
   #   The end of the time range from which you want page views.
   #
   # @returns [PageView]

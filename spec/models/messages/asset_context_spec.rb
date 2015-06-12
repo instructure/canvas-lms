@@ -13,29 +13,29 @@ module Messages
 
     describe '#reply_to_name' do
       it 'is nil for notification types that dont have source users' do
-        asset_for("Nonsense").reply_to_name.should be_nil
+        expect(asset_for("Nonsense").reply_to_name).to be_nil
       end
 
       it 'uses the author name for messages with authors' do
-        asset_for("Submission Comment").reply_to_name.should  == "Author Name via Canvas Notifications"
+        expect(asset_for("Submission Comment").reply_to_name).to  eq "Author Name via Canvas Notifications"
       end
 
       it 'uses the user name for messages belonging to users' do
-        asset_for("New Discussion Entry").reply_to_name.should  == "User Name via Canvas Notifications"
+        expect(asset_for("New Discussion Entry").reply_to_name).to  eq "User Name via Canvas Notifications"
       end
     end
 
     describe '#from_name' do
       it 'is nil for notification types that dont have source users' do
-        asset_for("Nonsense").from_name.should be_nil
+        expect(asset_for("Nonsense").from_name).to be_nil
       end
 
       it 'uses the author name for messages with authors' do
-        asset_for("Conversation Message").from_name.should == "Author Name"
+        expect(asset_for("Conversation Message").from_name).to eq "Author Name"
       end
 
       it 'uses the user name for messages belonging to users' do
-        asset_for("Assignment Resubmitted").from_name.should == "User Name"
+        expect(asset_for("Assignment Resubmitted").from_name).to eq "User Name"
       end
     end
   end

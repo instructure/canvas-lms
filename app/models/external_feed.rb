@@ -21,15 +21,20 @@ class ExternalFeed < ActiveRecord::Base
   belongs_to :user
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Group']
+
   has_many :external_feed_entries, :dependent => :destroy
+  has_many :discussion_topics, dependent: :nullify
 
   before_validation :infer_defaults
 
   include CustomValidations
-  validates_presence_of :url, :context_id, :context_type
+  validates :url, :context_id, :context_type, presence: true
   validates_as_url :url
+  validates :url,
+    uniqueness: { scope: [:context_id, :context_type, :verbosity, :header_match] },
+    length: { maximum: maximum_string_length }
 
-  VERBOSITIES = %w(full link_only truncate)
+  VERBOSITIES = %w(full link_only truncate).freeze
   validates_inclusion_of :verbosity, :in => VERBOSITIES, :allow_nil => true
 
   def infer_defaults
@@ -52,12 +57,10 @@ class ExternalFeed < ActiveRecord::Base
     write_attribute(:header_match, str.to_s.strip.presence)
   end
   
-  scope :to_be_polled, -> {
-    where("external_feeds.consecutive_failures<5 AND external_feeds.refresh_at<?", Time.now.utc).order(:refresh_at)
+  scope :to_be_polled, ->(start) {
+    where("external_feeds.consecutive_failures<5 AND external_feeds.refresh_at<?", start).order(:refresh_at)
   }
   
-  scope :for, lambda { |obj| where(:feed_purpose => obj) }
-
   def add_rss_entries(rss)
     items = rss.items.map{|item| add_entry(item, rss, :rss) }.compact
     self.context.add_aggregate_entries(items, self) if self.context && self.context.respond_to?(:add_aggregate_entries)
@@ -68,12 +71,6 @@ class ExternalFeed < ActiveRecord::Base
     items = []
     atom.each_entry{|item| items << add_entry(item, atom, :atom) }
     items.compact!
-    self.context.add_aggregate_entries(items, self) if self.context && self.context.respond_to?(:add_aggregate_entries)
-    items
-  end
-  
-  def add_ical_entries(cal)
-    items = cal.events.map{|event| add_entry(event, cal, :ical) }.compact
     self.context.add_aggregate_entries(items, self) if self.context && self.context.respond_to?(:add_aggregate_entries)
     items
   end
@@ -93,8 +90,8 @@ class ExternalFeed < ActiveRecord::Base
   def add_entry(item, feed, feed_type)
     if feed_type == :rss
       uuid = (item.respond_to?(:guid) && item.guid && item.guid.content.to_s) || Digest::MD5.hexdigest("#{item.title}#{item.date.strftime('%Y-%m-%d')}")
-      entry = self.external_feed_entries.find_by_uuid(uuid)
-      entry ||= self.external_feed_entries.find_by_url(item.link)
+      entry = self.external_feed_entries.where(uuid: uuid).first
+      entry ||= self.external_feed_entries.where(url: item.link).first
       description = entry && entry.message
       if !description || description.empty?
         description = "<a href='#{ERB::Util.h(item.link)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
@@ -113,7 +110,7 @@ class ExternalFeed < ActiveRecord::Base
       return nil if (date && self.created_at > date rescue false)
       description = "<a href='#{ERB::Util.h(item.link)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
       description += format_description(item.description || item.title)
-      entry = self.external_feed_entries.create(
+      entry = self.external_feed_entries.new(
         :title => item.title,
         :message => description,
         :source_name => feed.channel.title,
@@ -123,10 +120,11 @@ class ExternalFeed < ActiveRecord::Base
         :url => item.link,
         :uuid => uuid
       )
+      return entry if entry.save
     elsif feed_type == :atom
       uuid = item.id || Digest::MD5.hexdigest("#{item.title}#{item.published.utc.strftime('%Y-%m-%d')}")
-      entry = self.external_feed_entries.find_by_uuid(uuid)
-      entry ||= self.external_feed_entries.find_by_url(item.links.alternate.to_s)
+      entry = self.external_feed_entries.where(uuid: uuid).first
+      entry ||= self.external_feed_entries.where(url: item.links.alternate.to_s).first
       description = entry && entry.message
       if !description || description.empty?
         description = "<a href='#{ERB::Util.h(item.links.alternate.to_s)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
@@ -148,7 +146,7 @@ class ExternalFeed < ActiveRecord::Base
       author = item.authors.first || OpenObject.new
       description = "<a href='#{ERB::Util.h(item.links.alternate.to_s)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
       description += format_description(item.content || item.title)
-      entry = self.external_feed_entries.create(
+      entry = self.external_feed_entries.new(
         :title => item.title,
         :message => description,
         :source_name => feed.title,
@@ -161,38 +159,7 @@ class ExternalFeed < ActiveRecord::Base
         :author_email => author.email,
         :uuid => uuid
       )
-    elsif feed_type == :ical
-      entry = self.external_feed_entries.find_by_uuid(uuid)
-      entry ||= self.external_feed_entries.find_by_title_and_url(item.summary, item.url)
-      description = entry && entry.message
-      if !description || description.empty?
-        description = "<a href='#{ERB::Util.h(item.url)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
-        description += (item.description || item.summary).to_s
-      end
-      if entry
-        entry.update_feed_attributes(
-          :title => item.summary,
-          :message => description,
-          :url => item.url,
-          :start_at => item.start,
-          :end_at => item.end
-        )
-        entry.cancel_it if item.status.downcase == 'cancelled' && entry.active?
-        return entry
-      end
-      description = (item.description || item.summary).to_s
-      description += "<br/><br/><a href='#{ERB::Util.h(item.url)}'>#{ERB::Util.h(item.url)}</a>"
-      entry = self.external_feed_entries.create(
-        :title => item.summary,
-        :message => description,
-        :source_name => self.title,
-        :source_url => self.url,
-        :posted_at => item.timestamp,
-        :start_at => item.start,
-        :end_at => item.end,
-        :url => item.url,
-        :user => self.user
-      )
+      return entry if entry.save
     end
   end
 end

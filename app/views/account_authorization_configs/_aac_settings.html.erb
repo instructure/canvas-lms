@@ -1,0 +1,22 @@
+<div
+  <% if aac.new_record? %>
+    id="<%= aac.auth_type %>_form" class="new_auth auth_form" style="display:none;"
+  <% else %>
+    class="<%= aac.auth_type %>_form auth_form"
+  <% end %>>
+
+  <div <%= raw presenter.form_class(aac) %>>
+
+    <% url = aac.new_record? ? account_account_authorization_configs_url(account) :
+                              account_account_authorization_config_url(account, aac) %>
+    <%= form_for(aac,
+                 url: url,
+                 id: presenter.form_id(aac),
+                 class: "auth_type #{aac.auth_type}_form") do %>
+
+      <%= render partial: "#{aac.auth_type}_fields",
+                 locals: {account: account, aac: aac, presenter: presenter}%>
+
+    <% end %>
+  </div>
+</div>

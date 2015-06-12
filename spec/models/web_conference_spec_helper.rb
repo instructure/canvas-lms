@@ -19,12 +19,12 @@
 shared_examples_for 'WebConference' do
 
   describe "WebConference interface" do
-    it { should respond_to :initiate_conference }
-    it { should respond_to :conference_status }
-    it { should respond_to :admin_join_url }
-    it { should respond_to :participant_join_url }
-    it { should respond_to :recordings }
-    it { should respond_to :infer_conference_settings }
+    it { is_expected.to respond_to :initiate_conference }
+    it { is_expected.to respond_to :conference_status }
+    it { is_expected.to respond_to :admin_join_url }
+    it { is_expected.to respond_to :participant_join_url }
+    it { is_expected.to respond_to :recordings }
+    it { is_expected.to respond_to :infer_conference_settings }
     # admin_settings_url is an optional interface
   end
 

@@ -18,13 +18,14 @@ define [
       "locked"    : I18n.t("module_locked", "Locked")
 
     iconClasses:
-      'ModuleItem'   : "icon-module"
-      'File'         : "icon-download"
-      'Page'         : "icon-document"
-      'Discussion'   : "icon-discussion"
-      'Assignment'   : "icon-assignment"
-      'Quiz'         : "icon-quiz"
-      'ExternalTool' : "icon-link"
+      'ModuleItem'          : "icon-module"
+      'File'                : "icon-download"
+      'Page'                : "icon-document"
+      'Discussion'          : "icon-discussion"
+      'Assignment'          : "icon-assignment"
+      'Quiz'                : "icon-quiz"
+      'ExternalTool'        : "icon-link"
+      'Lti::MessageHandler' : "icon-link"
 
     toJSON: ->
       json = super

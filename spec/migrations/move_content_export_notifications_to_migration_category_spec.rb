@@ -37,8 +37,8 @@ describe 'DataFixup::MoveContentExportNotificationsToMigrationCategory' do
 
     users.each do |u|
       nps = NotificationPolicy.for(u)
-      nps.count.should == 1
-      nps.first.notification.should == @n2
+      expect(nps.count).to eq 1
+      expect(nps.first.notification).to eq @n2
     end
   end
 end

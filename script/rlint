@@ -1,0 +1,70 @@
+#!/usr/bin/env ruby
+$:.push File.expand_path("../../gems/rubocop-canvas/lib", __FILE__)
+
+def git_diff(env_sha)
+  sha = env_sha
+  if sha.nil?
+    return `git diff` if RuboCop::Canvas::GitProxy.dirty?
+    sha = RuboCop::Canvas::GitProxy.head_sha
+  end
+  `git show #{sha}`
+end
+
+def get_offenses_json(cli, env_sha)
+  ruby_files = RuboCop::Canvas::FileSieve.new.files(env_sha)
+  return {} unless ruby_files.size > 0
+  json = `rubocop #{ruby_files.join(' ')} --format json`
+  results_json = JSON.parse(json)
+end
+
+def pretty_comment(comment)
+  message = ""
+  message += "[#{comment[:severity]}]".colorize(:yellow)
+  message += " #{comment[:path].colorize(:light_blue)}:#{comment[:position]}"
+  message += " => #{comment[:message].colorize(:green)}"
+  puts message
+end
+
+require 'rubocop_canvas'
+
+cli = RuboCop::CLI.new
+if ENV['GERRIT_REFSPEC']
+  if ENV['GERRIT_PROJECT'] == 'canvas-lms' # only really want this on canvas atm
+    require 'rubocop_canvas/helpers/comments'
+    require 'shellwords'
+    rev = ENV['GERRIT_REFSPEC']
+    env_sha = `git fetch origin #{rev} && git rev-parse FETCH_HEAD`
+    results_json = get_offenses_json(cli, env_sha)
+    unless results_json.empty?
+      diff = git_diff(env_sha)
+      comments = RuboCop::Canvas::Comments.build(diff, results_json)
+      `gergich comment #{Shellwords.escape(comments.to_json)}`
+    end
+  end
+else
+  heavy_mode = ARGV.include?("--heavy")
+  boyscout_mode = ARGV.include?("--boy-scout")
+  env_sha = ENV['SHA']
+  ruby_files = RuboCop::Canvas::FileSieve.new.files(env_sha)
+  if ruby_files.size > 0
+    if heavy_mode
+      args = ruby_files
+      args_index = ARGV.index('--')
+      if args_index
+        args.concat(ARGV[(args_index + 1)..-1])
+      end
+      cli.run(args)
+    else
+      require 'colorize'
+      output_filename = ".rubocop-output.json"
+      cli.run(ruby_files + ["--format", "json", "--out", output_filename])
+      results_json = JSON.parse(File.read(output_filename))
+      diff = git_diff(env_sha)
+      comments = RuboCop::Canvas::Comments.build(diff, results_json, boyscout_mode)
+      comments.each{ |comment| pretty_comment(comment) }
+      File.delete(output_filename)
+    end
+  else
+    puts "No ruby file changes found!"
+  end
+end

@@ -53,6 +53,6 @@ describe AttachmentSerializer do
       unlock_at locked hidden lock_at hidden_for_user thumbnail_url
     ]
 
-    (json.keys.map(&:to_s) & expected_keys).should == expected_keys
+    expect(json.keys.map(&:to_s) & expected_keys).to eq expected_keys
   end
 end

@@ -1,4 +1,4 @@
-module DataFixup::PopulateConversationParticipantRootAccountIds
+class DataFixup::PopulateConversationParticipantRootAccountIds
   def self.run
     target = %w{MySQL Mysql2}.include?(ConversationParticipant.connection.adapter_name) ? 'conversation_participants.root_account_ids' : 'root_account_ids'
     scope = ConversationParticipant.where(:root_account_ids => nil)
