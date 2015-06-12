@@ -83,6 +83,54 @@ describe SisApiController, type: :request do
           get "/api/sis/accounts/#{@account.id}/assignments", account_id: @account.id, per_page: 2, page: 3
           expect(json_parse.length).to eq(0)
         end
+
+        it "should return courses starting before starts_before" do
+          @account.courses.each(&:destroy)
+          start_at = 1.week.ago
+          course1 = @account.courses.create!
+          course2 = @account.courses.create!(:start_at => start_at - 1.day)
+          course3 = @account.courses.create!(:start_at => start_at + 1.day)
+
+          term1 = @account.enrollment_terms.create!(:start_at => start_at - 1.day)
+          term2 = @account.enrollment_terms.create!(:start_at => start_at + 1.day)
+          course4 = @account.courses.create!(:enrollment_term => term1)
+          course5 = @account.courses.create!(:enrollment_term => term2)
+
+          @account.courses.not_deleted.each do |c|
+            c.update_attribute(:workflow_state, 'available')
+            c.assignments.create!(:post_to_sis => true)
+          end
+
+          get "/api/sis/accounts/#{@account.id}/assignments?starts_before=#{start_at.iso8601}", :account_id => @account.id
+          expect(response).to be_success
+
+          result = json_parse
+          expect(result.map{|h| h['course_id']}).to match_array [course1.id, course2.id, course4.id]
+        end
+
+        it "should return courses concluding after ends_after" do
+          @account.courses.each(&:destroy)
+          end_at = 1.week.from_now
+          course1 = @account.courses.create!
+          course2 = @account.courses.create!(:conclude_at => end_at + 1.day)
+          course3 = @account.courses.create!(:conclude_at => end_at - 1.day)
+
+          term1 = @account.enrollment_terms.create!(:end_at => end_at + 1.day)
+          term2 = @account.enrollment_terms.create!(:end_at => end_at - 1.day)
+          course4 = @account.courses.create!(:enrollment_term => term1)
+          course5 = @account.courses.create!(:enrollment_term => term2)
+
+          @account.courses.not_deleted.each do |c|
+            c.update_attribute(:workflow_state, 'available')
+            c.assignments.create!(:post_to_sis => true)
+          end
+
+          get "/api/sis/accounts/#{@account.id}/assignments?ends_after=#{end_at.iso8601}", :account_id => @account.id
+          expect(response).to be_success
+
+          result = json_parse
+          expect(result.map{|h| h['course_id']}).to match_array [course1.id, course2.id, course4.id]
+        end
       end
 
       context 'with :bulk_sis_grade_export feature enabled' do
