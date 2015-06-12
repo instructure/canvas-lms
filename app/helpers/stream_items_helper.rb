@@ -80,7 +80,7 @@ module StreamItemsHelper
     presenter.unread = item.unread
     presenter.path = extract_path(category, item)
     presenter.context = extract_context(category, item)
-    presenter.summary = extract_summary(category, item)
+    presenter.summary = extract_summary(category, item, user)
     presenter
   end
 
@@ -124,7 +124,7 @@ module StreamItemsHelper
     context
   end
 
-  def extract_summary(category, item)
+  def extract_summary(category, item, user = @current_user)
     asset = item.data
     case category
     when "Announcement", "DiscussionTopic"
@@ -135,7 +135,7 @@ module StreamItemsHelper
       asset.subject
     when "AssessmentRequest"
       # TODO I18N should use placeholders, not concatenation
-      asset.asset.assignment.title + " " + I18n.t('for', "for") + " " + asset.asset.user.name
+      asset.asset.assignment.title + " " + I18n.t('for', "for") + " " + assessment_author_name(asset, user)
     else
       nil
     end
@@ -158,5 +158,14 @@ module StreamItemsHelper
       "Ignore"
     end
   end
-  private :category_for_message
+
+  def assessment_author_name(asset, user = @current_user)
+    if can_do(asset, user, :read_assessment_user)
+      asset.asset.user.name
+    else
+      I18n.t(:anonymous_user, "Anonymous User")
+    end
+  end
+
+  private :category_for_message, :assessment_author_name
 end

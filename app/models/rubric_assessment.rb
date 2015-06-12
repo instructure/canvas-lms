@@ -189,6 +189,7 @@ class RubricAssessment < ActiveRecord::Base
       self.can_read_assessor_name?(user, session)
     }
     can :read_assessor
+
   end
 
   scope :of_type, lambda { |type| where(:assessment_type => type.to_s) }

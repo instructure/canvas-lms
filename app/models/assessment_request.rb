@@ -74,6 +74,23 @@ class AssessmentRequest < ActiveRecord::Base
           user, purpose)
   }
 
+  set_policy do
+    given {|user, session|
+      self.can_read_assessment_user_name?(user, session)
+    }
+    can :read_assessment_user
+  end
+
+  def can_read_assessment_user_name?(user, session)
+    !self.considered_anonymous? ||
+        self.user_id == user.id ||
+        self.submission.assignment.context.grants_right?(user, session, :view_all_grades)
+  end
+
+  def considered_anonymous?
+    self.submission.assignment.anonymous_peer_reviews?
+  end
+
   def send_reminder!
     @send_reminder = true
     self.updated_at = Time.now

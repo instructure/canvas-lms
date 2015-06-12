@@ -97,7 +97,7 @@ class CrocodocDocument < ActiveRecord::Base
 
     submissions = attachment.attachment_associations.
       where(:context_type => 'Submission').
-      preload(:context).
+      preload(context: [:assignment]).
       map(&:context)
 
     return opts unless submissions
@@ -108,6 +108,11 @@ class CrocodocDocument < ActiveRecord::Base
       if submissions.any? { |s| s.grants_right? user, :grade }
         opts[:admin] = true
       end
+    end
+
+    if submissions.map(&:assignment).any?(&:anonymous_peer_reviews?)
+      opts[:editable] = false
+      opts[:filter] = 'none'
     end
 
     opts

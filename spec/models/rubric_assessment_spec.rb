@@ -144,11 +144,11 @@ describe RubricAssessment do
         @assignment.update_attribute(:anonymous_peer_reviews, true)
         @reviewed = @student
         @reviewer = student_in_course(:active_all => true).user
-        @assignment.assign_peer_review(@reviewer, @student)
+        @assignment.assign_peer_review(@reviewer, @reviewed)
         @assessment = @association.assess({
           :user => @reviewed,
           :assessor => @reviewer,
-          :artifact => @assignment.find_or_create_submission(@student),
+          :artifact => @assignment.find_or_create_submission(@reviewed),
           :assessment => {
             :assessment_type => 'peer_review',
             :criterion_crit1 => {
@@ -186,7 +186,9 @@ describe RubricAssessment do
       it "should allow reviewed to see reviewer's name if reviewer is teacher" do
         expect(@teacher_assessment.grants_right?(@reviewed, :read_assessor)).to be_truthy
       end
+
     end
+
 
     describe "#considered_anonymous?" do
       let_once(:assessment) {
