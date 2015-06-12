@@ -5,8 +5,12 @@ module Autoextend
       if block
         block.call(target)
       else
-        target.send(from_included ? :include : method,
-                    Object.const_get(module_name.to_s, false))
+        mod = if module_name.is_a?(Module)
+                module_name
+              else
+                Object.const_get(module_name.to_s, false)
+              end
+        target.send(from_included ? :include : method, mod)
       end
     end
   end

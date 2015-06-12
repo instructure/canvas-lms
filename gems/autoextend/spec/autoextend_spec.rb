@@ -52,4 +52,11 @@ describe Autoextend::ObjectMethods do
 
     end
   end
+
+  it "should allow extending with a module instead of a module name" do
+    class AutoextendSpec::Class; end
+    module AutoextendSpec::MyExtension; end
+    Autoextend.hook(:"AutoextendSpec::Class", AutoextendSpec::MyExtension)
+    AutoextendSpec::Class.ancestors.must_include AutoextendSpec::MyExtension
+  end
 end
