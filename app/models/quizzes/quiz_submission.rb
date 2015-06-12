@@ -302,13 +302,9 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     new_params[:cnt] = (new_params[:cnt].to_i + 1) % 5
     snapshot!(params) if new_params[:cnt] == 1
 
-    connection.execute <<-SQL
-      UPDATE quiz_submissions
-         SET user_id=#{self.user_id || 'NULL'},
-             submission_data=#{connection.quote(new_params.to_yaml)}
-       WHERE workflow_state NOT IN ('complete', 'pending_review')
-         AND id=#{self.id}
-    SQL
+    self.class.where(id: self).
+        where("workflow_state NOT IN ('complete', 'pending_review')").
+        update_all(user_id: user_id, submission_data: new_params.to_yaml)
 
     record_answer(new_params)
 
