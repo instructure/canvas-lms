@@ -63,7 +63,10 @@ class AccountAuthorizationConfigsPresenter
 
   def sso_options
     new_auth_types.map do |auth_type|
-      [auth_type.display_name, auth_type.sti_name]
+      {
+        name: auth_type.display_name,
+        value: auth_type.sti_name
+      }
     end
   end
 

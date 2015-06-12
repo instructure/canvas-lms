@@ -7,11 +7,20 @@ describe "account" do
     course_with_admin_logged_in
   end
 
+  def add_auth_type(auth_type)
+    f("#add-authentication-provider button").click
+    driver.find_elements(:css, "#add-authentication-provider a").each do |link|
+      if link.text == auth_type
+        link.click
+      end
+    end
+  end
+
   describe "authentication configs" do
 
     it "should allow setting up a secondary ldap server" do
       get "/accounts/#{Account.default.id}/account_authorization_configs"
-      click_option('#add_auth_select', 'ldap', :value)
+      add_auth_type('LDAP')
       ldap_form = f('#new_ldap')
       expect(ldap_form).to be_displayed
 
@@ -35,7 +44,7 @@ describe "account" do
       expect(config.auth_decrypted_password).to eq 'primary password'
 
       # now add a secondary ldap config
-      click_option('#add_auth_select', 'ldap', :value)
+      add_auth_type("LDAP")
       ldap_form = f('#ldap_form form')
       ldap_form.find_element(:id, 'account_authorization_config_auth_host').send_keys('secondary.host.example.com')
       ldap_form.find_element(:id, 'account_authorization_config_auth_port').send_keys('2')
@@ -98,7 +107,7 @@ describe "account" do
 
     it "should be able to set login labels for delegated auth accounts" do
       get "/accounts/#{Account.default.id}/account_authorization_configs"
-      click_option('#add_auth_select', 'cas', :value)
+      add_auth_type("CAS")
       f("#account_authorization_config_auth_base").send_keys("cas.example.com")
       expect_new_page_load { submit_form('#cas_form form') }
 
@@ -115,7 +124,7 @@ describe "account" do
     context "cas" do
       it "should be able to set unknown user url option" do
         get "/accounts/#{Account.default.id}/account_authorization_configs"
-        click_option('#add_auth_select', 'cas', :value)
+        add_auth_type("CAS")
 
         expect_new_page_load { submit_form('#cas_form form') }
 
@@ -131,7 +140,7 @@ describe "account" do
     context "saml" do
       it "should be able to set unknown user url option" do
         get "/accounts/#{Account.default.id}/account_authorization_configs"
-        click_option('#add_auth_select', 'saml', :value)
+        add_auth_type("SAML")
 
         expect(f("#account_authorization_config_idp_entity_id")).to be_displayed
 

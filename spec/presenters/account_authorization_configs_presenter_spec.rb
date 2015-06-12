@@ -130,20 +130,15 @@ describe AccountAuthorizationConfigsPresenter do
     it "always has cas and ldap" do
       AccountAuthorizationConfig::SAML.stubs(:enabled?).returns(false)
       presenter = described_class.new(stubbed_account)
-      expect(presenter.sso_options).to eq([['CAS', 'cas'],
-                                           ['Facebook', 'facebook'],
-                                           ['GitHub', 'github'],
-                                           ['Google', 'google'],
-                                           ['LDAP', 'ldap'],
-                                           ['LinkedIn', 'linkedin'],
-                                           ['OpenID Connect', 'openid_connect'],
-                                           ['Twitter', 'twitter']])
+      options = presenter.sso_options
+      expect(options).to include({name: 'CAS', value: 'cas'})
+      expect(options).to include({name: 'LinkedIn', value: 'linkedin'})
     end
 
     it "includes saml if saml enabled" do
       AccountAuthorizationConfig::SAML.stubs(:enabled?).returns(true)
       presenter = described_class.new(stubbed_account)
-      expect(presenter.sso_options).to include(['SAML', 'saml'])
+      expect(presenter.sso_options).to include({name: 'SAML', value: 'saml'})
     end
   end
 
