@@ -23,8 +23,8 @@ describe StreamItemsHelper do
     Notification.create!(:name => "Assignment Created", :category => "TestImmediately")
     course_with_teacher(:active_all => true)
     course_with_student(:active_all => true, :course => @course)
-    @other_user = user()
-    @another_user = user()
+    @other_user = user
+    @another_user = user
 
     @context = @course
     @discussion = discussion_topic_model
@@ -168,6 +168,19 @@ describe StreamItemsHelper do
       expect(@categorized["Assignment"].first.summary).to match /Assignment Created/
       expect(@categorized["DiscussionTopic"].first.summary).to eq @discussion.title
       expect(@categorized["AssessmentRequest"].first.summary).to include(@assignment.title)
+    end
+
+    it 'should handle anonymous review for AssessmentRequests' do
+      @assignment.update_attribute(:anonymous_peer_reviews, true)
+      student = @student
+      assessor_submission = submission_model(assignment: @assignment, user: @other_user)
+      assessment_request = AssessmentRequest.create!(assessor: @other_user, asset: @submission,
+                                                     user: student, assessor_asset: assessor_submission)
+      assessment_request.workflow_state = 'assigned'
+      assessment_request.save
+      items = @other_user.recent_stream_items
+      @categorized = helper.categorize_stream_items(items, @other_user)
+      expect(@categorized["AssessmentRequest"].first.summary).to include('Anonymous User')
     end
   end
 end

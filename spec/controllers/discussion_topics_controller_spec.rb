@@ -534,6 +534,15 @@ describe DiscussionTopicsController do
       end
       expect(si.data['subject']).to eq "Assignment Created - #{obj_params[:title]}, #{@course.name}"
     end
+
+    it 'does not allow for anonymous peer review assignment' do
+      obj_params = topic_params(@course).merge(assignment_params(@course))
+      obj_params[:assignment][:anonymous_peer_reviews] = true
+      user_session(@teacher)
+      post 'create', { :format => :json }.merge(obj_params)
+      json = JSON.parse response.body
+      expect(json['assignment']['anonymous_peer_reviews']).to be_falsey
+    end
   end
 
   describe "PUT: update" do

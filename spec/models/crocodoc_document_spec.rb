@@ -88,6 +88,15 @@ describe 'CrocodocDocument' do
         :editable => false,
       })
     end
+
+    it "should not allow annotations if anonymous_peer_reviews" do
+      @submission.assignment.update_attribute(:anonymous_peer_reviews, true)
+      expect(@crocodoc.permissions_for_user(@student)).to eq({
+        :filter => 'none',
+        :admin => false,
+        :editable => false,
+      })
+    end
   end
 
   context 'update_process_states' do

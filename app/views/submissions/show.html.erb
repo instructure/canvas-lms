@@ -15,10 +15,10 @@
       :submission => @assignment.muted? ? {} : @submission.attributes
     }
   })
-  content_for :page_title, join_title(@assignment.title, @submission.user.name)
+  content_for :page_title, join_title(@assignment.title, submission_author_name_for(@assessment_request))
   add_crumb(t('crumbs.assignments', "Assignments"), context_url(@context, :context_assignments_url))
   add_crumb(@assignment.title, context_url(@context, :context_assignment_url, @assignment.id))
-  add_crumb(@user.try_rescue(:short_name))
+  add_crumb(user_crumb_name)
   @active_tab = "assignments"
 %>
 <% content_for :stylesheets do %>
@@ -72,7 +72,8 @@
       <% end %>
     </div>
     <h2 class="submission_header" style="margin-bottom: 0;"><%= @assessment_request ? t('peer_review', "Peer Review") : t('submission_details', "Submission Details") %></h2>
-    <span style="padding-left: 10px; line-height: 0.7em; font-size: 0.8em;"><%= @assignment.title %>, <%= context_user_name(@context, @submission.user) %></span>
+        <span style="padding-left: 10px; line-height: 0.7em; font-size: 0.8em;"><%= @assignment.title %>, <%= submission_author_name_for @assessment_request %></span>
+
     <span style="padding-left: 10px; line-height: 0.7em; font-size: 0.8em; <%= 'color: #800; font-weight: bold;' if @submission.late? %> <%= hidden unless @submission.submitted_at %>">
       <%= t('submitted_at', 'submitted %{submit_date}', :submit_date => datetime_string(@submission.submitted_at)) %>
       <%= t('late_submission', '(late)') if @submission.late? %>
