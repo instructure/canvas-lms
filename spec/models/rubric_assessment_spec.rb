@@ -157,6 +157,18 @@ describe RubricAssessment do
             }
           }
         })
+        @teacher_assessment = @association.assess({
+          :user => @reviewed,
+          :assessor => @teacher,
+          :artifact => @assignment.find_or_create_submission(@student),
+          :assessment => {
+            :assessment_type => 'grading',
+            :criterion_crit1 => {
+              :points => 3,
+              :comments => "Hey, it's a teacher comment."
+            }
+          }
+        })
       end
 
       it "should prevent reviewed from seeing reviewer's name" do
@@ -169,6 +181,10 @@ describe RubricAssessment do
 
       it "should allow teacher to see reviewer's name" do
         expect(@assessment.grants_right?(@teacher, :read_assessor)).to be_truthy
+      end
+
+      it "should allow reviewed to see reviewer's name if reviewer is teacher" do
+        expect(@teacher_assessment.grants_right?(@reviewed, :read_assessor)).to be_truthy
       end
     end
 
