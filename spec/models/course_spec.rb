@@ -4180,3 +4180,21 @@ describe Course, 'invited_count_visible_to' do
     expect(@course.invited_count_visible_to(@teacher)).to eq(2)
   end
 end
+
+describe Course, '#favorite_for_user?' do
+  before :once do
+    @courses = []
+    @courses << course_with_student(:active_all => true, :course_name => "Course 0").course
+    @courses << course_with_student(:course_name => "Course 1", :user => @user, :active_all => true).course
+    @user.favorites.build(:context => @courses[0])
+    @user.save
+  end
+
+  it "should return true if a user has a course set as a favorite" do
+    expect(@courses[0].favorite_for_user?(@user)).to eql(true)
+  end
+
+  it "should return false if a user has not set a course to be a favorite" do
+    expect(@courses[1].favorite_for_user?(@user)).to eql(false)
+  end
+end

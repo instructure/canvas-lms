@@ -2879,4 +2879,11 @@ class Course < ActiveRecord::Base
   def list_students_by_sortable_name?
     feature_enabled?(:gradebook_list_students_by_sortable_name)
   end
+
+  ##
+  # Returns a boolean describing if the user passed in has marked this course
+  # as a favorite.
+  def favorite_for_user?(user)
+    user.favorites.where(:context_type => 'Course', :context_id => self).exists?
+  end
 end
