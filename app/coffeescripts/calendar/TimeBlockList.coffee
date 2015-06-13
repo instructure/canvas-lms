@@ -60,7 +60,11 @@ define [
           @blocksManager.add row.getData()... unless row.blank()
         else
           valid = false
-      unless valid
+
+      if @blocksManager.blocks.length == 0
+        alert(I18n.t 'no_dates_error', 'You need to specify at least one date and time')
+        valid = false
+      else if !valid
         alert(I18n.t 'time_block_errors', 'There are errors in your time block selections.')
       valid
 

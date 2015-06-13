@@ -74,6 +74,23 @@ describe "scheduler" do
       expect(end_time_correct).to eq true
     end
 
+    it "should require at least one time slot" do
+      get '/calendar2'
+      click_scheduler_link
+      f('.create_link').click
+      fj('.ui-datepicker-trigger:visible').click
+      datepicker_next
+      set_value(f('.start_time'), '01')
+
+      # Need to submit manually to avoid waiting for ajaximations, which
+      # causes Selenium to blow up when it sees the alert we're expecting
+      _, save_and_publish = ff('.ui-dialog-buttonset .ui-button')
+      save_and_publish.click
+
+      expect(driver.switch_to.alert.text).to be_present
+      driver.switch_to.alert.accept
+    end
+
     it "should allow checkboxes in the options section to be edited" do
       get "/calendar2"
       click_scheduler_link
