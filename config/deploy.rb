@@ -72,9 +72,6 @@ end
 # manifest* that rails generates during a normal "deploy:compile_assets" back into place.
 Rake::Task["deploy:rollback_assets"].clear_actions
 
-# Disable for now until we get the basic Cap deploy and rollback going for code and can really test this.
-#Rake::Task["deploy:migrate"].clear_actions
-
 Rake::Task["deploy:restart"].clear_actions
 
 namespace :deploy do
@@ -109,11 +106,6 @@ namespace :deploy do
   end
 
   before :updated, :clone_qtimigrationtool
-
-  #desc "Migrate database"
-  #task :migrate do
-  #  # TODO: need to get this working, but for now we're just focusing on getting a code deploy and rollback flow going
-  #end
 
   desc "Compile static assets"
   task :compile_assets => :set_compile_assets_vars do
