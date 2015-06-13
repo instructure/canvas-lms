@@ -1,17 +1,11 @@
 <%
   notification = account_notification
-  icon_type = notification.icon || "warning"
-
-  # map legacy icon types to new types
-  icon_type = "question" if icon_type == "help"
-  icon_type = "calendar" if icon_type == "calendar_icon"
-  icon_type = "information" if icon_type == "people" || icon_type == "file" || icon_type == "group"
 %>
 <div class="global-message image-block">
   <div class="image-block-image">
-    <i class="<%= "#{icon_type}-icon"%>"></i>
+    <i class="<%=  notification_icon_classname(notification)  %>"></i>
     <span class="hidden-inline-text">
-      <%= accessible_message_icon_text(icon_type) %>
+      <%= accessible_message_icon_text(notification_icon_type(notification)) %>
     </span>
   </div>
   <div class="image-block-content">

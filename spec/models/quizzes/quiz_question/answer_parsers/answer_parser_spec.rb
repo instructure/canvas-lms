@@ -20,12 +20,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper.rb')
 require 'ostruct'
 
 describe Quizzes::QuizQuestion::AnswerParsers::AnswerParser do
+
   context "#parse" do
     let(:answer_parser) { Quizzes::QuizQuestion::AnswerParsers::AnswerParser.new([]) }
 
     it "returns the question with answers assigned" do
       question = OpenStruct.new
-      answer_parser.parse(question).answers.should == []
+      expect(answer_parser.parse(question).answers).to eq []
     end
   end
 end

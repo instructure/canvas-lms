@@ -1,0 +1,5 @@
+// this is the css to load the tinyMCE editor chrome, NOT the stuff that gets loaded
+// inside the editor and applied to the user content as they are editing it.
+@import 'vendor/lightskin.scss';
+@import 'base/environment';
+@import 'our_custom_tiny_mce_stuff/tiny_like_ck_with_external_tools.scss';

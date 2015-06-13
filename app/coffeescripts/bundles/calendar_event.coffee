@@ -1,2 +1,0 @@
-require ['calendar_event']
-

@@ -16,7 +16,7 @@ define [
       ).length
 
     mastery_count: ->
-      @statusCount('mastery')
+      @statusCount('mastery') + @statusCount('exceeds')
 
     remedialCount: ->
       @statusCount('remedial')

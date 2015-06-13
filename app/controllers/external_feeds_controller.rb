@@ -84,7 +84,7 @@ class ExternalFeedsController < ApplicationController
   def index
     if authorized_action(@context.announcements.scoped.new, @current_user, :create)
       api_route = polymorphic_url([:api, :v1, @context, :external_feeds])
-      @feeds = Api.paginate(@context.external_feeds.for('announcements').order(:id), self, api_route)
+      @feeds = Api.paginate(@context.external_feeds.order(:id), self, api_route)
       render :json => external_feeds_api_json(@feeds, @context, @current_user, session)
     end
   end
@@ -93,13 +93,14 @@ class ExternalFeedsController < ApplicationController
   #
   # Create a new external feed for the course or group.
   #
-  # @argument url [String]
+  # @argument url [Required, String]
   #   The url to the external rss or atom feed
   #
-  # @argument header_match [Optional, Boolean]
+  # @argument header_match [Boolean]
   #   If given, only feed entries that contain this string in their title will be imported
   #
   # @argument verbosity [String, "full"|"truncate"|"link_only"]
+  #   Defaults to "full"
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/external_feeds \ 

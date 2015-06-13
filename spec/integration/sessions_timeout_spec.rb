@@ -26,32 +26,32 @@ describe "Session Timeout" do
 
     context "when a user logs in" do 
       before do
-        course_with_student(:active_all => true, :user => user_with_pseudonym)
+        course_with_student(:active_all => true, :user => user_with_pseudonym(:active_user => true))
         login_as
       end
 
       it "should time out after 40 minutes of inactivity" do
         now = Time.now
         get "/"
-        response.should be_success
+        expect(response).to be_success
 
         Time.stubs(:now).returns(now + 40.minutes)
         get "/"
-        response.should redirect_to "http://www.example.com/login"
+        expect(response).to redirect_to "http://www.example.com/login"
       end
 
       it "should not time out if the user remains active" do
         now = Time.now
         get "/"
-        response.should be_success
+        expect(response).to be_success
 
         Time.stubs(:now).returns(now + 20.minutes)
         get "/"
-        response.should be_success
+        expect(response).to be_success
 
         Time.stubs(:now).returns(now + 40.minutes)
         get "/"
-        response.should be_success
+        expect(response).to be_success
       end
     end
   end

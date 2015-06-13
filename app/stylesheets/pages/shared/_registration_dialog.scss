@@ -1,0 +1,11 @@
+// Shared between:
+// - registration.scss
+// - login.sass
+// - otp_login.scss
+.registration-dialog {
+  margin: 2em 0;
+  font-size: 1.1em;
+  .registration-dialog .spinner {
+    width: 100px;
+  }
+}

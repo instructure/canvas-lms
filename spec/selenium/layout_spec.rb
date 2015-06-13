@@ -17,8 +17,8 @@ describe "layout" do
     CS
 
     rs_wrapper = f('#right-side-wrapper')
-    rs_wrapper.should_not have_class 'with-scrolling-right-side'
-    rs_wrapper.should_not have_class 'with-sidebar-pinned-to-bottom'
+    expect(rs_wrapper).not_to have_class 'with-scrolling-right-side'
+    expect(rs_wrapper).not_to have_class 'with-sidebar-pinned-to-bottom'
 
     f('#footer').location_once_scrolled_into_view
     # We sleep here because the window scroll triggers a call to scrollSidebar that might
@@ -26,25 +26,25 @@ describe "layout" do
     # because that's subverting part of the test. The throttle shouldn't be more than 50ms,
     # so sleeping 100ms should be sufficient for it to fire.
     sleep 0.1
-    rs_wrapper.should_not have_class 'with-scrolling-right-side'
-    rs_wrapper.should have_class 'with-sidebar-pinned-to-bottom'
+    expect(rs_wrapper).not_to have_class 'with-scrolling-right-side'
+    expect(rs_wrapper).to have_class 'with-sidebar-pinned-to-bottom'
 
     f('#dashboard').location_once_scrolled_into_view
     sleep 0.1
-    rs_wrapper.should have_class 'with-scrolling-right-side'
-    rs_wrapper.should_not have_class 'with-sidebar-pinned-to-bottom'
+    expect(rs_wrapper).to have_class 'with-scrolling-right-side'
+    expect(rs_wrapper).not_to have_class 'with-sidebar-pinned-to-bottom'
 
     f('#header').location_once_scrolled_into_view
     sleep 0.1
-    rs_wrapper.should_not have_class 'with-scrolling-right-side'
-    rs_wrapper.should_not have_class 'with-sidebar-pinned-to-bottom'
+    expect(rs_wrapper).not_to have_class 'with-scrolling-right-side'
+    expect(rs_wrapper).not_to have_class 'with-sidebar-pinned-to-bottom'
   end
 
   it "should have ENV available to the JavaScript from js_env" do
-    driver.execute_script("return ENV.current_user_id").should == @user.id.to_s
+    expect(driver.execute_script("return ENV.current_user_id")).to eq @user.id.to_s
   end
 
   it "should escape JSON injected directly into the view" do
-    driver.execute_script("return ENV.current_user.display_name").should ==  "</script><b>evil html & name</b>"
+    expect(driver.execute_script("return ENV.current_user.display_name")).to eq  "</script><b>evil html & name</b>"
   end
 end

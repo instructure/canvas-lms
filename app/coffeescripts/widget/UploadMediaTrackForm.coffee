@@ -9,7 +9,7 @@ define [
   class UploadMediaTrackForm
 
     # video url needs to be the url to mp4 version of the video.
-    # it will be passed along to universalsubtitles.org
+    # it will be passed along to amara.org
     constructor: (@mediaCommentId, @video_url) ->
       templateVars =
         languages: _.map(mejs.language.codes, (name, code) -> {name, code})
@@ -49,7 +49,7 @@ define [
         $.ajaxJSON "/media_objects/#{@mediaCommentId}/media_tracks", 'POST', params, =>
           submitDfd.resolve()
           @$dialog.dialog('close')
-          $.flashMessage I18n.t 'track_uploaded_successfully', "Track uploaded successfuly, refresh to see it."
+          $.flashMessage I18n.t 'track_uploaded_successfully', "Track uploaded successfully; please refresh your browser."
 
     getFileContent: ->
       dfd = new $.Deferred

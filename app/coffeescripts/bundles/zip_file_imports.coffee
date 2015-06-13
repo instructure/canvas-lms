@@ -1,12 +1,13 @@
 require [
   'i18n!zip_file_imports' # I18n
   'jquery' # $
+  'str/htmlEscape'
   'jquery.ajaxJSON' # getJSON
   'jquery.instructure_forms' # ajaxJSONFiles
   'jqueryui/dialog'
   'compiled/jquery.rails_flash_notifications'
   'jqueryui/progressbar' # /\.progressbar/
-], (I18n, $) ->
+], (I18n, $, htmlEscape) ->
 
   $(document).ready ->
     $zipFile = $("#zip_file_import_form #zip_file")
@@ -73,7 +74,7 @@ require [
             importFailed []
           else if zfi.workflow_state == 'imported'
             $("#uploading_progressbar").progressbar 'value', 100
-            $("#uploading_please_wait_dialog").prepend I18n.t('notices.uploading_complete', "Uploading complete!")
+            $("#uploading_please_wait_dialog").prepend htmlEscape I18n.t('notices.uploading_complete', "Uploading complete!")
             location.href = $("#return_to").val()
           else
             pollImport.errorCount = 0

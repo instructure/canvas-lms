@@ -14,7 +14,7 @@ module CustomSeleniumRspecMatchers
       "expected #{@element.inspect} to have class #{@class_name}, actual class names: #{@element.attribute('class')}"
     end
 
-    def negative_failure_message
+    def failure_message_when_negated
       "expected #{@element.inspect} to NOT have class #{@class_name}, actual class names: #{@element.attribute('class')}"
     end
   end
@@ -31,19 +31,16 @@ module CustomSeleniumRspecMatchers
 
     def matches?(element)
       @element = element
-      if (@element.instance_of? String)
-        @element.include?(@text)
-      else
-        @element.text.include?(@text)
-      end
+      @element_text = @element.instance_of?(String) ? @element : @element.text
+      @element_text.include?(@text)
     end
 
     def failure_message
-      "expected #{@element.inspect} text to include #{@text}, actual text was: #{@element.text}"
+      "expected #{@element.inspect} text to include #{@text}, actual text was: #{@element_text}"
     end
 
-    def negative_failure_message
-      "expected #{@element.inspect} text to NOT include #{@text}, actual text was: #{@element.text}"
+    def failure_message_when_negated
+      "expected #{@element.inspect} text to NOT include #{@text}, actual text was: #{@element_text}"
     end
   end
 
@@ -65,7 +62,7 @@ module CustomSeleniumRspecMatchers
       "expected #{@element.inspect} to have value #{@value_attribute}, actual class names: #{@element.attribute('value')}"
     end
 
-    def negative_failure_message
+    def failure_message_when_negated
       "expected #{@element.inspect} to NOT have value #{@value_attribute}, actual value names: #{@element.attribute('value')}"
     end
   end
@@ -89,7 +86,7 @@ module CustomSeleniumRspecMatchers
       "expected #{@element.inspect} to have attribute #{@attribute_value}, actual attribute type: #{@element.attribute('#{@attribute.to_s}')}"
     end
 
-    def negative_failure_message
+    def failure_message_when_negated
       "expected #{@element.inspect} to NOT have attribute #{@attribute_value}, actual attribute type: #{@element.attribute('#{@attribute.to_s}')}"
     end
   end

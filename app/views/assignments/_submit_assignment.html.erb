@@ -117,7 +117,7 @@
         <td>
           <div style="text-align: right; font-size: 0.8em;">
             <a class="switch_text_entry_submission_views" href="#"><%= t '#editor.switch_editor_html', "HTML Editor" %></a>
-            <a class="switch_text_entry_submission_views" href="#" style="display:none"><%= t '#editor.switch_editor_visual', "Visual Editor" %></a>
+            <a class="switch_text_entry_submission_views" href="#" style="display:none"><%= t '#editor.switch_editor_rich_text', "Rich Content Editor" %></a>
           </div>
           <%= text_area :submission, :body, :style => "width: 100%; height: 250px;" %>
         </td>
@@ -197,13 +197,14 @@
     }
     #google_docs_tree li.file .filename {
       float: left;
+      max-width: 98%;
     }
     #google_docs_tree li.file .popout {
       float: right;
     }
     </style>
     <% if show_google_docs %>
-      <% if @google_docs_token %>
+      <% if @google_docs_token  and not @google_drive_upgrade%>
         <% if @domain_root_account.feature_enabled?(:google_docs_domain_restriction) &&
               @domain_root_account.settings[:google_docs_domain] &&
              !@current_user.gmail.match(%r{@#{@domain_root_account.settings[:google_docs_domain]}$}) %>
@@ -267,6 +268,13 @@
             </div>
           <% end %>
         <% end %>
+      <% elsif @google_drive_upgrade %>
+        <div id="submit_google_doc_form">
+          <%= t 'messages.google_drives_auth_required', "Before you can submit assignments directly from Google Drive you need to authorize Canvas to access your Google Drive account:" %>
+          <div style="font-size: 1.1em; text-align: center; margin: 10px;">
+            <a class="btn" href="<%= oauth_url(:service => :google_drive, :return_to => (request.url + "#submit_google_doc_form")) %>"><%= t 'links.authorize_google_drive', "Authorize Google Drive Access" %></a>
+          </div>
+        </div>
       <% else %>
         <div id="submit_google_doc_form">
           <%= t 'messages.google_docs_auth_required', "Before you can submit assignments directly from Google Docs you need to authorize Canvas to access your Google Docs account:" %>
@@ -276,6 +284,7 @@
         </div>
       <% end %>
     <% end %>
+
     <% if @assignment.submission_types && @assignment.submission_types.match(/media_recording/) %>
       <% if !feature_enabled?(:kaltura) %>
         <div id="submit_media_recording_form">
@@ -393,4 +402,3 @@
     <% end %>
   </div>
 </div>
-

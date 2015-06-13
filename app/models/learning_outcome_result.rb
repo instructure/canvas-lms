@@ -44,7 +44,7 @@ class LearningOutcomeResult < ActiveRecord::Base
   before_save :infer_defaults
 
   attr_accessible :learning_outcome, :user, :association_object, :alignment, :associated_asset
-  
+
   def infer_defaults
     self.learning_outcome_id = self.alignment.learning_outcome_id
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
@@ -55,7 +55,7 @@ class LearningOutcomeResult < ActiveRecord::Base
     self.percent = nil if self.percent && !self.percent.to_f.finite?
     true
   end
-  
+
   def assignment
     if self.association_object.is_a?(Assignment)
       self.association_object
@@ -88,7 +88,11 @@ class LearningOutcomeResult < ActiveRecord::Base
       save
     end
   end
-  
+
+  def submitted_or_assessed_at
+    submitted_at || assessed_at
+  end
+
   scope :for_context_codes, lambda { |codes|
     if codes == 'all'
       scoped

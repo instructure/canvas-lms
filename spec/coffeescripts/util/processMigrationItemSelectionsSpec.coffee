@@ -1,4 +1,4 @@
-require ['compiled/util/processMigrationItemSelections'], (processMigrationItemSelections)->
+define ['compiled/util/processMigrationItemSelections'], (processMigrationItemSelections)->
   module "processMigrationItemSelections"
   data = {
             "authenticity_token": "QL/bXYKYG65JrbPhnzd5XXwNMmRw2kbsl+j02gY3Quc=",
@@ -98,5 +98,5 @@ require ['compiled/util/processMigrationItemSelections'], (processMigrationItemS
                         "copy[day_substitutions][0]" : "1",
                         "copy[day_substitutions][3]" : "4"
     }
-    
-    
+
+

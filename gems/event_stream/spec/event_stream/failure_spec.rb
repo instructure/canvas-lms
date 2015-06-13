@@ -26,17 +26,16 @@ describe EventStream::Failure do
         :attributes => { 'attribute' => 'attribute_value' },
         :changes => { 'changed_attribute' => 'changed_value' })
 
-      @stream = double('stream', :identifier => 'stream_identifier')
+      @stream = double('stream',
+        :identifier => 'stream_identifier',
+        :raise_on_error => false)
+
       allow(@stream).to receive(:operation_payload).with(:insert, @record).and_return(@record.attributes)
       allow(@stream).to receive(:operation_payload).with(:update, @record).and_return(@record.changes)
 
       @exception = Exception.new
       allow(@exception).to receive(:message).and_return(double('exception_message', :to_s => 'exception_message_string'))
       allow(@exception).to receive(:backtrace).and_return([42])
-
-      # By default the log! method raises exceptions in test env.  Override this
-      # to log the CanvasEvent and not raise it for these tests.
-      allow(Rails.env).to receive(:test?).and_return(false)
     end
 
     it "creates a new db record" do

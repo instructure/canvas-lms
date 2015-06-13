@@ -16,10 +16,7 @@ class Profile < ActiveRecord::Base
   validates_inclusion_of :visibility, :in => %w{ public unlisted private }
 
   self.abstract_class = true
-
-  unless CANVAS_RAILS2
-    self.table_name = 'profiles'
-  end
+  self.table_name = 'profiles'
 
   def title=(title)
     write_attribute(:title, title)
@@ -31,7 +28,7 @@ class Profile < ActiveRecord::Base
     return nil unless title
     path = base_path = title.downcase.gsub(/[^a-z0-9]+/, '-').gsub(/\A\-+|\-+\z/, '')
     count = 0
-    while profile = Profile.find_by_root_account_id_and_path(root_account_id, path)
+    while profile = Profile.where(root_account_id: root_account_id, path: path).first
       break if profile.id == id
       path = "#{base_path}-#{count += 1}"
     end
@@ -101,7 +98,7 @@ class Profile < ActiveRecord::Base
       klass.class_eval <<-CODE, __FILE__, __LINE__ + 1
         def profile_with_correct_class
           profile_without_correct_class || begin
-            profile = #{klass.to_s}Profile.new(:context => self)
+            profile = #{klass}Profile.new(:context => self)
             profile.root_account = root_account
             profile.title = name
             profile.visibility = "private"

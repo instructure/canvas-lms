@@ -33,12 +33,12 @@ require [
   course.url = ENV.URLS.course_url
   course.fetch()
 
-  includes = ["assignments"]
+  includes = ["assignments", "discussion_topic"]
   if ENV.PERMISSIONS.manage
     includes.push "all_dates"
     includes.push "module_ids"
   # observers
-  else if !_.include(ENV.current_user_roles, "student")
+  else if ENV.current_user_has_been_observer_in_this_course
     includes.push "all_dates"
 
   assignmentGroups = new AssignmentGroupCollection [],

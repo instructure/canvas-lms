@@ -1,1 +1,0 @@
-gem 'recaptcha', '0.3.1', :require => 'recaptcha/rails'

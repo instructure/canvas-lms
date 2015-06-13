@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'aws-sdk'
+
 class DeveloperKey < ActiveRecord::Base
   include CustomValidations
 
@@ -55,13 +57,13 @@ class DeveloperKey < ActiveRecord::Base
 
       if Rails.env.test?
         # TODO: we have to do this because tests run in transactions
-        return @special_keys[default_key_name] = DeveloperKey.find_or_create_by_name(default_key_name)
+        return @special_keys[default_key_name] = DeveloperKey.where(name: default_key_name).first_or_create
       end
 
       key = @special_keys[default_key_name]
       return key if key
       if (key_id = Setting.get("#{default_key_name}_developer_key_id", nil)) && key_id.present?
-        key = DeveloperKey.find_by_id(key_id)
+        key = DeveloperKey.where(id: key_id).first
       end
       return @special_keys[default_key_name] = key if key
       key = DeveloperKey.create!(:name => default_key_name)

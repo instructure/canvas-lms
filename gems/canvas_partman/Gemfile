@@ -1,0 +1,14 @@
+source 'https://rubygems.org'
+
+gem 'simplecov', '0.8.2', :require => false
+gem 'simplecov-rcov', '0.2.3', :require => false
+
+platforms :ruby_19 do
+  gem 'debugger'
+end
+
+platforms :ruby_21, :ruby_22 do
+  gem 'byebug', require: false
+end
+
+gemspec

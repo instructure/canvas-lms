@@ -61,3 +61,6 @@ define [
         method = 'PUT'
         url = $.replaceTags(@contextInfo.assignment_url, 'id', @assignment.id)
       [ method, url ]
+
+    isCompleted: ->
+      @assignment.user_submitted || (this.isPast() && @assignment.needs_grading_count == 0)

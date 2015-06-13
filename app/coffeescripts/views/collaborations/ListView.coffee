@@ -47,7 +47,9 @@ define [
       if type is 'user'
         new UserCollection(comparator: (user) -> user.get('sortable_name'))
       else
-        new GroupCollection
+        collection = new GroupCollection()
+        collection.forCourse = true
+        collection
 
     # Internal: Attach events to the collection.
     #
@@ -58,8 +60,8 @@ define [
 
     render: =>
       @updateFilter([])
-      collaborators = @collection.map(@renderCollaborator)
-      @$el.html(collaborators.join(''))
+      collaboratorsHtml = @collection.map(@renderCollaborator).join('')
+      @$el.html(collaboratorsHtml)
       @updateFocus() if @currentIndex? && @hasFocus
       @hasFocus = false
       super

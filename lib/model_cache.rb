@@ -115,14 +115,6 @@ module ModelCache
     orig_method = "super"
     alias_method = nil
 
-    if CANVAS_RAILS2
-      if (options[:type] == :instance ? klass.instance_methods : klass.methods).map(&:to_s).include?(method.to_s)
-        orig_method = "#{method}_without_cache(*args)"
-        alias_method = "alias_method_chain #{method.inspect}, :cache"
-        method = "#{method}_with_cache"
-      end
-    end
-
     key_value = options[:key_method] || "args.first"
     # if extra args are provided, we should clear out the current value
     # (e.g. if you call c.user(:lock => true) )

@@ -139,7 +139,7 @@ module LiveAssessments
     #
     # Returns a list of live assessment results
     #
-    # @argument user_id [Optional, Integer]
+    # @argument user_id [Integer]
     #   If set, restrict results to those for this user
     #
     # @example_response

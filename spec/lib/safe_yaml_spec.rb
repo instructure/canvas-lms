@@ -26,7 +26,7 @@ real_format:
 YAML
     expect { YAML.load yaml }.to raise_error(SafeYAML::UnsafeTagError)
     result = YAML.unsafe_load yaml
-    result.class.should == ActionController::Base
+    expect(result.class).to eq ActionController::Base
   end
 
   it "should allow some whitelisted classes" do
@@ -46,7 +46,6 @@ os: !ruby/object:OpenStruct
       modifiable: true
       table: 
         :c: 3
-scribd: !ruby/object:Scribd::Document
 str: !str
   hai
 mime: !ruby/object:Mime::Type
@@ -88,42 +87,40 @@ YAML
 
     def verify(result, key, klass)
       obj = result[key]
-      obj.class.should == klass
+      expect(obj.class).to eq klass
       obj
     end
 
     hwia = verify(result, 'hwia', HashWithIndifferentAccess)
-    hwia.values_at(:a, :b).should == [1, 2]
+    expect(hwia.values_at(:a, :b)).to eq [1, 2]
 
     float = verify(result, 'float', Float)
-    float.should == 5.1
+    expect(float).to eq 5.1
 
     os = verify(result, 'os', OpenStruct)
-    os.a.should == 1
-    os.b.should == 2
-    os.sub.class.should == OpenStruct
-    os.sub.c.should == 3
-
-    scribd = verify(result, 'scribd', Scribd::Document)
+    expect(os.a).to eq 1
+    expect(os.b).to eq 2
+    expect(os.sub.class).to eq OpenStruct
+    expect(os.sub.c).to eq 3
 
     str = verify(result, 'str', String)
-    str.should == "hai"
+    expect(str).to eq "hai"
 
     mime = verify(result, 'mime', Mime::Type)
-    mime.to_s.should == 'png'
+    expect(mime.to_s).to eq 'png'
 
     http = verify(result, 'http', URI::HTTP)
-    http.host.should == 'example.com'
+    expect(http.host).to eq 'example.com'
 
     https = verify(result, 'https', URI::HTTPS)
-    https.host.should == 'example.com'
+    expect(https.host).to eq 'example.com'
 
-    result['ab'].should == AcademicBenchmark::Converter
-    result['qt'].should == Qti::Converter
+    expect(result['ab']).to eq AcademicBenchmark::Converter
+    expect(result['qt']).to eq Qti::Converter
 
-    result['verbose_symbol'].should == :blah
+    expect(result['verbose_symbol']).to eq :blah
 
     oo = verify(result, 'oo', OpenObject)
-    oo.a.should == 1
+    expect(oo.a).to eq 1
   end
 end

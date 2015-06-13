@@ -30,16 +30,17 @@ describe AssessmentRequest do
     end
 
     it "defaults to assigned" do
-      request.should be_assigned
+      expect(request).to be_assigned
     end
 
     it "can be completed" do
       request.complete!
-      request.should be_completed
+      expect(request).to be_completed
     end
   end
 
   describe "notifications" do
+
     let(:notification_name) { 'Rubric Assessment Submission Reminder' }
     let(:notification)      { Notification.create!(:name => notification_name, :category => 'Invitation') }
 
@@ -52,9 +53,10 @@ describe AssessmentRequest do
       assignment = @course.assignments.create!
       submission = assignment.find_or_create_submission(@student)
       request = AssessmentRequest.new(:user => @user, :asset => submission, :assessor_asset => @student, :assessor => @user)
+      request.stubs(:rubric_association).returns(true)
       request.send_reminder!
 
-      request.messages_sent.keys.should include(notification_name)
+      expect(request.messages_sent.keys).to include(notification_name)
     end
   end
 end

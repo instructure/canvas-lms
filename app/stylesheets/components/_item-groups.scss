@@ -1,0 +1,395 @@
+@import 'base/environment';
+
+/* @styleguide Item Groups
+
+<br/>
+### tl;dr
+
+  - Item groups come either `item-group` or `item-group-condensed` styles  
+  - The `item-group` style is for draggable tiems and `item-group-condensed` is for items that are not draggable
+
+<br/>
+
+```html
+<div class="item-group">
+  <div class="ig-header">
+    <h2 class="ig-header-title element_toggler"
+       aria-controls="group_1"
+       aria-expanded="true"
+       aria-label="Item Group Header toggle item visibility"
+       role="button">
+      <i class="icon-mini-arrow-down"></i> Item Group Header
+    </h2>
+  </div>
+  <ul class="ig-list" id="group_1">
+    <li>
+      <div class="ig-row">
+        <div class="ig-row__layout">
+          <a href="#" class="ig-title ellipses">
+            <i class="icon-assignment"></i> Some Assignment
+          </a>
+          <div class="ig-details">
+            <div class="ellipses"><b>Due</b> Nov 4, 2012</div>
+            <div class="ellipses"><b>Available</b> Nov 1</div>
+            <div class="ellipses">10 pts</div>
+          </div>
+          <div class="ig-admin">
+            <span class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
+              <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
+            </span>
+
+            <div class="inline-block">
+              <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" href="#">
+                <i class="icon-settings"></i>
+                <i class="icon-mini-arrow-down"></i>
+                <span class="screenreader-only">Settings</span>
+              </a>
+
+              <ul id="content-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
+                <li role="presentation">
+                  <a href="#" class="icon-edit" id="content-2" tabindex="-1" role="menuitem" title="Edit">Edit</a>
+                </li>
+                <li role="presentation">
+                  <a href="#" class="icon-trash" id="content-3" tabindex="-1" role="menuitem" title="Delete this module">Delete</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+
+    <li>
+      <div class="ig-row ig-published ig-indent1">
+        <div class="ig-row__layout">
+          <a href="#" class="ig-title ellipses">
+            <i class="icon-assignment"></i> Some Assignment
+          </a>
+          <div class="ig-details">
+            <div class="ellipses"><b>Due</b> Nov 4, 2012</div>
+            <div class="ellipses"><b>Available</b> Nov 1</div>
+            <div class="ellipses">10 pts</div>
+          </div>
+          <div class="ig-admin">
+            <span class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
+              <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
+            </span>
+
+            <div class="inline-block">
+              <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" href="#">
+                <i class="icon-settings"></i>
+                <i class="icon-mini-arrow-down"></i>
+                <span class="screenreader-only">Settings</span>
+              </a>
+
+              <ul id="content-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
+                <li role="presentation">
+                  <a href="#" class="icon-edit" id="content-2" tabindex="-1" role="menuitem" title="Edit">Edit</a>
+                </li>
+                <li role="presentation">
+                  <a href="#" class="icon-trash" id="content-3" tabindex="-1" role="menuitem" title="Delete this module">Delete</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+
+    <li>
+      <div class="ig-text">
+        Greek Civilization Essay
+      </div>
+    </li>
+
+    <li>
+      <div class="ig-row">
+        <div class="ig-row__layout">
+          <a href="#" class="ig-title ellipses">
+            <i class="icon-assignment"></i> Some Assignment
+          </a>
+          <div class="ig-details">
+            <div class="ellipses"><b>Due</b> Nov 4, 2012</div>
+            <div class="ellipses"><b>Available</b> Nov 1</div>
+            <div class="ellipses">10 pts</div>
+          </div>
+          <div class="ig-admin">
+            <span class="publish-icon publish-icon-published" data-tooltip title="Unpublish">
+              <i class="icon-publish"></i><span class="publish-text">&nbsp;Published</span>
+            </span>
+
+            <div class="inline-block">
+              <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" href="#">
+                <i class="icon-settings"></i>
+                <i class="icon-mini-arrow-down"></i>
+                <span class="screenreader-only">Settings</span>
+              </a>
+
+              <ul id="content-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
+                <li role="presentation">
+                  <a href="#" class="icon-edit" id="content-2" tabindex="-1" role="menuitem" title="Edit">Edit</a>
+                </li>
+                <li role="presentation">
+                  <a href="#" class="icon-trash" id="content-3" tabindex="-1" role="menuitem" title="Delete this module">Delete</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+
+  </ul>
+</div>
+
+<div class="item-group">
+  <div class="ig-header">
+    <h2 class="ig-header-title element_toggler"
+       aria-controls="group_2"
+       aria-expanded="true">
+      <i class="icon-mini-arrow-down"></i> Item Group Header
+    </h2>
+  </div>
+  <ul class="ig-list" id="group_2">
+    <li>
+      <div class="ig-row ig-row-empty">
+        <div class="ig-empty-msg">
+          No assignments in this Group
+        </div>
+      </div>
+    </li>
+  </ul>
+</div>
+```
+
+*/
+
+@mixin item-group-ellipses {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.item-group {
+  @if $use_new_styles {
+    border: 1px solid $ic-border-light;
+    padding: $ic-sp;
+    border-radius: $baseBorderRadius;
+    margin-bottom: $ic-sp*2;
+    background-color: $lightBackground;
+  }
+  @else {
+    border: 1px solid darken($wellBackground, 7%);
+    background-color: $wellBackground; 
+    padding: 9px; 
+    border-radius: 3px;
+    margin-bottom: 20px;
+  }
+}
+
+@if $use_new_styles == false {
+  .ig-header, .ig-text { padding-left: 30px; }
+}
+
+.ig-header .name {
+  color: #3d454c;
+  font-size: 15px;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
+  font-weight: bold;
+}
+
+.ig-text {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.ig-header {
+  min-height: 30px;
+  @if $use_new_styles {
+    padding-top: $ic-sp/2;
+    padding-bottom: $ic-sp/2;
+  }
+  @else {
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+
+  .ig-header-title {
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: bold;
+    line-height: 20px;
+    margin: auto;
+    display: inline-block;
+
+    .icon-mini-arrow-down {
+      vertical-align: middle;
+    }
+    .icon-mini-arrow-right {
+      position: relative;
+      top: -1px;
+      vertical-align: middle;
+    }
+  }
+
+  .btn {
+    vertical-align: text-bottom;
+  }
+}
+
+.ig-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  margin-top: 10px;
+}
+
+.ig-list li {
+  @if $use_new_styles { margin: $ic-sp/2 0; }
+  @else { margin: 4px 0; }
+}
+
+.ig-row__layout {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.ig-list .ig-row {
+  position: relative;
+  display: block;
+  padding: $ic-sp;
+  box-sizing: border-box;
+  border-radius: $baseBorderRadius;
+  color: $ic-font-color--subdued;
+  @if $use_new_styles {
+    border: 1px solid $ic-border-light;
+    background: $ic-color-light;
+  }
+  @else {
+    border: 1px solid #c1c7cf; 
+    box-shadow: 0 1px 0 #dde0e4;
+    background: #fff;
+  }
+
+  a.ig-title {
+    color: $ic-font-color--subdued;
+    text-decoration: none;
+  }
+
+  .ellipses { @include item-group-ellipses; }
+
+  &:hover {
+    background-color: $ic-list-item-background--hover;
+  }
+
+  &:focus {
+    background-color: $ic-list-item-background--hover;
+  }
+
+  &:before {
+    position: relative;
+    top: -2px;
+  }
+
+  &.ig-published .ig-title {
+    color: #33802a;
+  }
+
+  &.ig-published.student-view .ig-title {
+    color: #4d4d4d;
+  }
+
+  &.ig-row-empty {
+    box-sizing: border-box;
+    height: $ic-sp*3; line-height: $ic-sp*3;
+    padding: 0;
+    @if $use_new_styles {
+      border: 1px solid $ic-border-light;
+      background: $ic-color-light;
+    }
+    @else {
+      background: #f3f6f7;
+      border: 1px solid #dcdee0;
+      box-shadow: none;
+    }
+  }
+
+  .ig-empty-msg {
+    text-align: center;
+    @if $use_new_styles { color: $ic-font-color--subdued; }
+    @else { color: #676b6e; }
+  }
+}
+
+.ig-title {
+  @include item-group-ellipses;
+  display: block;
+  flex: 1;
+  box-sizing: border-box;
+  padding-right: $ic-sp;
+  @include breakpoint(desktop) { flex: 0 0 34%; }
+  @include breakpoint(wide) { flex: 0 0 40%; }
+  @if $use_new_styles { font-weight: 500; }
+  @else { font-weight: bold; }
+}
+
+.ig-details {
+  font-size: 11px;
+  flex: 0.66;
+  line-height: 1.5;
+  box-sizing: border-box;
+  @include breakpoint(desktop) {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    > * {
+      box-sizing: border-box;
+      padding: 0 $ic-sp/2;
+      flex: 1;
+    }
+    @if $use_new_styles == false { body.ff & { @include item-group-ellipses; } }
+  }
+}
+
+.ig-admin {
+  box-sizing: border-box;
+  white-space: nowrap;
+  padding-left: $ic-sp;
+  @include breakpoint(desktop) { padding-left: 0; }
+
+  .publish-icon {
+    margin-right: $ic-sp/2;
+    @include breakpoint(desktop) { margin-right: $ic-sp; }
+    i[class*=icon-]:before,
+    i[class^=icon-]:before { font-size: 18px; }
+  }
+}
+
+.ig-list .icon-drag-handle {
+  color: $ic-brand-secondary;
+}
+
+.ig-details [class^=span] {
+  white-space: nowrap;
+}
+
+[class^=ig-indent] {
+  // anything > 2 is still 60px;
+  margin-left: 60px;
+}
+
+.ig-indent1 {
+  margin-left: 20px;
+}
+
+.ig-indent2 {
+  margin-left: 40px;
+}
+
+.ig-text {
+  color: #3d454c;
+  font-size: 15px;
+}

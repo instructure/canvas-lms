@@ -31,5 +31,5 @@ define [
         }
 
       """
-    $('<div/>').html("<style>#{css.join('')}</style>").appendTo(document.body)
+    $('<div/>').html("<style>#{$.raw(css.join(''))}</style>").appendTo(document.body)
 

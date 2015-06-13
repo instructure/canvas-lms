@@ -19,13 +19,8 @@
 module SendToStream
   module SendToStreamClassMethods
     def self.extended(klass)
-      if CANVAS_RAILS2
-        klass.send(:class_inheritable_accessor, :send_to_stream_block)
-        klass.send(:class_inheritable_accessor, :send_to_stream_update_block)
-      else
-        klass.send(:class_attribute, :send_to_stream_block)
-        klass.send(:class_attribute, :send_to_stream_update_block)
-      end
+      klass.send(:class_attribute, :send_to_stream_block)
+      klass.send(:class_attribute, :send_to_stream_update_block)
       klass.has_one :stream_item, :as => :asset
     end
 
@@ -62,9 +57,7 @@ module SendToStream
       generate_stream_items(stream_recipients) if stream_recipients
     rescue => e
       if Rails.env.production?
-        ErrorReport.log_exception(:default, e, {
-          :message => "SendToStream failure",
-        })
+        Canvas::Errors.capture(e, {message: "SendToStream failure" })
       else
         raise
       end
@@ -87,19 +80,11 @@ module SendToStream
         true
       end
     rescue => e
-      ErrorReport.log_exception(:default, e, {
-        :message => "SendToStream failure",
-      })
+      Canvas::Errors.capture(e, { message: "SendToStream failure" })
       true
     end
-    
-    def generated_stream_items
-      @generated_stream_items
-    end
-    
-    def stream_item_recipient_ids
-      @stream_item_recipient_ids
-    end
+
+    attr_reader :generated_stream_items, :stream_item_recipient_ids
 
     def stream_item_inactive?
       (self.respond_to?(:workflow_state) && self.workflow_state == 'deleted') || (self.respond_to?(:deleted?) && self.deleted?)

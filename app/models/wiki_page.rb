@@ -16,9 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+
 class WikiPage < ActiveRecord::Base
   attr_accessible :title, :body, :url, :user_id, :editing_roles, :notify_of_update
-  attr_readonly :wiki_id, :hide_from_students
+  attr_readonly :wiki_id
   validates_length_of :body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :wiki_id
   include Workflow
@@ -28,11 +30,13 @@ class WikiPage < ActiveRecord::Base
 
   include SearchTermHelper
 
+  after_update :post_to_pandapub_when_revised
+
   belongs_to :wiki, :touch => true
   belongs_to :user
 
   EXPORTABLE_ATTRIBUTES = [
-    :id, :wiki_id, :title, :body, :workflow_state, :recent_editors, :user_id, :created_at, :updated_at, :url, :delayed_post_at, :protected_editing, :hide_from_students,
+    :id, :wiki_id, :title, :body, :workflow_state, :recent_editors, :user_id, :created_at, :updated_at, :url, :delayed_post_at, :protected_editing,
     :editing_roles, :view_count, :revised_at, :could_be_locked, :cloned_item_id, :wiki_page_comments_count
   ]
 
@@ -47,7 +51,7 @@ class WikiPage < ActiveRecord::Base
   after_save :touch_wiki_context
 
   TITLE_LENGTH = WikiPage.columns_hash['title'].limit rescue 255
-  SIMPLY_VERSIONED_EXCLUDE_FIELDS = [:workflow_state, :hide_from_students, :editing_roles, :notify_of_update]
+  SIMPLY_VERSIONED_EXCLUDE_FIELDS = [:workflow_state, :editing_roles, :notify_of_update]
 
   def touch_wiki_context
     self.wiki.touch_context if self.wiki && self.wiki.context
@@ -55,7 +59,7 @@ class WikiPage < ActiveRecord::Base
 
   def validate_front_page_visibility
     if !published? && self.is_front_page?
-      self.errors.add(:hide_from_students, t(:cannot_hide_page, "cannot hide front page"))
+      self.errors.add(:published, t(:cannot_unpublish_front_page, "cannot unpublish front page"))
     end
   end
 
@@ -66,10 +70,10 @@ class WikiPage < ActiveRecord::Base
     return unless self.wiki
     # TODO i18n (see wiki.rb)
     if self.title == "Front Page" && self.new_record?
-      baddies = self.wiki.wiki_pages.not_deleted.find_all_by_title("Front Page").select{|p| p.url != "front-page" }
+      baddies = self.wiki.wiki_pages.not_deleted.where(title: "Front Page").select{|p| p.url != "front-page" }
       baddies.each{|p| p.title = to_cased_title.call(p.url); p.save_without_broadcasting! }
     end
-    if existing = self.wiki.wiki_pages.not_deleted.find_by_title(self.title)
+    if existing = self.wiki.wiki_pages.not_deleted.where(title: self.title).first
       return if existing == self
       real_title = self.title.gsub(/-(\d*)\z/, '') # remove any "-#" at the end
       n = $1 ? $1.to_i + 1 : 2
@@ -77,35 +81,10 @@ class WikiPage < ActiveRecord::Base
         mod = "-#{n}"
         new_title = real_title[0...(TITLE_LENGTH - mod.length)] + mod
         n = n.succ
-      end while self.wiki.wiki_pages.not_deleted.find_by_title(new_title)
+      end while self.wiki.wiki_pages.not_deleted.where(title: new_title).exists?
 
       self.title = new_title
     end
-  end
-
-  def normalize_hide_from_students
-    workflow_state = self.read_attribute('workflow_state')
-    hide_from_students = self.read_attribute('hide_from_students')
-    if !workflow_state.nil? && !hide_from_students.nil?
-      self.workflow_state = 'unpublished' if hide_from_students && workflow_state == 'active'
-      self.write_attribute('hide_from_students', nil)
-    end
-  end
-  if CANVAS_RAILS2
-    alias_method :after_find, :normalize_hide_from_students
-  else
-    after_find :normalize_hide_from_students
-  end
-  private :normalize_hide_from_students
-
-  def hide_from_students
-    self.workflow_state == 'unpublished'
-  end
-
-  def hide_from_students=(v)
-    self.workflow_state = 'unpublished' if v && self.workflow_state == 'active'
-    self.workflow_state = 'active' if !v && self.workflow_state = 'unpublished'
-    hide_from_students
   end
 
   def self.title_order_by_clause
@@ -190,7 +169,7 @@ class WikiPage < ActiveRecord::Base
   alias_method :published?, :active?
 
   def restore
-    self.workflow_state = context.feature_enabled?(:draft_state) ? 'unpublished' : 'active'
+    self.workflow_state = 'unpublished'
     self.save
   end
 
@@ -201,6 +180,7 @@ class WikiPage < ActiveRecord::Base
     true
   end
 
+  attr_reader :wiki_page_changed
   def notify_of_update=(val)
     @wiki_page_changed = Canvas::Plugin.value_to_boolean(val)
   end
@@ -223,8 +203,8 @@ class WikiPage < ActiveRecord::Base
 
   scope :not_deleted, -> { where("wiki_pages.workflow_state<>'deleted'") }
 
-  scope :published, -> { where("wiki_pages.workflow_state='active' AND (wiki_pages.hide_from_students=? OR wiki_pages.hide_from_students IS NULL)", false) }
-  scope :unpublished, -> { where("wiki_pages.workflow_state='unpublished' OR (wiki_pages.hide_from_students=? AND wiki_pages.workflow_state<>'deleted')", true) }
+  scope :published, -> { where("wiki_pages.workflow_state='active'", false) }
+  scope :unpublished, -> { where("wiki_pages.workflow_state='unpublished'", true) }
 
   # needed for ensure_unique_url
   def not_deleted
@@ -247,30 +227,24 @@ class WikiPage < ActiveRecord::Base
 
   def is_front_page?
     return false if self.deleted?
-    self.url == self.wiki.get_front_page_url # wiki.get_front_page_url checks has_front_page? and context.feature_enabled?(:draft_state)
+    self.url == self.wiki.get_front_page_url # wiki.get_front_page_url checks has_front_page?
   end
 
   def set_as_front_page!
-    can_set_front_page = true
     if self.unpublished?
       self.errors.add(:front_page, t(:cannot_set_unpublished_front_page, 'could not set as front page because it is unpublished'))
-      can_set_front_page = false
+      return false
     end
-    if self.hide_from_students
-      self.errors.add(:front_page, t(:cannot_set_hidden_front_page, 'could not set as front page because it is hidden'))
-      can_set_front_page = false
-    end
-    return false unless can_set_front_page
 
     self.wiki.set_front_page_url!(self.url)
   end
 
   def context_module_tag_for(context)
-    @tag ||= self.context_module_tags.where(context_id: context, context_type: context.class.base_ar_class.name).first
+    @tag ||= self.context_module_tags.where(context_id: context, context_type: context.class.base_class.name).first
   end
 
   def context_module_action(user, context, action)
-    self.context_module_tags.where(context_id: context, context_type: context.class.base_ar_class.name).each do |tag|
+    self.context_module_tags.where(context_id: context, context_type: context.class.base_class.name).each do |tag|
       tag.context_module_action(user, action)
     end
   end
@@ -351,15 +325,15 @@ class WikiPage < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :updated_wiki_page
     p.to { participants }
-    p.whenever do |record|
-      return false unless record.created_at < Time.now - 30.minutes
-      (record.published? && @wiki_page_changed && record.prior_version) || record.changed_state(:active)
+    p.whenever do |wiki_page|
+      BroadcastPolicies::WikiPagePolicy.new(wiki_page).
+        should_dispatch_updated_wiki_page?
     end
   end
 
   def context(user=nil)
     shard.activate do
-      @context ||= Course.find_by_wiki_id(self.wiki_id) || Group.find_by_wiki_id(self.wiki_id)
+      @context ||= Course.where(wiki_id: self.wiki_id).first || Group.where(wiki_id: self.wiki_id).first
     end
   end
 
@@ -384,7 +358,7 @@ class WikiPage < ActiveRecord::Base
       entry.published = self.created_at
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/wiki_pages/#{self.feed_code}_#{self.updated_at.strftime("%Y-%m-%d")}"
       entry.links    << Atom::Link.new(:rel => 'alternate', 
-                                    :href => "http://#{HostUrl.context_host(context)}/#{self.context.class.to_s.downcase.pluralize}/#{self.context.id}/wiki/#{self.url}")
+                                    :href => "http://#{HostUrl.context_host(context)}/#{self.context.class.to_s.downcase.pluralize}/#{self.context.id}/pages/#{self.url}")
       entry.content   = Atom::Content::Html.new(self.body || t('defaults.no_content', "no content"))
     end
   end
@@ -418,10 +392,11 @@ class WikiPage < ActiveRecord::Base
   end
 
   def initialize_wiki_page(user)
-    is_privileged_user = wiki.grants_right?(user, :manage)
-    if is_privileged_user && context.feature_enabled?(:draft_state) && !context.is_a?(Group)
+    if wiki.grants_right?(user, :publish_page)
+      # Leave the page unpublished if the user is allowed to publish it later
       self.workflow_state = 'unpublished'
     else
+      # If they aren't, publish it automatically
       self.workflow_state = 'active'
     end
 
@@ -431,6 +406,16 @@ class WikiPage < ActiveRecord::Base
       self.body = t "#application.wiki_front_page_default_content_course", "Welcome to your new course wiki!" if context.is_a?(Course)
       self.body = t "#application.wiki_front_page_default_content_group", "Welcome to your new group wiki!" if context.is_a?(Group)
       self.workflow_state = 'active'
+    end
+  end
+
+  def post_to_pandapub_when_revised
+    if revised_at_changed?
+      CanvasPandaPub.post_update(
+        "/private/wiki_page/#{self.global_id}/update", {
+          revised_at: self.revised_at,
+          revision: self.versions.current.number
+        })
     end
   end
 end

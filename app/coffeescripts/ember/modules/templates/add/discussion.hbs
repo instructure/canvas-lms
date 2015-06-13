@@ -1,0 +1,24 @@
+{{#ic-modal-title}}{{title}}{{/ic-modal-title}}
+
+<ul>
+  {{#each topic in topics}}
+    <li>
+      <label>
+        <input type="checkbox" {{action "toggleSelected" topic on="change"}}/>
+        {{topic.title}}
+      </label>
+    </li>
+  {{/each}}
+</ul>
+
+<div class="form-controls">
+  <button type="submit" class="btn btn-primary">{{#t "add_topics"}}Add Discussion Topics{{/t}}</button>
+  <ul>
+    {{#each model.selected}}
+      <li>{{title}}</li>
+    {{/each}}
+  </ul>
+</div>
+
+
+

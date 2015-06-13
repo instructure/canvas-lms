@@ -2,16 +2,14 @@
   if (typeof define === 'function' && define.amd) {
     define([
       'ember',
-      './lib/components/ic-lazy-list',
-      './lib/templates'
+      './lib/components/ic-lazy-list'
     ], function(Ember, IcLazyListComponent) {
       return factory(Ember, IcLazyListComponent);
     });
   } else if (typeof exports === 'object') {
     module.exports = factory(
       require('ember'),
-      require('./lib/components/ic-lazy-list'),
-      require('./lib/templates')
+      require('./lib/components/ic-lazy-list')
     );
   } else {
     factory(Ember, ic.LazyListComponent);

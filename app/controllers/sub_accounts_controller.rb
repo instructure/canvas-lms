@@ -88,22 +88,24 @@ class SubAccountsController < ApplicationController
   
   def show
     @sub_account = subaccount_or_self(params[:id])
-    render :json => @sub_account.as_json(:include => [:sub_accounts, :courses], :methods => [:course_count, :sub_account_count])
+    ActiveRecord::Associations::Preloader.new(@sub_account, [{:sub_accounts => [:parent_account, :root_account]}]).run
+    render :json => @sub_account.as_json(:only => [:id, :name], :methods => [:course_count, :sub_account_count],
+                                         :include => [:sub_accounts => {:only => [:id, :name], :methods => [:course_count, :sub_account_count]}])
   end
   
   # @API Create a new sub-account
   # Add a new sub-account to a given account.
   #
-  # @argument account[name] [String]
+  # @argument account[name] [Required, String]
   #   The name of the new sub-account.
   #
-  # @argument account[default_storage_quota_mb] [Optional, Integer]
+  # @argument account[default_storage_quota_mb] [Integer]
   #   The default course storage quota to be used, if not otherwise specified.
   #
-  # @argument account[default_user_storage_quota_mb] [Optional, Integer]
+  # @argument account[default_user_storage_quota_mb] [Integer]
   #   The default user storage quota to be used, if not otherwise specified.
   #
-  # @argument account[default_group_storage_quota_mb] [Optional, Integer]
+  # @argument account[default_group_storage_quota_mb] [Integer]
   #   The default group storage quota to be used, if not otherwise specified.
   #
   # @returns [Account]

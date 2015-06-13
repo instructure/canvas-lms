@@ -31,3 +31,7 @@
   <a id="bad_file_link" class="link" href="<%= @return_url %>?return_type=file&url=<%= CGI.escape("#{HostUrl.protocol}://#{HostUrl.default_host}/images/delete_404.png") %>&text=<%= CGI.escape("delete.png") %>&content_type=<%= CGI.escape("image/png") %>">bad file embed</a>
   <br/>
 <% end %>
+<% if params[:ext_content_intended_use] == 'content_package' %>
+  <a id="file_link" class="link" href="<%= @return_url %>?return_type=file&url=<%= CGI.escape("#{HostUrl.protocol}://#{HostUrl.default_host}/images/delete.png") %>&text=<%= CGI.escape("delete.png") %>">file embed</a>
+  <br/>
+<% end %>

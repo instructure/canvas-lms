@@ -16,7 +16,7 @@ describe GradeSummaryPresenter do
       end
 
       it 'includes courses where the user is enrolled' do
-        presenter.selectable_courses.should include(course)
+        expect(presenter.selectable_courses).to include(course)
       end
     end
 
@@ -35,7 +35,7 @@ describe GradeSummaryPresenter do
         end
 
         presenter = GradeSummaryPresenter.new(course, user, user.id)
-        presenter.selectable_courses.should include(course)
+        expect(presenter.selectable_courses).to include(course)
       end
 
       it 'can find courses when the user and course are on different shards' do
@@ -53,30 +53,36 @@ describe GradeSummaryPresenter do
         end
 
         presenter = GradeSummaryPresenter.new(course, user, user.id)
-        presenter.selectable_courses.should include(course)
+        expect(presenter.selectable_courses).to include(course)
       end
     end
   end
 
   describe '#assignment_stats' do
-    it 'works' do
+    before(:each) do
       teacher_in_course
-      s1, s2, s3 = n_students_in_course(3)
+      @course.disable_feature!(:differentiated_assignments)
+    end
+    it 'works' do
+      s1, s2, s3, s4 = n_students_in_course(4)
       a = @course.assignments.create! points_possible: 10
       a.grade_student s1, grade:  0
       a.grade_student s2, grade:  5
       a.grade_student s3, grade: 10
+
+      # this student should be ignored
+      a.grade_student s4, grade: 99
+      s4.enrollments.each &:destroy
+
       p = GradeSummaryPresenter.new(@course, @teacher, nil)
       stats = p.assignment_stats
       assignment_stats = stats[a.id]
-      assignment_stats.max.to_f.should == 10
-      assignment_stats.min.to_f.should == 0
-      assignment_stats.avg.to_f.should == 5
+      expect(assignment_stats.max.to_f).to eq 10
+      expect(assignment_stats.min.to_f).to eq 0
+      expect(assignment_stats.avg.to_f).to eq 5
     end
 
     it 'filters out test students and inactive enrollments' do
-      @course = Course.create!
-      teacher_in_course({:course => @course})
       s1, s2, s3, removed_student = n_students_in_course(4, {:course => @course})
 
       fake_student = course_with_user('StudentViewEnrollment', {:course => @course}).user
@@ -97,11 +103,28 @@ describe GradeSummaryPresenter do
       p = GradeSummaryPresenter.new(@course, @teacher, nil)
       stats = p.assignment_stats
       assignment_stats = stats[a.id]
-      assignment_stats.max.to_f.should == 10
-      assignment_stats.min.to_f.should == 0
-      assignment_stats.avg.to_f.should == 5
+      expect(assignment_stats.max.to_f).to eq 10
+      expect(assignment_stats.min.to_f).to eq 0
+      expect(assignment_stats.avg.to_f).to eq 5
+    end
+
+    it 'doesnt factor nil grades into the average or min' do
+      s1, s2, s3, s4 = n_students_in_course(4)
+      a = @course.assignments.create! points_possible: 10
+      a.grade_student s1, grade:  2
+      a.grade_student s2, grade:  6
+      a.grade_student s3, grade: 10
+      a.grade_student s4, grade: nil
+
+      p = GradeSummaryPresenter.new(@course, @teacher, nil)
+      stats = p.assignment_stats
+      assignment_stats = stats[a.id]
+      expect(assignment_stats.max.to_f).to eq 10
+      expect(assignment_stats.min.to_f).to eq 2
+      expect(assignment_stats.avg.to_f).to eq 6
     end
   end
+
 
   describe '#submission count' do
     it 'filters out test students and inactive enrollments' do
@@ -125,7 +148,7 @@ describe GradeSummaryPresenter do
       end
 
       p = GradeSummaryPresenter.new(@course, @teacher, nil)
-      p.submission_counts.values[0].should == 3
+      expect(p.submission_counts.values[0]).to eq 3
     end
   end
 
@@ -141,8 +164,8 @@ describe GradeSummaryPresenter do
 
       a2.destroy
 
-      p = GradeSummaryPresenter.new(@course, @teacher, @student)
-      p.submissions.map(&:assignment_id).should == [a1.id]
+      p = GradeSummaryPresenter.new(@course, @teacher, @student.id)
+      expect(p.submissions.map(&:assignment_id)).to eq [a1.id]
     end
 
     it "doesn't error on submissions for assignments not in the pre-loaded assignment list" do
@@ -152,22 +175,21 @@ describe GradeSummaryPresenter do
       assign.grade_student @student, grade: 10
       assign.update_attribute(:submission_types, "not_graded")
 
-      p = GradeSummaryPresenter.new(@course, @teacher, @student)
-      p.submissions.map(&:assignment_id).should == [assign.id]
+      p = GradeSummaryPresenter.new(@course, @teacher, @student.id)
+      expect(p.submissions.map(&:assignment_id)).to eq [assign.id]
     end
   end
 
   describe '#assignments' do
-    it "filters unpublished assignments when draft_state is on" do
+    it "filters unpublished assignments" do
       teacher_in_course
       student_in_course
-      @course.enable_feature!(:draft_state)
       published_assignment = @course.assignments.create!
       unpublished_assign = @course.assignments.create!
       unpublished_assign.update_attribute(:workflow_state, "unpublished")
 
-      p = GradeSummaryPresenter.new(@course, @teacher, @student)
-      p.assignments.should == [published_assignment]
+      p = GradeSummaryPresenter.new(@course, @teacher, @student.id)
+      expect(p.assignments).to eq [published_assignment]
     end
   end
 end

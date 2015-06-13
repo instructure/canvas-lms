@@ -8,23 +8,37 @@ define [
   'jst/registration/studentDialog'
   'jst/registration/parentDialog'
   'compiled/util/addPrivacyLinkToDialog'
+  'str/htmlEscape'
   'compiled/jquery/validate'
   'jquery.instructure_forms'
   'jquery.instructure_date_and_time'
-], ($, _, I18n, preventDefault, registrationErrors, teacherDialog, studentDialog, parentDialog, addPrivacyLinkToDialog) ->
+], ($, _, I18n, preventDefault, registrationErrors, teacherDialog, studentDialog, parentDialog, addPrivacyLinkToDialog, htmlEscape) ->
 
   $nodes = {}
   templates = {teacherDialog, studentDialog, parentDialog}
 
+  # we do this in coffee because of this hbs 1.3 bug:
+  # https://github.com/wycats/handlebars.js/issues/748
+  # https://github.com/fivetanley/i18nliner-handlebars/commit/55be26ff
+  termsHtml = ({terms_of_use_url, privacy_policy_url}) ->
+    I18n.t(
+      "teacher_dialog.agree_to_terms_and_pp"
+      "You agree to the *terms of use* and acknowledge the **privacy policy**."
+      wrappers: [
+        "<a href=\"#{htmlEscape terms_of_use_url}\" target=\"_blank\">$1</a>"
+        "<a href=\"#{htmlEscape privacy_policy_url}\" target=\"_blank\">$1</a>"
+      ]
+    )
+
   signupDialog = (id, title) ->
     return unless templates[id]
     $node = $nodes[id] ?= $('<div />')
-    $node.html templates[id](
+    html = templates[id](
       account: ENV.ACCOUNT.registration_settings
       terms_required: ENV.ACCOUNT.terms_required
-      terms_url: ENV.ACCOUNT.terms_of_use_url
-      privacy_url: ENV.ACCOUNT.privacy_policy_url
+      terms_html: termsHtml(ENV.ACCOUNT)
     )
+    $node.html html
     $node.find('.date-field').datetime_field()
 
     $node.find('.signup_link').click preventDefault ->

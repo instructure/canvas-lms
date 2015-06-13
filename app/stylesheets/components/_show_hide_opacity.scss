@@ -1,0 +1,51 @@
+//  example markup:
+//  <div class="hover-container">
+//    these links will be invisible (half transparent if on a touch device),
+//    half-transparent when you hover the container, and opaque when hovered.
+//    <span>
+//      <a class="hide-till-hover"><i class="icon-edit standalone-icon"></a>
+//      <a class="hide-till-hover"><i class="icon-delete standalone-icon"></a>
+//    <span>
+//  </div>
+
+@if $use_high_contrast { $dimmedOpacity: 0.9; }
+@else { $dimmedOpacity: 0.6; }
+
+.hide-till-hover {
+  opacity: 0;
+
+  .touch &,
+  .hover-container:hover &,
+  .hover-container:focus & {
+    opacity: $dimmedOpacity;
+  }
+
+  &:focus, &:hover {
+    opacity: 1 !important; // the !important part is to win specificity with the rule above this
+  }
+}
+
+
+
+//  Example markup:
+//  <a class="dim-till-hover">
+//    this will be 50% transparent until hovered over, regardless of .touch or .no-touch
+//  </a>
+.dim-till-hover {
+  opacity: $dimmedOpacity;
+  &:hover, &:focus { opacity: 1 }
+}
+
+
+// Completely hide, but make available to screenreader so it can read it.
+.screenreader-only {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+  transform: translatez(0);
+}

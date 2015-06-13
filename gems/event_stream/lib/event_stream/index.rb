@@ -89,7 +89,7 @@ class EventStream::Index
   end
 
   def select_cql
-    "SELECT ordered_id, #{id_column} FROM #{table} %CONSISTENCY% WHERE #{key_column} = ?"
+    "SELECT ordered_id, #{id_column}, #{key_column} FROM #{table} %CONSISTENCY% WHERE #{key_column} = ?"
   end
 
   def insert_cql
@@ -159,7 +159,12 @@ class EventStream::Index
 
     # now that the bookmark's been set, convert the ids to rows from the
     # related event stream, preserving the order
-    ids = pager.map { |row| row[id_column] }
+    # ids = pager.map { |row| row[id_column] }
+
+    # Temporarily run the data fixup on the ids to clean them.  We can remove
+    # this once the data fixup has completed for all indexes.
+    ids = EventStream.get_index_ids(self, pager)
+
     events = event_stream.fetch(ids)
     pager.replace events.sort_by { |event| ids.index(event.id) }
   end

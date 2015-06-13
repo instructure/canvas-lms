@@ -7,7 +7,6 @@ class Quizzes::QuizStatistics::Report
     :quiz,
     :includes_all_versions?,
     :anonymous?,
-    :start_progress,
     :update_progress,
     :t
 

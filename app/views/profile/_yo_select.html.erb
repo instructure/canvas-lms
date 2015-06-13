@@ -1,0 +1,6 @@
+<select class="yo_select contact_select" name="channel_id" style="display: none;">
+  <% yo = @current_user.communication_channels.unretired.where(path_type: 'yo').first %>
+  <% if yo && feature_and_service_enabled?(:yo) %>
+    <option class="channel_option_<%= yo.id %>" value="<%= yo.id %>" selected><%= t(:yo, "Yo") %></option>
+  <% end %>
+</select>

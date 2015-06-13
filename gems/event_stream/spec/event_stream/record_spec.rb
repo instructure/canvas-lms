@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
+require 'securerandom'
+
 describe EventStream::Failure do
   describe "Record" do
     class EventRecord < ::EventStream::Record
@@ -26,12 +28,17 @@ describe EventStream::Failure do
     end
 
     before do
-      @request_id = CanvasUUID.generate
+      @request_id = SecureRandom.uuid
       @event = EventRecord.new(
         'attribute1' => 'value1',
         'attribute2' => 'value2',
         'request_id' => @request_id
       )
+    end
+
+    it "responds to as_json with attributes" do
+      hash = @event.as_json
+      expect(hash.keys).to include(*%w[attribute1 attribute2 request_id])
     end
 
     it "sets default values" do
@@ -43,9 +50,9 @@ describe EventStream::Failure do
 
     it "allows overrided default values" do
       attributes = {
-        'id' => CanvasUUID.generate,
+        'id' => SecureRandom.uuid,
         'event_type' => 'other_type',
-        'request_id' => CanvasUUID.generate,
+        'request_id' => SecureRandom.uuid,
         'created_at' => Time.zone.now
       }
       event = EventRecord.new(attributes)
@@ -68,7 +75,7 @@ describe EventStream::Failure do
       request_id = 42
 
       attributes = {
-        'id' => CanvasUUID.generate,
+        'id' => SecureRandom.uuid,
         'event_type' => 'other_type',
         'request_id' => request_id,
         'created_at' => Time.zone.now

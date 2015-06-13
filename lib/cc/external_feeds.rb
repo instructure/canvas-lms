@@ -35,12 +35,11 @@ module CC
               "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
       ) do |feeds_node|
         @course.external_feeds.each do |feed|
+          next unless export_object?(feed)
           migration_id = CCHelper.create_key(feed)
           feeds_node.externalFeed(:identifier=>migration_id) do |feed_node|
             feed_node.title feed.title if feed.title
             feed_node.url feed.url
-            feed_node.feed_type feed.feed_type
-            feed_node.purpose feed.feed_purpose
             feed_node.verbosity feed.verbosity
             feed_node.header_match feed.header_match unless feed.header_match.blank?
           end

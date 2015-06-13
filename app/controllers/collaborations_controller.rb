@@ -55,17 +55,41 @@ class CollaborationsController < ApplicationController
   before_filter :require_collaborations_configured
   before_filter :reject_student_view_student
 
+  before_filter { |c| c.active_tab = "collaborations" }
+
   include Api::V1::Collaborator
 
   def index
     return unless authorized_action(@context, @current_user, :read) &&
       tab_enabled?(@context.class::TAB_COLLABORATIONS)
 
-    @collaborations = @context.collaborations.active
-    log_asset_access("collaborations:#{@context.asset_string}", "collaborations", "other")
+    add_crumb(t('#crumbs.collaborations', "Collaborations"), polymorphic_path([@context, :collaborations]))
 
-    @google_docs_authorized = google_docs_connection.verify_access_token rescue false
+    @collaborations = @context.collaborations.active
+    log_asset_access([ "collaborations", @context ], "collaborations", "other")
+
+    safe_token_valid = lambda do |service|
+      begin
+        self.send(service).verify_access_token
+      rescue => e
+        Canvas::Errors.capture(e, { source: 'rescue nil' })
+        false
+      end
+    end
+
+    @google_drive_upgrade = logged_in_user && Canvas::Plugin.find(:google_drive).try(:settings) &&
+      (!logged_in_user.user_services.where(service: 'google_drive').first ||
+      !safe_token_valid.call(:google_drive_connection))
+
+    @google_docs_authorized = !@google_drive_upgrade && safe_token_valid.call(:google_service_connection)
+
+    @sunsetting_etherpad = EtherpadCollaboration.config.try(:[], :domain) == "etherpad.instructure.com/p"
+    @has_etherpad_collaborations = @collaborations.any? {|c| c.collaboration_type == 'EtherPad'}
+    @etherpad_only = Collaboration.collaboration_types.length == 1 &&
+                     Collaboration.collaboration_types[0]['type'] == "etherpad"
+    @hide_create_ui = @sunsetting_etherpad && @etherpad_only
     js_env :TITLE_MAX_LEN => Collaboration::TITLE_MAX_LENGTH,
+           :CAN_MANAGE_GROUPS => @context.grants_right?(@current_user, session, :manage_groups),
            :collaboration_types => Collaboration.collaboration_types
   end
 
@@ -73,15 +97,19 @@ class CollaborationsController < ApplicationController
     @collaboration = @context.collaborations.find(params[:id])
     if authorized_action(@collaboration, @current_user, :read)
       @collaboration.touch
-      if @collaboration.valid_user?(@current_user)
-        @collaboration.authorize_user(@current_user)
-        log_asset_access(@collaboration, "collaborations", "other", 'participate')
-        redirect_to @collaboration.url
-      elsif @collaboration.is_a?(GoogleDocsCollaboration)
-        redirect_to oauth_url(:service => :google_docs, :return_to => request.url)
-      else
-        flash[:error] = t 'errors.cannot_load_collaboration', "Cannot load collaboration"
-        redirect_to named_context_url(@context, :context_collaborations_url)
+      begin
+        if @collaboration.valid_user?(@current_user)
+          @collaboration.authorize_user(@current_user)
+          log_asset_access(@collaboration, "collaborations", "other", 'participate')
+          redirect_to @collaboration.url
+        elsif @collaboration.is_a?(GoogleDocsCollaboration)
+          redirect_to oauth_url(:service => :google_docs, :return_to => request.url)
+        else
+          flash[:error] = t 'errors.cannot_load_collaboration', "Cannot load collaboration"
+          redirect_to named_context_url(@context, :context_collaborations_url)
+        end
+      rescue GoogleDocs::DriveConnectionException => drive_exception
+        Canvas::Errors.capture(drive_exception)
       end
     end
   end
@@ -131,7 +159,7 @@ class CollaborationsController < ApplicationController
   def destroy
     @collaboration = @context.collaborations.find(params[:id])
     if authorized_action(@collaboration, @current_user, :delete)
-      @collaboration.delete_document if params[:delete_doc]
+      @collaboration.delete_document if value_to_boolean(params[:delete_doc])
       @collaboration.destroy
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :collaborations_url) }
@@ -142,7 +170,9 @@ class CollaborationsController < ApplicationController
 
   # @API List members of a collaboration.
   #
-  # Examples
+  # List the collaborators of a given collaboration
+  #
+  # @example_request
   #
   #   curl https://<canvas>/api/v1/courses/1/collaborations/1/members
   #
@@ -174,5 +204,5 @@ class CollaborationsController < ApplicationController
       return false
     end
   end
-end
 
+end

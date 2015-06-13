@@ -27,8 +27,8 @@ describe 'appointment_reserved_for_user.summary' do
     generate_message(:appointment_reserved_for_user, :summary, @event,
                      :data => {:updating_user => @teacher})
 
-    @message.subject.should include('some title')
-    @message.body.should include('some title')
-    @message.body.should include(@teacher.name)
+    expect(@message.subject).to include('some title')
+    expect(@message.body).to include('some title')
+    expect(@message.body).to include(@teacher.name)
   end
 end

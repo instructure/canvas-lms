@@ -1,0 +1,17 @@
+{{render "addItem" this}}
+
+<div class="footer">
+  <div class="progression_container">
+    {{#if locked}}
+      <div>will unlock <span class="unlock_at">{{format-date unlock_at}}</span></div>
+    {{/if}}
+  </div>
+
+  <div class="prerequisites_footer" style="display: none;">
+    <div class="prerequisites_message" style="float: left;">
+      Prerequisites: 
+    </div>
+    <div class="prerequisites"></div>
+  </div>
+</div>
+

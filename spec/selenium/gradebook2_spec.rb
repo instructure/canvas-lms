@@ -3,48 +3,106 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 describe "gradebook2" do
   include_examples "in-process server selenium tests"
 
-  ASSIGNMENT_1_POINTS = "10"
-  ASSIGNMENT_2_POINTS = "5"
-  ASSIGNMENT_3_POINTS = "50"
-  ATTENDANCE_POINTS = "15"
-
-  STUDENT_NAME_1 = "student 1"
-  STUDENT_NAME_2 = "student 2"
-  STUDENT_NAME_3 = "student 3"
-  STUDENT_SORTABLE_NAME_1 = "1, student"
-  STUDENT_SORTABLE_NAME_2 = "2, student"
-  STUDENT_SORTABLE_NAME_3 = "3, student"
-  STUDENT_1_TOTAL_IGNORING_UNGRADED = "100%"
-  STUDENT_2_TOTAL_IGNORING_UNGRADED = "66.7%"
-  STUDENT_3_TOTAL_IGNORING_UNGRADED = "66.7%"
-  STUDENT_1_TOTAL_TREATING_UNGRADED_AS_ZEROS = "18.8%"
-  STUDENT_2_TOTAL_TREATING_UNGRADED_AS_ZEROS = "12.5%"
-  STUDENT_3_TOTAL_TREATING_UNGRADED_AS_ZEROS = "12.5%"
-  DEFAULT_PASSWORD = "qwerty"
-
-  context "as a teacher" do
-    before(:each) do
-      data_setup
+  describe "multiple grading periods" do
+    let!(:enable_mgp_and_navigate_to_gradebook) do
+      course_with_admin_logged_in
+      student_in_course
+      @course.root_account.enable_feature!(:multiple_grading_periods)
+      group = @course.root_account.grading_period_groups.create
+      group.grading_periods.create  start_date: 4.months.ago,
+                                    end_date:   2.months.ago,
+                                    title: "Period in the Past"
+      group.grading_periods.create  start_date: 1.month.ago,
+                                    end_date:   2.months.from_now,
+                                    title: "Current Period"
     end
 
+    let(:select_period_in_the_past) do
+      f(".grading-period-select-button").click
+      f("#ui-id-4").click # The id of the Period in the Past
+    end
+
+    let(:sign_in_as_a_teacher) do
+      teacher_in_course
+      user_session(@teacher)
+    end
+
+    let(:uneditable_cells) { f('.cannot_edit') }
+    let(:gradebook_header) { f('#gradebook_grid .container_1 .slick-header') }
+
+    it "should load gradebook when no grading periods have been created" do
+      get "/courses/#{@course.id}/gradebook2"
+      expect(f('#gradebook-grid-wrapper')).to be_displayed
+    end
+
+    context "assignments in past grading periods" do
+      let!(:assignment_in_the_past) do
+        @course.assignments.create! due_at: 3.months.ago,
+                                    title: "past-due assignment"
+      end
+
+      it "admins should be able to edit" do
+        get "/courses/#{@course.id}/gradebook2"
+
+        select_period_in_the_past
+        expect(gradebook_header).to include_text("past-due assignment")
+        expect(uneditable_cells).to_not be_present
+      end
+
+      it "teachers should not be able to edit" do
+        sign_in_as_a_teacher
+
+        get "/courses/#{@course.id}/gradebook2"
+
+        select_period_in_the_past
+        expect(gradebook_header).to include_text("past-due assignment")
+        expect(uneditable_cells).to be_present
+      end
+    end
+
+    context "assignments with no due_at" do
+      let!(:assignment_without_due_at) do
+        @course.assignments.create! title: "No Due Date"
+      end
+
+      it "admins should be able to edit" do
+        get "/courses/#{@course.id}/gradebook2"
+
+        expect(gradebook_header).to include_text("No Due Date")
+        expect(uneditable_cells).to_not be_present
+      end
+
+      it "teachers should be able to edit" do
+        sign_in_as_a_teacher
+
+        get "/courses/#{@course.id}/gradebook2"
+
+        expect(gradebook_header).to include_text("No Due Date")
+        expect(uneditable_cells).to_not be_present
+      end
+    end
+  end
+
+  context "as a teacher" do
+    let!(:setup) { gradebook_data_setup }
+
     it "hides unpublished/shows published assignments" do
-      @course.root_account.enable_feature!(:draft_state)
       assignment = @course.assignments.create! title: 'unpublished'
       assignment.unpublish
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
-      f('#gradebook_grid .container_1 .slick-header').should_not include_text(assignment.title)
+      expect(f('#gradebook_grid .container_1 .slick-header')).not_to include_text(assignment.title)
 
       @first_assignment.publish
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
-      f('#gradebook_grid .container_1 .slick-header').should include_text(@first_assignment.title)
+      expect(f('#gradebook_grid .container_1 .slick-header')).to include_text(@first_assignment.title)
     end
 
     it "should not show 'not-graded' assignments" do
       get "/courses/#{@course.id}/gradebook2"
 
-      f('.slick-header-columns').should_not include_text(@ungraded_assignment.title)
+      expect(f('.slick-header-columns')).not_to include_text(@ungraded_assignment.title)
     end
 
     def filter_student(text)
@@ -58,83 +116,75 @@ describe "gradebook2" do
 
     it 'should filter students' do
       get "/courses/#{@course.id}/gradebook2"
-      get_visible_students.length.should == @all_students.size
+      expect(get_visible_students.length).to eq @all_students.size
       filter_student 'student 1'
       visible_students = get_visible_students
-      visible_students.length.should == 1
-      visible_students[0].text.should == 'student 1'
-    end
-
-    it "should link to a students grades page" do
-      get "/courses/#{@course.id}/gradebook2"
-      els = ff('.student-name')
-      links = els.map { |e| URI.parse(e.find_element(:css, 'a').attribute('href')).path }
-      expected_links = @all_students.map { |s| "/courses/#{@course.id}/grades/#{s.id}" }
-      links.should == expected_links
+      expect(visible_students.length).to eq 1
+      expect(visible_students[0].text).to eq 'student 1'
     end
 
     it "should not show not-graded assignments" do
-      f('#gradebook_grid .slick-header').should_not include_text(@ungraded_assignment.title)
+      expect(f('#gradebook_grid .slick-header')).not_to include_text(@ungraded_assignment.title)
     end
 
     it "should validate correct number of students showing up in gradebook" do
       get "/courses/#{@course.id}/gradebook2"
 
-      ff('.student-name').count.should == @course.students.count
+      expect(ff('.student-name').count).to eq @course.students.count
     end
 
     it "should not show concluded enrollments in active courses by default" do
-      @student_1.enrollments.find_by_course_id(@course.id).conclude
+      @student_1.enrollments.where(course_id: @course).first.conclude
 
-      @course.students.count.should == @all_students.size - 1
-      @course.all_students.count.should == @all_students.size
+      expect(@course.students.count).to eq @all_students.size - 1
+      expect(@course.all_students.count).to eq @all_students.size
 
       get "/courses/#{@course.id}/gradebook2"
 
-      ff('.student-name').count.should == @course.students.count
+      expect(ff('.student-name').count).to eq @course.students.count
 
       # select the option and we'll now show concluded
       expect_new_page_load { open_gradebook_settings(f('label[for="show_concluded_enrollments"]')) }
       wait_for_ajaximations
 
-      driver.find_elements(:css, '.student-name').count.should == @course.all_students.count
+      expect(driver.find_elements(:css, '.student-name').count).to eq @course.all_students.count
     end
 
     it "should show concluded enrollments in concluded courses by default" do
       @course.complete!
 
-      @course.students.count.should == 0
-      @course.all_students.count.should == @all_students.size
+      expect(@course.students.count).to eq 0
+      expect(@course.all_students.count).to eq @all_students.size
 
       get "/courses/#{@course.id}/gradebook2"
-      driver.find_elements(:css, '.student-name').count.should == @course.all_students.count
+      expect(driver.find_elements(:css, '.student-name').count).to eq @course.all_students.count
 
       # the checkbox should fire an alert rather than changing to not showing concluded
       expect_fired_alert { open_gradebook_settings(f('label[for="show_concluded_enrollments"]')) }
-      driver.find_elements(:css, '.student-name').count.should == @course.all_students.count
+      expect(driver.find_elements(:css, '.student-name').count).to eq @course.all_students.count
     end
 
     it "should show students sorted by their sortable_name" do
       get "/courses/#{@course.id}/gradebook2"
       dom_names = ff('.student-name').map(&:text)
-      dom_names.should == @all_students.map(&:name)
+      expect(dom_names).to eq @all_students.map(&:name)
     end
 
     it "should not show student avatars until they are enabled" do
       get "/courses/#{@course.id}/gradebook2"
 
-      ff('.student-name').length.should == @all_students.size
-      ff('.avatar img').length.should == 0
+      expect(ff('.student-name').length).to eq @all_students.size
+      expect(ff('.avatar img').length).to eq 0
 
       @account = Account.default
       @account.enable_service(:avatars)
       @account.save!
-      @account.service_enabled?(:avatars).should be_true
+      expect(@account.service_enabled?(:avatars)).to be_truthy
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
 
-      ff('.student-name').length.should == @all_students.size
-      ff('.avatar').length.should == @all_students.size
+      expect(ff('.student-name').length).to eq @all_students.size
+      expect(ff('.avatar').length).to eq @all_students.size
     end
 
 
@@ -152,25 +202,25 @@ describe "gradebook2" do
       end
 
       choose_section.call "All Sections"
-      fj('.section-select-button:visible').should include_text("All Sections")
+      expect(fj('.section-select-button:visible')).to include_text("All Sections")
 
       choose_section.call @other_section.name
-      fj('.section-select-button:visible').should include_text(@other_section.name)
+      expect(fj('.section-select-button:visible')).to include_text(@other_section.name)
 
       validate_cell_text(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2'), '1')
 
       # verify that it remembers the section to show across page loads
       get "/courses/#{@course.id}/gradebook2"
-      fj('.section-select-button:visible').should include_text @other_section.name
+      expect(fj('.section-select-button:visible')).to include_text @other_section.name
       validate_cell_text(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2'), '1')
 
       # now verify that you can set it back
 
       fj('.section-select-button:visible').click
       wait_for_ajaximations
-      keep_trying_until { fj('.section-select-menu:visible').should be_displayed }
+      keep_trying_until { expect(fj('.section-select-menu:visible')).to be_displayed }
       fj("label[for='section_option_#{''}']").click
-      keep_trying_until { fj('.section-select-button:visible').should include_text "All Sections" }
+      keep_trying_until { expect(fj('.section-select-button:visible')).to include_text "All Sections" }
 
       # validate all grades (i.e. submissions) were loaded
       validate_cell_text(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2'), '0')
@@ -180,20 +230,33 @@ describe "gradebook2" do
 
     it "should handle muting/unmuting correctly" do
       get "/courses/#{@course.id}/gradebook2"
-
       toggle_muting(@second_assignment)
-      fj(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted").should be_displayed
-      @second_assignment.reload.should be_muted
+      expect(fj(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted")).to be_displayed
+      expect(@second_assignment.reload).to be_muted
 
       # reload the page and make sure it remembered the setting
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
-      fj(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted").should be_displayed
+      expect(fj(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted")).to be_displayed
 
       # make sure you can un-mute
       toggle_muting(@second_assignment)
-      fj(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted").should be_nil
-      @second_assignment.reload.should_not be_muted
+      expect(fj(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted")).to be_nil
+      expect(@second_assignment.reload).not_to be_muted
+    end
+
+    context "unpublished course" do
+      before do
+        @course.claim!
+        get "/courses/#{@course.id}/gradebook2"
+      end
+
+      it "should allow editing grades" do
+        cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
+        expect(f('.gradebook-cell', cell).text).to eq '10'
+        cell.click
+        expect(ff('.grade', cell)).to_not be_blank
+      end
     end
 
     context "concluded course" do
@@ -204,15 +267,15 @@ describe "gradebook2" do
 
       it "should not allow editing grades" do
         cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
-        cell.text.should == '10'
+        expect(f('.gradebook-cell', cell).text).to eq '10'
         cell.click
-        ff('.grade', cell).should be_blank
+        expect(ff('.grade', cell)).to be_blank
       end
 
       it "should hide mutable actions from the menu" do
         open_gradebook_settings do |menu|
-          ff("a.gradebook_upload_link", menu).should be_blank
-          ff("a.set_group_weights", menu).should be_blank
+          expect(ff("a.gradebook_upload_link", menu)).to be_blank
+          expect(ff("a.set_group_weights", menu)).to be_blank
         end
       end
     end
@@ -239,14 +302,14 @@ describe "gradebook2" do
       wait_for_ajaximations
 
       comment = open_comment_dialog.find_element(:css, '.comment')
-      comment.should include_text(comment_text)
+      expect(comment).to include_text(comment_text)
     end
 
     it "should let you post a group comment to a group assignment" do
       group_assignment = @course.assignments.create!({
                                                          :title => 'group assignment',
                                                          :due_at => (Time.now + 1.week),
-                                                         :points_possible => ASSIGNMENT_3_POINTS,
+                                                         :points_possible => @assignment_3_points,
                                                          :submission_types => 'online_text_entry',
                                                          :assignment_group => @group,
                                                          :group_category => GroupCategory.create!(:name => "groups", :context => @course),
@@ -271,7 +334,7 @@ describe "gradebook2" do
         open_comment_dialog(3, 1)
         fj(".submission_details_dialog:visible .comment")
       end
-      comment.should include_text(comment_text)
+      expect(comment).to include_text(comment_text)
     end
 
     it "should validate assignment details" do
@@ -283,13 +346,13 @@ describe "gradebook2" do
       f('[data-action="showAssignmentDetails"]').click
       wait_for_ajaximations
       details_dialog = f('#assignment-details-dialog')
-      details_dialog.should be_displayed
+      expect(details_dialog).to be_displayed
       table_rows = ff('#assignment-details-dialog-stats-table tr')
-      table_rows[3].find_element(:css, 'td').text.should == submissions_count
+      expect(table_rows[3].find_element(:css, 'td').text).to eq submissions_count
     end
 
     it "should not throw an error when setting the default grade when concluded enrollments exist" do
-      pending("bug 7413 - Error assigning default grade for all students when one student's enrollment has been concluded.")
+      skip("bug 7413 - Error assigning default grade for all students when one student's enrollment has been concluded.")
       conclude_and_unconclude_course
       3.times { student_in_course }
 
@@ -303,7 +366,7 @@ describe "gradebook2" do
       grade_grid = f('#gradebook_grid')
       @course.student_enrollments.each_with_index do |e, n|
         next if e.completed?
-        find_slick_cells(n, grade_grid)[2].text.should == 5
+        expect(find_slick_cells(n, grade_grid)[2].text).to eq 5
       end
     end
 
@@ -376,13 +439,13 @@ describe "gradebook2" do
         # expect dialog to show 1 more student with the "Haven't been graded" option
         f('[data-action="messageStudentsWho"]').click
         visible_students = ffj('.student_list li:visible')
-        visible_students.size.should == 1
-        visible_students[0].text.strip.should == STUDENT_NAME_3
+        expect(visible_students.size).to eq 1
+        expect(visible_students[0].text.strip).to eq @student_name_3
         click_option('#message_assignment_recipients .message_types', "Haven't been graded")
         visible_students = ffj('.student_list li:visible')
-        visible_students.size.should == 2
-        visible_students[0].text.strip.should == STUDENT_NAME_2
-        visible_students[1].text.strip.should == STUDENT_NAME_3
+        expect(visible_students.size).to eq 2
+        expect(visible_students[0].text.strip).to eq @student_name_2
+        expect(visible_students[1].text.strip).to eq @student_name_3
       end
 
       it "should create separate conversations" do
@@ -409,44 +472,47 @@ describe "gradebook2" do
       wait_for_ajaximations
 
       meta_cells = find_slick_cells(0, f('.grid-canvas'))
-      meta_cells[0].should include_text @course.default_section.display_name
-      meta_cells[0].should include_text @other_section.display_name
+      expect(meta_cells[0]).to include_text @course.default_section.display_name
+      expect(meta_cells[0]).to include_text @other_section.display_name
 
       switch_to_section(@course.default_section)
       meta_cells = find_slick_cells(0, f('.grid-canvas'))
-      meta_cells[0].should include_text STUDENT_NAME_1
+      expect(meta_cells[0]).to include_text @student_name_1
 
       switch_to_section(@other_section)
       meta_cells = find_slick_cells(0, f('.grid-canvas'))
-      meta_cells[0].should include_text STUDENT_NAME_1
+      expect(meta_cells[0]).to include_text @student_name_1
     end
 
     it "should display for users with only :view_all_grades permissions" do
       user_logged_in
-      RoleOverride.create!(:enrollment_type => 'CustomAdmin',
+
+      role = custom_account_role('CustomAdmin', :account => Account.default)
+      RoleOverride.create!(:role => role,
                            :permission => 'view_all_grades',
                            :context => Account.default,
                            :enabled => true)
       AccountUser.create!(:user => @user,
                           :account => Account.default,
-                          :membership_type => 'CustomAdmin')
+                          :role => role)
 
       get "/courses/#{@course.id}/gradebook2"
-      flash_message_present?(:error).should be_false
+      expect(flash_message_present?(:error)).to be_falsey
     end
 
     it "should display for users with only :manage_grades permissions" do
       user_logged_in
-      RoleOverride.create!(:enrollment_type => 'CustomAdmin',
+      role = custom_account_role('CustomAdmin', :account => Account.default)
+      RoleOverride.create!(:role => role,
                            :permission => 'manage_grades',
                            :context => Account.default,
                            :enabled => true)
       AccountUser.create!(:user => @user,
                           :account => Account.default,
-                          :membership_type => 'CustomAdmin')
+                          :role => role)
 
       get "/courses/#{@course.id}/gradebook2"
-      flash_message_present?(:error).should be_false
+      expect(flash_message_present?(:error)).to be_falsey
     end
 
     it "should include student view student for grading" do
@@ -459,11 +525,11 @@ describe "gradebook2" do
       get "/courses/#{@course.id}/gradebook2"
 
       fakes = [@fake_student1.name, @fake_student2.name]
-      ff('.student-name').last(2).map(&:text).should == fakes
+      expect(ff('.student-name').last(2).map(&:text)).to eq fakes
 
       # test students should always be last
       f('.slick-header-column').click
-      ff('.student-name').last(2).map(&:text).should == fakes
+      expect(ff('.student-name').last(2).map(&:text)).to eq fakes
     end
 
     it "should not include non-graded group assignment in group total" do
@@ -496,8 +562,8 @@ describe "gradebook2" do
 
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
-      f('#gradebook_grid .container_1 .slick-row:nth-child(1) .assignment-group-cell .percentage').should include_text('100%') # otherwise 108%
-      f('#gradebook_grid .container_1 .slick-row:nth-child(1) .total-cell .percentage').should include_text('100%') # otherwise 108%
+      expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .assignment-group-cell .percentage')).to include_text('100%') # otherwise 108%
+      expect(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .total-cell .percentage')).to include_text('100%') # otherwise 108%
     end
 
     it "should hide and show student names" do
@@ -506,7 +572,7 @@ describe "gradebook2" do
         keep_trying_until do
           f('#gradebook_settings').click
           student_toggle = f('.student_names_toggle')
-          student_toggle.should be_displayed
+          expect(student_toggle).to be_displayed
           student_toggle.click
           true
         end
@@ -516,12 +582,12 @@ describe "gradebook2" do
       wait_for_ajaximations
 
       toggle_hiding_students
-      fj('.student-name:visible').should be_nil
-      ffj('.student-placeholder:visible').length.should be > 0
+      expect(fj('.student-name:visible')).to be_nil
+      expect(ffj('.student-placeholder:visible').length).to be > 0
 
       toggle_hiding_students
-      ffj('.student-name:visible').length.should be > 0
-      fj('.student-placeholder:visible').should be_nil
+      expect(ffj('.student-name:visible').length).to be > 0
+      expect(fj('.student-placeholder:visible')).to be_nil
     end
 
     context "turnitin" do
@@ -535,7 +601,7 @@ describe "gradebook2" do
         get "/courses/#{@course.id}/gradebook2"
         wait_for_ajaximations
         icons = ffj('.gradebook-cell-turnitin')
-        icons.size.should == 2
+        expect(icons.size).to eq 2
 
         # make sure it appears in each submission dialog
         icons.each do |icon|
@@ -543,7 +609,7 @@ describe "gradebook2" do
 
           keep_trying_until do
             driver.action.move_to(f('#gradebook_settings')).move_to(cell).perform
-            cell.find_element(:css, "a").should be_displayed
+            expect(cell.find_element(:css, "a")).to be_displayed
           end
           cell.find_element(:css, "a").click
           wait_for_ajaximations
@@ -589,19 +655,19 @@ describe "gradebook2" do
         end
 
         # Then I should see a message indicating the file was processed
-        f('#content h3').should include_text 'Attached files to the following user submissions'
+        expect(f('#content h3')).to include_text 'Attached files to the following user submissions'
       end
     end
 
     it "should show late submissions" do
       get "/courses/#{@course.id}/gradebook2"
-      ff('.late').count.should == 0
+      expect(ff('.late').count).to eq 0
 
       @student_3_submission.write_attribute(:cached_due_date, 1.week.ago)
       @student_3_submission.save!
       get "/courses/#{@course.id}/gradebook2"
-      wait_for_ajaximations
-      ff('.late').count.should == 1
+
+      keep_trying_until { expect(ffj('.late').count).to eq 1 }
     end
 
     it "should not display a speedgrader link for large courses" do
@@ -610,7 +676,7 @@ describe "gradebook2" do
       get "/courses/#{@course.id}/gradebook2"
 
       f('.gradebook-header-drop').click
-      f('.gradebook-header-menu').text.should_not match(/SpeedGrader/)
+      expect(f('.gradebook-header-menu').text).not_to match(/SpeedGrader/)
     end
 
     context "multiple api-pages of students" do
@@ -624,8 +690,8 @@ describe "gradebook2" do
         get "/courses/#{@course.id}/gradebook2"
         wait_for_ajaximations
         filter_student(n)
-        ff('.student-name').size.should == 1
-        f('.student-name').text.should == "student #{n}"
+        expect(ff('.student-name').size).to eq 1
+        expect(f('.student-name').text).to eq "student #{n}"
       end
 
       it "should work for 2 pages" do
@@ -639,7 +705,7 @@ describe "gradebook2" do
 
     describe "Total points toggle" do
       def should_show_percentages
-        ff(".total-column").each { |total| total.text.should =~ /%/ }
+        ff(".total-column").each { |total| expect(total.text).to match /%/ }
       end
 
       def open_display_dialog
@@ -661,7 +727,7 @@ describe "gradebook2" do
         get "/courses/#{@course.id}/gradebook2"
         open_display_dialog
         dialog = fj('.ui-dialog:visible')
-        dialog.text.should =~ /Warning/
+        expect(dialog.text).to match /Warning/
       end
 
       it 'should allow toggling display by points or percent' do
@@ -672,7 +738,7 @@ describe "gradebook2" do
 
         expected_points = 15, 10, 10
         ff(".total-column").each { |total|
-          total.text.should =~ /\A#{expected_points.shift}$/
+          expect(total.text).to match /\A#{expected_points.shift}$/
         }
 
         toggle_grade_display
@@ -688,7 +754,7 @@ describe "gradebook2" do
 
         open_display_dialog
         dialog = fj('.ui-dialog:visible')
-        dialog.should equal nil
+        expect(dialog).to equal nil
       end
     end
 
@@ -715,11 +781,11 @@ describe "gradebook2" do
         get "/courses/#{@course.id}/gradebook2"
         wait_for_ajaximations
 
-        header_text(3).should == col.title
-        header_text(4).should_not == hidden.title
-        ff(".slick-cell.custom_column").select { |c|
+        expect(header_text(3)).to eq col.title
+        expect(header_text(4)).not_to eq hidden.title
+        expect(ff(".slick-cell.custom_column").select { |c|
           c.text == "123456"
-        }.size.should == 1
+        }.size).to eq 1
       end
 
       it "lets you show and hide the teacher notes column" do
@@ -730,7 +796,7 @@ describe "gradebook2" do
             h.text == "Notes"
           }
         }
-        has_notes_column.call.should be_false
+        expect(has_notes_column.call).to be_falsey
 
         dropdown_link = f("#gradebook_settings")
         click_dropdown_option = lambda { |option|
@@ -745,15 +811,54 @@ describe "gradebook2" do
 
         # create the column
         show_notes.call
-        has_notes_column.call.should be_true
+        expect(has_notes_column.call).to be_truthy
 
         # hide the column
         hide_notes.call
-        has_notes_column.call.should be_false
+        expect(has_notes_column.call).to be_falsey
 
         # un-hide the column
         show_notes.call
-        has_notes_column.call.should be_true
+        expect(has_notes_column.call).to be_truthy
+      end
+    end
+
+    context "differentiated assignments" do
+      before :each do
+        @course.enable_feature!(:differentiated_assignments)
+        @da_assignment = assignment_model({
+          :course => @course,
+          :name => 'DA assignment',
+          :points_possible => @assignment_1_points,
+          :submission_types => 'online_text_entry',
+          :assignment_group => @group,
+          :only_visible_to_overrides => true
+        })
+        @override = create_section_override_for_assignment(@da_assignment, course_section: @other_section)
+      end
+
+      it "should gray out cells" do
+        get "/courses/#{@course.id}/gradebook"
+        #student 3, assignment 4
+        selector = '#gradebook_grid .container_1 .slick-row:nth-child(3) .l5'
+        cell = f(selector)
+        expect(cell.find_element(:css, '.gradebook-cell')).to have_class('grayed-out')
+        cell.click
+        expect(f(selector + ' .grade')).to be_nil
+        #student 2, assignment 4 (not grayed out)
+        cell = f('#gradebook_grid .container_1 .slick-row:nth-child(2) .l5')
+        expect(cell.find_element(:css, '.gradebook-cell')).not_to have_class('grayed-out')
+      end
+
+      it "should gray out cells after removing a score which removes visibility" do
+        selector = '#gradebook_grid .container_1 .slick-row:nth-child(1) .l5'
+        @da_assignment.grade_student(@student_1, :grade => 42)
+        @override.destroy
+        get "/courses/#{@course.id}/gradebook"
+        edit_grade(selector, '')
+        wait_for_ajax_requests
+        cell = f(selector)
+        expect(cell.find_element(:css, '.gradebook-cell')).to have_class('grayed-out')
       end
     end
   end
@@ -765,51 +870,29 @@ describe "gradebook2" do
 
     it "should allow observer to see grade totals" do
       get "/courses/#{@course.id}/grades/#{@student_2.id}"
-      f(".final_grade .grade").should include_text("66.7")
+      expect(f(".final_grade .grade")).to include_text("66.7")
       f("#only_consider_graded_assignments").click
       wait_for_ajax_requests
-      f(".final_grade .grade").should include_text("12.5")
-    end
-  end
-
-  describe "outcome gradebook" do
-    before(:each) { data_setup }
-
-    it "should not be visible by default" do
-      get "/courses/#{@course.id}/gradebook2"
-      ff('.gradebook-navigation').length.should == 0
-    end
-
-    it "should be visible when enabled" do
-      Account.default.set_feature_flag!('outcome_gradebook', 'on')
-      get "/courses/#{@course.id}/gradebook2"
-      ff('.gradebook-navigation').length.should == 1
-
-      f('a[data-id=outcome]').click
-      wait_for_ajaximations
-      f('.outcome-gradebook-container').should_not be_nil
+      expect(f(".final_grade .grade")).to include_text("12.5")
     end
   end
 
   describe "post_grades" do
-    before(:each) { data_setup }
+    before(:each) do
+      gradebook_data_setup
+    end
 
     it "should not be visible by default" do
       get "/courses/#{@course.id}/gradebook2"
-      ff('.gradebook-navigation').length.should == 0
+      expect(ff('.post-grades-placeholder').length).to eq 0
     end
 
-    it "should be visible when enabled" do
+    it "should be visible when enabled on course with sis_source_id" do
       Account.default.set_feature_flag!('post_grades', 'on')
-      @course.integration_id = 'xyz'
+      @course.sis_source_id = 'xyz'
       @course.save
       get "/courses/#{@course.id}/gradebook2"
-
-      wait_for_ajaximations
-      ff('.gradebook-navigation').length.should == 2
-      f('#post-grades-button').click
-      wait_for_ajaximations
-      f('#post-grades-container').should_not be_nil
+      expect(ff('.post-grades-placeholder').length).to eq 1
     end
   end
 end

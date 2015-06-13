@@ -38,27 +38,27 @@ describe 'Canvadoc' do
   describe "#upload" do
     it "uploads" do
       @doc.upload
-      @doc.document_id.should == 123456
+      expect(@doc.document_id).to eq 123456
     end
 
     it "doesn't upload again" do
       @doc.update_attribute :document_id, 999999
       @doc.upload
-      @doc.document_id.should == 999999  # not 123456
+      expect(@doc.document_id).to eq 999999  # not 123456
     end
 
     it "doesn't upload when canvadocs isn't configured" do
       disable_canvadocs
-      lambda {
+      expect {
         @doc.upload
-      }.should raise_error
+      }.to raise_error
     end
   end
 
   describe "#session_url" do
     it "returns a session_url" do
       @doc.upload
-      @doc.session_url.should == "http://example.com/sessions/blah/view?theme=dark"
+      expect(@doc.session_url).to eq "http://example.com/sessions/blah/view?theme=dark"
     end
   end
 
@@ -66,15 +66,15 @@ describe 'Canvadoc' do
     before { @doc.upload }
 
     it "is available for documents that didn't fail" do
-      @doc.should be_available
+      expect(@doc).to be_available
 
       @doc.update_attribute :process_state, "error"
-      @doc.should_not be_available
+      expect(@doc).not_to be_available
     end
 
     it "... unless canvadocs isn't configured" do
       disable_canvadocs
-      @doc.should_not be_available
+      expect(@doc).not_to be_available
     end
   end
 end

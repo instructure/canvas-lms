@@ -16,6 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+require 'securerandom'
+
 class EportfoliosController < ApplicationController
   include EportfolioPage
   before_filter :require_user, :only => [:index, :user_index]
@@ -32,7 +35,7 @@ class EportfoliosController < ApplicationController
     add_crumb(@current_user.short_name, user_profile_url(@current_user))
     add_crumb(t(:crumb, "ePortfolios"))
     @portfolios = @current_user.eportfolios.active.order(:updated_at).all
-    render :action => 'user_index'
+    render :user_index
   end
   
   def create
@@ -40,12 +43,12 @@ class EportfoliosController < ApplicationController
       @portfolio = @current_user.eportfolios.build(params[:eportfolio])
       respond_to do |format|
         if @portfolio.save
-          @portfolio.setup_defaults
+          @portfolio.ensure_defaults
           flash[:notice] = t('notices.created', "Porfolio successfully created")
           format.html { redirect_to eportfolio_url(@portfolio) }
           format.json { render :json => @portfolio.as_json(:permissions => {:user => @current_user, :session => session}) }
         else
-          format.html { render :action => "new" }
+          format.html { render :new }
           format.json { render :json => @portfolio.errors, :status => :bad_request }
         end
       end
@@ -57,11 +60,11 @@ class EportfoliosController < ApplicationController
     if params[:verifier] == @portfolio.uuid
       session[:eportfolio_ids] ||= []
       session[:eportfolio_ids] << @portfolio.id
-      session[:session_affects_permissions] = true
+      session[:permissions_key] = SecureRandom.uuid
     end
-    if authorized_action(@portfolio, @current_user, :read)      
-      @category = @portfolio.eportfolio_categories.first rescue nil
-      @category ||= @portfolio.setup_defaults
+    if authorized_action(@portfolio, @current_user, :read)
+      @portfolio.ensure_defaults
+      @category = @portfolio.eportfolio_categories.first
       @page = @category.eportfolio_entries.first
       @owner_view = @portfolio.user == @current_user && params[:view] != 'preview'
       if @owner_view
@@ -77,10 +80,21 @@ class EportfoliosController < ApplicationController
       @show_left_side = true
       eportfolio_page_attributes
       if @current_user
+        # if profiles are enabled and I can message the portfolio's owner, link
+        # to their profile
+        @owner_url = user_profile_url(@portfolio.user) if @domain_root_account.enable_profiles? && @current_user.load_messageable_user(@portfolio.user)
+
+        # otherwise, if I'm the portfolio's owner (implying I can message
+        # myself, so therefore profiles just aren't enabled), link to my
+        # profile
+        @owner_url ||= profile_url if @current_user == @portfolio.user
+
+        # otherwise, if  I can otherwise view the user, link directly to them
+        @owner_url ||= user_url(@portfolio.user) if @portfolio.user.grants_right?(@current_user, :view_statistics)
+
         js_env :folder_id => Folder.unfiled_folder(@current_user).id,
                :context_code => @current_user.asset_string
       end
-      render :template => "eportfolios/show"
     end
   end
   
@@ -89,12 +103,12 @@ class EportfoliosController < ApplicationController
     if authorized_action(@portfolio, @current_user, :update)
       respond_to do |format|
         if @portfolio.update_attributes(params[:eportfolio])
-          @portfolio.setup_defaults
+          @portfolio.ensure_defaults
           flash[:notice] = t('notices.updated', "Porfolio successfully updated")
           format.html { redirect_to eportfolio_url(@portfolio) }
           format.json { render :json => @portfolio.as_json(:permissions => {:user => @current_user, :session => session}) }
         else
-          format.html { render :action => "edit" }
+          format.html { render :edit }
           format.json { render :json => @portfolio.errors, :status => :bad_request }
         end
       end
@@ -110,7 +124,7 @@ class EportfoliosController < ApplicationController
           format.html { redirect_to user_profile_url(@current_user) }
           format.json { render :json => @portfolio }
         else
-          format.html { render :action => "delete" }
+          format.html { render :delete }
           format.json { render :json => @portfolio.errors, :status => :bad_request }
         end
       end
@@ -138,11 +152,11 @@ class EportfoliosController < ApplicationController
     zip_filename = "eportfolio.zip"
     @portfolio = Eportfolio.find(params[:eportfolio_id])
     if authorized_action(@portfolio, @current_user, :update)
-      @attachments = @portfolio.attachments.find_all_by_display_name(zip_filename).select{|a| ['to_be_zipped', 'zipping', 'zipped', 'unattached'].include?(a.workflow_state) }.sort_by{|a| a.created_at }
+      @attachments = @portfolio.attachments.not_deleted.where(display_name: zip_filename, workflow_state: ['to_be_zipped', 'zipping', 'zipped', 'unattached']).order(:created_at).to_a
       @attachment = @attachments.pop
-      @attachments.each{|a| a.destroy! }
+      @attachments.each{|a| a.related_attachments.exists? ? a.destroy : a.destroy! }
       if @attachment && (@attachment.created_at < 1.hour.ago || @attachment.created_at < (@portfolio.eportfolio_entries.map{|s| s.updated_at}.compact.max || @attachment.created_at))
-        @attachment.destroy!
+        @attachment.related_attachments.exists? ? @attachment.destroy : @attachment.destroy!
         @attachment = nil
       end
 
@@ -157,8 +171,8 @@ class EportfoliosController < ApplicationController
         respond_to do |format|
           if @attachment.zipped?
             if Attachment.s3_storage?
-              format.html { redirect_to @attachment.cacheable_s3_inline_url }
-              format.zip { redirect_to @attachment.cacheable_s3_inline_url }
+              format.html { redirect_to @attachment.inline_url }
+              format.zip { redirect_to @attachment.inline_url }
             else
               cancel_cache_buster
               format.html { send_file(@attachment.full_filename, :type => @attachment.content_type_with_encoding, :disposition => 'inline') }

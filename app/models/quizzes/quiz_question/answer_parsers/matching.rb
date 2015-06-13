@@ -29,7 +29,8 @@ module Quizzes::QuizQuestion::AnswerParsers
           text: fields.fetch_with_enforced_length(:answer_match_left),
           left: fields.fetch_with_enforced_length(:answer_match_left),
           right: fields.fetch_with_enforced_length(:answer_match_right),
-          comments: fields.fetch_with_enforced_length([:answer_comment, :comments])
+          comments: fields.fetch_with_enforced_length([:answer_comment, :comments]),
+          comments_html: fields.fetch_with_enforced_length([:answer_comment_html, :comments_html])
         }
 
         a[:left_html] = a[:html] = fields.sanitize(fields.fetch_any(:answer_match_left_html)) if answer[:answer_match_left_html].present?

@@ -23,59 +23,61 @@ define [
 
       @url = @options.change_grade_url.replace(":assignment", @assignment.id).replace(":submission", @student.id)
       @submission = $.extend {}, @student["assignment_#{@assignment.id}"],
+        label: "student_grading_#{@assignment.id}"
         inputName: 'submission[posted_grade]'
         assignment: @assignment
         speedGraderUrl: speedGraderUrl
         loading: true
         showPointsPossible: (@assignment.points_possible || @assignment.points_possible == '0') && @assignment.grading_type != "gpa_scale"
       @submission["assignment_grading_type_is_#{@assignment.grading_type}"] = true
-      @dialog = $('<div class="use-css-transitions-for-show-hide" style="padding:0;"/>')
-      @dialog.html(submissionDetailsDialog(@submission))
-        .dialog
-          title: @student.name
-          width: 600
-          resizable: false
-          open: @scrollCommentsToBottom
 
-        .delegate 'select', 'change', (event) =>
-          @dialog.find('.submission_detail').each (index) ->
-            $(this).showIf(index == event.currentTarget.selectedIndex)
-        .delegate '.submission_details_grade_form', 'submit', (event) =>
-          event.preventDefault()
-          $(event.currentTarget.form).disableWhileLoading $.ajaxJSON @url, 'PUT', $(event.currentTarget).getFormData(), (data) =>
-            @update(data)
-            $.publish 'submissions_updated', [@submission.all_submissions]
-            setTimeout =>
-              @dialog.dialog('close')
-            , 500
-        .delegate '.submission_details_add_comment_form', 'submit', (event) =>
-          event.preventDefault()
-          $(event.currentTarget).disableWhileLoading $.ajaxJSON @url, 'PUT', $(event.currentTarget).getFormData(), (data) =>
-            @update(data)
-            setTimeout =>
-              @dialog.dialog('close')
-            , 500
+      @$el = $('<div class="use-css-transitions-for-show-hide" style="padding:0;"/>')
+      @$el.html(submissionDetailsDialog(@submission))
 
-      deferred = $.ajaxJSON @url+'?include[]=submission_history&include[]=submission_comments&include[]=rubric_assessment', 'GET', {}, @update
+      @dialog = @$el.dialog
+        title: @student.name
+        width: 600
+        resizable: false
+
+      @dialog.delegate 'select', 'change', (event) =>
+        @dialog.find('.submission_detail').each (index) ->
+          $(this).showIf(index == event.currentTarget.selectedIndex)
+      .delegate '.submission_details_grade_form', 'submit', (event) =>
+        event.preventDefault()
+        $(event.currentTarget.form).disableWhileLoading $.ajaxJSON @url, 'PUT', $(event.currentTarget).getFormData(), (data) =>
+          @update(data)
+          $.publish 'submissions_updated', [@submission.all_submissions]
+          setTimeout =>
+            @dialog.dialog('close')
+          , 500
+      .delegate '.submission_details_add_comment_form', 'submit', (event) =>
+        event.preventDefault()
+        $(event.currentTarget).disableWhileLoading $.ajaxJSON @url, 'PUT', $(event.currentTarget).getFormData(), (data) =>
+          @update(data)
+          setTimeout =>
+            @dialog.dialog('close')
+          , 500
+
+      deferred = $.ajaxJSON @url+'&include[]=submission_history&include[]=submission_comments&include[]=rubric_assessment', 'GET', {}, @update
       @dialog.find('.submission_details_comments').disableWhileLoading deferred
 
     open: =>
       @dialog.dialog('open')
-      $('.submission_details_dialog .assignment-name').focus()
+      @scrollCommentsToBottom()
+      $('.ui-dialog-titlebar-close').focus()
 
     scrollCommentsToBottom: =>
       @dialog.find('.submission_details_comments').scrollTop(999999)
 
     update: (newData) =>
       $.extend @submission, newData
-      @submission.submission_history[0] = @submission
       @submission.moreThanOneSubmission = @submission.submission_history.length > 1
       @submission.loading = false
       for submission in @submission.submission_history
         for comment in submission.submission_comments || []
           comment.url = "#{@options.context_url}/users/#{comment.author_id}"
           urlPrefix = "#{location.protocol}//#{location.host}"
-          comment.image_url = "#{urlPrefix}/images/users/#{comment.author_id}?fallback=#{encodeURIComponent(urlPrefix+'/images/messages/avatar-50.png')}"
+          comment.image_url = "#{urlPrefix}/images/users/#{comment.author_id}"
         submission.turnitin = extractDataFor(submission, "submission_#{submission.id}", @options.context_url)
         for attachment in submission.attachments || []
           attachment.turnitin = extractDataFor(submission, "attachment_#{attachment.id}", @options.context_url)

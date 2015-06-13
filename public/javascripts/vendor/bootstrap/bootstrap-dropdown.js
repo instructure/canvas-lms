@@ -45,11 +45,13 @@ define(['jquery'],function($) {
   , toggle: function (e) {
       var $this = $(this)
         , $parent
+        , $parentsParent
         , isActive
 
       if ($this.is('.disabled, :disabled')) return
 
       $parent = getParent($this)
+      $parentsParent = getParent($parent)
 
       isActive = $parent.hasClass('open')
 
@@ -60,10 +62,24 @@ define(['jquery'],function($) {
           // if mobile we we use a backdrop because click events don't delegate
           $('<div class="dropdown-backdrop"/>').insertBefore($(this)).on('click', clearMenus)
         }
-        // INSTRUCTURE added aria-expanded
-        $parent.toggleClass('open').attr('aria-expanded', 'true')
+        // INSTRUCTURE added aria-expanded and role='application'
+        $parent.toggleClass('open')
+        getProperParent($parent).attr('aria-expanded', 'true')
+        $parent.trigger("show.bs.dropdown")
+
+        if ($parent.hasClass('open')){
+          $parentsParent.attr('role', 'application');
+        }
+
+        // if this causes issues in the future, we should trackdown the event handler that is
+        // stealing focus after the fact
+        window.setTimeout(function (){$parent.find('>div.dropdown-menu>ul>li[rel=0]').focus()},0)
+      } else {
+        $parentsParent.removeAttr('role');
+        $parent.trigger("hide.bs.dropdown")
       }
 
+      $parent.trigger("toggle.bs.dropdown")
       $this.focus()
 
       return false
@@ -82,7 +98,7 @@ define(['jquery'],function($) {
       if (e.keyCode == 9) return clearMenus()
       if ($(e.target).is('input')) return
 
-      if (!/(37|38|39|40|27)/.test(e.keyCode)) return
+      if (!/(32|13|37|38|39|40|27)/.test(e.keyCode)) return
 
       $this = $(this)
 
@@ -140,10 +156,18 @@ define(['jquery'],function($) {
       $items
         .eq(index)
         .focus()
+      if((e.keyCode == 13 || e.keyCode == 32)) {
+        var parent = $($items.eq(index).closest('li'));
+        if (parent.hasClass("dropdown-submenu") ){
+          parent.find(".dropdown-menu input").focus()
+        }
+      }
+
     }
 
     // INSTRUCTURE
     , focusSubmenu: function(e) {
+      $(this).attr('role', 'application')
       $(this).addClass('open').attr('aria-expanded', 'true')
     }
 
@@ -151,12 +175,18 @@ define(['jquery'],function($) {
       var self = this;
       setTimeout(function() {
         if ($.contains(self, document.activeElement)) {return;}
+        $(self).removeAttr('role')
         $(self).removeClass('open').attr('aria-expanded', 'false')
       }, 0)
     }
 
     , clickSubmenu: function(e) {
-      if (!$(e.target).closest('li').hasClass('dropdown-submenu')) {return;}
+      var subMenu = $(e.target).closest('li');
+      if (subMenu.hasClass('dropdown-submenu')){
+        subMenu.find(".dropdown-menu input").focus();
+      } else {
+        return;
+      }
       e.stopPropagation();
       e.preventDefault();
     }
@@ -171,7 +201,9 @@ define(['jquery'],function($) {
     $('.dropdown-backdrop').remove()
     $(toggle).each(function () {
       // INSTRUCTURE added aria-expanded
-      getParent($(this)).removeClass('open').attr('aria-expanded', 'false')
+      var $parent = getParent($(this))
+      $parent.removeClass('open')
+      getProperParent($parent).attr('aria-expanded', 'false')
     })
     // INSTRUCTURE
     $('.dropdown-submenu').each(function() {
@@ -193,6 +225,16 @@ define(['jquery'],function($) {
     if (!$parent || !$parent.length) $parent = $this.parent()
 
     return $parent
+  }
+
+  // INSTRUCTURE - Added this to better suit needs of aria-expanded stuff
+  // It will return a button, rather than a parent div.
+  function getProperParent($parent) {
+    if ($parent.is('button')) {
+      return $parent;
+    } else {
+      return $parent.children('button')
+    }
   }
 
 

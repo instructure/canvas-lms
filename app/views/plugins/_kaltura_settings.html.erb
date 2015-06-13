@@ -6,8 +6,8 @@ You will need an account either at [Kaltura.com](%{kaltura_url})
 or with a self-hosted instance of Kaltura.
 
 **Note:** once you have Kaltura configured within Canvas,
-you need to go to the Kaltura Management Console and under "Settings -> 
-Integration Settings" enable server notifications with a 
+you need to go to the Kaltura Management Console and under "Settings ->
+Integration Settings" enable server notifications with a
 Notification URL of:
 
 %{notification_url}
@@ -119,10 +119,6 @@ TEXT
     </tr>
     <tr>
       <td colspan="2" style="font-size: 0.8em;"><%= t(:hide_rte_button_note, "(still there for conversations/SpeedGrader/Media Recordings homework submissions)")%></td>
-    </tr>
-    <tr>
-      <td><%= f.label :use_alt_record_widget, :en => "Use alternative flash recording widget" %></td>
-      <td><%= f.check_box :use_alt_record_widget, {}, 'yes', 'no' %></td>
     </tr>
     <tr>
       <td><%= f.label :js_uploader, :en => "Use html5 (accessible) uploader" %></td>

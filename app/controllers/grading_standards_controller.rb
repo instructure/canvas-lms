@@ -18,63 +18,77 @@
 
 class GradingStandardsController < ApplicationController
   before_filter :require_context
-  add_crumb(proc { t '#crumbs.grading_schemes', "Grading Schemes" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grading_standards_url }
+  add_crumb(proc { t '#crumbs.grading_standards', "Grading" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grading_standards_url }
   before_filter { |c| c.active_tab = "grading_standards" }
-  
-  def default_data
-    render :json => GradingStandard.default_grading_standard
-  end
-  
+
   def index
     if authorized_action(@context, @current_user, :manage_grades)
-      @standards = GradingStandard.standards_for(@context).sorted.limit(100)
+      js_env({
+        :GRADING_STANDARDS_URL => context_url(@context, :context_grading_standards_url),
+        :GRADING_PERIODS_URL => context_url(@context, :api_v1_context_grading_periods_url),
+        :MULTIPLE_GRADING_PERIODS => multiple_grading_periods?,
+        :DEFAULT_GRADING_STANDARD_DATA => GradingStandard.default_grading_standard,
+        :CONTEXT_SETTINGS_URL => context_url(@context, :context_settings_url)
+      })
+      @standards = GradingStandard.for(@context).sorted.limit(100)
       respond_to do |format|
         format.html { }
         format.json {
-          render :json => @standards.map{ |s| s.as_json(methods: [:display_name, :context_code]) }
+          standards_json = @standards.map do |s|
+            s.as_json(methods: [:display_name, :context_code, :assessed_assignment?, :context_name], permissions: {user: @current_user})
+          end
+          render :json => standards_json
         }
       end
     end
   end
-  
+
   def create
     if authorized_action(@context, @current_user, :manage_grades)
       @standard = @context.grading_standards.build(params[:grading_standard])
+      @standard.data = params[:grading_standard][:data] || GradingStandard.default_grading_standard
       @standard.user = @current_user
       respond_to do |format|
         if @standard.save
-          format.json{ render :json => @standard }
+          format.json{ render :json => @standard.as_json(methods: [:display_name, :context_code, :assessed_assignment?, :context_name], permissions: {user: @current_user}) }
         else
           format.json{ render :json => @standard.errors, :status => :bad_request }
         end
       end
     end
   end
-  
+
   def update
-    @standard = @context.grading_standards.find(params[:id])
-    if authorized_action(@context, @current_user, :manage_grades)
+    @standard = GradingStandard.for(@context).find(params[:id])
+    if authorized_action(@standard, @current_user, :manage)
       @standard.user = @current_user
       respond_to do |format|
         if @standard.update_attributes(params[:grading_standard])
-          format.json{ render :json => @standard }
+          format.json{ render :json => @standard.as_json(methods: [:display_name, :context_code, :assessed_assignment?, :context_name], permissions: {user: @current_user}) }
         else
           format.json{ render :json => @standard.errors, :status => :bad_request }
         end
       end
     end
   end
-  
+
   def destroy
-    @standard = @context.grading_standards.find(params[:id])
-    if authorized_action(@context, @current_user, :manage_grades)
+    @standard = GradingStandard.for(@context).find(params[:id])
+    if authorized_action(@standard, @current_user, :manage)
       respond_to do |format|
         if @standard.destroy
-          format.json{ render :json => @standard }
+          format.json{ render :json => @standard.as_json(methods: [:display_name, :context_code, :assessed_assignment?, :context_name], permissions: {user: @current_user}) }
         else
           format.json{ render :json => @standard.errors, :status => :bad_request }
         end
       end
     end
   end
+
+  private
+
+  def default_data
+    GradingStandard.default_grading_standard
+  end
+
 end

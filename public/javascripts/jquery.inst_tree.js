@@ -15,12 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+// xsslint jqueryObject.identifier tree
 define([
   'jquery' /* $ */,
   'underscore',
+  'str/htmlEscape',
   'jqueryui/draggable' /* /\.draggable/ */,
   'jqueryui/droppable' /* /\.droppable/ */
-], function($,_) {
+], function($, _, htmlEscape) {
   $.fn.instTree = function(options) {
     return $(this).each(function() {
       var binded = false;
@@ -48,13 +51,13 @@ define([
       $.fn.instTree.InitInstTree = function(obj) {
         tree = $(obj);
 
-        var sep = '<li class="separator"></li>';
+        var $sep = '<li class="separator"></li>';
 
         tree.find('li:not(.separator)').filter(function() {
           return !(($(this).prev('li.separator').get(0)) || ($(this).parents('ul.non-instTree').get(0)));
         })
         .each(function() {
-          $(this).before(sep);
+          $(this).before($sep);
         });
 
         tree.find('li > span').not('.sign').not('.clr').addClass('text').attr('unselectable', 'on');
@@ -90,7 +93,7 @@ define([
           cursor: ($.browser.msie) ? 'default': 'move',
           distance: 3,
           helper: function() {
-            return $('<div id="instTree-drag"><span>' + $(this).text() + '</span></div>');
+            return $('<div id="instTree-drag"><span>' + $(this).html() + '</span></div>');
           },
           appendTo: tree
         });
@@ -187,6 +190,7 @@ define([
           var lin = $(activeElement).parents('li.node:first');
 
           if ((!lin.is('.fixedLevel')) || (type != 'node')) {
+          // xsslint safeString.identifier ncont cn
           var cn = (type == 'leaf') ? '': ' class="node"';
 
           var sep = '<li class="separator"></li>';
@@ -247,7 +251,7 @@ define([
         if (activeElement) {
           var li = $(activeElement).parents('li:first');
 
-          $(activeElement).replaceWith('<span class="text">&nbsp;</span><input type="text" value="' + $(activeElement).text() + '" />');
+          $(activeElement).replaceWith('<span class="text">&nbsp;</span><input type="text" value="' + htmlEscape($(activeElement).text()) + '" />');
 
           li.find('input:text').focus().select().blur(function() {
             it.SaveInput(obj, $(this));
@@ -282,7 +286,7 @@ define([
 
         var val = ($.trim(input.get(0).value) !== '') ? input.get(0).value: '_____';
 
-        input.replaceWith('<span class="active text">' + val + '</span>');
+        input.replaceWith('<span class="active text">' + htmlEscape(val) + '</span>');
 
         $.fn.instTree.InitInstTree(obj);
       };//SaveInput

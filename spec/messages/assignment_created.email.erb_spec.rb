@@ -23,8 +23,8 @@ describe 'assignment_created.email' do
   it "should render" do
     assignment_model(:title => "Quiz 2")
     generate_message(:assignment_created, :email, @assignment)
-    @message.subject.should match(/Quiz 2/)
-    @message.body.should match(/Quiz 2/)
-    @message.body.should match(Regexp.new(@course.name))
+    expect(@message.subject).to match(/Quiz 2/)
+    expect(@message.body).to match(/Quiz 2/)
+    expect(@message.body).to match(Regexp.new(@course.name))
   end
 end

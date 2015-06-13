@@ -11,7 +11,9 @@
 <% content_for :right_side do %>
   <div class="rs-margin-lr rs-margin-top" style="padding-bottom: 20px;">
     <a href="<%= context_url(@context, :context_groups_url) %>" class="btn button-sidebar-wide user_groups"><i class="icon-group"></i> <%= t('buttons.user_groups', 'View User Groups') %></a>
-    <a href="<%= context_url(@context, :context_avatars_url) %>" class="btn button-sidebar-wide manage_profile_pictures"><i class="icon-student-view"></i> <%= t('buttons.manage_profile_pictures', 'Manage Profile Pictures') %></a>
+    <% if service_enabled?(:avatars) %>
+      <a href="<%= context_url(@context, :context_avatars_url) %>" class="btn button-sidebar-wide manage_profile_pictures"><i class="icon-student-view"></i> <%= t('buttons.manage_profile_pictures', 'Manage Profile Pictures') %></a>
+    <% end %>
   </div>
 
   <% if @enrollment_terms.size > 1 %>
@@ -34,10 +36,10 @@
 <% end %>
 
 <% if @query %>
-  <h2><%= t('titles.search_results', 'Search results for "%{search_term}"', :search_term => (params[:user][:name] rescue '')) %></h2>
+  <h1><%= t('titles.search_results', 'Search results for "%{search_term}"', :search_term => (params[:user][:name] rescue '')) %></h1>
   <%= t('no_results_found', "No Results Found") if @users.empty? %>
 <% else %>
-  <h2><%= t('titles.all_users', 'All Users') %></h2>
+  <h1><%= t('titles.all_users', 'All Users') %></h1>
 <% end %>
 
 <%= will_paginate(@users, :style=>"margin-bottom: 1em;") %>

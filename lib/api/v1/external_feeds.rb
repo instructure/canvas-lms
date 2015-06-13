@@ -40,9 +40,7 @@ module Api::V1::ExternalFeeds
 
   def create_api_external_feed(context, feed_params, user)
     feed = context.external_feeds.build(feed_params.slice(*API_ALLOWED_EXTERNAL_FEED_PARAMS))
-    feed.feed_purpose = "announcements"
     feed.user = user
-    feed.feed_type = "rss/atom"
     feed
   end
 

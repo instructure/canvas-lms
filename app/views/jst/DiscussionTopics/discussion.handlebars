@@ -8,18 +8,23 @@
 
     <div class="discussion-type">
       {{#if assignment}}
+        {{#if assignment.peer_reviews}}
+          <i class="icon-peer-review" aria-hidden="true"></i>
+        {{/if}}
         <i class="icon-assignment" aria-hidden="true"></i>
       {{/if}}
     </div>
 
     <div class="discussion-title">
-      <div role="heading">
+      <h3 class="inline-block discussion-title-block">
         {{#if assignment}}
           <span class="screenreader-only">{{#t "graded_discussion"}}Graded discussion: {{/t}}</span>
         {{/if}}
         <a href="{{html_url}}" class="title">{{title}}</a>
-      </div>
-      <small {{ contextSensitiveDatetimeTitle last_reply_at }}>{{#t "last_post_date"}}Last post {{display_last_reply_at}}{{/t}}</small>
+      </h3>
+      {{#if display_last_reply_at}}
+        <small {{ contextSensitiveDatetimeTitle last_reply_at }}>{{#t "last_post_date"}}Last post {{display_last_reply_at}}{{/t}}</small>
+      {{/if}}
     </div>
 
     <div class="discussion-date-available">
@@ -46,8 +51,8 @@
     </div>
 
     <div class="discussion-status">
-      <span id="publish-icon" class="publish-icon" {{#if ENV.DRAFT_STATE}} data-view="publishIcon" {{/if}}></span>
-      <a href="#" data-view="toggleableSubscriptionIcon" class="subscription-toggler">
+      <span id="publish-icon" class="publish-icon" data-view="publishIcon"></span>
+      <a href="#" data-view="toggleableSubscriptionIcon" class="subscription-toggler" role="button">
         <span class="screenreader-only">
           {{#if subscribed}}
             {{#t "user_subscribed"}}You are subscribed to this topic. Click to unsubscribe.{{/t}}
@@ -83,23 +88,29 @@
     </div>
 
 
-    <div class="discussion-actions" role="application">
+    <div class="discussion-actions">
       {{#if permissions.delete}}
-        <a href="#" class="al-trigger" role="button" id="manage_link">
+        <a href="#" class="al-trigger al-trigger-gray" role="button" id="manage_link">
           <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
           <span class="screenreader-only">{{#t "manage"}}Manage{{/t}}</span>
         </a>
 
         <ul class="al-options">
-          <li>
-            <a href="#" class="icon-lock">
-              {{#if locked}}
-                {{#t "open_to_comments"}}Open to comments{{/t}}
-              {{else}}
-                {{#t "close_for_comments"}}Close for comments{{/t}}
-              {{/if}}
-            </a>
-          </li>
+          {{#if locked}}
+            <li>
+              <a href="#" class="icon-lock">
+                {{#t "open_for_comments"}}Open for comments{{/t}}
+              </a>
+            </li>
+          {{else}}
+            {{#if can_lock}}
+              <li>
+                <a href="#" class="icon-lock">
+                  {{#t "close_for_comments"}}Close for comments{{/t}}
+                </a>
+              </li>
+            {{/if}}
+          {{/if}}
           <li>
             <a href="#" class="icon-trash">{{#t "delete"}}Delete{{/t}}</a>
           </li>
@@ -120,6 +131,16 @@
                 >{{#t "move"}}Move To&hellip;{{/t}}</a>
               </li>
             {{/if}}
+          {{/if}}
+          {{#if ENV.permissions.manage_content}}
+            {{#each discussion_topic_menu_tools}}
+              <li>
+                <a class="menu_tool_link" href="{{url}}">
+                  {{#if icon_url}}<img class="icon" src="{{icon_url}}" />{{/if}}
+                  {{title}}
+                </a>
+              </li>
+            {{/each}}
           {{/if}}
         </ul>
       {{/if}}

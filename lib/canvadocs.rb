@@ -91,7 +91,7 @@ module Canvadocs
     #
     # Returns a url string for viewing the session
     def view(session_id)
-      "#{@url.to_s}/sessions/#{session_id}/view?theme=dark"
+      "#{@url}/sessions/#{session_id}/view?theme=dark"
     end
 
 

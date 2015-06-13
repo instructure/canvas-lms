@@ -337,7 +337,6 @@ describe AdheresToPolicy::InstanceMethods do
 
       it "should change cache key based on session[:permissions_key]" do
         session = {
-          :session_affects_permissions => true,
           :permissions_key => 'permissions_key',
           :session_id => 'session_id'
         }
@@ -356,10 +355,6 @@ describe AdheresToPolicy::InstanceMethods do
         actor = actor_class.new
         expect(actor.call_permission_cache_key_for(nil, session, :read)).to match(/\>\/permissions_key\/read$/)
 
-        session[:permissions_key] = nil
-        expect(actor.call_permission_cache_key_for(nil, session, :read)).to match(/\>\/session_id\/read$/)
-
-        session[:session_affects_permissions] = false
         session.delete(:permissions_key)
         expect(actor.call_permission_cache_key_for(nil, session, :read)).to match(/\>\/read$/)
 

@@ -1,0 +1,37 @@
+<div class="ig-header">
+  <span draggable="true" class="sortable-handle" title="{{#t 'drag_to_reorder'}}Drag to reorder modules{{/t}}">
+    <a class="icon-drag-handle"></a>
+  </span>
+  <h2 class="ig-header-title">
+    <i class="icon-mini-arrow-down"></i>
+    <span class="name">{{name}}</span>
+  </h2>
+
+  <div class="ig-header-admin">
+    {{!--
+    <span class="completion_status" style="visibility: hidden;">
+      <i class="icon-check complete_icon"><span class="screenreader-only">Module Completed</span></i>
+      <img alt="incomplete" class="incomplete_icon" src="/images/blank.png?1358206837" title="Module Incomplete">
+      <i class="icon-lock locked_icon"><span class="screenreader-only">Module Locked</span></i>
+    </span>
+    --}}
+
+    {{!-- <span><i class="icon-publish"></i></span> --}}
+
+    {{#ic-actions id=actionsId button=true}}
+      {{#ic-menu-item on-select="edit"}}{{#t "edit"}}Edit{{/t}}{{/ic-menu-item}}
+      {{#ic-menu-item on-select="delete"}}{{#t "delete"}}Delete{{/t}}{{/ic-menu-item}}
+    {{/ic-actions}}
+  </div>
+
+</div>
+
+{{#c-modal-form
+  id=formId
+  on-submit="saveEdits"
+  on-cancel="restoreModel"
+  return-focus-to=actionsId
+}}
+  {{render "module_edit" this}}
+{{/c-modal-form}}
+

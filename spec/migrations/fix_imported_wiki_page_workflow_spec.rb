@@ -18,15 +18,15 @@ describe 'DataFixup::FixImportedWikiPageWorkflow' do
   end
 
   it "should find unpublished wiki pages" do
-    DataFixup::FixImportedWikiPageWorkflow.broken_wiki_page_scope.map(&:id).sort.should == @wiki_pages.map(&:id).sort
+    expect(DataFixup::FixImportedWikiPageWorkflow.broken_wiki_page_scope.map(&:id).sort).to eq @wiki_pages.map(&:id).sort
   end
 
   it "should publish the broken wiki pages" do
     FixImportedWikiPageWorkflow.up
     @wiki_pages.each do |page|
       page.reload
-      page.workflow_state.should == 'active'
+      expect(page.workflow_state).to eq 'active'
     end
-    DataFixup::FixImportedWikiPageWorkflow.broken_wiki_page_scope.count.should == 0
+    expect(DataFixup::FixImportedWikiPageWorkflow.broken_wiki_page_scope.count).to eq 0
   end
 end

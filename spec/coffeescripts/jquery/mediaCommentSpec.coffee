@@ -1,16 +1,16 @@
-require [
+define [
   'jquery'
   'compiled/jquery/mediaComment'
-], ($)->
+], ($, MediaUtils)->
 
   module 'mediaComment',
-    setup: -> 
+    setup: ->
       @server = sinon.fakeServer.create()
       window.INST.kalturaSettings = "settings set" # pretend kalturaSettings are set.
       @$holder = $('<div id="media-holder">').appendTo('#fixtures')
 
-    teardown: -> 
-      window.INST.kalturaSettings = null 
+    teardown: ->
+      window.INST.kalturaSettings = null
       @server.restore()
       @$holder.remove()
 
@@ -28,7 +28,7 @@ require [
       JSON.stringify(resp)
     ]
 
-  test "video player is displayed inline", -> 
+  test "video player is displayed inline", ->
     id = 10 #ID doesn't matter since we mock out the server
     @$holder.mediaComment('show_inline', id)
     mockServerResponse(@server, id)
@@ -45,7 +45,7 @@ require [
     equal @$holder.find('video').length, 0, 'There should not be a video tag'
 
 
-  test "video player includes url sources provided by the server", -> 
+  test "video player includes url sources provided by the server", ->
     id = 10 #ID doesn't matter since we mock out the server
     @$holder.mediaComment('show_inline', id)
     mockServerResponse(@server, id)
@@ -54,3 +54,27 @@ require [
     equal @$holder.find('source[type=mp4]').attr('src'),"http://some_mp4_url.com", "Video contains the mp4 source"
 
 
+  module "MediaCommentUtils functions",
+    setup: ->
+    teardown: ->
+
+  test "getElement includes width and height for video elements", ->
+    $media = MediaUtils.getElement("video", "", 100, 200)
+    equal($media.attr("width"), 100)
+    equal($media.attr("height"), 200)
+
+  test "getElement doesnt care about width and height for audio elements", ->
+    $media = MediaUtils.getElement("audio", "", 100, 200)
+    equal($media.attr("width"), null)
+    equal($media.attr("height"), null)
+
+  test "getElement adds preload='none' to both types", ->
+    $video = MediaUtils.getElement("video", "", 100, 200)
+    $audio = MediaUtils.getElement("audio", "", 100, 200)
+    equal($video.attr("preload"), "none")
+    equal($audio.attr("preload"), "none")
+
+  test "getElement puts source tags inside the element", ->
+    st_tag = "<source src='something'></source>"
+    $audio = MediaUtils.getElement("audio", st_tag)
+    equal($audio.html(), "<source src=\"something\">")

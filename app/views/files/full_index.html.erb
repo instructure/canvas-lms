@@ -4,6 +4,7 @@
   js_bundle :full_files 
   showing_all_contexts = @context.is_a?(UserProfile) && @context.user == @current_user && params[:show_all_contexts]
 %>
+  <h1 class="screenreader-only"><%= t 'files_title', "Files" %></h1>
 <div id="file_uploads" style="display: none;">
   <div class="file_upload" id="file_upload_blank" style="display: none;">
     <div style="float: left;">
@@ -61,9 +62,9 @@
 <% end %>
 <div style="float: right; font-size: 0.8em; margin-right: 1.0em;">
   <% if showing_all_contexts %>
-    <a href="<%= dashboard_files_url %>"><%= t 'links.show_personal_files', "just show my personal files" %></a>
+    <a href="<%= files_url %>"><%= t 'links.show_personal_files', "just show my personal files" %></a>
   <% else %>
-    <a href="<%= dashboard_files_url(:show_all_contexts => 1) %>"><%= t 'links.show_all_files', "see files for all your courses/groups" %></a>
+    <a href="<%= files_url(:show_all_contexts => 1) %>"><%= t 'links.show_all_files', "see files for all your courses/groups" %></a>
   <% end %>
 </div>
 <div class="clear"></div>
@@ -185,7 +186,7 @@
       </div>
     </div>
   </li>
-  <li class="file_scribd_preview">
+  <li class="file_preview_container">
   </li>
   <li class="file_image_preview" style="text-align: center; margin-top: 10px;">
     <a href="#" class="no-hover"><img src="" alt="<%= t 'alts.file_preview', 'preview' %>" title=""/></a>
@@ -255,7 +256,6 @@
     <a href="<%= root_url %>/zip_file_imports" class="<%= context.asset_string %>_zip_import_url">&nbsp;</a>
     <a href="<%= context_url(context, :context_zip_file_import_url, "{{ id }}", :format => :json) %>" class="<%= context.asset_string %>_zip_import_status_url" style="display: none;">&nbsp;</a>
     <a href="<%= context_url(context, :context_file_inline_view_url, "{{ id }}") rescue '#' %>" class="<%= context.asset_string %>_inline_view_attachment_url">&nbsp;</a>
-    <a href="<%= context_url(context, :context_file_scribd_render_url, "{{ id }}") rescue '#' %>" class="<%= context.asset_string %>_scribd_render_url">&nbsp;</a>
     <a href="<%= context_url(context, :context_import_files_url) rescue '#' %>" class="<%= context.asset_string %>_import_url">&nbsp;</a>
   <% end %>
 </div>
@@ -300,13 +300,13 @@
         <td>&nbsp;</td>
         <td style="vertical-align: top; padding-left: 5px; padding-top: 6px; white-space: nowrap;"><%= before_label :lock_until, "Lock Until" %></td>
         <td>
-          <%= f.text_field :unlock_at, :class => "datetime_field", :style => "width: 120px;" %>
+          <%= f.text_field :unlock_at, :class => "datetime_field", :style => "width: 120px;", :'aria-label' => t("Lock Until Date") %>
         </td>
       </tr><tr class="lock_range full_lock">
         <td>&nbsp;</td>
         <td style="vertical-align: top; padding-left: 5px; padding-top: 6px; white-space: nowrap;"><%= before_label :lock_after, "Lock After" %></td>
         <td>
-          <%= f.text_field :lock_at, :class => "datetime_field", :style => "width: 120px;" %>
+          <%= f.text_field :lock_at, :class => "datetime_field", :style => "width: 120px;", :"aria-label" => t("Lock After Date") %>
         </td>
       </tr><tr>
         <td colspan="3">
@@ -341,13 +341,13 @@
         <td>&nbsp;</td>
         <td style="vertical-align: top; padding-left: 5px; padding-top: 6px; white-space: nowrap;"><%= before_label :lock_until, "Lock Until" %></td>
         <td>
-          <%= f.text_field :unlock_at, :class => "datetime_field", :style => "width: 120px;" %>
+          <%= f.text_field :unlock_at, :class => "datetime_field", :style => "width: 120px;", :"aria-label" => t("Lock Until Date") %>
         </td>
       </tr><tr class="lock_range full_lock">
         <td>&nbsp;</td>
         <td style="vertical-align: top; padding-left: 5px; padding-top: 6px; white-space: nowrap;"><%= before_label :lock_after, "Lock After" %></td>
         <td>
-          <%= f.text_field :lock_at, :class => "datetime_field", :style => "width: 120px;" %>
+          <%= f.text_field :lock_at, :class => "datetime_field", :style => "width: 120px;", :"aria-label" => t("Lock After Date") %>
         </td>
       </tr><tr>
         <td colspan="3">

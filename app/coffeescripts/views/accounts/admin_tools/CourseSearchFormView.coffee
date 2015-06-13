@@ -16,7 +16,8 @@ define [
     els:
       '#courseSearchField': '$courseSearchField'
 
-    afterRender: -> 
+    initialize: ->
+      super
       @model.on 'restoring', @disableSearchForm
       @model.on 'doneRestoring', @enableSearchForm
    

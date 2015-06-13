@@ -20,7 +20,7 @@ module Quizzes
     extend Forwardable
     attr_reader :quiz, :user
 
-    def_delegators :@quiz, :context, :quiz_submissions
+    def_delegators :@quiz, :context, :quiz_submissions, :differentiated_assignments_applies?
 
     def initialize(quiz, user)
       @quiz = quiz
@@ -28,15 +28,23 @@ module Quizzes
     end
 
     def submitted_students
-      all_students.where(id: non_preview_user_ids)
+      all_students_with_visibility.where(id: non_preview_user_ids)
     end
 
     def unsubmitted_students
-      all_students.where('users.id NOT IN (?)', non_preview_user_ids)
+      all_students_with_visibility.where('users.id NOT IN (?)', non_preview_user_ids)
     end
 
     def all_students
       context.students_visible_to(user).order_by_sortable_name.group('users.id')
+    end
+
+    def all_students_with_visibility
+      if differentiated_assignments_applies?
+        all_students.able_to_see_quiz_in_course_with_da(@quiz.id, context.id)
+      else
+        all_students
+      end
     end
 
     def non_preview_quiz_submissions

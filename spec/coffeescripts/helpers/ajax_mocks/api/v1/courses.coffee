@@ -1,4 +1,4 @@
-require ['support/jquery.mockjax'], ($) ->
+define ['support/jquery.mockjax'], ($) ->
   $.mockjax
     url:  /\/api\/v1\/courses\/\d+(\?.+)?$/
     responseText: [

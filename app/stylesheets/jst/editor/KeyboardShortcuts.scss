@@ -1,0 +1,18 @@
+.tinymce-keyboard-shortcuts-toggle {
+  margin-right: 5px;
+}
+
+// The dialog
+ul.tinymce-keyboard-shortcuts {
+  list-style: none;
+  margin: 0;
+
+  code {
+    display: inline-block;
+    color: #123583;
+    background: none;
+    border: none;
+    font-weight: bold;
+    font-size: inherit;
+  }
+}

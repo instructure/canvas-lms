@@ -1,4 +1,4 @@
-require [
+define [
   'jquery'
   'compiled/helpDialog'
   'helpers/fakeENV'
@@ -7,9 +7,7 @@ require [
   # more tests are in spec/selenium/help_dialog_spec.rb
 
   # mock INST.browser for test to work
-  window.INST.browser =
-    ie: true
-    version: 8
+  originalBrowser = null
 
   module 'HelpDialog',
     setup: ->
@@ -18,24 +16,30 @@ require [
       @server = sinon.fakeServer.create()
       @server.respondWith '/help_links', '[]'
       @server.respondWith '/api/v1/courses.json', '[]'
+      originalBrowser = window.INST.browser
+      window.INST.browser =
+        ie: true
+        version: 8
 
     teardown: ->
       fakeENV.teardown()
       @server.restore()
 
       # if we don't close it after each test, subsequent tests get messed up.
-      # additionally, closing it starts an animation, so tick past that.
       if helpDialog.$dialog?
-        helpDialog.$dialog.remove()
-        @clock.tick 200
+        helpDialog.$dialog.dialog('close')
+        helpDialog.$dialog = null
+
       @clock.restore()
 
       # reset the shared object
       helpDialog.dialogInited = false
       helpDialog.teacherFeedbackInited = false
+      window.INST.browser = originalBrowser
+      $("#fixtures").empty()
 
   test 'init', ->
-    $tester = $('<a class="help_dialog_trigger" />').appendTo('body')
+    $tester = $('<a class="help_dialog_trigger" />').appendTo('#fixtures')
     helpDialog.initTriggers()
     $tester.click()
     ok $('.ui-dialog-content').is(':visible'), "help dialog appears when you click 'help' link"

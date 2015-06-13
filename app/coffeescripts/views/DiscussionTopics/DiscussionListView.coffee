@@ -208,5 +208,9 @@ define [
       return unless model
       [newGroup, currentGroup] = [$(e.currentTarget).data('view'), this]
       pinned = !!newGroup.options.pinned
+      return if pinned && !@options.pinnable
+
       locked = !!newGroup.options.locked
+      return if locked && !model.get('can_lock')
+
       model.updateBucket(pinned: pinned, locked: locked)

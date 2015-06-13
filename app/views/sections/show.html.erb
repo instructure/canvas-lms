@@ -13,7 +13,7 @@
         <a href="#" class="btn button-sidebar-wide crosslist_link"><i class="icon-off"></i> <%= t('buttons.crosslist_section', 'Cross-List this Section') %></a>
       <% end %>
     <% end %>
-    <a href="<%= context_url(@context, :context_details_url) %>" class="btn button-sidebar-wide"><i class="icon-settings"></i> <%= t('buttons.back_to_course', 'Back to Course Settings') %></a>
+    <a href="<%= context_url(@context, :context_settings_url) %>" class="btn button-sidebar-wide"><i class="icon-settings"></i> <%= t('buttons.back_to_course', 'Back to Course Settings') %></a>
   </div>
 <% end %>
 
@@ -127,11 +127,11 @@ h3 .tally {
   <% end %>
   <tr>
     <td><%= f.blabel :start_at, :en => "Starts" %></td>
-    <td><%= f.text_field :start_at, :class => "datetime_field", :value => unlocalized_datetime_string(@section.start_at), :style => 'width: 120px;' %></td>
+    <td><%= f.text_field :start_at, :class => "datetime_field", :value => unlocalized_datetime_string(@section.start_at), :style => 'width: 120px;', :"aria-label" => t("Starts on Date") %></td>
   </tr>
   <tr>
     <td><%= f.blabel :end_at, :en => "Ends" %></td>
-    <td><%= f.text_field :end_at, :class => "datetime_field", :value => unlocalized_datetime_string(@section.end_at), :style => 'width: 120px;' %></td>
+    <td><%= f.text_field :end_at, :class => "datetime_field", :value => unlocalized_datetime_string(@section.end_at), :style => 'width: 120px;', :"aria-label" => t("Ends on Date") %></td>
   </tr>
   <tr>
     <td colspan="2">
@@ -206,7 +206,7 @@ h3 .tally {
 <% js_bundle :section %>
 
 <div style="display: none;">
-  <%= form_tag context_url(@context, :context_section_crosslist_url, @section.id), :id => "crosslist_course_form", :class => "no-margin-bottom", :title => t('titles.crosslist_this_section', 'Cross-List this Section'), :method => :post do %>
+  <%= form_tag context_url(@context, :context_section_crosslist_url, @section.id), :id => "crosslist_course_form", :class => "form-dialog no-margin-bottom", :title => t('titles.crosslist_this_section', 'Cross-List this Section'), :method => :post do %>
     <h2><%= t('titles.cross_listed_sections', 'Cross-List Section') %></h2>
     <p>
       <%= t('crosslist_description', %{
@@ -239,14 +239,14 @@ h3 .tally {
               <div id="sis_id_holder" style="display: none;"><%= before_label('labels.sis_id', 'SIS ID') %> <span class="sis_id">&nbsp;</span></div>
               <div id="account_name_holder" style="display: none;"><%= before_label('labels.account', 'Account') %> <span class="account_name"></span></div>
             </div>
-            <div class="button-container">
-              <button type="submit" class="btn submit_button"><%= t('buttons.crosslist_this_section', 'Cross-List This Section') %></button>
-              <button type="button" class="btn btn button-secondary cancel_button"><%= t('buttons.cancel', 'Cancel') %></button>
-            </div>
           </div>
         </td>
       </tr>
     </table>
+    <div class="form-controls">
+      <button type="submit" class="btn btn-primary submit_button"><%= t('buttons.crosslist_this_section', 'Cross-List This Section') %></button>
+      <button type="button" class="btn button-secondary cancel_button"><%= t('buttons.cancel', 'Cancel') %></button>
+    </div>
   <% end %>
 
   <%= form_tag context_url(@context, :context_section_uncrosslist_url, @section.id), :id => "uncrosslist_form", :title => t('titles.decrosslist_section', 'De-Cross-List this Section'), :method => :delete do %>

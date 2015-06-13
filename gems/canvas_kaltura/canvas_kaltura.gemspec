@@ -15,8 +15,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
 
-  spec.add_dependency "nokogiri", "1.5.6"
-  spec.add_dependency "libxml-ruby", "2.6.0"
+  spec.add_dependency "nokogiri"
   spec.add_dependency "canvas_http"
   spec.add_dependency "canvas_sort"
   spec.add_dependency "multipart"
@@ -24,6 +23,6 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.5"
   spec.add_development_dependency "rake"
-  spec.add_development_dependency "rspec", "2.14.1"
+  spec.add_development_dependency "rspec", "2.99.0"
   spec.add_development_dependency "webmock", "1.16.1"
 end

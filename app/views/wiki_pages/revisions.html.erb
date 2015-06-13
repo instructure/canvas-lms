@@ -1,0 +1,6 @@
+<%
+  content_for :page_title, t('page_revisions_title', '%{title} revisions: %{context_name}', :title => @page.title, :context_name => @context.name)
+  js_bundle :wiki_page_revisions
+%>
+<div id="wiki_page_revisions" class="clearfix">
+</div>

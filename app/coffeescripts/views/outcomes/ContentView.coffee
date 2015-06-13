@@ -19,19 +19,29 @@
 define [
   'jquery'
   'underscore'
+  'i18n!contentview'
   'Backbone'
   'compiled/models/Outcome'
   'compiled/models/OutcomeGroup'
   'compiled/views/outcomes/OutcomeView'
   'compiled/views/outcomes/OutcomeGroupView'
-], ($, _, Backbone, Outcome, OutcomeGroup, OutcomeView, OutcomeGroupView) ->
+  'compiled/views/TreeBrowserView'
+  'compiled/views/RootOutcomesFinder'
+  'jst/MoveOutcomeDialog'
+  'jst/outcomes/noOutcomesWarning'
+  'compiled/backbone-ext/DefaultUrlMixin'
+  'str/htmlEscape'
+], ($, _, I18n, Backbone, Outcome, OutcomeGroup, OutcomeView, OutcomeGroupView, TreeBrowserView, RootOutcomesFinder, dialogTemplate, noOutcomesWarning, DefaultUrlMixin, htmlEscape) ->
 
   # This view is a wrapper for showing details for outcomes and groups.
   # It uses OutcomeView and OutcomeGroupView to render
   class ContentView extends Backbone.View
+    @mixin DefaultUrlMixin
 
     initialize: ({@readOnly, @setQuizMastery, @useForScoring, @instructionsTemplate, @renderInstructions}) ->
       super
+      $.subscribe "renderNoOutcomeWarning", @renderNoOutcomeWarning
+      $.subscribe "clearNoOutcomeWarning", @clearNoOutcomeWarning
       @render()
 
     # accepts: Outcome and OutcomeGroup
@@ -55,18 +65,83 @@ define [
         else if viewOpts.model instanceof OutcomeGroup
           new OutcomeGroupView viewOpts
       @render()
+      @innerView.screenreaderTitleFocus() if @innerView instanceof OutcomeView
 
     render: ->
       @attachEvents()
-      @$el.html if @innerView
+      html = if @innerView
           @innerView.render().el
         else if @renderInstructions
           @instructionsTemplate()
+      @$el.html html
       this
 
     attachEvents: ->
       return unless @innerView?
       @innerView.on 'deleteSuccess', => @trigger('deleteSuccess')
+      @innerView.on 'move', (outcomeItem) => @openDialog(outcomeItem)
+
+    openDialog: (outcomeItem) ->
+      dialogTree = @createTree()
+      dialogWindow = @createDialog()
+
+      moveDialog = {
+        tree: dialogTree
+        window: dialogWindow
+        model: outcomeItem
+      }
+
+      $(dialogTree.$el).appendTo('.form-dialog-content')
+      $('.form-controls .btn[type=button]').bind('click', =>
+        dialogWindow.dialog('close'))
+      $('.form-controls .btn[type=submit]').bind('click', (e) =>
+        e.preventDefault()
+        if dialogTree.activeTree
+          @trigger 'move', moveDialog.model, dialogTree.activeTree.model
+          moveDialog.model.on 'finishedMoving', =>
+            dialogWindow.dialog('close')
+        else
+          $.flashError I18n.t("No directory is selected, please select a directory before clicking 'move'")
+        )
+
+      $(moveDialog.window).dialog('option', 'title', I18n.t("Where would you like to move %{title}?", title: outcomeItem.get('title')))
+      $('.ui-dialog :button').blur()
+      setTimeout (=>
+        moveDialog.tree.focusOnOpen()
+        ), 200
+
+    createTree: ->
+      treeBrowser = new TreeBrowserView({
+        rootModelsFinder: new RootOutcomesFinder()
+        focusStyleClass: 'MoveDialog__folderItem--focused'
+        selectedStyleClass: 'MoveDialog__folderItem--selected'
+        onlyShowSubtrees: true
+        onClick: do ->
+          setActiveTree = TreeBrowserView.prototype.setActiveTree
+          ( -> setActiveTree(@, treeBrowser) )
+        }).render()
+      treeBrowser
+
+    createDialog: ->
+      dialog = $(dialogTemplate()).dialog({
+        dialogClass: 'moveDialog'
+        width: 600
+        height: 270
+        open: ->
+          $(@).show()
+        close: (e) ->
+          $(@).remove()
+      })
+      dialog
 
     remove: ->
       @innerView?.off 'addSuccess'
+
+    renderNoOutcomeWarning: =>
+      @$el?.empty()
+      contextPath = htmlEscape(@_contextPath())
+      noOutcomesLinkLabel = I18n.t("You have no outcomes. Click here to go to the outcomes page.")
+      @$el?.append($.raw(noOutcomesWarning(addOutcomesUrl: "/#{contextPath}/outcomes", noOutcomesLinkLabel: noOutcomesLinkLabel)))
+
+    clearNoOutcomeWarning: =>
+      @$el?.empty()

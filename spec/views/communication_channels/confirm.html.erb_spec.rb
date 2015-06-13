@@ -36,15 +36,15 @@ describe "communication_channels/confirm.html.erb" do
       render
       page = Nokogiri::HTML('<document>' + response.body + '</document>')
       registration_form = page.css('#registration_confirmation_form').first
-      registration_form.should_not be_nil
+      expect(registration_form).not_to be_nil
       if @enrollment
-        registration_form['style'].should match /display:\s*none/
-        page.css('#register.btn').first.should_not be_nil
-        page.css('#back.btn').first.should be_nil
+        expect(registration_form['style']).to match /display:\s*none/
+        expect(page.css('#register.btn').first).not_to be_nil
+        expect(page.css('#back.btn').first).to be_nil
       else
-        registration_form['style'].should be_blank
+        expect(registration_form['style']).to be_blank
         # no "back", "use this account", "new account", etc. buttons
-        page.css('a.btn').should be_empty
+        expect(page.css('a.btn')).to be_empty
       end
     end
 
@@ -54,14 +54,14 @@ describe "communication_channels/confirm.html.erb" do
       render
       page = Nokogiri::HTML('<document>' + response.body + '</document>')
       registration_form = page.css('#registration_confirmation_form').first
-      registration_form.should_not be_nil
-      registration_form['style'].should match /display:\s*none/
-      page.css('input[type="radio"][name="pseudonym_select"]').should be_empty
-      page.css('#register.btn').first.should_not be_nil
+      expect(registration_form).not_to be_nil
+      expect(registration_form['style']).to match /display:\s*none/
+      expect(page.css('input[type="radio"][name="pseudonym_select"]')).to be_empty
+      expect(page.css('#register.btn').first).not_to be_nil
       merge_button = page.css('#merge.btn').first
-      merge_button.should_not be_nil
-      merge_button['href'].should == login_url(:host => HostUrl.default_host, :confirm => @communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid), :pseudonym_session => {:unique_id => @pseudonym.unique_id}, :expected_user_id => @pseudonym.user_id)
-      page.css('#back.btn').first.should_not be_nil
+      expect(merge_button).not_to be_nil
+      expect(merge_button['href']).to eq login_url(:host => HostUrl.default_host, :confirm => @communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid), :pseudonym_session => {:unique_id => @pseudonym.unique_id}, :expected_user_id => @pseudonym.user_id)
+      expect(page.css('#back.btn').first).not_to be_nil
     end
 
     it "should follow the simple path for logged in as a matching user" do
@@ -72,15 +72,15 @@ describe "communication_channels/confirm.html.erb" do
       render
       page = Nokogiri::HTML('<document>' + response.body + '</document>')
       registration_form = page.css('#registration_confirmation_form').first
-      registration_form.should_not be_nil
-      registration_form['style'].should match /display:\s*none/
-      page.css('input[type="radio"][name="pseudonym_select"]').should be_empty
-      page.css('#register.btn').first.should_not be_nil
+      expect(registration_form).not_to be_nil
+      expect(registration_form['style']).to match /display:\s*none/
+      expect(page.css('input[type="radio"][name="pseudonym_select"]')).to be_empty
+      expect(page.css('#register.btn').first).not_to be_nil
       merge_button = page.css('#merge.btn').first
-      merge_button.should_not be_nil
-      merge_button.text.should == 'Yes'
-      merge_button['href'].should == registration_confirmation_path(@communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid), :confirm => 1)
-      page.css('#back.btn').first.should_not be_nil
+      expect(merge_button).not_to be_nil
+      expect(merge_button.text).to eq 'Yes'
+      expect(merge_button['href']).to eq registration_confirmation_path(@communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid), :confirm => 1)
+      expect(page.css('#back.btn').first).not_to be_nil
     end
 
     it "should follow the simple path for logged in as a non-matching user" do
@@ -90,15 +90,15 @@ describe "communication_channels/confirm.html.erb" do
       render
       page = Nokogiri::HTML('<document>' + response.body + '</document>')
       registration_form = page.css('#registration_confirmation_form').first
-      registration_form.should_not be_nil
-      registration_form['style'].should match /display:\s*none/
-      page.css('input[type="radio"][name="pseudonym_select"]').should be_empty
-      page.css('#register.btn').first.should_not be_nil
+      expect(registration_form).not_to be_nil
+      expect(registration_form['style']).to match /display:\s*none/
+      expect(page.css('input[type="radio"][name="pseudonym_select"]')).to be_empty
+      expect(page.css('#register.btn').first).not_to be_nil
       merge_button = page.css('#merge.btn').first
-      merge_button.should_not be_nil
-      merge_button['href'].should == registration_confirmation_path(@communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid), :confirm => 1)
-      merge_button.text.should == 'Yes, Add Email Address'
-      page.css('#back.btn').first.should_not be_nil
+      expect(merge_button).not_to be_nil
+      expect(merge_button['href']).to eq registration_confirmation_path(@communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid), :confirm => 1)
+      expect(merge_button.text).to eq 'Yes, Add Email Address'
+      expect(page.css('#back.btn').first).not_to be_nil
     end
 
     it "should follow the mostly-simple-path for not-logged in with multiple pseudonyms" do
@@ -108,14 +108,14 @@ describe "communication_channels/confirm.html.erb" do
       render
       page = Nokogiri::HTML('<document>' + response.body + '</document>')
       registration_form = page.css('#registration_confirmation_form').first
-      registration_form.should_not be_nil
-      registration_form['style'].should match /display:\s*none/
-      page.css('input[type="radio"][name="pseudonym_select"]').length.should == 2
-      page.css('#register.btn').first.should_not be_nil
+      expect(registration_form).not_to be_nil
+      expect(registration_form['style']).to match /display:\s*none/
+      expect(page.css('input[type="radio"][name="pseudonym_select"]').length).to eq 2
+      expect(page.css('#register.btn').first).not_to be_nil
       merge_button = page.css('#merge.btn').first
-      merge_button.should_not be_nil
-      merge_button['href'].should == login_url(:host => HostUrl.default_host, :confirm => @communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid), :pseudonym_session => {:unique_id => @pseudonym.unique_id}, :expected_user_id => @pseudonym.user_id)
-      page.css('#back.btn').first.should_not be_nil
+      expect(merge_button).not_to be_nil
+      expect(merge_button['href']).to eq login_url(:host => HostUrl.default_host, :confirm => @communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid), :pseudonym_session => {:unique_id => @pseudonym.unique_id}, :expected_user_id => @pseudonym.user_id)
+      expect(page.css('#back.btn').first).not_to be_nil
     end
 
     it "should render for multiple merge opportunities" do
@@ -135,14 +135,14 @@ describe "communication_channels/confirm.html.erb" do
       render
       page = Nokogiri::HTML('<document>' + response.body + '</document>')
       registration_form = page.css('#registration_confirmation_form').first
-      registration_form.should_not be_nil
-      registration_form['style'].should match /display:\s*none/
-      page.css('input[type="radio"][name="pseudonym_select"]').length.should == 6
-      page.css('#register.btn').should be_empty
+      expect(registration_form).not_to be_nil
+      expect(registration_form['style']).to match /display:\s*none/
+      expect(page.css('input[type="radio"][name="pseudonym_select"]').length).to eq 6
+      expect(page.css('#register.btn')).to be_empty
       merge_button = page.css('#merge.btn').first
-      merge_button.should_not be_nil
-      merge_button['href'].should == registration_confirmation_path(@communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid), :confirm => 1)
-      page.css('#back.btn').first.should_not be_nil
+      expect(merge_button).not_to be_nil
+      expect(merge_button['href']).to eq registration_confirmation_path(@communication_channel.confirmation_code, :enrollment => @enrollment.try(:uuid), :confirm => 1)
+      expect(page.css('#back.btn').first).not_to be_nil
     end
   end
 
@@ -162,13 +162,13 @@ describe "communication_channels/confirm.html.erb" do
 
       render
       page = Nokogiri::HTML('<document>' + response.body + '</document>')
-      page.css('#registration_confirmation_form').first.should be_nil
+      expect(page.css('#registration_confirmation_form').first).to be_nil
       transfer_button = page.css('#transfer.btn').first
-      transfer_button.should_not be_nil
-      transfer_button['href'].should == registration_confirmation_path(@communication_channel.confirmation_code, :enrollment => @enrollment.uuid, :transfer_enrollment => 1)
+      expect(transfer_button).not_to be_nil
+      expect(transfer_button['href']).to eq registration_confirmation_path(@communication_channel.confirmation_code, :enrollment => @enrollment.uuid, :transfer_enrollment => 1)
       login_button = page.css('#login.btn').first
-      login_button.should_not be_nil
-      login_button['href'].should == login_url(:enrollment => @enrollment.uuid, :pseudonym_session => { :unique_id => 'jt@instructure.com'}, :expected_user_id => @pseudonym1.user_id)
+      expect(login_button).not_to be_nil
+      expect(login_button['href']).to eq login_url(:enrollment => @enrollment.uuid, :pseudonym_session => { :unique_id => 'jt@instructure.com'}, :expected_user_id => @pseudonym1.user_id)
     end
 
     context "open registration" do
@@ -191,13 +191,13 @@ describe "communication_channels/confirm.html.erb" do
       assigns[:merge_opportunities] = [[@user, [@pseudonym]]]
       render
       page = Nokogiri::HTML('<document>' + response.body + '</document>')
-      page.css('input[type="radio"][name="pseudonym_select"]').should be_empty
-      page.css('#registration_confirmation_form').first.should be_nil
-      page.css('#register.btn').first.should be_nil
+      expect(page.css('input[type="radio"][name="pseudonym_select"]')).to be_empty
+      expect(page.css('#registration_confirmation_form').first).to be_nil
+      expect(page.css('#register.btn').first).to be_nil
       merge_button = page.css('#merge.btn').first
-      merge_button.should_not be_nil
-      merge_button.text.should == 'Combine'
-      merge_button['href'].should == registration_confirmation_path(@communication_channel.confirmation_code, :confirm => 1, :enrollment => nil)
+      expect(merge_button).not_to be_nil
+      expect(merge_button.text).to eq 'Combine'
+      expect(merge_button['href']).to eq registration_confirmation_path(@communication_channel.confirmation_code, :confirm => 1, :enrollment => nil)
     end
 
     it "should render to merge with the current user that doesn't have a pseudonym in the default account" do
@@ -207,13 +207,13 @@ describe "communication_channels/confirm.html.erb" do
       assigns[:merge_opportunities] = [[@user, [@pseudonym]]]
       render
       page = Nokogiri::HTML('<document>' + response.body + '</document>')
-      page.css('input[type="radio"][name="pseudonym_select"]').should be_empty
-      page.css('#registration_confirmation_form').first.should be_nil
-      page.css('#register.btn').first.should be_nil
+      expect(page.css('input[type="radio"][name="pseudonym_select"]')).to be_empty
+      expect(page.css('#registration_confirmation_form').first).to be_nil
+      expect(page.css('#register.btn').first).to be_nil
       merge_button = page.css('#merge.btn').first
-      merge_button.should_not be_nil
-      merge_button.text.should == 'Combine'
-      merge_button['href'].should == registration_confirmation_path(@communication_channel.confirmation_code, :confirm => 1, :enrollment => nil)
+      expect(merge_button).not_to be_nil
+      expect(merge_button.text).to eq 'Combine'
+      expect(merge_button['href']).to eq registration_confirmation_path(@communication_channel.confirmation_code, :confirm => 1, :enrollment => nil)
     end
 
     it "should render to merge multiple users" do
@@ -225,13 +225,13 @@ describe "communication_channels/confirm.html.erb" do
       assigns[:merge_opportunities] = [[@user1, [@user1.pseudonym]], [@user2, [@user2.pseudonym]]]
       render
       page = Nokogiri::HTML('<document>' + response.body + '</document>')
-      page.css('input[type="radio"][name="pseudonym_select"]').length.should == 2
-      page.css('#registration_confirmation_form').first.should be_nil
-      page.css('#register.btn').first.should be_nil
+      expect(page.css('input[type="radio"][name="pseudonym_select"]').length).to eq 2
+      expect(page.css('#registration_confirmation_form').first).to be_nil
+      expect(page.css('#register.btn').first).to be_nil
       merge_button = page.css('#merge.btn').first
-      merge_button.should_not be_nil
-      merge_button.text.should == 'Continue'
-      merge_button['href'].should == login_url(:host => HostUrl.default_host, :confirm => @communication_channel.confirmation_code, :pseudonym_session => {:unique_id => @pseudonym1.unique_id}, :expected_user_id => @pseudonym1.user_id)
+      expect(merge_button).not_to be_nil
+      expect(merge_button.text).to eq 'Continue'
+      expect(merge_button['href']).to eq login_url(:host => HostUrl.default_host, :confirm => @communication_channel.confirmation_code, :pseudonym_session => {:unique_id => @pseudonym1.unique_id}, :expected_user_id => @pseudonym1.user_id)
     end
   end
 

@@ -26,7 +26,7 @@ describe "/gradebooks/grade_summary" do
     a = @course.assignments.create!(:title => "some assignment")
     assigns[:presenter] = GradeSummaryPresenter.new(@course, @user, nil)
     render "gradebooks/grade_summary"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 
   it "should not show totals if configured so" do
@@ -36,9 +36,9 @@ describe "/gradebooks/grade_summary" do
     a = @course.assignments.create!(:title => "some assignment")
     assigns[:presenter] = GradeSummaryPresenter.new(@course, @user, nil)
     render "gradebooks/grade_summary"
-    response.should_not be_nil
+    expect(response).not_to be_nil
     page = Nokogiri('<document>' + response.body + '</document>')
-    page.css(".final_grade").length.should == 0
+    expect(page.css(".final_grade").length).to eq 0
   end
 
   it "should not show 'what if' if not the student" do
@@ -49,10 +49,10 @@ describe "/gradebooks/grade_summary" do
     view_context
     a = @course.assignments.create!(:title => "some assignment")
     assigns[:presenter] = GradeSummaryPresenter.new(@course, @teacher, @student.id)
-    assigns[:presenter].student_enrollment.should_not be_nil
+    expect(assigns[:presenter].student_enrollment).not_to be_nil
     render "gradebooks/grade_summary"
-    response.should_not be_nil
-    response.body.should_not match(/Click any score/)
+    expect(response).not_to be_nil
+    expect(response.body).not_to match(/Click any score/)
   end
   
   it "should know the types of media comments" do
@@ -67,8 +67,8 @@ describe "/gradebooks/grade_summary" do
     assigns[:presenter] = GradeSummaryPresenter.new(@course, @teacher, @student.id)
     render "gradebooks/grade_summary"
     doc = Nokogiri::HTML::DocumentFragment.parse response.body
-    doc.at_css('.audio_comment ~ span.media_comment_id').text.should eql '0_abcdefgh'
-    doc.at_css('.video_comment ~ span.media_comment_id').text.should eql '0_ijklmnop'
+    expect(doc.at_css('.audio_comment ~ span.media_comment_id').text).to eql '0_abcdefgh'
+    expect(doc.at_css('.video_comment ~ span.media_comment_id').text).to eql '0_ijklmnop'
   end
 
   it "should show a disabled message for grade stats for the test student" do
@@ -80,7 +80,7 @@ describe "/gradebooks/grade_summary" do
     a.grade_student(@student, grade: "10")
     assigns[:presenter] = GradeSummaryPresenter.new(@course, @teacher, @student.id)
     render "gradebooks/grade_summary"
-    response.should_not be_nil
-    response.body.should match(/Test Student scores are not included in grade statistics./)
+    expect(response).not_to be_nil
+    expect(response.body).to match(/Test Student scores are not included in grade statistics./)
   end
 end

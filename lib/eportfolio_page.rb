@@ -18,7 +18,6 @@
 
 module EportfolioPage
   def eportfolio_page_attributes
-    @portfolio.setup_defaults
     @categories = @portfolio.eportfolio_categories
     if @portfolio.grants_right?(@current_user, session, :manage)
       @recent_submissions = @current_user.submissions.order("created_at DESC").all if @current_user && @current_user == @portfolio.user

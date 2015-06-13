@@ -20,8 +20,9 @@ define({
       return;
     }
 
-    // also require the translations when config.translate is true
-    req(['i18nObj', 'translations/' + name], function(I18n, translations) {
+    // also require the translations when config.translate is true. note
+    // that build.js concats _core, but we still need to actually require it.
+    req(['i18nObj', 'translations/' + name, 'translations/_core'], function(I18n) {
       load( config.isBuild ? null : I18n.scoped(name) );
     });
   }

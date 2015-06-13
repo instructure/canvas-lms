@@ -27,6 +27,6 @@ describe "/terms/index" do
     assigns[:terms] = Account.default.enrollment_terms.active.sort_by{|t| t.start_at || t.created_at }.reverse
     render "terms/index"
     page = Nokogiri('<document>' + response.body + '</document>')
-    page.css(".delete_term_link")[0]['href'].should == '#'
+    expect(page.css(".delete_term_link")[0]['href']).to eq '#'
   end
 end

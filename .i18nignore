@@ -1,0 +1,7 @@
+/db
+/guard
+/node_modules
+/spec
+/tmp
+/vendor/bundle
+/vendor/cache

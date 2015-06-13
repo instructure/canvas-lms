@@ -13,7 +13,7 @@ describe Twitter::Messenger do
 
   describe '#deliver' do
 
-    let(:user) { stub(:user_services => stub(:find_by_service => @service)) }
+    let(:user) { stub(:user_services) }
     let(:message) { stub(:body => 'body', :url => 'url', :user => user, :asset_context => nil, :id => 0, :main_link => '') }
     let(:connection_mock) { mock() }
 

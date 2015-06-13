@@ -38,11 +38,12 @@ define ['jquery', 'compiled/editor/EditorToggle'], ($, EditorToggle) ->
     # @api public
     edit: ->
       super
+      id = @textArea.attr('id')
       @answerText.hide()
       if @content is ''
-        @textArea._setContentCode @answerText.val()
+        tinyMCE.get(id).setContent @answerText.val()
       else
-        @textArea._setContentCode @content
+        tinyMCE.get(id).setContent @content
 
     ##
     # Shows the original <input type=text> that the editor replaces and hides

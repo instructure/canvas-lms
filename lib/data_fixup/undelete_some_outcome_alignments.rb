@@ -8,19 +8,11 @@ module DataFixup::UndeleteSomeOutcomeAlignments
     # aligned".  When the data was a HashWithIndifferentAccess instead of just
     # a Hash, it didn't have the comma in front of learning_outcome_id.  This
     # brings those content tags back.
-    if CANVAS_RAILS2
-      scope = ContentTag.scoped(joins:
-        "INNER JOIN rubrics r
-          ON content_tags.content_id = r.id
-          AND content_tags.content_type = 'Rubric'
-      ", select: "content_tags.*")
-    else
-      scope = ContentTag.joins("
-        INNER JOIN rubrics r
-          ON content_tags.content_id = r.id
-          AND content_tags.content_type = 'Rubric'
-      ").select("content_tags.*")
-    end
+    scope = ContentTag.joins("
+      INNER JOIN rubrics r
+        ON content_tags.content_id = r.id
+        AND content_tags.content_type = 'Rubric'
+    ").select("content_tags.*")
     scope = scope.where("
       content_tags.tag_type = 'learning_outcome'
       AND content_tags.workflow_state = 'deleted'
@@ -38,41 +30,22 @@ module DataFixup::UndeleteSomeOutcomeAlignments
     # The fourth block in that same fixup then found outcomes that should no
     # longer be aligned to assignments, so we need to bring those back as well.
     rubric_ids.each_slice(1000) do |rids|
-      if CANVAS_RAILS2
-        scope = ContentTag.scoped(joins:
-          "INNER JOIN assignments a
-            ON content_tags.content_id = a.id
-            AND content_tags.content_type = 'Assignment'
-          INNER JOIN rubric_associations ra
-            ON ra.association_id = a.id
-            AND ra.association_type = 'Assignment'
-          INNER JOIN rubrics r
-            ON ra.rubric_id = r.id
-          INNER JOIN content_tags ct2
-            ON ct2.content_id = r.id
-            AND ct2.content_type = 'Rubric'
-            AND ct2.tag_type = 'learning_outcome'
-            AND ct2.workflow_state = 'active'
-            AND ct2.learning_outcome_id = content_tags.learning_outcome_id
-        ", select: "content_tags.*")
-      else
-        scope = ContentTag.joins("
-          INNER JOIN assignments a
-            ON content_tags.content_id = a.id
-            AND content_tags.content_type = 'Assignment'
-          INNER JOIN rubric_associations ra
-            ON ra.association_id = a.id
-            AND ra.association_type = 'Assignment'
-          INNER JOIN rubrics r
-            ON ra.rubric_id = r.id
-          INNER JOIN content_tags ct2
-            ON ct2.content_id = r.id
-            AND ct2.content_type = 'Rubric'
-            AND ct2.tag_type = 'learning_outcome'
-            AND ct2.workflow_state = 'active'
-            AND ct2.learning_outcome_id = content_tags.learning_outcome_id
-        ").select("content_tags.*")
-      end
+      scope = ContentTag.joins("
+        INNER JOIN assignments a
+          ON content_tags.content_id = a.id
+          AND content_tags.content_type = 'Assignment'
+        INNER JOIN rubric_associations ra
+          ON ra.association_id = a.id
+          AND ra.association_type = 'Assignment'
+        INNER JOIN rubrics r
+          ON ra.rubric_id = r.id
+        INNER JOIN content_tags ct2
+          ON ct2.content_id = r.id
+          AND ct2.content_type = 'Rubric'
+          AND ct2.tag_type = 'learning_outcome'
+          AND ct2.workflow_state = 'active'
+          AND ct2.learning_outcome_id = content_tags.learning_outcome_id
+      ").select("content_tags.*")
       scope = scope.where("
         content_tags.tag_type = 'learning_outcome'
         AND content_tags.workflow_state = 'deleted'

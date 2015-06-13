@@ -12,7 +12,7 @@ class FixUserMergeConversations2 < ActiveRecord::Migration
     convos = ConversationParticipant.where("NOT EXISTS (SELECT 1 FROM conversations WHERE id = conversation_id)")
     convos.group_by(&:conversation_id).each do |conversation_id, cps|
       private_hash = Conversation.private_hash_for(cps.map(&:user_id))
-      if target = Conversation.find_by_private_hash(private_hash)
+      if target = Conversation.where(private_hash: private_hash).first
         new_participants = target.conversation_participants.inject({}){ |h,p| h[p.user_id] = p; h }
         cps.each do |cp|
           if new_cp = new_participants[cp.user_id]

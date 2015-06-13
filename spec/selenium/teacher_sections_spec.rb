@@ -16,14 +16,14 @@ describe "sections" do
       get "/courses/#{@course.id}/sections/#{@section.id}"
       wait_for_ajaximations
 
-      ff("#current-enrollment-list .user").count.should == 1
-      f("#enrollment_#{e2.id}").should include_text e2.user.name
+      expect(ff("#current-enrollment-list .user").count).to eq 1
+      expect(f("#enrollment_#{e2.id}")).to include_text e2.user.name
 
       get "/courses/#{@course.id}/sections/#{@course.default_section.id}"
       wait_for_ajaximations
 
-      ff("#current-enrollment-list .user").count.should == 1
-      f("#enrollment_#{@teacher.enrollments.first.id}").should include_text @teacher.name
+      expect(ff("#current-enrollment-list .user").count).to eq 1
+      expect(f("#enrollment_#{@teacher.enrollments.first.id}")).to include_text @teacher.name
     end
   end
 end

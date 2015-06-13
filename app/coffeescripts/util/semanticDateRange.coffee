@@ -1,10 +1,10 @@
 # requires $.sameDate, $.dateString, $.timeString, $.datetimeString
-define ['i18n!dates', 'jquery', 'timezone', 'jquery.instructure_date_and_time'], (I18n, $, tz) ->
+define ['i18n!dates', 'jquery', 'timezone', 'str/htmlEscape', 'jquery.instructure_date_and_time'], (I18n, $, tz, htmlEscape) ->
   semanticDateRange = (startISO, endISO) ->
     unless startISO
       return """
         <span class="date-range date-range-no-date">
-          #{I18n.t 'no_date', 'No Date'}
+          #{htmlEscape I18n.t 'no_date', 'No Date'}
         </span>
       """
 

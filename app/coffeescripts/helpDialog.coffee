@@ -76,7 +76,8 @@ define [
       }, {
         step: =>
           #reposition vertically to reflect current height
-          @$dialog.dialog('option', 'position', 'center')
+          @initDialog() unless @dialogInited and @$dialog?.hasClass("ui-dialog-content")
+          @$dialog?.dialog('option', 'position', 'center')
         duration: 100
         complete: ->
           newPanel.find(':input').not(':disabled').first().focus()
@@ -85,16 +86,16 @@ define [
       if newTitle = @$dialog.find("a[href='#{panelId}'] .text").text()
         newTitle = $("
           <a class='ui-dialog-header-backlink' href='#help-dialog-options'>
-            #{I18n.t('Back', 'Back')}
+            #{htmlEscape(I18n.t('Back', 'Back'))}
           </a>
-          <span>#{newTitle}</span>
+          <span>#{htmlEscape(newTitle)}</span>
         ")
       else
         newTitle = @defaultTitle
       @$dialog.dialog 'option', 'title', newTitle
 
     open: ->
-      helpDialog.initDialog() unless helpDialog.dialogInited
+      helpDialog.initDialog() unless helpDialog.dialogInited and helpDialog.$dialog?.hasClass("ui-dialog-content")
       helpDialog.$dialog.dialog('open')
       helpDialog.initTeacherFeedback()
 
@@ -114,11 +115,12 @@ define [
                 @$dialog.dialog('close')
 
         $.when(coursesDfd, @helpLinksDfd).done ([courses]) ->
-          options = $.map courses, (c) ->
-            "<option value='course_#{c.id}_admins' #{if ENV.context_id is c.id then 'selected' else ''}>
+          optionsHtml = $.map(courses, (c) ->
+            "<option value='course_#{c.id}_admins' #{$.raw if ENV.context_id is c.id then 'selected' else ''}>
               #{htmlEscape(c.name)}
             </option>"
-          $form.find('[name="recipients[]"]').html(options.join '')
+          ).join('')
+          $form.find('[name="recipients[]"]').html(optionsHtml)
 
     initTriggers: ->
       $('.help_dialog_trigger').click preventDefault @open

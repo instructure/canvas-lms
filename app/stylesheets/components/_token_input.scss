@@ -1,0 +1,231 @@
+@import "base/environment";
+
+
+///////////
+/// New React Token Input
+///////////
+
+// These are classes used in Token Input Component
+// We should figure out a way to use our own instead
+.flex {display: flex;}
+.inline-flex {display: inline-flex;}
+
+.ic-tokeninput {
+  display: inline-block;
+}
+
+.ic-tokeninput-list {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 999999;
+  border: 1px solid $ic-border-light;
+  background: $ic-color-light;
+  padding: 5px 0px;
+  max-height: 600px;
+  font-size: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ic-tokeninput-is-open .ic-tokeninput-list {
+  display: block;
+}
+
+.ic-tokeninput-option:focus {
+  outline: 0;
+  color: white;
+  background: hsl(200, 50%, 50%);
+}
+
+.ic-tokeninput-input {
+  padding-right: 20px;
+  width: 100%;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.ic-tokeninput-button {
+  display: inline-block;
+  position: absolute;
+  cursor: default;
+  outline: none;
+  top: 2px;
+  right: 6px;
+  font-size: 14px;
+  cursor: default;
+}
+
+.ic-tokeninput-button:active {
+  color: #4095BF;
+}
+
+.ic-tokeninput-option, .ic-tokeninput-header {
+  display: block;
+  padding: 2px 16px;
+  cursor: default;
+}
+
+.ic-tokeninput-header{
+  font-weight: 700;
+}
+
+.ic-tokeninput-header:focus {
+  outline: 0;
+  color: white;
+  background: #ddd;
+}
+
+.ic-tokeninput-selected:before {
+  content: '✓';
+  position: absolute;
+  left: 4px;
+}
+
+.token-input-wrapper{
+  width: 204px;
+  min-height: 50px;
+  float: left;
+}
+
+.ic-tokens {
+  margin-left: 5px;
+  flex-wrap: wrap;
+  z-index: 1;
+  list-style: none;
+  padding: 6px 6px;
+  border: 1px solid $ic-border-light;
+  background-color: $ic-color-light;
+  border-radius: 3px;
+  cursor: text;
+  position: relative;
+  will-change: transform;
+  flex: 1 75%;
+  margin: 0;
+}
+$ic-token-padding: 3px 15px;
+.ic-token {
+  background-color: $ic-bg-light-neutral;
+  border: none;
+  color: $ic-color-dark;
+  border-radius: 3px;
+  padding: 0;
+  margin: 2px;
+  font-size: 12px;
+  display: inline-flex;
+}
+.ic-token-label {
+  padding: $ic-token-padding;
+}
+.ic-token-delete-button {
+  font-size: 12px;
+  padding: $ic-token-padding;
+  cursor: pointer;
+  order: 2; // makes it come after the words
+}
+
+.ic-token-delete-button:hover {
+  background-color: darken($ic-bg-light-neutral, 5);
+}
+
+.ic-tokeninput {
+  display: inline-flex;
+}
+
+.ic-tokeninput-input {
+  border: 0 none;
+  outline: 0;
+}
+
+.ic-tokeninput-button {
+  display: none;
+}
+
+///////////
+/// Legacy Token Input
+///////////
+.token_input {
+  line-height: 1.1em;
+  min-height: 20px;
+  display: inline-block;
+  border: 1px solid #999999;
+  border-top-color: #737373;
+  padding: 0;
+  background: #fff;
+  box-sizing: border-box;
+  cursor: text;
+  position: relative;
+  a.browser {
+    position: absolute;
+    top: 0;
+    right: 0;
+    cursor: pointer;
+    overflow: hidden;
+    height: 18px;
+    width: 18px;
+    text-indent: -9999em;
+    background: transparent url(/images/messages/address-book-icon-sprite.png) 0 0 no-repeat;
+  }
+  a.browser:hover {
+    background-position: 0 -18px;
+  }
+  > span {
+    float: left;
+    color: #888;
+    margin: 2px 1px 0;
+  }
+  > div {
+    overflow: auto;
+    max-height: 90px;
+  }
+  &.browsable > div {
+    padding-right: 20px;
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  li {
+    @include name_bubbles;
+    line-height: 1.1em;
+  }
+  li.selected {
+    background-color: #5b89f3;
+    border-color: #5b89f3;
+    color: #fff;
+    a {
+      background-position: (-10px) center;
+    }
+  }
+  li.details {
+    div {
+      padding: 0 11px;
+    }
+    span {
+      padding: 0 15px 0 4px;
+    }
+  }
+  input {
+    box-shadow: none;
+    float: left;
+    border: 0;
+    outline: none;
+    padding: 0;
+    margin: 1px 0;
+    line-height: 1.1em;
+  }
+}
+
+.token_input.browse {
+  a.browser {
+    background-position: 0 -36px;
+  }
+}
+
+.token_input.active {
+  box-shadow: 0 0 3px 2px #68B4DF;
+}
+

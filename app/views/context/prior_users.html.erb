@@ -12,13 +12,13 @@
 <% end %>
 
 <% jammit_css :prior_users %>
-<h2><%= t('headings.prior_users', %{Prior Users}) %></h2>
+<h1><%= t('headings.prior_users', %{Prior Users}) %></h1>
 <table id="users">
   <thead>
     <tr>
-      <th><%= t('#table_headings.name', %{Name}) %></th>
-      <th><%= t('#table_headings.type', %{Type}) %></th>
-      <th><%= t('#table_headings.total', %{Total}) %></th>
+      <th scope="col"><%= t('#table_headings.name', %{Name}) %></th>
+      <th scope="col"><%= t('#table_headings.type', %{Type}) %></th>
+      <th scope="col"><%= t('#table_headings.total', %{Total}) %></th>
     </tr>
   </thead>
   <tbody>

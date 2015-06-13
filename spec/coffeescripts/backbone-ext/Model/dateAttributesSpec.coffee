@@ -1,4 +1,4 @@
-require ['compiled/backbone-ext/Model'], (Model) ->
+define ['compiled/backbone-ext/Model'], (Model) ->
 
   module 'dateAttributes'
 

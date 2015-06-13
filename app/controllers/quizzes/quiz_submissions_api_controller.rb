@@ -121,6 +121,11 @@
 #           "type": "integer",
 #           "format": "int64"
 #         },
+#         "has_seen_results": {
+#           "description": "Whether the student has viewed their results to the quiz.",
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "workflow_state": {
 #           "description": "The current state of the quiz submission. Possible values: ['untaken'|'pending_review'|'complete'|'settings_only'|'preview'].",
 #           "example": "untaken",
@@ -155,12 +160,12 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   #    "quiz_submissions": [QuizSubmission]
   #  }
   def index
-    quiz_submissions = if is_authorized_action?(@context, @current_user, [:manage_grades, :view_all_grades])
+    quiz_submissions = if @context.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
       # teachers have access to all student submissions
       Api.paginate @quiz.quiz_submissions.where(:user_id => visible_user_ids),
         self,
         api_v1_course_quiz_submissions_url(@context, @quiz)
-    elsif is_authorized_action?(@quiz, @current_user, :submit)
+    elsif @quiz.grants_right?(@current_user, session, :submit)
       # students have access only to their own
       @quiz.quiz_submissions.where(:user_id => @current_user)
     end
@@ -188,6 +193,10 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   #  }
   def show
     if authorized_action(@quiz_submission, @current_user, :read)
+      if params.has_key?(:attempt)
+        retrieve_quiz_submission_attempt!(params[:attempt])
+      end
+
       serialize_and_render @quiz_submission
     end
   end
@@ -198,10 +207,10 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   # Start taking a Quiz by creating a QuizSubmission which you can use to answer
   # questions and submit your answers.
   #
-  # @argument access_code [Optional, String]
+  # @argument access_code [String]
   #   Access code for the Quiz, if any.
   #
-  # @argument preview [Optional, Boolean]
+  # @argument preview [Boolean]
   #   Whether this should be a preview QuizSubmission and not count towards
   #   the user's course record. Teachers only.
   #
@@ -236,14 +245,14 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   # answered, provide comments for the student about their answer(s), or simply
   # fudge the total score by a specific amount of points.
   #
-  # @argument attempt [Integer]
+  # @argument attempt [Required, Integer]
   #   The attempt number of the quiz submission that should be updated. This
   #   attempt MUST be already completed.
   #
-  # @argument fudge_points [Optional, Float]
+  # @argument fudge_points [Float]
   #   Amount of positive or negative points to fudge the total score by.
   #
-  # @argument questions [Optional, Hash]
+  # @argument questions [Hash]
   #   A set of scores and comments for each question answered by the student.
   #   The keys are the question IDs, and the values are hashes of `score` and
   #   `comment` entries. See {Appendix: Manual Scoring} for more on this
@@ -307,16 +316,16 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   # the quiz submission has been marked as complete, no further modifications
   # will be allowed.
   #
-  # @argument attempt [Integer]
+  # @argument attempt [Required, Integer]
   #   The attempt number of the quiz submission that should be completed. Note
   #   that this must be the latest attempt index, as earlier attempts can not
   #   be modified.
   #
-  # @argument validation_token [String]
+  # @argument validation_token [Required, String]
   #   The unique validation token you received when this Quiz Submission was
   #   created.
   #
-  # @argument access_code [Optional, String]
+  # @argument access_code [String]
   #   Access code for the Quiz, if any.
   #
   # <b>Responses</b>
@@ -336,8 +345,37 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   def complete
     @service.complete @quiz_submission, params[:attempt]
 
+    # TODO: should this go in the service instead?
+    Canvas::LiveEvents.quiz_submitted(@quiz_submission)
+
     serialize_and_render @quiz_submission
   end
+
+  # @API Get current quiz submission times.
+  # @beta
+  #
+  # Get the current timing data for the quiz attempt, both the end_at timestamp
+  # and the time_left parameter.
+  #
+  # <b>Responses</b>
+  #
+  # * <b>200 OK</b> if the request was successful
+  #
+  # @example_response
+  #  {
+  #    "end_at": [DateTime],
+  #    "time_left": [Integer]
+  #  }
+  def time
+    if authorized_action(@quiz_submission, @current_user, :record_events)
+      render :json =>
+      {
+        :end_at => @quiz_submission && @quiz_submission.end_at,
+        :time_left => @quiz_submission && @quiz_submission.time_left
+      }
+    end
+  end
+
 
   private
 

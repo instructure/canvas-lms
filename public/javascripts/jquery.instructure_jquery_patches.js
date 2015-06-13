@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-define(['vendor/jquery-1.7.2'], function($) {
-
+define(['vendor/jquery-1.7.2', 'vendor/jquery.cookie'], function($) {
   // monkey patch jquery's JSON parsing so we can have all of our ajax responses return with
   // 'while(1);' prepended to them to protect against a CSRF attack vector.
   var _parseJSON = $.parseJSON;
@@ -73,7 +72,7 @@ define(['vendor/jquery-1.7.2'], function($) {
 
   // see: https://github.com/rails/jquery-ujs/blob/master/src/rails.js#L80
   var CSRFProtection =  function(xhr) {
-    if (ENV.AUTHENTICITY_TOKEN) xhr.setRequestHeader('X-CSRF-Token', ENV.AUTHENTICITY_TOKEN);
+    if ($.cookie('_csrf_token')) xhr.setRequestHeader('X-CSRF-Token', $.cookie('_csrf_token'));
   }
 
   $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {

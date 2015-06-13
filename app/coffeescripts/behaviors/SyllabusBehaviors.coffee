@@ -20,6 +20,7 @@ define [
   'jquery' # jQuery, $ #
   'calendar_move' # calendarMonths #
   'wikiSidebar'
+  'compiled/views/editor/KeyboardShortcuts'
   'jquery.instructure_date_and_time' # dateString, datepicker #
   'jquery.instructure_forms' # formSubmit, formErrors #
   'jquery.instructure_misc_helpers' # scrollSidebar #
@@ -29,7 +30,7 @@ define [
   'tinymce.editor_box' # editorBox #
   'vendor/jquery.scrollTo' # /\.scrollTo/ #
   'jqueryui/datepicker' # /\.datepicker/ #
-], ($, calendarMonths, wikiSidebar) ->
+], ($, calendarMonths, wikiSidebar, KeyboardShortcuts) ->
 
   specialDatesAreHidden = false
 
@@ -170,6 +171,10 @@ define [
 
   # Binds to edit syllabus dom events
   bindToEditSyllabus = ->
+
+    # Add the backbone view for keyboardshortup help here
+    $('.toggle_views_link').first().before((new KeyboardShortcuts()).render().$el)
+
     $edit_course_syllabus_form = $('#edit_course_syllabus_form')
     $course_syllabus_body = $('#course_syllabus_body')
     $course_syllabus = $('#course_syllabus')
@@ -182,8 +187,9 @@ define [
       $edit_course_syllabus_form.show()
       $course_syllabus.hide()
       $course_syllabus_details.hide()
+      $course_syllabus_body.val($course_syllabus.data('syllabus_body'))
       $course_syllabus_body.editorBox()
-      $course_syllabus_body.editorBox 'set_code', $course_syllabus.data('syllabus_body')
+      $('.jump_to_today_link').focus() # a11y: Set focus so it doesn't get lost.
       if wikiSidebar
         wikiSidebar.attachToEditor $course_syllabus_body
         wikiSidebar.show()
@@ -226,6 +232,9 @@ define [
         $course_syllabus.loadingImage()
 
       success: (data) ->
+        ###
+        xsslint safeString.property syllabus_body
+        ###
         $course_syllabus.loadingImage('remove').html data.course.syllabus_body
         $course_syllabus.data('syllabus_body', data.course.syllabus_body)
         $course_syllabus_details.hide()

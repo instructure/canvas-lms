@@ -24,6 +24,10 @@ module SIS
         row.include?('group_id') && row.include?('name')
       end
 
+      def self.identifying_fields
+        %w[group_id].freeze
+      end
+
       # expected columns
       # group_id,account_id,name,status
       def process(csv)

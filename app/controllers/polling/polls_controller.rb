@@ -107,7 +107,7 @@ module Polling
     # @argument polls[][question] [Required, String]
     #   The title of the poll.
     #
-    # @argument polls[][description] [Optional, String]
+    # @argument polls[][description] [String]
     #   A brief description or instructions for the poll.
     #
     # @example_response
@@ -135,7 +135,7 @@ module Polling
     # @argument polls[][question] [Required, String]
     #   The title of the poll.
     #
-    # @argument polls[][description] [Optional, String]
+    # @argument polls[][description] [String]
     #   A brief description or instructions for the poll.
     #
     # @example_response

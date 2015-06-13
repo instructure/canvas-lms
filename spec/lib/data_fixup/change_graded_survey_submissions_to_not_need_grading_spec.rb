@@ -24,11 +24,11 @@ describe DataFixup::ChangeGradedSurveySubmissionsToNotNeedGrading do
 
     subject.run
 
-    submission.reload.should be_completed
-    submission.submission.should be_graded
+    expect(submission.reload).to be_completed
+    expect(submission.submission).to be_graded
 
     teacher_in_course(course: @course, active_all: true)
-    @teacher.assignments_needing_grading.should_not include @quiz.assignment
+    expect(@teacher.assignments_needing_grading).not_to include @quiz.assignment
 
   end
 

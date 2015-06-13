@@ -44,6 +44,14 @@ class DiscussionTopicPresenter
     end
   end
 
+  def has_peer_reviews?(user)
+    peer_reviews_for(user).present?
+  end
+
+  def peer_reviews_for(user)
+    user.assigned_submission_assessments.for_assignment(assignment.id)
+  end
+
   # Public: Determine if this discussion's assignment has an attached rubric.
   #
   # Returns a boolean.
@@ -88,10 +96,6 @@ class DiscussionTopicPresenter
   #
   # Returns a boolean.
   def allows_speed_grader?
-    !large_roster? && draft_state_allows_speedgrader?
-  end
-
-  def draft_state_allows_speedgrader?
-    topic.context.feature_enabled?(:draft_state) ? topic.assignment.published? : true
+    !large_roster? && topic.assignment.published?
   end
 end

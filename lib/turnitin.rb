@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,9 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'turnitin/response'
+
 module Turnitin
   class Client
-    
     attr_accessor :endpoint, :account_id, :shared_secret, :host, :testing
 
     def initialize(account_id, shared_secret, host=nil, testing=false)
@@ -49,7 +50,7 @@ module Turnitin
         :logout_user              => '18',
       }
     end
-    
+
     def id(obj)
       if @testing
         "test_#{obj.asset_string}"
@@ -57,43 +58,41 @@ module Turnitin
         "#{account_id}_#{obj.asset_string}"
       end
     end
-    
+
     def email(item)
       # emails @example.com are, guaranteed by RFCs, to be like /dev/null :)
-      null_email = "#{item.asset_string}@null.instructure.example.com"
-      if item.is_a?(User)
-        item.email || null_email
-      else
-        null_email
-      end
+      email = if item.is_a?(User)
+                item.email
+              elsif item.respond_to?(:turnitin_id)
+                item.generate_turnitin_id!
+                item_type = item.class.reflection_type_name
+                "#{item_type}_#{item.turnitin_id}@null.instructure.example.com"
+              end
+      email ||= "#{item.asset_string}@null.instructure.example.com"
     end
 
     TurnitinUser = Struct.new(:asset_string,:first_name,:last_name,:name)
-    
+
     def testSettings
       user = TurnitinUser.new("admin_test","Admin","Test","Admin Test")
       res = createTeacher(user)
-      !!res
+      res.success?
     end
-    
+
     def createStudent(user)
-      res = sendRequest(:create_user, 2, :user => user, :utp => '1')
-      res.css("userid").first.try(:content)
+      sendRequest(:create_user, 2, :user => user, :utp => '1')
     end
-    
+
     def createTeacher(user)
-      res = sendRequest(:create_user, 2, :user => user, :utp => '2')
-      res.css("userid").first.try(:content)
+      sendRequest(:create_user, 2, :user => user, :utp => '2')
     end
-    
+
     def createCourse(course)
-      res = sendRequest(:create_course, 2, :utp => '2', :course => course, :user => course, :utp => '2')
-      res.css("classid").first.try(:content)
+      sendRequest(:create_course, 2, :utp => '2', :course => course, :user => course, :utp => '2')
     end
-    
+
     def enrollStudent(course, student)
-      res = sendRequest(:enroll_student, 2, :user => student, :course => course, :utp => '1', :tem => email(course))
-      res.css("userid").first.try(:content)
+      sendRequest(:enroll_student, 2, :user => student, :course => course, :utp => '1', :tem => email(course))
     end
 
     def self.default_assignment_turnitin_settings
@@ -105,7 +104,8 @@ module Turnitin
         :exclude_biblio => '1',
         :exclude_quoted => '1',
         :exclude_type => '0',
-        :exclude_value => ''
+        :exclude_value => '',
+        :submit_papers_to => '1'
       }
     end
 
@@ -118,11 +118,10 @@ module Turnitin
         settings[:originality_report_visibility] = 'immediate' unless ['immediate', 'after_grading', 'after_due_date', 'never'].include?(settings[:originality_report_visibility])
         settings[:s_view_report] =  determine_student_visibility(settings[:originality_report_visibility])
 
-        [:s_paper_check, :internet_check, :journal_check, :exclude_biblio, :exclude_quoted].each do |key|
+        [:s_paper_check, :internet_check, :journal_check, :exclude_biblio, :exclude_quoted, :submit_papers_to].each do |key|
           bool = Canvas::Plugin.value_to_boolean(settings[key])
           settings[key] = bool ? '1' : '0'
         end
-
         exclude_value = settings[:exclude_value].to_i
         settings[:exclude_type] = '0' unless ['0', '1', '2'].include?(settings[:exclude_type])
         settings[:exclude_value] = case settings[:exclude_type]
@@ -149,39 +148,33 @@ module Turnitin
       settings = Turnitin::Client.normalize_assignment_turnitin_settings(settings)
       # institution_check   - 1/0, check institution
       # submit_papers_to    - 0=none, 1=standard, 2=institution
-      res = sendRequest(:create_assignment, settings.delete(:created) ? '3' : '2', settings.merge!({
+      response = sendRequest(:create_assignment, settings.delete(:created) ? '3' : '2', settings.merge!({
         :user => course,
         :course => course,
         :assignment => assignment,
-        :utp => '2', 
-        :dtstart => "#{today.strftime} 00:00:00", 
-        :dtdue => "#{today.strftime} 00:00:00", 
-        :dtpost => "#{today.strftime} 00:00:00", 
+        :utp => '2',
+        :dtstart => "#{today.strftime} 00:00:00",
+        :dtdue => "#{today.strftime} 00:00:00",
+        :dtpost => "#{today.strftime} 00:00:00",
         :late_accept_flag => '1',
         :post => true
       }))
 
-      assignment_id = res.css("assignmentid").first.try(:content)
-      rcode = res.css('rcode').first.try(:content).try(:to_i)
-      rmessage = res.css('rmessage').first.try(:content)
-
-      assignment_id ?
-        { :assignment_id => assignment_id } :
-        { :error_code => rcode, :error_message => rmessage, :public_error_message => public_error_message(rcode) }
+      response.success? ? { assignment_id: response.assignment_id } : response.error_hash
     end
-    
+
     # if asset_string is passed in, only submit that attachment
     def submitPaper(submission, asset_string=nil)
       student = submission.user
       assignment = submission.assignment
       course = assignment.context
-      opts = { 
-        :post => true, 
-        :utp => '1', 
-        :user => student, 
-        :course => course, 
-        :assignment => assignment, 
-        :tem => email(course) 
+      opts = {
+        :post => true,
+        :utp => '1',
+        :user => student,
+        :course => course,
+        :assignment => assignment,
+        :tem => email(course)
       }
       responses = {}
       if submission.submission_type == 'online_upload'
@@ -197,18 +190,12 @@ module Turnitin
 
       responses.keys.each do |asset_string|
         res = responses[asset_string]
-        object_id = res.css("objectID").first.try(:content)
-        rcode = res.css('rcode').first.try(:content).try(:to_i)
-        rmessage = res.css('rmessage').first.try(:content)
-
-        responses[asset_string] = object_id ? 
-                                  { :object_id => object_id } : 
-                                  { :error_code => rcode, :error_message => rmessage, :public_error_message => public_error_message(rcode) }
+        responses[asset_string] = res.success? ? {object_id: res.returned_object_id} : res.error_hash
       end
 
       responses
     end
-    
+
     def generateReport(submission, asset_string)
       user = submission.user
       assignment = submission.assignment
@@ -225,7 +212,7 @@ module Turnitin
       end
       data
     end
-    
+
     def submissionReportUrl(submission, asset_string)
       user = submission.user
       assignment = submission.assignment
@@ -233,7 +220,7 @@ module Turnitin
       object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
       sendRequest(:generate_report, 1, :oid => object_id, :utp => '2', :user => course, :course => course, :assignment => assignment)
     end
-    
+
     def submissionStudentReportUrl(submission, asset_string)
       user = submission.user
       assignment = submission.assignment
@@ -241,7 +228,7 @@ module Turnitin
       object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
       sendRequest(:generate_report, 1, :oid => object_id, :utp => '1', :user => user, :course => course, :assignment => assignment, :tem => email(course))
     end
-    
+
     def submissionPreviewUrl(submission, asset_string)
       user = submission.user
       assignment = submission.assignment
@@ -249,7 +236,7 @@ module Turnitin
       object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
       sendRequest(:show_paper, 1, :oid => object_id, :utp => '1', :user => user, :course => course, :assignment => assignment, :tem => email(course))
     end
-    
+
     def submissionDownloadUrl(submission, asset_string)
       user = submission.user
       assignment = submission.assignment
@@ -257,7 +244,7 @@ module Turnitin
       object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
       sendRequest(:show_paper, 1, :oid => object_id, :utp => '1', :user => user, :course => course, :assignment => assignment, :tem => email(course))
     end
-    
+
     def listSubmissions(assignment)
       course = assignment.context
       sendRequest(:list_papers, 2, :assignment => assignment, :course => course, :user => course, :utp => '1', :tem => email(course))
@@ -268,7 +255,7 @@ module Turnitin
     # alphabetical order according to variable name, being sure to include at
     # least the following:
     #
-    # aid + diagnostic + encrypt + fcmd + fid + gmtime + uem + ufn + uln + utp + shared secret key 
+    # aid + diagnostic + encrypt + fcmd + fid + gmtime + uem + ufn + uln + utp + shared secret key
     #
     # The shared secret key is added to the end of the parameters.
     #
@@ -335,25 +322,24 @@ module Turnitin
         params[:assignid] = id(assignment)
       end
       params[:diagnostic] = "1" if @testing
-      
+
       params[:md5] = request_md5(params)
       params = escape_params(params) if post
       return params
     end
-    
+
     def sendRequest(command, fcmd, args)
       require 'net/http'
 
       post = args[:post] # gets deleted in prepare_params
       params = prepare_params(command, fcmd, args)
-      
+
       if post
         mp = Multipart::Post.new
         query, headers = mp.prepare_query(params)
-        puts query if @testing
         http = Net::HTTP.new(@host, 443)
         http.use_ssl = true
-        res = http.start{|con|
+        http_response = http.start{|con|
           req = Net::HTTP::Post.new(@endpoint, headers)
           con.read_timeout = 30
           begin
@@ -369,56 +355,26 @@ module Turnitin
           next if value.nil?
           requestParams += "&#{URI.escape(key.to_s)}=#{CGI.escape(value.to_s)}"
         end
-        puts requestParams if @testing
         if params[:fcmd] == '1'
           return "https://#{@host}#{@endpoint}?#{requestParams}"
         else
           http = Net::HTTP.new(@host, 443)
           http.use_ssl = true
-          res = http.start{|conn| 
+          http_response = http.start{|conn|
             conn.get("#{@endpoint}?#{requestParams}")
           }
         end
       end
-      if @testing
-        puts res.body
-        nil
-      else
-        doc = Nokogiri(res.body) rescue nil
-        if doc && doc.css('rcode') && doc.css('rcode')[0].content.to_i >= 100
-          Rails.logger.error("Turnitin API error for account_id #{@account_id}: error #{doc.css('rcode')[0].content}")
-          Rails.logger.error(params.to_json)
-          Rails.logger.error(res.body)
-        end
-        doc
-      end
-    end
 
-    # We store the actual error message we got back from turnitin in the hash
-    # on the object, but often that message is not appropriate to show to
-    # users. So we're picking out the most common error messages we see, fixing
-    # up the wording, and then using this to display public facing error messages.
-    def public_error_message(error_code)
-      case error_code
-      when 216
-        I18n.t('turnitin.error_216', "The student limit for this account has been reached. Please contact your account administrator.")
-      when 217
-        I18n.t('turnitin.error_217', "The turnitin product for this account has expired. Please contact your sales agent to renew the turnitin product.")
-      when 414
-        I18n.t('turnitin.error_414', "The originality report for this submission is not available yet.")
-      when 415
-        I18n.t('turnitin.error_415', "The originality score for this submission is not available yet.")
-      when 1007
-        I18n.t('turnitin.error_1007', "The uploaded file is too big.")
-      when 1009
-        I18n.t('turnitin.error_1009', "Invalid file type. (Valid file types are MS Word, Acrobat PDF, Postscript, Text, HTML, WordPerfect (WPD) and Rich Text Format.)")
-      when 1013
-        I18n.t('turnitin.error_1013', "The student submission must be more than twenty words of text in order for it to be rated by turnitin.")
-      when 1023
-        I18n.t('turnitin.error_1023', "The PDF file could not be read. Please make sure that the file is not password protected.")
-      else
-        I18n.t('turnitin.error_default', "There was an error submitting to turnitin. Please try resubmitting the file before contacting support.")
+      return nil if @testing
+
+      response = Turnitin::Response.new(http_response)
+      if response.error?
+        Rails.logger.error("Turnitin API error for account_id #{@account_id}: error #{ response.return_code }")
+        Rails.logger.error(params.to_json)
+        Rails.logger.error(http_response.body)
       end
+      response
     end
   end
 end

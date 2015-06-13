@@ -14,7 +14,7 @@ Tools can know that they have been launched in a graded context because
 an additional parameter is sent across, `lis_outcome_service_url`,
 as specified in the LTI 1.1 specification. Grades are passed back to Canvas 
 from the tool's servers using the 
-<a href="http://www.imsglobal.org/lti/v1p1pd/ltiIMGv1p1pd.html#_Toc309649691">outcomes component of LTI 1.1</a>. 
+<a href="http://www.imsglobal.org/LTI/v1p1/ltiIMGv1p1.html#_Toc319560472">outcomes component of LTI 1.1</a>. 
 
 ## Data Return Extension
 
@@ -99,6 +99,53 @@ Add a `resultData` node with a `url` node within it like this:
           <resultData>
             <url>https://www.example.com/cool_lti_link_submission</url>
           </resultData>
+        </result>
+      </resultRecord>
+    </replaceResultRequest>
+  </imsx_POXBody>
+</imsx_POXEnvelopeRequest>
+</pre>
+
+
+## Total Score Return Extension
+
+Canvas sends an extension parameter for assignment launches that allows the tool
+provider to pass back a raw score value instead of a percentage.
+The key is `ext_outcome_result_total_score_accepted` and the value is `true`.
+So the added launch parameter will look like this:
+
+`ext_outcome_result_total_score_accepted=true`
+
+### Returning Total Score from Tool Provider
+
+If the external tool wants to supply this value, it can augment the POX sent
+with the grading value. <a href="http://www.imsglobal.org/LTI/v1p1/ltiIMGv1p1.html#_Toc319560473">LTI replaceResult POX</a>
+
+Simply add a node called `resultTotalScore` instead of `resultScore`. If both are
+sent, then `resultScore` will be ignored. The `textString` value  should be
+an Integer or Float value.
+
+<pre>
+<?xml version = "1.0" encoding = "UTF-8"?>
+<imsx_POXEnvelopeRequest xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
+  <imsx_POXHeader>
+    <imsx_POXRequestHeaderInfo>
+      <imsx_version>V1.0</imsx_version>
+      <imsx_messageIdentifier>999999123</imsx_messageIdentifier>
+    </imsx_POXRequestHeaderInfo>
+  </imsx_POXHeader>
+  <imsx_POXBody>
+    <replaceResultRequest>
+      <resultRecord>
+        <sourcedGUID>
+          <sourcedId>3124567</sourcedId>
+        </sourcedGUID>
+        <result>
+          <!-- Added element -->
+          <resultTotalScore>
+            <language>en</language>
+            <textString>50</textString>
+          </resultTotalScore>
         </result>
       </resultRecord>
     </replaceResultRequest>

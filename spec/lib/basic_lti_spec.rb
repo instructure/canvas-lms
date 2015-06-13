@@ -39,7 +39,7 @@ describe BasicLTI do
       </cartridge_basiclti_link>
     XML
     lti = CC::Importer::BLTIConverter.new
-    lambda {lti.convert_blti_xml(xml)}.should raise_error
+    expect {lti.convert_blti_xml(xml)}.to raise_error
   end
 
   it "xml converter should use raise an error when unescaped ampersands are used in custom url properties" do
@@ -69,6 +69,6 @@ describe BasicLTI do
       </cartridge_basiclti_link>
     XML
     lti = CC::Importer::BLTIConverter.new
-    lambda {lti.convert_blti_xml(xml)}.should raise_error
+    expect {lti.convert_blti_xml(xml)}.to raise_error
   end
 end

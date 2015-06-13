@@ -22,7 +22,8 @@ class CrocodocSessionsController < ApplicationController
 
   def show
     blob = extract_blob(params[:hmac], params[:blob],
-                        "user_id" => @current_user.global_id)
+                        "user_id" => @current_user.global_id,
+                        "type" => "crocodoc")
     attachment = Attachment.find(blob["attachment_id"])
 
     if attachment.crocodoc_available?
@@ -31,13 +32,17 @@ class CrocodocSessionsController < ApplicationController
         true
 
       crocodoc = attachment.crocodoc_document
-      redirect_to crocodoc.session_url(:user => @current_user,
-                                       :annotations => annotations)
+      url = crocodoc.session_url(:user => @current_user,
+                                 :annotations => annotations)
+      redirect_to url
     else
       render :text => "Not found", :status => :not_found
     end
 
   rescue HmacHelper::Error
     render :text => 'unauthorized', :status => :unauthorized
+  rescue Timeout::Error
+    render :text => "Service is currently unavailable. Try again later.",
+           :status => :service_unavailable
   end
 end

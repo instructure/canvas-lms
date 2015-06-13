@@ -1,13 +1,14 @@
 define [
-  'Backbone'
   'underscore'
+  'compiled/views/ValidatedFormView'
+  'compiled/models/ExternalFeed'
   'jst/ExternalFeeds/IndexView'
   'compiled/fn/preventDefault'
   'jquery'
   'jquery.toJSON'
-], (Backbone, _, template, preventDefault, $) ->
+], (_, ValidatedFormView, ExternalFeed, template, preventDefault, $) ->
 
-  class IndexView extends Backbone.View
+  class IndexView extends ValidatedFormView
 
     template: template
 
@@ -19,8 +20,18 @@ define [
 
     initialize: ->
       super
+      @createPendingModel()
       @collection.on 'all', @render, this
       @render()
+
+    createPendingModel: ->
+      @model = new ExternalFeed
+
+    toJSON: ->
+      json = @collection.toJSON()
+      json.cid = @cid
+      json.ENV = window.ENV if window.ENV?
+      json
 
     render: ->
       if @collection.length || @options.permissions.create
@@ -31,6 +42,10 @@ define [
       id = @$(event.target).data('deleteFeedId')
       @collection.get(id).destroy()
 
-    submit: preventDefault (event) ->
-      data = @$('#add_external_feed_form').toJSON()
-      @$el.disableWhileLoading @collection.create data, wait: true
+    getFormData: ->
+      @$('#add_external_feed_form').toJSON()
+
+    onSaveSuccess: =>
+      super
+      @collection.add(@model)
+      @createPendingModel()

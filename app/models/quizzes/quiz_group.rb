@@ -17,7 +17,7 @@
 #
 
 class Quizzes::QuizGroup < ActiveRecord::Base
-  self.table_name = 'quiz_groups' unless CANVAS_RAILS2
+  self.table_name = 'quiz_groups'
 
   attr_accessible :name, :pick_count, :question_points, :assessment_question_bank_id
   attr_readonly :quiz_id
@@ -33,6 +33,7 @@ class Quizzes::QuizGroup < ActiveRecord::Base
   validates_length_of :name, maximum: maximum_string_length, allow_nil: true
   validates_numericality_of :pick_count, :question_points, allow_nil: true
 
+  before_validation :set_default_pick_count
   before_save :infer_position
   before_destroy :update_quiz
   after_save :update_quiz
@@ -84,5 +85,9 @@ class Quizzes::QuizGroup < ActiveRecord::Base
     if !self.position && self.quiz
       self.position = self.quiz.root_entries_max_position + 1
     end
+  end
+
+  def set_default_pick_count
+    self.pick_count ||= actual_pick_count
   end
 end

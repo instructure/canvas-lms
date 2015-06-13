@@ -37,6 +37,8 @@ define [
     isUndated: () =>
       @start == null
 
+    isCompleted: -> false
+
     displayTimeString: () -> ""
     readableType: () -> ""
 
@@ -82,6 +84,10 @@ define [
     isDueAtMidnight: () ->
       @start && (@midnightFudged || (@start.getHours() == 23 && @start.getMinutes() > 30))
 
+    isPast: () ->
+      now = $.fudgeDateForProfileTimezone(new Date)
+      @start && @start < now
+
     copyDataFromObject: (data) ->
       @originalStart = (new Date(@start) if @start)
       @midnightFudged = false # clear out cached value because now we have new data
@@ -90,7 +96,9 @@ define [
         @start.setMinutes(30)
         @start.setSeconds(0)
         @end = new Date(@start.getTime()) unless @end
-      @forceMinimumDuration()
+      else
+        # minimum duration should only be enforced if not due at midnight
+        @forceMinimumDuration()
 
     forceMinimumDuration: () ->
       minimumDuration = 30 * 60 * 1000 # 30 minutes

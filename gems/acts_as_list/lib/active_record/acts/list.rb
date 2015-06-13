@@ -45,7 +45,7 @@ module ActiveRecord
             end
 
             def list_scope_base
-              self.class.scoped
+              self.class.base_class.scoped
             end
             RUBY
           else
@@ -65,10 +65,10 @@ module ActiveRecord
             new_scope = {}
             scope.each do |k, v|
               if reflection = reflections[k]
-                key = CANVAS_RAILS2 ? reflection.primary_key_name : reflection.foreign_key
+                key = reflection.foreign_key
                 new_scope[key] = v
                 if reflection.options[:polymorphic]
-                  key = CANVAS_RAILS2 ? reflection.options[:foreign_type] : reflection.foreign_type
+                  key = reflection.foreign_type
                   new_scope[key] = v
                 end
               else
@@ -103,7 +103,7 @@ module ActiveRecord
               end
 
               def list_scope_base
-                self.class.where(scope_condition)
+                self.class.base_class.where(scope_condition)
               end
             RUBY
           end

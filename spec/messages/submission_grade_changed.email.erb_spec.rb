@@ -32,12 +32,12 @@ describe 'submission_grade_changed.email' do
     @submission.update_attribute(:score, 5)
     @object = @submission
     message = generate_message(:submission_grade_changed, :summary, @object)
-    message.body.should_not match(/score:/)
+    expect(message.body).not_to match(/score:/)
     
     user = message.user
     user.preferences[:send_scores_in_emails] = true
     user.save!
     message = generate_message(:submission_grade_changed, :summary, @object, :user => user)
-    message.body.should match(/score:/)
+    expect(message.body).to match(/score:/)
   end
 end

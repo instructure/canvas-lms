@@ -28,16 +28,16 @@ describe "/gradebooks/gradebook2" do
     assigns[:assignments] = [a]
     assigns[:students] = [@user]
     assigns[:submissions] = []
-    assigns[:gradebook_upload] = @course.build_gradebook_upload
+    assigns[:gradebook_upload] = ''
     assigns[:body_classes] = []
     @course.expects(:allows_grade_publishing_by).with(@user).returns(course_allows)
     @course.expects(:grants_any_right?).returns(permissions_allow) if course_allows
     render "/gradebooks/gradebook2"
-    response.should_not be_nil
+    expect(response).not_to be_nil
     if course_allows && permissions_allow
-      response.body.should =~ /Publish grades to SIS/
+      expect(response.body).to match /Publish grades to SIS/
     else
-      response.body.should_not =~ /Publish grades to SIS/
+      expect(response.body).not_to match /Publish grades to SIS/
     end
   end
 
@@ -61,14 +61,14 @@ describe "/gradebooks/gradebook2" do
       assigns[:assignments] = []
       assigns[:students] = []
       assigns[:submissions] = []
-      assigns[:gradebook_upload] = @course.build_gradebook_upload
+      assigns[:gradebook_upload] = ''
       assigns[:body_classes] = []
     end
 
-    it "should not allow uploading scores for large roster courses" do
+    it "should allow uploading scores for courses" do
       render "/gradebooks/gradebook2"
-      response.should_not be_nil
-      response.body.should =~ /Upload Scores \(from .csv\)/
+      expect(response).not_to be_nil
+      expect(response.body).to match /Import/
     end
 
     it "should not allow uploading scores for large roster courses" do
@@ -76,8 +76,8 @@ describe "/gradebooks/gradebook2" do
       @course.save!
       @course.reload
       render "/gradebooks/gradebook2"
-      response.should_not be_nil
-      response.body.should_not =~ /Upload Scores \(from .csv\)/
+      expect(response).not_to be_nil
+      expect(response.body).not_to match /Import/
     end
   end
 

@@ -88,7 +88,7 @@ module SIS
             @logger.debug("Processing User #{user_row.inspect}")
             user_id, login_id, status, first_name, last_name, email, password, ssha_password, integration_id, short_name, full_name, sortable_name = user_row
 
-            pseudo = @root_account.pseudonyms.find_by_sis_user_id(user_id.to_s)
+            pseudo = @root_account.pseudonyms.where(sis_user_id: user_id.to_s).first
             pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(login_id).first
             pseudo ||= pseudo_by_login
             pseudo ||= @root_account.pseudonyms.active.by_unique_id(email).first if email.present?
@@ -175,7 +175,7 @@ module SIS
               User.transaction(:requires_new => true) do
                 if user.changed?
                   user_touched = true
-                  raise ImportError, user.errors.first.join(" ") if !user.save_without_broadcasting && user.errors.size > 0
+                  raise ImportError, user.errors.first.join(" ") if !user.save && user.errors.size > 0
                 elsif @batch
                   @users_to_set_sis_batch_ids << user.id
                 end

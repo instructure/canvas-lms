@@ -12,6 +12,6 @@ class LoadSubmissionNeedsGradingNotification < ActiveRecord::Migration
 
   def self.down
     return unless Shard.current == Shard.default
-    Notification.find_by_name('Submission Needs Grading').destroy
+    Notification.where(name: 'Submission Needs Grading').delete_all
   end
 end

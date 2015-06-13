@@ -30,8 +30,13 @@ module Quizzes::QuizQuestion::AnswerSerializers
       rc
     end
 
-    def deserialize(submission_data)
-      submission_data[question_key].to_i
+    # @return [String]
+    #   ID of the selected answer.
+    #
+    # @example output for answer #3 selected:
+    #   "3"
+    def deserialize(submission_data, full=false)
+      submission_data[question_key]
     end
   end
 end

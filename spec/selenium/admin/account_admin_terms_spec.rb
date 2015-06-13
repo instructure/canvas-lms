@@ -9,9 +9,9 @@ describe "account admin terms" do
 
   def validate_term_display(term_div_index = 0, title = 'Default Term', course_count = 1, user_count = 1)
     term_header = ff('.term .header')[term_div_index]
-    term_header.should include_text(title)
-    term_header.should include_text("#{course_count} Course")
-    term_header.should include_text("#{user_count} User")
+    expect(term_header).to include_text(title)
+    expect(term_header).to include_text("#{course_count} Course")
+    expect(term_header).to include_text("#{user_count} User")
   end
 
   before (:each) do
@@ -41,7 +41,7 @@ describe "account admin terms" do
       expect {
         click_term_action_link(@default_term, '.cant_delete_term_link')
         alert = driver.switch_to.alert
-        alert.text.should == "You can't delete a term that still has classes in it."
+        expect(alert.text).to eq "You can't delete a term that still has classes in it."
         alert.accept
       }.to change(EnrollmentTerm, :count).by(0)
       validate_term_display
@@ -60,7 +60,7 @@ describe "account admin terms" do
         submit_form('.enrollment_term_form')
         wait_for_ajax_requests
       }.to change(EnrollmentTerm, :count).by(1)
-      ff('.term .header')[0].text.should == new_term_name
+      expect(ff('.term .header')[0].text).to eq new_term_name
     end
 
     it "should delete a term" do
@@ -72,7 +72,7 @@ describe "account admin terms" do
       click_term_action_link(ff('.term')[0], '.delete_term_link')
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      EnrollmentTerm.find_by_name(term_name).workflow_state.should == 'deleted'
+      expect(EnrollmentTerm.where(name: term_name).first.workflow_state).to eq 'deleted'
       validate_term_display
     end
 

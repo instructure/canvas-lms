@@ -3,8 +3,9 @@ define [
   'jquery'
   'compiled/fn/preventDefault'
   'Backbone'
+  'str/htmlEscape'
   'jquery.instructure_forms'
-], (I18n, $, preventDefault, Backbone) ->
+], (I18n, $, preventDefault, Backbone, htmlEscape) ->
 
   class PublishButton extends Backbone.View
     disabledClass: 'disabled'
@@ -59,6 +60,9 @@ define [
       $label.text label
       @$el.attr 'aria-label', label
 
+    setFocusToElement: ->
+      @$el.focus()
+
     # calling publish/unpublish on the model expects a deferred object
 
     publish: (event) ->
@@ -67,6 +71,7 @@ define [
         @trigger("publish")
         @enable()
         @render()
+        @setFocusToElement()
 
     unpublish: (event) ->
       @renderUnpublishing()
@@ -75,12 +80,14 @@ define [
         @trigger("unpublish")
         @disable()
         @render()
+        @setFocusToElement()
       .fail (error) =>
         errors = JSON.parse(error.responseText)['errors']
         $.flashError errors.published[0].message
         @model.set 'unpublishable', true
         @disable()
         @renderPublished()
+        @setFocusToElement()
 
     # state
 
@@ -167,7 +174,7 @@ define [
       @$el.attr 'aria-pressed', options.buttonClass is @publishedClass
       @$icon.addClass options.iconClass
 
-      @$text.html "&nbsp;#{options.text}"
+      @$text.html "&nbsp;#{htmlEscape(options.text)}"
 
       # unpublishable
       if !@model.get('unpublishable')? or @model.get('unpublishable')

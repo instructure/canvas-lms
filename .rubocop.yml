@@ -1,0 +1,150 @@
+require:
+  - rubocop-rspec
+  # this odd relative path is so that rubocop works when run without "bundle
+  # exec", such as from most editors/IDEs.
+  - ./gems/rubocop-canvas/lib/rubocop_canvas
+
+AllCops:
+  RunRailsCops: true
+
+# our style changes: disabling style rules we aren't interested in
+Style/StringLiterals:
+  Enabled: false
+Style/SignalException:
+  Enabled: false
+Style/SpaceBeforeBlockBraces:
+  Enabled: false
+Style/SpaceInsideBlockBraces:
+  Enabled: false
+Style/NumericLiterals:
+  Enabled: false
+Style/BracesAroundHashParameters:
+  Enabled: false
+Style/SpaceInsideBrackets:
+  Enabled: false
+Style/SpaceInsideHashLiteralBraces:
+  Enabled: false
+Style/PercentLiteralDelimiters:
+  Enabled: false
+Style/SpaceAroundOperators:
+  Enabled: false
+Style/SpaceAfterColon:
+  Enabled: false
+Style/SpaceAfterComma:
+  Enabled: false
+Style/Documentation:
+  Enabled: false
+Style/ClassAndModuleChildren:
+  Enabled: false
+Style/RegexpLiteral:
+  Enabled: false
+Style/EmptyLines:
+  Enabled: false
+Style/EmptyLinesAroundMethodBody:
+  Enabled: false
+Style/EmptyLinesAroundClassBody:
+  Enabled: false
+Style/EmptyLinesAroundModuleBody:
+  Enabled: false
+Style/EmptyLinesAroundBlockBody:
+  Enabled: false
+Style/GuardClause:
+  Enabled: false
+Style/RedundantSelf:
+  Enabled: false
+Style/SpaceAroundEqualsInParameterDefault:
+  Enabled: false
+Style/SingleSpaceBeforeFirstArg:
+  Enabled: false
+Style/EmptyLinesAroundAccessModifier:
+  Enabled: false
+Style/IfUnlessModifier:
+  Enabled: false
+Style/WordArray:
+  Enabled: false
+Style/PercentQLiterals:
+  Enabled: false
+Style/IndentHash:
+  Enabled: false
+Style/DoubleNegation:
+  Enabled: false
+Style/TrailingComma:
+  Enabled: false
+Style/MethodCallParentheses:
+  Enabled: false
+Style/TrailingBlankLines:
+  Enabled: false
+Style/IndentationConsistency:
+  Enabled: false
+Style/IndentationWidth:
+  Enabled: false
+Style/AlignParameters:
+  Enabled: false
+Style/RescueModifier:
+  Severity: warning
+Style/DotPosition:
+  Enabled: false
+Style/TrailingWhitespace:
+  Enabled: false
+Style/MultilineOperationIndentation:
+  Enabled: false
+Style/AlignHash:
+  Enabled: false
+Style/AlignParameters:
+  Enabled: false
+Style/Lambda:
+  Enabled: false
+Style/WhileUntilModifier:
+  Enabled: false
+
+# Rails style changes
+Rails/TimeZone:
+  Enabled: false
+# accessors are often defined in terms of read_attribute
+Rails/ReadWriteAttribute:
+  Enabled: false
+
+# Lint changes
+Lint/AmbiguousRegexpLiteral:
+  Severity: convention
+Lint/UselessAssignment:
+  Severity: convention
+Lint/Debugger:
+  Severity: error
+Lint/EndAlignment:
+  Severity: convention
+
+# Performance changes
+Performance/Detect:
+  Severity: warning
+
+# these need better configuration than the default:
+Style/AndOr:
+  EnforcedStyle: conditionals
+
+# these don't make sense pre-Rails 4
+
+Rails/FindBy:
+  Enabled: false
+Rails/ActionFilter:
+  Enabled: false
+
+# Things we may want to tighten down later
+Metrics/AbcSize:
+  Enabled: false
+Metrics/LineLength:
+  Max: 120
+Metrics/MethodLength:
+  Max: 16
+Metrics/CyclomaticComplexity:
+  Max: 10
+RSpec/InstanceVariable:
+  Enabled: false
+RSpec/ExampleWording:
+  Enabled: false
+RSpec/DescribedClass:
+  Enabled: false
+RSpec/DescribeClass:
+  Enabled: false
+Style/HashSyntax:
+  Enabled: false

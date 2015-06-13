@@ -19,21 +19,47 @@
 define [
   'compiled/collections/PaginatedCollection'
   'underscore'
-], (PaginatedCollection, _) ->
+  'compiled/models/File'
+], (PaginatedCollection, _, File) ->
 
   class FilesCollection extends PaginatedCollection
     @optionProperty 'parentFolder'
 
+    model: File
+
+    initialize: ->
+      @on 'change:sort change:order', @setQueryStringParams
+      super
+
     fetch: (options = {}) ->
-      options.data = _.extend content_types: @parentFolder.contentTypes, options.data || {}
-      super options
+      options.data = _.extend content_types: @parentFolder?.contentTypes, options.data || {}
+      options.data.use_verifiers = 1 if @parentFolder?.useVerifiers
+      res = super options
 
     parse: (response) ->
-      if response
+      if response and @parentFolder
         previewUrl = @parentFolder.previewUrl()
         _.each response, (file) ->
-          file.preview_url = if previewUrl
+          file.rce_preview_url = if previewUrl
             previewUrl.replace('{{id}}', file.id.toString())
           else
             file.url
       super
+
+    # TODO: This is duplicate code from Folder.coffee, can we DRY?
+    setQueryStringParams: ->
+      newParams =
+        include: ['user']
+        per_page: 20
+        sort: @get('sort')
+        order: @get('order')
+
+      return if @loadedAll
+      url = new URL(@url)
+      params = deparam(url.search)
+      url.search = $.param _.extend(params, newParams)
+      @url = url.toString()
+      @reset()
+
+
+

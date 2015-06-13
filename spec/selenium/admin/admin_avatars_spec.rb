@@ -23,14 +23,14 @@ describe "admin avatars" do
 
   def verify_avatar_state(user, opts={})
     if (opts.empty?)
-      f("#submitted_profile").should include_text "Submitted 1"
+      expect(f("#submitted_profile")).to include_text "Submitted 1"
       f("#submitted_profile").click
     else
-      f(opts.keys[0]).should include_text(opts.values[0])
+      expect(f(opts.keys[0])).to include_text(opts.values[0])
       f(opts.keys[0]).click
     end
-    f("#avatars .name").should include_text user.name
-    f(".avatar").attribute('style').should match(/http/)
+    expect(f("#avatars .name")).to include_text user.name
+    expect(f(".avatar").attribute('style')).to match(/http/)
   end
 
   def lock_avatar(user, element)
@@ -38,9 +38,9 @@ describe "admin avatars" do
     f(".links .lock_avatar_link").click
     driver.switch_to.alert.accept
     wait_for_ajax_requests
-    f(".links .unlock_avatar_link").should be_displayed
+    expect(f(".links .unlock_avatar_link")).to be_displayed
     user.reload
-    user.avatar_state.should == :locked
+    expect(user.avatar_state).to eq :locked
     user
   end
 
@@ -78,18 +78,18 @@ describe "admin avatars" do
     f(".links .unlock_avatar_link").click
     wait_for_ajax_requests
     user.reload
-    user.avatar_state.should == :approved
-    f(".links .lock_avatar_link").should be_displayed
+    expect(user.avatar_state).to eq :approved
+    expect(f(".links .lock_avatar_link")).to be_displayed
   end
 
   it "should approve un-approved avatar" do
     user = create_avatar_state
-    user.avatar_state.should == :submitted
+    expect(user.avatar_state).to eq :submitted
     f(".links .approve_avatar_link").click
     wait_for_ajax_requests
     user.reload
-    user.avatar_state.should == :approved
-    f(".links .approve_avatar_link").should_not be_displayed
+    expect(user.avatar_state).to eq :approved
+    expect(f(".links .approve_avatar_link")).not_to be_displayed
   end
   it "should delete the avatar" do
     user = create_avatar_state
@@ -98,7 +98,7 @@ describe "admin avatars" do
     driver.switch_to.alert.accept
     wait_for_ajax_requests
     user.reload
-    user.avatar_state.should == :none
-    user.avatar_image_url.should be_nil
+    expect(user.avatar_state).to eq :none
+    expect(user.avatar_image_url).to be_nil
   end
 end

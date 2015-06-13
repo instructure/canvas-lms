@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2015 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -56,12 +56,11 @@ module SIS
         raise ImportError, "No name given for section #{section_id} in course #{course_id}" if name.blank?
         raise ImportError, "Improper status \"#{status}\" for section #{section_id} in course #{course_id}" unless status =~ /\Aactive|\Adeleted/i
 
-        course = Course.find_by_root_account_id_and_sis_source_id(@root_account.id, course_id)
+        course = @root_account.all_courses.where(sis_source_id: course_id).first
         raise ImportError, "Section #{section_id} references course #{course_id} which doesn't exist" unless course
 
-        section = CourseSection.find_by_root_account_id_and_sis_source_id(@root_account.id, section_id)
-        section ||= course.course_sections.find_by_sis_source_id(section_id)
-        section ||= course.course_sections.new
+        section = @root_account.course_sections.where(sis_source_id: section_id).first
+        section ||= course.course_sections.where(sis_source_id: section_id).first_or_initialize
         section.root_account = @root_account
         # this is an easy way to load up the cache with data we already have
         section.course = course if course.id == section.course_id
@@ -70,17 +69,17 @@ module SIS
         section.name = name if section.new_record? || !section.stuck_sis_fields.include?(:name)
 
         # update the course id if necessary
-        if section.course_id != course.id && !section.stuck_sis_fields.include?(:course_id)
+        if section.course_id != course.id
           if section.nonxlist_course_id
             # this section is crosslisted
-            if section.nonxlist_course_id != course.id
+            if (section.nonxlist_course_id != course.id && !section.stuck_sis_fields.include?(:course_id)) || (section.course.workflow_state == 'deleted' && !!(status =~ /\Aactive/))
               # but the course id we were given didn't match the crosslist info
               # we have, so, uncrosslist and move
               @course_ids_to_update_associations.merge [course.id, section.course_id, section.nonxlist_course_id]
               section.uncrosslist(:run_jobs_immediately)
               section.move_to_course(course, :run_jobs_immediately)
             end
-          else
+          elsif !section.stuck_sis_fields.include?(:course_id)
             # this section isn't crosslisted and lives on the wrong course. move
             @course_ids_to_update_associations.merge [section.course_id, course.id]
             section.move_to_course(course, :run_jobs_immediately)
@@ -91,7 +90,6 @@ module SIS
         end
 
         section.integration_id = integration_id
-        section.sis_source_id = section_id
         if status =~ /active/i
           section.workflow_state = 'active'
         elsif status =~ /deleted/i

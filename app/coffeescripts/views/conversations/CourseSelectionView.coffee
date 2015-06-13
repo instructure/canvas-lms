@@ -26,6 +26,7 @@ define [
       @options.courses.all.on('add', @render)
       @options.courses.groups.on('reset', @render)
       @options.courses.groups.on('add', @render)
+      @$picker = @$el.next()
       @render()
 
     render: () =>
@@ -50,8 +51,8 @@ define [
       @truncate_course_name_data(data)
       @$el.html(template(data))
       @$el.selectpicker('refresh')
-      @$picker = @$el.next()
       @$picker.find('.paginatedLoadingIndicator').remove()
+      @getAriaLabel()
       @createSearchViews()
       if !@renderValue() then @loadAll()
 
@@ -85,8 +86,14 @@ define [
       return if @silenced
       @_value = @$el.val()
       @triggerEvent()
+      @getAriaLabel()
       @searchViews.forEach (view) ->
         view.clearSearch()
+
+    getAriaLabel: ->
+      return if _.include(ENV.current_user_roles, 'admin')
+      label = @getCurrentContext().name || I18n.t("Select course: a selection is required before recipients field will become available")
+      @$picker.find('button').attr("aria-label", label)
 
     getCurrentContext: ->
       matches = @_value.match(/(\w+)_(\d+)/)
@@ -120,8 +127,7 @@ define [
         course['truncated_name'] = truncated
 
     middle_truncate: (name) ->
-      # This implementation ignores non-BMP character encoding issues in favor of simplicity
       if name.length > 25
-        name.slice(0, 10) + "&hellip;" + name.slice(-10)
+        name.slice(0, 10) + "…" + name.slice(-10)
       else
         name

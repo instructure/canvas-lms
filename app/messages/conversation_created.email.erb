@@ -1,0 +1,40 @@
+<% define_content :link do %>
+  <%= conversation_url(asset.conversation_id) %>
+<% end %>
+
+<% define_content :user_name do %>
+  <%= asset.author_short_name_with_shared_contexts(user) rescue t(:unknown_user, "Unknown User") %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t :subject, "%{user_name}, you just sent a message in Canvas.", :user_name => content(:user_name) %>
+<% end %>
+
+<% define_content :footer_link do %>
+  <a href="<%= content :link %>">
+    <%= t :view_message, "View this message in Conversations" %>
+  </a>
+<% end %>
+
+
+<% if asset.conversation.subject.present? %>
+  Subject: <%= asset.conversation.subject %>
+<% end %>
+
+<%= asset.body %>
+
+<% if asset.has_media_objects? %>
+<%= t :audio_comment, "This message includes media comments. To listen or reply, click the link below:" %>
+<% else %>
+<%= t :reply_to_conversation_message, "You can reply to this message in Canvas by replying directly to this email." %>
+<% end %>
+
+<%= content :link %>
+
+<% unless asset.attachments.empty? %>
+  <%= t :attached_files, "Attached Files:" %>
+  <% asset.attachments.each do |attachment| %>
+    <%= attachment.display_name %> - <%= attachment.readable_size %>
+    <%= file_download_url(attachment, verifier: attachment.uuid) %>
+  <% end %>
+<% end %>

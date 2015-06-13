@@ -20,6 +20,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizStatisticsService do
+
   let_once (:course) { Course.new.tap { |course| course.id = 1 } }
   let_once :quiz do
     Quizzes::Quiz.new.tap do |quiz|
@@ -55,14 +56,6 @@ describe Quizzes::QuizStatisticsService do
 
     after do
       Quizzes::QuizStatistics.unstub(:large_quiz?)
-    end
-
-    it 'should not generate for all versions of a large course' do
-      Quizzes::QuizStatistics.stubs(:large_quiz?).returns true
-
-      expect {
-        subject.generate_aggregate_statistics(true)
-      }.to raise_error(RequestError, 'operation not available for large quizzes')
     end
 
     it 'should generate for all quiz versions' do

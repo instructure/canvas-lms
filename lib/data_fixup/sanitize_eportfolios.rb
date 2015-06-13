@@ -1,3 +1,5 @@
+require 'sanitize'
+
 module DataFixup
   module SanitizeEportfolios
     def self.run

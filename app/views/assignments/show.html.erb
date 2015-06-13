@@ -5,8 +5,8 @@
 
 <% if @locked && !@locked[:due_at] %>
   <% js_bundle :module_sequence_footer %>
-    
-  <h2><%= @assignment.title %></h2>
+
+  <h1><%= @assignment.title %></h1>
   <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'assignment', @context) : t(:assignment_locked, "This assignment is currently locked.") %>
 
 <% else %>
@@ -17,31 +17,49 @@
 %>
 
 <div id="assignment_show" class="assignment content_underline_links">
-  <% if can_do(@assignment, @current_user, :update) %>
+  <% if can_do(@context, @current_user, :read_as_admin) %>
     <div class='assignment-title'>
       <div class='title-content'>
-        <h2 class="title">
+        <h1 class="title">
           <%= @assignment.title %>
-        </h2>
+        </h1>
       </div>
       <div class='edit-content'>
-        <% if @context.feature_enabled?(:draft_state) %>
-          <button
-            id="assignment_publish_button"
-            data-id='<%= @assignment.id %>'
-            class='btn <%= "published" if @assignment.published? %> <%= "disabled" if @assignment.has_student_submissions? %>'>
-          </button>
+        <button
+          id="assignment_publish_button"
+          data-id='<%= @assignment.id %>'
+          class='btn <%= "published" if @assignment.published? %> <%= "disabled" unless assignment_publishing_enabled?(@assignment, @current_user) %>'>
+        </button>
+        <% if can_do(@assignment, @current_user, :update) %>
+          <a href="<%= edit_polymorphic_path([@context, @assignment]) %>" class='btn edit_assignment_link'>
+            <i class='icon-edit'></i> <%= t('links.edit', 'Edit') %>
+          </a>
         <% end %>
-        <a href="<%= edit_polymorphic_path([@context, @assignment]) %>" class='btn edit_assignment_link'>
-          <i class='icon-edit'></i> <%= t('links.edit', 'Edit') %>
-        </a>
+
+        <% if @assignment_menu_tools.present? %>
+          <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
+            <i class="icon-settings"></i>
+            <i class="icon-mini-arrow-down"></i>
+            <span class="screenreader-only"><%= t('manage', 'Manage') %></span>
+          </a>
+          <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
+          <% @assignment_menu_tools.each do |tool_hash| %>
+            <li role="presentation">
+              <a class="menu_tool_link" href="<%= tool_hash[:base_url] %>&assignments[]=<%= @assignment.id %>" tabindex="-1" role="menuitem">
+                <% if tool_hash[:icon_url] %><img class="icon" src="<%= tool_hash[:icon_url] %>" /><% end %>
+                <%= tool_hash[:title] %>
+              </a>
+            </li>
+          <% end %>
+          </ul>
+        <% end %>
       </div>
     </div>
   <% else %>
     <!--Student View-->
-    <h2 class="title">
+    <h1 class="title">
       <%= @assignment.title %>
-    </h2>
+    </h1>
     <ul class='student-assignment-overview'>
       <li>
         <span class='title'><%= t :due_at, 'Due' %></span>
@@ -76,6 +94,7 @@
           </li>
         <% end %>
       <% end %>
+      <%= render :partial => "shared/available_dates", :locals => {:association => @assignment} %>
       <div class="clear"></div>
     </ul>
   <% end %>
@@ -89,9 +108,9 @@
   <div class="clear"></div>
 
   <% description = !@assignment.description.blank? ? user_content(@assignment.description) : t('defaults.no_content', "No Content") %>
-  <div class="description user_content <%= can_do(@assignment, @current_user, :update) ? "teacher-version" : "student-version" %>"><%= description %></div>
+  <div class="description user_content <%= can_do(@context, @current_user, :read_as_admin) ? "teacher-version" : "student-version" %>"><%= description %></div>
 
-  <% if can_do(@assignment, @current_user, :update) %>
+  <% if can_do(@context, @current_user, :read_as_admin) %>
     <!--Teacher view-->
 
     <form class="form-horizontal bootstrap-form display-only" style="margin-top:18px;">

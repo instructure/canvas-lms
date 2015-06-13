@@ -1,0 +1,30 @@
+<form class="bootstrap-form form-inline modules-create-item-form">
+  {{c-icon type="assignment"}}
+  {{input
+    type="text"
+    class="span4"
+    value=model.name
+    placeholder=text.assignmentName
+    aria-label=text.assignmentName
+  }}
+
+  {{fast-select
+    items=assignmentGroups
+    value=model.assignment_group_id
+    labelPath="name"
+    valuePath="id"
+  }}
+
+  <button
+    class="btn btn-primary"
+    type="submit"
+    {{action "create"}}
+  >{{#t "create"}}Create{{/t}}</button>
+
+  <button
+    class="btn"
+    type="button"
+    {{action "cancel"}}
+  >{{#t "cancel"}}Cancel{{/t}}</button>
+</form>
+

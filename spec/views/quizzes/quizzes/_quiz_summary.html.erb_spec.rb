@@ -26,7 +26,7 @@ describe "/quizzes/quizzes/_quiz_summary" do
     assigns[:quiz] = @course.quizzes.create!
     assigns[:submissions_hash] = {}
     render :partial => "quizzes/quizzes/quiz_summary", :object => assigns[:quiz]
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
   
   it "should not show scores on muted quizzes" do
@@ -38,7 +38,7 @@ describe "/quizzes/quizzes/_quiz_summary" do
     @quiz.published_at = Time.now
     @quiz.save
 
-    @quiz.assignment.should_not be_nil
+    expect(@quiz.assignment).not_to be_nil
     @quiz.assignment.mute!
     @submission = @quiz.generate_submission(@user)
     Quizzes::SubmissionGrader.new(@submission).grade_submission
@@ -48,8 +48,8 @@ describe "/quizzes/quizzes/_quiz_summary" do
     assigns[:submissions_hash] = { @quiz.id => @submission }
     render :partial => "quizzes/quizzes/quiz_summary", :object => @quiz
 
-    response.should_not be_nil
-    response.body.should =~ /Instructor is working on grades/
+    expect(response).not_to be_nil
+    expect(response.body).to match /Instructor is working on grades/
   end
 end
 

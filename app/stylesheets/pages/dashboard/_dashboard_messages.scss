@@ -1,0 +1,61 @@
+@import "base/environment";
+
+@mixin dashboard-message-icon($left) {
+  background-image: url(/images/dashboard_message_icons.png);
+  background-position: $left -4px;
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+}
+
+.global-message {
+  padding: 10px;
+  border-bottom: 1px solid #b3b3b3;
+  .title {
+    font-weight: bold;
+  }
+  .image-block-image {
+    margin-right: 18px;
+  }
+  .warning-icon {
+    @include dashboard-message-icon(-4px);
+  }
+  .error-icon {
+    @include dashboard-message-icon(-40px);
+  }
+  .information-icon {
+    @include dashboard-message-icon(-76px);
+  }
+  .question-icon {
+    @include dashboard-message-icon(-112px);
+  }
+  .calendar-icon {
+    @include dashboard-message-icon(-148px);
+  }
+  .announcement-icon {
+    @include dashboard-message-icon(-184px);
+  }
+  .invitation-icon {
+    @include dashboard-message-icon(-220px);
+  }
+  .btn {
+    min-width: 100px;
+  }
+}
+
+.icon-invitation.is-invitation-icon {
+  width: 32px;
+  height: 32px;
+  &:before {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    @if $use_high_contrast {
+      color: $ic-color-dark;
+    }
+    @else {
+      color: darken($ic-color-light, 30%);
+    }
+  }
+}

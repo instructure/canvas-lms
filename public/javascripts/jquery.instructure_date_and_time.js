@@ -105,7 +105,9 @@ var speakMessage = function ($this, message) {
     // format true date into profile timezone without tz-info, then parse in
     // browser timezone. then, as desired:
     // output.toString('yyyy-MM-dd hh:mm:ss') == tz.format(input, '%Y-%m-%d %H:%M:%S')
-    return Date.parse(tz.format(date, '%F %T'));
+    var year = tz.format(date, '%Y');
+    while (year.length < 4) year = "0" + year;
+    return Date.parse(tz.format(date, year + '-%m-%d %T'));
   }
 
   $.unfudgeDateForProfileTimezone = function(date) {
@@ -129,22 +131,33 @@ var speakMessage = function ($this, message) {
   $.midnight = function(date) {
     return date != null && tz.format(date, '%R') == '00:00';
   };
-  $.dateString = function(date, otherZone) {
+  $.dateString = function(date, options) {
     if (date == null) return "";
-    var format = $.sameYear(date, new Date()) ? '%b %-d' : '%b %-d, %Y';
-    if(arguments.length > 1) return tz.format(date, format, otherZone) || '';
-    return tz.format(date, format) || '';
+    var timezone = options && options.timezone;
+    var format = options && options.format;
+    format = (format !== 'medium') && $.sameYear(date, new Date()) ? 'date.formats.short' : 'date.formats.medium';
+    if (typeof timezone == 'string' || timezone instanceof String) {
+      return tz.format(date, format, timezone) || '';
+    } else {
+      return tz.format(date, format) || '';
+    }
   };
-  $.timeString = function(date, otherZone) {
+
+  $.timeString = function(date, options) {
     if (date == null) return "";
-    if(arguments.length > 1) return tz.format(date, '%l:%M%P', otherZone) || '';
-    return tz.format(date, '%l:%M%P') || '';
+    var timezone = options && options.timezone;
+    if (typeof timezone == 'string' || timezone instanceof String) {
+      return tz.format(date, 'time.formats.tiny', timezone) || '';
+    } else {
+      return tz.format(date, 'time.formats.tiny') || '';
+    }
   };
   $.datetimeString = function(datetime, options) {
-    var localized = options && options.localized;
-    var timezone = options && options.timezone;
     datetime = tz.parse(datetime);
     if (datetime == null) return "";
+    var localized = options && options.localized;
+    var timezone = options && options.timezone;
+    var format = options && options.format;
     if (localized == false) {
       // temporary unlocalized (which means avoiding tz.format)
       // expansion of the other branch. intent of being able to call
@@ -156,20 +169,12 @@ var speakMessage = function ($this, message) {
       //
       // TODO: implement that real solution and remove this
       var fudged = $.fudgeDateForProfileTimezone(datetime);
-      datePart = $.sameYear(datetime, new Date()) ? fudged.toString("MMM d") : fudged.toString("MMM d, yyyy");
+      datePart = (format !== 'medium') && $.sameYear(datetime, new Date()) ? fudged.toString("MMM d") : fudged.toString("MMM d, yyyy");
       timePart = fudged.toString("h:mmtt").toLowerCase();
       return datePart + " at " + timePart;
-    }
-    else {
-      var dateValue = null;
-      var timeValue = null;
-      if(typeof timezone == 'string' || timezone instanceof String){
-        dateValue = $.dateString(datetime, timezone);
-        timeValue = $.timeString(datetime, timezone);
-      }else{
-        dateValue = $.dateString(datetime);
-        timeValue = $.timeString(datetime);
-      }
+    } else {
+      var dateValue = $.dateString(datetime, options);
+      var timeValue = $.timeString(datetime, options);
       return I18n.t('#time.event', '%{date} at %{time}', { date: dateValue, time: timeValue });
     }
   };
@@ -249,7 +254,7 @@ var speakMessage = function ($this, message) {
       var ampm = inst.input.data('time-ampm') || "";
       var selectedAM = (ampm == "am") ? "selected" : "";
       var selectedPM = (ampm == "pm") ? "selected" : "";
-      html += "<div class='ui-datepicker-time ui-corner-bottom'><label for='ui-datepicker-time-hour'>" + htmlEscape(I18n.beforeLabel('datepicker.time', "Time")) + "</label> <input id='ui-datepicker-time-hour' type='text' value='" + hr + "' title='hr' class='ui-datepicker-time-hour' style='width: 20px;'/>:<input type='text' value='" + min + "' title='min' class='ui-datepicker-time-minute' style='width: 20px;'/> <select class='ui-datepicker-time-ampm un-bootrstrapify' title='" + htmlEscape(I18n.t('datepicker.titles.am_pm', "am/pm")) + "'><option value=''>&nbsp;</option><option value='am' " + selectedAM + ">" + htmlEscape(I18n.t('#time.am', "am")) + "</option><option value='pm' " + selectedPM + ">" + htmlEscape(I18n.t('#time.pm', "pm")) + "</option></select>&nbsp;&nbsp;&nbsp;<button type='button' class='btn btn-mini ui-datepicker-ok'>" + htmlEscape(I18n.t('#buttons.done', "Done")) + "</button></div>";
+      html += "<div class='ui-datepicker-time ui-corner-bottom'><label for='ui-datepicker-time-hour'>" + htmlEscape(I18n.beforeLabel(I18n.t('labels.datepicker.time', "Time"))) + "</label> <input id='ui-datepicker-time-hour' type='text' value='" + htmlEscape(hr) + "' title='hr' class='ui-datepicker-time-hour' style='width: 20px;'/>:<input type='text' value='" + htmlEscape(min) + "' title='min' class='ui-datepicker-time-minute' style='width: 20px;'/> <select class='ui-datepicker-time-ampm un-bootrstrapify' title='" + htmlEscape(I18n.t('datepicker.titles.am_pm', "am/pm")) + "'><option value=''>&nbsp;</option><option value='am' " + htmlEscape(selectedAM) + ">" + htmlEscape(I18n.t('#time.am', "am")) + "</option><option value='pm' " + htmlEscape(selectedPM) + ">" + htmlEscape(I18n.t('#time.pm', "pm")) + "</option></select>&nbsp;&nbsp;&nbsp;<button type='button' class='btn btn-mini ui-datepicker-ok'>" + htmlEscape(I18n.t('#buttons.done', "Done")) + "</button></div>";
     }
     return html;
   };
@@ -416,6 +421,7 @@ var speakMessage = function ($this, message) {
         if (!$this.val()) { text = ""; }
         if (d != null) {
           $this.data('date', fudged_d);
+          $this.data('unfudged-date', d);
           if ($this.data('hiddenInput')) {
             $this.data('hiddenInput').val(fudged_d);
           }

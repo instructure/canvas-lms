@@ -30,20 +30,29 @@ describe EnrollmentsFromUserList do
   context "initialized object" do
 
     it "should initialize with a course id" do
-      lambda{EnrollmentsFromUserList.new }.should raise_error(ArgumentError, /^wrong number of arguments/)
+      expect{EnrollmentsFromUserList.new }.to raise_error(ArgumentError, /^wrong number of arguments/)
       e = EnrollmentsFromUserList.new(@course)
-      e.course.should eql(@course)
+      expect(e.course).to eql(@course)
     end
     
     it "should process with an user list" do
       enrollments = EnrollmentsFromUserList.process(@el, @course)
-      enrollments.all? {|e| e.should be_is_a(StudentEnrollment)}
+      enrollments.all? {|e| expect(e).to be_is_a(StudentEnrollment)}
     end
     
     it "should process repeat addresses without creating new users" do
       @el = UserList.new(list_to_parse_with_repeats)
       enrollments = EnrollmentsFromUserList.process(@el, @course)
-      enrollments.length.should eql(3)
+      expect(enrollments.length).to eql(3)
+    end
+
+    it "should respect the section option when a user is already enrolled in another section" do
+      othersection = @course.course_sections.create! name: 'othersection'
+      @teacher.pseudonyms.create! unique_id: 'teacher@example.com'
+      @el = UserList.new('teacher@example.com')
+      enrollments = EnrollmentsFromUserList.process(@el, @course, course_section_id: othersection.to_param, enrollment_type: 'TeacherEnrollment')
+      expect(enrollments.map(&:course_section_id)).to eq([othersection.id])
+      expect(@teacher.teacher_enrollments.where(course_id: @course).pluck(:course_section_id)).to match_array([@course.default_section.id, othersection.id])
     end
 
   end
@@ -51,7 +60,7 @@ describe EnrollmentsFromUserList do
   context "EnrollmentsFromUserList.process" do
     it "should be able to process from the class" do
       enrollments = EnrollmentsFromUserList.process(@el, @course)
-      enrollments.all? {|e| e.should be_is_a(StudentEnrollment)}
+      enrollments.all? {|e| expect(e).to be_is_a(StudentEnrollment)}
     end
   end
   

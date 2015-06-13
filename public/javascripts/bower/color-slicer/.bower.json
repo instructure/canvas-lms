@@ -1,6 +1,6 @@
 {
   "name": "color-slicer",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "authors": [
     "Braden Anderson <bluej100@gmail.com>"
   ],
@@ -20,13 +20,13 @@
   ],
   "devDependencies": {},
   "homepage": "https://github.com/instructure/color-slicer",
-  "_release": "0.7.0",
+  "_release": "0.8.0",
   "_resolution": {
     "type": "version",
-    "tag": "v0.7.0",
-    "commit": "74a52e7e6867943ac67f715c54fd8e643e482ae1"
+    "tag": "v0.8.0",
+    "commit": "48b337a8fec31d118f47524a04347a674751de00"
   },
   "_source": "git://github.com/instructure/color-slicer.git",
-  "_target": "~0.7.0",
+  "_target": "0.8.0",
   "_originalSource": "color-slicer"
 }

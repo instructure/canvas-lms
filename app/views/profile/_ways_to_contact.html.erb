@@ -62,6 +62,11 @@
         <a href="#" class="path email_channel" title="<%=h c.path %>"><%= c.path %></a>
       </td>
       <td class="email_actions hidden_for_single">
+        <% if c.bouncing? %>
+          <span class="bouncing-channel" data-tooltip="left" title="<%= t('bouncing_email', 'Canvas was unable to send email to this address. Please ensure the address is correct to continue receiving email from Canvas.') %>" aria-label="<%= t('bouncing_email', 'Canvas was unable to send email to this address. Please ensure the address is correct to continue receiving email from Canvas.') %>">
+            <i class="text text-warning icon-warning"></i>
+          </span>
+        <% end %>
         <% if c.state == :unconfirmed && (@user.grants_right?(@current_user, :manage_user_details) || (@real_current_user && @user.grants_right?(@real_current_user, :manage_user_details))) %>
             <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="confirm_channel_link no-hover" aria-label="<%= t('titles.confirm_email_address_aria_label', "Confirm Email Address") %>"><i class="icon-check standalone-icon" alt="<%= t('titles.confirm_email_address_alt', "Confirm Email Address") %>" title="<%= t('titles.confirm_email_address', "Confirm Email Address") %>"></i></a>
         <% end %>
@@ -110,6 +115,11 @@
       <td><a href="#" class="path"><%= c.path_description %></a></td>
       <td><%= c.path_type %></td>
       <td style="padding: 0; text-align: center;">
+        <% if c.bouncing? %>
+          <span class="bouncing-channel" data-tooltip="left" title="<%= t('bouncing_channel', 'Canvas was unable to send messages to you using this contact method. Please ensure the contact information is correct to continue receiving messages from Canvas.') %>" aria-label="<%= t('bouncing_channel', 'Canvas was unable to send messages to you using this contact method. Please ensure the contact information is correct to continue receiving messages from Canvas.') %>">
+            <i class="text text-warning icon-warning"></i>
+          </span>
+        <% end %>
         <% if c.state == :unconfirmed && (@user.grants_right?(@current_user, :manage_user_details) || (@real_current_user && @user.grants_right?(@real_current_user, :manage_user_details))) %>
             <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="confirm_channel_link no-hover"><i class="icon-check standalone-icon" title="<%= t('titles.confirm_email_address', "Confirm Email Address") %>"></i></a>
         <% end %>
@@ -152,7 +162,7 @@
     <div class="control-group">
       <%= label :communication_channel, :address, t('labels.email_address', 'Email Address'), :class => 'control-label' %>
       <div class="controls">
-        <%= text_field :communication_channel, :address %>
+        <%= email_field :communication_channel, :address %>
       </div>
     </div>
 
@@ -199,7 +209,7 @@
     <div class="control-group">
       <label for='communication_channel_sms_email' class='control-label'><%= t('labels.sms_email', 'SMS Email') %></label>
       <div class="controls">
-        <%= text_field :communication_channel, :address, :id => 'communication_channel_sms_email', :class => 'sms_email' %>
+        <%= email_field :communication_channel, :address, :id => 'communication_channel_sms_email', :class => 'sms_email' %>
       </div>
     </div>
 
@@ -248,6 +258,6 @@
 <div style="display: none;" id="select_templates">
   <%= render :partial => "email_select" %>
   <%= render :partial => "sms_select" %>
-  <%= render :partial => "facebook_select" %>
   <%= render :partial => "twitter_select" %>
+  <%= render :partial => "yo_select" %>
 </div>

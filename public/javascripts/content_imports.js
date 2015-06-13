@@ -193,7 +193,8 @@ define([
         }
         folderNames = folderNames.sort();
         for (var idx in folderNames) {
-          $("#copy_files_list").append(folders[folderNames[idx]]);
+          var $folder = folders[folderNames[idx]];
+          $("#copy_files_list").append($folder);
         }
       }
       populateItem(null, null, null, null);

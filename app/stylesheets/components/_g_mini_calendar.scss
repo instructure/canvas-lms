@@ -1,0 +1,67 @@
+@import "base/environment";
+
+.mini_month {
+  @if $use_new_styles { 
+    padding: $ic-sp 0 0;
+    margin-bottom: $ic-sp*2;
+  }
+  @else { padding: 10px 0 0; }
+}
+
+.mini-cal-header {
+  text-align: center;
+  @if $use_new_styles {
+    padding: $ic-sp $ic-sp/2;
+    font-weight: 500;
+    border: 1px solid $ic-border-light;
+    color: $ic-font-color--subdued;
+  }
+  @else {
+    font-family: georgia, serif;
+    font-size: 14px;
+    padding: 0 8px;
+  }
+  img {
+    vertical-align: middle;
+  }
+  .prev_month_link {
+    float: left;
+  }
+  .next_month_link {
+    float: right;
+  }
+}
+
+.mini_calendar {
+  width: 100%;
+  @if $use_new_styles {
+    border: 1px solid $ic-border-light;
+    border-top: none;
+  }
+  @else {
+    background-color: #e6e7e8; 
+  }
+  .day {
+    padding: 0;
+    height: 21px;
+    color: #444;
+    text-align: center;
+    cursor: pointer;
+    width: 14%;
+    @if $use_new_styles {
+      font-size: 12px;
+      border-radius: $baseBorderRadius;
+      &.has_event { background-color: darken($lightBackground, 4%); }
+      &.today { background-color: $ic-bg-light-alert; }
+    }
+    @else {
+      font-size: 0.8em;
+      &.has_event { background-color: #ccc; }
+      &.today { background-color: #F1F1DD; }
+    }
+    
+    &.other_month { color: #888; }
+    &:hover, &.related, &.drop_target { background-image: url("/images/4_percent_opacity.png"); }
+    &.drop_target { background-color: #aaa; }
+  }
+}

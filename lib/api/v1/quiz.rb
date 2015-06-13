@@ -17,7 +17,6 @@
 #
 module Api::V1::Quiz
   include Api::V1::Json
-  include Api::V1::AssignmentOverride
 
   API_ALLOWED_QUIZ_INPUT_FIELDS = {
     :only => %w(
@@ -29,8 +28,10 @@ module Api::V1::Quiz
       shuffle_answers
       hide_results
       show_correct_answers
+      show_correct_answers_last_attempt
       show_correct_answers_at
       hide_correct_answers_at
+      one_time_results
       scoring_policy
       allowed_attempts
       one_question_at_a_time
@@ -48,27 +49,28 @@ module Api::V1::Quiz
       )
   }
 
-  def quizzes_json(quizzes, context, user, session)
+  def quizzes_json(quizzes, context, user, session, options={})
     quizzes.map do |quiz|
-      quiz_json(quiz, context, user, session)
+      quiz_json(quiz, context, user, session, options)
     end
   end
 
-  def quiz_json(quiz, context, user, session)
+  def quiz_json(quiz, context, user, session, options={})
     if accepts_jsonapi?
       Canvas::APIArraySerializer.new([quiz],
                          scope: user,
                          session: session,
                          root: :quizzes,
                          each_serializer: Quizzes::QuizSerializer,
-                         controller: self).as_json
+                         controller: self,
+                         serializer_options: options).as_json
     else
       Quizzes::QuizSerializer.new(quiz,
                          scope: user,
                          session: session,
                          root: false,
-                         controller: self).as_json
-
+                         controller: self,
+                         serializer_options: options).as_json
     end
   end
 
@@ -108,7 +110,7 @@ module Api::V1::Quiz
     # make sure assignment_group_id belongs to context
     if update_params.has_key?("assignment_group_id")
       ag_id = update_params.delete("assignment_group_id").presence
-      ag = quiz.context.assignment_groups.find_by_id(ag_id)
+      ag = quiz.context.assignment_groups.where(id: ag_id).first
       update_params["assignment_group_id"] = ag.try(:id)
     end
 
@@ -126,6 +128,7 @@ module Api::V1::Quiz
     # hide_results="until_after_last_attempt" is valid if allowed_attempts > 1
     if update_params['hide_results'] == "until_after_last_attempt"
       allowed_attempts = update_params.fetch('allowed_attempts', quiz.allowed_attempts)
+
       unless allowed_attempts.to_i > 1
         update_params.delete 'hide_results'
       end
@@ -134,16 +137,39 @@ module Api::V1::Quiz
     # show_correct_answers is valid if hide_results is null
     if update_params.has_key?('show_correct_answers')
       hide_results = update_params.fetch('hide_results', quiz.hide_results)
+
       unless hide_results.blank?
         update_params.delete 'show_correct_answers'
       end
     end
 
-    # show_correct_answers_at and hide_correct_answers_at are valid only if
-    # show_correct_answers=true
-    unless update_params.fetch('show_correct_answers', quiz.show_correct_answers)
-      %w[ show_correct_answers_at hide_correct_answers_at ].each do |key|
-        update_params.delete(key) if update_params.has_key?(key)
+    begin
+      show_correct_answers = parse_tribool update_params.fetch('show_correct_answers', quiz.show_correct_answers)
+
+      # The following fields are valid only if `show_correct_answers` is true:
+      if show_correct_answers == false
+        %w[ show_correct_answers_at hide_correct_answers_at ].each do |key|
+          update_params.delete(key) if update_params.has_key?(key)
+        end
+      end
+
+      # show_correct_answers_last_attempt is valid only if
+      # show_correct_answers=true and allowed_attempts > 1
+      if update_params.has_key?('show_correct_answers_last_attempt')
+        allowed_attempts = update_params.fetch('allowed_attempts', quiz.allowed_attempts).to_i
+
+        if show_correct_answers == false || allowed_attempts <= 1
+          update_params.delete 'show_correct_answers_last_attempt'
+        end
+      end
+    end
+
+    # one_time_results is valid if hide_results is null
+    if update_params.has_key?('one_time_results')
+      hide_results = update_params.fetch('hide_results', quiz.hide_results)
+
+      unless hide_results.blank?
+        update_params.delete 'one_time_results'
       end
     end
 
@@ -158,6 +184,7 @@ module Api::V1::Quiz
     # cant_go_back is valid if one_question_at_a_time=true
     if update_params.has_key?('cant_go_back')
       one_question_at_a_time = update_params.fetch('one_question_at_a_time', quiz.one_question_at_a_time)
+
       unless one_question_at_a_time
         update_params.delete 'one_question_at_a_time'
       end
@@ -189,4 +216,16 @@ module Api::V1::Quiz
     quiz
   end
 
+  protected
+
+  # nil, "null" => nil
+  # false, "false" => false
+  # true, "true" => true
+  def parse_tribool(value)
+    if value.nil? || value.to_s == 'null'
+      nil
+    else
+      Canvas::Plugin.value_to_boolean(value)
+    end
+  end
 end

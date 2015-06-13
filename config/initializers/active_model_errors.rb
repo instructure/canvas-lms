@@ -66,15 +66,11 @@ module ActiveModel
       end
 
       def options
-        if CANVAS_RAILS2
-          super().merge(scope: [:activerecord, :errors])
-        else
-          super().merge(scope: [:errors], throw: true)
-        end
+        super().merge(scope: [:errors], throw: true)
       end
 
       def i18n_keys
-        self_and_descendants = CANVAS_RAILS2 ? base.class.self_and_descendants_from_active_record : ([base.class] + base.class.descendants)
+        self_and_descendants = ([base.class] + base.class.descendants)
         keys = self_and_descendants.map do |klass|
           [ :"models.#{klass.name.underscore}.attributes.#{attribute}.#{type}",
             :"models.#{klass.name.underscore}.#{type}" ]

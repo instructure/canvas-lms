@@ -1,0 +1,33 @@
+@import "base/environment";
+
+#import_subset_options {
+  margin: 10px 20px;
+  font-size: 9px;
+}
+#file_upload {
+  #export_file_input {
+    display: block;
+  }
+  span.zip_error {
+    font-size: 12px;
+    padding: 4px 6px;
+  }
+}
+
+.action-buttons {
+  padding-top: 15px;
+}
+
+// Fix for Safari users with fieldset legend spacing bug (see https://github.com/twitter/bootstrap/issues/5313)
+#config_options {
+  legend {
+    margin-bottom: 0 !important;
+    border-bottom: none !important;
+  }
+  legend:after {
+    display: block;
+    height: 20px; /* @baseLineHeight; */
+    border-top: 1px solid #e5e5e5;
+    content: "";
+  }
+}

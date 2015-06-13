@@ -2,14 +2,17 @@ define [
   'jquery'
   'underscore'
   'i18n!calendar.edit'
+  'timezone'
   'Backbone'
   'jst/calendar/editCalendarEventFull'
   'compiled/views/calendar/MissingDateDialogView'
   'wikiSidebar'
   'compiled/object/unflatten'
+  'compiled/util/deparam'
+  'compiled/views/editor/KeyboardShortcuts'
   'tinymce.editor_box'
   'compiled/tinymce'
-], ($, _, I18n, Backbone, editCalendarEventFullTemplate, MissingDateDialogView, wikiSidebar, unflatten) ->
+], ($, _, I18n, tz, Backbone, editCalendarEventFullTemplate, MissingDateDialogView, wikiSidebar, unflatten, deparam, KeyboardShortcuts) ->
 
   ##
   # View for editing a calendar event on it's own page
@@ -28,13 +31,21 @@ define [
     initialize: ->
       super
       @model.fetch().done =>
-        if ENV.NEW_CALENDAR_EVENT_ATTRIBUTES
-          attrs = @model.parse(ENV.NEW_CALENDAR_EVENT_ATTRIBUTES)
-          # if start and end are at the beginning of a day, assume it is an all day date
-          attrs.all_day = !!attrs.start_at?.equals(attrs.end_at) and attrs.start_at.equals(attrs.start_at.clearTime())
-          @model.set(attrs)
+        picked_params = _.pick(deparam(), 'start_date', 'start_time', 'end_time', 'title', 'description', 'location_name', 'location_address')
+
+        attrs = @model.parse(picked_params)
+        # if start and end are at the beginning of a day, assume it is an all day date
+        attrs.all_day = !!attrs.start_at?.equals(attrs.end_at) and attrs.start_at.equals(attrs.start_at.clearTime())
+        @model.set(attrs)
 
         @render()
+
+        # populate inputs with params passed through the url
+        _.each _.keys(picked_params), (key) =>
+          $e = @$el.find("input[name='#{key}']")
+          $e.val(picked_params[key])
+          $e.change()
+
       @model.on 'change:use_section_dates', @toggleUsingSectionClass
 
     render: =>
@@ -45,7 +56,13 @@ define [
       $textarea = @$('textarea').editorBox()
       wikiSidebar.init() unless wikiSidebar.inited
       wikiSidebar.attachToEditor($textarea).show()
+
+      _.defer(@attachKeyboardShortcuts)
       this
+
+    attachKeyboardShortcuts: =>
+      $('.switch_event_description_view').first().before((new KeyboardShortcuts()).render().$el)
+
 
     destroyModel: =>
       msg = I18n.t "confirm_delete_calendar_event", "Are you sure you want to delete this calendar event?"
@@ -78,9 +95,8 @@ define [
 
     submit: (event) ->
       event?.preventDefault()
-      eventData = unflatten @$el.getFormData()
+      eventData = unflatten @getFormData()
       eventData.use_section_dates = eventData.use_section_dates is '1'
-      _.each [eventData].concat(eventData.child_event_data), @setStartEnd
       delete eventData.child_event_data if eventData.remove_child_events == '1'
 
       if $('#use_section_dates').prop('checked')
@@ -89,6 +105,7 @@ define [
             $fields = $('[name*=start_date]:visible').filter -> $(this).val() is ''
             if $fields.length > 0 then $fields else true
           labelFn   : (input) -> $(input).parents('tr').prev().find('label').text()
+          da_enabled: ENV.DIFFERENTIATED_ASSIGNMENTS_ENABLED
           success   : ($dialog) =>
             $dialog.dialog('close')
             @$el.disableWhileLoading @model.save eventData, success: =>
@@ -102,10 +119,33 @@ define [
       @$el.disableWhileLoading @model.save eventData, success: =>
         @redirectWithMessage I18n.t 'event_saved', 'Event Saved Successfully'
 
-    setStartEnd: (obj) ->
-      return unless obj
-      obj.start_at = $.unfudgeDateForProfileTimezone(Date.parse obj.start_date+' '+obj.start_time)
-      obj.end_at   = $.unfudgeDateForProfileTimezone(Date.parse obj.start_date+' '+obj.end_time)
+    getFormData: ->
+      data = @$el.getFormData()
+
+      # pull the true, parsed dates from the inputs to calculate start_at and end_at correctly
+      keys = _.filter _.keys(data), ( (key) -> /start_date/.test(key) )
+      _.each keys, (start_date_key) =>
+        start_time_key = start_date_key.replace(/start_date/, 'start_time')
+        end_time_key = start_date_key.replace(/start_date/, 'end_time')
+        start_at_key = start_date_key.replace(/start_date/, 'start_at')
+        end_at_key = start_date_key.replace(/start_date/, 'end_at')
+
+        start_date = @$el.find("[name='#{start_date_key}']").data('date')
+        start_time = @$el.find("[name='#{start_time_key}']").data('date')
+        end_time = @$el.find("[name='#{end_time_key}']").data('date')
+        return unless start_date
+
+        data = _.omit(data, start_date_key, start_time_key, end_time_key)
+
+        start_at = start_date.toString('yyyy-MM-dd')
+        start_at += start_time.toString(' HH:mm') if start_time
+        data[start_at_key] = tz.parse(start_at)
+
+        end_at = start_date.toString('yyyy-MM-dd')
+        end_at += end_time.toString(' HH:mm') if end_time
+        data[end_at_key] = tz.parse(end_at)
+
+      data
 
     @type:  'event'
     @title: -> super 'event', 'Event'

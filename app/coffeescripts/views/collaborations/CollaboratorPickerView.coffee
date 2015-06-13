@@ -30,6 +30,8 @@ define [
 
     events:
       'change .filters input': 'filterList'
+      'focus .filters input': 'focusRadioGroup'
+      'blur .filters input': 'blurRadioGroup'
 
     fetchOptions:
       data:
@@ -104,6 +106,12 @@ define [
       el = $(e.currentTarget).val()
       @$el.find('.available-lists ul').hide()
       @$el.find(".#{el}").show()
+
+    focusRadioGroup: (e) ->
+      $(e.currentTarget).parent().addClass("radio-group-outline")
+
+    blurRadioGroup: (e) ->
+      $(e.currentTarget).parent().removeClass("radio-group-outline")
 
     # Internal: Remove a collaborator and return them to their original list.
     #

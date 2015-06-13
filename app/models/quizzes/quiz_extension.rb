@@ -36,14 +36,19 @@ class Quizzes::QuizExtension
   end
 
   # build the list of extensions
-  def self.build_extensions(students, sub_manager, ext_params)
-    ext_params.map do |ext_params|
-      student    = students.find(ext_params[:user_id])
-      submission = sub_manager.find_or_create_submission(student, nil, 'settings_only')
-      extension  = self.new(submission, ext_params)
-      yield extension if block_given? # use yielded block to check permissions
-      extension
+  def self.build_extensions(students, quizzes, ext_params)
+    extensions = []
+    quizzes.each do |quiz|
+      sub_manager = Quizzes::SubmissionManager.new(quiz)
+      ext_params.map do |ext_params|
+        student    = students.find(ext_params[:user_id])
+        submission = sub_manager.find_or_create_submission(student, nil, 'settings_only')
+        extension  = self.new(submission, ext_params)
+        yield extension if block_given? # use yielded block to check permissions
+        extensions << extension
+      end
     end
+    extensions
   end
 
   private

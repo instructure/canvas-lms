@@ -23,11 +23,11 @@ module Alerts
       alerts.concat course.alerts.all
       return if alerts.empty?
 
-      student_enrollments = course.student_enrollments.active
+      student_enrollments = course.student_enrollments
       student_ids = student_enrollments.map(&:user_id)
       return if student_ids.empty?
 
-      teacher_enrollments = course.instructor_enrollments.active
+      teacher_enrollments = course.instructor_enrollments.active_or_pending
       teacher_ids = teacher_enrollments.map(&:user_id)
       return if teacher_ids.empty?
 
@@ -68,7 +68,7 @@ module Alerts
     end
 
     def self.send_alert(alert, user_ids, student_enrollment)
-      notification = Notification.by_name("Alert")
+      notification = BroadcastPolicy.notification_finder.by_name("Alert")
       notification.create_message(alert, user_ids, {:asset_context => student_enrollment})
     end
   end

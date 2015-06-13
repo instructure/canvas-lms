@@ -1,0 +1,39 @@
+.form-inline label {
+  margin: 0;
+}
+.form-inline input, .form-inline button {
+  margin-left: 0.5em;
+}
+#course_summaries {
+  margin: 0;
+}
+.course_summary {
+  display: inline-block;
+  height: 190px;
+  overflow: hidden;
+  margin: 0.5em;
+  position: relative;
+}
+.course_text {
+  display: block;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  color: #333;
+}
+.course_text:hover {
+  background-color: #cde;
+}
+h3 {
+  font-size: 1.2em;
+  line-height: normal;
+  margin: 0;
+  a, a:hover {color: #fff; text-decoration: none;}
+}
+p {
+  margin: 0.25em 0;
+}
+.course_enrollment_link {
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+}

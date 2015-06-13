@@ -25,9 +25,9 @@ describe 'forgot_password.email' do
     @pseudonym = @user.pseudonyms.create!(:unique_id => 'unique@example.com', :password => 'password', :password_confirmation => 'password')
     @object = @user.communication_channels.create!(:path_type => 'email', :path => 'bob@example.com', :user => @user)
     @object.reload
-    @user.all_active_pseudonyms.length.should > 0
-    @user.all_active_pseudonyms.first.unique_id.should_not be_nil
-    @user.all_active_pseudonyms.first.managed_password?.should eql(false)
+    expect(@user.all_active_pseudonyms.length).to be > 0
+    expect(@user.all_active_pseudonyms.first.unique_id).not_to be_nil
+    expect(@user.all_active_pseudonyms.first.managed_password?).to eql(false)
     @user.reload
     generate_message(:forgot_password, :email, @object)
   end

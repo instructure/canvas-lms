@@ -1,0 +1,9 @@
+#!/bin/sh
+echo "# running script/test"
+script/build
+echo "# script/build: bower install"
+node_modules/.bin/bower install
+#node_modules/.bin/karma start --browsers Firefox --single-run
+echo "# script/build: testem ci"
+node_modules/.bin/testem ci
+

@@ -7,12 +7,6 @@ test:
   username: canvas
   timeout: 5000
 
-test-in-memory:
-  adapter: sqlite3
-  encoding: utf8
-  database: ':memory:'
-  pool: 1
-
 development:
   adapter: postgresql
   encoding: utf8

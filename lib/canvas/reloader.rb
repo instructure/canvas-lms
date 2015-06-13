@@ -21,6 +21,11 @@ module Canvas::Reloader
   def self.reload!
     Setting.reset_cache!
     Canvas::RequestThrottle.reload!
+    to_reload.each(&:call)
+  end
+
+  def self.on_reload(&block)
+    to_reload << block
   end
 
   def self.trap_signal
@@ -28,5 +33,10 @@ module Canvas::Reloader
       Rails.logger.info("Canvas::Reloader fired")
       Canvas::Reloader.reload!
     end
+  end
+
+  private
+  def self.to_reload
+    @to_reload ||= []
   end
 end

@@ -4,15 +4,10 @@ module Canvas
   # this to :raise to raise an exception.
   mattr_accessor :protected_attribute_error
 
-  # defines the behavior when nil or empty array arguments passed into dynamic
-  # finders. The default (:log) logs a warning if the finder is not scoped and
-  # if *all* arguments are nil/[], e.g.
-  #   Thing.find_by_foo_and_bar(nil, nil)       # warning
-  #   Other.find_by_baz([])                     # warning
-  #   Another.find_all_by_a_and_b(123, nil)     # ok
-  #   ThisThing.some_scope.find_by_whatsit(nil) # ok
-  # Set this to :raise to raise an exception.
-  mattr_accessor :dynamic_finder_nil_arguments_error
+  # defines extensions that could possibly be used, so that specs can move them to the
+  # correct schemas for sharding
+  mattr_accessor :possible_postgres_extensions
+  self.possible_postgres_extensions = [:pg_collkey, :pg_trgm]
 
   def self.active_record_foreign_key_check(name, type, options)
     if name.to_s =~ /_id\z/ && type.to_s == 'integer' && options[:limit].to_i < 8
@@ -48,11 +43,6 @@ module Canvas
     end
   end
 
-  def self.cache_store_config(rails_env = :current, nil_is_nil = true)
-    rails_env = Rails.env if rails_env == :current
-    cache_stores[rails_env]
-  end
-
   def self.cache_stores
     unless @cache_stores
       # this method is called really early in the bootup process, and
@@ -67,12 +57,16 @@ module Canvas
         raise "Invalid config/cache_store.yml: Root is not a hash. See comments in config/cache_store.yml.example"
       end
 
-      unless configs.values.all? { |cfg| cfg.is_a?(Hash) }
-        broken = configs.keys.select{ |k| !configs[k].is_a?(Hash) }.map(&:to_s).join(', ')
-        raise "Invalid config/cache_store.yml: Some keys are not hashes: #{broken}. See comments in config/cache_store.yml.example"
-      end
+      non_hashes = configs.keys.select { |k| !configs[k].is_a?(Hash) }
+      non_hashes.reject! { |k| configs[k].is_a?(String) && configs[configs[k]].is_a?(Hash) }
+      raise "Invalid config/cache_store.yml: Some keys are not hashes: #{non_hashes.join(', ')}. See comments in config/cache_store.yml.example" unless non_hashes.empty?
 
       configs.each do |env, config|
+        if config.is_a?(String)
+          # switchman will treat strings as a link to another database server
+          @cache_stores[env] = config
+          next
+        end
         config = {'cache_store' => 'mem_cache_store'}.merge(config)
         case config.delete('cache_store')
         when 'mem_cache_store'
@@ -85,31 +79,32 @@ module Canvas
           Bundler.require 'redis'
           require_dependency 'canvas/redis'
           Canvas::Redis.patch
-          # merge in redis.yml, but give precedence to cache_store.yml
-          #
-          # the only options currently supported in redis-cache are the list of
-          # servers, not key prefix or database names.
-          config = (ConfigFile.load('redis', env) || {}).merge(config)
-          config['key_prefix'] ||= config['key']
-          servers = config['servers']
-          @cache_stores[env] = :redis_store, servers
+          # if cache and redis data are configured identically, we want to share connections
+          if config == {} && env == Rails.env && Canvas.redis_enabled?
+            # A bit of gymnastics to wrap an existing Redis::Store into an ActiveSupport::Cache::RedisStore
+            store = ActiveSupport::Cache::RedisStore.new([])
+            store.instance_variable_set(:@data, Canvas.redis.__getobj__)
+            @cache_stores[env] = store
+          else
+            # merge in redis.yml, but give precedence to cache_store.yml
+            #
+            # the only options currently supported in redis-cache are the list of
+            # servers, not key prefix or database names.
+            config = (ConfigFile.load('redis', env) || {}).merge(config)
+            config_options = config.symbolize_keys.except(:key, :servers, :database)
+            servers = config['servers']
+            if servers
+              servers = config['servers'].map { |s| Canvas::RedisConfig.url_to_redis_options(s).merge(config_options) }
+              @cache_stores[env] = :redis_store, servers
+            end
+          end
         when 'memory_store'
           @cache_stores[env] = :memory_store
         when 'nil_store'
-          if CANVAS_RAILS2
-            require 'nil_store'
-            @cache_stores[env] = NilStore.new
-          else
-            @cache_stores[env] = :null_store
-          end
+          @cache_stores[env] = :null_store
         end
       end
-      @cache_stores[Rails.env] ||= if CANVAS_RAILS2
-        require 'nil_store'
-        NilStore.new
-      else
-        :null_store
-      end
+      @cache_stores[Rails.env] ||= :null_store
     end
     @cache_stores
   end
@@ -137,22 +132,29 @@ module Canvas
 
   # can be called by plugins to allow reloading of that plugin in dev mode
   # pass in the path to the plugin directory
-  # e.g., in the vendor/plugins/<plugin_name>/init.rb:
+  # e.g., in the vendor/plugins/<plugin_name>/init.rb or
+  # gems/plugins/<plugin_name>/lib/<plugin_name>/engine.rb:
   #     Canvas.reloadable_plugin(File.dirname(__FILE__))
   def self.reloadable_plugin(dirname)
     return unless Rails.env.development?
     base_path = File.expand_path(dirname)
+    base_path.gsub(%r{/lib/[^/]*$}, '')
     ActiveSupport::Dependencies.autoload_once_paths.reject! { |p|
       p[0, base_path.length] == base_path
     }
   end
 
   def self.revision
-    return @revision unless @revision.nil?
-    if File.file?(Rails.root+"VERSION")
-      @revision = File.readlines(Rails.root+"VERSION").first.try(:strip)
+    return @revision if defined?(@revision)
+    @revision = if File.file?(Rails.root+"VERSION")
+      File.readlines(Rails.root+"VERSION").first.try(:strip)
+    else
+      nil
     end
-    @revision ||= I18n.t(:canvas_revision_unknown, "Unknown")
+  end
+
+  def self.timeout_protection_error_ttl(service_name)
+    (Setting.get("service_#{service_name}_error_ttl", nil) || Setting.get("service_generic_error_ttl", 1.minute.to_s)).to_i
   end
 
   # protection against calling external services that could timeout or misbehave.
@@ -171,7 +173,7 @@ module Canvas
     if Canvas.redis_enabled?
       redis_key = "service:timeouts:#{service_name}"
       cutoff = (Setting.get("service_#{service_name}_cutoff", nil) || Setting.get("service_generic_cutoff", 3.to_s)).to_i
-      error_ttl = (Setting.get("service_#{service_name}_error_ttl", nil) || Setting.get("service_generic_error_ttl", 1.minute.to_s)).to_i
+      error_ttl = timeout_protection_error_ttl(service_name)
       short_circuit_timeout(Canvas.redis, redis_key, timeout, cutoff, error_ttl, &block)
     else
       Timeout.timeout(timeout, &block)
@@ -181,7 +183,7 @@ module Canvas
     raise if options[:raise_on_timeout]
     return nil
   rescue Timeout::Error => e
-    ErrorReport.log_exception(:service_timeout, e)
+    Canvas::Errors.capture_exception(:service_timeout, e)
     raise if options[:raise_on_timeout]
     return nil
   end

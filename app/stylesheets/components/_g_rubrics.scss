@@ -1,0 +1,280 @@
+@mixin mode-visibility($edit, $disp, $igno) {
+  .editing {
+    display: $edit;
+  }
+  .displaying {
+    display: $disp;
+  }
+  .ignoring {
+    display: $igno;
+  }
+}
+
+// unfortunately, we used the same class name as bootstrap's .container, need to reset it's effects
+@mixin revert_bootstrap_container {
+  margin-left: 0;
+  margin-right: 0;
+  width: auto;
+}
+
+.rubric_container {
+  margin-top: 20px;
+  tr.criterion .links {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    display: none;
+  }
+  &.editing {
+    tr.criterion .links {
+      display: inline-block;
+      i {
+        visibility: hidden;
+      }
+    }
+    td.rating:hover, td.criterion_description:hover, .links a:focus {
+      i {
+        visibility: visible;
+      }
+    }
+    label[for=rubric-title] {
+      font-weight: bold;
+    }
+  }
+  .rubric_table {
+    border-collapse: collapse;
+    //for some reason, chrome puts a scrollbar on the table in the extended gradebook if it is 100%
+    width: 99.9%;
+    page-break-inside: avoid;
+  }
+  thead th {
+    background-color: #ccc;
+  }
+  td, th {
+    border: 1px solid #aaa;
+    padding: 2px 5px;
+  }
+  .rubric_title {
+    background-color: #ccc;
+    border-top: 1px solid #aaa;
+    border-left: 1px solid #aaa;
+    border-right: 1px solid #aaa;
+    padding: 5px;
+    margin-right: 1px;
+    font-weight: bold;
+  }
+  .has-assessments-warning {
+    font-size: 0.8em;
+    font-weight: normal;
+  }
+  tr.criterion td.criterion_description {
+    // :max-width 150px
+    .container {
+      @include revert_bootstrap_container;
+      position: relative;
+      font-size: 0.9em;
+    }
+    .learning_outcome_flag, .threshold {
+      display: none;
+    }
+    .long_description_holder {
+      font-size: 0.8em;
+      display: block;
+      &.empty {
+        display: none;
+      }
+    }
+    .assessment-comments {
+      font-size: 10px;
+      h6, .h6 {
+        margin-top: 10px;
+      }
+    }
+  }
+  tr.criterion.learning_outcome_criterion {
+    td.criterion_description {
+      .learning_outcome_flag {
+        display: inline;
+      }
+      .threshold {
+        font-size: 0.8em;
+        display: block;
+        white-space: nowrap;
+      }
+      &.points_form {
+        @include mode-visibility($edit: none, $disp: block, $igno: none);
+      }
+    }
+  }
+  tr.criterion.learning_outcome_criterion.ignore_criterion_for_scoring {
+    .points_form {
+      @include mode-visibility($edit: none, $disp: none, $igno: block);
+    }
+  }
+  table.ratings {
+    border-collapse: collapse;
+    width: 100%;
+    margin-left: -1px;
+    td {
+      border: 1px solid #aaa;
+      padding: 2px 5px;
+      border-bottom-width: 0;
+      border-right-width: 0;
+      border-top-width: 0;
+      font-size: 0.8em;
+      vertical-align: top;
+      padding: 2px 8px;
+      .container {
+        @include revert_bootstrap_container;
+        padding: 5px 0;
+        position: relative;
+      }
+      &.edge_rating .delete_rating_link {
+        display: none;
+      }
+      &:last-child .add_rating_link_after {
+        display: none;
+      }
+    }
+  }
+  @include mode-visibility($edit: none, $disp: block, $igno: none);
+  .assessing {
+    display: none;
+  }
+  td.criterion_description.completed {
+    background-color: #ddd;
+  }
+  td.rating.selected {
+    background-color: #cfa;
+  }
+  td.points_form {
+    .criterion_comments {
+      display: none;
+    }
+    .displaying {
+      .criterion_comments {
+        display: inline;
+        &.empty {
+          display: none;
+        }
+      }
+    }
+  }
+  &.assessing {
+    .points_form {
+      @include mode-visibility($edit: block, $disp: none, $igno: none);
+      .criterion_comments {
+        display: inline;
+        &.empty {
+          opacity: 0.7;
+          &:hover {
+            opacity: 0.9;
+          }
+        }
+      }
+    }
+    span.assessing {
+      display: inline;
+    }
+    div.assessing {
+      display: block;
+    }
+    div.not_assessing {
+      display: none;
+    }
+    td.rating:hover {
+      background-color: #ad9;
+      cursor: pointer;
+    }
+    tr.criterion.learning_outcome_criterion {
+      td.points_form {
+        @include mode-visibility($edit: block, $disp: none, $igno: none);
+      }
+    }
+    tr.criterion.learning_outcome_criterion.ignore_criterion_for_scoring {
+      td.points_form {
+        @include mode-visibility($edit: none, $disp: none, $igno: block);
+      }
+    }
+  }
+  &.editing {
+    @include mode-visibility($edit: block, $disp: none, $igno: none);
+    td.editing, th.editing {
+      display: table-cell;
+    }
+    tr.criterion td.criterion_description {
+      .long_description_holder {
+        font-size: 0.8em;
+        font-weight: bold;
+        &.empty {
+          font-weight: normal;
+          display: block;
+        }
+      }
+    }
+    table.ratings {
+      td.add_right {
+        border-right-color: #000;
+        background: url(/images/add_right.png) no-repeat center right;
+      }
+      td.add_left {
+        border-left-color: #000;
+        background: url(/images/add_left.png) no-repeat center left;
+      }
+      td.add_column {
+        cursor: pointer;
+      }
+    }
+  }
+  .has-assessments-warning {
+    font-size: 0.8em;
+    font-weight: normal;
+    text-align: left;
+  }
+}
+
+.rubric_summary {
+  margin-top: 0 !important;
+  .rating_holder {
+    margin-bottom: 3px;
+  }
+  .rating {
+    color: #777;
+    font-style: italic;
+    text-align: left;
+  }
+  .rating_comments_dialog_link {
+    font-size: 0.8em;
+    max-height: 2.7em;
+    cursor: pointer;
+    overflow: hidden;
+  }
+  .x_out_of_x {
+    float: right;
+  }
+  &.free_form {
+    .rating.description {
+      display: none;
+    }
+  }
+  .points_form {
+    .rating_custom {
+      height: 15px;
+    }
+  }
+}
+
+.edit-rubric-form .button-container {
+  margin: 8px 0;
+  text-align: right;
+}
+
+#rubric_holder {
+  .rubric_title {
+    margin-right: 0;
+  }
+  .hide_rubric_link {
+    color: #333;
+    cursor: pointer;
+  }
+}

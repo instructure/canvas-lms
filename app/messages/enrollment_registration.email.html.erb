@@ -1,16 +1,14 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.course) %>/<%= asset.course.class.to_s.downcase.pluralize %>/<%= asset.course_id %>?invitation=<%= asset.uuid %>
+  <%= course_url(asset.course, invitation: asset.uuid) %>
 <% end %>
 
 <% define_content :subject do %>
   <%= t :subject, "Course Invitation" %>
 <% end %>
 
-<% define_content :footer_link do %>
-  <a href="<%= content(:link) %>">
-    <%= t :link, "Click here to get started" %>
-  </a>
-<% end %>
+<a href="<%= content(:link) %>">
+  <%= t :link, "Click here to get started" %>
+</a>
 
 <% website = HostUrl.context_host(asset.course) %>
 <p><%= t :participate_in_class, "You've been invited to participate in a class at %{website}", :website => website %></p>
@@ -56,3 +54,15 @@
 </table>
 
 <p><%= t :details, "You'll need to register with Canvas before you can participate in the class." %></p>
+
+<br><br>
+
+<table width="100%" border="0" style="text-align:center;">
+  <tr>
+    <td>
+      <a href="<%= content(:link) %>">
+        <img src="<%= "#{HostUrl.protocol}://#{HostUrl.context_host(asset_context)}" %>/images/get-started-btn.png"  alt="Get Started" />
+      </a>
+    </td>
+  </tr>
+</table>

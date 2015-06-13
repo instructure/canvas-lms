@@ -2,7 +2,7 @@
   jammit_css :profile_show, :tinymce
   js_bundle :profile_show
   @body_classes << 'not-editing'
-  js_env PROFILE: @user_data
+  js_env PROFILE: @user_data if @user_data[:can_edit]
   js_env(folder_id: @user.profile_pics_folder.id) if @user == @current_user
 %>
 <%= form_tag update_profile_profile_path, { :method => :put, :id => :edit_profile_form, :class => "bootstrap-form form-vertical" } do %>
@@ -10,8 +10,11 @@
     <div class="image-block-image profile-avatar-wrapper">
       <% if @user_data[:can_edit] %>
         <%= avatar(@user_data[:id], size: 128, url: '#', edit: true, class: "profile-link", title: t('titles.click_to_change_profile_pic', "Click to change profile pic")) %>
+      <% elsif @user != @current_user %>
+        <%= avatar(@user_data[:id], size: 128, url: report_avatar_image_url(@user.id),
+          class: "report_avatar_link", title: t("Click to report profile picture"), show_flag: true) %>
       <% else %>
-        <%= avatar(@user_data[:id], size: 128) %>
+        <%= avatar(@user_data[:id], size: 128, url: nil) %>
       <% end %>
     </div>
     <div class="image-block-content row-fluid">
@@ -81,7 +84,7 @@
   </div>
 
   <div class="v-gutter">
-    <h2 class="h1 border border-b"><%= t :bio, "Bio" %></h2>
+    <h2 class="h1 border border-b"><label for="profile_bio" style="font-size: 22px"><%= t :bio, "Bio" %></label></h2>
     <% if @user_data[:bio] %>
       <div class="hide-if-editing"><%= raw format_message(@user_data[:bio]).first %></div>
     <% else %>
@@ -129,9 +132,9 @@
         <div class="show-if-editing">
           <table id="edit_links_table">
             <thead>
-              <th><%= t :links_title, 'Title' %></th>
+              <th scope="col"><%= t :links_title, 'Title' %></th>
               <th></th>
-              <th><%= t :links_url, 'URL' %></th>
+              <th scope="col"><%= t :links_url, 'URL' %></th>
             </thead>
             <tbody id="profile_link_fields"></tbody>
           </table>

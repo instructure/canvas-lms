@@ -3,10 +3,11 @@ require File.expand_path(File.dirname(__FILE__) + '/support/answer_serializers_s
 require File.expand_path(File.dirname(__FILE__) + '/support/id_answer_serializers_specs.rb')
 
 describe Quizzes::QuizQuestion::AnswerSerializers::MultipleChoice do
+
   include_examples 'Answer Serializers'
 
   let :input do
-    2405
+    '2405'
   end
 
   let :output do

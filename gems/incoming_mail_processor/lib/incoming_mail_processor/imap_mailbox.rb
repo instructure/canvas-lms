@@ -50,9 +50,11 @@ module IncomingMailProcessor
     rescue
     end
 
-    def each_message
+    def each_message(opts={})
       @imap.select(@folder)
-      @imap.search(@filter).each do |message_id|
+      message_ids = @imap.search(@filter)
+      message_ids = message_ids.select{|id| id % opts[:stride] == opts[:offset]} if opts[:stride] && opts[:offset]
+      message_ids.each do |message_id|
         body = @imap.fetch(message_id, "RFC822")[0].attr["RFC822"]
         yield message_id, body
       end

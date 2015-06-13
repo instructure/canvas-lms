@@ -27,7 +27,7 @@ describe "/submissions/show" do
     assigns[:assignment] = a
     assigns[:submission] = a.submit_homework(@user)
     render "submissions/show"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

@@ -1,4 +1,22 @@
-@import 'environment';
+@import 'base/environment';
+
+.accessibility-warning {
+  @include accessibility-prompt;
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  font-size: 12px;
+  &:focus{
+    left: 0;
+    top: 36px;
+    width: auto;
+    height: auto;
+    z-index: 1;
+  }
+}
 
 .progress-title {
   text-align: center;

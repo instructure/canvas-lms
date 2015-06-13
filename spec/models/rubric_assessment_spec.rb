@@ -20,12 +20,17 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe RubricAssessment do
-  it "should htmlify the rating comments" do
+  before :once do
     assignment_model
-    rubric_model
+    @teacher = user(:active_all => true)
+    @course.enroll_teacher(@teacher).accept
     @student = user(:active_all => true)
     @course.enroll_student(@student).accept
+    rubric_model
     @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
+  end
+
+  it "should htmlify the rating comments" do
     comment = "Hi, please see www.example.com.\n\nThanks."
     @assessment = @association.assess({
       :user => @student,
@@ -39,21 +44,15 @@ describe RubricAssessment do
         }
       }
     })
-    @assessment.data.first[:comments].should == comment
+    expect(@assessment.data.first[:comments]).to eq comment
     t = Class.new
     t.extend HtmlTextHelper
-    @assessment.data.first[:comments_html].should == t.format_message(comment).first
+    # data has been round-tripped through YAML, and syck doesn't preserve carriage returns
+    expect(@assessment.data.first[:comments_html]).to eq t.format_message(comment).first.gsub("\r", '')
   end
 
   context "grading" do
     it "should update scores if used for grading" do
-      assignment_model
-      @teacher = user(:active_all => true)
-      @course.enroll_teacher(@teacher).accept
-      @student = user(:active_all => true)
-      @course.enroll_student(@student).accept
-      rubric_model
-      @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
       @assessment = @association.assess({
         :user => @student,
         :assessor => @teacher,
@@ -65,23 +64,34 @@ describe RubricAssessment do
           }
         }
       })
-      @assessment.should_not be_nil
-      @assessment.user.should eql(@student)
-      @assessment.assessor.should eql(@teacher)
-      @assessment.artifact.should_not be_nil
-      @assessment.artifact.should be_is_a(Submission)
-      @assessment.artifact.user.should eql(@student)
-      @assessment.artifact.grader.should eql(@teacher)
-      @assessment.artifact.score.should eql(5.0)
-      @assessment.data.first[:comments_html].should be_nil
+      expect(@assessment).not_to be_nil
+      expect(@assessment.user).to eql(@student)
+      expect(@assessment.assessor).to eql(@teacher)
+      expect(@assessment.artifact).not_to be_nil
+      expect(@assessment.artifact).to be_is_a(Submission)
+      expect(@assessment.artifact.user).to eql(@student)
+      expect(@assessment.artifact.grader).to eql(@teacher)
+      expect(@assessment.artifact.score).to eql(5.0)
+      expect(@assessment.data.first[:comments_html]).to be_nil
     end
-    
+
+    it "should not mutate null/empty string score text to 0" do
+      @assessment = @association.assess({
+        :user => @student,
+        :assessor => @teacher,
+        :artifact => @assignment.find_or_create_submission(@student),
+        :assessment => {
+          :assessment_type => 'grading',
+          :criterion_crit1 => {
+            :points => ""
+          }
+        }
+      })
+      expect(@assessment.score).to be_nil
+      expect(@assessment.artifact.score).to eql(nil)
+    end
+
     it "should not update scores if not used for grading" do
-      assignment_model
-      @teacher = user(:active_all => true)
-      @course.enroll_teacher(@teacher).accept
-      @student = user(:active_all => true)
-      @course.enroll_student(@student).accept
       rubric_model
       @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => false)
       @assessment = @association.assess({
@@ -95,26 +105,19 @@ describe RubricAssessment do
           }
         }
       })
-      @assessment.should_not be_nil
-      @assessment.user.should eql(@student)
-      @assessment.assessor.should eql(@teacher)
-      @assessment.artifact.should_not be_nil
-      @assessment.artifact.should be_is_a(Submission)
-      @assessment.artifact.user.should eql(@student)
-      @assessment.artifact.grader.should eql(nil)
-      @assessment.artifact.score.should eql(nil)
+      expect(@assessment).not_to be_nil
+      expect(@assessment.user).to eql(@student)
+      expect(@assessment.assessor).to eql(@teacher)
+      expect(@assessment.artifact).not_to be_nil
+      expect(@assessment.artifact).to be_is_a(Submission)
+      expect(@assessment.artifact.user).to eql(@student)
+      expect(@assessment.artifact.grader).to eql(nil)
+      expect(@assessment.artifact.score).to eql(nil)
     end
-    
+
     it "should not update scores if not a valid grader" do
-      assignment_model
-      @teacher = user(:active_all => true)
-      @course.enroll_teacher(@teacher).accept
-      @student = user(:active_all => true)
-      @course.enroll_student(@student).accept
       @student2 = user(:active_all => true)
       @course.enroll_student(@student2).accept
-      rubric_model
-      @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
       @assessment = @association.assess({
         :user => @student,
         :assessor => @student2,
@@ -126,14 +129,63 @@ describe RubricAssessment do
           }
         }
       })
-      @assessment.should_not be_nil
-      @assessment.user.should eql(@student)
-      @assessment.assessor.should eql(@student2)
-      @assessment.artifact.should_not be_nil
-      @assessment.artifact.should be_is_a(Submission)
-      @assessment.artifact.user.should eql(@student)
-      @assessment.artifact.grader.should eql(nil)
-      @assessment.artifact.score.should eql(nil)
+      expect(@assessment).not_to be_nil
+      expect(@assessment.user).to eql(@student)
+      expect(@assessment.assessor).to eql(@student2)
+      expect(@assessment.artifact).not_to be_nil
+      expect(@assessment.artifact).to be_is_a(Submission)
+      expect(@assessment.artifact.user).to eql(@student)
+      expect(@assessment.artifact.grader).to eql(nil)
+      expect(@assessment.artifact.score).to eql(nil)
+    end
+
+    describe "for assignment requiring anonymous peer reviews" do
+      before(:once) do
+        @assignment.update_attribute(:anonymous_peer_reviews, true)
+        @reviewed = @student
+        @reviewer = student_in_course(:active_all => true).user
+        @assignment.assign_peer_review(@reviewer, @student)
+        @assessment = @association.assess({
+          :user => @reviewed,
+          :assessor => @reviewer,
+          :artifact => @assignment.find_or_create_submission(@student),
+          :assessment => {
+            :assessment_type => 'peer_review',
+            :criterion_crit1 => {
+              :points => 5,
+              :comments => "Hey, it's a comment."
+            }
+          }
+        })
+      end
+
+      it "should prevent reviewed from seeing reviewer's name" do
+        expect(@assessment.grants_right?(@reviewed, :read_assessor)).to be_falsey
+      end
+
+      it "should allow reviewer to see own name" do
+        expect(@assessment.grants_right?(@reviewer, :read_assessor)).to be_truthy
+      end
+
+      it "should allow teacher to see reviewer's name" do
+        expect(@assessment.grants_right?(@teacher, :read_assessor)).to be_truthy
+      end
+    end
+
+    describe "#considered_anonymous?" do
+      let_once(:assessment) {
+        RubricAssessment.create!({
+          artifact: @assignment.find_or_create_submission(@student),
+          assessment_type: 'peer_review',
+          assessor: student_in_course(active_all: true).user,
+          rubric: @rubric,
+          user: @student
+        })
+      }
+
+      it "should not blow up without a rubric_association" do
+        expect{assessment.considered_anonymous?}.not_to raise_error
+      end
     end
   end
 end

@@ -21,7 +21,5 @@ class ScribdMimeType < ActiveRecord::Base
 
   attr_accessible :extension, :name
 
-  unless CANVAS_RAILS2
-    self.shard_category = :unsharded
-  end
+  self.shard_category = :unsharded
 end

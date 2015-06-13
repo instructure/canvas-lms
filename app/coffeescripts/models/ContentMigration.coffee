@@ -74,7 +74,7 @@ define [
       fileElement = @get('pre_attachment').fileElement
       delete @get('pre_attachment').fileElement
 
-      super null,
+      super _.omit(arguments[0], 'file'),
         error: (xhr) => dObject.rejectWith(this, xhr.responseText)
         success: (model, xhr, options) => 
           tempModel = new Backbone.Model(@get('pre_attachment').upload_params)
@@ -98,6 +98,7 @@ define [
     toJSON: -> 
       json = super
       @addDaySubsitutions(json)
+      @translateDateAdjustmentParams(json)
       json
 
     # Add day substituions to a json object if this model has a daySubCollection. 
@@ -111,13 +112,14 @@ define [
       json.date_shift_options ||= {}
       json.date_shift_options.day_substitutions = collection.toJSON() if collection
 
-    # Since attribute are nested under 'date_shift_options' this method provides
-    # a simple consistant way to change dateshift options on the model. Allows
-    # a silent options to be passed in.
+    # Convert date adjustment (shift / remove) radio buttons into the format
+    # expected by the Canvas API
     #
-    # @api public
+    # @api private
 
-    setDateShiftOptions: ({value, property, silent}) -> 
-      date_data = @get('date_shift_options') || {}
-      date_data[property] = $.datetime.process(value)
-      @set('date_shift_options', date_data, {silent: silent})
+    translateDateAdjustmentParams: (json) =>
+      if json.adjust_dates
+        if json.adjust_dates.enabled == '1'
+          json.date_shift_options[json.adjust_dates.operation] = '1'
+        delete json.adjust_dates
+

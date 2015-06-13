@@ -1,6 +1,7 @@
 <option value="course_{{id}}" data-code="{{course_code}}"
 {{#if truncated_name}}
-  aria-label="{{name}}" data-content="<abbr class='text' data-value='{{id}}' title='{{name}}'>{{truncated_name}}</abbr>"
+  {{! We must escape everything in the attributes because the boostrap-select.js will parse it, so we need to double escape. }}
+  aria-label="{{escape_html name}}" data-content="<abbr class='text' data-value='{{id}}' title='{{escape_html name}}'>{{escape_html truncated_name}}</abbr>"
   >
   {{truncated_name}}
 {{else}}

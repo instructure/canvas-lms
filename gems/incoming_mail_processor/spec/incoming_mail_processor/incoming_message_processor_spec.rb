@@ -17,6 +17,7 @@
 #
 
 require 'spec_helper'
+MAIL_FIXTURES_PATH = File.dirname(__FILE__) + '/../fixtures/'
 describe IncomingMailProcessor::IncomingMessageProcessor do
 
   # Import this one constant
@@ -35,6 +36,46 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       @incoming_message = incoming_message
       @address_tag = tag
     end
+  end
+
+  def get_fixture (name)
+    mail = Mail.read(MAIL_FIXTURES_PATH + name)
+    return mail
+  end
+
+
+  def get_expected_text (name)
+    file = File.open(MAIL_FIXTURES_PATH + 'expected/' + name + '.text_body', 'rb')
+    content = file.read
+    file.close
+
+    return content
+  end
+
+  def get_expected_html (name)
+    file = File.open(MAIL_FIXTURES_PATH + 'expected/' + name + '.html_body', 'rb')
+    content = file.read
+    file.close
+
+    return content
+  end
+
+  def test_message (filename)
+    message = get_processed_message(filename)
+
+    text_body =  message.body.strip
+    text_body.should == get_expected_text(filename).strip
+
+    html_body =  message.html_body.strip
+    html_body.should == get_expected_html(filename).strip
+  end
+
+  def get_processed_message(name)
+    processor = IncomingMessageProcessor.new(message_handler, error_reporter)
+    message = get_fixture(name)
+    processor.process_single(message, '')
+
+    return message_handler
   end
 
   let(:error_reporter) { MockErrorReporter.new }
@@ -87,7 +128,9 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
 
   describe "#process_single" do
     it "should not choke on invalid UTF-8" do
-      IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new { body "he\xffllo" }, '')
+      IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new {
+          content_type 'text/plain; charset=UTF-8'
+          body "he\xffllo".force_encoding(Encoding::BINARY) }, '')
 
       message_handler.body.should == "hello"
       message_handler.html_body.should == "hello"
@@ -96,7 +139,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
     it "should convert another charset to UTF-8" do
       IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new {
           content_type 'text/plain; charset=Shift-JIS'
-          body "\x83\x40"
+          body "\x83\x40".force_encoding(Encoding::BINARY)
         }, '')
 
       comparison_string = "\xe3\x82\xa1"
@@ -126,6 +169,42 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       message_handler.expects(:handle).never
 
       IncomingMessageProcessor.new(message_handler, error_reporter).process_single(incoming_bounce_message, '')
+    end
+
+    it "creates text body from html only messages" do
+      IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new {
+          content_type 'text/html; charset=UTF-8'
+          body '<h1>This is HTML</h1>'
+        }, '')
+      message_handler.body.should == "************\nThis is HTML\n************"
+      message_handler.html_body.should == '<h1>This is HTML</h1>'
+    end
+
+    it "creates missing text part from html part" do
+      IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new {
+          html_part do
+            content_type 'text/html; charset=UTF-8'
+            body '<h1>This is HTML</h1>'
+          end
+        }, '')
+      message_handler.body.should == "************\nThis is HTML\n************"
+      message_handler.html_body.should == '<h1>This is HTML</h1>'
+    end
+
+    it "works with multipart emails with no html part" do
+      test_message('multipart_mixed_no_html_part.eml')
+    end
+
+    it "should be able to extract text and html bodies from nested_multipart_sample.eml" do
+      test_message('nested_multipart_sample.eml')
+    end
+
+    it "should be able to extract text and html bodies from multipart_mixed.eml" do
+      test_message('multipart_mixed.eml')
+    end
+
+    it "should be able to extract text and html bodies from no_image.eml" do
+      message = test_message('no_image.eml')
     end
   end
 
@@ -218,6 +297,28 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
         :config => config['imap'].except('error_folder').symbolize_keys,
       })
       IncomingMessageProcessor.configure(config)
+    end
+
+    it "splits messages between multiple workers" do
+      IncomingMessageProcessor.configure({
+        'workers' => 3,
+        'imap' => {
+          'username' => 'user@example.com',
+        }
+      })
+      @mock_mailbox.expects(:connect)
+      @mock_mailbox.expects(:each_message).with({stride: 3, offset: 0})
+      @mock_mailbox.expects(:disconnect)
+      imp = IncomingMessageProcessor.new(message_handler, error_reporter)
+      imp.process(worker_id: 0)
+      @mock_mailbox.expects(:connect)
+      @mock_mailbox.expects(:each_message).with({stride: 3, offset: 1})
+      @mock_mailbox.expects(:disconnect)
+      imp.process(worker_id: 1)
+      @mock_mailbox.expects(:connect)
+      @mock_mailbox.expects(:each_message).with({stride: 3, offset: 2})
+      @mock_mailbox.expects(:disconnect)
+      imp.process(worker_id: 2)
     end
 
     describe "message processing" do
@@ -381,7 +482,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       })
       processed_second = false
 
-      TimeoutMailbox.send(:define_method, :each_message) do
+      TimeoutMailbox.send(:define_method, :each_message) do |opts|
         if @config[:username] == 'first'
           raise Timeout::Error
         else

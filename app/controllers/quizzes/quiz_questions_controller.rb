@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# @API QuizQuestions
+# @API Quiz Questions
 # @beta
 #
 # @model QuizQuestion
@@ -173,28 +173,35 @@
 class Quizzes::QuizQuestionsController < ApplicationController
   include Api::V1::QuizQuestion
   include Filters::Quizzes
+  include Filters::QuizSubmissions
 
   before_filter :require_context, :require_quiz
   before_filter :require_question, :only => [:show]
 
-  # @API List questions in a quiz
+  # @API List questions in a quiz or a submission
   # @beta
   #
   # Returns the list of QuizQuestions in this quiz.
   #
+  # @argument quiz_submission_id [Integer]
+  #  If specified, the endpoint will return the questions that were presented
+  #  for that submission. This is useful if the quiz has been modified after
+  #  the submission was created and the latest quiz version's set of questions
+  #  does not match the submission's.
+  #  NOTE: you must specify quiz_submission_attempt as well if you specify this
+  #  parameter.
+  #
+  # @argument quiz_submission_attempt [Integer]
+  #  The attempt of the submission you want the questions for.
+  #
   # @returns [QuizQuestion]
   def index
-    if authorized_action(@quiz, @current_user, :update)
-      scope = @quiz.quiz_questions
-      api_route = polymorphic_url([:api, :v1, @context, :quiz_questions])
-      @questions = Api.paginate(scope, self, api_route)
+    if params[:quiz_submission_id] && params[:quiz_submission_attempt]
+      return index_submission_questions
+    end
 
-      render :json => questions_json(@questions,
-        @current_user,
-        session,
-        @context,
-        parse_includes,
-        censored?)
+    if authorized_action(@quiz, @current_user, :update)
+      render_question_set(@quiz.active_quiz_questions)
     end
   end
 
@@ -223,36 +230,36 @@ class Quizzes::QuizQuestionsController < ApplicationController
   #
   # Create a new quiz question for this quiz
   #
-  # @argument question[question_name] [Required, String]
+  # @argument question[question_name] [String]
   #   The name of the question.
   #
-  # @argument question[question_text] [Required, String]
+  # @argument question[question_text] [String]
   #   The text of the question.
   #
-  # @argument question[quiz_group_id] [Optional, Integer]
+  # @argument question[quiz_group_id] [Integer]
   #   The id of the quiz group to assign the question to.
   #
   # @argument question[question_type] ["calculated_question"|"essay_question"|"file_upload_question"|"fill_in_multiple_blanks_question"|"matching_question"|"multiple_answers_question"|"multiple_choice_question"|"multiple_dropdowns_question"|"numerical_question"|"short_answer_question"|"text_only_question"]
   #   The type of question. Multiple optional fields depend upon the type of question to be used.
   #
-  # @argument question[position] [Optional, Integer]
+  # @argument question[position] [Integer]
   #   The order in which the question will be displayed in the quiz in relation to other questions.
   #
-  # @argument question[points_possible] [Optional, Integer]
+  # @argument question[points_possible] [Integer]
   #   The maximum amount of points received for answering this question correctly.
   #
-  # @argument question[correct_comments] [Optional, String]
+  # @argument question[correct_comments] [String]
   #   The comment to display if the student answers the question correctly.
   #
-  # @argument question[incorrect_comments] [Optional, String]
+  # @argument question[incorrect_comments] [String]
   #   The comment to display if the student answers incorrectly.
   #
-  # @argument question[neutral_comments] [Optional, String]
+  # @argument question[neutral_comments] [String]
   #   The comment to display regardless of how the student answered.
   #
-  # @argument question[text_after_answers] [Optional, String]
+  # @argument question[text_after_answers] [String]
   #
-  # @argument question[answers] [Optional, [Answer]]
+  # @argument question[answers] [[Answer]]
   #
   # @returns QuizQuestion
   def create
@@ -260,6 +267,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
       if params[:existing_questions]
         return add_questions
       end
+
       question_data = params[:question]
       question_data ||= {}
 
@@ -267,18 +275,19 @@ class Quizzes::QuizQuestionsController < ApplicationController
         @group = @quiz.quiz_groups.find(question_data[:quiz_group_id])
       end
 
-      @question = @quiz.quiz_questions.create(:quiz_group => @group, :question_data => question_data)
-      @quiz.did_edit if @quiz.created?
-
-      render json: question_json(@question, @current_user, session, [:assessment_question])
+      guard_against_big_fields do
+        @question = @quiz.quiz_questions.create(:quiz_group => @group, :question_data => question_data)
+        @quiz.did_edit if @quiz.created?
+        render json: question_json(@question, @current_user, session, [:assessment_question])
+      end
 
     end
   end
 
   def add_questions
     find_bank(params[:assessment_question_bank_id]) do
-      @assessment_questions = @bank.assessment_questions.active.find_all_by_id(params[:assessment_questions_ids].split(",")).compact
-      @group = @quiz.quiz_groups.find_by_id(params[:quiz_group_id]) if params[:quiz_group_id].to_i > 0
+      @assessment_questions = @bank.assessment_questions.active.where(id: params[:assessment_questions_ids].split(",")).to_a
+      @group = @quiz.quiz_groups.where(id: params[:quiz_group_id]).first if params[:quiz_group_id].to_i > 0
       @questions = @quiz.add_assessment_questions(@assessment_questions, @group)
 
       render json: questions_json(@questions, @current_user, session, [:assessment_question])
@@ -297,36 +306,36 @@ class Quizzes::QuizQuestionsController < ApplicationController
   # @argument id [Required, Integer]
   #   The quiz question's unique identifier.
   #
-  # @argument question[question_name] [Required, String]
+  # @argument question[question_name] [String]
   #   The name of the question.
   #
-  # @argument question[question_text] [Required, String]
+  # @argument question[question_text] [String]
   #   The text of the question.
   #
-  # @argument question[quiz_group_id] [Optional, Integer]
+  # @argument question[quiz_group_id] [Integer]
   #   The id of the quiz group to assign the question to.
   #
   # @argument question[question_type] ["calculated_question"|"essay_question"|"file_upload_question"|"fill_in_multiple_blanks_question"|"matching_question"|"multiple_answers_question"|"multiple_choice_question"|"multiple_dropdowns_question"|"numerical_question"|"short_answer_question"|"text_only_question"]
   #   The type of question. Multiple optional fields depend upon the type of question to be used.
   #
-  # @argument question[position] [Optional, Integer]
+  # @argument question[position] [Integer]
   #   The order in which the question will be displayed in the quiz in relation to other questions.
   #
-  # @argument question[points_possible] [Optional, Integer]
+  # @argument question[points_possible] [Integer]
   #   The maximum amount of points received for answering this question correctly.
   #
-  # @argument question[correct_comments] [Optional, String]
+  # @argument question[correct_comments] [String]
   #   The comment to display if the student answers the question correctly.
   #
-  # @argument question[incorrect_comments] [Optional, String]
+  # @argument question[incorrect_comments] [String]
   #   The comment to display if the student answers incorrectly.
   #
-  # @argument question[neutral_comments] [Optional, String]
+  # @argument question[neutral_comments] [String]
   #   The comment to display regardless of how the student answered.
   #
-  # @argument question[text_after_answers] [Optional, String]
+  # @argument question[text_after_answers] [String]
   #
-  # @argument question[answers] [Optional, [Answer]]
+  # @argument question[answers] [[Answer]]
   #
   # @returns QuizQuestion
 
@@ -345,10 +354,12 @@ class Quizzes::QuizQuestionsController < ApplicationController
         end
       end
 
-      @question.question_data = question_data
-      @question.save
-      @quiz.did_edit if @quiz.created?
-      render json: question_json(@question, @current_user, session, [:assessment_question])
+      guard_against_big_fields do
+        @question.question_data = question_data
+        @question.save
+        @quiz.did_edit if @quiz.created?
+        render json: question_json(@question, @current_user, session, [:assessment_question])
+      end
     end
   end
 
@@ -361,7 +372,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
   # @argument id [Required, Integer]
   #   The quiz question's unique identifier
   #
-  # <b>204 No Content<b> response code is returned if the deletion was successful.
+  # <b>204 No Content</b> response code is returned if the deletion was successful.
 
   def destroy
     if authorized_action(@quiz, @current_user, :update)
@@ -373,6 +384,15 @@ class Quizzes::QuizQuestionsController < ApplicationController
   end
 
   private
+
+  def guard_against_big_fields
+    begin
+      yield
+    rescue Quizzes::QuizQuestion::RawFields::FieldTooLongError => ex
+      raise ex unless request.xhr?
+      render_xhr_exception(ex, ex.message)
+    end
+  end
 
   def require_question
     unless @question = @quiz.quiz_questions.active.find(params[:id])
@@ -386,5 +406,46 @@ class Quizzes::QuizQuestionsController < ApplicationController
 
   def censored?
     !@quiz.grants_right?(@current_user, session, :update)
+  end
+
+  # @private
+  #
+  # Basically, instead of rendering the quiz's active question set, this method
+  # would locate a submission model at a specific attempt and render the
+  # questions that were provided for that session instead.
+  #
+  # Requires :quiz_submission_id and :quiz_submission_attempt as parameters.
+  # These are currently documented in #index.
+  #
+  # @note
+  #  This is a good candidate to move out of this controller and into
+  #  QuizSubmissionQuestionsController. If you do, you can munge the rendered
+  #  question data along with the submission's question answer records provided
+  #  by that API. That way, API users won't have to pull each separately.
+  def index_submission_questions
+    require_quiz_submission
+
+    if authorized_action(@quiz_submission, @current_user, :read)
+      retrieve_quiz_submission_attempt!(params[:quiz_submission_attempt])
+
+      scope = Quizzes::QuizQuestion.where({
+        id: @quiz_submission.quiz_data.map { |question| question['id'] }
+      })
+
+      render_question_set(scope, @quiz_submission.quiz_data)
+    end
+  end
+
+  def render_question_set(scope, quiz_data=nil)
+    api_route = polymorphic_url([:api, :v1, @context, :quiz_questions])
+    questions = Api.paginate(scope, self, api_route)
+
+    render :json => questions_json(questions,
+      @current_user,
+      session,
+      @context,
+      parse_includes,
+      censored?,
+      quiz_data)
   end
 end

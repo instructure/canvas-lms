@@ -29,6 +29,9 @@ class Pseudonym < ActiveRecord::Base
   belongs_to :sis_communication_channel, :class_name => 'CommunicationChannel'
   MAX_UNIQUE_ID_LENGTH = 100
 
+  CAS_TICKET_EXPIRED = 'expired'
+  CAS_TICKET_TTL = 1.day
+
   EXPORTABLE_ATTRIBUTES = [
     :id, :user_id, :account_id, :workflow_state, :unique_id, :login_count, :failed_login_count, :last_request_at, :last_login_at, :current_login_at, :last_login_ip,
     :current_login_ip, :position, :created_at, :updated_at, :deleted_at, :sis_batch_id, :sis_user_id, :sis_ssha, :communication_channel_id, :login_path_to_ignore, :sis_communication_channel_id
@@ -65,6 +68,7 @@ class Pseudonym < ActiveRecord::Base
     config.perishable_token_valid_for = 30.minutes
     config.validates_length_of_login_field_options = {:within => 1..MAX_UNIQUE_ID_LENGTH}
     config.validates_uniqueness_of_login_field_options = { :case_sensitive => false, :scope => [:account_id, :workflow_state], :if => lambda { |p| (p.unique_id_changed? || p.workflow_state_changed?) && p.active? } }
+    config.crypto_provider = Authlogic::CryptoProviders::Sha512
   end
 
   attr_writer :require_password
@@ -129,9 +133,8 @@ class Pseudonym < ActiveRecord::Base
     end
   end
 
-  def self.custom_find_by_unique_id(unique_id, which = :first)
-    return nil unless unique_id
-    self.active.by_unique_id(unique_id).find(which)
+  def self.custom_find_by_unique_id(unique_id)
+    self.active.by_unique_id(unique_id).first if unique_id
   end
   
   def set_password_changed
@@ -219,7 +222,7 @@ class Pseudonym < ActiveRecord::Base
 
   def verify_unique_sis_user_id
     return true unless self.sis_user_id
-    existing_pseudo = Pseudonym.find_by_account_id_and_sis_user_id(self.account_id, self.sis_user_id.to_s)
+    existing_pseudo = Pseudonym.where(account_id: self.account_id, sis_user_id: self.sis_user_id.to_s).first
     return true if !existing_pseudo || existing_pseudo.id == self.id
     self.errors.add(:sis_user_id, t('#errors.sis_id_in_use', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_user_id))
     false
@@ -230,9 +233,73 @@ class Pseudonym < ActiveRecord::Base
     state :deleted
   end
 
+  set_policy do
+    # an admin can only create and update pseudonyms when they have
+    # :manage_user_logins permission on the pseudonym's account, :read
+    # permission on the pseudonym's owner, and a superset of hte pseudonym's
+    # owner's rights (if any) on the pseudonym's account. some fields of the
+    # pseudonym may require additional conditions to update (see below)
+    given do |user|
+      self.account.grants_right?(user, :manage_user_logins) &&
+      self.user.has_subset_of_account_permissions?(user, self.account) &&
+      self.user.grants_right?(user, :read)
+    end
+    can :create and can :update
+
+    # any user (admin or not) can change their own canvas password. if the
+    # pseudonym's account does not allow canvas authentication (i.e. it uses
+    # and requires delegated authentication), there is no canvas password to
+    # change.
+    given do |user|
+      self.user_id == user.try(:id) &&
+      self.account.canvas_authentication?
+    end
+    can :change_password
+
+    # an admin can set the initial canvas password (if there is one, see above)
+    # on another user's new pseudonym.
+    given do |user|
+      self.new_record? &&
+      self.account.canvas_authentication? &&
+      self.grants_right?(user, :create)
+    end
+    can :change_password
+
+    # an admin can only change another user's canvas password (if there is one,
+    # see above) on an existing pseudonym when :admins_can_change_passwords is
+    # enabled.
+    given do |user|
+      self.account.settings[:admins_can_change_passwords] &&
+      self.account.canvas_authentication? &&
+      self.grants_right?(user, :update)
+    end
+    can :change_password
+
+    # an admin can only update a pseudonym's SIS ID when they have :manage_sis
+    # permission on the pseudonym's account
+    given do |user|
+      self.account.grants_right?(user, :manage_sis) &&
+      self.grants_right?(user, :update)
+    end
+    can :manage_sis
+
+    # an admin can delete any non-SIS pseudonym that they can update
+    given do |user|
+      !self.system_created? &&
+      self.grants_right?(user, :update)
+    end
+    can :delete
+
+    # an admin can only delete an SIS pseudonym if they also can :manage_sis
+    given do |user|
+      self.system_created? &&
+      self.grants_right?(user, :manage_sis)
+    end
+    can :delete
+  end
+
   alias_method :destroy!, :destroy
-  def destroy(even_if_managed_password=false)
-    raise "Cannot delete system-generated pseudonyms" if !even_if_managed_password && self.managed_password?
+  def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
     result = self.save
@@ -288,6 +355,10 @@ class Pseudonym < ActiveRecord::Base
   
   def managed_password?
     !!(self.sis_user_id && self.account && !self.account.password_authentication?)
+  end
+
+  def system_created?
+    !!(self.sis_user_id && self.account)
   end
   
   def valid_arbitrary_credentials?(plaintext_password)
@@ -373,10 +444,11 @@ class Pseudonym < ActiveRecord::Base
     end
     !!res
   rescue => e
-    ErrorReport.log_exception(:ldap, e, {
-      :message => "LDAP authentication error",
-      :object => self.inspect.to_s,
-      :unique_id => self.unique_id,
+    Canvas::Errors.capture(e, {
+      type: :ldap,
+      message: "LDAP authentication error",
+      object: self.inspect.to_s,
+      unique_id: self.unique_id,
     })
     nil
   end
@@ -432,19 +504,39 @@ class Pseudonym < ActiveRecord::Base
     nil
   end
 
-  def claim_cas_ticket(ticket)
-    return unless Canvas.redis_enabled?
-    Canvas.redis.setex("cas_session:#{ticket}", 1.day, global_id)
+  def self.cas_ticket_key(ticket)
+    "cas_session:#{ticket}"
   end
 
-  def self.release_cas_ticket(ticket)
+  def claim_cas_ticket(ticket)
     return unless Canvas.redis_enabled?
-    redis_key = "cas_session:#{ticket}"
-    if id = Canvas.redis.get(redis_key)
-      pseudonym = Pseudonym.find_by_id(id)
-      Canvas.redis.del(redis_key)
+
+    redis_key = Pseudonym.cas_ticket_key(ticket)
+
+    # Refresh the keys ttl if it exists.
+    unless Canvas.redis.expire(redis_key, CAS_TICKET_TTL)
+      # If it does not exist we need to create it.
+      Canvas.redis.set(redis_key, global_id, ex: CAS_TICKET_TTL, nx: true)
     end
-    pseudonym.try(:reset_persistence_token!)
-    pseudonym
+  end
+
+  def cas_ticket_expired?(ticket)
+    return unless Canvas.redis_enabled?
+    redis_key = Pseudonym.cas_ticket_key(ticket)
+
+    # Refresh the ttl on the cas ticket before we check its state.
+    Canvas.redis.expire(redis_key, CAS_TICKET_TTL)
+    Canvas.redis.get(redis_key) != global_id.to_s
+  end
+
+  def self.expire_cas_ticket(ticket)
+    return unless Canvas.redis_enabled?
+    redis_key = cas_ticket_key(ticket)
+
+    if id = Canvas.redis.getset(redis_key, CAS_TICKET_EXPIRED)
+      Canvas.redis.expire(redis_key, CAS_TICKET_TTL)
+
+      Pseudonym.where(id: id).exists? if id != CAS_TICKET_EXPIRED
+    end
   end
 end

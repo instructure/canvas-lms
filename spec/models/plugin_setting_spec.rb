@@ -25,48 +25,48 @@ describe PluginSetting do
 
   it "should encrypt/decrypt transparently" do
     s = PluginSetting.new(:name => "plugin_setting_test", :settings => {:bar => "qwerty", :foo => "asdf"})
-    s.save.should be_true
+    expect(s.save).to be_truthy
     s.reload
-    s.valid_settings?.should be_true
-    s.settings.keys.sort_by(&:to_s).should eql([:bar, :foo, :foo_dec, :foo_enc, :foo_salt])
-    s.settings[:bar].should eql("qwerty")
-    s.settings[:foo_dec].should eql("asdf")
+    expect(s.valid_settings?).to be_truthy
+    expect(s.settings.keys.sort_by(&:to_s)).to eql([:bar, :foo, :foo_dec, :foo_enc, :foo_salt])
+    expect(s.settings[:bar]).to eql("qwerty")
+    expect(s.settings[:foo_dec]).to eql("asdf")
   end
 
   it "should not be valid if there are decrypt errors" do
     s = PluginSetting.new(:name => "plugin_setting_test", :settings => {:bar => "qwerty", :foo_enc => "invalid", :foo_salt => "invalid"})
-    s.send(:save_without_callbacks).should be_true
+    expect(s.send(:save_without_callbacks)).to be_truthy
 
     s.reload
-    s.valid_settings?.should be_false
-    s.settings.should eql({:bar => "qwerty", :foo_enc => "invalid", :foo_salt => "invalid", :foo => PluginSetting::DUMMY_STRING})
+    expect(s.valid_settings?).to be_falsey
+    expect(s.settings).to eql({:bar => "qwerty", :foo_enc => "invalid", :foo_salt => "invalid", :foo => PluginSetting::DUMMY_STRING})
   end
   
   it "should return default content if no setting is set" do
     settings = PluginSetting.settings_for_plugin("plugin_setting_test")
-    settings.should_not be_nil
-    settings[:bar].should == "asdf"
+    expect(settings).not_to be_nil
+    expect(settings[:bar]).to eq "asdf"
   end
   
   it "should return updated content if created" do
     s = PluginSetting.new(:name => "plugin_setting_test", :settings => {:bar => "qwerty"})
-    s.send(:save_without_callbacks).should be_true
+    expect(s.send(:save_without_callbacks)).to be_truthy
     settings = PluginSetting.settings_for_plugin("plugin_setting_test")
-    settings.should_not be_nil
-    settings[:bar].should == "qwerty"
+    expect(settings).not_to be_nil
+    expect(settings[:bar]).to eq "qwerty"
   end
   
   it "should return default content if the setting is disabled" do
     s = PluginSetting.new(:name => "plugin_setting_test", :settings => {:bar => "qwerty"})
-    s.send(:save_without_callbacks).should be_true
+    expect(s.send(:save_without_callbacks)).to be_truthy
     settings = PluginSetting.settings_for_plugin("plugin_setting_test")
-    settings.should_not be_nil
-    settings[:bar].should == "qwerty"
+    expect(settings).not_to be_nil
+    expect(settings[:bar]).to eq "qwerty"
     
     s.update_attribute(:disabled, true)
     settings = PluginSetting.settings_for_plugin("plugin_setting_test")
-    settings.should_not be_nil
-    settings[:bar].should == "asdf"
+    expect(settings).not_to be_nil
+    expect(settings[:bar]).to eq "asdf"
   end
 
   it "should immediately uncache on save" do
@@ -75,12 +75,12 @@ describe PluginSetting do
       s.save!
       # cache it
       settings = PluginSetting.settings_for_plugin("plugin_setting_test")
-      settings.should == {:bar => "qwerty"}
+      expect(settings).to eq({:bar => "qwerty"})
       s.settings = {:food => "bar"}
       s.save!
       # new settings
       settings = PluginSetting.settings_for_plugin("plugin_setting_test")
-      settings.should == {:food => "bar"}
+      expect(settings).to eq({:food => "bar"})
     end
   end
 end

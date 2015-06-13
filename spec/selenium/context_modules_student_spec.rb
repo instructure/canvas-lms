@@ -1,31 +1,11 @@
 require File.expand_path(File.dirname(__FILE__) + "/common")
+require File.expand_path(File.dirname(__FILE__) + '/helpers/context_modules_common')
 
-describe "context_modules" do
+describe "context modules" do
   include_examples "in-process server selenium tests"
 
-  context "as a student" do
-    def create_context_module(module_name)
-      context_module = @course.context_modules.create!(:name => module_name, :require_sequential_progress => true)
-      context_module
-    end
-
-    def go_to_modules
-      get "/courses/#{@course.id}/modules"
-      wait_for_ajaximations
-    end
-
-    def validate_context_module_status_text(module_num, text_to_validate)
-      context_modules_status = ff('.context_module .progression_container')
-      context_modules_status[module_num].should include_text(text_to_validate)
-    end
-
-    def navigate_to_module_item(module_num, link_text)
-      context_modules = ff('.context_module')
-      expect_new_page_load { context_modules[module_num].find_element(:link, link_text).click }
-      go_to_modules
-    end
-
-    before (:each) do
+  context "as a student", :priority => "1" do
+    before(:each) do
       @locked_text = 'locked'
       @completed_text = 'completed'
       @in_progress_text = 'in progress'
@@ -59,7 +39,7 @@ describe "context_modules" do
       go_to_modules
 
       # shouldn't show the teacher's "show student progression" button
-      ff('.module_progressions_link').should_not be_present
+      expect(ff('.module_progressions_link')).not_to be_present
 
       context_modules = ff('.context_module')
       #initial check to make sure everything was setup correctly
@@ -67,8 +47,26 @@ describe "context_modules" do
       validate_context_module_status_text(1, @locked_text)
       validate_context_module_status_text(2, @locked_text)
 
-      context_modules[1].find_element(:css, '.context_module_criterion').should include_text(@module_1.name)
-      context_modules[2].find_element(:css, '.context_module_criterion').should include_text(@module_2.name)
+      expect(context_modules[1].find_element(:css, '.context_module_criterion')).to include_text(@module_1.name)
+      expect(context_modules[2].find_element(:css, '.context_module_criterion')).to include_text(@module_2.name)
+    end
+
+    it "should not lock modules for observers" do
+      @course.enroll_user(user, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
+      user_session(@user)
+
+      go_to_modules
+
+      # shouldn't show the teacher's "show student progression" button
+      expect(ff('.module_progressions_link')).not_to be_present
+
+      context_modules = ff('.context_module')
+      #initial check to make sure everything was setup correctly
+      ff('.context_module .progression_container').each do |item|
+        expect(item.text.strip).to be_blank
+      end
+      get "/courses/#{@course.id}/assignments/#{@assignment_2.id}"
+      expect(f('#content')).not_to include_text("hasn't been unlocked yet")
     end
 
     it "should show overridden due dates for assignments" do
@@ -81,7 +79,7 @@ describe "context_modules" do
 
       go_to_modules
       context_modules = ff('.context_module')
-      context_modules[1].find_element(:css, '.due_date_display').text.should_not be_blank
+      expect(context_modules[1].find_element(:css, '.due_date_display').text).not_to be_blank
     end
 
     it "should move a student through context modules in sequential order" do
@@ -103,7 +101,7 @@ describe "context_modules" do
       validate_context_module_status_text(1, @completed_text)
       validate_context_module_status_text(2, @completed_text)
     end
-    
+
     it "should show progression in large_roster courses" do
       @course.large_roster = true
       @course.save!
@@ -114,11 +112,31 @@ describe "context_modules" do
 
     it "should validate that a student can't get to a locked context module" do
       go_to_modules
-
       #sequential error validation
       get "/courses/#{@course.id}/assignments/#{@assignment_2.id}"
-      f('#content').should include_text("hasn't been unlocked yet")
-      f('#module_prerequisites_list').should be_displayed
+      expect(f('#content')).to include_text("hasn't been unlocked yet")
+      expect(f('#module_prerequisites_list')).to be_displayed
+    end
+
+    it "should validate that a student can't get to locked external items" do
+      external_tool = @course.context_external_tools.create!(:url => "http://example.com/ims/lti",
+          :consumer_key => "asdf", :shared_secret => "hjkl", :name => "external tool")
+
+      @module_2.reload
+      tag_1 = @module_2.add_item(:id => external_tool.id, :type => "external_tool", :url => external_tool.url)
+      tag_2 = @module_2.add_item(:type => 'external_url', :url => 'http://example.com/lolcats',
+                                  :title => 'pls view', :indent => 1)
+
+      tag_1.publish!
+      tag_2.publish!
+
+      get "/courses/#{@course.id}/modules/items/#{tag_1.id}"
+      expect(f('#content')).to include_text("hasn't been unlocked yet")
+      expect(f('#module_prerequisites_list')).to be_displayed
+
+      get "/courses/#{@course.id}/modules/items/#{tag_2.id}"
+      expect(f('#content')).to include_text("hasn't been unlocked yet")
+      expect(f('#module_prerequisites_list')).to be_displayed
     end
 
     it "should validate that a student can't get to an unpublished context module" do
@@ -126,8 +144,8 @@ describe "context_modules" do
       @module_2.save!
 
       get "/courses/#{@course.id}/assignments/#{@assignment_2.id}"
-      f('#content').should include_text("is not available yet")
-      f('#module_prerequisites_list').should be_nil
+      expect(f('#content')).to include_text("is not available yet")
+      expect(f('#module_prerequisites_list')).to be_nil
     end
 
     it "should validate that a student can't see an unpublished context module item" do
@@ -137,8 +155,8 @@ describe "context_modules" do
       module1_unpublished_tag = @module_1.add_item({:id => @assignment_2.id, :type => 'assignment'})
       @module_1.completion_requirements = {@tag_1.id => {:type => 'must_view'}, module1_unpublished_tag.id => {:type => 'must_view'}}
       @module_1.save!
-      @module_1.completion_requirements.map{|h| h[:id]}.should include(@tag_1.id)
-      @module_1.completion_requirements.map{|h| h[:id]}.should include(module1_unpublished_tag.id) # unpublished requirements SHOULD remain
+      expect(@module_1.completion_requirements.map{|h| h[:id]}).to include(@tag_1.id)
+      expect(@module_1.completion_requirements.map{|h| h[:id]}).to include(module1_unpublished_tag.id) # unpublished requirements SHOULD remain
 
       module2_published_tag = @module_2.add_item({:id => @quiz_1.id, :type => 'quiz'})
       @module_2.save!
@@ -146,17 +164,43 @@ describe "context_modules" do
       go_to_modules
 
       context_modules = ff('.context_module')
-      context_modules[0].find_element(:css, '.context_module_items').should_not include_text(@assignment_2.name)
-      context_modules[1].find_element(:css, '.context_module_items').should_not include_text(@assignment_2.name)
+      expect(context_modules[0].find_element(:css, '.context_module_items')).not_to include_text(@assignment_2.name)
+      expect(context_modules[1].find_element(:css, '.context_module_items')).not_to include_text(@assignment_2.name)
 
       # Should go to the next module
       get "/courses/#{@course.id}/assignments/#{@assignment_1.id}"
-      nxt = f('#sequence_footer a.next')
-      URI.parse(nxt.attribute('href')).path.should == "/courses/#{@course.id}/modules/#{@module_2.id}/items/first"
+      nxt = f('.module-sequence-footer a.pull-right')
+      expect(URI.parse(nxt.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{module2_published_tag.id}"
 
       # Should redirect to the published item
       get "/courses/#{@course.id}/modules/#{@module_2.id}/items/first"
-      driver.current_url.should match %r{/courses/#{@course.id}/quizzes/#{@quiz_1.id}}
+      expect(driver.current_url).to match %r{/courses/#{@course.id}/quizzes/#{@quiz_1.id}}
+    end
+
+    it "should validate that a students cannot see unassigned differentiated assignments" do
+      @assignment_2.only_visible_to_overrides = true
+      @assignment_2.save!
+
+      @course.enable_feature!(:differentiated_assignments)
+      @student.enrollments.each(&:destroy)
+      @overriden_section = @course.course_sections.create!(name: "test section")
+      student_in_section(@overriden_section, user: @student)
+
+      go_to_modules
+
+      context_modules = ff('.context_module')
+      expect(context_modules[0].find_element(:css, '.context_module_items')).not_to include_text(@assignment_2.name)
+      expect(context_modules[1].find_element(:css, '.context_module_items')).not_to include_text(@assignment_2.name)
+
+      # Should not redirect to the hidden assignment
+      get "/courses/#{@course.id}/modules/#{@module_2.id}/items/first"
+      expect(driver.current_url).not_to match %r{/courses/#{@course.id}/assignments/#{@assignment_2.id}}
+
+      create_section_override_for_assignment(@assignment_2, {course_section: @overriden_section})
+
+      # Should redirect to the now visible assignment
+      get "/courses/#{@course.id}/modules/#{@module_2.id}/items/first"
+      expect(driver.current_url).to match %r{/courses/#{@course.id}/assignments/#{@assignment_2.id}}
     end
 
     it "should allow a student view student to progress through module content" do
@@ -167,8 +211,8 @@ describe "context_modules" do
 
       #sequential error validation
       get "/courses/#{@course.id}/assignments/#{@assignment_2.id}"
-      f('#content').should include_text("hasn't been unlocked yet")
-      f('#module_prerequisites_list').should be_displayed
+      expect(f('#content')).to include_text("hasn't been unlocked yet")
+      expect(f('#module_prerequisites_list')).to be_displayed
 
       go_to_modules
 
@@ -189,51 +233,136 @@ describe "context_modules" do
       validate_context_module_status_text(2, @completed_text)
     end
 
+    context "next and previous buttons", :priority => "2" do
+
+      def verify_next_and_previous_buttons_display
+        wait_for_ajaximations
+        expect(f('.module-sequence-footer a.pull-left')).to be_displayed
+        expect(f('.module-sequence-footer a.pull-right')).to be_displayed
+      end
+
+      def module_setup
+        course_with_teacher_logged_in(:active_all => true)
+        @module = @course.context_modules.create!(:name => "module")
+
+        #create module items
+        #add first and last module items to get previous and next displayed
+        @assignment1 = @course.assignments.create!(:title => 'first item in module')
+        @assignment2 = @course.assignments.create!(:title => 'assignment')
+        @assignment3 = @course.assignments.create!(:title => 'last item in module')
+        @quiz = @course.quizzes.create!(:title => 'quiz assignment')
+        @quiz.publish!
+        @wiki = @course.wiki.wiki_pages.create!(:title => "wiki", :body => 'hi')
+        @discussion = @course.discussion_topics.create!(:title => 'discussion')
+
+        #add items to module
+        @module.add_item :type => 'assignment', :id => @assignment1.id
+        @module.add_item :type => 'assignment', :id => @assignment2.id
+        @module.add_item :type => 'quiz', :id => @quiz.id
+        @module.add_item :type => 'wiki_page', :id => @wiki.id
+        @module.add_item :type => 'discussion_topic', :id => @discussion.id
+        @module.add_item :type => 'assignment', :id => @assignment3.id
+
+        #add external tool
+        @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => {'a' => '1', 'b' => '2'})
+        @external_tool_tag = @module.add_item({
+                                                  :type => 'context_external_tool',
+                                                  :title => 'Example',
+                                                  :url => 'http://www.example.com',
+                                                  :new_tab => '0'
+                                              })
+        @external_tool_tag.publish!
+        #add external url
+        @external_url_tag = @module.add_item({
+                                                 :type => 'external_url',
+                                                 :title => 'pls view',
+                                                 :url => 'http://example.com/lolcats'
+                                             })
+        @external_url_tag.publish!
+
+        #add another assignment at the end to create a bookend, provides next and previous for external url
+        @module.add_item :type => 'assignment', :id => @assignment3.id
+      end
+
+      before(:each) do
+        module_setup
+      end
+
+      it "should show previous and next buttons for quizzes" do
+        get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+        verify_next_and_previous_buttons_display
+      end
+
+      it "should show previous and next buttons for assignments" do
+        get "/courses/#{@course.id}/assignments/#{@assignment2.id}"
+        verify_next_and_previous_buttons_display
+      end
+
+      it "should show previous and next buttons for wiki pages" do
+        get "/courses/#{@course.id}/pages/#{@wiki.id}"
+        verify_next_and_previous_buttons_display
+      end
+
+      it "should show previous and next buttons for discussions" do
+        get "/courses/#{@course.id}/discussion_topics/#{@discussion.id}"
+        verify_next_and_previous_buttons_display
+      end
+
+      it "should show previous and next buttons for external tools" do
+        get "/courses/#{@course.id}/modules/items/#{@external_tool_tag.id}"
+        verify_next_and_previous_buttons_display
+      end
+
+      it "should show previous and next buttons for external urls" do
+        get "/courses/#{@course.id}/modules/items/#{@external_url_tag.id}"
+        verify_next_and_previous_buttons_display
+      end
+    end
+
     describe "sequence footer" do
       it "should show the right nav when an item is in modules multiple times" do
         @assignment = @course.assignments.create!(:title => "some assignment")
         @atag1 = @module_1.add_item(:id => @assignment.id, :type => "assignment")
         @after1 = @module_1.add_item(:type => "external_url", :title => "url1", :url => "http://example.com/1")
+        @after1.publish!
         @atag2 = @module_2.add_item(:id => @assignment.id, :type => "assignment")
         @after2 = @module_2.add_item(:type => "external_url", :title => "url2", :url => "http://example.com/2")
+        @after2.publish!
         get "/courses/#{@course.id}/modules/items/#{@atag1.id}"
-        wait_for_ajaximations
-        prev = f('#sequence_footer a.prev')
-        URI.parse(prev.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{@tag_1.id}"
-        nxt = f('#sequence_footer a.next')
-        URI.parse(nxt.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{@after1.id}"
+        prev = f('.module-sequence-footer a.pull-left')
+        expect(URI.parse(prev.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{@tag_1.id}"
+        nxt = f('.module-sequence-footer a.pull-right')
+        expect(URI.parse(nxt.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{@after1.id}"
 
         get "/courses/#{@course.id}/modules/items/#{@atag2.id}"
-        wait_for_ajaximations
-        prev = f('#sequence_footer a.prev')
-        URI.parse(prev.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{@tag_2.id}"
-        nxt = f('#sequence_footer a.next')
-        URI.parse(nxt.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{@after2.id}"
+        prev = f('.module-sequence-footer a.pull-left')
+        expect(URI.parse(prev.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{@tag_2.id}"
+        nxt = f('.module-sequence-footer a.pull-right')
+        expect(URI.parse(nxt.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{@after2.id}"
 
         # if the user didn't get here from a module link, we show no nav,
         # because we can't know which nav to show
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        wait_for_ajaximations
-        prev = f('#sequence_footer a.prev')
-        prev.should_not be_displayed
-        nxt = f('#sequence_footer a.next')
-        nxt.should_not be_displayed
+        prev = f('.module-sequence-footer a.pull-left')
+        expect(prev).to be_nil
+        nxt = f('.module-sequence-footer a.pull-right')
+        expect(nxt).to be_nil
       end
 
       it "should show the nav when going straight to the item if there's only one tag" do
         @assignment = @course.assignments.create!(:title => "some assignment")
         @atag1 = @module_1.add_item(:id => @assignment.id, :type => "assignment")
         @after1 = @module_1.add_item(:type => "external_url", :title => "url1", :url => "http://example.com/1")
+        @after1.publish!
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        wait_for_ajaximations
-        prev = f('#sequence_footer a.prev')
-        URI.parse(prev.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{@tag_1.id}"
-        nxt = f('#sequence_footer a.next')
-        URI.parse(nxt.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{@after1.id}"
+        prev = f('.module-sequence-footer a.pull-left')
+        expect(URI.parse(prev.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{@tag_1.id}"
+        nxt = f('.module-sequence-footer a.pull-right')
+        expect(URI.parse(nxt.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{@after1.id}"
       end
 
       it "should show module navigation for group assignment discussions" do
-        pending('intermittently fails')
+        skip('intermittently fails')
         group_assignment_discussion(:course => @course)
         @group.users << @student
         assignment_model(:course => @course)
@@ -244,14 +373,35 @@ describe "context_modules" do
         i3 = @module.content_tags.create!(:context => @course, :content => @page, :tag_type => 'context_module')
         @module2 = ContextModule.create!(:context => @course, :name => 'second module')
         get "/courses/#{@course.id}/modules/items/#{i2.id}"
-        wait_for_ajaximations
 
-        prev = f('#sequence_footer a.prev')
-        URI.parse(prev.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{i1.id}"
+        prev = f('.module-sequence-footer a.pull-left')
+        expect(URI.parse(prev.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{i1.id}"
 
-        nxt = f('#sequence_footer a.next')
-        URI.parse(nxt.attribute('href')).path.should == "/courses/#{@course.id}/modules/items/#{i3.id}"
+        nxt = f('.module-sequence-footer a.pull-right')
+        expect(URI.parse(nxt.attribute('href')).path).to eq "/courses/#{@course.id}/modules/items/#{i3.id}"
       end
     end
+  end
+
+  it "should fetch locked module prerequisites" do
+    course_with_teacher(:active_all => true)
+    student_in_course(:course => @course, :active_all => true)
+    @module = @course.context_modules.create!(:name => "module", :require_sequential_progress => true)
+    @assignment = @course.assignments.create!(:title => "assignment")
+    @assignment2 = @course.assignments.create!(:title => "assignment2")
+
+    @tag1 = @module.add_item :id => @assignment.id, :type => 'assignment'
+    @tag2 = @module.add_item :id => @assignment2.id, :type => 'assignment'
+
+    @module.completion_requirements = {@tag1.id => {:type => 'must_view'}, @tag2.id => {:type => 'must_view'}}
+    @module.save!
+
+    user_session(@student)
+
+    get "/courses/#{@course.id}/assignments/#{@assignment2.id}"
+
+    wait_for_ajaximations
+    expect(f("#module_prerequisites_list")).to be_displayed
+    expect(f(".module_prerequisites_fallback")).to_not be_displayed
   end
 end

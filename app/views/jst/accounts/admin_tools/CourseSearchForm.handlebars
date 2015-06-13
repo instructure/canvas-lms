@@ -1,8 +1,8 @@
 <div>
-  <label for="courseSearchField">{{#t "labels.find_deleted_course"}}Find a deleted course{{/t}}</label>
+  <label for="courseSearchField">{{#t "labels.find_deleted_course"}}Search for a deleted course by ID{{/t}}</label>
 </div>
 <div class="form-inline">
-  <input type="text" id="courseSearchField" class="span4" placeholder="Course ID" maxlength="50">
+  <input type="text" id="courseSearchField" class="span4" placeholder='{{#t "course_id"}}Course ID{{/t}}' maxlength="50">
   <input type="submit" class="btn btn-primary span2" id="courseSearchBtn" value="Find">
 </div>
 
@@ -17,5 +17,3 @@
     {{/each}}
   </select>
 </div>
-
-

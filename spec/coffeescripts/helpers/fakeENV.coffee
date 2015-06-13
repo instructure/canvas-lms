@@ -11,6 +11,6 @@ define ['underscore'], (_) ->
       context_cache_key: "users/1-20111116001415"
       PERMISSIONS: {}
 
-    window.ENV = _.extend(defaults,options)
+    window.ENV = _.extend(defaults, options)
 
   teardown: -> window.ENV = {}

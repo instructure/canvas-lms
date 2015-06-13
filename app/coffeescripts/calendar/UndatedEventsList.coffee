@@ -14,16 +14,16 @@ define [
       @div = $(selector).html undatedEventsTemplate({ unloaded: true })
       @hidden = true
       @visibleContextList = []
+      @previouslyFocusedElement = null
 
       $.subscribe
-        "CommonEvent/eventDeleting" : @eventSaving
-        "CommonEvent/eventDeleted" : @eventSaved
+        "CommonEvent/eventDeleting" : @eventDeleting
+        "CommonEvent/eventDeleted" : @eventDeleted
         "CommonEvent/eventSaving" : @eventSaving
         "CommonEvent/eventSaved" : @eventSaved
         "Calendar/visibleContextListChanged" : @visibleContextListChanged
 
-      @div.on('click keyclick', '.event', @clickEvent)
-          .on('click', '.undated_event_title', @clickEvent)
+      @div.on('click keyclick', '.event, .event:focus', @clickEvent)
           .on('click', '.undated-events-link', @show)
       if toggler = @div.prev('.element_toggler')
         toggler.on('click keyclick', @toggle)
@@ -75,7 +75,12 @@ define [
             event.end = null
             event.saveDates()
 
-        @div.find('.undated_event_title:first').focus() if setFocus
+        if setFocus
+          @div.find('.event:first').focus()
+        else if @previouslyFocusedElement
+          $(@previouslyFocusedElement).focus()
+        else
+          @div.siblings('.element_toggler').focus()
 
     show: (event) =>
       event.preventDefault()
@@ -104,6 +109,18 @@ define [
 
     eventSaving: (event) =>
       @div.find(".#{event.id}").addClass('event_pending')
+      @previouslyFocusedElement = "." + event.id
 
     eventSaved: =>
+      @load()
+
+    eventDeleting: (event) =>
+      siblings = @div.find(".#{event.id}").addClass('event_pending').siblings()
+
+      if siblings.length == 0
+        @previouslyFocusedElement = null
+      else
+        @previouslyFocusedElement = "." + siblings.first().data('event-id')
+
+    eventDeleted: =>
       @load()

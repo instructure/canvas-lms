@@ -1,0 +1,616 @@
+@import "vendor/bootstrap/button-groups";
+@import "components/autocomplete";
+
+#not_right_side, #content-wrapper, #content, .conversations {
+  height: 100%;
+}
+
+#main {
+  position: absolute;
+  bottom: 0;
+  margin-bottom: 0;
+  display: none;
+  box-sizing: border-box;
+  @if $use_new_styles {
+    top: 0 !important; // need a more elegant way of doing this
+    left: $ic-header-primary-width - $ic-sp;
+    width: calc(100% - (#{$ic-header-primary-width} - #{$ic-sp}) );
+    @include breakpoint(wide) { 
+      left: $ic-header-primary-width;
+      width: calc(100% - #{$ic-header-primary-width});
+    }
+  }
+  @else {
+    width: 100%;  
+  }
+}
+
+#footer {
+  display: none;
+}
+
+#content {
+  overflow:visible;
+}
+
+#content.container-fluid {
+  padding: 0;
+}
+
+.conversations {
+  position: relative;
+  @if $use_new_styles == false { min-width: 1160px; }
+}
+
+.conversations .panel {
+  box-sizing: border-box;
+  height: 58px;
+  
+  @if $use_new_styles {
+    background: $lightBackground;
+    border-bottom: 1px solid $ic-border-light;
+    height: 112px;
+    padding: $ic-sp;
+    @include breakpoint(wide) { 
+      height: 62px; 
+      display: flex;
+      align-items: center;
+      padding-bottom: 0;
+      padding-top: 0;
+    }
+    .panel__primary {
+      margin-bottom: $ic-sp;
+      @include breakpoint(wide) {
+        margin-bottom: 0;
+        flex: 1;
+        white-space: nowrap;
+      }
+      > * {
+        display: inline-block;
+        white-space: nowrap;
+      }
+    }
+    .panel__secondary {
+      @include breakpoint(wide) { white-space: nowrap; }
+      > div { 
+        display: inline-block;
+        vertical-align: middle;
+        white-space: nowrap;
+      }
+    }
+  }
+  @else {
+    background: #f1f1f1;
+    border-bottom: 1px solid #acacac;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+    padding: 9px 12px 0 12px;
+    color: #555;
+    > div { display: inline-block; }
+  }
+
+  .btn {
+    color: #555;
+  }
+
+  .btn.ui-state-active {
+    background-color: #E6E6E6;
+    background-image: none;
+  }
+
+  .actions {
+    @if $use_new_styles { margin-right: $ic-sp; }
+    @else { margin-right: 20px; }
+  }
+}
+
+#sending-spinner {
+  display: inline-block;
+  height: 8px;
+  width: 10px;
+  vertical-align: bottom;
+}
+
+.filters {
+  @if $use_new_styles { margin-right: $ic-sp; }
+  @else { margin-right: 50px; }
+  
+
+  /* TODO: make sure we still need this with the frd filters (may not be selects) */
+  select {
+    margin-bottom: 0;
+    width: 150px;
+  }
+}
+
+.bootstrap-select abbr {
+  cursor: pointer;
+  border-bottom: none;
+}
+
+.conversations .panel, .message-header {
+  button {
+    &[disabled], &[disabled]:focus, &[disabled]:hover {
+      color: #a6a6a6;
+    }
+  }
+
+  .btn-group {
+    display: inline-block;
+  }
+}
+
+#help-btn {
+  color: #333;
+  position: relative;
+  left: 8px;
+  float: right;
+
+  &:hover, &:focus {
+    color: #0088cc;
+    text-decoration: none;
+  }
+
+  .icon-mini-arrow-down {
+    position: relative;
+    right: 5px;
+  }
+}
+
+.search .ac {
+  float: left;
+  width: 250px;
+  display: block;
+
+  .ac-input-box {
+    border-radius: 16px 0 0 16px;
+    float: left;
+    width: 205px;
+    min-height: 0;
+    height: 38px;
+    padding: 7px 12px;
+
+    .ac-placeholder {
+      top: 0;
+      line-height: 38px;
+    }
+
+    .ac-clear {
+      top: 8px;
+    }
+  }
+
+  .ac-input {
+    margin-left: 0;
+  }
+
+  input {
+    border-radius: 0;
+  }
+
+  .btn {
+    border-radius: 0 16px 16px 0;
+    float: left;
+  }
+}
+
+.messaging-wrapper {
+  position: absolute;
+  bottom: 0;
+  @if $use_new_styles {
+    top: 112px;
+    @include breakpoint(wide) { top: 62px; }
+  }
+  @else { top: 58px; }
+}
+
+.message-list-scroller {
+  border-right: 1px solid #bfbfbf;
+  height: 100%;
+  overflow: auto;
+}
+
+.message-list {
+  .list-header {
+    color: darken($ic-color-neutral, 50);
+    padding: 3px 12px;
+    @if $use_new_styles { 
+      background: $lightBackground;
+      border-bottom: 1px solid $ic-border-light;
+    }
+    @else {
+      background: #f3f3f3;
+      border-bottom: 1px solid #bfbfbf; 
+    }
+  }
+
+  .current-context-code {
+    color: #f3f3f3;
+    background-color: $ic-color-neutral;
+    padding: 0 10px;
+  }
+
+  .messages > li {
+    background: #fff;    
+    box-sizing: border-box;
+    cursor: pointer;
+    height: 100px;
+    padding: 8px 12px 8px 32px;
+    position: relative;
+    @if $use_new_styles {
+      border-bottom: 1px solid $ic-border-light;
+    }
+    @else {
+      border-bottom: 1px solid #bfbfbf;
+    }
+
+    &.active {
+      background: $ic-bg-light-primary;
+    }
+    &:hover {
+      background: $ic-bg-light-primary;
+    }
+    &:hover .message-actions a, .message-actions a:focus {
+      left: 0;
+      outline: none;
+    }
+  }
+
+  .author {
+    display: inline-block;
+    max-width: 70%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  h2.author {
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 20px;
+    margin: 0px;
+  }
+
+  .date {
+    color: $ic-brand-primary;
+  }
+
+  .summary {
+    color: #7f7f7f;
+    height: 40px;
+    margin: 0 24px 0 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  p {
+    font-size: 12px;
+    line-height: 16px;
+    margin-bottom: 8px;
+  }
+}
+
+.subject {
+  display: block;
+  max-width: 80%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &:focus {
+    outline: 0;
+  }
+}
+
+h3.subject {
+ margin: 0px 0px 8px 0;
+ font-size: 13px;
+ line-height: 20px;
+}
+
+h2.subject {
+  font-size: 13px;
+  font-weight: bold;
+  margin: 0px;
+}
+
+.message-full-participants {
+  display: none;
+}
+
+.message-summarized-participants:focus, .message-full-participants:focus {
+  outline: 0;
+}
+
+.message-count {
+  font-size: 11px;
+  position: absolute;
+  right: 13px;
+  top: 43%;
+  background-color: $ic-brand-secondary;
+  text-shadow: none;
+}
+
+.message-actions {
+  left: 8px;
+  position: absolute;
+  top: 8px;
+
+  a {
+    position: relative;
+  }
+
+  li {
+    margin-bottom: 8px;
+  }
+
+  .read-state {
+    background: $ic-brand-secondary;
+    border-radius: 5px;
+    box-sizing: border-box;
+    display: inline-block;
+    height: 10px;
+    margin: 3px;
+    width: 10px;
+
+    &.read {
+      background: $ic-brand-primary;
+      border: 1px solid darken($ic-brand-primary, 10);
+      @if $use_high_contrast {
+        background: $ic-color-light;
+        border: 1px solid $ic-color-dark;
+      }
+      left: -9999px;
+    }
+
+    &:focus {
+      border: 1px solid $ic-color-dark;
+      box-shadow: none;
+    }
+  }
+
+  .star-btn {
+    color: $ic-brand-secondary;
+    display: inline-block;
+    font-family: 'Hiragino Kaku Gothic Pro', 'Lucida Sans Unicode', 'Arial Unicode MS';
+    font-size: 16px;
+    left: -9999em;
+
+    &:hover {
+      text-decoration: none;
+    }
+
+    &:focus {
+      color: #333;
+      text-decoration: none;
+    }
+
+    &:focus, &.active {
+      left: 0;
+    }
+
+    &.active {
+      &:before, &:after {
+        position: absolute;
+      }
+      &:before {
+        color: $ic-color-alert;
+        content: "\2605";
+      }
+      &:focus {
+        color: #333;
+        &:after {
+          content: "\2606";
+          color: #333;
+          z-index: 5;
+          top: 0; left: 0;
+        }
+      }
+    }
+  }
+}
+
+.open-message {
+  @include accessibility-prompt;
+  left: -9999px;
+  position: absolute;
+  &:focus {
+    left: auto; top: auto;
+    right: 0; bottom: 0;
+    z-index: 1;
+    width: auto; height: auto;
+  }
+}
+
+.message-detail.span8 {
+  margin-left: 0;
+  width: 68.08511%;
+  height: 100%;
+  overflow: auto;
+
+  &:focus {
+    outline: none;
+  }
+
+  .subject {
+    float: left;
+  }
+
+  .no-messages {
+    color: #bbbbbb;
+    display: block;
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 5%;
+    text-align: center;
+
+    i {
+      display: block;
+      line-height: 120px;
+      margin-bottom: 120px;
+      text-align: center;
+      width: 100%;
+
+      &:before {
+        font-size: 120px;
+      }
+    }
+  }
+
+  .message-header {
+    height: 40px;
+    line-height: 40px;
+    padding: 0 12px;
+    @if $use_new_styles { border-bottom: 1px solid $ic-border-light; }
+    @else { border-bottom: 1px solid #bfbfbf; }
+
+    .label {
+      margin-top: 12px;
+    }
+  }
+
+  .message-detail-actions {
+    li {
+      display: inline;
+    }
+  }
+
+  .message-content > li {
+    
+    margin: 0 12px;
+    padding: 24px 0;
+    @if $use_new_styles { border-bottom: 1px solid $ic-border-light; }
+    @else { border-bottom: 1px solid #bfbfbf; }
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+
+    .message-attachments {
+      list-style: none;
+      margin: 0 1em;
+      padding: 0.5em;
+      @if $use_new_styles { border-top: 1px solid $ic-border-light; }
+      @else { border-top: 1px solid #bfbfbf; }
+    }
+
+    .message-attachment-thumbnail {
+      max-height: 16px;
+      max-width: 16px;
+    }
+  }
+
+  .message-info {
+    margin-bottom: 12px;
+  }
+
+  .user-info {
+    .avatar {
+      float: left;
+      margin-right: 8px;
+    }
+
+    .context {
+      color: darken($ic-color-neutral, 50);
+      display: block;
+    }
+
+    .message-author-and-participants {
+      padding-top: 6px;
+    }
+  }
+
+  .message-metadata {
+    position: relative;
+  }
+
+  .date {
+    color: darken($ic-color-neutral, 50);
+    position: absolute;
+    right: 10px;
+    top: 0;
+  }
+
+  .actions {
+    right: 9999em;
+    position: relative;
+    top: 0;
+    margin: 20px 10px 0 8px;
+  }
+
+  .actions li {
+    border: none;
+    float: left;
+    margin:0 0 0 8px;
+    padding: 0;
+  }
+
+  .message-detail-actions li a,
+  .actions li a {
+    color: darken($ic-color-neutral, 50);;
+
+    &:hover, &:focus {
+      color: #333;
+      outline: none;
+      text-decoration: none;
+    }
+  }
+}
+
+.touch .message-detail .actions {
+  right: -7px;
+  top: 24px;
+}
+
+.touch .message-item-view:hover, .touch .message-metadata.hover {
+  .date {
+    right: 0;
+  }
+}
+
+.message-item-view:hover, .message-metadata.hover {
+
+  .actions {
+    display: block;
+    right: -7px;
+  }
+}
+
+.bootstrap-select.btn-group, .bootstrap-select.btn-group[class*="span"] {
+  margin-bottom: 0;
+}
+
+i.icon-ok:before {
+  // this is why we need the component loaded into the compiler sheet
+  // TODO: fix it so we're not using bootstrap.js and their classes
+  @extend .icon-check:before;
+  vertical-align: baseline;
+}
+
+.bootstrap-select .dropdown-submenu > .dropdown-menu {
+  top: -20px;
+}
+
+.bootstrap-select .dropdown-submenu .dropdown-menu.inner {
+  max-height: 200px;
+  overflow: auto;
+}
+
+.bootstrap-select label {
+  margin: 0;
+  display: block;
+}
+
+input.dropdown-search {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+
+.message-header-row .ac-input-box {
+  max-height: 95px;
+  overflow-y: auto;
+}
+
+.beta-notice {
+  margin: 36px 48px;
+}

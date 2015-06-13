@@ -110,7 +110,9 @@ $.widget( "ui.menu", {
 				// If not, activate the first item
 				var item = this.active || this.element.children( ".ui-menu-item" ).not(thisOrParentIsHidden).eq( 0 );
 
-				this.focus( event, item );
+				if ( item.length ) {
+                    this.focus(event, item);
+                }
 			},
 			blur: function( event ) {
 				this._delay(function() {
@@ -264,6 +266,7 @@ $.widget( "ui.menu", {
 		}
 
 		if ( preventDefault ) {
+			event.stopPropagation();
 			event.preventDefault();
 		}
 	},

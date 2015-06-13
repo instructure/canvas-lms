@@ -25,8 +25,7 @@ class AppointmentGroup < ActiveRecord::Base
   # has_many :through on the same table does not alias columns in condition
   # strings, just hashes. we create this helper association to ensure
   # appointments_participants conditions have the correct table alias
-  has_many :_appointments, opts.merge(:conditions => opts[:conditions].gsub(/calendar_events\./,
-      CANVAS_RAILS2 ? 'calendar_events_join.' : '_appointments_appointments_participants_join.'))
+  has_many :_appointments, opts.merge(:conditions => opts[:conditions].gsub(/calendar_events\./, '_appointments_appointments_participants_join.'))
   has_many :appointments_participants, :through => :_appointments, :source => :child_events, :conditions => "calendar_events.workflow_state <> 'deleted'", :order => :start_at
   has_many :appointment_group_contexts
   has_many :appointment_group_sub_contexts, :include => :sub_context
@@ -52,7 +51,8 @@ class AppointmentGroup < ActiveRecord::Base
   end
 
   def sub_contexts
-    appointment_group_sub_contexts.map &:sub_context
+    # I wonder how rails is adding multiples of the same sub_contexts
+    appointment_group_sub_contexts.uniq.map &:sub_context
   end
 
   validates_presence_of :workflow_state
@@ -132,7 +132,7 @@ class AppointmentGroup < ActiveRecord::Base
           @new_sub_context_codes.first =~ /\Agroup_category_(.*)/
         # a group category can only be assigned at creation time to
         # appointment groups with one course
-        gc = GroupCategory.find_by_id($1)
+        gc = GroupCategory.where(id: $1).first
         code = @new_sub_context_codes.first
         self.appointment_group_sub_contexts = [
           AppointmentGroupSubContext.new(:appointment_group => self,
@@ -148,7 +148,7 @@ class AppointmentGroup < ActiveRecord::Base
 
         new_sub_contexts = @new_sub_context_codes.map { |code|
           next unless code =~ /\Acourse_section_(.*)/
-          cs = CourseSection.find_by_id($1)
+          cs = CourseSection.where(id: $1).first
           AppointmentGroupSubContext.new(:appointment_group => self,
                                          :sub_context => cs,
                                          :sub_context_code => code)
@@ -242,12 +242,12 @@ class AppointmentGroup < ActiveRecord::Base
       next false unless active_contexts.all? { |c| c.grants_right? user, :manage_calendar }
       if appointment_group_sub_contexts.present? && appointment_group_sub_contexts.first.sub_context_type == 'CourseSection'
         sub_context_ids = appointment_group_sub_contexts.map(&:sub_context_id)
-        user_visible_sections = sub_context_ids & contexts.map { |c|
+        user_visible_section_ids = contexts.map { |c|
           c.section_visibilities_for(user).map { |v| v[:course_section_id] }
         }.flatten
-        next true if user_visible_sections.length == sub_contexts.length
+        next true if (sub_context_ids - user_visible_section_ids).empty?
       end
-      !contexts.all? { |c| c.visibility_limited_to_course_sections?(user) }
+      contexts.any? { |c| c.enrollment_visibility_level_for(user) == :full }
     }
     can :manage and can :manage_calendar and can :read and can :read_appointment_participants and
     can :create and can :update and can :delete
@@ -326,7 +326,7 @@ class AppointmentGroup < ActiveRecord::Base
   end
 
   def eligible_participant?(participant)
-    return false unless participant && participant.class.base_ar_class.name == participant_type
+    return false unless participant && participant.class.base_class.name == participant_type
     codes = participant.appointment_context_codes
     return false unless (codes[:primary] & appointment_group_contexts.map(&:context_code)).present?
     return false unless sub_context_codes.empty? || (codes[:secondary] & sub_context_codes).present?
@@ -341,7 +341,9 @@ class AppointmentGroup < ActiveRecord::Base
     participant = participant_for(user_or_participant) if participant_type == 'Group' && participant.is_a?(User)
     return false unless eligible_participant?(participant)
     return false unless min_appointments_per_participant
-    return false if participants_per_appointment && appointments_participants.count >= participants_per_appointment
+    return false if participants_per_appointment \
+                  && appointments \
+                  && appointments_participants.count >= (participants_per_appointment * appointments.length)
     return reservations_for(participant).size < min_appointments_per_participant
   end
 
@@ -353,9 +355,10 @@ class AppointmentGroup < ActiveRecord::Base
           user
         else
           # can't have more than one group_category
-          raise "inconsistent appointment group" if sub_contexts.size > 1
-          sub_context_id = sub_contexts.first.id
-          user.groups.detect{ |g| g.group_category_id == sub_context_id }
+          group_categories = sub_contexts.find_all{|sc| sc.instance_of? GroupCategory }
+          raise %Q{inconsistent appointment group: #{self.id} #{group_categories}} if group_categories.length > 1
+          group_category_id = group_categories.first.id
+          user.groups.detect{ |g| g.group_category_id == group_category_id }
         end
       participant if participant && eligible_participant?(participant)
     end

@@ -25,15 +25,15 @@ module.exports = function(config) {
 
     exclude: [],
 
-    // 'dots', 'progress', 'junit', 'growl', 'coverage'
-    reporters: ['progress'], 
+    // 'dots', 'progress', 'junit', 'growl', 'coverage', 'spec'
+    reporters: ['progress'],
 
     port: 9876,
 
     colors: true,
 
     // config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-    logLevel: config.LOG_INFO, 
+    logLevel: config.LOG_INFO,
 
     autoWatch: true,
 

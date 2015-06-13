@@ -121,9 +121,8 @@ Performing the OAuth2 token request flow requires an application client
 ID and client secret. To obtain these application credentials, you will
 need to register your application.  The client secret should never be shared.
 
-For Canvas Cloud, you can request a client ID and secret from
-http://www.instructure.com/partners , or contact your account
-representative.
+For Canvas Cloud (hosted by Instructure), you can request a client ID and secret from
+http://instructure.github.io/ in the Dev Key Signup section.
 
 For open source Canvas users, you can generate a client ID and secret in
 the Site Admin account of your Canvas install. There will be a

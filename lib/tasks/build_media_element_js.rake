@@ -1,5 +1,5 @@
 
-desc "Builds mediaelementjs from it's git repo into a form canvas_lms can use with AMD"
+desc "Builds mediaelementjs from it's git repo into a form canvas_lms can use with AMD and inject instructure-specific customizations"
 task :build_media_element_js do
   require 'fileutils'
 
@@ -49,12 +49,16 @@ task :build_media_element_js do
     'mep-feature-time.js',
     'mep-feature-volume.js',
     'mep-feature-fullscreen.js',
-    'mep-feature-tracks.js',
+    'public/javascripts/mediaelement/mep-feature-tracks-instructure.js',
     # 'mep-feature-contextmenu.js',
-    # 'mep-feature-sourcechooser.js',
+    'public/javascripts/mediaelement/mep-feature-speed-instructure.js',
+    'public/javascripts/mediaelement/mep-feature-sourcechooser-instructure.js',
     'mep-feature-googleanalytics.js'
   ]
-  mep_chunks = mep_files.map { |file| File.read "#{repo_path}/src/js/#{file}" }
+  mep_chunks = mep_files.map { |path|
+    resolved_path = (path.include? '/') ? path : "#{repo_path}/src/js/#{path}"
+    File.read resolved_path
+  }
 
   puts "Combining scripts"
 
@@ -67,7 +71,7 @@ task :build_media_element_js do
   css = File.read "#{repo_path}/src/css/mediaelementplayer.css"
   # fix urls to background images
   css = css.gsub('url(', 'url(/images/mediaelement/')
-  File.open("#{public_path}/stylesheets/static/mediaelementplayer.css", 'w') {|f| f.write(rev_msg + css) }
+  File.open("app/stylesheets/vendor/_mediaelementplayer.scss", 'w') {|f| f.write(rev_msg + css) }
 
   puts 'Copying Skin Files'
   img_path = "#{public_path}/images/mediaelement"

@@ -45,6 +45,8 @@ define [
       window.location = url
 
     showCommentDialog: =>
+      commentingIsDisabled = $(@slickGrid.getActiveCellNode()).hasClass("cannot_edit")
+      return if commentingIsDisabled
       $(@slickGrid.getActiveCellNode()).find('.gradebook-cell-comment').click()
 
     showToolTip: =>

@@ -39,9 +39,7 @@ class Quizzes::QuizSubmissionService
     assert_takeability! quiz
 
     # Look up an existing QS, and if one exists, make sure it is retriable.
-    assert_retriability! participant.find_quiz_submission(quiz.quiz_submissions, {
-      :order => 'created_at'
-    })
+    assert_retriability! quiz.quiz_submissions.order(:created_at).for_participant(participant).first
 
     quiz.generate_submission_for_participant participant
   end

@@ -1,0 +1,9 @@
+.FolderTree__folderItem--selected {
+  font-weight: bold;
+}
+
+.FolderTree__folderItem--focused {
+  & > .treeLabel {
+    background-color: $ic-list-item-background--hover;
+  }
+}

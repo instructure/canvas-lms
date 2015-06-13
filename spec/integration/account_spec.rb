@@ -18,22 +18,20 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+require 'nokogiri'
+
 describe AccountsController do
 
   context "SAML meta data" do
     before(:each) do
-      pending("requires SAML extension") unless AccountAuthorizationConfig.saml_enabled
-      ConfigFile.stub('saml', {
-              :tech_contact_name => nil,
-              :tech_contact_email => nil
-      })
+      skip("requires SAML extension") unless AccountAuthorizationConfig::SAML.enabled?
       @account = Account.create!(:name => "test")
     end
 
     it 'should render for non SAML configured accounts' do
       get "/saml_meta_data"
-      response.should be_success
-      response.body.should_not == ""
+      expect(response).to be_success
+      expect(response.body).not_to eq ""
     end
     
     it "should use the correct entity_id" do
@@ -41,11 +39,51 @@ describe AccountsController do
       @aac = @account.account_authorization_configs.create!(:auth_type => "saml")
       
       get "/saml_meta_data"
-      response.should be_success
+      expect(response).to be_success
       doc = Nokogiri::XML(response.body)
-      doc.at_css("EntityDescriptor")['entityID'].should == "http://bob.cody.instructure.com/saml2"
+      expect(doc.at_css("EntityDescriptor")['entityID']).to eq "http://bob.cody.instructure.com/saml2"
     end
 
   end
 
+  context "section tabs" do
+    it "should change in response to role override changes" do
+      enable_cache do
+        # cache permissions and tabs for a user
+        @account = Account.default
+        account_admin_user account: @account
+        user_session @admin
+        Timecop.freeze(61.minutes.ago) do
+          get "/accounts/#{@account.id}"
+          expect(response).to be_ok
+          doc = Nokogiri::HTML(response.body)
+          expect(doc.at_css('#section-tabs .section .outcomes')).not_to be_nil
+        end
+
+        # change a permission on the user's role
+        @account.role_overrides.create! role: admin_role, permission: 'manage_outcomes',
+                                        enabled: false
+
+        # ensure the change is reflected once the user's cached permissions expire
+        get "/accounts/#{@account.id}"
+        expect(response).to be_ok
+        doc = Nokogiri::HTML(response.body)
+        expect(doc.at_css('#section-tabs .section .outcomes')).to be_nil
+      end
+    end
+  end
+
+  it "should show the correct students counts" do
+    account_model
+    account_admin_user(:account => @account)
+    user_session(@user)
+
+    course_with_student(:active_all => true, :account => @account)
+    @course.student_view_student # shouldn't count
+
+    get "/accounts/#{@account.id}"
+
+    doc = Nokogiri::HTML(response.body)
+    expect(doc.at_css(".course .details").text).to include("1 Student")
+  end
 end

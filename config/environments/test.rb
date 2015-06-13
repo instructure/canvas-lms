@@ -1,36 +1,17 @@
 if ENV['COVERAGE'] == "1"
   puts "Code Coverage enabled"
-  require 'simplecov'
-  require 'simplecov-rcov'
-
-  SimpleCov.use_merging
-  SimpleCov.merge_timeout(10000)
-
-  SimpleCov.command_name "RSpec:#{Process.pid}#{ENV['TEST_ENV_NUMBER']}"
-  SimpleCov.start do
-    SimpleCov.at_exit {
-      SimpleCov.result
-      #SimpleCov.result.format! to get a coverage report without vendored_gems
-    }
+  begin
+    require 'spec/coverage_tool'
+    CoverageTool.start("RSpec:#{Process.pid}#{ENV['TEST_ENV_NUMBER']}")
+  rescue LoadError => e
+    puts "Error: #{e}"
   end
-else
-  puts "Code coverage not enabled"
 end
 
 environment_configuration(defined?(config) && config) do |config|
 
-  if ENV['BULLET'] == "1"
-    puts "Bullet enabled"
-    require 'bullet'
-
-    config.after_initialize do
-      Bullet.enable = true
-      Bullet.bullet_logger = true
-    end
-
-  elsif ENV['BULLET_GEM'] == "1"
-    puts "Bullet enabled"
-    require 'bullet_instructure'
+  if ENV['BULLET_GEM']
+    puts "Bullet Instructure enabled"
 
     config.after_initialize do
       Bullet.enable = true
@@ -38,7 +19,7 @@ environment_configuration(defined?(config) && config) do |config|
     end
 
   else
-    puts "Bullet not enabled"
+    puts "Bullet Instructure not enabled"
   end
 
   # Settings specified here will take precedence over those in config/application.rb
@@ -49,16 +30,14 @@ environment_configuration(defined?(config) && config) do |config|
   # and recreated between test runs.  Don't rely on the data there!
   config.cache_classes = true
 
-  # Log error messages when you accidentally call methods on nil.
-  # in 1.9, whiny_nils causes a huge performance penalty on tests for some reason
-  config.whiny_nils = false
+  if CANVAS_RAILS3
+    # Log error messages when you accidentally call methods on nil.
+    # in 1.9, whiny_nils causes a huge performance penalty on tests for some reason
+    config.whiny_nils = false
+  end
 
   # Show full error reports and disable caching
-  if CANVAS_RAILS2
-    config.action_controller.consider_all_requests_local = true
-  else
-    config.consider_all_requests_local = true
-  end
+  config.consider_all_requests_local = true
   config.action_controller.perform_caching = false
 
   # run rake js:build to build the optimized JS if set to true
@@ -76,30 +55,17 @@ environment_configuration(defined?(config) && config) do |config|
   config.active_record.schema_format = :sql
 
   # eval <env>-local.rb if it exists
-  Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read) }
+  Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) }
 
-  if CANVAS_RAILS2
-    require_dependency 'nil_store'
-    config.cache_store = NilStore.new
-  else
-    config.cache_store = :null_store
-  end
+  config.cache_store = :null_store
 
-  if CANVAS_RAILS2
-    require_dependency 'canvas'
+  # Raise exceptions instead of rendering exception templates
+  config.action_dispatch.show_exceptions = true
 
-    # Raise an exception on bad mass assignment. Helps us catch these bugs before
-    # they hit.
-    Canvas.protected_attribute_error = :raise
+  # Print deprecation notices to the stderr
+  config.active_support.deprecation = :stderr
 
-    # Raise an exception on finder type mismatch or nil arguments. Helps us catch
-    # these bugs before they hit.
-    Canvas.dynamic_finder_nil_arguments_error = :raise
-  else
-    # Raise exceptions instead of rendering exception templates
-    config.action_dispatch.show_exceptions = true
-
-    # Print deprecation notices to the stderr
-    config.active_support.deprecation = :stderr
+  unless CANVAS_RAILS3
+    config.eager_load = false
   end
 end

@@ -1,0 +1,3 @@
+<%= t :body, "Your recording of %{title} for %{name} is ready.", :title => asset.title, :name => asset.context.name %>
+
+<%= t :link_message, "More info at %{url}", :url => HostUrl.context_host(asset.context) %>

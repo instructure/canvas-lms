@@ -1,12 +1,8 @@
-@import "environment";
+@import "base/environment";
 
 #main {
   background-color: transparent;
   border: none;
-}
-
-#content {
-  padding-right: 0;
 }
 
 #calendar-app {
@@ -29,13 +25,14 @@
     background-color: white;
   }
   .fc-view-month .fc-widget-header {
-    color: #627382;
     font-size: 14px;
     background-color: #f6f7f9;
     line-height: 35px;
+    color: $ic-font-color--subdued;
+    font-weight: 500;
   }
   .fc-view-agendaWeek thead .fc-widget-header {
-    color: #617582;
+    color: $ic-font-color--subdued;
     font-weight: bold;
     padding: 10px 0;
     text-transform: uppercase;
@@ -61,7 +58,11 @@
   .fc-event-inner {
     border-color: inherit;
     width: auto;
-    padding-left: 3px;
+    @if $use_new_styles {
+      padding: $ic-sp/4;
+      line-height: 1.3;
+    }
+    @else { padding-left: 3px; }
   }
   .fc-event-time {
     font-weight: bold;
@@ -149,7 +150,6 @@
   padding: 10px;
   border-bottom: 1px solid #eeeeee;
   word-wrap: normal;
-  max-height: 245px;
   &:last-child {
     border-bottom: none;
   }
@@ -174,7 +174,9 @@
 
 .event-detail-overflow {
   min-height: 30px;
+  min-width: 160px;
   max-width: 395px;
+  max-height: 495px;
   margin-bottom: 6px;
   overflow: auto;
 }
@@ -215,7 +217,7 @@
     opacity: 0.7;
   }
   .fc-button-content {
-    color: $textColor;
+    color: $ic-font-color-dark;
     text-shadow: white 0 1px 1px;
   }
   &.fc-corner-left {
@@ -246,3 +248,12 @@
 .fc-grid .fc-day-number {
   float: left;
 }
+
+// Make adjustment to calendar modal tab styles to accommodate updated tab design
+#edit_event .ui-tabs-nav {
+  li { 
+    //a { color: $ic-color-light; }
+  }
+}
+
+.fc-event-title { line-height: 1.3; }
