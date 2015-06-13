@@ -148,7 +148,9 @@ namespace :deploy do
             # "canvasadmin" group.
             info("Compiling assets because a file in #{fetch(:assets_dependencies)} changed.")
             execute :sudo, 'chmod -R g+w', release_path.join('log') # Needed for rake canvas:compile_assets to work.  It tries to write to production.log
+            execute :npm, 'cache clear' # Was getting "npm ERR! cb() never called!".
             execute :npm, 'install', '--silent'
+            #execute :npm, '-d install' # print debug log of npm install
             execute :rake, 'canvas:compile_assets'
           end
         end
