@@ -139,6 +139,7 @@ namespace :deploy do
             execute(:sudo, 'cp -r', latest_release_path.join('public/javascripts'), release_path.join('public/javascripts'))
             execute(:sudo, 'cp -r', latest_release_path.join('public/optimized'), release_path.join('public/optimized'))
             execute(:sudo, 'cp -r', latest_release_path.join('public/stylesheets_compiled'), release_path.join('public/stylesheets_compiled'))
+            execute :sudo, 'chmod -R g+w', release_path.join('log') # Needed for rake canvas:compile_assets to work.  It tries to write to production.log
 
           rescue PrecompileRequired
             # Note: this took me forever to get going because the "deploy" user that it runs as needs rwx permissions on many
@@ -199,7 +200,6 @@ namespace :deploy do
       within release_path do
         execute :sudo, 'chown', "#{user}", "config/*", "Gemfile.lock", "config.ru", "tmp/"
         execute :sudo, 'chmod 440', "config/*.yml"
-        execute :sudo, 'chmod -R g+w', release_path.join('log') # Needed for rake canvas:compile_assets to work.  It tries to write to production.log
       end
     end
   end
