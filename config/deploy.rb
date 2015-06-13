@@ -199,6 +199,7 @@ namespace :deploy do
       within release_path do
         execute :sudo, 'chown', "#{user}", "config/*", "Gemfile.lock", "config.ru", "tmp/"
         execute :sudo, 'chmod 440', "config/*.yml"
+        execute :sudo, 'chmod -R g+w', release_path.join('log') # Needed for rake canvas:compile_assets to work.  It tries to write to production.log
       end
     end
   end
