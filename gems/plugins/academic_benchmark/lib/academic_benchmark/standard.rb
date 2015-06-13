@@ -73,7 +73,7 @@ class Standard
     if @parent.is_standard?
       base = @parent.build_num_title
       if base && num
-        base + '.' + num
+        num.include?(base) ? num : base + '.' + num
       elsif base
         base
       else

@@ -21,8 +21,14 @@ describe AcademicBenchmark::Converter do
     @d_levels_3 = File.join(File.dirname(__FILE__) + '/fixtures', 'd_levels_3.json')
     @j_levels_3 = File.join(File.dirname(__FILE__) + '/fixtures', 'j_levels_3.json')
     @authority_list = File.join(File.dirname(__FILE__) + '/fixtures', 'auth_list.json')
+    @florida_auth_list = File.join(File.dirname(__FILE__) + '/fixtures', 'florida_auth_list.json')
     File.open(@level_0_browse, 'r') do |file|
-      @att = Attachment.create!(:filename => 'standards.json', :display_name => 'standards.json', :uploaded_data => file, :context => @cm)
+      @att = Attachment.create!(
+        :filename => 'standards.json',
+        :display_name => 'standards.json',
+        :uploaded_data => file,
+        :context => @cm
+      )
     end
     @cm.attachment = @att
     @cm.save!
@@ -92,6 +98,20 @@ describe AcademicBenchmark::Converter do
     expect(m.short_description).to eq "1.DD.1"
     expect(m.description).to eq "And something else"
     expect(m.title).to eq "1.DD.1"
+  end
+
+  def check_for_parent_num_duplication(outcome)
+    parent = outcome.instance_variable_get('@parent')
+    if outcome.num && parent && parent.is_standard? && parent.title && outcome.num.include?(parent.title)
+      outcome.title == "#{parent.title}.#{outcome.num}"
+    else
+      false
+    end
+  end
+
+  def check_built_outcome(outcome)
+    expect(check_for_parent_num_duplication(outcome)).to be_falsey
+    outcome.instance_variable_get('@children').each { |o| check_built_outcome(o) }
   end
 
   it "should successfully import the standards" do
@@ -230,7 +250,20 @@ describe AcademicBenchmark::Converter do
       run_and_check
       verify_full_import
     end
-
   end
 
+  # This test came about because the titles being generated for
+  # Florida outcomes were long and out of control.  They were looking
+  # like this:
+  #
+  #    LAFS.1.L.LAFS.1.L.1.LAFS.1.L.1.1.a
+  #
+  # instead of this:
+  #
+  #    LAFS.1.L.1.1.a instead of LAFS.1.L.LAFS.1.L.1.LAFS.1.L.1.1.a
+  #
+  it "doesn't duplicate the base numbers when building a title" do
+    json_data = JSON.parse(File.read(@florida_auth_list))
+    check_built_outcome(AcademicBenchmark::Standard.new(json_data))
+  end
 end
