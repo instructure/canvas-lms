@@ -139,7 +139,6 @@ namespace :deploy do
             execute(:sudo, 'cp -r', latest_release_path.join('public/javascripts'), release_path.join('public/javascripts'))
             execute(:sudo, 'cp -r', latest_release_path.join('public/optimized'), release_path.join('public/optimized'))
             execute(:sudo, 'cp -r', latest_release_path.join('public/stylesheets_compiled'), release_path.join('public/stylesheets_compiled'))
-            execute :sudo, 'chmod -R g+w', release_path.join('log') # Needed for rake canvas:compile_assets to work.  It tries to write to production.log
 
           rescue PrecompileRequired
             # Note: this took me forever to get going because the "deploy" user that it runs as needs rwx permissions on many
@@ -148,6 +147,7 @@ namespace :deploy do
             # with their permissions set loosely enough on the group so that compile_assets will work since "deploy" is in the 
             # "canvasadmin" group.
             info("Compiling assets because a file in #{fetch(:assets_dependencies)} changed.")
+            execute :sudo, 'chmod -R g+w', release_path.join('log') # Needed for rake canvas:compile_assets to work.  It tries to write to production.log
             execute :npm, 'install', '--silent'
             execute :rake, 'canvas:compile_assets'
           end
