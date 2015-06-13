@@ -14525,6 +14525,11 @@ zh:
   to_35c6baa2: 至
   to_51406be9: 至
   to_c4c44f4b: 到
+  to_configure_an_openid_connect_provider_you_need_t_5c937249: |-
+      要配置一个公开ID连接提供者，您必须要授权和令牌URL和
+      获到客户ID和客户秘密。
+      
+      如果提供者可以配置有效回调或重定向URL，使用%{callback_url}。
   to_link_the_course_observer_name_to_a_student_star_f993c826: "要链接课程观察员*%{name}* 到学生，在下面开始输入学生名字，查找他们，然后点击更新。"
   to_minscore_43e5452e: "至 %{minScore}%"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "要查看作业，请确保 *议程* 视图处于活动状态。"
@@ -14572,6 +14577,7 @@ zh:
   unknown_content_type_ae6d08e8: 未知内容类型
   unknown_question_bank: 未知题库
   unknown_quiz: 未知测验
+  unknown_user_url_82196ba7: 未知用户网址
   unlock_date_cannot_be_after_due_date_8829d9ca: 解锁时间不能晚于到期日期
   unlock_date_cannot_be_after_lock_date_591f7fda: 解锁日期不能晚于锁定日期
   unlock_date_cannot_be_before_course_start_9c7b8524: 解锁日期不能早于课程开始日期
@@ -14654,6 +14660,8 @@ zh:
       update_login: 更新登录信息
     confirms: 
       delete_login: "是否确定要删除登录信息\"%{login}\"?"
+    error: 
+      unauthorized: 您没有足够的资格作出所要求的更改
     notices: 
       cant_delete_last_login: 您不能删除用户的上次登录信息
       mfa_reset: 多重身份验证已重置
@@ -15029,6 +15037,7 @@ zh:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE，WebCT 6+ 课程"
   webct_name: "Blackboard Vista/CE (WebCT)"
+  welcome_to_your_courses_to_customize_the_list_of_c_2922a551: "欢迎到您的课程。 要自定义课程列表，点击“所有课程”链接并标记要显示的课程。"
   well_below_mastery_37664bdc: 远低于掌握
   what_should_the_csv_file_look_like_985a59ac: "CSV 文件应该是什么样子?"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: 此页面是用户访问课程时将看到的页面。您可以将其设置为显示活动流、课程单元列表、提纲或自己编写的自定义页面。默认显示为课程活动流。
@@ -15206,6 +15215,7 @@ zh:
   you_are_unsubscribed_and_will_not_be_notified_of_n_bf4b96a2: 您取消订阅，新的评论将不会通报。点击订阅。
   you_can_disable_this_feature_d5e61373: 您可以禁用此功能
   you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: 您可以隐藏或显示课程的作业，方法是将其切换为打开或关闭。
+  you_can_log_in_directly_with_this_provider_by_goin_467d7f66: "通过%{url}，您可以直接地使用此提供者登录。"
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: 您现在可以为已经参加测验的学生设置重新评分选项。
   you_can_try_to_log_in_again_2b23ef0f: 您可以尝试*再次登录*。
   you_have_changed_the_progression_requirements_for__6772bc89: 您已更改某个活动课程的进度要求。可能有些学生的进度已达到此单元以及依赖此单元的其他单元。
@@ -15225,10 +15235,27 @@ zh:
       您必须要创建[新的Facebook应用程序](%{facebook_url})，和启用客户OAuth 登录
       在高级设置。 您应该作为有效的OAuth重定向URI配置%{callback_url}。
       在您保存您的应用程序后，记下应用程序的ID和应用程序的秘密与在此输入。
+  you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
+      您将要在[谷歌开发者控制台](%{google_url})。
+      您应该作为自定义URL添加%{callback_url}。
+      当您创建您的应用程序后，记下客户ID和客户秘密并在此输入。
+  you_will_need_to_register_an_application_on_github_3c8f213a: |-
+      您将要[在GitHub注册一个应用程序](%{github_url})。
+      您应该作为认证回调URL配置%{callback_url}。
+      当您创建您的应用程序后，记下客户ID和客户秘密并在此输入。
   you_will_need_to_register_an_application_on_linked_26ecb18d: |-
       您必须要[在LinkedIn中登记一个应用程序](%{linkedin_url})。
       您应该作为一个OAuth 2.0 授权重定向的URL添加%{callback_url} 并设置适用状态到现场
       当您创建您的应用程序后，记下客户端ID和客户端密钥，并在此输入。
+  you_will_need_to_register_an_application_on_twitte_5ff04bee: |-
+      您将要[在Twitter注册一个应用程序](%{twitter_url})。
+      您应该作为回调URL配置%{callback_url}。
+      当您创建您的应用程序后，记下消费者密钥和消费者秘密并在此输入。
+  you_will_need_to_register_an_application_on_twitte_95e7b621: |-
+      您将要[在Twitter注册一个应用程序](%{twitter_url})。
+      您应该作为回调URL配置%{callback_url}并设置访问级别到
+      读，写和访问直接信息
+      当您创建您的应用程序后，记下消费者密钥和消费者秘密并在此输入。
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "您的作业列表现在可以在 *日历* 页面上找到。"
   your_assignments_list_has_improved_3eded80e: "您的 *作业* 列表已改进！"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: 您的作业将显示在此处，按到期日期列出。
