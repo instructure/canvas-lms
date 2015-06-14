@@ -5,9 +5,11 @@
       <div class="ic-app-header__primary">
       <a href="#content" id="skip_navigation_link"><%= t 'links.skip_to_content', "Skip To Content" %></a>
         <div role="navigation" class="ic-app-header__main-navigation">
-          <a href="<%= dashboard_url %>" class="ic-app-header__logomark">
-            <span class="screenreader-only"><%= t 'links.dashboard', "Dashboard" %></span>
-          </a>
+          <div class="ic-app-header__logomark-container">
+            <a href="<%= dashboard_url %>" class="ic-app-header__logomark">
+              <span class="screenreader-only"><%= t 'links.dashboard', "Dashboard" %></span>
+            </a>
+          </div>
           <ul role="menu" id="menu"
             class="ic-app-header__menu-list"
             aria-label="<%= t('Main Navigation') %>"
@@ -22,7 +24,7 @@
               </a>
             </li>
             <% if @has_courses %>
-              <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('courses') %>">
+              <li class="menu-item ic-app-header__menu-list-item <%= 'ic-app-header__menu-list-item--active' if active_path?('courses') %>">
                 <a id="global_nav_courses_link" href="<%= courses_path %>" class="ic-app-header__menu-list-link">
                   <div class="menu-item-icon-container">
                     <%= svg_icon :courses_new_styles %>

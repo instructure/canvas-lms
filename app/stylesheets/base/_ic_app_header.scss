@@ -15,6 +15,7 @@
   $ic-global-nav-link-active:  darken($ic-brand-global-nav-bgd, 8%);
   $ic-masquerade-color: $ic-brand-primary;
   $ic-subnav-panel-bgd: $ic-color-light;
+  $ic-logomark-url: url("/images/svg-icons/svg_canvas_logomark_only.svg");
 
   .ic-app-header {
     box-sizing: border-box;
@@ -50,7 +51,7 @@
       .ic-app-header__menu-list-link { background: $ic-color-light; }
       .menu-item__text { color: $ic-brand-global-nav-menu-item__text-color--active; }
       .ic-icon-svg path { fill: $ic-brand-global-nav-ic-icon-svg-fill--active; }
-      .ic-avatar { 
+      .ic-avatar {
         border-color: $ic-border-light;
         &.ic-avatar--fake-student { border-color: $ic-masquerade-color; }
       }
@@ -207,13 +208,35 @@
     border: 2px solid transparent;
   }
 
+  .ic-app-header__logomark-container {
+    width: 100%;
+    background-color: $ic-brand-global-nav-logo-bgd;
+    box-sizing: border-box;
+    @if $ic-brand-header-image != $ic-logomark-url {
+      padding: 0;
+    }
+    @else {
+      padding: 0 $ic-sp+6;
+    }
+  }
+
   .ic-app-header__logomark {
     display: block;
-    height: 75px;
+    width: 100%;
     overflow: hidden;
-    margin-bottom: $ic-sp;
-    background: $ic-brand-global-nav-logo-bgd $ic-brand-header-image 50% no-repeat;
-    background-size: 50%;
+    margin: 0 auto $ic-sp auto;
+    background-image: $ic-brand-header-image;
+    background-position: 50%;
+    background-repeat: no-repeat;
+    background-size: contain;
+    transition: transform 0.5s;
+    @if $ic-brand-header-image != $ic-logomark-url {
+      height: 85px;
+    }
+    @else {
+      height: 75px;
+      transform: scale3d(0.7, 0.7, 0.7); // default canvas logo
+    }
   }
   // set to block to avoid any exta inline spacing at bottom
   .ic-app-header__uploaded-logo { display: block; }
