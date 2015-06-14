@@ -169,12 +169,7 @@ define([
               className="Theme__preview-overlay"
             >
               <div
-                style={{
-                  width: 700,
-                  textAlign: 'center',
-                  height: '100vh',
-                  margin: '0 auto'
-                }}
+                className="Theme__preview-overlay__container"
               >
                 <button type="submit" className="Button Button--primary" style={{margin: '40% auto'}}>
                   <i className="icon-refresh" />
