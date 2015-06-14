@@ -78,18 +78,18 @@
     "default": "$ic-brand-primary"
   },
   {
+    "human_name": "Nav Logo Background",
+    "variable_name": "ic-brand-global-nav-logo-bgd",
+    "type": "color",
+    "default": "#34444f"
+  },
+  {
     "human_name": "Nav Logo",
     "helper_text": "Accepted formats: svg, png, jpg, gif",
     "variable_name": "ic-brand-header-image",
     "type": "image",
     "accept": "image/png,image/gif,image/jpeg,image/svg",
     "default": "/images/svg-icons/svg_canvas_logomark_only.svg"
-  },
-  {
-    "human_name": "Nav Logo Background",
-    "variable_name": "ic-brand-global-nav-logo-bgd",
-    "type": "color",
-    "default": "#34444f"
   }
 ]},
 {
