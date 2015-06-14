@@ -132,7 +132,7 @@ zh:
     ldap_fields: 
       auth_filter_description: "使用 *%{placeholder}* 作为用户所提供的用户名的占位符。ÀýÈç: *(sAMAccountName=%{placeholder})*"
       identifer_format_description: "LDAP 属性用于查看 Canvas 登录。保留空白以使用用户提供用户名。"
-      ldap_timeout_failure_help2: "如果Canvas与LDAP服务器沟通时站停太多次，这会对%{time}住址使用那个LDAP服务器更多的登录尝试。 您的LDAP服务器最后在%{timestamp} 站停。"
+      ldap_timeout_failure_help2: "如果Canvas与LDAP服务器交流时暂停太多，这将阻止来自使用LDAP服务器的更多%{time}的登录尝试。 您的LDAP服务器最后在%{timestamp} 暂停。"
     ldap_settings_test: 
       labels: 
         pass: 密码
@@ -163,8 +163,8 @@ zh:
     linkedin_fields: 
       description: |-
           您必须要[在LinkedIn中登记一个应用程序](%{linkedin_url})。
-          您应该作为一个OAuth 2.0 授权重定向的URL添加%{callback_url} 并设置适用状态到现场
-          当您创建您的应用程序后，记下客户端ID和客户端密钥，并在此输入。
+          您应添加%{callback_url}作为一个OAuth 2.0 授权重定向的URL， 并设置适用状态到现场。
+          当您创建应用程序后，记下客户的ID和客户的密钥，并在此输入它们。
     login_required: 必须提供
     no_changing_auth_types: 无法更改授权配置类型，请删除，然后创建新的配置。
     password_required: 必须提供
@@ -206,9 +206,9 @@ zh:
       logout_response_from_idp: "来自 IdP 的 LogoutResponse"
     sso_settings_form: 
       change_password_url_help: "为默认的 Canvas行为而留空"
-      discovery_url_description: "如果设置了发现URL，当他们需要认证，Canvas会将所有用户转移到那个URL。 那个页面将需要帮助用户找出他们要去哪里登录。 如果没有配置发现URL，第一个配置将会使用来尝试认证用户。"
+      discovery_url_description: "如果设置了一个探索URL，当他们需要认证时，Canvas 会将所有用户转移到那个URL。 此页面将需要帮助用户找出他们要去哪里登录。 如果没有配置探索URL，第一个配置将被使用尝试认证用户。"
       login_handle_name_description: "标签用作唯一登录的标识符。示例: 登录名、用户名、学生 ID 等"
-      unknown_user_url_description: 当一个已认证的用户不能在Canvas找出的重定向的URL。
+      unknown_user_url_description: 当一个已认证的用户无法在Canvas找到时，URL要重新定向。
   account_navigation_80bbefd4: 账户导航
   account_notification: 
     errors: 
@@ -1291,8 +1291,8 @@ zh:
   allow_bulk_grade_export_to_sis_e11a6e66: 允许批量评分导出到SIS
   allow_lor_tools: "允许用户查看和使用针对 LOR 配置的外部工具。"
   allow_opt_out_of_inbox: "允许用户选择退出 Conversation 的收件箱。这将导致所有会话邮件和通知以紧急通知的形式发送到用户的主电子邮件，在收件箱上隐藏 Conversation 邮件箱的未读邮件标识，并且隐藏 Conversation 的通知首选项。"
-  allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: 允许学生查看谁注册了时段。
-  allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: 允许讲师标记将批量导出到SIS整合的评分数据。
+  allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: 允许学生查看已注册的时段。
+  allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: 允许讲师标记已批量导出到SIS整合的评分数据。
   always_3a59e701: 始终
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "为 %{filename} 设置使用权限时出错"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: 发生未知的服务器错误。请重试。
@@ -4980,7 +4980,7 @@ zh:
   diigo_993c4646: Diigo
   disable_a5c05db3: 禁用
   disabled_18c33a73: （已禁用）
-  discovery_url_3dce06d9: 发现URL
+  discovery_url_3dce06d9: 探索URL
   discussion_6719c51d: 讨论
   discussion_entries: 
     created_entry_notice: 条目已成功创建。
@@ -5290,13 +5290,13 @@ zh:
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
       在注册了部门课程的所有学生中分布当前
               评分。
-  divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "将%{num_minutes}分钟分成相等的插槽。 *去*"
+  divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "把%{num_minutes}分钟分成相等的时段。 *去*"
   domain_3b54c511: 域
-  don_t_move_lti_query_params_to_post_body_21744487: 别动LTI查询参数为POST体
+  don_t_move_lti_query_params_to_post_body_21744487: "不要移动 LTI查询参数为POST主体"
   don_t_show_again_15d8253e: 不再显示
   done_54e3d4b6: 完成
   done_8af51c9b: 完成
-  download_scores_generated_on_date_ff5b9cd2: "下载在%{date}生成的分数"
+  download_scores_generated_on_date_ff5b9cd2: "在%{date}下载生成的分数"
   download_submissions_7454665f: 下载提交
   due_a73610f6: 截止时间
   due_at_5e18eeac: 截止在：
@@ -5793,7 +5793,7 @@ zh:
   example_https_lti_tool_provider_example_herokuapp__e9802142: "示例：https://lti-tool-provider-example.herokuapp.com/register"
   example_item_scores_6726c689: 项目分数示例
   exceeds_mastery_1f995dce: 超过掌握
-  excused_5877183c: 原谅！
+  excused_5877183c: 请原谅！
   excused_cf8792eb: 原谅
   expand_collapse_title_outcome_group_239f0a9d: "展开/折叠 %{title} 结果组"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "展开 %{groupName} 的组成员列表"
@@ -6235,7 +6235,7 @@ zh:
     only_one_folder: "无法设置文件夹的路径和 ID"
   for: 针对
   for_all_devices_1f603968: 针对所有设备
-  forgot_password_url_3f9c04b: 忘记密码URL
+  forgot_password_url_3f9c04b: 忘记密码的URL
   from_fdd4956d: 从
   from_from_to_to_e31f6422: "从 %{from} 到 %{to}"
   get_the_following_from_your_salesforce_connected_a_881fc9a3: 从您的销售团队连接如下的应用程序
@@ -7280,10 +7280,10 @@ zh:
     text_entry_submission: 文本条目提交项
   idp_entity_id_25c51837: IDP实体ID
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: 如果启用，在发布前内容设计者必须提供版权和许可信息的文件。此仅适用于，如果同时启用更好的文件浏览。
-  if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: 如果启用，查询参数不会在一个LTI发射中复制到POST体。
+  if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "如果启用，查询参数不会在一个LTI 发送中复制到POST主体。"
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "如果启用，用户将能够配置 LTI 2 工具。"
   if_you_change_an_assignment_s_points_possible_you__25a0edad: 如果您更改作业的可能分数，则必须对作业进行重新评分。
-  if_you_configure_settings_that_cause_you_to_not_be_13d4cbbf: "如果您配置将引起您不可以登录的设置，您可以直接的在%{url}访问普通Canvas的登录"
+  if_you_configure_settings_that_cause_you_to_not_be_13d4cbbf: "如果您的配置将引起无法登录的设置，您可以直接在%{url}访问普通Canvas的登录"
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: 如果您现在不选择使用权限，此文件在上传后将不会发布
   if_you_enable_this_feature_be_sure_that_your_sales_566967e6: 如果启用此功能，请确保您的销售团队的帐户已拥有这些自定义栏目，以在表格的左栏中准确地添加名称。
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "如果您离开，目前正在准备的 zip 文件下载将被取消。"
@@ -7634,8 +7634,8 @@ zh:
   light_blue_5374f600: 浅蓝色
   light_green_c1cd020d: 浅绿色
   light_pink_e1214d62: 浅粉红色
-  limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "限制每个时隙到%{num_participants} *小组。* **用户。**"
-  limit_participants_to_attend_num_appointments_appo_dd3fd62f: "限制参与者出席%{num_appointments} 预约。"
+  limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "对*小组。* **用户。**限制每个时段 %{num_participants} "
+  limit_participants_to_attend_num_appointments_appo_dd3fd62f: "限制参与者出席%{num_appointments} 的预约。"
   link_enrollment: 
     buttons: 
       link: 链接至学生
@@ -7674,7 +7674,7 @@ zh:
   lock_until_date_62ce1b5c: 锁定截止时间
   log_on_url_fc166e4c: 登录到URL
   log_out_379ba28a: 注销
-  log_out_url_2605c2c1: 推出URL
+  log_out_url_2605c2c1: 退出URL
   logged_out_user: "注销的用户 %{user_counter}"
   login: 
     canvas: 
@@ -7747,7 +7747,7 @@ zh:
   login_with_auth_type_a0aaa52a: "使用*%{auth_type}*登录"
   login_with_provider_3fd3998e: "使用%{provider}登录"
   logo_a040ae0e: 徽标
-  logout_a9312e35: 推出
+  logout_a9312e35: 退出
   looks_great_e4d883ed: 好极！
   low_score_4eeb95b2: "低分：%{score}"
   lower_limit_of_range_6ddd4983: 范围的下限
@@ -7790,7 +7790,7 @@ zh:
       miscellaneous: 杂项
       operators: 运算符
       relationships: 关系
-  max_users_groups_per_appointment_867c505b: 每个预约的最高用户/小组
+  max_users_groups_per_appointment_867c505b: 每个预约的最多用户/小组
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: 一个参与者可以最多参加的预约次数
   media_comments: 
     alerts: 
@@ -9561,7 +9561,7 @@ zh:
     errors: 
       valid_workflow_state: 必须发送有效的工作流状态
   migration_selection_5f1c5f55: 转移选项
-  minutes_per_slot_5b7169e5: 每个插槽的分钟
+  minutes_per_slot_5b7169e5: 每个时段的分钟
   missing_percent_94534638: "缺少：%{percent}"
   model_is_already_located_in_newgroup_e5cea361: "%{model} 已位于 %{newGroup} 中"
   module_item_types: 
@@ -9715,7 +9715,7 @@ zh:
   moodle_formula_warning_title: 将需要为公式问题重新生成可能的答案
   more_courses_5ebbe998: 更多课程
   most_recent_score_13a87e8c: 最近的得分
-  most_recent_score_counts_as_calculation_int_of_mas_9a3bcf66: "最近的评分计算为掌握重量的 %{calculation_int}%，所有其他评分的平均计算为重量的 %{remainder}%。"
+  most_recent_score_counts_as_calculation_int_of_mas_9a3bcf66: "最近的得分以 %{calculation_int}%掌握加权为计算，所有其他得分的平均计算为加权的 %{remainder}%。"
   move_abf00365: 移动
   move_dialog: 
     cancel: 取消
@@ -9728,7 +9728,7 @@ zh:
   move_outcome_group_cfa1a505: 移动结果组
   moving_a4d552df: 正在移动...
   multi_factor_authentication_configured_865b1bde: 多重身份验证已配置
-  must_achieve_mastery_at_least_count_times_scores_a_628db168: "至少要得到掌握%{count}次。 掌握以上的评分将被平均来计算总分。"
+  must_achieve_mastery_at_least_count_times_scores_a_628db168: "必须获得掌握至少%{count}倍。 掌握以上的得分将以平均来计算总分。"
   must_mark_as_done_bf6cc563: 必须标记为完成
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: 必须提供“file_ids”和/或“folder_ids”参数
   mute_dialog: 
@@ -10448,9 +10448,9 @@ zh:
       description: Facebook登录
     facebook_settings: 
       description: |-
-          您必须要创建[新的Facebook应用程序](%{facebook_url})，和启用客户OAuth 登录
-          在高级设置。 您应该作为有效的OAuth重定向URI配置%{callback_url}。
-          在您保存您的应用程序后，记下应用程序的ID和应用程序的秘密与在此输入。
+          您必须要创建[新的Facebook的应用程序](%{facebook_url})，以及在高级设置启用客户OAuth 登录。
+          作为有效的OAuth，您应重新定向URI配置%{callback_url}。
+          在保存您的应用程序后，您记下应用程序的ID和应用程序的密钥，并在此输入它们。
       labels: 
         app_id: 应用程序ID
         app_secret: 应用程序秘密
@@ -11062,7 +11062,7 @@ zh:
     login: 
       invalid_login: 登录信息无效
       invalid_password: 密码无效
-      invalid_user_email: 糟糕！这不完全类似于电子邮件地址，请确认您在使用与您的Canvas账户相关的电子邮件地址。
+      invalid_user_email: 糟糕！这完全不像电子邮件地址，请确认您在使用与您的Canvas账户相关的电子邮件地址。
       parent_signup: 父级注册
       password_confirmation_sent: "密码确认已发送到 %{email_address}。确保检查您的垃圾邮件箱。"
     notices: 
@@ -11902,7 +11902,7 @@ zh:
         extended_quiz_time_explanation: 您可以为此学生提供有关其当前测验尝试的额外时间。您想要为其提供多长时间?
         extra_time_on_every_attempt: 每次尝试的额外时间
         finished_in: "在 %{duration} 内完成"
-        global_extra_attempt_time: "所有人已经获得%{count} 分钟"
+        global_extra_attempt_time: "每个人已获得的%{count} 分钟"
         global_extra_attempts: "所有人均已获得 %{n}"
         headers: 
           attempt: 尝试
@@ -12858,7 +12858,7 @@ zh:
       learning_mastery: 学习掌握程度
     settings: 
       assignment_toggles_and_actions: 
-        download_current_scores: 下载目前评分(.csv)
+        download_current_scores: 下载目前的得分(.csv)
         grading_history: 查看评分历史记录
         hide_student_names_label: 隐藏学生姓名
         include_ungraded_assignments: "将未评分的作业当作 0"
@@ -14267,15 +14267,15 @@ zh:
   the_material_is_licensed_under_creative_commons_3242cb5e: "材料已根据 Creative Commons 许可"
   the_material_is_subject_to_fair_use_exception_41bc6a4b: 材料受公正使用例外的约束
   the_message_titled_subject_could_not_be_delivered__8c6cbbe3: |-
-      "%{subject}"信息标题不能被发送。 信息是从一个没有与您的Canvas账户链接的地址发送。如果您想通过Canvas联系某个人，您可以尝试登录到您的账户并使用收信箱工具给他们发送信息。
+      "%{subject}"信息标题不能被发送。 信息是从一个没有与您的Canvas账户链接的地址发送。如果您想通过Canvas联系某个人，您可以尝试登录到账户并使用收信箱工具给他们发送信息。
       
-      谢谢，
-      Canvas支持
+      谢谢您，
+      Canvas的支持团队
   the_module_item_is_locked_27fe420b: 单元项已锁定。
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "为用户的最新得分 %{current_user_name} 和结果 %{outcome_name}。"
   the_profile_picture_has_been_reported_d609d6dd: 档案照片已被报道
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "报告用户(学生、教师、管理员等) 担当的角色"
-  the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "时间表工具允许您设置学生(或学生组群) 可以注册的时段。 要开始，点击以下按钮。"
+  the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "调度表工具允许您为学生(或学生组群) 设置登记的时段。 要开始，点击以下的按钮。"
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: 问题的严重程度，通过从下拉菜单的用户中作出选择。
   the_shortcut_icon_for_ios_android_devices_180x180__f87fa178: "iOS/Android 设备的快捷方式图标。180x180 png 或 svg"
   the_state_parameter_is_required_ffadf213: 需要状态参数
@@ -14297,8 +14297,8 @@ zh:
   there_were_errors_with_the_form_errors_ab5b559a: "表格出错：%{errors}"
   these_grading_periods_were_created_for_you_by_an_a_e977c2b5: 由管理员为您创建这些评分期限。
   this_assignment_has_been_excused_87f1dc13: 这个作业已被免除。
-  this_assignment_is_dropped_and_will_not_be_conside_35c3e198: 这个作业被丢弃并不会影响总计算。
-  this_assignment_is_excused_and_will_not_be_conside_5892de1f: 这个作业被免除并不会影响总计算。
+  this_assignment_is_dropped_and_will_not_be_conside_35c3e198: 这个作业被丢弃，但不会影响总计算。
+  this_assignment_is_excused_and_will_not_be_conside_5892de1f: 这个作业被免除，但不会影响总计算。
   this_conference_may_be_recorded_f76deeeb: 本次会议可能被记录。
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: 该课程此时无法添加到课程菜单中。
   this_course_is_claimed_and_ready_but_you_ll_need_t_25b95a0a: "本课程已被领受并准备就绪，但需要完成注册过程后才能发布。您应该收到了来自 Canvas 的电子邮件。确保检查您的垃圾邮件箱。"
@@ -14526,10 +14526,10 @@ zh:
   to_51406be9: 至
   to_c4c44f4b: 到
   to_configure_an_openid_connect_provider_you_need_t_5c937249: |-
-      要配置一个公开ID连接提供者，您必须要授权和令牌URL和
-      获到客户ID和客户秘密。
+      要配置一个公开ID连接提供者，您需要授权和令牌的URL，以及
+      获到客户ID和客户密钥。
       
-      如果提供者可以配置有效回调或重定向URL，使用%{callback_url}。
+      如果提供者可以配置有效的回调或重新定向的URL，使用%{callback_url}。
   to_link_the_course_observer_name_to_a_student_star_f993c826: "要链接课程观察员*%{name}* 到学生，在下面开始输入学生名字，查找他们，然后点击更新。"
   to_minscore_43e5452e: "至 %{minScore}%"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "要查看作业，请确保 *议程* 视图处于活动状态。"
@@ -14577,7 +14577,7 @@ zh:
   unknown_content_type_ae6d08e8: 未知内容类型
   unknown_question_bank: 未知题库
   unknown_quiz: 未知测验
-  unknown_user_url_82196ba7: 未知用户网址
+  unknown_user_url_82196ba7: 未知用户的网址
   unlock_date_cannot_be_after_due_date_8829d9ca: 解锁时间不能晚于到期日期
   unlock_date_cannot_be_after_lock_date_591f7fda: 解锁日期不能晚于锁定日期
   unlock_date_cannot_be_before_course_start_9c7b8524: 解锁日期不能早于课程开始日期
@@ -14661,7 +14661,7 @@ zh:
     confirms: 
       delete_login: "是否确定要删除登录信息\"%{login}\"?"
     error: 
-      unauthorized: 您没有足够的资格作出所要求的更改
+      unauthorized: 您没有足够的资格作出所要求的更改。
     notices: 
       cant_delete_last_login: 您不能删除用户的上次登录信息
       mfa_reset: 多重身份验证已重置
@@ -15037,7 +15037,7 @@ zh:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE，WebCT 6+ 课程"
   webct_name: "Blackboard Vista/CE (WebCT)"
-  welcome_to_your_courses_to_customize_the_list_of_c_2922a551: "欢迎到您的课程。 要自定义课程列表，点击“所有课程”链接并标记要显示的课程。"
+  welcome_to_your_courses_to_customize_the_list_of_c_2922a551: "欢迎到您的课程。 要自定义课程列表，点击“所有课程”的链接，并标记课程为显示。"
   well_below_mastery_37664bdc: 远低于掌握
   what_should_the_csv_file_look_like_985a59ac: "CSV 文件应该是什么样子?"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: 此页面是用户访问课程时将看到的页面。您可以将其设置为显示活动流、课程单元列表、提纲或自己编写的自定义页面。默认显示为课程活动流。
@@ -15232,30 +15232,26 @@ zh:
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "您必须将其设置为大于或等于 %{min} 的数值"
   you_must_specify_a_usage_right_5eb57f87: 您必须指定使用权限。
   you_will_need_to_create_a_new_app_on_facebook_face_8fe85297: |-
-      您必须要创建[新的Facebook应用程序](%{facebook_url})，和启用客户OAuth 登录
-      在高级设置。 您应该作为有效的OAuth重定向URI配置%{callback_url}。
-      在您保存您的应用程序后，记下应用程序的ID和应用程序的秘密与在此输入。
-  you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
-      您将要在[谷歌开发者控制台](%{google_url})。
-      您应该作为自定义URL添加%{callback_url}。
-      当您创建您的应用程序后，记下客户ID和客户秘密并在此输入。
+      您将需要创建[新的Facebook应用程序](%{facebook_url})，以及在高级设置启用客户OAuth 登录
+      作为有效的OAuth，您应重新定向URI配置%{callback_url}。
+      在保存您的应用程序后，您记下应用程序的ID和应用程序的密钥，并在此输入它们。
   you_will_need_to_register_an_application_on_github_3c8f213a: |-
       您将要[在GitHub注册一个应用程序](%{github_url})。
       您应该作为认证回调URL配置%{callback_url}。
-      当您创建您的应用程序后，记下客户ID和客户秘密并在此输入。
+      当您创建应用程序后，记下客户ID和客户密钥，并在此输入它们。
   you_will_need_to_register_an_application_on_linked_26ecb18d: |-
       您必须要[在LinkedIn中登记一个应用程序](%{linkedin_url})。
-      您应该作为一个OAuth 2.0 授权重定向的URL添加%{callback_url} 并设置适用状态到现场
-      当您创建您的应用程序后，记下客户端ID和客户端密钥，并在此输入。
+      作为一个OAuth 2.0 授权重新定向URL，您应添加%{callback_url}， 并设置适用状态到现场
+      当您创建应用程序后，记下客户ID和客户密钥，并在此输入它们。
   you_will_need_to_register_an_application_on_twitte_5ff04bee: |-
       您将要[在Twitter注册一个应用程序](%{twitter_url})。
       您应该作为回调URL配置%{callback_url}。
-      当您创建您的应用程序后，记下消费者密钥和消费者秘密并在此输入。
+      当您创建应用程序后，记下消费者密钥和消费者秘密，并在此输入它们。
   you_will_need_to_register_an_application_on_twitte_95e7b621: |-
       您将要[在Twitter注册一个应用程序](%{twitter_url})。
-      您应该作为回调URL配置%{callback_url}并设置访问级别到
-      读，写和访问直接信息
-      当您创建您的应用程序后，记下消费者密钥和消费者秘密并在此输入。
+      您应该作为回调URL配置%{callback_url}，并设置访问级别到
+      读、写和访问直接信息
+      当您创建应用程序后，记下消费者密钥和消费者秘密，并在此输t入它们。
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "您的作业列表现在可以在 *日历* 页面上找到。"
   your_assignments_list_has_improved_3eded80e: "您的 *作业* 列表已改进！"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: 您的作业将显示在此处，按到期日期列出。
