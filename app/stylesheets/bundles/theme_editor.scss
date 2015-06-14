@@ -1,6 +1,5 @@
 @import "base/environment";
-// TODO
-// - make theme editor panel content (if exceeding browser height) scroll independently from preview area
+
 //// Vertical content alignment on elements in Theme editor
 ///////
 .te-Flex {
@@ -54,7 +53,12 @@ $te-border-color: darken($ic-color-neutral, 10);
   flex: 1;
   width: 100%;
   height: 100vh;
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin-left: 300px;
+  padding-right: 300px;
+
   .grid-row {margin: 0;}
 }
 .Theme__preview-overlay {
