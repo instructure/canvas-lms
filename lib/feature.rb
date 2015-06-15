@@ -127,6 +127,7 @@ END
       applies_to: 'RootAccount',
       state: 'hidden',
       root_opt_in: true,
+      development: true,
       beta: true
     },
     'html5_first_videos' =>
