@@ -13,7 +13,7 @@
   $ic-global-nav-menu-item__badge-border: darken($ic-brand-global-nav-bgd, 5%);
   $ic-global-nav-link-hover: darken($ic-brand-global-nav-bgd, 5%);
   $ic-global-nav-link-active:  darken($ic-brand-global-nav-bgd, 8%);
-
+  $ic-masquerade-color: $ic-brand-primary;
   $ic-subnav-panel-bgd: $ic-color-light;
 
   .ic-app-header {
@@ -47,12 +47,13 @@
   .ic-app-header__menu-list-item {
     box-sizing: border-box;
     &.ic-app-header__menu-list-item--active {
-      .ic-app-header__menu-list-link {
-        background: $ic-color-light;
-      }
+      .ic-app-header__menu-list-link { background: $ic-color-light; }
       .menu-item__text { color: $ic-brand-global-nav-menu-item__text-color--active; }
       .ic-icon-svg path { fill: $ic-brand-global-nav-ic-icon-svg-fill--active; }
-      .ic-avatar { border-color: $ic-border-light; }
+      .ic-avatar { 
+        border-color: $ic-border-light;
+        &.ic-avatar--fake-student { border-color: $ic-masquerade-color; }
+      }
       .menu-item-icon-container .menu-item__badge { border-color: $ic-color-light; }
     }
   }
@@ -83,7 +84,10 @@
         outline: none;
       }
       .ic-icon-svg, .ic-avatar { transform: scale(1.075); }
-      .ic-avatar { border-color: $ic-brand-global-nav-avatar-border; }
+      .ic-avatar {
+        border-color: $ic-brand-global-nav-avatar-border;
+        &.ic-avatar--fake-student { border-color: $ic-masquerade-color; }
+      }
       &:active { .ic-icon-svg, .ic-avatar { transform: scale(1); } }
       .menu-item__badge { border-color: $ic-global-nav-menu-item__badge-border; }
     }
@@ -161,6 +165,7 @@
     box-sizing: border-box;
     display: inline-block;
     vertical-align: middle;
+    &.ic-avatar--fake-student { border-color: $ic-masquerade-color; }
   }
 
   .menu-item-icon-container {

@@ -2036,43 +2036,23 @@ form.user_content_post_form {
   margin: 4px 0;
 }
 
-.with-fixed-bottom #wrapper-container {
+.with-fixed-bottom #wrapper-container { 
   padding-bottom: 60px;
+  @if $use_new_styles { box-sizing: border-box; }
 }
 
 #fixed_bottom {
   bottom: 0;
-  i {
-    vertical-align: middle;
-    margin-right: 10px;
-  }
-  b {
-    line-height: 28px;
-    vertical-align: middle;
-  }
-  #masquerade_bar {
-    padding: 15px;
-    .buttons {
-      float: right;
-      .btn {
-        margin-left: 10px;
-      }
-      .btn-primary {
-        color: white;
-      }
+  // The styles below are no longer needed for the masquerading or student view;
+  // however, we need to keep them for other fixed warnings
+  >*:not(.ic-fixed-bottom-alert) {
+    i {
+      vertical-align: middle;
+      margin-right: 10px;
     }
-    .button-explanation {
-      float: right;
-      font-size: 10px;
-      text-align: right;
-    }
-    .masquerading_avatar {
-      float: left;
-      .avatar {
-        margin: (-9px) 10px 0 0;
-        width: 44px;
-        height: 44px;
-      }
+    b {
+      line-height: 28px;
+      vertical-align: middle;
     }
   }
   .fixed_warning {

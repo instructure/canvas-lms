@@ -1,0 +1,48 @@
+/*
+@styleguide Image-Text Combo
+
+## Add an icon or avatar image to your text the right way
+
+The Icon-Text Combo is a tiny component for when you want to use an avatar or icon with a headline or sentence, and not have the text wrap around the icon in an unsightly fashion.
+
+```html
+
+<div class="grid-row">
+  <div class="col-xs-12 col-lg-6">
+    <div class="ic-image-text-combo">
+      <div class="ic-avatar">
+        <img src="/images/panda-profile-placeholder.jpg" alt="Profile image" />
+      </div>
+      <div class="ic-image-text-combo__text">
+        Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr.
+      </div>
+    </div>
+  </div>
+  <div class="col-xs-12 col-lg-6">
+    <div class="ic-image-text-combo">
+      <i class="icon-assignment"></i>
+      <div class="ic-image-text-combo__text">
+        Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr.
+      </div>
+    </div>
+  </div>
+</div>
+
+```
+*/
+
+.ic-image-text-combo {
+  display: flex;
+  align-items: center;
+  @include overwrite-default-icon-size(18px);
+  // We don't know if it will be an icon or avatar (or something else) next to the text, hence the *
+  > * + .ic-image-text-combo__text {
+    margin-left: $ic-sp;
+  }
+}
+
+.ic-image-text-combo__text {
+  flex: 1;
+  line-height: 1.2;
+  padding: 0; margin: 0;
+}

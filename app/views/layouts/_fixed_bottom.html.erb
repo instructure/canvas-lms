@@ -10,30 +10,38 @@
   <% end %>
 <% if @real_current_user && @real_current_user != @current_user %>
   <% if @current_user.fake_student? %>
-    <div id="masquerade_bar" class="ui-widget ui-state-default">
+    <div id="masquerade_bar" class="ic-fixed-bottom-alert">
       <% student_view_course = @current_user.all_courses.first %>
-      <i class="icon-student-view"></i>
-      <b><%= t('student_view.warning_title', "You are currently logged into Student View") %></b>
-      <div class="buttons">
-        <%= link_to t('student_view.reset', "Reset Student"), course_test_student_path(student_view_course), 'data-method' => :delete, :rel => 'nofollow', :class => 'btn reset_test_student'%>
-        <%= link_to t('student_view.leave', "Leave Student View"), course_student_view_path(student_view_course), 'data-method' => :delete, :rel => 'nofollow', :class => 'btn btn-primary leave_student_view'%>
+      <div class="ic-fixed-bottom-module ic-fixed-bottom-module--header">
+        <div class="ic-image-text-combo">
+          <i class="icon-student-view"></i>
+          <div class="ic-image-text-combo__text"><%= t('student_view.warning_title', "You are currently logged into Student View") %></div>
+        </div>
       </div>
-      <div class="button-explanation">
-        <span>
-          <%= t('student_view.reset_explanation', "Resetting the test student will clear all history for this student, %{line_break}allowing you to view the course as a brand new student.", :line_break => raw("<br />")) %>
-        </span>
+      <div class="button-explanation ic-fixed-bottom-module ic-fixed-bottom-module--description">
+        <%= t('student_view.reset_explanation', "Resetting the test student will clear all history for this student, allowing you to view the course as a brand new student.") %>
+      </div>
+      <div class="buttons ic-fixed-bottom-module ic-fixed-bottom-module--buttons">
+        <%= link_to t('student_view.reset', "Reset Student"), course_test_student_path(student_view_course), 'data-method' => :delete, :rel => 'nofollow', :class => 'Button Button--small reset_test_student'%>
+        <%= link_to t('student_view.leave', "Leave Student View"), course_student_view_path(student_view_course), 'data-method' => :delete, :rel => 'nofollow', :class => 'Button Button--small Button--primary leave_student_view'%>
       </div>
     </div>
   <% else %>
-    <div id="masquerade_bar" class="ui-widget ui-state-default">
-      <% if service_enabled?(:avatars) %>
-        <div class="masquerading_avatar">
-          <%= avatar(@current_user, url: nil) %>
+    <div id="masquerade_bar" class="ic-fixed-bottom-alert">
+      <div class="ic-fixed-bottom-module ic-fixed-bottom-module--header">
+        <div class="ic-image-text-combo">
+          <% if service_enabled?(:avatars) %>
+            <div class="masquerading_avatar">
+              <%= avatar(@current_user, url: nil) %>
+            </div>
+          <% end %>
+          <div class="ic-image-text-combo__text">
+            <%= t('masquerading.warning_title', "You are currently masquerading as %{user_name}", :user_name => @current_user.short_name) %>
+          </div>
         </div>
-      <% end %>
-      <b><%= t('masquerading.warning_title', "You are currently masquerading as %{user_name}", :user_name => @current_user.short_name) %></b>
-      <div class="buttons">
-        <%= link_to t('masquerading.stop', "Stop Masquerading"), user_masquerade_url(@real_current_user.id), 'data-method' => :post, :rel => 'nofollow', :class => 'btn btn-primary stop_masquerading'%>
+      </div>
+      <div class="buttons ic-fixed-bottom-module ic-fixed-bottom-module--buttons">
+        <%= link_to t('masquerading.stop', "Stop Masquerading"), user_masquerade_url(@real_current_user.id), 'data-method' => :post, :rel => 'nofollow', :class => 'Button Button--primary stop_masquerading' %>
       </div>
     </div>
   <% end %>
