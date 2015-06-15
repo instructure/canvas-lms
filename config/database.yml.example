@@ -12,12 +12,7 @@ development:
   encoding: utf8
   database: canvas_development
   timeout: 5000
-  queue:
-    adapter: postgresql
-    encoding: utf8
-    database: canvas_queue_development
-    timeout: 5000
-    
+
 production:
   adapter: postgresql
   encoding: utf8
