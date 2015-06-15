@@ -726,6 +726,27 @@ describe Account do
       expect(tabs.map{|t| t[:id] }).to be_include(tool.asset_string)
     end
 
+    it "should use localized labels" do
+      tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret",
+                                                 :url => "http://example.com")
+
+      account_navigation = {
+          :text => 'this should not be the title',
+          :url => 'http://www.example.com',
+          :labels => {
+              'en' => 'English Label',
+              'sp' => 'Spanish Label'
+          }
+      }
+
+      tool.settings[:account_navigation] = account_navigation
+      tool.save!
+
+      tabs = @account.external_tool_tabs({})
+
+      expect(tabs.first[:label]).to eq "English Label"
+    end
+
     it 'includes message handlers' do
       mock_tab = {
         :id => '1234',

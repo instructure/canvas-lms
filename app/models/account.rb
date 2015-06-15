@@ -1249,7 +1249,7 @@ class Account < ActiveRecord::Base
     tools.sort_by(&:id).map do |tool|
      {
         :id => tool.asset_string,
-        :label => tool.label_for(:account_navigation, opts[:language]),
+        :label => tool.label_for(:account_navigation, opts[:language] || I18n.locale),
         :css_class => tool.asset_string,
         :visibility => tool.account_navigation(:visibility),
         :href => :account_external_tool_path,

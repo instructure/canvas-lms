@@ -150,7 +150,7 @@ class ApplicationController < ActionController::Base
     extension_settings = [:icon_url] + custom_settings
     tools.map do |tool|
       hash = {
-          :title => tool.label_for(type),
+          :title => tool.label_for(type, I18n.locale),
           :base_url => named_context_url(context, :context_external_tool_path, tool, :launch_type => type)
       }
       extension_settings.each do |setting|

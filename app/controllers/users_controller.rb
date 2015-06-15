@@ -1051,7 +1051,7 @@ class UsersController < ApplicationController
     @lti_launch.params = adapter.generate_post_payload
 
     @lti_launch.resource_url = @tool.user_navigation(:url)
-    @lti_launch.link_text = @tool.label_for(:user_navigation)
+    @lti_launch.link_text = @tool.label_for(:user_navigation, I18n.locale)
     @lti_launch.analytics_id = @tool.tool_id
 
     @active_tab = @tool.asset_string

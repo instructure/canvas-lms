@@ -418,7 +418,7 @@ class ExternalToolsController < ApplicationController
     lti_launch.params = assignment ? adapter.generate_post_payload_for_homework_submission(assignment) : adapter.generate_post_payload
 
     lti_launch.resource_url = adapter.launch_url
-    lti_launch.link_text = tool.label_for(selection_type.to_sym)
+    lti_launch.link_text = tool.label_for(selection_type.to_sym, I18n.locale)
     lti_launch.analytics_id = tool.tool_id
     lti_launch
   end
@@ -510,7 +510,7 @@ class ExternalToolsController < ApplicationController
     lti_launch.resource_url = tool.extension_setting(placement, :url)
     lti_launch.params = LtiOutbound::ToolLaunch.generate_params(params, lti_launch.resource_url, tool.consumer_key, tool.shared_secret,
                                                                 disable_lti_post_only: @context.root_account.feature_enabled?(:disable_lti_post_only))
-    lti_launch.link_text = tool.label_for(placement.to_sym)
+    lti_launch.link_text = tool.label_for(placement.to_sym, I18n.locale)
     lti_launch.analytics_id = tool.tool_id
 
     lti_launch

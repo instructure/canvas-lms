@@ -440,7 +440,7 @@ module ApplicationHelper
           having_setting('editor_button').polymorphic_where(context: contexts)
       tools.sort_by(&:id).map do |tool|
         {
-          :name => tool.label_for(:editor_button, nil),
+          :name => tool.label_for(:editor_button, I18n.locale),
           :id => tool.id,
           :url => tool.editor_button(:url),
           :icon_url => tool.editor_button(:icon_url),

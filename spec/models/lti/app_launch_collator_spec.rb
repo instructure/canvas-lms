@@ -73,7 +73,7 @@ module Lti
         expect(definition).to eq( {
           :definition_type => tool.class.name,
           :definition_id => tool.id,
-          :name => tool.name,
+          :name => tool.label_for(placements.first, I18n.locale),
           :description => tool.description,
           :domain => nil,
           :placements => {
@@ -89,6 +89,30 @@ module Lti
             }
           }
         })
+      end
+
+      it 'uses localized labels' do
+        tool = account.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret",
+                                                  :url => "http://example.com")
+
+        assignment_selection = {
+            :text => 'this should not be the title',
+            :url => 'http://www.example.com',
+            :labels => {
+                'en' => 'English Label',
+                'sp' => 'Spanish Label'
+            }
+        }
+
+        tool.settings[:assignment_selection] = assignment_selection
+
+        tool.save!
+
+        placements = [:assignment_selection]
+        tools_collection = described_class.bookmarked_collection(account, placements).paginate(per_page: 100).to_a
+
+        definitions = described_class.launch_definitions(tools_collection, placements)
+        expect(definitions[0][:name]).to eq "English Label"
       end
 
       it 'returns resource_selection tools' do

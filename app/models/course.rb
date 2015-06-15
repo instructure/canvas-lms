@@ -2406,7 +2406,7 @@ class Course < ActiveRecord::Base
     tools.sort_by(&:id).map do |tool|
      {
         :id => tool.asset_string,
-        :label => tool.label_for(:course_navigation, opts[:language]),
+        :label => tool.label_for(:course_navigation, opts[:language] || I18n.locale),
         :css_class => tool.asset_string,
         :href => :course_external_tool_path,
         :visibility => tool.course_navigation(:visibility),
