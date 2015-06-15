@@ -119,6 +119,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     self.workflow_state = 'deleted'
     self.save!
     enable_canvas_authentication
+    send_later_if_production(:soft_delete_pseudonyms)
   end
   alias_method :destroy!, :destroy
 
@@ -145,6 +146,11 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   end
 
   def self.serialization_excludes; [:auth_crypted_password, :auth_password_salt]; end
+
+  private
+  def soft_delete_pseudonyms
+    pseudonyms.find_each(&:destroy)
+  end
 
   def enable_canvas_authentication
     return if account.non_canvas_auth_configured?

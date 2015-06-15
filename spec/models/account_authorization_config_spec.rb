@@ -105,6 +105,15 @@ describe AccountAuthorizationConfig do
       found = AccountAuthorizationConfig.find(aac.id)
       expect(found).to_not be_nil
     end
+
+    it "soft-deletes associated pseudonyms" do
+      user = user_model
+      pseudonym = user.pseudonyms.create!(unique_id: "user@facebook.com")
+      pseudonym.authentication_provider = aac
+      pseudonym.save!
+      aac.destroy
+      expect(pseudonym.reload.workflow_state).to eq("deleted")
+    end
   end
 
   describe ".active" do
