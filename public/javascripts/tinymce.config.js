@@ -64,12 +64,34 @@ define([], function(){
       menubar: true,
       remove_script_host: true,
       resize: true,
-      block_formats: "Paragraph=p;Header 2=h2;Header 3=h3;Header 4=h4;Preformatted=pre",
+      block_formats: "Paragraph=p;Header 3=h3;Header 4=h4;Header 5=h5;Block Quote=blockquote",
+
+      style_formats: [
+	{title: 'Intro', inline: 'span', classes: 'bz-intro'},
+	{title: 'Spoiler', inline: 'span', classes: 'bz-spoiler'},
+	{title: 'Video play button', inline: 'span', classes: 'bz-video-link'},
+	{title: 'Quote source', inline: 'span', classes: 'bz-quote-source'},
+	{title: 'Screen Reader Only', inline: 'span', classes: 'bz-screen-reader-text'},
+	{title: 'Hideen from students', inline: 'span', classes: 'bz-hide-from-students'},
+	{title: 'Hidden from everyone', inline: 'span', classes: 'bz-hide-from-all-users'},
+
+	{title: 'Case Study Box', block: 'div', classes: 'bz-case-study-box'},
+	{title: 'Example Box', block: 'div', classes: 'bz-example'},
+	{title: 'Watch Out Box', block: 'div', classes: 'bz-watch-out-box'},
+	{title: 'Helpful Tip Box', block: 'div', classes: 'bz-helpful-tip-box'},
+	{title: 'Diagram Box', block: 'div', classes: 'bz-diagram-box'},
+	{title: 'Resource Box', block: 'div', classes: 'bz-resource-box'},
+	{title: 'Quick Practice Box', block: 'div', classes: 'bz-practice-box'},
+
+	{title: 'To Do List', block: 'ul', classes: 'bz-to-do-item'},
+	{title: 'Pros List', block: 'ul', classes: 'bz-pros'},
+	{title: 'Cons List', block: 'ul', classes: 'bz-cons'}
+      ],
 
       extended_valid_elements: "@[id|accesskey|class|dir|lang|style|tabindex|title|contenteditable|contextmenu|draggable|dropzone|hidden|spellcheck|translate|align|role|aria-labelledby|aria-atomic|aria-busy|aria-controls|aria-describedby|aria-disabled|aria-dropeffect|aria-flowto|aria-grabbed|aria-haspopup|aria-hidden|aria-invalid|aria-label|aria-labelledby|aria-live|aria-owns|aria-relevant|aria-autocomplete|aria-checked|aria-disabled|aria-expanded|aria-haspopup|aria-hidden|aria-invalid|aria-label|aria-level|aria-multiline|aria-multiselectable|aria-orientation|aria-pressed|aria-readonly|aria-required|aria-selected|aria-sort|aria-valuemax|aria-valuemin|aria-valuenow|aria-valuetext],iframe[src|width|height|name|align|style|class|sandbox|allowfullscreen|webkitallowfullscreen|mozallowfullscreen],i[iclass],a[hidden|href|target|rel|media|hreflang|type|charset|name|rev|shape|coords|download],div,span,#p,h2,h3,h4,h5,h6,header,ul,ol,li[value],ol[reversed|start|type|compact],pre[width],table[border|summary|width|frame|rules|cellspacing|cellpadding|bgcolor],tbody[char|charoff|valign],td[colspan|rowspan|headers|abbr|axis|scope|align|char|charoff|valign|nowrap|bgcolor|width|height],tfoot[char|charoff|valign],th[colspan|rowspan|headers|scope|abbr|axis|align|char|charoff|valign|nowrap|bgcolor|width|height],thead[char|charoff|valign],title,tr[char|charoff|valign|bgcolor],ul[compact]",
 
       non_empty_elements: "td th iframe video audio object script a i area base basefont br col frame hr img input isindex link meta param embed source wbr track",
-      content_css: "/stylesheets_compiled/legacy_normal_contrast/bundles/what_gets_loaded_inside_the_tinymce_editor.css",
+      content_css: "/stylesheets_compiled/legacy_normal_contrast/bundles/what_gets_loaded_inside_the_tinymce_editor.css," + window.bz_custom_css_url,
       browser_spellcheck: true
     };
   };
@@ -121,7 +143,7 @@ define([], function(){
    */
   EditorConfig.prototype.formatBtnGroup = "bold,italic,underline,forecolor,backcolor,removeformat,alignleft,aligncenter,alignright";
   EditorConfig.prototype.positionBtnGroup = "outdent,indent,superscript,subscript,bullist,numlist";
-  EditorConfig.prototype.fontBtnGroup = "ltr,rtl,fontsizeselect,formatselect";
+  EditorConfig.prototype.fontBtnGroup = "ltr,rtl,formatselect,styleselect";
 
 
   /**
