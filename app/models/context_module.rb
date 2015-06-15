@@ -65,6 +65,10 @@ class ContextModule < ActiveRecord::Base
         # ditto with removing a prerequisite
         @relock_warning = true if (self.prerequisites.to_a - self.prerequisites_was.to_a).present?
       end
+      if self.unlock_at_changed?
+        # adding a unlock_at date should trigger
+        @relock_warning = true if self.unlock_at.present? && self.unlock_at_was.blank?
+      end
     end
   end
 
