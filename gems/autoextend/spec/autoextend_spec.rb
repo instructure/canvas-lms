@@ -1,7 +1,7 @@
 require 'minitest/autorun'
 require 'autoextend'
 
-describe Autoextend::ObjectMethods do
+describe Autoextend do
   before do
     module AutoextendSpec; end
   end

@@ -16,13 +16,9 @@ module Autoextend
   end
   private_constant :Extension
 
-  def self.extensions
-    @extensions ||= {}
-  end
-
   def self.const_added(const)
     return [] unless const.name
-    Autoextend.extensions.fetch(const.name.to_sym, []).each do |extension|
+    extensions.fetch(const.name.to_sym, []).each do |extension|
       extension.extend(const)
     end
   end
@@ -63,94 +59,10 @@ module Autoextend
     nil
   end
 
-  MethodExtension = Struct.new(:target, :feature) do
-    # based off ActiveSupport's alias_method_chain
-    def extend(klass)
-      return if klass.instance_variable_get(:@autoextending)
-      begin
-        klass.instance_variable_set(:@autoextending, true)
+  private
 
-        # Strip out punctuation on predicates, bang or writer methods since
-        # e.g. target?_without_feature is not a valid method name.
-        aliased_target, punctuation = target.to_s.sub(/([?!=])$/, ''), $1
-
-        with_method = "#{aliased_target}_with_#{feature}#{punctuation}"
-        without_method = "#{aliased_target}_without_#{feature}#{punctuation}"
-
-        # make sure we're not inserting ourselves multiples times (could be
-        # caused by someone else doing an alias_method_chain)
-        return if klass.method_defined?(without_method)
-
-        klass.send(:alias_method, without_method, target)
-        klass.send(:alias_method, target, with_method)
-
-        case
-          when klass.public_method_defined?(without_method)
-            klass.send(:public, target)
-          when klass.protected_method_defined?(without_method)
-            klass.send(:protected, target)
-          when klass.private_method_defined?(without_method)
-            klass.send(:private, target)
-        end
-      ensure
-        klass.instance_variable_set(:@autoextending, false)
-      end
-    end
-  end
-
-  def self.included(klass)
-    klass.extend(KlassMethods)
-  end
-
-  module KlassMethods
-    def singleton_method_added(method)
-      singleton_autoextensions.fetch(method, []).each do |extension|
-        extension.extend(self.singleton_class)
-      end
-      super
-    end
-
-    def method_added(method)
-      autoextensions.fetch(method, []).each do |extension|
-        extension.extend(self)
-      end
-      super
-    end
-
-    def autoextensions
-      @autoextensions ||= {}
-    end
-
-    def singleton_autoextensions
-      @autoextensions ||= {}
-    end
-
-    def autoextend_singleton(method, feature)
-      extension = autoextend_method(method, feature, singleton_autoextensions)
-      if singleton_class.method_defined?(method) && method(method).owner == singleton_class
-        extension.extend(singleton_class)
-      end
-    end
-
-    def autoextend(method, feature)
-      extension = autoextend_method(method, feature, autoextensions)
-      if method_defined?(method) && instance_method(method).owner == self
-        extension.extend(self)
-      end
-    end
-
-    private
-    def autoextend_method(method, feature, extensions)
-      method_extensions = (extensions[method] ||= [])
-      method_extensions << (extension = MethodExtension.new(method, feature))
-      extension
-    end
-  end
-end
-
-module Autoextend::ObjectMethods
-  def autoextend_class(klass_name, module_name = nil, method = :prepend, &block)
-    Autoextend.hook(klass_name, module_name, method: method, &block)
+  def self.extensions
+    @extensions ||= {}
   end
 end
 
@@ -177,6 +89,5 @@ module Autoextend::ModuleMethods
   end
 end
 
-Object.send(:include, Autoextend::ObjectMethods)
 Module.prepend(Autoextend::ModuleMethods)
 Class.prepend(Autoextend::ClassMethods)
