@@ -1,4 +1,5 @@
 require 'rack-mini-profiler'
+require 'flamegraph'
 
 Permissions.register :app_profiling,
   :label => lambda { I18n.t('#role_override.permissions.app_profiling', "Application Profiling") },
