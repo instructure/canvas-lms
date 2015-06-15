@@ -372,7 +372,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def questions_as_object
-    self.quiz_data || {}
+    self.quiz_data || []
   end
 
   def quiz_question_ids
