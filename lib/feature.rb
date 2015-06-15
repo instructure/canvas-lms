@@ -333,13 +333,22 @@ END
       },
     'bulk_sis_grade_export' =>
       {
-      display_name: -> { I18n.t('Allow Bulk Grade Export to SIS') },
-      description:  -> { I18n.t('Allows teachers to mark grade data to be exported in bulk to SIS integrations.') },
-      applies_to: 'RootAccount',
-      state: 'hidden',
-      root_opt_in: true,
-      beta: true
-    }
+          display_name: -> { I18n.t('Allow Bulk Grade Export to SIS') },
+          description:  -> { I18n.t('Allows teachers to mark grade data to be exported in bulk to SIS integrations.') },
+          applies_to: 'RootAccount',
+          state: 'hidden',
+          root_opt_in: true,
+          beta: true
+      },
+    'nc_or' =>
+        {
+            display_name: -> { I18n.t('Enable "OR" Condition for Modules') },
+            description:  -> { I18n.t('If enabled, modules will have the option to be marked as complete when only one of the requirements is met.') },
+            applies_to: 'Course',
+            state: 'hidden_in_prod',
+            development: true,
+            root_opt_in: true
+        }
   )
 
   def self.definitions
