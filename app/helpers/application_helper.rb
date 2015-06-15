@@ -731,17 +731,28 @@ module ApplicationHelper
   # used for generating a
   # prompt for use with date pickers
   # so it doesn't need to be declared all over the place
-  def datepicker_screenreader_prompt
+  def datepicker_screenreader_prompt(format_input="datetime")
     prompt_text = I18n.t("#helpers.accessible_date_prompt", "Format Like")
-    format = accessible_date_format
+    format = accessible_date_format(format_input)
     "#{prompt_text} #{format}"
   end
 
+  ACCEPTABLE_FORMAT_TYPES = ['date', 'time', 'datetime'].freeze
   # useful for presenting a consistent
   # date format to screenreader users across the app
   # when telling them how to fill in a datetime field
-  def accessible_date_format
-    I18n.t("#helpers.accessible_date_format", "YYYY-MM-DD hh:mm")
+  def accessible_date_format(format='datetime')
+    if !ACCEPTABLE_FORMAT_TYPES.include?(format)
+      raise ArgumentError, "format must be one of #{ACCEPTABLE_FORMAT_TYPES.join(",")}"
+    end
+
+    if format == 'date'
+      I18n.t("#helpers.accessible_date_only_format", "YYYY-MM-DD")
+    elsif format == 'time'
+      I18n.t("#helpers.accessible_time_only_format", "hh:mm")
+    else
+      I18n.t("#helpers.accessible_date_format", "YYYY-MM-DD hh:mm")
+    end
   end
 
   # render a link with a tooltip containing a summary of due dates

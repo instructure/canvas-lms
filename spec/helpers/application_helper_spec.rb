@@ -169,6 +169,22 @@ describe ApplicationHelper do
     it "wraps a prompt around the format for Screenreader users" do
       expect(datepicker_screenreader_prompt).to include(accessible_date_format)
     end
+
+    it "produces a date-only format" do
+      format = accessible_date_format('date')
+      expect(format).to match(/YYYY/)
+      expect(format).to_not match(/hh:mm/)
+    end
+
+    it "produces a time-only format" do
+      format = accessible_date_format('time')
+      expect(format).to_not match(/YYYY/)
+      expect(format).to match(/hh:mm/)
+    end
+
+    it "throws an argument error for a foolish format" do
+      expect{ accessible_date_format('nonsense') }.to raise_error(ArgumentError)
+    end
   end
 
   describe "cache_if" do

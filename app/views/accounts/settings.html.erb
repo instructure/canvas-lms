@@ -968,19 +968,54 @@ acknowledge that you have read and agreed to the
         <% end %>
       </ul>
       <% if can_do(@account, @current_user, :manage_alerts) %>
-        <a href="#" class="btn btn-primary element_toggler" role="button" data-hide-while-target-shown="true" aria-controls="add_notification_form"><i class="icon-add"></i> <%= t(:add_announcement_link, "Add a New Announcement") %></a>
-        <%= form_for :account_notification, :url => account_account_notifications_url(@account), :html => {:id => "add_notification_form", :style => 'display: none;', :class => 'well', :role => "region" } do |f| %>
+        <a href="#" class="btn btn-primary element_toggler" role="button" data-hide-while-target-shown="true" aria-controls="add_notification_form">
+          <i class="icon-add"></i> <%= t(:add_announcement_link, "Add a New Announcement") %>
+        </a>
+        <%= form_for :account_notification,
+                     url: account_account_notifications_url(@account),
+                     html: {
+                       id: "add_notification_form",
+                       style: 'display: none;',
+                       class: 'well',
+                       role: "region" } do |f| %>
           <table class="formtable">
             <tr>
-              <td><%= f.blabel :subject, :en => "Subject" %></td>
+              <td><%= f.blabel :subject, en: "Subject" %></td>
               <td><%= f.text_field :subject %></td>
-            </tr><tr>
-              <td><%= f.blabel :start_at, :en => "Starts" %></td>
-              <td><%= f.text_field :start_at, :class => 'datetime_field' %></td>
-            </tr><tr>
-              <td><%= f.blabel :end_at, :en => "Ends" %></td>
-              <td><%= f.text_field :end_at, :class => 'datetime_field' %></td>
-            </tr><tr>
+            </tr>
+            <tr>
+              <td>
+                <%= f.blabel :start_at, en: "Starts" %>
+                <label class="screenreader-only" id="announcment_starts_at_label">
+                  <%= t("Announcement starts at") %>
+                  <%= datepicker_screenreader_prompt %>
+                </label>
+              </td>
+              <td>
+                <%= f.text_field :start_at,
+                                 class: 'datetime_field',
+                                 "aria-labelledby" => "announcement_starts_at_label",
+                                 "data-tooltip" => "",
+                                 title: accessible_date_format %>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <%= f.blabel :end_at, en: "Ends" %>
+                <label class="screenreader-only" id="announcment_ends_at_label">
+                  <%= t("Announcement ends at") %>
+                  <%= datepicker_screenreader_prompt %>
+                </label>
+              </td>
+              <td>
+                <%= f.text_field :end_at,
+                                 class: 'datetime_field',
+                                 "aria-labelledby" => "announcement_ends_at_label",
+                                 "data-tooltip" => "",
+                                 title: accessible_date_format %>
+              </td>
+            </tr>
+            <tr>
               <td><%= f.blabel :account_notification_icon, :en => "Icon" %></td>
               <td>
                 <select id="account_notification_icon" name="account_notification[icon]">
