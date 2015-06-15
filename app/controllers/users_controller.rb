@@ -1783,28 +1783,11 @@ class UsersController < ApplicationController
     end
   end
 
-  def require_self_registration
-    get_context
-    @context = @domain_root_account || Account.default unless @context.is_a?(Account)
-    @context = @context.root_account
-    unless @context.grants_right?(@current_user, session, :manage_user_logins) ||
-        @context.self_registration_allowed_for?(params[:user] && params[:user][:initial_enrollment_type])
-      flash[:error] = t('no_self_registration', "Self registration has not been enabled for this account")
-      respond_to do |format|
-        format.html { redirect_to root_url }
-        format.json { render :json => {}, :status => 403 }
-      end
-      return false
-    end
-  end
-
   def all_menu_courses
     render :json => Rails.cache.fetch(['menu_courses', @current_user].cache_key) {
       map_courses_for_menu(@current_user.courses_with_primary_enrollment)
     }
   end
-
-  protected :require_self_registration
 
   def teacher_activity
     @teacher = User.find(params[:user_id])
@@ -1969,6 +1952,23 @@ class UsersController < ApplicationController
 
 
     Canvas::ICU.collate_by(data.values) { |e| e[:enrollment].user.sortable_name }
+  end
+
+  protected
+
+  def require_self_registration
+    get_context
+    @context = @domain_root_account || Account.default unless @context.is_a?(Account)
+    @context = @context.root_account
+    unless @context.grants_right?(@current_user, session, :manage_user_logins) ||
+        @context.self_registration_allowed_for?(params[:user] && params[:user][:initial_enrollment_type])
+      flash[:error] = t('no_self_registration', "Self registration has not been enabled for this account")
+      respond_to do |format|
+        format.html { redirect_to root_url }
+        format.json { render :json => {}, :status => 403 }
+      end
+      return false
+    end
   end
 
   private
