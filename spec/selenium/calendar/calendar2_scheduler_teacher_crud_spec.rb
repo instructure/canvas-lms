@@ -1,6 +1,6 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/calendar2_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/scheduler_common')
+require File.expand_path(File.dirname(__FILE__) + '/../common')
+require File.expand_path(File.dirname(__FILE__) + '/../helpers/calendar2_common')
+require File.expand_path(File.dirname(__FILE__) + '/../helpers/scheduler_common')
 
 describe "scheduler" do
   include_examples "in-process server selenium tests"
