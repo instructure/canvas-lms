@@ -72,7 +72,7 @@ define([], function(){
 	{title: 'Video play button', inline: 'span', classes: 'bz-video-link'},
 	{title: 'Quote source', inline: 'span', classes: 'bz-quote-source'},
 	{title: 'Screen Reader Only', inline: 'span', classes: 'bz-screen-reader-text'},
-	{title: 'Hideen from students', inline: 'span', classes: 'bz-hide-from-students'},
+	{title: 'Hidden from students', inline: 'span', classes: 'bz-hide-from-students'},
 	{title: 'Hidden from everyone', inline: 'span', classes: 'bz-hide-from-all-users'},
 
 	{title: 'Case Study Box', block: 'div', classes: 'bz-case-study-box'},
