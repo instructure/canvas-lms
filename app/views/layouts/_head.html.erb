@@ -36,6 +36,7 @@
   <%= include_account_css %>
   <script>
     window.bz_custom_css_url = <%= custom_css_url.to_json.html_safe %>;
+  </script>
   <script>
     // listen for any clicks on links that have href="#" and queue them to be fired on dom ready.
       function _earlyClick(e){
