@@ -407,6 +407,12 @@ class AccountsController < ApplicationController
   # @argument account[default_group_storage_quota_mb] [Integer]
   #   The default group storage quota to be used, if not otherwise specified.
   #
+  # @argument account[settings][restrict_student_past_view] [Boolean]
+  #   Restrict students from viewing courses after end date
+  #
+  # @argument account[settings][restrict_student_future_view] [Boolean]
+  #   Restrict students from viewing courses before start date
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/<account_id> \
   #     -X PUT \
