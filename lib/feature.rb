@@ -348,7 +348,16 @@ END
             state: 'hidden_in_prod',
             development: true,
             root_opt_in: true
-        }
+        },
+    'use_new_tree' =>
+    {
+      display_name: -> { I18n.t('Use new folder tree in Files')},
+      description: -> {I18n.t('Replaces the current folder tree with a new accessible and more feature rich folder tree.')},
+      applies_to: 'Course',
+      state: 'hidden',
+      development: true,
+      root_opt_in: true
+    }
   )
 
   def self.definitions
