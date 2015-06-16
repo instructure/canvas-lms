@@ -319,7 +319,7 @@ describe ContentMigration do
       group3.assessment_question_bank = bank3
       group3.save
 
-      run_course_copy(["User didn't have permission to reference question bank in quiz group Question Group"])
+      run_course_copy(["User didn't have permission to reference question bank in quiz group #{group3.name}"])
 
       q = @copy_to.quizzes.where(migration_id: mig_id(q1)).first
       expect(q).not_to be_nil
@@ -726,7 +726,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
       quiz = @copy_from.quizzes.create!(:title => "ruhroh")
 
-      group1 = quiz.quiz_groups.create!(:name => "group", :pick_count => 1, :question_points => 5.0)
+      group1 = quiz.quiz_groups.create!(:name => "group", :pick_count => 2, :question_points => 5.0)
       group1.assessment_question_bank = bank1
       group1.save
       group2 = quiz.quiz_groups.create!(:name => "group2", :pick_count => 1, :question_points => 2.0)
@@ -747,6 +747,8 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       group2_copy = quiz_copy.quiz_groups.where(:migration_id => mig_id(group2)).first
 
       expect(group1_copy.assessment_question_bank_id).to eq bank1_copy.id
+      expect(group1_copy.pick_count).to eq group1.pick_count
+      expect(group1_copy.name).to eq group1.name
       expect(group2_copy.assessment_question_bank_id).to eq bank2_copy.id
     end
 
