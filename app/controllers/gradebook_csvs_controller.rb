@@ -23,8 +23,8 @@ class GradebookCsvsController < ApplicationController
   def show
     if authorized_action(@context, @current_user, :manage_grades)
       current_time = Time.zone.now.to_formatted_s(:short)
-      name = t('grades_filename', "Grades") + "-" + @context.name.to_s
-      filename = "#{current_time}_#{name}.csv".gsub(/ /, '_')
+      name = t('grades_filename', "Grades") + "-" + @context.short_name.to_s
+      filename = "#{current_time}_#{name}.csv".gsub(%r{/| }, '_') # SFU MOD - REPLACE SLASH WITH UNDERSCORE
 
       csv_options = {
         include_sis_id: @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis)
