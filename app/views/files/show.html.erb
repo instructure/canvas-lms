@@ -4,7 +4,7 @@
 <% add_crumb @attachment.display_name, context_url(@context, :context_file_url, @attachment) %>
 <% download_url = context_url(@context, :context_file_download_url, @attachment.id) %>
 <% js_bundle 'module_sequence_footer' %>
-<% if !can_do(@context, @current_user, :manage_files) && (locked = @attachment.locked_for?(@current_user)) %>
+<% if !can_do(@attachment.context, @current_user, :manage_files) && (locked = @attachment.locked_for?(@current_user)) %>
   <div style="margin: 10px 50px;">
     <% if @attachment.folder && @attachment.folder.locked? %>
       <%= t 'messages.folder_locked', "The folder \"%{folder},\" which includes this file, has been locked.", :folder => @attachment.folder.name %>

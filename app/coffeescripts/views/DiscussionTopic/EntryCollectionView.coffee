@@ -6,7 +6,7 @@ define [
   'jst/discussions/EntryCollectionView'
   'jst/discussions/entryStats'
   'compiled/views/DiscussionTopic/EntryView'
-], (I18n, $, walk, {View}, template, entryStats, EntryView) ->
+], (I18n, $, walk, {View}, template, entryStatsTemplate, EntryView) ->
 
   class EntryCollectionView extends View
 
@@ -110,7 +110,7 @@ define [
           one: "Show one reply"
           other: "Show all %{count} replies"
           {count: stats.total + @collection.options.perPage}
-      @nextLink.html entryStats({stats, moreText, showMore: yes})
+      @nextLink.html entryStatsTemplate({stats, moreText, showMore: yes})
       @nextLink.addClass 'showMore loadNext'
       if @options.threaded
         @nextLink.insertAfter @list

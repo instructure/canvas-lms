@@ -22,7 +22,7 @@ module IncomingMail
       secure_id, original_message_id = parse_tag(tag)
       raise IncomingMail::Errors::SilentIgnore unless original_message_id
 
-      original_message = Message.find_by_id(original_message_id)
+      original_message = Message.where(id: original_message_id).first
       # This prevents us from rebouncing users that have auto-replies setup -- only bounce something
       # that was sent out because of a notification.
       raise IncomingMail::Errors::SilentIgnore unless original_message && original_message.notification_id
@@ -69,7 +69,7 @@ module IncomingMail
       outgoing_message_delivered = false
 
       original_message.shard.activate do
-        comch = CommunicationChannel.active.find_by_path_and_path_type(incoming_from, 'email')
+        comch = CommunicationChannel.active.where(path: incoming_from, path_type: 'email').first
         outgoing_message.communication_channel = comch
         outgoing_message.user = comch.try(:user)
         if outgoing_message.communication_channel
@@ -95,7 +95,7 @@ module IncomingMail
       case error
         when IncomingMail::Errors::ReplyToLockedTopic
           ndr_subject = I18n.t('lib.incoming_message_processor.locked_topic.subject', "Message Reply Failed: %{subject}", :subject => subject)
-          ndr_body = I18n.t('lib.incoming_message_processor.locked_topic.body', <<-BODY, :subject => subject).strip_heredoc
+          ndr_body = I18n.t('lib.incoming_message_processor.locked_topic.body', <<-BODY, :subject => subject).gsub(/^ +/, '')
           The message titled "%{subject}" could not be delivered because the discussion topic is locked. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
           Thank you,
@@ -103,7 +103,7 @@ module IncomingMail
           BODY
         else # including IncomingMessageProcessor::UnknownAddressError
           ndr_subject = I18n.t('lib.incoming_message_processor.failure_message.subject', "Message Reply Failed: %{subject}", :subject => subject)
-          ndr_body = I18n.t('lib.incoming_message_processor.failure_message.body', <<-BODY, :subject => subject).strip_heredoc
+          ndr_body = I18n.t('lib.incoming_message_processor.failure_message.body', <<-BODY, :subject => subject).gsub(/^ +/, '')
           The message titled "%{subject}" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
           Thank you,
@@ -115,7 +115,7 @@ module IncomingMail
     end
 
     def valid_secure_id?(original_message, secure_id)
-      secure_id == IncomingMail::ReplyToAddress.new(original_message).secure_id
+      Canvas::Security.verify_hmac_sha1(secure_id, original_message.global_id.to_s)
     end
 
     def valid_user_and_context?(context, user)

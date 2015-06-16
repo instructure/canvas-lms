@@ -33,7 +33,6 @@ module CC
           meta_fields[:editing_roles] = page.editing_roles
           meta_fields[:notify_of_update] = page.notify_of_update
           meta_fields[:workflow_state] = page.workflow_state
-          meta_fields[:workflow_state] = 'unpublished' if page.hide_from_students && page.workflow_state == 'active'
           meta_fields[:front_page] = page.is_front_page?
 
           File.open(path, 'w') do |file|

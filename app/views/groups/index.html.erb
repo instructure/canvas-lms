@@ -12,6 +12,10 @@
   <% @groups.each do |group| %>
     <li>
       <%= link_to group.name, group_path(group) %>
+      <span class="subtitle"><%= group.context.name %></span>
+      <% if group.context_type == 'Course' && !group.context.enrollment_term.default_term? %>
+        <span class="subtitle"><%= group.context.enrollment_term.name %></span>
+      <% end %>
     </li>
   <% end %>
 </ul>

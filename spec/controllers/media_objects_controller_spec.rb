@@ -30,15 +30,15 @@ describe MediaObjectsController do
       # this test is purposely run with no user logged in to make sure it works in public courses
 
       missing_media_id = "0_12345678"
-      MediaObject.by_media_id(missing_media_id).should be_empty
+      expect(MediaObject.by_media_id(missing_media_id)).to be_empty
 
       get 'show', :media_object_id => missing_media_id
-      json_parse(response.body).should == {
+      expect(json_parse(response.body)).to eq({
               'can_add_captions' => false,
               'media_tracks' => [],
               'media_sources' => []
-      }
-      MediaObject.by_media_id(missing_media_id).first.media_id.should == missing_media_id
+      })
+      expect(MediaObject.by_media_id(missing_media_id).first.media_id).to eq missing_media_id
     end
     
     it "should retrieve info about a 'deleted' MediaObject" do
@@ -49,11 +49,11 @@ describe MediaObjectsController do
       media_object.save!
       
       get 'show', :media_object_id => deleted_media_id
-      json_parse(response.body).should == {
+      expect(json_parse(response.body)).to eq({
           'can_add_captions' => false,
           'media_tracks' => [],
           'media_sources' => []
-      }
+      })
     end
   end
 end

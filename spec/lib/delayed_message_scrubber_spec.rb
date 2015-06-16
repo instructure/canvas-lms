@@ -55,7 +55,7 @@ describe DelayedMessageScrubber do
       messages = old_messages(2)
       scrubber = DelayedMessageScrubber.new
       scrubber.scrub
-      DelayedMessage.where(id: messages.map(&:id)).count.should == 0
+      expect(DelayedMessage.where(id: messages.map(&:id)).count).to eq 0
     end
 
     it 'should not delete messages younger than 90 days' do
@@ -63,7 +63,7 @@ describe DelayedMessageScrubber do
 
       scrubber = DelayedMessageScrubber.new
       scrubber.scrub
-      DelayedMessage.where(id: messages.map(&:id)).count.should == 1
+      expect(DelayedMessage.where(id: messages.map(&:id)).count).to eq 1
     end
 
     it 'should log predicted results if passed dry_run=true' do

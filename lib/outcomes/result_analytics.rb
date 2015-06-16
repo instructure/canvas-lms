@@ -20,7 +20,7 @@ module Outcomes
   module ResultAnalytics
 
     Rollup = Struct.new(:context, :scores)
-    RollupScore = Struct.new(:outcome, :score, :count)
+    Result = Struct.new(:learning_outcome, :score, :count)
 
     # Public: Queries learning_outcome_results for rollup.
     #
@@ -35,11 +35,10 @@ module Outcomes
       required_opts = [:users, :context, :outcomes]
       required_opts.each { |p| raise "#{p} option is required" unless opts[p] }
       users, context, outcomes = opts.values_at(*required_opts)
-
       order_results_for_rollup LearningOutcomeResult.where(
         context_code:        context.asset_string,
         user_id:             users.map(&:id),
-        learning_outcome_id: outcomes.map(&:id),
+        learning_outcome_id: outcomes.map(&:id)
       )
     end
 
@@ -79,13 +78,12 @@ module Outcomes
     def aggregate_outcome_results_rollup(results, context)
       rollups = outcome_results_rollups(results)
       rollup_scores = rollups.map(&:scores).flatten
-      outcome_scores = rollup_scores.group_by(&:outcome)
-
-      aggregate_scores = outcome_scores.map do |outcome, scores|
-        aggregate_score = scores.map(&:score).sum.to_f / scores.size
-        RollupScore.new(outcome, aggregate_score, scores.size)
+      outcome_results = rollup_scores.group_by(&:outcome).values
+      aggregate_results = outcome_results.map do |scores|
+        scores.map{|score| Result.new(score.outcome, score.score, score.count)}
       end
-      Rollup.new(context, aggregate_scores)
+      aggregate_rollups = aggregate_results.map{|result| RollupScore.new(result,{aggregate_score: true})}
+      Rollup.new(context, aggregate_rollups)
     end
 
     # Internal: Generates a rollup of the outcome results, Assuming all the
@@ -96,9 +94,9 @@ module Outcomes
     #
     # Returns an Array of RollupScore objects
     def rollup_user_results(user_results)
-      outcome_scores = user_results.chunk(&:learning_outcome_id).map do |_, outcome_results|
-        user_rollup_score = outcome_results.map(&:score).max
-        RollupScore.new(outcome_results.first.learning_outcome, user_rollup_score, outcome_results.size)
+      filtered_results = user_results.select{|r| r.score != nil}
+      outcome_scores = filtered_results.chunk(&:learning_outcome_id).map do |_, outcome_results|
+        RollupScore.new(outcome_results)
       end
     end
 

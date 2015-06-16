@@ -1,4 +1,4 @@
 <% define_content :link do -%>
-<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.appointment_group.contexts.first) %>/appointment_groups/<%= asset.appointment_group.id %>
+  <%= appointment_group_url(asset.appointment_group) %>
 <% end -%>
 <%= t :message, 'Canvas Alert - Your time slot for "%{appointment_name} was canceled".', :appointment_name => asset.title %>

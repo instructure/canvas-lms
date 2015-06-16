@@ -32,14 +32,14 @@ module Alerts
         context "when there is a start_at set on the course" do
           it "returns true for new courses" do
             interaction_alert = Alerts::Interaction.new(@course, [@student.id], [@teacher.id])
-            interaction_alert.should_not_receive_message?(@student.id, 7).should == true
+            expect(interaction_alert.should_not_receive_message?(@student.id, 7)).to eq true
           end
 
           it "returns false for old courses" do
             @course.start_at = Time.now - 30.days
 
             interaction_alert = Alerts::Interaction.new(@course, [@student.id], [@teacher.id])
-            interaction_alert.should_not_receive_message?(@student.id, 7).should == false
+            expect(interaction_alert.should_not_receive_message?(@student.id, 7)).to eq false
           end
         end
 
@@ -50,7 +50,7 @@ module Alerts
             @course.save!
 
             interaction_alert = Alerts::Interaction.new(@course, [@student.id], [@teacher.id])
-            interaction_alert.should_not_receive_message?(@student.id, 7).should == true
+            expect(interaction_alert.should_not_receive_message?(@student.id, 7)).to eq true
           end
 
           it "returns false for old courses" do
@@ -59,7 +59,7 @@ module Alerts
             @course.save!
 
             interaction_alert = Alerts::Interaction.new(@course, [@student.id], [@teacher.id])
-            interaction_alert.should_not_receive_message?(@student.id, 7).should == false
+            expect(interaction_alert.should_not_receive_message?(@student.id, 7)).to eq false
           end
         end
       end
@@ -76,7 +76,7 @@ module Alerts
         @course.start_at = Time.now - 30.days
 
         interaction_alert = Alerts::Interaction.new(@course, [@student.id], [@teacher.id])
-        interaction_alert.should_not_receive_message?(@student.id, 7).should == true
+        expect(interaction_alert.should_not_receive_message?(@student.id, 7)).to eq true
       end
 
       it "returns false for old submission comments" do
@@ -90,7 +90,7 @@ module Alerts
         @course.start_at = Time.now - 30.days
 
         interaction_alert = Alerts::Interaction.new(@course, [@student.id], [@teacher.id])
-        interaction_alert.should_not_receive_message?(@student.id, 7).should == false
+        expect(interaction_alert.should_not_receive_message?(@student.id, 7)).to eq false
       end
 
       it "returns true for conversation messages" do
@@ -99,7 +99,7 @@ module Alerts
         @course.start_at = Time.now - 30.days
 
         interaction_alert = Alerts::Interaction.new(@course, [@student.id], [@teacher.id])
-        interaction_alert.should_not_receive_message?(@student.id, 7).should == true
+        expect(interaction_alert.should_not_receive_message?(@student.id, 7)).to eq true
       end
 
       it "returns false for old conversation messages" do
@@ -109,10 +109,10 @@ module Alerts
         message.save!
         @course.start_at = Time.now - 30.days
         @conversation.add_participants([user])
-        @conversation.messages.length.should == 2
+        expect(@conversation.messages.length).to eq 2
 
         interaction_alert = Alerts::Interaction.new(@course, [@student.id], [@teacher.id])
-        interaction_alert.should_not_receive_message?(@student.id, 7).should == false
+        expect(interaction_alert.should_not_receive_message?(@student.id, 7)).to eq false
       end
     end
   end

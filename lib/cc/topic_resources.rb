@@ -108,6 +108,7 @@ module CC
       doc.title topic.title
       doc.posted_at ims_datetime(topic.posted_at) if topic.posted_at
       doc.delayed_post_at ims_datetime(topic.delayed_post_at) if topic.delayed_post_at
+      doc.lock_at ims_datetime(topic.lock_at) if topic.lock_at
       doc.position topic.position
       doc.external_feed_identifierref CCHelper.create_key(topic.external_feed) if topic.external_feed
       doc.attachment_identifierref CCHelper.create_key(topic.attachment) if topic.attachment
@@ -119,10 +120,11 @@ module CC
       doc.discussion_type topic.discussion_type
       doc.pinned 'true' if topic.pinned
       doc.require_initial_post 'true' if topic.require_initial_post
+      doc.workflow_state topic.workflow_state
       if topic.assignment && !topic.assignment.deleted?
         assignment_migration_id = CCHelper.create_key(topic.assignment)
         doc.assignment(:identifier=>assignment_migration_id) do |a|
-          AssignmentResources.create_canvas_assignment(a, topic.assignment)
+          AssignmentResources.create_canvas_assignment(a, topic.assignment, @manifest)
         end
       end
     end

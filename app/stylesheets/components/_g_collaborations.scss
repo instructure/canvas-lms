@@ -1,0 +1,188 @@
+
+$dark-blue: #edf4fc;
+$green: #f5fbf7;
+$highlight-blue: #00b5fe;
+
+.collaborations-header {
+  display: block;
+  overflow: hidden;
+  margin-bottom: 14px;
+
+  h1, .h1 {
+    float: left;
+    margin: 0;
+  }
+  .add_collaboration_link {
+    float: right;
+  }
+}
+
+.collaboration {
+  background: url(/images/google_docs.png) no-repeat;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+  margin: 0 0 10px 0;
+  padding: 10px 10px 10px 60px;
+
+  &.etherpad {
+    background: url(/images/ether_pad.png) no-repeat 5px 20px;
+    padding: 10px 10px 10px 85px;
+  }
+
+  .collaboration-header {
+    h2, .h2 {
+      float: left;
+      font-family: arial, sans-serif;
+      font-size: 1.2em;
+      line-height: inherit;
+      margin: 0;
+      border-bottom: 1px solid #cccccc;
+    }
+
+    .links {
+      float: right;
+      line-height: 0.8em;
+    }
+  }
+
+  .description {
+    margin-bottom: 5px;
+  }
+
+  .edit_collaboration {
+    .header, .content, .footer {
+      margin: 0;
+      padding: 0;
+    }
+
+    .header {
+      input[name='collaboration[title]'] {
+        width: 300px;
+      }
+    }
+
+    .content {
+      label {
+        margin-bottom: 0;
+      }
+      textarea {
+        display: block;
+        height: 50px;
+        width: 400px;
+      }
+    }
+  }
+}
+
+.collaborator-picker {
+  .list-wrapper {
+    float: left;
+    height: 300px;
+    overflow-y: scroll;
+    width: 50%;
+  }
+
+  .list-wrapper li {
+    position: relative;
+
+    .icon-end, .icon-add {
+      display: none;
+      position: absolute;
+      right: 5px;
+      top: 4px;
+    }
+
+    &:hover .icon-end, &:hover .icon-add,
+    a:focus .icon-end, a:focus .icon-add {
+      display: block;
+    }
+  }
+
+  .loading-wrapper { text-align: center; }
+  .loading-wrapper img { margin: 16px auto; }
+
+  .list-wrapper ul             { display: none; }
+  .list-wrapper ul:first-child { display: block; }
+  .members-list-wrapper ul     { display: block; }
+
+  .box-with-header .box-content {
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .ui-state-active i {
+    color: $highlight-blue !important;
+  }
+
+  .filters {
+    display: inline-block;
+    padding-right: 5px;
+  }
+
+  .radio-group-outline {
+    outline: $ic-brand-primary solid 2px;
+  }
+}
+
+.collaboration-actions.form-actions {
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.collaborator-list > ul > li {
+  background: none;
+  border-bottom: 1px solid lighten($borderColor, 22%);
+  border-top: 1px solid $white;
+  color: $gray;
+  display: block;
+  padding: 4px 12px;
+
+  &:hover {
+    background: $dark-blue;
+  }
+
+  > a {
+    border: none;
+    padding: 0;
+  }
+
+  > a:hover { background: none; }
+}
+
+.members-list-wrapper {
+  li {
+    background: $green;
+
+    &:hover, &:hover a, a:focus {
+      background: none;
+      color: #b72d1e;
+      outline: 0;
+    }
+
+  }
+
+  a { cursor: pointer; }
+
+  .remove-button {
+    display: none;
+  }
+
+  .remove-button a {
+    color: #333;
+    cursor: pointer;
+    display: block;
+    text-align: center;
+  }
+
+  .member-instructions {
+    border: 2px dashed #999;
+    border-radius: 10px;
+    color: #777;
+    font-size: 16px;
+    margin: 36px 8px 8px 8px;
+    padding: 4px;
+    text-align: center;
+  }
+}
+

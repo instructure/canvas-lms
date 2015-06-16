@@ -15,16 +15,19 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+
+require 'oauth'
+
 module LtiOutbound
   class ToolLaunch
     attr_reader :url, :tool, :user, :context, :link_code, :return_url, :account,
                 :resource_type, :consumer_instance, :hash, :assignment,
-                :outgoing_email_address, :selected_html, :variable_substitutor
+                :outgoing_email_address, :selected_html, :variable_expander
 
     def initialize(options)
       @url = options[:url] || raise('URL required for generating LTI content')
       @tool = options[:tool] || raise('Tool required for generating LTI content')
-      @user = options[:user] || raise('User required for generating LTI content')
+      @user = options[:user] || LTIUser.new #|| raise('User required for generating LTI content')
       @account = options[:account] || raise('Account required for generating LTI content')
       @context = options[:context] || raise('Context required for generating LTI content')
       @link_code = options[:link_code] || raise('Link Code required for generating LTI content')
@@ -34,17 +37,9 @@ module LtiOutbound
       @selected_html = options[:selected_html]
       @consumer_instance = context.consumer_instance || raise('Consumer instance required for generating LTI content')
 
-      @variable_substitutor = options[:variable_substitutor]
-      variable_substitutor.add_substitution '$Person.name.family', @user.last_name
-      variable_substitutor.add_substitution '$Person.name.full', @user.name
-      variable_substitutor.add_substitution '$Person.name.given', @user.first_name
-      variable_substitutor.add_substitution '$Person.address.timezone', @user.timezone
+      @variable_expander = options[:variable_expander] || raise('VariableExpander is required for generating LTI content')
 
       @hash = {}
-    end
-
-    def variable_substitutor
-      @variable_substitutor ||= VariableSubstitutor.new
     end
 
     def for_assignment!(assignment, outcome_service_url, legacy_outcome_service_url)
@@ -53,6 +48,7 @@ module LtiOutbound
       hash['lis_outcome_service_url'] = outcome_service_url
       hash['ext_ims_lis_basic_outcome_url'] = legacy_outcome_service_url
       hash['ext_outcome_data_values_accepted'] = assignment.return_types.join(',')
+      hash['ext_outcome_result_total_score_accepted'] = true
 
       add_assignment_substitutions!(assignment)
     end
@@ -73,10 +69,10 @@ module LtiOutbound
       hash['resource_link_id'] = link_code
       hash['resource_link_title'] = overrides['resource_link_title'] || tool.name
       hash['user_id'] = user.opaque_identifier
-      hash['user_image'] = user.avatar_url
       hash['text'] = CGI::escape(selected_html) if selected_html
 
       hash['roles'] = user.current_role_types # AccountAdmin, Student, Faculty or Observer
+      hash['ext_roles'] = '$Canvas.xuser.allRoles'
 
       hash['custom_canvas_enrollment_state'] = '$Canvas.enrollment.enrollmentState'
 
@@ -89,12 +85,13 @@ module LtiOutbound
         hash['lis_person_contact_email_primary'] = user.email
       end
       if tool.public?
+        hash['user_image'] = user.avatar_url
         hash['custom_canvas_user_id'] = '$Canvas.user.id'
-        hash['lis_person_sourcedid'] = user.sis_source_id if user.sis_source_id
+        hash['lis_person_sourcedid'] = '$Person.sourcedId' if user.sis_source_id
         hash['custom_canvas_user_login_id'] = '$Canvas.user.loginId'
         if context.is_a?(LTICourse)
           hash['custom_canvas_course_id'] = '$Canvas.course.id'
-          hash['lis_course_offering_sourcedid'] = context.sis_source_id if context.sis_source_id
+          hash['lis_course_offering_sourcedid'] = '$CourseSection.sourcedId' if context.sis_source_id
         elsif context.is_a?(LTIAccount) || context.is_a?(LTIUser)
           hash['custom_canvas_account_id'] = '$Canvas.account.id'
           hash['custom_canvas_account_sis_id'] = '$Canvas.account.sisSourceId'
@@ -126,7 +123,7 @@ module LtiOutbound
       set_resource_type_keys()
       hash['oauth_callback'] = 'about:blank'
 
-      variable_substitutor.substitute!(hash)
+      @variable_expander.expand_variables!(hash)
 
       self.class.generate_params(hash, url, tool.consumer_key, tool.shared_secret)
     end
@@ -140,9 +137,6 @@ module LtiOutbound
 
       hash['custom_canvas_assignment_title'] = '$Canvas.assignment.title'
       hash['custom_canvas_assignment_points_possible'] = '$Canvas.assignment.pointsPossible'
-      @variable_substitutor.add_substitution('$Canvas.assignment.id', assignment.id)
-      @variable_substitutor.add_substitution('$Canvas.assignment.title', assignment.title)
-      @variable_substitutor.add_substitution('$Canvas.assignment.pointsPossible', assignment.points_possible)
     end
 
     def set_resource_type_keys
@@ -177,9 +171,9 @@ module LtiOutbound
       end
 
       consumer = OAuth::Consumer.new(key, secret, {
-          :site => "#{uri.scheme}://#{host}",
-          :signature_method => 'HMAC-SHA1'
-      })
+                                            :site => "#{uri.scheme}://#{host}",
+                                            :signature_method => 'HMAC-SHA1'
+                                        })
 
       path = uri.path
       path = '/' if path.empty?

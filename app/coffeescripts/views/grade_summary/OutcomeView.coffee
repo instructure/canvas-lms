@@ -1,28 +1,39 @@
 define [
-  'i18n!outcomes'
+  'jquery'
   'underscore'
   'Backbone'
   'compiled/views/grade_summary/ProgressBarView'
+  'compiled/views/grade_summary/OutcomePopoverView'
+  'compiled/views/grade_summary/OutcomeDialogView'
   'jst/grade_summary/outcome'
-], (I18n, _, Backbone, ProgressBarView, template) ->
+], ($, _, Backbone, ProgressBarView, OutcomePopoverView, OutcomeDialogView, template) ->
+
   class OutcomeView extends Backbone.View
-    tagName: 'li'
     className: 'outcome'
+    events:
+      'click .more-details' : 'show'
+      'keydown .more-details' : 'show'
+    tagName: 'li'
     template: template
 
     initialize: ->
       super
       @progress = new ProgressBarView(model: @model)
 
-    statusTooltip: ->
-      switch @model.status()
-        when 'undefined' then I18n.t 'undefined', 'Unstarted'
-        when 'remedial' then I18n.t 'remedial', 'Remedial'
-        when 'near' then I18n.t 'near', 'Near mastery'
-        when 'mastery' then I18n.t 'mastery', 'Mastery'
+    afterRender: ->
+      @popover = new OutcomePopoverView({
+        el: @$('.more-details')
+        model: @model
+      })
+      @dialog = new OutcomeDialogView({
+        model: @model
+      })
+
+    show: (e) ->
+      @dialog.show e
 
     toJSON: ->
       json = super
       _.extend json,
-        statusTooltip: @statusTooltip()
         progress: @progress
+

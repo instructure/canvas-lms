@@ -25,7 +25,7 @@ module Importers
     # in particular, strip out all of the embedded questions and add explicitly to assessment_questions
     def self.preprocess_migration_data(data)
       new_aqs = []
-      title_map = {}
+      assmnt_map = {}
 
       references = []
       # turn all quiz questions to question references
@@ -37,11 +37,11 @@ module Importers
             next unless q['questions']
             q['questions'].each do |ref|
               preprocess_quiz_question(ref, new_aqs, references)
-              title_map[ref['migration_id']] = assmnt['title']
+              assmnt_map[ref['migration_id']] = [assmnt['migration_id'], assmnt['title']]
             end
           else
             preprocess_quiz_question(q, new_aqs, references)
-            title_map[q['migration_id']] = assmnt['title']
+            assmnt_map[q['migration_id']] = [assmnt['migration_id'], assmnt['title']]
           end
         end
       end
@@ -56,7 +56,12 @@ module Importers
 
       # also default question bank name to quiz name
       data['assessment_questions']['assessment_questions'].each do |aq|
-        aq['question_bank_name'] = title_map[aq['migration_id']] if aq['question_bank_name'].blank?
+        if aq['question_bank_id'].blank? && aq['question_bank_migration_id'].blank?
+          assmnt_mig_id, assmnt_title = assmnt_map[aq['migration_id']]
+          aq['question_bank_name'] ||= assmnt_title
+          aq['question_bank_migration_id'] = CC::CCHelper.create_key("#{assmnt_mig_id}_#{aq['question_bank_name']}_question_bank")
+          aq['is_quiz_question_bank'] = true
+        end
       end
 
       dedup_assessment_questions(data['assessment_questions']['assessment_questions'], references)
@@ -69,29 +74,55 @@ module Importers
       unless ['question_reference', 'text_only_question'].include?(quiz_question['question_type'])
         aq = quiz_question.dup
         new_aqs << aq
-
         quiz_question['question_type'] = 'question_reference'
       end
 
       references << quiz_question if quiz_question['question_type'] == 'question_reference'
     end
 
+    QUIZ_QUESTION_KEYS = ['position', 'points_possible']
+    IGNORABLE_QUESTION_KEYS = QUIZ_QUESTION_KEYS + ['answers', 'assessment_question_migration_id', 'migration_id', 'question_bank_migration_id',
+                                              'question_bank_id', 'is_quiz_question_bank', 'question_bank_name']
+
+    def self.check_question_equality(question1, question2)
+      stripped_q1 = question1.reject{|k, v| IGNORABLE_QUESTION_KEYS.include?(k)}
+      stripped_q2 = question2.reject{|k, v| IGNORABLE_QUESTION_KEYS.include?(k)}
+      stripped_q1_answers = (question1['answers'] || []).map{|ans| ans.reject{|k, v| k == 'id'}}
+      stripped_q2_answers = (question2['answers'] || []).map{|ans| ans.reject{|k, v| k == 'id'}}
+
+      stripped_q1 == stripped_q2 && stripped_q1_answers == stripped_q2_answers
+    end
+
     def self.dedup_assessment_questions(questions, references)
       # it used to skip these in the importer, instead let's remove them outright
       aq_dups = []
-      questions.each do |aq|
-        if aq['assessment_question_migration_id'] &&
-            aq_dup = questions.detect{|other_aq| other_aq != aq && other_aq['migration_id'] == aq['assessment_question_migration_id']}
-          aq_dups << [aq_dup, aq['migration_id']]
+
+      questions.each_with_index do |quiz_question, qq_index|
+        aq_mig_id = quiz_question['assessment_question_migration_id']
+        next unless aq_mig_id
+
+        questions.each_with_index do |matching_question, mq_index|
+          next if qq_index == mq_index # don't match to yourself
+
+          if aq_mig_id == matching_question['migration_id']
+            # make sure that the match's core question data is identical
+            if check_question_equality(quiz_question, matching_question)
+              aq_dups << [quiz_question, matching_question['migration_id']]
+            end
+          end
         end
       end
+
       aq_dups.each do |aq_dup, new_mig_id|
         references.each do |ref|
           if ref['migration_id'] == aq_dup['migration_id']
+            ref['quiz_question_migration_id'] = ref['migration_id']
             ref['migration_id'] = new_mig_id
+            QUIZ_QUESTION_KEYS.each{|k| ref[k] ||= aq_dup[k]}
           end
           if ref['assessment_question_migration_id'] == aq_dup['migration_id']
             ref['assessment_question_migration_id'] = new_mig_id
+            QUIZ_QUESTION_KEYS.each{|k| ref[k] ||= aq_dup[k]}
           end
         end
         questions.delete(aq_dup)
@@ -132,11 +163,12 @@ module Importers
     def self.import_from_migration(hash, context, migration=nil, question_data=nil, item=nil, allow_update = false)
       hash = hash.with_indifferent_access
       # there might not be an import id if it's just a text-only type...
-      item ||= Quizzes::Quiz.find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id]) if hash[:id]
-      item ||= Quizzes::Quiz.find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
+      item ||= Quizzes::Quiz.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first if hash[:id]
+      item ||= Quizzes::Quiz.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
       if item && !allow_update
         if item.deleted?
-          item.workflow_state = hash[:available] ? 'available' : 'created'
+          item.workflow_state = (hash[:available] || !item.can_unpublish?) ? 'available' : 'unpublished'
+          item.saved_by = :migration
           item.save
         end
       end
@@ -150,8 +182,11 @@ module Importers
       item.show_correct_answers_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:show_correct_answers_at]) if hash[:show_correct_answers_at]
       item.hide_correct_answers_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:hide_correct_answers_at]) if hash[:hide_correct_answers_at]
       item.scoring_policy = hash[:which_attempt_to_keep] if hash[:which_attempt_to_keep]
-      hash[:missing_links] = []
-      item.description = ImportedHtmlConverter.convert(hash[:description], context, migration, {:missing_links => hash[:missing_links]})
+
+      missing_links = []
+      item.description = ImportedHtmlConverter.convert(hash[:description], context, migration) do |warn, link|
+        missing_links << link if warn == :missing_link
+      end
 
 
       %w[
@@ -175,17 +210,20 @@ module Importers
         cant_go_back
         require_lockdown_browser_monitor
         lockdown_browser_monitor_data
+        one_time_results
+        show_correct_answers_last_attempt
       ].each do |attr|
         attr = attr.to_sym
         item.send("#{attr}=", hash[attr]) if hash.key?(attr)
       end
 
+      item.saved_by = :migration
       item.save!
 
       if migration
         migration.add_missing_content_links(
           :class => item.class.to_s,
-          :id => item.id, :missing_links => hash[:missing_links],
+          :id => item.id, :missing_links => missing_links,
           :url => "/#{context.class.to_s.demodulize.underscore.pluralize}/#{context.id}/#{item.class.to_s.demodulize.underscore.pluralize}/#{item.id}"
         )
       end
@@ -221,14 +259,14 @@ module Importers
 
       if hash[:assignment]
         if hash[:assignment][:migration_id]
-          item.assignment ||= Quizzes::Quiz.find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:assignment][:migration_id])
+          item.assignment ||= Quizzes::Quiz.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:assignment][:migration_id]).first
         end
         item.assignment = nil if item.assignment && item.assignment.quiz && item.assignment.quiz.id != item.id
         item.assignment ||= context.assignments.new
 
         item.assignment = ::Importers::AssignmentImporter.import_from_migration(hash[:assignment], context, migration, item.assignment, item)
 
-        if !hash[:available]
+        if !hash[:available] && item.can_unpublish?
           item.workflow_state = 'unpublished'
           item.assignment.workflow_state = 'unpublished'
         end
@@ -245,15 +283,20 @@ module Importers
       end
 
       if hash[:assignment_group_migration_id]
-        if g = context.assignment_groups.find_by_migration_id(hash[:assignment_group_migration_id])
-          item.assignment_group_id = g.id
+        if g = context.assignment_groups.where(migration_id: hash[:assignment_group_migration_id]).first
+          item.assignment_group = g
         end
+      end
+
+      if item.for_assignment? && !item.assignment && item.can_unpublish?
+        item.workflow_state = 'unpublished'
       end
 
       item.save
       item.assignment.save if item.assignment && item.assignment.changed?
 
       migration.add_imported_item(item) if migration
+      item.saved_by = nil
       item
     end
 

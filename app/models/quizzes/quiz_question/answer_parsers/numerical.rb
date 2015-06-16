@@ -25,6 +25,7 @@ module Quizzes::QuizQuestion::AnswerParsers
           id: fields.fetch_any(:id, nil),
           text: fields.fetch_with_enforced_length([:answer_text, :text]),
           comments: fields.fetch_with_enforced_length([:answer_comment, :comments]),
+          comments_html: fields.fetch_with_enforced_length([:answer_comment_html, :comments_html]),
           weight: 100
         }
 

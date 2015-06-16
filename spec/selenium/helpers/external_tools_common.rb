@@ -3,64 +3,37 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 shared_examples_for "external tools tests" do
   include_examples "in-process server selenium tests"
 
-  def add_external_tool (*opts)
-    name = "external tool"
-    key = "1234567"
-    secret = "secret"
-
-    f("#tab-tools .add_tool_link").click
-
-    f("#external_tool_name").send_keys(name)
-    f("#external_tool_consumer_key").send_keys(key)
-    f("#external_tool_shared_secret").send_keys(secret)
-    if opts.include? :xml
-      add_xml
-    elsif opts.include? :url
-      add_url
-    else
-      add_manual opts
-    end
-    fj('.ui-dialog:visible .btn-primary').click()
-    wait_for_ajax_requests
-   # ContextExternalTool.count.should != 0
-    tool = ContextExternalTool.last
-    tool.name.should == name
-    tool.consumer_key.should == key
-    tool.shared_secret.should == secret
-    tool_checker tool, opts
-  end
-
   def tool_checker (tool, opts)
 
     if (opts.include? :xml)
       url = "http://example.com/other_url"
-      tool.url.should == url
-      tool.workflow_state.should == "public"
-      tool.description.should == "Description"
+      expect(tool.url).to eq url
+      expect(tool.workflow_state).to eq "public"
+      expect(tool.description).to eq "Description"
       ContextExternalTool::EXTENSION_TYPES.each do |type|
-        tool.extension_setting(type).should_not be_empty
-        f("#external_tool_#{tool.id} .#{type}").should be_displayed
+        expect(tool.extension_setting(type)).not_to be_empty
+        expect(f("#external_tool_#{tool.id} .#{type}")).to be_displayed
       end
       
     elsif opts.include? :url
-      tool.workflow_state.should == "anonymous"
-      tool.url.should == "http://www.edu-apps.org/tool_redirect?id=youtube"
-      tool.description.should include_text "YouTube videos"
-      tool.has_editor_button.should be_true
-      tool.settings.should be_present
-      tool.editor_button.should be_present
-      f("#external_tool_#{tool.id} .edit_tool_link").should be_displayed
+      expect(tool.workflow_state).to eq "anonymous"
+      expect(tool.url).to eq "http://www.edu-apps.org/tool_redirect?id=youtube"
+      expect(tool.description).to include_text "YouTube videos"
+      expect(tool.has_placement?(:editor_button)).to be_truthy
+      expect(tool.settings).to be_present
+      expect(tool.editor_button).to be_present
+      expect(f("#external_tool_#{tool.id} .edit_tool_link")).to be_displayed
 
     else
-      tool.description.should == @description
+      expect(tool.description).to eq @description
       tool.settings.count > 0
       tool.custom_fields.keys.count >0
       custom_hash = {@custom_key => @custom_value}
-      tool.custom_fields.should == custom_hash
+      expect(tool.custom_fields).to eq custom_hash
       if (opts.include? :manual_url)
-        tool.url.should == @manual_url
+        expect(tool.url).to eq @manual_url
       else
-        tool.domain.should == @domain
+        expect(tool.domain).to eq @domain
       end
     end
 
@@ -68,9 +41,9 @@ shared_examples_for "external tools tests" do
 
   def add_manual (opts)
     f("#external_tool_config_type option[value='manual']").click
-    f(".config_type.manual").should be_displayed
-    f("#external_tool_config_url").should_not be_displayed
-    f("#external_tool_config_xml").should_not be_displayed
+    expect(f(".config_type.manual")).to be_displayed
+    expect(f("#external_tool_config_url")).not_to be_displayed
+    expect(f("#external_tool_config_xml")).not_to be_displayed
     @custom_key = "value"
     @custom_value = "custom tool"
     @description = "this is an external tool"
@@ -96,18 +69,18 @@ shared_examples_for "external tools tests" do
   def add_url
     url = "#{app_host}/lti_url"
     f("#external_tool_config_type option[value='by_url']").click
-    f("#external_tool_form .config_type.manual").should_not be_displayed
-    f("#external_tool_config_xml").should_not be_displayed
-    f("#external_tool_config_url").should be_displayed
+    expect(f("#external_tool_form .config_type.manual")).not_to be_displayed
+    expect(f("#external_tool_config_xml")).not_to be_displayed
+    expect(f("#external_tool_config_url")).to be_displayed
     f("#external_tool_config_url").send_keys(url)
   end
 
 
   def add_xml
     f("#external_tool_config_type option[value='by_xml']").click
-    f(".config_type.manual").should_not be_displayed
-    f("#external_tool_config_url").should_not be_displayed
-    f("#external_tool_config_xml").should be_displayed
+    expect(f(".config_type.manual")).not_to be_displayed
+    expect(f("#external_tool_config_url")).not_to be_displayed
+    expect(f("#external_tool_config_xml")).to be_displayed
 
 #XML must be broken up to avoid intermittent selenium failures
     f("#external_tool_config_xml").send_keys <<-XML
@@ -170,6 +143,42 @@ shared_examples_for "external tools tests" do
         <lticm:property name="text">Build/Link to Wiki Page</lticm:property>
         <lticm:property name="display_type">full_width</lticm:property>
       </lticm:options>
+      <lticm:options name="global_navigation">
+        <lticm:property name="url">https://example.com/wiki</lticm:property>
+        <lticm:property name="text">Build/Link to Wiki Page</lticm:property>
+        <lticm:property name="display_type">full_width</lticm:property>
+      </lticm:options>
+      <lticm:options name="assignment_menu">
+        <lticm:property name="url">https://example.com/wiki</lticm:property>
+        <lticm:property name="text">Build/Link to Wiki Page</lticm:property>
+        <lticm:property name="display_type">full_width</lticm:property>
+      </lticm:options>
+      <lticm:options name="discussion_topic_menu">
+        <lticm:property name="url">https://example.com/wiki</lticm:property>
+        <lticm:property name="text">Build/Link to Wiki Page</lticm:property>
+        <lticm:property name="display_type">full_width</lticm:property>
+      </lticm:options>
+      <lticm:options name="file_menu">
+        <lticm:property name="url">https://example.com/wiki</lticm:property>
+        <lticm:property name="text">Build/Link to Wiki Page</lticm:property>
+        <lticm:property name="display_type">full_width</lticm:property>
+      </lticm:options>
+      <lticm:options name="module_menu">
+        <lticm:property name="url">https://example.com/wiki</lticm:property>
+        <lticm:property name="text">Build/Link to Wiki Page</lticm:property>
+        <lticm:property name="display_type">full_width</lticm:property>
+      </lticm:options>
+      <lticm:options name="quiz_menu">
+        <lticm:property name="url">https://example.com/wiki</lticm:property>
+        <lticm:property name="text">Build/Link to Wiki Page</lticm:property>
+        <lticm:property name="display_type">full_width</lticm:property>
+      </lticm:options>
+      <lticm:options name="wiki_page_menu">
+        <lticm:property name="url">https://example.com/wiki</lticm:property>
+        <lticm:property name="text">Build/Link to Wiki Page</lticm:property>
+        <lticm:property name="display_type">full_width</lticm:property>
+      </lticm:options>
+
     XML
     f("#external_tool_config_xml").send_keys <<-XML
       <lticm:options name="user_navigation">

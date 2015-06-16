@@ -27,7 +27,7 @@ describe "/eportfolios/_section_list" do
     assigns[:categories] = [assigns[:category]]
     assigns[:page] = @portfolio.eportfolio_entries.create!(:name => "some entry", :eportfolio_category => assigns[:category])
     render :partial => "eportfolios/section_list"
-    response.should have_tag("ul#section_list")
+    expect(response).to have_tag("ul#section_list")
   end
 end
 

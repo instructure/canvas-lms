@@ -40,6 +40,11 @@ class DiscussionEntryParticipant < ActiveRecord::Base
       pluck(:discussion_entry_id)
   end
 
+  def self.entry_ratings(entry_ids, user)
+    ratings = self.where(:user_id => user, :discussion_entry_id => entry_ids).where('rating IS NOT NULL')
+    Hash[ratings.map{|x| [x.discussion_entry_id, x.rating]}]
+  end
+
   workflow do
     state :unread
     state :read

@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.submission.assignment.context) %>/<%= asset.submission.assignment.context.class.to_s.downcase.pluralize %>/<%= asset.submission.assignment.context_id %>/assignments/<%= asset.submission.assignment_id %>/submissions/<%= asset.submission.user_id %>
+  <%= polymorphic_url([asset.submission.assignment.context, asset.submission.assignment, :submission], id: asset.submission.user) %>
 <% end %>
 
 <% define_content :subject do %>
@@ -25,7 +25,7 @@
       <td></td>
     </tr>
     <tr >
-      <td align="left" width="50px" ><img style="border-radius: 50px;" height= 50px width = 50px src= <%=author_avatar_url%> alt=<%=author_short_name%>> </td>
+      <td align="left" width="50" style="width: 50px"><img style="border-radius: 50px; height: 50px; width: 50px;" height="50" width="50" src="<%=author_avatar_url%>" alt="<%=author_short_name%>"> </td>
       <td width="10"></td>
       <td>
         <table border="0" style="font-size: 14px; color: #444444; background-color: #ffffff; font-family: 'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif';" valign="top" align="left">
@@ -36,7 +36,7 @@
           </tr>
           <tr>
             <td valign="top" align="left">
-              <a href="<%= content :link %>">
+              <a href="mailto:<%= author_email_address %>">
                 <%= author_email_address%>
               </a>
             </td>
@@ -50,7 +50,7 @@
   <p>
     <b><%= author_short_name%></b>
     <br/>
-    <a href="<%= content :link %>">
+    <a href="mailto:<%= author_email_address %>">
       <%= author_email_address%>
     </a>
   </p>
@@ -67,7 +67,7 @@
   <p style="margin: 0px;"><%= t "#messages.conversation_message.email.attached_files", "Attached Files:" %></p>
   <ul style="padding-left: 20px;">
     <% asset.attachments.each do |attachment| %>
-    <li><a href="<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/files/<%= attachment.id %>/download"><%= attachment.display_name %> - <%= attachment.readable_size %></a></li>
+    <li><a href="<%= file_download_url(attachment) %>"><%= attachment.display_name %> - <%= attachment.readable_size %></a></li>
     <% end %>
   </ul>
 </div>

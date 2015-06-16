@@ -16,24 +16,24 @@
 #
 require 'set'
 
-# unfortunately this timing data isn't exposed elsewhere,
-# so we override this method to put it in the rack env
-class ActionController::Base
-  def active_record_runtime
-    db_runtime = ActiveRecord::Base.connection.reset_runtime
-    db_runtime += @db_rt_before_render if @db_rt_before_render
-    db_runtime += @db_rt_after_render if @db_rt_after_render
-    request.env['active_record_runtime'] = db_runtime / 1000.0 if request
-    "DB: %.0f" % db_runtime
-  end
-end
-
 module Canvas
 class RequestThrottle
   # this @@last_sample data isn't thread-safe, and if canvas ever becomes
   # multi-threaded, we'll have to just get rid of it since we can't measure
   # per-thread heap used
   @@last_sample = 0
+
+  class ActionControllerLogSubscriber < ActiveSupport::LogSubscriber
+    def process_action(event)
+      # we don't have access to the request here, so we can't just put this in the env
+      Thread.current[:request_throttle_db_runtime] = (event.payload[:db_runtime] || 0) / 1000.0
+    end
+  end
+  ActionControllerLogSubscriber.attach_to :action_controller
+
+  def db_runtime(_request)
+    Thread.current[:request_throttle_db_runtime]
+  end
 
   def initialize(app)
     @app = app
@@ -43,16 +43,18 @@ class RequestThrottle
     starting_mem = Canvas.sample_memory()
     starting_cpu = Process.times()
 
-    request = ActionController::Request.new(env)
-    # workaround a rails bug where some ActionController::Request methods blow
+    request = ActionDispatch::Request.new(env)
+    # workaround a rails bug where some ActionDispatch::Request methods blow
     # up when using certain servers until fullpath is called once to set env['REQUEST_URI']
     request.fullpath
 
-    result = nil
+    status, headers, response = nil
+    throttled = false
     bucket = LeakyBucket.new(client_identifier(request))
 
-    bucket.reserve_capacity do
-      result = if !allowed?(request, bucket)
+    cost = bucket.reserve_capacity do
+      status, headers, response = if !allowed?(request, bucket)
+        throttled = true
         rate_limit_exceeded
       else
         @app.call(env)
@@ -64,18 +66,37 @@ class RequestThrottle
       user_cpu = ending_cpu.utime - starting_cpu.utime
       system_cpu = ending_cpu.stime - starting_cpu.stime
       account = env["canvas.domain_root_account"]
-      report_on_stats(account, starting_mem, ending_mem, user_cpu, system_cpu)
-
-      # currently we define cost as the amount of user cpu time plus the amount
-      # of time spent in db queries
-      cost = user_cpu + (env['active_record_runtime'] || 0.0)
+      db_runtime = (self.db_runtime(request) || 0.0)
+      report_on_stats(db_runtime, account, starting_mem, ending_mem, user_cpu, system_cpu)
+      cost = calculate_cost(user_cpu, db_runtime, env)
       cost
     end
 
-    result
+    if client_identifier(request) && !client_identifier(request).starts_with?('session')
+      headers['X-Request-Cost'] = cost.to_s unless throttled
+      headers['X-Rate-Limit-Remaining'] = bucket.remaining.to_s if subject_to_throttling?(request)
+    end
+
+    [status, headers, response]
+  end
+
+  # currently we define cost as the amount of user cpu time plus the amount
+  # of time spent in db queries, plus any arbitrary cost the app assigns
+  def calculate_cost(user_time, db_time, env)
+    extra_time = env.fetch("extra-request-cost", 0)
+    extra_time = 0 unless extra_time.is_a?(Numeric) && extra_time >= 0
+    user_time + db_time + extra_time
+  end
+
+  def subject_to_throttling?(request)
+    self.class.enabled? && Canvas.redis_enabled? && !whitelisted?(request) && !blacklisted?(request)
   end
 
   def allowed?(request, bucket)
+    unless self.class.enabled?
+      return true
+    end
+
     if whitelisted?(request)
       return true
     elsif blacklisted?(request)
@@ -142,6 +163,10 @@ class RequestThrottle
     @whitelist = @blacklist = nil
   end
 
+  def self.enabled?
+    Setting.get("request_throttle.skip", "false") != 'true'
+  end
+
   def self.list_from_setting(key)
     Set.new(Setting.get(key, '').split(',').map(&:strip).reject(&:blank?))
   end
@@ -153,17 +178,16 @@ class RequestThrottle
     ]
   end
 
-  def report_on_stats(account, starting_mem, ending_mem, user_cpu, system_cpu)
-    if account
-      CanvasStatsd::Statsd.timing("requests_user_cpu.account_#{account.id}", user_cpu)
-      CanvasStatsd::Statsd.timing("requests_system_cpu.account_#{account.id}", system_cpu)
-      CanvasStatsd::Statsd.timing("requests_user_cpu.shard_#{account.shard.id}", user_cpu)
-      CanvasStatsd::Statsd.timing("requests_system_cpu.shard_#{account.shard.id}", system_cpu)
+  def report_on_stats(db_runtime, account, starting_mem, ending_mem, user_cpu, system_cpu)
+    RequestContextGenerator.add_meta_header("b", starting_mem)
+    RequestContextGenerator.add_meta_header("m", ending_mem)
+    RequestContextGenerator.add_meta_header("u", "%.2f" % [user_cpu])
+    RequestContextGenerator.add_meta_header("y", "%.2f" % [system_cpu])
+    RequestContextGenerator.add_meta_header("d", "%.2f" % [db_runtime])
 
-      if account.shard.respond_to?(:database_server)
-        CanvasStatsd::Statsd.timing("requests_system_cpu.cluster_#{account.shard.database_server.id}", system_cpu)
-        CanvasStatsd::Statsd.timing("requests_user_cpu.cluster_#{account.shard.database_server.id}", user_cpu)
-      end
+    if account && account.shard.respond_to?(:database_server)
+      CanvasStatsd::Statsd.timing("requests_system_cpu.cluster_#{account.shard.database_server.id}", system_cpu)
+      CanvasStatsd::Statsd.timing("requests_user_cpu.cluster_#{account.shard.database_server.id}", user_cpu)
     end
 
     mem_stat = if starting_mem == 0 || ending_mem == 0
@@ -225,6 +249,11 @@ class RequestThrottle
     # expecting the block to return the final cost. It then increments again,
     # subtracting the initial up_front_cost from the final cost to erase it.
     def reserve_capacity(up_front_cost = self.up_front_cost)
+      if Setting.get("request_throttle.skip", "false") == "true"
+        yield
+        return
+      end
+
       increment(0, up_front_cost)
       cost = yield
     ensure
@@ -233,6 +262,10 @@ class RequestThrottle
 
     def full?
       count >= hwm
+    end
+
+    def remaining
+      hwm - count
     end
 
     # This is where we both leak and then increment by the given cost amount,

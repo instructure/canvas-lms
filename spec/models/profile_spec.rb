@@ -31,38 +31,33 @@ describe Profile do
     end
 
     after(:all) do
-      if CANVAS_RAILS2
-        subclasses = ActiveRecord::Base.send(:class_variable_get, :@@subclasses)[ActiveRecord::Base]
-        subclasses.delete(FooProfile)
-        subclasses.delete(Foo)
-      end
       Object.send(:remove_const, :FooProfile)
       Object.send(:remove_const, :Foo)
     end
 
     describe "initialization" do
       it "should be set by default" do
-        Foo.new.profile.should_not be_nil
+        expect(Foo.new.profile).not_to be_nil
       end
 
       it "should have the correct class when initialized" do
-        Foo.new.profile.class.should == FooProfile
+        expect(Foo.new.profile.class).to eq FooProfile
       end
 
       it "should have the correct class when found" do
         Foo.new(:name => "foo", :workflow_state => 'registered').profile.save!
-        Profile.all.first.class.should == FooProfile
+        expect(Profile.all.first.class).to eq FooProfile
       end
     end
 
     describe ".path" do
       it "should be inferred from the title" do
         profile = Foo.create!(:name => "My Foo!", :workflow_state => 'registered').profile
-        profile.path.should == "my-foo"
+        expect(profile.path).to eq "my-foo"
         profile.save!
 
         profile2 = Foo.create!(:name => "My Foo?!!!", :workflow_state => 'registered').profile
-        profile2.path.should == "my-foo-1"
+        expect(profile2.path).to eq "my-foo-1"
       end
     end
 
@@ -72,11 +67,11 @@ describe Profile do
           data :bar, :default => []
         end
         profile = FooProfile.new
-        profile.data.should == {}
-        profile.bar.should == []
-        profile.data.should == {:bar => []}
+        expect(profile.data).to eq({})
+        expect(profile.bar).to eq []
+        expect(profile.data).to eq({:bar => []})
         profile.bar = ["lol"]
-        profile.data.should == {:bar => ["lol"]}
+        expect(profile.data).to eq({:bar => ["lol"]})
       end
     end
   end

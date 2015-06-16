@@ -2,10 +2,11 @@ define([
   'INST' /* INST */,
   'i18n!submissions',
   'jquery' /* $ */,
+  'str/htmlEscape',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jqueryui/dialog',
   'jqueryui/progressbar' /* /\.progressbar/ */
-], function(INST, I18n, $) {
+], function(INST, I18n, $, htmlEscape) {
 
   INST.downloadSubmissions = function(url) {
     var cancelled = false;
@@ -29,8 +30,8 @@ define([
           if(attachment.workflow_state == 'zipped') { 
             $("#download_submissions_dialog .progress").progressbar('value', 100);
             var message = I18n.t("#submissions.finished_redirecting", "Finished!  Redirecting to File...");
-            var link = "<a href=\"" + url + "\"><b> " + I18n.t("#submissions.click_to_download", "Click here to download %{size_of_file}", {size_of_file: attachment.readable_size}) + "</b></a>"
-            $("#download_submissions_dialog .status").html(message + "<br>" + link);
+            var link = "<a href=\"" + htmlEscape(url) + "\"><b> " + htmlEscape(I18n.t("#submissions.click_to_download", "Click here to download %{size_of_file}", {size_of_file: attachment.readable_size})) + "</b></a>"
+            $("#download_submissions_dialog .status").html(htmlEscape(message) + "<br>" + $.raw(link));
             $("#download_submissions_dialog .status_loader").css('visibility', 'hidden');
             location.href = url;
             return;

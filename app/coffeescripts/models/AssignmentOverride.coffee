@@ -49,3 +49,7 @@ define [
     representsDefaultDueDate: =>
       @getCourseSectionID() is Section.defaultDueDateSectionID
 
+    combinedDates: =>
+      # using this as a key to sort overrides
+      # into rows in the due date picker
+      "#{@get("due_at") + @get("unlock_at") + @get("lock_at")}"

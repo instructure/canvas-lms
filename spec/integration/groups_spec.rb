@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+require 'nokogiri'
+
 describe GroupsController do
   it "should generate the correct 'Add Announcement' link" do
     course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym)
@@ -25,10 +27,10 @@ describe GroupsController do
     @group = Group.create!(:name => "group1", :group_category => group_category, :context => @course)
     
     get "/courses/#{@course.id}/groups/#{@group.id}"
-    response.should be_success
+    expect(response).to be_success
     
     html = Nokogiri::HTML(response.body)
-    html.css('#right-side a.add').attribute("href").text.should == "/groups/#{@group.id}/announcements#new"
+    expect(html.css('#right-side a.add').attribute("href").text).to eq "/groups/#{@group.id}/announcements#new"
   end
 
   it "should not rendering 'pending' page when joining a self-signup group" do
@@ -40,7 +42,15 @@ describe GroupsController do
       g1 = @course.groups.create!(:name => "some group", :group_category => category1)
 
       get "/courses/#{@course.id}/groups/#{g1.id}?join=1"
-      response.body.should_not =~ /This group has received your request to join/
+      expect(response.body).not_to match /This group has received your request to join/
     end
+  end
+
+  it "should render uncategorized groups" do
+    user_session(account_admin_user)
+    group = Account.default.groups.create!(name: 'SIS imported')
+
+    get "/groups/#{group.id}"
+    expect(response).to be_success
   end
 end

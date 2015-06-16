@@ -24,8 +24,8 @@ describe 'updated_wiki_page.email' do
     wiki_page_model
     @object = @page
     @object.reload
-    @object.wiki.should_not be_nil
-    @object.context.participants.should be_include(@user)
+    expect(@object.wiki).not_to be_nil
+    expect(@object.context.participants).to be_include(@user)
     generate_message(:updated_wiki_page, :email, @object, :user => @user)
   end
 end

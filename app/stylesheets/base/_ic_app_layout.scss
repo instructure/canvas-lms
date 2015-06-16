@@ -1,0 +1,91 @@
+.ic-app {
+  box-sizing: border-box;
+  min-height: 100vh;
+}
+
+.ic-app-layout {
+  box-sizing: border-box;
+  min-height: 100vh;  
+}
+
+.ic-app-layout__rows {
+  box-sizing: border-box;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.ic-app-layout__columns {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 0 auto;
+}
+
+.ic-app-secondary-menu {
+  box-sizing: border-box;
+  flex: 0 0 $ic-sp*13;
+  @include breakpoint(desktop) {
+    flex: 0 0 $ic-sp*14;
+    padding: $ic-sp*2 $ic-sp $ic-sp*2 $ic-sp*2; 
+  }
+  @include breakpoint(wide) {
+    flex: 0 0 $ic-sp*16;
+    padding-right: $ic-sp*2; 
+  }
+}
+
+.ic-app-main-content {
+  box-sizing: border-box;
+  flex: 1;
+  @include breakpoint(desktop) { display: flex; }
+}
+
+.ic-app-main-content__primary {
+  box-sizing: border-box;
+  @include breakpoint(desktop) { flex: 1; }
+}
+
+.ic-app-main-content__secondary {
+  box-sizing: border-box;
+  padding: $ic-sp*2; 
+  @include breakpoint(desktop) {
+    flex: 0 0 $ic-sp*22;
+    padding-left: $ic-sp;
+  }
+  @include breakpoint(wide) { 
+    flex: 0 0 $ic-sp*24;
+    padding-left: $ic-sp*2;
+  }
+}
+
+.ic-app-footer {
+  padding: $ic-sp 0;
+  margin: $ic-sp*2 $ic-sp*2 0;
+  border-top: 1px solid $ic-border-light;
+  @include breakpoint(desktop) {
+    display: flex;
+    align-items: center;
+  }
+  body.modal & {
+    margin: 0;
+    padding: $ic-sp $ic-sp*2;
+  }
+}
+
+.ic-app-footer__links {
+  flex: 1;
+  display: flex;
+  a { 
+    color: $ic-font-color--subdued;
+    margin-right: $ic-sp;
+    font-size: 12px;
+  }
+  @include breakpoint(desktop) { 
+    justify-content: flex-end;
+    a { margin-right: 0; margin-left: $ic-sp; }
+  }
+}
+
+.ic-app-secondary-menu__course-group-name {
+
+}

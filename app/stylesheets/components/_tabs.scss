@@ -1,0 +1,128 @@
+/*
+@styleguide Tab Navigation
+
+
+## Regular Tabs
+
+Our default tabs come complete with a panel attached to the tabs that displays the content inside each tab. 
+
+jQueryUI adds all the classes, once you initialize the tabs using the script and markup.
+
+
+```html
+<div id="styleguide-tabs-demo-regular">
+  <ul>
+    <li><a href="#tabs-1">Tab One</a></li>
+    <li><a href="#tabs-2">Tab Two</a></li>
+    <li><a href="#tabs-3">Tab Three</a></li>
+  </ul>
+  <div id="tabs-1">Tab 1 content</div>
+  <div id="tabs-2">Tab 2 content</div>
+  <div id="tabs-3">Tab 3 content</div>
+</div>
+```
+      $("#styleguide-tabs-demo-regular").tabs()
+
+## Minimal Tabs
+
+Don't want the bordered box around each tab panel? 
+
+Simply add the **.ui-tabs-minimal** class to the parent tab element.
+
+```html
+<div id="styleguide-tabs-demo-minimal" class="ui-tabs-minimal">
+  <ul>
+    <li><a href="#tabs-1">Tab One</a></li>
+    <li><a href="#tabs-2">Tab Two</a></li>
+    <li><a href="#tabs-3">Tab Three</a></li>
+  </ul>
+  <div id="tabs-1">Tab 1 content</div>
+  <div id="tabs-2">Tab 2 content</div>
+  <div id="tabs-3">Tab 3 content</div>
+</div>
+```
+
+
+      $("#styleguide-tabs-demo-minimal").tabs()
+
+
+*/
+
+// Custom Canvas branding for tabs -- overwriting the defaults in the jQuery UI tabs styles
+
+.ui-tabs {
+  .ui-tabs-panel {
+    border-color: $ic-border-light;
+    padding: 14px;
+  }
+  .ui-tabs-nav {
+    border-bottom-color: $ic-border-light;
+    li { 
+      background: transparent;
+      border-color: transparent;
+      box-shadow: none;
+      a {
+        @include ic-focus-base;
+        color: $ic-link-color;
+        font-weight: normal;
+        padding: 8px 14px;
+        text-shadow: none;
+        @if $use_high_contrast { text-decoration: underline; }
+        &:focus { 
+          @if $use_high_contrast { @include ic-focus-variant($ic-link-color, -4px); }
+          @else { 
+            text-decoration: underline; 
+            outline: none;
+          }
+        }
+
+        // special handling for Calendar tabs with solid-color header backgrounds
+        #edit_event & { color: $ic-color-light; }
+      }
+      &.ui-state-hover,
+      &:hover {
+        background: $ic-color-light;
+        border-color: $ic-border-light;
+        a {
+          color: $ic-color-dark;
+          @if $use_high_contrast { text-decoration: none; }
+          
+          // special handling for Calendar tabs with solid-color header backgrounds
+          #edit_event & { color: $ic-link-color; }
+        }
+      }
+      &.ui-state-focus,
+      &.ui-state-focus.ui-tabs-active {
+        outline: none;
+        border-color: $ic-border-light;
+        background: $ic-color-light;
+        a {
+          @if $use_high_contrast { @include ic-focus-variant($ic-link-color, -4px); }
+          @else { 
+            text-decoration: underline;
+            outline: none; 
+          }  
+        }
+      }
+      &.ui-tabs-active,
+      &.ui-tabs-active.ui-state-hover,
+      &.ui-tabs-active:hover {
+        border-color: $ic-border-light;
+        background: $ic-color-light;
+        a {
+          @if $use_high_contrast { text-decoration: none; }
+
+          // special handling for Calendar tabs with solid-color header backgrounds
+          #edit_event & { color: $ic-color-dark; }
+        }
+      }
+    }
+  }
+  &.ui-tabs--mini {
+    .ui-tabs-nav {
+      li { 
+        a { padding: 4px 8px; }
+      }
+    }
+  }
+}

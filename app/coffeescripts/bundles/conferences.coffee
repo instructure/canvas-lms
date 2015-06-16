@@ -31,11 +31,14 @@ require [
 
     initialize: ->
       # populate the conference list with inital set of data
-      course_id = ENV.context_asset_string.split('_')[1]
-
       @editView = new EditConferenceView()
 
-      @currentConferences = new ConferenceCollection(ENV.current_conferences, course_id: course_id)
+      @currentConferences = new ConferenceCollection(ENV.current_conferences)
+      @currentConferences.on('change', (event) =>
+        # focus if edit finalized (element is redrawn so we find by id)
+        if @editConferenceId
+          $("#new-conference-list div[data-id=" + @editConferenceId + "] .al-trigger").focus()
+      )
       view = @currentView = new CollectionView
         el: $("#new-conference-list")
         itemView: ConferenceView
@@ -44,7 +47,7 @@ require [
         listClassName: 'ig-list'
       view.render()
 
-      @concludedConferences = new ConferenceCollection(ENV.concluded_conferences, course_id: course_id)
+      @concludedConferences = new ConferenceCollection(ENV.concluded_conferences)
       view = @concludedView = new CollectionView
         el: $("#concluded-conference-list")
         itemView: ConcludedConferenceView
@@ -61,7 +64,7 @@ require [
       )
 
       $('.new-conference-btn').on('click', (event) =>
-        conference = new Conference(_.clone(ENV.default_conference), course_id: course_id)
+        conference = new Conference(_.clone(ENV.default_conference))
         conference.once('startSync', => @currentConferences.unshift(conference))
         @edit(conference)
       )
@@ -73,6 +76,7 @@ require [
       if typeof conference == 'string'
         conference = @currentConferences.get(conference)
       return unless conference
+      @editConferenceId = conference.get('id')
       @editView.show(conference)
 
     close: (conference) =>

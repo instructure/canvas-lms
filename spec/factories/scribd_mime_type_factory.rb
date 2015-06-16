@@ -17,7 +17,6 @@
 #
 
 def scribd_mime_type_model(opts={})
-  ScribdAPI.stubs(:enabled?).returns(true)
   @scribd_mime_type = ScribdMimeType.create!(valid_scribd_mime_type_attributes.merge(opts))
 end
 

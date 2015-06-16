@@ -44,11 +44,11 @@ describe AdobeConnectConference do
     it 'should generate an admin url using unique format if stored' do
       stored_url = 'canvas-mtg-ACCOUNT_ID-ID-CREATED_SECONDS'
       @conference.settings[:meeting_url_id] = stored_url
-      @conference.admin_join_url(@user).should == "http://connect.example.com/#{stored_url}"
+      expect(@conference.admin_join_url(@user)).to eq "http://connect.example.com/#{stored_url}"
     end
 
     it 'should generate an admin url using legacy format' do
-      @conference.admin_join_url(@user).should == "http://connect.example.com/canvas-meeting-#{@conference.id}"
+      expect(@conference.admin_join_url(@user)).to eq "http://connect.example.com/canvas-meeting-#{@conference.id}"
     end
   end
 end

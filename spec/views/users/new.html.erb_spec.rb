@@ -27,7 +27,7 @@ describe "/users/new" do
     assigns[:pseudonym] = Pseudonym.new
     
     render "users/new"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

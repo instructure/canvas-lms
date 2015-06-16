@@ -19,4 +19,22 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Eportfolio do
+  describe "#ensure_defaults" do
+    before(:once) do
+      eportfolio
+    end
+
+    it "should create a category if one doesn't exist" do
+      expect(@portfolio.eportfolio_categories).to be_empty
+      @portfolio.ensure_defaults
+      expect(@portfolio.reload.eportfolio_categories).not_to be_empty
+    end
+
+    it "should create an entry in the first category if one doesn't exist" do
+      @category = @portfolio.eportfolio_categories.create!(:name => "Hi")
+      expect(@category.eportfolio_entries).to be_empty
+      @portfolio.ensure_defaults
+      expect(@category.reload.eportfolio_entries).not_to be_empty
+    end
+  end
 end

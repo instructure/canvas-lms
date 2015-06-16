@@ -21,21 +21,20 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 describe Polling::PollChoice do
   before(:each) do
     course
-    @course.root_account.disable_feature!(:draft_state)
     teacher_in_course(course: @course, active_all: true)
     @poll = Polling::Poll.create!(user: @teacher, question: 'A Test Poll')
   end
 
   context "creating a poll choice" do
     it "requires an associated poll" do
-        lambda { Polling::PollChoice.create!(is_correct: false, text: 'Poll Choice A') }.should raise_error(ActiveRecord::RecordInvalid,
+        expect { Polling::PollChoice.create!(is_correct: false, text: 'Poll Choice A') }.to raise_error(ActiveRecord::RecordInvalid,
                                                                                     /Poll can't be blank/)
     end
 
     it "saves successfully" do
       @poll_choice = Polling::PollChoice.new(poll: @poll, text: 'A Poll Choice', is_correct: true)
       @poll_choice.save
-      @poll_choice.should be_valid
+      expect(@poll_choice).to be_valid
     end
   end
 end

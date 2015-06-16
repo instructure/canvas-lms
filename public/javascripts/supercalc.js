@@ -59,7 +59,7 @@ define([
                           "<tr><td colspan='3' class='last_row_details' style='display: none;'>" + htmlEscape(I18n.t('last_formula_row', "the last formula row will be used to compute the final answer")) + "</td></tr>" +
                           "<tr><td></td><td class='decimal_places'>" +
                             "<select aria-labelledby='decimal_places_label' class='round'><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select> " +
-                            "<label id='decimal_places_label'>" + I18n.t('decimal_places', 'Decimal Places') + "</label>" +
+                            "<label id='decimal_places_label'>" + htmlEscape(I18n.t('decimal_places', 'Decimal Places')) + "</label>" +
                           "</td></tr>" +
                         "</tfoot>" +
                         "<tbody></tbody>"+
@@ -126,7 +126,7 @@ define([
           }
           this.status.attr('data-res', res);
           if(!no_dom) {
-            this.status.html(res);
+            this.status.text(res);
           }
         });
         if(!no_dom) {
@@ -143,7 +143,7 @@ define([
         if(event.keyCode == 13 || enter && $displayBox.val()) {
           event.preventDefault();
           event.stopPropagation();
-          var $tr = $("<tr class='formula_row'><td class='formula' aria-labelledby='headings.formula' title='" + htmlEscape(I18n.t('drag_to_reorder', 'Drag to reorder')) + "'></td><td class='status' aria-labelledby='headings.result'></td><td><a href='#' class='delete_formula_row_link no-hover'><img src='/images/delete_circle.png' alt='" + I18n.t('delete_formula', 'Delete Formula') + "'/></a></td></tr>");
+          var $tr = $("<tr class='formula_row'><td class='formula' aria-labelledby='headings.formula' title='" + htmlEscape(I18n.t('drag_to_reorder', 'Drag to reorder')) + "'></td><td class='status' aria-labelledby='headings.result'></td><td><a href='#' class='delete_formula_row_link no-hover'><img src='/images/delete_circle.png' alt='" + htmlEscape(I18n.t('delete_formula', 'Delete Formula')) + "'/></a></td></tr>");
           $tr.find("td:first").text($entryBox.val());
           $entryBox.val("");
           $displayBox.val("");

@@ -1,0 +1,24 @@
+// .button-container is a class that we used to use for the buttons on a form,
+// I'm leaving it untouched but DONT USE IT! it is deprecated in favor of .form-actions
+.button-container { margin-top: 0.5em }
+
+
+// Deprecated: you should not use big, full width buttons on the right side.
+// use .page-action-list instead
+#right-side {
+  .button-sidebar-wide {
+    text-align: left;
+    margin: 5px auto;
+    display: block;
+    
+    i[class*=icon-], i[class^=icon-] {
+      &:before { color: #555 }
+    }
+    @if $use_new_styles { &:first-of-type { margin-top: 0; } }
+    
+  }
+  button.button-sidebar-wide {
+    @if $use_new_styles { width: 100%; }
+    @else { width: $right_side_width - $right_side_margin - $right_side_margin; }
+  }
+}

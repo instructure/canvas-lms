@@ -2,12 +2,13 @@ require([
   'i18n!accounts' /* I18n.t */,
   'jquery' /* $ */,
   'compiled/util/addPrivacyLinkToDialog',
+  'underscore',
   'user_sortable_name',
   'jquery.instructure_forms' /* formSubmit */,
   'jqueryui/dialog',
   'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
   'compiled/jquery.rails_flash_notifications'
-], function(I18n, $, addPrivacyLinkToDialog) {
+], function(I18n, $, addPrivacyLinkToDialog, _) {
 
   $(".add_user_link").click(function(event) {
     event.preventDefault();
@@ -22,7 +23,7 @@ require([
   });
   $("#add_user_form").formSubmit({
     formErrors: false,
-    required: ['user[name]'],
+    required: ['user[name]', 'pseudonym[unique_id]'],
     beforeSubmit: function(data) {
       $(this).find("button").attr('disabled', true)
         .filter(".submit_button").text(I18n.t('adding_user_message', "Adding User..."));
@@ -48,10 +49,13 @@ require([
       if(data.pseudonym.unique_id){
         errorList = [];
 
-        $.each(data.pseudonym.unique_id, function(i){
-          if(this.message){
-            errorList.push(this.message);
-          }
+        var messages = {
+          too_long: I18n.t("Login is too long"),
+          invalid: I18n.t("Login is invalid: must be alphanumeric or an email address")
+        };
+        var errors = _.uniq(_.map(data.pseudonym.unique_id, function(i){ return i.message; }));
+        _.each(errors, function(i){
+          errorList.push(messages[i] ? messages[i] : i);
         });
 
         errorData['unique_id'] = errorList.join(', ');

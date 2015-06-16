@@ -62,6 +62,7 @@ module CC
           blti_node.blti :secure_launch_url, tool.url
         end
         blti_node.blti(:icon, tool.settings[:icon_url]) if tool.settings[:icon_url]
+
         blti_node.blti :vendor do |v_node|
           v_node.lticp :code, 'unknown'
           v_node.lticp :name, 'unknown'
@@ -79,6 +80,11 @@ module CC
           ext_node.lticm(:property, tool.tool_id, 'name' => 'tool_id') if tool.tool_id
           ext_node.lticm :property, tool.workflow_state, 'name' => 'privacy_level'
           ext_node.lticm(:property, tool.domain, 'name' => 'domain') unless tool.domain.blank?
+
+          [:selection_width, :selection_height].each do |key|
+            ext_node.lticm(:property, tool.settings[key], 'name' => key) unless tool.settings[key].blank?
+          end
+
           if for_course_copy
             ext_node.lticm :property, tool.consumer_key, 'name' => 'consumer_key'
             ext_node.lticm :property, tool.shared_secret, 'name' => 'shared_secret'
@@ -86,18 +92,9 @@ module CC
           ContextExternalTool::EXTENSION_TYPES.each do |type|
             if tool.settings[type]
               ext_node.lticm(:options, :name => type.to_s) do |type_node|
-                type_node.lticm(:property, tool.settings[type][:url], 'name' => 'url') if tool.settings[type][:url]
-                type_node.lticm(:property, tool.settings[type][:text], 'name' => 'text') if tool.settings[type][:text]
-                if [:resource_selection,:editor_button,:homework_submission].include?(type)
-                  type_node.lticm(:property, tool.settings[type][:selection_width], 'name' => 'selection_width')
-                  type_node.lticm(:property, tool.settings[type][:selection_height], 'name' => 'selection_height')
-                end
-                if type == :course_navigation
-                  type_node.lticm(:property, tool.settings[type][:visibility], 'name' => 'visibility') if tool.settings[type][:visibility]
-                  type_node.lticm(:property, tool.settings[type][:default], 'name' => 'default') if tool.settings[type][:default]
-                end
-                if type == :editor_button
-                  type_node.lticm(:property, tool.settings[type][:icon_url], 'name' => 'icon_url') if tool.settings[type][:icon_url]
+
+                tool.settings[type].except(:labels, :custom_fields).each do |key, value|
+                  type_node.lticm(:property, value, 'name' => key.to_s)
                 end
                 if tool.settings[type][:labels]
                   type_node.lticm(:options, :name => 'labels') do |labels_node|

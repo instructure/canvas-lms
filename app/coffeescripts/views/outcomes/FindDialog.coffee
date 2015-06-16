@@ -67,6 +67,7 @@ define [
         directoryView: opts.directoryView
         rootOutcomeGroup: opts.rootOutcomeGroup
         readOnly: true
+        inFindDialog: true
       @content = new ContentView
         el: @$el.find('.outcomes-content')
         instructionsTemplate: instructionsTemplate

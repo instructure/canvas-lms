@@ -19,38 +19,46 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe CrocodocSessionsController do
-  before do
+  before :once do
     Setting.set 'crocodoc_counter', 0
     PluginSetting.create! :name => 'crocodoc',
                           :settings => { :api_key => "blahblahblahblahblah" }
-    Crocodoc::API.any_instance.stubs(:upload).returns 'uuid' => '1234567890'
-    Crocodoc::API.any_instance.stubs(:session).returns 'session' => 'SESSION'
-  end
-
-  before do
     @student_pseudonym = @pseudonym
     course_with_teacher(:active_all => true)
     student_in_course(:active_all => true)
     attachment_model :content_type => 'application/pdf', :context => @student
-    @blob = {attachment_id: @attachment.global_id, user_id: @student.global_id}.to_json
+    @blob = {attachment_id: @attachment.global_id,
+             user_id: @student.global_id,
+             type: "crocodoc"}.to_json
     @hmac = Canvas::Security.hmac_sha1(@blob)
+  end
+
+  before :each do
+    Crocodoc::API.any_instance.stubs(:upload).returns 'uuid' => '1234567890'
+    Crocodoc::API.any_instance.stubs(:session).returns 'session' => 'SESSION'
     user_session(@student)
   end
 
-  context "without crocodoc" do
+  context "with crocodoc" do
     before do
       @attachment.submit_to_crocodoc
     end
 
     it "works for the user in the blob" do
       get :show, blob: @blob, hmac: @hmac
-      response.body.should include 'https://crocodoc.com/view/SESSION'
+      expect(response.body).to include 'https://crocodoc.com/view/SESSION'
     end
 
     it "doesn't work for others" do
       user_session(@teacher)
       get :show, blob: @blob, hmac: @hmac
       assert_status(401)
+    end
+
+    it "fails gracefulishly when crocodoc times out" do
+      Crocodoc::API.any_instance.stubs(:session).raises(Timeout::Error)
+      get :show, blob: @blob, hmac: @hmac
+      assert_status(503)
     end
   end
 

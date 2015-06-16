@@ -1,5 +1,6 @@
 # This class both creates the slickgrid instance, and acts as the data source for that instance.
 define [
+  'react'
   'slickgrid.long_text_editor'
   'compiled/views/KeyboardNavDialog'
   'jst/KeyboardNavDialog'
@@ -23,18 +24,21 @@ define [
   'compiled/gradebook2/GradebookHeaderMenu'
   'compiled/util/NumberCompare'
   'str/htmlEscape'
-  'compiled/gradebook2/UploadDialog'
-  'compiled/gradebook2/PostGradesDialog'
-  'compiled/gradebook2/PostGradesModel'
+  # 'compiled/gradebook2/PostGradesDialog'
+  'jsx/gradebook/SISGradePassback/PostGradesStore'
+  'jsx/gradebook/SISGradePassback/PostGradesApp'
   'jst/gradebook2/column_header'
   'jst/gradebook2/group_total_cell'
   'jst/gradebook2/row_student_name'
   'compiled/views/gradebook/SectionMenuView'
+  'compiled/views/gradebook/GradingPeriodMenuView'
   'compiled/gradebook2/GradebookKeyboardNav'
   'jst/_avatar' #needed by row_student_name
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
   'jqueryui/dialog'
+  'jqueryui/tooltip'
+  'compiled/behaviors/tooltip'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
@@ -43,7 +47,10 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], (LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, Backbone, tz, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, UploadDialog, PostGradesDialog, PostGradesModel, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView, GradebookKeyboardNav) ->
+], (React, LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS,
+  $, _, Backbone, tz, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog,
+  SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, PostGradesStore, PostGradesApp, columnHeaderTemplate,
+  groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView, GradingPeriodMenuView, GradebookKeyboardNav) ->
 
   class Gradebook
     columnWidths =
@@ -56,12 +63,10 @@ define [
         default_max: 200
         max: 400
       total:
-        min: 85
-        max: 100
+        min: 95
+        max: 110
 
     DISPLAY_PRECISION = 2
-
-    numberOfFrozenCols: 2
 
     hasSections: $.Deferred()
     allSubmissionsLoaded: $.Deferred()
@@ -79,11 +84,19 @@ define [
       @userFilterRemovedRows = []
       @show_concluded_enrollments = userSettings.contextGet 'show_concluded_enrollments'
       @show_concluded_enrollments = true if @options.course_is_concluded
+      @totalColumnInFront = userSettings.contextGet 'total_column_in_front'
+      @numberOfFrozenCols = if @totalColumnInFront then 3 else 2
+      @mgpEnabled = ENV.GRADEBOOK_OPTIONS.multiple_grading_periods_enabled
+      @gradingPeriods = ENV.GRADEBOOK_OPTIONS.active_grading_periods
+      @gradingPeriodToShow = @getGradingPeriodToShow()
+      @gradebookColumnSizeSettings = ENV.GRADEBOOK_OPTIONS.gradebook_column_size_settings
+      @gradebookColumnOrderSettings = ENV.GRADEBOOK_OPTIONS.gradebook_column_order_settings
 
       $.subscribe 'assignment_group_weights_changed', @handleAssignmentGroupWeightChange
       $.subscribe 'assignment_muting_toggled',        @handleAssignmentMutingChange
       $.subscribe 'submissions_updated',              @updateSubmissionsFromExternal
       $.subscribe 'currentSection/change',            @updateCurrentSection
+      $.subscribe 'currentGradingPeriod/change',      @updateCurrentGradingPeriod
 
       enrollmentsUrl = if @show_concluded_enrollments
         'students_url_with_concluded_enrollments'
@@ -95,11 +108,22 @@ define [
       # this method should be removed after a month in production
       @alignCoursePreferencesWithLocalStorage()
 
+      assignmentGroupsParams = {exclude_descriptions: true}
+      if @mgpEnabled && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
+        $.extend(assignmentGroupsParams, {grading_period_id: @gradingPeriodToShow})
+
+      ajax_calls = [
+        $.ajaxJSON(@options[enrollmentsUrl], "GET")
+      , $.ajaxJSON(@options.assignment_groups_url, "GET", assignmentGroupsParams, @gotAssignmentGroups)
+      , $.ajaxJSON( @options.sections_url, "GET", {}, @gotSections)
+      ]
+
+      if(@options.post_grades_feature_enabled)
+        ajax_calls.push($.ajaxJSON( @options.course_url, "GET", {}, @gotCourse))
+
       # getting all the enrollments for a course via the api in the polite way
       # is too slow, so we're going to cheat.
-      $.when($.ajaxJSON(@options[enrollmentsUrl], "GET")
-      , $.ajaxJSON(@options.assignment_groups_url, "GET", {}, @gotAssignmentGroups)
-      , $.ajaxJSON( @options.sections_url, "GET", {}, @gotSections))
+      $.when(ajax_calls...)
       .then ([students, status, xhr]) =>
         @gotChunkOfStudents students
 
@@ -131,10 +155,76 @@ define [
         for c in @customColumns
           url = @options.custom_column_data_url.replace /:id/, c.id
           @getCustomColumnData(c.id)
+        @assignment_visibility() if ENV.GRADEBOOK_OPTIONS.differentiated_assignments_enabled
+        @disableAssignmentsInClosedGradingPeriods() if @mgpEnabled
 
       @showCustomColumnDropdownOption()
+      @initPostGradesStore()
+      @showPostGradesButton()
+
+    assignment_visibility: ->
+      allStudentIds = _.keys @students
+      for assignmentId, a of @assignments
+        if a.only_visible_to_overrides
+          hiddenStudentIds = @hiddenStudentIdsForAssignment(allStudentIds, a)
+          for studentId in hiddenStudentIds
+            @updateSubmission { assignment_id: assignmentId, user_id: studentId, hidden: true }
+
+    hiddenStudentIdsForAssignment: (studentIds, assignment) ->
+      _.difference studentIds, assignment.assignment_visibility
+
+    updateAssignmentVisibilities: (hiddenSub) ->
+      assignment = @assignments[hiddenSub.assignment_id]
+      filteredVisibility = assignment.assignment_visibility.filter (id) -> id != hiddenSub.user_id
+      assignment.assignment_visibility = filteredVisibility
+
+    disableAssignmentsInClosedGradingPeriods: () ->
+      closedAdminGradingPeriods = @getClosedAdminGradingPeriods()
+
+      if closedAdminGradingPeriods.length > 0
+        assignments = @getAssignmentsInClosedGradingPeriods(closedAdminGradingPeriods)
+        @disabledAssignments = assignments.map (a) ->
+          a.id
+
+        @grid.setColumns @getVisibleGradeGridColumns()
+
+    getClosedAdminGradingPeriods: () ->
+      _.select @gradingPeriods, (gradingPeriod) =>
+        @gradingPeriodIsAdmin(gradingPeriod) && @gradingPeriodIsClosed(gradingPeriod)
+
+    gradingPeriodIsAdmin: (gradingPeriod) ->
+      !gradingPeriod.permissions.manage
+
+    gradingPeriodIsClosed: (gradingPeriod) ->
+      new Date(gradingPeriod.end_date) < new Date()
+
+    gradingPeriodIsActive: (gradingPeriodId) ->
+      activePeriodIds = _.pluck(@gradingPeriods, 'id')
+      _.contains(activePeriodIds, gradingPeriodId)
+
+    getGradingPeriodToShow: () ->
+      currentPeriodId = userSettings.contextGet('gradebook_current_grading_period')
+      if currentPeriodId && @gradingPeriodIsActive(currentPeriodId)
+        currentPeriodId
+      else
+        ENV.GRADEBOOK_OPTIONS.current_grading_period_id
+
+    getAssignmentsInClosedGradingPeriods: (gradingPeriods) ->
+      latestEndDate = new Date(gradingPeriods[0]?.end_date)
+      for gradingPeriod in gradingPeriods
+        latestEndDate = new Date(gradingPeriod.end_date) if latestEndDate < new Date(gradingPeriod.end_date)
+      #return assignments whose end date is within the latest closed's end date
+      _.select @assignments, (a) =>
+        @assignmentIsDueBeforeEndDate(a, latestEndDate)
+
+    assignmentIsDueBeforeEndDate: (assignment, gradingPeriodEndDate) ->
+      if assignment.due_at
+        new Date(assignment.due_at) <= gradingPeriodEndDate
+      else
+        false
 
     onShow: ->
+      $(".post-grades-placeholder").show();
       return if @startedInitializing
       @startedInitializing = true
 
@@ -167,28 +257,6 @@ define [
           @grid.invalidateRow(student.row)
         @grid.render()
 
-
-    initPostGrades: () ->
-
-      $("#post-grades-button").click (event) =>
-        event.preventDefault()
-
-        pg = {
-          gradebook: ENV.GRADEBOOK_OPTIONS
-          assignments: @assignments
-        }
-        if @sectionToShow
-          pg.section_id = @sections[@sectionToShow].integration_id
-        else
-          pg.course_id = ENV.GRADEBOOK_OPTIONS.context_integration_id
-
-        postGradesModel = new PostGradesModel(pg)
-
-        postGradesDialog = new PostGradesDialog(postGradesModel, ENV.GRADEBOOK_OPTIONS.sis_app_url)
-        postGradesModel.reset_ignored_assignments()
-        postGradesDialog.render().show()
-        open = $('#post-grades-container').dialog('isOpen')
-
     doSlickgridStuff: =>
       @initGrid()
       @buildRows()
@@ -205,29 +273,35 @@ define [
       for group in assignmentGroups
         # note that assignmentGroups are not yet htmlEscaped like assignments and sections
         @assignmentGroups[group.id] = group
-        if ENV.GRADEBOOK_OPTIONS.draft_state_enabled
-          group.assignments = _.select group.assignments, (a) -> a.published
+        group.assignments = _.select group.assignments, (a) -> a.published
         for assignment in group.assignments
           htmlEscape(assignment)
           assignment.assignment_group = group
           assignment.due_at = tz.parse(assignment.due_at)
           @assignments[assignment.id] = assignment
 
+      @postGradesStore.setGradeBookAssignments @assignments
+
+    gotCourse: (course) =>
+      @course = course
+
     gotSections: (sections) =>
       @sections = {}
       for section in sections
         htmlEscape(section)
         @sections[section.id] = section
-      @displayPostGradesButton(@sectionToShow)
+
       @sections_enabled = sections.length > 1
       @hasSections.resolve()
+
+      @postGradesStore.setSections @sections
 
     gotChunkOfStudents: (studentEnrollments) =>
       for studentEnrollment in studentEnrollments
         student = studentEnrollment.user
         student.enrollment = studentEnrollment
 
-        if student.enrollment.role == "StudentViewEnrollment"
+        if student.enrollment.type == "StudentViewEnrollment"
           @studentViewStudents[student.id] ||= htmlEscape(student)
         else
           @students[student.id] ||= htmlEscape(student)
@@ -236,7 +310,7 @@ define [
 
     gotAllStudents: ->
       @withAllStudents (students) =>
-        for id, student of students
+        for student_id, student of students
           student.computed_current_score ||= 0
           student.computed_final_score ||= 0
           student.secondary_identifier = student.sis_login_id || student.login_id
@@ -246,28 +320,32 @@ define [
             sectionNames = $.toSentence(mySections.sort())
           student.display_name = rowStudentNameTemplate
             avatar_url: student.avatar_url
-            display_name: student.name
+            display_name: if ENV.GRADEBOOK_OPTIONS.list_students_by_sortable_name_enabled then student.sortable_name else student.name
             url: student.enrollment.grades.html_url+'#tab-assignments'
             sectionNames: sectionNames
             alreadyEscaped: true
 
           # fill in dummy submissions, so there's something there even if the
           # student didn't submit anything for that assignment
-          for id, assignment of @assignments
-            student["assignment_#{id}"] ||= { assignment_id: id, user_id: student.id }
+          for assignment_id, assignment of @assignments
+            student["assignment_#{assignment_id}"] ||= { assignment_id: assignment_id, user_id: student_id }
 
           @rows.push(student)
 
     defaultSortType: 'assignment_group'
 
+    studentsThatCanSeeAssignment: (potential_students, assignment) =>
+      if ENV.GRADEBOOK_OPTIONS.differentiated_assignments_enabled
+        _.pick potential_students, assignment.assignment_visibility...
+      else
+        potential_students
+
     getStoredSortOrder: =>
-      userSettings.contextGet('sort_grade_columns_by') || { sortType: @defaultSortType }
+      @gradebookColumnOrderSettings || {sortType: @defaultSortType}
 
     setStoredSortOrder: (newSortOrder) =>
-      if newSortOrder.sortType == @defaultSortType
-        userSettings.contextRemove('sort_grade_columns_by')
-      else
-        userSettings.contextSet('sort_grade_columns_by', newSortOrder)
+      url = ENV.GRADEBOOK_OPTIONS.gradebook_column_order_settings_url
+      $.ajaxJSON(url, 'POST', {column_order: newSortOrder})
 
     onColumnsReordered: =>
       # determine if assignment columns or custom columns were reordered
@@ -301,9 +379,9 @@ define [
       @$columnArrangementTogglers.each ->
         $(this).closest('li').showIf $(this).data('arrangeColumnsBy') isnt newSortOrder.sortType
 
-    arrangeColumnsBy: (newSortOrder) =>
+    arrangeColumnsBy: (newSortOrder, isFirstArrangement) =>
       @setArrangementTogglersVisibility(newSortOrder)
-      @setStoredSortOrder(newSortOrder)
+      @setStoredSortOrder(newSortOrder) unless isFirstArrangement
 
       columns = @grid.getColumns()
       frozen = columns.splice(0, @numberOfFrozenCols)
@@ -393,19 +471,25 @@ define [
         showingPoints: @displayPointTotals
         toggleShowingPoints: @togglePointsOrPercentTotals.bind(this)
         weightedGroups: @weightedGroups
+        totalColumnInFront: @totalColumnInFront
+        moveTotalColumn: @moveTotalColumn.bind(this)
       @totalHeader.render()
 
+    moveTotalColumn: =>
+      @totalColumnInFront = not @totalColumnInFront
+      userSettings.contextSet 'total_column_in_front', @totalColumnInFront
+      window.location.reload()
+
     assignmentGroupHtml: (group_name, group_weight) =>
-      escaped_group_name = htmlEscape(group_name)
       if @weightedGroups()
         percentage = I18n.toPercentage(group_weight, precision: 2)
         """
-          #{escaped_group_name}<div class='assignment-points-possible'>
-            #{I18n.t 'percent_of_grade', "%{percentage} of grade", percentage: percentage}
+          #{htmlEscape(group_name)}<div class='assignment-points-possible'>
+            #{htmlEscape I18n.t 'percent_of_grade', "%{percentage} of grade", percentage: percentage}
           </div>
         """
       else
-        "#{escaped_group_name}"
+        htmlEscape(group_name)
 
     # filter, sort, and build the dataset for slickgrid to read from, then force
     # a full redraw
@@ -429,6 +513,7 @@ define [
     getSubmissionsChunks: =>
       @withAllStudents (allStudentsObj) =>
         allStudents = (s for k, s of allStudentsObj)
+          .sort (a, b) => @localeSort(a.sortable_name, b.sortable_name)
         loop
           students = allStudents[@chunk_start...(@chunk_start+@options.chunk_size)]
           unless students.length
@@ -436,14 +521,17 @@ define [
             break
           params =
             student_ids: (student.id for student in students)
-            response_fields: ['id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission', 'attachments', 'late']
+            response_fields: ['id', 'user_id', 'url', 'score', 'grade', 'submission_type', 'submitted_at', 'assignment_id', 'grade_matches_current_submission', 'attachments', 'late', 'workflow_state']
+          params['grading_period_id'] = @gradingPeriodToShow if @mgpEnabled && @gradingPeriodToShow && @gradingPeriodToShow != '0' && @gradingPeriodToShow != ''
           $.ajaxJSON(@options.submissions_url, "GET", params, @gotSubmissionsChunk)
           @chunk_start += @options.chunk_size
 
     gotSubmissionsChunk: (student_submissions) =>
       for data in student_submissions
         student = @student(data.user_id)
-        @updateSubmission(submission) for submission in data.submissions
+        for submission in data.submissions
+          current_submission = student["assignment_#{submission.assignment_id}"]
+          @updateSubmission(submission) unless current_submission?["hidden"]
         student.loaded = true
         @grid.invalidateRow(student.row)
         @calculateStudentGrade(student)
@@ -486,6 +574,9 @@ define [
           editing and
           activeCell.row is student.row and
           activeCell.cell is cell
+        #check for DA visible
+        submission["hidden"] = !submission.assignment_visible if submission.assignment_visible?
+        @updateAssignmentVisibilities(submission) if submission["hidden"]
         @updateSubmission(submission)
         @calculateStudentGrade(student)
         @grid.updateCell student.row, cell unless thisCellIsActive
@@ -499,28 +590,34 @@ define [
     cellFormatter: (row, col, submission) =>
       if !@rows[row].loaded
         @staticCellFormatter(row, col, '')
+      else if submission.hidden
+        @uneditableCellFormatter(row, col)
       else if !submission?
         @staticCellFormatter(row, col, '-')
       else
         assignment = @assignments[submission.assignment_id]
         if !assignment?
           @staticCellFormatter(row, col, '')
+        # reverted until Quiz Icon pending review workflow_state thing is resolved
+        #else if submission.workflow_state == 'pending_review'
+        #  (SubmissionCell[assignment.grading_type] || SubmissionCell).formatter(row, col, submission, assignment)
         else
           if assignment.grading_type == 'points' && assignment.points_possible
             SubmissionCell.out_of.formatter(row, col, submission, assignment)
           else
-            (SubmissionCell[assignment.grading_type] || SubmissionCell).formatter(row, col, submission, assignment)
+            (SubmissionCell[assignment.grading_type] || SubmissionCell).formatter(row, col, submission, assignment, @grid)
 
     staticCellFormatter: (row, col, val) =>
-      "<div class='cell-content gradebook-cell'>#{val}</div>"
+      "<div class='cell-content gradebook-cell'>#{htmlEscape(val)}</div>"
+
+    uneditableCellFormatter: (row, col) =>
+      "<div class='cell-content gradebook-cell grayed-out cannot_edit'></div>"
 
     groupTotalFormatter: (row, col, val, columnDef, student) =>
       return '' unless val?
 
-      # rounds percentage to one decimal place
-      percentage = Math.round((val.score / val.possible) * 1000) / 10
+      percentage = @calculateAndRoundGroupTotalScore val.score, val.possible
       percentage = 0 if isNaN(percentage)
-
 
       if val.possible and @options.grading_standard and columnDef.type is 'total_grade'
         letterGrade = GradeCalculator.letter_grade(@options.grading_standard, percentage)
@@ -540,6 +637,10 @@ define [
     htmlContentFormatter: (row, col, val, columnDef, student) =>
       return '' unless val?
       val
+
+    calculateAndRoundGroupTotalScore: (score, possible_points) =>
+      grade = (score / possible_points) * 100
+      round(grade, DISPLAY_PRECISION)
 
     calculateStudentGrade: (student) =>
       if student.loaded
@@ -627,7 +728,7 @@ define [
       columnDef.name = columnDef.unminimizedName
       columnDef.minimized = false
       @$grid.find(".l#{colIndex}").add($columnHeader).removeClass('minimized')
-      $columnHeader.find('.slick-column-name').html(columnDef.name)
+      $columnHeader.find('.slick-column-name').html($.raw(columnDef.name))
       @assignmentsToHide = $.grep @assignmentsToHide, (el) -> el != columnDef.id
       userSettings.contextSet('hidden_columns', _.uniq(@assignmentsToHide))
 
@@ -651,7 +752,7 @@ define [
         # add lines for dropped, late, resubmitted
         Array::push.apply htmlLines, $.map(SubmissionCell.classesBasedOnSubmission(submission, assignment), (c)=> GRADEBOOK_TRANSLATIONS["#submission_tooltip_#{c}"])
       else if assignment.points_possible?
-        htmlLines.push I18n.t('points_out_of', "out of %{points_possible}", points_possible: assignment.points_possible)
+        htmlLines.push htmlEscape(I18n.t('points_out_of', "out of %{points_possible}", points_possible: assignment.points_possible))
 
       $hoveredCell.data('tooltip', $("<span />",
         class: 'gradebook-tooltip'
@@ -660,7 +761,7 @@ define [
           top: offset.top
           zIndex: 10000
           display: 'block'
-        html: htmlLines.join('<br />')
+        html: $.raw(htmlLines.join('<br />'))
       ).appendTo('body')
       .css('top', (i, top) -> parseInt(top) - $(this).outerHeight()))
 
@@ -701,6 +802,11 @@ define [
       $(@spinner.el).remove()
       $('#gradebook-grid-wrapper').show()
       @uid = @grid.getUID()
+      $('#content').focus ->
+        $('#accessibility_warning').removeClass('screenreader-only')
+      $('#accessibility_warning').focus ->
+        $('#accessibility_warning').blur ->
+          $('#accessibility_warning').remove()
       @$grid = grid = $('#gradebook_grid')
         .fillWindowWithMe({
           onResize: => @grid.resizeCanvas()
@@ -718,6 +824,7 @@ define [
             $(this).find('div.gradebook-tooltip').removeClass('first-row')
         .delegate '.gradebook-cell-comment', 'click.gradebook', (event) =>
           event.preventDefault()
+          return false if $(@grid.getActiveCellNode()).hasClass("cannot_edit")
           data = $(event.currentTarget).data()
           $(@grid.getActiveCellNode()).removeClass('editable')
           SubmissionDetailsDialog.open @assignments[data.assignmentId], @student(data.userId.toString()), @options
@@ -752,40 +859,65 @@ define [
 
     sectionList: ->
       _.map @sections, (section, id) =>
-        { name: section.name, id: id, checked: @sectionToShow == id }
+        if(section.passback_status)
+          date = new Date(section.passback_status.sis_post_grades_status.grades_posted_at)
+        { name: section.name, id: id, passback_status: section.passback_status, date: date, checked: @sectionToShow == id }
 
     drawSectionSelectButton: () ->
       @sectionMenu = new SectionMenuView(
         el: $('.section-button-placeholder'),
         sections: @sectionList(),
+        course: @course,
+        showSections: @showSections(),
+        showSisSync: @options.post_grades_feature_enabled,
         currentSection: @sectionToShow)
       @sectionMenu.render()
 
     updateCurrentSection: (section, author) =>
       @sectionToShow = section
-      @displayPostGradesButton(section)
+      @postGradesStore.setSelectedSection @sectionToShow
       userSettings[if @sectionToShow then 'contextSet' else 'contextRemove']('grading_show_only_section', @sectionToShow)
       @buildRows() if @grid
 
-    displayPostGradesButton: (section) =>
-      if section?
-        is_integration_section = @sections[section] && @sections[section].integration_id
+    showSections: ->
+      if @sections_enabled && @options.post_grades_feature_enabled
+        true
       else
-        is_integration_course = ENV.GRADEBOOK_OPTIONS.context_integration_id
+        false
 
-      if is_integration_section or is_integration_course
-        @showPostGradesButton()
-      else
-        @hidePostGradesButton()
+    gradingPeriodList: ->
+      _.map @gradingPeriods, (period) =>
+        { title: period.title, id: period.id, checked: @gradingPeriodToShow == period.id }
 
-    hidePostGradesButton: ->
-      $('#post-grades-button').closest('.gradebook-navigation').addClass('hidden')
+    drawGradingPeriodSelectButton: () ->
+      @gradingPeriodMenu = new GradingPeriodMenuView(
+        el: $('.multiple-grading-periods-selector-placeholder'),
+        periods: @gradingPeriodList(),
+        currentGradingPeriod: @gradingPeriodToShow)
+      @gradingPeriodMenu.render()
+
+    updateCurrentGradingPeriod: (period) =>
+      userSettings.contextSet 'gradebook_current_grading_period', period
+      window.location.reload()
+
+    initPostGradesStore: ->
+      @postGradesStore = PostGradesStore
+        course:
+          id:     ENV.GRADEBOOK_OPTIONS.context_id
+          sis_id: ENV.GRADEBOOK_OPTIONS.context_sis_id
+
+      @postGradesStore.setSelectedSection @sectionToShow
+
 
     showPostGradesButton: ->
-      $('#post-grades-button').closest('.gradebook-navigation').removeClass('hidden')
+      app = new PostGradesApp store: @postGradesStore
+      $placeholder = $('.post-grades-placeholder')
+      if ($placeholder.length > 0)
+        React.renderComponent(app, $placeholder[0])
 
     initHeader: =>
-      @drawSectionSelectButton() if @sections_enabled
+      @drawSectionSelectButton() if @sections_enabled || @course
+      @drawGradingPeriodSelectButton() if @mgpEnabled
 
       $settingsMenu = $('#gradebook_settings').next()
       $.each ['show_attendance', 'include_ungraded_assignments', 'show_concluded_enrollments'], (i, setting) =>
@@ -807,23 +939,103 @@ define [
       @$columnArrangementTogglers = $('#gradebook-toolbar [data-arrange-columns-by]').bind 'click', (event) =>
         event.preventDefault()
         newSortOrder = { sortType: $(event.currentTarget).data('arrangeColumnsBy') }
-        @arrangeColumnsBy(newSortOrder)
-      @arrangeColumnsBy(@getStoredSortOrder())
+        @arrangeColumnsBy(newSortOrder, false)
+      @arrangeColumnsBy(@getStoredSortOrder(), true)
 
-      $('#gradebook_settings').show().kyleMenu()
-
-      $settingsMenu.find('.gradebook_upload_link').click (event) =>
-        event.preventDefault()
-        new UploadDialog(@options.context_url)
+      $('#gradebook_settings').kyleMenu()
+      $('#download_csv').kyleMenu()
 
       $settingsMenu.find('.student_names_toggle').click(@studentNamesToggle)
 
       @userFilter = new InputFilterView el: '.gradebook_filter input'
       @userFilter.on 'input', @onUserFilterInput
 
-      @initPostGrades()
-
       @renderTotalHeader()
+      @initGradebookExporter()
+
+    initGradebookExporter: () =>
+      self = this
+
+      @initPreviousGradebookExportLink()
+
+      current_progress = ENV.GRADEBOOK_OPTIONS.gradebook_csv_progress
+      attachment = ENV.GRADEBOOK_OPTIONS.attachment
+
+      if current_progress && current_progress.progress.workflow_state != 'completed'
+        $('#download_csv').prop('disabled', true)
+        loading_interval = self.exportingGradebookStatus()
+
+        attachment_progress =
+          progress_id: current_progress.progress.id
+          attachment_id: attachment.attachment.id
+
+        @pollProgressForCSVExport(loading_interval, attachment_progress)
+
+      $('.generate_new_csv').click ->
+        $('#download_csv').prop('disabled', true)
+        loading_interval = self.exportingGradebookStatus()
+        $.ajaxJSON(ENV.GRADEBOOK_OPTIONS.export_gradebook_csv_url, 'GET')
+          .then((attachment_progress) ->
+            self.pollProgressForCSVExport(loading_interval, attachment_progress)
+          )
+
+    pollProgressForCSVExport: (loading_interval, attachment_progress) =>
+      self = this
+      polling = setInterval(() ->
+        $.ajaxJSON("/api/v1/progress/#{attachment_progress.progress_id}", 'GET').promise()
+          .then((response) ->
+            if response.workflow_state == 'failed'
+              clearInterval polling
+              clearInterval loading_interval
+              $.flashError(I18n.t('There was a problem exporting.'))
+
+            if response.workflow_state == 'completed'
+              $.ajaxJSON("/api/v1/users/#{ENV.current_user_id}/files/#{attachment_progress.attachment_id}", 'get')
+                .then((response) ->
+                  document.getElementById('csv_download').src = response.url
+
+                  updated_date = $.datetimeString(response.created_at)
+                  updated_previous_report = "#{I18n.t('Previous (%{timestamp})', timestamp: updated_date)}"
+                  $previous_link = $('#csv_export_options').children('li').last().children('a')
+                  $previous_link.text(updated_previous_report)
+                  $previous_link.attr('href', response.url)
+                  $('#csv_export_options').children('li').last().css('display', 'block')
+                  self.initPreviousGradebookExportLink()
+
+                  $('#download_csv').prop('disabled', false)
+                  self.setExportButtonTitle(I18n.t('Export'))
+
+                  clearInterval polling
+                  clearInterval loading_interval
+               )
+          )
+      , 2000)
+
+    initPreviousGradebookExportLink: () =>
+      link = $('#csv_export_options').children('li').last().children()
+      link.on 'click', (event) ->
+        event.preventDefault()
+        document.getElementById('csv_download').src = link[0].href
+
+    exportingGradebookStatus: () =>
+      self = this
+      loading_indicator = ''
+      count = 0
+      loading = setInterval(() ->
+        count++
+
+        loading_indicator = new Array(count % 5).join('.')
+        nonBreakingSpacesCount = 3 - loading_indicator.length
+        nonBreakingSpaces = ""
+        for scale in [0..nonBreakingSpacesCount]
+          nonBreakingSpaces += "&nbsp;"
+
+        self.setExportButtonTitle("#{I18n.t("Exporting")}#{loading_indicator}#{nonBreakingSpaces}")
+      , 200)
+      loading
+
+    setExportButtonTitle: (updated_title) =>
+      $($('#download_csv').children('span').contents()[2]).replaceWith(updated_title)
 
     studentNamesToggle: (e) =>
       e.preventDefault()
@@ -903,6 +1115,8 @@ define [
     getVisibleGradeGridColumns: ->
       res = [].concat @parentColumns, @customColumnDefinitions()
       for column in @allAssignmentColumns
+        if @disabledAssignments && @disabledAssignments.indexOf(column.object.id) != -1
+          column.cssClass = "cannot_edit"
         submissionType = ''+ column.object.submission_types
         res.push(column) unless submissionType is "not_graded" or
                                 submissionType is "attendance" and !@show_attendance
@@ -936,20 +1150,29 @@ define [
 
       @setAssignmentWarnings()
 
+      studentColumnWidth = 150
+      identifierColumnWidth = 100
+      if @gradebookColumnSizeSettings
+        if @gradebookColumnSizeSettings['student']
+          studentColumnWidth = parseInt(@gradebookColumnSizeSettings['student'])
+
+        if @gradebookColumnSizeSettings['secondary_identifier']
+          identifierColumnWidth = parseInt(@gradebookColumnSizeSettings['secondary_identifier'])
+
       @parentColumns = [
         id: 'student'
-        name: I18n.t 'student_name', 'Student Name'
+        name: htmlEscape I18n.t 'student_name', 'Student Name'
         field: 'display_name'
-        width: 150
+        width: studentColumnWidth
         cssClass: "meta-cell"
         resizable: true
         sortable: true
         formatter: @htmlContentFormatter
       ,
         id: 'secondary_identifier'
-        name: I18n.t 'secondary_id', 'Secondary ID'
+        name: htmlEscape I18n.t 'secondary_id', 'Secondary ID'
         field: 'secondary_identifier'
-        width: 100
+        width: identifierColumnWidth
         cssClass: "meta-cell secondary_identifier_cell"
         resizable: true
         sortable: true
@@ -963,6 +1186,11 @@ define [
                          SubmissionCell.out_of
         minWidth = if outOfFormatter then 70 else 90
         fieldName = "assignment_#{id}"
+
+        assignmentWidth = testWidth(assignment.name, minWidth, columnWidths.assignment.default_max)
+        if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings[fieldName]
+          assignmentWidth = parseInt(@gradebookColumnSizeSettings[fieldName])
+
         columnDef =
           id: fieldName
           field: fieldName
@@ -974,7 +1202,7 @@ define [
                   SubmissionCell
           minWidth: columnWidths.assignment.min,
           maxWidth: columnWidths.assignment.max,
-          width: testWidth(assignment.name, minWidth, columnWidths.assignment.default_max),
+          width: assignmentWidth
           sortable: true
           toolTip: assignment.name
           type: 'assignment'
@@ -991,37 +1219,51 @@ define [
         columnDef
 
       @aggregateColumns = for id, group of @assignmentGroups
+        fieldName = "assignment_group_#{id}"
+
+        aggregateWidth = testWidth(group.name, columnWidths.assignmentGroup.min, columnWidths.assignmentGroup.default_max)
+        if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings[fieldName]
+          aggregateWidth = parseInt(@gradebookColumnSizeSettings[fieldName])
+
         {
-          id: "assignment_group_#{id}"
-          field: "assignment_group_#{id}"
+          id: fieldName
+          field: fieldName
           formatter: @groupTotalFormatter
           name: @assignmentGroupHtml(group.name, group.group_weight)
           toolTip: group.name
           object: group
           minWidth: columnWidths.assignmentGroup.min,
           maxWidth: columnWidths.assignmentGroup.max,
-          width: testWidth(group.name, columnWidths.assignmentGroup.min, columnWidths.assignmentGroup.default_max)
+          width: aggregateWidth
           cssClass: "meta-cell assignment-group-cell",
           sortable: true
           type: 'assignment_group'
         }
 
       total = I18n.t "total", "Total"
-      @aggregateColumns.push
+
+      totalWidth = testWidth("Total", columnWidths.total.min, columnWidths.total.max)
+      if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings['total_grade']
+        totalWidth = @gradebookColumnSizeSettings['total_grade']
+
+      total_column =
         id: "total_grade"
         field: "total_grade"
         formatter: @groupTotalFormatter
         name: """
-          #{total}
+          #{htmlEscape total}
           <div id=total_column_header></div>
         """
         toolTip: total
         minWidth: columnWidths.total.min
         maxWidth: columnWidths.total.max
-        width: testWidth("Total", columnWidths.total.min, columnWidths.total.max)
-        cssClass: "total-cell"
+        width: totalWidth
+        cssClass: if @totalColumnInFront then 'meta-cell' else 'total-cell'
         sortable: true
         type: 'total_grade'
+
+      (if @totalColumnInFront then @parentColumns else
+        @aggregateColumns).push total_column
 
       $widthTester.remove()
 
@@ -1068,8 +1310,26 @@ define [
         false
 
       @grid.onColumnsReordered.subscribe @onColumnsReordered
+      @grid.onBeforeEditCell.subscribe @onBeforeEditCell
+      @grid.onColumnsResized.subscribe @onColumnsResized
 
       @onGridInit()
+
+    onColumnsResized: (event, obj) =>
+      grid = obj.grid
+      columns = grid.getColumns()
+
+      _.each columns, (column) =>
+        if column.previousWidth && column.width != column.previousWidth
+          @saveColumnWidthPreference(column.id, column.width)
+
+    saveColumnWidthPreference: (id, newWidth) ->
+      url = ENV.GRADEBOOK_OPTIONS.gradebook_column_size_settings_url
+      $.ajaxJSON(url, 'POST', {column_id: id, column_size: newWidth})
+
+    onBeforeEditCell: (event, {row, cell}) =>
+      $cell = @grid.getCellNode(row, cell)
+      return false if $($cell).hasClass("cannot_edit") || $($cell).find(".gradebook-cell").hasClass("cannot_edit")
 
     onCellChange: (event, {item, column}) =>
       if col_id = column.field.match /^custom_col_(\d+)/
@@ -1165,6 +1425,10 @@ define [
         else
           @totalGradeWarning = null
 
+    ###
+    xsslint jqueryObject.identifier createLink
+    xsslint jqueryObject.function showLink hideLink
+    ###
     showCustomColumnDropdownOption: ->
       linkContainer = $("<li>").appendTo(".gradebook_drop_down")
 

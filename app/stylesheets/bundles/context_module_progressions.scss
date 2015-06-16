@@ -1,0 +1,150 @@
+@import "base/environment";
+
+@if $use_new_styles == false {
+  #breadcrumbs { border-bottom: solid 1px $ic-border-light; }
+  #content { padding: 0; }
+}
+
+#progression_modules {
+  min-height: 450px;
+  @if $use_new_styles {
+    .message, .student-header { 
+      margin: 0;
+      line-height: 1.2;
+    }
+  }
+  @else {
+    .message, .student-header { margin-left: 25px; }  
+  }
+  .collectionViewItems {
+    list-style-type: none;
+    @if $use_new_styles { margin: 0 0 $ic-sp; }
+    li {
+      .progression-module {
+        @if $use_new_styles { background-color: $lightBackground; }
+        @else { background-color: $tableBackgroundAccent; }
+        padding: 0;
+        .name, .status.no_subtitle {
+          @if $use_new_styles { padding: $ic-sp; }
+          @else { padding: 12px 16px; }
+        }
+        .status {
+          padding-right: 16px;
+          text-align: right;
+          .subtitle {
+            color: $ic-hint-text;
+            font-size: 12px;
+            font-weight: normal;
+          }
+        }
+        .completed {
+          color: $successText;
+        }
+        hr {
+          margin: 0;
+          border-top-color: $ic-border-light;
+        }
+        .items {
+          ul {
+            list-style-type: none;
+            padding: 6px 0px;
+            li {
+              padding: 6px 0px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+#progression_students {
+  height: 450px;
+  @if $use_new_styles {
+    background-color: $lightBackground;
+    border: 1px solid $ic-border-light;
+  }
+  @else {
+    background-color: $tableBackgroundAccent;
+    border-left: solid 1px $ic-border-light;
+  }
+  p {
+    padding: 8px;
+  }
+  .header {
+    border-bottom: solid 1px $ic-border-light;
+    h3 {
+      font-size: inherit;
+      line-height: inherit;
+      text-transform: uppercase;
+      @if $use_new_styles {
+        font-weight: 500;
+        display: inline-block;
+        line-height: 1.3;
+        margin: 0;
+      }
+      @else {
+        display: inline;
+        font-weight: bold;
+      }
+    }
+    a {
+      float: right;
+    }
+  }
+  .header, li {
+    @if $use_new_styles { padding: $ic-sp/2 $ic-sp; }
+    @else { padding: 8px 16px; }
+  }
+  .collectionViewItems {
+    list-style-type: none;
+    margin-left: 0;
+    overflow-y: auto;
+    .student {
+      cursor: pointer;
+      border-top: solid 1px transparent;
+      a {
+        color: $ic-font-color-dark;
+        @if $use_new_styles {
+          box-sizing: border-box;
+          width: 100%;
+          display: block;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+      &.active {
+        background-color: $btnBackground;
+        border-bottom: solid 1px $ic-border-light;
+        @if $use_new_styles { font-weight: 500; }
+        @else { font-weight: bold; }
+        margin-left: -1px;
+        a { color: $ic-link-color; }
+      }
+    }
+    .student + .student.active {
+      border-top-color: $ic-border-light;
+    }
+  }
+}
+
+@if $use_new_styles {
+  .module-progress-view {
+    display: flex;
+    box-sizing: border-box;
+  }
+
+  .module-progress-view__modules {
+    flex: 1;
+    box-sizing: border-box;
+    padding-right: $ic-sp;
+    @include breakpoint(desktop) { padding-right: $ic-sp*2; }
+  }
+
+  .module-progress-view__students {
+    box-sizing: border-box;
+    flex: 0 0 $ic-sp*16;
+    @include breakpoint(desktop) { flex: 0 0 $ic-sp*18; }
+    @include breakpoint(wide) { flex: 0 0 $ic-sp*20; }
+  }
+}

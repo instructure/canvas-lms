@@ -1,0 +1,257 @@
+{{!-- Shows on any page in Canvas when a new session is kicked off--}}
+<div  
+  id="agenda-step-1" 
+  class="popover tour tour--notification"  
+  data-points-to="#identity"
+  data-position="bottom" 
+  aria-hidden="true"
+> 
+  <div class="arrow"></div> 
+  <div class="popover-content"> 
+    <div class="grid-row">
+      <div class="tour-icon">
+        <i class="icon-tour-info" aria-hidden="true"></i>
+      </div>
+      <div class="tour-content">
+        <p>{{#t}}Your <strong>Assignments</strong> list has improved!{{/t}}</p>       
+        <div class="controls"> 
+            <button class="agenda-step-2-button btn btn-small btn-success" data-usher-show="agenda-step-2">{{#t}}Show me{{/t}}</button>
+            <button class="btn btn-small usher-close">{{#t}}Not now{{/t}}</button>  
+        </div>  
+        <div class="hide-tour-link">
+          <button class="btn btn-link dismiss-tour">{{#t}}don't show again{{/t}}</button>  
+        </div>
+      </div>  
+    </div>      
+  </div>  
+</div>
+
+{{!-- If are you are starting from an area that is not calendar... --}}
+<div  
+  id="agenda-step-2"  
+  data-points-to="#menu #calendar_menu_item"  
+  class="popover tour bottom"  
+  data-position="bottom" 
+  data-offset-x="-100"  
+  data-offset-y="10"
+  aria-hidden="true"
+> 
+  <div class="arrow"></div> 
+  <div class="popover-content"> 
+    <div class="grid-row">
+      <div class="tour-icon">
+        <i class="icon-tour-info" aria-hidden="true"></i>
+      </div>
+      <div class="tour-content">
+        <p>     
+          {{#t}}Click here on the <strong>Calendar</strong> link{{/t}}
+        </p>  
+        <div class="controls">
+          <div class="step-counter" aria-hidden="true">
+            <i class="icon-tour-step-counter step-counter_item step-counter_item--current"></i>
+            <i class="icon-tour-step-counter step-counter_item"></i>
+            <i class="icon-tour-step-counter step-counter_item"></i>
+            <i class="icon-tour-step-counter step-counter_item"></i>
+          </div>
+        </div>
+      </div>      
+    </div>
+  </div>  
+</div>
+
+{{!-- If you're on the calendar page when you start the tour --}}
+<div  
+  id="agenda-step-2-on-calendar"  
+  data-points-to="#menu #calendar_menu_item"  
+  class="popover tour bottom"  
+  data-position="bottom" 
+  data-offset-x="-100"  
+  data-offset-y="10"
+  aria-hidden="true"
+> 
+  <div class="arrow"></div> 
+  <div class="popover-content">
+    <div class="grid-row">
+      <div class="tour-icon">
+        <i class="icon-tour-info" aria-hidden="true"></i>
+      </div> 
+      <div class="tour-content">
+        <p> 
+         {{#t}}Your Assignment list can now be found on the <strong>Calendar</strong> page.{{/t}}
+        </p>  
+        <div class="controls grid-row middle-xs">
+          <div class="step-counter" aria-hidden="true">
+            <i class="icon-tour-step-counter step-counter_item step-counter_item--current"></i>
+            <i class="icon-tour-step-counter step-counter_item"></i>
+            <i class="icon-tour-step-counter step-counter_item"></i>
+            <i class="icon-tour-step-counter step-counter_item"></i>
+          </div> 
+          <div class="controls--items-align-right">
+            <button class="agenda-step-3 btn btn-small" data-usher-show="agenda-step-3">{{#t}}Next{{/t}}</button>   
+          </div>      
+        </div>
+      </div>      
+    </div>
+  </div>  
+</div>
+
+{{!-- Click on the Agenda view --}}
+<div  
+  id="agenda-step-3"  
+  data-points-to=".calendar_view_buttons #agenda"  
+  class="popover tour bottom"  
+  data-position="bottom"
+  aria-hidden="true"
+> 
+  <div class="arrow"></div> 
+  <div class="popover-content"> 
+    <div class="grid-row">
+      <div class="tour-icon">
+        <i class="icon-tour-info" aria-hidden="true"></i>
+      </div>
+      <div class="tour-content">
+        <p> 
+         {{#t}}Now click the <strong>Agenda</strong> button{{/t}}
+        </p>  
+        <div class="controls">
+          <div class="step-counter" aria-hidden="true">
+            <i class="icon-tour-step-counter step-counter_item"></i>
+            <i class="icon-tour-step-counter step-counter_item step-counter_item--current"></i>
+            <i class="icon-tour-step-counter step-counter_item"></i>
+            <i class="icon-tour-step-counter step-counter_item"></i>
+          </div> 
+        </div>
+      </div>
+    </div>    
+  </div>  
+</div>
+
+{{!-- If the Agenda view is already active... --}}
+<div  
+  id="agenda-step-3-on-agenda-already"  
+  data-points-to=".calendar_view_buttons #agenda"  
+  class="popover tour bottom"  
+  data-position="bottom"
+  aria-hidden="true"
+> 
+  <div class="arrow"></div> 
+  <div class="popover-content"> 
+    <div class="grid-row">
+        <div class="tour-icon">
+          <i class="icon-tour-info" aria-hidden="true"></i>
+        </div>
+        <div class="tour-content">
+          <p> 
+            {{#t}}To view assignments, make sure the <strong>Agenda</strong> view is active.{{/t}}
+          </p>  
+          <div class="controls grid-row middle-xs">
+            <div class="step-counter" aria-hidden="true">
+              <i class="icon-tour-step-counter step-counter_item"></i>
+              <i class="icon-tour-step-counter step-counter_item step-counter_item--current"></i>
+              <i class="icon-tour-step-counter step-counter_item"></i>
+              <i class="icon-tour-step-counter step-counter_item"></i>
+            </div> 
+            <div class="controls--items-align-right">
+              <button class="agenda-step-3-on-agenda-already-button btn btn-small" data-usher-show="agenda-step-4">{{#t}}Next{{/t}}</button>   
+            </div>      
+          </div>
+        </div>
+    </div>    
+  </div>  
+</div>
+
+
+{{!-- If no assignments - Show a window describing the assignments list --}}
+<div  
+  id="agenda-step-4-no-assignments"  
+  data-points-to="span.agendaView--no-assignments" 
+  class="popover tour bottom"  
+  data-position="bottom"
+  aria-hidden="true"
+> 
+  <div class="arrow"></div> 
+  <div class="popover-content"> 
+    <div class="grid-row">
+      <div class="tour-icon">
+        <i class="icon-tour-info" aria-hidden="true"></i>
+      </div>  
+      <div class="tour-content">
+        <p> 
+          {{#t}}Your Assignments will show here listed by due date.{{/t}}
+        </p>  
+        <div class="controls grid-row middle-xs">
+          <div class="step-counter step-counter--align-left" aria-hidden="true">
+            <i class="icon-tour-step-counter step-counter_item"></i>
+            <i class="icon-tour-step-counter step-counter_item"></i>
+            <i class="icon-tour-step-counter step-counter_item step-counter_item--current"></i>
+            <i class="icon-tour-step-counter step-counter_item"></i>
+          </div> 
+          <div class="controls--items-align-right">
+            <button class="btn btn-small" data-usher-show="agenda-step-5">{{#t}}Next{{/t}}</button>   
+          </div>      
+        </div>
+      </div>    
+    </div>
+  </div>
+</div>
+
+
+{{!-- If Assignments - Show a window describing the assignments list --}}
+<div  
+  id="agenda-step-4"  
+  data-points-to="li.agenda-event:first-child span.ig-title" 
+  class="popover tour bottom"  
+  data-position="bottom"
+  aria-hidden="true"
+> 
+  <div class="arrow"></div> 
+  <div class="popover-content"> 
+    <div class="grid-row">
+      <div class="tour-icon">
+        <i class="icon-tour-info" aria-hidden="true"></i>
+      </div>  
+      <div class="tour-content">
+        <p> 
+          {{#t}}Here are your Assignments, listed by due date.{{/t}}
+        </p>  
+        <div class="controls grid-row middle-xs">
+          <div class="step-counter step-counter--align-left" aria-hidden="true">
+            <i class="icon-tour-step-counter step-counter_item"></i>
+            <i class="icon-tour-step-counter step-counter_item"></i>
+            <i class="icon-tour-step-counter step-counter_item step-counter_item--current"></i>
+            <i class="icon-tour-step-counter step-counter_item"></i>
+          </div> 
+          <div class="controls--items-align-right">
+            <button class="btn btn-small" data-usher-show="agenda-step-5">{{#t}}Next{{/t}}</button>   
+          </div>      
+        </div>
+      </div>    
+    </div>
+  </div>
+</div>
+
+{{!-- Last step - show you can turn calendars on and off --}}
+<div  
+  id="agenda-step-5"  
+  data-points-to="#context-list-holder" 
+  class="popover tour left"  
+  data-position="left"
+  aria-hidden="true"
+> 
+<div class="arrow"></div> 
+<div class="popover-content"> 
+  <div class="grid-row">
+    <div class="tour-icon">
+      <i class="icon-tour-info" aria-hidden="true"></i>
+    </div>  
+    <div class="tour-content">
+      <p>{{#t}}You can hide or show a course’s assignments by toggling them on or off.{{/t}}</p> 
+      <div class="controls grid-row middle-xs controls--buttons-only">       
+          <button class="btn usher-close">{{#t}}Remind me next time{{/t}}</button>        
+          <button class="btn dismiss-tour">{{#t}}Okay, got it{{/t}}</button>          
+      </div>  
+    </div>
+  </div>
+  
+</div>  
+</div>

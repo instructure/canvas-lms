@@ -125,6 +125,7 @@ tr.question td .number_answer.correct_answer {
 }
 </style>
 <% end %>
+
 <% content_for :right_side do %>
   <% if !@context.large_roster? %>
     <h2><%= @quiz.survey? ?
@@ -189,7 +190,7 @@ tr.question td .number_answer.correct_answer {
 <% end %>
 
 <% if !@context.large_roster? %>
-  <h2><%= @quiz.survey? ? t('headers.survey_statistics', "Survey Statistics") : t('headers.quiz_statistics', "Quiz Statistics") %></h2>
+  <h1><%= @quiz.survey? ? t('headers.survey_statistics', "Survey Statistics") : t('headers.quiz_statistics', "Quiz Statistics") %></h1>
   <table id="statistics">
   <% @statistics[:questions].each do |question_type, data| %>
     <% if question_type == 'group' %>
@@ -197,13 +198,13 @@ tr.question td .number_answer.correct_answer {
         <td colspan="3" class="group_name"><%= data[:name] %></td>
       </tr>
       <% data[:questions].each do |question_type, question| %>
-        <%= render :partial => 'question_statistic', :object => question, :locals => {:in_group => true, :ignore_correct_answers => @quiz.quiz_type == 'survey' || @quiz.quiz_type == 'graded_survey'} %>
+        <%= render :partial => 'question_statistic', :object => question, :locals => {:in_group => true, :ignore_correct_answers => @quiz.survey?} %>
       <% end %>
       <tr class="group_bottom">
         <td colspan="3">&nbsp;</td>
       </tr>
     <% else %>
-      <%= render :partial => 'question_statistic', :object => data, :locals => {:ignore_correct_answers => @quiz.quiz_type == 'survey' || @quiz.quiz_type == 'graded_survey'} %>
+      <%= render :partial => 'question_statistic', :object => data, :locals => {:ignore_correct_answers => @quiz.survey?} %>
     <% end %>
   <% end %>
   </table>

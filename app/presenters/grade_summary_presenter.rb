@@ -70,7 +70,7 @@ class GradeSummaryPresenter
 
   def selectable_courses
     courses_with_grades.to_a.select do |course|
-      student_enrollment = course.all_student_enrollments.find_by_user_id(student)
+      student_enrollment = course.all_student_enrollments.where(user_id: student).first
       student_enrollment.grants_right?(@current_user, :read_grades)
     end
   end
@@ -80,11 +80,11 @@ class GradeSummaryPresenter
       if @id_param # always use id if given
         validate_id
         user_id = Shard.relative_id_for(@id_param, @context.shard, @context.shard)
-        @context.shard.activate { @context.all_student_enrollments.find_by_user_id(user_id) }
+        @context.shard.activate { @context.all_student_enrollments.where(user_id: user_id).first }
       elsif observed_students.present? # otherwise try to find an observed student
         observed_student
       else # or just fall back to @current_user
-        @context.shard.activate { @context.all_student_enrollments.find_by_user_id(@current_user) }
+        @context.shard.activate { @context.all_student_enrollments.where(user_id: @current_user).first }
       end
     end
   end
@@ -107,17 +107,17 @@ class GradeSummaryPresenter
   end
 
   def groups
-    @groups ||= @context.assignment_groups.
-      active.includes(relevant_assignments_scope => :assignment_overrides).all
+    @groups ||= @context.assignment_groups.active.all
   end
 
-  def assignments
+  def assignments(gp_id = nil)
     @assignments ||= begin
+      visible_assignments = AssignmentGroup.visible_assignments(student, @context, groups, [:assignment_overrides])
+      if gp_id
+        visible_assignments = GradingPeriod.active.find(gp_id).assignments(visible_assignments)
+      end
       group_index = groups.index_by(&:id)
-
-      groups.flat_map(&relevant_assignments_scope).select { |a|
-        a.submission_types != 'not_graded'
-      }.map { |a|
+      visible_assignments.select { |a| a.submission_types != 'not_graded'}.map { |a|
         # prevent extra loads
         a.context = @context
         a.assignment_group = group_index[a.assignment_group_id]
@@ -127,10 +127,6 @@ class GradeSummaryPresenter
     end
   end
 
-  def relevant_assignments_scope
-    AssignmentGroup.assignment_scope_for_grading(@context)
-  end
-
   def submissions
     @submissions ||= begin
       ss = @context.submissions
@@ -138,7 +134,12 @@ class GradeSummaryPresenter
                 {:rubric_assessments => [:rubric, :rubric_association]},
                 :content_participations)
       .where("assignments.workflow_state != 'deleted'")
-      .find_all_by_user_id(student)
+      .where(user_id: student).to_a
+
+      if @context.feature_enabled?(:differentiated_assignments)
+        visible_assignment_ids = AssignmentStudentVisibility.visible_assignment_ids_for_user(student_id, @context.id)
+        ss.select!{ |submission| visible_assignment_ids.include?(submission.assignment_id) }
+      end
 
       assignments_index = assignments.index_by(&:id)
 
@@ -168,19 +169,21 @@ class GradeSummaryPresenter
   end
 
   def assignment_stats
-    @stats ||= @context.assignments.active
-      .except(:order)
-      .joins(:submissions)
-      .where("submissions.user_id in (?)", real_and_active_student_ids)
-      .group("assignments.id")
-      .select("assignments.id, max(score) max, min(score) min, avg(score) avg")
-      .index_by(&:id)
+    @stats ||= begin
+      chain = @context.assignments.active.except(:order)
+      # note: because a score is needed for max/min/ave we are not filtering
+      # by assignment_student_visibilities, if a stat is added that doesn't
+      # require score then add a filter when the DA feature is on
+      chain.joins(:submissions)
+        .where("submissions.user_id in (?)", real_and_active_student_ids)
+        .group("assignments.id")
+        .select("assignments.id, max(score) max, min(score) min, avg(score) avg")
+        .index_by(&:id)
+    end
   end
 
   def real_and_active_student_ids
-    @context.all_real_student_enrollments
-      .where("workflow_state not in (?)", ['rejected','inactive'])
-      .pluck(:user_id).uniq
+    @context.all_real_student_enrollments.active_or_pending.pluck(:user_id).uniq
   end
 
   def assignment_presenters

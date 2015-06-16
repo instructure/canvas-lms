@@ -52,7 +52,7 @@ module Quizzes::QuizQuestionDataFixer
   end
 
   def self.find_good_data(aq)
-    aq.versions.sort_by { |v| v.number }.reverse.each do |version|
+    aq.versions.sort_by { |v| v.number }.reverse_each do |version|
       data = version.model.question_data
       return data if is_valid_data(data)
     end

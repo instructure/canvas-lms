@@ -20,11 +20,12 @@ define [
       groupCategory = new GroupCategory()
       view = new GroupCreateView({groupCategory: groupCategory, model: group})
       view.render()
-      view.$el.appendTo($(document.body))
+      view.$el.appendTo($("#fixtures"))
 
     teardown: ->
       fakeENV.teardown()
       view.remove()
+      document.getElementById("fixtures").innerHTML = ""
 
   test 'renders join level in add group dialog for student organized group categories', ->
     view.groupCategory.set('role': 'student_organized')
@@ -35,6 +36,24 @@ define [
   test 'does not render join level in add group dialog for non student organized group categories', ->
     $group_join_level_select = $('#group_join_level')
     equal $group_join_level_select.length, 0
+
+  module 'GroupCreateView with blank fields',
+    setup: ->
+      fakeENV.setup()
+      group = new Group
+      groupCategory = new GroupCategory()
+      view = new GroupCreateView({groupCategory: groupCategory, model: group})
+      view.render()
+      view.$el.appendTo($("#fixtures"))
+
+    teardown: ->
+      fakeENV.teardown()
+      view.remove()
+      document.getElementById("fixtures").innerHTML = ""
+
+  test 'set focus on the group edit save button', ->
+    view.setFocusAfterError()
+    equal document.activeElement, $("#groupEditSaveButton")[0], "Active element"
 
   ### fails sporadically on jenkins
   test 'editing group should change name', ->

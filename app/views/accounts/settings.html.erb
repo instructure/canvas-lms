@@ -10,16 +10,18 @@
       'default_storage_quota_mb' => @context.default_storage_quota_mb,
       'default_user_storage_quota_mb' => @context.default_user_storage_quota_mb,
       'default_group_storage_quota_mb' => @context.default_group_storage_quota_mb,
-      'site_admin' => @account.site_admin?
+      'site_admin' => @account.site_admin?,
+      'root_account' => @account.root_account?
     }
   end
 %>
+
 
 <% content_for :right_side do %>
   <%= render :partial => "courses_right_side" unless @account.site_admin? %>
   <%= render :partial => "additional_settings_right_side" %>
 <% end %>
-
+<h1 class='screenreader-only'><%= t(:page_header_title, "Account Settings") %></h1>
 <% content_for :stylesheets do %>
   <style type="text/css" media="screen">
     fieldset {
@@ -31,7 +33,6 @@
   </style>
 <% end %>
 
-
 <div id="account_settings_tabs" style="display:none;" class="ui-tabs-minimal">
   <ul>
     <% if can_do(@context, @current_user, :manage_account_settings) %>
@@ -40,7 +41,7 @@
     <% if can_do(@context, @current_user, :manage_storage_quotas) %>
     <li><a href="#tab-quotas" id="tab-quotas-link"><%= t(:tab_quotas, "Quotas") %></a></li>
     <% end %>
-    <% if can_do(@context, @current_user, :manage_account_settings) %>
+    <% if can_do(@context, @current_user, :manage_account_settings) && @account.root_account? && !@account.site_admin? %>
     <li><a href="#tab-notifications" id="tab-notifications-link"><%= t(:tab_notifications, "Notifications") %></a></li>
     <% end %>
     <li><a href="#tab-users" id="tab-users-link"><%= t(:tab_admins, "Admins") %></a></li>
@@ -62,13 +63,14 @@
   </ul>
   <% if can_do(@context, @current_user, :manage_account_settings) %>
     <div id="tab-settings">
+      <h2 class="screenreader-only"><%= t('headings.settings', "Account Settings") %></h2>
       <%= form_for :account, :url => account_url(@account), :html => {:method => :put, :id => "account_settings", :class => 'account_settings'} do |f| %>
-        <fieldset id="account_settings" class="">
+        <fieldset id="account_settings">
           <legend><%= t(:account_settings_title, "Account Settings") %></legend>
           <table class="formtable">
             <tr>
               <td><%= f.blabel :name, :en => "Account Name" %></td>
-              <td><%= f.text_field :name %></td>
+              <td><%= f.text_field :name, :class => 'same-width-as-select' %></td>
             </tr>
             <% if !@account.root_account? && (@context.sis_source_id && can_do(@context.root_account, @current_user, :read_sis) || can_do(@context.root_account, @current_user, :manage_sis)) %>
               <tr>
@@ -104,7 +106,7 @@ TEXT
               <tr>
                 <td><%= f.blabel :default_time_zone, :en => "Default Time Zone" %></td>
                 <td>
-                  <%= f.time_zone_select :default_time_zone, ActiveSupport::TimeZone.us_zones %>
+                  <%= f.time_zone_select :default_time_zone, I18nTimeZone.us_zones, :model => I18nTimeZone %>
                 </td>
               </tr>
               <%= f.fields_for :settings do |settings| %>
@@ -129,6 +131,35 @@ TEXT
                         ], :selected => @account.settings[:self_enrollment] %>
                     </td>
                   </tr>
+
+                  <% unless @account.account_authorization_config
+                    # if the account has a account_authorization_config,
+                    # we'll control this setting from that page
+                  %>
+                    <tr>
+                      <td>
+                        <%= settings.blabel :login_handle_name, en: "Login Label" %>
+                      </td>
+                      <td>
+                        <%= settings.text_field :login_handle_name,
+                                                value: @account.login_handle_name,
+                                                class: 'same-width-as-select',
+                                                placeholder: t(:login_handle_name_placeholder, "ex: Login, Username, or Student ID") %>
+                      </td>
+                    </tr>
+                  <% end %>
+
+                  <tr>
+                    <td><%= settings.blabel :trusted_referers, :en => "Trusted HTTP Referers" %></td>
+                    <td>
+                      <%= settings.text_field :trusted_referers,
+                                              :value => @account.settings[:trusted_referers],
+                                              :class => 'same-width-as-select',
+                                              :placeholder => "https://example.edu" %>
+                      <p style="font-size: 0.9em;"><%= t("This is a comma separated list of URL's to trust.  Trusting any URL's in this list will bypass the CSRF token when logging in to Canvas.") %></p>
+                    </td>
+                  </tr>
+
                   <tr>
                     <td colspan="2"><%= settings.check_box :prevent_course_renaming_by_teachers, :checked => @account.settings[:prevent_course_renaming_by_teachers] %>
                     <%= settings.label :prevent_course_renaming_by_teachers, :en => "Don't let teachers rename their courses" %>
@@ -139,16 +170,57 @@ TEXT
                     <%= settings.label :allow_sending_scores_in_emails, :en => "Students can opt-in to receiving scores in email notifications" %>
                     </td>
                   </tr>
-                  <tr>
-                    <td colspan="2"><%= settings.check_box :restrict_student_future_view, :checked => @account.settings[:restrict_student_future_view] %>
-                      <%= settings.label :restrict_student_future_view, :en => "Restrict students from viewing courses before start date" %>
-                    </td>
-                  </tr>
+                  <% if @account.grants_right?(@current_user, :manage_site_settings) %>
+                    <tr>
+                      <td colspan="2"><%= settings.check_box :include_students_in_global_survey, checked: @account.include_students_in_global_survey?%>
+                        <%= settings.label :include_students_in_global_survey, en: "Include students in global surveys" %>
+                      </td>
+                    </tr>
+                  <% end %>
                   <tr>
                     <td colspan="2"><%= settings.check_box :restrict_quiz_questions, :checked => @account.settings[:restrict_quiz_questions] %>
                       <%= settings.label :restrict_quiz_questions, :en => "Restrict students from viewing quiz questions after course end date" %>
                     </td>
                   </tr>
+                <% end %>
+              <% end %>
+            <% end %>
+            <% unless @account.site_admin? %>
+              <%= f.fields_for :settings do |settings| %>
+                <%= settings.fields_for :restrict_student_past_view do |r| %>
+                  <% hash = @account.restrict_student_past_view %>
+                  <% disabled = hash[:locked] && hash[:inherited] %>
+                  <tr>
+                    <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
+                      <%= r.label :restrict_student_past_view, :en => "Restrict students from viewing courses after end date" %>
+                    </td>
+                  </tr>
+                  <% unless disabled %>
+                    <tr>
+                      <td colspan="2" class="sub_checkbox">
+                        <%= r.check_box :locked, :checked => hash[:locked] %>
+                        <%= r.label :locked, :en => "Lock this setting for sub-accounts and courses" %>
+                      </td>
+                    </tr>
+                  <% end %>
+                <% end %>
+
+                <%= settings.fields_for :restrict_student_future_view do |r| %>
+                  <% hash = @account.restrict_student_future_view %>
+                  <% disabled = hash[:locked] && hash[:inherited] %>
+                  <tr>
+                    <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
+                      <%= r.label :restrict_student_future_view, :en => "Restrict students from viewing courses before start date" %>
+                    </td>
+                  </tr>
+                  <% unless disabled %>
+                    <tr>
+                      <td colspan="2" class="sub_checkbox">
+                        <%= r.check_box :locked, :checked => hash[:locked] %>
+                        <%= r.label :locked, :en => "Lock this setting for sub-accounts and courses" %>
+                      </td>
+                    </tr>
+                  <% end %>
                 <% end %>
               <% end %>
             <% end %>
@@ -172,6 +244,134 @@ TEXT
         <% end %>
 
         <% unless @account.site_admin? %>
+          <% if @account == @domain_root_account && (use_new_styles? || k12?) %>
+            <%= f.fields_for :settings do |settings| %>
+              <fieldset>
+                <legend>Branding</legend>
+                <table class="formtable Settings__Branding" style="100%">
+                  <tr>
+                    <td>
+                      <%= settings.label :header_image, t('Logo') %>
+                    </td>
+                    <td>
+                      <div class="branding_section">
+                        <%= settings.file_field :header_image, accept: 'image/png,image/gif,image/jpeg,image/svg' %>
+                        <p style="font-size: 0.9em;">
+                          <%= t("The logo image in the top right Canvas header. 200x200 svg or png") %>
+                        </p>
+                        <% if @account.settings[:header_image] %>
+                          <p><%= t("Current:") %></p>
+                          <p><img src="<%= @account.settings[:header_image] %>" width="200" height="200" /></p>
+                        <% end %>
+                      </div>
+                      <% if @account.settings[:header_image] %>
+                        <%= settings.check_box :header_image_remove, "class" => "branding_section_toggler" %>
+                        <%= settings.label :header_image_remove, :en => "Revert to default" %>
+                      <% end %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <%= settings.label :favicon, t('Favicon') %>
+                    </td>
+                    <td>
+                      <div class="branding_section">
+                        <%= settings.file_field :favicon, accept: 'image/vnd.microsoft.icon,image/x-icon,image/png,image/gif' %>
+                        <p style="font-size: 0.9em;">
+                          <%= t do %>
+                            Use a <a href="http://realfavicongenerator.net/" target="_blank">single 16x16, 32x32, 48x48 ico file</a>.
+                          <% end %>
+                        </p>
+                        <% if @account.settings[:favicon] %>
+                          <p><%= t("Current:") %></p>
+                          <p><img src="<%= @account.settings[:favicon] %>" width="16" height="16" /></p>
+                        <% end %>
+                      </div>
+                      <% if @account.settings[:favicon] %>
+                        <%= settings.check_box :favicon_remove, "class" => "branding_section_toggler" %>
+                        <%= settings.label :favicon_remove, :en => "Revert to default" %>
+                      <% end %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <%= settings.label :apple_touch_icon, t('Apple Touch Icon') %>
+                    </td>
+                    <td>
+                      <div class="branding_section">
+                        <%= settings.file_field :apple_touch_icon, accept: 'image/png,image/svg' %>
+                        <p style="font-size: 0.9em;">
+                          <%= t("The shortcut icon for iOS/Android devices. 180x180 png or svg") %>
+                        </p>
+                        <% if @account.settings[:apple_touch_icon] %>
+                          <p><%= t("Current:") %></p>
+                          <p><img src="<%= @account.settings[:apple_touch_icon] %>" width="57" height="57" /></p>
+                        <% end %>
+                      </div>
+                      <% if @account.settings[:apple_touch_icon] %>
+                        <%= settings.check_box :apple_touch_icon_remove, "class" => "branding_section_toggler" %>
+                        <%= settings.label :apple_touch_icon_remove, :en => "Revert to default" %>
+                      <% end %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><%= settings.label :msapplication_tile_square, t('Windows Square Tile') %></td>
+                    <td>
+                      <div class="branding_section">
+                        <%= settings.file_field :msapplication_tile_square, accept: 'image/png,image/gif,image/jpeg' %>
+                        <p style="font-size: 0.9em;">
+                          <%= t("558x558 png (1.8x the standard tile size, so it can be scaled up or down
+as needed)") %>
+                        </p>
+                        <% if @account.settings[:msapplication_tile_square] %>
+                          <p><%= t("Current:") %></p>
+                          <p><img src="<%= @account.settings[:msapplication_tile_square] %>" width="150" height="150" /></p>
+                        <% end %>
+                      </div>
+                      <% if @account.settings[:msapplication_tile_square] %>
+                        <%= settings.check_box :msapplication_tile_square_remove, "class" => "branding_section_toggler" %>
+                        <%= settings.label :msapplication_tile_square_remove, :en => "Revert to default" %>
+                      <% end %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><%= settings.label :msapplication_tile_wide, t('Windows Wide Tile') %></td>
+                    <td>
+                      <div class="branding_section">
+                        <%= settings.file_field :msapplication_tile_wide, accept: 'image/png,image/gif,image/jpeg' %>
+                        <p style="font-size: 0.9em;">
+                          <%= t("558x270 png") %>
+                        </p>
+                        <% if @account.settings[:msapplication_tile_wide] %>
+                          <p><%= t("Current:") %></p>
+                          <p><img src="<%= @account.settings[:msapplication_tile_wide] %>" width="150" height="150" /></p>
+                        <% end %>
+                      </div>
+                      <% if @account.settings[:msapplication_tile_wide] %>
+                        <%= settings.check_box :msapplication_tile_wide_remove, "class" => "branding_section_toggler" %>
+                        <%= settings.label :msapplication_tile_wide_remove, :en => "Revert to default" %>
+                      <% end %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <%= settings.label :msapplication_tile_color, t('Windows Tile Color') %>
+                    </td>
+                    <td>
+                      <%= settings.text_field :msapplication_tile_color, value: @account.settings[:msapplication_tile_color], placeholder: '#0099e0'
+                        # #0099e0 is $canvas-primary from sass. If you change this, make sure to change it in app/views/info/browserconfig.xml.builder too.
+                      %>
+                      <p style="font-size:0.9em">
+                        <a href="http://msdn.microsoft.com/en-us/library/ie/dn455106.aspx" target="_blank">
+                          <%= t("Read more about windows tiles") %>
+                        </a>
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </fieldset>
+            <% end %>
+          <% end %>
           <fieldset>
             <legend><%= t(:quiz_ip_filters_title, "Quiz IP Address Filters")%>
               <%= link_to("<i class='icon-question standalone-icon'></i>".html_safe, '#', :class => 'ip_help_link no-hover', :title => t(:quiz_ip_filters_help_tooltip, "What are Quiz IP Filters?")) %></legend>
@@ -195,7 +395,7 @@ TEXT
                     <td><%= before_label(t(:ip_filter_filter_label, "Filter")) %></td>
                     <td><input type="text" class="value" value="<%= filter %>" maxlength="255"/></td>
                     <td>
-                      <a href="#" class="delete_filter_link"><i class="icon-end standalone-icon"></i></a>
+                      <a href="#" title="<%= t(:quiz_ip_filters_delete, "Remove Filter") %>" class="delete_filter_link"><i class="icon-end standalone-icon"></i></a>
                     </td>
                   </tr>
                 <% end %>
@@ -288,7 +488,7 @@ TEXT
                     <div id="open_registration_delegated_warning_dialog" style="display: none;">
                         <%= t(:open_registration_delegated_warning_message,
                         "An external identity provider is enabled, and users created via open registration may not be able to log in unless
-                        the external identity provider's login form has a link back to %{url}.", :url => login_url(:canvas_login => 1)) %>
+                        the external identity provider's login form has a link back to %{url}.", :url => canvas_login_url) %>
                     </div>
                   <% end %>
                 </div>
@@ -301,6 +501,11 @@ TEXT
               <div>
                 <%= settings.check_box :edit_institution_email, :checked => @account.edit_institution_email? %>
                 <%= settings.label     :edit_institution_email, :en => "Users can delete their institution-assigned email address" %>
+              </div>
+
+              <div>
+                <%= settings.check_box :author_email_in_notifications, :checked => @account.author_email_in_notifications? %>
+                <%= settings.label     :author_email_in_notifications, :en => "Show the email address of sender for user interaction Notifications" %>
               </div>
             <% end %>
             <% unless @account.site_admin? %>
@@ -344,6 +549,24 @@ TEXT
             </div>
           <% end %>
         </fieldset>
+
+        <% if !@account.site_admin? &&
+                @account.root_account? &&
+                @account.feature_allowed?(:post_grades) &&
+                @account.grants_right?(@current_user, :manage_site_settings) %>
+            <fieldset id="add_sis_app_token">
+              <legend><%= t("SIS Agent Token Authentication") %></legend>
+              <p style="font-size: 0.9em;"><%= t("This will allow you to authenticate Canvas for posting grades to SIS") %></p>
+              <%= f.fields_for :settings do |settings| %>
+                  <table class="formtable">
+                    <tr>
+                      <td><%= settings.blabel :sis_app_token, :en => "SIS Agent Token" %></td>
+                      <td><%= settings.text_field :sis_app_token, :value => @account.settings[:sis_app_token] %></td>
+                    </tr>
+                  </table>
+              <% end %>
+            </fieldset>
+        <% end %>
 
         <% if @account.root_account? && !@account.site_admin? && Setting.get("show_feedback_link", "false") == "true"  %>
           <fieldset>
@@ -510,6 +733,8 @@ acknowledge that you have read and agreed to the
           </fieldset>
         <% end %>
 
+        <%= render partial: 'external_integration_keys', locals: { f: f } %>
+
         <div class="button-container">
           <button type="submit" class="btn btn-primary"><%= t(:update_settings_button, "Update Settings") %></button>
         </div>
@@ -518,112 +743,111 @@ acknowledge that you have read and agreed to the
   <% end %>
 
   <% if can_do(@context, @current_user, :manage_storage_quotas) %>
-    <div id="tab-quotas"></div>
+    <div id="tab-quotas">
+      <h2 class="screenreader-only"><%= t('headings.quotas', "Account Quotas") %></h2>
+    </div>
   <% end %>
 
-  <% if can_do(@context, @current_user, :manage_account_settings) %>
+  <% if can_do(@context, @current_user, :manage_account_settings) && @account.root_account? && !@account.site_admin? %>
     <div id="tab-notifications">
       <%= form_for :account, :url => account_url(@account), :html => {:method => :put, :id => "account_settings_notifications"} do |f| %>
-
-        <% if @account.root_account? && !@account.site_admin? %>
-          <h2><%= t(:email_notification_from_settings, 'E-mail Notification "From" Settings') %></h2>
-          <p><%= t(:email_notification_from_description, "This setting allows the Admin to brand or label the 'From' text on all notifications sent from Canvas for this Account.") %></p>
-          <%= f.fields_for :settings do |settings| %>
-            <div>
-              <%= settings.radio_button :outgoing_email_default_name_option, 'default',
-                                        :checked => @account.settings[:outgoing_email_default_name].blank?,
-                                        :class => 'notification_from_name_option' %>
-              <%= settings.label :outgoing_email_default_name_option_default, :en => "Default Canvas Setting" %>
-            </div>
-            <div style='padding-left: 2em;'>
-              <strong><%= t 'notifications.example', 'Example:' %></strong>
-              <blockquote>
-                <table class="formtable" style='margin-left: 1.5em;'>
-                <tr>
-                  <td><%= t 'notifications.from', 'From' %></td>
-                  <td><%= HostUrl.outgoing_email_default_name %> <%= '<notifications@instructure.com>' %></td>
-                </tr>
-                <tr>
-                  <td><%= t 'notifications.subject', 'Subject' %></td>
-                  <td><%= t 'notifications.sample_subject', 'Grade Changed: Check In Survey, Testing Course' %></td>
-                </tr>
-                <tr>
-                  <td><%= t 'notifications.email_date', 'Date' %></td>
-                  <td><%= DateTime.now.strftime('%B %d, %Y %I:%M:%S %p %z') %></td>
-                </tr>
-                <tr>
-                  <td><%= t 'notifications.email_to', 'To' %></td>
-                  <td><%= 'recipient@instructure.com' %></td>
-                </tr>
-                <tr>
-                  <td><%= t 'notifications.email_reply_to', 'Reply-To' %></td>
-                  <td><%= 'notifications+e79df3ljk09s3jkl09ssljk3lkj2l-10191633@instructure.com' %></td>
-                </tr>
-              </table>
-              </blockquote>
-            </div>
-            <div>
-              <%= settings.radio_button :outgoing_email_default_name_option, 'custom',
-                                        :checked => !@account.settings[:outgoing_email_default_name].blank?,
-                                        :class => 'notification_from_name_option' %>
-              <%= settings.label :outgoing_email_default_name_option_custom, :en => 'Custom "From" Name' %>
-            </div>
-            <div style='padding-left: 2em;'>
-              <p>
-                <%= t('notifications.custom_name_description', 'If selected, this will replace all other branding sent in Canvas notifications.') %>
-                <br/>
-                <%= text_field_tag 'account[settings][outgoing_email_default_name]', @account.settings[:outgoing_email_default_name] %>
-              </p>
-            </div>
-            <div style='padding-left: 2em;'>
-              <strong><%= t 'notifications.example', 'Example:' %></strong>
-              <blockquote>
+        <h2><%= t(:email_notification_from_settings, 'E-mail Notification "From" Settings') %></h2>
+        <p><%= t(:email_notification_from_description, "This setting allows the Admin to brand or label the 'From' text on all notifications sent from Canvas for this Account.") %></p>
+        <%= f.fields_for :settings do |settings| %>
+          <div>
+            <%= settings.radio_button :outgoing_email_default_name_option, 'default',
+                                      :checked => @account.settings[:outgoing_email_default_name].blank?,
+                                      :class => 'notification_from_name_option' %>
+            <%= settings.label :outgoing_email_default_name_option_default, :en => "Default Canvas Setting" %>
+          </div>
+          <div style='padding-left: 2em;'>
+            <strong><%= t 'notifications.example', 'Example:' %></strong>
+            <blockquote>
               <table class="formtable" style='margin-left: 1.5em;'>
-                <tr>
-                  <td><%= t 'notifications.from', 'From' %></td>
-                  <td><strong id='custom_default_name_display'></strong> <%= '<notifications@instructure.com>' %></td>
-                </tr>
-                <tr>
-                  <td><%= t 'notifications.subject', 'Subject' %></td>
-                  <td><%= t 'notifications.sample_subject', 'Grade Changed: Check In Survey, Testing Course' %></td>
-                </tr>
-                <tr>
-                  <td><%= t 'notifications.email_date', 'Date' %></td>
-                  <td><%= DateTime.now.strftime('%B %d, %Y %I:%M:%S %p %z') %></td>
-                </tr>
-                <tr>
-                  <td><%= t 'notifications.email_to', 'To' %></td>
-                  <td><%= 'recipient@instructure.com' %></td>
-                </tr>
-                <tr>
-                  <td><%= t 'notifications.email_reply_to', 'Reply-To' %></td>
-                  <td><%= 'notifications+e79df3ljk09s3jkl09ssljk3lkj2l-10191633@instructure.com' %></td>
-                </tr>
-              </table>
-              </blockquote>
-            </div>
-
-            <h2><%= t('notifications.external_services', 'Notifications Sent to External Services') %></h2>
-            <table class="formtable">
               <tr>
-                <td><input type="checkbox" id="account_settings_external_notification_warning_checkbox" <%= 'checked="checked"' if @account.settings[:external_notification_warning] %> /></td>
-                <td>
-                  <label for="account_settings_external_notification_warning_checkbox"><%= t('notifications.external_services_label', 'Display one time pop-up warning on Notification Preferences page.') %></label>
-                  <input type="hidden" name="account[settings][external_notification_warning]" id="account_settings_external_notification_warning" value="<%= @account.settings[:external_notification_warning] ? 1 : 0 %>" />
-                </td>
+                <td><%= t 'notifications.from', 'From' %></td>
+                <td><%= HostUrl.outgoing_email_default_name %> <%= '<notifications@instructure.com>' %></td>
+              </tr>
+              <tr>
+                <td><%= t 'notifications.subject', 'Subject' %></td>
+                <td><%= t 'notifications.sample_subject', 'Grade Changed: Check In Survey, Testing Course' %></td>
+              </tr>
+              <tr>
+                <td><%= t 'notifications.email_date', 'Date' %></td>
+                <td><%= DateTime.now.strftime('%B %d, %Y %I:%M:%S %p %z') %></td>
+              </tr>
+              <tr>
+                <td><%= t 'notifications.email_to', 'To' %></td>
+                <td><%= 'recipient@instructure.com' %></td>
+              </tr>
+              <tr>
+                <td><%= t 'notifications.email_reply_to', 'Reply-To' %></td>
+                <td><%= 'notifications+e79df3ljk09s3jkl09ssljk3lkj2l-10191633@instructure.com' %></td>
               </tr>
             </table>
-
-            <table style="margin-left: 1.5em;" cellspacing="0" class="formtable">
+            </blockquote>
+          </div>
+          <div>
+            <%= settings.radio_button :outgoing_email_default_name_option, 'custom',
+                                      :checked => !@account.settings[:outgoing_email_default_name].blank?,
+                                      :class => 'notification_from_name_option' %>
+            <%= settings.label :outgoing_email_default_name_option_custom, :en => 'Custom "From" Name' %>
+          </div>
+          <div style='padding-left: 2em;'>
+            <p>
+              <%= t('notifications.custom_name_description', 'If selected, this will replace all other branding sent in Canvas notifications.') %>
+              <br/>
+              <%= text_field_tag 'account[settings][outgoing_email_default_name]', @account.settings[:outgoing_email_default_name] %>
+            </p>
+          </div>
+          <div style='padding-left: 2em;'>
+            <strong><%= t 'notifications.example', 'Example:' %></strong>
+            <blockquote>
+            <table class="formtable" style='margin-left: 1.5em;'>
               <tr>
-                <td>
-                  <b><%= t('notifications.external_services_warning_label', 'Pop-up Message Content:') %></b>
-                  <blockquote><%= t('notifications.external_services_warning', 'Notice: Some notifications may contain confidential information. Selecting to receive notifications at an email other than your institution provided address may result in sending sensitive Canvas course and group information outside of the institutional system.')%></blockquote>
-                </td>
+                <td><%= t 'notifications.from', 'From' %></td>
+                <td><strong id='custom_default_name_display'></strong> <%= '<notifications@instructure.com>' %></td>
+              </tr>
+              <tr>
+                <td><%= t 'notifications.subject', 'Subject' %></td>
+                <td><%= t 'notifications.sample_subject', 'Grade Changed: Check In Survey, Testing Course' %></td>
+              </tr>
+              <tr>
+                <td><%= t 'notifications.email_date', 'Date' %></td>
+                <td><%= DateTime.now.strftime('%B %d, %Y %I:%M:%S %p %z') %></td>
+              </tr>
+              <tr>
+                <td><%= t 'notifications.email_to', 'To' %></td>
+                <td><%= 'recipient@instructure.com' %></td>
+              </tr>
+              <tr>
+                <td><%= t 'notifications.email_reply_to', 'Reply-To' %></td>
+                <td><%= 'notifications+e79df3ljk09s3jkl09ssljk3lkj2l-10191633@instructure.com' %></td>
               </tr>
             </table>
+            </blockquote>
+          </div>
 
-          <% end %>
+          <h2><%= t('notifications.external_services', 'Notifications Sent to External Services') %></h2>
+          <table class="formtable">
+            <tr>
+              <td><input type="checkbox" id="account_settings_external_notification_warning_checkbox" <%= 'checked="checked"' if @account.settings[:external_notification_warning] %> /></td>
+              <td>
+                <label for="account_settings_external_notification_warning_checkbox"><%= t('notifications.external_services_label', 'Display one time pop-up warning on Notification Preferences page.') %></label>
+                <input type="hidden" name="account[settings][external_notification_warning]" id="account_settings_external_notification_warning" value="<%= @account.settings[:external_notification_warning] ? 1 : 0 %>" />
+              </td>
+            </tr>
+          </table>
+
+          <table style="margin-left: 1.5em;" cellspacing="0" class="formtable">
+            <tr>
+              <td>
+                <b><%= t('notifications.external_services_warning_label', 'Pop-up Message Content:') %></b>
+                <blockquote><%= t('notifications.external_services_warning', 'Notice: Some notifications may contain confidential information. Selecting to receive notifications at an email other than your institution provided address may result in sending sensitive Canvas course and group information outside of the institutional system.')%></blockquote>
+              </td>
+            </tr>
+          </table>
+
         <% end %>
 
         <div class="button-container">
@@ -637,21 +861,22 @@ acknowledge that you have read and agreed to the
     <h2><%= t(:account_admins_title, "Account Admins") %></h2>
     <ul class="admins_list user_list list admins">
       <%= render :partial => 'account_user', :collection => @account_users %>
-      <% if can_do(@context, @current_user, :manage_account_memberships) %>
+      <% available_roles = @context.available_account_roles(false, @current_user) %>
+      <% unless available_roles.empty? %>
         <%= render :partial => 'account_user', :object => nil %>
       <% end %>
     </ul>
-    <% if can_do(@context, @current_user, :manage_account_memberships) %>
+    <% unless available_roles.empty? %>
       <% js_bundle :user_lists %>
       <a href="#" class="add_users_link btn btn-primary"><i class="icon-add"></i> <%= t('links.add_admins', %{Add Account Admins}) %></a>
       <%= form_tag account_add_account_user_url(@account), {:id => "enroll_users_form", :style => "display: none;"} do  %>
         <h2><%= t(:add_admin_title, "Add Account Admins") %></h2>
         <div style="margin-top: 5px;">
           <div>
-            <%= label_tag :membership_type, :en => "Add More" %>
-            <select name="membership_type" id="admin_membership_type">
-            <% @context.available_account_roles(@current_user).each do |type| %>
-              <option value="<%= type %>"><%= AccountUser.readable_type(type) %></option>
+            <%= label_tag :role_id, :en => "Add More" %>
+            <select name="role_id" id="admin_role_id">
+            <% available_roles.each do |role| %>
+              <option value="<%= role.id %>"><%= AccountUser.readable_type(role.name) %></option>
             <% end %>
             </select>
           </div>
@@ -680,14 +905,29 @@ acknowledge that you have read and agreed to the
       </p>
       <ul class="announcements_list unstyled_list">
         <% @announcements.each do |announcement| %>
+
           <li class="alert">
             <% if can_do(@account, @current_user, :manage_alerts) %>
               <a href="#" rel="<%= context_url(@account, :context_account_notification_url, announcement) %>" class="delete_notification_link close" title="<%= t(:delete_announcement_tooltip, "Delete this Announcement") %>">×</a>
             <% end %>
-            <div class="subject">
-              <%= image_tag("#{announcement.icon}.png") %><%= announcement.subject %>
+
+            <div class="global-message image-block">
+              <div class="image-block-image">
+                <i class="<%= notification_icon_classname(announcement) %>"></i>
+                <span class="hidden-inline-text">
+                  <%= accessible_message_icon_text(notification_icon_type(announcement)) %>
+                </span>
+              </div>
+              <div class="image-block-content">
+                <div class="subject title">
+                  <%= announcement.subject %>
+                </div>
+                <div class="message user_content">
+                  <%= user_content(announcement.message) %>
+                </div>
+              </div>
             </div>
-            <div>
+            <div class="announcement-details">
               <span>
                 <%= t(:alert_timespan, "from %{start_at} to %{end_at}",
                       :start_at => datetime_string(announcement.start_at),
@@ -697,7 +937,7 @@ acknowledge that you have read and agreed to the
             </div>
             <% if announcement.required_account_service %>
               <div>
-                <%= Account.allowable_services[announcement.required_account_service.to_sym].try(:[], :name) %>
+                <%= AccountServices.allowable_services[announcement.required_account_service.to_sym].try(:[], :name) %>
               </div>
             <% end %>
             <% unless announcement.account_notification_roles.empty? %>
@@ -705,15 +945,14 @@ acknowledge that you have read and agreed to the
                 <%= t :announcement_sent_to_roles, "Send only to the following types of users:" %>
                 <ul>
                   <% announcement.account_notification_roles.each do |r| %>
-                    <% @enrollment_types.select {|rt| rt[:name] == r.role_type }.each do |rt| %>
-                      <li><%= rt[:plural_label][] %></li>
+                    <% @course_roles.select {|rt| rt[:id] == r.role_id }.each do |rt| %>
+                      <li><%= rt[:label] %></li>
                     <% end %>
                     <% # NilEnrollment is a special case %>
-                    <% if r.role_type == "NilEnrollment" %>
+                    <% if r.role_id.nil? %>
                       <li><%= t :no_enrollment_roles, "Unenrolled users" %></li>
                     <% end %>
-                    <% @role_types.select {|rt| rt[:name] == r.role_type }.each do |rt| %>
-                      <% # no plural_label :( %>
+                    <% @account_roles.select {|rt| rt[:id] == r.role_id }.each do |rt| %>
                       <li><%= rt[:label]  %></li>
                     <% end %>
                   <% end %>
@@ -725,9 +964,6 @@ acknowledge that you have read and agreed to the
                 <%= t :announcement_sent_to_subset, "Sent to 1 / %{denominator} users each month", denominator: announcement.months_in_display_cycle %>
               </div>
             <% end %>
-            <div class="message user_content">
-              <%= user_content(announcement.message) %>
-            </div>
           </li>
         <% end %>
       </ul>
@@ -777,41 +1013,37 @@ acknowledge that you have read and agreed to the
             </tr>
             <tr id="restrict_to_roles">
               <td id="restrict_to_enrollment_roles">
-                <% unless @enrollment_types.nil? %>
-                  <%= t :course_roles, "Course roles:" %>
-                  <ul>
-                    <% @enrollment_types.each do |r| %>
-                      <li id="account_notification_role_<%= r[:name]%>">
-                        <label>
-                          <%= check_box_tag "account_notification_roles[]", r[:name], false, { :class => "account_notification_role_cbx", :id => "account_notification_role_#{r[:name]}_cbx" } %>
-                          <%= r[:plural_label][] %>
-                        </label>
-                      </li>
-                    <% end %>
-                    <% # NilEnrollment is a special case, because it's not actually a role, just a status reflecting that the user is not part of any course %>
-                    <li id="account_notification_role_NilEnrollment">
+                <%= t :course_roles, "Course roles:" %>
+                <ul>
+                  <% @course_roles.each do |r| %>
+                    <li id="account_notification_role_<%= r[:id]%>">
                       <label>
-                        <%= check_box_tag "account_notification_roles[]", "NilEnrollment", false, { :class => "account_notification_role_cbx", :id => "account_notification_role_NilEnrollment_cbx" } %>
-                        <%= t :no_enrollment_roles, "Unenrolled users" %>
+                        <%= check_box_tag "account_notification_roles[]", r[:id], false, { :class => "account_notification_role_cbx", :id => "account_notification_role_#{r[:id]}_cbx" } %>
+                        <%= r[:label] %>
                       </label>
                     </li>
-                  </ul>
-                <% end %>
+                  <% end %>
+                  <% # NilEnrollment is a special case, because it's not actually a role, just a status reflecting that the user is not part of any course %>
+                  <li id="account_notification_role_NilEnrollment">
+                    <label>
+                      <%= check_box_tag "account_notification_roles[]", "NilEnrollment", false, { :class => "account_notification_role_cbx", :id => "account_notification_role_NilEnrollment_cbx" } %>
+                      <%= t :no_enrollment_roles, "Unenrolled users" %>
+                    </label>
+                  </li>
+                </ul>
               </td>
               <td id="restrict_to_membership_roles">
-                <% unless @role_types.nil? %>
-                  <%= t :account_roles, "Account roles:" %>
-                  <ul>
-                    <% @role_types.each do |r| %>
-                      <li id="account_notification_role_<%= r[:name]%>">
-                        <label>
-                          <%= check_box_tag "account_notification_roles[]", r[:name], false, { :class => "account_notification_role_cbx", :id => "account_notification_role_#{r[:name]}_cbx" } %>
-                          <%= r[:label] %>
-                        </label>
-                      </li>
-                    <% end %>
-                  </ul>
-                <% end %>
+                <%= t :account_roles, "Account roles:" %>
+                <ul>
+                  <% @account_roles.each do |r| %>
+                    <li id="account_notification_role_<%= r[:id]%>">
+                      <label>
+                        <%= check_box_tag "account_notification_roles[]", r[:id], false, { :class => "account_notification_role_cbx", :id => "account_notification_role_#{r[:id]}_cbx" } %>
+                        <%= r[:label] %>
+                      </label>
+                    </li>
+                  <% end %>
+                </ul>
               </td>
             </tr>
             <tr>
@@ -841,6 +1073,7 @@ acknowledge that you have read and agreed to the
   <% end %>
   <% if !@available_reports.blank? %>
     <div id="tab-reports">
+      <h2 class="screenreader-only"><%= t('headings.sections', "Reports") %></h2>
       <table class="reports">
         <tr class="reports">
           <th class="reports"><%= t 'headers.report_name', 'Name' %></th>
@@ -863,8 +1096,11 @@ acknowledge that you have read and agreed to the
             <td class="title reports">
               <span class="title"><%= title %></span>
               <% if description_partial %>
-                <a href="#" class="open_report_description_link"><i class="icon-question standalone-icon"></i></a>
-                <div style="display: none" class="report_description">
+                <a href="#" class="open_report_description_link" role="button" aria-haspopup="true" aria-owns="<%= "#{report}_report_description" %>">
+                  <i class="icon-question standalone-icon"></i>
+                  <span class="screenreader-only"><%= t(:open_report_description, "Open Report Description") %></span>
+                </a>
+                <div id="<%= "#{report}_report_description" %>" style="display: none" class="report_description">
                   <%= render(:partial => description_partial) %>
                 </div>
               <% end %>

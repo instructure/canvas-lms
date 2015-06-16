@@ -26,87 +26,58 @@ module Lti
     #   launch_url: a specific launch url for this launch
     #   link_code: the resource_link_id for this launch
     #   overrides
-    #   custom_substitutions: hash of translations values for custom variable
-    #      substitutions where the key is what we are translating from, and the value
-    #      is what we are translating to
-    def prepare_tool_launch(return_url, opts = {})
+    def prepare_tool_launch(return_url, variable_expander, opts = {})
       resource_type = opts[:resource_type]
       selected_html = opts[:selected_html]
       launch_url = opts[:launch_url] || default_launch_url(resource_type)
       link_code = opts[:link_code] || default_link_code
       @overrides = opts[:overrides] || {}
 
+
       lti_context = Lti::LtiContextCreator.new(@context, @tool).convert
-      lti_user = Lti::LtiUserCreator.new(@user, @root_account, @tool, @context).convert
+      lti_user = Lti::LtiUserCreator.new(@user, @root_account, @tool, @context).convert if @user
       lti_tool = Lti::LtiToolCreator.new(@tool).convert
       lti_account = Lti::LtiAccountCreator.new(@context, @tool).convert
 
-      variable_substitutor = LtiOutbound::VariableSubstitutor.new
-
-      #Account
-      variable_substitutor.add_substitution('$Canvas.account.id', lti_account.id)
-      variable_substitutor.add_substitution('$Canvas.account.name', lti_account.name)
-      variable_substitutor.add_substitution('$Canvas.account.sisSourceId', lti_account.sis_source_id)
-      #Consumer Instance
-      variable_substitutor.add_substitution('$Canvas.root_account.id', lti_context.consumer_instance.id)
-      variable_substitutor.add_substitution('$Canvas.root_account.sisSourceId', lti_context.consumer_instance.sis_source_id)
-      variable_substitutor.add_substitution('$Canvas.api.domain', lti_context.consumer_instance.domain)
-      #Course
-      if lti_context.is_a? LtiOutbound::LTICourse
-        variable_substitutor.add_substitution('$Canvas.course.id', lti_context.id)
-        variable_substitutor.add_substitution('$Canvas.course.sisSourceId', lti_context.sis_source_id)
-      end
-      #User
-      variable_substitutor.add_substitution('$Canvas.user.id', lti_user.id)
-      variable_substitutor.add_substitution('$Canvas.user.sisSourceId', -> { lti_user.sis_source_id })
-      variable_substitutor.add_substitution('$Canvas.user.loginId', -> { lti_user.login_id })
-      variable_substitutor.add_substitution('$Canvas.enrollment.enrollmentState', -> { lti_user.enrollment_state })
-      variable_substitutor.add_substitution('$Canvas.membership.concludedRoles', -> { lti_user.concluded_role_types })
-
-      if opts[:custom_substitutions]
-        opts[:custom_substitutions].each do |key, value|
-          variable_substitutor.add_substitution(key, value)
-        end
-      end
-
-
-      @tool_launch = LtiOutbound::ToolLaunch.new({
-                                                     url: launch_url,
-                                                     link_code: link_code,
-                                                     return_url: return_url,
-                                                     resource_type: resource_type,
-                                                     selected_html: selected_html,
-                                                     outgoing_email_address: HostUrl.outgoing_email_address,
-                                                     context: lti_context,
-                                                     user: lti_user,
-                                                     tool: lti_tool,
-                                                     account: lti_account,
-                                                     :variable_substitutor => variable_substitutor
-                                                 })
+      @tool_launch = LtiOutbound::ToolLaunch.new(
+          {
+              url: launch_url,
+              link_code: link_code,
+              return_url: return_url,
+              resource_type: resource_type,
+              selected_html: selected_html,
+              outgoing_email_address: HostUrl.outgoing_email_address,
+              context: lti_context,
+              user: lti_user,
+              tool: lti_tool,
+              account: lti_account,
+              variable_expander: variable_expander
+          }
+      )
       self
     end
 
     def generate_post_payload
-      raise('Called generate_post_payload before calling prepared_tool_launch') unless @tool_launch
+      raise('Called generate_post_payload before calling prepare_tool_launch') unless @tool_launch
       @tool_launch.generate(@overrides)
     end
 
     def generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url)
-      raise('Called generate_post_payload_for_assignment before calling generate_post_payload_for_assignment') unless @tool_launch
+      raise('Called generate_post_payload_for_assignment before calling prepare_tool_launch') unless @tool_launch
       lti_assignment = Lti::LtiAssignmentCreator.new(assignment, encode_source_id(assignment)).convert
       @tool_launch.for_assignment!(lti_assignment, outcome_service_url, legacy_outcome_service_url)
       generate_post_payload
     end
 
     def generate_post_payload_for_homework_submission(assignment)
-      raise('Called generate_post_payload_for_homework_submission before calling generate_post_payload_for_assignment') unless @tool_launch
+      raise('Called generate_post_payload_for_homework_submission before calling prepare_tool_launch') unless @tool_launch
       lti_assignment = Lti::LtiAssignmentCreator.new(assignment).convert
       @tool_launch.for_homework_submission!(lti_assignment)
       generate_post_payload
     end
 
     def launch_url
-      raise('Called launch_url before calling prepared_tool_launch') unless @tool_launch
+      raise('Called launch_url before calling prepare_tool_launch') unless @tool_launch
       @tool_launch.url
     end
 
@@ -127,7 +98,7 @@ module Lti
     def encode_source_id(assignment)
       @tool.shard.activate do
         payload = [@tool.id, @context.id, assignment.id, @user.id].join('-')
-        "#{payload}-#{Canvas::Security.hmac_sha1(payload, @tool.shard.settings[:encryption_key])}"
+        "#{payload}-#{Canvas::Security.hmac_sha1(payload)}"
       end
     end
   end

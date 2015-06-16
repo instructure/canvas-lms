@@ -3511,9 +3511,17 @@ if (typeof Slick === "undefined") {
         setActiveCellInternal(getCellNode(pos.row, pos.cell));
         activePosX = pos.posX;
         return true;
-      } else {
-        setActiveCellInternal(getCellNode(activeRow, activeCell));
-        return false;
+      } else if (activeRow === getDataLength() - 1) {
+        if ( activeCell === columns.length - 1 ) {
+          // When focus is on the last cell in a row
+          // and the last cell in a column.
+          // Move focus outside of SlickGrid.
+          return false;
+        }
+        // Otherwise, when focus is on the last cell in a column.
+        // Move focus to the first cell of the next column.
+        setActiveCell(0, activeCell + 1);
+        return true;
       }
     }
 

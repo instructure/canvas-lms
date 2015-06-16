@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Warning: maxattempts can not be controlled at item level, ignored: maxattempts='0'
+Note: in future, maxattempts will probably be controllable at assessment or assessment section level
+Converting proprietary Blackboard metadata field bbmd_asi_object_id = _153008_1
+Converting proprietary Blackboard metadata field bbmd_assessmenttype = Test
+Converting proprietary Blackboard metadata field bbmd_questiontype = Matching
+Converting proprietary Blackboard metadata field qmd_absolutescore_max = 10.0
+Warning: mat_extension not supported, looking inside for needed data.
+Warning: minnumber attribute no no longer supported on render_*
+Warning: flow_label is no longer supported in version 2, ignoring
+Warning: replacing bad NMTOKEN "10c0c1f2d42742599bdffb69daeb3923" with "RESPONSE_10c0c1f2d42742599bdffb69daeb3923"
+Warning: replacing bad NMTOKEN "71823479fd38441c8b3e2ba1673198b9" with "RESPONSE_71823479fd38441c8b3e2ba1673198b9"
+Warning: replacing bad NMTOKEN "2237e86b63b24c03b9c47714781fb4fd" with "RESPONSE_2237e86b63b24c03b9c47714781fb4fd"
+Warning: replacing bad NMTOKEN "59e37bd044904918b6f6aad6ec16e4a0" with "RESPONSE_59e37bd044904918b6f6aad6ec16e4a0"
+Warning: replacing bad NMTOKEN "837476d176bb4be5af0c43d10a2c5f98" with "RESPONSE_837476d176bb4be5af0c43d10a2c5f98"
+Warning: replacing bad NMTOKEN "1058bce9997147889c986b7ccb8bf270" with "RESPONSE_1058bce9997147889c986b7ccb8bf270"
+Warning: replacing bad NMTOKEN "9b0412756f764e108a690bcdaf06d571" with "RESPONSE_9b0412756f764e108a690bcdaf06d571"
+Warning: replacing bad NMTOKEN "6fe75d189fa946c590ca4b56b95104e3" with "RESPONSE_6fe75d189fa946c590ca4b56b95104e3"
+Warning: replacing bad NMTOKEN "20148d72718944cc82a96e08e49ca017" with "RESPONSE_20148d72718944cc82a96e08e49ca017"
+Warning: scoremodel not supported, ignoring "SumOfScores"
+Warning: min/max constraint on outcome will generate additional rules in responseProcessing
+Warning: case-insensitive comparison of identifiers not supported in version 2
+Warning: titles on respconditions no longer supported, ignored "incorrect"
+Warning: replacing <other/> with the base value true - what did you want me to do??
+	-->
+
+<assessmentItem
+	xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="_153008_1"
+ title=""
+ adaptive="false"
+ timeDependent="false">
+<instructureMetadata>
+<instructureField name="max_score" value="10.0" />
+<instructureField name="bb_question_type" value="Matching" />
+</instructureMetadata>
+<responseDeclaration identifier="RESPONSE_71823479fd38441c8b3e2ba1673198b9" cardinality="single" baseType="identifier"/>
+<responseDeclaration identifier="af9bdad3c7df46328dc2519111618762" cardinality="single" baseType="identifier"/>
+<responseDeclaration identifier="c6a6644883c44ff2bf6d81f4404664df" cardinality="single" baseType="identifier"/>
+<responseDeclaration identifier="e4531f8eeef542f8a13b911c37ef074a" cardinality="single" baseType="identifier"/>
+<outcomeDeclaration identifier="FEEDBACK" cardinality="multiple" baseType="identifier"/>
+<outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float">
+<defaultValue><value>0.0</value></defaultValue></outcomeDeclaration>
+<itemBody>
+<div class="QUESTION_BLOCK">
+<p class="FORMATTED_TEXT_BLOCK">Match these.</p></div>
+<div class="RESPONSE_BLOCK">
+<div class="flow_2">
+<choiceInteraction responseIdentifier="e4531f8eeef542f8a13b911c37ef074a" shuffle="false" maxChoices="1">
+<simpleChoice identifier="cc7648a243044653ae6a4a0b9e0c820f" fixed="true"></simpleChoice>
+<simpleChoice identifier="a6d406f62cc84c64858765847d334e8d" fixed="true"></simpleChoice>
+<simpleChoice identifier="RESPONSE_10c0c1f2d42742599bdffb69daeb3923" fixed="true"></simpleChoice>
+<simpleChoice identifier="f2c710dbc1c044f9bf2b8ccd189c24da" fixed="true"></simpleChoice>
+</choiceInteraction>
+<p class="FORMATTED_TEXT_BLOCK">left 1</p></div>
+<div class="flow_2">
+<choiceInteraction responseIdentifier="RESPONSE_71823479fd38441c8b3e2ba1673198b9" shuffle="false" maxChoices="1">
+<simpleChoice identifier="RESPONSE_2237e86b63b24c03b9c47714781fb4fd" fixed="true"></simpleChoice>
+<simpleChoice identifier="ec28778519f74e7aa1c3c1c01361fc07" fixed="true"></simpleChoice>
+<simpleChoice identifier="fc6281163fdf47f597d4cc35fc9a69e1" fixed="true"></simpleChoice>
+<simpleChoice identifier="RESPONSE_59e37bd044904918b6f6aad6ec16e4a0" fixed="true"></simpleChoice>
+</choiceInteraction>
+<p class="FORMATTED_TEXT_BLOCK">
+
+
+<i>left 2</i></p></div>
+<div class="flow_2">
+<choiceInteraction responseIdentifier="af9bdad3c7df46328dc2519111618762" shuffle="false" maxChoices="1">
+<simpleChoice identifier="RESPONSE_837476d176bb4be5af0c43d10a2c5f98" fixed="true"></simpleChoice>
+<simpleChoice identifier="RESPONSE_1058bce9997147889c986b7ccb8bf270" fixed="true"></simpleChoice>
+<simpleChoice identifier="RESPONSE_9b0412756f764e108a690bcdaf06d571" fixed="true"></simpleChoice>
+<simpleChoice identifier="RESPONSE_6fe75d189fa946c590ca4b56b95104e3" fixed="true"></simpleChoice>
+</choiceInteraction>
+<p class="FORMATTED_TEXT_BLOCK"><script></script>left 3</p></div>
+<div class="flow_2">
+<choiceInteraction responseIdentifier="c6a6644883c44ff2bf6d81f4404664df" shuffle="false" maxChoices="1">
+<simpleChoice identifier="cf60fb4fe58c430698031656e07c6d08" fixed="true"></simpleChoice>
+<simpleChoice identifier="d857ff850a75467b825f83bd98525c82" fixed="true"></simpleChoice>
+<simpleChoice identifier="RESPONSE_20148d72718944cc82a96e08e49ca017" fixed="true"></simpleChoice>
+<simpleChoice identifier="cf768ddeefb148ee82ddca95baea9f4a" fixed="true"></simpleChoice>
+</choiceInteraction>
+<p class="FORMATTED_TEXT_BLOCK">left 4</p></div></div>
+<div class="RIGHT_MATCH_BLOCK">
+<div class="flow_2">
+<p class="FORMATTED_TEXT_BLOCK">&lt;span style=";"&gt;right 1&lt;/span&gt;</p></div>
+<div class="flow_2">
+<p class="FORMATTED_TEXT_BLOCK">r&#239;ght 2</p></div>
+<div class="flow_2">
+<p class="FORMATTED_TEXT_BLOCK">right 3</p></div>
+<div class="flow_2">
+<p class="FORMATTED_TEXT_BLOCK">right 4</p></div></div>
+</itemBody>
+<responseProcessing>
+<responseCondition>
+<responseIf><match><variable identifier="e4531f8eeef542f8a13b911c37ef074a"/><baseValue baseType="identifier">cc7648a243044653ae6a4a0b9e0c820f</baseValue></match>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">correct</baseValue></multiple></setOutcomeValue>
+</responseIf>
+<responseElseIf><match><variable identifier="RESPONSE_71823479fd38441c8b3e2ba1673198b9"/><baseValue baseType="identifier">ec28778519f74e7aa1c3c1c01361fc07</baseValue></match>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">correct</baseValue></multiple></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="af9bdad3c7df46328dc2519111618762"/><baseValue baseType="identifier">RESPONSE_9b0412756f764e108a690bcdaf06d571</baseValue></match>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">correct</baseValue></multiple></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><match><variable identifier="c6a6644883c44ff2bf6d81f4404664df"/><baseValue baseType="identifier">cf768ddeefb148ee82ddca95baea9f4a</baseValue></match>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">correct</baseValue></multiple></setOutcomeValue>
+</responseElseIf>
+<responseElseIf><baseValue baseType="boolean">true</baseValue>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">0.0</baseValue></setOutcomeValue>
+<setOutcomeValue identifier="FEEDBACK"><multiple><variable identifier="FEEDBACK"/><baseValue baseType="identifier">incorrect</baseValue></multiple></setOutcomeValue>
+</responseElseIf>
+</responseCondition>
+<responseCondition>
+<responseIf><gt><variable identifier="SCORE"/><baseValue baseType="float">10.0</baseValue></gt>
+<setOutcomeValue identifier="SCORE"><baseValue baseType="float">10.0</baseValue></setOutcomeValue>
+</responseIf>
+</responseCondition>
+</responseProcessing>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="correct">
+<div class="flow_1">
+<p class="FORMATTED_TEXT_BLOCK">right</p></div></modalFeedback>
+<modalFeedback outcomeIdentifier="FEEDBACK" showHide="show" identifier="incorrect">
+<div class="flow_1">
+<p class="FORMATTED_TEXT_BLOCK">wrong</p></div></modalFeedback>
+</assessmentItem>

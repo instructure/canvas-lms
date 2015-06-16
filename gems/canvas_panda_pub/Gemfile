@@ -1,0 +1,6 @@
+source 'https://rubygems.org'
+
+gem 'canvas_http', :path => '../canvas_http'
+
+gemspec
+

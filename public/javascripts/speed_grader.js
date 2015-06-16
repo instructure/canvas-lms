@@ -18,6 +18,7 @@
 
 define([
   'jst/speed_grader/submissions_dropdown',
+  'jst/speed_grader/speech_recognition',
   'compiled/util/round',
   'underscore',
   'INST' /* INST */,
@@ -29,7 +30,6 @@ define([
   'rubric_assessment',
   'jst/_turnitinInfo',
   'jst/_turnitinScore',
-  'ajax_errors' /* INST.log_error */,
   'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.ajaxJSON' /* getJSON, ajaxJSON */,
   'jquery.instructure_forms' /* ajaxJSONFiles */,
@@ -48,10 +48,9 @@ define([
   'vendor/jquery.getScrollbarWidth' /* getScrollbarWidth */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'vendor/jquery.spin' /* /\.spin/ */,
-  'vendor/scribd.view' /* scribd */,
   'vendor/spin' /* new Spinner */,
   'vendor/ui.selectmenu' /* /\.selectmenu/ */
-], function(submissionsDropdownTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, turnitinInfoTemplate, turnitinScoreTemplate) {
+], function(submissionsDropdownTemplate, speechRecognitionTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, turnitinInfoTemplate, turnitinScoreTemplate) {
 
   // fire off the request to get the jsonData
   window.jsonData = {};
@@ -119,6 +118,8 @@ define([
       $rubric_full_resizer_handle = $("#rubric_full_resizer_handle"),
       $mute_link = $('#mute_link'),
       $no_annotation_warning = $('#no_annotation_warning'),
+      $comment_submitted = $('#comment_submitted'),
+      $comment_submitted_message = $('#comment_submitted_message'),
       $selectmenu = null,
       browserableCssClasses = /^(image|html|code)$/,
       windowLastHeight = null,
@@ -130,7 +131,8 @@ define([
       studentLabel = I18n.t("student", "Student"),
       groupLabel = I18n.t("group", "Group"),
       gradeeLabel = studentLabel,
-      utils;
+      utils,
+      crocodocSessionTimer;
 
   utils = {
     getParam: function(name){
@@ -262,23 +264,24 @@ define([
     return {raw: raw, formatted: formatted};
   }
 
+  // xsslint safeString.identifier MENU_PARTS_DELIMITER
   var MENU_PARTS_DELIMITER = '----☃----'; // something random and unlikely to be in a person's name
 
   function initDropdown(){
     var hideStudentNames = utils.shouldHideStudentNames();
     $("#hide_student_names").attr('checked', hideStudentNames);
-    var options = $.map(jsonData.studentsWithSubmissions, function(s, idx){
-      var name = htmlEscape(s.name).replace(MENU_PARTS_DELIMITER, ""),
+    var optionsHtml = $.map(jsonData.studentsWithSubmissions, function(s, idx){
+      var name = s.name.replace(MENU_PARTS_DELIMITER, ""),
           className = classNameBasedOnStudent(s);
 
       if(hideStudentNames) {
         name = I18n.t('nth_student', "Student %{n}", {'n': idx + 1});
       }
 
-      return '<option value="' + s.id + '" class="' + className.raw + ' ui-selectmenu-hasIcon">' + name + MENU_PARTS_DELIMITER + className.formatted + MENU_PARTS_DELIMITER + className.raw + '</option>';
+      return '<option value="' + s.id + '" class="' + htmlEscape(className.raw) + ' ui-selectmenu-hasIcon">' + htmlEscape(name) + MENU_PARTS_DELIMITER + htmlEscape(className.formatted) + MENU_PARTS_DELIMITER + htmlEscape(className.raw) + '</option>';
     }).join("");
 
-    $selectmenu = $("<select id='students_selectmenu'>" + options + "</select>")
+    $selectmenu = $("<select id='students_selectmenu'>" + optionsHtml + "</select>")
       .appendTo("#combo_box_container")
       .selectmenu({
         style:'dropdown',
@@ -290,6 +293,7 @@ define([
         EG.handleStudentChanged();
       });
 
+    // xsslint safeString.function getIcon
     function getIcon(helper_text){
       var icon = "<span class='ui-selectmenu-item-icon speedgrader-selectmenu-icon'>";
       if(helper_text == "graded"){
@@ -305,9 +309,9 @@ define([
           $menu = $("#section-menu");
 
 
-      $menu.find('ul').append($.map(jsonData.context.active_course_sections, function(section, i){
+      $menu.find('ul').append($.raw($.map(jsonData.context.active_course_sections, function(section, i){
         return '<li><a class="section_' + section.id + '" data-section-id="'+ section.id +'" href="#">'+ htmlEscape(section.name) +'</a></li>';
-      }).join(''));
+      }).join('')));
 
       $menu.insertBefore($selectmenu_list).bind('mouseenter mouseleave', function(event){
         $(this)
@@ -469,7 +473,7 @@ define([
           this.spinMute();
           $.ajaxJSON(this.muteUrl(), 'put', { status: true }, $.proxy(function(res){
             this.elements.spinner.stop();
-            this.elements.mute.label.html(label);
+            this.elements.mute.label.text(label);
             this.elements.mute.icon
               .removeClass('ui-icon-volume-off')
               .addClass('ui-icon-volume-on')
@@ -483,7 +487,7 @@ define([
           this.spinMute();
           $.ajaxJSON(this.muteUrl(), 'put', { status: false }, $.proxy(function(res){
             this.elements.spinner.stop();
-            this.elements.mute.label.html(label);
+            this.elements.mute.label.text(label);
             this.elements.mute.icon
               .removeClass('ui-icon-volume-on')
               .addClass('ui-icon-volume-off')
@@ -498,9 +502,7 @@ define([
 
   function initCommentBox(){
     //initialize the auto height resizing on the textarea
-    $('#add_a_comment textarea').elastic({
-      callback: EG.resizeFullHeight
-    });
+    $('#add_a_comment textarea').elastic();
 
     $(".media_comment_link").click(function(event) {
       event.preventDefault();
@@ -510,41 +512,138 @@ define([
       }, function() {
         EG.revertFromFormSubmit();
       }, true);
-      EG.resizeFullHeight();
     });
 
     $("#media_recorder_container a").live('click', hideMediaRecorderContainer);
 
     // handle speech to text for browsers that can (right now only chrome)
     function browserSupportsSpeech(){
-      var elem = document.createElement('input');
-      // chrome 10 advertises support but it LIES!!! doesn't work till chrome 11
-      var support = ('onwebkitspeechchange' in elem || 'speech' in elem) && !navigator.appVersion.match(/Chrome\/10/);
-      return support;
+      return 'webkitSpeechRecognition' in window;
     }
-    if (browserSupportsSpeech()) {
-      $(".speech_recognition_link").click(function() {
-          $('<input style="font-size: 30px;" speech x-webkit-speech />')
-            .dialog({
-              title: I18n.t('titles.click_to_record', "Click the mic to record your comments"),
-              open: function(){
-                $(this).width(100);
+    if (browserSupportsSpeech()){
+      var recognition = new webkitSpeechRecognition();
+      var messages = {
+        "begin": I18n.t('begin_record_prompt', 'Click the "Record" button to begin.'),
+        "allow": I18n.t('allow_message', 'Click the "Allow" button to begin recording.'),
+        "recording": I18n.t('recording_message', 'Recording...'),
+        "recording_expired": I18n.t('recording_expired_message', 'Speech recognition has expired due to inactivity. Click the "Stop" button to use current text for comment or "Cancel" to discard.'),
+        "mic_blocked": I18n.t('mic_blocked_message', 'Permission to use microphone is blocked. To change, go to chrome://settings/contentExceptions#media-stream'),
+        "no_speech": I18n.t('nodetect_message', 'No speech was detected. You may need to adjust your microphone settings.')
+      }
+      configureRecognition(recognition);
+      $(".speech_recognition_link").click(function(){
+        $(speechRecognitionTemplate({
+          message: messages.begin
+        }))
+          .dialog({
+            title: I18n.t('titles.click_to_record', "Speech to Text"),
+            minWidth: 450,
+            minHeight: 200,
+            dialogClass: "no-close",
+            buttons: [{
+              'class': 'dialog_button',
+              text: I18n.t('buttons.dialog_buttons', "Cancel"),
+              click: function(){
+                recognition.stop();
+                $(this).dialog('close').remove();
               }
-            })
-            .bind('webkitspeechchange', function(){
-              $add_a_comment_textarea.val($(this).val());
+            },
+            {
+              id: 'record_button',
+              'class': 'dialog_button',
+              'aria-label': I18n.t('dialog_button.aria_record', "Click to record"),
+              recording: false,
+              html: "<div></div>",
+              click: function(){
+                var $this = $(this)
+                processSpeech($this);
+              }
+            }],
+            close: function(){
+              recognition.stop();
               $(this).dialog('close').remove();
-            });
-          return false;
-        })
+            }
+          })
+        return false;
+      })
         // show the li that contains the button because it is hidden from browsers that dont support speech
-        .closest('li').show();
+      .closest('li').show();
+
+      function processSpeech($this){
+        if ($('#record_button').attr("recording") == "true"){
+          recognition.stop();
+          var current_comment = $('#final_results').html() + $('#interim_results').html()
+          $add_a_comment_textarea.val(formatComment(current_comment));
+          $this.dialog('close').remove();
+        }
+        else {
+          recognition.start();
+          $('#dialog_message').text(messages.allow)
+        }
+      }
+
+      function formatComment(current_comment){
+        return current_comment.replace(/<p><\/p>/g, '\n\n').replace(/<br>/g, '\n');
+      }
+
+      function configureRecognition(recognition){
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        var final_transcript = '';
+
+        recognition.onstart = function(){
+          $('#dialog_message').text(messages.recording);
+          $('#record_button').attr("recording", true).attr("aria-label", I18n.t('dialog_button.aria_stop', 'Hit "Stop" to end recording.'))
+        }
+
+        recognition.onresult = function(event){
+          var interim_transcript = '';
+          for (var i = event.resultIndex; i < event.results.length; i++){
+            if (event.results[i].isFinal){
+              final_transcript += event.results[i][0].transcript;
+              $('#final_results').html(linebreak(final_transcript))
+            }
+            else {
+              interim_transcript += event.results[i][0].transcript;
+            }
+            $('#interim_results').html(linebreak(interim_transcript))
+          }
+        }
+
+        recognition.onaudiostart = function(event){
+          //this call is required for onaudioend event to trigger
+        }
+
+        recognition.onaudioend = function(event){
+          if ($('#final_results').text() != '' || $('#interim_results').text() != ''){
+            $('#dialog_message').text(messages.recording_expired);
+          }
+        }
+
+        recognition.onend = function(event){
+          final_transcript = '';
+        }
+
+        recognition.onerror = function(event){
+          if (event.error == 'not-allowed') {
+            $('#dialog_message').text(messages.mic_blocked);
+          }
+          else if (event.error = 'no-speech'){
+            $('#dialog_message').text(messages.no_speech);
+          }
+          $('#record_button').attr("recording", false).attr("aria-label", I18n.t('dialog_button.aria_record_reset', "Click to record"));
+        }
+
+        // xsslint safeString.function linebreak
+        function linebreak(transcript){
+          return htmlEscape(transcript).replace(/\n\n/g, '<p></p>').replace(/\n/g, '<br>');
+        }
+      }
     }
   }
 
   function hideMediaRecorderContainer(){
     $("#media_media_recording").hide().removeData('comment_id').removeData('comment_type');
-    EG.resizeFullHeight();
   }
 
   function isAssessmentEditableByMe(assessment){
@@ -575,7 +674,6 @@ define([
     $rubric_assessments_select.change(function(){
       var selectedAssessment = getSelectedAssessment();
       rubricAssessment.populateRubricSummary($("#rubric_summary_holder .rubric_summary"), selectedAssessment, isAssessmentEditableByMe(selectedAssessment));
-      EG.resizeFullHeight();
     });
 
     $rubric_full_resizer_handle.draggable({
@@ -596,7 +694,6 @@ define([
             windowWidth = $window.width();
         $rubric_full.width(windowWidth - offset.left);
         $rubric_full_resizer_handle.css("left","0");
-        EG.resizeFullHeight();
       },
       stop: function(event, ui) {
         event.stopImmediatePropagation();
@@ -686,99 +783,16 @@ define([
     $("#submission_group_comment").prop({checked: true, disabled: true});
   }
 
-  function resizingFunction(){
-    var windowHeight = $window.height(),
-        delta,
-        deltaRemaining,
-        headerOffset = $right_side.offset().top,
-        fixedBottomHeight = $fixed_bottom.height(),
-        fullHeight = Math.max(minimumWindowHeight, windowHeight) - headerOffset - fixedBottomHeight,
-        resizableElements = [
-          { element: $submission_files_list,    data: { newHeight: 0 } },
-          { element: $rubric_summary_container, data: { newHeight: 0 } },
-          { element: $comments,                 data: { newHeight: 0 } }
-        ],
-        visibleResizableElements = $.grep(resizableElements, function(e, i){
-          return e && e.element.is(':visible');
-        });
-    $rubric_full.css({ 'maxHeight': fullHeight - 50, 'overflow': 'auto' });
-
-    $.each(visibleResizableElements, function(){
-      this.data.autoHeight = this.element.height("auto").height();
-      this.element.height(0);
-    });
-
-    var spaceLeftForResizables = fullHeight - $rightside_inner.height("auto").height() - $add_a_comment.outerHeight();
-
-    $full_height.height(fullHeight);
-    delta = deltaRemaining = spaceLeftForResizables;
-    var step = 1;
-    var didNothing;
-    if (delta > 0) { //the page got bigger
-      while(deltaRemaining > 0){
-        didNothing = true;
-        var shortestElementHeight = 10000000;
-        var shortestElement = null;
-        $.each(visibleResizableElements, function(){
-          if (this.data.newHeight < shortestElementHeight && this.data.newHeight < this.data.autoHeight) {
-            shortestElement = this;
-            shortestElementHeight = this.data.newHeight;
-          }
-        });
-        if (shortestElement) {
-          shortestElement.data.newHeight = shortestElementHeight + step;
-          deltaRemaining = deltaRemaining - step;
-          didNothing = false;
-        }
-        if (didNothing) {
-          break;
-        }
-      }
-    }
-    else { //the page got smaller
-      var tallestElementHeight, tallestElement;
-      while(deltaRemaining < 0){
-        didNothing = true;
-        tallestElementHeight = 0;
-        tallestElement = null;
-        $.each(visibleResizableElements, function(){
-          if (this.data.newHeight > 30 > tallestElementHeight && this.data.newHeight >= this.data.autoHeight ) {
-            tallestElement = this;
-            tallestElementHeight = this.data.newHeight;
-          }
-        });
-        if (tallestElement) {
-          tallestElement.data.newHeight = tallestElementHeight - step;
-          deltaRemaining = deltaRemaining + step;
-          didNothing = false;
-        }
-        if (didNothing) {
-          break;
-        }
-      }
-    }
-
-    $.each(visibleResizableElements, function(){
-      this.element.height(this.data.newHeight);
-    });
-
-    if (deltaRemaining > 0) {
-      $comments.height( windowHeight - Math.floor($comments.offset().top) - $add_a_comment.outerHeight() );
-    }
-    // This will cause the page to flicker in firefox if there is a scrollbar in both the comments and the rubric summary.
-    // I would like it not to, I tried setTimeout(function(){ $comments.scrollTop(1000000); }, 800); but that still doesnt work
-    if(!INST.browser.ff && $comments.height() > 100) {
-      $comments.scrollTop(1000000);
-    }
-  }
-
   $.extend(INST, {
     refreshGrades: function(){
       var url = unescape($assignment_submission_url.attr('href')).replace("{{submission_id}}", EG.currentStudent.submission.user_id) + ".json";
+      var currentStudentIDAsOfAjaxCall = EG.currentStudent.id;
       $.getJSON( url,
         function(data){
-          EG.currentStudent.submission = data.submission;
-          EG.showGrade();
+          if(currentStudentIDAsOfAjaxCall === EG.currentStudent.id) {
+            EG.currentStudent.submission = data.submission;
+            EG.showGrade();
+          }
       });
     },
     refreshQuizSubmissionSnapshot: function(data) {
@@ -821,13 +835,9 @@ define([
   var EG = {
     options: {},
     publicVariable: [],
-    scribdDoc: null,
     currentStudent: null,
 
     domReady: function(){
-      //attach to window resize and
-      $window.bind('resize orientationchange', EG.resizeFullHeight).resize();
-
       function makeFullWidth(){
         $full_width_container.addClass("full_width");
         $left_side.css("width",'');
@@ -869,7 +879,6 @@ define([
             $left_side.width("0%" );
             $right_side.width('100%');
           }
-          EG.resizeFullHeight();
         },
         stop: function(event, ui) {
           event.stopImmediatePropagation();
@@ -892,10 +901,9 @@ define([
 
       $multiple_submissions.change(function(e) {
         if (typeof EG.currentStudent.submission == 'undefined') EG.currentStudent.submission = {};
-        var i = e.target.value ?
-          parseInt(e.target.value, 10) :
-          EG.currentStudent.submission.submission_history.length - 1;
-        EG.currentStudent.submission.currentSelectedIndex = i;
+        var i = $("#submission_to_view").val() ||
+                EG.currentStudent.submission.submission_history.length - 1;
+        EG.currentStudent.submission.currentSelectedIndex = parseInt(i, 10);
         EG.handleSubmissionSelectionChange();
       });
 
@@ -905,9 +913,9 @@ define([
       header.init();
       initKeyCodes();
 
-      $('#hide_no_annotation_warning').click(function(e){
+      $('.dismiss_alert').click(function(e){
         e.preventDefault();
-        $no_annotation_warning.hide();
+        $(this).closest(".alert").hide();
       });
 
       $window.bind('hashchange', EG.handleFragmentChange);
@@ -952,17 +960,21 @@ define([
 
     next: function(){
       this.skipRelativeToCurrentIndex(1);
+      var studentInfo = this.getStudentNameAndGrade();
+      $("#aria_name_alert").text(studentInfo);
     },
 
     prev: function(){
       this.skipRelativeToCurrentIndex(-1);
+      var studentInfo = this.getStudentNameAndGrade();
+      $("#aria_name_alert").text(studentInfo);
     },
 
-    resizeFullHeight: function(){
-      if (resizeTimeOut) {
-        clearTimeout(resizeTimeOut);
-      }
-      resizeTimeOut = setTimeout(resizingFunction, 0);
+    getStudentNameAndGrade: function(){
+      var hideStudentNames = utils.shouldHideStudentNames();
+      var studentName = hideStudentNames ? I18n.t('student_index', "Student %{index}", { index: EG.currentIndex() + 1 }) : EG.currentStudent.name;
+      var submissionStatus = classNameBasedOnStudent(EG.currentStudent);
+      return studentName + " " + submissionStatus.formatted;
     },
 
     toggleFullRubric: function(force){
@@ -975,7 +987,6 @@ define([
       if ($rubric_full.filter(":visible").length || force === "close") {
         $("#grading").height("auto").children().show();
         $rubric_full.fadeOut();
-        this.resizeFullHeight();
         $(".toggle_full_rubric").focus()
       } else {
         $rubric_full.fadeIn();
@@ -991,7 +1002,6 @@ define([
 
       rubricAssessment.populateRubric($rubric_full.find(".rubric"), getSelectedAssessment() );
       $("#grading").height($rubric_full.height());
-      this.resizeFullHeight();
     },
 
     handleFragmentChange: function(){
@@ -1054,6 +1064,7 @@ define([
         "student_id": this.currentStudent.id
       }));
 
+      $rightside_inner.scrollTo(0);
       this.showGrade();
       this.showDiscussion();
       this.showRubric();
@@ -1116,107 +1127,98 @@ define([
     },
 
     handleSubmissionSelectionChange: function(){
-      try {
-        var $submission_to_view = $("#submission_to_view");
-        var submissionToViewVal = $submission_to_view.val(),
-            currentSelectedIndex = Number(submissionToViewVal) ||
-                                  ( this.currentStudent &&
-                                    this.currentStudent.submission &&
-                                    this.currentStudent.submission.currentSelectedIndex )
-                                  || 0,
-            isMostRecent = this.currentStudent &&
-                           this.currentStudent.submission &&
-                           this.currentStudent.submission.submission_history &&
-                           this.currentStudent.submission.submission_history.length - 1 === currentSelectedIndex,
-            submission  = this.currentStudent &&
-                          this.currentStudent.submission &&
-                          this.currentStudent.submission.submission_history &&
-                          this.currentStudent.submission.submission_history[currentSelectedIndex] &&
-                          this.currentStudent.submission.submission_history[currentSelectedIndex].submission
-                          || {},
-            inlineableAttachments = [],
-            browserableAttachments = [];
+      clearInterval(crocodocSessionTimer);
+      var $submission_to_view = $("#submission_to_view");
+      var submissionToViewVal = $submission_to_view.val(),
+          currentSelectedIndex = Number(submissionToViewVal) ||
+                                ( this.currentStudent &&
+                                  this.currentStudent.submission &&
+                                  this.currentStudent.submission.currentSelectedIndex )
+                                || 0,
+          isMostRecent = this.currentStudent &&
+                         this.currentStudent.submission &&
+                         this.currentStudent.submission.submission_history &&
+                         this.currentStudent.submission.submission_history.length - 1 === currentSelectedIndex,
+          submission  = this.currentStudent &&
+                        this.currentStudent.submission &&
+                        this.currentStudent.submission.submission_history &&
+                        this.currentStudent.submission.submission_history[currentSelectedIndex] &&
+                        this.currentStudent.submission.submission_history[currentSelectedIndex].submission
+                        || {},
+          inlineableAttachments = [],
+          browserableAttachments = [];
 
-        var $turnitinScoreContainer = $grade_container.find(".turnitin_score_container").empty(),
-            $turnitinInfoContainer = $grade_container.find(".turnitin_info_container").empty(),
-            assetString = 'submission_' + submission.id,
-            turnitinAsset = submission.turnitin_data && submission.turnitin_data[assetString];
-        // There might be a previous submission that was text_entry, but the
-        // current submission is an upload. The turnitin asset for the text
-        // entry would still exist
-        if (turnitinAsset && submission.submission_type == 'online_text_entry') {
+      var $turnitinScoreContainer = $grade_container.find(".turnitin_score_container").empty(),
+          $turnitinInfoContainer = $grade_container.find(".turnitin_info_container").empty(),
+          assetString = 'submission_' + submission.id,
+          turnitinAsset = submission.turnitin_data && submission.turnitin_data[assetString];
+      // There might be a previous submission that was text_entry, but the
+      // current submission is an upload. The turnitin asset for the text
+      // entry would still exist
+      if (turnitinAsset && submission.submission_type == 'online_text_entry') {
+        EG.populateTurnitin(submission, assetString, turnitinAsset, $turnitinScoreContainer, $turnitinInfoContainer, isMostRecent);
+      }
+
+      //handle the files
+      $submission_files_list.empty();
+      $turnitinInfoContainer = $("#submission_files_container .turnitin_info_container").empty();
+      $.each(submission.versioned_attachments || [], function(i,a){
+        var attachment = a.attachment;
+        if (attachment.crocodoc_url ||
+            attachment.canvadoc_url ||
+            $.isPreviewable(attachment.content_type, 'google')) {
+          inlineableAttachments.push(attachment);
+        }
+        if (browserableCssClasses.test(attachment.mime_class)) {
+          browserableAttachments.push(attachment);
+        }
+        $submission_file = $submission_file_hidden.clone(true).fillTemplateData({
+          data: {
+            submissionId: submission.user_id,
+            attachmentId: attachment.id,
+            display_name: attachment.display_name
+          },
+          hrefValues: ['submissionId', 'attachmentId']
+        }).appendTo($submission_files_list)
+          .find('a.display_name')
+            .addClass(attachment.mime_class)
+            .data('attachment', attachment)
+            .click(function(event){
+              event.preventDefault();
+              EG.loadAttachmentInline($(this).data('attachment'));
+            })
+          .end()
+          .find('a.submission-file-download')
+            .bind('dragstart', function(event){
+              // check that event dataTransfer exists
+              event.originalEvent.dataTransfer &&
+              // handle dragging out of the browser window only if it is supported.
+              event.originalEvent.dataTransfer.setData('DownloadURL', attachment.content_type + ':' + attachment.filename + ':' + this.href);
+            })
+          .end()
+          .show();
+        $turnitinScoreContainer = $submission_file.find(".turnitin_score_container");
+        assetString = 'attachment_' + attachment.id;
+        turnitinAsset = submission.turnitin_data && submission.turnitin_data[assetString];
+        if (turnitinAsset) {
           EG.populateTurnitin(submission, assetString, turnitinAsset, $turnitinScoreContainer, $turnitinInfoContainer, isMostRecent);
         }
+      });
 
-        //handle the files
-        $submission_files_list.empty();
-        $turnitinInfoContainer = $("#submission_files_container .turnitin_info_container").empty();
-        $.each(submission.versioned_attachments || [], function(i,a){
-          var attachment = a.attachment;
-          if (attachment.crocodoc_url ||
-              attachment.canvadoc_url ||
-              (attachment.scribd_doc && attachment.scribd_doc.created) ||
-              $.isPreviewable(attachment.content_type, 'google')) {
-            inlineableAttachments.push(attachment);
-          }
-          if (browserableCssClasses.test(attachment.mime_class)) {
-            browserableAttachments.push(attachment);
-          }
-          $submission_file = $submission_file_hidden.clone(true).fillTemplateData({
-            data: {
-              submissionId: submission.user_id,
-              attachmentId: attachment.id,
-              display_name: attachment.display_name
-            },
-            hrefValues: ['submissionId', 'attachmentId']
-          }).appendTo($submission_files_list)
-            .find('a.display_name')
-              .addClass(attachment.mime_class)
-              .data('attachment', attachment)
-              .click(function(event){
-                event.preventDefault();
-                EG.loadAttachmentInline($(this).data('attachment'));
-              })
-            .end()
-            .find('a.submission-file-download')
-              .bind('dragstart', function(event){
-                // check that event dataTransfer exists
-                event.originalEvent.dataTransfer &&
-                // handle dragging out of the browser window only if it is supported.
-                event.originalEvent.dataTransfer.setData('DownloadURL', attachment.content_type + ':' + attachment.filename + ':' + this.href);
-              })
-            .end()
-            .show();
-          $turnitinScoreContainer = $submission_file.find(".turnitin_score_container");
-          assetString = 'attachment_' + attachment.id;
-          turnitinAsset = submission.turnitin_data && submission.turnitin_data[assetString];
-          if (turnitinAsset) {
-            EG.populateTurnitin(submission, assetString, turnitinAsset, $turnitinScoreContainer, $turnitinInfoContainer, isMostRecent);
-          }
-        });
+      $submission_files_container.showIf(submission.versioned_attachments && submission.versioned_attachments.length);
 
-        $submission_files_container.showIf(submission.versioned_attachments && submission.versioned_attachments.length);
+      // load up a preview of one of the attachments if we can.
+      // do it in this order:
+      // show the first scridbable doc if there is one
+      // then show the first image if there is one,
+      // if not load the generic thing for the current submission (by not passing a value)
+      this.loadAttachmentInline(inlineableAttachments[0] || browserableAttachments[0]);
 
-        // load up a preview of one of the attachments if we can.
-        // do it in this order:
-        // show the first scridbable doc if there is one
-        // then show the first image if there is one,
-        // if not load the generic thing for the current submission (by not passing a value)
-        this.loadAttachmentInline(inlineableAttachments[0] || browserableAttachments[0]);
+      // if there is any submissions after this one, show a notice that they are not looking at the newest
+      $submission_not_newest_notice.showIf($submission_to_view.filter(":visible").find(":selected").nextAll().length);
 
-        // if there is any submissions after this one, show a notice that they are not looking at the newest
-        $submission_not_newest_notice.showIf($submission_to_view.filter(":visible").find(":selected").nextAll().length);
-
-        // if the submission was after the due date, mark it as late
-        this.resizeFullHeight();
-        $submission_late_notice.showIf(submission['late']);
-      } catch(e) {
-        INST.log_error({
-          'message': "SG_submissions_" + (e.message || e.description || ""),
-          'line': e.lineNumber || ''
-        });
-        throw e;
-      }
+      // if the submission was after the due date, mark it as late
+      $submission_late_notice.showIf(submission['late']);
     },
 
     refreshSubmissionsToView: function(){
@@ -1226,6 +1228,9 @@ define([
 
       if (submissionHistory.length > 0) {
         var noSubmittedAt = I18n.t('no_submission_time', 'no submission time');
+        var selectedIndex = parseInt($("#submission_to_view").val() ||
+                                       submissionHistory.length - 1,
+                                     10);
         var templateSubmissions = _(submissionHistory).map(function(o, i) {
           var s = o.submission;
           if (s.grade && (s.grade_matches_current_submission ||
@@ -1235,11 +1240,12 @@ define([
           return {
             value: s.version || i,
             late: s.late,
+            selected: selectedIndex === i,
             submittedAt: $.datetimeString(s.submitted_at) || noSubmittedAt,
             grade: grade
           };
         });
-        _(templateSubmissions).last().selected = true;
+
         innerHTML = submissionsDropdownTemplate({
           singleSubmission: submissionHistory.length == 1,
           submissions: templateSubmissions,
@@ -1248,13 +1254,16 @@ define([
                                          {user_id: this.currentStudent.id})
         });
       }
-      $multiple_submissions.html(innerHTML);
+      $multiple_submissions.html($.raw(innerHTML));
     },
 
     showSubmissionDetails: function(){
       //if there is a submission
-      if (this.currentStudent.submission && this.currentStudent.submission.submitted_at) {
+      var currentSubmission = this.currentStudent.submission;
+      if (currentSubmission && currentSubmission.submitted_at) {
         this.refreshSubmissionsToView();
+        var lastIndex = currentSubmission.submission_history.length - 1;
+        $("#submission_to_view option:eq(" + lastIndex + ")").attr("selected", "selected");
         $submission_details.show();
       }
       else { //there's no submission
@@ -1264,18 +1273,18 @@ define([
     },
 
     updateStatsInHeader: function(){
-      $x_of_x_students.html(
+      $x_of_x_students.text(
         I18n.t('gradee_index_of_total', '%{gradee} %{x} of %{y}', {
           gradee: gradeeLabel,
           x: EG.currentIndex() + 1,
-          y: jsonData.context.students.length
+          y: this.totalStudentCount()
         })
       );
 
       var gradedStudents = $.grep(jsonData.studentsWithSubmissions, function(s) {
         return (s.submission &&
                 s.submission.workflow_state === 'graded' &&
-                s.submission.from_enrollment_type === "StudentEnrollment"
+                _.contains(["StudentEnrollment", "StudentViewEnrollment"], s.submission.from_enrollment_type)
         );
       });
 
@@ -1298,13 +1307,13 @@ define([
           return Math.round(number*coefficient)/coefficient;
         }
         var outOf = jsonData.points_possible ? ([" / ", jsonData.points_possible, " (", Math.round( 100 * (avg(scores) / jsonData.points_possible)), "%)"].join("")) : "";
-        $average_score.html( [roundWithPrecision(avg(scores), 2) + outOf].join("") );
+        $average_score.text( [roundWithPrecision(avg(scores), 2) + outOf].join("") );
       }
       else { //there are no submissions that have been graded.
         $average_score_wrapper.hide();
       }
 
-      $grded_so_far.html(
+      $grded_so_far.text(
         I18n.t('portion_graded', '%{x} / %{y} Graded', {
           x: gradedStudents.length,
           y: jsonData.context.students.length
@@ -1312,9 +1321,18 @@ define([
       );
     },
 
+    totalStudentCount: function(){
+      if (sectionToShow) {
+        return _.filter(jsonData.context.students, function(student) {return _.contains(student.section_ids, sectionToShow)}).length;
+      } else {
+        return jsonData.context.students.length;
+      };
+    },
+
     loadAttachmentInline: function(attachment){
+      clearInterval(crocodocSessionTimer);
       $submissions_container.children().hide();
-      $no_annotation_warning.hide();
+      $(".speedgrader_alert").hide();
       if (!this.currentStudent.submission || !this.currentStudent.submission.submission_type || this.currentStudent.submission.workflow_state == 'unsubmitted') {
           $this_student_does_not_have_a_submission.show();
       } else if (this.currentStudent.submission && this.currentStudent.submission.submitted_at && jsonData.context.quiz && jsonData.context.quiz.anonymous_submissions) {
@@ -1323,21 +1341,41 @@ define([
         $iframe_holder.empty();
 
         if (attachment) {
-          var scribdDocAvailable = attachment.scribd_doc && attachment.scribd_doc.created && attachment.workflow_state != 'errored' && attachment.scribd_doc.attributes.doc_id;
           var previewOptions = {
             height: '100%',
+            id: "speedgrader_iframe",
             mimeType: attachment.content_type,
             attachment_id: attachment.id,
             submission_id: this.currentStudent.submission.id,
             attachment_view_inline_ping_url: attachment.view_inline_ping_url,
-            attachment_preview_processing: attachment.workflow_state == 'pending_upload' || attachment.workflow_state == 'processing',
-            attachment_scribd_render_url: attachment.scribd_render_url,
-            ready: function(){
-              EG.resizeFullHeight();
-            }
+            attachment_preview_processing: attachment.workflow_state == 'pending_upload' || attachment.workflow_state == 'processing'
           };
         }
+
+        if (attachment &&
+            attachment.submitted_to_crocodoc && !attachment.crocodoc_url) {
+          $("#crocodoc_pending").show();
+        }
+
         if (attachment && attachment.crocodoc_url) {
+          var crocodocStart = new Date()
+          ,   sessionLimit = 60 * 60 * 1000
+          ,   aggressiveWarnings = [50 * 60 * 1000,
+                                    55 * 60 * 1000,
+                                    58 * 60 * 1000,
+                                    59 * 60 * 1000];
+          crocodocSessionTimer = window.setInterval(function() {
+            var elapsed = new Date() - crocodocStart;
+            if (elapsed > sessionLimit) {
+              window.location.reload();
+            } else if (elapsed > aggressiveWarnings[0]) {
+              alert(I18n.t("crocodoc_expiring",
+                           "Your Crocodoc session is expiring soon.  Please reload " +
+                           "the window to avoid losing any work."));
+              aggressiveWarnings.shift();
+            }
+          }, 1000);
+
           $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
             crocodoc_session_url: attachment.crocodoc_url
           }));
@@ -1347,15 +1385,9 @@ define([
             canvadoc_session_url: attachment.canvadoc_url
           }));
         }
-        else if ( attachment && (attachment['scribdable?'] || $.isPreviewable(attachment.content_type, 'google')) ) {
+        else if ( attachment && ($.isPreviewable(attachment.content_type, 'google')) ) {
           if (!INST.disableCrocodocPreviews) $no_annotation_warning.show();
 
-          if (scribdDocAvailable) {
-            previewOptions = $.extend(previewOptions, {
-              scribd_doc_id: attachment.scribd_doc.attributes.doc_id,
-              scribd_access_key: attachment.scribd_doc.attributes.access_key
-            });
-          }
           var currentStudentIDAsOfAjaxCall = this.currentStudent.id;
           previewOptions = $.extend(previewOptions, {
               ajax_valid: _.bind(function() {
@@ -1367,12 +1399,12 @@ define([
 	        var src = unescape($submission_file_hidden.find('.display_name').attr('href'))
 	                  .replace("{{submissionId}}", this.currentStudent.submission.user_id)
 	                  .replace("{{attachmentId}}", attachment.id);
-	        $iframe_holder.html('<iframe src="'+src+'" frameborder="0" id="speedgrader_iframe"></iframe>').show();
+	        $iframe_holder.html('<iframe src="'+htmlEscape(src)+'" frameborder="0" id="speedgrader_iframe"></iframe>').show();
 	      }
 	      else {
 	        //load in the iframe preview.  if we are viewing a past version of the file pass the version to preview in the url
-	        $iframe_holder.html(
-            '<iframe id="speedgrader_iframe" src="/courses/' + jsonData.context_id  +
+	        $iframe_holder.html($.raw(
+            '<iframe id="speedgrader_iframe" src="' + htmlEscape('/courses/' + jsonData.context_id  +
             '/assignments/' + this.currentStudent.submission.assignment_id +
             '/submissions/' + this.currentStudent.submission.user_id +
             '?preview=true' + (
@@ -1384,7 +1416,7 @@ define([
               ''
             ) + (
               utils.shouldHideStudentNames() ? "&hide_student_name=1" : ""
-            ) + '" frameborder="0"></iframe>')
+            )) + '" frameborder="0"></iframe>'))
             .show();
 	      }
   	  }
@@ -1404,14 +1436,8 @@ define([
 
         $rubric_assessments_select.find("option").remove();
         $.each(this.currentStudent.rubric_assessments, function(){
-          $rubric_assessments_select.append('<option value="' + this.id + '">' + htmlEscape(this.assessor_name) + '</option>');
+          $rubric_assessments_select.append('<option value="' + htmlEscape(this.id) + '">' + htmlEscape(this.assessor_name) + '</option>');
         });
-
-        // show a new option if there is not an assessment by me
-        // or, if I can :manage_course, there is not an assessment already with assessment_type = 'grading'
-        if( !assessmentsByMe.length || (ENV.RUBRIC_ASSESSMENT.assessment_type == 'grading' && !gradingAssessments.length) ) {
-          $rubric_assessments_select.append('<option value="new">' + htmlEscape(I18n.t('new_assessment', '[New Assessment]')) + '</option>');
-        }
 
         //select the assessment that meets these rules:
         // 1. the assessment by me
@@ -1445,7 +1471,7 @@ define([
           var hideStudentName = hideStudentNames && jsonData.studentMap[comment.author_id];
           if (hideStudentName) { comment.author_name = I18n.t('student', "Student"); }
           var $comment = $comment_blank.clone(true).fillTemplateData({ data: comment });
-          $comment.find('span.comment').html(htmlEscape(comment.comment).replace(/\n/g, "<br />"));
+          $comment.find('span.comment').html($.raw(htmlEscape(comment.comment).replace(/\n/g, "<br />")));
           if (comment.avatar_path && !hideStudentName) {
             $comment.find(".avatar").attr('src', comment.avatar_path).show();
           }
@@ -1487,7 +1513,6 @@ define([
 
     revertFromFormSubmit: function() {
         EG.showDiscussion();
-        EG.resizeFullHeight();
         $add_a_comment_textarea.val("");
         // this is really weird but in webkit if you do $add_a_comment_textarea.val("").trigger('keyup') it will not let you
         // type it the textarea after you do that.  but I put it in a setTimeout it works.  so this is a hack for webkit,
@@ -1499,10 +1524,13 @@ define([
           disableGroupCommentCheckbox();
         }
 
+        $comment_submitted.show();
+        $comment_submitted_message.attr("tabindex",-1).focus();
         $add_a_comment_submit_button.text(I18n.t('buttons.submit_comment', "Submit Comment"));
     },
 
     handleCommentFormSubmit: function(){
+      $comment_submitted.hide();
       if (
         !$.trim($add_a_comment_textarea.val()).length &&
         !$("#media_media_recording").data('comment_id') &&
@@ -1531,6 +1559,9 @@ define([
           EG.setOrUpdateSubmission(this.submission);
         });
         EG.revertFromFormSubmit();
+        window.setTimeout(function() {
+          $rightside_inner.scrollTo($rightside_inner[0].scrollHeight, 500);
+        });
       }
       if($add_a_comment.find("input[type='file']:visible").length) {
         $.ajaxJSONFiles(url + ".text", method, formData, $add_a_comment.find("input[type='file']:visible"), formSuccess);
@@ -1583,17 +1614,26 @@ define([
     },
 
     showGrade: function(){
-      $grade.val( typeof EG.currentStudent.submission != "undefined" &&
-                  EG.currentStudent.submission.grade !== null ?
-                  EG.currentStudent.submission.grade : "")
-            .attr('disabled', typeof EG.currentStudent.submission != "undefined" &&
-                              EG.currentStudent.submission.submission_type === 'online_quiz');
+      var submission;
+      var grade = EG.currentStudent.submission === undefined ? 
+                  "" :
+                  EG.currentStudent.submission.grade; 
+
+      if ( EG.currentStudent.submission !== undefined ) {
+        submission = EG.currentStudent.submission;
+        if ( submission.grade !== null && !isNaN(parseFloat(submission.grade)) ) {
+          grade = round(submission.grade, 2);
+        }
+      }
+
+      $grade.val(grade)
+            .attr('disabled', typeof submission != "undefined" &&
+                              submission.submission_type === 'online_quiz');
 
       $('#submit_same_score').hide();
-      if (typeof EG.currentStudent.submission != "undefined" &&
-          EG.currentStudent.submission.score !== null) {
-        $score.text(round(EG.currentStudent.submission.score, round.DEFAULT));
-        if (!EG.currentStudent.submission.grade_matches_current_submission) {
+      if (typeof submission != "undefined" && submission.score !== null) {
+        $score.text(round(submission.score, round.DEFAULT));
+        if (!submission.grade_matches_current_submission) {
           $('#submit_same_score').show();
         }
       } else {
@@ -1625,13 +1665,17 @@ define([
         $queryIcon = $query.find(".speedgrader-selectmenu-icon");
 
         if(className.raw == "graded" && this == EG.currentStudent){
+          var studentInfo = EG.getStudentNameAndGrade()
           $queryIcon.text("").append("<i class='icon-check'></i>");
           $status.addClass("graded");
           $statusIcon.text("").append("<i class='icon-check'></i>");
+          $("#aria_name_alert").text(studentInfo);
         }else if(className.raw == "not_graded" && this == EG.currentStudent){
+          var studentInfo = EG.getStudentNameAndGrade()
           $queryIcon.text("").append("&#9679;");
           $status.removeClass("graded");
           $statusIcon.text("").append("&#9679;");
+          $("#aria_name_alert").text(studentInfo);
         }else{
           $status.removeClass("graded");
         }
@@ -1659,12 +1703,10 @@ define([
         $attachment.find("input").attr('name', 'attachments[' + fileIndex + '][uploaded_data]');
         fileIndex++;
         $("#comment_attachments").append($attachment.show());
-        EG.resizeFullHeight();
       });
       $comment_attachment_input_blank.find("a").click(function(event) {
         event.preventDefault();
         $(this).parents(".comment_attachment_input").remove();
-        EG.resizeFullHeight();
       });
       $right_side.delegate(".play_comment_link", 'click', function() {
         if($(this).data('media_comment_id')) {

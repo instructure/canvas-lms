@@ -20,18 +20,32 @@ module Importers
     def self.import_from_migration(hash, context, migration=nil, item=nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:external_feeds_to_import] && !hash[:external_feeds_to_import][hash[:migration_id]]
-      item ||= ExternalFeed.find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
-      item ||= context.external_feeds.new
+      item ||= find_or_initialize_from_migration(hash, context)
       item.migration_id = hash[:migration_id]
       item.url = hash[:url]
       item.title = hash[:title]
-      item.feed_type = hash[:feed_type]
-      item.feed_purpose = hash[:purpose]
       item.verbosity = hash[:verbosity]
       item.header_match = hash[:header_match] unless hash[:header_match].blank?
 
       item.save!
-      migration.add_imported_item(item) if migration && item.new_record?
+      migration.add_imported_item(item) if migration
+      item
+    end
+
+    def self.find_or_initialize_from_migration(hash, context)
+      item = ExternalFeed.where(
+        context_id: context,
+        context_type: context.class.to_s,
+        migration_id: hash[:migration_id]
+      ).first if hash[:migration_id]
+      item ||= ExternalFeed.where(
+        context_id: context,
+        context_type: context.class.to_s,
+        url: hash[:url],
+        header_match: hash[:header_match].presence,
+        verbosity: hash[:verbosity]
+      ).first if hash[:url]
+      item ||= context.external_feeds.new
       item
     end
   end

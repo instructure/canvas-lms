@@ -21,7 +21,8 @@ module Api::V1::ContentExport
   include Api::V1::Attachment
 
   def content_export_json(export, current_user, session)
-    json = api_json(export, current_user, session, :only => %w(id user_id created_at course_id workflow_state export_type))
+    json = api_json(export, current_user, session, :only => %w(id user_id created_at workflow_state export_type))
+    json['course_id'] = export.context_id if export.context_type == 'Course'
     if export.attachment && !export.for_course_copy?
       json[:attachment] = attachment_json(export.attachment, current_user, {}, {:can_manage_files => true})
     end

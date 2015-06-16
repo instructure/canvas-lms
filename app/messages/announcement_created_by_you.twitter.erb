@@ -1,0 +1,4 @@
+<% define_content :link do -%>
+<%= polymorphic_url([asset.context, asset]) %>
+<% end -%>
+<%= t :body, "Canvas Alert - You created this Announcement: %{title}, %{course}.", :title => asset.title, :course => asset.context.name %>

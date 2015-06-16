@@ -16,6 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'nokogiri'
+require 'oauth'
+
 module LinkedIn
   class Connection
     def get_service_user_info(access_token)

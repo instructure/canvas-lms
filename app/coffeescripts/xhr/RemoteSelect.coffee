@@ -20,6 +20,10 @@
 # Populates a <select> element with data from an ajax call. Takes two arguments.
 # The first is a <select> element, the second is an options hash 
 
+###
+xsslint jqueryObject.property placeholder spinner
+###
+
 define [
   'jquery'
   'underscore'

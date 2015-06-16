@@ -3,8 +3,9 @@ define [
   'jquery'
   'jst/ExternalTools/EditView'
   'compiled/views/ValidatedFormView'
+  'str/htmlEscape'
   'compiled/jquery/fixDialogButtons'
-], (I18n, $, template, ValidatedFormView) ->
+], (I18n, $, template, ValidatedFormView, htmlEscape) ->
 
   class EditView extends ValidatedFormView
     template: template
@@ -16,10 +17,14 @@ define [
     events:
       'change #external_tool_config_type': 'onConfigTypeChange'
 
+    initialize: ->
+      super
+      @title = @options.title || I18n.t 'dialog_title_edit_tool', 'Edit External Tool'
+
     afterRender: ->
       super
       @$el.dialog
-        title: I18n.t 'dialog_title_edit_tool', 'Edit External Tool'
+        title: @title
         width: 520
         height: "auto"
         resizable: true
@@ -60,13 +65,20 @@ define [
     addError: (input, message) ->
       input = $(input)
       input.parents('.control-group').addClass('error')
-      input.after("<span class='help-inline'>#{message}</span>")
+      input.after("<span id='#{htmlEscape input.attr("name")}_error_message' class='help-inline'>#{htmlEscape message}</span>")
+      input.attr('aria-describedby', "#{input.attr('name')}_error_message")
+      input.attr('aria-invalid', 'true')
       input.one 'keypress', ->
         $(this).parents('.control-group').removeClass('error')
+        input.removeAttr('aria-describedby')
+        $(this).removeAttr('aria-invalid')
         $(this).parents('.control-group').find('.help-inline').remove()
 
     onSaveFail: (xhr) =>
       super
       message = I18n.t 'generic_error', 'There was an error in processing your request'
-      @$el.prepend("<div class='alert alert-error'>#{message}</span>")
+      @$el.prepend("<div class='alert alert-error'>#{htmlEscape message}</span>")
+      delay = (ms, func) -> setTimeout func, ms
+      delay 1, -> @$("[aria-invalid='true']").first().focus()
+
 

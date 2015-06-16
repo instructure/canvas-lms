@@ -29,8 +29,9 @@ define [
 
   test 'Grid.View.masteryClassName', ->
     outcome = { mastery_points: 5 }
-    ok Grid.View.masteryClassName(5, outcome) == 'mastery', 'returns "mastery" if equal to mastery score"'
-    ok Grid.View.masteryClassName(7, outcome) == 'mastery', 'returns "mastery" if above mastery score"'
+    ok Grid.View.masteryClassName(8, outcome) == 'exceeds', 'returns "exceeds" if 150% or more of mastery score'
+    ok Grid.View.masteryClassName(5, outcome) == 'mastery', 'returns "mastery" if equal to mastery score'
+    ok Grid.View.masteryClassName(7, outcome) == 'mastery', 'returns "mastery" if above mastery score'
     ok Grid.View.masteryClassName(3, outcome) == 'near-mastery', 'returns "near-mastery" if half of mastery score or greater'
     ok Grid.View.masteryClassName(1, outcome) == 'remedial', 'returns "remedial" if less than half of mastery score'
 
@@ -45,3 +46,8 @@ define [
     ok _.isEqual([3, 3, 4], _.pluck(outcomeSort, 'outcome_1')), 'sorts by result value'
     ok _.map(outcomeSort, (r) -> r.student.sortable_name)[0] == 'Campbell, Pete', 'result sort falls back to sortable name'
     ok _.isEqual(_.map(userSort, (r) -> r.student.sortable_name), ['Campbell, Pete', 'Draper, Don', 'Olson, Peggy']), 'sorts by student name'
+
+  test 'Grid.Util.toColumns for xss', ->
+    outcome = { id: 1, title: '<script>' }
+    columns = Grid.Util.toColumns([outcome])
+    ok _.isEqual(columns[1].name, '&lt;script&gt;')

@@ -1,6 +1,7 @@
 define [
   'i18n!groups'
   'Backbone'
+  'underscore'
   'compiled/views/groups/manage/GroupCategoryDetailView'
   'compiled/views/groups/manage/GroupsView'
   'compiled/views/groups/manage/UnassignedUsersView'
@@ -8,7 +9,7 @@ define [
   'jst/groups/manage/groupCategory'
   'compiled/jquery.rails_flash_notifications'
   'jquery.disableWhileLoading'
-], (I18n, {View}, GroupCategoryDetailView, GroupsView, UnassignedUsersView, AddUnassignedMenu, template) ->
+], (I18n, {View}, _, GroupCategoryDetailView, GroupsView, UnassignedUsersView, AddUnassignedMenu, template) ->
 
   class GroupCategoryView extends View
 
@@ -23,6 +24,8 @@ define [
       '.filterable-unassigned-users': '$filterUnassignedUsers'
       '.unassigned-users-heading': '$unassignedUsersHeading'
       '.groups-with-count': '$groupsHeading'
+
+    _previousSearchTerm = ""
 
     initialize: (options) ->
       @groups = @model.groups()
@@ -55,6 +58,15 @@ define [
         groupsCollection: @groups
       }
 
+    filterChange: (event) ->
+      search_term = event.target.value
+      return if search_term == _previousSearchTerm #Don't rerender if nothing has changed
+
+      @options.unassignedUsersView.setFilter(search_term)
+
+      @_setUnassignedHeading(@originalCount) unless search_term.length >= 3
+      _previousSearchTerm = search_term
+
     attach: ->
       @model.on 'destroy', @remove, this
       @model.on 'change', => @groupsView.updateDetails()
@@ -73,6 +85,11 @@ define [
 
     cacheEls: ->
       super
+
+      if !@attachedFilter
+        @$filterUnassignedUsers.on "keyup", _.debounce(@filterChange.bind(this), 300)
+        @attachedFilter = true
+
       # need to be set before their afterRender's run (i.e. before this
       # view's afterRender)
       @groupsView.$externalFilter = @$filter
@@ -84,6 +101,10 @@ define [
 
     setUnassignedHeading: ->
       count = @model.unassignedUsersCount() ? 0
+      @originalCount = @originalCount || count
+      @_setUnassignedHeading(count)
+
+    _setUnassignedHeading: (count) ->
       @unassignedUsersView.render() if @unassignedUsersView
       @$unassignedUsersHeading.text(
         if @model.get('allows_multiple_memberships')

@@ -28,7 +28,7 @@ describe 'appointment_deleted_for_user.sms' do
                      :data => {:updating_user => @teacher,
                                        :cancel_reason => "just because"})
 
-    @message.body.should include('some title')
+    expect(@message.body).to include('some title')
   end
 
   it "should render for groups" do
@@ -43,6 +43,6 @@ describe 'appointment_deleted_for_user.sms' do
                      :data => {:updating_user => @teacher,
                                        :cancel_reason => "just because"})
 
-    @message.body.should include('some title')
+    expect(@message.body).to include('some title')
   end
 end

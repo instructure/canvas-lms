@@ -2,6 +2,7 @@ module DatesOverridable
   attr_accessor :applied_overrides, :overridden_for_user, :overridden,
     :has_no_overrides
   attr_writer :without_overrides
+  include DifferentiableAssignment
 
   def self.included(base)
     base.has_many :assignment_overrides, :dependent => :destroy
@@ -11,6 +12,10 @@ module DatesOverridable
     base.validates_associated :assignment_overrides
 
     base.extend(ClassMethods)
+  end
+
+  def reload_overrides_cache?
+    self.updated_at && self.updated_at > 2.seconds.ago
   end
 
   def without_overrides
@@ -31,11 +36,11 @@ module DatesOverridable
   end
 
   def has_overrides?
-    assignment_overrides.count > 0
+    assignment_overrides.loaded? ? assignment_overrides.any? : assignment_overrides.exists?
   end
 
   def has_active_overrides?
-    assignment_overrides.active.count > 0
+    assignment_overrides.active.exists?
   end
 
   def multiple_due_dates?
@@ -61,24 +66,16 @@ module DatesOverridable
   end
 
   def all_due_dates
-    all_dates = assignment_overrides.active.overriding_due_at.map(&:as_hash)
-    all_dates << base_due_date_hash unless differentiated_assignments_applies?
-  end
-
-  def differentiated_assignments_applies?
-    return false if !context.feature_enabled?(:differentiated_assignments)
-
-    if self.is_a?(Assignment)
-      self.only_visible_to_overrides
-    elsif self.assignment
-      self.assignment.only_visible_to_overrides
-    else
-      false
-    end
+    due_at_overrides = assignment_overrides.loaded? ? assignment_overrides.select{|ao| ao.active? && ao.due_at_overridden} : assignment_overrides.active.overriding_due_at
+    dates = due_at_overrides.map(&:as_hash)
+    dates << base_due_date_hash unless differentiated_assignments_applies?
+    dates
   end
 
   def all_dates_visible_to(user)
-    if ObserverEnrollment.observed_students(context, user).any?
+    if user.nil?
+      all_due_dates
+    elsif ObserverEnrollment.observed_students(context, user).any?
       observed_student_due_dates(user)
     elsif context.user_has_been_student?(user) || context.user_has_been_admin?(user) || context.user_has_been_observer?(user)
       overrides = overrides_for(user)
@@ -104,7 +101,7 @@ module DatesOverridable
 
     if all_dates
       # remove base if all sections are set
-      overrides = all_dates.select { |d| d[:set_type] == 'CourseSection' }
+      overrides = all_dates.select{ |d| d[:set_type] == 'CourseSection' }
       if overrides.count > 0 && overrides.count == context.active_course_sections.count
         all_dates.delete_if {|d| d[:base] }
       end

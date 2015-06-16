@@ -1,0 +1,9 @@
+<% define_content :link do %>
+  <%= polymorphic_url([asset.context, :discussion_topic], id: asset.discussion_topic_id) %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t :subject, "New Comment on Announcement: %{discussion_topic}: %{course}", :discussion_topic => asset.title, :course => asset.context.name %>
+<% end %>
+
+<%= CanvasTextHelper.truncate_text(html_to_text(asset.message, :base_url => dashboard_url), :max_length => 200) %>

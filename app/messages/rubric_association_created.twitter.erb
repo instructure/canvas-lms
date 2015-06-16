@@ -1,4 +1,4 @@
 <% define_content :link do -%>
-<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/rubrics/<%= asset.rubric_id %>
+  <%= polymorphic_url([asset.context, :rubric], id: asset.rubric_id) %>
 <% end -%>
 <%= t :tweet, "Canvas Alert - New Assessment: %{title}, %{context}.", :title => asset.title, :context => asset.context.name %>

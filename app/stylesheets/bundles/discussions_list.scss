@@ -1,0 +1,385 @@
+@import "base/environment";
+@import "pages/shared/move_dialog";
+
+$announcements_disscussion-summary-color: $ic-color-dark;
+
+// min width to ensure toolbar doesn't stagger
+@if $use_new_styles == false { 
+  #main { min-width: 700px; } 
+}
+
+.discussionTopicIndexList {
+  .discussion-actions {
+    float: right;
+    @if $use_new_styles { padding: $ic-sp 0 0; }
+    @else { padding: 11px 10px 0px 0px; }
+  }
+  .discussion-topic {
+    cursor: pointer;
+    @if $use_new_styles { 
+      transition: background-color 0.2s;
+      padding: $ic-sp/2 $ic-sp;
+      border-top: 1px solid $ic-border-light;
+      background-color: $ic-color-light;
+      display: flex;
+      align-items: center;
+      body.ff & {
+        .ellipsis { @include firefox-white-space-bug-fix; }  
+      } 
+    }
+    @else {
+      background-color: white;
+      display: table;
+      min-height: 52px;
+      padding: 8px;
+      border-top: 1px solid $tableBorder;
+    }
+    @if $use_high_contrast == false {
+      &:nth-child(odd) { 
+        @if $use_new_styles { 
+          background-color: $lightBackground;
+          body.ff & {
+            .ellipsis::after { background: linear-gradient(to right, rgba(255,255,255,0) 0%,$lightBackground 75%); }  
+          }
+        }
+        @else { background-color: $tableBackgroundAccent; }
+      }
+    }
+    &.unread .discussion-title{ font-weight: bold; }
+    &.selected {
+      @if $use_new_styles { background-color: $ic-bg-light-primary; }
+      @else { background-color: #d6ecfc; }
+    }
+  }
+  .discussion-summary {
+    max-width: 740px;
+    @media screen and (max-width: 1100px) { max-width: 520px; }
+  }
+  
+  .discussion-info-icons { float: right; }
+  .discussion-unread-container, .discussion-last-reply, .discussion-info-icons {
+    float: right;
+    padding: 11px 10px 0;
+    // 'not-important' styles
+    color: $announcements_disscussion-summary-color;
+    font-size: 11px; }
+  .discussion-unread-container { width: 56px; }
+  .discussion-author { font-size: 10px; }
+  .discussion-summary { font-size: 12px; color: $announcements_disscussion-summary-color; }
+  .discussion-title {
+    font-size: 14px;
+    line-height: 1;
+    display: block;
+    @if $use_new_styles { font-weight: 500; }
+  }
+  .discussion-column {
+    @if $use_new_styles {
+      &.image-block {
+        flex: 1;
+        align-items: center;
+      }
+    }
+    @else {
+      display: table-cell;
+      vertical-align: middle;
+    } 
+  }
+  .toggleSelected { margin: 0 8px 0 0; }
+}
+
+@if $use_new_styles == false {
+  .announcements .discussionTopicIndexList .discussion-summary {
+    @media screen and (max-width: 1100px) { max-width: 520px; }
+    @media screen and (max-width: 1345px) and (min-width: 1101px) { max-width: 550px; }
+    @media screen and (max-width: 1345px) and (min-width: 1176px) { max-width: 580px; }
+  }
+}
+
+.discussion-drag-handle {
+  display: none;
+  background-image: inline-image('drag_handle.png');
+  height: 20px;
+  width: 5px;
+  background-position: center center;
+  background-repeat: no-repeat;
+  margin: 0 4px 0 -5px;
+  float: left;
+  cursor: ns-resize;
+  opacity: 0;
+  .touch &, .discussion-topic:hover & { opacity: 0.5; }
+  .ui-sortable & { display: block; }
+  &:hover, &:focus {
+    opacity: 1 !important;
+  }
+}
+
+.discussion-title-block {
+  margin: 0;
+  @if $use_new_styles { line-height: 1.1; }
+  @else { line-height: 1.5em; }
+}
+
+.item-box {
+  background: #e0e5ea;
+  border: 1px solid #c1c7cf;
+  border-radius: 3px;
+  margin-bottom: 16px;
+  padding: 8px 0;
+
+  h1,h2,h3,h4,h5,h6 {
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 20px;
+    margin: 0 0 8px 16px;
+
+    &, a {
+      color: #3a4652;
+      text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.75);
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+  }
+}
+
+.discussion-collections {
+  @if $use_new_styles {
+    box-sizing: border-box;
+    border: 1px solid $ic-border-light;
+    background: $lightBackground; 
+  }
+  @else { background: #e8ecef; }
+  
+}
+
+.discussion-list {
+  box-sizing: border-box;
+  margin-bottom: 12px;
+  border: none;
+  
+  @if $use_new_styles {
+    border-bottom: 1px solid $ic-border-light;  
+    padding: $ic-sp;
+    border-radius: 0;
+  }
+  @else {
+    border-bottom: 2px dashed #c6cacd;  
+    padding: 9px 9px 16px 9px;  
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &.droppable-hover {
+    > * {
+      opacity: 0.5;
+    }
+  }
+
+  &.pinned.droppable-hover .no-content {
+    background: #dff0d8;
+  }
+
+  &.locked .title {
+    color: #696969;
+  }
+
+  .title-help {
+    color: #686868;
+    font-size: 11px;
+    font-style: italic;
+    font-weight: 300;
+  }
+
+  .collectionViewItems {
+    margin: 0;
+  }
+
+  .loader {
+    height: 40px;
+  }
+}
+
+.discussion {
+  position: relative;
+  display: block;
+  height: auto;
+  @if $use_new_styles {
+    background: $ic-color-light;
+    border: 1px solid $ic-border-light;
+    border-radius: $baseBorderRadius;
+    padding: ($ic-sp - 4) 0 ($ic-sp - 4) $ic-sp;
+    color: $ic-font-color--subdued;
+  }
+  @else {
+    background: #fff;
+    border: 1px solid #c1c7cf;
+    border-radius: 3px;
+    color: #696969;
+    padding: 5px 0 5px 10px;
+  }
+
+  &:after {
+    clear: both;
+    content: "";
+    display: table;
+  }
+
+  &:hover {
+    background: $ic-bg-light-primary;
+  }
+
+  a {
+    display: inline;
+    height: auto;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    &.al-trigger { display: inline-block; }
+  }
+
+  .discussion-content {
+    box-sizing: border-box;
+    display: table;
+    vertical-align: middle;
+    width: 100%;
+  }
+
+  .discussion-row {
+    display: table-row;
+
+    > div {
+      display: table-cell;
+      vertical-align: middle;
+      @if $use_new_styles {
+        &.discussion-title small { white-space: nowrap; }
+      }
+    }
+    &.discussion-unpublished {
+      .discussion-type, .discussion-title a {
+        color: #696969;
+      }
+    }
+    &.discussion-published {
+      .discussion-type, .discussion-title a {
+        @if $use_new_styles { color: $ic-color-success; }
+        @else { color: #33802a; }
+      }
+    }
+  }
+
+  .draggable-handle {
+    width: 16px;
+    color: #B4B7BA;
+    cursor: pointer;
+  }
+
+  .discussion-type {
+    text-align: center;
+    width: 36px;
+    @if $use_new_styles { padding-right: $ic-sp; }    
+  }
+
+  @if $use_new_styles {
+    .discussion-date-available, .discussion-due-date { font-size: 12px; }
+  }
+
+  .discussion-date-available {
+    width: 200px;
+    .status-description {
+      font-weight: bold;
+    }
+  }
+
+  .discussion-due-date {
+    width: 200px;
+    .discussion-date-type {
+      font-weight: bold;
+    }
+  }
+
+  .discussion-status {
+    color: $ic-color-icon-disabled;
+    width: 60px;
+
+    .publish-icon {
+      margin-right: 10px;
+    }
+
+    .subscription-toggler {
+      @include ic-focus-base;
+      padding: 4px;
+      &:focus { @include ic-focus-variant; }
+      &:before { margin: 0; }
+    }
+
+    a[class*=icon-] {
+       text-decoration: none;
+    }
+
+    .icon-discussion-check {
+      color: $ic-color-success;
+    }
+
+    .icon-discussion-x {
+      color: $ic-color-danger;
+    }
+  }
+
+  .discussion-unread-status {
+    padding-right: 5px;
+    width: 60px;
+  }
+
+  .discussion-actions {
+    width: 45px;
+  }
+
+  .title {
+    display: block;
+    font-size: 14px;
+    @if $use_new_styles and $use_high_contrast == false { font-weight: 500; }
+    @else { font-weight: bold; }
+    &:focus {
+      outline: 0;
+      text-decoration: underline;
+    }
+  }
+
+  &.no-content {
+    border-style: dashed;
+    display: none;
+    text-align: center;
+    @if $use_new_styles {
+      margin: $ic-sp/2;
+      padding: $ic-sp;
+      color: $ic-hint-text;
+      border-color: $ic-border-dark;
+    }
+    @else {
+      color: ensure-contrast(#878d92, #fff);
+      margin: 5px;
+      padding: 8px;
+    }
+
+    &:hover {
+      background: #fff;
+    }
+
+    b {
+      font-size: 16px;
+    }
+
+    p {
+      margin: 0;
+    }
+  }
+}
+
+.accessibility-warning {
+  @include accessibility-prompt;
+  font-size: 14px;
+}
+

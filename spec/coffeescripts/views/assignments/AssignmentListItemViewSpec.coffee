@@ -4,9 +4,13 @@ define [
   'compiled/models/Submission'
   'compiled/views/assignments/AssignmentListItemView'
   'jquery'
+  'timezone'
+  'vendor/timezone/America/Juneau'
+  'vendor/timezone/fr_FR'
+  'helpers/I18nStubber'
   'helpers/fakeENV'
   'helpers/jquery.simulate'
-], (Backbone, Assignment, Submission, AssignmentListItemView, $, fakeENV) ->
+], (Backbone, Assignment, Submission, AssignmentListItemView, $, tz, juneau, french, I18nStubber, fakeENV) ->
   screenreaderText = null
   nonScreenreaderText = null
 
@@ -105,9 +109,12 @@ define [
     $.extend base, options
 
   createView = (model, options) ->
-    options = $.extend {canManage: true}, options
+    options = $.extend {canManage: true, canReadGrades: false}, options
 
-    ENV.PERMISSIONS = { manage: options.canManage }
+    ENV.PERMISSIONS = {
+      manage: options.canManage
+      read_grades: options.canReadGrades
+    }
 
     view = new AssignmentListItemView(model: model)
     view.$el.appendTo $('#fixtures')
@@ -141,8 +148,14 @@ define [
     setup: ->
       genSetup.call @
 
+      @snapshot = tz.snapshot()
+      I18nStubber.pushFrame()
+
     teardown: ->
       genTeardown.call @
+
+      tz.restore(@snapshot)
+      I18nStubber.popFrame()
 
   test "initializes child views if can manage", ->
     view = createView(@model, canManage: true)
@@ -294,6 +307,69 @@ define [
     ok view.$(".modules").text().search("Multiple Modules") != -1
     ok view.$("#module_tooltip_#{@model.id}").text().search("#{mods[0]}") != -1
     ok view.$("#module_tooltip_#{@model.id}").text().search("#{mods[1]}") != -1
+
+  test 'render score template with permission', ->
+    spy = sinon.spy(AssignmentListItemView.prototype, 'updateScore')
+    createView(@model, canManage: false, canReadGrades: true)
+    ok spy.called
+    AssignmentListItemView.prototype.updateScore.restore()
+
+  test 'does not render score template without permission', ->
+    spy = sinon.spy(AssignmentListItemView.prototype, 'updateScore')
+    createView(@model, canManage: false, canReadGrades: false)
+    equal spy.callCount, 0
+    AssignmentListItemView.prototype.updateScore.restore()
+
+  test "renders lockAt/unlockAt with locale-appropriate format string", ->
+    tz.changeLocale(french, 'fr_FR')
+    I18nStubber.setLocale 'fr_FR'
+    I18nStubber.stub 'fr_FR',
+      'date.formats.short': '%-d %b'
+      'date.abbr_month_names.8': 'août'
+    model = new AssignmentCollection([buildAssignment
+      id: 1
+      all_dates: [
+        { lock_at: "2113-08-28T04:00:00Z", title: "Summer Session" }
+        { unlock_at: "2113-08-28T04:00:00Z", title: "Winter Session" }]]).at(0)
+
+    view = createView(model, canManage: true)
+    $dds = view.dateAvailableColumnView.$("#vdd_tooltip_#{@model.id}_lock div")
+    equal $("span", $dds.first()).last().text().trim(), '28 août'
+    equal $("span", $dds.last()).last().text().trim(), '28 août'
+
+  test "renders lockAt/unlockAt in appropriate time zone", ->
+    tz.changeZone(juneau, 'America/Juneau')
+    I18nStubber.stub 'en',
+      'date.formats.short': '%b %-d'
+      'date.abbr_month_names.8': 'Aug'
+
+    model = new AssignmentCollection([buildAssignment
+      id: 1
+      all_dates: [
+        { lock_at: "2113-08-28T04:00:00Z", title: "Summer Session" }
+        { unlock_at: "2113-08-28T04:00:00Z", title: "Winter Session" }]]).at(0)
+
+    view = createView(model, canManage: true)
+    $dds = view.dateAvailableColumnView.$("#vdd_tooltip_#{@model.id}_lock div")
+    equal $("span", $dds.first()).last().text().trim(), 'Aug 27'
+    equal $("span", $dds.last()).last().text().trim(), 'Aug 27'
+
+  test "renders due date column with locale-appropriate format string", ->
+    tz.changeLocale(french, 'fr_FR')
+    I18nStubber.setLocale 'fr_FR'
+    I18nStubber.stub 'fr_FR',
+      'date.formats.short': '%-d %b'
+      'date.abbr_month_names.8': 'août'
+    view = createView(@model, canManage: true)
+    equal view.dateDueColumnView.$("#vdd_tooltip_#{@model.id}_due div dd").first().text().trim(), '29 août'
+
+  test "renders due date column in appropriate time zone", ->
+    tz.changeZone(juneau, 'America/Juneau')
+    I18nStubber.stub 'en',
+      'date.formats.short': '%b %-d'
+      'date.abbr_month_names.8': 'Aug'
+    view = createView(@model, canManage: true)
+    equal view.dateDueColumnView.$("#vdd_tooltip_#{@model.id}_due div dd").first().text().trim(), 'Aug 28'
 
   module 'AssignmentListItemViewSpec—alternate grading type: percent',
     setup: ->

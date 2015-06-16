@@ -11,6 +11,12 @@ define [
       'mouseenter': 'showDetails'
       'mouseleave': 'hideDetails'
       'click': 'hideDetails'
+      'focusin': 'showDetails'
+      'focusout': 'hideDetails'
+
+    attributes:
+      'role': 'button'
+      'tabindex': '0'
 
     initialize: ->
       super

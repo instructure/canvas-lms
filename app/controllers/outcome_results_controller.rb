@@ -36,6 +36,11 @@
 #           "type": "integer",
 #           "description": "The student's score"
 #         },
+#         "submitted_or_assessed_at": {
+#           "description": "The datetime the resulting OutcomeResult was submitted at, or absent that, when it was assessed.",
+#           "example": "2013-02-01T00:00:00-06:00",
+#           "type": "datetime"
+#         },
 #         "links": {
 #           "example": "{\"user\"=>\"3\", \"learning_outcome\"=>\"97\", \"alignment\"=>\"53\"}",
 #           "description": "Unique identifiers of objects associated with this result"
@@ -191,17 +196,17 @@ class OutcomeResultsController < ApplicationController
   #
   # Gets the outcome results for users and outcomes in the specified context.
   #
-  # @argument user_ids[] [Optional, Integer]
+  # @argument user_ids[] [Integer]
   #   If specified, only the users whose ids are given will be included in the
   #   results. it is an error to specify an id for a user who is not a student in
   #   the context
   #
-  # @argument outcome_ids[] [Optional, Integer]
+  # @argument outcome_ids[] [Integer]
   #   If specified, only the outcomes whose ids are given will be included in the
   #   results. it is an error to specify an id for an outcome which is not linked
   #   to the context.
   #
-  # @argument include[] [Optional, String, "alignments"|"outcomes"|"outcomes.alignments"|"outcome_groups"|"outcome_links"|"outcome_paths"|"users"]
+  # @argument include[] [String, "alignments"|"outcomes"|"outcomes.alignments"|"outcome_groups"|"outcome_links"|"outcome_paths"|"users"]
   #   Specify additional collections to be side loaded with the result.
   #   "alignments" includes only the alignments referenced by the returned
   #   results.
@@ -226,22 +231,22 @@ class OutcomeResultsController < ApplicationController
   # Gets the outcome rollups for the users and outcomes in the specified
   # context.
   #
-  # @argument aggregate [Optional, String, "course"]
+  # @argument aggregate [String, "course"]
   #   If specified, instead of returning one rollup for each user, all the user
   #   rollups will be combined into one rollup for the course that will contain
   #   the average rollup score for each outcome.
   #
-  # @argument user_ids[] [Optional, Integer]
+  # @argument user_ids[] [Integer]
   #   If specified, only the users whose ids are given will be included in the
   #   results or used in an aggregate result. it is an error to specify an id
   #   for a user who is not a student in the context
   #
-  # @argument outcome_ids[] [Optional, Integer]
+  # @argument outcome_ids[] [Integer]
   #   If specified, only the outcomes whose ids are given will be included in the
   #   results. it is an error to specify an id for an outcome which is not linked
   #   to the context.
   #
-  # @argument include[] [Optional, String, "courses"|"outcomes"|"outcomes.alignments"|"outcome_groups"|"outcome_links"|"outcome_paths"|"users"]
+  # @argument include[] [String, "courses"|"outcomes"|"outcomes.alignments"|"outcome_groups"|"outcome_links"|"outcome_paths"|"users"]
   #   Specify additional collections to be side loaded with the result.
   #
   # @example_response
@@ -363,13 +368,14 @@ class OutcomeResultsController < ApplicationController
   def require_outcome_context
     reject! "invalid context type" unless @context.is_a?(Course)
 
-    return true if is_authorized_action?(@context, @current_user, [:manage_grades, :view_all_grades])
+    return true if @context.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
     reject! "users not specified and no access to all grades", :forbidden unless params[:user_ids]
     user_ids = Api.value_to_array(params[:user_ids]).map(&:to_i).uniq
     enrollments = @context.enrollments.where(user_id: user_ids)
-    reject! "specified users not enrolled" unless enrollments.length == user_ids.length
+    enrollment_user_ids = enrollments.map(&:user_id).uniq
+    reject! "specified users not enrolled" unless enrollment_user_ids.length == user_ids.length
     reject! "not authorized to read grades for specified users", :forbidden unless enrollments.all? do |e|
-      is_authorized_action?(e, @current_user, :read_grades)
+      e.grants_right?(@current_user, session, :read_grades)
     end
   end
 

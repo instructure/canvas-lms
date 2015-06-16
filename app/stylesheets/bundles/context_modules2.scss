@@ -1,0 +1,259 @@
+@import "base/environment";
+@import "pages/react_files/DialogPreview";
+
+
+.permissions-dialog-form{
+  .radio{
+    margin-top: 15px;
+  }
+}
+
+.no-wrap {
+  white-space: nowrap;
+}
+
+.RestrictedDialogForm__form .form-controls .btn:first-of-type{
+  margin-right: 10px;
+}
+
+.context_modules2 {
+
+  .publish-button {
+    &.published {
+      color: #007711; /* green */
+    }
+
+    &.unpublished {
+      color: #999999; /* light grey */
+    }
+
+    &.published.hover {
+      color: #db4f4a; /* red */
+    }
+
+    &.transitioning {
+      color: #999999;
+    }
+
+    &.disabled {
+     color: #999999;
+    }
+
+    &.disabled span,
+    .icon-unpublished {
+      color: #999999;
+    }
+  }
+
+  .module-item-title {
+    color: black;
+  }
+
+  .invisible {
+    visibility: hidden;
+  }
+
+  tr.hidden {
+    display: none;
+  }
+
+  .small-text {
+    font-size: .9em;
+  }
+
+  tr.visible {
+    display: table-row;
+  }
+
+  a,
+  .ig-publish-btn,
+  .module-published-button {
+    cursor: pointer;
+  }
+
+  #breadcrumbs {
+    border-bottom-color: #b6babf;
+  }
+  .modules-toolbar {
+    padding: 16px;
+    border-bottom: 1px solid #b6babf;
+    input[type="search"] {
+      width: 300px;
+      margin-bottom: 0;
+    }
+  }
+  #content {
+    padding: 0;
+  }
+  .btn {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  .module-published-button {
+    color: #33802a;
+    font-size: 14px;
+    display: inline-block;
+    padding-bottom: 3px;
+    line-height: 22px;
+    vertical-align: middle;
+  }
+
+  a.al-trigger {
+    color: #b4b8bb;
+
+    &:hover {
+      color: #0088cc;
+    }
+  }
+
+  .module {
+    h3 {
+      font-size: 1.18em;
+      font-weight: bold;
+      line-height: 1em;
+      margin: 0;
+    }
+  }
+
+  table {
+    table-layout: fixed;
+    margin-bottom: 0;
+
+    thead {
+      background-color: inherit;
+    }
+
+    .drag-handler {
+      cursor: move;
+    }
+
+    tbody {
+      background-color: white;
+      border: 1px solid #c2c9d1;
+      tr:hover {
+        background-color: #F6F8F9;
+      }
+    }
+
+    td:first-of-type, th:first-of-type {
+      text-align: left;
+    }
+
+    td:last-of-type, th:last-of-type {
+      text-align: right;
+    }
+
+    td {
+      width: 11%;
+    }
+
+    td,th {
+      text-align: inherit;
+
+      &.align-right {
+        text-align: right;
+      }
+      &.long {
+        width: auto;
+      }
+      &.inherit-width {
+        width: auto;
+      }
+
+      &.compact {
+        width: 1%;
+      }
+
+      &.no-right-padding {
+        padding-right: 0;
+      }
+    }
+  }
+
+  .prereqs {
+    font-size: 14px;
+    padding: 4px 12px;
+    line-height: 22px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .editable-show {
+    display: none;
+  }
+  .editable .editable-show {
+    display: inherit;
+  }
+  .item-group-condensed .ig-title {
+    left: 20px;
+  }
+
+  .indent-1 {
+    margin-left: 18px;
+  }
+  .indent-2 {
+    margin-left: 36px;
+  }
+  .indent-3 {
+    margin-left: 54px;
+  }
+  .indent-4 {
+    margin-left: 72px;
+  }
+
+  /*
+  .editable .item-group-condensed {
+    .ig-title {
+      right: 600px;
+      left: 30px;
+      &.indent-1 {
+        left: 42px;
+      }
+      &.indent-2 {
+        left: 54px;
+      }
+      &.indent-3 {
+        left: 66px;
+      }
+      &.indent-4 {
+        left: 78px;
+      }
+    }
+    .ig-details {
+      right: 140px;
+      width: 400px;
+    }
+    .ig-publish-btn {
+      position: absolute;
+      right: 76px;
+    }
+    .add-item-button {
+      padding-left: 7px;
+      padding-right: 7px;
+    }
+  }
+  */
+}
+
+tbody.sortable tr {
+  display: table-row;
+  width: 100%;
+}
+
+tr.ui-sortable-helper {
+  background-color: white;
+}
+
+tbody.sortable.empty2 {
+  min-height: 30px;
+  display: block;
+  width: 100%;
+}
+
+.drag_and_drop_warning {
+  @include accessibility-prompt;
+  display: none;
+  z-index: 2;
+  position: absolute;
+  top: -28px;
+  left: -1px;
+}

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="512px" height="416px" viewBox="0 0 512 416" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.0.4 (8053) - http://www.bohemiancoding.com/sketch -->
+    <title>Fill 4</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Artboard-1" sketch:type="MSArtboardGroup" transform="translate(0.000000, -48.000000)" fill="#4D4E4C">
+            <path d="M512,320 C512,399.68 447.552,464 367.936,464 L96,464 C41.792,456.32 0,408.32 0,352 C0,306.88 26.752,268.48 65.12,250.56 C64.672,247.04 64,243.2 64,239.68 C64,186.56 106.912,143.68 159.968,143.68 C172.192,143.68 183.808,146.24 194.592,150.4 C206.496,91.84 258.048,48 319.968,48 C390.752,48 448,105.28 448,176 C448,184 447.04,191.68 445.664,199.04 C485.504,224.64 512,269.12 512,320 L512,320 Z M336,272 L336,240 C336,204.656 307.344,176 272,176 C236.656,176 208,204.656 208,240 L208,272 C199.152,272 192,279.152 192,288 L192,384 C192,392.848 199.152,400 208,400 L336,400 C344.832,400 352,392.848 352,384 L352,288 C352,279.152 344.832,272 336,272 L336,272 Z M304,272 L240,272 L240,240 C240,224 256,208 272,208 C288,208 304,224 304,240 L304,272 L304,272 Z" id="Fill-4" sketch:type="MSShapeGroup"></path>
+        </g>
+    </g>
+</svg>

@@ -35,7 +35,7 @@ describe "accounts/_add_course_or_user.html.erb" do
       view_context(@account, admin)
       assigns[:current_user] = admin
       render
-      response.should have_tag("input#pseudonym_sis_user_id")
+      expect(response).to have_tag("input#pseudonym_sis_user_id")
     end
 
     it "should not show to non-sis admin" do
@@ -43,7 +43,7 @@ describe "accounts/_add_course_or_user.html.erb" do
       view_context(@account, admin)
       assigns[:current_user] = admin
       render
-      response.should_not have_tag("input#pseudonym_sis_source_id")
+      expect(response).not_to have_tag("input#pseudonym_sis_source_id")
     end
   end
 
@@ -62,7 +62,7 @@ describe "accounts/_add_course_or_user.html.erb" do
       view_context(@account, admin)
       assigns[:current_user] = admin
       render
-      response.should_not have_tag("input#pseudonym_sis_user_id")
+      expect(response).not_to have_tag("input#pseudonym_sis_user_id")
     end
 
     it "should not show to non-sis admin" do
@@ -70,7 +70,7 @@ describe "accounts/_add_course_or_user.html.erb" do
       view_context(@account, admin)
       assigns[:current_user] = admin
       render
-      response.should_not have_tag("input#pseudonym_sis_source_id")
+      expect(response).not_to have_tag("input#pseudonym_sis_source_id")
     end
   end
 end

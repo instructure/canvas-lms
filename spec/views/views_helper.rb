@@ -16,12 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'nokogiri'
+
 def view_context(context=@course, current_user=@user, real_current_user=nil)
   assigns[:context] = context
   assigns[:current_user] = current_user
   assigns[:real_current_user] = real_current_user
   assigns[:domain_root_account] = Account.default
 end
+
 def view_portfolio(portfolio=@portfolio, current_user=@user)
   assigns[:portfolio] = portfolio
   assigns[:current_user] = current_user

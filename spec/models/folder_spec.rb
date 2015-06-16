@@ -22,34 +22,67 @@ describe Folder do
   before(:once) do
     course
   end
-  
+
   it "should create a new instance given valid attributes" do
     folder_model
   end
-  
+
   it "should infer its full name if it has a parent folder" do
     f = Folder.root_folders(@course).first
-    f.full_name.should eql("course files")
+    expect(f.full_name).to eql("course files")
     child = f.active_sub_folders.build(:name => "child")
     child.context = @course
     child.save!
-    child.parent_folder.should eql(f)
-    child.full_name.should eql("course files/child")
+    expect(child.parent_folder).to eql(f)
+    expect(child.full_name).to eql("course files/child")
     grandchild = child.sub_folders.build(:name => "grandchild")
     grandchild.context = @course
     grandchild.save!
-    grandchild.full_name.should eql("course files/child/grandchild")
+    expect(grandchild.full_name).to eql("course files/child/grandchild")
     great_grandchild = grandchild.sub_folders.build(:name => "great_grandchild")
     great_grandchild.context = @course
     great_grandchild.save!
-    great_grandchild.full_name.should eql("course files/child/grandchild/great_grandchild")
+    expect(great_grandchild.full_name).to eql("course files/child/grandchild/great_grandchild")
 
     grandchild.parent_folder = f
     grandchild.save!
     grandchild.reload
-    grandchild.full_name.should eql("course files/grandchild")
+    expect(grandchild.full_name).to eql("course files/grandchild")
     great_grandchild.reload
-    great_grandchild.full_name.should eql("course files/grandchild/great_grandchild")
+    expect(great_grandchild.full_name).to eql("course files/grandchild/great_grandchild")
+  end
+
+  it "should add an iterator to duplicate folder names" do
+    f = Folder.root_folders(@course).first
+    expect(f.full_name).to eql("course files")
+    child = f.active_sub_folders.build(:name => "child")
+    child.context = @course
+    child.save!
+    expect(child.parent_folder).to eql(f)
+    expect(child.full_name).to eql("course files/child")
+    child2 = f.active_sub_folders.build(:name => "child")
+    child2.context = @course
+    child2.save!
+    expect(child2.parent_folder).to eql(f)
+    expect(child2.full_name).to eql("course files/child 2")
+  end
+
+  it "should allow the iterator to increase beyond 10 for duplicate folder names" do
+    f = Folder.root_folders(@course).first
+    expect(f.full_name).to eql("course files")
+    child = f.active_sub_folders.build(:name => "child")
+    child.context = @course
+    child.save!
+    expect(child.parent_folder).to eql(f)
+    expect(child.full_name).to eql("course files/child")
+
+    2.upto(11) do |i|
+      duplicate = f.active_sub_folders.build(:name => "child")
+      duplicate.context = @course
+      duplicate.save!
+      expect(duplicate.parent_folder).to eql(f)
+      expect(duplicate.full_name).to eql("course files/child #{i}")
+    end
   end
 
   it "should not allow recursive folder structures" do
@@ -57,8 +90,16 @@ describe Folder do
     f2 = f1.sub_folders.create!(:name => "f2", :context => @course)
     f3 = f2.sub_folders.create!(:name => "f3", :context => @course)
     f1.parent_folder = f3
-    f1.save.should == false
-    f1.errors.detect { |e| e.first.to_s == 'parent_folder_id' }.should be_present
+    expect(f1.save).to eq false
+    expect(f1.errors.detect { |e| e.first.to_s == 'parent_folder_id' }).to be_present
+  end
+
+  it "should not allow root folders to have their names changed" do
+    f1 = Folder.root_folders(@course).first
+    f1.reload
+    f1.update_attributes(:name => "something")
+    expect(f1.save).to eq false
+    expect(f1.errors.detect { |e| e.first.to_s == 'name' }).to be_present
   end
 
   it "files without an explicit folder_id should be inferred" do
@@ -69,8 +110,8 @@ describe Folder do
     a.save!
     nil_a = @course.attachments.new
     nil_a.update_attributes(:uploaded_data => default_uploaded_data)
-    nil_a.folder_id.should_not be_nil
-    f.active_file_attachments.should be_include(a)
+    expect(nil_a.folder_id).not_to be_nil
+    expect(f.active_file_attachments).to be_include(a)
     # f.active_file_attachments.should be_include(nil_a)
   end
   it "should assign unfiled files to the 'unfiled' folder" do
@@ -81,10 +122,10 @@ describe Folder do
     a.save!
     nil_a = @course.attachments.new
     nil_a.update_attributes(:uploaded_data => default_uploaded_data)
-    f.active_file_attachments.should be_include(a)
-    f.active_file_attachments.should be_include(nil_a)
+    expect(f.active_file_attachments).to be_include(a)
+    expect(f.active_file_attachments).to be_include(nil_a)
   end
-  
+
   it "should not return files without a folder_id if it's not the 'unfiled' folder" do
     f = @course.folders.create!(:name => "not_unfiled")
     a = f.active_file_attachments.build
@@ -92,8 +133,8 @@ describe Folder do
     a.uploaded_data = default_uploaded_data
     a.save!
     nil_a = @course.attachments.create!(:uploaded_data => default_uploaded_data)
-    f.active_file_attachments.should be_include(a)
-    f.active_file_attachments.should_not be_include(nil_a)
+    expect(f.active_file_attachments).to be_include(a)
+    expect(f.active_file_attachments).not_to be_include(nil_a)
   end
 
   it "should implement the not_locked scope correctly" do
@@ -108,91 +149,20 @@ describe Folder do
       @course.folders.create!(:name => "locked 2", :lock_at => 1.days.ago),
       @course.folders.create!(:name => "locked 3", :lock_at => 1.days.ago, :unlock_at => 1.days.from_now)
     ]
-    @course.folders.map(&:id).sort.should == (not_locked + locked).map(&:id).sort
-    @course.folders.not_locked.map(&:id).sort.should == (not_locked).map(&:id).sort
+    expect(@course.folders.map(&:id).sort).to eq (not_locked + locked).map(&:id).sort
+    expect(@course.folders.not_locked.map(&:id).sort).to eq (not_locked).map(&:id).sort
   end
 
   it "should not create multiple root folders for a course" do
-    pending('spec requires postgres index') unless Folder.connection.adapter_name == 'PostgreSQL'
+    skip('spec requires postgres index') unless Folder.connection.adapter_name == 'PostgreSQL'
 
     @course.folders.create!(:name => Folder::ROOT_FOLDER_NAME, :full_name => Folder::ROOT_FOLDER_NAME, :workflow_state => 'visible')
-    lambda { @course.folders.create!(:name => Folder::ROOT_FOLDER_NAME, :full_name => Folder::ROOT_FOLDER_NAME, :workflow_state => 'visible') }.should raise_error
+    expect { @course.folders.create!(:name => Folder::ROOT_FOLDER_NAME, :full_name => Folder::ROOT_FOLDER_NAME, :workflow_state => 'visible') }.to raise_error
 
     @course.reload
-    @course.folders.count.should == 1
+    expect(@course.folders.count).to eq 1
   end
 
-  describe "resolve_path" do
-    before :once do
-      @root_folder = Folder.root_folders(@course).first
-    end
-
-    it "should return a sequence of Folders" do
-      foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
-      bar = @course.folders.create! name: 'bar', parent_folder: foo
-      Folder.resolve_path(@course, "foo/bar").should eql [@root_folder, foo, bar]
-    end
-
-    it "should ignore trailing slashes" do
-      foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
-      Folder.resolve_path(@course, "foo/").should eql [@root_folder, foo]
-    end
-
-    it "should find the root folder given an empty path" do
-      Folder.resolve_path(@course, '').should eql [@root_folder]
-    end
-
-    it "should find the root folder given '/'" do
-      Folder.resolve_path(@course, '/').should eql [@root_folder]
-    end
-
-    it "should find the root folder given a nil path" do
-      Folder.resolve_path(@course, nil).should eql [@root_folder]
-    end
-
-    it "should find the root folder given an empty array" do
-      Folder.resolve_path(@course, []).should eql [@root_folder]
-    end
-
-    it "should return nil on incomplete match" do
-      foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
-      Folder.resolve_path(@course, "foo/bar").should be_nil
-    end
-
-    it "should search duplicate paths" do
-      foo1 = @course.folders.create! name: 'foo', parent_folder: @root_folder
-      foo2 = @course.folders.create! name: 'foo', parent_folder: @root_folder
-      bar = @course.folders.create! name: 'bar', parent_folder: foo1
-      baz = @course.folders.create! name: 'baz', parent_folder: foo2
-      Folder.resolve_path(@course, "foo/bar").should eql [@root_folder, foo1, bar]
-      Folder.resolve_path(@course, "foo/baz").should eql [@root_folder, foo2, baz]
-    end
-
-    it "should exclude hidden if specified" do
-      foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
-      foo.update_attribute(:workflow_state, 'hidden')
-      bar = @course.folders.create! name: 'bar', parent_folder: foo
-      Folder.resolve_path(@course, "foo/bar", true).should eql [@root_folder, foo, bar]
-      Folder.resolve_path(@course, "foo/bar", false).should be_nil
-    end
-
-    it "should exclude locked if specified" do
-      foo = @course.folders.create! name: 'foo', parent_folder: @root_folder, locked: true
-      bar = @course.folders.create! name: 'bar', parent_folder: foo
-      Folder.resolve_path(@course, "foo/bar", true).should eql [@root_folder, foo, bar]
-      Folder.resolve_path(@course, "foo/bar", false).should be_nil
-    end
-
-    it "should accept an array" do
-      foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
-      bar = @course.folders.create! name: 'bar', parent_folder: foo
-      Folder.resolve_path(@course, ['foo', 'bar']).should eql [@root_folder, foo, bar]
-    end
-  end
-end
-
-# specs_require_sharding breaks once-ler, thus it gets its own outer example group
-describe Folder do
   describe ".assert_path" do
     specs_require_sharding
 
@@ -204,9 +174,137 @@ describe Folder do
         user2.id = user1.local_id
         user2.save!
         f2 = Folder.assert_path('myfolder', user2)
-        f2.should_not == f1
+        expect(f2).not_to eq f1
+      end
+    end
+  end
+
+  describe "resolve_path" do
+    before :once do
+      @root_folder = Folder.root_folders(@course).first
+    end
+
+    it "should return a sequence of Folders" do
+      foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
+      bar = @course.folders.create! name: 'bar', parent_folder: foo
+      expect(Folder.resolve_path(@course, "foo/bar")).to eql [@root_folder, foo, bar]
+    end
+
+    it "should ignore trailing slashes" do
+      foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
+      expect(Folder.resolve_path(@course, "foo/")).to eql [@root_folder, foo]
+    end
+
+    it "should find the root folder given an empty path" do
+      expect(Folder.resolve_path(@course, '')).to eql [@root_folder]
+    end
+
+    it "should find the root folder given '/'" do
+      expect(Folder.resolve_path(@course, '/')).to eql [@root_folder]
+    end
+
+    it "should find the root folder given a nil path" do
+      expect(Folder.resolve_path(@course, nil)).to eql [@root_folder]
+    end
+
+    it "should find the root folder given an empty array" do
+      expect(Folder.resolve_path(@course, [])).to eql [@root_folder]
+    end
+
+    it "should return nil on incomplete match" do
+      foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
+      expect(Folder.resolve_path(@course, "foo/bar")).to be_nil
+    end
+
+    it "should exclude hidden if specified" do
+      foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
+      foo.update_attribute(:workflow_state, 'hidden')
+      bar = @course.folders.create! name: 'bar', parent_folder: foo
+      expect(Folder.resolve_path(@course, "foo/bar", true)).to eql [@root_folder, foo, bar]
+      expect(Folder.resolve_path(@course, "foo/bar", false)).to be_nil
+    end
+
+    it "should exclude locked if specified" do
+      foo = @course.folders.create! name: 'foo', parent_folder: @root_folder, locked: true
+      bar = @course.folders.create! name: 'bar', parent_folder: foo
+      expect(Folder.resolve_path(@course, "foo/bar", true)).to eql [@root_folder, foo, bar]
+      expect(Folder.resolve_path(@course, "foo/bar", false)).to be_nil
+    end
+
+    it "should accept an array" do
+      foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
+      bar = @course.folders.create! name: 'bar', parent_folder: foo
+      expect(Folder.resolve_path(@course, ['foo', 'bar'])).to eql [@root_folder, foo, bar]
+    end
+  end
+
+  describe "file_attachments_visible_to" do
+    before(:once) do
+      @root_folder = Folder.root_folders(@course).first
+      attachment_model context: @course, display_name: 'normal.txt', folder: @root_folder, uploaded_data: default_uploaded_data
+      attachment_model context: @course, display_name: 'hidden.txt', folder: @root_folder, uploaded_data: default_uploaded_data, hidden: true
+      attachment_model context: @course, display_name: 'locked.txt', folder: @root_folder, uploaded_data: default_uploaded_data, locked: true
+      attachment_model context: @course, display_name: 'date_restricted_unlocked.txt', folder: @root_folder, uploaded_data: default_uploaded_data, unlock_at: 1.day.ago, lock_at: 1.year.from_now
+      attachment_model context: @course, display_name: 'date_restricted_locked.txt', folder: @root_folder, uploaded_data: default_uploaded_data, lock_at: 1.day.ago, unlock_at: 1.year.from_now
+    end
+
+    it "should include all files for teachers" do
+      teacher_in_course active_all: true
+      expect(@root_folder.file_attachments_visible_to(@teacher).map(&:name)).to match_array %w(normal.txt hidden.txt locked.txt date_restricted_unlocked.txt date_restricted_locked.txt)
+    end
+
+    it "should exclude locked and hidden files for students" do
+      student_in_course active_all: true
+      expect(@root_folder.file_attachments_visible_to(@student).map(&:name)).to match_array %w(normal.txt date_restricted_unlocked.txt)
+    end
+  end
+
+  describe "all_visible_folder_ids" do
+    before(:once) do
+      @root_folder = Folder.root_folders(@course).first
+      @normal_folder = @root_folder.active_sub_folders.create!(:context => @course, :name => "normal")
+      @normal_sub1 = @normal_folder.active_sub_folders.create!(:context => @course, :name => "normal_sub1")
+      @normal_sub2 = @normal_sub1.active_sub_folders.create!(:context => @course, :name => "normal_sub2")
+      @locked_folder = @root_folder.active_sub_folders.create!(:context => @course, :name => "locked", :lock_at => 1.week.ago)
+      @locked_sub1 = @locked_folder.active_sub_folders.create!(:context => @course, :name => "locked_sub1")
+      @locked_sub2 = @locked_sub1.active_sub_folders.create!(:context => @course, :name => "locked_sub2")
+    end
+
+    it "should exclude all descendants of locked folders" do
+      expect(Folder.all_visible_folder_ids(@course)).to match_array([@root_folder, @normal_folder, @normal_sub1, @normal_sub2].map(&:id))
+    end
+  end
+
+  describe "read_contents permission" do
+    before(:once) do
+      @course.offer!
+      @root_folder = Folder.root_folders(@course).first
+      student_in_course(:course => @course, :active_all => true)
+      teacher_in_course(:course => @course, :active_all => true)
+    end
+
+    it "should grant right to students and teachers" do
+      expect(@root_folder.grants_right?(@student, :read_contents)).to be_truthy
+      expect(@root_folder.grants_right?(@teacher, :read_contents)).to be_truthy
+    end
+
+    context "with files tab hidden to students" do
+      before :once do
+        @course.tab_configuration = [{"id" => Course::TAB_FILES, "hidden" => true}]
+        @course.save!
+        @root_folder.reload
+      end
+
+      it "should grant right to teachers but not students" do
+        expect(@root_folder.grants_right?(@student, :read_contents)).to be_falsey
+        expect(@root_folder.grants_right?(@teacher, :read_contents)).to be_truthy
+      end
+
+      it "should still grant rights to teachers even if the teacher enrollment is concluded" do
+        @teacher.enrollments.where(:course_id => @course).first.complete!
+        expect(@course.grants_right?(@teacher, :manage_files)).to be_falsey
+        expect(@root_folder.grants_right?(@teacher, :read_contents)).to be_truthy
       end
     end
   end
 end
-

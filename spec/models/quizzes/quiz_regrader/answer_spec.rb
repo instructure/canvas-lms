@@ -42,7 +42,7 @@ describe Quizzes::QuizRegrader::Answer do
   end
 
   def assert_answer_has_regrade_option!(regrade_option)
-    answer[:regrade_option].should == regrade_option
+    expect(answer[:regrade_option]).to eq regrade_option
   end
 
   def score_question_as!(correct)
@@ -65,10 +65,10 @@ describe Quizzes::QuizRegrader::Answer do
         answer.each do |k,v|
           next unless /answer/ =~ k
           key = "question_#{question.id}_#{k}"
-          sent_answer_data[key].should == v
+          expect(sent_answer_data[key]).to eq v
         end
       else
-        sent_answer_data.should == answer.merge("question_#{question.id}" => answer[:text])
+        expect(sent_answer_data).to eq answer.merge("question_#{question.id}" => answer[:text])
       end
     end.returns(sent_params.merge(:points => points, :correct => correct)).at_least_once
   end
@@ -76,11 +76,11 @@ describe Quizzes::QuizRegrader::Answer do
   describe "#initialize" do
 
     it 'saves a reference to the passed answer hash' do
-      wrapper.answer.should == answer
+      expect(wrapper.answer).to eq answer
     end
 
     it 'saves a reference to the passed question hash' do
-      wrapper.question.should == question
+      expect(wrapper.question).to eq question
     end
 
     it 'raises an error if the question has an unrecognized regrade_option' do
@@ -108,14 +108,14 @@ describe Quizzes::QuizRegrader::Answer do
         mark_original_answer_as!(:wrong)
         score_question_as!(:correct)
         answer[:points] = 0
-        wrapper.regrade!.should == points
+        expect(wrapper.regrade!).to eq points
         assert_answer_has_regrade_option!('full_credit')
       end
 
       it 'returns 0 if answer was previously correct' do
         mark_original_answer_as!(:correct)
         score_question_as!(:wrong)
-        wrapper.regrade!.should == 0
+        expect(wrapper.regrade!).to eq 0
         assert_answer_has_regrade_option!('full_credit')
       end
     end
@@ -127,7 +127,7 @@ describe Quizzes::QuizRegrader::Answer do
       it 'returns 0 if previously correct' do
         mark_original_answer_as!(:correct)
         score_question_as!(:wrong)
-        wrapper.regrade!.should == 0
+        expect(wrapper.regrade!).to eq 0
         assert_answer_has_regrade_option!('current_and_previous_correct')
       end
 
@@ -135,7 +135,7 @@ describe Quizzes::QuizRegrader::Answer do
         mark_original_answer_as!(:wrong)
         score_question_as!(:correct)
 
-        wrapper.regrade!.should == points
+        expect(wrapper.regrade!).to eq points
         assert_answer_has_regrade_option!('current_and_previous_correct')
       end
 
@@ -143,14 +143,14 @@ describe Quizzes::QuizRegrader::Answer do
         mark_original_answer_as!(:partial)
         previous_score = answer[:points]
         score_question_as!(:correct)
-        wrapper.regrade!.should == points - previous_score
+        expect(wrapper.regrade!).to eq points - previous_score
         assert_answer_has_regrade_option!('current_and_previous_correct')
       end
 
       it 'returns 0 if previously wrong and wrong now' do
         mark_original_answer_as!(:wrong)
         score_question_as!(:wrong)
-        wrapper.regrade!.should == 0
+        expect(wrapper.regrade!).to eq 0
         assert_answer_has_regrade_option!('current_and_previous_correct')
       end
     end
@@ -162,28 +162,28 @@ describe Quizzes::QuizRegrader::Answer do
       it 'returns points_possible - points if previously wrong but now correct' do
         mark_original_answer_as!(:wrong)
         score_question_as!(:correct)
-        wrapper.regrade!.should == points
+        expect(wrapper.regrade!).to eq points
         assert_answer_has_regrade_option!('current_correct_only')
       end
 
       it 'returns 0 if previously correct and correct after regrading' do
         mark_original_answer_as!(:correct)
         score_question_as!(:correct)
-        wrapper.regrade!.should == 0
+        expect(wrapper.regrade!).to eq 0
         assert_answer_has_regrade_option!('current_correct_only')
       end
 
       it 'returns difference if previously partial and partial after regrading' do
         mark_original_answer_as!(:partial)
         score_question_as!(:partial)
-        wrapper.regrade!.should == 5
+        expect(wrapper.regrade!).to eq 5
         assert_answer_has_regrade_option!('current_correct_only')
       end
 
       it 'returns -points if prev correct but wrong after regrading' do
         mark_original_answer_as!(:correct)
         score_question_as!(:wrong)
-        wrapper.regrade!.should == -points
+        expect(wrapper.regrade!).to eq -points
         assert_answer_has_regrade_option!('current_correct_only')
       end
 
@@ -192,7 +192,7 @@ describe Quizzes::QuizRegrader::Answer do
         answer.merge!(:answer_1 => "0", :answer_2 => "1")
         mark_original_answer_as!(:correct)
         score_question_as!(:correct)
-        wrapper.regrade!.should == 0
+        expect(wrapper.regrade!).to eq 0
         assert_answer_has_regrade_option!('current_correct_only')
       end
     end
@@ -202,7 +202,7 @@ describe Quizzes::QuizRegrader::Answer do
 
       it 'returns 0 when regrading' do
         mark_original_answer_as!(:correct)
-        wrapper.regrade!.should == 0
+        expect(wrapper.regrade!).to eq 0
       end
     end
 
@@ -211,7 +211,7 @@ describe Quizzes::QuizRegrader::Answer do
 
       it 'returns 0 when regrading' do
         mark_original_answer_as!(:correct)
-        wrapper.regrade!.should == 0
+        expect(wrapper.regrade!).to eq 0
       end
     end
   end

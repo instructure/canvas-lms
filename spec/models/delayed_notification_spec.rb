@@ -24,17 +24,38 @@ describe DelayedNotification do
       qs = quiz_model.quiz_submissions.create!
       notification = DelayedNotification.create! asset: qs, notification: Notification.create!(notification_valid_attributes)
 
-      notification.asset_type.should == 'Quizzes::QuizSubmission'
+      expect(notification.asset_type).to eq 'Quizzes::QuizSubmission'
 
       DelayedNotification.where(id: notification).update_all(asset_type: 'QuizSubmission')
 
-      DelayedNotification.find(notification.id).asset_type.should == 'Quizzes::QuizSubmission'
+      expect(DelayedNotification.find(notification.id).asset_type).to eq 'Quizzes::QuizSubmission'
     end
 
     it 'returns the content type attribute if not a quiz' do
       notification = DelayedNotification.create! asset: assignment_model, notification: Notification.create!(notification_valid_attributes)
-      notification.asset_type.should == 'Assignment'
+      expect(notification.asset_type).to eq 'Assignment'
     end
   end
+
+  describe '#process' do
+    let(:group_user) { user_with_communication_channel(active_all: true) }
+    let(:group_membership) { group_with_user(user: group_user, active_all: true) }
+    let(:group_instance) { group_membership.group }
+    let(:notification) { Notification.create!(name: "New Context Group Membership", category: "Registration") }
+
+    it 'processes notifications' do
+      messages = DelayedNotification.process(
+      group_membership,
+      notification,
+      ["user_#{group_user.id}"],
+      group_instance,
+      nil
+      )
+
+      expect(messages.size).to eq 1
+      messages.first.user == group_user
+    end
+ end
+
 end
 

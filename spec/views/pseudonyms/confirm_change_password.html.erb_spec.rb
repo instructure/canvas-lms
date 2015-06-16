@@ -28,7 +28,7 @@ describe "/pseudonyms/confirm_change_password" do
     assigns[:password_pseudonyms] = @user.pseudonyms
     assigns[:cc] = @user.communication_channels.create!(:path => 'unique@example.com')
     render "pseudonyms/confirm_change_password"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

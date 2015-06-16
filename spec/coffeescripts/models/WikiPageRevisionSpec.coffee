@@ -3,6 +3,7 @@ define [
   'underscore'
   'compiled/models/WikiPage'
   'compiled/models/WikiPageRevision'
+  'jquery.ajaxJSON'
 ], ($, _, WikiPage, WikiPageRevision) ->
 
   module 'WikiPageRevision::urls'
@@ -43,9 +44,8 @@ define [
   test 'restore POSTs to the revision', ->
     revision = new WikiPageRevision {revision_id: 42}, contextAssetString: 'course_73', pageUrl: 'page-url'
     mock = @mock($)
-    mock.expects('ajaxJSON').atLeast(1).withArgs('/api/v1/courses/73/pages/page-url/revisions/42', 'POST').returns($.Deferred())
+    mock.expects('ajaxJSON').atLeast(1).withArgs('/api/v1/courses/73/pages/page-url/revisions/42', 'POST').returns($.Deferred().resolve())
     revision.restore()
-
 
   module 'WikiPageRevision::fetch'
   test 'the summary flag is passed to the server', ->

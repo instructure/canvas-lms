@@ -8,18 +8,20 @@ module Authlogic
   end
 end
 
-callback_chain = CANVAS_RAILS2 ?
-  Authlogic::Session::Base.persist_callback_chain :
-  Authlogic::Session::Base._persist_callbacks
+callback_chain = Authlogic::Session::Base._persist_callbacks
 
 # we need http basic auth to take precedence over the session cookie, for the api.
-cb = callback_chain.delete(CANVAS_RAILS2 ? :persist_by_http_auth : callback_chain.find { |cb| cb.filter == :persist_by_http_auth })
-callback_chain.unshift(cb) if cb
+cb = callback_chain.delete(callback_chain.find { |cb| cb.filter == :persist_by_http_auth })
+callback_chain.insert(0, cb) if cb
 # we also need the session cookie to take precendence over the "remember me" cookie,
 # otherwise we'll use the "remember me" cookie every request, which triggers
 # generating a new "remember me" cookie since they're one-time use.
-cb = callback_chain.delete(CANVAS_RAILS2 ? :persist_by_cookie : callback_chain.find { |cb| cb.filter == :persist_by_cookie })
-callback_chain.push(cb) if cb
+cb = callback_chain.delete(callback_chain.find { |cb| cb.filter == :persist_by_cookie })
+if CANVAS_RAILS3
+  callback_chain.push(cb) if cb
+else
+  callback_chain.append(cb) if cb
+end
 
 # be tolerant of using a slave
 Authlogic::Session::Callbacks.module_eval do
@@ -34,22 +36,4 @@ Authlogic::Session::Callbacks.module_eval do
     end
   end
   alias_method_chain :save_record, :ro_check
-end
-
-# i18n fix so the error gets translated at run time, not initialization time.
-# this is fixed in new authlogic
-# https://github.com/jovoto-team/authlogic/commit/db01cf108985bd176e1885a3c85450020d4bcc45
-if CANVAS_RAILS2
-  module Authlogic
-    module ActsAsAuthentic
-      module Login
-        module Config
-          def validates_format_of_login_field_options(value = nil)
-            rw_config(:validates_format_of_login_field_options, value, {:with => Authlogic::Regex.login, :message => lambda {I18n.t('error_messages.login_invalid', "should use only letters, numbers, spaces, and .-_@ please.")}})
-          end
-          alias_method :validates_format_of_login_field_options=, :validates_format_of_login_field_options
-        end
-      end
-    end
-  end
 end

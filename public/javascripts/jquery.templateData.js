@@ -64,7 +64,7 @@ define([
                 options.data[item] = "";
               }
               if(options.htmlValues && $.inArray(item, options.htmlValues) != -1) {
-                $found.html(options.data[item].toString());
+                $found.html($.raw(options.data[item].toString()));
                 if($found.hasClass('user_content')) {
                   contentChange = true;
                   $found.removeClass('enhanced');

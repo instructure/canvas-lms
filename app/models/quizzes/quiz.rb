@@ -18,7 +18,7 @@
 require 'canvas/draft_state_validations'
 
 class Quizzes::Quiz < ActiveRecord::Base
-  self.table_name = 'quizzes' unless CANVAS_RAILS2
+  self.table_name = 'quizzes'
 
   include Workflow
   include HasContentTags
@@ -36,17 +36,19 @@ class Quizzes::Quiz < ActiveRecord::Base
     :hide_results, :locked, :ip_filter, :require_lockdown_browser,
     :require_lockdown_browser_for_results, :context, :notify_of_update,
     :one_question_at_a_time, :cant_go_back, :show_correct_answers_at, :hide_correct_answers_at,
-    :require_lockdown_browser_monitor, :lockdown_browser_monitor_data
+    :require_lockdown_browser_monitor, :lockdown_browser_monitor_data,
+    :one_time_results, :only_visible_to_overrides, :show_correct_answers_last_attempt
 
   attr_readonly :context_id, :context_type
   attr_accessor :notify_of_update
 
-  has_many :quiz_questions, :dependent => :destroy, :order => 'position', class_name: 'Quizzes::QuizQuestion'
+  has_many :quiz_questions, dependent: :destroy, order: 'position', class_name: 'Quizzes::QuizQuestion', inverse_of: :quiz
   has_many :quiz_submissions, :dependent => :destroy, :class_name => 'Quizzes::QuizSubmission'
   has_many :quiz_groups, :dependent => :destroy, :order => 'position', class_name: 'Quizzes::QuizGroup'
   has_many :quiz_statistics, :class_name => 'Quizzes::QuizStatistics', :order => 'created_at'
   has_many :attachments, :as => :context, :dependent => :destroy
   has_many :quiz_regrades, class_name: 'Quizzes::QuizRegrade'
+  has_many :quiz_student_visibilities
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
   belongs_to :assignment
@@ -57,10 +59,17 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   EXPORTABLE_ATTRIBUTES = [
-    :id, :title, :description, :quiz_data, :points_possible, :context_id, :context_type, :assignment_id, :workflow_state, :shuffle_answers, :show_correct_answers, :time_limit,
-    :allowed_attempts, :scoring_policy, :quiz_type, :created_at, :updated_at, :lock_at, :unlock_at, :deleted_at, :could_be_locked, :cloned_item_id, :unpublished_question_count,
-    :due_at, :question_count, :last_assignment_id, :published_at, :last_edited_at, :anonymous_submissions, :assignment_group_id, :hide_results, :ip_filter, :require_lockdown_browser,
-    :require_lockdown_browser_for_results, :one_question_at_a_time, :cant_go_back, :show_correct_answers_at, :hide_correct_answers_at, :require_lockdown_browser_monitor, :lockdown_browser_monitor_data
+    :id, :title, :description, :quiz_data, :points_possible, :context_id,
+    :context_type, :assignment_id, :workflow_state, :shuffle_answers,
+    :show_correct_answers, :time_limit, :allowed_attempts, :scoring_policy,
+    :quiz_type, :created_at, :updated_at, :lock_at, :unlock_at, :deleted_at,
+    :could_be_locked, :cloned_item_id, :unpublished_question_count, :due_at,
+    :question_count, :last_assignment_id, :published_at, :last_edited_at,
+    :anonymous_submissions, :assignment_group_id, :hide_results, :ip_filter,
+    :require_lockdown_browser, :require_lockdown_browser_for_results,
+    :one_question_at_a_time, :cant_go_back, :show_correct_answers_at,
+    :hide_correct_answers_at, :require_lockdown_browser_monitor,
+    :lockdown_browser_monitor_data, :only_visible_to_overrides
   ]
 
   EXPORTABLE_ASSOCIATIONS = [:quiz_questions, :quiz_submissions, :quiz_groups, :quiz_statistics, :attachments, :quiz_regrades, :context, :assignment, :assignment_group]
@@ -80,10 +89,9 @@ class Quizzes::Quiz < ActiveRecord::Base
   sanitize_field :description, CanvasSanitize::SANITIZE
   copy_authorized_links(:description) { [self.context, nil] }
 
-  before_save :generate_quiz_data_on_publish, :if => :needs_republish?
+  before_save :generate_quiz_data_on_publish, :if => :workflow_state_changed?
   before_save :build_assignment
   before_save :set_defaults
-  before_save :flag_columns_that_need_republish
   after_save :update_assignment
   after_save :touch_context
   after_save :regrade_if_published
@@ -120,10 +128,14 @@ class Quizzes::Quiz < ActiveRecord::Base
     self.shuffle_answers = false if self.shuffle_answers == nil
     self.show_correct_answers = true if self.show_correct_answers == nil
     if !self.show_correct_answers
+      self.show_correct_answers_last_attempt = false
       self.show_correct_answers_at = nil
       self.hide_correct_answers_at = nil
     end
     self.allowed_attempts = 1 if self.allowed_attempts == nil
+    if self.allowed_attempts <= 1
+      self.show_correct_answers_last_attempt = false
+    end
     self.scoring_policy = "keep_highest" if self.scoring_policy == nil
     self.due_at ||= self.lock_at if self.lock_at.present?
     self.ip_filter = nil if self.ip_filter && self.ip_filter.strip.empty?
@@ -138,6 +150,11 @@ class Quizzes::Quiz < ActiveRecord::Base
       @assignment_to_set = self.assignment
       self.assignment_id = nil
     end
+
+    if !self.require_lockdown_browser
+      self.require_lockdown_browser_for_results = false
+    end
+
     self.assignment_group_id ||= self.assignment.assignment_group_id if self.assignment
     self.question_count = self.question_count(true)
     @update_existing_submissions = true if self.for_assignment? && self.quiz_type_changed?
@@ -154,30 +171,6 @@ class Quizzes::Quiz < ActiveRecord::Base
     end
   end
   private :generate_quiz_data_on_publish
-
-  # @return [Boolean] Whether the quiz has unsaved changes due for a republish.
-  def needs_republish?
-    # TODO: remove this conditional and the non-DS scenario once Draft State is
-    # permanently turned on
-    if context.feature_enabled?(:draft_state)
-      return true if @publishing || workflow_state_changed?
-
-    # pre-draft state we need ability to republish things. Since workflow_state
-    # stays available, we need to flag when we're forcing to publish!
-    else
-      return true if @publishing
-    end
-  end
-
-  # some attributes require us to republish for non-draft state
-  # We can safely remove this when draft state is permanent
-  def flag_columns_that_need_republish
-    return if context.feature_enabled?(:draft_state)
-
-    if shuffle_answers_changed? && !shuffle_answers
-      self.last_edited_at = Time.now.utc
-    end
-  end
 
   protected :set_defaults
 
@@ -211,14 +204,13 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def build_assignment
-    if (context.feature_enabled?(:draft_state) || self.available?) &&
-      !self.assignment_id && self.graded? && @saved_by != :assignment &&
-      @saved_by != :clone
+    if !self.assignment_id && self.graded? && ![:assignment, :clone, :migration].include?(@saved_by)
       assignment = self.assignment
       assignment ||= self.context.assignments.build(:title => self.title, :due_at => self.due_at, :submission_types => 'online_quiz')
       assignment.assignment_group_id = self.assignment_group_id
+      assignment.only_visible_to_overrides = self.only_visible_to_overrides
       assignment.saved_by = :quiz
-      if context.feature_enabled?(:draft_state) && !deleted?
+      unless deleted?
         assignment.workflow_state = self.published? ? 'published' : 'unpublished'
       end
       assignment.save
@@ -283,7 +275,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
-    res = self.save
+    res = self.save!
     if self.for_assignment?
       self.assignment.destroy unless self.assignment.deleted?
     end
@@ -291,7 +283,11 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def restore(from=nil)
-    self.workflow_state = self.context.feature_enabled?(:draft_state) ? 'unpublished' : 'edited'
+    self.workflow_state = if self.has_student_submissions?
+      "available"
+    else
+      "unpublished"
+    end
     self.save
     self.assignment.restore(:quiz) if self.for_assignment?
   end
@@ -327,11 +323,15 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def survey?
-    self.quiz_type == 'survey' || self.quiz_type == 'graded_survey'
+    self.quiz_type == 'survey' || graded_survey?
   end
 
   def graded?
-    self.quiz_type == 'assignment' || self.quiz_type == 'graded_survey'
+    self.quiz_type == 'assignment' || graded_survey?
+  end
+
+  def graded_survey?
+    self.quiz_type == 'graded_survey'
   end
 
   def ungraded?
@@ -350,7 +350,17 @@ class Quizzes::Quiz < ActiveRecord::Base
     return true if self.grants_right?(user, :grade) &&
       (submission && submission.user && submission.user != user)
 
-    return false if !self.show_correct_answers
+    return false unless self.show_correct_answers
+
+    if user.present? && self.show_correct_answers_last_attempt && quiz_submission = user.quiz_submissions.where(quiz_id: self.id).first
+      return quiz_submission.attempts_left == 0 && quiz_submission.complete?
+    end
+
+    # If we're showing the results only one time, and are letting students
+    # see their correct answers, don't take the showAt/hideAt dates into
+    # consideration because we really want them to see the CAs just once,
+    # no matter when they submit.
+    return true if self.one_time_results
 
     # Are we past the date the correct answers should no longer be shown after?
     return false if hide_at.present? && Time.now > hide_at
@@ -360,8 +370,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def restrict_answers_for_concluded_course?
     course = self.context
-    concluded = course.conclude_at && course.conclude_at < Time.now
-    concluded && course.root_account.settings[:restrict_quiz_questions]
+    course.concluded? && course.root_account.settings[:restrict_quiz_questions]
   end
 
   def update_existing_submissions
@@ -403,11 +412,12 @@ class Quizzes::Quiz < ActiveRecord::Base
         a.due_at = self.due_at
         a.lock_at = self.lock_at
         a.unlock_at = self.unlock_at
+        a.only_visible_to_overrides = self.only_visible_to_overrides
         a.submission_types = "online_quiz"
         a.assignment_group_id = self.assignment_group_id
         a.saved_by = :quiz
         a.workflow_state = 'published' if a.deleted?
-        if context.feature_enabled?(:draft_state) && !deleted?
+        unless deleted?
           a.workflow_state = self.published? ? 'published' : 'unpublished'
         end
         @notify_of_update ||= a.workflow_state_changed? && a.published?
@@ -441,7 +451,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     # only update quiz submissions that:
     # 1. belong to this quiz;
-    # 2. haven't been started; and
+    # 2. have been started; and
     # 3. won't lose time through this change.
     where_clause = <<-END
       quiz_id = ? AND
@@ -529,7 +539,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       if q[:pick_count]
         question_count += q[:actual_pick_count] || q[:pick_count]
       else
-        question_count += 1 unless q[:question_type] == "text_only_question"
+        question_count += 1 unless q[:question_type] == Quizzes::QuizQuestion::Q_TEXT_ONLY
       end
     end
     question_count || 0
@@ -539,40 +549,38 @@ class Quizzes::Quiz < ActiveRecord::Base
     published? ? question_count : unpublished_question_count
   end
 
+  # Lists all the question types available in this quiz
+  def question_types
+    return [] unless quiz_data
+    quiz_data.map do |question|
+      question["question_type"]
+    end.uniq
+  end
+
+  def has_access_code
+    access_code.present?
+  end
+
   # Returns data for the SAVED version of the quiz.  That is, not
   # the version found by gathering relationships on the Quiz data models,
   # but the version being held in Quizzes::Quiz.quiz_data.  Caches the result
   # in @stored_questions.
-  def stored_questions(hashes=nil)
-    res = []
-    return @stored_questions if @stored_questions && !hashes
-    questions = hashes || self.quiz_data || []
-    questions.each do |val|
+  def stored_questions(preview=false)
+    return @stored_questions if @stored_questions && !preview
 
-      if val[:answers]
-        val[:answers] = prepare_answers(val)
-        val[:matches] = val[:matches].sort_by { |m| m[:text] || ::CanvasSort::First } if val[:matches]
-      elsif val[:questions] # It's a Quizzes::QuizGroup
-        if val[:assessment_question_bank_id]
-          # It points to a question bank
-          # question/answer/match shuffling happens when a submission is generated
-        else #normal Quizzes::QuizGroup
-          questions = []
-          val[:questions].each do |question|
-            if question[:answers]
-              question[:answers] = prepare_answers(question)
-              question[:matches] = question[:matches].sort_by { |m| m[:text] || ::CanvasSort::First } if question[:matches]
-            end
-            questions << question
-          end
-          questions = questions.sort_by { |q| rand }
-          val[:questions] = questions
-        end
+    @stored_questions = begin
+      data_set = if preview
+        self.generate_quiz_data(:persist => false)
+      else
+        self.quiz_data || []
       end
-      res << val
+
+      builder = Quizzes::QuizQuestionBuilder.new({
+        shuffle_answers: self.shuffle_answers
+      })
+
+      builder.shuffle_quiz_data!(data_set)
     end
-    @stored_questions = res
-    res
   end
 
   def single_attempt?
@@ -583,129 +591,87 @@ class Quizzes::Quiz < ActiveRecord::Base
     self.allowed_attempts == -1
   end
 
-  def generate_submission_question(q)
-    @idx ||= 1
-    q[:name] = t '#quizzes.quiz.question_name_counter', "Question %{question_number}", :question_number => @idx
-    if q[:question_type] == 'text_only_question'
-      q[:name] = t '#quizzes.quiz.default_text_only_question_name', "Spacer"
-      @idx -= 1
-    elsif q[:question_type] == 'fill_in_multiple_blanks_question'
-      text = q[:question_text]
-      variables = q[:answers].map { |a| a[:blank_id] }.uniq
-      variables.each do |variable|
-        variable_id = ::AssessmentQuestion.variable_id(variable)
-        re = Regexp.new("\\[#{variable}\\]")
-        text = text.sub(re, "<input class='question_input' type='text' autocomplete='off' style='width: 120px;' name='question_#{q[:id]}_#{variable_id}' value='{{question_#{q[:id]}_#{variable_id}}}' />")
-      end
-      q[:original_question_text] = q[:question_text]
-      q[:question_text] = text
-    elsif q[:question_type] == 'multiple_dropdowns_question'
-      text = q[:question_text]
-      variables = q[:answers].map { |a| a[:blank_id] }.uniq
-      variables.each do |variable|
-        variable_id = ::AssessmentQuestion.variable_id(variable)
-        variable_answers = q[:answers].select { |a| a[:blank_id] == variable }
-        options = variable_answers.map { |a| "<option value='#{a[:id]}'>#{CGI::escapeHTML(a[:text])}</option>" }
-        select = "<select class='question_input' name='question_#{q[:id]}_#{variable_id}'><option value=''>#{ERB::Util.h(t('#quizzes.quiz.default_question_input', "[ Select ]"))}</option>#{options}</select>"
-        re = Regexp.new("\\[#{variable}\\]")
-        text = text.sub(re, select)
-      end
-      q[:original_question_text] = q[:question_text]
-      q[:question_text] = text
-      # on equation questions, pick one of the formulas, plug it in
-      # and you should be able to treat it like a numerical_answer
-      # question for all intents and purposes
-    elsif q[:question_type] == 'calculated_question'
-      text = q[:question_text]
-      q[:answers] = [q[:answers].sort_by { |a| rand }.first].compact
-      if q[:answers].first
-        q[:answers].first[:variables].each do |variable|
-          re = Regexp.new("\\[#{variable[:name]}\\]")
-          text = text.gsub(re, variable[:value].to_s)
-        end
-      end
-      q[:question_text] = text
+  def build_submission_end_at(submission)
+    course = context
+    user   = submission.user
+    end_at = nil
+
+    if self.time_limit
+      end_at = submission.started_at + (self.time_limit.to_f * 60.0)
     end
-    q[:question_name] = q[:name]
-    @idx += 1
-    q
+
+    # add extra time
+    if end_at && submission.extra_time
+      end_at += (submission.extra_time * 60.0)
+    end
+
+    # Admins can take the full quiz whenever they want
+    return end_at if user.is_a?(::User) && self.grants_right?(user, :grade)
+
+    # set to lock date
+    if lock_at && !submission.manually_unlocked
+      if !end_at || lock_at < end_at
+        end_at = lock_at
+      end
+
+    # set to course end
+    elsif course.end_at && course.restrict_enrollments_to_course_dates
+      if !end_at || course.end_at < end_at
+        end_at = course.end_at
+      end
+
+    # set to enrollment term end
+    elsif course.enrollment_term.end_at
+      if !end_at || course.enrollment_term.end_at < end_at
+        end_at = course.enrollment_term.end_at
+      end
+    end
+
+    end_at
   end
 
   # Generates a submission for the specified user on this quiz, based
   # on the SAVED version of the quiz.  Does not consider permissions.
   def generate_submission(user, preview=false)
-    submission = Quizzes::SubmissionManager.new(self).find_or_create_submission(user, preview)
-    submission.retake
-    submission.attempt = (submission.attempt + 1) rescue 1
-    user_questions = []
-    @idx = 1
-    @stored_questions = nil
-    @submission_questions = self.stored_questions
-    if preview
-      @submission_questions = self.stored_questions(generate_quiz_data(:persist => false))
-    end
+    submission = nil
 
-    exclude_ids = @submission_questions.map { |q| q[:assessment_question_id] }.compact
-    @submission_questions.each do |q|
-      if q[:pick_count] #Quizzes::QuizGroup
-        if q[:assessment_question_bank_id]
-          bank = ::AssessmentQuestionBank.find_by_id(q[:assessment_question_bank_id]) if q[:assessment_question_bank_id].present?
-          if bank
-            questions = bank.select_for_submission(q[:pick_count], exclude_ids)
-            questions = questions.map { |aq| aq.data }
-            questions.each do |question|
-              if question[:answers]
-                question[:answers] = prepare_answers(question)
-                question[:matches] = question[:matches].sort_by { |m| m[:text] || ::CanvasSort::First } if question[:matches]
-              end
-              question[:points_possible] = q[:question_points]
-              question[:published_at] = q[:published_at]
-              user_questions << generate_submission_question(question)
-            end
-          end
-        else
-          questions = q[:questions].shuffle
-          q[:pick_count].times do |i|
-            if questions[i]
-              question = questions[i]
-              question[:points_possible] = q[:question_points]
-              user_questions << generate_submission_question(question)
-            end
-          end
-        end
-      else #just a question
-        user_questions << generate_submission_question(q)
+    transaction do
+      builder = Quizzes::QuizQuestionBuilder.new({
+        shuffle_answers: self.shuffle_answers
+      })
+
+      submission = Quizzes::SubmissionManager.new(self).find_or_create_submission(user, preview)
+      submission.retake
+      submission.attempt = (submission.attempt + 1) rescue 1
+      submission.score = nil
+      submission.fudge_points = nil
+
+      submission.quiz_data = begin
+        @stored_questions = nil
+        builder.build_submission_questions(self.id, self.stored_questions(preview))
       end
-    end
 
-    submission.score = nil
-    submission.fudge_points = nil
-    submission.quiz_data = user_questions
-    submission.quiz_version = self.version_number
-    submission.started_at = ::Time.now
-    submission.score_before_regrade = nil
-    submission.end_at = nil
-    submission.end_at = submission.started_at + (self.time_limit.to_f * 60.0) if self.time_limit
-    # Admins can take the full quiz whenever they want
-    unless user.is_a?(::User) && self.grants_right?(user, :grade)
-      submission.end_at = due_at if due_at && ::Time.now < due_at && (!submission.end_at || due_at < submission.end_at)
-      submission.end_at = lock_at if lock_at && !submission.manually_unlocked && (!submission.end_at || lock_at < submission.end_at)
-    end
-    submission.end_at += (submission.extra_time * 60.0) if submission.end_at && submission.extra_time
-    submission.finished_at = nil
-    submission.submission_data = {}
-    submission.workflow_state = 'preview' if preview
-    submission.was_preview = preview
-    if preview || submission.untaken?
-      submission.save
-    else
-      submission.with_versioning(true, &:save!)
+      submission.quiz_version = self.version_number
+      submission.started_at = ::Time.now
+      submission.score_before_regrade = nil
+      submission.end_at = build_submission_end_at(submission)
+      submission.finished_at = nil
+      submission.submission_data = {}
+      submission.workflow_state = 'preview' if preview
+      submission.was_preview = preview
+      submission.question_references_fixed = true
+
+      if preview || submission.untaken?
+        submission.save!
+      else
+        submission.with_versioning(true, &:save!)
+      end
+
     end
 
     # Make sure the submission gets graded when it becomes overdue (if applicable)
-    submission.grade_when_overdue unless preview || !submission.end_at
+    submission.grade_when_overdue if submission && submission.end_at && !preview
     submission
-
   end
 
   def generate_submission_for_participant(quiz_participant)
@@ -716,16 +682,6 @@ class Quizzes::Quiz < ActiveRecord::Base
                end
 
     generate_submission quiz_participant.send(identity), false
-  end
-
-  def prepare_answers(question)
-    if answers = question[:answers]
-      if shuffle_answers && Quizzes::Quiz.shuffleable_question_type?(question[:question_type])
-        answers.sort_by { |a| rand }
-      else
-        answers
-      end
-    end
   end
 
   # Takes the PRE-SAVED version of the quiz and uses it to generate a
@@ -744,6 +700,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       end
       e[:published_at] = t
     end
+    possible = 0 if possible < 0
     data = entries
     if opts[:persist] != false
       self.quiz_data = data
@@ -786,22 +743,22 @@ class Quizzes::Quiz < ActiveRecord::Base
       locked = false
       quiz_for_user = self.overridden_for(user)
       if (quiz_for_user.unlock_at && quiz_for_user.unlock_at > Time.now)
-        sub = user && quiz_submissions.find_by_user_id(user.id)
+        sub = user && quiz_submissions.where(user_id: user).first
         if !sub || !sub.manually_unlocked
           locked = {:asset_string => self.asset_string, :unlock_at => quiz_for_user.unlock_at}
         end
       elsif (quiz_for_user.lock_at && quiz_for_user.lock_at <= Time.now)
-        sub = user && quiz_submissions.find_by_user_id(user.id)
+        sub = user && quiz_submissions.where(user_id: user).first
         if !sub || !sub.manually_unlocked
           locked = {:asset_string => self.asset_string, :lock_at => quiz_for_user.lock_at}
         end
       elsif !opts[:skip_assignment] && (self.for_assignment? && l = self.assignment.locked_for?(user, opts))
-        sub = user && quiz_submissions.find_by_user_id(user.id)
+        sub = user && quiz_submissions.where(user_id: user).first
         if !sub || !sub.manually_unlocked
           locked = l
         end
       elsif item = locked_by_module_item?(user, opts[:deep_check_if_needed])
-        sub = user && quiz_submissions.find_by_user_id(user.id)
+        sub = user && quiz_submissions.where(user_id: user).first
         if !sub || !sub.manually_unlocked
           locked = {:asset_string => self.asset_string, :context_module => item.context_module.attributes}
         end
@@ -965,7 +922,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     quiz_stats_opts = {
       :report_type => report_type,
-      :includes_all_versions => options[:includes_all_versions],
+      :includes_all_versions => !!options[:includes_all_versions],
       :anonymous => anonymous_submissions?
     }
 
@@ -1043,12 +1000,11 @@ class Quizzes::Quiz < ActiveRecord::Base
     given { |user, session| self.context.grants_right?(user, session, :manage_grades) } #admins.include? user }
     can :read_statistics and can :read and can :submit and can :grade
 
-    given { |user| self.available? && self.context.try_rescue(:is_public) && !self.graded? }
+    given { |user| self.available? && self.context.try_rescue(:is_public) && !self.graded? && self.visible_to_user?(user) }
     can :submit
 
     given do |user, session|
-      (feature_enabled?(:draft_state) ? published? : true) &&
-        context.grants_right?(user, session, :read)
+      published? && context.grants_right?(user, session, :read)
     end
     can :read
 
@@ -1057,9 +1013,13 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     given do |user, session|
       available? &&
-        context.grants_right?(user, session, :participate_as_student)
+        context.grants_right?(user, session, :participate_as_student) &&
+        visible_to_user?(user)
     end
     can :read and can :submit
+
+    given { |user| context.grants_right?(user, :view_quiz_answer_audits) }
+    can :view_answer_audits
   end
 
   scope :include_assignment, -> { includes(:assignment) }
@@ -1067,6 +1027,12 @@ class Quizzes::Quiz < ActiveRecord::Base
   scope :active, -> { where("quizzes.workflow_state<>'deleted'") }
   scope :not_for_assignment, -> { where(:assignment_id => nil) }
   scope :available, -> { where("quizzes.workflow_state = 'available'") }
+
+  # NOTE: only use for courses with differentiated assignments on
+  scope :visible_to_students_in_course_with_da, lambda {|student_ids, course_ids|
+    joins(:quiz_student_visibilities).
+    where(:quiz_student_visibilities => { :user_id => student_ids, :course_id => course_ids })
+  }
 
   def teachers
     context.teacher_enrollments.map(&:user)
@@ -1099,7 +1065,9 @@ class Quizzes::Quiz < ActiveRecord::Base
   alias :require_lockdown_browser? :require_lockdown_browser
 
   def require_lockdown_browser_for_results
-    self[:require_lockdown_browser_for_results] && Quizzes::Quiz.lockdown_browser_plugin_enabled?
+    self.require_lockdown_browser &&
+    self[:require_lockdown_browser_for_results] &&
+    Quizzes::Quiz.lockdown_browser_plugin_enabled?
   end
 
   alias :require_lockdown_browser_for_results? :require_lockdown_browser_for_results
@@ -1141,10 +1109,8 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def publish!
-    @publishing = true
     publish
     save!
-    @publishing = false
     self
   end
 
@@ -1155,8 +1121,9 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def can_unpublish?
+    return true if new_record?
     !has_student_submissions? &&
-      (!assignment || !assignment.has_student_submissions?)
+      (assignment.blank? || assignment.can_unpublish?)
   end
 
   alias_method :unpublishable?, :can_unpublish?
@@ -1229,9 +1196,8 @@ class Quizzes::Quiz < ActiveRecord::Base
     question_regrades.count
   end
 
-  # override for draft state
   def available?
-    feature_enabled?(:draft_state) ? published? : workflow_state == 'available'
+    published?
   end
 
   delegate :feature_enabled?, to: :context

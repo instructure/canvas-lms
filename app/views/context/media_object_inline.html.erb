@@ -1,6 +1,5 @@
 <% title = @media_object.try(:title) || t('titles.media_playback', "Media Playback")
    content_for :page_title, title
-   content_for :page_header, title
    add_crumb t('#crumbs.media', "Media")
    add_crumb title
 %>

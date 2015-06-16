@@ -1,0 +1,133 @@
+/*
+@styleguide Border Classes
+
+<br/>
+
+The `.border` class defines the border style and color with no width.
+
+Additional variations of this define the side(s) and radius(s) of the element. Examples are combined with `.content-box` and `.pad-box-mini`.
+
+<br/>
+
+## Full Border
+
+```html
+
+<div class="content-box pad-box-mini border border-trbl">
+  <p>some content here</p>
+</div>
+```
+
+## Partial Borders
+
+```html
+<div class="content-box pad-box-mini border border-rbl">
+  <p>The Content</p>
+</div>
+
+<div class="content-box pad-box-mini border border-tbl">
+  <p>The Content</p>
+</div>
+
+<div class="content-box pad-box-mini border border-bl">
+  <p>The Content</p>
+</div>
+
+<div class="content-box pad-box-mini border border-tl">
+  <p>The Content</p>
+</div>
+
+<div class="content-box pad-box-mini border border-b">
+  <p>The Content</p>
+</div>
+
+<div class="content-box pad-box-mini border border-t">
+  <p>The Content</p>
+</div>
+```
+
+## Border Radius
+
+Combines with `.border` and `.border-trbl`
+
+```html
+
+<div class="content-box pad-box-mini border border-trbl border-round">
+  <p>some content here</p>
+</div>
+
+<div class="content-box pad-box-mini border border-trbl border-round-b">
+  <p>some content here</p>
+</div>
+
+<div class="content-box pad-box-mini border border-trbl border-round-t">
+  <p>some content here</p>
+</div>
+
+<div class="content-box pad-box-mini border border-trbl border-round-tl">
+  <p>some content here</p>
+</div>
+```
+
+*/
+
+
+.border {
+  border-width: 0px;
+  border-style: solid;
+  border-color: $borderColor;
+}
+
+.border-trbl {
+  border-width: 1px;
+}
+
+.border-rbl {
+  border-width: 1px;
+  border-top: none;
+}
+
+.border-tbl {
+  border-width: 1px;
+  border-right: none;
+}
+
+.border-bl {
+  border-bottom-size: 1px;
+  border-left-size: 1px;
+}
+
+.border-tl {
+  border-top-width: 1px;
+  border-left-width: 1px;
+}
+.border-b {
+  border-bottom-width: 1px;
+}
+
+.border-t {
+  border-top-width: 1px;
+}
+
+.border-r {
+  border-right-width: 1px;
+}
+
+.border-round-b {
+  border-bottom-left-radius: $borderRadius;
+  border-bottom-right-radius: $borderRadius;
+}
+
+.border-round-t {
+  border-top-left-radius: $borderRadius;
+  border-top-right-radius: $borderRadius;
+}
+
+.border-round-tl {
+  border-top-left-radius: $borderRadius;
+}
+
+.border-round {
+  border-radius: $borderRadius;
+}
+

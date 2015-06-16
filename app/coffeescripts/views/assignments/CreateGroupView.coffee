@@ -128,6 +128,8 @@ define [
         drop_lowest: @model.rules()?.drop_lowest or 0
         drop_highest: @model.rules()?.drop_highest or 0
         editable_drop: @model.get('assignments').length > 0
+        #Safari is not fully compatiable with html5 validation - needs to be set to text instead to ensure our validations work
+        number_input: if !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/) then "text" else "number"
       })
 
     openAgain: ->

@@ -15,7 +15,7 @@ describe "Account Authorization Configs" do
       get "/accounts/#{Account.default.id}/account_authorization_configs"
       f(".test_ldap_link").click
       wait_for_ajaximations
-      f("#ldap_connection_help .server_error").text.should == "Unknown host: blah.blah"
+      expect(f("#ldap_connection_help .server_error").text).to eq "Unknown host: blah.blah"
     end
   end
 end

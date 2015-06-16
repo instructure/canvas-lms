@@ -40,6 +40,10 @@ class MessageScrubber
     @logger     = options.fetch(:logger, Rails.logger)
   end
 
+  def self.scrub
+    new.scrub
+  end
+
   # Public: Delete old delayed messages on the current shard.
   #
   # options - A settings hash that accepts:
@@ -115,6 +119,6 @@ class MessageScrubber
   #
   # Returns nothing.
   def log(scope)
-    logger.info("#{self.class.to_s}: #{scope.count} records would be deleted (older than #{limit})")
+    logger.info("#{self.class}: #{scope.count} records would be deleted (older than #{limit})")
   end
 end

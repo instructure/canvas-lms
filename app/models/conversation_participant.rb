@@ -61,9 +61,13 @@ class ConversationParticipant < ActiveRecord::Base
     # we're also counting on conversations being in the join
 
     own_root_account_ids = Shard.birth.activate do
-      user.associated_root_accounts.select{ |a| a.grants_right?(user, :become_user) }.map(&:id)
+      accts = user.associated_root_accounts.select{ |a| a.grants_right?(user, :become_user) }
+      # we really shouldn't need the global id here, but we've got a lot of participants with
+      # global id's in their root_account_ids for some reason
+      accts.map(&:id) + accts.map(&:global_id)
     end
-    id_string = "[" + own_root_account_ids.sort.join("][") + "]"
+    own_root_account_ids.sort!.uniq!
+    id_string = "[" + own_root_account_ids.join("][") + "]"
     root_account_id_matcher = "'%[' || REPLACE(conversation_participants.root_account_ids, ',', ']%[') || ']%'"
     where("conversation_participants.root_account_ids <> '' AND " + like_condition('?', root_account_id_matcher, false), id_string)
   }
@@ -282,6 +286,29 @@ class ConversationParticipant < ActiveRecord::Base
     conversation.add_message(user, body_or_obj, options.merge(:generated => false))
   end
 
+  def process_new_message(message_args, recipients, included_message_ids, tags)
+    if recipients && !self.private?
+      self.add_participants recipients, no_messages: true
+    end
+    self.reload
+
+    if included_message_ids
+      ConversationMessage.where(:id => included_message_ids).each do |msg|
+        self.conversation.add_message_to_participants(msg, new_message: false, only_users: recipients, reset_unread_counts: false)
+      end
+    end
+
+    message = Conversation.build_message(*message_args)
+    self.add_message(message, :tags => tags, :update_for_sender => false, :only_users => recipients)
+
+    message
+  end
+
+  # if this is false, should queue a job to add the message, don't wait
+  def should_process_immediately?
+    conversation.conversation_participants.count < Setting.get('max_immediate_conversation_participants', 100).to_i
+  end
+
   # Public: soft deletes the message participants for this conversation
   # participant for the specified messages. May pass :all to soft delete all
   # message participants.
@@ -467,7 +494,7 @@ class ConversationParticipant < ActiveRecord::Base
       self.class.send :with_exclusive_scope do
         old_shard = self.user.shard
         conversation.conversation_messages.where(:author_id => user_id).update_all(:author_id => new_user)
-        if existing = conversation.conversation_participants.find_by_user_id(new_user)
+        if existing = conversation.conversation_participants.where(user_id: new_user).first
           existing.update_attribute(:workflow_state, workflow_state) if unread? || existing.archived?
           destroy
         else
@@ -509,14 +536,10 @@ class ConversationParticipant < ActiveRecord::Base
 
   def self.conversation_ids
     raise "conversation_ids needs to be scoped to a user" unless scoped.where_values.any? do |v|
-      if CANVAS_RAILS2
-        v =~ /user_id (?:= |IN \()\d+/
+      if v.is_a?(Arel::Nodes::Binary) && v.left.is_a?(Arel::Attributes::Attribute)
+        v.left.name == 'user_id'
       else
-        if v.is_a?(Arel::Nodes::Binary) && v.left.is_a?(Arel::Attributes::Attribute)
-          v.left.name == 'user_id'
-        else
-          v =~ /user_id (?:= |IN \()\d+/
-        end
+        v =~ /user_id (?:= |IN \()\d+/
       end
     end
     order = 'last_message_at DESC' unless scoped.order_values.present?
@@ -560,7 +583,7 @@ class ConversationParticipant < ActiveRecord::Base
     end
 
     progress_runner.do_batch_update(conversation_ids) do |conversation_id|
-      participant = user.all_conversations.find_by_conversation_id(conversation_id)
+      participant = user.all_conversations.where(conversation_id: conversation_id).first
       raise t('not_participating', 'The user is not participating in this conversation') unless participant
       participant.update_one(update_params)
     end

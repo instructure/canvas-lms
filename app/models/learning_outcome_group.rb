@@ -119,7 +119,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
         
         new_ids = []
         ids_to_check.each do |id|
-          group = LearningOutcomeGroup.for_context(self.context).active.find_by_id(id)
+          group = LearningOutcomeGroup.for_context(self.context).active.where(id: id).first
           new_ids += group.parent_ids if group
         end
         
@@ -139,7 +139,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   # groups, but only once per group).
   def add_outcome(outcome)
     # no-op if the outcome is already linked under this group
-    outcome_link = child_outcome_links.active.find_by_content_id(outcome.id)
+    outcome_link = child_outcome_links.active.where(content_id: outcome).first
     return outcome_link if outcome_link
 
     # create new link and in this group

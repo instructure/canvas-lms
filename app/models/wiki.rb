@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+
 # == Schema Information
 #
 # Table name: wikis
@@ -40,8 +42,8 @@ class Wiki < ActiveRecord::Base
   DEFAULT_FRONT_PAGE_URL = 'front-page'
 
   def set_has_no_front_page_default
-    if self.has_no_front_page.nil? && self.id && context
-      self.has_no_front_page = true if context.feature_enabled?(:draft_state)
+    if self.has_no_front_page.nil?
+      self.has_no_front_page = true
     end
   end
   private :set_has_no_front_page_default
@@ -70,15 +72,6 @@ class Wiki < ActiveRecord::Base
     end
   end
 
-  def check_has_front_page
-    return unless self.has_no_front_page.nil?
-
-    url = DEFAULT_FRONT_PAGE_URL
-    self.has_no_front_page = !self.wiki_pages.not_deleted.where(:url => url).exists?
-    self.front_page_url = url unless self.has_no_front_page
-    self.save
-  end
-
   def front_page
     url = self.get_front_page_url
     return nil if url.nil?
@@ -86,7 +79,7 @@ class Wiki < ActiveRecord::Base
     # TODO i18n
     t :front_page_name, "Front Page"
     # attempt to find the page and store it's url (if it is found)
-    page = self.wiki_pages.not_deleted.find_by_url(url)
+    page = self.wiki_pages.not_deleted.where(url: url).first
     self.set_front_page_url!(url) if self.has_no_front_page && page
 
     # return an implicitly created page if a page could not be found
@@ -102,8 +95,7 @@ class Wiki < ActiveRecord::Base
   end
 
   def get_front_page_url
-    return nil unless self.has_front_page? || !context.feature_enabled?(:draft_state)
-    self.front_page_url || DEFAULT_FRONT_PAGE_URL
+    self.front_page_url || DEFAULT_FRONT_PAGE_URL if self.has_front_page?
   end
 
   def unset_front_page!
@@ -128,7 +120,7 @@ class Wiki < ActiveRecord::Base
 
   def context
     shard.activate do
-      @context ||= Course.find_by_wiki_id(self.id) || Group.find_by_wiki_id(self.id)
+      @context ||= self.id && (Course.where(wiki_id: self).first || Group.where(wiki_id: self).first)
     end
   end
 
@@ -150,11 +142,15 @@ class Wiki < ActiveRecord::Base
     given {|user, session| self.context.grants_right?(user, session, :view_unpublished_items)}
     can :view_unpublished_items
 
-    given {|user, session| self.context.grants_right?(user, session, :participate_as_student) && self.context.allow_student_wiki_edits}
+    given {|user, session| self.context.grants_right?(user, session, :participate_as_student) && self.context.respond_to?(:allow_student_wiki_edits) && self.context.allow_student_wiki_edits}
     can :read and can :create_page and can :update_page and can :update_page_content
 
     given {|user, session| self.context.grants_right?(user, session, :manage_wiki)}
     can :manage and can :read and can :update and can :create_page and can :delete_page and can :delete_unpublished_page and can :update_page and can :update_page_content
+
+    given {|user, session| self.context.grants_right?(user, session, :manage_wiki) && !self.context.is_a?(Group)}
+    # Pages created by a user without this permission will be automatically published
+    can :publish_page
   end
 
   def self.wiki_for_context(context)
@@ -187,5 +183,19 @@ class Wiki < ActiveRecord::Base
     page.wiki = self
     page.initialize_wiki_page(user)
     page
+  end
+
+  def find_page(param)
+    if (match = param.match(/\Apage_id:(\d+)\z/))
+      return self.wiki_pages.where(id: match[1].to_i).first
+    end
+    self.wiki_pages.not_deleted.where(url: param.to_s).first ||
+      self.wiki_pages.not_deleted.where(url: param.to_url).first ||
+      self.wiki_pages.not_deleted.where(id: param.to_i).first
+  end
+
+  def path
+    # was a shim for draft state, can be removed
+    'pages'
   end
 end

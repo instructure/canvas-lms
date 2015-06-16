@@ -1,4 +1,4 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.quiz.context) %>/<%= course_quiz_history_path(asset.quiz.context, asset.quiz, quiz_submission_id: asset.id) %>
+  <%= course_quiz_history_url(asset.quiz.context, asset.quiz, quiz_submission_id: asset.id) %>
 <%= t :body, "Canvas Alert - Quiz Submitted: %{quiz}, %{user_name}", :user_name => asset.user.name, :quiz=> asset.quiz.title %>
 <% end %>

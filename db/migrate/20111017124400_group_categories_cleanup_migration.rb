@@ -9,7 +9,7 @@ class GroupCategoriesCleanupMigration < ActiveRecord::Migration
     elsif name == "Imported Groups"
       GroupCategory.imported_for(context).id
     else
-      context.group_categories.find_or_create_by_name(name).id
+      context.group_categories.where(name: name).first_or_create.id
     end
   end
 

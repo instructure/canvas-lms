@@ -32,10 +32,10 @@ describe ErrorReport do
     report.save!
     report.send_to_external
     m = Message.last
-    m.should_not be_nil
-    m.to.should eql("nobody@nowhere.com")
+    expect(m).not_to be_nil
+    expect(m.to).to eql("nobody@nowhere.com")
   end
-  
+
   it "should not send emails if not configured" do
     account_model
     report = ErrorReport.new
@@ -45,34 +45,36 @@ describe ErrorReport do
     report.save!
     report.send_to_external
     m = Message.last
-    (!!(m && m.to == "nobody@nowhere.com")).should eql(false)
+    expect(!!(m && m.to == "nobody@nowhere.com")).to eql(false)
   end
 
   it "should not fail with invalid UTF-8" do
-    ErrorReport.log_error('my error', :message => "he\xffllo")
+    data = { extra: { message: "he\xffllo" } }
+    described_class.log_exception_from_canvas_errors('my error', data)
   end
 
   it "should return categories" do
-    ErrorReport.categories.should == []
+    expect(ErrorReport.categories).to eq []
     ErrorReport.create! { |r| r.category = 'bob' }
-    ErrorReport.categories.should == ['bob']
+    expect(ErrorReport.categories).to eq ['bob']
     ErrorReport.create! { |r| r.category = 'bob' }
-    ErrorReport.categories.should == ['bob']
+    expect(ErrorReport.categories).to eq ['bob']
     ErrorReport.create! { |r| r.category = 'george' }
-    ErrorReport.categories.should == ['bob', 'george']
+    expect(ErrorReport.categories).to eq ['bob', 'george']
     ErrorReport.create! { |r| r.category = 'fred' }
-    ErrorReport.categories.should == ['bob', 'fred', 'george']
+    expect(ErrorReport.categories).to eq ['bob', 'fred', 'george']
   end
 
   it "should filter the url when it is assigned" do
     report = ErrorReport.new
     report.url = "https://www.instructure.example.com?access_token=abcdef"
-    report.url.should == "https://www.instructure.example.com?access_token=[FILTERED]"
+    expect(report.url).to eq "https://www.instructure.example.com?access_token=[FILTERED]"
   end
 
   it "should use class name for category" do
-    report = ErrorReport.log_exception(nil, e = Exception.new("error"))
-    report.category.should == e.class.name
+    e = Exception.new("error")
+    report = described_class.log_exception_from_canvas_errors(e, {extra:{}})
+    expect(report.category).to eq(e.class.name)
   end
 
   it "should filter params" do
@@ -86,14 +88,19 @@ describe ErrorReport do
       :query_parameters => { "access_token" => "abcdef", "pseudonym[password]" => "zzz" },
       :request_parameters => { "client_secret" => "xoxo" }
     }
-    mock_attrs[:url] = mock_attrs[:env]["REQUEST_URI"] unless CANVAS_RAILS2
+    mock_attrs[:url] = mock_attrs[:env]["REQUEST_URI"]
     req = mock(mock_attrs)
-    report = ErrorReport.new
-    report.assign_data(ErrorReport.useful_http_env_stuff_from_request(req))
-    report.data["QUERY_STRING"].should == "?access_token=[FILTERED]&pseudonym[password]=[FILTERED]"
-    report.data["REQUEST_URI"].should == "https://www.instructure.example.com?access_token=[FILTERED]&pseudonym[password]=[FILTERED]"
-    report.data["path_parameters"].should == { :api_key => "[FILTERED]" }.inspect
-    report.data["query_parameters"].should == { "access_token" => "[FILTERED]", "pseudonym[password]" => "[FILTERED]" }.inspect
-    report.data["request_parameters"].should == { "client_secret" => "[FILTERED]" }.inspect
+    report = described_class.new
+    report.assign_data(Canvas::Errors::Info.useful_http_env_stuff_from_request(req))
+    expect(report.data["QUERY_STRING"]).to eq "?access_token=[FILTERED]&pseudonym[password]=[FILTERED]"
+
+    expected_uri = "https://www.instructure.example.com?"\
+      "access_token=[FILTERED]&pseudonym[password]=[FILTERED]"
+    expect(report.data["REQUEST_URI"]).to eq(expected_uri)
+    expect(report.data["path_parameters"]).to eq({ :api_key => "[FILTERED]" }.inspect)
+    q_params = { "access_token" => "[FILTERED]", "pseudonym[password]" => "[FILTERED]" }
+    expect(report.data["query_parameters"]).to eq(q_params.inspect)
+    expect(report.data["request_parameters"]).to eq({ "client_secret" => "[FILTERED]" }.inspect)
   end
+
 end

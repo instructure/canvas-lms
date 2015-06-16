@@ -24,7 +24,7 @@ describe "/shared/_javascript_init" do
     course_with_student
     view_context
     render :partial => "shared/javascript_init"
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end
 

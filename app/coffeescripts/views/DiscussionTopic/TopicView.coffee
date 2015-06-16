@@ -39,6 +39,7 @@ define [
       '#discussion-toolbar': '$discussionToolbar'
       '.topic-subscribe-button': '$subscribeButton'
       '.topic-unsubscribe-button': '$unsubscribeButton'
+      '.announcement_cog': '$announcementCog'
 
     initialize: ->
       super
@@ -166,6 +167,7 @@ define [
         modelData = @model.toJSON()
         modelData.showBoxReplyLink = true
         modelData.root = true
+        modelData.isForMainDiscussion = true
         html = replyTemplate modelData
         @$('#discussion_topic').append html
       super
@@ -183,10 +185,12 @@ define [
     markAllAsRead: (event) ->
       event.preventDefault()
       @trigger 'markAllAsRead'
+      @$announcementCog.focus()
 
     markAllAsUnread: (event) ->
       event.preventDefault()
       @trigger 'markAllAsUnread'
+      @$announcementCog.focus()
 
     handleKeyDown: (e) =>
       nodeName = e.target.nodeName.toLowerCase()

@@ -1,12 +1,6 @@
 require 'active_support'
 
-if CANVAS_RAILS2
-  ActiveSupport::BufferedLogger.class_eval do
-    alias :quietly :silence
-  end
-end
-
-class CanvasLogger < ActiveSupport::BufferedLogger
+class CanvasLogger < (CANVAS_RAILS3 ? ActiveSupport::BufferedLogger : ActiveSupport::Logger)
   attr_reader :log_path
 
   def initialize(log_path, level = DEBUG, options = {})

@@ -20,6 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
 describe "/quizzes/quizzes/_display_question" do
+
   it "should render" do
     course_with_student
     view_context
@@ -42,6 +43,6 @@ describe "/quizzes/quizzes/_display_question" do
     render :partial => "quizzes/quizzes/display_question", :object => q, :locals => {
         :user_answer => @submission.submission_data.find{|a| a[:question_id] == q[:id]},
         :assessment_results => true}
-    response.should_not be_nil
+    expect(response).not_to be_nil
   end
 end

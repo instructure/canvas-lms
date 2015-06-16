@@ -23,7 +23,7 @@ describe 'enrollment_registration.sms' do
   it "should render" do
     course_with_student(:active_all => true)
     @object = @enrollment
-    @enrollment.context.should_not be_nil
+    expect(@enrollment.context).not_to be_nil
     generate_message(:enrollment_registration, :sms, @object)
   end
 end

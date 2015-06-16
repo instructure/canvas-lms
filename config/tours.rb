@@ -23,6 +23,10 @@
 Tour.config do
 
   tour(:quiz_regrade, 1, ['quizzes#edit'])
+  
+  # We are taking this out for now 
+  # tour(:agenda_tour, 1, '*')
+
 
   #tour(:discussion_topic_auto_unread, 1, ['discussion_topics#show', 'discussion_topics#index']) do
     #if params["action"] == "show"

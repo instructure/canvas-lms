@@ -28,7 +28,7 @@ module Lti
         enable_cache do
           uuid = SecureRandom.uuid
           SecureRandom.expects(:uuid).once.returns(uuid)
-          subject.cache_key.should == uuid
+          expect(subject.cache_key).to eq uuid
         end
       end
 
@@ -36,8 +36,8 @@ module Lti
         enable_cache do
           uuid = SecureRandom.uuid
           SecureRandom.expects(:uuid).once.returns(uuid)
-          subject.cache_key.should == uuid
-          subject.cache_key.should == uuid
+          expect(subject.cache_key).to eq uuid
+          expect(subject.cache_key).to eq uuid
         end
       end
 

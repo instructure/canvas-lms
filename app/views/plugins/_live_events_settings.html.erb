@@ -1,0 +1,53 @@
+<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <tr>
+      <td colspan="2">
+        <p><%= t(:description, <<-TEXT)
+          Pushes events to a Kinesis stream.
+          TEXT
+        %></p>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :kinesis_stream_name, :en => "Kinesis Stream Name" %></td>
+      <td>
+        <%= f.text_field :kinesis_stream_name %>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <p><%= t(:endpoint_region_requirement, <<-TEXT)
+        Either the AWS Region or Endpoint are required. The endpoint is typically only
+        used for development.
+        TEXT
+        %></p>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :aws_region, :en => "AWS Region" %></td>
+      <td>
+        <%= f.text_field :aws_region %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :aws_endpoint, :en => "AWS Endpoint (url)" %></td>
+      <td>
+        <%= f.text_field :aws_endpoint %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :aws_access_key_id, :en => "AWS Access Key ID" %></td>
+      <td>
+        <%= f.text_field :aws_access_key_id %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :aws_secret_access_key, :en => "AWS Secret Access Key" %></td>
+      <td>
+        <%= f.password_field :aws_secret_access_key %>
+      </td>
+    </tr>
+  </table>
+<% end %>
+
+

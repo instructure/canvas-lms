@@ -2,11 +2,7 @@
 class RemoveQuizDataIds < ActiveRecord::Migration
   class QuizQuestionDataMigrationARShim < ActiveRecord::Base;
     attr_accessible
-    if CANVAS_RAILS2
-      set_table_name "quiz_questions"
-    else
-      self.table_name = "quiz_questions"
-    end
+    self.table_name = "quiz_questions"
     serialize :question_data
   end
 

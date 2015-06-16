@@ -7,6 +7,10 @@ define [
   'tinymce.editor_box'
 ], (_, I18n, $, Backbone, preventDefault) ->
 
+  ###
+  xsslint safeString.property content
+  ###
+
   ##
   # Toggles an element between a rich text editor and itself
   class EditorToggle
@@ -102,13 +106,16 @@ define [
     # creates the "done" button used to exit the editor
     # @api private
     createDone: ->
-      $('<a/>')
-        .html(@options.doneText)
+      $('<div/>').addClass('edit_html_done_wrapper').append(
+        $('<a/>')
+        .text(@options.doneText)
         .attr('href', '#')
-        .addClass('btn edit-html-done edit_html_done')
+        .addClass('btn edit_html_done')
         .attr('title', I18n.t('done.title', 'Click to finish editing the rich text area'))
-        .click preventDefault => @display()
-
+        .click preventDefault =>
+          @display()
+          @editButton.focus()
+      )
     ##
     # create the switch views links to go between rich text and a textarea
     # @api private
@@ -116,7 +123,7 @@ define [
       $switchToHtmlLink = $('<a/>', href: "#")
       $switchToVisualLink = $switchToHtmlLink.clone()
       $switchToHtmlLink.text(I18n.t('switch_editor_html', 'HTML Editor'))
-      $switchToVisualLink.hide().text(I18n.t('switch_editor_visual', 'Visual Editor'))
+      $switchToVisualLink.hide().text(I18n.t('switch_editor_rich_text', 'Rich Content Editor'))
       $switchViewsContainer = $('<div/>', style: "float: right")
       $switchViewsContainer.append($switchToHtmlLink, $switchToVisualLink)
       $switchViewsContainer.find('a').click preventDefault (e) =>

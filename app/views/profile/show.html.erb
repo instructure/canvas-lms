@@ -12,7 +12,7 @@
       <h1 class="h2 right-side-h2-border"><%= t :administration, 'Administration' %></h1>
       <div><a href="<%= user_path(@user.id) %>"><%= t('links.user_account_details', %{Account Details}) %></a></div>
       <% if @user != @current_user %>
-        <div><a href="<%= context_url(@user.profile, :context_url, :become_user_id => @user.id) %>"> <%= t('become', 'Become') %></a></div>
+        <div><a href="<%= user_profile_url(@user, :become_user_id => @user) %>"> <%= t('become', 'Become') %></a></div>
       <% end %>
     <% end %>
   </div>

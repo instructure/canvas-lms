@@ -1,4 +1,4 @@
-module DataFixup::PopulateConversationParticipantPrivateHash
+class DataFixup::PopulateConversationParticipantPrivateHash
   def self.run
     target = %w{MySQL Mysql2}.include?(ConversationParticipant.connection.adapter_name) ? 'conversation_participants.private_hash' : 'private_hash'
     scope = ConversationParticipant.where(:private_hash => nil)

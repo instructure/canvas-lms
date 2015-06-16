@@ -1,0 +1,378 @@
+@mixin icon_link {
+  background-repeat: no-repeat;
+  background-position: left center;
+  line-height: 20px;
+  // give it a 1px top and bottom padding so that the bg-images dont get chopped off, and give it a 20px left to make room for bg-icon
+  padding: 1px 0 1px 26px;
+  display: inline-block;
+}
+
+a.external_link {
+  padding-right: 15px;
+  background: no-repeat right center;
+  background-image: url(/images/popout.png);
+}
+
+a.equella_content_link {
+  padding-left: 17px;
+  background: no-repeat left center;
+  background-image: url(/images/equella_icon.png);
+}
+
+a.add {
+  @include icon_link;
+  background-image: url(/images/add.png);
+}
+
+a.add-small {
+  @include icon_link;
+  padding-left: 15px;
+  background-image: url(/images/add-small.png);
+}
+
+a.add-feed {
+  @include icon_link;
+  background-image: url(/images/add_feed.png);
+}
+
+a.add-file {
+  @include icon_link;
+  background-image: url(/images/file.png);
+}
+
+a.announcement-icon-small {
+  @include icon_link;
+  background-image: url(/images/announcement_icon_small.png);
+}
+
+a.atom {
+  @include icon_link;
+  background-image: url(/images/atom.png);
+}
+
+a.media-comment {
+  @include icon_link;
+  background-image: url(/images/audio_comment.gif);
+}
+
+a.back {
+  @include icon_link;
+  background-image: url(/images/back.png);
+}
+
+a.calendar {
+  @include icon_link;
+  background-image: url(/images/due_date_icon.png);
+}
+
+a.collapse {
+  @include icon_link;
+  background-image: url(/images/collapse.png);
+}
+
+a.delete {
+  @include icon_link;
+  background-image: url(/images/delete.png);
+}
+
+a.delete-circle {
+  @include icon_link;
+  background-image: url(/images/delete_circle.png);
+}
+
+a.discussion-icon-small {
+  @include icon_link;
+  background-image: url(/images/discussion_icon_small.png);
+}
+
+a.discussion-topic {
+  @include icon_link;
+  background-image: url(/images/discussion_topic.png);
+  padding-left: 30px;
+}
+
+a.download {
+  @include icon_link;
+  background-image: url(/images/download.png);
+}
+
+a.download-small {
+  @include icon_link;
+  padding-left: 15px;
+  background-image: url(/images/download-small.png);
+}
+
+a.edit {
+  @include icon_link;
+  background-image: url(/images/edit.png);
+}
+
+a.email {
+  @include icon_link;
+  background-image: url(/images/email.png);
+}
+
+a.expand {
+  @include icon_link;
+  background-image: url(/images/expand.png);
+}
+
+a.feed {
+  @include icon_link;
+  background-image: url(/images/atom.png);
+}
+
+a.file-multiple {
+  @include icon_link;
+  background-image: url(/images/file_multiple.png);
+}
+
+a.file_big {
+  @include icon_link;
+  background-image: url(/images/file_big.png);
+}
+
+a.folder-closed {
+  @include icon_link;
+  background-image: url(/images/folder_closed.png);
+}
+
+a.forward {
+  @include icon_link;
+  background-image: url(/images/forward.png);
+}
+
+a.find {
+  @include icon_link;
+  background-image: url(/images/find.png);
+}
+
+a.grading_dim {
+  @include icon_link;
+  background-image: url(/images/grading_icon_gray.png);
+}
+
+a.grading {
+  @include icon_link;
+  background-image: url(/images/grading_icon.png);
+}
+
+a.help {
+  @include icon_link;
+  background-image: url(/images/help.png);
+}
+
+a.history {
+  @include icon_link;
+  background-image: url(/images/history.png);
+}
+
+a.information {
+  @include icon_link;
+  font-size: 0.8em;
+  background-image: url(/images/information.png);
+}
+
+a.link {
+  @include icon_link;
+  background-image: url(/images/link.png);
+}
+
+a.lock {
+  @include icon_link;
+  background-image: url(/images/lock.png);
+}
+
+a.pass {
+  @include icon_link;
+  background-image: url(/images/pass.png);
+}
+
+a.peer-review {
+  @include icon_link;
+  background-image: url(/images/peer_review.png);
+}
+
+a.pending-review {
+  @include icon_link;
+  background-image: url(/images/pending_review.png);
+}
+
+a.quiz {
+  @include icon_link;
+  background-image: url(/images/quiz.png);
+}
+
+a.refresh {
+  @include icon_link;
+  background-image: url(/images/ajax-reload.gif);
+}
+
+a.refreshing {
+  @include icon_link;
+  background-image: url(/images/ajax-reload-animated.gif);
+}
+
+a.rename {
+  @include icon_link;
+  background-image: url(/images/rename.png);
+}
+
+a.reply {
+  @include icon_link;
+  background-image: url(/images/reply.png);
+}
+
+a.rubric {
+  @include icon_link;
+  background-image: url(/images/rubric.png);
+}
+
+a.small-calendar {
+  @include icon_link;
+  background-image: url(/images/ical.png);
+}
+
+a.speedgrader {
+  @include icon_link;
+  background-image: url(/images/speedgrader_icon.png);
+}
+
+a.text-entry {
+  @include icon_link;
+  background-image: url(/images/text_entry.png);
+}
+
+a.warning {
+  @include icon_link;
+  background-image: url(/images/warning.png);
+}
+
+a.word-bubble {
+  @include icon_link;
+  background-image: url(/images/word_bubble.png);
+}
+
+a.unlock {
+  @include icon_link;
+  background-image: url(/images/unlock.png);
+}
+
+a.icon-grading {
+  @include icon_link;
+  @if $use_high_contrast {
+    background-image: url(/images/icon-checkmark-plus-success-high-contrast.svg);
+  }
+  @else {
+    background-image: url(/images/icon-checkmark-plus-success.svg);
+  }
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: 18px;
+}
+
+a.icon-grading-gray {
+  @include icon_link;
+  background: url(/images/icon-checkmark-plus-gray.svg) no-repeat left center;
+  background-size: 18px;
+}
+
+a.admin {
+  color: #D15545;
+}
+
+@mixin attachment_link {
+  background-repeat: no-repeat;
+  background-position: left center;
+  font-size: 10px;
+  padding: 1px 0 2px 20px;
+}
+
+a {
+  &.file {
+    @include attachment_link;
+    background-image: url("/images/inst_tree/file_types/page_white.png") !important;
+  }
+  &.pdf {
+    @include attachment_link;
+    background-image: url("/images/inst_tree/file_types/page_white_acrobat.png") !important;
+  }
+  &.image {
+    @include attachment_link;
+    background-image: url("/images/inst_tree/file_types/page_white_picture.png") !important;
+  }
+  &.spreadsheet {
+    @include attachment_link;
+    background-image: url("/images/inst_tree/file_types/page_white_excel.png") !important;
+  }
+  &.xls {
+    @include attachment_link;
+    background-image: url("/images/inst_tree/file_types/page_white_excel.png") !important;
+  }
+  &.word, &.doc {
+    @include attachment_link;
+    background-image: url("/images/inst_tree/file_types/page_white_word.png") !important;
+  }
+  &.ppt {
+    @include attachment_link;
+    background-image: url("/images/inst_tree/file_types/page_white_powerpoint.png") !important;
+  }
+  &.zip {
+    @include attachment_link;
+    background-image: url("/images/inst_tree/file_types/page_white_zip.png") !important;
+  }
+  &.html {
+    @include attachment_link;
+    background-image: url("/images/inst_tree/file_types/page_white_world.png") !important;
+  }
+  &.code {
+    @include attachment_link;
+    background-image: url("/images/inst_tree/file_types/page_white_code.png") !important;
+  }
+  &.text {
+    @include attachment_link;
+    background-image: url("/images/inst_tree/file_types/page_white_text.png") !important;
+  }
+  &.audio {
+    @include attachment_link;
+    background-image: url("/images/inst_tree/file_types/sound_none.png") !important;
+  }
+  &.video {
+    @include attachment_link;
+    background-image: url("/images/inst_tree/file_types/page_white_camera.png") !important;
+  }
+  &.flash {
+    @include attachment_link;
+    background-image: url("/images/inst_tree/file_types/page_white_flash.png") !important;
+  }
+}
+
+a.no-underline, a.no-underline:hover, a.no-underline:focus {
+  text-decoration: none;
+}
+
+// atr is short for accessible text replacement
+// these classes make it so you can have links like <a class="atr-reply">reply to this topic</a> and have only
+// a reply.png icon show up.
+
+.atr-reply, .atr-edit, .atr-delete {
+  text-indent: -119988px;
+  overflow: hidden;
+  text-align: left;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  width: 16px;
+  height: 16px;
+}
+
+.atr-reply {
+  background-image: url("/images/reply.png");
+}
+
+.atr-edit {
+  background-image: url("/images/edit.png");
+}
+
+.atr-delete {
+  background-image: url("/images/delete.png");
+}

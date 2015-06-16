@@ -16,6 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+require 'oauth'
+
 # See Google Docs API documentation here:
 # http://code.google.com/apis/documents/docs/2.0/developers_guide_protocol.html
 module GoogleDocs
@@ -31,7 +34,11 @@ module GoogleDocs
       @access_token ||= OAuth::AccessToken.new(consumer, @oauth_gdocs_access_token, @oauth_gdocs_access_token_secret)
     end
 
-    def get_service_user_info(access_token)
+    def service_type
+      :google_docs
+    end
+
+    def get_service_user_info(access_token=retrieve_access_token)
       doc = create_doc("Temp Doc: #{Time.now.strftime("%d %b %Y, %I:%M %p")}", access_token)
       delete_doc(doc, access_token)
       service_user_id = doc.entry.authors[0].email rescue nil
@@ -53,16 +60,29 @@ module GoogleDocs
     end
 
 
-    def download(document_id)
+    def download(document_id, not_supported=nil)
       access_token = retrieve_access_token
       entry = fetch_list(access_token).entries.map { |e| GoogleDocs::Entry.new(e) }.find { |e| e.document_id == document_id }
       if entry
-        response = access_token.get(entry.download_url)
-        response = access_token.get(response['Location']) if response.is_a?(Net::HTTPFound)
+        response = fetch_entry(access_token, entry)
+
+        # some new google spreadsheets will not download as plain 'xls', so
+        # retry the download as 'xlsx'
+        if response.is_a?(Net::HTTPBadRequest) && entry.extension == 'xls'
+          entry.reset_extension_as_xlsx
+          response = fetch_entry(access_token, entry)
+        end
+
         [response, entry.display_name, entry.extension]
       else
         [nil, nil, nil]
       end
+    end
+
+    def fetch_entry(access_token, entry)
+      response = access_token.get(entry.download_url)
+      response = access_token.get(response['Location']) if response.is_a?(Net::HTTPFound)
+      response
     end
 
     def fetch_list(access_token)
@@ -198,7 +218,7 @@ module GoogleDocs
       add_extension_namespace :gAcl, 'http://schemas.google.com/acl/2007'
     end
 
-    def create_doc(name, access_token)
+    def create_doc(name, access_token=retrieve_access_token)
       url = "https://docs.google.com/feeds/documents/private/full"
       entry = Atom::Entry.new do |entry|
         entry.title = name

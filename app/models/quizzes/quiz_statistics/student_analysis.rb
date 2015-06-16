@@ -101,8 +101,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
       end
       answers = sub.submission_data || []
       next unless answers.is_a?(Array)
-      points = answers.map { |a| a[:points] }.sum
-      score_counter << points
+      score_counter << sub.score.to_f
       correct_cnt += answers.count { |a| a[:correct] == true }
       incorrect_cnt += answers.count { |a| a[:correct] == false }
       total_duration += ((sub.finished_at - sub.started_at).to_i rescue 30)
@@ -173,12 +172,18 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   end
 
   def attachment_csv(answer)
-    return "" unless answer && answer[:attachment_ids]
-    @attachments[answer[:attachment_ids].first.to_i].display_name
+    return "" unless answer && answer[:attachment_ids].present?
+
+    attachment = @attachments[answer[:attachment_ids].first.to_i]
+
+    if attachment.present?
+      attachment.display_name
+    else
+      ''
+    end
   end
 
   def to_csv
-    start_progress
     include_root_accounts = quiz.context.root_account.trust_exists?
     csv = CSV.generate do |csv|
       context = quiz.context
@@ -291,6 +296,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
           else
             row << ((answer_item && answer_item[:text]) || '')
           end
+          row.push(strip_tags(row.pop.to_s))
           row << (answer ? answer[:points] : "")
         end
         row << submission.submission_data.select { |a| a[:correct] }.length
@@ -306,10 +312,8 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
 
   def submissions_for_statistics
     Shackles.activate(:slave) do
-      #submissions from users
-      for_users = quiz.context.student_ids
-      scope = quiz.quiz_submissions.where(:user_id => for_users)
-      logged_out = quiz.quiz_submissions.logged_out.where('NOT was_preview')
+      scope = quiz.quiz_submissions.for_students(quiz)
+      logged_out = quiz.quiz_submissions.logged_out
 
       all_submissions = []
       all_submissions = prep_submissions scope
@@ -388,7 +392,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     strip_html_answers(question)
 
     question[:user_ids] = responses.map { |r| r[:user_id] }
-    question[:response_values] = responses.map { |r| r[:text] }
+    question[:response_values] = responses.map { |r| strip_tags(r[:text].to_s) }
     question[:responses] = responses.size
 
     question = Quizzes::QuizQuestion::Base.from_question_data(question).stats(responses)

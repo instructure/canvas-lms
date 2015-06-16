@@ -1,0 +1,48 @@
+@mixin bevelText {
+  text-shadow: 0 1px 1px hsla(0, 100%, 100%, 0.75);
+}
+
+@mixin header-text {
+  color: $fcHeader;
+  text-shadow: 0 1px 1px $textShadowHeader;
+}
+@mixin header-bg {
+  @include vertical-gradient($gradientTopHeader, $gradientBottomHeader);
+  box-shadow: inset 0 1px 0 hsla(0, 100%, 100%, 0.75);
+}
+
+@mixin ui-widget-header-bg-and-text {
+  @if $use_new_styles {
+    border: 1px solid $ic-border-light;
+    background: $lightBackground;
+  }
+  @else {
+    border: 1px solid $borderColorHeader;
+    @include header-text;
+    @include header-bg;  
+  }
+}
+
+// mixin for easy retina background images
+@mixin bg-image($filename, $filetype, $rep: no-repeat, $bgx: 0, $bgy: 0, $bgcolor: none, $bgw: auto, $bgh: auto) {
+
+  background-color: $bgcolor;
+  background-image: url('/images/' + $filename + '.' + $filetype);
+  background-repeat: $rep;
+  background-position: $bgx $bgy;
+
+  @media (min--moz-device-pixel-ratio: 1.5),
+  (-o-min-device-pixel-ratio: 3/2),
+  (-webkit-min-device-pixel-ratio: 1.5),
+  (min-device-pixel-ratio: 1.5),
+  (min-resolution: 1.5dppx) {
+    background-image: url('/images/' + $filename + '@2x.' + $filetype);
+    background-size: $bgw $bgh;
+  }
+}
+
+// Easier box model
+@mixin border-box {
+  -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+  &:before, &:after { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+}

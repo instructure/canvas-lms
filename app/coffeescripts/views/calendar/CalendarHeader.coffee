@@ -119,6 +119,7 @@ define [
     _triggerCreateNewEvent: (event) ->
       event.preventDefault()
       @trigger('createNewEvent')
+      $.publish("CalendarHeader/createNewEvent")
 
     _triggerRefreshCalendar: (event) ->
       event.preventDefault()

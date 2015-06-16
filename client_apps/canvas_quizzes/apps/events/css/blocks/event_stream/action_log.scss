@@ -1,0 +1,40 @@
+#ic-EventStream__ActionLog {
+  font-size: 16px;
+  line-height: 24px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ic-ActionLog__Entry {
+  margin: 0 0 $whitespace 0;
+
+  &.is-warning .ic-Icon {
+    color: $ic-color-danger;
+  }
+
+  &.is-ok .ic-Icon {
+    color: $ic-color-success;
+  }
+
+  &.is-neutral .ic-Icon {
+    color: $muteFg;
+  }
+}
+
+.ic-ActionLog__EntryTimestamp {
+  display: inline-block;
+  width: 60px;
+  color: $muteFg;
+  text-align: right;
+}
+
+.ic-ActionLog__EntryFlag {
+  display: inline-block;
+  width: 16px;
+  margin: 0 $whitespace;
+}
+
+.ic-ActionLog__EntryDescription {
+  display: inline-block;
+}

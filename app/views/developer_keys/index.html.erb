@@ -4,15 +4,15 @@
 <% jammit_css :developer_keys %>
 
 <h2 style="float: left;"><%= t :developer_keys, "Developer Keys" %></h2>
-<a href="#" style='float: right;' class='btn btn-primary add_key'><i class="icon-add"></i> Add Developer Key</a>
+<a href="#" style='float: right;' class='btn btn-primary add_key'><i class="icon-add"></i><%= t :add_developer_key, "Add Developer Key" %></a>
 <div class='clear'></div>
 <table id="keys">
   <thead>
     <tr>
-      <th>Name</th>
-      <th>User</th>
-      <th>Details</th>
-      <th>Stats</th>
+      <th><%= t :name, "Name" %></th>
+      <th><%= t :user, "User" %></th>
+      <th><%= t :details, "Details" %></th>
+      <th><%= t :stats, "Stats" %></th>
       <th>&nbsp;</th>
     </tr>
   </thead>

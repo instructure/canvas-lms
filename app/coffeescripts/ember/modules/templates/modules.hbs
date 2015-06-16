@@ -1,0 +1,45 @@
+<div class="item-group-container">
+
+  <div class="header-bar">
+    <div class="header-bar-right">
+      <a class="btn" href="/courses/1/modules/progressions">View Progress</a>
+      {{#ic-modal-trigger
+        controls="create-module-modal"
+        class="btn btn-primary"
+      }}Create a module{{/ic-modal-trigger}}
+    </div>
+  </div>
+
+  <div class="item-group-container">
+    <div class="ig-list">
+      {{#module-list is-loading=isLoading data=modules}}
+        {{#if isLoading}}
+          <div class="item-group-condensed">
+            <div class="ig-row ig-row-empty">
+              <div class="ig-empty-msg">Loading...</div>
+            </div>
+          </div>
+        {{else}}
+          {{#if modules.length}}
+            {{#each module in modules}}
+              {{#mm-sortable-module module=module modules=controller.modules on-reorder="syncModulesOrder"}}
+                {{render "module" module}}
+              {{/mm-sortable-module}}
+            {{/each}}
+          {{else}}
+            <div class="item-group-condensed">
+              <div class="ig-row ig-row-empty">
+                <div class="ig-empty-msg">No modules</div>
+              </div>
+            </div>
+          {{/if}}
+        {{/if}}
+      {{/module-list}}
+    </div>
+  </div>
+</div>
+
+{{#c-modal-form id="create-module-modal" on-submit="createModule"}}
+  {{render "moduleEdit" newModule}}
+{{/c-modal-form}}
+

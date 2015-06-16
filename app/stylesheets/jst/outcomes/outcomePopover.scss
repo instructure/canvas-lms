@@ -1,0 +1,137 @@
+@import 'base/environment';
+@import 'pages/shared/_outcome_colors';
+
+.outcome-details {
+  position: absolute;
+  z-index: 1000;
+  background-color: #fff;
+  border: 1px solid #b0afaf;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.6);
+  max-width: 500px;
+  min-width: 250px;
+  padding: 18px 12px;
+  border-radius: 8px;
+  font-weight: 500;
+  color: #4f5f6e;
+}
+
+.outcome-details, .outcome-details-dialog {
+  .title {
+    font-size: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #b0afaf;
+    margin-bottom: 10px;
+  }
+  .chart {
+    font-size: 11px;
+    text-align: center;
+    height: 150px
+  }
+  .line-graph {
+    font-size: 10px;
+    .guides {
+      .tick {
+        stroke: lightgrey;
+        opacity: 0.7;
+      }
+      path {
+        stroke-width: 0;
+      }
+    }
+    .date-guides {
+      path {
+        stroke-width: 0;
+      }
+    }
+    .mastery-percentage-guide {
+      .tick {
+        stroke: #00B416;
+        opacity: 0.5;
+      }
+      path {
+        stroke-width: 0;
+      }
+    }
+    .trendline {
+      stroke: #9f9f9f
+    }
+    svg {
+      background: #f7f7f7
+    }
+    .domain {
+      fill: none;
+      stroke: black;
+      stroke-width: 1;
+    }
+  }
+  .ratings {
+    font-weight: normal;
+    display: inline-block;
+    text-align: left;
+    margin-bottom: 0px;
+    margin-top: 25px;
+    .rating {
+      list-style-type: none;
+    }
+    .legend-color {
+      width: 13px;
+      height: 13px;
+      display: inline-block;
+      margin-right: 3px;
+      vertical-align: sub;
+    }
+  }
+  .outcome-info {
+    clear: both;
+    .description {
+      font-weight: 200;
+    }
+  }
+  .mastery {
+    color: #555;
+  }
+  .last-assessment {
+    color: $grayLight;
+    font-size: $fontSizeSmall;
+  }
+  .mastery-details i:before {
+    font-size: 1.5em;
+  }
+  .icon-check-plus:before {
+    color: $exceeds-color;
+  }
+  .icon-check:before {
+    color: $mastery-color;
+  }
+  .icon-plus {
+    color: $near-color;
+  }
+  .icon-x:before {
+    color: $remedial-color;
+  }
+  .method-details {
+    background-color: $ic-color-neutral;
+    margin-bottom: 0px;
+    margin-top: 10px;
+    div {
+      padding-bottom: 10px;
+    }
+    span {
+      display: inline-block;
+      font-style: italic;
+    }
+    .example {
+      color: $grayLight;
+      font-size: $fontSizeSmall;
+    }
+    .left-content {
+      float: left;
+    }
+    .right-content {
+      padding-left: 10px;
+    }
+    .method-description {
+      width: 320px;
+    }
+  }
+}

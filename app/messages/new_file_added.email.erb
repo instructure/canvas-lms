@@ -1,5 +1,5 @@
 <% define_content :link do %>
-<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/files/<%= asset.id %>
+  <%= polymorphic_url([asset.context, :file], id: asset) %>
 <% end %>
 <% define_content :subject do -%>
 <%= t('subject', 'New File Added: %{title}, %{name}', :title => asset.title, :name => asset.context.name) %>

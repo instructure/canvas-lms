@@ -16,22 +16,31 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Document Previews
+# This API can only be accessed when another endpoint provides a signed URL.
+# It will simply redirect you to the 3rd party document preview..
+#
 class CanvadocSessionsController < ApplicationController
   include HmacHelper
 
   def show
     blob = extract_blob(params[:hmac], params[:blob],
-                        "user_id" => @current_user.try(:global_id))
+                        "user_id" => @current_user.try(:global_id),
+                        "type" => "canvadoc")
     attachment = Attachment.find(blob["attachment_id"])
 
     if attachment.canvadocable?
       attachment.submit_to_canvadocs unless attachment.canvadoc_available?
-      redirect_to attachment.canvadoc.session_url
+      url = attachment.canvadoc.session_url
+      redirect_to url
     else
       render :text => "Not found", :status => :not_found
     end
 
   rescue HmacHelper::Error
     render :text => 'unauthorized', :status => :unauthorized
+  rescue Timeout::Error
+    render :text => "Service is currently unavailable. Try again later.",
+           :status => :service_unavailable
   end
 end

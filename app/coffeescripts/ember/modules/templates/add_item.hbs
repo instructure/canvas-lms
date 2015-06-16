@@ -1,0 +1,66 @@
+<div {{bind-attr class=":modules-add-item editing"}}>
+  {{#if createType}}
+    {{#if createAssignment}} {{render "create/assignment" newThing}} {{/if}}
+    {{#if createDiscussion}} {{render "create/discussion" newThing}} {{/if}}
+    {{#if createFile      }} {{render "create/file"       newThing}} {{/if}}
+    {{#if createHeader    }} {{render "create/header"     newThing}} {{/if}}
+    {{#if createLink      }} {{render "create/link"       newThing}} {{/if}}
+    {{#if createPage      }} {{render "create/page"       newThing}} {{/if}}
+    {{#if createQuiz      }} {{render "create/quiz"       newThing}} {{/if}}
+    {{#if createTool      }} {{render "create/tool"       newThing}} {{/if}}
+  {{else}}
+    <div class="modules-add-item-menu-container">
+      {{#ic-menu class="modules-add-item-menu module-add-new-item"}}
+        {{#ic-menu-trigger}}
+          {{c-icon type="add"}}
+          {{#t "add_new_item"}}Add new item{{/t}}
+        {{/ic-menu-trigger}}
+        {{#ic-menu-list}}
+          {{#ic-menu-item on-select="beginCreate" type="assignment"}} {{c-icon type="assignment"}} {{#t "assignment"   }}Assignment{{/t}}    {{/ic-menu-item}}
+          {{#ic-menu-item on-select="beginCreate" type="quiz"}}       {{c-icon type="quiz"}}       {{#t "quiz"         }}Quiz{{/t}}          {{/ic-menu-item}}
+          {{#ic-menu-item on-select="beginCreate" type="file"}}       {{c-icon type="upload"}}     {{#t "file"         }}File{{/t}}          {{/ic-menu-item}}
+          {{#ic-menu-item on-select="beginCreate" type="page"}}       {{c-icon type="document"}}   {{#t "content_page" }}Content Page{{/t}}  {{/ic-menu-item}}
+          {{#ic-menu-item on-select="beginCreate" type="discussion"}} {{c-icon type="discussion"}} {{#t "discussion"   }}Discussion{{/t}}    {{/ic-menu-item}}
+          {{#ic-menu-item on-select="beginCreate" type="header"}}     {{c-icon type="text"}}       {{#t "text_header"  }}Text Header{{/t}}   {{/ic-menu-item}}
+          {{#ic-menu-item on-select="beginCreate" type="link"}}       {{c-icon type="link"}}       {{#t "external_url" }}External URL{{/t}}  {{/ic-menu-item}}
+          {{#ic-menu-item on-select="beginCreate" type="tool"}}       {{c-icon type="tool"}}       {{#t "external_tool"}}External Tool{{/t}} {{/ic-menu-item}}
+        {{/ic-menu-list}}
+      {{/ic-menu}}
+    {{!
+      these divs are hugging not becuase they love each other but because they
+      are display inline-block and the space would mess up the layout
+    }}
+    </div><div class="modules-add-item-menu-container">
+      {{#ic-menu class="modules-add-item-menu module-add-existing-item"}}
+        {{#ic-menu-trigger id=addListId}}
+          {{c-icon type="add"}}
+          Add existing item
+        {{/ic-menu-trigger}}
+        {{#ic-menu-list}}
+          {{#ic-menu-item on-select="beginAdd" type="assignment"}} {{c-icon type="assignment"}} {{#t "assignment"   }}Assignment{{/t}}     {{/ic-menu-item}}
+          {{#ic-menu-item on-select="beginAdd" type="quiz"}}       {{c-icon type="quiz"}}       {{#t "quiz"         }}Quiz{{/t}}           {{/ic-menu-item}}
+          {{#ic-menu-item on-select="beginAdd" type="file"}}       {{c-icon type="download"}}   {{#t "file"         }}File{{/t}}           {{/ic-menu-item}}
+          {{#ic-menu-item on-select="beginAdd" type="page"}}       {{c-icon type="document"}}   {{#t "page"         }}Content Page{{/t}}   {{/ic-menu-item}}
+          {{#ic-menu-item on-select="beginAdd" type="discussion"}} {{c-icon type="discussion"}} {{#t "discussion"   }}Discussion{{/t}}     {{/ic-menu-item}}
+          {{#ic-menu-item on-select="beginAdd" type="header"}}     {{c-icon type="text"}}       {{#t "text_header"  }}Text Header{{/t}}    {{/ic-menu-item}}
+          {{#ic-menu-item on-select="beginAdd" type="tool"}}       {{c-icon type="text"}}       {{#t "external_tool"}}External Tool{{/t}}  {{/ic-menu-item}}
+        {{/ic-menu-list}}
+      {{/ic-menu}}
+    </div>
+  {{/if}}
+</div>
+
+{{#c-modal-form
+  id=modalId
+  return-focus-to=addListId
+  on-submit="addExistingItems"
+}}
+  {{#if addAssignment}} {{render "add/assignment" newThing}} {{/if}}
+  {{#if addDiscussion}} {{render "add/discussion" newThing}} {{/if}}
+  {{#if addFile      }} {{render "add/file"       newThing}} {{/if}}
+  {{#if addHeader    }} {{render "add/header"     newThing}} {{/if}}
+  {{#if addPage      }} {{render "add/page"       newThing}} {{/if}}
+  {{#if addQuiz      }} {{render "add/quiz"       newThing}} {{/if}}
+  {{#if addTool      }} {{render "add/tool"       newThing}} {{/if}}
+{{/c-modal-form}}
+

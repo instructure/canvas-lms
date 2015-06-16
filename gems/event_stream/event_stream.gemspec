@@ -2,9 +2,7 @@
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
-unless defined?(CANVAS_RAILS3)
-  require File.expand_path("../../../config/canvas_rails3", __FILE__)
-end
+require File.expand_path("../../../config/canvas_rails4", __FILE__)
 
 Gem::Specification.new do |spec|
   spec.name          = "event_stream"
@@ -21,14 +19,12 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'bookmarked_collection'
   spec.add_dependency 'canvas_cassandra'
   spec.add_dependency 'canvas_statsd'
-  spec.add_dependency 'canvas_uuid'
   spec.add_dependency 'json_token'
   spec.add_dependency 'paginated_collection'
 
-  if CANVAS_RAILS3
-    spec.add_dependency 'rails', '~>3.2'
-  else
-    spec.add_dependency 'rails', '~>2.3'
+  spec.add_dependency 'rails', ">= 3.2", "< 4.2"
+  unless CANVAS_RAILS3
+    spec.add_dependency 'protected_attributes', '~>1.0'
   end
 
   spec.add_development_dependency 'bundler', '~> 1.5'

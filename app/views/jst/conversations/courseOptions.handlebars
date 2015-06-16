@@ -2,17 +2,17 @@
 {{#favorites}}
   {{>[conversations/courseOption]}}
 {{/favorites}}
-<optgroup label="{{#t "course_options.more_courses"}}More Courses{{/t}}">
+<optgroup data-content-type="{{t "More Courses"}}" label="{{#t "course_options.more_courses"}}More Courses{{/t}}">
   {{#more}}
     {{>[conversations/courseOption]}}
   {{/more}}
 </optgroup>
-<optgroup label="{{#t "course_options.concluded"}}Concluded{{/t}}">
+<optgroup data-content-type="{{t "Concluded Courses"}}" label="{{#t "course_options.concluded"}}Concluded{{/t}}">
   {{#concluded}}
     {{>[conversations/courseOption]}}
   {{/concluded}}
 </optgroup>
-<optgroup label="{{#t "course_options.groups"}}Groups{{/t}}">
+<optgroup data-content-type="{{t "Groups"}}" label="{{#t "course_options.groups"}}Groups{{/t}}">
   {{#groups}}
     {{>[conversations/groupOption]}}
   {{/groups}}

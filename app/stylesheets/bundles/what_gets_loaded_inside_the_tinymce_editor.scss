@@ -1,0 +1,43 @@
+@import "base/environment";
+
+@import "vendor/bootstrap/reset";
+@import "vendor/bootstrap/scaffolding";
+@import "vendor/bootstrap/type";
+@import "base/bootstrap_overrides";
+
+// the first line of public/javascripts/tinymce/jscripts/tiny_mce/themes/advanced/skins/default/content.css
+// sets these to undesireable values, rather than modify that vendor file, we just override them here
+// to match the rest of the content in canvas
+body, td, pre {
+  margin: 0;
+  font-family: $baseFontFamily;
+  font-size: $baseFontSize;
+  color: $textColor;
+}
+
+.mce-content-body {
+  margin: 11px;
+  td {
+    padding: 2px;
+    min-width: 20px;
+  }
+}
+
+.mce-item-table, .mce-item-table td, .mce-item-table th, .mce-item-table caption, .mce-item-visual-aid {
+  border: 1px dashed #888;
+}
+
+.mce-item-table tr{
+  height: 20px;
+}
+
+.mce-item-table td {
+  padding: 2px;
+  min-width: 20px;
+}
+
+body#tinymce{
+  height: 100vh;
+}
+
+@import "our_custom_tiny_mce_stuff/_tinymce.editor_box.scss";

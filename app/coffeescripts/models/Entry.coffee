@@ -7,15 +7,15 @@ define [
   'jquery'
   'underscore'
   'Backbone'
+  'str/stripTags'
   'jquery.ajaxJSON'
-], (I18n, $, _, Backbone) ->
+], (I18n, $, _, Backbone, stripTags) ->
 
   ##
   # Model representing an entry in discussion topic
   class Entry extends Backbone.Model
 
-    defaults:
-
+    defaults: ->
       ##
       # Attributes persisted with the server
       id: null
@@ -45,6 +45,8 @@ define [
     computedAttributes: [
       'canModerate'
       'canReply'
+      'hiddenName'
+      'canRate'
       'speedgraderUrl'
       'inlineReplyLink'
       { name: 'allowsSideComments', deps: ['parent_id', 'deleted'] }
@@ -75,7 +77,13 @@ define [
       ENV.DISCUSSION.DELETE_URL.replace /:id/, @get 'id'
 
     sync: (method, model, options = {}) ->
+      replies = @get('replies')
+      @set('replies', [])
       options.url = @[method]()
+      oldComplete = options.complete
+      options.complete = =>
+        @set('replies', replies)
+        oldComplete() if oldComplete?
       Backbone.sync method, this, options
 
     parse: (data) ->
@@ -102,6 +110,25 @@ define [
         'replies'
         'author'
 
+    hiddenName: ->
+      if ENV.DISCUSSION.HIDE_STUDENT_NAMES
+        isGradersEntry = @get('user_id')+'' is ENV.DISCUSSION.CURRENT_USER.id
+        isStudentsEntry = @get('user_id')+'' is ENV.DISCUSSION.STUDENT_ID
+
+        if isGradersEntry
+          @get('author').display_name
+        else if isStudentsEntry
+          I18n.t('this_student', "This Student")
+        else
+          I18n.t('discussion_participant', "Discussion Participant")
+
+    ratingString: ->
+      return '' unless sum = @get('rating_sum')
+      I18n.t 'like_count', {
+        one: '(%{count} like)'
+        other: '(%{count} likes)'
+      }, count: sum
+
     ##
     # Computed attribute to determine if the entry can be moderated
     # by the current user
@@ -116,6 +143,12 @@ define [
       return no if @get 'deleted'
       return no unless ENV.DISCUSSION.PERMISSIONS.CAN_REPLY
       yes
+
+    ##
+    # Computed attribute to determine if the entry can be liked
+    # by the current user
+    canRate: ->
+      ENV.DISCUSSION.PERMISSIONS.CAN_RATE
 
     ##
     # Computed attribute to determine if an inlineReplyLink should be
@@ -154,13 +187,12 @@ define [
       # ENV.DISCUSSION.SPEEDGRADER_URL_TEMPLATE will only exist if I have permission to grade
       # and this thing is an assignment
       if ENV.DISCUSSION.SPEEDGRADER_URL_TEMPLATE
-        ENV.DISCUSSION.SPEEDGRADER_URL_TEMPLATE.replace /%22%3Astudent_id%22/, @get('user_id')
+        ENV.DISCUSSION.SPEEDGRADER_URL_TEMPLATE.replace /%22:student_id%22/, @get('user_id')
 
     ##
     # Computed attribute
     summary: ->
-      @escapeDiv ||= $('<div/>')
-      @escapeDiv.html(@get('message')).text()
+      stripTags @get('message')
 
     ##
     # Not familiar enough with Backbone.sync to do this, using ajaxJSON
@@ -175,6 +207,14 @@ define [
       @set(read_state: 'unread', forced_read_state: true)
       url = ENV.DISCUSSION.MARK_UNREAD_URL.replace /:id/, @get 'id'
       $.ajaxJSON url, 'DELETE', forced_read_state: true
+
+    toggleLike: ->
+      rating = if @get('rating') then 0 else 1
+      @set(rating: rating)
+      sum = (@get('rating_sum') || 0) + (if rating then 1 else -1)
+      @set('rating_sum', sum)
+      url = ENV.DISCUSSION.RATE_URL.replace /:id/, @get 'id'
+      $.ajaxJSON url, 'POST', rating: rating
 
     hasChildren: ->
       @get('replies').length > 0

@@ -1,0 +1,58 @@
+// makes a counter for a new and a total count, like the one used on discussion topics,
+// could also be used for inbox and other places.
+// if the .new-items or .total-items is blank it will just not show up at all so you dont
+// need a conditional to hide/show it
+//
+// sample markup:
+//
+//   <div class="new-and-total-badge">
+//     <span class="new-items">3</span>
+//     <span class="total-items">10</span>
+//   </div>
+//
+// you can combine it with tooltips like this:
+//
+//   <div class="new-and-total-badge">
+//     <span class="tooltip new-items">
+//       <span class="tooltip_wrap">
+//         <span class="tooltip_text">3 new messages</span>
+//       </span>
+//       3
+//     </span>
+//     <span class="tooltip total-items">
+//       <span class="tooltip_wrap">
+//         <span class="tooltip_text">
+//           15 messages in this thread
+//         </span>
+//       </span>
+//       15
+//     </span>
+//   </div>
+
+$new-total-padding: 5px;
+$new-total-border-radius: 3px;
+
+.new-and-total-badge {
+  .new-items, .total-items {
+    color: white;
+    border-radius: $new-total-border-radius;
+    padding: 0 $new-total-padding;
+    font-weight: bold;
+    font-size: 11px;
+    float: left;
+    color: white;
+  }
+  .new-items {    
+    background-color: $ic-brand-primary;    
+    margin-right: -$new-total-border-radius;
+    padding-right: $new-total-padding + $new-total-border-radius;
+  }
+  .total-items {
+    background-color: lighten($ic-color-neutral, 6);
+    color: darken($ic-color-neutral, 40);
+    @if $use_high_contrast {
+      background-color: $ic-color-dark;
+      color: $ic-color-light;
+    }
+  }
+}

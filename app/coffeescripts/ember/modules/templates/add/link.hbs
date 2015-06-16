@@ -1,0 +1,32 @@
+<form class="bootstrap-form form-inline modules-create-item-form">
+  {{c-icon type="link"}}
+
+  {{input
+    type="text"
+    class="span3"
+    value=model.title
+    placeholder=text.title
+    aria-label=text.title
+  }}
+
+  {{input
+    type="text"
+    class="span3"
+    value=model.url
+    placeholder=text.url
+    aria-label=text.url
+  }}
+
+  <button
+    class="btn btn-primary"
+    type="submit"
+    {{action "create"}}
+  >{{#t "add_link"}}Add Link{{/t}}</button>
+
+  <button
+    class="btn"
+    type="button"
+    {{action "cancel"}}
+  >{{#t "cancel"}}Cancel{{/t}}</button>
+</form>
+

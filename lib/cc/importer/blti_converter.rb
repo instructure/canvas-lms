@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+
+require 'nokogiri'
+
 module CC::Importer
   class BLTIConverter
     class CCImportError < Exception; end
@@ -45,7 +48,7 @@ module CC::Importer
         path = res[:href] || (res[:files] && res[:files].first && res[:files].first[:href])
         path = converter.get_full_path(path)
 
-        if File.exists?(path)
+        if File.exist?(path)
           doc = open_file_xml(path)
           tool = convert_blti_link(doc)
           tool[:migration_id] = res[:migration_id]
@@ -80,6 +83,7 @@ module CC::Importer
         
         if ext[:platform] == CANVAS_PLATFORM
           tool[:privacy_level] = ext[:custom_fields].delete 'privacy_level'
+          tool[:not_selectable] = ext[:custom_fields].delete 'not_selectable'
           tool[:domain] = ext[:custom_fields].delete 'domain'
           tool[:consumer_key] = ext[:custom_fields].delete 'consumer_key'
           tool[:shared_secret] = ext[:custom_fields].delete 'shared_secret'
@@ -100,7 +104,7 @@ module CC::Importer
     end
     
     def convert_blti_xml(xml)
-      doc = Nokogiri::XML(xml)
+      doc = create_xml_doc(xml)
       begin
         tool = convert_blti_link(doc)
         check_for_unescaped_url_properties(tool) if tool
@@ -128,17 +132,29 @@ module CC::Importer
       end
     end
 
+    def fetch(url, limit = 10)
+      # You should choose better exception.
+      raise ArgumentError, 'HTTP redirect too deep' if limit == 0
+
+      uri = URI.parse(url)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = uri.scheme == 'https'
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+      request = Net::HTTP::Get.new(uri.request_uri)
+      response = http.request(request)
+
+      case response
+        when Net::HTTPRedirection then fetch(response['location'], limit - 1)
+        else
+          response
+      end
+    end
+
     def retrieve_and_convert_blti_url(url)
       begin
-        uri = URI.parse(url)
-        http = Net::HTTP.new(uri.host, uri.port)
-        http.use_ssl = uri.scheme == 'https'
-        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-        
-        request = Net::HTTP::Get.new(uri.request_uri)
-        response = http.request(request)
+        response = fetch(url)
         config_xml = response.body
-
         convert_blti_xml(config_xml)
       rescue Timeout::Error
         raise CCImportError.new(I18n.t(:retrieve_timeout, "could not retrieve configuration, the server response timed out"))

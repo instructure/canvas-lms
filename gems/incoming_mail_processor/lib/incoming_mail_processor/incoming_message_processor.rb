@@ -15,7 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+
 require 'iconv'
+require 'mail'
 
 module IncomingMailProcessor
 
@@ -46,6 +48,10 @@ module IncomingMailProcessor
       configure_accounts(config.slice(*mailbox_keys))
     end
 
+    def self.workers
+      settings.workers || 1
+    end
+
     def self.run_periodically?
       if settings.run_periodically.nil?
         # check backwards compatibility settings
@@ -55,10 +61,12 @@ module IncomingMailProcessor
       end
     end
 
-    def process
+    def process(opts={})
       self.class.mailbox_accounts.each do |account|
         mailbox = self.class.create_mailbox(account)
-        process_mailbox(mailbox, account)
+        mailbox_opts = {}
+        mailbox_opts = {offset: opts[:worker_id], stride: self.class.workers} if opts[:worker_id] && self.class.workers > 1
+        process_mailbox(mailbox, account, mailbox_opts)
       end
     end
 
@@ -73,18 +81,33 @@ module IncomingMailProcessor
     private
 
     def extract_body(incoming_message)
-      if incoming_message.multipart? && part = incoming_message.parts.find { |p| p.content_type.try(:match, %r{^text/html(;|$)}) }
-        html_body = self.class.utf8ify(part.body.decoded, part.charset)
+
+      if incoming_message.multipart?
+        html_part = incoming_message.html_part
+        text_part =  incoming_message.text_part
+
+        html_body = self.class.utf8ify(html_part.body.decoded, html_part.charset) if html_part
+        text_body = self.class.utf8ify(text_part.body.decoded, text_part.charset) if text_part
+      else
+        case incoming_message.mime_type
+        when 'text/plain'
+          text_body = self.class.utf8ify(incoming_message.body.decoded, incoming_message.charset)
+        when 'text/html'
+          html_body = self.class.utf8ify(incoming_message.body.decoded, incoming_message.charset)
+        else
+          raise "Unrecognized Content-Type: #{incoming_message.mime_type.inspect}"
+        end
       end
-      html_body = self.class.utf8ify(incoming_message.body.decoded, incoming_message.charset) if !incoming_message.multipart? && incoming_message.content_type.try(:match, %r{^text/html(;|$)})
-      if incoming_message.multipart? && part = incoming_message.parts.find { |p| p.content_type.try(:match, %r{^text/plain(;|$)}) }
-        body = self.class.utf8ify(part.body.decoded, part.charset)
+
+      if html_body && !text_body
+        text_body = self.class.html_to_text(html_body)
       end
-      body ||= self.class.utf8ify(incoming_message.body.decoded, incoming_message.charset)
-      if !html_body
-        html_body = self.class.format_message(body).first
+
+      if text_body && !html_body
+        html_body = self.class.format_message(text_body).first
       end
-      return body, html_body
+
+      return text_body, html_body
     end
 
     def self.mailbox_keys
@@ -192,10 +215,10 @@ module IncomingMailProcessor
     end
 
 
-    def process_mailbox(mailbox, account)
+    def process_mailbox(mailbox, account, opts={})
       error_folder = account.error_folder
       mailbox.connect
-      mailbox.each_message do |message_id, raw_contents|
+      mailbox.each_message(opts) do |message_id, raw_contents|
         message, errors = parse_message(raw_contents)
         if message && !errors.present?
           process_message(message, account)

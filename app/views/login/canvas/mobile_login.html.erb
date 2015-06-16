@@ -1,0 +1,106 @@
+<%= form_for :pseudonym_session, :url => login_path, :html => {:id => "login_form", :class => "front face", :novalidate => 'novalidate'} do |f| %>
+  <input class="input-block-level" <%= 'type=email' if @login_handle_is_email %> name="pseudonym_session[unique_id]" value="<%= params[:pseudonym_session].try(:[], :unique_id) %>" placeholder="<%= @login_handle_name %>">
+  <input class="input-block-level" type="password" name="pseudonym_session[password]" placeholder="<%= t :password, "Password" %>">
+  <% if request.post? && flash[:error] %>
+    <div class="error"><%= flash[:error] %></div>
+  <% end %>
+  <button type="submit" class="btn btn-primary btn-large"><%= t('log_in', 'Log In') %></button>
+  <% if url = params[:canvas_login].blank? && @domain_root_account.try(:forgot_password_external_url) %>
+    <%= link_to t('dont_know_password', "I don't know my password"), url, :class => 'btn btn-large forgot-password' %>
+  <% else %>
+    <a class="btn btn-large btn-inverse flip-to-back"><%= t('dont_know_password', "I don't know my password") %></a>
+  <% end %>
+<% end %>
+<%= form_for :pseudonym_session, :url => forgot_password_path, :html => {:id => "forgot_password_form", :class => 'back face'} do |f| %>
+  <label for="pseudonym_session_unique_id_forgot"><%= t('login_handle', "Enter your %{login_handle_name} and we'll send you a link to change your password.", :login_handle_name => @login_handle_name) %></label>
+  <input class="input-block-level" <%= 'type=email' if @login_handle_is_email %> name="pseudonym_session[unique_id_forgot]" value="<%= @unauthorized_user.try :email %>" placeholder="<%= @login_handle_name %>" id="pseudonym_session_unique_id_forgot" />
+  <button type="submit" class="btn btn-primary btn-large" data-text-while-loading="<%= t :sending, "Sending..." %>" class="request-password-button"><%= t('buttons.request_password', 'Request Password') %></button>
+  <a class="btn btn-large btn-inverse flip-to-front"><%= t('back_to_login', "Back to Login") %></a>
+<% end %>
+<%= # for plugin use
+  render "shared/login_trailer" %>
+
+<script>
+  var eventToBindTo = ('ontouchstart' in window) ? 'touchstart' : 'click';
+
+  document.addEventListener('DOMContentLoaded', function(){
+    var $front_back_container = document.querySelector('#f1_container'),
+        $flip_to_back         = document.querySelector('.flip-to-back');
+
+    if ($flip_to_back) {
+      $flip_to_back.addEventListener(eventToBindTo, function(event){
+        event.preventDefault();
+        addClass($front_back_container, 'flipped');
+      });
+    }
+
+    document.querySelector('.flip-to-front').addEventListener(eventToBindTo, function(event){
+      event.preventDefault();
+      removeClass($front_back_container, 'flipped');
+    });
+
+    var $forgot_password_form = document.querySelector('#forgot_password_form');
+    $forgot_password_form.addEventListener('submit', function(event){
+      var $button      = $forgot_password_form.querySelector('.request-password-button'),
+          originalText = $button.textContent,
+          uniqueId     = $forgot_password_form.querySelector('input[name="pseudonym_session[unique_id_forgot]"]').value.trim();
+      if (!uniqueId) return false;
+      $button.disabled = true;
+      $button.textContent = $button.getAttribute('data-text-while-loading')
+      event.preventDefault();
+      ajax({
+        type: "POST",
+        url: "/forgot_password",
+        data: 'authenticity_token=' +
+              encodeURIComponent($forgot_password_form.querySelector('input[name=authenticity_token]').value) +
+              '&pseudonym_session%5Bunique_id_forgot%5D=' +
+              encodeURIComponent(uniqueId),
+        success: function(response){
+          alert(ENV.RESET_SENT);
+        },
+        error: function(){
+          alert(ENV.RESET_ERROR);
+        },
+        complete: function(){
+          $button.textContent = originalText;
+        }
+      });
+    });
+  });
+
+  function addClass(element, name){
+    removeClass(element, name);
+    element.className += ' ' + name;
+  }
+
+  function removeClass(element, name){
+    regex = new RegExp('(^|\\s)' + name + '(\\s|$)');
+    element.className = element.className.replace(regex, '')
+  }
+
+  function ajax(options){
+    var xhr = new window.XMLHttpRequest();
+    options.headers = options.headers || {}
+    options.headers['X-Requested-With'] = 'XMLHttpRequest'
+    if (options.data && !options.contentType) options.contentType = 'application/x-www-form-urlencoded';
+    if (options.contentType) options.headers['Content-Type'] = options.contentType;
+
+    xhr.onreadystatechange = function(){
+      if (xhr.readyState == 4) {
+        var error = false;
+        if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 0) {
+          options.success && options.success.call(options.context, xhr.responseText, 'success', xhr);
+        } else {
+          error = true;
+          options.error && options.error.call(options.context, xhr, 'error');
+        }
+        options.complete && options.complete.call(options.context, xhr, error ? 'error' : 'success');
+      }
+    };
+
+    xhr.open(options.type, options.url, true);
+    for (name in options.headers) xhr.setRequestHeader(name, options.headers[name]);
+    xhr.send(options.data);
+    return xhr;
+  }
+</script>

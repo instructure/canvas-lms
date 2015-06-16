@@ -22,10 +22,9 @@ describe CommMessagesApiController, type: :request do
   describe "index" do
     context "a site admin" do
       context "with permission" do
-        before do
+        before :once do
           @test_user = user(:active_all => true)
           site_admin_user
-          user_session(@admin)
         end
 
         it "should be able to see all messages" do
@@ -34,19 +33,19 @@ describe CommMessagesApiController, type: :request do
           json = api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}", {
             :controller => 'comm_messages_api', :action => 'index', :format => 'json',
             :user_id => @test_user.to_param })
-          json.size.should eql 2
-          json.map {|m| m['body'] }.sort.should eql ['account message', 'site admin message']
+          expect(json.size).to eql 2
+          expect(json.map {|m| m['body'] }.sort).to eql ['account message', 'site admin message']
         end
 
         it "should require a valid user_id parameter" do
           raw_api_call(:get, "/api/v1/comm_messages", {
             :controller => 'comm_messages_api', :action => 'index', :format => 'json'})
-          response.code.should eql '404'
+          expect(response.code).to eql '404'
 
           raw_api_call(:get, "/api/v1/comm_messages?user_id=0", {
             :controller => 'comm_messages_api', :action => 'index', :format => 'json',
             :user_id => '0' })
-          response.code.should eql '404'
+          expect(response.code).to eql '404'
         end
 
         it "should use start_time and end_time parameters to limit results" do
@@ -75,17 +74,17 @@ describe CommMessagesApiController, type: :request do
           json = api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}&per_page=2", {
             :controller => 'comm_messages_api', :action => 'index', :format => 'json',
             :user_id => @test_user.to_param, :per_page => '2' })
-          json.size.should eql 2
+          expect(json.size).to eql 2
 
           json = api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}&per_page=2&page=2", {
             :controller => 'comm_messages_api', :action => 'index', :format => 'json',
             :user_id => @test_user.to_param, :per_page => '2', :page => '2' })
-          json.size.should eql 2
+          expect(json.size).to eql 2
 
           json = api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}&per_page=2&page=3", {
             :controller => 'comm_messages_api', :action => 'index', :format => 'json',
             :user_id => @test_user.to_param, :per_page => '2', :page => '3' })
-          json.size.should eql 1
+          expect(json.size).to eql 1
         end
 
       end
@@ -95,25 +94,23 @@ describe CommMessagesApiController, type: :request do
           @test_user = user(:active_all => true)
           account_admin_user_with_role_changes(:account => Account.site_admin,
                                                :role_changes => {:read_messages => false})
-          user_session(@admin)
         end
 
         it "should receive unauthorized" do
           raw_api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}", {
             :controller => 'comm_messages_api', :action => 'index', :format => 'json',
             :user_id => @test_user.to_param })
-          response.code.should eql '401'
+          expect(response.code).to eql '401'
         end
       end
     end
 
     context "an account admin" do
       context "with permission" do
-        before do
+        before :once do
           @test_user = user(:active_all => true)
           account_admin_user_with_role_changes(:account => Account.default,
                                                :role_changes => {:view_notifications => true})
-          user_session(@admin)
         end
 
         it "should receive unauthorized if account setting disabled" do
@@ -122,7 +119,7 @@ describe CommMessagesApiController, type: :request do
           raw_api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}", {
               :controller => 'comm_messages_api', :action => 'index', :format => 'json',
               :user_id => @test_user.to_param })
-          response.code.should eql '401'
+          expect(response.code).to eql '401'
         end
 
         it "should only be able to see associated account's messages" do
@@ -133,8 +130,8 @@ describe CommMessagesApiController, type: :request do
           json = api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}", {
             :controller => 'comm_messages_api', :action => 'index', :format => 'json',
             :user_id => @test_user.to_param })
-          json.size.should eql 1
-          json.map {|m| m['body'] }.sort.should eql ['account message']
+          expect(json.size).to eql 1
+          expect(json.map {|m| m['body'] }.sort).to eql ['account message']
         end
       end
 
@@ -143,14 +140,13 @@ describe CommMessagesApiController, type: :request do
           @test_user = user(:active_all => true)
           account_admin_user_with_role_changes(:account => Account.default,
                                                :role_changes => {:view_notifications => false})
-          user_session(@admin)
         end
 
         it "should receive unauthorized" do
           raw_api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}", {
             :controller => 'comm_messages_api', :action => 'index', :format => 'json',
             :user_id => @test_user.to_param })
-          response.code.should eql '401'
+          expect(response.code).to eql '401'
         end
       end
     end
@@ -159,14 +155,13 @@ describe CommMessagesApiController, type: :request do
       before do
         @test_user = user(:active_all => true)
         @user = user(:active_all => true)
-        user_session(@user)
       end
 
       it "should receive unauthorized" do
         raw_api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}", {
           :controller => 'comm_messages_api', :action => 'index', :format => 'json',
           :user_id => @test_user.to_param })
-        response.code.should eql '401'
+        expect(response.code).to eql '401'
       end
     end
 

@@ -1,0 +1,61 @@
+//
+// Scaffolding
+// --------------------------------------------------
+
+
+// Body reset
+// -------------------------
+
+body {
+  margin: 0;
+  font-family: $baseFontFamily;
+  font-size: $baseFontSize;
+  line-height: $baseLineHeight;
+  color: $ic-font-color-dark;
+  background-color: $bodyBackground;
+}
+
+
+// Links
+// -------------------------
+
+a {
+  color: $ic-link-color;
+  &:focus, &:hover { color: darken($ic-link-color, 10%); }
+
+  @if $use_high_contrast {
+    text-decoration: underline;
+    &:focus, &:hover { text-decoration: none; }
+    @include ic-focus-base;
+    &:focus { @include ic-focus-variant($color: $ic-link-color, $offset: -1px); }
+  }
+
+  @else { 
+    text-decoration: none;
+    &:focus, &:hover { text-decoration: underline; }
+  }
+
+}
+
+
+// Images
+// -------------------------
+
+// Rounded corners
+.img-rounded {
+  @include border-radius(6px);
+}
+
+// Add polaroid-esque trim
+.img-polaroid {
+  padding: 4px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0,0,0,.2);
+  @include box-shadow(0 1px 3px rgba(0,0,0,.1));
+}
+
+// Perfect circle
+.img-circle {
+  @include border-radius(500px); // crank the border-radius so it works with most reasonably sized images
+}

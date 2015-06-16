@@ -19,18 +19,18 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe LiveAssessments::ResultsController, type: :request do
-  let(:assessment_course) { course(active_all: true) }
-  let(:teacher) { assessment_course.teachers.first }
-  let(:student) { course_with_student(course: assessment_course).user }
-  let(:another_student) { course_with_student(course: assessment_course).user }
-  let(:outcome) do
+  let_once(:assessment_course) { course(active_all: true) }
+  let_once(:teacher) { assessment_course.teachers.first }
+  let_once(:student) { course_with_student(course: assessment_course).user }
+  let_once(:another_student) { course_with_student(course: assessment_course).user }
+  let_once(:outcome) do
     outcome = assessment_course.created_learning_outcomes.create!(:description => 'this is a test outcome', :short_description => 'test outcome')
     assessment_course.root_outcome_group.add_outcome(outcome)
     assessment_course.root_outcome_group.save!
     assessment_course.reload
     outcome
   end
-  let(:assessment) do
+  let_once(:assessment) do
     assessment = LiveAssessments::Assessment.create!(context: assessment_course, key: '2014-05-28-Outcome-1', title: 'an assessment')
     outcome.align(assessment, assessment_course, mastery_type: 'none', mastery_score: 0.6)
     assessment
@@ -56,15 +56,15 @@ describe LiveAssessments::ResultsController, type: :request do
       it "creates results" do
         create_results(result_hashes)
         data = json_parse
-        data['results'].count.should == 2
+        expect(data['results'].count).to eq 2
         results = data['results'].map { |r| result = LiveAssessments::Result.find(r['id']) }
         results.each do |r|
-          r.assessor.should == teacher
-          r.assessment.should == assessment
-          r.passed.should == true
-          r.assessed_at.to_i.should == assessed_at.to_i
+          expect(r.assessor).to eq teacher
+          expect(r.assessment).to eq assessment
+          expect(r.passed).to eq true
+          expect(r.assessed_at.to_i).to eq assessed_at.to_i
         end
-        results.map(&:user).should == [student, another_student]
+        expect(results.map(&:user)).to eq [student, another_student]
       end
 
       it 'generates submissions' do
@@ -101,14 +101,14 @@ describe LiveAssessments::ResultsController, type: :request do
         index_results({})
         data = json_parse
         results = data['results']
-        results.count.should == 2
+        expect(results.count).to eq 2
         results.each do |r|
-          r['links']['assessor'].should == teacher.id.to_s
-          r['links']['assessment'].should == assessment.id.to_s
-          r['passed'].should == true
-          Time.parse(r['assessed_at']).to_i.should == assessed_at.to_i
+          expect(r['links']['assessor']).to eq teacher.id.to_s
+          expect(r['links']['assessment']).to eq assessment.id.to_s
+          expect(r['passed']).to eq true
+          expect(Time.parse(r['assessed_at']).to_i).to eq assessed_at.to_i
         end
-        results.map{|h|h['links']['user']}.should == [student.id.to_s, another_student.id.to_s]
+        expect(results.map{|h|h['links']['user']}).to eq [student.id.to_s, another_student.id.to_s]
       end
 
       it 'filters the results by user' do
@@ -118,14 +118,14 @@ describe LiveAssessments::ResultsController, type: :request do
         index_results({user_id: another_student.id})
         data = json_parse
         results = data['results']
-        results.count.should == 1
+        expect(results.count).to eq 1
         results.each do |r|
-          r['links']['assessor'].should == teacher.id.to_s
-          r['links']['assessment'].should == assessment.id.to_s
-          r['passed'].should == true
-          Time.parse(r['assessed_at']).to_i.should == assessed_at.to_i
+          expect(r['links']['assessor']).to eq teacher.id.to_s
+          expect(r['links']['assessment']).to eq assessment.id.to_s
+          expect(r['passed']).to eq true
+          expect(Time.parse(r['assessed_at']).to_i).to eq assessed_at.to_i
         end
-        results.map{|h|h['links']['user']}.should == [another_student.id.to_s]
+        expect(results.map{|h|h['links']['user']}).to eq [another_student.id.to_s]
       end
     end
 

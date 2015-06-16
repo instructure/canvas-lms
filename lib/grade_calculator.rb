@@ -22,13 +22,19 @@ class GradeCalculator
   def initialize(user_ids, course, opts = {})
     opts = opts.reverse_merge(:ignore_muted => true)
 
-    @course = course.is_a?(Course) ?
-      @course = course :
-      @course = Course.find(course)
-    @course_id = @course.id
-    assignment_scope = AssignmentGroup.assignment_scope_for_grading(@course)
-    @groups = @course.assignment_groups.active.includes(assignment_scope)
-    @assignments = @groups.flat_map(&assignment_scope).select(&:graded?)
+    Rails.logger.info("GRADES: calc args: user_ids=#{user_ids.inspect}")
+    Rails.logger.info("GRADES: calc args: course=#{course.inspect}")
+    Rails.logger.info("GRADES: calc args: opts=#{opts.inspect}")
+
+    @course = course.is_a?(Course) ? course : Course.find(course)
+    @groups = @course.assignment_groups.active
+    @grading_period = opts[:grading_period]
+
+    assignment_scope = @course.assignments.published.gradeable
+    @assignments = @grading_period ?
+                     @grading_period.assignments(assignment_scope) :
+                     assignment_scope.all
+
     @user_ids = Array(user_ids).map(&:to_i)
     @current_updates = {}
     @final_updates = {}
@@ -49,14 +55,25 @@ class GradeCalculator
     @submissions = @course.submissions.
         except(:order, :select).
         for_user(@user_ids).
+        where(assignment_id: @assignments.map(&:id)).
         select("submissions.id, user_id, assignment_id, score")
     submissions_by_user = @submissions.group_by(&:user_id)
-    @user_ids.map do |user_id|
-      user_submissions = submissions_by_user[user_id] || []
-      current, current_groups = calculate_current_score(user_id, user_submissions)
-      final, final_groups = calculate_final_score(user_id, user_submissions)
-      [[current, current_groups], [final, final_groups]]
+
+    scores = []
+    @user_ids.each_slice(100) do |batched_ids|
+      load_assignment_visibilities_for_users(batched_ids)
+      batched_ids.each do |user_id|
+        user_submissions = submissions_by_user[user_id] || []
+        if differentiated_assignments_on?
+          user_submissions.select!{|s| assignment_ids_visible_to_user(user_id).include?(s.assignment_id)}
+        end
+        current, current_groups = calculate_current_score(user_id, user_submissions)
+        final, final_groups = calculate_final_score(user_id, user_submissions)
+        scores << [[current, current_groups], [final, final_groups]]
+      end
+      clear_assignment_visibilities_cache
     end
+    scores
   end
 
   def compute_and_save_scores
@@ -65,6 +82,10 @@ class GradeCalculator
   end
 
   private
+
+  def differentiated_assignments_on?
+    @differentiated_assignments_enabled ||= @course.feature_enabled?(:differentiated_assignments)
+  end
 
   def save_scores
     raise "Can't save scores when ignore_muted is false" unless @ignore_muted
@@ -89,8 +110,9 @@ class GradeCalculator
   end
 
   def calculate_score(submissions, user_id, grade_updates, ignore_ungraded)
-    group_sums = create_group_sums(submissions, ignore_ungraded)
+    group_sums = create_group_sums(submissions, user_id, ignore_ungraded)
     info = calculate_total_from_group_scores(group_sums)
+    Rails.logger.info "GRADES: calculated: #{info.inspect}"
     grade_updates[user_id] = info[:grade]
     [info, group_sums.index_by { |s| s[:id] }]
   end
@@ -105,8 +127,12 @@ class GradeCalculator
   #    :weight   => 50},
   #   ...]
   # each group
-  def create_group_sums(submissions, ignore_ungraded=true)
-    assignments_by_group_id = @assignments.group_by(&:assignment_group_id)
+  def create_group_sums(submissions, user_id, ignore_ungraded=true)
+    visible_assignments = @assignments
+    if differentiated_assignments_on?
+      visible_assignments = visible_assignments.select{|a| assignment_ids_visible_to_user(user_id).include?(a.id)}
+    end
+    assignments_by_group_id = visible_assignments.group_by(&:assignment_group_id)
     submissions_by_assignment_id = Hash[
       submissions.map { |s| [s.assignment_id, s] }
     ]
@@ -130,6 +156,11 @@ class GradeCalculator
       group_submissions.reject! { |s| s[:score].nil? } if ignore_ungraded
       group_submissions.each { |s| s[:score] ||= 0 }
 
+      logged_submissions = group_submissions.map { |s| loggable_submission(s) }
+      Rails.logger.info "GRADES: calculating for assignment_group=#{group.global_id} user=#{user_id}"
+      Rails.logger.info "GRADES: calculating... ignore_ungraded=#{ignore_ungraded}"
+      Rails.logger.info "GRADES: calculating... submissions=#{logged_submissions.inspect}"
+
       kept = drop_assignments(group_submissions, group.rules_hash)
 
       score, possible = kept.reduce([0, 0]) { |(s_sum,p_sum),s|
@@ -142,8 +173,29 @@ class GradeCalculator
         :possible => possible,
         :weight   => group.group_weight,
         :grade    => ((score.to_f / possible * 100).round(2) if possible > 0),
+      }.tap { |group_grade_info|
+        Rails.logger.info "GRADES: calculated #{group_grade_info.inspect}"
       }
     end
+  end
+
+  def load_assignment_visibilities_for_users(user_ids)
+    @assignment_ids_visible_to_user ||= begin
+      if differentiated_assignments_on?
+        AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(course_id: @course.id, user_id: user_ids)
+      else
+        assignment_ids = @assignments.map(&:id)
+        user_ids.reduce({}){|hash, id| hash[id] = assignment_ids; hash}
+      end
+    end
+  end
+
+  def clear_assignment_visibilities_cache
+    @assignment_ids_visible_to_user = nil
+  end
+
+  def assignment_ids_visible_to_user(user_id)
+    @assignment_ids_visible_to_user[user_id]
   end
 
   # see comments for dropAssignments in grade_calculator.coffee
@@ -152,6 +204,8 @@ class GradeCalculator
     drop_highest   = rules[:drop_highest] || 0
     never_drop_ids = rules[:never_drop] || []
     return submissions if drop_lowest.zero? && drop_highest.zero?
+
+    Rails.logger.info "GRADES: dropping assignments! #{rules.inspect}"
 
     cant_drop = []
     if never_drop_ids.present?
@@ -177,7 +231,10 @@ class GradeCalculator
       drop_pointed(submissions, cant_drop, keep_highest, keep_lowest) :
       drop_unpointed(submissions, keep_highest, keep_lowest)
 
-    kept + cant_drop
+    (kept + cant_drop).tap do |all_kept|
+      loggable_kept = all_kept.map { |s| loggable_submission(s) }
+      Rails.logger.info "GRADES.calculating... kept=#{loggable_kept.inspect}"
+    end
   end
 
   def drop_unpointed(submissions, keep_highest, keep_lowest)
@@ -295,7 +352,7 @@ class GradeCalculator
         final_grade *= 100.0 / full_weight
       end
 
-      {:grade => final_grade.try(:round, 1)}
+      {:grade => final_grade.try(:round, 2)}
     else
       total, possible = group_sums.reduce([0,0]) { |(m,n),gs|
         [m + gs[:score], n + gs[:possible]]
@@ -303,7 +360,7 @@ class GradeCalculator
       if possible > 0
         final_grade = (total.to_f / possible) * 100
         {
-          :grade => final_grade.round(1),
+          :grade => final_grade.round(2),
           :total => total.to_f,
           :possible => possible,
         }
@@ -311,5 +368,14 @@ class GradeCalculator
         {:grade => nil, :total => total.to_f}
       end
     end
+  end
+
+  # this takes a wrapped submission (like from create_group_sums)
+  def loggable_submission(wrapped_submission)
+    {
+      assignment_id: wrapped_submission[:assignment].id,
+      score: wrapped_submission[:score],
+      total: wrapped_submission[:total],
+    }
   end
 end

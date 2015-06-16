@@ -115,6 +115,20 @@ h2 .defined-in {
 .method_details h4 {
 }
 
+table {
+  border: 1px solid gray;
+  border-collapse: collapse;
+}
+
+table th {
+  background-color: #DDD;
+}
+
+table th, table td {
+  border: 1px inset gray;
+  padding: 4px;
+}
+
 table.sis_csv {
 	border: 2px solid gray;
 	border-collapse: collapse;

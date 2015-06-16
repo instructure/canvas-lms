@@ -18,11 +18,7 @@
 
 module Polling
   class PollChoice < ActiveRecord::Base
-    if CANVAS_RAILS2
-      set_table_name 'polling_poll_choices'
-    else
-      self.table_name = 'polling_poll_choices'
-    end
+    self.table_name = 'polling_poll_choices'
 
     attr_accessible :text, :poll, :is_correct, :position
 

@@ -39,8 +39,12 @@ module Api::V1::CalendarEvent
     participant = nil
 
     hash = api_json(event, user, session, :only => %w(id created_at updated_at start_at end_at all_day all_day_date title location_address location_name workflow_state))
-    hash['title'] += " (#{context.name})" if event.context_type == "CourseSection"
-    hash['description'] = api_user_content(event.description, context)
+    if event.context_type == "CourseSection"
+      hash['title'] += " (#{context.name})"
+      hash['description'] = api_user_content(event.description, event.context.course)
+    else
+      hash['description'] = api_user_content(event.description, context)
+    end
 
     appointment_group = options[:appointment_group]
     appointment_group ||= AppointmentGroup.find(options[:appointment_group_id]) if options[:appointment_group_id]
@@ -105,7 +109,7 @@ module Api::V1::CalendarEvent
         events = can_read_child_events ? event.child_events.to_a : event.child_events_for(participant)
 
         # do some preloads
-        CalendarEvent.send(:preload_associations, events, :context)
+        ActiveRecord::Associations::Preloader.new(events, :context).run
         if events.first.context.is_a?(User) && user_json_is_admin?(@context, user)
           user_json_preloads(events.map(&:context))
         end
@@ -167,7 +171,7 @@ module Api::V1::CalendarEvent
     if include.include?('appointments')
       if include.include?('child_events')
         all_child_events = group.appointments.map(&:child_events).flatten
-        CalendarEvent.send(:preload_associations, all_child_events, :context)
+        ActiveRecord::Associations::Preloader.new(all_child_events, :context).run
         user_json_preloads(all_child_events.map(&:context)) if !all_child_events.empty? && all_child_events.first.context.is_a?(User) && user_json_is_admin?(@context, user)
       end
       hash['appointments'] = group.appointments.map { |event| calendar_event_json(event, user, session,
@@ -186,4 +190,3 @@ module Api::V1::CalendarEvent
     @context = orig_context
   end
 end
-

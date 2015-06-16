@@ -20,6 +20,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 shared_examples_for 'Takeable Quiz Services' do
+
   it 'should deny access to locked quizzes' do
     quiz.stubs(:locked?).returns true
 
@@ -100,7 +101,7 @@ describe Quizzes::QuizSubmissionService do
         end
 
         it 'should regenerate when possible' do
-          participant.stubs(:find_quiz_submission).returns { retriable_qs }
+          Quizzes::QuizSubmission.expects(:for_participant).with(participant).returns { stub(first: retriable_qs) }
 
           expect do
             subject.create quiz
@@ -108,7 +109,7 @@ describe Quizzes::QuizSubmissionService do
         end
 
         it 'should not regenerate if the QS is not retriable' do
-          participant.stubs(:find_quiz_submission).returns { unretriable_qs }
+          Quizzes::QuizSubmission.expects(:for_participant).with(participant).returns { stub(first: unretriable_qs) }
 
           expect do
             subject.create quiz

@@ -67,7 +67,15 @@ class Announcement < DiscussionTopic
     whenever { |record|
       record.context.available? and
         !record.context.concluded? and
-      ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, record.draft_state_enabled? ? :unpublished : :post_delayed))
+        ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, :unpublished) || record.changed_state(:active, :post_delayed))
+    }
+
+    dispatch :announcement_created_by_you
+    to { user }
+    whenever { |record|
+      record.context.available? and
+        !record.context.concluded? and
+        ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, :unpublished) || record.changed_state(:active, :post_delayed))
     }
   end
 
@@ -78,10 +86,20 @@ class Announcement < DiscussionTopic
     given { |user| self.user.present? && self.user == user && self.discussion_entries.active.empty? }
     can :delete
 
+    given do |user|
+      self.grants_right?(user, :read) &&
+       (self.context.is_a?(Group) ||
+        (user &&
+         (self.context.grants_right?(user, :read_as_admin) ||
+          (self.context.is_a?(Course) &&
+           self.context.includes_user?(user)))))
+    end
+    can :read_replies
+
     given { |user, session| self.context.grants_right?(user, session, :read) }
     can :read
 
-    given { |user, session| self.context.grants_right?(user, session, :post_to_forum) }
+    given { |user, session| self.context.grants_right?(user, session, :post_to_forum) && !self.locked?}
     can :reply
 
     given { |user, session| self.context.is_a?(Group) && self.context.grants_right?(user, session, :post_to_forum) }
@@ -102,11 +120,7 @@ class Announcement < DiscussionTopic
     :topic_is_announcement
   end
 
-  def can_unpublish?
-    false
-  end
-
-  def draft_state_enabled?
+  def can_unpublish?(opts=nil)
     false
   end
 

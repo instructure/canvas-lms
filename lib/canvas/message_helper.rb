@@ -22,7 +22,7 @@ module Canvas::MessageHelper
   end
 
   def self.add_message_path(path)
-    if File.exists?(path) && File.directory?(path)
+    if File.exist?(path) && File.directory?(path)
       @message_paths ||= []
       @message_paths << path
     end
@@ -33,7 +33,7 @@ module Canvas::MessageHelper
     if @message_paths
       @message_paths.each do |mp|
         test_path = File.join(mp, filename)
-        if File.exists?(test_path)
+        if File.exist?(test_path)
           path = test_path
           break
         end
@@ -77,7 +77,7 @@ module Canvas::MessageHelper
       using[:name] ||= split_txt[0]
     end
     raise 'Name is required' unless using[:name]
-    n = Notification.find_or_initialize_by_name(using[:name])
+    n = Notification.where(name: using[:name]).first_or_initialize
     begin
       n.update_attributes(:delay_for => using[:delay_for], :category => using[:category])
     rescue => e

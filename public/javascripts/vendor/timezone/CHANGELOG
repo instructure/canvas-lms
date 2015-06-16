@@ -1,3 +1,77 @@
+- Version 0.0.40.
+
+Fri Feb  6 14:40:10 UTC 2015
+
+ * Upgrade TZ Database to `tz2015a`. #230.
+
+- Version 0.0.39.
+
+Fri Feb  6 13:23:08 UTC 2015
+
+ * Upgrade TZ Database to `tz2014j`. #227.
+
+- Version 0.0.38.
+
+Mon Nov  3 13:40:31 UTC 2014
+
+ * Cannot find module `timezone/loaded`. #223.
+
+- Version 0.0.37.
+
+Thu Oct 30 23:24:49 UTC 2014
+
+ * Upgrade TZ Database to `tz2014i`. #221.
+
+- Version 0.0.36.
+
+Thu Oct 30 22:31:20 UTC 2014
+
+ * Upgrade TZ Database to `tz2014h`. #218.
+
+- Version 0.0.35.
+
+Sun Oct 26 03:17:59 UTC 2014
+
+ * Upgrade TZ Database to `tz2014g`. #217.
+
+- Verison 0.0.34.
+
+Thu Aug  7 01:55:45 UTC 2014
+
+ * Upgrade TZ Database to `tz2014f`. #215.
+
+- Verison 0.0.33.
+
+Fri Jun 27 16:21:08 UTC 2014
+
+ * Upgrade TZ Database to `tz2014e`. #213.
+
+- Verison 0.0.32.
+
+Mon Jun  2 06:34:24 UTC 2014
+
+ * Upgrade TZ Database to `tz2014d`. #211.
+
+- Verison 0.0.31.
+
+Sun Jun  1 21:14:47 UTC 2014
+
+ * Upgrade TZ database to `2014b`. #209.
+ * Upgrade Proof to 0.0.45. #208.
+
+- Verison 0.0.30.
+
+Fri Mar 28 02:32:38 UTC 2014
+
+ * Upgrade TZ database to `2014b`. #206.
+ * Upgrade Proof to 0.0.44. #205.
+
+- Version 0.0.29.
+
+Sun Mar 16 04:47:13 UTC 2014
+
+ * Upgrade to 2014a. #202.
+
 - Version 0.0.28.
 
 Wed Feb 12 18:53:25 UTC 2014

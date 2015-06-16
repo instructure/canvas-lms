@@ -16,14 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
+
 class ConversationMessage < ActiveRecord::Base
   include HtmlTextHelper
 
-  if CANVAS_RAILS2
-    include ActionController::UrlWriter
-  else
-    include Rails.application.routes.url_helpers
-  end
+  include Rails.application.routes.url_helpers
   include SendToStream
   include SimpleTags::ReaderInstanceMethods
 
@@ -84,11 +82,11 @@ class ConversationMessage < ActiveRecord::Base
       Shackles.activate(:slave) do
         ret = where(base_conditions).
           joins('JOIN conversation_message_participants ON conversation_messages.id = conversation_message_id').
-          distinct_on(['conversation_id', 'user_id'],
-            :select => "conversation_messages.*, conversation_participant_id, conversation_message_participants.user_id, conversation_message_participants.tags",
-            :order => 'conversation_id DESC, user_id DESC, created_at DESC')
-        map = Hash[ret.map{ |m| [[m.conversation_id, m.user_id.to_i], m]}]
-        backmap = Hash[ret.map{ |m| [m.conversation_participant_id.to_i, m]}]
+          select("conversation_messages.*, conversation_participant_id, conversation_message_participants.user_id, conversation_message_participants.tags").
+          order('conversation_id DESC, user_id DESC, created_at DESC').
+          distinct_on(:conversation_id, :user_id).to_a
+        map = Hash[ret.map{ |m| [[m.conversation_id, m.user_id], m]}]
+        backmap = Hash[ret.map{ |m| [m.conversation_participant_id, m]}]
         if author
           shard_participants.each{ |cp| cp.last_authored_message = map[[cp.conversation_id, cp.user_id]] || backmap[cp.id] }
         else
@@ -109,6 +107,10 @@ class ConversationMessage < ActiveRecord::Base
     p.dispatch :added_to_conversation
     p.to { self.new_recipients }
     p.whenever {|record| (record.just_created || @re_send_message) && record.generated && record.event_data[:event_type] == :users_added}
+
+    p.dispatch :conversation_created
+    p.to { [self.author] }
+    p.whenever {|record| record.cc_author && ((record.just_created || @re_send_message) && !record.generated && !record.submission)}
   end
 
   on_create_send_to_streams do
@@ -147,7 +149,7 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def attachment_ids=(ids)
-    self.attachments = author.conversation_attachments_folder.attachments.find_all_by_id(ids.map(&:to_i))
+    self.attachments = author.conversation_attachments_folder.attachments.where(id: ids.map(&:to_i)).to_a
     write_attribute(:attachment_ids, attachments.map(&:id).join(','))
   end
 
@@ -226,7 +228,7 @@ class ConversationMessage < ActiveRecord::Base
   def format_event_message
     case event_data[:event_type]
     when :users_added
-      user_names = User.find_all_by_id(event_data[:user_ids], :order => "id").map(&:short_name)
+      user_names = User.where(id: event_data[:user_ids]).order(:id).select([:name, :short_name]).map(&:short_name)
       EventFormatter.users_added(author.short_name, user_names)
     end
   end
@@ -246,6 +248,9 @@ class ConversationMessage < ActiveRecord::Base
       recipient.user_notes.create(:creator => author, :title => title, :note => note)
     end
   end
+
+
+  attr_accessor :cc_author
 
   def author_short_name_with_shared_contexts(recipient)
     if conversation.context
@@ -282,7 +287,7 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def forwarded_messages
-    @forwarded_messages ||= forwarded_message_ids && self.class.send(:with_exclusive_scope){ self.class.find_all_by_id(forwarded_message_ids.split(','), :order => 'created_at DESC')} || []
+    @forwarded_messages ||= forwarded_message_ids && self.class.send(:with_exclusive_scope){ self.class.where(id: forwarded_message_ids.split(',')).order('created_at DESC').to_a} || []
   end
 
   def all_forwarded_messages

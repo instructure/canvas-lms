@@ -30,7 +30,7 @@ module Importers
         q['assessment_question_id'] = existing_question.id if existing_question
       end
 
-      default_bank = migration.question_bank_id ? migration.context.assessment_question_banks.find_by_id(migration.question_bank_id) : nil
+      default_bank = migration.context.assessment_question_banks.where(id: migration.question_bank_id).first if migration.question_bank_id
       migration.question_bank_name = default_bank.title if default_bank
       default_title = migration.question_bank_name || AssessmentQuestionBank.default_imported_title
 
@@ -42,6 +42,9 @@ module Importers
 
         bank_mig_id = question[:question_bank_migration_id] || CC::CCHelper.create_key(default_title, 'assessment_question_bank')
         next unless migration.import_object?("assessment_question_banks", bank_mig_id)
+
+        # for canvas imports/copies, don't auto generate banks for quizzes
+        next if question['is_quiz_question_bank'] && (migration.for_course_copy? || (migration.migration_type == 'canvas_cartridge_importer'))
 
         question_bank = bank_map[bank_mig_id]
 
@@ -90,7 +93,13 @@ module Importers
       self.prep_for_import(hash, context, migration)
 
       missing_links = hash.delete(:missing_links) || {}
-      import_warnings = hash.delete(:import_warnings)
+      import_warnings = hash.delete(:import_warnings) || []
+      if error = hash.delete(:import_error)
+        import_warnings << error
+      end
+      if error = hash.delete(:qti_error)
+        import_warnings << error
+      end
 
       if id = hash['assessment_question_id']
         AssessmentQuestion.where(id: id).update_all(name: hash[:question_name], question_data: hash.to_yaml,
@@ -128,7 +137,11 @@ module Importers
       hash[:missing_links] = {}
       [:question_text, :correct_comments_html, :incorrect_comments_html, :neutral_comments_html, :more_comments_html].each do |field|
         hash[:missing_links][field] = []
-        hash[field] = ImportedHtmlConverter.convert(hash[field], context, migration, {:missing_links => hash[:missing_links][field], :remove_outer_nodes_if_one_child => true}) if hash[field].present?
+        if hash[field].present?
+          hash[field] = ImportedHtmlConverter.convert(hash[field], context, migration, {:remove_outer_nodes_if_one_child => true}) do |warn, link|
+            hash[:missing_links][field] << link if warn == :missing_link
+          end
+        end
       end
       [:correct_comments, :incorrect_comments, :neutral_comments, :more_comments].each do |field|
         html_field = "#{field}_html".to_sym
@@ -138,8 +151,13 @@ module Importers
       end
       hash[:answers].each_with_index do |answer, i|
         [:html, :comments_html, :left_html].each do |field|
-          hash[:missing_links]["answer #{i} #{field}"] = []
-          answer[field] = ImportedHtmlConverter.convert(answer[field], context, migration, {:missing_links => hash[:missing_links]["answer #{i} #{field}"], :remove_outer_nodes_if_one_child => true}) if answer[field].present?
+          key = "answer #{i} #{field}"
+          hash[:missing_links][key] = []
+          if answer[field].present?
+            answer[field] = ImportedHtmlConverter.convert(answer[field], context, migration, {:remove_outer_nodes_if_one_child => true}) do |warn, link|
+              hash[:missing_links][key] << link if warn == :missing_link
+            end
+          end
         end
         if answer[:comments].present? && answer[:comments] == answer[:comments_html]
           answer.delete(:comments_html)

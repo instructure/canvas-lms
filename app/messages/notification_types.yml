@@ -17,6 +17,12 @@
     - name: Added To Conversation
       delay_for: 0
 
+- category: Conversation Created
+  notifications:
+    - name: Conversation Created
+      delay_for: 0
+
+
 - category: Alert
   notifications:
     - name: Alert
@@ -34,6 +40,13 @@
 - category: Announcement
   notifications:
     - name: New Announcement
+      delay_for: 0
+
+- category: Announcement Created By You
+  notifications:
+    - name: Announcement Created By You
+      delay_for: 0
+    - name: Announcement Reply
       delay_for: 0
 
 - category: Appointment Availability
@@ -141,6 +154,8 @@
       delay_for: 0
     - name: Rubric Association Created
       delay_for: 0
+    - name: Peer Review Invitation
+      delay_for: 0
 
 - category: Late Grading
   notifications:
@@ -184,8 +199,6 @@
     - name: Report Generation Failed
       delay_for: 0
     - name: New User
-      delay_for: 0
-    - name: New Teacher Registration
       delay_for: 0
     - name: New Student Organized Group
       delay_for: 0
@@ -232,4 +245,9 @@
 - category: Summaries
   notifications:
     - name: Summaries
+      delay_for: 0
+
+- category: Recording Ready
+  notifications:
+    - name: Web Conference Recording Ready
       delay_for: 0

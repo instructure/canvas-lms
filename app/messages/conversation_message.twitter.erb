@@ -1,4 +1,4 @@
 <% define_content :link do -%>
-<%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/conversations/<%= asset.conversation_id %>
+  <%= conversation_url(asset.conversation_id) %>
 <% end -%>
 <%= t :tweet, "Canvas Alert - Message from %{user_name}.", :user_name => content(:user_name) %>

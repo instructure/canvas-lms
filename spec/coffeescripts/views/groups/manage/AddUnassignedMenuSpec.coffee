@@ -45,13 +45,14 @@ define [
         new GroupUser(id: 3, name: "John Scalzi", sortable_name: "Scalzi, John"),
         waldo
       ])
-      view.$el.appendTo($(document.body))
+      view.$el.appendTo($("#fixtures"))
 
     teardown: ->
       fakeENV.teardown()
       clock.restore()
       server.restore()
       view.remove()
+      document.getElementById("fixtures").innerHTML = ""
 
   test "updates the user's group and removes from unassigned collection", ->
     equal waldo.get('group'), null

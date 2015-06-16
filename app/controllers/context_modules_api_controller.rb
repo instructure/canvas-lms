@@ -337,11 +337,11 @@ class ContextModulesApiController < ApplicationController
   #      details with module items specific to their associated content items.
   #      Includes standard lock information for each item.
   #
-  # @argument search_term [Optional, String]
+  # @argument search_term [String]
   #   The partial name of the modules (and module items, if include['items'] is
   #   specified) to match and return.
   #
-  # @argument student_id [Optional]
+  # @argument student_id
   #   Returns module completion information for the student with this id.
   #
   # @example_request
@@ -358,7 +358,7 @@ class ContextModulesApiController < ApplicationController
       scope = ContextModule.search_by_attribute(scope, :name, params[:search_term]) unless includes.include?('items')
       modules = Api.paginate(scope, self, route)
 
-      ContextModule.send(:preload_associations, modules, {:content_tags => :content}) if includes.include?('items')
+      ActiveRecord::Associations::Preloader.new(modules, content_tags: :content) if includes.include?('items')
 
       if @student
         modules_and_progressions = modules.map { |m| [m, m.evaluate_for(@student)] }
@@ -370,6 +370,20 @@ class ContextModulesApiController < ApplicationController
         SearchTermHelper.validate_search_term(params[:search_term])
         opts[:search_term] = params[:search_term]
       end
+
+      if @context.feature_enabled?(:differentiated_assignments) && includes.include?('items')
+        user_ids = (@student || @current_user).id
+
+        if @context.user_has_been_observer?(@student || @current_user)
+          opts[:observed_student_ids] = ObserverEnrollment.observed_student_ids(self.context, (@student || @current_user) )
+          user_ids.concat(opts[:observed_student_ids])
+        end
+
+        opts[:assignment_visibilities] = AssignmentStudentVisibility.visible_assignment_ids_for_user(user_ids, @context.id)
+        opts[:discussion_visibilities] = DiscussionTopic.visible_to_students_in_course_with_da(user_ids, @context.id).pluck(:id)
+        opts[:quiz_visibilities] = Quizzes::Quiz.visible_to_students_in_course_with_da(user_ids,@context.id).pluck(:quiz_id)
+      end
+
       render :json => modules_and_progressions.map { |mod, prog| module_json(mod, @student || @current_user, session, prog, includes, opts) }.compact
     end
   end
@@ -391,7 +405,7 @@ class ContextModulesApiController < ApplicationController
   #      details with module items specific to their associated content items.
   #      Includes standard lock information for each item.
   #
-  # @argument student_id [Optional]
+  # @argument student_id
   #   Returns module completion information for the student with this id.
   #
   # @example_request
@@ -403,7 +417,7 @@ class ContextModulesApiController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       mod = @context.modules_visible_to(@student || @current_user).find(params[:id])
       includes = Array(params[:include])
-      ContextModule.send(:preload_associations, mod, {:content_tags => :content}) if includes.include?('items')
+      ActiveRecord::Associations::Preloader.new(mod, content_tags: :content).run if includes.include?('items')
       prog = @student ? mod.evaluate_for(@student) : nil
       render :json => module_json(mod, @student || @current_user, session, prog, includes)
     end
@@ -413,10 +427,10 @@ class ContextModulesApiController < ApplicationController
   #
   # Update multiple modules in an account.
   #
-  # @argument module_ids[] [String]
+  # @argument module_ids[] [Required, String]
   #   List of ids of modules to update.
   #
-  # @argument event [String]
+  # @argument event [Required, String]
   #   The action to take on each module. Must be 'delete'.
   #
   # @response_field completed A list of IDs for modules that were updated.
@@ -441,7 +455,7 @@ class ContextModulesApiController < ApplicationController
       return render(:json => { :message => 'must specify module_ids[]' }, :status => :bad_request) unless params[:module_ids].present?
 
       module_ids = Api.map_non_sis_ids(Array(params[:module_ids]))
-      modules = @context.context_modules.not_deleted.find_all_by_id(module_ids)
+      modules = @context.context_modules.not_deleted.where(id: module_ids)
       return render(:json => { :message => 'no modules found' }, :status => :not_found) if modules.empty?
 
       completed_ids = []
@@ -468,24 +482,24 @@ class ContextModulesApiController < ApplicationController
   #
   # Create and return a new module
   #
-  # @argument module[name] [String]
+  # @argument module[name] [Required, String]
   #   The name of the module
   #
-  # @argument module[unlock_at] [Optional, DateTime]
+  # @argument module[unlock_at] [DateTime]
   #   The date the module will unlock
   #
-  # @argument module[position] [Optional, Integer]
+  # @argument module[position] [Integer]
   #   The position of this module in the course (1-based)
   #
-  # @argument module[require_sequential_progress] [Optional, Boolean]
+  # @argument module[require_sequential_progress] [Boolean]
   #   Whether module items must be unlocked in order
   #
-  # @argument module[prerequisite_module_ids][] [Optional, String]
+  # @argument module[prerequisite_module_ids][] [String]
   #   IDs of Modules that must be completed before this one is unlocked.
   #   Prerequisite modules must precede this module (i.e. have a lower position
   #   value), otherwise they will be ignored
   #
-  # @argument module[publish_final_grade] [Optional, Boolean]
+  # @argument module[publish_final_grade] [Boolean]
   #   Whether to publish the student's final grade for the course upon
   #   completion of this module.
   #
@@ -512,11 +526,7 @@ class ContextModulesApiController < ApplicationController
       if ids = params[:module][:prerequisite_module_ids]
         @module.prerequisites = ids.map{|id| "module_#{id}"}.join(',')
       end
-      if @context.feature_enabled?(:draft_state)
-        @module.workflow_state = 'unpublished'
-      else
-        @module.workflow_state = 'active'
-      end
+      @module.workflow_state = 'unpublished'
 
       if @module.save && set_position
         render :json => module_json(@module, @current_user, session, nil)
@@ -530,28 +540,28 @@ class ContextModulesApiController < ApplicationController
   #
   # Update and return an existing module
   #
-  # @argument module[name] [Optional, String]
+  # @argument module[name] [String]
   #   The name of the module
   #
-  # @argument module[unlock_at] [Optional, DateTime]
+  # @argument module[unlock_at] [DateTime]
   #   The date the module will unlock
   #
-  # @argument module[position] [Optional, Integer]
+  # @argument module[position] [Integer]
   #   The position of the module in the course (1-based)
   #
-  # @argument module[require_sequential_progress] [Optional, Boolean]
+  # @argument module[require_sequential_progress] [Boolean]
   #   Whether module items must be unlocked in order
   #
-  # @argument module[prerequisite_module_ids][] [Optional, String]
+  # @argument module[prerequisite_module_ids][] [String]
   #   IDs of Modules that must be completed before this one is unlocked
   #   Prerequisite modules must precede this module (i.e. have a lower position
   #   value), otherwise they will be ignored
   #
-  # @argument module[publish_final_grade] [Optional, Boolean]
+  # @argument module[publish_final_grade] [Boolean]
   #   Whether to publish the student's final grade for the course upon
   #   completion of this module.
   #
-  # @argument module[published] [Optional, Boolean]
+  # @argument module[published] [Boolean]
   #   Whether the module is published and visible to students
   #
   # @example_request
@@ -587,9 +597,12 @@ class ContextModulesApiController < ApplicationController
           @module.unpublish
         end
       end
+      relock_warning = @module.relock_warning?
 
       if @module.update_attributes(module_parameters) && set_position
-        render :json => module_json(@module, @current_user, session, nil)
+        json = module_json(@module, @current_user, session, nil)
+        json['relock_warning'] = true if relock_warning || @module.relock_warning?
+        render :json => json
       else
         render :json => @module.errors, :status => :bad_request
       end
@@ -615,6 +628,29 @@ class ContextModulesApiController < ApplicationController
     end
   end
 
+  # @API Re-lock module progressions
+  #
+  # Resets module progressions to their default locked state and
+  # recalculates them based on the current requirements.
+  #
+  # Adding progression requirements to an active course will not lock students
+  # out of modules they have already unlocked unless this action is called.
+  #
+  # @example_request
+  #
+  #     curl https://<canvas>/api/v1/courses/<course_id>/modules/<module_id>/relock \
+  #       -X PUT \
+  #       -H 'Authorization: Bearer <token>'
+  #
+  # @returns Module
+  def relock
+    @module = @context.context_modules.not_deleted.find(params[:id])
+    if authorized_action(@module, @current_user, :update)
+      @module.relock_progressions
+      render :json => module_json(@module, @current_user, session, nil)
+    end
+  end
+
   def set_position
     return true unless @module && params[:module][:position]
 
@@ -635,7 +671,7 @@ class ContextModulesApiController < ApplicationController
   def find_student
     if params[:student_id]
       student_enrollments = @context.student_enrollments.for_user(params[:student_id])
-      return render_unauthorized_action unless student_enrollments.any?{|e| e.grants_right?(@current_user, session, :read)}
+      return render_unauthorized_action unless student_enrollments.any?{|e| e.grants_right?(@current_user, session, :read_grades)}
       @student = student_enrollments.first.user
     elsif @context.grants_right?(@current_user, session, :participate_as_student)
       @student = @current_user

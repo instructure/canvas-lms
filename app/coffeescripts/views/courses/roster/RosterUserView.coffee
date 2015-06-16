@@ -104,7 +104,7 @@ define [
       failure = =>
         @$el.show()
         $.flashError I18n.t('flash.removeError', 'Unable to remove the user. Please try again later.')
-      deferreds = _.map @model.allEnrollmentsByRole(@model.currentRole), (e) ->
+      deferreds = _.map @model.get('enrollments'), (e) ->
         $.ajaxJSON "#{ENV.COURSE_ROOT_URL}/unenroll/#{e.id}", 'DELETE'
       $.when(deferreds...).then success, failure
 

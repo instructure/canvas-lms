@@ -26,6 +26,9 @@ module CC::Importer::Standard
           resource_dir = File.dirname(path) if path
           
           asmnt = {:migration_id => res[:migration_id]}.with_indifferent_access
+          if res[:intended_user_role] == 'Instructor'
+            asmnt[:workflow_state] = 'unpublished'
+          end
           parse_cc_assignment_data(asmnt, doc, resource_dir)
 
           # FIXME check the XML namespace to make sure it's actually a canvas assignment
@@ -85,10 +88,13 @@ module CC::Importer::Standard
       assignment["migration_id"] ||= get_node_att(meta_doc, 'assignment', 'identifier') || meta_doc['identifier']
       assignment["assignment_group_migration_id"] = get_node_val(meta_doc, "assignment_group_identifierref")
       assignment["grading_standard_migration_id"] = get_node_val(meta_doc, "grading_standard_identifierref")
+      assignment["grading_standard_id"] = get_node_val(meta_doc, "grading_standard_external_identifier")
       assignment["rubric_migration_id"] = get_node_val(meta_doc, "rubric_identifierref")
       assignment["rubric_id"] = get_node_val(meta_doc, "rubric_external_identifier")
       assignment["quiz_migration_id"] = get_node_val(meta_doc, "quiz_identifierref")
       assignment["workflow_state"] = get_node_val(meta_doc, "workflow_state") if meta_doc.at_css("workflow_state")
+      assignment["external_tool_migration_id"] = get_node_val(meta_doc, "external_tool_identifierref") if meta_doc.at_css("external_tool_identifierref")
+      assignment["external_tool_id"] = get_node_val(meta_doc, "external_tool_external_identifier") if meta_doc.at_css("external_tool_external_identifier")
       if meta_doc.at_css("saved_rubric_comments comment")
         assignment[:saved_rubric_comments] = {}
         meta_doc.css("saved_rubric_comments comment").each do |comment_node|
@@ -100,7 +106,7 @@ module CC::Importer::Standard
         val = get_node_val(meta_doc, string_type)
         assignment[string_type] = val unless val.nil?
       end
-      ["turnitin_enabled", "peer_reviews_assigned", "peer_reviews",
+      ["turnitin_enabled", "peer_reviews",
        "automatic_peer_reviews", "anonymous_peer_reviews", "freeze_on_copy",
        "grade_group_students_individually", "external_tool_new_tab",
        "rubric_use_for_grading", "rubric_hide_score_total", "muted"].each do |bool_val|

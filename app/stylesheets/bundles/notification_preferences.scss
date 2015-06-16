@@ -1,0 +1,201 @@
+@import "base/environment";
+
+$stripeColor: #f3f4f8;
+
+/* normal table style overrides (make 6 tables look like one) */
+thead th {
+  background: #fff;
+}
+
+.table-bordered {
+  border-bottom: none;
+  border-radius: 0;
+  margin-bottom: 0;
+  thead {
+    tr:first-child th:first-child {
+      border-top-left-radius: 0 !important;
+    }
+    tr:first-child th:last-child {
+      border-top-right-radius: 0 !important;
+    }
+  }
+  tbody {
+    tr:last-child th {
+      border-bottom-left-radius: 0 !important;
+    }
+    tr:last-child td:last-child {
+      border-bottom-right-radius: 0 !important;
+    }
+  }
+}
+
+.table-bordered:first-of-type {
+  border-radius: 4px 4px 0 0;
+  thead {
+    tr:first-child th:first-child {
+      border-top-left-radius: 4px !important;
+    }
+    tr:first-child th:last-child {
+      border-top-right-radius: 4px !important;
+    }
+  }
+  .channel-name, .channel-addr {
+    text-indent: 0;
+  }
+}
+
+.table-bordered:last-of-type {
+  border-bottom: 1px solid #ddd;
+  border-radius: 0 0 4px 4px;
+  tbody {
+    tr:last-child th {
+      border-bottom-left-radius: 4px !important;
+    }
+    tr:last-child td:last-child {
+      border-bottom-right-radius: 4px !important;
+    }
+  }
+}
+
+.comm-channel {
+  min-width: 125px;
+}
+
+.channel-name, .channel-addr {
+  text-indent: -9999px;
+}
+
+/* Column striping */
+.table-columns-striped tr {
+  td:nth-child(2n),
+  th:nth-child(2n) {
+    background: none repeat scroll 0 0 $stripeColor;
+  }
+}
+
+.notification-table-wrapper {
+  @include transition(margin 0.3s ease);
+}
+
+@media screen and (max-width: 1300px) {
+  .notification-table-wrapper {
+    margin-right: 40px;
+  }
+}
+
+.notification-prefs-table {
+  .ui-button {
+    padding: 1px;
+  }
+  .ui-buttonset {
+    margin-right: 0;
+  }
+  .grouping > td:first-child {
+    min-width: 205px;
+  }
+  .group-name {
+    display: inline-block;
+    font-weight: bold;
+    margin-bottom: 0;
+    padding-top: 0.25em;
+    line-height: 1em;
+  }
+  .category-name {
+    font-size: 1.2em;
+    font-weight: normal;
+    vertical-align: middle;
+  }
+  tr:not(:first-child) .comm-channel > div {
+    display: none;
+  }
+  .comm-channel {
+    text-align: center;
+  }
+  .channel-addr {
+    font-weight: normal;
+    font-size: 0.8em;
+  }
+  .comm-event {
+    position: relative;
+    .row-title-cell {
+      position: relative;
+    }
+  }
+  td.comm-event-option {
+    text-align: left;
+    width: 110px;
+    min-width: 110px;
+    padding: 4px;
+    vertical-align: middle;
+    // By default, hide buttons and show selection text
+    .event-option-selection {
+      display: block;
+    }
+    .event-option-buttons {
+      float: left;
+    }
+    .comm-event-option-contents {
+      position: relative;
+      min-height: 22px;
+      .event-option-selection {
+        padding-top: 2px;
+        margin-left: 10px;
+        a {
+          &:hover, &:focus, &:active {
+            text-decoration: none;
+          }
+          color: $gray;
+        }
+      }
+      select {
+        opacity: 0;
+        outline: 0;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+      }
+    }
+  }
+  .user-preference {
+    margin-left: 1.1em;
+    label {
+      display: block;
+      font-size: 13px;
+    }
+  }
+  .no-touch & {
+    td.comm-event-option[data-selection='never'] .event-option-selection a.change-selection {
+      opacity: 0;
+      &:hover, &:focus {
+        opacity: 0.35;
+      }
+    }
+  }
+  .touch & {
+    td.comm-event-option .event-option-selection a.change-selection {
+      span.drop-arrow {
+        float: right;
+      }
+    }
+    td.comm-event-option[data-selection='never'] .event-option-selection a.change-selection span {
+      opacity: 0.35;
+    }
+  }
+}
+
+h2, .h2 {
+  position: relative;
+  #notifications_save_status {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+.weekly_notification_range {
+  color: gray;
+  font-style: italic;
+  padding-left: 1em;
+}

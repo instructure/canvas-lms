@@ -28,7 +28,7 @@
 </div>
 
 <%
-  count = "<span class='displaying' /><input type='text' name='alert[criteria][][threshold]' class='editing' size='2' />".html_safe
+  count = "%{count}" # we'll replace this with an input in js-land
   alert_data = {
     :DATA => @alerts,
     :POSSIBLE_RECIPIENTS_ORDER => [':student', ':teachers'],
@@ -58,9 +58,9 @@
       }
     }
   }
-  @role_types.each do |role|
-    alert_data[:POSSIBLE_RECIPIENTS_ORDER] << role[:name]
-    alert_data[:POSSIBLE_RECIPIENTS][role[:name]] = {:label => role[:label]}
+  (@account_roles || []).each do |role|
+    alert_data[:POSSIBLE_RECIPIENTS_ORDER] << role[:id]
+    alert_data[:POSSIBLE_RECIPIENTS][role[:id]] = {:label => role[:label]}
   end
   if @context.enable_user_notes
     alert_data[:POSSIBLE_CRITERIA_ORDER] << 'UserNote'

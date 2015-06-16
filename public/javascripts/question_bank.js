@@ -3,6 +3,7 @@ define([
   'jquery' /* $ */,
   'find_outcome',
   'jst/quiz/move_question',
+  'str/htmlEscape',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_forms' /* formSubmit, getFormData, formErrors */,
   'jqueryui/dialog',
@@ -11,7 +12,7 @@ define([
   'jquery.keycodes' /* keycodes */,
   'jquery.loadingImg' /* loadingImage */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */
-], function(I18n, $, find_outcome, moveQuestion) {
+], function(I18n, $, find_outcome, moveQuestionTemplate, htmlEscape) {
 
   var questionBankPage = {
     updateAlignments: function(alignments) {
@@ -24,7 +25,7 @@ define([
       if(alignments.length == 0) {
         params['assessment_question_bank[alignments]'] = '';
       }
-      var url = $(".edit_bank_link").attr('href');
+      var url = $(".edit_bank_link:last").attr('href');
       $.ajaxJSON(url, 'PUT', params, function(data) {
         var alignments = data.assessment_question_bank.learning_outcome_alignments.sort(function(a, b) {
           var a_name = ((a.content_tag && a.content_tag.learning_outcome && a.content_tag.learning_outcome.short_description) || 'none').toLowerCase();
@@ -215,7 +216,7 @@ define([
       var moveQuestions = {
         elements: {
           $dialog: $('#move_question_dialog'),
-          $loadMessage: $('<li />').append(I18n.t('load_questions', 'Loading Questions...')),
+          $loadMessage: $('<li />').append(htmlEscape(I18n.t('load_questions', 'Loading Questions...'))),
           $questions: $('#move_question_dialog .questions')
         },
         messages: {
@@ -261,9 +262,8 @@ define([
           $.ajaxJSON(window.location.href + '/questions?page=' + this.page, 'GET', {}, $.proxy(this.onData, this));
         },
         onData: function(data){
-          var questions = moveQuestion(data);
           this.elements.$loadMessage.remove();
-          this.elements.$questions.append(questions);
+          this.elements.$questions.append(moveQuestionTemplate(data));
           if (this.page < data.pages){
             this.elements.$questions.append(this.elements.$loadMessage);
             this.page += 1;

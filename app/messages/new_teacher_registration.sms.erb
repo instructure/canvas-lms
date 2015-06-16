@@ -1,1 +1,0 @@
-<%= t :body, "%{user} just registered as a teacher at %{website}.", :user => asset.name, :website => (HostUrl.context_host(asset.latest_pseudonym.account) rescue nil) || HostUrl.default_host %>

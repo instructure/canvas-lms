@@ -99,16 +99,16 @@ define [
       @attach()
       this
 
-    # Store all children views for easy access. 
-    #   ie: 
+    # Store all children views for easy access.
+    #   ie:
     #      @view.children # {@view1, @view2}
     #
     # @api private
-    
+
     storeChildrenViews: ->
       return unless @constructor.__childViews__
       @children = _.map @constructor.__childViews__, (viewObj) => @[viewObj.name]
-    
+
     ##
     # Sets the option properties
     #
@@ -249,6 +249,10 @@ define [
     #   <div data-bind="foo">{I will always mirror @model.get('foo') in here}</div>
     #
     # @api private
+
+    ###
+    xsslint safeString.method format
+    ###
 
     createBindings: (index, el) =>
       @$('[data-bind]').each (index, el) =>

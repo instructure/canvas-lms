@@ -23,20 +23,20 @@ describe 'UnifyActiveAssignmentWorkflowStates' do
   it "should update the right assignments" do
     course_with_teacher(:active_all => true)
     a1 = @course.assignments.create!(:name => 'hi')
-    a1.workflow_state.should == "published"
+    expect(a1.workflow_state).to eq "published"
 
     a2 = @course.assignments.create!(:name => 'hi')
     Assignment.where(:id => a2.id).update_all(:workflow_state => "available")
-    a2.reload.workflow_state.should == "available"
+    expect(a2.reload.workflow_state).to eq "available"
 
     a3 = @course.assignments.create!(:name => 'hi')
     a3.destroy
-    a3.workflow_state.should == "deleted"
+    expect(a3.workflow_state).to eq "deleted"
 
     UnifyActiveAssignmentWorkflowStates.up
 
-    a1.reload.workflow_state.should == "published"
-    a2.reload.workflow_state.should == "published"
-    a3.reload.workflow_state.should == "deleted"
+    expect(a1.reload.workflow_state).to eq "published"
+    expect(a2.reload.workflow_state).to eq "published"
+    expect(a3.reload.workflow_state).to eq "deleted"
   end
 end

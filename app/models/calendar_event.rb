@@ -16,7 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'atom'
 require 'date'
+require 'icalendar'
+
+Icalendar::Event.ical_property  :x_alt_desc
 
 class CalendarEvent < ActiveRecord::Base
   include CopyAuthorizedLinks
@@ -356,7 +360,7 @@ class CalendarEvent < ActiveRecord::Base
     dispatch :appointment_reserved_by_user
     to { appointment_group.instructors }
     whenever {
-      appointment_group && parent_event &&
+      user && appointment_group && parent_event &&
       just_created &&
       context == appointment_group.participant_for(user)
     }
@@ -552,11 +556,7 @@ class CalendarEvent < ActiveRecord::Base
 
   class IcalEvent
     include Api
-    if CANVAS_RAILS2
-      include ActionController::UrlWriter
-    else
-      include Rails.application.routes.url_helpers
-    end
+    include Rails.application.routes.url_helpers
     include HtmlTextHelper
 
     def initialize(event)
@@ -618,8 +618,8 @@ class CalendarEvent < ActiveRecord::Base
 
       # This will change when there are other things that have calendars...
       # can't call calendar_url or calendar_url_for here, have to do it manually
-      event.url           "http://#{HostUrl.context_host(@event.context)}/calendar?include_contexts=#{@event.context.asset_string}&month=#{start_at.try(:strftime, "%m")}&year=#{start_at.try(:strftime, "%Y")}##{tag_name}_#{@event.id.to_s}"
-      event.uid           "event-#{tag_name.gsub('_', '-')}-#{@event.id.to_s}"
+      event.url           "http://#{HostUrl.context_host(@event.context)}/calendar?include_contexts=#{@event.context.asset_string}&month=#{start_at.try(:strftime, "%m")}&year=#{start_at.try(:strftime, "%Y")}##{tag_name}_#{@event.id}"
+      event.uid           "event-#{tag_name.gsub('_', '-')}-#{@event.id}"
       event.sequence      0
 
       if @event.respond_to?(:applied_overrides)

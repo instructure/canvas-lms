@@ -50,7 +50,6 @@ class UnzipAttachment
     @logger ||= opts[:logger]
     @rename_files = !!opts[:rename_files]
     @migration_id_map = opts[:migration_id_map] || {}
-    @queue_scribd = !!opts[:queue_scribd]
 
     raise ArgumentError, "Must provide a context." unless self.context && self.context.is_a_context?
     raise ArgumentError, "Must provide a filename." unless self.filename
@@ -89,13 +88,13 @@ class UnzipAttachment
   # Tempfile will unlink its new file as soon as f is garbage collected.
   def process
 
+    Folder.reset_path_lookups!
     with_unzip_configuration do
       zip_stats.validate_against(context)
 
-      @attachments = []
       id_positions = {}
       path_positions = zip_stats.paths_with_positions(last_position)
-      Zip::File.open(self.filename).each_with_index do |entry, index|
+      CanvasUnzip.extract_archive(self.filename) do |entry, index|
         next if should_skip?(entry)
 
         folder_path_array = path_elements_for(@context_files_folder.full_name)
@@ -113,14 +112,15 @@ class UnzipAttachment
         # have to worry about what this name actually is.
         Tempfile.open(filename) do |f|
           begin
-            extract_entry(entry, f.path)
+            entry.extract(f.path, true) do |bytes|
+              zip_stats.charge_quota(bytes)
+            end
             # This is where the attachment actually happens.  See file_in_context.rb
             attachment = attach(f.path, entry, folder)
             id_positions[attachment.id] = path_positions[entry.name]
             if migration_id = @migration_id_map[entry.name]
               attachment.update_attribute(:migration_id, migration_id)
             end
-            @attachments << attachment if attachment
           rescue Attachment::OverQuotaError
             f.unlink
             raise
@@ -133,22 +133,8 @@ class UnzipAttachment
       update_attachment_positions(id_positions)
     end
 
-    queue_scribd_submissions(@attachments)
     @context.touch
     update_progress(1.0)
-  end
-
-  def extract_entry(entry, dest_path)
-    ::File.open(dest_path, "wb") do |os|
-      entry.get_input_stream do |is|
-        entry.set_extra_attributes_on_path(dest_path)
-        buf = ''
-        while buf = is.sysread(::Zip::Decompressor::CHUNK_SIZE, buf)
-          os << buf
-          zip_stats.charge_quota(buf.size)
-        end
-      end
-    end
   end
 
   def zip_stats
@@ -163,14 +149,6 @@ class UnzipAttachment
     if updates.any?
       sql = "UPDATE attachments SET position=CASE #{updates.join(" ")} ELSE position END WHERE id IN (#{id_positions.keys.join(",")})"
       Attachment.connection.execute(sql)
-    end
-  end
-
-  def queue_scribd_submissions(attachments)
-    return unless @queue_scribd
-    scribdable_ids = attachments.select(&:scribdable?).map(&:id)
-    if scribdable_ids.any?
-      Attachment.send_later_enqueue_args(:submit_to_scribd, { :strand => 'scribd', :max_attempts => 1 }, scribdable_ids)
     end
   end
 
@@ -227,7 +205,7 @@ class UnzipAttachment
     # For every directory in the path...
     # (-2 means all entries but the last, which should be a filename)
     list[0..-2].each do |dir|
-      if new_dir = current.sub_folders.find_by_name(dir)
+      if new_dir = current.sub_folders.where(name: dir).first
         current = new_dir
       else
         current = assert_folder(current, dir)
@@ -311,7 +289,7 @@ class ZipFileStats
 
   private
   def process!
-    Zip::File.open(filename).each do |entry|
+    CanvasUnzip::extract_archive(filename) do |entry|
       @file_count += 1
       @total_size += [entry.size, Attachment.minimum_size_for_quota].max
       @paths << entry.name

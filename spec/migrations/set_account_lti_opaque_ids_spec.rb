@@ -22,13 +22,14 @@ require 'lib/data_fixup/set_account_lti_opaque_ids.rb'
 describe 'DataFixup::SetAccountLtiOpaqueIds' do
   describe "up" do
     it "should work" do
-      root_account = Account.default
-      root_account.lti_guid.should == root_account.uuid
+      root_account = Account.create!
+      original_guid = root_account.lti_guid
+      expect(original_guid).not_to be_empty
 
       DataFixup::SetAccountLtiOpaqueIds.run
 
       root_account.reload
-      root_account.lti_guid.should_not == root_account.uuid
+      expect(root_account.lti_guid).not_to eq original_guid
     end
   end
 end

@@ -16,6 +16,7 @@ define [
     events: _.extend {},
       PopoverMenuView::events,
       'click .set-group': 'setGroup'
+      'focusin .focus-bound': "boundFocused"
 
     attach: ->
       @collection.on 'change add remove reset', @render
@@ -43,3 +44,13 @@ define [
 
     attachElement: ->
       $('body').append(@$el)
+
+    focus: ->
+      noGroupsToJoin = @collection.length <= 0 or @collection.models.every (g) -> g.isFull()
+      toFocus = if noGroupsToJoin then ".popover-content p" else "li a" #focus text if no groups, focus first group if groups
+      @$el.find(toFocus).first().focus()
+
+    boundFocused: ->
+      #force hide and pretend we pressed escape
+      @$el.detach()
+      @trigger("close", {"escapePressed": true })

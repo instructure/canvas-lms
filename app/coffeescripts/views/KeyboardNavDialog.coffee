@@ -16,8 +16,8 @@ define [
 
     # you're responsible for rendering the content via HB
     # and passing it in
-    render: (content) ->
-      @$el.html(content)
+    render: (html) ->
+      @$el.html(html)
       @
 
     bindOpenKeys: ->

@@ -60,7 +60,7 @@ define([
           .attr('href', action)
           .end()
         .find('.formatted_note')
-          .html(user_note.formatted_note)
+          .html($.raw(user_note.formatted_note))
           .end()
         .slideDown();
     },

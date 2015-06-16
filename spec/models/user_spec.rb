@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -34,44 +34,44 @@ describe User do
     @cc2.stubs(:path).returns('cc2')
     @user.stubs(:communication_channels).returns([@cc1, @cc2])
     @user.stubs(:communication_channel).returns(@cc1)
-    @user.communication_channel.should eql(@cc1)
+    expect(@user.communication_channel).to eql(@cc1)
   end
 
   it "should be able to assert a name" do
     @user = User.create
     @user.assert_name(nil)
-    @user.name.should eql('User')
+    expect(@user.name).to eql('User')
     @user.assert_name('david')
-    @user.name.should eql('david')
+    expect(@user.name).to eql('david')
     @user.assert_name('bill')
-    @user.name.should eql('bill')
+    expect(@user.name).to eql('bill')
     @user.assert_name(nil)
-    @user.name.should eql('bill')
+    expect(@user.name).to eql('bill')
     @user = User.find(@user)
-    @user.name.should eql('bill')
+    expect(@user.name).to eql('bill')
   end
 
   it "should update account associations when a course account changes" do
     account1 = account_model
     account2 = account_model
     course_with_student
-    @user.associated_accounts.length.should eql(1)
-    @user.associated_accounts.first.should eql(Account.default)
+    expect(@user.associated_accounts.length).to eql(1)
+    expect(@user.associated_accounts.first).to eql(Account.default)
 
     @course.account = account1
     @course.save!
     @course.reload
     @user.reload
 
-    @user.associated_accounts.length.should eql(1)
-    @user.associated_accounts.first.should eql(account1)
+    expect(@user.associated_accounts.length).to eql(1)
+    expect(@user.associated_accounts.first).to eql(account1)
 
     @course.account = account2
     @course.save!
     @user.reload
 
-    @user.associated_accounts.length.should eql(1)
-    @user.associated_accounts.first.should eql(account2)
+    expect(@user.associated_accounts.length).to eql(1)
+    expect(@user.associated_accounts.first).to eql(account2)
   end
 
   it "should update account associations when a course account moves in the hierachy" do
@@ -83,8 +83,8 @@ describe User do
     @course.reload
     @user.reload
 
-    @user.associated_accounts.length.should eql(1)
-    @user.associated_accounts.first.should eql(account1)
+    expect(@user.associated_accounts.length).to eql(1)
+    expect(@user.associated_accounts.first).to eql(account1)
 
     account2 = account_model
     account1.parent_account = account2
@@ -92,9 +92,9 @@ describe User do
     @course.reload
     @user.reload
 
-    @user.associated_accounts.length.should eql(2)
-    @user.associated_accounts[0].should eql(account1)
-    @user.associated_accounts[1].should eql(account2)
+    expect(@user.associated_accounts.length).to eql(2)
+    expect(@user.associated_accounts[0]).to eql(account1)
+    expect(@user.associated_accounts[1]).to eql(account2)
   end
 
   it "should update account associations when a user is associated to an account just by pseudonym" do
@@ -107,8 +107,8 @@ describe User do
     pseudonym.save
 
     user.reload
-    user.associated_accounts.length.should eql(1)
-    user.associated_accounts.first.should eql(account1)
+    expect(user.associated_accounts.length).to eql(1)
+    expect(user.associated_accounts.first).to eql(account1)
 
     # Make sure that multiple sequential updates also work
     pseudonym.account = account2
@@ -116,16 +116,16 @@ describe User do
     pseudonym.account = account1
     pseudonym.save
     user.reload
-    user.associated_accounts.length.should eql(1)
-    user.associated_accounts.first.should eql(account1)
+    expect(user.associated_accounts.length).to eql(1)
+    expect(user.associated_accounts.first).to eql(account1)
 
     account1.parent_account = account2
     account1.save!
 
     user.reload
-    user.associated_accounts.length.should eql(2)
-    user.associated_accounts[0].should eql(account1)
-    user.associated_accounts[1].should eql(account2)
+    expect(user.associated_accounts.length).to eql(2)
+    expect(user.associated_accounts[0]).to eql(account1)
+    expect(user.associated_accounts[1]).to eql(account2)
   end
 
   it "should update account associations when a user is associated to an account just by account_users" do
@@ -134,35 +134,44 @@ describe User do
     account.account_users.create!(user: @user)
 
     @user.reload
-    @user.associated_accounts.length.should eql(1)
-    @user.associated_accounts.first.should eql(account)
+    expect(@user.associated_accounts.length).to eql(1)
+    expect(@user.associated_accounts.first).to eql(account)
   end
 
   it "should populate dashboard_messages" do
     Notification.create(:name => "Assignment Created")
     course_with_teacher(:active_all => true)
-    @user.stream_item_instances.should be_empty
+    expect(@user.stream_item_instances).to be_empty
     @a = @course.assignments.new(:title => "some assignment")
     @a.workflow_state = "available"
     @a.save
-    @user.stream_item_instances(true).should_not be_empty
+    expect(@user.stream_item_instances(true)).not_to be_empty
   end
 
   it "should ignore orphaned stream item instances" do
     course_with_student(:active_all => true)
     google_docs_collaboration_model(:user_id => @user.id)
-    @user.recent_stream_items.size.should == 1
+    expect(@user.recent_stream_items.size).to eq 1
     StreamItem.delete_all
-    @user.recent_stream_items.size.should == 0
+    expect(@user.recent_stream_items.size).to eq 0
   end
 
   it "should ignore stream item instances from concluded courses" do
     course_with_teacher(:active_all => true)
     google_docs_collaboration_model(:user_id => @user.id)
-    @user.recent_stream_items.size.should == 1
+    expect(@user.recent_stream_items.size).to eq 1
     @course.soft_conclude!
     @course.save
-    @user.recent_stream_items.size.should == 0
+    expect(@user.recent_stream_items.size).to eq 0
+  end
+
+  it "should ignore stream item instances from courses the user is no longer participating in" do
+    course_with_student(:active_all => true)
+    google_docs_collaboration_model(:user_id => @user.id)
+    expect(@user.recent_stream_items.size).to eq 1
+    @enrollment.end_at = @enrollment.start_at = Time.now - 1.day
+    @enrollment.save!
+    expect(@user.recent_stream_items.size).to eq 0
   end
 
   describe "#recent_stream_items" do
@@ -173,14 +182,14 @@ describe User do
       sub = assignment.submit_homework @student, body: "submission"
       sub.add_comment :author => @teacher, :comment => "lol"
       item = StreamItem.last
-      item.asset.should == sub
-      @student.visible_stream_item_instances.map(&:stream_item).should include item
-      @student.recent_stream_items.should_not include item
+      expect(item.asset).to eq sub
+      expect(@student.visible_stream_item_instances.map(&:stream_item)).to include item
+      expect(@student.recent_stream_items).not_to include item
     end
   end
 
   describe "#cached_recent_stream_items" do
-    before(:each) do
+    before(:once) do
       @contexts = []
       # create stream item 1
       course_with_teacher(:active_all => true)
@@ -200,9 +209,9 @@ describe User do
     it "creates cache keys for each context" do
       enable_cache do
         @teacher.cached_recent_stream_items(:contexts => @contexts)
-        Rails.cache.read(@dashboard_key).should be_blank
+        expect(Rails.cache.read(@dashboard_key)).to be_blank
         @context_keys.each do |context_key|
-          Rails.cache.read(context_key).should_not be_blank
+          expect(Rails.cache.read(context_key)).not_to be_blank
         end
       end
     end
@@ -210,9 +219,9 @@ describe User do
     it "creates one cache key when there are no contexts" do
       enable_cache do
         @teacher.cached_recent_stream_items # cache the dashboard items
-        Rails.cache.read(@dashboard_key).should_not be_blank
+        expect(Rails.cache.read(@dashboard_key)).not_to be_blank
         @context_keys.each do |context_key|
-          Rails.cache.read(context_key).should be_blank
+          expect(Rails.cache.read(context_key)).to be_blank
         end
       end
     end
@@ -241,12 +250,12 @@ describe User do
     enrollment2.workflow_state = 'active'
     enrollment1.save!
     enrollment2.save!
-    user.associated_account_ids.include?(account1.id).should be_true
-    user.associated_account_ids.include?(account2.id).should be_true
+    expect(user.associated_account_ids.include?(account1.id)).to be_truthy
+    expect(user.associated_account_ids.include?(account2.id)).to be_truthy
     user.remove_from_root_account(account2)
     user.reload
-    user.associated_account_ids.include?(account1.id).should be_true
-    user.associated_account_ids.include?(account2.id).should be_false
+    expect(user.associated_account_ids.include?(account1.id)).to be_truthy
+    expect(user.associated_account_ids.include?(account2.id)).to be_falsey
   end
 
   it "should search by multiple fields" do
@@ -256,10 +265,10 @@ describe User do
     user2 = User.create! :name => "longname2", :short_name => "shortname2"
     user2.register!
 
-    User.name_like("longname1").map(&:id).should == [user1.id]
-    User.name_like("shortname2").map(&:id).should == [user2.id]
-    User.name_like("sisid1").map(&:id).should == []
-    User.name_like("uniqueid2").map(&:id).should == []
+    expect(User.name_like("longname1").map(&:id)).to eq [user1.id]
+    expect(User.name_like("shortname2").map(&:id)).to eq [user2.id]
+    expect(User.name_like("sisid1").map(&:id)).to eq []
+    expect(User.name_like("uniqueid2").map(&:id)).to eq []
 
     p1 = user1.pseudonyms.new :unique_id => "uniqueid1", :account => @account
     p1.sis_user_id = "sisid1"
@@ -268,47 +277,47 @@ describe User do
     p2.sis_user_id = "sisid2"
     p2.save!
 
-    User.name_like("longname1").map(&:id).should == [user1.id]
-    User.name_like("shortname2").map(&:id).should == [user2.id]
-    User.name_like("sisid1").map(&:id).should == [user1.id]
-    User.name_like("uniqueid2").map(&:id).should == [user2.id]
+    expect(User.name_like("longname1").map(&:id)).to eq [user1.id]
+    expect(User.name_like("shortname2").map(&:id)).to eq [user2.id]
+    expect(User.name_like("sisid1").map(&:id)).to eq [user1.id]
+    expect(User.name_like("uniqueid2").map(&:id)).to eq [user2.id]
 
     p3 = user1.pseudonyms.new :unique_id => "uniqueid3", :account => @account
     p3.sis_user_id = "sisid3"
     p3.save!
 
-    User.name_like("longname1").map(&:id).should == [user1.id]
-    User.name_like("shortname2").map(&:id).should == [user2.id]
-    User.name_like("sisid1").map(&:id).should == [user1.id]
-    User.name_like("uniqueid2").map(&:id).should == [user2.id]
-    User.name_like("uniqueid3").map(&:id).should == [user1.id]
+    expect(User.name_like("longname1").map(&:id)).to eq [user1.id]
+    expect(User.name_like("shortname2").map(&:id)).to eq [user2.id]
+    expect(User.name_like("sisid1").map(&:id)).to eq [user1.id]
+    expect(User.name_like("uniqueid2").map(&:id)).to eq [user2.id]
+    expect(User.name_like("uniqueid3").map(&:id)).to eq [user1.id]
 
     p4 = user1.pseudonyms.new :unique_id => "uniqueid4", :account => @account
     p4.sis_user_id = "sisid3 2"
     p4.save!
 
-    User.name_like("longname1").map(&:id).should == [user1.id]
-    User.name_like("shortname2").map(&:id).should == [user2.id]
-    User.name_like("sisid1").map(&:id).should == [user1.id]
-    User.name_like("uniqueid2").map(&:id).should == [user2.id]
-    User.name_like("uniqueid3").map(&:id).should == [user1.id]
-    User.name_like("sisid3").map(&:id).should == [user1.id]
+    expect(User.name_like("longname1").map(&:id)).to eq [user1.id]
+    expect(User.name_like("shortname2").map(&:id)).to eq [user2.id]
+    expect(User.name_like("sisid1").map(&:id)).to eq [user1.id]
+    expect(User.name_like("uniqueid2").map(&:id)).to eq [user2.id]
+    expect(User.name_like("uniqueid3").map(&:id)).to eq [user1.id]
+    expect(User.name_like("sisid3").map(&:id)).to eq [user1.id]
 
     user3 = User.create! :name => "longname1", :short_name => "shortname3"
     user3.register!
 
-    User.name_like("longname1").map(&:id).sort.should == [user1.id, user3.id].sort
-    User.name_like("shortname2").map(&:id).should == [user2.id]
-    User.name_like("sisid1").map(&:id).should == [user1.id]
-    User.name_like("uniqueid2").map(&:id).should == [user2.id]
-    User.name_like("uniqueid3").map(&:id).should == [user1.id]
-    User.name_like("sisid3").map(&:id).should == [user1.id]
+    expect(User.name_like("longname1").map(&:id).sort).to eq [user1.id, user3.id].sort
+    expect(User.name_like("shortname2").map(&:id)).to eq [user2.id]
+    expect(User.name_like("sisid1").map(&:id)).to eq [user1.id]
+    expect(User.name_like("uniqueid2").map(&:id)).to eq [user2.id]
+    expect(User.name_like("uniqueid3").map(&:id)).to eq [user1.id]
+    expect(User.name_like("sisid3").map(&:id)).to eq [user1.id]
 
-    User.name_like("sisid3").map(&:id).should == [user1.id]
-    User.name_like("uniqueid4").map(&:id).should == [user1.id]
+    expect(User.name_like("sisid3").map(&:id)).to eq [user1.id]
+    expect(User.name_like("uniqueid4").map(&:id)).to eq [user1.id]
     p4.destroy
-    User.name_like("sisid3").map(&:id).should == [user1.id]
-    User.name_like("uniqueid4").map(&:id).should == []
+    expect(User.name_like("sisid3").map(&:id)).to eq [user1.id]
+    expect(User.name_like("uniqueid4").map(&:id)).to eq []
 
   end
 
@@ -321,47 +330,46 @@ describe User do
     p1.sis_user_id = 'sis_id1'
     p1.save!
     user.pseudonyms.create! :unique_id => "id2", :account => account2
-    lambda { p1.destroy }.should raise_error /Cannot delete system-generated pseudonyms/
     user.remove_from_root_account account1
-    user.associated_root_accounts.should eql [account2]
+    expect(user.associated_root_accounts).to eql [account2]
   end
 
   describe "update_account_associations" do
     it "should support incrementally adding to account associations" do
       user = User.create!
-      user.user_account_associations.should == []
+      expect(user.user_account_associations).to eq []
       account1, account2, account3 = Account.create!, Account.create!, Account.create!
 
       sort_account_associations = lambda { |a, b| a.keys.first <=> b.keys.first }
 
       User.update_account_associations([user], :incremental => true, :precalculated_associations => {account1.id => 0})
-      user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.should == [{account1.id => 0}]
+      expect(user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }).to eq [{account1.id => 0}]
 
       User.update_account_associations([user], :incremental => true, :precalculated_associations => {account2.id => 1})
-      user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.sort(&sort_account_associations).should == [{account1.id => 0}, {account2.id => 1}].sort(&sort_account_associations)
+      expect(user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.sort(&sort_account_associations)).to eq [{account1.id => 0}, {account2.id => 1}].sort(&sort_account_associations)
 
       User.update_account_associations([user], :incremental => true, :precalculated_associations => {account3.id => 1, account1.id => 2, account2.id => 0})
-      user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.sort(&sort_account_associations).should == [{account1.id => 0}, {account2.id => 0}, {account3.id => 1}].sort(&sort_account_associations)
+      expect(user.user_account_associations.reload.map { |aa| {aa.account_id => aa.depth} }.sort(&sort_account_associations)).to eq [{account1.id => 0}, {account2.id => 0}, {account3.id => 1}].sort(&sort_account_associations)
     end
 
     it "should not have account associations for creation_pending or deleted" do
       user = User.create! { |u| u.workflow_state = 'creation_pending' }
-      user.should be_creation_pending
+      expect(user).to be_creation_pending
       course = Course.create!
       course.offer!
       enrollment = course.enroll_student(user)
-      enrollment.should be_invited
-      user.user_account_associations.should == []
+      expect(enrollment).to be_invited
+      expect(user.user_account_associations).to eq []
       Account.default.account_users.create!(user: user)
-      user.user_account_associations(true).should == []
+      expect(user.user_account_associations(true)).to eq []
       user.pseudonyms.create!(:unique_id => 'test@example.com')
-      user.user_account_associations(true).should == []
+      expect(user.user_account_associations(true)).to eq []
       user.update_account_associations
-      user.user_account_associations(true).should == []
+      expect(user.user_account_associations(true)).to eq []
       user.register!
-      user.user_account_associations(true).map(&:account).should == [Account.default]
+      expect(user.user_account_associations(true).map(&:account)).to eq [Account.default]
       user.destroy
-      user.user_account_associations(true).should == []
+      expect(user.user_account_associations(true)).to eq []
     end
 
     it "should not create/update account associations for student view student" do
@@ -369,25 +377,25 @@ describe User do
       account2 = account_model
       course_with_teacher(:active_all => true)
       @fake_student = @course.student_view_student
-      @fake_student.reload.user_account_associations.should be_empty
+      expect(@fake_student.reload.user_account_associations).to be_empty
 
       @course.account_id = account1.id
       @course.save!
-      @fake_student.reload.user_account_associations.should be_empty
+      expect(@fake_student.reload.user_account_associations).to be_empty
 
       account1.parent_account = account2
       account1.save!
-      @fake_student.reload.user_account_associations.should be_empty
+      expect(@fake_student.reload.user_account_associations).to be_empty
 
       @course.complete!
-      @fake_student.reload.user_account_associations.should be_empty
+      expect(@fake_student.reload.user_account_associations).to be_empty
 
       @fake_student = @course.reload.student_view_student
-      @fake_student.reload.user_account_associations.should be_empty
+      expect(@fake_student.reload.user_account_associations).to be_empty
 
       @section2 = @course.course_sections.create!(:name => "Other Section")
       @fake_student = @course.reload.student_view_student
-      @fake_student.reload.user_account_associations.should be_empty
+      expect(@fake_student.reload.user_account_associations).to be_empty
     end
 
     context "sharding" do
@@ -396,25 +404,27 @@ describe User do
       it "should create associations for a user in multiple shards" do
         user
         Account.site_admin.account_users.create!(user: @user)
-        @user.user_account_associations.map(&:account).should == [Account.site_admin]
+        expect(@user.user_account_associations.map(&:account)).to eq [Account.site_admin]
 
         @shard1.activate do
           @account = Account.create!
           au = @account.account_users.create!(user: @user)
-          @user.user_account_associations.with_each_shard.map(&:account).sort_by(&:id).should ==
+          expect(@user.user_account_associations.with_each_shard.map(&:account).sort_by(&:id)).to eq(
               [Account.site_admin, @account].sort_by(&:id)
-          @account.user_account_associations.map(&:user).should == [@user]
+          )
+          expect(@account.user_account_associations.map(&:user)).to eq [@user]
 
           au.destroy
 
-          @user.user_account_associations.with_each_shard.map(&:account).should == [Account.site_admin]
-          @account.reload.user_account_associations.map(&:user).should == []
+          expect(@user.user_account_associations.with_each_shard.map(&:account)).to eq [Account.site_admin]
+          expect(@account.reload.user_account_associations.map(&:user)).to eq []
 
           @account.account_users.create!(user: @user)
 
-          @user.user_account_associations.with_each_shard.map(&:account).sort_by(&:id).should ==
+          expect(@user.user_account_associations.with_each_shard.map(&:account).sort_by(&:id)).to eq(
               [Account.site_admin, @account].sort_by(&:id)
-          @account.reload.user_account_associations.map(&:user).should == [@user]
+          )
+          expect(@account.reload.user_account_associations.map(&:user)).to eq [@user]
 
           UserAccountAssociation.delete_all
         end
@@ -423,18 +433,19 @@ describe User do
         @shard2.activate do
           @user.update_account_associations
 
-          @user.user_account_associations.with_each_shard.map(&:account).sort_by(&:id).should ==
+          expect(@user.user_account_associations.with_each_shard.map(&:account).sort_by(&:id)).to eq(
               [Account.site_admin, @account].sort_by(&:id)
-          @account.reload.user_account_associations.map(&:user).should == [@user]
+          )
+          expect(@account.reload.user_account_associations.map(&:user)).to eq [@user]
         end
         UserAccountAssociation.delete_all
 
         @shard1.activate do
           # check sharding for when we pass user IDs into update_account_associations, rather than user objects themselves
           User.update_account_associations([@user.id], :all_shards => true)
-          @account.reload.all_users.should == [@user]
+          expect(@account.reload.all_users).to eq [@user]
         end
-        @shard2.activate { @account.reload.all_users.should == [@user] }
+        @shard2.activate { expect(@account.reload.all_users).to eq [@user] }
       end
     end
   end
@@ -451,20 +462,31 @@ describe User do
     create_course_with_student_and_assignment
     @assignment.mute!
     @assignment.grade_student @student, :grade => 9
-    @user.recent_feedback.should be_empty
+    expect(@user.recent_feedback).to be_empty
   end
 
   it "should include recent feedback for unmuted assignments" do
     create_course_with_student_and_assignment
     @assignment.grade_student @user, :grade => 9
-    @user.recent_feedback(:contexts => [@course]).should_not be_empty
+    expect(@user.recent_feedback(:contexts => [@course])).not_to be_empty
   end
 
   it "should not include recent feedback for unpublished assignments" do
     create_course_with_student_and_assignment
     @assignment.grade_student @user, :grade => 9
     @assignment.unpublish
-    @user.recent_feedback(:contexts => [@course]).should be_empty
+    expect(@user.recent_feedback(:contexts => [@course])).to be_empty
+  end
+
+  it "should not include recent feedback for other students in admin feedback" do
+    create_course_with_student_and_assignment
+    other_teacher = @teacher
+    teacher = teacher_in_course(:active_all => true).user
+    student = student_in_course(:active_all => true).user
+    sub = @assignment.grade_student(student, :grade => 9).first
+    sub.submission_comments.create!(:comment => 'c1', :author => other_teacher, :recipient_id => student.id)
+    sub.save!
+    expect(teacher.recent_feedback(:contexts => [@course])).to be_empty
   end
 
   describe '#courses_with_primary_enrollment' do
@@ -503,7 +525,7 @@ describe User do
 
 
       # only four, in the right order (type, then name), and with the top type per course
-      @user.courses_with_primary_enrollment.map{|c| [c.id, c.primary_enrollment]}.should eql [
+      expect(@user.courses_with_primary_enrollment.map{|c| [c.id, c.primary_enrollment_type]}).to eql [
         [@course5.id, 'TeacherEnrollment'],
         [@course2.id, 'TeacherEnrollment'],
         [@course3.id, 'TeacherEnrollment'],
@@ -540,7 +562,7 @@ describe User do
           alices_enrollment.save!
         end
 
-        alice.courses_with_primary_enrollment.size.should == 1
+        expect(alice.courses_with_primary_enrollment.size).to eq 1
       end
 
       it 'still filters out completed enrollments for the correct user' do
@@ -553,53 +575,52 @@ describe User do
           courseX.save!
           StudentEnrollment.create!(:course => courseX, :user => alice, :workflow_state => 'completed')
         end
-        alice.courses_with_primary_enrollment.size.should == 0
+        expect(alice.courses_with_primary_enrollment.size).to eq 0
       end
 
+      it 'works with favorite_courses' do
+        @user = User.create!(:name => 'user')
+        @shard1.activate do
+          account = Account.create!
+          @course = account.courses.build
+          @course.workflow_state = 'available'
+          @course.save!
+          StudentEnrollment.create!(:course => @course, :user => @user, :workflow_state => 'active')
+        end
+        @user.favorites.create!(:context => @course)
+        expect(@user.courses_with_primary_enrollment(:favorite_courses)).to eq [@course]
+      end
     end
   end
 
-  it "should delete the user transactionally in case the pseudonym removal fails" do
+  it "should delete system generated pseudonyms on delete" do
     user_with_managed_pseudonym
-    @pseudonym.should be_managed_password
-    @user.workflow_state.should == "pre_registered"
-    lambda { @user.destroy }.should raise_error("Cannot delete system-generated pseudonyms")
-    @user.workflow_state.should == "deleted"
-    @user.reload
-    @user.workflow_state.should == "pre_registered"
-    @account.account_authorization_config.destroy
-    @pseudonym.should_not be_managed_password
+    expect(@pseudonym).to be_managed_password
+    expect(@user.workflow_state).to eq "pre_registered"
     @user.destroy
-    @user.workflow_state.should == "deleted"
+    expect(@user.workflow_state).to eq "deleted"
     @user.reload
-    @user.workflow_state.should == "deleted"
-    user_with_managed_pseudonym
-    @pseudonym.should be_managed_password
-    @user.workflow_state.should == "pre_registered"
-    @user.destroy(true)
-    @user.workflow_state.should == "deleted"
-    @user.reload
-    @user.workflow_state.should == "deleted"
+    expect(@user.workflow_state).to eq "deleted"
   end
 
   it "should record deleted_at" do
     user = User.create
     user.destroy
-    user.deleted_at.should_not be_nil
+    expect(user.deleted_at).not_to be_nil
   end
 
   describe "can_masquerade?" do
     it "should allow self" do
       @user = user_with_pseudonym(:username => 'nobody1@example.com')
-      @user.can_masquerade?(@user, Account.default).should be_true
+      expect(@user.can_masquerade?(@user, Account.default)).to be_truthy
     end
 
     it "should not allow other users" do
       @user1 = user_with_pseudonym(:username => 'nobody1@example.com')
       @user2 = user_with_pseudonym(:username => 'nobody2@example.com')
 
-      @user1.can_masquerade?(@user2, Account.default).should be_false
-      @user2.can_masquerade?(@user1, Account.default).should be_false
+      expect(@user1.can_masquerade?(@user2, Account.default)).to be_falsey
+      expect(@user2.can_masquerade?(@user1, Account.default)).to be_falsey
     end
 
     it "should allow site and account admins" do
@@ -608,25 +629,26 @@ describe User do
       @site_admin = user_with_pseudonym(:username => 'nobody3@example.com', :account => Account.site_admin)
       Account.site_admin.account_users.create!(user: @site_admin)
       Account.default.account_users.create!(user: @admin)
-      user.can_masquerade?(@site_admin, Account.default).should be_true
-      @admin.can_masquerade?(@site_admin, Account.default).should be_true
-      user.can_masquerade?(@admin, Account.default).should be_true
-      @admin.can_masquerade?(@admin, Account.default).should be_true
-      @admin.can_masquerade?(user, Account.default).should be_false
-      @site_admin.can_masquerade?(@site_admin, Account.default).should be_true
-      @site_admin.can_masquerade?(user, Account.default).should be_false
-      @site_admin.can_masquerade?(@admin, Account.default).should be_false
+      expect(user.can_masquerade?(@site_admin, Account.default)).to be_truthy
+      expect(@admin.can_masquerade?(@site_admin, Account.default)).to be_truthy
+      expect(user.can_masquerade?(@admin, Account.default)).to be_truthy
+      expect(@admin.can_masquerade?(@admin, Account.default)).to be_truthy
+      expect(@admin.can_masquerade?(user, Account.default)).to be_falsey
+      expect(@site_admin.can_masquerade?(@site_admin, Account.default)).to be_truthy
+      expect(@site_admin.can_masquerade?(user, Account.default)).to be_falsey
+      expect(@site_admin.can_masquerade?(@admin, Account.default)).to be_falsey
     end
 
     it "should not allow restricted admins to become full admins" do
       user = user_with_pseudonym(:username => 'nobody1@example.com')
       @restricted_admin = user_with_pseudonym(:username => 'nobody3@example.com')
-      account_admin_user_with_role_changes(:user => @restricted_admin, :membership_type => 'Restricted', :role_changes => { :become_user => true })
+      role = custom_account_role('Restricted', :account => Account.default)
+      account_admin_user_with_role_changes(:user => @restricted_admin, :role => role, :role_changes => { :become_user => true })
       @admin = user_with_pseudonym(:username => 'nobody2@example.com')
       Account.default.account_users.create!(user: @admin)
-      user.can_masquerade?(@restricted_admin, Account.default).should be_true
-      @admin.can_masquerade?(@restricted_admin, Account.default).should be_false
-      @restricted_admin.can_masquerade?(@admin, Account.default).should be_true
+      expect(user.can_masquerade?(@restricted_admin, Account.default)).to be_truthy
+      expect(@admin.can_masquerade?(@restricted_admin, Account.default)).to be_falsey
+      expect(@restricted_admin.can_masquerade?(@admin, Account.default)).to be_truthy
     end
 
     it "should allow to admin even if user is in multiple accounts" do
@@ -637,10 +659,10 @@ describe User do
       @site_admin = user_with_pseudonym(:username => 'nobody3@example.com')
       Account.default.account_users.create!(user: @admin)
       Account.site_admin.account_users.create!(user: @site_admin)
-      user.can_masquerade?(@admin, Account.default).should be_true
-      user.can_masquerade?(@admin, @account2).should be_false
-      user.can_masquerade?(@site_admin, Account.default).should be_true
-      user.can_masquerade?(@site_admin, @account2).should be_true
+      expect(user.can_masquerade?(@admin, Account.default)).to be_truthy
+      expect(user.can_masquerade?(@admin, @account2)).to be_falsey
+      expect(user.can_masquerade?(@site_admin, Account.default)).to be_truthy
+      expect(user.can_masquerade?(@site_admin, @account2)).to be_truthy
       @account2.account_users.create!(user: @admin)
     end
 
@@ -653,13 +675,13 @@ describe User do
       course
       @course.enroll_teacher(@admin)
       Account.default.update_attribute(:settings, {:teachers_can_create_courses => true})
-      @admin.can_masquerade?(@site_admin, Account.default).should be_true
+      expect(@admin.can_masquerade?(@site_admin, Account.default)).to be_truthy
     end
 
     it "should allow teacher to become student view student" do
       course_with_teacher(:active_all => true)
       @fake_student = @course.student_view_student
-      @fake_student.can_masquerade?(@teacher, Account.default).should be_true
+      expect(@fake_student.can_masquerade?(@teacher, Account.default)).to be_truthy
     end
   end
 
@@ -668,68 +690,65 @@ describe User do
     let(:other_user) { User.new }
 
     it 'returns true for self' do
-      user.has_subset_of_account_permissions?(user, nil).should be_true
+      expect(user.has_subset_of_account_permissions?(user, nil)).to be_truthy
     end
 
     it 'is false if the account is not a root account' do
-      user.has_subset_of_account_permissions?(other_user, stub(:root_account? => false)).should be_false
+      expect(user.has_subset_of_account_permissions?(other_user, stub(:root_account? => false))).to be_falsey
     end
 
     it 'is true if there are no account users for this root account' do
       account = stub(:root_account? => true, :all_account_users_for => [])
-      user.has_subset_of_account_permissions?(other_user, account).should be_true
+      expect(user.has_subset_of_account_permissions?(other_user, account)).to be_truthy
     end
 
     it 'is true when all account_users for current user are subsets of target user' do
       account = stub(:root_account? => true, :all_account_users_for => [stub(:is_subset_of? => true)])
-      user.has_subset_of_account_permissions?(other_user, account).should be_true
+      expect(user.has_subset_of_account_permissions?(other_user, account)).to be_truthy
     end
 
     it 'is false when any account_user for current user is not a subset of target user' do
       account = stub(:root_account? => true, :all_account_users_for => [stub(:is_subset_of? => false)])
-      user.has_subset_of_account_permissions?(other_user, account).should be_false
-    end
-  end
-
-  context "permissions" do
-    it "should not allow account admin to modify admin privileges of other account admins" do
-      RoleOverride.readonly_for(Account.default, :manage_role_overrides, AccountUser::BASE_ROLE_NAME, 'AccountAdmin').should be_true
-      RoleOverride.readonly_for(Account.default, :manage_account_memberships, AccountUser::BASE_ROLE_NAME, 'AccountAdmin').should be_true
-      RoleOverride.readonly_for(Account.default, :manage_account_settings, AccountUser::BASE_ROLE_NAME, 'AccountAdmin').should be_true
+      expect(user.has_subset_of_account_permissions?(other_user, account)).to be_falsey
     end
   end
 
   context "check_courses_right?" do
-    before do
+    before :once do
       course_with_teacher(:active_all => true)
       @student = user_model
+    end
+
+    before :each do
       @course.stubs(:grants_right?).returns(true)
     end
 
     it "should require parameters" do
-      @student.check_courses_right?(nil, :some_right).should be_false
-      @student.check_courses_right?(@teacher, nil).should be_false
+      expect(@student.check_courses_right?(nil, :some_right)).to be_falsey
+      expect(@student.check_courses_right?(@teacher, nil)).to be_falsey
     end
 
     it "should check current courses" do
       @student.expects(:courses).once.returns([@course])
       @student.expects(:concluded_courses).never
-      @student.check_courses_right?(@teacher, :some_right).should be_true
+      expect(@student.check_courses_right?(@teacher, :some_right)).to be_truthy
     end
 
     it "should check concluded courses" do
       @student.expects(:courses).once.returns([])
       @student.expects(:concluded_courses).once.returns([@course])
-      @student.check_courses_right?(@teacher, :some_right).should be_true
+      expect(@student.check_courses_right?(@teacher, :some_right)).to be_truthy
     end
   end
 
   context "search_messageable_users" do
-    before(:each) do
+    before(:once) do
       @admin = user_model
       @student = user_model
-      tie_user_to_account(@admin, :membership_type => 'AccountAdmin')
-      tie_user_to_account(@student, :membership_type => 'Student')
+      tie_user_to_account(@admin, :role => admin_role)
+      role = custom_account_role('CustomStudent', :account => Account.default)
+      tie_user_to_account(@student, :role => role)
+      set_up_course_with_users
     end
 
     def set_up_course_with_users
@@ -764,127 +783,117 @@ describe User do
     end
 
     it "should include yourself even when not enrolled in courses" do
-      search_messageable_users(@student).map(&:id).should include(@student.id)
+      @student = user_model
+      expect(search_messageable_users(@student).map(&:id)).to include(@student.id)
     end
 
     it "should only return users from the specified context and type" do
-      set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
-      search_messageable_users(@student, :context => "course_#{@course.id}").map(&:id).sort.
-        should eql [@student, @this_section_user, @this_section_teacher, @other_section_user, @other_section_teacher].map(&:id).sort
-      @student.count_messageable_users_in_course(@course).should eql 5
+      expect(search_messageable_users(@student, :context => "course_#{@course.id}").map(&:id).sort).
+        to eql [@student, @this_section_user, @this_section_teacher, @other_section_user, @other_section_teacher].map(&:id).sort
+      expect(@student.count_messageable_users_in_course(@course)).to eql 5
 
-      search_messageable_users(@student, :context => "course_#{@course.id}_students").map(&:id).sort.
-        should eql [@student, @this_section_user, @other_section_user].map(&:id).sort
+      expect(search_messageable_users(@student, :context => "course_#{@course.id}_students").map(&:id).sort).
+        to eql [@student, @this_section_user, @other_section_user].map(&:id).sort
 
-      search_messageable_users(@student, :context => "group_#{@group.id}").map(&:id).sort.
-        should eql [@this_section_user].map(&:id).sort
-      @student.count_messageable_users_in_group(@group).should eql 1
+      expect(search_messageable_users(@student, :context => "group_#{@group.id}").map(&:id).sort).
+        to eql [@this_section_user].map(&:id).sort
+      expect(@student.count_messageable_users_in_group(@group)).to eql 1
 
-      search_messageable_users(@student, :context => "section_#{@other_section.id}").map(&:id).sort.
-        should eql [@other_section_user, @other_section_teacher].map(&:id).sort
+      expect(search_messageable_users(@student, :context => "section_#{@other_section.id}").map(&:id).sort).
+        to eql [@other_section_user, @other_section_teacher].map(&:id).sort
 
-      search_messageable_users(@student, :context => "section_#{@other_section.id}_teachers").map(&:id).sort.
-        should eql [@other_section_teacher].map(&:id).sort
+      expect(search_messageable_users(@student, :context => "section_#{@other_section.id}_teachers").map(&:id).sort).
+        to eql [@other_section_teacher].map(&:id).sort
     end
 
     it "should not include users from other sections if visibility is limited to sections" do
-      set_up_course_with_users
       enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
       # we currently force limit_privileges_to_course_section to be false for students; override it in the db
       Enrollment.where(:id => enrollment).update_all(:limit_privileges_to_course_section => true)
       messageable_users = search_messageable_users(@student).map(&:id)
-      messageable_users.should include @this_section_user.id
-      messageable_users.should_not include @other_section_user.id
+      expect(messageable_users).to include @this_section_user.id
+      expect(messageable_users).not_to include @other_section_user.id
 
       messageable_users = search_messageable_users(@student, :context => "course_#{@course.id}").map(&:id)
-      messageable_users.should include @this_section_user.id
-      messageable_users.should_not include @other_section_user.id
+      expect(messageable_users).to include @this_section_user.id
+      expect(messageable_users).not_to include @other_section_user.id
 
       messageable_users = search_messageable_users(@student, :context => "section_#{@other_section.id}").map(&:id)
-      messageable_users.should be_empty
+      expect(messageable_users).to be_empty
     end
 
     it "should let students message the entire class by default" do
-      set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
-      search_messageable_users(@student, :context => "course_#{@course.id}").map(&:id).sort.
-        should eql [@student, @this_section_user, @this_section_teacher, @other_section_user, @other_section_teacher].map(&:id).sort
+      expect(search_messageable_users(@student, :context => "course_#{@course.id}").map(&:id).sort).
+        to eql [@student, @this_section_user, @this_section_teacher, @other_section_user, @other_section_teacher].map(&:id).sort
     end
 
     it "should not let users message the entire class if they cannot send_messages" do
-      set_up_course_with_users
       RoleOverride.create!(:context => @course.account, :permission => 'send_messages',
-                           :enrollment_type => "StudentEnrollment", :enabled => false)
+                           :role => student_role, :enabled => false)
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
       # can only message self or the admins
-      search_messageable_users(@student, :context => "course_#{@course.id}").map(&:id).sort.
-        should eql [@student, @this_section_teacher, @other_section_teacher].map(&:id).sort
+      expect(search_messageable_users(@student, :context => "course_#{@course.id}").map(&:id).sort).
+        to eql [@student, @this_section_teacher, @other_section_teacher].map(&:id).sort
     end
 
     it "should not include deleted users" do
-      set_up_course_with_users
-      search_messageable_users(@student).map(&:id).should_not include(@deleted_user.id)
-      search_messageable_users(@student, :search => @deleted_user.name).map(&:id).should be_empty
-      search_messageable_users(@student, :strict_checks => false).map(&:id).should_not include(@deleted_user.id)
-      search_messageable_users(@student, :strict_checks => false, :search => @deleted_user.name).map(&:id).should be_empty
+      expect(search_messageable_users(@student).map(&:id)).not_to include(@deleted_user.id)
+      expect(search_messageable_users(@student, :search => @deleted_user.name).map(&:id)).to be_empty
+      expect(search_messageable_users(@student, :strict_checks => false).map(&:id)).not_to include(@deleted_user.id)
+      expect(search_messageable_users(@student, :strict_checks => false, :search => @deleted_user.name).map(&:id)).to be_empty
     end
 
     it "should include deleted iff strict_checks=false" do
-      set_up_course_with_users
-      @student.load_messageable_user(@deleted_user.id, :strict_checks => false).should_not be_nil
-      @student.load_messageable_user(@deleted_user.id).should be_nil
+      expect(@student.load_messageable_user(@deleted_user.id, :strict_checks => false)).not_to be_nil
+      expect(@student.load_messageable_user(@deleted_user.id)).to be_nil
     end
 
     it "should only include users from the specified section" do
-      set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
       messageable_users = search_messageable_users(@student, :context => "section_#{@course.default_section.id}").map(&:id)
-      messageable_users.should include @this_section_user.id
-      messageable_users.should_not include @other_section_user.id
+      expect(messageable_users).to include @this_section_user.id
+      expect(messageable_users).not_to include @other_section_user.id
 
       messageable_users = search_messageable_users(@student, :context => "section_#{@other_section.id}").map(&:id)
-      messageable_users.should_not include @this_section_user.id
-      messageable_users.should include @other_section_user.id
+      expect(messageable_users).not_to include @this_section_user.id
+      expect(messageable_users).to include @other_section_user.id
     end
 
     it "should include users from all sections if visibility is not limited to sections" do
-      set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
       messageable_users = search_messageable_users(@student).map(&:id)
-      messageable_users.should include @this_section_user.id
-      messageable_users.should include @other_section_user.id
+      expect(messageable_users).to include @this_section_user.id
+      expect(messageable_users).to include @other_section_user.id
     end
 
     it "should return users for a specified group if the receiver can access the group" do
-      set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
-      search_messageable_users(@this_section_user, :context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
+      expect(search_messageable_users(@this_section_user, :context => "group_#{@group.id}").map(&:id)).to eql [@this_section_user.id]
       # student can see it too, even though he's not in the group (since he can view the roster)
-      search_messageable_users(@student, :context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
+      expect(search_messageable_users(@student, :context => "group_#{@group.id}").map(&:id)).to eql [@this_section_user.id]
     end
 
     it "should respect section visibility when returning users for a specified group" do
-      set_up_course_with_users
       enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
       # we currently force limit_privileges_to_course_section to be false for students; override it in the db
       Enrollment.where(:id => enrollment).update_all(:limit_privileges_to_course_section => true)
 
       @group.users << @other_section_user
 
-      search_messageable_users(@this_section_user, :context => "group_#{@group.id}").map(&:id).sort.should eql [@this_section_user.id, @other_section_user.id]
-      @this_section_user.count_messageable_users_in_group(@group).should eql 2
+      expect(search_messageable_users(@this_section_user, :context => "group_#{@group.id}").map(&:id).sort).to eql [@this_section_user.id, @other_section_user.id]
+      expect(@this_section_user.count_messageable_users_in_group(@group)).to eql 2
       # student can only see people in his section
-      search_messageable_users(@student, :context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
-      @student.count_messageable_users_in_group(@group).should eql 1
+      expect(search_messageable_users(@student, :context => "group_#{@group.id}").map(&:id)).to eql [@this_section_user.id]
+      expect(@student.count_messageable_users_in_group(@group)).to eql 1
     end
 
     it "should only show admins and the observed if the receiver is an observer" do
-      set_up_course_with_users
       @course.enroll_user(@admin, 'TeacherEnrollment', :enrollment_state => 'active')
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
@@ -895,14 +904,13 @@ describe User do
       enrollment.save
 
       messageable_users = search_messageable_users(observer).map(&:id)
-      messageable_users.should include @admin.id
-      messageable_users.should include @student.id
-      messageable_users.should_not include @this_section_user.id
-      messageable_users.should_not include @other_section_user.id
+      expect(messageable_users).to include @admin.id
+      expect(messageable_users).to include @student.id
+      expect(messageable_users).not_to include @this_section_user.id
+      expect(messageable_users).not_to include @other_section_user.id
     end
 
     it "should not show non-linked observers to students" do
-      set_up_course_with_users
       @course.enroll_user(@admin, 'TeacherEnrollment', :enrollment_state => 'active')
       student1, student2 = user_model, user_model
       @course.enroll_user(student1, 'StudentEnrollment', :enrollment_state => 'active')
@@ -913,14 +921,13 @@ describe User do
       enrollment.associated_user_id = student1.id
       enrollment.save
 
-      search_messageable_users(student1).map(&:id).should include observer.id
-      student1.count_messageable_users_in_course(@course).should eql 8
-      search_messageable_users(student2).map(&:id).should_not include observer.id
-      student2.count_messageable_users_in_course(@course).should eql 7
+      expect(search_messageable_users(student1).map(&:id)).to include observer.id
+      expect(student1.count_messageable_users_in_course(@course)).to eql 8
+      expect(search_messageable_users(student2).map(&:id)).not_to include observer.id
+      expect(student2.count_messageable_users_in_course(@course)).to eql 7
     end
 
     it "should include all shared contexts and enrollment information" do
-      set_up_course_with_users
       @first_course = @course
       @first_course.enroll_user(@this_section_user, 'TaEnrollment', :enrollment_state => 'active')
       @first_course.enroll_user(@admin, 'TeacherEnrollment', :enrollment_state => 'active')
@@ -933,19 +940,19 @@ describe User do
 
       messageable_users = search_messageable_users(@admin)
       this_section_user = messageable_users.detect{|u| u.id == @this_section_user.id}
-      this_section_user.common_courses.keys.should include @first_course.id
-      this_section_user.common_courses[@first_course.id].sort.should eql ['StudentEnrollment', 'TaEnrollment']
+      expect(this_section_user.common_courses.keys).to include @first_course.id
+      expect(this_section_user.common_courses[@first_course.id].sort).to eql ['StudentEnrollment', 'TaEnrollment']
 
       two_context_guy = messageable_users.detect{|u| u.id == @other_section_user.id}
-      two_context_guy.common_courses.keys.should include @first_course.id
-      two_context_guy.common_courses[@first_course.id].sort.should eql ['StudentEnrollment']
-      two_context_guy.common_courses.keys.should include @other_course.id
-      two_context_guy.common_courses[@other_course.id].sort.should eql ['TeacherEnrollment']
+      expect(two_context_guy.common_courses.keys).to include @first_course.id
+      expect(two_context_guy.common_courses[@first_course.id].sort).to eql ['StudentEnrollment']
+      expect(two_context_guy.common_courses.keys).to include @other_course.id
+      expect(two_context_guy.common_courses[@other_course.id].sort).to eql ['TeacherEnrollment']
     end
 
     it "should include users with no shared contexts iff admin" do
-      search_messageable_users(@admin).map(&:id).should include(@student.id)
-      search_messageable_users(@student).map(&:id).should_not include(@admin.id)
+      expect(search_messageable_users(@admin).map(&:id)).to include(@student.id)
+      expect(search_messageable_users(@student).map(&:id)).not_to include(@admin.id)
     end
 
     it "should not do admin catch-all if specific contexts requested" do
@@ -962,57 +969,52 @@ describe User do
       enrollment.workflow_state = 'active'
       enrollment.save
 
-      search_messageable_users(@admin, :context => "course_#{course1.id}", :ids => [@student.id]).should be_empty
-      search_messageable_users(@admin, :context => "course_#{course2.id}", :ids => [@student.id]).should_not be_empty
-      search_messageable_users(@student, :context => "course_#{course2.id}", :ids => [@admin.id]).should_not be_empty
+      expect(search_messageable_users(@admin, :context => "course_#{course1.id}", :ids => [@student.id])).to be_empty
+      expect(search_messageable_users(@admin, :context => "course_#{course2.id}", :ids => [@student.id])).not_to be_empty
+      expect(search_messageable_users(@student, :context => "course_#{course2.id}", :ids => [@admin.id])).not_to be_empty
     end
 
     it "should not rank results by default" do
-      set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
       # ordered by name (all the same), then id
-      search_messageable_users(@student).map(&:id).
-        should eql [@student.id, @this_section_teacher.id, @this_section_user.id, @other_section_user.id, @other_section_teacher.id]
+      expect(search_messageable_users(@student).map(&:id)).
+        to eql [@student.id, @this_section_teacher.id, @this_section_user.id, @other_section_user.id, @other_section_teacher.id]
     end
 
     context "concluded enrollments" do
       it "should return concluded enrollments" do # i.e. you can do a bare search for people who used to be in your class
-        set_up_course_with_users
         @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
         @this_section_user_enrollment.conclude
 
-        search_messageable_users(@this_section_user).map(&:id).should include @this_section_user.id
-        search_messageable_users(@student).map(&:id).should include @this_section_user.id
+        expect(search_messageable_users(@this_section_user).map(&:id)).to include @this_section_user.id
+        expect(search_messageable_users(@student).map(&:id)).to include @this_section_user.id
       end
 
       it "should not return concluded student enrollments in the course" do # when browsing a course you should not see concluded enrollments
-        set_up_course_with_users
         @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
         @course.complete!
 
-        search_messageable_users(@this_section_user, :context => "course_#{@course.id}").map(&:id).should_not include @this_section_user.id
+        expect(search_messageable_users(@this_section_user, :context => "course_#{@course.id}").map(&:id)).not_to include @this_section_user.id
         # if the course was a concluded, a student should be able to browse it and message an admin (if if the admin's enrollment concluded too)
-        search_messageable_users(@this_section_user, :context => "course_#{@course.id}").map(&:id).should include @this_section_teacher.id
-        @this_section_user.count_messageable_users_in_course(@course).should eql 2 # just the admins
-        search_messageable_users(@student, :context => "course_#{@course.id}").map(&:id).should_not include @this_section_user.id
-        search_messageable_users(@student, :context => "course_#{@course.id}").map(&:id).should include @this_section_teacher.id
-        @student.count_messageable_users_in_course(@course).should eql 2
+        expect(search_messageable_users(@this_section_user, :context => "course_#{@course.id}").map(&:id)).to include @this_section_teacher.id
+        expect(@this_section_user.count_messageable_users_in_course(@course)).to eql 2 # just the admins
+        expect(search_messageable_users(@student, :context => "course_#{@course.id}").map(&:id)).not_to include @this_section_user.id
+        expect(search_messageable_users(@student, :context => "course_#{@course.id}").map(&:id)).to include @this_section_teacher.id
+        expect(@student.count_messageable_users_in_course(@course)).to eql 2
       end
 
       it "should return concluded enrollments in the group if they are still members" do
-        set_up_course_with_users
         @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
         @this_section_user_enrollment.conclude
 
-        search_messageable_users(@this_section_user, :context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
-        @this_section_user.count_messageable_users_in_group(@group).should eql 1
-        search_messageable_users(@student, :context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
-        @student.count_messageable_users_in_group(@group).should eql 1
+        expect(search_messageable_users(@this_section_user, :context => "group_#{@group.id}").map(&:id)).to eql [@this_section_user.id]
+        expect(@this_section_user.count_messageable_users_in_group(@group)).to eql 1
+        expect(search_messageable_users(@student, :context => "group_#{@group.id}").map(&:id)).to eql [@this_section_user.id]
+        expect(@student.count_messageable_users_in_group(@group)).to eql 1
       end
 
       it "should return concluded enrollments in the group and section if they are still members" do
-        set_up_course_with_users
         enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
         # we currently force limit_privileges_to_course_section to be false for students; override it in the db
         Enrollment.where(:id => enrollment).update_all(:limit_privileges_to_course_section => true)
@@ -1020,33 +1022,31 @@ describe User do
         @group.users << @other_section_user
         @this_section_user_enrollment.conclude
 
-        search_messageable_users(@this_section_user, :context => "group_#{@group.id}").map(&:id).sort.should eql [@this_section_user.id, @other_section_user.id]
-        @this_section_user.count_messageable_users_in_group(@group).should eql 2
+        expect(search_messageable_users(@this_section_user, :context => "group_#{@group.id}").map(&:id).sort).to eql [@this_section_user.id, @other_section_user.id]
+        expect(@this_section_user.count_messageable_users_in_group(@group)).to eql 2
         # student can only see people in his section
-        search_messageable_users(@student, :context => "group_#{@group.id}").map(&:id).should eql [@this_section_user.id]
-        @student.count_messageable_users_in_group(@group).should eql 1
+        expect(search_messageable_users(@student, :context => "group_#{@group.id}").map(&:id)).to eql [@this_section_user.id]
+        expect(@student.count_messageable_users_in_group(@group)).to eql 1
       end
     end
 
     context "admin_context" do
-      before do
-        set_up_course_with_users
-        account_admin_user
-      end
-
       it "should find users in the course" do
-        search_messageable_users(@admin, :context => @course.asset_string, :admin_context => @course).map(&:id).sort.should ==
+        expect(search_messageable_users(@admin, :context => @course.asset_string, :admin_context => @course).map(&:id).sort).to eq(
           [@this_section_teacher.id, @this_section_user.id, @other_section_user.id, @other_section_teacher.id]
+        )
       end
 
       it "should find users in the section" do
-        search_messageable_users(@admin, :context => "section_#{@course.default_section.id}", :admin_context => @course.default_section).map(&:id).sort.should ==
+        expect(search_messageable_users(@admin, :context => "section_#{@course.default_section.id}", :admin_context => @course.default_section).map(&:id).sort).to eq(
           [@this_section_teacher.id, @this_section_user.id]
+        )
       end
 
       it "should find users in the group" do
-        search_messageable_users(@admin, :context => @group.asset_string, :admin_context => @group).map(&:id).sort.should ==
+        expect(search_messageable_users(@admin, :context => @group.asset_string, :admin_context => @group).map(&:id).sort).to eq(
           [@this_section_user.id]
+        )
       end
     end
 
@@ -1054,187 +1054,199 @@ describe User do
       it "should optionally show invited enrollments" do
         course(:active_all => true)
         student_in_course(:user_state => 'creation_pending')
-        search_messageable_users(@teacher, :strict_checks => false).map(&:id).should include @student.id
+        expect(search_messageable_users(@teacher, :strict_checks => false).map(&:id)).to include @student.id
       end
 
       it "should optionally show pending enrollments in unpublished courses" do
         course()
         teacher_in_course(:active_user => true)
         student_in_course()
-        search_messageable_users(@teacher, :strict_checks => false, :context => @course.asset_string, :admin_context => @course).map(&:id).should include @student.id
+        expect(search_messageable_users(@teacher, :strict_checks => false, :context => @course.asset_string, :admin_context => @course).map(&:id)).to include @student.id
       end
     end
   end
 
   context "tabs_available" do
+    before(:once) { Account.default }
     it "should not include unconfigured external tools" do
       tool = Account.default.context_external_tools.new(:consumer_key => 'bob', :shared_secret => 'bob', :name => 'bob', :domain => "example.com")
       tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
-      tool.has_user_navigation.should == false
+      expect(tool.has_placement?(:user_navigation)).to eq false
       user_model
       tabs = @user.profile.tabs_available(@user, :root_account => Account.default)
-      tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
+      expect(tabs.map{|t| t[:id] }).not_to be_include(tool.asset_string)
     end
 
     it "should include configured external tools" do
       tool = Account.default.context_external_tools.new(:consumer_key => 'bob', :shared_secret => 'bob', :name => 'bob', :domain => "example.com")
       tool.user_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
-      tool.has_user_navigation.should == true
+      expect(tool.has_placement?(:user_navigation)).to eq true
       user_model
       tabs = @user.profile.tabs_available(@user, :root_account => Account.default)
-      tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
+      expect(tabs.map{|t| t[:id] }).to be_include(tool.asset_string)
       tab = tabs.detect{|t| t[:id] == tool.asset_string }
-      tab[:href].should == :user_external_tool_path
-      tab[:args].should == [@user.id, tool.id]
-      tab[:label].should == "Example URL"
+      expect(tab[:href]).to eq :user_external_tool_path
+      expect(tab[:args]).to eq [@user.id, tool.id]
+      expect(tab[:label]).to eq "Example URL"
     end
   end
 
   context "avatars" do
-    it "should find only users with avatars set" do
+    before :once do
       user_model
+    end
+
+    it "should find only users with avatars set" do
       @user.avatar_state = 'submitted'
       @user.save!
-      User.with_avatar_state('submitted').count.should == 0
-      User.with_avatar_state('any').count.should == 0
+      expect(User.with_avatar_state('submitted').count).to eq 0
+      expect(User.with_avatar_state('any').count).to eq 0
       @user.avatar_image_url = 'http://www.example.com'
       @user.save!
-      User.with_avatar_state('submitted').count.should == 1
-      User.with_avatar_state('any').count.should == 1
+      expect(User.with_avatar_state('submitted').count).to eq 1
+      expect(User.with_avatar_state('any').count).to eq 1
     end
 
     it "should clear avatar state when assigning by service that no longer exists" do
-      user_model
       @user.avatar_image_url = 'http://www.example.com'
       @user.avatar_image = { 'type' => 'twitter' }
-      @user.avatar_image_url.should be_nil
+      expect(@user.avatar_image_url).to be_nil
     end
 
     it "should allow external url's to be assigned" do
-      user_model
       @user.avatar_image = { 'type' => 'external', 'url' => 'http://www.example.com/image.jpg' }
       @user.save!
-      @user.reload.avatar_image_url.should == 'http://www.example.com/image.jpg'
+      expect(@user.reload.avatar_image_url).to eq 'http://www.example.com/image.jpg'
     end
 
     it "should return a useful avatar_fallback_url" do
-      User.avatar_fallback_url.should ==
+      expect(User.avatar_fallback_url).to eq(
         "https://#{HostUrl.default_host}/images/messages/avatar-50.png"
-      User.avatar_fallback_url("/somepath").should ==
+      )
+      expect(User.avatar_fallback_url("/somepath")).to eq(
         "https://#{HostUrl.default_host}/somepath"
+      )
       HostUrl.expects(:default_host).returns('somedomain:3000')
-      User.avatar_fallback_url("/path").should ==
+      expect(User.avatar_fallback_url("/path")).to eq(
         "https://somedomain:3000/path"
-      User.avatar_fallback_url("//somedomain/path").should ==
+      )
+      expect(User.avatar_fallback_url("//somedomain/path")).to eq(
         "https://somedomain/path"
-      User.avatar_fallback_url("http://somedomain/path").should ==
+      )
+      expect(User.avatar_fallback_url("http://somedomain/path")).to eq(
         "http://somedomain/path"
-      User.avatar_fallback_url("http://somedomain:3000/path").should ==
+      )
+      expect(User.avatar_fallback_url("http://somedomain:3000/path")).to eq(
         "http://somedomain:3000/path"
-      User.avatar_fallback_url(nil, OpenObject.new(:host => "foo", :protocol => "http://")).should ==
+      )
+      expect(User.avatar_fallback_url(nil, OpenObject.new(:host => "foo", :protocol => "http://"))).to eq(
         "http://foo/images/messages/avatar-50.png"
-      User.avatar_fallback_url("/somepath", OpenObject.new(:host => "bar", :protocol => "https://")).should ==
+      )
+      expect(User.avatar_fallback_url("/somepath", OpenObject.new(:host => "bar", :protocol => "https://"))).to eq(
         "https://bar/somepath"
-      User.avatar_fallback_url("//somedomain/path", OpenObject.new(:host => "bar", :protocol => "https://")).should ==
+      )
+      expect(User.avatar_fallback_url("//somedomain/path", OpenObject.new(:host => "bar", :protocol => "https://"))).to eq(
         "https://somedomain/path"
-      User.avatar_fallback_url("http://somedomain/path", OpenObject.new(:host => "bar", :protocol => "https://")).should ==
+      )
+      expect(User.avatar_fallback_url("http://somedomain/path", OpenObject.new(:host => "bar", :protocol => "https://"))).to eq(
         "http://somedomain/path"
-      User.avatar_fallback_url('%{fallback}').should ==
+      )
+      expect(User.avatar_fallback_url('%{fallback}')).to eq(
         '%{fallback}'
+      )
     end
 
     describe "#clear_avatar_image_url_with_uuid" do
-      before :each do
-        user_model
+      before :once do
         @user.avatar_image_url = '1234567890ABCDEF'
         @user.save!
       end
       it "should raise ArgumentError when uuid nil or blank" do
-        lambda { @user.clear_avatar_image_url_with_uuid(nil) }.should  raise_error(ArgumentError, "'uuid' is required and cannot be blank")
-        lambda { @user.clear_avatar_image_url_with_uuid('') }.should raise_error(ArgumentError, "'uuid' is required and cannot be blank")
-        lambda { @user.clear_avatar_image_url_with_uuid('  ') }.should raise_error(ArgumentError, "'uuid' is required and cannot be blank")
+        expect { @user.clear_avatar_image_url_with_uuid(nil) }.to  raise_error(ArgumentError, "'uuid' is required and cannot be blank")
+        expect { @user.clear_avatar_image_url_with_uuid('') }.to raise_error(ArgumentError, "'uuid' is required and cannot be blank")
+        expect { @user.clear_avatar_image_url_with_uuid('  ') }.to raise_error(ArgumentError, "'uuid' is required and cannot be blank")
       end
       it "should clear avatar_image_url when uuid matches" do
         @user.clear_avatar_image_url_with_uuid('1234567890ABCDEF')
-        @user.avatar_image_url.should be_nil
-        @user.changed?.should == false   # should be saved
+        expect(@user.avatar_image_url).to be_nil
+        expect(@user.changed?).to eq false   # should be saved
       end
       it "should not clear avatar_image_url when no match" do
         @user.clear_avatar_image_url_with_uuid('NonMatchingText')
-        @user.avatar_image_url.should == '1234567890ABCDEF'
+        expect(@user.avatar_image_url).to eq '1234567890ABCDEF'
       end
       it "should not error when avatar_image_url is nil" do
         @user.avatar_image_url = nil
         @user.save!
         #
-        lambda { @user.clear_avatar_image_url_with_uuid('something') }.should_not raise_error
-        @user.avatar_image_url.should be_nil
+        expect { @user.clear_avatar_image_url_with_uuid('something') }.not_to raise_error
+        expect(@user.avatar_image_url).to be_nil
       end
     end
   end
 
   it "should find sections for course" do
     course_with_student
-    @student.sections_for_course(@course).should include @course.default_section
+    expect(@student.sections_for_course(@course)).to include @course.default_section
   end
 
   describe "name_parts" do
     it "should infer name parts" do
-      User.name_parts('Cody Cutrer').should == ['Cody', 'Cutrer', nil]
-      User.name_parts('  Cody  Cutrer   ').should == ['Cody', 'Cutrer', nil]
-      User.name_parts('Cutrer, Cody').should == ['Cody', 'Cutrer', nil]
-      User.name_parts('Cutrer, Cody Houston').should == ['Cody Houston', 'Cutrer', nil]
-      User.name_parts('St. Clair, John').should == ['John', 'St. Clair', nil]
+      expect(User.name_parts('Cody Cutrer')).to eq ['Cody', 'Cutrer', nil]
+      expect(User.name_parts('  Cody  Cutrer   ')).to eq ['Cody', 'Cutrer', nil]
+      expect(User.name_parts('Cutrer, Cody')).to eq ['Cody', 'Cutrer', nil]
+      expect(User.name_parts('Cutrer, Cody Houston')).to eq ['Cody Houston', 'Cutrer', nil]
+      expect(User.name_parts('St. Clair, John')).to eq ['John', 'St. Clair', nil]
       # sorry, can't figure this out
-      User.name_parts('John St. Clair').should == ['John St.', 'Clair', nil]
-      User.name_parts('Jefferson Thomas Cutrer IV').should == ['Jefferson Thomas', 'Cutrer', 'IV']
-      User.name_parts('Jefferson Thomas Cutrer, IV').should == ['Jefferson Thomas', 'Cutrer', 'IV']
-      User.name_parts('Cutrer, Jefferson, IV').should == ['Jefferson', 'Cutrer', 'IV']
-      User.name_parts('Cutrer, Jefferson IV').should == ['Jefferson', 'Cutrer', 'IV']
-      User.name_parts(nil).should == [nil, nil, nil]
-      User.name_parts('Bob').should == ['Bob', nil, nil]
-      User.name_parts('Ho, Chi, Min').should == ['Chi Min', 'Ho', nil]
+      expect(User.name_parts('John St. Clair')).to eq ['John St.', 'Clair', nil]
+      expect(User.name_parts('Jefferson Thomas Cutrer IV')).to eq ['Jefferson Thomas', 'Cutrer', 'IV']
+      expect(User.name_parts('Jefferson Thomas Cutrer, IV')).to eq ['Jefferson Thomas', 'Cutrer', 'IV']
+      expect(User.name_parts('Cutrer, Jefferson, IV')).to eq ['Jefferson', 'Cutrer', 'IV']
+      expect(User.name_parts('Cutrer, Jefferson IV')).to eq ['Jefferson', 'Cutrer', 'IV']
+      expect(User.name_parts(nil)).to eq [nil, nil, nil]
+      expect(User.name_parts('Bob')).to eq ['Bob', nil, nil]
+      expect(User.name_parts('Ho, Chi, Min')).to eq ['Chi Min', 'Ho', nil]
       # sorry, don't understand cultures that put the surname first
       # they should just manually specify their sort name
-      User.name_parts('Ho Chi Min').should == ['Ho Chi', 'Min', nil]
-      User.name_parts('').should == [nil, nil, nil]
-      User.name_parts('John Doe').should == ['John', 'Doe', nil]
-      User.name_parts('Junior').should == ['Junior', nil, nil]
-      User.name_parts('John St. Clair', 'St. Clair').should == ['John', 'St. Clair', nil]
-      User.name_parts('John St. Clair', 'Cutrer').should == ['John St.', 'Clair', nil]
-      User.name_parts('St. Clair', 'St. Clair').should == [nil, 'St. Clair', nil]
-      User.name_parts('St. Clair,').should == [nil, 'St. Clair', nil]
+      expect(User.name_parts('Ho Chi Min')).to eq ['Ho Chi', 'Min', nil]
+      expect(User.name_parts('')).to eq [nil, nil, nil]
+      expect(User.name_parts('John Doe')).to eq ['John', 'Doe', nil]
+      expect(User.name_parts('Junior')).to eq ['Junior', nil, nil]
+      expect(User.name_parts('John St. Clair', 'St. Clair')).to eq ['John', 'St. Clair', nil]
+      expect(User.name_parts('John St. Clair', 'Cutrer')).to eq ['John St.', 'Clair', nil]
+      expect(User.name_parts('St. Clair', 'St. Clair')).to eq [nil, 'St. Clair', nil]
+      expect(User.name_parts('St. Clair,')).to eq [nil, 'St. Clair', nil]
     end
 
     it "should keep the sortable_name up to date if all that changed is the name" do
       u = User.new
       u.name = 'Cody Cutrer'
       u.save!
-      u.sortable_name.should == 'Cutrer, Cody'
+      expect(u.sortable_name).to eq 'Cutrer, Cody'
 
       u.name = 'Bracken Mosbacker'
       u.save!
-      u.sortable_name.should == 'Mosbacker, Bracken'
+      expect(u.sortable_name).to eq 'Mosbacker, Bracken'
 
       u.name = 'John St. Clair'
       u.sortable_name = 'St. Clair, John'
       u.save!
-      u.sortable_name.should == 'St. Clair, John'
+      expect(u.sortable_name).to eq 'St. Clair, John'
 
       u.name = 'Matthew St. Clair'
       u.save!
-      u.sortable_name.should == "St. Clair, Matthew"
+      expect(u.sortable_name).to eq "St. Clair, Matthew"
 
       u.name = 'St. Clair'
       u.save!
-      u.sortable_name.should == "St. Clair,"
+      expect(u.sortable_name).to eq "St. Clair,"
     end
   end
 
   context "group_member_json" do
-    before :each do
+    before :once do
       @account = Account.default
       @enrollment = course_with_student(:active_all => true)
       @section = @enrollment.course_section
@@ -1244,21 +1256,21 @@ describe User do
     end
 
     it "should include user_id, name, and display_name" do
-      @student.group_member_json(@account).should == {
+      expect(@student.group_member_json(@account)).to eq({
         :user_id => @student.id,
         :name => 'Doe, John',
         :display_name => 'Johnny'
-      }
+      })
     end
 
     it "should include course section (section_id and section_code) if appropriate" do
-      @student.group_member_json(@account).should == {
+      expect(@student.group_member_json(@account)).to eq({
         :user_id => @student.id,
         :name => 'Doe, John',
         :display_name => 'Johnny'
-      }
+      })
 
-      @student.group_member_json(@course).should == {
+      expect(@student.group_member_json(@course)).to eq({
         :user_id => @student.id,
         :name => 'Doe, John',
         :display_name => 'Johnny',
@@ -1266,7 +1278,7 @@ describe User do
           :section_id => @section.id,
           :section_code => @section.section_code
         } ]
-      }
+      })
     end
   end
 
@@ -1281,12 +1293,12 @@ describe User do
       course(:active_all => 1)
       @course.enroll_user(@user2)
 
-      @user1.menu_courses.should == [@course]
+      expect(@user1.menu_courses).to eq [@course]
     end
   end
 
   describe "favorites" do
-    before :each do
+    before :once do
       @user = User.create!
 
       @courses = []
@@ -1301,31 +1313,30 @@ describe User do
 
     it "should default favorites to enrolled courses when favorite courses do not exist" do
       @user.favorites.by("Course").destroy_all
-      @user.menu_courses.should == @courses
+      expect(@user.menu_courses.to_set).to eq @courses.to_set
     end
 
     it "should only include favorite courses when set" do
       course = @courses.shift
       @user.favorites.where(context_type: "Course", context_id: course).first.destroy
-      @user.menu_courses.should == @courses
+      expect(@user.menu_courses.to_set).to eq @courses.to_set
     end
 
     context "sharding" do
       specs_require_sharding
 
       before :each do
+        account2 = @shard1.activate { account_model }
         (4..6).each do |x|
-          course = course_with_student(:course_name => "Course #{x}", :user => @user, :active_all => true).course
+          course = course_with_student(:course_name => "Course #{x}", :user => @user, :active_all => true, :account => account2).course
           @courses << course
           @user.favorites.create!(context: course)
         end
-
-        @user.save!
       end
 
       it "should include cross shard favorite courses" do
         @user.favorites.by("Course").where("id % 2 = 0").destroy_all
-        @user.menu_courses.size.should eql(@courses.length / 2)
+        expect(@user.menu_courses.size).to eql(@courses.length / 2)
       end
     end
   end
@@ -1341,7 +1352,7 @@ describe User do
       course(:active_all => 1)
       @enrollment = @course.enroll_user(@user2)
 
-      @user1.cached_current_enrollments.should == [@enrollment]
+      expect(@user1.cached_current_enrollments).to eq [@enrollment]
     end
 
     context "sharding" do
@@ -1358,38 +1369,41 @@ describe User do
           course2.offer!
           course2.enroll_student(user)
         end
-        user.cached_current_enrollments.should == [e1, e2]
+        expect(user.cached_current_enrollments).to eq [e1, e2]
       end
     end
   end
 
   describe "pseudonym_for_account" do
-    before do
+    before :once do
+      @account1 = Account.create!
       @account2 = Account.create!
       @account3 = Account.create!
+    end
+
+    before :each do
       Pseudonym.any_instance.stubs(:works_for_account?).returns(false)
       Pseudonym.any_instance.stubs(:works_for_account?).with(Account.default, false).returns(true)
     end
 
     it "should return an active pseudonym" do
       user_with_pseudonym(:active_all => 1)
-      @user.find_pseudonym_for_account(Account.default).should == @pseudonym
+      expect(@user.find_pseudonym_for_account(Account.default)).to eq @pseudonym
     end
 
     it "should return a trusted pseudonym" do
       user_with_pseudonym(:active_all => 1, :account => @account2)
-      @user.find_pseudonym_for_account(Account.default).should == @pseudonym
+      expect(@user.find_pseudonym_for_account(Account.default)).to eq @pseudonym
     end
 
     it "should return nil if none work" do
       user_with_pseudonym(:active_all => 1)
-      @user.find_pseudonym_for_account(@account2).should == nil
+      expect(@user.find_pseudonym_for_account(@account2)).to eq nil
     end
 
     describe 'with cross-sharding' do
       specs_require_sharding
       it "should only search trusted shards" do
-        @account1 = Account.create!
         @user = user(:active_all => 1, :account => @account1)
         @shard1.activate do
           @account2 = Account.create!
@@ -1407,42 +1421,38 @@ describe User do
         @shard2.expects(:activate).once
 
         pseudonym = @user.find_pseudonym_for_account(@account1)
-        pseudonym.should == @psuedonym2
+        expect(pseudonym).to eq @psuedonym2
       end
     end
 
     it "should create a copy of an existing pseudonym" do
-      @account1 = Account.create!
-      @account2 = Account.create!
-      @account3 = Account.create!
-
       # from unrelated account
       user_with_pseudonym(:active_all => 1, :account => @account2, :username => 'unrelated@example.com', :password => 'abcdef')
       new_pseudonym = @user.find_or_initialize_pseudonym_for_account(@account1)
-      new_pseudonym.should_not be_nil
-      new_pseudonym.should be_new_record
-      new_pseudonym.unique_id.should == 'unrelated@example.com'
+      expect(new_pseudonym).not_to be_nil
+      expect(new_pseudonym).to be_new_record
+      expect(new_pseudonym.unique_id).to eq 'unrelated@example.com'
 
       # from default account
       @user.pseudonyms.create!(:unique_id => 'default@example.com', :password => 'abcdef', :password_confirmation => 'abcdef')
       @user.pseudonyms.create!(:account => @account3, :unique_id => 'preferred@example.com', :password => 'abcdef', :password_confirmation => 'abcdef')
       new_pseudonym = @user.find_or_initialize_pseudonym_for_account(@account1)
-      new_pseudonym.should_not be_nil
-      new_pseudonym.should be_new_record
-      new_pseudonym.unique_id.should == 'default@example.com'
+      expect(new_pseudonym).not_to be_nil
+      expect(new_pseudonym).to be_new_record
+      expect(new_pseudonym.unique_id).to eq 'default@example.com'
 
       # from site admin account
       @user.pseudonyms.create!(:account => Account.site_admin, :unique_id => 'siteadmin@example.com', :password => 'abcdef', :password_confirmation => 'abcdef')
       new_pseudonym = @user.find_or_initialize_pseudonym_for_account(@account1)
-      new_pseudonym.should_not be_nil
-      new_pseudonym.should be_new_record
-      new_pseudonym.unique_id.should == 'siteadmin@example.com'
+      expect(new_pseudonym).not_to be_nil
+      expect(new_pseudonym).to be_new_record
+      expect(new_pseudonym.unique_id).to eq 'siteadmin@example.com'
 
       # from preferred account
       new_pseudonym = @user.find_or_initialize_pseudonym_for_account(@account1, @account3)
-      new_pseudonym.should_not be_nil
-      new_pseudonym.should be_new_record
-      new_pseudonym.unique_id.should == 'preferred@example.com'
+      expect(new_pseudonym).not_to be_nil
+      expect(new_pseudonym).to be_new_record
+      expect(new_pseudonym.unique_id).to eq 'preferred@example.com'
 
       # from unrelated account, if other options are not viable
       user2 = User.create!
@@ -1450,89 +1460,85 @@ describe User do
       @user.pseudonyms.detect { |p| p.account == Account.site_admin }.update_attribute(:password_auto_generated, true)
       Account.default.account_authorization_configs.create!(:auth_type => 'cas')
       new_pseudonym = @user.find_or_initialize_pseudonym_for_account(@account1, @account3)
-      new_pseudonym.should_not be_nil
-      new_pseudonym.should be_new_record
-      new_pseudonym.unique_id.should == 'unrelated@example.com'
+      expect(new_pseudonym).not_to be_nil
+      expect(new_pseudonym).to be_new_record
+      expect(new_pseudonym.unique_id).to eq 'unrelated@example.com'
       new_pseudonym.save!
-      new_pseudonym.valid_password?('abcdef').should be_true
+      expect(new_pseudonym.valid_password?('abcdef')).to be_truthy
     end
 
     it "should not create a new one when there are no viable candidates" do
-      @account1 = Account.create!
       # no pseudonyms
       user
-      @user.find_or_initialize_pseudonym_for_account(@account1).should be_nil
+      expect(@user.find_or_initialize_pseudonym_for_account(@account1)).to be_nil
 
       # auto-generated password
-      @account2 = Account.create!
       @user.pseudonyms.create!(:account => @account2, :unique_id => 'bracken@instructure.com')
-      @user.find_or_initialize_pseudonym_for_account(@account1).should be_nil
+      expect(@user.find_or_initialize_pseudonym_for_account(@account1)).to be_nil
 
       # delegated auth
-      @account3 = Account.create!
       @account3.account_authorization_configs.create!(:auth_type => 'cas')
-      @account3.should be_delegated_authentication
+      expect(@account3).to be_delegated_authentication
       @user.pseudonyms.create!(:account => @account3, :unique_id => 'jacob@instructure.com', :password => 'abcdef', :password_confirmation => 'abcdef')
-      @user.find_or_initialize_pseudonym_for_account(@account1).should be_nil
+      expect(@user.find_or_initialize_pseudonym_for_account(@account1)).to be_nil
 
       # conflict
       @user2 = User.create! { |u| u.workflow_state = 'registered' }
       @user2.pseudonyms.create!(:account => @account1, :unique_id => 'jt@instructure.com', :password => 'abcdef', :password_confirmation => 'abcdef')
       @user.pseudonyms.create!(:unique_id => 'jt@instructure.com', :password => 'ghijkl', :password_confirmation => 'ghijkl')
-      @user.find_or_initialize_pseudonym_for_account(@account1).should be_nil
+      expect(@user.find_or_initialize_pseudonym_for_account(@account1)).to be_nil
     end
 
     context "sharding" do
       specs_require_sharding
 
-      it "should find a pseudonym in another shard" do
-        @shard1.activate do
-          account = Account.create!
-          user_with_pseudonym(:active_all => 1, :account => account)
-        end
-        @p2 = Account.site_admin.pseudonyms.create!(:user => @user, :unique_id => 'user')
-        @p2.any_instantiation.stubs(:works_for_account?).with(Account.site_admin, false).returns(true)
-        @user.find_pseudonym_for_account(Account.site_admin).should == @p2
-      end
-
-      it "should copy a pseudonym from another shard" do
+      before :once do
         @shard1.activate do
           account = Account.create!
           user_with_pseudonym(:active_all => 1, :account => account, :password => 'qwerty')
         end
+      end
+
+      it "should find a pseudonym in another shard" do
+        @p2 = Account.site_admin.pseudonyms.create!(:user => @user, :unique_id => 'user')
+        @p2.any_instantiation.stubs(:works_for_account?).with(Account.site_admin, false).returns(true)
+        expect(@user.find_pseudonym_for_account(Account.site_admin)).to eq @p2
+      end
+
+      it "should copy a pseudonym from another shard" do
         p = @user.find_or_initialize_pseudonym_for_account(Account.site_admin)
-        p.should be_new_record
+        expect(p).to be_new_record
         p.save!
-        p.valid_password?('qwerty').should be_true
+        expect(p.valid_password?('qwerty')).to be_truthy
       end
     end
   end
 
   describe "can_be_enrolled_in_course?" do
-    before do
+    before :once do
       course active_all: true
     end
 
     it "should allow a user with a pseudonym in the course's root account" do
       user_with_pseudonym account: @course.root_account, active_all: true
-      @user.can_be_enrolled_in_course?(@course).should be_true
+      expect(@user.can_be_enrolled_in_course?(@course)).to be_truthy
     end
 
     it "should allow a temporary user with an existing enrollment but no pseudonym" do
       @user = User.create! { |u| u.workflow_state = 'creation_pending' }
       @course.enroll_student(@user)
-      @user.can_be_enrolled_in_course?(@course).should be_true
+      expect(@user.can_be_enrolled_in_course?(@course)).to be_truthy
     end
 
     it "should not allow a registered user with an existing enrollment but no pseudonym" do
       user active_all: true
       @course.enroll_student(@user)
-      @user.can_be_enrolled_in_course?(@course).should be_false
+      expect(@user.can_be_enrolled_in_course?(@course)).to be_falsey
     end
 
     it "should not allow a user with neither an enrollment nor a pseudonym" do
       user active_all: true
-      @user.can_be_enrolled_in_course?(@course).should be_false
+      expect(@user.can_be_enrolled_in_course?(@course)).to be_falsey
     end
   end
 
@@ -1540,87 +1546,75 @@ describe User do
     it "should not return retired channels" do
       u = User.create!
       retired = u.communication_channels.create!(:path => 'retired@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'retired'}
-      u.email_channel.should be_nil
+      expect(u.email_channel).to be_nil
       active = u.communication_channels.create!(:path => 'active@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'}
-      u.email_channel.should == active
+      expect(u.email_channel).to eq active
     end
   end
 
   describe "sis_pseudonym_for" do
+    let_once(:course1) { course :active_all => true, :account => Account.default }
+    let_once(:course2) { course :active_all => true, :account => account2 }
+    let_once(:account1) { account_model }
+    let_once(:account2) { account_model }
+    let_once(:u) { User.create! }
+
     it "should return active pseudonyms only" do
-      course :active_all => true, :account => Account.default
-      u = User.create!
       u.pseudonyms.create!(:account => Account.default, :unique_id => "user2@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf") {|x| x.workflow_state = 'deleted'; x.sis_user_id = "user2" }
-      u.sis_pseudonym_for(@course).should be_nil
+      expect(u.sis_pseudonym_for(course1)).to be_nil
       @p = u.pseudonyms.create!(:account => Account.default, :unique_id => "user1@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf") {|x| x.workflow_state = 'active'; x.sis_user_id = "user1" }
-      u.sis_pseudonym_for(@course).should == @p
+      expect(u.sis_pseudonym_for(course1)).to eq @p
     end
 
     it "should return pseudonyms in the right account" do
-      course :active_all => true, :account => Account.default
       other_account = account_model
-      u = User.create!
       u.pseudonyms.create!(:account => other_account, :unique_id => "user1@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf") {|x| x.workflow_state = 'active'; x.sis_user_id = "user1" }
-      u.sis_pseudonym_for(@course).should be_nil
+      expect(u.sis_pseudonym_for(course1)).to be_nil
       @p = u.pseudonyms.create!(:account => Account.default, :unique_id => "user2@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf") {|x| x.workflow_state = 'active'; x.sis_user_id = "user2" }
-      u.sis_pseudonym_for(@course).should == @p
+      expect(u.sis_pseudonym_for(course1)).to eq @p
     end
 
     it "should return pseudonyms with a sis id only" do
-      course :active_all => true, :account => Account.default
-      u = User.create!
       u.pseudonyms.create!(:account => Account.default, :unique_id => "user1@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf") {|x| x.workflow_state = 'active' }
-      u.sis_pseudonym_for(@course).should be_nil
+      expect(u.sis_pseudonym_for(course1)).to be_nil
       @p = u.pseudonyms.create!(:account => Account.default, :unique_id => "user2@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf") {|x| x.workflow_state = 'active'; x.sis_user_id = "user2" }
-      u.sis_pseudonym_for(@course).should == @p
+      expect(u.sis_pseudonym_for(course1)).to eq @p
     end
 
     it "should find the right root account for a course" do
-      @account = account_model
-      course :active_all => true, :account => @account
-      u = User.create!
-      p = @account.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
-      u.sis_pseudonym_for(@course).should == p
+      p = account2.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
+      expect(u.sis_pseudonym_for(course2)).to eq p
     end
 
     it "should find the right root account for a group" do
-      @account = account_model
-      course :active_all => true, :account => @account
-      @group = group :group_context => @course
-      u = User.create!
-      p = @account.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
-      u.sis_pseudonym_for(@group).should == p
+      @group = group :group_context => course2
+      p = account2.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
+      expect(u.sis_pseudonym_for(@group)).to eq p
     end
 
     it "should find the right root account for a non-root-account" do
-      @root_account = account_model
+      @root_account = account1
       @account = @root_account.sub_accounts.create!
-      u = User.create!
       p = @root_account.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
-      u.sis_pseudonym_for(@account).should == p
+      expect(u.sis_pseudonym_for(@account)).to eq p
     end
 
     it "should find the right root account for a root account" do
-      @account = account_model
-      u = User.create!
-      p = @account.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
-      u.sis_pseudonym_for(@account).should == p
+      p = account1.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
+      expect(u.sis_pseudonym_for(account1)).to eq p
     end
 
     it "should bail if it can't find a root account" do
       context = Course.new # some context that doesn't have an account
-      (lambda {User.create!.sis_pseudonym_for(context)}).should raise_error("could not resolve root account")
+      expect(lambda {u.sis_pseudonym_for(context)}).to raise_error("could not resolve root account")
     end
 
     it "should include a pseudonym from a trusted account" do
-      account1 = account_model
-      account2 = account_model
-      u = User.create!
       p = account2.pseudonyms.create!(user: u, unique_id: 'user') { |p| p.sis_user_id = 'abc' }
       account1.stubs(:trust_exists?).returns(true)
       account1.stubs(:trusted_account_ids).returns([account2.id])
-      u.sis_pseudonym_for(account1).should be_nil
-      u.sis_pseudonym_for(account1, true).should == p
+      expect(u.sis_pseudonym_for(account1)).to be_nil
+      expect(u.sis_pseudonym_for(account1, true)).to eq p
     end
 
     context "sharding" do
@@ -1632,10 +1626,10 @@ describe User do
         end
         @pseudonym = Account.default.pseudonyms.create!(:user => @user, :unique_id => 'user') { |p| p.sis_user_id = 'abc' }
         @shard2.activate do
-          @user.sis_pseudonym_for(Account.default).should == @pseudonym
+          expect(@user.sis_pseudonym_for(Account.default)).to eq @pseudonym
         end
         @shard1.activate do
-          @user.sis_pseudonym_for(Account.default).should == @pseudonym
+          expect(@user.sis_pseudonym_for(Account.default)).to eq @pseudonym
         end
       end
     end
@@ -1645,47 +1639,44 @@ describe User do
     it "should work" do
       @user = User.create!
       @user.email = 'john@example.com'
-      @user.communication_channels.map(&:path).should == ['john@example.com']
-      @user.email.should == 'john@example.com'
+      expect(@user.communication_channels.map(&:path)).to eq ['john@example.com']
+      expect(@user.email).to eq 'john@example.com'
     end
   end
 
   describe "event methods" do
     describe "calendar_events_for_calendar" do
+      before(:once) { course_with_student(:active_all => true) }
       it "should include own scheduled appointments" do
-        course_with_student(:active_all => true)
         ag = AppointmentGroup.create!(:title => 'test appointment', :contexts => [@course], :new_appointments => [[Time.now, Time.now + 1.hour], [Time.now + 1.hour, Time.now + 2.hour]])
         ag.appointments.first.reserve_for(@user, @user)
         events = @user.calendar_events_for_calendar
-        events.size.should eql 1
-        events.first.title.should eql 'test appointment'
+        expect(events.size).to eql 1
+        expect(events.first.title).to eql 'test appointment'
       end
 
       it "should include manageable appointments" do
-        course(:active_all => true)
         @user = @course.instructors.first
         ag = AppointmentGroup.create!(:title => 'test appointment', :contexts => [@course], :new_appointments => [[Time.now, Time.now + 1.hour]])
         events = @user.calendar_events_for_calendar
-        events.size.should eql 1
-        events.first.title.should eql 'test appointment'
+        expect(events.size).to eql 1
+        expect(events.first.title).to eql 'test appointment'
       end
 
-      it "should not include unpublished assignments when draft_state is enabled" do
-        course_with_student(:active_all => true)
-        @course.enable_feature!(:draft_state)
+      it "should not include unpublished assignments" do
         as = @course.assignments.create!({:title => "Published", :due_at => 2.days.from_now})
         as.publish
         as2 = @course.assignments.create!({:title => "Unpublished", :due_at => 2.days.from_now})
         as2.unpublish
         events = @user.calendar_events_for_calendar(:contexts => [@course])
-        events.size.should eql 1
-        events.first.title.should eql 'Published'
+        expect(events.size).to eql 1
+        expect(events.first.title).to eql 'Published'
       end
     end
 
     describe "upcoming_events" do
+      before(:once) { course_with_teacher(:active_all => true) }
       it "handles assignments where the applied due_at is nil" do
-        course_with_teacher_logged_in(:active_all => true)
         assignment = @course.assignments.create!(:title => "Should not throw",
                                                  :due_at => 1.days.from_now)
         assignment2 = @course.assignments.create!(:title => "Should not throw2",
@@ -1703,21 +1694,19 @@ describe User do
         expect do
           events = @user.upcoming_events(:end_at => 1.week.from_now)
         end.to_not raise_error
-
-        events.first.should == assignment2
-        events.second.should == assignment
+        
+        expect(events.first).to eq assignment2
+        expect(events.second).to eq assignment
       end
 
-      it "doesn't show unpublished assignments if draft_state is enabled" do
-        course_with_teacher_logged_in(:active_all => true)
-        @course.enable_feature!(:draft_state)
+      it "doesn't show unpublished assignments" do
         assignment = @course.assignments.create!(:title => "not published", :due_at => 1.days.from_now)
         assignment.unpublish
         assignment2 = @course.assignments.create!(:title => "published", :due_at => 1.days.from_now)
         assignment2.publish
         events = []
         events = @user.upcoming_events(:end_at => 1.week.from_now)
-        events.first.should == assignment2
+        expect(events.first).to eq assignment2
       end
 
     end
@@ -1732,7 +1721,7 @@ describe User do
         assignment.stubs(:due_at => time)
         assignment.expects(:grants_right?).with(user, :delete).returns false
       end
-      user.select_upcoming_assignments(assignments,{:end_at => time}).should == assignments
+      expect(user.select_upcoming_assignments(assignments,{:end_at => time})).to eq assignments
     end
 
     it "returns assignments that have an override between now and end_at opt" do
@@ -1757,10 +1746,102 @@ describe User do
         upcoming_assignments = user.select_upcoming_assignments(assignments,{
           :end_at => 1.week.from_now
         })
-        upcoming_assignments.should include assignments.first
-        upcoming_assignments.should include assignments.second
-        upcoming_assignments.should_not include assignments.third
-        upcoming_assignments.should_not include assignments[3]
+        expect(upcoming_assignments).to include assignments.first
+        expect(upcoming_assignments).to include assignments.second
+        expect(upcoming_assignments).not_to include assignments.third
+        expect(upcoming_assignments).not_to include assignments[3]
+      end
+    end
+  end
+
+  describe "assignments_visibile_in_course" do
+    before do
+      @teacher_enrollment = course_with_teacher(:active_course => true)
+      @course_section = @course.course_sections.create
+      @student1 = User.create
+      @student2 = User.create
+      @student3 = User.create
+      @assignment = Assignment.create!(title: "title", context: @course, only_visible_to_overrides: true)
+      @unpublished_assignment = Assignment.create!(title: "title", context: @course, only_visible_to_overrides: false)
+      @unpublished_assignment.unpublish
+      @course.enroll_student(@student2, :enrollment_state => 'active')
+      @section = @course.course_sections.create!(name: "test section")
+      student_in_section(@section, user: @student1)
+      create_section_override_for_assignment(@assignment, {course_section: @section})
+      @course.reload
+    end
+
+    context "as student" do
+      context "differentiated_assignments on" do
+        before {@course.enable_feature!(:differentiated_assignments)}
+        it "should return assignments only when a student has overrides" do
+          expect(@student1.assignments_visibile_in_course(@course).include?(@assignment)).to be_truthy
+          expect(@student2.assignments_visibile_in_course(@course).include?(@assignment)).to be_falsey
+          expect(@student1.assignments_visibile_in_course(@course).include?(@unpublished_assignment)).to be_falsey
+        end
+      end
+
+      context "differentiated_assignments off" do
+        before {
+          @course.disable_feature!(:differentiated_assignments)
+        }
+        it "should return all assignments" do
+          expect(@student1.assignments_visibile_in_course(@course).include?(@assignment)).to be_truthy
+        end
+      end
+    end
+
+    context "as teacher" do
+      it "should return all assignments" do
+        expect(@teacher_enrollment.user.assignments_visibile_in_course(@course).include?(@assignment)).to be_truthy
+        expect(@teacher_enrollment.user.assignments_visibile_in_course(@course).include?(@unpublished_assignment)).to be_truthy
+      end
+    end
+
+    context "as observer" do
+      before do
+        @observer = User.create
+        @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+      end
+      context "differentiated_assignments on" do
+        before{@course.enable_feature!(:differentiated_assignments)}
+        context "observer watching student with visibility" do
+          before{ @observer_enrollment.update_attribute(:associated_user_id, @student1.id) }
+          it "should be true" do
+            expect(@observer.assignments_visibile_in_course(@course).include?(@assignment)).to be_truthy
+          end
+        end
+        context "observer watching student without visibility" do
+          before{ @observer_enrollment.update_attribute(:associated_user_id, @student2.id) }
+          it "should be false" do
+            expect(@observer.assignments_visibile_in_course(@course).include?(@assignment)).to be_falsey
+          end
+        end
+        context "observer watching a only section" do
+          it "should be true" do
+            expect(@observer.assignments_visibile_in_course(@course).include?(@assignment)).to be_truthy
+          end
+        end
+      end
+      context "differentiated_assignments off" do
+        before{@course.disable_feature!(:differentiated_assignments)}
+        context "observer watching student with visibility" do
+          before{ @observer_enrollment.update_attribute(:associated_user_id, @student1.id) }
+          it "should be true" do
+            expect(@observer.assignments_visibile_in_course(@course).include?(@assignment)).to be_truthy
+          end
+        end
+        context "observer watching student without visibility" do
+          before{ @observer_enrollment.update_attribute(:associated_user_id, @student2.id) }
+          it "should be true" do
+            expect(@observer.assignments_visibile_in_course(@course).include?(@assignment)).to be_truthy
+          end
+        end
+        context "observer watching a only section" do
+          it "should be true" do
+            expect(@observer.assignments_visibile_in_course(@course).include?(@assignment)).to be_truthy
+          end
+        end
       end
     end
   end
@@ -1768,9 +1849,13 @@ describe User do
   describe "assignments_needing_submitting" do
     # NOTE: More thorough testing of the Assignment#not_locked named scope is in assignment_spec.rb
     context "locked assignments" do
-      before :each do
-        course_with_student_logged_in(:active_all => true)
+      before :once do
+        course_with_student(:active_all => true)
         assignment_quiz([], :course => @course, :user => @user)
+      end
+
+      before :each do
+        user_session(@user)
         # Setup default values for tests (leave unsaved for easy changes)
         @quiz.unlock_at = nil
         @quiz.lock_at = nil
@@ -1789,44 +1874,43 @@ describe User do
         override.due_at = 1.weeks.from_now - 1.day
         override.due_at_overridden = true
         override.save!
-        @student.assignments_needing_submitting(:contexts => [@course]).
-          should include @quiz.assignment
+        expect(@student.assignments_needing_submitting(:contexts => [@course])).
+          to include @quiz.assignment
       end
       it "should include assignments with no locks" do
         @quiz.save!
         list = @student.assignments_needing_submitting(:contexts => [@course])
-        list.size.should eql 1
-        list.first.title.should eql 'Test Assignment'
+        expect(list.size).to eql 1
+        expect(list.first.title).to eql 'Test Assignment'
       end
       it "should include assignments with unlock_at in the past" do
         @quiz.unlock_at = 1.hour.ago
         @quiz.save!
         list = @student.assignments_needing_submitting(:contexts => [@course])
-        list.size.should eql 1
-        list.first.title.should eql 'Test Assignment'
+        expect(list.size).to eql 1
+        expect(list.first.title).to eql 'Test Assignment'
       end
       it "should include assignments with lock_at in the future" do
         @quiz.lock_at = 1.hour.from_now
         @quiz.save!
         list = @student.assignments_needing_submitting(:contexts => [@course])
-        list.size.should eql 1
-        list.first.title.should eql 'Test Assignment'
+        expect(list.size).to eql 1
+        expect(list.first.title).to eql 'Test Assignment'
       end
       it "should not include assignments where unlock_at is in future" do
         @quiz.unlock_at = 1.hour.from_now
         @quiz.save!
-        @student.assignments_needing_submitting(:contexts => [@course]).count.should == 0
+        expect(@student.assignments_needing_submitting(:contexts => [@course]).count).to eq 0
       end
       it "should not include assignments where lock_at is in past" do
         @quiz.lock_at = 1.hour.ago
         @quiz.save!
-        @student.assignments_needing_submitting(:contexts => [@course]).count.should == 0
+        expect(@student.assignments_needing_submitting(:contexts => [@course]).count).to eq 0
       end
     end
 
-    it "should not include unpublished assignments when draft_state is enabled" do
+    it "should not include unpublished assignments" do
       course_with_student_logged_in(:active_all => true)
-      @course.enable_feature!(:draft_state)
       assignment_quiz([], :course => @course, :user => @user)
       @assignment.unpublish
       @quiz.unlock_at = 1.hour.ago
@@ -1839,254 +1923,351 @@ describe User do
       @quiz.due_at = 2.days.from_now
       @quiz.save!
 
-      @student.assignments_needing_submitting(:contexts => [@course]).count.should == 1
+      expect(@student.assignments_needing_submitting(:contexts => [@course]).count).to eq 1
+    end
+
+    it "should not include assignments from soft concluded courses" do
+      course_with_student_logged_in(:active_all => true)
+      @course.enrollment_term.update_attribute(:end_at, 1.day.from_now)
+      assignment_quiz([], :course => @course, :user => @user)
+      @quiz.unlock_at = nil
+      @quiz.lock_at = nil
+      @quiz.due_at = 3.days.from_now
+      @quiz.save!
+      Timecop.travel(2.days) do
+        expect(@student.assignments_needing_submitting(:contexts => [@course]).count).to eq 0
+      end
+    end
+
+    it "should always have the only_visible_to_overrides attribute" do
+      course_with_student_logged_in(:active_all => true)
+      assignment_quiz([], :course => @course, :user => @user)
+      @quiz.unlock_at = nil
+      @quiz.lock_at = nil
+      @quiz.due_at = 2.days.from_now
+      @quiz.save!
+      assignments = @student.assignments_needing_submitting(:contexts => [@course])
+      expect(assignments[0].has_attribute?(:only_visible_to_overrides)).to be_truthy
+    end
+
+    def create_course_with_assignment_needing_submitting(opts={})
+      student = opts[:student]
+      course_with_student_logged_in(:active_all => true, :user => student)
+      @course.enrollments.each(&:destroy!) #student removed from default section
+      section = @course.course_sections.create!
+      student_in_section(section, user: student)
+      assignment_quiz([], :course => @course, :user => student)
+      @assignment.only_visible_to_overrides = true
+      @assignment.publish
+      @quiz.due_at = 2.days.from_now
+      @quiz.save!
+      if opts[:differentiated_assignments]
+        @course.enable_feature!(:differentiated_assignments)
+      end
+      if opts[:override]
+        create_section_override_for_assignment(@assignment, {course_section: section})
+      end
+      @assignment
+    end
+
+    context "differentiated_assignments" do
+      context "feature flag on" do
+        before {@student = User.create!(name: "Test Student")}
+        it "should not return the assignments without an override" do
+          assignment = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: false, student: @student})
+          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_falsey
+        end
+
+        it "should return the assignments with an override" do
+          assignment = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: true, student: @student})
+          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_truthy
+        end
+
+        it "should not return the assignments without an override" do
+          assignment = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: false, student: @student})
+          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_falsey
+        end
+
+        it "should return the assignments in both types of courses" do
+          assignment0 = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: true, student: @student})
+          assignment1 = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: false, student: @student})
+          assignment2 = create_course_with_assignment_needing_submitting({differentiated_assignments: false, override: false, student: @student})
+          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment0)).to be_truthy
+          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment1)).to be_falsey
+          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment2)).to be_truthy
+        end
+      end
+
+      context "feature flag off" do
+        before {@student = User.create!(name: "Test Student")}
+        it "should return the assignment without an override" do
+          assignment = create_course_with_assignment_needing_submitting({differentiated_assignments: false, override: false, student: @student})
+          expect(@student.assignments_needing_submitting(contexts: Course.all).include?(assignment)).to be_truthy
+        end
+      end
+    end
+  end
+
+  describe "submissions_needing_peer_review" do
+    before(:each) do
+      course_with_student_logged_in(:active_all => true)
+      @assessor = @student
+      assignment_model(course: @course, peer_reviews: true)
+      @submission = submission_model(assignment: @assignment)
+      @assessor_submission = submission_model(assignment: @assignment, user: @assessor)
+      @assessment_request = AssessmentRequest.create!(assessor: @assessor, asset: @submission, user: @student, assessor_asset: @assessor_submission)
+      @assessment_request.workflow_state = 'assigned'
+      @assessment_request.save
+    end
+
+    it "should included assessment requests where the user is the assessor" do
+      expect(@assessor.submissions_needing_peer_review.length).to eq 1
+    end
+
+    it "should note include assessment requests that have been ignored" do
+      Ignore.create!(asset: @assessment_request, user: @assessor, purpose: 'reviewing')
+      expect(@assessor.submissions_needing_peer_review.length).to eq 0
     end
   end
 
   describe "avatar_key" do
     it "should return a valid avatar key for a valid user id" do
-      User.avatar_key(1).should == "1-#{Canvas::Security.hmac_sha1('1')[0,10]}"
-      User.avatar_key("1").should == "1-#{Canvas::Security.hmac_sha1('1')[0,10]}"
-      User.avatar_key("2").should == "2-#{Canvas::Security.hmac_sha1('2')[0,10]}"
-      User.avatar_key("161612461246").should == "161612461246-#{Canvas::Security.hmac_sha1('161612461246')[0,10]}"
+      expect(User.avatar_key(1)).to eq "1-#{Canvas::Security.hmac_sha1('1')[0,10]}"
+      expect(User.avatar_key("1")).to eq "1-#{Canvas::Security.hmac_sha1('1')[0,10]}"
+      expect(User.avatar_key("2")).to eq "2-#{Canvas::Security.hmac_sha1('2')[0,10]}"
+      expect(User.avatar_key("161612461246")).to eq "161612461246-#{Canvas::Security.hmac_sha1('161612461246')[0,10]}"
     end
     it" should return '0' for an invalid user id" do
-      User.avatar_key(nil).should == "0"
-      User.avatar_key("").should == "0"
-      User.avatar_key(0).should == "0"
+      expect(User.avatar_key(nil)).to eq "0"
+      expect(User.avatar_key("")).to eq "0"
+      expect(User.avatar_key(0)).to eq "0"
     end
   end
   describe "user_id_from_avatar_key" do
     it "should return a valid user id for a valid avatar key" do
-      User.user_id_from_avatar_key("1-#{Canvas::Security.hmac_sha1('1')[0,10]}").should == '1'
-      User.user_id_from_avatar_key("2-#{Canvas::Security.hmac_sha1('2')[0,10]}").should == '2'
-      User.user_id_from_avatar_key("1536394658-#{Canvas::Security.hmac_sha1('1536394658')[0,10]}").should == '1536394658'
+      expect(User.user_id_from_avatar_key("1-#{Canvas::Security.hmac_sha1('1')[0,10]}")).to eq '1'
+      expect(User.user_id_from_avatar_key("2-#{Canvas::Security.hmac_sha1('2')[0,10]}")).to eq '2'
+      expect(User.user_id_from_avatar_key("1536394658-#{Canvas::Security.hmac_sha1('1536394658')[0,10]}")).to eq '1536394658'
     end
     it "should return nil for an invalid avatar key" do
-      User.user_id_from_avatar_key("1-#{Canvas::Security.hmac_sha1('1')}").should == nil
-      User.user_id_from_avatar_key("1").should == nil
-      User.user_id_from_avatar_key("2-123456").should == nil
-      User.user_id_from_avatar_key("a").should == nil
-      User.user_id_from_avatar_key(nil).should == nil
-      User.user_id_from_avatar_key("").should == nil
-      User.user_id_from_avatar_key("-").should == nil
-      User.user_id_from_avatar_key("-159135").should == nil
+      expect(User.user_id_from_avatar_key("1-#{Canvas::Security.hmac_sha1('1')}")).to eq nil
+      expect(User.user_id_from_avatar_key("1")).to eq nil
+      expect(User.user_id_from_avatar_key("2-123456")).to eq nil
+      expect(User.user_id_from_avatar_key("a")).to eq nil
+      expect(User.user_id_from_avatar_key(nil)).to eq nil
+      expect(User.user_id_from_avatar_key("")).to eq nil
+      expect(User.user_id_from_avatar_key("-")).to eq nil
+      expect(User.user_id_from_avatar_key("-159135")).to eq nil
     end
   end
 
   describe "order_by_sortable_name" do
-    it "should sort lexicographically" do
+    let_once :ids do
       ids = []
       ids << User.create!(:name => "John Johnson")
       ids << User.create!(:name => "John John")
-      User.order_by_sortable_name.where(id: ids).all.map(&:sortable_name).should == ["John, John", "Johnson, John"]
+    end
+
+    it "should sort lexicographically" do
+      expect(User.order_by_sortable_name.where(id: ids).all.map(&:sortable_name)).to eq ["John, John", "Johnson, John"]
     end
 
     it "should sort support direction toggle" do
-      ids = []
-      ids << User.create!(:name => "John Johnson")
-      ids << User.create!(:name => "John John")
-      User.order_by_sortable_name(:direction => :descending).where(id: ids).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
+      expect(User.order_by_sortable_name(:direction => :descending).where(id: ids).all.map(&:sortable_name)).to eq ["Johnson, John", "John, John"]
     end
 
     it "should sort support direction toggle with a prior select" do
-      ids = []
-      ids << User.create!(:name => "John Johnson")
-      ids << User.create!(:name => "John John")
-      User.select([:id, :sortable_name]).order_by_sortable_name(:direction => :descending).where(id: ids).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
+      expect(User.select([:id, :sortable_name]).order_by_sortable_name(:direction => :descending).where(id: ids).all.map(&:sortable_name)).to eq ["Johnson, John", "John, John"]
     end
 
     it "should sort by the current locale with pg_collkey if possible" do
-      pending "requires postgres" unless User.connection.adapter_name == 'PostgreSQL'
-      pending "requires pg_collkey on the server" if User.connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='collkey'").to_i == 0
+      skip "requires postgres" unless User.connection.adapter_name == 'PostgreSQL'
+      skip "requires pg_collkey on the server" if User.connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='collkey'").to_i == 0
       begin
         Bundler.require 'icu'
       rescue LoadError
-        pending "requires icu locally"
+        skip "requires icu locally"
       end
       I18n.locale = :es
-      User.sortable_name_order_by_clause.should match /es/
-      User.sortable_name_order_by_clause.should_not match /root/
+      expect(User.sortable_name_order_by_clause).to match /es/
+      expect(User.sortable_name_order_by_clause).not_to match /root/
       # english has no specific sorting rules, so use root
       I18n.locale = :en
-      User.sortable_name_order_by_clause.should_not match /es/
-      User.sortable_name_order_by_clause.should match /root/
+      expect(User.sortable_name_order_by_clause).not_to match /es/
+      expect(User.sortable_name_order_by_clause).to match /root/
     end
   end
 
   describe "quota" do
+    before(:once) { user }
     it "should default to User.default_storage_quota" do
-      user().quota.should eql User.default_storage_quota
+      expect(@user.quota).to eql User.default_storage_quota
     end
 
     it "should sum up associated root account quotas" do
-      user()
       @user.associated_root_accounts << Account.create! << (a = Account.create!)
       a.update_attribute :default_user_storage_quota_mb, a.default_user_storage_quota_mb + 10
-      @user.quota.should eql(2 * User.default_storage_quota + 10.megabytes)
+      expect(@user.quota).to eql(2 * User.default_storage_quota + 10.megabytes)
     end
   end
 
   it "should build a profile if one doesn't already exist" do
     user = User.create! :name => "John Johnson"
     profile = user.profile
-    profile.id.should be_nil
+    expect(profile.id).to be_nil
     profile.bio = "bio!"
     profile.save!
-    user.profile.should == profile
+    expect(user.profile).to eq profile
   end
 
   describe "common_account_chain" do
-    before do
+    before :once do
       user_with_pseudonym
     end
+    let_once(:root_acct1) { Account.create! }
+    let_once(:root_acct2) { Account.create! }
 
     it "work for just root accounts" do
-      root_acct1 = Account.create!
-      root_acct2 = Account.create!
-
       @user.user_account_associations.create!(:account_id => root_acct2.id)
       @user.reload
-      @user.common_account_chain(root_acct1).should == []
-      @user.common_account_chain(root_acct2).should eql [root_acct2]
+      expect(@user.common_account_chain(root_acct1)).to eq []
+      expect(@user.common_account_chain(root_acct2)).to eql [root_acct2]
     end
 
     it "should work for one level of sub accounts" do
-      root_acct = Account.create!
+      root_acct = root_acct1
       sub_acct1 = Account.create!(:parent_account => root_acct)
       sub_acct2 = Account.create!(:parent_account => root_acct)
 
       @user.user_account_associations.create!(:account_id => root_acct.id)
-      @user.reload.common_account_chain(root_acct).should eql [root_acct]
+      expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct]
 
       @user.user_account_associations.create!(:account_id => sub_acct1.id)
-      @user.reload.common_account_chain(root_acct).should eql [root_acct, sub_acct1]
+      expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct, sub_acct1]
 
       @user.user_account_associations.create!(:account_id => sub_acct2.id)
-      @user.reload.common_account_chain(root_acct).should eql [root_acct]
+      expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct]
     end
 
     it "should work for two levels of sub accounts" do
-      root_acct = Account.create!
+      root_acct = root_acct1
       sub_acct1 = Account.create!(:parent_account => root_acct)
       sub_sub_acct1 = Account.create!(:parent_account => sub_acct1)
       sub_sub_acct2 = Account.create!(:parent_account => sub_acct1)
       sub_acct2 = Account.create!(:parent_account => root_acct)
 
       @user.user_account_associations.create!(:account_id => root_acct.id)
-      @user.reload.common_account_chain(root_acct).should eql [root_acct]
+      expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct]
 
       @user.user_account_associations.create!(:account_id => sub_acct1.id)
-      @user.reload.common_account_chain(root_acct).should eql [root_acct, sub_acct1]
+      expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct, sub_acct1]
 
       @user.user_account_associations.create!(:account_id => sub_sub_acct1.id)
-      @user.reload.common_account_chain(root_acct).should eql [root_acct, sub_acct1, sub_sub_acct1]
+      expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct, sub_acct1, sub_sub_acct1]
 
       @user.user_account_associations.create!(:account_id => sub_sub_acct2.id)
-      @user.reload.common_account_chain(root_acct).should eql [root_acct, sub_acct1]
+      expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct, sub_acct1]
 
       @user.user_account_associations.create!(:account_id => sub_acct2.id)
-      @user.reload.common_account_chain(root_acct).should eql [root_acct]
+      expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct]
     end
   end
 
   describe "mfa_settings" do
+    let_once(:user) { User.create! }
+
     it "should be :disabled for unassociated users" do
       user = User.new
-      user.mfa_settings.should == :disabled
+      expect(user.mfa_settings).to eq :disabled
     end
 
     it "should inherit from the account" do
-      user = User.create!
       user.pseudonyms.create!(:account => Account.default, :unique_id => 'user')
       Account.default.settings[:mfa_settings] = :required
       Account.default.save!
 
-      user.mfa_settings.should == :required
+      expect(user.mfa_settings).to eq :required
 
       Account.default.settings[:mfa_settings] = :optional
       Account.default.save!
-      user = User.find(user)
-      user.mfa_settings.should == :optional
+      user = User.find(user())
+      expect(user.mfa_settings).to eq :optional
     end
 
     it "should be the most-restrictive if associated with multiple accounts" do
-      user = User.create!
       disabled_account = Account.create!(:settings => { :mfa_settings => :disabled })
       optional_account = Account.create!(:settings => { :mfa_settings => :optional })
       required_account = Account.create!(:settings => { :mfa_settings => :required })
 
       p1 = user.pseudonyms.create!(:account => disabled_account, :unique_id => 'user')
-      user = User.find(user)
-      user.mfa_settings.should == :disabled
+      user = User.find(user())
+      expect(user.mfa_settings).to eq :disabled
 
       p2 = user.pseudonyms.create!(:account => optional_account, :unique_id => 'user')
       user = User.find(user)
-      user.mfa_settings.should == :optional
+      expect(user.mfa_settings).to eq :optional
 
       p3 = user.pseudonyms.create!(:account => required_account, :unique_id => 'user')
       user = User.find(user)
-      user.mfa_settings.should == :required
+      expect(user.mfa_settings).to eq :required
 
       p1.destroy
       user = User.find(user)
-      user.mfa_settings.should == :required
+      expect(user.mfa_settings).to eq :required
 
       p2.destroy
       user = User.find(user)
-      user.mfa_settings.should == :required
+      expect(user.mfa_settings).to eq :required
     end
 
     it "should be required if admin and required_for_admins" do
-      user = User.create!
       account = Account.create!(:settings => { :mfa_settings => :required_for_admins })
       user.pseudonyms.create!(:account => account, :unique_id => 'user')
 
-      user.mfa_settings.should == :optional
+      expect(user.mfa_settings).to eq :optional
       account.account_users.create!(user: user)
       user.reload
-      user.mfa_settings.should == :required
+      expect(user.mfa_settings).to eq :required
     end
 
     it "required_for_admins shouldn't get confused by admins in other accounts" do
-      user = User.create!
       account = Account.create!(:settings => { :mfa_settings => :required_for_admins })
       user.pseudonyms.create!(:account => account, :unique_id => 'user')
       user.pseudonyms.create!(:account => Account.default, :unique_id => 'user')
 
       Account.default.account_users.create!(user: user)
 
-      user.mfa_settings.should == :optional
+      expect(user.mfa_settings).to eq :optional
     end
   end
 
   context "crocodoc attributes" do
-    before do
+    before :once do
       Setting.set 'crocodoc_counter', 998
       @user = User.create! :short_name => "Bob"
     end
 
     it "should generate a unique crocodoc_id" do
-      @user.crocodoc_id.should be_nil
-      @user.crocodoc_id!.should eql 999
-      @user.crocodoc_user.should eql '999,Bob'
+      expect(@user.crocodoc_id).to be_nil
+      expect(@user.crocodoc_id!).to eql 999
+      expect(@user.crocodoc_user).to eql '999,Bob'
     end
 
     it "should scrub commas from the user name" do
       @user.short_name = "Smith, Bob"
       @user.save!
-      @user.crocodoc_user.should eql '999,Smith Bob'
+      expect(@user.crocodoc_user).to eql '999,Smith Bob'
     end
 
     it "should not change a user's crocodoc_id" do
       @user.update_attribute :crocodoc_id, 2
-      @user.crocodoc_id!.should eql 2
-      Setting.get('crocodoc_counter', 0).to_i.should eql 998
+      expect(@user.crocodoc_id!).to eql 2
+      expect(Setting.get('crocodoc_counter', 0).to_i).to eql 998
     end
   end
 
   context "assignments_needing_grading" do
-    before :each do
+    before :once do
       # create courses and sections
       @course1 = course_with_teacher(:active_all => true).course
       @course2 = course_with_teacher(:active_all => true, :user => @teacher).course
@@ -2115,58 +2296,68 @@ describe User do
       end
     end
 
+    it "should not count assignments in soft concluded courses" do
+      @course.enrollment_term.update_attribute(:end_at, 1.day.from_now)
+      Timecop.travel(1.week) do
+        expect(@teacher.reload.assignments_needing_grading.size).to eql(0)
+      end
+    end
+
     it "should count assignments with ungraded submissions across multiple courses" do
-      @teacher.assignments_needing_grading.size.should eql(2)
-      @teacher.assignments_needing_grading.should be_include(@course1.assignments.first)
-      @teacher.assignments_needing_grading.should be_include(@course2.assignments.first)
+      expect(@teacher.assignments_needing_grading.size).to eql(2)
+      expect(@teacher.assignments_needing_grading).to be_include(@course1.assignments.first)
+      expect(@teacher.assignments_needing_grading).to be_include(@course2.assignments.first)
 
       # grade one submission for one assignment; these numbers don't change
       @course1.assignments.first.grade_student(@studentA, :grade => "1")
-      @teacher.assignments_needing_grading.size.should eql(2)
-      @teacher.assignments_needing_grading.should be_include(@course1.assignments.first)
-      @teacher.assignments_needing_grading.should be_include(@course2.assignments.first)
+      expect(@teacher.assignments_needing_grading.size).to eql(2)
+      expect(@teacher.assignments_needing_grading).to be_include(@course1.assignments.first)
+      expect(@teacher.assignments_needing_grading).to be_include(@course2.assignments.first)
 
       # grade the other submission; now course1's assignment no longer needs grading
       @course1.assignments.first.grade_student(@studentB, :grade => "1")
       @teacher = User.find(@teacher.id)
-      @teacher.assignments_needing_grading.size.should eql(1)
-      @teacher.assignments_needing_grading.should be_include(@course2.assignments.first)
+      expect(@teacher.assignments_needing_grading.size).to eql(1)
+      expect(@teacher.assignments_needing_grading).to be_include(@course2.assignments.first)
     end
 
     it "should only count submissions in accessible course sections" do
-      @ta.assignments_needing_grading.size.should eql(2)
-      @ta.assignments_needing_grading.should be_include(@course1.assignments.first)
-      @ta.assignments_needing_grading.should be_include(@course2.assignments.first)
+      expect(@ta.assignments_needing_grading.size).to eql(2)
+      expect(@ta.assignments_needing_grading).to be_include(@course1.assignments.first)
+      expect(@ta.assignments_needing_grading).to be_include(@course2.assignments.first)
 
       # grade student A's submissions in both courses; now course1's assignment
       # should not show up because the TA doesn't have access to studentB's submission
       @course1.assignments.first.grade_student(@studentA, :grade => "1")
       @course2.assignments.first.grade_student(@studentA, :grade => "1")
       @ta = User.find(@ta.id)
-      @ta.assignments_needing_grading.size.should eql(1)
-      @ta.assignments_needing_grading.should be_include(@course2.assignments.first)
+      expect(@ta.assignments_needing_grading.size).to eql(1)
+      expect(@ta.assignments_needing_grading).to be_include(@course2.assignments.first)
 
       # but if we enroll the TA in both sections of course1, it should be accessible
       @course1.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :section => @section1b,
                           :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true)
       @ta = User.find(@ta.id)
-      @ta.assignments_needing_grading.size.should eql(2)
-      @ta.assignments_needing_grading.should be_include(@course1.assignments.first)
-      @ta.assignments_needing_grading.should be_include(@course2.assignments.first)
+      expect(@ta.assignments_needing_grading.size).to eql(2)
+      expect(@ta.assignments_needing_grading).to be_include(@course1.assignments.first)
+      expect(@ta.assignments_needing_grading).to be_include(@course2.assignments.first)
     end
 
     it "should limit the number of returned assignments" do
-      20.times do |x|
-        assignment = @course1.assignments.create!(:title => "excess assignment #{x}", :submission_types => ['online_text_entry'])
-        assignment.submit_homework @studentB, body: "hello"
-      end
-      @teacher.assignments_needing_grading.size.should == 15
+      # since we're bulk inserting, the assignments_needing_grading callback doesn't happen, so we manually populate it
+      assignment_ids = create_records(Assignment, 20.times.map{ |x| {title: "excess assignment #{x}", submission_types: 'online_text_entry', workflow_state: "available", context_type: "Course", context_id: @course1.id, needs_grading_count: 1} })
+      create_records(Submission, assignment_ids.map{ |id| {assignment_id: id, user_id: @studentB.id, body: "hello", workflow_state: "submitted", submission_type: 'online_text_entry'} })
+      expect(@teacher.assignments_needing_grading.size).to eq 15
+    end
+
+    it "should always have the only_visible_to_overrides attribute" do
+      @teacher.assignments_needing_grading.each {|a| expect(a.has_attribute?(:only_visible_to_overrides)).to be_truthy }
     end
 
     context "sharding" do
       specs_require_sharding
 
-      before do
+      before :once do
         @shard1.activate do
           @account = Account.create!
           @course3 = @account.courses.create!
@@ -2180,43 +2371,74 @@ describe User do
       end
 
       it "should find assignments from all shards" do
-        @teacher.assignments_needing_grading.sort_by(&:id).should ==
-            [@course1.assignments.first, @course2.assignments.first, @assignment3].sort_by(&:id)
+        [Shard.default, @shard1, @shard2].each do |shard|
+          shard.activate do
+            expect(@teacher.assignments_needing_grading.sort_by(&:id)).to eq(
+                [@course1.assignments.first, @course2.assignments.first, @assignment3].sort_by(&:id)
+            )
+          end
+        end
       end
 
       it "should honor ignores for a separate shard" do
         @teacher.ignore_item!(@assignment3, 'grading')
-        @teacher.assignments_needing_grading.sort_by(&:id).should ==
+        expect(@teacher.assignments_needing_grading.sort_by(&:id)).to eq(
             [@course1.assignments.first, @course2.assignments.first].sort_by(&:id)
+        )
 
         @shard1.activate do
           @assignment3.submit_homework @studentB, :submission_type => "online_text_entry", :body => "submission for B"
         end
         @teacher = User.find(@teacher)
-        @teacher.assignments_needing_grading.size.should == 3
+        expect(@teacher.assignments_needing_grading.size).to eq 3
       end
 
       it "should apply a global limit" do
-        @teacher.assignments_needing_grading(:limit => 1).length.should == 1
+        expect(@teacher.assignments_needing_grading(:limit => 1).length).to eq 1
+      end
+    end
+
+    context "differentiated assignments" do
+      before :once do
+        @a2 = @course1.assignments.create!(:title => "some assignment 2", :submission_types => ['online_text_entry'])
+        [@studentA, @studentB].each do |student|
+          @a2.submit_homework student, body: "submission for #{student.name}"
+        end
+
+        @section1a = @course1.course_sections.create!(name: 'Section One')
+        student_in_section(@section1a, user: @studentB)
+
+        assignments = @course1.assignments
+        differentiated_assignment(assignment: assignments[0], course_section: @section1b)
+        differentiated_assignment(assignment: assignments[1], course_section: @section1a)
+      end
+
+      it "should not include submissions from students without visibility" do
+        @course1.enable_feature!(:differentiated_assignments)
+        expect(@teacher.assignments_needing_grading.length).to eq 2
+      end
+
+      it "should show all submissions with the feature flag off" do
+        expect(@teacher.assignments_needing_grading.length).to eq 3
       end
     end
   end
 
   describe ".initial_enrollment_type_from_type" do
     it "should return supported initial_enrollment_type values" do
-      User.initial_enrollment_type_from_text('StudentEnrollment').should == 'student'
-      User.initial_enrollment_type_from_text('StudentViewEnrollment').should == 'student'
-      User.initial_enrollment_type_from_text('TeacherEnrollment').should == 'teacher'
-      User.initial_enrollment_type_from_text('TaEnrollment').should == 'ta'
-      User.initial_enrollment_type_from_text('ObserverEnrollment').should == 'observer'
-      User.initial_enrollment_type_from_text('DesignerEnrollment').should be_nil
-      User.initial_enrollment_type_from_text('UnknownThing').should be_nil
-      User.initial_enrollment_type_from_text(nil).should be_nil
+      expect(User.initial_enrollment_type_from_text('StudentEnrollment')).to eq 'student'
+      expect(User.initial_enrollment_type_from_text('StudentViewEnrollment')).to eq 'student'
+      expect(User.initial_enrollment_type_from_text('TeacherEnrollment')).to eq 'teacher'
+      expect(User.initial_enrollment_type_from_text('TaEnrollment')).to eq 'ta'
+      expect(User.initial_enrollment_type_from_text('ObserverEnrollment')).to eq 'observer'
+      expect(User.initial_enrollment_type_from_text('DesignerEnrollment')).to be_nil
+      expect(User.initial_enrollment_type_from_text('UnknownThing')).to be_nil
+      expect(User.initial_enrollment_type_from_text(nil)).to be_nil
       # Non-enrollment type strings
-      User.initial_enrollment_type_from_text('student').should == 'student'
-      User.initial_enrollment_type_from_text('teacher').should == 'teacher'
-      User.initial_enrollment_type_from_text('ta').should == 'ta'
-      User.initial_enrollment_type_from_text('observer').should == 'observer'
+      expect(User.initial_enrollment_type_from_text('student')).to eq 'student'
+      expect(User.initial_enrollment_type_from_text('teacher')).to eq 'teacher'
+      expect(User.initial_enrollment_type_from_text('ta')).to eq 'ta'
+      expect(User.initial_enrollment_type_from_text('observer')).to eq 'observer'
     end
   end
 
@@ -2231,7 +2453,19 @@ describe User do
         @account2.account_users.create!(user: @user)
       end
 
-      @user.all_accounts.map(&:id).sort.should == [Account.site_admin, @account2].map(&:id).sort
+      expect(@user.all_accounts.map(&:id).sort).to eq [Account.site_admin, @account2].map(&:id).sort
+    end
+
+    it "should exclude deleted accounts" do
+      user
+      Account.site_admin.account_users.create!(user: @user)
+      @shard1.activate do
+        @account2 = Account.create!
+        @account2.account_users.create!(user: @user)
+        @account2.destroy
+      end
+
+      expect(@user.all_accounts.map(&:id).sort).to eq [Account.site_admin].map(&:id).sort
     end
   end
 
@@ -2246,43 +2480,43 @@ describe User do
         @p2 = account.pseudonyms.create!(:user => @user, :unique_id => 'abcd')
       end
 
-      @user.all_pseudonyms.should == [@p1, @p2]
+      expect(@user.all_pseudonyms).to eq [@p1, @p2]
     end
   end
 
   describe "active_pseudonyms" do
-    before :each do
+    before :once do
       user_with_pseudonym(:active_all => 1)
     end
 
     it "should include active pseudonyms" do
-      @user.active_pseudonyms.should == [@pseudonym]
+      expect(@user.active_pseudonyms).to eq [@pseudonym]
     end
 
     it "should not include deleted pseudonyms" do
       @pseudonym.destroy
-      @user.active_pseudonyms.should be_empty
+      expect(@user.active_pseudonyms).to be_empty
     end
   end
 
   describe "preferred_gradebook_version" do
     let(:user) { User.new }
-    let(:course) { mock('course') }
+    let(:course) { double('course') }
     subject { user.preferred_gradebook_version }
 
     context "prefers gb2" do
       before { user.stubs(:preferences => { :gradebook_version => '2' }) }
-      it { should == '2' }
+      it { is_expected.to eq '2' }
     end
 
     context "prefers srgb" do
       before { user.stubs(:preferences => { :gradebook_version => 'srgb' }) }
-      it { should == 'srgb' }
+      it { is_expected.to eq 'srgb' }
     end
 
     context "nil preference" do
       before { user.stubs(:preferences => { :gradebook_version => nil }) }
-      it { should == '2' }
+      it { is_expected.to eq '2' }
     end
   end
 
@@ -2291,17 +2525,17 @@ describe User do
     subject { user.manual_mark_as_read? }
 
     context 'default' do
-      it { should be_false }
+      it { is_expected.to be_falsey }
     end
 
     context 'after being set to true' do
       before { user.stubs(preferences: { manual_mark_as_read: true }) }
-      it     { should be_true }
+      it     { is_expected.to be_truthy }
     end
 
     context 'after being set to false' do
       before { user.stubs(preferences: { manual_mark_as_read: false }) }
-      it     { should be_false }
+      it     { is_expected.to be_falsey }
     end
   end
 
@@ -2311,137 +2545,222 @@ describe User do
       # don't ship it to the page (even as json).
       user = User.create!
       users = User.order_by_sortable_name
-      users.first.as_json['user'].keys.should_not include('collkey')
+      expect(users.first.as_json['user'].keys).not_to include('collkey')
     end
   end
 
-  describe '#grants_right?' do
-    let(:subaccount) do
-      account = Account.create!
-      account.root_account_id = Account.default.id
-      account.save!
-      account
+  describe 'permissions' do
+    it "should not allow account admin to modify admin privileges of other account admins" do
+      expect(RoleOverride.readonly_for(Account.default, :manage_role_overrides, admin_role)).to be_truthy
+      expect(RoleOverride.readonly_for(Account.default, :manage_account_memberships, admin_role)).to be_truthy
+      expect(RoleOverride.readonly_for(Account.default, :manage_account_settings, admin_role)).to be_truthy
     end
 
-    let(:site_admin) do
-      user = User.create!
-      Account.site_admin.account_users.create!(user: user)
-      Account.default.account_users.create!(user: user)
-      user
+    describe ":reset_mfa" do
+      let(:account1) {
+        a = Account.default
+        a.settings[:admins_can_view_notifications] = true
+        a.save!
+        a
+      }
+      let(:account2) { Account.create! }
+
+      let(:sally) { account_admin_user(
+        user: student_in_course(account: account2).user,
+        account: account1) }
+
+      let(:bob) { student_in_course(
+        user: student_in_course(account: account2).user,
+        course: course(account: account1)).user }
+
+      let(:charlie) { student_in_course(account: account1).user }
+
+      let(:alice) { account_admin_user_with_role_changes(
+        account: account1,
+        role: custom_account_role('StrongerAdmin', account: account1),
+        role_changes: { view_notifications: true }) }
+
+      it "should grant non-admins :reset_mfa on themselves" do
+        pseudonym(charlie, account: account1)
+        expect(charlie).to be_grants_right(charlie, :reset_mfa)
+      end
+
+      it "should grant admins :reset_mfa on themselves" do
+        pseudonym(sally, account: account1)
+        expect(sally).to be_grants_right(sally, :reset_mfa)
+      end
+
+      it "should grant admins :reset_mfa on fully admined users" do
+        pseudonym(charlie, account: account1)
+        expect(charlie).to be_grants_right(sally, :reset_mfa)
+      end
+
+      it "should not grant admins :reset_mfa on partially admined users" do
+        pseudonym(bob, account: account1)
+        pseudonym(bob, account: account2)
+        expect(bob).not_to be_grants_right(sally, :reset_mfa)
+      end
+
+      it "should not grant subadmins :reset_mfa on stronger admins" do
+        pseudonym(alice, account: account1)
+        expect(alice).not_to be_grants_right(sally, :reset_mfa)
+      end
+
+      context "MFA is required on the account" do
+        before do
+          account1.settings[:mfa_settings] = :required
+          account1.save!
+        end
+
+        it "should no longer grant non-admins :reset_mfa on themselves" do
+          pseudonym(charlie, account: account1)
+          expect(charlie).not_to be_grants_right(charlie, :reset_mfa)
+        end
+
+        it "should no longer grant admins :reset_mfa on themselves" do
+          pseudonym(sally, account: account1)
+          expect(sally).not_to be_grants_right(sally, :reset_mfa)
+        end
+
+        it "should still grant admins :reset_mfa on other fully admined users" do
+          pseudonym(charlie, account: account1)
+          expect(charlie).to be_grants_right(sally, :reset_mfa)
+        end
+      end
     end
 
-    let(:local_admin) do
-      user = User.create!
-      Account.default.account_users.create!(user: user)
-      subaccount.account_users.create!(user: user)
-      user
-    end
+    describe ":merge" do
+      let(:account1) {
+        a = Account.default
+        a.settings[:admins_can_view_notifications] = true
+        a.save!
+        a
+      }
+      let(:account2) { Account.create! }
 
-    let(:user) do
-      user = User.create!
-      subaccount.account_users.create!(user: user)
-      user
-    end
+      let(:sally) { account_admin_user(
+        user: student_in_course(account: account2).user,
+        account: account1) }
 
+      let(:bob) { student_in_course(
+        user: student_in_course(account: account2).user,
+        course: course(account: account1)).user }
 
-    it 'allows site admins to manage their own logins' do
-      site_admin.grants_right?(site_admin, :manage_logins).should be_true
-    end
+      let(:charlie) { student_in_course(account: account2).user }
 
-    it 'allows local admins to manage their own logins' do
-      local_admin.grants_right?(local_admin, :manage_logins).should be_true
-    end
+      let(:alice) { account_admin_user_with_role_changes(
+        account: account1,
+        role: custom_account_role('StrongerAdmin', account: account1),
+        role_changes: { view_notifications: true }) }
 
-    it 'allows site admins to manage local admins logins' do
-      local_admin.grants_right?(site_admin, :manage_logins).should be_true
-    end
+      it "should grant admins :merge on themselves" do
+        pseudonym(sally, account: account1)
+        expect(sally).to be_grants_right(sally, :merge)
+      end
 
-    it 'forbids local admins from managing site admins logins' do
-      site_admin.grants_right?(local_admin, :manage_logins).should be_false
-    end
+      it "should not grant non-admins :merge on themselves" do
+        pseudonym(bob, account: account1)
+        expect(bob).not_to be_grants_right(bob, :merge)
+      end
 
-    it 'only considers root accounts when checking subset permissions' do
-      user.grants_right?(local_admin, :manage_logins).should be_true
+      it "should not grant non-admins :merge on other users" do
+        pseudonym(sally, account: account1)
+        expect(sally).not_to be_grants_right(bob, :merge)
+      end
+
+      it "should grant admins :merge on partially admined users" do
+        pseudonym(bob, account: account1)
+        pseudonym(bob, account: account2)
+        expect(bob).to be_grants_right(sally, :merge)
+      end
+
+      it "should not grant admins :merge on users from other accounts" do
+        pseudonym(charlie, account: account2)
+        expect(charlie).not_to be_grants_right(sally, :merge)
+      end
+
+      it "should not grant subadmins :merge on stronger admins" do
+        pseudonym(alice, account: account1)
+        expect(alice).not_to be_grants_right(sally, :merge)
+      end
     end
   end
 
   describe "#conversation_context_codes" do
-    before do
+    before :once do
       @user = user(:active_all => true)
+      course_with_student(:user => @user, :active_all => true)
+      group_with_user(:user => @user, :active_all => true)
     end
 
     it "should include courses" do
-      course_with_student(:user => @user, :active_all => true)
-      @user.conversation_context_codes.should include(@course.asset_string)
+      expect(@user.conversation_context_codes).to include(@course.asset_string)
     end
 
     it "should include concluded courses" do
-      course_with_student(:user => @user, :active_all => true)
       @enrollment.workflow_state = 'completed'
       @enrollment.save!
-      @user.conversation_context_codes.should include(@course.asset_string)
+      expect(@user.conversation_context_codes).to include(@course.asset_string)
     end
 
     it "should optionally not include concluded courses" do
-      course_with_student(:user => @user, :active_all => true)
       @enrollment.update_attribute(:workflow_state, 'completed')
-      @user.conversation_context_codes(false).should_not include(@course.asset_string)
+      expect(@user.conversation_context_codes(false)).not_to include(@course.asset_string)
     end
 
     it "should include groups" do
-      group_with_user(:user => @user, :active_all => true)
-      @user.conversation_context_codes.should include(@group.asset_string)
+      expect(@user.conversation_context_codes).to include(@group.asset_string)
     end
 
-    context "sharding" do
+    describe "sharding" do
       specs_require_sharding
 
-      before do
+      before :once do
         @shard1_account = @shard1.activate{ Account.create! }
       end
 
       it "should include courses on other shards" do
         course_with_student(:account => @shard1_account, :user => @user, :active_all => true)
-        @user.conversation_context_codes.should include(@course.asset_string)
+        expect(@user.conversation_context_codes).to include(@course.asset_string)
       end
 
       it "should include concluded courses on other shards" do
         course_with_student(:account => @shard1_account, :user => @user, :active_all => true)
         @enrollment.workflow_state = 'completed'
         @enrollment.save!
-        @user.conversation_context_codes.should include(@course.asset_string)
+        expect(@user.conversation_context_codes).to include(@course.asset_string)
       end
 
       it "should optionally not include concluded courses on other shards" do
         course_with_student(:account => @shard1_account, :user => @user, :active_all => true)
         @enrollment.update_attribute(:workflow_state, 'completed')
-        @user.conversation_context_codes(false).should_not include(@course.asset_string)
+        expect(@user.conversation_context_codes(false)).not_to include(@course.asset_string)
       end
 
       it "should include groups on other shards" do
         # course is just to associate the get shard1 in @user's associated shards
         course_with_student(:account => @shard1_account, :user => @user, :active_all => true)
         @shard1.activate{ group_with_user(:user => @user, :active_all => true) }
-        @user.conversation_context_codes.should include(@group.asset_string)
+        expect(@user.conversation_context_codes).to include(@group.asset_string)
       end
 
       it "should include the default shard version of the asset string" do
         course_with_student(:account => @shard1_account, :user => @user, :active_all => true)
         default_asset_string = @course.asset_string
-        @shard1.activate{ @user.conversation_context_codes.should include(default_asset_string) }
+        @shard1.activate{ expect(@user.conversation_context_codes).to include(default_asset_string) }
       end
     end
   end
 
   describe "#stamp_logout_time!" do
-    before do
+    before :once do
       user_model
     end
 
     it "should update last_logged_out" do
       now = Time.zone.now
       Timecop.freeze(now) { @user.stamp_logout_time! }
-      @user.reload.last_logged_out.to_i.should == now.to_i
+      expect(@user.reload.last_logged_out.to_i).to eq now.to_i
     end
 
     context "sharding" do
@@ -2449,7 +2768,7 @@ describe User do
 
       it "should update regardless of current shard" do
         @shard1.activate{ @user.stamp_logout_time! }
-        @user.reload.last_logged_out.should_not be_nil
+        expect(@user.reload.last_logged_out).not_to be_nil
       end
     end
   end
@@ -2466,7 +2785,7 @@ describe User do
       DueDateCacher.expects(:recompute_course).twice # sync_enrollments and destroy_enrollments
       test_student = @course.student_view_student
       test_student.destroy
-      test_student.reload.enrollments.each { |e| e.should be_deleted }
+      test_student.reload.enrollments.each { |e| expect(e).to be_deleted }
     end
   end
 
@@ -2479,10 +2798,10 @@ describe User do
     it "should add an ip to an existing cookie" do
       cookie1 = @user.otp_secret_key_remember_me_cookie(Time.now.utc, nil, 'ip1')
       cookie2 = @user.otp_secret_key_remember_me_cookie(Time.now.utc, cookie1, 'ip2')
-      @user.validate_otp_secret_key_remember_me_cookie(cookie1, 'ip1').should be_true
-      @user.validate_otp_secret_key_remember_me_cookie(cookie1, 'ip2').should be_false
-      @user.validate_otp_secret_key_remember_me_cookie(cookie2, 'ip1').should be_true
-      @user.validate_otp_secret_key_remember_me_cookie(cookie2, 'ip2').should be_true
+      expect(@user.validate_otp_secret_key_remember_me_cookie(cookie1, 'ip1')).to be_truthy
+      expect(@user.validate_otp_secret_key_remember_me_cookie(cookie1, 'ip2')).to be_falsey
+      expect(@user.validate_otp_secret_key_remember_me_cookie(cookie2, 'ip1')).to be_truthy
+      expect(@user.validate_otp_secret_key_remember_me_cookie(cookie2, 'ip2')).to be_truthy
     end
   end
 
@@ -2490,6 +2809,113 @@ describe User do
     user = user_model
     user.stubs(:conversations).returns Struct.new(:unread).new(Array.new(5))
     user.reset_unread_conversations_counter
-    user.reload.unread_conversations_count.should == 5
+    expect(user.reload.unread_conversations_count).to eq 5
+  end
+
+  describe 'group_memberships' do
+    before :once do
+      course_with_student active_all: true
+      @group = Group.create! context: @course, name: "group"
+      @group.users << @student
+      @group.save!
+    end
+
+    it "doesn't include deleted groups in current_group_memberships" do
+      expect(@student.current_group_memberships.size).to eq 1
+      @group.destroy
+      expect(@student.current_group_memberships.size).to eq 0
+    end
+
+    it "doesn't include deleted groups in group_memberships_for" do
+      expect(@student.group_memberships_for(@course).size).to eq 1
+      @group.destroy
+      expect(@student.group_memberships_for(@course).size).to eq 0
+    end
+
+  end
+
+  describe 'visible_groups' do
+    it "should include groups in published courses" do
+      course_with_student active_all:true
+      @group = Group.create! context: @course, name: "GroupOne"
+      @group.users << @student
+      @group.save!
+      expect(@student.visible_groups.size).to eq 1
+    end
+
+    it "should not include groups that belong to unpublished courses" do
+      course_with_student
+      @group = Group.create! context: @course, name: "GroupOne"
+      @group.users << @student
+      @group.save!
+      expect(@student.visible_groups.size).to eq 0
+    end
+
+    it "should include account groups" do
+      account = account_model(:parent_account => Account.default)
+      student = user active_all: true
+      @group = Group.create! context: account, name: "GroupOne"
+      @group.users << student
+      @group.save!
+      expect(student.visible_groups.size).to eq 1
+    end
+  end
+
+  describe 'roles' do
+    before(:once) do
+      user(active_all: true)
+      course(active_course: true)
+      @account = Account.default
+    end
+
+    it "always includes 'user'" do
+      expect(@user.roles(@account)).to eq %w[user]
+    end
+
+    it "includes 'student' if the user has a student enrollment" do
+      @enrollment = @course.enroll_user(@user, 'StudentEnrollment', enrollment_state: 'active')
+      expect(@user.roles(@account)).to eq %w[user student]
+    end
+
+    it "includes 'student' if the user has a student view student enrollment" do
+      @user = @course.student_view_student
+      expect(@user.roles(@account)).to eq %w[user student]
+    end
+
+    it "includes 'teacher' if the user has a teacher enrollment" do
+      @enrollment = @course.enroll_user(@user, 'TeacherEnrollment', enrollment_state: 'active')
+      expect(@user.roles(@account)).to eq %w[user teacher]
+    end
+
+    it "includes 'teacher' if the user has a ta enrollment" do
+      @enrollment = @course.enroll_user(@user, 'TaEnrollment', enrollment_state: 'active')
+      expect(@user.roles(@account)).to eq %w[user teacher]
+    end
+
+    it "includes 'teacher' if the user has a designer enrollment" do
+      @enrollment = @course.enroll_user(@user, 'DesignerEnrollment', enrollment_state: 'active')
+      expect(@user.roles(@account)).to eq %w[user teacher]
+    end
+
+    it "includes 'admin' if the user has an admin user record" do
+      @account.account_users.create!(:user => @user, :role => admin_role)
+      expect(@user.roles(@account)).to eq %w[user admin]
+    end
+  end
+
+  it "should not grant user_notes rights to restricted users" do
+    course_with_ta(:active_all => true)
+    student_in_course(:course => @course, :active_all => true)
+    @course.account.role_overrides.create!(role: ta_role, enabled: false, permission: :manage_user_notes)
+
+    expect(@student.grants_right?(@ta, :create_user_notes)).to be_falsey
+    expect(@student.grants_right?(@ta, :read_user_notes)).to be_falsey
+  end
+
+  it "should change avatar state on reporting" do
+    user
+    @user.report_avatar_image!
+    @user.reload
+    expect(@user.avatar_state).to eq :reported
   end
 end

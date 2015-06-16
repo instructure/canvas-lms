@@ -1,7 +1,7 @@
 <% define_content :link do %>
-  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/accounts/<%= asset.account_id %>/files/<%= asset.attachment_id %>/download
+  <%= account_url(asset.account) %>
 <% end %>
-  
+
 <% define_content :subject do %>
   <%= t :subject, "Report Generation Failed" %>
 <% end %>

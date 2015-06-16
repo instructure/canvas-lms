@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest identifier="cctd0001"
+          xmlns="http://www.imsglobal.org/xsd/imsccv1p3/imscp_v1p1"
+          xmlns:lom="http://ltsc.ieee.org/xsd/imsccv1p3/LOM/resource"
+          xmlns:lomimscc="http://ltsc.ieee.org/xsd/imsccv1p3/LOM/manifest"
+          xmlns:cpx="http://www.imsglobal.org/xsd/imsccv1p3/imscp_extensionv1p2"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://ltsc.ieee.org/xsd/imsccv1p3/LOM/resource http://www.imsglobal.org/profile/cc/ccv1p3/LOM/ccv1p3_lomresource_v1p0.xsd
+                      http://www.imsglobal.org/xsd/imsccv1p3/imscp_v1p1 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_imscp_v1p2_v1p0.xsd 
+                      http://ltsc.ieee.org/xsd/imsccv1p3/LOM/manifest http://www.imsglobal.org/profile/cc/ccv1p3/LOM/ccv1p3_lommanifest_v1p0.xsd
+                      http://www.imsglobal.org/xsd/imsccv1p3/imscp_extensionv1p2 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_cpextensionv1p2_v1p0.xsd">
+  <metadata>
+    <schema>IMS Common Cartridge</schema>
+    <schemaversion>1.3.0</schemaversion>
+    <lomimscc:lom>
+      <lomimscc:general>
+        <lomimscc:title>
+          <lomimscc:string language="en-US">Common Cartridge Test</lomimscc:string>
+        </lomimscc:title>
+        <lomimscc:description>
+          <lomimscc:string language="en-US">CC 1.3 test with extension and variants</lomimscc:string>
+        </lomimscc:description>
+      </lomimscc:general>
+    </lomimscc:lom>
+  </metadata>
+  <organizations>
+    <organization identifier="O_1" structure="rooted-hierarchy">
+      <item identifier="I_1">
+        <item identifier="I_00000">
+          <title>CCv1.3 With Assignment</title>
+          <item identifier="I_00001" identifierref="Resource2">
+            <title>Preferred Assignment, not a discussion</title>
+          </item>
+          <item identifier="I_00002" identifierref="Resource5">
+            <title>Discussion not a link</title>
+          </item>
+          <item identifier="I_00003" identifierref="Resource7">
+            <title>Link to 3, not 4</title>
+          </item>
+          <item identifier="I_00004" identifierref="Resource10">
+            <title>Discussion 2 not a link</title>
+          </item>
+          <item identifier="I_00005" identifierref="Resource11">
+            <title>Loop Link</title>
+          </item>
+        </item>
+      </item>
+    </organization>
+  </organizations>
+  <resources>
+
+    <!--Basic test, pointing to supported preferred item-->
+    <resource identifier="Resource1" type="assignment_xmlv1p0">
+      <assignment xmlns="http://www.imsglobal.org/xsd/imscc_extensions/assignment"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://www.imsglobal.org/xsd/imscc_extensions/assignment http://www.imsglobal.org/profile/cc/cc_extensions/cc_extresource_assignmentv1p0_v1p0.xsd ">
+        <title>Assignment you should see</title>
+        <text texttype="text/plain">This was a preferred variant</text>
+        <instructor_text texttype="text/plain">Super Secret</instructor_text>
+        <gradable>true</gradable>
+      </assignment>
+    </resource>
+
+    <resource identifier="Resource2" type="imsdt_xmlv1p3">
+      <cpx:variant identifier="Resource1_variant" identifierref="Resource1">
+        <cpx:metadata></cpx:metadata>
+      </cpx:variant>
+      <topic xmlns="http://www.imsglobal.org/xsd/imsccv1p3/imsdt_v1p3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imsccv1p3/imsdt_v1p3 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_imsdt_v1p3.xsd">
+        <title>Discussion - Should not see</title>
+        <text texttype="text/html">This has a resource that is preferred to it. You shouldn't see this on import.</text>
+      </topic>
+    </resource>
+
+
+    <!--Chaining test, 2 variants-->
+    <resource identifier="Resource3" type="imsdt_xmlv1p3">
+      <topic xmlns="http://www.imsglobal.org/xsd/imsccv1p3/imsdt_v1p3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imsccv1p3/imsdt_v1p3 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_imsdt_v1p3.xsd">
+        <title>Discussion you should see</title>
+        <text texttype="text/html">Discussion at end of variant chain. You should see this.</text>
+      </topic>
+    </resource>
+
+    <resource identifier="Resource4" type="imswl_xmlv1p3">
+      <cpx:variant identifier="Resource3_variant2" identifierref="Resource3">
+        <cpx:metadata></cpx:metadata>
+      </cpx:variant>
+      <webLink xmlns="http://www.imsglobal.org/xsd/imsccv1p3/imswl_v1p3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imsccv1p3/imswl_v1p3 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_imswl_v1p3.xsd">
+        <title>Weblink you should not see</title>
+        <url href="https://example.com/2"/>
+      </webLink>
+    </resource>
+
+    <resource identifier="Resource5" type="imswl_xmlv1p3">
+      <cpx:variant identifier="Resource3_variant3" identifierref="Resource4">
+        <cpx:metadata></cpx:metadata>
+      </cpx:variant>
+      <webLink xmlns="http://www.imsglobal.org/xsd/imsccv1p3/imswl_v1p3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imsccv1p3/imswl_v1p3 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_imswl_v1p3.xsd">
+        <title>Weblink you should also not see</title>
+        <url href="https://example.com/1"/>
+      </webLink>
+    </resource>
+
+
+    <!--unsupported preferred item-->
+    <resource identifier="Resource6" type="fake_thing">
+      <webLink xmlns="http://www.imsglobal.org/xsd/imsccv1p3/imswl_v1p3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imsccv1p3/imswl_v1p3 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_imswl_v1p3.xsd">
+        <title>Weblink you should not see because it is a fake type</title>
+        <url href="https://example.com/4"/>
+      </webLink>
+    </resource>
+
+    <resource identifier="Resource7" type="imswl_xmlv1p3">
+      <cpx:variant identifier="Resource6_variant" identifierref="Resource6">
+        <cpx:metadata></cpx:metadata>
+      </cpx:variant>
+      <webLink xmlns="http://www.imsglobal.org/xsd/imsccv1p3/imswl_v1p3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imsccv1p3/imswl_v1p3 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_imswl_v1p3.xsd">
+        <title>Weblink you should see because preferred variant is unsupported</title>
+        <url href="https://example.com/3"/>
+      </webLink>
+    </resource>
+
+
+    <!--Unsupported pointing to supported-->
+    <resource identifier="Resource8" type="imsdt_xmlv1p3">
+      <topic xmlns="http://www.imsglobal.org/xsd/imsccv1p3/imsdt_v1p3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imsccv1p3/imsdt_v1p3 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_imsdt_v1p3.xsd">
+        <title>Discussion 2 you should see</title>
+        <text texttype="text/html">This discussion is pointed to by unsupported variant.</text>
+      </topic>
+    </resource>
+
+    <resource identifier="Resource9" type="fake_thing">
+      <cpx:variant identifier="Resource8_variant2" identifierref="Resource8">
+        <cpx:metadata></cpx:metadata>
+      </cpx:variant>
+      <webLink xmlns="http://www.imsglobal.org/xsd/imsccv1p3/imswl_v1p3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imsccv1p3/imswl_v1p3 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_imswl_v1p3.xsd">
+        <title>Weblink 3</title>
+        <url href="https://example.com/3"/>
+      </webLink>
+    </resource>
+
+    <resource identifier="Resource10" type="imsdt_xmlv1p3">
+      <cpx:variant identifier="Resource8_variant1" identifierref="Resource9">
+        <cpx:metadata></cpx:metadata>
+      </cpx:variant>
+      <topic xmlns="http://www.imsglobal.org/xsd/imsccv1p3/imsdt_v1p3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imsccv1p3/imsdt_v1p3 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_imsdt_v1p3.xsd">
+        <title>Discussion 2 you should not see</title>
+        <text texttype="text/html">This discussion has preferred variants.</text>
+      </topic>
+    </resource>
+
+
+    <!--A loop of references (shouldn't exist, but need to test anyway)-->
+    <resource identifier="Resource11" type="imswl_xmlv1p3">
+      <cpx:variant identifier="Resource12_variant" identifierref="Resource12">
+        <cpx:metadata></cpx:metadata>
+      </cpx:variant>
+      <webLink xmlns="http://www.imsglobal.org/xsd/imsccv1p3/imswl_v1p3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imsccv1p3/imswl_v1p3 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_imswl_v1p3.xsd">
+        <title>link in a loop 1</title>
+        <url href="https://example.com/loop1"/>
+      </webLink>
+    </resource>
+
+    <resource identifier="Resource12" type="imswl_xmlv1p3">
+      <cpx:variant identifier="Resource11_variant" identifierref="Resource11">
+        <cpx:metadata></cpx:metadata>
+      </cpx:variant>
+      <webLink xmlns="http://www.imsglobal.org/xsd/imsccv1p3/imswl_v1p3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imsccv1p3/imswl_v1p3 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_imswl_v1p3.xsd">
+        <title>link in a loop 2</title>
+        <url href="https://example.com/loop2"/>
+      </webLink>
+    </resource>
+
+  </resources>
+</manifest>

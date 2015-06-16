@@ -8,9 +8,6 @@
 
 <% content_for :right_side do %>
   <div class="rs-margin-all">
-    <% if @domain_root_account.try_rescue(:enable_user_notes) and can_do(@user, @current_user, :read_user_notes) %>
-      <a href="<%= user_user_notes_path(@user) %>" class="btn button-sidebar-wide"><%= t(:faculty_journal, "Faculty Journal for %{user}", :user => context_user_name(@context, @user)) %></a>
-    <% end %>
     <% if @context.hide_final_grades? %>
       <div class="student_assignment final_grade" style="font-size: 1.2em;">
         <%= t('labels.final_grade_hidden', "Calculation of totals has been disabled") %>
@@ -27,11 +24,11 @@
     <% end %>
     <% if @presenter.editable? %>
         <div class="show_guess_grades" style="display: none; margin-bottom: 10px; font-size: 0.8em;">
-          <button type="button" class="btn button-sidebar-wide show_guess_grades_link"><%= image_tag "grading_icon.png", :alt => "" %> <%= t('buttons.show_what_if', "Show Saved \"What-If\" Scores") %></button>
+          <button type="button" class="btn button-sidebar-wide show_guess_grades_link"> <i class="icon-check-plus"></i> <%= t('buttons.show_what_if', "Show Saved \"What-If\" Scores") %></button>
         </div>
         <div class="revert_all_scores" style="font-size: 0.8em; padding-left: 10px; display: none;">
           <%= t(:not_official, "*NOTE*: This is NOT your official score.") %><br/>
-          <a href="#" class="btn revert_all_scores_link"><%= image_tag "back.png", :alt => "" %> <%= t('links.revert_score', "Revert to Actual Score") %></a>
+          <a href="#" class="btn revert_all_scores_link"><i class="icon-reply-2"></i> <%= t('links.revert_score', "Revert to Actual Score") %></a>
         </div>
     <% end %>
     <div class="show_all_details" style="font-size: 0.8em; margin-top: 10px;">
@@ -55,9 +52,32 @@
   </div>
 <% end %>
 
-<a class="btn btn-small print-grades icon-printer" href="javascript:window.print()">
-  <%= t :print_grades, "Print grades" %>
-</a>
+<div class="grid-row middle-xs between-xs">
+  <div class="col-xs-6" >
+    <% if multiple_grading_periods? %>
+      <select id="grading_periods_selector">
+        <option
+          value="0"
+          <%= "selected=selected" if @current_grading_period_id == "0" %> >
+          <%= t :all_grading_periods, "All Grading Periods" %>
+        </option>
+        <% @grading_periods.each do |gp| %>
+          <option
+            value="<%= gp[:id] %>"
+            <%= "selected=selected" if @current_grading_period_id == gp[:id].to_s %> >
+            <%= gp[:title] %>
+          </option>
+        <% end %>
+      </select>
+    <% end %>
+  </div>
+
+  <div class="col-md-6 col-lg-3" >
+    <a class="btn print-grades icon-printer" href="javascript:window.print()">
+      <%= t :print_grades, "Print grades" %>
+    </a>
+  </div>
+</div>
 
 <h2>
 <% ot('headers.grades', "Grades For %{student}", :student => capture { %>
@@ -100,11 +120,20 @@
     <li><a href="#outcomes"><%= t :learning_outcomes, "Learning Mastery" %></a></li>
   </ul>
   <div class="outcome-toggles">
-    <a class="btn btn-small icon-collapse" title="<%= t :collapse, "Collapse" %>" href="#">
-      <span class="screenreader-only"><%= t :collapse, "Collapse" %></span>
+    <a class="btn btn-small icon-collapse"
+       title="<%= t :collapse_title, "Collapse" %>"
+       disabled='disabled'
+       aria-disabled='true'
+       aria-controls='groups'
+       href="#">
+      <span class="screenreader-only"><%= t :collapse, "Collapse all learning mastery outcome groups." %></span>
     </a>
-    <a class="btn btn-small icon-expand" title="<%= t :expand, "Expand" %>" href="#">
-      <span class="screenreader-only"><%= t :expand, "Expand" %></span>
+    <a class="btn btn-small icon-expand"
+       title="<%= t :expand_title, "Expand" %>"
+       aria-controls='groups'
+       aria-disabled='false'
+       href="#">
+      <span class="screenreader-only"><%= t :expand, "Expand all learning mastery outcome groups." %></span>
     </a>
   </div>
   <div id="outcomes"></div>
@@ -154,6 +183,9 @@
                 <span class="tooltip_text score_teaser">
                   <% if assignment.muted? %>
                     <%= t(:student_mute_notification, "Instructor is working on grades") %>
+                    <%-# Comment out this until it is ready for primetime with the DB additions %>
+                  <% elsif false #submission && submission.workflow_state == 'pending_review' %>
+                    <%= t(:grading_in_progress, "Instructor is working on grades") %>
                   <% elsif assignment.special_class %>
                     <%= t(:total, "Total") %>
                   <% else %>
@@ -169,11 +201,15 @@
                 <span class="screenreader-only" role="link">
                   <%= t(:click_to_change, "Click to test a different score") unless assignment_presenter.unchangeable? %>
                 </span>
+                <%-# Comment out this until it is ready for primetime with the DB additions %>
+                <% if false #submission && submission.workflow_state == 'pending_review' %>
+                  <span class="screenreader-only"><%=t(:grading_in_progress, "Instructor is working on grades")%></span>
+                <% end %>
                 <%= student_score_display_for(submission, !can_do(@context, @current_user, :manage_grades)) %>
               <% end %>
             </span>
             <% if assignment_presenter.is_letter_graded? || assignment_presenter.is_gpa_scaled?%>
-              <span class="score_value" style="font-size: 0.8em; color: #aaa;">
+              <span class="score_value">
                 <%= assignment_presenter.display_score %>
               </span>
             <% end %>
@@ -182,6 +218,8 @@
             <span class="original_score">
               <%= assignment_presenter.display_score %>
             </span>
+            <span class="submission_status">
+              <%= submission.blank? ? 'none' : submission.workflow_state %>
             <span class="score">
               <%= assignment_presenter.display_score %>
             </span>
@@ -212,7 +250,7 @@
           <span class="tooltip_wrap right">
             <span class="tooltip_text"><%= t(:see_rubric_results, "See rubric results") %></span>
           </span>
-          <%= image_tag "rubric.png", :alt => t('icons.rubric_results', 'See rubric results') %>
+          <i class="icon-rubric"></i>
         </a>
         <% if @presenter.turnitin_enabled? %>
           <%
@@ -277,14 +315,14 @@
                     <td>
                       <% graph = assignment_presenter.graph %>
                       <div style="cursor: pointer; float: right; height: 30px; margin-left: 20px; width: 160px; position: relative; margin-right: 30px;" title="<%= graph.title %>">
-                        <div style="position: absolute; top: 0; left: 0; width: 0px; height: 10px; margin: 5px 0px; border: 2px solid #aaa; overflow: hidden; border-right-width: 0;">&nbsp;</div>
-                        <div style="position: absolute; top: 0; left: 0px; width: <%= graph.low_width %>px; height: 0px; margin-top: 10px; border-bottom: 2px solid #aaa; overflow: hidden; border-top-width: 0;">&nbsp;</div>
-                        <div style="position: absolute; top: 0; left: <%= graph.high_left %>px; width: <%= graph.high_width %>px; height: 0px; margin-top: 10px; border-bottom: 2px solid #aaa; overflow: hidden;">&nbsp;</div>
-                        <div style="position: absolute; top: 0; left: <%= graph.low_width %>px; width: <%= graph.mean_low_width %>px; height: 20px; border: 2px solid #aaa; overflow: hidden; -moz-border-radius-topleft: 3px; -moz-border-radius-bottomleft: 3px; border-right-width: 0; background: #fff;">&nbsp;</div>
-                        <div style="position: absolute; top: 0; left: <%= graph.mean_left%>px; width: <%= graph.mean_high_width%>px; height: 20px; border: 2px solid #aaa; overflow: hidden; -moz-border-radius-topright: 3px; -moz-border-radius-bottomright: 3px; background: #fff;">&nbsp;</div>
-                        <div style="position: absolute; top: 0; left: <%= graph.max_left %>px; width: 0px; height: 10px; margin: 5px 0px; border: 2px solid #aaa; overflow: hidden; border-left-width: 0;">&nbsp;</div>
+                        <div class="grade-summary-graph-component" style="height: 10px; margin: 5px 0px; border-width: 2px; border-right-width: 0;">&nbsp;</div>
+                        <div class="grade-summary-graph-component" style="width: <%= graph.low_width %>px; height: 0px; margin-top: 10px; border-bottom-width: 2px;">&nbsp;</div>
+                        <div class="grade-summary-graph-component" style="left: <%= graph.high_left %>px; width: <%= graph.high_width %>px; height: 0px; margin-top: 10px; border-bottom-width: 2px;">&nbsp;</div>
+                        <div class="grade-summary-graph-component" style="left: <%= graph.low_width %>px; width: <%= graph.mean_low_width %>px; height: 20px; border-width: 2px; border-top-left-radius: 3px; border-bottom-left-radius: 3px; border-right-width: 0; background: #fff;">&nbsp;</div>
+                        <div class="grade-summary-graph-component" style="left: <%= graph.mean_left%>px; width: <%= graph.mean_high_width%>px; height: 20px; border-width: 2px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; background: #fff;">&nbsp;</div>
+                        <div class="grade-summary-graph-component" style="left: <%= graph.max_left %>px; height: 10px; margin: 5px 0px; border-width: 2px; border-left-width: 0;">&nbsp;</div>
                         <% if submission && submission.score %>
-                          <div style="position: absolute; top: 5px; height: 10px; width: 10px; left: <%= graph.score_left %>px; border: 2px solid #248; background-color: #abd; overflow: hidden; -moz-border-radius: 3px;" title="<%= before_label(:your_score, "Your Score") %>
+                          <div class="grade-summary-graph-component" style="top: 5px; height: 10px; width: 10px; left: <%= graph.score_left %>px; border: 2px solid #248; background: #abd; border-radius: 3px;" title="<%= before_label(:your_score, "Your Score") %>
                             <%= t(:submission_score, "*%{score}* out of %{possible}", :wrapper => '\1', :score => submission.score, :possible => assignment.points_possible) %>">&nbsp;
                           </div>
                         <% end %>
@@ -331,7 +369,8 @@
                     </div>
                   </td>
                   <td>
-                    <%= comment.author_name %>, <%= datetime_string(comment.created_at) %>
+                    <%= comment_author_name_for(comment) %>,
+                    <%= datetime_string(comment.created_at) %>
                   </td>
                 <% end %>
               </tr>
@@ -361,5 +400,5 @@
 <div id="total_groups_weight" style="display: none;"><%= @presenter.total_weight %></div>
 <%= render :partial => "shared/rubric_criterion_dialog" %>
 <input type="text" style="width: 40px; display: none;" id="grade_entry" title="<%= t('titles.enter_score', "Enter a score to test") %>"/>
-<a href="#" id="revert_score_template" class="revert_score_link" title="<%= t('titles.revert_score', "Revert to original score") %>"><%= image_tag "back.png", :alt => "" %></a>
+<a href="#" id="revert_score_template" class="revert_score_link" title="<%= t('titles.revert_score', "Revert to original score") %>"><i class="icon-reply-2"></i></a>
 <a href="<%= context_url(@context, :context_assignment_submission_url, "{{ assignment_id }}", @presenter.student_id) %>" class="update_submission_url" style="display: none;">&nbsp;</a>

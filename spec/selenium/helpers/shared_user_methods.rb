@@ -12,19 +12,19 @@ def add_user (opts={})
   if (!sortable_name.eql? name)
     replace_content f("#user_sortable_name"), sortable_name
   end
-  is_checked("#pseudonym_send_confirmation").should be_true
+  expect(is_checked("#pseudonym_send_confirmation")).to be_truthy
   if (confirmation == 0)
     f("#pseudonym_send_confirmation").click
-    is_checked("#pseudonym_send_confirmation").should be_false
+    expect(is_checked("#pseudonym_send_confirmation")).to be_falsey
   end
   f("#add_user_form #user_name").send_keys name
   f("#pseudonym_unique_id").send_keys email
   submit_form("#add_user_form")
   wait_for_ajax_requests
   user = User.where(:name => name).first
-  user.should be_present
-  user.sortable_name.should == sortable_name
-  user.short_name.should == short_name
-  user.email.should == email
+  expect(user).to be_present
+  expect(user.sortable_name).to eq sortable_name
+  expect(user.short_name).to eq short_name
+  expect(user.email).to eq email
   user
 end

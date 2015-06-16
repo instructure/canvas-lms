@@ -5,5 +5,3 @@ define [
 
   class ConferenceCollection extends Collection
     model: Conference
-
-    @optionProperty 'course_id'

@@ -24,19 +24,19 @@ shared_examples_for "url validation tests" do
     # should add http://
     model.url = "example.com"
     model.save!
-    model.errors.size.should == 0
-    model.url.should == "http://example.com"
+    expect(model.errors.size).to eq 0
+    expect(model.url).to eq "http://example.com"
 
     # should remove whitespace
     model.url = "   example.com  "
     model.save!
-    model.errors.size.should == 0
-    model.url.should == "http://example.com"
+    expect(model.errors.size).to eq 0
+    expect(model.url).to eq "http://example.com"
 
     model.url = "   http://www.example.com  "
     model.save!
-    model.errors.size.should == 0
-    model.url.should == "http://www.example.com"
+    expect(model.errors.size).to eq 0
+    expect(model.url).to eq "http://www.example.com"
 
     # should not work on invalid urls
     ["/relativepath",
@@ -45,9 +45,9 @@ shared_examples_for "url validation tests" do
      "not a url"].each do |invalid_url|
       model.url = invalid_url
       saved = model.save
-      [model.url, saved].should == [invalid_url, false]
-      model.errors.size.should == 1
-      model.errors.full_messages.join.should =~ /not a valid URL/
+      expect([model.url, saved]).to eq [invalid_url, false]
+      expect(model.errors.size).to eq 1
+      expect(model.errors.full_messages.join).to match /not a valid URL/
     end
 
     # should work on valid urls
@@ -61,15 +61,15 @@ shared_examples_for "url validation tests" do
      "http://www.example.com"].each do |valid_url|
       model.url = valid_url
       model.save!
-      model.errors.size.should == 0
-      model.url.should == valid_url
+      expect(model.errors.size).to eq 0
+      expect(model.url).to eq valid_url
     end
 
     # should support nil urls
     model.url = nil
     model.save!
-    model.errors.size.should == 0
-    model.url.should be_nil
+    expect(model.errors.size).to eq 0
+    expect(model.url).to be_nil
   end
 
 end

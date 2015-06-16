@@ -2,6 +2,12 @@ module I18nTasks
   class I18nImport
     attr_reader :source_translations, :new_translations, :language
 
+    class MisMatch < Struct.new(:key, :expected, :actual)
+      def to_s
+        "#{key}: expected #{expected.inspect}, got #{actual.inspect}"
+      end
+    end
+
     def initialize(source_translations, new_translations)
       @source_translations = init_source(source_translations)
       @language = init_language(new_translations)
@@ -38,12 +44,12 @@ module I18nTasks
           [@markdown_mismatches, "markdown/wrapper mismatches"],
       ].each do |mismatches, description|
         if mismatches.size > 0
-          case (action = yield(mismatch_diff(mismatches), description))
+          case (action = yield(mismatches, description))
             when :abort then
               throw(:abort)
             when :discard then
               @new_translations.delete_if do |k, v|
-                mismatches.keys.include? k
+                mismatches.any? { |m| m.key == k }
               end
             when :accept then
               :ok
@@ -89,19 +95,21 @@ module I18nTasks
     end
 
     def find_mismatches
-      @placeholder_mismatches = {}
-      @markdown_mismatches = {}
+      @placeholder_mismatches = []
+      @markdown_mismatches = []
       new_translations.keys.each do |key|
         next unless source_translations[key]
         p1 = placeholders(source_translations[key].to_s)
         p2 = placeholders(new_translations[key].to_s)
-        @placeholder_mismatches[key] = [p1, p2] if p1 != p2
+        @placeholder_mismatches << MisMatch.new(key, p1, p2) if p1 != p2
 
         m1 = markdown_and_wrappers(source_translations[key].to_s)
         m2 = markdown_and_wrappers(new_translations[key].to_s)
-        @markdown_mismatches[key] = [m1, m2] if m1 != m2
+        @markdown_mismatches << MisMatch.new(key, m1, m2) if m1 != m2
       end
     end
+
+    LIST_ITEM_PATTERN = /^ {0,3}(\d+\.|\*|\+|\-)\s/
 
     def markdown_and_wrappers(str)
       # Since underscores can be wrappers, and underscores can also be inside
@@ -112,15 +120,38 @@ module I18nTasks
       #   blockquotes, e.g. "> some text"
       #   reference links, e.g. "[an example][id]"
       #   indented code
-      (
-      scan_and_report(dashed_str, /\\[\\`\*_\{\}\[\]\(\)#\+\-\.!]/) +
-          scan_and_report(dashed_str, /(\*+|_+|`+)[^\s].*?[^\s]?\1/).map { |m| "#{m[0]}-wrap" } +
-          scan_and_report(dashed_str, /(!?\[)[^\]]+\]\(([^\)"']+).*?\)/).map { |m| "link:#{m.last}" } +
-          scan_and_report(dashed_str, /^((\s*\*\s*){3,}|(\s*-\s*){3,}|(\s*_\s*){3,})$/).map { "hr" } +
-          scan_and_report(dashed_str, /^[^=\-\n]+\n^(=+|-+)$/).map { |m| m.first[0]=='=' ? 'h1' : 'h2' } +
-          scan_and_report(dashed_str, /^(\#{1,6})\s+[^#]*#*$/).map { |m| "h#{m.first.size}" } +
-          scan_and_report(dashed_str, /^ {0,3}(\d+\.|\*|\+|\-)\s/).map { |m| m.first =~ /\d/ ? "1." : "*" }
-      ).sort
+      matches = scan_and_report(dashed_str, /\\[\\`\*_\{\}\[\]\(\)#\+\-\.!]/) # escaped special char
+        .concat(wrappers(dashed_str))
+        .concat(scan_and_report(dashed_str, /(!?\[)[^\]]+\]\(([^\)"']+).*?\)/).map { |m| "link:#{m.last}" }) # links
+
+      # only do fancy markdown checks on multi-line strings
+      if dashed_str =~ /\n/
+        matches.concat(scan_and_report(dashed_str, /^(\#{1,6})\s+[^#]*#*$/).map { |m| "h#{m.first.size}" }) # headings
+               .concat(scan_and_report(dashed_str, /^[^=\-\n]+\n^(=+|-+)$/).map { |m| m.first[0]=='=' ? 'h1' : 'h2' }) # moar headings
+               .concat(scan_and_report(dashed_str, /^((\s*\*\s*){3,}|(\s*-\s*){3,}|(\s*_\s*){3,})$/).map { "hr" })
+               .concat(scan_and_report(dashed_str, LIST_ITEM_PATTERN).map { |m| m.first =~ /\d/ ? "1." : "*" })
+      end
+      matches.uniq.sort
+    end
+
+    # return array of balanced wrappers in the source string, e.g.
+    # "* **ohai** * user, *welcome*!" => ["**-wrap", "*-wrap"]
+    def wrappers(str)
+      pattern = /\*+|\++|`+/
+      str = str.gsub(LIST_ITEM_PATTERN, '') # ignore markdown lists
+      parts = scan_and_report(str, pattern)
+      stack = []
+      result = []
+      parts.each do |part|
+        next if part !~ pattern
+        if stack.last == part
+          result << "#{part}-wrap"
+          stack.pop
+        else
+          stack << part
+        end
+      end
+      result.uniq
     end
 
     def placeholders(str)
@@ -148,10 +179,6 @@ module I18nTasks
       language = translations.keys.first
       raise "Translation file appears to have only English strings" if language == 'en'
       language
-    end
-
-    def mismatch_diff(mismatches)
-      mismatches.map { |k, (p1, p2)| "#{k}: expected #{p1.inspect}, got #{p2.inspect}" }.sort
     end
   end
 end

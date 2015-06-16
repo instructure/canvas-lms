@@ -22,7 +22,7 @@ require 'db/migrate/20120404230916_fix_user_merge_conversations2.rb'
 describe 'FixUserMergeConversations2' do
   describe "up" do
     it "should work" do
-      pending("can't create the bad state anymore due to foreign keys preventing it")
+      skip("can't create the bad state anymore due to foreign keys preventing it")
       u1 = user
       u2 = user
       u3 = user
@@ -52,26 +52,26 @@ describe 'FixUserMergeConversations2' do
       unrelated.reload
 
       # these are gone for reals now
-      lambda { borked.reload }.should raise_error
-      borked_cps.each { |cp| lambda { cp.reload }.should raise_error }
+      expect { borked.reload }.to raise_error
+      borked_cps.each { |cp| expect { cp.reload }.to raise_error }
 
       # these are moved to the right place
       borked_cmps.each do |cmp|
-        lambda { cmp.reload }.should_not raise_error
-        cmp.conversation_participant.conversation.should eql correct
+        expect { cmp.reload }.not_to raise_error
+        expect(cmp.conversation_participant.conversation).to eql correct
       end
       correct.conversation_participants.each do |cp|
-        cp.messages.size.should eql 2
-        cp.message_count.should eql 2
+        expect(cp.messages.size).to eql 2
+        expect(cp.message_count).to eql 2
       end
       # got bumped out of archived by the merged/deleted ones
-      correct.conversation_participants.default.size.should eql 2
-      correct.conversation_participants.unread.size.should eql 1
+      expect(correct.conversation_participants.default.size).to eql 2
+      expect(correct.conversation_participants.unread.size).to eql 1
 
       # no changes here
       unrelated.conversation_participants.each do |cp|
-        cp.messages.size.should eql 1
-        cp.message_count.should eql 1
+        expect(cp.messages.size).to eql 1
+        expect(cp.message_count).to eql 1
       end
     end
   end

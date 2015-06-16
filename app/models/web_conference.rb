@@ -118,17 +118,12 @@ class WebConference < ActiveRecord::Base
     user_setting_fields[name] = options
   end
 
-  if CANVAS_RAILS2
-    def self.user_setting_fields
-      read_inheritable_attribute(:user_setting_fields) || write_inheritable_attribute(:user_setting_fields, {})
-    end
-  else
-    def self.user_setting_fields
-      @user_setting_fields ||= {}
-    end
-    def self.user_setting_fields=(val)
-      @user_setting_fields = val
-    end
+  def self.user_setting_fields
+    @user_setting_fields ||= {}
+  end
+
+  def self.user_setting_fields=(val)
+    @user_setting_fields = val
   end
 
   def self.user_setting_field_name(key)
@@ -153,17 +148,11 @@ class WebConference < ActiveRecord::Base
     send("#{key}_external_url", user, url_id) || []
   end
 
-  if CANVAS_RAILS2
-    def self.external_urls
-      read_inheritable_attribute(:external_urls) || write_inheritable_attribute(:external_urls, {})
-    end
-  else
-    def self.external_urls
-      @external_urls ||= {}
-    end
-    def self.external_urls=(val)
-      @external_urls = val
-    end
+  def self.external_urls
+    @external_urls ||= {}
+  end
+  def self.external_urls=(val)
+    @external_urls = val
   end
 
   def self.external_url(name, options)
@@ -177,10 +166,18 @@ class WebConference < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :web_conference_invitation
-    p.to { @new_participants.select { |p| context.membership_for_user(p).active? } }
-    p.whenever { |record|
-      @new_participants && !@new_participants.empty?
-    }
+    p.to do
+      @new_participants.select do |participant|
+        context.membership_for_user(participant).try(:active?)
+      end
+    end
+    p.whenever { @new_participants && !@new_participants.empty? }
+
+    p.dispatch :web_conference_recording_ready
+    p.to { user }
+    p.whenever do
+      recording_ready? && recording_ready_changed?
+    end
   end
 
   on_create_send_to_streams do
@@ -189,8 +186,8 @@ class WebConference < ActiveRecord::Base
 
   def add_user(user, type)
     return unless user
-    p = self.web_conference_participants.find_by_web_conference_id_and_user_id(self.id, user.id)
-    p ||= self.web_conference_participants.build(:web_conference => self, :user => user)
+    p = self.web_conference_participants.where(user_id: user).first
+    p ||= self.web_conference_participants.build(user: user)
     p.participation_type = type unless type == 'attendee' && p.participation_type == 'initiator'
     (@new_participants ||= []) << user if p.new_record?
     # Once anyone starts attending the conference, mark it as started.
@@ -201,6 +198,15 @@ class WebConference < ActiveRecord::Base
     p.save
   end
 
+  def recording_ready!
+    self.recording_ready = true
+    save!
+  end
+
+  def recording_ready?
+    !!recording_ready
+  end
+
   def added_users
     attendees
   end
@@ -208,9 +214,11 @@ class WebConference < ActiveRecord::Base
   def add_initiator(user)
     add_user(user, 'initiator')
   end
+
   def add_invitee(user)
     add_user(user, 'invitee')
   end
+
   def add_attendee(user)
     add_user(user, 'attendee')
   end
@@ -267,6 +275,7 @@ class WebConference < ActiveRecord::Base
   def long_running?
     duration.nil?
   end
+
   def long_running
     long_running? ? 1 : 0
   end
@@ -374,6 +383,7 @@ class WebConference < ActiveRecord::Base
   def has_advanced_settings?
     respond_to?(:admin_settings_url)
   end
+
   def has_advanced_settings
     has_advanced_settings? ? 1 : 0
   end
@@ -394,16 +404,13 @@ class WebConference < ActiveRecord::Base
     can :create
 
     given { |user, session| user && user.id == self.user_id && self.context.grants_right?(user, session, :create_conferences) }
-    can :initiate
+    can :initiate and can :close
 
-    given { |user, session| self.context.grants_right?(user, session, :manage_content) }
-    can :read and can :join and can :initiate and can :create and can :delete
+    given { |user, session| self.context.grants_all_rights?(user, session, :manage_content, :create_conferences) }
+    can :read and can :join and can :initiate and can :delete and can :close
 
-    given { |user, session| context.grants_right?(user, session, :manage_content) && !finished? }
+    given { |user, session| context.grants_all_rights?(user, session, :manage_content, :create_conferences) && !finished? }
     can :update
-
-    given { |user, session| context.grants_right?(user, session, :manage_content) && long_running? && active? }
-    can :close
   end
 
   def config
@@ -438,7 +445,7 @@ class WebConference < ActiveRecord::Base
     plugins.map{ |plugin|
       next unless plugin.enabled? &&
           (klass = (plugin.base || "#{plugin.id.classify}Conference").constantize rescue nil) &&
-          klass < self.base_ar_class
+          klass < self.base_class
       plugin.settings.merge(
         :conference_type => plugin.id.classify,
         :class_name => (plugin.base || "#{plugin.id.classify}Conference"),

@@ -19,6 +19,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+require 'nokogiri'
+
 describe ApplicationHelper do
   include ApplicationHelper
   include ERB::Util
@@ -26,7 +28,7 @@ describe ApplicationHelper do
   alias_method :content_tag_without_nil_return, :content_tag
 
   context "folders_as_options" do
-    before(:each) do
+    before(:once) do
       course_model
       @f = Folder.create!(:name => 'f', :context => @course)
       @f_1 = Folder.create!(:name => 'f_1', :parent_folder => @f, :context => @course)
@@ -40,49 +42,49 @@ describe ApplicationHelper do
       option_string = folders_as_options([@f], :all_folders => @all_folders)
 
       html = Nokogiri::HTML::DocumentFragment.parse("<select>#{option_string}</select>")
-      html.css('option').count.should == 5
-      html.css('option')[0].text.should == @f.name
-      html.css('option')[1].text.should match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/
-      html.css('option')[4].text.should match /^\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_2_1_1.name}/
+      expect(html.css('option').count).to eq 5
+      expect(html.css('option')[0].text).to eq @f.name
+      expect(html.css('option')[1].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/
+      expect(html.css('option')[4].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_2_1_1.name}/
     end
 
     it "should limit depth" do
       option_string = folders_as_options([@f], :all_folders => @all_folders, :max_depth => 1)
 
       html = Nokogiri::HTML::DocumentFragment.parse("<select>#{option_string}</select>")
-      html.css('option').count.should == 3
-      html.css('option')[0].text.should == @f.name
-      html.css('option')[1].text.should match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/
-      html.css('option')[2].text.should match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_2.name}/
+      expect(html.css('option').count).to eq 3
+      expect(html.css('option')[0].text).to eq @f.name
+      expect(html.css('option')[1].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/
+      expect(html.css('option')[2].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_2.name}/
     end
 
     it "should work without supplying all folders" do
       option_string = folders_as_options([@f])
 
       html = Nokogiri::HTML::DocumentFragment.parse("<select>#{option_string}</select>")
-      html.css('option').count.should == 5
-      html.css('option')[0].text.should == @f.name
-      html.css('option')[1].text.should match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/
-      html.css('option')[4].text.should match /^\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_2_1_1.name}/
+      expect(html.css('option').count).to eq 5
+      expect(html.css('option')[0].text).to eq @f.name
+      expect(html.css('option')[1].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/
+      expect(html.css('option')[4].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_2_1_1.name}/
     end
   end
 
   it "show_user_create_course_button should work" do
     Account.default.update_attribute(:settings, { :teachers_can_create_courses => true, :students_can_create_courses => true })
     @domain_root_account = Account.default
-    show_user_create_course_button(nil).should be_false
+    expect(show_user_create_course_button(nil)).to be_falsey
     user
-    show_user_create_course_button(@user).should be_false
+    expect(show_user_create_course_button(@user)).to be_falsey
     course_with_teacher
-    show_user_create_course_button(@teacher).should be_true
+    expect(show_user_create_course_button(@teacher)).to be_truthy
     account_admin_user
-    show_user_create_course_button(@admin).should be_true
+    expect(show_user_create_course_button(@admin)).to be_truthy
   end
 
   describe "tomorrow_at_midnight" do
     it "should always return a time in the future" do
       now = 1.day.from_now.midnight - 5.seconds
-      tomorrow_at_midnight.should > now
+      expect(tomorrow_at_midnight).to be > now
     end
   end
 
@@ -101,22 +103,29 @@ describe ApplicationHelper do
     describe '#context_sensitive_datetime_title' do
       it "produces a string showing the local time and the course time" do
         context = stub(time_zone: ActiveSupport::TimeZone["America/Denver"])
-        context_sensitive_datetime_title(Time.now, context).should == "data-tooltip title=\"Local: Mar 13 at  1:12am<br>Course: Mar 13 at  3:12am\""
+        expect(context_sensitive_datetime_title(Time.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Local: Mar 13 at  1:12am<br>Course: Mar 13 at  3:12am\""
       end
 
       it "only prints the text if just_text option passed" do
         context = stub(time_zone: ActiveSupport::TimeZone["America/Denver"])
-        context_sensitive_datetime_title(Time.now, context, just_text: true).should == "Local: Mar 13 at  1:12am<br>Course: Mar 13 at  3:12am"
+        expect(context_sensitive_datetime_title(Time.now, context, just_text: true)).to eq "Local: Mar 13 at  1:12am<br>Course: Mar 13 at  3:12am"
       end
 
       it "uses the simple title if theres no timezone difference" do
         context = stub(time_zone: ActiveSupport::TimeZone["America/Anchorage"])
-        context_sensitive_datetime_title(Time.now, context, just_text: true).should == "Mar 13 at  1:12am"
-        context_sensitive_datetime_title(Time.now, context).should == "data-tooltip title=\"Mar 13 at  1:12am\""
+        expect(context_sensitive_datetime_title(Time.now, context, just_text: true)).to eq "Mar 13 at  1:12am"
+        expect(context_sensitive_datetime_title(Time.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Mar 13 at  1:12am\""
       end
 
       it 'uses the simple title for nil context' do
-        context_sensitive_datetime_title(Time.now, nil, just_text: true).should == "Mar 13 at  1:12am"
+        expect(context_sensitive_datetime_title(Time.now, nil, just_text: true)).to eq "Mar 13 at  1:12am"
+      end
+
+      it 'crosses date boundaries appropriately' do
+        Timecop.freeze(Time.utc(2013,3,13,7,12)) do
+          context = stub(time_zone: ActiveSupport::TimeZone["America/Denver"])
+          expect(context_sensitive_datetime_title(Time.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Local: Mar 12 at 11:12pm<br>Course: Mar 13 at  1:12am\""
+        end
       end
     end
 
@@ -125,27 +134,40 @@ describe ApplicationHelper do
 
       it 'spits out a friendly time tag' do
         tag = friendly_datetime(Time.now)
-        tag.should == "<time data-tooltip=\"top\" title=\"Mar 13 at  1:12am\">Mar 13 at  1:12am</time>"
+        expect(tag).to eq "<time data-html-tooltip-title=\"Mar 13 at  1:12am\" data-tooltip=\"top\">Mar 13 at  1:12am</time>"
       end
 
       it 'builds a whole time tag with a useful title showing the timezone offset if theres a context' do
         tag = friendly_datetime(Time.now, context: context)
-        tag.should =~ /^<time.*<\/time>$/
-        tag.should =~ /Local: Mar 13 at  1:12am/
-        tag.should =~ /Course: Mar 13 at  3:12am/
+        expect(tag).to match /^<time.*<\/time>$/
+        expect(tag).to match /data-html-tooltip-title=/
+        expect(tag).to match /Local: Mar 13 at  1:12am/
+        expect(tag).to match /Course: Mar 13 at  3:12am/
       end
 
       it 'can produce an alternate tag type' do
         tag = friendly_datetime(Time.now, context: context, tag_type: :span)
-        tag.should =~ /^<span.*<\/span>$/
-        tag.should =~ /Local: Mar 13 at  1:12am/
-        tag.should =~ /Course: Mar 13 at  3:12am/
+        expect(tag).to match /^<span.*<\/span>$/
+        expect(tag).to match /data-html-tooltip-title=/
+        expect(tag).to match /Local: Mar 13 at  1:12am/
+        expect(tag).to match /Course: Mar 13 at  3:12am/
       end
 
       it 'produces no tooltip for a nil datetime' do
         tag = friendly_datetime(nil, context: context)
-        tag.should == "<time></time>"
+        expect(tag).to eq "<time></time>"
       end
+    end
+  end
+
+  describe "accessible date formats" do
+    it "generates a date format for use throughout the app" do
+      expect(accessible_date_format).to match(/YYYY/)
+      expect(accessible_date_format).to match(/hh:mm/)
+    end
+
+    it "wraps a prompt around the format for Screenreader users" do
+      expect(datepicker_screenreader_prompt).to include(accessible_date_format)
     end
   end
 
@@ -153,27 +175,27 @@ describe ApplicationHelper do
     it "should cache the fragment if the condition is true" do
       enable_cache do
         cache_if(true, "t1", :expires_in => 15.minutes, :no_locale => true) { output_buffer.concat "blargh" }
-        @controller.read_fragment("t1").should == "blargh"
+        expect(@controller.read_fragment("t1")).to eq "blargh"
       end
     end
 
     it "should not cache if the condition is false" do
       enable_cache do
         cache_if(false, "t1", :expires_in => 15.minutes, :no_locale => true) { output_buffer.concat "blargh" }
-        @controller.read_fragment("t1").should be_nil
+        expect(@controller.read_fragment("t1")).to be_nil
       end
     end
   end
 
   context "include_account_css" do
-    before do
+    before :once do
       @site_admin = Account.site_admin
       @domain_root_account = Account.default
     end
 
     context "with no custom css" do
       it "should be empty" do
-        include_account_css.should be_nil
+        expect(include_account_css).to be_nil
       end
     end
 
@@ -184,8 +206,8 @@ describe ApplicationHelper do
         @domain_root_account.save!
 
         output = include_account_css
-        output.should have_tag 'link'
-        output.should match %r{/path/to/css}
+        expect(output).to have_tag 'link'
+        expect(output).to match %r{/path/to/css}
       end
 
       it "should include site admin css" do
@@ -194,8 +216,8 @@ describe ApplicationHelper do
         @site_admin.save!
 
         output = include_account_css
-        output.should have_tag 'link'
-        output.should match %r{/path/to/css}
+        expect(output).to have_tag 'link'
+        expect(output).to match %r{/path/to/css}
       end
 
       it "should include site admin css once" do
@@ -204,8 +226,8 @@ describe ApplicationHelper do
         @site_admin.save!
 
         output = include_account_css
-        output.should have_tag 'link'
-        output.scan(%r{/path/to/css}).length.should eql 1
+        expect(output).to have_tag 'link'
+        expect(output.scan(%r{/path/to/css}).length).to eql 1
       end
 
       it "should include site admin css first" do
@@ -218,8 +240,8 @@ describe ApplicationHelper do
         @domain_root_account.save!
 
         output = include_account_css
-        output.should have_tag 'link'
-        output.scan(%r{/path/to/(root/|admin/)?css}).should eql [['admin/'], ['root/']]
+        expect(output).to have_tag 'link'
+        expect(output.scan(%r{/path/to/(root/|admin/)?css})).to eql [['admin/'], ['root/']]
       end
 
       it "should not include anything if param is set to 0" do
@@ -229,12 +251,12 @@ describe ApplicationHelper do
 
         params[:global_includes] = '0'
         output = include_account_css
-        output.should be_nil
+        expect(output).to be_nil
       end
     end
 
     context "sub-accounts" do
-      before do
+      before :once do
         @site_admin.settings = @site_admin.settings.merge({ :global_includes => true })
         @site_admin.settings = @site_admin.settings.merge({ :global_stylesheet => '/path/to/admin/css' })
         @site_admin.save!
@@ -257,30 +279,30 @@ describe ApplicationHelper do
       it "should include sub-account css" do
         @context = @sub_account1
         output = include_account_css
-        output.should have_tag 'link'
-        output.scan(%r{/path/to/(sub1/|sub2/|root/|admin/)?css}).should eql [['admin/'], ['root/'], ['sub1/']]
+        expect(output).to have_tag 'link'
+        expect(output.scan(%r{/path/to/(sub1/|sub2/|root/|admin/)?css})).to eql [['admin/'], ['root/'], ['sub1/']]
       end
 
       it "should not include sub-account css when root account is context" do
         @context = @domain_root_account
         output = include_account_css
-        output.should have_tag 'link'
-        output.scan(%r{/path/to/(sub1/|sub2/|root/|admin/)?css}).should eql [['admin/'], ['root/']]
+        expect(output).to have_tag 'link'
+        expect(output.scan(%r{/path/to/(sub1/|sub2/|root/|admin/)?css})).to eql [['admin/'], ['root/']]
       end
 
       it "should include sub-account css for course context" do
         @context = @sub_account1.courses.create!
         output = include_account_css
-        output.should have_tag 'link'
-        output.scan(%r{/path/to/(sub1/|sub2/|root/|admin/)?css}).should eql [['admin/'], ['root/'], ['sub1/']]
+        expect(output).to have_tag 'link'
+        expect(output.scan(%r{/path/to/(sub1/|sub2/|root/|admin/)?css})).to eql [['admin/'], ['root/'], ['sub1/']]
       end
 
       it "should include sub-account css for group context" do
         @course = @sub_account1.courses.create!
         @context = @course.groups.create!
         output = include_account_css
-        output.should have_tag 'link'
-        output.scan(%r{/path/to/(sub1/|sub2/|root/|admin/)?css}).should eql [['admin/'], ['root/'], ['sub1/']]
+        expect(output).to have_tag 'link'
+        expect(output.scan(%r{/path/to/(sub1/|sub2/|root/|admin/)?css})).to eql [['admin/'], ['root/'], ['sub1/']]
       end
 
       it "should use include sub-account css, if sub-account is lowest common account context" do
@@ -290,8 +312,8 @@ describe ApplicationHelper do
         @context = @user
         @current_user = @user
         output = include_account_css
-        output.should have_tag 'link'
-        output.scan(%r{/path/to/(sub1/|sub2/|root/|admin/)?css}).should eql [['admin/'], ['root/'], ['sub1/']]
+        expect(output).to have_tag 'link'
+        expect(output.scan(%r{/path/to/(sub1/|sub2/|root/|admin/)?css})).to eql [['admin/'], ['root/'], ['sub1/']]
       end
 
       it "should not use include sub-account css, if sub-account is not lowest common account context" do
@@ -304,8 +326,8 @@ describe ApplicationHelper do
         @context = @user
         @current_user = @user
         output = include_account_css
-        output.should have_tag 'link'
-        output.scan(%r{/path/to/(sub1/|sub2/|root/|admin/)?css}).should eql [['admin/'], ['root/']]
+        expect(output).to have_tag 'link'
+        expect(output.scan(%r{/path/to/(sub1/|sub2/|root/|admin/)?css})).to eql [['admin/'], ['root/']]
       end
 
       it "should include multiple levesl of sub-account css in the right order for course page" do
@@ -315,8 +337,8 @@ describe ApplicationHelper do
 
         @context = @sub_sub_account1.courses.create!
         output = include_account_css
-        output.should have_tag 'link'
-        output.scan(%r{/path/to/(subsub1/|sub1/|sub2/|root/|admin/)?css}).should eql [['admin/'], ['root/'], ['sub1/'], ['subsub1/']]
+        expect(output).to have_tag 'link'
+        expect(output.scan(%r{/path/to/(subsub1/|sub1/|sub2/|root/|admin/)?css})).to eql [['admin/'], ['root/'], ['sub1/'], ['subsub1/']]
       end
 
       it "should include multiple levesl of sub-account css in the right order" do
@@ -330,21 +352,21 @@ describe ApplicationHelper do
         @context = @user
         @current_user = @user
         output = include_account_css
-        output.should have_tag 'link'
-        output.scan(%r{/path/to/(subsub1/|sub1/|sub2/|root/|admin/)?css}).should eql [['admin/'], ['root/'], ['sub1/'], ['subsub1/']]
+        expect(output).to have_tag 'link'
+        expect(output.scan(%r{/path/to/(subsub1/|sub1/|sub2/|root/|admin/)?css})).to eql [['admin/'], ['root/'], ['sub1/'], ['subsub1/']]
       end
     end
   end
 
   describe "include_account_js" do
-    before do
+    before :once do
       @site_admin = Account.site_admin
       @domain_root_account = Account.default
     end
 
     context "with no custom js" do
       it "should be empty" do
-        include_account_js.should be_nil
+        expect(include_account_js).to be_nil
       end
     end
 
@@ -355,8 +377,8 @@ describe ApplicationHelper do
         @domain_root_account.save!
 
         output = include_account_js
-        output.should have_tag 'script'
-        output.should match %r{\\?/path\\?/to\\?/js}
+        expect(output).to have_tag 'script'
+        expect(output).to match %r{\\?/path\\?/to\\?/js}
       end
 
       it "should include site admin javascript" do
@@ -365,8 +387,8 @@ describe ApplicationHelper do
         @site_admin.save!
 
         output = include_account_js
-        output.should have_tag 'script'
-        output.should match %r{\\?/path\\?/to\\?/js}
+        expect(output).to have_tag 'script'
+        expect(output).to match %r{\\?/path\\?/to\\?/js}
       end
 
       it "should include both site admin and root account javascript, site admin first" do
@@ -379,8 +401,8 @@ describe ApplicationHelper do
         @site_admin.save!
 
         output = include_account_js
-        output.should have_tag 'script'
-        output.scan(%r{\\?/path\\?/to\\?/(admin|root)?\\?/?js}).should eql [['admin'], ['root']]
+        expect(output).to have_tag 'script'
+        expect(output.scan(%r{\\?/path\\?/to\\?/(admin|root)?\\?/?js})).to eql [['admin'], ['root']]
       end
     end
   end
@@ -389,51 +411,51 @@ describe ApplicationHelper do
     it "should only compute includes once, with includes" do
       @site_admin = Account.site_admin
       @site_admin.expects(:global_includes_hash).once.returns({:css => "/path/to/css", :js => "/path/to/js"})
-      include_account_css.should match %r{/path/to/css}
-      include_account_js.should match %r{\\?/path\\?/to\\?/js}
+      expect(include_account_css).to match %r{/path/to/css}
+      expect(include_account_js).to match %r{\\?/path\\?/to\\?/js}
     end
 
     it "should only compute includes once, with includes" do
       @site_admin = Account.site_admin
       @site_admin.expects(:global_includes_hash).once.returns(nil)
-      include_account_css.should be_nil
-      include_account_js.should be_nil
+      expect(include_account_css).to be_nil
+      expect(include_account_js).to be_nil
     end
   end
 
   describe "hidden dialogs" do
     before do
-      hidden_dialogs.should be_empty
+      expect(hidden_dialogs).to be_empty
     end
 
     it "should generate empty string when there are no dialogs" do
       str = render_hidden_dialogs
-      str.should == ''
+      expect(str).to eq ''
     end
 
     it "should work with one hidden_dialog" do
       hidden_dialog('my_test_dialog') { "Hello there!" }
       str = render_hidden_dialogs
-      str.should == "<div id='my_test_dialog' style='display: none;''>Hello there!</div>"
+      expect(str).to eq "<div id='my_test_dialog' style='display: none;''>Hello there!</div>"
     end
 
     it "should work with more than one hidden dialog" do
       hidden_dialog('first_dialog') { "first" }
       hidden_dialog('second_dialog') { "second" }
       str = render_hidden_dialogs
-      str.should == "<div id='first_dialog' style='display: none;''>first</div><div id='second_dialog' style='display: none;''>second</div>"
+      expect(str).to eq "<div id='first_dialog' style='display: none;''>first</div><div id='second_dialog' style='display: none;''>second</div>"
     end
 
     it "should raise an error when a dialog with conflicting content is added" do
       hidden_dialog('dialog_id') { 'content' }
-      lambda { hidden_dialog('dialog_id') { 'different content' } }.should raise_error
+      expect { hidden_dialog('dialog_id') { 'different content' } }.to raise_error
     end
 
     it "should only render a dialog once when it has been added multiple times" do
       hidden_dialog('dialog_id') { 'content' }
       hidden_dialog('dialog_id') { 'content' }
       str = render_hidden_dialogs
-      str.should == "<div id='dialog_id' style='display: none;''>content</div>"
+      expect(str).to eq "<div id='dialog_id' style='display: none;''>content</div>"
     end
   end
 
@@ -442,44 +464,24 @@ describe ApplicationHelper do
       collection = [user, user, user]
       key1 = collection_cache_key(collection)
       key2 = collection_cache_key(collection)
-      key1.should == key2
+      expect(key1).to eq key2
       # verify it's not overly long
-      key1.length.should <= 40
+      expect(key1.length).to be <= 40
 
       User.where(:id => collection[1]).update_all(:updated_at => 1.hour.ago)
       collection[1].reload
       key3 = collection_cache_key(collection)
-      key1.should_not == key3
-    end
-  end
-
-  describe "jt" do
-    after do
-      I18n.locale = I18n.default_locale
-    end
-
-    it "should output the translated default" do
-      pending('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
-      def i18n_scope; "date.days"; end
-      (I18n.available_locales - [:en]).each do |locale|
-        I18n.locale = locale
-        expected = I18n.t("#date.days.today").to_json
-        # relative
-        jt("today", nil).should include expected
-        # and absolute
-        jt("#date.days.today", nil).should include expected
-      end
+      expect(key1).not_to eq key3
     end
   end
 
   context "dashboard_url" do
-    before :each do
+    before :once do
       @domain_root_account = Account.default
     end
 
     it "returns a regular canvas dashboard url" do
-      @controller.expects(:dashboard_url).with({}).returns("http://test.host/") if CANVAS_RAILS2
-      dashboard_url.should == "http://test.host/"
+      expect(dashboard_url).to eq "http://test.host/"
     end
 
     context "with a custom dashboard_url on the account" do
@@ -488,11 +490,19 @@ describe ApplicationHelper do
       end
 
       it "returns the custom dashboard_url" do
-        dashboard_url.should == "http://foo.bar"
+        expect(dashboard_url).to eq "http://foo.bar"
       end
 
-      it "with login_success=1, returns a regular canvas dashboard url" do
-        dashboard_url(:login_success => '1').should == "http://test.host/?login_success=1"
+      context "with login_success=1" do
+        it "returns a regular canvas dashboard url" do
+          expect(dashboard_url(:login_success => '1')).to eq "http://test.host/?login_success=1"
+        end
+      end
+
+      context "with become_user_id=1" do
+        it "returns a regular canvas dashboard url for masquerading" do
+          expect(dashboard_url(:become_user_id => '1')).to eq "http://test.host/?become_user_id=1"
+        end
       end
 
       context "with a user logged in" do
@@ -501,7 +511,7 @@ describe ApplicationHelper do
         end
 
         it "returns the custom dashboard_url with the current user's id" do
-          dashboard_url.should == "http://foo.bar?current_user_id=#{@current_user.id}"
+          expect(dashboard_url).to eq "http://foo.bar?current_user_id=#{@current_user.id}"
         end
       end
     end
@@ -509,20 +519,60 @@ describe ApplicationHelper do
 
   context "include_custom_meta_tags" do
     it "should be nil if @meta_tags is not defined" do
-      include_custom_meta_tags.should be_nil
+      expect(include_custom_meta_tags).to be_nil
     end
 
     it "should include tags if present" do
       @meta_tags = [{ :name => "hi", :content => "there" }]
       result = include_custom_meta_tags
-      result.should match(/meta/)
-      result.should match(/name="hi"/)
-      result.should match(/content="there"/)
+      expect(result).to match(/meta/)
+      expect(result).to match(/name="hi"/)
+      expect(result).to match(/content="there"/)
     end
 
     it "should html_safe-ify them" do
       @meta_tags = [{ :name => "hi", :content => "there" }]
-      include_custom_meta_tags.should be_html_safe
+      expect(include_custom_meta_tags).to be_html_safe
+    end
+  end
+
+  describe "editor_buttons" do
+    it "should return hash of tools if in group" do
+      @course = course_model
+      @group = @course.groups.create!(:name => "some group")
+      tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret", :url => "http://example.com")
+      tool.editor_button = {:url => "http://example.com", :icon_url => "http://example.com"}
+      tool.save!
+      @context = @group
+
+      expect(editor_buttons).to eq([{:name=>"bob", :id=>tool.id, :url=>"http://example.com", :icon_url=>"http://example.com", :width=>800, :height=>400}])
+    end
+
+    it "should return hash of tools if in course" do
+      @course = course_model
+      tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret", :url => "http://example.com")
+      tool.editor_button = {:url => "http://example.com", :icon_url => "http://example.com"}
+      tool.save!
+      controller.stubs(:group_external_tool_path).returns('http://dummy')
+      @context = @course
+
+      expect(editor_buttons).to eq([{:name=>"bob", :id=>tool.id, :url=>"http://example.com", :icon_url=>"http://example.com", :width=>800, :height=>400}])
+    end
+
+    it "should not include tools from the domain_root_account for users" do
+      @domain_root_account = Account.default
+      account_admin_user
+      tool = @domain_root_account.context_external_tools.new(
+        :name => "bob",
+        :consumer_key => "test",
+        :shared_secret => "secret",
+        :url => "http://example.com"
+      )
+      tool.editor_button = {:url => "http://example.com", :icon_url => "http://example.com"}
+      tool.save!
+      @context = @admin
+
+      expect(editor_buttons).to be_empty
     end
   end
 end

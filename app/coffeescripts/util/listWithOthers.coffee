@@ -9,7 +9,7 @@ define [
     if strings.length > cutoff
       strings = strings[0...cutoff].concat([strings[cutoff...strings.length]])
     $.toSentence(for strOrArray in strings
-      if typeof strOrArray is 'string' or strOrArray._icHTMLSafe
+      if typeof strOrArray is 'string' or strOrArray instanceof h.SafeString
         "<span>#{h(strOrArray)}</span>"
       else
         """
@@ -17,7 +17,7 @@ define [
           #{h(I18n.t('other', 'other', count: strOrArray.length))}
           <span>
             <ul>
-              #{(('<li>' + h(str) + '</li>') for str in strOrArray).join('')}
+              #{$.raw (('<li>' + h(str) + '</li>') for str in strOrArray).join('')}
             </ul>
           </span>
         </span>
