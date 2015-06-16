@@ -1080,7 +1080,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :sis_imports_api) do
       post 'accounts/:account_id/sis_imports', action: :create
       get 'accounts/:account_id/sis_imports/:id', action: :show
-      get 'accounts/:account_id/sis_imports', action: :index
+      get 'accounts/:account_id/sis_imports', action: :index, as: "account_sis_imports"
     end
 
     scope(controller: :users) do
