@@ -844,6 +844,8 @@ class Quizzes::QuizzesController < ApplicationController
       js_env QUIZ_SUBMISSION_EVENTS_URL: events_url
     end
 
+    js_env IS_PREVIEW: true if @submission.preview?
+
     @quiz_presenter = Quizzes::TakeQuizPresenter.new(@quiz, @submission, params)
     render :take_quiz
   end

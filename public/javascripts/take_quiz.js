@@ -225,7 +225,7 @@ define([
           }
         }
 
-        if(quizSubmission.isTimeUp(currentTimeLeft)) {
+        if(quizSubmission.isTimeUp(currentTimeLeft) && !ENV.IS_PREVIEW) {
           quizSubmission.showTimeUpDialog(now);
         } else if(currentTimeToDueDate != null && currentTimeLeft > currentTimeToDueDate) {
           quizSubmission.showDueDateWarnings(currentTimeToDueDate);
