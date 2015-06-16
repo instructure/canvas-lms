@@ -1223,7 +1223,7 @@ class UsersController < ApplicationController
     end
     @user.name ||= params[:pseudonym][:unique_id]
     unless @user.registered?
-      @user.workflow_state = if require_password
+      @user.workflow_state = if require_password || skip_confirmation
         # no email confirmation required (self_enrollment_code and password
         # validations will ensure everything is legit)
         'registered'
