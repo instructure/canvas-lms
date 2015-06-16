@@ -31,7 +31,7 @@ define [
     ok view
 
   test 'delete calls screenreader', ->
-    confirm_stub = sinon.stub(window, 'confirm').returns(true)
+    @stub(window, 'confirm').returns(true)
     ENV.context_asset_string = "course_1"
     server = sinon.fakeServer.create()
     server.respondWith('DELETE', '/api/v1/courses/1/conferences/1',
@@ -47,4 +47,3 @@ define [
     view.delete(jQuery.Event( "click" ))
     server.respond()
     equal $.screenReaderFlashMessage.callCount, 1
-    confirm_stub.restore()

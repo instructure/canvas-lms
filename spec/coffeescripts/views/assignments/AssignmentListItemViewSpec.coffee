@@ -182,18 +182,14 @@ define [
   test 'asks for confirmation before deleting an assignment', ->
     view = createView(@model)
 
-    group_stub = sinon.stub(view, 'visibleAssignments', -> [])
-    confirm_stub = sinon.stub(window, "confirm", -> true )
-    delete_spy = sinon.spy view, "delete"
+    @stub(view, 'visibleAssignments', -> [])
+    @stub(window, "confirm", -> true )
+    @spy view, "delete"
 
     view.$("#assignment_#{@model.id} .delete_assignment").click()
 
-    ok confirm_stub.called
-    ok delete_spy.called
-
-    confirm_stub.restore()
-    delete_spy.restore()
-    group_stub.restore()
+    ok window.confirm.called
+    ok view.delete.called
 
   test "delete destroys model", ->
     old_asset_string = ENV.context_asset_string

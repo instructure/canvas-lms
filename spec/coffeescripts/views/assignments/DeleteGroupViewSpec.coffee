@@ -31,16 +31,14 @@ define [
   module 'DeleteGroupView'
 
   test 'it should delete a group without assignments', ->
-    confirm_stub = sinon.stub(window, "confirm", -> true )
+    @stub(window, "confirm", -> true )
     view = createView(false, true)
-    destroy_stub = sinon.stub(view, "destroyModel", -> )
+    @stub(view, "destroyModel", -> )
     view.render()
     view.open()
 
-    ok confirm_stub.called
-    ok destroy_stub.called
-    confirm_stub.restore()
-    destroy_stub.restore()
+    ok window.confirm.called
+    ok view.destroyModel.called
 
   test 'assignment and ag counts should be correct', ->
     view = createView(true, true)

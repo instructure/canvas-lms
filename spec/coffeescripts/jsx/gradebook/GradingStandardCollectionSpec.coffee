@@ -15,8 +15,7 @@ define [
       $.flashMessage = ->
       @fError = $.flashError
       $.flashError = ->
-      @wConfirm = window.confirm
-      window.confirm = ->
+      @stub(window, 'confirm', -> )
       @server = sinon.fakeServer.create()
       @sandbox = sinon.sandbox.create()
       ENV.current_user_roles = ["admin", "teacher"]
@@ -80,7 +79,6 @@ define [
       ENV.DEFAULT_GRADING_STANDARD_DATA = null
       $.flashMessage = @fMessage
       $.flashError = @fError
-      window.confirm = @wConfirm
       @server.restore()
       @sandbox.restore()
 

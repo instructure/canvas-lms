@@ -13,10 +13,9 @@ define [
     setup: ->
       @fMessage = $.flashMessage
       @fError = $.flashError
-      @wConfirm = window.confirm
       $.flashMessage = ->
       $.flashError = ->
-      window.confirm = -> true
+      @stub(window, 'confirm', -> true)
       @server = sinon.fakeServer.create()
       @sandbox = sinon.sandbox.create()
       ENV.current_user_roles = ["teacher"]
@@ -58,7 +57,6 @@ define [
       ENV.GRADING_PERIODS_URL = null
       $.flashMessage = @fMessage
       $.flashError = @fError
-      window.confirm = @wConfirm
       @server.restore()
       @sandbox.restore()
 
@@ -219,10 +217,9 @@ define [
     setup: ->
       @fMessage = $.flashMessage
       @fError = $.flashError
-      @wConfirm = window.confirm
       $.flashMessage = ->
       $.flashError = ->
-      window.confirm = -> true
+      @stub(window, 'confirm', -> true)
       @server = sinon.fakeServer.create()
       @sandbox = sinon.sandbox.create()
       ENV.current_user_roles = ["teacher"]
@@ -264,7 +261,6 @@ define [
       ENV.GRADING_PERIODS_URL = null
       $.flashMessage = @fMessage
       $.flashError = @fError
-      window.confirm = @wConfirm
       @server.restore()
       @sandbox.restore()
 
