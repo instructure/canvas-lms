@@ -10,11 +10,8 @@ define [
 
   module 'GradingStandardCollection',
     setup: ->
-      # be very careful to clean up things you monkeypatch out
-      @fMessage = $.flashMessage
-      $.flashMessage = ->
-      @fError = $.flashError
-      $.flashError = ->
+      @stub($, 'flashMessage', ->)
+      @stub($, 'flashError', ->)
       @stub(window, 'confirm', -> )
       @server = sinon.fakeServer.create()
       @sandbox = sinon.sandbox.create()
@@ -77,8 +74,6 @@ define [
       ENV.current_user_roles = null
       ENV.GRADING_STANDARDS_URL = null
       ENV.DEFAULT_GRADING_STANDARD_DATA = null
-      $.flashMessage = @fMessage
-      $.flashError = @fError
       @server.restore()
       @sandbox.restore()
 

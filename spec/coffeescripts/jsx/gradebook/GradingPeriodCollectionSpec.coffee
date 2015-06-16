@@ -11,10 +11,8 @@ define [
 
   module 'GradingPeriodCollection with read and manage permission for all periods',
     setup: ->
-      @fMessage = $.flashMessage
-      @fError = $.flashError
-      $.flashMessage = ->
-      $.flashError = ->
+      @stub($, 'flashMessage', ->)
+      @stub($, 'flashError', ->)
       @stub(window, 'confirm', -> true)
       @server = sinon.fakeServer.create()
       @sandbox = sinon.sandbox.create()
@@ -55,8 +53,6 @@ define [
       React.unmountComponentAtNode(@gradingPeriodCollection.getDOMNode().parentNode)
       ENV.current_user_roles = null
       ENV.GRADING_PERIODS_URL = null
-      $.flashMessage = @fMessage
-      $.flashError = @fError
       @server.restore()
       @sandbox.restore()
 
