@@ -574,10 +574,25 @@ TEXT
           <td><%= f.text_field :purpose %></td>
         </tr>
         <tr>
-          <td><%= f.blabel :expires_at, :en => "Expires" %></td>
           <td>
-            <div><%= f.text_field :expires_at, :class => "expires_field datetime_field", :style => "width: 120px;", :"aria-label" => t("Expires on Date") %></div>
-            <div style="font-size: 0.8em;" class="hint"><%= t('hints.expires_at', "leave blank for no expiration") %></div>
+            <%= f.blabel :expires_at, en: "Expires" %>
+            <label class="screenreader-only" id="token_expires_at_accessible_label">
+              <%= t("Access token is valid until") %>
+              <%= datepicker_screenreader_prompt %>
+            </label>
+          </td>
+          <td>
+            <div>
+              <%= f.text_field :expires_at,
+                               class: "expires_field datetime_field",
+                               style: "width: 120px;",
+                               "aria-labelledby" => "token_expires_at_accessible_label",
+                               "data-tooltip" => "{\"position\":\"top\",\"force_position\":\"true\"}",
+                               title: accessible_date_format %>
+            </div>
+            <div style="font-size: 0.8em;" class="hint">
+              <%= t('hints.expires_at', "leave blank for no expiration") %>
+            </div>
           </td>
         </tr>
           <td colspan="2">
