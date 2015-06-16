@@ -148,6 +148,30 @@ describe Course do
     it "should create a new instance given valid attributes" do
       course_model
     end
+
+    it "should require unique sis_source_id" do
+      other_course = course
+      other_course.sis_source_id = "sisid"
+      other_course.save!
+
+      new_course = course
+      new_course.sis_source_id = other_course.sis_source_id
+      expect(new_course).to_not be_valid
+      new_course.sis_source_id = nil
+      expect(new_course).to be_valid
+    end
+
+    it "should require unique integration_id" do
+      other_course = course
+      other_course.integration_id = "intid"
+      other_course.save!
+
+      new_course = course
+      new_course.integration_id = other_course.integration_id
+      expect(new_course).to_not be_valid
+      new_course.integration_id = nil
+      expect(new_course).to be_valid
+    end
   end
 
   it "should create a unique course." do

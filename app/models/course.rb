@@ -235,7 +235,7 @@ class Course < ActiveRecord::Base
   after_save :set_self_enrollment_code
 
   before_save :touch_root_folder_if_necessary
-  before_validation :verify_unique_sis_source_id
+  before_validation :verify_unique_ids
   validates_presence_of :account_id, :root_account_id, :enrollment_term_id, :workflow_state
   validates_length_of :syllabus_body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
@@ -330,19 +330,31 @@ class Course < ActiveRecord::Base
     tags
   end
 
-  def verify_unique_sis_source_id
-    return true unless self.sis_source_id
+  def verify_unique_ids
     infer_root_account unless self.root_account_id
 
-    return true if !root_account_id_changed? && !sis_source_id_changed?
+    is_unique = true
+    if self.sis_source_id && (root_account_id_changed? || sis_source_id_changed?)
+      scope = root_account.all_courses.where(sis_source_id: self.sis_source_id)
+      scope = scope.where("id<>?", self) unless self.new_record?
+      if scope.exists?
+        is_unique = false
+        self.errors.add(:sis_source_id, t('errors.sis_in_use', "SIS ID \"%{sis_id}\" is already in use",
+            :sis_id => self.sis_source_id))
+      end
+    end
 
-    scope = root_account.all_courses.where(sis_source_id: self.sis_source_id)
-    scope = scope.where("id<>?", self) unless self.new_record?
+    if self.integration_id && (root_account_id_changed? || integration_id_changed?)
+      scope = root_account.all_courses.where(integration_id: self.integration_id)
+      scope = scope.where("id<>?", self) unless self.new_record?
+      if scope.exists?
+        is_unique = false
+        self.errors.add(:integration_id, t("Integration ID \"%{int_id}\" is already in use",
+            :int_id => self.integration_id))
+      end
+    end
 
-    return true unless scope.exists?
-
-    self.errors.add(:sis_source_id, t('errors.sis_in_use', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_source_id))
-    false
+    is_unique
   end
 
   def public_license?
