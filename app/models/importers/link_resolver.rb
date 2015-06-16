@@ -44,9 +44,12 @@ module Importers
           if att = context.attachments.where(migration_id: migration_id).first
             link[:new_value] = "#{context_path}/files/#{att.id}/preview"
           end
-        elsif context.respond_to?(type) && context.send(type).respond_to?(:where)
-          if object = context.send(type).where(migration_id: migration_id).first
-            link[:new_value] = "#{context_path}/#{type_for_url}/#{object.id}"
+        elsif context.respond_to?(type) && context.send(type).respond_to?(:scoped)
+          scope = context.send(type).scoped
+          if scope.table.columns.map(&:name).include?(:migration_id)
+            if object = scope.where(migration_id: migration_id).first
+              link[:new_value] = "#{context_path}/#{type_for_url}/#{object.id}"
+            end
           end
         end
       when :media_object
