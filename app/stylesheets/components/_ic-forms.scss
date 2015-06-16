@@ -671,7 +671,17 @@ Reduce the width of your screen to see how the example components below both sca
         <label class="ic-Label" for="demo-action-box-2">
           Start date
         </label>
-        <input type="datetime" id="demo-action-box-2" class="ic-Input"></input>
+        <label class="screenreader-only" id="demo-action-box-2-accessible-label">
+          <%= t("Start Date field for styleguide") %>
+          <%= datepicker_screenreader_prompt %>
+        </label>
+        <input type="datetime"
+               id="demo-action-box-2"
+               class="ic-Input"
+               aria-labelledby="demo-action-box-2-accessible-label"
+               data-tooltip
+               title="<%= accessible_date_format %>">
+        </input>
         <button type="button" class="Button" aria-hidden="true" tabindex="-1">
           <i class="icon-calendar-month"></i>
         </button>  
@@ -712,31 +722,52 @@ Reduce the width of your screen to see how the example components below both sca
     </div>
     <div class="ic-Form-control">
       <div class="ic-Input-group">
-        <input type="datetime" class="ic-Input" id="demo-action-box-5" placeholder="Due date" aria-label="Due date"></input>
+        <label class="screenreader-only" id="demo-action-box-5-accessible-label">
+          <%= t("Due Date field for styleguide") %>
+          <%= datepicker_screenreader_prompt %>
+        </label>
+        <input type="datetime" class="ic-Input" id="demo-action-box-5" placeholder="Due date" aria-labelledby="demo-action-box-5-accessible-label"
+               data-tooltip
+               title="<%= accessible_date_format %>">
+        </input>
         <button type="button" class="Button" aria-hidden="true" tabindex="-1">
           <i class="icon-calendar-month"></i>
-        </button>  
-      </div>  
+        </button>
+      </div>
     </div>
     <div class="ic-Form-control">
       <div class="ic-Input-group">
-        <input type="datetime" class="ic-Input" id="demo-action-box-6" placeholder="Available from" aria-label="Available from"></input>
+        <label class="screenreader-only" id="demo-action-box-6-accessible-label">
+          <%= t("Available From field for styleguide") %>
+          <%= datepicker_screenreader_prompt %>
+        </label>
+        <input type="datetime" class="ic-Input" id="demo-action-box-6" placeholder="Available from" aria-label="demo-action-box-6-accessible-label"
+               data-tooltip
+               title="<%= accessible_date_format %>">
+        </input>
         <button type="button" class="Button" aria-hidden="true" tabindex="-1">
           <i class="icon-calendar-month"></i>
-        </button>  
-      </div>  
+        </button>
+      </div>
     </div>
     <div class="ic-Form-control">
       <div class="ic-Input-group">
-        <input type="datetime" class="ic-Input" id="demo-action-box-7" placeholder="Until" aria-label="Until"></input>
+        <label class="screenreader-only" id="demo-action-box-7-accessible-label">
+          <%= t("Available Until field for styleguide") %>
+          <%= datepicker_screenreader_prompt %>
+        </label>
+        <input type="datetime" class="ic-Input" id="demo-action-box-7" placeholder="Until" aria-labelledby="demo-action-box-7-accessible-label"
+               data-tooltip
+               title="<%= accessible_date_format %>">
+        </input>
         <button type="button" class="Button" aria-hidden="true" tabindex="-1">
           <i class="icon-calendar-month"></i>
-        </button>  
-      </div>  
+        </button>
+      </div>
     </div>
 
   </div>
-  
+
   <div class="ic-Form-action-box__Actions">
     <button type="button" class="Button Button--icon-action">
       <span class="screenreader-only">Delete row</span>
