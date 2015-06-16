@@ -52,7 +52,7 @@ set :linked_dirs, %w{log tmp/pids public/system}
 # set :default_env, { path: "/opt/ruby/bin:$PATH" }
 
 # Default value for keep_releases is 5
-# set :keep_releases, 5
+set :keep_releases, 3
 
 # set the locations that we will look for changed assets to determine whether to precompile
 set :assets_dependencies, %w(app/stylesheets app/coffeescripts public/javascripts public/stylesheets spec/javascripts spec/coffeescripts Gemfile.lock config/routes.rb)
