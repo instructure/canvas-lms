@@ -297,7 +297,9 @@
         </div><br/>
         <%= before_label(:file_upload, "Or upload a new file") %><br/>
         <%= file_field :attachment, :uploaded_data, :class => "file_upload", :style => "padding-left: 50px;" %>
-        <div style="font-size: 0.8em; margin-left: 20px;"><%= t(:upload_limit, "limit 50MB per file") %></div>
+        <div style="font-size: 0.8em; margin-left: 20px;">
+          <%= t(:upload_limit, "limit %{file_size_limit} per file", file_size_limit: number_to_human_size(@current_user.quota)) %>
+        </div>
       </div>
       <div class='button-container button-container-right-aligned'>
         <button type="button" class="upload_file_button btn btn-small"><%= t('buttons.upload_file', "Select/Upload File") %></button>
