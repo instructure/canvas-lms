@@ -52,14 +52,12 @@ define [
     ok _.isEmpty(errors)
 
   test 'it should create a new assignment group', ->
-    close_stub = sinon.stub(CreateGroupView.prototype, 'close', -> )
+    @stub(CreateGroupView.prototype, 'close', -> )
 
     view = createView(false)
     view.render()
     view.onSaveSuccess()
     equal view.assignmentGroups.size(), 3
-
-    close_stub.restore()
 
   test 'it should edit an existing assignment group', ->
     view = createView()
@@ -141,7 +139,6 @@ define [
 
   test 'it should call render on save success if adding an assignmentGroup', ->
     view = createView(false)
-    renderStub = sinon.stub(view, 'render')
-    calls = renderStub.callCount
+    @stub(view, 'render')
     view.onSaveSuccess()
-    equal renderStub.callCount, calls + 1
+    equal view.render.callCount, 1

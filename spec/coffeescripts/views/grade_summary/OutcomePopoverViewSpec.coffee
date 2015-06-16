@@ -69,15 +69,11 @@ define [
 
   test 'openPopover', ->
     ok _.isUndefined(@popoverView.popover), 'precondition'
-    elementSpy = sinon.stub(@popoverView.outcomeLineGraphView, 'setElement')
-    renderSpy = sinon.stub(@popoverView.outcomeLineGraphView, 'render')
+    elementSpy = @stub(@popoverView.outcomeLineGraphView, 'setElement')
+    renderSpy = @stub(@popoverView.outcomeLineGraphView, 'render')
 
     @popoverView.openPopover(@e('mouseenter'))
 
     ok @popoverView.popover instanceof Popover
     ok elementSpy.called
     ok renderSpy.called
-
-    @popoverView.outcomeLineGraphView.setElement.restore()
-    @popoverView.outcomeLineGraphView.render.restore()
-

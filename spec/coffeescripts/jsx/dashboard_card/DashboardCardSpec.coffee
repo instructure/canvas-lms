@@ -24,11 +24,10 @@ define [
         courseCode: '101',
         id: 1
       }
-      sinon.stub(CourseActivitySummaryStore, 'getStateForCourse', -> {})
+      @stub(CourseActivitySummaryStore, 'getStateForCourse', -> {})
 
     teardown: ->
       localStorage.clear()
-      CourseActivitySummaryStore.getStateForCourse.restore()
       React.unmountComponentAtNode(@component.getDOMNode().parentNode)
 
   test 'render', ->

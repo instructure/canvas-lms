@@ -8,16 +8,6 @@ define [
 
   Simulate = React.addons.TestUtils.Simulate
 
-  mockUploader = (name, progress) ->
-    uploader = new FileUploader({file: {}})
-    sinon.stub(uploader, 'getFileName').returns(name)
-    sinon.stub(uploader, 'roundProgress').returns(progress)
-    uploader
-
-  resetUploader = (uploader) ->
-    uploader.getFileName.restore()
-    uploader.roundProgress.restore()
-
   module 'CurrentUploads',
     setup: ->
       @uploads = React.render(CurrentUploads(), $('<div>').appendTo('#fixtures')[0])
@@ -26,33 +16,31 @@ define [
       React.unmountComponentAtNode(@uploads.getDOMNode().parentNode)
       $("#fixtures").empty()
 
+    mockUploader: (name, progress) ->
+      uploader = new FileUploader({file: {}})
+      @stub(uploader, 'getFileName').returns(name)
+      @stub(uploader, 'roundProgress').returns(progress)
+      uploader
+
   test 'announces upload progress to screen reader when queue changes', ->
-    sinon.stub($, 'screenReaderFlashMessage')
-    uploader = mockUploader('filename', 25)
-    sinon.stub(UploadQueue, 'getCurrentUploader').returns(uploader)
+    @stub($, 'screenReaderFlashMessage')
+    uploader = @mockUploader('filename', 25)
+    @stub(UploadQueue, 'getCurrentUploader').returns(uploader)
 
     UploadQueue.onChange()
     equal($.screenReaderFlashMessage.calledWith('filename - 25%'), true)
 
-    resetUploader(uploader)
-    UploadQueue.getCurrentUploader.restore()
-    $.screenReaderFlashMessage.restore()
-
   test 'does not announces upload progress to screen reader if no uploader present', ->
-    sinon.stub($, 'screenReaderFlashMessage')
-    uploader = mockUploader('filename', 25)
-    sinon.stub(UploadQueue, 'getCurrentUploader').returns(null)
+    @stub($, 'screenReaderFlashMessage')
+    uploader = @mockUploader('filename', 25)
+    @stub(UploadQueue, 'getCurrentUploader').returns(null)
 
     UploadQueue.onChange()
     equal($.screenReaderFlashMessage.called, false)
 
-    resetUploader(uploader)
-    UploadQueue.getCurrentUploader.restore()
-    $.screenReaderFlashMessage.restore()
-
   test 'pulls FileUploaders from UploadQueue', ->
-    allUploads = [mockUploader('name', 0), mockUploader('other', 0)]
-    sinon.stub(UploadQueue, 'getAllUploaders').returns(allUploads)
+    allUploads = [@mockUploader('name', 0), @mockUploader('other', 0)]
+    @stub(UploadQueue, 'getAllUploaders').returns(allUploads)
+
     UploadQueue.onChange()
     equal @uploads.state.currentUploads, allUploads
-    UploadQueue.getAllUploaders.restore()

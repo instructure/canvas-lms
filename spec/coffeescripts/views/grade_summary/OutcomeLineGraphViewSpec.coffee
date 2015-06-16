@@ -61,12 +61,10 @@ define [
     ok _.isUndefined(@outcomeLineGraphView.svg),
       'should not render svg if promise is unresolved'
 
-    sinon.stub(@outcomeLineGraphView.collection, 'isEmpty', -> true)
     @outcomeLineGraphView.collection.trigger('fetched:last')
     ok renderSpy.calledTwice, 'promise should call render'
     ok _.isUndefined(@outcomeLineGraphView.svg),
       'should not render svg if collection is empty'
-    @outcomeLineGraphView.collection.isEmpty.restore()
 
     @outcomeLineGraphView.collection.parse(@response)
     @outcomeLineGraphView.collection.add(

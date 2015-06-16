@@ -73,15 +73,15 @@ define [
     equal @collection.options.params.order, 'desc', 'order param set'
 
   test 'sortByField delegates to setSortField', ->
-    setSortFieldStub = sinon.stub(@collection, 'setSortField')
-    fetchStub = sinon.stub(@collection, 'fetch')
+    setSortFieldStub = @stub(@collection, 'setSortField')
+    fetchStub = @stub(@collection, 'fetch')
 
     @collection.sortByField('created_at', 'desc')
     ok setSortFieldStub.calledOnce, 'setSortField called once'
     ok setSortFieldStub.calledWith('created_at', 'desc'), 'setSortField called with correct arguments'
 
   test 'sortByField triggers a fetch', ->
-    fetchStub = sinon.stub(@collection, 'fetch')
+    fetchStub = @stub(@collection, 'fetch')
 
     @collection.sortByField('created_at', 'desc')
     ok fetchStub.calledOnce, 'fetch called once'

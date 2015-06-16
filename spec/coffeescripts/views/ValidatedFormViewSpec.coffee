@@ -160,7 +160,7 @@ define [
     ok @form.validateFormData.called, 'validateFormData called'
 
   test 'validate always calls hideErrors', 2, ->
-    sinon.stub(@form, 'validateFormData')
+    @stub(@form, 'validateFormData')
     sinon.spy(@form, 'hideErrors')
 
     @form.validateFormData.returns({})
@@ -177,7 +177,7 @@ define [
     ok @form.hideErrors.called, 'hideErrors called with errors'
 
   test 'validate always calls showErrors', 2, ->
-    sinon.stub(@form, 'validateFormData')
+    @stub(@form, 'validateFormData')
     sinon.spy(@form, 'showErrors')
 
     @form.validateFormData.returns({})

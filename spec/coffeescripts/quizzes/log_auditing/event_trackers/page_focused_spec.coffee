@@ -13,7 +13,7 @@ define [
 
   test 'capturing: it works', ->
     tracker = new Subject()
-    capture = sinon.stub()
+    capture = @stub()
     tracker.install(capture)
 
     $(window).focus()

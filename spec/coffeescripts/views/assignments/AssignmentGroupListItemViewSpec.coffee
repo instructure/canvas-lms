@@ -99,7 +99,6 @@ define [
   createView = (model, options) ->
     options = $.extend {canManage: true}, options
     ENV.PERMISSIONS = { manage: options.canManage }
-    sinon.stub( AssignmentGroupListItemView.prototype, "currentUserId", -> 1)
 
     view = new AssignmentGroupListItemView
       model: model
@@ -113,7 +112,6 @@ define [
     model = group3()
     options = $.extend {canManage: true}, options
     ENV.PERMISSIONS = { manage: options.canManage }
-    sinon.stub( AssignmentGroupListItemView.prototype, "currentUserId", -> 1)
     groupCollection = new AssignmentGroupCollection([model])
     assignmentGroupsView = new AssignmentGroupListView
       collection: groupCollection
@@ -133,7 +131,6 @@ define [
 
     teardown: ->
       fakeENV.teardown()
-      AssignmentGroupListItemView.prototype.currentUserId.restore()
       $('#fixtures').empty()
 
   test "initializes collection", ->

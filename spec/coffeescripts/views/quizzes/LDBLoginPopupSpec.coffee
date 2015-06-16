@@ -92,7 +92,7 @@ define [
     originalOpen = window.open
 
     # needed for proper cleanup of windows
-    openStub = sinon.stub window, "open", ->
+    openStub = @stub window, "open", ->
       latestWindow = originalOpen.apply(this, arguments)
 
     server = sinon.fakeServer.create()
@@ -122,7 +122,6 @@ define [
           popup.off "close.sticky"
           latestWindow.close()
           ok onClose.calledTwice, "popup closed for good"
-          openStub.restore()
 
     whnd = popup.exec()
     ok onOpen.called, "popup opened"

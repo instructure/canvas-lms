@@ -7,25 +7,20 @@ define [
 
   Simulate = React.addons.TestUtils.Simulate
 
-  mockUploader = (name, progress) ->
-    uploader = new FileUploader({file: {}})
-    sinon.stub(uploader, 'getFileName').returns(name)
-    sinon.stub(uploader, 'roundProgress').returns(progress)
-    uploader
-
-  resetUploader = (uploader) ->
-    uploader.getFileName.restore()
-    uploader.roundProgress.restore()
-
   module 'UploadProgress',
     setup: ->
-      @uploader = mockUploader('filename', 35)
+      @uploader = @mockUploader('filename', 35)
       @prog = React.render(UploadProgress(uploader: @uploader), $('<div>').appendTo('#fixtures')[0])
 
     teardown: ->
-      resetUploader(@uploader)
       React.unmountComponentAtNode(@prog.getDOMNode().parentNode)
       $("#fixtures").empty()
+
+    mockUploader: (name, progress) ->
+      uploader = new FileUploader({file: {}})
+      @stub(uploader, 'getFileName').returns(name)
+      @stub(uploader, 'roundProgress').returns(progress)
+      uploader
 
   test 'getLabel displays file name', ->
     equal(@prog.refs.fileName.getDOMNode().textContent, 'filename')
