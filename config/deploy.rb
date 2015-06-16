@@ -74,6 +74,8 @@ Rake::Task["deploy:rollback_assets"].clear_actions
 
 Rake::Task["deploy:restart"].clear_actions
 
+#Rake::Task["deploy:migrate"].clear_actions
+
 namespace :deploy do
 
   # TODO: change this to tag the git branch. 
@@ -107,6 +109,19 @@ namespace :deploy do
 
   before :updated, :clone_qtimigrationtool
 
+  #desc "Migrate database"
+  #task :migrate do
+  #  on roles(:app) do
+  #    within release_path do
+  #      with rails_env: fetch(:rails_env) do
+          # If we skip compile assets and copy them over, some symlinks get broken and fail to recreate b/c of 
+          # permissions errors, so we use sudo.  Note: the error I saw was in public/javascripts/client_app
+          # TODO: still didnt' work b/c db:migrate can't be run as root.
+  #      end
+  #    end
+  #  end
+  #end
+
   desc "Compile static assets"
   task :compile_assets => :set_compile_assets_vars do
    on roles(:app) do
@@ -132,13 +147,14 @@ namespace :deploy do
             # NOTE: the commented out command below is for a standard Rails 4+ assets, but our version of Canvas uses an older Rails.
             #
             # copy over all of the assets from the last release
-            # execute(:sudo, 'cp -r', latest_release_path.join('public', fetch(:assets_prefix)), release_path.join('public', fetch(:assets_prefix)))
+            # execute(:sudo, 'cp -a', latest_release_path.join('public', fetch(:assets_prefix)), release_path.join('public', fetch(:assets_prefix)))
             latest_release_path=fetch(:latest_release_path)
-            execute(:sudo, 'cp -r', latest_release_path.join('public/assets'), release_path.join('public/assets'))
-            execute(:sudo, 'cp -r', latest_release_path.join('public/doc'), release_path.join('public/doc'))
-            execute(:sudo, 'cp -r', latest_release_path.join('public/javascripts'), release_path.join('public/javascripts'))
-            execute(:sudo, 'cp -r', latest_release_path.join('public/optimized'), release_path.join('public/optimized'))
-            execute(:sudo, 'cp -r', latest_release_path.join('public/stylesheets_compiled'), release_path.join('public/stylesheets_compiled'))
+            execute(:sudo, 'cp -a', latest_release_path.join('public/assets'), release_path.join('public/assets'))
+            execute(:sudo, 'cp -a', latest_release_path.join('public/doc'), release_path.join('public/doc'))
+            execute(:sudo, 'cp -a', latest_release_path.join('public/javascripts'), release_path.join('public/javascripts'))
+            execute(:sudo, 'cp -a', latest_release_path.join('public/optimized'), release_path.join('public/optimized'))
+            execute(:sudo, 'cp -a', latest_release_path.join('public/stylesheets_compiled'), release_path.join('public/stylesheets_compiled'))
+            execute(:sudo, 'chmod -R g+w', release_path.join('public')) # For some reason, cp -a is not preserving symlinks in public/javascripts/client_apps.  Let the initializer that fixes it create those links.
 
           rescue PrecompileRequired
             # Note: this took me forever to get going because the "deploy" user that it runs as needs rwx permissions on many
