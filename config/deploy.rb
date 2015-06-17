@@ -149,12 +149,13 @@ namespace :deploy do
             # copy over all of the assets from the last release
             # execute(:sudo, 'cp -a', latest_release_path.join('public', fetch(:assets_prefix)), release_path.join('public', fetch(:assets_prefix)))
             latest_release_path=fetch(:latest_release_path)
-            execute(:sudo, 'cp -a', latest_release_path.join('public/assets'), release_path.join('public/assets'))
-            execute(:sudo, 'cp -a', latest_release_path.join('public/doc'), release_path.join('public/doc'))
-            execute(:sudo, 'cp -a', latest_release_path.join('public/javascripts'), release_path.join('public/javascripts'))
-            execute(:sudo, 'cp -a', latest_release_path.join('public/optimized'), release_path.join('public/optimized'))
-            execute(:sudo, 'cp -a', latest_release_path.join('public/stylesheets_compiled'), release_path.join('public/stylesheets_compiled'))
-            execute(:sudo, 'chmod -R g+w', release_path.join('public')) # For some reason, cp -a is not preserving symlinks in public/javascripts/client_apps.  Let the initializer that fixes it create those links.
+            execute(:sudo, 'cp -a', latest_release_path.join('public/assets'), release_path.join('public'))
+            execute(:sudo, 'cp -a', latest_release_path.join('public/doc'), release_path.join('public'))
+            execute(:sudo, 'cp -a', latest_release_path.join('client_apps'), release_path) # some things in public/javascripts are symlinked here
+            execute(:sudo, 'cp -a', latest_release_path.join('public/javascripts'), release_path.join('public'))
+            execute(:sudo, 'cp -a', latest_release_path.join('public/optimized'), release_path.join('public'))
+            execute(:sudo, 'cp -a', latest_release_path.join('public/stylesheets_compiled'), release_path.join('public'))
+            #execute(:sudo, 'chmod -R g+w', release_path.join('public')) # For some reason, cp -a is not preserving symlinks in public/javascripts/client_apps.  Let the initializer that fixes it create those links.
 
           rescue PrecompileRequired
             # Note: this took me forever to get going because the "deploy" user that it runs as needs rwx permissions on many
@@ -215,6 +216,7 @@ namespace :deploy do
       user = fetch :user
       group = fetch :group
       execute :sudo, 'chown -R', "#{group}:#{group}", "#{release_path}"
+      execute :sudo, 'chown', "#{user}:#{group}", '/tmp/attachment_fu' # tmp directly used to export grades.
       within release_path do
         execute :sudo, 'chown', "#{user}", "config/*", "Gemfile.lock", "config.ru", "tmp/"
         execute :sudo, 'chmod 440', "config/*.yml"
