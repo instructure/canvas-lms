@@ -146,7 +146,7 @@ class Quizzes::QuizzesController < ApplicationController
           flash[:notice] = t 'notices.submission_doesnt_count', "This quiz will no longer count towards your grade."
         else
           respond_to do |format|
-            flash[:error] = t 'notices.quiz_not_availible', "You do not have access to the requested quiz."
+            flash[:error] = t "You do not have access to the requested quiz."
             format.html { redirect_to named_context_url(@context, :context_quizzes_url) }
           end
           return

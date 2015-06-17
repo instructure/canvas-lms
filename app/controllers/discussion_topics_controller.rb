@@ -474,7 +474,7 @@ class DiscussionTopicsController < ApplicationController
     if authorized_action(@topic, @current_user, :read)
       if @current_user && @topic.for_assignment? && !@topic.assignment.visible_to_user?(@current_user)
         respond_to do |format|
-          flash[:error] = t 'notices.discussion_not_availible', "You do not have access to the requested discussion."
+          flash[:error] = t "You do not have access to the requested discussion."
           format.html { redirect_to named_context_url(@context, :context_discussion_topics_url) }
         end
         return
