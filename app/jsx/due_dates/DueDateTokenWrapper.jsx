@@ -242,7 +242,7 @@ define([
           <div className  = "ic-Label"
                title      = 'Assign to'
                aria-label = 'Assign to'>
-             To
+             {I18n.t("Assign to")}
            </div>
           <TokenInput menuContent     = {this.optionsForMenu()}
                       selected        = {this.props.tokens}
