@@ -196,11 +196,10 @@ define [
     ENV.context_asset_string = "course_1"
 
     view = createView(@model)
-    sinon.spy view.model, "destroy"
+    @spy view.model, "destroy"
 
     view.delete()
     ok view.model.destroy.called
-    view.model.destroy.restore()
 
     ENV.context_asset_string = old_asset_string
 
@@ -330,16 +329,14 @@ define [
     ok view.$("#module_tooltip_#{@model.id}").text().search("#{mods[1]}") != -1
 
   test 'render score template with permission', ->
-    spy = sinon.spy(AssignmentListItemView.prototype, 'updateScore')
+    spy = @spy(AssignmentListItemView.prototype, 'updateScore')
     createView(@model, canManage: false, canReadGrades: true)
     ok spy.called
-    AssignmentListItemView.prototype.updateScore.restore()
 
   test 'does not render score template without permission', ->
-    spy = sinon.spy(AssignmentListItemView.prototype, 'updateScore')
+    spy = @spy(AssignmentListItemView.prototype, 'updateScore')
     createView(@model, canManage: false, canReadGrades: false)
     equal spy.callCount, 0
-    AssignmentListItemView.prototype.updateScore.restore()
 
   test "renders lockAt/unlockAt with locale-appropriate format string", ->
     tz.changeLocale(french, 'fr_FR')

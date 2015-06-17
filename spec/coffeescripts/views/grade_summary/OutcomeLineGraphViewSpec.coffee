@@ -54,7 +54,7 @@ define [
       'should resolve promise on fetched:last'
 
   test 'render', ->
-    renderSpy = sinon.spy(@outcomeLineGraphView, 'render')
+    renderSpy = @spy(@outcomeLineGraphView, 'render')
     ok !@outcomeLineGraphView.deferred.isResolved(),
       'precondition'
     ok @outcomeLineGraphView.render()
@@ -75,5 +75,3 @@ define [
       'should render svg if scores are present'
     ok @outcomeLineGraphView.$('.screenreader-only'),
       'should render table of data for screen reader'
-
-    @outcomeLineGraphView.render.restore()

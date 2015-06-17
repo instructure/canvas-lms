@@ -35,7 +35,7 @@ define [
     $html = $(@component.getDOMNode())
     ok $html.attr('class').match(/DashboardCard/)
 
-    renderSpy = sinon.spy(@component, 'render')
+    renderSpy = @spy(@component, 'render')
     ok !renderSpy.called, 'precondition'
     CourseActivitySummaryStore.setState({
       streams: {
@@ -45,7 +45,6 @@ define [
       }
     })
     ok renderSpy.called, 'should re-render on state update'
-    @component.render.restore()
 
   test 'backgroundColor', ->
     ok _.isUndefined(localStorage['canvas.dashboard.color.1']),

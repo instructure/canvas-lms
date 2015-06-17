@@ -140,11 +140,10 @@ define [
       $("#fixtures").empty()
 
   test 'calls save on the model with only hidden if calendarOption is false', ->
-    sinon.spy(@restrictedDialogForm.props.models[0], 'save')
+    @spy(@restrictedDialogForm.props.models[0], 'save')
     Simulate.submit(@restrictedDialogForm.refs.dialogForm.getDOMNode())
 
     ok @restrictedDialogForm.props.models[0].save.calledWithMatch({}, {attrs: {hidden: true}}), 'Called save with single hidden true attribute'
-    @restrictedDialogForm.props.models[0].save.restore()
 
   test 'calls save on the model with calendar should update hidden, unlock_at, lock_at and locked', 1, ->
     refs = @restrictedDialogForm.refs
@@ -154,11 +153,10 @@ define [
     $(refs.unlock_at.getDOMNode()).data('unfudged-date', '123')
     $(refs.lock_at.getDOMNode()).data('unfudged-date', '123')
 
-    stubbedSave = sinon.spy(@restrictedDialogForm.props.models[0], 'save')
+    stubbedSave = @spy(@restrictedDialogForm.props.models[0], 'save')
     Simulate.submit(refs.dialogForm.getDOMNode())
 
     ok @restrictedDialogForm.props.models[0].save.calledWithMatch({}, {attrs: {hidden: false, lock_at: '123', unlock_at: '123', locked: false}}), 'Called save with single hidden true attribute'
-    stubbedSave.restore()
 
   module 'RestrictedDialogForm Multiple Items',
     setup: ->

@@ -20,7 +20,7 @@ define [
     ok capture.called, 'it captures page focus'
 
   test 'capturing: it throttles captures', ->
-    capture = sinon.spy()
+    capture = @spy()
 
     tracker = new Subject()
     tracker.install(capture)

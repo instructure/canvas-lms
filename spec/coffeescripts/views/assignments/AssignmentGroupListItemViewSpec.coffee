@@ -152,20 +152,18 @@ define [
     a1 = models[0]
     a2 = models[1]
 
-    sinon.spy(a1, 'doNotParse')
-    sinon.spy(a2, 'doNotParse')
+    @spy(a1, 'doNotParse')
+    @spy(a2, 'doNotParse')
 
     createView(@model)
 
     # first assignment has multiple due dates
     ok a1.multipleDueDates()
     ok a1.doNotParse.called
-    a1.doNotParse.restore()
 
     # second assignment has single due dates
     ok !a2.multipleDueDates()
     ok !a2.doNotParse.called
-    a2.doNotParse.restore()
 
   test "initializes child views if can manage", ->
     view = createView(@model)

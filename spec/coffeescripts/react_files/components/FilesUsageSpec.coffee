@@ -35,14 +35,12 @@ define [
         JSON.stringify data
       ]
 
-      sinon.spy(@filesUsage, 'setState')
+      @spy(@filesUsage, 'setState')
 
       @filesUsage.update()
       @server.respond()
 
       ok @filesUsage.setState.calledWith(data), 'called set state with returned get request data'
-
-      @filesUsage.setState.restore()
 
   test 'update called after component mounted', ->
     @filesUpdateTest {contextType: 'users', contextId: 4}, =>

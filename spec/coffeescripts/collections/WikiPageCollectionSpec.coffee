@@ -59,7 +59,7 @@ define [
     equal @collection.sortOrders['created_at'], 'asc', 'sort order remains'
 
   test 'setting sort triggers a sortChanged event', ->
-    sortChangedSpy = sinon.spy()
+    sortChangedSpy = @spy()
     @collection.on 'sortChanged', sortChangedSpy
     @collection.setSortField 'created_at'
     ok sortChangedSpy.calledOnce, 'sortChanged event triggered once'

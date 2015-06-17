@@ -22,7 +22,7 @@ define ['compiled/models/Progress'], (Progress) ->
     )
 
   test 'polls the progress api until the job is finished', ->
-    spy = sinon.spy()
+    spy = @spy()
     model.on 'complete', spy
     model.poll()
     respond workflow_state: 'queued'
@@ -34,4 +34,3 @@ define ['compiled/models/Progress'], (Progress) ->
     respond workflow_state: 'completed'
     equal model.get('workflow_state'), 'completed'
     ok spy.calledOnce
-

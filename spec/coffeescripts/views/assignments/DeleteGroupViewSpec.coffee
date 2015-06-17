@@ -77,11 +77,10 @@ define [
   test 'it should not delete the last assignment group', ->
     alert_stub = @stub(window, "alert", -> true )
     view = createView(true, false)
-    destroy_spy = sinon.spy(view, "destroyModel")
+    destroy_spy = @spy(view, "destroyModel")
     view.render()
     view.open()
 
     ok alert_stub.called
     ok !destroy_spy.called
-    destroy_spy.restore()
     view.close()

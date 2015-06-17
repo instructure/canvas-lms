@@ -13,7 +13,7 @@ define [
       @server?.restore()
 
     ajaxFixture: (method, url, status, body) ->
-      spy = sinon.spy()
+      spy = @spy()
 
       @server.respondWith method, url, (request) ->
         spy()
@@ -55,7 +55,7 @@ define [
     })
 
     @server = sinon.fakeServer.create()
-    saveSpy = sinon.spy(@quizReport, 'save')
+    saveSpy = @spy(@quizReport, 'save')
     ajaxSpy = @ajaxFixture 'POST', '/api/v1/courses/1/quizzes/1/reports', 200, {}
 
     @subject = new View({ model: @quizReport })
@@ -91,7 +91,7 @@ define [
     })
 
     @server = sinon.fakeServer.create()
-    saveSpy = sinon.spy(@quizReport, 'save')
+    saveSpy = @spy(@quizReport, 'save')
     ajaxSpy = @ajaxFixture 'POST', '/api/v1/courses/1/quizzes/1/reports', 200, {
       file: {
         id: 1,

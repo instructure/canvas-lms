@@ -218,25 +218,21 @@ define [
 
   test "openAgain doesn't add datetime for multiple dates", ->
     @stub(DialogFormView.prototype, "openAgain", ->)
-    sinon.spy $.fn, "datetime_field"
+    @spy $.fn, "datetime_field"
 
     view = createView(@assignment1)
     view.openAgain()
 
     ok $.fn.datetime_field.notCalled
 
-    $.fn.datetime_field.restore()
-
   test "openAgain adds datetime picker", ->
     @stub(DialogFormView.prototype, "openAgain", ->)
-    sinon.spy $.fn, "datetime_field"
+    @spy $.fn, "datetime_field"
 
     view = createView(@assignment2)
     view.openAgain()
 
     ok $.fn.datetime_field.called
-
-    $.fn.datetime_field.restore()
 
   test "requires name to save assignment", ->
     view = createView(@assignment3)

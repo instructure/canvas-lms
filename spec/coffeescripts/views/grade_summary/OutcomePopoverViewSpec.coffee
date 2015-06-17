@@ -35,7 +35,7 @@ define [
     ok _.isUndefined(@popoverView.popover)
 
   test 'mouseenter', ->
-    spy = sinon.spy(@popoverView, 'openPopover')
+    spy = @spy(@popoverView, 'openPopover')
     ok !@popoverView.inside, 'precondition'
 
     @popoverView.el.find('i').trigger(@e('mouseenter'))
@@ -43,29 +43,23 @@ define [
     ok spy.called
     ok @popoverView.inside
 
-    @popoverView.openPopover.restore()
-
   test 'mouseleave when no popover is present', ->
-    spy = sinon.spy(@popoverView, 'closePopover')
+    spy = @spy(@popoverView, 'closePopover')
 
     ok _.isUndefined(@popoverView.popover), 'precondition'
     @popoverView.el.find('i').trigger(@e('mouseleave'))
     @clock.tick(@popoverView.TIMEOUT_LENGTH)
     ok !spy.called
 
-    @popoverView.closePopover.restore()
-
   test 'mouseleave when popover is present', ->
     @popoverView.el.find('i').trigger('mouseenter')
     ok !_.isUndefined(@popoverView.popover), 'precondition'
     ok @popoverView.inside, 'precondition'
 
-    spy = sinon.spy(@popoverView, 'closePopover')
+    spy = @spy(@popoverView, 'closePopover')
     @popoverView.el.find('i').trigger(@e('mouseleave'))
     @clock.tick(@popoverView.TIMEOUT_LENGTH)
     ok spy.called
-
-    @popoverView.closePopover.restore()
 
   test 'openPopover', ->
     ok _.isUndefined(@popoverView.popover), 'precondition'
