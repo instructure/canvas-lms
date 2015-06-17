@@ -23,6 +23,7 @@ module Api::V1::Submission
   include Api::V1::DiscussionTopics
   include Api::V1::Course
   include Api::V1::User
+  include Api::V1::SubmissionComment
 
   def submission_json(submission, assignment, user, session, context = nil, includes = [])
     context ||= assignment.context
@@ -38,27 +39,7 @@ module Api::V1::Submission
     end
 
     if includes.include?("submission_comments")
-      hash['submission_comments'] = submission.comments_for(@current_user).map do |sc|
-        sc_hash = sc.as_json(
-          :include_root => false,
-          :only => %w(id author_id author_name created_at comment))
-        if sc.media_comment?
-          sc_hash['media_comment'] = media_comment_json(:media_id => sc.media_comment_id, :media_type => sc.media_comment_type)
-        end
-        sc_hash['attachments'] = sc.attachments.map do |a|
-          attachment_json(a, user)
-        end unless sc.attachments.blank?
-        if sc.grants_right?(@current_user, :read_author)
-          sc_hash['author'] = user_display_json(sc.author, sc.context)
-        else
-          sc_hash.merge!({
-            author: {},
-            author_id: nil,
-            author_name: I18n.t("Anonymous User")
-          })
-        end
-        sc_hash
-      end
+      hash['submission_comments'] = submission_comments_json(submission.comments_for(@current_user), user)
     end
 
     if includes.include?("rubric_assessment") && submission.rubric_assessment && submission.grants_right?(user, :read_grade)
