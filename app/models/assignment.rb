@@ -1985,7 +1985,7 @@ class Assignment < ActiveRecord::Base
     self.submission_types == 'online_quiz' && self.quiz.present?
   end
 
-  def self.show_sis_grade_export_option?(context)
+  def self.sis_grade_export_enabled?(context)
     context.feature_enabled?(:post_grades) ||
       context.root_account.feature_enabled?(:bulk_sis_grade_export) ||
       Lti::AppLaunchCollator.any?(context, [:post_grades])

@@ -560,6 +560,8 @@ class Course < ActiveRecord::Base
       none :
       where("EXISTS (?)", CourseAccountAssociation.where("course_account_associations.course_id=courses.id AND course_account_associations.account_id IN (?)", account_ids))
   }
+  scope :published, -> { where(workflow_state: %w(available completed)) }
+  scope :unpublished, -> { where(workflow_state: %w(created claimed)) }
 
   scope :deleted, -> { where(:workflow_state => 'deleted') }
 
@@ -2278,6 +2280,10 @@ class Course < ActiveRecord::Base
     scope = users_visible_to(user).
       where("enrollments.workflow_state in ('invited', 'creation_pending') AND enrollments.type != 'StudentViewEnrollment'")
     scope.select('users.id').uniq.count
+  end
+
+  def published?
+    self.available? || self.completed?
   end
 
   def unpublished?

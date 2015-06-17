@@ -465,11 +465,11 @@ module Api::V1::Assignment
       end
     end
 
-    if Assignment.show_sis_grade_export_option?(assignment.context)
-      if assignment_params.has_key? "post_to_sis"
-        assignment.post_to_sis = value_to_boolean(assignment_params['post_to_sis'])
-      end
+    post_to_sis = assignment_params.key?('post_to_sis') ? value_to_boolean(assignment_params['post_to_sis']) : nil
+    unless post_to_sis.nil? || !Assignment.sis_grade_export_enabled?(assignment.context)
+      assignment.post_to_sis = post_to_sis
     end
+
     assignment.updating_user = user
     assignment.attributes = update_params
     assignment.infer_times

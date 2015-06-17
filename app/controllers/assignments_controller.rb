@@ -402,7 +402,7 @@ class AssignmentsController < ApplicationController
         :ASSIGNMENT_GROUPS => json_for_assignment_groups,
         :GROUP_CATEGORIES => group_categories,
         :KALTURA_ENABLED => !!feature_enabled?(:kaltura),
-        :POST_TO_SIS => Assignment.show_sis_grade_export_option?(@context),
+        :POST_TO_SIS => Assignment.sis_grade_export_enabled?(@context),
         :SECTION_LIST => (@context.course_sections.active.map { |section|
           {
             :id => section.id,

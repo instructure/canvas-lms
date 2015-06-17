@@ -270,7 +270,7 @@ class GradebooksController < ApplicationController
       :attachment => @last_exported_gradebook_csv.try(:attachment),
       :sis_app_url => Setting.get('sis_app_url', nil),
       :sis_app_token => Setting.get('sis_app_token', nil),
-      :post_grades_feature_enabled => Assignment.show_sis_grade_export_option?(@context),
+      :post_grades_feature_enabled => Assignment.sis_grade_export_enabled?(@context),
       :list_students_by_sortable_name_enabled => @context.list_students_by_sortable_name?,
       :gradebook_column_size_settings => @current_user.preferences[:gradebook_column_size],
       :gradebook_column_size_settings_url => change_gradebook_column_size_course_gradebook_url,
