@@ -230,6 +230,11 @@ class FilesController < ApplicationController
   #   "user":: the user who uploaded the file or last edited its content
   #   "usage_rights":: copyright and license information for the file (see UsageRights)
   #
+  # @argument only[] [Array]
+  #   Array of information to restrict to. Overrides include[]
+  #
+  #   "names":: only returns file name information
+  #
   # @argument sort [String, "name"|"size"|"created_at"|"updated_at"|"content_type"|"user"]
   #   Sort results by this field. Defaults to 'name'. Note that `sort=user` implies `include[]=user`.
   #
@@ -306,6 +311,7 @@ class FilesController < ApplicationController
       @files = Api.paginate(scope, self, url)
       render :json => attachments_json(@files, @current_user, {},
           :can_view_hidden_files => can_view_hidden_files, :include => params[:include],
+          :only => params[:only],
           :omit_verifier_in_app => !value_to_boolean(params[:use_verifiers]))
     end
   end

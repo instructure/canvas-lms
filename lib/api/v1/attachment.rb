@@ -33,6 +33,14 @@ module Api::V1::Attachment
   end
 
   def attachment_json(attachment, user, url_options = {}, options = {})
+    hash = {
+      'id' => attachment.id,
+      'folder_id' => attachment.folder_id,
+      'display_name' => attachment.display_name,
+      'filename' => attachment.filename,
+    }
+    return hash if options[:only] && options[:only].include?('names')
+
     options.reverse_merge!(submission_attachment: false)
     includes = options[:include] || []
 
@@ -73,12 +81,8 @@ module Api::V1::Attachment
       ''
     end
 
-    hash = {
-      'id' => attachment.id,
-      'folder_id' => attachment.folder_id,
+    hash.merge!(
       'content-type' => attachment.content_type,
-      'display_name' => attachment.display_name,
-      'filename' => attachment.filename,
       'url' => url,
       'size' => attachment.size,
       'created_at' => attachment.created_at,
@@ -90,7 +94,7 @@ module Api::V1::Attachment
       'hidden_for_user' => hidden_for_user,
       'thumbnail_url' => thumbnail_download_url,
       'modified_at' => attachment.modified_at ? attachment.modified_at : attachment.updated_at
-    }
+    )
     locked_json(hash, attachment, user, 'file')
 
     if includes.include? 'user'

@@ -285,6 +285,13 @@ describe "Files API", type: :request do
       expect(links.find{ |l| l.match(/rel="last"/)}).to match /page=3/
     end
 
+    it "should only return names if requested" do
+      json = api_call(:get, @files_path, @files_path_options, {:only => ['names']})
+      res = json.map{|f|f['display_name']}
+      expect(res).to eq %w{atest3.txt mtest2.txt ztest.txt}
+      expect(json.any?{|f| f['url']}).to be_falsey
+    end
+
     context "content_types" do
       before :once do
         txt = attachment_model :display_name => 'thing.txt', :content_type => 'text/plain', :context => @course, :folder => @f1
