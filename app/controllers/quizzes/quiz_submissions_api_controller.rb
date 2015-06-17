@@ -165,7 +165,6 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   #    "quiz_submissions": [QuizSubmission]
   #  }
   def index
-    t = Time.now
     quiz_submissions = if @context.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
       # teachers have access to all student submissions
       Api.paginate @quiz.quiz_submissions.where(:user_id => visible_user_ids),
@@ -184,9 +183,6 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
       Quizzes::OutstandingQuizSubmissionManager.new(@quiz).send_later_if_production(:grade_by_ids, quiz_submissions_ids)
       serialize_and_render quiz_submissions
     end
-    Rails.logger.info "QS_API -- url: #{@_request.original_url}"
-    Rails.logger.info "QS_API -- filtered_params: #{@_request.filtered_parameters}"
-    Rails.logger.info "QS_API -- timer: #{Time.now-t} seconds"
   end
 
   # @API Get a single quiz submission.
