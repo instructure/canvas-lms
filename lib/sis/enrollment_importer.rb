@@ -86,12 +86,34 @@ module SIS
         @success_count = 0
       end
 
-      def add_enrollment(course_id, section_id, user_id, role, status, start_date, end_date, associated_user_id=nil, root_account_id=nil, role_id=nil)
-        raise ImportError, "No course_id or section_id given for an enrollment" if course_id.blank? && section_id.blank?
-        raise ImportError, "No user_id given for an enrollment" if user_id.blank?
-        raise ImportError, "Improper status \"#{status}\" for an enrollment" unless status =~ /\Aactive|\Adeleted|\Acompleted|\Ainactive/i
+      # This method signature is deprecated:
+      # add_enrollment(course_id, section_id, user_id, role, status, start_date, end_date, associated_user_id=nil, root_account_id=nil, role_id=nil)
+      # Pass a single instance of SIS::Models::Enrollment instead
+      def add_enrollment(*enrollment_data)
+        if enrollment_data.length == 1
+          enrollment = enrollment_data.first
+        else
+          enrollment = SIS::Models::Enrollment.new(
+              {
+                  course_id: enrollment_data[0],
+                  section_id: enrollment_data[1],
+                  user_id: enrollment_data[2],
+                  role: enrollment_data[3],
+                  status: enrollment_data[4],
+                  start_date: enrollment_data[5],
+                  end_date: enrollment_data[6],
+                  associated_user_id: enrollment_data[7],
+                  root_account_id: enrollment_data[8],
+                  role_id: enrollment_data[9]
+              }
+          )
+        end
 
-        @enrollment_batch << [course_id.to_s, section_id.to_s, user_id.to_s, role, role_id, status, start_date, end_date, associated_user_id, root_account_id]
+        raise ImportError, "No course_id or section_id given for an enrollment" unless enrollment.valid_context?
+        raise ImportError, "No user_id given for an enrollment" unless enrollment.valid_user?
+        raise ImportError, "Improper status \"#{enrollment.status}\" for an enrollment" unless enrollment.valid_status?
+
+        @enrollment_batch << enrollment
         process_batch if @enrollment_batch.size >= @updates_every
       end
 
@@ -108,8 +130,9 @@ module SIS
           enrollment = nil
           while !@enrollment_batch.empty? && tx_end_time > Time.now
             enrollment = @enrollment_batch.shift
-            @logger.debug("Processing Enrollment #{enrollment.inspect}")
-            course_id, section_id, user_id, role_name, role_id, status, start_date, end_date, associated_sis_user_id, root_account_sis_id = enrollment
+            enrollment_array = enrollment.to_a
+            @logger.debug("Processing Enrollment #{enrollment_array.inspect}")
+            course_id, section_id, user_id, role_name, role_id, status, start_date, end_date, associated_sis_user_id, root_account_sis_id = enrollment_array
 
             last_section = @section
             # reset the cached course/section if they don't match this row
@@ -127,7 +150,12 @@ module SIS
             else
               root_account = @root_account
             end
-            pseudo = root_account.pseudonyms.where(sis_user_id: user_id).first
+
+            if !enrollment.user_integration_id.blank?
+              pseudo = root_account.pseudonyms.where(integration_id: enrollment.user_integration_id).first
+            else
+              pseudo = root_account.pseudonyms.where(sis_user_id: user_id).first
+            end
 
             unless pseudo
               @messages << "User #{user_id} didn't exist for user enrollment"
