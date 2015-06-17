@@ -3,13 +3,11 @@ define [
   'tinymce_plugins/instructure_links/linkable_editor'
 ], ($, LinkableEditor) ->
 
-  sandbox = null
   rawEditor = null
 
   module "LinkableEditor",
     setup: ->
       $("#fixtures").html("<div id='some_editor' data-value='42'></div>")
-      sandbox = sinon.sandbox.create()
       rawEditor = {
         id: 'some_editor',
         selection: {
@@ -19,7 +17,6 @@ define [
       }
 
     teardown: ->
-      sandbox.restore()
       $("#fixtures").empty()
 
   test "can load the original element from the editor id", ->
@@ -37,8 +34,6 @@ define [
       selectedContent: "Some Content",
       selectedRange: "Some Range"
     }
-    edMock = sandbox.mock(jqueryEditor)
+    edMock = @mock(jqueryEditor)
     edMock.expects("editorBox").withArgs('create_link', expectedOpts)
     editor.createLink(text, classes)
-    edMock.verify()
-

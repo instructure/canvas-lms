@@ -15,7 +15,6 @@ define [
       @stub($, 'flashError', ->)
       @stub(window, 'confirm', -> true)
       @server = sinon.fakeServer.create()
-      @sandbox = sinon.sandbox.create()
       ENV.current_user_roles = ["teacher"]
       ENV.GRADING_PERIODS_URL = "/api/v1/courses/1/grading_periods"
       @indexData = "grading_periods":[
@@ -54,7 +53,6 @@ define [
       ENV.current_user_roles = null
       ENV.GRADING_PERIODS_URL = null
       @server.restore()
-      @sandbox.restore()
 
   test 'gets the grading periods from the grading periods controller', ->
     deepEqual @gradingPeriodCollection.state.periods, @formattedIndexData.grading_periods
@@ -75,12 +73,12 @@ define [
     ok !@gradingPeriodCollection.cannotDeleteLastPeriod()
 
   test 'getPeriods requests the index data from the server', ->
-    @sandbox.spy($, "ajax")
+    @spy($, "ajax")
     @gradingPeriodCollection.getPeriods()
     ok $.ajax.calledOnce
 
   test 'getPeriods calls gotPeriods once the data is received', ->
-    @sandbox.stub(@gradingPeriodCollection, 'gotPeriods')
+    @stub(@gradingPeriodCollection, 'gotPeriods')
     @gradingPeriodCollection.getPeriods()
     @server.respond()
     ok @gradingPeriodCollection.gotPeriods.calledOnce
@@ -163,12 +161,12 @@ define [
       }
     ]
     @gradingPeriodCollection.setState({periods: unsavedPeriod})
-    confirmDelete = @sandbox.stub($.fn, 'confirmDelete')
+    confirmDelete = @stub($.fn, 'confirmDelete')
     @gradingPeriodCollection.deleteGradingPeriod('new1')
     ok confirmDelete.notCalled
 
   test 'deleteGradingPeriod calls confirmDelete if the period being deleted is not new (it is saved server side)', ->
-    confirmDelete = @sandbox.stub($.fn, 'confirmDelete')
+    confirmDelete = @stub($.fn, 'confirmDelete')
     @gradingPeriodCollection.deleteGradingPeriod('1')
     ok confirmDelete.calledOnce
 
@@ -183,7 +181,7 @@ define [
     deepEqual updatedPeriod.title, updatedPeriodData.title
 
   test 'updateGradingPeriodCollection calls getPeriods if a previousStateId is passed in', ->
-    @sandbox.stub(@gradingPeriodCollection, 'getPeriods')
+    @stub(@gradingPeriodCollection, 'getPeriods')
     @gradingPeriodCollection.updateGradingPeriodCollection({}, {}, '1')
     ok @gradingPeriodCollection.getPeriods.calledOnce
 
@@ -217,7 +215,6 @@ define [
       $.flashError = ->
       @stub(window, 'confirm', -> true)
       @server = sinon.fakeServer.create()
-      @sandbox = sinon.sandbox.create()
       ENV.current_user_roles = ["teacher"]
       ENV.GRADING_PERIODS_URL = "/api/v1/courses/1/grading_periods"
       @indexData = "grading_periods":[
@@ -258,7 +255,6 @@ define [
       $.flashMessage = @fMessage
       $.flashError = @fError
       @server.restore()
-      @sandbox.restore()
 
   test 'gets the grading periods from the grading periods controller', ->
     deepEqual @gradingPeriodCollection.state.periods, @formattedIndexData.grading_periods
@@ -268,25 +264,25 @@ define [
     ok !@gradingPeriodCollection.canManageAtLeastOnePeriod(periods)
 
   test 'copyTemplatePeriods sets the disabled state to true while periods are being copied', ->
-    @sandbox.stub(@gradingPeriodCollection, 'getPeriods')
+    @stub(@gradingPeriodCollection, 'getPeriods')
     ok !@gradingPeriodCollection.state.disabled
     @gradingPeriodCollection.copyTemplatePeriods(@gradingPeriodCollection.state.periods)
     @server.respond()
     ok @gradingPeriodCollection.state.disabled
 
   test 'copyTemplatePeriods calls getPeriods', ->
-    @sandbox.stub(@gradingPeriodCollection, 'getPeriods')
+    @stub(@gradingPeriodCollection, 'getPeriods')
     @gradingPeriodCollection.copyTemplatePeriods(@gradingPeriodCollection.state.periods)
     @server.respond()
     ok @gradingPeriodCollection.getPeriods.calledOnce
 
   test 'deleteGradingPeriod calls copyTemplatePeriods if periods need to be copied (cannot manage any periods and there is at least 1)', ->
-    copyPeriods = @sandbox.stub(@gradingPeriodCollection, 'copyTemplatePeriods')
+    copyPeriods = @stub(@gradingPeriodCollection, 'copyTemplatePeriods')
     @gradingPeriodCollection.deleteGradingPeriod('1')
     ok copyPeriods.calledOnce
 
   test 'updateGradingPeriodCollection calls copyTemplatePeriods if periods need to be copied (cannot manage any periods and there is at least 1)', ->
-    copyPeriods = @sandbox.stub(@gradingPeriodCollection, 'copyTemplatePeriods')
+    copyPeriods = @stub(@gradingPeriodCollection, 'copyTemplatePeriods')
     @gradingPeriodCollection.updateGradingPeriodCollection({}, {}, '1')
     ok copyPeriods.calledOnce
 

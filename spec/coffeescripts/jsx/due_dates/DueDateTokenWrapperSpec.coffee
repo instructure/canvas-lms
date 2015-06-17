@@ -13,7 +13,6 @@ define [
     setup: ->
       fakeENV.setup(context_asset_string = "course_1")
       @clock = sinon.useFakeTimers()
-      @sandbox = sinon.sandbox.create()
       props =
         tokens: [
           {name: "Atilla", student_id: "3", type: "student"},
@@ -43,7 +42,6 @@ define [
 
     teardown: ->
       @clock.restore()
-      @sandbox.restore()
       React.unmountComponentAtNode(@DueDateTokenWrapper.getDOMNode().parentNode)
       fakeENV.teardown()
 
@@ -54,7 +52,7 @@ define [
     ok @TokenInput.isMounted()
 
   test 'call to fetchStudents on input changes', ->
-    fetch = @sandbox.stub(@DueDateTokenWrapper, "fetchStudents")
+    fetch = @stub(@DueDateTokenWrapper, "fetchStudents")
     @DueDateTokenWrapper.handleInput("to")
     equal fetch.callCount, 1
     @DueDateTokenWrapper.handleInput("tre")
@@ -76,12 +74,12 @@ define [
     equal @DueDateTokenWrapper.optionsForMenu()[6].props.value, "Seneca The Elder"
 
   test 'handleTokenAdd is called when a token is added', ->
-    addProp = @sandbox.stub(@DueDateTokenWrapper.props, "handleTokenAdd")
+    addProp = @stub(@DueDateTokenWrapper.props, "handleTokenAdd")
     @DueDateTokenWrapper.handleTokenAdd("sene")
     ok addProp.calledOnce
 
   test 'handleTokenRemove is called when a token is removed', ->
-    removeProp = @sandbox.stub(@DueDateTokenWrapper.props, "handleTokenRemove")
+    removeProp = @stub(@DueDateTokenWrapper.props, "handleTokenRemove")
     @DueDateTokenWrapper.handleTokenRemove("sene")
     ok removeProp.calledOnce
 

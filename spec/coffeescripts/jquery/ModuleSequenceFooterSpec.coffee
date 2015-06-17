@@ -222,7 +222,7 @@ define [
     equal @server.requests[0].status, '200', 'Request was successful'
 
   test 'show gets called when rendering', ->
-    @sandbox.stub(@$testEl, 'show')
+    @stub(@$testEl, 'show')
     @server.respondWith "GET",
                         "/api/v1/courses/42/module_item_sequence?asset_type=Assignment&asset_id=123&frame_external_urls=true",
                         [
