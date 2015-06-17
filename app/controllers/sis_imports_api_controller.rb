@@ -31,8 +31,8 @@
 #           "type": "string"
 #         },
 #         "supplied_batches": {
-#           "description": "Which file were included in the SIS import",
-#           "example": "[\"term\", \"course\", \"section\", \"user\", \"enrollment\"]",
+#           "description": "Which files were included in the SIS import",
+#           "example": ["term", "course", "section", "user", "enrollment"],
 #           "type": "array",
 #           "items": { "type": "string" }
 #         },
