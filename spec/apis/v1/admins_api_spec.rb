@@ -90,14 +90,26 @@ describe "Admins API", type: :request do
       })
     end
 
-    it "should not send a notification email if passed a valid 'send_confirmation' value" do
+    it "should not send a notification email if passed a 0 'send_confirmation' value" do
+      AccountUser.any_instance.expects(:account_user_notification!).never
+      AccountUser.any_instance.expects(:account_user_registration!).never
+
+      api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
+               {:controller => 'admins', :action => 'create', :format => 'json',
+                :account_id => @admin.account.to_param },
+               {:user_id => @new_user.to_param, :send_confirmation => '0'})
+
+      # Both of the expectations above should pass.
+    end
+
+    it "should not send a notification email if passed a false 'send_confirmation' value" do
       AccountUser.any_instance.expects(:account_user_notification!).never
       AccountUser.any_instance.expects(:account_user_registration!).never
 
       json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
                       {:controller => 'admins', :action => 'create', :format => 'json',
                        :account_id => @admin.account.to_param },
-                      {:user_id => @new_user.to_param, :send_confirmation => '0'})
+                      {:user_id => @new_user.to_param, :send_confirmation => 'false'})
 
       # Both of the expectations above should pass.
     end
