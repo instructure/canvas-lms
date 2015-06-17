@@ -502,6 +502,7 @@ class ExternalToolsController < ApplicationController
         content_item_return_url: return_url,
         #optional params
         accept_multiple: false,
+        accept_unsigned: true,
         context_title: @context.name,
     }).merge(extra_params).merge(variable_expander(tool:tool).expand_variables!(tool.set_custom_fields(placement)))
 
