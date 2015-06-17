@@ -173,6 +173,7 @@ define [
             setQuizMastery: @setQuizMastery,
             useForScoring: @useForScoring,
             isLargeRoster: ENV.IS_LARGE_ROSTER,
+            assessedInContext: @model.outcomeLink.assessed
 
       @$('input:first').focus()
       @screenreaderTitleFocus()
