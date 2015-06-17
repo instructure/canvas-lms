@@ -348,12 +348,23 @@ define [
       else
         potential_students
 
+    isInvalidCustomSort: =>
+      sortSettings = @gradebookColumnOrderSettings
+      sortSettings && sortSettings.sortType == 'custom' && sortSettings.customOrder.length == 0
+
+    columnOrderHasNotBeenSaved: =>
+      !@gradebookColumnOrderSettings
+
     getStoredSortOrder: =>
-      @gradebookColumnOrderSettings || {sortType: @defaultSortType}
+      if @isInvalidCustomSort() || @columnOrderHasNotBeenSaved()
+        {sortType: @defaultSortType}
+      else
+        @gradebookColumnOrderSettings
 
     setStoredSortOrder: (newSortOrder) =>
-      url = ENV.GRADEBOOK_OPTIONS.gradebook_column_order_settings_url
-      $.ajaxJSON(url, 'POST', {column_order: newSortOrder})
+      unless @isInvalidCustomSort()
+        url = ENV.GRADEBOOK_OPTIONS.gradebook_column_order_settings_url
+        $.ajaxJSON(url, 'POST', {column_order: newSortOrder})
 
     onColumnsReordered: =>
       # determine if assignment columns or custom columns were reordered
