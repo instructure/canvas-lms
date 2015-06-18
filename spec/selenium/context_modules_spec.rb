@@ -149,7 +149,7 @@ describe "context modules" do
       expect(edit_form).to be_displayed
       f('.completion_entry .delete_criterion_link', edit_form).click
       wait_for_ajaximations
-      ff('.cancel_button', dialog_for(edit_form)).last.click
+      ff('.cancel_button.ui-button', dialog_for(edit_form)).last.click
       wait_for_ajaximations
 
       # now delete the criterion frd
@@ -344,7 +344,7 @@ describe "context modules" do
         replace_content(f('#sub_header_title'), header_text)
         true
       end
-      fj('.add_item_button:visible').click
+      fj('.add_item_button.ui-button').click
       wait_for_ajaximations
       tag = ContentTag.last
       module_item = f("#context_module_item_#{tag.id}")
@@ -381,7 +381,7 @@ describe "context modules" do
       wait_for_ajaximations
       keep_trying_until do
         select_module_item('#add_module_item_select', 'External Tool')
-        fj('.add_item_button:visible').click
+        fj('.add_item_button.ui-button').click
         expect(ff('.alert.alert-error').length).to eq 1
       end
       expect(fj('.alert.alert-error:visible').text).to eq "An external tool can't be saved without a URL."
@@ -414,7 +414,7 @@ describe "context modules" do
       option = first_selected_option(prereq_select)
       expect(option.text).to eq 'the module, ' + first_module_name
 
-      ff('.cancel_button', dialog_for(add_form)).last.click
+      ff('.cancel_button.ui-button', dialog_for(add_form)).last.click
       wait_for_ajaximations
       mod2.publish!
 
@@ -518,7 +518,7 @@ describe "context modules" do
 
       it "should return focus to the cog menu when closing the edit dialog for an item" do
         hover_and_click("#context_module_item_#{@tag.id} .edit_item_link")
-        keep_trying_until { fj('.cancel_button:visible') }.click
+        keep_trying_until { ff('.cancel_button.ui-button')[2] }.click
         check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
       end
 

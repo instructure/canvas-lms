@@ -66,7 +66,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     wait_for_ajaximations
     select_module_item('#add_module_item_select', module_name)
     select_module_item(item_select_selector + ' .module_item_select', item_name)
-    fj('.add_item_button:visible').click
+    fj('.add_item_button.ui-button').click
     wait_for_ajaximations
     tag = ContentTag.last
     module_item = f("#context_module_item_#{tag.id}")
@@ -111,7 +111,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     end
     replace_content(item_title, item_title_text)
     yield if block_given?
-    fj('.add_item_button:visible').click
+    fj('.add_item_button.ui-button').click
     wait_for_ajaximations
     tag = ContentTag.last
     module_item = f("#context_module_item_#{tag.id}")
@@ -132,7 +132,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
     replace_content(title_input, page_name_text)
 
-    fj('.add_item_button:visible').click
+    fj('.add_item_button.ui-button').click
     wait_for_ajaximations
     tag = ContentTag.last
     module_item = f("#context_module_item_#{tag.id}")
