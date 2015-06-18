@@ -23,7 +23,7 @@ describe ApplicationController do
   before :each do
     controller.stubs(:request).returns(stub(:host_with_port => "www.example.com",
                                             :host => "www.example.com",
-                                            :headers => {}))
+                                            :headers => {}, :format => stub(:html? => true)))
   end
 
   describe "#twitter_connection" do
@@ -451,6 +451,7 @@ describe ApplicationController do
 
       req.stubs(:host).returns('www.example.com')
       req.stubs(:headers).returns({})
+      req.stubs(:format).returns(stub(:html? => true))
       controller.stubs(:request).returns(req)
       controller.send(:assign_localizer)
       I18n.set_locale_with_localizer # this is what t() triggers

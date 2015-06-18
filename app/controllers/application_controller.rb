@@ -103,7 +103,7 @@ class ApplicationController < ActionController::Base
   #       ENV.FOO_BAR #> [1,2,3]
   #
   def js_env(hash = {})
-    return {} if api_request?
+    return {} unless request.format.html?
     # set some defaults
     unless @js_env
       @js_env = {
@@ -497,7 +497,7 @@ class ApplicationController < ActionController::Base
 
       assign_localizer if @context.present?
 
-      unless api_request?
+      if request.format.html?
         if @context.is_a?(Account) && !@context.root_account?
           account_chain = @context.account_chain.to_a.select {|a| a.grants_right?(@current_user, session, :read) }
           account_chain.slice!(0) # the first element is the current context
