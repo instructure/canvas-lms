@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe ConversationMessage do
   context "notifications" do
@@ -222,6 +222,28 @@ describe ConversationMessage do
     end
 
     it "should delete the stream_item if the conversation is deleted" # not yet implemented
+  end
+
+  context 'sharding' do
+    specs_require_sharding
+
+    it 'should preserve attachments across shards' do
+      @shard1.activate do
+        course_with_teacher(active_all: true)
+      end
+      a = @teacher.shard.activate do
+        attachment_model(context: @teacher, folder: @teacher.conversation_attachments_folder)
+      end
+      m = nil
+      @shard2.activate do
+        student_in_course(active_all: true)
+        m = @teacher.initiate_conversation([@student]).add_message('test', attachment_ids: [a.id])
+        expect(m.attachments).to match_array([a])
+      end
+      @shard1.activate do
+        expect(m.attachments).to match_array([a])
+      end
+    end
   end
 
   context "infer_defaults" do
