@@ -18,4 +18,8 @@ class BeyondZConfiguration
     @config[:bitly_access_token]
   end
 
+  def self.unrestricted_html_users
+    @config[:unrestricted_html_users]
+  end
+
 end
