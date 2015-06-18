@@ -970,6 +970,13 @@ class Assignment < ActiveRecord::Base
     raise GradeError.new("Student is required") unless original_student
     raise GradeError.new("Student must be enrolled in the course as a student to be graded") unless context.includes_student?(original_student)
     raise GradeError.new("Grader must be enrolled as a course admin") if opts[:grader] && !self.context.grants_right?(opts[:grader], :manage_grades)
+
+    if opts.key? :excuse
+      opts[:excused] = Canvas::Plugin.value_to_boolean(opts.delete(:excuse))
+    end
+    raise GradeError.new("Cannot simultaneously grade and excuse an assignment") if opts[:excused] && opts[:grade]
+
+
     opts.delete(:id)
     dont_overwrite_grade = opts.delete(:dont_overwrite_grade)
     group_comment = Canvas::Plugin.value_to_boolean(opts.delete(:group_comment))
@@ -988,11 +995,8 @@ class Assignment < ActiveRecord::Base
     comment[:group_comment_id] = CanvasSlug.generate_securish_uuid if group_comment && group
     submissions = []
 
-    if opts.key? :excuse
-      opts[:excused] = Canvas::Plugin.value_to_boolean(opts.delete(:excuse))
-    end
 
-    grade_group_students = !grade_group_students_individually && !opts.key?(:excused)
+    grade_group_students = !(grade_group_students_individually || opts[:excused])
 
     find_or_create_submissions(students) do |submission|
       submission_updated = false
