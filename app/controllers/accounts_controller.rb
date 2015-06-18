@@ -736,10 +736,10 @@ class AccountsController < ApplicationController
     if authorized_action(@account, @current_user, :manage_admin_users)
       @users = @account.all_users
       @avatar_counts = {
-        :all => @users.with_avatar_state('any').count,
-        :reported => @users.with_avatar_state('reported').count,
-        :re_reported => @users.with_avatar_state('re_reported').count,
-        :submitted => @users.with_avatar_state('submitted').count
+        :all => format_avatar_count(@users.with_avatar_state('any').count),
+        :reported => format_avatar_count(@users.with_avatar_state('reported').count),
+        :re_reported => format_avatar_count(@users.with_avatar_state('re_reported').count),
+        :submitted => format_avatar_count(@users.with_avatar_state('submitted').count)
       }
       if params[:avatar_state]
         @users = @users.with_avatar_state(params[:avatar_state])
@@ -753,7 +753,7 @@ class AccountsController < ApplicationController
           @avatar_state = 'reported'
         end
       end
-      @users = @users.paginate(:page => params[:page], :per_page => 100)
+      @users = Api.paginate(@users, self, account_avatars_url)
     end
   end
 
@@ -903,4 +903,10 @@ class AccountsController < ApplicationController
       end
     end
   end
+
+  def format_avatar_count(count = 0)
+    count > 99 ? "99+" : count
+  end
+  private :format_avatar_count
+
 end
