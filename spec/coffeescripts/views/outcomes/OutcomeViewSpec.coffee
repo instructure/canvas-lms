@@ -268,3 +268,14 @@ define [
     ok view.$el.find('.delete_button').length > 0
     ok not view.$el.find('.delete_button').attr('disabled')
     view.remove()
+
+  test 'validates display_name length', ->
+    long_name = "long outcome name "
+    long_name += long_name for _ in [1..5]
+    ok long_name.length > 256
+    view = createView(model: @outcome1, state: 'edit')
+    view.$('#display_name').val(long_name)
+    view.$('#display_name').trigger('change')
+    ok !view.isValid()
+    ok view.errors.display_name
+    view.remove()

@@ -44,6 +44,9 @@ define [
     , OutcomeContentBase::events
 
     validations: _.extend
+      display_name: (data) ->
+        if data.display_name.length > 255
+          I18n.t('length_error', 'Must be 255 characters or less')
       mastery_points: (data) ->
         if _.isEmpty(data.mastery_points) or parseFloat(data.mastery_points) < 0
           I18n.t('mastery_error', 'Must be greater than or equal to 0')
