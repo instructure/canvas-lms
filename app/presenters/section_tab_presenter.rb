@@ -21,7 +21,7 @@ class SectionTabPresenter
   end
 
   def path
-    send(tab.href, *path_args)
+    tab[:args].instance_of?(Hash) ? send(tab[:href], tab[:args]) : send(tab[:href], *path_args)
   end
 
   def path_args
