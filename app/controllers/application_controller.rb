@@ -1334,7 +1334,7 @@ class ApplicationController < ActionController::Base
         @lti_launch.analytics_id = @tool.tool_id
 
         @append_template = 'context_modules/tool_sequence_footer'
-        render Lti::AppUtil.display_template
+        render Lti::AppUtil.display_template(params['display'])
       end
     else
       flash[:error] = t "#application.errors.invalid_tag_type", "Didn't recognize the item type for this tag"
