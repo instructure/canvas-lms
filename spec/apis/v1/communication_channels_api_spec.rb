@@ -97,6 +97,11 @@ describe 'CommunicationChannels API', type: :request do
       })
     end
 
+    it "doesn't error if the user already has a login with the same e-mail address" do
+      @someone.pseudonyms.create!(unique_id: 'new+api@example.com')
+      api_call(:post, @path, @path_options, @post_params.merge(skip_confirmation: 1))
+    end
+
     context 'a site admin' do
       before { @user = @site_admin }
 
