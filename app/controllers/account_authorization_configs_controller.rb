@@ -578,7 +578,7 @@ class AccountAuthorizationConfigsController < ApplicationController
       return
     end
 
-    deselect_parent_registration(data)
+    deselect_parent_registration(data, aac)
     aac.update_attributes(data)
 
     if position.present?
@@ -938,9 +938,11 @@ class AccountAuthorizationConfigsController < ApplicationController
     @account.save!
   end
 
-  def deselect_parent_registration(data)
+  def deselect_parent_registration(data, aac = nil)
     if data[:parent_registration] == 'true' || data[:parent_registration] == '1'
-      @account.authentication_providers.update_all(parent_registration: false)
+      auth_providers = @account.authentication_providers
+      auth_providers = auth_providers.where('id <> ?', aac) if aac
+      auth_providers.update_all(parent_registration: false)
     end
   end
 
