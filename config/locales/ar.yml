@@ -129,6 +129,7 @@ ar:
     ldap_fields: 
       auth_filter_description: "استخدم *%{placeholder}* كعنصر نائب لاسم المستخدم الذي يوفره المستخدم. على سبيل المثال: *(sAMAccountName=%{placeholder})*"
       identifer_format_description: "السمة LDAP تستخدم للبحث في تسجيل دخول Canvas. اتركها فارغة لاستخدام اسم المستخدم الذي قام المستخدم بتوفيره."
+      ldap_timeout_failure_help2: "إذا انتهت مهلة اتصال Canvas بخادم LDAP لمرات كثيرة للغاية، سيتم منع أي محاولات دخول أخرى من استخدام خادم LDAP ذلك لمدة %{time}. انتهت مهلة اتصال خادم LDAP لآخر مرة في %{timestamp}."
     ldap_settings_test: 
       labels: 
         pass: "كلمة المرور"
@@ -156,6 +157,11 @@ ar:
       test_ldap_search_help_fixes_3: "تحقق من أن كائن المستخدم في LDAP يحتوي على امتيازات البحث لأساس البحث الذي تم توفيره."
       test_ldap_search_help_header: "لا يمكن لـ Canvas البحث عن مثيل LDAP الخاص بك"
       test_ldap_search_label: "جارٍ اختبار بحث LDAP..."
+    linkedin_fields: 
+      description: |-
+          سوف تحتاج لـ [تسجيل تطبيق على LinkedIn](%{linkedin_url}).
+          عليك بإضافة %{callback_url} كعنوان URL مخوّل له لإعادة توجيه OAuth 2.0، ثم تعيين حالة التطبيق على "مباشر".
+          بعد إنشاء التطبيق، قم بتدوين معرف العميل وكلمة سر العميل، ثم أدخلهما هنا.
     login_required: "يجب أن يتم التزويد"
     no_changing_auth_types: "لا يمكن تغيير نوع تهيئة التفويض، ولذا يرجى حذف وإنشاء تهيئة جديدة."
     password_required: "يجب أن يتم التزويد"
@@ -197,7 +203,9 @@ ar:
       logout_response_from_idp: "LogoutResponse من IdP"
     sso_settings_form: 
       change_password_url_help: "ترك فراغ لسلوك Canvas الافتراضي"
+      discovery_url_description: "إذا تم تعيين عنوان URL للاكتشاف، سيقوم Canvas بتوجيه كافة المستخدمين إلى هذا العنوان عندما تتعين المصادقة عليهم. ينبغي على هذه الصفحة مساعدة المستخدم ليعرف أين يجب أن يتوجه للقيام بتسجيل الدخول. في حال عدم تكوين أي عنوان URL للاكتشاف، سيتم استخدام أول تمكين لمحاولة المصادقة على المستخدم."
       login_handle_name_description: "التسمية المستخدمة لمعرّفات تسجيل الدخول الفريدة. أمثلة: تسجيل الدخول، اسم المستخدم، معرف الطالب، إلخ"
+      unknown_user_url_description: "عنوان URL مخصص لإعادة التوجيه في حالة عدم العثور على مستخدم مصدق في Canvas."
   account_navigation_80bbefd4: "التنقل عبر الحساب"
   account_notification: 
     errors: 
@@ -333,6 +341,7 @@ ar:
       open_registration_delegated_warning_dialog: "تم تمكين موفر الهوية الخارجي"
       what_are_quiz_ip_filters: "ما المقصود بعوامل تصفية IP للاختبار؟"
     user: مستخدم
+  account_settings_fe083453: "إعدادات الحساب"
   account_surveys_b0039876: "استطلاعات الحساب"
   account_user: 
     types: 
@@ -1205,6 +1214,7 @@ ar:
         default: 
           zero_activity: 
             text: "يوضح هذا التقرير جميع الطلاب الملتحقين بأي مساقات في فصل دراسي معين. سيحتوي الملف الناتج بتنسيق cvs على صف واحد لالتحاق كل مستخدم لم يقم بزيارة المساق منذ ذلك التاريخ."
+  accounts_752dc365: الحسابات
   achieve_mastery_count_times_8c9bbcec: "تحقيق مستوى الإتقان %{count} مرة/مرات"
   actions_efcde10d: إجراءات
   activerecord: 
@@ -1293,8 +1303,11 @@ ar:
   all_grading_periods_77974940: "كل فترات تقييم الدرجات"
   all_students_have_taken_the_quiz_b558f8b4: "أدى جميع الطلاب الاختبار"
   all_students_have_taken_the_survey_494f9f42: "شارك جميع الطلاب في الاستطلاع"
+  allow_bulk_grade_export_to_sis_e11a6e66: "السماح بالتصدير المجمع للدرجة إلى SIS"
   allow_lor_tools: "السماح للمستخدمين بعرض الأدوات الخارجية المكونة واستخدامها لـ LOR. "
   allow_opt_out_of_inbox: "السماح للمستخدمين بإلغاء الاشتراك في صندوق وارد المحادثات. سيؤدي هذا إلى إرسال جميع رسائل وإعلامات المحادثات كإعلامات ASAP إلى البريد الإلكتروني الأساسي الخاص بالمستخدم، مع إخفاء شارة الرسائل غير المقروءة في صندوق الوارد الخاص بالمحادثات، إضافة إلى إخفاء تفضيلات الإعلامات الخاصة بالمحادثات.   "
+  allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "السماح للطلبة بمشاهدة من قام بتسجيل المشاركة في الأجزاء الزمنية."
+  allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "السماح للمعلمين بوضع علامة على بيانات الدرجة المراد تصديرها بشكل مجمع إلى تكاملات SIS."
   always_3a59e701: دائمًا
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "حدث خطأ أثناء إعداد حق الاستخدام الخاص بـ %{filename}"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "حدث خطأ غير معروف في الخادم. الرجاء إعادة المحاولة."
@@ -2195,6 +2208,7 @@ ar:
   availible_to_format_like_yyyy_mm_dd_hh_mm_f2611528: "متوفر إلى غاية - التنسيق على شكل DD-MM-YYYY hh:mm"
   average_49c63f9b: متوسط
   back_to_app_center_95420d83: "عودة إلى مركز التطبيقات"
+  base_847aca7c: أساس
   bb_display: "تعلم Blackboard"
   bb_file_description: "تصدير Blackboard 6/7/8/9 بتنسيق ملف zip."
   bb_name: "محول Blackboard"
@@ -2628,6 +2642,7 @@ ar:
       loading_undated_events: "جارٍ تحميل العناصر غير المؤرخة..."
       no_undated_events: "لا توجد عناصر مؤرخة."
       show_undated_events: "عرض العناصر غير المؤرخة"
+  calendar_d14cfc8f: التقويم
   calendar_event: 
     errors: 
       duplicate_child_event_contexts: "سياقات حدث فرعية متكررة"
@@ -2736,6 +2751,7 @@ ar:
   canvas_ticketing_email_connector_27e253ae: "رابط تذاكر البريد الإلكتروني لـ Canvas"
   canvas_ticketing_web_post_connector_11158897: "رابط تذاكر منشورات Canvas"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "سيعيد Canvas تقييم درجات جميع إرسالاتك بعد حفظ الاختبار، قد يستغرق ذلك بضع دقائق."
+  cas_url_4ba2843e: "عنوان URL لـ CAS"
   cc: 
     by: "سمة CC"
     by_nc: "سمة CC غير التجارية"
@@ -2745,6 +2761,7 @@ ar:
     by_sa: "سمة CC المشاركة أيضًا"
     private: "خاص (محمي بموجب حقوق النشر)"
     public_domain: "المجال العام"
+  certificate_fingerprint_b376df90: "بصمة الشهادة"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "هذا التعيين يشتمل على %{assignmentPoints} نقطة ممكنة، هل ترغب في تغييره بحيث يشتمل على %{rubricPoints} نقطة ممكنة لمطابقة هذا المعيار؟"
@@ -2830,6 +2847,8 @@ ar:
         delete_google_doc_as_well: "تم تخزين هذا التعاون كـ Google Doc. هل رغبت في حذفه من موقع Canvas، أو إزالته كذلك من Google Docs؟"
       titles: 
         new: "بدء تعاون جديد"
+    google_drive: 
+      file_not_found: "لم يتم العثور على ملف التعاون"
     index: 
       description_rs: |-
           تعتبر أدوات الويب المجانية مثل [Google Docs](%{google_url}) و[EtherPad](%{etherpad_url})
@@ -2861,6 +2880,7 @@ ar:
     show: 
       error_cause_1: "حساب Google Drive للمنشِئ يختلف عن الحساب المستخدم لإنشاء التعاون."
       error_cause_2: "منشئ التعاون لم يعد مؤلفاً على Google Doc."
+      error_cause_3: "Google Doc لم يعد موجوداً."
       error_summary: "يبدو أن هذا التعاون لا يعمل. الأسباب الممكنة:"
       error_title: "خطأ في تعاون Google Drive"
       headings: 
@@ -4768,6 +4788,7 @@ ar:
         ratio: "نسبة الطلاب خاطئة"
   current_3ce5414a: الحالي
   current_mastery_score_score_out_of_mastery_points_fedd343f: "درجة الإتقان الحالية: %{score} من %{mastery_points}"
+  current_provider_6c3f7f96: "موفر الهوية الحالي"
   current_score_6c81792: "الدرجة الحالية"
   current_total_67bf5f72: "الإجمالي الحالي:"
   curve_grades_dialog: 
@@ -4895,6 +4916,7 @@ ar:
       date_at_time: "%-d %b at %k:%M"
       default: "%d/%m/%Y"
       full: "%-d %b، %Y %-l:%M%P"
+      full_with_weekday: "%a %-d %b، %Y %-l:%M%P"
       long: "%-d %B %Y"
       long_with_weekday: "%A، %-d %B"
       medium: "%-d %b %Y"
@@ -5149,6 +5171,7 @@ ar:
   diigo_993c4646: Diigo
   disable_a5c05db3: تعطيل
   disabled_18c33a73: (معطل)
+  discovery_url_3dce06d9: "عنوان URL للاكتشاف"
   discussion_6719c51d: المناقشة
   discussion_entries: 
     created_entry_notice: "تم إنشاء الإدخال بنجاح."
@@ -5484,9 +5507,13 @@ ar:
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
       توزيع الدرجات الحالية في المساقات لكل الطلاب المسجلين
               في مساقات القسم.
+  divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "التقسيم إلى فترات متساوية مدتها %{num_minutes} دقيقة. *تنفيذ*"
   domain_3b54c511: المجال
+  don_t_move_lti_query_params_to_post_body_21744487: "عدم نقل معلمات استعلام LTI إلى نص المنشورة"
   don_t_show_again_15d8253e: "عدم إظهار مرة أخرى"
+  done_54e3d4b6: تم
   done_8af51c9b: انتهاء.
+  download_scores_generated_on_date_ff5b9cd2: "تنزيل الدرجات التي تم إنشاؤها بتاريخ %{date}"
   download_submissions_7454665f: "تنزيل الإرسالات"
   due_a73610f6: الاستحقاق
   due_at_5e18eeac: "الاستحقاق في:"
@@ -5936,6 +5963,7 @@ ar:
       submissions: 
         body1: "قد تلاحظ قائمة بالإرسالات الحديثة من الفصول أسفل هذه الصفحة (%{showme}). يمكنك إضافة الإرسالات سريعًا للصفحات الجديدة في المحفظة الخاصة بك من هذه الصفحة. ما عليك سوى النقر فوق الإرسال الذي تريد إضافته وسينبثق مربع حوار صغير."
         body2: "رائع! والآن لإنهاء إضافة الإرسال، يجب اختيار أي قسم تريد إضافته إليه وتسمية الصفحة. بعد النقر فوق \"إضافة صفحة\" ستنتقل إلى صفحة جديدة وبذلك يمكنك تحريرها بمزيد من التفاصيل إن رغبت."
+  eportfolios_f6dc4579: "محفظات إلكترونية"
   error_deleting_name_reason_11f9d399: "حدث خطأ أثناء حذف %{name}: %{reason}"
   error_message_2b9d12ee: "خطأ: %{message}"
   error_uploading_file_e2d31b56: "حدث خطأ أثناء تحميل الملف."
@@ -5979,6 +6007,8 @@ ar:
       too_short: "قصير للغاية (الحد الأدنى هو %{count} حرفًا/أحرف)"
       wrong_length: "طول خاطئ (يجب أن يكون %{count} حرفًا/أحرف)"
     no_attached_file: "يجب أن ترفق ملفًا واحدًا على الأقل بهذا التعيين"
+    notices: 
+      error_reported: "شكرًا لمساعدتك! سنتخذ اللازم فورًا"
     registration_incomplete: "تحتاج إلى تأكيد عنوان بريدك الإلكتروني حتى تتمكن من عرض هذه الصفحة"
     required: مطلوب
     sis_id_in_use: "معرف SIS \"%{sis_id}\" قيد الاستخدام بالفعل"
@@ -5997,6 +6027,8 @@ ar:
   example_https_lti_tool_provider_example_herokuapp__e9802142: "مثال: https://lti-tool-provider-example.herokuapp.com/register"
   example_item_scores_6726c689: "نموذج لدرجات عنصر"
   exceeds_mastery_1f995dce: "تجاوز الإتقان"
+  excused_5877183c: "ليس إجباري!"
+  excused_cf8792eb: "ليس إجباري"
   expand_collapse_title_outcome_group_239f0a9d: "توسيع/طي مجموعة نتائج %{title}"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "توسيع قائمة أعضاء مجموعة %{groupName}"
   expand_or_collapse_calendars_9854b0d0: "توسعة التقاويم أو طيها"
@@ -6403,12 +6435,14 @@ ar:
     warnings: 
       file_uploaded_without_response: "ربما تم تحميل الملف، لكن فشل الخادم في الاستجابة.  أعد تحميل الصفحة للتأكيد."
   files_and_folder_contents_only_available_to_studen_944f9166: "لا تتاح محتويات الملفات والمجلدات إلا للطلاب الذين لديهم الارتباط. غير مرئية في ملفات الطلاب."
+  files_c300e900: الملفات
   files_uploaded_519844ed: "الملفات المحملة"
   fill_in_the_blank_read_surrounding_text_1a6c73c7: "املأ الفراغات، اقرأ النص المجاور"
   filter_announcements_by_unread_495eeeb3: "تصفية الإعلانات حسب غير المقروء"
   filter_by_name_34cbe139: "تصفية حسب الاسم"
   filter_discussions_by_assignments_757924ed: "تصفية المناقشات حسب المهام"
   filter_discussions_by_unread_6c48322: "تصفية المناقشات حسب غير المقروءة"
+  filter_e3398407: تصفية
   filter_replies_by_unread_caf870ea: "تصفية الردود حسب غير المقروء"
   find_flickr_image_view: 
     find_cc_on_flickr: "البحث عن صور عامة إبداعية على Flickr"
@@ -6440,6 +6474,7 @@ ar:
     only_one_folder: "يتعذر تعيين مسار مجلد ومعرف المجلد"
   for: لـ
   for_all_devices_1f603968: "لكل الأجهزة"
+  forgot_password_url_3f9c04b: "عنوان URL لكلمة المرور المفقودة"
   from_fdd4956d: من
   from_from_to_to_e31f6422: "من %{from} إلى %{to}"
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "احصل على ما يلي من التطبيق المتصل Salesforce الخاص بك"
@@ -7416,6 +7451,7 @@ ar:
                       الملفات.  يمكن للمجموعات التعاون في المستندات وحتي في جدولة المؤتمرات عبر الويب.
                       تشبه المساق الصغير حيث يمكنك من خلالها العمل مع مجموعة صغيرة من الطلاب في 
                       مشروع يحتاج إلى تركيز أكثر.
+  help_4c4968b1: تعليمات
   help_dialog: 
     Back: عودة
     Help: تعليمات
@@ -7520,6 +7556,7 @@ ar:
   highest_28ad71e6: الأعلى
   highest_score_e080551e: "أعلى درجة"
   homework_submission_172e8354: "إرسال الواجب المنزلي"
+  host_8be927e0: المضيف
   html5_first_videos_description: |-
       بشكل افتراضي، سيحاول Canvas استخدام Flash أولاً لتشغيل مقاطع الفيديو. يمكنك تشغيل هذا الخيار لمحاولة استخدام HTML5 أولاً،
       ثم العودة إلى Flash.
@@ -7536,9 +7573,12 @@ ar:
     online_url_submission: "إرسال عنوان URL عبر الإنترنت"
     quiz_submission: "إرسال الاختبار"
     text_entry_submission: "إرسال إدخال النص"
+  idp_entity_id_25c51837: "معرف كيان IdP"
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "عند التمكين، يتعين على مصممي المحتوى توفير المعلومات الخاصة بحقوق النشر والتراخيص للملفات قبل نشرها. ينطبق ذلك فقط عند تمكين Better File Browsing \"أفضل استعراض للملفات\" كذلك."
+  if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "في حال تمكين معلمات الاستعلام، لن يتم نسخها في نص المنشورة أثناء تشغيل LTI."
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "في حالة التمكين، سيستطيع المستخدمون تكوين أدوات LTI 2."
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "عند تغيير النقاط الممكنة للمهمة، يتعين عليك إعادة تقييم المهمة."
+  if_you_configure_settings_that_cause_you_to_not_be_13d4cbbf: "في حال قيامك بتكوين إعدادات تؤدي إلى منعك من تسجيل الدخول، يمكنك الوصول مباشرة إلى تسجيل الدخول العادي إلى Canvas من خلال %{url}"
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "إن لم تحدد الآن حقوق الاستخدام، لن يتم نشر هذا الملف بعد تحميله."
   if_you_enable_this_feature_be_sure_that_your_sales_566967e6: "إذا قمت بتمكين هذه الميزة، تأكد من أن هذه الحقول المخصصة أضيفت إلى حساب Salesforce الخاص بك تماماً بنفس الأسماء الموجودة في العمود الأيسر من الجدول"
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "إذا قمت بالمغادرة، فسيتم إلغاء تنزبل الملف المضغوط الذي يجري إعداده حاليًا."
@@ -7587,6 +7627,7 @@ ar:
     title_for_topics_category: "موضوعات %{category}"
     warnings: 
       truncated_wiki_title: "تم اقتطاع عنوان صفحة wiki التالية: %{title}"
+  inbox_bb245a60: "صندوق الوارد"
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "إدراج تقديرات المهمة هذه عند الإرسال إلى نظام معلومات الطالب في مدرستك"
   incorrect_username_and_or_password_2de73abb: "اسم مستخدم و/أو كلمة مرور غير صحيحة"
   incremental_update_successfully_generated_against__db3f3f06: "تم إنشاء التحديث التزايدي بنجاح مقابل تصدير SIS."
@@ -7892,6 +7933,8 @@ ar:
   light_blue_5374f600: "أزرق فاتح"
   light_green_c1cd020d: "أخضر فاتح"
   light_pink_e1214d62: "وردي فاتح"
+  limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "تحديد كل جزء زمني إلى %{num_participants} *مجموعات.* **مستخدمين.**"
+  limit_participants_to_attend_num_appointments_appo_dd3fd62f: "تحديد عدد المشاركين الذين يحضرون الموعد (المواعيد) إلى %{num_appointments}."
   link_enrollment: 
     buttons: 
       link: "الارتباط بالطالب"
@@ -7928,7 +7971,9 @@ ar:
   lock_date_cannot_be_after_term_end_cf1a188f: "لا يمكن أن يكون تاريخ التأمين بعد نهاية الفصل الدراسي"
   lock_date_cannot_be_before_due_date_ac30f54: "لا يمكن أن يكون تاريخ التأمين قبل تاريخ الاستحقاق"
   lock_until_date_62ce1b5c: "قفل حتى تاريخ"
+  log_on_url_fc166e4c: "عنوان URL لتسجيل الدخول"
   log_out_379ba28a: "تسجيل الخروج"
+  log_out_url_2605c2c1: "عنوان URL لتسجيل الخروج"
   logged_out_user: "المستخدم الذي قام بتسجيل الخروج %{user_counter}"
   login: 
     canvas: 
@@ -7988,9 +8033,14 @@ ar:
         logout_response_redirect_from_idp: "تم استلام LogoutResponse من IdP"
         logout_response_redirect_to_idp: "إرسال LogoutResponse إلى IdP"
         redirect_from_idp: "تم استلام LoginResponse من IdP"
+  login_attribute_731a8181: "سمة تسجيل الدخول"
   login_is_invalid_must_be_alphanumeric_or_an_email__ae4499b3: "معرّف تسجيل الدخول غير صالح: يجب أن يكون على شكل حروف وأرقام أو عنوان بريد إلكتروني "
   login_is_too_long_25373f95: "معرّف تسجيل الدخول طويل جداً"
+  login_label_1dea0f9d: "تسمية تسجيل الدخول"
+  login_with_auth_type_a0aaa52a: "تسجيل الدخول باستخدام *%{auth_type}*"
+  login_with_provider_3fd3998e: "تسجيل الدخول باستخدام %{provider}"
   logo_a040ae0e: شعار
+  logout_a9312e35: "تسجيل الخروج"
   looks_great_e4d883ed: "يبدو جيداً!"
   low_score_4eeb95b2: "الدرجة المنخفضة: %{score}"
   lower_limit_of_range_6ddd4983: "الحد الأدنى للنطاق"
@@ -8004,6 +8054,7 @@ ar:
     register_tool: "أداة التسجيل"
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "برنامج استيراد Moodle"
+  main_navigation_3f080c80: "التنقل الرئيسي"
   make_sure_you_choose_the_most_appropiate_option_as_93079937: "تأكد من اختيار أنسب خيار حيث قد تتأثر نقاط الطلاب."
   make_this_course_publicly_visible_student_data_wil_3954d6c8: "جعل هذا المساق مرئيًا بصورة عامة (ستظل بيانات الطلاب خاصة)"
   malformed_csv_aaa4b7f2: "تم تكوين CSV بشكل غير صحيح"
@@ -8018,6 +8069,9 @@ ar:
   manage_group_group_name_ac8578c6: "إدارة المجموعة %{group_name}"
   manage_usage_rights_c5a8c216: "إدارة حقوق الاستخدام"
   manual_entry_e4a4f99a: "إدخال يدوي"
+  mark_as_done_6fa48d2f: "وضع علامة \"تم\""
+  mark_as_done_779556d7: "وضع علامة \"تم\""
+  marked_done_8f61ebb8: "يحمل علامة \"تم\""
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "تعكس درجة الإتقان أعلى درجة لمهمة أو اختبار تم تقييم درجته."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "تعكس درجة الإتقان أحدث مهمة أو اختبار تم تقييم درجته."
   mathquill: 
@@ -8029,6 +8083,8 @@ ar:
       miscellaneous: متنوع
       operators: المشغلون
       relationships: العلاقات
+  max_users_groups_per_appointment_867c505b: "الحد الأقصى لعدد المستخدمين/المجموعات لكل موعد"
+  maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "الحد الأقصى لعدد المواعيد التي يمكن للمشارك حضورها"
   media_comments: 
     alerts: 
       kaltura_disabled: "تم تعطيل Kaltura لموقع Canvas هذا"
@@ -8080,6 +8136,7 @@ ar:
   message: 
     default_subject: "تنبيه Canvas"
   message_896d2ed0: "%{message}"
+  message_reply_failed_subject_5d27a0c9: "فشل الرد على الرسالة: %{subject}"
   message_students: 
     buttons: 
       send_message: "إرسال رسالة"
@@ -9823,6 +9880,7 @@ ar:
     errors: 
       valid_workflow_state: "يجب إرسال حالة سير عمل صالحة"
   migration_selection_5f1c5f55: "تحديد الترحيل"
+  minutes_per_slot_5b7169e5: "الدقائق لكل فترة"
   missing_percent_94534638: "المفقود: %{percent}"
   model_is_already_located_in_newgroup_e5cea361: "%{model} موجود بالفعل في %{newGroup}"
   module_item_types: 
@@ -9984,6 +10042,7 @@ ar:
   moodle_formula_warning_title: "ستحتاج الإجابات الممكنة إلى إعادة إنشائها لسؤال الصيغة"
   more_courses_5ebbe998: "مزيد من المساقات"
   most_recent_score_13a87e8c: "أحدث درجة"
+  most_recent_score_counts_as_calculation_int_of_mas_9a3bcf66: "تساوي أحدث درجة %{calculation_int}% من درجة الإتقان، بينما يساوي متوسط كل الدرجات الأخرى %{remainder}% من الدرجة."
   move_abf00365: نقل
   move_dialog: 
     cancel: إلغاء
@@ -9996,6 +10055,8 @@ ar:
   move_outcome_group_cfa1a505: "نقل مجموعة النتائج"
   moving_a4d552df: "يتم الآن النقل..."
   multi_factor_authentication_configured_865b1bde: "تم تكوين المصادقة متعددة العوامل"
+  must_achieve_mastery_at_least_count_times_scores_a_628db168: "يجب تحقيق درجة الإتقان %{count} مرات على الأقل. سيتم تحديد متوسط الدرجات التي تفوق درجة الإتقان لحساب الدرجة النهائية."
+  must_mark_as_done_bf6cc563: "يجب وضع علامة \"تم\""
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "يجب تزويد معلمة 'file_ids' و/أو معلمة 'folder_ids'"
   mute_dialog: 
     curving_assignments: "المهام المنحنية"
@@ -10008,6 +10069,7 @@ ar:
     submission_comments: "تعليقات الإرسال"
     sure_you_want_to_mute: "هل ترغب بالتأكيد في حجب هذه المهمة؟ بينما تم حجب هذه المهمة، لن يتلقى الطلاب إعلامات جديدة حولها أو لن يقدروا على رؤيتها:"
   muted_283cfa0f: "(تم الحجب)"
+  my_dashboard_8983c283: "لوحة معلوماتي"
   my_dashboard_b724020: "لوحة معلوماتي"
   n_a_d6f6c42f: "لا يوجد"
   n_number_of_times_c2e78b72: "n عدد المرات"
@@ -10045,6 +10107,7 @@ ar:
   no_score_yet_c94e919b: "لا توجد درجة حتى الآن"
   no_students_have_taken_the_quiz_yet_e667644b: "لم يؤدِ الاختبار أي طالب حتى الآن"
   no_students_have_taken_the_survey_yet_d378cd35: "لم يشارك أي طالب في الاستطلاع حتى الآن"
+  no_tls_618add1a: "لا يوجد TLS"
   no_usage_rights_object_supplied_304b8d40: "لم يتم تزويد كائن 'usage_rights'"
   not_a_number: "يجب أن تكون القيمة عددًا موجبًا"
   not_available_until_next_submission_2175158: "غير متوفر قبل الإرسال القادم"
@@ -10285,6 +10348,7 @@ ar:
       other: أخرى
       parent: "رسائل البريد الإلكتروني الأصل"
       scheduling: الجدولة
+  notifications_cbfa7704: إعلامات
   now_click_the_agenda_button_607fb40e: "انقر فوق زر *جدول الأعمال*"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "تم الآن إعداد المساق الخاص بك وأصبح متاحًا، ربما لا تعد في حاجة إلى قائمة التحقق هذه ولكننا سنحتفظ بها لترجع إليها إذا رأيت فيما بعد أنك في حاجة إلى تجربة شيء جديد أو إن احتجت إلى مساعدة إضافية أثناء إجرائك تغييرات على محتوى المساق."
   num_messages_c1949bbc: 
@@ -10374,6 +10438,7 @@ ar:
     : لا
     ? "yes"
     : نعم
+  options_3ab0ea65: الخيارات
   orange_81386a62: برتقالي
   orbis_report_header_assignment_id: "معرف المهمة"
   orbis_report_header_assignment_title: "عنوان المهمة"
@@ -10721,6 +10786,23 @@ ar:
       primary_pad: "Primary Pad"
       sketchpad: SketchPad
       typewithme: TypeWith.me
+    facebook: 
+      description: "تسجيل دخول Facebook"
+    facebook_settings: 
+      description: |-
+          سوف تحتاج لإنشاء [تطبيق جديد على Facebook](%{facebook_url})، وتمكين تسجيل دخول عميل OAuth
+          في الإعدادات المتقدمة. عليك بتكوين %{callback_url} كعنوان URL الصالح لإعادة توجيه OAuth.
+          بعد حفظ التطبيق، قم بتدوين معرف التطبيق وكلمة سر التطبيق، ثم أدخلهما هنا.
+      labels: 
+        app_id: "معرف التطبيق"
+        app_secret: "كلمة سر التطبيق"
+    github: 
+      description: "تسجيل الدخول إلى Github"
+    github_settings: 
+      labels: 
+        client_id: "معرف العميل"
+        client_secret: "كلمة سر العميل"
+        domain: المجال
     google_docs: 
       description: "مشاركة مستند Google Docs"
       name: "Google Docs"
@@ -10833,6 +10915,9 @@ ar:
       description: "تكامل LinkedIn"
     linked_in_settings: 
       domain_name: مجال
+      labels: 
+        client_id: "معرف العميل"
+        client_secret: "كلمة سر العميل"
     live_events: 
       description: "خدمة الأحداث في الوقت الحقيقي"
       name: "الأحداث المباشرة"
@@ -10905,6 +10990,10 @@ ar:
         type: "نوع نظام التذاكر"
     twitter: 
       description: "إعلامات Twitter"
+    twitter_settings: 
+      labels: 
+        consumer_key: "مفتاح العميل"
+        consumer_secret: "كلمة سر العميل"
     webct_scraper_settings: 
       description: |-
           إذا كان المعهد لا يستخدم "الوحدات التعليمية" لـ WebCT (بما في ذلك المدارس التي تبنت WebCT قبل الإصدار 4.0، عندما كانت الوحدات متوفرة)، فيمكن تحسين عمليات الترحيل من خلال استيراد "محتوى المساق"
@@ -10944,6 +11033,8 @@ ar:
         poll_choice_belongs_to_poll: "اختيار الاستطلاع هذا لا ينتمي إلى الاستطلاع الموجود."
         poll_is_published: "جلسة الاستطلاع هذه غير مفتوحة لعمليات الإرسال."
         user_and_poll_session_uniqueness: "يمكن إرسال اختيار واحد فقط لكل جلسة استطلاع."
+  port_75f69d1: المنفذ
+  position_f9c9b93c: الموضع
   possible_combination_count_db651ca4: "عدد المجموعات الممكنة"
   possible_score_5e0a328e: "الممكنة: %{score}"
   post_grades_39c52870: "نشر الدرجات"
@@ -11266,6 +11357,7 @@ ar:
     upload_file_view: 
       choose_a_picture: "اختيار صورة"
       crop_instructions: "لقص صورة، اسحب الجزء المحدد، ثم انقر فوق زر \"حفظ\" بالأسفل."
+  project_groups_1fa0320b: "مجموعات المشروع"
   provisioning_title: التزويد
   pseudonym: 
     errors: 
@@ -11300,6 +11392,7 @@ ar:
     login: 
       invalid_login: "تسجيل دخول غير صالح"
       invalid_password: "كلمة مرور غير صالحة"
+      invalid_user_email: "عذراً، هذا لا يبدو عنوان بريد إلكتروني، تأكد من أنك تستخدم عنوان البريد الإلكتروني المرتبط بحسابك على Canvas."
       parent_signup: "تسجيل ولي الأمر"
       password_confirmation_sent: "تم إرسال تأكيد كلمة المرور إلى %{email_address}. وتأكد من مراجعة صندوق البريد العشوائي ربما يصل البريد هناك."
     notices: 
@@ -12177,6 +12270,7 @@ ar:
         extended_quiz_time_explanation: "يمكنك إعطاء هذا المستخدم وقتًا إضافيًا بخصوص محاولة الاختبار الحالية. فكم من الوقت تود إعطاءه؟"
         extra_time_on_every_attempt: "الوقت الإضافي على كل محاولة:"
         finished_in: "تم الانتهاء في %{duration}"
+        global_extra_attempt_time: "حصل كل شخص على %{count} دقيقة بالفعل"
         global_extra_attempts: "لكل شخص %{n} بالفعل"
         headers: 
           attempt: المحاولة
@@ -13264,6 +13358,7 @@ ar:
       learning_mastery: "إتقان التعلم"
     settings: 
       assignment_toggles_and_actions: 
+        download_current_scores: "تنزيل الدرجات الحالية (csv.)"
         grading_history: "عرض محفوظات التقدير"
         hide_student_names_label: "إخفاء أسماء الطلاب"
         include_ungraded_assignments: "اعتبار درجة المهام التي لم يتم تقييمها كـ 0"
@@ -13521,6 +13616,7 @@ ar:
         orgid: "معرف Org لـ Salesforce"
         record_type: "نوع التسجيل"
         ret_val: "عنوان URL العودة"
+  settings_5aa0fd0c: إعدادات
   setup_checklist_eb8b00b8: "قائمة تحقق الإعداد"
   shared: 
     account_notification: 
@@ -13838,6 +13934,10 @@ ar:
       new_course_name_placeholder: "اسم المساق"
       sample_course_code: المساق-101
       start_a_new_course: "بدء مساق جديد"
+    new_nav_header: 
+      links: 
+        dashboard: "لوحة معلوماتي"
+        skip_to_content: "المرور إلى المحتوى"
     no_recent_activity: 
       empty_stream_message: "ليست لديك أية رسائل لإظهارها في التدفق بعد. وبمجرد البدء في المشاركة في المساقات، سترى هذا التدفق مملوءًا بالرسائل الواردة من المناقشات وتحديثات تقييم الدرجات والرسائل الخاصة التي تتم بينك وبين مستخدمين آخرين، وغير ذلك."
       no_recent_messages: "لا توجد رسائل أخيرة"
@@ -14208,11 +14308,13 @@ ar:
         uploading: "جارٍ التحميل، يرجى الانتظار."
   shared_secret_892c88f2: "كلمة السر المشتركة"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "يفترض أن ذلك بديهي، معرف Canvas المستخدم الذي يقوم بالإبلاغ"
+  show_and_hide_courses_menu_9e09d1d0: "عرض وإخفاء قائمة المساقات"
   show_by_date_e3967761: "إظهار حسب التاريخ"
   show_by_type_c5d61732: "إظهار حسب النوع"
   show_correct_answers_at_a5475aa3: "عرض الأجوبة الصحيحة في"
   show_lti_2_configuration_ui_94ce35a9: "إظهار واجهة مستخدم تكوين LTI 2"
   show_me_76823679: إظهاري
+  simple_tls_45df2648: "TLS بسيطة"
   sis_agent_token_authentication_2a0b29e3: "مصادقة رمز وكيل SIS المميز"
   sis_batch: 
     diff_filename: "sis_upload_diffed_%{id}.zip"
@@ -14286,6 +14388,7 @@ ar:
     users: 
       user_search_label: "البحث عن مستخدم"
       users_matching_label: "مطابقة المستخدمين"
+  skip_to_content_22ad1d00: "المرور إلى المحتوى"
   skipping_unknown_file_type_cd1086ee: "تخطي نوع الملف غير المعروف"
   skype_18850ba7: Skype
   slideshow: 
@@ -14340,6 +14443,7 @@ ar:
     online_url: "عنوان URL عبر الإنترنت"
     previous_object: "%{type} السابق"
     student_hidden_name: "الطالب %{position}"
+  sso_settings_ebf98263: "إعدادات SSO"
   start_date_e937be8a: "تاريخ البدء"
   start_date_must_be_before_end_date_a00be892: "يجب أن يكون تاريخ البداية قبل تاريخ النهاية"
   starts_on_date_a777f505: "تاريخ البدء"
@@ -14711,9 +14815,15 @@ ar:
   the_material_is_in_the_public_domain_279c39a3: "توجد المادة في المجال العام"
   the_material_is_licensed_under_creative_commons_3242cb5e: "المادة مرخصة بموجب المشاع الإبداعي"
   the_material_is_subject_to_fair_use_exception_41bc6a4b: "تخضع المادة إلى استثناء الاستخدام العادل"
+  the_message_titled_subject_could_not_be_delivered__8c6cbbe3: |-
+      تعذر تسليم الرسالة المعنونة "%{subject}". تم إرسال الرسالة من عنوان غير مرتبط بحسابك على Canvas. إذا كنت تحاول الاتصال بشخص ما من خلال Canvas، يمكنك محاولة تسجيل الدخول إلى حسابك وإرسال رسالة إليه باستخدام أداة Inbox.
+      
+      شكرًا،
+      دعم Canvas
   the_module_item_is_locked_27fe420b: "تم تأمين عنصر الوحدة"
   the_profile_picture_has_been_reported_d609d6dd: "تم الإبلاغ عن صورة ملف التعريف"
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "أدوار المستخدم الذي يقوم بالإبلاغ (طالب، معلم، مسؤول، إلخ)"
+  the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "تسمح لك أداة الجدولة بإعداد الفترات الزمنية التي يستطيع الطلبة (أو مجموعات الطلاب) تسجيل المشاركة فيها. للبدء، انقر فوق الزر أدناه."
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "حدّة المشكلة، حسب ما حدده المستخدم في القائمة المنسدلة."
   the_shortcut_icon_for_ios_android_devices_180x180__f87fa178: "أيقونة الاختصار لأجهزة iOS/Android. بحجم 180x180 بتنسيق png أو svg"
   the_state_parameter_is_required_ffadf213: "معلمة الحالة مطلوبة"
@@ -14737,6 +14847,9 @@ ar:
   there_was_an_error_setting_usage_rights_53739e1d: "كان هناك خطأ في إعداد حقوق الاستخدام."
   there_were_errors_with_the_form_errors_ab5b559a: "كانت هناك أخطاء في النموذج: %{errors}"
   these_grading_periods_were_created_for_you_by_an_a_e977c2b5: "قام مسؤول بإنشاء فترات تقييم الدرجات هذه من أجلك."
+  this_assignment_has_been_excused_87f1dc13: "هذه المهمة لم تعد إجبارية."
+  this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "تم حذف هذه المهمة ولن تؤخذ في الاعتبار أثناء الحساب الإجمالي"
+  this_assignment_is_excused_and_will_not_be_conside_5892de1f: "هذه المهمة لم تعد إجبارية ولن تؤخذ في الاعتبار أثناء الحساب الإجمالي"
   this_conference_may_be_recorded_f76deeeb: "قد يتم تسجيل هذا المؤتمر."
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "يتعذر في هذه المرة إضافة هذا المساق إلى قائمة المساقات."
   this_course_is_claimed_and_ready_but_you_ll_need_t_25b95a0a: "تم طلب هذا المساق وهو جاهز ولكن يتعين عليك إنهاء عملية التسجيل قبل نشر المساق. من المفترض استلامك بريد إلكتروني من Canvas به ارتباط لإنهاء العملية. تأكد من مراجعة صندوق البريد العشوائي."
@@ -14748,6 +14861,7 @@ ar:
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "هذا المجلد مؤمن حاليًا وغير متاح للعرض."
   this_grading_period_overlaps_16332589: "فترة التقييم هذه تتداخل"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "هذه قائمة تضم عناوين URL المفصولة بفاصلة للوثوق بها. تؤدي الثقة بأي عنوان URL في هذه القائمة إلى تخطي رمز CSRF المميز عند تسجيل الدخول إلى Canvas."
+  this_login_is_for_provider_6f17462: "تسجيل الدخول هذا خاص بـ %{provider}"
   this_most_likely_happened_because_you_imported_cou_a78ea880: "السبب الأرجح في حدوث ذلك هو أنك قمت باستيراد محتوى المساق دون الملفات المرتبطة به."
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "تم استخدام هذه النتيجة لتقييم أحد الطلاب ولا يمكن تحريرها أو حذفها"
   this_outcome_has_been_used_to_assess_a_student_the_1f04402e: "تم استخدام هذه النتيجة لتقييم أحد الطلاب. تم تأمين طريقة الحساب"
@@ -14970,6 +15084,10 @@ ar:
   to_35c6baa2: إلى
   to_51406be9: إلى
   to_c4c44f4b: إلى
+  to_configure_an_openid_connect_provider_you_need_t_5c937249: |-
+      لتكوين مورد اتصال OpenID تحتاج لعناوين URL للمصادقة والتخويل، والحصول على معرف العميل وكلمة سر العميل.
+      
+      إذا كان المورد قادراً على تكوين عناوين URL صالحة لرد الاتصال أو إعادة التوجيه، استخدم %{callback_url}.
   to_link_the_course_observer_name_to_a_student_star_f993c826: "لربط مراقب الدورة *%{name}* مع طالب ما، قم بكتابة اسم الطالب للعثور عليه ثم انقر فوق تحديث."
   to_minscore_43e5452e: "إلى %{minScore}%"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "لعرض المهام، تأكد من أن طريقة عرض *جدول الأعمال* نشطة."
@@ -15017,6 +15135,7 @@ ar:
   unknown_content_type_ae6d08e8: "نوع المحتوى غير معروف"
   unknown_question_bank: "بنك الأسئلة غير معروف"
   unknown_quiz: "الاختبار غير معروف"
+  unknown_user_url_82196ba7: "عنوان URL لمستخدم غير معروف"
   unlock_date_cannot_be_after_due_date_8829d9ca: "لا يمكن أن يكون تاريخ إلغاء التأمين بعد تاريخ الاستحقاق"
   unlock_date_cannot_be_after_lock_date_591f7fda: "لا يمكن أن يكون تاريخ إلغاء التأمين بعد تاريخ التأمين"
   unlock_date_cannot_be_before_course_start_9c7b8524: "لا يمكن أن يكون تاريخ إلغاء التأمين قبل بدء المساق"
@@ -15123,6 +15242,8 @@ ar:
       update_login: "تحديث تسجيل الدخول"
     confirms: 
       delete_login: "هل ترغب بالتأكيد في حذف تسجيل الدخول، \"%{login}\"?"
+    error: 
+      unauthorized: "لا تملك الامتيازات الكافية للقيام بالتغيير المطلوب"
     notices: 
       cant_delete_last_login: "لا يمكنك حذف تسجيل الدخول الأخير لمستخدم"
       mfa_reset: "إعادة تعيين مصادقة متعددة العوامل"
@@ -15508,6 +15629,7 @@ ar:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE،‏ WebCT 6+ المساق"
   webct_name: "Blackboard Vista/CE (WebCT)"
+  welcome_to_your_courses_to_customize_the_list_of_c_2922a551: "مرحباً في مساقاتك! لتخصيص قائمة المساقات، انقر فوق ارتباط \"جميع المساقات\" وضع نجمة فوق المساقات التي تريد عرضها."
   well_below_mastery_37664bdc: "أقل بكثير من الإتقان"
   what_should_the_csv_file_look_like_985a59ac: "ما الشكل الذي يجب أن يكون عليه ملف CSV؟"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "عندما يزور الأشخاص المساق، هذه هي الصفحة التي سيرونها. يمكنك إعدادها لتعرض تدفق النشاط أو قائمة وحدات المساق أو المناهج أو صفحة مخصصة تكتبها بنفسك. الإعداد الافتراضي هو تدفق نشاط المساق."
@@ -15685,6 +15807,7 @@ ar:
   you_are_unsubscribed_and_will_not_be_notified_of_n_bf4b96a2: "أنت غير مشترك ولن يتم إعلامك بالتعليقات الجديدة. انقر للاشتراك"
   you_can_disable_this_feature_d5e61373: "يمكنك تعطيل هذه الميزة"
   you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: "يمكنك إخفاء مهام المساق أو إظهارها من خلال تبديل إظهارها أو إخفائها."
+  you_can_log_in_directly_with_this_provider_by_goin_467d7f66: "يمكنك تسجيل الدخول مع ذلك المورد بالذهاب إلى %{url}"
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "يمكنك الآن تعيين خيارات إعادة التقييم للطلاب الذين حلوا الاختبار بالفعل."
   you_can_try_to_log_in_again_2b23ef0f: "يمكنك محاولة *تسجيل الدخول مرة أخرى*."
   you_have_changed_the_progression_requirements_for__6772bc89: "لقد قمت بتغيير متطلبات التقدم لمساق نشط. من المحتمل وجود طلاب تقدموا بالفعل إلى هذه الوحدة وإلى وحدات أخرى تعتمد عليها."
@@ -15700,6 +15823,30 @@ ar:
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "يجب تحديد مساق لنسخ المحتوى منه"
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "يتعين التعيين على رقم أكبر من أو يساوي %{min}"
   you_must_specify_a_usage_right_5eb57f87: "يتعين عليك تعيين حقوق الاستخدام."
+  you_will_need_to_create_a_new_app_on_facebook_face_8fe85297: |-
+      سوف تحتاج لإنشاء [تطبيق جديد على Facebook](%{facebook_url})، وتمكين تسجيل دخول عميل OAuth
+      في الإعدادات المتقدمة. عليك بتكوين %{callback_url} كعنوان URL الصالح لإعادة توجيه OAuth.
+      بعد حفظ تطبيقك، قم بتدوين معرف التطبيق وكلمة سر التطبيق، ثم أدخلهما هنا.
+  you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
+      سوف تحتاج لإنشاء تطبيق ويب في [وحدة تحكم مطوّري Google](%{google_url}).
+      عليك بإضافة %{callback_url} كعنوان URL لإعادة التوجيه.
+      بعد إنشاء التطبيق، قم بتدوين معرف العميل وكلمة سر العميل، ثم أدخلهما هنا.
+  you_will_need_to_register_an_application_on_github_3c8f213a: |-
+      سوف تحتاج لـ [تسجيل تطبيق على GitHub](%{github_url}).
+      عليك بتكوين %{callback_url} كعنوان URL لرد إتصال التخويل.
+      بعد إنشاء التطبيق، قم بتدوين معرف العميل وكلمة سر العميل، ثم أدخلهما هنا.
+  you_will_need_to_register_an_application_on_linked_26ecb18d: |-
+      سوف تحتاج لـ [تسجيل تطبيق على LinkedIn](%{linkedin_url}).
+      عليك بإضافة %{callback_url} كعنوان URL لإعادة توجيه OAuth 2.0 مخوّل له، وتعيين حالة التطبيق على "مباشر".
+      بعد إنشاء التطبيق، قم بتدوين معرف العميل وكلمة سر العميل، ثم أدخلهما هنا.
+  you_will_need_to_register_an_application_on_twitte_5ff04bee: |-
+      سوف تحتاج لـ [تسجيل تطبيق على Twitter](%{twitter_url}).
+      عليك بتكوين %{callback_url} كعنوان URL لرد الاتصال.
+      بعد إنشاء التطبيق، قم بتدوين مفتاح العميل وكلمة سر العميل، ثم أدخلهما هنا.
+  you_will_need_to_register_an_application_on_twitte_95e7b621: |-
+      سوف تحتاج لـ [تسجيل تطبيق على Twitter](%{twitter_url}).
+      عليك بتكوين %{callback_url} كعنوان URL لرد الاتصال، ثم تعيين مستوى الوصول على "قراءة" و "كتابة" و "وصول" إلى الرسائل المباشرة.
+      بعد إنشاء التطبيق، قم بتدوين مفتاح العميل وكلمة سر العميل، ثم أدخلهما هنا.
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "يمكن الآن العثور على قائمة المهام الخاصة بك في صفحة *التقويم*."
   your_assignments_list_has_improved_3eded80e: "تم تحسين قائمة *المهام* الخاصة بك!"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: "ستظهر المهام الخاصة بك هنا معروضة حسب التاريخ."
