@@ -10,7 +10,8 @@ define [
       $dialog = $(this)
       $buttons = $dialog.find(".button-container:last .btn, button[type=submit]")
       if $buttons.length
-        $dialog.find(".button-container:last, button[type=submit]").hide()
+        # position hack for safari to still see the submit buttons
+        $dialog.find(".button-container:last, button[type=submit]").css({position:"absolute",left:"-9999px"})
         buttons = $.map $buttons.toArray(), (button) ->
           $button = $(button)
           classes = $button.attr('class') ? ''
