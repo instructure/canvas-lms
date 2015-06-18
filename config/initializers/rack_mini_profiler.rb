@@ -1,5 +1,8 @@
 require 'rack-mini-profiler'
-require 'flamegraph'
+
+# only load the flamegraph gem and its dependencies if we use it, since it is
+# rare to use.
+autoload :Flamegraph, 'flamegraph'
 
 Permissions.register :app_profiling,
   :label => lambda { I18n.t('#role_override.permissions.app_profiling', "Application Profiling") },
