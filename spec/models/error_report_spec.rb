@@ -53,6 +53,12 @@ describe ErrorReport do
     described_class.log_exception_from_canvas_errors('my error', data)
   end
 
+  it "uses an empty hash as a default for errors with no extra data" do
+    data = { tags: { a: "b" } }
+    expect { described_class.log_exception_from_canvas_errors('my error', data) }.
+      to_not raise_error
+  end
+
   it "should return categories" do
     expect(ErrorReport.categories).to eq []
     ErrorReport.create! { |r| r.category = 'bob' }
