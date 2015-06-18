@@ -26,6 +26,7 @@ class Course < ActiveRecord::Base
   include HtmlTextHelper
   include TimeZoneHelper
   include ContentLicenses
+  include TurnitinID
 
   attr_accessor :teacher_names
   attr_writer :student_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :invitation
@@ -1790,14 +1791,6 @@ class Course < ActiveRecord::Base
 
   def turnitin_enabled?
     !!self.turnitin_settings
-  end
-
-  def generate_turnitin_id!
-    # the reason we don't just use the global_id all the time is so that the
-    # turnitin_id is preserved when shard splits/etc. occur
-    unless turnitin_id
-      update_attribute(:turnitin_id, global_id)
-    end
   end
 
   def self.migrate_content_links(html, from_context, to_context, supported_types=nil, user_to_check_for_permission=nil)
