@@ -615,8 +615,10 @@ class WikiPagesApiController < ApplicationController
     # we want to be able to disable it on a per-user basis, it
     # needs to be moved to the controller where we know who is
     # editing it.
-    unless BeyondZConfiguration.unrestricted_html_users.include?(current_user.id)
-      page_params[:body] = Sanitize.clean(page_params[:body], CanvasSanitize::SANITIZE)
+    if page_params.include?(:body)
+      unless BeyondZConfiguration.unrestricted_html_users.include?(current_user.id)
+        page_params[:body] = Sanitize.clean(page_params[:body], CanvasSanitize::SANITIZE)
+      end
     end
 
     page_params

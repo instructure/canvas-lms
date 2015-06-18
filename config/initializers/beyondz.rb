@@ -18,6 +18,10 @@ class BeyondZConfiguration
     @config[:bitly_access_token]
   end
 
+  # This returns an array of user IDs who are allowed to post anything to the html
+  # boxes - including scripts and anything else that would normally be filtered out.
+  #
+  # Should only be trusted admin editors who need to add custom interactivity, etc.
   def self.unrestricted_html_users
     @config[:unrestricted_html_users]
   end
