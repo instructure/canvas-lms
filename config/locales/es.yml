@@ -2457,7 +2457,7 @@ es:
       links: 
         more_options: "Más opciones"
       location: "Ubicación:"
-      timespan_separator: para
+      timespan_separator: hasta
       title: "Título:"
     edit_calendar_event_full: 
       buttons: 
@@ -14330,7 +14330,7 @@ es:
     view_in_separate_window: "Ver en una ventana separada"
   to_35c6baa2: a
   to_51406be9: A
-  to_c4c44f4b: para
+  to_c4c44f4b: hasta
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Para conectar a un observador del curso *%{name}* a un estudiante, comience a escribir el nombre del estudiantes más abajo para encontrarle y luego haga clic en Actualizar."
   to_minscore_43e5452e: "a %{minScore}%"
   to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "Para ver las tareas, asegúrese de que esté activa la vista *Agenda*."
