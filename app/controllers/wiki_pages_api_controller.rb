@@ -610,6 +610,17 @@ class WikiPagesApiController < ApplicationController
 
     page_params[:user_id] = @current_user.id if @current_user
     page_params[:body] = process_incoming_html_content(page_params[:body]) if page_params.include?(:body)
+
+    # The sanitize used to be done in the model, but since
+    # we want to be able to disable it on a per-user basis, it
+    # needs to be moved to the controller where we know who is
+    # editing it.
+    if page_params.include?(:body)
+      unless BeyondZConfiguration.unrestricted_html_users.include?(current_user.id)
+        page_params[:body] = Sanitize.clean(page_params[:body], CanvasSanitize::SANITIZE)
+      end
+    end
+
     page_params
   end
 
