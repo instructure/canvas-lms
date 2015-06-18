@@ -350,4 +350,16 @@ describe Turnitin::Client do
       expect(@course.turnitin_id).to eql @course.global_id
     end
   end
+
+  describe '#id' do
+    it "uses turnitin_id when defined" do
+      turnitin = Turnitin::Client.new('blah', 'blah')
+      student_in_course active_all: true
+      assignment = @course.assignments.create!
+
+      expect(turnitin.id(@course)).to eql "course_#{@course.turnitin_id}"
+      expect(turnitin.id(assignment)).to eql "assignment_#{assignment.turnitin_id}"
+      expect(turnitin.id(@student)).to eql "user_#{@student.turnitin_id}"
+    end
+  end
 end

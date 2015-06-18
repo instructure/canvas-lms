@@ -62,6 +62,8 @@ module Turnitin
     def id(obj)
       if @testing
         "test_#{obj.asset_string}"
+      elsif obj.respond_to?(:turnitin_id)
+        obj.turnitin_asset_string
       else
         "#{account_id}_#{obj.asset_string}"
       end
@@ -72,9 +74,7 @@ module Turnitin
       email = if item.is_a?(User)
                 item.email
               elsif item.respond_to?(:turnitin_id)
-                item.generate_turnitin_id!
-                item_type = item.class.reflection_type_name
-                "#{item_type}_#{item.turnitin_id}@null.instructure.example.com"
+                "#{item.turnitin_asset_string}@null.instructure.example.com"
               end
       email ||= "#{item.asset_string}@null.instructure.example.com"
     end

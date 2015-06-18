@@ -32,6 +32,7 @@ class Assignment < ActiveRecord::Base
   include DatesOverridable
   include SearchTermHelper
   include Canvas::DraftStateValidations
+  include TurnitinID
 
   attr_accessible :title, :name, :description, :due_at, :points_possible,
     :grading_type, :submission_types, :assignment_group, :unlock_at, :lock_at,
