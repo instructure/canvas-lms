@@ -514,7 +514,7 @@ class ApplicationController < ActionController::Base
         end
 
         if @context && @context.respond_to?(:short_name)
-          crumb_url = named_context_url(@context, :context_url) if @context.grants_right?(@current_user, :read)
+          crumb_url = named_context_url(@context, :context_url) if @context.grants_right?(@current_user, session, :read)
           add_crumb(@context.short_name, crumb_url)
         end
 

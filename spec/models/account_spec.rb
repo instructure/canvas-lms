@@ -473,6 +473,7 @@ describe Account do
       v[:account] = Account.find(account)
     end
     RoleOverride.clear_cached_contexts
+    AdheresToPolicy::Cache.clear
     hash.each do |k, v|
       account = v[:account]
       expect(account.check_policy(hash[:site_admin][:admin])).to match_array full_access + (k == :site_admin ? [:read_global_outcomes] : [])
@@ -826,6 +827,7 @@ describe Account do
       expect(Account.default.grants_right?(@user, :read_sis)).to be_falsey
       @course = Account.default.courses.create!
       @course.enroll_teacher(@user).accept!
+      AdheresToPolicy::Cache.clear
       expect(Account.default.grants_right?(@user, :read_sis)).to be_truthy
     end
 

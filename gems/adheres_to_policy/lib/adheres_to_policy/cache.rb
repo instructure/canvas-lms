@@ -37,7 +37,8 @@ module AdheresToPolicy
     def self.fetch(key)
       return yield unless key
 
-      unless value = self.read(key)
+      value = self.read(key)
+      if value.nil?
         if block_given?
           value = yield
           self.write(key, value)
