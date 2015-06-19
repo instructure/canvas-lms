@@ -2010,7 +2010,15 @@ class User < ActiveRecord::Base
       # normal policy checking and somewhat duplicating auth logic here. which
       # is a shame. it'd be really nice to add support to our policy framework
       # for understanding how to load associations based on policies.
-      self.courses.includes(:active_groups).select { |c| c.grants_right?(self, :manage_groups) }.each { |c| context_groups += c.active_groups }
+
+      # :manage_groups is only available for admin enrollments
+      admin_enrolls = self.enrollments.current.of_admin_type
+      group_admin_courses = self.courses_for_enrollments(admin_enrolls).includes(:active_groups).select do |c|
+        c.active_groups.any? && c.grants_right?(self, :manage_groups)
+      end
+      group_admin_courses.each do |c|
+        context_groups += c.active_groups
+      end
       self.courses + (self.groups.active + context_groups).uniq
     end
   end
