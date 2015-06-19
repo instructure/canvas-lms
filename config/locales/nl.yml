@@ -2002,7 +2002,7 @@ nl:
         from_external_tool: "Een hulpprogramma uit de onderstaande lijst selecteren om een bron vanuit deze tool te laden en in te leveren."
         google_docs: "Het bestand uit de onderstaande lijst selecteren."
         media_recording: "De onderstaande link gebruiken om jouw inzending vast te leggen. Klikken op \"Opslaan\" wanneer je klaar bent en wilt inleveren."
-        online_text_entry: "Jouw inzending kopieëren en plakken of hier rechts typen."
+        online_text_entry: "Jouw uitwerking vanuit een tekstverwerker hierin kopiëren en plakken, of hieronder rechtstreeks uitwerken."
         online_url: "De link naar de door jouw gewenste website kopieëren en plakken om deze opdracht in te leveren."
       invalid_google_docs_domain: "Ongeldig domein"
       labels: 
