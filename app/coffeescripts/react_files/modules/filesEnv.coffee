@@ -4,8 +4,11 @@ define [
 ], (Folder, splitAssetString) ->
 
   fileContexts = ENV.FILES_CONTEXTS or []
+  newFolderTree = ENV.NEW_FOLDER_TREE
+  newFolderTree = false if newFolderTree == undefined
 
   filesEnv =
+    newFolderTree: newFolderTree
     contexts: fileContexts
 
     contextsDictionary: fileContexts.reduce (dict, context)  ->
