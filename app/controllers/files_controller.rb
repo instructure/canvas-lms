@@ -525,6 +525,9 @@ class FilesController < ApplicationController
           @headers = false
           @show_left_side = false
         end
+        if attachment.content_type && attachment.content_type.match(/\Avideo\/|audio\//)
+          attachment.context_module_action(@current_user, :read)
+        end
         format.html { render :show }
       end
       format.json do

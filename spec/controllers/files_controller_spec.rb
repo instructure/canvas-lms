@@ -393,6 +393,14 @@ describe FilesController do
         expect(@module.evaluate_for(@student).state).to eql(:completed)
       end
 
+      it "should mark media files viewed when rendering html with file_preview" do
+        @file = attachment_model(:context => @course, :uploaded_data => stub_file_data('test.m4v', 'asdf', 'video/mp4'))
+        file_in_a_module
+        get 'show', :course_id => @course.id, :id => @file.id, :format => :html
+        @module.reload
+        expect(@module.evaluate_for(@student).state).to eql(:completed)
+      end
+
       it "should redirect to the user's files URL when browsing to an attachment with the same path as a deleted attachment" do
         owned_file = course_file
         owned_file.display_name = 'holla'
