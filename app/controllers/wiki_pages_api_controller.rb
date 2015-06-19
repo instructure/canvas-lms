@@ -616,7 +616,7 @@ class WikiPagesApiController < ApplicationController
     # needs to be moved to the controller where we know who is
     # editing it.
     if page_params.include?(:body)
-      unless BeyondZConfiguration.unrestricted_html_users.include?(current_user.id)
+      unless BeyondZConfiguration.unrestricted_html_users.include?(@current_user.id)
         page_params[:body] = Sanitize.clean(page_params[:body], CanvasSanitize::SANITIZE)
       end
     end
