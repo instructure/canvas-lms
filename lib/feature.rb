@@ -123,9 +123,8 @@ END
 This enables an updated navigation, new dashboard and a simpler, more modern look and feel.
 END
       applies_to: 'RootAccount',
-      state: 'hidden',
+      state: 'allowed',
       root_opt_in: true,
-      development: true,
       beta: true
     },
     'html5_first_videos' =>
