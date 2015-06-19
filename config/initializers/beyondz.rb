@@ -23,7 +23,7 @@ class BeyondZConfiguration
   #
   # Should only be trusted admin editors who need to add custom interactivity, etc.
   def self.unrestricted_html_users
-    @config[:unrestricted_html_users]
+    @config[:unrestricted_html_users].nil? ? [] : @config[:unrestricted_html_users]
   end
 
 end
