@@ -11,7 +11,6 @@ describe 'Global Navigation' do
 
     describe 'Courses Link' do
       it 'should show the courses tray upon clicking' do
-        pending 'https://gerrit.instructure.com/#/c/56046/9 needs merging first'
         get "/"
         f('#global_nav_courses_link').click
         wait_for_ajaximations
