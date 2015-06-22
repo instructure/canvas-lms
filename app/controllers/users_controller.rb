@@ -1144,6 +1144,9 @@ class UsersController < ApplicationController
   #   Otherwise, the user must respond to a confirmation message to confirm the
   #   channel.
   #
+  #   If this is true, it is recommended to set <tt>"pseudonym[send_confirmation]"</tt> to true as well.
+  #   Otherwise, the user will not receive any messages about their account creation.
+  #
   # @argument force_validations [Boolean]
   #   If true, validations are performed on the newly created user (and their associated pseudonym)
   #   even if the request is made by a privileged user like an admin. When set to false,
