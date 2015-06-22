@@ -357,9 +357,11 @@ class ContextModuleProgression < ActiveRecord::Base
     end
 
     # invalidate all, then re-evaluate each
-    progressions.each(&:mark_as_outdated!)
-    progressions.each do |progression|
-      progression.send_later_if_production(:evaluate!, self)
+    Shackles.activate(:master) do
+      progressions.each(&:mark_as_outdated!)
+      progressions.each do |progression|
+        progression.send_later_if_production(:evaluate!, self)
+      end
     end
   end
   private :trigger_reevaluation_of_dependent_progressions
