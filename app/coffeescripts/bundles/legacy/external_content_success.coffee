@@ -8,9 +8,9 @@ require [
 
   dataReady = (data) ->
     if parentWindow[callback] and parentWindow[callback].ready
-      event = jQuery.Event( "externalContentReady" )
-      event.contentItems = data
-      parentWindow.$(parentWindow).trigger "externalContentReady", event
+      e = jQuery.Event( "externalContentReady" )
+      e.contentItems = data
+      parentWindow.$(parentWindow).trigger "externalContentReady", e
       parentWindow[callback].ready data
       setTimeout (->
         if callback == 'external_tool_dialog'
