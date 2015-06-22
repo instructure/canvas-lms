@@ -321,4 +321,9 @@ describe SIS::CSV::Import do
     end
   end
 
+  it "should not invalidly break up UTF-8 characters" do
+    process_csv_data_cleanly(
+      File.read(File.expand_path(File.dirname(__FILE__) + '/../../../fixtures/sis/utf8.csv'))
+    )
+  end
 end
