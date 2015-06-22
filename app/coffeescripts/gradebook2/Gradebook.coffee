@@ -68,8 +68,6 @@ define [
         min: 95
         max: 110
 
-    DISPLAY_PRECISION = 2
-
     hasSections: $.Deferred()
     allSubmissionsLoaded: $.Deferred()
 
@@ -654,8 +652,8 @@ define [
         letterGrade = GradeCalculator.letter_grade(@options.grading_standard, percentage)
 
       templateOpts =
-        score: round(val.score, DISPLAY_PRECISION)
-        possible: round(val.possible, DISPLAY_PRECISION)
+        score: round(val.score, round.DEFAULT)
+        possible: round(val.possible, round.DEFAULT)
         letterGrade: letterGrade
         percentage: percentage
       if columnDef.type == 'total_grade'
@@ -671,7 +669,7 @@ define [
 
     calculateAndRoundGroupTotalScore: (score, possible_points) ->
       grade = (score / possible_points) * 100
-      round(grade, DISPLAY_PRECISION)
+      round(grade, round.DEFAULT)
 
     calculateStudentGrade: (student) =>
       if student.loaded

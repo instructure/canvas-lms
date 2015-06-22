@@ -89,7 +89,7 @@ define([
       if (possible === 0 || isNaN(score)) {
         grade = "N/A"
       } else {
-        grade = Math.round((score / possible) * 1000) / 10;
+        grade = round((score / possible)*100, round.DEFAULT);
       }
       return grade;
     };
@@ -102,13 +102,13 @@ define([
         calculateGrade(groupGradeInfo.score, groupGradeInfo.possible) + "%"
       );
       $groupRow.find('.score_teaser').text(
-        round(groupGradeInfo.score, 2) + ' / ' + round(groupGradeInfo.possible, 2)
+        round(groupGradeInfo.score, round.DEFAULT) + ' / ' + round(groupGradeInfo.possible, round.DEFAULT)
       );
     }
 
     var finalScore = calculatedGrades[currentOrFinal].score;
     var finalPossible = calculatedGrades[currentOrFinal].possible;
-    var scoreAsPoints = round(finalScore, 2) + ' / ' + round(finalPossible, 2);
+    var scoreAsPoints = round(finalScore, round.DEFAULT) + ' / ' + round(finalPossible, round.DEFAULT);
     var scoreAsPercent = calculateGrade(finalScore, finalPossible);
 
     var finalGrade = scoreAsPercent + "%";
@@ -202,7 +202,7 @@ define([
       if (isNaN(val)) { val = null; }
       if (!val && val !== 0) { val = originalVal; }
       isChanged = (originalVal != val);
-      if (val || val === 0) { val = round(val, 2); }
+      if (val || val === 0) { val = round(val, round.DEFAULT); }
       if (val == parseInt(val, 10)) {
         val = val + '.0';
       }
