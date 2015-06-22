@@ -1553,85 +1553,14 @@ describe User do
   end
 
   describe "sis_pseudonym_for" do
-    let_once(:course1) { course :active_all => true, :account => Account.default }
-    let_once(:course2) { course :active_all => true, :account => account2 }
-    let_once(:account1) { account_model }
-    let_once(:account2) { account_model }
-    let_once(:u) { User.create! }
-
-    it "should return active pseudonyms only" do
-      u.pseudonyms.create!(:account => Account.default, :unique_id => "user2@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf") {|x| x.workflow_state = 'deleted'; x.sis_user_id = "user2" }
-      expect(u.sis_pseudonym_for(course1)).to be_nil
-      @p = u.pseudonyms.create!(:account => Account.default, :unique_id => "user1@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf") {|x| x.workflow_state = 'active'; x.sis_user_id = "user1" }
-      expect(u.sis_pseudonym_for(course1)).to eq @p
-    end
-
-    it "should return pseudonyms in the right account" do
-      other_account = account_model
-      u.pseudonyms.create!(:account => other_account, :unique_id => "user1@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf") {|x| x.workflow_state = 'active'; x.sis_user_id = "user1" }
-      expect(u.sis_pseudonym_for(course1)).to be_nil
-      @p = u.pseudonyms.create!(:account => Account.default, :unique_id => "user2@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf") {|x| x.workflow_state = 'active'; x.sis_user_id = "user2" }
-      expect(u.sis_pseudonym_for(course1)).to eq @p
-    end
-
-    it "should return pseudonyms with a sis id only" do
-      u.pseudonyms.create!(:account => Account.default, :unique_id => "user1@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf") {|x| x.workflow_state = 'active' }
-      expect(u.sis_pseudonym_for(course1)).to be_nil
-      @p = u.pseudonyms.create!(:account => Account.default, :unique_id => "user2@example.com", :password => "asdfasdf", :password_confirmation => "asdfasdf") {|x| x.workflow_state = 'active'; x.sis_user_id = "user2" }
-      expect(u.sis_pseudonym_for(course1)).to eq @p
-    end
-
     it "should find the right root account for a course" do
-      p = account2.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
-      expect(u.sis_pseudonym_for(course2)).to eq p
-    end
-
-    it "should find the right root account for a group" do
-      @group = group :group_context => course2
-      p = account2.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
-      expect(u.sis_pseudonym_for(@group)).to eq p
-    end
-
-    it "should find the right root account for a non-root-account" do
-      @root_account = account1
-      @account = @root_account.sub_accounts.create!
-      p = @root_account.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
-      expect(u.sis_pseudonym_for(@account)).to eq p
-    end
-
-    it "should find the right root account for a root account" do
-      p = account1.pseudonyms.create!(:user => u, :unique_id => 'user') { |p| p.sis_user_id = 'abc'}
-      expect(u.sis_pseudonym_for(account1)).to eq p
-    end
-
-    it "should bail if it can't find a root account" do
-      context = Course.new # some context that doesn't have an account
-      expect(lambda {u.sis_pseudonym_for(context)}).to raise_error("could not resolve root account")
-    end
-
-    it "should include a pseudonym from a trusted account" do
-      p = account2.pseudonyms.create!(user: u, unique_id: 'user') { |p| p.sis_user_id = 'abc' }
-      account1.stubs(:trust_exists?).returns(true)
-      account1.stubs(:trusted_account_ids).returns([account2.id])
-      expect(u.sis_pseudonym_for(account1)).to be_nil
-      expect(u.sis_pseudonym_for(account1, true)).to eq p
-    end
-
-    context "sharding" do
-      specs_require_sharding
-
-      it "should find a pseudonym on a different shard" do
-        @shard1.activate do
-          @user = User.create!
-        end
-        @pseudonym = Account.default.pseudonyms.create!(:user => @user, :unique_id => 'user') { |p| p.sis_user_id = 'abc' }
-        @shard2.activate do
-          expect(@user.sis_pseudonym_for(Account.default)).to eq @pseudonym
-        end
-        @shard1.activate do
-          expect(@user.sis_pseudonym_for(Account.default)).to eq @pseudonym
-        end
+      account = account_model
+      user = User.create!
+      account_course = course(active_all: true, account: account)
+      pseudonym = account.pseudonyms.create!(user: user, unique_id: 'user') do |p|
+        p.sis_user_id = 'abc'
       end
+      expect(user.sis_pseudonym_for(account_course, false, true)).to eq(pseudonym)
     end
   end
 
@@ -1694,7 +1623,7 @@ describe User do
         expect do
           events = @user.upcoming_events(:end_at => 1.week.from_now)
         end.to_not raise_error
-        
+
         expect(events.first).to eq assignment2
         expect(events.second).to eq assignment
       end

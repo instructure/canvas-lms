@@ -44,7 +44,7 @@ class KalturaMediaFileHandler
 
     if send_sis_data_to_kaltura?
       if attachment.user && attachment.context.respond_to?(:root_account)
-        pseudonym = attachment.user.sis_pseudonym_for(attachment.context)
+        pseudonym = SisPseudonym.for(attachment.user, attachment.context)
         if pseudonym
           partner_data[:sis_user_id] = pseudonym.sis_user_id
         end

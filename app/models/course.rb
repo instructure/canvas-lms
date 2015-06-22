@@ -1368,7 +1368,7 @@ class Course < ActiveRecord::Base
     settings = Canvas::Plugin.find!('grade_export').settings
     format_settings = Course.valid_grade_export_types[settings[:format_type]]
     return false unless format_settings
-    return false if user.sis_pseudonym_for(self).nil? and format_settings[:requires_publishing_pseudonym]
+    return false if SisPseudonym.for(user, self).nil? && format_settings[:requires_publishing_pseudonym]
     return true
   end
 
@@ -1412,7 +1412,7 @@ class Course < ActiveRecord::Base
       raise "unknown format type: #{settings[:format_type]}" unless format_settings
       raise "grade publishing requires a grading standard" if !self.grading_standard_enabled? && format_settings[:requires_grading_standard]
 
-      publishing_pseudonym = publishing_user.sis_pseudonym_for(self)
+      publishing_pseudonym = SisPseudonym.for(publishing_user, self)
       raise "publishing disallowed for this publishing user" if publishing_pseudonym.nil? and format_settings[:requires_publishing_pseudonym]
 
       callback = Course.valid_grade_export_types[settings[:format_type]][:callback]
@@ -1624,7 +1624,7 @@ class Course < ActiveRecord::Base
           end
           row = [student.send(name_method), student.id]
           if options[:include_sis_id]
-            pseudonym = student.sis_pseudonym_for(self.root_account, include_root_account)
+            pseudonym = SisPseudonym.for(student, self, include_root_account)
             row << pseudonym.try(:sis_user_id)
             pseudonym ||= student.find_pseudonym_for_account(self.root_account, include_root_account)
             row << pseudonym.try(:unique_id)
