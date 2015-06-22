@@ -330,6 +330,16 @@ class Course < ActiveRecord::Base
     tags
   end
 
+  def sequential_module_item_ids
+    Rails.cache.fetch(['ordered_module_item_ids', self].cache_key) do
+      self.context_module_tags.not_deleted.joins(:context_module).
+        where("context_modules.workflow_state <> 'deleted'").
+        where("content_tags.content_type <> 'ContextModuleSubHeader'").
+        reorder("COALESCE(context_modules.position, 0), context_modules.id, content_tags.position NULLS LAST").
+        pluck(:id)
+    end
+  end
+
   def verify_unique_ids
     infer_root_account unless self.root_account_id
 
