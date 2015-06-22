@@ -376,11 +376,13 @@ class ActiveRecord::Base
       # If that extension isn't around, casting to a bytea sucks for international characters,
       # but at least it's consistent, and orders commas before letters so you don't end up with
       # Johnson, Bob sorting before Johns, Jimmy
-      @collkey ||= connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='collkey'").to_i
-      if @collkey == 0
-        "CAST(LOWER(replace(#{col}, '\\', '\\\\')) AS bytea)"
+      unless instance_variable_defined?(:@collkey)
+        @collkey = connection.extension_installed?(:pg_collkey)
+      end
+      if @collkey
+        "#{@collkey}.collkey(#{col}, '#{Canvas::ICU.locale_for_collation}', false, 0, true)"
       else
-        "collkey(#{col}, '#{Canvas::ICU.locale_for_collation}', false, 0, true)"
+        "CAST(LOWER(replace(#{col}, '\\', '\\\\')) AS bytea)"
       end
     else
       # Not yet optimized for other dbs (MySQL's default collation is case insensitive;
