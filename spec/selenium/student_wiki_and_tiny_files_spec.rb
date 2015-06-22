@@ -164,7 +164,9 @@ describe "Wiki pages and Tiny WYSIWYG editor Files" do
       @course.save!
 
       get "/courses/#{@course.id}/discussion_topics/new"
-      f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
+      images_link = f('#editor_tabs .ui-tabs-nav li:nth-child(2) a')
+      expect(images_link.text).to match(/Images/i) #files tab should be missingp
+      images_link.click
       wait_for_ajaximations
       expect(ff('.image_list img.img').count).to eq 0
     end
