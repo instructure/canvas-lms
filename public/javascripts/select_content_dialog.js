@@ -292,6 +292,10 @@ define([
               }
               $("#resource_selection_dialog iframe").attr('src', 'about:blank');
               $("#resource_selection_dialog").dialog('close');
+
+              if (item.placementAdvice.presentationDocumentTarget.toLowerCase() === 'window') {
+                document.querySelector('#external_tool_create_new_tab').checked = true
+              }
             });
         }
         $dialog.dialog('close')
