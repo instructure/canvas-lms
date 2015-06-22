@@ -1,35 +1,27 @@
 /** @jsx React.DOM */
 
 define([
+  'underscore',
+  'jquery',
   'i18n!new_nav',
   'react',
   'bower/react-tray/dist/react-tray',
-  'jsx/navigation_header/MenuItem',
   'jsx/navigation_header/trays/CoursesTray',
   'jsx/navigation_header/trays/GroupsTray',
   'jsx/navigation_header/trays/AccountsTray',
   'jsx/navigation_header/trays/ProfileTray',
   'jsx/shared/SVGWrapper',
-  'jquery'
-], (I18n, React, Tray, MenuItem, CoursesTray, GroupsTray, AccountsTray, ProfileTray, SVGWrapper, $) => {
+  'compiled/fn/preventDefault'
+], (_, $, I18n, React, Tray, CoursesTray, GroupsTray, AccountsTray, ProfileTray, SVGWrapper, preventDefault) => {
 
-  var EXTERNAL_TOOLS_REGEX = /^\/accounts\/[^\/]*\/(external_tools)/
-  var ACTIVE_ROUTE_REGEX = /^\/(courses|groups|accounts|grades|calendar|conversations|profile)/
+  var EXTERNAL_TOOLS_REGEX = /^\/accounts\/[^\/]*\/(external_tools)/;
+  var ACTIVE_ROUTE_REGEX = /^\/(courses|groups|accounts|grades|calendar|conversations|profile)/;
+  var ACTIVE_CLASS = 'ic-app-header__menu-list-item--active';
 
   var Navigation = React.createClass({
-    propTypes: {
-      current_user: React.PropTypes.object.isRequired,
-      buttonsToShow: React.PropTypes.object.isRequired
-    },
+    displayName: 'Navigation',
 
-    getDefaultProps() {
-      return {
-        current_user: null,
-        buttonsToShow: null
-      };
-    },
-
-    getInitialState() {
+    getInitialState () {
       return {
         groups: [],
         accounts: [],
@@ -37,60 +29,88 @@ define([
         unread_count: 0,
         isTrayOpen: false,
         type: null,
-        activeItem: null,
-        userLoggedIn: this.props.current_user && this.props.current_user.id
+        coursesAreLoaded: false,
+        accountsAreLoaded: false,
+        groupsAreLoaded: false
       };
     },
 
-    componentWillMount() {
-      this.determineActiveLink();
-      if (this.state.userLoggedIn) {
-        $.get('/api/v1/conversations/unread_count', (data) => {
-          this.setState({
-            unread_count: parseInt(data.unread_count, 10)
+    componentWillMount () {
+
+      /**
+       * Mount up stuff to our existing DOM elements, yes, it's not very
+       * React-y, but it is workable and maintainable, plus it doesn't require
+       * us to trash what Rails has already rendered.
+       */
+
+      //////////////////////////////////
+      /// Hover Events
+      //////////////////////////////////
+
+      _.forEach({
+        courses: '/api/v1/users/self/favorites/courses',
+        groups: '/api/v1/users/self/groups',
+        accounts: '/api/v1/accounts'
+      }, (url, type) => {
+        $(`#global_nav_${type}_link`).one('mouseover', () => {
+          $.get(url, (data) => {
+            var newState = {};
+            newState[type] = data;
+            this.setState(newState);
           });
         });
+      });
+
+      //////////////////////////////////
+      /// Click Events
+      //////////////////////////////////
+
+      ['courses', 'groups', 'accounts', 'profile'].forEach((type) => {
+        $(`#global_nav_${type}_link`).on('click', preventDefault(this.handleMenuClick.bind(this, type)));
+      });
+
+      //////////////////////////////////
+      /// Other Events
+      //////////////////////////////////
+      if (window.ENV.current_user_id) {
+        // Put this in a function so we can call it on an interval to do some
+        // polling.
+        var updateCount = () => {
+          $.ajax({
+            url: '/api/v1/conversations/unread_count',
+            type: 'GET',
+            success: (data) => {
+              var parsedInt = parseInt(data.unread_count, 10);
+              var $countContainer = $('#global_nav_conversations_link').find('.menu-item__badge');
+              $countContainer.text(parsedInt);
+              $countContainer.toggle(parsedInt > 0);
+            },
+            error: (data) => {
+              // Failure case, should never get here.
+              console.log(data);
+            }
+          });
+        };
+        setInterval(updateCount, 30000); // 30 seconds
+        updateCount();
+      }
+    },
+
+    componentWillUpdate (newProps, newState) {
+      if (newState.activeItem !== this.state.activeItem) {
+        $('.' + ACTIVE_CLASS).removeClass(ACTIVE_CLASS);
+        $('#global_nav_' + newState.activeItem + '_link').closest('li').addClass(ACTIVE_CLASS);
       }
     },
 
     determineActiveLink () {
       var path = window.location.pathname;
       var matchData = path.match(EXTERNAL_TOOLS_REGEX) || path.match(ACTIVE_ROUTE_REGEX);
-      var activeItem = matchData && matchData[1]
+      var activeItem = matchData && matchData[1];
       this.setState({activeItem});
     },
 
-    handleHover(type) {
-      if (type === 'courses' && !this.coursesLoaded) {
-        this.coursesLoaded = true
-        $.get('/api/v1/users/self/favorites/courses', (data) => {
-          this.setState({
-            courses: data
-          });
-        });
-      }
-
-      if (type === 'groups' && !this.groupsLoaded) {
-        this.groupsLoaded = true
-        $.get('/api/v1/users/self/groups', (data) => {
-          this.setState({
-            groups: data
-          });
-        });
-      }
-
-      if (type === 'accounts' && !this.accountsLoaded) {
-        this.accountsLoaded = true
-        $.get('/api/v1/accounts', (data) => {
-          this.setState({
-            accounts: data
-          });
-        });
-      }
-
-    },
-
-    handleMenuClick(type) {
+    handleMenuClick (type) {
       if (this.state.isTrayOpen && (this.state.activeItem === type)) {
         this.closeTray();
       } else if (this.state.isTrayOpen && (this.state.activeItem !== type)) {
@@ -100,18 +120,7 @@ define([
       }
     },
 
-    handleMenuKeyPress(type) {
-      if (this.state.isTrayOpen && this.state.activeItem === type) {
-        this.closeTray();
-      } else if (this.state.isTrayOpen && this.state.activeItem !== type) {
-        this.closeTray();
-        this.openTray(type);
-      } else {
-        this.openTray(type);
-      }
-    },
-
-    openTray(type) {
+    openTray (type) {
       this.setState({
         type: type,
         isTrayOpen: true,
@@ -119,11 +128,11 @@ define([
       });
     },
 
-    closeTray() {
+    closeTray () {
+      this.determineActiveLink();
       this.setState({
         isTrayOpen: false
       }, function () {
-        this.determineActiveLink();
         setTimeout(() => {
           this.setState({
             type: null
@@ -132,8 +141,8 @@ define([
       });
     },
 
-    renderTrayContent() {
-      switch(this.state.type) {
+    renderTrayContent () {
+      switch (this.state.type) {
         case 'courses':
           return <CoursesTray courses={this.state.courses} closeTray={this.closeTray} />;
         case 'groups':
@@ -147,94 +156,11 @@ define([
       }
     },
 
-    renderGlobalNavTools () {
-      var globalNavTools = window.ENV.GLOBAL_NAV_MENU_ITEMS;
-      if (globalNavTools) {
-        return globalNavTools.map((tool) => {
-          var icon = (tool.tool_data.context_external_tool.name === 'Commons') ? "/images/svg-icons/svg_commons_logo.svg" : ''
-          return (
-            <MenuItem id={`external_tool_${tool.tool_data.context_external_tool.id}`}
-                      href={tool.link} text={tool.tool_data.context_external_tool.name}
-                      icon={icon}
-                      isActive={this.state.activeItem === 'external_tools'} />
-          );
-        });
-      } else {
-        return null;
-      }
-    },
-
-    render() {
-      var { current_user } = this.props;
-      var { unread_count, groups } = this.state;
-
+    render () {
       return (
-        <ul role="menu" id="menu"
-            className="ic-app-header__menu-list"
-            aria-label={I18n.t('Main Navigation')}
-        >
           <Tray isOpen={this.state.isTrayOpen} onBlur={this.closeTray} closeTimeoutMS={400}>
             {this.renderTrayContent()}
           </Tray>
-          {!!this.props.buttonsToShow.hasCourses && (
-            <MenuItem id="courses_menu_item" href="/courses" text={I18n.t('Courses')}
-                    icon="/images/svg-icons/svg_icon_courses_new_styles.svg"
-                    haspopup={true}
-                    onHover={this.handleHover.bind(this, 'courses')}
-                    onClick={this.handleMenuClick.bind(this, 'courses')}
-                    onKeyPress={this.handleMenuKeyPress.bind(this, 'courses')}
-                    isActive={this.state.activeItem === 'courses'} />
-          )}
-
-          {!!this.props.buttonsToShow.hasGroups && (
-            <MenuItem id="groups_menu_item" href="/groups" text={I18n.t('Groups')}
-                    icon="/images/svg-icons/svg_icon_groups_new_styles.svg"
-                    onHover={this.handleHover.bind(this, 'groups')}
-                    onClick={this.handleMenuClick.bind(this, 'groups')}
-                    onKeyPress={this.handleMenuKeyPress.bind(this, 'groups')}
-                    isActive={this.state.activeItem === 'groups'} />
-          )}
-
-          {!!this.props.buttonsToShow.hasAccounts && (
-            <MenuItem id="accounts_menu_item" href="/accounts" text={I18n.t('Accounts')}
-                    icon="/images/svg-icons/svg_icon_accounts_new_styles.svg"
-                    onHover={this.handleHover.bind(this, 'accounts')}
-                    onClick={this.handleMenuClick.bind(this, 'accounts')}
-                    onKeyPress={this.handleMenuKeyPress.bind(this, 'accounts')}
-                    isActive={this.state.activeItem === 'accounts'} />
-          )}
-
-          <MenuItem id="grades_menu_item" href="/grades" text={I18n.t('Grades')}
-                    icon="/images/svg-icons/svg_icon_grades_new_styles.svg"
-                    isActive={this.state.activeItem === 'grades'} />
-
-          <MenuItem id="calendar_menu_item" href="/calendar" text={I18n.t('Calendar')}
-                    icon="/images/svg-icons/svg_icon_calendar_new_styles.svg"
-                    isActive={this.state.activeItem === 'calendar'} />
-
-          {!current_user.fake_student && (
-            <MenuItem id="inbox_menu_item" href="/conversations" text={I18n.t('Inbox')}
-                      icon="/images/svg-icons/svg_icon_inbox.svg"
-                      isActive={this.state.activeItem === 'conversations'}
-                      showBadge={!current_user.disabled_inbox} badgeCount={unread_count} />
-          )}
-
-          {this.renderGlobalNavTools()}
-
-          {!this.state.userLoggedIn && (
-            <MenuItem id="login_menu_item" href="/login" text={I18n.t('Login')}
-                      icon="/images/svg-icons/svg_icon_arrow_right.svg"
-                      isActive={false} />
-          )}
-
-          {this.state.userLoggedIn && (
-            <MenuItem id="profile_menu_item" href="/profile" text={I18n.t('Profile')}
-                      isActive={this.state.activeItem === 'profile'}
-                      onClick={this.handleMenuClick.bind(this, 'profile')}
-                      onKeyPress={this.handleMenuKeyPress.bind(this, 'profile')}
-                      avatar={current_user.avatar_image_url} />
-          )}
-        </ul>
       );
     }
   });

@@ -26,7 +26,7 @@ module AcademicBenchmark
     end
 
     if (permissionful_user = User.where(id: user_id).first)
-      Array.new(guid_or_guids).each do |guid|
+      Array(guid_or_guids).each do |guid|
         AcademicBenchmark.queue_migration_for_guid(guid, permissionful_user)
       end
     else

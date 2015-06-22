@@ -86,8 +86,12 @@ define [
     _titleActivated: ->
       @showPicker()
 
-    _dateFieldSelect: (data) ->
-      data = @_enterKeyData || data
+    _currentSelectedDate: ->
+      @$dateField.trigger('change')
+      @$dateField.data()
+
+    _dateFieldSelect: ->
+      data = @_enterKeyData || @_currentSelectedDate()
       @_triggerDate data.date unless data.invalid or data.blank
       @hidePicker()
 
@@ -111,7 +115,7 @@ define [
       if event.keyCode == 13 # enter
         # store current field data for later so we can tell the difference
         # between this and a mouse click
-        @_enterKeyData = @$dateField.data()
+        @_enterKeyData = @_currentSelectedDate()
       else
         @_flashDateSuggestion()
 
@@ -129,8 +133,8 @@ define [
         message = @messages.screenreader_date_suggestion(message)
         $.screenReaderFlashMessage(message)
 
-    _onPickerSelect: (selectedDateText) =>
-      @_dateFieldSelect @$dateField.data()
+    _onPickerSelect: =>
+      @_dateFieldSelect()
 
-    _onPickerClose: (selectedDateText) =>
+    _onPickerClose: =>
       @hidePicker()

@@ -19,18 +19,33 @@
 require 'spec_helper'
 
 describe GradingPeriod::CourseGradingPeriodFinder do
+  let(:now) { Time.zone.now }
+
   describe "#grading_periods" do
-    let(:grading_period_params) { { weight: 0, start_date: Time.now, end_date: 2.days.from_now } }
+    let(:grading_period_params) do
+      {
+        title:      'a period',
+        weight:     0,
+        start_date: now,
+        end_date:   2.days.from_now(now)
+      }
+    end
     let(:root_account) { Account.create! }
     let(:sub_account) { root_account.sub_accounts.create! }
     let(:course) { Course.create!(account: sub_account) }
 
-    let!(:course_grading_period) { course.grading_period_groups.create!
-                                         .grading_periods.create!(grading_period_params) }
-    let!(:root_account_grading_period) { root_account.grading_period_groups.create!
-                                                  .grading_periods.create!(grading_period_params) }
-    let!(:sub_account_grading_period) { sub_account.grading_period_groups.create!
-                                                  .grading_periods.create!(grading_period_params) }
+    let!(:course_grading_period) do
+      group = course.grading_period_groups.create!
+      group.grading_periods.create!(grading_period_params)
+    end
+    let!(:root_account_grading_period) do
+      group = root_account.grading_period_groups.create!
+      group.grading_periods.create!(grading_period_params)
+    end
+    let!(:sub_account_grading_period) do
+      group = sub_account.grading_period_groups.create!
+      group.grading_periods.create!(grading_period_params)
+    end
 
     it "finds grading periods for the course" do
       grading_periods = GradingPeriod::CourseGradingPeriodFinder.new(course).grading_periods

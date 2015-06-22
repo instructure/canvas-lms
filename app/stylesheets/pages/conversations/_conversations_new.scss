@@ -177,17 +177,25 @@
 }
 
 .search .ac {
-  float: left;
-  width: 250px;
   display: block;
+  @if $use_new_styles == false {
+    float: left;
+    width: 250px;
+  }
 
   .ac-input-box {
-    border-radius: 16px 0 0 16px;
     float: left;
-    width: 205px;
     min-height: 0;
     height: 38px;
-    padding: 7px 12px;
+    padding: 6px 12px;
+    @if $use_new_styles {
+      box-sizing: border-box;
+      width: 205px;
+    }
+    @else {
+      border-radius: 16px 0 0 16px;
+      width: 203px;
+    }
 
     .ac-placeholder {
       top: 0;
@@ -208,8 +216,8 @@
   }
 
   .btn {
-    border-radius: 0 16px 16px 0;
     float: left;
+    @if $use_new_styles == false { border-radius: 0 16px 16px 0; }
   }
 }
 
