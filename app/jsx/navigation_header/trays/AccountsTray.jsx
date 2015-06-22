@@ -28,7 +28,7 @@ define([
       return (
         <div>
           <div className="ReactTray__header">
-            <h1 className="ReactTray__headline">{I18n.t('Accounts')}</h1>
+            <h1 className="ReactTray__headline">{I18n.t('Admin')}</h1>
             <button className="Button Button--icon-action ReactTray__closeBtn" type="button" onClick={this.props.closeTray}>
               <i className="icon-x"></i>
               <span className="screenreader-only">{I18n.t('Close')}</span>

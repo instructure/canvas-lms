@@ -56,7 +56,7 @@
                     <%= render(:partial => "shared/svg/svg_icon_accounts_new_styles.svg") %>
                   </div>
                   <div class="menu-item__text">
-                    <%= t('Accounts') %>
+                    <%= t('Admin') %>
                   </div>
                 </a>
               </li>
@@ -100,11 +100,11 @@
               <a id="global_nav_profile_link" href="/profile" class="ic-app-header__menu-list-link">
                 <div class="menu-item-icon-container">
                   <div class="ic-avatar">
-                    <img src="<%= @current_user.try { |usr| avatar_image_attrs(usr).first } %>" />
+                    <img src="<%= @current_user.try { |usr| avatar_image_attrs(usr).first } %>" alt="<%= @current_user.short_name %>" />
                   </div>
                 </div>
                 <div class="menu-item__text">
-                  <%= t('Profile') %>
+                  <%= t('Account') %>
                 </div>
               </a>
             </li>
