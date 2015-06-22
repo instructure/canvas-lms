@@ -118,11 +118,9 @@ END
     },
     'use_new_styles' =>
     {
-      display_name: -> { I18n.t('features.new_styles', 'Use New Styles') },
-      description: -> { I18n.t('new_styles_description', <<-END) },
-We are working on a UI facelift to Canvas. Turn this on to opt-in to seeing the
-updated, simplified look and feel of the Canvas interface. This is a very "Work in progress"
-feature and should not be turned on in production for actual users yet.
+      display_name: -> { I18n.t('New UI') },
+      description: -> { I18n.t(<<END) },
+This enables an updated navigation, new dashboard and a simpler, more modern look and feel. 
 END
       applies_to: 'RootAccount',
       state: 'hidden',
