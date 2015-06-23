@@ -189,12 +189,6 @@ input.move-module-label-spacer {
   </div>
 <% end %>
 
-<% keyboard_navigation([
-   {:key => t('keycodes.next_module_item', 'Up'), :description => t('keycode_descriptions.next_module_item', 'Select next module or module item')},
-   {:key => t('keycodes.previous_module_item', 'Down'), :description => t('keycode_descriptions.previous_module_item', 'Select previous module or module item')},
-   {:key => t('keycodes.toggle_module_dragging', 'Space'), :description => t('keycode_descriptions.toggle_module_dragging', 'Select item to begin dragging, or drop previously selected item')}
-]) %>
-
 <div class="item-group-container" id="context_modules_sortable_container">
 
   <div id="no_context_modules_message" style="display:none; clear: both;">
@@ -504,39 +498,54 @@ TEXT
 <% content_for :keyboard_navigation do %>
   <ul class="navigation_list" tabindex="-1">
     <li>
-      <span class="keycode"><%= t('keycodes.next', %{j}) %></span>
+      <span class="keycode"><%= t('Up') %></span>
       <span class="colon">:</span>
-      <span class="description"><%= t('key.description.next', %{Next Module/Item}) %></span>
+      <span class="description"><%= t("Previous Module/Item") %></span>
     </li>
     <li>
-      <span class="keycode"><%= t('keycodes.previous', %{k}) %></span>
+      <span class="keycode"><%= t('Down') %></span>
       <span class="colon">:</span>
-      <span class="description"><%= t('key.description.previous', %{Previous Module/Item}) %></span>
+      <span class="description"><%= t("Next Module/Item") %></span>
     </li>
     <li>
-      <span class="keycode"><%= t('keycodes.edit', %{e}) %></span>
+      <span class="keycode"><%= t('Space') %></span>
       <span class="colon">:</span>
-      <span class="description"><%= t('key.description.edit', %{Edit Module/Item}) %></span>
+      <span class="description"><%= t("Move Module/Item") %></span>
     </li>
     <li>
-      <span class="keycode"><%= t('keycodes.delete', %{d}) %></span>
+      <span class="keycode"><%= t('k') %></span>
       <span class="colon">:</span>
-      <span class="description"><%= t('key.description.delete', %{Delete Current Module/Item}) %></span>
+      <span class="description"><%= t("Previous Module/Item") %></span>
     </li>
     <li>
-      <span class="keycode"><%= t('keycodes.indent', %{i}) %></span>
+      <span class="keycode"><%= t('j') %></span>
       <span class="colon">:</span>
-      <span class="description"><%= t('key.description.indent', %{Increase Indent}) %></span>
+      <span class="description"><%= t("Next Module/Item") %></span>
     </li>
     <li>
-      <span class="keycode"><%= t('keycodes.outdent', %{o}) %></span>
+      <span class="keycode"><%= t('e') %></span>
       <span class="colon">:</span>
-      <span class="description"><%= t('key.description.outdent', %{Decrease Indent}) %></span>
+      <span class="description"><%= t("Edit Module/Item") %></span>
     </li>
     <li>
-      <span class="keycode"><%= t('keycodes.new', %{n}) %></span>
+      <span class="keycode"><%= t('d') %></span>
       <span class="colon">:</span>
-      <span class="description"><%= t('key.description.new', %{New Module}) %></span>
+      <span class="description"><%= t("Delete Current Module/Item") %></span>
+    </li>
+    <li>
+      <span class="keycode"><%= t('i') %></span>
+      <span class="colon">:</span>
+      <span class="description"><%= t("Increase Indent") %></span>
+    </li>
+    <li>
+      <span class="keycode"><%= t('o') %></span>
+      <span class="colon">:</span>
+      <span class="description"><%= t("Decrease Indent") %></span>
+    </li>
+    <li>
+      <span class="keycode"><%= t('n') %></span>
+      <span class="colon">:</span>
+      <span class="description"><%= t("New Module") %></span>
     </li>
   </ul>
 <% end %>

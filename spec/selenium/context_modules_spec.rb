@@ -612,6 +612,85 @@ describe "context modules" do
         check_element_has_focus(first_handle)
 
       end
+
+      it "should use the keyboard shortcuts to navigate through modules and module items" do
+        # Test these shortcuts (access menu by pressing comma key):
+        # Up : Previous Module/Item
+        # Down : Next Module/Item
+        # Space : Move Module/Item
+        # k : Previous Module/Item
+        # j : Next Module/Item
+        # e : Edit Module/Item
+        # d : Delete Current Module/Item
+        # i : Increase Indent
+        # o : Decrease Indent
+        # n : New Module
+        
+        modules = create_modules(2, true)
+        modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
+        modules[0].add_item({:id => @assignment2.id, :type => 'assignment'})
+        modules[1].add_item({:id => @assignment3.id, :type => 'assignment'})
+        get "/courses/#{@course.id}/modules"
+        
+        context_modules = ff('.context_module .icon-drag-handle')
+        context_module_items = ff('.context_module_item a.title')
+
+        # Navigate through modules and module items
+        f('html').send_keys("j")
+        check_element_has_focus(context_modules[0])
+
+        context_modules[0].send_keys(:arrow_down)
+        check_element_has_focus(context_module_items[0])
+        
+        context_module_items[0].send_keys("j")
+        check_element_has_focus(context_module_items[1])
+
+        context_module_items[1].send_keys("k")
+        check_element_has_focus(context_module_items[0])
+
+        context_module_items[0].send_keys(:arrow_up)
+        check_element_has_focus(context_modules[0])
+        
+        # Test Edit key
+        wait_for_ajaximations(1000) # Has to wait one second before sending keys for it to work
+        context_modules[0].send_keys("e")
+        expect(f('#add_context_module_form')).to be_displayed
+        ff('.cancel_button', dialog_for(f('#add_context_module_form'))).last.click
+
+        # Test New Module key
+        wait_for_ajaximations(1000)
+        context_modules[0].send_keys("n")
+        expect(f('#add_context_module_form')).to be_displayed
+        ff('.cancel_button', dialog_for(f('#add_context_module_form'))).last.click
+
+        context_modules[0].send_keys(:arrow_down)
+        check_element_has_focus(context_module_items[0])
+
+        # Test Indent / Outdent
+        expect(ff('.context_module_item')[0]).to have_class('indent_0')
+
+        wait_for_ajaximations(1000) 
+        context_module_items[0].send_keys("i")
+        keep_trying_until do
+          expect(ff('.context_module_item')[0]).to have_class('indent_1')
+        end
+        
+        wait_for_ajaximations(1000)
+        ff('.context_module_item a.title')[0].send_keys("o")
+        keep_trying_until do
+          expect(ff('.context_module_item')[0]).to have_class('indent_0')
+        end
+
+        # Test Delete key
+        wait_for_ajaximations(1000)
+        new_first_module_item = ff('.context_module_item')[1]
+        ff('.context_module_item')[0].send_keys("d")
+        driver.switch_to.alert.accept
+        keep_trying_until do
+          expect(ff('.context_module_item')[0]).to eq(new_first_module_item)
+        end
+
+      end
     end
 
     context "multiple overridden due dates", :priority => "2" do

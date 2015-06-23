@@ -842,8 +842,10 @@ define([
         }
       });
     });
-    $(".outdent_item_link,.indent_item_link").live('click', function(event) {
+    $(".outdent_item_link,.indent_item_link").live('click', function(event, elem, activeElem) {
       event.preventDefault();
+      var $elem = $(elem);
+      var elemID = ( $elem && $elem.attr('id') ) ? "#" + $elem.attr('id') : elem && "." + $elem.attr('class');
       var $cogLink = $(this).closest('.cog-menu-container').children('.al-trigger');
       var do_indent = $(this).hasClass('indent_item_link');
       var $item = $(this).parents(".context_module_item");
@@ -856,9 +858,20 @@ define([
         modules.addItemToModule($module, data.content_tag);
         $module.find(".context_module_items.ui-sortable").sortable('refresh');
         modules.updateAssignmentData();
-        $cogLink.focus();
+        
       }, function(data) {
-      });
+      }).done (function() {
+        if (elemID) {
+          setTimeout(function() {;
+            var $activeElemClass = "." + $(activeElem).attr('class').split(' ').join(".");
+            $(elemID).find($activeElemClass).focus();
+          }, 0);
+          
+        } else {
+          $cogLink.focus();
+        }
+      })
+        
     });
     $(".edit_item_link").live('click', function(event) {
       event.preventDefault();
@@ -875,7 +888,7 @@ define([
           $(this).find('input[type=text],textarea,select').first().focus();
         },
         close: function () {
-          $cogLink.focus();
+           $cogLink.focus();
         },
         minWidth: 320
       }).fixDialogButtons();
@@ -1390,62 +1403,115 @@ define([
       }
       $elem.find(":tabbable:first").focus();
     };
-    $(document).keycodes('j k', function(event) {
-      $currentElem = $(".context_module_hover:visible,.context_module_item_hover:visible").filter(":last");
-      if($currentElem.length === 0) {
-        $currentElem = $(".context_module:visible:first");
-        hover($currentElem);
-        return;
+
+    // This method will select the items passed in with the options object 
+    // and can be used to advance the focus or return to the previous module or module_item
+    // This will also return the element that is now in focus 
+    var selectItem = function (options) {
+      options = options || {};
+
+      if (!$currentElem) {
+        $elem = $('.context_module:first'); 
+      } else if($currentElem && $currentElem.hasClass('context_module')) {
+        $elem = options.selectWhenModuleFocused && options.selectWhenModuleFocused.item;
+        $elem = $elem.length ? $elem : (options.selectWhenModuleFocused && options.selectWhenModuleFocused.fallbackModule);
+      } else if ($currentElem && $currentElem.hasClass('context_module_item')) {
+        $elem = options.selectWhenModuleItemFocused && options.selectWhenModuleItemFocused.item;
+        $elem = $elem.length ? $elem : (options.selectWhenModuleItemFocused && options.selectWhenModuleItemFocused.fallbackModule);
       }
-      var method = "prev";
-      var $elem = null;
-      if(event.keyString == 'j') {
-        if($currentElem.hasClass('context_module')) {
-          $elem = $currentElem.find(".context_module_item:visible:first");
-          if($elem.length === 0) {
-            $elem = $currentElem.next(".context_module");
-          }
-        } else if($currentElem.hasClass('context_module_item')) {
-          $elem = $currentElem.next(".context_module_item:visible");
-          if($elem.length === 0) {
-            $elem = $currentElem.parents(".context_module").next(".context_module");
-          }
-        }
-      } else if(event.keyString == 'k') {
-        if($currentElem.hasClass('context_module')) {
-          $elem = $currentElem.prev(".context_module").find(".context_module_item:visible:last");
-          if($elem.length === 0) {
-            $elem = $currentElem.prev(".context_module");
-          }
-        } else if($currentElem.hasClass('context_module_item')) {
-          $elem = $currentElem.prev(".context_module_item:visible");
-          if($elem.length === 0) {
-            $elem = $currentElem.parents(".context_module");
-          }
-        }
-      }
-      if($elem && $elem.length > 0) {
-        $currentElem = $elem;
-      }
-      hover($currentElem);
-    }).keycodes('e d i o', function(event) {
-      if(!$currentElem || $currentElem.length === 0) {
-        return;
-      }
+
+      hover($elem);
+      return $elem;
+    };
+
+    var getClosestModuleOrItem = function ($currentElem) {
+      var selector = $currentElem && $currentElem.closest('.context_module_item_hover').length ? '.context_module_item_hover' : '.context_module_hover';
+      return $currentElem.closest(selector);
+    };
+
+    // Keyboard Shortcuts:
+    // "k" and "up arrow" move the focus up between modules and module items
+    var $document = $(document);
+    $document.keycodes('k up', function(event) {
+      var params = {
+                    selectWhenModuleFocused: {
+                      item: $currentElem && $currentElem.prev(".context_module").find(".context_module_item:visible:last"),
+                      fallbackModule: $currentElem && $currentElem.prev(".context_module")
+                    }, 
+                    selectWhenModuleItemFocused: {
+                      item: $currentElem && $currentElem.prev(".context_module_item:visible"),
+                      fallbackModule: $currentElem && $currentElem.parents(".context_module")
+                    }
+                  };
+      var $elem = selectItem(params);
+      if ($elem.length) $currentElem = $elem; 
+
+    });
+
+    // "j" and "down arrow" move the focus down between modules and module items
+    $document.keycodes('j down', function(event) {
+       var params = {
+                    selectWhenModuleFocused: {
+                      item: $currentElem && $currentElem.find(".context_module_item:visible:first"),
+                      fallbackModule: $currentElem && $currentElem.next(".context_module")
+                    }, 
+                    selectWhenModuleItemFocused: {
+                      item: $currentElem && $currentElem.next(".context_module_item:visible"),
+                      fallbackModule: $currentElem && $currentElem.parents(".context_module").next(".context_module")
+                    }
+                  };
+      var $elem = selectItem(params);
+      if ($elem.length) $currentElem = $elem; 
+
+    }); 
+
+    // "e" opens up Edit Module Settings form if focus is on Module or Edit Item Details form if focused on Module Item
+    // "d" deletes module or module item
+    // "space" opens up Move Item or Move Module form depending on which item is focused
+    $document.keycodes('e d space', function(event) {
+      $elem = getClosestModuleOrItem($currentElem); 
+      $hasClassItemHover = $elem.hasClass('context_module_item_hover');
+
       if(event.keyString == 'e') {
-        $currentElem.find(".edit_link:first:visible").click();
+        $hasClassItemHover ? $currentElem.find(".edit_item_link:first").click() : $currentElem.find(".edit_module_link:first").click();
       } else if(event.keyString == 'd') {
-        $currentElem.find(".delete_link:first:visible").click();
-      } else if(event.keyString == 'i') {
-        $currentElem.find(".indent_item_link:first:visible").click();
-      } else if(event.keyString == 'o') {
-        $currentElem.find(".outdent_item_link:first:visible").click();
+        if ($hasClassItemHover) {
+          $currentElem.find(".delete_item_link:first").click();
+          $currentElem = $currentElem.parents('.context_module');
+        } else {
+          $currentElem.find(".delete_module_link:first").click();
+          $currentElem = null;
+        }
+      } else if(event.keyString == 'space') {
+        $hasClassItemHover ? $currentElem.find(".move_module_item_link:first").click() : $currentElem.find(".move_module_link:first").click();
       }
-    }).keycodes('n', function(event) {
-      if(event.keyString == 'n') {
-        $(".add_module_list:visible:first").click();
+
+      event.preventDefault();
+
+    }); 
+
+    // "n" opens up the Add Module form
+    $document.keycodes('n', function(event) {
+      $(".add_module_link:visible:first").click();
+      event.preventDefault();
+    }); 
+    
+    // "i" indents module item
+    // "o" outdents module item
+    $document.keycodes('i o', function(event) {
+      var $currentElemID = $currentElem.attr('id');
+
+      if (event.keyString == 'i') {
+        $currentElem.find(".indent_item_link:first").trigger("click", [$currentElem, document.activeElement]);
+      } else if (event.keyString == 'o') {
+        $currentElem.find(".outdent_item_link:first").trigger("click", [$currentElem, document.activeElement]);
       }
-    });;
+
+      $document.ajaxStop(function() {
+        $currentElem = $('#' + $currentElemID);
+      });
+    });
+
     if($(".context_module:first .content:visible").length == 0) {
       $("html,body").scrollTo($(".context_module .content:visible").filter(":first").parents(".context_module"));
     }
