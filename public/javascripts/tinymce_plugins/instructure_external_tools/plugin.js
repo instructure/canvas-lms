@@ -21,12 +21,13 @@ define([
   'i18n!editor',
   'jquery',
   'str/htmlEscape',
+  'tinymce_plugins/instructure_external_tools/TinyMCEContentItem',
   'jquery.dropdownList',
   'jquery.instructure_misc_helpers',
   'jqueryui/dialog',
   'jquery.instructure_misc_plugins',
   'underscore'
-], function(tinymce, I18n, $, htmlEscape, _) {
+], function(tinymce, I18n, $, htmlEscape, TinyMCEContentItem) {
 
   var TRANSLATIONS = {
     embed_from_external_tool: I18n.t('embed_from_external_tool', '"Embed content from External Tool"'),
@@ -169,89 +170,14 @@ define([
         $(window).unbind("externalContentReady");
         $(window).bind("externalContentReady", function (event, data) {
           var editor = $dialog.data('editor') || ed,
-            item = data.contentItems[0],
-            placementAdvice = item.placementAdvice,
-            presentationDocTarget = placementAdvice.presentationDocumentTarget,
-            ltiMimeTypes = [ 'application/vnd.ims.lti.v1.ltilink', 'application/vnd.ims.lti.v1.launch+json'],
-            isLtiLink = !!~ltiMimeTypes.indexOf(item.mediaType),
-            url = isLtiLink ? item.canvasURL : item.url,
-            thumbnail = item.thumbnail || item.icon || null,
-            shouldOverrideTarget = isLtiLink && thumbnail && presentationDocTarget === 'iframe',
-            linkTarget = placementAdvice.presentationDocumentTarget == 'window' ? '_blank' : null,
-            linkClassName = "",
-            codePayload;
+              contentItems = data.contentItems,
+              itemLength = contentItems.length,
+              codePayload;
 
-          // no monkey business here
-          url = url.replace(/^(data:text\/html|javascript:)/, "#$1")
-
-          //check to see if we should override the target to for pretty thumbnails
-          if(shouldOverrideTarget) {
-            presentationDocTarget = 'text';
-            linkTarget = JSON.stringify(placementAdvice);
-            linkClassName = "lti-thumbnail-launch";
+          for(var i = 0; i < itemLength; i++){
+            codePayload = TinyMCEContentItem.fromJSON(contentItems[i]).codePayload;
+            $("#" + editor.id).editorBox('insert_code', codePayload);
           }
-
-          switch(presentationDocTarget) {
-
-            case 'iframe':
-              codePayload = $("<div/>").append($("<iframe/>", {
-                src: url,
-                title: item.title,
-                allowfullscreen: 'true',
-                webkitallowfullscreen: 'true',
-                mozallowfullscreen: 'true'
-              }).css({
-                width: placementAdvice.displayWidth,
-                height: placementAdvice.displayHeight
-              })).html();
-              break;
-
-
-            case 'embed':
-
-              if (item.mediaType && item.mediaType.indexOf('image') == 0) {
-                codePayload = $("<div/>").append($("<img/>", {
-                  src: url,
-                  alt: item.text
-                }).css({
-                  width: placementAdvice.displayWidth,
-                  height: placementAdvice.displayHeight
-                })).html();
-              } else {
-                codePayload = item.text;
-              }
-              break;
-
-
-            default:
-
-              var $linkContainer = $("<div/>"),
-                $link = $("<a/>", {
-                  href: url,
-                  title: item.title,
-                  target: linkTarget,
-                  'class': linkClassName
-                });
-
-              $linkContainer.append($link);
-
-              if(thumbnail) {
-                $link.append($("<img />", {
-                  src: thumbnail['@id'],
-                  height: thumbnail.height || 48,
-                  width: thumbnail.width || 48,
-                  alt: item.text
-                }))
-              } else {
-                $link.text(item.text);
-              }
-
-              codePayload = $linkContainer.html();
-              break;
-          }
-
-          $("#" + editor.id).editorBox('insert_code', codePayload);
-
           $dialog.find('iframe').attr('src', 'about:blank');
           $dialog.dialog('close')
         });
