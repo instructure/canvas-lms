@@ -84,6 +84,7 @@ class ActiveRecord::Base
                         can_participate_before_start_at
                         limit_priveleges_to_course_sections
                         role_name).freeze,
+    'eportfolio_entries' => %w(attachment_id artifact_type).freeze,
     'external_feeds' => %w(body_match feed_type feed_purpose).freeze,
     'failed_jobs' => %w(original_id).freeze,
     'gradebook_uploads' => %w(context_type context_id).freeze,

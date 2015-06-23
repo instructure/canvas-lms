@@ -20,13 +20,15 @@ require 'atom'
 require 'sanitize'
 
 class EportfolioEntry < ActiveRecord::Base
-  attr_accessible :eportfolio, :eportfolio_category, :name, :artifact_type, :attachment, :allow_comments, :show_comments, :url
+  attr_accessible :eportfolio, :eportfolio_category, :name, :allow_comments, :show_comments, :url
   attr_readonly :eportfolio_id, :eportfolio_category_id
   belongs_to :eportfolio, touch: true
   belongs_to :eportfolio_category
 
-  EXPORTABLE_ATTRIBUTES = [:id, :eportfolio_id, :eportfolio_category_id, :position, :name, :artifact_type, :attachment_id, :allow_comments, :show_comments, :slug, :url, :content, :created_at, :updated_at]
-  EXPORTABLE_ASSOCIATIONS = [:eportfolio, :eportfolio_category]
+  EXPORTABLE_ATTRIBUTES = [:id, :eportfolio_id, :eportfolio_category_id,
+                           :position, :name, :allow_comments, :show_comments,
+                           :slug, :url, :content, :created_at, :updated_at].freeze
+  EXPORTABLE_ASSOCIATIONS = [:eportfolio, :eportfolio_category].freeze
 
   acts_as_list :scope => :eportfolio_category
   before_save :infer_unique_slug
