@@ -55,7 +55,7 @@ define [
     equal @component.get('points'), expected
 
   test 'percent', ->
-    expected = "8.5%"
+    expected = "8.51%"
     equal @component.get('percent'), expected
 
   test 'letterGrade', ->
