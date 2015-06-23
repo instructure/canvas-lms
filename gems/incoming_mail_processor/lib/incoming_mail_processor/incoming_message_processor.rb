@@ -165,7 +165,7 @@ module IncomingMailProcessor
       flat_account_configs = flatten_account_configs(account_configs)
       self.mailbox_accounts = flat_account_configs.map do |mailbox_protocol, mailbox_config|
         error_folder = mailbox_config.delete(:error_folder)
-        address = mailbox_config[:username]
+        address = mailbox_config[:address] || mailbox_config[:username]
         IncomingMailProcessor::MailboxAccount.new({
           :protocol => mailbox_protocol.to_sym,
           :config => mailbox_config,
