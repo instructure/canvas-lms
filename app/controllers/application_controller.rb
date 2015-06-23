@@ -518,7 +518,7 @@ class ApplicationController < ActionController::Base
           add_crumb(@context.short_name, crumb_url)
         end
 
-        set_badge_counts_for(@context, @current_user, @current_enrollment)
+        @set_badge_counts = true
       end
     end
 
@@ -584,6 +584,7 @@ class ApplicationController < ActionController::Base
     return unless context.respond_to?(:content_participation_counts) # just Course and Group so far
     js_env(:badge_counts => badge_counts_for(context, user, enrollment))
   end
+  helper_method :set_badge_counts_for
 
   def badge_counts_for(context, user, enrollment=nil)
     badge_counts = {}
