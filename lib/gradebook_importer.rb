@@ -60,7 +60,7 @@ class GradebookImporter
     end
   end
 
-  CSV::Converters[:nil] = lambda do |e| 
+  CSV::Converters[:nil] = lambda do |e|
     begin
       e.nil? ? e : raise
     rescue

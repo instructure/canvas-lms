@@ -38,4 +38,3 @@ define [
     userSettings["context#{$.capitalize(method)}"] = addTokens(method, 'current_user_id', 'context_asset_string')
 
   userSettings
-  

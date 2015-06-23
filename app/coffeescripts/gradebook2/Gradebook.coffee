@@ -169,6 +169,7 @@ define [
       @showCustomColumnDropdownOption()
       @initPostGradesStore()
       @showPostGradesButton()
+      @checkForUploadComplete()
 
     assignment_visibility: ->
       allStudentIds = _.keys @students
@@ -1071,6 +1072,11 @@ define [
 
     setExportButtonTitle: (updated_title) =>
       $($('#download_csv').children('span').contents()[2]).replaceWith(updated_title)
+
+    checkForUploadComplete: () ->
+      if userSettings.contextGet('gradebookUploadComplete')
+        $.flashMessage I18n.t('Upload successful')
+        userSettings.contextRemove('gradebookUploadComplete')
 
     studentNamesToggle: (e) =>
       e.preventDefault()
