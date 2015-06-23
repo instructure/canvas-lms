@@ -363,6 +363,8 @@ module QuizzesCommon
 
   def select_regrade_option(option_index=0)
     visible_regrade_options[option_index].click
+    fj('.ui-dialog:visible .btn-primary').click
+    wait_for_ajaximations
   end
 
   def visible_regrade_options

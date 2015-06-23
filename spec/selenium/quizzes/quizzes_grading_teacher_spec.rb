@@ -34,19 +34,24 @@ describe 'Grading quizzes' do
 
       it 'shows the regrade options', priority: "1", test_id: 140622 do
         # verify presence of regrade alert
-        expect(f('.regrade-options.alert')).to include_text 'REGRADE OPTIONS' \
-          ' (for students who have already answered this question)'
+        expect(fj('.ui-dialog:visible .alert')).to include_text 'Choose a regrade option for students who have already taken the quiz'
 
         # verify all regrade options are present
         expect(visible_regrade_options.count).to eq 4
       end
 
+      it 'displays the selected regrade option on the correct answer' do
+        option_text = fj('.regrade_enabled .regrade_option_text').text
+        select_regrade_option
+        expect(f('.correct_answer .regrade_option_text').text).to eq option_text
+      end
+
       it 'remembers the selected regrade option', priority: "1", test_id: 140625 do
         select_regrade_option
-
         save_question
-        edit_first_question
 
+        edit_first_question
+        select_different_correct_answer(1)
         expect(find_radio_button_by_value('current_and_previous_correct', '.regrade_enabled').selected?).to be_truthy
       end
     end
@@ -68,7 +73,7 @@ describe 'Grading quizzes' do
         close_regrade_tooltip
 
         # verify explanation message
-        expect(f('.regrade-options.alert')).to include_text 'Regrading is not allowed on this question' \
+        expect(fj('.ui-dialog:visible .regrade_option_text')).to include_text 'Regrading is not allowed on this question' \
           ' because either an answer was removed or the question type was changed after a student' \
           ' completed a submission.'
 
