@@ -2354,7 +2354,7 @@ class Course < ActiveRecord::Base
         :css_class => 'files',
         :href => :course_files_path,
         :screenreader => t("Course Files"),
-        :icon => 'icon-collection'
+        :icon => 'icon-folder'
       }, {
         :id => TAB_SYLLABUS,
         :label => t('#tabs.syllabus', "Syllabus"),

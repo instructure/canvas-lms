@@ -22,7 +22,7 @@ define([
     render: function () {
       var cards = this.props.courseCards.map(function(card) {
         return (
-          <div className="col-xs-6 col-md-4 card">
+          <div className="col-xs-6 col-lg-4 card">
             <DashboardCard shortName={card.shortName}
               courseCode={card.courseCode}
               id={card.id}
