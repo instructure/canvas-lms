@@ -5673,7 +5673,6 @@ pl:
         already_used: "To przesłane zadanie znajduje się już w Twoim portfolio"
         feed: "Kanał informacyjny Atom dot. ePortfolio"
         view_submission: "Pokaż przesłane zadanie"
-      upload_limit: "maksymalny rozmiar pliku to 50 MB"
       welcome: "Jeśli jesteś tu po raz pierwszy, możesz skorzystać z kreatora i dowiedzieć się, jak najlepiej rozpocząć obsługę. Jeśli to Twoja kolejna wizyta, możesz szybko dodać ostatnio przesłane zadania lub po prostu przejść bezpośrednio do portfolio."
       write_only_comments: "Komentarze dla tej strony mają status prywatny. Możesz dodawać komentarze, ale tylko właściciel portfolio będzie mógł je zobaczyć."
     show_me: pokaż

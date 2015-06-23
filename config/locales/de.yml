@@ -5626,7 +5626,6 @@ de:
         already_used: "Diese Einsendung wurde Ihrem Portfolio bereits hinzugefügt."
         feed: "Atom-feed für des ePortfolios"
         view_submission: "Einsendung anzeigen"
-      upload_limit: "Dateigröße auf 50MB begrenzen"
       welcome: "Wenn Sie zum ersten mal hier sind, ist Ihnen der Einführungsassistent beim Einstieg behilflich. Andernfalls können Sie jetzt aktuelle Einsendungen hinzufügen oder direkt das Portfolio aufrufen."
       write_only_comments: "Die Kommentare auf dieser Seite sind privat. Sie können Kommentare einstellen, die aber nur dem Besitzer des Portfolios angezeigt werden."
     show_me: zeigen

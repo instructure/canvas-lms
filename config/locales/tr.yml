@@ -5525,7 +5525,6 @@ tr:
         already_used: "Bu gönderi zaten portfolyonuzda var"
         feed: "ePortfolyo Atom Beslemesi"
         view_submission: "Gönderiyi Göster"
-      upload_limit: "dosya başına 50MB limit"
       welcome: "Eğer buraya ilk defa geliyorsanız sihirbazı açıp nasıl başlayacağınızı görmek isteyebilirsiniz. Ya da hızlı bir şekilde güncel gönderiler ekleyebilir veya doğrudan portfolyoya geçebilirsiniz."
       write_only_comments: "Bu sayfa için yorumlar özeldir. Yorum yapabilirsiniz fakat yalnızca portfolyonun sahibi bunları görebilir."
     show_me: "bana göster"
