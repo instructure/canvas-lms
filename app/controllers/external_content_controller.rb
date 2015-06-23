@@ -20,7 +20,6 @@ require 'ims/lti'
 IMS::LTI::Models::ContentItems::ContentItem.add_attribute :canvas_url, json_key: 'canvasURL'
 
 class ExternalContentController < ApplicationController
-  before_filter :require_context, only: :success
   protect_from_forgery :except => [:selection_test, :success]
 
   def success
@@ -35,6 +34,7 @@ class ExternalContentController < ApplicationController
     elsif params[:return_type] == 'oembed'
       js_env(oembed: {endpoint: params[:endpoint], url: params[:url]})
     elsif params[:service] == 'external_tool_dialog'
+      get_context
       @retrieved_data = content_items_for_canvas
     elsif params[:service] == 'external_tool_redirect'
       @hide_message = true if params[:service] == 'external_tool_redirect'

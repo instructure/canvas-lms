@@ -7,7 +7,7 @@ if CANVAS_RAILS3
   gem 'strong_parameters', '0.2.3'
 else
   gem 'rails', '4.0.12'
-  gem 'rack', '1.5.2'
+  gem 'rack', '1.5.4'
   gem 'builder', '3.1.4'
   gem 'protected_attributes', '1.0.8'
   gem 'rails-observers', '0.1.2'
