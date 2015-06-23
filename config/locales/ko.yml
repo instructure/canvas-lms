@@ -4783,7 +4783,6 @@ ko:
         already_used: "이 제출물은 이미 포트폴리오에 포함됨"
         feed: "Eportfolio Atom 피드"
         view_submission: "제출물 보기"
-      upload_limit: "파일 당 50MB로 제한"
       welcome: "여기에 처음 오신 경우에는 마법사를 띄우고 시작할 수 있는 최선의 방법을 볼 수 있습니다. 그렇지 않다면 신속하게 최근 제출물을 추가하거나 포트폴리오로 바로 갈 수 있습니다."
       write_only_comments: "이 페이지의 설명은 비공개입니다. 설명을 추가할 수 있으나 포트폴리오 소유자만 볼 수 있게 됩니다."
     show_me: 표시하기
