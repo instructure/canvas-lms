@@ -5655,7 +5655,6 @@ en-AU:
         already_used: "This submission is already included in your portfolio"
         feed: "Eportfolio Atom Feed"
         view_submission: "View the Submission"
-      upload_limit: "limit 50MB per file"
       welcome: "If this is your first time here, you may want to pop up the wizard and see how best to get started. Otherwise you can quickly add recent submissions or just jump straight to the portfolio."
       write_only_comments: "Comments for this page are private. You can make comments, but only the portfolio's owner will be able to see them."
     show_me: "show me"
