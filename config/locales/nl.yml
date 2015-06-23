@@ -5632,7 +5632,6 @@ nl:
         already_used: "Deze inzending is al  aan jouw portfolio toegevoegd"
         feed: "Atom-feed ePortfolio"
         view_submission: "De inzending bekijken"
-      upload_limit: "maximaal 50 MB per bestand"
       welcome: "Als je voor de eerste keer hier bent, kun je de wizard starten om een introductie te krijgen. Verder kun je recente inzendingen snel toevoegen of direct naar de portfolio springen."
       write_only_comments: "Opmerkingen op deze pagina zijn privé. Je kunt wel opmerkingen maken, maar alleen de eigenaar van de portfolio kan die zien."
     show_me: "toon me"
