@@ -273,8 +273,7 @@ END
       cutoff dates. Assignments can be filtered by these grading periods in the gradebook.
 END
       applies_to: 'Course',
-      state: 'hidden_in_prod',
-      development: true,
+      state: 'allowed',
       root_opt_in: true
     },
     'course_catalog' =>
