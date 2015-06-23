@@ -16,11 +16,12 @@ describe "sub account grading schemes" do
 
     describe "grading schemes" do
 
-      it "should add a grading scheme" do
+      it "should add a grading scheme", priority: 1, test_id: 163992 do
         should_add_a_grading_scheme
+
       end
 
-      it "should edit a grading scheme" do
+      it "should edit a grading scheme", priority: 1, test_id: 210075 do
         should_edit_a_grading_scheme(account, url)
       end
 
@@ -29,9 +30,10 @@ describe "sub account grading schemes" do
       end
     end
 
+
     describe "grading scheme items" do
 
-      before (:each) do
+      before(:each) do
         create_simple_standard_and_edit(account, url)
       end
 
@@ -51,7 +53,7 @@ describe "sub account grading schemes" do
 
   context "with Multiple Grading Periods enabled" do
 
-    it "should contain a tab for grading schemes and grading periods" do
+    it "should contain a tab for grading schemes and grading periods", priority: 1, test_id:202306  do
       should_contain_a_tab_for_grading_schemes_and_periods(url)
     end
   end

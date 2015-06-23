@@ -6,10 +6,16 @@ describe "grading standards" do
 
   context "without Multiple Grading Periods" do
 
-    it "should allow creating grading standards" do
+    it "should allow creating grading standards", priority: 1, test_id: 163993 do
       course_with_teacher_logged_in
       get "/courses/#{@course.id}/grading_standards"
       should_add_a_grading_scheme
+    end
+
+    it "should allow editing a grading standard", priority: 1, test_id: 163993 do
+      course_with_teacher_logged_in
+      get "/courses/#{@course.id}/grading_standards"
+      should_edit_a_grading_scheme(@course, "/courses/#{@course.id}/grading_standards")
     end
 
     it "should allow deleting grading standards" do

@@ -17,6 +17,7 @@ end
 def should_add_a_grading_scheme(options = {name: "new grading standard"})
   new_standard_name = options[:name]
   f('.add_standard_link').click
+  expect(f('.add_standard_link')).to have_class('disabled')
   replace_content(f('.scheme_name'), new_standard_name)
   f('.save_button').click
   wait_for_ajax_requests
