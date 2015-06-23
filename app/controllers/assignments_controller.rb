@@ -86,7 +86,6 @@ class AssignmentsController < ApplicationController
       return
     end
     if authorized_action(@assignment, @current_user, :read)
-
       if (da_on = @context.feature_enabled?(:differentiated_assignments)) &&
            @current_user && @assignment &&
            !@assignment.visible_to_user?(@current_user, differentiated_assignments: da_on)
@@ -99,6 +98,35 @@ class AssignmentsController < ApplicationController
 
       @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @current_user)
       @assignment.ensure_assignment_group
+
+      @locked = @assignment.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
+      @locked.delete(:lock_at) if @locked.is_a?(Hash) && @locked.has_key?(:unlock_at) # removed to allow proper translation on show page
+      @unlocked = !@locked || @assignment.grants_right?(@current_user, session, :update)
+      @assignment.context_module_action(@current_user, :read) if @unlocked && !@assignment.new_record?
+
+      if @assignment.grants_right?(@current_user, session, :read_own_submission) && @context.grants_right?(@current_user, session, :read_grades)
+        @current_user_submission = @assignment.submissions.where(user_id: @current_user).first if @current_user
+        @current_user_submission = nil if @current_user_submission &&
+          !@current_user_submission.graded? &&
+          !@current_user_submission.submission_type
+        @current_user_rubric_assessment = @assignment.rubric_association.rubric_assessments.where(user_id: @current_user).first if @current_user && @assignment.rubric_association
+        @current_user_submission.send_later(:context_module_action) if @current_user_submission
+      end
+
+      log_asset_access(@assignment, "assignments", @assignment.assignment_group)
+
+      if request.format.html?
+        if @assignment.submission_types == 'online_quiz' && @assignment.quiz
+          return redirect_to named_context_url(@context, :context_quiz_url, @assignment.quiz.id)
+        elsif @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic && @assignment.discussion_topic.grants_right?(@current_user, session, :read)
+          return redirect_to named_context_url(@context, :context_discussion_topic_url, @assignment.discussion_topic.id)
+        elsif @assignment.submission_types == 'attendance'
+          return redirect_to named_context_url(@context, :context_attendance_url, :anchor => "assignment/#{@assignment.id}")
+        elsif @assignment.submission_types == 'external_tool' && @assignment.external_tool_tag && @unlocked
+          tag_type = params[:module_item_id].present? ? :modules : :assignments
+          return content_tag_redirect(@context, @assignment.external_tool_tag, :context_url, tag_type)
+        end
+      end
 
       if @assignment.submission_types.include?("online_upload") || @assignment.submission_types.include?("online_url")
         @external_tools = ContextExternalTool.all_tools_for(@context, :user => @current_user, :type => :homework_submission)
@@ -113,23 +141,9 @@ class AssignmentsController < ApplicationController
         :EXTERNAL_TOOLS => external_tools_json(@external_tools, @context, @current_user, session)
       })
 
-      @locked = @assignment.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
-      @locked.delete(:lock_at) if @locked.is_a?(Hash) && @locked.has_key?(:unlock_at) # removed to allow proper translation on show page
-      @unlocked = !@locked || @assignment.grants_right?(@current_user, session, :update)
-      @assignment.context_module_action(@current_user, :read) if @unlocked && !@assignment.new_record?
-
       if @assignment.grants_right?(@current_user, session, :grade)
         visible_student_ids = @context.enrollments_visible_to(@current_user).pluck(:user_id)
         @current_student_submissions = @assignment.submissions.where("submissions.submission_type IS NOT NULL").where(:user_id => visible_student_ids).all
-      end
-
-      if @assignment.grants_right?(@current_user, session, :read_own_submission) && @context.grants_right?(@current_user, session, :read_grades)
-        @current_user_submission = @assignment.submissions.where(user_id: @current_user).first if @current_user
-        @current_user_submission = nil if @current_user_submission &&
-                                        !@current_user_submission.graded? &&
-                                        !@current_user_submission.submission_type
-        @current_user_rubric_assessment = @assignment.rubric_association.rubric_assessments.where(user_id: @current_user).first if @current_user && @assignment.rubric_association
-        @current_user_submission.send_later(:context_module_action) if @current_user_submission
       end
 
       begin
@@ -146,27 +160,13 @@ class AssignmentsController < ApplicationController
 
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
-      log_asset_access(@assignment, "assignments", @assignment.assignment_group)
 
       @assignment_menu_tools = external_tools_display_hashes(:assignment_menu)
-
 
       @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user)
 
       respond_to do |format|
-        if @assignment.submission_types == 'online_quiz' && @assignment.quiz
-          format.html { redirect_to named_context_url(@context, :context_quiz_url, @assignment.quiz.id) }
-        elsif @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic && @assignment.discussion_topic.grants_right?(@current_user, session, :read)
-          format.html { redirect_to named_context_url(@context, :context_discussion_topic_url, @assignment.discussion_topic.id) }
-        elsif @assignment.submission_types == 'attendance'
-          format.html { redirect_to named_context_url(@context, :context_attendance_url, :anchor => "assignment/#{@assignment.id}") }
-        elsif @assignment.submission_types == 'external_tool' && @assignment.external_tool_tag && @unlocked
-          tag_type = params[:module_item_id].present? ? :modules : :assignments
-          format.html { content_tag_redirect(@context, @assignment.external_tool_tag, :context_url, tag_type) }
-
-        else
-          format.html { render }
-        end
+        format.html { render }
         format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}) }
       end
     end
