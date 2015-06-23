@@ -319,17 +319,19 @@ namespace :js do
 
   desc "Compile React JSX to JS"
   task :jsx do
-    source = Rails.root + 'app/jsx'
-    dest = Rails.root + 'public/javascripts/jsx'
-    if Rails.env == 'development'
-      msg = `node_modules/.bin/babel #{source} --out-dir #{dest} --source-maps inline 2>&1 >/dev/null`
-    else
-      msg = `node_modules/.bin/babel #{source} --out-dir #{dest} 2>&1 >/dev/null`
-    end
+    dirs = [["#{Rails.root}/app/jsx", "#{Rails.root}/public/javascripts/jsx"],
+            ["#{Rails.root}/spec/javascripts/jsx", "#{Rails.root}/spec/javascripts/compiled"]]
+    dirs.each { |source,dest|
+      if Rails.env == 'development'
+        msg = `node_modules/.bin/babel #{source} --out-dir #{dest} --source-maps inline 2>&1 >/dev/null`
+      else
+        msg = `node_modules/.bin/babel #{source} --out-dir #{dest} 2>&1 >/dev/null`
+      end
 
-    unless $?.success?
-      raise msg
-    end
+      unless $?.success?
+        raise msg
+      end
+    }
   end
 
   desc "creates ember app bundles"
