@@ -1021,7 +1021,15 @@ class Quizzes::Quiz < ActiveRecord::Base
         context.grants_right?(user, session, :participate_as_student) &&
         visible_to_user?(user)
     end
-    can :read and can :submit
+    can :read
+
+    given do |user, session|
+      available? &&
+        context.grants_right?(user, session, :participate_as_student) &&
+        visible_to_user?(user) &&
+        !excused_for_student?(user)
+    end
+    can :submit
 
     given { |user| context.grants_right?(user, :view_quiz_answer_audits) }
     can :view_answer_audits
@@ -1207,6 +1215,12 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def available?
     published?
+  end
+
+  def excused_for_student?(student)
+    if assignment
+      assignment.submission_for_student(student).excused?
+    end
   end
 
   delegate :feature_enabled?, to: :context

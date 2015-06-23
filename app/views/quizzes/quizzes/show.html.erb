@@ -325,6 +325,10 @@
           <div class="take_quiz_button">
             <%= link_to_resume_poll('class' => "btn btn-primary") %>
           </div>
+        <% elsif @assignment && @assignment.submission_for_student(@current_user).excused? %>
+          <div class="lock_explanation">
+            <%= t "This quiz has been excused" %>
+          </div>
         <% elsif can_do(@quiz, @current_user, :submit) && !@lockdown_browser_authorized_to_view %>
           <div class="take_quiz_button">
             <%= link_to_take_or_retake_poll('class' => "btn btn-primary", 'id' => "take_quiz_link") %>
