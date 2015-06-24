@@ -26,16 +26,10 @@ zh-Hans:
   locales:
     zh-Hans: 简体中文
   qualified_locale: zh-CN
-zh:
-  qualified_locale: zh-CN
-  deprecated_for: zh-Hans
 zh-Hant:
   locales:
     zh-Hant: 繁體中文
   qualified_locale: zh-HK
-zh_Hant:
-  qualified_locale: zh-HK
-  deprecated_for: zh-Hant
 ar:
   locales:
     ar: العربية
@@ -88,10 +82,6 @@ fa:
     fa: فارسی (crowd-sourced)
   qualified_locale: fa-IR
   crowdsourced: true
-fa-IR:
-  qualified_locale: fa-IR
-  crowdsourced: true
-  deprecated_for: fa
 da:
   locales:
     da: Dansk
