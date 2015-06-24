@@ -5634,6 +5634,7 @@ nb:
         already_used: "Denne innleveringen finnes allerede i porteføljen din"
         feed: "Atom-mating for ePortfolio"
         view_submission: "Se innleveringen"
+      upload_limit: "maks 50MB per fil"
       welcome: "Om dette er første gang du er her ønsker du sikkert å sjekke ut veiviseren for å se hvordan man kommer i gang. Ellers kan du raskt legge til nylige innleveringer eller gå rett til porteføljen."
       write_only_comments: "Kommentarer på denne siden er private. Du kan kommentere, men kun porteføljens eier kan se kommentarene."
     show_me: "vis meg"
