@@ -252,6 +252,33 @@ describe "Module Items API", type: :request do
       })
     end
 
+    context 'with differentiated assignments' do
+      before :each do
+        @course.enable_feature!(:differentiated_assignments)
+        course_with_student(:course => @course, :active_all => true)
+        @user = @student
+      end
+
+      it "should find module items" do
+        api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
+          :controller => "context_module_items_api", :action => "show", :format => "json",
+          :course_id => "#{@course.id}", :module_id => "#{@module1.id}",
+          :id => "#{@assignment_tag.id}")
+      end
+
+      it "should not find module items when hidden" do
+        @assignment.only_visible_to_overrides = true
+        @assignment.save!
+        @section = @course.course_sections.create!(name: "test section")
+        create_section_override_for_assignment(@assignment, {course_section: @section})
+
+        api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
+          {:controller => "context_module_items_api", :action => "show", :format => "json",
+          :course_id => "#{@course.id}", :module_id => "#{@module1.id}",
+          :id => "#{@assignment_tag.id}"}, {}, {}, {:expected_status => 404})
+      end
+    end
+
     context 'show with content details' do
       let(:json) do
         api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}?include[]=content_details",

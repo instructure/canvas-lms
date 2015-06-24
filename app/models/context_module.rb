@@ -354,12 +354,23 @@ class ContextModule < ActiveRecord::Base
       tags = is_teacher ? cached_not_deleted_tags : cached_active_tags
 
       if !is_teacher && differentiated_assignments_enabled? && user
-        opts[:is_teacher]= false
+        opts[:is_teacher] = false
         tags = filter_tags_for_da(tags, user, opts)
       end
 
-      tags
+      # always return an array now because filter_tags_for_da *might* return one
+      tags.to_a
     end
+  end
+
+  def visibility_for_user(user)
+    opts = {}
+    opts[:can_read] = self.context.grants_right?(user, :read)
+    if opts[:can_read]
+      opts[:can_read_as_admin] = self.context.grants_right?(user, :read_as_admin)
+      opts[:differentiated_assignments] = !opts[:can_read_as_admin] && self.differentiated_assignments_enabled?
+    end
+    opts
   end
 
   def filter_tags_for_da(tags, user, opts={})
