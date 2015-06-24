@@ -28,9 +28,9 @@ module AccountAuthorizationConfig::PluginSettings
 
     def recognized_params
       if globally_configured?
-        @recognized_params
+        super
       else
-        @plugin_settings
+        @plugin_settings + super
       end
     end
 
@@ -43,7 +43,7 @@ module AccountAuthorizationConfig::PluginSettings
           settings_hash[setting] = setting
         end
       end
-      @plugin_settings = settings_hash.keys + @recognized_params
+      @plugin_settings = settings_hash.keys
 
       # use an anonymous module so we can prepend and always call super,
       # regardless of if the method is actually defined on this class,
@@ -63,7 +63,7 @@ module AccountAuthorizationConfig::PluginSettings
 
   def self.included(klass)
     klass.instance_variable_set(:@recognized_params, klass.recognized_params)
-    klass.extend(ClassMethods)
+    klass.singleton_class.prepend(ClassMethods)
     klass.cattr_accessor(:plugin)
   end
 
