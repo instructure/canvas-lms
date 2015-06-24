@@ -49,7 +49,9 @@ define(['underscore', 'i18n!gradebok_upload', 'compiled/userSettings'], function
         if (submission.original_grade === submission.grade) return; // no change
 
         bulkGradeData[assignmentId] = bulkGradeData[assignmentId] || {};
-        bulkGradeData[assignmentId][userId] = {posted_grade: submission.grade};
+        bulkGradeData[assignmentId][userId] = ((submission.grade || "").toUpperCase() === "EX") ?
+          {excuse: true} :
+          {posted_grade: submission.grade};
       });
     });
 

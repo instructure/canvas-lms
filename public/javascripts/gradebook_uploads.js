@@ -126,7 +126,8 @@ define([
               updatedGrade  = parseInt(this.grade),
               updateWillRemoveGrade = !isNaN(originalGrade) && isNaN(updatedGrade);
 
-          if (originalGrade > updatedGrade || updateWillRemoveGrade) {
+          if ((originalGrade > updatedGrade || updateWillRemoveGrade) &&
+              (this.grade || "").toUpperCase() !== "EX") {
             rowsToHighlight.push({rowIndex: index, id: this.assignment_id});
           }
 

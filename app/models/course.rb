@@ -1636,9 +1636,13 @@ class Course < ActiveRecord::Base
               "N/A"
             else
               submission = submissions[[student.id, a.id]]
-              a.grading_type == "gpa_scale" && submission.try(:score) ?
-                a.score_to_grade(submission.score) :
+              if submission.try(:excused?)
+                "EX"
+              elsif a.grading_type == "gpa_scale" && submission.try(:score)
+                a.score_to_grade(submission.score)
+              else
                 submission.try(:score)
+              end
             end
           end
           row = [student.send(name_method), student.id]

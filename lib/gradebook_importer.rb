@@ -108,14 +108,14 @@ class GradebookImporter
 
     # look up existing score for everything that was provided
     @original_submissions = @context.submissions
-      .select([:assignment_id, :user_id, :score])
+      .select([:assignment_id, :user_id, :score, :excused])
       .where(:assignment_id => (@missing_assignment ? @all_assignments.values : @assignments),
              :user_id => (@missing_student ? @all_students.values : @students))
       .map do |submission|
         {
           :user_id => submission.user_id,
           :assignment_id => submission.assignment_id,
-          :score => submission.score.to_s
+          :score => submission.excused? ? "EX" : submission.score.to_s
         }
     end
 
