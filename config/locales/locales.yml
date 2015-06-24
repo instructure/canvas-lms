@@ -1,39 +1,66 @@
-en:
-  locales:
-    en: English (US)
-  qualified_locale: en-US
-es:
-  locales:
-    es: Español
-  qualified_locale: es-ES
-de:
-  locales:
-    de: Deutsch
-  qualified_locale: de-DE
-ru:
-  locales:
-    ru: pу́сский
-  qualified_locale: ru-RU
-fr:
-  locales:
-    fr: Français
-  qualified_locale: fr-FR
-pl:
-  locales:
-    pl: Polski
-  qualified_locale: pl-PL
-zh:
-  locales:
-    zh: 简体中文
-  qualified_locale: zh-CN
-zh_Hant:
-  locales:
-    zh_Hant: 繁體中文
-  qualified_locale: zh-HK
 ar:
   locales:
     ar: العربية
   qualified_locale: ar-SA
+da:
+  locales:
+    da: Dansk
+  qualified_locale: da-DK
+de:
+  locales:
+    de: Deutsch
+  qualified_locale: de-DE
+en:
+  locales:
+    en: English (US)
+  qualified_locale: en-US
+en-AU:
+  locales:
+    en-AU: English (Australia)
+  qualified_locale: en-AU
+en-GB:
+  locales:
+    en-GB: English (United Kingdom)
+  qualified_locale: en-GB
+es:
+  locales:
+    es: Español
+  qualified_locale: es-ES
+fa:
+  locales:
+    fa: فارسی (crowd-sourced)
+  qualified_locale: fa-IR
+  crowdsourced: true
+fa-IR:
+  qualified_locale: fa-IR
+  crowdsourced: true
+  deprecated_for: fa
+fr:
+  locales:
+    fr: Français
+  qualified_locale: fr-FR
+ja:
+  locales:
+    ja: 日本語
+  qualified_locale: ja-JP
+ko:
+  locales:
+    ko: 한국말 (crowd-sourced)
+  qualified_locale: ko-KR
+  crowdsourced: true
+nb:
+  locales:
+    nb: Norwegian (Bokmål)
+  qualified_locale: nb-NO
+nl:
+  locales:
+    nl: Nederlands
+  qualified_locale: nl-NL
+  crowdsourced: false
+pl:
+  locales:
+    pl: Polski
+  qualified_locale: pl-PL
 pt:
   locales:
     pt: Português
@@ -42,52 +69,35 @@ pt-BR:
   locales:
     pt-BR: Português do Brasil
   qualified_locale: pt-BR
-ja:
+ru:
   locales:
-    ja: 日本語
-  qualified_locale: ja-JP
-nl:
+    ru: pу́сский
+  qualified_locale: ru-RU
+sv:
   locales:
-    nl: Nederlands
-  qualified_locale: nl-NL
-  crowdsourced: false
-nb:
-  locales:
-    nb: Norwegian (Bokmål)
-  qualified_locale: nb-NO
-ko:
-  locales:
-    ko: 한국말 (crowd-sourced)
-  qualified_locale: ko-KR
-  crowdsourced: true
-en-GB:
-  locales:
-    en-GB: English (United Kingdom)
-  qualified_locale: en-GB
-en-AU:
-  locales:
-    en-AU: English (Australia)
-  qualified_locale: en-AU
+    sv: Svenska
+  qualified_locale: sv-SE
 tr:
   locales:
     tr: Türkçe (crowd-sourced)
   qualified_locale: tr-TR
   crowdsourced: true
-fa-IR:
+zh-Hans:
   locales:
-    fa-IR: فارسی (crowd-sourced)
-  qualified_locale: fa-IR
-  crowdsourced: true
-da:
-  locales:
-    da: Dansk
-  qualified_locale: da-DK
+   zh-Hans: 简体中文
+  qualified_locale: zh-CN
 hy:
   locales:
     hy: Հայերեն (crowd-sourced)
   qualified_locale: hy-AM
   crowdsourced: true
-sv:
+zh:
+  qualified_locale: zh-CN
+  deprecated_for: zh-Hans
+zh-Hant:
   locales:
-    sv: Svenska
-  qualified_locale: sv-SE
+    zh-Hant: 繁體中文
+  qualified_locale: zh-HK
+zh_Hant:
+  qualified_locale: zh-HK
+  deprecated_for: zh-Hant

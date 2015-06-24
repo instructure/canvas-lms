@@ -1,7 +1,7 @@
 # This YAML file is auto-generated from a Transifex import.
 # Do not edit it by hand, your changes will be overwritten.
 --- 
-fa-IR: 
+fa:
   EditAppointmentGroupDetails: 
     affect_reservations: "چگونه روی رزروها اثر خواهد گذاشت؟"
     and_n_contexts: "و %{n} دیگر"

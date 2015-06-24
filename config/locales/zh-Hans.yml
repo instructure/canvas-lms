@@ -1,7 +1,7 @@
 # This YAML file is auto-generated from a Transifex import.
 # Do not edit it by hand, your changes will be overwritten.
 --- 
-zh: 
+zh-Hans:
   1_item_scores_5512cd03: "1- 项目分数"
   2_final_score_7b0fd15e: "2- 最终分数"
   451_message: 
@@ -7594,7 +7594,7 @@ zh:
   loading_25990131: 正在加载...
   loading_bde52856: 加载
   locales: 
-    zh: 简体中文
+    zh-Hans: 简体中文
   lock_date_cannot_be_after_course_end_a473158b: 锁定日期不能晚于课程结束日期
   lock_date_cannot_be_after_section_end_d37da70c: 锁定日期不能晚于章节结束日期
   lock_date_cannot_be_after_term_end_cf1a188f: 锁定日期不能晚于学期结束日期
