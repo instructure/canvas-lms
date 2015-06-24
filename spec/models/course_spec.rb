@@ -1004,6 +1004,15 @@ describe Course, "gradebook_to_csv" do
     end
   end
 
+  it "marks excused assignments" do
+    student_in_course active_all: true
+    a = @course.assignments.create! name: "asdf", points_possible: 10
+    a.grade_student @student, excuse: true
+    csv = CSV.parse(@course.gradebook_to_csv)
+    _name, _id, _section, score, _ = csv[-1]
+    expect(score).to eq "EX"
+  end
+
   it "should include all section names in alphabetical order" do
     course
     sections = []
