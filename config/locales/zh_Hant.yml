@@ -5624,6 +5624,7 @@ zh_Hant:
         already_used: 此提交件已經包含在您的電子檔案袋中
         feed: "電子檔案袋 Atom 摘要"
         view_submission: 檢視提交件
+      upload_limit: "每個檔案限制為 50MB"
       welcome: 如果這是您第一次來這裡，您可能想要彈出精靈，看看如何更好地開始。另外，可以快速新增近期提交件或只是直接跳到檔案袋。
       write_only_comments: 此頁面的註解是私有的。您可以進行註解，但只有檔案袋的所有者能夠看到。
     show_me: 為我顯示
@@ -7217,6 +7218,7 @@ zh_Hant:
   host_8be927e0: 主機
   html5_first_videos_description: "預設情況下，Canvas 會嘗試先使用 Flash 播放視頻。啟用該選項以嘗試先使用 HTML5，然後返回到 Flash。"
   html_editor_fb2ab713: "HTML 編輯器"
+  i_agree_to_the_terms_of_use_and_privacy_policy_f41760cc: 我同意*新的服務*條款和**隱私條款**。
   i_have_obtained_permission_to_use_this_file_6386f087: 我已經獲得了使用該檔案的權限。
   i_hold_the_copyright_71ee91b1: 我持有該版權
   ic_actions: 
