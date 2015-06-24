@@ -56,13 +56,18 @@ class RequestContextGenerator
     meta_headers << "#{name}=#{value};"
   end
 
+  def self.store_request_meta(request, context)
+    self.add_meta_header("o", request.path_parameters[:controller])
+    self.add_meta_header("n", request.path_parameters[:action])
+    if context
+      self.add_meta_header("t", context.class)
+      self.add_meta_header("i", context.id)
+    end
+  end
+
   def self.store_page_view_meta(page_view)
-    self.add_meta_header("o", page_view.controller)
-    self.add_meta_header("n", page_view.action)
     self.add_meta_header("x", page_view.interaction_seconds)
     self.add_meta_header("p", page_view.participated? ? "t" : "f")
-    self.add_meta_header("t", page_view.context_type)
-    self.add_meta_header("i", page_view.context_id)
     self.add_meta_header("e", page_view.asset_user_access_id)
   end
 end
