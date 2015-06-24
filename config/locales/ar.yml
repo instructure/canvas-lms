@@ -33,6 +33,7 @@ ar:
       other: "%{count} من الطلاب"
       two: "%{count} طالب"
       zero: "%{count} طالب"
+    student_count_max: "{count} / %{max}% من الطلاب"
     user_count: 
       few: "%{count} مستخدمين"
       many: "%{count} مستخدم"
@@ -40,6 +41,7 @@ ar:
       other: "%{count} من المستخدمين"
       two: "%{count} مستخدم"
       zero: "%{count} مستخدم"
+    user_count_max: "{count} / %{max}% من المستخدمين"
   GroupUserCollection: 
     flash: 
       userAlreadyInGroup: "تحذير: %{user} هو عضو بالفعل في %{group}"
@@ -5889,6 +5891,7 @@ ar:
         already_used: "تم تضمين هذا الإرسال بالفعل في المحفظة الخاصة بك"
         feed: "موجز Atom لـ Eportfolio"
         view_submission: "عرض الإرسال"
+      upload_limit: "تخصيص 50 ميجابايت لكل ملف"
       welcome: "إذا كانت هذه هي المرة الأولى لك هنا، فلعلك ترغب في انبثاق المعالج لمعرفة أفضل طريقة للبدء. وإلا فيمكنك إضافة الإرسالات الحديثة سريعًا أو الانتقال مباشرة للمحفظة."
       write_only_comments: "التعليقات الخاصة بهذه الصفحة خاصة. يمكنك إنشاء تعليقات، لكن سيكون مالك المحفظة فقط هو الشخص الوحيد الذي يمكنه عرضها."
     show_me: إظهار
