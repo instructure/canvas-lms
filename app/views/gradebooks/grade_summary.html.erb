@@ -391,7 +391,13 @@
       <% if assignment_presenter.has_rubric_assessments? %>
         <td colspan="5">
           <% assignment_presenter.rubric_assessments.each do |assessment| %>
-            <div class="assessor" style="text-align: right; margin-bottom: 5px"><%= t(:assessment_by, "Assessment by %{name}", :name => assessment.assessor_name) %></div>
+            <div class="assessor" style="text-align: right; margin-bottom: 5px">
+              <% if assignment.anonymous_peer_reviews %>
+                <%= t("Anonymous User") %>
+              <% else %>
+                <%= t("Assessment by %{name}", :name => assessment.assessor_name) %>
+              <% end %>
+            </div>
             <div class="rubric-toggle"><a href="#" data-aria="rubric_<%= assignment.id %>" class="screenreader-toggle pull-left"><%= t(:close_rubric, 'Close Rubric') %></a></div>
             <%= render :partial => "shared/rubric", :object => assessment.rubric, :locals => { :assessment => assessment } %>
           <% end %>
