@@ -5653,6 +5653,7 @@ zh:
         already_used: 该提交文件已包含在您的学业档案中
         feed: "学习档案 Atom 馈送"
         view_submission: 查看提交文件
+      upload_limit: "每个文件最大 50MB"
       welcome: 如果这是您首次来到这里，您可能希望弹出向导并查看如何快速入门。否则，您可以快速添加最近的提交文件或直接跳转至学习档案。
       write_only_comments: 此页的评论为私人可见。您可以发表评论，但只有学习档案的所有者能够看到它们。
     show_me: 给我看看
