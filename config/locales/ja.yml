@@ -160,6 +160,11 @@ ja:
       test_ldap_search_help_fixes_3: "LDAP のユーザ オブジェクトに、提供された検索ベースに対する検索特権があることを確認してください。"
       test_ldap_search_help_header: "Canvas は LDAP インスタンスを検索できません"
       test_ldap_search_label: "LDAP 検索をテストしています..."
+    linkedin_fields: 
+      description: |-
+          [LinkedInにアプリケーションを登録する](%{linkedin_url})必要があります。
+          OAuthの2.0リダイレクトの承認されたURLとして%{callback_url} を追加する必要があり、  そして、アプリケーションのステータスはライブに設定します。
+          アプリケーションの作成後、クライアントIDとシークレットをメモし、それらをここに入力してください。
     login_required: 入力が必要です
     no_changing_auth_types: 認証設定の種類は変更できません。削除した後、新しい設定を作成してください。
     password_required: 入力が必要です
@@ -5649,6 +5654,7 @@ ja:
         already_used: この提出物は既にポートフォリオに含まれています
         feed: "eポートフォリオの Atom フィード"
         view_submission: 提出物の表示
+      upload_limit: "ファイルあたり 50MB に制限する"
       welcome: はじめてこのページを訪れた場合は、ウィザードをポップアップさせて、おすすめの開始方法を確認できます。または、今すぐ最近の提出物を追加してもいいですし、一気にポートフォリオにアクセスするだけでも構いません。
       write_only_comments: このページへのコメントは非公開です。コメントすることはできますが、そのコメントを見ることができるのはポートフォリオの所有者のみです。
     show_me: 表示する
@@ -15216,6 +15222,10 @@ ja:
   you_will_need_to_register_an_application_on_github_3c8f213a: |-
       [GitHubにアプリを登録](%{github_url})する必要があります。
       リダイレクトURIとして、%{callback_url} を追加する必要があります。
+      アプリケーションの作成後、クライアントIDとシークレットをメモし、それらをここに入力してください。
+  you_will_need_to_register_an_application_on_linked_26ecb18d: |-
+      [LinkedInにアプリケーションを登録する](%{linkedin_url})必要があります。
+      OAuthの2.0リダイレクトの承認されたURLとして%{callback_url}を追加する必要があり、  そして、アプリケーションのステータスはライブに設定します。
       アプリケーションの作成後、クライアントIDとシークレットをメモし、それらをここに入力してください。
   you_will_need_to_register_an_application_on_twitte_5ff04bee: |-
       [Twitterにアプリを登録](%{twitter_url})する必要があります。
