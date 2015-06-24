@@ -107,6 +107,12 @@ jQuery(function($){
           $(this).slideUp(function() {
             $(this).remove();
           });
+        },
+        error: function(data, request, status, error) {
+          this.undim();
+          if (data.hasOwnProperty('message')) {
+            alert(data.message);
+          }
         }
       });
     }
