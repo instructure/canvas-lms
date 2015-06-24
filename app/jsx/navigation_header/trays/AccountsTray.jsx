@@ -9,7 +9,8 @@ define([
   var AccountsTray = React.createClass({
     propTypes: {
       accounts: React.PropTypes.array.isRequired,
-      closeTray: React.PropTypes.func.isRequired
+      closeTray: React.PropTypes.func.isRequired,
+      hasLoaded: React.PropTypes.bool.isRequired
     },
 
     getDefaultProps() {
@@ -19,6 +20,13 @@ define([
     },
 
     renderAccounts() {
+      if (!this.props.hasLoaded) {
+        return (
+          <li className="ReactTray__loading-list-item">
+            {I18n.t('Loading')} &hellip;
+          </li>
+        );
+      }
       return this.props.accounts.map((account) => {
         return <li key={account.id}><a href={`/accounts/${account.id}`}>{account.name}</a></li>;
       });

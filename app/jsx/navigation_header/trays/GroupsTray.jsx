@@ -9,7 +9,8 @@ define([
   var GroupsTray = React.createClass({
     propTypes: {
       groups: React.PropTypes.array.isRequired,
-      closeTray: React.PropTypes.func.isRequired
+      closeTray: React.PropTypes.func.isRequired,
+      hasLoaded: React.PropTypes.bool.isRequired
     },
 
     getDefaultProps() {
@@ -19,6 +20,13 @@ define([
     },
 
     renderGroups() {
+      if (!this.props.hasLoaded) {
+        return (
+          <li className="ReactTray__loading-list-item">
+            {I18n.t('Loading')} &hellip;
+          </li>
+        );
+      }
       return this.props.groups.map((group) => {
         return <li key={group.id}><a href={`/groups/${group.id}`}>{group.name}</a></li>;
       });

@@ -56,6 +56,7 @@ define([
           $.get(url, (data) => {
             var newState = {};
             newState[type] = data;
+            newState[`${type}AreLoaded`] = true;
             this.setState(newState);
           });
         });
@@ -148,11 +149,11 @@ define([
     renderTrayContent () {
       switch (this.state.type) {
         case 'courses':
-          return <CoursesTray courses={this.state.courses} closeTray={this.closeTray} />;
+          return <CoursesTray courses={this.state.courses} hasLoaded={this.state.coursesAreLoaded} closeTray={this.closeTray} />;
         case 'groups':
-          return <GroupsTray groups={this.state.groups} closeTray={this.closeTray} />;
+          return <GroupsTray groups={this.state.groups} hasLoaded={this.state.groupsAreLoaded} closeTray={this.closeTray} />;
         case 'accounts':
-          return <AccountsTray accounts={this.state.accounts} closeTray={this.closeTray} />;
+          return <AccountsTray accounts={this.state.accounts} hasLoaded={this.state.accountsAreLoaded} closeTray={this.closeTray} />;
         case 'profile':
           return <ProfileTray closeTray={this.closeTray} />;
         default:

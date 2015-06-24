@@ -9,7 +9,8 @@ define([
   var CoursesTray = React.createClass({
     propTypes: {
       courses: React.PropTypes.array.isRequired,
-      closeTray: React.PropTypes.func.isRequired
+      closeTray: React.PropTypes.func.isRequired,
+      hasLoaded: React.PropTypes.bool.isRequired
     },
 
     getDefaultProps() {
@@ -19,6 +20,13 @@ define([
     },
 
     renderCourses() {
+      if (!this.props.hasLoaded) {
+        return (
+          <li className="ReactTray__loading-list-item">
+            {I18n.t('Loading')} &hellip;
+          </li>
+        );
+      }
       var courses = this.props.courses.map((course) => {
         return <li key={course.id}><a href={`/courses/${course.id}`}>{course.name}</a></li>;
       });
