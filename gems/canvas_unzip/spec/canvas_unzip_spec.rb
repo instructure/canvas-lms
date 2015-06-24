@@ -98,6 +98,14 @@ describe "CanvasUnzip" do
     end
   end
 
+  describe "non-UTF-8 filenames" do
+    it "converts zip filename entries from cp437 to utf-8" do
+      stupid_entry = Zip::Entry.new
+      stupid_entry.name = "mol\x82"
+      expect(CanvasUnzip::Entry.new(stupid_entry).name).to eq('molé')
+    end
+  end
+
   it_behaves_like 'it extracts archives with extension', 'zip'
   it_behaves_like 'it extracts archives with extension', 'tar'
   it_behaves_like 'it extracts archives with extension', 'tar.gz'
