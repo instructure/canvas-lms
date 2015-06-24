@@ -26,14 +26,6 @@ module AccountAuthorizationConfig::PluginSettings
       Canvas::Plugin.find(plugin).enabled?
     end
 
-    def recognized_params
-      if globally_configured?
-        @recognized_params
-      else
-        @plugin_settings
-      end
-    end
-
     def plugin_settings(*settings)
       settings_hash = {}
       settings.each do |setting|
@@ -69,6 +61,15 @@ module AccountAuthorizationConfig::PluginSettings
   def self.included(klass)
     klass.instance_variable_set(:@recognized_params, klass.recognized_params)
     klass.extend(ClassMethods)
+
+    def klass.recognized_params
+      if globally_configured?
+        @recognized_params
+      else
+        @plugin_settings
+      end
+    end
+
     klass.cattr_accessor(:plugin)
   end
 
