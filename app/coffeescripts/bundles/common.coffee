@@ -35,6 +35,7 @@ require [
   'jqueryui/progressbar'
   'jqueryui/tabs'
   'compiled/registration/incompleteRegistrationWarning'
+  'moment'
 
   # random modules required by the js_blocks, put them all in here
   # so RequireJS doesn't try to load them before common is loaded

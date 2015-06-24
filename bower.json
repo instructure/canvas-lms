@@ -25,6 +25,7 @@
     "react-tokeninput": "https://github.com/instructure-react/react-tokeninput.git#0ea4354091831f87e0887fe54c5591b716b1f76c",
     "react-select-box": "https://github.com/instructure-react/react-select-box.git#b1ddd39223d48793fbe3dc4e87aca00d57197b5f",
     "react-tray": "~0.1.2",
-    "classnames": "~2.1.2"
+    "classnames": "~2.1.2",
+    "moment": "~2.10.3"
   }
 }
