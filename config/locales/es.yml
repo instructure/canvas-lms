@@ -5600,6 +5600,7 @@ es:
         already_used: "Este envío ya está incluído en su portafolio"
         feed: "Canal Atom para su ePortafolio"
         view_submission: "Ver el Envío"
+      upload_limit: "límite de 50MB por archivo"
       welcome: " Si esta es su primera vez visitandonos, puede que necesite la ayuda del asistente para ver como comenzar. De otra manera, puede agregar envíos recientes o simplemente accesar el portafolio. "
       write_only_comments: " Los comentarios para esta página son privados. Puede hacer comentarios, pero solo el dueño del portafolio podrá verlos. "
     show_me: mostrarme
