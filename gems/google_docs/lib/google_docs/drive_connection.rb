@@ -36,15 +36,33 @@ module GoogleDocs
       'google_drive'
     end
 
+    def with_timeout_protection
+      Timeout.timeout(30) { yield }
+    rescue Timeout::Error
+      raise DriveConnectionException, "Google Drive connection timed out"
+    end
+
+    def client_execute(options)
+      with_timeout_protection { api_client.execute(options) }
+    end
+
+    def client_execute!(options)
+      with_timeout_protection { api_client.execute!(options) }
+    end
+
+    def force_token_update
+      with_timeout_protection { api_client.authorization.update_token! }
+    end
+
     def download(document_id, extensions)
-      response = api_client.execute!(
+      response = client_execute!(
         :api_method => drive.files.get,
         :parameters => { :fileId => normalize_document_id(document_id) }
       )
 
       file = response.data.to_hash
       entry = GoogleDocs::DriveEntry.new(file, extensions)
-      result = api_client.execute(:uri => entry.download_url)
+      result = client_execute(:uri => entry.download_url)
       if result.status == 200
 
         # hack to make it seem like the old object
@@ -73,10 +91,10 @@ module GoogleDocs
         :mimeType => 'application/vnd.google-apps.document'
       }
 
-      api_client.authorization.update_token!
+      force_token_update
       file = drive.files.insert.request_schema.new(file_data)
 
-      result = api_client.execute(
+      result = client_execute(
         :api_method => drive.files.insert,
         :body_object => file
       )
@@ -89,8 +107,8 @@ module GoogleDocs
     end
 
     def delete_doc(document_id)
-      api_client.authorization.update_token!
-      result = api_client.execute(
+      force_token_update
+      result = client_execute(
         :api_method => drive.files.delete,
         :parameters => { :fileId => normalize_document_id(document_id) })
       if result.error? && !result.error_message.include?('File not found')
@@ -99,10 +117,10 @@ module GoogleDocs
     end
 
     def acl_remove(document_id, users)
-      api_client.authorization.update_token!
+      force_token_update
       users.each do |user_id|
         next if user_id.blank? || /@/.match(user_id) # google drive ids are numeric, google docs are emails. if it is a google doc email just skip it
-        result = api_client.execute(
+        result = client_execute(
           :api_method => drive.permissions.delete,
           :parameters => {
             :fileId => normalize_document_id(document_id),
@@ -121,16 +139,16 @@ module GoogleDocs
     #   Accounts not on this domain will be ignored.
     #
     # Returns nothing.
-    def acl_add(document_id, users, domain = nil)
+    def acl_add(document_id, users, _domain = nil)
       # TODO: support domain
-      api_client.authorization.update_token!
+      force_token_update
       users.each do |user_id|
         new_permission = drive.permissions.insert.request_schema.new({
            :id => user_id,
            :type => 'user',
            :role => 'writer'
         })
-        result = api_client.execute(
+        result = client_execute(
           :api_method => drive.permissions.insert,
           :body_object => new_permission,
           :parameters => { :fileId => normalize_document_id(document_id) }
@@ -142,11 +160,11 @@ module GoogleDocs
     end
 
     def verify_access_token
-      api_client.authorization.update_token!
-      api_client.execute(:api_method => drive.about.get).status == 200
+      force_token_update
+      client_execute(:api_method => drive.about.get).status == 200
     end
 
-    def self.config_check(settings)
+    def self.config_check(_settings)
       raise DriveConnectionException("No config check")
     end
 
@@ -164,7 +182,12 @@ module GoogleDocs
     private
 
     def list(extensions)
-      folderize_list(api_client.execute!(:api_method => drive.files.list, :parameters => {:maxResults => 0}).data.to_hash, extensions)
+      client_params = {
+        api_method: drive.files.list,
+        parameters: { maxResults: 0 }
+      }
+      list_data = client_execute!(client_params).data.to_hash
+      folderize_list(list_data, extensions)
     end
 
     def normalize_document_id(doc_id)
@@ -207,6 +230,13 @@ module GoogleDocs
       @api_client ||= GoogleDrive::Client.create(GoogleDocs::DriveConnection.config, @refresh_token, @access_token)
     end
 
+    # override for specs because GoogleDrive is in a sibling project
+    # and not an actual declared dependency of this gem.  That's
+    # probably a design mistake that should be corrected
+    def set_api_client(client)
+      @api_client = client
+    end
+
     def drive
       api_client.discovered_api('drive', 'v2')
     end
@@ -222,4 +252,3 @@ module GoogleDocs
     end
   end
 end
-

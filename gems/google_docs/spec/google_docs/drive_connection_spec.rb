@@ -23,6 +23,57 @@ describe GoogleDocs::DriveConnection do
   let(:token) { "token" }
   let(:secret) { "secret" }
 
+  fake_client = Class.new do
+    attr_reader :token
+    attr_writer :responses
+
+    def initialize(input=nil)
+      @input = input
+      @calls = 0
+      @token = 0
+      @responses = []
+    end
+
+    def insert
+      self
+    end
+
+    def request_schema
+      self.class
+    end
+
+    def discovered_api(_endpoint, _version)
+      self
+    end
+
+    def files
+      self
+    end
+
+    def authorization
+      self
+    end
+
+    def update_token!
+      @token += 1
+    end
+
+    def get
+      "/api_method"
+    end
+
+    def execute!(*_args)
+      response = @responses[@calls]
+      @calls += 1
+      response
+    end
+
+    def execute(*args)
+      execute!(*args)
+    end
+
+  end
+
   before do
     config = {
       "api_key" => "key",
@@ -102,7 +153,67 @@ describe GoogleDocs::DriveConnection do
 
       doc_id = google_docs.send(:normalize_document_id, "awesome-document-id")
       expect(doc_id).to eq("awesome-document-id")
+    end
+  end
 
+  describe "API interaction" do
+    let(:connection){ GoogleDocs::DriveConnection.new(token, secret) }
+    let(:client){ fake_client.new }
+
+    before do
+      connection.send(:set_api_client, client)
+    end
+
+    describe "#download" do
+      before do
+        client.responses = [
+          stub(status: 200, data:
+                {
+                  'parents' => [],
+                  'title' => "SomeFile.txt"
+                }
+              ),
+          stub(status: 200, data: {})
+        ]
+      end
+
+      it "requests a download from the api client" do
+        output = connection.download("42", nil)
+        expect(output[1]).to eq("SomeFile.txt")
+        expect(output[2]).to eq("txt")
+      end
+
+      it "wraps a timeout in a drive connection exception" do
+        Timeout.stubs(:timeout).raises(Timeout::Error)
+        expect{ connection.download("42", nil) }.to(
+          raise_error(GoogleDocs::DriveConnectionException) do |e|
+            expect(e.message).to eq("Google Drive connection timed out")
+          end
+        )
+      end
+    end
+
+    describe "#create_doc" do
+
+      before do
+        client.responses = [
+          stub(status: 200, data: {})
+        ]
+      end
+
+      it "forces a new refresh token" do
+        connection.create_doc("DocName")
+        expect(client.token).to eq(1)
+      end
+
+      it "wraps a timeout in a drive connection exception" do
+        Timeout.stubs(:timeout).raises(Timeout::Error)
+        expect{ connection.create_doc("Docname") }.to(
+          raise_error(GoogleDocs::DriveConnectionException) do |e|
+            expect(e.message).to eq("Google Drive connection timed out")
+          end
+        )
+      end
     end
   end
 end
