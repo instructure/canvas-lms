@@ -406,11 +406,25 @@ class ContextModule < ActiveRecord::Base
   end
 
   def cached_active_tags
-    @cached_active_tags ||= self.content_tags.active.reload
+    @cached_active_tags ||= begin
+      if self.content_tags.loaded?
+        # don't reload the preloaded content
+        self.content_tags.select{|tag| tag.active?}
+      else
+        self.content_tags.active.to_a
+      end
+    end
   end
 
   def cached_not_deleted_tags
-    @cached_not_deleted_tags ||= self.content_tags.not_deleted.reload
+    @cached_not_deleted_tags ||= begin
+      if self.content_tags.loaded?
+        # don't reload the preloaded content
+        self.content_tags.select{|tag| !tag.deleted?}
+      else
+        self.content_tags.not_deleted.to_a
+      end
+    end
   end
 
   def add_item(params, added_item=nil, opts={})
