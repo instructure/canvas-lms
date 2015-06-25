@@ -215,8 +215,8 @@ class Quizzes::QuizzesController < ApplicationController
       js_env(hash)
 
       @quiz_menu_tools = external_tools_display_hashes(:quiz_menu)
-      @can_take = can_take_quiz?
-      if params[:take] && @can_take
+      if params[:take] && (@can_take = can_take_quiz?)
+
         # allow starting the quiz via a GET request, but only when using a lockdown browser
         if request.post? || (@quiz.require_lockdown_browser? && !quiz_submission_active?)
           start_quiz!
@@ -855,18 +855,33 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def can_take_quiz?
-    return false if params[:take] && !authorized_action(@quiz, @current_user, :submit)
+    return false if @locked
+    return false unless authorized_action(@quiz, @current_user, :submit)
     return false if @quiz.require_lockdown_browser? && !check_lockdown_browser(:highest, named_context_url(@context, 'context_quiz_take_url', @quiz.id))
-    can_take = Quizzes::QuizEligibility.new(course: @context,
-                                            quiz: @quiz,
-                                            user: @current_user,
-                                            session: session,
-                                            remote_ip: request.remote_ip,
-                                            access_code: params[:access_code])
 
-    reason = can_take.declined_reason_renders
-    render reason if reason
-    can_take.eligible?
+    quiz_access_code_key = @quiz.access_code_key_for_user(@current_user)
+
+    if @quiz.access_code.present? && params[:access_code] == @quiz.access_code
+      session[quiz_access_code_key] = true
+    end
+    if @quiz.access_code.present? && !session[quiz_access_code_key]
+      render :access_code
+      false
+    elsif @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
+      render :invalid_ip
+      false
+    elsif @section.present? && @section.restrict_enrollments_to_section_dates && @section.end_at < Time.now
+      false
+    elsif @context.restrict_enrollments_to_course_dates && @context.soft_concluded?
+      false
+    elsif @current_user.present? &&
+          @context.present? &&
+          @context.enrollments.where(user_id: @current_user.id).all? {|e| e.inactive? } &&
+          !@context.grants_right?(@current_user, :read_as_admin)
+      false
+    else
+      true
+    end
   end
 
   def quiz_submission_active?
