@@ -175,6 +175,9 @@ class RubricAssessment < ActiveRecord::Base
     given {|user, session| self.rubric_association && self.rubric_association.grants_right?(user, session, :manage) }
     can :create and can :read and can :delete
 
+    given {|user, session| self.rubric_association && self.rubric_association.grants_right?(user, session, :view_rubric_assessments) }
+    can :read
+
     given {|user, session|
       self.rubric_association &&
       self.rubric_association.grants_right?(user, session, :manage) &&

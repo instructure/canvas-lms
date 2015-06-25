@@ -204,4 +204,46 @@ describe RubricAssessment do
       end
     end
   end
+
+  describe "read permissions" do
+    before(:once) do
+      @account = @course.root_account
+      @assessment = @association.assess({
+                                          :user => @student,
+                                          :assessor => @teacher,
+                                          :artifact => @assignment.find_or_create_submission(@student),
+                                          :assessment => {
+                                            :assessment_type => 'grading',
+                                            :criterion_crit1 => {
+                                              :points => 5,
+                                              :comments => "comments",
+                                            }
+                                          }
+                                        })
+    end
+
+    it "grants :read to the user" do
+      expect(@assessment.grants_right?(@student, :read)).to eq true
+    end
+
+    it "grants :read to the assessor" do
+      expect(@assessment.grants_right?(@teacher, :read)).to eq true
+    end
+
+    it "does not grant :read to an account user without :manage_courses or :view_all_grades" do
+      user
+      role = custom_account_role('custom', :account => @account)
+      @account.account_users.create!(user: @user, role: role)
+      expect(@assessment.grants_right?(@user, :read)).to eq false
+    end
+
+    it "grants :read to an account user with :view_all_grades but not :manage_courses" do
+      user
+      role = custom_account_role('custom', :account => @account)
+      RoleOverride.create!(:context => @account, :permission => 'view_all_grades', :role => role, :enabled => true)
+      RoleOverride.create!(:context => @account, :permission => 'manage_courses', :role => role, :enabled => false)
+      @account.account_users.create!(user: @user, role: role)
+      expect(@assessment.grants_right?(@user, :read)).to eq true
+    end
+  end
 end

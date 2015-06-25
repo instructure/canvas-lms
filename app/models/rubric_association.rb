@@ -146,6 +146,9 @@ class RubricAssociation < ActiveRecord::Base
 
     given {|user, session| self.context.grants_right?(user, session, :participate_as_student) }
     can :submit
+
+    given {|user, session| self.context.grants_right?(user, session, :view_all_grades)}
+    can :view_rubric_assessments
   end
 
   def update_assignment_points
