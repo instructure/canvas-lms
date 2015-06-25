@@ -1,14 +1,11 @@
 class CanvasTwitterConfig
-  def initialize(plugin=Canvas::Plugin.find(:twitter))
-    @plugin = plugin
-  end
 
-  def call
-    settings = @plugin.try(:settings)
+  def self.call
+    settings = Canvas::Plugin.find(:twitter).try(:settings)
     if settings
       {
-          api_key: settings[:consumer_key],
-          secret_key: settings[:consumer_secret_dec]
+        api_key: settings[:consumer_key],
+        secret_key: settings[:consumer_secret_dec]
       }.with_indifferent_access
     else
       ConfigFile.load('twitter')
@@ -18,4 +15,4 @@ class CanvasTwitterConfig
 end
 
 
-Twitter::Connection.config = CanvasTwitterConfig.new
+Twitter::Connection.config = CanvasTwitterConfig
