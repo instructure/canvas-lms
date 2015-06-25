@@ -54,12 +54,23 @@ module AttachmentFu # :nodoc:
       end
 
       def filename=(value)
+        value = sanitize_filename(value)
         if self.new_record?
-          write_attribute(:filename, value)
+          write_attribute :filename, value
         else
           @old_filename = full_filename unless filename.nil? || @old_filename
-          write_attribute :filename, sanitize_filename(value)
+          write_attribute :filename, value
         end
+      end
+
+      def sanitize_filename(filename)
+        if self.respond_to?(:root_attachment) && self.root_attachment && self.root_attachment.filename
+          filename = self.root_attachment.filename
+        else
+          filename = Attachment.truncate_filename(filename, 255)
+          filename.gsub!(%r{/| }, '_')
+        end
+        filename
       end
 
       def bucket_name; "no-bucket"; end

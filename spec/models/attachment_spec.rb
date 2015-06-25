@@ -1453,4 +1453,21 @@ describe Attachment do
       end
     end
   end
+
+  describe 'local storage' do
+    it 'should properly sanitie a filename containing a slash' do
+      local_storage!
+      course
+      a = attachment_model(filename: 'ENGL_100_/_ENGL_200.csv')
+      expect(a.filename).to eql('ENGL_100___ENGL_200.csv')
+    end
+
+    it 'should still properly escape the same filename on s3' do
+      s3_storage!
+      course
+      a = attachment_model(filename: 'ENGL_100_/_ENGL_200.csv')
+      expect(a.filename).to eql('ENGL_100_%2F_ENGL_200.csv')
+    end
+  end
+
 end
