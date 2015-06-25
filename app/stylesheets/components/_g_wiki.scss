@@ -357,13 +357,13 @@ $revision-button-hover-color: $ic-brand-primary;
     margin: 4px 0 6px 25px;
   }
   .show-content {
+    overflow-x: auto;
     @if $use_new_styles {
       padding: 0 $ic-sp;
       @include breakpoint(desktop) { padding: 0 $ic-sp*3 0 $ic-sp*2; } 
     }
     @else { 
-      padding: 15px 25px; 
-      overflow-x: auto;
+      padding: 15px 25px;
     }
   }
   .floating_links {

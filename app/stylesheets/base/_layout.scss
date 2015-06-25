@@ -140,8 +140,10 @@ body {
 
 #content {
   @if $use_new_styles { padding: $ic-sp*2; }
-  @else { padding: 1em; }
-  overflow: hidden;
+  @else { 
+    padding: 1em; 
+    overflow: hidden; 
+  } 
 }
 
 // **********************************************************************************
