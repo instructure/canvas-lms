@@ -30,9 +30,18 @@ describe Quizzes::QuizEligibility do
     user.stubs(:workflow_state).returns('active')
     course.stubs(:enrollment_term).returns(term)
     quiz.stubs(:grants_right?).returns(true)
+    quiz.stubs(:grants_right?)
+      .with(anything, anything, :manage_assignments).returns(false)
   end
 
   describe "#eligible?" do
+
+    it "always returns true if the user is a teacher" do
+      quiz.stubs(:grants_right?).returns(false)
+      quiz.stubs(:grants_right?)
+        .with(anything, anything, :manage_assignments).returns(true)
+      expect(eligibility.eligible?).to be_truthy
+    end
 
     it "returns false if no course is provided" do
       eligibility.stubs(:course).returns(nil)

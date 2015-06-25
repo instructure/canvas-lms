@@ -33,6 +33,7 @@ class Quizzes::QuizEligibility
   end
 
   def eligible?
+    return true if quiz.grants_right?(user, session, :manage_assignments)
     return false unless course
     return false if inactive_student_with_private_course?
     !(course_restrictions_apply? || user_restrictions_apply?)

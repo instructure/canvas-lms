@@ -64,6 +64,23 @@ describe "site-wide" do
     expect(response['x-frame-options']).to be_nil
   end
 
+  context "x-canvas-meta header" do
+    it "should set action information in API requests" do
+      course_with_teacher_logged_in
+      get "/api/v1/courses/#{@course.id}"
+      expect(response['x-canvas-meta']).to match(%r{o=courses;n=show;})
+    end
+
+    it "should set page view information in user requests" do
+      course_with_teacher_logged_in
+      Setting.set('enable_page_views', 'db')
+      get "/courses/#{@course.id}"
+      expect(response['x-canvas-meta']).to match(%r{o=courses;n=show;})
+      expect(response['x-canvas-meta']).to match(%r{t=Course;})
+      expect(response['x-canvas-meta']).to match(%r{x=5;})
+    end
+  end
+
   context "user headers" do
     before(:each) do
       course_with_teacher

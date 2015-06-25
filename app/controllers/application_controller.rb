@@ -303,6 +303,7 @@ class ApplicationController < ActionController::Base
     if !files_domain? && Setting.get('block_html_frames', 'true') == 'true' && !@embeddable
       headers['X-Frame-Options'] = 'SAMEORIGIN'
     end
+    RequestContextGenerator.store_request_meta(request, @context)
     true
   end
 
