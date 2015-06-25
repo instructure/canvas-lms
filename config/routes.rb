@@ -1734,10 +1734,4 @@ CanvasRails::Application.routes.draw do
     #Tool Proxy Services
     get  "tool_proxy/:tool_proxy_guid", controller: 'lti/ims/tool_proxy', action: :show, as: "show_lti_tool_proxy"
   end
-
-  ApiRouteSet.draw(self, "/api/sis") do
-    scope(controller: :sis_api) do
-      get 'grade_export/accounts/:account_id/assignments', :action => 'sis_assignments', :as => :sis_assignments
-    end
-  end
 end
