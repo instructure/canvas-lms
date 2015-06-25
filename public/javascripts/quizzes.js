@@ -280,7 +280,7 @@ define([
         htmlValues: ['answer_html', 'answer_match_left_html']
       });
 
-      addHTMLFeedback($answer, answer, 'answer_comment');
+      addHTMLFeedback($answer.find('.answer_comments'), answer, 'answer_comment');
 
       if (answer.answer_weight > 0) {
         $answer.addClass('correct_answer');
