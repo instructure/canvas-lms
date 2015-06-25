@@ -5651,6 +5651,7 @@ pt:
         already_used: "Este envio já está incluído no seu portefólio"
         feed: "Feed Atom do ePortfolio"
         view_submission: "Exibir o envio"
+      upload_limit: "limite de 50MB por arquivo"
       welcome: "Se esta for a sua primeira vez aqui, poderá usar o pop-up do assistente e ver a melhor forma de começar. Caso contrário, pode adicionar rapidamente envios recentes ou ir diretamente para o seu portefólio."
       write_only_comments: "Os comentários desta página são privados. Pode fazer comentários, mas apenas o proprietário do portefólio poderá vê-los."
     show_me: mostre-me

@@ -116,7 +116,7 @@ describe "context modules" do
         click_option('#add_module_item_select', 'wiki_page', :value)
         click_option('#wiki_pages_select .module_item_select', 'new', :value)
         replace_content(f('#wiki_pages_select .item_title'), 'new page')
-        fj('.add_item_button:visible').click
+        fj('.add_item_button.ui-button').click
         wait_for_ajaximations
 
         new_page = WikiPage.last
@@ -149,7 +149,7 @@ describe "context modules" do
         replace_content(f('#content_tag_create_url'), 'http://www.example.com')
         replace_content(f('#content_tag_create_title'), 'new item')
 
-        fj('.add_item_button:visible').click
+        fj('.add_item_button.ui-button').click
         wait_for_ajaximations
 
         new_tag = ContentTag.last

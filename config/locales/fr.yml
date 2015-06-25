@@ -5644,6 +5644,7 @@ fr:
         already_used: "Cet envoi est déjà inclus dans votre portefeuille."
         feed: "Flux Atom du portefeuille électronique"
         view_submission: "Afficher l’envoi"
+      upload_limit: "limiter à 50 Mo par fichier"
       welcome: "S’il s’agit de votre première visite, vous pouvez ouvrir l’assistant et choisir la meilleure solution pour débuter. Sinon, vous pouvez rapidement ajouter des envois récents ou simplement accéder directement au portefeuille."
       write_only_comments: "Les commentaires sur cette page sont privés. Vous pouvez faire des commentaires, mais seul le propriétaire du portefeuille pourra les consulter."
     show_me: montrez-moi

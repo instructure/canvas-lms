@@ -17,6 +17,10 @@
 #
 
 class AccountAuthorizationConfig::Facebook < AccountAuthorizationConfig::Oauth2
+  def self.recognized_params
+    [ :login_attribute ].freeze
+  end
+
   include AccountAuthorizationConfig::PluginSettings
   self.plugin = :facebook
 
@@ -40,10 +44,6 @@ class AccountAuthorizationConfig::Facebook < AccountAuthorizationConfig::Oauth2
 
   def client_secret
     self.class.globally_configured? ? app_secret : super
-  end
-
-  def self.recognized_params
-    [ :login_attribute ].freeze
   end
 
   def self.login_attributes

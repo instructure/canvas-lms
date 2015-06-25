@@ -36,9 +36,7 @@ define [
     ok $dialog.is(':ui-dialog:visible'), 'pops up dialog'
     equal $dialog.dialog('option', 'buttons').length, 2, 'converts both buttons in .button-pane only'
 
-    msg = "hides the original .buttons in the .button-container only"
-    $dialog.find('.btn').each ->
-      equal $(this).is(':hidden'), ($(this).text() isnt 'Should NOT be converted'), msg
+    equal $dialog.find('.button-container').first().css('left'), '-9999px', "moves the original .buttons in the .button-container should have an offeset of -999px"
 
     msg = "make sure clicking on converted ui-dialog-button causes submit handler to be called on form"
     $submitButton = $dialog.dialog('widget').find('.ui-dialog-buttonpane .ui-button:contains("This will Submit the form")')
