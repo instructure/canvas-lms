@@ -12,6 +12,8 @@
 
 .bundle/
 /.yardoc/
+/.ruby-gemset
+/.ruby-version
 /app/coffeescripts/ember/*/main.coffee
 /app/views/info/styleguide.html.erb
 /config/*.yml
