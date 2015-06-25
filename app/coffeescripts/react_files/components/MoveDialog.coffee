@@ -24,6 +24,7 @@ define [
       rootFoldersToShow: React.PropTypes.arrayOf(customPropTypes.folder).isRequired
       thingsToMove: React.PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired
       onClose: React.PropTypes.func.isRequired
+      onMove: React.PropTypes.func.isRequired
 
     getInitialState: ->
       destinationFolder: null
@@ -43,6 +44,7 @@ define [
     submit: () ->
       promise = moveStuff(@props.thingsToMove, @state.destinationFolder)
       promise.then =>
+        @props.onMove()
         @closeDialog()
 
     closeDialog: ->

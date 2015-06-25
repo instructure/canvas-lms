@@ -198,6 +198,7 @@ define [
                 onItemDragEnterOrOver: @onItemDragEnterOrOver
                 onItemDragLeaveOrEnd: @onItemDragLeaveOrEnd
                 onItemDrop: @onItemDrop
+              clearSelectedItems: @clearSelectedItems
 
         div className: 'ef-footer grid-row',
           if userCanManageFilesForContext

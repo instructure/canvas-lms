@@ -152,6 +152,7 @@ define [
               previewItem: @props.previewItem.bind(null, child)
               dndOptions: @props.dndOptions
               modalOptions: @props.modalOptions
+              clearSelectedItems: @props.clearSelectedItems
 
         LoadingIndicator isLoading: @props.currentFolder.folders.fetchingNextPage || @props.currentFolder.files.fetchingNextPage
 

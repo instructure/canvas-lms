@@ -63,6 +63,22 @@ def move_using_cog_icon(file_name, row_selected = 0)
   ff(".btn-primary")[1].click
 end
 
+def move_multiple_using_toolbar(files = [])
+  files.each do |file_name|
+    file = driver.find_element(xpath: "//span[contains(text(), '#{file_name}') and @class='media-body']")
+                 .find_element(xpath: "../..")
+    driver.action.key_down(:control).click(file).key_up(:control).perform
+  end
+  wait_for_ajaximations
+  f('.btn-move').click
+  wait_for_ajaximations
+  expect(f(".ReactModal__Header-Title h4").text).to eq "Where would you like to move these #{files.count} items?"
+  ff(".treeLabel span")[3].click
+  driver.action.send_keys(:return).perform
+  wait_for_ajaximations
+  ff(".btn-primary")[1].click
+end
+
 #This method sets permissions on files/folders
 def set_item_permissions(permission_type = :publish, restricted_access_option = nil)
   f('.btn-link.published-status').click

@@ -104,7 +104,7 @@ describe "better_file_browsing" do
   context "Move dialog" do
     before(:each) do
       course_with_teacher_logged_in
-      txt_files = ["a_file.txt", "b_file.txt"]
+      txt_files = ["a_file.txt", "b_file.txt", "c_file.txt"]
       txt_files.map { |text_file| add_file(fixture_file_upload("files/#{text_file}", 'text/plain'), @course, text_file) }
       get "/courses/#{@course.id}/files"
     end
@@ -122,10 +122,26 @@ describe "better_file_browsing" do
       expect(f("#flash_message_holder").text).to eq "#{file_name} moved to destination_folder\nClose"
       wait_for_ajaximations
       expect(ff('.media-body')[0].text).not_to eq file_name
-      ff('.media-body')[1].click
+      ff('.media-body')[2].click
       wait_for_ajaximations
       expect(fln(file_name)).to be_displayed
     end
+    it "should move multiple files", priority: '1' do
+      files = ["a_file.txt", "b_file.txt", "c_file.txt"]
+      add_folder("destination_folder")
+      move_multiple_using_toolbar(files)
+      wait_for_ajaximations
+      expect(f("#flash_message_holder").text).to eq "#{files.count} items moved to destination_folder\nClose"
+      wait_for_ajaximations
+      expect(ff('.media-body')[0].text).not_to eq files[0]
+      ff('.media-body')[0].click
+      wait_for_ajaximations
+      files.each do |file|
+        expect(fln(file)).to be_displayed
+      end
+    end
+
+
   end
 
   context "File Downloads" do

@@ -197,6 +197,7 @@ define [
                     contextType: @props.contextType
                     contextId: @props.contextId
                     returnFocusTo: event.target
+                    clearSelectedItems: @props.clearSelectedItems
                   })
                 title: I18n.t('move', 'Move')
                 'aria-label': I18n.t('move', 'Move')

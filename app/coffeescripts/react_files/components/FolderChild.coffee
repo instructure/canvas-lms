@@ -234,4 +234,5 @@ define [
               usageRightsRequiredForContext: @props.usageRightsRequiredForContext
               externalToolsForContext: @props.externalToolsForContext
               modalOptions: @props.modalOptions
+              clearSelectedItems: @props.clearSelectedItems
             })

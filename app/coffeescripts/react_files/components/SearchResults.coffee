@@ -125,6 +125,7 @@ define [
               previewItem: @props.previewItem.bind(null, child)
               dndOptions: @props.dndOptions
               modalOptions: @props.modalOptions
+              clearSelectedItems: @props.clearSelectedItems
           LoadingIndicator isLoading: !@state.collection.loadedAll
 
           # Prepare and render the FilePreview if needed.
