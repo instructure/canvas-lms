@@ -23,17 +23,19 @@ class ObserverEnrollment < Enrollment
 
   # returns a hash mapping students to arrays of enrollments
   def self.observed_students(context, current_user)
-    context.shard.activate do
-      observer_enrollments = context.observer_enrollments.where("user_id=? AND associated_user_id IS NOT NULL", current_user)
-      observed_students = {}
-      observer_enrollments.each do |e|
-        student_enrollment = StudentEnrollment.active.where(user_id: e.associated_user_id, course_id: e.course_id).first
-        next unless student_enrollment
-        student = student_enrollment.user
-        observed_students[student] ||= []
-        observed_students[student] << student_enrollment
+    TempCache.cache(:observed_students, context, current_user) do
+      context.shard.activate do
+        observer_enrollments = context.observer_enrollments.where("user_id=? AND associated_user_id IS NOT NULL", current_user)
+        observed_students = {}
+        observer_enrollments.each do |e|
+          student_enrollment = StudentEnrollment.active.where(user_id: e.associated_user_id, course_id: e.course_id).first
+          next unless student_enrollment
+          student = student_enrollment.user
+          observed_students[student] ||= []
+          observed_students[student] << student_enrollment
+        end
+        observed_students
       end
-      observed_students
     end
   end
 

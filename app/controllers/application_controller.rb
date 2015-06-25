@@ -554,23 +554,27 @@ class ApplicationController < ActionController::Base
     raise(ArgumentError, "Need a starting context") if @context.nil?
 
     @contexts = [@context]
-    only_contexts = ActiveRecord::Base.parse_asset_string_list(params[:only_contexts])
+    only_contexts = ActiveRecord::Base.parse_asset_string_list(opts[:only_contexts] || params[:only_contexts])
     if @context && @context.is_a?(User)
       # we already know the user can read these courses and groups, so skip
       # the grants_right? check to avoid querying for the various memberships
       # again.
-      courses = @context.enrollments.current.shard(@context).select { |e| e.state_based_on_date == :active }.map(&:course).uniq
-      groups = opts[:include_groups] ? @context.current_groups.with_each_shard.reject{|g| g.context_type == "Course" &&
-          g.context.concluded?} : []
+      enrollment_scope = @context.enrollments.current.shard(@context).preload(:course)
+      group_scope = opts[:include_groups] ? @context.current_groups : nil
+
       if only_contexts.present?
         # find only those courses and groups passed in the only_contexts
         # parameter, but still scoped by user so we know they have rights to
         # view them.
         course_ids = only_contexts.select { |c| c.first == "Course" }.map(&:last)
-        courses = course_ids.empty? ? [] : courses.select { |c| course_ids.include?(c.id) }
-        group_ids = only_contexts.select { |c| c.first == "Group" }.map(&:last)
-        groups = group_ids.empty? ? [] : groups.select { |g| group_ids.include?(g.id) } if opts[:include_groups]
+        enrollment_scope = enrollment_scope.where(:course_id => course_ids)
+        if group_scope
+          group_ids = only_contexts.select { |c| c.first == "Group" }.map(&:last)
+          group_scope = group_scope.where(:id => group_ids)
+        end
       end
+      courses = enrollment_scope.select { |e| e.state_based_on_date == :active }.map(&:course).uniq
+      groups = group_scope ? group_scope.with_each_shard.reject{|g| g.context_type == "Course" && g.context.concluded?} : []
 
       if opts[:favorites_first]
         favorite_course_ids = @context.favorite_context_ids("Course")
@@ -580,14 +584,17 @@ class ApplicationController < ActionController::Base
       @contexts.concat courses
       @contexts.concat groups
     end
-    if params[:include_contexts]
-      params[:include_contexts].split(",").each do |include_context|
+
+    include_contexts = opts[:include_contexts] || params[:include_contexts]
+    if include_contexts
+      include_contexts.split(",").each do |include_context|
         # don't load it again if we've already got it
         next if @contexts.any? { |c| c.asset_string == include_context }
         context = Context.find_by_asset_string(include_context)
         @contexts << context if context && context.grants_right?(@current_user, :read)
       end
     end
+
     @contexts = @contexts.uniq
     Course.require_assignment_groups(@contexts)
     @context_enrollment = @context.membership_for_user(@current_user) if @context.respond_to?(:membership_for_user)

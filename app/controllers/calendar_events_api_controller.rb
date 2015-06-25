@@ -280,6 +280,8 @@ class CalendarEventsApiController < ApplicationController
   #   no course/group events). Limited to 10 context codes, additional ones are
   #   ignored. The format of this field is the context type, followed by an
   #   underscore, followed by the context id. For example: course_42
+  # @argument excludes[] [Array]
+  #   Array of attributes to exclude. Possible values are "description", "child_events" and "assignment"
   #
   # @returns [CalendarEvent]
   def index
@@ -311,7 +313,7 @@ class CalendarEventsApiController < ApplicationController
     mark_submitted_assignments(@current_user, events) if @type == :assignment
 
     if @errors.empty?
-      render :json => events.map { |event| event_json(event, @current_user, session) }
+      render :json => events.map { |event| event_json(event, @current_user, session, {:excludes => params[:excludes]}) }
     else
       render json: {errors: @errors.as_json}, status: :bad_request
     end
@@ -696,14 +698,11 @@ class CalendarEventsApiController < ApplicationController
     @type ||= params[:type] == 'assignment' ? :assignment : :event
 
     @context ||= @current_user
-    # refactor opportunity: get_all_pertinent_contexts expects the list of
-    # unenrolled contexts to be in the include_contexts parameter, rather than
-    # a function parameter
-    params[:include_contexts] = codes.join(",") if codes
 
     # only get pertinent contexts if there is a user
     if @current_user
-      get_all_pertinent_contexts(include_groups: true)
+      joined_codes = codes && codes.join(",")
+      get_all_pertinent_contexts(include_groups: true, only_contexts: joined_codes, include_contexts: joined_codes)
     end
 
     if codes
@@ -823,6 +822,9 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def apply_assignment_overrides(events)
+    ActiveRecord::Associations::Preloader.new(events, [:context, :assignment_overrides]).run
+
+    TempCache.enable do
     events = events.inject([]) do |assignments, assignment|
 
       if assignment.context.user_has_been_student?(@current_user)
@@ -843,7 +845,7 @@ class CalendarEventsApiController < ApplicationController
         end
 
         if original_dates.present?
-          if (assignment.context.user_has_been_observer?(@current_user) && assignments.empty?) || (assignment.context.course_sections.active.count != overridden_dates.size)
+          if (assignment.context.user_has_been_observer?(@current_user) && assignments.empty?) || (assignment.context.active_section_count != overridden_dates.size)
             assignments << assignment
           end
         end
@@ -858,6 +860,7 @@ class CalendarEventsApiController < ApplicationController
         due_at = assignment.due_at
         due_at && (due_at > @end_date || due_at < @start_date)
       end
+    end
     end
 
     events

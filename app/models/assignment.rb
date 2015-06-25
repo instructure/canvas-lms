@@ -473,7 +473,8 @@ class Assignment < ActiveRecord::Base
     tags_to_update.each { |tag| tag.context_module_action(user, action, points) }
   end
 
-  def context_module_tag_info(user)
+  def context_module_tag_info(user, context)
+    self.association(:context).target ||= context
     tag_info = {:points_possible => self.points_possible}
     if self.multiple_due_dates_apply_to?(user)
       tag_info[:vdd_tooltip] = OverrideTooltipPresenter.new(self, user).as_json

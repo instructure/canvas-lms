@@ -19,7 +19,7 @@
 class ContextModulesController < ApplicationController
   include Api::V1::ContextModule
 
-  before_filter :require_context  
+  before_filter :require_context
   add_crumb(proc { t('#crumbs.modules', "Modules") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_context_modules_url }
   before_filter { |c| c.active_tab = "modules" }
 
@@ -84,7 +84,7 @@ class ContextModulesController < ApplicationController
       end
     end
   end
-  
+
   def module_redirect
     if authorized_action(@context, @current_user, :read)
       @module = @context.context_modules.not_deleted.find(params[:context_module_id])
@@ -120,7 +120,7 @@ class ContextModulesController < ApplicationController
       end
     end
   end
-  
+
   def create
     if authorized_action(@context.context_modules.scoped.new, @current_user, :create)
       @module = @context.context_modules.build
@@ -164,12 +164,21 @@ class ContextModulesController < ApplicationController
   def content_tag_assignment_data
     if authorized_action(@context, @current_user, :read)
       info = {}
-      @context.module_items_visible_to(@current_user).each do |tag|
-        info[tag.id] = Rails.cache.fetch([tag, @current_user, "content_tag_assignment_info"].cache_key) do
-          if tag.assignment
-            tag.assignment.context_module_tag_info(@current_user)
+      TempCache.enable do
+        @context.module_items_visible_to(@current_user).each do |tag|
+          if tag.can_have_assignment?
+            info[tag.id] = Rails.cache.fetch([tag, @current_user, "content_tag_assignment_info"].cache_key) do
+              if tag.assignment
+                tag.assignment.context_module_tag_info(@current_user, @context)
+              else
+                {
+                  :points_possible => nil,
+                  :due_date => (tag.content_type_quiz? && tag.content.due_at ? tag.content.due_at.utc.iso8601 : nil)
+                }
+              end
+            end
           else
-            {:points_possible => nil, :due_date => (tag.content.due_at.utc.iso8601 rescue nil)}
+            info[tag.id] = {:points_possible => nil, :due_date => nil}
           end
         end
       end
@@ -202,7 +211,7 @@ class ContextModulesController < ApplicationController
     pres
   end
   protected :prerequisites_needing_finishing_for
-  
+
   def content_tag_prerequisites_needing_finishing
     type, id = ActiveRecord::Base.parse_asset_string params[:code]
     raise ActiveRecord::RecordNotFound if id == 0
@@ -253,7 +262,7 @@ class ContextModulesController < ApplicationController
     end
     render :json => res
   end
-  
+
   def toggle_collapse
     if authorized_action(@context, @current_user, :read)
       @module = @context.modules_visible_to(@current_user).find(params[:context_module_id])
@@ -273,7 +282,7 @@ class ContextModulesController < ApplicationController
       end
     end
   end
-  
+
   def show
     @module = @context.context_modules.not_deleted.find(params[:id])
     if authorized_action @module, @current_user, :read
@@ -283,7 +292,7 @@ class ContextModulesController < ApplicationController
       end
     end
   end
-  
+
   def reorder_items
     @module = @context.context_modules.not_deleted.find(params[:context_module_id])
     if authorized_action(@module, @current_user, :update)
@@ -310,9 +319,9 @@ class ContextModulesController < ApplicationController
       end
     end
   end
-  
 
-  def item_details  
+
+  def item_details
     if authorized_action(@context, @current_user, :read)
       # namespaced models are separated by : in the url
       code = params[:id].gsub(":", "/").split("_")
@@ -373,7 +382,7 @@ class ContextModulesController < ApplicationController
       render json: json
     end
   end
-  
+
   def remove_item
     @tag = @context.context_module_tags.not_deleted.find(params[:id])
     if authorized_action(@tag.context_module, @current_user, :update)
@@ -382,7 +391,7 @@ class ContextModulesController < ApplicationController
       render :json => @tag
     end
   end
-  
+
   def update_item
     @tag = @context.context_module_tags.not_deleted.find(params[:id])
     if authorized_action(@tag.context_module, @current_user, :update)
@@ -425,7 +434,7 @@ class ContextModulesController < ApplicationController
       end
     end
   end
-  
+
   def update
     @module = @context.context_modules.not_deleted.find(params[:id])
     if authorized_action(@module, @current_user, :update)
@@ -448,7 +457,7 @@ class ContextModulesController < ApplicationController
       end
     end
   end
-  
+
   def destroy
     @module = @context.context_modules.not_deleted.find(params[:id])
     if authorized_action(@module, @current_user, :delete)

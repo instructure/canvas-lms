@@ -28,13 +28,16 @@ module Api::V1::CalendarEvent
     hash = if event.is_a?(CalendarEvent)
       calendar_event_json(event, user, session, options)
     else
-      assignment_event_json(event, user, session)
+      assignment_event_json(event, user, session, options)
     end
     hash
   end
 
   def calendar_event_json(event, user, session, options={})
-    include = options[:include] || ['child_events']
+    excludes = options[:excludes] || []
+    include = options[:include]
+    include ||= excludes.include?('child_events') ? [] : ['child_events']
+
     context = (options[:context] || event.context)
     duplicates = options[:duplicates] || []
     participant = nil
@@ -42,9 +45,9 @@ module Api::V1::CalendarEvent
     hash = api_json(event, user, session, :only => %w(id created_at updated_at start_at end_at all_day all_day_date title location_address location_name workflow_state))
     if event.context_type == "CourseSection"
       hash['title'] += " (#{context.name})"
-      hash['description'] = api_user_content(event.description, event.context.course)
+      hash['description'] = api_user_content(event.description, event.context.course) unless excludes.include?('description')
     else
-      hash['description'] = api_user_content(event.description, context)
+      hash['description'] = api_user_content(event.description, context) unless excludes.include?('description')
     end
 
     appointment_group = options[:appointment_group]
@@ -137,15 +140,20 @@ module Api::V1::CalendarEvent
     hash
   end
 
-  def assignment_event_json(assignment, user, session)
+  def assignment_event_json(assignment, user, session, options={})
+    excludes = options[:excludes] || []
     hash = api_json(assignment, user, session, :only => %w(created_at updated_at title all_day all_day_date workflow_state))
-    hash['description'] = api_user_content(assignment.description, assignment.context)
+    hash['description'] = api_user_content(assignment.description, assignment.context) unless excludes.include?('description')
     hash['id'] = "assignment_#{assignment.id}"
-    hash['assignment'] = assignment_json(assignment, user, session, override_dates: false)
+    if excludes.include?('assignment')
+      hash['html_url'] = course_assignment_url(assignment.context_id, assignment)
+    else
+      hash['assignment'] = assignment_json(assignment, user, session, override_dates: false)
+      hash['html_url'] = hash['assignment']['html_url'] if hash['assignment'].include?('html_url')
+    end
     hash['context_code'] = assignment.context_code
     hash['start_at'] = hash['end_at'] = assignment.due_at
     hash['url'] = api_v1_calendar_event_url("assignment_#{assignment.id}")
-    hash['html_url'] = hash['assignment']['html_url'] if hash['assignment'].include?('html_url')
     if assignment.applied_overrides.present?
       hash['assignment_overrides'] = assignment.applied_overrides.map { |o| assignment_override_json(o) }
     end

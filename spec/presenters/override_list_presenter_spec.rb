@@ -170,7 +170,7 @@ describe OverrideListPresenter do
 
       before do
         assignment.stubs(:context).
-          returns stub(:active_course_sections => sections)
+          returns stub(:active_section_count => sections.count)
         assignment.stubs(:all_dates_visible_to).with(user).
           returns dates_visible_to_user
         @visible_due_dates = presenter.visible_due_dates
@@ -206,7 +206,7 @@ describe OverrideListPresenter do
 
       before do
         assignment.stubs(:context).
-          returns stub(:active_course_sections => sections)
+          returns stub(:active_section_count => sections.count)
         assignment.stubs(:all_dates_visible_to).with(user).
           returns dates_visible
         @visible_due_dates = presenter.visible_due_dates
