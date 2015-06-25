@@ -30,7 +30,7 @@ define [
         loading: true
         showPointsPossible: (@assignment.points_possible || @assignment.points_possible == '0') && @assignment.grading_type != "gpa_scale"
       @submission["assignment_grading_type_is_#{@assignment.grading_type}"] = true
-
+      @submission.grade = "EX" if @submission.excused
       @$el = $('<div class="use-css-transitions-for-show-hide" style="padding:0;"/>')
       @$el.html(submissionDetailsDialog(@submission))
 
@@ -84,10 +84,10 @@ define [
         submission.turnitin = extractDataFor(submission, "submission_#{submission.id}", @options.context_url)
         for attachment in submission.attachments || []
           attachment.turnitin = extractDataFor(submission, "attachment_#{attachment.id}", @options.context_url)
+      @submission.grade = "EX" if @submission.excused
       @dialog.html(submissionDetailsDialog(@submission))
       @dialog.find('select').trigger('change')
       @scrollCommentsToBottom()
 
     @open: (assignment, student, options) ->
       new SubmissionDetailsDialog(assignment, student, options).open()
-
