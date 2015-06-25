@@ -1309,7 +1309,7 @@ class ApplicationController < ActionController::Base
         variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self,{
                                                         current_user: @current_user,
                                                         current_pseudonym: @current_pseudonym,
-                                                        content_tag: tag,
+                                                        content_tag: @module_tag || tag,
                                                         assignment: @assignment,
                                                         tool: @tool})
         adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(@return_url, variable_expander, opts)

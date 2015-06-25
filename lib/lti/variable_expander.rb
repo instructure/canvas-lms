@@ -259,11 +259,15 @@ module Lti
                        ENROLLMENT_GUARD
 
     register_expansion 'Canvas.module.id', [],
-                       -> { @content_tag.context_module_id },
+                       -> {
+                         @content_tag.context_module_id
+                       },
                        CONTENT_TAG_GUARD
 
     register_expansion 'Canvas.moduleItem.id', [],
-                       -> { @content_tag.id },
+                       -> {
+                         @content_tag.id
+                       },
                        CONTENT_TAG_GUARD
 
     register_expansion 'Canvas.assignment.id', [],
