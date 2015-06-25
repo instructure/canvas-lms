@@ -8,7 +8,7 @@ describe "screenreader gradebook" do
       gradebook_data_setup
     end
 
-    it "should switch to srgb" do
+    it "should switch to srgb", priority: "1", test_id: 209987 do
       get "/courses/#{@course.id}/gradebook"
       f("#change_gradebook_version_link_holder .ellipsible").click
       expect(f("#not_right_side")).to include_text("Gradebook: Individual View")
@@ -18,7 +18,7 @@ describe "screenreader gradebook" do
       expect(f("#change_gradebook_version_link_holder .ellipsible")).to be_displayed
     end
 
-    it "Should show sections in drop-down" do
+    it "Should show sections in drop-down", priority: "1", test_id: 209989 do
       sections=[]
       2.times do |i|
         sections << @course.course_sections.create!(:name => "other section #{i}")
@@ -32,7 +32,7 @@ describe "screenreader gradebook" do
       end
     end
 
-    it "should focus on accessible elements when setting default grades" do
+    it "should focus on accessible elements when setting default grades", priority: "1", test_id: 209991 do
       get "/courses/#{@course.id}/gradebook"
       f("#change_gradebook_version_link_holder .ellipsible").click
       refresh_page

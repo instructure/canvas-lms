@@ -30,7 +30,7 @@ describe "gradebook2" do
     let(:uneditable_cells) { f('.cannot_edit') }
     let(:gradebook_header) { f('#gradebook_grid .container_1 .slick-header') }
 
-    it "should load gradebook when no grading periods have been created" do
+    it "should load gradebook when no grading periods have been created", priority: "1", test_id: 210011 do
       get "/courses/#{@course.id}/gradebook2"
       expect(f('#gradebook-grid-wrapper')).to be_displayed
     end
@@ -41,7 +41,7 @@ describe "gradebook2" do
                                     title: "past-due assignment"
       end
 
-      it "admins should be able to edit" do
+      it "admins should be able to edit", priority: "1", test_id: 210012 do
         get "/courses/#{@course.id}/gradebook2"
 
         select_period_in_the_past
@@ -49,7 +49,7 @@ describe "gradebook2" do
         expect(uneditable_cells).to_not be_present
       end
 
-      it "teachers should not be able to edit" do
+      it "teachers should not be able to edit", priority: "1", test_id: 210023 do
         sign_in_as_a_teacher
 
         get "/courses/#{@course.id}/gradebook2"
@@ -65,14 +65,14 @@ describe "gradebook2" do
         @course.assignments.create! title: "No Due Date"
       end
 
-      it "admins should be able to edit" do
+      it "admins should be able to edit", priority: "1", test_id: 210014 do
         get "/courses/#{@course.id}/gradebook2"
 
         expect(gradebook_header).to include_text("No Due Date")
         expect(uneditable_cells).to_not be_present
       end
 
-      it "teachers should be able to edit" do
+      it "teachers should be able to edit", priority: "1", test_id: 210015 do
         sign_in_as_a_teacher
 
         get "/courses/#{@course.id}/gradebook2"
@@ -86,7 +86,7 @@ describe "gradebook2" do
   context "as a teacher" do
     let!(:setup) { gradebook_data_setup }
 
-    it "hides unpublished/shows published assignments" do
+    it "hides unpublished/shows published assignments", priority: "1", test_id: 210016 do
       assignment = @course.assignments.create! title: 'unpublished'
       assignment.unpublish
       get "/courses/#{@course.id}/gradebook2"
@@ -99,7 +99,7 @@ describe "gradebook2" do
       expect(f('#gradebook_grid .container_1 .slick-header')).to include_text(@first_assignment.title)
     end
 
-    it "should not show 'not-graded' assignments" do
+    it "should not show 'not-graded' assignments", priority: "1", test_id: 210017 do
       get "/courses/#{@course.id}/gradebook2"
 
       expect(f('.slick-header-columns')).not_to include_text(@ungraded_assignment.title)
@@ -114,7 +114,7 @@ describe "gradebook2" do
       ff('.student-name')
     end
 
-    it 'should filter students' do
+    it 'should filter students', priority: "1", test_id: 210018 do
       get "/courses/#{@course.id}/gradebook2"
       expect(get_visible_students.length).to eq @all_students.size
       filter_student 'student 1'
@@ -123,17 +123,18 @@ describe "gradebook2" do
       expect(visible_students[0].text).to eq 'student 1'
     end
 
+    # duplicate of test_id: 210017
     it "should not show not-graded assignments" do
       expect(f('#gradebook_grid .slick-header')).not_to include_text(@ungraded_assignment.title)
     end
 
-    it "should validate correct number of students showing up in gradebook" do
+    it "should validate correct number of students showing up in gradebook", priority: "1", test_id: 210019 do
       get "/courses/#{@course.id}/gradebook2"
 
       expect(ff('.student-name').count).to eq @course.students.count
     end
 
-    it "should not show concluded enrollments in active courses by default" do
+    it "should not show concluded enrollments in active courses by default", priority: "1", test_id: 210020 do
       @student_1.enrollments.where(course_id: @course).first.conclude
 
       expect(@course.students.count).to eq @all_students.size - 1
@@ -150,7 +151,7 @@ describe "gradebook2" do
       expect(driver.find_elements(:css, '.student-name').count).to eq @course.all_students.count
     end
 
-    it "should show concluded enrollments in concluded courses by default" do
+    it "should show concluded enrollments in concluded courses by default", priority: "1", test_id: 210021 do
       @course.complete!
 
       expect(@course.students.count).to eq 0
@@ -164,13 +165,13 @@ describe "gradebook2" do
       expect(driver.find_elements(:css, '.student-name').count).to eq @course.all_students.count
     end
 
-    it "should show students sorted by their sortable_name" do
+    it "should show students sorted by their sortable_name", priority: "1", test_id: 210022 do
       get "/courses/#{@course.id}/gradebook2"
       dom_names = ff('.student-name').map(&:text)
       expect(dom_names).to eq @all_students.map(&:name)
     end
 
-    it "should not show student avatars until they are enabled" do
+    it "should not show student avatars until they are enabled", priority: "1", test_id: 210023 do
       get "/courses/#{@course.id}/gradebook2"
 
       expect(ff('.student-name').length).to eq @all_students.size
@@ -188,7 +189,7 @@ describe "gradebook2" do
     end
 
 
-    it "should allow showing only a certain section" do
+    it "should allow showing only a certain section", priority: "1", test_id: 210024 do
       get "/courses/#{@course.id}/gradebook2"
       # grade the first assignment
       edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2', 0)
@@ -228,7 +229,7 @@ describe "gradebook2" do
     end
 
 
-    it "should handle muting/unmuting correctly" do
+    it "should handle muting/unmuting correctly", priority: "1", test_id: 210025 do
       get "/courses/#{@course.id}/gradebook2"
       toggle_muting(@second_assignment)
       expect(fj(".container_1 .slick-header-column[id*='assignment_#{@second_assignment.id}'] .muted")).to be_displayed
@@ -251,7 +252,7 @@ describe "gradebook2" do
         get "/courses/#{@course.id}/gradebook2"
       end
 
-      it "should allow editing grades" do
+      it "should allow editing grades", priority: "1", test_id: 210026 do
         cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
         expect(f('.gradebook-cell', cell).text).to eq '10'
         cell.click
@@ -265,14 +266,14 @@ describe "gradebook2" do
         get "/courses/#{@course.id}/gradebook2"
       end
 
-      it "should not allow editing grades" do
+      it "should not allow editing grades", priority: "1", test_id: 210027 do
         cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
         expect(f('.gradebook-cell', cell).text).to eq '10'
         cell.click
         expect(ff('.grade', cell)).to be_blank
       end
 
-      it "should hide mutable actions from the menu" do
+      it "should hide mutable actions from the menu", priority: "1", test_id: 210028 do
         open_gradebook_settings do |menu|
           expect(ff("a.gradebook_upload_link", menu)).to be_blank
           expect(ff("a.set_group_weights", menu)).to be_blank
@@ -280,14 +281,14 @@ describe "gradebook2" do
       end
     end
 
-    it "should validate that gradebook settings is displayed when button is clicked" do
+    it "should validate that gradebook settings is displayed when button is clicked", priority: "1", test_id: 210029 do
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
 
       open_gradebook_settings
     end
 
-    it "should validate posting a comment to a graded assignment" do
+    it "should validate posting a comment to a graded assignment", priority: "1", test_id: 210046 do
       comment_text = "This is a new comment!"
 
       get "/courses/#{@course.id}/gradebook2"
@@ -305,7 +306,7 @@ describe "gradebook2" do
       expect(comment).to include_text(comment_text)
     end
 
-    it "should let you post a group comment to a group assignment" do
+    it "should let you post a group comment to a group assignment", priority: "1", test_id: 210047 do
       group_assignment = @course.assignments.create!({
                                                          :title => 'group assignment',
                                                          :due_at => (Time.now + 1.week),
@@ -337,7 +338,7 @@ describe "gradebook2" do
       expect(comment).to include_text(comment_text)
     end
 
-    it "should validate assignment details" do
+    it "should validate assignment details", priority: "1", test_id: 210048 do
       submissions_count = @second_assignment.submissions.count.to_s + ' submissions'
 
       get "/courses/#{@course.id}/gradebook2"
