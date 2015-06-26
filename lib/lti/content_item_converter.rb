@@ -60,7 +60,7 @@ module Lti
       when 'file'
         IMS::LTI::Models::ContentItems::FileItem.new(converted_opts)
       when 'lti_launch_url'
-        IMS::LTI::Models::ContentItems::LtiLink.new(converted_opts)
+        IMS::LTI::Models::ContentItems::LtiLinkItem.new(converted_opts)
       else
         IMS::LTI::Models::ContentItems::ContentItem.new(converted_opts)
       end

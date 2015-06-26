@@ -281,7 +281,7 @@ define([
             })
             .bind('selection', function(event) {
               var item = event.contentItems[0];
-              if(item["@type"] === 'LtiLink' && item.url) {
+              if(item["@type"] === 'LtiLinkItem' && item.url) {
                 $("#external_tool_create_url").val(item.url);
                 $("#external_tool_create_title").val(item.title || tool.name);
                 $("#context_external_tools_select .domain_message").hide();
