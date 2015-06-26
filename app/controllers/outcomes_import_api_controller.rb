@@ -19,8 +19,10 @@
 class OutcomesImportApiController < ApplicationController
   include Api::V1::Outcome
 
-  before_filter :require_user, :require_account_context,
-                :can_manage_global_outcomes, :has_api_config
+  before_filter :require_user, :can_manage_global_outcomes, :has_api_config
+
+  NATIONAL_STANDARDS_TITLE = "National Standards"
+  UNITED_KINGDOM_TITLE = "United Kingdom"
 
   def available
     render json: list_of_available_guids
@@ -32,9 +34,15 @@ class OutcomesImportApiController < ApplicationController
 
     begin
       err_msg = "Import failed to queue"
+
+      # AcademicBenchmark.queue_migration_for_guid can raise Canvas::Migration::Error
       migration = AcademicBenchmark.import(Array(params[:guid])).first
-      raise RuntimeError.new(err_msg) unless migration
-      render json: { migration_id: migration.id, guid: params[:guid] }
+
+      if migration
+        render json: { migration_id: migration.id, guid: params[:guid] }
+      else
+        render json: { error: err_msg }
+      end
     rescue StandardError => e
       render json: { error: "#{err_msg}: #{e.message}" }
     end
@@ -80,7 +88,7 @@ class OutcomesImportApiController < ApplicationController
   # National Standards are also known as Common Core and NGSS
   ##
   def nat_stds_guid(authorities)
-    authorities.find{|a| a["title"] == "National Standards"}["guid"]
+    authorities.find{|a| a["title"] == NATIONAL_STANDARDS_TITLE}["guid"]
   end
 
   def api_connection
@@ -127,6 +135,6 @@ class OutcomesImportApiController < ApplicationController
 
   # The UK standards are now available to us as well,
   def uk_guid(api)
-    api.browse.find{ |a| a["title"] == "United Kingdom" }
+    api.browse.find{ |a| a["title"] == UNITED_KINGDOM_TITLE }
   end
 end
