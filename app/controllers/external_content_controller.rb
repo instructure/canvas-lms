@@ -103,7 +103,7 @@ class ExternalContentController < ApplicationController
 
   def content_items_for_canvas
     content_item_selection.map do |item|
-      if item.type == IMS::LTI::Models::ContentItems::LtiLink::TYPE
+      if item.type == IMS::LTI::Models::ContentItems::LtiLinkItem::TYPE
         url_gen_params = {url: item.url}
         url_gen_params[:display] = 'borderless' if item.placement_advice.presentation_document_target == 'iframe'
         item.canvas_url = named_context_url(@context, :retrieve_context_external_tools_path, url_gen_params)

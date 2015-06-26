@@ -141,9 +141,9 @@ module Lti
       end
 
       context 'lti_link' do
-        it 'creates a IMS::LTI::Models::ContentItems::LtiLink' do
+        it 'creates a IMS::LTI::Models::ContentItems::LtiLinkItem' do
           content_item = described_class.convert_resource_selection(lti_link)
-          expect(content_item).to be_a IMS::LTI::Models::ContentItems::LtiLink
+          expect(content_item).to be_a IMS::LTI::Models::ContentItems::LtiLinkItem
         end
 
         it 'sets the media_type to application/vnd.ims.lti.v1.ltilink' do
