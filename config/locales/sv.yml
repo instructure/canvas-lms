@@ -5313,6 +5313,7 @@ sv:
   due_on_date_aa4725cd: "Färdig på datumet:"
   e_mail_only_2cc5e513: "Endast e-post"
   each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: "Varje stapel är en uppgift. Det gröna lagret representerar procenten elever som lämnat in sin inläming *i tid*. **Sena** inlämningar är gula, och inlämningar som ***saknas*** r röda."
+  each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Varje stapel är en uppgift. Den \"tunna lodräta linjen* sträcker sig från den lägsta elevpoängen till den högsta. Den **tjockare stolpen** sträcker sig från den 25:e till den 75:e procentenheten, med ***medianen markerad***."
   each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "Varje stapel är en uppgift. Den tunna lodräta linjen sträcker sig från den lägsta elevpoängen till den högsta. Den tjockare stolpen sträcker sig från den 25:e till den 75:e procentenheten. Elevens poäng är markerad med en prick."
   each_bar_represents_the_number_of_page_views_on_th_3f833fcd: "Varje stapel representerar antalet *sidvisningar* den dagen. En orange stapel indikerar att eleven **genomfört en åtgärd** med kursen den dagen."
   each_bar_represents_the_number_of_page_views_on_th_442f8465: "Varje stapel representerar antalet *sidvisningar* den dagen. En orange stapel indikerar att en användare **genomfört en åtgärd** med kursen den dagen."
@@ -7661,7 +7662,7 @@ sv:
   links_14b70841: Länkar
   loading_25990131: Laddar...
   locales: 
-    da: Svenska
+    sv: Svenska
   lock_after_date_92f9149: "Lås efter datum"
   lock_date_cannot_be_after_course_end_a473158b: "Lås-datumet kan inte infalla efter kursens slut"
   lock_date_cannot_be_after_section_end_d37da70c: "Lås-datumet kan inte infalla efter sektionens slut"
