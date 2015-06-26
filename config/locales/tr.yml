@@ -4165,6 +4165,7 @@ tr:
         email: Eposta
         email_field_label: "Eklemek istediğiniz kullanıcıların e-posta adreslerini araya virgül koyarak giriniz"
         email_field_place_holder: "\"Deneme Öğrenci\" <student@example.com>, \"Soyisim, İsim\" <firstlast@example.com>, justAnEmailAddress@example.com"
+        email_or_login: "Eposta/Oturum Aç"
         example_formats: "Örnekler: user@example.com, \"İsim Soyisim\" <user@example.com>, \"Soyisim, İsim\" <user@example.com>"
         form_instructions: "Aşağıya eposta adres listesi yazın ya da yapıştırın:"
         go_back: "Baştan Başla"
