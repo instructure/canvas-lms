@@ -1,0 +1,128 @@
+// TO-DO: Change CSS animation to ReactTransitionGroup once 
+// we upgrade to React 0.13
+
+@keyframes color-picker-enter {
+  to {
+    opacity: 1;
+    transform: translate3d(0,0,0);
+  }
+}
+
+.ColorPicker__Overlay { background-color: rgba(0,0,0,0); }
+
+.ColorPicker__Title {
+  margin: 0 0 $ic-sp; padding: 0;
+  line-height: 1.1;
+  font-size: $baseFontSize;
+  font-weight: 500;
+}
+
+.ColorPicker__Container {
+  opacity: 0;
+  transform: translate3d(-20%,0,0);
+  animation-name: color-picker-enter;
+  animation-duration: 0.2s;
+  animation-fill-mode: forwards;
+  animation-timing-function: ease-out;
+  width: $ic-sp*20;
+  background: $ic-color-light;
+  box-sizing: border-box;
+  padding: $ic-sp;
+  box-shadow: 0 1px 8px rgba(black, 0.2);
+  border-radius: $baseBorderRadius;
+  border: 1px solid $ic-border-light;
+  position: relative;
+
+  &:after, &:before {
+    right: 100%; top: $ic-sp*2;
+    border: solid transparent;
+    content: "";
+    height: 0; width: 0;
+    position: absolute;
+    pointer-events: none;
+  }
+  &:after {
+    border-color: rgba(255,255,255,0);
+    border-right-color: $ic-color-light;
+    border-width: $ic-sp - 1;
+    margin-top: -($ic-sp - 1);
+  }
+  &:before {
+    border-color: rgba(215, 215, 215, 0);
+    border-right-color: darken($ic-border-light, 4%);
+    border-width: $ic-sp;
+    margin-top: -($ic-sp);
+  }
+}
+
+.right > .ColorPicker__Container {
+  transform: translate3d(20%,0,0);
+  &:after, &:before {
+    right: auto; left: 100%;
+  }
+  &:after {
+    border-right-color: rgba(255,255,255,0);
+    border-left-color: $ic-color-light;
+  }
+  &:before {
+    border-right-color: rgba(255,255,255,0);
+    border-left-color: darken($ic-border-light, 4%);
+  }
+}
+
+.middle > .ColorPicker__Container {
+  &:after, &:before { top: 50%; } 
+}
+
+.ColorPicker__ColorContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.ColorPicker__ColorBlock {
+  transition: all 0.2s;
+  transform: translate3d(0,0,0);
+  display: inline-block;
+  width: 34px;
+  height: 34px; line-height: 33px;
+  margin: 0 8px 8px 0;
+  padding: 0;
+  appearance: none;
+  box-shadow: none;
+  border-radius: $baseBorderRadius;
+  border-style: solid;
+  border-width: 1px;
+  text-align: center;
+  color: $ic-color-light;
+  &:hover { box-shadow: 0 1px 2px rgba(black, 0.25); }
+  &:focus { 
+    box-shadow: 0 1px 2px rgba(black, 0.25), inset 0 0 0 1px $ic-color-light;
+    @if $use_high_contrast == false { outline: none; }
+  }
+  &:hover, &:focus { transform: scale(1.15); }
+  i[class*=icon-], i[class^=icon-] { top: 0; }
+
+  // Note that this declaration will have to be changed if
+  // the total # colors is changed from the current 15
+  &:nth-child(5n) {
+    margin-right: 0;
+  }
+}
+
+.ColorPicker__CustomInputContainer {
+  margin: 0 0 $ic-sp;
+}
+
+.ColorPicker__ColorPreview {
+  width: $ic-sp*3;
+}
+
+.ColorPicker__Actions {
+  text-align: right;
+  body.chrome & {
+    // fixes weird Chrome bug, where left border of first button gets cut off
+    .Button:first-of-type { margin-left: 1px; } 
+  }
+  
+}
