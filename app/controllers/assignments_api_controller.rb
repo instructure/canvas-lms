@@ -596,6 +596,10 @@ class AssignmentsApiController < ApplicationController
       needs_grading_by_section_param = params[:needs_grading_count_by_section] || false
       needs_grading_count_by_section = value_to_boolean(needs_grading_by_section_param)
 
+      if @context.grants_right?(@current_user, :manage_assignments)
+        Assignment.preload_can_unpublish(assignments)
+      end
+
       hashes = []
       TempCache.enable do
         hashes = assignments.map do |assignment|

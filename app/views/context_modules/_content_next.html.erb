@@ -70,6 +70,7 @@ TEXT
     <% cache_key = add_menu_tools_to_cache_key(cache_key) %>
     <% cache(cache_key) do %>
       <% ActiveRecord::Associations::Preloader.new(@modules, :content_tags => :content).run %>
+      <% preload_can_unpublish(@context, @modules) %>
       <% @modules.each do |m| %>
         <%= render :partial => 'context_modules/context_module_next', :object => m, :locals => {:editable => editable } %>
       <% end %>

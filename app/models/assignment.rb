@@ -1961,7 +1961,19 @@ class Assignment < ActiveRecord::Base
 
   def can_unpublish?
     return true if new_record?
-    !has_student_submissions?
+    return @can_unpublish unless @can_unpublish.nil?
+    @can_unpublish = !has_student_submissions?
+  end
+  attr_writer :can_unpublish
+
+  def self.preload_can_unpublish(assignments, assmnt_ids_with_subs=nil)
+    return unless assignments.any?
+    assmnt_ids_with_subs ||= assignment_ids_with_submissions(assignments.map(&:id))
+    assignments.each{|a| a.can_unpublish = !(assmnt_ids_with_subs.include?(a.id)) }
+  end
+
+  def self.assignment_ids_with_submissions(assignment_ids)
+    Submission.having_submission.where(:assignment_id => assignment_ids).uniq.pluck(:assignment_id)
   end
 
   # override so validations are called

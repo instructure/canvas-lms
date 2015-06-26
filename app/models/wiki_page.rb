@@ -89,8 +89,8 @@ class WikiPage < ActiveRecord::Base
 
   def self.title_order_by_clause
     best_unicode_collation_key('wiki_pages.title')
-  end  
-  
+  end
+
   def ensure_unique_url
     url_attribute = self.class.url_attribute
     base_url = self.send(url_attribute)
@@ -357,7 +357,7 @@ class WikiPage < ActiveRecord::Base
       entry.updated   = self.updated_at
       entry.published = self.created_at
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/wiki_pages/#{self.feed_code}_#{self.updated_at.strftime("%Y-%m-%d")}"
-      entry.links    << Atom::Link.new(:rel => 'alternate', 
+      entry.links    << Atom::Link.new(:rel => 'alternate',
                                     :href => "http://#{HostUrl.context_host(context)}/#{self.context.class.to_s.downcase.pluralize}/#{self.context.id}/pages/#{self.url}")
       entry.content   = Atom::Content::Html.new(self.body || t('defaults.no_content', "no content"))
     end
@@ -388,7 +388,15 @@ class WikiPage < ActiveRecord::Base
   end
 
   def can_unpublish?
-    !is_front_page?
+    return @can_unpublish unless @can_unpublish.nil?
+    @can_unpublish = !is_front_page?
+  end
+  attr_writer :can_unpublish
+
+  def self.preload_can_unpublish(context, wiki_pages)
+    return unless wiki_pages.any?
+    front_page_url = context.wiki.get_front_page_url
+    wiki_pages.each{|wp| wp.can_unpublish = !(wp.url == front_page_url)}
   end
 
   def initialize_wiki_page(user)

@@ -635,14 +635,38 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def can_unpublish?(opts={})
-    if self.assignment
-      !self.assignment.has_student_submissions?
-    else
-      student_ids = opts[:student_ids] || self.context.all_real_students.pluck(:id)
-      if self.for_group_discussion?
-        !(self.child_topics.any? { |child| child.discussion_entries.active.where(:user_id => student_ids).exists? })
+    return @can_unpublish unless @can_unpublish.nil?
+
+    @can_unpublish = begin
+      if self.assignment
+        !self.assignment.has_student_submissions?
       else
-        !self.discussion_entries.active.where(:user_id => student_ids).exists?
+        student_ids = opts[:student_ids] || self.context.all_real_students.pluck(:id)
+        if self.for_group_discussion?
+          !(self.child_topics.any? { |child| child.discussion_entries.active.where(:user_id => student_ids).exists? })
+        else
+          !self.discussion_entries.active.where(:user_id => student_ids).exists?
+        end
+      end
+    end
+  end
+  attr_writer :can_unpublish
+
+  def self.preload_can_unpublish(context, topics, assmnt_ids_with_subs=nil)
+    return unless topics.any?
+    assmnt_ids_with_subs ||= Assignment.assignment_ids_with_submissions(topics.map(&:assignment_id).compact)
+
+    student_ids = context.all_real_students.pluck(:id)
+    topic_ids_with_entries = DiscussionEntry.active.where(:discussion_topic_id => topics.map(&:id)).
+      where(:user_id => student_ids).uniq.pluck(:discussion_topic_id)
+    topic_ids_with_entries += DiscussionTopic.where("root_topic_id IS NOT NULL").
+      where(:id => topic_ids_with_entries).uniq.pluck(:root_topic_id)
+
+    topics.each do |topic|
+      if topic.assignment_id
+        topic.can_unpublish = !(assmnt_ids_with_subs.include?(topic.assignment_id))
+      else
+        topic.can_unpublish = !(topic_ids_with_entries.include?(topic.id))
       end
     end
   end

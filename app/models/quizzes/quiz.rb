@@ -1139,8 +1139,22 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def can_unpublish?
     return true if new_record?
-    !has_student_submissions? &&
-      (assignment.blank? || assignment.can_unpublish?)
+    return @can_unpublish unless @can_unpublish.nil?
+    @can_unpublish = !has_student_submissions? && (assignment.blank? || assignment.can_unpublish?)
+  end
+  attr_writer :can_unpublish
+
+  def self.preload_can_unpublish(quizzes, assmnt_ids_with_subs=nil)
+    return unless quizzes.any?
+    assmnt_ids_with_subs ||= Assignment.assignment_ids_with_submissions(quizzes.map(&:assignment_id).compact)
+
+    quiz_ids_with_subs = Quizzes::QuizSubmission.where(:quiz_id => quizzes.map(&:id)).
+      not_settings_only.where("user_id IS NOT NULL").uniq.pluck(:quiz_id)
+
+    quizzes.each do |quiz|
+      quiz.can_unpublish = !(quiz_ids_with_subs.include?(quiz.id)) &&
+        (quiz.assignment_id.nil? || !assmnt_ids_with_subs.include?(quiz.assignment_id))
+    end
   end
 
   alias_method :unpublishable?, :can_unpublish?

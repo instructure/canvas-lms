@@ -37,6 +37,20 @@ module ContextModulesHelper
     cache_key
   end
 
+  def preload_can_unpublish(context, modules)
+    items = modules.map(&:content_tags).flatten.map(&:content)
+    asmnts = items.select{|item| item.is_a?(Assignment)}
+    topics = items.select{|item| item.is_a?(DiscussionTopic)}
+    quizzes = items.select{|item| item.is_a?(Quizzes::Quiz)}
+    wiki_pages = items.select{|item| item.is_a?(WikiPage)}
+
+    assmnt_ids_with_subs = Assignment.assignment_ids_with_submissions(context.assignments.pluck(:id))
+    Assignment.preload_can_unpublish(asmnts, assmnt_ids_with_subs)
+    DiscussionTopic.preload_can_unpublish(context, topics, assmnt_ids_with_subs)
+    Quizzes::Quiz.preload_can_unpublish(quizzes, assmnt_ids_with_subs)
+    WikiPage.preload_can_unpublish(context, wiki_pages)
+  end
+
   def module_item_publishable_id(item)
     if item.nil?
       ''
