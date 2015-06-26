@@ -87,6 +87,20 @@ module Lti
           expect(response).to eq 400
           expect(JSON.parse(body)).to eq({"error" => "Invalid Capabilities"})
         end
+
+        it 'accepts split secret' do
+          course_with_teacher_logged_in(:active_all => true)
+          #tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
+          tool_proxy_fixture = JSON.parse(File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json')))
+          tool_proxy_fixture[:enabled_capability] = ['OAuth.splitSecret']
+          tool_proxy_fixture["security_contract"].delete("shared_secret")
+          tool_proxy_fixture["security_contract"]["tp_half_shared_secret"] = SecureRandom.hex(128)
+          headers = {'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json'}
+          response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", tool_proxy_fixture.to_json, headers
+          expect(response).to eq 201
+          expect(JSON.parse(body).keys).to match_array ["@context", "@type", "@id", "tool_proxy_guid", "tc_half_shared_secret"]
+        end
+
       end
 
     end
