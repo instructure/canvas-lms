@@ -322,6 +322,15 @@ input[type="button"] {
   }
 }
 
+// Same as .Button--icon-action, but white for dark backgrounds
+.Button--icon-action-rev {
+  @extend .Button--icon-action;
+  color: $ic-color-light;
+  &:hover, &:focus {
+    color: $ic-color-light;
+  }
+}
+
 // Handle jQueryUI-generated button classes
 .ui-button-icon-only .ui-button-text, .ui-button-icons-only .ui-button-text { @extend .ui-helper-hidden-accessible; }
 

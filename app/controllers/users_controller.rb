@@ -488,7 +488,8 @@ class UsersController < ApplicationController
     js_env({
       :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
       :PREFERENCES => {
-        :recent_activity_dashboard => @current_user.preferences[:recent_activity_dashboard]
+        :recent_activity_dashboard => @current_user.preferences[:recent_activity_dashboard],
+        :custom_colors => @current_user.custom_colors
       }
     })
 

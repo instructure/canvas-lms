@@ -20,6 +20,10 @@ $ic-DashboardCard-action--active: $ic-brand-primary;
   margin-bottom: $ic-sp*2;
 }
 
+.ic-DashboardCard__background {
+  position: relative;
+}
+
 .ic-DashboardCard__link {
   transition: background 0.2s;
   box-sizing: border-box;
@@ -51,6 +55,16 @@ $ic-DashboardCard-action--active: $ic-brand-primary;
   max-height: $ic-sp*10;
   flex: 1;
   @include breakpoint(short) { max-height: $ic-sp*9; }
+}
+
+.ic-DashboardCard__header-button {
+  position: absolute;
+  top: $ic-sp/2; right: $ic-sp/2;
+}
+
+.ic-DashboardCard_settings_icon {
+  color: #fff;
+  opacity: 0.6;
 }
 
 .ic-DashboardCard__header-title {
