@@ -7,7 +7,9 @@ define [
   # use this method to process any user content fields returned in api responses
   # this is important to handle object/embed tags safely, and to properly display audio/video tags
   convertApiUserContent = (html, options = {}) ->
-    $dummy = $('<div />').html(html)
+    $dummy = document.createElement('div')
+    $dummy.innerHTML = html
+    $dummy = $($dummy)
     # finds any <video/audio class="instructure_inline_media_comment"> and turns them into media comment thumbnails
     $dummy.find('video.instructure_inline_media_comment,audio.instructure_inline_media_comment').replaceWith ->
       $node = $("<a id='media_comment_#{htmlEscape($(this).data('media_comment_id'))}'
