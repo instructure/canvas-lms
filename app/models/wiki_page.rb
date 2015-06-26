@@ -132,7 +132,10 @@ class WikiPage < ActiveRecord::Base
     end
   end
 
-  sanitize_field :body, CanvasSanitize::SANITIZE
+  # I'm commenting this and moving it to the wiki_api_controller, so we
+  # can decide to sanitize or not based on which user is attempting to make
+  # the edit - this lets us let admins bypass the html filter.
+  # sanitize_field :body, CanvasSanitize::SANITIZE
   copy_authorized_links(:body) { [self.context, self.user] }
 
   validates_each :title do |record, attr, value|
