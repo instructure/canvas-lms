@@ -342,7 +342,7 @@ define [
 
     isInvalidCustomSort: =>
       sortSettings = @gradebookColumnOrderSettings
-      sortSettings && sortSettings.sortType == 'custom' && sortSettings.customOrder.length == 0
+      sortSettings && sortSettings.sortType == 'custom' && !sortSettings.customOrder
 
     columnOrderHasNotBeenSaved: =>
       !@gradebookColumnOrderSettings
@@ -354,6 +354,7 @@ define [
         @gradebookColumnOrderSettings
 
     setStoredSortOrder: (newSortOrder) ->
+      @gradebookColumnOrderSettings = newSortOrder
       unless @isInvalidCustomSort()
         url = ENV.GRADEBOOK_OPTIONS.gradebook_column_order_settings_url
         $.ajaxJSON(url, 'POST', {column_order: newSortOrder})
