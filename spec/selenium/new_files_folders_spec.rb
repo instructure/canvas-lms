@@ -12,16 +12,16 @@ describe "better_file_browsing, folders" do
       add_folder(folder_name)
     end
 
-    it "should display the new folder form", priority: 1, test_id: 121884 do
+    it "should display the new folder form", priority: '1', test_id: 121884 do
       click_new_folder_button
       expect(f("form.ef-edit-name-form")).to be_displayed
     end
 
-    it "should create a new folder", priority: 1, test_id: 126905 do
+    it "should create a new folder", priority: '1', test_id: 126905 do
       expect(fln("new test folder")).to be_present
     end
 
-    it "should edit folder name", priority: 1, test_id: 129444 do
+    it "should edit folder name", priority: '1', test_id: 129444 do
       folder_rename_to = "test folder"
       edit_name_from_cog_icon(folder_rename_to)
       wait_for_ajaximations
@@ -29,12 +29,12 @@ describe "better_file_browsing, folders" do
       expect(fln("test folder")).to be_present
     end
 
-    it "should delete a folder from cog menu", priority: 1, test_id: 129445 do
+    it "should delete a folder from cog menu", priority: '1', test_id: 129445 do
       delete_from_cog_icon
       expect(fln("new test folder")).not_to be_present
     end
 
-    it "should unpublish and publish a folder from cog menu", priority: 1, test_id: 193161 do
+    it "should unpublish and publish a folder from cog menu", priority: '1', test_id: 193161 do
       set_item_permissions(:unpublish)
       expect(f('.btn-link.published-status.unpublished')).to be_displayed
       expect(driver.find_element(:class => 'unpublished')).to be_displayed
@@ -43,24 +43,24 @@ describe "better_file_browsing, folders" do
       expect(driver.find_element(:class => 'published')).to be_displayed
     end
 
-    it "should make folder available to student with link", priority: 1, test_id: 129452 do
+    it "should make folder available to student with link", priority: '1', test_id: 129452 do
       set_item_permissions(:restricted_access, :available_with_link)
       expect(f('.btn-link.published-status.hiddenState')).to be_displayed
       expect(driver.find_element(:class => 'hiddenState')).to be_displayed
     end
 
-    it "should make folder available to student within given timeframe", priority: 1, test_id: 193160 do
+    it "should make folder available to student within given timeframe", priority: '1', test_id: 193160 do
       set_item_permissions(:restricted_access, :available_with_timeline)
       expect(f('.btn-link.published-status.restricted')).to be_displayed
       expect(driver.find_element(:class => 'restricted')).to be_displayed
     end
 
-    it "should delete folder from toolbar", priority: 1, test_id: 129451 do
+    it "should delete folder from toolbar", priority: '1', test_id: 129451 do
       delete_from_toolbar
       expect(get_all_files_folders.count).to eq 0
     end
 
-    it "should be able to create and view a new folder with uri characters", priority: 2, test_id: 193153 do
+    it "should be able to create and view a new folder with uri characters", priority: '2', test_id: 193153 do
       folder_name = "this#could+be bad? maybe"
       add_folder(folder_name)
       folder = @course.folders.where(:name => folder_name).first
@@ -83,13 +83,13 @@ describe "better_file_browsing, folders" do
        get "/courses/#{@course.id}/files"
      end
 
-     it "should create a new folder", priority: 2, test_id: 126905 do
+     it "should create a new folder", priority: '2', test_id: 126905 do
        new_folder = create_new_folder
        expect(get_all_files_folders.count).to eq 1
        expect(new_folder.text).to match /New Folder/
      end
 
-     it "should create 15 new child folders and show them in the FolderTree when expanded", priority: 2, test_id: 121886 do
+     it "should create 15 new child folders and show them in the FolderTree when expanded", priority: '2', test_id: 121886 do
        create_new_folder
        f('.ef-name-col > a.media').click
        wait_for_ajaximations
