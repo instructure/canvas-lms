@@ -476,7 +476,7 @@ class MessageableUser
           # section_visible_courses at this point
           course = course_index[group.context_id]
           scope = enrollment_scope({:common_group_column => group.id}.merge(options)).where([
-            "course_section_id IN (?) AND EXISTS(SELECT 1 FROM group_memberships WHERE user_id=users.id AND group_id=?)",
+            "course_section_id IN (?) AND EXISTS(SELECT 1 FROM group_memberships WHERE user_id=users.id AND group_id=? AND workflow_state = 'accepted')",
             visible_section_ids_in_courses([course]), group.id])
           scope = scope.where(observer_restriction_clause) if student_courses.present?
           scope
