@@ -78,3 +78,11 @@ fa-IR:
     fa-IR: فارسی (crowd-sourced)
   qualified_locale: fa-IR
   crowdsourced: true
+da:
+  locales:
+    da: Dansk
+  qualified_locale: da-DK
+sv:
+  locales:
+    sv: Svenska
+  qualified_locale: sv-SE
