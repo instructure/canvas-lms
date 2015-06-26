@@ -4844,6 +4844,7 @@ da:
         username: Emailadresse
     register: 
       africa: Afrika
+      agree_to_terms: "Jeg accepterer \"vilkår for brug\" og anerkender \"fortrolighedspolitiken\"."
       asia_and_middle_east: "Asien og mellemøsten"
       assistant_superintendent: "Assisterende skoledirektør"
       australia_new_zealand_and_oceania: "Australien, New Zealand og Oceanien"
@@ -5289,8 +5290,14 @@ da:
   due_multiple_dates_cc0ee3f5: "Forfald: Flere datoer"
   due_on_date_aa4725cd: "Forfaldsdato:"
   e_mail_only_2cc5e513: "Kun email "
+  each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: "Hver bar er en opgave. Grønt lag repræsentere procent af studerende, der har indsendt deres opgave \"til tiden\". Indsendelser der er \"for sent\" er gule og \"manglende\" indsendelser er røde."
+  each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Hver bar er en opgave. Den \"tynde vertikale linje\" forlænger sig fra den laveste score for enhver student i kurset til den højeste score. Den \"tykkere bar\" forlænges fra 25. percentil til 75. percentil med marking af medianen."
   each_bar_is_one_assignment_the_thin_whisker_extend_425bf274: "Hver bar er en opgave. Den tynde vertikale linje forlænger sig fra den laveste score for enhver student i kurset til den højeste score. Den \"tykkere bar\" forlænges fra 25. percentil til 75. percentil med marking af medianen. Den studerendes score er markeret med en prink."
+  each_bar_represents_the_number_of_page_views_on_th_3f833fcd: "Hver bar repræsenterer antal af \"sidevisninger\" på den pågældende dag. En orange bar indikerer, at den studerende \"foretog en handling\" indenfor kurset den dag."
+  each_bar_represents_the_number_of_page_views_on_th_442f8465: "Hver bar repræsenterer antal af \"sidevisninger\" på den pågældende dag. En organe bar indikerer, at nogle brugere \"foretog en handling\" indenfor et kursus den dag."
+  each_bar_represents_the_number_of_page_views_on_th_66e1dcc0: "Hver bar repræsenterer antal af \"sidevisninger\" på den pågældende dag. En organge bar indikerer, at nogle brugere \"foretog en handling\" indenfor kurset den dag."
   each_bar_represents_the_number_of_page_views_relat_29d1e341: "Hver bar repræsentere et antal af sidevisninger relateret til den kategori."
+  each_row_is_one_assignment_the_diamond_is_the_due__2a5c7d7c: "Hver række er en opgave. Diamant er forfaldsdato og baren udvider til indesendelsedato. Grøn indikere en \"indsendelse til tiden\", gul en \"for sen indsendelse\" og rød en \"manglende opgave\". Grå diamanter er opgave uden forfaldsdatoer, placeret for tiden for indsendelse."
   ecollege_file_description: Ecollege
   ecollege_name: "Ecollege Konverter"
   edit_app_b0cc1c17: "Rediger App"
@@ -14157,6 +14164,7 @@ da:
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "Alvoren af sagen, som valgt af brugeren fra rullegardinsmenuen."
   the_shortcut_icon_for_ios_android_devices_180x180__f87fa178: "Genvejsikon for  iOS/Android devices. 180x180 png or svg"
   the_state_parameter_is_required_ffadf213: "Status parameter er nødvendig"
+  the_top_track_represents_days_on_which_the_student_2a347099: "Top spor repræsenterer dage på hvilken den \"studerende sendte beskeder\" til kursus instruktører. Bundspor er for \"beskeder fra instruktører\" til den studerende."
   the_unique_id_used_for_representing_the_specific_r_3bdf5870: "Unik id benyttet for at repræsentere den specifikke anmodning/svar cyklus, som denne fejlrapport skete ved"
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "URL'et som en tilstrækkelig priviligeret bruger kan bruge til at maskere sig som den rapporterende bruger på den samme side for at forsøge at genskabe problemet"
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "URL af siden, som brugeren besøgte, da de rapporterede fejlen"
@@ -14490,6 +14498,8 @@ da:
       required: Nødvendig
       terms: "Du skal acceptere vilkårene"
       too_long: "Kan ikke overskride %{max} karaktere"
+    registration: 
+      agree_to_terms_with_code_of_conduct: "Du accepterer \"vilkårene for brug\" og \"etiske regler\"."
   user_avatars_e4fc4ed3: "Bruger avatar"
   user_date_range_search: 
     cant_be_blank: "Canvas bruger ID kan ikke være tomt"
