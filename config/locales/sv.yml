@@ -2398,6 +2398,7 @@ sv:
       scheduler_explanation_teacher_paragraph_1: "Det här är ett schamläggningsvektyg. Du kan använda det för att skapa plan-gupper dina elever kan boka in sig för"
       scheduler_explanation_teacher_paragraph_2: "Till exempel, låt oss säga att du vill gå igenom en mitt-terminsuppgift med alla studenter i din kurs. Då kan du skapa en plan-grupp och specifiera tider och datum då du är tillgänglig, dela tiden i 15 minuters block och tillåta en elev per block."
       scheduler_explanation_teacher_paragraph_3: "Därefter meddelas eleverna och de ser att de måste boka in sig för en utav de specifierade blocken. De kommer se en kalender med de tillgängliga tidsblocken ovanför allt på deras kalender så att de kan välja en tid som passar dem."
+      scheduler_explanation_teacher_paragraph_4: "* Kom igång genom att tryck på \"Skapa en plan-grupp\"-knappen till höger. *"
       signed_up_for: "Du är inbokad för"
       x_groups_have_signed_up: "%{participant_count} har bokat in sig"
       x_people_have_signed_up: "%{participant_count} personer har bokat in sig"
@@ -2890,6 +2891,7 @@ sv:
       titles: 
         welcome_aboard: "Välkomen ombord!"
     confirm_failed: 
+      details: "Det ser utom som att du redan har bekräftat din registrering. Försök *logga in* med epostadressen och lösenordet du använda. Om du inte kommer ihåg lösenordet klickar du på \"Glömt Lösenord\"-länken och du får en ny länk du kan använda att logga in med och återställa ditt lösenord. "
       feedback: "Om du fortsätter ha problem, klicka på \"Hjälp\" -länken nedan för att söka i guiderna och låta oss veta vad som händer."
       page_title: "Registreringsbekräftelsen misslyckades"
       titles: 
@@ -3029,9 +3031,11 @@ sv:
       ok_thanks: "Ok, Tack"
     messages: 
       assignment_locked_at: "Den här uppgiften låstes klockan %{at}."
+      assignment_locked_module: "Den här uppgiften är en del av modulen *%{module}* och har ännu inte låsts upp."
       assignment_locked_no_reason: "Den här uppgiften är låst. Ingen annan anledning har uppgetts."
       assignment_locked_until: "Den här uppgiften är låst tills %{date}."
       content_locked_at: "Det här innehållet låstes klockan %{at}."
+      content_locked_module: "Det här innehållet är en del av modulen *%{module}* och har ännu inte låsts upp."
       content_locked_no_reason: "Det här innehållet är låst. Ingen annan anledning har uppgetts."
       content_locked_until: "Det här innehållet är låst tills %{date}."
       file_locked_at: "Den här filen låstes klockan %{at}."
@@ -5250,6 +5254,7 @@ sv:
       anonymous_user: Anonym
     pinned_discussions: "Nålade diskussioner"
     reply: 
+      error_saving_reply: "*Ett fel uppstod*, vänligen skriv ditt svar igen senare"
       saving_reply: "Sparar svar..."
     reply_attachment: 
       attachment_label: Bilaga
@@ -5282,6 +5287,7 @@ sv:
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
       Fördelning av nuvarande kursbetyg utspritt över alla anmälda elever
       i avdelningskurser
+  divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "Dela in i lika stora %{num_minutes} minuters luckro. *Gå*"
   domain_3b54c511: Domän
   don_t_move_lti_query_params_to_post_body_21744487: "Flytta inte LTI query params för att POSTA body"
   don_t_show_again_15d8253e: "visa inte igen"
@@ -5920,6 +5926,7 @@ sv:
       all: Alla
       app_headder: "Externa Appar"
       external_tools_note: "Appar erbjuder ett enkelt sätt att lägga till nya funktion i Canvas. De kan läggas till i enskilda kurser eller till alla kurser i ett konto. När de har konfigurerats kan du länka dem genom kursmoduler och skapa uppgifter för uppgiftsverktyg. "
+      external_tools_references: "*Ta en titt på några LTI-verktyg* som fungerar bra med Canvas. Du kan också kolla in ** Canvas-community ämnen om LTI-verktyg**"
       installed: Installerad
       not_installed: "Inte installerad"
       search_filter: "Filtrera efter namn"
@@ -8322,6 +8329,7 @@ sv:
         assignment_graded: "Canvaslarm - Betygsatt: %{assignment_name}, %{course_name}"
     assignment_locked: "Den här uppgiften är för tillfället låst."
     assignment_locked_at: "Den här uppgiften låstes klockan %{at}."
+    assignment_locked_module: "Den här uppgiften är en del av modulen *%{module}* och har inte låsts upp ännu."
     assignment_locked_until: "Den här uppgiften är låst tills %{date}."
     assignment_module_time_locked: "Den här uppgiften är en del av modulen *%{module}*, som är låst tills %{time}."
     assignment_resubmitted: 
@@ -8455,6 +8463,7 @@ sv:
         subject: "Bekräfta e-post: Canvas"
     confirm_registration: 
       email: 
+        body: "Tack för att du registrerat dig med %{product_name}! Det här e-postmeddelandet är en bekräftelse på att användaren %{user} är registrerad för ett nytt konto på %{website}."
         details: "För att slutföra registreringen, vänligen besök följande url:"
         html: 
           body: "Tack för att du registrerat dig med %{product_name}! Det här e-postmeddelandet är en bekräftelse på att användaren %{user} är registrerad för ett nytt konto på %{website}."
@@ -8476,15 +8485,19 @@ sv:
         html: 
           body2: "Ett problem uppstod när kursen *%{course}* exporterades. Vänligen kontakta din system-administratör, och ge dem följande export-indentifierare:"
           link: "Klicka för att visa exporteringar"
+          subject: "Exportering av kursen misslyckades: %{course}"
+        subject: "Exportering av kursen misslyckades: *%{course}"
     content_export_finished: 
       email: 
         body: "Din exportering av innehåll för \"%{course}\" har avslutats."
         html: 
+          body2: "Din exportering av innehåll för *%{course}* har avslutats."
           link: "Klicka för att visa exporteringar"
           subject: "Exportering av kurs avslutades: %{course}"
         subject: "Exportering av kurs avslutades: %{course}"
     content_locked: "Den här quizen är för nuvarande låst."
     content_locked_at: "Det här innehållet låstes klockan %{at}."
+    content_locked_module: "Det här innehållet är en del av modulen *%{module}* och har ännu inte låsts upp."
     content_locked_until: "Det här innehållet är låst tills %{date}."
     content_module_time_locked: "Innehållet är en del av modulen *%{module}*, som är låst tills %{time}."
     content_unpublished_module: "Det här innehållet är en del av en opublicerad modul och är därför inte tillgängligt än."
@@ -9045,6 +9058,7 @@ sv:
         subject: "Nytt gruppmedlemsskap för %{course_or_account} "
       twitter: 
         body_account: "Canvaslarm - Inbjudan: %{group} för kontot %{account}"
+        body_course: "Canvaslarm - Inbjudan: %{group} för kursen %{course}"
     new_course: 
       email: 
         body: "En kurs, %{course}, har lagts till för kontot %{account}"
@@ -9113,6 +9127,7 @@ sv:
         body: "En ny händelse som du bör ha kännedom om är schemalagd för %{course_name}"
         from_to_time: "från %{start_date_time} till %{end_date_time}"
         html: 
+          body: "En ny händelse som du bör ha %{course_name} kännedom om är schemalagd för:"
           from_to_time: "från %{start_date_time} till %{end_date_time}"
           no_time_set: "Ingen tid har ställts in"
           see_details: "Du kan se detaljerna här"
@@ -9517,12 +9532,15 @@ sv:
         body: "Din inspelning av %{title} för %{name} is redo."
         details_link: "Du kan se detaljerna här: %{link}"
         html: 
+          body: "Din inspelning av %{title} för %{name} är redo."
           details_link: "Klicka här för att se detaljerna"
           subject: "Webb-konferensinspelning redo: %{name}"
         subject: "Webb-konferensinspelning redo: %{name}"
       sms: 
+        body: "Din inspelning av %{title} för %{name} är redo."
         link_message: "Mer information på %{url}"
       summary: 
+        body: "Din inspelning av %{title} för %{name} är redo."
         subject: "Webb-konferensinspelning redo: %{name}"
       twitter: 
         tweet: "Canvaslarm - Inspelning redo: %{title}, %{name}"
@@ -9674,6 +9692,7 @@ sv:
         published: Publiserad
     progression_module_collection: 
       module_progress_for: "Modul-utveckling för *%{student.name}*"
+      module_progress_for_student: "Modul-utveckling för %{student.name}"
       no_modules_found: "Inga moduler hittades"
     progression_module_view: 
       items: "Föremål att slutföra"
@@ -9786,6 +9805,9 @@ sv:
         
         Uppgift inlämning/återinlämning
     all_submissions_display: "Alla inlämningar"
+    announcement_created_by_you_description: |-
+        * Tillkännagivanden skapade av dig
+        * Svar på tillkännagivandena du skapat
     announcement_created_by_you_display: "Tillkännagivanden skapade av dig"
     announcement_description: "Nytt tillkännagivande i din kurs"
     announcement_display: Tillkännagivande
@@ -9829,6 +9851,12 @@ sv:
     conversation_created_display: "Konversation skapad av mig"
     conversation_message_description: "Nytt inboxmeddelanden"
     conversation_message_display: Konversationsmeddelande
+    course_content_description: |-
+        Ändra till kursinnehåll:
+        
+        * Wikisida
+        * Quizinnehåll
+        * Uppgiftsinnehåll
     course_content_display: Kursinnehåll
     discussion_description: "Nytt diskussionämne i din kurs"
     discussion_display: Diskussion
@@ -9838,6 +9866,17 @@ sv:
     due_date_display: Förfallodatum
     files_description: "Ny fil har lagts till din kurs"
     files_display: Filer
+    grading_description: |-
+        Inkluderar:
+        
+        * Uppgift/inlämningsbetyg givna/ändrade
+        * Av-tystade uppgiftsbetyg
+        * Ändrade betygsvikter
+        
+        
+        
+        Markera 'Inkludera poäng vid meddelande om betygsändringar' om du vill se dina betyg bland aviseringarna.
+        Om din e-post inte är en institutions-epost betyder det att känsligt innehåll kommer skickas utanför institutionen.
     grading_display: Betygsätter
     grading_notify_include_grade: "nkludera poäng vid meddelande om betygsändringar."
     grading_policies_description: "Ändra kursens betygspolicy "
@@ -10750,6 +10789,7 @@ sv:
       page_title: "Elever som observeras"
     please_select_an_option: "Vänligen välj ett alternativ"
     profile: 
+      access_token_description: "Tillgångstokens kan användas för att tillåta att applikationer gör API calls i ditt namn. Du kan också generera tillgångstokens och *använda Canvas Open API* för att skapa dina egna integrationer."
       approved_integrations: "Det här är tredjehands-applikationerna som du har gett tillåtelse att använda Canvas i ditt namn:"
       buttons: 
         add_picture_file: "Lägg till fil"
@@ -10974,6 +11014,7 @@ sv:
     ways_to_contact_me: "Sätt att kontakta mig"
     yo_select: 
       yo: Yo
+    you_have_no_services: "Du har inte registrerat några tjänster, du lägg till några på *inställning* -sida."
   profile_6bd2baed: Profil
   profiles: 
     avatar_dialog: 
@@ -11307,6 +11348,7 @@ sv:
       audible_bracket_aced: "Alla elever i den här gruppen har svara korrekt."
       audible_bracket_failed: "Inte en enda elev i den här gruppen har uppgett ett rätt svar."
       audible_chart_description: "Den här tabellen visar varje grupp av elever i klassen har svarat på den här frågan. Elevgrupper baseras på deras poäng. Den högsta gruppen består av de högsta 27%, medans mellangruppen består av de 46% imellan, och bottengruppen består av de lägsta 27%."
+      audible_discrimination_index: "Diskriminationsindex: %{number}."
       audible_middle_bracket: Mellangrupp
       audible_response_ratio_distribution: "%{correct_ratio}% av eleverna i den här gruppen har svarat korrekt."
       audible_top_bracket: "Högsta gruppen:"
@@ -13002,6 +13044,9 @@ sv:
       class_full: "Kursen **%{course}** har fyllts upp. Vi ber om ursäkt för alla olägenheter."
     enrollment_closed: 
       enrollment_is_closed: "Anmälan för **%{course}** är stängd."
+    new: 
+      titles: 
+        course_enrollment: "Anmäl dig till %{course}"
     successfully_enrolled: 
       already_enrolled: "Du har anmält dig till **%{course}**."
       buttons: 
@@ -13090,6 +13135,7 @@ sv:
         edit_assignment: Redigera
         submission_comments: Inlämningskommentarer
         view_rubric_evaluation: "Visa utvärdering av rubrik"
+      points_out_of: "%{points} utav %{possible}"
       student_mute_notification: "Instruktören håller på att betygsätta"
       submitted_and_graded_count: "%{submitted_count} inlämnade, %{graded_count} betygsatta"
       submitted_count: "%{submitted_count} inlämnade"
@@ -13556,6 +13602,8 @@ sv:
       file_item: Fil
       file_notice: "Välj den filen du vill associera med den här *modulen* eller lägg till en fil genom att välja \"Ny fil\"."
       indent_level: 
+        one: "*Ingrad 1 nivå*"
+        other: "*Indrag %{count} nivåer*"
         zero: "*Inget indrag*"
       labels: 
         assignment_name: Uppgiftsnamn
@@ -13582,6 +13630,7 @@ sv:
       quiz_notice: "Välj den quizen du vill associera till den här *modulen* eller lägg till en ny genom att välja \"Ny quiz\"."
       quiz_select_label: "Välj den quizen du vill associera eller lägg till en ny genom att välja \"Ny quiz\"."
       select_item_type_label: "Välj den sortens innehåll du vill lägga till."
+      sub_header_notice: "Skirv texten du vill lägga till som *modul* -underrubrik"
       text_header_item: Textrubrik
       topic_notice: "Välj det ämne du vill associera med den här *modulen* eller lägg till ett ämne genom att välja \"Nytt ämne\"."
       wiki_page_notice: "Välj den wiki-sida du vill assoicera med en *här modulen* eller lägg till en ny sida genom att välja \"Ny sida\"."
@@ -13848,6 +13897,7 @@ sv:
       one: "Obeservera: Poängen inkluderar inte uppgifter från gruppeb %{list_of_group_names} eftersom den inte har några möjliga poäng."
       other: "Obeservera: Poängen inkluderar inte uppgifter från grupperna %{list_of_group_names} eftersom de inte har några möjliga poäng."
     media_recordin: Mediainspelning
+    next_object: "Nästa %{type}"
     no_assignment: "Ingen uppgift har valts"
     no_outcome: "Inget resultat har valts"
     no_student: "Ingen elev har valts"
@@ -14882,6 +14932,7 @@ sv:
       overview_video: "Översiktsvideo av Canvas"
       registration_complete: "Registrering färdig"
       resending: "Skicka igen..."
+      sent_email_paragraph: "Vi skickade et e-postmeddelande till %{email_address}. *Klicka på länken i meddelandet för att slutföra registreringen.* Om du inte se meddelandet, **klicka på skicka meddelande igen**, och se till att du kollar din skräppost."
       while_you_wait: "Medans du väntar..."
     scheduled_conference: 
       current_conference_text: "Du har blivit inbjuden att delta i %{conference}. Den startar %{starts_at}."
@@ -14996,6 +15047,7 @@ sv:
       file: Fil
       language: Språk
       media_track_form_button: "Gå till vektyget som skapar undertexter"
+      upload_media_track_form_description: "När du har ett spår med undertexter i antingen SRT eller *WebVTT* format, kan du ladda upp den här."
       upload_media_track_form_description_1: "Kopiera den här videons url:"
       upload_media_track_form_description_2: "Skapa en undertextfil genom att klicka på den här länken och följa instruktionerna."
       upload_media_track_form_description_3: "Ladda upp ett undertextspår i antingen SRT eller *WebVTT* format."
@@ -15202,8 +15254,10 @@ sv:
       Du bör konfigurera %{callback_url} som Callback URL, och ställa in tillgångsnivån
       Läs, Skriv och tillgång till direktmeddelanden
       Efter att du skapat din applikation skriver du ner Konsumentnyckeln och Konsument hemligheten, och anger dem här.
+  your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Din uppgiftslista kan nu hittas på *Kalender* sidan."
   your_assignments_list_has_improved_3eded80e: "Din *Uppgifts* -list har förbättrats!"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: "Dina uppgifter kommer visas här, listade efter förfallodatum."
+  your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "Din webbläsare uppfyller inte Canvas minimum krav. Vänligen besök *Canvas Community* för en fullständig lista av webbläsare som stödjs."
   your_content_has_been_exported_bbb57764: "Ditt innehåll har inte exporterats."
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: "Din fil laddas upp till betygsboken och du kan lämna den här sidan när du vill. Om du har en stor CSV-fil kan det ta ett par minuter att uppdatera. För att förhindra att data över skrivs ber vi dig att vänligen bekräfta att uppladdning är färdig och att din Betygsbok är korrekt innan du gör ändringar."
   your_message_has_been_sent_thank_you_e0284316: "Ditt meddelande har skickats. Tack!"
