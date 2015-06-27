@@ -39,3 +39,20 @@ def submit_and_grade_homework(student, grade)
   @assignment.submit_homework(student)
   @assignment.grade_student(student, :grade => grade)
 end
+
+# Creates a dummy rubric and scores its criteria as specified in the parameters (passed as strings)
+def setup_and_grade_rubric(score1, score2)
+  student_submission
+  @association.save!
+
+  get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+  wait_for_ajaximations
+
+  f('.toggle_full_rubric').click
+  wait_for_ajaximations
+  rubric = f('#rubric_full')
+
+  rubric_inputs = rubric.find_elements(:css, 'input.criterion_points')
+  rubric_inputs[0].send_keys(score1)
+  rubric_inputs[1].send_keys(score2)
+end

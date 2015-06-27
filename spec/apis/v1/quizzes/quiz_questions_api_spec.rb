@@ -40,6 +40,24 @@ describe Quizzes::QuizQuestionsController, type: :request do
         question_ids = json.collect { |q| q['id'] }
         expect(question_ids).to eq questions.map(&:id)
       end
+
+      it "calls api_user_content for each question and answer text" do
+        (1..3).map do |n|
+          @quiz.quiz_questions.create!(:question_data => {
+            :question_name => "Question #{n}",
+            "answers" => [{"id" => 1, "text" => "foo foo"}, {"id" => 2}]
+          })
+        end
+
+        Quizzes::QuizQuestionsController.any_instance
+          .expects(:api_user_content)
+          .times(6)
+
+        api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
+                 :controller => "quizzes/quiz_questions", :action => "index", :format => "json",
+                 :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s)
+      end
+
       it "returns a list of questions which do not include previously deleted questions" do
         question1 = @quiz.quiz_questions.create!(:question_data => { :question_name => "Question 1"})
         question2 = @quiz.quiz_questions.create!(:question_data => { :question_name => "Question 2"})

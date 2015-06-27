@@ -6,7 +6,8 @@ define [
   'compiled/views/PaginatedCollectionView'
   'compiled/views/TreeItemView'
   'jst/TreeCollection'
-], (Backbone, $, _, preventDefault, PaginatedCollectionView, TreeItemView, collectionTemplate) ->
+  'compiled/str/TextHelper'
+], (Backbone, $, _, preventDefault, PaginatedCollectionView, TreeItemView, collectionTemplate, textHelper) ->
 
   class TreeView extends Backbone.View
 
@@ -50,6 +51,26 @@ define [
     render: ->
       @renderSelf()
       @renderContents()
+      @truncateLinks()
+
+    truncateLinks: ->
+      truncLength = 37
+      items = @$('.truncate')
+      items.each ->
+        $this = $(this)
+        the_text = $this.text()
+        $this.attr('data-tooltip', '')
+
+        # only truncate text that hasn't already been truncated
+        # This is neccessary because the "render" function calls each node once,
+        # then a final render with all of the nodes. Yikes.
+        if (the_text.length > truncLength)
+          truncateText = textHelper.truncateText(the_text, {max: truncLength})
+          $this.text(truncateText)
+          $this.attr('title', the_text)
+
+        # Handles any folders that didn't get a tooltip added to them
+        $this.attr('title', the_text) unless $this.attr('title')?
 
     toggle: (event) ->
       # prevent it from bubbling up to parents and from following link
@@ -75,6 +96,7 @@ define [
             $('.' + _this.selectedStyleClass).each((key, element) => $(element).removeClass(@selectedStyleClass))
             $(event.target).addClass(@selectedStyleClass)
           @onClick?(event, @model)
+        @$labelInner.addClass('truncate')
 
         $label = $("""
           <a

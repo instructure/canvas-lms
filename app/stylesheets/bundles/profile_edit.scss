@@ -58,6 +58,10 @@
   }
 }
 
+li[id$=service_google_docs] {
+  display: none;
+}
+
 #unregistered_services {
   .btn {
     margin: 3px;
@@ -260,4 +264,8 @@
   border: 2px solid #D3D9D9;
   box-sizing: border-box;
   margin: -2px;
+}
+
+#disable_inbox {
+  vertical-align: top;
 }

@@ -31,9 +31,9 @@ define([
               <a className={"al-trigger btn"} role="button" href="#">
                 <i className={"icon-settings"}></i>
                 <i className={"icon-mini-arrow-down"}></i>
-                <span className={"screenreader-only"}>Settings</span>
+                <span className={"screenreader-only"}>{ this.props.tool.name + ' ' + I18n.t('Settings') }</span>
               </a>
-              <ul className={"al-options"} role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="toolbar-2">
+              <ul className={"al-options"} role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" >
                 {configureButton}
                 <EditExternalToolButton ref="editExternalToolButton" tool={this.props.tool} />
                 <ExternalToolPlacementButton ref="externalToolPlacementButton" tool={this.props.tool} />

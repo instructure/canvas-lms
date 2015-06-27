@@ -20,12 +20,13 @@ define([
   'jquery' /* $ */,
   'str/htmlEscape',
   'compiled/str/TextHelper',
+  'compiled/util/round',
   'jquery.instructure_forms' /* fillFormData */,
   'jqueryui/dialog',
   'jquery.instructure_misc_plugins' /* showIf */,
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */
-], function(I18n, $, htmlEscape, TextHelper) {
+], function(I18n, $, htmlEscape, TextHelper, round) {
 
 // TODO: stop managing this in the view and get it out of the global scope submissions/show.html.erb
 window.rubricAssessment = {
@@ -85,7 +86,7 @@ window.rubricAssessment = {
         $rubric_criterion_comments_dialog.find("textarea.criterion_comments").focus();
       })
       // cant use a .delegate because up above when we delegate '.rating' 'click' it calls .change() and that doesnt bubble right so it doesen't get caught
-      .find(".criterion_points").bind('keypress change blur', function(event) {
+      .find(".criterion_points").bind('keyup change blur', function(event) {
         var $obj = $(event.target);
         if($obj.parents(".rubric").hasClass('assessing')) {
           var val = parseFloat($obj.val(), 10);
@@ -109,6 +110,7 @@ window.rubricAssessment = {
             if(isNaN(val)) { val = 0; }
             total += val;
           });
+          total = round(total, round.DEFAULT)
           $obj.parents(".rubric").find(".rubric_total").text(total);
         }
       });
@@ -265,8 +267,6 @@ window.rubricAssessment = {
           });
         }
         $criterion
-          .find(".criterion_description").addClass('original_completed').end()
-          .find("#rating_" + rating.id).addClass('original_selected').addClass('selected').end()
           .find(".custom_rating_field").val(comments).end()
           .find(".custom_rating_comments").html(comments_html).end()
           .find(".criterion_points").val(rating.points).change().end()
@@ -275,11 +275,17 @@ window.rubricAssessment = {
           .find(".custom_rating").text(comments).end()
           .find(".criterion_comments").toggleClass('empty', !comments).end()
           .find(".save_custom_rating").attr('checked', false);
+        if(ratingHasScore(rating)){
+          $criterion
+            .find(".criterion_description").addClass('original_completed').end()
+            .find("#rating_" + rating.id).addClass('original_selected').addClass('selected').end()
+        }
         if(comments) $criterion.find('.criterion_comments').show();
         if(rating.points && !rating.ignore_for_scoring) {
           total += rating.points;
         }
       }
+      total = round(total, round.DEFAULT)
       $rubric.find(".rubric_total").text(total);
     }
   },
@@ -295,10 +301,13 @@ window.rubricAssessment = {
         var rating = assessment.data[idx];
         $rubricSummary.find("#criterion_" + rating.criterion_id)
           .find(".rating").hide().end()
-          .find(".rating.description").showIf(!$rubricSummary.hasClass('free_form')).text(rating.description).end()
           .find(".rating_" + rating.id).show().end()
           .find(".criterion_points").text(rating.points).end()
           .find(".ignore_for_scoring").showIf(rating.ignore_for_scoring);
+        if(ratingHasScore(rating) && !$rubricSummary.hasClass('free_form')){
+          $rubricSummary.find("#criterion_" + rating.criterion_id)
+            .find(".rating.description").show().text(rating.description).end()
+        }
         if(rating.comments_enabled && rating.comments) {
           $rubricSummary.find("#criterion_" + rating.criterion_id).find(".rating_custom").show().text(rating.comments);
         }
@@ -306,6 +315,7 @@ window.rubricAssessment = {
           total += rating.points;
         }
       }
+      total = round(total, round.DEFAULT)
       $rubricSummary.show().find(".rubric_total").text(total);
       $rubricSummary.closest(".edit").show();
     }
@@ -314,6 +324,10 @@ window.rubricAssessment = {
     }
   }
 };
+
+function ratingHasScore(rating) {
+  return (rating.points || rating.points === 0);
+}
 
 $(rubricAssessment.init);
 

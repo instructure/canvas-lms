@@ -82,24 +82,28 @@
   background-color: lighten(#cdf, 6%);
 }
 
-#grades_summary tr.editable.student_assignment.dropped:hover td.points_possible {
+#grades_summary tr.editable.student_assignment.dropped:hover td.points_possible,
+#grades_summary tr.editable.student_assignment.excused:hover td.points_possible {
   background-image: url(/images/earmark_hover.png);
 }
 
-#grades_summary tr.student_assignment.dropped td {
+#grades_summary tr.student_assignment.dropped td,
+#grades_summary tr.student_assignment.excused td {
   color: #ccc;
   @media print {
     color: black;
   }
 }
 
-#grades_summary tr.student_assignment.dropped td.points_possible {
+#grades_summary tr.student_assignment.dropped td.points_possible,
+#grades_summary tr.student_assignment.excused td.points_possible {
   background-image: url(/images/earmark.png);
   background-repeat: no-repeat;
   background-position: top left;
 }
 
-#grades_summary tr.student_assignment.dropped td a {
+#grades_summary tr.student_assignment.dropped td a,
+#grades_summary tr.student_assignment.excused td a {
   color: #aaa;
   @media print {
     color: black;

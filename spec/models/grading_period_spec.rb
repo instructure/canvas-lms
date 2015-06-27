@@ -25,7 +25,7 @@ describe GradingPeriod do
   let(:account) { Account.create! }
 
   let(:params) do
-    { start_date: Time.zone.now, end_date: 1.day.from_now }
+    { title: 'A Grading Period', start_date: Time.zone.now, end_date: 1.day.from_now }
   end
 
   it { is_expected.to be_valid }
@@ -41,8 +41,13 @@ describe GradingPeriod do
   end
 
   it "requires start_date to be before end_date" do
-    subject.update_attributes(start_date: Time.zone.now, end_date: 1.day.ago)
+    subject.assign_attributes(start_date: Time.zone.now, end_date: 1.day.ago)
     is_expected.to_not be_valid
+  end
+
+  it "requires a title" do
+    grading_period = GradingPeriod.new(params.except(:title))
+    expect(grading_period).to_not be_valid
   end
 
   describe "#destroy" do
@@ -116,26 +121,34 @@ describe GradingPeriod do
     end
   end
 
-  describe "#current" do
-    let(:grading_period) { create_grading_periods_for(Account.default, grading_periods: [:current]).first }
+  describe "#current?" do
+    subject(:grading_period) { GradingPeriod.new }
 
     it "returns false for a grading period in the past" do
-      grading_period.start_date = 2.months.ago
-      grading_period.end_date = 1.month.ago
-      expect(grading_period.current?).to be false
+      grading_period.assign_attributes(start_date: 2.months.ago,
+                                       end_date:   1.month.ago)
+      expect(grading_period).to_not be_current
     end
 
     it "returns true if the current time falls between the start date and end date (inclusive)" do
-      grading_period.start_date = 1.month.ago
-      grading_period.end_date = 1.month.from_now
-      expect(grading_period.current?).to be true
+      grading_period.assign_attributes(start_date: 1.month.ago,
+                                       end_date:   1.month.from_now)
+      expect(grading_period).to be_current
     end
 
     it "returns false for a grading period in the future" do
-      grading_period.start_date = 1.month.from_now
-      grading_period.end_date = 2.months.from_now
-      expect(grading_period.current?).to be false
+      grading_period.assign_attributes(start_date: 1.month.from_now,
+                                       end_date:   2.months.from_now)
+      expect(grading_period).to_not be_current
     end
+  end
+
+  context "Soft deletion" do
+    let(:account) { Account.create }
+    let(:group) { account.grading_period_groups.create }
+    let(:creation_arguments) { { start_date: 1.week.ago, end_date: 2.weeks.from_now } }
+    subject { group.grading_periods }
+    include_examples "soft deletion"
   end
 end
 

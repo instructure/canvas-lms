@@ -22,6 +22,8 @@
 module Lti
   class VariableExpander
 
+    SUBSTRING_REGEX = /(?<=\${).*?(?=})/.freeze #matches only the stuff inside `${}`
+
     attr_reader :context, :root_account, :controller, :current_user
 
     attr_accessor :current_pseudonym, :content_tag, :assignment,
@@ -69,15 +71,17 @@ module Lti
 
     def [](key)
       k = (key[0] == '$' && key) || "$#{key}"
-      if expansion = self.class.expansions[k.respond_to?(:to_sym) && k.to_sym]
+      if (expansion = self.class.expansions[k.respond_to?(:to_sym) && k.to_sym])
         expansion.expand(self)
       end
     end
 
     def expand_variables!(var_hash)
       var_hash.update(var_hash) do |_, v|
-        if expansion = v.respond_to?(:to_sym) && self.class.expansions[v.to_sym]
+        if (expansion = v.respond_to?(:to_sym) && self.class.expansions[v.to_sym])
           expansion.expand(self)
+        elsif v.respond_to?(:to_s) && v.to_s =~ SUBSTRING_REGEX
+          expand_substring_variables(v)
         else
           v
         end
@@ -338,6 +342,13 @@ module Lti
 
     def sis_pseudonym
       @sis_pseudonym ||= @current_user.find_pseudonym_for_account(@root_account) if @current_user
+    end
+
+    def expand_substring_variables(value)
+      value.to_s.scan(SUBSTRING_REGEX).inject(value) do |v, match|
+        substring = "${#{match}}"
+        v.gsub(substring, (self[match] || substring).to_s)
+      end
     end
 
   end

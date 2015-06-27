@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 describe "admin settings tab" do
   include_examples "in-process server selenium tests"
-  before (:each) do
+  before :each do
     course_with_admin_logged_in
     get "/accounts/#{Account.default.id}/settings"
   end

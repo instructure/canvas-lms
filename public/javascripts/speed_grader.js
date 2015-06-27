@@ -1599,9 +1599,14 @@ define([
           method = $(".update_submission_grade_url").attr('title'),
           formData = {
             'submission[assignment_id]': jsonData.id,
-            'submission[user_id]':       EG.currentStudent.id,
-            'submission[grade]':         $grade.val()
+            'submission[user_id]':       EG.currentStudent.id
           };
+      var grade = $grade.val();
+      if (grade.toUpperCase() === "EX") {
+        formData["submission[excuse]"] = true;
+      } else {
+        formData["submission[grade]"] = grade;
+      }
 
       $.ajaxJSON(url, method, formData, function(submissions) {
         $.each(submissions, function(){
@@ -1621,7 +1626,10 @@ define([
 
       if ( EG.currentStudent.submission !== undefined ) {
         submission = EG.currentStudent.submission;
-        if ( submission.grade !== null && !isNaN(parseFloat(submission.grade)) ) {
+        if (submission.excused) {
+          grade = "EX"
+        }
+        else if ( submission.grade !== null && !isNaN(parseFloat(submission.grade)) ) {
           grade = round(submission.grade, 2);
         }
       }

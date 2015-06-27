@@ -1,12 +1,12 @@
 class GradingPeriod < ActiveRecord::Base
-  include Workflow
+  include Canvas::SoftDeletable
 
   attr_accessible :weight, :start_date, :end_date, :title
 
-  belongs_to :grading_period_group, :inverse_of => :grading_periods
+  belongs_to :grading_period_group, inverse_of: :grading_periods
   has_many :grading_period_grades, dependent: :destroy
 
-  validates :start_date, :end_date, :grading_period_group_id, presence: true
+  validates :title, :start_date, :end_date, :grading_period_group_id, presence: true
   validate :validate_dates
 
   set_policy do
@@ -17,12 +17,6 @@ class GradingPeriod < ActiveRecord::Base
     can :manage
   end
 
-  workflow do
-    state :active
-    state :deleted
-  end
-
-  scope :active, -> { where workflow_state: "active" }
   scope :current, -> { where("start_date <= ? AND end_date >= ?", Time.now, Time.now) }
   scope :grading_periods_by, ->(context_with_ids) {
     joins(:grading_period_group).where(grading_period_groups: context_with_ids)
@@ -45,16 +39,6 @@ class GradingPeriod < ActiveRecord::Base
 
   def current?
     start_date <= Time.now && end_date >= Time.now
-  end
-
-  # save the previous definition of `destroy` and alias it to `destroy!`
-  # Note: `destroy!` now does NOT throw errors while the newly defined
-  # `destroy` DOES throw errors due to `save!`
-  alias_method :destroy!, :destroy
-  def destroy
-    self.workflow_state = 'deleted'
-    save!
-    run_callbacks :destroy
   end
 
   def assignments(assignment_scope)

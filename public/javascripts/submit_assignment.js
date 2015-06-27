@@ -182,6 +182,7 @@ define([
       $("html,body").scrollTo($("#submit_assignment"));
       createSubmitAssignmentTabs();
       homeworkSubmissionLtiContainer.loadExternalTools();
+      $("#submit_assignment_tabs li").first().focus();
     });
 
     $(".switch_text_entry_submission_views").click(function(event) {

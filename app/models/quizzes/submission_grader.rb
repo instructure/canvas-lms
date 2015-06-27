@@ -28,9 +28,8 @@ module Quizzes
         end
       end
       @submission.score_before_regrade = nil
-      @submission.finished_at = Time.now
       @submission.manually_unlocked = nil
-      @submission.finished_at = opts[:finished_at] if opts[:finished_at]
+      @submission.finished_at ||= opts[:finished_at] || Time.zone.now
       if @submission.quiz.for_assignment? && @submission.user_id
         assignment_submission = @submission.assignment.find_or_create_submission(@submission.user_id)
         @submission.submission = assignment_submission

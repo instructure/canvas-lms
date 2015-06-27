@@ -156,7 +156,16 @@
        assignment = assignment_presenter.assignment
        can_view_distribution = can_do(@context, @current_user, :read_as_admin) || !assignment_presenter.hide_distribution_graphs?
     %>
-    <tr class="student_assignment <%= 'assignment_graded' if assignment_presenter.graded? %> <%= assignment_presenter.special_class %>" data-muted="<%= assignment.muted? %>" id="<%= "submission_" + assignment.id.to_s %>">
+  <tr class="<%= assignment_presenter.classes %>"
+      data-muted="<%= assignment.muted? %>"
+      id="<%= "submission_" + assignment.id.to_s %>"
+      <% if assignment_presenter.excused? %>
+        <% excused_label = t "This assignment is excused and will not be considered in the total calculation" %>
+        aria-label="<%= excused_label %>"
+        title="<%= excused_label %>"
+      <% end %>
+      >
+
       <th class="title" scope="row">
         <% if assignment_presenter.is_unread? %>
           <div class="unread-grade">&nbsp;</div>

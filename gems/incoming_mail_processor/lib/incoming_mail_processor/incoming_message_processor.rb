@@ -52,6 +52,11 @@ module IncomingMailProcessor
       settings.workers || 1
     end
 
+    # True if we should launch N workers per mailbox, false to just launch N workers overall
+    def self.dedicated_workers_per_mailbox
+      settings.dedicated_workers_per_mailbox.nil? ? false : settings.dedicated_workers_per_mailbox
+    end
+
     def self.run_periodically?
       if settings.run_periodically.nil?
         # check backwards compatibility settings
@@ -62,7 +67,14 @@ module IncomingMailProcessor
     end
 
     def process(opts={})
-      self.class.mailbox_accounts.each do |account|
+      if opts[:mailbox_account_address]
+        # Find the one with that address, or do nothing if none exists (probably means we're in the middle of a deploy)
+        accounts_to_process = self.class.mailbox_accounts.select { |a| a.address == opts[:mailbox_account_address] }
+      else
+        accounts_to_process = self.class.mailbox_accounts
+      end
+
+      accounts_to_process.each do |account|
         mailbox = self.class.create_mailbox(account)
         mailbox_opts = {}
         mailbox_opts = {offset: opts[:worker_id], stride: self.class.workers} if opts[:worker_id] && self.class.workers > 1

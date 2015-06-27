@@ -1,0 +1,24 @@
+<p><%= mt(<<-TEXT, callback_url: oauth2_login_callback_url)
+To configure an OpenID Connect provider you need the authorize and token urls, and
+obtain a Client ID and Client Secret.
+
+If the provider can configure valid callback or redirect URIs, use %{callback_url}.
+                  TEXT
+              %></p>
+  <%= render partial: 'oauth2_fields', locals: { f: f } %>
+<div class="ic-Form-control">
+  <%= f.label :authorize_url, 'Authorize URL', class: 'ic-Label' %>
+  <%= f.text_field :authorize_url, class: 'ic-Input' %>
+</div>
+<div class="ic-Form-control">
+  <%= f.label :token_url, 'Token URL', class: 'ic-Label' %>
+  <%= f.password_field :token_url, class: 'ic-Input' %>
+</div>
+<div class="ic-Form-control">
+  <%= f.label :scope, 'Scope', class: 'ic-Label' %>
+  <%= f.text_field :scope, class: 'ic-Input' %>
+</div>
+<div class="ic-Form-control">
+  <%= f.label :login_attribute, 'Login Attribute', class: 'ic-Label' %>
+  <%= f.text_field :login_attribute, placeholder: 'sub', class: 'ic-Input' %>
+</div>

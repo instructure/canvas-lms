@@ -29,9 +29,9 @@ define [
       count = @model.usersCount()
       if @model.theLimit()
         if ENV.group_user_type is 'student'
-          I18n.t "student_count_max", "%{count} / %{max} students", count: count, max: @model.theLimit()
+          I18n.t "%{count} / %{max} students", count: count, max: @model.theLimit()
         else
-          I18n.t "user_count_max", "%{count} / %{max} users", count: count, max: @model.theLimit()
+          I18n.t "%{count} / %{max} users", count: count, max: @model.theLimit()
       else
         if ENV.group_user_type is 'student'
           I18n.t "student_count", "student", count: count

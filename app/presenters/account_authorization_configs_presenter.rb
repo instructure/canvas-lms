@@ -6,16 +6,25 @@ class AccountAuthorizationConfigsPresenter
   end
 
   def configs
-    account.account_authorization_configs.to_a
+    @configs ||= account.account_authorization_configs.to_a
   end
 
-  def auth_types
-    AccountAuthorizationConfig::VALID_AUTH_TYPES
+  def new_auth_types
+    AccountAuthorizationConfig::VALID_AUTH_TYPES.map do |auth_type|
+      klass = AccountAuthorizationConfig.find_sti_class(auth_type)
+      next unless klass.enabled?
+      next if klass.singleton? && configs.any? { |aac| aac.is_a?(klass) }
+      klass
+    end.compact
   end
 
   def needs_discovery_url?
     configs.count >= 2 &&
       configs.any?{|c| !c.is_a?(AccountAuthorizationConfig::LDAP) }
+  end
+
+  def needs_unknown_user_url?
+    configs.any? { |c| c.is_a?(AccountAuthorizationConfig::Delegated) }
   end
 
   def login_url_options(aac)
@@ -51,20 +60,11 @@ class AccountAuthorizationConfigsPresenter
     configs.select{|c| c.is_a?(AccountAuthorizationConfig::CAS) }
   end
 
-  def form_id(config)
-    return "#{config.auth_type}_form" if config.new_record?
-    'auth_form'
-  end
-
-  def form_class(config)
-    return 'class="active"' unless config.new_record?
-    ''
-  end
 
   def sso_options
-    options = [[:CAS, 'cas'], [:LDAP, 'ldap']]
-    options << [:SAML, 'saml'] if saml_enabled?
-    options
+    new_auth_types.map do |auth_type|
+      [auth_type.display_name, auth_type.sti_name]
+    end
   end
 
   def position_options(config)
@@ -86,11 +86,6 @@ class AccountAuthorizationConfigsPresenter
     Onelogin::Saml::NameIdentifiers::ALL_IDENTIFIERS
   end
 
-  def saml_login_attributes
-    return {} unless saml_enabled?
-    AccountAuthorizationConfig::SAML.login_attributes
-  end
-
   def saml_debugging?
      !saml_configs.empty? && saml_configs.any?(&:debugging?)
   end
@@ -109,7 +104,7 @@ class AccountAuthorizationConfigsPresenter
   end
 
   def canvas_auth_only?
-    account.canvas_authentication? && !account.ldap_authentication?
+    !account.non_canvas_auth_configured?
   end
 
   def login_placeholder
@@ -122,6 +117,10 @@ class AccountAuthorizationConfigsPresenter
 
   def new_config(auth_type)
     account.account_authorization_configs.new(auth_type)
+  end
+
+  def parent_reg_selected
+    account.parent_registration?
   end
 
   private

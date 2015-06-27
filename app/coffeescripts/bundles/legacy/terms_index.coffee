@@ -35,9 +35,6 @@ require [
     $(".enrollment_term_form").formSubmit
       processData: (data) ->
         permissions = $(this).parents("tr").find(".permissions").getFormData(object_name: "enrollment_term")
-        $.each permissions, (key, val) ->
-          permissions[key] = $.datetime.process(val)  if key.match(/\[(start)|(end)_at\]/)
-
         $.extend permissions, data
 
       beforeSubmit: (data) ->

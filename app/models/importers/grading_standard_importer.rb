@@ -3,6 +3,13 @@ module Importers
 
     self.item_class = GradingStandard
 
+    def self.select_course_grading_standard(data, migration)
+      return unless migration.import_object?('course_settings', '')
+      return unless data[:course] && data[:course][:grading_standard_enabled]
+      gs_id = data[:course][:grading_standard_identifier_ref]
+      migration.import_object!('grading_standards', gs_id) if gs_id
+    end
+
     def self.process_migration(data, migration)
       standards = data['grading_standards'] || []
       standards.each do |standard|

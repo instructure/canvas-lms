@@ -8,7 +8,7 @@ describe "grading periods" do
       course_with_teacher_logged_in
     end
 
-    context "with Multiple Grading Periods feature on" do
+    context "with Multiple Grading Periods feature on," do
       before(:each) do
         @course.root_account.enable_feature!(:multiple_grading_periods)
       end
@@ -49,18 +49,6 @@ describe "grading periods" do
         expect(ff('.grading-period').length).to eq(1)
       end
 
-      it "prevents saving a grading period until each input is filled out" do
-        get "/courses/#{@course.id}/grading_standards"
-        f('#add-period-button').click
-
-        expect(f('.update-button')['disabled']).to eq("true")
-        f('#period_title_new2').send_keys 'grading period name'
-        f('#period_start_date_new2').send_keys 'Feb 12, 2015'
-        f('#period_end_date_new2').send_keys 'Feb 13, 2015'
-        f('.grading-period').click
-        expect(f('.update-button')['disabled']).to be_nil
-      end
-
       it "removes an unsaved grading period from the dom gracefully" do
         create_grading_periods_for(@course)
         get "/courses/#{@course.id}/grading_standards"
@@ -78,25 +66,8 @@ describe "grading periods" do
         f('#period_end_date_new2').send_keys 'Feb 1'
         f('.grading-period').click
 
-        f('.update-button').click
-        assert_error_box '#period_start_date_new2'
-      end
-
-      it "submit button says 'save' when creating a new grading period" do
-        get "/courses/#{@course.id}/grading_standards"
-        f('#add-period-button').click
-        expect(f('.update-button').text).to eq('Save')
-      end
-
-      it "submit button text says 'update' when updating a grading period" do
-        grading_period_group = @course.grading_period_groups.create!
-        grading_period_group.grading_periods.create!(title: "Delete me, please!",
-            start_date: Time.zone.now,
-            end_date: 30.days.from_now,
-            weight: 1)
-
-        get "/courses/#{@course.id}/grading_standards"
-        expect(f('.update-button').text).to eq('Update')
+        f('#update-button').click
+        assert_flash_error_message(/All start dates must be before the end date/)
       end
 
       it "allows a user to add multiple grading periods simultaneously" do
@@ -110,11 +81,11 @@ describe "grading periods" do
         get "/courses/#{@course.id}/grading_standards"
         f('#add-period-button').click
 
-        f('#period_title_new2').send_keys grading_period_title
-        f('#period_start_date_new2').send_keys 'Feb 12, 2015'
-        f('#period_end_date_new2').send_keys 'Feb 22, 2015'
+        replace_content f('#period_title_new2'), grading_period_title
+        replace_content f('#period_start_date_new2'), 'Feb 12, 2015 at 12:00am'
+        replace_content f('#period_end_date_new2'), 'Feb 22, 2015 at 12:00am'
         f('.grading-period').click
-        f('.update-button').click
+        f('#update-button').click
         wait_for_ajax_requests
         expect(GradingPeriod.last.title).to eq(grading_period_title)
       end
@@ -129,7 +100,7 @@ describe "grading periods" do
         get "/courses/#{@course.id}/grading_standards"
         replace_content(f('#period_title_' + grading_period.id.to_s), updated_grading_period_title)
         f('.grading-period').click
-        f('.update-button').click
+        f('#update-button').click
         wait_for_ajax_requests
 
         expect(GradingPeriod.last.title).to eq(updated_grading_period_title)
@@ -150,7 +121,7 @@ describe "grading periods" do
       @account = @course.root_account
     end
 
-    context "with Multiple Grading Periods feature on" do
+    context "with Multiple Grading Periods feature on," do
       before(:each) do
         @account.enable_feature!(:multiple_grading_periods)
       end

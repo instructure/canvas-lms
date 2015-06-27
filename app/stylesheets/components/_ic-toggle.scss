@@ -4,10 +4,10 @@
 ### tl;dr
 
   - Regular old checkboxes that look and feel like toggle switches
-  - No javascript is required for the **.ic-Toggle** component. 
-  - However, including all the right markup is important for it to function properly. 
+  - No javascript is required for the **.ic-Toggle** component.
+  - However, including all the right markup is important for it to function properly.
   - The id of the checkbox input must match the "for" attribute of the label, for example.
-  - The **.ic-Toggle** component was designed to be as accessible as a regular checkbox. 
+  - The **.ic-Toggle** component was designed to be as accessible as a regular checkbox.
   - Supports both *:focus* and *disabled* states. Once in focus, it can be toggled via the keyboard by pressing SPACE.
 
 ## Basic usage
@@ -163,7 +163,7 @@ The SCSS above would give you the toggle below.
       }
       @else {
         outline: 2px solid rgba($ic-Toggle-on-color, 0.25);
-        outline-offset: -2px;  
+        outline-offset: -2px;
       }
     }
 
@@ -417,4 +417,55 @@ The SCSS above would give you the toggle below.
   }
   // End styleguide demo styles
 
+  &.ic-Toggle--dashcard {
+
+    @include ic-Toggle-appearance (
+      $ic-Toggle-width: 62px,
+      $ic-Toggle-height: 28px,
+      $ic-Toggle-offset: 2px
+    );
+    @include ic-Toggle-branding (
+      $ic-brand-secondary, // off state color
+      $ic-brand-secondary, // on state color
+      $ic-color-light, // inactive text color
+      cubic-bezier(0,1,0.5,1) // transition timing function
+    );
+
+    width: 62px;
+
+    // Default state
+    label {
+      .ic-Toggle__switch {
+        &:before {
+          content: url('/images/dashcards/ic-dashcard-toggle-cards.png');
+          position: relative;
+          top: 4px;
+          left: 26px;
+        }
+        &:after {
+          content: url('/images/dashcards/ic-dashcard-toggle.png');
+          height: 24px;
+        }
+      }
+    }
+    // Switched to Activity
+    input[type="checkbox"] {
+      &:checked {
+        ~ label {
+          .ic-Toggle__switch {
+            &:before {
+              content: url('/images/dashcards/ic-dashcard-toggle-stream.png');
+              position: relative;
+              top: 3px;
+              left: -5px;
+            }
+            &:after {
+              content: url('/images/dashcards/ic-dashcard-toggle.png');
+              height: 24px;
+            }
+          }
+        }
+      }
+    }
+  } // end custom toggle for dashboard cards
 }

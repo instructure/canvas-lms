@@ -29,7 +29,7 @@ class UserObserveesController < ApplicationController
   #
   # List the users that the given user is observing.
   #
-  # *Note:* all users are allowed to list their own observees. Administrators can list 
+  # *Note:* all users are allowed to list their own observees. Administrators can list
   # other users' observees.
   #
   # @example_request
@@ -67,15 +67,34 @@ class UserObserveesController < ApplicationController
   #
   # @returns User
   def create
-    observee_pseudonym = Pseudonym.authenticate(params[:observee] || {}, [@domain_root_account.id] + @domain_root_account.trusted_account_ids)
-
-    observee_user = observee_pseudonym.user if observee_pseudonym && common_accounts_for(user, observee_pseudonym.user).present?
-    if observee_user
-      add_observee(observee_user)
-      render json: user_json(observee_user, @current_user, session)
-    else
-      render json: {errors: [{'message' => 'Invalid credentials provided.'}]}, status: :unauthorized
+    # verify target observee exists and is in an account with the observer
+    observee_pseudonym = @domain_root_account.pseudonyms.by_unique_id(params[:observee][:unique_id]).first
+    if observee_pseudonym.nil? || common_accounts_for(user, observee_pseudonym.user).empty?
+      render json: {errors: [{'message' => 'Unknown observee.'}]}, status: 422
+      return
     end
+
+    # if using external auth, save off form information then send to external
+    # login form. remainder of adding observee happens in response to that flow
+    if @domain_root_account.parent_registration?
+      session[:parent_registration] = {}
+      session[:parent_registration][:user_id] = @current_user.id
+      session[:parent_registration][:observee] = params[:observee]
+      session[:parent_registration][:observee_only] = true
+      render(json: {redirect: saml_observee_path})
+      return
+    end
+
+    # verify provided password
+    unless Pseudonym.authenticate(params[:observee] || {}, [@domain_root_account.id] + @domain_root_account.trusted_account_ids)
+      render json: {errors: [{'message' => 'Invalid credentials provided.'}]}, status: :unauthorized
+      return
+    end
+
+    # add observer
+    observee_user = observee_pseudonym.user
+    add_observee(observee_user)
+    render json: user_json(observee_user, @current_user, session)
   end
 
   # @API Show an observee

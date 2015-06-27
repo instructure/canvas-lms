@@ -57,9 +57,17 @@
     </div>
   <% else %>
     <!--Student View-->
-    <h1 class="title">
-      <%= @assignment.title %>
-    </h1>
+    <div class='assignment-title'>
+      <div class='title-content'>
+        <h1 class="title">
+          <%= @assignment.title %>
+        </h1>
+      </div>
+      <div class="edit-content">
+        <%= render "shared/mark_as_done" %>
+      </div>
+    </div>
+
     <ul class='student-assignment-overview'>
       <li>
         <span class='title'><%= t :due_at, 'Due' %></span>

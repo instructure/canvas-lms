@@ -1,5 +1,22 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
+def init_course_with_students(num = 1)
+  course_with_teacher_logged_in
+
+  @students = []
+  (1..num).each do |i|
+    student = User.create!(:name => "Student_#{i}")
+    student.register!
+
+    e1 = @course.enroll_student(student)
+    e1.workflow_state = 'active'
+    e1.save!
+    @course.reload
+
+    @students.push student
+  end
+end
+
 def set_default_grade(cell_index, points = "5")
   open_assignment_options(cell_index)
   f('[data-action="setDefaultGrade"]').click

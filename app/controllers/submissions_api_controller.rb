@@ -132,6 +132,11 @@
 #           "description": "Whether the assignment is visible to the user who submitted the assignment. Submissions where `assignment_visible` is false no longer count towards the student's grade and the assignment can no longer be accessed by the student. `assignment_visible` becomes false for submissions that do not have a grade and whose assignment is no longer assigned to the student's section.",
 #           "example": true,
 #           "type": "boolean"
+#         },
+#         "excused": {
+#           "description": "Whether the assignment is excused.  Excused assignments have no impact on a user's grade.",
+#           "example": true,
+#           "type": "boolean"
 #         }
 #       }
 #     }
@@ -536,6 +541,8 @@ class SubmissionsApiController < ApplicationController
   #   a posted_grade in the "points" or "percentage" format is sent, the grade
   #   will only be accepted if the grade equals one of those two values.
   #
+  # @argument submission[excuse] [Boolean]
+  #   Sets the "excused" status of an assignment.
   #
   # @argument rubric_assessment [RubricAssessment]
   #   Assign a rubric assessment to this assignment submission. The
@@ -593,8 +600,9 @@ class SubmissionsApiController < ApplicationController
       submission = { :grader => @current_user }
       if params[:submission].is_a?(Hash)
         submission[:grade] = params[:submission].delete(:posted_grade)
+        submission[:excuse] = params[:submission].delete(:excuse)
       end
-      if submission[:grade]
+      if submission[:grade] || submission[:excuse]
         @submissions = @assignment.grade_student(@user, submission)
         @submission = @submissions.first
       else

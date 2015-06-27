@@ -29,9 +29,8 @@ class SelfEnrollmentsController < ApplicationController
     login_handle_name = @domain_root_account.login_handle_name_with_inference
     @login_label_name = login_handle_name if login_handle_name
 
-    if !@current_user && delegated_authentication_url?
+    if !@current_user && @domain_root_account.delegated_authentication?
       store_location
-      flash[:notice] = t('notices.login_required', "Please log in to join this course.")
       return redirect_to login_url
     end
   end

@@ -123,6 +123,11 @@
 #         "outcome": {
 #           "description": "an abbreviated Outcome object representing the outcome linked into the containing outcome group.",
 #           "$ref": "Outcome"
+#         },
+#         "assessed": {
+#           "description": "whether this outcome has been used to assess a student in the context of this outcome link.  In other words, this will be set to true if the context is a course, and a student has been assessed with this outcome in that course.",
+#           "example": true,
+#           "type": "boolean"
 #         }
 #       }
 #     }
@@ -189,9 +194,7 @@ class OutcomeGroupsApiController < ApplicationController
       outcome_params[:assessed_outcomes] = ret
     end
 
-    render json: links.map { |link|
-      outcome_link_json(link, @current_user, session, outcome_params)
-    }
+    render json: outcome_links_json(links, @current_user, session, outcome_params)
   end
 
   # @API Show an outcome group
@@ -337,7 +340,7 @@ class OutcomeGroupsApiController < ApplicationController
     ActiveRecord::Associations::Preloader.new(@links, :learning_outcome_content => :context).run
 
     # render to json and serve
-    render :json => @links.map{ |link| outcome_link_json(link, @current_user, session) }
+    render :json => outcome_links_json(@links, @current_user, session)
   end
 
   # Intentionally undocumented in the API. Used by the UI to show a list of

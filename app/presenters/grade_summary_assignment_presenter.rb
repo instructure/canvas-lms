@@ -18,7 +18,9 @@ class GradeSummaryAssignmentPresenter
   end
 
   def graded?
-    submission && submission.grade && !assignment.muted?
+    submission &&
+      (submission.grade || submission.excused?) &&
+      !assignment.muted?
   end
 
   def is_letter_graded?
@@ -79,6 +81,18 @@ class GradeSummaryAssignmentPresenter
 
   def special_class
     assignment.special_class ? ("hard_coded " + assignment.special_class) : "editable"
+  end
+
+  def classes
+    classes = ["student_assignment"]
+    classes << "assignment_graded" if graded?
+    classes << special_class
+    classes << "excused" if excused?
+    classes.join(" ")
+  end
+
+  def excused?
+    submission.try(:excused?)
   end
 
   def published_grade

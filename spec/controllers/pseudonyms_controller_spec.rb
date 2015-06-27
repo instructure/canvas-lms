@@ -399,17 +399,33 @@ describe PseudonymsController do
       expect(bob.pseudonym.reload.unique_id).to eq 'old_username'
     end
 
-    it "should succeed with partial update" do
+    it "should fail partial update when permission isn't given to make username change" do
       bob = user_with_pseudonym(username: 'old_username', password: 'old_password')
       user_session(bob)
       put 'update',
-        id: bob.pseudonym.id,
-        user_id: bob.id,
-        pseudonym: {
-          password: 'new_password',
-          password_confirmation: 'new_password',
-          unique_id: 'new_username'
-        }
+          id: bob.pseudonym.id,
+          user_id: bob.id,
+          pseudonym: {
+              password: 'new_password',
+              password_confirmation: 'new_password',
+              unique_id: 'new_username'
+          }
+      expect(response).not_to be_success
+      bob.pseudonym.reload
+      expect(bob.pseudonym.unique_id).to eq 'old_username'
+      expect(bob.pseudonym).to be_valid_password('old_password')
+    end
+
+    it "should allow password change for current user" do
+      bob = user_with_pseudonym(username: 'old_username', password: 'old_password')
+      user_session(bob)
+      put 'update',
+          id: bob.pseudonym.id,
+          user_id: bob.id,
+          pseudonym: {
+              password: 'new_password',
+              password_confirmation: 'new_password',
+          }
       expect(response).to be_redirect
       bob.pseudonym.reload
       expect(bob.pseudonym.unique_id).to eq 'old_username'

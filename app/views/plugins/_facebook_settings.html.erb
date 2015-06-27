@@ -1,0 +1,24 @@
+<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+  <table style="width: 600px;" class="formtable">
+    <tr>
+      <td colspan="2"><%= mt(:description, <<-TEXT, facebook_url: "https://developers.facebook.com/", callback_url: oauth2_login_callback_url)
+You will need to create a [new app on Facebook](%{facebook_url}), and enable Client OAuth Login
+in Advanced Settings.  You should configure %{callback_url} as the Valid OAuth redirect URI.
+After you save your app, make a note of the App ID and App Secret, and enter them here.
+TEXT
+      %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :app_id, :en => "App ID" %></td>
+      <td>
+        <%= f.text_field :app_id %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :app_secret, :en => "App Secret" %></td>
+      <td>
+        <%= f.password_field :app_secret, autocomplete: false %>
+      </td>
+    </tr>
+  </table>
+<% end %>

@@ -125,7 +125,9 @@ class AssignmentsController < ApplicationController
 
       if @assignment.grants_right?(@current_user, session, :read_own_submission) && @context.grants_right?(@current_user, session, :read_grades)
         @current_user_submission = @assignment.submissions.where(user_id: @current_user).first if @current_user
-        @current_user_submission = nil if @current_user_submission && !@current_user_submission.grade && !@current_user_submission.submission_type
+        @current_user_submission = nil if @current_user_submission &&
+                                        !@current_user_submission.graded? &&
+                                        !@current_user_submission.submission_type
         @current_user_rubric_assessment = @assignment.rubric_association.rubric_assessments.where(user_id: @current_user).first if @current_user && @assignment.rubric_association
         @current_user_submission.send_later(:context_module_action) if @current_user_submission
       end
@@ -148,6 +150,9 @@ class AssignmentsController < ApplicationController
 
       @assignment_menu_tools = external_tools_display_hashes(:assignment_menu)
 
+
+      @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user)
+
       respond_to do |format|
         if @assignment.submission_types == 'online_quiz' && @assignment.quiz
           format.html { redirect_to named_context_url(@context, :context_quiz_url, @assignment.quiz.id) }
@@ -158,6 +163,7 @@ class AssignmentsController < ApplicationController
         elsif @assignment.submission_types == 'external_tool' && @assignment.external_tool_tag && @unlocked
           tag_type = params[:module_item_id].present? ? :modules : :assignments
           format.html { content_tag_redirect(@context, @assignment.external_tool_tag, :context_url, tag_type) }
+
         else
           format.html { render }
         end
@@ -396,7 +402,7 @@ class AssignmentsController < ApplicationController
         :ASSIGNMENT_GROUPS => json_for_assignment_groups,
         :GROUP_CATEGORIES => group_categories,
         :KALTURA_ENABLED => !!feature_enabled?(:kaltura),
-        :POST_TO_SIS => @context.feature_enabled?(:post_grades),
+        :POST_TO_SIS => Assignment.show_sis_grade_export_option?(@context),
         :SECTION_LIST => (@context.course_sections.active.map { |section|
           {
             :id => section.id,

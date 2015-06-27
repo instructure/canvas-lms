@@ -428,10 +428,17 @@ describe DiscussionTopic do
     end
 
     it "shouldn't send to streams on creation or update if it's delayed" do
-      topic = @course.discussion_topics.create!(:title => "this should not be delayed", :message => "content here")
+      topic = @course.discussion_topics.create!(
+        title: "this should not be delayed",
+        message: "content here"
+      )
       expect(topic.stream_item).not_to be_nil
 
-      topic = delayed_discussion_topic(:title => "this should be delayed", :message => "content here", :delayed_post_at => Time.now + 1.day)
+      topic = delayed_discussion_topic(
+        title: "this should be delayed",
+        message: "content here",
+        delayed_post_at: 1.day.from_now
+      )
       expect(topic.stream_item).to be_nil
 
       topic.message = "content changed!"
@@ -439,15 +446,31 @@ describe DiscussionTopic do
       expect(topic.stream_item).to be_nil
     end
 
-    it "should send to streams on update from delayed to active" do
-      topic = delayed_discussion_topic(:title => "this should be delayed", :message => "content here", :delayed_post_at => Time.now + 1.day)
-      expect(topic.workflow_state).to eq 'post_delayed'
+    it "should send to streams on update from unpublished to active" do
+      topic = discussion_topic(
+        title: "this should be delayed",
+        message: "content here",
+        workflow_state: "unpublished"
+      )
+      expect(topic.workflow_state).to eq 'unpublished'
       expect(topic.stream_item).to be_nil
 
-      topic.delayed_post_at = nil
-      topic.title = "this isn't delayed any more"
       topic.workflow_state = 'active'
       topic.save!
+      expect(topic.stream_item).not_to be_nil
+    end
+
+    it "doesn't rely on broadcast policy when sending to stream" do
+      topic = discussion_topic(
+        title: "this should be delayed",
+        message: "content here",
+        workflow_state: "unpublished"
+      )
+      expect(topic.workflow_state).to eq 'unpublished'
+      expect(topic.stream_item).to be_nil
+
+      topic.workflow_state = 'active'
+      topic.save_without_broadcasting!
       expect(topic.stream_item).not_to be_nil
     end
 

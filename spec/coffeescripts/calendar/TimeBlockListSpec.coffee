@@ -51,20 +51,30 @@ define [
     equal @me.rows.length, rowsBefore + 1
     ok $.contains(@me.element, row.$row), 'make sure the element got appended to my <tbody>'
 
+  test "should validate if all rows are valid and complete or blank", ->
+    ok @me.validate(), 'should validate'
+
   test "should not not validate if all rows are not valid", ->
-    ok @me.validate(), 'should validate if has valid dates'
+    row = @me.addRow()
+    row.$date.val('asdfasdf').change()
+    ok !@me.validate(), 'should not validate'
 
-    # make an invalid row
-    row =  @me.addRow()
-    row.updateDom('date', 'asdfasdf').change()
+  test "should not validate if a row is incomplete", ->
+    row = @me.addRow()
+    row.$start_time.val('7pm').change()
+    ok !@me.validate(), 'should not validate'
 
-    # todo, use sinon to mock alert when it lands in master
-    _alert = window.alert
-    calledAlert = false
-    window.alert = -> calledAlert = true
-    ok !@me.validate(), 'should not validate with asdf dates'
-    ok calledAlert, 'should `alert` a message'
-    window.alert = _alert #restore native alert
+  test "should still validate if a row is fully blank", ->
+    row = @me.addRow()
+    ok @me.validate(), 'should validate'
+
+  test "should alert when invalid", ->
+    row = @me.addRow()
+    row.$date.val('asdfasdf').change()
+    spy = sinon.spy(window, 'alert')
+    @me.validate()
+    ok spy.called, 'should `alert` a message'
+    spy.restore()
 
   test "should split correctly", ->
     @me.rows[2].remove()

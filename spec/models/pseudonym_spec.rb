@@ -246,10 +246,10 @@ describe Pseudonym do
 
   it "should determine if the password is managed" do
     u = User.create!
-    p = Pseudonym.create!(:unique_id => 'jt@instructure.com', :user => u)
+    p = Pseudonym.create!(unique_id: 'jt@instructure.com', user: u)
     p.sis_user_id = 'jt'
     expect(p).not_to be_managed_password
-    p.account.account_authorization_configs.create!(:auth_type => 'ldap')
+    p.account.account_authorization_configs.create!(auth_type: 'ldap')
     expect(p).to be_managed_password
     p.sis_user_id = nil
     expect(p).not_to be_managed_password
@@ -626,6 +626,57 @@ describe Pseudonym do
         end
       end
     end
+  end
+
+  describe ".for_auth_configuration" do
+    let!(:bob){ user_model }
+    let!(:new_pseud) { Account.default.pseudonyms.create!(user: bob, unique_id: "BobbyRicky") }
+
+    context "with legacy auth types" do
+      let!(:aac){ Account.default.account_authorization_configs.create!(auth_type: 'ldap') }
+
+      it "filters down by unique ID" do
+        pseud = Account.default.pseudonyms.for_auth_configuration("BobbyRicky", aac)
+        expect(pseud).to eq(new_pseud)
+      end
+
+      it "excludes inactive pseudonyms" do
+        new_pseud.destroy
+        pseud = Account.default.pseudonyms.for_auth_configuration("BobbyRicky", aac)
+        expect(pseud).to be_nil
+      end
+    end
+
+    context "with contemporary auth types" do
+
+      let!(:aac){ Account.default.account_authorization_configs.create!(auth_type: 'facebook') }
+
+      before do
+        new_pseud.authentication_provider_id = aac.id
+        new_pseud.save!
+      end
+
+      it "finds the first related pseudonym" do
+        pseud = Account.default.pseudonyms.for_auth_configuration("BobbyRicky", aac)
+        expect(pseud).to eq(new_pseud)
+      end
+
+      it "will not load an AAC related pseudonym if you don't provide an AAC" do
+        pseud = Account.default.pseudonyms.for_auth_configuration("BobbyRicky", nil)
+        expect(pseud).to be_nil
+      end
+    end
+
+  end
+
+  it "allows duplicate unique_ids, in different providers" do
+    u = User.create!
+    aac = Account.default.account_authorization_configs.create!(auth_type: 'facebook')
+    u.pseudonyms.create!(unique_id: 'a', account: Account.default)
+    p2 = u.pseudonyms.new(unique_id: 'a', account: Account.default)
+    expect(p2).to_not be_valid
+    p2.authentication_provider = aac
+    expect(p2).to be_valid
   end
 end
 

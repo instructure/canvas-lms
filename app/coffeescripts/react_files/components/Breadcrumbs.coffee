@@ -10,7 +10,8 @@ define [
 ], (I18n, $, _, React, ReactRouter, BreadcrumbCollapsedContainerComponent, withReactElement, customPropTypes) ->
 
   MAX_CRUMB_WIDTH = 500
-  MIN_CRUMB_WIDTH = 40
+  MIN_CRUMB_WIDTH = if window.ENV.use_new_styles then 80 else 40
+    
   Link = React.createFactory ReactRouter.Link
   BreadcrumbCollapsedContainer = React.createFactory BreadcrumbCollapsedContainerComponent
 
@@ -49,8 +50,10 @@ define [
       $a = $oldCrumbs.find('li').eq(1).find('a')
       contextUrl = $a.attr('href')
       contextName = $a.text()
-      $oldCrumbs.remove()
-
+      if (ENV.use_new_styles)
+        $('.ic-app-nav-toggle-and-crumbs').remove()
+      else
+        $oldCrumbs.remove()
       @setState({homeName, contextUrl, contextName, heightOfOneBreadcrumb})
 
     handleResize: ->

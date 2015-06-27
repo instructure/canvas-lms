@@ -1,4 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignments_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/discussions_common')
 
 describe "discussion assignments" do
   include_examples "in-process server selenium tests"
@@ -47,6 +48,19 @@ describe "discussion assignments" do
       expect_new_page_load{ edit_assignment(assign.id, :name => "Rediscuss!", :points => "10", :more_options => true) }
       expect(f('#discussion-title').attribute(:value)).to eq "Rediscuss!"
       expect(f('#discussion_topic_assignment_points_possible').attribute(:value)).to eq "10"
+    end
+  end
+
+  context "created with html in title" do
+    it "should not render html in flash notice", priority: 2, test_id: 132616 do
+      discussion_title = '<s>broken</s>'
+      topic = create_discussion(discussion_title, 'threaded')
+      get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
+      wait_for_ajaximations
+      f('.announcement_cog').click
+      fln('Delete').click
+      driver.switch_to.alert.accept
+      assert_flash_notice_message("#{discussion_title} deleted successfully")
     end
   end
 end

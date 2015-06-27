@@ -67,7 +67,6 @@ define [
     curve: =>
       idx                  = 0
       scores               = {}
-      data                 = @$dialog.getFormData()
       users_for_score      = []
       scoreCount           = 0
       middleScore          = parseInt($("#middle_score").val(), 10)

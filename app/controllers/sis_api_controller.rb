@@ -1,0 +1,2 @@
+class SisApiController < ApplicationController
+end

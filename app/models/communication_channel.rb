@@ -327,7 +327,10 @@ class CommunicationChannel < ActiveRecord::Base
     end
     
     state :retired do
-      event :re_activate, :transitions_to => :active
+      event :re_activate, :transitions_to => :active do
+        # Reset bounce count when we're being reactivated
+        reset_bounce_count!
+      end
     end
   end
 
@@ -374,6 +377,11 @@ class CommunicationChannel < ActiveRecord::Base
     old_bounce_count = self.previous_changes[:bounce_count].try(:first)
     old_bounce_count ||= self.bounce_count
     old_bounce_count >= RETIRE_THRESHOLD
+  end
+
+  def reset_bounce_count!
+    self.bounce_count = 0
+    self.save!
   end
 
   def was_retired?

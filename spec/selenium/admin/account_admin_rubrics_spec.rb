@@ -1,6 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/rubrics_common')
-require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 describe "account shared rubric specs" do
   include_examples "in-process server selenium tests"

@@ -62,7 +62,7 @@ define [
           title: @props.model.get('usage_rights').license_name
           'data-tooltip': 'top'
           },
-            span {className: 'screenreader-only'},
+            span {ref: 'screenreaderText', className: 'screenreader-only'},
               switch useJustification
                 when 'own_copyright' then I18n.t('Own Copyright')
                 when 'public_domain' then I18n.t('Public Domain')
@@ -71,4 +71,4 @@ define [
                 when 'creative_commons' then I18n.t('Creative Commons')
             span {className: 'screenreader-only'},
               @props.model.get('usage_rights').license_name
-            i {className: iconClass}
+            i {ref: "icon", className: iconClass}

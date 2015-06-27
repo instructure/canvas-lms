@@ -303,6 +303,7 @@ class ApplicationController < ActionController::Base
     if !files_domain? && Setting.get('block_html_frames', 'true') == 'true' && !@embeddable
       headers['X-Frame-Options'] = 'SAMEORIGIN'
     end
+    RequestContextGenerator.store_request_meta(request, @context)
     true
   end
 
@@ -391,13 +392,13 @@ class ApplicationController < ActionController::Base
     respond_to do |format|
       @show_left_side = false
       clear_crumbs
-      params = request.path_parameters
-      params[:format] = nil
+      path_params = request.path_parameters
+      path_params[:format] = nil
       @headers = !!@current_user if @headers != false
       @files_domain = @account_domain && @account_domain.host_type == 'files'
       format.html {
         store_location
-        return redirect_to login_url if !@files_domain && !@current_user
+        return redirect_to login_url(params.slice(:authentication_provider)) if !@files_domain && !@current_user
 
         if @context.is_a?(Course) && @context_enrollment
           start_date = @context_enrollment.enrollment_dates.map(&:first).compact.min if @context_enrollment.state_based_on_date == :inactive
@@ -412,16 +413,11 @@ class ApplicationController < ActionController::Base
 
         render "shared/unauthorized", status: :unauthorized
       }
-      format.zip { redirect_to(url_for(params)) }
+      format.zip { redirect_to(url_for(path_params)) }
       format.json { render_json_unauthorized }
     end
     response.headers["Pragma"] = "no-cache"
     response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
-  end
-
-  def delegated_authentication_url?
-    @domain_root_account.delegated_authentication? &&
-    !@domain_root_account.ldap_authentication?
   end
 
   # To be used as a before_filter, requires controller or controller actions
@@ -1011,6 +1007,7 @@ class ApplicationController < ActionController::Base
         opts = {type: type}
         info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts)
         error_info = info.to_h
+        error_info[:tags][:response_code] = response_code
         capture_outputs = Canvas::Errors.capture(exception, error_info)
         error = ErrorReport.find(capture_outputs[:error_report])
       end
@@ -1165,11 +1162,9 @@ class ApplicationController < ActionController::Base
     masked_authenticity_token
   end
 
-  API_REQUEST_REGEX = %r{\A/api/v\d}
-  LTI_API_REQUEST_REGEX = %r{\A/api/lti/}
-
+  API_REQUEST_REGEX = %r{\A/api/}
   def api_request?
-    @api_request ||= !!request.path.match(API_REQUEST_REGEX) || !!request.path.match(LTI_API_REQUEST_REGEX)
+    @api_request ||= !!request.path.match(API_REQUEST_REGEX)
   end
 
   def session_loaded?
@@ -1887,7 +1882,12 @@ class ApplicationController < ActionController::Base
   end
 
   def google_drive_client(refresh_token=nil, access_token=nil)
-    client_secrets = Canvas::Plugin.find(:google_drive).try(:settings)
+    settings = Canvas::Plugin.find(:google_drive).try(:settings) || {}
+    client_secrets = {
+      client_id: settings[:client_id],
+      client_secret: settings[:client_secret_dec],
+      redirect_uri: settings[:redirect_uri]
+    }.with_indifferent_access
     GoogleDrive::Client.create(client_secrets, refresh_token, access_token)
   end
 

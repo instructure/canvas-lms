@@ -92,7 +92,7 @@ define [
 
       @checkUnsavedOnLeave = true
       view = this
-      window.addEventListener 'beforeunload', @onUnload
+      $(window).on 'beforeunload', @onUnload
 
       unless @firstRender
         @firstRender = true

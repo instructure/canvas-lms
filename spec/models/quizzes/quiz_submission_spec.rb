@@ -85,6 +85,29 @@ describe Quizzes::QuizSubmission do
     end
   end
 
+  describe '#finished_at_fallback' do
+    it "should select the earlier time" do
+      Timecop.freeze(5.minutes.ago) do
+        now = Time.zone.now
+        later = now + 5.minutes
+        earlier = now - 5.minutes
+
+        subject.end_at = earlier
+        expect(subject.finished_at_fallback).to eq(earlier)
+
+        subject.end_at = later
+        expect(subject.finished_at_fallback).to eq(now)
+      end
+    end
+    it "should work with no end_at time" do
+      Timecop.freeze(5.minutes.ago) do
+        now = Time.zone.now
+        subject.end_at = nil
+        expect(subject.finished_at_fallback).to eq(now)
+      end
+    end
+  end
+
   it "should copy the quiz's points_possible whenever it's saved" do
     Quizzes::Quiz.where(:id => @quiz).update_all(:points_possible => 1.1)
     q = @quiz.quiz_submissions.create!
@@ -1253,6 +1276,34 @@ describe Quizzes::QuizSubmission do
       @submission.questions_regraded_since_last_attempt
     end
 
+  end
+
+  describe "quiz_question_ids" do
+    before do
+      @quiz = @course.quizzes.create! title: 'Test Quiz'
+      @submission = @quiz.quiz_submissions.build
+    end
+    it "takes ids from questions_as_object" do
+      @submission.stubs(:questions_as_object).returns [{"id" => 2}, {"id" => 3}]
+
+      expect(@submission.quiz_question_ids).to eq [2, 3]
+    end
+  end
+
+  describe "quiz_questions" do
+    before do
+      @quiz = @course.quizzes.create! title: 'Test Quiz'
+      @submission = @quiz.quiz_submissions.build
+    end
+    it "fetches questions based on quiz_question_ids" do
+      @submission.stubs(:quiz_question_ids).returns [2, 3]
+      Quizzes::QuizQuestion.expects(:where)
+        .with(id: [2, 3])
+        .returns(User.where(id: [2, 3]))
+        .at_least_once
+
+      @submission.quiz_questions
+    end
   end
 
   it "does not put a graded survey submission in teacher's todos" do

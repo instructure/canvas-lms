@@ -36,9 +36,7 @@ define [
     ok $dialog.is(':ui-dialog:visible'), 'pops up dialog'
     equal $dialog.dialog('option', 'buttons').length, 2, 'converts both buttons in .button-pane only'
 
-    msg = "hides the original .buttons in the .button-container only"
-    $dialog.find('.btn').each ->
-      equal $(this).is(':hidden'), ($(this).text() isnt 'Should NOT be converted'), msg
+    equal $dialog.find('.button-container').first().css('left'), '-9999px', "moves the original .buttons in the .button-container should have an offeset of -999px"
 
     msg = "make sure clicking on converted ui-dialog-button causes submit handler to be called on form"
     $submitButton = $dialog.dialog('widget').find('.ui-dialog-buttonpane .ui-button:contains("This will Submit the form")')
@@ -67,47 +65,3 @@ define [
     equal $dialog.dialog('isOpen'), false, msg
 
     $dialog.remove() #clean up
-
-  test "enter key submits form", ->
-    $dialog = $("<form style='display:none'><input id='box' type='text'></input><div class='button-container'><button type='submit'></button></div></form>").appendTo('#fixtures').dialog()
-    $dialog.fixDialogButtons()
-
-    submitCount = 0
-    $dialog.submit (e) ->
-      e.preventDefault()
-      ++submitCount
-
-    $('#box').simulate("keyup", { keyCode: $.ui.keyCode.ENTER })
-    equal submitCount, 1
-
-    $dialog.remove()
-
-  test "enter key does not duplicate submissions if fixDialogButtons invoked more than once", ->
-    $dialog = $("<form style='display:none'><input id='box' type='text'></input><div class='button-container'><button type='submit'></button></div></form>").appendTo('#fixtures').dialog()
-    $dialog.fixDialogButtons()
-    $dialog.fixDialogButtons()
-
-    submitCount = 0
-    $dialog.submit (e) ->
-      e.preventDefault()
-      ++submitCount
-
-    $('#box').simulate("keyup", { keyCode: $.ui.keyCode.ENTER })
-    equal submitCount, 1
-
-    $dialog.remove()
-
-  test "enter key submits form only once without preventDefault", ->
-    $dialog = $("<form style='display:none' action='#' onsubmit='return false;'><input id='box' type='text'></input><div class='button-container'><button type='submit'></button></div></form>").appendTo('#fixtures').dialog()
-    $dialog.fixDialogButtons()
-
-    submitCount = 0
-    $dialog.submit (e) ->
-      ++submitCount
-
-    $('#box').simulate("keydown", { keyCode: $.ui.keyCode.ENTER })
-    $('#box').simulate("keypress", { keyCode: $.ui.keyCode.ENTER })
-    $('#box').simulate("keyup", { keyCode: $.ui.keyCode.ENTER })
-    equal submitCount, 1
-
-    $dialog.remove()

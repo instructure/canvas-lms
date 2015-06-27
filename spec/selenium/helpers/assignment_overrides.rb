@@ -99,13 +99,13 @@ module AssignmentOverridesSeleniumHelper
     wait_for_ajaximations
   end
 
-  def add_due_date_override(assignment)
+  def add_due_date_override(assignment, due_at = Time.zone.now.advance(days:1))
     user = @user
     new_section = @course.course_sections.create!(:name => 'New Section')
     student_in_section(new_section)
     override = assignment.assignment_overrides.build
     override.set = new_section
-    override.due_at = Time.zone.now.advance(days:1)
+    override.due_at = due_at
     override.due_at_overridden = true
     override.save!
     @user = user

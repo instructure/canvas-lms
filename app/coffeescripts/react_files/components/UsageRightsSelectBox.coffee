@@ -148,7 +148,7 @@ define [
               placeholder: I18n.t('(c) 2001 Acme Inc.')
             }
         if @state.showMessage
-          div {className: 'alert'},
+          div {ref:'showMessageAlert', className: 'alert'},
             span {},
               i {className: 'icon-warning'}, null
               span {style: {paddingLeft: "10px"}}, I18n.t("If you do not select usage rights now, this file will be unpublished after it's uploaded.")

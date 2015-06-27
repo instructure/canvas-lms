@@ -108,7 +108,7 @@
 #           "type": "string"
 #         },
 #         "unknown_user_url": {
-#           "description": "Valid for SAML and CAS authorization.",
+#           "description": "_Deprecated_[2015-05-08: This is moving to an account setting] Valid for SAML and CAS authorization.",
 #           "example": "https://canvas.instructure.com/login",
 #           "type": "string"
 #         }
@@ -146,6 +146,11 @@
 #           "description": "If a discovery url is set, canvas will forward all users to that URL when they need to be authenticated. That page will need to then help the user figure out where they need to go to log in. If no discovery url is configured, the first configuration will be used to attempt to authenticate the user.",
 #           "example": "https://example.com/which_account",
 #           "type": "string"
+#        },
+#        "unknown_user_url": {
+#           "description": "If an unknown user url is set, Canvas will forward to that url when a service authenticates a user, but that user does not exist in Canvas. The default behavior is to present an error.",
+#           "example": "https://example.com/register_for_canvas",
+#           "type": "string"
 #        }
 #       }
 #     }
@@ -174,18 +179,24 @@ class AccountAuthorizationConfigsController < ApplicationController
   # @API Create Authorization Config
   #
   # Add external account authentication service(s) for the account.
-  # Services may be CAS, SAML, or LDAP.
+  # Services may be CAS, Facebook, GitHub, Google, LDAP, OpenID Connect,
+  # LinkedIn, SAML, or Twitter.
   #
   # Each authentication service is specified as a set of parameters as
   # described below. A service specification must include an 'auth_type'
-  # parameter with a value of 'cas', 'saml', or 'ldap'. The other recognized
+  # parameter with a value of 'cas', 'facebook', 'github', 'google', 'ldap',
+  # 'linkedin', 'openid_connect', 'saml', or 'twitter'. The other recognized
   # parameters depend on this auth_type; unrecognized parameters are discarded.
   # Service specifications not specifying a valid auth_type are ignored.
   #
-  # _Deprecated_[2015-05-08] Any service specification may include an optional 'login_handle_name'
-  # parameter. This parameter specifies the label used for unique login
-  # identifiers; for example: 'Login', 'Username', 'Student ID', etc. The
-  # default is 'Email'. _Deprecated_ [Use update_sso_settings instead]
+  # _Deprecated_[2015-05-08] Any service specification may include an
+  # optional 'login_handle_name' parameter. This parameter specifies the
+  # label used for unique login identifiers; for example: 'Login',
+  # 'Username', 'Student ID', etc. The default is 'Email'.
+  # _Deprecated_[2015-05-20] Any service specification besides LDAP may include
+  # an optional 'unknown_user_url' parameters. This parameters specifies a url
+  # to redirect to when a user is authorized but is not found in Canvas.
+  # _Deprecated_ [Use update_sso_settings instead]
   #
   # You can set the 'position' for any configuration. The config in the 1st position
   # is considered the default.
@@ -201,55 +212,65 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   An alternate SSO URL for logging into CAS. You probably should not set
   #   this.
   #
-  # - unknown_user_url [Optional]
+  # - unknown_user_url [Optional] _Deprecated_ [2015-05-20: use update_sso_settings instead]
   #
   #   A url to redirect to when a user is authorized through CAS but is not
   #   found in Canvas.
   #
-  # For SAML authentication services, the additional recognized parameters are:
+  # For Facebook, the additional recognized parameters are:
   #
-  # - idp_entity_id
+  # - app_id [Required]
   #
-  #   The SAML IdP's entity ID - This is used to look up the correct SAML IdP if
-  #   multiple are configured
+  #   The Facebook App ID. Not available if configured globally for Canvas.
   #
-  # - log_in_url
+  # - app_secret [Required]
   #
-  #   The SAML service's SSO target URL
+  #   The Facebook App Secret. Not available if configured globally for Canvas.
   #
-  # - log_out_url
+  # - login_attribute [Optional]
   #
-  #   The SAML service's SLO target URL
+  #   The attribute to use to look up the user's login in Canvas. Either
+  #   'id' (the default), or 'email'
   #
-  # - certificate_fingerprint
+  # For GitHub, the additional recognized parameters are:
   #
-  #   The SAML service's certificate fingerprint.
+  # - domain [Optional]
   #
-  # - change_password_url [Optional] _Deprecated_ [2015-05-08: use update_sso_settings instead]
+  #   The domain of a GitHub Enterprise installation. I.e.
+  #   github.mycompany.com. If not set, it will default to the public
+  #   github.com.
   #
-  #   Forgot Password URL. Leave blank for default Canvas behavior.
+  # - client_id [Required]
   #
-  # - unknown_user_url [Optional]
+  #   The GitHub application's Client ID. Not available if configured globally
+  #   for Canvas.
   #
-  #   A url to redirect to when a user is authorized through SAML but is not
-  #   found in Canvas.
+  # - client_secret [Required]
   #
-  # - identifier_format
+  #   The GitHub application's Client Secret. Not available if configured
+  #   globally for Canvas.
   #
-  #   The SAML service's identifier format. Must be one of:
+  # - login_attribute [Optional]
   #
-  #   - urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
-  #   - urn:oasis:names:tc:SAML:2.0:nameid-format:entity
-  #   - urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos
-  #   - urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
-  #   - urn:oasis:names:tc:SAML:2.0:nameid-format:transient
-  #   - urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified
-  #   - urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName
-  #   - urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName
+  #   The attribute to use to look up the user's login in Canvas. Either
+  #   'id' (the default), or 'login'
   #
-  # - requested_authn_context
+  # For Google, the additional recognized parameters are:
   #
-  #   The SAML AuthnContext
+  # - client_id [Required]
+  #
+  #   The Google application's Client ID. Not available if configured globally
+  #   for Canvas.
+  #
+  # - client_secret [Required]
+  #
+  #   The Google application's Client Secret. Not available if configured
+  #   globally for Canvas.
+  #
+  # - login_attribute [Optional]
+  #
+  #   The attribute to use to look up the user's login in Canvas. Either
+  #   'sub' (the default), or 'email'
   #
   # For LDAP authentication services, the additional recognized parameters are:
   #
@@ -293,6 +314,117 @@ class AccountAuthorizationConfigsController < ApplicationController
   # - change_password_url [Optional] _Deprecated_ [2015-05-08: use update_sso_settings instead]
   #
   #   Forgot Password URL. Leave blank for default Canvas behavior.
+  #
+  # For LinkedIn, the additional recognized parameters are:
+  #
+  # - client_id [Required]
+  #
+  #   The LinkedIn application's Client ID. Not available if configured globally
+  #   for Canvas.
+  #
+  # - client_secret [Required]
+  #
+  #   The LinkedIn application's Client Secret. Not available if configured
+  #   globally for Canvas.
+  #
+  # - login_attribute [Optional]
+  #
+  #   The attribute to use to look up the user's login in Canvas. Either
+  #   'id' (the default), or 'emailAddress'
+  #
+  # For OpenID Connect, the additional recognized parameters are:
+  #
+  # - client_id [Required]
+  #
+  #   The application's Client ID.
+  #
+  # - client_secret [Required]
+  #
+  #   The application's Client Secret.
+  #
+  # - authorize_url [Required]
+  #
+  #   The URL for getting starting the OAuth 2.0 web flow
+  #
+  # - token_url [Required]
+  #
+  #   The URL for exchanging the OAuth 2.0 authorization code for an access
+  #   token and id token
+  #
+  # - scope [Optional]
+  #
+  #   Space separated additional scopes to request for the token.
+  #
+  # - login_attribute [Optional]
+  #
+  #   The attribute of the ID token to look up the user's login in Canvas.
+  #   Defaults to 'sub'.
+  #
+  # For SAML authentication services, the additional recognized parameters are:
+  #
+  # - idp_entity_id
+  #
+  #   The SAML IdP's entity ID - This is used to look up the correct SAML IdP if
+  #   multiple are configured
+  #
+  # - log_in_url
+  #
+  #   The SAML service's SSO target URL
+  #
+  # - log_out_url
+  #
+  #   The SAML service's SLO target URL
+  #
+  # - certificate_fingerprint
+  #
+  #   The SAML service's certificate fingerprint.
+  #
+  # - change_password_url [Optional] _Deprecated_ [2015-05-08: use update_sso_settings instead]
+  #
+  #   Forgot Password URL. Leave blank for default Canvas behavior.
+  #
+  # - unknown_user_url [Optional] _Deprecated_ [2015-05-20: use update_sso_settings instead]
+  #
+  #   A url to redirect to when a user is authorized through SAML but is not
+  #   found in Canvas.
+  #
+  # - identifier_format
+  #
+  #   The SAML service's identifier format. Must be one of:
+  #
+  #   - urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+  #   - urn:oasis:names:tc:SAML:2.0:nameid-format:entity
+  #   - urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos
+  #   - urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+  #   - urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+  #   - urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified
+  #   - urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName
+  #   - urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName
+  #
+  # - requested_authn_context
+  #
+  #   The SAML AuthnContext
+  #
+  # For Twitter, the additional recognized parameters are:
+  #
+  # - consumer_key [Required]
+  #
+  #   The Twitter Consumer Key. Not available if configured globally for Canvas.
+  #
+  # - consumer_secret [Required]
+  #
+  #   The Twitter Consumer Secret. Not available if configured globally for Canvas.
+  #
+  # - login_attribute [Optional]
+  #
+  #   The attribute to use to look up the user's login in Canvas. Either
+  #   'user_id' (the default), or 'screen_name'
+  #
+  # - parent_registration [Optional]
+  #
+  #   Accepts a boolean value, true designates the authentication service
+  #   for use on parent registrations.  Only one service can be selected
+  #   at a time so if set to true all others will be set to false
   #
   # - account_authorization_config[n] (deprecated)
   #   The nth service specification as described above. For instance, the
@@ -397,9 +529,11 @@ class AccountAuthorizationConfigsController < ApplicationController
         update_all
       end
     else
-      aac_data = params.has_key?(:account_authorization_config) ? params[:account_authorization_config] : params
+      aac_data = strong_params.fetch(:account_authorization_config, strong_params)
+      position = aac_data.delete(:position)
       data = filter_data(aac_data)
-      position = data.delete :position
+      deselect_parent_registration(data)
+
       account_config = @account.account_authorization_configs.build(data)
       update_deprecated_account_settings_data(aac_data, account_config)
 
@@ -429,9 +563,10 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   # @returns AccountAuthorizationConfig
   def update
-    aac_data = params.has_key?(:account_authorization_config) ? params[:account_authorization_config] : params
+    aac_data = strong_params.fetch(:account_authorization_config, strong_params)
     aac = @account.account_authorization_configs.find params[:id]
     update_deprecated_account_settings_data(aac_data, aac)
+    position = aac_data.delete(:position)
     data = filter_data(aac_data)
 
     if aac.auth_type != data[:auth_type]
@@ -444,7 +579,7 @@ class AccountAuthorizationConfigsController < ApplicationController
       return
     end
 
-    position = data.delete :position
+    deselect_parent_registration(data, aac)
     aac.update_attributes(data)
 
     if position.present?
@@ -492,11 +627,11 @@ class AccountAuthorizationConfigsController < ApplicationController
   def update_all
     account_configs_to_delete = @account.account_authorization_configs.to_a.dup
     account_configs = []
-    (params[:account_authorization_config] || {}).sort_by {|k,v| k }.each do |idx, data|
+    (params[:account_authorization_config] || {}).sort_by {|k,_| k }.each do |_idx, data|
       id = data.delete :id
       disabled = data.delete :disabled
       next if disabled == '1'
-      data = filter_data(data)
+      data = filter_data(ActionController::Parameters.new(data))
       next if data.empty?
 
       if id.to_i == 0
@@ -588,6 +723,17 @@ class AccountAuthorizationConfigsController < ApplicationController
   end
 
 
+  def sso_settings_json(account)
+    {
+      sso_settings: {
+        login_handle_name: account.login_handle_name,
+        change_password_url: account.change_password_url,
+        auth_discovery_url: account.auth_discovery_url,
+        unknown_user_url: account.unknown_user_url,
+      }
+    }
+  end
+
   # @API show account auth settings
   #
   # The way to get the current state of each account level setting
@@ -604,13 +750,7 @@ class AccountAuthorizationConfigsController < ApplicationController
     respond_to do |format|
       format.html { redirect_to(account_account_authorization_configs_path(@account)) }
       format.json do
-        render json: {
-          sso_settings: {
-            login_handle_name: @account.login_handle_name,
-            change_password_url: @account.change_password_url,
-            auth_discovery_url: @account.auth_discovery_url
-          }
-        }
+        render json: sso_settings_json(@account)
       end
     end
   end
@@ -621,10 +761,10 @@ class AccountAuthorizationConfigsController < ApplicationController
   # configuration at the account level to handle the particulars of your
   # setup.
   #
-  # This endpoint accepts a PUT request to set 3 possible account settings.
-  # All 3 are optional on each request, any that are not provided at all
-  # are simply retained as is.  Any that provide the key but a null-ish value
-  # (blank string, null, undefined) will be UN-set.
+  # This endpoint accepts a PUT request to set several possible account
+  # settings. All setting are optional on each request, any that are not
+  # provided at all are simply retained as is.  Any that provide the key but
+  # a null-ish value (blank string, null, undefined) will be UN-set.
   #
   # You can list the current state of each setting with "show_sso_settings"
   #
@@ -639,19 +779,14 @@ class AccountAuthorizationConfigsController < ApplicationController
   def update_sso_settings
     sets = strong_params.require(:sso_settings).permit(:login_handle_name,
                                                        :change_password_url,
-                                                       :auth_discovery_url)
+                                                       :auth_discovery_url,
+                                                       :unknown_user_url)
     update_account_settings_from_hash(sets)
 
     respond_to do |format|
       format.html { redirect_to(account_account_authorization_configs_path(@account)) }
       format.json do
-        render json: {
-          sso_settings: {
-            login_handle_name: @account.login_handle_name,
-            change_password_url: @account.change_password_url,
-            auth_discovery_url: @account.auth_discovery_url
-          }
-        }
+        render json: sso_settings_json(@account)
       end
     end
   end
@@ -695,12 +830,6 @@ class AccountAuthorizationConfigsController < ApplicationController
 
   def test_ldap_login
     results = []
-    unless @account.ldap_authentication?
-      return render(
-        :json => {:errors => {:account => t(:account_required, 'must be LDAP-authenticated')}},
-        :status_code => 400
-      )
-    end
     unless params[:username]
       return render(
         :json => {:errors => {:login => t(:login_required, 'must be supplied')}},
@@ -713,13 +842,22 @@ class AccountAuthorizationConfigsController < ApplicationController
         :status_code => 400
       )
     end
-    @account.account_authorization_configs.each do |config|
+
+    @account.account_authorization_configs.where(auth_type: 'ldap').each do |config|
       h = {
         :account_authorization_config_id => config.id,
         :ldap_login_test => config.test_ldap_login(params[:username], params[:password])
       }
       results << h.merge({:errors => config.errors.map {|attr,msg| {attr => msg}}})
     end
+
+    if results.empty?
+      return render(
+          :json => {:errors => {:account => t(:account_required, 'must be LDAP-authenticated')}},
+          :status_code => 400
+      )
+    end
+
     render(
       :json => results,
       :status_code => 200
@@ -734,55 +872,48 @@ class AccountAuthorizationConfigsController < ApplicationController
   end
 
   def saml_testing
-    if @account.saml_authentication?
-      @account_config = @account.account_authorization_config
-      @account_config.start_debugging if params[:start_debugging]
+    @account_config = @account.account_authorization_configs.where(auth_type: 'saml').first
 
-      respond_to do |format|
-        format.html do
-          render partial: 'saml_testing',
-                 locals: { config: @account_config },
-                 layout: false
-        end
-        format.json do
-          render json: {
-            debugging: @account_config.debugging?,
-            debug_data: render_to_string(partial: 'saml_testing',
-                                         locals: { config: @account_config },
-                                         formats: [:html],
-                                         layout: false)
-          }
-        end
+    unless @account_config
+      render json: {
+                 errors: {
+                     account: t(:saml_required,
+                                "A SAML configuration is required to test SAML")
+                 }
+             }
+      return
+    end
+    @account_config.start_debugging if params[:start_debugging]
+
+    respond_to do |format|
+      format.html do
+        render partial: 'saml_testing',
+               locals: { config: @account_config },
+               layout: false
       end
-    else
-      respond_to do |format|
-        format.html do
-          render partial: 'saml_testing',
-                 locals: { config: @account_config },
-                 layout: false
-        end
-        format.json do
-          render json: {
-            errors: {
-              account: t(:saml_required,
-                         "A SAML configuration is required to test SAML")
-            }
-          }
-        end
+      format.json do
+        render json: {
+          debugging: @account_config.debugging?,
+          debug_data: render_to_string(partial: 'saml_testing',
+                                       locals: { config: @account_config },
+                                       formats: [:html],
+                                       layout: false)
+        }
       end
     end
   end
 
   def saml_testing_stop
-    account_config = @account.account_authorization_config
+    account_config = @account.account_authorization_configs.where(auth_type: "saml").first
     account_config.finish_debugging if account_config.present?
     render json: { status: "ok" }
   end
 
   protected
   def filter_data(data)
-    data ||= {}
-    data = data.slice(*AccountAuthorizationConfig.find_sti_class(data[:auth_type]).recognized_params)
+    auth_type = data.delete(:auth_type)
+    data = data.permit(*AccountAuthorizationConfig.find_sti_class(auth_type).recognized_params)
+    data[:auth_type] = auth_type
     if data[:auth_type] == 'ldap'
       data[:auth_over_tls] = 'start_tls' unless data.has_key?(:auth_over_tls)
       data[:auth_over_tls] = AccountAuthorizationConfig::LDAP.auth_over_tls_setting(data[:auth_over_tls])
@@ -808,5 +939,13 @@ class AccountAuthorizationConfigsController < ApplicationController
       @account.public_send("#{setting}=".to_sym, setting_val)
     end
     @account.save!
+  end
+
+  def deselect_parent_registration(data, aac = nil)
+    if data[:parent_registration] == 'true' || data[:parent_registration] == '1'
+      auth_providers = @account.account_authorization_configs
+      auth_providers = auth_providers.where('id <> ?', aac) if aac
+      auth_providers.update_all(parent_registration: false)
+    end
   end
 end

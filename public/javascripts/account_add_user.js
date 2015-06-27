@@ -61,6 +61,18 @@ require([
         errorData['unique_id'] = errorList.join(', ');
       }
 
+      // SIS ID taken error
+      if (data.pseudonym.sis_user_id) {
+        errorList = [];
+
+        var errors = _.uniq(_.map(data.pseudonym.sis_user_id, function(i){ return i.message; }));
+        _.each(errors, function(i){
+          errorList.push(i);
+        });
+
+        errorData['sis_user_id'] = errorList.join(', ');
+      }
+
       $(this).formErrors(errorData);
 
       $(this).find("button").attr('disabled', false)

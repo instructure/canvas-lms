@@ -460,7 +460,7 @@ module Api::V1::Assignment
       end
     end
 
-    if assignment.context.feature_enabled?(:post_grades)
+    if Assignment.show_sis_grade_export_option?(assignment.context)
       if assignment_params.has_key? "post_to_sis"
         assignment.post_to_sis = value_to_boolean(assignment_params['post_to_sis'])
       end

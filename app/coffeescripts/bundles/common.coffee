@@ -58,6 +58,13 @@ require [
   if $logo.length > 0 and $logo.css('background-image').match(/\/canvas\/header_canvas_logo\.png/)
     $logo.addClass('original')
 
+  # new styles only - show and hide the courses vertical menu when the user clicks the hamburger button
+  # This was in the courses bundle, but it sometimes needs to work in places that don't
+  # load that bundle.
+  $("body").on('click', '#courseMenuToggle', ->
+    $("body").toggleClass("course-menu-expanded")
+  )
+
   ##
   # Backbone routes
   $('body').on 'click', '[data-pushstate]', (event) ->

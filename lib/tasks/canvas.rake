@@ -242,11 +242,6 @@ namespace :db do
     task :predeploy => [:environment, :load_config] do
       ActiveRecord::Migrator.new(:up, "db/migrate/", nil).migrate(:predeploy)
     end
-
-    desc "Run all pending postdeploy migrations"
-    task :postdeploy => [:environment, :load_config] do
-      ActiveRecord::Migrator.new(:up, "db/migrate/", nil).migrate(:postdeploy)
-    end
   end
 
   namespace :test do
@@ -283,6 +278,6 @@ Switchman::Rake.filter_database_servers do |servers, block|
   block.call(servers)
 end
 
-%w{db:pending_migrations db:migrate:predeploy db:migrate:postdeploy}.each { |task_name| Switchman::Rake.shardify_task(task_name) }
+%w{db:pending_migrations db:migrate:predeploy}.each { |task_name| Switchman::Rake.shardify_task(task_name) }
 
 end

@@ -51,11 +51,11 @@ class LoginController < ApplicationController
     end
 
     # deprecated redirect; link directly to /login/canvas
-    if params['canvas_login']
-      return redirect_to canvas_login_url
-    end
+    params[:authentication_provider] = 'canvas' if params['canvas_login']
+    # deprecated redirect; they should already know the correct type
+    params[:authentication_provider] ||= params[:id]
 
-    if @domain_root_account.auth_discovery_url && !params[:id]
+    if @domain_root_account.auth_discovery_url && !params[:authentication_provider]
       auth_discovery_url = @domain_root_account.auth_discovery_url
       if flash[:delegated_message]
         auth_discovery_url << URI.parse(auth_discovery_url).query ? '&' : '?'
@@ -64,9 +64,13 @@ class LoginController < ApplicationController
       return redirect_to auth_discovery_url
     end
 
-    if params[:id]
-      # deprecated redirect; they should already know the correct type
-      auth_type = @domain_root_account.account_authorization_configs.find(params[:id]).auth_type
+    if params[:authentication_provider]
+      if params[:authentication_provider] == 'canvas'
+        # canvas isn't an actual type, so we have to _not_ look for it
+        auth_type = 'canvas'
+      else
+        auth_type = @domain_root_account.account_authorization_configs.find(params[:authentication_provider]).auth_type
+      end
     else
       auth_type = @domain_root_account.account_authorization_configs.first.try(:auth_type)
       auth_type ||= 'canvas'
@@ -94,7 +98,9 @@ class LoginController < ApplicationController
     if session[:login_aac]
       # The AAC could have been deleted since the user logged in
       aac = AccountAuthorizationConfig.where(id: session[:login_aac]).first
-      redirect = aac.user_logout_redirect(self, @current_user) if aac
+      if aac && aac.respond_to?(:user_logout_redirect)
+        redirect = aac.user_logout_redirect(self, @current_user)
+      end
     end
 
     redirect ||= login_url

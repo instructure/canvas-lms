@@ -28,6 +28,9 @@ CanvasRails::Application.routes.draw do
     post :remove_messages
   end
 
+  post "/external_auth_observers/redirect_login" => 'login/external_auth_observers#redirect_login',
+       as: :external_auth_validation
+
   # So, this will look like:
   # http://instructure.com/register/5R32s9iqwLK75Jbbj0
   match 'register/:nonce' => 'communication_channels#confirm', as: :registration_confirmation, via: [:get, :post]
@@ -623,9 +626,26 @@ CanvasRails::Application.routes.draw do
   # deprecated alias
   get 'saml_logout' => 'login/saml#destroy'
   get 'login/saml/:id' => 'login/saml#new', as: :saml_login
+  get 'saml_observee' => 'login/saml#observee_validation', as: :saml_observee
   post 'login/saml' => 'login/saml#create'
   # deprecated alias
   post 'saml_consume' => 'login/saml#create'
+
+  # the callback URL for all OAuth1.0a based SSO
+  get 'login/oauth/callback' => 'login/oauth#create', as: :oauth_login_callback
+  # the callback URL for all OAuth2 based SSO
+  get 'login/oauth2/callback' => 'login/oauth2#create', as: :oauth2_login_callback
+  # ActionController::TestCase can't deal with aliased controllers when finding
+  # routes, so we let this route exist only for tests
+  get 'login/oauth2' => 'login/oauth2#new' if Rails.env.test?
+
+  get 'login/facebook' => 'login/facebook#new', as: :facebook_login
+  get 'login/github' => 'login/github#new', as: :github_login
+  get 'login/google' => 'login/google#new', as: :google_login
+  get 'login/linkedin' => 'login/linkedin#new', as: :linkedin_login
+  get 'login/openid_connect' => 'login/openid_connect#new'
+  get 'login/openid_connect/:id' => 'login/openid_connect#new', as: :openid_connect_login
+  get 'login/twitter' => 'login/twitter#new', as: :twitter_login
 
   get 'login/otp' => 'login/otp#new', as: :otp_login
   post 'login/otp/sms' => 'login/otp#send_via_sms', as: :send_otp_via_sms
@@ -708,7 +728,7 @@ CanvasRails::Application.routes.draw do
 
   get '' => 'users#user_dashboard', as: 'dashboard'
   get 'dashboard-sidebar' => 'users#dashboard_sidebar', as: :dashboard_sidebar
-  post 'toggle_dashboard' => 'users#toggle_dashboard'
+  post 'users/toggle_recent_activity_dashboard' => 'users#toggle_recent_activity_dashboard'
   get 'styleguide' => 'info#styleguide'
   get 'old_styleguide' => 'info#old_styleguide'
   root to: 'users#user_dashboard', as: 'root', via: :get
@@ -1368,6 +1388,8 @@ CanvasRails::Application.routes.draw do
     scope(controller: :context_module_items_api) do
       get "courses/:course_id/modules/:module_id/items", action: :index, as: 'course_context_module_items'
       get "courses/:course_id/modules/:module_id/items/:id", action: :show, as: 'course_context_module_item'
+      put "courses/:course_id/modules/:module_id/items/:id/done", action: :mark_as_done, as: 'course_context_module_item_done'
+      delete "courses/:course_id/modules/:module_id/items/:id/done", action: :mark_as_not_done, as: 'course_context_module_item_not_done'
       get "courses/:course_id/module_item_redirect/:id", action: :redirect, as: 'course_context_module_item_redirect'
       get "courses/:course_id/module_item_sequence", action: :item_sequence
       post "courses/:course_id/modules/:module_id/items", action: :create, as: 'course_context_module_items_create'
@@ -1639,6 +1661,8 @@ CanvasRails::Application.routes.draw do
         get prefix, action: :index, as: "#{context}_grading_periods"
         get "#{prefix}/:id", action: :show, as: "#{context}_grading_period"
         post prefix, action: :create, as: "#{context}_grading_period_create"
+        # FIXME: should be PATCH in upcoming Rails 4
+        put "#{prefix}/batch_update", action: :batch_update, as: "#{context}_grading_period_batch_update"
         put "#{prefix}/:id", action: :update, as: "#{context}_grading_period_update"
         delete "#{prefix}/:id", action: :destroy, as: "#{context}_grading_period_destroy"
       end
@@ -1699,6 +1723,5 @@ CanvasRails::Application.routes.draw do
 
     #Tool Proxy Services
     get  "tool_proxy/:tool_proxy_guid", controller: 'lti/ims/tool_proxy', action: :show, as: "show_lti_tool_proxy"
-
   end
 end

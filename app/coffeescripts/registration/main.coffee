@@ -7,7 +7,7 @@ define [
   $loginForm = null
 
   $('.signup_link').click preventDefault ->
-    signupDialog($(this).data('template'), $(this).prop('title'))
+    signupDialog($(this).data('template'), $(this).prop('title'), $(this).data('path'))
 
   $('#registration_video a').click preventDefault ->
     $('<div style="padding:0;"><iframe style="float:left;" src="//player.vimeo.com/video/35336470?portrait=0&amp;color=7fc8ff&amp;autoplay=1" width="800" height="450" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe></div>')

@@ -113,11 +113,29 @@ define [
         # Sometimes it worked, others it didn't, this makes it work always
         header {},
           h1 {className: 'screenreader-only'},
-              I18n.t('files_heading', "Files")
-        Breadcrumbs({
-          rootTillCurrentFolder: @state.rootTillCurrentFolder
-          showingSearchResults: @state.showingSearchResults
-        })
+            I18n.t('files_heading', "Files")
+        if ENV.use_new_styles
+          div {className: 'ic-app-nav-toggle-and-crumbs ic-app-nav-toggle-and-crumbs--files'},
+            button {
+              className:'Button Button--link Button--small ic-app-course-nav-toggle',
+              type:'button',
+              id:'courseMenuToggle',
+              title:I18n.t("Show and hide courses menu"),
+              'aria-hidden':'true'
+            },
+              i {
+                className:'icon-hamburger'
+              }
+            div {className:'ic-app-crumbs'},
+              Breadcrumbs({
+                rootTillCurrentFolder: @state.rootTillCurrentFolder
+                showingSearchResults: @state.showingSearchResults
+              })
+        else
+          Breadcrumbs({
+            rootTillCurrentFolder: @state.rootTillCurrentFolder
+            showingSearchResults: @state.showingSearchResults
+          })
         Toolbar({
           currentFolder: @state.currentFolder
           query: @getQuery()

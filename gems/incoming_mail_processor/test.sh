@@ -2,11 +2,9 @@
 result=0
 
 echo "################ incoming_mail_processor ################"
-echo "################ Running tests against Rails 3 ################"
 bundle check || bundle install
 bundle exec rspec spec
 let result=$result+$?
-mv Gemfile.lock.rails2 Gemfile.lock
 
 if [ $result -eq 0 ]; then
   echo "SUCCESS"

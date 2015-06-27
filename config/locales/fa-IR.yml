@@ -99,22 +99,9 @@ fa-IR:
     saml_eppn_domain_stripped: "%{eppn} (دامنه حذف شد)"
   account_authorization_configs: 
     account_required: "باید با LDAP اعتبارسنجی شود"
-    cas_fields: 
-      labels: 
-        auth_base: "نشانی اینترنتی سرور مرکزی اعتبارسنجی"
-        unknown_user_url: "نشانی اینترنتی کاربر ناشناس"
-      unknown_user_url_description: "نشانی اینترنتی برای تغییر مسیر به آن در هنگامی که کاربر اعتبارسنجی شده در کانواس موجود نیست."
-    form_footer: 
-      labels: 
-        position: موقعیت
-      save_button: "ذخیره سازی تنظیمات اعتبارسنجی"
-    form_header: 
-      auth_type_label: نوع
-      auth_url: "نشانی اینترنتی ورود برای این پیکربندی"
     index: 
       add_auth_desc: "افزودن یک ارائه دهنده هویت به این حساب:"
       choose_auth_type_option: "یک سرویس اعتبارسنجی را انتخاب کنید"
-      current_settings_title: "یکپارچه‌سازی فعلی"
       delete_auth_confirmation: "آیا مطمئنید؟ ممکن است در صورت حذف، کاربران نتوانند وارد شوند"
       ip_address_list_description: "اگر از یک سرویس اعتبارسنجی استفاده می‌کنید که نیازمند اتصال مستقیم سرورهای کانواس به سرورهای شماست، مانند LDAP، باید مطمئن شوید که سرورهای شما می‌توانند مستقیما از این نشانی های آی‌پی ارتباط قبول کنند:"
       no_auth_type_description: "این حساب در حال حاضر با ارائه دهنده هویت یکپارچه نمی شود."
@@ -124,21 +111,7 @@ fa-IR:
       settings_title: "تنظیمات اعتبارسنجی"
     ldap_fields: 
       auth_filter_description: "از *%{placeholder}* به عنوان جای نام کاربری ارائه شده توسط کاربر استفاده کنید. برای مثال: *(sAMAccountName=%{placeholder})*"
-      auth_password_description: "برای اینکه همچنان از رمز عبور فعلی استفاده کنید، آن جا را خالی بگذارید."
       identifer_format_description: "ویزگی LDAP جهت استفاده برای جستجوی ورود کانواس. برای استفاده از نام کاربری فراهم شده توسط کاربر، خالی بگذارید."
-      labels: 
-        auth_base: مبنا
-        auth_filter: فیلتر
-        auth_host: میزبان
-        auth_over_tls: "از طریق TLS؟"
-        auth_over_tls_false: "TLS موجود نیست"
-        auth_over_tls_simple_tls: "TLS ساده"
-        auth_over_tls_start_tls: "شروع TLS"
-        auth_password: "رمز عبور"
-        auth_port: درگاه
-        auth_username: "نام کاربری"
-        identifier_format: "ویژگی شناسه ورود"
-      last_ldap_timeout_failure: "آخرین خطای به پایان رسیدن زمان"
     ldap_settings_test: 
       labels: 
         pass: "رمز عبور"
@@ -169,17 +142,6 @@ fa-IR:
     login_required: "باید ارائه شود"
     no_changing_auth_types: "نمی توان نوع پیکربندی تأیید اعتبار را تغییر داد، لطفا حذف کنید و پیکربندی جدید را ایجاد نمایید."
     password_required: "باید ارائه شود"
-    saml_fields: 
-      labels: 
-        certificate_fingerprint: "اثر انگشت گواهی"
-        identifier_format: "قالب شناسه"
-        idp_entity_id: "شناسه موجودیت IdP"
-        log_in_url: "نشانی اینترنتی ورود"
-        log_out_url: "نشانی اینترنتی خروج"
-        login_attribute: "ویژگی ورود"
-        requested_authn_context: "زمینه اعتبارسنجی"
-        unknown_user_url: "نشانی اینترنتی کاربر ناشناس"
-      unknown_user_url_description: "نشانی اینترنتی برای تغییر مسیر به آن در هنگامی که کاربر اعتبارسنجی شده در کانواس موجود نیست."
     saml_required: "یک پیکربندی SAML برای آزمون SAML لازم است"
     saml_settings_test: 
       refresh_debugging: "تازه سازی"
@@ -217,9 +179,6 @@ fa-IR:
       logout_response_from_idp: "درخواست خروج از IdP"
     sso_settings_form: 
       change_password_url_help: "برای رفتار پیش‌فرض کانواس خالی بگذارید"
-      labels: 
-        change_password_url: "لینک فراموشی رمز"
-        login_handle_name: "برچسب ورود"
       login_handle_name_description: "برچسب استفاده شده برای شناسه های یکتای ورود. به‌عنوان مثال: ورود، نام کاربری، شناسه دانشجو و غیره."
   account_notification: 
     errors: 
@@ -2380,7 +2339,6 @@ fa-IR:
         warning: هشدار
     edit_appointment_group: 
       affect_reservations: "چگونه بر رزروها اثر می گذارد؟"
-      appointments_per_participant_label: "حداکثر تعداد قرار ملاقات هایی که یک شرکت کننده می تواند حضور یابد"
       appt_group_options_help1: "برخی از رزروهای موجود بیش از حدی هستند که افزوده اید. آنها تحت تأثیر قرار نخواهند گرفت، این تاثیر فقط از ایجاد رزروهای جدید جلوگیری می کند."
       appt_group_options_help2: "با این وجود، می توانید به طور دستی رزروهای موجود را حذف کنید."
       calendar: تقویم
@@ -2390,8 +2348,6 @@ fa-IR:
       group_signup: "دانشجویان در گروه ها ثبت نام کنند."
       location: مکان
       name: نام
-      participants_per_appointment_label: "حداکثر تعداد کاربر/گروه در هر قرار ملاقات"
-      slot_duration_label: "دقیقه در هر بازه زمانی"
       time_range: "بازه زمانی"
     edit_appt_calendar_event: 
       description: "شرح:"
@@ -6069,7 +6025,6 @@ fa-IR:
     student_mute_notification: "استاد روی نمره ها کار می کند"
     titles: 
       click_to_record: "گفتار به متن"
-      dropped_assignment_no_total: "این تکلیف در محاسبه کل در نظر گرفته نخواهد شد"
       hypothetical_score: "این نمره، یک نمره احتمالی است"
     turnitin: 
       error_message: "در هنگام ارسال به turnitin اشکالی رخ داد. لطفا قبل از تماس با پشتیبانی، فایل را دوباره ارسال کنید"
@@ -7062,8 +7017,6 @@ fa-IR:
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "نمره های این تکلیف در هنگام ارسال به سامانه اطلاعات دانشجو در دانشکده شما درج شود"
   incorrect_username_and_or_password_2de73abb: "نام کاربری و/یا رمز عبور اشتباه است"
   info: 
-    notices: 
-      error_reported: "از کمک شما سپاسگزاریم! مشکل را برطرف خواهیم کرد"
     old_styleguide: 
       create_collection: "ایجاد مجموعه"
       start_a_group: "راه اندازی گروه"
@@ -7249,7 +7202,6 @@ fa-IR:
       log_in_to_canvas: "ورود به کانواس"
     styleguide: 
       default_page_title: "سیستم مدیریت آموزش کانواس"
-  ldap_e1e0a916: LDAP
   learning_mastery_gradebook_description: |-
       دفتر نمره تسلط یادگیری روشی را به اساتید ارائه می دهد که بتوانند پیشرفت دانشجو و درس را در نتایج یادگیری 
       درس به سرعت مشاهده کنند. نتایج در قالبی 
@@ -7363,7 +7315,6 @@ fa-IR:
     errors: 
       4xx_feedback: "برای اینکه به ما بگویید چه چیزی را جستجو می کردید، اینجا کلیک کنید."
       feedback: "برای اینکه به ما بگویید چه اتفاقی رخ داد، اینجا کلیک کنید"
-    help: راهنما
     show_me_where: "جای آن را به من نمایش بده"
   links_14b70841: پیوندها
   loading_25990131: "در حال بارگذاری..."
@@ -9822,7 +9773,6 @@ fa-IR:
     missing_outcome: "این نتیجه یادگیری یافت نشد"
     new_outcome_group: "گروه جدید نتیجه"
     outcome: 
-      example: "مثال:"
       links: 
         delete_outcome: "حذف نتیجه"
         edit_outcome: "ویرایش نتیجه"
@@ -9839,7 +9789,6 @@ fa-IR:
       criterion_info_link: "برای آشنایی با رتبه بندی های معیار کلیک کنید"
       description: "این نتیجه را شرح دهید"
       display_name: "نام دوستانه (انتخابی)"
-      example: "مثال:"
       mastery: "تسلط در"
       points: "%{points_possible} امتیاز"
       title: "این نتیجه را نام گذاری کنید"
@@ -10159,21 +10108,8 @@ fa-IR:
       ui_conf_ids: "برای مشتریانی که توسط Kaltura میزبانی می شوند، می توانید از Kaltura بخواهید این شناسه ها را در اختیار شما قرار دهد. نمونه های میزبانی شده توسط خود می توانند این مقادیر را در جدول ui_confs بیابند."
     linked_in: 
       description: "یکپارچه‌سازی لینکدین"
-      name: لینکدین
     linked_in_settings: 
-      description: |-
-          نیاز به ثبت یک [برنامه جدید در لینکدین](%{linkedin_url}) خواهید داشت.
-          گزینه های پیکر بندی زیر را تنظیم کنید تا مطمئن شوید یکپارچه‌سازی لینکدین شما
-          درست کار می کند.
-          
-          * **نوع برنامه:** روی «برنامه وب» تنظیم کنید
-          * **وضعیت فعال:** روی «فعال» تنظیم کنید
-          * **نشانی اینترنتی هدایت OAuth:** روی %{oauth_url} تنظیم کنید
-          * بعد از اینکه برنامه خود را ذخیره ساختید، از کلید API و کلید رمز یادداشت بردارید
       domain_name: دامنه
-      labels: 
-        api_key: "کلید API"
-        secret_key: "کلید رمز"
     lockdown_browser: 
       labels: 
         download_url: "نشانی اینترنتی بارگیری مرورگر LockDown"
@@ -10230,21 +10166,6 @@ fa-IR:
         queue_for_parallel_jobs: "صف کار جهت استفاده برای کارهای موازی (جای خالی به عنوان پیش فرض)"
     twitter: 
       description: "اطلاعیه های توییتر"
-      name: توییتر
-    twitter_settings: 
-      description: |-
-          باید یک [برنامه جدید در توییتر](%{twitter_url}) ایجاد کنید.
-          گزینه های پیکربندی زیر را تنظیم کنید تا مطمئن شوید که برنامه توییتر شما
-          درست کار می کند:
-          
-          * **نوع برنامه:** روی «مرورگر» تنظیم کنید
-          * **نشانی اینترنتی پس فراخوان:** روی %{callback_url} تنظیم کنید
-          * **نوع دسترسی پیش فرض:** روی «خواندن، نوشتن و پیام خصوصی" تنظیم کنید
-          * بعد از ذخیره سازی برنامه خود، از کلید مصرف کننده و رمز مصرف کننده یادداشت بردارید
-      domain_name: دامنه
-      labels: 
-        api_key: "کلید مصرف کننده"
-        secret_key: "رمز مصرف کننده"
     webct_scraper_settings: 
       description: |-
           اگر دانشگاه از «ماژول های یادگیری» WebCT استفاده نمی کند (شامل دانشکده هایی که در هنگام در دسترس قرار گرفتن
@@ -11444,7 +11365,6 @@ fa-IR:
         extended_quiz_time_explanation: "می توانید به این دانشجو برای آزمون فعلی زمان اضافی بدهید. چقدر می خواهید به آنها زمان بدهید؟"
         extra_time_on_every_attempt: "وقت اضافی برای هر تلاش:"
         finished_in: "تکمیل شده در %{duration}"
-        global_extra_attempt_time: "همه اکنون %{count} دقیقه دریافت می کنند"
         global_extra_attempts: "همه اکنون %{n} دریافت می کنند"
         headers: 
           attempt: تلاش
@@ -12105,8 +12025,6 @@ fa-IR:
         description: "لغو انتشار"
     options_2: 
       description: "زمان بندی در دسترس بودن دانشجو"
-    title: 
-      default_title: "کادر گفتگو"
   resume_quiz_afeceb87: "از سر گرفتن آزمون"
   resume_survey_58dce775: "از سر گرفتن نظرسنجی"
   retrieve_timeout: " پیکربندی قابل بازیابی نیست، زمان پاسخ سرور به پایان رسیده است"
@@ -12381,7 +12299,6 @@ fa-IR:
       learning_mastery: "تسلط یادگیری"
     settings: 
       assignment_toggles_and_actions: 
-        download_scores: "بارگیری نمره ها (.csv)"
         grading_history: "مشاهده تاریخچه نمره گذاری"
         hide_student_names_label: "مخفی کردن نام دانشجویان"
         include_ungraded_assignments: "در نظر گرفتن نمره گذاری نشده به عنوان 0"
@@ -12570,8 +12487,6 @@ fa-IR:
     new: 
       titles: 
         course_enrollment: "ثبت نام در %{course}"
-    notices: 
-      login_required: "لطفا برای پیوستن به این درس وارد شوید."
     successfully_enrolled: 
       already_enrolled: "با موفقیت در **%{course}** ثبت نام کرده اید."
       buttons: 
@@ -12879,10 +12794,6 @@ fa-IR:
       needs_grading_count: 
         one: "%{count} تکلیف نیاز به نمره گذاری دارد"
         other: "%{count} تکلیف نیاز به نمره گذاری دارد"
-    menu_enrollment: 
-      labels: 
-        enrolled_as: "ثبت نام شده به عنوان"
-        invited_as: "دعوت شده به عنوان"
     message_students: 
       buttons: 
         send_message: "ارسال پیام"

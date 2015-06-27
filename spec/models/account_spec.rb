@@ -869,12 +869,40 @@ describe Account do
     end
   end
 
+  describe "delegated_authentication?" do
+    let(:account){ Account.default }
+
+    before do
+      expect(account.delegated_authentication?).to be_falsey
+    end
+
+    it "is false for LDAP" do
+      account.account_authorization_configs.create!(auth_type: 'ldap')
+      expect(account.delegated_authentication?).to be_falsey
+    end
+
+    it "is true for CAS" do
+      account.account_authorization_configs.create!(auth_type: 'cas')
+      expect(account.delegated_authentication?).to be_truthy
+    end
+  end
+
   describe "canvas_authentication?" do
-    it "should be true if there's not an AAC" do
+    before do
+      Account.default.account_authorization_configs.destroy_all
       Account.default.settings[:canvas_authentication] = false
+      Account.default.save!
       expect(Account.default.canvas_authentication?).to be_truthy
-      Account.default.account_authorization_configs.create!(:auth_type => 'ldap')
+      Account.default.account_authorization_configs.create!(auth_type: 'ldap')
+    end
+
+    it "should be true if there's not an AAC" do
       expect(Account.default.canvas_authentication?).to be_falsey
+    end
+
+    it "is true after AACs are destroyed" do
+      Account.default.account_authorization_configs.destroy_all
+      expect(Account.default.reload.canvas_authentication?).to be_truthy
     end
   end
 
@@ -1049,7 +1077,7 @@ describe Account do
 
   describe "#update_account_associations" do
     it "should update associations for all courses" do
-      account = Account.create!
+      account = Account.default.sub_accounts.create!
       c1 = account.courses.create!
       c2 = account.courses.create!
       account.course_account_associations.scoped.delete_all

@@ -304,6 +304,7 @@ describe DiscussionTopicsController, type: :request do
                                    'hidden_for_user' => false,
                                    'created_at' => @attachment.created_at.as_json,
                                    'updated_at' => @attachment.updated_at.as_json,
+                                   'modified_at' => @attachment.updated_at.as_json,
                                    'thumbnail_url' => @attachment.thumbnail_url,
                   }],
                   "topic_children"=>[@sub.id],
@@ -1131,6 +1132,7 @@ describe DiscussionTopicsController, type: :request do
                 'created_at' => attachment.created_at.as_json,
                 'updated_at' => attachment.updated_at.as_json,
                 'thumbnail_url' => attachment.thumbnail_url,
+                'modified_at' => attachment.updated_at.as_json
               }],
       "posted_at"=>gtopic.posted_at.as_json,
       "root_topic_id"=>nil,
@@ -2198,6 +2200,7 @@ describe DiscussionTopicsController, type: :request do
           'created_at' => @attachment.created_at.as_json,
           'updated_at' => @attachment.updated_at.as_json,
           'thumbnail_url' => @attachment.thumbnail_url,
+          'modified_at' => @attachment.updated_at.as_json
         }
 
         v0 = json['view'][0]

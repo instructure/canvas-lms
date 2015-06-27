@@ -810,6 +810,22 @@ describe Quizzes::Quiz do
     specify { expect(Quizzes::Quiz.shuffleable_question_type?("multiple_choice_question")).to be_truthy }
   end
 
+  describe "shuffle_answers_for_user?" do
+    before do
+      @quiz = Quizzes::Quiz.create!(:context => @course, :shuffle_answers => true)
+    end
+
+    it "returns false for teachers" do
+      course_with_teacher(active_all: true, course: @course)
+      expect(@quiz.shuffle_answers_for_user?(@teacher)).to be_falsey
+    end
+
+    it "returns true for students" do
+      @student = student_in_course(course: @course).user
+      expect(@quiz.shuffle_answers_for_user?(@student)).to be_truthy
+    end
+  end
+
   describe '#has_student_submissions?' do
     before :once do
       course = Course.create!
@@ -1047,6 +1063,25 @@ describe Quizzes::Quiz do
         expect(quiz.errors).to be_blank
         expect(quiz.hide_results).to eq 'invalid'
       end
+    end
+  end
+
+  describe "#question_types" do
+    before :once do
+      @quiz = @course.quizzes.build :title => "test quiz", :hide_results => 'invalid'
+    end
+
+    it "returns an empty array when no quiz data" do
+      @quiz.stubs(:quiz_data).returns nil
+      expect(@quiz.question_types).to eq([])
+    end
+
+    it "returns quiz types of question in quiz groups" do
+      @quiz.stubs(:quiz_data).returns([
+        {"question_type" => "foo"},
+        {"entry_type" => "quiz_group", "questions" => [{"question_type" => "bar"},{"question_type" => "baz"}]}
+      ])
+      expect(@quiz.question_types).to eq(["foo", "bar", "baz"])
     end
   end
 

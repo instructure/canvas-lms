@@ -1,0 +1,30 @@
+<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+    <table style="width: 600px;" class="formtable">
+      <tr>
+        <td colspan="2"><%= mt(<<-TEXT, github_url: "https://github.com/settings/developers", callback_url: oauth2_login_callback_url)
+You will need to [register an application on GitHub](%{github_url}).
+You should configure %{callback_url} as the Authorization callback URL.
+After you create your app, make a note of the Client ID and Client Secret, and enter them here.
+TEXT
+        %></td>
+      </tr>
+      <tr>
+        <td><%= f.blabel :domain, :en => "Domain" %></td>
+        <td>
+          <%= f.text_field :domain, placeholder: 'github.com' %>
+        </td>
+      </tr>
+      <tr>
+        <td><%= f.blabel :client_id, :en => "Client ID" %></td>
+        <td>
+          <%= f.text_field :client_id %>
+        </td>
+      </tr>
+      <tr>
+        <td><%= f.blabel :client_secret, :en => "Client Secret" %></td>
+        <td>
+          <%= f.password_field :client_secret, autocomplete: false %>
+        </td>
+      </tr>
+    </table>
+<% end %>

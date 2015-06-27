@@ -130,6 +130,11 @@
 #           "description": "The current state of the quiz submission. Possible values: ['untaken'|'pending_review'|'complete'|'settings_only'|'preview'].",
 #           "example": "untaken",
 #           "type": "string"
+#         },
+#         "overdue_and_needs_submission": {
+#           "description": "Indicates whether the quiz submission is overdue and needs submission",
+#           "example": "false",
+#           "type": "boolean"
 #         }
 #       }
 #     }
@@ -167,12 +172,15 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
         api_v1_course_quiz_submissions_url(@context, @quiz)
     elsif @quiz.grants_right?(@current_user, session, :submit)
       # students have access only to their own
-      @quiz.quiz_submissions.where(:user_id => @current_user)
+      @quiz.quiz_submissions.where(:user_id => @current_user).flat_map(&:submitted_attempts)
     end
 
     if !quiz_submissions
       render_unauthorized_action
     else
+      # trigger delayed grading job for all submission id's which needs grading
+      quiz_submissions_ids = quiz_submissions.map(&:id).uniq
+      Quizzes::OutstandingQuizSubmissionManager.new(@quiz).send_later_if_production(:grade_by_ids, quiz_submissions_ids)
       serialize_and_render quiz_submissions
     end
   end

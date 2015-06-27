@@ -85,6 +85,7 @@ module Api::V1::Attachment
       'lock_at' => attachment.lock_at,
       'hidden_for_user' => hidden_for_user,
       'thumbnail_url' => thumbnail_download_url,
+      'modified_at' => attachment.modified_at ? attachment.modified_at : attachment.updated_at
     }
     locked_json(hash, attachment, user, 'file')
 
@@ -123,6 +124,7 @@ module Api::V1::Attachment
     @attachment.file_state = 'deleted'
     @attachment.workflow_state = 'unattached'
     @attachment.user = @current_user
+    @attachment.modified_at = Time.now.utc
     @attachment.content_type = params[:content_type].presence || Attachment.mimetype(@attachment.filename)
     # Handle deprecated folder path
     params[:parent_folder_path] ||= params[:folder]

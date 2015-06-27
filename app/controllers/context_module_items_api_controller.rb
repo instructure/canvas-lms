@@ -253,10 +253,9 @@ class ContextModuleItemsApiController < ApplicationController
   # @returns ModuleItem
   def show
     if authorized_action(@context, @current_user, :read)
-      mod = @context.modules_visible_to(@student || @current_user).find(params[:module_id])
-      item = mod.content_tags_visible_to(@student || @current_user).find(params[:id])
-      prog = @student ? mod.evaluate_for(@student) : nil
-      render :json => module_item_json(item, @student || @current_user, session, mod, prog, Array(params[:include]))
+      get_module_item
+      prog = @student ? @module.evaluate_for(@student) : nil
+      render :json => module_item_json(@item, @student || @current_user, session, @module, prog, Array(params[:include]))
     end
   end
 
@@ -481,8 +480,44 @@ class ContextModuleItemsApiController < ApplicationController
     end
   end
 
-  MAX_SEQUENCES = 10
 
+  # @API Mark module item as done/not done
+  #
+  # Mark a module item as done/not done. Use HTTP method PUT to mark as done,
+  # and DELETE to mark as not done.
+  #
+  # @example_request
+  #
+  #     curl https://<canvas>/api/v1/courses/<course_id>/modules/<module_id>/items/<item_id>/done \
+  #       -X Put \
+  #       -H 'Authorization: Bearer <token>'
+  def mark_as_done
+    if authorized_action(@context, @current_user, :read)
+      get_module_item
+      @item.context_module_action(@current_user, :done)
+      render :json => { :message => t('OK') }
+    end
+  end
+
+  def mark_as_not_done
+    if authorized_action(@context, @current_user, :read)
+      get_module_item
+      if (progression = @item.progression_for_user(@current_user))
+        progression.uncomplete_requirement(params[:id].to_i)
+        progression.evaluate
+      end
+      render :json => { :message => t('OK') }
+    end
+  end
+
+  def get_module_item
+    user = @student || @current_user
+    @module = @context.modules_visible_to(user).find(params[:module_id])
+    @item = @module.content_tags.find(params[:id])
+    raise ActiveRecord::RecordNotFound unless @item && @item.visible_to_user?(user)
+  end
+
+  MAX_SEQUENCES = 10
   # @API Get module item sequence
   #
   # Given an asset in a course, find the ModuleItem it belongs to, and also the previous and next Module Items
@@ -590,13 +625,11 @@ class ContextModuleItemsApiController < ApplicationController
   #
   def mark_item_read
     if authorized_action(@context, @current_user, :read)
-      mod = @context.modules_visible_to(@current_user).find(params[:module_id])
-      item = mod.content_tags_visible_to(@current_user).find(params[:id])
-
-      content = (item.content && item.content.respond_to?(:locked_for?)) ? item.content : item
+      get_module_item
+      content = (@item.content && @item.content.respond_to?(:locked_for?)) ? @item.content : @item
       return render :json => { :message => t('The module item is locked.') }, :status => :forbidden if content.locked_for?(@current_user)
 
-      item.context_module_action(@current_user, :read)
+      @item.context_module_action(@current_user, :read)
       render :json => { :message => t('OK') }
     end
   end

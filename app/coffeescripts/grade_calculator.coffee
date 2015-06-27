@@ -10,7 +10,7 @@ define [
     [trueList, falseList]
 
   class GradeCalculator
-    # each submission needs fields: score, points_possible, assignment_id, assignment_group_id
+    # each submission needs fields: score, points_possible, assignment_id, assignment_group_id, excused
     #   to represent assignments that the student hasn't submitted, pass a
     #   submission with score == null
     #
@@ -61,6 +61,9 @@ define [
         dummySubmissions = _(missingSubmissions).map (assignmentId) ->
           s = assignment_id: assignmentId, score: null
         submissions.push dummySubmissions...
+
+      # filter out excused assignments
+      submissions = _(submissions).filter (s) -> not s.excused
 
       submissionsByAssignment = arrayToObj submissions, "assignment_id"
 

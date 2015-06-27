@@ -1,0 +1,10 @@
+<% unless AccountAuthorizationConfig::Google.globally_configured? %>
+  <p><%= mt(<<-TEXT, google_url: "https://console.developers.google.com/project", callback_url: oauth2_login_callback_url)
+You will need to create a web application in the [Google Developer Console](%{google_url}).
+You should add %{callback_url} as a redirect URI.
+After you create your app, make a note of the Client ID and Client Secret, and enter them here.
+TEXT
+      %></p>
+  <%= render partial: 'oauth2_fields', locals: { f: f } %>
+<% end %>
+<%= render partial: 'login_attribute_dropdown', locals: { f: f, aac: aac } %>

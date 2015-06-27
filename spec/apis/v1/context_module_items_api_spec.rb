@@ -252,6 +252,33 @@ describe "Module Items API", type: :request do
       })
     end
 
+    context 'with differentiated assignments' do
+      before :each do
+        @course.enable_feature!(:differentiated_assignments)
+        course_with_student(:course => @course, :active_all => true)
+        @user = @student
+      end
+
+      it "should find module items" do
+        api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
+          :controller => "context_module_items_api", :action => "show", :format => "json",
+          :course_id => "#{@course.id}", :module_id => "#{@module1.id}",
+          :id => "#{@assignment_tag.id}")
+      end
+
+      it "should not find module items when hidden" do
+        @assignment.only_visible_to_overrides = true
+        @assignment.save!
+        @section = @course.course_sections.create!(name: "test section")
+        create_section_override_for_assignment(@assignment, {course_section: @section})
+
+        api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
+          {:controller => "context_module_items_api", :action => "show", :format => "json",
+          :course_id => "#{@course.id}", :module_id => "#{@module1.id}",
+          :id => "#{@assignment_tag.id}"}, {}, {}, {:expected_status => 404})
+      end
+    end
+
     context 'show with content details' do
       let(:json) do
         api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}?include[]=content_details",
@@ -1132,6 +1159,67 @@ describe "Module Items API", type: :request do
                       :id => "#{@assignment_tag.id}", :student_id => "#{student.id}"},
                       {}, {},
                       {:expected_status => 401})
+    end
+
+    context 'mark_as_done' do
+      before :once do
+        @module = @course.context_modules.create(:name => "mark_as_done_module")
+        wiki_page = @course.wiki.wiki_pages.create!(:title => "mark_as_done page", :body => "")
+        wiki_page.workflow_state = 'active'
+        wiki_page.save!
+        @tag = @module.add_item(:id => wiki_page.id, :type => 'wiki_page')
+        @module.completion_requirements = {
+          @tag.id => { :type => 'must_mark_done' },
+        }
+        @module.save!
+      end
+
+      def mark_done_api_call
+        api_call(:put,
+                 "/api/v1/courses/#{@course.id}/modules/#{@module.id}/items/#{@tag.id}/done",
+                 :controller => "context_module_items_api",
+                 :action     => "mark_as_done",
+                 :format     => "json",
+                 :course_id  => @course.to_param,
+                 :module_id  => @module.to_param,
+                 :id => @tag.to_param,
+                )
+      end
+
+      def mark_not_done_api_call
+        api_call(:delete,
+                 "/api/v1/courses/#{@course.id}/modules/#{@module.id}/items/#{@tag.id}/done",
+                 :controller => "context_module_items_api",
+                 :action     => "mark_as_not_done",
+                 :format     => "json",
+                 :course_id  => @course.to_param,
+                 :module_id  => @module.to_param,
+                 :id => @tag.to_param,
+                )
+      end
+
+      describe "PUT" do
+        it "should fulfill must-mark-done requirement" do
+          mark_done_api_call
+          expect(@module.evaluate_for(@user).requirements_met).to be_any do |rm|
+            rm[:type] == "must_mark_done" && rm[:id] == @tag.id
+          end
+        end
+      end
+
+      describe "DELETE" do
+        it "should remove must-mark-done requirement" do
+          mark_done_api_call
+          mark_not_done_api_call
+          expect(@module.evaluate_for(@user).requirements_met).to be_none do |rm|
+            rm[:type] == "must_mark_done"
+          end
+        end
+
+        it "should work even when there is none must-mark-done requirement to delete" do
+          mark_not_done_api_call
+        end
+      end
     end
 
     describe "POST 'mark_item_read'" do

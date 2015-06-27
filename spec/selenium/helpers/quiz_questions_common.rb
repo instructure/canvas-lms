@@ -71,7 +71,7 @@ shared_examples_for "quiz question selenium tests" do
 
   def accept_cant_go_back_warning
     expect_new_page_load {
-      fj("button:contains('Begin'):visible").click
+      fj("button:contains('Begin').ui-button").click
     }
     wait_for_ajaximations
   end

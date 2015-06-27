@@ -73,13 +73,49 @@ module Lti
       expect(expanded[:some_name]).to eq account
     end
 
-    it 'handles lti1 expansion' do
-      described_class.register_expansion('test_expan', ['a'], -> { @context })
-      expanded = subject.expand_variables!({'some_name' => '$test_expan'})
+    it 'expands substring variables' do
+      account.stubs(:id).returns(42)
+      described_class.register_expansion('test_expan', ['a'], -> { @context.id })
+      expanded = subject.expand_variables!({some_name: 'my variable is buried in here ${test_expan} can you find it?'})
       expect(expanded.count).to eq 1
-      expect(expanded['some_name']).to eq account
+      expect(expanded[:some_name]).to eq "my variable is buried in here 42 can you find it?"
     end
 
+    it 'handles multiple substring variables' do
+      account.stubs(:id).returns(42)
+      described_class.register_expansion('test_expan', ['a'], -> { @context.id })
+      described_class.register_expansion('variable1', ['a'], -> { 1 })
+      described_class.register_expansion('other_variable', ['a'], -> { 2 })
+      expanded = subject.expand_variables!(
+        {some_name: 'my variables ${variable1} is buried ${other_variable} in here ${test_expan} can you find them?'}
+      )
+      expect(expanded[:some_name]).to eq "my variables 1 is buried 2 in here 42 can you find them?"
+    end
+
+    it 'does not expand a substring variable if it is not valid' do
+      account.stubs(:id).returns(42)
+      described_class.register_expansion('test_expan', ['a'], -> { @context.id })
+      expanded = subject.expand_variables!({some_name: 'my variable is buried in here ${tests_expan} can you find it?'})
+      expect(expanded.count).to eq 1
+      expect(expanded[:some_name]).to eq "my variable is buried in here ${tests_expan} can you find it?"
+    end
+
+    context 'lti1' do
+      it 'handles expansion' do
+        described_class.register_expansion('test_expan', ['a'], -> { @context })
+        expanded = subject.expand_variables!({'some_name' => '$test_expan'})
+        expect(expanded.count).to eq 1
+        expect(expanded['some_name']).to eq account
+      end
+
+      it 'expands substring variables' do
+        account.stubs(:id).returns(42)
+        described_class.register_expansion('test_expan', ['a'], -> { @context.id })
+        expanded = subject.expand_variables!({'some_name' => 'my variable is buried in here ${test_expan} can you find it?'})
+        expect(expanded.count).to eq 1
+        expect(expanded['some_name']).to eq "my variable is buried in here 42 can you find it?"
+      end
+    end
     describe "#variable expansions" do
 
       it 'has substitution for $Canvas.api.domain' do
@@ -211,7 +247,7 @@ module Lti
       end
 
       context 'context is a course and there is a user' do
-        subject { described_class.new(root_account, course, controller, current_user: user, tool:tool) }
+        subject { described_class.new(root_account, course, controller, current_user: user, tool: tool) }
 
         it 'has substitution for $Canvas.xapi.url' do
           Lti::XapiService.stubs(:create_token).returns('abcd')
@@ -269,7 +305,7 @@ module Lti
         it 'has substitution for $Canvas.externalTool.url' do
           course.save!
           tool = course.context_external_tools.create!(:domain => 'example.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'anonymous', :name => 'tool')
-          expander = described_class.new(root_account, course, controller, current_user: user, tool:tool)
+          expander = described_class.new(root_account, course, controller, current_user: user, tool: tool)
           exp_hash = {test: '$Canvas.externalTool.url'}
           expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq "url"

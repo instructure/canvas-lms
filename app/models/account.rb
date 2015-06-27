@@ -73,7 +73,7 @@ class Account < ActiveRecord::Base
   has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_with_sub_folders, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
-  has_many :account_authorization_configs, :order => "position"
+  has_many :account_authorization_configs, order: "position", extend: AccountAuthorizationConfig::FindWithType
   has_many :account_reports
   has_many :grading_standards, :as => :context, :conditions => ['workflow_state != ?', 'deleted']
   has_many :assessment_questions, :through => :assessment_question_banks
@@ -164,6 +164,7 @@ class Account < ActiveRecord::Base
   add_setting :prevent_course_renaming_by_teachers, :boolean => true, :root_only => true
   add_setting :login_handle_name, root_only: true
   add_setting :change_password_url, root_only: true
+  add_setting :unknown_user_url, root_only: true
 
   add_setting :restrict_student_future_view, :boolean => true, :default => false, :inheritable => true
   add_setting :restrict_student_past_view, :boolean => true, :default => false, :inheritable => true
@@ -213,8 +214,9 @@ class Account < ActiveRecord::Base
   add_setting :trusted_referers, root_only: true
 
   BRANDING_SETTINGS = [:header_image, :favicon, :apple_touch_icon,
-    :msapplication_tile_color, :msapplication_tile_square, :msapplication_tile_wide
-  ]
+                       :msapplication_tile_color, :msapplication_tile_square,
+                       :msapplication_tile_wide].freeze
+
   BRANDING_SETTINGS.each { |setting| add_setting(setting, root_only: true) }
 
   def settings=(hash)
@@ -274,8 +276,12 @@ class Account < ActiveRecord::Base
     settings[:mfa_settings].try(:to_sym) || :disabled
   end
 
+  def non_canvas_auth_configured?
+    account_authorization_configs.exists?
+  end
+
   def canvas_authentication?
-    settings[:canvas_authentication] != false || !self.account_authorization_config
+    settings[:canvas_authentication] != false || !non_canvas_auth_configured?
   end
 
   def open_registration?
@@ -430,8 +436,12 @@ class Account < ActiveRecord::Base
   end
 
   def associated_courses
-    shard.activate do
-      Course.where("EXISTS (SELECT 1 FROM course_account_associations WHERE course_id=courses.id AND account_id=?)", self)
+    if root_account?
+      all_courses
+    else
+      shard.activate do
+        Course.where("EXISTS (SELECT 1 FROM course_account_associations WHERE course_id=courses.id AND account_id=?)", self)
+      end
     end
   end
 
@@ -787,13 +797,6 @@ class Account < ActiveRecord::Base
     role && (role.built_in? || (self.id == role.account_id) || self.account_chain.map(&:id).include?(role.account_id))
   end
 
-  def account_authorization_config
-    # We support multiple auth configs per account, but several places we assume there is only one.
-    # This is for compatibility with those areas. TODO: migrate everything to supporting multiple
-    # auth configs
-    self.account_authorization_configs.first
-  end
-
   def login_handle_name_is_customized?
     self.login_handle_name.present?
   end
@@ -951,28 +954,12 @@ class Account < ActiveRecord::Base
     Canvas::PasswordPolicy.default_policy.merge(settings[:password_policy] || {})
   end
 
-  def password_authentication?
-    !self.account_authorization_config
-  end
-
   def delegated_authentication?
-    !canvas_authentication? || !!(self.account_authorization_config && self.account_authorization_config.is_a?(AccountAuthorizationConfig::Delegated))
+    account_authorization_configs.first.is_a?(AccountAuthorizationConfig::Delegated)
   end
 
   def forgot_password_external_url
     self.change_password_url
-  end
-
-  def cas_authentication?
-    !!(self.account_authorization_config && self.account_authorization_config.is_a?(AccountAuthorizationConfig::CAS))
-  end
-
-  def ldap_authentication?
-    self.account_authorization_configs.any? { |aac| aac.is_a?(AccountAuthorizationConfig::LDAP) }
-  end
-
-  def saml_authentication?
-    !!(self.account_authorization_config && self.account_authorization_config.is_a?(AccountAuthorizationConfig::SAML)) && AccountAuthorizationConfig::SAML.enabled?
   end
 
   def multi_auth?
@@ -1001,6 +988,14 @@ class Account < ActiveRecord::Base
 
   def change_password_url
     self.settings[:change_password_url]
+  end
+
+  def unknown_user_url=(unknown_user_url)
+    self.settings[:unknown_user_url] = unknown_user_url
+  end
+
+  def unknown_user_url
+    self.settings[:unknown_user_url]
   end
 
   def validate_auth_discovery_url
@@ -1488,5 +1483,18 @@ class Account < ActiveRecord::Base
     if referer_with_port = format_referer(referer_url)
       self.settings[:trusted_referers].split(',').include?(referer_with_port)
     end
+  end
+
+  def parent_registration?
+    self.account_authorization_configs.exists?(parent_registration: true)
+  end
+
+  def parent_auth_type
+    return nil unless parent_registration?
+    parent_registration_aac.auth_type
+  end
+
+  def parent_registration_aac
+    account_authorization_configs.where(parent_registration: true).first
   end
 end

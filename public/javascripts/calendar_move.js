@@ -39,7 +39,7 @@ define([
       var data = {};
       var current = null;
       if(typeof(change) == "string") {
-        var current = $.datepicker.parseDate('mm/dd/yy', change);
+        var current = $.datepicker.oldParseDate('mm/dd/yy', change);
         if(current) {
           current.setDate(1);
         }

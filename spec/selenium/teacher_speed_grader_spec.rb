@@ -423,6 +423,36 @@ describe "speed grader" do
     expect(f('.rubric_container .criterion_points').attribute(:value)).to eq('')
   end
 
+  describe "when rounding .rubric_total" do
+    it "should round to 2 decimal places" do
+      setup_and_grade_rubric('1.001', '1.01')
+
+      expect(f('#rubric_full .rubric_total').text).to eq('2.01') # while entering scores
+
+      f('.save_rubric_button').click
+      wait_for_ajaximations
+      expect(f('#rubric_summary_holder .rubric_total').text).to eq('2.01') # seeing the summary after entering scores
+
+      f('.toggle_full_rubric').click
+      wait_for_ajaximations
+      expect(f('#rubric_full .rubric_total').text).to eq('2.01') # after opening the rubric up again to re-score
+    end
+
+    it "should not display trailing zeros" do
+      setup_and_grade_rubric('1', '1')
+
+      expect(f('#rubric_full .rubric_total').text).to eq('2') # while entering scores
+
+      f('.save_rubric_button').click
+      wait_for_ajaximations
+      expect(f('#rubric_summary_holder .rubric_total').text).to eq('2') # seeing the summary after entering scores
+
+      f('.toggle_full_rubric').click
+      wait_for_ajaximations
+      expect(f('#rubric_full .rubric_total').text).to eq('2') # after opening the rubric up again to re-score
+    end
+  end
+
   it "creates a comment on assignment" do
     #pending("failing because it is dependant on an external kaltura system")
 
@@ -690,6 +720,8 @@ describe "speed grader" do
     expect(f("#rubric_summary_container tr:nth-child(3) .editing")).not_to be_displayed
     expect(f("#rubric_summary_container tr:nth-child(3) .ignoring")).to be_displayed
     expect(f("#rubric_summary_container tr.summary .rubric_total").text).to eq '3'
+    # check that null scores do not show a criterion level
+    expect(f("#rubric_summary_container tr:nth-child(2) .description").text).to be_empty
 
     # check again that initial page load has the same data.
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
@@ -700,6 +732,7 @@ describe "speed grader" do
     expect(f("#rubric_summary_container tr:nth-child(3) .editing")).not_to be_displayed
     expect(f("#rubric_summary_container tr:nth-child(3) .ignoring")).to be_displayed
     expect(f("#rubric_summary_container tr.summary .rubric_total").text).to eq '3'
+    expect(f("#rubric_summary_container tr:nth-child(2) .description").text).to be_empty
   end
 
   it "includes the student view student for grading" do

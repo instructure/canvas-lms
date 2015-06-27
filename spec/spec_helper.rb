@@ -165,7 +165,11 @@ Mocha::ObjectMethods.instance_methods.each do |m|
   RUBY
 end
 
-Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
+factories = "#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb"
+Dir.glob(factories).each { |file| require file }
+
+examples = "#{File.dirname(__FILE__).gsub(/\\/, "/")}/shared_examples/*.rb"
+Dir.glob(examples).each { |file| require file }
 
 def pend_with_bullet
   if defined?(Bullet) && Bullet.enable?
@@ -601,7 +605,7 @@ RSpec.configure do |config|
 
   def managed_pseudonym(user, opts={})
     other_account = opts[:account] || account_with_saml
-    if other_account.password_authentication?
+    if other_account.canvas_authentication?
       config = other_account.account_authorization_configs.build
       config.auth_type = "saml"
       config.log_in_url = opts[:saml_log_in_url] if opts[:saml_log_in_url]

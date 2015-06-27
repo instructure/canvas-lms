@@ -17,7 +17,7 @@
 #
 
 # # enforce the version of bundler itself, to avoid any surprises
-req_bundler_version_floor, req_bundler_version_ceiling = '1.7.10', '1.9.6'
+req_bundler_version_floor, req_bundler_version_ceiling = '1.7.10', '1.10.3'
 bundler_requirements = [">=#{req_bundler_version_floor}",
                         "<=#{req_bundler_version_ceiling}"]
 gem 'bundler', bundler_requirements
@@ -41,10 +41,7 @@ unless Gem::Requirement.new(*bundler_requirements).satisfied_by?(Gem::Version.ne
 end
 
 # NOTE: this has to use 1.8.7 hash syntax to not raise a parser exception on 1.8.7
-if RUBY_VERSION == "2.0.0"
-  warn "Ruby 2.0 support is untested"
-  ruby '2.0.0', :engine => 'ruby', :engine_version => '2.0.0'
-elsif RUBY_VERSION >= "2.1" && RUBY_VERSION < "2.2"
+if RUBY_VERSION >= "2.1" && RUBY_VERSION < "2.2"
   ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_VERSION
 elsif RUBY_VERSION >= "2.2"
   warn "Ruby newer than 2.1 is very UNSUPPORTED"

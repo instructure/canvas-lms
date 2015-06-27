@@ -2,7 +2,7 @@
 @import "pages/shared/menu_tools.scss";
 @import "pages/shared/move_dialog";
 
-$backgroundColor: #dfe9f0;
+$backgroundColor: #fff;
 $borderColor: #AAA;
 $questionHeaderBackground: #F5F5F5;
 $selectedBorderColor: #31b5ff;
@@ -1317,6 +1317,7 @@ ul#quiz_versions {
         overflow: visible;
       }
       .option-group {
+        max-width: 478px;
         padding: 10px 10px 0 10px;
         border: 1px solid #ccc;
         border-radius: 4px;

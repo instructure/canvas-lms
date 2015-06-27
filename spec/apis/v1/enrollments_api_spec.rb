@@ -645,13 +645,23 @@ describe EnrollmentsApiController, type: :request do
     end
 
     context "grading periods" do
-      before :once do
-        grading_period_group = @course.grading_period_groups.create!
-        @grading_period1 = grading_period_group.grading_periods.create!(start_date: 2.months.ago, end_date: Time.now - 1)
-        @grading_period2 = grading_period_group.grading_periods.create!(start_date: Time.now, end_date: 2.months.from_now)
+      let(:grading_period_group) { @course.grading_period_groups.create! }
+      let(:now) { Time.zone.now }
 
-        @assignment1 = @course.assignments.create! due_at: Time.now - 2.day, points_possible: 10
-        @assignment2 = @course.assignments.create! due_at: Time.now + 1.day, points_possible: 10
+      before :once do
+        @grading_period1 = grading_period_group.grading_periods.create!(
+          title: 'first',
+          start_date: 2.months.ago(now),
+          end_date: now
+        )
+        @grading_period2 = grading_period_group.grading_periods.create!(
+          title: 'second',
+          start_date: now,
+          end_date: 2.months.from_now(now)
+        )
+
+        @assignment1 = @course.assignments.create! due_at: 2.days.ago(now), points_possible: 10
+        @assignment2 = @course.assignments.create! due_at: 1.day.from_now(now), points_possible: 10
       end
 
       context "multiple grading periods feature flag enabled" do

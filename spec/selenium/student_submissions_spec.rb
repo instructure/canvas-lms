@@ -2,7 +2,6 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/submissions_common')
 
-
 describe "submissions" do
   include_examples "in-process server selenium tests"
 
@@ -364,6 +363,22 @@ describe "submissions" do
         driver.switch_to.alert.accept
         driver.switch_to.default_content
       end
+    end
+  end
+
+  context 'Excused assignment' do
+    it 'does not allow submissions', priority: '1', test_id: 197048 do
+      course_with_student_logged_in
+      @assignment = @course.assignments.create!(
+        title: 'assignment 1',
+        name: 'assignment 1',
+        submission_types: 'online_text_entry'
+      )
+
+      @assignment.grade_student @student, {excuse: 1}
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      expect(f('a.submit_assignment_link')).to be_nil
+      expect(f('#assignment_show .assignment-title').text).to eq 'assignment 1'
     end
   end
 end

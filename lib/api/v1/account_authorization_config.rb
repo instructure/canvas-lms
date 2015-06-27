@@ -26,11 +26,11 @@ module Api::V1::AccountAuthorizationConfig
   end
 
   def aac_json(aac)
-    result = api_json(aac, nil, nil, :only => [:id, :position])
+    result = api_json(aac, nil, nil, :only => [:auth_type, :id, :position])
     allowed_params = aac.class.recognized_params
-    allowed_params.delete(:auth_password)
-    allowed_params.each do |param|
-      result[param] = aac.send(param)
+    sensitive_params = aac.class.const_get(:SENSITIVE_PARAMS)
+    (allowed_params - sensitive_params).each do |param|
+      result[param] = aac.public_send(param)
     end
 
     # These settings were moved to the account settings level,

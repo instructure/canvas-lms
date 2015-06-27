@@ -103,7 +103,7 @@ module GoogleDocs
           :parameters => {
             :fileId => normalize_document_id(document_id),
             :permissionId => user_id })
-        if result.error?
+        if result.error? && !result.error_message.starts_with?("Permission not found")
           raise DriveConnectionException, result.error_message
         end
       end

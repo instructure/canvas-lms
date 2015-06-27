@@ -2063,11 +2063,6 @@ define([
       }).change();
 
       $("#lock_attachment_form").formSubmit({
-        processData: function(data) {
-          data['attachment[unlock_at]'] = $.datetime.process(data['attachment[unlock_at]']);
-          data['attachment[lock_at]'] = $.datetime.process(data['attachment[lock_at]']);
-          return data;
-        },
         beforeSubmit: function(data) {
           $(this).loadingImage();
         },
@@ -2079,11 +2074,6 @@ define([
       });
 
       $("#lock_folder_form").formSubmit({
-        processData: function(data) {
-          data['folder[unlock_at]'] = $.datetime.process(data['folder[unlock_at]']);
-          data['folder[lock_at]'] = $.datetime.process(data['folder[lock_at]']);
-          return data;
-        },
         beforeSubmit: function(data) {
           $(this).loadingImage();
         },

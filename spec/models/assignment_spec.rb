@@ -106,7 +106,7 @@ describe Assignment do
   describe '#grade_student' do
     before(:once) { setup_assignment_without_submission }
 
-    describe 'with a valid student' do
+    context 'with a valid student' do
       before :once do
         @result = @assignment.grade_student(@user, :grade => "10")
         @assignment.reload
@@ -142,12 +142,16 @@ describe Assignment do
       end
     end
 
-    it 'raises an error if there is no student' do
-      expect { @assignment.grade_student(nil) }.to raise_error(StandardError, 'Student is required')
+    context 'with no student' do
+      it 'raises an error' do
+        expect { @assignment.grade_student(nil) }.to raise_error(Assignment::GradeError, 'Student is required')
+      end
     end
 
-    it 'will not continue if the student does not belong here' do
-      expect { @assignment.grade_student(User.new) }.to raise_error(StandardError, 'Student must be enrolled in the course as a student to be graded')
+    context 'with a student that does not belong' do
+      it 'raises an error' do
+        expect { @assignment.grade_student(User.new) }.to raise_error(Assignment::GradeError, 'Student must be enrolled in the course as a student to be graded')
+      end
     end
   end
 
@@ -489,6 +493,76 @@ describe Assignment do
       # there should only be one version, even though the grade changed
       expect(s.versions.length).to eql(1)
       expect(s2[0].state).to eql(:graded)
+    end
+
+
+    context "group assignments" do
+      before :once do
+        @student1, @student2 = n_students_in_course(2)
+        gc = @course.group_categories.create! name: "asdf"
+        group = gc.groups.create! name: "zxcv", context: @course
+        [@student1, @student2].each { |u|
+          group.group_memberships.create! user: u, workflow_state: "accepted"
+        }
+        @assignment.update_attribute :group_category, gc
+      end
+
+      context "when excusing an assignment" do
+        it "marks the assignment as excused" do
+          submission, _ = @assignment.grade_student(@student, excuse: true)
+          expect(submission).to be_excused
+        end
+
+        it "doesn't mark everyone in the group excused" do
+          sub1, sub2 = @assignment.grade_student(
+            @student1,
+            excuse: true,
+            comment: "(This comment ensures that both submissions are returned)",
+            group_comment: true
+          )
+
+          expect(sub1.user).to eq @student1
+          expect(sub1).to be_excused
+          expect(sub2).to_not be_excused
+        end
+
+        context "when trying to grade and excuse simultaneously" do
+          it "raises an error" do
+            expect(lambda {
+              @assignment.grade_student(
+                @student1,
+                grade: 0,
+                excuse: true
+              )
+            }).to raise_error("Cannot simultaneously grade and excuse an assignment")
+          end
+        end
+      end
+
+      context "when not excusing an assignment" do
+        it "grades every member of the group" do
+          sub1, sub2 = @assignment.grade_student(
+            @student1,
+            grade: 38,
+            excuse: false,
+            comment: "(This comment ensures that both submissions are returned)",
+            group_comment: true
+          )
+
+          expect(sub1.user).to eq @student1
+          expect(sub1.grade).to eq "38"
+          expect(sub2.grade).to eq "38"
+        end
+
+        it "doesn't overwrite the grades of group members who have been excused" do
+          sub1 = @assignment.grade_student(@student1, excuse: true).first
+          expect(sub1).to be_excused
+
+          sub2 = @assignment.grade_student(@student2, grade: 10).first
+          expect(sub1.reload).to be_excused
+        end
+      end
+
     end
   end
 
@@ -1268,7 +1342,6 @@ describe Assignment do
       expect(ev.uid).to eq "event-assignment-#{@a.id}"
       expect(ev.summary).to eq "#{@a.title} [#{@a.context.course_code}]"
     end
-
   end
 
   context "quizzes" do
@@ -2579,12 +2652,12 @@ describe Assignment do
     context "group assignments" do
       before :once do
         course_with_teacher(active_all: true)
-        gc = @course.group_categories.create! name: "Assignment Groups"
-        @groups = 2.times.map { |i| gc.groups.create! name: "Group #{i}", context: @course }
+        @gc = @course.group_categories.create! name: "Assignment Groups"
+        @groups = 2.times.map { |i| @gc.groups.create! name: "Group #{i}", context: @course }
         students = create_users_in_course(@course, 4, return_type: :record)
         students.each_with_index { |s, i| @groups[i % @groups.size].add_user(s) }
         @assignment = @course.assignments.create!(
-          group_category_id: gc.id,
+          group_category_id: @gc.id,
           grade_group_students_individually: false,
           submission_types: %w(text_entry)
         )
@@ -2630,9 +2703,30 @@ describe Assignment do
         expect(@assignment.representatives(@teacher)).to include g1rep
       end
 
+      it "prefers people who aren't excused" do
+        g1, _ = @groups
+        g1rep, *others = g1.users.all.shuffle
+        others.each { |u|
+          @assignment.grade_student(u, excuse: true)
+        }
+        expect(@assignment.representatives(@teacher)).to include g1rep
+      end
+
       it "includes users who aren't in a group" do
         student_in_course active_all: true
         expect(@assignment.representatives(@teacher).last).to eq @student
+      end
+
+      it "doesn't include deleted groups" do
+        student_in_course active_all: true
+        deleted_group = @gc.groups.create! name: "DELETE ME", context: @course
+        deleted_group.add_user(@student)
+        rep_names = @assignment.representatives(@teacher).map(&:name)
+        expect(rep_names).to include "DELETE ME"
+
+        deleted_group.destroy
+        rep_names = @assignment.representatives(@teacher).map(&:name)
+        expect(rep_names).not_to include "DELETE ME"
       end
     end
 

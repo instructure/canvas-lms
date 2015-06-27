@@ -16,6 +16,8 @@ define [
         if jqXHR.status == 409
           # file already exists: prompt and retry
           React.render(React.createFactory(FileRenameForm)(
+            onClose: ->
+            closeWithX: -> dfd.reject()
             closeOnResolve: true
             fileOptions: {name: item.attributes.display_name}
             onNameConflictResolved: (opts) =>

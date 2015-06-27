@@ -53,17 +53,24 @@ module Api::V1::QuizQuestion
   #   the questions will be modified to use the position index found in that
   #   data. This is needed if you're rendering questions for a submission
   #   as each submission may position each question differently.
-  def questions_json(questions, user, session, context=nil, includes=[], censored=false, quiz_data=nil)
+  def questions_json(questions, user, session, context=nil, includes=[], censored=false, quiz_data=nil, opts={})
     questions.map do |question|
-      question_json(question, user, session, context, includes, censored, quiz_data)
+      question_json(question, user, session, context, includes, censored, quiz_data, opts)
     end
   end
 
-  def question_json(question, user, session, context=nil, includes=[], censored=false, quiz_data=nil)
+  def question_json(question, user, session, _context=nil, includes=[], censored=false, quiz_data=nil, opts={})
     hsh = api_json(question, user, session, API_ALLOWED_QUESTION_OUTPUT_FIELDS) do |json, q|
       API_ALLOWED_QUESTION_DATA_OUTPUT_FIELDS.each do |field|
         json.send("#{field}=", q.question_data[field])
       end
+    end
+
+    user ||= @current_user
+    hsh = add_verifiers_to_question(hsh, @context, user)
+
+    if opts[:shuffle_answers] && Quizzes::Quiz.shuffleable_question_type?(hsh[:question_type])
+      hsh["answers"].shuffle!
     end
 
     if includes.include?(:assessment_question)
@@ -88,6 +95,19 @@ module Api::V1::QuizQuestion
   end
 
   private
+
+  def add_verifiers_to_question(question_hash, context, user)
+    if question_hash["question_text"]
+      question_hash["question_text"] = api_user_content(question_hash["question_text"], context, user)
+    end
+
+    question_hash["answers"].each do |a|
+      next unless a["text"].present?
+      a["text"] = api_user_content(a["text"], context, user)
+    end
+
+    question_hash
+  end
 
   # Delete sensitive question data that students shouldn't get to see.
   #

@@ -22,6 +22,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe SisBatch do
   before :once do
     account_model
+    Delayed::Job.destroy_all
+  end
+
+  def sis_jobs
+    Delayed::Job.where("tag ilike 'sis'")
   end
 
   def create_csv_data(data)
@@ -35,14 +40,14 @@ describe SisBatch do
         end
       end
 
-      old_job_count = Delayed::Job.count
+      old_job_count = sis_jobs.count
       batch = File.open(path, 'rb') do |tmp|
         # arrrgh attachment.rb
         def tmp.original_filename; File.basename(path); end
         SisBatch.create_with_attachment(@account, 'instructure_csv', tmp, @user || user)
       end
       # SisBatches shouldn't need any background processing
-      expect(Delayed::Job.count).to eq old_job_count
+      expect(sis_jobs.count).to eq old_job_count
       yield batch if block_given?
       batch
     end

@@ -52,7 +52,7 @@ define([
       return (
         <div className="ExternalToolsTable">
           <InfiniteScroll pageStart={0} loadMore={this.loadMore} hasMore={store.getState().hasMore} loader={this.loader()}>
-            <table className="table table-striped">
+            <table className="table table-striped" role="presentation">
               <caption className="screenreader-only">{I18n.t('External Apps')}</caption>
               <thead>
                 <tr>
