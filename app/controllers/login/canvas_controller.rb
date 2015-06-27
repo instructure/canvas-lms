@@ -28,6 +28,7 @@ class Login::CanvasController < ApplicationController
     @pseudonym_session = PseudonymSession.new
     @headers = false
     @aacs_with_buttons = @domain_root_account.authentication_providers.active.select(&:login_button?)
+    flash.now[:error] = params[:message] if params[:message]
 
     maybe_render_mobile_login
   end
