@@ -43,6 +43,15 @@ describe LoginController do
       expect(response).to redirect_to('https://google.com/')
     end
 
+    it "passes delegated message on to discovery url" do
+      Account.default.auth_discovery_url = 'https://google.com/'
+      Account.default.save!
+
+      controller.stubs(:flash).returns(delegated_message: 'hi')
+      get 'new'
+      expect(response).to redirect_to('https://google.com/?message=hi')
+    end
+
     it "handles legacy canvas_login=1 param" do
       account_with_cas(account: Account.default)
 
