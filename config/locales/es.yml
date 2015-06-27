@@ -132,6 +132,7 @@ es:
     ldap_fields: 
       auth_filter_description: "Usar *%{placeholder}* como un marcador para el nombre de usuarioproporcionado por el usuario. Por ejemplo: *(sAMAccountName=%{placeholder})*"
       identifer_format_description: "El atributo LDAP para buscar el inicio de sesión en Canvas. Dejar en blanco para usar el nombre de usuario proporcionado por el usuario."
+      ldap_timeout_failure_help2: "Si Canvas expira demasiadas veces la comunicación con el servidor LDAP, bloqueará futuros intentos para iniciar una sesión usando ese servidor LDAP por %{time}. Su servidor LDAP expiró la sesión a las %{timestamp}."
     ldap_settings_test: 
       labels: 
         pass: Contraseña
@@ -159,6 +160,11 @@ es:
       test_ldap_search_help_fixes_3: "Verifique que el objeto del usuario LDAP tiene privilegios de búsqueda en la base de datos."
       test_ldap_search_help_header: "Canvas no puede buscar esa instancia LDAP"
       test_ldap_search_label: "Probando la búsqueda LDAP..."
+    linkedin_fields: 
+      description: |-
+          Usted necesitará [registrar una aplicación en LinkedIn](%{linkedin_url}).
+          Debe agregar %{callback_url} como una URL de redireccionamiento autorizada de OAuth 2.0 y establecer el estado de la aplicación a Live 
+          Después de crear su aplicación, anote el ID del cliente y cliente secreto e ingréselos aquí.
     login_required: "debe ser suministrado"
     no_changing_auth_types: "No se puede cambiar el tipo de configuración de la autorización, elimínelo y cree una configuración nueva."
     password_required: "debe ser suministrado"
