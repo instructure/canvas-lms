@@ -1,3 +1,5 @@
+require 'canvas/draft_state_validations'
+
 module Canvas
   # defines the behavior when a protected attribute is assigned to in mass
   # assignment. The default, and Rails' normal behavior, is to just :log. Set
