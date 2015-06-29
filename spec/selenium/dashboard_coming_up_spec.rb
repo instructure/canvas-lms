@@ -8,7 +8,7 @@ describe "dashboard" do
       course_with_student_logged_in(:active_all => true)
     end
 
-    it "should display calendar events in the coming up list" do
+    it "should display calendar events in the coming up list", priority: "1", test_id: 216392 do
       calendar_event_model({
                                :title => "super fun party",
                                :description => 'celebrating stuff',
@@ -19,7 +19,7 @@ describe "dashboard" do
       expect(f('.events_list .event a')).to include_text(@event.title)
     end
 
-    it "should put locked graded discussions / quizzes in the coming up list only" do
+    it "should put locked graded discussions / quizzes in the coming up list only", priority: "1", test_id: 216393 do
       check_list_text = ->(list_element, text, should_have_text = true) do
         if should_have_text
           expect(list_element).to include_text(text)
@@ -44,7 +44,7 @@ describe "dashboard" do
       2.times { |i| check_list_text.call(coming_up_list, names[i]) }
     end
 
-    it "should display assignment in to do list" do
+    it "should display assignment in coming up list", priority: "1", test_id: 216394 do
       due_date = Time.now.utc + 2.days
       @assignment = assignment_model({:due_at => due_date, :course => @course})
       get "/"
@@ -53,7 +53,7 @@ describe "dashboard" do
       expect(driver.execute_script("return $('.event a .tooltip_text').text()")).to match(@course.short_name)
     end
 
-    it "should display quiz submissions with essay questions as submitted in coming up list" do
+    it "should display quiz submissions with essay questions as submitted in coming up list", priority: "1", test_id: 216395 do
       quiz_with_graded_submission([:question_data => {:id => 31,
                                                       :name => "Quiz Essay Question 1",
                                                       :question_type => 'essay_question',

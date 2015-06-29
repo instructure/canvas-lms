@@ -8,7 +8,7 @@ describe "dashboard" do
       course_with_teacher_logged_in(:active_cc => true)
     end
 
-    it "should validate the functionality of soft concluded courses on courses page" do
+    it "should validate the functionality of soft concluded courses on courses page", priority: "1", test_id: 216396 do
       term = EnrollmentTerm.new(:name => "Super Term", :start_at => 1.month.ago, :end_at => 1.week.ago)
       term.root_account_id = @course.root_account_id
       term.save!
@@ -21,7 +21,7 @@ describe "dashboard" do
       expect(fj("#past_enrollments_table a[href='/courses/#{@course.id}']")).to include_text(c1.name)
     end
 
-    it "should display assignment to grade in to do list for a teacher" do
+    it "should display assignment to grade in to do list for a teacher", priority: "1", test_id: 216397 do
       assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
       student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
       @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
@@ -36,7 +36,7 @@ describe "dashboard" do
       end
     end
 
-    it "should be able to ignore an assignment to grade permanently" do
+    it "should be able to ignore an assignment to grade permanently", priority: "1", test_id: 216398 do
       assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
       student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
       student2 = user_with_pseudonym(:active_user => true, :username => 'student2@example.com', :password => 'qwerty')
@@ -71,7 +71,7 @@ describe "dashboard" do
 
     end
 
-    it "should be able to ignore an assignment until the next submission" do
+    it "should be able to ignore an assignment until the next submission", priority: "1", test_id: 216399 do
       assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
       student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
       student2 = user_with_pseudonym(:active_user => true, :username => 'student2@example.com', :password => 'qwerty')
@@ -114,7 +114,7 @@ describe "dashboard" do
         assignment.submit_homework(@student, {:submission_type => 'online_text_entry', :body => 'ABC'})
       end
 
-      it "should focus on the previous ignore link after ignoring a todo item" do
+      it "should focus on the previous ignore link after ignoring a todo item", priority: "1", test_id: 216400 do
         assignment2 = assignment_model({:submission_types => 'online_text_entry', :course => @course})
         assignment2.submit_homework(@student, {:submission_type => 'online_text_entry', :body => 'Number2'})
         enable_cache do
@@ -130,7 +130,7 @@ describe "dashboard" do
         end
       end
 
-      it "should focus on the 'View Calendar' link if there are no other todo items" do
+      it "should focus on the 'View Calendar' link if there are no other todo items", priority: "1", test_id: 216401 do
         enable_cache do
           get "/"
 
@@ -144,7 +144,7 @@ describe "dashboard" do
       end
     end
 
-    it "should not display assignment to grade in to do list for a designer" do
+    it "should not display assignment to grade in to do list for a designer", priority: "1", test_id: 216402 do
       course_with_designer_logged_in(:active_all => true)
       assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
       student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwerty')
@@ -159,7 +159,7 @@ describe "dashboard" do
       end
     end
 
-    it "should show submitted essay quizzes in the todo list" do
+    it "should show submitted essay quizzes in the todo list", priority: "1", test_id: 216403 do
       quiz_title = 'new quiz'
       student_in_course(:active_all => true)
       q = @course.quizzes.create!(:title => quiz_title)
@@ -181,7 +181,7 @@ describe "dashboard" do
 
     context "course menu customization" do
 
-      it "should always have a link to the courses page (with customizations)" do
+      it "should always have a link to the courses page (with customizations)", priority: "1", test_id: 216404 do
         20.times { course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}) }
 
         get "/"

@@ -9,7 +9,7 @@ describe "dashboard" do
       course_with_student_logged_in(:active_all => true)
     end
 
-    it "should limit the number of visible items in the to do list" do
+    it "should limit the number of visible items in the to do list", priority: "1", test_id: 216405 do
       due_date = Time.now.utc + 2.days
       20.times do
         assignment_model :due_at => due_date, :course => @course, :submission_types => 'online_text_entry'
@@ -23,7 +23,7 @@ describe "dashboard" do
       expect(ffj(".to-do-list li:visible").size).to eq 20
     end
 
-    it "should display assignments to do in to do list for a student" do
+    it "should display assignments to do in to do list for a student", priority: "1", test_id: 216406 do
       notification_model(:name => 'Assignment Due Date Changed')
       notification_policy_model(:notification_id => @notification.id)
       assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
@@ -41,7 +41,7 @@ describe "dashboard" do
       expect(f('.coming_up')).to include_text(assignment.title)
     end
 
-    it "should not display assignments for soft-concluded courses in to do list for a student" do
+    it "should not display assignments for soft-concluded courses in to do list for a student", priority: "1", test_id: 216407 do
       notification_model(:name => 'Assignment Due Date Changed')
       notification_policy_model(:notification_id => @notification.id)
       assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
@@ -60,7 +60,7 @@ describe "dashboard" do
       expect(f('.coming_up')).to_not include_text(assignment.title)
     end
 
-    it "should allow to do list items to be ignored" do
+    it "should allow to do list items to be ignored", priority: "1", test_id: 216408 do
       notification_model(:name => 'Assignment Due Date Changed')
       notification_policy_model(:notification_id => @notification.id)
       assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
