@@ -953,6 +953,7 @@ da:
         megabytes_tooltip: megabytes
         update_button: Opdater
       report_last_run_never: Aldrig
+      report_running: "Rapporten genereres. *Du vil modtage en e-mail, når den er færdig.*"
       select: 
         mfa: 
           disabled: Deaktiveret
@@ -1362,6 +1363,7 @@ da:
       unread: Ulæst
       your_search_did_not_match_any_announcements: "Din søgning matchede ikke nogle bekendtgørelser."
     podcast_feed_description_course: "Enhver mediefil forbundet fra eller indeholdt i bekendtgørelser i kursus %{course}\" vil forekomme i denne nyhedskilde."
+    podcast_feed_description_group: "Enhver mediefil forbundet fra eller indeholdt i bekendtgørelser i gruppen \"%{group}\" vil forekomme i denne nyhedskilde."
     podcast_feed_name: "%{course} Bekendtgørelser Podcast nyhedskilde"
   anonymous_e1b8ad27: Annonym
   anonymous_user_d984b9ce: "Anonym bruger"
@@ -1584,6 +1586,7 @@ da:
       empty_points_possible: "-/%{pointsPossible} pts"
       no_submission: "Ingen indsendelser"
       no_submission_for_assignment_screenreader: "Ingen indsendselser for denne opgave. %{pointsPossible} mulige points."
+      not_yet_graded: "*Endnu ikke bedømt*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} pts"
       score_with_points_possible_screenreader: "Score: %{score} ud af %{pointsPossible} points."
     assignment_settings: 
@@ -2375,6 +2378,7 @@ da:
     agenda_view: 
       due: Forfalden
       loading: Loading
+      no_events: "*Ingen begivenheder efter denne dato.*"
       starts_at: "Starter ved"
     agenda_view_displaying_start_end: "Viser nu %{start} til %{end}"
     appointment_group_deletion_details: "Sletning af det vil også slette enhver aftale, der er blevet tilmeldt af de studrende."
@@ -2641,9 +2645,13 @@ da:
         assignment_done: "Udført! Opgaven er nu oprettet\" Du kan klikke på den for at se detaljer, redigere og slette begivenhed, eller trække og droppe den til en ny dag for at ændre dato."
         change_date: "Den der er nem. Blot træk begivenheden til den ny dato og slip. Eller du kan klikke på begivenheden og derefter klikke på \"Rediger\" for at være en lillte smule mere nøjagtig."
         create: "For at starte med at oprette en kalender begivenhed, blot klik på dagen i kalenderen, hvor du ønsker begivenheden."
+        create_assignment: "Blot ligesom med en kalenderbegivenhed, klik på datoen du ønsker at tilføje opgaven til. Eller du kan oprette en opgave uden en forfaldsdato ved at klikke på boksen for \"Udaterede begivenheder\" (*Hvor?*)"
         delete: "Klik på begivenhed eller opgave du ønsker at slette på kalenderen."
+        delete2: "Klik nu på \"Slet\" (*Hvor?*) og din begivenhed vil blvie slettet."
         delete_done: "Udført og udført. Det var nogle alvorlige sletteegenskaber du havde der."
         done: "Udført! Begivenheden er nu oprettet! Du kan klikke for at se detaljer, redigere og slette begivenheden, eller trække og droppe den til en ny dag for at ændre datoen."
+        edit: "Godt! Indtast nu blot et navn for begivenheden (*Hvor?*). Du kan specificere en start og slut tid for begivenheden. Eller blot en start tid. Eller ingen starttid overhovedet. Klik \"Indsend\" for at slutte."
+        edit_assignment: "Indtast nu blot et navn for opgaven (*Hvor?*) og opgavegruppen den hører til. Du kan også specificere en forfaldsdato, hvis du ønsker. Klik \"Indsend\" for at slutte."
       labels: 
         i_would_like_to: "Jeg vil gerne"
       links: 
@@ -2707,6 +2715,7 @@ da:
   choose_a_csv_file_to_upload_9644480c: "Vælg en CVS fil at uploade:"
   choose_usage_rights_33683854: "Vælg brugerrettigheder..."
   click_for_more_details_on_this_outcome_8c018d2f: "Klik for flere detaljer for dette resultat"
+  click_here_on_the_calendar_link_c9965631: "Klik her på *Kalender* link"
   click_to_modify_89fa26aa: "Klik for at ændre"
   click_to_report_profile_picture_370f9625: "Klik for at rapportere profilbillede"
   close_and_return_to_canvas_80544344: "Luk og vend tilbage til Canvas"
@@ -2766,6 +2775,10 @@ da:
             EtherPad er et open-source projekt, der hurtigt lader dig opsætte og dele dokumenter.  Det er så hurtigt, at du kan se hvad andre taster mens de taster. På den anden side, "pads" er ikke beskyttet af en adgangskode så enhver person med et link kan redigere dem. EtherPad er bedre end Google Docs, hvis du ønsker at understøtte anonymitet og/eller tillade folk uden Google konti at deltage.  
               
             **Advarsel**: sørg for at du er bekendt med [EtherPad's sletningspolik](%{etherpad_deletion_policy_url}) for at sikre at dit arbejde sikres.
+        google_docs: |-
+            Google Docs er et godt sted at samarbejde på et gruppeproject.  Det er som Microsoft Word, men tillader dig at arbejde sammen med andre på den samme fil på den samme ti uden at skulle emaile det rundt.  
+              
+            **Advarsel**: du (og alle dine samarbejdspartnere) skal have en Google konto for at kunne deltage i Google Docs samarrbejder.
       labels: 
         collaboration_type: "Samarbejde benyttende:"
         description: "Beskrivelse:"
@@ -2863,6 +2876,7 @@ da:
             Hvilken er du?
         none_of_these: "Ingen af disse, jeg er en ny bruger"
         register: "For at kunne oprette din konto, har vi brug for en lille smule mere information."
+        register_with_course: "For at fudlføre tilmelding af dig til kursus **%{course}**, behøver vi en lille smule mere information."
         wrong_account: "Invitation for %{course} var sendt til **%{invited_user}**, men du er for øjeblikket logget ind som **%{current_user}**"
       labels: 
         password: Kodeord
@@ -2873,6 +2887,7 @@ da:
       titles: 
         welcome_aboard: "Velkommen ombord!"
     confirm_failed: 
+      details: "Det ser ud som om du allerede har bekræftet din tilmelding. Forsøg *login* med den e-mailadresse og adgangskode du registrerede. Hvis du ikke kan huske din adgangskode, klik på \"Glemt adgangskode\" link og du skulle få et nyt link, som du kan bruge til at logge ind og genindstille din adgangskode."
       feedback: "Hvis du forsat har problemer, klik på nedentstående \"Hjælp\" link for at søge i guiderne eller for at lade os vide, hvad problemet er."
       page_title: "Registreringsbekræftelse mislykkedes"
       titles: 
@@ -2978,6 +2993,8 @@ da:
         download_file_export: "Fil eksport fra %{date}: *Klik her for download*"
         download_qti: "QTI eksport fra %{date}: *Klik her for download*"
         download_user_export: "Brugerdata eksport fra %{date}: *Klik her for download*"
+      message: 
+        export_started: "Eksportproces er startet. Dette kan tage et stykke tid for større kurser. *Du kan forlade siden* og du vil få en e-mail, når eksport er fuldført."
       no_submissions: "Du har for øjeblikket ingen indsendelser for eksport."
       user_data_exports: "Download indsendelser"
     labels: 
@@ -3284,6 +3301,7 @@ da:
         cant_delete: "Kan ikke slette"
         conclude_enrollment: "Slut denne tilmeldelse"
         delete_enrollment: "Slet denne tilmeldelse"
+        faculty_journal: Fakultetsjournal
         link_enrollment: "Link denne tilmeldelse"
         link_services: "Link webservicer til min konto"
         message_user: "Send besked"
@@ -4072,7 +4090,10 @@ da:
         conclude_course: "Slut kursus"
         delete_course: "Slet kursus"
       details: 
+        conclude_alt_text: "Hvis du ønsker at beholde evnen til at ændre karakterer mens du begrænser  studerende adgang til kurset, venligst benyt kursus dato indstillinger. Du kan lære om kursusdato indstillinger i vores guider *her*."
         confirm_conclude: "Advarsel: Konkludering af kursus vil arkivere al kursus indhold og forhindre dig i at ændre karaktererne."
+        confirm_delete: "Er du sikker på, at du ønsker at slette dette kursus? Når der er slettet, vil studerende og lærer ikke længere have adgang til det. Hvis du ønsker at fjerne det fra kursus rullegardinmenuen, skal du benytte *slut kursus* i stedet."
+        confirm_delete_addendum: "Hvis du ikke har tilladelse til at afslutte kurset, kan du *ændre kurus og dato* eller spørge din administrator om at afslutte kurset."
       headings: 
         confirm_conclude: "Bekræft  afslutning af kursus"
         confirm_delete: "Bekræft sletning af kursus"
@@ -4250,6 +4271,7 @@ da:
       invitations_view: 
         accepted_invitation: "%{name} har allerede modtaget og accepteret en invitation til at deltage i kurset, men du kan stadig sende invitatiionene igen, hvis der er behov for det."
         admin_invitation_unaccepted: "%{name} har endnu ikke accepteret invitationen til at deltage i kurset. Invitationen var sendt %{time}"
+        invitations_pending_publish: "Invitationer er ikke sendt indtil kurset er *offentliggjort*"
         student_invitation_unaccepted_available: "%{name} har endnu ikke accepteret invitationen til at deltage i kurset. Invitationen var sendt %{time}"
         student_invitation_unaccepted_unavailable: "%{name} var tilføjet til kurset: %{time}"
       link_to_students_view: 
@@ -4417,6 +4439,8 @@ da:
         unconclude: "Ikke afsluttet kursus"
       headings: 
         current_users: "Nuværende brugere"
+      help: 
+        reset_course_content: "Nulstilling af kursusindhold vil permanent slette alle associerede opgaver, diskussioner, quizzer, moduler, instruktioner, sider, filer, indlæringsresultater, spørgsmålsbanker, samarbejder, konferencer eller enhvert andet indhold. Denne handling kan ikke fortrydes, og data *kan ikke* blive gendannet. Er du sikker på, at du ønsker at fortsætte?"
       links: 
         calendar: Kursuskalender
         conclude: "Slut dette kursus"
@@ -4469,6 +4493,7 @@ da:
       re_sending: Gen-send
       send_done: "Udført! Besked kan tage et par minutter."
       send_failed: "Forespørgsel mislykkedes. Prøv igen."
+      teachers_only: "Kun lærer kan se dette kursus indtil det er *offentliggjort*"
       titles: 
         drop_course: "Drop dette kursus"
         recent_feedback: "Nylig feedback"
@@ -5227,6 +5252,7 @@ da:
       anonymous_user: Annonym
     pinned_discussions: "Pinned diskussioner"
     reply: 
+      error_saving_reply: "*En fejl opstod*, venligst indsend dit svar igen senere"
       saving_reply: "Gemmer svar..."
     reply_attachment: 
       attachment_label: Bilag
@@ -5390,6 +5416,8 @@ da:
       rte_help: "Rich Text område, tryk ALT+F8 for hjælp"
   editor_button_6647db9c: "Rediger knap"
   either_the_url_or_domain_should_be_set_c29cf8c1: "Enten URL eller domæne skal være angivet."
+  either_you_re_a_new_user_or_the_terms_of_use_have__14f0d0d0: "Du er enten en ny bruger eller *vilkår for brug* er ændret sinden du sidst accepterede dem. Prøv venligst at acceptere til *vilkår for brug* og **fortrolighedspolitik** før du fortsætter."
+  element_option_missing_error_an_element_to_attach__be433478: "`element` mulighed mangler fejl: Et element vedhæftet til TreeBrowserView skal være speciferet, når render muligheden indstilles til 'sand' for BBTreeBrowserView"
   email: 
     default_from_name: "Instructure Canvas"
   email_e366fa29: mail
@@ -5607,11 +5635,14 @@ da:
         share: "Kopier og del dette link for at give andre adgang til din private ePortfolio:"
         view_original: "Se originale fil"
         wizard: "Kom i gang guide"
+      login_required: "Du skal være *logged ind* for at foretage en kommentar på denne page."
       new_section: "Ny sektion"
       no_comments: "Ingen Kommentarer"
       no_files: "Ingen filer uploaded"
       no_submissions: "Ingen indeselser fundet"
+      private_comments: "Lige nu kan kun du se kommentare for denne side. Du kan gøre kommentarerne offentlige, hvis du ønsker ved at *ændre indstillingerne for denne side*."
       private_eportfolio: "Det betyder, at folk ikke kan finde den eller endda se den uden tilladelse. Du akn se den, siden det er din portfolio, men hvis du ønsker at lade andre se den, skal du kopiere og dele det følgende specielle link så de kan få adgang til din portfolio:"
+      public_eportfolio: "Det betyder, at enhver der kender adressen på din portofolie kan se den. Du kan gøre din portfolio privat ved at *ændre dine portfolio indstillinger*."
       recent_submissions: "Klik på enhver indsendelse for at tilføje den til en ny side i dein ePortfolio."
       titles: 
         already_used: "Denne indsendelse er allerede inkluderet i din portfolio"
@@ -5892,6 +5923,7 @@ da:
       all: Alle
       app_headder: "Ekstern app"
       external_tools_note: "Apps er en nem måde at tilføje nye funktioner til Canvas. De kan tilføjes til individuelle kurser, eller til alle kurser i en konto. Når de er konfigureret kan du forbinde dem gennem kursus moduler og oprette opgaver for bedømmelsesværktøjer."
+      external_tools_references: "*See nogel LTI værktøjer*, der virker storartet med Canvas. Du kan også tjekke ** Canvas fællesskabsemner om LTI værkthøjer**"
       installed: Installeret
       not_installed: "Ikke installeret"
       search_filter: "Filtrer efter navn"
@@ -6452,6 +6484,7 @@ da:
         title: Titel
       links: 
         add_column: "Tilføj kolonne"
+      mark_attendance_info: "Deltagelsesvisning viser en tabel med studerende listet til venstre og opgaver lsitet over toppen. For at markere en studerende som tilstedeværende eller faværende klik på den korresponderende boks indtil den viser den korrekte markering (%{present_icon}  for tilstede, %{absent_icon} for fraværende). Du kan også se rullegardinsmenuen for hver opgave for at markere alle som tilstedeværende eller fraværende."
       new_group: "Ny gruppe"
       page_title: Deltagelse
       points_abbrev: pts
@@ -7021,6 +7054,7 @@ da:
         save: Gem
         saving: Gemmer...
         self_signup: Selv-tilmelding
+        split_into_groups: "Inddel studerende ind i %{num_groups} lige grupper"
       group_category_detail: 
         add_group: "Tilføj gruppe"
         category_settings: Indstillinger
@@ -7155,6 +7189,7 @@ da:
     how_is_this_affecting_you: "Hvordan dette pårviker dig?"
     i_cant_get_things_done_until_i_hear_back_from_you: "Jeg kan ikke få gjort ting, før jeg har hørt fra dig"
     i_need_some_help_but_its_not_urgent: "Jeg har brug for hjælp, men det er ikke presserende"
+    include_a_link_to_a_screencast_or_screenshot_using_something_like_jing: "Inkluder et link til et skærmbillede ved at benytte f.eks. *Jing*."
     instructor_question: "Stil et spørgsmål til din instruktør"
     instructor_question_sub: "Spørgsmål er indsendt til din instruktør"
     just_a_casual_question_comment_idea_suggestion: "Blot et flygtigt spørgsmål kommentar, ide, forslag"
@@ -7164,6 +7199,7 @@ da:
     report_problem: "Rapporter et problem..."
     report_problem_sub: "Hvis Canvans ikke opfører sig ordentlig, fortæl os om det"
     search_the_canvas_guides: "Søg i Canvas Guides"
+    see_if_your_issue_is_addressed_in_the_canvas_guides: "Undersøg om dit problem er omtalt i *Canvas Guides*."
     send_message: "Send besked"
     sending: Senger...
     somethings_broken_but_i_can_work_around_it_for_now: "Noget er i stykker, men jeg kan arbejde omkring det for nævrende tid"
@@ -7231,6 +7267,7 @@ da:
       Som standard vil Canvas forsøge at benytte Flash først til at afspille videoer. Aktiver dette ved at bruge HTML5 først,
       derefter gå tilbage til Flash.
   html_editor_fb2ab713: "HTML Editor"
+  i_agree_to_the_terms_of_use_and_privacy_policy_f41760cc: "Jeg acceptere *betingelser for brug* og **fortrolighedspolitik**."
   i_have_obtained_permission_to_use_this_file_6386f087: "Jeg har opnået tilladelse til at bruge denne fil."
   i_hold_the_copyright_71ee91b1: "Jeg har copyright"
   ic_actions: 
@@ -7407,6 +7444,10 @@ da:
       strand: strand
       tag: mærke
       worker: arbejder
+    confirm: 
+      destroy_all: "Er du sikker på,a t du ønsker et ødelægge *alle* job af denne type og matchende denne forspørgsesl?"
+      hold_all: "Er du sikker på, at du ønsker at holde *alle* job af denne type og matchende denne forespørgsel?"
+      unhold_all: "Er  du sikker på, at  du ønsker at slippe *alle* job af denne type og matchende denne forspørgsel?"
     index: 
       actions: 
         show: vis
@@ -7472,6 +7513,7 @@ da:
   launch_url_e150bd41: "Start URL"
   layouts: 
     application: 
+      bouncing_communication_channels: "Der ser ud til at være et problem med en af dine kontaktmetoder. Tjek venligst din *Indstillingsside*."
       group_switch: Skift
       javascript_required: "Du skal have JavaScript aktiveret for at kunne få adgang til denne side."
       keyboard_navigation: 
@@ -8441,6 +8483,7 @@ da:
             Der var et problem med eksportering af kursus "%{course}".
             Notificer venligst din system administrator, og giv dem den følgende eksport identifikation: %{id}.
         html: 
+          body2: "Der var et problem med eksportering af kursus *%{course}*. Notificer venligst din system administrator, og giv dem den følgende eksport identifikation: "
           link: "Klik for at se eksporter"
           subject: "Kursuseksport mislykkedes: %{course}"
         subject: "Kursuseksport mislykkedes: %{course}"
@@ -8917,6 +8960,7 @@ da:
         body: "En konto er blevet oprettet for dig på %{host}, men du har allerde en Canvas konto. Hvis du ønsker at flette dem sammen, besøg venligst det følgende url:"
         html: 
           account_created: "En konto er belvet oprettet for dig hos %{host},, men du har allerede en Canvas konto."
+          merge2: "Hvis du ønsker at flette dem sammen, *klik her!*"
           subject: "Ny Canvas konto"
         subject: "Ny Canvas konto"
     message: 
@@ -8974,6 +9018,8 @@ da:
         html: 
           body_account: "Du er blevet tilføjet til en ny gruppe for konto %{account}. Navnet på gruppen er %{group_name}."
           body_course: "Du er blevet tilføjet til en ny gruppe for kursus %{course}. Navnet på gruppen er %{group_name}."
+          html_details_account2: "Du kan se, hvilke grupper du er en del af for denne kkonto ved at *klikke her*"
+          html_details_course2: "Du kan se, hvilke grupper du er en del af for dette kursus ved at *klikke her*"
           subject: "Nyt gruppemedlemsskab for %{course_or_account}"
           title: "Nyt gruppemedlems: %{group_name}"
         subject: "Nyt gruppemedlemsskab for %{course_or_account}"
@@ -9220,6 +9266,7 @@ da:
         link_message: "Du kan se quizen her:"
         subject: "Quiz ombedømmelse afsluttet: %{quiz}, %{context}"
       sms: 
+        body_sms: "Quiz ombedømmelse afsluttet: %{title}, %{context}"
         more_info: "Mere information %{url}"
       summary: 
         body: "En ombedømmelse er aflsuttet for din quiz  %{title}."
@@ -9254,6 +9301,8 @@ da:
       summary: 
         body: "Du er blevet påmindet om at vurdere: %{rubric}, %{context}:"
         subject: "Påmindelse om vurdering: %{rubric}, %{context}"
+      twitter: 
+        tweet: "Canvas Notifikation - Påmindelse:  vurder %{rubric}, %{context}"
     rubric_association_created: 
       email: 
         body: "En ny vurdering er blevet oprettet for %{context}:"
@@ -9442,6 +9491,7 @@ da:
     topic_locked_at: "Dette emne blev låst %{at}."
     topic_locked_module: "Dette emne er en del af modulet *%{module}*  og er endnu ikke blevet låst op."
     topic_locked_until: "Dette emne er låst indtil %{date}."
+    topic_module_time_locked: "Dette emen er en del af modulet *%{module}*, der er låst indtil %{time}."
     topic_unpublished_module: "Dette emne er en del af en ikke offentliggjort modul og er endnu ikke tilgængelig."
     updated_wiki_page: 
       email: 
@@ -9459,6 +9509,7 @@ da:
         subject: "Opdateret Wiki side: %{title}, %{user}"
       twitter: 
         tweet: "Canvas Notifikation - Side opdateret: %{title}, %{user}."
+    visit_modules_page: "*Besøg kursus modulside for information om, hvordan indholdet kan låses op.*"
     web_conference_invitation: 
       email: 
         body: "du er blevet inviteret til at deltage i en webkonference, %{title} for %{name}."
@@ -9656,6 +9707,10 @@ da:
     relock_modules: "Lås moduler igen"
     requirements_changed: "Betingelserne blev ændret"
   modules_item_controller: 
+    max_score_complete: "scorede ikke mere end *score*"
+    max_score_incomplete: "skal ikke score mere end *score*"
+    min_score_complete: "scorede mindst *score*"
+    min_score_incomplete: "skal score mindst *score*"
     must_contribute_complete: "bidrog til indholdet af siden"
     must_contribute_incomplete: "skal bidrage til indholdet af siden"
     must_submit_complete: "indsendte opagven"
@@ -9704,6 +9759,8 @@ da:
   name_3806192d: "Navn:"
   name_app_has_been_deleted_fb2d9426: "%{name} app er blevet slettet"
   name_error_fee4236: Navnefejl
+  name_has_been_successfully_installed_but_has_not_y_c3148b96: "*navn* er blevet succesfuldt installeret, men er endnu ikke blevet aktiveret."
+  name_is_currently_status_9065c996: "*navn* er for øjeblikket **status**."
   name_only_5f56718e: "Kun navn"
   near_mastery_f25174a4: "Nær beherskelse"
   new_account_role_6e5c4964: "Ny kontorole"
@@ -9739,6 +9796,7 @@ da:
   not_now_97efd947: "Ikke nu"
   note_some_items_fall_outside_the_start_and_or_end__feab0642: "Bemærk: nogle elementer falder udenfor start- og/eller slutdato for kurset"
   note_students_have_submitted_work_for_these_assign_7bc34e28: "BEMÆRK: Studerende har indsendt arbejde for disse opgaver, der ikke er blevet bedømt. Hvis du poster disse karaktere nu, skal du gen-postere deres scorer efter bedømmelse af deres indsendelser."
+  note_this_login_s_account_uses_delegated_authentic_89227914: "Bemærk: Denne login's konto benytter delegeret autencitet. Adgangskodefeltet i denne form opdatere reserve Canvas adgangskode, *ikke* den delegerede autenticering."
   notification: 
     added_to_conversation_description: "Du er tilføjet til en koversation"
     added_to_conversation_display: "Tilføjet til konversation"
@@ -9973,6 +10031,7 @@ da:
       parent: "Forældre e-mails"
       scheduling: Planlægning
   notifications_cbfa7704: Notifikationer
+  now_click_the_agenda_button_607fb40e: "Klik nu på *Dagsorden* knappen"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "Nu da dit kursus er sat op og tilgængeligt, vil du formodentlig ikke længere behøve denne checkliste. Men vi vil beholde den i nærheden, skulle du senre få brug for at prøve nogete nyt, eller du ønsker en lillle smule ekstrea hjælp, når du ændrer dit kursus indhold."
   num_messages_c1949bbc: 
     one: "1 besked"
@@ -10113,6 +10172,7 @@ da:
     find_instructions: 
       instructions: 
         find: 
+          description: "*Få adgang til resultater oprette af din institution, eller stat her. Blot synes om dit kurus, panelet til venstre vil tillade dig at navigere mellem eksisterende resultater. Når du har fundet det resultat eller den resultatgruppe du ønsker at benytte, klik import knappen nedenfor for at tilføje den til dit kursus.*"
           title: "Finder resultater"
     flash: 
       addSuccess: "Oprettelse lykkedes"
@@ -10128,6 +10188,7 @@ da:
       instructions: 
         main: 
           manage: 
+            description: "*Resultater er oprettet her for at spore beherskelse af et kursus. For at komme i gang, tjek menubaren øverst oppe. Klik på ny knappen for at oprette et nyt resutlat, eller ny gruppe knappen for at oprette en ny gruppe at organisere dine resultater ind i. Find knappen vil tillade digat benytte resultater, der er blevet oprettet af din stat eller institution. Mens du opretter eller bruger resultater, vil du være i stand til at bruge panellet til venstre for at navigere gennem dine resultater. Du kan trække og droppe resultater mellem forskellige niveauer for at skabe struktur.* *Vigtigere, Canvas kan tillade dig at tilføje resultater til din bedømmelsesinstruktioner, så du kan evaluere beherskelse mens du bedømmer opgaver. Når du har sat op resulater, klik administrer instruktioner for a starte med at bruge dine resultater for bedømmelse.*"
             title: "Opsætter resultater"
     mastery_error: "Skal være større end eller lig med 0"
     missing_outcome: "Kunne ikke finde indlæringsresultater"
@@ -10240,6 +10301,8 @@ da:
     notices: 
       delete_failed: "Siden \"%{title}\" kunne ikke slettes."
       page_deleted: "Denne side \"%{title}\" er blevet slettet."
+    reload_editing_page: "Dene side er ændret siden du begyndte at redigere den. *Genopfriskning* vil  miste alle ændringer."
+    reload_viewing_page: "Denne side er ændret siden du begyndte at se den. *Genopfrisk*"
     restore_failed: "Gendannelse af side revision mislykkedes"
     save_button: Gem
     saving_button: Gemmer...
@@ -10413,6 +10476,9 @@ da:
       description: "Google Docs dokument deling"
       name: "Google Docs"
     google_docs_settings: 
+      description: |-
+          Du skal [registrere dit domæne hos Google](%{google_url}).
+          Noter din "OAuth forbruger nøgle" og "OAuth forbuger hemmelighed" værdier.
       labels: 
         api_key: "OAuth forbrugernølge"
         secret_key: "OAuth forbruger hemmelighed"
@@ -10684,6 +10750,7 @@ da:
       select_profile_picture: "Vælg profilbillede"
       selecting_image: "Vælg billede..."
     communication: 
+      confirm_email_instructions: "Før du kan modtage notifikationer, skal du bekræfte din e-mailadresse (%{email}) ved at klikke linket i den e-mail vi har sendt til dig. Hvis du ikke ser det, *Klik på  send e-mail igen*, og sørg for at tjekke din spamboks."
       crumb_notification_preferences: Notifikationsindstilinger
       headers: 
         notification_preferences: Notifikationsindstillinger
@@ -10724,6 +10791,7 @@ da:
       page_title: "Studerende observeres"
     please_select_an_option: "Vælg venligst en mulighed"
     profile: 
+      access_token_description: "Adgangstoken kan benytte til at tillade andre applikationer at foretage API opkald på dine vegne. Du kan også generere adgangstokens og *benytte Canvas Open API* for at komme med dine egne integrationer."
       approved_integrations: "Disse er trejde part applikationer, som du har autoriseret til at få adgang til Canvas siden på dine vegne:"
       buttons: 
         add_picture_file: "Tilføj fil"
@@ -10739,6 +10807,7 @@ da:
         save_yo_name: "Gem Yo navn"
         select_image: "Vælg billede"
         update_settings: "Opdater Indstillinger"
+      confirm_email_instructions: "Før du kan redigere din profil, skal du bekræfte din e-mailadresse (%{email}) ved at klikke på linket i den e-mail vi har sendt til dig. Hvis du ikke kan se det, *klik på send e-mail igen*, og sørg for at tjekke din spamboks."
       delicious_description: "Delicious er et værktøj, der lader dig gemme og dele dine bogmærker med andre. Canvas's rich content editor vil lade dig søge dine Delicious mærker for nemt at forbinde fra Canvas til andre resurser som du finder nyttinge."
       diigo_description: "Diigo er et socialt bogmærkværktøj specielt skræddersyet til forskning og undervisning. Canvas's rich content editor vil lade dig søge dine Diigo mærker for nemt at forbinde fra Canvas til andre resurser du finder nyttige."
       error_loading_token_details: "Fejl under loading af nøgle detaljer"
@@ -10948,6 +11017,7 @@ da:
     ways_to_contact_me: "Måder at kontakte mig "
     yo_select: 
       yo: Halløj!
+    you_have_no_services: "Du har ikke registreret nogle servicer, du kan tilføje nogle vis *indstillings* siden."
   profile_6bd2baed: Profil
   profiles: 
     avatar_dialog: 
@@ -10957,6 +11027,7 @@ da:
     gravatar_view: 
       button: 
         preview: Forhåndsvisning
+      enter_gravatar_email_below: "indtast dit *Gravatar* e-mailadresse nedenfor"
     notification_preferences: 
       captions: 
         notification_preferences: "%{name} notifikation begivnehder og indstillinger"
@@ -11152,7 +11223,10 @@ da:
   quiz: 
     regrade: 
       give_everyone_full_credit: "Giv alle topkarakter for dette spørgsm¨ål."
+      no_scores_reduced: "Beløn points for både rettede og tidligere rettede svar (*ingen score vil blive reduceret*)"
       regrade_disabled: "Ombedømmelse er ikke tilladt for dette spørgsmål, fordi entenet svar blev fjernet eller spørgsmålstypen blev ændret efter en studerende gennemførte en indsendelse."
+      regrade_options: "Ombedømmelsesmuligheden *(for studerende, der allerede har besvaret dette spørgsmål):*"
+      some_scores_reduced: "Kun tildel points for det korrekte svar (*nogle studerendes score kan måske blive reduceret*)"
       update_question_without_regrading: "Opdater spørgsmål uden ombedømmelse"
   quiz_e0dcce8f: Quiz
   quiz_log_auditing: 
@@ -11284,6 +11358,7 @@ da:
       discrimination_index: Diskriminationsindeks
       discrimination_index_dialog_title: Diskriminationsindeksgraf
       discrimination_index_dialog_trigger: "Lær mere om diskriminationsindeks."
+    discrimination_index_help: "* Denne parameter giver et mål af, hvor godt et enkelt spørgsmål kan bestemme forskellen (eller diskriminere) mellem studerende, der gør det godt ved en eksamen og dem, der ikke klarer sig godt. * ** Det inddelser studerende ind i tre grupper baseret på deres score over hele quizzen og viser de grupper, der har svaret korrekt på spørgsmålet. ** *** ****Mere information er tilgængelig her.**** ***"
     download_submissions: "Download alle filer"
     duration_in_hours: 
       one: "1 time"
@@ -11440,6 +11515,7 @@ da:
     ldb_login_popup: 
       email: Email
       log_in: Login
+      logged_out_of_canvas: "*Du er blevet logget ud af canvas.* For at fortsætte log venligst ind."
       password: Kode
       titles: 
         log_in: Login
@@ -11655,6 +11731,7 @@ da:
         titles: 
           add_new_question_group: "Tilføj en ny spørgsmålgruppe"
       form_answer: 
+        answer_in_range_accessible: "mellem *område start* og #område slut#"
         answer_text: "Svar tekst"
         answer_weight: "Svar vægtning"
         exact_answer_with_error_margin_accessible: "*nøjagtigt svar* med fejl margin #fejl margin#"
@@ -12458,6 +12535,7 @@ da:
         password_confirmation: "Bekræft Kodeord"
         username: Brugernavn
     teacher_dialog: 
+      agree_to_terms_and_pp: "Du accepterede *vilkår for brug* og vedkender dig **fortrolighedspolitikken**."
       buttons: 
         start_teaching: "Start med at undervise"
       labels: 
@@ -12912,6 +12990,7 @@ da:
         crosslist_this_section: "Krydslist denne sektion"
         current_enrollments: "Nuværende tilmeldinger"
         decrosslist_section: "Afkrydslist denne sektion"
+  see_some_lti_tools_that_work_great_with_canvas_you_3c27bc7b: "*Se nogle LTI værktøjer* der virker godt med Canvas. Du kan også tjekke **Canvas Fællesskabsemner om LTI værktøjer**."
   select_a_grading_period_aab25483: "Vælg en bedømmelsesperiode"
   select_content: "Vælg indhold"
   select_content_checkbox: 
@@ -12981,7 +13060,11 @@ da:
   send_e3bd0ed0: Send
   sequence_footer: 
     next_module: "Næste modul:"
+    next_module_desc: "Næste modul: *modul*"
+    next_module_item_desc: "Næste *element*"
     prev_module: "Forrige modul:"
+    prev_module_desc: "Forrige modul: *modul*"
+    prev_module_item_desc: "Forrige: *element*"
   service_cloud_ticketing_connector_889e1b7b: "Service Cloud Ticketing Connector"
   services_api: 
     must_be_logged_in: "Du skal være logget ind for at benytte Kaltura"
@@ -13321,6 +13404,7 @@ da:
     new_course_form: 
       cancel: Annuller
       course_cose_explanation: "Dette vil blive vist i steder med lidt rum"
+      course_is_public_explanation: "Gør kursus offentlig synlig *(studenrendes data vil forsat være privat)*"
       create_course: "Opret kurus"
       creating_course: "Oprette kursus..."
       labels: 
@@ -13392,6 +13476,7 @@ da:
       close: luk
       unread: Ulæst
     registration_incomplete: 
+      confirm_email_instructions: "Før du kan se denne side, skal du *verificere din e-mailadresse* (%{email}). Klik link i din e-mail for at fulføre opsættelse af din konto. Hvis du ikke ser e-mailen, **klik for at sende igen**, og vær sikker på at tjekke din spamboks."
       headings: 
         confirm_email: "Bekræft din e-mailadresse"
     right_side: 
@@ -13507,13 +13592,21 @@ da:
       add_to_module: "Tilføj %{item} til *modul*"
       assignment_item: Besvarelse
       assignment_item_select_label: "Vælg opgaven du ønsker at associere, eller tilføj en opgave ved at sævlge \"Ny opgave\"."
+      assignment_notice: "Vælg den opgave du ønkser at associere med dette *modul*, eller tilføj en opgave ved at vælge *Ny opgave*."
       content_page_item: Indholdsside
       discussion_item: Diskussion
       discussion_topic_select_label: "Vælg det emne du ønsker at associere, eller tilføj et emne ved at vælge \"Nyt emne\"."
       domain_match_notice: "for at benytte dette værktøj skal domænet matche %{domain}"
       external_tool_item: "Eksternt Værktøj"
+      external_tool_notice: "Vælg et værktøj fra nedenstående liste, eller indtast URL for et eksternt værktøj du allerede ved er konfiguret med Basic LTI for at tiljøfe et link til dette *modul*."
       external_url_item: "Eksternt URL"
+      external_url_notice: "Indtast et URL og sidenavn for tilføjelse af link til enhver webside URL til dette *modul*."
       file_item: Fil
+      file_notice: "Vælg den fil du ønsker at associere med dette *modul*, eller tilføj en fil ved at vælge \"Ny fil\"."
+      indent_level: 
+        one: "*Indryning 1 niveau*"
+        other: "*Indrykning %{count} niveauer*"
+        zero: "*Indryk ikke*"
       labels: 
         assignment_name: "Opgave navn"
         file: Fil
@@ -13536,9 +13629,13 @@ da:
       options: 
         assignments: Opgaver
       quiz_item: Quiz
+      quiz_notice: "Vælg den quiz du ønsker at associere med dette *modul*, og tilføj en ny ved at vægle \"Ny quiz\"."
       quiz_select_label: "Vælg den quiz du ønsker at associere, eller tilføj en ny ved at vælge \"Ny quiz\"."
       select_item_type_label: "Vælg typen af indhold der skal tilføjes."
+      sub_header_notice: "Indtast den tekst, du ønsker at tilføje som et *modul* under-toptekst"
       text_header_item: Toptekst
+      topic_notice: "Vælg det emne du ønsker at associere med dette *modul*, eller tilføj et emne ved at vægle \"Nyt emne\"."
+      wiki_page_notice: "Vælg den wiki side du ønsker at associere med dette *modul*, eller tilføj en ny side ved at vælge \"Ny side\"."
       wiki_page_select_label: "Vælg den wiki side du ønsker at associere med dette 'modul', eller tilføj en ny side ved at vælge \"Ny side\"."
     submission_comment: 
       assignment: Besvarelse
@@ -13576,6 +13673,7 @@ da:
       labels: 
         alert: Alarm
         notice: Bemærk
+      no_valid_users: "*Beklager*, det ser ud til at der var en gyldig e-mailadrese eller login ID indtastet, gå venligst tilbage og prøv igen."
       titles: 
         new_user: "Nu bruger"
       user_list_explanation: "Prøvformat: \"Eksempel Student\" <student@example.com>, \"Efternavn, Fornavn\" <firstlast@example.com>, justAnEmailAddress@example.com"
@@ -13969,6 +14067,7 @@ da:
         resubmit: "Indsend opgave igen"
         submit: "Indsend opgave"
       media_comment: Mediakommentar
+      media_comment_link: "Dette er en mediekommentar,*klik her for at se*."
       only_see_your_own_comments_muted: "Du kan muligvis ikke se alle kommentarer lige nu, fordi opgaven for øjeblikket er ved at blive bedømt "
       only_see_your_own_comments_peer: "Som peer review studerende vil du kun se kommentarer skrevet af dig."
       options: 
@@ -13987,11 +14086,14 @@ da:
       teachers_notified_of_comments: "Lærer og indsender vil blive informeret om alle kommentarer."
     show_preview: 
       anonymous_username: "Denne studerende"
+      discussion_submission_description: "Indsendelsen for denne opgave er poster i opgavens dikussion. Nedenfor er diskussionsposterne for %{user}, eller du kan *se hele diskussionen*."
       discussion_submission_description_without_link: "Indsendelser for denne opgave er posteret i opgavens diskussion. Nedenfor er diskussionsposter for %{user}."
       entry_no_image: "Husk på at denne side har mulgivis ændret sig siden indsendelsen oprindeligt forekom."
       entry_with_image: "Vi har inkluderet et øjebliksbillede af, hvad siden så ud som, da den blev indsendt. Eller du kan klikke for at se original indsendelse."
       external_url_submission: "Denne indsendelse var et URL til en ekstern side."
+      group_discussion_submission_description: "Indsendelser for denne opgave er posteret i opgavens diskussion for denne gruppe. Nedenfor er diskussionsposter for %{user}, eller du kan *se hele gruppediskussionen*."
       group_discussion_submission_description_without_link: "Indsendelser for denne opgave er posteret i opgavens diskussino for denne gruppe. Nedenfor er diskussionsposter for %{user}."
+      media_comment_link: "Denne indsendelse er en medieoptgelse. *klik her for at se.*"
       no_files: "Ingen filer blev uploadet for denne indsendelse"
       no_preview_available: "Ingen forhåndsvisning tilgængelig"
       no_submission: "Ingen indsendelser"
@@ -14106,6 +14208,7 @@ da:
         sis_id: "SIS ID"
         students_can_access_from: "**Studerende** kan få adgang fra"
         tas_can_access_from: "**TAs** kan få adgang fra"
+        teachers_can_access_from: "**Lærer** kan få¨adgang fra"
       name: "Periode Navn:"
       sis_source_id: "SIS ID:"
       term_runs_from: "**Terming løber** fra"
@@ -14200,6 +14303,7 @@ da:
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Dette resultat er bleveet benyttet til at vurdere en studerende og kan ikke blive redigeret eller slettet"
   this_outcome_has_been_used_to_assess_a_student_the_1f04402e: "Dette resultat er blevet benyttet til at vurdere en studerende. Beregningsmetoden er låst"
   this_outcome_has_been_used_to_assess_a_student_the_1ff3a596: "Dette resultat er blevet benyttet til at vurdere en studerende. Beregningsværdien er låst"
+  this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Denne quiz er ikke offentliggjort* Kun lærerer kan se quizzen indtil den er offentliggjort."
   this_student_wrote_f1a3f22d: "Denne studerende skrev:"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Dette vil tillade dig at autoricere Canvas for postering af karakterere til SIS"
   ticketing_system_52205bff: Fejlmeldingssystem
@@ -14416,6 +14520,7 @@ da:
       Hvis udbyderen kan konfigurere gyldigt callback eller omdirigere URL'er, benyt %{callback_url}.
   to_link_the_course_observer_name_to_a_student_star_f993c826: "For at forbinde kursus observatør *%{name}* til en studerende, begynd med at indtaste den studerendes navn for at finde dem og klik derefter opdater."
   to_minscore_43e5452e: "til %{minScore}%"
+  to_view_assignments_make_sure_the_agenda_view_is_a_5695abfd: "For at se  opgaver, sørg for at *Dagsorden* visning er aktiv."
   tolerance_value_9e96573c: Toleranceværdi
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "For mange mislykkede login forsøg. Prøv venligst igen senere eller kontakt din system administrator."
   too_many_members_b8b15069: "For mange medlemmer"
@@ -14487,6 +14592,7 @@ da:
   usage_rights_f0960ad6: Brugsrettigheder
   usage_rights_have_been_set_d1b433c7: "Brugsrettigheder er blevet indstillet."
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Brugsrettigheder vil blive sat for alle filer indholdt i:"
+  use_a_single_16x16_32x32_48x48_ico_file_60bc8d91: "Brug en *enkelt 16x16, 32x32, 48x48 ico fil*.."
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Brug det nye quiz LTI værktøj i stedet for regulære canvas quizzer"
   used_by_permission_314a78dd: "Benyttet med tilladelse"
   user: 
@@ -14566,6 +14672,7 @@ da:
       updating_user_details: "Opdaterer brugerdetaljer..."
     notices: 
       image_reported: "Dette blillede er blevet rapporteret"
+  user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}, du skal *logge ind* før du kan se den side."
   user_navigation_a097be0f: "Bruger navigation"
   user_notes: 
     confirms: 
@@ -14764,6 +14871,11 @@ da:
     masquerade: 
       are_you_sure_start: "Er du sikker på, at du ønsker at maskere dig som denne bruger?"
       are_you_sure_stop: "Er du sikker på, at du ønsker at stoppe maskering?"
+      details: |-
+          Maskering er essentielt at logge ind som denne bruger uden en adgangskode.
+          Du vil være i stand til at foretage enhver handling som om du er denne bruger, og fra andre brugeres synspunkt,
+          vild et være som om denne bruger udførte dem. Ikke desto mindre, kontorl logs vil registrere, at
+          et er **dig** der rent faktisk udførte handlingerne på denne brugers vegne.
       masquerade_as: "Maskering som %{user_name}"
       page_title_header: "Maskering som bruger"
     merge_results: 
@@ -14810,12 +14922,14 @@ da:
       almost_there: "Du er næsten der..."
       done_resending: "Udført! Besked kan tage et par minutter."
       failed_resending: "Forespørgsel mislykkedes. Prøv igen."
+      invite_to_read: "Vi invitere dig til at se dette korte overblik af Canvas. Du kan også *læse om hvordan Canvas hjælper* med at bringe studerende i 27 lande tættere til forlæsningssteder, instruktører og klassekammerater."
       links: 
         download_pdf: "download PDF"
       need_flash: "Du behøver Flash Player 8+ og JavaScript aktiveret for at se denne video."
       overview_video: "Overse video af Canvas"
       registration_complete: "Registrering fuldført"
       resending: Gen-send
+      sent_email_paragraph: "Vi sendte en e-mail til %{email_address}. *Klik link til e-mail for at fuldføre registrering*. Hvis du ikke ser den, **klik på send e-mail igen**, og sørg for at tjekke din spamboks."
       while_you_wait: "Mens du venter..."
     scheduled_conference: 
       current_conference_text: "Du er blevvet inviteret til at deltage i %{conference}. Den starter %{starts_at}."
@@ -14926,11 +15040,14 @@ da:
   widget: 
     upload_media_track_form: 
       choose_a_language: "--Vælg et sprog--"
+      error_message: "*Fejl:* Du skal vælge et sprog og en gyldig sporingsfil."
       file: Fil
       language: Sprog
       media_track_form_button: "Gå til undertekstværktøj"
+      upload_media_track_form_description: "Når du har en undertitel i enten SRT eller *WebVTT* format, kan du uploade den her."
       upload_media_track_form_description_1: "Kopier dette video url:"
       upload_media_track_form_description_2: "Opret en undertekstfil ved a klikke på dette link og følge instruktionerne."
+      upload_media_track_form_description_3: "Upload en undertekst spor i enten SRT eller *WebVTT* format."
       upload_media_track_form_step1_label: "Trin 1:"
       upload_media_track_form_step2_label: "Trin 2:"
       upload_media_track_form_step3_label: "Trin 3:"
@@ -15095,7 +15212,10 @@ da:
   you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: "Du kan skjule elle vise et kursus opgaver ved at skifte mellem dem  on eller off."
   you_can_log_in_directly_with_this_provider_by_goin_467d7f66: "Du kan logge ind direkte med denne udbyder ved at gå til %{url}"
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "Du akn nu se ombedømmelsesmuligheder for studrende, der allerede har taget quizzen."
+  you_can_try_to_log_in_again_2b23ef0f: "Du kan forsøge at *logge ind igen*."
   you_have_changed_the_progression_requirements_for__6772bc89: "Du har ændret forudsætningerne for et aktivt kursus. Der er måske studerennd, der allerede er i gang med dette modul og andre, der afhænger af det."
+  you_have_made_changes_to_the_questions_in_this_qui_1658361a: "*Du har foretaget ændringer til spørgsmål i denne quiz.* Disse ændringer vil ikke blive vist til de studerende indtil du har gemt quizzen."
+  you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Du har ingen resultater. *Klik her* for at oprette dem."
   you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "Du har ingen resultater. Klik her for at gå til resultatsiden."
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "Du har nået det maksimale antal webhooks pr. kontogrænse  (%{max})"
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "Du har npet det makstimale antal webhooks pr. brugergrænse (%{max})"
@@ -15131,7 +15251,10 @@ da:
       Du skal konfigurere %{callback_url} som tilbagekald URL, og sætte adgangsniveau til
       Læs, skriv og adgang til direkte beskeder
       Når du har oprettet din applikation, noter Consumer Key og Consumer Secret, og indtst dem her.
+  your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Din opgavelsite kan nu findes på *Kalender* siden."
+  your_assignments_list_has_improved_3eded80e: "Din *opgaveliste* er forbedret!"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: "Dine opgaver vil blive vist her sorteret efter forfaldsdato."
+  your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "Din browser kan ikke opfylde minimums krav for Canvas. Besøg venligst *Canvas fællesskab* for en fuldstænding liste af understøttede browsere."
   your_content_has_been_exported_bbb57764: "Dit indhold er blevet eksporteret."
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: "Din fil er blevet uploadet til Gradebook, og du kan forlade denne side til enhver tid. Hvis du har en stor CSV fil, vil dine ændringer måske tage et par minutter at opdatere. For at forhindre overskrivning af data, bekræft venligst upload er fuldført, og at din Gradebook er korrekt før andre yderligere ændringer."
   your_message_has_been_sent_thank_you_e0284316: "Din besked er blevet sendt. Tak!"

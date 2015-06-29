@@ -62,6 +62,6 @@ class Login::OauthController < Login::OauthBaseController
   protected
 
   def callback_uri
-    oauth_login_callback_url(id: @aac)
+    oauth_login_callback_url(id: @aac.global_id)
   end
 end
