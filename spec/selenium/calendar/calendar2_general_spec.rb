@@ -83,7 +83,7 @@ describe "calendar2" do
       expect(assignment2.assignment_group).to eq group2
     end
 
-    it "editing an existing assignment should preserve more options link", :priority => "1", :test_id => 138854 do
+    it "editing an existing assignment should preserve more options link", priority: "1", test_id: 138854 do
       assignment = @course.active_assignments.create!(:name => "to edit", :due_at => Time.zone.now)
       get "/calendar2"
       f('.fc-event').click
@@ -122,7 +122,7 @@ describe "calendar2" do
       expect(f('.undated_event_title').text).to include_text("undate me")
     end
 
-    context "event editing", :priority => "1", :test_id => 138853 do
+    context "event editing", priority: "1", test_id: 138853 do
       it "should allow editing appointment events" do
         create_appointment_group
         ag = AppointmentGroup.first
@@ -227,7 +227,7 @@ describe "calendar2" do
       end
     end
 
-    it "tooltip is correct for creating new event", :priority => "1", :test_id => 138852 do
+    it "tooltip is correct for creating new event", priority: "1", test_id: 138852 do
      load_month_view
 
       driver.mouse.move_to f("#create_new_event_link")
@@ -237,7 +237,7 @@ describe "calendar2" do
       expect(tooltip).to include_text 'Create New Event'
     end
 
-    it "graded discussion appears on all calendars", :priority => "1", :test_id => 138851 do
+    it "graded discussion appears on all calendars", priority: "1", test_id: 138851 do
       create_graded_discussion
 
       load_agenda_view
@@ -250,7 +250,7 @@ describe "calendar2" do
       expect(f(".fc-event-title")).to include_text('Graded Discussion')
     end
 
-    it "event appears on all calendars", :priority => "1" do
+    it "event appears on all calendars", priority: "1" do
       title = "loom"
       @course.calendar_events.create!(title: title, start_at: 5.minute.from_now)
 
@@ -265,7 +265,7 @@ describe "calendar2" do
       expect(f(".fc-event-title")).to include_text(title)
     end
 
-    it "assignment appears on all calendars", :priority => "1" do
+    it "assignment appears on all calendars", priority: "1" do
       title = "Zak McKracken"
       @assignment = @course.assignments.create!(:name => title,:due_at => 5.minute.from_now)
 
@@ -280,7 +280,7 @@ describe "calendar2" do
       expect(f(".fc-event-title")).to include_text(title)
     end
 
-    it "quiz appears on all calendars", :priority => "1" do
+    it "quiz appears on all calendars", priority: "1" do
       create_quiz
 
       load_agenda_view
