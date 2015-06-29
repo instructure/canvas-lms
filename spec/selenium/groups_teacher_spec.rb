@@ -178,5 +178,39 @@ describe "new groups" do
       expect(f('.group-summary')).to include_text("0 / 2 students")
       manually_fill_limited_group("2",2)
     end
+
+    it "should show the FULL icon moving from one group to the next", priority: "1", test_id: 94163 do
+      group_test_setup(4,1,2)
+      @group_category.first.update_attribute(:group_limit,2)
+
+      2.times do |n|
+        add_user_to_group(@students[n],@testgroup.first,false)
+      end
+
+      add_user_to_group(@students.last,@testgroup[1],false)
+      get "/courses/#{@course.id}/groups"
+
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full")).to be_displayed
+      expect(f(".group[data-id=\"#{@testgroup[1].id}\"] span.show-group-full")).not_to be_displayed
+
+      f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
+      wait_for_ajaximations
+
+      f(".group-user-actions[data-user-id=\"#{@students[0].id}\"]").click
+      wait_for_ajaximations
+
+      f('.ui-menu-item .edit-group-assignment').click
+      wait_for_ajaximations
+
+      f('.single-select option').click
+      wait_for_ajaximations
+
+      f('.set-group').click
+      wait_for_ajaximations
+
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full")).not_to be_displayed
+      expect(f(".group[data-id=\"#{@testgroup[1].id}\"] span.show-group-full")).to be_displayed
+    end
   end
 end
+
