@@ -1281,8 +1281,11 @@ nb:
   all_grading_periods_77974940: "Alle Gradering Perioder"
   all_students_have_taken_the_quiz_b558f8b4: "Alle studentene har tatt prøven"
   all_students_have_taken_the_survey_494f9f42: "Alle studenter har tatt undersøkelsen"
+  allow_bulk_grade_export_to_sis_e11a6e66: "Tillat gruppe-karaktereksport til SIS"
   allow_lor_tools: "Tillat brukere for å vise og bruke eksterne verktøy som er konfigurert for LOR."
   allow_opt_out_of_inbox: "Tillat brukere å trekke seg fra Samtalen innboks. Dette vil føre til at alle samtalemeldinger og varslinger som skal sendes som ASAP varsler til brukerens primære epost, skjule Samtale innboks uleste meldinger merket på innboksen, og skjule samtalen varslingsinnstillinger."
+  allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Tillat studenter å se hvem som har meldt seg for tidsluker"
+  allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Tillat lærere å markere karakterdata som til eksport i bulk til SIS-integrasjoner"
   always_3a59e701: Alltid
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "En feil oppstod ved innstilling av bruk rett for %{filename}"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "En ukjent server feil oppstod. Vennligst prøv igjen."
@@ -2693,6 +2696,7 @@ nb:
     by_sa: "CC Navngivelse-Del på samme vilkår BY-SA"
     private: "Privat (Kopibeskyttet)"
     public_domain: "Åpent område"
+  certificate_fingerprint_b376df90: Sertifikat-fingeravtrykk
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "Denne oppgaven har %{assignmentPoints} oppnåelige poeng, ønsker du å endre den til å ha %{rubricPoints} oppnåelige poeng for å passe med denne vurderingen?"
@@ -2774,6 +2778,8 @@ nb:
         delete_google_doc_as_well: "Dette Samarbeidet lagres som et Google Doc. Vil du slette det kun fra Canvas, eller vil du fjerne det fra Google Docs i tillegg?"
       titles: 
         new: "Start et nytt Samarbeid"
+    google_drive: 
+      file_not_found: "Samarbeid-fil ikke funnet"
     index: 
       description_rs: |-
           Gratis nettbaserte verktøy som [Google Docs](%{google_url}) og [EtherPad](%{etherpad_url}) 
@@ -2808,6 +2814,7 @@ nb:
     show: 
       error_cause_1: "Google Drive-kontoen til oppretteren skiller seg fra kontoen brukt til å opprette samarbeidet."
       error_cause_2: "Samarbeidets skaper er ikke lenger en forfatter i google doc."
+      error_cause_3: "Google Doc eksisterer ikke lenger."
       error_summary: "Det ser ut at dette samarbeidet ikke fungerer. Mulige årsaker:"
       error_title: "Google Drive samarbeidsfeil"
       headings: 
@@ -4657,6 +4664,7 @@ nb:
         ratio: "Feil studentratio"
   current_3ce5414a: "Nåværende:"
   current_mastery_score_score_out_of_mastery_points_fedd343f: "Nåværende Mestring Poeng: %{score} out of %{mastery_points}"
+  current_provider_6c3f7f96: "Nåværende tilbyder"
   current_score_6c81792: "Gjeldende resultat"
   current_total_67bf5f72: "Nåværende Totalt:"
   curve_grades_dialog: 
@@ -5273,7 +5281,9 @@ nb:
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
       Fordeling av aktuelle karakterer i kurs på tvers av alle innrullert studenter
       i avdeling kurs
+  divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "Del inn i like luker på %{num_minutes} minutter. *Gå*"
   domain_3b54c511: Domene
+  don_t_move_lti_query_params_to_post_body_21744487: "Ikke flytt LTI-søkeparametre til POST-body"
   don_t_show_again_15d8253e: "viser ikke igjen"
   done_54e3d4b6: Ferdig
   done_8af51c9b: Ferdig.
@@ -7620,6 +7630,8 @@ nb:
   light_blue_5374f600: Lyseblå
   light_green_c1cd020d: Lysegrønn
   light_pink_e1214d62: Lyserosa
+  limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Begrens hver tidsluke til %{num_participants} *groups.* **users.**"
+  limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Begrens deltakere til å delta i %{num_appointments} møter."
   link_enrollment: 
     buttons: 
       link: "Lenke til Student"
@@ -7726,6 +7738,8 @@ nb:
   login_is_invalid_must_be_alphanumeric_or_an_email__ae4499b3: "Innlogg er ugyldig: må være alfanumerisk eller en e-postadresse"
   login_is_too_long_25373f95: "Innlogg er for langt"
   login_label_1dea0f9d: Innloggingstekst
+  login_with_auth_type_a0aaa52a: "Logg inn med *%{auth_type}*"
+  login_with_provider_3fd3998e: "Logg inn med %{provider}"
   logo_a040ae0e: Logo
   logout_a9312e35: "Logg ut"
   looks_great_e4d883ed: "Ser bra ut!"
