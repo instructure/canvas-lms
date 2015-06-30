@@ -31,13 +31,11 @@ ru:
       many: "%{count} студентов"
       one: "1 студент"
       other: "%{count} студентов"
-    student_count_max: "%{count} / %{max} студентов"
     user_count: 
       few: "%{count} пользователя"
       many: "%{count} пользователей"
       one: "1 пользователь"
       other: "%{count} пользователей"
-    user_count_max: "%{count} / %{max} пользователей"
   GroupUserCollection: 
     flash: 
       userAlreadyInGroup: "ПРЕДУПРЕЖДЕНИЕ. %{user} уже является членом %{group}"
@@ -122,8 +120,6 @@ ru:
   account_authorization_configs: 
     account_required: "требуется проверка подлинности LDAP"
     index: 
-      add_auth_desc: "Добавить провайдера идентификации к этой учетной записи:"
-      choose_auth_type_option: "Выберите службу аутентификации"
       delete_auth_confirmation: "Вы уверены? При удалении вход пользователей в систему может быть невозможен."
       delete_auth_link: "Удалить все аутентификации"
       ip_address_list_description: "При использовании службы аутентификации, требующей, чтобы серверы Canvas непосредственно подключались к серверам, таким как LDAP, необходимо убедиться, что серверы могут принимать подключение от следующих IP-адресов:"
@@ -348,7 +344,6 @@ ru:
       open_registration_delegated_warning_dialog: "Провайдер внешней идентификации включен"
       what_are_quiz_ip_filters: "Что такое IP-фильтры Quiz?"
     user: Пользователь
-  account_settings_fe083453: "Параметры учетной записи"
   account_surveys_b0039876: "Опросы учетной записи"
   account_user: 
     types: 
@@ -899,7 +894,6 @@ ru:
         turnitin_host: "Узел Turnitin"
         turnitin_pledge: "Обязательство Turnitin"
         turnitin_shared_secret: "Общий секретный ключ Turnitin"
-        users_can_edit_name: "Пользователи могут редактировать отображаемое имя"
       links: 
         add_admins: "Добавить администраторов учетной записи"
         configure_report: "Задать конфигурацию..."
@@ -1205,7 +1199,6 @@ ru:
         default: 
           zero_activity: 
             text: "Данный отчет отображает всех студентов, зарегистрированных на любом курсе в данном семестре. Полученный файл .csv содержит по одной строке на каждого зарегистрированного пользователя, который не посещал курс, начиная с даты."
-  accounts_752dc365: "Учетные записи"
   achieve_mastery_count_times_8c9bbcec: "Усвоение достигнуто %{count} раз(а)"
   actions_efcde10d: "Действия "
   activerecord: 
@@ -1450,8 +1443,6 @@ ru:
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Вы уверены, что хотите удалить этот оценочный период?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Вы уверены, что хотите удалить этот инструмент?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Вы уверены, что хотите сообщить об этой фотографии профиля?"
-  aria_labels: 
-    unlock_at_date: "Разблокировать после наступления даты"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Когда вы начнете набирать текст в этом поле, список групп будет автоматически фильтроваться, оставляя только те названия, которые соответствуют вашему вводу."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "По мере ввода текста в это поле, список результатов будет автоматически обновляться."
   assessment_question: 
@@ -1609,9 +1600,6 @@ ru:
       save: Сохранить
       validating: Сохранение...
       weight_groups: "Взвесить итоговую оценку на основе групп заданий"
-    assignment_sidebar: 
-      links: 
-        submit: "Отправить задание"
     assignments_list_right_side: 
       links: 
         manage_assignments: "Управление подписками"
@@ -1977,14 +1965,12 @@ ru:
         grade: "Результат: %{grade} *(%{points_possible} возможно pts)*"
         none_assigned: "Ничего не задано"
       links: 
-        resubmit: "Повторно отправить задание"
         submission: 
           details: "Сведения о передаче"
           download_attachment: "Загрузить %{attachment_display_name}"
           view_original_page: "Просмотреть исходную страницу"
           view_quiz: "Просмотреть переданную контрольную работу"
           view_survey: "Просмотреть переданный опрос"
-        submit: "Отправить задание"
         view_rubric_evaluation: "Просмотреть оценку рубрики"
       messages: 
         no_comments: "Комментарии отсутствуют"
@@ -2148,20 +2134,13 @@ ru:
     upload_error_unexpected: "Произошла неизвестная ошибка при загрузке с %{url}"
   attachment_deffe5a9: Вложение
   attendance: 
-    default_attendance_title: "Посещение %{date}"
-    errors: 
-      could_not_add_assignment: "Ошибка добавления задания"
     options: 
       clear_attendance_marks: "Снять метки посещения"
       edit_assignment: "Редактировать задание"
       mark_all_as_absent: "Отметить всех отсутствующих"
       mark_all_as_present: "Отметить всех присутствующих"
-    status: 
-      added_assignment: "Добавленное задание"
-      adding_assignment: "Добавление задания..."
     titles: 
       attendance_help: "Справка по посещению"
-      new_attendance_column: "Новый столбец посещения"
   audio_dd489fcc: Аудио
   auth_logging: 
     corrupted: "Сведения недоступны"
@@ -2177,8 +2156,6 @@ ru:
   available_until_date_cd125c62: "Доступно до даты"
   available_until_f3b9c4ed: "Доступно до"
   available_until_lock_at_ab022445: "Доступно до %{lock_at}"
-  availible_from_format_like_yyyy_mm_dd_hh_mm_f101e0dd: "Доступен с - Формат: ГГГГ-MM-ДД чч:мм"
-  availible_to_format_like_yyyy_mm_dd_hh_mm_f2611528: "Доступен до - Формат: ГГГГ-MM-ДД чч:мм"
   average_49c63f9b: Среднее
   back_to_app_center_95420d83: "Вернуться в App Center"
   base_847aca7c: Базовый
@@ -2929,12 +2906,10 @@ ru:
       notices: 
         contact_registered: "Способ контакта зарегистрирован!"
   concluded_courses_94782e21: "Завершенные курсы"
-  conference_36b50fda: Конференция
   conferences: 
     concluded_conference: 
       delete: Удалить
       no_recording: "Записи отсутствуют"
-      preparing_video: "Подготовка видео"
       recording: "1 запись"
       recordings: "%{recordingCount} записей"
       settings: Настройки
@@ -3178,14 +3153,6 @@ ru:
         date_adjustment: "Настройки даты"
         ending_change_to: "изменить на"
         ending_date: "Дата окончания"
-        new_end_date_label: "Изменить дату окончания на"
-        new_end_date_title: "Изменить дату окончания на"
-        new_start_date_label: "Изменить дату начала на"
-        new_start_date_title: "Изменить дату начала на"
-        old_end_date_label: "Дата окончания"
-        old_end_date_title: "Дата окончания"
-        old_start_date_label: "Дата начала"
-        old_start_date_title: "Дата начала"
         remove_dates: "Удалить даты"
         shift_dates: "Сдвинуть даты"
         substitution: Замена
@@ -4784,7 +4751,6 @@ ru:
       many: "Развернуть %{count} сообщений разговора"
       one: "Развернуть %{count} сообщение разговора"
       other: "Развернуть %{count} сообщений разговора"
-    disable_dashboard: "Вернуться к старой панели"
     discussions_collapse: 
       few: "Свернуть %{count} обсуждения"
       many: "Свернуть %{count} обсуждений"
@@ -4795,7 +4761,6 @@ ru:
       many: "Развернуть %{count} обсуждений"
       one: "Развернуть %{count} обсуждение"
       other: "Развернуть %{count} обсуждений"
-    enable_dashboard: "Попробуйте новую панель"
     show_more_link: 
       show_less: "Показать меньше"
       show_more: "Показать больше"
@@ -5232,8 +5197,6 @@ ru:
         one: "1 непрочитанный ответ."
         other: "%{count} непрочитанных ответа (-ов)."
         zero: "Непрочитанные ответы отсутствуют."
-    notices: 
-      discussion_not_availible: "У вас нет доступа к запрошенному обсуждению."
     page_nav: 
       Page: Страница
       current_page: Текущие
@@ -5427,7 +5390,6 @@ ru:
   due_datetime_f5a81b81: "До: %{dateTime}"
   due_format_like_yyyy_mm_dd_hh_mm_ef30a9ef: "Срок выполнения - Формат: ГГГГ-MM-ДД чч:мм"
   due_multiple_dates_cc0ee3f5: "До: несколько дат"
-  due_on_date_aa4725cd: "Выполнить до даты:"
   e_mail_only_2cc5e513: "Только электронная почта"
   each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: "Каждая вкладка представляет собой задание.Зеленый цвет означает процент студентов, которые сдали домашнее задание *вовремя*. Задание, которое было сдано **с опозданием** отмечено желтым, и ***отсутствующее*** задание, отмечено красным."
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Каждая полоска представляет собой одно задание. *Тонкие вертикальные усы* простираются от самой низкой оценки любого из студентов курса до самой высокой оценки. **Более толстая линия** простирается от 25 до 75 процентилей, с ***отмеченной медианой***."
@@ -5547,7 +5509,6 @@ ru:
       Множественные Периоды Оценивания позволяют учителям и администраторам создавать периоды оценивания с установленными
       контрольными датами. Задания могут быть отфильтрованы по этим периодам оценивания в журнале успеваемости.
   end_date_e0093ed7: "Дата окончания"
-  ends_on_date_320e0c26: "Завершение на дату"
   enrollment: 
     default_course_name: Курс
     default_email: "Электронная почта отсутствует"
@@ -5771,7 +5732,6 @@ ru:
         already_used: "Эта отправка уже включена в portfolio"
         feed: "Канал Atom Eportfolio"
         view_submission: "Просмотреть отправку"
-      upload_limit: "ограничить размер файла 50 МБ"
       welcome: "При первом использовании можно открыть мастер и узнать, с чего лучше начать работу. Можно быстро добавить последние отправки или же приступить к работе с portfolio."
       write_only_comments: "Комментарии для этой страницы являются частными. Можно добавлять комментарии, но только владелец portfolio может просматривать их."
     show_me: показать
@@ -5854,7 +5814,6 @@ ru:
   errors: 
     bad_navigation_config: "Недействительная конфигурация табуляции курса"
     blank: Требуется
-    failed: Ошибка
     format: "%{attribute} %{message}"
     index: 
       all_categories: "- Все категории -"
@@ -5917,7 +5876,6 @@ ru:
   expand_or_collapse_calendars_9854b0d0: "Развернуть или свернуть календари"
   expand_or_collapse_undated_items_b901de09: "Развернуть или свернуть элементы без даты"
   expand_subdiscussion_cd226ed4: "Развернуть под-дискуссию"
-  expires_on_date_18efe4e2: "Истекает на дату"
   export_de71cd8e: Экспорт
   exporting_b1eab154: Экспорт
   external_apps_f5490181: "Внешние приложения"
@@ -6090,7 +6048,6 @@ ru:
   features: 
     allow_opt_out_of_inbox: "Разрешить пользователям отказаться от ящика входящих сообщений"
     better_file_browsing: "Просмотр лучшего файла"
-    course_catalog: "Каталог курсов"
     differentiated_assignments: "Дифференцированные задания"
     differentiated_assignments_account_disable_warning: |-
         Отключение этой функции повлияет на существующие курсы. Для получения помощи в отключении этой функции, пожалуйста, свяжитесь
@@ -6106,7 +6063,6 @@ ru:
     lor: "Внешние инструменты LOR"
     multiple_grading_periods: "Несколько периодов выставления оценок"
     new_quiz_statistics: "Страница статистики новой контрольной работы"
-    new_styles: "Использовать новые стили"
     post_grades: "Опубликовать оценки в SIS"
     quiz_log_auditing: "Аудит журнала контрольных работ"
     student_groups: "Страница новых групп студентов"
@@ -6152,138 +6108,30 @@ ru:
     unpublished_status: "Не опубликовано"
   filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filename} был опубликован со следующим правом на использование: %{usage_right}"
   files: 
-    alts: 
-      file: Файл
-      folder: Папка
-      folder_locked: "Заблокированная папка"
-      locked_file: "Заблокированный файл"
-    buttons: 
-      update_file: "Обновить файл"
-    cancel: Отменить
     content_folder: 
       titles: 
         edit_and_move_instructions: "Щелкните для изменения, перетащите для переноса в другую папку"
     could_not_find_file: "	Этот файл был удален"
     errors: 
       empty_file: "Этот файл пустой.  Загрузите другой файл."
-      extracting: "При извлечении ZIP-файла произошли ошибки.  Повторите попытку."
-      failed_uploading: "Ошибка загрузки: %{error_info}"
-      loading_file: "Ошибка загрузки содержания файла.  Повторите попытку."
       missing_field: "Ошибка загрузки, необходимое поле формы отсутствует"
       not_found: "При загрузке файла произошла ошибка, невозможно найти действительный файл.  Может потребоваться уведомить владельца файла для его повторной загрузки."
       server_error: "Сбой загрузки, ошибка сервера, повторите попытку."
-      server_returned_invalid_status: "Сервер прекратил возвращать действительное состояние"
-      server_unresponsive: "Сервер прекратил отвечать на запросы статуса"
       too_large: "Файл слишком большой для редактирования"
-      unexpected_response: "ожидаемый ответ не получен"
-      update_file_failed: "Ошибка загрузки файла, повторите попытку"
       upload_failed: "Сбой загрузки, повторите попытку"
-      uploading: "Ошибка загрузки"
-      uploading_zip: "Произошло несколько ошибок при загрузке архива"
     fields: 
       file: Файл
     files_page_title: Файлы
     full_index: 
-      alts: 
-        file_locked: заблокирован
-        file_preview: "предварительный просмотр"
-        folder_locked: заблокирован
-      buttons: 
-        add_a_file: "Добавить файл"
-        lock_file: "Заблокировать этот файл"
-        lock_folder: "Заблокировать эту папку"
-        overwrite_duplicate_attachment: Замена
-        rename_duplicate_attachment: "Переименовать новые файлы"
-      descriptions: 
-        file_locked_after: "Он будет заблокирован после %{lock_at}."
-        file_locked_until: "Он заблокирован до %{unlock_at}."
-        folder_locked: "Эта папка заблокирована и не может просматриваться студентами."
-        folder_locked_after: "Он будет заблокирован после %{lock_at}."
-        folder_locked_until: "Он заблокирован до %{unlock_at}."
-        lock_file: "Если файл заблокирован, он доступен только учителям и ассистентам."
-        lock_folder: "Если папка заблокирована, она доступна только учителям и ассистентам."
-      drop_here: "Перетащите файлы сюда, чтобы добавить их в эту папку."
-      drop_zip_files: "Также можно перетащить ZIP-файлы и выбрать извлечение содержимого в эту папку."
-      edit_html_warning: "Редактор HTML изменяет ваш файл HTML. Загрузите резервную копию, прежде чем сохранить изменения."
-      file_details: "Сведения о файле"
-      file_list: "Список файлов"
-      files_title: Файлы
-      labels: 
-        just_hide_file: "Разрешить студентам загружать или просматривать файл, если на него есть ссылка, просто не показывать его в списке файлов для студентов"
-        just_hide_folder: "Разрешить студентам загружать или просматривать файлы в этой папке, если на них есть ссылка, просто не показывать их в списке файлов для студентов"
-        lock_after: "Заблокировать после"
-        lock_until: "Заблокировать до"
-        locked: "Заблокировать, пока не будет разблокировано вручную"
       links: 
-        add_file: "Добавить файл"
-        add_folder: "Добавить папку"
-        delete_file: "Удалить этот файл"
-        delete_folder: "Удалить эту папку"
-        download_as_zip: "Загрузить файлы в папке как ZIP-файл"
-        download_file: "Загрузить этот файл"
-        download_with_size: "загрузка файла (%{size})"
         download_zip: "Щелкните здесь для загрузки %{size}"
-        edit_content: "редактировать содержание"
-        import_zip: "Импорт ZIP-файла"
-        lock_file: "Заблокировать этот файл"
-        lock_folder: "Заблокировать эту папку"
-        preview: "предварительный просмотр"
-        rename_file: "Переименовать этот файл"
-        rename_folder: "Переименовать эту папку"
-        show_all_files: "см. файлы для всех курсов/групп"
-        show_personal_files: "показать только мои личные файлы"
-        unlock_file: "Разблокировать этот файл"
-        unlock_folder: "Разблокировать эту папку"
-      locked: "Этот файл еще не разблокирован, поэтому он не может быть загружен."
-      locked2: "Этот файл заблокирован и не может быть загружен студентами."
       messages: 
         creating_zip: "Создание ZIP-файла..."
-        gathering_and_zipping: |-
-            **Содержание этой папки собирается** и сжимается
-            в архивный файл.  Это может занять некоторое время в зависимости от размера и числа файлов.
         gathering_data: "Сбор данных..."
-        gathering_files: "Сбор файлов..."
         gathering_files_with_progress: "Сбор файлов (%{progress}%)..."
-        no_preview_avaialble: "Предварительный просмотр не доступен"
-        uploading: "Загрузка 5 файлов..."
         zip_finished: "Завершено!  Перенаправление к файлу..."
-      page_title: Файлы
-      storage_used: "Используемое хранение: %{size1} из %{size2}"
-      switch_views: "Переключить представления"
       titles: 
         download_folder_contents: "Загрузить содержимое папки"
-        edit_file: "Изменить %{file}"
-        edit_file_contents: "Редактировать содержание файла"
-        file_locked: Заблокировано
-        folder_locked: Заблокировано
-        lock_file: "Заблокировать %{file_name}"
-        lock_folder: "Заблокировать %{folder_name}"
-      warnings: 
-        too_many: "Слишком много курсов/групп для одновременного отображения. Ниже приведены первые 15 результатов."
-    links: 
-      add_files: "Добавить файлы"
-    messages: 
-      access_denied: "Чтение содержимого этой папки невозможно."
-      done_uploading: "Загрузка завершена"
-      error_count: 
-        few: "%{count} ошибки(ок)"
-        many: "%{count} ошибки(ок)"
-        one: "1 ошибка"
-        other: "%{count} ошибки(ок)"
-      extraction_complete: "Извлечение завершено!  Загрузка структуры файла..."
-      finalizing: Завершение
-      folder_empty: "Эта папка пустая"
-      loading_files: "Загрузка файлов..."
-      no_files_selected: "Допустимые файлы не выбраны"
-      queued: "Постановка в очередь"
-      updating_file: "Обновление файла..."
-      upload_complete: "Загрузка завершена"
-      uploading: Загрузка
-      uploading_files: 
-        few: "Загрузка %{count} файлов..."
-        many: "Загрузка %{count} файлов..."
-        one: "Загрузка 1 файла..."
-        other: "Загрузка %{count} файлов..."
     my_files: "Мои файлы"
     new: 
       buttons: 
@@ -6293,28 +6141,12 @@ ru:
     notices: 
       deleted: "Файл %{display_name} удален"
       updated: "Файл успешно обновлен."
-    prompts: 
-      delete_file: "Действительно хотите удалить этот файл?"
-      delete_folder: "Удалить эту папку и все ее содержимое?"
-      duplicate_filenames: "Файлы с такими именами уже существуют в этой папке. Заменить их или переименовать новые файлы, используя эти уникальные имена?"
-      extract_zip: "Это ZIP-файл.  Извлечь его содержимое в эту папку?"
     show: 
       messages: 
         file_locked: "Этот файл еще не разблокирован."
         folder_locked: "Папка \"%{folder},\" включающая этот файл, заблокирована."
     text_show: 
       page_title: "Предварительный просмотр файла"
-    titles: 
-      click_and_drag: "Щелкните и перетащите для переноса этой папки в другую папку"
-      drag_to_move: "Перетащите для переноса в другую папку"
-      extracting: "Извлечение файлов в папку"
-      file_uplaods_queue: "Очередь загрузки файлов"
-      lock_file: "Заблокировать файл"
-      lock_folder: "Заблокировать папку"
-    update_file: "Обновить файл"
-    upload_error: "Произошла ошибка во время загрузки вашего файла"
-    warnings: 
-      file_uploaded_without_response: "Файлы могут быть загружены, но сервер не смог ответить.  Перезагрузите страницу для подтверждения."
   files_and_folder_contents_only_available_to_studen_944f9166: "Содержимое файлов и папок доступно только для студентов, пришедших по ссылке. Не отображается в файлах студента."
   files_c300e900: Файлы
   files_uploaded_519844ed: "Файлы загружены"
@@ -6598,27 +6430,15 @@ ru:
   gradebooks: 
     attendance: 
       attendance_info: "Задания участников не созданы."
-      buttons: 
-        add_assignment: "Добавить задание"
       edit_attendance_info: "Для редактирования сведений о задании посещения щелкните значок раскрывающегося списка под названием задания, затем щелкните \"Редактировать задание\"."
       headers: 
         attendance: Посещение
         edit_attendance: "Редактировать сведения о посещении"
         loading_attendance: "Загрузка таблицы посещения..."
         mark_attendance: "Отметить посещение"
-        new_column: "Новый столбец посещения"
       how_do_i: Как...?
-      labels: 
-        date: Дата
-        group: Группа
-        possible: Возможно
-        title: Заголовок
-      links: 
-        add_column: "Добавить столбец"
       mark_attendance_info: "В обзоре посещения отображается таблица, слева которой перечислены студенты, а в верхней части перечислены задания. Чтобы отметить присутствие или отсутствие студента, установите соответствующий флажок, чтобы он отображал верную отметку (%{present_icon} для присутствия, %{absent_icon} для отсутствия). Также можно использовать раскрывающийся список для каждого задания, чтобы установить присутствие или отсутствие."
-      new_group: "Новая группа"
       page_title: Посещение
-      points_abbrev: баллы
       titles: 
         click_to_change: "Щелкните для изменения"
     blank_submission: 
@@ -6633,7 +6453,6 @@ ru:
       muted: "Звук отключен"
     grade_summary: 
       all_grading_periods: "Все периоды выставления оценок"
-      assessment_by: "Проверено %{name}"
       assignments: Задания
       buttons: 
         show_what_if: "Показать сохраненные оценки \"Что если\""
@@ -7526,13 +7345,9 @@ ru:
       invalid_datetime: "Недопустимое значение даты/времени"
       invalid_entry_for_field: "Неверная запись: %{field}"
       invalid_number: "Должно быть числом."
-      not_a_date: "Это не дата!"
       posting_message_failed: "Сбой записи, повторите попытку"
       required: "Обязательное для заполнения поле"
       search_failed: "Сбой поиска, повторите попытку"
-    labels: 
-      datepicker: 
-        time: Время
     links: 
       minimize_file_preview: "Уменьшить просмотр файла"
       minimize_youtube_video: "Уменьшить видео"
@@ -7821,12 +7636,10 @@ ru:
   loading_25990131: Загрузка...
   locales: 
     ru: pу́сский
-  lock_after_date_92f9149: "Заблокировать после даты"
   lock_date_cannot_be_after_course_end_a473158b: "Дата блокировки не может быть позднее окончания курса"
   lock_date_cannot_be_after_section_end_d37da70c: "Дата блокировки не может быть позднее окончания раздела"
   lock_date_cannot_be_after_term_end_cf1a188f: "Дата блокировки не может быть позднее окончания семестра"
   lock_date_cannot_be_before_due_date_ac30f54: "Дата блокировки не может быть раньше даты выполнения"
-  lock_until_date_62ce1b5c: "Заблокировать до даты"
   log_on_url_fc166e4c: "URL-адрес входа в систему"
   log_out_379ba28a: "	Выйти "
   log_out_url_2605c2c1: "URL-адрес выхода из системы"
@@ -9926,7 +9739,6 @@ ru:
     submission_comments: "Комментарии отправки"
     sure_you_want_to_mute: "Действительно хотите отключить звук этого задания? Пока звук этого задания отключен, студенты не будут получать новые уведомления и не смогут просматривать:"
   muted_283cfa0f: (отключено)
-  my_dashboard_8983c283: "Моя информационная панель"
   my_dashboard_b724020: "Моя информационная панель"
   n_a_d6f6c42f: Н/Д
   n_number_of_times_c2e78b72: "n Количество раз"
@@ -9944,10 +9756,6 @@ ru:
   new_file_135ae520: "[ Новый файл ]"
   new_outcome_7fba8c7d: "Новый результат"
   new_quiz_statistics_desc: "Включить страницу статистики новой контрольной работы для курса."
-  new_styles_description: |-
-      Мы работаем над внешним обновлением пользовательского интерфейса для Canvas. Включите его, чтобы согласиться на просмотр 
-      обновленного упрощенного внешнего вида и функций интерфейса Canvas. Это одна из "разрабатываемых"
-      функций, и ее еще нельзя включать для реальных пользователей.
   next_40e12421: Далее
   next_steps_ce0f0d0c: "Дальнейшие действия"
   no_assignment_name_adbb215b: "Отсутствует имя задания"
@@ -10277,7 +10085,6 @@ ru:
       page_title: "Вход в приложение"
       remember_auth: "Запомнить мою авторизацию для данной службы"
   observees: 
-    add_observee_button: "Добавить студента"
     being_observed: "Наблюдаемые студенты"
     new_observee_password: Пароль
     new_observee_username: "Имя пользователя"
@@ -12241,7 +12048,6 @@ ru:
         has_submissions_already: "Имейте в виду, что некоторые студенты уже выполнили или начали выполнять эту контрольную работу"
         less_than_allotted_time: "Вы начали выполнять эту контрольную работу незадолго до срока окончания, поэтому у вас не будет достаточно времени на выполнение работы."
         no_submission_for_user: "Для этого пользователя нет доступных отправок"
-        quiz_not_availible: "У вас нет доступа к запрошенному контрольному опросу"
         quiz_updated: "Контрольная работа успешно обновлена"
         quizzes_published: 
           few: "%{count} контрольные работы успешно опубликованы!"
@@ -13399,18 +13205,6 @@ ru:
         go: Переход
       titles: 
         find_user: "Найти пользователя"
-    add_assignment: 
-      buttons: 
-        add_assignment: "Добавить задание"
-      labels: 
-        assignment_group_id: Группа
-        due_at: Срок
-        points_possible: Баллы
-        title: Имя
-      options: 
-        assignments: Задания
-      titles: 
-        add_assignment: "Добавить задание"
     add_assignment_group: 
       buttons: 
         add_group: "Добавить группу"
@@ -14211,8 +14005,6 @@ ru:
     student_hidden_name: "Студент %{position}"
   sso_settings_ebf98263: "Настройки SSO"
   start_date_e937be8a: "Дата начала"
-  start_date_must_be_before_end_date_a00be892: "Дата начала должна быть раньше даты окончания"
-  starts_on_date_a777f505: "Начинается с даты"
   statistics: 
     csv_columns: 
       attempt: попытка
@@ -14562,7 +14354,6 @@ ru:
   the_following_fields_are_invalid_fields_b3565800: "Следующие поля являются недействительными: %{fields}"
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "Полное имя хоста для экземпляра аккаунта (something.instructure.com, например)"
   the_grading_period_was_deleted_7814a349: "Период оценивания был удален"
-  the_grading_period_was_saved_4a504c5: "Период оценивания был сохранен"
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "Организация, через которую вы вошли в систему, не настроена для данной учетной записи"
   the_list_of_results_has_been_updated_46e3c733: "Список результатов был обновлен."
   the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "Изображение логотипа в правой верхней части заголовка Canvas. 200x200 svg или png"
@@ -14613,7 +14404,6 @@ ru:
   this_field_name_is_required_b9196401: "Необходимо заполнить поле \" name\""
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "До публикации для этого файла необходимо настроить usage_rights."
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Эта папка в данный момент заблокирована и недоступна для просмотра."
-  this_grading_period_overlaps_16332589: "Этот Период выставления оценок пересекается"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Это список надежных URL-адресов, перечисленных через запятую. Если URL-адрес находится в списке надежных, при входе с него в систему Canvas будет пропускаться использование маркера CSRF."
   this_login_is_for_provider_6f17462: "Логин для %{provider}"
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Скорее всего, это произошло потому, что вы импортировали содержимое курса без связанных с ним файлов."
@@ -14873,7 +14663,6 @@ ru:
     buttons: 
       resubmit_to_turnitin: "Повторно отправить на Turnitin"
   twitter_fcef6b54: Twitter
-  type_more_to_find_additional_students_d5211cd5: "Введите больше, чтобы найти дополнительных студентов"
   unable_to_remove_app_4293cb53: "Невозможно удалить приложение."
   unarchive_selected_e0c4bd3d: "Выбрана разархивация"
   unauthorized: "не авторизован"
@@ -14901,7 +14690,6 @@ ru:
   until_date_949017c4: "До %{date}"
   untitled_assignment_59354b34: "задание без названия"
   unused_courses_title: "Неиспользованные курсы"
-  update_4d8ee62: Обновить
   updated_group_group_name_727b1d98: "Обновленная группа %{group_name}"
   upload_button: 
     upload: Загрузить
@@ -15150,8 +14938,6 @@ ru:
         one: "в среднем на 1 студента"
         other: "в среднем на %{count} студентов"
       course: Курс
-      crumbs: 
-        grades: Оценки
       current_teacher_courses: "Преподаваемые курсы"
       linked_student_accounts: "Связанные учетные записи студентов"
       links: 
@@ -15364,7 +15150,6 @@ ru:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Курс Blackboard Vista/CE, WebCT 6+ "
   webct_name: "Blackboard Vista/CE (WebCT)"
-  welcome_to_your_courses_to_customize_the_list_of_c_2922a551: "Добро пожаловать на ваши курсы! Чтобы настроить список курсов, нажмите на ссылку  \"Все курсы\" и звезду для отображения курсов."
   well_below_mastery_37664bdc: "Гораздо ниже проходного балла"
   what_should_the_csv_file_look_like_985a59ac: "Как должен быть выполнен CSV-файл?"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Эту страницу видят люди, посещающие курс. Вы можете настроить на ней отображение ленты активности, списка модулей курса, программы обучения или установить пользовательскую страницу, созданную вами. По умолчанию на ней отображается лента активности курса."
