@@ -120,7 +120,7 @@ END
     {
       display_name: -> { I18n.t('New UI') },
       description: -> { I18n.t(<<END) },
-This enables an updated navigation, new dashboard and a simpler, more modern look and feel. 
+This enables an updated navigation, new dashboard and a simpler, more modern look and feel.
 END
       applies_to: 'RootAccount',
       state: 'hidden',
@@ -342,7 +342,7 @@ END
             display_name: -> { I18n.t('Enable "OR" Condition for Modules') },
             description:  -> { I18n.t('If enabled, modules will have the option to be marked as complete when only one of the requirements is met.') },
             applies_to: 'Course',
-            state: 'hidden_in_prod',
+            state: 'hidden',
             development: true,
             root_opt_in: true
         },
