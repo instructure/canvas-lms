@@ -389,6 +389,9 @@ RSpec.configure do |config|
     AdheresToPolicy::Cache.clear
     # silence migration specs
     ActiveRecord::Migration.verbose = false
+
+    # allow tests to still run in non-DA state even though it's hard-coded on
+    Feature.definitions["differentiated_assignments"].send(:instance_variable_set, '@state', 'allowed')
   end
 
   def delete_fixtures!
