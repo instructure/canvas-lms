@@ -3,8 +3,9 @@
 define([
   'i18n!new_nav',
   'react',
-  'jsx/shared/SVGWrapper'
-], (I18n, React, SVGWrapper) => {
+  'jsx/shared/SVGWrapper',
+  'compiled/fn/preventDefault'
+], (I18n, React, SVGWrapper, PreventDefault) => {
 
   var ProfileTray = React.createClass({
 
@@ -39,10 +40,15 @@ define([
               <a href="/dashboard/eportfolios">{I18n.t('ePortfolios')}</a>
             </li>
             <li className="ReactTray__feature-list-item">
-              <a href="/logout">
-                <i className="icon-off"></i>
-                {I18n.t('Logout')}
-              </a>
+              <form ref="logoutForm" action="/logout" method="post">
+                <input name="utf8" value="✓" type="hidden"/>
+                <input name="_method" value="delete" type="hidden"/>
+                <input name="authenticity_token" value={$.cookie('_csrf_token')} type="hidden"/>
+                <a href="/logout" onClick={PreventDefault(() => this.refs.logoutForm.getDOMNode().submit())}>
+                  <i className="icon-off"></i>
+                  {I18n.t('Logout')}
+                </a>
+              </form>
             </li>
           </ul>
         </div>
