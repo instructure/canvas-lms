@@ -41,7 +41,8 @@ describe "Groups API", type: :request do
       'group_category_id' => group.group_category_id,
       'storage_quota_mb' => group.storage_quota_mb,
       'leader' => group.leader,
-      'has_submission' => group.submission?
+      'has_submission' => group.submission?,
+      'concluded' => group.context.concluded?
     }
     if opts[:include_users]
       json['users'] = users_json(group.users, opts)
