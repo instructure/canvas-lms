@@ -29,11 +29,9 @@ pt:
     student_count: 
       one: "1 aluno"
       other: "%{count} alunos"
-    student_count_max: "%{count} / %{max} alunos"
     user_count: 
       one: "1 utilizador"
       other: "%{count} utilizadores"
-    user_count_max: "%{count} / %{max} utilizadores"
   GroupUserCollection: 
     flash: 
       userAlreadyInGroup: "AVISO: %{user} já é um membro de %{group}"
@@ -118,8 +116,6 @@ pt:
   account_authorization_configs: 
     account_required: "deve ter autenticação LDAP"
     index: 
-      add_auth_desc: "Adicionar um provedor de identidade a esta conta:"
-      choose_auth_type_option: "Escolha um serviço de autenticação"
       delete_auth_confirmation: "Tem a certeza? Os utilizadores poderão não conseguir iniciar sessão se isto for removido."
       delete_auth_link: "Remover todas as Autenticações"
       ip_address_list_description: "Se estiver usando um serviço de autenticação que exige que os servidores do Canvas entrem em contato com seus servidores diretamente, como LDAP, será necessário assegurar que seus servidores possam aceitar conexões destes endereços IP:"
@@ -344,7 +340,6 @@ pt:
       open_registration_delegated_warning_dialog: "Está ativado um fornecedor de identidade externo"
       what_are_quiz_ip_filters: "O que são filtros de IP de teste?"
     user: Utilizador
-  account_settings_fe083453: "Configurações de conta"
   account_surveys_b0039876: "Questionários da conta"
   account_user: 
     types: 
@@ -900,7 +895,6 @@ pt:
         turnitin_host: "Anfitrião do Turnitin"
         turnitin_pledge: "Compromisso do Turnitin"
         turnitin_shared_secret: "Segredo compartilhado do Turnitin"
-        users_can_edit_name: "Os utilizadores podem editar o nome de visualização"
       links: 
         add_admins: "Adicionar administradores de conta"
         configure_report: Configurar...
@@ -1200,7 +1194,6 @@ pt:
         default: 
           zero_activity: 
             text: "Este relatório mostra todos os alunos inscritos em qualquer uma das disciplinas num determinado período. O ficheiro csv resultante irá conter uma linha por inscrição de utilizadores que não visitaram a disciplina desde a data em questão."
-  accounts_752dc365: Contas
   achieve_mastery_count_times_8c9bbcec: "Obter domínio %{count} vezes"
   actions_efcde10d: Ações
   activerecord: 
@@ -1441,8 +1434,6 @@ pt:
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Tem a certeza que deseja remover este período de classificação?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Tem a certeza de que pretende remover esta ferramenta?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Tem a certeza que deseja denunciar esta fotografia de perfil?"
-  aria_labels: 
-    unlock_at_date: "Data de Desbloquear em"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "À medida que escreve neste campo, a lista de grupos é filtrada automaticamente de modo a incluir apenas os grupos cujos nomes correspondem à informação introduzida."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "Quando digitar neste campo, a lista de resultados será atualizada automaticamente."
   assessment_question: 
@@ -1594,9 +1585,6 @@ pt:
       save: Guardar
       validating: "A guardar..."
       weight_groups: "Ponderar nota final com base nos grupos de tarefa"
-    assignment_sidebar: 
-      links: 
-        submit: "Enviar tarefa"
     assignments_list_right_side: 
       links: 
         manage_assignments: "Gerenciar tarefas"
@@ -1950,14 +1938,12 @@ pt:
         grade: "Nota: %{grade} *(%{points_possible} pts possíveis)*"
         none_assigned: "Nenhum atribuído"
       links: 
-        resubmit: "Reenviar tarefa"
         submission: 
           details: "Detalhes do envio"
           download_attachment: "Download %{attachment_display_name}"
           view_original_page: "Ver a página original"
           view_quiz: "Ver o teste enviado"
           view_survey: "Ver o questionário enviado"
-        submit: "Enviar tarefa"
         view_rubric_evaluation: "Ver avaliação do protocolo"
       messages: 
         no_comments: "Nenhum comentário"
@@ -2121,20 +2107,13 @@ pt:
     upload_error_unexpected: "Ocorreu um erro desconhecido durante a transferência a partir de %{url}"
   attachment_deffe5a9: Anexo
   attendance: 
-    default_attendance_title: "Comparecimento %{date}"
-    errors: 
-      could_not_add_assignment: "Falha ao adicionar a tarefa"
     options: 
       clear_attendance_marks: "Limpar marcas de presença"
       edit_assignment: "Editar tarefa"
       mark_all_as_absent: "Marcar todos ausentes"
       mark_all_as_present: "Marcar todos presentes"
-    status: 
-      added_assignment: "Tarefa adicionada"
-      adding_assignment: "Adicionando tarefa..."
     titles: 
       attendance_help: "Ajuda com presença"
-      new_attendance_column: "Nova coluna de presença"
   audio_dd489fcc: Áudio
   auth_logging: 
     corrupted: "Detalhes não disponíveis"
@@ -2150,8 +2129,6 @@ pt:
   available_until_date_cd125c62: "Data de Disponível até"
   available_until_f3b9c4ed: "Disponível até"
   available_until_lock_at_ab022445: "Disponível até %{lock_at}"
-  availible_from_format_like_yyyy_mm_dd_hh_mm_f101e0dd: "Disponível desde - Formato AAAA-MM-DD hh:mm"
-  availible_to_format_like_yyyy_mm_dd_hh_mm_f2611528: "Disponível até - Formato AAAA-MM-DD hh:mm"
   average_49c63f9b: Média
   back_to_app_center_95420d83: "Voltar ao Centro de Aplicações"
   base_847aca7c: Base
@@ -2904,12 +2881,10 @@ pt:
       notices: 
         contact_registered: "Método de contacto registado!"
   concluded_courses_94782e21: "Disciplinas concluídas"
-  conference_36b50fda: "Conferência "
   conferences: 
     concluded_conference: 
       delete: Eliminar
       no_recording: "Nenhuma gravação"
-      preparing_video: "Preparar vídeo"
       recording: "1 gravação"
       recordings: "%{recordingCount} gravações"
       settings: Definições
@@ -3153,14 +3128,6 @@ pt:
         date_adjustment: "Ajustar a data"
         ending_change_to: "mudar para"
         ending_date: "Data de fim"
-        new_end_date_label: "Alterar data de fim para"
-        new_end_date_title: "Alterar data de fim para"
-        new_start_date_label: "Alterar data de início para"
-        new_start_date_title: "Alterar data de início para"
-        old_end_date_label: "Data de fim"
-        old_end_date_title: "Data de fim"
-        old_start_date_label: "Data de início"
-        old_start_date_title: "Data de início"
         remove_dates: "Remover datas"
         shift_dates: "Mudar datas"
         substitution: Substituição
@@ -4716,14 +4683,12 @@ pt:
     conversations_expand: 
       one: "Expandir %{count} mensagem de conversa"
       other: "Expandir %{count} mensagens de conversa"
-    disable_dashboard: "Voltar ao painel antigo"
     discussions_collapse: 
       one: "Fechar %{count} discussão"
       other: "Fechar %{count} discussões"
     discussions_expand: 
       one: "Expandir %{count} discussão"
       other: "Expandir %{count} discussões"
-    enable_dashboard: "Experimentar o novo painel"
     show_more_link: 
       show_less: "Mostrar menos"
       show_more: "Mostrar mais"
@@ -5128,8 +5093,6 @@ pt:
         one: "1 resposta não lida."
         other: "%{count} respostas não lidas."
         zero: "Nenhuma resposta não lida."
-    notices: 
-      discussion_not_availible: "Não tem acesso à discussão solicitada."
     page_nav: 
       Page: Página
       current_page: Atual
@@ -5319,7 +5282,6 @@ pt:
   due_datetime_f5a81b81: "Prazo: %{dateTime}"
   due_format_like_yyyy_mm_dd_hh_mm_ef30a9ef: "Termina em - Formato AAAA-MM-DD hh:mm"
   due_multiple_dates_cc0ee3f5: "Prazo: Várias datas"
-  due_on_date_aa4725cd: "Data de Prazo:"
   e_mail_only_2cc5e513: "Apenas e-mail"
   each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: "Cada barra é uma tarefa. A camada verde representa uma percentagem de estudantes que fizeram a entrega *on time*. As entregas que estejam **late** estão amarelas, e as entregas ***missing*** estão a vermelho."
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Cada barra é uma tarefa. A *linha fina vertical* vai da pontuação mais baixa de qualquer aluno na disciplina até à pontuação mais alta. A **barra mais grossa** vai do percentil 25 até ao 75, com a ***mediana assinalada***."
@@ -5433,7 +5395,6 @@ pt:
   enable_gradebook_list_students_by_sortable_name: "Listar alunos pelos respetivos nomes ordenáveis no livro de notas. A predefinição de nome ordenável é 'Apelido, Nome próprio', podendo ser alterada nas definições."
   enable_multiple_grading_periods: "Vários Períodos de Classificação permitem aos professores e administradores criarem períodos de classificação com datas finais predefinidas. As Tarefas podem ser filtradas por estes períodos de classificação no livro de classificação."
   end_date_e0093ed7: "Data de fim"
-  ends_on_date_320e0c26: "Data de Termina em"
   enrollment: 
     default_course_name: Disciplina
     default_email: "Sem email"
@@ -5651,7 +5612,6 @@ pt:
         already_used: "Este envio já está incluído no seu portefólio"
         feed: "Feed Atom do ePortfolio"
         view_submission: "Exibir o envio"
-      upload_limit: "limite de 50MB por arquivo"
       welcome: "Se esta for a sua primeira vez aqui, poderá usar o pop-up do assistente e ver a melhor forma de começar. Caso contrário, pode adicionar rapidamente envios recentes ou ir diretamente para o seu portefólio."
       write_only_comments: "Os comentários desta página são privados. Pode fazer comentários, mas apenas o proprietário do portefólio poderá vê-los."
     show_me: mostre-me
@@ -5732,7 +5692,6 @@ pt:
   errors: 
     bad_navigation_config: "Configuração inválida do separador de disciplina"
     blank: Necessário
-    failed: Falhou
     format: "%{attribute} %{message}"
     index: 
       all_categories: "- Todas as categorias -"
@@ -5795,7 +5754,6 @@ pt:
   expand_or_collapse_calendars_9854b0d0: "Expandir ou fechar Calendários"
   expand_or_collapse_undated_items_b901de09: "Expandir ou fechar Itens sem data"
   expand_subdiscussion_cd226ed4: "Expandir a Subdiscussão"
-  expires_on_date_18efe4e2: "Data de Expira em"
   export_de71cd8e: Exportar
   exporting_b1eab154: Exportando
   external_apps_f5490181: "Aplicações externas"
@@ -5968,7 +5926,6 @@ pt:
   features: 
     allow_opt_out_of_inbox: "Permitir que os utilizadores cancelem a função de caixa de entrada"
     better_file_browsing: "Melhor pesquisa de ficheiros"
-    course_catalog: "Catálogo de disciplinas"
     differentiated_assignments: "Tarefas diferenciadas"
     differentiated_assignments_account_disable_warning: |-
         A desativação desta funcionalidade irá afetar disciplinas existentes. Para obter ajuda relacionada com a
@@ -5984,7 +5941,6 @@ pt:
     lor: "Ferramentas externas LOR"
     multiple_grading_periods: "Vários períodos de avaliação"
     new_quiz_statistics: "Nova página de estatísticas de teste"
-    new_styles: "Utilizar novos estilos"
     post_grades: "Publicar notas em SIS"
     quiz_log_auditing: "Auditoria de registo de testes"
     student_groups: "Nova página de grupos de alunos"
@@ -6030,134 +5986,30 @@ pt:
     unpublished_status: "Publicação anulada"
   filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filename} foi publicado com o seguinte direito de utilização: %{usage_right}"
   files: 
-    alts: 
-      file: Arquivo
-      folder: Pasta
-      folder_locked: "Pasta travada"
-      locked_file: "Ficheiro bloqueado"
-    buttons: 
-      update_file: "Atualizar arquivo"
-    cancel: Cancelar
     content_folder: 
       titles: 
         edit_and_move_instructions: "Clique para editar, arraste para mover para outra pasta"
     could_not_find_file: "Este ficheiro foi eliminado"
     errors: 
       empty_file: "Este arquivo está vazio  Faça upload de um arquivo diferente."
-      extracting: "Houve erros durante a extração do arquivo zip.  Tente novamente."
-      failed_uploading: "Falha no upload: %{error_info}"
-      loading_file: "Erro ao carregar conteúdo do arquivo.  Tente novamente."
       missing_field: "Falha no upload, um campo de formulário esperado não foi encontrado"
       not_found: "Parece que algo correu mal durante o carregamento deste ficheiro e não é possível localizar o ficheiro.  Deve notificar o proprietário do ficheiro para efetuar novamente o carregamento."
       server_error: "Falha no upload, erro do servidor, tente novamente."
-      server_returned_invalid_status: "O servidor parou de retornar um status válido"
-      server_unresponsive: "O servidor parou de responder às solicitações de status"
       too_large: "O arquivo é muito grande para ser editado"
-      unexpected_response: "não retornou a resposta esperada"
-      update_file_failed: "Falha na atualização do arquivo, tente novamente"
       upload_failed: "Falha no upload, tente novamente."
-      uploading: "Erro no upload"
-      uploading_zip: "Ocorreram erros durante o carregamento do ficheiro zip."
     fields: 
       file: Arquivo
     files_page_title: Ficheiros
     full_index: 
-      alts: 
-        file_locked: bloqueado
-        file_preview: visualização
-        folder_locked: bloqueado
-      buttons: 
-        add_a_file: "Adicionar arquivo"
-        lock_file: "Travar este arquivo"
-        lock_folder: "Travar esta pasta"
-        overwrite_duplicate_attachment: Substituir
-        rename_duplicate_attachment: "Renomear novos arquivos"
-      descriptions: 
-        file_locked_after: "Ela será travada após %{lock_at}."
-        file_locked_until: "Ela está travada até %{unlock_at}."
-        folder_locked: "Esta pasta está travada e não pode ser exibida pelos alunos."
-        folder_locked_after: "Ela será travada após %{lock_at}."
-        folder_locked_until: "Ela está travada até %{unlock_at}."
-        lock_file: "Quando um ficheiro está bloqueado, apenas professores e assistentes podem aceder ao ficheiro."
-        lock_folder: "Quando uma pasta está travada, apenas professores e assistentes podem acessá-lo."
-      drop_here: "Solte os arquivos aqui para adicioná-los a esta pasta."
-      drop_zip_files: "Também é possível soltar arquivos zip e escolher extrair seus conteúdos nesta pasta."
-      edit_html_warning: "O editor de HTML altera o HTML; deve transferir uma cópia de segurança antes de guardar as alterações."
-      file_details: "Detalhes do ficheiro"
-      file_list: "Lista de ficheiros"
-      files_title: Ficheiros
-      labels: 
-        just_hide_file: "Permite que os alunos baixem ou exibam o arquivo se eu fizer um link para ele, apenas não exibi-lo nas listas de arquivo dos alunos"
-        just_hide_folder: "Permite que os alunos baixem ou exibam arquivos nesta pasta se eu fizer um link para eles, apenas não os exibe nas listas de arquivo dos alunos"
-        lock_after: "Travar após"
-        lock_until: "Travar até"
-        locked: "Travar até que eu destrave manualmente"
       links: 
-        add_file: "Adicionar arquivo"
-        add_folder: "Adicionar pasta"
-        delete_file: "Excluir este arquivo"
-        delete_folder: "Excluir esta pasta"
-        download_as_zip: "Baixar arquivos nesta pasta como um zip"
-        download_file: "Baixar este arquivo"
-        download_with_size: "baixar o arquivo (%{size})"
         download_zip: "Clique aqui para descarregar %{size}"
-        edit_content: "editar conteúdo"
-        import_zip: "Importar um arquivo zip"
-        lock_file: "Travar este arquivo"
-        lock_folder: "Travar esta pasta"
-        preview: visualização
-        rename_file: "Renomear este arquivo"
-        rename_folder: "Renomear esta pasta"
-        show_all_files: "ver ficheiros de todas as disciplinas/grupos"
-        show_personal_files: "exibir somente meus arquivos pessoais"
-        unlock_file: "Destravar este arquivo"
-        unlock_folder: "Destravar esta pasta"
-      locked: "Este ficheiro ainda não está desbloqueado, por isso não pode ser transferido."
-      locked2: "Este ficheiro está bloqueado e não pode ser transferido pelos alunos."
       messages: 
         creating_zip: "A criar ficheiro zip..."
-        gathering_and_zipping: |-
-            **O conteúdo desta pasta está sendo reunido** e comprimido
-            em um arquivo zip.  Isso pode levar algum tempo, dependendo do tamanho e número de arquivos.
         gathering_data: "A reunir dados..."
-        gathering_files: "Reunindo arquivos..."
         gathering_files_with_progress: "A reunir ficheiros (%{progress}%)..."
-        no_preview_avaialble: "Nenhuma visualização disponível"
-        uploading: "Fazendo upload de 5 arquivos..."
         zip_finished: "Concluído! A redirecionar para o ficheiro..."
-      page_title: Arquivos
-      storage_used: "Armazenamento utilizado: %{size1} de %{size2}"
-      switch_views: "Alternar exibição"
       titles: 
         download_folder_contents: "Descarregar conteúdo da pasta"
-        edit_file: "Editar %{file}"
-        edit_file_contents: "Editar conteúdo do arquivo"
-        file_locked: Travada
-        folder_locked: Travada
-        lock_file: "Travar %{file_name}"
-        lock_folder: "Travar %{folder_name}"
-      warnings: 
-        too_many: "Existem demasiadas disciplinas/grupos para serem mostrados todos ao mesmo tempo. Abaixo estão os primeiros 15 resultados."
-    links: 
-      add_files: "Adicionar arquivos"
-    messages: 
-      access_denied: "Não é possível ler o conteúdo desta pasta."
-      done_uploading: "Upload concluído"
-      error_count: 
-        one: "1 erro"
-        other: "%{count} erros"
-      extraction_complete: "Extração concluída!  Atualizando a estrutura de arquivo..."
-      finalizing: Concluindo
-      folder_empty: "Nada nesta pasta"
-      loading_files: "Carregando arquivos..."
-      no_files_selected: "Nenhum arquivo válido selecionado"
-      queued: "Na fila"
-      updating_file: "Atualizando arquivo..."
-      upload_complete: "Upload concluído"
-      uploading: "Realizando upload"
-      uploading_files: 
-        one: "Fazendo upload de 1 arquivo..."
-        other: "Fazendo upload de %{count} arquivos..."
     my_files: "Os meus ficheiros"
     new: 
       buttons: 
@@ -6167,28 +6019,12 @@ pt:
     notices: 
       deleted: "O arquivo %{display_name} foi excluído"
       updated: "O arquivo foi atualizado com sucesso."
-    prompts: 
-      delete_file: "Tem certeza de que deseja excluir este arquivo?"
-      delete_folder: "Tem certeza de que deseja excluir esta pasta e todo seu conteúdo?"
-      duplicate_filenames: "Já existem ficheiros com os seguintes nomes nesta pasta. Deseja substituí-los ou mudar o nome dos novos ficheiros para nomes exclusivos?"
-      extract_zip: "Este arquivo é um arquivo zip.  Deseja extrair seu conteúdo nesta pasta?"
     show: 
       messages: 
         file_locked: "Este ficheiro ainda não foi desbloqueado."
         folder_locked: "A pasta \"%{folder},\" que contém este arquivo foi travada."
     text_show: 
       page_title: "Visualização do arquivo"
-    titles: 
-      click_and_drag: "Clique e arraste para mover a pasta para outra pasta"
-      drag_to_move: "Arrastar para mover a uma pasta diferente"
-      extracting: "Extraindo arquivos na pasta"
-      file_uplaods_queue: "Fila de upload de arquivo"
-      lock_file: "Travar arquivo"
-      lock_folder: "Travar pasta"
-    update_file: "Atualizar arquivo"
-    upload_error: "Ocorreu um erro durante o carregamento do ficheiro"
-    warnings: 
-      file_uploaded_without_response: "O upload do arquivo foi realizado, mas o servidor não responde.  Recarregue a página para confirmar."
   files_and_folder_contents_only_available_to_studen_944f9166: "Conteúdos de ficheiros e pastas apenas disponíveis para os alunos com ligação. Não são visíveis nos ficheiros dos alunos."
   files_c300e900: Arquivos
   files_uploaded_519844ed: "Ficheiros carregados"
@@ -6468,27 +6304,15 @@ pt:
   gradebooks: 
     attendance: 
       attendance_info: "Nenhuma tarefa de presença foi criada."
-      buttons: 
-        add_assignment: "Adicionar tarefa"
       edit_attendance_info: "Para editar os detalhes de uma tarefa de presença, clique no ícone suspenso abaixo do nome da tarefa e depois em \"Editar tarefa\"."
       headers: 
         attendance: Presença
         edit_attendance: "Editar detalhes de presença"
         loading_attendance: "Carregando tabela de presença...."
         mark_attendance: "Marcar presença"
-        new_column: "nova coluna de presença"
       how_do_i: "Como faço para...?"
-      labels: 
-        date: Data
-        group: Grupo
-        possible: Possível
-        title: Título
-      links: 
-        add_column: "Adicionar coluna"
       mark_attendance_info: "A tela de presença exibe uma tabela com os alunos listados abaixo à esquerda e as tarefas listadas ao longo da parte superior. Para marcar um aluno como presente ou ausente, clique na caixa correspondente até que ela mostre a marca correta (%{present_icon} para presente, %{absent_icon} para ausente). É possível também usar o menu suspenso de cada tarefa para definir todos como presentes ou ausentes."
-      new_group: "Novo Grupo"
       page_title: Presença
-      points_abbrev: pts
       titles: 
         click_to_change: "Clique para alterar"
     blank_submission: 
@@ -6503,7 +6327,6 @@ pt:
       muted: Silenciada
     grade_summary: 
       all_grading_periods: "Todos os períodos de avaliação"
-      assessment_by: "Avaliação por %{name}"
       assignments: Tarefas
       buttons: 
         show_what_if: "Exibir pontuações \"e se\" salvas"
@@ -7373,13 +7196,9 @@ pt:
       invalid_datetime: "Valor de data/hora inválido"
       invalid_entry_for_field: "Entrada inválida: %{field}"
       invalid_number: "Este valor deve ser um número."
-      not_a_date: "Isto não é uma data!"
       posting_message_failed: "Falha na publicação, tente novamente"
       required: "Campo de preenchimento obrigatório"
       search_failed: "Falha na pesquisa, tente novamente."
-    labels: 
-      datepicker: 
-        time: Hora
     links: 
       minimize_file_preview: "Minimizar visualização de arquivo"
       minimize_youtube_video: "Minimizar vídeo"
@@ -7666,12 +7485,10 @@ pt:
   loading_25990131: "A carregar..."
   locales: 
     pt: Português
-  lock_after_date_92f9149: "Data de Bloquear após"
   lock_date_cannot_be_after_course_end_a473158b: "A data de bloqueio não pode ser posterior ao fim da disciplina"
   lock_date_cannot_be_after_section_end_d37da70c: "A data de bloqueio não pode ser posterior ao fim da secção"
   lock_date_cannot_be_after_term_end_cf1a188f: "A data de bloqueio não pode ser posterior ao fim do período"
   lock_date_cannot_be_before_due_date_ac30f54: "A data de bloqueio não pode ser anterior à data de entrega"
-  lock_until_date_62ce1b5c: "Data de Bloquear até"
   log_on_url_fc166e4c: "URL de log on"
   log_out_379ba28a: "Terminar sessão"
   log_out_url_2605c2c1: "URL de log out"
@@ -9741,7 +9558,6 @@ pt:
     submission_comments: "Comentários do envio"
     sure_you_want_to_mute: "Tem certeza que deseja silenciar esta tarefa? Enquanto esta tarefa estiver silenciada, os alunos não receberão novas notificações sobre ela, nem poderão ver:"
   muted_283cfa0f: (desativada)
-  my_dashboard_8983c283: "Meu painel"
   my_dashboard_b724020: "O meu painel"
   n_a_d6f6c42f: ND
   n_number_of_times_c2e78b72: "n Número de Vezes"
@@ -9759,11 +9575,6 @@ pt:
   new_file_135ae520: "[ Novo arquivo ]"
   new_outcome_7fba8c7d: "Novo resultado"
   new_quiz_statistics_desc: "Ativar a nova página de estatísticas de teste para uma disciplina."
-  new_styles_description: |-
-      Estamos a preparar uma remodelação da interface do Canvas. Ative esta opção para
-      escolher a possibilidade de ver o aspeto simplificado e atualizado da interface do Canvas.
-      É uma funcionalidade que está a ser aperfeiçoada e que ainda não deve ser ativada
-      para utilizadores reais.
   next_40e12421: Seguinte
   next_steps_ce0f0d0c: "Próximas etapas"
   no_assignment_name_adbb215b: "Nenhum nome de tarefa"
@@ -10085,7 +9896,6 @@ pt:
       page_title: "Iniciar sessão em Aplicação"
       remember_auth: "Não esquecer a minha autorização para este serviço"
   observees: 
-    add_observee_button: "Adicionar aluno"
     being_observed: "Alunos em observação"
     new_observee_password: Palavra-passe
     new_observee_username: "Nome de utilizador"
@@ -12025,7 +11835,6 @@ pt:
         has_submissions_already: "Tenha em consideração que alguns alunos já fizeram ou já iniciaram este teste"
         less_than_allotted_time: "Iniciou este teste perto do prazo de entrega, por isso não terá o tempo total para realizar o teste."
         no_submission_for_user: "Não há nenhum envio disponível para esse utilizador"
-        quiz_not_availible: "Não tem acesso ao teste solicitado."
         quiz_updated: "Teste atualizado com sucesso"
         quizzes_published: 
           one: "1 teste publicado com sucesso!"
@@ -13113,18 +12922,6 @@ pt:
         go: Ir
       titles: 
         find_user: "Localizar um utilizador"
-    add_assignment: 
-      buttons: 
-        add_assignment: "Adicionar tarefa"
-      labels: 
-        assignment_group_id: Grupo
-        due_at: Prazo
-        points_possible: Pontos
-        title: Nome
-      options: 
-        assignments: Tarefas
-      titles: 
-        add_assignment: "Adicionar tarefa"
     add_assignment_group: 
       buttons: 
         add_group: "Adicionar grupo"
@@ -13917,8 +13714,6 @@ pt:
     student_hidden_name: "Aluno %{position}"
   sso_settings_ebf98263: "Definições SSO"
   start_date_e937be8a: "Data de início"
-  start_date_must_be_before_end_date_a00be892: "A data de início tem de ser anterior à data final"
-  starts_on_date_a777f505: "Data de Começa em"
   statistics: 
     csv_columns: 
       attempt: tentativa
@@ -14256,7 +14051,6 @@ pt:
   the_following_fields_are_invalid_fields_b3565800: "Os seguintes campos são inválidos: %{fields}"
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "O nome compelto do anfitrião desta conta (something.instructure.com, por exemplo)"
   the_grading_period_was_deleted_7814a349: "O período de avaliação foi apagado"
-  the_grading_period_was_saved_4a504c5: "O período de avaliação foi guardado"
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "A instituição a partir da qual iniciou sessão não está configurada nesta conta."
   the_list_of_results_has_been_updated_46e3c733: "A lista de resultados foi atualizada."
   the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "Imagem do logótipo no cabeçalho superior direito do Canvas. 200x200 svg ou png"
@@ -14305,7 +14099,6 @@ pt:
   this_field_name_is_required_b9196401: "O campo \"nome\" é obrigatório."
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "Este ficheiro tem de ter direitos de utilização definidos para poder ser publicado."
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Esta pasta está bloqueada e não está disponível para visualização."
-  this_grading_period_overlaps_16332589: "Este Período de Classificação é superior"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Esta é uma lista separada por vírgulas de endereços URL fidedignos. Confiar em qualquer um dos endereços URL desta lista ultrapassará o token CSRF quando se iniciar sessão no Canvas."
   this_login_is_for_provider_6f17462: "Este registo é para %{provider}"
   this_most_likely_happened_because_you_imported_cou_a78ea880: "É provável que isto tenha acontecido por ter importado conteúdo da disciplina sem os ficheiros associados."
@@ -14561,7 +14354,6 @@ pt:
     buttons: 
       resubmit_to_turnitin: "Reenviar para Turnitin"
   twitter_fcef6b54: Twitter
-  type_more_to_find_additional_students_d5211cd5: "Escreva mais para encontrar mais estudantes"
   unable_to_remove_app_4293cb53: "Não é possível remover a aplicação"
   unarchive_selected_e0c4bd3d: "Desativar Selecionado"
   unauthorized: "não autorizado"
@@ -14589,7 +14381,6 @@ pt:
   until_date_949017c4: "Até %{date}"
   untitled_assignment_59354b34: "tarefa sem nome"
   unused_courses_title: "Disciplinas não utilizadas"
-  update_4d8ee62: Atualizar
   updated_group_group_name_727b1d98: "Atualizou o grupo %{group_name}"
   upload_button: 
     upload: Carregar
@@ -14822,8 +14613,6 @@ pt:
         one: "média para 1 aluno"
         other: "média para %{count} aluno"
       course: Disciplina
-      crumbs: 
-        grades: Notas
       current_teacher_courses: "Disciplinas que leciono"
       linked_student_accounts: "Contas de alunos vinculadas"
       links: 
@@ -15038,7 +14827,6 @@ pt:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Disciplina Blackboard Vista/CE, WebCT 6+"
   webct_name: "Blackboard Vista/CE (WebCT)"
-  welcome_to_your_courses_to_customize_the_list_of_c_2922a551: "Bem vindo às suas disciplinas! Para personalizar esta lista de disciplinas, clique na ligação \"Todas as Disciplinas\" e escolha as disciplinas para apresentar."
   well_below_mastery_37664bdc: "Muito abaixo de Domínio"
   what_should_the_csv_file_look_like_985a59ac: "Qual seria a aparência do arquivo CSV?"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Esta é a página que as pessoas verão quando visitarem a disciplina. Pode configurar a página para mostrar um fluxo de atividade, a lista de módulos da disciplina, um programa ou uma página personalizada criada por si. A predefinição é o fluxo de atividade da disciplina."
