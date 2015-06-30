@@ -29,11 +29,9 @@ fr:
     student_count: 
       one: "1 étudiant"
       other: "%{count} étudiants"
-    student_count_max: "%{count} / %{max} étudiants"
     user_count: 
       one: "1 utilisateur"
       other: " %{count} utilisateurs"
-    user_count_max: "%{count} / %{max} utilisateurs"
   GroupUserCollection: 
     flash: 
       userAlreadyInGroup: "AVERTISSEMENT : %{user} est déjà un membre du groupe %{group}"
@@ -118,8 +116,6 @@ fr:
   account_authorization_configs: 
     account_required: "authentification avec LDAP nécessaire"
     index: 
-      add_auth_desc: "Ajouter un fournisseur d’identités à ce compte :"
-      choose_auth_type_option: "Choisir un service d’authentification"
       delete_auth_confirmation: "Êtes-vous sûr ? Les utilisateurs risquent de ne pas pouvoir se connecter si vous la supprimez."
       delete_auth_link: "Supprimer toutes les authentifications"
       ip_address_list_description: "Si vous utilisez un service d’authentification, par exemple LDAP, qui exige que les serveurs Canvas contactent directement vos serveurs, assurez-vous que vos serveurs accepteront les connexions en provenance de ces adresses IP :"
@@ -343,7 +339,6 @@ fr:
       open_registration_delegated_warning_dialog: "Un fournisseur d'identités externe est activé"
       what_are_quiz_ip_filters: "Que sont les filtres IP de questionnaire ?"
     user: Utilisateur
-  account_settings_fe083453: "Paramètres de compte"
   account_surveys_b0039876: "Enquêtes du compte"
   account_user: 
     types: 
@@ -897,7 +892,6 @@ fr:
         turnitin_host: "Hôte Turnitin"
         turnitin_pledge: "Engagement Turnitin"
         turnitin_shared_secret: "Secret partagé Turnitin"
-        users_can_edit_name: "Les utilisateurs peuvent modifier le nom d’affichage"
       links: 
         add_admins: "Ajouter des administrateurs de compte"
         configure_report: Configurer...
@@ -1197,7 +1191,6 @@ fr:
         default: 
           zero_activity: 
             text: "Ce rapport montre tous les étudiants inscrits à un cours d’un trimestre donné. Le fichier CSV résultant contient une ligne par inscription d’utilisateurs qui n’ont pas consulté le cours depuis la date indiquée."
-  accounts_752dc365: Comptes
   achieve_mastery_count_times_8c9bbcec: "Parvenir à la maîtrise %{count} fois "
   actions_efcde10d: Actions
   activerecord: 
@@ -1438,8 +1431,6 @@ fr:
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Voulez-vous vraiment supprimer cette période de notation ? "
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Voulez-vous vraiment supprimer cet outil ?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Êtes-vous certain de vouloir signaler cette image de profile ?"
-  aria_labels: 
-    unlock_at_date: "Déverrouiller à la date"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Au fur et à mesure que vous remplissez ce champ, la liste des groupes est filtrée automatiquement pour inclure uniquement les noms correspondant aux caractères tapés."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "Alors que vous écrivez dans ce champ, la liste des résultats se mettra automatiquement à jour."
   assessment_question: 
@@ -1591,9 +1582,6 @@ fr:
       save: Enregistrer
       validating: Enregistrement...
       weight_groups: "Pondérer la note finale en fonction des groupes de tâches"
-    assignment_sidebar: 
-      links: 
-        submit: "Envoyer une tâche"
     assignments_list_right_side: 
       links: 
         manage_assignments: "Gérer les tâches"
@@ -1948,14 +1936,12 @@ fr:
         grade: "Note : %{grade} *(%{points_possible} points possibles)*"
         none_assigned: "Aucune attribuée"
       links: 
-        resubmit: "Renvoyer la tâche"
         submission: 
           details: "Informations de l’envoi"
           download_attachment: "Télécharger %{attachment_display_name}"
           view_original_page: "Afficher la page d’origine"
           view_quiz: "Afficher l’envoi du questionnaire"
           view_survey: "Afficher l’envoi de l’enquête"
-        submit: "Envoyer une tâche"
         view_rubric_evaluation: "Afficher l’évaluation par barème"
       messages: 
         no_comments: "Aucun commentaire"
@@ -2118,20 +2104,13 @@ fr:
     upload_error_unexpected: "Une erreur inconnue s’est produite lors du téléchargement depuis %{url}"
   attachment_deffe5a9: "Pièce jointe"
   attendance: 
-    default_attendance_title: "Participation le %{date}"
-    errors: 
-      could_not_add_assignment: "L’ajout de la tâche a échoué"
     options: 
       clear_attendance_marks: "Effacer les marques de participation"
       edit_assignment: "Modifier la tâche"
       mark_all_as_absent: "Marquer tout le mode absent"
       mark_all_as_present: "Marquer tout le monde présent"
-    status: 
-      added_assignment: "Tâche ajoutée"
-      adding_assignment: "Ajout d’une tâche"
     titles: 
       attendance_help: "Aide sur la participation"
-      new_attendance_column: "Colonne Nouvelle participation"
   audio_dd489fcc: Audio
   auth_logging: 
     corrupted: "Détails non disponibles"
@@ -2147,8 +2126,6 @@ fr:
   available_until_date_cd125c62: "Disponible jusqu’à la date"
   available_until_f3b9c4ed: "Disponible jusqu’à"
   available_until_lock_at_ab022445: "Disponible jusqu’à %{lock_at}"
-  availible_from_format_like_yyyy_mm_dd_hh_mm_f101e0dd: "Disponible depuis - Formater comme suit : AAAA-MM-JJ hh:mm"
-  availible_to_format_like_yyyy_mm_dd_hh_mm_f2611528: "Disponible jusqu'à - Formater comme suit : AAAA-MM-JJ hh:mm"
   average_49c63f9b: Moyenne
   back_to_app_center_95420d83: "Revenir au centre d’applications"
   base_847aca7c: Base
@@ -2895,12 +2872,10 @@ fr:
       notices: 
         contact_registered: "Méthode de contact enregistrée !"
   concluded_courses_94782e21: "Cours clôturés"
-  conference_36b50fda: Conférence
   conferences: 
     concluded_conference: 
       delete: Supprimer
       no_recording: "Pas d’enregistrements"
-      preparing_video: "Préparation de la vidéo"
       recording: "1 enregistrement"
       recordings: "%{recordingCount} enregistrements"
       settings: Paramètres
@@ -3144,14 +3119,6 @@ fr:
         date_adjustment: "Ajustement de la date"
         ending_change_to: "remplacer par"
         ending_date: "Date de fin"
-        new_end_date_label: "Remplacer la date de fin par"
-        new_end_date_title: "Remplacer la date de fin par"
-        new_start_date_label: "Remplacer la date de début par"
-        new_start_date_title: "Remplacer la date de début par"
-        old_end_date_label: "Date de fin"
-        old_end_date_title: "Date de fin"
-        old_start_date_label: "Date de début"
-        old_start_date_title: "Date de début"
         remove_dates: "Supprimer les dates"
         shift_dates: "Décaler les dates"
         substitution: Substitution
@@ -4707,14 +4674,12 @@ fr:
     conversations_expand: 
       one: "Développer %{count} message de conversation"
       other: "Développer %{count} messages de conversation"
-    disable_dashboard: "Revenir à l’ancien tableau de bord"
     discussions_collapse: 
       one: "Réduire %{count} discussion"
       other: "Réduire %{count} discussions"
     discussions_expand: 
       one: "Développer %{count} discussion"
       other: "Développer %{count} discussions"
-    enable_dashboard: "Essayer le nouveau tableau de bord"
     show_more_link: 
       show_less: "Afficher moins "
       show_more: "Afficher plus"
@@ -5119,8 +5084,6 @@ fr:
         one: "1 réponse non lue."
         other: "%{count} réponses non lues."
         zero: "Pas de réponses non lues."
-    notices: 
-      discussion_not_availible: "Vous n’avez pas accès à la discussion demandée."
     page_nav: 
       Page: Page
       current_page: Actuelle
@@ -5310,7 +5273,6 @@ fr:
   due_datetime_f5a81b81: "À rendre le : %{dateTime}"
   due_format_like_yyyy_mm_dd_hh_mm_ef30a9ef: "Échéance - Formater comme suit : AAAA-MM-JJ hh:mm"
   due_multiple_dates_cc0ee3f5: "Échéance : plusieurs dates"
-  due_on_date_aa4725cd: "Date d’échéance :"
   e_mail_only_2cc5e513: "E-mail uniquement"
   each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: "Chaque barre symbolise un travail. La couche verte représente le pourcentage d’étudiants qui ont rendu le travail *à temps*. Les travaux **en retard** sont signalés en jaune et ceux qui ***manquent*** sont en rouge."
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Chaque barre symbolise un travail. Les *fines moustaches verticales* partent de la plus basse note, quel que soit l’étudiant, et rejoignent la note la plus élevée. La **barre plus épaisse** relie le 25e centile au 75e, avec la valeur ***médiane signalée***."
@@ -5426,7 +5388,6 @@ fr:
       Plusieurs périodes de notation permettent aux professeurs et administrateurs  de créer des périodes de notation avec des 
       dates butoir fixes. Les travaux peuvent être filtrés par ces périodes de notation dans le relevé de notes.
   end_date_e0093ed7: "Date de fin"
-  ends_on_date_320e0c26: "Se termine à la date"
   enrollment: 
     default_course_name: Cours
     default_email: "Aucun e-mail"
@@ -5644,7 +5605,6 @@ fr:
         already_used: "Cet envoi est déjà inclus dans votre portefeuille."
         feed: "Flux Atom du portefeuille électronique"
         view_submission: "Afficher l’envoi"
-      upload_limit: "limiter à 50 Mo par fichier"
       welcome: "S’il s’agit de votre première visite, vous pouvez ouvrir l’assistant et choisir la meilleure solution pour débuter. Sinon, vous pouvez rapidement ajouter des envois récents ou simplement accéder directement au portefeuille."
       write_only_comments: "Les commentaires sur cette page sont privés. Vous pouvez faire des commentaires, mais seul le propriétaire du portefeuille pourra les consulter."
     show_me: montrez-moi
@@ -5728,7 +5688,6 @@ fr:
   errors: 
     bad_navigation_config: "Configuration d’onglet de cours non valide"
     blank: Requis
-    failed: Échec
     format: "%{attribute} %{message}"
     index: 
       all_categories: "- Toutes les catégories -"
@@ -5791,7 +5750,6 @@ fr:
   expand_or_collapse_calendars_9854b0d0: "Développer ou réduire les calendriers"
   expand_or_collapse_undated_items_b901de09: "Développer ou réduire les éléments non datés"
   expand_subdiscussion_cd226ed4: "Développer la sous-discussion"
-  expires_on_date_18efe4e2: "Expire à la date"
   export_de71cd8e: Exporter
   exporting_b1eab154: Exportation
   external_apps_f5490181: "Applications externes"
@@ -5964,7 +5922,6 @@ fr:
   features: 
     allow_opt_out_of_inbox: "Autoriser les utilisateurs à sortir de la boîte de réception"
     better_file_browsing: "Meilleure navigation dans les fichiers"
-    course_catalog: "Catalogue des cours"
     differentiated_assignments: "Travaux différenciés"
     differentiated_assignments_account_disable_warning: |-
         La désactivation de cette fonctionnalité aura un impact sur les cours existants. Pour en savoir plus sur la manière de la désactiver, contactez votre 
@@ -5980,7 +5937,6 @@ fr:
     lor: "Outils externes LOR"
     multiple_grading_periods: "Plusieurs périodes de notation"
     new_quiz_statistics: "Nouvelle page de statistiques de questionnaire"
-    new_styles: "Utiliser les nouveaux styles"
     post_grades: "Publier les notes sur SIS"
     quiz_log_auditing: "Audit du journal des questionnaires"
     student_groups: "Nouvelle page de groupes d’étudiants"
@@ -6026,134 +5982,30 @@ fr:
     unpublished_status: "Non publié"
   filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filename} a été publié avec le droit d’utilisation suivant : %{usage_right}"
   files: 
-    alts: 
-      file: Fichier
-      folder: Dossier
-      folder_locked: "Dossier verrouillé"
-      locked_file: "Fichier verrouillé"
-    buttons: 
-      update_file: "Mettre à jour le fichier"
-    cancel: Annuler
     content_folder: 
       titles: 
         edit_and_move_instructions: "Cliquer pour modifier, faire glisser pour déplacer dans un autre dossier"
     could_not_find_file: "Ce fichier a été supprimé."
     errors: 
       empty_file: "Ce fichier est vide. Veuillez télécharger un autre fichier."
-      extracting: "Des erreurs se sont produites lors de l’extraction du fichier zip. Veuillez réessayer."
-      failed_uploading: "Échec lors du téléchargement : %{error_info}"
-      loading_file: "Erreur lors du chargement du contenu du fichier. Veuillez réessayer."
       missing_field: "Échec du téléchargement, il manque un champ de formulaire"
       not_found: "Une erreur s’est produite lors du téléchargement du fichier ; le fichier est introuvable. Vous pouvez en informer le propriétaire du fichier et lui demander un nouveau téléchargement."
       server_error: "Échec du téléchargement, veuillez réessayer"
-      server_returned_invalid_status: "Le serveur ne renvoie plus de statut valide"
-      server_unresponsive: "Le serveur ne répond plus aux demandes de statuts"
       too_large: "Le fichier est trop volumineux pour être modifié"
-      unexpected_response: "la réponse attendue n’a pas été obtenue"
-      update_file_failed: "Échec de la mise à jour du fichier, veuillez réessayer"
       upload_failed: "Échec du téléchargement, veuillez réessayer"
-      uploading: "Erreur de téléchargement"
-      uploading_zip: "Des erreurs sont survenues lors du téléchargement du fichier zip."
     fields: 
       file: Fichier
     files_page_title: Fichiers
     full_index: 
-      alts: 
-        file_locked: verrouillé
-        file_preview: aperçu
-        folder_locked: verrouillé
-      buttons: 
-        add_a_file: "Ajouter un fichier"
-        lock_file: "Verrouiller ce fichier"
-        lock_folder: "Verrouiller ce dossier"
-        overwrite_duplicate_attachment: Remplacer
-        rename_duplicate_attachment: "Renommer les nouveaux fichiers"
-      descriptions: 
-        file_locked_after: "Il sera verrouillé après le %{lock_at}."
-        file_locked_until: "Il est verrouillé jusqu’au %{unlock_at}."
-        folder_locked: "Ce dossier est verrouillé et ne peut pas être consulté par les étudiants."
-        folder_locked_after: "Il sera verrouillé après le %{lock_at}."
-        folder_locked_until: "Il est verrouillé jusqu’au %{unlock_at}."
-        lock_file: "Lorsqu’un fichier est verrouillé, seuls les enseignants et les aides-enseignants peuvent y accéder."
-        lock_folder: "Lorsqu’un dossier est verrouillé, seuls les enseignants et les aides-enseignants peuvent y accéder."
-      drop_here: "Déplacez les fichiers ici pour les ajouter dans ce dossier."
-      drop_zip_files: "Vous pouvez aussi déplacer les fichiers zip et extraire leur contenu dans ce dossier."
-      edit_html_warning: "L’éditeur HTML modifie votre code HTML. Vous devriez télécharger une copie de sauvegarde avant d’enregistrer les modifications."
-      file_details: "Informations sur le fichier"
-      file_list: "Liste des fichiers"
-      files_title: Fichiers
-      labels: 
-        just_hide_file: "Laisser les étudiants télécharger ou consulter le fichier si je lui ajoute un lien, mais ne pas l’afficher dans la liste des fichiers pour les étudiants"
-        just_hide_folder: "Laisser les étudiants télécharger ou consulter les fichiers si je leur ajoute un lien, mais ne pas l’afficher dans la liste des fichiers pour les étudiants"
-        lock_after: "Verrouiller après le"
-        lock_until: "Verrouiller jusqu’au"
-        locked: "Verrouiller jusqu’au déverrouillage manuel"
       links: 
-        add_file: "Ajouter un fichier"
-        add_folder: "Ajouter un dossier"
-        delete_file: "Supprimer le fichier"
-        delete_folder: "Supprimer le dossier"
-        download_as_zip: "Télécharger les fichiers dans ce dossier sous forme de zip"
-        download_file: "Télécharger le fichier"
-        download_with_size: "télécharger le fichier (%{size})"
         download_zip: "Cliquez ici pour télécharger %{size}"
-        edit_content: "modifier le contenu"
-        import_zip: "Importer un fichier zip"
-        lock_file: "Verrouiller ce fichier"
-        lock_folder: "Verrouiller ce dossier"
-        preview: aperçu
-        rename_file: "Renommer le fichier"
-        rename_folder: "Renommer le dossier"
-        show_all_files: "afficher les fichiers de tous vos cours/groupes"
-        show_personal_files: "afficher seulement mes fichiers personnels"
-        unlock_file: "Déverrouiller ce fichier"
-        unlock_folder: "Déverrouiller ce dossier"
-      locked: "Ce fichier n’étant pas encore déverrouillé, il ne peut pas être téléchargé."
-      locked2: "Ce fichier est verrouillé et ne peut pas être téléchargé par les étudiants."
       messages: 
         creating_zip: "Création d’un fichier zip..."
-        gathering_and_zipping: |-
-            **Le contenu de ce dossier est réuni** et compressé
-            dans un fichier zip. L’opération peut prendre plus ou moins de temps en fonction de la taille et du nombre de fichiers.
         gathering_data: "Collecte des données..."
-        gathering_files: "Collecte des fichiers..."
         gathering_files_with_progress: "Collecte des fichiers (%{progress}%)..."
-        no_preview_avaialble: "Aucun aperçu disponible"
-        uploading: "Téléchargement de 5 fichiers..."
         zip_finished: "Terminé. Redirection vers le fichier..."
-      page_title: Fichiers
-      storage_used: "Stockage utilisé : %{size1} sur %{size2}"
-      switch_views: "Basculer les fenêtres"
       titles: 
         download_folder_contents: "Télécharger le contenu du dossier"
-        edit_file: "Modifier %{file}"
-        edit_file_contents: "Modifier le contenu du fichier"
-        file_locked: Verrouillé
-        folder_locked: Verrouillé
-        lock_file: "Verrouiller %{file_name}"
-        lock_folder: "Verrouiller %{folder_name}"
-      warnings: 
-        too_many: "Trop de cours/groupes à afficher à la fois. Ci-dessous sont affichés les 15 premiers résultats."
-    links: 
-      add_files: "Ajouter des fichiers"
-    messages: 
-      access_denied: "Impossible de lire le contenu de ce dossier."
-      done_uploading: "Téléchargement terminé"
-      error_count: 
-        one: 1 erreur
-        other: "%{count} erreurs"
-      extraction_complete: "Extraction terminée. Mise à jour de la structure de fichiers..."
-      finalizing: Finalisation
-      folder_empty: "Ce dossier est vide"
-      loading_files: "Chargement des fichiers..."
-      no_files_selected: "Aucun fichier valide n’est sélectionné"
-      queued: "En file d’attente"
-      updating_file: "Mise à jour du fichier..."
-      upload_complete: "Téléchargement terminé"
-      uploading: Téléchargement
-      uploading_files: 
-        one: "Téléchargement d’un fichier..."
-        other: "Téléchargement de %{count} fichiers..."
     my_files: "Mes fichiers"
     new: 
       buttons: 
@@ -6163,28 +6015,12 @@ fr:
     notices: 
       deleted: "Le fichier %{display_name} a été supprimé."
       updated: "Le fichier a été mis à jour."
-    prompts: 
-      delete_file: "Voulez-vous vraiment supprimer ce fichier ?"
-      delete_folder: "Voulez-vous vraiment supprimer ce dossier et tout ce qu’il contient ?"
-      duplicate_filenames: "Des fichiers portant ce nom existent déjà dans ce dossier. Voulez-vous les remplacer ou renommer les nouveaux fichiers avec des noms uniques ?"
-      extract_zip: "Ce fichier est un fichier zip. Voulez-vous extraire son contenu dans ce dossier ?"
     show: 
       messages: 
         file_locked: "Ce fichier n’est pas encore déverrouillé."
         folder_locked: "Le dossier %{folder} qui contient ce fichier a été verrouillé."
     text_show: 
       page_title: "Aperçu de fichier"
-    titles: 
-      click_and_drag: "Cliquer sur le dossier et le faire glisser dans un autre dossier"
-      drag_to_move: "Faire glisser pour déplacer dans un dossier différent"
-      extracting: "Extraction des fichiers dans un dossier"
-      file_uplaods_queue: "File d’attente de téléchargement des fichiers"
-      lock_file: "Verrouiller le fichier"
-      lock_folder: "Verrouiller le dossier"
-    update_file: "Mettre à jour le fichier"
-    upload_error: "Erreur lors du téléchargement du fichier"
-    warnings: 
-      file_uploaded_without_response: "Le fichier est peut-être téléchargé mais le serveur n’a pas répondu. Retéléchargez la page pour confirmer."
   files_and_folder_contents_only_available_to_studen_944f9166: "Fichiers et contenu des dossiers disponibles uniquement via un lien pour les étudiants. Pas visibles dans les fichiers des étudiants."
   files_c300e900: Fichiers
   files_uploaded_519844ed: "Fichiers transmis"
@@ -6460,27 +6296,15 @@ fr:
   gradebooks: 
     attendance: 
       attendance_info: "Aucune tâche de participation n’a été créée."
-      buttons: 
-        add_assignment: "Ajouter une tâche"
       edit_attendance_info: "Pour modifier les informations d’une tâche de participation, cliquez sur l’icône de liste déroulante sous le nom de la tâche, puis cliquez sur Modifier la tâche."
       headers: 
         attendance: Participation
         edit_attendance: "Modifier les informations de participation"
         loading_attendance: "Chargement du tableau de participation..."
         mark_attendance: "Marquer la participation"
-        new_column: "Colonne Nouvelle participation"
       how_do_i: "Comment faire pour... ?"
-      labels: 
-        date: Date
-        group: Groupe
-        possible: Possible
-        title: Titre
-      links: 
-        add_column: "Ajouter une colonne"
       mark_attendance_info: "La vue de participation affiche un tableau avec les étudiants énumérés dans la colonne de gauche et les tâches dans la ligne du haut. Pour indiquer qu’un étudiant est présent ou absent, cliquez sur la case correspondante jusqu’à obtenir la marque souhaitée (%{present_icon} pour présent, %{absent_icon} pour absent). Vous pouvez aussi utiliser la liste déroulante pour chaque tâche afin d’indiquer la présence ou l’absence de tous."
-      new_group: "Nouveau groupe"
       page_title: Participation
-      points_abbrev: points
       titles: 
         click_to_change: "Cliquer pour modifier"
     blank_submission: 
@@ -6495,7 +6319,6 @@ fr:
       muted: "Mode silencieux"
     grade_summary: 
       all_grading_periods: "Toutes les périodes de notation"
-      assessment_by: "Évaluation par %{name}"
       assignments: Travaux
       buttons: 
         show_what_if: "Afficher les notes hypothétiques enregistrées"
@@ -7358,13 +7181,9 @@ fr:
       invalid_datetime: "Date/heure non valide"
       invalid_entry_for_field: "Entrée non valide : %{field}"
       invalid_number: "Vous devez indiquer un nombre."
-      not_a_date: "Vous devez indiquer une date."
       posting_message_failed: "Échec de la publication, veuillez réessayer"
       required: "Champ obligatoire"
       search_failed: "Échec de la recherche, veuillez réessayer."
-    labels: 
-      datepicker: 
-        time: Heure
     links: 
       minimize_file_preview: "Réduire l’aperçu du fichier"
       minimize_youtube_video: "Réduire la vidéo"
@@ -7648,12 +7467,10 @@ fr:
   loading_25990131: Chargement...
   locales: 
     fr: Français
-  lock_after_date_92f9149: "Verrouiller après la date"
   lock_date_cannot_be_after_course_end_a473158b: "La date du verrouillage ne peut pas être postérieure à la date de fin du cours."
   lock_date_cannot_be_after_section_end_d37da70c: "La date de verrouillage ne peut pas se situer après la fin de la section"
   lock_date_cannot_be_after_term_end_cf1a188f: "La date de verrouillage ne peut pas se situer après la fin du trimestre"
   lock_date_cannot_be_before_due_date_ac30f54: "La date de verrouillage ne peut pas être antérieure à la date d’échéance."
-  lock_until_date_62ce1b5c: "Verrouiller jusqu’à la date"
   log_on_url_fc166e4c: "Se Connecter sur l'URL"
   log_out_379ba28a: Déconnexion
   log_out_url_2605c2c1: "Se Déconnecter de l'URL"
@@ -9722,7 +9539,6 @@ fr:
     submission_comments: "Commentaires sur l’envoi"
     sure_you_want_to_mute: "Voulez-vous vraiment mettre cette tâche en mode silencieux ? Tant qu’elle sera en mode silencieux, les étudiants ne reçoivent pas de nouvelles notifications ni ne peuvent afficher :"
   muted_283cfa0f: (muet)
-  my_dashboard_8983c283: "Mon Tableau de bord"
   my_dashboard_b724020: "Mon tableau de bord"
   n_a_d6f6c42f: NA
   n_number_of_times_c2e78b72: "n Nombre de fois"
@@ -9740,10 +9556,6 @@ fr:
   new_file_135ae520: "[ Nouveau fichier ]"
   new_outcome_7fba8c7d: "Nouveau résultat"
   new_quiz_statistics_desc: "Activez la nouvelle page de statistiques de questionnaire pour un cours."
-  new_styles_description: |-
-      Nous sommes en train de revoir l’interface utilisateur de Canvas. Activez cette option
-      pour afficher la nouvelle interface, offrant un aspect et un fonctionnement simplifiés.
-      Il s’agit d’une fonctionnalité en plein développement qui ne doit pas encore être activée dans un environnement de production.
   next_40e12421: Suivant
   next_steps_ce0f0d0c: "Étapes suivantes"
   no_assignment_name_adbb215b: "Pas de nom de travail"
@@ -10065,7 +9877,6 @@ fr:
       page_title: "Connexion à l’application"
       remember_auth: "Mémoriser mon autorisation pour ce service"
   observees: 
-    add_observee_button: "Ajouter un étudiant"
     being_observed: "Étudiants observés"
     new_observee_password: "Mot de passe"
     new_observee_username: "Nom d’utilisateur"
@@ -12009,7 +11820,6 @@ fr:
         has_submissions_already: "Gardez à l’esprit que certains étudiants ont déjà complété ou commencé ce questionnaire."
         less_than_allotted_time: "Vous avez commencé ce questionnaire peu avant son échéance, par conséquent vous ne disposez pas de toute la durée pour le compléter."
         no_submission_for_user: "Aucun envoi disponible pour cet utilisateur"
-        quiz_not_availible: "Vous n’avez pas accès au questionnaire demandé."
         quiz_updated: "Le questionnaire a bien été mis à jour"
         quizzes_published: 
           one: "1 questionnaire a été publié"
@@ -13097,18 +12907,6 @@ fr:
         go: Ok
       titles: 
         find_user: "Chercher un utilisateur"
-    add_assignment: 
-      buttons: 
-        add_assignment: "Ajouter une tâche"
-      labels: 
-        assignment_group_id: Groupe
-        due_at: Échéance
-        points_possible: Points
-        title: Nom
-      options: 
-        assignments: Tâches
-      titles: 
-        add_assignment: "Ajouter une tâche"
     add_assignment_group: 
       buttons: 
         add_group: "Ajouter un groupe"
@@ -13900,8 +13698,6 @@ fr:
     student_hidden_name: "Étudiant %{position}"
   sso_settings_ebf98263: "Paramètres SSO"
   start_date_e937be8a: "Date de début"
-  start_date_must_be_before_end_date_a00be892: "La date de début doit être antérieure à la date de fin"
-  starts_on_date_a777f505: "Commence à la date"
   statistics: 
     csv_columns: 
       attempt: tentative
@@ -14239,7 +14035,6 @@ fr:
   the_following_fields_are_invalid_fields_b3565800: "Les champs suivants ne sont pas valides : %{fields}"
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "Le nom complet d'hôte de l'instance de compte (quelquechose.instructure.com, par exemple)"
   the_grading_period_was_deleted_7814a349: "La période de notation a été supprimée"
-  the_grading_period_was_saved_4a504c5: "La période de notation a été sauvegardée"
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "L’institution à partir de laquelle vous vous êtes connecté n’est pas configurée sur ce compte."
   the_list_of_results_has_been_updated_46e3c733: "La liste des résultats a été mise à jour."
   the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "L’image du logo en haut à droite de l’en-tête Canvas. SVG ou PNG 200 x 200"
@@ -14288,7 +14083,6 @@ fr:
   this_field_name_is_required_b9196401: "Le champ « nom » est obligatoire."
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "Ce fichier ne peut pas être publié tant que ses droits d’utilisation ne sont pas définis."
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Ce dossier est actuellement verrouillé et non consultable."
-  this_grading_period_overlaps_16332589: "Cette période de notation en chevauche une autre"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Il s’agit d’une liste d’URL de confiance séparées par des virgules. La confiance accordée à n’importe quelle URL de cette liste rend inutile le jeton CSRF lors de la connexion à Canvas."
   this_login_is_for_provider_6f17462: "Cette connexion est pour %{provider}"
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Cela est très probablement dû au fait que vous avez importé le contenu du cours sans ses fichiers associés."
@@ -14544,7 +14338,6 @@ fr:
     buttons: 
       resubmit_to_turnitin: "Renvoyer à Turnitin"
   twitter_fcef6b54: Twitter
-  type_more_to_find_additional_students_d5211cd5: "Continuez d'écrire pour trouver un plus grand nombre d'étudiants"
   unable_to_remove_app_4293cb53: "Impossible de supprimer l’application"
   unarchive_selected_e0c4bd3d: "Désarchiver la sélection"
   unauthorized: "non autorisé"
@@ -14572,7 +14365,6 @@ fr:
   until_date_949017c4: "Jusqu’au %{date}"
   untitled_assignment_59354b34: "travail sans titre"
   unused_courses_title: "Cours non utilisés"
-  update_4d8ee62: "Mettre à jour"
   updated_group_group_name_727b1d98: "A mis à jour le groupe %{group_name}"
   upload_button: 
     upload: "Mettre en ligne"
@@ -14805,8 +14597,6 @@ fr:
         one: "moyenne pour 1 étudiant"
         other: "moyenne pour %{count} étudiants"
       course: Cours
-      crumbs: 
-        grades: Notes
       current_teacher_courses: "Les cours que j’enseigne"
       linked_student_accounts: "Comptes d’étudiants liés"
       links: 
@@ -15021,7 +14811,6 @@ fr:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Cours 6+ Blackboard Vista/CE, WebCT"
   webct_name: "Blackboard Vista/CE (WebCT)"
-  welcome_to_your_courses_to_customize_the_list_of_c_2922a551: "Bienvenue dans vos cours ! Pour personnaliser la liste des cours, cliquez sur le lien \"Tous les cours\" et marquez d'une étoile les cours à afficher."
   well_below_mastery_37664bdc: "Bien inférieur au niveau de maîtrise"
   what_should_the_csv_file_look_like_985a59ac: "À quoi ressemble le fichier CSV ?"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Lorsque des internautes visitent le cours, ils voient cette page. Vous pouvez y afficher un flux d’activités, la liste des modules du cours, un programme ou une page personnalisée créée par vos soins. Par défaut, c’est le flux d’activités du cours qui est présenté."
