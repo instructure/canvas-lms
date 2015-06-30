@@ -29,11 +29,9 @@ da:
     student_count: 
       one: "1 studerende"
       other: "%{count} studerende"
-    student_count_max: "%{count} / %{max} studerende"
     user_count: 
       one: "1 bruger"
       other: "%{count} brugere"
-    user_count_max: "%{count} / %{max} brugere"
   GroupUserCollection: 
     flash: 
       userAlreadyInGroup: "ADVARSEL: %{user} er allerede medlem af %{group}"
@@ -118,8 +116,6 @@ da:
   account_authorization_configs: 
     account_required: "Skal være LDAP-autoriseret"
     index: 
-      add_auth_desc: "Tilføj en indentitetsudbyder til dene konto:"
-      choose_auth_type_option: "Vælg en autoriceringsservice"
       delete_auth_confirmation: "Er du sikker? Brugerne kan mulgivis ikke logge ind, hvis dette fjernes."
       delete_auth_link: "Fjern alle autorisationer"
       ip_address_list_description: "Hvis du benytter en autoriceringsservice, der behøver Canvas servere for at kontakte dine servere direkte, så som LDAP, vil det være nødvendigt at dine servere kan acceptere forbindelse fra disse IP adresser:"
@@ -344,7 +340,6 @@ da:
       open_registration_delegated_warning_dialog: "En ekstern identifikation udbyder er aktiveret"
       what_are_quiz_ip_filters: "Hvad er Quiz IP Filtrer?"
     user: Bruger
-  account_settings_fe083453: Kontoindstillinger
   account_surveys_b0039876: Kontooversigter
   account_user: 
     types: 
@@ -900,7 +895,6 @@ da:
         turnitin_host: "Turnitin Host"
         turnitin_pledge: "Turnitin Forpligte"
         turnitin_shared_secret: "Turnitin delt hemmelighed"
-        users_can_edit_name: "Brugere kan redigere viste navn"
       links: 
         add_admins: "Tilføj Konti Admins"
         configure_report: Konfigurer...
@@ -1200,7 +1194,6 @@ da:
         default: 
           zero_activity: 
             text: "Denne rapport viser alle de studerende tilmeldt til ethvert kursus i en given termin. Resulterende cvs fil vil have en række pr. brugertilmelding, der ikke har besøgt kurset siden datoen."
-  accounts_752dc365: Konti
   achieve_mastery_count_times_8c9bbcec: "Opnå beherskelse %{count} gange"
   actions_efcde10d: Handlinger
   activerecord: 
@@ -1441,8 +1434,6 @@ da:
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Er du sikker på, at du ønsker at fjerne denne bedømmelsesperiode?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Er du sikker på, at du ønsker at fjerne dette værktøj?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Er du sikker på, at du ønsker at rapportere dette profilbillede?"
-  aria_labels: 
-    unlock_at_date: "Åben på dato"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Mens du indtaster i dette felt, vil listen af grupper automatisk blive filtreret til kun at inkludere dem, hvis navn matcher dit indput."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "Mens du taster i dette felt, vil listen af resultater automatisk blive opdateret."
   assessment_question: 
@@ -1594,9 +1585,6 @@ da:
       save: Gem
       validating: Gemmer...
       weight_groups: "Vægtning af endelige karakter baseret på grupper"
-    assignment_sidebar: 
-      links: 
-        submit: "Indsend opgave"
     assignments_list_right_side: 
       links: 
         manage_assignments: "Administer opgaver"
@@ -1952,14 +1940,12 @@ da:
         grade: "Karakter: %{grade} *(%{points_possible} pts mulig)*"
         none_assigned: "Ingen tildelt"
       links: 
-        resubmit: "Indsend opgave igen"
         submission: 
           details: Indsendelsesdetaljer
           download_attachment: "Download %{attachment_display_name}"
           view_original_page: "Se den originale side"
           view_quiz: "Se Quiz indsendelse"
           view_survey: "Se spørgeundersøgelsesindsendelse"
-        submit: "Indsend opgave"
         view_rubric_evaluation: "Se kategorievaluering"
       messages: 
         no_comments: "Ingen Kommentarer"
@@ -2122,20 +2108,13 @@ da:
     upload_error_unexpected: "En ukendt fejl opsted ved downloading fra %{url}"
   attachment_deffe5a9: Bilag
   attendance: 
-    default_attendance_title: "Deltagelse %{date}"
-    errors: 
-      could_not_add_assignment: "Tilføjelse af opgave mislykkedes"
     options: 
       clear_attendance_marks: "Ryd deltagelsesmærker"
       edit_assignment: "Rediger opgave"
       mark_all_as_absent: "Marker alle som fraværende"
       mark_all_as_present: "Marker alle som tilstede"
-    status: 
-      added_assignment: "Tilføjet opgave"
-      adding_assignment: "Tilføjer opgaver..."
     titles: 
       attendance_help: Deltagelseshjælp
-      new_attendance_column: "Ny deltagelseskolonne"
   audio_dd489fcc: Lyd
   auth_logging: 
     corrupted: "Detaljer ikke tilgængelig"
@@ -2151,8 +2130,6 @@ da:
   available_until_date_cd125c62: "Tilgængelig indtil dato"
   available_until_f3b9c4ed: "Tilgængelig indtil"
   available_until_lock_at_ab022445: "Tilfængelig indtil %{lock_at}"
-  availible_from_format_like_yyyy_mm_dd_hh_mm_f101e0dd: "Tilfængelig fra - format som YYYY-MM-DD hh:mm"
-  availible_to_format_like_yyyy_mm_dd_hh_mm_f2611528: "Tilgængelig indtil - Format som YYYY-MM-DD hh:mm"
   average_49c63f9b: Gennemsnit
   back_to_app_center_95420d83: "Tilbage til App center"
   base_847aca7c: Bund
@@ -2899,12 +2876,10 @@ da:
       notices: 
         contact_registered: "Kontaktmetode registrert!"
   concluded_courses_94782e21: "Endte kurser"
-  conference_36b50fda: Konference
   conferences: 
     concluded_conference: 
       delete: Slet
       no_recording: "Ingen optagelser"
-      preparing_video: "Forbereder video"
       recording: "1 optagelse"
       recordings: "%{recordingCount} Optagelser"
       settings: Indstillinger
@@ -3148,14 +3123,6 @@ da:
         date_adjustment: Datojustering
         ending_change_to: "Ændre til"
         ending_date: Slutdato
-        new_end_date_label: "Ændre slutdato til"
-        new_end_date_title: "Ændre slutdato til"
-        new_start_date_label: "Ændre begyndelsesdato til"
-        new_start_date_title: "Ændre begyndelsesdato til"
-        old_end_date_label: Slutdato
-        old_end_date_title: Slutdato
-        old_start_date_label: Begyndelsesdato
-        old_start_date_title: Begyndelsesdato
         remove_dates: "Slet datoer"
         shift_dates: "Flyt datoer"
         substitution: Sustitution
@@ -4711,14 +4678,12 @@ da:
     conversations_expand: 
       one: "Udvid %{count} konversationsbesked"
       other: "Udvid %{count} konversationsbeskeder"
-    disable_dashboard: "Gå tilbage til det gamle instrumentbræt"
     discussions_collapse: 
       one: "Sammenfold %{count} diskussion"
       other: "Sammenfold %{count} diskussioner"
     discussions_expand: 
       one: "Udvid %{count} diskussion"
       other: "Udvid %{count} diskussioner"
-    enable_dashboard: "Prøv det nye instrumentbræt"
     show_more_link: 
       show_less: "Vis mindre"
       show_more: "Vis mere"
@@ -5123,8 +5088,6 @@ da:
         one: "1 ulæst svar"
         other: "%{count} ulæste svar."
         zero: "Ingen ulæste svar."
-    notices: 
-      discussion_not_availible: "Du har ikke adgang til den anmodede diskussion."
     page_nav: 
       Page: Side
       current_page: Nuværende
@@ -5314,7 +5277,6 @@ da:
   due_datetime_f5a81b81: "Forfald: %{dateTime}"
   due_format_like_yyyy_mm_dd_hh_mm_ef30a9ef: "Forfald - format som YYYY-MM-DD hh:mm"
   due_multiple_dates_cc0ee3f5: "Forfald: Flere datoer"
-  due_on_date_aa4725cd: "Forfaldsdato:"
   e_mail_only_2cc5e513: "Kun email "
   each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: "Hver bar er en opgave. Grønt lag repræsentere procent af studerende, der har indsendt deres opgave \"til tiden\". Indsendelser der er \"for sent\" er gule og \"manglende\" indsendelser er røde."
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Hver bar er en opgave. Den \"tynde vertikale linje\" forlænger sig fra den laveste score for enhver student i kurset til den højeste score. Den \"tykkere bar\" forlænges fra 25. percentil til 75. percentil med marking af medianen."
@@ -5430,7 +5392,6 @@ da:
       Flere bedømmelsesperioder tilader lærer og admins at oprette bedømmelsesperioder med faste
       ophørsdatoer. Opgaver kan filtreres efter disse bedømmelsesperioder i Gradebook.
   end_date_e0093ed7: "Slut dato"
-  ends_on_date_320e0c26: "Slutter på dato"
   enrollment: 
     default_course_name: Kursus
     default_email: "Ingen e-mail"
@@ -5648,7 +5609,6 @@ da:
         already_used: "Denne indsendelse er allerede inkluderet i din portfolio"
         feed: "Eportfolio Atom Feed"
         view_submission: "Se indsendelse"
-      upload_limit: "grænse 50 MB pr. fil"
       welcome: "Hvis dette er din første gang her, vil du måske benytte guiden og se, hvordan du bedst kommer i gang. Ellers kan du hurtigt tilføje nylige indsendelser eller blot hoppe direkte til portfolioen."
       write_only_comments: "Kommentarer for denne side er private. Du kan give en kommentar, men kun ejeren af portfolioen kan se dem."
     show_me: "vis mig"
@@ -5731,7 +5691,6 @@ da:
   errors: 
     bad_navigation_config: "Ugyldig kursus fane konfiguration"
     blank: Nødvendig
-    failed: Fejlede
     format: "%{attribute} %{message}"
     index: 
       all_categories: "- Alle kategorier -"
@@ -5794,7 +5753,6 @@ da:
   expand_or_collapse_calendars_9854b0d0: "Udfold eller sammenfold kalendere"
   expand_or_collapse_undated_items_b901de09: "Udfold eller sammenfold udaterede elementer"
   expand_subdiscussion_cd226ed4: "Udfold under-diskussion"
-  expires_on_date_18efe4e2: "Udløber på dato"
   export_de71cd8e: Eksport
   exporting_b1eab154: Eksporterer
   external_apps_f5490181: "Ekstern app"
@@ -5967,7 +5925,6 @@ da:
   features: 
     allow_opt_out_of_inbox: "Tillad brugere at fravælge indboks"
     better_file_browsing: "Bedre fil browsing"
-    course_catalog: Kursuskatalog
     differentiated_assignments: "Forskelligartede opgaver"
     differentiated_assignments_account_disable_warning: |-
         Deaktivering af denne funktion vil påvirke eksisterende kurser. For assistance med deaktivering af denne funktion, kontakt venligst
@@ -5983,7 +5940,6 @@ da:
     lor: "LOR eksternt værktøj"
     multiple_grading_periods: "Flere bedømmelsesperioder"
     new_quiz_statistics: "Ny quiz statistikside"
-    new_styles: "Brug ny stil"
     post_grades: "Poster karaktere til SIS"
     quiz_log_auditing: "Quiz log revision"
     student_groups: "Ny studerendes gruppeside"
@@ -6029,134 +5985,30 @@ da:
     unpublished_status: "Ikke offentliggjort"
   filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filename} er blevet offentliggjort med den følgende brugsrettighed: %{usage_right}"
   files: 
-    alts: 
-      file: Fil
-      folder: Mappe
-      folder_locked: "Låst mappe"
-      locked_file: "Låst fil"
-    buttons: 
-      update_file: "Opdater fil"
-    cancel: Annuller
     content_folder: 
       titles: 
         edit_and_move_instructions: "Kilk for at redigere, trække for at flytte til anden mappe"
     could_not_find_file: "Denne fil er blevet slettet"
     errors: 
       empty_file: "Denne fil er tom. Upload venligst en anden fil."
-      extracting: "Der var en fejl ved udpakningen af zip filen. Prøv venligst igen."
-      failed_uploading: "Uploading mislykkedes: %{error_info}"
-      loading_file: "Fejl ved loading af fil indhold. Prøv venligst igen."
       missing_field: "Uploading mislykkedes, forventet form felt mangler"
       not_found: "Det ser ud som om noget gik galt, da denne fil blev uploaded, og vi kan ikke finde den aktuelle fil. Du bør give ejeren af filen besked og få dem til at uploaded den igen."
       server_error: "Upload mislykkedes, server fejl, prøv venligst igen."
-      server_returned_invalid_status: "Serveren holdt op med at returnere en gyldig status"
-      server_unresponsive: "Serveren holdt op med at svare på status anmodninger"
       too_large: "Denne fil er for stor at redigere"
-      unexpected_response: "fik ikke forventede svar tilbage"
-      update_file_failed: "Updatering af fil mislykkedes, prøv venligst igen"
       upload_failed: "Uploading mislykkedes, prøv venligst igen"
-      uploading: "Uploading fejl"
-      uploading_zip: "Der var fejl under uploading  af zip fil."
     fields: 
       file: Fil
     files_page_title: Filer
     full_index: 
-      alts: 
-        file_locked: låst
-        file_preview: forhåndsvisning
-        folder_locked: låst
-      buttons: 
-        add_a_file: "Tilføj fil"
-        lock_file: "Lås denne fil"
-        lock_folder: "Lås denne mappe"
-        overwrite_duplicate_attachment: Overskriv
-        rename_duplicate_attachment: "Omdøb nye filer"
-      descriptions: 
-        file_locked_after: "Det vil blive låst efter %{lock_at}."
-        file_locked_until: "Det er låst indtil %{unlock_at}."
-        folder_locked: "Denne mappe er låst og kan ikke ses af de studerende."
-        folder_locked_after: "Det vil blive låst efter %{lock_at}."
-        folder_locked_until: "Det er låst indtil %{unlock_at}."
-        lock_file: "Når en fil er låst, kan kun lærer og TAs få adgang til den. "
-        lock_folder: "Når en mappe er låst, kan kun lærer og TAs få adgang til den."
-      drop_here: "Drop filer her for at tilføje dem til denne mappe."
-      drop_zip_files: "Du kan også droppe zip filer og vælge at udpakke deres indholde ind i denne mappe."
-      edit_html_warning: "HTML editor ændre din HTML, du bør downloade en backup før du gemmer ænderinger."
-      file_details: "Fil detaljer"
-      file_list: "Fil liste"
-      files_title: Filer
-      labels: 
-        just_hide_file: "Lad studerende downloade eller se filen, hvis jeg giver den et link, men vis den ikke i fillisten for de studerende"
-        just_hide_folder: "Lad studerende downloade og se filer i denne mappe, hvis jeg giver dem et link, men vis dem ikke i fillisten for studerende"
-        lock_after: "Lås efter"
-        lock_until: "Lås indtil"
-        locked: "Lås indtil jeg manuelt åbner det"
       links: 
-        add_file: "Tilføj fil"
-        add_folder: "Tilføj mappe"
-        delete_file: "Slet denne fil"
-        delete_folder: "Slet denne mappe"
-        download_as_zip: "Dowload filer i denne mappe some en zip"
-        download_file: "Download denne fil"
-        download_with_size: "download filen (%{size})"
         download_zip: "Klik her for at downloade %{size}"
-        edit_content: "Rediger indhold"
-        import_zip: "Importer en zip fil"
-        lock_file: "Lås denne fil"
-        lock_folder: "Lås denne mappe"
-        preview: forhåndsvisning
-        rename_file: "Omdøb denne fil"
-        rename_folder: "Omdøb denne mappe"
-        show_all_files: "see filer for alle dine kurser/grupper"
-        show_personal_files: "Vis kun mine personlige filer"
-        unlock_file: "Lås op for denne fil"
-        unlock_folder: "Lås op for denne mappe"
-      locked: "Denne fil er endnu ikek låst op, så den kan ikke blive downloaded."
-      locked2: "Denne fil er låst og kan ikke blive downloaded af studerende."
       messages: 
         creating_zip: "Opret zip fil..."
-        gathering_and_zipping: |-
-            **Indholdet af denne mapper bliver indsamlet** og komprimeret
-            ind i en a zip fil.  Dette kan tage et stykke tid, afhængig af størrelse og antal filer.
         gathering_data: "Samler data..."
-        gathering_files: "Samler filer..."
         gathering_files_with_progress: "Samler filer (%{progress}%)..."
-        no_preview_avaialble: "Ingen forhåndsvisning tilgængelig"
-        uploading: "Uploading 5 filer..."
         zip_finished: "Fuldført! Omdirigering til fil..."
-      page_title: iler
-      storage_used: "Lagring benyttet: %{size1} ud af %{size2}"
-      switch_views: "Skift syn"
       titles: 
         download_folder_contents: "Download indhold af mappe"
-        edit_file: "Rediger %{file}"
-        edit_file_contents: "Rediger filindhold"
-        file_locked: Låst
-        folder_locked: Låst
-        lock_file: "Lås %{file_name}"
-        lock_folder: "Lås %{folder_name}"
-      warnings: 
-        too_many: "Der var for mange kurser/grupper til at vise dem alle på en gang. Nedenfor er de første 15 resultater."
-    links: 
-      add_files: "Tilføj filer"
-    messages: 
-      access_denied: "Du kan ikke læste indholdet af denne mappe"
-      done_uploading: "Uploading færdig"
-      error_count: 
-        one: "1 fejl"
-        other: "%{count} fejl"
-      extraction_complete: "Udpakning fuldført! Opdatering..."
-      finalizing: Færdiggøre
-      folder_empty: "Intet i denne mappe"
-      loading_files: "Loading filer..."
-      no_files_selected: "Ingen gyldige filer er valgt"
-      queued: "Sat i kø"
-      updating_file: "Opdaterer fil..."
-      upload_complete: "Uploading færdig"
-      uploading: Uploading
-      uploading_files: 
-        one: "Uploading 1 fil..."
-        other: "Uploading %{count} filer..."
     my_files: "Mine filer"
     new: 
       buttons: 
@@ -6166,28 +6018,12 @@ da:
     notices: 
       deleted: "Filen %{display_name} er blevet slettet"
       updated: "Filen var opdateret succesfuldt"
-    prompts: 
-      delete_file: "Er du sikker på, at du ønsker at slette denne fil?"
-      delete_folder: "Er du sikker på, at du ønsker at slette denne mappe og al dens indhold?"
-      duplicate_filenames: "Filer med de følgende navne findes allerede i denne mappe. Ønsker du at erstatte dem, eller omdøbe de nye filer med unikke navne?"
-      extract_zip: "Denne fil er en zip fil. Ønsker du at udpakket dens indhold ind i denne mappe?"
     show: 
       messages: 
         file_locked: "Denne fil er endnu ikke blevet låst op."
         folder_locked: "Mappen \"%{folder},\" der inkluderer denne fil, er blevet låst."
     text_show: 
       page_title: "Fil forhåndsvisning"
-    titles: 
-      click_and_drag: "Klik og træk for at flytte mappe til anden mappe"
-      drag_to_move: "Træk for at flytte til en anden mappe"
-      extracting: "Udpakker filer ind i mappe"
-      file_uplaods_queue: Filuploadkø
-      lock_file: "Lås fil"
-      lock_folder: "Lås mappe"
-    update_file: "Opdater fil"
-    upload_error: "Der opstod en fejl under uploading af din fil"
-    warnings: 
-      file_uploaded_without_response: "Filer er muligvis blevet uploaded, men serversvar mislykkedes. Genindlæs siden for at bekræfte."
   files_and_folder_contents_only_available_to_studen_944f9166: "Fil- og mappeindhold kun tilgængelig for studerende med link. Ikke synlig i studerendes filer."
   files_c300e900: Filer
   files_uploaded_519844ed: "Uploadede filer "
@@ -6467,27 +6303,15 @@ da:
   gradebooks: 
     attendance: 
       attendance_info: "Ingen deltageropaver er blevet oprettet."
-      buttons: 
-        add_assignment: "Tilføj opgave"
       edit_attendance_info: "For at redigere detaljer for en deltageropgave, klik på rullegardin ikonet lige under opgavens navn og klik derefter på \"Rediger opgave\"."
       headers: 
         attendance: Deltagelse
         edit_attendance: "Rediger deltagelsesdetaljer"
         loading_attendance: "Loading deltagelsestabel..."
         mark_attendance: "Marker deltagelse"
-        new_column: "Ny deltagelseskolonne"
       how_do_i: "Hvordan gør jeg...?"
-      labels: 
-        date: Dato
-        group: Gruppe
-        possible: Mulige
-        title: Titel
-      links: 
-        add_column: "Tilføj kolonne"
       mark_attendance_info: "Deltagelsesvisning viser en tabel med studerende listet til venstre og opgaver lsitet over toppen. For at markere en studerende som tilstedeværende eller faværende klik på den korresponderende boks indtil den viser den korrekte markering (%{present_icon}  for tilstede, %{absent_icon} for fraværende). Du kan også se rullegardinsmenuen for hver opgave for at markere alle som tilstedeværende eller fraværende."
-      new_group: "Ny gruppe"
       page_title: Deltagelse
-      points_abbrev: pts
       titles: 
         click_to_change: "Klik for at ændre"
     blank_submission: 
@@ -6502,7 +6326,6 @@ da:
       muted: Afbrudt
     grade_summary: 
       all_grading_periods: "Alle bedømmelsesperioder"
-      assessment_by: "Opgave fra %{name}"
       assignments: Opgaver
       buttons: 
         show_what_if: "Vis gemte \"Hvad-nu-hvis\" scores"
@@ -7376,13 +7199,9 @@ da:
       invalid_datetime: "Ugyldig dato/tids værdi"
       invalid_entry_for_field: "Ugyldig indtastning: %{field}"
       invalid_number: "Dette bør være et nummer."
-      not_a_date: "Det er ikke en dato!"
       posting_message_failed: "Post mislykkedes. Prøv igen"
       required: "Nødvendigt felt"
       search_failed: "Søgning mislykkedes, prøv venligst igen."
-    labels: 
-      datepicker: 
-        time: Tid
     links: 
       minimize_file_preview: "Minimer fil forhåndsvisning"
       minimize_youtube_video: "Minimer video"
@@ -7669,12 +7488,10 @@ da:
   loading_25990131: Loading...
   locales: 
     da: Dansk
-  lock_after_date_92f9149: "Lås efter dato"
   lock_date_cannot_be_after_course_end_a473158b: "Låsningsdato kan ikke være efter kursus slutning"
   lock_date_cannot_be_after_section_end_d37da70c: "Låsningsdato kan ikke være efter sektions slutning"
   lock_date_cannot_be_after_term_end_cf1a188f: "Låsningsdato kan ikke være efter termin slutning"
   lock_date_cannot_be_before_due_date_ac30f54: "Låsningsdato kan ikke være før forfaldsdato"
-  lock_until_date_62ce1b5c: "Lås indtil dato"
   log_on_url_fc166e4c: "Logon URL"
   log_out_379ba28a: Logout
   log_out_url_2605c2c1: "Logout URL"
@@ -9750,7 +9567,6 @@ da:
     submission_comments: Indsendelseskommentarer
     sure_you_want_to_mute: "Er du sikker på, at du ønsker at afbryde denne opgave? Mens denne opgave er afbrudt, vil studerende ikke modtage nye notifikationer om eller være i stand til at se:"
   muted_283cfa0f: (afbrhudt)
-  my_dashboard_8983c283: "Mit Instrumentbræt"
   my_dashboard_b724020: "Mit instrumentbræt"
   n_a_d6f6c42f: N/A
   n_number_of_times_c2e78b72: "n antal gange"
@@ -9768,10 +9584,6 @@ da:
   new_file_135ae520: "[ Ny Fil ]"
   new_outcome_7fba8c7d: "Nyt resultat"
   new_quiz_statistics_desc: "Aktiver ny quiz statistikside for et kursus."
-  new_styles_description: |-
-      Vi arbejder på en UI ansigtsløftning for Canvas. Aktiver dette for at vælge at se
-      det opdaterede, simplificerede udseende og fornemmelse af Canvas interface. Dette er ganske meget et "arbejde i fremgang"
-      funktion og bør endnu ikke blive aktiveret i produktion for faktiske bruger.
   next_40e12421: Næste
   next_steps_ce0f0d0c: "Næste trin"
   no_assignment_name_adbb215b: "Intet opgavenavn"
@@ -10093,7 +9905,6 @@ da:
       page_title: "App login"
       remember_auth: "Husk min autorisation for denne service"
   observees: 
-    add_observee_button: "Tilføj studerende"
     being_observed: "Studerende observeres"
     new_observee_password: Kode
     new_observee_username: Brugernavn
@@ -12023,7 +11834,6 @@ da:
         has_submissions_already: "Husk på, at nogle studerende allerede har taget eller har startet med at tage denne quiz"
         less_than_allotted_time: "Du startede denne quiz tæt på dens afslutning, så du wil ikke have den fulde tid til at tage quizzen i."
         no_submission_for_user: "Der er ingen indsendelser tilgængelig for den bruger"
-        quiz_not_availible: "Du har ikke adgang til den anmodede quiz."
         quiz_updated: "Quiz opdateret succesfuldt"
         quizzes_published: 
           one: "1 quiz offentliggjort succesfuld!"
@@ -13110,18 +12920,6 @@ da:
         go: OK
       titles: 
         find_user: "Find en bruger"
-    add_assignment: 
-      buttons: 
-        add_assignment: "Tilføj opgave"
-      labels: 
-        assignment_group_id: Gruppe
-        due_at: Forfalden
-        points_possible: Points
-        title: Navn
-      options: 
-        assignments: Opgaver
-      titles: 
-        add_assignment: "Tilføj opgave"
     add_assignment_group: 
       buttons: 
         add_group: "Tilføj gruppe"
@@ -13914,8 +13712,6 @@ da:
     student_hidden_name: "Studenter %{position}"
   sso_settings_ebf98263: "SSO indstillinger"
   start_date_e937be8a: "Start dato"
-  start_date_must_be_before_end_date_a00be892: "Startdato skal være før slutdato"
-  starts_on_date_a777f505: "Starter på dato"
   statistics: 
     csv_columns: 
       attempt: forsøg
@@ -14247,7 +14043,6 @@ da:
   the_following_fields_are_invalid_fields_b3565800: "Følgende felter er ugyldige: %{fields}"
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "Fuld hostnavn for konto tilfælde (something.instructure.com, for eksempel)"
   the_grading_period_was_deleted_7814a349: "Bedømmelseperioden blev slettet"
-  the_grading_period_was_saved_4a504c5: "Bedømmelsesperioden blev gemt"
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "Institutionen du logged in fra er ikke konfigureret i denne konto."
   the_list_of_results_has_been_updated_46e3c733: "Listen af resultater er blevet opdateret."
   the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "Logo billedet på Canvas overskrivt øverst til højre. 200x200 svg eller png"
@@ -14296,7 +14091,6 @@ da:
   this_field_name_is_required_b9196401: "Dette felt \"navn\" er nødvendigt."
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "Denne fil skal have brugerrettigheder indstillet før den kan offentliggøres."
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Denne mappe er for øjeblikket låst og kan ikke ses."
-  this_grading_period_overlaps_16332589: "Denne bedømmelsesperiode overlapper"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Dette er en kommasepareret liste af betroede URL'er. Tiltro til ethver URL på denne liste vil tilsidesætte CSRF token, når du er logget ind til Canvas."
   this_login_is_for_provider_6f17462: "Dette login er for %{provider}"
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Dette skete mest sandsynligt fordi du importerede kususindhold unden dets associerede filer."
@@ -14552,7 +14346,6 @@ da:
     buttons: 
       resubmit_to_turnitin: "Indsend igen til Turnitin"
   twitter_fcef6b54: Twitter
-  type_more_to_find_additional_students_d5211cd5: "Indtast mere for at finde yderligere studerende"
   unable_to_remove_app_4293cb53: "Ikke muligt at fjerne app"
   unarchive_selected_e0c4bd3d: "Ingen arkivering valgt"
   unauthorized: uautoriseret
@@ -14580,7 +14373,6 @@ da:
   until_date_949017c4: "Indtil %{date}"
   untitled_assignment_59354b34: ",Opgave uden titel"
   unused_courses_title: "Ubrugte kurser"
-  update_4d8ee62: Opdater
   updated_group_group_name_727b1d98: "Opdateret gruppe %{group_name}"
   upload_button: 
     upload: Upload
@@ -14813,8 +14605,6 @@ da:
         one: "gennemsnit for 1 studerende"
         other: "gennemsnit for %{count} studrende"
       course: Kursus
-      crumbs: 
-        grades: Karakterer
       current_teacher_courses: "Kurser jeg underviser i"
       linked_student_accounts: "Linkede studiekonti"
       links: 
@@ -15032,7 +14822,6 @@ da:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ kursus"
   webct_name: "Blackboard Vista/CE (WebCT)"
-  welcome_to_your_courses_to_customize_the_list_of_c_2922a551: "Velkommen til dine kurser! For at tilpasse listen af kurser, klik på \"Alle kurser\" linket og marker kurser for visning."
   well_below_mastery_37664bdc: "Langt under beherskelse"
   what_should_the_csv_file_look_like_985a59ac: "Hvad skal CSV filen se ud som?"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Når folk besøger kurset, vil dette være siden de ser. Du kan sætte den til at vise en aktivitetsstrøm, listen af kursusmoduler, et pensum eller en tilpasset side, som du selv skriver. Standard er kursus aktivitetsstrøm."
