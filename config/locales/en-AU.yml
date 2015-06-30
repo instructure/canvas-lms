@@ -29,11 +29,9 @@ en-AU:
     student_count: 
       one: "1 student"
       other: "%{count} students"
-    student_count_max: "%{count} / %{max} students"
     user_count: 
       one: "1 user"
       other: "%{count} users"
-    user_count_max: "%{count} / %{max} users"
   GroupUserCollection: 
     flash: 
       userAlreadyInGroup: "WARNING: %{user} is already a member of %{group}"
@@ -118,8 +116,6 @@ en-AU:
   account_authorization_configs: 
     account_required: "must be LDAP-authenticated"
     index: 
-      add_auth_desc: "Add an identity provider to this account:"
-      choose_auth_type_option: "Choose an authentication service"
       delete_auth_confirmation: "Are you sure? Users may not be able to log in if this is removed."
       delete_auth_link: "Remove All Authentication"
       ip_address_list_description: "If you are using an authentication service that requires the Canvas servers to contact your servers directly, such as LDAP, you'll need to make sure that your servers can accept connections from these IP addresses:"
@@ -344,7 +340,6 @@ en-AU:
       open_registration_delegated_warning_dialog: "An External Identity Provider is Enabled"
       what_are_quiz_ip_filters: "What are Quiz IP Filters?"
     user: User
-  account_settings_fe083453: "Account Settings"
   account_surveys_b0039876: "Account Surveys"
   account_user: 
     types: 
@@ -900,7 +895,6 @@ en-AU:
         turnitin_host: "Turnitin Host"
         turnitin_pledge: "Turnitin Pledge"
         turnitin_shared_secret: "Turnitin Shared Secret"
-        users_can_edit_name: "Users can edit display name"
       links: 
         add_admins: "Add Account Admins"
         configure_report: Configure...
@@ -1200,7 +1194,6 @@ en-AU:
         default: 
           zero_activity: 
             text: "This report shows all the students enrolled in any courses in a given term. Resulting csv file will have one row per user enrollment that have not visited the course since the date."
-  accounts_752dc365: Accounts
   achieve_mastery_count_times_8c9bbcec: "Achieve mastery %{count} times"
   actions_efcde10d: Actions
   activerecord: 
@@ -1441,8 +1434,6 @@ en-AU:
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Are you sure you want to remove this grading period?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Are you sure you want to remove this tool?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Are you sure you want to report this profile picture?"
-  aria_labels: 
-    unlock_at_date: "Unlock on Date"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "As you type in this field, the list of groups will be automatically filtered to only include those whose names match your input."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "As you type in this field, the list of results will be automatically updated."
   assessment_question: 
@@ -1594,9 +1585,6 @@ en-AU:
       save: Save
       validating: Saving...
       weight_groups: "Weight final mark based on assignment groups"
-    assignment_sidebar: 
-      links: 
-        submit: "Submit Assignment"
     assignments_list_right_side: 
       links: 
         manage_assignments: "Manage Assignments"
@@ -1952,14 +1940,12 @@ en-AU:
         grade: "Mark: %{grade} *(%{points_possible} pts possible)*"
         none_assigned: "None Assigned"
       links: 
-        resubmit: "Re-submit Assignment"
         submission: 
           details: "Submission Details"
           download_attachment: "Download %{attachment_display_name}"
           view_original_page: "View the Original Page"
           view_quiz: "View the Quiz Submission"
           view_survey: "View the Survey Submission"
-        submit: "Submit Assignment"
         view_rubric_evaluation: "View Rubric Evaluation"
       messages: 
         no_comments: "No Comments"
@@ -2123,20 +2109,13 @@ en-AU:
     upload_error_unexpected: "An unknown error occurred downloading from %{url}"
   attachment_deffe5a9: Attachment
   attendance: 
-    default_attendance_title: "Attendance %{date}"
-    errors: 
-      could_not_add_assignment: "Add Assignment Failed"
     options: 
       clear_attendance_marks: "Clear Attendance Marks"
       edit_assignment: "Edit Assignment"
       mark_all_as_absent: "Mark Everyone Absent"
       mark_all_as_present: "Mark Everyone Present"
-    status: 
-      added_assignment: "Added Assignment"
-      adding_assignment: "Adding Assignment..."
     titles: 
       attendance_help: "Attendance Help"
-      new_attendance_column: "New Attendance Column"
   audio_dd489fcc: Audio
   auth_logging: 
     corrupted: "Details Not Available"
@@ -2152,8 +2131,6 @@ en-AU:
   available_until_date_cd125c62: "Available Until Date"
   available_until_f3b9c4ed: "Available Until"
   available_until_lock_at_ab022445: "Available until %{lock_at}"
-  availible_from_format_like_yyyy_mm_dd_hh_mm_f101e0dd: "Available from - Format Like YYYY-MM-DD hh:mm"
-  availible_to_format_like_yyyy_mm_dd_hh_mm_f2611528: "Available to - Format Like YYYY-MM-DD hh:mm"
   average_49c63f9b: Average
   back_to_app_center_95420d83: "Back to App Centre"
   base_847aca7c: Base
@@ -2906,12 +2883,10 @@ en-AU:
       notices: 
         contact_registered: "Contact method registered!"
   concluded_courses_94782e21: "Concluded Courses"
-  conference_36b50fda: Conference
   conferences: 
     concluded_conference: 
       delete: Delete
       no_recording: "No Recordings"
-      preparing_video: "Preparing Video"
       recording: "1 Recording"
       recordings: "%{recordingCount} Recordings"
       settings: Settings
@@ -3155,14 +3130,6 @@ en-AU:
         date_adjustment: "Date adjustment"
         ending_change_to: "change to"
         ending_date: "Ending date"
-        new_end_date_label: "Change ending date to"
-        new_end_date_title: "Change ending date to"
-        new_start_date_label: "Change beginning date to"
-        new_start_date_title: "Change beginning date to"
-        old_end_date_label: "Ending date"
-        old_end_date_title: "Ending date"
-        old_start_date_label: "Beginning date"
-        old_start_date_title: "Beginning date"
         remove_dates: "Remove dates"
         shift_dates: "Shift dates"
         substitution: Substitution
@@ -4718,14 +4685,12 @@ en-AU:
     conversations_expand: 
       one: "Expand %{count} conversation messages"
       other: "Expand %{count} conversation messages"
-    disable_dashboard: "Go back to the old dashboard"
     discussions_collapse: 
       one: "Collapse %{count} discussions"
       other: "Collapse %{count} discussions"
     discussions_expand: 
       one: "Expand %{count} discussions"
       other: "Expand %{count} discussions"
-    enable_dashboard: "Try out the new dashboard"
     show_more_link: 
       show_less: "Show Less"
       show_more: "Show More"
@@ -5130,8 +5095,6 @@ en-AU:
         one: "1 unread reply."
         other: "%{count} unread replies."
         zero: "No unread replies."
-    notices: 
-      discussion_not_availible: "You do not have access to the requested discussion."
     page_nav: 
       Page: Page
       current_page: Current
@@ -5321,7 +5284,6 @@ en-AU:
   due_datetime_f5a81b81: "Due: %{dateTime}"
   due_format_like_yyyy_mm_dd_hh_mm_ef30a9ef: "Due - Format Like YYYY-MM-DD hh:mm"
   due_multiple_dates_cc0ee3f5: "Due: Multiple Dates"
-  due_on_date_aa4725cd: "Due on Date:"
   e_mail_only_2cc5e513: "E-Mail Only"
   each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: "Each bar is an assignment. The green layer represents the percentage of students who turned in their submission *on time*. Submissions that are **late** are yellow, and ***missing*** submissions are red."
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Each bar is one assignment. The *thin vertical whisker* extends from the lowest score for any student in the course to the highest score. The **thicker bar** extends from the 25th percentile to the 75th, with the ***median marked***."
@@ -5437,7 +5399,6 @@ en-AU:
       Multiple Grading Periods allow teachers and admins to create grading periods with set
             cutoff dates. Assignments can be filtered by these grading periods in the gradebook.
   end_date_e0093ed7: "End Date"
-  ends_on_date_320e0c26: "Ends on Date"
   enrollment: 
     default_course_name: Course
     default_email: "No Email"
@@ -5655,7 +5616,6 @@ en-AU:
         already_used: "This submission is already included in your portfolio"
         feed: "Eportfolio Atom Feed"
         view_submission: "View the Submission"
-      upload_limit: "limit 50MB per file"
       welcome: "If this is your first time here, you may want to pop up the wizard and see how best to get started. Otherwise you can quickly add recent submissions or just jump straight to the portfolio."
       write_only_comments: "Comments for this page are private. You can make comments, but only the portfolio's owner will be able to see them."
     show_me: "show me"
@@ -5739,7 +5699,6 @@ en-AU:
   errors: 
     bad_navigation_config: "Invalid course tab configuration"
     blank: Required
-    failed: Failed
     format: "%{attribute} %{message}"
     index: 
       all_categories: "- All Categories -"
@@ -5802,7 +5761,6 @@ en-AU:
   expand_or_collapse_calendars_9854b0d0: "Expand or Collapse Calendars"
   expand_or_collapse_undated_items_b901de09: "Expand or collapse Undated items"
   expand_subdiscussion_cd226ed4: "Expand Subdiscussion"
-  expires_on_date_18efe4e2: "Expires on Date"
   export_de71cd8e: Export
   exporting_b1eab154: Exporting
   external_apps_f5490181: "External Apps"
@@ -5975,7 +5933,6 @@ en-AU:
   features: 
     allow_opt_out_of_inbox: "Allow Users to Opt-out of the Inbox"
     better_file_browsing: "Better File Browsing"
-    course_catalog: "Course Catalogue"
     differentiated_assignments: "Differentiated Assignments"
     differentiated_assignments_account_disable_warning: |-
         Turning this feature off will impact existing courses. For assistance in disabling this feature, please contact
@@ -5991,7 +5948,6 @@ en-AU:
     lor: "LOR External Tools"
     multiple_grading_periods: "Multiple Grading Periods"
     new_quiz_statistics: "New Quiz Statistics Page"
-    new_styles: "Use New Styles"
     post_grades: "Post Marks to SIS"
     quiz_log_auditing: "Quiz Log Auditing"
     student_groups: "New Student Groups Page"
@@ -6037,134 +5993,30 @@ en-AU:
     unpublished_status: Unpublished
   filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filename} has been published with the following usage right: %{usage_right}"
   files: 
-    alts: 
-      file: File
-      folder: Folder
-      folder_locked: "Locked Folder"
-      locked_file: "Locked File"
-    buttons: 
-      update_file: "Update File"
-    cancel: Cancel
     content_folder: 
       titles: 
         edit_and_move_instructions: "Click to edit, drag to move to another folder"
     could_not_find_file: "This file has been deleted"
     errors: 
       empty_file: "That file is empty.  Please upload a different file."
-      extracting: "There were errors extracting the zip file.  Please try again."
-      failed_uploading: "Failed uploading: %{error_info}"
-      loading_file: "Error Loading File Contents.  Please try again."
       missing_field: "Upload failed, expected form field missing"
       not_found: "It looks like something went wrong when this file was uploaded, and we can't find the actual file.  You may want to notify the owner of the file and have them re-upload it."
       server_error: "Upload failed, server error, please try again."
-      server_returned_invalid_status: "The server stopped returning a valid status"
-      server_unresponsive: "The server stopped responding to status requests"
       too_large: "The file is too large to edit"
-      unexpected_response: "didn't get back expected response"
-      update_file_failed: "Updating File Failed, please try again"
       upload_failed: "Upload failed, please try again."
-      uploading: "Uploading Error"
-      uploading_zip: "There were errors uploading the zip file."
     fields: 
       file: File
     files_page_title: Files
     full_index: 
-      alts: 
-        file_locked: locked
-        file_preview: preview
-        folder_locked: locked
-      buttons: 
-        add_a_file: "Add File"
-        lock_file: "Lock this File"
-        lock_folder: "Lock this Folder"
-        overwrite_duplicate_attachment: Overwrite
-        rename_duplicate_attachment: "Rename New Files"
-      descriptions: 
-        file_locked_after: "It will be locked after %{lock_at}."
-        file_locked_until: "It is locked until %{unlock_at}."
-        folder_locked: "This folder is locked and cannot be viewed by students."
-        folder_locked_after: "It will be locked after %{lock_at}."
-        folder_locked_until: "It is locked until %{unlock_at}."
-        lock_file: "When a file is locked, only teachers and TAs can access it."
-        lock_folder: "When a folder is locked, only teachers and TAs can access it."
-      drop_here: "Drop files here to add them to this folder."
-      drop_zip_files: "You can also drop zip files and choose to extract their contents into this folder."
-      edit_html_warning: "The HTML editor alters your HTML, you should download a backup before saving changes."
-      file_details: "File details"
-      file_list: "File list"
-      files_title: Files
-      labels: 
-        just_hide_file: "Let students download or view the file if I link to it, just don't show it in the file listings for students"
-        just_hide_folder: "Let students download or view files in this folder if I link to them, just don't show it in the file listings for students"
-        lock_after: "Lock After"
-        lock_until: "Lock Until"
-        locked: "Lock until I manually unlock it"
       links: 
-        add_file: "Add File"
-        add_folder: "Add Folder"
-        delete_file: "Delete this File"
-        delete_folder: "Delete this Folder"
-        download_as_zip: "Download files in this folder as a zip"
-        download_file: "Download this File"
-        download_with_size: "download the file (%{size})"
         download_zip: "Click here to download %{size}"
-        edit_content: "edit content"
-        import_zip: "Import a zip file"
-        lock_file: "Lock this File"
-        lock_folder: "Lock this Folder"
-        preview: preview
-        rename_file: "Rename this File"
-        rename_folder: "Rename this Folder"
-        show_all_files: "see files for all your courses/groups"
-        show_personal_files: "just show my personal files"
-        unlock_file: "Unlock this File"
-        unlock_folder: "Unlock this Folder"
-      locked: "This file isn't unlocked yet, so it can't be downloaded."
-      locked2: "This file is locked and cannot be downloaded by students."
       messages: 
         creating_zip: "Creating zip file..."
-        gathering_and_zipping: |-
-            **The contents of this folder are being gathered** and compressed
-            into a zip file.  This may take some time, depending on the size and number of files.
         gathering_data: "Gathering data..."
-        gathering_files: "Gathering Files..."
         gathering_files_with_progress: "Gathering Files (%{progress}%)..."
-        no_preview_avaialble: "No Preview Available"
-        uploading: "Uploading 5 Files..."
         zip_finished: "Finished!  Redirecting to File..."
-      page_title: Files
-      storage_used: "Storage Used: %{size1} out of %{size2}"
-      switch_views: "Switch Views"
       titles: 
         download_folder_contents: "Download Folder Contents"
-        edit_file: "Edit %{file}"
-        edit_file_contents: "Edit File Contents"
-        file_locked: Locked
-        folder_locked: Locked
-        lock_file: "Lock %{file_name}"
-        lock_folder: "Lock %{folder_name}"
-      warnings: 
-        too_many: "There were too many courses/groups to show all at once. Below are the first 15 results."
-    links: 
-      add_files: "Add Files"
-    messages: 
-      access_denied: "You cannot read the contents of this folder."
-      done_uploading: "Done uploading"
-      error_count: 
-        one: "1 Error"
-        other: "%{count} Errors"
-      extraction_complete: "Extraction complete!  Updating..."
-      finalizing: Finalizing
-      folder_empty: "Nothing in this Folder"
-      loading_files: "Loading Files..."
-      no_files_selected: "No valid files were selected"
-      queued: Queued
-      updating_file: "Updating File..."
-      upload_complete: "Done uploading"
-      uploading: Uploading
-      uploading_files: 
-        one: "Uploading 1 File..."
-        other: "Uploading %{count} Files..."
     my_files: "My Files"
     new: 
       buttons: 
@@ -6174,28 +6026,12 @@ en-AU:
     notices: 
       deleted: "The file %{display_name} has been deleted"
       updated: "File was successfully updated."
-    prompts: 
-      delete_file: "Are you sure you want to delete this file?"
-      delete_folder: "Are you sure you want to delete this folder and all of its contents?"
-      duplicate_filenames: "Files with the following names already exist in this folder. Do you want to replace them, or rename the new files with unique names?"
-      extract_zip: "This file is a zip file.  Do you want to extract its contents into this folder?"
     show: 
       messages: 
         file_locked: "This file has not been unlocked yet."
         folder_locked: "The folder \"%{folder},\" which includes this file, has been locked."
     text_show: 
       page_title: "File Preview"
-    titles: 
-      click_and_drag: "Click and drag to move folder to another folder"
-      drag_to_move: "Drag to move to a different folder"
-      extracting: "Extracting Files into Folder"
-      file_uplaods_queue: "File Uploads Queue"
-      lock_file: "Lock File"
-      lock_folder: "Lock Folder"
-    update_file: "Update File"
-    upload_error: "There was an error uploading your file"
-    warnings: 
-      file_uploaded_without_response: "File may have uploaded, but the server failed to respond.  Reload the page to confirm."
   files_and_folder_contents_only_available_to_studen_944f9166: "Files and folder contents only available to students with link. Not visible in student files."
   files_c300e900: Files
   files_uploaded_519844ed: "Files Uploaded"
@@ -6475,27 +6311,15 @@ en-AU:
   gradebooks: 
     attendance: 
       attendance_info: "No attendance assignments have been created."
-      buttons: 
-        add_assignment: "Add Assignment"
       edit_attendance_info: "To edit the details for an attendance assignment, click the dropdown icon just below the assignment's name and then click \"Edit Assignment\"."
       headers: 
         attendance: Attendance
         edit_attendance: "Edit Attendance Details"
         loading_attendance: "Loading Attendance Table..."
         mark_attendance: "Mark Attendance"
-        new_column: "New Attendance Column"
       how_do_i: "How Do I...?"
-      labels: 
-        date: Date
-        group: Group
-        possible: Possible
-        title: Title
-      links: 
-        add_column: "Add Column"
       mark_attendance_info: "The attendance view shows a table with students listed down the left and assignments listed across the top. To mark a student as present or absent, click the corresponding box until it shows the correct mark (%{present_icon} for present, %{absent_icon} for absent). You can also use the dropdown for each assignment to set everyone as present or absent."
-      new_group: "New Group"
       page_title: Attendance
-      points_abbrev: pts
       titles: 
         click_to_change: "Click to Change"
     blank_submission: 
@@ -6510,7 +6334,6 @@ en-AU:
       muted: Muted
     grade_summary: 
       all_grading_periods: "All Grading Periods"
-      assessment_by: "Assessment by %{name}"
       assignments: Assignments
       buttons: 
         show_what_if: "Show Saved \"What-If\" Scores"
@@ -7384,13 +7207,9 @@ en-AU:
       invalid_datetime: "Invalid date/time value"
       invalid_entry_for_field: "Invalid entry: %{field}"
       invalid_number: "This should be a number."
-      not_a_date: "That's not a date!"
       posting_message_failed: "Post Failed, Try Again"
       required: "Required field"
       search_failed: "Search failed, please try again."
-    labels: 
-      datepicker: 
-        time: Time
     links: 
       minimize_file_preview: "Minimize File Preview"
       minimize_youtube_video: "Minimize Video"
@@ -7677,12 +7496,10 @@ en-AU:
   loading_25990131: Loading...
   locales: 
     en-AU: "English (Australia)"
-  lock_after_date_92f9149: "Lock After Date"
   lock_date_cannot_be_after_course_end_a473158b: "Lock date cannot be after course end"
   lock_date_cannot_be_after_section_end_d37da70c: "Lock date cannot be after section end"
   lock_date_cannot_be_after_term_end_cf1a188f: "Lock date cannot be after term end"
   lock_date_cannot_be_before_due_date_ac30f54: "Lock date cannot be before due date"
-  lock_until_date_62ce1b5c: "Lock Until Date"
   log_on_url_fc166e4c: "Log On URL"
   log_out_379ba28a: "Log Out"
   log_out_url_2605c2c1: "Log Out URL"
@@ -9758,7 +9575,6 @@ en-AU:
     submission_comments: "Submission comments"
     sure_you_want_to_mute: "Are you sure you want to mute this assignment? While this assignment is muted, students will not receive new notifications about or be able to see:"
   muted_283cfa0f: (muted)
-  my_dashboard_8983c283: "My Dashboard"
   my_dashboard_b724020: "My dashboard"
   n_a_d6f6c42f: N/A
   n_number_of_times_c2e78b72: "n Number of Times"
@@ -9776,10 +9592,6 @@ en-AU:
   new_file_135ae520: "[ New File ]"
   new_outcome_7fba8c7d: "New Outcome"
   new_quiz_statistics_desc: "Enable the new quiz statistics page for a course."
-  new_styles_description: |-
-      We are working on a UI facelift to Canvas. Turn this on to opt-in to seeing the
-      updated, simplified look and feel of the Canvas interface. This is a very "Work in progress"
-      feature and should not be turned on in production for actual users yet.
   next_40e12421: Next
   next_steps_ce0f0d0c: "Next Steps"
   no_assignment_name_adbb215b: "No Assignment Name"
@@ -10101,7 +9913,6 @@ en-AU:
       page_title: "App Login"
       remember_auth: "Remember my authorisation for this service"
   observees: 
-    add_observee_button: "Add Student"
     being_observed: "Students Being Observed"
     new_observee_password: Password
     new_observee_username: Username
@@ -12031,7 +11842,6 @@ en-AU:
         has_submissions_already: "Keep in mind, some students have already taken or started taking this quiz"
         less_than_allotted_time: "You started this quiz near when it was due, so you won't have the full amount of time to take the quiz."
         no_submission_for_user: "There is no submission available for that user"
-        quiz_not_availible: "You do not have access to the requested quiz."
         quiz_updated: "Quiz successfully updated"
         quizzes_published: 
           one: "1 quiz successfully published!"
@@ -13119,18 +12929,6 @@ en-AU:
         go: Go
       titles: 
         find_user: "Find A User"
-    add_assignment: 
-      buttons: 
-        add_assignment: "Add Assignment"
-      labels: 
-        assignment_group_id: Group
-        due_at: Due
-        points_possible: Points
-        title: Name
-      options: 
-        assignments: Assignments
-      titles: 
-        add_assignment: "Add Assignment"
     add_assignment_group: 
       buttons: 
         add_group: "Add Group"
@@ -13923,8 +13721,6 @@ en-AU:
     student_hidden_name: "Student %{position}"
   sso_settings_ebf98263: "SSO Settings"
   start_date_e937be8a: "Start Date"
-  start_date_must_be_before_end_date_a00be892: "The start date must be before the end date."
-  starts_on_date_a777f505: "Starts on Date"
   statistics: 
     csv_columns: 
       attempt: attempt
@@ -14262,7 +14058,6 @@ en-AU:
   the_following_fields_are_invalid_fields_b3565800: "The following fields are invalid: %{fields}"
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "The full hostname for the account instance (something.instructure.com, for example)"
   the_grading_period_was_deleted_7814a349: "The grading period was deleted."
-  the_grading_period_was_saved_4a504c5: "The grading period was saved."
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "The institution you logged in from is not configured on this account."
   the_list_of_results_has_been_updated_46e3c733: "The list of results has been updated."
   the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "The logo image in the top right Canvas header. 200x200 svg or png"
@@ -14311,7 +14106,6 @@ en-AU:
   this_field_name_is_required_b9196401: "This field \"name\" is required."
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "This file must have usage_rights set before it can be published."
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "This folder is currently locked and unavailable to view."
-  this_grading_period_overlaps_16332589: "This Grading Period overlaps."
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "This is a comma separated list of URL's to trust. Trusting any URL's in this list will bypass the CSRF token when logging in to Canvas."
   this_login_is_for_provider_6f17462: "This login is for %{provider}"
   this_most_likely_happened_because_you_imported_cou_a78ea880: "This most likely happened because you imported course content without its associated files."
@@ -14567,7 +14361,6 @@ en-AU:
     buttons: 
       resubmit_to_turnitin: "Resubmit to Turnitin"
   twitter_fcef6b54: Twitter
-  type_more_to_find_additional_students_d5211cd5: "Type more to find additional students"
   unable_to_remove_app_4293cb53: "Unable to remove app"
   unarchive_selected_e0c4bd3d: "Unarchive Selected"
   unauthorized: unauthorised
@@ -14595,7 +14388,6 @@ en-AU:
   until_date_949017c4: "Until %{date}"
   untitled_assignment_59354b34: "untitled assignment"
   unused_courses_title: "Unused Courses"
-  update_4d8ee62: Update
   updated_group_group_name_727b1d98: "Updated Group %{group_name}"
   upload_button: 
     upload: Upload
@@ -14828,8 +14620,6 @@ en-AU:
         one: "average for 1 student"
         other: "average for %{count} students"
       course: Course
-      crumbs: 
-        grades: Marks
       current_teacher_courses: "Courses I'm Teaching"
       linked_student_accounts: "Linked Student Accounts"
       links: 
@@ -15044,7 +14834,6 @@ en-AU:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ Course"
   webct_name: "Blackboard Vista/CE (WebCT)"
-  welcome_to_your_courses_to_customize_the_list_of_c_2922a551: "Welcome to your courses! To customise the list of courses, click on the \"All Courses\" link and star the courses to display."
   well_below_mastery_37664bdc: "Well Below Mastery"
   what_should_the_csv_file_look_like_985a59ac: "What should the CSV file look like?"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "When people visit the course, this is the page they'll see.  You can set it to show an activity stream, the list of course modules, a syllabus, or a custom page you write yourself.  The default is the course activity stream."
