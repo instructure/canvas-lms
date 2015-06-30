@@ -29,11 +29,9 @@ sv:
     student_count: 
       one: "1 elev"
       other: "%{count} elever"
-    student_count_max: "%{count} / %{max} elever"
     user_count: 
       one: "1 användare"
       other: "%{count} användare"
-    user_count_max: "%{count} / %{max} användare"
   GroupUserCollection: 
     flash: 
       userAlreadyInGroup: "VARNING: %{user} är redan medlem i %{group}"
@@ -118,8 +116,6 @@ sv:
   account_authorization_configs: 
     account_required: "måste vara LDAP-verifierad"
     index: 
-      add_auth_desc: "Lägg till en identity provider för det här kontot"
-      choose_auth_type_option: "Välj en verifieringstjänst"
       delete_auth_confirmation: "Är du säker? Användare kan har problem med att logga in om den tas bort."
       delete_auth_link: "Ta bort alla verifieringar"
       ip_address_list_description: "Om du använder en verifieringstjänst som kräver att Canvas servrar kontaktar din servrar, såsom LDAP, måste du se till att dina servrar accepterar anslutningar från dessa IP-adresserna:"
@@ -344,7 +340,6 @@ sv:
       open_registration_delegated_warning_dialog: "En extern Identity Provider är aktiverad"
       what_are_quiz_ip_filters: "Vad är Quiz IP filter?"
     user: Användare
-  account_settings_fe083453: Kontoinställningar
   account_surveys_b0039876: Kontoundersökningar
   account_user: 
     types: 
@@ -900,7 +895,6 @@ sv:
         turnitin_host: "Turnitin Värd"
         turnitin_pledge: "Turnitin Pledge"
         turnitin_shared_secret: "Delad Turnitin hemlighet"
-        users_can_edit_name: "Användare kan ändra det visade namnet"
       links: 
         add_admins: "Lägg till konto-administratörer"
         configure_report: Konfigurerar...
@@ -1200,7 +1194,6 @@ sv:
         default: 
           zero_activity: 
             text: "Den här rapporten visa elever som är anmälda till kurser under en specifik termin. Den färdiga csv filen kommer ha en rad per användar-anmälan som inte besökt kursen sedan startdatumet."
-  accounts_752dc365: Konton
   achieve_mastery_count_times_8c9bbcec: "Uppnå mästare %{count} gånger"
   actions_efcde10d: Handling
   activerecord: 
@@ -1441,8 +1434,6 @@ sv:
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Är du säker på att du vill ta bort den här betygsperioden?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Är du säker på att du vill ta bort det här verktyget?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Är du säker på att du vill rapportera den här profilbilden?"
-  aria_labels: 
-    unlock_at_date: "Lås upp på datum"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Medans du skriver i det här filtret kommer listan av grupper automatiskt filtreras för att endast inkludera de namn som matchar vad du skriver."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "Medans du skriver i det här fältet kommer listan med resultat automatiskt uppdateras."
   assessment_question: 
@@ -1594,9 +1585,6 @@ sv:
       save: Spara
       validating: Sparar...
       weight_groups: "Viktning av slutbetyget baserat på uppgiftsgrupper"
-    assignment_sidebar: 
-      links: 
-        submit: "Lämna in uppgift"
     assignments_list_right_side: 
       links: 
         manage_assignments: "Hantera uppgifter"
@@ -1952,14 +1940,12 @@ sv:
         grade: "Betyg: %{grade} *(%{points_possible} pts possible)*"
         none_assigned: "Inga tilldelningar"
       links: 
-        resubmit: "Lämna in uppgiften igen"
         submission: 
           details: Inlämningsdetaljer
           download_attachment: "Ladda ner %{attachment_display_name}"
           view_original_page: "Visa originalsidan"
           view_quiz: "Visa Quiz-inlämning"
           view_survey: "Visa undersökningsinläming"
-        submit: "Lämna in uppgift"
         view_rubric_evaluation: "Visa utvärdering av rubrik"
       messages: 
         no_comments: "Inga kommentarer"
@@ -2123,20 +2109,13 @@ sv:
     upload_error_unexpected: "Ett okänt fel uppstod vid nedladdning från %{url}"
   attachment_deffe5a9: Bilaga
   attendance: 
-    default_attendance_title: "Närvaro %{date}"
-    errors: 
-      could_not_add_assignment: "Misslyckades att lägga till uppgift"
     options: 
       clear_attendance_marks: "Rensa närvaromarkeringar"
       edit_assignment: "Redigera uppgift"
       mark_all_as_absent: "Markera alla som frånvarande"
       mark_all_as_present: "Markera alla som närvarande"
-    status: 
-      added_assignment: "Tillagd uppgift"
-      adding_assignment: "Lägger till uppgift"
     titles: 
       attendance_help: "Närvaro hjälp"
-      new_attendance_column: "Ny närvarokolumn"
   audio_dd489fcc: Ljud
   auth_logging: 
     corrupted: "Detaljer är inte tillgängliga"
@@ -2152,8 +2131,6 @@ sv:
   available_until_date_cd125c62: "Tillgänglig tills datum"
   available_until_f3b9c4ed: "Tillgänglig tills"
   available_until_lock_at_ab022445: "Tillgänglig tills %{lock_at}"
-  availible_from_format_like_yyyy_mm_dd_hh_mm_f101e0dd: "Tillgänglig från - Format som ÅÅÅÅ-MM-DD hh:mm"
-  availible_to_format_like_yyyy_mm_dd_hh_mm_f2611528: "Tillgänglig tills - Format som ÅÅÅÅ-MM-DD hh:mm"
   average_49c63f9b: Genomsnitt
   back_to_app_center_95420d83: "Tillbaka till App center"
   base_847aca7c: Bas
@@ -2903,12 +2880,10 @@ sv:
       notices: 
         contact_registered: "Kontaktmetod har registrerats!"
   concluded_courses_94782e21: "Avslutade kurser"
-  conference_36b50fda: Konferens
   conferences: 
     concluded_conference: 
       delete: Radera
       no_recording: "Inga inspelningar"
-      preparing_video: "Förbered video"
       recording: "1 Inspelning"
       recordings: "%{recordingCount} inspelningar"
       settings: Inställningar
@@ -3151,14 +3126,6 @@ sv:
         date_adjustment: Datumjustering
         ending_change_to: "ändra till"
         ending_date: Slutdatum
-        new_end_date_label: "Ändra slutdatumet till"
-        new_end_date_title: "Ändra slutdatumet til"
-        new_start_date_label: "Ändra startdatumet till"
-        new_start_date_title: "Ändra startdatumet till"
-        old_end_date_label: Slutdatum
-        old_end_date_title: Slutdatum
-        old_start_date_label: Startdatum
-        old_start_date_title: Startdatum
         remove_dates: "Ta bort datum"
         shift_dates: "Skifta datum"
         substitution: Substitut
@@ -4713,14 +4680,12 @@ sv:
     conversations_expand: 
       one: "Förstora %{count} konversationsmeddelande"
       other: "Förstora %{count} konverstationsmeddelanden"
-    disable_dashboard: "Gå tillbaka till gammal dashboard"
     discussions_collapse: 
       one: "Minska %{count} diskussion"
       other: "Minska %{count} diskussioner"
     discussions_expand: 
       one: "Förstora %{count} diskussion"
       other: "Förstora %{count} diskussioner"
-    enable_dashboard: "Testa ny dashboard"
     show_more_link: 
       show_less: "Visa mindre"
       show_more: "Visa mer"
@@ -5125,8 +5090,6 @@ sv:
         one: "1 oläst svar."
         other: "%{count} ölästa svar."
         zero: "Inga olästa svar."
-    notices: 
-      discussion_not_availible: "Du har inte tillgång till den önskade diskussionen."
     page_nav: 
       Page: Sida
       current_page: Nuvarande
@@ -5316,7 +5279,6 @@ sv:
   due_datetime_f5a81b81: "Färdig: %{dateTime}"
   due_format_like_yyyy_mm_dd_hh_mm_ef30a9ef: "Färdig: Format som ÅÅÅÅ-MM-DD hh:mm"
   due_multiple_dates_cc0ee3f5: "Färdig: flera datum"
-  due_on_date_aa4725cd: "Färdig på datumet:"
   e_mail_only_2cc5e513: "Endast e-post"
   each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: "Varje stapel är en uppgift. Det gröna lagret representerar procenten elever som lämnat in sin inläming *i tid*. **Sena** inlämningar är gula, och inlämningar som ***saknas*** r röda."
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Varje stapel är en uppgift. Den \"tunna lodräta linjen* sträcker sig från den lägsta elevpoängen till den högsta. Den **tjockare stolpen** sträcker sig från den 25:e till den 75:e procentenheten, med ***medianen markerad***."
@@ -5432,7 +5394,6 @@ sv:
       Flera betygsperioder tillåter lärare och administratörer att skapa betygsperioder med 
       avbrytande datum. Uppgifter kan filtreras efter dessa betygsperioderna i årsboken.
   end_date_e0093ed7: Slutdatum
-  ends_on_date_320e0c26: "Slutar på datumet"
   enrollment: 
     default_course_name: Kurs
     default_email: "Ingen E-post"
@@ -5650,7 +5611,6 @@ sv:
         already_used: "Den här inlämning finns redan i din porfolio"
         feed: "ePortfolio Atom Feed"
         view_submission: "Visa inlämningen"
-      upload_limit: "50MB gräns per fil"
       welcome: "Om det är första gånge du är här kan du öppna wizard för att lära dig mer om hur du sätter igån. Annars kan du snabbt och enkelt lägga till nya inlämningar eller hoppa direkt till portfolion."
       write_only_comments: "Kommentarer på den här sidan är privata. Du kan lämna kommentarer, men endast portfolions ägare kommer kunna se dem."
     show_me: "visa mig"
@@ -5734,7 +5694,6 @@ sv:
   errors: 
     bad_navigation_config: "Oglitig konfiguration av kursflik"
     blank: Nödvändig
-    failed: Misslyckad
     format: "%{attribute} %{message}"
     index: 
       all_categories: "- Alla kategorier - "
@@ -5797,7 +5756,6 @@ sv:
   expand_or_collapse_calendars_9854b0d0: "Förstora eller minska kalendrar"
   expand_or_collapse_undated_items_b901de09: "Förstora elle minska odaterade föremål"
   expand_subdiscussion_cd226ed4: "Förstora underdiskussion"
-  expires_on_date_18efe4e2: "Utgår den"
   export_de71cd8e: Exportera
   exporting_b1eab154: Exporterar
   external_apps_f5490181: "Externa Appar"
@@ -5970,7 +5928,6 @@ sv:
   features: 
     allow_opt_out_of_inbox: "Tillåt användare att inte använda inboxen"
     better_file_browsing: "Bättre fil-bläddring"
-    course_catalog: Kurskatalog
     differentiated_assignments: "Olika uppgifter"
     differentiated_assignments_account_disable_warning: |-
         Att stänga av den här funktion kommer påverka existerande kurser. Behöver du hjälpa att avaktivera funktionen, vänligen kontakta
@@ -5986,7 +5943,6 @@ sv:
     lor: "LOR externa verktyg"
     multiple_grading_periods: "Flera betygsperioder"
     new_quiz_statistics: "Ny quizstatistik sida"
-    new_styles: "Använda nya stilar"
     post_grades: "Posta betyg till SIS"
     quiz_log_auditing: "Granskning av quizlogg"
     student_groups: "Ny elevgruppsida"
@@ -6032,134 +5988,30 @@ sv:
     unpublished_status: Opublicerad
   filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filename} har publicerats med följande nyttjanderrätt: %{usage_right}"
   files: 
-    alts: 
-      file: Fil
-      folder: Mapp
-      folder_locked: "Låst mapp"
-      locked_file: "Låst fil"
-    buttons: 
-      update_file: "Uppdaterad fil"
-    cancel: Avbryt
     content_folder: 
       titles: 
         edit_and_move_instructions: "Klicka för att redigera, dra för att flytta till en annan mapp"
     could_not_find_file: "Filen har raderats"
     errors: 
       empty_file: "Den filen är tom. Vänligen ladda upp en annan fil."
-      extracting: "Fel uppstod när zipfilen extraherades. Vänligen försök igen."
-      failed_uploading: "Misslyckades med uppladdning: %{error_info}"
-      loading_file: "Fel vid laddning av filinnehåll. Vänligen försök igen."
       missing_field: "Uppladdningen misslyckades, förväntat forumlärfält saknas"
       not_found: "Det verkar som att något gick fel när den här filen laddades upp, och vi kan inte hitta den verkliga filen. Du bör kontakta filens ägaren och be dem att ladda upp den igen."
       server_error: "Uppladdning misslyckade, server fel, vänligen försök igen."
-      server_returned_invalid_status: "Servern slutade skicka tillbaka en giltig status"
-      server_unresponsive: "Servern slutade svar på statusbegäran"
       too_large: "Filen är förstor för att redigera"
-      unexpected_response: "fick inte tillbaka den förväntade responsen"
-      update_file_failed: "Uppdatering av fil misslyckades, vänligen försök igen"
       upload_failed: "Uppladdning misslyckades, vänligen försök igen."
-      uploading: Uppladdningsfel
-      uploading_zip: "Fel uppstod när zipfilen laddades upp."
     fields: 
       file: Fil
     files_page_title: Filer
     full_index: 
-      alts: 
-        file_locked: låst
-        file_preview: förhandsvisa
-        folder_locked: låst
-      buttons: 
-        add_a_file: "Lägg till fil"
-        lock_file: "Lås den här filen"
-        lock_folder: "Lås den här mappen"
-        overwrite_duplicate_attachment: "Skriv över"
-        rename_duplicate_attachment: "Döp om nya filer"
-      descriptions: 
-        file_locked_after: "Den kommer låsas efter %{lock_at}."
-        file_locked_until: "Den är låst fram tills %{unlock_at}."
-        folder_locked: "Den här mappen är låst och kan inte visas av elever."
-        folder_locked_after: "Den kommer låsas efter %{lock_at}."
-        folder_locked_until: "Den är låst fram tills %{unlock_at}."
-        lock_file: "När en fil är låst kan endast lärare och lärarassistenter nå den."
-        lock_folder: "När en mapp är låst kan endast lärare och lärarassistenter nå den."
-      drop_here: "Släpp filer här för att lägga till dem i den här mappen."
-      drop_zip_files: "Du kan även släppa zipfiler och vänlja att extrahera innehållet i mappen."
-      edit_html_warning: "HTML-redigeraren ändrar din HTML, vi rekommenderar att du laddar ner en säkerhetskopia innan du sparar ändringarna."
-      file_details: Fildetaljer.
-      file_list: Fil-lista
-      files_title: Filer
-      labels: 
-        just_hide_file: "Låt elever ladda ner eller visa filen om jag länkar till den, visa den inte i elevernas fil-lista"
-        just_hide_folder: "Låt elever ladda ner eller visa filerna om jag länkar till dem, visa inte dem i elevernas fil-lista"
-        lock_after: "Lås efter"
-        lock_until: "Lås fram tills"
-        locked: "Lås till jag låser upp den manuellt"
       links: 
-        add_file: "Lägg till fil"
-        add_folder: "Lägg till mapp"
-        delete_file: "Radera den här filen"
-        delete_folder: "Radera den här mappen"
-        download_as_zip: "Ladda ner filen i den här mappen som en zip"
-        download_file: "Ladda ner den här filen"
-        download_with_size: "ladda ner den här filen (%{size})"
         download_zip: "Klicka här för att ladda ner %{size}"
-        edit_content: "redigera innehåll"
-        import_zip: "Importera en zipfil"
-        lock_file: "Lås den här filen"
-        lock_folder: "Lås den här mappen"
-        preview: förhandsvisa
-        rename_file: "Döp om den här filen"
-        rename_folder: "Döp om den här mappen"
-        show_all_files: "se alla filer i dina kurser/grupper"
-        show_personal_files: "visa endast mina personliga filer"
-        unlock_file: "Lås den här filen"
-        unlock_folder: "Lås upp den här filen"
-      locked: "Den här filen har inte låsts upp än, och kan därför inte laddas ner."
-      locked2: "Den här filen är låst och kan inte laddas ner av elever."
       messages: 
         creating_zip: "Skapa zipfil..."
-        gathering_and_zipping: |-
-            **Innehållet i mappen samlas ihop** och komprimeras
-            till en zipfil. Det kan ta en stund beroendes på storleken och antalet filer.
         gathering_data: "Samlar data..."
-        gathering_files: "Samlar filer..."
         gathering_files_with_progress: "Samlar file (%{progress}%)..."
-        no_preview_avaialble: "Förhandsvisning är inte tillgänligt"
-        uploading: "Laddar upp 5 filer..."
         zip_finished: "Färdig! Omdirigerar till fil..."
-      page_title: Filer
-      storage_used: "Använd förvaring: %{size1} av %{size2}"
-      switch_views: "Ändra översikt"
       titles: 
         download_folder_contents: "Ladda ner mappens innehåll"
-        edit_file: "Redigera %{file}"
-        edit_file_contents: "Redigera filens innehåll"
-        file_locked: Låst
-        folder_locked: Låst
-        lock_file: "Lås %{file_name}"
-        lock_folder: "Lås %{folder_name}"
-      warnings: 
-        too_many: "Det är för många kurser/grupper att visa på en gång. Nedanför hittar du de första 15 resultaten."
-    links: 
-      add_files: "Lägg till filer"
-    messages: 
-      access_denied: "Du kan inte läsa innehållet i den här filen."
-      done_uploading: "Färdig med uppladdning"
-      error_count: 
-        one: "1 Fel"
-        other: "%{count} Fel"
-      extraction_complete: "Extraheringen är färdig! Laddar upp..."
-      finalizing: Färdigställer
-      folder_empty: "Ingenting i den här mappen"
-      loading_files: "Laddar filer..."
-      no_files_selected: "Inga giltiga filer valdes"
-      queued: Köad
-      updating_file: "Uppdaterar filer..."
-      upload_complete: "Färdig med uppladdning"
-      uploading: "Laddar upp"
-      uploading_files: 
-        one: "Laddar upp 1 fil..."
-        other: "Laddar upp %{count} filer..."
     my_files: "Mina filer"
     new: 
       buttons: 
@@ -6169,28 +6021,12 @@ sv:
     notices: 
       deleted: "Filen %{display_name} har raderats"
       updated: "Filen har uppdaterats."
-    prompts: 
-      delete_file: "Är du säker på att du vill radera den här filen?"
-      delete_folder: "Är du säker på att du vill radera den här mappen samman med allt innehåll?"
-      duplicate_filenames: "Filer med följande namn finns redan i mappen. Vill du ersätta dem, eller döpa om de nya filerna med unika namn?"
-      extract_zip: "Den här filen är en zipfil. Vill du extrahera innehållet till mappen?"
     show: 
       messages: 
         file_locked: "Den här filen har inte låsts upp än."
         folder_locked: "Mappen \"%{folder},\" som innehåller den här filen, har inte låsts."
     text_show: 
       page_title: "Förhandsvisning av fil"
-    titles: 
-      click_and_drag: "Klicka och dra för att flytta mappen till en annan mapp"
-      drag_to_move: "Dra för att flytta till en annan mapp"
-      extracting: "Extrahera filerna till mappen"
-      file_uplaods_queue: Filuppladningskö
-      lock_file: "Lås fil"
-      lock_folder: "Lås mapp"
-    update_file: "Uppdaterad fil"
-    upload_error: "Ett fel uppstod när din fil laddades upp"
-    warnings: 
-      file_uploaded_without_response: "Filen kan ha laddats upp, men servern svarade inte. Uppdatera sidan för att bekräfta."
   files_and_folder_contents_only_available_to_studen_944f9166: "Filer och mappars innehåll är endast tillgängliga för elever med länk. Inte synliga i elevfiler."
   files_c300e900: Filer
   files_uploaded_519844ed: "Uppladdade filer"
@@ -6469,27 +6305,15 @@ sv:
   gradebooks: 
     attendance: 
       attendance_info: "Inga närvaro uppgifter har skapats."
-      buttons: 
-        add_assignment: "Lägg till uppgifter"
       edit_attendance_info: "För att redigera detaljerna kring en närvaro uppgift, klickar du på ikonen under uppgiftens namn och därefter på \"Redigera uppgift\"."
       headers: 
         attendance: Närvaro
         edit_attendance: "Redigera närvarodetaljer"
         loading_attendance: "Laddar närvarotabell..."
         mark_attendance: "Markera närvaro"
-        new_column: "Ny närvarokolumn"
       how_do_i: "Hur gör jag...?"
-      labels: 
-        date: Datum
-        group: Grupp
-        possible: Möjlig
-        title: Titel
-      links: 
-        add_column: "Lägg till kolumn"
       mark_attendance_info: "Deltagandevyn visar en tabell med elever listad till vänster och uppgifter listad högst upp. För att markera en elev som närvarande eller frånvarande, klickar du på respektive ruta tills den visar rätt markering (%{present_icon} för närvarande, %{absent_icon} för frånvarande). Du kan också använda rullgardinsmeny för varje uppgift och markera alla som närvarande eller frånvarande."
-      new_group: "Ny grupp"
       page_title: Närvaro
-      points_abbrev: pts
       titles: 
         click_to_change: "Klicka för att ändra"
     blank_submission: 
@@ -6504,7 +6328,6 @@ sv:
       muted: Tystad
     grade_summary: 
       all_grading_periods: "Alla betygsperioder"
-      assessment_by: "Utvärdering av %{name}"
       assignments: Uppgifter
       buttons: 
         show_what_if: "Visa sparade \"What-if\" -poäng"
@@ -7377,13 +7200,9 @@ sv:
       invalid_datetime: "Ogiltgt datum/tids värde"
       invalid_entry_for_field: "Ogiltigt inlägg: %{field}"
       invalid_number: "Det här ska vara ett nummer"
-      not_a_date: "Det är inte ett datum!"
       posting_message_failed: "Inlägg misslyckades, Försök igen"
       required: "Nödvändigt fält"
       search_failed: "Sökning misslyckades, vänligen försök igen."
-    labels: 
-      datepicker: 
-        time: Tid
     links: 
       minimize_file_preview: "Minimera förhandsvisning av fil"
       minimize_youtube_video: "Minimera video"
@@ -7670,12 +7489,10 @@ sv:
   loading_25990131: Laddar...
   locales: 
     sv: Svenska
-  lock_after_date_92f9149: "Lås efter datum"
   lock_date_cannot_be_after_course_end_a473158b: "Lås-datumet kan inte infalla efter kursens slut"
   lock_date_cannot_be_after_section_end_d37da70c: "Lås-datumet kan inte infalla efter sektionens slut"
   lock_date_cannot_be_after_term_end_cf1a188f: "Lås-datumet kan inte infalla efter terminens slut"
   lock_date_cannot_be_before_due_date_ac30f54: "Lås-datumet kan inte infalla före förfallodagen"
-  lock_until_date_62ce1b5c: "Lås till datumet"
   log_on_url_fc166e4c: "Logga in URL"
   log_out_379ba28a: "Logga ut"
   log_out_url_2605c2c1: "Logga ut URL"
@@ -9750,7 +9567,6 @@ sv:
     submission_comments: Inlämningskommentarer
     sure_you_want_to_mute: "Är du säker på att du vill tysta den här uppgiften? När uppgiften är tystad kommer elever inte längre ta emot aviseringar om eller kunna se:"
   muted_283cfa0f: (tystad)
-  my_dashboard_8983c283: "Min Dashboard"
   my_dashboard_b724020: "Min dashboard"
   n_a_d6f6c42f: N/A
   n_number_of_times_c2e78b72: "n Antal gånger"
@@ -9768,10 +9584,6 @@ sv:
   new_file_135ae520: "[Ny fil ]"
   new_outcome_7fba8c7d: "Nytt resultat"
   new_quiz_statistics_desc: "Aktivera den nya quiz-statistikssidan för en kurs"
-  new_styles_description: |-
-      Vi arbetar på en UI-ansiktslyftning åt Canvas. Sätt igång det här för att få en chans att se
-      Canvas gränssnitts uppdaterade och förenklade utessende och känsla. Det är en väldigt "Arbete pågår"
-      -funktion och bör inte sättas i gång för riktiga användare än.
   next_40e12421: Nästa
   next_steps_ce0f0d0c: "Nästa stegen"
   no_assignment_name_adbb215b: "Inget uppgiftsnamn"
@@ -10093,7 +9905,6 @@ sv:
       page_title: "App inloggning"
       remember_auth: "Kom ihåg min verifiering för den här tjänsten"
   observees: 
-    add_observee_button: "Lägg till elev"
     being_observed: "Elever som observeras"
     new_observee_password: Lösenord
     new_observee_username: Användarnamn
@@ -12020,7 +11831,6 @@ sv:
         has_submissions_already: "Kom ihåg att vissa elever redan har tagit eller påbörjat den här quizen."
         less_than_allotted_time: "Du påbörjade den här quizen nära förfallotiden, därför kommer du inte ha samma mängd tid att genomföra den."
         no_submission_for_user: "Det finns inga inlämningar tillgängliga för den användaren"
-        quiz_not_availible: "Du har inte tillgång till den begärda quizen."
         quiz_updated: "Quizen har uppdaterats"
         quizzes_published: 
           one: "1 quiz har publicerats!"
@@ -13108,18 +12918,6 @@ sv:
         go: Gå
       titles: 
         find_user: "Hitta en användare"
-    add_assignment: 
-      buttons: 
-        add_assignment: "Lägg till uppgifter"
-      labels: 
-        assignment_group_id: Grupp
-        due_at: Färdig
-        points_possible: Poäng
-        title: Namn
-      options: 
-        assignments: Uppgifter
-      titles: 
-        add_assignment: "Lägg till uppgifter"
     add_assignment_group: 
       buttons: 
         add_group: "Lägg till grupp"
@@ -13912,8 +13710,6 @@ sv:
     student_hidden_name: "Elev %{position}"
   sso_settings_ebf98263: SSO-inställningar
   start_date_e937be8a: Startdatum
-  start_date_must_be_before_end_date_a00be892: "Startdatumet måste vara före slutdatumet"
-  starts_on_date_a777f505: "Starta den"
   statistics: 
     csv_columns: 
       attempt: försök
@@ -14251,7 +14047,6 @@ sv:
   the_following_fields_are_invalid_fields_b3565800: "Följande fält är ogiltiga: %{fields}"
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "Fullständiga värdnamnet för konto-instansen (something.instructure.com, for example)"
   the_grading_period_was_deleted_7814a349: "Betygsperioden har raderats"
-  the_grading_period_was_saved_4a504c5: "Betygsperioden sparades"
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "Institutionen du loggade in från är inte konfigurerad med det här kontot."
   the_list_of_results_has_been_updated_46e3c733: "Listan av uppdaterade resultat."
   the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "Loggo-bilden i den övre högra Canvas rubriken. 200x200 svg eller png"
@@ -14300,7 +14095,6 @@ sv:
   this_field_name_is_required_b9196401: "Fältet \"namn\" krävs."
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "Den är filen måsta ha användar_rättigheter inställda innan den kan publiceras."
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Mappen är för tillfället låst och inte möjlig att visa."
-  this_grading_period_overlaps_16332589: "Den här betygsperioden överlappar"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Det här är en komma-separerad lista av URL att lita på. Lita på en URL från den här lista och gå runt CSRF token när du logga in på Canvas."
   this_login_is_for_provider_6f17462: "Den här inloggningen är för %{provider}"
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Det här hände förmodligen för att du importerade kursinnehåll utan associerade filer."
@@ -14555,7 +14349,6 @@ sv:
     buttons: 
       resubmit_to_turnitin: "Lämna in til tunitin igen"
   twitter_fcef6b54: Twitter
-  type_more_to_find_additional_students_d5211cd5: "Skriv mer för att hitta fler elever"
   unable_to_remove_app_4293cb53: "Kunde inte ta bort appen"
   unarchive_selected_e0c4bd3d: "Avarkivera valda"
   unauthorized: "ej godkänd"
@@ -14583,7 +14376,6 @@ sv:
   until_date_949017c4: "Tills %{date}"
   untitled_assignment_59354b34: "ej namngiven uppgift"
   unused_courses_title: "Oanvända kurser"
-  update_4d8ee62: Uppdatera
   updated_group_group_name_727b1d98: "Uppdaterade gruppen %{group_name}"
   upload_button: 
     upload: "Ladda upp"
@@ -14816,8 +14608,6 @@ sv:
         one: "Genomsnitt för 1 elev"
         other: "genomsnitt för %{count} elever"
       course: Kurs
-      crumbs: 
-        grades: Betyg
       current_teacher_courses: "Kurser jag undervisar i"
       linked_student_accounts: "Länkade elevkonton"
       links: 
@@ -15035,7 +14825,6 @@ sv:
   webct_display: "Blackboard Vista/Ce (WebCT)"
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ Course"
   webct_name: "Blackboard Vista/Ce (WebCT)"
-  welcome_to_your_courses_to_customize_the_list_of_c_2922a551: "Välkommen till dina kurser! För att ändra listan av kursen klickar du på \"Alla kurser\" -länken och stjärnmärker kurserna du vill visa."
   well_below_mastery_37664bdc: "Lång under mästare"
   what_should_the_csv_file_look_like_985a59ac: "Hur ser CSV filen ut?"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Det här är sidan personer kommer se när de besöker sidan. Du kan välja om den ska via en aktiv stream, en lista av kursmoduler, en studieplan eller en sidan som du skrivit själv. Det förinställda alternativet är kursens aktiva stream."
