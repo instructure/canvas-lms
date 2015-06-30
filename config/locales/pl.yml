@@ -30,12 +30,10 @@ pl:
       few: "%{count} uczestników"
       one: "% uczestnik"
       other: "%{count} uczestników"
-    student_count_max: "%{count} / %{max} uczestników"
     user_count: 
       few: "%{count} użytkowników"
       one: "1 użytkownik"
       other: "%{count} użytkowników"
-    user_count_max: "%{count} / %{max} użytkowników"
   GroupUserCollection: 
     flash: 
       userAlreadyInGroup: "OSTRZEŻENIE: użytkownik %{user} jest już członkiem grupy %{group}"
@@ -120,8 +118,6 @@ pl:
   account_authorization_configs: 
     account_required: "konieczność uwierzytelnienia za pomocą protokołu LDAP"
     index: 
-      add_auth_desc: "Dodaj dostawcę tożsamości do tego konta:"
-      choose_auth_type_option: "Wybierz usługę uwierzytelniania"
       delete_auth_confirmation: "Na pewno? Usunięcie tego elementu może uniemożliwić logowanie użytkownikom."
       delete_auth_link: "Usuń wszystkie uwierzytelnienia"
       ip_address_list_description: "W przypadku korzystania z usługi uwierzytelniania wymagającej bezpośredniego połączenia serwerów Canvas z serwerem użytkownika (np. protokołu LDAP) należy upewnić się, że serwery przyjmują połączenia z następujących adresów IP:"
@@ -347,7 +343,6 @@ pl:
       open_registration_delegated_warning_dialog: "Zewnętrzny dostawca tożsamości jest włączony"
       what_are_quiz_ip_filters: "Co to są filtry adresu IP dla testów?"
     user: Użytkownik
-  account_settings_fe083453: "Ustawienia konta"
   account_surveys_b0039876: "Ankiety dotyczące konta"
   account_user: 
     types: 
@@ -895,7 +890,6 @@ pl:
         turnitin_host: "Host programu Turnitin"
         turnitin_pledge: "Zobowiązanie z programu Turnitin"
         turnitin_shared_secret: "Hasło znane obu stronom dla programu Turnitin"
-        users_can_edit_name: "Użytkownicy mogą edytować wyświetlaną nazwę"
       links: 
         add_admins: "Dodaj administratorów kont"
         configure_report: "Trwa konfigurowanie..."
@@ -1196,7 +1190,6 @@ pl:
         default: 
           zero_activity: 
             text: "W tym raporcie uwzględniono wszystkich uczestników zapisanych do jakiegokolwiek kursu w danym semestrze. Wynikowy plik csv będzie zawierał jeden rząd na zapis użytkownika, który nie odwiedził kursu od określonej daty."
-  accounts_752dc365: Konta
   achieve_mastery_count_times_8c9bbcec: "Osiągnij biegłość %{count} razy"
   actions_efcde10d: Akcje
   activerecord: 
@@ -1439,8 +1432,6 @@ pl:
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Czy jesteś pewny, że chcesz usunąć dany okres klasyfikacyjny?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Czy na pewno chcesz usunąć to narzędzie?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Napewno chcesz zgłosić to zdjęcie profilowe?"
-  aria_labels: 
-    unlock_at_date: "Odblokuj w dniu"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Podczas uzupełniania tego pola lista grup będzie automatycznie filtrowana i zostaną pokazane jedynie nazwy odpowiadające wpisowi."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "Podczas wpisywania w tym polu, lista wyników będzie automatycznie aktualizowana."
   assessment_question: 
@@ -1595,9 +1586,6 @@ pl:
       save: Zapisz
       validating: "Trwa zapisywanie..."
       weight_groups: "Wyważ ocenę końcową na podstawie grup zadań"
-    assignment_sidebar: 
-      links: 
-        submit: "Prześlij zadanie"
     assignments_list_right_side: 
       links: 
         manage_assignments: "Zarządzaj zadaniami"
@@ -1957,14 +1945,12 @@ pl:
         grade: "Ocena: %{grade} *(możliwych punktów: %{points_possible})*"
         none_assigned: "Nie przypisano żadnego elementu"
       links: 
-        resubmit: "Prześlij ponownie zadanie"
         submission: 
           details: "Szczegółowe informacje dot. przesłanego zadania"
           download_attachment: "Pobierz %{attachment_display_name}"
           view_original_page: "Pokaż oryginalną stronę"
           view_quiz: "Pokaż przesłany test"
           view_survey: "Pokaż przesłane badanie"
-        submit: "Prześlij zadanie"
         view_rubric_evaluation: "Pokaż analizę kryteriów ocen"
       messages: 
         no_comments: "Brak komentarzy"
@@ -2128,20 +2114,13 @@ pl:
     upload_error_unexpected: "Nieznany błąd pojawił się podczas pobierania z adresu url %{url}"
   attachment_deffe5a9: Załącznik
   attendance: 
-    default_attendance_title: "Obecność %{date}"
-    errors: 
-      could_not_add_assignment: "Dodawanie zadania nie powiodło się"
     options: 
       clear_attendance_marks: "Wyczyść wyniki obecności"
       edit_assignment: "Edytuj zadanie"
       mark_all_as_absent: "Oznacz wszystkich uczestników jako nieobecnych"
       mark_all_as_present: "Oznacz wszystkich uczestników jako obecnych"
-    status: 
-      added_assignment: "Dodane zadanie"
-      adding_assignment: "Trwa dodawanie zadania..."
     titles: 
       attendance_help: "Obecność — pomoc"
-      new_attendance_column: "Nowa kolumna obecności"
   audio_dd489fcc: Audio
   auth_logging: 
     corrupted: "Informacje szczegółowe nie są dostępne"
@@ -2157,8 +2136,6 @@ pl:
   available_until_date_cd125c62: "Dostępne do dnia"
   available_until_f3b9c4ed: "Dostępne do"
   available_until_lock_at_ab022445: "Dostępne do %{lock_at}"
-  availible_from_format_like_yyyy_mm_dd_hh_mm_f101e0dd: "Dostępne od - Format RRRR-MM-DD gg:mm"
-  availible_to_format_like_yyyy_mm_dd_hh_mm_f2611528: "Dostępne do - Format RRRR-MM-DD gg:mm"
   average_49c63f9b: Średnio
   back_to_app_center_95420d83: "Powrót do centrum aplikacji"
   base_847aca7c: Baza
@@ -2906,12 +2883,10 @@ pl:
       notices: 
         contact_registered: "Metoda kontaku zarejestrowana!"
   concluded_courses_94782e21: "Zakończone kursy"
-  conference_36b50fda: Konferencja
   conferences: 
     concluded_conference: 
       delete: Usuń
       no_recording: "Brak nagrań"
-      preparing_video: "Przygotowywanie wideo"
       recording: "1 nagranie"
       recordings: "Liczba nagrań: %{recordingCount}"
       settings: Ustawienia
@@ -3155,14 +3130,6 @@ pl:
         date_adjustment: "Dostosowanie daty"
         ending_change_to: "zmień na"
         ending_date: "Data zakończenia"
-        new_end_date_label: "Zamień datę końcową na"
-        new_end_date_title: "Zamień datę zakończenia na"
-        new_start_date_label: "Zamień datę rozpoczęcia na"
-        new_start_date_title: "Zamień datę rozpoczęcia na"
-        old_end_date_label: "Data zakończenia"
-        old_end_date_title: "Data zakończenia"
-        old_start_date_label: "Data rozpoczęcia"
-        old_start_date_title: "Data rozpoczęcia"
         remove_dates: "Usuń daty"
         shift_dates: "Zmień daty"
         substitution: Podstawianie
@@ -4739,7 +4706,6 @@ pl:
       few: "Rozwiń %{count} wiadomości w rozmowie"
       one: "Rozwiń %{count} wiadomość w rozmowie"
       other: "Rozwiń %{count} wiadomości w rozmowie"
-    disable_dashboard: "Powrót do starego panelu"
     discussions_collapse: 
       few: "Zwiń %{count} dyskusje"
       one: "Zwiń %{count} dyskusję"
@@ -4748,7 +4714,6 @@ pl:
       few: "Rozwiń %{count} dyskusje"
       one: "Rozwiń %{count} dyskusję"
       other: "Rozwiń %{count} dyskusji"
-    enable_dashboard: "Wypróbuj nowy panel"
     show_more_link: 
       show_less: "Pokaż mniej"
       show_more: "Pokaż więcej"
@@ -5169,8 +5134,6 @@ pl:
         one: "1 nieprzeczytana odpowiedź."
         other: "%{count} nieprzeczytanych odpowiedzi."
         zero: "Brak nieprzeczytanych odpowiedzi."
-    notices: 
-      discussion_not_availible: "Nie masz dostępu do wybranej dyskusji."
     page_nav: 
       Page: Strona
       current_page: Bieżące
@@ -5359,7 +5322,6 @@ pl:
   due_datetime_f5a81b81: "Termin dostarczenia: %{dateTime}"
   due_format_like_yyyy_mm_dd_hh_mm_ef30a9ef: "Termin - Format typu RRRR-MM-DD  gg:mm"
   due_multiple_dates_cc0ee3f5: "Termin: Wiele dat"
-  due_on_date_aa4725cd: "Termin dostarczenia:"
   e_mail_only_2cc5e513: "Tylko e-mail"
   each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: "Każdy pasek to przydział. Zielona warstwa stanowi odsetek studentów, którzy oddali zgłoszenia *na czas*. **spóźnione** zgłoszenia są oznakowane kolorem żółtym a ***brakujące*** kolorem czerwonym."
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Każdy pasek to jedno zadanie. *Cienki pionowy włos* rozciąga się od najniższego wyniku punktowego dla każdego uczestnika kursu do najwyższego wyniku punktowego. **Grubszy pasek** rozciąga się od 25. percentyla do 75. z ***zaznaczoną medianą***."
@@ -5477,7 +5439,6 @@ pl:
       Wielokrotne Okresy Klasyfikacyjne pozwalają nauczycielom i administratorom na tworzenie okresów klasyfikacyjnych z ustalonymi
        data końcowymi. Zadania mogą być filtrowane przez te okresy klasyfikacyjne w Dzienniku Ocen.
   end_date_e0093ed7: "Data zakończenia"
-  ends_on_date_320e0c26: "Data zakończenia"
   enrollment: 
     default_course_name: Kurs
     default_email: "Brak adresu e-mail"
@@ -5698,7 +5659,6 @@ pl:
         already_used: "To przesłane zadanie znajduje się już w Twoim portfolio"
         feed: "Kanał informacyjny Atom dot. ePortfolio"
         view_submission: "Pokaż przesłane zadanie"
-      upload_limit: "maksymalny rozmiar pliku to 50 MB"
       welcome: "Jeśli jesteś tu po raz pierwszy, możesz skorzystać z kreatora i dowiedzieć się, jak najlepiej rozpocząć obsługę. Jeśli to Twoja kolejna wizyta, możesz szybko dodać ostatnio przesłane zadania lub po prostu przejść bezpośrednio do portfolio."
       write_only_comments: "Komentarze dla tej strony mają status prywatny. Możesz dodawać komentarze, ale tylko właściciel portfolio będzie mógł je zobaczyć."
     show_me: pokaż
@@ -5781,7 +5741,6 @@ pl:
   errors: 
     bad_navigation_config: "NIeprawidłowa konfiguracja zakładki kursu"
     blank: Wymagany
-    failed: Niepowodzenie
     format: "%{attribute} %{message}"
     index: 
       all_categories: "- Wszystkie kategorie -"
@@ -5844,7 +5803,6 @@ pl:
   expand_or_collapse_calendars_9854b0d0: "Rozwiń lub zwiń kalendarze"
   expand_or_collapse_undated_items_b901de09: "Rozwiń lub zwiń elementy bez daty"
   expand_subdiscussion_cd226ed4: "Rozwiń sub-dyskusję"
-  expires_on_date_18efe4e2: "Data wygaśnięcia"
   export_de71cd8e: Eksport
   exporting_b1eab154: Eksportowanie
   external_apps_f5490181: "Zewnętrzne aplikacje"
@@ -6017,7 +5975,6 @@ pl:
   features: 
     allow_opt_out_of_inbox: "Pozwól użytkownikom wypisać się ze skrzynki"
     better_file_browsing: "Lepsze przeglądanie pliku"
-    course_catalog: "Katalog kursu"
     differentiated_assignments: "Zadania zróżnicowane"
     differentiated_assignments_account_disable_warning: "Wyłączenie tej funkcji będzie miało wpływ na istniejące kursy. Aby uzyskać pomoc podczas wyłączania tej funkcji, skontaktuj się z\n\
         Canvas Success Manager. "
@@ -6032,7 +5989,6 @@ pl:
     lor: "Zewnętrzne narzędzia LOR"
     multiple_grading_periods: "Wiele okresów rozliczeniowych"
     new_quiz_statistics: "Strona ze statystyką nowego testu"
-    new_styles: "Użyj nowych stylów"
     post_grades: "Wyślij oceny do SIS"
     quiz_log_auditing: "Inspekcja dziennika testów"
     student_groups: "Strona z nowymi grupami uczestników"
@@ -6078,136 +6034,30 @@ pl:
     unpublished_status: Nieopublikowano
   filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filename} został opublikowany z następującym prawem użytkowania: %{usage_right}"
   files: 
-    alts: 
-      file: Plik
-      folder: Folder
-      folder_locked: "Folder zablokowany"
-      locked_file: "Plik zablokowany"
-    buttons: 
-      update_file: "Aktualizuj plik"
-    cancel: Anuluj
     content_folder: 
       titles: 
         edit_and_move_instructions: "Kliknij, aby rozpocząć edycję, przeciągnij, aby przenieść do innego folderu"
     could_not_find_file: "Plik został usunięty"
     errors: 
       empty_file: "Plik jest pusty.  Przekaż inny plik."
-      extracting: "Wystąpiły błędy podczas rozpakowywania pliku .zip.  Spróbuj ponownie."
-      failed_uploading: "Przekazywanie nie powiodło się: %{error_info}"
-      loading_file: "Wystąpił błąd podczas przekazywania zawartości pliku.  Spróbuj ponownie."
       missing_field: "Przekazywanie nie powiodło się, brak oczekiwanych pól formularza"
       not_found: "Wystąpił błąd podczas przekazywania pliku — nie można odnaleźć właściwego pliku.  Warto poinformować o tym autora pliku i poprosić o ponowne przekazanie."
       server_error: "Przekazywanie nie powiodło się z powodu błędu serwera. Ponów próbę."
-      server_returned_invalid_status: "Serwer przestał zgłaszać prawidłowy status"
-      server_unresponsive: "Serwer przestał odpowiadać na zapytania o status"
       too_large: "Nie można edytować pliku, ponieważ jest za duży."
-      unexpected_response: "nie odpowiedział poprawnie"
-      update_file_failed: "Aktualizacja pliku nie powiodła się, ponów próbę"
       upload_failed: "Przekazywanie nie powiodło się, spróbuj ponownie"
-      uploading: "Błąd przekazywania"
-      uploading_zip: "Wystąpiły błędy podczas przysyłania pliku zip."
     fields: 
       file: Plik
     files_page_title: Pliki
     full_index: 
-      alts: 
-        file_locked: zablokowany
-        file_preview: podgląd
-        folder_locked: zablokowany
-      buttons: 
-        add_a_file: "Dodaj plik"
-        lock_file: "Zablokuj ten plik"
-        lock_folder: "Zablokuj ten folder"
-        overwrite_duplicate_attachment: Zastąp
-        rename_duplicate_attachment: "Zmień nazwy nowych plików"
-      descriptions: 
-        file_locked_after: "Zostanie zablokowany po %{lock_at}."
-        file_locked_until: "Jest zablokowany do %{unlock_at}."
-        folder_locked: "Folder jest zablokowany i uczestnicy nie mogą wyświetlać jego zawartości."
-        folder_locked_after: "Zostanie zablokowany po %{lock_at}."
-        folder_locked_until: "Jest zablokowany do %{unlock_at}."
-        lock_file: "Dostęp do zablokowanych plików mają wyłącznie instruktorzy i asystenci."
-        lock_folder: "Dostęp do zablokowanych folderów mają wyłącznie instruktorzy i asystenci."
-      drop_here: "Upuść pliki w tym miejscu, aby dodać je do folderu."
-      drop_zip_files: "Możesz również przenosić pliki .zip i rozpakowywać ich zawartość do tego folderu."
-      edit_html_warning: "Edytor HTML zmienił kod HTML, powinieneś pobrać kopię zapasową zanim zapiszesz zmiany."
-      file_details: "Informacje szczegółowe o pliku"
-      file_list: "Lista plików"
-      files_title: Pliki
-      labels: 
-        just_hide_file: "Pozwól uczestnikom na pobieranie i wyświetlanie pliku z bezpośredniego łącza, ale nie umieszczaj pliku na liście plików dla uczestników"
-        just_hide_folder: "Pozwól uczestnikom na pobieranie i wyświetlanie plików w tym folderze z bezpośredniego łącza, ale nie umieszczaj pliku na liście plików dla uczestników"
-        lock_after: "Zablokuj po"
-        lock_until: "Zablokuj do"
-        locked: "Zablokuj do momentu ręcznego odblokowania"
       links: 
-        add_file: "Dodaj plik"
-        add_folder: "Dodaj folder"
-        delete_file: "Usuń ten plik"
-        delete_folder: "Usuń ten folder"
-        download_as_zip: "Pobierz pliki z tego folderu w formie pliku .zip"
-        download_file: "Pobierz ten plik"
-        download_with_size: "pobierz plik (%{size})"
         download_zip: "Kliknij tutaj, aby pobrać %{size}"
-        edit_content: "edytuj komentarz"
-        import_zip: "Importuj plik .zip"
-        lock_file: "Zablokuj ten plik"
-        lock_folder: "Zablokuj ten folder"
-        preview: podgląd
-        rename_file: "Zmień nazwę tego pliku"
-        rename_folder: "Zmień nazwę tego folderu"
-        show_all_files: "wyświetl pliki dla wszystkich kursów/grup"
-        show_personal_files: "pokaż tylko moje prywatne pliki"
-        unlock_file: "Odblokuj ten plik"
-        unlock_folder: "Odblokuj ten folder"
-      locked: "Ten plik nie został jeszcze odblokowany, dlatego nie można go pobrać."
-      locked2: "Plik jest zablokowany i uczestnicy nie mogą go pobierać."
       messages: 
         creating_zip: "Trwa tworzenie pliku .zip..."
-        gathering_and_zipping: |-
-            **Trwa zbieranie zawartości tego folderu** i kompresja
-            do pliku. zip.  Może to chwilę potrwać w zależności od rozmiaru i liczby plików.
         gathering_data: "Trwa zbieranie danych…"
-        gathering_files: "Trwa zbieranie plików..."
         gathering_files_with_progress: "Trwa zbieranie plików (%{progress}%)..."
-        no_preview_avaialble: "Podgląd niedostępny"
-        uploading: "Trwa przekazywanie 5 plików..."
         zip_finished: "Zakończono!  Trwa przekierowanie do pliku…"
-      page_title: Pliki
-      storage_used: "Użyty przydział magazynowania: %{size1} z %{size2}"
-      switch_views: "Przełącz widok"
       titles: 
         download_folder_contents: "Pobierz zawartość folderu"
-        edit_file: "Edytuj %{file}"
-        edit_file_contents: "Edytuj zawartość pliku"
-        file_locked: Zablokowany
-        folder_locked: Zablokowany
-        lock_file: "Zablokuj plik %{file_name}"
-        lock_folder: "Zablokuj folder %{folder_name}"
-      warnings: 
-        too_many: "Zbyt duża liczba kursów/grup uniemożliwia ich jednoczesne wyświetlenie. Poniżej znajduje się pierwsze 15 pozycji."
-    links: 
-      add_files: "Dodaj pliki"
-    messages: 
-      access_denied: "Nie masz dostępu do zawartości tego folderu."
-      done_uploading: "Przekazywanie zostało zakończone"
-      error_count: 
-        few: "%{count} błędy"
-        one: "1 błąd"
-        other: "%{count} błędów"
-      extraction_complete: "Zakończono wypakowywanie!  Trwa aktualizacja struktury plików..."
-      finalizing: finalizowanie
-      folder_empty: "Folder jest pusty"
-      loading_files: "Trwa przekazywanie plików..."
-      no_files_selected: "Nie wybrano żadnego poprawnego pliku"
-      queued: "W kolejce"
-      updating_file: "Trwa aktualizacja pliku..."
-      upload_complete: "Przekazywanie zostało zakończone"
-      uploading: Przekazywanie...
-      uploading_files: 
-        few: "Przesyłanie %{count} plików..."
-        one: "Przesyłanie 1 pliku..."
-        other: "Przesyłanie %{count} plików..."
     my_files: "Moje pliki"
     new: 
       buttons: 
@@ -6217,28 +6067,12 @@ pl:
     notices: 
       deleted: "Plik %{display_name} został usunięty"
       updated: "Plik został pomyślnie zaktualizowany."
-    prompts: 
-      delete_file: "Czy na pewno chcesz usunąć ten plik?"
-      delete_folder: "Czy na pewno chcesz usunąć ten folder i całą jego zawartość?"
-      duplicate_filenames: "Pliki o tych nazwach istnieją już w tym folderze. Chcesz je zastąpić czy zmienić nazwy nowych plików?"
-      extract_zip: "Ten plik jest plikiem .zip.  Czy chcesz wypakować jego zawartość do tego folderu?"
     show: 
       messages: 
         file_locked: "Plik nie został jeszcze odblokowany."
         folder_locked: "Folder \"%{folder},\" który zawiera ten plik, został zablokowany."
     text_show: 
       page_title: "Pogląd pliku"
-    titles: 
-      click_and_drag: "Kliknij i przeciągnij, aby przenieść folder do innego folderu"
-      drag_to_move: "Przeciągnij, aby przenieść do innego folderu"
-      extracting: "Wypakowywanie plików do folderu"
-      file_uplaods_queue: "Kolejka przekazywanych plików"
-      lock_file: "Zablokuj plik"
-      lock_folder: "Zablokuj folder"
-    update_file: "Aktualizuj plik"
-    upload_error: "Wystąpił błąd podczas przesyłania Twojego pliku"
-    warnings: 
-      file_uploaded_without_response: "Plik mógł zostać przekazany, ale nie uzyskano odpowiedzi z serwera.  Ponownie załaduj stronę, aby potwierdzić."
   files_and_folder_contents_only_available_to_studen_944f9166: "Pliki i zawartość folderów dostępne jedynie dla uczestników posiadających łącze. Nie są widoczne w plikach uczestnika."
   files_c300e900: Pliki
   files_uploaded_519844ed: "Pliki przekazane"
@@ -6521,27 +6355,15 @@ pl:
   gradebooks: 
     attendance: 
       attendance_info: "Nie utworzono żadnych zadań dot. obecności."
-      buttons: 
-        add_assignment: "Dodaj zadanie"
       edit_attendance_info: "Aby przejść do edycji szczegółowych informacji na temat zadania dot. obecności, kliknij rozwijaną ikonę znajdującą się bezpośrednio pod nazwą zadania, a następnie kliknij pozycję \"Edytuj zadanie\"."
       headers: 
         attendance: Obecność
         edit_attendance: "Edytuj szczegółowe informacje dot. obecności"
         loading_attendance: "Trwa ładowanie tabeli obecności..."
         mark_attendance: "Zaznacz obecność"
-        new_column: "Nowa kolumna obecności"
       how_do_i: "W jaki sposób...?"
-      labels: 
-        date: Data
-        group: Grupa
-        possible: Możliwe
-        title: Tytuł
-      links: 
-        add_column: "Dodaj kolumnę"
       mark_attendance_info: "Widok z listą obecności przedstawia tabelę — w kolumnie po lewej stronie znajduje się lista uczestników, a lista zadań została rozmieszczona poziomo w górnej części. Aby zaznaczyć obecność lub nieobecność, klikaj odpowiednie pole do momentu aż zostanie wyświetlone właściwe oznaczenie (%{present_icon} dla obecności, %{absent_icon} dla nieobecności). Dla każdego zadania możesz również skorzystać z rozwijanego menu, aby oznaczyć wszystkich uczestników jako obecnych lub nieobecnych."
-      new_group: "Nowa grupa"
       page_title: Obecność
-      points_abbrev: pkt
       titles: 
         click_to_change: "Kliknij, aby zmienić"
     blank_submission: 
@@ -6556,7 +6378,6 @@ pl:
       muted: Ukryte
     grade_summary: 
       all_grading_periods: "Wszystkie okresy oceniania"
-      assessment_by: "Zadanie użytkownika %{name}"
       assignments: Zadania
       buttons: 
         show_what_if: "Pokaż zapisane wyniki \"hipotetyczne\""
@@ -7435,13 +7256,9 @@ pl:
       invalid_datetime: "Nieprawidłowa data/godzina"
       invalid_entry_for_field: "Nieprawidłowy wpis: %{field}"
       invalid_number: "Powinna to być wartość liczbowa."
-      not_a_date: "To nie jest data!"
       posting_message_failed: "Publikacja nie powiodła się, spróbuj ponownie"
       required: "Wymagane pole"
       search_failed: "Wyszukiwanie nie powiodło się, ponów próbę."
-    labels: 
-      datepicker: 
-        time: Godzina
     links: 
       minimize_file_preview: "Minimalizuj podgląd pliku"
       minimize_youtube_video: "Minimalizuj okno wideo"
@@ -7729,12 +7546,10 @@ pl:
   loading_25990131: "Trwa ładowanie..."
   locales: 
     pl: Polski
-  lock_after_date_92f9149: "Zablokuj po dacie"
   lock_date_cannot_be_after_course_end_a473158b: "Data zablokowania nie może przypadać po dacie zakończenia kursu"
   lock_date_cannot_be_after_section_end_d37da70c: "Data zablokowania nie może przypadać po zakończeniu sekcji"
   lock_date_cannot_be_after_term_end_cf1a188f: "Data zablokowania nie może przypadać po zakończeniu semestru"
   lock_date_cannot_be_before_due_date_ac30f54: "Data zablokowania nie może przypadać przed terminem dostarczenia"
-  lock_until_date_62ce1b5c: "Zablokuj do daty"
   log_on_url_fc166e4c: "Adres URL logowania"
   log_out_379ba28a: Wyloguj
   log_out_url_2605c2c1: "Adres URL wylogowania"
@@ -9827,7 +9642,6 @@ pl:
     submission_comments: "Komentarze do przesłanego zadania"
     sure_you_want_to_mute: "Czy na pewno chcesz ukryć to zadanie? Gdy zadanie jest ukryte, uczestnicy nie otrzymują nowych powiadomień ani nie mogą zobaczyć:"
   muted_283cfa0f: (wyłączone)
-  my_dashboard_8983c283: "Mój panel"
   my_dashboard_b724020: "Mój panel"
   n_a_d6f6c42f: "Brak danych"
   n_number_of_times_c2e78b72: "n Ilość razy"
@@ -9845,9 +9659,6 @@ pl:
   new_file_135ae520: "[ Nowy plik ]"
   new_outcome_7fba8c7d: "Nowy wynik"
   new_quiz_statistics_desc: "Włącz nową stronę statystyki testu na koncie."
-  new_styles_description: |-
-      Pracujemy nad zmianą UI systemu Canvas. Włącz, aby zobaczyć zaktualizowany, uproszczony wygląd i poczuć interfejs systemu Canvas. Jest to funkcja w trakcie realizacji
-      i nie należy jej jeszcze aktywować w przypadku bieżących użytkowników.
   next_40e12421: Dalej
   next_steps_ce0f0d0c: "Kolejne kroki"
   no_assignment_name_adbb215b: "Brak nazwy zadania"
@@ -10173,7 +9984,6 @@ pl:
       page_title: "Login Aplikacji"
       remember_auth: "Zapamiętaj moją autoryzację do tej usługi"
   observees: 
-    add_observee_button: "Dodaj uczestnika"
     being_observed: "Obserwowani uczestnicy"
     new_observee_password: Hasło
     new_observee_username: "Nazwa użytkownika"
@@ -12123,7 +11933,6 @@ pl:
         has_submissions_already: "Niektórzy uczestnicy już napisali lub właśnie piszą ten test"
         less_than_allotted_time: "Użytkownik rozpoczął pisanie testu na krótko przed jego zakończeniem i dlatego nie będzie miał pełnego wymiaru czasu na jego napisanie."
         no_submission_for_user: "Użytkownik nie przesłał jeszcze żadnych zadań"
-        quiz_not_availible: "Nie masz dostępu do żądanego testu."
         quiz_updated: "Test został pomyślnie zaktualizowany"
         quizzes_published: 
           few: "%{count} quizy opublikowano z powodzeniem!"
@@ -13239,18 +13048,6 @@ pl:
         go: Przejdź
       titles: 
         find_user: "Wyszukaj użytkownika"
-    add_assignment: 
-      buttons: 
-        add_assignment: "Dodaj zadanie"
-      labels: 
-        assignment_group_id: Grupa
-        due_at: "Termin dostarczenia"
-        points_possible: Punkty
-        title: Nazwa
-      options: 
-        assignments: Zadania
-      titles: 
-        add_assignment: "Dodaj zadanie"
     add_assignment_group: 
       buttons: 
         add_group: "Dodaj grupę"
@@ -14047,8 +13844,6 @@ pl:
     student_hidden_name: "Uczestnik %{position}"
   sso_settings_ebf98263: "Ustawienia SSO"
   start_date_e937be8a: "Data rozpoczęcia"
-  start_date_must_be_before_end_date_a00be892: "Data rozpoczęcia musi wypadać przed datą zakończenia"
-  starts_on_date_a777f505: "Data rozpoczęcia"
   statistics: 
     csv_columns: 
       attempt: próba
@@ -14392,7 +14187,6 @@ pl:
   the_following_fields_are_invalid_fields_b3565800: "Poniższe pola są nieprawidłowe: %{fields}"
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "Pełna nazwa hosta dla instancji konta (cokolwiek.instructure.com, na przykład)"
   the_grading_period_was_deleted_7814a349: "Okres klasyfikacyjny został usunięty"
-  the_grading_period_was_saved_4a504c5: "Okres klasyfikacynjy została zapisany"
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "Instytucja, z której się zalogowano nie jest skonfigurowana na tym koncie."
   the_list_of_results_has_been_updated_46e3c733: "Lista wyników została zaktualizowana."
   the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "Obraz logo w prawym górnym nagłówku programu Canvas. 200x200 svg lub png"
@@ -14437,7 +14231,6 @@ pl:
   this_field_name_is_required_b9196401: "„Nazwa” tego pola jest wymagana."
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "Zanim będzie można opublikować ten plik, należy ustawić jego usage_rights."
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Ten folder jest aktualnie zablokowany i niedostępny do wyświetlenia."
-  this_grading_period_overlaps_16332589: "Ten okres klasyfikacyjny nakłada się z innym"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Jest to rozdzielona przecinkami lista zaufanych adresów URL. Zaufanie adresom URL na tej liście spowoduje obejście tokena CSRF podczas logowania do systemu Canvas."
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Najprawdopodobniej doszło do tego, ponieważ zaimportowano zawartość kursu bez skojarzonych plików."
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Ten wynik został wykorzystany do oceny ucznia i nie może być zmieniony ani usunięty"
@@ -14693,7 +14486,6 @@ pl:
     buttons: 
       resubmit_to_turnitin: "Wyślij ponownie do programu Turnitin"
   twitter_fcef6b54: Twitter
-  type_more_to_find_additional_students_d5211cd5: "Wpisz więcej aby znaleźć dodatkowych uczniów"
   unable_to_remove_app_4293cb53: "Nie można usunąć aplikacji"
   unarchive_selected_e0c4bd3d: "Wybrano zdezarchywizowanie"
   unauthorized: nieautoryzowany
@@ -14721,7 +14513,6 @@ pl:
   until_date_949017c4: "Do %{date} "
   untitled_assignment_59354b34: "Zadanie bez tytułu"
   unused_courses_title: "Nieużywane kursy"
-  update_4d8ee62: Aktualizuj
   updated_group_group_name_727b1d98: "Zaktualizowano grupę %{group_name}"
   upload_button: 
     upload: Przekaż
@@ -14962,8 +14753,6 @@ pl:
         one: "średnia dla 1 uczestnika"
         other: "średnia dla  %{count} uczestników"
       course: Kurs
-      crumbs: 
-        grades: Oceny
       current_teacher_courses: "Kursy, na których nauczam"
       linked_student_accounts: "Połączone konta uczestników"
       links: 
@@ -15175,7 +14964,6 @@ pl:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE, Kurs WebCT 6+"
   webct_name: "Blackboard Vista/CE (WebCT)"
-  welcome_to_your_courses_to_customize_the_list_of_c_2922a551: "Witamy w twoich kursach! Aby dostosować listę kursów, kliknij na link \"Wszystkie kursy\" i oznacz gwiazdką kursy do wyświetlenia."
   well_below_mastery_37664bdc: "Znacznie poniżej poziomu biegłości"
   what_should_the_csv_file_look_like_985a59ac: "Jak powinien wyglądać plik CSV?"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "To jest strona, którą zobaczą osoby odwiedzające kurs. Możesz ustawić ją tak, aby pokazywała strumień aktywności, listę modułów kursu, program kursu lub stronę niestandardową napisaną przez Ciebie. Wartością domyślną jest strumień aktywności kursu."
