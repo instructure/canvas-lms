@@ -29,11 +29,9 @@ zh:
     student_count: 
       one: "%{count} 个学生"
       other: "%{count} 个学生"
-    student_count_max: "%{count} 个学生/最多 %{max} 个学生"
     user_count: 
       one: "%{count} 个用户"
       other: "%{count} 个用户"
-    user_count_max: "%{count} 个用户/最多 %{max} 个用户"
   GroupUserCollection: 
     flash: 
       userAlreadyInGroup: "警告: %{user} 已经是 %{group} 的成员"
@@ -118,8 +116,6 @@ zh:
   account_authorization_configs: 
     account_required: "必须经过 LDAP 身份验证"
     index: 
-      add_auth_desc: "添加身份提供商到此帐户:"
-      choose_auth_type_option: 选择一个身份认证服务
       delete_auth_confirmation: 是否确定?如果删除，用户可能无法登录。
       delete_auth_link: 移除所有认证
       ip_address_list_description: "如果使用的身份验证服务要求 Canvas 服务器与您的服务器直接连接，例如 LDAP，则需确保您的服务器可以接受来自以下 IP 地址的连接:"
@@ -344,7 +340,6 @@ zh:
       open_registration_delegated_warning_dialog: 已启用外部身份提供程序
       what_are_quiz_ip_filters: "什么是测验 IP 过滤器?"
     user: 用户
-  account_settings_fe083453: 账户设置
   account_surveys_b0039876: 帐户调查
   account_user: 
     types: 
@@ -899,7 +894,6 @@ zh:
         turnitin_host: "Turnitin 主机"
         turnitin_pledge: "Turnitin 保证"
         turnitin_shared_secret: "Turnitin 共享密钥"
-        users_can_edit_name: 用户可以编辑显示姓名
       links: 
         add_admins: 添加帐户管理员
         configure_report: 配置...
@@ -1199,7 +1193,6 @@ zh:
         default: 
           zero_activity: 
             text: "此报告显示某个给定学期中注册了任意课程的所有学生。在生成的 csv 文件中，自该日期起尚未访问课程的每项用户注册将具有一行。"
-  accounts_752dc365: 账户
   achieve_mastery_count_times_8c9bbcec: "达到掌握程度 %{count} 次"
   actions_efcde10d: 动作
   activerecord: 
@@ -1440,8 +1433,6 @@ zh:
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: 您要删除该评分期限吗？
   are_you_sure_you_want_to_remove_this_tool_7363f90b: 是否确定要删除此工具？
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: 您确定要报告该档案图片吗？
-  aria_labels: 
-    unlock_at_date: 解锁日期
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: 当您在此字段中输入时，组列表将自动过滤，以便仅包括名称与您的输入内容相匹配的组。
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: 当您在该栏输入，结果列表将自动地更新。
   assessment_question: 
@@ -1593,9 +1584,6 @@ zh:
       save: 保存
       validating: 正在保存...
       weight_groups: 根据作业小组加权最终评分
-    assignment_sidebar: 
-      links: 
-        submit: 提交作业
     assignments_list_right_side: 
       links: 
         manage_assignments: 管理作业
@@ -1951,14 +1939,12 @@ zh:
         grade: "评分: %{grade} *（%{points_possible} 最高得分）*"
         none_assigned: 未分配
       links: 
-        resubmit: 重新提交作业
         submission: 
           details: 提交作业详细信息
           download_attachment: "下载 %{attachment_display_name}"
           view_original_page: 查看原始页面
           view_quiz: 查看测验提交
           view_survey: 查看调查提交
-        submit: 提交作业
         view_rubric_evaluation: 查看评分标准评估
       messages: 
         no_comments: 无评论
@@ -2122,20 +2108,13 @@ zh:
     upload_error_unexpected: "从 %{url} 下载时发生未知错误"
   attachment_deffe5a9: 附件
   attendance: 
-    default_attendance_title: "参与 %{date}"
-    errors: 
-      could_not_add_assignment: 添加作业失败
     options: 
       clear_attendance_marks: 清除参与标记
       edit_assignment: 编辑作业
       mark_all_as_absent: 标记所有人缺席
       mark_all_as_present: 标记所有人出席
-    status: 
-      added_assignment: 添加的作业
-      adding_assignment: 正在添加作业...
     titles: 
       attendance_help: 参与帮助
-      new_attendance_column: 新参与列
   audio_dd489fcc: 音频
   auth_logging: 
     corrupted: 详细信息不可用
@@ -2151,8 +2130,6 @@ zh:
   available_until_date_cd125c62: 可供使用的截止日期
   available_until_f3b9c4ed: 可供使用的截止日期
   available_until_lock_at_ab022445: "%{lock_at} 之前可供使用"
-  availible_from_format_like_yyyy_mm_dd_hh_mm_f101e0dd: "有效从－格式像YYYY-MM-DD hh:mm"
-  availible_to_format_like_yyyy_mm_dd_hh_mm_f2611528: "有效到－格式像YYYY-MM-DD hh:mm"
   average_49c63f9b: 平均分
   back_to_app_center_95420d83: "返回 App Center"
   base_847aca7c: 基础
@@ -2904,12 +2881,10 @@ zh:
       notices: 
         contact_registered: 联系方式已注册!
   concluded_courses_94782e21: 已结束课程
-  conference_36b50fda: 会议
   conferences: 
     concluded_conference: 
       delete: 删除
       no_recording: 无录音
-      preparing_video: 正在准备视频
       recording: "1 个录音"
       recordings: "%{recordingCount} 个录音"
       settings: 设置
@@ -3153,14 +3128,6 @@ zh:
         date_adjustment: 日期调整
         ending_change_to: 更改为
         ending_date: 结束日期
-        new_end_date_label: 将结束日期更改为
-        new_end_date_title: 将结束日期更改为
-        new_start_date_label: 将开始日期更改为
-        new_start_date_title: 将开始日期更改为
-        old_end_date_label: 结束日期
-        old_end_date_title: 结束日期
-        old_start_date_label: 开始日期
-        old_start_date_title: 开始日期
         remove_dates: 删除日期
         shift_dates: 换班日期
         substitution: 替换
@@ -4716,14 +4683,12 @@ zh:
     conversations_expand: 
       one: "展开 %{count} 个会话消息"
       other: "展开 %{count} 个会话消息"
-    disable_dashboard: 返回到旧仪表板
     discussions_collapse: 
       one: "折叠 %{count} 个讨论"
       other: "折叠 %{count} 个讨论"
     discussions_expand: 
       one: "展开 %{count} 个讨论"
       other: "展开 %{count} 个讨论"
-    enable_dashboard: 试用新仪表板
     show_more_link: 
       show_less: 显示更少
       show_more: 显示更多
@@ -5128,8 +5093,6 @@ zh:
         one: "1 个未读答复。"
         other: "%{count} 个未读答复。"
         zero: 无未读答复。
-    notices: 
-      discussion_not_availible: 您无权访问已请求的讨论。
     page_nav: 
       Page: 页
       current_page: 当前
@@ -5319,7 +5282,6 @@ zh:
   due_datetime_f5a81b81: "到期日期：%{dateTime}"
   due_format_like_yyyy_mm_dd_hh_mm_ef30a9ef: "截止－格式像YYYY-MM-DD hh:mm"
   due_multiple_dates_cc0ee3f5: 到期日期：多个日期
-  due_on_date_aa4725cd: 到期日期：
   e_mail_only_2cc5e513: 仅限电子邮件
   each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: "每个栏目是一项作业。绿色层代表 *准时* 提交作业学生的百分比。**迟交**则显示为黄色，而***缺交***则显示为红色。"
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "每一条为一项作业。*垂直细条* 表示该课程中任意学生的最低分一直到最高分。**粗条** 表示第 25 个百分位一直到第 75 个百分位，其中标记了 ***中值分数***。"
@@ -5435,7 +5397,6 @@ zh:
       多重评分期限让教师和管理员来创建设置
       截止日期。作业可通过成绩簿的这些评分期限而被过滤。
   end_date_e0093ed7: 结束日期
-  ends_on_date_320e0c26: 结束日期
   enrollment: 
     default_course_name: 课程
     default_email: 无电子邮件
@@ -5653,7 +5614,6 @@ zh:
         already_used: 该提交文件已包含在您的学业档案中
         feed: "学习档案 Atom 馈送"
         view_submission: 查看提交文件
-      upload_limit: "每个文件最大 50MB"
       welcome: 如果这是您首次来到这里，您可能希望弹出向导并查看如何快速入门。否则，您可以快速添加最近的提交文件或直接跳转至学习档案。
       write_only_comments: 此页的评论为私人可见。您可以发表评论，但只有学习档案的所有者能够看到它们。
     show_me: 给我看看
@@ -5737,7 +5697,6 @@ zh:
   errors: 
     bad_navigation_config: 课程标签配置无效
     blank: 必需
-    failed: 已失败
     format: "%{attribute} %{message}"
     index: 
       all_categories: "- 所有类别 -"
@@ -5800,7 +5759,6 @@ zh:
   expand_or_collapse_calendars_9854b0d0: 展开或折叠日历
   expand_or_collapse_undated_items_b901de09: 展开或折叠未注明日期的项
   expand_subdiscussion_cd226ed4: 扩展分组讨论
-  expires_on_date_18efe4e2: 到期日期
   export_de71cd8e: 导出
   exporting_b1eab154: 正在导出
   external_apps_f5490181: 外部应用程序
@@ -5973,7 +5931,6 @@ zh:
   features: 
     allow_opt_out_of_inbox: 允许用户选择退出收件箱
     better_file_browsing: 更好的文件浏览功能
-    course_catalog: 课程目录
     differentiated_assignments: 差异化作业
     differentiated_assignments_account_disable_warning: |-
         关闭此功能将影响现有的课程。有关禁用此功能的帮助，请联系
@@ -5989,7 +5946,6 @@ zh:
     lor: "LOR 外部工具"
     multiple_grading_periods: 多个评分时段
     new_quiz_statistics: 新测验统计页面
-    new_styles: 使用新样式
     post_grades: "发布评分到 SIS"
     quiz_log_auditing: 测验日志审核
     student_groups: 新学生组页面
@@ -6035,134 +5991,30 @@ zh:
     unpublished_status: 已取消发布
   filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filename} 已发布，使用权限如下：%{usage_right}"
   files: 
-    alts: 
-      file: 文件
-      folder: 文件夹
-      folder_locked: 已锁定文件夹
-      locked_file: 已锁定文件
-    buttons: 
-      update_file: 更新文件
-    cancel: 取消
     content_folder: 
       titles: 
         edit_and_move_instructions: 单击可编辑，拖动可移动到其它文件夹
     could_not_find_file: 此文件已被删除
     errors: 
       empty_file: 该文件夹为空。请加载其它文件。
-      extracting: 提取压缩文件时出错。请重试。
-      failed_uploading: "上传失败: %{error_info}"
-      loading_file: 加载文件内容出错。请重试。
       missing_field: 上传失败，缺少预期的表单字段
       not_found: 此文件上传时可能出错，我们找不到实际文件。请通知文件所有者，让他们重新上传文件。
       server_error: 上传失败，服务器出错，请重试。
-      server_returned_invalid_status: 服务器停止返回有效状态
-      server_unresponsive: 服务器停止响应状态请求
       too_large: 文件太大，无法编辑
-      unexpected_response: 未得到预期响应
-      update_file_failed: 更新文件失败，请重试
       upload_failed: 上传失败，请重试。
-      uploading: 上传出错
-      uploading_zip: "上传 zip 文件时出错。"
     fields: 
       file: 文件
     files_page_title: 文件
     full_index: 
-      alts: 
-        file_locked: 已锁定
-        file_preview: 预览
-        folder_locked: 已锁定
-      buttons: 
-        add_a_file: 添加文件
-        lock_file: 锁定此文件
-        lock_folder: 锁定此文件夹
-        overwrite_duplicate_attachment: 覆盖
-        rename_duplicate_attachment: 重命名新文件
-      descriptions: 
-        file_locked_after: "它将在 %{lock_at} 之后锁定。"
-        file_locked_until: "它在 %{unlock_at} 之前锁定。"
-        folder_locked: 此文件夹被锁定，学生无法查看。
-        folder_locked_after: "它将在 %{lock_at} 之后锁定。"
-        folder_locked_until: "它在 %{unlock_at} 之前锁定。"
-        lock_file: 文件被锁定后，只有教师和助教才能访问它。
-        lock_folder: 文件夹被锁定后，只有教师和助教才能访问它。
-      drop_here: 将文件拖放到此处以添加到此文件夹。
-      drop_zip_files: 还可以拖放压缩文件并选择提取其内容到此文件夹。
-      edit_html_warning: "HTML 编辑器会更改您的 HTML，您应该先下载备份，然后再保存更改。"
-      file_details: 文件详细信息
-      file_list: 文件列表
-      files_title: 文件
-      labels: 
-        just_hide_file: 让学生下载或查看文件（如果我链接到它），只是不在文件列表中显示它
-        just_hide_folder: 让学生下载或查看此文件夹中的文件（如果我链接到它们），只是不在文件列表中显示它
-        lock_after: 锁定开始时间
-        lock_until: 锁定结束时间
-        locked: 在所动解锁前锁定
       links: 
-        add_file: 添加文件
-        add_folder: 添加文件夹
-        delete_file: 删除此文件
-        delete_folder: 删除此文件夹
-        download_as_zip: 将此文件夹中的文件下载为压缩文件
-        download_file: 下载此文件
-        download_with_size: "下载文件 (%{size})"
         download_zip: "单击此处下载 %{size}"
-        edit_content: 编辑内容
-        import_zip: 导入压缩文件
-        lock_file: 锁定此文件
-        lock_folder: 锁定此文件夹
-        preview: 预览
-        rename_file: 重命名此文件
-        rename_folder: 重命名此文件夹
-        show_all_files: 查看所有课程/课程组的文件
-        show_personal_files: 只显示我的个人文件
-        unlock_file: 解锁此文件
-        unlock_folder: 解锁此文件夹
-      locked: 此文件尚未解锁，因此无法下载
-      locked2: 此文件被锁定，学生无法下载。
       messages: 
         creating_zip: "正在创建 zip 文件..."
-        gathering_and_zipping: |-
-            **此文件夹的内容正被收集**并压缩
-            为 zip 文件。这可能需要一些时间，具体取决于文件的大小和数量。
         gathering_data: 正在收集数据...
-        gathering_files: 正在收集文件...
         gathering_files_with_progress: "正在收集文件 (%{progress}%)..."
-        no_preview_avaialble: 无可用预览
-        uploading: "正在上传 5 个文件..."
         zip_finished: 已完成！正在重定向至文件...
-      page_title: 文件
-      storage_used: "已用存储:%{size1} ³¬³ö %{size2}"
-      switch_views: 切换视图
       titles: 
         download_folder_contents: 下载文件夹内容
-        edit_file: "编辑 %{file}"
-        edit_file_contents: 编辑文件内容
-        file_locked: 已锁定
-        folder_locked: 已锁定
-        lock_file: "锁定 %{file_name}"
-        lock_folder: "锁定 %{folder_name}"
-      warnings: 
-        too_many: "有太多课程/课程组同时显示。以下是前 15 个结果。"
-    links: 
-      add_files: 添加文件
-    messages: 
-      access_denied: 您无法阅读此文件夹的内容。
-      done_uploading: 完成上传
-      error_count: 
-        one: "%{count} 个错误"
-        other: "%{count} 个错误"
-      extraction_complete: 提取完成！正在更新文件结构...
-      finalizing: 完成
-      folder_empty: 此文件夹中没有内容
-      loading_files: 正在加载文件...
-      no_files_selected: 未选择有效的文件
-      queued: 已排队
-      updating_file: 正在更新文件...
-      upload_complete: 完成上传
-      uploading: 正在上传
-      uploading_files: 
-        one: "正在上传 %{count} 个文件..."
-        other: "正在上传 %{count} 个文件..."
     my_files: 我的文件
     new: 
       buttons: 
@@ -6172,28 +6024,12 @@ zh:
     notices: 
       deleted: "文件 %{display_name} 已删除"
       updated: 文件已成功更新。
-    prompts: 
-      delete_file: 是否确定要删除此文件?
-      delete_folder: 是否确定要删除此文件夹及其所有内容?
-      duplicate_filenames: 此文件中已存在以下名称的文件。是否要替换它们，或者用独特的名称重命名新文件?
-      extract_zip: 此文件为压缩文件。是否要提取其内容到此文件夹?
     show: 
       messages: 
         file_locked: 此文件尚未解锁。
         folder_locked: "包含此文件的文件夹 \"%{folder},\" 已锁定。"
     text_show: 
       page_title: 文件预览
-    titles: 
-      click_and_drag: 单击并拖动可将文件夹移动到其它文件夹
-      drag_to_move: 拖动以移动到其它文件夹
-      extracting: 正在提取文件到文件夹
-      file_uplaods_queue: 文件上传队列
-      lock_file: 锁定文件
-      lock_folder: 锁定文件夹
-    update_file: 更新文件
-    upload_error: 上传您的文件时出错
-    warnings: 
-      file_uploaded_without_response: 文件可能已上传，但服务器没有响应。请重新加载页面以确认。
   files_and_folder_contents_only_available_to_studen_944f9166: 只能通过链接向学生提供文件和文件夹内容。在学生文件中不显示。
   files_c300e900: 文件
   files_uploaded_519844ed: 上传的文件
@@ -6473,27 +6309,15 @@ zh:
   gradebooks: 
     attendance: 
       attendance_info: 尚未创建参与作业。
-      buttons: 
-        add_assignment: 添加作业
       edit_attendance_info: "要编辑参与作业的详细信息，请单击作业名称正下方的下拉图标，然后单击 \"编辑作业\"。"
       headers: 
         attendance: 参与
         edit_attendance: 编辑参与详细信息
         loading_attendance: 正在加载参与表...
         mark_attendance: 标记参与
-        new_column: 新参与列
       how_do_i: 如何...?
-      labels: 
-        date: 日期
-        group: 小组
-        possible: 可能
-        title: 标题
-      links: 
-        add_column: 添加列
       mark_attendance_info: "参与视图显示的表格中，学生纵向列在左侧，作业横向列在顶部。要标记学生出席或缺席，请单击相应的复选框，直至其显示正确的标记（%{present_icon} 表示出席，%{absent_icon} 表示缺席）。还可以使用每个作业的下拉列表设置所有学生的出席情况。"
-      new_group: 创建新小组
       page_title: 参与
-      points_abbrev: 得分
       titles: 
         click_to_change: 单击以更改
     blank_submission: 
@@ -6508,7 +6332,6 @@ zh:
       muted: 已屏蔽
     grade_summary: 
       all_grading_periods: 所有评分时段
-      assessment_by: "评估者 %{name}"
       assignments: 作业
       buttons: 
         show_what_if: "显示已保存的 \"假设\" 分数"
@@ -7375,13 +7198,9 @@ zh:
       invalid_datetime: 无效的日期/时间值
       invalid_entry_for_field: "无效的条目: %{field}"
       invalid_number: 这应该是数字。
-      not_a_date: 这不是日期！
       posting_message_failed: 发布失败，请重试
       required: 必填字段
       search_failed: 搜索失败，请重试。
-    labels: 
-      datepicker: 
-        time: 时间
     links: 
       minimize_file_preview: 最小化文件预览
       minimize_youtube_video: 最小化视频
@@ -7666,12 +7485,10 @@ zh:
   loading_25990131: 正在加载...
   locales: 
     zh: 简体中文
-  lock_after_date_92f9149: 锁定起始日期
   lock_date_cannot_be_after_course_end_a473158b: 锁定日期不能晚于课程结束日期
   lock_date_cannot_be_after_section_end_d37da70c: 锁定日期不能晚于章节结束日期
   lock_date_cannot_be_after_term_end_cf1a188f: 锁定日期不能晚于学期结束日期
   lock_date_cannot_be_before_due_date_ac30f54: 锁定时间不能早于截止时间
-  lock_until_date_62ce1b5c: 锁定截止时间
   log_on_url_fc166e4c: 登录到URL
   log_out_379ba28a: 注销
   log_out_url_2605c2c1: 退出URL
@@ -9742,7 +9559,6 @@ zh:
     submission_comments: 提交评论
     sure_you_want_to_mute: "是否确定要静音此作业?此作业静音时，学生将不会收到关于以下内容的新通知或无法看到:"
   muted_283cfa0f: （静音）
-  my_dashboard_8983c283: 我的控制面板
   my_dashboard_b724020: 我的面板
   n_a_d6f6c42f: 不适用
   n_number_of_times_c2e78b72: "n 次数"
@@ -9760,10 +9576,6 @@ zh:
   new_file_135ae520: "[新文件]"
   new_outcome_7fba8c7d: 新建结果
   new_quiz_statistics_desc: 启用某课程的新测验统计页面。
-  new_styles_description: |-
-      我们正在改进 Canvas 的 UI 界面。启用此项可选择查看
-      更新的简化外观并感受 Canvas 界面。这是一项“正在进行中”的功能，
-      在生产中还不应该为实际用户启用此功能。
   next_40e12421: 下一页
   next_steps_ce0f0d0c: 后续步骤
   no_assignment_name_adbb215b: 无作业名称
@@ -10084,7 +9896,6 @@ zh:
       page_title: 应用程序登录
       remember_auth: 记住我对此服务的授权
   observees: 
-    add_observee_button: 添加学生
     being_observed: 被观察的学生
     new_observee_password: 密码
     new_observee_username: 用户名
@@ -12026,7 +11837,6 @@ zh:
         has_submissions_already: 请记住，某些学生已经进行或开始进行此测验
         less_than_allotted_time: 您开始此测验时测验已接近截止，因此您没有足够的时间量进行测验。
         no_submission_for_user: 没有可用于该用户的提交文件
-        quiz_not_availible: 您没有权限访问所请求的测试。
         quiz_updated: 测验已成功更新
         quizzes_published: 
           one: "%{count} 个测验已成功发布！"
@@ -13114,18 +12924,6 @@ zh:
         go: 执行
       titles: 
         find_user: 查找用户
-    add_assignment: 
-      buttons: 
-        add_assignment: 添加作业
-      labels: 
-        assignment_group_id: 小组
-        due_at: 截止时间
-        points_possible: 得分
-        title: 姓名
-      options: 
-        assignments: 作业
-      titles: 
-        add_assignment: 添加作业
     add_assignment_group: 
       buttons: 
         add_group: 添加小组
@@ -13918,8 +13716,6 @@ zh:
     student_hidden_name: "学生 %{position}"
   sso_settings_ebf98263: "SSO 设置"
   start_date_e937be8a: 开始日期
-  start_date_must_be_before_end_date_a00be892: 开始日期必须在结束日期之前。
-  starts_on_date_a777f505: 开始日期
   statistics: 
     csv_columns: 
       attempt: 已尝试次数
@@ -14259,7 +14055,6 @@ zh:
   the_following_fields_are_invalid_fields_b3565800: "以下栏目是无效的：%{fields}"
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "为帐户实例的完整名称 (例如，something.instructure.com)"
   the_grading_period_was_deleted_7814a349: 删除评分期限
-  the_grading_period_was_saved_4a504c5: 保存评分期限
   the_institution_you_logged_in_from_is_not_configur_5ceac41: 您登录的机构未在此帐户上配置。
   the_list_of_results_has_been_updated_46e3c733: 结果列表已被更新。
   the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "Canvas 右上角标题中的徽标图像。200x200 svg 或 png"
@@ -14308,7 +14103,6 @@ zh:
   this_field_name_is_required_b9196401: 此字段“name”必填。
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "此文件必须先设置 usage_rights，然后才能发布。"
   this_folder_is_currently_locked_and_unavailable_to_f85c451: 此文件夹目前已锁定并且无法查看。
-  this_grading_period_overlaps_16332589: 该评分期限覆盖
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "这是一个受信任 URL的逗号分隔列表。登录 Canvas 时，信任此列表中的任何 URL 将绕过 CSRF 令牌。"
   this_login_is_for_provider_6f17462: "这个登录是为%{provider}"
   this_most_likely_happened_because_you_imported_cou_a78ea880: 这很可能发生，因为您导入了不带关联文件的课程内容。
@@ -14564,7 +14358,6 @@ zh:
     buttons: 
       resubmit_to_turnitin: "重新提交到 Turnitin"
   twitter_fcef6b54: Twitter
-  type_more_to_find_additional_students_d5211cd5: 输入更多以找查其余学生
   unable_to_remove_app_4293cb53: 无法删除应用程序
   unarchive_selected_e0c4bd3d: 取消存档选择
   unauthorized: 未授权
@@ -14592,7 +14385,6 @@ zh:
   until_date_949017c4: "直到 %{date}"
   untitled_assignment_59354b34: 无标题作业
   unused_courses_title: 未使用的课程
-  update_4d8ee62: 更新
   updated_group_group_name_727b1d98: "已更新组 %{group_name}"
   upload_button: 
     upload: 上传
@@ -14825,8 +14617,6 @@ zh:
         one: "%{count} 个学生的平均分"
         other: "%{count} 个学生的平均分"
       course: 课程
-      crumbs: 
-        grades: 评分
       current_teacher_courses: 我教授的课程
       linked_student_accounts: 链接的学生帐户
       links: 
@@ -15037,7 +14827,6 @@ zh:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE，WebCT 6+ 课程"
   webct_name: "Blackboard Vista/CE (WebCT)"
-  welcome_to_your_courses_to_customize_the_list_of_c_2922a551: "欢迎到您的课程。 要自定义课程列表，点击“所有课程”的链接，并标记课程为显示。"
   well_below_mastery_37664bdc: 远低于掌握
   what_should_the_csv_file_look_like_985a59ac: "CSV 文件应该是什么样子?"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: 此页面是用户访问课程时将看到的页面。您可以将其设置为显示活动流、课程单元列表、提纲或自己编写的自定义页面。默认显示为课程活动流。
