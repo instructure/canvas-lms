@@ -29,11 +29,9 @@ de:
     student_count: 
       one: "1 Student"
       other: "%{count} Studenten"
-    student_count_max: "%{count}/%{max} Studenten"
     user_count: 
       one: "1 Benutzer"
       other: "%{count} Benutzer"
-    user_count_max: "%{count}/%{max} Benutzer"
   GroupUserCollection: 
     flash: 
       userAlreadyInGroup: "ACHTUNG: %{user} ist bereits Mitglied von %{group}"
@@ -119,8 +117,6 @@ de:
   account_authorization_configs: 
     account_required: "LDAP-authentifizierung erforderlich"
     index: 
-      add_auth_desc: "Fügen Sie diesem Konto einen Identitätsanbieter hinzu:"
-      choose_auth_type_option: "Wählen Sie einen Authentifizierungsservice aus"
       delete_auth_confirmation: "Sind Sie sicher? Ein Entfernen kann bewirken, dass Besucher sich nicht mehr anmelden können."
       delete_auth_link: "Gesamte Authentifizierung Entfernen"
       ip_address_list_description: "Wenn Sie einen Authentifizierungsservice wie LDAP verwenden, der eine direkte Verbindung der Canvas-server mit Ihren Servern erfordert, müssen Sie sicherstellen, dass Ihre Server Verbindungen von folgenden IP-adressen akzeptieren:"
@@ -345,7 +341,6 @@ de:
       open_registration_delegated_warning_dialog: "Ein externer Identitätsanbieter ist aktiviert"
       what_are_quiz_ip_filters: "Was sind Quiz-IP-filter?"
     user: Benutzer
-  account_settings_fe083453: Kontoeinstellungen
   account_surveys_b0039876: Account-Übersichten
   account_user: 
     types: 
@@ -901,7 +896,6 @@ de:
         turnitin_host: Turnitin-Host
         turnitin_pledge: Turnitin-erklärung
         turnitin_shared_secret: "Turnitin Shared Secret (Schlüssel)"
-        users_can_edit_name: "Benutzer können angezeigten Namen bearbeiten"
       links: 
         add_admins: "Kontoadministratoren hinzufügen"
         configure_report: Konfigurieren...
@@ -1194,7 +1188,6 @@ de:
         default: 
           zero_activity: 
             text: "Dieser Bericht zeigt alle für beliebige Kurse in einer bestimmten Kursperiode eingeschriebenen Benutzer. Die erstellte CSV-Datei enthält eine Zeile für jeden eingeschriebenen Benutzer, der den Kurs seit dem Datum nicht besucht hat."
-  accounts_752dc365: Konten
   achieve_mastery_count_times_8c9bbcec: "Leistungsziel %{count} Mal erreichen"
   actions_efcde10d: Aktionen
   activerecord: 
@@ -1435,8 +1428,6 @@ de:
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Möchten Sie diese Benotungsperiode wirklich entfernen?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Möchten Sie dieses Tool wirklich entfernen?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Möchten Sie dieses Profilbild wirklich berichten?"
-  aria_labels: 
-    unlock_at_date: "Datum 'Freigabe am'"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Wenn Sie etwas in dieses Feld eingeben, wird die Liste der Gruppen automatisch nach den Gruppen gefiltert, deren Namen mit Ihrer Eingabe übereinstimmen."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "Bei Einträgen in dieses Feld, wird die Liste der Ergebnisse automatisch aktualisiert."
   assessment_question: 
@@ -1588,9 +1579,6 @@ de:
       save: Speichern
       validating: "Wird gespeichert..."
       weight_groups: "Gesamtnote nach Aufgabengruppen gewichten"
-    assignment_sidebar: 
-      links: 
-        submit: "Aufgabe einsenden"
     assignments_list_right_side: 
       links: 
         manage_assignments: "Aufgaben verwalten"
@@ -1943,14 +1931,12 @@ de:
         grade: "Note: %{grade} *(max. %{points_possible} mögliche Punkte)*"
         none_assigned: "Keine zugewiesen"
       links: 
-        resubmit: "Aufgabe erneut einsenden"
         submission: 
           details: "Details der Einsendung"
           download_attachment: " %{attachment_display_name} herunterladen"
           view_original_page: "Originalseite anzeigen"
           view_quiz: "Quizeinsendung anzeigen"
           view_survey: "Umfrageeinsendung anzeigen"
-        submit: "Aufgabe einsenden"
         view_rubric_evaluation: "Rubrik-bewertung anzeigen"
       messages: 
         no_comments: "Keine Kommentare vorhanden"
@@ -2111,20 +2097,13 @@ de:
     upload_error_unexpected: "Beim Herunterladen von %{url} ist ein unbekannter Fehler aufgetreten"
   attachment_deffe5a9: Anhang
   attendance: 
-    default_attendance_title: "Anwesenheit am %{date}"
-    errors: 
-      could_not_add_assignment: "Hinzufügen der Aufgabe fehlgeschlagen"
     options: 
       clear_attendance_marks: "Teilnahmemarkierungen löschen"
       edit_assignment: "Aufgabe bearbeiten"
       mark_all_as_absent: "Alle Teilnehmer als abwesend markieren"
       mark_all_as_present: "Alle Teilnehmer als anwesend markieren"
-    status: 
-      added_assignment: "Aufgabe hinzugefügt"
-      adding_assignment: "Aufgabe wird hinzugefügt..."
     titles: 
       attendance_help: Teilnahmehilfe
-      new_attendance_column: "Neue Anwesenheitsspalte"
   audio_dd489fcc: Audio
   auth_logging: 
     corrupted: "Details nicht verfügbar"
@@ -2140,8 +2119,6 @@ de:
   available_until_date_cd125c62: "Datum 'Verfügbar bis'"
   available_until_f3b9c4ed: "Verfügbar bis"
   available_until_lock_at_ab022445: "Verfügbar bis %{lock_at}"
-  availible_from_format_like_yyyy_mm_dd_hh_mm_f101e0dd: "Vorhanden ab - Format TT-MM-JJJJ hh:mm"
-  availible_to_format_like_yyyy_mm_dd_hh_mm_f2611528: "Vorhanden bis - Format TT-MM-JJJJ hh:mm"
   average_49c63f9b: Durchschnitt
   back_to_app_center_95420d83: "Zurück zum App Center"
   base_847aca7c: Basis
@@ -2880,12 +2857,10 @@ de:
       notices: 
         contact_registered: "Kontaktart registriert!"
   concluded_courses_94782e21: "Abgeschlossene Kurse"
-  conference_36b50fda: Konferenz
   conferences: 
     concluded_conference: 
       delete: Löschen
       no_recording: "Keine Aufzeichnungen"
-      preparing_video: "Video wird vorbereitet"
       recording: "1 Aufzeichnung"
       recordings: "%{recordingCount} Aufzeichnungen"
       settings: Einstellungen
@@ -3129,14 +3104,6 @@ de:
         date_adjustment: Datumsanpassung
         ending_change_to: "Verlegen auf"
         ending_date: Enddatum
-        new_end_date_label: "Enddatum verlegen auf"
-        new_end_date_title: "Enddatum verlegen auf"
-        new_start_date_label: "Anfangsdatum verlegen auf"
-        new_start_date_title: "Anfangsdatum verlegen auf"
-        old_end_date_label: Enddatum
-        old_end_date_title: Enddatum
-        old_start_date_label: Anfangsdatum
-        old_start_date_title: Anfangsdatum
         remove_dates: "Daten entfernen"
         shift_dates: "Daten verschieben"
         substitution: Verschiebung
@@ -4692,14 +4659,12 @@ de:
     conversations_expand: 
       one: "%{count} Konversationsnachricht aufklappen"
       other: "%{count} Konversationsnachrichten aufklappen"
-    disable_dashboard: "zurück zum alten Dashboard"
     discussions_collapse: 
       one: "%{count} Diskussion minimieren"
       other: "%{count} Diskussionen minimieren"
     discussions_expand: 
       one: "%{count} Diskussion aufklappen"
       other: "%{count} Diskussionen aufklappen"
-    enable_dashboard: "das neue Dashboard ausprobieren"
     show_more_link: 
       show_less: "Weniger anzeigen"
       show_more: "Mehr anzeigen"
@@ -5103,8 +5068,6 @@ de:
         one: "1 ungelesene Antwort."
         other: "%{count} ungelesene Antworten."
         zero: "Keine ungelesenen Antworten."
-    notices: 
-      discussion_not_availible: "Sie haben keinen Zugriff auf die angeforderte Diskussion."
     page_nav: 
       Page: Seite
       current_page: Aktuell
@@ -5294,7 +5257,6 @@ de:
   due_datetime_f5a81b81: "Fällig am: %{dateTime}"
   due_format_like_yyyy_mm_dd_hh_mm_ef30a9ef: "Fällig - Format TT-MM-JJJJ hh:mm"
   due_multiple_dates_cc0ee3f5: "Fällig am: Mehrere Daten"
-  due_on_date_aa4725cd: "Fälligkeitsdatum:"
   e_mail_only_2cc5e513: "Nur E-Mail"
   each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: "Jede Leiste ist eine Aufgabe. Die grüne Schicht zeigt wie viel Prozent der Studenten *rechtzeitig* abgegeben haben. **Verspätete** Abgaben sind gelb ***fehlende*** Abgaben sind rot gekennzeichnet."
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Jeder Balken ist eine Aufgabe. Die *dünne vertikale Linie* erstreckt sich von der niedrigsten Punktzahl für einen Studenten im Kurs zur höchsten Punktzahl. Der **dickere Balken** erstreckt sich vom 25-Perzentilwert bis zum 75-Perzentilwert, wobei der ***Mittelwerkt markiert ist***."
@@ -5408,7 +5370,6 @@ de:
   enable_gradebook_list_students_by_sortable_name: "Listen Sie Studenten im Notenbuch nach ihren sortierbaren Namen auf. Die Standardwerte für sortierbare Namen sind 'Nachname, Vorname'. Diese können in den Einstellungen geändert werden."
   enable_multiple_grading_periods: "Mehrere Benotungsperioden erlauben Lehrern und Administratoren, Benotungsperioden mit festgesetzten Stichtagen zu erstellen. Aufgaben können im Kursbuch nach diesen Benotungsperioden gefiltert werden."
   end_date_e0093ed7: Enddatum
-  ends_on_date_320e0c26: "Datum 'Endet am'"
   enrollment: 
     default_course_name: Kurs
     default_email: "Keine E-mail"
@@ -5626,7 +5587,6 @@ de:
         already_used: "Diese Einsendung wurde Ihrem Portfolio bereits hinzugefügt."
         feed: "Atom-feed für des ePortfolios"
         view_submission: "Einsendung anzeigen"
-      upload_limit: "Dateigröße auf 50MB begrenzen"
       welcome: "Wenn Sie zum ersten mal hier sind, ist Ihnen der Einführungsassistent beim Einstieg behilflich. Andernfalls können Sie jetzt aktuelle Einsendungen hinzufügen oder direkt das Portfolio aufrufen."
       write_only_comments: "Die Kommentare auf dieser Seite sind privat. Sie können Kommentare einstellen, die aber nur dem Besitzer des Portfolios angezeigt werden."
     show_me: zeigen
@@ -5707,7 +5667,6 @@ de:
   errors: 
     bad_navigation_config: "Ungültige Kursfensterkonfiguration"
     blank: Erforderlich
-    failed: Fehlgeschlagen
     format: "%{attribute} %{message}"
     index: 
       all_categories: "- Alle Kategorien -"
@@ -5770,7 +5729,6 @@ de:
   expand_or_collapse_calendars_9854b0d0: "Kalender maximieren oder minimieren"
   expand_or_collapse_undated_items_b901de09: "Nicht datierte Elemente maximieren oder minimieren"
   expand_subdiscussion_cd226ed4: "Unter-Diskussion ausweiten"
-  expires_on_date_18efe4e2: "Datum 'Ablauf am'"
   export_de71cd8e: Exportieren
   exporting_b1eab154: "Wird exportiert"
   external_apps_f5490181: "Externe Apps"
@@ -5943,7 +5901,6 @@ de:
   features: 
     allow_opt_out_of_inbox: "Benutzern das Deaktivieren des Posteingangs ermöglichen"
     better_file_browsing: "Besseres Durchsuchen von Dateien"
-    course_catalog: Kurskatalog
     differentiated_assignments: "Differenzierte Aufgaben"
     differentiated_assignments_account_disable_warning: |-
         Die Deaktivierung dieser Funktion wirkt sich auf vorhandene Kurse aus. Um Hilfestellung bei der Deaktivierung
@@ -5959,7 +5916,6 @@ de:
     lor: "Externe LOR-Tools"
     multiple_grading_periods: "Mehrere Benotungszeiträume"
     new_quiz_statistics: "Neue Seite für Quiz-Statistiken"
-    new_styles: "Neue Stile verwenden"
     post_grades: "Noten in SIS veröffentlichen"
     quiz_log_auditing: "Prüfung des Quiz-Protokolls"
     student_groups: "Neue Seite für Studentengruppen"
@@ -6005,134 +5961,30 @@ de:
     unpublished_status: "Nicht veröffentlicht"
   filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filename} wurde mit den folgenden Nutzungsrechten veröffentlicht %{usage_right}"
   files: 
-    alts: 
-      file: Datei
-      folder: Ordner
-      folder_locked: "Gesperrter Ordner"
-      locked_file: "Gesperrte Datei"
-    buttons: 
-      update_file: "Datei aktualisieren"
-    cancel: Abbrechen
     content_folder: 
       titles: 
         edit_and_move_instructions: "Klicken zum Bearbeiten oder Ziehen zum Verschieben in einen anderen Ordner"
     could_not_find_file: "Diese Datei wurde gelöscht"
     errors: 
       empty_file: "Diese Datei ist leer.  Bitte laden Sie eine andere Datei hoch."
-      extracting: "Beim Extrahieren der Zip-datei sind Fehler aufgetreten.  Bitte versuchen Sie es erneut."
-      failed_uploading: "Upload fehlgeschlagen: %{error_info}"
-      loading_file: "Fehler beim Laden von Dateiinhalten.  Bitte versuchen Sie es erneut."
       missing_field: "Upload fehlgeschlagen, erforderliches Formularfeld fehlt"
       not_found: "Offenbar ist beim Hochladen dieser Datei ein Fehler aufgetreten und die Datei kann nicht gefunden werden.  Informieren Sie gegebenenfalls den Besitzer der Datei und bitte Sie ihn, die Datei erneut hochzuladen."
       server_error: "Upload fehlgeschlagen wegen Serverfehlers, bitte erneut versuchen"
-      server_returned_invalid_status: "Server gibt keinen gültigen Status zurück"
-      server_unresponsive: "Server reagiert nicht mehr auf Statusanforderungen"
       too_large: "Die Datei ist zu groß zum Bearbeiten"
-      unexpected_response: "hat nicht die erwartete Antwort zurückerhalten"
-      update_file_failed: "Dateiaktualisierung fehlgeschlagen, bitte erneut versuchen"
       upload_failed: "Upload fehlgeschlagen, bitte erneut versuchen"
-      uploading: "Fehler beim Hochladen"
-      uploading_zip: "Beim Hochladen der Zip-datei ist ein Fehler aufgetreten."
     fields: 
       file: Datei
     files_page_title: Dateien
     full_index: 
-      alts: 
-        file_locked: gesperrt
-        file_preview: Vorschau
-        folder_locked: gesperrt
-      buttons: 
-        add_a_file: "Datei hinzufügen"
-        lock_file: "Diese Datei sperren"
-        lock_folder: "Diesen Ordner sperren"
-        overwrite_duplicate_attachment: Überschreiben
-        rename_duplicate_attachment: "Neue Dateien umbenennen"
-      descriptions: 
-        file_locked_after: "Der Ordner ist gesperrt ab %{lock_at}."
-        file_locked_until: "Ist gesperrt bis %{unlock_at}."
-        folder_locked: "Dieser Ordner ist gesperrt und wird Studenten nicht angezeigt."
-        folder_locked_after: "Ist gesperrt ab %{lock_at}."
-        folder_locked_until: "Ist gesperrt bis %{unlock_at}."
-        lock_file: "Wenn eine Datei gesperrt ist, haben nur Dozenten und Lehrassistenten Zugriff."
-        lock_folder: "Wenn ein Ordner gesperrt ist, haben nur Dozenten und Lehrassistenten Zugriff."
-      drop_here: "Ziehen Sie die Dateien hierher, um sie in diesen Ordner zu verschieben."
-      drop_zip_files: "Sie können auch Zip-dateien hier ablegen und deren Inhalt in diesen Ordner extrahieren."
-      edit_html_warning: "Der HTML-editor verändert ihre HTML, sie sollten daher vor dem Speichern eine Sicherheitskopie herunterladen."
-      file_details: Dateildetails
-      file_list: Dateiliste
-      files_title: Dateien
-      labels: 
-        just_hide_file: "Studenten dürfen verlinkte Dateien herunterladen oder anzeigen, die Datei soll jedoch nicht in der Dateiliste für Studenten erscheinen"
-        just_hide_folder: "Studenten dürfen verlinkte Dateien dieses Ordners herunterladen oder anzeigen, der Ordner soll jedoch nicht in der Dateiliste für Studenten erscheinen"
-        lock_after: "Sperren um"
-        lock_until: "Sperren bis"
-        locked: "Sperren bis zur manuellen Freigabe"
       links: 
-        add_file: "Datei hinzufügen"
-        add_folder: "Ordner hinzufügen"
-        delete_file: "Diese Datei löschen"
-        delete_folder: "Diesen Ordner löschen"
-        download_as_zip: "Die Dateien in diesem Ordner als Zip-datei herunterladen"
-        download_file: "Diese Datei herunterladen"
-        download_with_size: "Die Datei herunterladen (%{size})"
         download_zip: "Zum Herunterladen hier klicken %{size}"
-        edit_content: "Inhalt bearbeiten"
-        import_zip: "Eine Zip-datei importieren"
-        lock_file: "Diese Datei sperren"
-        lock_folder: "Diesen Ordner sperren"
-        preview: Vorschau
-        rename_file: "Diese Datei umbenennen"
-        rename_folder: "Diesen Ordner umbenennen"
-        show_all_files: "Dateien für alle Ihre Kurse/Gruppen anzeigen"
-        show_personal_files: "nur meine persönlichen Dateien anzeigen"
-        unlock_file: "Diese Datei freigeben"
-        unlock_folder: "Diesen Ordner freigeben"
-      locked: "Diese Datei ist noch nicht freigegeben und kann nicht heruntergeladen werden."
-      locked2: "Diese Datei ist gesperrt und kann von Studenten nicht heruntergeladen werden."
       messages: 
         creating_zip: "ZIP-Datei wird erstellt ..."
-        gathering_and_zipping: |-
-            **Die Inhalte dieses Ordners werden gesammelt** und zu einer
-            Zip-datei komprimiert.  Dies kann abhängig von der Größe und Anzahl der Dateien eine Weile dauern.
         gathering_data: "Daten werden erfasst ..."
-        gathering_files: "Dateien werden gesammelt..."
         gathering_files_with_progress: "Dateien werden erfasst (%{progress}%) ..."
-        no_preview_avaialble: "Keine Vorschau verfügbar"
-        uploading: "5 Dateien werden hochgeladen..."
         zip_finished: "Fertig!  Weiterleitung zur Datei ..."
-      page_title: Dateien
-      storage_used: "Verwendeter Speicherplatz: %{size1} von %{size2}"
-      switch_views: "Ansichten wechseln"
       titles: 
         download_folder_contents: "Ordnerinhalte herunterladen"
-        edit_file: "%{file} bearbeiten"
-        edit_file_contents: "Dateiinhalte bearbeiten"
-        file_locked: Gesperrt
-        folder_locked: Gesperrt
-        lock_file: "%{file_name} sperren"
-        lock_folder: "%{folder_name} sperren "
-      warnings: 
-        too_many: "Es gibt zu viele Kurse/Gruppen, um alle gleichzeitig zu zeigen. Gezeigt werden die ersten 15 Ergebnisse."
-    links: 
-      add_files: "Dateien hinzufügen"
-    messages: 
-      access_denied: "Sie können die Inhalte dieses Ordners nicht anzeigen."
-      done_uploading: "Upload abgeschlossen"
-      error_count: 
-        one: "1 Fehler"
-        other: "%{count} Fehler"
-      extraction_complete: "Extraktion abgeschlossen!  Dateistruktur wird aktualisiert..."
-      finalizing: Fertigstellen
-      folder_empty: "Keine Inhalte in diesem Ordner"
-      loading_files: "Dateien werden geladen..."
-      no_files_selected: "Es wurden keine gültigen Dateien ausgewählt"
-      queued: "In Warteschlange"
-      updating_file: "Datei wird aktualisiert..."
-      upload_complete: "Upload abgeschlossen"
-      uploading: Upload
-      uploading_files: 
-        one: "1 Datei wird hochgeladen..."
-        other: "%{count} Dateien werden hochgeladen..."
     my_files: "Meine Dateien"
     new: 
       buttons: 
@@ -6142,28 +5994,12 @@ de:
     notices: 
       deleted: "Die Datei %{display_name} wurde gelöscht"
       updated: "Die Datei wurde erfolgreich aktualisiert."
-    prompts: 
-      delete_file: "Möchten Sie diese Datei wirklich löschen?"
-      delete_folder: "Möchten Sie diesen Ordner und seinen gesamten Inhalt wirklich löschen?"
-      duplicate_filenames: "Dieser Ordner enthält bereits Dateien mit folgenden Namen. Wollen Sie diese Dateien ersetzen oder die neuen Dateien umbenennen?"
-      extract_zip: "Diese Datei ist eine ZIP-datei.  Wollen Sie den Inhalt in diesen Ordner extrahieren?"
     show: 
       messages: 
         file_locked: "Diese Datei wurde noch nicht freigegeben."
         folder_locked: "Der Ordner \"%{folder},\" der diese Datei enthält, wurde gesperrt."
     text_show: 
       page_title: Dateivorschau
-    titles: 
-      click_and_drag: "Klicken und ziehen, um den Ordner in einen anderen Ordner zu verschieben"
-      drag_to_move: "Ziehen zum Verschieben in einen anderen Ordner"
-      extracting: "Dateien in Ordner extrahieren"
-      file_uplaods_queue: "Warteschleife für Dateiuploads"
-      lock_file: "Datei sperren"
-      lock_folder: "Ordner sperren"
-    update_file: "Datei aktualisieren"
-    upload_error: "Beim Hochladen Ihrer Datei ist ein Fehler aufgetreten"
-    warnings: 
-      file_uploaded_without_response: "Die Datei wurde möglicherweise hochgeladen, aber der Server reagiert nicht.  Bitte laden Sie die Seite erneut, um eine Bestätigung zu erhalten."
   files_and_folder_contents_only_available_to_studen_944f9166: "Datei- und Ordnerinhalte stehen Studenten nur über den Link zur Verfügung. Sie sind in den Dateien der Studenten nicht sichtbar."
   files_c300e900: Dateien
   files_uploaded_519844ed: "Dateien hochgeladen"
@@ -6441,27 +6277,15 @@ de:
   gradebooks: 
     attendance: 
       attendance_info: "Es wurden keine Aufgaben mit Anwesenheitspflicht erstellt."
-      buttons: 
-        add_assignment: "Aufgabe hinzufügen"
       edit_attendance_info: "Um die Details für eine Aufgabe mit Anwesenheitspflicht zu bearbeiten, klicken Sie auf das Dropdownsymbol unter dem Aufgabennamen und dann auf \"Aufgabe bearbeiten\"."
       headers: 
         attendance: Anwesenheit
         edit_attendance: "Anwesenheitsdetails bearbeiten"
         loading_attendance: "Anwesenheitstabelle wird geladen..."
         mark_attendance: "Anwesenheit markieren"
-        new_column: "Neue Anwesenheitsspalte"
       how_do_i: "Wie kann ich...?"
-      labels: 
-        date: Datum
-        group: Gruppe
-        possible: Möglich
-        title: Titel
-      links: 
-        add_column: "Spalte hinzufügen"
       mark_attendance_info: "Die Anwesenheitsansicht zeigt eine Tabelle mit den Namen der Studenten in der linken Spalte und den einzelnen Aufgaben in der obersten Zeile. Um einen Studenten als anwesend oder abwesend zu markieren, klicken Sie auf das entsprechende Kästchen, bis die gewünschte Markierung erscheint (%{present_icon} für anwesend, %{absent_icon} für abwesend). Sie können außerdem die Dropdownliste für jede Aufgabe verwenden, um alle Studenten als anwesend oder abwesend zu markieren."
-      new_group: "Neue Gruppe"
       page_title: Anwesenheit
-      points_abbrev: Pkt.
       titles: 
         click_to_change: "Zum Ändern anklicken"
     blank_submission: 
@@ -6476,7 +6300,6 @@ de:
       muted: Stummgeschaltet
     grade_summary: 
       all_grading_periods: "Alle Benotungszeiträume"
-      assessment_by: "Leistungstest erstellt von %{name}"
       assignments: Aufgaben
       buttons: 
         show_what_if: "gespeicherte hypothetische Punktestände anzeigen"
@@ -7341,13 +7164,9 @@ de:
       invalid_datetime: "Ungültige Datums-/Uhrzeitangabe"
       invalid_entry_for_field: "Ungültiger Eintrag: %{field}"
       invalid_number: "Diese Eingabe muss eine Nummer sein."
-      not_a_date: "Das ist kein gültiges Datum!"
       posting_message_failed: "Einstellen des Beitrags fehlgeschlagen, bitte erneut versuchen"
       required: Pflichtfeld
       search_failed: "Suche fehlgeschlagen, bitte erneut versuchen."
-    labels: 
-      datepicker: 
-        time: Uhrzeit
     links: 
       minimize_file_preview: "Dateivorschau minimieren"
       minimize_youtube_video: "Video minimieren"
@@ -7634,12 +7453,10 @@ de:
   loading_25990131: "Wird geladen ..."
   locales: 
     de: Deutsch
-  lock_after_date_92f9149: "Datum 'Sperren nach'"
   lock_date_cannot_be_after_course_end_a473158b: "Sperrdatum kann nicht nach dem Kursende liegen"
   lock_date_cannot_be_after_section_end_d37da70c: "Das Sperrdatum kann nicht nach dem Ende des Kursabschnitts liegen"
   lock_date_cannot_be_after_term_end_cf1a188f: "Das Sperrdatum kann nicht nach dem Ende der Kursperiode liegen"
   lock_date_cannot_be_before_due_date_ac30f54: "Das Sperrdatum kann nicht vor dem Abgabetermin liegen"
-  lock_until_date_62ce1b5c: "Datum 'Sperren bis'"
   log_on_url_fc166e4c: Anmelde-URL
   log_out_379ba28a: Abmeldung
   log_out_url_2605c2c1: "Abmelde-URL "
@@ -9681,7 +9498,6 @@ de:
     submission_comments: Einsendungskommentare
     sure_you_want_to_mute: "Möchten Sie diese Aufgabe wirklich stummschalten? Solange diese Aufgabe stummgeschaltet ist, erhalten die Studenten keine neuen Benachrichtigungen und sehen keine Informationen im Zusammenhang mit:"
   muted_283cfa0f: (stummgeschaltet)
-  my_dashboard_8983c283: "Mein Dashboard"
   my_dashboard_b724020: "Mein Dashboard"
   n_a_d6f6c42f: k. A.
   n_number_of_times_c2e78b72: "n Mal"
@@ -9699,10 +9515,6 @@ de:
   new_file_135ae520: "[ Neue Datei ]"
   new_outcome_7fba8c7d: "Neues Ergebnis"
   new_quiz_statistics_desc: "Aktiviert die neue Seite mit Quizstatistiken für einen Kurs."
-  new_styles_description: |-
-      Wir gestalten die Benutzeroberfläche von Canvas um. Aktivieren Sie diese Option, um Zugriff auf die
-      aktualisierte und vereinfachte Canvas-Oberfläche zu erhalten. Diese Funktion wird noch bearbeitet
-      und sollte während der Bearbeitung noch nicht für tatsächliche Benutzer aktiviert werden.
   next_40e12421: Weiter
   next_steps_ce0f0d0c: "Nächste Schritte"
   no_assignment_name_adbb215b: "Kein Aufgabenname"
@@ -10024,7 +9836,6 @@ de:
       page_title: "Anmeldung bei Anwendung"
       remember_auth: "Meine Berechtigung für diesen Dienst speichern"
   observees: 
-    add_observee_button: "Student hinzufügen"
     being_observed: "Beobachtete Studenten"
     new_observee_password: Passwort
     new_observee_username: Benutzername
@@ -11944,7 +11755,6 @@ de:
         has_submissions_already: "Bedenken Sie, dass einige Studenten dieses Quiz bereits absolviert oder damit begonnen haben"
         less_than_allotted_time: "Da Sie dieses Quiz kurz vor Erreichen der Abgabefrist begonnen haben, steht Ihnen nicht die volle Zeit zur Verfügung."
         no_submission_for_user: "Für diesen Benutzer ist keine Einsendung verfügbar"
-        quiz_not_availible: "Sie haben keinen Zugriff auf das angeforderte Quiz."
         quiz_updated: "Quiz erfolgreich aktualisiert"
         quizzes_published: 
           one: "1 Quiz erfolgreich veröffentlicht"
@@ -13032,18 +12842,6 @@ de:
         go: Los
       titles: 
         find_user: "Benutzer suchen"
-    add_assignment: 
-      buttons: 
-        add_assignment: "Aufgabe hinzufügen"
-      labels: 
-        assignment_group_id: Gruppe
-        due_at: Abgabetermin
-        points_possible: Punkte
-        title: Name
-      options: 
-        assignments: Aufgaben
-      titles: 
-        add_assignment: "Aufgabe hinzufügen"
     add_assignment_group: 
       buttons: 
         add_group: "Gruppe hinzufügen"
@@ -13833,8 +13631,6 @@ de:
     student_hidden_name: "Student %{position}"
   sso_settings_ebf98263: SSO-Einstellungen
   start_date_e937be8a: Startdatum
-  start_date_must_be_before_end_date_a00be892: "Startdatum muss vor Enddatum liegen"
-  starts_on_date_a777f505: "Datum 'Start am'"
   statistics: 
     csv_columns: 
       attempt: Versuch
@@ -14169,7 +13965,6 @@ de:
   the_following_fields_are_invalid_fields_b3565800: "Die folgenden Felder sind ungültig: %{fields}"
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "Der vollständige Hostname der Account-Instanz (z.B. something.instructure.com)"
   the_grading_period_was_deleted_7814a349: "Die Benotungsperiode wurde gelöscht"
-  the_grading_period_was_saved_4a504c5: "Die Benotungsperiode wurde gespeichert"
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "Die Institution, über die Sie sich angemeldet haben, ist für diesen Account nicht konfiguriert."
   the_list_of_results_has_been_updated_46e3c733: "Die Liste mit den Ergebnissen wurde aktualisiert."
   the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "Das Logo-Bild oben rechts in der Canvas-Kopfzeile. 200x200 SVG oder PNG"
@@ -14218,7 +14013,6 @@ de:
   this_field_name_is_required_b9196401: "Dieses Feld \"name\" ist erforderlich."
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "Für diese Datei müssen usage_rights festgelegt werden, bevor sie veröffentlicht werden kann."
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Dieser Ordner ist derzeit gesperrt und kann nicht angezeigt werden."
-  this_grading_period_overlaps_16332589: "Dieser Benotungszeitraum überschneidet sich"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Dies ist eine durch Kommata getrennte Liste mit vertrauenswürdigen URLs. Wenn eine URL in der Liste als vertrauenswürdig angesehen wird, wird das CSRF-Token bei der Anmeldung bei Canvas umgangen."
   this_login_is_for_provider_6f17462: "Diese Anmeldung ist für %{provider}"
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Die Ursache hierfür liegt wahrscheinlich darin, dass Sie Kursinhalte ohne die ihnen zugeordneten Dateien importiert haben."
@@ -14473,7 +14267,6 @@ de:
     buttons: 
       resubmit_to_turnitin: "Erneut an Turnitin einsenden"
   twitter_fcef6b54: Twitter
-  type_more_to_find_additional_students_d5211cd5: "Tippen Sie mehr ein, um zusätzliche Studenten zu finden"
   unable_to_remove_app_4293cb53: "Die App kann nicht entfernt werden"
   unarchive_selected_e0c4bd3d: "Nicht archivieren ausgewählt"
   unauthorized: "nicht berechtigt"
@@ -14501,7 +14294,6 @@ de:
   until_date_949017c4: "Bis %{date}"
   untitled_assignment_59354b34: "Aufgabe ohne Titel"
   unused_courses_title: "Nicht verwendete Kurse"
-  update_4d8ee62: Aktualisieren
   updated_group_group_name_727b1d98: "Aktualisierte Gruppe %{group_name}"
   upload_button: 
     upload: Hochladen
@@ -14734,8 +14526,6 @@ de:
         one: "Durchschnitt für 1 Student"
         other: "Durchschnitt für %{count} Studenten"
       course: Kurs
-      crumbs: 
-        grades: Noten
       current_teacher_courses: "Von mir unterrichtete Kurse"
       linked_student_accounts: "Verlinkte Studentenkonten"
       links: 
@@ -14953,7 +14743,6 @@ de:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista-/CE-, WebCT 6+ Kurs"
   webct_name: "Blackboard Vista/CE (WebCT)"
-  welcome_to_your_courses_to_customize_the_list_of_c_2922a551: "Willkommen bei Ihren Kursen! Zur Anpassung der Kursliste, klicken Sie auf den Link \"Alle Kurse\" und lassen sich die Kurse anzeigen."
   well_below_mastery_37664bdc: "Weit unter Master"
   what_should_the_csv_file_look_like_985a59ac: "Wie sollte diese CSV-Datei aussehen?"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Wenn Personen den Kurs besuchen, wird ihnen diese Seite angezeigt. Sie können sie so einrichten, dass eine Aktivitätenliste, die Liste der Kursmodule, ein Syllabus oder eine benutzerdefinierte Seite angezeigt wird. Standardmäßig wird die Aktivitätenliste für den Kurs angezeigt."
