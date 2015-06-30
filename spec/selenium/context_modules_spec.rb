@@ -113,7 +113,7 @@ describe "context modules" do
     it "should add and remove completion criteria" do
       get "/courses/#{@course.id}/modules"
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
-      
+
       @course.reload
       smodule = @course.context_modules.first
       smodule.publish!
@@ -394,7 +394,7 @@ describe "context modules" do
       third_module_name = 'Third Module'
       add_module(first_module_name)
       add_module(second_module_name)
-      
+
       #adding second module - can't use add_module method because a prerequisite needs to be added to this module
       add_form = new_module_form
       replace_content(add_form.find_element(:id, 'context_module_name'), third_module_name)
@@ -436,7 +436,7 @@ describe "context modules" do
       @course.enable_feature!(:nc_or)
       get "/courses/#{@course.id}/modules"
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
-    
+
       @course.reload
 
       # add completion criterion
@@ -456,7 +456,7 @@ describe "context modules" do
 
       # Test that pill now says Complete One Item right after change and one reload
       expect(fj('.pill li').text).to eq "Complete One Item"
-      @course.reload
+      get "/courses/#{@course.id}/modules"
       expect(fj('.pill li').text).to eq "Complete One Item"
     end
 
@@ -480,7 +480,7 @@ describe "context modules" do
 
     it "should validate locking a module item display functionality" do
       get "/courses/#{@course.id}/modules"
-      
+
       add_form = new_module_form
       lock_check = add_form.find_element(:id, 'unlock_module_at')
       lock_check.click
@@ -661,13 +661,13 @@ describe "context modules" do
         # i : Increase Indent
         # o : Decrease Indent
         # n : New Module
-        
+
         modules = create_modules(2, true)
         modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
         modules[0].add_item({:id => @assignment2.id, :type => 'assignment'})
         modules[1].add_item({:id => @assignment3.id, :type => 'assignment'})
         get "/courses/#{@course.id}/modules"
-        
+
         context_modules = ff('.context_module .icon-drag-handle')
         context_module_items = ff('.context_module_item a.title')
 
@@ -677,7 +677,7 @@ describe "context modules" do
 
         context_modules[0].send_keys(:arrow_down)
         check_element_has_focus(context_module_items[0])
-        
+
         context_module_items[0].send_keys("j")
         check_element_has_focus(context_module_items[1])
 
@@ -686,7 +686,7 @@ describe "context modules" do
 
         context_module_items[0].send_keys(:arrow_up)
         check_element_has_focus(context_modules[0])
-        
+
         # Test Edit key
         wait_for_ajaximations(1000) # Has to wait one second before sending keys for it to work
         context_modules[0].send_keys("e")
@@ -705,12 +705,12 @@ describe "context modules" do
         # Test Indent / Outdent
         expect(ff('.context_module_item')[0]).to have_class('indent_0')
 
-        wait_for_ajaximations(1000) 
+        wait_for_ajaximations(1000)
         context_module_items[0].send_keys("i")
         keep_trying_until do
           expect(ff('.context_module_item')[0]).to have_class('indent_1')
         end
-        
+
         wait_for_ajaximations(1000)
         ff('.context_module_item a.title')[0].send_keys("o")
         keep_trying_until do

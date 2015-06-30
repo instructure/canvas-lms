@@ -348,7 +348,7 @@ define([
         $module.find(".prerequisites .prerequisite_criterion").each(function() {
           prerequisites.push($(this).getTemplateData({textValues: ['id', 'name', 'type']}));
         });
-      
+
         $form.find(".prerequisites_list .criteria_list").empty();
         for(var idx in prerequisites) {
           var pre = prerequisites[idx];
@@ -372,21 +372,21 @@ define([
           .find(".prerequisites_list .criteria_list").showIf(prerequisites.length != 0).end()
           .find(".add_prerequisite_link").showIf(!no_prereqs).end()
           .find(".completion_entry .criteria_list").showIf(!no_items).end()
-          
+
           .find(".completion_entry .no_items_message").hide().end()
           .find(".add_completion_criterion_link").showIf(!no_items);
 
         // Set no items or criteria message plus diasable elements if there are no items or no requirements
         if (no_items) {
           $form.find(".completion_entry .no_items_message").show();
-          
+
         } else if ($module.find(".content .context_module_item .criterion.defined").length !== 0) {
           $(".require-sequential").children().show();
           $(".requirement-count-radio .ic-Radio").children().show();
-        } 
+        }
 
-        var $requirmentCount = $module.find('.pill li').data("requirement-count");
-        $requirmentCount == 1 ? $('#context_module_requirement_count_1').prop('checked', true) : $('#context_module_requirement_count_0').prop('checked', true);
+        var $requirementCount = $module.find('.pill li').data("requirement-count");
+        $requirementCount == 1 ? $('#context_module_requirement_count_1').prop('checked', true) : $('#context_module_requirement_count').prop('checked', true);
 
         $module.fadeIn('fast', function() {
         });
@@ -653,7 +653,7 @@ define([
 
       // Update requirement message pill
       var $pillMessage = $module.find('.pill li');
-      var newPillMessage = data.context_module.requirement_count && data.context_module.requirement_count !== 0 ? I18n.t("Complete One Item") : I18n.t("Complete All Items");
+      var newPillMessage = data.context_module.requirement_count ? I18n.t("Complete One Item") : I18n.t("Complete All Items");
       $pillMessage.text(newPillMessage);
       $pillMessage.data("requirement-count", data.context_module.requirement_count);
 
@@ -695,8 +695,14 @@ define([
             prereqs.push("module_" + id);
           }
         });
-        data['context_module[requirement_count]'] = $('input[name="context_module[requirement_count]"]:checked').val();
-"0";
+        var requirementCount = $('input[name="context_module[requirement_count]"]:checked').val();
+
+        if (requirementCount) {
+          data['context_module[requirement_count]'] = requirementCount;
+        } else {
+          delete data['context_module[requirement_count]'];
+        }
+
         data['context_module[prerequisites]'] = prereqs.join(",");
         data['context_module[completion_requirements][none]'] = "none";
         $(this).find(".criteria_list .criterion").each(function() {
@@ -771,7 +777,7 @@ define([
       var $pre = $form.find("#criterion_blank_prereq").clone(true).removeAttr('id');
       $select.find("." + $module.attr('id')).remove();
       var afters = [];
-      
+
       $("#context_modules .context_module").each(function() {
         if($(this)[0] == $module[0] || afters.length > 0) {
           afters.push($(this).attr('id'));
@@ -850,7 +856,7 @@ define([
       var $option = $(this).parents(".completion_criterion_option");
 
       // Show score text box and do some resizing of drop down to get it to stay on one line
-      $option.find(".min_score_box").showIf($(this).val() == 'min_score'); 
+      $option.find(".min_score_box").showIf($(this).val() == 'min_score');
 
       var id = $option.find(".id").val();
       var points_possible = $.trim($("#context_module_item_" + id + " .points_possible_display").text().split(' ')[0]);
@@ -913,7 +919,7 @@ define([
         modules.addItemToModule($module, data.content_tag);
         $module.find(".context_module_items.ui-sortable").sortable('refresh');
         modules.updateAssignmentData();
-        
+
       }, function(data) {
       }).done (function() {
         if (elemID) {
@@ -921,12 +927,12 @@ define([
             var $activeElemClass = "." + $(activeElem).attr('class').split(' ').join(".");
             $(elemID).find($activeElemClass).focus();
           }, 0);
-          
+
         } else {
           $cogLink.focus();
         }
       })
-        
+
     });
     $(".edit_item_link").live('click', function(event) {
       event.preventDefault();
@@ -1460,14 +1466,14 @@ define([
       $elem.find(":tabbable:first").focus();
     };
 
-    // This method will select the items passed in with the options object 
+    // This method will select the items passed in with the options object
     // and can be used to advance the focus or return to the previous module or module_item
-    // This will also return the element that is now in focus 
+    // This will also return the element that is now in focus
     var selectItem = function (options) {
       options = options || {};
 
       if (!$currentElem) {
-        $elem = $('.context_module:first'); 
+        $elem = $('.context_module:first');
       } else if($currentElem && $currentElem.hasClass('context_module')) {
         $elem = options.selectWhenModuleFocused && options.selectWhenModuleFocused.item;
         $elem = $elem.length ? $elem : (options.selectWhenModuleFocused && options.selectWhenModuleFocused.fallbackModule);
@@ -1493,14 +1499,14 @@ define([
                     selectWhenModuleFocused: {
                       item: $currentElem && $currentElem.prev(".context_module").find(".context_module_item:visible:last"),
                       fallbackModule: $currentElem && $currentElem.prev(".context_module")
-                    }, 
+                    },
                     selectWhenModuleItemFocused: {
                       item: $currentElem && $currentElem.prev(".context_module_item:visible"),
                       fallbackModule: $currentElem && $currentElem.parents(".context_module")
                     }
                   };
       var $elem = selectItem(params);
-      if ($elem.length) $currentElem = $elem; 
+      if ($elem.length) $currentElem = $elem;
 
     });
 
@@ -1510,22 +1516,22 @@ define([
                     selectWhenModuleFocused: {
                       item: $currentElem && $currentElem.find(".context_module_item:visible:first"),
                       fallbackModule: $currentElem && $currentElem.next(".context_module")
-                    }, 
+                    },
                     selectWhenModuleItemFocused: {
                       item: $currentElem && $currentElem.next(".context_module_item:visible"),
                       fallbackModule: $currentElem && $currentElem.parents(".context_module").next(".context_module")
                     }
                   };
       var $elem = selectItem(params);
-      if ($elem.length) $currentElem = $elem; 
+      if ($elem.length) $currentElem = $elem;
 
-    }); 
+    });
 
     // "e" opens up Edit Module Settings form if focus is on Module or Edit Item Details form if focused on Module Item
     // "d" deletes module or module item
     // "space" opens up Move Item or Move Module form depending on which item is focused
     $document.keycodes('e d space', function(event) {
-      $elem = getClosestModuleOrItem($currentElem); 
+      $elem = getClosestModuleOrItem($currentElem);
       $hasClassItemHover = $elem.hasClass('context_module_item_hover');
 
       if(event.keyString == 'e') {
@@ -1544,14 +1550,14 @@ define([
 
       event.preventDefault();
 
-    }); 
+    });
 
     // "n" opens up the Add Module form
     $document.keycodes('n', function(event) {
       $(".add_module_link:visible:first").click();
       event.preventDefault();
-    }); 
-    
+    });
+
     // "i" indents module item
     // "o" outdents module item
     $document.keycodes('i o', function(event) {
