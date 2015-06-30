@@ -912,6 +912,12 @@ describe "gradebook2" do
   describe "post_grades" do
     before(:each) do
       gradebook_data_setup
+      create_sis_assignment
+    end
+
+    def create_sis_assignment
+      @assignment.post_to_sis = true
+      @assignment.save
     end
 
     it "should not be visible by default" do
@@ -947,8 +953,6 @@ describe "gradebook2" do
       Account.default.set_feature_flag!('post_grades', 'on')
       @course.sis_source_id = 'xyz'
       @course.save
-      @assignment.post_to_sis = true
-      @assignment.save
       get "/courses/#{@course.id}/gradebook2"
       wait_for_ajaximations
       expect(f('.post-grades-placeholder > button')).to be_displayed

@@ -32,6 +32,8 @@ class GradebooksController < ApplicationController
   add_crumb(proc { t '#crumbs.grades', "Grades" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grades_url }
   before_filter { |c| c.active_tab = "grades" }
 
+  MAX_POST_GRADES_TOOLS = 10
+
   def grade_summary
     @presenter = GradeSummaryPresenter.new(@context, @current_user, params[:id])
     # do this as the very first thing, if the current user is a teacher in the course and they are not trying to view another user's grades, redirect them to the gradebook
@@ -150,7 +152,7 @@ class GradebooksController < ApplicationController
       @last_exported_gradebook_csv = @context.gradebook_csvs.where(user_id: @current_user).first
       set_current_grading_period if multiple_grading_periods?
       set_js_env
-      @external_tools = external_tools
+      @post_grades_tools = post_grades_tools
       case @current_user.preferred_gradebook_version
       when "2"
         render :gradebook2
@@ -166,9 +168,29 @@ class GradebooksController < ApplicationController
     redirect_to action: :show
   end
 
+  def published_assignments?
+    context.assignments.published.where(post_to_sis: true).exists?
+  end
+
+  def post_grades_tools
+    return [] unless published_assignments?
+    tools = []
+    tool_limit = @context.feature_enabled?(:post_grades) ? MAX_POST_GRADES_TOOLS - 1 : MAX_POST_GRADES_TOOLS
+    external_tools[0...tool_limit].each do |tool|
+      tools.push(
+        data_url: tool[:placements][:post_grades][:canvas_launch_url],
+        name: tool[:name],
+        type: :lti
+      )
+    end
+    tools.push(type: :post_grades) if @context.feature_enabled?(:post_grades)
+    tools.push(type: :ellip) if external_tools.length > tool_limit
+    tools
+  end
+
   def external_tools
     bookmarked_collection = Lti::AppLaunchCollator.bookmarked_collection(@context, [:post_grades])
-    tools = bookmarked_collection.paginate(per_page: 10 + 1).to_a # one more than a full page
+    tools = bookmarked_collection.paginate(per_page: MAX_POST_GRADES_TOOLS + 1).to_a
     launch_definitions = Lti::AppLaunchCollator.launch_definitions(tools, [:post_grades])
     launch_definitions.each do |launch_definition|
       case launch_definition[:definition_type]
