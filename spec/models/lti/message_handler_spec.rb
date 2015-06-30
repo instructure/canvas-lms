@@ -110,9 +110,8 @@ module Lti
         @mh3 = create_message_handler(rh3)
         rh1.placements.create(placement: ResourcePlacement::ACCOUNT_NAVIGATION)
         rh1.placements.create(placement: ResourcePlacement::COURSE_NAVIGATION)
-        rh2.placements.create(placement: ResourcePlacement::RESOURCE_SELECTION)
         rh2.placements.create(placement: ResourcePlacement::ACCOUNT_NAVIGATION)
-        rh3.placements.create(placement: ResourcePlacement::RESOURCE_SELECTION)
+        rh3.placements.create(placement: ResourcePlacement::COURSE_NAVIGATION)
       end
 
 
@@ -125,7 +124,7 @@ module Lti
       end
 
       it 'filters on multiple placement types' do
-        handlers = described_class.has_placements(ResourcePlacement::ACCOUNT_NAVIGATION, ResourcePlacement::RESOURCE_SELECTION)
+        handlers = described_class.has_placements(ResourcePlacement::ACCOUNT_NAVIGATION, ResourcePlacement::COURSE_NAVIGATION)
         expect(handlers.count).to eq 3
         expect(handlers).to include(@mh1)
         expect(handlers).to include(@mh2)

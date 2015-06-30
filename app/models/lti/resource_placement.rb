@@ -39,7 +39,7 @@ module Lti
     belongs_to :resource_handler, class_name: 'Lti::ResourceHandler'
     validates_presence_of :resource_handler, :placement
 
-    validates_inclusion_of :placement, :in => [RESOURCE_SELECTION, ACCOUNT_NAVIGATION, COURSE_NAVIGATION, LINK_SELECTION, ASSIGNMENT_SELECTION]
+    validates_inclusion_of :placement, :in => PLACEMENT_LOOKUP.values
 
   end
 end

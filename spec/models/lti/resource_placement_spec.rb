@@ -28,6 +28,12 @@ module Lti
         expect(subject.errors.first).to eq [:resource_handler, "can't be blank"]
       end
 
+      it 'accepts types in PLACEMENT_LOOKUP' do
+        subject.placement = ResourcePlacement::PLACEMENT_LOOKUP.values.first
+        subject.save
+        expect(subject.errors).to_not include(:placement)
+      end
+
     end
 
   end
