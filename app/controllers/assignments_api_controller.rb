@@ -545,24 +545,11 @@ class AssignmentsApiController < ApplicationController
   # @returns [Assignment]
   def index
     if authorized_action(@context, @current_user, :read)
-      scope = @context.active_assignments.
+      scope = Assignments::ScopedToUser.new(@context, @current_user).scope.
           includes(:assignment_group, :rubric_association, :rubric).
           reorder("assignment_groups.position, assignments.position")
-
       scope = Assignment.search_by_attribute(scope, :title, params[:search_term])
-
-      # fake assignment used for checking if the @current_user can read unpublished assignments
-      fake = @context.assignments.scoped.new
-      fake.workflow_state = 'unpublished'
-
-      unless fake.grants_right?(@current_user, session, :read)
-        # user should not see unpublished assignments
-        scope = scope.published
-      end
-
-      if da_enabled = @context.feature_enabled?(:differentiated_assignments)
-        scope = DifferentiableAssignment.scope_filter(scope, @current_user, @context)
-      end
+      da_enabled = @context.feature_enabled?(:differentiated_assignments)
 
       if params[:bucket]
         return invalid_bucket_error unless SortsAssignments::VALID_BUCKETS.include?(params[:bucket].to_sym)
