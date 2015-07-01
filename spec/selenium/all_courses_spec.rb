@@ -40,4 +40,10 @@ describe "course catalog" do
     courses = course_elements
     expect(courses.size).to eql 1
   end
+
+  it "should work without course catalog" do
+    Account.default.disable_feature!(:course_catalog)
+    courses = course_elements
+    expect(courses.size).to eql 1
+  end
 end

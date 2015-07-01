@@ -181,12 +181,7 @@ class SearchController < ApplicationController
   #   Only return courses that allow self enrollment. Defaults to false.
   #
   def all_courses
-    unless @domain_root_account.feature_enabled?(:course_catalog)
-      return render status: 404, template: "shared/errors/404_message"
-    end
-
-    @courses = Course
-      .where(root_account_id: @domain_root_account)
+    @courses = Course.where(root_account_id: @domain_root_account)
       .where(indexed: true)
       .where(workflow_state: 'available')
       .order('created_at')
