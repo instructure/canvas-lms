@@ -1708,27 +1708,31 @@ class User < ActiveRecord::Base
 
   # this method takes an optional {:include_enrollment_uuid => uuid}   so that you can pass it the session[:enrollment_uuid] and it will include it.
   def cached_current_enrollments(opts={})
-    enrollments = self.shard.activate do
-      res = Rails.cache.fetch([self, 'current_enrollments3', opts[:include_future], ApplicationController.region ].cache_key) do
-        scope = (opts[:include_future] ? self.enrollments.current_and_future : self.enrollments.current_and_invited)
-        scope.shard(in_region_associated_shards).to_a
+    RequestCache.cache('cached_current_enrollments', self, opts) do
+      enrollments = self.shard.activate do
+        res = Rails.cache.fetch([self, 'current_enrollments3', opts[:include_future], ApplicationController.region ].cache_key) do
+          scope = (opts[:include_future] ? self.enrollments.current_and_future : self.enrollments.current_and_invited)
+          scope.shard(in_region_associated_shards).to_a
+        end
+        if opts[:include_enrollment_uuid] && !res.find { |e| e.uuid == opts[:include_enrollment_uuid] } &&
+            (pending_enrollment = Enrollment.where(uuid: opts[:include_enrollment_uuid], workflow_state: "invited").first)
+          res << pending_enrollment
+        end
+        res
+      end + temporary_invitations
+      if opts[:preload_courses]
+        ActiveRecord::Associations::Preloader.new(enrollments, :course).run
       end
-      if opts[:include_enrollment_uuid] && !res.find { |e| e.uuid == opts[:include_enrollment_uuid] } &&
-          (pending_enrollment = Enrollment.where(uuid: opts[:include_enrollment_uuid], workflow_state: "invited").first)
-        res << pending_enrollment
-      end
-      res
-    end + temporary_invitations
-    if opts[:preload_courses]
-      ActiveRecord::Associations::Preloader.new(enrollments, :course).run
+      enrollments
     end
-    enrollments
   end
 
   def cached_not_ended_enrollments
-    self.shard.activate do
-      @cached_all_enrollments = Rails.cache.fetch([self, 'not_ended_enrollments2'].cache_key) do
-        self.not_ended_enrollments.to_a
+    RequestCache.cache("not_ended_enrollments", self) do
+      self.shard.activate do
+        Rails.cache.fetch([self, 'not_ended_enrollments2'].cache_key) do
+          self.not_ended_enrollments.to_a
+        end
       end
     end
   end
@@ -1738,8 +1742,8 @@ class User < ActiveRecord::Base
   end
 
   def cached_current_group_memberships
-    self.shard.activate do
-      @cached_current_group_memberships = Rails.cache.fetch(group_membership_key) do
+    @cached_current_group_memberships ||= self.shard.activate do
+      Rails.cache.fetch(group_membership_key) do
         self.current_group_memberships.shard(self.in_region_associated_shards).to_a
       end
     end

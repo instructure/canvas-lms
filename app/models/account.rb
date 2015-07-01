@@ -123,8 +123,8 @@ class Account < ActiveRecord::Base
   before_save :ensure_defaults
   after_save :update_account_associations_if_changed
 
-  before_save :setup_quota_cache_invalidation
-  after_save :invalidate_quota_caches_if_changed
+  before_save :setup_cache_invalidation
+  after_save :invalidate_caches_if_changed
 
   after_create :default_enrollment_term
 
@@ -230,6 +230,7 @@ class Account < ActiveRecord::Base
   BRANDING_SETTINGS.each { |setting| add_setting(setting, root_only: true) }
 
   def settings=(hash)
+    @invalidate_settings_cache = true
     if hash.is_a?(Hash)
       hash.each do |key, val|
         if account_settings_options && account_settings_options[key.to_sym]
@@ -524,29 +525,38 @@ class Account < ActiveRecord::Base
     nil
   end
 
-  def setup_quota_cache_invalidation
-    @quota_invalidations = []
+  def setup_cache_invalidation
+    @invalidations = []
     unless self.new_record?
-      @quota_invalidations += ['default_storage_quota', 'current_quota'] if self.try_rescue(:default_storage_quota_changed?)
-      @quota_invalidations << 'default_group_storage_quota' if self.try_rescue(:default_group_storage_quota_changed?)
+      @invalidations += ['default_storage_quota', 'current_quota'] if self.try_rescue(:default_storage_quota_changed?)
+      @invalidations << 'default_group_storage_quota' if self.try_rescue(:default_group_storage_quota_changed?)
     end
   end
 
-  def invalidate_quota_caches_if_changed
-    Account.send_later_if_production(:invalidate_quota_caches, self.id, @quota_invalidations) if @quota_invalidations.present?
+  def invalidate_caches_if_changed
+    @invalidations ||= []
+    @invalidations += Account.inheritable_settings if @invalidate_settings_cache
+    if @invalidations.present?
+      @invalidations.each do |key|
+        Rails.cache.delete([key, self.global_id].cache_key)
+      end
+      Account.send_later_if_production(:invalidate_inherited_caches, self, @invalidations)
+    end
   end
 
-  def self.invalidate_quota_caches(account_id, keys)
-    account_ids = Account.sub_account_ids_recursive(account_id) + [account_id]
-    keys.each do |quota_key|
+  def self.invalidate_inherited_caches(parent_account, keys)
+    parent_account.shard.activate do
+      account_ids = Account.sub_account_ids_recursive(parent_account.id).map{|id| Shard.global_id_for(id)}
       account_ids.each do |id|
-        Rails.cache.delete([quota_key, id].cache_key)
+        keys.each do |key|
+          Rails.cache.delete([key, id].cache_key)
+        end
       end
     end
   end
 
   def quota
-    Rails.cache.fetch(['current_quota', self.id].cache_key) do
+    Rails.cache.fetch(['current_quota', self.global_id].cache_key) do
       read_attribute(:storage_quota) ||
         (self.parent_account.default_storage_quota rescue nil) ||
         Setting.get('account_default_quota', 500.megabytes.to_s).to_i
@@ -554,7 +564,7 @@ class Account < ActiveRecord::Base
   end
 
   def default_storage_quota
-    Rails.cache.fetch(['default_storage_quota', self.id].cache_key) do
+    Rails.cache.fetch(['default_storage_quota', self.global_id].cache_key) do
       read_attribute(:default_storage_quota) ||
         (self.parent_account.default_storage_quota rescue nil) ||
         Setting.get('account_default_quota', 500.megabytes.to_s).to_i
@@ -600,7 +610,7 @@ class Account < ActiveRecord::Base
   end
 
   def default_group_storage_quota
-    Rails.cache.fetch(['default_group_storage_quota', self.id].cache_key) do
+    Rails.cache.fetch(['default_group_storage_quota', self.global_id].cache_key) do
       read_attribute(:default_group_storage_quota) ||
         (self.parent_account.default_group_storage_quota rescue nil) ||
         Group.default_storage_quota

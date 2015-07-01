@@ -619,6 +619,12 @@ class Enrollment < ActiveRecord::Base
   end
 
   def state_based_on_date
+    RequestCache.cache('enrollment_state_based_on_date', self) do
+      calculated_state_based_on_date
+    end
+  end
+
+  def calculated_state_based_on_date
     if state == :completed || ([:invited, :active].include?(state) && self.course.completed?)
       if self.restrict_past_view?
         return :inactive
@@ -656,11 +662,15 @@ class Enrollment < ActiveRecord::Base
   end
 
   def restrict_past_view?
-    self.view_restrictable? && self.course.restrict_student_past_view?
+    self.view_restrictable? && RequestCache.cache('restrict_student_past_view', self.global_course_id) do
+      self.course.restrict_student_past_view?
+    end
   end
 
   def restrict_future_view?
-    self.view_restrictable? && self.course.restrict_student_future_view?
+    self.view_restrictable? && RequestCache.cache('restrict_student_future_view', self.global_course_id) do
+      self.course.restrict_student_future_view?
+    end
   end
 
   def active?

@@ -34,6 +34,7 @@ class ApplicationController < ActionController::Base
   include Api::V1::WikiPage
   include LegalInformationHelper
   around_filter :set_locale
+  around_filter :enable_request_cache
 
   helper :all
 
@@ -253,6 +254,12 @@ class ApplicationController < ActionController::Base
     yield if block_given?
   ensure
     I18n.localizer = nil
+  end
+
+  def enable_request_cache
+    RequestCache.enable do
+      yield
+    end
   end
 
   def store_session_locale

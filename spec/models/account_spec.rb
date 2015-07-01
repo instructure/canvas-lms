@@ -1266,7 +1266,7 @@ describe Account do
     it "should only clear the quota cache if something changes" do
       account = account_model
 
-      Account.expects(:invalidate_quota_caches).once
+      Account.expects(:invalidate_inherited_caches).once
 
       account.default_storage_quota = 10.megabytes
       account.save! # clear here

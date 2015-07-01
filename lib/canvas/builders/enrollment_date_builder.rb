@@ -45,7 +45,9 @@ class EnrollmentDateBuilder
   end
 
   def self.fetch(enrollment)
-    result = Rails.cache.fetch(cache_key(enrollment))
+    result = RequestCache.cache('enrollment_dates', enrollment) do
+      Rails.cache.read(cache_key(enrollment))
+    end
     enrollment.instance_variable_set(:@enrollment_dates, result)
   end
 
@@ -70,6 +72,10 @@ class EnrollmentDateBuilder
       add_term_dates
     else
       @enrollment_dates << default_dates
+    end
+
+    RequestCache.cache('enrollment_dates', self) do
+      @enrollment_dates
     end
 
     Rails.cache.write(cache_key, @enrollment_dates)

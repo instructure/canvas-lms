@@ -2620,7 +2620,9 @@ class Course < ActiveRecord::Base
     class_eval <<-CODE
       def #{setting}
         if Course.settings_options[#{setting.inspect}][:inherited]
-          inherited = self.account.send(#{setting.inspect})
+          inherited = RequestCache.cache('inherited_course_setting', #{setting.inspect}, self.global_account_id) do
+            self.account.send(#{setting.inspect})
+          end
           if inherited[:locked] || settings_frd[#{setting.inspect}].nil?
             inherited[:value]
           else

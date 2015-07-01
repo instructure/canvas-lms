@@ -5,6 +5,7 @@ class TempCache
     clear
     @enabled = true
     yield
+  ensure
     @enabled = false
     clear
   end
