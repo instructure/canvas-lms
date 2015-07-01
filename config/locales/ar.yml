@@ -70,6 +70,7 @@ ar:
         api_key: "مفتاح واجهة API"
         api_url: "عنوان Url لواجهة Api"
         common_core_guid: "المعرف الأساسي المشترك GUID (اختياري)"
+  access_token_is_valid_until_d2f048cf: "رمز الوصول المميز صالح لغاية"
   account: 
     ask_canvas_network: "طرح سؤال على مجتمع شبكة Canvas"
     default_account_name: "حساب افتراضي"
@@ -102,6 +103,7 @@ ar:
     tab_terms: "الفصول الدراسية"
     tab_users: المستخدمون
     turnitin_pledge: "يعد إرسال هذه المهمة هو عملي الخاص والأصلي"
+  account_97b34646: الحساب
   account_authorization_config: 
     default_delegated_login_handle_name: "تسجيل الدخول"
     default_login_handle_name: "البريد الإلكتروني"
@@ -899,6 +901,7 @@ ar:
         turnitin_host: "مضيف Turnitin"
         turnitin_pledge: "تعهد Turnitin"
         turnitin_shared_secret: "كلمة سر Turnitin المشتركة"
+        users_can_edit_name: "بإمكان المستخدمين تحرير اسمهم"
       links: 
         add_admins: "إضافة مسؤولي الحساب"
         configure_report: "جارٍ التكوين..."
@@ -1221,6 +1224,7 @@ ar:
   activity_by_category_9c2033d1: "النشاط حسب الفئة"
   activity_by_date_878c5b49: "النشاط حسب التاريخ"
   add_8523c19b: إضافة
+  add_an_identity_provider_to_this_account_c2644478: "إضافة موفر الهوية لهذا الحساب:"
   add_app_baf540f: "إضافة تطبيق"
   add_attachment_93868828: "إضافة مرفق"
   add_course_assignments_628ed6d0: "إضافة مهام المساق"
@@ -1239,6 +1243,7 @@ ar:
   add_students_to_the_course_874be8fb: "إضافة طلاب إلى المساق"
   add_tas_to_the_course_2aac6e02: "إضافة مساعد معلم إلى المساق"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "أضف مهامك. يمكنك عمل قائمة طويلة أو تقسيمها إلى مجموعات - كما يمكنك تعيين تقديرات لكل مجموعة مهام. "
+  admin_4d3ba42f: المسؤول
   after_date_981cd41b: "بعد %{date}"
   after_last_attempt_c9168da2: "بعد المحاولة الأخيرة"
   ajax_errors: 
@@ -1294,6 +1299,7 @@ ar:
       recipients_required: "مطلوب مستلم واحد على الأقل"
       threshold_should_be_numeric: "من المفترض أن يكون رقمًا إيجابيًا"
   all_4321c3a1: الكل
+  all_changes_were_saved_f6f3ddcc: "تم حفظ جميع التغييرات"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "هل تم الانتهاء من كل الأمور؟ حدد توقيت لنشر المساق الخاص بك! انقر على الزر أدناه لإتاحته رسميًا! سيتيح النشر للمستخدمين المشاركة في المساق."
   all_grading_periods_77974940: "كل فترات تقييم الدرجات"
   all_students_have_taken_the_quiz_b558f8b4: "أدى جميع الطلاب الاختبار"
