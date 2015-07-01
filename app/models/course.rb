@@ -2361,10 +2361,10 @@ class Course < ActiveRecord::Base
         :icon => 'icon-discussion'
       }, {
         :id => TAB_GRADES,
-        :label => t('#tabs.grades', "Grades"),
+        :label => t("My Grades"),
         :css_class => 'grades',
         :href => :course_grades_path,
-        :screenreader => t('#tabs.course_grades', "Course Grades")
+        :screenreader => t("Course Grades")
       }, {
         :id => TAB_PEOPLE,
         :label => t('#tabs.people', "People"),
@@ -2532,6 +2532,12 @@ class Course < ActiveRecord::Base
         tabs.delete_if { |t| t[:hidden] && t[:external] } unless opts[:api] && self.grants_right?(user,  :read_as_admin)
         tabs.delete_if { |t| t[:id] == TAB_GRADES } unless self.grants_any_right?(user, opts[:session], :read_grades, :view_all_grades, :manage_grades)
         tabs.detect { |t| t[:id] == TAB_GRADES }[:manageable] = true if self.grants_any_right?(user, opts[:session], :view_all_grades, :manage_grades)
+
+        grades_tab = tabs.find { |t| t[:id] == TAB_GRADES }
+        if !grades_tab.nil? && self.grants_any_right?(user, opts[:session], :view_all_grades, :manage_grades)
+          grades_tab[:label] = t('Gradebook')
+        end
+
         tabs.delete_if { |t| t[:id] == TAB_PEOPLE } unless self.grants_any_right?(user, opts[:session], :read_roster, :manage_students, :manage_admin_users)
         tabs.detect { |t| t[:id] == TAB_PEOPLE }[:manageable] = true if self.grants_any_right?(user, opts[:session], :manage_students, :manage_admin_users)
         tabs.delete_if { |t| t[:id] == TAB_FILES } unless self.grants_any_right?(user, opts[:session], :read, :manage_files)

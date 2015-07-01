@@ -80,7 +80,7 @@ describe TabsController, type: :request do
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@course)}/courses/#{@course.id}/grades",
           "position" => 5,
           "visibility" => "public",
-          "label" => "Grades",
+          "label" => "Gradebook",
           "type" => "internal"
         },
         {
