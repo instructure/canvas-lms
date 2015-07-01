@@ -40,7 +40,7 @@ describe "links", priority: "2" do
 
     it "should navigate user to gradebook page after grades link is clicked" do
       link = find_link('.grades')
-      validate_breadcrumb_link(link, 'Grades')
+      validate_breadcrumb_link(link, 'Gradebook')
     end
 
     it "should navigate user to users page after people link is clicked" do
@@ -110,7 +110,7 @@ describe "links", priority: "2" do
       end
 
       it "should navigate user to gradebook page after grades link is clicked" do
-        validate_breadcrumb_link(f('#grades_menu_item a'), 'Grades')
+        validate_breadcrumb_link(f('#grades_menu_item a'), 'Gradebook')
       end
 
       it "should navigate user to the calendar page after calender link is clicked" do
