@@ -188,12 +188,6 @@ describe "AccountAuthorizationConfigs API", type: :request do
       update_saml({:account_authorization_config => {"0" => @saml1, "1" => @saml2}, :discovery_url => ''})
       @account.reload
       expect(@account.auth_discovery_url).to eq nil
-
-      @account.auth_discovery_url = 'http://example.com/auth_discovery'
-      @account.save!
-      update_saml({:account_authorization_config => {"0" => @saml1}, :discovery_url => 'http://example.com/wutwut'})
-      @account.reload
-      expect(@account.auth_discovery_url).to eq nil
     end
 
   end

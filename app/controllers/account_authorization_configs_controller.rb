@@ -649,11 +649,7 @@ class AccountAuthorizationConfigsController < ApplicationController
 
     @account.reload
 
-    if @account.authentication_providers.active.count > 1 && params[:discovery_url] && params[:discovery_url] != ''
-      @account.auth_discovery_url = params[:discovery_url]
-    else
-      @account.auth_discovery_url = nil
-    end
+    @account.auth_discovery_url = params[:discovery_url].presence
     @account.save!
 
     render :json => aacs_json(@account.authentication_providers.active)
@@ -692,11 +688,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   # @returns DiscoveryUrl
   def update_discovery_url
-    if params[:discovery_url] && params[:discovery_url] != ''
-      @account.auth_discovery_url = params[:discovery_url]
-    else
-      @account.auth_discovery_url = nil
-    end
+    @account.auth_discovery_url = params[:discovery_url].presence
 
     if @account.save
       render :json => {:discovery_url => @account.auth_discovery_url}

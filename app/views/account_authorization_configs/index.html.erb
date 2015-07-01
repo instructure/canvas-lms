@@ -64,10 +64,8 @@
   </p>
 <% end %>
 
-<% if @presenter.configs.size >= 1 %>
-    <%= render partial: 'sso_settings_form',
-               locals: { presenter: @presenter, account: @account }%>
-<% end %>
+<%= render partial: 'sso_settings_form',
+           locals: { presenter: @presenter, account: @account }%>
 
 <h2><%= t("Current Provider") %></h2>
 

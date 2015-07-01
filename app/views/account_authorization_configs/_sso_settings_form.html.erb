@@ -27,21 +27,19 @@
                   "Leave blank for default Canvas behavior") %>
           </div>
         </div>
-        <% if presenter.needs_discovery_url? %>
-          <div class="ic-Form-control">
-            <%= f.label :auth_discovery_url, t("Discovery URL"),
-                        class: 'ic-Label' %>
-            <%= f.text_field :auth_discovery_url, class: 'ic-Input' %>
-            <div class="help-box">
-              <%= t('discovery_url_description', <<-TEXT)
+        <div class="ic-Form-control">
+          <%= f.label :auth_discovery_url, t("Discovery URL"),
+                      class: 'ic-Label' %>
+          <%= f.text_field :auth_discovery_url, class: 'ic-Input' %>
+          <div class="help-box">
+            <%= t('discovery_url_description', <<-TEXT)
 If a discovery URL is set, Canvas will forward all users to that URL when they need to be authenticated.
 That page will need to then help the user figure out where they need to go to log in.
 If no discovery URL is configured, the first configuration will be used to attempt to authenticate the user.
-                  TEXT
-              %>
-            </div>
+                TEXT
+            %>
           </div>
-        <% end %>
+        </div>
         <% if presenter.needs_unknown_user_url? %>
           <div class="ic-Form-control">
             <%= f.label :unknown_user_url, t("Unknown User URL"),

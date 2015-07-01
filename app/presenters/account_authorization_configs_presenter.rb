@@ -18,11 +18,6 @@ class AccountAuthorizationConfigsPresenter
     end.compact
   end
 
-  def needs_discovery_url?
-    configs.count >= 2 &&
-      configs.any?{|c| !c.is_a?(AccountAuthorizationConfig::LDAP) }
-  end
-
   def needs_unknown_user_url?
     configs.any? { |c| c.is_a?(AccountAuthorizationConfig::Delegated) }
   end
