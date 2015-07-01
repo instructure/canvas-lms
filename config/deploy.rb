@@ -61,6 +61,7 @@ set :assets_dependencies, %w(app/stylesheets app/coffeescripts public/javascript
 # Rollbacks and cleanups of more than :keep_releases fail with permissions errors. 
 # This solves that.
 SSHKit.config.command_map[:rm]  = "sudo rm"
+SSHKit.config.command_map[:tar]  = "sudo tar"
 
 # Canvas uses it's own precompile assets defined below.
 Rake::Task["deploy:compile_assets"].clear_actions
