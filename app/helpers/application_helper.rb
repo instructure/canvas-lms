@@ -851,9 +851,21 @@ module ApplicationHelper
     end
   end
 
-  # Returns true if the parameter matches with the active url
+  # Returns true if the given value is in the current path.
   def active_path?(to_test)
-    request.fullpath.include? to_test
+    # Make sure to not include account external tools
+    if account_external_tool_path?(request.fullpath)
+      false
+    else
+      request.fullpath.include?(to_test)
+    end
+  end
+
+  # Returns true if the active path is an account external tool (like Commons)
+  def account_external_tool_path?(to_test)
+    ext_tools_regex = /^\/accounts\/[^\/]*\/(external_tools)/
+    first_match_location = ext_tools_regex =~ to_test
+    !first_match_location.nil?
   end
 
   def link_to_parent_signup(auth_type)

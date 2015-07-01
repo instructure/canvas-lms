@@ -591,4 +591,31 @@ describe ApplicationHelper do
       expect(editor_buttons).to be_empty
     end
   end
+
+  describe "UI path checking" do
+    describe "#active_path?" do
+      let(:request){ stub('request', :fullpath => '/courses/2')}
+
+      it "recognizes the active path" do
+        expect(active_path?('courses')).to be_truthy
+      end
+
+      it "rejects paths that don't match" do
+        expect(active_path?('grades')).to be_falsey
+      end
+    end
+
+    describe "#account_external_tool_path?" do
+      account_ext_tool_path = "/accounts/2/external_tools/27"
+      course_ext_tool_path = "/courses/2/external_tools/27"
+
+      it "recognizes the account external tool path" do
+        expect(account_external_tool_path?(account_ext_tool_path)).to be_truthy
+      end
+
+      it "rejects paths that don't match" do
+        expect(account_external_tool_path?(course_ext_tool_path)).to be_falsey
+      end
+    end
+  end
 end
