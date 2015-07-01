@@ -154,23 +154,23 @@ class ContextModuleProgression < ActiveRecord::Base
         next
       end
 
+      sub = get_submission_or_quiz_submission(tag) if tag.scoreable?
+      if sub && (sub.respond_to?(:excused?) && sub.excused?)
+        calc.check_action!(req, true)
+        next
+      end
+
       if req[:type] == 'must_view'
         calc.add_view_requirement(req)
       elsif %w(must_contribute must_mark_done).include? req[:type]
         # must_contribute is handled by ContextModule#update_for
         calc.check_action!(req, false)
       elsif req[:type] == 'must_submit'
-        sub = get_submission_or_quiz_submission(tag)
-
         req_met = false
         if sub
           if sub.graded? && sub.attempt.nil?
-            if (sub.respond_to?(:excused?) && sub.excused?)
-              req_met = true
-            else
-              # is a manual grade - doesn't count for submission
-              req_met = false
-            end
+            # is a manual grade - doesn't count for submission
+            req_met = false
           elsif %w(submitted graded complete pending_review).include?(sub.workflow_state)
             req_met = true
           end
@@ -178,7 +178,7 @@ class ContextModuleProgression < ActiveRecord::Base
 
         calc.check_action!(req, req_met)
       elsif req[:type] == 'min_score' || req[:type] == 'max_score'
-        calc.check_action!(req, evaluate_score_requirement_met(req, tag) && tag.scoreable?)
+        calc.check_action!(req, evaluate_score_requirement_met(req, sub))
       end
     end
     calc.check_view_requirements
@@ -210,8 +210,7 @@ class ContextModuleProgression < ActiveRecord::Base
   end
   private :get_submission_score
 
-  def evaluate_score_requirement_met(requirement, tag)
-    sub = get_submission_or_quiz_submission(tag)
+  def evaluate_score_requirement_met(requirement, sub)
     score = get_submission_score(sub)
     if requirement[:type] == "max_score"
       score.present? && score <= requirement[:max_score].to_f
