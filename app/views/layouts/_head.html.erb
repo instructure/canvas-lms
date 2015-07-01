@@ -36,6 +36,16 @@
   <%= include_account_css %>
   <script>
     window.bz_custom_css_url = <%= custom_css_url.to_json.html_safe %>;
+    try {
+      if(localStorage) {
+        window.lastUrlSeen = localStorage.getItem('last_url');
+        window.lastUrlTitle = localStorage.getItem('last_url_title');
+        if(window.location.pathname != '/' && window.location.pathname.indexOf('/login') != 0) {
+          localStorage.setItem('last_url', window.location.href);
+          localStorage.setItem('last_url_title', document.title);
+        }
+      }
+    } catch(e) { }
   </script>
   <script>
     // listen for any clicks on links that have href="#" and queue them to be fired on dom ready.

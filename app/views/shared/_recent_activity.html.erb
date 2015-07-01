@@ -7,6 +7,39 @@
 </h2>
 
 <ul class="recent_activity unstyled_list">
+
+	<!-- This is the last left off area, styled like the stuff below, but special as it is a BZ addition with custom data source and click destination -->
+  <li class="stream-category" onclick="window.location.href = window.lastUrlSeen;">
+    <div class="stream_header">
+      <div class="image-block">
+        <div class=image-block-image>
+          <i class="icon-import-content"></i>
+        </div>
+        <div class=image-block-content>
+          <div class=title>
+						Pick up where you left off
+          </div>
+
+          <div class="links">
+<script>
+  if(window.lastUrlSeen) {
+    var holder = document.createElement("div");
+    var link = document.createElement("a");
+    link.href = window.lastUrlSeen;
+    link.appendChild(document.createTextNode(window.lastUrlTitle ? window.lastUrlTitle : 'this page'));
+    holder.appendChild(link);
+    document.write(holder.innerHTML);
+  }
+</script>
+          </div>
+        </div>
+      </div>
+    </div>
+  </li>
+	<!-- End last left off. -->
+
+
+
 <% categorized_items = categorize_stream_items(@stream_items) %>
 <% %w(Announcement Conversation Assignment DiscussionTopic AssessmentRequest).each do |category| %>
   <% items = categorized_items[category] %>
