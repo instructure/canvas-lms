@@ -291,7 +291,7 @@ class Quizzes::QuizzesApiController < ApplicationController
   #   The partial title of the quizzes to match and return.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/courses/<course_id>/quizzes \ 
+  #     curl https://<canvas>/api/v1/courses/<course_id>/quizzes \
   #          -H 'Authorization: Bearer <token>'
   #
   # @returns [Quiz]
@@ -306,14 +306,7 @@ class Quizzes::QuizzesApiController < ApplicationController
       value = Rails.cache.fetch(cache_key) do
         api_route = api_v1_course_quizzes_url(@context)
         scope = Quizzes::Quiz.search_by_attribute(@context.quizzes.active, :title, params[:search_term])
-
-        if @context.feature_enabled?(:differentiated_assignments)
-          scope = DifferentiableAssignment.scope_filter(scope, @current_user, @context)
-        end
-
-        unless @context.grants_right?(@current_user, session, :manage_assignments)
-          scope = scope.available
-        end
+        scope = Quizzes::ScopedToUser.new(@context, @current_user, scope).scope
 
         if accepts_jsonapi?
           {
