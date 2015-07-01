@@ -8,7 +8,8 @@ require [
     window.top.location = self.location.href
 
   React.render(React.createElement(ThemeEditor, {
-    brandConfig: window.ENV.brandConfig,
+    brandConfig: window.ENV.brandConfig
+    hasUnsavedChanges: window.ENV.hasUnsavedChanges
     variableSchema: window.ENV.variableSchema
     sharedBrandConfigs: window.ENV.sharedBrandConfigs
   }), document.body)

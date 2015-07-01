@@ -36,6 +36,13 @@ define([
 
     displayName: 'ThemeEditor',
 
+    propTypes: {
+      brandConfig: React.PropTypes.object.isRequired,
+      hasUnsavedChanges: React.PropTypes.bool.isRequired,
+      variableSchema: React.PropTypes.object.isRequired,
+      sharedBrandConfigs: React.PropTypes.array.isRequired
+    },
+
     getInitialState() {
       return {
         somethingChanged: false,
@@ -67,21 +74,28 @@ define([
       submitHtmlForm('/brand_configs', 'POST')
     },
 
-    cancelChanges() {
-      var msg = I18n.t('This will just cancel the unsaved changes you ' +
-                       'have made in the Theme Editor. It will not affect ' +
-                       'anyone else and you will now see canvas as everyone ' +
-                       'else at your accout does.')
+    redirectToWhatIframeIsShowing() {
+      window.top.location = this.refs.previewIframe.getDOMNode().contentWindow.location
+    },
 
-      if(confirm(msg)) submitHtmlForm('/brand_configs', 'DELETE')
+    exit() {
+      if (this.props.hasUnsavedChanges || this.state.somethingChanged) {
+        var msg = I18n.t('You are about to lose any unsaved changes.\n\n' +
+                         'Would you still like to proceed?')
+        if (confirm(msg)) {
+          $.ajax('/brand_configs', {method: 'DELETE'})
+            .then(this.redirectToWhatIframeIsShowing)
+            .then(null, function() { // our version of jQuery doesn't have .catch
+              alert(I18n.t('Something went wrong, please try again.'))
+            })
+        }
+      } else {
+        this.redirectToWhatIframeIsShowing()
+      }
     },
 
     saveToAccount() {
-      var msg = I18n.t('This will apply the changes that you have made in ' +
-                       'the Theme Editor so everyone else at your accout will ' +
-                       'see Canvas as you are seeing it now. ' +
-                       'Are you sure you want to do this?')
-
+      var msg = I18n.t('This will apply these changes to your entire account. Would you like to proceed?')
       if (confirm(msg)) submitHtmlForm('/brand_configs/save_to_account', 'POST')
     },
 
@@ -122,25 +136,29 @@ define([
                       <a
                         href="#"
                         className="icon-end"
-                        onClick={preventDefault(this.cancelChanges)}
+                        onClick={preventDefault(this.exit)}
                       >
-                        {I18n.t('Cancel Changes')}
+                        {I18n.t('Exit Theme Editor')}
                       </a>
                     </li>
                   </ul>
                 </div>
-                <button
-                  type="button"
-                  className="Theme__editor-header_button Button Button--success"
-                  disabled={this.state.somethingChanged}
+                <span
+                  data-tooltip="bottom"
                   title={this.state.somethingChanged ?
-                    I18n.t('"Preview Your Changes" before applying to everyone') :
+                    I18n.t('you need to "Preview Your Changes" before applying to everyone') :
                     null
                   }
-                  onClick={this.saveToAccount}
                 >
-                  {I18n.t('Apply')}
-                </button>
+                  <button
+                    type="button"
+                    className="Theme__editor-header_button Button Button--success"
+                    disabled={!this.props.hasUnsavedChanges || this.state.somethingChanged}
+                    onClick={this.saveToAccount}
+                  >
+                    {I18n.t('Apply')}
+                  </button>
+                </span>
               </div>
             </div>
 
@@ -177,7 +195,7 @@ define([
                 </button>
               </div>
             </div>
-            <iframe src="/?editing_brand_config=1" />
+            <iframe ref="previewIframe" src="/?editing_brand_config=1" />
           </div>
         </form>
         </div>
