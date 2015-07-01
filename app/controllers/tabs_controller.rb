@@ -70,11 +70,11 @@ class TabsController < ApplicationController
   #   (Only has effect for courses, not groups)
   #
   # @example_request
-  #     curl -H 'Authorization: Bearer <token>' \ 
+  #     curl -H 'Authorization: Bearer <token>' \
   #          https://<canvas>/api/v1/courses/<course_id>/tabs\?include\="external"
   #
   # @example_request
-  #     curl -H 'Authorization: Bearer <token>' \ 
+  #     curl -H 'Authorization: Bearer <token>' \
   #          https://<canvas>/api/v1/groups/<group_id>/tabs"
   #
   # @example_response
@@ -132,7 +132,7 @@ class TabsController < ApplicationController
   #
   # @returns Tab
   def update
-    return unless  authorized_action(@context, @current_user, :manage_content) && @context.is_a?(Course)
+    return unless authorized_action(@context, @current_user, :manage_content) && @context.is_a?(Course)
     css_class = params['tab_id']
     new_pos = params['position'].to_i if params['position']
     tabs = context_tabs
@@ -145,6 +145,10 @@ class TabsController < ApplicationController
       render json: {error: t(:tab_location_error, 'That tab location is invalid')}, status: :bad_request
     else
       pos = tab_config.index { |t| t['id'] == tab['id'] }
+      if pos.nil?
+        pos = (tab['position'] || tab_config.size) - 1
+        tab_config.insert(pos, tab.with_indifferent_access.slice(*%w{id hidden position}))
+      end
 
       if value_to_boolean(params['hidden'])
         tab[:hidden] = true
