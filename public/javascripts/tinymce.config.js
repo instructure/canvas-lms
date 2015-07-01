@@ -89,7 +89,6 @@ define([], function(){
       ],
 
       extended_valid_elements: "*[*]",
-      non_empty_elements: "*",
       valid_children: "+body[style|script|svg]",
 
       content_css: "/stylesheets_compiled/legacy_normal_contrast/bundles/what_gets_loaded_inside_the_tinymce_editor.css," + window.bz_custom_css_url,
