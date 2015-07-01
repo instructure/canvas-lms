@@ -38,6 +38,20 @@ describe SelfEnrollmentsController do
       expect(response).to redirect_to login_url
     end
 
+    it "forwards authentication_provider param" do
+      account_with_cas(account: Account.default)
+
+      get 'new', self_enrollment_code: @course.self_enrollment_code, authentication_provider: 'facebook'
+      expect(response).to redirect_to login_url(authentication_provider: 'facebook')
+    end
+
+    it "renders directly if authentication_provider=canvas" do
+      account_with_cas(account: Account.default)
+
+      get 'new', self_enrollment_code: @course.self_enrollment_code, authentication_provider: 'canvas'
+      expect(response).to be_success
+    end
+
     it "should not render for an incorrect code" do
       assert_page_not_found do
         get 'new', :self_enrollment_code => 'abc'
