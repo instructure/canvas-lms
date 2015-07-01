@@ -54,16 +54,6 @@
                 </a>
               </li>
             <% end %>
-            <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('grades') %>">
-              <a id="global_nav_grades_link" href="<%= grades_path %>" class="ic-app-header__menu-list-link">
-                <div class="menu-item-icon-container">
-                  <%= render(:partial => "shared/svg/svg_icon_grades_new_styles.svg") %>
-                </div>
-                <div class="menu-item__text">
-                  <%= t('Grades') %>
-                </div>
-              </a>
-            </li>
             <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('calendar') %>">
               <a id="global_nav_calendar_link" href="/calendar" class="ic-app-header__menu-list-link">
                 <div class="menu-item-icon-container">
