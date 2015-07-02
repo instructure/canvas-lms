@@ -8,6 +8,10 @@ Dir["{gems,vendor}/plugins/*/config/pre_routes.rb"].each { |pre_routes|
 CanvasRails::Application.routes.draw do
   resources :submission_comments, only: :destroy
 
+  # BZ custom sesction
+  post 'bz/last_user_url' => 'bz#last_user_url'
+  # end
+
   get 'inbox' => 'context#inbox'
   get 'oauth/redirect_proxy' => 'oauth_proxy#redirect_proxy'
 

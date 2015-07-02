@@ -8,8 +8,9 @@
 
 <ul class="recent_activity unstyled_list">
 
+	<% if @current_user && @current_user.last_url %>
 	<!-- This is the last left off area, styled like the stuff below, but special as it is a BZ addition with custom data source and click destination -->
-  <li class="stream-category" onclick="window.location.href = window.lastUrlSeen;">
+  <li class="stream-category" onclick="window.location.href = <%= @current_user.last_url.to_json %>;">
     <div class="stream_header">
       <div class="image-block">
         <div class=image-block-image>
@@ -21,22 +22,14 @@
           </div>
 
           <div class="links">
-<script>
-  if(window.lastUrlSeen) {
-    var holder = document.createElement("div");
-    var link = document.createElement("a");
-    link.href = window.lastUrlSeen;
-    link.appendChild(document.createTextNode(window.lastUrlTitle ? window.lastUrlTitle : 'this page'));
-    holder.appendChild(link);
-    document.write(holder.innerHTML);
-  }
-</script>
+						<a href="<%= @current_user.last_url %>"><%= @current_user.last_url_title %></a>
           </div>
         </div>
       </div>
     </div>
   </li>
 	<!-- End last left off. -->
+	<% end %>
 
 
 
