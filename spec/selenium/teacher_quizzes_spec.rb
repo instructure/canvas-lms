@@ -197,6 +197,7 @@ describe "quizzes" do
     end
 
     it "should update a question group" do
+      skip('fragile')
       get "/courses/#{@course.id}/quizzes/new"
 
       click_questions_tab

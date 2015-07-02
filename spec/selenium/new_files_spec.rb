@@ -143,6 +143,7 @@ describe "better_file_browsing" do
       check_element_has_focus(ff('.tree')[1])
     end
     it "should move a file using cog icon", priority: '1', test_id: 129453 do
+      skip('fragile')
       file_name = "a_file.txt"
       add_folder("destination_folder")
       move(file_name, 0, :cog_icon)
