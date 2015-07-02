@@ -25,7 +25,7 @@ describe "sub account grading schemes" do
         should_edit_a_grading_scheme(account, url)
       end
 
-      it "should delete a grading scheme" do
+      it "should delete a grading scheme", priority: 1, test_id: 210111 do
         should_delete_a_grading_scheme(account, url)
       end
     end
@@ -37,15 +37,15 @@ describe "sub account grading schemes" do
         create_simple_standard_and_edit(account, url)
       end
 
-      it "should add a grading scheme item" do
+      it "should add a grading scheme item", priority: 1, test_id: 210113 do
         should_add_a_grading_scheme_item
       end
 
-      it "should edit a grading scheme item" do
+      it "should edit a grading scheme item", priority: 1, test_id: 210114 do
         should_edit_a_grading_scheme_item
       end
 
-      it "should delete a grading scheme item" do
+      it "should delete a grading scheme item", priority: 1, test_id: 210115 do
         should_delete_a_grading_scheme_item
       end
     end
