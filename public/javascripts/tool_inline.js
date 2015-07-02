@@ -61,7 +61,12 @@ switch($toolForm.data('tool-launch-type')){
     } catch(e){}
 
     $("#tool_content").bind("load", function(){
-      $("#content").addClass('padless');
+      if (ENV.use_new_styles) {
+        $("#content").addClass('horizontal-padding');
+      }
+      else {
+        $("#content").addClass('padless');
+      }
       $('#insecure_content_msg').hide();
       $toolForm.hide();
     });
@@ -96,9 +101,13 @@ var resize_tool_content_wrapper = function(height) {
 $(function() {
   var $window = $(window);
   $tool_content_wrapper = $('.tool_content_wrapper');
-
-  min_tool_height = $('#main').height();
-  canvas_chrome_height = $tool_content_wrapper.offset().top + $('#wrapper').height() - $('#main').height();
+  if (ENV.use_new_styles) {
+    canvas_chrome_height = $tool_content_wrapper.offset().top + $('#footer').outerHeight(true);
+  }
+  else {
+    min_tool_height = $('#main').height();
+    canvas_chrome_height = $tool_content_wrapper.offset().top + $('#wrapper').height() - $('#main').height(); 
+  }
 
   if ($tool_content_wrapper.length) {
     $window.resize(function () {
