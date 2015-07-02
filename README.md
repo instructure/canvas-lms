@@ -6,6 +6,10 @@ How to install:
 
 Follow the instructions from the [Canvas wiki](https://github.com/instructure/canvas-lms/wiki/Quick-Start)
 
+You may also want to set up a virtual machine with Ubuntu dedicated to Canvas, as it requires some specific versions and a separate VM just makes it easier to manage without conflicts with other stuff installed on your computer. This is suggested in the Canvas wiki under the prerequisities section too and I suggest it too.
+
+When creating the VM, make sure you give it at least 1 GB of RAM or Ubuntu will likely fail to install. The hard drive can be as little as 20 GB. Do a default installation of Ubuntu, then install gcc with `apt-get install gcc` and then follow the quick start guide. The automated script will get most the way.
+
 ### Extra Installation Notes: 
 * On my box i had to run the i18n thing as  root individually but it should work automatically on other boxes
 
