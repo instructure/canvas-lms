@@ -211,6 +211,36 @@ describe "new groups" do
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full")).not_to be_displayed
       expect(f(".group[data-id=\"#{@testgroup[1].id}\"] span.show-group-full")).to be_displayed
     end
+
+    it "should remove a student from a group and update the group status", priority: "1", test_id: 94165 do
+      group_test_setup(4, 1, 2)
+      @group_category.first.update_attribute(:group_limit,2)
+
+      2.times do |n|
+        add_user_to_group(@students[n],@testgroup.first,false)
+      end
+
+      add_user_to_group(@students.last,@testgroup[1],false)
+      get "/courses/#{@course.id}/groups"
+
+      expect(f('.unassigned-users-heading')).to include_text("Unassigned Students (1)")
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text("2 / 2 students")
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full")).to be_displayed
+
+      f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
+      wait_for_ajaximations
+
+      f(".group-user-actions[data-user-id=\"#{@students[0].id}\"]").click
+      wait_for_ajaximations
+
+      f('.ui-menu-item .remove-from-group').click
+      wait_for_ajaximations
+
+      expect(f('.ui-cnvs-scrollable')).to include_text(@students[0].name)
+      expect(f('.unassigned-users-heading')).to include_text("Unassigned Students (2)")
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text("1 / 2 students")
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full").css_value 'display').to eq 'none'
+    end
   end
 end
 
