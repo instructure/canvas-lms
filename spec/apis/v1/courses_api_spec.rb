@@ -322,6 +322,7 @@ describe CoursesController, type: :request do
           'account_id' => @account.id,
           'root_account_id' => @account.id,
           'enrollment_term_id' => term.id,
+          'grading_standard_id' => nil,
           'integration_id' => nil,
           'start_at' => '2011-01-01T07:00:00Z',
           'end_at' => '2011-05-01T07:00:00Z',
@@ -382,6 +383,7 @@ describe CoursesController, type: :request do
           'account_id' => @account.id,
           'root_account_id' => @account.id,
           'enrollment_term_id' => term.id,
+          'grading_standard_id' => nil,
           'integration_id' => nil,
           'start_at' => '2011-01-01T07:00:00Z',
           'end_at' => '2011-05-01T07:00:00Z',
@@ -2125,6 +2127,7 @@ describe CoursesController, type: :request do
         'account_id' => @course1.account_id,
         'course_code' => @course1.course_code,
         'enrollments' => [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'role_id' => teacher_role.id, 'enrollment_state' => 'active'}],
+        'grading_standard_id' => nil,
         'sis_course_id' => @course1.sis_course_id,
         'integration_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
@@ -2200,6 +2203,14 @@ describe CoursesController, type: :request do
       expect(json.has_key?("permissions")).to be_truthy
       expect(json["permissions"].has_key?("create_announcement")).to be_truthy
       expect(json["permissions"]["create_announcement"]).to be_truthy # The setup makes this user a teacher of the course too
+    end
+
+    it 'should include grading_standard_id' do
+      standard = grading_standard_for @course1
+      @course1.update_attribute(:grading_standard_id, standard.id)
+      json = api_call(:get, "/api/v1/courses/#{@course1.id}.json", { :controller => 'courses', :action => 'show',
+                                                                     :id => @course1.to_param, :format => 'json' })
+      expect(json['grading_standard_id']).to eq(standard.id)
     end
 
     context "when scoped to account" do

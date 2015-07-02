@@ -130,6 +130,11 @@ require 'securerandom'
 #           "example": 34,
 #           "type": "integer"
 #         },
+#         "grading_standard_id": {
+#            "description": "the grading standard associated with the course",
+#            "example": 25,
+#            "type": "integer"
+#         },
 #         "start_at": {
 #           "description": "the start date for the course, if applicable",
 #           "example": "2012-06-01T00:00:00-06:00",
