@@ -66,6 +66,7 @@ pt:
       Aceder às colaborações Etherpad abaixo vai ser descontinuado a 8 de Agosto de 2015.  Se deseja guardar este conteúdo, por favor migre este conteúdo antes desta data.
       
       Para mais instruções em como criar uma colaboração com o Google, [click here](%{google_collab_help_url}).
+  access_token_is_valid_until_d2f048cf: "Token de acesso é válido até"
   account: 
     ask_canvas_network: "Perguntar à Comunidade da Rede Canvas"
     default_account_name: "Conta padrão"
@@ -98,6 +99,7 @@ pt:
     tab_terms: Períodos
     tab_users: Utilizadores
     turnitin_pledge: "Esta tarefa enviada é o meu trabalho e é original"
+  account_97b34646: Conta
   account_authorization_config: 
     default_delegated_login_handle_name: Login
     default_login_handle_name: Email
@@ -895,6 +897,7 @@ pt:
         turnitin_host: "Anfitrião do Turnitin"
         turnitin_pledge: "Compromisso do Turnitin"
         turnitin_shared_secret: "Segredo compartilhado do Turnitin"
+        users_can_edit_name: "Os usuários podem editar o seu nome"
       links: 
         add_admins: "Adicionar administradores de conta"
         configure_report: Configurar...
@@ -1205,6 +1208,7 @@ pt:
   activity_by_category_9c2033d1: "Atividade por categoria"
   activity_by_date_878c5b49: "Atividade por data"
   add_8523c19b: Adicionar
+  add_an_identity_provider_to_this_account_c2644478: "Adicionar um fornecedor de identidade a esta conta"
   add_app_baf540f: "Adicionar aplicação"
   add_attachment_93868828: "Adicionar anexo"
   add_course_assignments_628ed6d0: "Adicionar tarefas da disciplina"
@@ -1223,6 +1227,7 @@ pt:
   add_students_to_the_course_874be8fb: "Adicionar alunos à disciplina"
   add_tas_to_the_course_2aac6e02: "Adicionar assistentes à disciplina"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Adicione as suas tarefas. Pode simplesmente criar uma lista longa ou dividir as tarefas em grupos e especificar pesos para cada grupo de tarefas."
+  admin_4d3ba42f: Administradores
   after_date_981cd41b: "Após %{date}"
   after_last_attempt_c9168da2: "Após a última tentativa"
   ajax_errors: 
@@ -1278,8 +1283,12 @@ pt:
       recipients_required: "É obrigatório pelo menos um destinatário"
       threshold_should_be_numeric: "Este valor deve ser um número positivo."
   all_4321c3a1: Todos
+  all_changes_were_saved_f6f3ddcc: "Todas as alterações foram guardadas"
+  all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Todos os campos de dados têm de estar apresentados e formatados corretamente"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Está tudo concluído? Então está na hora de publicar a sua disciplina! Clique no botão abaixo para tornar tudo oficial! A publicação permitirá aos utilizadores começarem a participar na disciplina."
   all_grading_periods_77974940: "Todos os períodos de avaliação"
+  all_grading_periods_must_have_a_title_a1a38d87: "Todos os períodos de classificação têm de ter um título"
+  all_start_dates_must_be_before_the_end_date_d949eca9: "Todas as datas de início têm de ser anteriores às datas finais"
   all_students_have_taken_the_quiz_b558f8b4: "Todos os alunos fizeram o teste"
   all_students_have_taken_the_survey_494f9f42: "Todos os alunos fizeram o questionário"
   allow_bulk_grade_export_to_sis_e11a6e66: "Permitir Exportação de Notas para o SIS"
@@ -1322,7 +1331,9 @@ pt:
   angel_file_description: "Formato de exportação .zip para Angel"
   announcement: 
     no_title: "Sem título"
+  announcement_ends_at_4ccc2a7e: "O Anúncio termina "
   announcement_fb4cb645: Anúncio
+  announcement_starts_at_2e987a38: "O Anúncio começa"
   announcements: 
     announcements_crumb: Anúncios
     error_draft_state: "Não é possível definir este tópico para estado de rascunho porque é um anúncio."
@@ -1360,10 +1371,13 @@ pt:
     podcast_feed_name: "%{course} Feed Podcast dos anúncios"
   anonymous_e1b8ad27: Anónimo
   anonymous_user_d984b9ce: "Utilizador Anónimo"
+  another_configuration_is_currently_selected_select_95b394e: "Foi seleccionada outra configuração. Se seleccionar esta configuração, vai cancelar a anterior."
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "As respostas serão mostradas após a última tentativa"
   api_url_3ee7cb0a: "API URL"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "O Centro de Aplicações irá aparecer no separador \"Aplicações\" na página de definições de uma disciplina ou de uma conta. O URL disponibilizado abaixo deverá apontar para um terminal de Centro de Aplicações válido (por exemplo, %{url} -- não se esqueça de omitir a barra final)."
   app_placements_6d877225: "Colocação App"
+  appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "Junte um número ao fim de cada título de evento (ex. Evento 1, Evento2, etc)"
+  appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "Junte um número ao fim de cada título de evento (ex. Evento1, Evento 2, etc)\" for=\"append_iterator"
   apple_touch_icon_2c258bb3: "Ícone de Apple Touch"
   application: 
     errors: 
@@ -1436,6 +1450,7 @@ pt:
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Tem a certeza que deseja denunciar esta fotografia de perfil?"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "À medida que escreve neste campo, a lista de grupos é filtrada automaticamente de modo a incluir apenas os grupos cujos nomes correspondem à informação introduzida."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "Quando digitar neste campo, a lista de resultados será atualizada automaticamente."
+  assessment_by_name_7b879a2c: "Avaliação por %{name}"
   assessment_question: 
     default_question_name: Pergunta
   assessment_question_bank: 
@@ -1444,6 +1459,7 @@ pt:
     default_unfiled_title: "Perguntas não arquivadas"
   assign_eedf72bb: Delegar
   assign_reviews_on_date_7e48ec50: "Data de Atribuir revisões em"
+  assign_to_c46e21: "Atribuir a"
   assignment: 
     assignment_group_must_have_group: "Selecione um grupo de tarefa para esta tarefa"
     at_least_one_file_type: "Especifique pelo menos um tipo de ficheiro permitido"
@@ -1525,6 +1541,7 @@ pt:
     unmuting_assignment: "A ativar a tarefa..."
   assignment_name_b2d87383: "Nome da tarefa"
   assignment_selection_6bff05c4: "Seleção de Tarefas"
+  assignment_was_deleted_8320d26d: "A Tarefa foi apagada"
   assignments: 
     assignment_count: 
       one: "1 tarefa"
@@ -2125,9 +2142,13 @@ pt:
   available_from_date_43b5e11d: "Data de Disponível a partir de"
   available_from_date_afc594fa: "Disponível a partir da Data:"
   available_from_f84e4611: "Disponível de"
+  available_from_field_for_styleguide_7ced3861: "Disponível por campo de assunto"
+  available_from_format_like_yyyy_mm_dd_hh_mm_8b726122: "Disponível por - Formato como AAAA-MM-DD hh:mm"
   available_until_date_2c0ccec3: "Disponível Até à Data:"
   available_until_date_cd125c62: "Data de Disponível até"
   available_until_f3b9c4ed: "Disponível até"
+  available_until_field_for_styleguide_85d5d65a: "Disponível até campo de assunto"
+  available_until_format_like_yyyy_mm_dd_hh_mm_622378d6: "Disponível até - Formato como AAAA-MM-DD hh:mm"
   available_until_lock_at_ab022445: "Disponível até %{lock_at}"
   average_49c63f9b: Média
   back_to_app_center_95420d83: "Voltar ao Centro de Aplicações"
@@ -2138,6 +2159,7 @@ pt:
   be_a_hero_and_ask_your_instructor_to_fix_this_link_4981930c: "Seja um herói e peça ao seu instrutor que corrija esta ligação."
   before_publishing_this_file_you_must_specify_usage_2229d20b: "É necessário especificar direitos de utilização antes de publicar este ficheiro."
   before_publishing_you_must_set_usage_rights_on_you_dcd7b567: "É necessário definir direitos de utilização relativos aos seus ficheiros antes de publicar."
+  beginning_date_2d2a29ac: "Data de início"
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "Por baixo deste campo de pesquisa encontra-se uma lista de %{content_type}. A lista é filtrada de acordo com a consulta à medida que digita. As mensagens de conversas são filtradas de acordo com a opção selecionada."
   better_file_browsing_description: |-
       Uma nova interface de pesquisa de ficheiros mais simples e fácil de utilizar. Se ativar esta opção ao nível da disciplina,
@@ -2449,17 +2471,20 @@ pt:
         more_options: "Mais opções"
     edit_calendar_event: 
       calendar: "Calendário:"
+      count: "Contagem:"
       date: "Data:"
       from: "De:"
       links: 
         more_options: "Mais opções"
       location: "Local:"
+      repeat: Repetir
       timespan_separator: para
       title: "Título:"
     edit_calendar_event_full: 
       buttons: 
         create: "Criar um evento"
         update: "Atualizar evento"
+      count: "contagem:"
       date: Data
       delete: Excluir
       different_date_for_each_section: "Utilizar uma data diferente para cada secção"
@@ -2470,6 +2495,7 @@ pt:
       location_address: "Morada:"
       location_name: "Local:"
       new_calendar_event_header: "Novo evento do calendário"
+      repeat: repetir
       start_time: "Hora de início"
     edit_event: 
       tabs: 
@@ -2525,6 +2551,7 @@ pt:
         chooseDueDate: "Deseja retroceder e selecionar uma data de entrega?"
         goBackToInclude: "Deseja voltar atrás para incluir:"
         notAllSectionsAssigned: "Nem todas as secções serão atribuídas a este item."
+    no_dates_error: "Precisa de especificar pelo menos uma data e hora"
     no_groups: "Não foram encontrados grupos"
     no_users: "Não foram encontrados utilizadores"
     ok: OK
@@ -2682,13 +2709,17 @@ pt:
     private: "Privado (com direitos autorais)"
     public_domain: "Domínio público"
   certificate_fingerprint_b376df90: "Impressão digital certificada"
+  change_beginning_date_to_39dbd06e: "Alterar data de início para"
+  change_ending_date_to_d2cebd54: "Alterar data de fim para"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "Esta tarefa tem %{assignmentPoints} pontos possíveis. Pretende alterá-la para ter %{rubricPoints} pontos possíveis e corresponder a este protocolo?"
     titles: 
       update_assignment_points: "Mudar pontos possíveis para corresponder a protocolo?"
+  child_s_username_dde3aa9: "Nome de utilizador da criança"
   choose_a_course_home_page_8059c7b: "Escolher uma página inicial da disciplina"
   choose_a_csv_file_to_upload_9644480c: "Selecione um arquivo CSV para fazer upload:"
+  choose_an_authentication_service_47dc8875: "Escolha um serviço de autenticação"
   choose_usage_rights_33683854: "Escolher direitos de utilização..."
   click_for_more_details_on_this_outcome_8c018d2f: "clique para mais detalhes sobre este assunto"
   click_here_on_the_calendar_link_c9965631: "Clique aqui na ligação *Calendário*"
@@ -2699,6 +2730,7 @@ pt:
   close_picker_256aca8a: Escolher
   collaboration: 
     default_title: "Colaboração anônima"
+  collaboration_was_deleted_9cf9934b: "A colaboração foi apagada"
   collaborations: 
     collaboration: 
       delete: "Tem a certeza de que pretende eliminar esta colaboração?"
@@ -2881,6 +2913,7 @@ pt:
       notices: 
         contact_registered: "Método de contacto registado!"
   concluded_courses_94782e21: "Disciplinas concluídas"
+  conference_was_deleted_30869390: "A conferência foi apagada"
   conferences: 
     concluded_conference: 
       delete: Eliminar
@@ -3584,6 +3617,7 @@ pt:
   context_modules_api: 
     invalid_position: "Posição inválida"
   continue_ac067716: Continuar
+  continue_typing_to_find_additional_sections_or_stu_49786085: "Continue a escrever para encontrar secções adicionais ou estudantes."
   conversation_dialog: 
     errors: 
       field_is_required: "Este campo é obrigatório"
@@ -3784,6 +3818,8 @@ pt:
   count_items_selected_91814713: 
     one: "%{count} item selecionado"
     other: "%{count} itens selecionados"
+  count_max_students_2db76773: "%{count} / %{max} alunos"
+  count_max_users_bdebb537: "%{count} / %{max} utilizadores"
   count_minutes_a6eeeacb: 
     one: "1 minuto"
     other: "%{count} minutos"
@@ -3854,6 +3890,7 @@ pt:
       all: "Qualquer pessoa"
       only_teachers: "Apenas professores"
       teachers_students: "Professores e alunos"
+  course_announcements_76b07340: "Anúncios de disciplinas"
   course_atom_feed_9d95214e: "Feed Atom da disciplina"
   course_copy_argument_error: "Para fazer uma cópia de uma disciplina é necessária uma disciplina de origem."
   course_copy_description: "Plug-in de migração para copiar disciplinas Canvas"
@@ -3862,6 +3899,7 @@ pt:
   course_copy_name: "Copiar disciplina Canvas"
   course_copy_no_course_error: "A disciplina de origem não foi encontrada."
   course_copy_not_allowed_error: "Não tem permissão para copiar a disciplina de origem."
+  course_discussions_38c0b74f: "Discussão da disciplina"
   course_exports: 
     errors: 
       assignment: "Erro ao exportar a tarefa \"%{title}\""
