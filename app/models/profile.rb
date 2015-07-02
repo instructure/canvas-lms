@@ -73,7 +73,7 @@ class Profile < ActiveRecord::Base
     context_type = klass.name.sub(/Profile\z/, '')
     klass.class_eval { alias_method context_type.downcase.underscore, :context }
     klass.instance_eval { def table_name; "profiles"; end }
-    klass.default_scope :conditions => ["context_type = ?", context_type]
+    klass.default_scope -> { where(:context_type => context_type) }
   end
 
   def self.columns_hash
