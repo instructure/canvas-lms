@@ -49,10 +49,23 @@
       <%= t('entry_no_image', 'Keep in mind that this page may have changed since the submission originally occurred.') %>
     <% end %>
     <div style="font-size: 1.4em; margin: 10px;">
-      <a href="<%= @submission.url %>" class="not_external"><%= t('view_original_submission', 'View the Original Submission for %{user}', :user => user_name) %></a>
+      <%= link_to t('view_original_submission',
+                    'View the Original Submission for %{user}',
+                    :user => user_name),
+                  @submission.url,
+                  class: "open_in_a_new_tab",
+                  target: "_blank" %>
+      <span style="display: inline-block;" class="ui-icon ui-icon-extlink ui-icon-inline"
+        title="<%= t('titles.external_link', 'Links to an external site.') %>"/>
     </div>
     <div style="font-size: 1.4em; margin: 10px;">
-      <a href="<%= @submission.url %>" class="not_external"><%= @submission.url %></a>
+      <%= link_to @submission.url,
+                  @submission.url,
+                  class: "open_in_a_new_tab",
+                  target: "_blank" %>
+
+      <span style="display: inline-block;" class="ui-icon ui-icon-extlink ui-icon-inline"
+        title="<%= t('titles.external_link', 'Links to an external site.') %>"/>
     </div>
   </div>
   <div style="text-align: center;">

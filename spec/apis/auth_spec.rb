@@ -200,7 +200,7 @@ describe "API Authentication", type: :request do
 
       it "should execute for saml login" do
         skip("requires SAML extension") unless AccountAuthorizationConfig::SAML.enabled?
-        account = account_with_saml(:account => Account.default)
+        account_with_saml(account: Account.default)
         flow do
           Onelogin::Saml::Response.any_instance.stubs(:settings=)
           Onelogin::Saml::Response.any_instance.stubs(:logger=)
@@ -209,6 +209,7 @@ describe "API Authentication", type: :request do
           Onelogin::Saml::Response.any_instance.stubs(:name_id).returns('test1@example.com')
           Onelogin::Saml::Response.any_instance.stubs(:name_qualifier).returns(nil)
           Onelogin::Saml::Response.any_instance.stubs(:session_index).returns(nil)
+          Onelogin::Saml::Response.any_instance.stubs(:issuer).returns("saml_entity")
 
           post 'saml_consume', :SAMLResponse => "foo"
         end
@@ -218,9 +219,9 @@ describe "API Authentication", type: :request do
         flow do
           account = account_with_cas(:account => Account.default)
           # it should *not* redirect to the alternate log_in_url on the config, when doing oauth
-          account.account_authorization_configs.first.update_attribute(:log_in_url, "https://www.example.com/bogus")
+          account.authentication_providers.first.update_attribute(:log_in_url, "https://www.example.com/bogus")
 
-          cas = CASClient::Client.new(:cas_base_url => account.account_authorization_configs.first.auth_base)
+          cas = CASClient::Client.new(:cas_base_url => account.authentication_providers.first.auth_base)
           cas.instance_variable_set(:@stub_user, @user)
           def cas.validate_service_ticket(st)
             response = CASClient::ValidationResponse.new("yes\n#{@stub_user.pseudonyms.first.unique_id}\n")

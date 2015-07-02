@@ -1,7 +1,11 @@
 /**
  * sinon-qunit 1.0.0, 2010/12/09
  *
- * @author Christian Johansen (christian@cjohansen.no)
+ * @author Simon Williams
+ * Modified version of sinon-qunit from Gustavo Machado (@machadogj), Jose Romaniello (@jfroma)
+ * - https://github.com/jfromaniello/jmail/blob/master/scripts/Tests/sinon-qunit-1.0.0.js
+ * Modified version of sinon-qunit from Christian Johansen
+ * - https://github.com/cjohansen/sinon-qunit/blob/master/lib/sinon-qunit.js
  *
  * (The BSD License)
  * 
@@ -49,14 +53,31 @@ sinon.config = {
 };
 
 (function (global) {
-    var qTest = QUnit.test;
-    
-    QUnit.test = global.test = function (testName, expected, callback, async) {
-        if (arguments.length === 2) {
-            callback = expected;
-            expected = null;
-        }
+    var qModule = QUnit.module;
+    var wrappingSandbox;
 
-        return qTest(testName, expected, sinon.test(callback), async);
+    var setup = function () {
+        var config = sinon.getConfig(sinon.config);
+        config.injectInto = config.injectIntoThis && this || config.injectInto;
+        wrappingSandbox = sinon.sandbox.create(config);
+    };
+
+    var teardown = function () { wrappingSandbox.verifyAndRestore(); };
+
+    QUnit.module = global.module = function (name, lifecycle) {
+        lifecycle = lifecycle || {};
+        var origSetup = lifecycle.setup;
+        var origTeardown = lifecycle.teardown;
+
+        lifecycle.setup = function(){
+            setup.call(this);
+            origSetup && origSetup.call(this);
+        };
+        lifecycle.teardown = function(){
+            teardown.call(this);
+            origTeardown && origTeardown.call(this);
+        };
+
+        qModule(name, lifecycle);
     };
 }(this));

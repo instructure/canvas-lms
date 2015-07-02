@@ -90,8 +90,8 @@ define [
     assertItemRendered '4'
 
   test 'doesn\'t fetch if already fetching', ->
-    sinon.spy collection, 'fetch'
-    sinon.spy view, 'hideLoadingIndicator'
+    @spy collection, 'fetch'
+    @spy view, 'hideLoadingIndicator'
     collection.fetch()
     view.checkScroll()
     ok collection.fetch.calledOnce, 'fetch called once'

@@ -46,7 +46,7 @@ module Importers
               migration.import_object?('announcements', topic['migration_id']))
     end
 
-    def self.import_from_migration(hash, context, migration=nil, item=nil)
+    def self.import_from_migration(hash, context, migration, item=nil)
       importer = self.new(hash, context, migration, item)
       importer.run
     end
@@ -79,11 +79,10 @@ module Importers
        :require_initial_post].each do |attr|
         item.send("#{attr}=", options[attr])
       end
-      missing_links = []
+
+      type = item.is_a?(Announcement) ? :announcement : :discussion_topic
       if options.message
-        item.message = ImportedHtmlConverter.convert(options.message, context, migration) do |warn, link|
-          missing_links << link if warn == :missing_link
-        end
+        item.message = migration.convert_html(options.message, type, options[:migration_id], :message)
       else
         item.message = I18n.t('#discussion_topic.empty_message', 'No message')
       end
@@ -115,7 +114,6 @@ module Importers
 
       item.save_without_broadcasting!
       import_migration_item
-      add_missing_content_links(missing_links)
       item.saved_by = nil
       item
     end
@@ -136,15 +134,7 @@ module Importers
     end
 
     def import_migration_item
-      migration.add_imported_item(item) if migration
-    end
-
-    def add_missing_content_links(missing_links)
-      if migration
-        migration.add_missing_content_links(class: item.class.to_s,
-          id: item.id, missing_links: missing_links,
-          url: "/#{context.class.to_s.underscore.pluralize}/#{context.id}/#{item.class.to_s.demodulize.underscore.pluralize}/#{item.id}")
-      end
+      migration.add_imported_item(item)
     end
 
     class DiscussionTopicOptions

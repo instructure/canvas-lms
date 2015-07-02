@@ -140,7 +140,11 @@ module Canvas::Security
     return if encryption_keys.any? { |key| Digest::SHA1.hexdigest(key) == db_hash}
 
     if db_hash.nil? || overwrite
-      Setting.set("encryption_key_hash", Digest::SHA1.hexdigest(encryption_key))
+      begin
+        Setting.set("encryption_key_hash", Digest::SHA1.hexdigest(encryption_key))
+      rescue ActiveRecord::StatementInvalid
+        # the db may not exist yet
+      end
     else
       abort "encryption key is incorrect. if you have intentionally changed it, you may want to run `rake db:reset_encryption_key_hash`"
     end

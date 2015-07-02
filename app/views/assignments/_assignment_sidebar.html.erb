@@ -5,15 +5,6 @@
 
   <% if @current_user_submission %>
     <%= render :partial => "submission_sidebar" %>
-  <% elsif @assignment.expects_submission? && can_do(@assignment, @current_user, :submit) %>
-    <ul class="page-action-list">
-      <li>
-        <% late = @current_user_submission.try(:late?) ? "late" : "" %>
-        <a href="#" class="submit_assignment_link button-sidebar-wide <%= late %>">
-          <i class='icon-add'></i> <%= t 'links.submit', "Submit Assignment" %>
-        </a>
-      </li>
-    </ul>
   <% end %>
 
 </div>

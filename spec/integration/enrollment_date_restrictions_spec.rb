@@ -126,6 +126,7 @@ describe "enrollment_date_restrictions" do
     expect(html.css('.course').length).to eq 2
 
     Account.default.account_users.create!(user: @user)
+    @user.reload
     get "/users/#{@user.id}"
     expect(response.body).to match /Inactive/
     expect(response.body).to match /Completed/

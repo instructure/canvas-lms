@@ -107,7 +107,7 @@ class AccountAuthorizationConfig::SAML < AccountAuthorizationConfig::Delegated
     settings.tech_contact_name = app_config[:tech_contact_name] || 'Webmaster'
     settings.tech_contact_email = app_config[:tech_contact_email] || ''
 
-    settings.issuer = account.account_authorization_configs.where(auth_type: 'saml').first.try(:entity_id)
+    settings.issuer = account.authentication_providers.active.where(auth_type: 'saml').first.try(:entity_id)
     settings.issuer ||= saml_default_entity_id_for_account(account)
 
     encryption = app_config[:encryption]

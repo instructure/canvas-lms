@@ -36,9 +36,9 @@ describe "AccountAuthorizationConfigs API", type: :request do
     end
 
     it "should return all aacs in position order" do
-      config1 = @account.account_authorization_configs.create!(@saml_hash.merge(:idp_entity_id => "a"))
-      config2 = @account.account_authorization_configs.create!(@saml_hash.merge(:idp_entity_id => "d"))
-      config3 = @account.account_authorization_configs.create!(@saml_hash.merge(:idp_entity_id => "r"))
+      @account.authentication_providers.create!(@saml_hash.merge(:idp_entity_id => "a"))
+      @account.authentication_providers.create!(@saml_hash.merge(:idp_entity_id => "d"))
+      config3 = @account.authentication_providers.create!(@saml_hash.merge(:idp_entity_id => "r"))
       config3.move_to_top
       config3.save!
 
@@ -66,7 +66,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
 
     it "should create a saml aac" do
       json = call_create(@saml_hash)
-      aac = @account.account_authorization_configs.first
+      aac = @account.authentication_providers.first
       expect(aac.auth_type).to eq 'saml'
       expect(aac.idp_entity_id).to eq 'http://example.com/saml1'
       expect(aac.log_in_url).to eq 'http://example.com/saml1/sli'
@@ -78,7 +78,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
 
     it "should work with rails form style params" do
       call_create({:account_authorization_config => @saml_hash})
-      aac = @account.account_authorization_configs.first
+      aac = @account.authentication_providers.first
       expect(aac.auth_type).to eq 'saml'
       expect(aac.idp_entity_id).to eq 'http://example.com/saml1'
     end
@@ -87,18 +87,18 @@ describe "AccountAuthorizationConfigs API", type: :request do
       call_create(@saml_hash)
       call_create(@saml_hash.merge('idp_entity_id' => "secondeh"))
 
-      aac1 = @account.account_authorization_configs.first
+      aac1 = @account.authentication_providers.first
       expect(aac1.idp_entity_id).to eq 'http://example.com/saml1'
       expect(aac1.position).to eq 1
 
-      aac2 = @account.account_authorization_configs.last
+      aac2 = @account.authentication_providers.last
       expect(aac2.idp_entity_id).to eq 'secondeh'
       expect(aac2.position).to eq 2
     end
 
     it "should create an ldap aac" do
       call_create(@ldap_hash)
-      aac = @account.account_authorization_configs.first
+      aac = @account.authentication_providers.first
       expect(aac.auth_type).to eq 'ldap'
       expect(aac.auth_host).to eq '127.0.0.1'
       expect(aac.auth_filter).to eq 'filter1'
@@ -109,22 +109,22 @@ describe "AccountAuthorizationConfigs API", type: :request do
     it "should create multiple ldap aacs" do
       call_create(@ldap_hash)
       call_create(@ldap_hash.merge('auth_host' => '127.0.0.2'))
-      aac = @account.account_authorization_configs.first
+      aac = @account.authentication_providers.first
       expect(aac.auth_host).to eq '127.0.0.1'
       expect(aac.position).to eq 1
-      aac2 = @account.account_authorization_configs.last
+      aac2 = @account.authentication_providers.last
       expect(aac2.auth_host).to eq '127.0.0.2'
       expect(aac2.position).to eq 2
     end
     it "should default ldap auth_over_tls to 'start_tls'" do
       call_create(@ldap_hash)
-      expect(@account.account_authorization_configs.first.auth_over_tls).to eq 'start_tls'
+      expect(@account.authentication_providers.first.auth_over_tls).to eq 'start_tls'
     end
 
     it "should create a cas aac" do
       call_create(@cas_hash)
 
-      aac = @account.account_authorization_configs.first
+      aac = @account.authentication_providers.first
       expect(aac.auth_type).to eq 'cas'
       expect(aac.auth_base).to eq '127.0.0.1'
       expect(aac.position).to eq 1
@@ -139,13 +139,13 @@ describe "AccountAuthorizationConfigs API", type: :request do
       call_create(@ldap_hash)
       call_create(@ldap_hash.merge('auth_host' => '127.0.0.2', 'position' => 1))
 
-      expect(@account.account_authorization_configs.first.auth_host).to eq '127.0.0.2'
+      expect(@account.authentication_providers.first.auth_host).to eq '127.0.0.2'
 
       call_create(@ldap_hash.merge('auth_host' => '127.0.0.3', 'position' => 2))
 
-      expect(@account.account_authorization_configs[0].auth_host).to eq '127.0.0.2'
-      expect(@account.account_authorization_configs[1].auth_host).to eq '127.0.0.3'
-      expect(@account.account_authorization_configs[2].auth_host).to eq '127.0.0.1'
+      expect(@account.authentication_providers[0].auth_host).to eq '127.0.0.2'
+      expect(@account.authentication_providers[1].auth_host).to eq '127.0.0.3'
+      expect(@account.authentication_providers[2].auth_host).to eq '127.0.0.1'
     end
 
     it "should error if deprecated and new style are used" do
@@ -184,7 +184,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
     end
 
     it "should return saml aac" do
-      aac = @account.account_authorization_configs.create!(@saml_hash)
+      aac = @account.authentication_providers.create!(@saml_hash)
       json = call_show(aac.id)
 
       @saml_hash['id'] = aac.id
@@ -199,7 +199,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
     end
 
     it "should return ldap aac" do
-      aac = @account.account_authorization_configs.create!(@ldap_hash)
+      aac = @account.authentication_providers.create!(@ldap_hash)
       json = call_show(aac.id)
 
       @ldap_hash.delete 'auth_password'
@@ -213,7 +213,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
     end
 
     it "should return cas aac" do
-      aac = @account.account_authorization_configs.create!(@cas_hash)
+      aac = @account.authentication_providers.create!(@cas_hash)
       json = call_show(aac.id)
 
       @cas_hash['log_in_url'] = nil
@@ -243,7 +243,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
     end
 
     it "should update a saml aac" do
-      aac = @account.account_authorization_configs.create!(@saml_hash)
+      aac = @account.authentication_providers.create!(@saml_hash)
       @saml_hash['idp_entity_id'] = 'hahahaha'
       call_update(aac.id, @saml_hash)
 
@@ -252,7 +252,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
     end
 
     it "should work with rails form style params" do
-      aac = @account.account_authorization_configs.create!(@saml_hash)
+      aac = @account.authentication_providers.create!(@saml_hash)
       @saml_hash['idp_entity_id'] = 'hahahaha'
       call_update(aac.id, {:account_authorization_config => @saml_hash})
 
@@ -261,7 +261,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
     end
 
     it "should update an ldap aac" do
-      aac = @account.account_authorization_configs.create!(@ldap_hash)
+      aac = @account.authentication_providers.create!(@ldap_hash)
       @ldap_hash['auth_host'] = '192.168.0.1'
       call_update(aac.id, @ldap_hash)
 
@@ -270,7 +270,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
     end
 
     it "should update a cas aac" do
-      aac = @account.account_authorization_configs.create!(@cas_hash)
+      aac = @account.authentication_providers.create!(@cas_hash)
       @cas_hash['auth_base'] = '192.168.0.1'
       call_update(aac.id, @cas_hash)
 
@@ -279,19 +279,19 @@ describe "AccountAuthorizationConfigs API", type: :request do
     end
 
     it "should error when mixing auth_types" do
-      aac = @account.account_authorization_configs.create!(@saml_hash)
+      aac = @account.authentication_providers.create!(@saml_hash)
       json = call_update(aac.id, @cas_hash, 400)
       expect(json['message']).to eq 'Can not change type of authorization config, please delete and create new config.'
     end
 
     it "should update positions" do
-      aac = @account.account_authorization_configs.create!(@ldap_hash)
+      @account.authentication_providers.create!(@ldap_hash)
       @ldap_hash['auth_host'] = '192.168.0.1'
-      aac2 = @account.account_authorization_configs.create!(@ldap_hash)
+      aac2 = @account.authentication_providers.create!(@ldap_hash)
       @ldap_hash['position'] = 1
       call_update(aac2.id, @ldap_hash)
 
-      expect(@account.account_authorization_configs.first.id).to eq aac2.id
+      expect(@account.authentication_providers.first.id).to eq aac2.id
     end
 
     it "should 404" do
@@ -314,24 +314,24 @@ describe "AccountAuthorizationConfigs API", type: :request do
     end
 
     it "should delete" do
-      aac = @account.account_authorization_configs.create!(@saml_hash)
+      aac = @account.authentication_providers.create!(@saml_hash)
       call_destroy(aac.id)
 
       expect(@account.non_canvas_auth_configured?).to be_falsey
     end
 
     it "should reposition correctly" do
-      aac = @account.account_authorization_configs.create!(@saml_hash)
-      aac2 = @account.account_authorization_configs.create!(@saml_hash)
-      aac3 = @account.account_authorization_configs.create!(@saml_hash)
-      aac4 = @account.account_authorization_configs.create!(@saml_hash)
+      aac = @account.authentication_providers.create!(@saml_hash)
+      aac2 = @account.authentication_providers.create!(@saml_hash)
+      aac3 = @account.authentication_providers.create!(@saml_hash)
+      aac4 = @account.authentication_providers.create!(@saml_hash)
 
       call_destroy(aac.id)
       aac2.reload
       aac3.reload
       aac4.reload
-      expect(@account.account_authorization_configs.count).to eq 3
-      expect(@account.account_authorization_configs.first.id).to eq aac2.id
+      expect(@account.authentication_providers.active.count).to eq 3
+      expect(@account.authentication_providers.active.first.id).to eq aac2.id
       expect(aac2.position).to eq 1
       expect(aac3.position).to eq 2
       expect(aac4.position).to eq 3
@@ -339,8 +339,8 @@ describe "AccountAuthorizationConfigs API", type: :request do
       call_destroy(aac3.id)
       aac2.reload
       aac4.reload
-      expect(@account.account_authorization_configs.count).to eq 2
-      expect(@account.account_authorization_configs.first.id).to eq aac2.id
+      expect(@account.authentication_providers.active.count).to eq 2
+      expect(@account.authentication_providers.active.first.id).to eq aac2.id
       expect(aac2.position).to eq 1
       expect(aac4.position).to eq 2
     end

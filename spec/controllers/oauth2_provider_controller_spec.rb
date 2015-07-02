@@ -67,6 +67,12 @@ describe Oauth2ProviderController do
         expect(response).to redirect_to(login_url(:force_login => 1))
       end
 
+      it 'should redirect to login_url when oauth2 session is nil' do
+        get :confirm
+        expect(flash[:error]).to eq "Must submit new OAuth2 request"
+        expect(response).to redirect_to(login_url)
+      end
+
       it 'should redirect to the redirect uri if the user already has remember-me token' do
         @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
         get :auth, :client_id => key.id, :redirect_uri => 'https://example.com', :scopes => '/auth/userinfo'

@@ -65,15 +65,12 @@ describe "better_file_browsing, folders" do
       add_folder(folder_name)
       folder = @course.folders.where(:name => folder_name).first
       expect(folder).to_not be_nil
-
       file_name = "some silly file"
       att = @course.attachments.create!(:display_name => file_name, :uploaded_data => default_uploaded_data, :folder => folder)
-
       folder_link = fln(folder_name, f('.ef-directory'))
       expect(folder_link).to be_present
       folder_link.click
       wait_for_ajaximations
-
       # we should be viewing the new folders contents
       file_link = fln(file_name, f('.ef-directory'))
       expect(file_link).to be_present
@@ -96,14 +93,12 @@ describe "better_file_browsing, folders" do
        create_new_folder
        f('.ef-name-col > a.media').click
        wait_for_ajaximations
-
        1.upto(15) do |number_of_folders|
         folder_regex = number_of_folders > 1 ? Regexp.new("New Folder\\s#{number_of_folders}") : "New Folder"
         create_new_folder
         expect(get_all_files_folders.count).to eq number_of_folders
         expect(get_all_files_folders.last.text).to match folder_regex
        end
-
        get "/courses/#{@course.id}/files"
        f('ul.collectionViewItems > li > a > i.icon-mini-arrow-right').click
        wait_for_ajaximations

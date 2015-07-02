@@ -90,6 +90,8 @@ $(document).ready(function() {
     $form.fillFormData(data, {object_name: 'pseudonym'});
     if( data.can_edit_sis_user_id == 'true' ){
       $sis_row.show();
+    } else {
+      $sis_row.remove();
     }
     var passwordable = $(this).parents(".links").hasClass('passwordable');
     var delegated = passwordable && $(this).parents(".links").hasClass('delegated-auth');

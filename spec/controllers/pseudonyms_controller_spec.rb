@@ -191,7 +191,7 @@ describe PseudonymsController do
       @p2 = @user.pseudonyms.build(:unique_id => "another_one@test.com",:password => 'password', :password_confirmation => 'password')
       @p2.sis_user_id = 'another_one@test.com'
       @p2.save!
-      @p2.account.account_authorization_configs.create!(:auth_type => 'ldap')
+      @p2.account.authentication_providers.create!(:auth_type => 'ldap')
       delete 'destroy', :user_id => @user.id, :id => @p2.id
       assert_status(200)
       expect(@pseudonym).to be_active

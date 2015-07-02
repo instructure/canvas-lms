@@ -58,8 +58,8 @@ class LoginController < ApplicationController
     if @domain_root_account.auth_discovery_url && !params[:authentication_provider]
       auth_discovery_url = @domain_root_account.auth_discovery_url
       if flash[:delegated_message]
-        auth_discovery_url << URI.parse(auth_discovery_url).query ? '&' : '?'
-        auth_discovery_url << flash[:delegated_message]
+        auth_discovery_url << (URI.parse(auth_discovery_url).query ? '&' : '?')
+        auth_discovery_url << "message=#{URI.escape(flash[:delegated_message])}"
       end
       return redirect_to auth_discovery_url
     end
@@ -69,10 +69,14 @@ class LoginController < ApplicationController
         # canvas isn't an actual type, so we have to _not_ look for it
         auth_type = 'canvas'
       else
-        auth_type = @domain_root_account.account_authorization_configs.find(params[:authentication_provider]).auth_type
+        auth_type = @domain_root_account.
+          authentication_providers.
+          active.
+          find(params[:authentication_provider]).
+          auth_type
       end
     else
-      auth_type = @domain_root_account.account_authorization_configs.first.try(:auth_type)
+      auth_type = @domain_root_account.authentication_providers.active.first.try(:auth_type)
       auth_type ||= 'canvas'
     end
 

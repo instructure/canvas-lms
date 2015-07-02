@@ -589,31 +589,47 @@ describe Attachment do
       a = attachment
       expect(a.grants_right?(nil, :read)).to eql(false)
       expect(a.grants_right?(nil, :download)).to eql(false)
-      expect(a.grants_right?(nil, {'file_access_user_id' => student.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :read)).to eql(true)
-      expect(a.grants_right?(nil, {'file_access_user_id' => student.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :download)).to eql(true)
+      mock_session = {
+        'file_access_user_id' => student.id,
+        'file_access_expiration' => 1.hour.from_now.to_i,
+        'permissions_key' => SecureRandom.uuid
+      }.with_indifferent_access
+      expect(a.grants_right?(nil, mock_session, :read)).to eql(true)
+      expect(a.grants_right?(nil, mock_session, :download)).to eql(true)
     end
 
     it "should correctly deny user access based on 'file_access_user_id'" do
       a = attachment_model(context: user)
       other_user = user_model
-      expect(a.grants_right?(nil, {'file_access_user_id' => other_user.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :read)).to eql(false)
-      expect(a.grants_right?(nil, {'file_access_user_id' => other_user.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :download)).to eql(false)
+      mock_session = {
+        'file_access_user_id' => other_user.id,
+        'file_access_expiration' => 1.hour.from_now.to_i,
+        'permissions_key' => SecureRandom.uuid
+      }.with_indifferent_access
+      expect(a.grants_right?(nil, mock_session, :read)).to eql(false)
+      expect(a.grants_right?(nil, mock_session, :download)).to eql(false)
     end
 
     it "should allow user access to anyone if the course is public to auth users (with 'file_access_user_id' and 'file_access_expiration' in the session)" do
-      a = attachment_model(context: course)
+      mock_session = {
+        'file_access_user_id' => user.id,
+        'file_access_expiration' => 1.hour.from_now.to_i,
+        'permissions_key' => SecureRandom.uuid
+      }.with_indifferent_access
 
-      expect(a.grants_right?(nil, {'file_access_user_id' => user.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :read)).to eql(false)
-      expect(a.grants_right?(nil, {'file_access_user_id' => user.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :download)).to eql(false)
+      a = attachment_model(context: course)
+      expect(a.grants_right?(nil, mock_session, :read)).to eql(false)
+      expect(a.grants_right?(nil, mock_session, :download)).to eql(false)
 
       course.is_public_to_auth_users = true
       course.save!
       a.reload
+      AdheresToPolicy::Cache.clear
 
       expect(a.grants_right?(nil, :read)).to eql(false)
       expect(a.grants_right?(nil, :download)).to eql(false)
-      expect(a.grants_right?(nil, {'file_access_user_id' => user.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :read)).to eql(true)
-      expect(a.grants_right?(nil, {'file_access_user_id' => user.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :download)).to eql(true)
+      expect(a.grants_right?(nil, mock_session, :read)).to eql(true)
+      expect(a.grants_right?(nil, mock_session, :download)).to eql(true)
     end
 
     it "should not allow user access based on incorrect 'file_access_user_id' in the session" do

@@ -1,10 +1,40 @@
 module Assignments
   class NeedsGradingCountQuery
-    attr_reader :assignment, :user
 
-    def initialize(_assignment, _user)
+    # holds values so we don't have to recompute them over and over again
+    class CourseProxy
+      attr_reader :course, :user
+
+      def initialize(_course, _user)
+        @course = _course
+        @user = _user
+      end
+
+      def da_enabled?
+        @da_enabled ||= course.feature_enabled?(:differentiated_assignments)
+      end
+
+      def section_visibilities
+        @section_visibilities ||= course.section_visibilities_for(user)
+      end
+
+      def visibility_level
+        @visibility_level ||= course.enrollment_visibility_level_for(user, section_visibilities)
+      end
+
+      def visible_section_ids
+        @visible_section_ids ||= section_visibilities.map{|v| v[:course_section_id]}
+      end
+    end
+
+    attr_reader :assignment, :user, :course_proxy
+
+    delegate :course, :da_enabled?, :section_visibilities, :visibility_level, :visible_section_ids, :to => :course_proxy
+
+    def initialize(_assignment, _user, _course_proxy=nil)
       @assignment = _assignment
       @user = _user
+      @course_proxy = _course_proxy || CourseProxy.new(@assignment.context, @user)
     end
 
     def count
@@ -75,26 +105,6 @@ module Assignments
 
     def joined_submissions
       assignment.submissions.joins("INNER JOIN enrollments e ON e.user_id = submissions.user_id")
-    end
-
-    def visible_section_ids
-      section_visibilities.map{|v| v[:course_section_id]}
-    end
-
-    def visibility_level
-      course.enrollment_visibility_level_for(user, section_visibilities)
-    end
-
-    def section_visibilities
-      course.section_visibilities_for(user)
-    end
-
-    def course
-      assignment.context
-    end
-
-    def da_enabled?
-      course.feature_enabled?(:differentiated_assignments)
     end
   end
 end

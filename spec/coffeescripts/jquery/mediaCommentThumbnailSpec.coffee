@@ -10,12 +10,11 @@ define [
       # flop out the _.defer function to just call directly down to the passed
       # function reference. this helps the tests run in a synchronous order
       # internally so asserts can work like we expect.
-      @stub = sinon.stub _, 'defer', (func, args...) ->
+      @stub _, 'defer', (func, args...) ->
         func(args...)
       @$fixtures = $('#fixtures')
 
     teardown: ->
-      _.defer.restore()
       window.INST.kalturaSettings = null
 
   test "creates a thumbnail span with a background image URL generated from kaltura settings and media id", ->

@@ -114,6 +114,7 @@ module AccountReports
       attachment = account_report.account.attachments.create!(
         :uploaded_data => Rack::Test::UploadedFile.new(filepath, filetype, true),
         :display_name => filename,
+        :filename => filename,
         :user => account_report.user
       )
     end

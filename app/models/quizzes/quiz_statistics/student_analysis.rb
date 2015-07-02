@@ -228,7 +228,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
           if submission.user
             row << submission.user.name
             row << submission.user_id
-            pseudonym = submission.user.sis_pseudonym_for(quiz.context.account, include_root_accounts)
+            pseudonym = SisPseudonym.for(submission.user, quiz.context.account, include_root_accounts)
             row << pseudonym.try(:sis_user_id)
             row << (pseudonym && HostUrl.context_host(pseudonym.account)) if include_root_accounts
           else

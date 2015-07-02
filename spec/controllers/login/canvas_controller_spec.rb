@@ -121,11 +121,11 @@ describe Login::CanvasController do
     it "should log in a user with a identifier_format" do
       user_with_pseudonym(:username => '12345', :active_all => 1)
       @pseudonym.update_attribute(:sis_user_id, '12345')
-      aac = Account.default.account_authorization_configs.create!(:auth_type => 'ldap', :identifier_format => 'uid')
+      aac = Account.default.authentication_providers.create!(:auth_type => 'ldap', :identifier_format => 'uid')
       aac.any_instantiation.expects(:ldap_bind_result).once.
           with('username', 'password').
           returns([{ 'uid' => ['12345'] }])
-      Account.default.account_authorization_configs.create!(:auth_type => 'ldap', :identifier_format => 'uid')
+      Account.default.authentication_providers.create!(:auth_type => 'ldap', :identifier_format => 'uid')
       aac.any_instantiation.expects(:ldap_bind_result).never
       post 'create', :pseudonym_session => { :unique_id => 'username', :password => 'password'}
       expect(response).to be_redirect
@@ -135,7 +135,7 @@ describe Login::CanvasController do
 
     it "should only query the LDAP server once, even with a differing identifier_format but a matching pseudonym" do
       user_with_pseudonym(:username => 'username', :active_all => 1)
-      aac = Account.default.account_authorization_configs.create!(:auth_type => 'ldap', :identifier_format => 'uid')
+      aac = Account.default.authentication_providers.create!(:auth_type => 'ldap', :identifier_format => 'uid')
       aac.any_instantiation.expects(:ldap_bind_result).once.with('username', 'password').returns(nil)
       post 'create', :pseudonym_session => { :unique_id => 'username', :password => 'password'}
       assert_status(400)

@@ -21,7 +21,7 @@ module Importers
       end
     end
 
-    def self.import_from_migration(hash, context, migration=nil, item=nil)
+    def self.import_from_migration(hash, context, migration, item=nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:external_tools_to_import] && !hash[:external_tools_to_import][hash[:migration_id]]
 

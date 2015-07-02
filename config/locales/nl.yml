@@ -29,11 +29,9 @@ nl:
     student_count: 
       one: "1 cursist"
       other: "%{count} cursisten"
-    student_count_max: "%{count} / %{max} cursisten"
     user_count: 
       one: "1 gebruiker"
       other: "%{count} gebruikers"
-    user_count_max: "%{count} / %{max} gebruikers"
   GroupUserCollection: 
     flash: 
       userAlreadyInGroup: "WAARSCHUWING: %{user} is al lid van %{group}"
@@ -118,8 +116,6 @@ nl:
   account_authorization_configs: 
     account_required: "Moet via LDAP geverifieerd zijn"
     index: 
-      add_auth_desc: "Een identiteit van provider toevoegen aan dit account: "
-      choose_auth_type_option: "Een verificatieservice kiezen"
       delete_auth_confirmation: "Weet je het zeker? Gebruikers kunnen zich mogelijk niet aanmelden als dit wordt verwijderd"
       delete_auth_link: "Alle Verificatie Verwijderen"
       ip_address_list_description: "Als je een verificatieservice gebruikt die nodig is om de Canvas-servers rechtstreeks verbinding te laten maken met jouw servers, zoals LDAP,  dan moet je ervoor zorgen dat jouw servers verbindingen vanuit deze IP-adressen kunnen accepteren:"
@@ -344,7 +340,6 @@ nl:
       open_registration_delegated_warning_dialog: "Een externe id-provider is ingeschakeld"
       what_are_quiz_ip_filters: "Wat zijn Toets IP Filters?"
     user: Gebruiker
-  account_settings_fe083453: Accountinstellingen
   account_surveys_b0039876: "Account enquêtes"
   account_user: 
     types: 
@@ -900,7 +895,6 @@ nl:
         turnitin_host: Turnitin-host
         turnitin_pledge: Turnitin-belofte
         turnitin_shared_secret: "Turnitin gedeelde geheim"
-        users_can_edit_name: "Gebruikers kunnen weergavenaam aanpassen"
       links: 
         add_admins: "Accountbeheerders toevoegen"
         configure_report: Configureren...
@@ -1197,7 +1191,6 @@ nl:
         default: 
           zero_activity: 
             text: "Dit rapport toont alle cursisten die voor iedere cursus in een bepaalde periode staan ingeschreven. Het daaruitvoortvloeiende CSV-bestand zal een rij per ingeschreven gebruiker hebben die de cursus sinds die datum nog niet heeft bezocht."
-  accounts_752dc365: Accounts
   achieve_mastery_count_times_8c9bbcec: "Meesterschap %{count} keer bereiken "
   actions_efcde10d: Acties
   activerecord: 
@@ -1438,8 +1431,6 @@ nl:
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Weet je zeker dat je deze beoordelingsperiode wilt verwijderen?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Weet je zeker dat je dit hulpprogramma wilt verwijderen? "
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "Weet je zeker dat je deze profielfoto wilt melden?"
-  aria_labels: 
-    unlock_at_date: "Ontgrendelen op datum"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Als je in dit veld typt zal de lijst met groepen automatisch gefilterd worden om alleen namen op te nemen van diegenen waarvan de namen met jouw invoer overeenkomen. "
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "Als je in dit velt typt, zal de lijst met resultaten automatisch bijgewerkt worden."
   assessment_question: 
@@ -1591,9 +1582,6 @@ nl:
       save: Opslaan
       validating: "Bezig met opslaan..."
       weight_groups: "Het eindcijfer wegen op basis van opdrachtgroepen"
-    assignment_sidebar: 
-      links: 
-        submit: "Opdracht inleveren"
     assignments_list_right_side: 
       links: 
         manage_assignments: "Opdrachten beheren"
@@ -1944,14 +1932,12 @@ nl:
         grade: "Cijfer: %{grade} *(%{points_possible} punten mogelijk)*"
         none_assigned: "Niets toegewezen"
       links: 
-        resubmit: "Opdracht opnieuw inleveren"
         submission: 
           details: "Details over ingestuurde opdracht"
           download_attachment: "%{attachment_display_name} downloaden"
           view_original_page: "De originele pagina bekijken"
           view_quiz: "Ingezonden toets bekijken"
           view_survey: "Ingezonden enquête bekijken"
-        submit: "Opdracht inleveren"
         view_rubric_evaluation: "Evaluatie van rubric bekijken"
       messages: 
         no_comments: "Geen opmerkingen"
@@ -2114,20 +2100,13 @@ nl:
     upload_error_unexpected: " Een onbekende fout opgetreden bij het downloaden van %{url}"
   attachment_deffe5a9: Bijlage
   attendance: 
-    default_attendance_title: "Aanwezigheid %{date}"
-    errors: 
-      could_not_add_assignment: "Toevoegen van opdracht mislukt"
     options: 
       clear_attendance_marks: "Aanwezigheidsmarkeringen verduidelijken"
       edit_assignment: "Opdracht bewerken"
       mark_all_as_absent: "Iedereen als afwezig markeren"
       mark_all_as_present: "Iedereen als aanwezig markeren"
-    status: 
-      added_assignment: "Toegevoegde opdracht"
-      adding_assignment: "Bezig met het toevoegen van opdracht..."
     titles: 
       attendance_help: Presentielijst
-      new_attendance_column: "Nieuwe aanwezigheidskolom"
   audio_dd489fcc: "Audio "
   auth_logging: 
     corrupted: "Details zijn niet beschikbaar"
@@ -2143,8 +2122,6 @@ nl:
   available_until_date_cd125c62: "Beschikbaar tot datum"
   available_until_f3b9c4ed: "Beschikbaar tot en met "
   available_until_lock_at_ab022445: "Beschikbaar tot en met %{lock_at} "
-  availible_from_format_like_yyyy_mm_dd_hh_mm_f101e0dd: "Beschikbaar vanaf - Formaat als JJJJ-MM-DD uu:mm"
-  availible_to_format_like_yyyy_mm_dd_hh_mm_f2611528: "Beschikbaar vanaf - Formaat als JJJJ-MM-DD uu:mm"
   average_49c63f9b: Gemiddeld
   back_to_app_center_95420d83: "Terug naar App Center "
   base_847aca7c: Basis
@@ -2883,12 +2860,10 @@ nl:
       notices: 
         contact_registered: "Contactmethode geregistreerd!"
   concluded_courses_94782e21: "Voltooide cursussen"
-  conference_36b50fda: Conferentie
   conferences: 
     concluded_conference: 
       delete: Verwijderen
       no_recording: "Geen opnames"
-      preparing_video: "Video wordt voorbereid"
       recording: "1 opname"
       recordings: "%{recordingCount} opnames"
       settings: Instellingen
@@ -3132,14 +3107,6 @@ nl:
         date_adjustment: "Datum aanpassing"
         ending_change_to: "wijzigen in"
         ending_date: Einddatum
-        new_end_date_label: "Einddatum wijzigen naar"
-        new_end_date_title: "Einddatum wijzigen naar"
-        new_start_date_label: "Startdatum wijzigen naar"
-        new_start_date_title: "Startdatum wijzigen naar"
-        old_end_date_label: Einddatum
-        old_end_date_title: Einddatum
-        old_start_date_label: Startdatum
-        old_start_date_title: Startdatum
         remove_dates: "Datums verwijderen"
         shift_dates: "Datums verschuiven"
         substitution: Vervanging
@@ -4696,14 +4663,12 @@ nl:
     conversations_expand: 
       one: " %{count} gespreksbericht uitvouwen"
       other: "%{count} gespreksberichten uitvouwen"
-    disable_dashboard: "Naar het oude dashboard teruggaan"
     discussions_collapse: 
       one: " %{count} discussie samenvouwen"
       other: "%{count} discussies samenvouwen"
     discussions_expand: 
       one: "%{count} discussie uitvouwen"
       other: "%{count} discussies uitvouwen"
-    enable_dashboard: "Het nieuwe dashboard uitproberen"
     show_more_link: 
       show_less: "Minder tonen"
       show_more: "Meer tonen"
@@ -5107,8 +5072,6 @@ nl:
         one: "1 ongelezen antwoord."
         other: "%{count} ongelezen antwoorden."
         zero: "Geen ongelezen antwoorden."
-    notices: 
-      discussion_not_availible: "Je hebt geen toegang tot de gevraagde discussie."
     page_nav: 
       Page: Pagina
       current_page: Huidig
@@ -5298,7 +5261,6 @@ nl:
   due_datetime_f5a81b81: "Inleverdatum: %{dateTime} "
   due_format_like_yyyy_mm_dd_hh_mm_ef30a9ef: "Inleverdatum - Formaat als JJJJ-MM-DD uu:mm"
   due_multiple_dates_cc0ee3f5: "Inleverdatum: meerdere data "
-  due_on_date_aa4725cd: "Verschuldigd op datum:"
   e_mail_only_2cc5e513: "Alleen e-mail "
   each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: "Elke staafje is een opdracht. De groene laag vertegenwoordigt het percentage cursisten dat  hun inzending *op tijd* heeft ingediend. Inzendingen die **laat** zijn, zijn geel, en ***ontbrekende *** inzendingen zijn rood."
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Elke bar is één opdracht. De *dunne verticale lijn* strekt zich uit van de laagste score voor elke student in de cursus tot de hoogste score. De **dikkere bar** strekt zich uit van het 25e percentiel tot het 75e, met de ***mediaan gemarkeerd***."
@@ -5414,7 +5376,6 @@ nl:
   enable_gradebook_list_students_by_sortable_name: "Een lijst van te sorteren namen van cursisten in de cijferlijst maken. Namen worden standaard op 'Achternaam voornaam' gesorteerd en kan in instellingen veranderd worden."
   enable_multiple_grading_periods: "Met Meerdere Beoordelingsperioden kunnen docenten en beheerders beoordelingsperioden maken met ingestelde afsluitdatums. Opdrachten kunnen gefilterd worden op deze beoordelingsperioden in de cijferlijst."
   end_date_e0093ed7: Einddatum
-  ends_on_date_320e0c26: "Eindigt op datum"
   enrollment: 
     default_course_name: Cursus
     default_email: "Geen e-mail"
@@ -5632,7 +5593,6 @@ nl:
         already_used: "Deze inzending is al  aan jouw portfolio toegevoegd"
         feed: "Atom-feed ePortfolio"
         view_submission: "De inzending bekijken"
-      upload_limit: "maximaal 50 MB per bestand"
       welcome: "Als je voor de eerste keer hier bent, kun je de wizard starten om een introductie te krijgen. Verder kun je recente inzendingen snel toevoegen of direct naar de portfolio springen."
       write_only_comments: "Opmerkingen op deze pagina zijn privé. Je kunt wel opmerkingen maken, maar alleen de eigenaar van de portfolio kan die zien."
     show_me: "toon me"
@@ -5716,7 +5676,6 @@ nl:
   errors: 
     bad_navigation_config: "Ongeldige configuratie van cursustabbladen"
     blank: Vereist
-    failed: Mislukt
     format: "%{attribute} %{message}"
     index: 
       all_categories: "- Alle categorieën -"
@@ -5779,7 +5738,6 @@ nl:
   expand_or_collapse_calendars_9854b0d0: "Kalenders uit- of invouwen "
   expand_or_collapse_undated_items_b901de09: "Items zonder datum uit- en invouwen "
   expand_subdiscussion_cd226ed4: "Subdiscussie Uitbreiden"
-  expires_on_date_18efe4e2: "Verloopt op datum"
   export_de71cd8e: Exporteren
   exporting_b1eab154: "Aan het exporteren"
   external_apps_f5490181: "Externe apps "
@@ -5952,7 +5910,6 @@ nl:
   features: 
     allow_opt_out_of_inbox: "Opt-out van de inbox voor gebruikers toestaan "
     better_file_browsing: "Beter door bestanden bladderen"
-    course_catalog: "Catalogus van de cursus"
     differentiated_assignments: " Gedifferentieerde opdrachten"
     differentiated_assignments_account_disable_warning: |-
         Het uitschakelen van deze functie zal impact op bestaande cursussen hebben. Neem voor het uitschakelen van dit onderdeel contact
@@ -5968,7 +5925,6 @@ nl:
     lor: "LOR externe tools"
     multiple_grading_periods: "Meerdere beoordelingsperiodes"
     new_quiz_statistics: "Pagina met statistieken voor nieuwe toets"
-    new_styles: "Nieuwe stijlen gebruiken"
     post_grades: "Cijfers op SIS posten"
     quiz_log_auditing: "Toetslogboek controleren "
     student_groups: "Pagina met nieuwe groepen cursisten"
@@ -6014,134 +5970,30 @@ nl:
     unpublished_status: "Publicatie ongedaan gemaakt"
   filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filename} is gepubliceerd met het volgende gebruiksrecht: %{usage_right} "
   files: 
-    alts: 
-      file: Bestand
-      folder: Map
-      folder_locked: "Vergrendelde map"
-      locked_file: "Vergrendeld bestand"
-    buttons: 
-      update_file: "Bestand updaten"
-    cancel: Annuleren
     content_folder: 
       titles: 
         edit_and_move_instructions: "Klikken om te bewerken, slepen om naar een andere map te verplaatsen"
     could_not_find_file: "Dit bestand is verwijderd"
     errors: 
       empty_file: "Dit bestand is leeg. Upload een ander bestand."
-      extracting: "Er zijn fouten opgetreden tijdens het uitpakken van het zip-bestand. Probeer het opnieuw."
-      failed_uploading: "Uploaden mislukt: %{error_info}"
-      loading_file: "Er is een fout opgetreden tijdens het laden van bestandsinhoud. Probeer het opnieuw."
       missing_field: "Uploaden mislukt,verwachte veld op formulier ontbreekt"
       not_found: "Het lijkt erop dat er tijdens het uploaden van dit bestand iets is misgegaan. Het actuele bestand is niet te vinden. Misschien wil je de eigenaar van het bestand waarschuwen om het bestand opnieuw te uploaden."
       server_error: "Uploaden mislukt door een serverfout. Probeer het opnieuw."
-      server_returned_invalid_status: "De server is gestopt met het terugsturen van een ongeldige status"
-      server_unresponsive: "De server reageert niet meer op statusverzoeken"
       too_large: "Het bestand is te groot om te bewerken"
-      unexpected_response: "geen verwacht antwoord teruggekregen"
-      update_file_failed: "Het updaten van het bestand mislukt, probeer het opnieuw"
       upload_failed: "Uploaden mislukt. Probeer het opnieuw."
-      uploading: "Fout tijdens het uploaden"
-      uploading_zip: "Er zijn fouten opgetreden tijdens het uploaden van het zipbestand."
     fields: 
       file: Bestand
     files_page_title: Bestanden
     full_index: 
-      alts: 
-        file_locked: vergrendeld
-        file_preview: voorbeeldweergave
-        folder_locked: vergrendeld
-      buttons: 
-        add_a_file: "Bestand toevoegen"
-        lock_file: "Dit bestand vergrendelen"
-        lock_folder: "Deze map vergrendelen"
-        overwrite_duplicate_attachment: Overschrijven
-        rename_duplicate_attachment: "Naam van nieuwe bestanden wijzigen"
-      descriptions: 
-        file_locked_after: "Het wordt vergrendeld na %{lock_at}."
-        file_locked_until: "Het is vergrendeld tot %{unlock_at}."
-        folder_locked: "Deze map is vergrendeld en kan niet  door cursisten bekeken worden."
-        folder_locked_after: "Het wordt vergrendeld na %{lock_at}."
-        folder_locked_until: "Het is vergrendeld tot %{unlock_at}."
-        lock_file: "Als een bestand is vergrendeld, hebben alleen docenten en onderwijsassistenten er toegang toe."
-        lock_folder: "Als een map is vergrendeld, hebben alleen docenten en onderwijsassistenten er toegang toe."
-      drop_here: "Bestanden hier neerzetten om ze aan deze map toe te voegen."
-      drop_zip_files: "Je kunt ook zip-bestanden neerzetten en er voor kiezen de inhoud ervan in deze map uit te pakken."
-      edit_html_warning: "De HTML-editor wijzigt jouw HTML , je moet een back-up downloaden voordat  wijzigingen opgeslagen worden . "
-      file_details: "Details van bestand"
-      file_list: "Lijst van bestanden"
-      files_title: Bestanden
-      labels: 
-        just_hide_file: "Laat cursisten  via een link het bestand downloaden of bekijken, het bestand gewoon niet tonen in het bestandsoverzicht voor cursisten"
-        just_hide_folder: "Laat cursisten via een link bestanden in deze map downloaden of bekijken , de map gewoon niet tonen in het bestandsoverzicht voor cursisten"
-        lock_after: "Vergrendelen na"
-        lock_until: "Vergrendelen tot"
-        locked: "Vergrendelen tot ik handmatig ontgrendel"
       links: 
-        add_file: "Bestand toevoegen"
-        add_folder: "Map toevoegen"
-        delete_file: "Dit bestand verwijderen"
-        delete_folder: "Deze map verwijderen"
-        download_as_zip: "Bestanden in deze map  als een zip-bestand downloaden"
-        download_file: "Dit bestand downloaden"
-        download_with_size: "het bestand downloaden (%{size})"
         download_zip: "Hier klikken om %{size}  te downloaden"
-        edit_content: "inhoud bewerken"
-        import_zip: "Een zip-bestand importeren"
-        lock_file: "Dit bestand vergrendelen"
-        lock_folder: "Deze map vergrendelen"
-        preview: voorbeeldweergave
-        rename_file: "Naam van dit bestand wijzigen"
-        rename_folder: "Naam van deze map wijzigen"
-        show_all_files: "bestanden voor al jouw cursussen/groepen zien"
-        show_personal_files: "alleen mijn persoonlijke bestanden tonen"
-        unlock_file: "Dit bestand ontgrendelen"
-        unlock_folder: "Deze map ontgrendelen"
-      locked: "Dit bestand is nog niet ontgrendeld, dus het kan niet gedownload worden."
-      locked2: "Dit bestand is vergrendeld, en kan niet door cursisten gedownload worden."
       messages: 
         creating_zip: "Bezig met maken van zip-bestand..."
-        gathering_and_zipping: |-
-            **De inhoud van deze map wordt verzameld** en gecomprimeerd in een zip-bestand.
-            Dit kan enige tijd duren, afhankelijk van de bestandsgrootte en het aantal bestanden.
         gathering_data: "Bezig met het verzamelen van gegevens..."
-        gathering_files: "Bezig met verzamelen van bestanden..."
         gathering_files_with_progress: "Bezig met het verzamelen van bestanden (%{progress}%)..."
-        no_preview_avaialble: "Geen voorbeeldweergave beschikbaar"
-        uploading: "Bezig met het uploaden van 5 bestanden..."
         zip_finished: "Voltooid! Bezig met omleiden naar bestand..."
-      page_title: Bestanden
-      storage_used: "Gebruikte ruimte: %{size1} van %{size2}"
-      switch_views: "Schakelen naar andere weergaven"
       titles: 
         download_folder_contents: "Inhoud van de map downloaden"
-        edit_file: "Bewerken %{file}"
-        edit_file_contents: "Bestandsinhoud bewerken"
-        file_locked: Vergrendeld
-        folder_locked: Vergrendeld
-        lock_file: "Vergrendelen %{file_name}"
-        lock_folder: "Vergrendelen %{folder_name}"
-      warnings: 
-        too_many: "Er zijn te veel cursussen/groepen om in een keer te tonen. Hieronder staan de eerste 15 resultaten."
-    links: 
-      add_files: "Bestanden toevoegen"
-    messages: 
-      access_denied: "De inhoud van deze map kan niet gelezen worden."
-      done_uploading: "Klaar met uploaden"
-      error_count: 
-        one: "1 fout"
-        other: "%{count} fouten"
-      extraction_complete: "Klaar met uitpakken! Bezig met bijwerken..."
-      finalizing: "Wordt voltooid"
-      folder_empty: "Deze map is leeg"
-      loading_files: "Bezig met laden van bestanden..."
-      no_files_selected: "Geen geldige bestanden geselecteerd"
-      queued: "In de wacht"
-      updating_file: "Bezig met het bijwerken van bestand..."
-      upload_complete: "Klaar met uploaden"
-      uploading: "Bezig met uploaden"
-      uploading_files: 
-        one: "Bezig met uploaden van 1 bestand..."
-        other: "Bezig met uploaden van %{count} bestanden..."
     my_files: "Mijn bestanden"
     new: 
       buttons: 
@@ -6151,28 +6003,12 @@ nl:
     notices: 
       deleted: "Het bestand %{display_name} is verwijderd"
       updated: "Bestand is succesvol bijgewerkt."
-    prompts: 
-      delete_file: "Weet je zeker dat je dit bestand wilt verwijderen?"
-      delete_folder: "Weet je zeker dat je deze map inclusief alle inhoud wilt verwijderen?"
-      duplicate_filenames: "Er staan al bestanden met de volgende namen in deze map. Wil je de bestanden vervangen of wil je de naam van de nieuwe bestanden met een unieke naam wijzigen? "
-      extract_zip: "Dit bestand is een zipbestand.  Wil je de inhoud uitpakken in deze map?"
     show: 
       messages: 
         file_locked: "Het bestand is nog niet ontgrendeld."
         folder_locked: "Deze map \"%{folder}\", inclusief dit bestand is vergrendeld."
     text_show: 
       page_title: Bestandsvoorbeeld
-    titles: 
-      click_and_drag: "Klikken en slepen om een map naar een andere map te verplaatsen"
-      drag_to_move: "Slepen om naar een andere map te verplaatsen"
-      extracting: "Bestanden worden uitgepakt in map"
-      file_uplaods_queue: "Wachtrij voor te uploaden bestanden"
-      lock_file: "Bestand vergrendelen"
-      lock_folder: "Map vergrendelen"
-    update_file: "Bestand bijwerken"
-    upload_error: "Er is een fout opgetreden tijdens het uploaden van jouw bestand"
-    warnings: 
-      file_uploaded_without_response: "Bestand kan geüpload zijn, maar de server reageert niet. De pagina opnieuw laden om te bevestigen."
   files_and_folder_contents_only_available_to_studen_944f9166: "Inhoud van bestanden en mappen zijn alleen door deze koppeling  voor cursisten beschikbaar. Niet zichtbaar in bestanden van cursist. "
   files_c300e900: Bestanden
   files_uploaded_519844ed: "Bestanden geupload"
@@ -6448,27 +6284,15 @@ nl:
   gradebooks: 
     attendance: 
       attendance_info: "Er zijn geen aanwezigheidstaken gemaakt."
-      buttons: 
-        add_assignment: "Opdracht toevoegen"
       edit_attendance_info: "Op de pictogram keuzelijst, direct onder de naam van de opdracht, klikken en daarna op \"opdracht bewerken\" om de details van een aanwezigheidsopdracht te bewerken"
       headers: 
         attendance: Aanwezigheid
         edit_attendance: " Details over aanwezigheid bewerken"
         loading_attendance: "Bezig met het laden van aanwezigheidstabel..."
         mark_attendance: "Aanwezigheid markeren"
-        new_column: "Nieuwe aanwezigheidskolom"
       how_do_i: "Hoe kan ik...?"
-      labels: 
-        date: Datum
-        group: Groep
-        possible: Mogelijk
-        title: Titel
-      links: 
-        add_column: "Kolom toevoegen"
       mark_attendance_info: "De aanwezigheidsweergave toont een tabel met cursisten linksonder en een tabel met opdrachten aan de bovenkant. Om een cursist als aanwezig of afwezig te markeren, op het corresponderende vakje klikken tot de juiste markering (%{present_icon} voor aanwezig, %{absent_icon} voor afwezigheid weergegeven wordt). Je kunt ook voor iedere opdracht de keuzelijst gebruiken om van iedereen de aanwezigheid of afwezigheid vast te stellen."
-      new_group: "Nieuwe groep"
       page_title: Aanwezigheid
-      points_abbrev: punten
       titles: 
         click_to_change: "Klikken om te wijzigen"
     blank_submission: 
@@ -6483,7 +6307,6 @@ nl:
       muted: Verborgen
     grade_summary: 
       all_grading_periods: "Alle beoordelingsperioden"
-      assessment_by: "Beoordeling door %{name}"
       assignments: Opdrachten
       buttons: 
         show_what_if: "Opgeslagen \"wat-als weergeven \"-scores tonen"
@@ -7351,13 +7174,9 @@ nl:
       invalid_datetime: "Ongeldige datum-/tijdswaarde"
       invalid_entry_for_field: "Ongeldige invoer: %{field}"
       invalid_number: "Dit moet een getal zijn."
-      not_a_date: "Dit is geen datum!"
       posting_message_failed: "Posten mislukt, probeer het opnieuw"
       required: "Vereist veld"
       search_failed: "Zoeken mislukt, probeer het opnieuw."
-    labels: 
-      datepicker: 
-        time: Tijd
     links: 
       minimize_file_preview: "Voorbeeldweergave van bestand minimaliseren"
       minimize_youtube_video: " Video minimaliseren"
@@ -7643,12 +7462,10 @@ nl:
   loading_25990131: "Bezig met Laden... "
   locales: 
     nl: Nederlands
-  lock_after_date_92f9149: "Blokkeren na datum"
   lock_date_cannot_be_after_course_end_a473158b: "Vergrendeldatum kan niet na afloop van cursus plaatsvinden "
   lock_date_cannot_be_after_section_end_d37da70c: "Datumvergrendeling kan niet na afloop van gedeelte plaatsvinden "
   lock_date_cannot_be_after_term_end_cf1a188f: "Datumvergrendeling kan niet na afloop van termijn plaatsvinden "
   lock_date_cannot_be_before_due_date_ac30f54: "Vergrendeldatum kan niet voor vervaldatum vallen "
-  lock_until_date_62ce1b5c: "Blokkeren na datum"
   log_on_url_fc166e4c: "Aanmelden op URL"
   log_out_379ba28a: Afmelden
   log_out_url_2605c2c1: "Afmelden op URL"
@@ -9722,7 +9539,6 @@ nl:
     submission_comments: "Opmerkingen over inzending"
     sure_you_want_to_mute: "Weet je zeker dat je deze opdracht wilt verbergen? Terwijl deze opdracht verborgen wordt, zullen cursisten geen nieuwe meldingen ontvangen. Ze kunnen ze ook niet zien:"
   muted_283cfa0f: "(gedempt) "
-  my_dashboard_8983c283: "Mijn Dashboard"
   my_dashboard_b724020: "Mijn dashboard "
   n_a_d6f6c42f: "Niet van toepassing "
   n_number_of_times_c2e78b72: "n Aantal keren"
@@ -9740,7 +9556,6 @@ nl:
   new_file_135ae520: "[ Nieuw bestand ]"
   new_outcome_7fba8c7d: "Nieuw leerresultaat "
   new_quiz_statistics_desc: "De nieuwe pagina met statistieken van de toets voor een cursus inschakelen."
-  new_styles_description: "We zijn bezig met de Canvas gebruikersinterface een facelift te geven. Dit inschakelen om de bijgewerkte, simpeler vormgeving en stijl van de Canvas gebruikersinterface te kunnen zien. Dit is een \"Work in Progress\" functie en moet nog niet ingeschakeld worden voor huidige gebruikers. "
   next_40e12421: Volgende
   next_steps_ce0f0d0c: "Volgende stappen "
   no_assignment_name_adbb215b: "Geen naam voor opdracht "
@@ -10057,7 +9872,6 @@ nl:
       page_title: "Op app aanmelden"
       remember_auth: "Mijn goedkeuring voor deze dienst onthouden"
   observees: 
-    add_observee_button: "Cursist toevoegen"
     being_observed: "Cursisten worden waargenomen"
     new_observee_password: Wachtwoord
     new_observee_username: Gebruikersnaam
@@ -11974,7 +11788,6 @@ nl:
         has_submissions_already: "Let op dat sommige cursisten deze toets al gemaakt hebben of er nog mee bezig zijn"
         less_than_allotted_time: "Je bent net voor de inleverdatum gestart met deze toets, dus je hebt niet de volledige tijd om de toets af te maken."
         no_submission_for_user: "Er is  voor die gebruiker geen inzending beschikbaar"
-        quiz_not_availible: "Je hebt geen toegang tot de gevraagde toets."
         quiz_updated: "Toets succesvol bijgewerkt"
         quizzes_published: 
           one: "1 toets succesvol gepubliceerd"
@@ -13061,18 +12874,6 @@ nl:
         go: Start
       titles: 
         find_user: "Een gebruiker zoeken"
-    add_assignment: 
-      buttons: 
-        add_assignment: "Opdracht toevoegen"
-      labels: 
-        assignment_group_id: Groep
-        due_at: Inleverdatum
-        points_possible: Punten
-        title: Naam
-      options: 
-        assignments: Opdrachten
-      titles: 
-        add_assignment: "Opdracht toevoegen"
     add_assignment_group: 
       buttons: 
         add_group: "Groep toevoegen"
@@ -13861,8 +13662,6 @@ nl:
     student_hidden_name: "Cursist %{position}"
   sso_settings_ebf98263: "SSO Instellingen"
   start_date_e937be8a: Startdatum
-  start_date_must_be_before_end_date_a00be892: "Startdatum moet voor einddatum liggen"
-  starts_on_date_a777f505: Startdatum
   statistics: 
     csv_columns: 
       attempt: poging
@@ -14197,7 +13996,6 @@ nl:
   the_following_fields_are_invalid_fields_b3565800: "De volgende velden zijn ongeldig: %{fields}"
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "De volledige hostnaam voor het account exemplaar (bijvoorbeeld something.instructure.com)"
   the_grading_period_was_deleted_7814a349: "De beoordelingsperiode is verwijderd"
-  the_grading_period_was_saved_4a504c5: "De beoordelingsperiode is opgeslagen"
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "De instelling waarbij je probeerde aan te melden, is niet geconfigureerd voor dit account."
   the_list_of_results_has_been_updated_46e3c733: "De lijst resultaten is bijgewerkt"
   the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "Het logo rechtsboven in de Canvas header. 200 x 200 svg of png"
@@ -14246,7 +14044,6 @@ nl:
   this_field_name_is_required_b9196401: "Het veld \"naam\" is vereist. "
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "Dit bestand moet ingestelde gebruiks_rechten hebben voordat het bestand gepubliceerd kan worden. "
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Deze map is momenteel vergrendeld en kan niet bekeken worden. "
-  this_grading_period_overlaps_16332589: "Deze Beoordelingsperiode overlapt"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Dit is een door komma's gescheiden lijst van URL's die vertrouwd kunnen worden. Iedere vertrouwde URL in deze lijst  zal de code voor CSRF overslaan wanneer je je op Canvas aanmeldt."
   this_login_is_for_provider_6f17462: "Deze login is voor %{provider}"
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Dit gebeurde zeer waarschijnlijk omdat je de inhoud van de cursus zonder gekoppelde bestanden hebt geïmporteerd. "
@@ -14501,7 +14298,6 @@ nl:
     buttons: 
       resubmit_to_turnitin: "Opnieuw inleveren bij Turnitin"
   twitter_fcef6b54: Twitter
-  type_more_to_find_additional_students_d5211cd5: "Meer typen om extra cursisten te vinden"
   unable_to_remove_app_4293cb53: "Kan app niet verwijderen "
   unarchive_selected_e0c4bd3d: "Geselecteerde dearchiveren"
   unauthorized: onbevoegd
@@ -14529,7 +14325,6 @@ nl:
   until_date_949017c4: "Tot %{date}"
   untitled_assignment_59354b34: "Naamloze opdracht"
   unused_courses_title: "Cursussen die niet gebruikt zijn"
-  update_4d8ee62: Bijwerken
   updated_group_group_name_727b1d98: "Bijgewerkte %{group_name} groep "
   upload_button: 
     upload: Uploaden
@@ -14762,8 +14557,6 @@ nl:
         one: "gemiddelde van 1 cursist"
         other: "gemiddelde van %{count} cursisten"
       course: Cursus
-      crumbs: 
-        grades: Cijfers
       current_teacher_courses: "Cursussen waarin ik lesgeef"
       linked_student_accounts: "Gekoppele accounts van cursist"
       links: 
@@ -14974,7 +14767,6 @@ nl:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE, WebCT 6+-cursus"
   webct_name: "Blackboard Vista/CE (WebCT)"
-  welcome_to_your_courses_to_customize_the_list_of_c_2922a551: "Welkom bij onze cursussen! Om de lijst van cursussen aan te passen, klik je op de link \"Alle Cursussen\" en duid de cursussen om weer te geven met een sterretje aan."
   well_below_mastery_37664bdc: "Ruim onder Meesterschap"
   what_should_the_csv_file_look_like_985a59ac: "Hoe zou het CSV-bestand er uit moeten zien?"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Wanneer mensen de cursus bezoeken, is dit de pagina dat ze zullen zien. Je kunt de pagina instellen om een activiteitenstroom, de lijst met cursus modulen, een syllabus, of een eigen pagina die jezelf schrijft weer te geven. De standaardinstelling is de activiteitenstroom van de cursus."

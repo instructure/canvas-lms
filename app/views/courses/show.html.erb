@@ -52,7 +52,7 @@
           <a class="btn button-sidebar-wide course-home-sub-navigation-lti"
              href="<%= course_external_tool_path(@context, tool, launch_type: 'course_home_sub_navigation') %>">
             <img class="icon" src="<%= tool.course_home_sub_navigation(:icon_url) %>" />
-            <%= tool.label_for(:course_home_sub_navigation) %>
+            <%= tool.label_for(:course_home_sub_navigation, I18n.locale) %>
           </a>
         <% end %>
         <% if @can_manage_content %>
@@ -87,7 +87,7 @@
           <a class="btn button-sidebar-wide course-home-sub-navigation-lti"
              href="<%= course_external_tool_path(@context, tool, launch_type: 'course_home_sub_navigation') %>">
             <img class="icon" src="<%= tool.course_home_sub_navigation(:icon_url) %>" />
-            <%= tool.label_for(:course_home_sub_navigation) %>
+            <%= tool.label_for(:course_home_sub_navigation, I18n.locale) %>
           </a>
         <% end %>
         <% if @can_manage_content %>

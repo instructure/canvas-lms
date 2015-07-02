@@ -36,7 +36,7 @@ class Login::OauthController < Login::OauthBaseController
   def create
     reset_session_for_login
 
-    @aac = @domain_root_account.account_authorization_configs.find(params[:id])
+    @aac = @domain_root_account.authentication_providers.active.find(params[:id])
     raise ActiveRecord::RecordNotFound unless @aac.is_a?(AccountAuthorizationConfig::Oauth)
 
     oauth_state = session.delete(:oauth)
@@ -62,6 +62,6 @@ class Login::OauthController < Login::OauthBaseController
   protected
 
   def callback_uri
-    oauth_login_callback_url(id: @aac)
+    oauth_login_callback_url(id: @aac.global_id)
   end
 end

@@ -104,7 +104,7 @@ describe DelayedMessage do
     account = Account.create!(:name => 'new acct')
     user = user_with_pseudonym(:account => account)
     expect(user.pseudonym.account).to eq account
-    user.any_instantiation.expects(:sis_pseudonym_for).with(Account.default).returns(user.pseudonym)
+    SisPseudonym.expects(:for).with(user, Account.default).returns(user.pseudonym)
     HostUrl.expects(:context_host).with(account).at_least(1).returns("dm.dummy.test.host")
     HostUrl.stubs(:default_host).returns("test.host")
     user.communication_channel.confirm!

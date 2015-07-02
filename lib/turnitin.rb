@@ -88,7 +88,7 @@ module Turnitin
     end
 
     def createCourse(course)
-      sendRequest(:create_course, 2, :utp => '2', :course => course, :user => course, :utp => '2')
+      sendRequest(:create_course, 2, :course => course, :user => course, :utp => '2')
     end
 
     def enrollStudent(course, student)

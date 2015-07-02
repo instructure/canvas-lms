@@ -1,0 +1,272 @@
+@mixin super-toggle-state ($attrs) {
+  .ic-Super-toggle__input:#{$attrs} ~ .ic-Super-toggle__container {
+    @content;
+  }
+}
+
+// START Mixin to brand different variants of ic-Super-toggle
+
+// Parameters are defaults and can be overwritten when you call in the mixin
+// Please do not edit the default parameters and note that if you alter
+// anything in this mixin, it will affect ALL ic-Super-toggles
+
+@mixin super-toggle-designer (
+  $toggle-width: $ic-sp*5,
+  $toggle-color-switch: $ic-color-light,
+  $toggle-background-OFF: $ic-brand-secondary,
+  $toggle-background-ON: $ic-brand-primary,
+  $toggle-color-left-unchecked: $ic-color-light,
+  $toggle-color-left-checked: $ic-color-light,
+  $toggle-color-right-unchecked: $ic-color-light,
+  $toggle-color-right-checked: $ic-color-light
+  ) {
+
+  .ic-Form-group.ic-Form-group--horizontal & {
+    @include breakpoint(tablet) {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      .ic-Super-toggle__container { flex: 1; }
+    }
+  }
+
+  .ic-Super-toggle__switch {
+    width: $toggle-width; height: $toggle-width/2;
+    background: $toggle-background-OFF;
+    border: 2px solid $toggle-background-OFF;
+    border-radius: ($toggle-width/4) + 2;
+
+    &::after { // handle
+      background-color: $toggle-color-switch;
+      width: $toggle-width/2; height: $toggle-width/2;
+    }
+  }
+
+  .ic-Super-toggle__option--LEFT {
+    color: $toggle-color-left-unchecked;
+    .ic-Super-toggle__svg > * { fill: $toggle-color-left-unchecked; }
+  }
+
+  .ic-Super-toggle__option--RIGHT {
+    color: $toggle-color-right-unchecked;
+    .ic-Super-toggle__svg > * { fill: $toggle-color-right-unchecked; }
+  }
+
+  .ic-Super-toggle__svg {
+    max-width: $toggle-width/4;
+    max-height: $toggle-width/4;
+  }
+
+  @include super-toggle-state ('checked') {
+    .ic-Super-toggle__switch {
+      background: $toggle-background-ON;
+      border-color: $toggle-background-ON;
+    }
+    .ic-Super-toggle__option--LEFT {
+      color: $toggle-color-left-checked;
+      .ic-Super-toggle__svg > * {
+        fill: $toggle-color-left-checked;
+      }
+    }
+    .ic-Super-toggle__option--RIGHT {
+      color: $toggle-color-right-checked;
+      .ic-Super-toggle__svg > * {
+        fill: $toggle-color-right-checked;
+      }
+    }
+  }
+
+  @include super-toggle-state ('focus') {
+    .ic-Super-toggle__switch::after { // handle
+      box-shadow:
+        inset 0 0 0 1px $toggle-color-switch,
+        inset 0 0 0 3px $toggle-background-OFF,
+        0 3px 6px rgba(black, 0.3);
+    }
+  }
+
+  @include super-toggle-state ('focus:checked') {
+    .ic-Super-toggle__switch::after { // handle
+      box-shadow:
+        inset 0 0 0 1px $toggle-color-switch,
+        inset 0 0 0 3px $toggle-background-ON,
+        0 3px 6px rgba(black, 0.3);
+    }
+  }
+
+
+}
+// END mixin
+
+
+// START base/global styles for ic-Super-toggle elements
+// Editing these styles will affect ALL ic-Super-toggles
+// If you are creating a new type of ic-Super-Toggle, you can overwrite
+// or expand on these base styles inside your own new class
+
+.ic-Super-toggle__container {
+  box-sizing: border-box;
+  margin: 0;
+  user-select: none;
+}
+
+.ic-Super-toggle__input {
+  opacity: 0;
+  position: absolute;
+  top: 0; left: 0;
+}
+
+.ic-Super-toggle__switch {
+  transition: background 0.1s, border-color 0.1s;
+  position: relative;
+  line-height: 1;
+  background-clip: padding-box;
+
+  &::after { // handle
+    transition: all 0.1s ease-in-out;
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    transform: translate3d(0,0,0);
+    border-radius: 100%;
+    box-shadow: 0 3px 6px rgba(black, 0.3);
+    background-image: image-url("toggle-handle.svg");
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-size: 20px;
+  }
+}
+
+[class^="ic-Super-toggle__option--"] {
+  transition: all 0.2s ease-out;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  text-transform: uppercase;
+  font-weight: bold;
+  line-height: 1;
+  speak: none;
+  box-sizing: border-box;
+
+  @include overwrite-default-icon-size(18px);
+}
+
+@include super-toggle-state ('checked') {
+  .ic-Super-toggle__switch::after { // handle
+    transform: translate3d(100%,0,0);
+  }
+}
+
+@include super-toggle-state ('disabled') {
+  .ic-Super-toggle__switch,
+  [class^="ic-Super-toggle__option--"] {
+    display: none;
+  }
+  &::before { // disabled message
+    font-style: italic;
+    opacity: 0.8;
+    content: attr(data-unchecked);
+  }
+}
+
+@include super-toggle-state ('disabled:checked') {
+  &::before { // disabled message
+    content: attr(data-checked);
+  }
+}
+
+// END base styles for ic-Super-toggle
+
+
+// START ic-Super-toggle variant #1
+// This is a basic ON/OFF toggle switch
+// The ON state is indicated by a checkmark; OFF is indicated by an X
+// Ideal for turning features on and off, in place of a regular checkbox
+
+.ic-Super-toggle--on-off {
+  // Call in toggle mixin, using default parameters
+  @include super-toggle-designer;
+
+  .ic-Super-toggle__switch {
+    display: flex;
+    align-items: center;
+  }
+
+  [class^="ic-Super-toggle__option--"] {
+    transition-delay: 0.1s; // Make checkmark and X animate and fade in when checkbox is checked/unchecked
+    flex: 0 0 50%;
+  }
+
+  .ic-Super-toggle__option--LEFT {
+    transform: scale(0.1);
+    opacity: 0;
+  }
+
+  .ic-Super-toggle__option--RIGHT {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  @include super-toggle-state ('checked') {
+    .ic-Super-toggle__option--LEFT {
+      transform: scale(1);
+      opacity: 1;
+    }
+    .ic-Super-toggle__option--RIGHT {
+      transform: scale(0.1);
+      opacity: 0;
+    }
+  }
+}
+// END ic-Super-toggle variant #1
+
+
+// START ic-Super-toggle variant #2
+// This is a toggle that switches between 2 states, indicated by icons
+// on the left and right of the toggle.
+
+.ic-Super-toggle--ui-switch {
+  // Call in the toggle mixin, overwriting the default parameters
+  @include super-toggle-designer(
+    $ic-sp*5, // width
+    $ic-color-light, // switch bg color
+    $ic-brand-secondary, // background color when checkbox is unchecked
+    $ic-brand-secondary, // background color when checkbox is checked
+    $ic-brand-primary, // left unchecked
+    $ic-icon-link-color, // left checked
+    $ic-icon-link-color, // right unchecked
+    $ic-brand-primary // right checked
+  );
+
+  .ic-Super-toggle__container {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .ic-Super-toggle__switch {
+    display: block;
+  }
+
+  [class^="ic-Super-toggle__option--"] {
+    min-width: 24px;
+  }
+
+  .ic-Super-toggle__option--LEFT {
+    text-align: left;
+    transform: scale(1.1);
+  }
+
+  .ic-Super-toggle__option--RIGHT {
+    text-align: right;
+    transform: scale(0.9);
+  }
+
+  @include super-toggle-state ('checked') {
+    .ic-Super-toggle__option--LEFT {
+      transform: scale(0.9);
+    }
+    .ic-Super-toggle__option--RIGHT {
+      transform: scale(1.1);
+    }
+  }
+}

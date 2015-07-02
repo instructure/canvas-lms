@@ -36,7 +36,7 @@ class ContentMigration < ActiveRecord::Base
   DATE_FORMAT = "%m/%d/%Y"
 
   attr_accessible :context, :migration_settings, :user, :source_course, :copy_options, :migration_type, :initiated_source
-  attr_accessor :imported_migration_items, :outcome_to_id_map
+  attr_accessor :imported_migration_items, :outcome_to_id_map, :attachment_path_id_lookup, :attachment_path_id_lookup_lower
 
   workflow do
     state :created
@@ -588,27 +588,27 @@ class ContentMigration < ActiveRecord::Base
     ContentMigration.where(:id => self).update_all(:progress=>val)
   end
 
-  def add_missing_content_links(item)
-    @missing_content_links ||= {}
-    item[:field] ||= :text
-    key = "#{item[:class]}_#{item[:id]}_#{item[:field]}"
-    if item[:missing_links].present?
-      @missing_content_links[key] = item
-    else
-      @missing_content_links.delete(key)
-    end
+  def html_converter
+    @html_converter ||= ImportedHtmlConverter.new(self)
   end
 
-  def add_warnings_for_missing_content_links
-    return unless @missing_content_links
-    @missing_content_links.each_value do |item|
-      if item[:missing_links].any?
-        add_warning(t(:missing_content_links_title, "Missing links found in imported content") + " - #{item[:class]} #{item[:field]}",
-          {:error_message => "#{item[:class]} #{item[:field]} - " + t(:missing_content_links_message,
-            "The following references could not be resolved:") + " " + item[:missing_links].join(', '),
-            :fix_issue_html_url => item[:url]})
-      end
-    end
+  def convert_html(*args)
+    html_converter.convert(*args)
+  end
+
+  def convert_text(*args)
+    html_converter.convert_text(*args)
+  end
+
+  def resolve_content_links!
+    html_converter.resolve_content_links!
+  end
+
+  def add_warning_for_missing_content_links(type, field, missing_links, fix_issue_url)
+    add_warning(t(:missing_content_links_title, "Missing links found in imported content") + " - #{type} #{field}",
+      {:error_message => "#{type} #{field} - " + t(:missing_content_links_message,
+        "The following references could not be resolved:") + " " + missing_links.join(', '),
+        :fix_issue_html_url => fix_issue_url})
   end
 
   UPLOAD_TIMEOUT = 1.hour
@@ -700,17 +700,31 @@ class ContentMigration < ActiveRecord::Base
 
   def imported_migration_items
     @imported_migration_items_hash ||= {}
-    @imported_migration_items_hash.values.flatten
+    @imported_migration_items_hash.values.map(&:values).flatten
+  end
+
+  def imported_migration_items_hash(klass)
+    @imported_migration_items_hash ||= {}
+    @imported_migration_items_hash[klass.name] ||= {}
   end
 
   def imported_migration_items_by_class(klass)
-    @imported_migration_items_hash ||= {}
-    @imported_migration_items_hash[klass.name] ||= []
+    imported_migration_items_hash(klass).values
+  end
+
+  def find_imported_migration_item(klass, migration_id)
+    imported_migration_items_hash(klass)[migration_id]
   end
 
   def add_imported_item(item)
-    arr = imported_migration_items_by_class(item.class)
-    arr << item unless arr.include?(item)
+    imported_migration_items_hash(item.class)[item.migration_id] = item
+  end
+
+  def add_attachment_path(path, migration_id)
+    self.attachment_path_id_lookup ||= {}
+    self.attachment_path_id_lookup_lower ||= {}
+    self.attachment_path_id_lookup[path] = migration_id
+    self.attachment_path_id_lookup_lower[path.downcase] = migration_id
   end
 
   def add_external_tool_translation(migration_id, target_tool, custom_fields)

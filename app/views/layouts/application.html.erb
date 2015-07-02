@@ -1,4 +1,6 @@
 <%-
+  set_badge_counts_for(@context, @current_user, @current_enrollment) if @set_badge_counts
+
   @body_classes ||= []
   keyboard_navigation = (yield :keyboard_navigation).presence
   left_side = nil

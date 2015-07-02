@@ -27,8 +27,8 @@ describe "discussion_topics" do
   end
 
   it "should show assignment group discussions without errors" do
-    group_assignment_discussion
     course_with_student_logged_in(:course => @course, :active_all => true)
+    group_assignment_discussion(course: @course)
     @group.users << @user
 
     get "/groups/#{@group.id}/discussion_topics/#{@topic.id}"
@@ -40,7 +40,7 @@ describe "discussion_topics" do
     get "/groups/#{@group.id}/discussion_topics/#{@topic.id}"
     expect(response).to be_success
   end
-  
+
   it "should not allow concluded students to update topic" do
     student_enrollment = course_with_student(:course => @course, :user => @user, :active_enrollment => true)
     @topic = DiscussionTopic.new(:context => @course, :title => "will this work?", :user => @user)

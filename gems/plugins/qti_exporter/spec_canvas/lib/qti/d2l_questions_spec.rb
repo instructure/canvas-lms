@@ -20,15 +20,15 @@ describe "Converting D2L QTI" do
   it "should convert multi select" do
     expect(get_question_hash(d2l_question_dir, 'multi_select', true, @opts)).to eq D2LExpected::MULTI_SELECT
   end
-  
+
   it "should convert multiple short" do
     expect(get_question_hash(d2l_question_dir, 'multiple_short', true, @opts)).to eq D2LExpected::MULTIPLE_SHORT
   end
-  
+
   it "should convert fill in the blank with multiple blanks" do
     expect(get_question_hash(d2l_question_dir, 'fib', true, @opts)).to eq D2LExpected::FIB
   end
-  
+
   it "should convert matching" do
     #pp get_question_hash(d2l_question_dir, 'matching', false)
     hash = get_question_hash(d2l_question_dir, 'matching', false, @opts)
@@ -42,11 +42,11 @@ describe "Converting D2L QTI" do
     hash[:matches].each {|m|m.delete(:match_id)}
     expect(hash).to eq D2LExpected::MATCHING
   end
-  
+
   it "should flag ordering question as an error" do
     expect(get_question_hash(d2l_question_dir, 'ordering', true, @opts)).to eq D2LExpected::ORDERING
   end
-  
+
   it "should convert math question" do
     expect(get_question_hash(d2l_question_dir, 'math', true, @opts)).to eq D2LExpected::MATH
   end
@@ -104,7 +104,7 @@ module D2LExpected
                   :correct_comments=>"",
                   :question_type=>"multiple_choice_question"
           }
-  
+
   TRUE_FALSE =
           {:question_type=>"multiple_choice_question",
            :incorrect_comments=>"",
@@ -156,7 +156,7 @@ module D2LExpected
                      :time_limit=>15,
                      :access_code=>"insecure",
                      :assignment_migration_id=>'164842'}
-  
+
   LONG_ANSWER = {:question_bank_name=>"02gilback",
                  :points_possible=>1,
                  :answers=>[],
@@ -178,7 +178,7 @@ module D2LExpected
                   :question_name=>"",
                   :migration_id=>"QUES_522317_638596",
                   :correct_comments=>""}
-  
+
   MULTI_SELECT = {:correct_comments=>"",
                   :question_type=>"multiple_answers_question",
                   :incorrect_comments=>"",
@@ -227,9 +227,9 @@ module D2LExpected
                         :comments=>"",
                         :text=>"A",
                         :left=>"A"},
-                       {:right=>"2", 
-                        :comments=>"", 
-                        :text=>"b", 
+                       {:right=>"2",
+                        :comments=>"",
+                        :text=>"b",
                         :left=>"b"}]}
 
   ORDERING = {:question_bank_id=>"SECT_3981973",
@@ -297,7 +297,7 @@ module D2LExpected
                   :question_type => "multiple_answers_question",
                   :question_bank_id => "SECT_3981973",
                   :incorrect_comments => "",
-                  :points_possible => 1,
+                  :points_possible => 0,
                   :question_bank_name => "02gilback",
                   :question_text => "<p>According to the class handout Basic Principles to Enhance Memory which of the following are effective ways to remember?</p>"}
 

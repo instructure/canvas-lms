@@ -133,6 +133,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def label_for(key, lang=nil)
+    lang = lang.to_s if lang
     labels = settings[key] && settings[key][:labels]
     labels2 = settings[:labels]
     (labels && labels[lang]) ||

@@ -239,7 +239,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
   # @argument question[quiz_group_id] [Integer]
   #   The id of the quiz group to assign the question to.
   #
-  # @argument question[question_type] ["calculated_question"|"essay_question"|"file_upload_question"|"fill_in_multiple_blanks_question"|"matching_question"|"multiple_answers_question"|"multiple_choice_question"|"multiple_dropdowns_question"|"numerical_question"|"short_answer_question"|"text_only_question"]
+  # @argument question[question_type] ["calculated_question"|"essay_question"|"file_upload_question"|"fill_in_multiple_blanks_question"|"matching_question"|"multiple_answers_question"|"multiple_choice_question"|"multiple_dropdowns_question"|"numerical_question"|"short_answer_question"|"text_only_question"|"true_false_question"]
   #   The type of question. Multiple optional fields depend upon the type of question to be used.
   #
   # @argument question[position] [Integer]
@@ -315,7 +315,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
   # @argument question[quiz_group_id] [Integer]
   #   The id of the quiz group to assign the question to.
   #
-  # @argument question[question_type] ["calculated_question"|"essay_question"|"file_upload_question"|"fill_in_multiple_blanks_question"|"matching_question"|"multiple_answers_question"|"multiple_choice_question"|"multiple_dropdowns_question"|"numerical_question"|"short_answer_question"|"text_only_question"]
+  # @argument question[question_type] ["calculated_question"|"essay_question"|"file_upload_question"|"fill_in_multiple_blanks_question"|"matching_question"|"multiple_answers_question"|"multiple_choice_question"|"multiple_dropdowns_question"|"numerical_question"|"short_answer_question"|"text_only_question"|"true_false_question"]
   #   The type of question. Multiple optional fields depend upon the type of question to be used.
   #
   # @argument question[position] [Integer]

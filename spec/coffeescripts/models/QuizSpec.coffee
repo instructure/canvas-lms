@@ -10,11 +10,9 @@ define [
   module 'Quiz',
     setup: ->
       @quiz = new Quiz(id: 1, html_url: 'http://localhost:3000/courses/1/quizzes/24')
-      @ajaxStub = sinon.stub $, 'ajaxJSON'
+      @ajaxStub = @stub $, 'ajaxJSON'
 
     teardown: ->
-      $.ajaxJSON.restore()
-
 
   # Initialize
 
@@ -25,7 +23,6 @@ define [
     assign = id: 1, title: 'Foo Bar'
     @quiz = new Quiz(assignment: assign)
     equal @quiz.get('assignment').constructor, Assignment
-
 
   test '#initialize ignores assignment_overrides if not given', ->
     ok !@quiz.get('assignment_overrides')
@@ -46,7 +43,6 @@ define [
   test '#initialize should set unpublish_url from html url', ->
     equal @quiz.get('unpublish_url'), 'http://localhost:3000/courses/1/quizzes/unpublish'
 
-
   test '#initialize should set title_label from title', ->
     @quiz = new Quiz(title: 'My Quiz!', readable_type: 'Quiz')
     equal @quiz.get('title_label'), 'My Quiz!'
@@ -54,7 +50,6 @@ define [
   test '#initialize should set title_label from readable_type', ->
     @quiz = new Quiz(readable_type: 'Quiz')
     equal @quiz.get('title_label'), 'Quiz'
-
 
   test '#initialize defaults unpublishable to true', ->
     ok @quiz.get('unpublishable')
@@ -67,14 +62,12 @@ define [
     @quiz = new Quiz(can_unpublish: false, published: true)
     ok !@quiz.get('unpublishable')
 
-
   test "#initialize sets question count", ->
     @quiz = new Quiz(question_count: 1, published: true)
     equal @quiz.get('question_count_label'), "1 Question"
 
     @quiz = new Quiz(question_count: 2, published: true)
     equal @quiz.get('question_count_label'), "2 Questions"
-
 
   test "#initialize sets possible points count with no points", ->
     @quiz = new Quiz()
@@ -91,7 +84,6 @@ define [
   test "#initialize sets possible points count with 2 points", ->
     @quiz = new Quiz(points_possible: 2)
     equal @quiz.get('possible_points_label'), "2 pts"
-
 
   # Publishing
 
@@ -110,7 +102,6 @@ define [
   test '#unpublish sets published attribute to false', ->
     @quiz.unpublish()
     ok !@quiz.get('published')
-
 
   # multiple due dates
 
@@ -151,10 +142,8 @@ define [
       {due_at: null, title: "Everyone"},
       {due_at: dueAt, title: "Summer"}
     ]
-    false_stub = sinon.stub quiz, "multipleDueDates"
-    false_stub.returns false
+    @stub quiz, "multipleDueDates", -> false
     deepEqual quiz.singleSectionDueDate(), dueAt.toISOString()
-    false_stub.restore()
 
   test "returns due_at when only one date/section are present", ->
     date = Date.now()
@@ -208,9 +197,6 @@ define [
       {due_at: null, title: "Everyone"},
       {due_at: dueAt, title: "Summer"}
     ]
-    false_stub = sinon.stub quiz, "multipleDueDates"
-    false_stub.returns false
+    @stub quiz, "multipleDueDates", -> false
     json = quiz.toView()
     equal json.singleSectionDueDate, dueAt.toISOString()
-    false_stub.restore()
-

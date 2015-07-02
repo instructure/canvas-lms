@@ -514,7 +514,7 @@ describe CommunicationChannelsController do
 
       it "should not show users that can't have a pseudonym created for the correct account" do
         Pseudonym.any_instance.stubs(:works_for_account?).returns(false)
-        @account1.account_authorization_configs.create!(:auth_type => 'cas')
+        @account1.authentication_providers.create!(:auth_type => 'cas')
         user_with_pseudonym(:active_all => 1, :account => @account1, :username => 'jt@instructure.com')
 
         course(:active_all => 1, :account => @account2)

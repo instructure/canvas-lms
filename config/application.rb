@@ -107,37 +107,41 @@ module CanvasRails
       ActiveSupport::JSON::Encoding.escape_html_entities_in_json = true
     end
 
-    if CANVAS_RAILS3
-      # This patch is perfectly placed to go in as soon as the PostgreSQLAdapter
-      # is required for the first time, but before it's actually used.
-      #
-      # This patch won't be required in Rails >= 4.0.0, which supports params such as
-      # connect_timeout.
-      ActiveRecord::Base::ConnectionSpecification.class_eval do
-        def initialize_with_postgresql_patches(config, adapter_method)
-          initialize_without_postgresql_patches(config, adapter_method)
-          if adapter_method == "postgresql_connection" && !defined?(@@postgresql_patches_applied)
-            ActiveRecord::Base.class_eval do
-              def self.postgresql_connection(config) # :nodoc:
-                config = config.symbolize_keys
-                config[:user] ||= config.delete(:username) if config.key?(:username)
-
-                if config.key?(:database)
-                  config[:dbname] = config[:database]
-                else
-                  raise ArgumentError, "No database specified. Missing argument: database."
-                end
-                conn_params = config.slice(:host, :port, :dbname, :user, :password, :connect_timeout)
-
-                # The postgres drivers don't allow the creation of an unconnected PGconn object,
-                # so just pass a nil connection object for the time being.
-                ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.new(nil, logger, [conn_params], config)
-              end
-            end
-            @@postgresql_patches_applied = true
-          end
+    module PostgreSQLPreparedStatementsDefault
+      def initialize(connection, logger, connection_parameters, config)
+        unless config.key?(:prepared_statements)
+          config = config.dup
+          config[:prepared_statements] = false
         end
-        alias_method_chain :initialize, :postgresql_patches unless private_instance_methods.include?(:initialize_without_postgresql_patches)
+        super(connection, logger, connection_parameters, config)
+      end
+    end
+
+    Autoextend.hook(:"ActiveRecord::ConnectionAdapters::PostgreSQLAdapter",
+                    PostgreSQLPreparedStatementsDefault,
+                    method: :prepend)
+
+    if CANVAS_RAILS3
+      module PostgreSQLConnectTimeoutParam
+        def postgresql_connection(config) # :nodoc:
+          config = config.symbolize_keys
+          config[:user] ||= config.delete(:username) if config.key?(:username)
+
+          if config.key?(:database)
+            config[:dbname] = config[:database]
+          else
+            raise ArgumentError, "No database specified. Missing argument: database."
+          end
+          conn_params = config.slice(:host, :port, :dbname, :user, :password, :connect_timeout)
+
+          # The postgres drivers don't allow the creation of an unconnected PGconn object,
+          # so just pass a nil connection object for the time being.
+          ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.new(nil, logger, [conn_params], config)
+        end
+      end
+
+      Autoextend.hook(:"ActiveRecord::ConnectionAdapters::PostgreSQLAdapter") do
+        ActiveRecord::Base.singleton_class.prepend(PostgreSQLConnectTimeoutParam)
       end
     end
 

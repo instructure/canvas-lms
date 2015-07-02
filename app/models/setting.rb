@@ -28,7 +28,13 @@ class Setting < ActiveRecord::Base
     if @@cache.has_key?(name)
       @@cache[name]
     else
-      @@cache[name] = Setting.where(name: name).first.try(:value) || default.try(:to_s)
+      begin
+        from_db = Setting.where(name: name).first.try(:value)
+      rescue ActiveRecord::StatementInvalid => e
+        # the db may not exist yet
+        Rails.logger.warn("Unable to read setting: #{e}")
+      end
+      @@cache[name] = from_db || default.try(:to_s)
     end
   end
 

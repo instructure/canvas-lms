@@ -9,6 +9,10 @@ requirejs.config({
       'compiled': 'canvas/compiled',
       'jquery': 'canvas/vendor/jquery-1.7.2',
       'jqueryui': 'canvas/vendor/jqueryui',
+      'vendor': 'canvas/vendor',
+      'timezone': 'canvas/timezone',
+      'jquery.instructure_date_and_time': 'canvas/jquery.instructure_date_and_time',
+      'i18nObj': 'i18n'
     },
 
     'canvas/jquery.instructure_date_and_time': {
@@ -38,10 +42,6 @@ requirejs.config({
 
     'canvas/timezone': {
       'timezone_plugin': 'canvas/timezone_plugin'
-    },
-
-    'canvas/timezone_core': {
-      'vendor/timezone': 'canvas/vendor/timezone'
     },
 
     'canvas/vendor/date': {

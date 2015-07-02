@@ -244,6 +244,20 @@ EOS
     end
   end
 
+  context "banner" do
+    it "should add a banner above and below the text equal to text length" do
+      th.banner('hi', char: '#').should eq "##\nhi\n##"
+    end
+
+    it "should default to '*' if not char is passed" do
+      th.banner('hi').should eq "**\nhi\n**"
+    end
+
+    it "should return the input text if it is nil or empty" do
+      th.banner('').should eq ''
+    end
+  end
+
   context "#strip_and_truncate" do
     it "should strip and truncate text" do
       HtmlTextHelper.stub(:strip_tags){"something else"}

@@ -50,7 +50,7 @@ describe Login::CasController do
     request_text.strip!
 
     session[:cas_session] = cas_ticket
-    session[:login_aac] = Account.default.account_authorization_configs.first
+    session[:login_aac] = Account.default.authentication_providers.first
     @pseudonym.claim_cas_ticket(cas_ticket)
 
     post :destroy, logoutRequest: request_text

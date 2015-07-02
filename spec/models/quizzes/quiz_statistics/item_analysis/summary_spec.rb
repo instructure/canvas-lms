@@ -35,6 +35,31 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Summary do
       expect(middle).to be_approximately 0.46, 0.06
       expect(bottom).to be_approximately 0.27, 0.03
     end
+
+    it "resolves ties by moving them to a higher bucket" do
+      simple_quiz_with_submissions %w{T T A},
+        %w{T T A}, %w{T T A}, %w{F F B}, %w{F F B}
+
+      # non-ties would result in 1, 2, 1
+      summary = Quizzes::QuizStatistics::ItemAnalysis::Summary.new(@quiz,
+        buckets: [[:top, 0.75], [:middle, 0.25], [:bottom, 0]])
+      buckets = summary.buckets
+      expect(buckets[:top].length).to eq 2
+      expect(buckets[:middle].length).to eq 2
+      expect(buckets[:bottom].length).to eq 0
+    end
+
+    it "doesn't choke when everyone was perfect" do
+      simple_quiz_with_submissions %w{T T A},
+                                   %w{T T A}, %w{T T A}
+
+      summary = Quizzes::QuizStatistics::ItemAnalysis::Summary.new(@quiz)
+      buckets = summary.buckets
+      expect(buckets[:top].length).to eq 2
+      expect(buckets[:middle].length).to eq 0
+      expect(buckets[:bottom].length).to eq 0
+    end
+
   end
 
   describe "#add_response" do

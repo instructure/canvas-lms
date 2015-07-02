@@ -15,10 +15,9 @@ define [
                             model: new ContentMigration
 
     $('#fixtures').html copyCourseView.render().el
-    sinonSpy = sinon.spy(copyCourseView.dateShift, 'updateNewDates')
+    sinonSpy = @spy(copyCourseView.dateShift, 'updateNewDates')
     course = {start_at: 'foo', end_at: 'bar'}
     copyCourseView.courseFindSelect.trigger 'course_changed', course
     ok sinonSpy.calledWith(course), "Called updateNewDates with passed in object"
 
     copyCourseView.remove()
-

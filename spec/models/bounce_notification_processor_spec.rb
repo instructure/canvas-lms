@@ -48,9 +48,19 @@ describe BounceNotificationProcessor do
       queue.expects(:poll).multiple_yields(*@all_bounce_messages_json.map {|m| mock_message(m)})
       bnp.stubs(:bounce_queue).returns(queue)
 
-      CommunicationChannel.expects(:bounce_for_path).with('hard@example.edu').times(5)
-      CommunicationChannel.expects(:bounce_for_path).with('suppressed@example.edu').times(1)
-      CommunicationChannel.expects(:bounce_for_path).with('soft@example.edu').times(0)
+      CommunicationChannel.expects(:bounce_for_path).with do |path:, timestamp:, details:, suppression_bounce:|
+        path == 'hard@example.edu' &&
+        timestamp == '2014-08-22T12:25:46.786Z' &&
+        suppression_bounce == false
+      end.times(4)
+      CommunicationChannel.expects(:bounce_for_path).with do |path:, timestamp:, details:, suppression_bounce:|
+        path == 'suppressed@example.edu' &&
+        timestamp == '2014-08-22T12:18:58.044Z' &&
+        suppression_bounce == true
+      end.times(1)
+      CommunicationChannel.expects(:bounce_for_path).with do |path:, timestamp:, details:, suppression_bounce:|
+        path == 'soft@example.edu'
+      end.times(0)
 
       bnp.process
     end

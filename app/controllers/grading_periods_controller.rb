@@ -91,8 +91,7 @@ class GradingPeriodsController < ApplicationController
   #   }
   #
   def show
-    params_id = params[:id].to_i
-    grading_period = GradingPeriod.context_find(context: @context, id: params_id)
+    grading_period = GradingPeriod.context_find(@context, params[:id])
     fail ActionController::RoutingError.new('Not Found') if grading_period.blank?
 
     if authorized_action(grading_period, @current_user, :read)

@@ -1574,6 +1574,16 @@ CanvasRails::Application.routes.draw do
       get 'courses/:course_id/outcome_results', action: :index, as: 'course_outcome_results'
     end
 
+    scope(controller: :outcomes_import_api) do
+      # These can be uncommented when implemented
+      # get  "global/outcomes_import",            action: :index
+      # get  "global/outcomes_import/:id",        action: :show
+      # put  "global/outcomes_import/:id",        action: :cancel
+      # get  "global/outcomes_import/list/:guid", action: :list
+      get  "global/outcomes_import/available",  action: :available
+      post "global/outcomes_import",            action: :create
+    end
+
     scope(controller: :group_categories) do
       resources :group_categories, except: [:index, :create]
       get 'accounts/:account_id/group_categories', action: :index, as: 'account_group_categories'
@@ -1723,5 +1733,12 @@ CanvasRails::Application.routes.draw do
 
     #Tool Proxy Services
     get  "tool_proxy/:tool_proxy_guid", controller: 'lti/ims/tool_proxy', action: :show, as: "show_lti_tool_proxy"
+  end
+
+  ApiRouteSet.draw(self, '/api/sis') do
+    scope(controller: :sis_api) do
+      get 'accounts/:account_id/assignments', action: 'sis_assignments', as: :sis_account_assignments
+      get 'courses/:course_id/assignments', action: 'sis_assignments', as: :sis_course_assignments
+    end
   end
 end

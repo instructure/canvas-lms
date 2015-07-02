@@ -5,8 +5,8 @@ define [
   'compiled/views/outcomes/OutcomeView'
 ], ($, Backbone, Outcome, OutcomeView) ->
 
-  newOutcome = (options) ->
-    new Outcome(buildOutcome(options), { parse: true })
+  newOutcome = (outcomeOptions, outcomeLinkOptions) ->
+    new Outcome(buildOutcome(outcomeOptions, outcomeLinkOptions), { parse: true })
 
   outcome1 = ->
     new Outcome(buildOutcome1(), { parse: true })
@@ -17,7 +17,7 @@ define [
       "calculation_int" : "65"
     )
 
-  buildOutcome = (options) ->
+  buildOutcome = (outcomeOptions, outcomeLinkOptions) ->
     base =
       "context_type" : "Course"
       "context_id" : 1
@@ -36,7 +36,8 @@ define [
         "calculation_int" : 65
         "assessed" : false
         "can_edit" : true
-    $.extend base.outcome, options if options
+    $.extend base.outcome, outcomeOptions if outcomeOptions
+    $.extend base, outcomeLinkOptions if outcomeLinkOptions
     base
 
   createView = (opts) ->
@@ -171,7 +172,11 @@ define [
     view.remove()
 
   test 'edit and delete buttons are disabled for outcomes that have been assessed', ->
-    view = createView(model: newOutcome('assessed' : true, 'native' : true, 'can_edit' : true), state: 'show')
+    view = createView
+      model: newOutcome(
+        { 'assessed' : true, 'native' : true, 'can_edit' : true },
+        { 'assessed' : true }),
+      state: 'show'
     ok view.$('.edit_button').length > 0
     ok view.$('.delete_button').length > 0
     ok view.$('.edit_button').attr('disabled')
@@ -179,7 +184,11 @@ define [
     view.remove()
 
   test 'edit and delete buttons are enabled for outcomes that have not been assessed', ->
-    view = createView(model: newOutcome('assessed' : false, 'native' : true, 'can_edit' : true), state: 'show')
+    view = createView
+      model: newOutcome(
+        { 'assessed' : false, 'native' : true, 'can_edit' : true },
+        { 'assessed' : false }),
+      state: 'show'
     ok view.$('.edit_button').length > 0
     ok view.$('.delete_button').length > 0
     ok not view.$('.edit_button').attr('disabled')
@@ -187,7 +196,11 @@ define [
     view.remove()
 
   test 'an informative banner is displayed when edit/delete buttons are disabled', ->
-    view = createView(model: newOutcome('assessed' : true, 'native' : true), state: 'show')
+    view = createView
+      model: newOutcome(
+        { 'assessed' : true, 'native' : true },
+        { 'assessed' : true }),
+      state: 'show'
     ok view.$('#assessed_info_banner').length > 0
     view.remove()
 
@@ -216,4 +229,53 @@ define [
     view = createView(model: newOutcome('calculation_method' : 'n_mastery', 'calculation_int' : 5), state: 'edit')
     changeSelectedCalcMethod(view, 'n_mastery')
     equal view.$('#calculation_int').val(), '5'
+    view.remove()
+
+  test 'delete button is disabled for account outcomes that have been assessed in this course', ->
+    view = createView
+      model: newOutcome(
+        {
+          'assessed' : true,
+          'native' : false,
+          'can_edit' : true,
+          'context_type' : 'Account'
+        },
+        {
+          'assessed' : true
+        }
+      ),
+      state: 'show'
+
+    ok view.$el.find('.delete_button').length > 0
+    ok view.$el.find('.delete_button').attr('disabled')
+    view.remove()
+
+  test 'delete button is enabled for account outcomes that have been assessed, but not in this course', ->
+    view = createView
+      model: newOutcome(
+        {
+          'assessed' : true,
+          'native' : false,
+          'can_edit' : true,
+          'context_type' : 'Account'
+        },
+        {
+          'assessed' : false
+        }
+      ),
+      state: 'show'
+
+    ok view.$el.find('.delete_button').length > 0
+    ok not view.$el.find('.delete_button').attr('disabled')
+    view.remove()
+
+  test 'validates display_name length', ->
+    long_name = "long outcome name "
+    long_name += long_name for _ in [1..5]
+    ok long_name.length > 256
+    view = createView(model: @outcome1, state: 'edit')
+    view.$('#display_name').val(long_name)
+    view.$('#display_name').trigger('change')
+    ok !view.isValid()
+    ok view.errors.display_name
     view.remove()

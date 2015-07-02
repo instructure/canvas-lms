@@ -73,7 +73,7 @@ module Api::V1
       # load all versions for the given submissions and back-populate their
       # versionable associations
       submission_index = submissions.index_by(&:id)
-      versions = Version.where(:versionable_type => 'Submission', :versionable_id => submissions).order('number DESC')
+      versions = Version.where(:versionable_type => 'Submission', :versionable_id => submissions).order(:number)
       versions.each{ |version| version.versionable = submission_index[version.versionable_id] }
 
       # convert them all to json and then group by submission
@@ -81,9 +81,9 @@ module Api::V1
       versions_hash = versions.group_by{ |version| version[:id] }
 
       # populate previous_* and new_* keys and convert hash to array of objects
-      versions_hash.inject([]) do |memo, (submission_id, versions)|
+      versions_hash.inject([]) do |memo, (submission_id, submission_versions)|
         prior = HashWithIndifferentAccess.new
-        filtered_versions = versions.sort_by{|v| v[:graded_at].to_i || 0 }.each_with_object([]) do |version, new_array|
+        filtered_versions = submission_versions.each_with_object([]) do |version, new_array|
           if version[:score]
             if prior[:id].nil? || prior[:score] != version[:score]
               if prior[:id].nil? || prior[:graded_at].nil? || version[:graded_at].nil?

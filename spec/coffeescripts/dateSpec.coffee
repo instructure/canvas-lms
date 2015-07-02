@@ -58,7 +58,7 @@ define [ 'vendor/date' ], ->
 
     for offset, expectedResult of examples
       date = new Date
-      sinon.stub(date, 'getTimezoneOffset').returns(Number(offset))
+      @stub(date, 'getTimezoneOffset').returns(Number(offset))
       equal date.getUTCOffset(), expectedResult
 
   test 'date.add* at DST-end', ->

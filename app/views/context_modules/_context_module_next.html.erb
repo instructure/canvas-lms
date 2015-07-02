@@ -115,7 +115,7 @@
                                                   :modules => [context_module ? context_module.id : "{{ id }}"]) %>
               <a class="menu_tool_link" href="<%= tool_path %>">
                 <% if icon_url = tool.extension_setting(:module_menu, :icon_url) %><img class="icon" src="<%= icon_url %>" /><% end %>
-                <%= tool.label_for(:module_menu) %>
+                <%= tool.label_for(:module_menu, I18n.locale) %>
               </a>
             </li>
           <% end %>

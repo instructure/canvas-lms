@@ -6,9 +6,22 @@
         <td><input id="assignment_title" name="assignment[title]" size="30" maxlength="255" style="width: 200px;" type="text" value="{{title}}"/></td>
       </tr>
       <tr>
-        <td><label for="assignment_due_at">{{#t "due"}}Due:{{/t}}</label></td>
         <td>
-          <input class="datetime_field" id="assignment_due_at" name="assignment[due_at]" size="30" style="width: 150px;" type="text" aria-label="{{#t}}Due on Date:{{/t}}"/>
+          <label for="assignment_due_at">{{#t "due"}}Due:{{/t}}</label>
+          <label class="screenreader-only" id="calendar_assignment_due_date_accessible_label">
+             {{#t}}Due on date{{/t}}
+             {{datepickerScreenreaderPrompt}}
+           </label>
+        </td>
+        <td>
+          <input class="datetime_field"
+                 id="assignment_due_at"
+                 name="assignment[due_at]"
+                 size="30"
+                 style="width: 150px;"
+                 type="text"
+                 aria-labelledby="calendar_assignment_due_date_accessible_label"
+                 data-tooltip title="{{accessibleDateFormat}}"/>
         </td>
       </tr>
       <tr class="context_select">

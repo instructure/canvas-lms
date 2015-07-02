@@ -25,7 +25,7 @@ define [
     ok $(form).attr('class').match(/hidden/), 'is hidden from user'
 
   test 'only enques uploads when state.newUploads is true', ->
-    sinon.spy(@button, 'queueUploads')
+    @spy(@button, 'queueUploads')
 
     @button.state.nameCollisions.length = 0
     @button.state.resolvedNames.length = 1
@@ -37,5 +37,3 @@ define [
     FileOptionsCollection.state.newOptions = true
     @button.componentDidUpdate()
     equal @button.queueUploads.callCount, 1
-
-    @button.queueUploads.restore()

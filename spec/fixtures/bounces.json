@@ -47,17 +47,6 @@
         "Type" : "Notification",
         "MessageId" : "example-id",
         "TopicArn" : "example-arn",
-        "Message" : "{\"notificationType\":\"Bounce\",\"bounce\":{\"bounceSubType\":\"Suppressed\",\"bounceType\":\"Permanent\",\"bouncedRecipients\":[{\"status\":\"5.1.1\",\"action\":\"failed\",\"diagnosticCode\":\"Amazon SES has suppressed sending to this address because it has a recent history of bouncing as an invalid address. For more information about how to remove an address from the suppression list, see the Amazon SES Developer Guide: http://docs.aws.amazon.com/ses/latest/DeveloperGuide/remove-from-suppressionlist.html \",\"emailAddress\":\"hard@example.edu\"}],\"reportingMTA\":\"dns; amazonses.com\",\"timestamp\":\"2014-08-22T12:18:57.314Z\",\"feedbackId\":\"example-id\"},\"mail\":{\"timestamp\":\"2014-08-22T12:18:57.000Z\",\"destination\":[\"hard@example.edu\"],\"source\":\"notifications@instructure.com\",\"messageId\":\"example-id\"}}",
-        "Timestamp" : "2014-08-22T12:18:57.429Z",
-        "SignatureVersion" : "1",
-        "Signature" : "example==",
-        "SigningCertURL" : "https://example.com/example.pem",
-        "UnsubscribeURL" : "https://example.com/unsubscribe"
-    },
-    {
-        "Type" : "Notification",
-        "MessageId" : "example-id",
-        "TopicArn" : "example-arn",
         "Message" : "{\"notificationType\":\"Bounce\",\"bounce\":{\"bounceSubType\":\"General\",\"bounceType\":\"Transient\",\"reportingMTA\":\"dns;SCN-EX13MB03.scn.internal\",\"bouncedRecipients\":[{\"status\":\"5.7.1\",\"action\":\"failed\",\"diagnosticCode\":\"smtp;550 5.7.1 RESOLVER.RST.AuthRequired; authentication required\",\"emailAddress\":\"soft@example.edu\"}],\"timestamp\":\"2014-08-22T13:24:31.000Z\",\"feedbackId\":\"example-id\"},\"mail\":{\"timestamp\":\"2014-08-22T13:24:23.000Z\",\"source\":\"notifications@instructure.com\",\"messageId\":\"example-id\",\"destination\":[\"soft@example.edu\"]}}",
         "Timestamp" : "2014-08-22T13:24:36.599Z",
         "SignatureVersion" : "1",

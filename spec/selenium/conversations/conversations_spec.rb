@@ -20,43 +20,43 @@ describe "conversations new" do
       conversation(@teacher, @s1, @s2, workflow_state: 'archived', starred: true)
     end
 
-    it "should default to inbox view" do
+    it "should default to inbox view", priority: "1", test_id: 86601 do
       get_conversations
       selected = expect(get_bootstrap_select_value(get_view_filter)).to eq 'inbox'
       expect(conversation_elements.size).to eq 2
     end
 
-    it "should have an unread view" do
+    it "should have an unread view", priority: "1", test_id: 197523 do
       get_conversations
       select_view('unread')
       expect(conversation_elements.size).to eq 1
     end
 
-    it "should have an starred view" do
+    it "should have an starred view", priority: "1", test_id: 197524 do
       get_conversations
       select_view('starred')
       expect(conversation_elements.size).to eq 2
     end
 
-    it "should have an sent view" do
+    it "should have an sent view", priority: "1", test_id: 197525 do
       get_conversations
       select_view('sent')
       expect(conversation_elements.size).to eq 3
     end
 
-    it "should have an archived view" do
+    it "should have an archived view", priority: "1", test_id: 197526 do
       get_conversations
       select_view('archived')
       expect(conversation_elements.size).to eq 1
     end
 
-    it "should default to all courses view" do
+    it "should default to all courses context", priority: "1", test_id: 197527 do
       get_conversations
       selected = expect(get_bootstrap_select_value(get_course_filter)).to eq ''
       expect(conversation_elements.size).to eq 2
     end
 
-    it "should truncate long course names" do
+    it "should truncate long course names", priority: "2", test_id: 197528 do
       @course.name = "this is a very long course name that will be truncated"
       @course.save!
       get_conversations
@@ -67,20 +67,20 @@ describe "conversations new" do
       expect(button_text[-5..-1]).to eq @course.name[-5..-1]
     end
 
-    it "should filter by course" do
+    it "should filter by course", priority: "1", test_id: 197529 do
       get_conversations
       select_course(@course.id)
       expect(conversation_elements.size).to eq 2
     end
 
-    it "should filter by course plus view" do
+    it "should filter by course plus view", priority: "1", test_id: 197530 do
       get_conversations
       select_course(@course.id)
       select_view('unread')
       expect(conversation_elements.size).to eq 1
     end
 
-    it "should hide the spinner after deleting the last conversation" do
+    it "should hide the spinner after deleting the last conversation", priority: "1", test_id: 207164 do
       get_conversations
       select_view('archived')
       expect(conversation_elements.size).to eq 1
@@ -103,7 +103,7 @@ describe "conversations new" do
       @conv_starred.save!
     end
 
-    it "should star via star icon" do
+    it "should star via star icon", priority: "1", test_id: 197532 do
       get_conversations
       unstarred_elt = conversation_elements[1]
       # make star button visible via mouse over
@@ -119,7 +119,7 @@ describe "conversations new" do
       expect(@conv_unstarred.reload.starred).to be_truthy
     end
 
-    it "should unstar via star icon" do
+    it "should unstar via star icon", priority: "1", test_id: 197533 do
       get_conversations
       starred_elt = conversation_elements[0]
       star_btn = f('.star-btn', starred_elt)
@@ -132,7 +132,7 @@ describe "conversations new" do
       expect(@conv_starred.reload.starred).to be_falsey
     end
 
-    it "should star via gear menu" do
+    it "should star via gear menu", priority: "1", test_id: 197534 do
       get_conversations
       unstarred_elt = conversation_elements[1]
       unstarred_elt.click
@@ -143,7 +143,7 @@ describe "conversations new" do
       expect(@conv_unstarred.reload.starred).to be_truthy
     end
 
-    it "should unstar via gear menu" do
+    it "should unstar via gear menu", priority: "1", test_id: 197535 do
       get_conversations
       starred_elt = conversation_elements[0]
       starred_elt.click

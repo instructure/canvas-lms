@@ -29,7 +29,7 @@ define ['compiled/models/progressable', 'Backbone'], (progressable, {Model}) ->
       clock.restore()
 
   test 'set progress_url', ->
-    spy = sinon.spy()
+    spy = @spy()
     model.progressModel.on 'complete', spy
     model.on 'progressResolved', spy
     model.set progress_url: progressUrl
@@ -40,7 +40,7 @@ define ['compiled/models/progressable', 'Backbone'], (progressable, {Model}) ->
     equal model.get('csv'), 'one,two,three'
 
   test 'set progress.url', ->
-    spy = sinon.spy()
+    spy = @spy()
     model.progressModel.on 'complete', spy
     model.on 'progressResolved', spy
     model.progressModel.set url: progressUrl, workflow_state: 'queued'
@@ -50,5 +50,3 @@ define ['compiled/models/progressable', 'Backbone'], (progressable, {Model}) ->
     server.respond()
     equal model.progressModel.get('workflow_state'), 'completed'
     equal model.get('csv'), 'one,two,three'
-
-

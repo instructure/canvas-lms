@@ -17,16 +17,16 @@
 #
 
 class AccountAuthorizationConfig::LinkedIn < AccountAuthorizationConfig::Oauth2
-  def self.recognized_params
-    [ :login_attribute ].freeze
-  end
-
   include AccountAuthorizationConfig::PluginSettings
   self.plugin = :linked_in
   plugin_settings :client_id, client_secret: :client_secret_dec
 
   def self.sti_name
     'linkedin'.freeze
+  end
+
+  def self.recognized_params
+    [ :login_attribute ].freeze
   end
 
   def self.login_attributes

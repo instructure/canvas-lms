@@ -25,11 +25,10 @@
             <%= render(:partial => 'shared/svg/svg_commons_logo.svg') %>
             <div class="menu-item__text">
           <% end %>
-          <%= tool.label_for(:global_navigation) %>
+          <%= tool.label_for(:global_navigation, I18n.locale) %>
           <% if k12? %></div><% end %>
         </a>
       <% end %>
-
       </li>
     <% end %>
   <% end %>

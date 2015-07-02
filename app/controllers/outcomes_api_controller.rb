@@ -216,21 +216,15 @@ class OutcomesApiController < ApplicationController
   def update
     return unless authorized_action(@outcome, @current_user, :update)
 
-    @outcome.update_attributes(params.slice(:title, :display_name, :description, :vendor_guid, :calculation_method, :calculation_int))
-
-    if params[:mastery_points] || params[:ratings]
-      criterion = @outcome.data && @outcome.data[:rubric_criterion]
-      criterion ||= {}
-      if params[:mastery_points]
-        criterion[:mastery_points] = params[:mastery_points]
-      else
-        criterion.delete(:mastery_points)
-      end
-      if params[:ratings]
-        criterion[:ratings] = params[:ratings]
-      end
-      @outcome.rubric_criterion = criterion
+    if @outcome.assessed?
+      return render(
+        :json => assessed_outcome_error_message,
+        :status => :bad_request
+      )
     end
+
+    @outcome.update_attributes(params.slice(*DIRECT_PARAMS))
+    update_outcome_criterion(@outcome) if params[:mastery_points] || params[:ratings]
 
     if @outcome.save
       render :json => outcome_json(@outcome, @current_user, session)
@@ -244,4 +238,26 @@ class OutcomesApiController < ApplicationController
   def get_outcome
     @outcome = LearningOutcome.active.find(params[:id])
   end
+
+  def update_outcome_criterion(outcome)
+    criterion = outcome.data && outcome.data[:rubric_criterion]
+    criterion ||= {}
+    if params[:mastery_points]
+      criterion[:mastery_points] = params[:mastery_points]
+    else
+      criterion.delete(:mastery_points)
+    end
+    if params[:ratings]
+      criterion[:ratings] = params[:ratings]
+    end
+    outcome.rubric_criterion = criterion
+  end
+
+  def assessed_outcome_error_message
+    message = t("This outcome has been used to assess a student and can no longer be updated")
+    { errors: message }
+  end
+
+  # Direct params are those that have a direct correlation to attrs in the model
+  DIRECT_PARAMS = %w[title display_name description vendor_guid calculation_method calculation_int].freeze
 end

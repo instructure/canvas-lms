@@ -8,7 +8,7 @@ gem 'simplecov-rcov', '0.2.3', :require => false
 
 gem 'canvas_text_helper', path: '../canvas_text_helper'
 
-platforms :ruby_20, :ruby_21 do
+platforms :ruby_20, :ruby_21, :ruby_22 do
   gem 'iconv', '1.0.4'
 end
 

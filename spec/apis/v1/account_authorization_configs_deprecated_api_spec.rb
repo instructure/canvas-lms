@@ -31,8 +31,8 @@ describe "AccountAuthorizationConfigs API", type: :request do
              { :controller => 'account_authorization_configs', :action => 'create', :account_id => @account.id.to_s, :format => 'json' },
              { :account_authorization_config => {"0" => {"auth_type" => "cas", "auth_base" => "127.0.0.1"}}})
     @account.reload
-    expect(@account.account_authorization_configs.size).to eq 1
-    config = @account.account_authorization_configs.first
+    expect(@account.authentication_providers.size).to eq 1
+    config = @account.authentication_providers.first
     expect(config.auth_type).to eq 'cas'
     expect(config.auth_base).to eq '127.0.0.1'
   end
@@ -45,9 +45,9 @@ describe "AccountAuthorizationConfigs API", type: :request do
              { :account_authorization_config => {"0" => ldap1, "1" => ldap2}})
 
     @account.reload
-    expect(@account.account_authorization_configs.size).to eq 2
-    config1 = @account.account_authorization_configs.first
-    config2 = @account.account_authorization_configs.second
+    expect(@account.authentication_providers.size).to eq 2
+    config1 = @account.authentication_providers.first
+    config2 = @account.authentication_providers.second
 
     expect(config1.auth_type).to eq 'ldap'
     expect(config1.auth_host).to eq '127.0.0.1'
@@ -63,26 +63,26 @@ describe "AccountAuthorizationConfigs API", type: :request do
   end
 
   it "should update existing configs" do
-    config = @account.account_authorization_configs.create!("auth_type" => "cas", "auth_base" => "127.0.0.1")
+    config = @account.authentication_providers.create!("auth_type" => "cas", "auth_base" => "127.0.0.1")
     api_call(:post, "/api/v1/accounts/#{@account.id}/account_authorization_configs",
              { :controller => 'account_authorization_configs', :action => 'create', :account_id => @account.id.to_s, :format => 'json' },
              { :account_authorization_config => {"0" => {"id" => config.id.to_s, "auth_type" => "cas", "auth_base" => "127.0.0.2"}}})
     @account.reload
     config.reload
 
-    expect(@account.account_authorization_configs.size).to eq 1
-    expect(@account.account_authorization_configs.first).to eq config
+    expect(@account.authentication_providers.size).to eq 1
+    expect(@account.authentication_providers.first).to eq config
     expect(config.auth_base).to eq '127.0.0.2'
   end
 
   it "should delete configs not referenced" do
-    config = @account.account_authorization_configs.create!("auth_type" => "ldap")
-    config = @account.account_authorization_configs.create!("auth_type" => "ldap")
+    @account.authentication_providers.create!("auth_type" => "ldap")
+    config = @account.authentication_providers.create!("auth_type" => "ldap")
     api_call(:post, "/api/v1/accounts/#{@account.id}/account_authorization_configs",
              { :controller => 'account_authorization_configs', :action => 'create', :account_id => @account.id.to_s, :format => 'json' },
              { :account_authorization_config => {"0" => {"id" => config.id.to_s, "auth_type" => "ldap"}}})
     @account.reload
-    expect(@account.account_authorization_configs.count).to eq 1
+    expect(@account.authentication_providers.active.count).to eq 1
   end
 
   it "should discard config parameters not recognized for the given auth_type" do
@@ -90,8 +90,8 @@ describe "AccountAuthorizationConfigs API", type: :request do
              { :controller => 'account_authorization_configs', :action => 'create', :account_id => @account.id.to_s, :format => 'json' },
              { :account_authorization_config => {"0" => {"auth_type" => "cas", "auth_base" => "127.0.0.1", "auth_filter" => "discarded"}}})
     @account.reload
-    expect(@account.account_authorization_configs.size).to eq 1
-    config = @account.account_authorization_configs.first
+    expect(@account.authentication_providers.size).to eq 1
+    config = @account.authentication_providers.first
     expect(config.auth_type).to eq 'cas'
     expect(config.auth_filter).to be_nil
   end
@@ -112,9 +112,9 @@ describe "AccountAuthorizationConfigs API", type: :request do
     it "should set multiple saml configs" do
       update_saml
       @account.reload
-      expect(@account.account_authorization_configs.size).to eq 2
-      config1 = @account.account_authorization_configs.first
-      config2 = @account.account_authorization_configs.second
+      expect(@account.authentication_providers.size).to eq 2
+      config1 = @account.authentication_providers.first
+      config2 = @account.authentication_providers.second
 
       expect(config1.auth_type).to eq 'saml'
       expect(config1.idp_entity_id).to eq 'http://example.com/saml1'
@@ -135,8 +135,8 @@ describe "AccountAuthorizationConfigs API", type: :request do
       update_saml
 
       @account.reload
-      config1 = @account.account_authorization_configs.first
-      config2 = @account.account_authorization_configs.second
+      config1 = @account.authentication_providers.first
+      config2 = @account.authentication_providers.second
 
       @saml1['idp_entity_id'] = 'different'
       @saml1['id'] = config1.id
@@ -146,7 +146,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
       update_saml
 
       @account.reload
-      expect(@account.account_authorization_configs.size).to eq 2
+      expect(@account.authentication_providers.size).to eq 2
 
       config1.reload
       expect(config1.idp_entity_id).to eq 'different'
@@ -156,20 +156,20 @@ describe "AccountAuthorizationConfigs API", type: :request do
 
     it "should use the first config as the default" do
       update_saml
-      expect(@account.account_authorization_configs.first.idp_entity_id).to eq 'http://example.com/saml1'
+      expect(@account.authentication_providers.first.idp_entity_id).to eq 'http://example.com/saml1'
     end
 
     it "should create new configs if they are reordered" do
       update_saml
-      config1 = @account.account_authorization_configs.first
-      config2 = @account.account_authorization_configs.second
+      config1 = @account.authentication_providers.first
+      config2 = @account.authentication_providers.second
 
       update_saml(:account_authorization_config => {"0" => @saml2, "1" => @saml1})
       @account.reload
-      expect(@account.account_authorization_configs.count).to eq 2
+      expect(@account.authentication_providers.active.count).to eq 2
 
-      config3 = @account.account_authorization_configs.first
-      config4 = @account.account_authorization_configs.second
+      config3 = @account.authentication_providers.active.first
+      config4 = @account.authentication_providers.active.second
       expect(config3.idp_entity_id).to eq 'http://example.com/saml2'
       expect(config3.id).not_to eq config2.id
       expect(config4.idp_entity_id).to eq 'http://example.com/saml1'

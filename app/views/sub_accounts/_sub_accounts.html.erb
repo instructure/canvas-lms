@@ -11,7 +11,7 @@
         <button class="btn btn-link add_sub_account_link no-hover" title="<%= t('add_sub_accounts', 'Add Sub-Account') %>" style="<%= hidden unless (keep_going && account && sub_account_count < max_sub_accounts) || (account && sub_account_count == 0) %>"><i class="icon-add standalone-icon"><span class="screenreader-only"><%= t('add_sub_accounts', 'Add Sub-Account') %></span></i></button>
         <button class="btn btn-link edit_account_link no-hover" title="<%= t('edit_account_name', 'Edit Account Name') %>"><i class="icon-edit standalone-icon"><span class="screenreader-only"><%= t('edit_account_name', 'Edit Account Name') %></span></i></button>
         <% if account && !course_count.zero? %>
-          <button aria-disabled=true class="btn btn-link cant_delete_account_link no-hover" title="<%= t('can_not_delete', "You can't delete a sub-account that has courses in it") %>"><i class="icon-end standalone-icon"><span class="screenreader-only"><%= t('can_not_delete', "You can't delete a sub-account that has courses in it") %></span></i></button>
+          <button aria-disabled=true class="btn btn-link cant_delete_account_link no-hover" title="<%= t('can_not_delete', "You can't delete a sub-account that has courses in it") %>"><i class="icon-trash standalone-icon"><span class="screenreader-only"><%= t('can_not_delete', "You can't delete a sub-account that has courses in it") %></span></i></button>
         <% elsif account != @context %>
           <button class="btn btn-link delete_account_link no-hover" title="<%= t('delete_sub_account', 'Delete Sub-Account') %>"><i class="icon-trash standalone-icon"><span class="screenreader-only"><%= t('delete_sub_account', 'Delete Sub-Account') %></span></i></button>
         <% end %>
@@ -35,7 +35,7 @@
       <% @accounts[account.id][:sub_account_ids].each do |sub_account_id| %>
         <li class="sub_account">
           <% account_data = @accounts[sub_account_id] %>
-          <%= render :partial => "sub_accounts", :locals => {:account => account_data[:account], :course_count => account_data[:course_count], :sub_account_count => account_data[:sub_account_count]} %>
+          <%= render :partial => "sub_accounts", :locals => {:account => account_data[:account], :course_count => account_data[:course_count], :sub_account_count => account_data[:sub_account_count], :depth => depth, :current_depth => current_depth + 1} %>
         </li>
       <% end %>
     <% end %>

@@ -9,14 +9,14 @@ module Importers
       data['all_files_export']['file_path'] ||= data['all_files_zip']
       return unless data['all_files_export']['file_path'] && File.exist?(data['all_files_export']['file_path'])
 
-      course.attachment_path_id_lookup ||= {}
-      course.attachment_path_id_lookup_lower ||= {}
+      migration.attachment_path_id_lookup ||= {}
+      migration.attachment_path_id_lookup_lower ||= {}
+
       params = migration.migration_settings[:migration_ids_to_import]
       valid_paths = []
       (data['file_map'] || {}).each do |id, file|
         path = file['path_name'].starts_with?('/') ? file['path_name'][1..-1] : file['path_name']
-        course.attachment_path_id_lookup[path] = file['migration_id']
-        course.attachment_path_id_lookup_lower[path.downcase] = file['migration_id']
+        migration.add_attachment_path(path, file['migration_id'])
         if migration.import_object?("attachments", file['migration_id']) || migration.import_object?("files", file['migration_id'])
           if file['errored']
             migration.add_warning(t(:file_import_warning, "File %{file} could not be found", :file => File.basename(file['path_name'])))
@@ -45,7 +45,7 @@ module Importers
             :callback => callback,
             :logger => logger,
             :rename_files => migration.migration_settings[:files_import_allow_rename],
-            :migration_id_map => course.attachment_path_id_lookup,
+            :migration_id_map => migration.attachment_path_id_lookup,
         }
         if root_path = migration.migration_settings[:files_import_root_path]
           unzip_opts[:root_directory] = Folder.assert_path(
@@ -104,38 +104,29 @@ module Importers
         end
       end
 
-      migration.update_import_progress(31)
-      question_data = Importers::AssessmentQuestionImporter.process_migration(data, migration); migration.update_import_progress(35)
-      Importers::GroupImporter.process_migration(data, migration); migration.update_import_progress(36)
-      Importers::LearningOutcomeImporter.process_migration(data, migration); migration.update_import_progress(37)
-      Importers::RubricImporter.process_migration(data, migration); migration.update_import_progress(38)
+      migration.update_import_progress(35)
+      question_data = Importers::AssessmentQuestionImporter.process_migration(data, migration); migration.update_import_progress(45)
+      Importers::GroupImporter.process_migration(data, migration); migration.update_import_progress(48)
+      Importers::LearningOutcomeImporter.process_migration(data, migration); migration.update_import_progress(50)
+      Importers::RubricImporter.process_migration(data, migration); migration.update_import_progress(52)
       course.assignment_group_no_drop_assignments = {}
-      Importers::AssignmentGroupImporter.process_migration(data, migration); migration.update_import_progress(39)
-      Importers::ExternalFeedImporter.process_migration(data, migration); migration.update_import_progress(39.5)
-      Importers::GradingStandardImporter.process_migration(data, migration); migration.update_import_progress(40)
-      Importers::ContextExternalToolImporter.process_migration(data, migration); migration.update_import_progress(45)
-
-      #These need to be ran twice because they can reference each other
-      Importers::QuizImporter.process_migration(data, migration, question_data); migration.update_import_progress(50)
-      Importers::DiscussionTopicImporter.process_migration(data, migration);migration.update_import_progress(55)
-      Importers::WikiPageImporter.process_migration(data, migration);migration.update_import_progress(60)
-      Importers::AssignmentImporter.process_migration(data, migration);migration.update_import_progress(65)
-
-      # and second time...
-      Importers::ContextModuleImporter.process_migration(data, migration);migration.update_import_progress(70)
-      Importers::QuizImporter.process_migration(data, migration, question_data); migration.update_import_progress(72)
-      Importers::DiscussionTopicImporter.process_migration(data, migration);migration.update_import_progress(75)
-      Importers::WikiPageImporter.process_migration(data, migration);migration.update_import_progress(80)
-      Importers::AssignmentImporter.process_migration(data, migration);migration.update_import_progress(85)
-
-      #These aren't referenced by anything, but reference other things
-      Importers::CalendarEventImporter.process_migration(data, migration);migration.update_import_progress(90)
-      Importers::WikiPageImporter.process_migration_course_outline(data, migration);migration.update_import_progress(95)
+      Importers::AssignmentGroupImporter.process_migration(data, migration); migration.update_import_progress(54)
+      Importers::ExternalFeedImporter.process_migration(data, migration); migration.update_import_progress(56)
+      Importers::GradingStandardImporter.process_migration(data, migration); migration.update_import_progress(58)
+      Importers::ContextExternalToolImporter.process_migration(data, migration); migration.update_import_progress(60)
+      Importers::QuizImporter.process_migration(data, migration, question_data); migration.update_import_progress(65)
+      Importers::DiscussionTopicImporter.process_migration(data, migration); migration.update_import_progress(70)
+      Importers::WikiPageImporter.process_migration(data, migration); migration.update_import_progress(75)
+      Importers::AssignmentImporter.process_migration(data, migration); migration.update_import_progress(80)
+      Importers::ContextModuleImporter.process_migration(data, migration); migration.update_import_progress(85)
+      Importers::WikiPageImporter.process_migration_course_outline(data, migration)
+      Importers::CalendarEventImporter.process_migration(data, migration)
 
       everything_selected = !migration.copy_options || migration.is_set?(migration.copy_options[:everything])
       if everything_selected || migration.is_set?(migration.copy_options[:all_course_settings])
-        self.import_settings_from_migration(course, data, migration); migration.update_import_progress(96)
+        self.import_settings_from_migration(course, data, migration)
       end
+      migration.update_import_progress(90)
 
       # be very explicit about draft state courses, but be liberal toward legacy courses
       if course.wiki.has_no_front_page
@@ -155,7 +146,8 @@ module Importers
         self.import_syllabus_from_migration(course, syllabus_body, migration) if syllabus_body
       end
 
-      migration.add_warnings_for_missing_content_links
+      migration.resolve_content_links!
+      migration.update_import_progress(95)
 
       begin
         #Adjust dates
@@ -226,13 +218,7 @@ module Importers
     end
 
     def self.import_syllabus_from_migration(course, syllabus_body, migration)
-      missing_links = []
-      course.syllabus_body = ImportedHtmlConverter.convert(syllabus_body, course, migration) do |warn, link|
-        missing_links << link if warn == :missing_link
-      end
-      migration.add_missing_content_links(:class => course.class.to_s,
-        :id => course.id, :field => "syllabus", :missing_links => missing_links,
-        :url => "/#{course.class.to_s.underscore.pluralize}/#{course.id}/assignments/syllabus")
+      course.syllabus_body = migration.convert_html(syllabus_body, :syllabus, nil, :syllabus)
     end
 
     def self.import_settings_from_migration(course, data, migration)
