@@ -1,5 +1,6 @@
 @import "base/environment";
 
+
 //// Vertical content alignment on elements in Theme editor
 ///////
 .te-Flex {
@@ -441,4 +442,16 @@ $te-border-color: darken($ic-color-neutral, 10);
   }
 }
 
+.ReactModal__Overlay--Theme__editor_progress {
+  background-color: transparentize($ic-color-light, .2);
+}
 
+@import "components/ProgressBar";
+.Theme__editor_progress {
+  width: 300px;
+  text-align: center;
+  color: ensure-contrast($ic-color-dark, $ic-color-light, true);
+  .progress-bar__bar-container {
+    background-color: $ic-color-light;
+  }
+}

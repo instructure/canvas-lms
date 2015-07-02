@@ -18,8 +18,12 @@ module Canvas
       end
 
       def upload!
+        total_files = local_files.count
+        uploaded_files = 0
         Parallel.each(local_files, :in_threads=>8) do |file|
           upload_file(file)
+          uploaded_files += 1
+          yield (100.0 * uploaded_files / total_files) if block_given?
         end
       end
 

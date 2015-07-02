@@ -16,19 +16,13 @@ define([
 
     propTypes: {
       activeBrandConfigMd5: customTypes.md5,
-      sharedBrandConfigs: customTypes.sharedBrandConfigs
+      sharedBrandConfigs: customTypes.sharedBrandConfigs,
+      saveToSession: React.PropTypes.func.isRequired
     },
 
     selectBrandConfig(md5) {
-      if (md5 === USE_CANVAS_DEFAULT){
-        md5 = ''
-      }
-      $(`
-        <form hidden method="POST" action="/brand_configs" method="POST">
-          <input name="authenticity_token" type="hidden" value="${htmlEscape($.cookie('_csrf_token'))}" />
-          <input name="brand_config[md5]" value="${htmlEscape(md5)}" />
-        </form>
-      `).appendTo('body').submit()
+      if (md5 === USE_CANVAS_DEFAULT) md5 = ''
+      this.props.saveToSession(md5)
     },
 
     defaultValue() {
@@ -50,7 +44,7 @@ define([
             defaultValue={this.defaultValue()}
             onChange={event => this.selectBrandConfig(event.target.value)}
           >
-            <option value="" disabled selected> {I18n.t('-- Start From a Template Theme --')} </option>
+            <option value="" disabled selected> {I18n.t('-- Start From a Template --')} </option>
             <option value={USE_CANVAS_DEFAULT}>{I18n.t('Canvas Default')}</option>
             {this.props.sharedBrandConfigs.map(brandConfig =>
               <option key={brandConfig.md5} value={brandConfig.md5}>

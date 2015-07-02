@@ -3,14 +3,17 @@
 define([
   'i18n!theme_editor',
   'react',
+  'react-modal',
   'str/htmlEscape',
   'compiled/fn/preventDefault',
+  'compiled/models/Progress',
+  'compiled/react_files/components/ProgressBar',
   './PropTypes',
   './ThemeEditorAccordion',
   './SharedBrandConfigPicker'
-], (I18n, React, htmlEscape, preventDefault, customTypes, ThemeEditorAccordion, SharedBrandConfigPicker) => {
+], (I18n, React, Modal, htmlEscape, preventDefault, Progress, ProgressBar, customTypes, ThemeEditorAccordion, SharedBrandConfigPicker) => {
 
-  var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
+  Modal.setAppElement(document.body)
 
   function findVarDef (variableSchema, variableName) {
     for (var i = 0; i < variableSchema.length; i++) {
@@ -23,12 +26,12 @@ define([
     }
   }
 
-  function submitHtmlForm(action, method) {
+  function submitHtmlForm(action, method, md5) {
     $(`
       <form hidden action="${htmlEscape(action)}" method="POST">
         <input name="_method" type="hidden" value="${htmlEscape(method)}" />
         <input name="authenticity_token" type="hidden" value="${htmlEscape($.cookie('_csrf_token'))}" />
-        <input name="brand_config" value="" />
+        <input name="brand_config_md5" value="${htmlEscape(md5 ? md5 : '')}" />
       </form>
     `).appendTo('body').submit()
   }
@@ -47,7 +50,9 @@ define([
     getInitialState() {
       return {
         somethingChanged: false,
-        changedValues: {}
+        changedValues: {},
+        showProgressModal: false,
+        progress: 0
       }
     },
 
@@ -71,8 +76,8 @@ define([
       return val
     },
 
-    resetToCanvasDefaults() {
-      submitHtmlForm('/brand_configs', 'POST')
+    saveToSession(md5) {
+      submitHtmlForm('/brand_configs/save_to_user_session', 'POST', md5)
     },
 
     redirectToWhatIframeIsShowing() {
@@ -98,10 +103,48 @@ define([
       if (confirm(msg)) submitHtmlForm('/brand_configs/save_to_account', 'POST')
     },
 
+    onProgress(data) {
+      this.setState({progress: data.completion})
+    },
+
+    preview() {
+      var newMd5
+
+      this.setState({showProgressModal: true})
+
+      $.ajax({
+        url: '/brand_configs',
+        type: 'POST',
+        data: new FormData(this.refs.ThemeEditorForm.getDOMNode()),
+        processData: false,
+        contentType: false,
+        dataType: "json"
+      })
+      .pipe((resp) => {
+        newMd5 = resp.brand_config.md5
+        if (resp.progress) {
+          return new Progress(resp.progress).poll().progress(this.onProgress)
+        }
+      })
+      .pipe(() => this.saveToSession(newMd5))
+      .fail(() => {
+        alert(I18n.t('An error occured trying to generate this theme, please try again.'))
+        this.setState({showProgressModal: false})
+      })
+    },
+
     render() {
       return (
         <div id="main">
-        <form encType="multipart/form-data" acceptCharset="UTF-8" action="/brand_configs" method="POST" className="Theme__container">
+        <form
+          ref="ThemeEditorForm"
+          onSubmit={preventDefault(this.preview)}
+          encType="multipart/form-data"
+          acceptCharset="UTF-8"
+          action="/brand_configs"
+          method="POST"
+          className="Theme__container"
+        >
           <input name="utf8" type="hidden" value="✓" />
           <input name="authenticity_token" type="hidden" value={$.cookie('_csrf_token')} />
           <div className="Theme__editor">
@@ -111,6 +154,7 @@ define([
                   type='button'
                   className="Theme__editor-header_title-icon btn-link pull-left"
                   onClick={this.exit}
+                  title={I18n.t('Exit Theme Editor')}
                 >
                   <i className="icon-x" />
                   <span className="screenreader-only">{I18n.t('Exit Theme Editor')}</span>
@@ -138,11 +182,12 @@ define([
               </div>
             </div>
 
-            {this.props.sharedBrandConfigs.length ?
-              <SharedBrandConfigPicker sharedBrandConfigs={this.props.sharedBrandConfigs} activeBrandConfigMd5={this.props.brandConfig.md5} />
-            :
-              null
-            }
+            <SharedBrandConfigPicker
+              sharedBrandConfigs={this.props.sharedBrandConfigs}
+              activeBrandConfigMd5={this.props.brandConfig.md5}
+              saveToSession={this.saveToSession}
+            />
+
             <div id="Theme__editor-tabs">
               <div id="te-editor">
                 <div className="Theme__editor-tabs_panel">
@@ -172,6 +217,21 @@ define([
             <iframe ref="previewIframe" src="/?editing_brand_config=1" />
           </div>
         </form>
+        <Modal
+          isOpen={this.state.showProgressModal}
+          className='ReactModal__Content--canvas ReactModal__Content--mini-modal'
+          overlayClassName='ReactModal__Overlay--Theme__editor_progress'
+        >
+          <div className="Theme__editor_progress">
+            <h4>{I18n.t('Generating Preview...')}</h4>
+            <ProgressBar
+              progress={this.state.progress}
+              title={I18n.t('%{percent} complete', {
+                percent: I18n.toPercentage(this.state.progress, {precision: 0})
+              })}
+            />
+          </div>
+        </Modal>
         </div>
       )
     }
