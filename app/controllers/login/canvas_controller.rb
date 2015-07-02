@@ -29,6 +29,7 @@ class Login::CanvasController < ApplicationController
     @headers = false
     @aacs_with_buttons = @domain_root_account.account_authorization_configs.
                            select(&:login_button?)
+    flash.now[:error] = params[:message] if params[:message]
 
     maybe_render_mobile_login
   end

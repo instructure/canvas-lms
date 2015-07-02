@@ -1,0 +1,34 @@
+[
+  {
+    "title": "United States",
+    "guid": "4850ad62",
+    "type": "country",
+    "itm": [
+      {
+        "title": "National Standards",
+        "guid": "18d9f221",
+        "type": "authority",
+        "itm": [
+          {
+            "title": "Common Core State Standards",
+            "guid": "89c8ea94",
+            "type": "document",
+            "chld": "2"
+          },
+          {
+            "title": "NGSS Arranged by Topic",
+            "guid": "138c9cb7",
+            "type": "document",
+            "chld": "1"
+          },
+          {
+            "title": "Next Generation Science Standards NGSS Arranged by Disciplinary Core Idea (DCI)",
+            "guid": "923ce7bf",
+            "type": "document",
+            "chld": "1"
+          }
+        ]
+      }
+    ]
+  }
+]
