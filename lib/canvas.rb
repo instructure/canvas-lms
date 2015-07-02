@@ -1,4 +1,4 @@
-require 'canvas/draft_state_validations'
+require_dependency 'canvas/draft_state_validations'
 
 module Canvas
   # defines the behavior when a protected attribute is assigned to in mass
