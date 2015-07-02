@@ -45,7 +45,8 @@ define([
   'jquery.templateData' /* fillTemplateData, getTemplateData */,
   'vendor/date' /* Date.parse */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'jqueryui/sortable' /* /\.sortable/ */
+  'jqueryui/sortable' /* /\.sortable/ */,
+  'compiled/jquery.rails_flash_notifications'
 ], function(_, ModuleFile, PublishCloud, React, PublishableModuleItem, PublishIconView, INST, I18n, $, ContextModulesView, RelockModulesDialog, vddTooltip, vddTooltipView, Publishable, PublishButtonView, htmlEscape) {
 
   // TODO: AMD don't export global, use as module
@@ -1598,12 +1599,14 @@ define([
             $module.toggleClass('collapsed_module', false);
             // Makes sure the resulting item has focus.
             $module.find(".collapse_module_link").focus();
-
+            $.screenReaderFlashMessage(I18n.t('Expanded'));
+            
           } else {
             $module.find(".footer .manage_module").css('display', ''); //'none');
             $module.toggleClass('collapsed_module', true);
             // Makes sure the resulting item has focus.
             $module.find(".expand_module_link").focus();
+            $.screenReaderFlashMessage(I18n.t('Collapsed'));
           }
           if(expandCallback && $.isFunction(expandCallback)) {
             expandCallback();
