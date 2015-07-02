@@ -9,7 +9,7 @@ class CourseForMenuPresenter
 
   def initialize(course, available_section_tabs)
     @course = course
-    @available_section_tabs = available_section_tabs.select do |tab|
+    @available_section_tabs = (available_section_tabs || []).select do |tab|
       DASHBOARD_CARD_TABS.include?(tab[:id])
     end
   end

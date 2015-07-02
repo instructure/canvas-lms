@@ -487,7 +487,6 @@ class UsersController < ApplicationController
 
     js_env({
       :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
-      :DASHBOARD_COURSES => map_courses_for_menu(@current_user.menu_courses),
       :PREFERENCES => {
         :recent_activity_dashboard => @current_user.preferences[:recent_activity_dashboard]
       }
