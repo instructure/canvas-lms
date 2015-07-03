@@ -589,7 +589,7 @@ RSpec.configure do |config|
     @spec_pseudonym_count += 1 if username =~ /nobody(\+\d+)?@example.com/
     password = opts[:password] || "asdfasdf"
     password = nil if password == :autogenerate
-    account = opts[:account] || Account.default
+    account = (opts[:account] ? opts[:account].root_account : Account.default)
     @pseudonym = account.pseudonyms.build(:user => user, :unique_id => username, :password => password, :password_confirmation => password)
     @pseudonym.save_without_session_maintenance
     @pseudonym.communication_channel = communication_channel(user, opts)
