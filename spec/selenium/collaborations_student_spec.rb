@@ -7,36 +7,29 @@ describe "collaborations" do
   include_examples "in-process server selenium tests"
 
   context "a Student's" do
-    [['EtherPad', 'etherpad'], ['Google Docs', 'google_docs']].each do |title, type|
-      context "#{title} collaboration" do
-        before(:each) do
-          course_with_student_logged_in
-          set_up_google_docs
-        end
+    title = 'Google Docs'
+    type = 'google_docs'
 
-        if type == 'etherpad' then test_id = 158506 end
-        if type == 'google_docs' then test_id = 158504 end
-        it 'should be editable', priority: "1", test_id: test_id do
-          be_editable(type, title)
-        end
+    context "#{title} collaboration" do
+      before(:each) do
+        course_with_student_logged_in
+        set_up_google_docs
+      end
 
-        if type == 'etherpad' then test_id = 158503 end
-        if type == 'google_docs' then test_id = 158505 end
-        it 'should be delete-able', priority: "1", test_id: test_id do
-          be_deletable(type, title)
-        end
+      it 'should be editable', priority: "1", test_id: 158504 do
+        be_editable(type, title)
+      end
 
-        if type == 'etherpad' then test_id = 138613 end
-        if type == 'google_docs' then test_id = 162356 end
-        it 'should display available collaborators', priority: "1", test_id: test_id do
-          display_available_collaborators(type)
-        end
+      it 'should be delete-able', priority: "1", test_id: 158505 do
+        be_deletable(type, title)
+      end
 
-        if type == 'etherpad' then test_id = 162361 end
-        if type == 'google_docs' then test_id = 162362 end
-        it 'start collaboration with people', priority: "1", test_id: test_id do
-          select_collaborators_and_look_for_start(type)
-        end
+      it 'should display available collaborators', priority: "1", test_id: 162356 do
+        display_available_collaborators(type)
+      end
+
+      it 'start collaboration with people', priority: "1", test_id: 162362 do
+        select_collaborators_and_look_for_start(type)
       end
     end
 
