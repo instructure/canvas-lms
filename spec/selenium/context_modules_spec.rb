@@ -2,7 +2,7 @@
 
 describe "context modules" do
   include_examples "in-process server selenium tests"
-  context "as a teacher", :priority => "1" do
+  context "as a teacher", priority: "1" do
     before(:each) do
       course_with_teacher_logged_in
       # have to add quiz and assignment to be able to add them to a new module
@@ -544,7 +544,7 @@ describe "context modules" do
       expect(tag.indent).to eq 1
     end
 
-    context "module item cog focus management", :priority => "1" do
+    context "module item cog focus management", priority: "1" do
 
       before :each do
         get "/courses/#{@course.id}/modules"
@@ -634,7 +634,7 @@ describe "context modules" do
       expect(module_item.find_element(:css, ".points_possible_display")).to include_text "10"
     end
 
-    context "Keyboard Accessibility", :priority => "1" do
+    context "Keyboard Accessibility", priority: "1" do
       it "should set focus to the first drag handle after the + Module button" do
         # Add two modules, so the drag handles show up.
         course_module
@@ -729,7 +729,7 @@ describe "context modules" do
       end
     end
 
-    context "multiple overridden due dates", :priority => "2" do
+    context "multiple overridden due dates", priority: "2" do
       def create_section_override(section, due_at)
         override = assignment_override_model(:assignment => @assignment)
         override.set = section
@@ -896,7 +896,7 @@ describe "context modules" do
     end
   end
 
-  context "as a teacher", :priority => "1" do
+  context "as a teacher", priority: "1" do
     before(:each) do
       course_with_teacher_logged_in
       @course.default_view = 'modules'
@@ -1032,7 +1032,7 @@ describe "context modules" do
     end
   end
 
-  context "logged out", :priority => "2" do
+  context "logged out", priority: "2" do
     before(:each) do
       @course = course(:active_all => true)
       course_module

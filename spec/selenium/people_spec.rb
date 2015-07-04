@@ -316,7 +316,7 @@ describe "people" do
     expect(ff('#sections > .section')[1]).to include_text(section_name)
   end
 
-  context "course with multiple sections", :priority => "2" do
+  context "course with multiple sections", priority: "2" do
     before (:each) do
       course_with_admin_logged_in
       add_a_section

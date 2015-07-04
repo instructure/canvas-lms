@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/context_modules_comm
 
 describe "context modules" do
   include_examples "in-process server selenium tests"
-  context "progressions", :priority => "1" do
+  context "progressions", priority: "1" do
     before :each do
       course_with_teacher_logged_in
 
@@ -107,7 +107,7 @@ describe "context modules" do
     end
   end
 
-  context "progression link", :priority => "2" do
+  context "progression link", priority: "2" do
     before(:each) do
       course_with_teacher_logged_in
     end

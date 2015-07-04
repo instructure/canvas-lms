@@ -315,7 +315,7 @@ describe "assignments" do
       end
     end
 
-    context "frozen assignment", :priority => "2" do
+    context "frozen assignment", priority: "2" do
       before do
         stub_freezer_plugin Hash[Assignment::FREEZABLE_ATTRIBUTES.map { |a| [a, "true"] }]
         default_group = @course.assignment_groups.create!(:name => "default")
@@ -411,7 +411,7 @@ describe "assignments" do
         @assignment.unpublish
       end
 
-      it "should allow publishing from the index page", :priority => "2" do
+      it "should allow publishing from the index page", priority: "2" do
         get "/courses/#{@course.id}/assignments"
         wait_for_ajaximations
         f("#assignment_#{@assignment.id} .publish-icon").click

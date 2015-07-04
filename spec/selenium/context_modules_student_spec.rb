@@ -4,7 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/context_modules_comm
 describe "context modules" do
   include_examples "in-process server selenium tests"
 
-  context "as a student", :priority => "1" do
+  context "as a student", priority: "1" do
     before(:each) do
       @locked_text = 'locked'
       @completed_text = 'completed'
@@ -232,7 +232,7 @@ describe "context modules" do
       validate_context_module_status_text(2, @completed_text)
     end
 
-    context "next and previous buttons", :priority => "2" do
+    context "next and previous buttons", priority: "2" do
 
       def verify_next_and_previous_buttons_display
         wait_for_ajaximations

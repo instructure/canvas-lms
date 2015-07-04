@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
-describe "links", :priority => "2" do
+describe "links", priority: "2" do
   include_examples "in-process server selenium tests"
 
   before (:each) do

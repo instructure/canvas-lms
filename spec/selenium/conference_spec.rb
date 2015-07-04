@@ -16,7 +16,7 @@ describe "web conference" do
       get url
     end
 
-    it "should display initial elements of the conference page", :priority => "1", :test_id => 118488 do
+    it "should display initial elements of the conference page", priority: "1", test_id: 118488 do
       keep_trying_until do
         expect(fj('.new-conference-btn')).to be_displayed
       end
@@ -27,7 +27,7 @@ describe "web conference" do
       expect(f('#concluded-conference-list')).to include_text("There are no concluded conferences")
     end
 
-    it "should create a web conference", :priority => "1", :test_id => 118489 do
+    it "should create a web conference", priority: "1", test_id: 118489 do
       conference_title = 'Testing Conference'
       fj('.new-conference-btn').click
       wait_for_ajaximations
@@ -40,7 +40,7 @@ describe "web conference" do
       expect(fj("#new-conference-list .ig-title").text).to include(conference_title)
     end
 
-    it "should cancel creating a web conference", :priority => "2" do
+    it "should cancel creating a web conference", priority: "2" do
       conference_title = 'new conference'
       f('.new-conference-btn').click
       wait_for_ajaximations
@@ -59,7 +59,7 @@ describe "web conference" do
       @cc = WimbaConference.create!(:title => "test conference", :user => @user, :context => @course)
     end
 
-    it "should delete active conferences", :priority => "1", :test_id => 126912 do
+    it "should delete active conferences", priority: "1", test_id: 126912 do
       get url
 
       f('.icon-settings').click
@@ -68,7 +68,7 @@ describe "web conference" do
       expect(f('#new-conference-list')).to include_text("There are no new conferences")
     end
 
-    it "should delete concluded conferences", :priority => "2", :test_id => 163991 do
+    it "should delete concluded conferences", priority: "2", test_id: 163991 do
       #closing will conclude the conference
       @cc.close
       @cc.save!

@@ -38,8 +38,7 @@ describe "scheduler" do
       expect(f('.fc-event')).to include_text "Reserved"
     end
 
-    it "should allow me to cancel existing reservation and sign up for the appointment group from the calendar",
-          :priority  => "1", test_id: 140200 do
+    it "should allow me to cancel existing reservation and sign up for the appointment group from the calendar", :priority  => "1", test_id: 140200 do
       tomorrow = (Date.today + 1).to_s
       create_appointment_group(:max_appointments_per_participant => 1,
                                :new_appointments => [

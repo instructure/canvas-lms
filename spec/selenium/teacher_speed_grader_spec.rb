@@ -44,7 +44,7 @@ describe "speed grader" do
       @submission2 = @assignment.submit_homework(@student2, :submission_type => "online_text_entry", :body => "there")
     end
 
-    it "lists the correct number of students", :priority => "2" do
+    it "lists the correct number of students", priority: "2" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       expect(f("#x_of_x_students")).to include_text("1 of 1")

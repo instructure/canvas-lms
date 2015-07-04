@@ -66,7 +66,7 @@ describe "assignment groups" do
     expect(get_value("#assignment_group_id")).to eq ag2.id.to_s
   end
 
-  it "should edit group details", :priority => "1" do
+  it "should edit group details", priority: "1" do
     assignment_group = @course.assignment_groups.create!(:name => "first test group")
     4.times do
       @course.assignments.create(:title => 'other assignment', :assignment_group => assignment_group)
@@ -189,7 +189,7 @@ describe "assignment groups" do
     expect(ags.collect(&:position)).to eq [1,3,2,4,5]
   end
 
-  it "should allow quick-adding an assignment to a group", :priority => "1" do
+  it "should allow quick-adding an assignment to a group", priority: "1" do
     @course.require_assignment_group
     ag = @course.assignment_groups.first
     time = Timecop.freeze(2015,2,7,4,15).utc
@@ -234,7 +234,7 @@ describe "assignment groups" do
 
   end
 
-  it "should allow quick-adding two assignments to a group (dealing with form re-render)", :priority => "2" do
+  it "should allow quick-adding two assignments to a group (dealing with form re-render)", priority: "2" do
     @course.require_assignment_group
     ag = @course.assignment_groups.first
 
@@ -263,13 +263,13 @@ describe "assignment groups" do
       @frozen_assign = frozen_assignment(default_group)
     end
 
-    it "should not allow assignment group to be deleted by teacher if assignment group id frozen", :priority => "2" do
+    it "should not allow assignment group to be deleted by teacher if assignment group id frozen", priority: "2" do
       get "/courses/#{@course.id}/assignments"
       expect(fj("#group_#{@frozen_assign.assignment_group_id} .delete_group_link")).to be_nil
       expect(fj("#assignment_#{@frozen_assign.id} .delete_assignment_link")).to be_nil
     end
 
-    it "should not be locked for admin", :priority => "2" do
+    it "should not be locked for admin", priority: "2" do
       @course.assignment_groups.create!(:name => "other")
       course_with_admin_logged_in(:course => @course, :name => "admin user")
       orig_title = @frozen_assign.title
