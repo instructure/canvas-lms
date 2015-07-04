@@ -36,10 +36,6 @@ describe "collaborations" do
         leave_new_form_open_when_last_is_deleted(type, title)
       end
 
-      it 'should display available collaborators', priority: "1", test_id: 158507 do
-        display_available_collaborators(type)
-      end
-
       it 'should select collaborators', priority: "1", test_id: 159848 do
         select_collaborators(type)
       end
