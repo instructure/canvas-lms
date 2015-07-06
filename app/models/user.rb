@@ -492,7 +492,7 @@ class User < ActiveRecord::Base
         data[:courses] += Course.select([:id, :account_id]).where(:id => course_ids.to_a).all unless course_ids.empty?
 
         data[:pseudonyms] += Pseudonym.active.select([:user_id, :account_id]).uniq.where(:user_id => shard_user_ids).all
-        AccountUser.send(:with_exclusive_scope) do
+        AccountUser.unscoped do
           data[:account_users] += AccountUser.select([:user_id, :account_id]).uniq.where(:user_id => shard_user_ids).all
         end
       end

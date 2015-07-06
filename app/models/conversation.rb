@@ -520,7 +520,7 @@ class Conversation < ActiveRecord::Base
       Shard.birth.activate { self.conversation_participants.reload.map(&:user_id) } )
     return unless private_hash_changed?
     existing = self.shard.activate do
-      ConversationParticipant.send(:with_exclusive_scope) do
+      ConversationParticipant.unscoped do
         ConversationParticipant.where(private_hash: private_hash).first.try(:conversation)
       end
     end

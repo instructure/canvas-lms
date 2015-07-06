@@ -632,7 +632,7 @@ ActiveRecord::Relation.class_eval do
       self.activate { find_in_batches_with_temp_table(options, &block) }
     else
       find_in_batches_without_usefulness(options) do |batch|
-        klass.send(:with_exclusive_scope) { yield batch }
+        klass.unscoped { yield batch }
       end
     end
   end
@@ -653,7 +653,7 @@ ActiveRecord::Relation.class_eval do
         cursor = "#{table_name}_in_batches_cursor_#{sql.hash.abs.to_s(36)}"
         connection.execute("DECLARE #{cursor} CURSOR FOR #{sql}")
         includes = includes_values
-        klass.send(:with_exclusive_scope) do
+        klass.unscoped do
           batch = connection.uncached { klass.find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }
           while !batch.empty?
             ActiveRecord::Associations::Preloader.new(batch, includes).run if includes
@@ -718,7 +718,7 @@ ActiveRecord::Relation.class_eval do
       end
 
       includes = includes_values
-      klass.send(:with_exclusive_scope) do
+      klass.unscoped do
         if pluck
           batch = klass.from(table).order(index).limit(batch_size).pluck(pluck)
         else
