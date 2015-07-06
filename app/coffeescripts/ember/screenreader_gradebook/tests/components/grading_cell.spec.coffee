@@ -82,7 +82,7 @@ define [
       @component.set('value', 'ohai')
       @component.send('focusOut')
 
-      requestStub.then ->
-        start()
+      start()
+      setTimeout =>
         ok stub.called
 

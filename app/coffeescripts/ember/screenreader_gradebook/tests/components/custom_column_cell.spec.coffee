@@ -67,6 +67,6 @@ define [
       @component.set('value', 'such success')
       @component.send('focusOut')
 
-      requestStub.then =>
-        start()
+      start()
+      setTimeout =>
         ok stub.called
