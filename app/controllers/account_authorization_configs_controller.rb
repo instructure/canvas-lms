@@ -364,8 +364,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   # - idp_entity_id
   #
-  #   The SAML IdP's entity ID - This is used to look up the correct SAML IdP if
-  #   multiple are configured
+  #   The SAML IdP's entity ID
   #
   # - log_in_url
   #
