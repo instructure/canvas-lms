@@ -11,4 +11,6 @@ if CANVAS_RAILS3
       end
     end
   end
+else
+  ActiveSupport::TimeWithZone.delegate :to_yaml, :to => :utc
 end
