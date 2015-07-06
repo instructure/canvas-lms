@@ -1,4 +1,5 @@
 $LOAD_PATH << File.dirname(__FILE__)
+require 'guard-gulp'
 
 ignore! Listen::DirectoryRecord::DEFAULT_IGNORED_DIRECTORIES - ['vendor'] + [%r{vendor/(?!plugins)}]
 
