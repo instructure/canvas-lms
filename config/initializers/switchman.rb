@@ -136,6 +136,19 @@ Rails.application.config.to_prepare do
       end
       @in_current_region
     end
+
+    def self.send_in_each_region(klass, method, enqueue_args = {}, *args)
+      klass.send(method, *args)
+      regions = Set.new
+      regions << Shard.current.database_server.config[:region]
+      all.each do |db|
+        next if regions.include?(db.config[:region]) || !db.config[:region]
+        next if db.shards.empty?
+        db.shards.first.activate do
+          klass.send_later_enqueue_args(method, enqueue_args, *args)
+        end
+      end
+    end
   end
 
   Switchman.config[:on_fork_proc] = -> { Canvas.reconnect_redis }
