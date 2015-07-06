@@ -309,7 +309,7 @@ class Course < ActiveRecord::Base
   end
 
   def modules_visible_to(user)
-    if self.grants_right?(user, :manage_content)
+    if self.grants_right?(user, :view_unpublished_items)
       self.context_modules.not_deleted
     else
       self.context_modules.active
@@ -317,7 +317,7 @@ class Course < ActiveRecord::Base
   end
 
   def module_items_visible_to(user)
-    if user_is_teacher = self.grants_right?(user, :manage_content)
+    if user_is_teacher = self.grants_right?(user, :view_unpublished_items)
       tags = self.context_module_tags.not_deleted.joins(:context_module).where("context_modules.workflow_state <> 'deleted'")
     else
       tags = self.context_module_tags.active.joins(:context_module).where(:context_modules => {:workflow_state => 'active'})
@@ -1132,7 +1132,7 @@ class Course < ActiveRecord::Base
          end
         )
     end
-    can [:read, :read_as_admin, :read_roster, :read_prior_roster, :read_forum, :use_student_view, :read_outcomes]
+    can [:read, :read_as_admin, :read_roster, :read_prior_roster, :read_forum, :use_student_view, :read_outcomes, :view_unpublished_items]
 
     given do |user|
       !self.deleted? && user &&

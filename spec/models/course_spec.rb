@@ -4231,3 +4231,49 @@ describe Course, '#favorite_for_user?' do
     expect(@courses[1].favorite_for_user?(@user)).to eql(false)
   end
 end
+
+describe Course, '#modules_visible_to' do
+  before :once do
+    course_with_teacher active_all: true
+    student_in_course active_enrollment: true
+    @course.context_modules.create!(name: 'published')
+    @course.context_modules.create!(name: 'unpublished').unpublish!
+  end
+
+  it "shows published modules to students" do
+    expect(@course.modules_visible_to(@student).map(&:name)).to match_array %w(published)
+  end
+
+  it "shows all modules to teachers" do
+    expect(@course.modules_visible_to(@teacher).map(&:name)).to match_array %w(published unpublished)
+  end
+
+  it "shows all modules to teachers even when course is concluded" do
+    @course.complete!
+    expect(@course.grants_right?(@teacher, :manage_content)).to eq(false)
+    expect(@course.modules_visible_to(@teacher).map(&:name)).to match_array %w(published unpublished)
+  end
+end
+
+describe Course, '#module_items_visible_to' do
+  before :once do
+    course_with_teacher active_all: true
+    student_in_course active_enrollment: true
+    @module = @course.context_modules.create!
+    @module.add_item(type: 'sub_header', title: 'published').publish!
+    @module.add_item(type: 'sub_header', title: 'unpublished')
+  end
+
+  it "shows published items to students" do
+    expect(@course.module_items_visible_to(@student).map(&:title)).to match_array %w(published)
+  end
+
+  it "shows all items to teachers" do
+    expect(@course.module_items_visible_to(@teacher).map(&:title)).to match_array %w(published unpublished)
+  end
+
+  it "shows all items to teachers even when course is concluded" do
+    @course.complete!
+    expect(@course.module_items_visible_to(@teacher).map(&:title)).to match_array %w(published unpublished)
+  end
+end
