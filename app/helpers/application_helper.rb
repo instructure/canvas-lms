@@ -298,7 +298,7 @@ module ApplicationHelper
   end
 
   def include_common_stylesheets
-    stylesheet_link_tag css_url_for(:vendor), css_url_for(:common), media: "all"
+    stylesheet_link_tag css_url_for(:common), media: "all"
   end
 
   def sortable_tabs
