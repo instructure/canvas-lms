@@ -1237,6 +1237,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :notification_preferences) do
       get 'users/:user_id/communication_channels/:communication_channel_id/notification_preferences', action: :index
+      get 'users/:user_id/communication_channels/:communication_channel_id/notification_preference_categories', action: :category_index
       get 'users/:user_id/communication_channels/:type/:address/notification_preferences', action: :index, constraints: { address: %r{[^/?]+} }
       get 'users/:user_id/communication_channels/:communication_channel_id/notification_preferences/:notification', action: :show
       get 'users/:user_id/communication_channels/:type/:address/notification_preferences/:notification', action: :show, constraints: { address: %r{[^/?]+} }
@@ -1244,6 +1245,7 @@ CanvasRails::Application.routes.draw do
       put 'users/self/communication_channels/:type/:address/notification_preferences/:notification', action: :update, constraints: { address: %r{[^/?]+} }
       put 'users/self/communication_channels/:communication_channel_id/notification_preferences', action: :update_all
       put 'users/self/communication_channels/:type/:address/notification_preferences', action: :update_all, constraints: { address: %r{[^/?]+} }
+      put 'users/self/communication_channels/:communication_channel_id/notification_preference_categories/:category', action: :update_preferences_by_category
     end
 
     scope(controller: :comm_messages_api) do
