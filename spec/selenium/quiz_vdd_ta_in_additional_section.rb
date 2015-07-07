@@ -16,7 +16,7 @@ describe "quizzes attempts" do
     ta_in_section(@new_section, :user => @ta1)
   end
 
-  it "should show the due dates for TA in the additional section", test_id: 114315, priority: 1 do
+  it "should show the due dates for TA in the additional section", priority: "1", test_id: 114315 do
     user_session(@ta1)
     get "/courses/#{@course1.id}"
     expect_new_page_load{ f("#section-tabs .quizzes").click }

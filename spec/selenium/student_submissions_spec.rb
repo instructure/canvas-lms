@@ -367,7 +367,7 @@ describe "submissions" do
   end
 
   context 'Excused assignment' do
-    it 'does not allow submissions', priority: '1', test_id: 197048 do
+    it 'does not allow submissions', priority: "1", test_id: 197048 do
       course_with_student_logged_in
       @assignment = @course.assignments.create!(
         title: 'assignment 1',

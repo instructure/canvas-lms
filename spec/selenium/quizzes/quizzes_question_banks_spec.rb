@@ -11,7 +11,7 @@ describe 'quizzes question banks' do
       course_with_teacher_logged_in
     end
 
-    it 'should be able to create question bank', priority: '1', test_id: 140667 do
+    it 'should be able to create question bank', priority: "1", test_id: 140667 do
       # report_test(72402) do
       get "/courses/#{@course.id}/question_banks"
       question_bank_title = keep_trying_until do
@@ -31,7 +31,7 @@ describe 'quizzes question banks' do
       question_bank
     end
 
-    it 'should be able to create quiz questions', priority: '1', test_id: 140668 do
+    it 'should be able to create quiz questions', priority: "1", test_id: 140668 do
       # report_test(72403) do
       bank = AssessmentQuestionBank.create!(context: @course)
       get "/courses/#{@course.id}/question_banks/#{bank.id}"
@@ -41,7 +41,7 @@ describe 'quizzes question banks' do
       expect { create_multiple_choice_question }.to change(AssessmentQuestion, :count).by(1)
     end
 
-    it 'should tally up question bank question points', priority: '1', test_id: 201930 do
+    it 'should tally up question bank question points', priority: "1", test_id: 201930 do
       quiz = @course.quizzes.create!(title: 'My Quiz')
       bank = AssessmentQuestionBank.create!(context: @course)
       3.times { assessment_question_model(bank: bank) }
@@ -62,7 +62,7 @@ describe 'quizzes question banks' do
       keep_trying_until { expect(fj('#quiz_display_points_possible .points_possible').text).to eq '17' }
     end
 
-    it 'should allow you to use inherited question banks', priority: '1', test_id: 201931 do
+    it 'should allow you to use inherited question banks', priority: "1", test_id: 201931 do
       @course.account = Account.default
       @course.save
       quiz = @course.quizzes.create!(title: 'My Quiz')
@@ -97,7 +97,7 @@ describe 'quizzes question banks' do
       keep_trying_until { expect(fj('#quiz_display_points_possible .points_possible').text).to eq '2' }
     end
 
-    it 'should allow you to use bookmarked question banks', priority: '1', test_id: 201932 do
+    it 'should allow you to use bookmarked question banks', priority: "1", test_id: 201932 do
       @course.account = Account.default
       @course.save
       quiz = @course.quizzes.create!(title: 'My Quiz')
@@ -135,7 +135,7 @@ describe 'quizzes question banks' do
       keep_trying_until { expect(fj('#quiz_display_points_possible .points_possible').text).to eq '2' }
     end
 
-    it 'should check permissions when retrieving question banks', priority: '1', test_id: 201933 do
+    it 'should check permissions when retrieving question banks', priority: "1", test_id: 201933 do
       @course.account = Account.default
       @course.account.role_overrides.create(
         permission: 'read_question_banks',
@@ -173,7 +173,7 @@ describe 'quizzes question banks' do
       expect(ffj('#find_bank_dialog .bank:visible').size).to eq 1
     end
 
-    it 'should import questions from a question bank', priority: '1', test_id: 140671 do
+    it 'should import questions from a question bank', priority: "1", test_id: 140671 do
       get "/courses/#{@course.id}/quizzes/new"
       click_questions_tab
 
@@ -217,7 +217,7 @@ describe 'quizzes question banks' do
       expect(@bank.assessment_questions.select { |aq| !aq.deleted? }.length).to eq 59
     end
 
-    it 'should allow editing quiz questions that belong to a quiz bank', priority: '1', test_id: 217531 do
+    it 'should allow editing quiz questions that belong to a quiz bank', priority: "1", test_id: 217531 do
       @course.account = Account.default
       @course.save
 

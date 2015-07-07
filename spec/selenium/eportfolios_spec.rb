@@ -87,7 +87,7 @@ describe "eportfolios" do
       expect(@eportfolio.name).to eq "new ePortfolio name"
     end
 
-    it "should validate time stamp on ePortfolio", priority: 2 do
+    it "should validate time stamp on ePortfolio", priority: "2" do
       # Freezes time to 2 days from today.
       old_time = Timecop.freeze(Date.today + 2).utc
       current_time = old_time.strftime('%b %-d at %-l') << old_time.strftime('%p').downcase

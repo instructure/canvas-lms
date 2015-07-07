@@ -10,7 +10,7 @@ describe 'quizzes question creation' do
   end
 
   # Multiple Choice Question
-  it 'should create a quiz with a multiple choice question', priority: '1', test_id: 201942 do
+  it 'should create a quiz with a multiple choice question', priority: "1", test_id: 201942 do
     quiz = @last_quiz
     create_multiple_choice_question
     quiz.reload
@@ -36,7 +36,7 @@ describe 'quizzes question creation' do
   end
 
   # True/False Question
-  it 'should create a quiz question with a true false question', priority: '1', test_id: 140628 do
+  it 'should create a quiz question with a true false question', priority: "1", test_id: 140628 do
     quiz = @last_quiz
     create_true_false_question
     quiz.reload
@@ -48,7 +48,7 @@ describe 'quizzes question creation' do
   end
 
   # Fill-in-the-blank Question
-  it 'should create a quiz question with a fill in the blank question', priority: '1', test_id: 197492 do
+  it 'should create a quiz question with a fill in the blank question', priority: "1", test_id: 197492 do
     quiz = @last_quiz
     create_fill_in_the_blank_question
     quiz.reload
@@ -56,7 +56,7 @@ describe 'quizzes question creation' do
   end
 
   # Multiple Blanks Question
-  it 'should create a quiz question with a fill in multiple blanks question', priority: '1', test_id: 197508 do
+  it 'should create a quiz question with a fill in multiple blanks question', priority: "1", test_id: 197508 do
     quiz = @last_quiz
 
     question = fj('.question_form:visible')
@@ -102,7 +102,7 @@ describe 'quizzes question creation' do
   end
 
   # Multiple Answers Question
-  it 'should create a quiz question with a multiple answers question', priority: '1', test_id: 140629 do
+  it 'should create a quiz question with a multiple answers question', priority: "1", test_id: 140629 do
     quiz = @last_quiz
 
     question = fj('.question_form:visible')
@@ -126,7 +126,7 @@ describe 'quizzes question creation' do
   end
 
   # Multiple Dropdown Question
-  it 'should create a quiz question with a multiple dropdown question', priority: '1', test_id: 197510 do
+  it 'should create a quiz question with a multiple dropdown question', priority: "1", test_id: 197510 do
     quiz = @last_quiz
 
     question = fj('.question_form:visible')
@@ -172,7 +172,7 @@ describe 'quizzes question creation' do
   end
 
   # Matching Question
-  it 'should be able to create a basic matching question', priority: '1', test_id: 201943 do
+  it 'should be able to create a basic matching question', priority: "1", test_id: 201943 do
     quiz = @last_quiz
 
     question = fj('.question_form:visible')
@@ -204,7 +204,7 @@ describe 'quizzes question creation' do
   end
 
   # Numerical Answer
-  it 'should be able to create a basic numerical answer question', priority: '1', test_id: 201944 do
+  it 'should be able to create a basic numerical answer question', priority: "1", test_id: 201944 do
     quiz = @last_quiz
 
     click_option('.question_form:visible .question_type', 'Numerical Answer')
@@ -228,7 +228,7 @@ describe 'quizzes question creation' do
   end
 
   # Formula Question
-  it 'should be able to create a basic formula question', priority: '1', test_id: 201945 do
+  it 'should be able to create a basic formula question', priority: "1", test_id: 201945 do
     quiz = @last_quiz
 
     question = fj('.question_form:visible')
@@ -258,7 +258,7 @@ describe 'quizzes question creation' do
   end
 
   # Essay Question
-  it 'should be able to create a basic essay question', priority: '1', test_id: 201946 do
+  it 'should be able to create a basic essay question', priority: "1", test_id: 201946 do
     quiz = @last_quiz
 
     question = fj('.question_form:visible')
@@ -275,7 +275,7 @@ describe 'quizzes question creation' do
   end
 
   # File Upload Question
-  it 'should be able to create a basic file upload question', priority: '1', test_id: 201947 do
+  it 'should be able to create a basic file upload question', priority: "1", test_id: 201947 do
     quiz = @last_quiz
 
     create_file_upload_question
@@ -287,7 +287,7 @@ describe 'quizzes question creation' do
   end
 
   # Text Answer Question
-  it 'should be able to create a basic text answer question', priority: '1', test_id: 201948 do
+  it 'should be able to create a basic text answer question', priority: "1", test_id: 201948 do
     quiz = @last_quiz
 
     question = fj('.question_form:visible')
@@ -317,7 +317,7 @@ describe 'quizzes question creation' do
     assert_error_box(".question_form:visible input[name='question_points']")
   end
 
-  context 'quizzes with more than 25 questions', priority: '1', test_id: 140578 do
+  context 'quizzes with more than 25 questions', priority: "1", test_id: 140578 do
 
     def quiz_questions_creation
       @q = @course.quizzes.create!(title: 'new quiz')
@@ -348,7 +348,7 @@ describe 'quizzes question creation' do
   end
 
   context 'quiz groups', priority: '2' do
-    it 'should add questions from a question bank', priority: '1', test_id: 140671 do
+    it 'should add questions from a question bank', priority: "1", test_id: 140671 do
       quiz_with_new_questions
       click_questions_tab
       f('.find_question_link').click

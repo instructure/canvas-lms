@@ -14,7 +14,7 @@ describe "quizzes attempts" do
                                         :lock_at => Time.zone.now.advance(days:4))
   end
 
-  it "should be accesible for student in the main section", priority: "1", test_id: 114315, priority: 1  do
+  it "should be accesible for student in the main section", priority: "1", test_id: 114315, priority: "1"  do
     get "/courses/#{@course1.id}/quizzes"
     expect_new_page_load { f("#summary_quiz_#{@quiz.id}").click }
     due_at_time = @quiz.due_at.strftime('%b %-d at %-l:%M') << @quiz.due_at.strftime('%p').downcase

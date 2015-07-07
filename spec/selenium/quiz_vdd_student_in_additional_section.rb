@@ -16,7 +16,7 @@ describe "quizzes attempts" do
     student_in_section(@new_section, :user => @student2)
   end
 
-  it "should not be accesible for student in the additional section", test_id: 114315, priority: 1 do
+  it "should not be accesible for student in the additional section", priority: "1",test_id: 114315 do
     user_session(@student2)
     due_at_time = @override.due_at.strftime('%b %-d at %-l:%M') << @override.due_at.strftime('%p').downcase
     unlock_at_time = @override.unlock_at.strftime('%b %-d at %-l:%M') << @override.unlock_at.strftime('%p').downcase

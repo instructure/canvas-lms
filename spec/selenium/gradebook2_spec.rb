@@ -864,7 +864,7 @@ describe "gradebook2" do
   end
 
   context 'excused assignment' do
-    it 'is not included in grade calculations', priority: '1', test_id: 196596 do
+    it 'is not included in grade calculations', priority: "1", test_id: 196596 do
       init_course_with_students
 
       a1 = @course.assignments.create! title: 'Excuse Me', points_possible: 20

@@ -111,7 +111,7 @@ describe "discussions" do
           expect(f('.topic-subscribe-button')).to be_displayed
         end
 
-        it "should unsubscribe from topic", priority: 1, test_id: 150474 do
+        it "should unsubscribe from topic", priority: "1", test_id: 150474 do
           topic.subscribe(somebody)
           topic.create_materialized_view
 
@@ -122,7 +122,7 @@ describe "discussions" do
           expect(topic.subscribed?(somebody)).to eq false
         end
 
-        it "should subscribe to topic", priority: 1, test_id: 150474 do
+        it "should subscribe to topic", priority: "1", test_id: 150474 do
           topic.unsubscribe(somebody)
           topic.create_materialized_view
 

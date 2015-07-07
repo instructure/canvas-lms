@@ -52,7 +52,7 @@ describe "discussion assignments" do
   end
 
   context "created with html in title" do
-    it "should not render html in flash notice", priority: 2, test_id: 132616 do
+    it "should not render html in flash notice", priority: "2", test_id: 132616 do
       discussion_title = '<s>broken</s>'
       topic = create_discussion(discussion_title, 'threaded')
       get "/courses/#{@course.id}/discussion_topics/#{topic.id}"

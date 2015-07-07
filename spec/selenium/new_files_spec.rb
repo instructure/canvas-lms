@@ -10,13 +10,13 @@ describe "better_file_browsing" do
                @course, "example.pdf")
       get "/courses/#{@course.id}/files"
     end
-    it "should display new files UI", priority: '1', test_id: 126904 do
+    it "should display new files UI", priority: "1", test_id: 126904 do
       expect(f('.btn-upload')).to be_displayed
       expect(get_all_files_folders.count).to eq 1
     end
 
     context "from cog icon" do
-      it "should edit file name", priority: '1', test_id: 129430 do
+      it "should edit file name", priority: "1", test_id: 129430 do
         expect(fln("example.pdf")).to be_present
         file_rename_to = "Example_edited.pdf"
         edit_name_from_cog_icon(file_rename_to)
@@ -24,14 +24,14 @@ describe "better_file_browsing" do
         expect(fln("example.pdf")).not_to be_present
         expect(fln(file_rename_to)).to be_present
       end
-      it "should delete file", priority: '1', test_id: 129431 do
+      it "should delete file", priority: "1", test_id: 129431 do
         delete(0, :cog_icon)
         expect(get_all_files_folders.count).to eq 0
       end
     end
 
     context "from cloud icon" do
-      it "should unpublish and publish a file", priority: '1', test_id: 121931 do
+      it "should unpublish and publish a file", priority: "1", test_id: 121931 do
         set_item_permissions(:unpublish, :cloud_icon)
         expect(f('.btn-link.published-status.unpublished')).to be_displayed
         expect(driver.find_element(:class => 'unpublished')).to be_displayed
@@ -39,12 +39,12 @@ describe "better_file_browsing" do
         expect(f('.btn-link.published-status.published')).to be_displayed
         expect(driver.find_element(:class => 'published')).to be_displayed
       end
-      it "should make file available to student with link", priority: '1', test_id: 193158 do
+      it "should make file available to student with link", priority: "1", test_id: 193158 do
         set_item_permissions(:restricted_access, :available_with_link, :cloud_icon)
         expect(f('.btn-link.published-status.hiddenState')).to be_displayed
         expect(driver.find_element(:class => 'hiddenState')).to be_displayed
       end
-      it "should make file available to student within given timeframe", priority: '1', test_id: 193159 do
+      it "should make file available to student within given timeframe", priority: "1", test_id: 193159 do
         set_item_permissions(:restricted_access, :available_with_timeline, :cloud_icon)
         expect(f('.btn-link.published-status.restricted')).to be_displayed
         expect(driver.find_element(:class => 'restricted')).to be_displayed
@@ -52,11 +52,11 @@ describe "better_file_browsing" do
     end
 
     context "from toolbar menu" do
-      it "should delete file from toolbar", priority: '1', test_id: 129451 do
+      it "should delete file from toolbar", priority: "1", test_id: 129451 do
         delete(0, :toolbar_menu)
         expect(get_all_files_folders.count).to eq 0
       end
-      it "should unpublish and publish a file", priority: '1', test_id: 121931 do
+      it "should unpublish and publish a file", priority: "1", test_id: 121931 do
         set_item_permissions(:unpublish, :toolbar_menu)
         expect(f('.btn-link.published-status.unpublished')).to be_displayed
         expect(driver.find_element(:class => 'unpublished')).to be_displayed
@@ -64,12 +64,12 @@ describe "better_file_browsing" do
         expect(f('.btn-link.published-status.published')).to be_displayed
         expect(driver.find_element(:class => 'published')).to be_displayed
       end
-      it "should make file available to student with link from toolbar", priority: '1', test_id: 193158 do
+      it "should make file available to student with link from toolbar", priority: "1", test_id: 193158 do
         set_item_permissions(:restricted_access, :available_with_link, :toolbar_menu)
         expect(f('.btn-link.published-status.hiddenState')).to be_displayed
         expect(driver.find_element(:class => 'hiddenState')).to be_displayed
       end
-      it "should make file available to student within given timeframe from toolbar", priority: '1', test_id: 193159 do
+      it "should make file available to student within given timeframe from toolbar", priority: "1", test_id: 193159 do
         set_item_permissions(:restricted_access, :available_with_timeline, :toolbar_menu)
         expect(f('.btn-link.published-status.restricted')).to be_displayed
         expect(driver.find_element(:class => 'restricted')).to be_displayed
@@ -136,13 +136,13 @@ describe "better_file_browsing" do
       txt_files.map { |text_file| add_file(fixture_file_upload("files/#{text_file}", 'text/plain'), @course, text_file) }
       get "/courses/#{@course.id}/files"
     end
-    it "should set focus to the folder tree when opening the dialog", priority: '1', test_id: 180641 do
+    it "should set focus to the folder tree when opening the dialog", priority: "1", test_id: 180641 do
       ff('.al-trigger')[0].click
       fln("Move").click
       wait_for_ajaximations
       check_element_has_focus(ff('.tree')[1])
     end
-    it "should move a file using cog icon", priority: '1', test_id: 129453 do
+    it "should move a file using cog icon", priority: "1", test_id: 129453 do
       skip('fragile')
       file_name = "a_file.txt"
       add_folder("destination_folder")
@@ -155,7 +155,7 @@ describe "better_file_browsing" do
       wait_for_ajaximations
       expect(fln(file_name)).to be_displayed
     end
-    it "should move a file using toolbar menu", priority: '1', test_id: 217603 do
+    it "should move a file using toolbar menu", priority: "1", test_id: 217603 do
       file_name = "a_file.txt"
       add_folder("destination_folder")
       move(file_name, 0, :toolbar_menu)
@@ -167,7 +167,7 @@ describe "better_file_browsing" do
       wait_for_ajaximations
       expect(fln(file_name)).to be_displayed
     end
-    it "should move multiple files", priority: '1' do
+    it "should move multiple files", priority: "1" do
       files = ["a_file.txt", "b_file.txt", "c_file.txt"]
       add_folder("destination_folder")
       move_multiple_using_toolbar(files)
@@ -207,7 +207,7 @@ describe "better_file_browsing" do
                @course, "a_file.txt")
       get "/courses/#{@course.id}/files"
     end
-    it "should validate that file is published by default", priority: '1', test_id: 193820 do
+    it "should validate that file is published by default", priority: "1", test_id: 193820 do
       expect(f('.btn-link.published-status.published')).to be_displayed
     end
     it "should set focus to the close button when opening the dialog", priority: '2', test_id: 194243 do
@@ -248,7 +248,7 @@ describe "better_file_browsing" do
       before :each do
         get "/courses/#{@course.id}/files"
       end
-      it "should set usage rights on a file via the modal by clicking the indicator", priority: '1', test_id: 194244 do
+      it "should set usage rights on a file via the modal by clicking the indicator", priority: "1", test_id: 194244 do
         f('.UsageRightsIndicator__openModal').click
         wait_for_ajaximations
         set_usage_rights_in_modal
@@ -257,7 +257,7 @@ describe "better_file_browsing" do
         check_element_has_focus(f('.UsageRightsIndicator__openModal'))
         verify_usage_rights_ui_updates
       end
-      it "should set usage rights on a file via the cog menu", priority: '1', test_id: 194245 do
+      it "should set usage rights on a file via the cog menu", priority: "1", test_id: 194245 do
         f('.ef-links-col .al-trigger').click
         f('.ItemCog__OpenUsageRights a').click
         wait_for_ajaximations
@@ -267,7 +267,7 @@ describe "better_file_browsing" do
         check_element_has_focus(f('.ef-links-col .al-trigger'))
         verify_usage_rights_ui_updates
       end
-      it "should set usage rights on a file via the toolbar", priority: '1', test_id: 194246 do
+      it "should set usage rights on a file via the toolbar", priority: "1", test_id: 194246 do
         f('.ef-item-row').click
         f('.Toolbar__ManageUsageRights').click
         wait_for_ajaximations
@@ -277,7 +277,7 @@ describe "better_file_browsing" do
         check_element_has_focus(f('.Toolbar__ManageUsageRights'))
         verify_usage_rights_ui_updates
       end
-      it "should not show the creative commons selection if creative commons isn't selected", priority: '1', test_id: 194247 do
+      it "should not show the creative commons selection if creative commons isn't selected", priority: "1", test_id: 194247 do
         f('.UsageRightsIndicator__openModal').click
         wait_for_ajaximations
         set_value f('.UsageRightsSelectBox__select'), 'fair_use'
@@ -297,7 +297,7 @@ describe "better_file_browsing" do
     end
 
     context "user files" do
-      it "should update course files from user files page", priority: '1', test_id: 194248 do
+      it "should update course files from user files page", priority: "1", test_id: 194248 do
         get "/files/folder/courses_#{@course.id}/"
         f('.UsageRightsIndicator__openModal').click
         wait_for_ajaximations
@@ -308,7 +308,7 @@ describe "better_file_browsing" do
         verify_usage_rights_ui_updates
       end
 
-      it "should copy a file to a different context", priority: '1', test_id: 194249 do
+      it "should copy a file to a different context", priority: "1", test_id: 194249 do
         get "/files/"
         file_name = "amazing_file.txt"
         move(file_name, 1, :cog_icon)
@@ -318,7 +318,7 @@ describe "better_file_browsing" do
         expect(ff('.media-body')[1].text).to eq file_name
       end
 
-      it "should show modal on how to handle duplicates when copying files", priority: '1', test_id: 194250 do
+      it "should show modal on how to handle duplicates when copying files", priority: "1", test_id: 194250 do
         get "/files/"
         file_name = "a_file.txt"
         move(file_name, 0, :cog_icon)
