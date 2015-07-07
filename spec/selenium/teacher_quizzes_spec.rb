@@ -47,7 +47,7 @@ describe "quizzes" do
       end
     end
 
-    it "should show a summary of due dates if there are multiple" do
+    it "should show a summary of due dates if there are multiple", priority: "1", test_id: 210054 do
       create_quiz_with_default_due_dates
       get "/courses/#{@course.id}/quizzes"
       expect(f('.item-group-container .date-available')).not_to include_text "Multiple Dates"
@@ -62,7 +62,7 @@ describe "quizzes" do
       expect(tooltip).to include_text 'Everyone else'
     end
 
-    it "should allow a teacher to create a quiz from the quizzes tab directly" do
+    it "should allow a teacher to create a quiz from the quizzes tab directly", priority: "1", test_id: 210055 do
       get "/courses/#{@course.id}/quizzes"
       expect_new_page_load { f(".new-quiz-link").click }
       expect_new_page_load do
@@ -72,7 +72,7 @@ describe "quizzes" do
       expect(f('#quiz_title')).to include_text "Unnamed Quiz"
     end
 
-    it "should create and preview a new quiz" do
+    it "should create and preview a new quiz", priority: "1", test_id: 210056 do
       get "/courses/#{@course.id}/quizzes"
       expect_new_page_load do
         f('.new-quiz-link').click
@@ -111,7 +111,7 @@ describe "quizzes" do
       expect(f('#questions')).to be_present
     end
 
-    it "should edit a quiz" do
+    it "should edit a quiz", priority: "1", test_id: 210057 do
       @context = @course
       q = quiz_model
       q.generate_quiz_data
@@ -134,7 +134,7 @@ describe "quizzes" do
       expect(f('#main .description')).to include_text(test_text)
     end
 
-    it "should asynchronously load student quiz results" do
+    it "should asynchronously load student quiz results", priority: "2", test_id: 210058 do
       @context = @course
       q = quiz_model
       q.generate_quiz_data
@@ -148,7 +148,7 @@ describe "quizzes" do
     end
 
 
-    it "should republish on save" do
+    it "should republish on save", priority: "1", test_id: 210059 do
       get "/courses/#{@course.id}/quizzes"
       expect_new_page_load { f(".new-quiz-link").click }
       quiz = Quizzes::Quiz.last
@@ -183,7 +183,7 @@ describe "quizzes" do
       expect(f('.icon-speed-grader')).not_to be_nil
     end
 
-    it "should create a new question group" do
+    it "should create a new question group", priority: "1", test_id: 210060 do
       get "/courses/#{@course.id}/quizzes/new"
 
       click_questions_tab
@@ -196,7 +196,7 @@ describe "quizzes" do
 
     end
 
-    it "should update a question group" do
+    it "should update a question group", priority: "1", test_id: 210061 do
       skip('fragile')
       get "/courses/#{@course.id}/quizzes/new"
 
@@ -225,7 +225,7 @@ describe "quizzes" do
       keep_trying_until { expect(f("#quiz_display_points_possible .points_possible").text).to eq "2" }
     end
 
-    it "should not let you exceed the question limit" do
+    it "should not let you exceed the question limit", priority: "1", test_id: 210062 do
       get "/courses/#{@course.id}/quizzes/new"
 
       click_questions_tab
@@ -269,7 +269,7 @@ describe "quizzes" do
         @quiz.save!
       end
 
-      it "should moderate quiz" do
+      it "should moderate quiz", priority: "1", test_id: 210063 do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/moderate"
         f('.moderate_student_link').click
 
@@ -286,7 +286,7 @@ describe "quizzes" do
         expect(f('.attempts_left').text).to eq '3'
       end
 
-      it "should preserve extra time values" do
+      it "should preserve extra time values", priority: "2", test_id: 210064 do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/moderate"
         f('.moderate_student_link').click
 
@@ -303,7 +303,7 @@ describe "quizzes" do
 
     end
 
-    it "should indicate when it was last saved" do
+    it "should indicate when it was last saved", priority: "1", test_id: 210065 do
       take_quiz do
         indicator = f('#last_saved_indicator')
         expect(indicator.text).to eq 'Not saved'
@@ -317,7 +317,7 @@ describe "quizzes" do
       end
     end
 
-    it "should validate numerical input data" do
+    it "should validate numerical input data", priority: "2", test_id: 210066 do
       @quiz = quiz_with_new_questions do |bank, quiz|
         aq = bank.assessment_questions.create!
         quiz.quiz_questions.create!(:question_data => {:name => "numerical", 'question_type' => 'numerical_question', 'answers' => [], :points_possible => 1}, :assessment_question => aq)
@@ -347,7 +347,7 @@ describe "quizzes" do
       end
     end
 
-    it "should mark dropdown questions as answered" do
+    it "should mark dropdown questions as answered", priority: "2", test_id: 210067 do
       skip("xvfb issues")
       @quiz = quiz_with_new_questions do |bank, quiz|
         aq1 = AssessmentQuestion.create!
@@ -412,7 +412,7 @@ describe "quizzes" do
       end
     end
 
-    it "should give a student extra time if the time limit is extended" do
+    it "should give a student extra time if the time limit is extended", priority: "2", test_id: 210068 do
       @context = @course
       bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
       q = quiz_model
@@ -475,7 +475,7 @@ describe "quizzes" do
     end
 
 
-    it "works with file upload questions" do
+    it "works with file upload questions", priority: "1", test_id: 210071 do
       @context = @course
       bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
       q = quiz_model
@@ -528,7 +528,7 @@ describe "quizzes" do
       end
     end
 
-    it "should notify a student of extra time given by a moderator" do
+    it "should notify a student of extra time given by a moderator", priority: "2", test_id: 210070 do
       skip('broken')
       @context = @course
       bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
@@ -574,7 +574,7 @@ describe "quizzes" do
     end
 
 
-    it "should display quiz statistics" do
+    it "should display quiz statistics", priority: "1", test_id: 210071 do
       quiz_with_submission
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
@@ -583,7 +583,7 @@ describe "quizzes" do
       expect(f('#content .question-statistics .question-text')).to include_text("Which book(s) are required for this course?")
     end
 
-    it "should display a link to quiz statistics for a MOOC" do
+    it "should display a link to quiz statistics for a MOOC", priority: "2", test_id: 210072 do
       quiz_with_submission
       @course.large_roster = true
       @course.save!
@@ -592,7 +592,7 @@ describe "quizzes" do
       expect(f('#right-side')).to include_text('Quiz Statistics')
     end
 
-    it "should delete a quiz" do
+    it "should delete a quiz", priority: "1", test_id: 210073 do
       quiz_with_submission
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
       expect_new_page_load do
@@ -606,7 +606,7 @@ describe "quizzes" do
       expect(@quiz.reload).to be_deleted
     end
 
-    it "can create overrides" do
+    it "should create overrides", priority: "2", test_id: 210074 do
       @quiz = create_quiz_with_default_due_dates
       default_section = @course.course_sections.first
       other_section = @course.course_sections.create!(:name => "other section")
