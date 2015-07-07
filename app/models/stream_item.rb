@@ -330,7 +330,7 @@ class StreamItem < ActiveRecord::Base
     count = 0
 
     scope = where("updated_at<?", before_date).
-        includes(:context).
+        preload(:context).
         limit(1000)
     scope = scope.includes(:stream_item_instances) if touch_users
 

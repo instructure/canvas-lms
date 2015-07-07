@@ -97,7 +97,7 @@ class CrocodocDocument < ActiveRecord::Base
 
     submissions = attachment.attachment_associations.
       where(:context_type => 'Submission').
-      includes(:context).
+      preload(:context).
       map(&:context)
 
     return opts unless submissions

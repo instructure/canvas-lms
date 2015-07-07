@@ -1,4 +1,5 @@
-$LOAD_PATH << Pathname.new(File.absolute_path __FILE__) + "../../.."
+require_relative '../spec_helper'
+
 require 'lib/ember_bundle'
 
 describe EmberBundle do

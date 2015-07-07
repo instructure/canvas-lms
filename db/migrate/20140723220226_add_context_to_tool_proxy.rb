@@ -13,7 +13,7 @@ class AddContextToToolProxy < ActiveRecord::Migration
 
   def self.down
 
-    Lti::ToolProxy.where("context_type <> 'Account'").includes(:context).each do |tp|
+    Lti::ToolProxy.where("context_type <> 'Account'").preload(:context).each do |tp|
       tp.context_id = tp.context.root_account_id
       tp.save
     end
