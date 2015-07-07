@@ -186,7 +186,7 @@ describe 'quizzes question banks' do
       expect(f('#questions .group_top .group_display.name')).to include_text('new group')
     end
 
-    it 'deleting AJAX-loaded questions should work', priority: '2', test_id: 201938 do
+    it 'deleting AJAX-loaded questions should work', priority: "2", test_id: 201938 do
       @bank = @course.assessment_question_banks.create!(title: 'Test Bank')
       (1..60).each do |idx|
         @bank.assessment_questions.create!(
