@@ -1,6 +1,7 @@
 require "html_text_helper"
 require "mail"
 require "utf8_cleaner"
+require "canvas_statsd"
 
 module IncomingMailProcessor
   require "incoming_mail_processor/pop3_mailbox"
@@ -11,4 +12,5 @@ module IncomingMailProcessor
   require "incoming_mail_processor/incoming_message_processor"
   require "incoming_mail_processor/mailbox_account"
   require "incoming_mail_processor/settings"
+  require "incoming_mail_processor/instrumentation"
 end
