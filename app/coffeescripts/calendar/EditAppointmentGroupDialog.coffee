@@ -24,6 +24,7 @@ define [
       @parentCloseCB(saved)
 
     show: =>
+
       @appointmentGroupsForm = new EditAppointmentGroupDetails(dialog.find(".wrapper"), @apptGroup, @contexts, @closeCB)
 
       buttons = if @apptGroup.workflow_state == 'active'
@@ -35,9 +36,6 @@ define [
       else
         [
           text: I18n.t 'save', 'Save'
-          click: @appointmentGroupsForm.saveWithoutPublishingClick
-        ,
-          text: I18n.t 'save_and_publish', 'Save & Publish'
           class: 'btn-primary'
           click: @appointmentGroupsForm.saveClick
         ]

@@ -19,26 +19,12 @@ describe "scheduler" do
       make_full_screen
     end
 
-    it "should create a new appointment group" do
+    it "should create a new appointment group and automatically publish it", priority: "1", test_id: 85934 do
       get "/calendar2"
       click_scheduler_link
+
       create_appointment_group_manual
-    end
-
-    it "should create appointment group and go back and publish it", priority: "1", test_id: 85934 do
-      get "/calendar2"
-      click_scheduler_link
-
-      create_appointment_group_manual(:publish => false)
       new_appointment_group = AppointmentGroup.last
-      expect(new_appointment_group.workflow_state).to eq 'pending'
-      expect(f('.ag-x-of-x-signed-up')).to include_text('unpublished')
-      open_edit_dialog
-      edit_form = f('#edit_appointment_form')
-      keep_trying_until { expect(edit_form).to be_displayed }
-      f('.ui-dialog-buttonset .btn-primary').click
-      wait_for_ajaximations
-      new_appointment_group.reload
       expect(new_appointment_group.workflow_state).to eq 'active'
     end
 

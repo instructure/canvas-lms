@@ -84,8 +84,8 @@ describe "scheduler" do
 
       # Need to submit manually to avoid waiting for ajaximations, which
       # causes Selenium to blow up when it sees the alert we're expecting
-      _, save_and_publish = ff('.ui-dialog-buttonset .ui-button')
-      save_and_publish.click
+      save = f('.ui-dialog-buttonset .ui-button')
+      save.click
 
       expect(driver.switch_to.alert.text).to be_present
       driver.switch_to.alert.accept
