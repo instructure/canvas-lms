@@ -2,6 +2,8 @@ class EpubExport < ActiveRecord::Base
   include CC::Exporter::Epub::Exportable
   include Workflow
 
+  strong_params
+
   belongs_to :content_export
   belongs_to :course
   belongs_to :user

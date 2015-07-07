@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 class ProtectAttributes
   def matches?(target)
     @target = target
-    !(@target.accessible_attributes.empty? && @target.protected_attributes.empty?)
+    !@target.active_authorizer.empty? || @target.strong_params?
   end
 
   def failure_message
@@ -35,11 +35,12 @@ def protect_attributes
 end
 
 describe 'Models' do
-  it "should use attr_accessible or attr_protected" do
+  it "protects attributes somehow" do
     ignore_classes = [
         ActiveRecord::Base,
         Delayed::Backend::ActiveRecord::Job,
         Delayed::Backend::ActiveRecord::Job::Failed,
+        Switchman::Shard,
         Version,
       ]
     if Object.const_defined?('ActiveRecord::SessionStore::Session')

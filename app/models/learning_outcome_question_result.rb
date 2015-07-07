@@ -21,6 +21,8 @@ class LearningOutcomeQuestionResult < ActiveRecord::Base
   belongs_to :learning_outcome
   belongs_to :associated_asset, :polymorphic => true
 
+  strong_params
+
   simply_versioned
 
   scope :for_associated_asset, lambda {|associated_asset|
