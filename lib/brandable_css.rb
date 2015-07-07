@@ -1,9 +1,11 @@
-module BrandableCSS
-  require 'rails'
-  CONFIG = YAML.load_file(Rails.root.join('config/brandable_css.yml')).freeze
-  BRANDABLE_VARIABLES = JSON.parse(File.read(Rails.root.join(CONFIG['paths']['brandable_variables_json']))).freeze
-  SASS_STYLE = ENV['SASS_STYLE'] || (Rails.env.production? ? 'compressed' : 'nested')
+require 'pathname'
+require 'yaml'
 
+module BrandableCSS
+  APP_ROOT = defined?(Rails) && Rails.root || Pathname.pwd
+  CONFIG = YAML.load_file(APP_ROOT.join('config/brandable_css.yml')).freeze
+  BRANDABLE_VARIABLES = JSON.parse(File.read(APP_ROOT.join(CONFIG['paths']['brandable_variables_json']))).freeze
+  SASS_STYLE = (ENV['SASS_STYLE'] || ((defined?(Rails) && Rails.env.production?) ? 'compressed' : 'nested')).freeze
 
   class << self
     def variables_map
@@ -35,13 +37,15 @@ module BrandableCSS
     end
 
     def combined_checksums
-      return @combined_checksums if ActionController::Base.perform_caching && defined? @combined_checksums
-      file = Rails.root.join(CONFIG['paths']['bundles_with_deps'] + SASS_STYLE)
+      if defined?(ActionController) && ActionController::Base.perform_caching && defined?(@combined_checksums)
+        return @combined_checksums
+      end
+      file = APP_ROOT.join(CONFIG['paths']['bundles_with_deps'] + SASS_STYLE)
       if file.exist?
         @combined_checksums = JSON.parse(file.read).each_with_object({}) do |(k, v), memo|
           memo[k] = v['combinedChecksum']
         end.freeze
-      elsif Rails.env.production?
+      elsif defined?(Rails) && Rails.env.production?
         raise "you need to run #{cli} before you can serve css."
       else
         # for dev/test there might be cases where you don't want it to raise an exception
@@ -88,7 +92,7 @@ module BrandableCSS
 
       command = [cli].push(*args).shelljoin + ' 2>&1'
       msg = "running BrandableCSS CLI: #{command}"
-      Rails.logger.try(:debug, msg)
+      Rails.logger.try(:debug, msg) if defined?(Rails)
       raise "Error: #{msg}" unless system(command)
     end
   end
