@@ -65,3 +65,18 @@ def topic_with_nested_replies(opts = {})
   @all_entries.each &:reload
   @topic.reload
 end
+
+def group_discussion_assignment
+  course = @course || course(:active_all => true)
+  group_category = course.group_categories.create!(:name => "category")
+  @group1 = course.groups.create!(:name => "group 1", :group_category => group_category)
+  @group2 = course.groups.create!(:name => "group 2", :group_category => group_category)
+
+  @topic = course.discussion_topics.build(:title => "topic")
+  @topic.group_category = group_category
+  @assignment = course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
+  @assignment.infer_times
+  @assignment.saved_by = :discussion_topic
+  @topic.assignment = @assignment
+  @topic.save!
+end
