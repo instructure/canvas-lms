@@ -35,6 +35,7 @@ Attachment.class_eval do
   def marshal_load(data)
     initialize
     instance_variable_set :@attributes, data[0]
+    instance_variable_set :@attributes_cache, {}
     instance_variable_set :@new_record, data[1]
   end
 end
