@@ -22,6 +22,8 @@ require 'net_ldap_extensions'
 class AccountAuthorizationConfig < ActiveRecord::Base
   include Workflow
 
+  strong_params
+
   workflow do
     state :active
     state :deleted
