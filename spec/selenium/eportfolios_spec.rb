@@ -8,11 +8,11 @@ describe "eportfolios" do
     course_with_student_logged_in
   end
 
-  it "should create an eportfolio" do
+  it "should create an eportfolio", priority: "1", test_id: 220018 do
     create_eportfolio
   end
 
-  it "should create an eportfolio that is public" do
+  it "should create an eportfolio that is public", priority: "2", test_id: 114348 do
     create_eportfolio(true)
   end
 
@@ -21,13 +21,20 @@ describe "eportfolios" do
       eportfolio_model({:user => @user, :name => "student content"})
     end
 
-    it "should start the download of ePortfolio contents" do
+    it "should start the download of ePortfolio contents", priority: "1", test_id: 115980 do
       get "/eportfolios/#{@eportfolio.id}"
       f(".download_eportfolio_link").click
       keep_trying_until { expect(f("#export_progress")).to be_displayed }
     end
 
-    it "should display and hide eportfolio wizard" do
+    it "should display the eportfolio wizard", priority: "1", test_id: 220019 do
+      get "/eportfolios/#{@eportfolio.id}"
+      f(".wizard_popup_link").click
+      wait_for_animations
+      expect(f("#wizard_box")).to be_displayed
+    end
+
+    it "should display and hide eportfolio wizard", priority: "2", test_id: 220020 do
       get "/eportfolios/#{@eportfolio.id}"
       f(".wizard_popup_link").click
       wait_for_animations
@@ -37,7 +44,7 @@ describe "eportfolios" do
       expect(f("#wizard_box")).not_to be_displayed
     end
 
-    it "should add a new page" do
+    it "should add a new page", priority: "1", test_id: 115979 do
       page_title = 'I made this page.'
 
       get "/eportfolios/#{@eportfolio.id}"
@@ -69,7 +76,7 @@ describe "eportfolios" do
       expect(fj("#section_list li:last-child .name").text).to eq "test section name"
     end
 
-    it "should edit ePortfolio settings" do
+    it "should edit ePortfolio settings", priority: "2", test_id: 220021 do
       get "/eportfolios/#{@eportfolio.id}"
       f('#section_list_manage .portfolio_settings_link').click
       replace_content f('#edit_eportfolio_form #eportfolio_name'), "new ePortfolio name"
@@ -138,7 +145,7 @@ describe "eportfolios" do
     end
 
 
-    it "should delete the ePortfolio" do
+    it "should delete the ePortfolio", priority: "2", test_id: 114350 do
       get "/eportfolios/#{@eportfolio.id}"
       wait_for_ajax_requests
       f(".delete_eportfolio_link").click
