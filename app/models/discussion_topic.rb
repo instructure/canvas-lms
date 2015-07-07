@@ -153,6 +153,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def schedule_delayed_transitions
+    return if self.saved_by == :migration
+
     self.send_at(self.delayed_post_at, :update_based_on_date) if @should_schedule_delayed_post
     self.send_at(self.lock_at, :update_based_on_date) if @should_schedule_lock_at
     # need to clear these in case we do a save whilst saving (e.g.

@@ -108,6 +108,8 @@ describe ContentMigration do
 
         new_disc = @copy_to.discussion_topics.first
         expect(new_disc.delayed_post_at).to be_nil
+        expect(new_disc.lock_at).to be_nil
+        expect(new_disc.locked).to be_falsey
 
         new_ann = @copy_to.announcements.first
         expect(new_ann.delayed_post_at).to be_nil
