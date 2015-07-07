@@ -38,7 +38,7 @@ module Lti
       end
 
       def create
-        secret = RegistrationRequestService.retrieve_registration_password(oauth_consumer_key)
+        secret = RegistrationRequestService.retrieve_registration_password(context, oauth_consumer_key)
         if oauth_authenticated_request?(secret)
           tool_proxy = ToolProxyService.new.process_tool_proxy_json(request.body.read, context, oauth_consumer_key)
           json = {

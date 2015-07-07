@@ -27,6 +27,7 @@ module Lti
         @lti_launch = Launch.new
         @lti_launch.resource_url = params[:tool_consumer_url]
         message = RegistrationRequestService.create_request(
+            @context,
             polymorphic_url([@context, :tool_consumer_profile], tool_consumer_profile_id: "339b6700-e4cb-47c5-a54f-3ee0064921a9"),
             ->(tool_proxy_uuid) { polymorphic_url([@context, :registration_return], tool_proxy_uuid: tool_proxy_uuid) }
         )
