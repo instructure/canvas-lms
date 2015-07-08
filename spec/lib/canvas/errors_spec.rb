@@ -2,7 +2,12 @@ require 'spec_helper'
 module Canvas
   describe Errors do
     before(:each) do
+      @old_registry = described_class.instance_variable_get(:@registry)
       described_class.clear_callback_registry!
+    end
+
+    after(:each) do
+      described_class.instance_variable_set(:@registry, @old_registry)
     end
 
     let(:error){ stub("Some Error") }
