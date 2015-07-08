@@ -203,7 +203,7 @@ describe CalendarEvent do
       HTML
         ev = @event.to_ics(false)
         expect(ev.description).to match_ignoring_whitespace("This assignment is due December 16th. Please do the reading.
- 
+
 
 [link!](www.example.com)")
         expect(ev.x_alt_desc).to eq @event.description
@@ -219,6 +219,7 @@ describe CalendarEvent do
         @attachment.file_state = 'public'
         @attachment.save!
 
+        AdheresToPolicy::Cache.clear
         ev = @event.to_ics(false)
         expect(ev.description).to include("verifier")
 
@@ -228,6 +229,7 @@ describe CalendarEvent do
         @course.is_public = true
         @course.save!
 
+        AdheresToPolicy::Cache.clear
         ev = @event.to_ics(false)
         expect(ev.description).to include("verifier")
       end
@@ -827,7 +829,7 @@ describe CalendarEvent do
         expect(child.start_at).to be_nil
         expect(child.title).to eql @event.title
       end
-  
+
       it "should update cascaded attributes on the child events whenever the parent is updated" do
         calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
         child = @event.child_events.build
@@ -835,14 +837,14 @@ describe CalendarEvent do
         child.save!
         child.reload
         orig_start_at = child.start_at
-  
+
         @event.title = 'asdf'
         @event.start_at = Time.now.utc
         @event.save!
         expect(child.reload.title).to eql 'asdf'
         expect(child.start_at).to eql orig_start_at
       end
-  
+
       it "should disregard attempted changes to cascaded attributes" do
         calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
         child = @event.child_events.build
@@ -869,31 +871,31 @@ describe CalendarEvent do
         expect(child.start_at).to eql @event.start_at
         expect(child.title).to eql @event.title
       end
-  
+
       it "should update locked child events whenever the parent is updated" do
         calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
         child = @event.child_events.build
         child.context = user
         child.workflow_state = :locked
         child.save!
-  
+
         @event.title = 'asdf'
         @event.save!
         expect(child.reload.title).to eql 'asdf'
       end
-  
+
       it "should disregard attempted changes to locked attributes" do
         calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
         child = @event.child_events.build
         child.context = user
         child.workflow_state = :locked
         child.save!
-  
+
         child.title = 'asdf'
         child.save!
         expect(child.title).to eql 'some event'
       end
-  
+
       it "should unlock events when the last child is deleted" do
         calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
         @event.workflow_state = :locked
@@ -902,7 +904,7 @@ describe CalendarEvent do
         child.context = user
         child.workflow_state = :locked
         child.save!
-  
+
         child.destroy
         expect(@event.reload).to be_active
         expect(child.reload).to be_deleted

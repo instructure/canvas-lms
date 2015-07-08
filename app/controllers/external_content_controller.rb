@@ -54,7 +54,7 @@ class ExternalContentController < ApplicationController
       end
     end
     @headers = false
-    js_env(retrieved_data: (@retrieved_data || {}),
+    js_env(retrieved_data: (@retrieved_data || {}), lti_response_messages: lti_response_messages,
            service: params[:service])
   end
 
@@ -123,4 +123,28 @@ class ExternalContentController < ApplicationController
     end
   end
 
+  def lti_response_messages
+    @lti_response_messages ||= (
+      response_messages = {}
+
+      lti_msg = param_if_set "lti_msg"
+      lti_log = param_if_set "lti_log"
+      lti_errormsg = param_if_set("lti_errormsg") {|error_msg| logger.warn error_msg}
+      lti_errorlog = param_if_set("lti_errorlog") {|error_log| logger.warn error_log}
+
+      response_messages[:lti_msg] = lti_msg if lti_msg
+      response_messages[:lti_log] = lti_log if lti_log
+      response_messages[:lti_errormsg] = lti_errormsg if lti_errormsg
+      response_messages[:lti_errorlog] = lti_errorlog if lti_errorlog
+      response_messages
+    )
+  end
+
+  def param_if_set(param_key)
+    param_value = params[param_key] && !params[param_key].empty? && params[param_key]
+    if param_value && block_given?
+      yield param_value
+    end
+    param_value
+  end
 end

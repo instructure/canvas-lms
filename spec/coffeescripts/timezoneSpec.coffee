@@ -154,3 +154,10 @@ define [
     tz.preload('America/Detroit', detroit)
     tz.changeZone('America/Detroit')
     equal tz.format(moonwalk, '%c'), "Sun 20 Jul 1969 09:56:00 PM EST"
+
+  test "hasMeridian() true if locale defines am/pm", ->
+    ok tz.hasMeridian()
+
+  test "hasMeridian() false if locale doesn't define am/pm", ->
+    tz.changeLocale(french, 'fr_FR')
+    ok !tz.hasMeridian()

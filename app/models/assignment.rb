@@ -622,11 +622,7 @@ class Assignment < ActiveRecord::Base
   protected :process_if_quiz
 
   def grading_scheme
-    if self.grading_standard
-      self.grading_standard.grading_scheme
-    else
-      GradingStandard.default_grading_scheme
-    end
+    grading_standard_or_default.grading_scheme
   end
 
   def infer_grading_type
@@ -645,7 +641,9 @@ class Assignment < ActiveRecord::Base
   end
 
   def grading_standard_or_default
-    grading_standard || GradingStandard.default_instance
+    grading_standard ||
+      context.default_grading_standard ||
+      GradingStandard.default_instance
   end
 
   def score_to_grade(score=0.0, given_grade=nil)
@@ -1007,6 +1005,7 @@ class Assignment < ActiveRecord::Base
       if student == original_student || grade_group_students
         previously_graded = submission.grade.present?
         next if previously_graded && dont_overwrite_grade
+        next if student != original_student && submission.excused?
 
         did_grade = false
         submission.attributes = opts
@@ -1409,23 +1408,24 @@ class Assignment < ActiveRecord::Base
   # name.  for non-group assignments this just returns all visible users
   def representatives(user)
     if grade_as_group?
-      submissions = self.submissions.includes(:user)
-      users_with_submissions = submissions
-                               .select(&:has_submission?)
-                               .reject(&:excused?)
-                               .map(&:user)
+      submissions = self.submissions.includes(:user).all
+      users_with_submissions = submissions.select(&:has_submission?).map(&:user)
       users_with_turnitin_data = if turnitin_enabled?
                                    submissions
-                                   .where("turnitin_data IS NOT NULL AND turnitin_data <> ?", {}.to_yaml)
+                                   .reject { |s| s.turnitin_data.blank? }
                                    .map(&:user)
                                  else
                                    []
                                  end
+      users_who_arent_excused = submissions.reject(&:excused?).map(&:user)
       reps_and_others = groups_and_ungrouped(user).map { |group_name, group_students|
         visible_group_students = group_students & visible_students_for_speed_grader(user)
-        representative   = (visible_group_students & users_with_turnitin_data).first
-        representative ||= (visible_group_students & users_with_submissions).first
-        representative ||= visible_group_students.first
+        candidate_students = visible_group_students & users_who_arent_excused
+        candidate_students = visible_group_students if candidate_students.empty?
+
+        representative   = (candidate_students & users_with_turnitin_data).first
+        representative ||= (candidate_students & users_with_submissions).first
+        representative ||= candidate_students.first
         others = visible_group_students - [representative]
         next unless representative
 
@@ -1985,7 +1985,9 @@ class Assignment < ActiveRecord::Base
     self.submission_types == 'online_quiz' && self.quiz.present?
   end
 
-  def self.show_sis_grade_export_option?(context)
-    context.feature_enabled?(:post_grades) || context.root_account.feature_enabled?(:bulk_sis_grade_export)
+  def self.sis_grade_export_enabled?(context)
+    context.feature_enabled?(:post_grades) ||
+      context.root_account.feature_enabled?(:bulk_sis_grade_export) ||
+      Lti::AppLaunchCollator.any?(context, [:post_grades])
   end
 end

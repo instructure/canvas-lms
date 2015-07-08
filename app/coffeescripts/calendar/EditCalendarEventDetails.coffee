@@ -28,11 +28,12 @@ define [
       @$form.submit @formSubmit
       @$form.find(".more_options_link").click @moreOptionsClick
       @$form.find("select.context_id").change @contextChange
+      @$form.find("#duplicate_event").change @duplicateCheckboxChanged
       @$form.find("select.context_id").triggerHandler('change', false)
 
-      # Hide the context selector completely if this is an existing event, since it can't be changed.
-      if !@event.isNewEvent()
-        @$form.find(".context_select").hide()
+      # Context can't be changed, and duplication only works on create
+      unless @event.isNewEvent()
+        @$form.find(".context_select, .duplicate_event_row, .duplicate_event_toggle_row").hide()
 
     contextInfoForCode: (code) ->
       for context in @event.possibleContexts()
@@ -45,7 +46,9 @@ define [
 
     getFormData: =>
       data = @$form.getFormData(object_name: 'calendar_event')
-      data = _.omit(data, 'date', 'start_time', 'end_time')
+      data = _.omit(data,
+        'date', 'start_time', 'end_time',
+        'duplicate', 'duplicate_count', 'duplicate_interval', 'duplicate_frequency', 'append_iterator')
 
       # check if input box was cleared for explicitly undated
       date = @$form.find('input[name=date]').data('date') if @$form.find('input[name=date]').val()
@@ -59,6 +62,14 @@ define [
         end_at = date.toString('yyyy-MM-dd')
         end_at += end_time.toString(' HH:mm') if end_time
         data.end_at = tz.parse(end_at)
+
+      if duplicate = @$form.find('#duplicate_event').prop('checked')
+        data.duplicate = {
+          count: @$form.find('#duplicate_count').val()
+          interval: @$form.find('#duplicate_interval').val()
+          frequency: @$form.find('#duplicate_frequency').val()
+          append_iterator: @$form.find('#append_iterator').is(":checked")
+        }
 
       data
 
@@ -80,6 +91,7 @@ define [
       if data.start_date then params['start_date'] = data.start_date
       if data.start_time then params['start_time'] = data.start_time
       if data.end_time then params['end_time'] = data.end_time
+      if data.duplicate then params['duplicate'] = data.duplicate
 
       pieces = $(jsEvent.target).attr('href').split("#")
       pieces[0] += "?" + $.param(params)
@@ -104,6 +116,15 @@ define [
       else
         moreOptionsHref = @event.fullDetailsURL() + '/edit'
       @$form.find(".more_options_link").attr 'href', moreOptionsHref
+
+    duplicateCheckboxChanged: (jsEvent, propagate) =>
+      @enableDuplicateFields(jsEvent.target.checked)
+
+    enableDuplicateFields: (shouldEnable) =>
+      elts = @$form.find(".duplicate_fields").find('input')
+      disableValue = !shouldEnable
+      elts.prop("disabled", disableValue)
+      @$form.find('.duplicate_event_row').toggle(!disableValue)
 
     setupTimeAndDatePickers: () =>
       # select the appropriate fields
@@ -139,6 +160,8 @@ define [
         'calendar_event[end_at]': if data.end_at then data.end_at.toISOString() else ''
         'calendar_event[location_name]': location_name
       }
+
+      params['calendar_event[duplicate]'] = data.duplicate if data.duplicate?
 
       if @event.isNewEvent()
         params['calendar_event[context_code]'] = data.context_code

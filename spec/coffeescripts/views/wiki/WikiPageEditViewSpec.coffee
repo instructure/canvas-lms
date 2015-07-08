@@ -7,14 +7,11 @@ define [
 
   module 'WikiPageEditView:Init',
     setup: ->
-      @initStub = sinon.stub(wikiSidebar, 'init')
-      @scrollSidebarStub = sinon.stub($, 'scrollSidebar')
-      @attachWikiEditorStub = sinon.stub(wikiSidebar, 'attachToEditor')
-      @attachWikiEditorStub.returns(show: sinon.stub())
+      @initStub = @stub(wikiSidebar, 'init')
+      @scrollSidebarStub = @stub($, 'scrollSidebar')
+      @attachWikiEditorStub = @stub(wikiSidebar, 'attachToEditor')
+      @attachWikiEditorStub.returns(show: ->)
     teardown: ->
-      @scrollSidebarStub.restore()
-      @initStub.restore()
-      @attachWikiEditorStub.restore()
       $(window).off('beforeunload')
 
   test 'init wiki sidebar during render', ->
@@ -45,7 +42,7 @@ define [
     setup = ->
       @stub($, 'scrollSidebar')
       @stub(wikiSidebar, 'init')
-      @stub(wikiSidebar, 'attachToEditor').returns(show: @stub())
+      @stub(wikiSidebar, 'attachToEditor').returns(show: ->)
 
       @wikiPage = new WikiPage attributes
       @view = new WikiPageEditView model: @wikiPage

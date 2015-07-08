@@ -26,15 +26,23 @@
   {{/if}}
   {{#if isDatePicker}}
     <label for="web_conference_user_settings_{{field}}">{{name}}</label>
-        <input
-          class="date_entry"
-          id="web_conference_user_settings_{{field}}"
-          name="web_conference[user_settings][{{field}}]"
-          size="30"
-          type="text"
-          value="{{value}}"
-          {{#if ../../conference_started}}disabled="disabled"{{/if}}
-          >
+    <label class="screenreader-only" id="conference_settings_{{field}}_label">
+      {{#t}}Pick the date and time for the following conference setting: {{/t}}
+      {{name}}
+      {{datepickerScreenreaderPrompt}}
+    </label>
+    <input
+      class="date_entry"
+      id="web_conference_user_settings_{{field}}"
+      name="web_conference[user_settings][{{field}}]"
+      size="30"
+      type="text"
+      value="{{value}}"
+      {{#if ../../conference_started}}disabled="disabled"{{/if}}
+      aria-labelledby="conference_settings_{{field}}_label"
+      data-tooltip
+      title="{{accessibleDateFormat}}"
+      />
   {{/if}}
   {{#if isSelect}}
       <label for="web_conference_user_settings_{{field}}">{{name}}</label>

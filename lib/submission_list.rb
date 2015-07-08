@@ -241,12 +241,6 @@ class SubmissionList
       prior_submission_id, prior_grade, prior_score, prior_graded_at, prior_grader = nil
 
       @filtered_submissions = full_hash_list.inject([]) do |l, h|
-
-        # Don't update prior_grade or prior_submission unless there is a grade.
-        # Also don't add it to the list.  Just pass the list to the next
-        # iteration of the block.
-        next(l) unless h[:score]
-
         # If the submission is different (not null for the first one, or just
         # different than the last one), set the previous_grade to nil (this is
         # the first version that changes a grade), set the new_grade to this

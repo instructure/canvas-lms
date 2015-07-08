@@ -1,7 +1,7 @@
 require 'uri'
 
 module CanvasHttp
-  class Error < ::Exception; end
+  class Error < ::StandardError; end
   class TooManyRedirectsError < CanvasHttp::Error; end
   class InvalidResponseCodeError < CanvasHttp::Error
     attr_reader :code

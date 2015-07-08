@@ -17,12 +17,9 @@
 #
 
 class AccountAuthorizationConfig::GitHub < AccountAuthorizationConfig::Oauth2
-  def self.recognized_params
-    [ :login_attribute ].freeze
-  end
-
   include AccountAuthorizationConfig::PluginSettings
   self.plugin = :github
+  plugin_settings :domain, :client_id, client_secret: :client_secret_dec
 
   def self.sti_name
     'github'.freeze
@@ -30,6 +27,10 @@ class AccountAuthorizationConfig::GitHub < AccountAuthorizationConfig::Oauth2
 
   def login_button?
     true
+  end
+
+  def self.recognized_params
+    [ :login_attribute ].freeze
   end
 
   # Rename db field
@@ -40,8 +41,6 @@ class AccountAuthorizationConfig::GitHub < AccountAuthorizationConfig::Oauth2
   def domain
     auth_host
   end
-
-  plugin_settings :domain, :client_id, client_secret: :client_secret_dec
 
   def unique_id(token)
     token.options[:mode] = :query

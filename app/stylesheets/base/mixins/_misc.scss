@@ -35,3 +35,19 @@
     z-index: 1;
   }
 }
+
+// Quick and easy way for times where you want the icon to be
+// (usually) larger than the default 16px
+// Add this mixin under a parent class, and any icons that are
+// children of your class will show at the size specified in the
+// $new-icon-size parameter
+@mixin overwrite-default-icon-size($new-icon-size) {
+  i[class*=icon-], i[class^=icon-] {
+    width: auto; height: auto;
+    line-height: 1;
+    &:before {
+      font-size: $new-icon-size;
+      top: 0;
+    }
+  }
+}

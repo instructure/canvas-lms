@@ -17,16 +17,16 @@
 #
 
 class AccountAuthorizationConfig::Twitter < AccountAuthorizationConfig::Oauth
-  def self.recognized_params
-    [ :login_attribute ].freeze
-  end
-
   include AccountAuthorizationConfig::PluginSettings
   self.plugin = :twitter
   plugin_settings :consumer_key, consumer_secret: :consumer_secret_dec
 
   def login_button?
     true
+  end
+
+  def self.recognized_params
+    [ :login_attribute ].freeze
   end
 
   def self.login_attributes

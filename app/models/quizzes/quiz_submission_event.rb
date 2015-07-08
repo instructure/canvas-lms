@@ -64,6 +64,8 @@ class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
   # An event describing the student choosing an answer to a question.
   EVT_QUESTION_ANSWERED = "question_answered".freeze
   EVT_QUESTION_FLAGGED = "question_flagged".freeze
+  # An event for every new submission created
+  EVT_SUBMISSION_CREATED = "submission_created".freeze
 
   belongs_to :quiz_submission, class_name: 'Quizzes::QuizSubmission'
 

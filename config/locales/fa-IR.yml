@@ -20,11 +20,9 @@ fa-IR:
     student_count: 
       one: "%{count} دانشجو"
       other: "%{count} دانشجو"
-    student_count_max: "%{count} / %{max} دانشجو"
     user_count: 
       one: "%{count} کاربر"
       other: "%{count} کاربر"
-    user_count_max: "%{count} / %{max} کاربر"
   GroupUserCollection: 
     flash: 
       userAlreadyInGroup: "هشدار: %{user} اکنون عضو %{group} است"
@@ -100,8 +98,6 @@ fa-IR:
   account_authorization_configs: 
     account_required: "باید با LDAP اعتبارسنجی شود"
     index: 
-      add_auth_desc: "افزودن یک ارائه دهنده هویت به این حساب:"
-      choose_auth_type_option: "یک سرویس اعتبارسنجی را انتخاب کنید"
       delete_auth_confirmation: "آیا مطمئنید؟ ممکن است در صورت حذف، کاربران نتوانند وارد شوند"
       ip_address_list_description: "اگر از یک سرویس اعتبارسنجی استفاده می‌کنید که نیازمند اتصال مستقیم سرورهای کانواس به سرورهای شماست، مانند LDAP، باید مطمئن شوید که سرورهای شما می‌توانند مستقیما از این نشانی های آی‌پی ارتباط قبول کنند:"
       no_auth_type_description: "این حساب در حال حاضر با ارائه دهنده هویت یکپارچه نمی شود."
@@ -855,7 +851,6 @@ fa-IR:
         turnitin_host: "میزبان Turnitin"
         turnitin_pledge: "تعهدنامه Turnitin"
         turnitin_shared_secret: "رمز مشترک Turnitin"
-        users_can_edit_name: "کاربران می توانند نام نمایش داده شده را ویرایش نمایند"
       links: 
         add_admins: "افزودن مدیرهای حساب"
         configure_report: پیکربندی...
@@ -1514,9 +1509,6 @@ fa-IR:
       save: "ذخیره سازی"
       validating: "در حال ذخیره سازی..."
       weight_groups: "وزن دار کردن نمره نهایی بر مبنای گروه های تکلیف"
-    assignment_sidebar: 
-      links: 
-        submit: "ارسال تکلیف"
     assignments_list_right_side: 
       links: 
         manage_assignments: "مدیریت تکلیف ها"
@@ -1867,14 +1859,12 @@ fa-IR:
         grade: "نمره: %{grade} *(%{points_possible} امتیاز ممکن)*"
         none_assigned: "هیچ موردی تخصیص داده نشده است"
       links: 
-        resubmit: "ارسال دوباره تکلیف"
         submission: 
           details: "اطلاعات ارسال"
           download_attachment: "بارگیری %{attachment_display_name}"
           view_original_page: "مشاهده صفحه اصلی"
           view_quiz: "مشاهده آزمون ارسالی"
           view_survey: "مشاهده نظرسنجی ارسالی"
-        submit: "ارسال تکلیف"
         view_rubric_evaluation: "مشاهده ارزیابی با استفاده از دستورالعمل"
       messages: 
         no_comments: "نظر موجود نیست"
@@ -2037,20 +2027,13 @@ fa-IR:
     upload_error_unexpected: "در هنگام بارگیری از %{url} یک خطای ناشناس رخ داد"
   attachment_deffe5a9: پیوست
   attendance: 
-    default_attendance_title: "حضور %{date}"
-    errors: 
-      could_not_add_assignment: "افزودن تکلیف انجام نشد"
     options: 
       clear_attendance_marks: "پاک کردن علامت های حضور"
       edit_assignment: "ویرایش تکلیف"
       mark_all_as_absent: "علامتگذاری همه به عنوان غایب"
       mark_all_as_present: "علامت گذاری همه به عنوان حاضر"
-    status: 
-      added_assignment: "تکلیف افزوده شده"
-      adding_assignment: "در حال افزودن تکلیف..."
     titles: 
       attendance_help: "راهنمای حضور"
-      new_attendance_column: "ستون جدید حضور"
   audio_dd489fcc: صدا
   auth_logging: 
     corrupted: "اطلاعات بیشتر موجود نیست"
@@ -2763,7 +2746,6 @@ fa-IR:
     concluded_conference: 
       delete: حذف
       no_recording: "هیج ضبطی موجود نیست"
-      preparing_video: "در حال آماده سازی فیلم"
       recording: "1 مورد ضبط شده"
       recordings: "%{recordingCount} مورد ضبط شده"
       settings: تنظیمات
@@ -3001,14 +2983,6 @@ fa-IR:
         date_adjustment: "تنظیم تاریخ"
         ending_change_to: "تغییر به"
         ending_date: "تاریخ پایان"
-        new_end_date_label: "تغییر تاریخ پایان به"
-        new_end_date_title: "تغییر تاریخ پایان به"
-        new_start_date_label: "تغییر تاریخ شروع به"
-        new_start_date_title: "تغییر تاریخ شروع به"
-        old_end_date_label: "تاریخ پایان"
-        old_end_date_title: "تاریخ پایان"
-        old_start_date_label: "تاریخ شروع"
-        old_start_date_title: "تاریخ شروع"
         remove_dates: "حذف تاریخ ها"
         shift_dates: "تغییر دادن تاریخ ها"
         substitution: جایگزینی
@@ -4530,14 +4504,12 @@ fa-IR:
     conversations_expand: 
       one: "باز کردن %{count} پیام گفتگو"
       other: "باز کردن %{count} پیام گفتگو"
-    disable_dashboard: "بازگشت به داشبورد قدیمی"
     discussions_collapse: 
       one: "بستن %{count} بحث"
       other: "بستن %{count} بحث"
     discussions_expand: 
       one: "باز کردن %{count} بحث"
       other: "باز کردن %{count} بحث"
-    enable_dashboard: "امتحان کردن داشبورد جدید"
     show_more_link: 
       show_less: "نمایش کمتر"
       show_more: "نمایش بیشتر"
@@ -4924,8 +4896,6 @@ fa-IR:
         one: "1 پاسخ خوانده نشده."
         other: "%{count} پاسخ خوانده نشده."
         zero: "هیچ پاسخ خوانده نشده موجود نیست."
-    notices: 
-      discussion_not_availible: "به بحث درخواست شده دسترسی ندارید."
     page_nav: 
       Page: صفحه
       current_page: فعلی
@@ -5401,7 +5371,6 @@ fa-IR:
         already_used: "این مورد ارسالی هم اکنون در مجموعه اسناد شما درج شده است"
         feed: "تک خوراک خبری مجموعه اسناد الکترونیکی"
         view_submission: "مشاهده مورد ارسالی"
-      upload_limit: "محدود کردن به اندازه 50 مگابایت در ازای هر فایل"
       welcome: "اگر اولین باری است که اینجا هستید، ممکن است بخواهید که راهنمای گام به گام را فعال کنید و ببینید که چگونه می توانید به بهترین نحو شروع به کار کنید. در غیر این صورت، می توانید موردهای ارسالی جدید را به سرعت بیفزایید یا اینکه به طور مستقیم به مجموعه اسناد بروید."
       write_only_comments: "نظرهای مربوط به این صفحه خصوصی هستند. می توانید نظر بگذارید، اما فقط صاحب مجموعه اسناد می تواند آن را ببیند."
     show_me: "به من نشان بده"
@@ -5481,7 +5450,6 @@ fa-IR:
   errors: 
     bad_navigation_config: "پیکربندی زبانه درس معتبر نیست"
     blank: لازم
-    failed: "انجام نشد"
     format: "%{attribute} %{message}"
     index: 
       all_categories: "- همه رده ها -"
@@ -5693,7 +5661,6 @@ fa-IR:
   features: 
     allow_opt_out_of_inbox: "دادن امکان انتخاب از صندوق ورودی به کاربران"
     better_file_browsing: "مرور بهتر فایل"
-    course_catalog: "کاتالوگ درس"
     differentiated_assignments: "تکلیف های متمایز"
     differentiated_assignments_account_disable_warning: |-
         غیرفعال کردن این ویژگی روی درس های موجود تأثیر می گذارد. برای راهنمایی برای غیر فعال کردن این ویژگی، لطفا
@@ -5709,7 +5676,6 @@ fa-IR:
     lor: "ابزارهای بیرونی LOR"
     multiple_grading_periods: "چند دوره نمره گذاری"
     new_quiz_statistics: "صفحه آمار آزمون جدید"
-    new_styles: "استفاده از سبک های جدید"
     post_grades: "ارسال نمره ها به سامانه اطلاعات دانشجو"
     quiz_log_auditing: "حسابرسی گزارش ثبت وقایع آزمون"
     student_groups: "صفحه جدید گروه های دانشجو"
@@ -5753,134 +5719,30 @@ fa-IR:
     unpublished_status: "منتشر نشده"
   filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filename} با حق استفاده زیر منتشر شده است: %{usage_right}"
   files: 
-    alts: 
-      file: فایل
-      folder: پوشه
-      folder_locked: "پوشه قفل شده"
-      locked_file: "فایل قفل شده"
-    buttons: 
-      update_file: "بهنگام سازی فایل"
-    cancel: لغو
     content_folder: 
       titles: 
         edit_and_move_instructions: "برای ویرایش کلیک کنید، برای انتقال به یک پوشه دیگر، بکشید"
     could_not_find_file: "این فایل حذف شده است"
     errors: 
       empty_file: "این فایل خالی است. لطفا یک فایل دیگر را بارگذاری کنید."
-      extracting: "در هنگام استخراج فایل فشرده خطاهایی رخ داد. لطفا دوباره سعی کنید."
-      failed_uploading: "بارگذاری انجام نشد: %{error_info}"
-      loading_file: "در هنگام بارگذاری محتوای فایل خطایی رخ داد. لطفا دوباره سعی کنید."
       missing_field: "بارگذاری انجام نشد، جای خالی پیش بینی شده فرم موجود نیست"
       not_found: "ظاهراً در هنگام بارگذاری این فایل اشکالی رخ داده است و نمی توانیم فایل واقعی را پیدا کنیم. ممکن است بخواهید صاحب فایل را مطلع کنید و از او بخواهید که آن دوباره بارگذاری نماید."
       server_error: "بارگذاری انجام نشد، خطای سرور، لطفا دوباره سعی کنید."
-      server_returned_invalid_status: "سرور برگرداندن وضعیت معتبر را متوقف کرد"
-      server_unresponsive: "سرور، پاسخ دادن به درخواست های وضعیت را متوقف کرد"
       too_large: "این فایل برای ویرایش، بزرگ است"
-      unexpected_response: "پاسخ مورد انتظار را برنگرداند"
-      update_file_failed: "بهنگام سازی فایل انجام نشد. لطفا دوباره سعی کنید"
       upload_failed: "بارگذاری انجام نشد. لطفا دوباره سعی کنید."
-      uploading: "خطا در بارگذاری"
-      uploading_zip: "خطاهایی در هنگام بارگذاری فایل فشرده رخ داد."
     fields: 
       file: فایل
     files_page_title: "فایل ها"
     full_index: 
-      alts: 
-        file_locked: "قفل شده"
-        file_preview: "پیش نمایش"
-        folder_locked: "قفل شده"
-      buttons: 
-        add_a_file: "افزودن فایل"
-        lock_file: "قفل کردن این فایل"
-        lock_folder: "قفل کردن این پوشه"
-        overwrite_duplicate_attachment: رونویسی
-        rename_duplicate_attachment: "تغییر نام فایل های جدید"
-      descriptions: 
-        file_locked_after: "بعد از %{lock_at}، قفل خواهد شد."
-        file_locked_until: "تا تاریخ %{unlock_at} قفل شده است."
-        folder_locked: "این پوشه قفل شده است و برای دانشجویان قابل مشاهده نیست."
-        folder_locked_after: "بعد از %{lock_at} قفل خواهد شد."
-        folder_locked_until: "تا تاریخ %{unlock_at} قفل شده است."
-        lock_file: "وقتی یک فایل قفل می شود، فقط اساتید و دستیارهای آموزشی می توانند به آن دسترسی یابند."
-        lock_folder: "وقتی یک پوشه قفل می شود، فقط اساتید و دستیارهای آموزشی می توانند به آن دسترسی یابند."
-      drop_here: "برای افزودن فایل ها به این پوشه، آنها را اینجا رها کنید."
-      drop_zip_files: "همچنین می توانید فایل های فشرده را رها کنید و محتوای آنها را در این پوشه استخراج کنید."
-      edit_html_warning: "ویرایشگر HTML ،HTML شما را تغییر می دهد، باید قبل از ذخیره سازی تغییرها، یک نسخه پشتیبان را بارگیری کنید."
-      file_details: "اطلاعات فایل"
-      file_list: "فهرست فایل"
-      files_title: "فایل ها"
-      labels: 
-        just_hide_file: "به دانشجویان اجازه داده شود در صورتی که به فایل پیوند دهم، آن را بارگیری یا مشاهده کنند، در فهرست فایل های دانشجویان نشان داده نشود"
-        just_hide_folder: "به دانشجویان اجازه داده شود در صورتی که به فایل های موجود در این پوشه پیوند دهم، آنها را بارگیری یا مشاهده کنند، در فهرست فایل های دانشجویان نشان داده نشود"
-        lock_after: "قفل کرده بعد از"
-        lock_until: "قفل کردن تا تاریخ"
-        locked: "قفل کردن تا زمانی که آن را به طور دستی قفل گشایی کنم"
       links: 
-        add_file: "افزودن فایل"
-        add_folder: "افزودن پوشه"
-        delete_file: "حذف این فایل"
-        delete_folder: "حذف این پوشه"
-        download_as_zip: "بارگیری فایل های موجود در این پوشه به صورت فایل فشرده"
-        download_file: "بارگیری این فایل"
-        download_with_size: "بارگیری فایل (%{size})"
         download_zip: "برای بارگیری %{size}، اینجا کلیک کنید"
-        edit_content: "ویرایش محتوا"
-        import_zip: "وارد کردن یک فایل فشرده"
-        lock_file: "قفل کردن این فایل"
-        lock_folder: "قفل کردن این پوشه"
-        preview: "پیش نمایش"
-        rename_file: "تغییر نام این فایل"
-        rename_folder: "تغییر نام این پوشه"
-        show_all_files: "مشاهده فایل های مربوط به همه درس ها/گروه های شما"
-        show_personal_files: "نمایش فقط فایل های شخصی من"
-        unlock_file: "قفل گشایی این فایل"
-        unlock_folder: "قفل گشایی این پوشه"
-      locked: "این فایل هنوز قفل گشایی نشده است، بنابراین نمی توان آن را بارگیری کرد."
-      locked2: "این فایل قفل شده است و برای دانشجویان قابل بارگیری نیست."
       messages: 
         creating_zip: "در حال ایجاد فایل فشرده..."
-        gathering_and_zipping: |-
-            **محتویات این پوشه در حال گردآوری** و تبدیل به یک فایل فشرده
-            هستند. این کار ممکن است بسته به اندازه و تعداد فایل ها مدتی طول بکشد.
         gathering_data: "در حال جمع آوری داده ها..."
-        gathering_files: "در حال گردآوری فایل ها..."
         gathering_files_with_progress: "در حال جمع آوری فایل ها (%{progress}%)..."
-        no_preview_avaialble: "پیش نمایش موجود نیست"
-        uploading: "در حال بارگذاری 5 فایل..."
         zip_finished: "پایان یافت! تغییر مسیر به فایل..."
-      page_title: "فایل ها"
-      storage_used: "ذخیره استفاده شده: %{size1} از %{size2}"
-      switch_views: "تغییر دادن نماها"
       titles: 
         download_folder_contents: "بارگیری محتوای پوشه"
-        edit_file: "ویرایش %{file}"
-        edit_file_contents: "ویرایش محتوای فایل"
-        file_locked: "قفل شده"
-        folder_locked: "قفل شده"
-        lock_file: "قفل کردن %{file_name}"
-        lock_folder: "قفل کردن %{folder_name}"
-      warnings: 
-        too_many: "تعداد درس ها/گروه ها برای نمایش به صورت یکباره زیاد است. در قسمت زیر 15 نتیجه اول آمده است."
-    links: 
-      add_files: "افزودن فایل ها"
-    messages: 
-      access_denied: "نمی توانید محتوای این پوشه را بخوانید."
-      done_uploading: "بارگذاری انجام شد"
-      error_count: 
-        one: "%{count} خطا"
-        other: "%{count} خطا"
-      extraction_complete: "استخراج انجام شد! در حال بهنگام سازی..."
-      finalizing: "در حال نهایی کردن"
-      folder_empty: "چیزی در این پوشه موجود نیست"
-      loading_files: "در حال بارگذاری فایل ها..."
-      no_files_selected: "هیچ فایل معتبری انتخاب نشده است"
-      queued: "در صف"
-      updating_file: "در حال بهنگام سازی فایل..."
-      upload_complete: "بارگذاری انجام شد"
-      uploading: "در حال بارگذاری"
-      uploading_files: 
-        one: "در حال بارگذاری %{count} فایل..."
-        other: "در حال بارگذاری %{count} فایل..."
     my_files: "فایل های من"
     new: 
       buttons: 
@@ -5890,28 +5752,12 @@ fa-IR:
     notices: 
       deleted: "فایل %{display_name} حذف شده است"
       updated: "فایل با موفقیت بهنگام سازی شد."
-    prompts: 
-      delete_file: "مطمئنید که می خواهید این فایل حذف شود؟"
-      delete_folder: "مطمئنید که می خواهید این پوشه و تمام محتوای آن حذف شود؟"
-      duplicate_filenames: "فایل هایی با نام های زیر هم اکنون در این پوشه موجود هستند. می خواهید آنها را جایگزین کنید یا نام فایل های جدید را با استفاده از نام های یکتا تغییر دهید؟"
-      extract_zip: "این فایل، یک فایل فشرده است. می خواهید محتوای آن را در این پوشه استخراج کنید؟"
     show: 
       messages: 
         file_locked: "این فایل هنوز قفل گشایی نشده است."
         folder_locked: "پوشه \"%{folder},\" که این فایل در آن قرار دارد، قفل شده است."
     text_show: 
       page_title: "پیش نمایش فایل"
-    titles: 
-      click_and_drag: "برای انتقال پوشه به یک پوشه دیگر، کلیک کنید و بکشید"
-      drag_to_move: "برای انتقال به یک پوشه دیگر، بکشید"
-      extracting: "در حال استخراج فایل ها در پوشه"
-      file_uplaods_queue: "صف بارگذاری های فایل"
-      lock_file: "قفل کردن فایل"
-      lock_folder: "قفل کردن پوشه"
-    update_file: "بهنگام سازی فایل"
-    upload_error: "در هنگام بهنگام سازی فایل شما خطایی رخ داد"
-    warnings: 
-      file_uploaded_without_response: "فایل ممکن است بارگذاری شده باشد، اما سرور پاسخ نداد. صفحه را برای تأیید، دوباره بارگذاری کنید."
   files_and_folder_contents_only_available_to_studen_944f9166: "فایل ها و محتوای پوشه ها فقط از طریق پیوند قابل دسترس هستند. در فایل های دانشجو قابل مشاهده نیست."
   fill_in_the_blank_read_surrounding_text_1a6c73c7: "جای خالی را پر کنید، متن های اطراف را بخوانید"
   filter_announcements_by_unread_495eeeb3: "فیلتر کردن اطلاعیه ها بر اساس موردهای خوانده نشده"
@@ -6174,27 +6020,15 @@ fa-IR:
   gradebooks: 
     attendance: 
       attendance_info: "هیچ تکلیف حضوری ایجاد نشده است."
-      buttons: 
-        add_assignment: "افزودن تکلیف"
       edit_attendance_info: "برای ویرایش اطلاعات مربوط به یک تکلیف حضوری، روی نماد بازشونده در زیر نام تکلیف کلیک کنید و سپس روی «ویرایش تکلیف» کلیک کنید."
       headers: 
         attendance: حضور
         edit_attendance: "ویرایش اطلاعات حضور"
         loading_attendance: "در حال بارگذاری جدول حضور..."
         mark_attendance: "علامتگذاری حضور"
-        new_column: "ستون جدید حضور"
       how_do_i: چگونه...؟
-      labels: 
-        date: تاریخ
-        group: گروه
-        possible: ممکن
-        title: عنوان
-      links: 
-        add_column: "افزودن ستون"
       mark_attendance_info: "نمای حضور یک جدول را به همراه فهرست دانشجویان در سمت چپ و فهرست تکلیف ها در طرف بالا نشان می دهد. برای مشخص کردن یک دانشجو به عنوان حاضر یا غایب، روی کادر مرتبط کلیک کنید تا علامت صحیح (%{present_icon} را برای حاضر، %{absent_icon} را برای غایب) نمایش دهد. همچنین می توانید از منوی بازشونده ی هر تکلیف برای مشخص کردن یک شخص به عنوان حاضر یا غایب استفاده کنید."
-      new_group: "گروه جدید"
       page_title: حضور
-      points_abbrev: امتیازها
       titles: 
         click_to_change: "برای تغییر دادن کلیک کنید"
     blank_submission: 
@@ -6208,7 +6042,6 @@ fa-IR:
     grade: 
       muted: "غیر فعال"
     grade_summary: 
-      assessment_by: "ارزیابی بر اساس %{name}"
       assignments: "تکلیف ها"
       buttons: 
         show_what_if: "نمایش نمره های «احتمالی» ذخیره شده"
@@ -7049,13 +6882,9 @@ fa-IR:
       invalid_datetime: "مقدار تاریخ/زمان معتبر نیست"
       invalid_entry_for_field: "ورودی معتبر نیست: %{field}"
       invalid_number: "باید یک عدد باشد."
-      not_a_date: "تاریخ نیست!"
       posting_message_failed: "ارسال انجام نشد، دوباره سعی کنید"
       required: "تکمیل جای خالی لازم است"
       search_failed: "جستجو انجام نشد، لطفا دوباره سعی کنید."
-    labels: 
-      datepicker: 
-        time: زمان
     links: 
       minimize_file_preview: "کمینه کردن پیش نمایش فایل"
       minimize_youtube_video: "کمینه کردن تصویر"
@@ -9365,11 +9194,6 @@ fa-IR:
   new_file_135ae520: "[ فایل جدید ]"
   new_outcome_7fba8c7d: "نتیجه جدید"
   new_quiz_statistics_desc: "صفحه آمار آزمون جدید را برای یک درس فعال سازید."
-  new_styles_description: |-
-      روی یک ظاهر جدید واسط کاربر برای کانواس کار می کنیم. این گزینه را برای مشاهده
-      ظاهر و حس ساده سازی شده و بهنگام سازی شده واسط کاربر کانواس فعال کنید. این ویژگی،
-      یک ویژگی
-      «در حال پیشرفت» است و هنوز نباید در تولید برای کاربران واقعی فعال شود.
   next_40e12421: بعدی
   next_steps_ce0f0d0c: "مراحل بعدی"
   no_assignment_name_adbb215b: "نام تکلیف موجود نیست"
@@ -9678,7 +9502,6 @@ fa-IR:
       page_title: "ورود به برنامه"
       remember_auth: "مجوز من برای این سرویس به خاطر سپرده شود"
   observees: 
-    add_observee_button: "افزودن دانشجو"
     being_observed: "دانشجویانی که در حال مشاهده شدن هستند"
     new_observee_password: "رمز عبور"
     new_observee_username: "نام کاربری"
@@ -11483,7 +11306,6 @@ fa-IR:
         has_submissions_already: "به یاد داشته باشید که برخی دانشجویان این آزمون را قبلا داده اند یا آن را شروع کرده اند."
         less_than_allotted_time: "این آزمون را نزدیک به زمان مهلت آن شروع کرده اید. بنابراین وقت کامل برای دادن این آزمون نخواهید داشت."
         no_submission_for_user: "هیچ مورد ارسالی برای این کاربر در دسترس نیست"
-        quiz_not_availible: "به آزمون درخواست شده دسترسی ندارید."
         quiz_updated: "آزمون با موفقیت بهنگام سازی شد."
         quizzes_published: 
           one: "%{count} آزمون با موفقیت منتشر شد!"
@@ -12530,18 +12352,6 @@ fa-IR:
         go: برو
       titles: 
         find_user: "یافتن کاربر"
-    add_assignment: 
-      buttons: 
-        add_assignment: "افزودن تکلیف"
-      labels: 
-        assignment_group_id: گروه
-        due_at: مهلت
-        points_possible: امتیازها
-        title: نام
-      options: 
-        assignments: "تکلیف ها"
-      titles: 
-        add_assignment: "افزودن تکلیف"
     add_assignment_group: 
       buttons: 
         add_group: "افزودن گروه"
@@ -13907,7 +13717,6 @@ fa-IR:
   until_date_949017c4: "تا %{date}"
   untitled_assignment_59354b34: "تکلیف بدون عنوان"
   unused_courses_title: "درس های استفاده نشده"
-  update_4d8ee62: "بهنگام سازی"
   updated_group_group_name_727b1d98: "گروه %{group_name} بهنگام سازی شد"
   upload_button: 
     upload: بارگذاری
@@ -14129,8 +13938,6 @@ fa-IR:
         one: "میانگین برای %{count} دانشجو"
         other: "میانگین برای %{count} دانشجو"
       course: درس
-      crumbs: 
-        grades: "نمره ها"
       current_teacher_courses: "درس هایی که آموزش می دهم"
       linked_student_accounts: "حساب های دانشجویی متصل شده"
       links: 

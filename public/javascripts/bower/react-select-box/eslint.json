@@ -1,0 +1,21 @@
+{
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "rules": {
+    "no-unused-expressions": 0,
+    "eol-last": 0,
+    "semi": 0,
+    "quotes": 0,
+    "curly": 0,
+    "new-cap": 0,
+    "no-comma-dangle": 2,
+    "no-cond-assign": 0,
+    "no-underscore-dangle": 0,
+    "no-console": 2,
+    "no-floating-decimal": 2,
+    "no-self-compare": 2
+  }
+}
+

@@ -9,7 +9,7 @@ define [
 
   module 'DashboardCardBox',
     setup: ->
-      sinon.stub(CourseActivitySummaryStore, 'getStateForCourse', -> {})
+      @stub(CourseActivitySummaryStore, 'getStateForCourse', -> {})
       @courseCards = [{
         id: 1,
         shortName: 'Bio 101'
@@ -19,7 +19,6 @@ define [
       }]
 
     teardown: ->
-      CourseActivitySummaryStore.getStateForCourse.restore()
       localStorage.clear()
       if @component
         React.unmountComponentAtNode(@component.getDOMNode().parentNode)

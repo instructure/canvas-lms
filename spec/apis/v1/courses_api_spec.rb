@@ -56,6 +56,10 @@ describe Api::V1::Course do
       expect(@test_api.course_json(@course1, @me, {}, [], [teacher_enrollment]).has_key?("needs_grading_count")).to be_falsey
     end
 
+    it 'should only include is_favorite if requested' do
+      expect(@test_api.course_json(@course1, @me, {}, ['favorites'], [teacher_enrollment]).key?('is_favorite')).to be_truthy
+    end
+
     it 'should honor needs_grading_count for teachers' do
       expect(@test_api.course_json(@course1, @me, {}, ['needs_grading_count'], [teacher_enrollment]).has_key?("needs_grading_count")).to be_truthy
     end

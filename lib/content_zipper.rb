@@ -67,76 +67,28 @@ class ContentZipper
 
   def zip_assignment(zip_attachment, assignment)
     mark_attachment_as_zipping!(zip_attachment)
-    filename = assignment_zip_filename(assignment)
 
-    user = zip_attachment.user
-    context = assignment.context
+    @assignment = assignment
+    @context    = assignment.context
 
-    students = assignment.representatives(user).index_by(&:id)
+    filename    = assignment_zip_filename(assignment)
+    user        = zip_attachment.user
+    students    = assignment.representatives(user).index_by(&:id)
     submissions = assignment.submissions.where(:user_id => students.keys)
 
     make_zip_tmpdir(filename) do |zip_name|
       @logger.debug("creating #{zip_name}")
       Zip::File.open(zip_name, Zip::File::CREATE) do |zipfile|
         count = submissions.length
+        # prevents browser hangs when there are no submissions to download
+        mark_successful! if count == 0
+
         submissions.each_with_index do |submission, idx|
-          @assignment = assignment
-          @submission = submission
-          @context = assignment.context
-          @logger.debug(" checking submission for #{(submission.user.name rescue nil)}")
-
-          # pulling out of this hash to get group names for group assignments
-          # and to avoid extra queries
-          users_name = students[submission.user_id].sortable_name
-          # necessary because we use /_\d+_/ to infer the user/attachment
-          # ids when teachers upload graded submissions
-          users_name.gsub! /_(\d+)_/, '-\1-'
-          users_name.gsub! /^(\d+)$/, '-\1-'
-
-          filename = users_name + (submission.late? ? " LATE_" : "_") + submission.user_id.to_s
-          filename = filename.gsub(/ /, "-").gsub(/[^-\w]/, "-").downcase
-
-          content = nil
-          if submission.submission_type == "online_upload"
-            # NOTE: not using #versioned_attachments or #attachments because
-            # they do not include submissions for group assignments for anyone
-            # but the original submitter of the group submission
-            attachment_ids = submission.attachment_ids.try(:split, ",")
-            attachments = attachment_ids ?
-                            Attachment.where(id: attachment_ids) :
-                            []
-            attachments.each do |attachment|
-              @logger.debug("  found attachment: #{attachment.display_name}")
-              fn = filename + "_" + attachment.id.to_s + "_" + attachment.display_name
-              mark_successful! if add_attachment_to_zip(attachment, zipfile, fn)
-            end
-          elsif submission.submission_type == "online_url" && submission.url
-            @logger.debug("  found url: #{submission.url}")
-            self.extend(ApplicationHelper)
-            filename += "_link.html"
-            @logger.debug("  loading template")
-            content = File.open(File.join("app", "views", "assignments", "redirect_page.html.erb")).read
-            @logger.debug("  parsing template")
-            content = ERB.new(content).result(binding)
-            @logger.debug("  done parsing template")
-            if content
-              zipfile.get_output_stream(filename) {|f| f.puts content }
-              mark_successful!
-            end
-          elsif submission.submission_type == "online_text_entry" && submission.body
-            @logger.debug("  found text entry")
-            self.extend(ApplicationHelper)
-            filename += "_text.html"
-            content = File.open(File.join("app", "views", "assignments", "text_entry_page.html.erb")).read
-            content = ERB.new(content).result(binding)
-            if content
-              zipfile.get_output_stream(filename) {|f| f.puts content }
-              mark_successful!
-            end
-          end
+          add_submission(submission, students, zipfile)
           update_progress(zip_attachment, idx, count)
         end
       end
+
       @logger.debug("added #{submissions.size} submissions")
       assignment.increment!(:submissions_downloads)
       complete_attachment!(zip_attachment, zip_name)
@@ -269,10 +221,10 @@ class ContentZipper
     # 2. we're doing this inside a course context export, and are bypassing
     # the user check (@check_user == false)
     attachments = if !@check_user || folder.context.grants_right?(@user, :manage_files)
-                folder.active_file_attachments
-              else
-                folder.visible_file_attachments
-              end
+                    folder.active_file_attachments
+                  else
+                    folder.visible_file_attachments
+                  end
 
     attachments = attachments.select{|a| opts[:exporter].export_object?(a)} if opts[:exporter]
     attachments.select{|a| !@check_user || a.grants_right?(@user, :download)}.each do |attachment|
@@ -360,5 +312,100 @@ class ContentZipper
       zip_attachment.workflow_state = 'errored'
       zip_attachment.save!
     end
+  end
+
+  private
+
+  def add_file(attachment, zipfile, fn)
+    if attachment.deleted?
+      mark_successful!
+    elsif add_attachment_to_zip(attachment, zipfile, fn)
+      mark_successful!
+    end
+  end
+
+  def add_online_submission_content(filename, display_page, zipfile)
+    extend(ApplicationHelper)
+
+    content = File.open(File.join("app", "views", "assignments", display_page)).read
+    content = ERB.new(content).result(binding)
+
+    if content
+      zipfile.get_output_stream(filename) {|f| f.puts content }
+      mark_successful!
+    end
+  end
+
+  def add_submission(submission, students, zipfile)
+    @submission = submission
+    @logger.debug(" checking submission for #{(submission.user.id)}")
+
+    users_name = get_user_name(students, submission)
+    filename = get_filename(users_name, submission)
+
+    case submission.submission_type
+    when "online_upload"
+      add_upload_submission(submission, zipfile, filename)
+    when "online_url"
+      add_text_or_url(:url, zipfile, filename)
+    when "online_text_entry"
+      add_text_or_url(:text, zipfile, filename)
+    end
+
+  end
+
+  def add_text_or_url(type, to_zip, called)
+    if type == :text
+      filename = "#{called}_text.html"
+      display_page = "text_entry_page.html.erb"
+    elsif type == :url
+      filename = "#{called}_link.html"
+      display_page = "redirect_page.html.erb"
+    end
+
+    add_online_submission_content(filename, display_page, to_zip)
+  end
+
+  def add_upload_submission(submission, zipfile, filename)
+    uploaded_files = get_uploaded_files_from(submission)
+
+    uploaded_files.each do |file|
+      @logger.debug("  found attachment: #{file.display_name}")
+      full_filename = "#{filename}_#{file.id}_#{file.display_name}"
+
+      add_file(file, zipfile, full_filename)
+    end
+  end
+
+  def get_filename(users_name, submission)
+    filename = "#{users_name}#{submission.late? ? ' LATE' : ''}_#{submission.user_id}"
+    sanitize_file_name(filename)
+  end
+
+  def get_uploaded_files_from(submission)
+    # NOTE: not using #versioned_attachments or #attachments because
+    # they do not include submissions for group assignments for anyone
+    # but the original submitter of the group submission
+    attachment_ids = submission.attachment_ids.try(:split, ",")
+    Attachment.where(id: Array.wrap(attachment_ids))
+  end
+
+  def get_user_name(students, submission)
+    # pulling out of this hash to get group names for group assignments
+    # and to avoid extra queries
+    user_name = students[submission.user_id].sortable_name
+    sanitize_user_name(user_name)
+  end
+
+  def sanitize_file_name(filename)
+    filename.gsub(/ /, "-").gsub(/[^-\w]/, "-").downcase
+  end
+
+  def sanitize_user_name(user_name)
+    # necessary because we use /_\d+_/ to infer the user/attachment
+    # ids when teachers upload graded submissions
+    user_name.gsub!(/_(\d+)_/, '-\1-')
+    user_name.gsub!(/^(\d+)$/, '-\1-')
+    user_name
   end
 end

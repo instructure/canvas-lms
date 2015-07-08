@@ -3,23 +3,19 @@ define [
   'tinymce_plugins/instructure_links/linkable_editor'
 ], ($, LinkableEditor) ->
 
-  sandbox = null
   rawEditor = null
 
   module "LinkableEditor",
     setup: ->
       $("#fixtures").html("<div id='some_editor' data-value='42'></div>")
-      sandbox = sinon.sandbox.create()
       rawEditor = {
         id: 'some_editor',
         selection: {
-          getContent: (()-> "Some Content"),
-          getRng: (()-> "Some Range")
+          getContent: (()-> "Some Content")
         }
       }
 
     teardown: ->
-      sandbox.restore()
       $("#fixtures").empty()
 
   test "can load the original element from the editor id", ->
@@ -34,11 +30,28 @@ define [
     expectedOpts = {
       url: text,
       classes: classes,
-      selectedContent: "Some Content",
-      selectedRange: "Some Range"
+      selectedContent: "Some Content"
     }
-    edMock = sandbox.mock(jqueryEditor)
+    edMock = @mock(jqueryEditor)
     edMock.expects("editorBox").withArgs('create_link', expectedOpts)
     editor.createLink(text, classes)
-    edMock.verify()
+
+  test "pulling out text content from a text node", ->
+    editor = new LinkableEditor(rawEditor)
+    extractedText = editor.extractTextContent({
+      getContent: ((opts)-> "Plain Text")
+    })
+    equal(extractedText, "Plain Text")
+
+  test "extracting text from an IMG node with firefox api", ->
+    editor = new LinkableEditor(rawEditor)
+    extractedText = editor.extractTextContent({
+      getContent: ((opts)->
+        if opts? and opts.format is "text"
+          "alt_text"
+        else
+          "<img alt='alt_text' src=''/>"
+      )
+    })
+    equal(extractedText, "")
 

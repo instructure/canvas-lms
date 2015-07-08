@@ -50,13 +50,13 @@ module Importers
       migration.context.touch
     end
 
-    def self.import_from_migration(hash, context, migration=nil, item=nil)
+    def self.import_from_migration(hash, context, migration, item=nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:modules_to_import] && !hash[:modules_to_import][hash[:migration_id]]
       item ||= ContextModule.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first
       item ||= ContextModule.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
       item ||= ContextModule.new(:context => context)
-      migration.add_imported_item(item) if migration
+      migration.add_imported_item(item)
       item.name = hash[:title] || hash[:description]
       item.migration_id = hash[:migration_id]
       if hash[:workflow_state] == 'unpublished'
@@ -94,7 +94,7 @@ module Importers
         begin
           self.add_module_item_from_migration(item, tag_hash, 0, context, item_map, migration)
         rescue
-          migration.add_import_warning(t(:migration_module_item_type, "Module Item"), tag_hash[:title], $!) if migration
+          migration.add_import_warning(t(:migration_module_item_type, "Module Item"), tag_hash[:title], $!)
         end
       end
 
@@ -117,7 +117,7 @@ module Importers
     end
 
 
-    def self.add_module_item_from_migration(context_module, hash, level, context, item_map, migration=nil)
+    def self.add_module_item_from_migration(context_module, hash, level, context, item_map, migration)
       hash = hash.with_indifferent_access
       hash[:migration_id] ||= hash[:item_migration_id]
       hash[:migration_id] ||= Digest::MD5.hexdigest(hash[:title]) if hash[:title]
@@ -129,7 +129,7 @@ module Importers
       else
         existing_item.workflow_state = 'active'
       end
-      migration.add_imported_item(existing_item) if migration
+      migration.add_imported_item(existing_item)
       existing_item.migration_id = hash[:migration_id]
       hash[:indent] = [hash[:indent] || 0, level].max
       resource_class = linked_resource_type_class(hash[:linked_resource_type])
@@ -137,7 +137,7 @@ module Importers
         wiki = context_module.context.wiki.wiki_pages.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
         if wiki
           item = context_module.add_item({
-            :title => hash[:title] || hash[:linked_resource_title],
+            :title => wiki.title.presence || hash[:title] || hash[:linked_resource_title],
             :type => 'wiki_page',
             :id => wiki.id,
             :indent => hash[:indent].to_i
@@ -158,7 +158,7 @@ module Importers
         ass = context_module.context.assignments.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
         if ass
           item = context_module.add_item({
-            :title => hash[:title] || hash[:linked_resource_title],
+            :title => ass.title.presence || hash[:title] || hash[:linked_resource_title],
             :type => 'assignment',
             :id => ass.id,
             :indent => hash[:indent].to_i
@@ -175,7 +175,7 @@ module Importers
         # external url
         if url = hash[:url]
           if (CanvasHttp.validate_url(hash[:url]) rescue nil)
-            url = migration.process_domain_substitutions(url) if migration
+            url = migration.process_domain_substitutions(url)
 
             item = context_module.add_item({
               :title => hash[:title] || hash[:linked_resource_title] || hash['description'],
@@ -184,7 +184,7 @@ module Importers
               :url => url
             }, existing_item, :position => context_module.migration_position)
           else
-            migration.add_import_warning(t(:migration_module_item_type, "Module Item"), hash[:title], "#{hash[:url]} is not a valid URL") if migration
+            migration.add_import_warning(t(:migration_module_item_type, "Module Item"), hash[:title], "#{hash[:url]} is not a valid URL")
           end
         end
       elsif resource_class == ContextExternalTool
@@ -194,7 +194,7 @@ module Importers
 
         if hash[:linked_resource_global_id] && (!migration || !migration.cross_institution?)
           external_tool_id = hash[:linked_resource_global_id]
-        elsif migration && arr = migration.find_external_tool_translation(hash[:linked_resource_id])
+        elsif arr = migration.find_external_tool_translation(hash[:linked_resource_id])
           external_tool_id = arr[0]
           custom_fields = arr[1]
           if custom_fields.present?
@@ -206,14 +206,14 @@ module Importers
 
         if external_tool_url
           title = hash[:title] || hash[:linked_resource_title] || hash['description']
-          if migration
-            external_tool_url = migration.process_domain_substitutions(external_tool_url)
-            if external_tool_id.nil?
-              migration.add_warning(t(:foreign_lti_tool,
-                  %q{The account External Tool for module item "%{title}" must be configured before the item can be launched},
-                  :title => title))
-            end
+
+          external_tool_url = migration.process_domain_substitutions(external_tool_url)
+          if external_tool_id.nil?
+            migration.add_warning(t(:foreign_lti_tool,
+                %q{The account External Tool for module item "%{title}" must be configured before the item can be launched},
+                :title => title))
           end
+
           item = context_module.add_item({
             :title => title,
             :type => 'context_external_tool',
@@ -226,7 +226,7 @@ module Importers
         quiz = context_module.context.quizzes.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
         if quiz
           item = context_module.add_item({
-            :title => hash[:title] || hash[:linked_resource_title],
+            :title => quiz.title.presence || hash[:title] || hash[:linked_resource_title],
             :type => 'quiz',
             :indent => hash[:indent].to_i,
             :id => quiz.id
@@ -236,7 +236,7 @@ module Importers
         topic = context_module.context.discussion_topics.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
         if topic
           item = context_module.add_item({
-            :title => hash[:title] || hash[:linked_resource_title],
+            :title => topic.title.presence || hash[:title] || hash[:linked_resource_title],
             :type => 'discussion_topic',
             :indent => hash[:indent].to_i,
             :id => topic.id

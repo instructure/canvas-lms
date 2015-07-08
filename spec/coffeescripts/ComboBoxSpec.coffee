@@ -108,7 +108,7 @@ define [
       {label: 'label3', value: 'value3'}
     ]
     @combobox = new ComboBox items
-    spy = sinon.spy()
+    spy = @spy()
     @combobox.on 'change', spy
 
     # calling select should change selection and trigger callback with new
@@ -131,7 +131,7 @@ define [
       {label: 'label3', value: 'value3'}
     ]
     @combobox = new ComboBox items, selected: items[1].value
-    spy = sinon.spy()
+    spy = @spy()
     @combobox.on 'change', spy
 
     # clicking prev button selects previous element
@@ -150,7 +150,7 @@ define [
   test 'prev button: one item', ->
     items = [{label: 'label1', value: 'value1'}]
     @combobox = new ComboBox items
-    spy = sinon.spy()
+    spy = @spy()
     @combobox.on 'change', spy
 
     # clicking prev button does nothing
@@ -165,7 +165,7 @@ define [
       {label: 'label3', value: 'value3'}
     ]
     @combobox = new ComboBox items, selected: items[1].value
-    spy = sinon.spy()
+    spy = @spy()
     @combobox.on 'change', spy
 
     # clicking prev button selects previous element
@@ -184,7 +184,7 @@ define [
   test 'next button: one item', ->
     items = [{label: 'label1', value: 'value1'}]
     @combobox = new ComboBox items
-    spy = sinon.spy()
+    spy = @spy()
     @combobox.on 'change', spy
 
     # clicking prev button does nothing

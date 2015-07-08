@@ -294,11 +294,21 @@ TEXT
           <input type="checkbox" id="unlock_module_at"/>
           <label for="unlock_module_at"><%= t('#labels.lock_module_until', %{Lock module until a given date}) %></label>
         </td>
-      </tr><tr class="unlock_module_at_details">
+      </tr>
+      <tr class="unlock_module_at_details">
         <td>
           <%= before_label('unlock_at', %{Unlock At}) %>
-        </td><td>
-          <%= f.text_field :unlock_at, :class => "datetime_field", :'aria-label' => t('#aria_labels.unlock_at_date', "Unlock on Date") %>
+          <label class='screenreader-only' id='unlock_at_date_label'>
+            <%= t("Unlock module on date") %>
+            <%= datepicker_screenreader_prompt %>
+          </label>
+        </td>
+        <td>
+          <%= f.text_field :unlock_at,
+                           class: "datetime_field",
+                           'aria-labelledby' => 'unlock_at_date_label',
+                           'data-tooltip' => '',
+                           title: accessible_date_format %>
         </td>
       </tr>
 

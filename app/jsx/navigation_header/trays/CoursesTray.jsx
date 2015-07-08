@@ -9,7 +9,8 @@ define([
   var CoursesTray = React.createClass({
     propTypes: {
       courses: React.PropTypes.array.isRequired,
-      closeTray: React.PropTypes.func.isRequired
+      closeTray: React.PropTypes.func.isRequired,
+      hasLoaded: React.PropTypes.bool.isRequired
     },
 
     getDefaultProps() {
@@ -19,10 +20,17 @@ define([
     },
 
     renderCourses() {
+      if (!this.props.hasLoaded) {
+        return (
+          <li className="ReactTray__loading-list-item">
+            {I18n.t('Loading')} &hellip;
+          </li>
+        );
+      }
       var courses = this.props.courses.map((course) => {
         return <li key={course.id}><a href={`/courses/${course.id}`}>{course.name}</a></li>;
       });
-      courses.push(<li key='allCourseLink'><a href='/courses'>All Courses ❯</a></li>);
+      courses.push(<li key='allCourseLink' className='ReactTray__feature-list-item'><a href='/courses'>All Courses</a></li>);
       return courses;
     },
 
@@ -43,7 +51,7 @@ define([
           </div>
           <div className="ReactTray__secondary-content">
             <div className="ReactTray__info-box">
-              {I18n.t('Welcome to your courses! To customize the list of courses,' +
+              {I18n.t('Welcome to your courses! To customize the list of courses, ' +
                       'click on the "All Courses" link and star the courses to display.')}
             </div>
           </div>

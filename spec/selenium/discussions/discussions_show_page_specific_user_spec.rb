@@ -60,7 +60,7 @@ describe "discussions" do
           expect(f('#content')).to include_text(new_student_entry_text)
         end
 
-        it "should display the subscribe button after an initial post" do
+        it "should display the subscribe button after an initial post", priority: 1, test_id: 150484 do
           topic.unsubscribe(student)
           topic.require_initial_post = true
           topic.save!

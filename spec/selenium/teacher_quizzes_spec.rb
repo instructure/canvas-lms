@@ -6,9 +6,17 @@ describe "quizzes" do
   include AssignmentOverridesSeleniumHelper
   include_examples "quizzes selenium tests"
 
+  def add_question_to_group
+    f('.add_question_link').click
+    wait_for_ajaximations
+    question_form = f('.question_form')
+    submit_form(question_form)
+    wait_for_ajaximations
+  end
+
   context "as a teacher" do
 
-    before (:each) do
+    before(:each) do
       course_with_teacher_logged_in
       @course.update_attributes(:name => 'teacher course')
       @course.save!
@@ -198,6 +206,10 @@ describe "quizzes" do
       replace_content(group_form.find_element(:name, 'quiz_group[question_points]'), '3')
       submit_form(group_form)
       expect(group_form.find_element(:css, '.group_display.name')).to include_text('new group')
+
+      expect(f("#quiz_display_points_possible .points_possible").text).to eq "0"
+
+      add_question_to_group
       click_settings_tab
       keep_trying_until { expect(f("#quiz_display_points_possible .points_possible").text).to eq "3" }
 

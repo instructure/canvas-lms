@@ -23,12 +23,16 @@ define([
      * Options is an object containing additional options for the store:
      *    - perPage - indicates the number of records that should be pulled per
      *                request.
+     *
+     * Other options will be to query parameters
      */
     constructor (apiEndpoint, options) {
       // We clone the initialStoreState so it doesn't hang onto a bad reference.
       this.store = createStore(_.clone(initialStoreState));
-      if (options && options.perPage) {
-        apiEndpoint += '?per_page=' + options.perPage;
+      if (options) {
+        options.per_page = options.perPage;
+        delete(options.perPage);
+        apiEndpoint += '?' + $.param(options);
       }
       this.apiEndpoint = apiEndpoint;
     }

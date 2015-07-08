@@ -14,11 +14,10 @@ define [
   test 'DP: single item rendered with FilesystemObjectThumbnail', ->
     file = new File(name: 'Test File', thumbnail_url: 'blah')
     file.url = -> "some_url"
-    fsObjStub = sinon.stub(FilesystemObjectThumbnail.type.prototype, 'render').returns(React.createElement('div'))
+    fsObjStub = @stub(FilesystemObjectThumbnail.type.prototype, 'render').returns(React.createElement('div'))
     dialogPreview = TestUtils.renderIntoDocument(DialogPreview(itemsToShow: [file]))
 
     ok fsObjStub.calledOnce
-    fsObjStub.restore()
     React.unmountComponentAtNode(dialogPreview.getDOMNode().parentNode)
 
   test 'DP: multiple file items rendered in i elements', ->

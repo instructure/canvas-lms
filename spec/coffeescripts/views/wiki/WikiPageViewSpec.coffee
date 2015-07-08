@@ -61,7 +61,7 @@ define [
     strictEqual view.toJSON().wiki_page_edit_path, '/groups/73/pages/37/revisions', 'wiki_page_history_path represented in toJSON'
 
   test 'lock_info.unlock_at', ->
-    @sandbox.useFakeTimers(new Date(2012, 0, 31).getTime())
+    clock = sinon.useFakeTimers(new Date(2012, 0, 31).getTime())
     model = new WikiPage
       locked_for_user: true
       lock_info:
@@ -69,6 +69,7 @@ define [
     view = new WikiPageView
       model: model
     ok !!view.toJSON().lock_info?.unlock_at.match('Feb'), 'lock_info.unlock_at reformatted and represented in toJSON'
+    clock.restore()
 
   testRights = (subject, options) ->
     test "#{subject}", ->

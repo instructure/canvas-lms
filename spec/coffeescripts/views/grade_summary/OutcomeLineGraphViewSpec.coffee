@@ -54,19 +54,17 @@ define [
       'should resolve promise on fetched:last'
 
   test 'render', ->
-    renderSpy = sinon.spy(@outcomeLineGraphView, 'render')
+    renderSpy = @spy(@outcomeLineGraphView, 'render')
     ok !@outcomeLineGraphView.deferred.isResolved(),
       'precondition'
     ok @outcomeLineGraphView.render()
     ok _.isUndefined(@outcomeLineGraphView.svg),
       'should not render svg if promise is unresolved'
 
-    sinon.stub(@outcomeLineGraphView.collection, 'isEmpty', -> true)
     @outcomeLineGraphView.collection.trigger('fetched:last')
     ok renderSpy.calledTwice, 'promise should call render'
     ok _.isUndefined(@outcomeLineGraphView.svg),
       'should not render svg if collection is empty'
-    @outcomeLineGraphView.collection.isEmpty.restore()
 
     @outcomeLineGraphView.collection.parse(@response)
     @outcomeLineGraphView.collection.add(
@@ -77,5 +75,3 @@ define [
       'should render svg if scores are present'
     ok @outcomeLineGraphView.$('.screenreader-only'),
       'should render table of data for screen reader'
-
-    @outcomeLineGraphView.render.restore()

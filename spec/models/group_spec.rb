@@ -178,7 +178,7 @@ describe Group do
   end
 
   it "should grant manage permissions for associated objects to group managers" do
-    e = course_with_teacher
+    e = course_with_teacher(active_course: true)
     course = e.context
     teacher = e.user
     group = course.groups.create
@@ -191,7 +191,7 @@ describe Group do
   end
 
   it "should only allow me to moderate_forum if I can moderate_forum of group's context" do
-    course_with_teacher
+    course_with_teacher(active_course: true)
     student_in_course
     group = @course.groups.create
 
@@ -200,7 +200,7 @@ describe Group do
   end
 
   it "should grant read_roster permissions to students that can freely join or request an invitation to the group" do
-    course_with_teacher
+    course_with_teacher(active_course: true)
     student_in_course
 
     # default join_level == 'invitation_only' and default category is not self-signup
@@ -533,7 +533,7 @@ describe Group do
 
   context "tabs_available" do
     before :once do
-      course_with_teacher
+      course_with_teacher(active_course: true)
       @teacher = @user
       @group = group(:group_context => @course)
       @group.users << @student = student_in_course(:course => @course).user

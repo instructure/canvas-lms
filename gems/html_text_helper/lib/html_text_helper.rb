@@ -114,9 +114,13 @@ module HtmlTextHelper
   # like so
   # *******
   def banner(text, opts={})
+    return text if text.empty?
+
+    char = opts.fetch(:char, '*')
     text_width = text.lines.map{|l| l.strip.length}.max
     text_width = [text_width, opts[:line_width]].min if opts[:line_width]
-    line = opts[:char] * text_width
+    line = char * text_width
+
     (opts[:underline] ? '' : line + "\n") + text + "\n" + line
   end
 

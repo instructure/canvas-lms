@@ -59,7 +59,23 @@ module Api
           expect(html).to eq(%Q{<body><a class=\"instructure_inline_media_comment audio_comment\" id=\"media_comment_123/\" href=\"/media_objects/123/\"></a></body>})
         end
       end
+
+      describe "#rewritten_html" do
+
+        it "stuffs mathml into a data attribute on equation images" do
+          string = "<div><ul><li><img class='equation_image' alt='\int f(x)/g(x)'/></li>"\
+                 "<li><img class='equation_image' alt='\\sum 1..n'/></li>"\
+                 "<li><img class='nothing_special'></li></ul></div>"
+          url_helper = stub(rewrite_api_urls: nil)
+          html = Content.new(string).rewritten_html(url_helper)
+          expected = "<div><ul>\n"\
+              "<li><img class=\"equation_image\" data-mathml=\"&lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot; display=&quot;inline&quot;&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mi&gt;f&lt;/mi&gt;&lt;mo stretchy='false'&gt;(&lt;/mo&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo stretchy='false'&gt;)&lt;/mo&gt;&lt;mo&gt;/&lt;/mo&gt;&lt;mi&gt;g&lt;/mi&gt;&lt;mo stretchy='false'&gt;(&lt;/mo&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo stretchy='false'&gt;)&lt;/mo&gt;&lt;/math&gt;\"></li>\n"\
+              "<li><img class=\"equation_image\" data-mathml='&lt;math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"&gt;&lt;mo lspace=\"thinmathspace\" rspace=\"thinmathspace\"&gt;&amp;Sum;&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;.&lt;/mo&gt;&lt;mo&gt;.&lt;/mo&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;/math&gt;'></li>\n"\
+              "<li><img class=\"nothing_special\"></li>\n</ul></div>"
+          expect(html).to eq(expected)
+        end
+      end
     end
   end
 end
-    
+

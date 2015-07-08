@@ -42,7 +42,7 @@ module Api::V1::User
     api_json(user, current_user, session, API_USER_JSON_OPTS).tap do |json|
       if !excludes.include?('pseudonym') && user_json_is_admin?(context, current_user)
         include_root_account = @domain_root_account.trust_exists?
-        if sis_pseudonym = user.sis_pseudonym_for(@domain_root_account, include_root_account)
+        if (sis_pseudonym = SisPseudonym.for(user, @domain_root_account, include_root_account))
           # the sis fields on pseudonym are poorly named -- sis_user_id is
           # the id in the SIS import data, where on every other table
           # that's called sis_source_id.

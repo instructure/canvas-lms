@@ -133,40 +133,16 @@ class Enrollment < ActiveRecord::Base
   def adjust_needs_grading_count(mode = :increment)
     amount = mode == :increment ? 1 : -1
 
-    other_enrollments_conditions = sanitize_sql([
-      "#{Enrollment.active_student_conditions} AND (user_id = :user_id AND course_id = :course_id AND id <> :id",
-      {user_id: user_id, course_id: course_id, id: id}
-    ])
-
-    if ['MySQL', 'Mysql2'].include?(connection.adapter_name)
-      # IN (...) subselects perform poorly in mysql, plus we want to avoid
-      #locking rows in other tables
-      unless Enrollment.where(other_enrollments_conditions).pluck(:id).first
-        connection.execute sanitize_sql([<<-SQL, {amount: amount, now: Time.now.utc, user_id: user_id, course_id: course_id}])
-          UPDATE assignments, submissions SET needs_grading_count = needs_grading_count + :amount, assignments.updated_at = :now
-          WHERE context_id = :course_id
-            AND context_type = 'Course'
-            AND assignments.id = submissions.assignment_id
-            AND submissions.user_id = :user_id
-            AND (#{Submission.needs_grading_conditions});
-         SQL
-      end
-    else
-      connection.execute sanitize_sql([<<-SQL, {amount: amount, now: Time.now.utc, user_id: user_id, course_id: course_id}])
-        UPDATE assignments SET needs_grading_count = needs_grading_count + :amount, updated_at = :now
-        WHERE context_id = :course_id
-        AND context_type = 'Course'
-        AND EXISTS (
-          SELECT 1
-          FROM submissions
-          WHERE user_id = :user_id
-          AND assignment_id = assignments.id
-          AND (#{Submission.needs_grading_conditions})
-          LIMIT 1
-        )
-        AND NOT EXISTS (SELECT 1 FROM enrollments WHERE #{other_enrollments_conditions}))
-      SQL
-    end
+    Assignment.
+      where(context_id: course_id, context_type: 'Course').
+      where("EXISTS (?) AND NOT EXISTS (?)",
+        Submission.where(user_id: user_id).
+          where("assignment_id=assignments.id").
+          where(Submission.needs_grading_conditions),
+        Enrollment.where(Enrollment.active_student_conditions).
+          where(user_id: user_id, course_id: course_id).
+          where("id<>?", self)).
+      update_all(["needs_grading_count=needs_grading_count+?, updated_at=?", amount, Time.now.utc])
   end
 
   after_create :update_needs_grading_count, if: :active_student?

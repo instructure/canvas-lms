@@ -256,7 +256,7 @@ describe "Groups API", type: :request do
   end
 
   it "should allow a teacher to create a group in a course" do
-    course_with_teacher
+    course_with_teacher(active_enrollment: true)
     @user = @teacher
     project_groups = @course.group_categories.build
     project_groups.name = "Course Project Groups"

@@ -16,17 +16,28 @@
 #
 module Lti
   class AppLaunchCollator
+    def self.scopes(context, placements)
+      [
+        ContextExternalTool.all_tools_for(context).placements(*placements),
+        MessageHandler.for_context(context).has_placements(*placements)
+          .by_message_types('basic-lti-launch-request')
+      ]
+    end
+
     def self.bookmarked_collection(context, placements)
-      external_tools_scope = ContextExternalTool.all_tools_for(context).placements(*placements)
-      external_tools_collection = BookmarkedCollection.wrap(ExternalToolNameBookmarker, external_tools_scope)
-      message_handler_scope = MessageHandler.for_context(context).by_message_types('basic-lti-launch-request').has_placements(*placements)
-      message_handler_collection = BookmarkedCollection.wrap(MessageHandlerNameBookmarker, message_handler_scope)
+      external_tools, message_handlers = scopes(context, placements)
+      external_tools = BookmarkedCollection.wrap(ExternalToolNameBookmarker, external_tools)
+      message_handlers = BookmarkedCollection.wrap(MessageHandlerNameBookmarker, message_handlers)
       BookmarkedCollection.merge(
-        ['external_tools', external_tools_collection],
-        ['message_handlers', message_handler_collection]
+        ['external_tools', external_tools],
+        ['message_handlers', message_handlers]
       )
     end
 
+    def self.any?(context, placements)
+      external_tools, message_handlers = scopes(context, placements)
+      external_tools.exists? || message_handlers.exists?
+    end
 
     def self.launch_definitions(collection, placements)
       collection.map do |o|
@@ -39,14 +50,13 @@ module Lti
       end
     end
 
-
     private
 
     def self.lti1_launch_definition(tool, placements)
       definition = {
         definition_type: tool.class.name,
         definition_id: tool.id,
-        name: tool.name,
+        name: tool.label_for(placements.first, I18n.locale),
         description: tool.description,
         domain: tool.domain,
         placements: {}

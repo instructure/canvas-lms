@@ -12,14 +12,10 @@ define [
 
   module 'GradingPeriodCollection with read and manage permission for all periods',
     setup: ->
-      @fMessage = $.flashMessage
-      @fError = $.flashError
-      @wConfirm = window.confirm
-      $.flashMessage = ->
-      $.flashError = ->
-      window.confirm = -> true
+      @stub($, 'flashMessage', ->)
+      @stub($, 'flashError', ->)
+      @stub(window, 'confirm', -> true)
       @server = sinon.fakeServer.create()
-      @sandbox = sinon.sandbox.create()
       ENV.current_user_roles = ["teacher"]
       ENV.GRADING_PERIODS_URL = "/api/v1/courses/1/grading_periods"
       @indexData = "grading_periods":[
@@ -57,11 +53,7 @@ define [
       React.unmountComponentAtNode(@gradingPeriodCollection.getDOMNode().parentNode)
       ENV.current_user_roles = null
       ENV.GRADING_PERIODS_URL = null
-      $.flashMessage = @fMessage
-      $.flashError = @fError
-      window.confirm = @wConfirm
       @server.restore()
-      @sandbox.restore()
 
   test 'gets the grading periods from the grading periods controller', ->
     deepEqual @gradingPeriodCollection.state.periods, @formattedIndexData.grading_periods
@@ -82,7 +74,7 @@ define [
     ok !@gradingPeriodCollection.cannotDeleteLastPeriod()
 
   test 'getPeriods requests the index data from the server', ->
-    @sandbox.spy($, "ajax")
+    @spy($, "ajax")
     @gradingPeriodCollection.getPeriods()
     ok $.ajax.calledOnce
 
@@ -121,12 +113,12 @@ define [
       }
     ]
     @gradingPeriodCollection.setState({periods: unsavedPeriod})
-    confirmDelete = @sandbox.stub($.fn, 'confirmDelete')
+    confirmDelete = @stub($.fn, 'confirmDelete')
     @gradingPeriodCollection.deleteGradingPeriod('new1')
     ok confirmDelete.notCalled
 
   test 'deleteGradingPeriod calls confirmDelete if the period being deleted is not new (it is saved server side)', ->
-    confirmDelete = @sandbox.stub($.fn, 'confirmDelete')
+    confirmDelete = @stub($.fn, 'confirmDelete')
     @gradingPeriodCollection.deleteGradingPeriod('1')
     ok confirmDelete.calledOnce
 
@@ -164,14 +156,10 @@ define [
 
   module 'GradingPeriodCollection without read or manage permissions for any periods',
     setup: ->
-      @fMessage = $.flashMessage
-      @fError = $.flashError
-      @wConfirm = window.confirm
-      $.flashMessage = ->
-      $.flashError = ->
-      window.confirm = -> true
+      @stub($, 'flashMessage', ->)
+      @stub($, 'flashError', ->)
+      @stub(window, 'confirm', -> true)
       @server = sinon.fakeServer.create()
-      @sandbox = sinon.sandbox.create()
       ENV.current_user_roles = ["teacher"]
       ENV.GRADING_PERIODS_URL = "/api/v1/courses/1/grading_periods"
       @indexData = "grading_periods":[
@@ -209,11 +197,7 @@ define [
       React.unmountComponentAtNode(@gradingPeriodCollection.getDOMNode().parentNode)
       ENV.current_user_roles = null
       ENV.GRADING_PERIODS_URL = null
-      $.flashMessage = @fMessage
-      $.flashError = @fError
-      window.confirm = @wConfirm
       @server.restore()
-      @sandbox.restore()
 
   test 'gets the grading periods from the grading periods controller', ->
     deepEqual @gradingPeriodCollection.state.periods, @formattedIndexData.grading_periods
@@ -223,7 +207,7 @@ define [
     ok !@gradingPeriodCollection.canManageAtLeastOnePeriod(periods)
 
   test 'copyTemplatePeriods sets the disabled state to true while periods are being copied', ->
-    @sandbox.stub(@gradingPeriodCollection, 'getPeriods')
+    @stub(@gradingPeriodCollection, 'getPeriods')
     ok !@gradingPeriodCollection.state.disabled
     @gradingPeriodCollection.copyTemplatePeriods(@gradingPeriodCollection.state.periods)
     @server.respond()
@@ -233,13 +217,13 @@ define [
     deepEqual @gradingPeriodCollection.state.periods, @formattedIndexData.grading_periods
 
   test 'copyTemplatePeriods calls getPeriods', ->
-    @sandbox.stub(@gradingPeriodCollection, 'getPeriods')
+    @stub(@gradingPeriodCollection, 'getPeriods')
     @gradingPeriodCollection.copyTemplatePeriods(@gradingPeriodCollection.state.periods)
     @server.respond()
     ok @gradingPeriodCollection.getPeriods.calledOnce
 
   test 'deleteGradingPeriod calls copyTemplatePeriods if periods need to be copied (cannot manage any periods and there is at least 1)', ->
-    copyPeriods = @sandbox.stub(@gradingPeriodCollection, 'copyTemplatePeriods')
+    copyPeriods = @stub(@gradingPeriodCollection, 'copyTemplatePeriods')
     @gradingPeriodCollection.deleteGradingPeriod('1')
     ok copyPeriods.calledOnce
 

@@ -13,7 +13,6 @@ define [
     setup: ->
       fakeENV.setup()
       ENV.context_asset_string = "course_1"
-      @sandbox = sinon.sandbox.create()
       @override1 = new AssignmentOverride name: "Plebs", course_section_id: "1", due_at: null
       @override2 = new AssignmentOverride name: "Patricians", course_section_id: "2", due_at: "2015-04-05"
       @override3 = new AssignmentOverride name: "Students", student_ids: ["1","3"], due_at: null
@@ -26,11 +25,10 @@ define [
         overrideModel: AssignmentOverride
         syncWithBackbone: ->
 
-      @syncWithBackboneStub = @sandbox.stub(props, 'syncWithBackbone')
+      @syncWithBackboneStub = @stub(props, 'syncWithBackbone')
       @dueDates = React.render(DueDates(props), $('<div>').appendTo('body')[0])
 
     teardown: ->
-      @sandbox.restore()
       React.unmountComponentAtNode(@dueDates.getDOMNode().parentNode)
       fakeENV.teardown()
 

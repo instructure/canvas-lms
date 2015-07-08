@@ -10,6 +10,7 @@
   editable ||= false
   editing ||= false
   in_group ||= false
+  group_id ||= nil
   question_bank_id ||= nil
   display_correct_answers = show_correct_answers?
   correct = user_answer && hash_get(user_answer, :correct) == true
@@ -25,7 +26,7 @@
     right_answers = (hash_get(question, :matches) || hash_get(question, :answers).sort_by{|a| rand }) if question_type.entry_type == "matching" rescue {}
   end
 %>
-<div class="quiz_sortable question_holder <%= "group" if in_group %>" id="<%= "question_template" unless question %>" style="<%= hidden unless question %>">
+<div class="quiz_sortable question_holder <%= "group" if in_group %>" id="<%= "question_template" unless question %>" style="<%= hidden unless question %>" data-group-id="<%= group_id %>">
   <div style="display: block; height: 1px; overflow: hidden;">&nbsp;</div>
   <a name="question_<%= hash_get(question, :id, "blank") %>"></a>
   <% marked = assessing && @stored_params && @stored_params["question_#{hash_get(question, :id)}_marked"].present? %>

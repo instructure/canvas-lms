@@ -38,8 +38,8 @@ define([
 
     render: function () {
       var classes = classnames({
-        'ic-DashboardCard_action': true,
-        'ic-DashboardCard_action--active': this.props.hasActivity
+        'ic-DashboardCard__action': true,
+        'ic-DashboardCard__action--active': this.props.hasActivity
       });
       return (
         <a href={this.props.path} className={classes}>

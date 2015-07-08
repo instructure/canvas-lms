@@ -98,7 +98,7 @@ describe "Files API", type: :request do
         'created_at' => @attachment.created_at.as_json,
         'updated_at' => @attachment.updated_at.as_json,
         'thumbnail_url' => nil,
-        'modified_at' => @attachment.updated_at.as_json
+        'modified_at' => @attachment.modified_at.as_json
       })
       expect(@attachment.file_state).to eq 'available'
     end
@@ -131,7 +131,7 @@ describe "Files API", type: :request do
         'created_at' => @attachment.created_at.as_json,
         'updated_at' => @attachment.updated_at.as_json,
         'thumbnail_url' => nil,
-        'modified_at' => @attachment.updated_at.as_json
+        'modified_at' => @attachment.modified_at.as_json
       })
       expect(@attachment.reload.file_state).to eq 'available'
     end
@@ -236,14 +236,23 @@ describe "Files API", type: :request do
     it "should not list locked file if not authed" do
       course_with_student_logged_in(:course => @course)
       json = api_call(:get, @files_path, @files_path_options, {})
-      expect(json.any?{|f|f[:id] == @a2.id}).to eq false
+      expect(json.any?{|f|f['id'] == @a2.id}).to be_falsey
     end
 
     it "should not list hidden files if not authed" do
       course_with_student_logged_in(:course => @course)
       json = api_call(:get, @files_path, @files_path_options, {})
 
-      expect(json.any?{|f|f[:id] == @a3.id}).to eq false
+      expect(json.any?{|f| f['id'] == @a3.id}).to be_falsey
+    end
+
+    it "should list hidden files with :read_as_admin rights" do
+      course_with_ta(:course => @course, :active_all => true)
+      user_session(@user)
+      @course.account.role_overrides.create!(:permission => :manage_files, :enabled => false, :role => ta_role)
+      json = api_call(:get, @files_path, @files_path_options, {})
+
+      expect(json.any?{|f| f['id'] == @a3.id}).to be_truthy
     end
 
     it "should not list locked folder if not authed" do
@@ -274,6 +283,13 @@ describe "Files API", type: :request do
       expect(links.find{ |l| l.match(/rel="prev"/)}).to match /page=2/
       expect(links.find{ |l| l.match(/rel="first"/)}).to match /page=1/
       expect(links.find{ |l| l.match(/rel="last"/)}).to match /page=3/
+    end
+
+    it "should only return names if requested" do
+      json = api_call(:get, @files_path, @files_path_options, {:only => ['names']})
+      res = json.map{|f|f['display_name']}
+      expect(res).to eq %w{atest3.txt mtest2.txt ztest.txt}
+      expect(json.any?{|f| f['url']}).to be_falsey
     end
 
     context "content_types" do

@@ -19,9 +19,37 @@ define(["jquery"], function($){
    *   that can be found in normal circumstances by calling "getEditor"
    */
   var LinkableEditor = function(editor, $editorEl){
+
+    /**
+     * Firefox has some special needs here because when we
+     * ask tinymce for text content, in FF we get the alt text of any
+     * img tag.  This helper function wraps that interaction, checks for
+     * an img tag with alt attribute for "textContent", and replaces it with
+     * a blank string if so.  This is important because our link injecting code
+     * checks for blank string to decide whether to wrap a DOM node in an
+     * a tag or just take the text and put an anchor around it.  We want it
+     * to wrap the dom node in the case of an image so the image stays on the
+     * page.
+     *
+     * @param {tinymce.Selection} selection the object representing the users
+     *  currently selected content in the RCE, usually comes from "editor.selection"
+     *
+     * @returns {String}
+     */
+    this.extractTextContent = function(selection){
+      var textContent = selection.getContent({format: "text"});
+      var $content = $(selection.getContent());
+      if($content.prop("tagName") == "IMG" && textContent == $content.attr("alt") && $content.html() == ""){
+        textContent = "";
+      }
+
+      return textContent;
+    };
+
     this.id = editor.id;
-    this.selectedContent = editor.selection.getContent({format: "text"});
+    this.selectedContent = this.extractTextContent(editor.selection);
     this.$editorEl = $editorEl;
+
 
     /**
      * Builds a jquery object wrapping the target text area for the

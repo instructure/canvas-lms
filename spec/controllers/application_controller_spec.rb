@@ -23,7 +23,7 @@ describe ApplicationController do
   before :each do
     controller.stubs(:request).returns(stub(:host_with_port => "www.example.com",
                                             :host => "www.example.com",
-                                            :headers => {}))
+                                            :headers => {}, :format => stub(:html? => true)))
   end
 
   describe "#twitter_connection" do
@@ -451,6 +451,7 @@ describe ApplicationController do
 
       req.stubs(:host).returns('www.example.com')
       req.stubs(:headers).returns({})
+      req.stubs(:format).returns(stub(:html? => true))
       controller.stubs(:request).returns(req)
       controller.send(:assign_localizer)
       I18n.set_locale_with_localizer # this is what t() triggers
@@ -530,6 +531,40 @@ describe ApplicationController do
       controller.stubs(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
+
+    context 'ContextExternalTool' do
+
+      let(:course){ course_model }
+
+      let(:tool) do
+        tool = course.context_external_tools.new(
+          name: "bob",
+          consumer_key: "bob",
+          shared_secret: "bob",
+          tool_id: 'some_tool',
+          privacy_level: 'public'
+        )
+        tool.url = "http://www.example.com/basic_lti"
+        tool.resource_selection = {
+          :url => "http://#{HostUrl.default_host}/selection_test",
+          :selection_width => 400,
+          :selection_height => 400}
+        tool.save!
+        tool
+      end
+
+      let(:content_tag) { ContentTag.create(content: tool, url: tool.url)}
+
+      it 'returns the full path for the redirect url' do
+        controller.expects(:named_context_url).with(course, :context_url, {:include_host => true})
+        controller.expects(:named_context_url).with(course, :context_external_content_success_url, 'external_tool_redirect', {:include_host => true}).returns('wrong_url')
+        controller.stubs(:render)
+        controller.stubs(js_env:[])
+        controller.instance_variable_set(:"@context", course)
+        controller.send(:content_tag_redirect, course, content_tag, nil)
+      end
+    end
+
   end
 
   describe 'external_tools_display_hashes' do

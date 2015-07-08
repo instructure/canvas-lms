@@ -36,20 +36,20 @@ describe "conversations new" do
     end
 
     describe 'view filter' do
-      it 'shows submission comments' do
+      it 'shows submission comments', priority: "2", test_id: 197517 do
         get_conversations
         select_view('submission_comments')
         expect(conversation_elements.size).to eq 2
       end
 
-      it 'filters by course' do
+      it 'filters by course', priority: "2", test_id: 197518 do
         get_conversations
         select_view('submission_comments')
         select_course(@course1.id)
         expect(conversation_elements.size).to eq 1
       end
 
-      it 'filters by submitter' do
+      it 'filters by submitter', priority: "2", test_id: 197519 do
         get_conversations
         select_view('submission_comments')
         name = @s2.name
@@ -59,7 +59,7 @@ describe "conversations new" do
       end
     end
 
-    it 'adds new messages to the view' do
+    it 'adds new messages to the view', priority: "2", test_id: 197520 do
       get_conversations
       select_view('submission_comments')
       initial_message_count = @submission.submission_comments.count
@@ -73,7 +73,7 @@ describe "conversations new" do
       expect(@submission.reload.submission_comments.count).to eq (initial_message_count + 1)
     end
 
-    it 'marks unread on click' do
+    it 'marks unread on click', priority: "2", test_id: 197521 do
       expect(@submission.read?(@teacher)).to be_falsey
       get_conversations
       select_view('submission_comments')
@@ -82,7 +82,7 @@ describe "conversations new" do
       expect(@submission.read?(@teacher)).to be_truthy
     end
 
-    it 'marks an read/unread' do
+    it 'marks an read/unread', priority: "2", test_id: 197522 do
       expect(@submission.read?(@teacher)).to be_falsey
       get_conversations
       select_view('submission_comments')

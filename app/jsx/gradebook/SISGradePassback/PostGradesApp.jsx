@@ -18,24 +18,31 @@ define([
 
     render () {
       var navClass = React.addons.classSet({
-        "hidden": !this.props.store.isEnabled() || !this.props.store.hasAssignments()
+        "hidden": !this.props.store.isEnabled() || !this.props.store.hasAssignments(),
+        "ui-button": this.props.renderAsButton
       });
-      return (
-        <nav className={navClass}>
+      if(this.props.renderAsButton){
+        return (
           <button
-             className="btn"
-             onClick={this.openDialog}
-             type="button"
-             id="post-grades-button"
-          >
-            {I18n.t("Post Grades")}
-          </button>
-        </nav>
-      );
+            id="post-grades-button"
+            className={navClass}
+            onClick={this.openDialog}
+          >{this.props.labelText}</button>
+        );
+      } else {
+        return (
+          <a
+            id="post-grades-button"
+            className={navClass}
+            onClick={this.openDialog}
+          >{this.props.labelText}</a>
+        );
+      }
     },
 
     openDialog(e) {
       e.preventDefault();
+      var returnFocusTo = this.props.returnFocusTo;
 
       var $dialog = $('<div class="post-grades-dialog">').dialog({
         title: I18n.t("Post Grades to SIS"),
@@ -47,6 +54,9 @@ define([
         close(e) {
           React.unmountComponentAtNode(this);
           $(this).remove();
+          if(returnFocusTo){
+            returnFocusTo.focus();
+          }
         }
       });
 

@@ -4,7 +4,9 @@ module AvatarHelper
     return ["/images/messages/avatar-50.png", ''] unless user_or_id
     user_id = user_or_id.is_a?(User) ? user_or_id.id : user_or_id
     user = user_or_id.is_a?(User) && user_or_id
-    if session["reported_#{user_id}"]
+    account = @account || @domain_root_account
+    is_admin = account && account.grants_right?(@current_user, session, :manage)
+    if session["reported_#{user_id}"] && !is_admin
       ["/images/messages/avatar-50.png", '']
     else
       avatar_settings = @domain_root_account && @domain_root_account.settings[:avatars] || 'enabled'

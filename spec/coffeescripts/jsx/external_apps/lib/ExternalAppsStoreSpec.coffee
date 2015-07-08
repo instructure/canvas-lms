@@ -71,7 +71,7 @@ define [
         foo: 'bar'
       }
 
-    spy = sinon.spy(store, 'save')
+    spy = @spy(store, 'save')
     data = { some: 'data' }
 
     success = (data, statusText, xhr)->
@@ -87,7 +87,6 @@ define [
     equal spy.lastCall.args[0], 'manual'
     equal spy.lastCall.args[1], data
 
-    store.save.restore()
     store._generateParams = _generateParams
 
   test '_generateParams manual', ->

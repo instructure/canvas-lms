@@ -16,4 +16,28 @@ describe GradeSummaryPresenter do
       expect(f('#grades_summary')).to be_displayed
     end
   end
+
+  describe "grade summary page" do
+    let(:student)  { user(active_user: true) }
+    let(:observer) { user(active_user: true) }
+    let(:observed_courses) do
+      2.times.map { course(active_course: true, active_all: true) }
+    end
+
+    it 'should show the courses dropdown when logged in as observer' do
+      observed_courses.each do |course|
+        student_enrollment = course.enroll_student student
+        student_enrollment.accept
+
+        observer_enrollment = course.enroll_user(observer, 'ObserverEnrollment')
+        observer_enrollment.update_attribute(:associated_user_id, student.id)
+        observer_enrollment.accept
+      end
+
+      user_session observer
+      get "/courses/#{observed_courses.first.id}/grades"
+
+      expect(f('.course_selector')).to be_displayed
+    end
+  end
 end

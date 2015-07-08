@@ -10,6 +10,7 @@ define(function(require) {
   var Router = require('canvas_packages/react-router');
   var Link = Router.Link;
 
+
   var Event = React.createClass({
     getDefaultProps: function() {
       return {
@@ -19,19 +20,26 @@ define(function(require) {
 
     render: function() {
       var e = this.props;
-      var secondsSinceStart = (
-        new Date(e.createdAt) - new Date(this.props.startedAt)
-      ) / 1000;
-
       var className = classSet({
         'ic-ActionLog__Entry': true,
         'is-warning': e.flag === K.EVT_FLAG_WARNING,
         'is-ok': e.flag === K.EVT_FLAG_OK,
         'is-neutral': !e.flag
       });
-
       return (
         <li className={className} key={"event-"+e.id}>
+          {this.renderRow(e)}
+        </li>
+      );
+    },
+
+    renderRow: function(e) {
+      var secondsSinceStart = (
+        new Date(e.createdAt) - new Date(e.startedAt)
+      ) / 1000;
+
+      return (
+        <div>
           <span className="ic-ActionLog__EntryTimestamp">
             {secondsToTime(secondsSinceStart)}
           </span>
@@ -43,7 +51,7 @@ define(function(require) {
           <div className="ic-ActionLog__EntryDescription">
             {this.renderDescription(e)}
           </div>
-        </li>
+        </div>
       );
     },
 
@@ -66,7 +74,6 @@ define(function(require) {
     renderDescription: function(event) {
       var description;
       var label;
-
       switch(event.type) {
         case K.EVT_SESSION_STARTED:
           description = I18n.t('session_started', 'Session started');

@@ -22,7 +22,7 @@ describe "conversations new" do
       @convo.add_message(@s2, "I need the homework too.")
     end
 
-    it "should maintain context and subject" do
+    it "should maintain context and subject", priority: "1", test_id: 138696 do
       get_conversations
       conversation_elements[0].click
       wait_for_ajaximations
@@ -36,7 +36,7 @@ describe "conversations new" do
       expect(fj('.message_subject_ro').text).to eq @convo.subject
     end
 
-    it "should address replies to the most recent author by default" do
+    it "should address replies to the most recent author by default", priority: "2", test_id: 197538 do
       get_conversations
       conversation_elements[0].click
       wait_for_ajaximations
@@ -45,7 +45,7 @@ describe "conversations new" do
       expect(fj('input[name="recipients[]"]')).to have_value(@s2.id.to_s)
     end
 
-    it "should add new messages to the conversation" do
+    it "should add new messages to the conversation", priority: "1", test_id: 197537 do
       get_conversations
       initial_message_count = @convo.conversation_messages.length
       conversation_elements[0].click

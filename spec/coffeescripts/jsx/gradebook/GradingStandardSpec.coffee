@@ -19,7 +19,7 @@ define [
         editing: false
         justAdded: false
         othersEditing: false
-        round: (number)-> return Math.round(number * 100)/100;
+        round: (number)-> return Math.round(number * 100)/100
         onSetEditingStatus: ->
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
@@ -45,7 +45,7 @@ define [
     ok @gradingStandard.refs.editLink
 
   test 'calls onSetEditingStatus when edit link is clicked', ->
-    setEditingStatus = sinon.spy(@gradingStandard.props, 'onSetEditingStatus')
+    setEditingStatus = @spy(@gradingStandard.props, 'onSetEditingStatus')
     Simulate.click(@gradingStandard.refs.editLink.getDOMNode())
     ok setEditingStatus.calledOnce
 
@@ -53,7 +53,7 @@ define [
     ok @gradingStandard.refs.deleteLink
 
   test 'calls onDeleteGradingStandard when delete link is clicked', ->
-    deleteGradingStandard = sinon.spy(@gradingStandard.props, 'onDeleteGradingStandard')
+    deleteGradingStandard = @spy(@gradingStandard.props, 'onDeleteGradingStandard')
     Simulate.click(@gradingStandard.refs.deleteLink.getDOMNode())
     ok deleteGradingStandard.calledOnce
 
@@ -80,7 +80,7 @@ define [
         editing: false
         justAdded: false
         othersEditing: false
-        round: (number)-> return Math.round(number * 100)/100;
+        round: (number)-> return Math.round(number * 100)/100
         onSetEditingStatus: ->
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
@@ -110,7 +110,7 @@ define [
         editing: true
         justAdded: false
         othersEditing: false
-        round: (number)-> return Math.round(number * 100)/100;
+        round: (number)-> return Math.round(number * 100)/100
         onSetEditingStatus: ->
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
@@ -136,7 +136,7 @@ define [
     deepEqual @gradingStandard.rowDataIsValid(), true
 
   test 'calls onSaveGradingStandard save button is clicked', ->
-    saveGradingStandard = sinon.spy(@gradingStandard.props, 'onSaveGradingStandard')
+    saveGradingStandard = @spy(@gradingStandard.props, 'onSaveGradingStandard')
     Simulate.click(@gradingStandard.refs.saveButton.getDOMNode())
     ok saveGradingStandard.calledOnce
 
@@ -149,7 +149,7 @@ define [
     ok @gradingStandard.refs.cancelButton
 
   test 'calls onSetEditingStatus when the cancel button is clicked', ->
-    setEditingStatus = sinon.spy(@gradingStandard.props, 'onSetEditingStatus')
+    setEditingStatus = @spy(@gradingStandard.props, 'onSetEditingStatus')
     Simulate.click(@gradingStandard.refs.cancelButton.getDOMNode())
     ok setEditingStatus.calledOnce
 
@@ -194,7 +194,7 @@ define [
         editing: true
         justAdded: false
         othersEditing: false
-        round: (number)-> return Math.round(number * 100)/100;
+        round: (number)-> return Math.round(number * 100)/100
         onSetEditingStatus: ->
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
@@ -230,7 +230,7 @@ define [
         editing: true
         justAdded: false
         othersEditing: false
-        round: (number)-> return Math.round(number * 100)/100;
+        round: (number)-> return Math.round(number * 100)/100
         onSetEditingStatus: ->
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
@@ -266,7 +266,7 @@ define [
         editing: true
         justAdded: false
         othersEditing: false
-        round: (number)-> return Math.round(number * 100)/100;
+        round: (number)-> return Math.round(number * 100)/100
         onSetEditingStatus: ->
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
@@ -302,7 +302,7 @@ define [
         editing: true
         justAdded: false
         othersEditing: false
-        round: (number)-> return Math.round(number * 100)/100;
+        round: (number)-> return Math.round(number * 100)/100
         onSetEditingStatus: ->
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
@@ -323,7 +323,7 @@ define [
   test 'shows a messsage describing why the input is invalid', ->
     Simulate.click(@gradingStandard.refs.saveButton.getDOMNode())
     deepEqual @gradingStandard.refs.invalidStandardAlert.getDOMNode().textContent,
-      "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again."  
+      "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again."
 
   module "GradingStandard being edited with values that round to the same number",
     setup: ->
@@ -338,7 +338,7 @@ define [
         editing: true
         justAdded: false
         othersEditing: false
-        round: (number)-> return Math.round(number * 100)/100;
+        round: (number)-> return Math.round(number * 100)/100
         onSetEditingStatus: ->
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->
@@ -374,7 +374,7 @@ define [
         editing: true
         justAdded: false
         othersEditing: false
-        round: (number)-> return Math.round(number * 100)/100;
+        round: (number)-> return Math.round(number * 100)/100
         onSetEditingStatus: ->
         onDeleteGradingStandard: ->
         onSaveGradingStandard: ->

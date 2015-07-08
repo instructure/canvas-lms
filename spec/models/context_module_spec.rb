@@ -567,6 +567,87 @@ describe ContextModule do
       expect(@module.evaluate_for(@user)).to be_completed
     end
 
+    describe "must_submit requirement" do
+      before :each do
+        course_module
+        student_in_course course: @course, active_all: true
+
+        @teacher = User.create!(:name => "some teacher")
+        @course.enroll_teacher(@teacher)
+      end
+
+      it "should not fulfill assignment must_submit requirement on manual grade" do
+        @assign = @course.assignments.create!(title: 'how many roads must a man walk down?', submission_types: 'online_text_entry')
+        @tag = @module.add_item({id: @assign.id, type: 'assignment'})
+        @module.completion_requirements = {@tag.id => {type: 'must_submit'}}
+        @module.save!
+
+        expect(@module.evaluate_for(@student)).to be_unlocked
+
+        @assign.reload
+        @assign.grade_student(@student, :grade => "5", :grader => @teacher)
+        expect(@module.evaluate_for(@student)).to be_unlocked
+      end
+
+      it "should not fulfill quiz must_submit requirement on manual grade" do
+        @quiz = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :scoring_policy => 'keep_highest')
+        @quiz.workflow_state = 'available'
+        @quiz.save!
+        @tag = @module.add_item({:id => @quiz.id, :type => 'quiz'})
+        @module.completion_requirements = {@tag.id => {:type => 'must_submit'}}
+        @module.save!
+
+        @quiz.assignment.grade_student(@student, :grade => "4", :grader => @teacher)
+        expect(@module.evaluate_for(@student)).to be_unlocked
+      end
+
+      it "should fulfill assignment must_submit requirement on excused submission" do
+        @assign = @course.assignments.create!(title: 'how many roads must a man walk down?', submission_types: 'online_text_entry')
+        @tag = @module.add_item({id: @assign.id, type: 'assignment'})
+        @module.completion_requirements = {@tag.id => {type: 'must_submit'}}
+        @module.save!
+
+        expect(@module.evaluate_for(@student)).to be_unlocked
+
+        @assign.reload
+        @assign.grade_student(@student, :grader => @teacher, :excuse => true)
+        expect(@module.evaluate_for(@student)).to be_completed
+      end
+
+      it "should fulfill quiz must_submit requirement on excused submission" do
+        @quiz = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :scoring_policy => 'keep_highest')
+        @quiz.workflow_state = 'available'
+        @quiz.save!
+        @tag = @module.add_item({:id => @quiz.id, :type => 'quiz'})
+        @module.completion_requirements = {@tag.id => {:type => 'must_submit'}}
+        @module.save!
+
+        @quiz.assignment.grade_student(@student, :grader => @teacher, :excuse => true)
+        expect(@module.evaluate_for(@student)).to be_completed
+      end
+
+      it "should fulfill quiz must_submit requirement on 0 score attempt" do
+        @quiz = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :scoring_policy => 'keep_highest')
+        @quiz.workflow_state = 'available'
+        @quiz.save!
+        @q1 = @quiz.quiz_questions.create!(:question_data => {:name => 'question 1', :points_possible => 1,
+            'question_type' => 'multiple_choice_question',
+            'answers' => [{'answer_text' => '1', 'answer_weight' => '100'}, {'answer_text' => '2'}]})
+        @quiz.generate_quiz_data(:persist => true)
+        wrong_answer = @q1.question_data[:answers].detect{|a| a[:weight] != 100 }[:id]
+
+        @tag = @module.add_item({:id => @quiz.id, :type => 'quiz'})
+        @module.completion_requirements = {@tag.id => {:type => 'must_submit'}}
+        @module.save!
+
+        @sub = @quiz.generate_submission(@student)
+        @sub.submission_data = {"question_#{@q1.data[:id]}" => wrong_answer}
+        Quizzes::SubmissionGrader.new(@sub).grade_submission
+        expect(@sub.score).to eq 0
+        expect(@module.evaluate_for(@student)).to be_completed
+      end
+    end
+
     it "should mark progression completed for min_score on discussion topic assignment" do
       asmnt = assignment_model(:submission_types => "discussion_topic", :points_possible => 10)
       topic = asmnt.discussion_topic

@@ -21,13 +21,14 @@ class GradebookCsvsController < ApplicationController
   before_filter :require_user
 
   def show
-    if authorized_action(@context, @current_user, :manage_grades)
+    if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       current_time = Time.zone.now.to_formatted_s(:short)
-      name = t('grades_filename', "Grades") + "-" + @context.name.to_s
-      filename = "#{current_time}_#{name}.csv".gsub(/ /, '_')
+      name = t('grades_filename', "Grades") + "-" + @context.short_name.to_s
+      filename = "#{current_time}_#{name}.csv".gsub(%r{/| }, '_')
 
       csv_options = {
-        include_sis_id: @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis)
+        include_sis_id: @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis),
+        include_priors: Canvas::Plugin.value_to_boolean(params[:include_priors])
       }
 
       attachment_progress = @context.gradebook_to_csv_in_background(filename, @current_user, csv_options)

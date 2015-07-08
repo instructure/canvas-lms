@@ -5,7 +5,19 @@
         <span class="<%= date_class_prefix %>start_at"><%= date_string(object.try(:start_at), :long) || (whenever[0] ? t('date.unspecified', "whenever") : t('date.term_start', "term start")) %></span>
       </div>
       <div class="edit_term">
-        <input type="text" name="enrollment_term<%= key %>[start_at]" value="<%= date_string(object.try(:start_at), :long) %>" title="<%= start_tooltip %>" class="date_field" style="width: 120px;"/>
+        <div class="date_field_container">
+          <label class="screenreader-only" id="<%= key %>_start_at_label">
+            <%= start_tooltip %> <%= datepicker_screenreader_prompt %>
+          </label>
+          <input type="text"
+            name="enrollment_term<%= key %>[start_at]"
+            value="<%= date_string(object.try(:start_at), :long) %>"
+            title="<%= accessible_date_format %>"
+            class="date_field"
+            style="width: 120px;"
+            aria-labelledby="<%= key %>_start_at_label"
+            data-tooltip />
+        </div>
       </div>
     </td>
   <% }, :wrapper => capture { %>
@@ -18,7 +30,20 @@
         <span class="<%= date_class_prefix %>end_at"><%= date_string(object.try(:end_at), :long) || (whenever[1] ? t('date.unspecified', "whenever") : t('date.term_end', "term end")) %></span>
       </div>
       <div class="edit_term">
-        <input type="text" name="enrollment_term<%= key %>[end_at]" value="<%= date_string(object.try(:end_at), :long) %>" title="<%= end_tooltip %>" class="date_field" style="width: 120px;"/>
+        <div class="date_field_container">
+          <label class="screenreader-only" id="<%= key %>_end_at_label">
+            <%= end_tooltip %> <%= datepicker_screenreader_prompt %>
+          </label>
+          <input
+            type="text"
+            name="enrollment_term<%= key %>[end_at]"
+            value="<%= date_string(object.try(:end_at), :long) %>"
+            title="<%= accessible_date_format %>"
+            class="date_field"
+            style="width: 120px;"
+            aria-labelledby="<%= key %>_end_at_label"
+            data-tooltip />
+        </div>
       </div>
     </td>
   <% }) %>

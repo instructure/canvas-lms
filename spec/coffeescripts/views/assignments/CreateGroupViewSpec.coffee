@@ -52,18 +52,16 @@ define [
     ok _.isEmpty(errors)
 
   test 'it should create a new assignment group', ->
-    close_stub = sinon.stub(CreateGroupView.prototype, 'close', -> )
+    @stub(CreateGroupView.prototype, 'close', -> )
 
     view = createView(false)
     view.render()
     view.onSaveSuccess()
     equal view.assignmentGroups.size(), 3
 
-    close_stub.restore()
-
   test 'it should edit an existing assignment group', ->
     view = createView()
-    save_spy = sinon.spy(view.model, "save")
+    save_spy = @spy(view.model, "save")
     view.render()
     view.open()
     #the selector uses 'new' for id because this model hasn't been saved yet
@@ -77,11 +75,10 @@ define [
     equal formData["rules"]["drop_lowest"], 1
     equal formData["rules"]["drop_highest"], 1
     ok save_spy.called
-    save_spy.restore()
 
   test 'it should not save drop rules when none are given', ->
     view = createView()
-    save_spy = sinon.spy(view.model, "save")
+    save_spy = @spy(view.model, "save")
     view.render()
     view.open()
     view.$("#ag_new_drop_lowest").val("")
@@ -93,7 +90,6 @@ define [
     equal formData["name"], "IchangedIt"
     equal _.keys(formData["rules"]).length, 0
     ok save_spy.called
-    save_spy.restore()
 
   test 'it should only allow positive numbers for drop rules', ->
     view = createView()
@@ -133,15 +129,13 @@ define [
     equal _.keys(errors).length, 1
 
   test 'it should trigger a render event on save success when editing', ->
-    triggerSpy = sinon.spy(AssignmentGroupCollection::, 'trigger')
+    triggerSpy = @spy(AssignmentGroupCollection::, 'trigger')
     view = createView()
     view.onSaveSuccess()
     ok triggerSpy.calledWith 'render'
-    triggerSpy.restore()
 
   test 'it should call render on save success if adding an assignmentGroup', ->
     view = createView(false)
-    renderStub = sinon.stub(view, 'render')
-    calls = renderStub.callCount
+    @stub(view, 'render')
     view.onSaveSuccess()
-    equal renderStub.callCount, calls + 1
+    equal view.render.callCount, 1

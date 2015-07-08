@@ -25,11 +25,12 @@ class ContextModulesController < ApplicationController
 
   module ModuleIndexHelper
     def load_module_file_details
-      @context.module_items_visible_to(@current_user).where(content_type: 'Attachment').inject({}) do |items, file_tag|
+      attachment_tags = @context.module_items_visible_to(@current_user).where(content_type: 'Attachment').preload(:content => :folder)
+      attachment_tags.inject({}) do |items, file_tag|
         items[file_tag.id] = {
             id: file_tag.id,
             content_id: file_tag.content_id,
-            content_details: content_details(file_tag, @current_user)
+            content_details: content_details(file_tag, @current_user, :for_admin => true)
         }
         items
       end

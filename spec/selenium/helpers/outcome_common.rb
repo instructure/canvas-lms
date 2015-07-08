@@ -268,23 +268,18 @@ def should_validate_decaying_average
   below_range = 0
   above_range = 100
   replace_content(f('.outcomes-content input[name=title]'), 'Decaying Average')
-  # select option
   click_option('#calculation_method', "Decaying Average")
   # enter invalid number below range
   replace_content(f('input[name=calculation_int]'), below_range)
-  # submit
   f('.submit_button').click
   wait_for_ajaximations
-  # expect
   expect(f('.error_box')).to be_present
   expect(fj('.error_text div').text).to include("'#{below_range}' is not a valid value")
 
   # enter second invalid number above range
   replace_content(f('input[name=calculation_int]'), above_range)
-  # submit
   f('.submit_button').click
   wait_for_ajaximations
-  # expect
   expect(f('.error_box')).to be_present
   expect(fj('.error_text div').text).to include("'#{above_range}' is not a valid value")
 end
@@ -295,23 +290,18 @@ def should_validate_n_mastery
   below_range = 1
   above_range = 6
   replace_content(f('.outcomes-content input[name=title]'), 'n Number of Times')
-  # select option
   click_option('#calculation_method', "n Number of Times")
   # enter invalid number below range
   replace_content(f('input[name=calculation_int]'), below_range)
-  # submit
   f('.submit_button').click
   wait_for_ajaximations
-  # expect
   expect(f('.error_box')).to be_present
   expect(fj('.error_text div').text).to include("'#{below_range}' is not a valid value")
 
   # enter second invalid number above range
   replace_content(f('input[name=calculation_int]'), above_range)
-  # submit
   f('.submit_button').click
   wait_for_ajaximations
-  # expect
   expect(f('.error_box')).to be_present
   expect(fj('.error_text div').text).to include("'#{above_range}' is not a valid value")
 end

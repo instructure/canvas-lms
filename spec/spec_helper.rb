@@ -387,6 +387,8 @@ RSpec.configure do |config|
     Account.clear_special_account_cache!(true)
     Role.ensure_built_in_roles!
     AdheresToPolicy::Cache.clear
+    # silence migration specs
+    ActiveRecord::Migration.verbose = false
   end
 
   def delete_fixtures!
@@ -446,7 +448,7 @@ RSpec.configure do |config|
     config.auth_type = "cas"
     config.auth_base = cas_url
     config.log_in_url = opts[:cas_log_in_url] if opts[:cas_log_in_url]
-    @account.account_authorization_configs << config
+    @account.authentication_providers << config
     @account
   end
 
@@ -454,25 +456,12 @@ RSpec.configure do |config|
     @account = opts[:account]
     @account ||= Account.create!
     config = AccountAuthorizationConfig::SAML.new
+    config.idp_entity_id = "saml_entity"
     config.auth_type = "saml"
     config.log_in_url = opts[:saml_log_in_url] if opts[:saml_log_in_url]
     config.log_out_url = opts[:saml_log_out_url] if opts[:saml_log_out_url]
-    @account.account_authorization_configs << config
+    @account.authentication_providers << config
     @account
-  end
-
-  def grading_periods(opts = {})
-    Account.default.set_feature_flag! :multiple_grading_periods, 'on'
-    ctx = opts[:context] || @course || course
-    count = opts[:count] || 2
-
-    gpg = ctx.grading_period_groups.create!
-    now = Time.zone.now
-    count.times.map { |n|
-      gpg.grading_periods.create! start_date: n.months.since(now),
-        end_date: (n+1).months.since(now),
-        weight: 1
-    }
   end
 
   def course(opts={})
@@ -503,22 +492,26 @@ RSpec.configure do |config|
     context.root_account.enable_feature!(:multiple_grading_periods) if opts[:mgp_flag_enabled]
     gp_group = context.grading_period_groups.create!
     class_name = context.class.name.demodulize
-    periods = opts[:grading_periods] || [:current]
-    periods.each.with_index(1) do |timeframe, index|
-      cutoff_dates = {
-        current: { start_date: index.months.ago,
-                   end_date: index.months.from_now },
-        old:     { start_date: (index + 1).months.ago,
-                   end_date: index.months.ago },
-        future:  { start_date: index.months.from_now,
-                   end_date: (index + 1).months.from_now }
+    timeframes = opts[:grading_periods] || [:current]
+    now = Time.zone.now
+    period_fixtures = {
+      old: {
+        start_date: 5.months.ago(now),
+        end_date:   2.months.ago(now)
+      },
+      current: {
+        start_date: 2.months.ago(now),
+        end_date:   2.months.from_now(now)
+      },
+      future: {
+        start_date: 2.months.from_now(now),
+        end_date:   5.months.from_now(now)
       }
-      period_params = cutoff_dates[timeframe].merge(title: "#{class_name} Period #{index}: #{timeframe} period")
-      new_period = gp_group.grading_periods.create!(period_params)
-      new_period[:workflow_state] = 'active'
-      new_period.save!
+    }
+    timeframes.map.with_index(1) do |timeframe, index|
+      period_params = period_fixtures[timeframe].merge(title: "#{class_name} Period #{index}: #{timeframe} period")
+      gp_group.grading_periods.create!(period_params)
     end
-    gp_group.grading_periods
   end
 
   def account_with_role_changes(opts={})
@@ -606,7 +599,7 @@ RSpec.configure do |config|
   def managed_pseudonym(user, opts={})
     other_account = opts[:account] || account_with_saml
     if other_account.canvas_authentication?
-      config = other_account.account_authorization_configs.build
+      config = other_account.authentication_providers.build
       config.auth_type = "saml"
       config.log_in_url = opts[:saml_log_in_url] if opts[:saml_log_in_url]
       config.save!
@@ -668,6 +661,15 @@ RSpec.configure do |config|
     enrollment.workflow_state = 'active'
     enrollment.save!
     student
+  end
+
+  def ta_in_section(section, opts={})
+    ta = opts.fetch(:user) { user }
+    enrollment = section.course.enroll_user(ta, 'TaEnrollment', :section => section, :force_update => true)
+    ta.save!
+    enrollment.workflow_state = 'active'
+    enrollment.save!
+    ta
   end
 
   def teacher_in_course(opts={})
@@ -1029,7 +1031,14 @@ RSpec.configure do |config|
   def conversation(*users)
     options = users.last.is_a?(Hash) ? users.pop : {}
     @conversation = (options.delete(:sender) || @me || users.shift).initiate_conversation(users, options.delete(:private))
-    @message = @conversation.add_message('test')
+
+    # if the "body" hash is passed in, use that for the message body
+    if !options[:body].nil?
+      @message = @conversation.add_message(options[:body].to_s)
+    else
+      @message = @conversation.add_message('test')
+    end
+
     @conversation.update_attributes(options)
     @conversation.reload
   end

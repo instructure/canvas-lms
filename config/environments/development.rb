@@ -26,9 +26,6 @@ environment_configuration(defined?(config) && config) do |config|
   cache_store_rb = File.dirname(__FILE__) + "/cache_store.rb"
   eval(File.new(cache_store_rb).read, nil, cache_store_rb, 1)
 
-  # eval <env>-local.rb if it exists
-  Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) }
-
   # allow debugging only in development environment by default
   #
   # Option to DISABLE_RUBY_DEBUGGING is helpful IDE-based debugging.
@@ -55,4 +52,7 @@ environment_configuration(defined?(config) && config) do |config|
   unless CANVAS_RAILS3
     config.eager_load = false
   end
+
+  # eval <env>-local.rb if it exists
+  Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) }
 end

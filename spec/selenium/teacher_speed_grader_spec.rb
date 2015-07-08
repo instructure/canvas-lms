@@ -12,6 +12,19 @@ describe "speed grader" do
     @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
   end
 
+  context "as a teacher" do
+    it "alerts the teacher before leaving the page if comments are not saved" do
+      student_in_course(:active_user => true).user
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      comment_textarea = f("#speedgrader_comment_textarea")
+      replace_content(comment_textarea, "oh no i forgot to save this comment!")
+      driver.close
+      alert_shown = alert_present?
+      dismiss_alert
+      expect(alert_shown).to eq(true)
+    end
+  end
+
   context "as a course limited ta" do
     before(:each) do
       @taenrollment = course_with_ta(:course => @course, :active_all => true)
@@ -130,7 +143,7 @@ describe "speed grader" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       in_frame 'speedgrader_iframe' do
-        expect(f('.not_external')).to include_text("User")
+        expect(f('.open_in_a_new_tab')).to include_text("User")
       end
 
       f("#settings_link").click
@@ -140,7 +153,7 @@ describe "speed grader" do
       wait_for_ajaximations
 
       in_frame 'speedgrader_iframe' do
-        expect(f('.not_external')).to include_text("This Student")
+        expect(f('.open_in_a_new_tab')).to include_text("This Student")
       end
     end
   end

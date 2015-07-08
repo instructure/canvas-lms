@@ -1,5 +1,5 @@
 define [
-  'i18n!instructure'
+  'i18n!datepicker'
   'jquery'
   'timezone'
   'compiled/util/parseDatetime'
@@ -14,6 +14,15 @@ define [
       showOn: 'button'
       buttonText: '<i class="icon-calendar-month"></i>'
       buttonImageOnly: false
+
+      # localization values understood by $.datepicker
+      prevText:           I18n.t('prevText', 'Prev')                        # title text for previous month icon
+      nextText:           I18n.t('nextText', 'Next')                        # title text for next month icon
+      monthNames:         I18n.lookup('date.month_names')[1..]              # names of months
+      dayNames:           I18n.lookup('date.day_names')                     # title text for column headings
+      dayNamesMin:        I18n.lookup('date.datepicker.column_headings')    # column headings for days (Sunday = 0)
+      firstDay:           I18n.t('first_day_index', '0')                    # first day of the week (Sun = 0)
+      showMonthAfterYear: I18n.t('#date.formats.medium_month')[0:1] is "%Y" # "month year" or "year month"
 
     parseError: I18n.t('errors.not_a_date', "That's not a date!")
     courseLabel: I18n.t('#helpers.course', 'Course') + ": "
@@ -167,11 +176,16 @@ define [
           'time-hour': null
           'time-minute': null
           'time-ampm': null
-      else
+      else if tz.hasMeridian()
         @$field.data
           'time-hour': tz.format(@datetime, "%-l")
           'time-minute': tz.format(@datetime, "%M")
           'time-ampm': tz.format(@datetime, "%P")
+      else
+        @$field.data
+          'time-hour': tz.format(@datetime, "%-k")
+          'time-minute': tz.format(@datetime, "%M")
+          'time-ampm': tz.format(@datetime, null)
 
     updateSuggest: ->
       text = @formatSuggest()

@@ -159,15 +159,7 @@ describe "new groups" do
 
       manually_set_groupset_limit("2")
       expect(f('.group-summary')).to include_text("0 / 2 students")
-
-      2.times do |n|
-        studs = ff('.assign-to-group')
-        studs.first.click
-        f('.set-group').click
-        expect(f('.group-summary')).to include_text("#{n+1} / 2 students")
-      end
-
-      expect(f('.show-group-full')).to be_displayed
+      manually_fill_limited_group("2",2)
     end
 
     it "should allow a teacher to set up a group with member limits", priority: "1", test_id: 94161 do
@@ -176,6 +168,15 @@ describe "new groups" do
 
       manually_create_group(has_max_membership:true, member_limit:2)
       expect(f('.group-summary')).to include_text("0 / 2 students")
+    end
+
+    it "should update student count when they're added to groups limited by group", priority: "1", test_id: 94167 do
+      group_test_setup(3,1,0)
+      create_group(group_category:@group_category.first,has_max_membership:true,member_limit:2)
+      get "/courses/#{@course.id}/groups"
+
+      expect(f('.group-summary')).to include_text("0 / 2 students")
+      manually_fill_limited_group("2",2)
     end
   end
 end

@@ -146,9 +146,9 @@ module Lti
           expect(content_item).to be_a IMS::LTI::Models::ContentItems::LtiLink
         end
 
-        it 'sets the media_type to application/vnd.ims.lti.v1.launch+json' do
+        it 'sets the media_type to application/vnd.ims.lti.v1.ltilink' do
           content_item = described_class.convert_resource_selection(lti_link)
-          expect(content_item.media_type).to eq 'application/vnd.ims.lti.v1.launch+json'
+          expect(content_item.media_type).to eq 'application/vnd.ims.lti.v1.ltilink'
         end
 
         it 'sets the presentation_document_target to frame' do

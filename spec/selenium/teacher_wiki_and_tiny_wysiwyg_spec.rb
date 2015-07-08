@@ -255,6 +255,20 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     check_image(f('#wiki_page_show img'))
   end
 
+  it "should not scroll to the top of the page after using an equation button" do
+    get "/courses/#{@course.id}/pages/front-page/edit"
+    scroll_page_to_bottom
+
+    f(equation_button_selector).click
+    wait_for_ajaximations
+
+    misc_tab = f('.mathquill-tab-bar > li:last-child a')
+    misc_tab.click
+    f('#Misc_tab li:nth-child(35) a').click
+    scroll_location = driver.execute_script("return window.scrollY")
+    expect(scroll_location).not_to be 0
+  end
+
   it "should add an equation to the rce by using the equation editor" do
     equation_text = '\\text{yay math stuff:}\\:\\frac{d}{dx}\\sqrt{x}=\\frac{d}{dx}x^{\\frac{1}{2}}=\\frac{1}{2}x^{-\\frac{1}{2}}=\\frac{1}{2\\sqrt{x}}\\text{that. is. so. cool.}'
 

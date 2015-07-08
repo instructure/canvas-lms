@@ -138,6 +138,9 @@ class SubAccountsController < ApplicationController
   
   def destroy
     @sub_account = subaccount_or_self(params[:id])
+    if @sub_account.associated_courses.not_deleted.exists?
+      return render json: { message: I18n.t("You can't delete a sub-account that has courses in it.") }, status: 409
+    end
     @sub_account.destroy
     render :json => @sub_account
   end

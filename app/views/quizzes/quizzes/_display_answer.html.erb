@@ -10,7 +10,7 @@
   # Determine if we should show the correct answers. Start with the quiz setting but enable if the user can grade but not on surveys.
   # Also show if not on results page and no answers (i.e. when teacher editing quiz)
   show_correct_answers = @quiz && @quiz.show_correct_answers?(@current_user, @submission) || (!assessment_results && !user_answer)
-  show_correct_answers = false if @quiz.try(:survey?)
+  show_correct_answers = false if @quiz.try(:survey?) && !@quiz.grants_right?(@current_user, :update)
   answer_id = hash_get(answer, :id)
   question_id = hash_get(question, :id)
   selected_answer = user_answer && answer && hash_get(user_answer, :answer_id) == answer_id

@@ -67,16 +67,6 @@ module Importers
 
         begin
           question = self.import_from_migration(question, migration.context, migration, question_bank)
-
-          # If the question appears to have links, we need to translate them so that file links point
-          # to the AssessmentQuestion. Ideally we would just do this before saving the question, but
-          # the link needs to include the id of the AQ, which we don't have until it's saved. This will
-          # be a problem as long as we use the question as a context for its attachments. (We're turning this
-          # hash into a string so we can quickly check if anywhere in the hash might have a URL.)
-          if question.to_s =~ %r{/files/\d+/(download|preview)}
-            AssessmentQuestion.find(question[:assessment_question_id]).translate_links
-          end
-
           question_data[:aq_data][question['migration_id']] = question
         rescue
           migration.add_import_warning(t('#migration.quiz_question_type', "Quiz Question"), question[:question_name], $!)
@@ -90,9 +80,8 @@ module Importers
       hash = hash.with_indifferent_access
       hash.delete(:question_bank_migration_id) if hash.has_key?(:question_bank_migration_id)
 
-      self.prep_for_import(hash, context, migration)
+      self.prep_for_import(hash, migration, :assessment_question)
 
-      missing_links = hash.delete(:missing_links) || {}
       import_warnings = hash.delete(:import_warnings) || []
       if error = hash.delete(:import_error)
         import_warnings << error
@@ -115,54 +104,49 @@ module Importers
         hash['assessment_question_id'] = id
       end
 
-      if migration
-        missing_links.each do |field, links|
-          migration.add_missing_content_links(:class => self.to_s,
-            :id => hash['assessment_question_id'], :field => field, :missing_links => links,
-            :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/question_banks/#{bank.id}#question_#{hash['assessment_question_id']}_question_text")
-        end
-        if import_warnings
-          import_warnings.each do |warning|
-            migration.add_warning(warning, {
-              :fix_issue_html_url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/question_banks/#{bank.id}#question_#{hash['assessment_question_id']}_question_text"
-            })
-          end
+      if import_warnings
+        import_warnings.each do |warning|
+          migration.add_warning(warning, {
+            :fix_issue_html_url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/question_banks/#{bank.id}#question_#{hash['assessment_question_id']}_question_text"
+          })
         end
       end
       hash
     end
 
-    def self.prep_for_import(hash, context, migration=nil)
+    def self.prep_for_import(hash, migration, item_type)
       return hash if hash[:prepped_for_import]
-      hash[:missing_links] = {}
+
       [:question_text, :correct_comments_html, :incorrect_comments_html, :neutral_comments_html, :more_comments_html].each do |field|
-        hash[:missing_links][field] = []
         if hash[field].present?
-          hash[field] = ImportedHtmlConverter.convert(hash[field], context, migration, {:remove_outer_nodes_if_one_child => true}) do |warn, link|
-            hash[:missing_links][field] << link if warn == :missing_link
-          end
+          hash[field] = migration.convert_html(
+            hash[field], item_type, hash[:migration_id], field, {:remove_outer_nodes_if_one_child => true}
+          )
         end
       end
+
       [:correct_comments, :incorrect_comments, :neutral_comments, :more_comments].each do |field|
         html_field = "#{field}_html".to_sym
         if hash[field].present? && hash[field] == hash[html_field]
           hash.delete(html_field)
         end
       end
+
       hash[:answers].each_with_index do |answer, i|
         [:html, :comments_html, :left_html].each do |field|
           key = "answer #{i} #{field}"
-          hash[:missing_links][key] = []
+
           if answer[field].present?
-            answer[field] = ImportedHtmlConverter.convert(answer[field], context, migration, {:remove_outer_nodes_if_one_child => true}) do |warn, link|
-              hash[:missing_links][key] << link if warn == :missing_link
-            end
+            answer[field] = migration.convert_html(
+              answer[field], item_type, hash[:migration_id], key, {:remove_outer_nodes_if_one_child => true}
+            )
           end
         end
         if answer[:comments].present? && answer[:comments] == answer[:comments_html]
           answer.delete(:comments_html)
         end
       end if hash[:answers]
+
       hash[:prepped_for_import] = true
       hash
     end

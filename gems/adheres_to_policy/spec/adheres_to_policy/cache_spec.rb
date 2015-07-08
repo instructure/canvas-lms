@@ -36,6 +36,13 @@ describe AdheresToPolicy::Cache do
       value = AdheresToPolicy::Cache.fetch(:key){ 'value' }
       expect(value).to eq 'value'
     end
+
+    it "does not write the key if the value is 'false'" do
+      AdheresToPolicy::Cache.write(:key, false)
+      expect(AdheresToPolicy::Cache).to_not receive(:write)
+      value = AdheresToPolicy::Cache.fetch(:key){ 'new_value' }
+      expect(value).to eq false
+    end
   end
 
   context "#write" do
