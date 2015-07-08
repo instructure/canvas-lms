@@ -1,3 +1,21 @@
+#
+# Copyright (C) 2015 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 class GradingPeriod < ActiveRecord::Base
   include Canvas::SoftDeletable
 
@@ -35,8 +53,13 @@ class GradingPeriod < ActiveRecord::Base
       .grading_periods
   end
 
-  def self.context_find(context, id)
-    self.for(context).detect { |grading_period| grading_period.id == id.to_i }
+  # Takes a context and a grading_period_id and returns a grading period
+  # if it is in the for collection. Uses Enumberable#find to query
+  # collection.
+  def self.context_find(context, grading_period_id)
+    self.for(context).find do |grading_period|
+      grading_period.id == grading_period_id.to_i
+    end
   end
 
   def assignments(assignment_scope)
