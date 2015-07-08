@@ -21,7 +21,7 @@ describe "collaborations" do
       end
 
       it 'should not display the new collaboration form if other collaborations exist', priority: "1", test_id: 162347 do
-        not_display_new_form_if_none_exist(type,title)
+        not_display_new_form_if_none_exist(type, title)
       end
 
       it 'should open the new collaboration form if the last collaboration is deleted', priority: "1", test_id: 162320 do
@@ -50,7 +50,7 @@ describe "collaborations" do
         end
 
         it 'should hide the new collaboration form if collaborations exist', priority: "2", test_id: 162340 do
-          hide_new_form_if_exists(type,title)
+          hide_new_form_if_exists(type, title)
         end
       end
     end

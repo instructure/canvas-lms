@@ -137,7 +137,7 @@ def no_delete_with_no_access
   expect(f('.delete_collaboration_link')).to be_nil
 end
 
-def not_display_new_form_if_none_exist(type,title)
+def not_display_new_form_if_none_exist(type, title)
   create_collaboration!(type, title)
   validate_collaborations(%W{/courses/#{@course.id}/collaborations}, false)
 end
@@ -148,7 +148,7 @@ def display_new_form_if_none_exist(type)
             /courses/#{@course.id}/collaborations#add_collaboration}, true)
 end
 
-def hide_new_form_if_exists(type,title)
+def hide_new_form_if_exists(type, title)
     create_collaboration!(type, title)
     validate_collaborations(%W{/courses/#{@course.id}/collaborations
               /courses/#{@course.id}/collaborations#add_collaboration}, false)

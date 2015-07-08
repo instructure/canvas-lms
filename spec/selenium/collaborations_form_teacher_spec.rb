@@ -16,12 +16,13 @@ describe "collaborations" do
         set_up_google_docs
       end
 
-      it 'should display the new collaboration form if there are no existing collaborations', priority: "1", test_id: 162302 do
+      it 'should display the new collaboration form if there are no existing collaborations', priority: "1", test_id: 132521 do
+        # was tied to test_id: 162302 - this seems incorrect.
         new_collaborations_form(type)
       end
 
       it 'should not display the new collaboration form if other collaborations exist', priority: "1", test_id: 162300 do
-        not_display_new_form_if_none_exist(type,title)
+        not_display_new_form_if_none_exist(type, title)
       end
 
       it 'should open the new collaboration form if the last collaboration is deleted', priority: "1", test_id: 162309 do
@@ -54,7 +55,7 @@ describe "collaborations" do
         end
 
         it 'should hide the new collaboration form if collaborations exist', priority: "2", test_id: 162342 do
-          hide_new_form_if_exists(type,title)
+          hide_new_form_if_exists(type, title)
         end
       end
     end
