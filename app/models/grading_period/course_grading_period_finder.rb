@@ -24,10 +24,12 @@ class GradingPeriod
     end
 
     def grading_periods
-      course_gps = GradingPeriod.active.grading_periods_by(course_id: course.id)
-      course_gps.present? ?
-        course_gps :
+      periods = GradingPeriod.active.grading_periods_by(course_id: course.id)
+      if periods.present?
+        periods
+      else
         AccountGradingPeriodFinder.new(course.account).grading_periods
+      end
     end
 
     private
