@@ -56,9 +56,9 @@ class UserList
     parse_list(list_in)
     resolve
   end
-  
+
   attr_reader :errors, :addresses, :duplicate_addresses
-  
+
   def as_json(*options)
     {
       :users => addresses.map { |a| a.reject { |k, v| k == :shard } },
@@ -87,7 +87,7 @@ class UserList
   end
 
   private
-  
+
   def parse_single_user(path)
     return if path.blank?
 
@@ -124,7 +124,7 @@ class UserList
       nil
     end
   end
-  
+
   def quote_ends(chars, i)
     loop do
       i = i + 1
@@ -159,7 +159,7 @@ class UserList
       end
     end
   end
-  
+
   def resolve
     all_account_ids = [@root_account.id] + @root_account.trusted_account_ids
     associated_shards = @addresses.map {|x| Pseudonym.associated_shards(x[:address].downcase) }.flatten.to_set
@@ -277,6 +277,7 @@ class UserList
       address.delete :workflow_state
       address.delete :account_id
       address.delete :sis_user_id
+      address.delete :id
       # Only allow addresses that we found a user, or that we can implicitly create the user
       if address[:user_id].present?
         (@addresses.find { |a| a[:user_id] == address[:user_id] && a[:shard] == address[:shard] } ? @duplicate_addresses : @addresses) << address
@@ -292,5 +293,5 @@ class UserList
       end
     end
   end
-  
+
 end

@@ -576,6 +576,7 @@ describe UserMerge do
       expect(user1).to be_deleted
       expect(p1.reload.user).to eq @user2
       expect(cc1.reload).to be_retired
+      @user2.reload
       expect(@user2.communication_channels.all.map(&:path).sort).to eq ['user1@example.com', 'user2@example.com']
       expect(@user2.all_pseudonyms).to eq [@p2, p1]
       expect(@user2.associated_shards).to eq [@shard1, Shard.default]
