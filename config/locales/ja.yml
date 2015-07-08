@@ -896,7 +896,7 @@ ja:
         turnitin_host: "Turnitin ホスト"
         turnitin_pledge: "Turnitin 誓約"
         turnitin_shared_secret: "Turnitin 共有シークレット"
-        users_can_edit_name: ユーザは氏名を編集できる
+        users_can_edit_name: ユーザは氏名を編集できます
       links: 
         add_admins: アカウント管理者の追加
         configure_report: 設定...
@@ -4870,7 +4870,7 @@ ja:
   default_conference_title: "%{course_name} 会議"
   default_question_name: 問題
   default_question_text: 問題文
-  delay_posting_this_topic_until_aa483eec: このトピックの投稿は
+  delay_posting_this_topic_until_aa483eec: このトピックの投稿を先送り
   delete_a6efa79d: 削除
   delete_grading_period_dba36e59: 採点期間の削除
   delete_grading_scheme_6b308832: 採点スキームの削除
@@ -7179,7 +7179,7 @@ ja:
     text_entry_submission: テキスト入力での提出
   idp_entity_id_25c51837: "IdP エンティティ ID"
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: 有効な場合、コンテンツの設計者は公開される前にファイルの著作権とライセンス情報を指定する必要があります。より良いファイルのブラウジングも有効になっている場合にのみ適用されます。
-  if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: 有効である場合、必須条件の１つを満たした際に、モジュールには、完了と表示する選択ができます。
+  if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: 有効である場合、必須条件の１つを満たした際、モジュールに完了と表示する選択ができます。
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: 有効にした場合、LTI起動中にクエリーパラメーターは、ポストボディーにはコピーされません。
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "有効な場合、ユーザは LTI 2 ツールを設定できます。"
   if_you_change_an_assignment_s_points_possible_you__25a0edad: 課題の配点を変更する場合は、課題を再評価する必要があります。
@@ -7188,7 +7188,7 @@ ja:
   if_you_enable_this_feature_be_sure_that_your_sales_566967e6: この機能を有効にした場合、セールスフォースアカウントに、表の左の欄の中の名前と共にこれらのカスタムフィールドがきちんと追加されていることを確認してください。
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "退出すると、現在準備中の zip ファイルのダウンロードはキャンセルされます。"
   if_you_ve_been_using_another_course_management_sys_67edfab1: "別のコース管理システムをご利用になっていた場合は、そのシステム上のコンテンツを Canvas に移動したいとお考えでしょう。そのようなご希望をお持ちの方のために、コンテンツを簡単に Canvas に移行するためのプロセスを、順を追ってご説明します。"
-  if_you_would_like_to_keep_your_unsubmitted_comment_b7e349ce: 見送信のコメントを保存したい場合、このページを出る前にそれらを保存して下さい。
+  if_you_would_like_to_keep_your_unsubmitted_comment_b7e349ce: 未送信のコメントを保存したい場合、このページを出る前にそれらを保存して下さい。
   ignore_91750df8: 無視する
   ignore_assignment_738b3c99: 課題を無視
   ignore_name_55edc6fe: "%{name} を無視"
@@ -7233,7 +7233,7 @@ ja:
     title_for_topics_category: "%{category} のトピック"
     warnings: 
       truncated_wiki_title: "次の Wiki ページのタイトルは切り詰められました: %{title}"
-  in_order_to_complete_the_process_you_will_be_redir_83376e10: プロセスを完了するために、あなたの子供の認証情報でログインする必要があるログインページにリダイレクトされます。
+  in_order_to_complete_the_process_you_will_be_redir_83376e10: プロセスを完了するために、あなたの子供の認証情報でログインする必要があるログインページに、リダイレクトされます。
   inbox_bb245a60: 受信箱
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: 学校の受講生情報システムに投稿する際にこの課題の成績を含める
   incorrect_username_and_or_password_2de73abb: ユーザ名またはパスワード、またはその両方が間違っています
@@ -12458,7 +12458,7 @@ ja:
   remove_row_f9d59cba: 行を削除
   remove_these_dates_48453a81: これらの日付を削除
   rename_45608f54: 名前変更
-  replaces_the_current_folder_tree_with_a_new_access_6f9d15c2: 現在のフォルダツリーを、新しいアクセスでより機能が豊富なフォルダツリーに置き換えます。
+  replaces_the_current_folder_tree_with_a_new_access_6f9d15c2: 現在のフォルダツリーを新しいアクセスで、より機能が豊富なフォルダツリーに置き換えます。
   reply_from_name: "%{name} (Canvas のお知らせから)"
   reply_to_comment_72d96728: コメントに返信
   reply_to_main_discussion_29823888: "メイン ディスカッションに返信"
