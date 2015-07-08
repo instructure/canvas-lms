@@ -326,6 +326,7 @@ class Message < ActiveRecord::Base
   class UnescapedBuffer < String # acts like safe buffer except for the actually being safe part
     alias :append= :<<
     alias :safe_concat :concat
+    alias :safe_append= :concat
   end
 
   # Public: Store content in a message_content_... instance variable.
