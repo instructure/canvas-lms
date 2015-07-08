@@ -222,10 +222,9 @@ describe 'quizzes question banks' do
       @course.save
 
       # create quiz that pulls from question bank
-      quiz = quiz_with_new_questions true
+      quiz_with_new_questions true
 
       # create question group, fill with existing question bank questions
-      get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
       create_question_group
       drag_question_into_group(@quest1.id, @group.id)
       drag_question_into_group(@quest2.id, @group.id)
@@ -235,7 +234,7 @@ describe 'quizzes question banks' do
       new_name = 'I have been edited'
       new_question_text = "What is the answer to #{new_name}?"
 
-      get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
+      get "/courses/#{@course.id}/quizzes/#{@q.id}/edit"
       click_questions_tab
       hover_and_click("#question_#{@quest1.id} .edit_question_link")
       replace_content(f('.question_form [name=\'question_name\']'), new_name)
@@ -244,7 +243,7 @@ describe 'quizzes question banks' do
       click_save_settings_button
 
       # verify modifications
-      get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
+      get "/courses/#{@course.id}/quizzes/#{@q.id}/edit"
       click_questions_tab
 
       expect(f("#question_#{@quest1.id}")).to include_text new_name
