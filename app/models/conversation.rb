@@ -18,8 +18,6 @@
 
 class Conversation < ActiveRecord::Base
   include SimpleTags
-  include ModelCache
-  cacheable_by :id, :private_hash
 
   has_many :conversation_participants, :dependent => :destroy
   has_many :conversation_messages, :order => "created_at DESC, id DESC", :dependent => :delete_all

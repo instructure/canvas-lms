@@ -50,15 +50,15 @@ module ModelCache
       options[:key_method] ||= "#{method}_id"
       options[:key_lookup] ||= :id
       options[:type] ||= :instance
-      ModelCache.make_cacheable self, method, options
-    end
 
-    # e.g. use this to cache calls to Conversation.find_by_id
-    def cacheable_by(*keys)
-      keys.each do |key|
-        ModelCache.keys[self.name] << key
-        ModelCache.make_cacheable self, "find_by_#{key}", :key_lookup => key
+      # add the :id lookup for the target class
+      target_klass = reflections[method.to_sym].klass
+      unless ModelCache.keys[target_klass.name].include?(options[:key_lookup])
+        target_klass.include(ModelCache) unless target_klass.included_modules.include?(ModelCache)
+        ModelCache.keys[target_klass.name] << options[:key_lookup]
       end
+
+      ModelCache.make_cacheable self, method, options
     end
   end
 
