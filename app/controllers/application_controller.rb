@@ -165,12 +165,12 @@ class ApplicationController < ActionController::Base
   end
 
   def k12?
-    @domain_root_account && @domain_root_account.feature_enabled?('k12')
+    @domain_root_account && @domain_root_account.feature_enabled?(:k12)
   end
   helper_method 'k12?'
 
   def use_new_styles?
-    @domain_root_account && @domain_root_account.feature_enabled?(:use_new_styles)
+    @domain_root_account && @domain_root_account.feature_enabled?(:use_new_styles) || k12?
   end
   helper_method 'use_new_styles?'
 

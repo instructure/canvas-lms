@@ -19,5 +19,6 @@ variants:
   new_styles_normal_contrast:
     brandable: true
   new_styles_high_contrast: {}
-  k12_normal_contrast: {}
+  k12_normal_contrast:
+    brandable: true
   k12_high_contrast: {}
