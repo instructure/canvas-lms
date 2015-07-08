@@ -4,7 +4,6 @@ define [
   'Backbone'
   'jst/conferences/newConference'
   'jquery.google-analytics'
-  'compiled/jquery.rails_flash_notifications'
 ], (I18n, $, {View}, template) ->
 
   class ConferenceView extends View
@@ -43,8 +42,7 @@ define [
           allCogs[curIndex - 1].focus()
         else
           $('.new-conference-btn').focus()
-        @model.destroy success: =>
-          $.screenReaderFlashMessage(I18n.t('Conference was deleted'))
+        @model.destroy()
 
     close: (e) ->
       e.preventDefault()

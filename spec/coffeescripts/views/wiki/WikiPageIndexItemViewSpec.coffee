@@ -34,7 +34,7 @@ define [
       published: true
     view = new WikiPageIndexItemView
       model: model
-    stub = @stub(model, 'setFrontPage')
+    stub = sinon.stub(model, 'setFrontPage')
 
     view.useAsFrontPage()
     ok stub.calledOnce

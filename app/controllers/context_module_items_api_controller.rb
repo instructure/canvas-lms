@@ -546,12 +546,16 @@ class ContextModuleItemsApiController < ApplicationController
 
       # assemble a sequence of content tags in the course
       # (break ties on module position by module id)
-      tag_ids = @context.sequential_module_item_ids & @context.module_items_visible_to(@current_user).reorder(nil).pluck(:id)
+      tags = @context.module_items_visible_to(@current_user).
+          select('content_tags.*, context_modules.id as module_id, context_modules.position AS module_position').
+          reject { |item| item.content_type == 'ContextModuleSubHeader' }.
+          sort_by { |item| [item.module_position.to_i, item.module_id, item.position || CanvasSort::Last] }
 
       # find content tags to include
       tag_indices = []
       if asset_type == 'ContentTag'
-        tag_ids.each_with_index { |tag_id, ix| tag_indices << ix if tag_id == asset_id.to_i }
+        tag_ix = tags.each_index.detect { |ix| tags[ix].id == asset_id.to_i }
+        tag_indices << tag_ix if tag_ix
       else
         # map wiki page url to id
         if asset_type == 'WikiPage'
@@ -573,45 +577,32 @@ class ContextModuleItemsApiController < ApplicationController
         end
 
         # find up to MAX_SEQUENCES tags containing the object (or its associated assignment)
-        matching_tag_ids = @context.context_module_tags.where(:id => tag_ids).
-          where(:content_type => asset_type, :content_id => asset_id).pluck(:id)
-        if associated_assignment_id
-          matching_tag_ids += @context.context_module_tags.where(:id => tag_ids).
-            where(:content_type => 'Assignment', :content_id => associated_assignment_id).pluck(:id)
+        tags.each_index do |ix|
+          if (tags[ix].content_type == asset_type && tags[ix].content_id == asset_id) ||
+             (associated_assignment_id && tags[ix].content_type == 'Assignment' && tags[ix].content_id == associated_assignment_id)
+            tag_indices << ix
+            break if tag_indices.length == MAX_SEQUENCES
+          end
         end
-
-        if matching_tag_ids.any?
-          tag_ids.each_with_index { |tag_id, ix| tag_indices << ix if matching_tag_ids.include?(tag_id) }
-        end
-      end
-
-      tag_indices.sort!
-      if tag_indices.length > MAX_SEQUENCES
-        tag_indices = tag_indices[0, MAX_SEQUENCES]
       end
 
       # render the result
+      module_ids = Set.new
       result = { :items => [] }
-
-      needed_tag_ids = []
       tag_indices.each do |ix|
-        needed_tag_ids << tag_ids[ix]
-        needed_tag_ids << tag_ids[ix - 1] if ix > 0
-        needed_tag_ids << tag_ids[ix + 1] if ix < tag_ids.size - 1
-      end
-
-      needed_tags = ContentTag.where(:id => needed_tag_ids.uniq).preload(:context_module).index_by(&:id)
-      tag_indices.each do |ix|
-        hash = { :current => module_item_json(needed_tags[tag_ids[ix]], @current_user, session), :prev => nil, :next => nil }
+        hash = { :current => module_item_json(tags[ix], @current_user, session), :prev => nil, :next => nil }
+        module_ids << tags[ix].context_module_id
         if ix > 0
-          hash[:prev] = module_item_json(needed_tags[tag_ids[ix - 1]], @current_user, session)
+          hash[:prev] = module_item_json(tags[ix - 1], @current_user, session)
+          module_ids << tags[ix - 1].context_module_id
         end
-        if ix < tag_ids.size - 1
-          hash[:next] = module_item_json(needed_tags[tag_ids[ix + 1]], @current_user, session)
+        if ix < tags.size - 1
+          hash[:next] = module_item_json(tags[ix + 1], @current_user, session)
+          module_ids << tags[ix + 1].context_module_id
         end
         result[:items] << hash
       end
-      modules = needed_tags.values.map(&:context_module).uniq
+      modules = @context.context_modules.where(id: module_ids.to_a)
       result[:modules] = modules.map { |mod| module_json(mod, @current_user, session) }
 
       render :json => result

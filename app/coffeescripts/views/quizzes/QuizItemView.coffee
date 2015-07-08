@@ -27,8 +27,6 @@ define [
     messages:
       confirm: I18n.t('confirms.delete_quiz', 'Are you sure you want to delete this quiz?')
       multipleDates: I18n.t('multiple_due_dates', 'Multiple Dates')
-      deleteSuccessful: I18n.t('flash.removed', 'Quiz successfully deleted.')
-      deleteFail: I18n.t('flash.fail', 'Quiz deletion failed.')
 
     initialize: (options) ->
       @initializeChildViews()
@@ -65,14 +63,8 @@ define [
 
     # delete quiz item
     delete: ->
-      @$el.hide()
-      @model.destroy
-        success : =>
-          @$el.remove()
-          $.flashMessage @messages.deleteSuccessful
-        error : =>
-          @$el.show()
-          $.flashError @messages.deleteFail
+      @model.destroy()
+      @$el.remove()
 
     observeModel: ->
       @model.on('change:published', @updatePublishState)

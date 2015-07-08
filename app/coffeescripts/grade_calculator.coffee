@@ -129,6 +129,10 @@ define [
       keepHighest = submissions.length - dropLowest
       keepLowest  = keepHighest - dropHighest
 
+      # make sure we drop the same submission regardless of order
+      submissions.sort (a, b) ->
+        a.submission.assignment_id - b.submission.assignment_id
+
       hasPointed = (s.total for s in submissions when s.total > 0).length > 0
       kept = if hasPointed
         @dropPointed submissions, cantDrop, keepHighest, keepLowest
@@ -143,11 +147,7 @@ define [
       kept
 
     @dropUnpointed: (submissions, keepHighest, keepLowest) ->
-      sortedSubmissions = submissions.sort @stableSubmissionSort(
-        (a,b) -> a.score - b.score,
-        (s) -> s.submission.assignment_id
-      )
-
+      sortedSubmissions = submissions.sort (a,b) -> a.score - b.score
       _.chain(sortedSubmissions).last(keepHighest).first(keepLowest).value()
 
     @dropPointed: (submissions, cantDrop, keepHighest, keepLowest) ->
@@ -195,14 +195,8 @@ define [
 
         kept
 
-      kept = keepHelper(submissions, keepHighest, @stableSubmissionSort(
-        ([a,xx], [b,yy]) -> b - a,
-        ([_score,s]) -> s.submission.assignment_id
-      ))
-      kept = keepHelper(kept, keepLowest, @stableSubmissionSort(
-        ([a,xx], [b,yy]) -> a - b,
-        ([_score,s]) -> s.submission.assignment_id
-      ))
+      kept = keepHelper(submissions, keepHighest, ([a,xx], [b,yy]) -> b - a)
+      kept = keepHelper(kept, keepLowest, ([a,xx], [b,yy]) -> a - b)
 
     @estimateQHigh: (pointed, unpointed, grades) ->
       if unpointed.length > 0
@@ -216,16 +210,6 @@ define [
         maxScore / pointsPossible
       else
         qHigh = grades[grades.length - 1]
-
-    # v8's sort is not stable, this function ensures that the same submission
-    # will be dropped regardless of browser
-    @stableSubmissionSort: (sortFn, getAssignmentIdFn) ->
-      (a, b) ->
-        ret = sortFn(a, b)
-        if ret == 0
-          getAssignmentIdFn(a) - getAssignmentIdFn(b)
-        else
-          ret
 
     @calculate_total: (groupSums, ignoreUngraded, weightingScheme) ->
 

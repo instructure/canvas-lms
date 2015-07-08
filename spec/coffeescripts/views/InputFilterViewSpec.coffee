@@ -27,7 +27,7 @@ define [
     clock.tick view.options.onInputDelay
 
   test 'fires input event, sends value', ->
-    spy = @spy()
+    spy = sinon.spy()
     view.on 'input', spy
     setValue 'foo'
     simulateKeyup()
@@ -35,7 +35,7 @@ define [
     ok spy.calledWith 'foo'
 
   test 'does not fire input event if value has not changed', ->
-    spy = @spy()
+    spy = sinon.spy()
     view.on 'input', spy
     setValue 'foo'
     simulateKeyup()

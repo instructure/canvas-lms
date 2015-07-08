@@ -153,22 +153,19 @@ define [
         })
 
         div className: 'ef-main',
-          if(filesEnv.newFolderTree)
-            p {}, "new folder tree goes here"
-          else
-            aside {
-              className: 'visible-desktop ef-folder-content'
-              role: 'region'
-              'aria-label' : I18n.t('folder_browsing_tree', 'Folder Browsing Tree')
-            },
-              FolderTree({
-                rootTillCurrentFolder: @state.rootTillCurrentFolder
-                rootFoldersToShow: filesEnv.rootFolders
-                dndOptions:
-                  onItemDragEnterOrOver: @onItemDragEnterOrOver
-                  onItemDragLeaveOrEnd: @onItemDragLeaveOrEnd
-                  onItemDrop: @onItemDrop
-              })
+          aside {
+            className: 'visible-desktop ef-folder-content'
+            role: 'region'
+            'aria-label' : I18n.t('folder_browsing_tree', 'Folder Browsing Tree')
+          },
+            FolderTree({
+              rootTillCurrentFolder: @state.rootTillCurrentFolder
+              rootFoldersToShow: filesEnv.rootFolders
+              dndOptions:
+                onItemDragEnterOrOver: @onItemDragEnterOrOver
+                onItemDragLeaveOrEnd: @onItemDragLeaveOrEnd
+                onItemDrop: @onItemDrop
+            })
           div {
             className:'ef-directory'
             role: 'region'

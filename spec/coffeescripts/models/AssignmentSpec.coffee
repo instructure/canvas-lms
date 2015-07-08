@@ -425,8 +425,10 @@ define [
       {due_at: null, title: "Everyone"},
       {due_at: dueAt, title: "Summer"}
     ]
-    @stub assignment, "multipleDueDates", -> false
+    false_stub = sinon.stub assignment, "multipleDueDates"
+    false_stub.returns false
     deepEqual assignment.singleSectionDueDate(), dueAt.toISOString()
+    false_stub.restore()
 
   test "returns due_at when only one date/section are present", ->
     date = Date.now()
@@ -572,9 +574,11 @@ define [
       {due_at: null, title: "Everyone"},
       {due_at: dueAt, title: "Summer"}
     ]
-    @stub assignment, "multipleDueDates", -> false
+    false_stub = sinon.stub assignment, "multipleDueDates"
+    false_stub.returns false
     json = assignment.toView()
     equal json.singleSectionDueDate, dueAt.toISOString()
+    false_stub.restore()
 
   test "includes isQuiz", ->
     assignment = new Assignment("submission_types":["online_quiz"])

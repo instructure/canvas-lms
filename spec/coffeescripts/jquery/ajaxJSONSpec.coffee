@@ -17,7 +17,7 @@ define [
     notEqual INST.environment, 'production'
     deepEqual $.ajaxJSON.unhandledXHRs, []
 
-    spy = @spy()
+    spy = sinon.spy()
     $("#fixtures").defaultAjaxError(spy)
     xhr = {status: 200, responseText: '{"status": "ok"}'}
     $.fn.defaultAjaxError.func({}, xhr)
@@ -28,7 +28,7 @@ define [
     xhr = {status: 400, responseText: '{"status": "ok"}'}
     $.ajaxJSON.unhandledXHRs.push(xhr)
 
-    spy = @spy()
+    spy = sinon.spy()
     $("#fixtures").defaultAjaxError(spy)
     $.fn.defaultAjaxError.func({}, xhr)
     ok spy.called
@@ -37,7 +37,7 @@ define [
     INST.environment = 'production'
     deepEqual $.ajaxJSON.unhandledXHRs, []
 
-    spy = @spy()
+    spy = sinon.spy()
     $("#fixtures").defaultAjaxError(spy)
     xhr = {status: 401, responseText: '{"status": "unauthenticated"}'}
     $.fn.defaultAjaxError.func({}, xhr)

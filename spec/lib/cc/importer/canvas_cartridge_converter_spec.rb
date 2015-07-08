@@ -96,7 +96,7 @@ describe "Canvas Cartridge importing" do
     hash = {:migration_id=>CC::CCHelper.create_key(a),
             :title=>a.title,
             :assignment_group_migration_id=>CC::CCHelper.create_key(ag2)}
-    Importers::AssignmentImporter.import_from_migration(hash, @copy_to, @migration)
+    Importers::AssignmentImporter.import_from_migration(hash, @copy_to)
 
     ag2_2.reload
     expect(ag2_2.assignments.count).to eq 1
@@ -567,9 +567,8 @@ describe "Canvas Cartridge importing" do
     hash = @converter.convert_wiki(doc, 'some-page')
     hash = hash.with_indifferent_access
     #import into new course
-    @migration.attachment_path_id_lookup = { 'unfiled/ohai there.txt' => attachment_import.migration_id }
-    Importers::WikiPageImporter.import_from_migration(hash, @copy_to, @migration)
-    @migration.resolve_content_links!
+    @copy_to.attachment_path_id_lookup = { 'unfiled/ohai there.txt' => attachment_import.migration_id }
+    Importers::WikiPageImporter.import_from_migration(hash, @copy_to)
 
     page_2 = @copy_to.wiki.wiki_pages.where(migration_id: migration_id).first
     expect(page_2.title).to eq page.title
@@ -596,7 +595,7 @@ describe "Canvas Cartridge importing" do
     to_att.migration_id = CC::CCHelper.create_key(from_att)
     to_att.save
     path = to_att.full_display_path.gsub('course files/', '')
-    @migration.attachment_path_id_lookup = {path => to_att.migration_id}
+    @copy_to.attachment_path_id_lookup = {path => to_att.migration_id}
 
     body_with_link = %{<p>Watup? <strong>eh?</strong>
       <a href=\"/courses/%s/assignments\">Assignments</a>
@@ -626,7 +625,6 @@ describe "Canvas Cartridge importing" do
     hash = hash.with_indifferent_access
     #import into new course
     Importers::WikiPageImporter.process_migration({'wikis' => [hash, nil]}, @migration)
-    @migration.resolve_content_links!
 
     expect(ErrorReport.last.message).to match /nil wiki/
 
@@ -652,7 +650,7 @@ describe "Canvas Cartridge importing" do
     hash = @converter.convert_wiki(doc, 'blti-link')
     hash = hash.with_indifferent_access
     #import into new course
-    Importers::WikiPageImporter.import_from_migration(hash, @copy_to, @migration)
+    Importers::WikiPageImporter.import_from_migration(hash, @copy_to)
 
     page_2 = @copy_to.wiki.wiki_pages.where(migration_id: migration_id).first
     expect(page_2.title).to eq page.title
@@ -705,7 +703,7 @@ describe "Canvas Cartridge importing" do
     hash = @converter.parse_canvas_assignment_data(meta_doc, html_doc)
     hash = hash.with_indifferent_access
     #import
-    Importers::AssignmentImporter.import_from_migration(hash, @copy_to, @migration)
+    Importers::AssignmentImporter.import_from_migration(hash, @copy_to)
 
     asmnt_2 = @copy_to.assignments.where(migration_id: migration_id).first
     expect(asmnt_2.title).to eq asmnt.title
@@ -744,7 +742,7 @@ describe "Canvas Cartridge importing" do
     hash = @converter.parse_canvas_assignment_data(meta_doc, html_doc)
     hash = hash.with_indifferent_access
     #import
-    Importers::AssignmentImporter.import_from_migration(hash, @copy_to, @migration)
+    Importers::AssignmentImporter.import_from_migration(hash, @copy_to)
 
     asmnt_2 = @copy_to.assignments.where(migration_id: migration_id).first
     expect(asmnt_2.submission_types).to eq "external_tool"
@@ -805,7 +803,7 @@ XML
     hash = @converter.convert_topic(cc_doc, meta_doc)
     hash = hash.with_indifferent_access
     #import
-    Importers::DiscussionTopicImporter.import_from_migration(hash, @copy_to, @migration)
+    Importers::DiscussionTopicImporter.import_from_migration(hash, @copy_to)
 
     dt_2 = @copy_to.discussion_topics.where(migration_id: migration_id).first
     expect(dt_2.title).to eq dt.title
@@ -853,7 +851,7 @@ XML
     ag1.migration_id = CC::CCHelper.create_key(assignment.assignment_group)
     ag1.save!
     #import
-    Importers::DiscussionTopicImporter.import_from_migration(hash, @copy_to, @migration)
+    Importers::DiscussionTopicImporter.import_from_migration(hash, @copy_to)
 
     dt_2 = @copy_to.discussion_topics.where(migration_id: migration_id).first
     expect(dt_2.title).to eq dt.title
@@ -963,7 +961,7 @@ XML
     ag.migration_id = "i713e960ab2685259505efeb08cd48a1d"
     ag.save!
 
-    Importers::QuizImporter.import_from_migration(quiz_hash, @copy_to, @migration, {})
+    Importers::QuizImporter.import_from_migration(quiz_hash, @copy_to, nil, {})
     q = @copy_to.quizzes.where(migration_id: "ie3d8f8adfad423eb225229c539cdc450").first
     a = q.assignment
     expect(a.assignment_group.id).to eq ag.id

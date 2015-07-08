@@ -300,7 +300,6 @@ describe Enrollment do
       expect(@enrollment.grants_right?(@new_user, :read_grades)).to be_falsey
       @course.enroll_teacher(@new_user)
       @enrollment.reload
-      AdheresToPolicy::Cache.clear
       expect(@enrollment.grants_right?(@user, :read_grades)).to be_truthy
     end
 

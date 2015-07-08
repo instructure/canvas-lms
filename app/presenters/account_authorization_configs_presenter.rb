@@ -6,7 +6,7 @@ class AccountAuthorizationConfigsPresenter
   end
 
   def configs
-    @configs ||= account.authentication_providers.active.to_a
+    @configs ||= account.account_authorization_configs.to_a
   end
 
   def new_auth_types
@@ -63,10 +63,7 @@ class AccountAuthorizationConfigsPresenter
 
   def sso_options
     new_auth_types.map do |auth_type|
-      {
-        name: auth_type.display_name,
-        value: auth_type.sti_name
-      }
+      [auth_type.display_name, auth_type.sti_name]
     end
   end
 
@@ -119,7 +116,7 @@ class AccountAuthorizationConfigsPresenter
   end
 
   def new_config(auth_type)
-    account.authentication_providers.new(auth_type)
+    account.account_authorization_configs.new(auth_type)
   end
 
   def parent_reg_selected

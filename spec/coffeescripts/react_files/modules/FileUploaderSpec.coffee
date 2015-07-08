@@ -21,10 +21,13 @@ define [
 
 
   test 'posts to the files endpoint to kick off upload', ->
-    @stub($, 'ajaxJSON')
+    sinon.stub($, 'ajaxJSON')
 
     @uploader.upload()
     equal($.ajaxJSON.calledWith('/api/v1/folders/1/files'), true, 'kicks off upload')
+
+    $.ajaxJSON.restore()
+
 
   test 'stores params from preflight for actual upload', ->
     server = sinon.fakeServer.create()
@@ -36,7 +39,7 @@ define [
                        ]
     )
 
-    @stub(@uploader, '_actualUpload')
+    uploadStub = sinon.stub(@uploader, '_actualUpload')
     @uploader.upload()
 
     server.respond()
@@ -44,15 +47,16 @@ define [
     equal @uploader.uploadData.upload_url, '/upload/url'
     equal @uploader.uploadData.upload_params.key, 'value'
 
+    uploadStub.restore()
     server.restore()
 
   test 'roundProgress returns back rounded values', ->
-    @stub(@uploader, 'getProgress').returns(0.18) # progress is [0 .. 1]
+    sinon.stub(@uploader, 'getProgress').returns(0.18) # progress is [0 .. 1]
     equal @uploader.roundProgress(), 18
 
   test 'roundProgress returns back values no greater than 100', ->
-    @stub(@uploader, 'getProgress').returns(1.1) # something greater than 100%
-    equal @uploader.roundProgress(), 100
+   sinon.stub(@uploader, 'getProgress').returns(1.1) # something greater than 100%
+   equal @uploader.roundProgress(), 100
 
   test 'getFileName returns back the option name if one exists', ->
     folder = {id: 1}

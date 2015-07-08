@@ -29,7 +29,7 @@ define [
 
   test 'two entries do not render keyboard shortcuts to the same place', ->
     clock = sinon.useFakeTimers()
-    @stub(Reply.prototype, 'edit')
+    sinon.stub(Reply.prototype, 'edit')
     $('#fixtures').append($('<div />').attr('id', 'e1'))
     $('#fixtures').append($('<div />').attr('id', 'e2'))
 
@@ -55,7 +55,7 @@ define [
 
   test 'should listen on model change:replies', ->
     entry = new Entry(id: 1, message: 'a comment, wooper')
-    spy = @stub(EntryView.prototype, 'renderTree')
+    spy = sinon.stub(EntryView.prototype, 'renderTree')
     view = new EntryView(model: entry)
 
     entry.set('replies', [new Entry(id: 2, message: 'a reply', parent_id: 1)])
@@ -64,3 +64,6 @@ define [
     spy.reset()
     entry.set('replies', [])
     ok !spy.called, 'should not renderTree when value is empty'
+
+    EntryView.prototype.renderTree.restore()
+

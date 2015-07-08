@@ -65,11 +65,7 @@ define [
       $.ajaxJSON url, type, data
 
     submissionDidChange: (->
-      newVal = if @submission?.excused
-                 'EX'
-               else
-                 @submission?.grade || '-'
-
+      newVal = if @submission?.grade? then @submission.grade else '-'
       @set 'value', newVal
     ).observes('submission').on('init')
 
@@ -83,16 +79,12 @@ define [
       return unless submission = @get('submission')
       url = @get('saveURL')
       value = @$('input, select').val()
-      if @get('isPassFail') and value == '-'
+      if @get('isPassFail') and value == "-"
         value = ''
       return if value == submission.grade
-      data = if value?.toUpperCase() == 'EX'
-               { "submission[excuse]": true }
-             else
-               { "submission[posted_grade]": value }
       save = @ajax url,
         type: "PUT"
-        data: data
+        data: { "submission[posted_grade]": value }
       save.then @boundUpdateSuccess, @onUpdateError
 
     bindSave: (->

@@ -49,18 +49,20 @@ class Login::SamlController < ApplicationController
     increment_saml_stat('login_response_received')
     response = Onelogin::Saml::Response.new(params[:SAMLResponse])
 
-    @aac = @domain_root_account.authentication_providers.active.
-        where(auth_type: 'saml').
-        where(idp_entity_id: response.issuer).
-        first
-    if @aac.nil?
-      logger.error "Attempted SAML login for #{response.issuer} on account without that IdP"
-      if @domain_root_account.auth_discovery_url
-        flash[:delegated_message] = t("Canvas did not recognize your identity provider")
-      else
-        flash[:delegated_message] = t("The institution you logged in from is not configured on this account.")
+    if @domain_root_account.account_authorization_configs.where(auth_type: 'saml').count > 1
+      @aac = @domain_root_account.account_authorization_configs.
+          where(auth_type: 'saml').
+          where(idp_entity_id: response.issuer).
+          first
+      if @aac.nil?
+        logger.error "Attempted SAML login for #{response.issuer} on account without that IdP"
+        if @domain_root_account.auth_discovery_url
+          flash[:delegated_message] = t("Canvas did not recognize your identity provider")
+        else
+          flash[:delegated_message] = t("The institution you logged in from is not configured on this account.")
+        end
+        return redirect_to login_url
       end
-      return redirect_to login_url
     end
 
     settings = aac.saml_settings(request.host_with_port)
@@ -225,7 +227,7 @@ class Login::SamlController < ApplicationController
       increment_saml_stat("logout_response_received")
       saml_response = Onelogin::Saml::LogoutResponse.parse(params[:SAMLResponse])
 
-      aac = @domain_root_account.authentication_providers.active.where(idp_entity_id: saml_response.issuer).first
+      aac = @domain_root_account.account_authorization_configs.where(idp_entity_id: saml_response.issuer).first
       return render status: :bad_request, text: "Could not find SAML Entity" unless aac
 
       settings = aac.saml_settings(request.host_with_port)
@@ -243,7 +245,7 @@ class Login::SamlController < ApplicationController
     else
       increment_saml_stat("logout_request_received")
       saml_request = Onelogin::Saml::LogoutRequest.parse(params[:SAMLRequest])
-      if (aac = @domain_root_account.authentication_providers.active.where(idp_entity_id: saml_request.issuer).first)
+      if (aac = @domain_root_account.account_authorization_configs.where(idp_entity_id: saml_request.issuer).first)
         settings = aac.saml_settings(request.host_with_port)
         saml_request.process(settings)
 
@@ -284,7 +286,7 @@ class Login::SamlController < ApplicationController
 
   def aac
     @aac ||= begin
-      scope = @domain_root_account.authentication_providers.active.where(auth_type: 'saml')
+      scope = @domain_root_account.account_authorization_configs.where(auth_type: 'saml')
       params[:id] ? scope.find(params[:id]) : scope.first!
     end
   end

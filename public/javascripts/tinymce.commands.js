@@ -2,9 +2,6 @@ define([
   "compiled/editor/stocktiny"
 ], function(tinymce){
 
-  var openTag = /</;
-  var isLink = /^<a [^>]+>[^<]+<\/a>$/;
-
   /**
    * @exports
    * A series of functions that wrap conditionals
@@ -43,8 +40,8 @@ define([
     },
 
     isOnlyText: function(maybeHtml){
-      return !(openTag.test(maybeHtml) &&
-              (!isLink.test(maybeHtml) ||
+      return !(/</.test(maybeHtml) &&
+              (!/^<a [^>]+>[^<]+<\/a>$/.test(maybeHtml) ||
               maybeHtml.indexOf('href=') == -1));
     },
 

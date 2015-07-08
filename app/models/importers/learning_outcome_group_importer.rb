@@ -36,7 +36,7 @@ module Importers
         root_outcome_group.adopt_outcome_group(item)
       end
 
-      migration.add_imported_item(item)
+      migration.add_imported_item(item) if migration
 
       if hash[:outcomes]
         hash[:outcomes].each do |child|

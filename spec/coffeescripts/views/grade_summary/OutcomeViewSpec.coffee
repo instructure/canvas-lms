@@ -20,7 +20,7 @@ define [
   test 'assign instance of ProgressBarView on init', ->
     ok @outcomeView.progress instanceof ProgressBarView
 
-  test 'have after render behavior', ->
+  test 'have after render beheavior', ->
     ok _.isUndefined(@outcomeView.popover, 'precondition')
 
     @outcomeView.render()
@@ -30,7 +30,7 @@ define [
 
   test 'click & keydown .more-details', ->
     @outcomeView.render()
-    showSpy = @stub(@outcomeView.dialog, 'show')
+    showSpy = sinon.stub(@outcomeView.dialog, 'show')
     @outcomeView.$el.find('a.more-details').trigger(@e('click'))
     ok showSpy.called
 
@@ -38,3 +38,5 @@ define [
 
     @outcomeView.$el.find('a.more-details').trigger(@e('keydown'))
     ok showSpy.called
+
+    @outcomeView.dialog.show.restore()

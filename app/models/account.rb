@@ -73,17 +73,7 @@ class Account < ActiveRecord::Base
   has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_with_sub_folders, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
-
-  has_many :authentication_providers,
-           order: "position",
-           extend: AccountAuthorizationConfig::FindWithType,
-           class_name: "AccountAuthorizationConfig"
-
-  # Shim until plugins can be updated to use "authentication_providers"
-  has_many :account_authorization_configs,
-           order: "position",
-           extend: AccountAuthorizationConfig::FindWithType
-
+  has_many :account_authorization_configs, order: "position", extend: AccountAuthorizationConfig::FindWithType
   has_many :account_reports
   has_many :grading_standards, :as => :context, :conditions => ['workflow_state != ?', 'deleted']
   has_many :assessment_questions, :through => :assessment_question_banks
@@ -287,17 +277,11 @@ class Account < ActiveRecord::Base
   end
 
   def non_canvas_auth_configured?
-    authentication_providers.active.exists?
+    account_authorization_configs.exists?
   end
 
   def canvas_authentication?
     settings[:canvas_authentication] != false || !non_canvas_auth_configured?
-  end
-
-  def enable_canvas_authentication
-    return if settings[:canvas_authentication]
-    settings[:canvas_authentication] = true
-    self.save!
   end
 
   def open_registration?
@@ -971,7 +955,7 @@ class Account < ActiveRecord::Base
   end
 
   def delegated_authentication?
-    authentication_providers.active.first.is_a?(AccountAuthorizationConfig::Delegated)
+    account_authorization_configs.first.is_a?(AccountAuthorizationConfig::Delegated)
   end
 
   def forgot_password_external_url
@@ -979,7 +963,7 @@ class Account < ActiveRecord::Base
   end
 
   def multi_auth?
-    self.authentication_providers.active.count > 1
+    self.account_authorization_configs.count > 1
   end
 
   def auth_discovery_url=(url)
@@ -1249,7 +1233,7 @@ class Account < ActiveRecord::Base
     tools.sort_by(&:id).map do |tool|
      {
         :id => tool.asset_string,
-        :label => tool.label_for(:account_navigation, opts[:language] || I18n.locale),
+        :label => tool.label_for(:account_navigation, opts[:language]),
         :css_class => tool.asset_string,
         :visibility => tool.account_navigation(:visibility),
         :href => :account_external_tool_path,

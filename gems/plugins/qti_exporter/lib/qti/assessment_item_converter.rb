@@ -39,6 +39,7 @@ class AssessmentItemConverter
     @question = {:answers=>[],
                  :correct_comments=>"",
                  :incorrect_comments=>"",
+                 :points_possible=>AssessmentItemConverter::DEFAULT_POINTS_POSSIBLE,
                  :question_text=>""}
   end
 
@@ -128,7 +129,6 @@ class AssessmentItemConverter
       @log.error "#{e}: #{e.backtrace}"
     end
 
-    @question[:points_possible] ||= AssessmentItemConverter::DEFAULT_POINTS_POSSIBLE
     @question
   end
 

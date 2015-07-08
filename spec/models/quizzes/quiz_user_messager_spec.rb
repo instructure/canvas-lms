@@ -30,7 +30,7 @@ describe Quizzes::QuizUserMessager do
     @submitted = @student
     submission = @quiz.generate_submission(@submitted)
     submission.mark_completed
-    Quizzes::SubmissionGrader.new(submission).grade_submission
+    submission.grade_submission
     @finder = Quizzes::QuizUserFinder.new(@quiz, @teacher)
   end
 

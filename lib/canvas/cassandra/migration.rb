@@ -14,7 +14,7 @@ module Canvas
 
       def self.included(migration)
         migration.tag :cassandra
-        migration.singleton_class.include(ClassMethods)
+        migration.extend ClassMethods
       end
     end
   end

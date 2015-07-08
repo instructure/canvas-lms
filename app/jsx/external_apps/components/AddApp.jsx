@@ -154,7 +154,6 @@ define([
       newTool.set('config_url', this.configUrl());
       newTool.set('config_type', 'by_url');
       newTool.set('name', this.state.fields.name.value);
-      newTool.set('app_center_id', this.props.app.short_name);
 
       $(e.target).attr('disabled', 'disabled');
       

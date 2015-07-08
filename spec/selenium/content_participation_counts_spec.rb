@@ -18,11 +18,12 @@ describe "courses" do
     expect(f("#section-tabs .grades .nav-badge").text).to eq "1"
   end
 
-  it "should decrement the badge when the grades page is visited" do
-    get "/courses/#{@course.id}"
+  it "should derement the badge when the grades page is visited" do
+    # visiting the page will decrement the count on the next page load
+    get "/courses/#{@course.id}/grades"
     expect(f("#section-tabs .grades .nav-badge").text).to eq "1"
 
-    get "/courses/#{@course.id}/grades"
+    get "/courses/#{@course.id}"
     expect(f("#section-tabs .grades .nav-badge")).to be_nil
   end
 end

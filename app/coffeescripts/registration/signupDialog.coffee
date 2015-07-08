@@ -42,6 +42,8 @@ define [
       path: path
     )
     $node.html html
+    $node.find('.date-field').datetime_field()
+
     $node.find('.signup_link').click preventDefault ->
       $node.dialog('close')
       signupDialog($(this).data('template'), $(this).prop('title'))

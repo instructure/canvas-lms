@@ -197,11 +197,7 @@ require [
         @list.collection.remove(messages)
 
     onFilter: (filters) =>
-      # Update the hash. Replace if there isn't already a hash - we're in the
-      # process of loading the page if so, and we wouldn't want to create a
-      # spurious history entry by not doing so.
-      existingHash = window.location.hash && window.location.hash.substring(1)
-      @navigate('filter='+$.param(filters), {trigger: true, replace: !existingHash})
+      @navigate('filter='+$.param(filters), {trigger: true})
 
     onCourse: (course) =>
       @list.updateCourse(course)

@@ -11,8 +11,7 @@ $button-hover: #dee5ea;
 }
 
 .module-sequence-footer{
-  @if $use_new_styles { position: relative }
-  @else { position: absolute; }
+  position: absolute;
   left:0px;
   right:0px;
   bottom:0px;

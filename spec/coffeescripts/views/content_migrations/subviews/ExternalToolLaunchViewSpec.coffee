@@ -19,7 +19,7 @@ define [
       @launchView.remove()
 
   test 'calls render on return view when launch button clicked', ->
-    @stub(@mockReturnView, 'render', -> this)
+    sinon.stub(@mockReturnView, 'render', -> this)
     @launchView.$el.find('#externalToolLaunch').click()
     ok @mockReturnView.render.calledOnce, 'render not called on return view'
 

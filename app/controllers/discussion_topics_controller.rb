@@ -340,7 +340,9 @@ class DiscussionTopicsController < ApplicationController
         }
         append_sis_data(hash)
 
-        js_env(hash.merge(POST_GRADES: Assignment.sis_grade_export_enabled?(@context)))
+        js_env(hash.merge(
+          POST_GRADES: Assignment.show_sis_grade_export_option?(@context)
+        ))
         if user_can_edit_course_settings?
           js_env(SETTINGS_URL: named_context_url(@context, :api_v1_context_settings_url))
         end
@@ -430,7 +432,7 @@ class DiscussionTopicsController < ApplicationController
                      map { |category| { id: category.id, name: category.name } },
                  CONTEXT_ID: @context.id,
                  CONTEXT_ACTION_SOURCE: :discussion_topic,
-                 POST_GRADES: Assignment.sis_grade_export_enabled?(@context),
+                 POST_GRADES: Assignment.show_sis_grade_export_option?(@context),
                  DIFFERENTIATED_ASSIGNMENTS_ENABLED: @context.feature_enabled?(:differentiated_assignments)}
       if @context.is_a?(Course)
         js_hash['SECTION_LIST'] = sections.map { |section|
@@ -472,7 +474,7 @@ class DiscussionTopicsController < ApplicationController
     if authorized_action(@topic, @current_user, :read)
       if @current_user && @topic.for_assignment? && !@topic.assignment.visible_to_user?(@current_user)
         respond_to do |format|
-          flash[:error] = t "You do not have access to the requested discussion."
+          flash[:error] = t 'notices.discussion_not_availible', "You do not have access to the requested discussion."
           format.html { redirect_to named_context_url(@context, :context_discussion_topics_url) }
         end
         return
@@ -1029,8 +1031,7 @@ class DiscussionTopicsController < ApplicationController
              @assignment.grants_right?(@current_user, session, :update)
         params[:assignment][:group_category_id] = nil unless @topic.group_category_id || @assignment.has_submitted_submissions?
         params[:assignment][:published] = @topic.published?
-        params[:assignment][:name] = @topic.title
-        update_api_assignment(@assignment, params[:assignment], @current_user)
+        update_api_assignment(@assignment, params[:assignment].merge(@topic.attributes.slice('title')), @current_user)
         @assignment.submission_types = 'discussion_topic'
         @assignment.saved_by = :discussion_topic
         @topic.assignment = @assignment

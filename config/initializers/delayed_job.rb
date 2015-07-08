@@ -101,7 +101,7 @@ Delayed::Worker.lifecycle.before(:perform) do |job|
 end
 
 Delayed::Worker.lifecycle.before(:exceptional_exit) do |worker, exception|
-  info = Canvas::Errors::WorkerInfo.new(worker)
+  info = Canvas::Errors::JobInfo.new(nil, worker)
   Canvas::Errors.capture(exception, info.to_h)
 end
 

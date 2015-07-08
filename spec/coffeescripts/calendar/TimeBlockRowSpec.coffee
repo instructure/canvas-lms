@@ -66,25 +66,24 @@ define [
     me = new TimeBlockRow(@timeBlockList, {start, end})
     me.$date.val('1/1/2000').change()
     ok !me.validate()
+    ok me.$end_time.data('associated_error_box').is(':visible'), 'error box is visible'
     ok me.$end_time.hasClass('error'), 'has error class'
-    ok me.$end_time.data('associated_error_box')?.is(':visible'), 'error box is visible'
 
   test 'validate: just time in past', ->
-    fudgedNow = $.fudgeDateForProfileTimezone(new Date())
-    fudgedMidnight = new Date(fudgedNow.toDateString())
-    fudgedEnd = new Date(fudgedMidnight)
-    fudgedEnd.setMinutes(1)
+    twelveOClock = new Date(new Date().toDateString())
+    twelveOOne = new Date(twelveOClock)
+    twelveOOne.setMinutes(1)
 
-    me = new TimeBlockRow(@timeBlockList, {start: fudgedMidnight, end: fudgedEnd})
+    me = new TimeBlockRow(@timeBlockList, {start: twelveOClock, end: twelveOOne})
     ok !me.validate(), 'not valid if time in past'
+    ok me.$end_time.data('associated_error_box').is(':visible'), 'error box is visible'
     ok me.$end_time.hasClass('error'), 'has error class'
-    ok me.$end_time.data('associated_error_box')?.is(':visible'), 'error box is visible'
 
   test 'validate: end before start', ->
     me = new TimeBlockRow(@timeBlockList, {start: end, end: start})
     ok !me.validate()
+    ok me.$start_time.data('associated_error_box').parents('#fixtures'), 'error box is visible'
     ok me.$start_time.hasClass('error'), 'has error class'
-    ok me.$start_time.data('associated_error_box')?.is(':visible'), 'error box is visible'
 
   test 'valid if whole row is blank', ->
     me = new TimeBlockRow(@timeBlockList)

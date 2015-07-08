@@ -125,7 +125,7 @@ def create_assignment_event(assignment_title, should_add_date = false, publish =
 end
 
 # Creates event from clicking on the mini calendar
-def create_calendar_event(event_title, should_add_date = false, should_add_location = false, should_duplicate = false)
+def create_calendar_event(event_title, should_add_date = false, should_add_location = false)
   middle_number = find_middle_day.find_element(:css, '.fc-day-number').text
   find_middle_day.click
   edit_event_dialog = f('#edit_event_tabs')
@@ -136,29 +136,9 @@ def create_calendar_event(event_title, should_add_date = false, should_add_locat
   replace_content(title, event_title)
   add_date(middle_number) if should_add_date
   replace_content(f('#calendar_event_location_name'), 'location title') if should_add_location
-
-  if should_duplicate
-    f('#duplicate_event').click
-    duplicate_options = edit_event_form.find_element(:id, 'duplicate_interval')
-    keep_trying_until { duplicate_options.displayed? }
-    duplicate_interval = edit_event_form.find_element(:id, 'duplicate_interval')
-    duplicate_count = edit_event_form.find_element(:id, 'duplicate_count')
-    replace_content(duplicate_interval, "1")
-    replace_content(duplicate_count, "3")
-    f('#append_iterator').click
-  end
-
   submit_form(edit_event_form)
   wait_for_ajax_requests
-  keep_trying_until do
-    if should_duplicate
-      4.times do |i|
-        expect(ff('.fc-view-month .fc-event-title')[i]).to include_text("#{event_title} #{i + 1}")
-      end
-    else
-      expect(f('.fc-view-month .fc-event-title')).to include_text(event_title)
-    end
-  end
+  keep_trying_until { expect(f('.fc-view-month .fc-event-title')).to include_text(event_title) }
 end
 
 
@@ -181,9 +161,9 @@ def get_header_text
   header.text
 end
 
-def create_middle_day_event(name = 'new event', with_date = false, with_location = false, with_duplicates = false)
+def create_middle_day_event(name = 'new event', with_date = false, with_location = false)
   get "/calendar2"
-  create_calendar_event(name, with_date, with_location, with_duplicates)
+  create_calendar_event(name, with_date, with_location)
 end
 
 def create_middle_day_assignment(name = 'new assignment')

@@ -19,7 +19,7 @@ define [
       React.unmountComponentAtNode(zFOF.getDOMNode().parentNode)
 
     test "handleExpandClick expands zip", ->
-      zipOptionsResolvedStub = @stub()
+      zipOptionsResolvedStub = sinon.stub()
 
       props = {
         fileOptions: {file: 'the_file_obj' }
@@ -34,7 +34,7 @@ define [
       React.unmountComponentAtNode(zFOF.getDOMNode().parentNode)
 
     test "handleUploadClick uploads zip", ->
-      zipOptionsResolvedStub = @stub()
+      zipOptionsResolvedStub = sinon.stub()
 
       props = {
         fileOptions: {file: 'the_file_obj' }

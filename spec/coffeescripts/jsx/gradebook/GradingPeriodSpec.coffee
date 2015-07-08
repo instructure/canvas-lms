@@ -14,6 +14,7 @@ define [
       @stub($, 'flashMessage', -> )
       @stub($, 'flashError', -> )
       @server = sinon.fakeServer.create()
+      @sandbox = sinon.sandbox.create()
       ENV.GRADING_PERIODS_URL = "api/v1/courses/1/grading_periods"
 
       @createdPeriodData = "grading_periods":[
@@ -50,6 +51,7 @@ define [
       React.unmountComponentAtNode(@gradingPeriod.getDOMNode().parentNode)
       ENV.GRADING_PERIODS_URL = null
       @server.restore()
+      @sandbox.restore()
 
   test 'sets initial state properly', ->
     deepEqual @gradingPeriod.state.id, @props.id
@@ -71,13 +73,13 @@ define [
 
   test 'handleDateChange calls replaceInputWithDate', ->
     fakeEvent = { target: { name: "startDate", value: "Feb 20, 2015 2:55 am" } }
-    replaceInputWithDate = @stub(@gradingPeriod, 'replaceInputWithDate')
+    replaceInputWithDate = @sandbox.stub(@gradingPeriod, 'replaceInputWithDate')
     @gradingPeriod.handleDateChange(fakeEvent)
     ok replaceInputWithDate.calledOnce
 
   test 'handleDateChange calls updateGradingPeriodCollection', ->
     fakeEvent = { target: { name: "startDate", value: "Feb 20, 2015 2:55 am" } }
-    update = @stub(@gradingPeriod.props, 'updateGradingPeriodCollection')
+    update = @sandbox.stub(@gradingPeriod.props, 'updateGradingPeriodCollection')
     @gradingPeriod.handleDateChange(fakeEvent)
     ok update.calledOnce
 
@@ -95,16 +97,17 @@ define [
 
   test 'handleTitleChange calls updateGradingPeriodCollection', ->
     fakeEvent = { target: { name: "title", value: "MXP: Most Xtreme Primate" } }
-    update = @stub(@gradingPeriod.props, 'updateGradingPeriodCollection')
+    update = @sandbox.stub(@gradingPeriod.props, 'updateGradingPeriodCollection')
     @gradingPeriod.handleTitleChange(fakeEvent)
     ok update.calledOnce
 
   test 'replaceInputWithDate calls formatDateForDisplay', ->
-    formatDate = @stub(@gradingPeriod, 'formatDateForDisplay')
+    formatDate = @sandbox.stub(@gradingPeriod, 'formatDateForDisplay')
     @gradingPeriod.replaceInputWithDate(@gradingPeriod.refs.startDate)
     ok formatDate.calledOnce
 
   test 'triggerDeleteGradingPeriod calls onDeleteGradingPeriod', ->
-    deletePeriod = @stub(@gradingPeriod.props, 'onDeleteGradingPeriod')
+    deletePeriod = @sandbox.stub(@gradingPeriod.props, 'onDeleteGradingPeriod')
     @gradingPeriod.triggerDeleteGradingPeriod()
     ok deletePeriod.calledOnce
+

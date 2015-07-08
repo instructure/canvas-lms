@@ -20,9 +20,10 @@ define [
   module 'Backbone.Collection',
     setup: ->
       @xhr = sinon.useFakeXMLHttpRequest()
-      @ajaxSpy = @spy $, 'ajax'
+      @ajaxSpy = sinon.spy $, 'ajax'
     teardown: ->
       @xhr.restore
+      $.ajax.restore()
 
   test 'default options', ->
     collection = new TestCollection()
@@ -67,7 +68,7 @@ define [
 
   test 'triggers setParam event', ->
     collection = new Backbone.Collection
-    spy = @spy()
+    spy = sinon.spy()
     collection.on 'setParam', spy
     collection.setParam 'foo', 'bar'
     ok spy.calledOnce, 'event triggered'
@@ -84,7 +85,7 @@ define [
 
   test 'triggers setParams event', ->
     collection = new Backbone.Collection
-    spy = @spy()
+    spy = sinon.spy()
     collection.on 'setParams', spy
     params =
       foo: 'bar'

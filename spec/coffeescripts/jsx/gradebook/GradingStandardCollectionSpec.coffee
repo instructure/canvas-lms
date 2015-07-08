@@ -10,10 +10,15 @@ define [
 
   module 'GradingStandardCollection',
     setup: ->
-      @stub($, 'flashMessage', ->)
-      @stub($, 'flashError', ->)
-      @stub(window, 'confirm', -> )
+      # be very careful to clean up things you monkeypatch out
+      @fMessage = $.flashMessage
+      $.flashMessage = ->
+      @fError = $.flashError
+      $.flashError = ->
+      @wConfirm = window.confirm
+      window.confirm = ->
       @server = sinon.fakeServer.create()
+      @sandbox = sinon.sandbox.create()
       ENV.current_user_roles = ["admin", "teacher"]
       ENV.GRADING_STANDARDS_URL = "/courses/1/grading_standards"
       ENV.DEFAULT_GRADING_STANDARD_DATA = [
@@ -73,7 +78,11 @@ define [
       ENV.current_user_roles = null
       ENV.GRADING_STANDARDS_URL = null
       ENV.DEFAULT_GRADING_STANDARD_DATA = null
+      $.flashMessage = @fMessage
+      $.flashError = @fError
+      window.confirm = @wConfirm
       @server.restore()
+      @sandbox.restore()
 
   test 'gets the standards data from the grading standards controller, and multiplies data values by 100 (i.e. .20 becomes 20)', ->
     deepEqual @gradingStandardCollection.state.standards, @processedIndexData
@@ -96,7 +105,7 @@ define [
 
 
   test 'does not save the new standard on the backend when the add button is clicked', ->
-    saveGradingStandard = @spy(@gradingStandardCollection, 'saveGradingStandard')
+    saveGradingStandard = @sandbox.spy(@gradingStandardCollection, 'saveGradingStandard')
     Simulate.click(@gradingStandardCollection.refs.addButton.getDOMNode())
     ok saveGradingStandard.notCalled
 
@@ -216,7 +225,7 @@ define [
     ok @gradingStandardCollection.refs.noSchemesMessage
 
   test 'deleteGradingStandard calls confirmDelete', ->
-    confirmDelete = @spy($.fn, "confirmDelete")
+    confirmDelete = @sandbox.spy($.fn, "confirmDelete")
     deleteLink = @gradingStandardCollection.refs.gradingStandard1.refs.deleteLink.getDOMNode()
     Simulate.click(deleteLink)
     ok confirmDelete.calledOnce

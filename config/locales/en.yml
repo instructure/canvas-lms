@@ -1,14 +1,5 @@
 en:
   date:
-    datepicker:
-      column_headings:
-        - Su
-        - Mo
-        - Tu
-        - We
-        - Th
-        - Fr
-        - Sa
     formats:
       weekday: "%A"
       short_weekday: "%a"

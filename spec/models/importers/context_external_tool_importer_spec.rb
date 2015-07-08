@@ -3,16 +3,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 describe Importers::ContextExternalToolImporter do
   it "should work for course-level tools" do
     course_model
-    migration = @course.content_migrations.create!
-    tool = Importers::ContextExternalToolImporter.import_from_migration({:title => 'tool', :url => 'http://example.com'}, @course, migration)
+    tool = Importers::ContextExternalToolImporter.import_from_migration({:title => 'tool', :url => 'http://example.com'}, @course)
     expect(tool).not_to be_nil
     expect(tool.context).to eq @course
   end
 
   it "should work for account-level tools" do
     course_model
-    migration = @course.account.content_migrations.create!
-    tool = Importers::ContextExternalToolImporter.import_from_migration({:title => 'tool', :url => 'http://example.com'}, @course.account, migration)
+    tool = Importers::ContextExternalToolImporter.import_from_migration({:title => 'tool', :url => 'http://example.com'}, @course.account)
     expect(tool).not_to be_nil
     expect(tool.context).to eq @course.account
   end

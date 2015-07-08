@@ -9,6 +9,8 @@ define [
 ], ( DueDateList, Assignment, AssignmentOverride, AssignmentOverrideCollection,
 Section, SectionList, _ ) ->
 
+  stub = sinon.stub
+
   module "DueDateList",
     setup: ->
       @date = Date.now()

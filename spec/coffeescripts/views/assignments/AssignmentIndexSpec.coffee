@@ -52,12 +52,13 @@ define [
   module 'assignmentIndex',
     setup: ->
       fakeENV.setup(PERMISSIONS: {manage: true})
-      @enable_spy = @spy(IndexView.prototype, 'enableSearch')
+      @enable_spy = sinon.spy(IndexView.prototype, 'enableSearch')
 
     teardown: ->
       fakeENV.teardown()
       assignmentGroups = null
       fixtures.empty()
+      @enable_spy.restore()
 
   test 'should filter by search term', ->
 
@@ -113,9 +114,10 @@ define [
       fixtures.empty()
 
   test 'should clear search on toggle', ->
-    clear_spy = @spy(IndexView.prototype, 'clearSearch')
+    clear_spy = sinon.spy(IndexView.prototype, 'clearSearch')
     view = assignmentIndex()
     view.$('#search_term').val('something')
     view.showByView.toggleShowBy({preventDefault: -> })
     equal view.$('#search_term').val(), ""
     ok clear_spy.called
+    clear_spy.restore()

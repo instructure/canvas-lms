@@ -8,19 +8,19 @@ describe "conversations new" do
   end
 
   describe 'conversations inbox opt-out option' do
-    it "should be hidden a feature flag", priority: "1", test_id: 206028 do
+    it "should be hidden a feature flag" do
       get "/profile/settings"
       expect(ff('#disable_inbox').count).to eq 0
     end
 
-    it "should reveal when the feature flag is set", priority: "1", test_id: 138894 do
+    it "should reveal when the feature flag is set" do
       @course.root_account.enable_feature!(:allow_opt_out_of_inbox)
       get "/profile/settings"
       expect(ff('#disable_inbox').count).to eq 1
     end
 
     context "when activated" do
-      it "should set the notification preferences for conversations to ASAP, and hide those options", priority: "1", test_id: 207091 do
+      it "should set the notification preferences for conversations to ASAP, and hide those options" do
         @course.root_account.enable_feature!(:allow_opt_out_of_inbox)
         expect(@teacher.reload.disabled_inbox?).to be_falsey
         notification = Notification.create!(workflow_state: "active", name: "Conversation Message",

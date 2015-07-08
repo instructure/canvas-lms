@@ -9,8 +9,11 @@ define [
       @avatarDialogView = null
 
   test 'calls flashError with base error message when errors are present', ->
-    errorMessage = "User storage quota exceeded"
-    @stub(@avatarDialogView, 'enableSelectButton')
-    flashError = @mock(jQuery)
-    flashError.expects('flashError').withArgs(errorMessage)
+    errorMessage = "this is an error message"
+    aDV = sinon.stub(@avatarDialogView, 'enableSelectButton')
+    flashError = sinon.mock(jQuery)
     @avatarDialogView.onPreflight({}, ['{"errors":{"base":"User storage quota exceeded"}}'])
+    ok flashError.expects('flashError').withArgs(errorMessage), 'calls a flash error with response error message'
+    flashError.restore()
+    aDV.restore()
+

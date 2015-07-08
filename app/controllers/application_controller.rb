@@ -103,7 +103,7 @@ class ApplicationController < ActionController::Base
   #       ENV.FOO_BAR #> [1,2,3]
   #
   def js_env(hash = {})
-    return {} unless request.format.html?
+    return {} if api_request?
     # set some defaults
     unless @js_env
       @js_env = {
@@ -150,7 +150,7 @@ class ApplicationController < ActionController::Base
     extension_settings = [:icon_url] + custom_settings
     tools.map do |tool|
       hash = {
-          :title => tool.label_for(type, I18n.locale),
+          :title => tool.label_for(type),
           :base_url => named_context_url(context, :context_external_tool_path, tool, :launch_type => type)
       }
       extension_settings.each do |setting|
@@ -229,7 +229,7 @@ class ApplicationController < ActionController::Base
   # time or resources that are not well represented by simple time/cpu
   # benchmarks, so you can use this method to increase the perceived cost
   # of a request by an arbitrary amount.  For an anchor, rate limiting
-  # kicks in when a user has exceeded 600 arbitrary units of cost (it's
+  # kicks in when a user has exceeded 600 arbitrary units of cost (it's 
   # a leaky bucket, go see Canvas::RequestThrottle), so using an 'amount'
   # param of 600, for example, would max out the bucket immediately
   def increment_request_cost(amount)
@@ -513,7 +513,7 @@ class ApplicationController < ActionController::Base
 
       assign_localizer if @context.present?
 
-      if request.format.html?
+      unless api_request?
         if @context.is_a?(Account) && !@context.root_account?
           account_chain = @context.account_chain.to_a.select {|a| a.grants_right?(@current_user, session, :read) }
           account_chain.slice!(0) # the first element is the current context
@@ -530,11 +530,11 @@ class ApplicationController < ActionController::Base
         end
 
         if @context && @context.respond_to?(:short_name)
-          crumb_url = named_context_url(@context, :context_url) if @context.grants_right?(@current_user, session, :read)
+          crumb_url = named_context_url(@context, :context_url) if @context.grants_right?(@current_user, :read)
           add_crumb(@context.short_name, crumb_url)
         end
 
-        @set_badge_counts = true
+        set_badge_counts_for(@context, @current_user, @current_enrollment)
       end
     end
 
@@ -600,7 +600,6 @@ class ApplicationController < ActionController::Base
     return unless context.respond_to?(:content_participation_counts) # just Course and Group so far
     js_env(:badge_counts => badge_counts_for(context, user, enrollment))
   end
-  helper_method :set_badge_counts_for
 
   def badge_counts_for(context, user, enrollment=nil)
     badge_counts = {}
@@ -1277,7 +1276,7 @@ class ApplicationController < ActionController::Base
           @return_url = success_url
         else
           if @context
-            @return_url = named_context_url(@context, :context_external_content_success_url, 'external_tool_redirect', include_host: true)
+            @return_url = named_context_url(@context, :context_external_content_success_url, 'external_tool_redirect')
           else
             @return_url = external_content_success_url('external_tool_redirect')
           end
@@ -1317,7 +1316,7 @@ class ApplicationController < ActionController::Base
         @lti_launch.analytics_id = @tool.tool_id
 
         @append_template = 'context_modules/tool_sequence_footer'
-        render Lti::AppUtil.display_template
+        render ExternalToolsController.display_template('default')
       end
     else
       flash[:error] = t "#application.errors.invalid_tag_type", "Didn't recognize the item type for this tag"

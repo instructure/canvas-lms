@@ -14,10 +14,10 @@ define [
   'compiled/discussions/EntryEditor'
   'str/htmlEscape'
   'vendor/jquery.ba-tinypubsub'
-  'compiled/str/apiUserContent'
+  'compiled/str/convertApiUserContent'
   'jst/_avatar'
   'jst/discussions/_reply_form'
-], ($, _, I18n, MarkAsReadWatcher, walk, Backbone, EntryCollection, entryContentPartial, deletedEntriesTemplate, entryWithRepliesTemplate, entryStatsTemplate, Reply, EntryEditor, htmlEscape, {publish}, apiUserContent) ->
+], ($, _, I18n, MarkAsReadWatcher, walk, Backbone, EntryCollection, entryContentPartial, deletedEntriesTemplate, entryWithRepliesTemplate, entryStatsTemplate, Reply, EntryEditor, htmlEscape, {publish}, convertApiUserContent) ->
 
   class EntryView extends Backbone.View
 
@@ -268,7 +268,7 @@ define [
 
     format: (attr, value) ->
       if attr is 'message'
-        value = apiUserContent.convert(value)
+        value = convertApiUserContent(value)
         @$el.find('.message').removeClass('enhanced')
         publish('userContent/change')
         value

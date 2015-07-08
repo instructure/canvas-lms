@@ -23,8 +23,7 @@ class AppCenterController < ApplicationController
     return unless apps
     ContextExternalTool.all_tools_for(context).each do |tool|
       app = nil
-      app_center_id = tool.app_center_id || tool.tool_id
-      app = apps.find{|a| app_center_id == a['short_name'] } if app_center_id
+      app = apps.find{|a| tool.tool_id == a['short_name'] } if tool.tool_id
       app['is_installed'] = true if app
     end
   end

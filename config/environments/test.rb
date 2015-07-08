@@ -54,6 +54,9 @@ environment_configuration(defined?(config) && config) do |config|
   #hairtrigger parallelized runtime race conditions
   config.active_record.schema_format = :sql
 
+  # eval <env>-local.rb if it exists
+  Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) }
+
   config.cache_store = :null_store
 
   # Raise exceptions instead of rendering exception templates
@@ -65,7 +68,4 @@ environment_configuration(defined?(config) && config) do |config|
   unless CANVAS_RAILS3
     config.eager_load = false
   end
-
-  # eval <env>-local.rb if it exists
-  Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) }
 end

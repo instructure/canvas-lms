@@ -50,13 +50,16 @@ define [
       $("#fixtures").empty()
 
   test 'deletes model when delete link is pressed', ->
-    ajaxSpy = @spy($, 'ajax')
-    @stub(window, 'confirm').returns(true)
+    ajaxSpy = sinon.spy($, 'ajax')
+    sinon.stub(window, 'confirm').returns(true)
 
     Simulate.click(@itemCog.refs.deleteLink.getDOMNode())
 
     ok window.confirm.calledOnce, 'confirms before deleting'
     ok ajaxSpy.calledWithMatch({url: '/api/v1/folders/999', type: 'DELETE', data: {force: 'true'}}), 'sends DELETE to right url'
+
+    window.confirm.restore()
+    ajaxSpy.restore()
 
   test 'only shows download button for limited users', ->
     readOnlyItemCog = React.render(ItemCog(@sampleProps(false)), $('<div>').appendTo('#fixtures')[0])

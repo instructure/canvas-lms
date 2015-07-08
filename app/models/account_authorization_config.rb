@@ -20,13 +20,6 @@ require 'net-ldap'
 require 'net_ldap_extensions'
 
 class AccountAuthorizationConfig < ActiveRecord::Base
-  include Workflow
-
-  workflow do
-    state :active
-    state :deleted
-  end
-
   self.inheritance_column = :auth_type
 
   # unless Rails.version > '5.0'? (https://github.com/rails/rails/pull/19500)
@@ -77,14 +70,15 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     name.try(:demodulize)
   end
 
-  scope :active, ->{ where("workflow_state <> 'deleted'") }
   belongs_to :account
   has_many :pseudonyms, foreign_key: :authentication_provider_id
-  acts_as_list scope: { account: self, workflow_state: [nil, 'active'] }
+  acts_as_list scope: :account
 
   VALID_AUTH_TYPES = %w[cas facebook github google ldap linkedin openid_connect saml twitter].freeze
   validates_inclusion_of :auth_type, in: VALID_AUTH_TYPES, message: "invalid auth_type, must be one of #{VALID_AUTH_TYPES.join(',')}"
   validates_presence_of :account_id
+
+  after_destroy :enable_canvas_authentication
 
   # create associate model find to accept auth types, and just return the first one of that
   # type
@@ -114,15 +108,6 @@ class AccountAuthorizationConfig < ActiveRecord::Base
     false
   end
 
-  def destroy
-    self.send(:remove_from_list_for_destroy)
-    self.workflow_state = 'deleted'
-    self.save!
-    enable_canvas_authentication
-    send_later_if_production(:soft_delete_pseudonyms)
-  end
-  alias_method :destroy!, :destroy
-
   def auth_password=(password)
     return if password.blank?
     self.auth_crypted_password, self.auth_password_salt = Canvas::Security.encrypt_password(password, 'instructure_auth')
@@ -147,14 +132,12 @@ class AccountAuthorizationConfig < ActiveRecord::Base
 
   def self.serialization_excludes; [:auth_crypted_password, :auth_password_salt]; end
 
-  private
-  def soft_delete_pseudonyms
-    pseudonyms.find_each(&:destroy)
-  end
-
   def enable_canvas_authentication
     return if account.non_canvas_auth_configured?
-    account.enable_canvas_authentication
+    if self.account.settings[:canvas_authentication] == false
+      self.account.settings[:canvas_authentication] = true
+      self.account.save!
+    end
   end
 end
 

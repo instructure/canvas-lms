@@ -27,8 +27,8 @@ define [
     @server.respondWith([200, {}, ''])
     replies = [new Entry(id: 2, message: 'a reply', parent_id: 1)]
     @entry.set('replies', replies)
-    @setSpy = @spy(@entry, 'set')
-    onCompleteCallback = @spy()
+    @setSpy = sinon.spy(@entry, 'set')
+    onCompleteCallback = sinon.spy()
 
     @entry.sync('update', @entry, {
       complete: onCompleteCallback

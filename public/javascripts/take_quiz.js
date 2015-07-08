@@ -225,7 +225,7 @@ define([
           }
         }
 
-        if(quizSubmission.isTimeUp(currentTimeLeft) && !ENV.IS_PREVIEW) {
+        if(quizSubmission.isTimeUp(currentTimeLeft)) {
           quizSubmission.showTimeUpDialog(now);
         } else if(currentTimeToDueDate != null && currentTimeLeft > currentTimeToDueDate) {
           quizSubmission.showDueDateWarnings(currentTimeToDueDate);
@@ -756,10 +756,10 @@ define([
         $timer.text($timeRunningTimeRemaining.text());
       }
     });
-    if(ENV.QUIZ_SUBMISSION_EVENTS_URL) {
+    if(location.href.indexOf("preview=1") == -1){
       QuizLogAuditing.start();
-      QuizLogAuditingEventDumper(false);
     }
+    QuizLogAuditingEventDumper(false);
   });
 
   $('.essay_question .answers').before((new KeyboardShortcuts()).render().el);

@@ -39,7 +39,7 @@ module Importers
     end
     private_class_method :wiki_page_migration?
 
-    def self.import_from_migration(hash, context, migration, item=nil)
+    def self.import_from_migration(hash, context, migration=nil, item=nil)
       hash = hash.with_indifferent_access
       item ||= WikiPage.where(wiki_id: context.wiki, id: hash[:id]).first
       item ||= WikiPage.where(wiki_id: context.wiki, migration_id: hash[:migration_id]).first
@@ -71,7 +71,7 @@ module Importers
       end
 
       item.set_as_front_page! if !!hash[:front_page] && context.wiki.has_no_front_page
-      migration.add_imported_item(item)
+      migration.add_imported_item(item) if migration
 
       item.migration_id = hash[:migration_id]
       (hash[:contents] || []).each do |sub_item|
@@ -81,6 +81,7 @@ module Importers
         }), context, migration)
       end
       return if hash[:type] && ['folder', 'FOLDER_TYPE'].member?(hash[:type]) && hash[:linked_resource_id]
+      missing_links = {}
       allow_save = true
       if hash[:type] == 'linked_resource' || hash[:type] == "URL_TYPE"
         allow_save = false
@@ -88,15 +89,21 @@ module Importers
         item.title = hash[:title] unless hash[:root_folder]
         description = ""
         if hash[:header]
+          missing_links[:header] = []
           if hash[:header][:is_html]
-            description += migration.convert_html(hash[:header][:body], :wiki_page, hash[:migration_id], :body)
+            description += ImportedHtmlConverter.convert(hash[:header][:body] || "", context, migration) do |warn, link|
+              missing_links[:header] << link if warn == :missing_link
+            end
           else
-            description += migration.convert_text(hash[:header][:body] || [""])
+            description  += ImportedHtmlConverter.convert_text(hash[:header][:body] || [""], context)
           end
         end
 
+        missing_links[:description] = []
         if hash[:description]
-          description += migration.convert_html(hash[:description], :wiki_page, hash[:migration_id], :body)
+          description += ImportedHtmlConverter.convert(hash[:description], context, migration) do |warn, link|
+            missing_links[:description] << link if warn == :missing_link
+          end
         end
 
         contents = ""
@@ -113,8 +120,11 @@ module Importers
             end
             description += "\n<h2>#{sub_item[:title]}</h2>\n" if sub_item[:title]
 
+            missing_links[:sub_item] = []
             if sub_item[:description]
-              description += migration.convert_html(sub_item[:description], :wiki_page, hash[:migration_id], :body)
+              description += ImportedHtmlConverter.convert(sub_item[:description], context, migration) do |warn, link|
+                missing_links[:sub_item] << link if warn == :missing_link
+              end
             end
 
           elsif sub_item[:type] == 'linked_resource'
@@ -149,10 +159,13 @@ module Importers
         description += "<ul>\n#{contents}\n</ul>" if contents && contents.length > 0
 
         if hash[:footer]
+          missing_links[:footer] = []
           if hash[:footer][:is_html]
-            description += migration.convert_html(hash[:footer][:body], :wiki_page, hash[:migration_id], :body)
+            description += ImportedHtmlConverter.convert(hash[:footer][:body] || "", context, migration) do |warn, link|
+              missing_links[:footer] << link if warn == :missing_link
+            end
           else
-            description += migration.convert_text(hash[:footer][:body] || "")
+            description += ImportedHtmlConverter.convert_text(hash[:footer][:body] || [""], context)
           end
         end
 
@@ -181,12 +194,16 @@ module Importers
         #it's an actual wiki page
         item.title = hash[:title].presence || item.url.presence || "unnamed page"
         if item.title.length > WikiPage::TITLE_LENGTH
-          migration.add_warning(t('warnings.truncated_wiki_title',
-              "The title of the following wiki page was truncated: %{title}", :title => item.title))
+          if migration
+            migration.add_warning(t('warnings.truncated_wiki_title', "The title of the following wiki page was truncated: %{title}", :title => item.title))
+          end
           item.title.splice!(0...WikiPage::TITLE_LENGTH) # truncate too-long titles
         end
 
-        item.body = migration.convert_html(hash[:text], :wiki_page, hash[:migration_id], :body)
+        missing_links[:body] = []
+        item.body = ImportedHtmlConverter.convert(hash[:text] || "", context, migration) do |warn, link|
+          missing_links[:body] << link if warn == :missing_link
+        end
 
         item.editing_roles = hash[:editing_roles] if hash[:editing_roles].present?
         item.notify_of_update = hash[:notify_of_update] if !hash[:notify_of_update].nil?
@@ -198,7 +215,14 @@ module Importers
           item.user = nil
         end
         item.save_without_broadcasting!
-        migration.add_imported_item(item)
+        migration.add_imported_item(item) if migration
+        if migration
+          missing_links.each do |field, missing_links|
+            migration.add_missing_content_links(:class => item.class.to_s,
+              :id => item.id, :field => field, :missing_links => missing_links,
+              :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/pages/#{item.url}")
+          end
+        end
         return item
       end
     end

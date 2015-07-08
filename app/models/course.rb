@@ -184,7 +184,6 @@ class Course < ActiveRecord::Base
   has_many :context_external_tools, :as => :context, :dependent => :destroy, :order => 'name'
   belongs_to :wiki
   has_many :quizzes, :class_name => 'Quizzes::Quiz', :as => :context, :dependent => :destroy, :order => 'lock_at, title'
-  has_many :quiz_questions, :class_name => 'Quizzes::QuizQuestion', :through => :quizzes
   has_many :active_quizzes, :class_name => 'Quizzes::Quiz', :as => :context, :include => :assignment, :conditions => ['quizzes.workflow_state != ?', 'deleted'], :order => 'created_at'
   has_many :assessment_questions, :through => :assessment_question_banks
   has_many :assessment_question_banks, :as => :context, :include => [:assessment_questions, :assessment_question_bank_users]
@@ -235,7 +234,7 @@ class Course < ActiveRecord::Base
   after_save :set_self_enrollment_code
 
   before_save :touch_root_folder_if_necessary
-  before_validation :verify_unique_ids
+  before_validation :verify_unique_sis_source_id
   validates_presence_of :account_id, :root_account_id, :enrollment_term_id, :workflow_state
   validates_length_of :syllabus_body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
@@ -330,41 +329,19 @@ class Course < ActiveRecord::Base
     tags
   end
 
-  def sequential_module_item_ids
-    Rails.cache.fetch(['ordered_module_item_ids', self].cache_key) do
-      self.context_module_tags.not_deleted.joins(:context_module).
-        where("context_modules.workflow_state <> 'deleted'").
-        where("content_tags.content_type <> 'ContextModuleSubHeader'").
-        reorder("COALESCE(context_modules.position, 0), context_modules.id, content_tags.position NULLS LAST").
-        pluck(:id)
-    end
-  end
-
-  def verify_unique_ids
+  def verify_unique_sis_source_id
+    return true unless self.sis_source_id
     infer_root_account unless self.root_account_id
 
-    is_unique = true
-    if self.sis_source_id && (root_account_id_changed? || sis_source_id_changed?)
-      scope = root_account.all_courses.where(sis_source_id: self.sis_source_id)
-      scope = scope.where("id<>?", self) unless self.new_record?
-      if scope.exists?
-        is_unique = false
-        self.errors.add(:sis_source_id, t('errors.sis_in_use', "SIS ID \"%{sis_id}\" is already in use",
-            :sis_id => self.sis_source_id))
-      end
-    end
+    return true if !root_account_id_changed? && !sis_source_id_changed?
 
-    if self.integration_id && (root_account_id_changed? || integration_id_changed?)
-      scope = root_account.all_courses.where(integration_id: self.integration_id)
-      scope = scope.where("id<>?", self) unless self.new_record?
-      if scope.exists?
-        is_unique = false
-        self.errors.add(:integration_id, t("Integration ID \"%{int_id}\" is already in use",
-            :int_id => self.integration_id))
-      end
-    end
+    scope = root_account.all_courses.where(sis_source_id: self.sis_source_id)
+    scope = scope.where("id<>?", self) unless self.new_record?
 
-    is_unique
+    return true unless scope.exists?
+
+    self.errors.add(:sis_source_id, t('errors.sis_in_use', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_source_id))
+    false
   end
 
   def public_license?
@@ -560,8 +537,6 @@ class Course < ActiveRecord::Base
       none :
       where("EXISTS (?)", CourseAccountAssociation.where("course_account_associations.course_id=courses.id AND course_account_associations.account_id IN (?)", account_ids))
   }
-  scope :published, -> { where(workflow_state: %w(available completed)) }
-  scope :unpublished, -> { where(workflow_state: %w(created claimed)) }
 
   scope :deleted, -> { where(:workflow_state => 'deleted') }
 
@@ -772,9 +747,13 @@ class Course < ActiveRecord::Base
       Enrollment.where(:course_id => self).update_all(:root_account_id => self.root_account_id)
     end
 
-    Enrollment.where(:course_id => self).update_all(:updated_at => Time.now.utc)
-    User.where("id IN (SELECT user_id FROM enrollments WHERE course_id=?)", self).
-        update_all(updated_at: Time.now.utc)
+    case Enrollment.connection.adapter_name
+    when 'MySQL', 'Mysql2'
+      Enrollment.connection.execute("UPDATE users, enrollments SET users.updated_at=NOW(), enrollments.updated_at=NOW() WHERE users.id=enrollments.user_id AND enrollments.course_id=#{self.id}")
+    else
+      Enrollment.where(:course_id => self).update_all(:updated_at => Time.now.utc)
+      User.where("id IN (SELECT user_id FROM enrollments WHERE course_id=?)", self).update_all(:updated_at => Time.now.utc)
+    end
   end
 
   def self_enrollment_allowed?
@@ -1370,7 +1349,7 @@ class Course < ActiveRecord::Base
     settings = Canvas::Plugin.find!('grade_export').settings
     format_settings = Course.valid_grade_export_types[settings[:format_type]]
     return false unless format_settings
-    return false if SisPseudonym.for(user, self).nil? && format_settings[:requires_publishing_pseudonym]
+    return false if user.sis_pseudonym_for(self).nil? and format_settings[:requires_publishing_pseudonym]
     return true
   end
 
@@ -1414,7 +1393,7 @@ class Course < ActiveRecord::Base
       raise "unknown format type: #{settings[:format_type]}" unless format_settings
       raise "grade publishing requires a grading standard" if !self.grading_standard_enabled? && format_settings[:requires_grading_standard]
 
-      publishing_pseudonym = SisPseudonym.for(publishing_user, self)
+      publishing_pseudonym = publishing_user.sis_pseudonym_for(self)
       raise "publishing disallowed for this publishing user" if publishing_pseudonym.nil? and format_settings[:requires_publishing_pseudonym]
 
       callback = Course.valid_grade_export_types[settings[:format_type]][:callback]
@@ -1603,8 +1582,6 @@ class Course < ActiveRecord::Base
       row << read_only if self.grading_standard_enabled?
       csv << row
 
-      name_method = list_students_by_sortable_name? ?  :sortable_name : :name
-
       student_enrollments.each_slice(100) do |student_enrollments_batch|
 
         if da_enabled = feature_enabled?(:differentiated_assignments)
@@ -1624,9 +1601,10 @@ class Course < ActiveRecord::Base
                 submission.try(:score)
             end
           end
-          row = [student.send(name_method), student.id]
+          #Last Row
+          row = [student.last_name_first, student.id]
           if options[:include_sis_id]
-            pseudonym = SisPseudonym.for(student, self, include_root_account)
+            pseudonym = student.sis_pseudonym_for(self.root_account, include_root_account)
             row << pseudonym.try(:sis_user_id)
             pseudonym ||= student.find_pseudonym_for_account(self.root_account, include_root_account)
             row << pseudonym.try(:unique_id)
@@ -1992,7 +1970,8 @@ class Course < ActiveRecord::Base
   end
 
   attr_accessor :full_migration_hash, :external_url_hash,
-                :folder_name_lookups, :assignment_group_no_drop_assignments, :migration_results
+                :folder_name_lookups, :attachment_path_id_lookup, :attachment_path_id_lookup_lower,
+                :assignment_group_no_drop_assignments, :migration_results
 
 
   def backup_to_json
@@ -2033,6 +2012,7 @@ class Course < ActiveRecord::Base
   end
 
   def copy_attachments_from_course(course, options={})
+    self.attachment_path_id_lookup = {}
     root_folder = Folder.root_folders(self).first
     root_folder_name = root_folder.name + '/'
     ce = options[:content_export]
@@ -2048,7 +2028,7 @@ class Course < ActiveRecord::Base
         if !ce || ce.export_object?(file)
           begin
             new_file = file.clone_for(self, nil, :overwrite => true)
-            cm.add_attachment_path(file.full_display_path.gsub(/\A#{root_folder_name}/, ''), new_file.migration_id)
+            self.attachment_path_id_lookup[file.full_display_path.gsub(/\A#{root_folder_name}/, '')] = new_file.migration_id
             new_folder_id = merge_mapped_id(file.folder)
 
             if file.folder && file.folder.parent_folder_id.nil?
@@ -2282,10 +2262,6 @@ class Course < ActiveRecord::Base
     scope.select('users.id').uniq.count
   end
 
-  def published?
-    self.available? || self.completed?
-  end
-
   def unpublished?
     self.created? || self.claimed?
   end
@@ -2360,7 +2336,7 @@ class Course < ActiveRecord::Base
         :css_class => 'files',
         :href => :course_files_path,
         :screenreader => t("Course Files"),
-        :icon => 'icon-folder'
+        :icon => 'icon-collection'
       }, {
         :id => TAB_SYLLABUS,
         :label => t('#tabs.syllabus', "Syllabus"),
@@ -2412,7 +2388,7 @@ class Course < ActiveRecord::Base
     tools.sort_by(&:id).map do |tool|
      {
         :id => tool.asset_string,
-        :label => tool.label_for(:course_navigation, opts[:language] || I18n.locale),
+        :label => tool.label_for(:course_navigation, opts[:language]),
         :css_class => tool.asset_string,
         :href => :course_external_tool_path,
         :visibility => tool.course_navigation(:visibility),
@@ -2698,9 +2674,13 @@ class Course < ActiveRecord::Base
       self.course_sections.update_all(:course_id => new_course)
       # we also want to bring along prior enrollments, so don't use the enrollments
       # association
-      Enrollment.where(:course_id => self).update_all(:course_id => new_course, :updated_at => Time.now.utc)
-      User.where("id IN (SELECT user_id FROM enrollments WHERE course_id=?)", new_course).
-          update_all(updated_at: Time.now.utc)
+      case Enrollment.connection.adapter_name
+      when 'MySQL', 'Mysql2'
+        Enrollment.connection.execute("UPDATE users, enrollments SET users.updated_at=#{Course.sanitize(Time.now.utc)}, enrollments.updated_at=#{Course.sanitize(Time.now.utc)}, enrollments.course_id=#{new_course.id} WHERE users.id=enrollments.user_id AND enrollments.course_id=#{self.id}")
+      else
+        Enrollment.where(:course_id => self).update_all(:course_id => new_course, :updated_at => Time.now.utc)
+        User.where("id IN (SELECT user_id FROM enrollments WHERE course_id=?)", new_course).update_all(:updated_at => Time.now.utc)
+      end
       self.replacement_course_id = new_course.id
       self.workflow_state = 'deleted'
       self.save!
@@ -2901,16 +2881,5 @@ class Course < ActiveRecord::Base
       self.wiki.touch
       self.wiki.wiki_pages.update_all(:updated_at => Time.now.utc)
     end
-  end
-
-  def list_students_by_sortable_name?
-    feature_enabled?(:gradebook_list_students_by_sortable_name)
-  end
-
-  ##
-  # Returns a boolean describing if the user passed in has marked this course
-  # as a favorite.
-  def favorite_for_user?(user)
-    user.favorites.where(:context_type => 'Course', :context_id => self).exists?
   end
 end

@@ -30,17 +30,23 @@ body {
     @else { background-color: $ic-body-background-color; }
   }
   &.no-headers, &.embedded {
-    #header, #topbar, #left-side, #breadcrumbs { display: none !important; }
-    @if $use_new_styles {
-      .ic-app-nav-toggle-and-crumbs { display: none; }
+    #header, #topbar, #left-side, #breadcrumbs {
+      display: none !important;
     }
     @if $is-k12 {
-      .canvas-header { display: none !important; }
+      .canvas-header {
+        display: none !important;
+      }
     }
-    #footer { display: none; }
+    #footer {
+      display: none;
+    }
     #wrapper {
       margin: 0;
-      @if $use_new_styles == false { min-width: 400px; }
+      @if $use_new_styles == false {
+        min-width: 400px;
+      }
+
     }
     #main {
       margin: 0;
@@ -120,8 +126,13 @@ body {
   }
 }
 
-@if $use_new_styles == false { 
-  #wrapper { @include pie-clearfix; }
+#wrapper {
+  @if $use_new_styles {
+    // leave for now
+  }
+  @else {
+    @include pie-clearfix;
+  }
 }
 
 #main {

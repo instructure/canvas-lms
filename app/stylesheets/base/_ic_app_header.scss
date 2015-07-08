@@ -24,8 +24,15 @@
   .ic-app-header__layout {
     position: relative;
     height: 100%;
-    // Use this element to preload the loading image for the secondary nav drawers
-    background: image-url("panda-cycle-loader.gif") no-repeat -9999px -9999px;
+  }
+
+  .ic-app-header__overlay {
+    transition: all 0.3s;
+    background: $ic-brand-global-nav-bgd;
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    opacity: 0;
   }
 
   .ic-app-header__main-navigation {
@@ -35,6 +42,7 @@
 
   .ic-app-header__secondary-navigation {
     box-sizing: border-box;
+    background: darken($ic-brand-global-nav-bgd, 5%);
   }
 
   .ic-app-header__menu-list { @include reset-list; }
@@ -98,7 +106,7 @@
     }
 
     // Need to provide heights for IE10 and 11
-    .ic-icon-svg--dashboard { height: 30px; }
+    .ic-icon-svg--dashboard { height: 20px; }
     .ic-icon-svg--calendar,
     .ic-icon-svg--inbox,
     .ic-icon-svg--apps { height: 28px; }
@@ -176,7 +184,7 @@
   }
 
   .menu-item__text {
-    margin-top: $ic-sp/2;
+    margin-top: $ic-sp/3;
     box-sizing: border-box;
     color: $ic-brand-global-nav-menu-item__text-color;
     line-height: 1.1;
@@ -293,17 +301,6 @@
         border-top: 1px solid $ic-border-light;
         padding-top: $ic-sp;
         @include breakpoint(short) { padding-top: $ic-sp/2; }
-      }
-      &.ReactTray__loading-list-item {
-        background: image-url("panda-cycle-loader.gif") no-repeat left center;
-        background-size: 100px;
-        text-align: center;
-        color: $ic-dim-helper-text;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        font-size: $baseFontSize;
-        box-sizing: border-box;
-        padding: $ic-sp*4 0;
       }
     }
     a {

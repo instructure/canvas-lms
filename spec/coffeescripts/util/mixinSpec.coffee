@@ -7,12 +7,12 @@ define ['compiled/util/mixin'], (mixin) ->
       events: 'click .foo': 'foo'
       defaults:
         foo: 'bar'
-      foo: @spy()
+      foo: sinon.spy()
     mixin2 =
       events: 'click .bar': 'bar'
       defaults:
         baz: 'qux'
-      bar: @spy()
+      bar: sinon.spy()
     obj = mixin {}, mixin1, mixin2
     # events are expected to all be merged together
     # rather than getting blown away by the last mixin

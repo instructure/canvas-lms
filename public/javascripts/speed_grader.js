@@ -809,7 +809,7 @@ define([
     }
   });
 
-  function beforeLeavingSpeedgrader() {
+  window.onbeforeunload = function() {
     window.opener && window.opener.updateGrades && $.isFunction(window.opener.updateGrades) && window.opener.updateGrades();
 
     var userNamesWithPendingQuizSubmission = $.map(snapshotCache, function(snapshot) {
@@ -826,13 +826,10 @@ define([
         }
         return ret;
       })();
-    var hasUnsubmittedComments = $.trim($add_a_comment_textarea.val()) !== "";
     if (hasPendingQuizSubmissions) {
       return I18n.t('confirms.unsaved_changes', "The following students have unsaved changes to their quiz submissions: \n\n %{users}\nContinue anyway?", {'users': userNamesWithPendingQuizSubmission.join('\n ')});
-    } else if (hasUnsubmittedComments) {
-      return I18n.t("If you would like to keep your unsubmitted comments, please save them before navigating away from this page.");
     }
-  }
+  };
 
   // Public Variables and Methods
   var EG = {
@@ -928,7 +925,6 @@ define([
         e.preventDefault();
       });
 
-      window.onbeforeunload = beforeLeavingSpeedgrader;
     },
 
     jsonReady: function(){

@@ -6,10 +6,11 @@ define [
     setup: ->
       @$testEl = $('<div>')
       $('#fixtures').append @$testEl
-      @stub $.fn.moduleSequenceFooter.MSFClass.prototype, 'fetch', -> {done: ->}
+      sinon.stub $.fn.moduleSequenceFooter.MSFClass.prototype, 'fetch', -> {done: ->}
 
-    teardown: ->
+    teardown: -> 
       @$testEl.remove()
+      $.fn.moduleSequenceFooter.MSFClass.prototype.fetch.restore()
 
   test 'returns jquery object of itself', ->
     jobj = @$testEl.moduleSequenceFooter({assetType: 'Assignment', assetID: 42})
@@ -28,7 +29,7 @@ define [
 
   test 'accepts animation option', ->
     $.fn.moduleSequenceFooter.MSFClass.prototype.fetch.restore()
-    @stub $.fn.moduleSequenceFooter.MSFClass.prototype, 'fetch', ->
+    sinon.stub $.fn.moduleSequenceFooter.MSFClass.prototype, 'fetch', ->
       this.success
         items: [
           prev: null
@@ -59,15 +60,15 @@ define [
     equal @$testEl.find('.module-sequence-padding:not(.no-animation)').length, 1, 'no-animation removed from module-sequence-padding'
 
   module 'ModuleSequenceFooter: rendering',
-    setup: ->
+    setup: -> 
       @server = sinon.fakeServer.create()
       @$testEl = $('<div>')
       $('#fixtures').append @$testEl
-    teardown: ->
+    teardown: -> 
       @server.restore()
       @$testEl.remove()
 
-  nullButtonData =
+  nullButtonData = 
      {
        items:
          [
@@ -222,7 +223,7 @@ define [
     equal @server.requests[0].status, '200', 'Request was successful'
 
   test 'show gets called when rendering', ->
-    @stub(@$testEl, 'show')
+    @sandbox.stub(@$testEl, 'show')
     @server.respondWith "GET",
                         "/api/v1/courses/42/module_item_sequence?asset_type=Assignment&asset_id=123&frame_external_urls=true",
                         [

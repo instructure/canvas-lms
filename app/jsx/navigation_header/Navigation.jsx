@@ -56,7 +56,6 @@ define([
           $.get(url, (data) => {
             var newState = {};
             newState[type] = data;
-            newState[`${type}AreLoaded`] = true;
             this.setState(newState);
           });
         });
@@ -108,11 +107,7 @@ define([
       var path = window.location.pathname;
       var matchData = path.match(EXTERNAL_TOOLS_REGEX) || path.match(ACTIVE_ROUTE_REGEX);
       var activeItem = matchData && matchData[1];
-      if (!activeItem) {
-        this.setState({activeItem: 'dashboard'})
-      } else {
-        this.setState({activeItem});
-      }
+      this.setState({activeItem});
     },
 
     handleMenuClick (type) {
@@ -149,11 +144,11 @@ define([
     renderTrayContent () {
       switch (this.state.type) {
         case 'courses':
-          return <CoursesTray courses={this.state.courses} hasLoaded={this.state.coursesAreLoaded} closeTray={this.closeTray} />;
+          return <CoursesTray courses={this.state.courses} closeTray={this.closeTray} />;
         case 'groups':
-          return <GroupsTray groups={this.state.groups} hasLoaded={this.state.groupsAreLoaded} closeTray={this.closeTray} />;
+          return <GroupsTray groups={this.state.groups} closeTray={this.closeTray} />;
         case 'accounts':
-          return <AccountsTray accounts={this.state.accounts} hasLoaded={this.state.accountsAreLoaded} closeTray={this.closeTray} />;
+          return <AccountsTray accounts={this.state.accounts} closeTray={this.closeTray} />;
         case 'profile':
           return <ProfileTray closeTray={this.closeTray} />;
         default:

@@ -15,7 +15,6 @@ define [
   'compiled/views/assignments/AssignmentKeyBindingsMixin'
   'jqueryui/tooltip'
   'compiled/behaviors/tooltip'
-  'compiled/jquery.rails_flash_notifications'
 ], (I18n, Backbone, $, _, PublishIconView, DateDueColumnView, DateAvailableColumnView, CreateAssignmentView, MoveDialogView, preventDefault, template, scoreTemplate, round, AssignmentKeyBindingsMixin) ->
 
   class AssignmentListItemView extends Backbone.View
@@ -183,8 +182,7 @@ define [
         @focusOnGroupByID(id)
 
     delete: ->
-      @model.destroy success: =>
-        $.screenReaderFlashMessage(I18n.t('Assignment was deleted'))
+      @model.destroy()
       @$el.remove()
 
     canManage: ->

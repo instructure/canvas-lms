@@ -1,9 +1,8 @@
-ActionView::Helpers::FormOptionsHelper.class_eval do
-  def time_zone_options_for_select_with_i18n(selected = nil, priority_zones = nil, model = I18nTimeZone)
+ActionView::Helpers::InstanceTag.class_eval do
+  def time_zone_options_for_select(selected = nil, priority_zones = nil, model = I18nTimeZone)
     selected = selected.name if selected && selected.is_a?(::ActiveSupport::TimeZone)
-    time_zone_options_for_select_without_i18n(selected, priority_zones, model)
+    super(selected, priority_zones, model)
   end
-  alias_method_chain :time_zone_options_for_select, :i18n
 end
 
 ActionController::DataStreaming.class_eval do

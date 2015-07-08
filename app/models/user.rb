@@ -976,12 +976,34 @@ class User < ActiveRecord::Base
     @courses_with_grades ||= self.available_courses.with_each_shard.select{|c| c.grants_right?(self, :participate_as_student)}
   end
 
-  def sis_pseudonym_for(context, include_trusted = false, override_deprecation = false)
-    if Rails.env.production? || override_deprecation
-      SisPseudonym.for(self, context, include_trusted)
-    else
-      raise "User#sis_pseudonym_for is deprecated. Use SisPseudonym.for"
+  def sis_pseudonym_for(context, include_trusted = false)
+    root_account = context.root_account
+    raise "could not resolve root account" unless root_account.is_a?(Account)
+    result = if self.pseudonyms.loaded? && self.shard == root_account.shard
+        self.pseudonyms.detect { |p| p.active? && p.sis_user_id && p.account_id == root_account.id }
+      else
+        root_account.shard.activate do
+          root_account.pseudonyms.active.
+            where("sis_user_id IS NOT NULL AND user_id=?", self).
+            first
+        end
+      end
+    if !result && include_trusted
+      result = Shard.partition_by_shard(root_account.trusted_account_ids) do |trusted_ids|
+        next if result
+        result = if self.pseudonyms.loaded? && self.shard == Shard.current
+            self.pseudonyms.detect { |p| p.active? && p.sis_user_id && trusted_ids.include?(p.account_id) }
+          else
+            next unless associated_shards.include?(Shard.current)
+            Pseudonym.where(account_id: trusted_ids).active.
+                where("sis_user_id IS NOT NULL AND user_id=?", self).first
+          end
+      end.first
     end
+    if result
+      result.account = root_account if result.account_id == root_account.id
+    end
+    result
   end
 
   def check_courses_right?(user, sought_right)
@@ -1988,15 +2010,7 @@ class User < ActiveRecord::Base
       # normal policy checking and somewhat duplicating auth logic here. which
       # is a shame. it'd be really nice to add support to our policy framework
       # for understanding how to load associations based on policies.
-
-      # :manage_groups is only available for admin enrollments
-      admin_enrolls = self.enrollments.current.of_admin_type
-      group_admin_courses = self.courses_for_enrollments(admin_enrolls).includes(:active_groups).select do |c|
-        c.active_groups.any? && c.grants_right?(self, :manage_groups)
-      end
-      group_admin_courses.each do |c|
-        context_groups += c.active_groups
-      end
+      self.courses.includes(:active_groups).select { |c| c.grants_right?(self, :manage_groups) }.each { |c| context_groups += c.active_groups }
       self.courses + (self.groups.active + context_groups).uniq
     end
   end

@@ -6,7 +6,7 @@ define [
   module 'outerclick'
 
   test 'should work', ->
-    handler = @spy()
+    handler = sinon.spy()
     $doc = $(document)
     $foo = $('<b>hello <i>world</i></b>').appendTo($doc)
     $foo.on 'outerclick', handler

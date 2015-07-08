@@ -88,6 +88,8 @@ define [
       @dialog.find('select').trigger('change')
       @scrollCommentsToBottom()
 
+    @cachedDialogs: {}
+
     @open: (assignment, student, options) ->
-      new SubmissionDetailsDialog(assignment, student, options).open()
+      (SubmissionDetailsDialog.cachedDialogs["#{assignment.id}-#{student.id}"] ||= new SubmissionDetailsDialog(assignment, student, options)).open()
 

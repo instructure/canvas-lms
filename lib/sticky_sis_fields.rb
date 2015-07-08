@@ -72,13 +72,7 @@ module StickySisFields
       end
     end
 
-    def reload(*a)
-      @stuck_sis_fields_cache = @sis_fields_to_stick = @sis_fields_to_unstick = nil
-      super
-    end
-
-    private
-
+  private
     def load_stuck_sis_fields_cache
       @stuck_sis_fields_cache ||= (read_attribute(:stuck_sis_fields) || '').split(',').map(&:to_sym).to_set
     end
@@ -88,6 +82,11 @@ module StickySisFields
       @sis_fields_to_unstick ||= [].to_set
       changed_sis_fields = self.class.sticky_sis_fields & (self.changed.map(&:to_sym).to_set | @sis_fields_to_stick)
       return (load_stuck_sis_fields_cache | changed_sis_fields) - @sis_fields_to_unstick
+    end
+
+    def reload_with_sis_stickiness(*a)
+      @stuck_sis_fields_cache = @sis_fields_to_stick = @sis_fields_to_unstick = nil
+      reload_without_sis_stickiness(*a)
     end
   end
 
@@ -136,10 +135,11 @@ module StickySisFields
   def self.included(klass)
     if klass < ActiveRecord::Base
       klass.send :extend, ClassMethods
-      klass.prepend(InstanceMethods)
+      klass.send :include, InstanceMethods
       klass.cattr_accessor :sticky_sis_fields
       klass.cattr_accessor :sis_stickiness_options
       klass.before_update :set_sis_stickiness
+      klass.alias_method_chain :reload, :sis_stickiness
     end
   end
 

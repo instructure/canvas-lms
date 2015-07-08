@@ -26,14 +26,6 @@ module AccountAuthorizationConfig::PluginSettings
       Canvas::Plugin.find(plugin).enabled?
     end
 
-    def recognized_params
-      if globally_configured?
-        super
-      else
-        @plugin_settings + super
-      end
-    end
-
     def plugin_settings(*settings)
       settings_hash = {}
       settings.each do |setting|
@@ -43,27 +35,41 @@ module AccountAuthorizationConfig::PluginSettings
           settings_hash[setting] = setting
         end
       end
-      @plugin_settings = settings_hash.keys
+      @plugin_settings = settings_hash.keys + @recognized_params
 
-      # use an anonymous module so we can prepend and always call super,
-      # regardless of if the method is actually defined on this class,
-      # or a parent
-      mod = Module.new
+      # force attribute methods to be created so that we can alias them
+      # also rescue nil, cause the db may not exist yet
+      self.new rescue nil
+
       settings_hash.each do |(accessor, setting)|
-        mod.module_eval <<-RUBY, __FILE__, __LINE__ + 1
+        super_method = 'super'
+        # it's defined directly on the class; we have to alias things around
+        unless superclass.public_instance_methods.include?(accessor)
+          super_method = "#{accessor}_without_plugin_settings"
+          alias_method super_method, accessor
+        end
+
+          class_eval <<-RUBY, __FILE__, __LINE__ + 1
           def #{accessor}
-            self.class.globally_configured? ? settings_from_plugin[#{setting.inspect}] : super
+            self.class.globally_configured? ? settings_from_plugin[#{setting.inspect}] : #{super_method}
           end
         RUBY
       end
-
-      prepend mod
     end
   end
 
   def self.included(klass)
     klass.instance_variable_set(:@recognized_params, klass.recognized_params)
-    klass.singleton_class.prepend(ClassMethods)
+    klass.extend(ClassMethods)
+
+    def klass.recognized_params
+      if globally_configured?
+        @recognized_params
+      else
+        @plugin_settings
+      end
+    end
+
     klass.cattr_accessor(:plugin)
   end
 

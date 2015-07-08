@@ -23,7 +23,11 @@
         {{/if}}
       {{else}}
         <div class="ellipses">
-          {{#t "no_recording"}}No Recordings{{/t}}
+          {{#if user_settings.record}}
+            {{#t "preparing_video"}}Preparing Video{{/t}}
+          {{else}}
+            {{#t "no_recording"}}No Recordings{{/t}}
+          {{/if}}
         </div>
       {{/if}}
     </div>

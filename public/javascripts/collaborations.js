@@ -23,8 +23,7 @@ define([
   'jqueryui/dialog',
   'jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */,
   'jquery.templateData' /* getTemplateData */,
-  'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'compiled/jquery.rails_flash_notifications' /* screen reader notifications*/
+  'vendor/jquery.scrollTo' /* /\.scrollTo/ */
 ], function(I18n, $) {
 
   var CollaborationsPage = {};
@@ -36,22 +35,9 @@ define([
       if (visibleCollaborations.length <= 1) {
         $('#no_collaborations_message').slideDown();
         $('.add_collaboration_link').click();
-        $collaboration.remove();
       }
-      else{
-        var sortedCollaborations = visibleCollaborations.toArray().sort(function(a, b) {
-          return $(a).data("id") - $(b).data("id");
-        });
-        if (sortedCollaborations.length <= sortedCollaborations.indexOf($collaboration[0])+1)
-        {
-          $(sortedCollaborations[sortedCollaborations.indexOf($collaboration[0])-1]).find(".title").focus()
-        }
-        else
-        {
-          $(sortedCollaborations[sortedCollaborations.indexOf($collaboration[0])+1]).find(".title").focus()
-        }
-        $collaboration.slideUp(function() { $collaboration.remove(); });
-      }
+
+      $collaboration.slideUp(function() { $collaboration.remove(); });
     }
   };
 
@@ -78,7 +64,6 @@ define([
 
       $.ajaxJSON(url, 'DELETE', data, function(data) {
         CollaborationsPage.Util.removeCollaboration($collaboration);
-        $.screenReaderFlashMessage(I18n.t('Collaboration was deleted'));
       }, $.noop);
     },
 
@@ -117,7 +102,5 @@ define([
   };
 
   $(document).ready(CollaborationsPage.Events.init.bind(CollaborationsPage.Events));
-
-  return CollaborationsPage;
 });
 

@@ -352,9 +352,8 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     return false unless self.show_correct_answers
 
-    quiz_submission = user.present? && user.quiz_submissions.where(quiz_id: self.id).first
-    if self.show_correct_answers_last_attempt && quiz_submission
-      return quiz_submission.attempts_left == 0 && quiz_submission.completed?
+    if user.present? && self.show_correct_answers_last_attempt && quiz_submission = user.quiz_submissions.where(quiz_id: self.id).first
+      return quiz_submission.attempts_left == 0 && quiz_submission.complete?
     end
 
     # If we're showing the results only one time, and are letting students
@@ -675,7 +674,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       end
 
     end
-    submission.record_creation_event unless preview
+
     submission
   end
 

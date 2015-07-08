@@ -57,6 +57,7 @@ define [
 
         @render()
 
+
     getFormData: ->
       data = super
       if data.rules

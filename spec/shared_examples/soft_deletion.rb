@@ -1,30 +1,16 @@
 shared_examples "soft deletion" do
-  let(:first) do
-    if creation_arguments.is_a? Array
-      subject.create! creation_arguments.first
-    else
-      subject.create! creation_arguments
-    end
-  end
-
-  let(:second) do
-    if creation_arguments.is_a? Array
-      subject.create! creation_arguments.last
-    else
-      subject.create! creation_arguments
-    end
-  end
-
+  let(:first)         { subject.create creation_arguments }
+  let(:second)        { subject.create creation_arguments }
   let(:active_scope)  { subject.active }
 
   describe "workflow" do
     it "defaults to active" do
-      expect(first).to be_active
+      expect(first.active?).to be true
     end
 
     it "is deleted after destroy is called" do
       first.destroy
-      expect(first).to be_deleted
+      expect(first.deleted?).to be true
     end
   end
 
@@ -42,6 +28,7 @@ shared_examples "soft deletion" do
   describe "#destroy" do
     it "marks deleted periods workflow_state as deleted" do
       first.destroy
+
       expect(first.workflow_state).to eq "deleted"
     end
 

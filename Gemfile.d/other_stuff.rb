@@ -39,7 +39,7 @@ gem 'canvas-jobs', '0.9.13'
 gem 'ffi', '1.1.5', require: false
 gem 'hairtrigger', '0.2.12'
   gem 'ruby2ruby', '2.0.8', require: false
-  gem 'ruby_parser', '3.7.0', require: false
+  gem 'ruby_parser', '3.6.1', require: false
 gem 'hashery', '1.3.0', require: false
 gem 'highline', '1.6.1', require: false
 gem 'hoe', '3.8.1'
@@ -71,9 +71,7 @@ gem 'nokogiri', '1.6.6.2', require: false
 # oauth gem, with rails3 fixes rolled in
 gem 'oauth-instructure', '0.4.10', require: false
 gem 'oauth2', '1.0.0', require: false
-gem 'rack-mini-profiler', '0.9.2', require: false
-gem 'flamegraph', '0.1.0', require: false
-  gem 'stackprof', '0.2.7', require: false
+gem 'rack-mini-profiler', '0.9.1', require: false
 gem 'rake', '10.4.2'
 gem 'rdoc', '3.12'
 gem 'ratom', '0.9.0', require: false

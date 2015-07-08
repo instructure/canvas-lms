@@ -2,7 +2,7 @@ define [
   'Backbone'
   'compiled/util/mixin'
   'helpers/fakeENV'
-], ({View}, mixing, fakeENV) ->
+], ({View}, mixing, fakeENV) -> 
   module 'View',
     setup: ->
       fakeENV.setup()
@@ -37,7 +37,7 @@ define [
     view = new Backbone.View foo: 'bar'
     ok !view.foo?, 'parent class property options not poluted'
 
-  test 'children should have a list of child views', ->
+  test 'children should have a list of child views', -> 
     class SomeView extends Backbone.View
       @child 'test', '.test'
 
@@ -153,13 +153,13 @@ define [
 
   test 'View.mixin initialize, attach and afterRender magic tricks', ->
     mixin1 =
-      initialize: @spy()
-      attach: @spy()
-      afterRender: @spy()
+      initialize: sinon.spy()
+      attach: sinon.spy()
+      afterRender: sinon.spy()
     mixin2 =
-      initialize: @spy()
-      attach: @spy()
-      afterRender: @spy()
+      initialize: sinon.spy()
+      attach: sinon.spy()
+      afterRender: sinon.spy()
     class SomeView extends View
       @mixin mixin1, mixin2
     view = new SomeView
@@ -179,13 +179,13 @@ define [
     equal Foo::defaults.foo, 'bar', 'Foo::defaults was appended'
 
   test 'View.mixin with compound mixins', ->
-    afterRender1 = @spy()
+    afterRender1 = sinon.spy()
     mixin1 = afterRender: afterRender1
-    afterRender2 = @spy()
+    afterRender2 = sinon.spy()
     mixin2 = mixing {}, mixin1, afterRender: afterRender2
-    afterRender3 = @spy()
+    afterRender3 = sinon.spy()
     mixin3 = afterRender: afterRender3
-    afterRenderFoo = @spy()
+    afterRenderFoo = sinon.spy()
     class Foo extends View
       @mixin mixin2, mixin3
       afterRender: -> super and afterRenderFoo()
@@ -198,13 +198,13 @@ define [
     ok afterRenderFoo.calledOnce, 'called foo afterRender'
 
     # order of mixing in shouldn't matter
-    afterRender4 = @spy()
-    afterRender5 = @spy()
-    afterRender6 = @spy()
+    afterRender4 = sinon.spy()
+    afterRender5 = sinon.spy()
+    afterRender6 = sinon.spy()
     mixin4 = afterRender: afterRender4
     mixin5 = mixing {}, mixin4, afterRender: afterRender5
     mixin6 = afterRender: afterRender6
-    afterRenderBar = @spy()
+    afterRenderBar = sinon.spy()
     class Bar extends View
       @mixin mixin6, mixin5
       afterRender: -> super and afterRenderBar()

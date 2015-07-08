@@ -398,9 +398,8 @@ describe QuizzesHelper do
       quiz = stub({
         show_correct_answers_last_attempt: true,
       })
-      quiz_submission = stub(last_attempt_completed?: false)
 
-      message = render_correct_answer_protection(quiz, quiz_submission)
+      message = render_correct_answer_protection(quiz)
       expect(message).to match /last attempt/
     end
     it 'should provide a useful message when "no"' do
@@ -410,9 +409,8 @@ describe QuizzesHelper do
         show_correct_answers_at: nil,
         hide_correct_answers_at: nil
       })
-      quiz_submission = stub(last_attempt_completed?: false)
 
-      message = render_correct_answer_protection(quiz, quiz_submission)
+      message = render_correct_answer_protection(quiz)
       expect(message).to match /are hidden/
     end
 
@@ -423,9 +421,8 @@ describe QuizzesHelper do
         show_correct_answers_at: nil,
         hide_correct_answers_at: nil
       })
-      quiz_submission = stub(last_attempt_completed?: false)
 
-      message = render_correct_answer_protection(quiz, quiz_submission)
+      message = render_correct_answer_protection(quiz)
       expect(message).to eq nil
     end
 
@@ -436,9 +433,8 @@ describe QuizzesHelper do
         show_correct_answers_at: 1.day.from_now,
         hide_correct_answers_at: nil
       })
-      quiz_submission = stub(last_attempt_completed?: false)
 
-      message = render_correct_answer_protection(quiz, quiz_submission)
+      message = render_correct_answer_protection(quiz)
       expect(message).to match /will be available/
     end
 
@@ -449,9 +445,8 @@ describe QuizzesHelper do
         show_correct_answers_at: nil,
         hide_correct_answers_at: 1.day.from_now
       })
-      quiz_submission = stub(last_attempt_completed?: false)
 
-      message = render_correct_answer_protection(quiz, quiz_submission)
+      message = render_correct_answer_protection(quiz)
       expect(message).to match /are available until/
     end
   end

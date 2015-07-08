@@ -148,30 +148,6 @@ describe Course do
     it "should create a new instance given valid attributes" do
       course_model
     end
-
-    it "should require unique sis_source_id" do
-      other_course = course
-      other_course.sis_source_id = "sisid"
-      other_course.save!
-
-      new_course = course
-      new_course.sis_source_id = other_course.sis_source_id
-      expect(new_course).to_not be_valid
-      new_course.sis_source_id = nil
-      expect(new_course).to be_valid
-    end
-
-    it "should require unique integration_id" do
-      other_course = course
-      other_course.integration_id = "intid"
-      other_course.save!
-
-      new_course = course
-      new_course.integration_id = other_course.integration_id
-      expect(new_course).to_not be_valid
-      new_course.integration_id = nil
-      expect(new_course).to be_valid
-    end
   end
 
   it "should create a unique course." do
@@ -970,38 +946,19 @@ describe Course, "gradebook_to_csv" do
     expect(assignments).to eq ["Assignment 01", "Assignment 02"]
   end
 
-  context "sort order" do
-    before :once do
-      course
-      _, zed, _ = ["Ned Ned", "Zed Zed", "Aardvark Aardvark"].map { |name|
-        student_in_course(:name => name)
-        @student
-      }
-      zed.update_attribute :sortable_name, "aaaaaa zed"
+  it "should alphabetize by sortable name with the test student at the end" do
+    course
+    ["Ned Ned", "Zed Zed", "Aardvark Aardvark"].each{|name| student_in_course(:name => name)}
+    test_student_enrollment = student_in_course(:name => "Test Student")
+    test_student_enrollment.type = "StudentViewEnrollment"
+    test_student_enrollment.save!
 
-      test_student_enrollment = student_in_course(:name => "Test Student")
-      test_student_enrollment.type = "StudentViewEnrollment"
-      test_student_enrollment.save!
-    end
-
-    it "should alphabetize by sortable name with the test student at the end" do
-      csv = @course.gradebook_to_csv
-      rows = CSV.parse(csv)
-      expect([rows[2][0],
-       rows[3][0],
-       rows[4][0],
-       rows[5][0]]).to eq ["Zed Zed", "Aardvark Aardvark", "Ned Ned", "Test Student"]
-    end
-
-    it "can show students by sortable name" do
-      @course.enable_feature! :gradebook_list_students_by_sortable_name
-      csv = @course.gradebook_to_csv
-      rows = CSV.parse(csv)
-      expect([rows[2][0],
-       rows[3][0],
-       rows[4][0],
-       rows[5][0]]).to eq ["aaaaaa zed", "Aardvark, Aardvark", "Ned, Ned", "Student, Test"]
-    end
+    csv = @course.gradebook_to_csv
+    rows = CSV.parse(csv)
+    expect([rows[2][0],
+     rows[3][0],
+     rows[4][0],
+     rows[5][0]]).to eq ["Aardvark, Aardvark", "Ned, Ned", "Zed, Zed", "Student, Test"]
   end
 
   it "should include all section names in alphabetical order" do
@@ -3472,7 +3429,7 @@ describe Course do
     it "should be preferred if delegated authentication is configured" do
       account = Account.default
       account.settings = { :open_registration => true }
-      account.authentication_providers.create!(:auth_type => 'cas')
+      account.account_authorization_configs.create!(:auth_type => 'cas')
       account.save!
       course
       expect(@course.user_list_search_mode_for(nil)).to eq :preferred
@@ -4202,23 +4159,5 @@ describe Course, 'invited_count_visible_to' do
     student_in_course
     expect(@student.enrollments.where(course_id: @course).first).to be_creation_pending
     expect(@course.invited_count_visible_to(@teacher)).to eq(2)
-  end
-end
-
-describe Course, '#favorite_for_user?' do
-  before :once do
-    @courses = []
-    @courses << course_with_student(:active_all => true, :course_name => "Course 0").course
-    @courses << course_with_student(:course_name => "Course 1", :user => @user, :active_all => true).course
-    @user.favorites.build(:context => @courses[0])
-    @user.save
-  end
-
-  it "should return true if a user has a course set as a favorite" do
-    expect(@courses[0].favorite_for_user?(@user)).to eql(true)
-  end
-
-  it "should return false if a user has not set a course to be a favorite" do
-    expect(@courses[1].favorite_for_user?(@user)).to eql(false)
   end
 end

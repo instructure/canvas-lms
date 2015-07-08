@@ -65,10 +65,6 @@ class ContextModule < ActiveRecord::Base
         # ditto with removing a prerequisite
         @relock_warning = true if (self.prerequisites.to_a - self.prerequisites_was.to_a).present?
       end
-      if self.unlock_at_changed?
-        # adding a unlock_at date should trigger
-        @relock_warning = true if self.unlock_at.present? && self.unlock_at_was.blank?
-      end
     end
   end
 
@@ -406,25 +402,11 @@ class ContextModule < ActiveRecord::Base
   end
 
   def cached_active_tags
-    @cached_active_tags ||= begin
-      if self.content_tags.loaded?
-        # don't reload the preloaded content
-        self.content_tags.select{|tag| tag.active?}
-      else
-        self.content_tags.active.to_a
-      end
-    end
+    @cached_active_tags ||= self.content_tags.active.reload
   end
 
   def cached_not_deleted_tags
-    @cached_not_deleted_tags ||= begin
-      if self.content_tags.loaded?
-        # don't reload the preloaded content
-        self.content_tags.select{|tag| !tag.deleted?}
-      else
-        self.content_tags.not_deleted.to_a
-      end
-    end
+    @cached_not_deleted_tags ||= self.content_tags.not_deleted.reload
   end
 
   def add_item(params, added_item=nil, opts={})

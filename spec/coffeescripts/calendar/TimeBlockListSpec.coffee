@@ -71,9 +71,10 @@ define [
   test "should alert when invalid", ->
     row = @me.addRow()
     row.$date.val('asdfasdf').change()
-    spy = @spy(window, 'alert')
+    spy = sinon.spy(window, 'alert')
     @me.validate()
     ok spy.called, 'should `alert` a message'
+    spy.restore()
 
   test "should split correctly", ->
     @me.rows[2].remove()

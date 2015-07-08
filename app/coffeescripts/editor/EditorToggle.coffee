@@ -4,9 +4,8 @@ define [
   'jquery'
   'Backbone'
   'compiled/fn/preventDefault'
-  'compiled/views/editor/KeyboardShortcuts'
   'tinymce.editor_box'
-], (_, I18n, $, Backbone, preventDefault, KeyboardShortcuts) ->
+], (_, I18n, $, Backbone, preventDefault) ->
 
   ###
   xsslint safeString.property content
@@ -52,13 +51,7 @@ define [
       @textArea.val @getContent()
       @textArea.insertBefore @el
       @el.detach()
-      if @options.switchViews
-        @switchViews.insertBefore @textArea
-        @switchViews.find('a').toggle() if !@switchViews.find('a').first().is(":visible")
-      @infoIcon ||= (new KeyboardShortcuts()).render().$el
-      @infoIcon.css("float", "right")
-      @infoIcon.insertAfter @switchViews
-      $('<div/>', style: "clear: both").insertBefore @textArea
+      @switchViews.insertBefore @textArea if @options.switchViews
       @done.insertAfter @textArea
       opts = {focus: true, tinyOptions: {}}
       if @options.editorBoxLabel
@@ -79,7 +72,6 @@ define [
       @textArea._removeEditor()
       @textArea.detach()
       @switchViews.detach() if @options.switchViews
-      @infoIcon.detach()
       @done.detach()
       # so tiny doesn't hang on to this instance
       @textArea.attr 'id', ''

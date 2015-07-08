@@ -64,7 +64,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   before_create :assign_validation_token
 
   has_many :attachments, :as => :context, :dependent => :destroy
-  has_many :events, class_name: 'Quizzes::QuizSubmissionEvent'
+  has_many :events, class_name: 'Quizzes::QuizSubmissionEvent', dependent: :destroy
 
   # update the QuizSubmission's Submission to 'graded' when the QuizSubmission is marked as 'complete.' this
   # ensures that quiz submissions with essay questions don't show as graded in the SpeedGrader until the instructor
@@ -229,14 +229,10 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       # prevents the student from starting to take the quiz for the last
       # time, then opening a new tab and looking at the results from
       # a prior attempt)
-      !quiz.allowed_attempts || quiz.allowed_attempts < 1 || attempt > quiz.allowed_attempts || last_attempt_completed?
+      !quiz.allowed_attempts || quiz.allowed_attempts < 1 || attempt > quiz.allowed_attempts || (completed? && attempt == quiz.allowed_attempts)
     else
       true
     end
-  end
-
-  def last_attempt_completed?
-    completed? && quiz.allowed_attempts && attempt >= quiz.allowed_attempts
   end
 
   def self.needs_grading
@@ -254,14 +250,18 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   # There is also a needs_grading scope which needs to replicate this logic
   def needs_grading?(strict=false)
-    overdue_and_needs_submission?(strict) || (self.completed? && !graded?)
+    if strict && self.untaken? && self.overdue?(true)
+      true
+    elsif self.untaken? && self.end_at && self.end_at < Time.now
+      true
+    elsif self.completed? && !graded?
+      true
+    else
+      false
+    end
   end
 
-  def overdue_and_needs_submission?(strict=false)
-    (strict && self.untaken? && self.overdue?(true)) ||
-    (self.untaken? && self.end_at && self.end_at < Time.now)
-  end
-  alias_method :overdue_and_needs_submission, :overdue_and_needs_submission?
+  alias_method :overdue_and_needs_submission, :needs_grading?
 
   def has_seen_results?
     !!self.has_seen_results
@@ -302,9 +302,13 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     new_params[:cnt] = (new_params[:cnt].to_i + 1) % 5
     snapshot!(params) if new_params[:cnt] == 1
 
-    self.class.where(id: self).
-        where("workflow_state NOT IN ('complete', 'pending_review')").
-        update_all(user_id: user_id, submission_data: new_params.to_yaml)
+    connection.execute <<-SQL
+      UPDATE quiz_submissions
+         SET user_id=#{self.user_id || 'NULL'},
+             submission_data=#{connection.quote(new_params.to_yaml)}
+       WHERE workflow_state NOT IN ('complete', 'pending_review')
+         AND id=#{self.id}
+    SQL
 
     record_answer(new_params)
 
@@ -314,16 +318,6 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   def record_answer(submission_data)
     extractor = Quizzes::LogAuditing::QuestionAnsweredEventExtractor.new
     extractor.create_event!(submission_data, self)
-  end
-
-  def record_creation_event
-    Quizzes::QuizSubmissionEvent.new.tap do |event|
-      event.event_type = Quizzes::QuizSubmissionEvent::EVT_SUBMISSION_CREATED
-      event.event_data = {"quiz_version" => self.quiz_version, "quiz_data" => self.quiz_data}
-      event.created_at = Time.zone.now
-      event.quiz_submission = self
-      event.attempt = self.attempt
-    end.save!
   end
 
   def sanitize_params(params)
@@ -372,7 +366,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def questions_as_object
-    self.quiz_data || []
+    self.quiz_data || {}
   end
 
   def quiz_question_ids
@@ -524,7 +518,6 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     self.score = final_score
     to_be_kept_score = final_score
     self.fudge_points = new_fudge
-    mark_completed
 
     if self.quiz && self.quiz.scoring_policy == "keep_highest"
       # exclude the score of the version we're curretly overwriting
@@ -619,6 +612,11 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     })
   end
 
+  def grade_submission(opts={})
+    warn '[DEPRECATED] Quizzes::QuizSubmission#grade_submission is deprecated, use Quizzes::SubmissionGrader#grade_submission'
+    Quizzes::SubmissionGrader.new(self).grade_submission(opts)
+  end
+
   # Complete (e.g, turn-in) the quiz submission by doing the following:
   #
   #  - generating a (full) snapshot of the current state along with any
@@ -663,8 +661,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     if self.quiz && self.user
       if self.score
         self.quiz.context_module_action(self.user, :scored, self.kept_score)
-      end
-      if self.finished_at
+      elsif self.finished_at
         self.quiz.context_module_action(self.user, :submitted)
       end
     end

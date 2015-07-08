@@ -20,7 +20,7 @@ define [
         {id: 1, name: "group set 1"}
         {id: 2, name: "group set 2"}
       ]
-      @stub(categories, "fetch").returns([])
+      sinon.stub(categories, "fetch").returns([])
       view = new GroupCategoriesView
         collection: categories
       view.render()

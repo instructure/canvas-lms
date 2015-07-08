@@ -28,9 +28,9 @@ class Quizzes::QuizStatistics::ItemAnalysis::Summary
     @attempts = quiz.quiz_submissions.for_students(quiz).map { |qs| qs.submitted_attempts.first }.compact
     @options = options
     @options[:buckets] ||= [
-      [:top, 0.73],
-      [:middle, 0.27],
-      [:bottom, 0]
+      [:bottom, 0.27],
+      [:middle, 0.73],
+      [:top, 1]
     ]
 
     aggregate_data
@@ -57,23 +57,16 @@ class Quizzes::QuizStatistics::ItemAnalysis::Summary
   end
 
   # group the student ids into buckets according to score (e.g. bottom
-  # 27%, middle 46%, top 27%); ties put both users in a higher bucket
+  # 27%, middle 46%, top 27%)
   def buckets
     @buckets ||= begin
-                   bucket_defs = @options[:buckets]
-                   ranked_respondent_ids = @respondent_scores.sort_by(&:last)
-                   previous_floor = ranked_respondent_ids.length
-                   buckets = {}
-                   bucket_defs.each do |(name, cutoff)|
-                     floor = (cutoff * ranked_respondent_ids.length).round
-                     floor_score = ranked_respondent_ids[floor].try(:last)
-                     # include all tied users in this bucket
-                     floor -= 1 while floor > 0 && ranked_respondent_ids[floor - 1].last == floor_score
-
-                     buckets[name] = ranked_respondent_ids[floor...previous_floor].map(&:first)
-                     previous_floor = floor
-                   end
-                   buckets
+                   buckets = @options[:buckets]
+                   ranked_respondent_ids = @respondent_scores.sort_by(&:last).map(&:first)
+                   Hash[buckets.each_with_index.map { |(name, cutoff), i|
+                     floor = i > 0 ? (buckets[i - 1][1] * ranked_respondent_ids.length).round : 0
+                     ceiling = (cutoff * ranked_respondent_ids.length).round
+                     [name, ranked_respondent_ids[floor...ceiling]]
+                   }]
                  end
   end
 

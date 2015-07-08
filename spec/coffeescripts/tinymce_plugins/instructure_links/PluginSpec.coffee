@@ -78,19 +78,26 @@ define [
     ok(!called)
 
   test "it closes the dialog box", ->
-    @mock(@box).expects("dialog").once().withArgs('close')
+    mock = sinon.mock(@box)
+    mock.expects("dialog").once().withArgs('close')
     EditorLinks.bindLinkSubmit(@box, @editor, @fetchClasses, (()->))
     @form.trigger('submit')
+    mock.verify()
+    mock.restore()
 
   test "it inserts the link properly", ->
-    @mock(@editor).expects("createLink").once().
-      withArgs('promptValue', "classes")
+    mock = sinon.mock(@editor)
+    mock.expects("createLink").once().withArgs('promptValue', "classes")
     called = false
     @box.on('submit', (()-> called = true))
     EditorLinks.bindLinkSubmit(@box, @editor, @fetchClasses, (()->))
     @form.trigger('submit')
+    mock.verify()
+    mock.restore()
 
   module "InstructureLinks Tinymce Plugin: buildLinkClasses",
+    setup: ->
+    teardown: ->
 
   test "it removes any existing link-specific classes", ->
     box = $("<div></div>")

@@ -145,15 +145,13 @@ define([
       }, this);
       return (
         <div className="ic-DashboardCard">
-          <div className="ic-DashboardCard__background" style={this.backgroundColor()}>
-            <a className="ic-DashboardCard__link" href={this.props.href}>
-              <header className="ic-DashboardCard__header">
-                <h2 className="ic-DashboardCard__header-title">{this.props.shortName}</h2>
-                <h3 className="ic-DashboardCard__header-subtitle">{this.props.courseCode}</h3>
-              </header>
+          <div className="ic-DashboardCard_header" style={this.backgroundColor()}>
+            <a className="ic-DashboardCard_header_link" href={this.props.href}>
+              <h2 className="ic-DashboardCard_header-title">{this.props.shortName}</h2>
+              <h3 className="ic-DashboardCard_header-subtitle">{this.props.courseCode}</h3>
             </a>
           </div>
-          <div className="ic-DashboardCard__action-container">
+          <div className="ic-DashboardCard_action-container">
             {links}
           </div>
         </div>

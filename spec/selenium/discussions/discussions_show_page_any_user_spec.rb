@@ -111,7 +111,7 @@ describe "discussions" do
           expect(f('.topic-subscribe-button')).to be_displayed
         end
 
-        it "should unsubscribe from topic", priority: 1, test_id: 150474 do
+        it "should unsubscribe from topic" do
           topic.subscribe(somebody)
           topic.create_materialized_view
 
@@ -122,7 +122,7 @@ describe "discussions" do
           expect(topic.subscribed?(somebody)).to eq false
         end
 
-        it "should subscribe to topic", priority: 1, test_id: 150474 do
+        it "should subscribe to topic" do
           topic.unsubscribe(somebody)
           topic.create_materialized_view
 
@@ -131,6 +131,21 @@ describe "discussions" do
           wait_for_ajaximations
           topic.reload
           expect(topic.subscribed?(somebody)).to eq true
+        end
+
+        it "should prevent subscribing when a student post is required first" do
+          new_student_entry_text = 'new student entry'
+          topic.require_initial_post = true
+          topic.save
+          get url
+          # shouldn't see subscribe button until after posting
+          expect(f('.topic-subscribe-button')).not_to be_displayed
+          add_reply new_student_entry_text
+          # now the subscribe button should be available.
+          get url
+          wait_for_ajax_requests
+          # already subscribed because they posted
+          expect(f('.topic-unsubscribe-button')).to be_displayed
         end
 
         context "someone else's topic" do

@@ -140,24 +140,20 @@ module Api::V1::ContextModule
     hash
   end
 
-  def content_details(content_tag, current_user, opts={})
+  def content_details(content_tag, current_user)
     details = {}
     item = content_tag.content
 
     item = item.assignment if item.is_a?(DiscussionTopic) && item.assignment
     item = item.overridden_for(current_user) if item.respond_to?(:overridden_for)
 
-    attrs = [:usage_rights, :thumbnail_url, :locked, :hidden, :lock_explanation, :display_name, :due_at, :unlock_at, :lock_at, :points_possible]
-    attrs.delete(:thumbnail_url) if opts[:for_admin]
-
-    attrs.each do |attr|
+    [:usage_rights, :thumbnail_url, :locked, :hidden, :lock_explanation, :display_name, :due_at, :unlock_at, :lock_at, :points_possible].each do |attr|
       if item.respond_to?(attr) && val = item.try(attr)
         details[attr] = val
       end
     end
 
-    unless opts[:for_admin]
-      item_type = case content_tag.content_type
+    item_type = case content_tag.content_type
                   when 'Quiz', 'Quizzes::Quiz'
                     'quiz'
                   when 'Assignment'
@@ -171,9 +167,8 @@ module Api::V1::ContextModule
                   else
                     ''
                 end
-      lock_item = item && item.respond_to?(:locked_for?) ? item : content_tag
-      locked_json(details, lock_item, current_user, item_type)
-    end
+    lock_item = item && item.respond_to?(:locked_for?) ? item : content_tag
+    locked_json(details, lock_item, current_user, item_type)
 
     details
   end

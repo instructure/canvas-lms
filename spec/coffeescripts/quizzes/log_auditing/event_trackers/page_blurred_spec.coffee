@@ -13,14 +13,14 @@ define [
 
   test 'capturing: it works', ->
     tracker = new Subject()
-    capture = @stub()
+    capture = sinon.stub()
     tracker.install(capture)
 
     $(window).blur()
     ok capture.called, 'it captures page focus'
 
   test 'capturing: it throttles captures', ->
-    capture = @spy()
+    capture = sinon.spy()
 
     tracker = new Subject()
     tracker.install(capture)

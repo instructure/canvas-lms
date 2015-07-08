@@ -90,16 +90,14 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
     # update outcome groups
     unless outcome_group_ids.empty?
-      LearningOutcomeGroup.
-          where(id: outcome_group_ids, context_type: context_type, context_id: context_id).
-          update_all(learning_outcome_group_id: self)
+      sql = "UPDATE learning_outcome_groups SET learning_outcome_group_id=#{self.id} WHERE id IN (#{outcome_group_ids.join(",")}) AND context_type='#{self.context_type}' AND context_id='#{self.context_id}'"
+      ContentTag.connection.execute(sql)
     end
 
     # update outcome links
     unless outcome_link_ids.empty?
-      ContentTag.
-          where(id: outcome_link_ids, context_type: context_type, context_id: context_id).
-          update_all(associated_asset_id: self)
+      sql = "UPDATE content_tags SET associated_asset_id=#{self.id} WHERE id IN (#{outcome_link_ids.join(",")}) AND context_type='#{self.context_type}' AND context_id='#{self.context_id}'"
+      ContentTag.connection.execute(sql)
     end
 
     orders

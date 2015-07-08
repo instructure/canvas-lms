@@ -1,1 +1,1 @@
-CanvasStatsd.track_default_metrics logger: Rails.logger
+CanvasStatsd.track_default_metrics

@@ -122,9 +122,6 @@ module Canvas
             'bower/react-tokeninput/dist/react-tokeninput': {
               deps: ['react'],
             },
-            'bower/react-select-box/dist/react-select-box': {
-              deps: ['react'],
-            },
             'bower/ember/ember': {
               deps: ['jquery', 'handlebars'],
               exports: 'Ember'

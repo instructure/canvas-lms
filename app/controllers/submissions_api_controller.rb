@@ -142,7 +142,7 @@
 #     }
 #
 class SubmissionsApiController < ApplicationController
-  before_filter :get_course_from_section, :require_context, :require_user
+  before_filter :get_course_from_section, :require_context
   batch_jobs_in_actions :only => [:update], :batch => { :priority => Delayed::LOW_PRIORITY }
 
   include Api::V1::Progress
@@ -365,7 +365,7 @@ class SubmissionsApiController < ApplicationController
         seen_users << student.id
         hash = { :user_id => student.id, :section_id => enrollment.course_section_id, :submissions => [] }
 
-        pseudonym = SisPseudonym.for(student, context)
+        pseudonym = student.sis_pseudonym_for(context)
         if pseudonym && context.grants_any_right?(@current_user, :read_sis, :manage_sis)
           hash[:integration_id] = pseudonym.integration_id
           hash[:sis_user_id] = pseudonym.sis_user_id

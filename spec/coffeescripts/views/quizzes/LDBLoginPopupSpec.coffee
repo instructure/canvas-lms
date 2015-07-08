@@ -30,8 +30,8 @@ define [
       $(root.document).find("link[href]").length
 
   test "it should trigger the @open and @close events", ->
-    onOpen = @spy()
-    onClose = @spy()
+    onOpen = sinon.spy()
+    onClose = sinon.spy()
 
     popup.on "open", onOpen
     popup.on "close", onClose
@@ -43,7 +43,7 @@ define [
     ok onClose.called, "@close handler gets called"
 
   test "it should close after a successful login", 1, ->
-    onClose = @spy()
+    onClose = sinon.spy()
 
     server = sinon.fakeServer.create()
     server.respondWith "POST", /login/, [ 200, {}, "OK" ]
@@ -57,7 +57,7 @@ define [
     whnd = popup.exec()
 
   test "it should trigger the @login_success event", 1, ->
-    onSuccess = @spy()
+    onSuccess = sinon.spy()
 
     server = sinon.fakeServer.create()
     server.respondWith "POST", /login/, [ 200, {}, "OK" ]
@@ -71,7 +71,7 @@ define [
     whnd = popup.exec()
 
   test "it should trigger the @login_failure event", 1, ->
-    onFailure = @spy()
+    onFailure = sinon.spy()
 
     server = sinon.fakeServer.create()
     server.respondWith "POST", /login/, [ 401, {}, "Bad Request" ]
@@ -86,13 +86,13 @@ define [
 
   asyncTest "it should pop back in if student closes it", 5, ->
     latestWindow = undefined
-    onFailure = @spy()
-    onOpen = @spy()
-    onClose = @spy()
+    onFailure = sinon.spy()
+    onOpen = sinon.spy()
+    onClose = sinon.spy()
     originalOpen = window.open
 
     # needed for proper cleanup of windows
-    openStub = @stub window, "open", ->
+    openStub = sinon.stub window, "open", ->
       latestWindow = originalOpen.apply(this, arguments)
 
     server = sinon.fakeServer.create()
@@ -122,6 +122,7 @@ define [
           popup.off "close.sticky"
           latestWindow.close()
           ok onClose.calledTwice, "popup closed for good"
+          openStub.restore()
 
     whnd = popup.exec()
     ok onOpen.called, "popup opened"

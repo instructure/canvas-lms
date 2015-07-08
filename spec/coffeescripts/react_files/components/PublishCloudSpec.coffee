@@ -27,10 +27,11 @@ define [
     equal @publishCloud.state.published, true, "changing models locked changes it to true"
 
   test "clicking a published cloud opens restricted dialog", ->
-    @stub(React, 'render')
+    sinon.stub(React, 'render')
     Simulate.click(@publishCloud.refs.publishCloud.getDOMNode())
 
     ok React.render.calledOnce, 'renders a component inside the dialog'
+    React.render.restore()
 
   module 'PublishCloud Student View',
     setup: ->

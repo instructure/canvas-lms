@@ -5,16 +5,20 @@ define [
 
   model = null
   file = {}
+  getFilesStub = null
+  filterFilesStub = null
 
   module 'ImageFile',
     setup: ->
       model = new ImageFile(null, preflightUrl: '/preflight')
       file = {}
-      @stub FileAPI, 'getFiles', -> [file]
-      @stub FileAPI, 'filterFiles', (f, cb) ->
+      getFilesStub = sinon.stub FileAPI, 'getFiles', -> [file]
+      filterFilesStub = sinon.stub FileAPI, 'filterFiles', (f, cb) ->
         cb(file, file)
 
     teardown: ->
+      getFilesStub.restore()
+      filterFilesStub.restore()
 
   test 'returns a useful deferred', ->
     file = {type: "text/plain", size: 1234}

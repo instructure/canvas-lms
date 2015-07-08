@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 
-define(['underscore', 'i18n!gradebok_upload', 'compiled/userSettings'], function(_, I18n, userSettings) {
+define(['underscore', 'i18n!gradebok_upload'], function(_, I18n) {
 
   var processGradebookUpload = function(uploadedGradebook) {
     return makeNewAssignments(uploadedGradebook)
@@ -68,9 +68,6 @@ define(['underscore', 'i18n!gradebok_upload', 'compiled/userSettings'], function
           progress.workflow_state == "failed") {
         $("#gradebook_grid_form").text(I18n.t("Done."));
         dfd.resolve();
-        if (progress.workflow_state === "completed") {
-          userSettings.contextSet('gradebookUploadComplete', true);
-        }
         window.location = ENV.gradebook_path;
       } else {
         setTimeout(function() {

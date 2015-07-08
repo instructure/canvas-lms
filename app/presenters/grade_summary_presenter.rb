@@ -35,10 +35,6 @@ class GradeSummaryPresenter
     user_has_elevated_permissions? && !@id_param
   end
 
-  def user_an_observer_of_student?
-    observed_students.key? student
-  end
-
   def student_is_user?
     student == @current_user
   end
@@ -204,7 +200,7 @@ class GradeSummaryPresenter
 
   def courses_with_grades
     @courses_with_grades ||= begin
-      if student_is_user? || user_an_observer_of_student?
+      if student_is_user?
         student.courses_with_grades
       else
         nil

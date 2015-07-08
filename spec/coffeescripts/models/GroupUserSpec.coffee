@@ -10,8 +10,11 @@ define [
     setup: ->
       @groupUser = new GroupUser
         category: new GroupCategory
-      @leaveGroupStub = @stub @groupUser, 'leaveGroup'
-      @joinGroupStub = @stub @groupUser, 'joinGroup'
+      @leaveGroupStub = sinon.stub @groupUser, 'leaveGroup'
+      @joinGroupStub = sinon.stub @groupUser, 'joinGroup'
+    teardown: ->
+      @leaveGroupStub.restore()
+      @joinGroupStub.restore()
 
   test "updates group correctly upon save and fires joinGroup and leaveGroup appropriately", ->
     group1 = new Group(id: 777)

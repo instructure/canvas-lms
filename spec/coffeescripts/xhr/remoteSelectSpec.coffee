@@ -13,7 +13,7 @@ define [
       document.getElementById("fixtures").innerHTML = ""
 
   test 'should load results into a select', ->
-    server = sinon.fakeServer.create()
+    server = @sandbox.useFakeServer()
     server.respondWith(/.+/, @response)
 
     rs = new RemoteSelect(@el, url: '/test/url.json')
@@ -36,7 +36,7 @@ define [
       ]
     }
 
-    server = sinon.fakeServer.create()
+    server = @sandbox.useFakeServer()
     server.respondWith(/.+/, @response)
 
     rs = new RemoteSelect(@el, url: '/test/url.json')
@@ -46,7 +46,7 @@ define [
     server.restore()
 
   test 'should cache responses', ->
-    server = sinon.fakeServer.create()
+    server = @sandbox.useFakeServer()
     server.respondWith(/.+/, @response)
     @spy($, 'getJSON')
 
@@ -58,7 +58,7 @@ define [
     server.restore()
 
   test 'should accept a formatter', ->
-    server = sinon.fakeServer.create()
+    server = @sandbox.useFakeServer()
     @response.pop()
     @response.push JSON.stringify [
       { group: 'one', name: 'one', id: 1 }
@@ -85,7 +85,7 @@ define [
     server.restore()
 
   test 'should take params', ->
-    server = sinon.fakeServer.create()
+    server = @sandbox.useFakeServer()
     @spy($, 'getJSON')
 
     rs = new RemoteSelect(@el,
@@ -97,7 +97,7 @@ define [
     server.restore()
 
   test 'should include original options in select', ->
-    server = sinon.fakeServer.create()
+    server = @sandbox.useFakeServer()
     server.respondWith(/.+/, @response)
     @el.append '<option value="">Default</option>'
 

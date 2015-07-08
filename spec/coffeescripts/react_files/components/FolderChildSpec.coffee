@@ -44,10 +44,11 @@ define [
   #   equal input, document.activeElement, 'input is focused automatically'
 
   #   input.value = 'testing 123'
-  #   ajaxSpy = @spy($, 'ajax')
+  #   ajaxSpy = sinon.spy($, 'ajax')
   #   Simulate.submit(input.form)
   #   ok ajaxSpy.calledWithMatch({
   #     url: TEST_FOLDERS_COLLECTION_URL
   #     type: 'POST'
   #     data: '{"name":"testing 123"}'
   #   }), 'sends POST to create folder'
+  #   ajaxSpy.restore()

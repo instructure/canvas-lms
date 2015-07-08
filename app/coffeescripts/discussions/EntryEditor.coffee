@@ -2,9 +2,9 @@ define [
   'i18n!editor'
   'jquery'
   'compiled/editor/EditorToggle'
-  'compiled/str/apiUserContent'
+  'compiled/str/convertApiUserContent'
   'vendor/jquery.ba-tinypubsub'
-], (I18n, $, EditorToggle, apiUserContent, {publish}) ->
+], (I18n, $, EditorToggle, convertApiUserContent, {publish}) ->
 
   ##
   # Makes an EntryView's model message editable with TinyMCE
@@ -68,7 +68,7 @@ define [
     #
     # @api private
     getContent: ->
-      apiUserContent.convert @view.model.get('message'), forEditing: true
+      convertApiUserContent @view.model.get('message'), forEditing: true
 
     ##
     # Called when the model is successfully saved, provides user feedback

@@ -31,14 +31,16 @@ define [
   module 'DeleteGroupView'
 
   test 'it should delete a group without assignments', ->
-    @stub(window, "confirm", -> true )
+    confirm_stub = sinon.stub(window, "confirm", -> true )
     view = createView(false, true)
-    @stub(view, "destroyModel", -> )
+    destroy_stub = sinon.stub(view, "destroyModel", -> )
     view.render()
     view.open()
 
-    ok window.confirm.called
-    ok view.destroyModel.called
+    ok confirm_stub.called
+    ok destroy_stub.called
+    confirm_stub.restore()
+    destroy_stub.restore()
 
   test 'assignment and ag counts should be correct', ->
     view = createView(true, true)
@@ -64,7 +66,7 @@ define [
     view.close()
 
   test 'it should delete a group with assignments', ->
-    destroy_stub = @stub(DeleteGroupView.prototype, "destroy", -> )
+    destroy_stub = sinon.stub(DeleteGroupView.prototype, "destroy", -> )
     view = createView(true, true)
     view.render()
     view.open()
@@ -72,15 +74,18 @@ define [
     view.$(".delete_group").click()
 
     ok destroy_stub.called
+    destroy_stub.restore()
     view.close()
 
   test 'it should not delete the last assignment group', ->
-    alert_stub = @stub(window, "alert", -> true )
+    alert_stub = sinon.stub(window, "alert", -> true )
     view = createView(true, false)
-    destroy_spy = @spy(view, "destroyModel")
+    destroy_spy = sinon.spy(view, "destroyModel")
     view.render()
     view.open()
 
     ok alert_stub.called
     ok !destroy_spy.called
+    alert_stub.restore()
+    destroy_spy.restore()
     view.close()

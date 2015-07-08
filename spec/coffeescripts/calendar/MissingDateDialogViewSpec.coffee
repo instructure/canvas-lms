@@ -12,7 +12,7 @@ define [
           $('input[name=date]').each ->
             invalidFields.push($(this)) if $(this).val() == ''
           if invalidFields.length > 0 then invalidFields else true
-        success: @spy()
+        success: sinon.spy()
 
     teardown: ->
       $('input[name=date]').remove()
