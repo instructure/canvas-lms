@@ -135,7 +135,7 @@ define [
     #
     # @api private
     onPostReplyError: (entry) =>
-      @view.model.set 'notification', "<div class='alert alert-info'>#{I18n.t 'error_saving_reply', "*An error occured*, please post your reply again later", wrapper: '<strong>$1</strong>'}</div>"
+      @view.model.set 'notification', "<div class='alert alert-info'>#{I18n.t "*An error occurred*, please post your reply again later", wrapper: '<strong>$1</strong>'}</div>"
       @textArea.val entry.get('message')
       @edit()
 
