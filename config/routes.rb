@@ -1572,6 +1572,7 @@ CanvasRails::Application.routes.draw do
       # get  "global/outcomes_import/list/:guid", action: :list
       get  "global/outcomes_import/available",  action: :available
       post "global/outcomes_import",            action: :create
+      get  "global/outcomes_import/migration_status/:migration_id", action: :migration_status
     end
 
     scope(controller: :group_categories) do
