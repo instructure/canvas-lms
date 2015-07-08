@@ -22,8 +22,7 @@ body {
   @if $use_new_styles == false { min-width: $min_main_width; }
   @if $use_high_contrast { background: white; }
   @else {
-    @if $is-k12 { background: white; }
-    @else if $use_new_styles {
+    @if $use_new_styles {
       background: $ic-color-light;
       font-weight: 300;
     }
@@ -33,9 +32,6 @@ body {
     #header, #topbar, #left-side, #breadcrumbs { display: none !important; }
     @if $use_new_styles {
       .ic-app-nav-toggle-and-crumbs { display: none; }
-    }
-    @if $is-k12 {
-      .canvas-header { display: none !important; }
     }
     #footer { display: none; }
     #wrapper {
@@ -120,7 +116,7 @@ body {
   }
 }
 
-@if $use_new_styles == false { 
+@if $use_new_styles == false {
   #wrapper { @include pie-clearfix; }
 }
 
@@ -140,10 +136,10 @@ body {
 
 #content {
   @if $use_new_styles { padding: $ic-sp*2; }
-  @else { 
-    padding: 1em; 
-    overflow: hidden; 
-  } 
+  @else {
+    padding: 1em;
+    overflow: hidden;
+  }
 }
 
 // **********************************************************************************

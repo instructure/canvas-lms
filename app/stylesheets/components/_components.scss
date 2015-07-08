@@ -14,23 +14,11 @@
 $ic-brand-course-nav-link--active: $ic-brand-primary;
 
 .list-view {
-  @if $is-k12 { background-color: white; }
   overflow: auto;
   & > header,
   // oldskool compat
   #section-tabs-header {
-    @if $is-k12 {
-      background-color: white;
-      margin: 0;
-      line-height: 1.1;
-      font-weight: bold;
-      padding: $k12-sp;
-      font-size: 14px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    @else if $use_new_styles {
+    @if $use_new_styles {
       font-size: 14px;
       font-weight: 500;
       margin: 0 0 $ic-sp/2;
@@ -71,28 +59,10 @@ $ic-brand-course-nav-link--active: $ic-brand-primary;
 
     & > li {
       padding: 0;
-      @if $is-k12 { padding: 0 $k12-sp - 4; }
-
       & > a {
         display: block;
         text-decoration: none;
-
-        // K-12 styles
-        @if $is-k12 {
-          color: ensure-contrast($gray, $lightBackground);
-          padding: ($k12-sp - 4) $k12-sp;
-          border-radius: $k12-sp/2;
-
-          @if $use_high_contrast {
-            &:hover, &:focus {
-              background: darken($brand-k12-dark, 30%);
-              color: white;
-            }
-          }
-          @else { &:hover, &:focus { background: #f2f2f2; } }
-        }
-
-        @else if $use_new_styles {
+        @if $use_new_styles {
           color: $ic-color-dark;
           font-weight: 300;
           border-radius: $baseBorderRadius;
@@ -100,7 +70,6 @@ $ic-brand-course-nav-link--active: $ic-brand-primary;
           @include breakpoint(short) { padding: $ic-sp/4 $ic-sp; }
           &:hover, &:focus { background: lighten($ic-color-neutral, 5%); }
         }
-
         // Default UI styles
         @else {
           color: ensure-contrast($gray, $lightBackground);
@@ -139,21 +108,7 @@ $ic-brand-course-nav-link--active: $ic-brand-primary;
   }
 
   a.active {
-
-    @if $is-k12 {
-      background-color: $brand-k12;
-      color: white;
-      @if $use_high_contrast {
-        background-color: darken($brand-k12, 35%);
-        &:hover, &:focus { background-color: darken($brand-k12, 35%); }
-      }
-      @else {
-        background-color: $brand-k12;
-        &:hover, &:focus { background-color: $brand-k12; }
-      }
-    }
-
-    @else if $use_new_styles {
+    @if $use_new_styles {
       background-color: $ic-brand-course-nav-link--active;
       font-weight: 500;
       color: $ic-color-light;
@@ -163,7 +118,6 @@ $ic-brand-course-nav-link--active: $ic-brand-primary;
         color: $ic-brand-primary;
       }
     }
-
     @else {
       /// active state colors and backgrounds on left sidenav
       background: $ic-course-sidenav_list-item--bg-color;
