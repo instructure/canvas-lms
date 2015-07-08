@@ -66,7 +66,7 @@ module HandlebarsTasks
         dependencies = ['compiled/handlebars_helpers']
 
         # if a scss file named exactly like this exists, load it when this is loaded
-        if Dir.glob("app/stylesheets/jst/#{id}.s[ac]ss").first
+        if Dir.glob("app/stylesheets/jst/#{id}.scss").first
           bundle = "jst/#{id}"
           require 'lib/brandable_css'
           fingerprints = MultiJson.dump BrandableCSS.all_fingerprints_for(bundle)
