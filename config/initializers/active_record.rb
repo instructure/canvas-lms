@@ -1418,7 +1418,7 @@ end
 
 module UnscopeCallbacks
   def run_callbacks(kind)
-    scope = self.class.unscoped
+    scope = self.class.base_class.unscoped
     scope.default_scoped = true
     scope.scoping { super }
   end
