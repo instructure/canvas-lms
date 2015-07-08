@@ -3995,7 +3995,7 @@ ar:
       all: "أي شخص"
       only_teachers: "المعلمون فقط"
       teachers_students: "المعلمون والطلاب"
-  course_announcements_76b07340: "إعلانات المساقات"
+  course_announcements_76b07340: "إعلانات المساق"
   course_atom_feed_9d95214e: "موجز Atom للمساق"
   course_copy_argument_error: "نسخة مساق بحاجة إلى مساق مصدر."
   course_copy_description: "مكون الترحيل الإضافي لنسخ مساقات canvas"
@@ -4005,7 +4005,7 @@ ar:
   course_copy_no_course_error: "المساق المصدر غير موجود."
   course_copy_not_allowed_error: "غير مسموح لك بنسخ المساق المصدر."
   course_discussions_38c0b74f: "مناقشات المساق"
-  course_ends_at_e8b166df: "انتهاء المساق في"
+  course_ends_at_e8b166df: "ينتهي المساق في"
   course_exports: 
     errors: 
       assignment: "فشل تصدير \"%{title}\" المهمة"
@@ -4178,7 +4178,7 @@ ar:
       section_enrollments: "تسجيلات القسم"
   course_settings_sub_navigation_b95deae: "التنقل الفرعي عبر إعدادات المساق"
   course_setup_wizard_is_showing_a7c087c1: "يظهر معالج إعداد المساق."
-  course_starts_at_3a01f9da: "بداية المساق في"
+  course_starts_at_3a01f9da: "يبدء المساق في"
   course_statistics: 
     unknown: "غير معروف"
   course_users: 
@@ -6917,7 +6917,7 @@ ar:
       overlap_message: "لا يمكن أن تتداخل فترة تقييم الدرجات مع فترات التقييم الموجودة في المجموعة"
   grading_period_name_31ceb3e3: "اسم فترة تقييم الدرجات"
   grading_periods_81941e66: "فترات التقييم"
-  grading_periods_must_not_overlap_f45336fb: "ل ايجب أن تتداخل فترات تقييم الدرجات"
+  grading_periods_must_not_overlap_f45336fb: "لا يجب أن تتداخل فترات تقييم الدرجات"
   grading_scheme_deleted_7ae5a072: "تم حذف نظام تقييم الدرجات"
   grading_scheme_saved_85535151: "تم حفظ نظام تقييم الدرجات"
   grading_schemes_1c3c3252: "أنظمة التقييم"
@@ -10330,7 +10330,7 @@ ar:
     observee_added: "جارٍ ملاحظة %{user}"
     observing: ملاحظة
   observing_f3c5e759: مراقبة
-  occurrence_s_c12d1aad: "مساق (مساقات)"
+  occurrence_s_c12d1aad: "حدث (أحداث)"
   of_students_5d1af0d2: "# من الطلاب"
   ok_c47544a2: موافق
   okay_got_it_d686d4e8: "حسنًا، فهمت"
@@ -10583,7 +10583,7 @@ ar:
   please_enter_your_label_name_7745272d: "يرجى إدخال %{label_name}:"
   please_enter_your_label_name_and_password_5c56be80: "يرجى إدخال %{label_name} وكلمة المرور:"
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: "يرجى إعلامهم بالصفحة التي كنت تشاهدها والارتباط الذي قمت بالنقر عليه."
-  please_wait_e6355980: "يرجى النتظار..."
+  please_wait_e6355980: "يرجى الانتظار..."
   plugins: 
     academic_benchmark_importer: 
       description: "يقوم هذا بتمكين استيراد معايير القياس الأكاديمي إلى Canvas."
@@ -14774,7 +14774,7 @@ ar:
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "هذه قائمة تضم عناوين URL المفصولة بفاصلة للوثوق بها. تؤدي الثقة بأي عنوان URL في هذه القائمة إلى تخطي رمز CSRF المميز عند تسجيل الدخول إلى Canvas."
   this_login_is_for_provider_6f17462: "تسجيل الدخول هذا خاص بـ %{provider}"
   this_most_likely_happened_because_you_imported_cou_a78ea880: "السبب الأرجح في حدوث ذلك هو أنك قمت باستيراد محتوى المساق دون الملفات المرتبطة به."
-  this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "تم استخدام هذه النتيجة لتقييم أحد الطلاب ولم يعد ممكناً تحديثها"
+  this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "تم استخدام هذه النتيجة لتقييم أحد الطلاب ولم يعد تحديثها ممكن"
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "تم استخدام هذه النتيجة لتقييم أحد الطلاب ولا يمكن تحريرها أو حذفها"
   this_outcome_has_been_used_to_assess_a_student_the_1f04402e: "تم استخدام هذه النتيجة لتقييم أحد الطلاب. تم تأمين طريقة الحساب"
   this_outcome_has_been_used_to_assess_a_student_the_1ff3a596: "تم استخدام هذه النتيجة لتقييم أحد الطلاب. تم تأمين قيمة الحساب"

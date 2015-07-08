@@ -4,9 +4,17 @@ describe 'quizzes question creation' do
 
   include_examples 'quizzes selenium tests'
 
-  before (:each) do
+  before(:each) do
     course_with_teacher_logged_in
     @last_quiz = start_quiz_question
+  end
+
+  context 'when the \'+ New Question\' button is clicked' do
+
+    it 'should open a new question form', priority: "1", test_id: 140627 do
+      # setup is accomplished in before(:each)
+      expect(fj('.question_form:visible')).to be_displayed
+    end
   end
 
   # Multiple Choice Question
@@ -171,36 +179,63 @@ describe 'quizzes question creation' do
     expect(options[1].text).to eq 'color2'
   end
 
-  # Matching Question
-  it 'should be able to create a basic matching question', priority: '1', test_id: 201943 do
-    quiz = @last_quiz
+  context 'when creating a matching question' do
+    # Matching Question
+    it 'should be able to create a basic matching question', priority: "1", test_id: 201943 do
+      quiz = @last_quiz
 
-    question = fj('.question_form:visible')
-    click_option('.question_form:visible .question_type', 'Matching')
+      question = fj('.question_form:visible')
+      click_option('.question_form:visible .question_type', 'Matching')
 
-    type_in_tiny '.question:visible textarea.question_content', 'This is a matching question.'
+      type_in_tiny '.question:visible textarea.question_content', 'This is a matching question.'
 
-    answers = question.find_elements(:css, '.form_answers > .answer')
+      answers = question.find_elements(:css, '.form_answers > .answer')
 
-    answers = answers.each_with_index do |answer, i|
-      answer.find_element(:name, 'answer_match_left').send_keys("#{i} left side")
-      answer.find_element(:name, 'answer_match_right').send_keys("#{i} right side")
+      answers.each_with_index do |answer, i|
+        answer.find_element(:name, 'answer_match_left').send_keys("#{i} left side")
+        answer.find_element(:name, 'answer_match_right').send_keys("#{i} right side")
+      end
+
+      submit_form(question)
+      wait_for_ajax_requests
+
+      f('#show_question_details').click
+      finished_question = f("#question_#{quiz.quiz_questions[0].id}")
+
+      finished_question.find_elements(:css, '.answer_match').each_with_index do |filled_answer, i|
+        expect(filled_answer.find_element(:css, '.answer_match_left')).to include_text("#{i} left side")
+        expect(filled_answer.find_element(:css, '.answer_match_right')).to include_text("#{i} right side")
+      end
     end
-    question.find_element(:name, 'matching_answer_incorrect_matches').send_keys('first_distractor')
 
-    submit_form(question)
-    wait_for_ajax_requests
+    it 'should be able to create a matching question with distractors', priority: "1", test_id: 220014 do
+      quiz = @last_quiz
 
-    f('#show_question_details').click
+      question = fj('.question_form:visible')
+      click_option('.question_form:visible .question_type', 'Matching')
 
-    quiz.reload
-    finished_question = f("#question_#{quiz.quiz_questions[0].id}")
-    expect(finished_question).to be_displayed
+      type_in_tiny '.question:visible textarea.question_content', 'This is a matching question.'
 
-    finished_question.find_elements(:css, '.answer_match').each_with_index do |filled_answer, i|
-      expect(filled_answer.find_element(:css, '.answer_match_left')).to include_text("#{i} left side")
-      expect(filled_answer.find_element(:css, '.answer_match_right')).to include_text("#{i} right side")
+      answers = question.find_elements(:css, '.form_answers > .answer')
+
+      answers.each_with_index do |answer, i|
+        answer.find_element(:name, 'answer_match_left').send_keys("#{i} left side")
+        answer.find_element(:name, 'answer_match_right').send_keys("#{i} right side")
+      end
+
+      # add a distractor
+      distractor_content = 'first_distractor'
+      question.find_element(:name, 'matching_answer_incorrect_matches').send_keys(distractor_content)
+
+      submit_form(question)
+      wait_for_ajax_requests
+
+      f('#show_question_details').click
+      finished_question = f("#question_#{quiz.quiz_questions[0].id}")
+
+      expect(finished_question).to include_text(distractor_content)
     end
+
   end
 
   # Numerical Answer
@@ -304,7 +339,7 @@ describe 'quizzes question creation' do
   end
 
   # Negative Question Points
-  it 'should not allow negative question points', priority: '2', test_id: 201953 do
+  it 'should not allow negative question points', priority: "2", test_id: 201953 do
     quiz = @last_quiz
     question = fj('.question_form:visible')
     click_option('.question_form:visible .question_type', 'essay_question', :value)
@@ -318,7 +353,6 @@ describe 'quizzes question creation' do
   end
 
   context 'quizzes with more than 25 questions', priority: '1', test_id: 140578 do
-
     def quiz_questions_creation
       @q = @course.quizzes.create!(title: 'new quiz')
       26.times do
@@ -330,7 +364,7 @@ describe 'quizzes question creation' do
       @q.reload
     end
 
-    before (:each) do
+    before(:each) do
       course_with_teacher_logged_in
       quiz_questions_creation
     end
@@ -347,8 +381,8 @@ describe 'quizzes question creation' do
     end
   end
 
-  context 'quiz groups', priority: '2' do
-    it 'should add questions from a question bank', priority: '1', test_id: 140671 do
+  context 'when editing a quiz question group', priority: "2" do
+    it 'should add questions from a question bank', priority: "1", test_id: 140671 do
       quiz_with_new_questions
       click_questions_tab
       f('.find_question_link').click

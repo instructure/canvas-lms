@@ -33,7 +33,7 @@ module Api::V1::SisAssignment
   }.freeze
 
   API_SIS_ASSIGNMENT_COURSE_JSON_OPTS = {
-    only: %i(id sis_source_id integration_id).freeze
+    only: %i(id name sis_source_id integration_id).freeze
   }.freeze
 
   def sis_assignments_json(assignments)
