@@ -3,21 +3,18 @@ development:
   change_password_path: /users/edit
   nonexistent_user_path: /users/not_on_lms
   bitly_access_token: 12345689assdfe
-  unrestricted_html_users: [1, 2]
 
 test:
   base_url: https://test.beyondz.org/
   change_password_path: /users/edit
   nonexistent_user_path: /users/not_on_lms
   bitly_access_token: 12345689assdfe
-  unrestricted_html_users: [1, 2]
 
 staging:
   base_url: https://staging.beyondz.org/
   change_password_path: /users/edit
   nonexistent_user_path: /users/not_on_lms
   bitly_access_token: 12345689assdfe
-  unrestricted_html_users: [1, 2]
 
 production:
   google_analytics_account: UA-XXXXXXXX-1
@@ -25,4 +22,3 @@ production:
   change_password_path: /users/edit
   nonexistent_user_path: /users/not_on_lms
   bitly_access_token: 12345689assdfe
-  unrestricted_html_users: [1, 2]

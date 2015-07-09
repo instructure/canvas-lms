@@ -616,7 +616,9 @@ class WikiPagesApiController < ApplicationController
     # needs to be moved to the controller where we know who is
     # editing it.
     if page_params.include?(:body)
-      unless BeyondZConfiguration.unrestricted_html_users.include?(@current_user.id)
+      # unless BeyondZConfiguration.unrestricted_html_users.include?(@current_user.id)
+      # This checks if the current user is a teacher of the course this page is attached to - replaces the old security whitelist.
+      unless @current_user && @context && @context.respond_to?(:grants_any_right?) && can_do(@context, @current_user, :manage)
         page_params[:body] = Sanitize.clean(page_params[:body], CanvasSanitize::SANITIZE)
       end
     end
