@@ -14,6 +14,7 @@ class BrandConfigsController < ApplicationController
   end
 
   def create
+    old_md5 = session[:brand_config_md5]
     session[:brand_config_md5] = begin
       if params[:brand_config] == ''
         false
@@ -23,19 +24,22 @@ class BrandConfigsController < ApplicationController
         create_brand_config(variables).md5
       end
     end
+    BrandConfig.destroy_if_unused(old_md5)
     redirect_to brand_configs_new_path
   end
 
   def save_to_account
-    @domain_root_account.update_attributes!(brand_config_md5: session[:brand_config_md5].presence)
-    BrandConfig.clean_up_unused
-    session.delete(:brand_config_md5)
+    old_md5 = @domain_root_account.brand_config_md5
+    new_md5 = session.delete(:brand_config_md5).presence
+    @domain_root_account.brand_config = new_md5 && BrandConfig.find(new_md5)
+    @domain_root_account.save!
+    BrandConfig.destroy_if_unused(old_md5)
     redirect_to :back, notice: t('Success! All users on this domain will now see this branding.')
   end
 
   def destroy
     session.delete(:brand_config_md5)
-    BrandConfig.clean_up_unused
+    BrandConfig.destroy_if_unused(session.delete(:brand_config_md5))
     flash[:notice] = t('Theme editor changes have been cancelled.')
     render json: {success: true}
   end

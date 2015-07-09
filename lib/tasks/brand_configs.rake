@@ -3,15 +3,15 @@ namespace :brand_configs do
        "Set BRAND_CONFIG_MD5=<whatever> to save just that one, otherwise writes a file for each BrandConfig in db."
   task :write => :environment do
     if md5 = ENV['BRAND_CONFIG_MD5']
-      BrandConfig.find(md5).save_file!
+      BrandConfig.find(md5).save_scss_file!
     else
       Rake::Task['brand_configs:clean'].invoke
-      BrandConfig.find_each(&:save_file!)
+      BrandConfig.find_each(&:save_scss_file!)
     end
   end
 
   desc "Remove all Brand Variable scss files"
   task :clean do
-    rm_rf BrandConfig::CONFIG['paths']['branded_scss_folder']
+    rm_rf BrandableCSS.branded_scss_folder
   end
 end

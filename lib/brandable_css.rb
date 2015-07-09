@@ -28,6 +28,10 @@ module BrandableCSS
       default
     end
 
+    def branded_scss_folder
+      Pathname.new(CONFIG['paths']['branded_scss_folder'])
+    end
+
     def variants
       @variants ||= CONFIG['variants'].map{|(k)| k }.freeze
     end

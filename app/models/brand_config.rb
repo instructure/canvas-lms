@@ -35,18 +35,28 @@ class BrandConfig < ActiveRecord::Base
     end.compact.join("\n")
   end
 
-  def filename
-    File.join(CONFIG['paths']['branded_scss_folder'], md5, '_brand_variables.scss')
+  def scss_file
+    scss_dir.join('_brand_variables.scss')
+  end
+
+  def scss_dir
+    BrandableCSS.branded_scss_folder.join(md5)
   end
 
   def public_folder
     "dist/brandable_css/#{md5}"
   end
 
-  def save_file!
-    logger.info "saving BrandConfig: #{filename}"
-    FileUtils.mkdir_p(File.dirname(filename))
-    File.write(filename, to_scss)
+  def save_scss_file!
+    logger.info "saving brand variables file: #{scss_file}"
+    scss_dir.mkpath
+    scss_file.write(to_scss)
+  end
+
+  def remove_scss_file!
+    return unless scss_dir.exist?
+    logger.info "removing: #{scss_dir}"
+    scss_dir.rmtree
   end
 
   def compile_css!
@@ -58,16 +68,22 @@ class BrandConfig < ActiveRecord::Base
   end
 
   def save_and_sync_to_s3!
-    save_file!
+    save_scss_file!
     compile_css!
     sync_to_s3!
   end
 
-  def self.clean_up_unused
-    BrandConfig.
+  def self.destroy_if_unused(md5)
+    return unless md5
+    unused_brand_config = BrandConfig.
+      where(md5: md5).
       where('NOT EXISTS (SELECT 1 FROM accounts WHERE brand_config_md5=brand_configs.md5)').
       where('NOT share').
-      destroy_all
+      first
+    if unused_brand_config
+      unused_brand_config.destroy
+      unused_brand_config.remove_scss_file!
+    end
   end
 
 end
