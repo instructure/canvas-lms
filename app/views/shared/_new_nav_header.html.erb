@@ -14,7 +14,10 @@
           >
             <li class="ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/') && request.fullpath.length == 1 %>">
               <a id="global_nav_dashboard_link" href="<%= dashboard_url %>" class="ic-app-header__menu-list-link">
-                <div class="menu-item-icon-container"><%= render(:partial => 'shared/svg/svg_icon_dashboard.svg') %></div>
+                <div class="menu-item-icon-container">
+                    <%= svg_icon :dashboard %>
+                </div>
+
                 <div class="menu-item__text"><%= t('Dashboard') %></div>
               </a>
             </li>
@@ -22,7 +25,7 @@
               <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('courses') %>">
                 <a id="global_nav_courses_link" href="<%= courses_path %>" class="ic-app-header__menu-list-link">
                   <div class="menu-item-icon-container">
-                    <%= render(:partial => "shared/svg/svg_icon_courses_new_styles.svg") %>
+                    <%= svg_icon :courses_new_styles %>
                   </div>
                   <div class="menu-item__text">
                     <%= t('Courses') %>
@@ -34,7 +37,7 @@
               <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('groups') %>">
                 <a id="global_nav_groups_link" href="/groups" class="ic-app-header__menu-list-link">
                   <div class="menu-item-icon-container">
-                    <%= render(:partial => "shared/svg/svg_icon_courses_new_styles.svg") %>
+                    <%= svg_icon :courses_new_styles %>
                   </div>
                   <div class="menu-item__text">
                     <%= t('Groups') %>
@@ -57,7 +60,7 @@
             <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('calendar') %>">
               <a id="global_nav_calendar_link" href="/calendar" class="ic-app-header__menu-list-link">
                 <div class="menu-item-icon-container">
-                  <%= render(:partial => "shared/svg/svg_icon_calendar_new_styles.svg") %>
+                  <%= svg_icon :calendar_new_styles %>
                 </div>
                 <div class="menu-item__text">
                   <%= t('Calendar') %>
@@ -67,7 +70,7 @@
             <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('conversations') %>">
               <a id="global_nav_conversations_link" href="/conversations" class="ic-app-header__menu-list-link">
                 <div class="menu-item-icon-container">
-                  <%= render(:partial => "shared/svg/svg_icon_inbox.svg") %>
+                  <%= svg_icon :inbox %>
                   <span class="menu-item__badge" style="display: none">0</span>
                 </div>
                 <div class="menu-item__text">

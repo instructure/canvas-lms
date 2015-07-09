@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="36px" height="34px" class="ic-icon-svg ic-icon-svg--dashboard" viewBox="0 0 36 34" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.3.2 (12043) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-calendar</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="_svg_icon_calendar" sketch:type="MSLayerGroup" fill="#000000">
+            <g id="Page-2" sketch:type="MSShapeGroup">
+                <g id="1--Courses-Art-History-Modules">
+                    <path d="M24,3 L13,3 L13,4.501424 C13,6.434866 11.4375454,8 9.5,8 C7.5665985,8 6,6.439149 6,4.501424 L6,3 L1.9997073,3 C0.8952994,3 0,3.898261 0,4.997913 L0,9 L36,9 L36,4.997913 C36,3.894496 35.1101074,3 34.0002927,3 L31,3 L31,4.501424 C31,6.434866 29.4375454,8 27.5,8 C25.5665985,8 24,6.439149 24,4.501424 L24,3 L24,3 Z M0,11 L36,11 L36,31.999136 C36,33.104183 35.1101074,34 34.0002927,34 L1.9997073,34 C0.8952994,34 0,33.098373 0,31.999136 L0,11 L0,11 Z M4,14 L8,14 L8,18 L4,18 L4,14 L4,14 Z M10,26 L14,26 L14,30 L10,30 L10,26 L10,26 Z M4,20 L8,20 L8,24 L4,24 L4,20 L4,20 Z M10,14 L14,14 L14,18 L10,18 L10,14 L10,14 Z M16,26 L20,26 L20,30 L16,30 L16,26 L16,26 Z M10,20 L14,20 L14,24 L10,24 L10,20 L10,20 Z M16,14 L20,14 L20,18 L16,18 L16,14 L16,14 Z M22,26 L26,26 L26,30 L22,30 L22,26 L22,26 Z M16,20 L20,20 L20,24 L16,24 L16,20 L16,20 Z M22,14 L26,14 L26,18 L22,18 L22,14 L22,14 Z M28,26 L32,26 L32,30 L28,30 L28,26 L28,26 Z M22,20 L26,20 L26,24 L22,24 L22,20 L22,20 Z M28,20 L32,20 L32,24 L28,24 L28,20 L28,20 Z M8,1.498576 L8,4.501424 C8,5.33497 8.6715729,6 9.5,6 C10.3342028,6 11,5.329065 11,4.501424 L11,1.498576 C11,0.66503 10.3284271,0 9.5,0 C8.6657972,0 8,0.670935 8,1.498576 L8,1.498576 Z M26,1.498576 L26,4.501424 C26,5.33497 26.6715729,6 27.5,6 C28.3342028,6 29,5.329065 29,4.501424 L29,1.498576 C29,0.66503 28.3284271,0 27.5,0 C26.6657972,0 26,0.670935 26,1.498576 L26,1.498576 Z" id="icon-calendar"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
