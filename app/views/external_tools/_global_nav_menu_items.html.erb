@@ -10,7 +10,7 @@
           <% if tool.name == 'Commons' %>
             <%= render(:partial => 'shared/svg/svg_commons_logo.svg') %>
           <% elsif tool.icon_url %>
-            <img src="<%= tool.icon_url %>" />
+            <img alt="" src="<%= tool.icon_url %>" />
           <% else %>
             <%= render(:partial => 'shared/svg/svg_default_lti_new_styles.svg') %>
           <% end %>

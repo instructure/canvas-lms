@@ -144,7 +144,7 @@
                   <% (@discussion_topic_menu_tools || []).each do |tool_hash| %>
                     <li>
                       <a class="menu_tool_link" href="<%= tool_hash[:base_url] %>&discussion_topics[]=<%= @topic.id %>" tabindex="-1" role="menuitem">
-                        <% if tool_hash[:icon_url] %><img class="icon" src="<%= tool_hash[:icon_url] %>" /><% end %>
+                        <% if tool_hash[:icon_url] %><img class="icon" alt="" src="<%= tool_hash[:icon_url] %>" /><% end %>
                         <%= tool_hash[:title] %>
                       </a>
                     </li>
