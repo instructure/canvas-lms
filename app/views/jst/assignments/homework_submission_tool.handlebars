@@ -1,12 +1,12 @@
 <li class='tool'>
   <a href='#'>
     {{#if homework_submission.icon_url}}
-      <img style="max-width: 25px; max-height: 25px;" src='{{homework_submission.icon_url}}'/>
+      <img style="max-width: 25px; max-height: 25px;" alt="" src='{{homework_submission.icon_url}}'/>
     {{else}}
       {{#if icon_url}}
-        <img style="max-width: 25px; max-height: 25px;" src='{{icon_url}}'/>
+        <img style="max-width: 25px; max-height: 25px;" alt="" src='{{icon_url}}'/>
       {{else}}
-        <img src='/images/link.png'/>
+        <img alt="" src='/images/link.png'/>
       {{/if}}
     {{/if}}
 

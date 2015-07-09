@@ -224,7 +224,7 @@
             <% (@quiz_menu_tools || []).each do |tool_hash| %>
               <li role="presentation">
                 <a class="menu_tool_link" href="<%= tool_hash[:base_url] %>&quizzes[]=<%= @quiz.id %>" tabindex="-1" role="menuitem">
-                  <% if tool_hash[:icon_url] %><img class="icon" src="<%= tool_hash[:icon_url] %>" /><% end %>
+                  <% if tool_hash[:icon_url] %><img class="icon" alt="" src="<%= tool_hash[:icon_url] %>" /><% end %>
                   <%= tool_hash[:title] %>
                 </a>
               </li>
