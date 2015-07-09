@@ -4999,10 +4999,6 @@ en-GB:
     cancel: Cancel
     save_settings: "Save settings"
     saving: Saving...
-  differentiated_assignments_description: |-
-      Differentiated Assignments is a *beta* feature that enables choosing which section(s) an assignment applies to.
-      Sections that are not given an assignment will not see it in their course content and their final grade will be
-      calculated without those points.
   diigo_993c4646: Diigo
   disable_a5c05db3: Disable
   disabled_18c33a73: (disabled)

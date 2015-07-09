@@ -89,25 +89,27 @@
         </div>
       </div>
 
-      <div class="nested">
-        <div class="subtitle">
-          <strong>
-            {{#t 'anonymous_peer_reviews'}}Anonymity{{/t}}
-          </strong>
-        </div>
+      {{#unless hideAnonymousPeerReview}}
+        <div class="nested">
+          <div class="subtitle">
+            <strong>
+              {{#t 'anonymous_peer_reviews'}}Anonymity{{/t}}
+            </strong>
+          </div>
 
-        <label class="checkbox" for="anonymous_peer_reviews">
-          {{checkbox "anonymous_peer_reviews"
-          checked=anonymousPeerReviews
-          id="anonymous_peer_reviews"
-          aria-controls="anonymous_peer_reviews"
-          prefix=prefix
-          disabled=peerReviewsFrozen}}
-          {{#t "labels.anonymous_peer_reviews"}}
-            Peer Reviews Appear Anonymously
-          {{/t}}
-        </label>
-      </div>
+          <label class="checkbox" for="anonymous_peer_reviews">
+            {{checkbox "anonymous_peer_reviews"
+            checked=anonymousPeerReviews
+            id="anonymous_peer_reviews"
+            aria-controls="anonymous_peer_reviews"
+            prefix=prefix
+            disabled=peerReviewsFrozen}}
+            {{#t "labels.anonymous_peer_reviews"}}
+              Peer Reviews Appear Anonymously
+            {{/t}}
+          </label>
+        </div>
+      {{/unless}}
     </div>
   </div>
 </div>

@@ -4921,9 +4921,6 @@ tr:
     cancel: İptal
     save_settings: "Ayarları Kaydet"
     saving: Kaydediliyor...
-  differentiated_assignments_description: |-
-      Farklılaşmış Ödevler ödevin hangi bölüm(ler) için geçerli olacağını seçmeyi sağlayan *beta* bir özelliktir.
-      Ödev içermeyen bölümlerde ders içeriğinde bu görünmez ve finla notları bu notlar olmadan hesaplanır.
   diigo_993c4646: Diigo
   disable_a5c05db3: "Devre Dışı"
   disabled_18c33a73: "(devre dışı)"

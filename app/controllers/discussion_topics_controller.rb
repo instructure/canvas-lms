@@ -1030,7 +1030,9 @@ class DiscussionTopicsController < ApplicationController
         params[:assignment][:group_category_id] = nil unless @topic.group_category_id || @assignment.has_submitted_submissions?
         params[:assignment][:published] = @topic.published?
         params[:assignment][:name] = @topic.title
-        update_api_assignment(@assignment, params[:assignment], @current_user)
+
+        assignment_params = params[:assignment].except('anonymous_peer_reviews')
+        update_api_assignment(@assignment, assignment_params, @current_user)
         @assignment.submission_types = 'discussion_topic'
         @assignment.saved_by = :discussion_topic
         @topic.assignment = @assignment

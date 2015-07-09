@@ -4994,10 +4994,6 @@ sv:
     cancel: Avbryt
     save_settings: "Spara inställningar"
     saving: Sparar...
-  differentiated_assignments_description: |-
-      Olika uppgifter är en *beta* funktion som tillåter ett val av vilken sektion(er) en uppgift gäller för.
-      Sektioner som inte har getts en uppgift kommer inte se det i sitt kursinnehåll och deras slutbetyg kommer
-      beräknad utan de poängen.
   diigo_993c4646: Diigo
   disable_a5c05db3: Avaktivera
   disabled_18c33a73: (avaktivera)

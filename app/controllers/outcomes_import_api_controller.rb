@@ -18,6 +18,7 @@
 
 class OutcomesImportApiController < ApplicationController
   include Api::V1::Outcome
+  include Api::V1::ContentMigration
 
   before_filter :require_user, :can_manage_global_outcomes, :has_api_config
 
@@ -45,6 +46,17 @@ class OutcomesImportApiController < ApplicationController
       end
     rescue StandardError => e
       render json: { error: "#{err_msg}: #{e.message}" }
+    end
+  end
+
+  def migration_status
+    return render json: { error: "must specify a migration id" } unless params[:migration_id]
+
+    begin
+      cm = ContentMigration.find(params[:migration_id])
+      render json: content_migration_json(cm, @current_user, session)
+    rescue ActiveRecord::RecordNotFound => e
+      render json: { error: "no content migration matching id #{params[:migration_id]}" }
     end
   end
 

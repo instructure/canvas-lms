@@ -87,7 +87,7 @@ cache(safe_cache_key([@current_user, contexts, 'a_need_grading']), cache_opts) d
             data-track-category="dashboard"
             data-track-label="todo needs reviewing"
             data-tooltip
-            title="User: <%= assessment_request.user.name %>"
+            title="<%= submission_author_name_for(assessment_request, "#{t('user')}: ") %>"
           >
             <b>Peer Review for <%= assignment.title %></b>
             <em>

@@ -4973,9 +4973,6 @@ de:
     cancel: Abbrechen
     save_settings: "Einstellungen speichern"
     saving: "Speichervorgang läuft..."
-  differentiated_assignments_description: |-
-      Differenzierte Aufgaben ist eine *Beta*-Funktion, mit der ausgewählt werden kann, für welche(n) Kursabschnitt(e) eine Aufgabe gilt.
-      Bei Kursabschnitten, die keine Aufgaben umfassen, werden die differenzierten Aufgaben nicht im Kursinhalt angezeigt, und die Gesamtnote wird ohne die entsprechenden Punkte berechnet.
   diigo_993c4646: Diigo
   disable_a5c05db3: Deaktivieren
   disabled_18c33a73: (deaktiviert)

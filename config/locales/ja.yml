@@ -4998,10 +4998,6 @@ ja:
     cancel: キャンセル
     save_settings: 設定の保存
     saving: 保存しています...
-  differentiated_assignments_description: |-
-      分化課題とは、課題の適用先セクションを選択できる *ベータ* 機能です。
-      課題が割り当てられていないセクションでは、コースの内容に課題が表示されず、
-      最終的な成績は課題の点数なしで計算されます。
   diigo_993c4646: Diigo
   disable_a5c05db3: 無効
   disabled_18c33a73: (無効)

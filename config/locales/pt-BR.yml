@@ -4998,10 +4998,6 @@ pt-BR:
     cancel: Cancelar
     save_settings: "Salvar configurações"
     saving: Salvando...
-  differentiated_assignments_description: |-
-      Tarefas diferenciadas é um recurso *beta* que permite escolher à qual ou quais seções uma tarefa se aplica.
-      Seções que não recebem uma tarefa não a verão em seu conteúdo de curso e sua nota final será
-      calculada sem esses pontos.
   diigo_993c4646: Diigo
   disable_a5c05db3: Desativar
   disabled_18c33a73: (desativado)
