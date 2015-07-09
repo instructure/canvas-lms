@@ -4988,10 +4988,6 @@ fr:
     cancel: Annuler
     save_settings: "Enregistrer les paramètres"
     saving: Enregistrement...
-  differentiated_assignments_description: |-
-      Les travaux différenciés sont une fonction *bêta* qui permet de choisir à quelle(s) section(s) un travail s’applique.
-      Les sections auxquelles aucun travail n’est attribué n’en afficheront pas dans le contenu du cours et la note finale sera calculée
-      sans ces points
   diigo_993c4646: Diigo
   disable_a5c05db3: Désactiver
   disabled_18c33a73: (désactivé)
