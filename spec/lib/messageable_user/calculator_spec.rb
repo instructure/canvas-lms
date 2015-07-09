@@ -34,7 +34,7 @@ describe "MessageableUser::Calculator" do
         expect(@calculator.uncached_visible_section_ids).to eq({})
       end
 
-      it "should include sections from section visibile courses" do
+      it "should include sections from section visible courses" do
         Enrollment.limit_privileges_to_course_section!(@course, @viewing_user, true)
         expect(@calculator.uncached_visible_section_ids.keys).to include(@course.id)
       end
@@ -82,7 +82,7 @@ describe "MessageableUser::Calculator" do
         expect(@calculator.uncached_observed_student_ids).to eq({})
       end
 
-      it "should not include observed students from section visibile courses" do
+      it "should not include observed students from section visible courses" do
         Enrollment.limit_privileges_to_course_section!(@course, @viewing_user, true)
         expect(@calculator.uncached_observed_student_ids).to eq({})
       end

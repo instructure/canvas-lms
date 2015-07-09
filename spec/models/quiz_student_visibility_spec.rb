@@ -91,14 +91,14 @@ describe "differentiated_assignments" do
   end
 
   def ensure_user_does_not_see_quiz
-    visibile_quiz_ids = Quizzes::QuizStudentVisibility.where(user_id: @user.id, course_id: @course.id).pluck(:quiz_id)
-    expect(visibile_quiz_ids.map(&:to_i).include?(@quiz.id)).to be_falsey
+    visible_quiz_ids = Quizzes::QuizStudentVisibility.where(user_id: @user.id, course_id: @course.id).pluck(:quiz_id)
+    expect(visible_quiz_ids.map(&:to_i).include?(@quiz.id)).to be_falsey
     expect(Quizzes::QuizStudentVisibility.visible_quiz_ids_in_course_by_user(user_id: [@user.id], course_id: [@course.id])[@user.id]).not_to include(@quiz.id)
   end
 
   def ensure_user_sees_quiz
-    visibile_quiz_ids = Quizzes::QuizStudentVisibility.where(user_id: @user.id, course_id: @course.id).pluck(:quiz_id)
-    expect(visibile_quiz_ids.map(&:to_i).include?(@quiz.id)).to be_truthy
+    visible_quiz_ids = Quizzes::QuizStudentVisibility.where(user_id: @user.id, course_id: @course.id).pluck(:quiz_id)
+    expect(visible_quiz_ids.map(&:to_i).include?(@quiz.id)).to be_truthy
     expect(Quizzes::QuizStudentVisibility.visible_quiz_ids_in_course_by_user(user_id: [@user.id], course_id: [@course.id])[@user.id]).to include(@quiz.id)
   end
 
@@ -141,7 +141,7 @@ describe "differentiated_assignments" do
       course_with_differentiated_assignments_enabled
       add_multiple_sections
     end
-    context "quiz only visibile to overrides" do
+    context "quiz only visible to overrides" do
       before do
         quiz_with_true_only_visible_to_overrides
         give_section_foo_due_date(@quiz)

@@ -1683,7 +1683,7 @@ describe User do
     end
   end
 
-  describe "assignments_visibile_in_course" do
+  describe "assignments_visible_in_course" do
     before do
       @teacher_enrollment = course_with_teacher(:active_course => true)
       @course_section = @course.course_sections.create
@@ -1704,9 +1704,9 @@ describe User do
       context "differentiated_assignments on" do
         before {@course.enable_feature!(:differentiated_assignments)}
         it "should return assignments only when a student has overrides" do
-          expect(@student1.assignments_visibile_in_course(@course).include?(@assignment)).to be_truthy
-          expect(@student2.assignments_visibile_in_course(@course).include?(@assignment)).to be_falsey
-          expect(@student1.assignments_visibile_in_course(@course).include?(@unpublished_assignment)).to be_falsey
+          expect(@student1.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
+          expect(@student2.assignments_visible_in_course(@course).include?(@assignment)).to be_falsey
+          expect(@student1.assignments_visible_in_course(@course).include?(@unpublished_assignment)).to be_falsey
         end
       end
 
@@ -1715,15 +1715,15 @@ describe User do
           @course.disable_feature!(:differentiated_assignments)
         }
         it "should return all assignments" do
-          expect(@student1.assignments_visibile_in_course(@course).include?(@assignment)).to be_truthy
+          expect(@student1.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
         end
       end
     end
 
     context "as teacher" do
       it "should return all assignments" do
-        expect(@teacher_enrollment.user.assignments_visibile_in_course(@course).include?(@assignment)).to be_truthy
-        expect(@teacher_enrollment.user.assignments_visibile_in_course(@course).include?(@unpublished_assignment)).to be_truthy
+        expect(@teacher_enrollment.user.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
+        expect(@teacher_enrollment.user.assignments_visible_in_course(@course).include?(@unpublished_assignment)).to be_truthy
       end
     end
 
@@ -1737,18 +1737,18 @@ describe User do
         context "observer watching student with visibility" do
           before{ @observer_enrollment.update_attribute(:associated_user_id, @student1.id) }
           it "should be true" do
-            expect(@observer.assignments_visibile_in_course(@course).include?(@assignment)).to be_truthy
+            expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
           end
         end
         context "observer watching student without visibility" do
           before{ @observer_enrollment.update_attribute(:associated_user_id, @student2.id) }
           it "should be false" do
-            expect(@observer.assignments_visibile_in_course(@course).include?(@assignment)).to be_falsey
+            expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_falsey
           end
         end
         context "observer watching a only section" do
           it "should be true" do
-            expect(@observer.assignments_visibile_in_course(@course).include?(@assignment)).to be_truthy
+            expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
           end
         end
       end
@@ -1757,18 +1757,18 @@ describe User do
         context "observer watching student with visibility" do
           before{ @observer_enrollment.update_attribute(:associated_user_id, @student1.id) }
           it "should be true" do
-            expect(@observer.assignments_visibile_in_course(@course).include?(@assignment)).to be_truthy
+            expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
           end
         end
         context "observer watching student without visibility" do
           before{ @observer_enrollment.update_attribute(:associated_user_id, @student2.id) }
           it "should be true" do
-            expect(@observer.assignments_visibile_in_course(@course).include?(@assignment)).to be_truthy
+            expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
           end
         end
         context "observer watching a only section" do
           it "should be true" do
-            expect(@observer.assignments_visibile_in_course(@course).include?(@assignment)).to be_truthy
+            expect(@observer.assignments_visible_in_course(@course).include?(@assignment)).to be_truthy
           end
         end
       end

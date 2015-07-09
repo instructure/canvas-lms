@@ -1404,7 +1404,7 @@ class User < ActiveRecord::Base
     self.touch
   end
 
-  def assignments_visibile_in_course(course)
+  def assignments_visible_in_course(course)
     return course.active_assignments if course.grants_any_right?(self, :read_as_admin, :manage_grades, :manage_assignments)
     published_visible_assignments = course.active_assignments.published
     if course.feature_enabled?(:differentiated_assignments)

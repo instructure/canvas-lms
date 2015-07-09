@@ -5392,7 +5392,7 @@ function DayEventRenderer() {
 		html += "</" + (url ? "a" : "div") + ">";
 
 		// TODO:
-		// When these elements are initially rendered, they will be briefly visibile on the screen,
+		// When these elements are initially rendered, they will be briefly visible on the screen,
 		// even though their widths/heights are not set.
 		// SOLUTION: initially set them as visibility:hidden ?
 

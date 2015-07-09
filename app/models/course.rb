@@ -273,7 +273,7 @@ class Course < ActiveRecord::Base
         includes(:child_events).
         reject(&:hidden?) +
       AppointmentGroup.manageable_by(user, [asset_string]) +
-        user.assignments_visibile_in_course(self)
+        user.assignments_visible_in_course(self)
     else
       calendar_events.active.includes(:child_events).reject(&:hidden?) +
         assignments.active
