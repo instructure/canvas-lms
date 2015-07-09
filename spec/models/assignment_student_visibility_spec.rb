@@ -54,6 +54,7 @@ describe "differentiated_assignments" do
     ao.workflow_state = "active"
     ao.set_type = "ADHOC"
     ao.save!
+    assignment.reload
     override_student = ao.assignment_override_students.build
     override_student.user = @user
     override_student.save!
@@ -84,6 +85,7 @@ describe "differentiated_assignments" do
     ao.workflow_state = "active"
     block.call(ao)
     ao.save!
+    assignment.reload
   end
 
   def give_section_due_date(assignment, section)

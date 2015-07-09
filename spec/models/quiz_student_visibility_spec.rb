@@ -54,6 +54,7 @@ describe "differentiated_assignments" do
     override_student = ao.assignment_override_students.build
     override_student.user = @user
     override_student.save!
+    quiz.reload
     @user
   end
 
@@ -81,6 +82,7 @@ describe "differentiated_assignments" do
     ao.workflow_state = "active"
     block.call(ao)
     ao.save!
+    quiz.reload
   end
 
   def give_section_foo_due_date(quiz)
