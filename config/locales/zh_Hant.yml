@@ -4973,9 +4973,6 @@ zh_Hant:
     cancel: 取消
     save_settings: 儲存設定
     saving: 正在儲存...
-  differentiated_assignments_description: |-
-      差異化任務是*測試版*功能，能夠選擇適用任務的章節。
-      未提供任務的章節將不會在他們的課程內容中看到它，並且他們的最終成績將被計算，而不包括這些點。
   diigo_993c4646: Diigo
   disable_a5c05db3: 停用
   disabled_18c33a73: (已停用)
