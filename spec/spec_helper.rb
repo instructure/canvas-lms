@@ -412,6 +412,25 @@ RSpec.configure do |config|
     $spec_api_tokens = {}
   end
 
+  # this runs on post-merge builds to capture dependencies of each spec;
+  # we then use that data to run just the bare minimum subset of selenium
+  # specs on the patchset builds
+  if ENV["SELINIMUM_CAPTURE"]
+    require "selinimum"
+
+    config.before :suite do
+      Selinimum::Capture.install!
+    end
+
+    config.before do |example|
+      Selinimum::Capture.current_example = example
+    end
+
+    config.after :suite do
+      Selinimum::Capture.report!(ENV["SELINIMUM_BATCH_NAME"])
+    end
+  end
+
   # flush redis before the first spec, and before each spec that comes after
   # one that used redis
   class << Canvas

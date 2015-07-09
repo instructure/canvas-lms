@@ -28,6 +28,7 @@ group :test do
   gem 'selenium-webdriver', '2.46.2'
     gem 'childprocess', '0.5.0', require: false
     gem 'websocket', '1.0.7', require: false
+  gem 'selinimum', '0.0.1', require: false, path: 'gems/selinimum'
   gem 'test_after_commit', '0.4.0'
   gem 'test-unit', '~> 3.0', require: false, platform: :ruby_22
   gem 'webmock', '1.16.1', require: false
