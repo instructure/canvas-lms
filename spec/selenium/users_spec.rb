@@ -292,19 +292,18 @@ describe "users" do
   end
 
   context "masquerading" do
-    it "should masquerade as a user" do
-      skip('testbot fragile')
-      site_admin_logged_in(:name => "The Admin")
-      user_with_pseudonym(:active_user => true, :name => "The Student")
+    it "should masquerade as a user", priority: "1", test_id: 134743 do
+      site_admin_logged_in(:name => 'The Admin')
+      user_with_pseudonym(:active_user => true, :name => 'The Student')
       get "/users/#{@user.id}/masquerade"
       f('.masquerade_button').click
       wait_for_ajaximations
-      expect(f("#identity .user_name")).to include_text "The Student"
-      bar = f("#masquerade_bar")
-      expect(bar).to include_text "You are currently masquerading"
-      bar.find_element(:css, ".stop_masquerading").click
+      expect(f('#identity .user_name')).to include_text 'The Student'
+      bar = f('#masquerade_bar')
+      expect(bar).to include_text 'You are currently masquerading'
+      bar.find_element(:css, '.stop_masquerading').click
       wait_for_ajaximations
-      expect(f("#identity .user_name")).to include_text "The Admin"
+      expect(f('#identity .user_name')).to include_text 'The Admin'
     end
   end
 end
