@@ -4977,9 +4977,6 @@ nl:
     cancel: Annuleren
     save_settings: "Instellingen opslaan"
     saving: "Bezig met opslaan..."
-  differentiated_assignments_description: "Gedifferentieerde opdracthen is een *beta* functie die het mogelijk maakt om de sectie(s) te kiezen waar het opdracht van toepassing is.\n\
-      Secties zonder een opdracht zullen niet in hun cursussen getoond worden en hun eindcijfers zullen\n\
-      zonder die punten worden berekend. "
   diigo_993c4646: Diigo
   disable_a5c05db3: Uitschakelen
   disabled_18c33a73: (uitgeschakeld)
