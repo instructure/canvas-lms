@@ -241,6 +241,33 @@ describe "new groups" do
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text("1 / 2 students")
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full").css_value 'display').to eq 'none'
     end
+
+    it 'moves leader', priority: "1", test_id: 94163 do
+      group_test_setup(4,1,2)
+      add_user_to_group(@students[0],@testgroup.first,true)
+      2.times do |n|
+        add_user_to_group(@students[n+1], @testgroup.first,false)
+      end
+      get "/courses/#{@course.id}/groups"
+
+      f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
+
+      expect(f(".icon-user.group-leader")).to be_displayed
+
+      f(".group-user-actions[data-user-id=\"#{@students[0].id}\"]").click
+
+      f(".ui-menu-item .edit-group-assignment").click
+
+      f(".single-select option").click
+
+      f(".set-group").click
+      wait_for_ajaximations
+
+      f(".group[data-id=\"#{@testgroup[1].id}\"] .toggle-group").click
+
+      expect(f(".icon-user.group-leader")).to be_nil
+      expect(f(".group[data-id=\"#{@testgroup[1].id}\"] .group-user")).to include_text("Test Student 1")
+    end
   end
 end
 
