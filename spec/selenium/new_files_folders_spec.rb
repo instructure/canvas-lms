@@ -17,11 +17,11 @@ describe "better_file_browsing, folders" do
       expect(f("form.ef-edit-name-form")).to be_displayed
     end
 
-    it "should create a new folder", priority: "1", test_id: 126905 do
+    it "should create a new folder", priority: "1", test_id: 133121 do
       expect(fln("new test folder")).to be_present
     end
 
-    it "should edit folder name", priority: "1", test_id: 129444 do
+    it "should edit folder name", priority: "1", test_id: 133127 do
       folder_rename_to = "test folder"
       edit_name_from_cog_icon(folder_rename_to)
       wait_for_ajaximations
@@ -29,12 +29,12 @@ describe "better_file_browsing, folders" do
       expect(fln("test folder")).to be_present
     end
 
-    it "should delete a folder from cog icon", priority: "1", test_id: 129445 do
+    it "should delete a folder from cog icon", priority: "1", test_id: 133128 do
       delete(0, :cog_icon)
       expect(fln("new test folder")).not_to be_present
     end
 
-    it "should unpublish and publish a folder from cloud icon", priority: "1", test_id: 193161 do
+    it "should unpublish and publish a folder from cloud icon", priority: "1", test_id: 220354 do
       set_item_permissions(:unpublish, :cloud_icon)
       expect(f('.btn-link.published-status.unpublished')).to be_displayed
       expect(driver.find_element(:class => 'unpublished')).to be_displayed
@@ -43,7 +43,7 @@ describe "better_file_browsing, folders" do
       expect(driver.find_element(:class => 'published')).to be_displayed
     end
 
-    it "should make folder available to student with link", priority: "1", test_id: 129452 do
+    it "should make folder available to student with link", priority: "1", test_id: 193158 do
       set_item_permissions(:restricted_access, :available_with_link, :cloud_icon)
       expect(f('.btn-link.published-status.hiddenState')).to be_displayed
       expect(driver.find_element(:class => 'hiddenState')).to be_displayed
@@ -55,7 +55,7 @@ describe "better_file_browsing, folders" do
       expect(driver.find_element(:class => 'restricted')).to be_displayed
     end
 
-    it "should delete folder from toolbar", priority: "1", test_id: 129451 do
+    it "should delete folder from toolbar", priority: "1", test_id: 133105 do
       delete(0, :toolbar_menu)
       expect(get_all_files_folders.count).to eq 0
     end
@@ -83,7 +83,7 @@ describe "better_file_browsing, folders" do
        get "/courses/#{@course.id}/files"
      end
 
-     it "should create a new folder", priority: '2', test_id: 126905 do
+     it "should create a new folder", priority: '2', test_id: 133121 do
        new_folder = create_new_folder
        expect(get_all_files_folders.count).to eq 1
        expect(new_folder.text).to match /New Folder/

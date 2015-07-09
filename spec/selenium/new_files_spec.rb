@@ -10,13 +10,13 @@ describe "better_file_browsing" do
                @course, "example.pdf")
       get "/courses/#{@course.id}/files"
     end
-    it "should display new files UI", priority: "1", test_id: 126904 do
+    it "should display new files UI", priority: "1", test_id: 133092 do
       expect(f('.btn-upload')).to be_displayed
       expect(get_all_files_folders.count).to eq 1
     end
 
     context "from cog icon" do
-      it "should edit file name", priority: "1", test_id: 129430 do
+      it "should edit file name", priority: "1", test_id: 133124 do
         expect(fln("example.pdf")).to be_present
         file_rename_to = "Example_edited.pdf"
         edit_name_from_cog_icon(file_rename_to)
@@ -24,14 +24,14 @@ describe "better_file_browsing" do
         expect(fln("example.pdf")).not_to be_present
         expect(fln(file_rename_to)).to be_present
       end
-      it "should delete file", priority: "1", test_id: 129431 do
+      it "should delete file", priority: "1", test_id: 133128 do
         delete(0, :cog_icon)
         expect(get_all_files_folders.count).to eq 0
       end
     end
 
     context "from cloud icon" do
-      it "should unpublish and publish a file", priority: "1", test_id: 121931 do
+      it "should unpublish and publish a file", priority: "1", test_id: 133096 do
         set_item_permissions(:unpublish, :cloud_icon)
         expect(f('.btn-link.published-status.unpublished')).to be_displayed
         expect(driver.find_element(:class => 'unpublished')).to be_displayed
@@ -39,7 +39,7 @@ describe "better_file_browsing" do
         expect(f('.btn-link.published-status.published')).to be_displayed
         expect(driver.find_element(:class => 'published')).to be_displayed
       end
-      it "should make file available to student with link", priority: "1", test_id: 193158 do
+      it "should make file available to student with link", priority: "1", test_id: 133102 do
         set_item_permissions(:restricted_access, :available_with_link, :cloud_icon)
         expect(f('.btn-link.published-status.hiddenState')).to be_displayed
         expect(driver.find_element(:class => 'hiddenState')).to be_displayed
@@ -52,11 +52,11 @@ describe "better_file_browsing" do
     end
 
     context "from toolbar menu" do
-      it "should delete file from toolbar", priority: "1", test_id: 129451 do
+      it "should delete file from toolbar", priority: "1", test_id: 133105 do
         delete(0, :toolbar_menu)
         expect(get_all_files_folders.count).to eq 0
       end
-      it "should unpublish and publish a file", priority: "1", test_id: 121931 do
+      it "should unpublish and publish a file", priority: "1", test_id: 133096 do
         set_item_permissions(:unpublish, :toolbar_menu)
         expect(f('.btn-link.published-status.unpublished')).to be_displayed
         expect(driver.find_element(:class => 'unpublished')).to be_displayed
@@ -118,7 +118,7 @@ describe "better_file_browsing" do
       get "/courses/#{@course.id}/files"
     end
 
-    it "should search for a file", priority: '2', test_id: 121924 do
+    it "should search for a file", priority: '2', test_id: 220355 do
       edit_name_from_cog_icon("b_file1.txt")
       wait_for_ajaximations
       f("input[type='search']").send_keys "b_fi"
@@ -136,13 +136,13 @@ describe "better_file_browsing" do
       txt_files.map { |text_file| add_file(fixture_file_upload("files/#{text_file}", 'text/plain'), @course, text_file) }
       get "/courses/#{@course.id}/files"
     end
-    it "should set focus to the folder tree when opening the dialog", priority: "1", test_id: 180641 do
+    it "should set focus to the folder tree when opening the dialog", priority: "1", test_id: 220356 do
       ff('.al-trigger')[0].click
       fln("Move").click
       wait_for_ajaximations
       check_element_has_focus(ff('.tree')[1])
     end
-    it "should move a file using cog icon", priority: "1", test_id: 129453 do
+    it "should move a file using cog icon", priority: "1", test_id: 133103 do
       skip('fragile')
       file_name = "a_file.txt"
       add_folder("destination_folder")
@@ -167,7 +167,7 @@ describe "better_file_browsing" do
       wait_for_ajaximations
       expect(fln(file_name)).to be_displayed
     end
-    it "should move multiple files", priority: "1" do
+    it "should move multiple files", priority: "1", test_id: 220357 do
       files = ["a_file.txt", "b_file.txt", "c_file.txt"]
       add_folder("destination_folder")
       move_multiple_using_toolbar(files)
