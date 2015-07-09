@@ -4992,10 +4992,6 @@ da:
     cancel: Annuller
     save_settings: "Gem indstillinger"
     saving: Gemmer...
-  differentiated_assignments_description: |-
-      Forskelligartede opgaver er en *beta* funktion, der aktivere valg af sektion(-er) en opgave hører til.
-      Sektioner, der ikke er givet en opgave vil ikke se det i deres kursusindhold og deres endelige karakter vil blive
-      beregnet uden disse points.
   diigo_993c4646: Diigo
   disable_a5c05db3: Deaktiver
   disabled_18c33a73: (dieaktiveret)
