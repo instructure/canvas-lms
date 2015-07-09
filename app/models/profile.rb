@@ -87,7 +87,8 @@ class Profile < ActiveRecord::Base
     @columns_hash
   end
 
-  def self.instantiate(record)
+  def self.instantiate(*args)
+    record = args.first
     record["type"] = "#{record["context_type"]}Profile"
     super
   end

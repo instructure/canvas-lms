@@ -17,6 +17,7 @@
 #
 
 require 'atom'
+require 'crocodoc'
 
 # See the uploads controller and views for examples on how to use this model.
 class Attachment < ActiveRecord::Base
