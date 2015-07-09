@@ -1032,7 +1032,12 @@ class Assignment < ActiveRecord::Base
           submission.grade = self.score_to_grade(submission.score, submission.grade)
         end
         submission.grade_matches_current_submission = true if did_grade
-        submission_updated = true if !(submission.changes.keys - ['user_id', 'assignment_id']).empty?
+
+        if submission.changes.except(*%w{user_id assignment_id}).values.flatten.any?(&:present?)
+          # changing turnitin_data from nil to {} doesn't count
+          submission_updated = true
+        end
+
         submission.workflow_state = "graded" if submission.score_changed? || submission.grade_matches_current_submission
         submission.group = group
         submission.graded_at = Time.zone.now if did_grade
