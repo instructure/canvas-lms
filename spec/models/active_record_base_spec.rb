@@ -106,6 +106,16 @@ describe ActiveRecord::Base do
       expect(cs.sort).to eq [@c1.id, @c2.id].sort
     end
 
+    it "should multi-column pluck" do
+      skip "Rails 4 specific" if CANVAS_RAILS3
+      scope = Course.where(id: [@c1, @c2])
+      cs = []
+      scope.find_in_batches_with_temp_table(batch_size: 1, pluck: [:id, :name]) do |batch|
+        cs.concat(batch)
+      end
+      expect(cs.sort).to eq [[@c1.id, @c1.name], [@c2.id, @c2.name]].sort
+    end
+
     it "should pluck with join" do
       scope = Enrollment.joins(:course).where(courses: { id: [@c1, @c2] })
       es = []
@@ -236,7 +246,7 @@ describe ActiveRecord::Base do
           tries += 1
           Submission.create!(:user => @user, :assignment => @assignment)
         end
-      }.to raise_error # we don't catch the error the last time 
+      }.to raise_error # we don't catch the error the last time
       expect(tries).to eql 3
       expect(Submission.count).to eql 1
     end
@@ -319,7 +329,7 @@ describe ActiveRecord::Base do
       # it already has :submission
       ConversationMessage.add_polymorph_methods :asset, [:other_polymorphy_thing]
     end
-    
+
     before :once do
       @conversation = Conversation.create
       @user = user_model
@@ -348,12 +358,12 @@ describe ActiveRecord::Base do
         m = @conversation.conversation_messages.build
         s = @user.submissions.create!(:assignment => @assignment)
         m.submission = s
-        
+
         expect(m.asset_type).to eql 'Submission'
         expect(m.asset_id).to eql s.id
         expect(m.asset).to eql s
         expect(m.submission).to eql s
-        
+
         m.submission = nil
 
         expect(m.asset_type).to be_nil

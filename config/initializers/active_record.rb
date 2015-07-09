@@ -681,6 +681,7 @@ ActiveRecord::Relation.class_eval do
           column_name.to_s
         end
       end
+      pluck = pluck.map(&:to_s)
     end
     batch_size = options[:batch_size] || 1000
     if pluck
@@ -697,7 +698,7 @@ ActiveRecord::Relation.class_eval do
         when 'PostgreSQL'
           begin
             old_proc = connection.raw_connection.set_notice_processor {}
-            if pluck && pluck.length == 1 && pluck.first.to_s == primary_key.to_s
+            if pluck && pluck.any?{|p| p == primary_key.to_s}
               connection.add_index table, primary_key, name: index
               index = primary_key
             else
@@ -722,7 +723,7 @@ ActiveRecord::Relation.class_eval do
       includes = includes_values
       klass.unscoped do
         if pluck
-          batch = klass.from(table).order(index).limit(batch_size).pluck(pluck)
+          batch = klass.from(table).order(index).limit(batch_size).pluck(*pluck)
         else
           sql = "SELECT * FROM #{table} ORDER BY #{index} LIMIT #{batch_size}"
           batch = klass.find_by_sql(sql)
@@ -733,8 +734,8 @@ ActiveRecord::Relation.class_eval do
           break if batch.size < batch_size
 
           if pluck
-            last_value = pluck.length == 1 ? batch.last : batch.last[index]
-            batch = klass.from(table).order(index).where("#{index} > ?", last_value).limit(batch_size).pluck(pluck)
+            last_value = pluck.length == 1 ? batch.last : batch.last[pluck.index(index)]
+            batch = klass.from(table).order(index).where("#{index} > ?", last_value).limit(batch_size).pluck(*pluck)
           else
             last_value = batch.last[index]
             sql = "SELECT *
