@@ -16,7 +16,7 @@ describe "assignment groups" do
     @course.assignments.create(:name => "test", :assignment_group => @assignment_group)
   end
 
-  it "should create a new assignment group" do
+  it "should create a new assignment group", priority: "1", test_id: 120673  do
     get "/courses/#{@course.id}/assignments"
     wait_for_ajaximations
 
@@ -30,7 +30,7 @@ describe "assignment groups" do
     expect(ff('.assignment_group .ig-header h2').map(&:text)).to include("Second AG")
   end
 
-  it "should default to proper group when using group's inline add assignment button" do
+  it "should default to proper group when using group's inline add assignment button", priority: "2", test_id: 209998 do
     @course.require_assignment_group
     ag = @course.assignment_groups.create!(:name => "Pamplemousse")
 
@@ -48,7 +48,7 @@ describe "assignment groups" do
 
   #Per selenium guidelines, we should not test buttons navigating to a page
   # We could test that the page loads with the correct info from the params elsewhere
-  it "should remember entered settings when 'more options' is pressed" do
+  it "should remember entered settings when 'more options' is pressed", priority: "2", test_id: 209999 do
     ag2 = @course.assignment_groups.create!(:name => "blah")
 
     get "/courses/#{@course.id}/assignments"
@@ -66,7 +66,7 @@ describe "assignment groups" do
     expect(get_value("#assignment_group_id")).to eq ag2.id.to_s
   end
 
-  it "should edit group details", priority: "1" do
+  it "should edit group details", priority: "1", test_id: 120672 do
     assignment_group = @course.assignment_groups.create!(:name => "first test group")
     4.times do
       @course.assignments.create(:title => 'other assignment', :assignment_group => assignment_group)
@@ -103,7 +103,7 @@ describe "assignment groups" do
     expect(assignment_group.rules_hash["never_drop"]).to eq [assignment.id]
   end
 
-  it "should edit assignment groups grade weights" do
+  it "should edit assignment groups grade weights", priority: "1", test_id: 120675 do
     @course.update_attribute(:group_weighting_scheme, 'percent')
     ag1 = @course.assignment_groups.create!(:name => "first group")
     ag2 = @course.assignment_groups.create!(:name => "second group")
@@ -123,7 +123,7 @@ describe "assignment groups" do
   end
 
   #This feels like it would be better suited here than in QUnit
-  it "should not remove new assignments when editing a group" do
+  it "should not remove new assignments when editing a group", priority: "1", test_id: 210000 do
     get "/courses/#{@course.id}/assignments"
     wait_for_ajaximations
     ag = @course.assignment_groups.first
@@ -149,7 +149,7 @@ describe "assignment groups" do
   end
 
   #Because of the way this feature was made, i recommend we keep this one
-  it "should move assignments to another assignment group" do
+  it "should move assignments to another assignment group", priority: "2", test_id: 210001 do
     before_count = @assignment_group.assignments.count
     @ag2 = @course.assignment_groups.create!(:name => "2nd Group")
     @assignment = @course.assignments.create(:name => "Test assignment", :assignment_group => @ag2)
@@ -173,7 +173,7 @@ describe "assignment groups" do
     expect(@assignment.assignment_group).to eq @assignment_group
   end
 
-  it "should reorder assignment groups with drag and drop" do
+  it "should reorder assignment groups with drag and drop", priority: "2", test_id: 2100010 do
     ags = [@assignment_group]
     4.times do |i|
       ags << @course.assignment_groups.create!(:name => "group_#{i}")
@@ -189,7 +189,7 @@ describe "assignment groups" do
     expect(ags.collect(&:position)).to eq [1,3,2,4,5]
   end
 
-  it "should allow quick-adding an assignment to a group", priority: "1" do
+  it "should allow quick-adding an assignment to a group", priority: "1", test_id: 210083 do
     @course.require_assignment_group
     ag = @course.assignment_groups.first
     time = Timecop.freeze(2015,2,7,4,15).utc
@@ -234,7 +234,7 @@ describe "assignment groups" do
 
   end
 
-  it "should allow quick-adding two assignments to a group (dealing with form re-render)", priority: "2" do
+  it "should allow quick-adding two assignments to a group (dealing with form re-render)", priority: "2", test_id: 210084 do
     @course.require_assignment_group
     ag = @course.assignment_groups.first
 
@@ -263,13 +263,13 @@ describe "assignment groups" do
       @frozen_assign = frozen_assignment(default_group)
     end
 
-    it "should not allow assignment group to be deleted by teacher if assignment group id frozen", priority: "2" do
+    it "should not allow assignment group to be deleted by teacher if assignment group id frozen", priority: "2", test_id: 210085 do
       get "/courses/#{@course.id}/assignments"
       expect(fj("#group_#{@frozen_assign.assignment_group_id} .delete_group_link")).to be_nil
       expect(fj("#assignment_#{@frozen_assign.id} .delete_assignment_link")).to be_nil
     end
 
-    it "should not be locked for admin", priority: "2" do
+    it "should not be locked for admin", priority: "2", test_id: 210086 do
       @course.assignment_groups.create!(:name => "other")
       course_with_admin_logged_in(:course => @course, :name => "admin user")
       orig_title = @frozen_assign.title

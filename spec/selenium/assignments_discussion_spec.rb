@@ -11,7 +11,7 @@ describe "discussion assignments" do
   end
 
   context "created on the index page" do
-    it "should create a discussion topic when created" do
+    it "should create a discussion topic when created", priority: "1", test_id: 209964 do
       ag = @course.assignment_groups.create!(:name => "Stuff")
       get "/courses/#{@course.id}/assignments"
       build_assignment_with_type("Discussion", :assignment_group_id => ag.id, :name => "This discussion was created on the assignments page", :submit => true)
@@ -21,7 +21,7 @@ describe "discussion assignments" do
   end
 
   context "created with 'more options'" do
-    it "should redirect to the discussion new page and maintain parameters" do
+    it "should redirect to the discussion new page and maintain parameters", priority: "1", test_id: 209966 do
       ag = @course.assignment_groups.create!(:name => "Stuff")
       get "/courses/#{@course.id}/assignments"
       expect_new_page_load { build_assignment_with_type("Discussion", :assignment_group_id => ag.id, :name => "More options created discussion", :points => '30', :more_options => true)}
@@ -33,7 +33,7 @@ describe "discussion assignments" do
   end
 
   context "edited from the index page" do
-    it "should update discussion when updated" do
+    it "should update discussion when updated", priority: "2", test_id: 209967 do
       assign = @course.assignments.create!(:name => "Discuss!", :points_possible => "5", :submission_types => "discussion_topic")
       get "/courses/#{@course.id}/assignments"
       edit_assignment(assign.id, :name => 'Rediscuss!', :submit => true)
@@ -42,7 +42,7 @@ describe "discussion assignments" do
   end
 
   context "edited with 'more options'" do
-    it "should redirect to the discussion edit page and maintain parameters" do
+    it "should redirect to the discussion edit page and maintain parameters", priority: "2", test_id: 209968 do
       assign = @course.assignments.create!(:name => "Discuss!", :points_possible => "5", :submission_types => "discussion_topic")
       get "/courses/#{@course.id}/assignments"
       expect_new_page_load{ edit_assignment(assign.id, :name => "Rediscuss!", :points => "10", :more_options => true) }
