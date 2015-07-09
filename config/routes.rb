@@ -388,6 +388,7 @@ CanvasRails::Application.routes.draw do
     delete 'student_view' => 'courses#leave_student_view'
     delete 'test_student' => 'courses#reset_test_student'
     get 'content_migrations' => 'content_migrations#index'
+    get 'link_validator' => 'courses#link_validator', :as => :link_validator
   end
 
   get 'quiz_statistics/:quiz_statistics_id/files/:file_id/download' => 'files#show', as: :quiz_statistics_download, download: '1'
@@ -871,7 +872,7 @@ CanvasRails::Application.routes.draw do
       put  'accounts/:account_id/courses', action: :batch_update
       post 'courses/:course_id/ping', action: :ping, as: 'course_ping'
 
-      get 'courses/:course_id/link_validation', action: :link_validation
+      get 'courses/:course_id/link_validation', action: :link_validation, as: 'course_link_validation'
       post 'courses/:course_id/link_validation', action: :start_link_validation
 
       post 'courses/:course_id/reset_content', :action => :reset_content

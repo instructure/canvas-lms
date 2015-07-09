@@ -56,6 +56,7 @@ class CourseLinkValidator
 
     # Assignments
     self.course.assignments.active.each do |assignment|
+      next if assignment.quiz || assignment.discussion_topic
       find_invalid_links(assignment.description) do |links|
         self.issues << {:name => assignment.title, :type => :assignment,
                    :content_url => "/courses/#{self.course.id}/assignments/#{assignment.id}"}.merge(:invalid_links => links)

@@ -2376,6 +2376,12 @@ class CoursesController < ApplicationController
     render :json => {:success => true}
   end
 
+  def link_validator
+    get_context
+    return unless authorized_action(@context, @current_user, :manage_content)
+    # render view
+  end
+
   def courses_for_user(user)
     if params[:state]
       states = Array(params[:state])

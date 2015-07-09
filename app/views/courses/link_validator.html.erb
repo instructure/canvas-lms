@@ -1,0 +1,16 @@
+<%
+   content_for :page_title, join_title(t(:page_title, "Course Link Validator"), @context.name)
+   js_env :validation_api_url => api_v1_course_link_validation_url(@context)
+   js_bundle :course_link_validator
+   css_bundle :course_link_validator
+%>
+
+<div id="link_validator">
+  <h2>
+    <%= t("link_validator", "Course Link Validator") %>
+  </h2>
+  <div>
+    <%= t("link_validator_desc", "The course link validator searches through course content and returns every invalid or unresponsive link that it comes across. The process may take a few minutes.") %>
+  </div>
+  <div id="link_validator_wrapper"></div>
+</div>
