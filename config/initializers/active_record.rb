@@ -259,8 +259,10 @@ class ActiveRecord::Base
     # We are in the process of migrating away from including the root in all our
     # json serializations at all. Once that's done, we can remove this and the
     # monkey patch to Serialzer, below.
+
+    # ^hahahahahahaha
     unless options.key?(:include_root)
-      options[:include_root] = ActiveRecord::Base.include_root_in_json
+      options[:include_root] = true
     end
 
     hash = serializable_hash(options)
