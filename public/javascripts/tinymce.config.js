@@ -69,6 +69,7 @@ define([], function(){
       style_formats: [
 	{title: 'Intro', inline: 'span', classes: 'bz-intro'},
 	{title: 'Spoiler', inline: 'span', classes: 'bz-spoiler'},
+	{title: 'Teaser', inline: 'span', classes: 'bz-teaser'},
 	{title: 'Video play button', inline: 'span', classes: 'bz-video-link'},
 	{title: 'Quote source', inline: 'span', classes: 'bz-quote-source'},
 	{title: 'Screen Reader Only', inline: 'span', classes: 'bz-screen-reader-text'},
@@ -82,6 +83,7 @@ define([], function(){
 	{title: 'Diagram Box', wrapper: true, block: 'div', classes: 'bz-diagram-box'},
 	{title: 'Resource Box', wrapper: true, block: 'div', classes: 'bz-resource-box'},
 	{title: 'Quick Practice Box', wrapper: true, block: 'div', classes: 'bz-practice-box'},
+	{title: 'Pull out Box', wrapper: true, block: 'div', classes: 'bz-pull-out-box'},
 
 	{title: 'To Do List', block: 'ul', classes: 'bz-to-do-item'},
 	{title: 'Pros List', block: 'ul', classes: 'bz-pros'},
