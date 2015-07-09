@@ -1,10 +1,10 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/announcements_common')
+require File.expand_path(File.dirname(__FILE__) + '/../common')
+require File.expand_path(File.dirname(__FILE__) + '/../helpers/announcements_common')
 
 describe "announcements" do
   include_examples "in-process server selenium tests"
 
-  it "should validate replies are not visible until after users post" do
+  it "should validate replies are not visible until after users post", priority: "1", test_id: 150533 do
     password = 'asdfasdf'
     student_2_entry = 'reply from student 2'
     topic_title = 'new replies hidden until post topic'
@@ -46,12 +46,12 @@ describe "announcements" do
       course_with_student_logged_in
     end
 
-    it "should not show an announcements section if there are no announcments" do
+    it "should not show an announcements section if there are no announcements", priority: "1", test_id: 150534 do
       get "/courses/#{@course.id}"
       expect(f(".announcements active")).to be_nil
     end
 
-    it "should not show JSON when loading more announcements via pageless" do
+    it "should not show JSON when loading more announcements via pageless", priority: "2", test_id: 220375 do
       50.times { @course.announcements.create!(:title => 'Hi there!', :message => 'Announcement time!') }
       get "/courses/#{@course.id}/announcements"
 
@@ -62,7 +62,7 @@ describe "announcements" do
       expect(f(".discussionTopicIndexList")).not_to include_text('discussion_topic')
     end
 
-    it "should validate that a student can not see an announcement with a delayed posting date" do
+    it "should validate that a student can not see an announcement with a delayed posting date", priority: "1", test_id: 220376 do
       announcement_title = 'Hi there!'
       announcement = @course.announcements.create!(:title => announcement_title, :message => 'Announcement time!', :delayed_post_at => Time.now + 1.day)
       get "/courses/#{@course.id}/announcements"
@@ -74,7 +74,7 @@ describe "announcements" do
       expect(f(".discussion-topic")).to include_text(announcement_title)
     end
 
-    it "should not allow a student to close/open announcement for comments or delete an announcement" do
+    it "should not allow a student to close/open announcement for comments or delete an announcement", priority: "1", test_id: 220377 do
       announcement_title = "Announcement 1"
       announcement = @course.announcements.create!(:title => announcement_title, :message => "Hey")
       get "/courses/#{@course.id}/announcements"
@@ -84,7 +84,7 @@ describe "announcements" do
       expect(f('.discussion_actions ul.al-options')).to be_nil
     end
 
-    it "should allow a group member to create an announcement" do
+    it "should allow a group member to create an announcement", priority: "1", test_id: 220378 do
       gc = group_category
       group = gc.groups.create!(:context => @course)
       group.add_user(@student, 'accepted')
@@ -96,7 +96,7 @@ describe "announcements" do
       }.to change(Announcement, :count).by 1
     end
 
-    it "should have deleted announcement removed from student account" do
+    it "should have deleted announcement removed from student account", priority: "1", test_id: 220379 do
       @announcement = @course.announcements.create!(:title => 'delete me', :message => 'Here is my message')
       get "/courses/#{@course.id}/announcements/"
       expect(f(".discussion-title")).to include_text('delete me')
@@ -105,7 +105,7 @@ describe "announcements" do
       expect(f(".discussion-title")).to be_nil
     end
 
-    it "should remove notifications from unenrolled courses" do
+    it "should remove notifications from unenrolled courses", priority: "1", test_id: 220380 do
       enable_cache do
         @student.enrollments.first.update_attribute(:workflow_state, 'active')
         @course.announcements.create!(:title => 'Something', :message => 'Announcement time!')

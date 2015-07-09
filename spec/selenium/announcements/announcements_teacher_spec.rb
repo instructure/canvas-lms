@@ -1,5 +1,5 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/announcements_common')
+require File.expand_path(File.dirname(__FILE__) + '/../common')
+require File.expand_path(File.dirname(__FILE__) + '/../helpers/announcements_common')
 
 describe "announcements" do
   include_examples "in-process server selenium tests"
@@ -23,7 +23,7 @@ describe "announcements" do
         @checkboxes = ff('.toggleSelected')
       end
 
-      it "should bulk delete topics" do
+      it "should bulk delete topics", priority: "1", test_id: 220360 do
         5.times { |i| @checkboxes[i].click }
         f('#delete').click
         driver.switch_to.alert.accept
@@ -32,7 +32,7 @@ describe "announcements" do
         expect(what_to_create.where(:workflow_state => 'active').count).to eq 0
       end
 
-      it "should bulk lock topics" do
+      it "should bulk lock topics", priority: "1", test_id: 220361 do
         5.times { |i| @checkboxes[i].click }
         f('#lock').click
         wait_for_ajax_requests
@@ -40,17 +40,17 @@ describe "announcements" do
         expect(what_to_create.where(:locked => true).count).to eq 5
       end
 
-      it "should search by title" do
+      it "should search by title", priority: "1", test_id: 150525 do
         expected_text = 'hey there'
         update_attributes_and_validate(:title, expected_text)
       end
 
-      it "should search by body" do
+      it "should search by body", priority: "1", test_id: 220358 do
         body_text = 'new topic body'
         update_attributes_and_validate(:message, body_text, 'topic')
       end
 
-      it "should search by author" do
+      it "should search by author", priority: "1", test_id: 220359 do
         user_name = 'jake@instructure.com'
         title = 'new one'
         new_teacher = teacher_in_course(:course => @course, :active_all => true, :name => user_name)
@@ -58,14 +58,14 @@ describe "announcements" do
         refresh_and_filter(:string, 'jake', user_name)
       end
 
-      it "should return multiple items in the search" do
+      it "should return multiple items in the search", priority: "1", test_id: 220362 do
         new_title = 'updated'
         what_to_create.first.update_attributes(:title => "#{new_title} first")
         what_to_create.last.update_attributes(:title => "#{new_title} last")
         refresh_and_filter(:string, new_title, new_title, 2)
       end
 
-      it "should filter by unread" do
+      it "should filter by unread", priority: "1", test_id: 220363 do
         what_to_create.last.change_read_state('unread', @user)
         refresh_and_filter(:css, '#onlyUnread', 'new 004')
       end
@@ -80,7 +80,7 @@ describe "announcements" do
         @context = @course
       end
 
-      it "should have a lock that appears and disappears when the cog menu is used to lock/unlock the announcement for comments" do
+      it "should have a lock that appears and disappears when the cog menu is used to lock/unlock the announcement for comments", priority: "1", test_id: 220365 do
         title = "My announcement"
         announcement_model(:title => title, :user => @user)
         get url
@@ -98,7 +98,7 @@ describe "announcements" do
         expect(f('.discussion-info-icons .icon-lock')).to be_nil
       end
 
-      it "should remove an announcement when it is deleted from the delete option in the cog menu" do
+      it "should remove an announcement when it is deleted from the delete option in the cog menu", priority: "1", test_id: 220364 do
         title = "My announcement"
         announcement_model(:title => title, :user => @user)
         get url
@@ -113,14 +113,14 @@ describe "announcements" do
         expect(f('.discussion-topic')).to be_nil
       end
 
-      it "should start a new topic" do
+      it "should start a new topic", priority: "1", test_id: 150528 do
         get url
 
         expect_new_page_load { f('.btn-primary').click }
         edit(@topic_title, 'new topic')
       end
 
-      it "should add an attachment to a new topic" do
+      it "should add an attachment to a new topic", priority: "1", test_id: 150529 do
         topic_title = 'new topic with file'
         get url
 
@@ -130,7 +130,7 @@ describe "announcements" do
         expect(what_to_create.where(title: topic_title).first.attachment_id).to be_present
       end
 
-      it "should perform front-end validation for message" do
+      it "should perform front-end validation for message", priority: "1", test_id: 220366 do
         topic_title = 'new topic with file'
         get url
 
@@ -144,7 +144,7 @@ describe "announcements" do
         expect(ff('.error_box').any?{|box| box.text.include?("A message is required")}).to be_truthy
       end
 
-      it "should add an attachment to a graded topic" do
+      it "should add an attachment to a graded topic", priority: "1", test_id: 220367 do
         what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => 'graded attachment topic', :user => @user) : announcement_model(:title => 'graded attachment topic', :user => @user)
         if what_to_create == DiscussionTopic
           what_to_create.last.update_attributes(:assignment => @course.assignments.create!(:name => 'graded topic assignment'))
@@ -156,7 +156,7 @@ describe "announcements" do
         add_attachment_and_validate
       end
 
-      it "should edit a topic" do
+      it "should edit a topic", priority: "1", test_id: 150530 do
         edit_name = 'edited discussion name'
         topic = what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => @topic_title, :user => @user) : announcement_model(:title => @topic_title, :user => @user)
         get url + "#{topic.id}"
@@ -165,7 +165,7 @@ describe "announcements" do
         edit(edit_name, 'edit message')
       end
 
-      it "should delete a topic" do
+      it "should delete a topic", priority: "1", test_id: 150526 do
         what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => @topic_title, :user => @user) : announcement_model(:title => @topic_title, :user => @user)
         get url
 
@@ -177,7 +177,7 @@ describe "announcements" do
         expect(f('.discussionTopicIndexList')).to be_nil
       end
 
-      it "should reorder topics" do
+      it "should reorder topics", priority: "1", test_id: 220368 do
         3.times { |i| what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => "new topic #{i}", :user => @user) : announcement_model(:title => "new topic #{i}", :user => @user) }
         get url
 
@@ -192,7 +192,7 @@ describe "announcements" do
       end
     end
 
-    it "should create a delayed announcement" do
+    it "should create a delayed announcement", priority: "1", test_id: 150531 do
       get course_announcements_path(@course)
       create_announcement_option('input[type=checkbox][name=delay_posting]')
       f('.ui-datepicker-trigger').click
@@ -202,7 +202,7 @@ describe "announcements" do
       expect(f('.discussion-fyi')).to include_text('The content of this announcement will not be visible to users until')
     end
 
-    it "allows creating a delayed announcement with an attachment" do
+    it "allows creating a delayed announcement with an attachment", priority: "1", test_id: 220369 do
       get course_announcements_path(@course)
       create_announcement_option('input[type=checkbox][name=delay_posting]')
       f('.ui-datepicker-trigger').click
@@ -214,7 +214,7 @@ describe "announcements" do
       expect(f('.discussion-fyi')).to include_text('The content of this announcement will not be visible to users until')
     end
 
-    it "should add and remove an external feed to announcements" do
+    it "should add and remove an external feed to announcements", priority: "1", test_id: 220370 do
       get "/courses/#{@course.id}/announcements"
 
       #add external feed to announcements
@@ -244,7 +244,7 @@ describe "announcements" do
       }.to change(ExternalFeed, :count).by(-1)
     end
 
-    it "should remove delayed_post_at when unchecking delay_posting" do
+    it "should remove delayed_post_at when unchecking delay_posting", priority: "1", test_id: 220371 do
       topic = @course.announcements.create!(:title => @topic_title, :user => @user, :delayed_post_at => 10.days.ago, :message => "message")
       get "/courses/#{@course.id}/announcements/#{topic.id}"
       expect_new_page_load { f(".edit-btn").click }
@@ -256,7 +256,7 @@ describe "announcements" do
       expect(topic.delayed_post_at).to be_nil
     end
 
-    it "should have a teacher add a new entry to its own announcement" do
+    it "should have a teacher add a new entry to its own announcement", priority: "1", test_id: 220372 do
       skip "delayed jobs"
       create_announcement
       get [@course, @announcement]
@@ -270,7 +270,7 @@ describe "announcements" do
       expect(f('.topic_reply_count').text).to eq '1'
     end
 
-    it "should show announcements to student view student" do
+    it "should show announcements to student view student", priority: "1", test_id: 220373 do
       create_announcement
       enter_student_view
       get "/courses/#{@course.id}/announcements"
@@ -279,7 +279,7 @@ describe "announcements" do
       expect(announcement.find_element(:css, '.discussion-summary')).to include_text(@announcement.message)
     end
 
-    it "should always see student replies when 'initial post required' is turned on" do
+    it "should always see student replies when 'initial post required' is turned on", priority: "1", test_id: 220374 do
       student_entry = 'this is my reply'
 
       create_announcement_initial
@@ -293,56 +293,6 @@ describe "announcements" do
       #As a teacher, verify that you can see the student's reply even though you have not responded
       get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
       expect(ff('.discussion_entry .message')[1]).to include_text(student_entry)
-    end
-
-    def setup_search()
-      create_announcement('day one', 'partridge')
-      create_announcement('day two', 'turtle doves')
-      create_announcement('day three', 'french hens')
-    end
-
-
-    # Search for an announcement by the content of the announcement
-    it "should search by body" do
-      setup_search
-      get "/courses/#{@course.id}/announcements/"
-      f('#searchTerm').send_keys('turtle')
-
-      # The keyword 'turtle' is in the body. Due to the layout of the html, it
-      #is more efficient to look for the title that matches the body
-      expect(f('.discussion-title')).not_to include_text("one")
-      expect(f('.discussion-title')).to include_text("two")
-      expect(f('.discussion-title')).not_to include_text("three")
-    end
-
-    # Search for an announcement by the title of the announcement
-    it "should search by title" do
-      setup_search
-      get "/courses/#{@course.id}/announcements/"
-      f('#searchTerm').send_keys('o')
-
-      #Two of our titles have an 'o' in them. There are two announcements
-      #so we store the ones we find in an array. Sorting algorithms will put
-      # "two" first and "one" second. We should not see three.
-      expect(ff('.discussion-title')[1]).to include_text("one")
-      expect(ff('.discussion-title')[0]).to include_text("two")
-      expect(f('.discussion-title')[2]).to be_nil #No 3rd one listed
-    end
-
-    # Search for an announcement by the author of the announcement
-    it "should search by author" do
-      setup_search
-      # Creating users through the rails function does not set an author.
-      # Manual setup is needed
-      create_announcement_manual("title 1", "jocoga")
-      create_announcement_manual("title 2", "hotdog")
-      get "/courses/#{@course.id}/announcements/"
-      f('#searchTerm').send_keys('nob')
-
-      # Only 2 of the 5 announcements will have an author
-      expect(ff('.discussion-author')[0]).to include_text("nobody")
-      expect(ff('.discussion-author')[1]).to include_text("nobody")
-      expect(ff('.discussion-author')[2]).to be_nil #No 3rd one listed
     end
   end
 end
