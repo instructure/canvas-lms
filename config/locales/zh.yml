@@ -4997,10 +4997,6 @@ zh:
     cancel: 取消
     save_settings: 保存设置
     saving: 正在保存...
-  differentiated_assignments_description: |-
-      差异化作业是一项*测试版*功能，允许选择某个作业应用于哪些班级。
-      没有分配某个作业的班级将不会在其课程内容中看到此作业，其最终计分将
-      在不使用那些分数的情况下计算出来。
   diigo_993c4646: Diigo
   disable_a5c05db3: 禁用
   disabled_18c33a73: （已禁用）
