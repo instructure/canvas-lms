@@ -5033,10 +5033,6 @@ pl:
     cancel: Anuluj
     save_settings: "Zapisz ustawienia"
     saving: "Trwa zapisywanie..."
-  differentiated_assignments_description: |-
-      Zadania zróżnicowane stanowią funkcję *beta* umożliwiającą wybranie jednej sekcji (lub kilku), do której odnosi się zadanie.
-      Sekcje, do których nie przydzielono zadania nie będą wyświetlały go w zawartości kursu, a ich końcowa ocena będzie
-      obliczona bez tych punktów.
   diigo_993c4646: Diigo
   disable_a5c05db3: Wyłącz
   disabled_18c33a73: (wyłączone)
