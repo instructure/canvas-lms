@@ -4929,10 +4929,6 @@ nb:
     cancel: Avbryt
     save_settings: "Lagre innstillinger"
     saving: Lagrer...
-  differentiated_assignments_description: |-
-      Differensierte Oppgaver er en *beta* funksjonalitet som tillater at forskjellige oppgaver relateres til forskjellige klasse(er)/klasser.
-      Klasser som ikke har noen oppgave vil ikke se oppgaven i sitt kursinnhold og deres sluttresultat vil være
-      basert på øvrige oppgaver.
   diigo_993c4646: Diigo
   disable_a5c05db3: "Slå av"
   disabled_18c33a73: (deaktivert)
