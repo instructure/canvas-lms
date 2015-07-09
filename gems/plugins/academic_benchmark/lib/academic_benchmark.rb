@@ -7,27 +7,27 @@ require 'academic_benchmark/standard'
 
 module AcademicBenchmark
   def self.config
-    Canvas::Plugin.find('academic_benchmark_importer').settings || {}
+    empty_settings = {}.freeze
+    p = Canvas::Plugin.find('academic_benchmark_importer')
+    return empty_settings unless p
+    p.settings || empty_settings
   end
 
   class APIError < StandardError; end
 
   def self.import(guid_or_guids)
     unless AcademicBenchmark.config[:api_key]
-      puts "Not importing academic benchmark data because no API key is set"
-      return []
+      raise Canvas::Migration::Error.new("Not importing academic benchmark data because no API key is set")
     end
 
     # need a user with global outcome management rights
     user_id = Setting.get("academic_benchmark_migration_user_id", nil)
     unless user_id
-      puts "Not importing academic benchmark data because no user id set"
-      return []
+      raise Canvas::Migration::Error.new("Not importing academic benchmark data because no user id set")
     end
 
     unless (permissionful_user = User.where(id: user_id).first)
-      puts "Not importing academic benchmark data because no user found"
-      return []
+      raise Canvas::Migration::Error.new("Not importing academic benchmark data because no user found")
     end
 
     Array(guid_or_guids).map do |guid|
