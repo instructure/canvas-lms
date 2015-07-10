@@ -114,6 +114,9 @@ module Lti
                                                           @tool.id, include_host:true) },
                        LTI1_GUARD
 
+    register_expansion 'Canvas.css.common', [],
+                       -> { URI.parse(@request.url)
+                               .merge(@controller.view_context.stylesheet_path(@controller.css_url_for(:common))).to_s }
 
     ##### Deprecated Substitutions #####
 
