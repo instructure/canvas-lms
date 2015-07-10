@@ -37,18 +37,23 @@ module Polling
       can :create
 
       given do |user, http_session|
-        self.poll_sessions.with_each_shard do |scope|
-          scope.includes(:course).any? { |session| session.course.grants_right?(user, http_session, :manage_content) }
-        end.any?
+        self.poll_sessions.shard(self).includes(:course).any? do |session|
+          session.course.grants_right?(user, http_session, :manage_content)
+        end
       end
       can :update and can :read and can :delete and can :submit
 
       given do |user|
-        self.poll_sessions.with_each_shard do |scope|
-          scope.where(["course_id IN (?) AND (course_section_id IS NULL OR course_section_id IN (?))",
+        can_read = false
+        self.poll_sessions.shard(self).activate do |scope|
+          if scope.where(["course_id IN (?) AND (course_section_id IS NULL OR course_section_id IN (?))",
                        Enrollment.where(user_id: user).active.select(:course_id),
                        Enrollment.where(user_id: user).active.select(:course_section_id)]).exists?
-        end.any?
+            can_read = true
+            break
+          end
+        end
+        can_read
       end
       can :read
     end
@@ -58,8 +63,8 @@ module Polling
     end
 
     def closed_and_viewable_for?(user)
-      results = poll_sessions.with_each_shard do |scope|
-        scope
+      poll_sessions.shard(self).activate do |scope|
+        return true if scope
         .joins(:poll_submissions)
         .where(["polling_poll_submissions.user_id = ? AND is_published=? AND course_id IN (?) AND (course_section_id IS NULL OR course_section_id IN (?))",
                 user,
@@ -71,13 +76,11 @@ module Polling
         .limit(1)
         .exists?
       end
-
-       results.any?
+      false
     end
 
     def total_results
-      results = poll_submissions.with_each_shard { |scope| scope.group('poll_choice_id').count }
-      Hash[*results.flatten]
+      poll_submissions.shard(self).group('poll_choice_id').count
     end
   end
 end

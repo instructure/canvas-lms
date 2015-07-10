@@ -325,7 +325,7 @@ class Conversation < ActiveRecord::Base
       skip_users = message.conversation_message_participants.active.select(:user_id).all
     end
 
-    self.conversation_participants.with_each_shard do |cps|
+    self.conversation_participants.shard(self).activate do |cps|
       cps.update_all(:root_account_ids => options[:root_account_ids]) if options[:root_account_ids].present?
 
       cps = cps.visible if options[:only_existing]
@@ -437,7 +437,7 @@ class Conversation < ActiveRecord::Base
 
   def update_participants(message, options = {})
     updated = false
-    self.conversation_participants.with_each_shard do |conversation_participants|
+    self.conversation_participants.shard(self).activate do |conversation_participants|
       conversation_participants = conversation_participants.where(:user_id =>
         (options[:only_users]).map(&:id)) if options[:only_users]
 
@@ -700,7 +700,7 @@ class Conversation < ActiveRecord::Base
     shard.activate do
       conversation_message_participants.scoped.delete_all
     end
-    conversation_participants.with_each_shard { |scope| scope.scoped.delete_all; nil }
+    conversation_participants.shard(self).delete_all
   end
 
   protected

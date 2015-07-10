@@ -865,22 +865,6 @@ ActiveRecord::Relation.class_eval do
   end
   alias_method_chain :lock, :exclusive_smarts
 
-  def with_each_shard(*args)
-    scope = self
-    if self.respond_to?(:proxy_association) && (owner = self.proxy_association.try(:owner)) && self.shard_category != :explicit
-      scope = scope.shard(owner)
-    end
-    scope = scope.shard(args) if args.any?
-    if block_given?
-      ret = scope.activate{ |rel|
-        yield(rel)
-      }
-      Array(ret)
-    else
-      scope.to_a
-    end
-  end
-
   def polymorphic_where(args)
     raise ArgumentError unless args.length == 1
 

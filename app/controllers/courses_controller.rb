@@ -365,7 +365,7 @@ class CoursesController < ApplicationController
   def index
     respond_to do |format|
       format.html {
-        all_enrollments = @current_user.enrollments.with_each_shard { |scope| scope.not_deleted }
+        all_enrollments = @current_user.enrollments.not_deleted.shard(@current_user).to_a
         @past_enrollments = []
         @current_enrollments = []
         @future_enrollments  = []

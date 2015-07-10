@@ -404,7 +404,7 @@ class StreamItem < ActiveRecord::Base
 
   public
   def destroy_stream_item_instances
-    self.stream_item_instances.with_each_shard do |scope|
+    self.stream_item_instances.shard(self).activate do |scope|
       user_ids = scope.pluck(:user_id)
       if !self.invalidate_immediately && user_ids.count > 100
         StreamItemCache.send_later_if_production_enqueue_args(:invalidate_all_recent_stream_items,

@@ -259,7 +259,7 @@ class SearchController < ApplicationController
     if context_name.nil?
       result = if terms.blank?
                  courses = @contexts[:courses].values
-                 group_ids = @current_user.current_groups.with_each_shard.map(&:id)
+                 group_ids = @current_user.current_groups.shard(@current_user).pluck(:id)
                  groups = @contexts[:groups].slice(*group_ids).values
                  courses + groups
                else

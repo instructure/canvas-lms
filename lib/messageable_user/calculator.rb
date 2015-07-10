@@ -746,14 +746,12 @@ class MessageableUser
       # translation magic. we *have* to use with_each_shard... but we're
       # already in a with_each_shard from shard_cached, so we can restrict it
       # to this shard
-      @user.observee_enrollments.with_each_shard(Shard.current) do |scope|
-        scope.includes(:user).map{ |e| Shard.global_id_for(e.user_id) }
-      end
+      @user.observee_enrollments.shard(Shard.current).map(&:global_user_id)
     end
 
     def uncached_visible_account_ids
       # ditto
-      @user.associated_accounts.with_each_shard(Shard.current).
+      @user.associated_accounts.shard(Shard.current).
         select{ |account| account.grants_right?(@user, :read_roster) }.
         map(&:id)
     end
@@ -761,7 +759,7 @@ class MessageableUser
     def uncached_fully_visible_group_ids
       # ditto for current groups
       course_group_ids = uncached_group_ids_in_courses(recent_fully_visible_courses)
-      own_group_ids = @user.current_groups.with_each_shard(Shard.current).map(&:id)
+      own_group_ids = @user.current_groups.shard(Shard.current).pluck(:id)
       (course_group_ids + own_group_ids).uniq
     end
 

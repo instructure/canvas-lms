@@ -410,19 +410,19 @@ describe User do
         @shard1.activate do
           @account = Account.create!
           au = @account.account_users.create!(user: @user)
-          expect(@user.user_account_associations.with_each_shard.map(&:account).sort_by(&:id)).to eq(
+          expect(@user.user_account_associations.shard(@user).map(&:account).sort_by(&:id)).to eq(
               [Account.site_admin, @account].sort_by(&:id)
           )
           expect(@account.user_account_associations.map(&:user)).to eq [@user]
 
           au.destroy
 
-          expect(@user.user_account_associations.with_each_shard.map(&:account)).to eq [Account.site_admin]
+          expect(@user.user_account_associations.shard(@user).map(&:account)).to eq [Account.site_admin]
           expect(@account.reload.user_account_associations.map(&:user)).to eq []
 
           @account.account_users.create!(user: @user)
 
-          expect(@user.user_account_associations.with_each_shard.map(&:account).sort_by(&:id)).to eq(
+          expect(@user.user_account_associations.shard(@user).map(&:account).sort_by(&:id)).to eq(
               [Account.site_admin, @account].sort_by(&:id)
           )
           expect(@account.reload.user_account_associations.map(&:user)).to eq [@user]
@@ -434,7 +434,7 @@ describe User do
         @shard2.activate do
           @user.update_account_associations
 
-          expect(@user.user_account_associations.with_each_shard.map(&:account).sort_by(&:id)).to eq(
+          expect(@user.user_account_associations.shard(@user).map(&:account).sort_by(&:id)).to eq(
               [Account.site_admin, @account].sort_by(&:id)
           )
           expect(@account.reload.user_account_associations.map(&:user)).to eq [@user]

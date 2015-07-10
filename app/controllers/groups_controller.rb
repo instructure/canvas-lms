@@ -200,11 +200,11 @@ class GroupsController < ApplicationController
     groups_scope = @current_user.current_groups
     respond_to do |format|
       format.html do
-        @groups = groups_scope.with_each_shard{ |scope|
-          scope = scope.by_name
-          scope = scope.where(:context_type => params[:context_type]) if params[:context_type]
-          scope.includes(:group_category)
-        }
+        groups_scope = groups_scope.by_name
+        groups_scope = groups_scope.where(:context_type => params[:context_type]) if params[:context_type]
+        groups_scope = groups_scope.includes(:group_category)
+
+        @groups = groups_scope.shard(@current_user).to_a
       end
 
       format.json do

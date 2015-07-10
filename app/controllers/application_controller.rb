@@ -584,7 +584,7 @@ class ApplicationController < ActionController::Base
         end
       end
       courses = enrollment_scope.select { |e| e.state_based_on_date == :active }.map(&:course).uniq
-      groups = group_scope ? group_scope.with_each_shard.reject{|g| g.context_type == "Course" && g.context.concluded?} : []
+      groups = group_scope ? group_scope.shard(@context).to_a.reject{|g| g.context_type == "Course" && g.context.concluded?} : []
 
       if opts[:favorites_first]
         favorite_course_ids = @context.favorite_context_ids("Course")
@@ -670,7 +670,7 @@ class ApplicationController < ActionController::Base
     @courses.each { |course| log_course(course) }
 
     if @current_user
-      @submissions = @current_user.submissions.with_each_shard
+      @submissions = @current_user.submissions.shard(@current_user).to_a
       @submissions.each{ |s| s.mute if s.muted_assignment? }
     else
       @submissions = []
