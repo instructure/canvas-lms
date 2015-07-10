@@ -60,7 +60,7 @@ describe "better_file_browsing, folders" do
       expect(get_all_files_folders.count).to eq 0
     end
 
-    it "should be able to create and view a new folder with uri characters", priority: '2', test_id: 193153 do
+    it "should be able to create and view a new folder with uri characters", priority: "2", test_id: 193153 do
       folder_name = "this#could+be bad? maybe"
       add_folder(folder_name)
       folder = @course.folders.where(:name => folder_name).first
@@ -83,13 +83,13 @@ describe "better_file_browsing, folders" do
        get "/courses/#{@course.id}/files"
      end
 
-     it "should create a new folder", priority: '2', test_id: 133121 do
+     it "should create a new folder", priority: "2", test_id: 133121 do
        new_folder = create_new_folder
        expect(get_all_files_folders.count).to eq 1
        expect(new_folder.text).to match /New Folder/
      end
 
-     it "should create 15 new child folders and show them in the FolderTree when expanded", priority: '2', test_id: 121886 do
+     it "should create 15 new child folders and show them in the FolderTree when expanded", priority: "2", test_id: 121886 do
        create_new_folder
        f('.ef-name-col > a.media').click
        wait_for_ajaximations
