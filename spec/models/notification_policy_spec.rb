@@ -30,7 +30,8 @@ describe NotificationPolicy do
       @student = factory_with_protected_attributes(User, :name => "student", :workflow_state => "registered")
       e = @course.enroll_student(@student)
       e.accept!
-      Notification.all_cached.each{|n| n.destroy }
+      Notification.all.each{|n| n.destroy }
+      Notification.reset_cache!
       @notif = Notification.create!(:name => "Assignment Created", :subject => "Test", :category => 'TestNever')
     end
 

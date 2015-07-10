@@ -22,7 +22,7 @@ describe PolymorphicTypeOverride do
 
   describe '.override_polymorphic_types' do
     it 'overrides multiple old polymorphic types with a new one' do
-      class ContentTag
+      ContentTag.class_eval do
         include PolymorphicTypeOverride
         override_polymorphic_types content_type: {'OldClassInDatabase' => 'Quizzes::Quiz'},
                                    context_type: {'AnotherOldClassInDatabase' => 'Quizzes::Quiz'}
@@ -44,7 +44,7 @@ describe PolymorphicTypeOverride do
     end
 
     it 'overrides a single old polymorphic type with a new one' do
-      class ContentTag
+      ContentTag.class_eval do
         include PolymorphicTypeOverride
         override_polymorphic_types content_type: {'OldClassInDatabase' => 'Quizzes::Quiz'}
       end

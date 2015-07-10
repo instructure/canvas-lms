@@ -597,7 +597,7 @@ class Course < ActiveRecord::Base
     scope = User.joins(:not_ended_enrollments).
       where(enrollments: {course_id: self, type: 'StudentEnrollment'}).
       where(Group.not_in_group_sql_fragment(groups.map(&:id))).
-      select("users.id, users.name").uniq
+      select("users.id, users.name, users.updated_at").uniq
     scope = scope.select(opts[:order]).order(opts[:order]) if opts[:order]
     scope
   end

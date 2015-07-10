@@ -38,11 +38,11 @@ describe 'Models' do
   it "should use attr_accessible or attr_protected" do
     ignore_classes = [
         ActiveRecord::Base,
-        ActiveRecord::SessionStore::Session,
         Delayed::Backend::ActiveRecord::Job,
         Delayed::Backend::ActiveRecord::Job::Failed,
         Version,
       ]
+    (ignore_classes << ActiveRecord::SessionStore::Session) rescue nil
     (ignore_classes << AddThumbnailUuid::Thumbnail) rescue nil
     (ignore_classes << Story) rescue nil
     (ignore_classes << CustomField) rescue nil

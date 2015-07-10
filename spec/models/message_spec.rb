@@ -43,14 +43,14 @@ describe Message do
 
     it 'should sanitize html' do
       Message.any_instance.expects(:load_html_template).returns <<-ZOMGXSS
-        <b>Your content</b>: <%= "<script>alert('haha')</script>" %>
+        <b>Your content</b>: <%= "<script>alert()</script>" %>
       ZOMGXSS
       user         = user(:active_all => true)
       account_user = AccountUser.create!(:account => account_model, :user => user)
       message      = generate_message(:account_user_notification, :email, account_user)
 
       expect(message.html_body).not_to include "<script>"
-      expect(message.html_body).to include "<b>Your content</b>: &lt;script&gt;alert(&#x27;haha&#x27;)&lt;/script&gt;"
+      expect(message.html_body).to include "<b>Your content</b>: &lt;script&gt;alert()&lt;/script&gt;"
     end
   end
 
