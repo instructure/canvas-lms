@@ -268,6 +268,35 @@ describe "new groups" do
       expect(f(".icon-user.group-leader")).to be_nil
       expect(f(".group[data-id=\"#{@testgroup[1].id}\"] .group-user")).to include_text("Test Student 1")
     end
+
+    it 'moves non-leader', priority: "1", test_id: 96024 do
+      group_test_setup(4,1,2)
+      add_user_to_group(@students[0], @testgroup.first, true)
+      2.times do |n|
+        add_user_to_group(@students[n+1], @testgroup.first, false)
+      end
+      add_user_to_group(@students[3], @testgroup.last, false)
+
+      get "/courses/#{@course.id}/groups"
+
+      f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
+
+      expect(f(".icon-user.group-leader")).to be_displayed
+
+      f(".group-user-actions[data-user-id=\"#{@students[1].id}\"]").click
+
+      f(".ui-menu-item .edit-group-assignment").click
+      wait_for_ajaximations
+
+      f(".set-group").click
+      wait_for_ajaximations
+
+      f(".group[data-id=\"#{@testgroup[1].id}\"] .toggle-group").click
+
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-user")).to include_text("Test Student 1")
+      expect(f(".group[data-id=\"#{@testgroup[1].id}\"] .group-user")).to include_text("Test Student 4")
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-leader")).to be_displayed
+      expect(f(".group[data-id=\"#{@testgroup[1].id}\"] .group-leader")).to be_nil
+    end
   end
 end
-
