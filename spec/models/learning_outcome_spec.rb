@@ -440,37 +440,6 @@ describe LearningOutcome do
       expect(@result.mastery).to eql(false)
     end
 
-    it "should not let you change calculation_method if it has been used to assess a student" do
-      @outcome.calculation_method = 'latest'
-      @outcome.save!
-      expect(@outcome.calculation_method).to eq('latest')
-      assess_with
-      expect(@outcome).to have(:no).errors_on(:calculation_method)
-      @outcome.calculation_method = 'n_mastery'
-      @outcome.save
-      expect(@outcome).to have(1).error_on(:calculation_method)
-      expect(@outcome).to have(1).error
-      expect(outcome_errors(:calculation_method).first).to include("outcome has been used to assess a student")
-      @outcome.reload
-      expect(@outcome.calculation_method).to eq('latest')
-    end
-
-    it "should not let you change calculation_int if it has been used to assess a student" do
-      @outcome.calculation_method = 'decaying_average'
-      @outcome.calculation_int = 24
-      @outcome.save!
-      expect(@outcome.calculation_int).to eq(24)
-      assess_with
-      expect(@outcome).to have(:no).errors
-      @outcome.calculation_int = 71
-      @outcome.save
-      expect(@outcome).to have(1).error_on(:calculation_int)
-      expect(@outcome).to have(1).error
-      expect(outcome_errors(:calculation_int).first).to include("outcome has been used to assess a student")
-      @outcome.reload
-      expect(@outcome.calculation_int).to eq(24)
-    end
-
     it "should not let you set the calculation_method to nil if it has been set to something else" do
       @outcome.calculation_method = 'latest'
       @outcome.save!

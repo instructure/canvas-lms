@@ -57,8 +57,7 @@ class LearningOutcome < ActiveRecord::Base
   }
   validates :short_description, :workflow_state, presence: true
   sanitize_field :description, CanvasSanitize::SANITIZE
-  validate :calculation_changes_after_asessing, if: :assessed?
-  validate :validate_calculation_int, unless: :assessed?
+  validate :validate_calculation_int
 
   set_policy do
     # managing a contextual outcome requires manage_outcomes on the outcome's context
@@ -87,21 +86,6 @@ class LearningOutcome < ActiveRecord::Base
     # if we are changing the calculation_method but not the calculation_int, set the int to the default value
     if calculation_method_changed? && !calculation_int_changed?
       self.calculation_int = default_calculation_int
-    end
-  end
-
-  def calculation_changes_after_asessing
-    # if we've been used to assess a student, refuse to accept any changes to our calculation options
-    if calculation_method_changed?
-      errors.add(:calculation_method, t(
-        "This outcome has been used to assess a student. The calculation method is locked",
-      ))
-    end
-
-    if calculation_int_changed?
-      errors.add(:calculation_int, t(
-        "This outcome has been used to assess a student. The calculation value is locked"
-      ))
     end
   end
 
