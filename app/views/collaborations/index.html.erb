@@ -4,9 +4,8 @@
 
 <% content_for :right_side do %>
   <div class="rs-margin-all">
-    <p><%= mt :description_rs, <<-HEREDOC, :google_url => "http://docs.google.com", :etherpad_url => "http://www.etherpad.org"
-Free online web tools like [Google Docs](%{google_url}) and [EtherPad](%{etherpad_url})
-are an excellent place for students to work on group projects or papers, take shared notes, etc.
+    <p><%= mt :description_rs, <<-HEREDOC, :google_url => "http://docs.google.com"
+Free online web tools like [Google Docs](%{google_url}) are an excellent place for students to work on group projects or papers, take shared notes, etc.
 Teacher *or* students can set up group collaborations.
 HEREDOC
        %>
@@ -16,14 +15,6 @@ HEREDOC
 <a href="#" class="external_link" target="_blank" style="display: none;">&nbsp;</a>
 
 <header class="collaborations-header clearfix">
-  <% if @sunsetting_etherpad && @has_etherpad_collaborations %>
-    <div class="alert"><%= mt <<-HEREDOC, :google_collab_help_url => "http://community.canvaslms.com/docs/DOC-2641"
-Access to the Etherpad collaborations below will be discontinued on August 8, 2015. If you wish to save this content, please migrate this content before this date.
-
-For instructions on how to create a collaboration with Google, [click here](%{google_collab_help_url}).
-HEREDOC
-  %></div>
-  <% end %>
   <h1><%= t 'titles.current', "Current Collaborations" %></h1>
 
   <% if can_do(@context, @current_user, :create_collaborations) && !@hide_create_ui %>
@@ -36,20 +27,20 @@ HEREDOC
 
 <div id="no_collaborations_message" style="<%= hidden unless @collaborations.empty? %>">
   <% if can_do(@context, @current_user, :manage_content) %>
-    <p><%= mt :description_teacher, <<-HEREDOC, :google_url => "http://docs.google.com", :etherpad_url => "http://www.etherpad.org"
+    <p><%= mt :description_teacher, <<-HEREDOC, :google_url => "http://docs.google.com"
 **What do we mean by collaborations?**  We're talking about web-based tools that most
 likely your students are already familiar with.  Students can use resources like
-[Google Docs](%{google_url}) and [EtherPad](%{etherpad_url})
+[Google Docs](%{google_url})
 to work collaboratively on tasks like group papers or note-taking.  This page gives them
 (and you) an easy place to keep track of those collaborations, and also to set them
 up without having to swap emails.
 HEREDOC
         %></p>
   <% else %>
-    <p><%= mt :description_student, <<-HEREDOC, :google_url => "http://docs.google.com", :etherpad_url => "http://www.etherpad.org"
+    <p><%= mt :description_student, <<-HEREDOC, :google_url => "http://docs.google.com"
 **What do we mean by collaborations?**  We're talking about web-based tools for
 working together on a shared document.  You can use resources like
-[Google Docs](%{google_url}) and [EtherPad](%{etherpad_url})
+[Google Docs](%{google_url})
 to work collaboratively on tasks like group papers or note-taking.  This page is
 an easy place to keep track of those collaborations, and also to set them
 up without having to swap emails.
