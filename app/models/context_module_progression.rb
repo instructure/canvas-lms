@@ -120,9 +120,9 @@ class ContextModuleProgression < ActiveRecord::Base
   def evaluate_requirements_met
     result = evaluate_uncompleted_requirements
 
-    count_needed = self.context_module.requirement_count
+    count_needed = self.context_module.requirement_count.to_i
     # if no requirement_count is specified, assume all are needed
-    if (count_needed && result.met_requirement_count >= count_needed) || result.all_met?
+    if (count_needed && count_needed > 0 && result.met_requirement_count >= count_needed) || result.all_met?
       self.workflow_state = 'completed'
     elsif result.met_requirement_count >= 1
       self.workflow_state = 'started'
