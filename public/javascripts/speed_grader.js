@@ -233,7 +233,7 @@ define([
 
   function submissionStateName(submission) {
     if (submission && submission.workflow_state != 'unsubmitted' && (submission.submitted_at || !(typeof submission.grade == 'undefined'))) {
-      if (typeof submission.grade == 'undefined' || submission.grade === null || submission.workflow_state == 'pending_review') {
+      if (!submission.excused && (typeof submission.grade == 'undefined' || submission.grade === null || submission.workflow_state == 'pending_review')) {
         return "not_graded";
       } else if (submission.grade_matches_current_submission) {
         return "graded";
