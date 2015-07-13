@@ -177,7 +177,7 @@ define([
                 </button>
               </div>
             </div>
-            <iframe src="/?editing_brand_config=1" style={{border: 'none', width: '100%', height: '100vh'}} />
+            <iframe src="/?editing_brand_config=1" />
           </div>
         </form>
         </div>
