@@ -48,6 +48,11 @@ define([
     variables: React.PropTypes.arrayOf(types.varDef).isRequired
   })
 
+  types.userColorInput = React.PropTypes.shape({
+    val: React.PropTypes.string,
+    invalid: React.PropTypes.bool
+  })
+
   types.variableSchema = React.PropTypes.arrayOf(types.variableGroup).isRequired
 
   return types

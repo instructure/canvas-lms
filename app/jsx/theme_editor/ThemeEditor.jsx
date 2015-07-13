@@ -56,8 +56,15 @@ define([
       }
     },
 
-    somethingChanged(variableName, newValue) {
-      this.state.changedValues[variableName] = newValue
+    invalidForm() {
+      return Object.keys(this.state.changedValues).some((key) => {
+        return this.state.changedValues[key].invalid
+      })
+    },
+
+    somethingChanged(variableName, newValue, isInvalid) {
+      var change = {val: newValue, invalid: isInvalid}
+      this.state.changedValues[variableName] = change
       this.setState({
         somethingChanged: true,
         changedValues: this.state.changedValues
@@ -65,7 +72,7 @@ define([
     },
 
     getDefault(variableName) {
-      var val = this.state.changedValues[variableName]
+      var val = this.state.changedValues[variableName] && this.state.changedValues[variableName].val
       if (val) return val
       if (val !== '') {
         val = this.props.brandConfig.variables[variableName]
@@ -207,7 +214,7 @@ define([
             { this.state.somethingChanged ?
               <div className="Theme__preview-overlay">
                 <div className="Theme__preview-overlay__container">
-                  <button type="submit" className="Button Button--primary">
+                  <button type="submit" className="Button Button--primary" disabled={this.invalidForm()}>
                     <i className="icon-refresh" />
                     {I18n.t('Preview Your Changes')}
                   </button>

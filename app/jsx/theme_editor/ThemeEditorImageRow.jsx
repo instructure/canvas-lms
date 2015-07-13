@@ -12,9 +12,16 @@ define([
 
     propTypes: {
       varDef: customTypes.image,
+      userInput: customTypes.userColorInput,
       onChange: React.PropTypes.func.isRequired,
       currentValue: React.PropTypes.string,
       placeholder: React.PropTypes.string
+    },
+
+    getDefaultProps(){
+      return ({
+        userInput: {}
+      })
     },
 
     setValue(inputElement) {
@@ -32,7 +39,7 @@ define([
 
     inputName(){
       // dont insert name & send params if default value
-      var valueIsDefault = !this.props.chosenValue && !this.props.currentValue
+      var valueIsDefault = !this.props.userInput.val && !this.props.currentValue
       return valueIsDefault ? '' : 'brand_config[variables]['+ this.props.varDef.variable_name +']'
     },
 
@@ -55,7 +62,7 @@ define([
             {{/* ^ this utility class is to control the background color that shows behind the images you can customize in theme editor - see theme_editor.scss */}}
                 <div className="Theme__editor_preview-img">
                   <img
-                    src={this.props.chosenValue || this.props.placeholder}
+                    src={this.props.userInput.val || this.props.placeholder}
                     className="Theme__editor-placeholder"
                   />
                 </div>
@@ -71,19 +78,19 @@ define([
                   <input
                     type="file"
                     className="Theme__editor-input_upload"
-                    name={this.props.chosenValue ? 'brand_config[variables]['+ this.props.varDef.variable_name +']' : ''}
+                    name={this.props.userInput.val ? 'brand_config[variables]['+ this.props.varDef.variable_name +']' : ''}
                     accept={this.props.varDef.accept}
                     onChange={event => this.setValue(event.target)}
                     ref="fileInput"
                   />
                 </label>
-                {this.props.chosenValue || (this.props.currentValue && this.props.chosenValue !== '') ? (
+                {this.props.userInput.val || (this.props.currentValue && this.props.userInput.val !== '') ? (
                   <button
                     type="button"
                     className="Button Button--link"
-                    onClick={() => this.setValue(this.props.chosenValue ? null : '')}
+                    onClick={() => this.setValue(this.props.userInput.val ? null : '')}
                   >
-                    {this.props.chosenValue && this.props.currentValue ? I18n.t('Undo') : I18n.t('Reset')}
+                    {this.props.userInput.val && this.props.currentValue ? I18n.t('Undo') : I18n.t('Reset')}
                   </button>
                 ) : (
                   null
