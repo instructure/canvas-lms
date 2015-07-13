@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
+require 'rotp'
 
 describe User do
 
@@ -331,7 +332,7 @@ describe User do
     p1.save!
     user.pseudonyms.create! :unique_id => "id2", :account => account2
     user.remove_from_root_account account1
-    expect(user.associated_root_accounts).to eql [account2]
+    expect(user.associated_root_accounts.to_a).to eql [account2]
   end
 
   describe "update_account_associations" do

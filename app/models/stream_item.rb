@@ -65,6 +65,7 @@ class StreamItem < ActiveRecord::Base
     end
 
     res.instance_variable_set(:@attributes, data)
+    res.instance_variable_set(:@attributes_cache, {})
     res.instance_variable_set(:@new_record, false) if data['id']
     res
   end

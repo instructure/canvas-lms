@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe StudentViewEnrollment do
-  
+
   before(:each) do
     @student = User.create(:name => "some student")
     @course = Course.create(:name => "some course")
@@ -31,11 +31,11 @@ describe StudentViewEnrollment do
     @submission = @assignment.submit_homework(@student)
     @assignment.reload
     expect(@submission).not_to be_nil
-    expect(@assignment.submissions).to eql([@submission])
+    expect(@assignment.submissions.to_a).to eql([@submission])
     @course.save!
     @se = @course.student_enrollments.first
   end
-  
+
   it "should belong to a student" do
     @se.reload
     @student.reload

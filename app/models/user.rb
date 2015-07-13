@@ -454,7 +454,7 @@ class User < ActiveRecord::Base
     shards = [Shard.current]
     if !precalculated_associations
       if !users_or_user_ids.first.is_a?(User)
-        users = users_or_user_ids = User.select([:id, :preferences, :workflow_state]).where(id: user_ids).to_a
+        users = users_or_user_ids = User.select([:id, :preferences, :workflow_state, :updated_at]).where(id: user_ids).to_a
       else
         users = users_or_user_ids
       end
