@@ -458,4 +458,10 @@ describe Message do
     end
   end
 
+  it 'allows urls > 255 characters' do
+    url = "a" * 256
+    msg = Message.new
+    msg.url = url
+    msg.save!
+  end
 end
