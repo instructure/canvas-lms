@@ -77,3 +77,11 @@ define [
     inputText = $('#student_grading_1').val()
 
     deepEqual inputText, 'EX'
+
+  test "allows teacher to change grade to 'Ex'", ->
+    @assignment.grading_type = 'pass_fail'
+    dialog = new SubmissionDetailsDialog(@assignment, @user, @options)
+    dialog.open()
+
+    excusedOptionText = $('.grading_value option')[3].text
+    deepEqual excusedOptionText, 'Excused'

@@ -29,6 +29,7 @@ define [
         speedGraderUrl: speedGraderUrl
         loading: true
         showPointsPossible: (@assignment.points_possible || @assignment.points_possible == '0') && @assignment.grading_type != "gpa_scale"
+        shouldShowExcusedOption: true
       @submission["assignment_grading_type_is_#{@assignment.grading_type}"] = true
       @submission.grade = "EX" if @submission.excused
       @$el = $('<div class="use-css-transitions-for-show-hide" style="padding:0;"/>')
