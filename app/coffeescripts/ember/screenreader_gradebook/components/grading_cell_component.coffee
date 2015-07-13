@@ -31,6 +31,10 @@ define [
           label: I18n.t "grade_incomplete", "Incomplete"
           value: "incomplete"
         }
+        {
+          label: I18n.t "Excused"
+          value: 'EX'
+        }
     ]
 
     outOfText: (->
