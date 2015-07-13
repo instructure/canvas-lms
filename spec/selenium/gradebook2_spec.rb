@@ -865,6 +865,40 @@ describe "gradebook2" do
   end
 
   context 'excused assignment' do
+    it 'default grade cannot be set to excused', priority: "1", test_id: 219380 do
+      init_course_with_students
+
+      assignment = @course.assignments.create! title: 'Test Me!', points_possible: 20
+      get "/courses/#{@course.id}/grades"
+      f('.assignment_header_drop').click
+      f('.gradebook-header-menu [data-action="setDefaultGrade"]').click
+
+      ['EX', 'eX', 'Ex', 'ex'].each_with_index do |ex, i|
+        replace_content f("#student_grading_#{assignment.id}"), "#{ex}\n"
+        wait_for_ajaximations
+        expect(ff('.ic-flash-error').length).to be i + 1
+        expect(f('.ic-flash-error').text).to include 'Default grade cannot be set to EX'
+      end
+    end
+
+    it 'formats excused grade like dropped assignment', priority: "1", test_id: 216380 do
+      init_course_with_students
+
+      assignment = @course.assignments.create! title: 'Excuse Me', points_possible: 20
+      assignment.grade_student(@students[0], {excuse: true})
+
+      user_session(@students[0])
+      get "/courses/#{@course.id}/grades"
+
+      grade_row = f("#submission_#{assignment.id}")
+      grade_cell = f(".assignment_score .grade", grade_row)
+      grade = grade_cell.text.scan(/\d+|EX/).first
+
+      expect(grade_row).to have_class '.excused'
+      expect(grade).to eq 'EX'
+      expect(grade_row.attribute 'title').to eq 'This assignment is excused and will not be considered in the total calculation'
+    end
+
     it 'is not included in grade calculations', priority: "1", test_id: 196596 do
       init_course_with_students
 
@@ -1043,6 +1077,33 @@ describe "gradebook2" do
         wait_for_ajaximations
         expect(f('iframe.post-grades-frame')).to be_displayed
       end
+    end
+  end
+
+  context 'Grading History' do
+    it 'displays excused grades', priority: "1", test_id: 208844 do
+      course_with_teacher_logged_in(name: 'Teacher')
+      course_with_student(course: @course, active_all: true)
+
+      assignment = @course.assignments.build
+      assignment.publish
+      assignment.grade_student(@student, {grade: 15})
+      assignment.grade_student(@student, {excuse: true})
+
+      get "/courses/#{@course.id}/gradebook/history"
+      f('.assignment_header').click
+      wait_for_ajaximations
+      expect(f('.assignment_header .changes').text).to eq '1 change'
+
+      changed_values = ff('.assignment_details td').map(& :text)
+      expect(changed_values).to eq ['15', 'EX', 'EX']
+
+      assignment.grade_student(@student, {grade: 10})
+      refresh_page
+      f('.assignment_header').click
+      wait_for_ajaximations
+      changed_values = ff('.assignment_details td').map(& :text)
+      expect(changed_values).to eq ['EX', '10', '10']
     end
   end
 end

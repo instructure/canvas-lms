@@ -1,6 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/submissions_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 
 describe "submissions" do
   include_examples "in-process server selenium tests"
@@ -367,11 +368,41 @@ describe "submissions" do
   end
 
   context 'Excused assignment' do
+    it 'indicates as excused in submission details page', priority: "1", test_id: 201937 do
+      init_course_with_students
+      assignments = []
+      3.times do |i|
+        assignments << assignment = @course.assignments.create!(title: "Assignment #{i}", submission_types: 'online_text_entry', points_possible: 20)
+        assignment.submit_homework(@students[0], {submission_type: 'online_text_entry'}) unless i == 2
+      end
+
+      assignments[1].grade_student @students[0], {grade: 10}
+
+      assignments.each do |assignment|
+        assignment.grade_student @students[0], {excuse: true}
+      end
+
+      user_session @students[0]
+
+      get "/courses/#{@course.id}/assignments"
+      index_scores = ff('.score-display')
+      index_scores.each do
+        expect(score.text).to eq 'Excused'
+      end
+
+      3.times do |i|
+        get "/courses/#{@course.id}/assignments/#{assignments[i].id}"
+        expect(f("#sidebar_content .header").text).to eq 'Excused!'
+
+        get "/courses/#{@course.id}/assignments/#{assignments[i].id}/submissions/#{@students[0].id}"
+        expect(f("#content .submission_details .published_grade").text).to eq 'Excused'
+      end
+    end
+
     it 'does not allow submissions', priority: "1", test_id: 197048 do
       course_with_student_logged_in
       @assignment = @course.assignments.create!(
         title: 'assignment 1',
-        name: 'assignment 1',
         submission_types: 'online_text_entry'
       )
 
