@@ -31,7 +31,7 @@ shared_examples_for 'Quiz Submissions API Restricted Endpoints' do
 
     subject.stubs(:ldb_plugin).returns fake_plugin
     Canvas::LockdownBrowser.stubs(:plugin).returns fake_plugin
-    
+
     @request_proxy.call true, {
       attempt: 1
     }
@@ -205,6 +205,18 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       json = qs_api_index
       expect(json.key?('quiz_submissions')).to be_truthy
       expect(json['quiz_submissions'].length).to eq 2
+    end
+
+    it 'should show in progress attempt only when applicable' do
+      enroll_student
+      @quiz_submission = @quiz.generate_submission(@student)
+      json = qs_api_index
+
+      expect(json.key?('quiz_submissions')).to be_truthy
+      expect(json['quiz_submissions'].length).to eq 1
+      expect(json['quiz_submissions'].first['started_at']).to be_truthy
+      expect(json['quiz_submissions'].first['workflow_state']).to eq 'untaken'
+      expect(json['quiz_submissions'].first['finished_at']).to eq nil
     end
 
     it 'should show most recent attemps of quiz to teacher' do
