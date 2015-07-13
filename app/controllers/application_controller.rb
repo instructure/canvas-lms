@@ -1662,13 +1662,16 @@ class ApplicationController < ActionController::Base
   end
 
   def active_brand_config
-    @active_brand_config ||= begin
+    return @active_brand_config if defined? @active_brand_config
+    @active_brand_config = begin
       if !use_new_styles? || (@current_user && @current_user.prefers_high_contrast?)
         nil
       elsif session.key?(:brand_config_md5)
         BrandConfig.find(session[:brand_config_md5]) if session[:brand_config_md5]
-      else
+      elsif @domain_root_account.brand_config
         @domain_root_account.brand_config
+      elsif k12?
+        BrandConfig.where(name: 'K12 Theme', share: true).first
       end
     end
   end

@@ -5,9 +5,10 @@ define([
   'react',
   'str/htmlEscape',
   'compiled/fn/preventDefault',
+  './PropTypes',
   './ThemeEditorAccordion',
   './SharedBrandConfigPicker'
-], (I18n, React, htmlEscape, preventDefault, ThemeEditorAccordion, SharedBrandConfigPicker) => {
+], (I18n, React, htmlEscape, preventDefault, customTypes, ThemeEditorAccordion, SharedBrandConfigPicker) => {
 
   var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
 
@@ -37,10 +38,10 @@ define([
     displayName: 'ThemeEditor',
 
     propTypes: {
-      brandConfig: React.PropTypes.object.isRequired,
+      brandConfig: customTypes.brandConfig,
       hasUnsavedChanges: React.PropTypes.bool.isRequired,
-      variableSchema: React.PropTypes.object.isRequired,
-      sharedBrandConfigs: React.PropTypes.array.isRequired
+      variableSchema: customTypes.variableSchema,
+      sharedBrandConfigs: customTypes.sharedBrandConfigs
     },
 
     getInitialState() {
@@ -62,7 +63,7 @@ define([
       var val = this.state.changedValues[variableName]
       if (val) return val
       if (val !== '') {
-        val = this.props.brandConfig[variableName]
+        val = this.props.brandConfig.variables[variableName]
         if (val) return val
       }
       val = findVarDef(this.props.variableSchema, variableName).default
@@ -83,11 +84,9 @@ define([
         var msg = I18n.t('You are about to lose any unsaved changes.\n\n' +
                          'Would you still like to proceed?')
         if (confirm(msg)) {
-          $.ajax('/brand_configs', {method: 'DELETE'})
+          $.ajax('/brand_configs', {type: 'DELETE'})
             .then(this.redirectToWhatIframeIsShowing)
-            .then(null, function() { // our version of jQuery doesn't have .catch
-              alert(I18n.t('Something went wrong, please try again.'))
-            })
+            .then(null, () => alert(I18n.t('Something went wrong, please try again.')))
         }
       } else {
         this.redirectToWhatIframeIsShowing()
@@ -108,41 +107,18 @@ define([
           <div className="Theme__editor">
             <div className="Theme__editor-header">
               <h1 className="Theme__editor-header_title">
-                <i className="icon-instructure Theme__editor-header_title-icon"></i>
+                <button
+                  type='button'
+                  className="Theme__editor-header_title-icon btn-link pull-left"
+                  onClick={this.exit}
+                >
+                  <i className="icon-x" />
+                  <span className="screenreader-only">{I18n.t('Exit Theme Editor')}</span>
+                </button>
+
                 {I18n.t('Theme Editor')}
               </h1>
               <div className="Theme__editor-header_actions">
-                <div className="al-dropdown__container">
-                  <a className="al-trigger Button" role="button" href="#">
-                    <i className="icon-more"></i>
-                    <span className="screenreader-only">{I18n.t('More Options')}</span>
-                  </a>
-                  <ul
-                    className="al-options"
-                    role="menu"
-                    tabIndex="0"
-                    aria-hidden="true"
-                    aria-expanded="false">
-                    <li role="presentation" tabIndex="-1" role="menuitem">
-                      <a
-                        href="#"
-                        className="icon-reset"
-                        onClick={preventDefault(this.resetToCanvasDefaults)}
-                      >
-                        {I18n.t('Reset all to Canvas defaults')}
-                      </a>
-                    </li>
-                    <li role="presentation" tabIndex="-1" role="menuitem">
-                      <a
-                        href="#"
-                        className="icon-end"
-                        onClick={preventDefault(this.exit)}
-                      >
-                        {I18n.t('Exit Theme Editor')}
-                      </a>
-                    </li>
-                  </ul>
-                </div>
                 <span
                   data-tooltip="bottom"
                   title={this.state.somethingChanged ?
@@ -163,7 +139,7 @@ define([
             </div>
 
             {this.props.sharedBrandConfigs.length ?
-              <SharedBrandConfigPicker sharedBrandConfigs={this.props.sharedBrandConfigs} />
+              <SharedBrandConfigPicker sharedBrandConfigs={this.props.sharedBrandConfigs} activeBrandConfigMd5={this.props.brandConfig.md5} />
             :
               null
             }
@@ -172,7 +148,7 @@ define([
                 <div className="Theme__editor-tabs_panel">
                   <ThemeEditorAccordion
                     variableSchema={this.props.variableSchema}
-                    brandConfig={this.props.brandConfig}
+                    brandConfigVariables={this.props.brandConfig.variables}
                     getDefault={this.getDefault}
                     changedValues={this.state.changedValues}
                     somethingChanged={this.somethingChanged}

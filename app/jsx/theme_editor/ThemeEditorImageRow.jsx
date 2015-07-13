@@ -2,14 +2,16 @@
 
 define([
   'react',
+  './PropTypes',
   'i18n!theme_editor'
-], (React, I18n) => {
+], (React, customTypes, I18n) => {
+
   return React.createClass({
 
     displayName: 'ThemeEditorImageRow',
 
     propTypes: {
-      varDef: React.PropTypes.object.isRequired,
+      varDef: customTypes.image,
       onChange: React.PropTypes.func.isRequired,
       currentValue: React.PropTypes.string,
       placeholder: React.PropTypes.string

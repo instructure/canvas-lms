@@ -4,16 +4,18 @@ define([
   'react',
   './ThemeEditorColorRow',
   './ThemeEditorImageRow',
+  './PropTypes',
   'jquery',
   'jqueryui/accordion'
-], (React, ThemeEditorColorRow, ThemeEditorImageRow, $) => {
+], (React, ThemeEditorColorRow, ThemeEditorImageRow, customTypes, $) => {
+
   return React.createClass({
 
     displayName: 'ThemeEditorAccordion',
 
     propTypes: {
-      variableSchema: React.PropTypes.array.isRequired,
-      brandConfig: React.PropTypes.object.isRequired,
+      variableSchema: customTypes.variableSchema,
+      brandConfigVariables: React.PropTypes.object.isRequired,
       changedValues: React.PropTypes.object.isRequired,
       somethingChanged: React.PropTypes.func.isRequired,
       getDefault: React.PropTypes.func.isRequired
@@ -28,7 +30,7 @@ define([
 
     renderRow(varDef) {
       var props = {
-        currentValue: this.props.brandConfig[varDef.variable_name],
+        currentValue: this.props.brandConfigVariables[varDef.variable_name],
         chosenValue: this.props.changedValues[varDef.variable_name],
         onChange: this.props.somethingChanged.bind(null, varDef.variable_name),
         placeholder: this.props.getDefault(varDef.variable_name),

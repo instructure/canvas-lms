@@ -100,9 +100,10 @@ $te-border-color: darken($ic-color-neutral, 10);
     font-size: 18px;
     font-weight: 300;
     flex: 1;
+    text-align: center;
   }
   .Theme__editor-header_title-icon {
-    color: #D5412F;
+    color: $ic-color-light;
   }
   .Theme__editor-header_actions {
     display: flex;

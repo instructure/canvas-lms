@@ -6,7 +6,8 @@ class BrandConfigsController < ApplicationController
     @page_title = join_title(t('Theme Editor'), @domain_root_account.name)
     css_bundle :common, :theme_editor
     js_bundle :theme_editor
-    js_env brandConfig: (active_brand_config || BrandConfig.new).variables,
+    brand_config = active_brand_config || BrandConfig.new
+    js_env brandConfig: brand_config.as_json(include_root: false),
            hasUnsavedChanges: active_brand_config != @domain_root_account.brand_config,
            variableSchema: BrandableCSS::BRANDABLE_VARIABLES,
            sharedBrandConfigs: BrandConfig.select('md5, name').where(share: true).as_json(include_root: false)

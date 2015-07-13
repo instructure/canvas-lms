@@ -1,12 +1,16 @@
 /** @jsx React.DOM */
 
-define(['react'], (React) => {
+define([
+  'react',
+  './PropTypes'
+], (React, customTypes) => {
+
   return React.createClass({
 
     displayName: 'ThemeEditorColorRow',
 
     propTypes: {
-      varDef: React.PropTypes.object.isRequired,
+      varDef: customTypes.color,
       onChange: React.PropTypes.func.isRequired,
       currentValue: React.PropTypes.string,
       placeholder: React.PropTypes.string.isRequired
@@ -43,7 +47,7 @@ define(['react'], (React) => {
                   role="presentation-only"
                   onChange={event => this.props.onChange(event.target.value) }
                 />
-                
+
               </label>
             </div>
           </div>
