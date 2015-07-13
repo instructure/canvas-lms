@@ -335,11 +335,6 @@ $te-border-color: darken($ic-color-neutral, 10);
     color: $ic-color-dark;
     border: 1px solid $ic-color-neutral;
     border-radius: 3px;
-    $te-placeholder-color: $ic-color-dark;
-    &::-webkit-input-placeholder   {color: $te-placeholder-color;}
-    &::-moz-placeholder            {color: $te-placeholder-color;}
-    &:-ms-input-placeholder        {color: $te-placeholder-color;}
-
   }
   .Theme__editor-color-block_label-sample {
     border: 1px solid $ic-color-neutral;
