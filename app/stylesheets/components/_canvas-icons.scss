@@ -297,7 +297,7 @@ Either use `<a>` with icon desired icon class added or insert `<i>` inside `<but
   src:  url('/fonts/canvas/canvas-icons.eot?#iefix') format('embedded-opentype'),
         url('/fonts/canvas/canvas-icons.woff') format('woff'),
         url('/fonts/canvas/canvas-icons.ttf') format('truetype'),
-        url('/fonts/canvas/canvas-webfont.svg#canvasregular') format('svg');
+        url('/fonts/canvas/canvas-icons.svg#canvas-icons') format('svg');
   font-weight: normal;
   font-style: normal;
 }

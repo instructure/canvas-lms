@@ -30,7 +30,7 @@
     position: relative;
     height: 100%;
     // Use this element to preload the loading image for the secondary nav drawers
-    background: image-url("/images/panda-cycle-loader.gif") no-repeat -9999px -9999px;
+    background: url("/images/panda-cycle-loader.gif") no-repeat -9999px -9999px;
   }
 
   .ic-app-header__main-navigation {
@@ -279,7 +279,7 @@
         @include breakpoint(short) { padding-top: $ic-sp/2; }
       }
       &.ReactTray__loading-list-item {
-        background: image-url("panda-cycle-loader.gif") no-repeat left center;
+        background: url("/images/panda-cycle-loader.gif") no-repeat left center;
         background-size: 100px;
         text-align: center;
         color: $ic-dim-helper-text;

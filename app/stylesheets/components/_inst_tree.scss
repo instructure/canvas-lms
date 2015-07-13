@@ -34,7 +34,7 @@ ul.instTree {
         background-image: url("/images/groups_folder.png");
       }
       // &.open
-   
+
     }
     &.leaf {
       background-image: url("/images/mimeClassIcons/file.svg");
@@ -93,6 +93,7 @@ ul.instTree {
   z-index: 1000;
   position: absolute;
   &.node {
+    // FIXME: this background image doesn't exist
     background: #C3E1FF url("/images/inst_tree/node-drag.gif") left 3px no-repeat;
   }
   &.leaf {

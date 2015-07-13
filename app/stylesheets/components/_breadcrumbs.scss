@@ -12,7 +12,7 @@
       @if $use_new_styles {
         vertical-align: top;
         font-size: 18px;
-        // temporary solution for new styles before crumbs are re-done: 
+        // temporary solution for new styles before crumbs are re-done:
         // we do not want to see the home link
         &:first-of-type { display: none; }
         &:nth-child(2):before { display: none; }
@@ -43,7 +43,7 @@
             width: 5px; height: 9px;
             display: inline-block;
             margin: 0 ($ic-sp - 3);
-            background: image-url("breadcrumb-arrow-light.svg") no-repeat 50% 50%;
+            background: url("/images/breadcrumb-arrow-light.svg") no-repeat 50% 50%;
             background-size: 5px 9px;
           }
           @else {
