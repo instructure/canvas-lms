@@ -107,12 +107,13 @@ describe "context modules" do
     end
   end
 
-  context "progression link", priority: "2" do
+  context "progression link" do
     before(:each) do
       course_with_teacher_logged_in
     end
 
-    it "should show progressions link in modules home page" do
+    it "should show progressions link in modules home page", priority: "2" do
+      # progression link is the "View Progress" button
       create_modules(1)
       @course.default_view = 'modules'
       @course.save!
@@ -122,7 +123,20 @@ describe "context modules" do
       expect_new_page_load { link.click }
     end
 
-    it "should not show progressions link in modules home page for large rosters (MOOCs)" do
+    it "should show student progress page when view progress button is clicked", priority: "1", test_id: 140811 do
+      create_modules(1)
+      @course.default_view = 'modules'
+      @course.save!
+      get "/courses/#{@course.id}"
+      link = f('.module_progressions_link')
+      # module_progressions_link is the "View Progress" button
+      expect(link).to be_displayed
+      link.click
+      wait_for_ajaximations
+      expect(f('#breadcrumbs')).to include_text('Student Progress')
+    end
+
+    it "should not show progressions link in modules home page for large rosters (MOOCs)", priority: "2" do
       create_modules(1)
       @course.default_view = 'modules'
       @course.large_roster = true
