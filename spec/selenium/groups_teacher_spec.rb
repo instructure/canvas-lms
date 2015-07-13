@@ -242,7 +242,7 @@ describe "new groups" do
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full").css_value 'display').to eq 'none'
     end
 
-    it 'moves leader', priority: "1", test_id: 94163 do
+    it 'should move group leader', priority: "1", test_id: 96023 do
       group_test_setup(4,1,2)
       add_user_to_group(@students[0],@testgroup.first,true)
       2.times do |n|
