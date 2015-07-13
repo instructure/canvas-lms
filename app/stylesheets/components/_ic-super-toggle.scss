@@ -1,3 +1,8 @@
+/*
+@styleguide Super Toggle
+See Forms section.
+*/
+
 @mixin super-toggle-state ($attrs) {
   .ic-Super-toggle__input:#{$attrs} ~ .ic-Super-toggle__container {
     @content;
@@ -20,6 +25,8 @@
   $toggle-color-right-unchecked: $ic-color-light,
   $toggle-color-right-checked: $ic-color-light
   ) {
+
+  margin-bottom: 0; // override the default margin on labels in Canvas
 
   .ic-Form-group.ic-Form-group--horizontal & {
     @include breakpoint(tablet) {
@@ -44,17 +51,19 @@
 
   .ic-Super-toggle__option--LEFT {
     color: $toggle-color-left-unchecked;
-    .ic-Super-toggle__svg > * { fill: $toggle-color-left-unchecked; }
+    svg > * { fill: $toggle-color-left-unchecked; }
   }
 
   .ic-Super-toggle__option--RIGHT {
     color: $toggle-color-right-unchecked;
-    .ic-Super-toggle__svg > * { fill: $toggle-color-right-unchecked; }
+    svg > * { fill: $toggle-color-right-unchecked; }
   }
 
-  .ic-Super-toggle__svg {
+  svg {
     max-width: $toggle-width/4;
     max-height: $toggle-width/4;
+    display: inline-block;
+    vertical-align: middle;
   }
 
   @include super-toggle-state ('checked') {
@@ -64,13 +73,13 @@
     }
     .ic-Super-toggle__option--LEFT {
       color: $toggle-color-left-checked;
-      .ic-Super-toggle__svg > * {
+      svg > * {
         fill: $toggle-color-left-checked;
       }
     }
     .ic-Super-toggle__option--RIGHT {
       color: $toggle-color-right-checked;
-      .ic-Super-toggle__svg > * {
+      svg > * {
         fill: $toggle-color-right-checked;
       }
     }
@@ -130,7 +139,7 @@
     transform: translate3d(0,0,0);
     border-radius: 100%;
     box-shadow: 0 3px 6px rgba(black, 0.3);
-    background-image: image-url("toggle-handle.svg");
+    background-image: url("/images/toggle-handle.svg");
     background-position: 50% 50%;
     background-repeat: no-repeat;
     background-size: 20px;
@@ -243,8 +252,11 @@
     align-items: center;
   }
 
-  .ic-Super-toggle__switch {
-    display: block;
+  .ic-Super-toggle__switch { display: block; }
+
+  svg {
+    max-width: 18px; // SVGs look nicer a bit larger than the default for this variant of the toggle
+    max-height: 18px;
   }
 
   [class^="ic-Super-toggle__option--"] {
