@@ -344,6 +344,7 @@ describe ContentMigration do
       @copy_from.is_public = true
       @copy_from.public_syllabus = true
       @copy_from.lock_all_announcements = true
+      @copy_from.allow_student_discussion_editing = false
       @copy_from.save!
 
       run_course_copy
@@ -359,9 +360,7 @@ describe ContentMigration do
       expect(@copy_to.grading_standard).to eq gs_2
       expect(@copy_to.name).to eq "tocourse"
       expect(@copy_to.course_code).to eq "tocourse"
-      expect(@copy_to.is_public).to eq true
-      expect(@copy_to.public_syllabus).to eq true
-      expect(@copy_to.lock_all_announcements).to eq true
+      # other attributes changed from defaults are compared in clonable_attributes below
       atts = Course.clonable_attributes
       atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
       atts.each do |att|

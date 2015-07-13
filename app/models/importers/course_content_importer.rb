@@ -252,6 +252,7 @@ module Importers
       end
       atts = Course.clonable_attributes
       atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
+      course.settings_will_change! unless atts.empty?
       settings.slice(*atts.map(&:to_s)).each do |key, val|
         course.send("#{key}=", val)
       end
