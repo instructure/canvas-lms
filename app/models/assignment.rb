@@ -1004,7 +1004,7 @@ class Assignment < ActiveRecord::Base
       submission.skip_grade_calc = opts[:skip_grade_calc]
       student = submission.user
       if student == original_student || grade_group_students
-        previously_graded = submission.grade.present?
+        previously_graded = submission.grade.present? || submission.excused?
         next if previously_graded && dont_overwrite_grade
         next if student != original_student && submission.excused?
 
@@ -1019,7 +1019,7 @@ class Assignment < ActiveRecord::Base
           submission.score = score
           submission.excused = false
         else
-          submission.score = nil
+         submission.score = nil
           submission.grade = nil
         end
 
@@ -1031,6 +1031,11 @@ class Assignment < ActiveRecord::Base
           did_grade = true
           submission.grade = self.score_to_grade(submission.score, submission.grade)
         end
+
+        if submission.excused?
+          did_grade = true
+        end
+
         submission.grade_matches_current_submission = true if did_grade
 
         if submission.changes.except(*%w{user_id assignment_id}).values.flatten.any?(&:present?)
