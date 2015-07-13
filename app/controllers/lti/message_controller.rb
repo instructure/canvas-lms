@@ -27,8 +27,9 @@ module Lti
         @lti_launch = Launch.new
         @lti_launch.resource_url = params[:tool_consumer_url]
         message = RegistrationRequestService.create_request(
-          named_context_url(context, :context_tool_consumer_profile_url, "339b6700-e4cb-47c5-a54f-3ee0064921a9", include_host: true ),
-          named_context_url(context, :context_registration_return_url, include_host: true ))
+            polymorphic_url([@context, :tool_consumer_profile], tool_consumer_profile_id: "339b6700-e4cb-47c5-a54f-3ee0064921a9"),
+            ->(tool_proxy_uuid) { polymorphic_url([@context, :registration_return], tool_proxy_uuid: tool_proxy_uuid) }
+        )
         @lti_launch.params = message.post_params
         @lti_launch.link_text = I18n.t('lti2.register_tool', 'Register Tool')
         @lti_launch.launch_type = message.launch_presentation_document_target
@@ -75,7 +76,7 @@ module Lti
     end
 
     def registration_return
-      @tool = ToolProxy.where(guid: params[:tool_proxy_guid]).first
+      @tool = ToolProxy.where(guid: request.path_parameters[:tool_proxy_uuid]).first
       @data = {
         subject: 'lti.lti2Registration',
         status: params[:status],

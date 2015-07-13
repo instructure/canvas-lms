@@ -7,7 +7,7 @@ module Lti
 
       it 'creates a RegistrationRequest' do
         enable_cache do
-          reg_request = described_class.create_request('profile_url', 'return_url')
+          reg_request = described_class.create_request('profile_url', ->(_) {'return_url'})
           expect(reg_request.lti_version).to eq 'LTI-2p0'
           expect(reg_request.launch_presentation_document_target).to eq 'iframe'
           expect(reg_request.tc_profile_url).to eq 'profile_url'
@@ -20,7 +20,7 @@ module Lti
             returns(['key', 'password'])
           Rails.cache.expects(:write).with('lti_registration_request/key', 'password', anything)
 
-          described_class.create_request('profile_url', 'return_url')
+          described_class.create_request('profile_url', ->(_) {'return_url'})
         end
       end
 

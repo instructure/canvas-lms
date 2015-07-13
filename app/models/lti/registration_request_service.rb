@@ -12,9 +12,9 @@ module Lti
         lti_version: IMS::LTI::Models::LTIModel::LTI_VERSION_2P0,
         launch_presentation_document_target: IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME,
         tc_profile_url: tc_profile_url,
-        launch_presentation_return_url: return_url
       )
       reg_key, reg_password = registration_request.generate_key_and_password
+      registration_request.launch_presentation_return_url = return_url.call(reg_key)
       cache_registration(reg_key, reg_password)
 
       registration_request
