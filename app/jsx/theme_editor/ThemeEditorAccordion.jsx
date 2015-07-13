@@ -31,7 +31,7 @@ define([
     renderRow(varDef) {
       var props = {
         currentValue: this.props.brandConfigVariables[varDef.variable_name],
-        chosenValue: this.props.changedValues[varDef.variable_name],
+        userInput: this.props.changedValues[varDef.variable_name],
         onChange: this.props.somethingChanged.bind(null, varDef.variable_name),
         placeholder: this.props.getDefault(varDef.variable_name),
         varDef: varDef

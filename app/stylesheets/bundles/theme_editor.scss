@@ -352,6 +352,16 @@ $te-border-color: darken($ic-color-neutral, 10);
     height: $te-input-height;
     box-shadow: none;
   }
+  input[type="text"].Theme__editor-color-block_input--has-error {
+    &, &:focus{
+      border-color: $ic-color-danger;
+    }
+  }
+  .ic-Form-message.ic-Form-message--error{
+    position: absolute;
+    left: 150px;
+    top: 40px;
+  }
 }
 ////
 // Styles for image upload block
