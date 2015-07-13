@@ -298,5 +298,36 @@ describe "new groups" do
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-leader")).to be_displayed
       expect(f(".group[data-id=\"#{@testgroup[1].id}\"] .group-leader")).to be_nil
     end
+
+    it 'should remove group leader', priority: "1", test_id: 96025 do
+      group_test_setup(4,1,2)
+      add_user_to_group(@students[0], @testgroup.first, true)
+      2.times do |n|
+        add_user_to_group(@students[n+1], @testgroup.first, false)
+      end
+      add_user_to_group(@students[3], @testgroup.last, false)
+
+      get "/courses/#{@course.id}/groups"
+
+      f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
+      wait_for_ajaximations
+
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-user")).to include_text('Test Student 1')
+      expect(f('.icon-user.group-leader')).to be_displayed
+
+      f(".group-user-actions[data-user-id=\"#{@students[0].id}\"]").click
+      f('.ui-menu-item .icon-trash').click
+      wait_for_ajaximations
+
+      get "/courses/#{@course.id}/groups"
+
+      f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
+      wait_for_ajaximations
+      f(".group[data-id=\"#{@testgroup[1].id}\"] .toggle-group").click
+      wait_for_ajaximations
+
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-user")).not_to include_text('Test Student 1')
+      expect(f('.row-fluid .group-leader')).to be_nil
+    end
   end
 end
