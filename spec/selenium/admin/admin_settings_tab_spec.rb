@@ -79,6 +79,12 @@ describe "admin settings tab" do
     wait_for_ajax_requests
   end
 
+  def go_to_feature_options(account_id)
+    get "/accounts/#{account_id}/settings"
+    f("#tab-features-link").click
+    wait_for_ajaximations
+  end
+
   context "account settings" do
 
     it "should change the default time zone to Lima" do
@@ -473,9 +479,37 @@ describe "admin settings tab" do
     get "/accounts/#{Account.site_admin.id}/settings"
     f("#tab-features-link").click
     wait_for_ajaximations
-    
+
     Feature.applicable_features(Account.site_admin).each do |feature|
       expect(f(".feature.#{feature.feature}")).to be_displayed
     end
+  end
+
+  it "should test SIS Agent Token Authentication", priority: "1", test_id: 132577 do
+    sis_token = "canvas"
+    course_with_admin_logged_in(:account => Account.site_admin)
+    go_to_feature_options(Account.site_admin.id)
+    f("#ff_allowed_post_grades").click
+    admin = User.create!
+    Account.site_admin.account_users.create!(user: admin)
+    user_session(admin)
+    go_to_feature_options(Account.default.id)
+    f("#ff_allowed_post_grades").click
+    f("#tab-settings-link").click
+    # SIS Agent Token Authentication will not appear without refresh
+    refresh_page
+    expect(f("#add_sis_app_token")).to be_displayed
+    expect(f("#account_settings_sis_app_token")).to be_displayed
+    f("#account_settings_sis_app_token").send_keys(sis_token)
+    f(".btn-primary").click
+    keep_trying_until{
+      expect(f("#account_settings_sis_app_token").attribute("value")).to eq sis_token
+    }
+    go_to_feature_options(Account.default.id)
+    f("#ff_off_post_grades").click
+    f('#tab-settings-link').click
+    refresh_page
+    sis_token_element = f("#account_settings_sis_app_token")
+    expect(@sis_token_element).to be_nil
   end
 end
