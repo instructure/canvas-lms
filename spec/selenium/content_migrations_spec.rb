@@ -452,7 +452,7 @@ describe "content migrations", :non_parallel do
       expect(f("option[value=\"#{enrolled_course.id}\"]")).not_to be_nil
     end
 
-    it "should copy all content from a course" do
+    it "should copy all content from a course", priority: "1", test_id: 126677 do
       skip unless Qti.qti_enabled?
       visit_page
 
@@ -473,7 +473,7 @@ describe "content migrations", :non_parallel do
       expect(@course.quizzes.first.quiz_questions.count).to eq 11
     end
 
-    it "should selectively copy content" do
+    it "should selectively copy content", priority: "1", test_id: 126682 do
       skip unless Qti.qti_enabled?
       visit_page
 
