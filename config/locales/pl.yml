@@ -9707,6 +9707,7 @@ pl:
   moodle_formula_warning_title: "Trzeba będzie ponownie wygenerować możliwe odpowiedzi do pytania opartego na formule"
   more_courses_5ebbe998: "Więcej kursów"
   most_recent_score_13a87e8c: "Najnowszy wynik"
+  most_recent_score_counts_as_calculation_int_of_mas_9a3bcf66: "Najnowszy wynik punktowy liczy się jako %{calculation_int}% wagi biegłości, średnia ze wszystkich innych wyników punktowych liczy się jako  %{pozostałość}% wagi."
   move_abf00365: Przenieś
   move_dialog: 
     cancel: Anuluj
