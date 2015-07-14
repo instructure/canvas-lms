@@ -1377,6 +1377,7 @@ pt-BR:
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "O App Center aparecerá na guia \"Apps\" da página de configurações de um curso ou conta. A URL fornecida abaixo deve apontar para um endpoint válido do App Center (por exemplo, %{url} -- certifique-se de omitir a última barra"
   app_placements_6d877225: "Posicionamentos de Aplicativos"
   appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "Acrescenta um número ao fim de cada título de evento (por exemplo, Evento 1, Evento 2, etc)"
+  appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "Acrescenta um número ao fim de cada título de evento (por exemplo, Evento 1, Evento 2, etc.) \" for=\"append_iterator"
   apple_touch_icon_2c258bb3: "Ícone do Apple Touch"
   application: 
     errors: 
@@ -10633,6 +10634,7 @@ pt-BR:
       Aspire (SIS2000), JMC, e qualquer outro SIS ativado por SIF que aceita os elementos SIF GradingCategory,
       GradingAssignment, GradingAssignmentScore.
   post_grades_to_sis_97ece878: "Postar notas no SIS"
+  powerschool_a30f0bfc: PowerSchool
   practice_quiz_19a8505d: "Praticar teste"
   prerequisites_lookup: 
     headers: 
