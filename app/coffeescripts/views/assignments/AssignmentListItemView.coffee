@@ -233,7 +233,6 @@ define [
 
       json.submission.gradingType = json.gradingType if json.submission?
 
-
       if json.gradingType is 'not_graded'
         json.hideGrade = true
       json
