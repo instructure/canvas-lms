@@ -257,7 +257,7 @@ tr:
     report_header_canvas_xlist_course_id: canvas_xlist_course_id
     report_header_course: ders
     report_header_course__id: course_id
-    report_header_course_id: "kurs id"
+    report_header_course_id: "ders id"
     report_header_course_name: "ders adı"
     report_header_course_sis: "ders sis"
     report_header_course_sis_id: "ders sis id"
@@ -2172,7 +2172,7 @@ tr:
   between_2_and_5_c34f5152: "2 ile 5 Arasında"
   big_blue_button_conference: 
     recording_setting: Kaydediliyor
-    recording_setting_enabled_description: "Bu konferans için kaydı etkinleştir"
+    recording_setting_enabled_description: "Bu canlı ders için kaydı etkinleştir"
   blackboard: 
     no_manifest: "Bu Blackboard .zip uzantılı dosyasının içeriği ana dizininde imsmanifest.xml dosyası bulunamadı."
   blue_daf8fea9: Mavi
@@ -2668,6 +2668,9 @@ tr:
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Aynı türde birden fazla dosya için karşılaştırma yapılamaz"
   cancel_caeb1e68: İptal
   cannot_be_nil_when_account_id_is_nil_be6d1d60: "account_id sıfır olduğunda bu değer sıfır olamaz"
+  cannot_be_nil_when_course_id_is_nil_f539388: "course_id sıfır olduğunda bu değer sıfır olamaz"
+  cannot_be_present_when_account_id_is_present_f7d9b51f: "account_id var olduğunda bu değer var olamaz"
+  cannot_be_present_when_course_id_is_present_785e6a59: "course_id var olduğunda bu değer var olamaz"
   canvas: 
     migration: 
       errors: 
@@ -2677,18 +2680,27 @@ tr:
     plugins: 
       errors: 
         all_fields_required: "Tüm alanlar zorunludur"
+        aws_creds_required: "AWS bilgileri gereklidir."
+        endpoint_or_region_required: "AWS bölgesi (veya uç noktası) gereklidir."
         fields_required: "\"%{field}\" alanı zorunludur"
+        invalid_live_events_url: "Geçersiz uç nokta, geçerli bir URL olmalı."
         invalid_url: "Geçersiz bağlantı"
         login_expiration_minimum: "Oturum bitişi 20 dakika yada daha büyük olmalıdır"
         need_integer: "Oynatma listesi önbelleği için lütfen bir rakam giriniz"
+        stream_name_required: "Devinim akış adı gereklidir."
   canvas_cartridge_description: "Bu eklenti ile canvas dışa aktarımı, içe aktarılacak bir aracı json formatına dönüştürülür"
   canvas_cartridge_display: "Genel Canvas Cartridge"
   canvas_cartridge_file_description: "Canvas Dersi Dışarı Aktarma Paketi"
   canvas_cartridge_name: "Canvas Kartuş İçe Aktarıcı"
+  canvas_cloud_information_fdd404f2: "Canvas Bulut Bilgisi"
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas sizin kimlik saylayıcınızı tanımlayamadı"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "%{user} kullanıcı Canvas üzerinde kayıtlı değil"
+  canvas_error_report_ff678539: "Canvas Hata Raporu"
   canvas_revision_unknown: Bilinmiyor
+  canvas_ticketing_email_connector_27e253ae: "Canvas İşlem Açma Eposta Bağlayıcısı"
+  canvas_ticketing_web_post_connector_11158897: "Canvas İşlem Açma Web Gönderim Bağlayıcısı"
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas şu anda gönderilerinizi kaydetme sonrası tekrardan notlandırıyor, bu biraz zaman alabilir."
+  cas_url_4ba2843e: "CAS URL"
   cc: 
     by: "CC Özelliği"
     by_nc: "CC Özelliği Ticari Olmayan"
@@ -2698,21 +2710,29 @@ tr:
     by_sa: "CC Özelliği İlk lisans modeli korunacak"
     private: "Özel (Telif Hakkı Saklı)"
     public_domain: "Herkese Açık"
+  certificate_fingerprint_b376df90: "Sertifika Takip Bilgisi"
+  change_beginning_date_to_39dbd06e: "Başlangıç tarihini değiştir"
+  change_ending_date_to_d2cebd54: "Bitiş tarihini değiştir"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "Bu ödev için şu puanlar kullanılabilir: %{assignmentPoints}. Bu yönergeye uyumlu olması için bu puanları şu puanlarla  %{rubricPoints} değiştirmek ister misiniz?"
     titles: 
       update_assignment_points: "Değerlendirme listesine uyması için olası puanlar değiştirilsin mi?"
+  child_s_username_dde3aa9: "Alt Birim'in Kullanıcı Adı"
   choose_a_course_home_page_8059c7b: "Bir Ders Ana Sayfası Seçin"
   choose_a_csv_file_to_upload_9644480c: "Yüklencek bir CSV dosyası seçin:"
+  choose_an_authentication_service_47dc8875: "Bir kimlik doğrulama hizmeti seçin"
   choose_usage_rights_33683854: "Kullanıcı haklarını seçin..."
+  click_for_more_details_on_this_outcome_8c018d2f: "Bu öğrenme çıktısı hakkında daha fazla ayrıntı için tıklayın"
   click_here_on_the_calendar_link_c9965631: "*Takvim* bağlantısı üzerinde buraya tıklayın"
   click_to_modify_89fa26aa: "Değişiklik yapmak için tıklayın"
   click_to_report_profile_picture_370f9625: "Profil resmini raport etmek için tıklayın"
   close_and_return_to_canvas_80544344: "Kapat ve Canvas'a geri dön"
   close_d634289d: Kapat
+  close_picker_256aca8a: "Seçiciyi Kapat"
   collaboration: 
     default_title: "İsimsiz İşbirliği"
+  collaboration_was_deleted_9cf9934b: "İşbirliği silindi"
   collaborations: 
     collaboration: 
       delete: "Bu ortak çalışmayı silmek istediğine emin misin?"
@@ -2775,6 +2795,8 @@ tr:
         delete_google_doc_as_well: "Bu işbirliği çalışması Google Doc belgesi olarak kaydediliyor. Bu belgenin sadece Canvas'tan mı yoksa Google Docs'dan da mı silinmesini istediniz?"
       titles: 
         new: "Yeni Bir İşbirliği Başlat"
+    google_drive: 
+      file_not_found: "İşbirliği dosyası bulunamadı"
     index: 
       description_rs: |-
           [Google Docs](%{google_url}) ve [EtherPad](%{etherpad_url}) gibi çevrimiçi ücretsiz araçlar, grup projeleri veya ödevler ve ortak notlar oluşturmak ve benzeri etkinlikler için uygun ortamlardır.
@@ -2808,6 +2830,15 @@ tr:
       started_by: "*%{user}*, tarafından %{at} 'de başlatıldı"
       titles: 
         current: "Geçerli İşbirliği Çalışmaları"
+    show: 
+      error_cause_1: "Oluşturanın Google Drive hesabı, işbirliği oluşturulurken kullanılan hesaptan farklı."
+      error_cause_2: "İşbirliğini oluşturan google doc üzerinde artık bir yazar değil."
+      error_cause_3: "Google doc artık mevcut değil."
+      error_summary: "Görünüşe göre bu işbirliği çalışmıyor. Olası nedenler:"
+      error_title: "Google Drive İşbirliği Hatası"
+      headings: 
+        page: "Google Drive İşbirliği Hatası"
+      resolution: "Oluşturan ile iletişime geçip bilgilendirin."
     titles: 
       delete: "Çalışma ekibini sil?"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "%{groupName} için grup üyeleri listesini daraltın"
@@ -2885,6 +2916,7 @@ tr:
       notices: 
         contact_registered: "İletişim yöntemi kaydedildi!"
   concluded_courses_94782e21: "Tamamlanmış Dersler"
+  conference_was_deleted_30869390: "Canlı ders silindi"
   conferences: 
     concluded_conference: 
       delete: Sil
@@ -2895,10 +2927,10 @@ tr:
       view: Göster
     confirm: 
       close: |-
-          Bu konferansı sonlandırmak istediğinize emin misiniz?
+          Bu canlı dersi sonlandırmak istediğinize emin misiniz?
           
           Tekrar açamayacaksınız.
-      delete: "Bu konferansı silmek istediğinizden emin misiniz?"
+      delete: "Bu canlı dersi silmek istediğinizden emin misiniz?"
     disabled_error: "Web konferansı bu Canvas sitesi için aktif değildir."
     edit_conference_form: 
       advanced_settings: "Gelişmiş Ayarları Yönet..."
@@ -2907,21 +2939,22 @@ tr:
       duration: Süre
       duration_in_minutes: dakika
       invite_all: "Tüm Ders Üyelerini Davet Et"
-      long_running: "Süre sınırı yok (uzun süreli konferanslar için)"
+      long_running: "Süre sınırı yok (uzun süreli canlı dersler için)"
       members: Üyeler
       name: Ad
       options: Seçenekler
-    general_error: "Konferansa katılmada bir hata oluştu"
-    general_error_with_message: "Konferansa katılmada bir hata meydana geldi. Mesaj :  '%{message}'"
-    inactive_error: "Konferans şu an aktif değil"
+    general_error: "Canlı derse katılmada bir hata oluştu"
+    general_error_with_message: "Canlı derse katılmada bir hata meydana geldi. Mesaj :  '%{message}'"
+    inactive_error: "Canlı ders şu an aktif değil"
     index: 
-      concluded_conferences: "Tamamlanmış Konferanslar"
-      conference_header: Konferanslar
-      new_conference: "Yeni Konferans"
-      new_conferences: "Yeni Konferanslar"
-      page_title: "Web Konferansları"
+      concluded_conferences: "Tamamlanmış Canlı Dersler"
+      conference: "Canlı Ders"
+      conference_header: "Canlı Dersler"
+      new_conference: "Yeni Canlı Ders"
+      new_conferences: "Yeni Canlı Dersler"
+      page_title: "Web Üzerinden Canlı Dersler"
     loading_urls_message: "Yükleniyor, lütfen bekleyin..."
-    multiple_urls_message: "Bu konferans için çoklu %{type} sayfalar bulunmaktadır. Lütfen birini seçin:"
+    multiple_urls_message: "Bu canlı ders için çoklu %{type} sayfa bulunmaktadır. Lütfen birini seçin:"
     new_conference: 
       delete: Sil
       edit: Düzenle
@@ -2933,20 +2966,21 @@ tr:
       settings: Ayarlar
       start: Başlat
       view: Göster
-    no_concluded_conferences: "Sonlandırılmış konferans yok"
-    no_new_conferences: "Yeni konferans yok"
-    no_settings_error: "Konferansın gelişmiş ayarlar sayfası yok"
-    no_urls_error: "Üzgünüz, bu konferans için henüz %{type} sayfa bulunmamakta."
+    no_concluded_conferences: "Sonlandırılmış canlı ders yok"
+    no_new_conferences: "Yeni canlı ders yok"
+    no_settings_error: "Canlı dersin gelişmiş ayarlar sayfası yok"
+    no_urls_error: "Üzgünüz, bu canlı ders için henüz %{type} sayfa bulunmamakta."
     notifications: 
       inaccessible: "Uyaru : Bu sayfa üçüncü parti içerik içeren uygulamalara erişememektedir."
     show: 
       buttons: 
         close: "Şimdi bitir."
         join: "Şimdi katıl"
-    type_disabled_error: "Bu Canvas sitesinde bu türde bir konferans artık bulunmamakta"
+    type_disabled_error: "Bu Canvas sitesinde bu türde bir canlı ders artık bulunmamakta"
   config_url_e96ceaf3: "Ayar URL'si"
   configurate_tool_app_5a721f2c: "%{tool} Uygulaması Yapılandırılsın mı?"
   configuration_type_25a084a4: "Yapılandırma Türü"
+  configure_ecb97e30: Yapılandır
   configure_toolname_app_651371be: "%{toolName} Uygulamasını Yapılandır"
   confirm_dialog: 
     cancel: İptal
@@ -3264,6 +3298,7 @@ tr:
         user_services: "Kayıt Olunan Web Servisleri"
       help: 
         list_services: "Kayıtlı servislerin listesi etkinleştirilmemiş. Bu listeyi etkinleştimek ders ve grup üyelerinin sınıf dışında size daha kolay bağlanmalarını sağlar. "
+        services: "Kullanıcı profilinizi herhangi bir dış servisle ilişkilendirmediniz. Canvas hesabınızı Twitter gibi servislere bağlayabilirsiniz. Bu sayede ders dışında da sınıf veya grup arkadaşlarınızla kolaylıkla iletişimde kalabilirsiniz."
       labels: 
         public_list_services: "Ders/grup arkadaşlarım profilimi ilişkilendirdiğim servisleri görebilsinler"
         user_privileges: Ayrıcalıklar
@@ -3302,6 +3337,7 @@ tr:
         registered_services: "Kayıt olunan Servisler"
         service_types: "Hizmet Türleri"
       help: 
+        no_services: "Kullanıcı profilinizi herhangi bir dış servisle ilişkilendirmediniz. Canvas hesabınızı Twitter gibi servislere bağlayabilirsiniz."
         services_private: "Kayıtlı servislerin listesi etkinleştirilmemiş. Bu listeyi etkinleştimek ders ve grup üyelerinin Canvas hesabınızla hangi servisleri ilişkilendirdiğinizi görmelerini sağlar."
         user_services: "Eğer diğer üyeler seçerlerse, Canvas hesapları ile hangi harici servisleri ilişkilendirdiklerini görebilirsiniz. Bu durumda grup projelerinin koordinasyonu kolaylaşır ve sınıf dışında da iletişim sağlanır."
       labels: 
@@ -3351,6 +3387,7 @@ tr:
     invalid_content: "İçerik bulunamadı"
     invalid_position: "Geçersiz konum"
     invalid_requirement_type: "Geçersiz bitirme gereksinim türü"
+  context_module_sub_header_2f39e87b: "Bağlam Modülü Alt Başlığı"
   context_modules: 
     buttons: 
       add: "Modül Ekle"
@@ -3583,6 +3620,7 @@ tr:
   context_modules_api: 
     invalid_position: "Geçersiz konum"
   continue_ac067716: Devam
+  continue_typing_to_find_additional_sections_or_stu_49786085: "Daha fazla bölüm veya öğrenci bulmak için yazmaya devam edin."
   conversation_dialog: 
     errors: 
       field_is_required: "Bu alan zorunludur"
@@ -3759,6 +3797,8 @@ tr:
     unarchive: Arşivlenmemiş
     unstar: "Yıldız Al"
     unstar_conversation: "Tartışmadan yıldızı kaldır"
+  copy_to_folder_32ecc3c3: "Klasöre Kopyala"
+  copying_628a9607: Kopyalanıyor...
   copyright_holder_66ee111: "Telif Sahibi:"
   correct_answer: "Doğru cevap. "
   correct_answers_are_available_until_date_df01cc5f: "Doğru cevaplar %{date}'ne kadar görülebilir."
@@ -3781,6 +3821,8 @@ tr:
   count_items_selected_91814713: 
     one: "%{count} öğe seçildi"
     other: "%{count} öğe seçildi"
+  count_max_students_2db76773: "%{count} / %{max} öğrenci"
+  count_max_users_bdebb537: "%{count} / %{max} kullanıcı"
   count_minutes_a6eeeacb: 
     one: "1 dakika"
     other: "%{count} dakika"
@@ -3851,7 +3893,8 @@ tr:
       all: Herkes
       only_teachers: "Sadece Öğretmenler"
       teachers_students: "Öğretmen ve Öğrenciler"
-  course_atom_feed_9d95214e: "Kurs Atom Yayını"
+  course_announcements_76b07340: "Ders Duyuruları"
+  course_atom_feed_9d95214e: "Ders Atom Yayını"
   course_copy_argument_error: "Dersi kopyalamak için kaynak ders gerekmektedir."
   course_copy_description: "Canvas derslerini kopyalamak için aktarma eklentisi"
   course_copy_display: "Ders Kopyala"
@@ -3859,6 +3902,8 @@ tr:
   course_copy_name: "Canvas Dersini Kopyala"
   course_copy_no_course_error: "Kaynak ders bulunamadı."
   course_copy_not_allowed_error: "Ders kaynağının kopyalanmasına izin verilmiyor."
+  course_discussions_38c0b74f: "Ders Tartışmaları"
+  course_ends_at_e8b166df: "Dersin bitiş tarihi"
   course_exports: 
     errors: 
       assignment: "\"%{title}\" ödevinin dışa aktarımı başarısız oldu"
@@ -3899,6 +3944,8 @@ tr:
       file: "Bilinmeyen dosya"
       topic: "Bilinmeyen konu"
       wiki_page: "Bilinmeyen wiki sayfası"
+  course_files_62deb8f8: "Ders Dosyaları"
+  course_home_sub_navigation_b1ee6b03: "Ders Ana Sayfa Alt Gezinme"
   course_list: 
     favorited_tooltip: "Dersler menüsünden çıkarmak için tıklayınız."
     nonfavorited_tooltip: "Dersler menüsüne eklemek için tıklayınız."
@@ -4027,7 +4074,9 @@ tr:
       move_course: "Dersi Taşı"
       reset_course_content_dialog_help: "Ders İçeriğini Sıfırla"
       section_enrollments: "Seçilenleri Dahil Et"
+  course_settings_sub_navigation_b95deae: "Ders Ayarları Alt Gezinme"
   course_setup_wizard_is_showing_a7c087c1: "Ders Kurulum Sihirbazı gösteriliyor."
+  course_starts_at_3a01f9da: "Dersin başlangıç tarihi"
   course_statistics: 
     unknown: bilinmeyen
   course_users: 
@@ -4057,6 +4106,8 @@ tr:
         conclude_course: "Dersi Sonlandır"
         delete_course: "Dersi Sil"
       details: 
+        conclude_alt_text: "Öğrencilerin derse erişimini sınırlandırıp notları değiştirebilme yetkisini tekrar elde etmek isterseniz lütfen ders tarihleri ayarını kullanın. Ders tarih ayarları hakkında bilgiyi *burada* bulabilirsiniz"
+        confirm_conclude: "Uyarı: Dersi sonlandırırsanız tüm ders içeriği arşivlenir ve notları değiştiremezsiniz"
         confirm_delete: "Bu dersi silmek istediğinize emin misiniz? Silerseniz, öğrenciler ve öğretmenler birdaha erişemeyeceklerdir. Eğer açılır menüden kaldırılmasını istiyorsanız *dersi sonlandırmalısınız*."
         confirm_delete_addendum: "Dersi sonlandırmaya izin vermiyorsa, *ders bitiş tarihini değiştirmelisiniz* veya yöneticiye dersin sonlandırılması için başvurun."
       headings: 
@@ -4242,6 +4293,7 @@ tr:
       link_to_students_view: 
         link_student_desc: "Bir gözlemci olarak bir öğrenciye bağlandığınızda, o öğrencinin notlarına ve ders etkileşimleri erişebilirsiniz."
       resend_invitations: 
+        pending_invitation: "1 davet kabul edilmedi."
         pending_invitations: "%{pendingInvitationsCount} davet henüz onaylanmadı."
         re_send_invitations: "Tekrar gönder"
         re_sending_invitations: "Tekrar gönderiliyor..."
@@ -4330,7 +4382,7 @@ tr:
         course_name: Ad
         course_section_name: "Yeni Bölüm Ekle"
         course_status_published: "Ders Yayınlanıyor"
-        course_status_unpublished: "Kurs Yayınlanmıyor"
+        course_status_unpublished: "Ders Yayınlanmıyor"
         course_visibility: Görünebilirlik
         enrollment_term_id: Dönem
         grading_scheme: "Notlandırma Şemaları"
@@ -4404,7 +4456,7 @@ tr:
       headings: 
         current_users: "Varolan Kullanıcılar"
       help: 
-        reset_course_content: "Ders içeriğini sıfırlamak o dersle ilgili tüm ödev, tartışma, kısa sınav, modül, denetim listeleri, sayfalar, dosyalar, öğrenme çıktıları, soru bankaları, işbirlikleri, konferanslar ve diğer tüm içeriği kalıcı olarak silecektir. Bu eylemin dönüşü yoktur ve veri geri *getirilemez*. Devam etmek istediğinize emin misiniz?"
+        reset_course_content: "Ders içeriğini sıfırlamak o dersle ilgili tüm ödev, tartışma, kısa sınav, modül, denetim listeleri, sayfalar, dosyalar, öğrenme çıktıları, soru bankaları, işbirlikleri, canlı dersler ve diğer tüm içeriği kalıcı olarak silecektir. Bu eylemin dönüşü yoktur ve veri geri *getirilemez*. Devam etmek istediğinize emin misiniz?"
       links: 
         calendar: "Ders Takvimi"
         conclude: "Bu Dersi Sonlandır"
@@ -4432,7 +4484,7 @@ tr:
           select_content: "Ana sayfada gösterilecek şeyi seçin."
         options: 
           assignments: "Ödev Listesi"
-          course_activity_stream: "Kurs Aktivite Yayını"
+          course_activity_stream: "Ders Aktivite Yayını"
           custom_page: "Ön Sayfa Sayfaları"
           modules: "Ders Modülleri"
           syllabus: "Ders Programı"
@@ -4544,7 +4596,9 @@ tr:
     url: URL
   create_users_view: 
     required: "Lütfen birkaç eposta adresi giriniz"
+  created_by_b39b9c8b: Oluşturan
   created_group_group_name_2097306b: "Oluşturulan Grup %{group_name}"
+  creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Gönderileri Dışa Aktar oluşturma şimdiki ve geçmiş tüm derslerinizdeki ödev gönderilerini zip dosyası olarak indirmenizi sağlar. Dosya boyutu büyükse, indirmek zaman alabilir. Bu sayfadan ayrılıp sonra tekrar buraya gelebilirsiniz."
   creative_commons_714a065f: "Creative Commons"
   creative_commons_license_725584ae: "Creative Commons Lisansı:"
   crowdsourced: true
@@ -4554,7 +4608,7 @@ tr:
     assignments: Ödevler
     calendar_events: "Takvim Olayları"
     collaborations: İşbirlikleri
-    conferences: Konferanslar
+    conferences: "Canlı Dersler"
     confirmation: Onaylama
     copy_course: "Dersi Kopyala"
     developer_keys: "Geliştirici Anahtarları"
@@ -4631,6 +4685,7 @@ tr:
         ratio: "Yanlış Öğrenci Oranı"
   current_3ce5414a: "Geçerli:"
   current_mastery_score_score_out_of_mastery_points_fedd343f: "Geçerli Yeterlik Puanı: %{mastery_points} üzerinden %{score}"
+  current_provider_6c3f7f96: "Geçerli Sağlayıcı"
   current_score_6c81792: "Güncel Puan"
   current_total_67bf5f72: "Geçerli Toplam:"
   curve_grades_dialog: 
@@ -4645,6 +4700,7 @@ tr:
     out_of_points_possible: "%{assignment.points_possible} üzerinden"
     this_is_permanent: "Not çan eğrisi oluşturma geri alınamaz. Önceden çan eğrisi oluşturulmuş notların geçmişi kullanılabilir fakat çan eğrisi oluşturma geri alınamaz."
   custom_fields_fc3e55af: "Varsayılan Alanlar"
+  cyan_c1d5f68a: "Cam göbeği"
   d2l_display: Desire2Learn
   d2l_file_description: "D2L .zip dışarı aktarma formatı"
   d2l_name: "D2L Dönüştürücü"
@@ -4663,7 +4719,7 @@ tr:
       other: "%{count} ödev bildirimini genişlet"
     confirm: 
       close: |-
-          Bu konferansı sonlandırmak istediğinize emin misiniz?
+          Bu canlı dersi sonlandırmak istediğinize emin misiniz?
           
           Tekrar açamayacaksınız.
     conversations_collapse: 
@@ -4681,6 +4737,7 @@ tr:
     show_more_link: 
       show_less: "Daha Az Göster"
       show_more: "Daha Fazla Göster"
+  dashboard_7f1dbf71: "Kontrol Paneli"
   data_exports: "veri aktarımları"
   data_set_identifier_data_set_id_c228b5df: "Veri Seti Tanımlayıcısı: %{data_set_id}"
   date: 
@@ -4706,6 +4763,15 @@ tr:
       - Eki
       - Kas
       - Ara
+    datepicker: 
+      column_headings: 
+        - Paz
+        - Ptesi
+        - Sa
+        - Çar
+        - Per
+        - Cu
+        - Ctesi
     day_names: 
       - Pazar
       - Pazartesi
@@ -4722,6 +4788,8 @@ tr:
     formats: 
       date_at_time: "%b %-d at %l:%M%P"
       default: "%Y-%m-%d"
+      full: "%b %-d, %Y %-l:%M%P"
+      full_with_weekday: "%a %b %-d, %Y %-l:%M%P"
       long: "%B %-d, %Y"
       long_with_weekday: "%A, %B %-d"
       medium: "%b %-d, %Y"
@@ -4747,6 +4815,12 @@ tr:
       - Kasım
       - Aralık
   date_error_7b38f8ff: "Tarih Hatası"
+  datepicker: 
+    errors: 
+      not_a_date: "Bu bir tarih değil!"
+    first_day_index: "0"
+    nextText: Sonraki
+    prevText: Önceki
   dates: 
     no_date: "Tarih Yok"
   datetime: 
@@ -4792,18 +4866,24 @@ tr:
       month: Ay
       second: Saniye
       year: Yıl
+  day_s_7cc1231f: Gün(ler)
   decaying_average_8bf6a0dd: "Düşüş Ortalaması"
-  default_conference_title: "%{course_name} Konferansı"
+  deep_orange_4c7eea99: "Koyu Turuncu"
+  deep_purple_bb3e2907: "Koyu Mor"
+  default_conference_title: "%{course_name} Canlı Dersi"
   default_question_name: Soru
   default_question_text: "Soru metni"
+  delay_posting_this_topic_until_aa483eec: "Bu konuyu göndermeyi şu tarihe kadar ertele"
   delete_a6efa79d: Sil
   delete_grading_period_dba36e59: "Notlandırma peryodunu sil"
   delete_grading_scheme_6b308832: "Notlandırma Şemasını Sil"
   delete_my_account_41060aad: "Hesabımı Sil"
   delete_quiz_142b8099: "Kısa Sınavı Sil"
+  delete_selected_a023ccf8: "Seçileni Sil"
   delete_survey_56fddbbd: "Anket Sil"
   delete_tool_app_9c9f6d35: "%{tool} Uygulaması Silinsin mi?"
   delete_toolname_app_85f9d4ee: "%{toolName} Uygulamasını Sil"
+  deleting_6421031e: siliniyor...
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Demo siteler için Recaptcha ayarları yapılmış olmalıdır. Canvas'ın bu uygulaması için lütfen site yöneticiniz ile görüşün."
   demos: 
@@ -6657,7 +6737,7 @@ tr:
       buttons: 
         create: "Grup Oluştur"
       course_groups: "Ders Grupları"
-      group_explanation: "Gruplar projeler için işbirliği veya çalışma oturumları için vb. çalışmalar için idealdir. Her grup için takvim, wiki, tartışma ve dosyalama alanı sağlanmaktadır. Gruplar bu belgeler üzerinde işbirliği yapabilir veya web konferanslarını zamanlayabilirler. Öğrencilerin bir proje üzerinde küçük öğrenci grupları ile daha iyi odaklanabilecekleri mini dersler olarakta benzetebiliriz."
+      group_explanation: "Gruplar projeler için işbirliği veya çalışma oturumları için vb. çalışmalar için idealdir. Her grup için takvim, wiki, tartışma ve dosyalama alanı sağlanmaktadır. Gruplar bu belgeler üzerinde işbirliği yapabilir veya web üzerinden canlı dersleri  zamanlayabilirler. Öğrencilerin bir proje üzerinde küçük öğrenci grupları ile daha iyi odaklanabilecekleri mini dersler olarakta benzetebiliriz."
       groups_disabled: "Bu ders için öğrencilerin grupları kendilerinin organize etme özelliği devre dışı; bu yüzden öğretmeninizin sizi atadığı gruba razı olacaksınız."
       headings: 
         available_groups: "Mevcut Gruplar"
@@ -6920,7 +7000,7 @@ tr:
   groups_6c90e26a: Gruplar
   groups_are_a_good_place_to_collaborate_on_projects_7386830f: "Gruplar projelerde işbirliği yapmak veya çalışma oturumları ve benzer şeyleri yapmak için idealdir.\n\
       Her grup için takvim, wiki, tartışma ve biraz dosyalama alanı sağlanmaktadır. Gruplar bu belgeler\n\
-      üzerinde işbirliği yapabilir ve hatta web konferanslarını düzenleyebilirler. Aslında daha çok\n\
+      üzerinde işbirliği yapabilir ve hatta web üzerinden canlı dersler düzenleyebilirler. Aslında daha çok\n\
       proje odaklı olarak az sayıda öğrenci ile çalışabileceğiniz küçük bir derse benzetebiliriz. "
   help_dialog: 
     Back: Geri
@@ -7402,7 +7482,7 @@ tr:
         sending: Gönderiliyor...
       new: 
         back_to_login: "Oturum Aç'a dön"
-        browse_courses: "Kursları görüntüle"
+        browse_courses: "Dersleri göster"
         buttons: 
           request_password: "Şifremi Gönder"
         coenrollment_banner: "*Canvas kullanıcısınının ebeveyni misiniz?* **Hesap oluşturmak için tıklayın**"
@@ -9204,19 +9284,19 @@ tr:
     visit_modules_page: "*Bu içeriğin kilidinin nasıl kaldırılacağı ile ilgili bilgi için ders modül sayfasına gidin.*"
     web_conference_invitation: 
       email: 
-        body: "Bir Web konferansına davet edildiniz, %{title} for %{name}."
+        body: "Bir Web üzerinden canlı derse davet edildiniz, %{title} for %{name}."
         details_link: "Ayrıntıyı buradan görebilirsiniz: %{link}"
         html: 
-          body: "Bir Web konferansına davet edildiniz, %{title} for %{name}."
+          body: "Bir Web üzerinden canlı derse davet edildiniz, %{title} for %{name}."
           details_link: "Ayrıntıları görmek için tıklayınız"
-          subject: "Web Konferans Daveti: %{name}"
-        subject: "Web Konferans Daveti: %{name}"
+          subject: "Web Üzerinden Canlı Ders Daveti: %{name}"
+        subject: "Web Üzerinden Canlı Ders Daveti: %{name}"
       sms: 
-        body: "Bir Web konferansına davet edildiniz, %{title} for %{name}."
+        body: "Bir Web üzerinden canlı derse davet edildiniz, %{title} for %{name}."
         link_message: "Daha fazla bilgi için %{url}"
       summary: 
-        body: "Bir Web konferansına davet edildiniz, %{title} for %{name}."
-        subject: "Web Konferans Daveti: %{name}"
+        body: "Bir Web üzerinden canlı derse davet edildiniz, %{title} for %{name}."
+        subject: "Web Üzerinden Canlı Ders Daveti: %{name}"
       twitter: 
         tweet: "Canvas Uyarısı - Davet: katılım %{title}, %{name}"
     web_conference_recording_ready: 
@@ -9224,8 +9304,12 @@ tr:
         details_link: "Ayrıntıyı buradan görebilirsiniz: %{link}"
         html: 
           details_link: "Ayrıntıları görmek için tıklayınız"
+          subject: "Web Üzerinden Canlı Ders Kaydı Hazır: %{name}"
+        subject: "Web Üzerinden Canlı Ders Kaydı Hazır: %{name}"
       sms: 
         link_message: "Daha fazla bilgi için %{url}"
+      summary: 
+        subject: "Web Üzerinden Canlı Ders Kaydı Hazır: %{name}"
   migration: 
     announcement_type: Duyuru
     assignment_group_type: "Ödev Grubu"
@@ -9426,7 +9510,7 @@ tr:
     submission_comments: "Gönderim yorumları"
     sure_you_want_to_mute: "Bu ödevi askıya almak istediğinize emin misiniz? Bu ödev askıdayken öğenciler yeni bildirim almayacak ve şunları göremeyecekler:"
   muted_283cfa0f: "(askıya alınmış)"
-  my_dashboard_b724020: Özetim
+  my_dashboard_b724020: "Kontrol Panelim"
   n_a_d6f6c42f: Yok
   n_number_of_times_c2e78b72: "n Kere"
   name: "Academic Benchmark İçeri Aktarıcı"
@@ -9439,7 +9523,7 @@ tr:
   name_only_5f56718e: "Sadece İsim"
   near_mastery_f25174a4: "Yeterliğe Yakın"
   new_account_role_6e5c4964: "Yeni Hesap Rolü"
-  new_course_role_6a7bb75f: "Yeni Kurs Rolü"
+  new_course_role_6a7bb75f: "Yeni Ders Rolü"
   new_file_135ae520: "[ Yeni Dosya ]"
   new_outcome_7fba8c7d: "Yeni Öğrenme Çıktısı"
   new_quiz_statistics_desc: "Ders için yeni kısa sınav istatistik sayfasını etkinleştir."
@@ -9552,7 +9636,7 @@ tr:
     invitation_description: |-
         Davet:
         
-        * Web konferansı
+        * Web üzerinden canlı derse
         * Grup
         * İşbirliği
         * Ders
@@ -9639,7 +9723,8 @@ tr:
       submission_needs_grading: "Gönderinin Değerlendirilmesi Gerekli"
       summaries: Özetler
       updated_wiki_page: "Wiki Sayfası Düzenlendi"
-      web_conference_invitation: "Web Konferans Daveti"
+      web_conference_invitation: "Web Üzerinden Canlı Ders Daveti"
+      web_conference_recording_ready: "Web Üzerinden Canlı Ders Kaydı Hazır"
     no_subject: "Konu Yok"
     other_display: "Yönetimden Gelen Bildirimler"
     reminder_display: Hatırlatma
@@ -9650,6 +9735,7 @@ tr:
     student_appointment_display: "Öğrenci Randevu Oturumları"
     submission_comment_description: "Ödev gönderim yorumu"
     submission_comment_display: "Gönderi Yorumu"
+    web_conference_recording_ready: "Bir canlı ders kaydı hazır"
   notification_preferences: 
     communication: 
       email: 
@@ -9678,7 +9764,7 @@ tr:
       admin: "Yönetsel "
       alerts: Uyarılar
       communication: Mesajlaşmalar
-      conferences: Konferanslar
+      conferences: "Canlı Dersler"
       course: "Ders Etkinlikleri"
       discussions: Tartışmalar
       groups: Gruplar
@@ -9979,6 +10065,7 @@ tr:
   permission_not_found_620b80d1: "İzin bulunamadı"
   permissions: 
     manage_webhooks: "Webhook'ları yönet"
+  pick_the_date_and_time_for_the_following_conferenc_e9f91edd: "Aşağıdaki canlı ders ayarı için gün ve saati seçin:"
   plain_text_e3ab33aa: "Düz metin"
   please_add_at_least_one_non_blank_answer_213c2c8e: "Lütfen en az bir tane boş olmayan cevap ekleyin."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Lütfen her değişken için en az bir tane boş olmayan cevap ekleyin."
@@ -10019,7 +10106,7 @@ tr:
       domain_description: "BigblueButton kurulumunuzun **hostname** veya **ip address** (örneğin bigbluebutton.mycompany.com)"
       labels: 
         domain: Alan
-        recording_enabled: "Konferansların kaydedilmesine izin ver."
+        recording_enabled: "Canlı derslerin kaydedilmesine izin ver."
         secret: Secret
       secret_description: "%{parameter_name} parametresi %{filename} ayar dosyasında bulundu."
     buttons: 
@@ -10689,7 +10776,7 @@ tr:
     unpublish: Yayınlanmıyor
     unpublish_click: "yayınlanmıyor, yayınlamak için tıklayın"
     unpublishing: "Yayından kaldırılıyor..."
-  publish_the_course_f2f6ef80: "Kursu Yayınla"
+  publish_the_course_f2f6ef80: "Dersi Yayınla"
   publishable: 
     cant_unpublish: Yayınlanamıyor
   publishableModuleItem: 
@@ -12067,7 +12154,7 @@ tr:
   recent_student: 
     last_logged_in: "son oturum %{last_login}"
   recentint_remainderint_decaying_average_79bc09fb: "%{recentInt}/%{remainderInt} Düşüş Ortalaması"
-  recently_deleted_courses_title: "Son Silinen Kurslar"
+  recently_deleted_courses_title: "Son Silinen Dersler"
   recipient_input: 
     context_search_placeholder: "Bir isim, ders ya da grup girin"
     context_search_title: "İsim, ders veya grup"
@@ -12162,7 +12249,7 @@ tr:
       comment_on_others_submissions: "Tüm öğrencilerinizin gönderilerini görüntüleyip yorum yapın"
       create_accounts: "Yeni ana hesap oluştur"
       create_collaborations: "Öğrenci işbirlikleri oluştur"
-      create_conferences: "Web konferansı oluştur"
+      create_conferences: "Web üzerinden canlı ders oluştur"
       manage_account_memberships: "Bu hesap için diğer yöneticileri ekle/sil"
       manage_account_settings: "Hesap düzeyi ayarlarını yönet"
       manage_admin_users: "Bu ders için diğer öğretmenleri, ders tasarımcıları veya asistan öğretmenleri ekle/sil"
@@ -12273,7 +12360,7 @@ tr:
       add_role: "Rol Ekle"
     roles_override_index: 
       account_roles: "Hesap Rolleri"
-      course_roles: "Kurs Rolleri"
+      course_roles: "Ders Rolleri"
       page_header_title: "Hesap İzinleri"
   rootFoldersFinder: 
     course_files: "Ders dosyaları"
@@ -12457,8 +12544,8 @@ tr:
   search: 
     all_courses: 
       name: İsim
-      open_enrollment_only: "Sadece açık girişli kurslar"
-      public_only: "Sadece yayınlanmış kurslar"
+      open_enrollment_only: "Yalnızca kaydolunabilir dersler"
+      public_only: "Yalnızca herkese açık dersler"
       search: Ara
       titles: 
         all_courses: "Tüm Dersler"
@@ -13675,9 +13762,9 @@ tr:
     announcements: Duyurular
     assignments: Ödevler
     collaborations: "İşbirliğine Yönelik Çalışmalar"
-    conferences: Konferanslar
+    conferences: "Canlı Dersler"
     course_assignments: Ödevler
-    course_grades: "Kurs Notları"
+    course_grades: "Ders Notları"
     course_settings: "Ders Ayarları"
     discussions: Tartışmalar
     eportfolios: ePortfolyolar
@@ -13785,6 +13872,7 @@ tr:
   there_was_an_error_in_processing_your_request_6513a49a: "İsteğin işlenmesinde hata ile karşılaşıldı"
   there_was_an_error_setting_usage_rights_53739e1d: "Kullanım haklarını ayarlamada hata oluştu"
   there_were_errors_with_the_form_errors_ab5b559a: "Şu formla ilgili hatalar oluştu: %{errors}"
+  this_conference_may_be_recorded_f76deeeb: "Bu canlı ders kaydediliyor olabilir."
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "Bu ders şu anda dersler menüsüne eklenemez."
   this_course_is_claimed_and_ready_but_you_ll_need_t_25b95a0a: "Bu dersin sahibi var ve hazır fakat dersi yayınlamadan önce kayıt sürecini tamamlamalısınız. Süreci tamamlamak için Canvas'tan bir eposta almış olmalısınız. İstenmeyen Posta kutunuzu kontrol etmeyi unutmayın."
   this_course_is_visible_only_to_teachers_until_it_i_ce972f0: "Bu ders yayınlanana kadar yalnızca öğretmenler tarafından görülebilir."
@@ -14053,12 +14141,12 @@ tr:
   unlock_date_cannot_be_before_section_start_793ddc66: "Kilidi açma tarihi bölüm başlangıcından önce olamaz."
   unlock_date_cannot_be_before_term_start_d3c01813: "Kilidi açma tarihi dönem başlangıcından önce olamaz."
   unpublished_click_to_modify_60f9051: "Yayınlanmamış - Değiştirmek için tıklayın"
-  unpublished_courses_title: "Yayınlanmamış Kurslar"
+  unpublished_courses_title: "Yayınlanmamış Dersler"
   unstarted_932f2990: Başlamamış
   unsupported_package: "Desteklenmeyen içerik paketi"
   until_date_949017c4: "%{date}'e kadar"
   untitled_assignment_59354b34: "başlıksız ödev"
-  unused_courses_title: "Kullanılmayan Kurslar"
+  unused_courses_title: "Kullanılmayan Dersler"
   updated_group_group_name_727b1d98: "%{group_name} Grubu Güncellendi"
   upload_button: 
     upload: Yükle
@@ -14245,7 +14333,7 @@ tr:
     crumbs: 
       profile: "%{user}'ın profili"
     current_conference: 
-      current_conference_text: "**[%{conference}](%{link_to_conference})**na katılmaya davet edildiniz. Konferans, %{started_at} de başladı ve %{participant_count} var."
+      current_conference_text: "**[%{conference}](%{link_to_conference})**na katılmaya davet edildiniz. Canlı ders, %{started_at} de başladı ve %{participant_count} var."
       participant_count: 
         one: "1 katılımcı"
         other: "%{count} katılımcı"
@@ -14444,6 +14532,7 @@ tr:
     twitter_added: "Twitter'a erişime izin verildi!"
     twitter_fail_whale: "Twitter'a izin verme başarısız oldu. Lütfen tekrar deneyin"
     user_dashboard: 
+      dashboard: "Kontrol Paneli"
       user_atom_feed: "Kullanıcı Atom Beslemesi (Tüm Dersler)"
       user_dashboard: "Kullanıcı Kontrol Paneli"
     user_is_deleted: "%{user_name} silindi"
@@ -14486,8 +14575,8 @@ tr:
   we_were_unable_to_deactivate_the_app_5e2632f3: "Uygulamayı devre dışı bırakamıyoruz."
   we_were_unable_to_update_the_app_659f5bc6: "Uygulamayı güncelleyemiyoruz."
   web_conference: 
-    default_name_for_courses: "Ders Web Konferansı"
-    default_name_for_groups: "Grup Web Konferansı"
+    default_name_for_courses: "Dersin Web Üzerinden Canlı Dersi"
+    default_name_for_groups: "Grup Web Üzerinden Canlı Dersi"
     settings: 
       boolean: 
         ? "false"
