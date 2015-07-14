@@ -1589,6 +1589,9 @@ class UsersController < ApplicationController
           end
           session.delete(:require_terms)
           flash[:notice] = t('user_updated', 'User was successfully updated.')
+          unless params[:redirect_to_previous].blank?
+            return redirect_to :back
+          end
           format.html { redirect_to user_url(@user) }
           format.json {
             render :json => user_json(@user, @current_user, session, %w{locale avatar_url},
