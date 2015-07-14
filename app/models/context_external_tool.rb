@@ -22,7 +22,7 @@ class ContextExternalTool < ActiveRecord::Base
   validates_presence_of :config_xml, :if => lambda { |t| t.config_type == "by_xml" }
   validates_length_of :domain, :maximum => 253, :allow_blank => true
   validate :url_or_domain_is_set
-  serialize :settings
+  serialize_utf8_safe :settings
   attr_accessor :config_type, :config_url, :config_xml
 
   before_save :infer_defaults, :validate_vendor_help_link

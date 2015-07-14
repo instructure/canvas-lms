@@ -96,7 +96,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   after_save :touch_context
   after_save :regrade_if_published
 
-  serialize :quiz_data
+  serialize_utf8_safe :quiz_data
 
   simply_versioned
 

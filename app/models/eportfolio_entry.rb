@@ -39,26 +39,26 @@ class EportfolioEntry < ActiveRecord::Base
   validates_length_of :name, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => true
   validates_length_of :slug, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => true
   has_many :page_comments, :as => :page, :include => :user, :order => 'page_comments.created_at DESC'
-  
 
-  serialize :content
+
+  serialize_utf8_safe :content
 
   set_policy do
     given {|user| user && self.allow_comments }
     can :comment
   end
-  
+
   def infer_comment_visibility
     self.show_comments = false if !self.allow_comments
     true
   end
   protected :infer_comment_visibility
-  
+
   def update_portfolio
     self.eportfolio.save!
   end
   protected :update_portfolio
-  
+
   def content_sections
     (self.content.is_a?(String) && Array(self.content) || self.content || []).map do |section|
       if section.is_a?(Hash)
@@ -68,7 +68,7 @@ class EportfolioEntry < ActiveRecord::Base
       end
     end
   end
-  
+
   def submission_ids
     res = []
     content_sections.each do |section|
@@ -76,11 +76,11 @@ class EportfolioEntry < ActiveRecord::Base
     end
     res
   end
-  
+
   def full_slug
     (self.eportfolio_category.slug rescue "") + "_" + self.slug
   end
-  
+
   def attachments
     res = []
     content_sections.each do |section|
@@ -90,7 +90,7 @@ class EportfolioEntry < ActiveRecord::Base
     end
     res.compact
   end
-  
+
   def submissions
     res = []
     content_sections.each do |section|
@@ -128,7 +128,7 @@ class EportfolioEntry < ActiveRecord::Base
       else
         new_obj = nil
       end
-      
+
       if new_obj
           self.content << new_obj
       end
@@ -136,11 +136,11 @@ class EportfolioEntry < ActiveRecord::Base
     self.content << t(:default_content, "No Content Added Yet") if self.content.empty?
   end
 
-  
+
   def category_slug
     self.eportfolio_category.slug rescue self.eportfolio_category_id
   end
-  
+
   def infer_unique_slug
     pages = self.eportfolio_category.eportfolio_entries rescue []
     self.name ||= t(:default_name, "Page Name")

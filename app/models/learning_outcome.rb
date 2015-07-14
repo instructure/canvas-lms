@@ -28,7 +28,7 @@ class LearningOutcome < ActiveRecord::Base
 
   EXPORTABLE_ATTRIBUTES = [:id, :context_id, :context_type, :short_description, :context_code, :description, :data, :workflow_state, :created_at, :updated_at, :vendor_guid, :low_grade, :high_grade]
   EXPORTABLE_ASSOCIATIONS = [:context, :learning_outcome_results, :alignments]
-  serialize :data
+  serialize_utf8_safe :data
 
   before_validation :infer_default_calculation_method, :adjust_calculation_int
   before_save :infer_defaults

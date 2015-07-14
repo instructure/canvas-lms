@@ -21,8 +21,8 @@ class SisBatch < ActiveRecord::Base
   belongs_to :account
   serialize :data
   serialize :options
-  serialize :processing_errors, Array
-  serialize :processing_warnings, Array
+  serialize_utf8_safe :processing_errors, Array
+  serialize_utf8_safe :processing_warnings, Array
   belongs_to :attachment
   belongs_to :generated_diff, class_name: 'Attachment'
   belongs_to :batch_mode_term, class_name: 'EnrollmentTerm'

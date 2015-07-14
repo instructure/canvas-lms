@@ -101,19 +101,24 @@ if CANVAS_RAILS3
 
   class ActiveRecord::Base
     extend HandleInvalidUtf8
-  end
-else
-  # For Rails 4 use Custom Types
-  # https://github.com/rails/rails/blob/08754f12e65a9ec79633a605e986d0f1ffa4b251/activerecord/lib/active_record/attributes.rb#L53?line=53
-end
-
-unless CANVAS_RAILS3
-  module AttributeReadWithUtf8Check
-    def read_attribute(attr_name, &block)
-      self.class.strip_invalid_utf8_from_attribute(attr_name, super)
+    def self.serialize_utf8_safe(*args)
+      serialize(*args)
     end
   end
-  ActiveRecord::AttributeMethods::Read.send(:prepend, AttributeReadWithUtf8Check)
+else
+  module ActiveRecord::Coders
+    class Utf8SafeYAMLColumn < YAMLColumn
+      def load(*args)
+        Utf8Cleaner.recursively_strip_invalid_utf8!(super, true)
+      end
+    end
+  end
+
+  class ActiveRecord::Base
+    def self.serialize_utf8_safe(attr_name, class_name = Object)
+      serialize(attr_name, ::ActiveRecord::Coders::Utf8SafeYAMLColumn.new(class_name))
+    end
+  end
 end
 
 # Fix for https://bugs.ruby-lang.org/issues/7278 , which was filling up our logs with these warnings
