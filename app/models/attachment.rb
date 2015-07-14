@@ -1198,7 +1198,10 @@ class Attachment < ActiveRecord::Base
     # ... or crocodoc (this will go away soon)
     return if Attachment.skip_3rd_party_submits?
 
-    if opts[:wants_annotation] && crocodocable?
+    submit_to_crocodoc_instead = opts[:wants_annotation] &&
+                                 crocodocable? &&
+                                 !Canvadocs.annotations_supported?
+    if submit_to_crocodoc_instead
       # get crocodoc off the canvadocs strand
       # (maybe :wants_annotation was a dumb idea)
       send_later_enqueue_args :submit_to_crocodoc, {
@@ -1208,12 +1211,12 @@ class Attachment < ActiveRecord::Base
       }, attempt
     elsif canvadocable?
       doc = canvadoc || create_canvadoc
-      doc.upload
+      doc.upload annotatable: opts[:wants_annotation]
       update_attribute(:workflow_state, 'processing')
     end
   rescue => e
     update_attribute(:workflow_state, 'errored')
-    Canvas::Errors.capture(e, type: :canvadocs, attachment_id: id)
+    Canvas::Errors.capture(e, type: :canvadocs, attachment_id: id, annotatable: opts[:wants_annotation])
 
     if attempt <= Setting.get('max_canvadocs_attempts', '5').to_i
       send_later_enqueue_args :submit_to_canvadocs, {

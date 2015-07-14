@@ -35,6 +35,7 @@ module Canvadocs
     # Public: Create a document with the file at the given url.
     #
     # obj - a url string
+    # params - other post params
     #
     # Examples
     #
@@ -42,12 +43,12 @@ module Canvadocs
     #   # => { "id": 1234, "status": "queued" }
     #
     # Returns a hash containing the document's id and status
-    def upload(obj)
+    def upload(obj, extra_params = {})
       params = if obj.is_a?(File)
-        { :file => obj }
+        { :file => obj }.merge(extra_params)
         raise Canvadocs::Error, "TODO: support raw files"
       else
-        { :url => obj.to_s }
+        { :url => obj.to_s }.merge(extra_params)
       end
 
       raw_body = api_call(:post, "documents", params)
@@ -174,5 +175,9 @@ module Canvadocs
 
   def self.enabled?
     !!config
+  end
+
+  def self.annotations_supported?
+    Canvas::Plugin.value_to_boolean config["annotations_supported"]
   end
 end
