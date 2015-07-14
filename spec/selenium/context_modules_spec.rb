@@ -20,7 +20,7 @@ describe "context modules" do
       @course.reload
     end
 
-    it "should rearrange child objects in same module" do
+    it "should rearrange child objects in same module", priority: "1", test_id: 126733  do
       modules = create_modules(1, true)
       #attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
       item1 = modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
@@ -41,7 +41,7 @@ describe "context modules" do
       end
     end
 
-    it "should rearrange child object to new module" do
+    it "should rearrange child object to new module", priority: "1", test_id: 126735 do
       modules = create_modules(2, true)
       #attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
       item1_mod1 = modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
@@ -177,7 +177,7 @@ describe "context modules" do
       expect(ff('.completion_entry .delete_criterion_link:visible', edit_form)).to be_empty
     end
 
-    it "should delete a module item" do
+    it "should delete a module item", priority: "1", test_id: 126739 do
       get "/courses/#{@course.id}/modules"
 
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
@@ -332,9 +332,8 @@ describe "context modules" do
       expect(@ag2.assignments.first.title).to eq "New Quiz"
     end
 
-    it "should add a text header to a module" do
+    it "should add a text header to a module", priority: "1", test_id: 126729  do
       get "/courses/#{@course.id}/modules"
-
       header_text = 'new header text'
       add_module('Text Header Module')
       f('.ig-header-admin .al-trigger').click
@@ -351,13 +350,15 @@ describe "context modules" do
       expect(module_item).to include_text(header_text)
     end
 
-    it "should hide module contents" do
+    it "should hide and show module contents", priority: "1", test_id: 126732 do
       get "/courses/#{@course.id}/modules"
-
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
-      f('.collapse_module_link').click
+      ff(".icon-mini-arrow-down")[1].click
       wait_for_ajaximations
       expect(f('.context_module .content')).not_to be_displayed
+      f('.icon-mini-arrow-right').click
+      wait_for_ajaximations
+      expect(f('.context_module .content')).to be_displayed
     end
 
     it "should allow adding an item twice" do
@@ -480,7 +481,6 @@ describe "context modules" do
 
     it "should validate locking a module item display functionality" do
       get "/courses/#{@course.id}/modules"
-
       add_form = new_module_form
       lock_check = add_form.find_element(:id, 'unlock_module_at')
       lock_check.click
@@ -857,7 +857,7 @@ describe "context modules" do
       expect(tooltip).to include_text 'Everyone else'
     end
 
-    it "should publish a file from the modules page" do
+    it "should publish a file from the modules page", priority: "1", test_id: 126727 do
       @module = @course.context_modules.create!(:name => "some module")
       @file = @course.attachments.create!(:display_name => "some file", :uploaded_data => default_uploaded_data, :locked => true)
       @tag = @module.add_item({:id => @file.id, :type => 'attachment'})
@@ -936,7 +936,7 @@ describe "context modules" do
       expect(mod).to be_unpublished
     end
 
-    it "should edit a module" do
+    it "should edit a module", priority: "1", test_id: 126738 do
       edit_text = 'Module Edited'
       add_module('Edit Module')
       f('.ig-header-admin .al-trigger').click
@@ -950,7 +950,7 @@ describe "context modules" do
       expect(f('.context_module > .header')).to include_text(edit_text)
     end
 
-    it "should delete a module" do
+    it "should delete a module", priority: "1", test_id: 126736 do
       add_module('Delete Module')
       driver.execute_script("$('.context_module').addClass('context_module_hover')")
       f('.ig-header-admin .al-trigger').click

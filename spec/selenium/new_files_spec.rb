@@ -80,7 +80,7 @@ describe "better_file_browsing" do
       before do
         fln("example.pdf").click
       end
-      it "tabs through all buttons in the header button bar", priority: "2", test_id: 193816 do
+      it "tabs through all buttons in the header button bar", priority: "1", test_id: 193816 do
         buttons = ff('.ef-file-preview-header-buttons > *')
         driver.execute_script("$('.ef-file-preview-header-buttons').children().first().focus()")
         buttons.each do |button|
@@ -88,18 +88,18 @@ describe "better_file_browsing" do
           button.send_keys("\t")
         end
       end
-      it "returns focus to the link that was clicked when closing with the esc key", priority: "2", test_id: 193817 do
+      it "returns focus to the link that was clicked when closing with the esc key", priority: "1", test_id: 193817 do
         driver.execute_script('return document.activeElement').send_keys :escape
         check_element_has_focus(fln("example.pdf"))
       end
-      it "returns focus to the link when the close button is clicked", priority: "2", test_id: 193818 do
+      it "returns focus to the link when the close button is clicked", priority: "1", test_id: 193818 do
         f('.ef-file-preview-header-close').click
         check_element_has_focus(fln("example.pdf"))
       end
     end
 
     context "Toolbar Previews" do
-      it "returns focus to the preview toolbar button when closed", priority: "2", test_id: 193819 do
+      it "returns focus to the preview toolbar button when closed", priority: "1", test_id: 193819 do
         ff('.ef-item-row')[0].click
         f('.btn-view').click
         f('.ef-file-preview-header-close').click
@@ -209,7 +209,7 @@ describe "better_file_browsing" do
     it "should validate that file is published by default", priority: "1", test_id: 193820 do
       expect(f('.btn-link.published-status.published')).to be_displayed
     end
-    it "should set focus to the close button when opening the dialog", priority: "2", test_id: 194243 do
+    it "should set focus to the close button when opening the dialog", priority: "1", test_id: 194243 do
       f('.btn-link.published-status').click
       wait_for_ajaximations
       shouldFocus = f('.ui-dialog-titlebar-close')
@@ -266,7 +266,7 @@ describe "better_file_browsing" do
         check_element_has_focus(f('.ef-links-col .al-trigger'))
         verify_usage_rights_ui_updates
       end
-      it "should set usage rights on a file via the toolbar", priority: "1", test_id: 194246 do
+      it "should set usage rights on a file via the toolbar", priority: "1", test_id: 132584 do
         f('.ef-item-row').click
         f('.Toolbar__ManageUsageRights').click
         wait_for_ajaximations
