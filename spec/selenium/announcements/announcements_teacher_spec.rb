@@ -279,7 +279,7 @@ describe "announcements" do
       expect(announcement.find_element(:css, '.discussion-summary')).to include_text(@announcement.message)
     end
 
-    it "should always see student replies when 'initial post required' is turned on", priority: "1", test_id: 220374 do
+    it "should always see student replies when 'initial post required' is turned on", priority: "1", test_id: 150524 do
       student_entry = 'this is my reply'
 
       create_announcement_initial
