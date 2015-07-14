@@ -1,6 +1,6 @@
 class BrandConfigsController < ApplicationController
   before_filter :require_user
-  before_filter :require_manage_site_settings, except: [:destroy]
+  before_filter :require_manage_account_settings, except: [:destroy]
 
   def new
     @page_title = join_title(t('Theme Editor'), @domain_root_account.name)
@@ -46,8 +46,10 @@ class BrandConfigsController < ApplicationController
 
   protected
 
-  def require_manage_site_settings
-    return false unless authorized_action(@domain_root_account, @current_user, :manage_site_settings) && use_new_styles?
+  def require_manage_account_settings
+    return false unless authorized_action(@domain_root_account,
+                                          @current_user,
+                                          :manage_account_settings) && use_new_styles?
   end
 
   def create_brand_config(variables)
