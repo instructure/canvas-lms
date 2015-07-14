@@ -486,13 +486,10 @@ describe "admin settings tab" do
   end
 
   it "should test SIS Agent Token Authentication", priority: "1", test_id: 132577 do
-    sis_token = "canvas"
     course_with_admin_logged_in(:account => Account.site_admin)
+    sis_token = "canvas"
     go_to_feature_options(Account.site_admin.id)
     f("#ff_allowed_post_grades").click
-    admin = User.create!
-    Account.site_admin.account_users.create!(user: admin)
-    user_session(admin)
     go_to_feature_options(Account.default.id)
     f("#ff_allowed_post_grades").click
     f("#tab-settings-link").click
