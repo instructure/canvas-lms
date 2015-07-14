@@ -18,6 +18,8 @@ define([
   var ACTIVE_ROUTE_REGEX = /^\/(courses|groups|accounts|grades|calendar|conversations|profile)/;
   var ACTIVE_CLASS = 'ic-app-header__menu-list-item--active';
 
+  var UNREAD_COUNT_POLL_INTERVAL = 30000 // 30 seconds
+
   var Navigation = React.createClass({
     displayName: 'Navigation',
 
@@ -74,27 +76,22 @@ define([
       /// Other Events
       //////////////////////////////////
       if (window.ENV.current_user_id) {
-        // Put this in a function so we can call it on an interval to do some
-        // polling.
-        var updateCount = () => {
-          $.ajax({
-            url: '/api/v1/conversations/unread_count',
-            type: 'GET',
-            success: (data) => {
-              var parsedInt = parseInt(data.unread_count, 10);
-              var $countContainer = $('#global_nav_conversations_link').find('.menu-item__badge');
-              $countContainer.text(parsedInt);
-              $countContainer.toggle(parsedInt > 0);
-            },
-            error: (data) => {
-              // Failure case, should never get here.
-              console.log(data);
-            }
-          });
-        };
-        setInterval(updateCount, 30000); // 30 seconds
-        updateCount();
+        this.pollUnreadCount();
       }
+    },
+
+    pollUnreadCount () {
+      $.ajax('/api/v1/conversations/unread_count')
+        .then((data) => this.updateUnreadCount(data.unread_count))
+        .then(null, console.log.bind(console, 'something went wrong updating unread count'))
+        .always(() => setTimeout(this.pollUnreadCount, UNREAD_COUNT_POLL_INTERVAL));
+    },
+
+    updateUnreadCount (count) {
+      count = parseInt(count, 10);
+      this.$unreadCount || (this.$unreadCount = $('#global_nav_conversations_link').find('.menu-item__badge'))
+      this.$unreadCount.text(count);
+      this.$unreadCount.toggle(count > 0);
     },
 
     componentWillUpdate (newProps, newState) {
