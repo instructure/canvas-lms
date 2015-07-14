@@ -28,6 +28,12 @@ define([
       this.props.onChange(chosenValue)
     },
 
+    inputName(){
+      // dont insert name & send params if default value
+      var valueIsDefault = !this.props.chosenValue && !this.props.currentValue
+      return valueIsDefault ? '' : 'brand_config[variables]['+ this.props.varDef.variable_name +']'
+    },
+
     render() {
       return (
         <section className="Theme__editor-accordion_element Theme__editor-upload">
@@ -54,7 +60,7 @@ define([
               </div>
               <input
                 type="hidden"
-                name={this.props.chosenValue == null ? '' : 'brand_config[variables]['+ this.props.varDef.variable_name +']'}
+                name={this.inputName()}
                 value={this.props.currentValue}
               />
               <div className="Theme__editor-image_upload">
