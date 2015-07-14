@@ -696,12 +696,7 @@ define([
           }
         });
         var requirementCount = $('input[name="context_module[requirement_count]"]:checked').val();
-
-        if (requirementCount) {
-          data['context_module[requirement_count]'] = requirementCount;
-        } else {
-          delete data['context_module[requirement_count]'];
-        }
+        data['context_module[requirement_count]'] = requirementCount;
 
         data['context_module[prerequisites]'] = prereqs.join(",");
         data['context_module[completion_requirements][none]'] = "none";
