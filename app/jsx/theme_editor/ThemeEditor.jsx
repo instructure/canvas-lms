@@ -181,20 +181,18 @@ define([
               </div>
             </div>
           </div>
+
           <div className="Theme__preview">
-            <div
-              hidden={!this.state.somethingChanged}
-              className="Theme__preview-overlay"
-            >
-              <div
-                className="Theme__preview-overlay__container"
-              >
-                <button type="submit" className="Button Button--primary" style={{margin: '40% auto'}}>
-                  <i className="icon-refresh" />
-                  {I18n.t('Preview Your Changes')}
-                </button>
+            { this.state.somethingChanged ?
+              <div className="Theme__preview-overlay">
+                <div className="Theme__preview-overlay__container">
+                  <button type="submit" className="Button Button--primary">
+                    <i className="icon-refresh" />
+                    {I18n.t('Preview Your Changes')}
+                  </button>
+                </div>
               </div>
-            </div>
+            : null }
             <iframe ref="previewIframe" src="/?editing_brand_config=1" />
           </div>
         </form>

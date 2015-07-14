@@ -71,11 +71,13 @@ $te-border-color: darken($ic-color-neutral, 10);
   top: 0;
 }
 .Theme__preview-overlay__container {
-  width: 700px;
   text-align: center;
   height: 100vh;
   margin: 0 auto;
-  padding-left: 300px;
+  padding-right: 300px; /* adjust for width of theme editor */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .Theme__preview iframe {
   border: none;
