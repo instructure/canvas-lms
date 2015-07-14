@@ -9,11 +9,13 @@ define [
 
   class DiscussionTopicSummaryView extends Backbone.View
 
+    tagName: 'li'
     template: template
 
     attributes: ->
       'class': "discussion-topic #{@model.get('read_state')} #{if @model.selected then 'selected' else '' }"
       'data-id': @model.id
+      'role': "listitem"
 
     events:
       'change .toggleSelected' : 'toggleSelected'
