@@ -141,43 +141,6 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     true
   end
 
-  def create_outcome_result(question, alignment)
-    # find or create the user's unique LearningOutcomeResult for this alignment
-    # of the quiz question.
-    result = alignment.learning_outcome_results.
-      for_association(quiz).
-      for_associated_asset(question).
-      where(user_id: user.id).
-      first_or_initialize
-
-    # force the context and artifact
-    result.artifact = self
-    result.context = quiz.context || alignment.context
-
-    # update the result with stuff from the quiz submission's question result
-    cached_question = quiz_data.detect { |q| q[:assessment_question_id] == question.id }
-    cached_answer = submission_data.detect { |q| q[:question_id] == cached_question[:id] }
-    raise "Could not find valid question" unless cached_question
-    raise "Could not find valid answer" unless cached_answer
-
-    # mastery
-    result.score = cached_answer[:points]
-    result.possible = cached_question['points_possible']
-    result.mastery = alignment.mastery_score && result.score && result.possible && (result.score / result.possible) > alignment.mastery_score
-
-    # attempt
-    result.attempt = attempt
-
-    # title
-    result.title = "#{user.name}, #{quiz.title}: #{cached_question[:name]}"
-
-    result.assessed_at = Time.now
-    result.submitted_at = self.finished_at
-
-    result.save_to_version(result.attempt)
-    result
-  end
-
   def question(id)
     questions.detect { |q| q[:id].to_i == id.to_i }
   end

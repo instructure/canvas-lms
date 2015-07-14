@@ -33,14 +33,15 @@ class LearningOutcomeResult < ActiveRecord::Base
   validates_inclusion_of :associated_asset_type, :allow_nil => true, :in => ['AssessmentQuestion', 'Quizzes::Quiz', 'LiveAssessments::Assessment']
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
+  has_many :learning_outcome_question_results
   simply_versioned
 
   EXPORTABLE_ATTRIBUTES = [
     :id, :context_id, :context_type, :context_code, :association_id, :association_type, :content_tag_id, :learning_outcome_id, :mastery, :user_id, :score, :created_at, :updated_at,
     :attempt, :possible, :comments, :original_score, :original_possible, :original_mastery, :artifact_id, :artifact_type, :assessed_at, :title, :percent, :associated_asset_id, :associated_asset_type
-  ]
+  ].freeze
 
-  EXPORTABLE_ASSOCIATIONS = [:user, :learning_outcome, :association_object, :artifact, :associated_asset, :context]
+  EXPORTABLE_ASSOCIATIONS = [:user, :learning_outcome, :association_object, :artifact, :associated_asset, :context].freeze
   before_save :infer_defaults
 
   attr_accessible :learning_outcome, :user, :association_object, :alignment, :associated_asset
@@ -51,9 +52,15 @@ class LearningOutcomeResult < ActiveRecord::Base
     self.original_score ||= self.score
     self.original_possible ||= self.possible
     self.original_mastery = self.mastery if self.original_mastery == nil
-    self.percent = self.score.to_f / self.possible.to_f rescue nil
-    self.percent = nil if self.percent && !self.percent.to_f.finite?
+    calculate_percent!
     true
+  end
+
+  def calculate_percent!
+    if self.score && self.possible
+      self.percent = self.score.to_f / self.possible.to_f
+    end
+    self.percent = nil if self.percent && !self.percent.to_f.finite?
   end
 
   def assignment

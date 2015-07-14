@@ -208,8 +208,8 @@ module AccountReports
                  aq.id                                       AS "assessment question id",
                  learning_outcomes.short_description         AS "learning outcome name",
                  learning_outcomes.id                        AS "learning outcome id",
-                 r.attempt                                   AS "attempt",
-                 r.score                                     AS "outcome score",
+                 COALESCE(qr.attempt, r.attempt)             AS "attempt",
+                 COALESCE(qr.score, r.score)                 AS "outcome score",
                  c.name                                      AS "course name",
                  c.id                                        AS "course id",
                  c.sis_source_id                             AS "course sis id",
@@ -219,6 +219,7 @@ module AccountReports
         joins("INNER JOIN #{LearningOutcome.quoted_table_name} ON content_tags.content_id = learning_outcomes.id
                  AND content_tags.content_type = 'LearningOutcome'
                INNER JOIN #{LearningOutcomeResult.quoted_table_name} r ON r.learning_outcome_id = learning_outcomes.id
+               FULL OUTER JOIN #{LearningOutcomeQuestionResult.quoted_table_name} qr on qr.learning_outcome_id = r.learning_outcome_id
                INNER JOIN #{ContentTag.quoted_table_name} ct ON r.content_tag_id = ct.id
                INNER JOIN #{User.quoted_table_name} u ON u.id = r.user_id
                INNER JOIN #{Pseudonym.quoted_table_name} p on p.user_id = r.user_id
@@ -231,8 +232,8 @@ module AccountReports
                  AND subs.user_id = u.id
                LEFT OUTER JOIN #{Quizzes::QuizSubmission.quoted_table_name} qs ON r.artifact_id = qs.id
                  AND r.artifact_type IN ('QuizSubmission', 'Quizzes::QuizSubmission')
-               LEFT OUTER JOIN #{AssessmentQuestion.quoted_table_name} aq ON aq.id = r.associated_asset_id
-                 AND r.associated_asset_type = 'AssessmentQuestion'").
+               LEFT OUTER JOIN #{AssessmentQuestion.quoted_table_name} aq ON aq.id = qr.associated_asset_id
+                 AND qr.associated_asset_type = 'AssessmentQuestion'").
         where("ct.workflow_state <> 'deleted'
                AND (r.id IS NULL OR (r.artifact_type IS NOT NULL AND r.artifact_type <> 'Submission'))")
 
