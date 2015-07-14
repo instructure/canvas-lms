@@ -6,7 +6,7 @@ if CANVAS_RAILS3
   gem 'routing_concerns', '0.1.0'
   gem 'strong_parameters', '0.2.3'
 else
-  gem 'rails', '4.0.12'
+  gem 'rails', '4.0.13'
   gem 'rack', '1.5.4'
   gem 'builder', '3.1.4'
   gem 'protected_attributes', '1.0.8'

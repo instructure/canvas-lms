@@ -1,18 +1,6 @@
 require 'active_support/callbacks/suspension'
 
 class ActiveRecord::Base
-  unless CANVAS_RAILS3
-    # in rails 4, if someone happens to call an association method before the initial save,
-    # it'll cache a broken association scope in the collection proxy (because its id is nil)
-    after_create :reset_collection_proxies
-    def reset_collection_proxies
-      @association_cache.values.select{|a| a.is_a?(CollectionAssociation)}.each do |association|
-        association.reset_scope
-        association.instance_variable_set(:@proxy, nil)
-      end
-    end
-  end
-
   def write_attribute(attr_name, *args)
     if CANVAS_RAILS3
       column = column_for_attribute(attr_name)
