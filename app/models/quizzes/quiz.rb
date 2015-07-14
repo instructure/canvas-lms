@@ -100,7 +100,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   simply_versioned
 
-  has_many :context_module_tags, :as => :content, :class_name => 'ContentTag', :conditions => "content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'", :include => {:context_module => [:content_tags]}
+  has_many :context_module_tags, :as => :content, :class_name => 'ContentTag', :conditions => "content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'"
 
   # This callback is listed here in order for the :link_assignment_overrides
   # method to be called after the simply_versioned callbacks. We want the
@@ -386,7 +386,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   def update_assignment
     send_later_if_production(:set_unpublished_question_count) if self.id
     if !self.assignment_id && @old_assignment_id
-      self.context_module_tags.each { |tag| tag.confirm_valid_module_requirements }
+      self.context_module_tags.preload(:context_module => :content_tags).each { |tag| tag.confirm_valid_module_requirements }
     end
     if !self.graded? && (@old_assignment_id || self.last_assignment_id)
       ::Assignment.where(:id => [@old_assignment_id, self.last_assignment_id].compact, :submission_types => 'online_quiz').update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
