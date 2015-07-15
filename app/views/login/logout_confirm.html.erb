@@ -10,13 +10,7 @@
       <div class="ic-Login__content">
         <div class="ic-Login__innerContent">
           <div class="ic-Login__header">
-            <div class="ic-Login__header__logo">
-                <% if @domain_root_account.settings[:header_image].present? %>
-                  <img src="<%= @domain_root_account.settings[:header_image] %>" alt="Canvas by Instructure" />
-                <% else %>
-                  <%= image_tag("login/canvas-logo.svg", class: "", alt:"Canvas by Instructure") %>
-                <% end %>
-            </div>
+            <div class="ic-Login__header__logo" role="presentation"></div>
           </div>
           <div class="ic-Login__body">
             <h1 class="ic-Login__title">

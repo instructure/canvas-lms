@@ -135,5 +135,112 @@
     "accept": "image/png,image/gif,image/jpeg",
     "default": "/images/windows-tile-wide.png"
   }
-  ]
+]},
+{
+  "group_name": "Login Screen",
+  "variables": [{
+    "human_name": "Background Color",
+    "variable_name": "ic-brand-Login-body-bgd-color",
+    "type": "color",
+    "default": "#34444f"
+  },
+  {
+    "human_name": "Background Image",
+    "variable_name": "ic-brand-Login-body-bgd-image",
+    "type": "image",
+    "default": ""
+  },
+  {
+    "human_name": "Body Shadow",
+    "variable_name": "ic-brand-Login-body-bgd-shadow-color",
+    "type": "color",
+    "helper_text": "accepted formats: hex, rgba, rgb, hsl",
+    "default": "#182025"
+  },
+  {
+    "human_name": "Login Logo",
+    "variable_name": "ic-brand-Login-logo",
+    "type": "image",
+    "accept": "image/png,image/gif,image/jpeg",
+    "default": "/images/login/canvas-logo.png"
+  },
+  {
+    "human_name": "Top Box Background",
+    "variable_name": "ic-brand-Login-Content-bgd-color",
+    "type": "color",
+    "default": "none"
+  },
+  {
+    "human_name": "Top Box Border",
+    "variable_name": "ic-brand-Login-Content-border-color",
+    "type": "color",
+    "default": "none"
+  },
+  {
+    "human_name": "Inner Box Background",
+    "variable_name": "ic-brand-Login-Content-inner-bgd",
+    "type": "color",
+    "default": "none"
+  },
+  {
+    "human_name": "Inner Box Border",
+    "variable_name": "ic-brand-Login-Content-inner-border",
+    "type": "color",
+    "default": "none"
+  },
+  {
+    "human_name": "Form Background",
+    "variable_name": "ic-brand-Login-Content-inner-body-bgd",
+    "type": "color",
+    "default": "none"
+  },
+  {
+    "human_name": "Form Border",
+    "variable_name": "ic-brand-Login-Content-inner-body-border",
+    "type": "color",
+    "default": "none"
+  },
+  {
+    "human_name": "Login Label",
+    "variable_name": "ic-brand-Login-Content-label-text-color",
+    "type": "color",
+    "default": "#ffffff"
+  },
+  {
+    "human_name": "Login Link Color",
+    "variable_name": "ic-brand-Login-Content-password-text-color",
+    "type": "color",
+    "default": "#ffffff"
+  },
+  {
+    "human_name": "Login Button",
+    "variable_name": "ic-brand-Login-Content-button-bgd",
+    "type": "color",
+    "default": "#0096db"
+  },
+  {
+    "human_name": "Login Button Text",
+    "variable_name": "ic-brand-Login-Content-button-text",
+    "type": "color",
+    "default": "#ffffff"
+  },
+  {
+    "human_name": "Login Footer Link",
+    "variable_name": "ic-brand-Login-footer-link-color",
+    "type": "color",
+    "default": "#ffffff"
+  },
+  {
+    "human_name": "Login Footer Link Hover",
+    "variable_name": "ic-brand-Login-footer-link-color-hover",
+    "type": "color",
+    "default": "#ffffff"
+  },
+  {
+    "human_name": "Login Instructure Logo",
+    "variable_name": "ic-brand-Login-instructure-logo",
+    "type": "color",
+    "default": "#ffffff"
+  }
+]
 }]
