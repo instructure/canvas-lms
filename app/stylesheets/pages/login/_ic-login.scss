@@ -9,23 +9,23 @@
 /// Theme Editor. Note the ic-brand- prefix to denote
 /// which are customizable.
 ////////////////////////////////////////
-$ic-brand-Login-body-bgd-color: $ic-brand-secondary !default;
-$ic-brand-Login-logo: "/images/login/canvas-logo.svg";
-$ic-brand-Login-body-bgd-shadow-color: darken($ic-brand-Login-body-bgd-color, 15) !default;
-$ic-brand-Login-body-bgd-image: none;
-$ic-brand-Login-Content-bgd-color: transparent !default;
-$ic-brand-Login-Content-border-color: transparent !default;
-$ic-brand-Login-Content-inner-bgd: transparent !default;
-$ic-brand-Login-Content-inner-border: transparent !default;
-$ic-brand-Login-Content-inner-body-bgd: transparent !default;
-$ic-brand-Login-Content-inner-body-border: transparent !default;
-$ic-brand-Login-Content-label-text-color: $ic-color-light !default;
-$ic-brand-Login-Content-password-text-color: $ic-brand-Login-Content-label-text-color !default;
-$ic-brand-Login-Content-button-bgd: $ic-brand-primary !default;
-$ic-brand-Login-Content-button-text: $ic-color-light !default;
-$ic-brand-Login-footer-link-color: $ic-color-light !default;
-$ic-brand-Login-footer-link-color-hover: $ic-brand-primary !default;
-$ic-brand-Login-instructure-logo: $ic-color-light !default;
+// ic-brand-Login-body-bgd-color
+// ic-brand-Login-logo
+// ic-brand-Login-body-bgd-shadow-color
+// ic-brand-Login-body-bgd-image
+// ic-brand-Login-Content-bgd-color
+// ic-brand-Login-Content-border-color
+// ic-brand-Login-Content-inner-bgd
+// ic-brand-Login-Content-inner-border
+// ic-brand-Login-Content-inner-body-bgd
+// ic-brand-Login-Content-inner-body-border
+// ic-brand-Login-Content-label-text-color
+// ic-brand-Login-Content-password-text-color
+// ic-brand-Login-Content-button-bgd
+// ic-brand-Login-Content-button-text
+// ic-brand-Login-footer-link-color
+// ic-brand-Login-footer-link-color-hover
+// ic-brand-Login-instructure-logo
 
 $ic-Login-border-radius: 5px;
 $modal_box_width: 623px;
@@ -35,13 +35,16 @@ $modal_box_padding: 20px;
 // New Login Styles
 ////////////////////////////////////////
 #content {padding: 0;}
-.ic-Login {
+body.ic-Login-Body { // apply the background to the body element so that you don't see white bg as you scroll
   background-color: $ic-brand-Login-body-bgd-color;
   background-image:
     linear-gradient(transparent, transparent 80%, $ic-brand-Login-body-bgd-shadow-color),
-    url($ic-brand-Login-body-bgd-image); // if there is a custom image
+    $ic-brand-Login-body-bgd-image; // if there is a custom image
   background-size: cover;
+  background-attachment: fixed;
   height: 100vh; // enable full height
+}
+.ic-Login {
   display: flex;
   justify-content: center;
   color: $ic-color-light;
@@ -75,9 +78,11 @@ $modal_box_padding: 20px;
 .ic-Login__body {
   background: $ic-brand-Login-Content-inner-body-bgd;
   border: 2px solid $ic-brand-Login-Content-inner-body-border;
-  padding: $ic-sp*2 $ic-sp*2 0 $ic-sp*2;
+  padding: $ic-sp*2 $ic-sp*2 $ic-sp $ic-sp*2;
   margin-top: $ic-sp;
 }
+// these have !important because Canvas specificity on labels and
+// links will override these if we don't
 .ic-Form-control--login .ic-Label {
   color: $ic-brand-Login-Content-label-text-color !important;
 }
@@ -109,8 +114,11 @@ $modal_box_padding: 20px;
     align-content: center;
     justify-content: center;
     flex: 1;
-    height: $ic-sp*7;
-    img {max-width: 100%;max-height:100%;}
+    height: $ic-sp*13;
+    background: $ic-brand-Login-logo;
+    background-repeat: no-repeat;
+    background-position: left 50%;
+    background-size: contain;
   }
   .ic-Login__headerBrowse {
     text-align: right;
@@ -193,7 +201,7 @@ body.ic-Login-Body #footer.ic-Login-footer {
       font-size: 11px;
       padding: 0 $ic-sp/2;
       white-space: nowrap;
-      @if $use_high_contrast == false {
+      @if not $use_high_contrast {
         text-decoration: none;
       }
       &:hover {
