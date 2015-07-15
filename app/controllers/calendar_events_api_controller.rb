@@ -261,12 +261,12 @@ class CalendarEventsApiController < ApplicationController
   #
   # @argument type [String, "event"|"assignment"] Defaults to "event"
   # @argument start_date [Date]
-  #   Only return events since the start_date (inclusive).
+  #   Only return events since the start_date (inclusive). 
   #   Defaults to today. The value should be formatted as: yyyy-mm-dd or ISO 8601 YYYY-MM-DDTHH:MM:SSZ.
   # @argument end_date [Date]
-  #   Only return events before the end_date (inclusive).
+  #   Only return events before the end_date (inclusive). 
   #   Defaults to start_date. The value should be formatted as: yyyy-mm-dd or ISO 8601 YYYY-MM-DDTHH:MM:SSZ.
-  #   If end_date is the same as start_date, then only events on that day are
+  #   If end_date is the same as start_date, then only events on that day are 
   #   returned.
   # @argument undated [Boolean]
   #   Defaults to false (dated events only).
@@ -276,9 +276,9 @@ class CalendarEventsApiController < ApplicationController
   #   If true, all events are returned, ignoring start_date, end_date, and undated criteria.
   # @argument context_codes[] [String]
   #   List of context codes of courses/groups/users whose events you want to see.
-  #   If not specified, defaults to the current user (i.e personal calendar,
-  #   no course/group events). Limited to 10 context codes, additional ones are
-  #   ignored. The format of this field is the context type, followed by an
+  #   If not specified, defaults to the current user (i.e personal calendar, 
+  #   no course/group events). Limited to 10 context codes, additional ones are 
+  #   ignored. The format of this field is the context type, followed by an 
   #   underscore, followed by the context id. For example: course_42
   # @argument excludes[] [Array]
   #   Array of attributes to exclude. Possible values are "description", "child_events" and "assignment"
@@ -350,15 +350,6 @@ class CalendarEventsApiController < ApplicationController
   #   Section-level end time(s) if this is a course event.
   # @argument calendar_event[child_event_data][X][context_code] [String]
   #   Context code(s) corresponding to the section-level start and end time(s).
-  # @argument calendar_event[duplicate][count] [Number]
-  #   Number of times to copy/duplicate the event.
-  # @argument calendar_event[duplicate][interval] [Number]
-  #   Defaults to 1 if duplicate `count` is set.  The interval between the duplicated events.
-  # @argument calendar_event[duplicate][frequency] [String, "daily"|"weekly"|"monthly"]
-  #   Defaults to "weekly".  The frequency at which to duplicate the event
-  # @argument calendar_event[duplicate][append_iterator] [Boolean]
-  #   Defaults to false.  If set to `true`, an increasing counter number will be appended to the event title
-  #   when the event is duplicated.  (e.g. Event 1, Event 2, Event 3, etc)
   #
   # @example_request
   #
@@ -373,40 +364,14 @@ class CalendarEventsApiController < ApplicationController
     if params[:calendar_event][:description].present?
       params[:calendar_event][:description] = process_incoming_html_content(params[:calendar_event][:description])
     end
-
     @event = @context.calendar_events.build(params[:calendar_event])
-    @event.updating_user = @current_user
-
     if authorized_action(@event, @current_user, :create)
-
-      # Create duplicates if necessary
-      dup_options = get_duplicate_params
-      duplicates = create_duplicates(dup_options) if dup_options[:count] > 0
-      duplicates ||= []
-
-      if dup_options[:count] > 100
-        return render :json => {
-                        message: t("only a maximum of 100 events can be created")
-                      }, :status => :bad_request
-      end
-
-
-      if duplicates.length > 0 && value_to_boolean(dup_options[:add_count])
-        @event.title = "#{@event.title} 1"
-      end
-
-      events = [@event].concat(duplicates)
-
-      CalendarEvent.transaction do
-        error = events.detect { |event| !event.save }
-
-        unless error
-          original_event = events.shift
-          render :json => event_json(original_event, @current_user, session, { :duplicates => events }), :status => :created
-        else
-          render :json => error.errors, :status => :bad_request
-          raise ActiveRecord::Rollback
-        end
+      @event.validate_context! if @context.is_a?(AppointmentGroup)
+      @event.updating_user = @current_user
+      if @event.save
+        render :json => event_json(@event, @current_user, session), :status => :created
+      else
+        render :json => @event.errors, :status => :bad_request
       end
     end
   end
@@ -414,7 +379,6 @@ class CalendarEventsApiController < ApplicationController
   # @API Get a single calendar event or assignment
   #
   # @returns CalendarEvent
-
   def show
     get_event(true)
     if authorized_action(@event, @current_user, :read)
@@ -884,53 +848,6 @@ class CalendarEventsApiController < ApplicationController
       map(&:asset_string)
   end
 
-  def create_duplicates(options = {})
-    events = []
-    @context ||= @current_user
-
-    if @current_user
-      get_all_pertinent_contexts(include_groups: true)
-    end
-
-    options[:count].times do |i|
-      params = set_duplicate_params(i, options)
-      event = @context.calendar_events.build(params[:calendar_event])
-      event.validate_context! if @context.is_a?(AppointmentGroup)
-      event.updating_user = @current_user
-      events << event
-    end
-
-    events
-  end
-
-  def get_duplicate_params
-    duplicate_data = params[:calendar_event].delete(:duplicate)
-    duplicate_data ||= {}
-
-    {
-        title:     params[:calendar_event][:title],
-        start_at:  params[:calendar_event][:start_at],
-        end_at:    params[:calendar_event][:end_at],
-        count:     duplicate_data.fetch(:count, 0).to_i,
-        interval:  duplicate_data.fetch(:interval, 1).to_i,
-        add_count: value_to_boolean(duplicate_data[:append_iterator]),
-        frequency: duplicate_data.fetch(:frequency, "weekly")
-    }
-  end
-
-  def set_duplicate_params(iterator = 0, options = {})
-    offset_interval = options[:interval] * (iterator + 1)
-    offset = if options[:frequency] == "monthly"
-               offset_interval.months
-             elsif options[:frequency] == "daily"
-               offset_interval.days
-             else
-               offset_interval.weeks
-             end
-
-    params[:calendar_event][:title] = "#{options[:title]} #{iterator + 2}" if options[:add_count]
-    params[:calendar_event][:start_at] = Time.iso8601(options[:start_at]) + offset unless options[:start_at].blank?
-    params[:calendar_event][:end_at] = Time.iso8601(options[:end_at]) + offset unless options[:end_at].blank?
-    params
+  def select_public_codes(codes)
   end
 end
