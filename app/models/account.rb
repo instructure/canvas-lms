@@ -690,10 +690,10 @@ class Account < ActiveRecord::Base
     if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
       Account.find_by_sql([<<-SQL, self.id, limit.to_i, offset.to_i])
           WITH RECURSIVE t AS (
-            SELECT * FROM accounts
+            SELECT * FROM #{Account.quoted_table_name}
             WHERE parent_account_id = ? AND workflow_state <>'deleted'
             UNION
-            SELECT accounts.* FROM accounts
+            SELECT accounts.* FROM #{Account.quoted_table_name}
             INNER JOIN t ON accounts.parent_account_id = t.id
             WHERE accounts.workflow_state <>'deleted'
           )
@@ -714,10 +714,10 @@ class Account < ActiveRecord::Base
     if connection.adapter_name == 'PostgreSQL'
       sql = "
           WITH RECURSIVE t AS (
-            SELECT id, parent_account_id FROM accounts
+            SELECT id, parent_account_id FROM #{Account.quoted_table_name}
             WHERE parent_account_id = #{parent_account_id} AND workflow_state <> 'deleted'
             UNION
-            SELECT accounts.id, accounts.parent_account_id FROM accounts
+            SELECT accounts.id, accounts.parent_account_id FROM #{Account.quoted_table_name}
             INNER JOIN t ON accounts.parent_account_id = t.id
             WHERE accounts.workflow_state <> 'deleted'
           )

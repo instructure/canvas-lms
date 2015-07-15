@@ -204,8 +204,8 @@ describe ActiveRecord::Base do
   it "should have a valid GROUP BY clause when group_by is used correctly" do
     conn = ActiveRecord::Base.connection
     expect {
-      User.find_by_sql "SELECT id, name FROM users GROUP BY #{conn.group_by('id', 'name')}"
-      User.find_by_sql "SELECT id, name FROM (SELECT id, name FROM users) u GROUP BY #{conn.group_by('id', 'name')}"
+      User.find_by_sql "SELECT id, name FROM #{User.quoted_table_name} GROUP BY #{conn.group_by('id', 'name')}"
+      User.find_by_sql "SELECT id, name FROM (SELECT id, name FROM #{User.quoted_table_name}) u GROUP BY #{conn.group_by('id', 'name')}"
     }.not_to raise_error
   end
 

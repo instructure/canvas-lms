@@ -439,9 +439,9 @@ class ActiveRecord::Base
       sql << "SELECT NULL AS #{column} WHERE EXISTS(SELECT * FROM #{table_name} WHERE #{column} IS NULL) UNION ALL (" if options[:include_nil]
       sql << <<-SQL
         WITH RECURSIVE t AS (
-          SELECT MIN(#{column}) AS #{column} FROM #{table_name}
+          SELECT MIN(#{column}) AS #{column} FROM #{quoted_table_name}
           UNION ALL
-          SELECT (SELECT MIN(#{column}) FROM #{table_name} WHERE #{column} > t.#{column})
+          SELECT (SELECT MIN(#{column}) FROM #{quoted_table_name} WHERE #{column} > t.#{column})
           FROM t
           WHERE t.#{column} IS NOT NULL
         )

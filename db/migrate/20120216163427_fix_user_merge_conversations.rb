@@ -8,9 +8,9 @@ class FixUserMergeConversations < ActiveRecord::Migration
     # (which may merge it with another conversation)
     ConversationParticipant.find_by_sql(<<-SQL).
       SELECT conversation_participants.*
-      FROM conversation_participants, (
+      FROM #{ConversationParticipant.quoted_table_name}, (
         SELECT MIN(id) AS id, user_id, conversation_id
-        FROM conversation_participants
+        FROM #{ConversationParticipant.quoted_table_name}
         GROUP BY user_id, conversation_id
         HAVING COUNT(*) > 1
         ORDER BY conversation_id
