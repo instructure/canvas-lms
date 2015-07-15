@@ -508,7 +508,6 @@ define [
       # This is another reason to do a refetchEvents instead of just an update.
       delete event._id
       @calendar.fullCalendar('refetchEvents')
-      @reloadClick() if event?.object?.duplicates?.length
       # We'd like to just add the event to the calendar rather than fetching,
       # but the save may be as a result of moving an event from being undated
       # to dated, and in that case we don't know whether to just update it or
