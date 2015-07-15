@@ -224,7 +224,7 @@
             <% (@quiz_menu_tools || []).each do |tool_hash| %>
               <li role="presentation">
                 <a class="menu_tool_link" href="<%= tool_hash[:base_url] %>&quizzes[]=<%= @quiz.id %>" tabindex="-1" role="menuitem">
-                  <% if tool_hash[:icon_url] %><img class="icon" src="<%= tool_hash[:icon_url] %>" /><% end %>
+                  <% if tool_hash[:icon_url] %><img class="icon" alt="" src="<%= tool_hash[:icon_url] %>" /><% end %>
                   <%= tool_hash[:title] %>
                 </a>
               </li>
@@ -324,6 +324,10 @@
         <% elsif @submission && @submission.untaken? %>
           <div class="take_quiz_button">
             <%= link_to_resume_poll('class' => "btn btn-primary") %>
+          </div>
+        <% elsif @assignment && @assignment.submission_for_student(@current_user).excused? %>
+          <div class="lock_explanation">
+            <%= t "This quiz has been excused" %>
           </div>
         <% elsif can_do(@quiz, @current_user, :submit) && !@lockdown_browser_authorized_to_view %>
           <div class="take_quiz_button">

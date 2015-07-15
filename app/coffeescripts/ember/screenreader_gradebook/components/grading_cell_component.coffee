@@ -31,10 +31,16 @@ define [
           label: I18n.t "grade_incomplete", "Incomplete"
           value: "incomplete"
         }
+        {
+          label: I18n.t "Excused"
+          value: 'EX'
+        }
     ]
 
     outOfText: (->
-      if @get('isGpaScale')
+      if @submission && @submission.excused
+        I18n.t "Excused"
+      else if @get('isGpaScale')
         ""
       else if @get('isLetterGrade') or @get('isPassFail')
         I18n.t "out_of_with_score", "(%{score} out of %{points})",

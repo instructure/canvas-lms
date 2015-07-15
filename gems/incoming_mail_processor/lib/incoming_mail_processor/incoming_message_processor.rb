@@ -87,7 +87,9 @@ module IncomingMailProcessor
 
       body, html_body = extract_body(incoming_message)
 
-      @message_handler.handle(mailbox_account.address, body, html_body, incoming_message, tag)
+      handle = @message_handler.handle(mailbox_account.address, body, html_body, incoming_message, tag)
+      CanvasStatsd::Statsd.increment("incoming_mail_processor.incoming_message_processed")
+      handle
     end
 
     private

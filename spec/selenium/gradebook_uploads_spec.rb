@@ -279,4 +279,21 @@ describe "gradebook uploads" do
 
     assert_assignment_is_not_highlighted
   end
+
+  it "should not highlight scores if the assignment is excused", priority: "1", test_id: 209983 do
+    assignment1 = @course.assignments.create!(:title => "Assignment 1")
+    assignment1.grade_student(@student, :grade => 10)
+
+    filename, fullpath, data = gradebook_file("gradebook2.csv",
+          "Student Name,ID,Section,Assignment 1",
+          "User,#{@student.id},,EX")
+
+    @upload_element.send_keys(fullpath)
+    @upload_form.submit
+    wait_for_ajaximations
+    run_jobs
+    keep_trying_until { !f("#spinner").displayed? }
+
+    assert_assignment_is_not_highlighted
+  end
 end

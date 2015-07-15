@@ -63,6 +63,22 @@ describe SubmissionList do
     expect(@days[1].graders[0].assignments.size).to eq 2
   end
 
+  it "handles excused assignments" do
+    course_with_teacher(:active_all => true)
+    course_with_student(:course => @course, :active_all => true)
+
+    @some_assignment = @course.assignments.create!(:title => 'one', :points_possible => 10)
+    subs = @some_assignment.grade_student(@student, {grade: 8, grader: @teacher})
+    subs.each { |s| s.created_at = 3.days.ago; s.updated_at = 3.days.ago; s.save }
+    @some_assignment.grade_student(@student, {excuse: true, grader: @teacher})
+    @days = SubmissionList.days(@course)
+    submissions = @days[0].graders[0].assignments[0].submissions
+    submissions.each do |sub|
+      expect(sub.current_grade).to eq("EX")
+      expect(sub.new_grade).to eq("EX")
+    end
+  end
+
   context "named loops" do
 
     before do
@@ -168,6 +184,7 @@ describe SubmissionList do
         )
     end
   end
+
   context "regrading" do
     it 'should include regrade events in the final data' do
       # Figure out how to manually regrade a test piece of data

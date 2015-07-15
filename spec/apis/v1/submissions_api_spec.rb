@@ -2993,6 +2993,21 @@ describe 'Submissions API', type: :request do
       assert_status(401)
     end
 
+    it "should excuse assignments" do
+      grade_data = {
+        grade_data: { @student1.id => {excuse: "1"} }
+      }
+
+      api_call(:post,
+        "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions/update_grades",
+        { :controller => 'submissions_api', :action => 'bulk_update',
+          :format => 'json', :section_id => @section.id.to_s,
+          :assignment_id => @a1.id.to_s }, grade_data)
+      run_jobs
+
+      expect(@a1.submission_for_student(@student1)).to be_excused
+    end
+
     it "should check user ids for sections" do
       grade_data = {
         :grade_data => {

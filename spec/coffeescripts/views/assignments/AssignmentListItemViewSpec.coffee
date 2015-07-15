@@ -406,6 +406,13 @@ define [
     ok nonScreenreaderText().match('1.56/5 pts')[0], 'sets non-screenreader screen text'
     ok nonScreenreaderText().match('90%')[0], 'sets non-screenreader grade text'
 
+  test "excused score and grade outputs", ->
+    @submission.set 'excused': true
+    @model.set 'submission', @submission
+    @model.trigger 'change:submission'
+
+    ok screenreaderText().match('This assignment has been excused.')
+    ok nonScreenreaderText().match('Excused')
 
   module 'AssignmentListItemViewSpec—alternate grading type: pass_fail',
     setup: ->

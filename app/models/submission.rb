@@ -1268,9 +1268,10 @@ class Submission < ActiveRecord::Base
             next
           end
 
-          if grade = user_data[:posted_grade]
+          if user_data[:posted_grade] || user_data.key?(:excuse)
             submissions = assignment.grade_student(user, :grader => grader,
-                                                   :grade => grade,
+                                                   :grade => user_data[:posted_grade],
+                                                   :excuse => Canvas::Plugin.value_to_boolean(user_data[:excuse]),
                                                    :skip_grade_calc => true)
             submissions.each { |s| graded_user_ids << s.user_id }
             submission = submissions.first
