@@ -395,7 +395,7 @@ describe "context modules" do
       def navigate_to_wikipage(title)
         els = ff('.context_module_item')
         el = els.find {|e| e.text =~ /#{title}/}
-        el.find_element(:css, 'a').click
+        el.find_element(:css, 'a.title').click
         wait_for_ajaximations
       end
 

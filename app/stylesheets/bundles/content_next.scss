@@ -243,3 +243,12 @@ input.move-module-label-spacer {
   padding-right: 40px;
   padding-left: 40px;
 }
+
+.for-nvda {
+  position:absolute;
+  left:-10000px;
+  top:auto;
+  width:1px;
+  height:1px;
+  overflow:hidden;
+}

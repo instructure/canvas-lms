@@ -34,7 +34,10 @@
     <%= module_item.item_class if module_item %>
   "
 >
-  <div class="ig-row <%= 'with-completion-requirements' if criterion%> <%= 'ig-published' if module_item && module_item.published? %>">
+<div class="ig-row <%= 'with-completion-requirements' if criterion%> <%= 'ig-published' if module_item && module_item.published? %>">
+
+    <a aria-label='<%= tag && tag.title %>' role='link' tabindex="-1" class="for-nvda" href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>"><%= tag && tag.title %></a>
+
     <div class="ig-title module-item-title ellipsis">
       <% if editable || module_item.nil? %>
       <span
@@ -50,7 +53,7 @@
         <i class="icon-quiz" aria-label="<%= t('Item type: Quiz') %>"></i>
         <i class="icon-link" aria-label="<%= t('Item type: Link') %>"></i>
       </span>
-      <span class="item_name">
+      <span class="item_name" aria-hidden="true">
         <% if tag && tag.content_type == 'ExternalUrl' && tag.new_tab %>
           <a aria-label='<%= tag.title %>' class="title external_url_link" target="_blank" href="<%= tag.url %>"
              data-item-href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag.id %>"><%= tag.title %></a>
