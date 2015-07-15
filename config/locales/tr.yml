@@ -5004,6 +5004,7 @@ tr:
   diigo_993c4646: Diigo
   disable_a5c05db3: "Devre Dışı"
   disabled_18c33a73: "(devre dışı)"
+  discovery_url_3dce06d9: "Keşif Bağlantısı:"
   discussion_6719c51d: Tartışma
   discussion_entries: 
     created_entry_notice: "Girdi başarıyla oluşturuldu."
@@ -5022,6 +5023,7 @@ tr:
     default_title: "Başlık Yok"
     empty_message: "Mesaj yok"
   discussion_topic_dc85ad4c: "Tartışma Konusu"
+  discussion_topic_menu_3d4684c6: "Tartışma Konusu Menüsü"
   discussion_topics: 
     assignment_details: 
       available_from: Kullanılabilir

@@ -41,6 +41,7 @@ describe Pseudonym do
   end
 
   it "should validate the presence of user and infer default account" do
+    Account.default
     u = User.create!
     p = Pseudonym.new(:unique_id => 'cody@instructure.com')
     expect(p.save).to be_falsey

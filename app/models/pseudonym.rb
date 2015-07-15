@@ -43,6 +43,7 @@ class Pseudonym < ActiveRecord::Base
   validates_length_of :unique_id, :maximum => MAX_UNIQUE_ID_LENGTH
   validates_length_of :sis_user_id, :maximum => maximum_string_length, :allow_blank => true
   validates_presence_of :account_id
+  validate :must_be_root_account
   # allows us to validate the user and pseudonym together, before saving either
   validates_each :user_id do |record, attr, value|
     record.errors.add(attr, "blank?") unless value || record.user
@@ -113,12 +114,18 @@ class Pseudonym < ActiveRecord::Base
     account.root_account_id || account.id
   end
 
+  def must_be_root_account
+    if account_id_changed?
+      self.errors.add(:account_id, "must belong to a root_account") unless self.account_id == self.root_account_id
+    end
+  end
+
   def send_registration_notification!
     @send_registration_notification = true
     self.save!
     @send_registration_notification = false
   end
-  
+
   def send_confirmation!
     @send_confirmation = true
     self.save!
