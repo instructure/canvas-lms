@@ -6,11 +6,6 @@
     "type": "color",
     "default": "#0096db"
   },{
-    "human_name": "Secondary Color",
-    "variable_name": "ic-brand-secondary",
-    "type": "color",
-    "default": "#34444f"
-  },{
     "human_name": "Primary Button",
     "variable_name": "ic-brand-button--primary-bgd",
     "type": "color",
@@ -24,7 +19,7 @@
     "human_name": "Secondary Button",
     "variable_name": "ic-brand-button--secondary-bgd",
     "type": "color",
-    "default": "$ic-brand-secondary"
+    "default": "#34444f"
   },{
     "human_name": "Secondary Button Text",
     "variable_name": "ic-brand-button--secondary-text",
@@ -44,7 +39,7 @@
     "human_name": "Nav Background",
     "variable_name": "ic-brand-global-nav-bgd",
     "type": "color",
-    "default": "$ic-brand-secondary"
+    "default": "#34444f"
   },
   {
     "human_name": "Nav Icon",
@@ -94,7 +89,7 @@
     "human_name": "Nav Logo Background",
     "variable_name": "ic-brand-global-nav-logo-bgd",
     "type": "color",
-    "default": "$ic-brand-secondary"
+    "default": "#34444f"
   }
 ]},
 {

@@ -48,8 +48,9 @@
 
 
 @if $use_high_contrast { $ic-brand-primary: #0073ac; }
-@if $use_high_contrast { $ic-brand-secondary: #343c44; }
 
+$ic-brand-secondary: #34444f;
+@if $use_high_contrast { $ic-brand-secondary: #343c44; }
 
 $ic-color-success:                  #008a14; // green
 @if $use_high_contrast { $ic-color-success: #007a12; }
