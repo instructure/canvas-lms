@@ -646,9 +646,9 @@ class Account < ActiveRecord::Base
       chain = Shard.shard_for(starting_account_id).activate do
         Account.find_by_sql(<<-SQL)
               WITH RECURSIVE t AS (
-                SELECT * FROM accounts WHERE id=#{Shard.local_id_for(starting_account_id).first}
+                SELECT * FROM #{Account.quoted_table_name} WHERE id=#{Shard.local_id_for(starting_account_id).first}
                 UNION
-                SELECT accounts.* FROM accounts INNER JOIN t ON accounts.id=t.parent_account_id
+                SELECT accounts.* FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id
               )
               SELECT * FROM t
         SQL

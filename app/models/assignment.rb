@@ -1709,8 +1709,10 @@ class Assignment < ActiveRecord::Base
   }
 
   scope :not_ignored_by, lambda { |user, purpose|
-    where("NOT EXISTS (SELECT * FROM ignores WHERE asset_type='Assignment' AND asset_id=assignments.id AND user_id=? AND purpose=?)",
-          user, purpose)
+    where("NOT EXISTS (?)",
+          Ignore.where(asset_type: 'Assignment',
+                       user_id: user,
+                       purpose: purpose).where('asset_id=assignments.id'))
   }
 
   # the map on the API_NEEDED_FIELDS here is because PostgreSQL will see the
