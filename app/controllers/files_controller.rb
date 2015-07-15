@@ -295,7 +295,7 @@ class FilesController < ApplicationController
         when 'content_type'
           "attachments.content_type"
         when 'user'
-          scope = scope.joins("LEFT OUTER JOIN users ON attachments.user_id=users.id")
+          scope = scope.joins("LEFT OUTER JOIN #{User.quoted_table_name} ON attachments.user_id=users.id")
           "users.sortable_name IS NULL, #{User.sortable_name_order_by_clause('users')}"
         else
           Attachment.display_name_order_by_clause('attachments')

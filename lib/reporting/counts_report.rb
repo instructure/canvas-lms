@@ -68,7 +68,7 @@ class CountsReport
           else
             timespan = Setting.get('recently_logged_in_timespan', 30.days.to_s).to_i.seconds
             enrollment_scope = Enrollment.active.not_fake.
-              joins("INNER JOIN pseudonyms ON enrollments.user_id=pseudonyms.user_id").
+              joins("INNER JOIN #{Pseudonym.quoted_table_name} ON enrollments.user_id=pseudonyms.user_id").
               where(pseudonyms: { workflow_state: 'active'}).
               where("course_id IN (?) AND pseudonyms.last_request_at>?", course_ids, timespan.ago)
 

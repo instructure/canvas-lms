@@ -72,12 +72,12 @@ module AccountReports
                 WHEN e.workflow_state = 'completed' THEN 'concluded'
                 WHEN e.workflow_state = 'deleted' THEN 'deleted' END AS enroll_state").
         order("t.id, c.id, e.id").
-        joins("INNER JOIN users u ON pseudonyms.user_id = u.id
-               INNER JOIN enrollments e ON pseudonyms.user_id = e.user_id
+        joins("INNER JOIN #{User.quoted_table_name} u ON pseudonyms.user_id = u.id
+               INNER JOIN #{Enrollment.quoted_table_name} e ON pseudonyms.user_id = e.user_id
                  AND e.type = 'StudentEnrollment'
-               INNER JOIN courses c ON c.id = e.course_id
-               INNER JOIN enrollment_terms t ON c.enrollment_term_id = t.id
-               INNER JOIN course_sections s ON e.course_section_id = s.id")
+               INNER JOIN #{Course.quoted_table_name} c ON c.id = e.course_id
+               INNER JOIN #{EnrollmentTerm.quoted_table_name} t ON c.enrollment_term_id = t.id
+               INNER JOIN #{CourseSection.quoted_table_name} s ON e.course_section_id = s.id")
 
       if @include_deleted
         students = students.where("e.workflow_state IN ('active', 'completed', 'deleted')")

@@ -82,8 +82,8 @@ class Submission < ActiveRecord::Base
     select("assignments.id, assignments.title, assignments.points_possible, assignments.due_at,
             submissions.grade, submissions.score, submissions.graded_at, assignments.grading_type,
             assignments.context_id, assignments.context_type, courses.name AS context_name").
-    joins("JOIN assignments ON assignments.id=submissions.assignment_id
-           JOIN courses ON courses.id=assignments.context_id").
+    joins(:assignment).
+    joins("JOIN #{Course.quoted_table_name} ON courses.id=assignments.context_id").
     where("graded_at>? AND user_id=? AND muted=?", date, user_id, false).
     order("graded_at DESC").
     limit(limit)

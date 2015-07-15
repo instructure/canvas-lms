@@ -104,7 +104,7 @@ module Assignments
     end
 
     def joined_submissions
-      assignment.submissions.joins("INNER JOIN enrollments e ON e.user_id = submissions.user_id")
+      assignment.submissions.joins("INNER JOIN #{Enrollment.quoted_table_name} e ON e.user_id = submissions.user_id")
     end
   end
 end

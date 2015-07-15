@@ -159,7 +159,7 @@ module AccountReports
         accounts = root_account.all_accounts.
           select("accounts.*, pa.id AS parent_id,
                   pa.sis_source_id AS parent_sis_source_id").
-          joins("INNER JOIN accounts AS pa ON accounts.parent_account_id=pa.id")
+          joins("INNER JOIN #{Account.quoted_table_name} AS pa ON accounts.parent_account_id=pa.id")
 
         if @sis_format
           accounts = accounts.where("accounts.sis_source_id IS NOT NULL")
@@ -337,10 +337,10 @@ module AccountReports
                   rc.sis_source_id AS course_sis_id, nxc.id AS non_x_course_id,
                   ra.id AS r_account_id, ra.sis_source_id AS r_account_sis_id,
                   nxc.account_id AS nx_account_id, nxa.sis_source_id AS nx_account_sis_id").
-          joins("INNER JOIN courses AS rc ON course_sections.course_id = rc.id
-                 INNER JOIN accounts AS ra ON rc.account_id = ra.id
-                 LEFT OUTER JOIN courses AS nxc ON course_sections.nonxlist_course_id = nxc.id
-                 LEFT OUTER JOIN accounts AS nxa ON nxc.account_id = nxa.id")
+          joins("INNER JOIN #{Course.quoted_table_name} AS rc ON course_sections.course_id = rc.id
+                 INNER JOIN #{Account.quoted_table_name} AS ra ON rc.account_id = ra.id
+                 LEFT OUTER JOIN #{Course.quoted_table_name} AS nxc ON course_sections.nonxlist_course_id = nxc.id
+                 LEFT OUTER JOIN #{Account.quoted_table_name} AS nxa ON nxc.account_id = nxa.id")
 
         if @include_deleted
           sections = sections.where("course_sections.workflow_state<>'deleted'
@@ -433,11 +433,11 @@ module AccountReports
                        WHEN enrollments.workflow_state = 'completed' THEN 'concluded'
                        WHEN enrollments.workflow_state = 'deleted' THEN 'deleted'
                        WHEN enrollments.workflow_state = 'rejected' THEN 'rejected' END AS enroll_state").
-          joins("INNER JOIN course_sections cs ON cs.id = enrollments.course_section_id
-                 INNER JOIN courses ON courses.id = cs.course_id
-                 INNER JOIN pseudonyms ON pseudonyms.user_id=enrollments.user_id
-                 LEFT OUTER JOIN courses nxc ON cs.nonxlist_course_id = nxc.id
-                 LEFT OUTER JOIN pseudonyms AS ob ON ob.user_id = enrollments.associated_user_id
+          joins("INNER JOIN #{CourseSection.quoted_table_name} cs ON cs.id = enrollments.course_section_id
+                 INNER JOIN #{Course.quoted_table_name} ON courses.id = cs.course_id
+                 INNER JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id=enrollments.user_id
+                 LEFT OUTER JOIN #{Course.quoted_table_name} nxc ON cs.nonxlist_course_id = nxc.id
+                 LEFT OUTER JOIN #{Pseudonym.quoted_table_name} AS ob ON ob.user_id = enrollments.associated_user_id
                    AND ob.account_id = enrollments.root_account_id").
           where("pseudonyms.account_id=enrollments.root_account_id
                  AND enrollments.type <> 'StudentViewEnrollment'")
@@ -515,7 +515,7 @@ module AccountReports
         csv << headers
         groups = root_account.all_groups.
           select("groups.*, accounts.sis_source_id AS account_sis_id").
-          joins("INNER JOIN accounts ON accounts.id = groups.account_id")
+          joins("INNER JOIN #{Account.quoted_table_name} ON accounts.id = groups.account_id")
 
         if @sis_format
           groups = groups.where("groups.sis_source_id IS NOT NULL")
@@ -565,8 +565,8 @@ module AccountReports
         csv << headers
         gm = root_account.all_groups.
           select("group_id, sis_source_id, group_memberships.user_id, pseudonyms.sis_user_id AS user_sis_id, group_memberships.workflow_state").
-          joins("INNER JOIN group_memberships ON groups.id = group_memberships.group_id
-                 INNER JOIN pseudonyms ON pseudonyms.user_id=group_memberships.user_id").
+          joins("INNER JOIN #{GroupMembership.quoted_table_name} ON groups.id = group_memberships.group_id
+                 INNER JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id=group_memberships.user_id").
           where("pseudonyms.account_id=groups.root_account_id AND
                  NOT EXISTS (SELECT user_id
                              FROM enrollments e
@@ -627,8 +627,8 @@ module AccountReports
         xl = root_account.course_sections.
           select("course_sections.*, courses.sis_source_id AS course_sis_id,
                   nxc.sis_source_id AS nxc_sis_id").
-          joins("INNER JOIN courses ON course_sections.course_id = courses.id
-                 INNER JOIN courses nxc ON course_sections.nonxlist_course_id = nxc.id").
+          joins("INNER JOIN #{Course.quoted_table_name} ON course_sections.course_id = courses.id
+                 INNER JOIN #{Course.quoted_table_name} nxc ON course_sections.nonxlist_course_id = nxc.id").
           where("course_sections.nonxlist_course_id IS NOT NULL")
 
         if @sis_format

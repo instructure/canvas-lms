@@ -567,14 +567,14 @@ class MessageableUser
         :common_role_column => 'enrollments.type'
       }.merge(options)
       scope = base_scope(options)
-      scope = scope.joins("INNER JOIN enrollments ON enrollments.user_id=users.id")
+      scope = scope.joins("INNER JOIN #{Enrollment.quoted_table_name} ON enrollments.user_id=users.id")
 
       enrollment_conditions = self.class.enrollment_conditions(options)
       if enrollment_conditions
-        scope = scope.joins("INNER JOIN courses ON courses.id=enrollments.course_id") unless options[:course_workflow_state]
+        scope = scope.joins("INNER JOIN #{Course.quoted_table_name} ON courses.id=enrollments.course_id") unless options[:course_workflow_state]
         scope = scope.where(enrollment_conditions)
       else
-        scope = scope.where('?', false)
+        scope = scope.none
       end
 
       scope
@@ -673,7 +673,7 @@ class MessageableUser
       }.merge(options)
 
       base_scope(options).
-        joins("INNER JOIN user_account_associations ON user_account_associations.user_id=users.id")
+        joins("INNER JOIN #{UserAccountAssociation.quoted_table_name} ON user_account_associations.user_id=users.id")
     end
 
     # further restricts the account user scope to users associated with
@@ -693,7 +693,7 @@ class MessageableUser
       }.merge(options)
 
       base_scope(options).
-        joins("INNER JOIN group_memberships ON group_memberships.user_id=users.id").
+        joins("INNER JOIN #{GroupMembership.quoted_table_name} ON group_memberships.user_id=users.id").
         where(:group_memberships => { :workflow_state => 'accepted' })
     end
 

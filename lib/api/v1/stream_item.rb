@@ -110,11 +110,11 @@ module Api::V1::StreamItem
       scope = @current_user.visible_stream_item_instances(opts).includes(:stream_item)
       scope = scope.joins(:stream_item).where("stream_items.asset_type=?", opts[:asset_type]) if opts.has_key?(:asset_type)
       if opts.has_key?(:submission_user_id) || opts[:asset_type] == 'Submission'
-        scope = scope.joins('inner join "submissions" on "submissions"."id"="asset_id"')
+        scope = scope.joins("INNER JOIN #{Submission.quoted_table_name} ON submissions.id=asset_id")
         # just because there are comments doesn't mean the user can see them.
         # we still need to filter after the pagination :(
-        scope = scope.where('"submissions"."submission_comments_count">0')
-        scope = scope.where('"submissions"."user_id"=?', opts[:submission_user_id]) if opts.has_key?(:submission_user_id)
+        scope = scope.where("submissions.submission_comments_count>0")
+        scope = scope.where("submissions.user_id=?", opts[:submission_user_id]) if opts.has_key?(:submission_user_id)
       end
       Api.paginate(scope, self, self.send(opts[:paginate_url], @context), default_per_page: 21).to_a
     end
