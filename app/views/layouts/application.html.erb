@@ -74,36 +74,42 @@
   <div id="wrapper-container" <% if use_new_styles? %>class="ic-app-container"<% end %>>
     <div id="wrapper" <% if use_new_styles? %>class="ic-app-main-layout-vertical"<% end %>>
       <% #Start new styles div %>
-      <% if use_new_styles? %><div class="ic-app-main-layout-horizontal"><% end %>
-        <% if @show_left_side %>
+      <% if crumbs.length > 1 && use_new_styles? %>
+        <div class="ic-app-nav-toggle-and-crumbs">
+          <% if @show_left_side %>
+            <button type="button" aria-hidden="true" id="courseMenuToggle" class="Button Button--link Button--small ic-app-course-nav-toggle" title="<%= t('Show and hide courses menu') %>"><i class="icon-hamburger"></i></button> 
+            <div class="ic-app-crumbs">
+          <% end %>
+          <%= render_crumbs %>
+          <% if @show_left_side %></div><% end %>
+        </div>
+      <% end %>
+    <% if use_new_styles? %><div class="ic-app-main-layout-horizontal"><% end %>
+      <% if @show_left_side %>
           <div id="left-side" class="<% if !@no_left_side_list_view %>list-view<% end %> <% if use_new_styles? %>ic-app-course-menu<% end %>">
           <% if left_side %>
             <%= left_side %>
           <% else %>
-            <% if @context.try(:short_name) %>
-              <div
-                id="section-tabs-header"
-                class="
-                  <% if use_new_styles? %>ic-app-course-menu__header<% else %>h1<% end %>"
-              >
+            <% if @context.try(:short_name) && !use_new_styles? %>
+              <h1 id="section-tabs-header">
                 <%= @context.short_name %>
-                <% if @context && @context.is_a?(Group) && can_do(@context, @current_user, :manage) && @context.group_category %>
-                  <a  class="al-trigger" href="#" style="display:inline-block; float:right" data-popup-within="#wrapper">
-                    <i class="icon-mini-arrow-down"></i>
-                    <span class="screenreader-only"><%= t("group_switch","Switch")%></span>
-                  </a>
-                  <ul class="al-options">
-                    <% @context.group_category.groups.active.by_name.each do |group| %>
-                      <li><%= link_to group.short_name, group_path(group) %></li>
-                    <% end %>
-                  </ul>
+              </h1>
+            <% end %>
+            <% if @context && @context.is_a?(Group) && can_do(@context, @current_user, :manage) && @context.group_category %>
+              <a  class="al-trigger" href="#" style="display:inline-block; float:right" data-popup-within="#wrapper">
+                <i class="icon-mini-arrow-down"></i>
+                <span class="screenreader-only"><%= t("group_switch","Switch")%></span>
+              </a>
+              <ul class="al-options">
+                <% @context.group_category.groups.active.by_name.each do |group| %>
+                  <li><%= link_to group.short_name, group_path(group) %></li>
                 <% end %>
-                <% if @context && @context.respond_to?(:context)  %>
-                  <a href="<%= url_for(@context.context) %>" id="section-tabs-header-subtitle" class="ellipsis"><%= @context.context.name %></a>
-                <% elsif @context && @context.respond_to?(:enrollment_term) && !@context.enrollment_term.default_term? %>
-                  <span id="section-tabs-header-subtitle" class="ellipsis"><%= @context.enrollment_term.name %></span>
-                <% end %>
-              </div>
+              </ul>
+            <% end %>
+            <% if @context && @context.respond_to?(:context)  %>
+              <a href="<%= url_for(@context.context) %>" id="section-tabs-header-subtitle" class="ellipsis"><%= @context.context.name %></a>
+            <% elsif @context && @context.respond_to?(:enrollment_term) && !@context.enrollment_term.default_term? %>
+              <span id="section-tabs-header-subtitle" class="ellipsis"><%= @context.enrollment_term.name %></span>
             <% end %>
             <%= section_tabs %>
           <% end %>
@@ -113,16 +119,6 @@
         </div>
         <% end %>
         <div id="main" <% if use_new_styles? %>class="ic-app-main-and-right-side"<% end %>>
-          <% if crumbs.length > 1 && use_new_styles? %>
-          <div class="ic-app-nav-toggle-and-crumbs">
-            <% if @show_left_side %>
-              <button type="button" aria-hidden="true" id="courseMenuToggle" class="Button Button--link Button--small ic-app-course-nav-toggle" title="<%= t('Show and hide courses menu') %>"><i class="icon-hamburger"></i></button>
-              <div class="ic-app-crumbs">
-            <% end %>
-            <%= render_crumbs %>
-            <% if @show_left_side %></div><% end %>
-            </div>
-          <% end %>
           <div id="not_right_side" <% if use_new_styles? %>class="ic-app-main-content"<% end %>>
             <div id="content-wrapper" <% if use_new_styles? %>class="ic-app-main-content__primary"<% end %>>
                 <% unless use_new_styles? %><%= render_crumbs %><% end %>

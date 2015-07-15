@@ -181,7 +181,7 @@ $page-dark: #ebeff2;
 .gradebook-header {
   @if $use_new_styles {
     @include clearfix;
-    padding: $ic-sp 0 $ic-sp/2;
+    padding-top: $ic-sp;
     + .assignment-gradebook-container {
       #gradebook-toolbar { border-top: 1px solid $ic-border-light; }
     }
