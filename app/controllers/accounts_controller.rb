@@ -532,7 +532,7 @@ class AccountsController < ApplicationController
         @last_reports = {}
         if AccountReport.connection.adapter_name == 'PostgreSQL'
           scope = @account.account_reports.select("DISTINCT ON (report_type) account_reports.*").order(:report_type)
-          @last_complete_reports = scope.last_complete_of_type(@available_reports.keys, nil).includes(:attachment).index_by(&:report_type)
+          @last_complete_reports = scope.last_complete_of_type(@available_reports.keys, nil).preload(:attachment).index_by(&:report_type)
           @last_reports = scope.last_of_type(@available_reports.keys, nil).index_by(&:report_type)
         else
           @available_reports.keys.each do |report|
