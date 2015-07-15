@@ -1951,7 +1951,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.with_student_submission_count
-    joins("LEFT OUTER JOIN submissions s ON
+    joins("LEFT OUTER JOIN #{Submission.quoted_table_name} s ON
            s.assignment_id = assignments.id AND
            s.submission_type IS NOT NULL AND
            s.user_id IS NOT NULL")

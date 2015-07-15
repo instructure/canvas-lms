@@ -549,10 +549,10 @@ class ContextExternalTool < ActiveRecord::Base
                         else
                           ''
                         end
-      where(default_placement_sql + 'EXISTS (
-              SELECT * FROM context_external_tool_placements
-              WHERE context_external_tools.id = context_external_tool_placements.context_external_tool_id
-              AND context_external_tool_placements.placement_type IN (?) )', placements || [])
+      return none unless placements
+      where(default_placement_sql + 'EXISTS (?)',
+            ContextExternalToolPlacement.where(placement_type: placements).
+        where("context_external_tools.id = context_external_tool_placements.context_external_tool_id"))
     else
       scoped
     end
