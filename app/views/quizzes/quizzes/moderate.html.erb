@@ -50,7 +50,7 @@
                count: (submission && submission.extra_time) || '0',
                wrapper: {
                  '*' => submission ? %{<a class="student_name" href="#{context_url(@context, :context_quiz_history_url, @quiz.id, :quiz_submission_id => submission.id)}">\\1</a>} : '\1',
-                 '**' => %{<div class='extra_time_allowed' style="#{hidden unless submission && submission.extra_time && submission.extra_time == "0"}">\\1</div>}
+                 '**' => %{<div class='extra_time_allowed' style="#{hidden unless submission && submission.extra_time && submission.extra_time != "0"}">\\1</div>}
                },
              })
           %>
