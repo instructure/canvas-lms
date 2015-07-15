@@ -113,16 +113,18 @@ namespace :canvas do
     compile_css = truthy_values.include?(args[:compile_css])
     build_js = truthy_values.include?(args[:build_js])
 
+    log_time('Making sure node_modules are up to date') { `npm install` }
+
+    # public/dist/brandable_css/brandable_css_bundles_with_deps.json needs
+    # to exist before we run handlebars stuff, so we have to do this first
+    require 'lib/brandable_css'
+    log_time('compile css (including custom brands)') { BrandableCSS.compile_all! }
+
     require 'parallel'
     processes = (ENV['CANVAS_BUILD_CONCURRENCY'] || Parallel.processor_count).to_i
     puts "working in #{processes} processes"
 
     tasks = Hash.new
-
-    # "tmp/brandable_css_bundles_with_deps.json needs to exist before we run
-    # handlebars stuff, so we have to do this first
-    require 'lib/brandable_css'
-    log_time('compile css (including custom brands)') { BrandableCSS.compile_all! }
 
     if compile_css
       tasks["css:styleguide"] = -> {

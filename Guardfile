@@ -3,6 +3,12 @@ require 'guard-gulp'
 
 ignore! Listen::DirectoryRecord::DEFAULT_IGNORED_DIRECTORIES - ['vendor'] + [%r{vendor/(?!plugins)}]
 
+guard :shell, all_on_start: true do
+  watch('package.json') do
+    `npm install`
+  end
+end
+
 guard :brandable_css
 guard 'coffeescript', :input => 'app/coffeescripts',  :output => 'public/javascripts/compiled'
 guard 'coffeescript', :input => 'spec/coffeescripts', :output => 'spec/javascripts/compiled'

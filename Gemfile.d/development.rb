@@ -1,6 +1,7 @@
 group :development do
   gem 'guard', '1.8.0'
   gem 'guard-gulp', '~>0.0.2', require: false
+  gem 'guard-shell', '~>0.6.1', require: false
   gem 'listen', '~>1.3' # pinned to fix guard error
   gem 'rb-inotify', '~>0.9.0', require: false
   gem 'rb-fsevent', require: false
