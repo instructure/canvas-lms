@@ -46,8 +46,8 @@ set :deploy_to, '/var/canvas'
 # for core ruby config, like boot.rb when it sets RAILS_ROOT.  You'll get Rack loading
 # errors when it can't find files (e.g. lib/canvas_logger).  This is the reason that
 # configs are copied over in the copy_configs task.
-set :linked_dirs, %w{log tmp/pids public/system}
 
+set :linked_dirs, %w{log tmp/pids public/system}
 # Default value for default_env is {}
 # set :default_env, { path: "/opt/ruby/bin:$PATH" }
 
@@ -108,6 +108,16 @@ namespace :deploy do
     end
   end
 
+  desc "Clone data analytics package"
+  task :clone_data_analytics do
+    on roles(:app) do
+      within release_path do
+        execute :git, 'clone', 'https://github.com/beyond-z/analytics.git', 'gems/plugins/analytics'
+      end
+    end
+  end
+
+  before :updated, :clone_data_analytics
   before :updated, :clone_qtimigrationtool
 
   #desc "Migrate database"
@@ -156,7 +166,8 @@ namespace :deploy do
             execute(:sudo, 'cp -a', latest_release_path.join('public/javascripts'), release_path.join('public'))
             execute(:sudo, 'cp -a', latest_release_path.join('public/optimized'), release_path.join('public'))
             execute(:sudo, 'cp -a', latest_release_path.join('public/stylesheets_compiled'), release_path.join('public'))
-            #execute(:sudo, 'chmod -R g+w', release_path.join('public')) # For some reason, cp -a is not preserving symlinks in public/javascripts/client_apps.  Let the initializer that fixes it create those links.
+            execute(:sudo, 'chmod -R g+w', release_path.join('public')) # For some reason, cp -a is not preserving symlinks in public/javascripts/client_apps.  Let the initializer that fixes it create those links.
+                                                                        # Also, it db:migrate fails if it has to create new dirs.  E.g. public/plugins
 
           rescue PrecompileRequired
             # Note: this took me forever to get going because the "deploy" user that it runs as needs rwx permissions on many
