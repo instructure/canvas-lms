@@ -196,6 +196,7 @@ define [
           a.id
 
         @grid.setColumns @getVisibleGradeGridColumns()
+        @fixColumnReordering()
 
     getClosedAdminGradingPeriods: () ->
       _.select @gradingPeriods, (gradingPeriod) =>
@@ -383,6 +384,8 @@ define [
           @customColumns = _(reorderedIds).map (id) -> colsById[id]
       else
         @storeCustomColumnOrder()
+
+      @fixColumnReordering()
 
     reorderCustomColumns: (ids) ->
       $.ajaxJSON(@options.reorder_custom_columns_url, "POST", order: ids)
