@@ -21,11 +21,13 @@ module Lti
 
     BASIC_LTI_LAUNCH_REQUEST = 'basic-lti-launch-request'
 
-    attr_accessible :message_type, :launch_path, :capabilities, :parameters, :resource_handler, :links
+    attr_accessible :message_type, :placements, :launch_path, :capabilities, :parameters, :resource_handler, :links
     attr_readonly :created_at
 
     belongs_to :resource_handler, class_name: "Lti::ResourceHandler", :foreign_key => :resource_handler_id
     has_many :links, :class_name => 'Lti::LtiLink'
+
+    has_many :placements, class_name: 'Lti::ResourcePlacement', dependent: :destroy
 
     has_many :context_module_tags, :as => :content, :class_name => 'ContentTag', :conditions => "content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'", :include => {:context_module => [:content_tags]}
 
