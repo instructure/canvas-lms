@@ -2758,23 +2758,6 @@ nb:
     google_drive: 
       file_not_found: "Samarbeid-fil ikke funnet"
     index: 
-      description_rs: |-
-          Gratis nettbaserte verktøy som [Google Docs](%{google_url}) og [EtherPad](%{etherpad_url}) 
-          er godt egnede steder for studenter å samarbeide rundt gruppeprosjekter eller -innleveringer, dele notater, etc.
-          Lærer *eller* studenter kan etablere gruppesamarbeid.
-      description_student: |-
-          **Hva mener vi med samarbeid?**  Vi snakker om nettbaserte verktøy som
-          muliggjør samarbeid på et delt dokumenter.  Du kan benytte ressurser som for eks.
-          [Google Docs](%{google_url}) og [EtherPad](%{etherpad_url})
-          for å samarbeide rundt gruppeoppgaver eller å ta notater. Denne siden er
-          et egnet sted for å holde oversikt over disse samarbeidene, samt å etablere de
-          uten å sende eposter.
-      description_teacher: |-
-          **Hva mener vi med samarbeid?** Vi snakker om nettbaserte verktøy som studentene dine helt sikkert bruker fra før. Studentene kan bruke ressurser som
-          [Google Docs](%{google_url}) og [EtherPad](%{etherpad_url})
-          for å samarbeide om gruppeoppgaver og notater. Denne siden gir dem
-          (og deg) et sted hvor man enkelt kan holde styr på disse samarbeidene, og lar dem sette dem opp
-          uten å måtte utveksle e-postadresser.
       google: 
         drive: 
           upgrade: 
