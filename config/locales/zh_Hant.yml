@@ -2777,21 +2777,6 @@ zh_Hant:
     google_drive: 
       file_not_found: 協作檔案未找到
     index: 
-      description_rs: |-
-          像 [Google Docs](%{google_url}) 和 [EtherPad](%{etherpad_url}) 的免費線上網路工具是學生致力於群組專案或文件、共用筆記等的極好的工具。
-          教師*或*學生可以設定群組協作。
-      description_student: |-
-          **我們所說的協作是什麼意思呢？**我們正在談論的是基於 Web 的工具，用於一起致力於共用文
-          件。您可以使用如 [Google Docs](%{google_url}) 和 [EtherPad](%{etherpad_url}) 的資源協同工作於
-          某些任務，如群組文件或做筆記。此頁面是跟蹤這些協作以及對其進行設定而無需互發電子郵件的
-          簡單的工具。
-      description_teacher: |-
-          **我們所說的協作是什麼意思呢？** 我們正在談論的是您的學生可能已經熟悉的基於 
-          Web 的工具。學生可以使用如 
-          [Google Docs](%{google_url}) 和 [EtherPad](%{etherpad_url}) 
-          的資源協同工作於某些任務，如群組文件或做筆記。此頁面為其提供
-          了跟蹤這些協作以及對
-          其進行設定而無需互發電子郵件的簡單的工具。
       google: 
         drive: 
           upgrade: 
@@ -9396,6 +9381,7 @@ zh_Hant:
     quiz: 測驗
     sub_header: 子標題
   module_menu_3201af4e: 模組功能表
+  module_module_name_was_successfully_deleted_fc9e9d47: "模塊 %{module_name} 已經成功刪除。"
   modules: 
     add: 
       assignment: 
