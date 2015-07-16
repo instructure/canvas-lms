@@ -2800,24 +2800,6 @@ pt-BR:
     google_drive: 
       file_not_found: "Arquivo de Colaboração não encontrado"
     index: 
-      description_rs: |-
-          As ferramentas web online gratuitas [Google Docs](%{google_url}) e [EtherPad](%{etherpad_url})
-          são excelentes locais para que os alunos trabalhem em grupo em projetos ou artigos, façam notas conjuntas, etc.
-          O professor *ou* alunos podem iniciar colaborações em grupo.
-      description_student: |-
-          **O que queremos dizer com colaborações?**  Estamos falando sobre ferramentas baseadas na web para
-          trabalho conjunto em um documento compartilhado.  Você pode usar recursos como
-          [Google Docs](%{google_url}) e [EtherPad](%{etherpad_url})
-          para trabalhar colaborativamente em tarefas como artigos de grupo ou anotações.  Esta página é
-          um local fácil para acompanhar estas colaborações, e também para configurá-las
-          sem precisar trocar emails.
-      description_teacher: |-
-          **O que queremos dizer com colaborações?**  Estamos falando sobre ferramentas baseadas na web com maior
-          probabilidade dos seus alunos já conhecerem.  Os alunos podem usar recursos como
-          [Google Docs](%{google_url}) e [EtherPad](%{etherpad_url})
-          para trabalhar colaborativamente em tarefas como artigos de grupo ou anotações.  Esta página fornece a eles
-          (e você) um local fácil para acompanhar estas colaborações, e também para configurá-las
-          sem precisar trocar emails.
       google: 
         drive: 
           upgrade: 
