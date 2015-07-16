@@ -225,7 +225,7 @@ class WikiPagesApiController < ApplicationController
         scope = scope.not_deleted
       end
       # published parameter notwithstanding, hide unpublished items if the user doesn't have permission to see them
-      scope = scope.published unless @context.grants_right?(@current_user, session, :view_unpublished_items)
+      scope = scope.published unless @context.wiki.grants_right?(@current_user, session, :view_unpublished_items)
 
       scope = WikiPage.search_by_attribute(scope, :title, params[:search_term])
 

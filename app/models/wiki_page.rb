@@ -276,7 +276,6 @@ class WikiPage < ActiveRecord::Base
   end
 
   def can_read_page?(user, session=nil)
-    return true if self.wiki.grants_right?(user, session, :manage)
     return true if self.unpublished? && self.wiki.grants_right?(user, session, :view_unpublished_items)
     self.published? && self.wiki.grants_right?(user, session, :read)
   end
