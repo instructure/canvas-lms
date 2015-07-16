@@ -43,7 +43,7 @@ $ic-DashboardCard-action--active: $ic-brand-primary;
   }
   // if NOT high contrast, do not show ugly underline on :hover, but DO show it on :focus
   @if $use_high_contrast == false {
-    &:hover { text-decoration: none; }  
+    &:hover { text-decoration: none; }
   }
 }
 
@@ -76,7 +76,7 @@ $ic-DashboardCard-action--active: $ic-brand-primary;
   line-height: 1.3;
   font-size: $baseFontSize + 2;
   font-weight: 500;
-  @include breakpoint(wide) { 
+  @include breakpoint(wide) {
     font-size: $baseFontSize + 3;
     @include breakpoint(short) { font-size: $baseFontSize + 2; }
   }
@@ -98,6 +98,7 @@ $ic-DashboardCard-action--active: $ic-brand-primary;
   align-items: center;
   .ic-DashboardCard__action {
     transition: background 0.2s, color 0.2s;
+    background-color: $ic-color-light;
     flex: 1;
     display: block; // fix for IE10
     position: relative; // for :after alignment

@@ -95,6 +95,13 @@
 {
   "group_name": "Watermarks & Other Images",
   "variables": [{
+    "human_name": "Watermark",
+    "helper_text": "This image appears as a background watermark to your page. Accepted formats: png, svg",
+    "variable_name": "ic-brand-watermark",
+    "type": "image",
+    "accept": "image/png,image/svg",
+    "default": ""
+  },{
     "human_name": "Favicon",
     "helper_text": "You can use a single 16x16, 32x32, 48x48 ico file.",
     "variable_name": "ic-brand-favicon",
