@@ -206,6 +206,28 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
     it "should be able to extract text and html bodies from no_image.eml" do
       message = test_message('no_image.eml')
     end
+
+    context "reporting stats" do
+      let (:message) { Mail.new(content_type: 'text/plain; charset=UTF-8', body: "hello") }
+
+      it "increments the processed count" do
+        CanvasStatsd::Statsd.expects(:increment).with("incoming_mail_processor.incoming_message_processed").once
+        IncomingMessageProcessor.new(message_handler, error_reporter).process_single(message, '')
+      end
+
+      it "reports the age based on the date header" do
+        Timecop.freeze do
+          message.date = 10.minutes.ago
+          CanvasStatsd::Statsd.expects(:timing).once.with("incoming_mail_processor.message_age.", 10*60*1000)
+          IncomingMessageProcessor.new(message_handler, error_reporter).process_single(message, '')
+        end
+      end
+
+      it "does not report the age if there is no date header" do
+        CanvasStatsd::Statsd.expects(:timing).never
+        IncomingMessageProcessor.new(message_handler, error_reporter).process_single(message, '')
+      end
+    end
   end
 
   describe "#process" do
