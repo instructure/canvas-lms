@@ -147,7 +147,7 @@ describe "Files API", type: :request do
 
       raw_api_call(:post, "/api/v1/files/#{@attachment.id}/create_success?uuid=#{@attachment.uuid}",
                {:controller => "files", :action => "api_create_success", :format => "json", :id => @attachment.to_param, :uuid => @attachment.uuid})
-      expect(response.headers["content-type"]).to eq "text/html; charset=utf-8"
+      expect(response.headers[content_type_key]).to eq "text/html; charset=utf-8"
       expect(response.body).not_to include 'verifier='
     end
 

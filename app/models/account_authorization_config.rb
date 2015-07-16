@@ -45,6 +45,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   # we have a lot of old data that didn't actually use STI,
   # so we shim it
   def self.find_sti_class(type_name)
+    return self if type_name.blank? # super no longer does this in Rails 4
     case type_name
     when 'cas', 'ldap', 'saml'
       const_get(type_name.upcase)

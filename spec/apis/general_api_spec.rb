@@ -93,7 +93,7 @@ describe "API", type: :request do
       # no content-type header is sent
       post "/api/v1/courses/#{@course.id}/assignments", html_request, { "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
       expect(response).to be_success
-      expect(response.header['content-type']).to eq 'application/json; charset=utf-8'
+      expect(response.header[content_type_key]).to eq 'application/json; charset=utf-8'
 
       @assignment = @course.assignments.order(:id).last
       expect(@assignment.title).to eq "test assignment"
@@ -104,7 +104,7 @@ describe "API", type: :request do
       json_request = { "assignment" => { "name" => "test assignment", "points_possible" => 15 } }
       post "/api/v1/courses/#{@course.id}/assignments", json_request.to_json, { "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
       expect(response).to be_success
-      expect(response.header['content-type']).to eq 'application/json; charset=utf-8'
+      expect(response.header[content_type_key]).to eq 'application/json; charset=utf-8'
 
       @assignment = @course.assignments.order(:id).last
       expect(@assignment.title).to eq "test assignment"
@@ -125,7 +125,7 @@ describe "API", type: :request do
                           "file_ids" => [a1.id, a2.id] } }
       post "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions", json_request.to_json, { "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
       expect(response).to be_success
-      expect(response.header['content-type']).to eq 'application/json; charset=utf-8'
+      expect(response.header[content_type_key]).to eq 'application/json; charset=utf-8'
 
       @submission = @assignment.submissions.where(user_id: @user).first
       expect(@submission.attachments.map { |a| a.id }.sort).to eq [a1.id, a2.id]

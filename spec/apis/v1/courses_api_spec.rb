@@ -87,10 +87,9 @@ describe Api::V1::Course do
       mod.publish
       mod.save!
 
-      class CourseProgress
-        def course_context_modules_item_redirect_url(opts = {})
-          "course_context_modules_item_redirect_url(:course_id => #{opts[:course_id]}, :id => #{opts[:id]}, :host => HostUrl.context_host(Course.find(#{opts[:course_id]}))"
-        end
+      stubbed_url = "redirect_url"
+      CourseProgress.any_instance.stubs(:course_context_modules_item_redirect_url).returns(stubbed_url).with do |opts|
+        opts[:course_id] == @course2.id && opts[:id] == tag.id
       end
 
       json = @test_api.course_json(@course2, @me, {}, ['course_progress'], [])
@@ -98,7 +97,7 @@ describe Api::V1::Course do
       expect(json['course_progress']).to eq({
         'requirement_count' => 1,
         'requirement_completed_count' => 0,
-        'next_requirement_url' => "course_context_modules_item_redirect_url(:course_id => #{@course2.id}, :id => #{tag.id}, :host => HostUrl.context_host(Course.find(#{@course2.id}))",
+        'next_requirement_url' => stubbed_url,
         'completed_at' => nil
       })
     end

@@ -752,6 +752,10 @@ RSpec.configure do |config|
     send(method, url, query, headers.merge(http_headers))
   end
 
+  def content_type_key
+    CANVAS_RAILS3 ? 'content-type' : 'Content-Type'
+  end
+
   def force_string_encoding(str, encoding = "UTF-8")
     if str.respond_to?(:force_encoding)
       str.force_encoding(encoding)

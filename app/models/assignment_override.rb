@@ -170,7 +170,7 @@ class AssignmentOverride < ActiveRecord::Base
       true
     end
 
-    scope "overriding_#{field}", where("#{field}_overridden" => true)
+    scope "overriding_#{field}", -> { where("#{field}_overridden" => true) }
   end
 
   override :due_at

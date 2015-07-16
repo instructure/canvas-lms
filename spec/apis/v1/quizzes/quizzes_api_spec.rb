@@ -193,7 +193,8 @@ describe Quizzes::QuizzesApiController, type: :request do
                          { quizzes: [{ 'title' => 'blah blah', 'published' => true }] },
                         'Accept' => 'application/vnd.api+json')
         @json = @json.fetch('quizzes').map { |q| q.with_indifferent_access }
-        @quiz = Quizzes::Quiz.first
+        @course.reload
+        @quiz = @course.quizzes.first
         expect(@json).to match_array [
           Quizzes::QuizSerializer.new(@quiz, scope: @user, controller: controller, session: session).
           as_json[:quiz].with_indifferent_access

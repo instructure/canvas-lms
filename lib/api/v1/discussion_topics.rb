@@ -226,17 +226,17 @@ module Api::V1::DiscussionTopics
 
   def entry_pagination_url(topic)
     if @context.is_a? Course
-      api_v1_course_discussion_entries_url(@context)
+      api_v1_course_discussion_entries_url(@context, topic)
     else
-      api_v1_group_discussion_entries_url(@context)
+      api_v1_group_discussion_entries_url(@context, topic)
     end
   end
 
-  def reply_pagination_url(entry)
+  def reply_pagination_url(topic, entry)
     if @context.is_a? Course
-      api_v1_course_discussion_replies_url(@context)
+      api_v1_course_discussion_replies_url(@context, topic, entry)
     else
-      api_v1_group_discussion_replies_url(@context)
+      api_v1_group_discussion_replies_url(@context, topic, entry)
     end
   end
 end

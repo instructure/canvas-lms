@@ -697,7 +697,7 @@ describe 'Submissions API', type: :request do
     url = json[0]['attachments'][0]['url']
     get_via_redirect(url)
     expect(response).to be_success
-    expect(response['content-type']).to eq 'image/png'
+    expect(response[content_type_key]).to eq 'image/png'
   end
 
   it "should allow retrieving media comments without a session" do

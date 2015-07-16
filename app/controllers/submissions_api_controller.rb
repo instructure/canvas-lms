@@ -179,7 +179,7 @@ class SubmissionsApiController < ApplicationController
       if includes.include?("visibility") && @context.feature_enabled?(:differentiated_assignments)
         json = bulk_process_submissions_for_visibility(submissions, includes)
       else
-        submissions = Api.paginate(submissions, self, api_v1_course_assignment_submissions_url(@context))
+        submissions = Api.paginate(submissions, self, api_v1_course_assignment_submissions_url(@context, @assignment))
         bulk_load_attachments_and_previews(submissions)
         json = submissions.map { |s|
           s.visible_to_user = true
