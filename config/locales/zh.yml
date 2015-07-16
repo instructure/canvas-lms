@@ -2799,23 +2799,6 @@ zh:
     google_drive: 
       file_not_found: 没有找到协作文件
     index: 
-      description_rs: |-
-          免费在线网络工具，如 [Google Docs](%{google_url}) 和 [EtherPad](%{etherpad_url})
-          是学生处理小组项目或论文、做共享笔记等的极佳方式
-          教师*或*学生可以设置小组协作。
-      description_student: |-
-          **协作对我们意味着什么?**  我们讨论的是用于共同处理共享文档的网络工具。您可以使用诸如
-          [Google Docs](%{google_url}) 和 [EtherPad](%{etherpad_url})
-          等资源协作处理组论文或笔记等任务。此页面是
-          跟踪这些协作的便利位置，无需交换电子邮件
-          也可设置。
-      description_teacher: |-
-          **协作对我们意味着什么?**  我们讨论的网络工具很可能
-          您的学生已经熟悉。学生可以使用诸如
-          [Google Docs](%{google_url}) 和 [EtherPad](%{etherpad_url})
-          等资源协作处理组论文或笔记等任务。此页面为他们
-          （及您）提供跟踪这些协作的便利位置，无需交换电子邮件
-          也可设置。
       google: 
         drive: 
           upgrade: 
