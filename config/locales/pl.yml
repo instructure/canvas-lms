@@ -132,6 +132,7 @@ pl:
     ldap_fields: 
       auth_filter_description: "Użyj *%{placeholder}* jako symbolu zastępczego dla nazwy użytkownika podanej przez użytkownika. Na przykład: *(sAMAccountName=%{placeholder})*"
       identifer_format_description: "Właściwości protokołu LDAP używane do sprawdzania loginu Canvas. Pozostaw puste, aby użyć nazwy użytkownika podanej przez użytkownika."
+      ldap_timeout_failure_help2: "Jeśli system Canvas podczas komunikacji z serwerem LDAP przekroczy czas zbyt wiele razy, spowoduje to, że kolejne próby logowania nie będą mogły odbywać się za pomocą serwera LDAP przez okres %{time}. Ostatnim razem twój serwer LDAP przekroczył limit czasowy po %{timestamp}."
     ldap_settings_test: 
       labels: 
         pass: Hasło
@@ -2807,20 +2808,6 @@ pl:
     google_drive: 
       file_not_found: "Nie znaleziono pliku współpracy"
     index: 
-      description_rs: |-
-          Bezpłatne narzędzia online, np. program [Google Docs](%{google_url}) lub [EtherPad](%{etherpad_url})
-          to doskonałe rozwiązania pozwalające uczestnikom pracować nad grupowymi projektami lub zadaniami, udostępniać notatki itd.
-          Instruktor *lub* uczestnicy mogą zakładać grupowe projekty współpracy.
-      description_student: |-
-          **Co to jest projekt współpracy?**  Narzędzia internetowe służą do 
-          wspólnej pracy nad udostępnianymi dokumentami.  Pracując wspólnie nad zadaniami, np. projektami grupowymi lub notatkami, można korzystać z zasobów takich jak program [Google Docs](%{google_url}) czy [EtherPad](%{etherpad_url}).  Strona pozwala
-          w łatwy sposób śledzić i tworzyć projekty współpracy
-          bez konieczności wymiany wiadomości mailowych.
-      description_teacher: |-
-          **Co to jest projekt współpracy?**  Mowa tu o narzędziach internetowych, z którymi prawdopodobnie 
-          uczestnicy są już zaznajomieni.  Pracując wspólnie nad zadaniami, np. projektami grupowymi lub notatkami, uczestnicy mogą korzystać z zasobów takich jak program [Google Docs](%{google_url}) czy [EtherPad](%{etherpad_url}).  Strona pozwala
-          im (i Tobie) w łatwy sposób śledzić i tworzyć projekty współpracy
-          bez konieczności wymiany wiadomości mailowych.
       google: 
         drive: 
           upgrade: 
@@ -5358,6 +5345,7 @@ pl:
   don_t_show_again_15d8253e: "nie pokazuj ponownie"
   done_54e3d4b6: Gotowe
   done_8af51c9b: Gotowe.
+  download_scores_generated_on_date_ff5b9cd2: "Pobierz wyniki punktowe wygenerowane %{date}"
   download_submissions_7454665f: "Pobierz przesłane zadania"
   due_a73610f6: "Termin dostarczenia"
   due_at_5e18eeac: "Godz:"
@@ -7710,6 +7698,7 @@ pl:
   login_is_too_long_25373f95: "Login jest za długi"
   login_label_1dea0f9d: "Etykieta logowania"
   login_with_auth_type_a0aaa52a: "Zaloguj się z *%{auth_type}*"
+  login_with_provider_3fd3998e: "Zaloguj się z %{provider}"
   logo_a040ae0e: Logo
   logout_a9312e35: Wyloguj
   looks_great_e4d883ed: Świetnie!
@@ -7807,6 +7796,7 @@ pl:
   message: 
     default_subject: "Alert systemu Canvas"
   message_896d2ed0: "%{message}"
+  message_reply_failed_subject_5d27a0c9: "Wysłanie odpowiedzi nie powiodło się: %{subject}"
   message_students: 
     buttons: 
       send_message: "Wyślij wiadomość"
@@ -9720,6 +9710,7 @@ pl:
   move_outcome_group_cfa1a505: "Przenieś grupę wyników"
   moving_a4d552df: "Trwa przenoszenie..."
   multi_factor_authentication_configured_865b1bde: "Skonfigurowano wieloskładnikowe uwierzytelnianie"
+  must_achieve_mastery_at_least_count_times_scores_a_628db168: "Należy osiągnąć biegłość co najmniej %{count} razy. Wyniki punktowe powyżej biegłości zostaną uśrednione w celu obliczenia końcowego wyniku punktowego."
   must_mark_as_done_bf6cc563: "trzeba oznaczyć jako gotowe"
   must_submit_new_oauth2_request_e1fb00bb: "Trzeba złożyć nowe żądanie OAuth2"
   must_supply_file_ids_and_or_folder_ids_parameter_9d29448c: "Należy podać parametr 'file_ids' i/lub 'folder_ids'"
@@ -11915,6 +11906,7 @@ pl:
         extended_quiz_time_explanation: "Możesz przydzielić więcej czasu temu uczestnikowi w trakcie bieżącej próby rozwiązania testu. Ile dodatkowego czasu chcesz przydzielić?"
         extra_time_on_every_attempt: "Dodatkowy czas do każdego podejścia"
         finished_in: "zakończono w ciągu %{duration}"
+        global_extra_attempt_time: "każdy uczestnik otrzymuje już  %{count} minut"
         global_extra_attempts: "każdy uczestnik otrzymuje %{n}"
         headers: 
           attempt: Próba
@@ -14309,6 +14301,11 @@ pl:
   the_material_is_in_the_public_domain_279c39a3: "Materiał znajduje się w domenie publicznej"
   the_material_is_licensed_under_creative_commons_3242cb5e: "Materiał jest objęty licencją Creative Commons"
   the_material_is_subject_to_fair_use_exception_41bc6a4b: "Materiał podlega wyjątkowi dozwolonego użytku"
+  the_message_titled_subject_could_not_be_delivered__8c6cbbe3: |-
+      Nie można było dostarczyć wiadomości zatytułowanej "%{subject}". Wiadomość została wysłana z adres nie powiązanego z twoim kontem Canvas. eśli próbujesz skontaktować się z inną osobą za pośrednictwem systemu Canvas, zaloguj się na swoje konto i spróbuj wysłać wiadomość za pośrednictwem skrzynki pocztowej.
+      
+      Dziękujemy,
+      Dział pomocy technicznej Canvas
   the_module_item_is_locked_27fe420b: "Element modułu jest zablokowany."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Najnowsze wyniki użytkownika %{current_user_name} i rezultat %{outcome_name}."
   the_profile_picture_has_been_reported_d609d6dd: "Zdjęcie profilowe zostało zgłoszone"
@@ -14350,6 +14347,7 @@ pl:
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "Zanim będzie można opublikować ten plik, należy ustawić jego usage_rights."
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Ten folder jest aktualnie zablokowany i niedostępny do wyświetlenia."
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Jest to rozdzielona przecinkami lista zaufanych adresów URL. Zaufanie adresom URL na tej liście spowoduje obejście tokena CSRF podczas logowania do systemu Canvas."
+  this_login_is_for_provider_6f17462: "Ten login jest dla %{provider}"
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Najprawdopodobniej doszło do tego, ponieważ zaimportowano zawartość kursu bez skojarzonych plików."
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "Ten wynik został wykorzystany do oceny ucznia i nie może już być aktualizowany"
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Ten wynik został wykorzystany do oceny ucznia i nie może być zmieniony ani usunięty"
