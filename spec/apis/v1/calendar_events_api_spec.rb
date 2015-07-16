@@ -27,7 +27,7 @@ describe CalendarEventsApiController, type: :request do
   context 'events' do
     expected_fields = [
       'all_day', 'all_day_date', 'child_events', 'child_events_count',
-      'context_code', 'created_at', 'description', 'duplicates', 'end_at', 'hidden', 'html_url',
+      'context_code', 'created_at', 'description', 'end_at', 'hidden', 'html_url',
       'id', 'location_address', 'location_name', 'parent_event_id', 'start_at',
       'title', 'updated_at', 'url', 'workflow_state'
     ]
@@ -629,40 +629,6 @@ describe CalendarEventsApiController, type: :request do
       assert_status(201)
       expect(json.keys.sort).to eql expected_fields
       expect(json['title']).to eql 'ohai'
-    end
-
-    it 'should create recurring events if options have been specified' do
-      start_at = Time.zone.now.utc.change(hour: 0, min: 1) # For pre-Normandy bug with all_day method in calendar_event.rb
-      end_at = Time.zone.now.utc.change(hour: 23)
-      json = api_call(:post, "/api/v1/calendar_events",
-                      {:controller => 'calendar_events_api', :action => 'create', :format => 'json'},
-                      {:calendar_event => {
-                          :context_code => @course.asset_string,
-                          :title => "ohai",
-                          :start_at => start_at.iso8601,
-                          :end_at => end_at.iso8601,
-                          :duplicate => {
-                              :count => "3",
-                              :interval => "1",
-                              :frequency => "weekly"
-                          }
-                       }
-                      })
-      assert_status(201)
-      expect(json.keys.sort).to eq expected_fields
-      expect(json['title']).to eq 'ohai'
-
-      duplicates = json['duplicates']
-      expect(duplicates.count).to eq 3
-
-      duplicates.to_a.each_with_index do |duplicate, i|
-        start_result = Time.iso8601(duplicate['calendar_event']['start_at'])
-        end_result = Time.iso8601(duplicate['calendar_event']['end_at'])
-        expect(duplicate['calendar_event']['title']).to eql 'ohai'
-        expect(start_result).to eq(start_at + (i + 1).weeks)
-        expect(end_result).to eq(end_at + (i + 1).weeks)
-      end
-
     end
 
     it 'should process html content in description on create' do

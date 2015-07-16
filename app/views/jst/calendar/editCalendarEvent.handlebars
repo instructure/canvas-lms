@@ -19,7 +19,7 @@
               {{#t}}Event Date:{{/t}}
               {{datepickerScreenreaderPrompt 'date'}}
             </label>
-            <input id="calendar_event_date" type="text"
+            <input id="calendar_event_date" type="text" 
               name="date" style="width: 100px;" class="date_field"
               aria-labelledby='calendar_event_date_accessible_label'
               data-tooltip title="{{accessibleDateFormat 'date'}}"/>
@@ -73,38 +73,6 @@
               {{/if}}
             {{/each}}
           </select>
-        </td>
-      </tr>
-      <tr class="duplicate_event_toggle_row">
-        <td style="vertical-align: top;"><label for="duplicate_event">{{#t "repeat"}}Repeat{{/t}}</label></td>
-        <td><input type="checkbox" id="duplicate_event" name="duplicate" value="true" /></td>
-      </tr>
-      <tr class="duplicate_event_row duplicate_fields" style="display: none">
-        <td style="vertical-align: top; padding-left: 20px;" colspan="2">
-          <label for="duplicate_interval">
-            <div style="float: left; display: inline-block; margin: 0 5px; line-height: 38px; width: 35px; text-align: right;">{{#t}}Every{{/t}}</div>
-            <input value="1" disabled="true" style="width: 50px; float: left; display: inline-block; margin: 0 5px;" type="number" id="duplicate_interval" name="duplicate_interval" min="1" />
-            <select id="duplicate_frequency" style="width: 100px;" name="duplicate_frequency">
-                <option value="daily">{{#t}}Day(s){{/t}}</option>
-                <option value="weekly" selected>{{#t}}Week(s){{/t}}</option>
-                <option value="monthly">{{#t}}Month(s){{/t}}</option>
-            </select>
-          </label>
-        </td>
-      </tr>
-      <tr class="duplicate_event_row duplicate_fields" style="display: none">
-          <td style="vertical-align: top; padding-left: 20px;" colspan="2">
-            <label for="duplicate_count">
-              <div style="float: left; display: inline-block; margin: 0 5px; line-height: 38px; width: 35px; text-align: right;">{{#t}}For{{/t}}</div>
-              <input value="1" disabled="true" style="width: 50px; float: left; display: inline-block; margin: 0 5px;" type="number" id="duplicate_count" name="duplicate_count" min="1" />
-              <div style="float: left; display: inline-block; margin: 0 5px; line-height: 38px;">{{#t}}occurrence(s){{/t}}</div>
-            </label>
-          </td>
-      </tr>
-      <tr class="duplicate_event_row duplicate_fields" style="display: none">
-        <td style="vertical-align: top; padding-left: 20px; width: 35px;"><label data-tooltip title="{{#t}}Appends a number to the end of each event title (e.g. Event 1, Event 2, etc)" for="append_iterator{{/t}}">{{#t "count"}}Count:{{/t}}</label></td>
-        <td>
-          <input data-tooltip title="{{#t}}Appends a number to the end of each event title (e.g. Event 1, Event 2, etc){{/t}}" value="true" disabled="true" type="checkbox" id="append_iterator" name="append_iterator" />
         </td>
       </tr>
     </table>

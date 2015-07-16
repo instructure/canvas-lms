@@ -41,33 +41,35 @@ define [
       $(".ui-dialog-titlebar-close").focus()
       $form.submit (e) =>
         e.preventDefault()
-        submittingDfd = $.Deferred()
-        $form.disableWhileLoading(submittingDfd)
-
         formData = $form.getFormData()
+        if @gradeIsExcused(formData.default_grade)
+          $.flashError I18n.t('Default grade cannot be set to %{ex}', { ex: 'EX' })
+        else
+          submittingDfd = $.Deferred()
+          $form.disableWhileLoading(submittingDfd)
 
-        students = getStudents()
-        pages = (students.splice 0, PAGE_SIZE while students.length)
+          students = getStudents()
+          pages = (students.splice 0, PAGE_SIZE while students.length)
 
-        postDfds = pages.map (page) =>
-          studentParams = getParams(page, formData.default_grade)
-          params = _.extend {}, studentParams,
-            dont_overwrite_grades: not formData.overwrite_existing_grades
-          $.ajaxJSON $form.attr("action"), "POST", params
+          postDfds = pages.map (page) =>
+            studentParams = getParams(page, formData.default_grade)
+            params = _.extend {}, studentParams,
+              dont_overwrite_grades: not formData.overwrite_existing_grades
+            $.ajaxJSON $form.attr("action"), "POST", params
 
-        $.when(postDfds...).then (responses...) =>
-          responses = [responses] if postDfds.length == 1
-          submissions = getSubmissions(responses)
-          $.publish 'submissions_updated', [submissions]
-          alert(I18n.t 'alerts.scores_updated'
-          ,
-            one: '1 Student score updated'
-            other: '%{count} Student scores updated'
-          ,
-            count: submissions.length)
-          submittingDfd.resolve()
-          $("#set_default_grade").focus()
-          @$dialog.remove()
+          $.when(postDfds...).then (responses...) =>
+            responses = [responses] if postDfds.length == 1
+            submissions = getSubmissions(responses)
+            $.publish 'submissions_updated', [submissions]
+            alert(I18n.t 'alerts.scores_updated'
+            ,
+              one: '1 Student score updated'
+              other: '%{count} Student scores updated'
+            ,
+              count: submissions.length)
+            submittingDfd.resolve()
+            $("#set_default_grade").focus()
+            @$dialog.remove()
 
       getStudents = =>
         if @selected_section
@@ -92,3 +94,6 @@ define [
          .map ([response, __]) ->
            [s.submission for s in response]
          .flatten().value()
+
+    gradeIsExcused: (grade) ->
+      _.isString(grade) && grade.toUpperCase() == 'EX'
