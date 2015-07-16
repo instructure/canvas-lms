@@ -515,6 +515,26 @@ describe ActiveRecord::Base do
       expect(@p1_2.reload.unique_id).to eq 'pa2'
       expect(@p2.reload.unique_id).to eq 'pb'
     end
+
+    # in rails 4, the where conditions use bind values for association scopes
+    it "should do an update all with a join on associations" do
+      @u1.pseudonyms.joins(:user).active.where(:users => {:name => 'b'}).update_all(:unique_id => 'pa3')
+      expect(@p1.reload.unique_id).to_not eq 'pa3'
+      @u1.pseudonyms.joins(:user).active.where(:users => {:name => 'a'}).update_all(:unique_id => 'pa3')
+      expect(@p1.reload.unique_id).to eq 'pa3'
+      expect(@p1_2.reload.unique_id).to eq 'pa2'
+    end
+
+    it "should do a delete all with a join on associations" do
+      @u1.pseudonyms.joins(:user).active.where(:users => {:name => 'b'}).delete_all
+      expect(@u1.reload).not_to be_deleted
+      expect(@p1.reload.unique_id).to eq 'pa'
+      expect(@p1_2.reload.unique_id).to eq 'pa2'
+      @u1.pseudonyms.joins(:user).active.where(:users => {:name => 'a'}).delete_all
+      expect { @p1.reload }.to raise_error(ActiveRecord::RecordNotFound)
+      expect(@u1.reload).not_to be_deleted
+      expect(@p1_2.reload.unique_id).to eq 'pa2'
+    end
   end
 
   describe "delete_all with_limit" do

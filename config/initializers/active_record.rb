@@ -780,7 +780,13 @@ ActiveRecord::Relation.class_eval do
 
           scope = self
           join_conditions.each { |join| scope = scope.where(join) }
-          sql.concat(scope.arel.where_sql.to_s)
+          binds = scope.bind_values.dup
+          where_statements = scope.arel.constraints.map do |node|
+            connection.visitor.accept(node) do
+              connection.quote(*binds.shift.reverse)
+            end
+          end
+          sql.concat('WHERE ' + where_statements.join(' AND '))
           connection.update(sql, "#{name} Update")
         else
           update_all_without_joins(updates, conditions, options)
@@ -809,14 +815,21 @@ ActiveRecord::Relation.class_eval do
 
           scope = self
           join_conditions.each { |join| scope = scope.where(join) }
-          sql.concat(scope.arel.where_sql.to_s)
+
+          binds = scope.bind_values.dup
+          where_statements = scope.arel.constraints.map do |node|
+            connection.visitor.accept(node) do
+              connection.quote(*binds.shift.reverse)
+            end
+          end
+          sql.concat('WHERE ' + where_statements.join(' AND '))
         when 'MySQL', 'Mysql2'
           sql = "DELETE #{quoted_table_name} FROM #{quoted_table_name} #{arel.join_sql} #{arel.where_sql}"
         else
           raise "Joins in delete not supported!"
         end
 
-        connection.delete(sql, "#{name} Delete all")
+        connection.exec_query(sql, "#{name} Delete all", scope.bind_values)
       end
     else
       delete_all_without_joins(conditions)
