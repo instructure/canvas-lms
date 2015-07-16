@@ -132,7 +132,7 @@ describe 'Student Gradebook' do
     expect(f('.final_grade .grade').text).to eq '100%'
 
     f('#only_consider_graded_assignments').click
-    expect(f('.final_grade .grade').text).to eq '66.7%'
+    expect(f('.final_grade .grade').text).to eq '66.67%'
   end
 end
 
