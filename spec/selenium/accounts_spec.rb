@@ -19,18 +19,18 @@ describe "account" do
   describe "authentication configs" do
 
     it "should allow setting up a secondary ldap server" do
-      get "/accounts/#{Account.default.id}/account_authorization_configs"
+      get "/accounts/#{Account.default.id}/authentication_providers"
       add_auth_type('LDAP')
       ldap_form = f('#new_ldap')
       expect(ldap_form).to be_displayed
 
-      ldap_form.find_element(:id, 'account_authorization_config_auth_host').send_keys('primary.host.example.com')
-      ldap_form.find_element(:id, 'account_authorization_config_auth_port').send_keys('1')
-      ldap_form.find_element(:id, 'account_authorization_config_auth_over_tls_simple_tls').click
-      ldap_form.find_element(:id, 'account_authorization_config_auth_base').send_keys('primary base')
-      ldap_form.find_element(:id, 'account_authorization_config_auth_filter').send_keys('primary filter')
-      ldap_form.find_element(:id, 'account_authorization_config_auth_username').send_keys('primary username')
-      ldap_form.find_element(:id, 'account_authorization_config_auth_password').send_keys('primary password')
+      ldap_form.find_element(:id, 'authentication_provider_auth_host').send_keys('primary.host.example.com')
+      ldap_form.find_element(:id, 'authentication_provider_auth_port').send_keys('1')
+      ldap_form.find_element(:id, 'authentication_provider_auth_over_tls_simple_tls').click
+      ldap_form.find_element(:id, 'authentication_provider_auth_base').send_keys('primary base')
+      ldap_form.find_element(:id, 'authentication_provider_auth_filter').send_keys('primary filter')
+      ldap_form.find_element(:id, 'authentication_provider_auth_username').send_keys('primary username')
+      ldap_form.find_element(:id, 'authentication_provider_auth_password').send_keys('primary password')
       submit_form(ldap_form)
 
       keep_trying_until { expect(Account.default.authentication_providers.length).to eq 1 }
@@ -46,13 +46,13 @@ describe "account" do
       # now add a secondary ldap config
       add_auth_type("LDAP")
       ldap_form = f('#ldap_form form')
-      ldap_form.find_element(:id, 'account_authorization_config_auth_host').send_keys('secondary.host.example.com')
-      ldap_form.find_element(:id, 'account_authorization_config_auth_port').send_keys('2')
-      ldap_form.find_element(:id, 'account_authorization_config_auth_base').send_keys('secondary base')
-      ldap_form.find_element(:id, 'account_authorization_config_auth_filter').send_keys('secondary filter')
-      ldap_form.find_element(:id, 'account_authorization_config_auth_username').send_keys('secondary username')
-      ldap_form.find_element(:id, 'account_authorization_config_auth_password').send_keys('secondary password')
-      ldap_form.find_element(:id, 'account_authorization_config_auth_over_tls_start_tls').click
+      ldap_form.find_element(:id, 'authentication_provider_auth_host').send_keys('secondary.host.example.com')
+      ldap_form.find_element(:id, 'authentication_provider_auth_port').send_keys('2')
+      ldap_form.find_element(:id, 'authentication_provider_auth_base').send_keys('secondary base')
+      ldap_form.find_element(:id, 'authentication_provider_auth_filter').send_keys('secondary filter')
+      ldap_form.find_element(:id, 'authentication_provider_auth_username').send_keys('secondary username')
+      ldap_form.find_element(:id, 'authentication_provider_auth_password').send_keys('secondary password')
+      ldap_form.find_element(:id, 'authentication_provider_auth_over_tls_start_tls').click
       submit_form(ldap_form)
 
       keep_trying_until { expect(Account.default.authentication_providers.length).to eq 2 }
@@ -106,9 +106,9 @@ describe "account" do
     end
 
     it "should be able to set login labels for delegated auth accounts" do
-      get "/accounts/#{Account.default.id}/account_authorization_configs"
+      get "/accounts/#{Account.default.id}/authentication_providers"
       add_auth_type("CAS")
-      f("#account_authorization_config_auth_base").send_keys("cas.example.com")
+      f("#authentication_provider_auth_base").send_keys("cas.example.com")
       expect_new_page_load { submit_form('#cas_form form') }
 
       expect(f("#sso_settings_login_handle_name")).to be_displayed
@@ -123,7 +123,7 @@ describe "account" do
 
     context "cas" do
       it "should be able to set unknown user url option" do
-        get "/accounts/#{Account.default.id}/account_authorization_configs"
+        get "/accounts/#{Account.default.id}/authentication_providers"
         add_auth_type("CAS")
 
         expect_new_page_load { submit_form('#cas_form form') }
@@ -139,10 +139,10 @@ describe "account" do
 
     context "saml" do
       it "should be able to set unknown user url option" do
-        get "/accounts/#{Account.default.id}/account_authorization_configs"
+        get "/accounts/#{Account.default.id}/authentication_providers"
         add_auth_type("SAML")
 
-        expect(f("#account_authorization_config_idp_entity_id")).to be_displayed
+        expect(f("#authentication_provider_idp_entity_id")).to be_displayed
 
         expect_new_page_load { submit_form('#saml_form form') }
 
@@ -273,7 +273,7 @@ describe "account" do
     it "should load/refresh SAML debug info" do
       enable_cache do
         aac = Account.default.authentication_providers.create!(auth_type: 'saml')
-        get "/accounts/#{Account.default.id}/account_authorization_configs"
+        get "/accounts/#{Account.default.id}/authentication_providers"
 
         start = f("#start_saml_debugging")
         refresh = f("#refresh_saml_debugging")
@@ -313,7 +313,7 @@ describe "account" do
       @account = Account.default
       @account.authentication_providers.create!(auth_type: 'saml')
       @account.authentication_providers.create!(auth_type: 'saml')
-      get "/accounts/#{Account.default.id}/account_authorization_configs"
+      get "/accounts/#{Account.default.id}/authentication_providers"
       f("#sso_settings_auth_discovery_url").send_keys(auth_url)
       expect_new_page_load { submit_form("#edit_sso_settings") }
 

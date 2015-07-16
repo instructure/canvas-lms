@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe "AccountAuthorizationConfigs API", type: :request do
+describe "AuthenticationProviders API", type: :request do
   before :once do
     @account = account_model(:name => 'root')
     user_with_pseudonym(:active_all => true, :account => @account)
@@ -30,7 +30,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
 
   context "/index" do
     def call_index(status=200)
-      api_call(:get, "/api/v1/accounts/#{@account.id}/account_authorization_configs",
+      api_call(:get, "/api/v1/accounts/#{@account.id}/authentication_providers",
              { :controller => 'account_authorization_configs', :action => 'index', :account_id => @account.id.to_s, :format => 'json' },
              {}, {}, :expected_status => status)
     end
@@ -57,7 +57,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
     # the deprecated mass-update/create is tested in account_authorization_configs_deprecated_api_spec.rb
 
     def call_create(params, status = 200)
-      json = api_call(:post, "/api/v1/accounts/#{@account.id}/account_authorization_configs",
+      json = api_call(:post, "/api/v1/accounts/#{@account.id}/authentication_providers",
              { :controller => 'account_authorization_configs', :action => 'create', :account_id => @account.id.to_s, :format => 'json' },
              params, {}, :expected_status => status)
       @account.reload
@@ -77,7 +77,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
     end
 
     it "should work with rails form style params" do
-      call_create({:account_authorization_config => @saml_hash})
+      call_create({:authentication_provider => @saml_hash})
       aac = @account.authentication_providers.first
       expect(aac.auth_type).to eq 'saml'
       expect(aac.idp_entity_id).to eq 'http://example.com/saml1'
@@ -148,16 +148,6 @@ describe "AccountAuthorizationConfigs API", type: :request do
       expect(@account.authentication_providers[2].auth_host).to eq '127.0.0.1'
     end
 
-    it "should error if deprecated and new style are used" do
-      json = call_create({:account_authorization_config => {"0" => @ldap_hash}}.merge(@ldap_hash), 400)
-      expect(json.keys.sort).to eq ['error_report_id', 'errors']
-      expect(json['errors']).to eq [
-        "error_code" => "deprecated_request_syntax",
-        "message" => "This request syntax has been deprecated",
-        "field" => nil,
-      ]
-    end
-
     it "should error if empty post params sent" do
       json = call_create({}, 422)
       expect(json['errors'].first).to eq({ 'field' => 'auth_type', 'message' => "invalid auth_type, must be one of #{AccountAuthorizationConfig::VALID_AUTH_TYPES.join(',')}", 'error_code' => 'inclusion' })
@@ -178,7 +168,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
 
   context "/show" do
     def call_show(id, status = 200)
-      api_call(:get, "/api/v1/accounts/#{@account.id}/account_authorization_configs/#{id}",
+      api_call(:get, "/api/v1/accounts/#{@account.id}/authentication_providers/#{id}",
              { :controller => 'account_authorization_configs', :action => 'show', :account_id => @account.id.to_s, :id => id.to_param, :format => 'json' },
              {}, {}, :expected_status => status)
     end
@@ -235,7 +225,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
 
   context "/update" do
     def call_update(id, params, status = 200)
-      json = api_call(:put, "/api/v1/accounts/#{@account.id}/account_authorization_configs/#{id}",
+      json = api_call(:put, "/api/v1/accounts/#{@account.id}/authentication_providers/#{id}",
              { :controller => 'account_authorization_configs', :action => 'update', :account_id => @account.id.to_s, :id => id.to_param, :format => 'json' },
              params, {}, :expected_status => status)
       @account.reload
@@ -254,7 +244,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
     it "should work with rails form style params" do
       aac = @account.authentication_providers.create!(@saml_hash)
       @saml_hash['idp_entity_id'] = 'hahahaha'
-      call_update(aac.id, {:account_authorization_config => @saml_hash})
+      call_update(aac.id, {:authentication_provider => @saml_hash})
 
       aac.reload
       expect(aac.idp_entity_id).to eq 'hahahaha'
@@ -306,7 +296,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
 
   context "/destroy" do
     def call_destroy(id, status = 200)
-      json = api_call(:delete, "/api/v1/accounts/#{@account.id}/account_authorization_configs/#{id}",
+      json = api_call(:delete, "/api/v1/accounts/#{@account.id}/authentication_providers/#{id}",
              { :controller => 'account_authorization_configs', :action => 'destroy', :account_id => @account.id.to_s, :id => id.to_param, :format => 'json' },
              {}, {}, :expected_status => status)
       @account.reload

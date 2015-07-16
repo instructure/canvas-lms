@@ -16,99 +16,103 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# @API Account Authentication Services
+# @API Authentication Providers
+# Authentication providers were previously known as account authorization
+# configs. They are being renamed. The urls with account_authorization_configs
+# are all deprecated as of 2015-07-16. Please use the authentication_providers
+# version instead.
 #
-# @model AccountAuthorizationConfig
+# @model AuthenticationProvider
 #     {
-#       "id": "AccountAuthorizationConfig",
+#       "id": "1",
 #       "description": "",
 #       "properties": {
 #         "login_handle_name": {
-#           "description": "_Deprecated_[2015-05-08: This is moving to an account setting ] Valid for SAML and CAS authorization.",
+#           "description": "_Deprecated_[2015-05-08: This is moving to an account setting ] Valid for SAML and CAS providers.",
 #           "type": "string"
 #         },
 #         "identifier_format": {
-#           "description": "Valid for SAML authorization.",
+#           "description": "Valid for SAML providers.",
 #           "example": "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
 #           "type": "string"
 #         },
 #         "auth_type": {
-#           "description": "Valid for SAML, LDAP and CAS authorization.",
+#           "description": "Valid for all providers.",
 #           "example": "saml",
 #           "type": "string"
 #         },
 #         "id": {
-#           "description": "Valid for SAML, LDAP and CAS authorization.",
+#           "description": "Valid for all providers.",
 #           "example": 1649,
 #           "type": "integer"
 #         },
 #         "log_out_url": {
-#           "description": "Valid for SAML authorization.",
+#           "description": "Valid for SAML providers.",
 #           "example": "http://example.com/saml1/slo",
 #           "type": "string"
 #         },
 #         "log_in_url": {
-#           "description": "Valid for SAML and CAS authorization.",
+#           "description": "Valid for SAML and CAS providers.",
 #           "example": "http://example.com/saml1/sli",
 #           "type": "string"
 #         },
 #         "certificate_fingerprint": {
-#           "description": "Valid for SAML authorization.",
+#           "description": "Valid for SAML providers.",
 #           "example": "111222",
 #           "type": "string"
 #         },
 #         "change_password_url": {
-#           "description": "_Deprecated_[2015-05-08: This is moving to an account setting] Valid for SAML authorization.",
+#           "description": "_Deprecated_[2015-05-08: This is moving to an account setting] Valid for SAML providers.",
 #           "type": "string"
 #         },
 #         "requested_authn_context": {
-#           "description": "Valid for SAML authorization.",
+#           "description": "Valid for SAML providers.",
 #           "type": "string"
 #         },
 #         "auth_host": {
-#           "description": "Valid for LDAP authorization.",
+#           "description": "Valid for LDAP providers.",
 #           "example": "127.0.0.1",
 #           "type": "string"
 #         },
 #         "auth_filter": {
-#           "description": "Valid for LDAP authorization.",
+#           "description": "Valid for LDAP providers.",
 #           "example": "filter1",
 #           "type": "string"
 #         },
 #         "auth_over_tls": {
-#           "description": "Valid for LDAP authorization.",
+#           "description": "Valid for LDAP providers.",
 #           "type": "integer"
 #         },
 #         "auth_base": {
-#           "description": "Valid for LDAP and CAS authorization.",
+#           "description": "Valid for LDAP and CAS providers.",
 #           "type": "string"
 #         },
 #         "auth_username": {
-#           "description": "Valid for LDAP authorization.",
+#           "description": "Valid for LDAP providers.",
 #           "example": "username1",
 #           "type": "string"
 #         },
 #         "auth_port": {
-#           "description": "Valid for LDAP authorization.",
+#           "description": "Valid for LDAP providers.",
 #           "type": "integer"
 #         },
 #         "position": {
-#           "description": "Valid for SAML, LDAP and CAS authorization.",
+#           "description": "Valid for all providers.",
 #           "example": 1,
 #           "type": "integer"
 #         },
 #         "idp_entity_id": {
-#           "description": "Valid for SAML authorization.",
+#           "description": "Valid for SAML providers.",
 #           "example": "http://example.com/saml1",
 #           "type": "string"
 #         },
 #         "login_attribute": {
-#           "description": "Valid for SAML authorization.",
+#           "description": "Valid for SAML providers.",
 #           "example": "nameid",
 #           "type": "string"
 #         },
 #         "unknown_user_url": {
-#           "description": "_Deprecated_[2015-05-08: This is moving to an account setting] Valid for SAML and CAS authorization.",
+#           "description": "_Deprecated_[2015-05-08: This is moving to an account setting] Valid for SAML and CAS providers.",
 #           "example": "https://canvas.instructure.com/login",
 #           "type": "string"
 #         }
@@ -130,7 +134,7 @@
 # @model SSOSettings
 #     {
 #       "id": "SSOSettings",
-#       "description": "Settings that are applicable across an account's authorization configuration, even if there are multiple individual account authorization configs",
+#       "description": "Settings that are applicable across an account's authentication configuration, even if there are multiple individual providers",
 #       "properties": {
 #        "login_handle_name": {
 #           "description": "The label used for unique login identifiers.",
@@ -159,15 +163,15 @@ class AccountAuthorizationConfigsController < ApplicationController
   before_filter :require_context, :require_root_account_management
   include Api::V1::AccountAuthorizationConfig
 
-  # @API List Authorization Configs
-  # Returns the list of authorization configs
+  # @API List authentication providers
+  # Returns the list of authentication providers
   #
   # @example_request
   #
-  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs' \
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/authentication_providers' \
   #        -H 'Authorization: Bearer <token>'
   #
-  # @returns [AccountAuthorizationConfig]
+  # @returns [AuthenticationProvider]
   def index
     if api_request?
       render json: aacs_json(@account.authentication_providers.active)
@@ -176,24 +180,24 @@ class AccountAuthorizationConfigsController < ApplicationController
     end
   end
 
-  # @API Create Authorization Config
+  # @API Add authentication provider
   #
-  # Add external account authentication service(s) for the account.
+  # Add external authentication provider(s) for the account.
   # Services may be CAS, Facebook, GitHub, Google, LDAP, OpenID Connect,
   # LinkedIn, SAML, or Twitter.
   #
-  # Each authentication service is specified as a set of parameters as
-  # described below. A service specification must include an 'auth_type'
+  # Each authentication provider is specified as a set of parameters as
+  # described below. A provider specification must include an 'auth_type'
   # parameter with a value of 'cas', 'facebook', 'github', 'google', 'ldap',
   # 'linkedin', 'openid_connect', 'saml', or 'twitter'. The other recognized
   # parameters depend on this auth_type; unrecognized parameters are discarded.
-  # Service specifications not specifying a valid auth_type are ignored.
+  # Provider specifications not specifying a valid auth_type are ignored.
   #
-  # _Deprecated_[2015-05-08] Any service specification may include an
+  # _Deprecated_[2015-05-08] Any provider specification may include an
   # optional 'login_handle_name' parameter. This parameter specifies the
   # label used for unique login identifiers; for example: 'Login',
   # 'Username', 'Student ID', etc. The default is 'Email'.
-  # _Deprecated_[2015-05-20] Any service specification besides LDAP may include
+  # _Deprecated_[2015-05-20] Any provider specification besides LDAP may include
   # an optional 'unknown_user_url' parameters. This parameters specifies a url
   # to redirect to when a user is authorized but is not found in Canvas.
   # _Deprecated_ [Use update_sso_settings instead]
@@ -201,7 +205,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   # You can set the 'position' for any configuration. The config in the 1st position
   # is considered the default.
   #
-  # For CAS authentication services, the additional recognized parameters are:
+  # For CAS, the additional recognized parameters are:
   #
   # - auth_base
   #
@@ -272,7 +276,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   The attribute to use to look up the user's login in Canvas. Either
   #   'sub' (the default), or 'email'
   #
-  # For LDAP authentication services, the additional recognized parameters are:
+  # For LDAP, the additional recognized parameters are:
   #
   # - auth_host
   #
@@ -360,7 +364,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   The attribute of the ID token to look up the user's login in Canvas.
   #   Defaults to 'sub'.
   #
-  # For SAML authentication services, the additional recognized parameters are:
+  # For SAML, the additional recognized parameters are:
   #
   # - idp_entity_id
   #
@@ -425,18 +429,9 @@ class AccountAuthorizationConfigsController < ApplicationController
   #   for use on parent registrations.  Only one service can be selected
   #   at a time so if set to true all others will be set to false
   #
-  # - account_authorization_config[n] (deprecated)
-  #   The nth service specification as described above. For instance, the
-  #   auth_type of the first service is given by the
-  #   account_authorization_config[0][auth_type] parameter. There must be
-  #   either a single CAS or SAML specification, or one or more LDAP
-  #   specifications. Additional services after an initial CAS or SAML service
-  #   are ignored; additional non-LDAP services after an initial LDAP service
-  #   are ignored.
-  #
   # @example_request
   #   # Create LDAP config
-  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs' \
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/authentication_providers' \
   #        -F 'auth_type=ldap' \
   #        -F 'auth_host=ldap.mydomain.edu' \
   #        -F 'auth_filter=(sAMAccountName={{login}})' \
@@ -447,7 +442,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   # @example_request
   #   # Create SAML config
-  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs' \
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/authentication_providers' \
   #        -F 'auth_type=saml' \
   #        -F 'idp_entity_id=<idp_entity_id>' \
   #        -F 'log_in_url=<login_url>' \
@@ -457,111 +452,47 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   # @example_request
   #   # Create CAS config
-  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs' \
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/authentication_providers' \
   #        -F 'auth_type=cas' \
   #        -F 'auth_base=cas.mydomain.edu' \
   #        -F 'log_in_url=<login_url>' \
   #        -H 'Authorization: Bearer <token>'
   #
-  # _Deprecated_[2015-05-08] Examples:
-  #
-  # This endpoint still supports a deprecated version of setting the authorization configs.
-  # If you send data in this format it is considered a snapshot of how the configs
-  # should be setup and will clear any configs not sent.
-  #
-  # Simple CAS server integration.
-  #
-  #   account_authorization_config[0][auth_type]=cas&
-  #   account_authorization_config[0][auth_base]=cas.mydomain.edu
-  #
-  # Single SAML server integration.
-  #
-  #   account_authorization_config[0][idp_entity_id]=http://idp.myschool.com/sso/saml2
-  #   account_authorization_config[0][log_in_url]=saml-sso.mydomain.com&
-  #   account_authorization_config[0][log_out_url]=saml-slo.mydomain.com&
-  #   account_authorization_config[0][certificate_fingerprint]=1234567890ABCDEF&
-  #   account_authorization_config[0][identifier_format]=urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
-  #
-  # Two SAML server integration with discovery url.
-  #
-  #   discovery_url=http://www.myschool.com/sso/identity_provider_selection
-  #   account_authorization_config[0][idp_entity_id]=http://idp.myschool.com/sso/saml2&
-  #   account_authorization_config[0][log_in_url]=saml-sso.mydomain.com&
-  #   account_authorization_config[0][log_out_url]=saml-slo.mydomain.com&
-  #   account_authorization_config[0][certificate_fingerprint]=1234567890ABCDEF&
-  #   account_authorization_config[0][identifier_format]=urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress&
-  #   account_authorization_config[1][idp_entity_id]=http://idp.otherschool.com/sso/saml2&
-  #   account_authorization_config[1][log_in_url]=saml-sso.otherdomain.com&
-  #   account_authorization_config[1][log_out_url]=saml-slo.otherdomain.com&
-  #   account_authorization_config[1][certificate_fingerprint]=ABCDEFG12345678789&
-  #   account_authorization_config[1][identifier_format]=urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
-  #
-  # Single LDAP server integration.
-  #
-  #   account_authorization_config[0][auth_type]=ldap&
-  #   account_authorization_config[0][auth_host]=ldap.mydomain.edu&
-  #   account_authorization_config[0][auth_filter]=(sAMAccountName={{login}})&
-  #   account_authorization_config[0][auth_username]=username&
-  #   account_authorization_config[0][auth_password]=password
-  #
-  # Multiple LDAP server integration.
-  #
-  #   account_authorization_config[0][auth_type]=ldap&
-  #   account_authorization_config[0][auth_host]=faculty-ldap.mydomain.edu&
-  #   account_authorization_config[0][auth_filter]=(sAMAccountName={{login}})&
-  #   account_authorization_config[0][auth_username]=username&
-  #   account_authorization_config[0][auth_password]=password&
-  #   account_authorization_config[1][auth_type]=ldap&
-  #   account_authorization_config[1][auth_host]=student-ldap.mydomain.edu&
-  #   account_authorization_config[1][auth_filter]=(sAMAccountName={{login}})&
-  #   account_authorization_config[1][auth_username]=username&
-  #   account_authorization_config[1][auth_password]=password
-  #
-  # @returns AccountAuthorizationConfig
+  # @returns AuthenticationProvider
   def create
-    # Check if this is using the deprecated version of the api
-    if params[:account_authorization_config] && params[:account_authorization_config].has_key?("0")
-      if params.has_key?(:auth_type) || (params[:account_authorization_config] && params[:account_authorization_config].has_key?(:auth_type))
-        # it has deprecated configs, and non-deprecated
-        api_raise(:deprecated_request_syntax)
-      else
-        update_all
-      end
+    aac_data = strong_params.fetch(:authentication_provider, strong_params)
+    position = aac_data.delete(:position)
+    data = filter_data(aac_data)
+    deselect_parent_registration(data)
+    account_config = @account.authentication_providers.build(data)
+    update_deprecated_account_settings_data(aac_data, account_config)
+
+    if position.present?
+      account_config.insert_at(position.to_i)
     else
-      aac_data = strong_params.fetch(:account_authorization_config, strong_params)
-      position = aac_data.delete(:position)
-      data = filter_data(aac_data)
-      deselect_parent_registration(data)
-      account_config = @account.authentication_providers.build(data)
-      update_deprecated_account_settings_data(aac_data, account_config)
+      account_config.save!
+    end
 
-      if position.present?
-        account_config.insert_at(position.to_i)
-      else
-        account_config.save!
-      end
-
-      respond_to do |format|
-        format.html { redirect_to(account_account_authorization_configs_path(@account)) }
-        format.json { render json: aac_json(account_config) }
-      end
+    respond_to do |format|
+      format.html { redirect_to(account_authentication_providers_path(@account)) }
+      format.json { render json: aac_json(account_config) }
     end
   end
 
-  # @API Update Authorization Config
-  # Update an authorization config using the same options as the create endpoint.
-  # You can not update an existing configuration to a new authentication type.
+  # @API Update authentication provider
+  # Update an authentication provider using the same options as the create endpoint.
+  # You can not update an existing provider to a new authentication type.
   #
   # @example_request
   #   # update SAML config
-  #   curl -XPUT 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs/<id>' \
+  #   curl -XPUT 'https://<canvas>/api/v1/accounts/<account_id>/authentication_providers/<id>' \
   #        -F 'idp_entity_id=<new_idp_entity_id>' \
   #        -F 'log_in_url=<new_url>' \
   #        -H 'Authorization: Bearer <token>'
   #
-  # @returns AccountAuthorizationConfig
+  # @returns AuthenticationProvider
   def update
-    aac_data = strong_params.fetch(:account_authorization_config, strong_params)
+    aac_data = strong_params.fetch(:authentication_provider, strong_params)
     aac = @account.authentication_providers.active.find params[:id]
     update_deprecated_account_settings_data(aac_data, aac)
     position = aac_data.delete(:position)
@@ -586,73 +517,39 @@ class AccountAuthorizationConfigsController < ApplicationController
     end
 
     respond_to do |format|
-      format.html { redirect_to(account_account_authorization_configs_path(@account)) }
+      format.html { redirect_to(account_authentication_providers_path(@account)) }
       format.json { render json: aac_json(aac) }
     end
   end
 
-  # @API Get Authorization Config
-  # Get the specified authorization config
+  # @API Get authentication provider
+  # Get the specified authentication provider
   #
   # @example_request
-  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs/<id>' \
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/authentication_providers/<id>' \
   #        -H 'Authorization: Bearer <token>'
   #
-  # @returns AccountAuthorizationConfig
+  # @returns AuthenticationProvider
   #
   def show
     aac = @account.authentication_providers.active.find params[:id]
     render json: aac_json(aac)
   end
 
-  # @API Delete Authorization Config
+  # @API Delete authentication provider
   # Delete the config
   #
   # @example_request
-  #   curl -XDELETE 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs/<id>' \
+  #   curl -XDELETE 'https://<canvas>/api/v1/accounts/<account_id>/authentication_providers/<id>' \
   #        -H 'Authorization: Bearer <token>'
   def destroy
     aac = @account.authentication_providers.active.find params[:id]
     aac.destroy
 
     respond_to do |format|
-      format.html { redirect_to(account_account_authorization_configs_path(@account)) }
+      format.html { redirect_to(account_authentication_providers_path(@account)) }
       format.json { render json: aac_json(aac) }
     end
-  end
-
-  # deprecated version of the AAC API
-  def update_all
-    account_configs_to_delete = @account.authentication_providers.active.to_a.dup
-    account_configs = []
-    (params[:account_authorization_config] || {}).sort_by {|k,_| k }.each do |_idx, data|
-      id = data.delete :id
-      disabled = data.delete :disabled
-      next if disabled == '1'
-      data = filter_data(ActionController::Parameters.new(data))
-      next if data.empty?
-
-      if id.to_i == 0
-        account_config = @account.authentication_providers.build(data)
-        account_config.save!
-      else
-        account_config = @account.authentication_providers.active.find(id)
-        account_configs_to_delete.delete(account_config)
-        account_config.update_attributes!(data)
-      end
-
-      account_configs << account_config
-    end
-
-    account_configs_to_delete.map(&:destroy)
-    account_configs.each_with_index{|aac, i| aac.insert_at(i+1);aac.save!}
-
-    @account.reload
-
-    @account.auth_discovery_url = params[:discovery_url].presence
-    @account.save!
-
-    render :json => aacs_json(@account.authentication_providers.active)
   end
 
   # @API GET discovery url _Deprecated_[2015-05-08]
@@ -737,12 +634,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   # @returns SSOSettings
   def show_sso_settings
-    respond_to do |format|
-      format.html { redirect_to(account_account_authorization_configs_path(@account)) }
-      format.json do
-        render json: sso_settings_json(@account)
-      end
-    end
+    render json: sso_settings_json(@account)
   end
 
   # @API update account auth settings
@@ -774,7 +666,7 @@ class AccountAuthorizationConfigsController < ApplicationController
     update_account_settings_from_hash(sets)
 
     respond_to do |format|
-      format.html { redirect_to(account_account_authorization_configs_path(@account)) }
+      format.html { redirect_to(account_authentication_providers_path(@account)) }
       format.json do
         render json: sso_settings_json(@account)
       end
@@ -856,7 +748,7 @@ class AccountAuthorizationConfigsController < ApplicationController
 
   def destroy_all
     @account.authentication_providers.active.each(&:destroy)
-    redirect_to :account_account_authorization_configs
+    redirect_to :account_authentication_providers
   end
 
   def saml_testing

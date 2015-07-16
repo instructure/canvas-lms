@@ -251,7 +251,7 @@ describe 'login' do
       account.auth_discovery_url = discovery_url
       account.save!
 
-      get account_account_authorization_configs_url(account)
+      get account_authentication_providers_url(account)
       redirect_until(discovery_url)
     end
   end

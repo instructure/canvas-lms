@@ -524,14 +524,11 @@ CanvasRails::Application.routes.draw do
     concerns :announcements
     resources :assignments
     resources :submissions
-    put 'account_authorization_configs' => 'account_authorization_configs#update_all', as: :update_all_authorization_configs
-    delete 'account_authorization_configs' => 'account_authorization_configs#destroy_all', as: :remove_all_authorization_configs
-    get 'sso_settings' => 'account_authorization_configs#show_sso_settings',
-        as: :sso_settings
+    delete 'authentication_providers' => 'account_authorization_configs#destroy_all', as: :remove_all_authentication_providers
     put 'sso_settings' => 'account_authorization_configs#update_sso_settings',
         as: :update_sso_settings
 
-    resources :account_authorization_configs
+    resources :authentication_providers, controller: :account_authorization_configs, only: [:index, :create, :update, :destroy]
     get 'test_ldap_connections' => 'account_authorization_configs#test_ldap_connection'
     get 'test_ldap_binds' => 'account_authorization_configs#test_ldap_bind'
     get 'test_ldap_searches' => 'account_authorization_configs#test_ldap_search'
@@ -1185,12 +1182,19 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :account_authorization_configs) do
+      get 'accounts/:account_id/sso_settings', action: :show_sso_settings, as: 'account_show_sso_settings_url'
+      put 'accounts/:account_id/sso_settings', action: :update_sso_settings, as: 'account_update_sso_settings_url'
+
+      get 'accounts/:account_id/authentication_providers', action: :index
+      get 'accounts/:account_id/authentication_providers/:id', action: :show
+      post 'accounts/:account_id/authentication_providers', action: :create, as: 'account_create_ap'
+      put 'accounts/:account_id/authentication_providers/:id', action: :update, as: 'account_update_ap'
+      delete 'accounts/:account_id/authentication_providers/:id', action: :destroy, as: 'account_delete_ap'
+
+      # deprecated
       get 'accounts/:account_id/account_authorization_configs/discovery_url', action: :show_discovery_url
       put 'accounts/:account_id/account_authorization_configs/discovery_url', action: :update_discovery_url, as: 'account_update_discovery_url'
       delete 'accounts/:account_id/account_authorization_configs/discovery_url', action: :destroy_discovery_url, as: 'account_destroy_discovery_url'
-
-      get 'accounts/:account_id/sso_settings', action: :show_sso_settings, as: 'account_show_sso_settings_url'
-      put 'accounts/:account_id/sso_settings', action: :update_sso_settings, as: 'account_update_sso_settings_url'
 
       get 'accounts/:account_id/account_authorization_configs', action: :index
       get 'accounts/:account_id/account_authorization_configs/:id', action: :show

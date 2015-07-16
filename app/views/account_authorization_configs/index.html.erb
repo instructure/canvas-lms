@@ -17,7 +17,7 @@
 
     <% if @presenter.auth? %>
       <%= link_to(image_tag("delete.png") + t(:delete_auth_link, "Remove All Authentication"),
-                  context_url(@account, :context_remove_all_authorization_configs_url),
+                  account_remove_all_authentication_providers_url(@account),
                   confirm: t(:delete_auth_confirmation, "Are you sure? Users may not be able to log in if this is removed."),
                   method: :delete,
                   class: "delete_auth_link btn button-sidebar-wide")%>

@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
-describe "Account Authorization Configs" do
+describe "Authentication Providers" do
   include_examples "in-process server selenium tests"
   context "Server errors " do
 
@@ -12,7 +12,7 @@ describe "Account Authorization Configs" do
                                                                 :auth_port => "123",
                                                                 :auth_type => "ldap",
                                                             })
-      get "/accounts/#{Account.default.id}/account_authorization_configs"
+      get "/accounts/#{Account.default.id}/authentication_providers"
       f(".test_ldap_link").click
       wait_for_ajaximations
       expect(f("#ldap_connection_help .server_error").text).to eq "Unknown host: blah.blah"

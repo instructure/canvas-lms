@@ -3,11 +3,11 @@
      <%= hidden(true) if aac.new_record? %>>
   <div class="grid-row">
     <div class="col-xs-12 col-md-8 off-md-2">
-      <% url = aac.new_record? ? account_account_authorization_configs_url(account) :
-              account_account_authorization_config_url(account, aac) %>
+      <% url = aac.new_record? ? account_authentication_providers_url(account) :
+              account_authentication_provider_url(account, aac) %>
 
       <%= form_for(aac,
-                   as: :account_authorization_config,
+                   as: :authentication_provider,
                    url: url,
                    html: {
                            id: "#{aac.new_record? ? 'new' : 'edit'}_#{aac.class.sti_name}#{aac.id unless aac.new_record?}",
@@ -36,7 +36,7 @@
 
         <div class="ic-Form-actions">
           <% unless aac.new_record? %>
-              <%= link_to(account_account_authorization_config_url(account, aac),
+              <%= link_to(account_authentication_provider_url(account, aac),
                 method: "delete",
                 rel: 'nofollow',
                 id: "delete-aac-#{aac.id}",
