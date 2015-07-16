@@ -72,8 +72,9 @@ class AssessmentRequest < ActiveRecord::Base
   scope :for_context_codes, lambda { |context_codes| includes(:submission).where(:submissions => { :context_code =>context_codes })}
 
   scope :not_ignored_by, lambda { |user, purpose|
-    where("NOT EXISTS (SELECT * FROM ignores WHERE asset_type='AssessmentRequest' AND asset_id=assessment_requests.id AND user_id=? AND purpose=?)",
-          user, purpose)
+    where("NOT EXISTS (?)",
+          Ignore.where("asset_id=assessment_requests.id").
+              where(asset_type: 'AssessmentRequest', user_id: user, purpose: purpose))
   }
 
   set_policy do

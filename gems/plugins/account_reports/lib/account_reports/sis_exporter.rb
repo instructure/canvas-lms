@@ -90,7 +90,7 @@ module AccountReports
            pseudonyms.unique_id, pseudonyms.workflow_state, users.sortable_name,
            users.updated_at AS user_updated_at, users.name, users.short_name").
           where("NOT EXISTS (SELECT user_id
-                             FROM enrollments e
+                             FROM #{Enrollment.quoted_table_name} e
                              WHERE e.type = 'StudentViewEnrollment'
                              AND e.user_id = pseudonyms.user_id)")
 
@@ -569,7 +569,7 @@ module AccountReports
                  INNER JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id=group_memberships.user_id").
           where("pseudonyms.account_id=groups.root_account_id AND
                  NOT EXISTS (SELECT user_id
-                             FROM enrollments e
+                             FROM #{Enrollment.quoted_table_name} e
                              WHERE e.type = 'StudentViewEnrollment'
                              AND e.user_id = pseudonyms.user_id)")
 

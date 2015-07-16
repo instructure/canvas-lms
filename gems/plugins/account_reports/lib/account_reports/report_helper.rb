@@ -121,7 +121,7 @@ module AccountReports::ReportHelper
   def add_course_sub_account_scope(scope, table = 'courses')
     if account != root_account
       scope.where("EXISTS (SELECT course_id
-                           FROM course_account_associations caa
+                           FROM #{CourseAccountAssociation.quoted_table_name} caa
                            WHERE caa.account_id = ?
                            AND caa.course_id=#{table}.id
                            AND caa.course_section_id IS NULL)", account)
@@ -141,7 +141,7 @@ module AccountReports::ReportHelper
   def add_user_sub_account_scope(scope,table = 'users')
     if account != root_account
       scope.where("EXISTS (SELECT user_id
-                           FROM user_account_associations uaa
+                           FROM #{UserAccountAssociation.quoted_table_name} uaa
                            WHERE uaa.account_id = ?
                            AND uaa.user_id=#{table}.id)", account)
     else

@@ -3,9 +3,9 @@ class AddForeignKeys7 < ActiveRecord::Migration
   tag :postdeploy
 
   def self.up
-    UserAccountAssociation.where("NOT EXISTS (SELECT 1 FROM accounts WHERE account_id=accounts.id)").delete_all
+    UserAccountAssociation.where("NOT EXISTS (?)", Account.where("account_id=accounts.id")).delete_all
     add_foreign_key_if_not_exists :user_account_associations, :accounts, :delay_validation => true
-    UserAccountAssociation.where("NOT EXISTS (SELECT 1 FROM users WHERE user_id=users.id)").delete_all
+    UserAccountAssociation.where("NOT EXISTS (?)", User.where("user_id=users.id")).delete_all
     add_foreign_key_if_not_exists :user_account_associations, :users, :delay_validation => true
     add_foreign_key_if_not_exists :user_services, :users, :delay_validation => true
     add_foreign_key_if_not_exists :web_conferences, :users, :delay_validation => true

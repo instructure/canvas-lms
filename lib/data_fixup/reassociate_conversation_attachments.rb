@@ -16,7 +16,7 @@ module DataFixup::ReassociateConversationAttachments
         SELECT context_id AS conversation_message_id,
           (SELECT author_id FROM conversation_messages WHERE id = a.context_id) AS author_id,
           id AS attachment_id
-        FROM attachments a
+        FROM #{Attachment.quoted_table_name} a
         WHERE context_type = 'ConversationMessage'
       SQL
       unless ['MySQL', 'Mysql2'].include?(conn.adapter_name)
@@ -27,23 +27,23 @@ module DataFixup::ReassociateConversationAttachments
   
       # make sure users w/ conversation attachments have root folders
       conn.execute <<-SQL
-        INSERT INTO folders(context_id, context_type, name, full_name, workflow_state)
+        INSERT INTO #{Folder.quoted_table_name}(context_id, context_type, name, full_name, workflow_state)
         SELECT DISTINCT author_id, 'User', 'my files', 'my files', 'visible'
         FROM _conversation_message_attachments
-        WHERE NOT EXISTS (SELECT 1 FROM folders WHERE context_id = author_id AND context_type = 'User' AND name = 'my files')
+        WHERE NOT EXISTS (SELECT 1 FROM #{Folder.quoted_table_name} WHERE context_id = author_id AND context_type = 'User' AND name = 'my files')
       SQL
   
       # and conversation attachment folders
       conn.execute <<-SQL
         INSERT INTO folders(context_id, context_type, name, full_name, workflow_state, parent_folder_id)
         SELECT DISTINCT author_id, 'User', 'conversation attachments', 'conversation attachments', 'visible', folders.id
-        FROM _conversation_message_attachments, folders
+        FROM _conversation_message_attachments, #{Folder.quoted_table_name}
         WHERE folders.context_id = author_id AND folders.context_type = 'User'
-          AND NOT EXISTS (SELECT 1 FROM folders WHERE context_id = author_id AND context_type = 'User' AND name = 'conversation attachments')
+          AND NOT EXISTS (SELECT 1 FROM #{Folder.quoted_table_name} WHERE context_id = author_id AND context_type = 'User' AND name = 'conversation attachments')
       SQL
   
       conn.execute <<-SQL
-        INSERT INTO attachment_associations(attachment_id, context_id, context_type)
+        INSERT INTO #{AttachmentAssociation.quoted_table_name}(attachment_id, context_id, context_type)
         SELECT attachment_id, conversation_message_id, 'ConversationMessage'
         FROM _conversation_message_attachments
         WHERE author_id IS NOT NULL
@@ -54,8 +54,8 @@ module DataFixup::ReassociateConversationAttachments
     end
 
     cmas.group_by{ |r| r['conversation_message_id'] }.each_slice(1000) do |groups|
-      conn.execute <<-SQL
-        UPDATE conversation_messages
+      conn.update <<-SQL
+        UPDATE #{ConversationMessage.quoted_table_name}
         SET attachment_ids = CASE id #{groups.map{ |id, rows| "WHEN #{id} THEN '#{rows.map{ |r| r['attachment_id'] }.join(",")}' "}.join} END
         WHERE id IN (#{groups.map(&:first).join(', ')})
       SQL
@@ -63,11 +63,11 @@ module DataFixup::ReassociateConversationAttachments
 
     cmas.each_slice(1000) do |rows|
       attachment2user = "CASE attachments.id #{rows.map{ |r| "WHEN #{r['attachment_id']} THEN #{r['author_id']} "}.join} END"
-      conn.execute <<-SQL
-        UPDATE attachments
+      conn.update <<-SQL
+        UPDATE #{Attachment.quoted_table_name}
         SET context_type = 'User',
           context_id = #{attachment2user},
-          folder_id = (SELECT f.id FROM folders f WHERE f.name = 'conversation attachments' AND f.context_type = 'User' AND f.context_id = #{attachment2user} LIMIT 1)
+          folder_id = (SELECT f.id FROM #{Folder.quoted_table_name} f WHERE f.name = 'conversation attachments' AND f.context_type = 'User' AND f.context_id = #{attachment2user} LIMIT 1)
         WHERE attachments.id IN (
           #{rows.map{ |r| r['attachment_id'] }.join(', ')}
         )

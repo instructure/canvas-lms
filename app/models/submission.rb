@@ -164,7 +164,7 @@ class Submission < ActiveRecord::Base
       update_all(["needs_grading_count=needs_grading_count+?, updated_at=?", amount, Time.now.utc])
     # TODO: add this to the SQL above when DA is on for everybody
     # and remove NeedsGradingCountQuery#manual_count
-    # AND EXISTS(SELECT assignment_student_visibilities.* WHERE assignment_student_visibilities.user_id = NEW.user_id AND assignment_student_visibilities.assignment_id = NEW.assignment_id);
+    # AND EXISTS (SELECT assignment_student_visibilities.* WHERE assignment_student_visibilities.user_id = NEW.user_id AND assignment_student_visibilities.assignment_id = NEW.assignment_id);
   end
 
   after_create :update_needs_grading_count, if: :needs_grading?

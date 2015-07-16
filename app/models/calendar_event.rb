@@ -177,8 +177,8 @@ class CalendarEvent < ActiveRecord::Base
     end
   }
 
-  scope :events_without_child_events, -> { where("NOT EXISTS (SELECT 1 FROM calendar_events children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state<>'deleted')") }
-  scope :events_with_child_events, -> { where("EXISTS (SELECT 1 FROM calendar_events children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state<>'deleted')") }
+  scope :events_without_child_events, -> { where("NOT EXISTS (SELECT 1 FROM #{CalendarEvent.quoted_table_name} children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state<>'deleted')") }
+  scope :events_with_child_events, -> { where("EXISTS (SELECT 1 FROM #{CalendarEvent.quoted_table_name} children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state<>'deleted')") }
 
   def validate_context!
     @validate_context = true

@@ -452,7 +452,7 @@ class Account < ActiveRecord::Base
       all_courses
     else
       shard.activate do
-        Course.where("EXISTS (SELECT 1 FROM course_account_associations WHERE course_id=courses.id AND account_id=?)", self)
+        Course.where("EXISTS (?)", CourseAccountAssociation.where(account_id: self).where("course_id=courses.id"))
       end
     end
   end

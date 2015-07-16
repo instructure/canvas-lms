@@ -19,7 +19,7 @@
 module DataFixup::PopulateSubmissionVersions
   def self.run
     Version.where(:versionable_type => 'Submission').
-      where("NOT EXISTS (SELECT 1 FROM submission_versions WHERE version_id=versions.id)").
+      where("NOT EXISTS (?)", SubmissionVersion.where("version_id=versions.id")).
       find_in_batches do |versions|
       SubmissionVersion.index_versions(versions, ignore_errors: true)
     end

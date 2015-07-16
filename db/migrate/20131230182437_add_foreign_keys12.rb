@@ -10,7 +10,7 @@ class AddForeignKeys12 < ActiveRecord::Migration
     add_foreign_key_if_not_exists :course_account_associations, :course_sections, delay_validation: true
     add_foreign_key_if_not_exists :course_account_associations, :courses, delay_validation: true
     add_foreign_key_if_not_exists :courses, :abstract_courses, delay_validation: true
-    DelayedMessage.where("NOT EXISTS (SELECT 1 FROM notification_policies WHERE notification_policy_id=notification_policies.id) AND notification_policy_id IS NOT NULL").delete_all
+    DelayedMessage.where("NOT EXISTS (?) AND notification_policy_id IS NOT NULL", NotificationPolicy.where("notification_policy_id=notification_policies.id")).delete_all
     add_foreign_key_if_not_exists :delayed_messages, :notification_policies, delay_validation: true
     add_foreign_key_if_not_exists :discussion_entries, :discussion_entries, column: :parent_id, delay_validation: true
     add_foreign_key_if_not_exists :discussion_entries, :discussion_entries, column: :root_entry_id, delay_validation: true

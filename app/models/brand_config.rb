@@ -90,8 +90,8 @@ class BrandConfig < ActiveRecord::Base
     return unless md5
     unused_brand_config = BrandConfig.
       where(md5: md5).
-      where('NOT EXISTS (SELECT 1 FROM accounts WHERE brand_config_md5=brand_configs.md5)').
-      where('NOT share').
+      where("NOT EXISTS (?)", Account.where("brand_config_md5=brand_configs.md5")).
+      where("NOT share").
       first
     if unused_brand_config
       unused_brand_config.destroy

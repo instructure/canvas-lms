@@ -107,32 +107,32 @@ module AccountReports
                   WHEN courses.workflow_state = 'available' THEN 'active'
               END AS course_state").
           where("NOT EXISTS (SELECT NULL
-                             FROM assignments a
+                             FROM #{Assignment.quoted_table_name} a
                              WHERE a.context_id = courses.id
                                AND a.context_type = 'Course'
                                AND a.workflow_state <> 'deleted')
              AND NOT EXISTS (SELECT NULL
-                             FROM attachments at
+                             FROM #{Attachment.quoted_table_name} at
                              WHERE at.context_id = courses.id
                                AND at.context_type = 'Course'
                                AND at.file_state <> 'deleted')
              AND NOT EXISTS (SELECT NULL
-                             FROM discussion_topics d
+                             FROM #{DiscussionTopic.quoted_table_name} d
                              WHERE d.context_id = courses.id
                                AND d.context_type = 'Course'
                                AND d.workflow_state <> 'deleted')
              AND NOT EXISTS (SELECT NULL
-                             FROM context_modules m
+                             FROM #{ContextModule.quoted_table_name} m
                              WHERE m.context_id = courses.id
                                AND m.context_type = 'Course'
                                AND m.workflow_state <> 'deleted')
              AND NOT EXISTS (SELECT NULL
-                             FROM quizzes q
+                             FROM #{Quizzes::Quiz.quoted_table_name} q
                              WHERE q.context_id = courses.id
                                AND q.context_type = 'Course'
                                AND q.workflow_state <> 'deleted')
              AND NOT EXISTS (SELECT NULL
-                             FROM wiki_pages w
+                             FROM #{WikiPage.quoted_table_name} w
                              WHERE w.wiki_id = courses.wiki_id
                                AND w.workflow_state <> 'deleted')")
 

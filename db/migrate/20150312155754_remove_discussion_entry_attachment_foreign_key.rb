@@ -13,7 +13,7 @@ class RemoveDiscussionEntryAttachmentForeignKey < ActiveRecord::Migration
 
   def self.down
     # this will detach all cross-shard discussion entry attachments, which we did before we created the constraint originally
-    DiscussionEntry.where("attachment_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM attachments WHERE attachment_id=attachments.id)").update_all(attachment_id: nil)
+    DiscussionEntry.where("attachment_id IS NOT NULL AND NOT EXISTS (?)", Attachment.where("attachment_id=attachments.id")).update_all(attachment_id: nil)
     add_index :discussion_entries, :attachment_id, where: 'attachment_id IS NOT NULL', algorithm: :concurrently
     add_foreign_key_if_not_exists :discussion_entries, :attachments, delay_validation: true
   end

@@ -9,7 +9,7 @@ class FixUserMergeConversations2 < ActiveRecord::Migration
     # the previous merging was done incorrectly due to a scoping issue
     
     # there are only about 100 that need to be fixed, so we just load them all
-    convos = ConversationParticipant.where("NOT EXISTS (SELECT 1 FROM conversations WHERE id = conversation_id)")
+    convos = ConversationParticipant.where("NOT EXISTS (?)", Conversation.where("id=conversation_id"))
     convos.group_by(&:conversation_id).each do |conversation_id, cps|
       private_hash = Conversation.private_hash_for(cps.map(&:user_id))
       if target = Conversation.where(private_hash: private_hash).first

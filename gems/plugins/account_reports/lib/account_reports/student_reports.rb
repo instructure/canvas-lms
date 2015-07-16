@@ -199,7 +199,7 @@ module AccountReports
 
         data = data.
           where("NOT EXISTS (SELECT user_id, context_id
-                             FROM asset_user_accesses aua
+                             FROM #{AssetUserAccess.quoted_table_name} aua
                              WHERE aua.user_id = enrollments.user_id
                                AND aua.context_id = enrollments.course_id
                                AND aua.context_type = 'Course'

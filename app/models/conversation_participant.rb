@@ -129,7 +129,7 @@ class ConversationParticipant < ActiveRecord::Base
         [<<-SQL, user_ids]
         EXISTS (
           SELECT *
-          FROM conversation_participants cp
+          FROM #{ConversationParticipant.quoted_table_name} cp
           WHERE cp.conversation_id = conversation_participants.conversation_id
           AND user_id IN (?)
         )
@@ -138,7 +138,7 @@ class ConversationParticipant < ActiveRecord::Base
         [<<-SQL, user_ids, user_ids.size]
         (
           SELECT COUNT(*)
-          FROM conversation_participants cp
+          FROM #{ConversationParticipant.quoted_table_name} cp
           WHERE cp.conversation_id = conversation_participants.conversation_id
           AND user_id IN (?)
         ) = ?
