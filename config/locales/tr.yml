@@ -2798,23 +2798,6 @@ tr:
     google_drive: 
       file_not_found: "İşbirliği dosyası bulunamadı"
     index: 
-      description_rs: |-
-          [Google Docs](%{google_url}) ve [EtherPad](%{etherpad_url}) gibi çevrimiçi ücretsiz araçlar, grup projeleri veya ödevler ve ortak notlar oluşturmak ve benzeri etkinlikler için uygun ortamlardır.
-          Öğretmen *veya* öğrenciler gruplar için işbirliği ortamları oluşturabilirler.
-      description_student: |-
-          **İşbirliği ile neyi kastediyoruz?**  Paylaşılan bir belge üzerinde birlikte çalışmak
-          için Web tabanlı araçları kastediyoruz. Grup yayınları veya not tutma gibi
-          etkinliklerde işbirliği halinde çalışmak için [Google Docs](%{google_url}) ve
-          [EtherPad](%{etherpad_url}) gibi kaynakları kullanabilirsiniz. Bu sayfada
-          bu işbirliklerinin takibini kolayca yapabilir ve eposta adreslerini alma ile
-          uğraşmadan bu kaynakları oluşturabilirsiniz.
-      description_teacher: |-
-          **İşbirliği ile neyi kastediyoruz?**  Öğrencilerinizin büyük ihtimalle zaten bildiği
-           Web tabanlı araçları kastediyoruz. Öğrenciler, [Google Docs](%{google_url})
-          ve [EtherPad](%{etherpad_url}) gibi kaynakları grup yayınları
-          veya not tutma gibi etkinliklerde işbirliği halinde çalışmak için kullanabilirler. 
-          Bu sayfada öğrenciler (ve siz) bu işbirliklerinin takibini kolayca yapabilir ve eposta 
-          adreslerini alma ile uğraşmadan bu kaynakları oluşturabilirler.
       google: 
         drive: 
           upgrade: 
