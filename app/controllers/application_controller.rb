@@ -107,8 +107,10 @@ class ApplicationController < ActionController::Base
     return {} unless request.format.html?
     # set some defaults
     unless @js_env
+      editor_css = view_context.stylesheet_path(css_url_for('what_gets_loaded_inside_the_tinymce_editor'))
       @js_env = {
         active_brand_config: active_brand_config.try(:md5),
+        url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css,
         current_user_id: @current_user.try(:id),
         current_user: user_display_json(@current_user, :profile),
         current_user_roles: @current_user.try(:roles, @domain_root_account),
