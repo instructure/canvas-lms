@@ -2788,13 +2788,6 @@ de:
     google_drive: 
       file_not_found: "Kollaborationsdatei nicht gefunden"
     index: 
-      description_rs: |-
-          Kostenlose Onlinewebtools wie [Google Docs](%{google_url}) und [EtherPad](%{etherpad_url}) sind exzellente Möglichkeiten für Studenten, um bei Gruppenprojekten oder Aufgaben zusammenzuarbeiten, Notizen gemeinsam zu nutzen usw.
-          Dozenten *oder* Studenten können Kollaborationen einrichten.
-      description_student: |-
-          **Was verstehen wir unter Kollaborationen?**  Im Mittelpunkt stehen Webtools für die Teamarbeit an einem gemeinsamen Dokument.  Sie können Ressourcen wie [Google Docs](%{google_url}) und [EtherPad](%{etherpad_url}) einsetzen, um als Team an Gruppenaufsätzen zu arbeiten und gemeinsame Notizen zu erstellen.  Diese Seite bietet eine Übersicht über diese Kollaborationen und erleichtert deren Einrichtung,
-          ohne E-mails mit allen Gruppenmitgliedern austauschen zu müssen.
-      description_teacher: "**Was verstehen wir unter Kollaborationen?**  Wir meinen damit Webtools, die wahrscheinlich den meisten Studenten bereits vertraut sind.  Die Studenten können Ressourcen wie [Google Docs](%{google_url}) und [EtherPad](%{etherpad_url}) einsetzen, um als Team an Gruppenaufgaben zu arbeiten und gemeinsame Notizen zu erstellen.  Diese Seite bietet den Studenten (und Ihnen) eine Übersicht über die bestehenden Kollaborationen und deren Erstellung, ohne dafür E-mails mit allen Gruppenmitgliedern austauschen zu müssen."
       google: 
         drive: 
           upgrade: 
