@@ -2799,18 +2799,6 @@ da:
     google_drive: 
       file_not_found: "Samarbejdsfil ikke fundet"
     index: 
-      description_student: |-
-          **Hvad mener vi med samarbejder?**  Vi taler om web-baserede værktøjer for 
-          at arbejde sammen på et delt dokument. Du kan bruge resurser som 
-          [Google Docs](%{google_url}) og [EtherPad](%{etherpad_url})
-          til at arbejde fælles på opgaver sås som gruppeopgaver eller note-tagning.  Denne side er
-          et nemt sted at holde orden på disse samarbejder, og også at sætte dem op unden at skulle udveksle emails.
-      description_teacher: |-
-          **Hvad mener vi med samarbejder?**  Vi taler om web-baserede værktøjer, som mest sandsynlig 
-          dine studerende allerede er bekendte med. Studerende kan benytte resurser så som 
-          [Google Docs](%{google_url}) og [EtherPad](%{etherpad_url})
-          til at arbejde fælles på opgaver sås som gruppeopgaver eller note-tagning.  Denne side giver dem
-          (og dig) et nemt sted at holde orden på disse samarbejder, og også at sætte dem op unden at skulle udveksle emails.
       google: 
         drive: 
           upgrade: 
