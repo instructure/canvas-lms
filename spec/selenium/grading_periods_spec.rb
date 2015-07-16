@@ -58,16 +58,36 @@ describe "grading periods" do
         expect(ff('.grading-period').length).to be(1)
       end
 
-      it "warns user start_date occurs after end_date" do
+      it "flashes an error to the user if start_date occurs after end_date" do
         get "/courses/#{@course.id}/grading_standards"
         f('#add-period-button').click
-        f('#period_title_new2').send_keys 'hi'
+        f('#period_title_new2').send_keys 'title'
         f('#period_start_date_new2').send_keys 'Feb 2'
         f('#period_end_date_new2').send_keys 'Feb 1'
         f('.grading-period').click
 
         f('#update-button').click
         assert_flash_error_message(/All start dates must be before the end date/)
+      end
+
+      it "flashes an error if the user removes start_date" do
+        create_grading_periods_for(@course)
+        get "/courses/#{@course.id}/grading_standards"
+
+        f("\#period_start_date_#{GradingPeriod.last.id}").clear
+
+        f('#update-button').click
+        assert_flash_error_message(/All dates fields must be present and formatted correctly/)
+      end
+
+      it "flashes an error if the user removes end_date" do
+        create_grading_periods_for(@course)
+        get "/courses/#{@course.id}/grading_standards"
+
+        f("\#period_end_date_#{GradingPeriod.last.id}").clear
+
+        f('#update-button').click
+        assert_flash_error_message(/All dates fields must be present and formatted correctly/)
       end
 
       it "allows a user to add multiple grading periods simultaneously" do
