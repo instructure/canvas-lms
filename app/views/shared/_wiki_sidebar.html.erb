@@ -35,7 +35,7 @@
               <% end %>
             </ul>
             <% if can_do(@wiki, @current_user, :create_page) %>
-              <%= link_to t('links.new_page', "Link to a New Page"), polymorphic_url([@context, :wiki_page], action: :new), :id => 'new_page_link', :class => "add" %>
+              <%= link_to t('links.new_page', "Link to a New Page"), "#", :id => 'new_page_link', :class => "add" %>
               <form id="new_page_drop_down" style="display:none; margin: 5px;">
                 <div class="row-fluid">
                   <label for="new_page_name"><%= t('new_page_name', %{What would you like to call the new page?}) %></label><br />
