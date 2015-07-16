@@ -18,9 +18,6 @@ module GlobalNavigationHelper
           HAS_COURSES: @has_courses || false,
           HAS_GROUPS: @has_groups || false,
           HAS_ACCOUNTS: @has_accounts || false,
-          # TODO: This header image piece should be changed once theme editor is live.
-          CUSTOM_HEADER_IMAGE: @domain_root_account.settings[:header_image],
-          CUSTOM_HEADER_NAME: @domain_root_account.display_name,
           HELP_LINK: help_link,
           GLOBAL_NAV_MENU_ITEMS: @mapped_tools
     })
