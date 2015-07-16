@@ -136,7 +136,7 @@ class AssignmentOverride < ActiveRecord::Base
 
   def set
     if self.set_type == 'ADHOC'
-      assignment_override_students.includes(:user).map(&:user)
+      assignment_override_students.preload(:user).map(&:user)
     else
       super
     end

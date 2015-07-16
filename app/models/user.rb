@@ -172,12 +172,12 @@ class User < ActiveRecord::Base
 
   scope :of_account, lambda { |account| where("EXISTS (?)", account.user_account_associations.where("user_account_associations.user_id=users.id")).shard(account.shard) }
   scope :recently_logged_in, -> {
-    includes(:pseudonyms).
+    eager_load(:pseudonyms).
         where("pseudonyms.current_login_at>?", 1.month.ago).
         order("pseudonyms.current_login_at DESC").
         limit(25)
   }
-  scope :include_pseudonym, -> { includes(:pseudonym) }
+  scope :include_pseudonym, -> { preload(:pseudonym) }
   scope :restrict_to_sections, lambda { |sections|
     if sections.empty?
       scoped
@@ -601,7 +601,7 @@ class User < ActiveRecord::Base
 
   scope :with_service, lambda { |service|
     service = service.service if service.is_a?(UserService)
-    includes(:user_services).where(:user_services => { :service => service.to_s })
+    eager_load(:user_services).where(:user_services => { :service => service.to_s })
   }
   scope :enrolled_before, lambda { |date| where("enrollments.created_at<?", date) }
 
@@ -2001,7 +2001,7 @@ class User < ActiveRecord::Base
 
       # :manage_groups is only available for admin enrollments
       admin_enrolls = self.enrollments.current.of_admin_type
-      group_admin_courses = self.courses_for_enrollments(admin_enrolls).includes(:active_groups).select do |c|
+      group_admin_courses = self.courses_for_enrollments(admin_enrolls).preload(:active_groups).select do |c|
         c.active_groups.any? && c.grants_right?(self, :manage_groups)
       end
       group_admin_courses.each do |c|
@@ -2560,7 +2560,7 @@ class User < ActiveRecord::Base
   # mfa settings for a user are the most restrictive of any pseudonyms the user has
   # a login for
   def mfa_settings
-    result = self.pseudonyms.shard(self).includes(:account).map(&:account).uniq.map do |account|
+    result = self.pseudonyms.shard(self).preload(:account).map(&:account).uniq.map do |account|
       case account.mfa_settings
         when :disabled
           0

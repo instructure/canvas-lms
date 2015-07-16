@@ -319,8 +319,8 @@ class SubmissionsApiController < ApplicationController
 
     if params[:grouped].present?
       scope = (@section || @context).all_student_enrollments.
-          includes(:user).
-          where('users.id' => student_ids)
+          eager_load(:user).
+          where("users.id" => student_ids)
 
       submissions = if requested_assignment_ids.present?
                       Submission.where(

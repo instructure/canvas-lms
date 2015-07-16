@@ -784,7 +784,7 @@ describe EnrollmentsApiController, type: :request do
         e.sis_batch_id = sis_batch.id
         e.save!
         json = api_call(:get, @user_path, @user_params)
-        enrollments = @student.enrollments.current.includes(:user).order("users.sortable_name ASC")
+        enrollments = @student.enrollments.current.eager_load(:user).order("users.sortable_name ASC")
         expect(json).to eq enrollments.map { |e|
           {
             'root_account_id' => e.root_account_id,
@@ -835,7 +835,7 @@ describe EnrollmentsApiController, type: :request do
         recent_activity.record!(Time.zone.now - 5.minutes)
         recent_activity.record!(Time.zone.now)
         json = api_call(:get, @user_path, @user_params)
-        enrollments = @student.enrollments.current.includes(:user).order("users.sortable_name ASC")
+        enrollments = @student.enrollments.current.eager_load(:user).order("users.sortable_name ASC")
         expect(json).to eq enrollments.map { |e|
           {
             'root_account_id' => e.root_account_id,
@@ -1018,7 +1018,7 @@ describe EnrollmentsApiController, type: :request do
         @user = current_user
         json = api_call(:get, @path, @params)
         enrollments = %w{observer student ta teacher}.inject([]) do |res, type|
-          res + @course.send("#{type}_enrollments").includes(:user).order(User.sortable_name_order_by_clause("users"))
+          res + @course.send("#{type}_enrollments").eager_load(:user).order(User.sortable_name_order_by_clause("users"))
         end
         expect(json).to eq enrollments.map { |e|
           h = {
@@ -1104,7 +1104,7 @@ describe EnrollmentsApiController, type: :request do
 
       it "should list its own enrollments" do
         json = api_call(:get, @user_path, @user_params)
-        enrollments = @user.enrollments.current.includes(:user).order("users.sortable_name ASC")
+        enrollments = @user.enrollments.current.eager_load(:user).order("users.sortable_name ASC")
         expect(json).to eq enrollments.map { |e|
           {
             'root_account_id' => e.root_account_id,
@@ -1204,7 +1204,7 @@ describe EnrollmentsApiController, type: :request do
       it "should include users' sis and login ids" do
         json = api_call(:get, @path, @params)
         enrollments = %w{observer student ta teacher}.inject([]) do |res, type|
-          res + @course.send("#{type}_enrollments").includes(:user)
+          res + @course.send("#{type}_enrollments").preload(:user)
         end
         expect(json).to eq(enrollments.map do |e|
           user_json = {
@@ -1317,7 +1317,7 @@ describe EnrollmentsApiController, type: :request do
       it "should properly paginate" do
         json = api_call(:get, "#{@path}?page=1&per_page=1", @params.merge(:page => 1.to_param, :per_page => 1.to_param))
         enrollments = %w{observer student ta teacher}.inject([]) { |res, type|
-          res = res + @course.send("#{type}_enrollments").includes(:user)
+          res = res + @course.send("#{type}_enrollments").preload(:user)
         }.map do |e|
           h = {
             'root_account_id' => e.root_account_id,

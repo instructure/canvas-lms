@@ -86,7 +86,7 @@ class RubricAssociation < ActiveRecord::Base
   scope :for_purpose, lambda { |purpose| where(:purpose => purpose) }
   scope :for_grading, -> { where(:purpose => 'grading') }
   scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
-  scope :include_rubric, -> { includes(:rubric) }
+  scope :include_rubric, -> { preload(:rubric) }
   scope :before, lambda { |date| where("rubric_associations.created_at<?", date) }
 
   def assert_uniqueness

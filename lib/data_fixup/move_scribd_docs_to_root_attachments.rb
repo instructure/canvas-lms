@@ -1,7 +1,7 @@
 module DataFixup::MoveScribdDocsToRootAttachments
   def self.run
     Shackles.activate(:slave) do
-      Attachment.where("scribd_doc IS NOT NULL AND root_attachment_id IS NOT NULL").includes(:root_attachment).find_each do |a|
+      Attachment.where("scribd_doc IS NOT NULL AND root_attachment_id IS NOT NULL").preload(:root_attachment).find_each do |a|
         ra = a.root_attachment
         # bad data!
         next unless ra

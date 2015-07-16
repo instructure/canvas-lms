@@ -37,7 +37,7 @@ module Polling
       can :create
 
       given do |user, http_session|
-        self.poll_sessions.shard(self).includes(:course).any? do |session|
+        self.poll_sessions.shard(self).preload(:course).any? do |session|
           session.course.grants_right?(user, http_session, :manage_content)
         end
       end

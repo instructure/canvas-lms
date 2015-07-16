@@ -59,7 +59,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def self.find_all_private_conversations(user, other_users)
-    user.all_conversations.includes(:conversation).where(:private_hash => other_users.map { |u| private_hash_for([user, u]) }).
+    user.all_conversations.preload(:conversation).where(:private_hash => other_users.map { |u| private_hash_for([user, u]) }).
       map(&:conversation)
   end
 

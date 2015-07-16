@@ -322,7 +322,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   end
 
   def prep_submissions(submissions)
-    subs = submissions.includes(:versions).map do |qs|
+    subs = submissions.preload(:versions).map do |qs|
       includes_all_versions? ? qs.attempts.version_models : qs.attempts.kept
     end
     subs = subs.flatten.compact.select do |s|

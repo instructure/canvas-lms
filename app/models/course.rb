@@ -269,12 +269,12 @@ class Course < ActiveRecord::Base
       CalendarEvent.
         active.
         for_user_and_context_codes(user, [asset_string]).
-        includes(:child_events).
+        preload(:child_events).
         reject(&:hidden?) +
       AppointmentGroup.manageable_by(user, [asset_string]) +
         user.assignments_visible_in_course(self)
     else
-      calendar_events.active.includes(:child_events).reject(&:hidden?) +
+      calendar_events.active.preload(:child_events).reject(&:hidden?) +
         assignments.active
     end
   end
@@ -410,7 +410,7 @@ class Course < ActiveRecord::Base
       else
         course_ids = courses_or_course_ids
         courses = Course.where(:id => course_ids).
-            includes(:course_sections => [:course, :nonxlist_course]).
+            preload(:course_sections => [:course, :nonxlist_course]).
             select([:id, :account_id]).to_a
       end
       course_ids_to_update_user_account_associations = []
@@ -1207,7 +1207,7 @@ class Course < ActiveRecord::Base
 
   def self.find_all_by_context_code(codes)
     ids = codes.map{|c| c.match(/\Acourse_(\d+)\z/)[1] rescue nil }.compact
-    Course.where(:id => ids).includes(:current_enrollments).to_a
+    Course.where(:id => ids).preload(:current_enrollments).to_a
   end
 
   def end_at
@@ -1412,7 +1412,7 @@ class Course < ActiveRecord::Base
     # 'publish_final_grades'
 
     self.recompute_student_scores_without_send_later(user_ids_to_publish)
-    enrollments = self.student_enrollments.not_fake.includes(:user, :course_section).order_by_sortable_name
+    enrollments = self.student_enrollments.not_fake.eager_load(:user).preload(:course_section).order_by_sortable_name
     enrollments = enrollments.where(user_id: user_ids_to_publish) if user_ids_to_publish
 
     errors = []
@@ -1489,6 +1489,7 @@ class Course < ActiveRecord::Base
                                             :last_publish_attempt_at => last_publish_attempt_at).
         update_all(:grade_publishing_status => 'error', :grade_publishing_message => "Timed out.")
   end
+
 
   def gradebook_to_csv_in_background(filename, user, options = {})
     progress = progresses.build(tag: 'gradebook_to_csv')
@@ -2601,7 +2602,7 @@ class Course < ActiveRecord::Base
   end
 
   def participating_users(user_ids)
-    enrollments = self.enrollments.includes(:user).
+    enrollments = self.enrollments.eager_load(:user).
       where(:enrollments => {:workflow_state => 'active'}, :users => {:id => user_ids})
     Canvas::Builders::EnrollmentDateBuilder.preload(enrollments)
     enrollments.select { |e| e.active? }.map(&:user).uniq
@@ -2735,7 +2736,7 @@ class Course < ActiveRecord::Base
   end
 
   def re_send_invitations!
-    self.enrollments.invited.except(:includes).includes(:user => :communication_channels).find_each do |e|
+    self.enrollments.invited.except(:includes).preload(:user => :communication_channels).find_each do |e|
       e.re_send_confirmation! if e.invited?
     end
   end

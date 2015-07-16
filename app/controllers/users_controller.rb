@@ -169,7 +169,7 @@ class UsersController < ApplicationController
       add_crumb(@current_user.short_name, crumb_url)
       add_crumb(t('crumbs.grades', 'Grades'), grades_path)
 
-      current_active_enrollments = @user.enrollments.current.includes(:course).shard(@user).to_a
+      current_active_enrollments = @user.enrollments.current.preload(:course).shard(@user).to_a
 
       @presenter = GradesPresenter.new(current_active_enrollments)
 
@@ -975,12 +975,16 @@ class UsersController < ApplicationController
     if authorized_action(@user, @current_user, :view_statistics)
       add_crumb(t('crumbs.profile', "%{user}'s profile", :user => @user.short_name), @user == @current_user ? user_profile_path(@current_user) : user_path(@user) )
 
-      @group_memberships = @user.current_group_memberships.includes(:group)
+      @group_memberships = @user.current_group_memberships.preload(:group)
 
       # course_section and enrollment term will only be used if the enrollment dates haven't been cached yet;
       # maybe should just look at the first enrollment and check if it's cached to decide if we should include
       # them here
-      @enrollments = @user.enrollments.shard(@user).where("enrollments.workflow_state<>'deleted' AND courses.workflow_state<>'deleted'").includes({:course => { :enrollment_term => :enrollment_dates_overrides }}, :associated_user, :course_section).to_a
+      @enrollments = @user.enrollments.
+        shard(@user).
+        where("enrollments.workflow_state<>'deleted' AND courses.workflow_state<>'deleted'").
+        eager_load(:course).
+        preload(:associated_user, :course_section, course: { enrollment_term: :enrollment_dates_overrides }).to_a
 
       # restrict view for other users
       if @user != @current_user
@@ -1821,7 +1825,7 @@ class UsersController < ApplicationController
 
       if params[:student_id]
         student = User.find(params[:student_id])
-        enrollments = student.student_enrollments.active.includes(:course).shard(student).to_a
+        enrollments = student.student_enrollments.active.preload(:course).shard(student).to_a
         enrollments.each do |enrollment|
           should_include = enrollment.course.user_has_been_instructor?(@teacher) &&
                            enrollment.course.enrollments_visible_to(@teacher, :include_priors => true).where(id: enrollment).first &&
@@ -1951,7 +1955,7 @@ class UsersController < ApplicationController
 
     # find all ungraded submissions in one query
     ungraded_submissions = course.submissions.
-        includes(:assignment).
+        preload(:assignment).
         where("user_id IN (?) AND #{Submission.needs_grading_conditions}", ids).
         except(:order).
         order(:submitted_at).to_a

@@ -183,7 +183,7 @@ class FilesController < ApplicationController
             else
               @current_attachments = @current_folder.visible_file_attachments.by_position_then_display_name
             end
-            @current_attachments = @current_attachments.includes(:thumbnail, :media_object)
+            @current_attachments = @current_attachments.preload(:thumbnail, :media_object)
             render :json => @current_attachments.map do |a|
               a.as_json({
                 methods: [ :readable_size, :currently_locked, :thumbnail_url ],
@@ -206,7 +206,7 @@ class FilesController < ApplicationController
 
             if @current_user
               file_structure[:collaborations] = @current_user.collaborations.for_context(@context).active.
-                includes(:user, :users).order("created_at DESC").map{ |c|
+                preload(:user, :users).order("created_at DESC").map{ |c|
                 c.as_json(permissions: {user: @current_user}, methods: [:collaborator_ids])
               }
             end
@@ -265,8 +265,8 @@ class FilesController < ApplicationController
       params[:include] << 'user' if params[:sort] == 'user'
 
       scope = Attachments::ScopedToUser.new(@context || @folder, @current_user).scope
-      scope = scope.includes(:user) if params[:include].include?('user') && params[:sort] != 'user'
-      scope = scope.includes(:usage_rights) if params[:include].include?('usage_rights')
+      scope = scope.preload(:user) if params[:include].include?('user') && params[:sort] != 'user'
+      scope = scope.preload(:usage_rights) if params[:include].include?('usage_rights')
       scope = Attachment.search_by_attribute(scope, :display_name, params[:search_term])
 
       order_clause = case params[:sort]

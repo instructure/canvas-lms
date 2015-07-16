@@ -823,7 +823,7 @@ describe Course, "enroll" do
   it "should scope correctly when including teachers from course" do
     account = @course.account
     @course.enroll_student(@user)
-    scope = account.associated_courses.active.select([:id, :name]).joins(:teachers).includes(:teachers).where(:enrollments => { :workflow_state => 'active' })
+    scope = account.associated_courses.active.select([:id, :name]).eager_load(:teachers).joins(:teachers).where(:enrollments => { :workflow_state => 'active' })
     sql = scope.to_sql
     expect(sql).to match(/enrollments.type = 'TeacherEnrollment'/)
   end

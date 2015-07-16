@@ -82,7 +82,7 @@ class Submission < ActiveRecord::Base
   validates_length_of :published_grade, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
   validates_as_url :url
 
-  scope :with_comments, -> { includes(:submission_comments) }
+  scope :with_comments, -> { preload(:submission_comments) }
   scope :after, lambda { |date| where("submissions.created_at>?", date) }
   scope :before, lambda { |date| where("submissions.created_at<?", date) }
   scope :submitted_before, lambda { |date| where("submitted_at<?", date) }
@@ -547,7 +547,7 @@ class Submission < ActiveRecord::Base
 
   def submit_attachments_to_canvadocs
     if attachment_ids_changed?
-      attachments.includes(:crocodoc_document).each do |a|
+      attachments.preload(:crocodoc_document).each do |a|
         if Canvas::Crocodoc.enabled? && a.crocodocable?
           # indicates a crocodoc preview is coming
           a.crocodoc_document || a.create_crocodoc_document
@@ -703,7 +703,7 @@ class Submission < ActiveRecord::Base
       attachments_by_id = {}
     else
       attachments_by_id = Attachment.where(:id => bulk_attachment_ids)
-                          .includes(:thumbnail, :media_object)
+                          .preload(:thumbnail, :media_object)
                           .group_by(&:id)
     end
 
@@ -824,19 +824,19 @@ class Submission < ActiveRecord::Base
 
   scope :graded, -> { where("submissions.grade IS NOT NULL") }
 
-  scope :ungraded, -> { where(:grade => nil).includes(:assignment) }
+  scope :ungraded, -> { where(:grade => nil).preload(:assignment) }
 
   scope :in_workflow_state, lambda { |provided_state| where(:workflow_state => provided_state) }
 
   scope :having_submission, -> { where("submissions.submission_type IS NOT NULL") }
   scope :without_submission, -> { where(submission_type: nil, workflow_state: "unsubmitted") }
 
-  scope :include_user, -> { includes(:user) }
+  scope :include_user, -> { preload(:user) }
 
-  scope :include_assessment_requests, -> { includes(:assessment_requests, :assigned_assessments) }
-  scope :include_versions, -> { includes(:versions) }
-  scope :include_submission_comments, -> { includes(:submission_comments) }
-  scope :speed_grader_includes, -> { includes(:versions, :submission_comments, :attachments, :rubric_assessment) }
+  scope :include_assessment_requests, -> { preload(:assessment_requests, :assigned_assessments) }
+  scope :include_versions, -> { preload(:versions) }
+  scope :include_submission_comments, -> { preload(:submission_comments) }
+  scope :speed_grader_includes, -> { preload(:versions, :submission_comments, :attachments, :rubric_assessment) }
   scope :for_user, lambda { |user| where(:user_id => user) }
   scope :needing_screenshot, -> { where("submissions.submission_type='online_url' AND submissions.attachment_id IS NULL AND submissions.process_attempts<3").order(:updated_at) }
 

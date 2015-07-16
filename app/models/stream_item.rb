@@ -351,7 +351,7 @@ class StreamItem < ActiveRecord::Base
     scope = where("updated_at<?", before_date).
         preload(:context).
         limit(1000)
-    scope = scope.includes(:stream_item_instances) if touch_users
+    scope = scope.preload(:stream_item_instances) if touch_users
 
     while true
       batch = scope.reload.to_a

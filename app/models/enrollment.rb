@@ -224,7 +224,7 @@ class Enrollment < ActiveRecord::Base
         where(:type => 'StudentEnrollment', :workflow_state => 'active', :courses => { :workflow_state => ['available', 'claimed'] }) }
 
   scope :all_student, -> {
-    includes(:course).
+    eager_load(:course).
         where("(enrollments.type = 'StudentEnrollment'
               AND enrollments.workflow_state IN ('invited', 'active', 'completed')
               AND courses.workflow_state IN ('available', 'completed')) OR
@@ -331,7 +331,7 @@ class Enrollment < ActiveRecord::Base
     section = CourseSection.find(self.course_section_id_was)
 
     # ok, consider groups the user is in from the abandoned section's course
-    self.user.groups.includes(:group_category).where(
+    self.user.groups.preload(:group_category).where(
       :context_type => 'Course', :context_id => section.course_id).each do |group|
 
       # check group deletion criteria if either enrollment is not a deletion

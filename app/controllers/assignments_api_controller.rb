@@ -546,7 +546,8 @@ class AssignmentsApiController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       scope = Assignments::ScopedToUser.new(@context, @current_user).scope.
-          includes(:assignment_group, :rubric_association, :rubric).
+          eager_load(:assignment_group).
+          preload(:rubric_association, :rubric).
           reorder("assignment_groups.position, assignments.position")
       scope = Assignment.search_by_attribute(scope, :title, params[:search_term])
       da_enabled = @context.feature_enabled?(:differentiated_assignments)

@@ -216,7 +216,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
     transaction do
       # delete the children of the group, both links and subgroups, then delete
       # the group itself
-      self.child_outcome_links.active.includes(:content).each do |outcome_link|
+      self.child_outcome_links.active.preload(:content).each do |outcome_link|
         outcome_link.skip_touch = true if @skip_tag_touch
         outcome_link.destroy
       end

@@ -25,7 +25,7 @@ module Quizzes::LogAuditing
 
       snapshots = ::Quizzes::QuizSubmissionSnapshot.
         where({ quiz_submission_id: quiz_submission_ids }).
-        includes(:quiz_submission)
+        preload(:quiz_submission)
 
       events_from_snapshots(snapshots)
     end

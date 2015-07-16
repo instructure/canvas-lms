@@ -228,7 +228,7 @@ class CommunicationChannel < ActiveRecord::Base
     when User
       where(:user_id => context)
     when Notification
-      includes(:notification_policies).where(:notification_policies => { :notification_id => context })
+      eager_load(:notification_policies).where(:notification_policies => { :notification_id => context })
     else
       scoped
     end
@@ -271,7 +271,7 @@ class CommunicationChannel < ActiveRecord::Base
       order("#{self.rank_sql(rank_order, 'communication_channels.path_type')} ASC, communication_channels.position asc").to_a
   end
 
-  scope :include_policies, -> { includes(:notification_policies) }
+  scope :include_policies, -> { preload(:notification_policies) }
 
   scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
   scope :of_type, lambda { |type| where(:path_type => type) }
@@ -356,7 +356,7 @@ class CommunicationChannel < ActiveRecord::Base
     merge_candidates = {}
     Shard.with_each_shard(shards) do
       scope = scope.shard(Shard.current)
-      scope.where("user_id<>?", self.user_id).includes(:user).map(&:user).select do |u|
+      scope.where("user_id<>?", self.user_id).preload(:user).map(&:user).select do |u|
         result = merge_candidates.fetch(u.global_id) do
           merge_candidates[u.global_id] = (u.all_active_pseudonyms.length != 0)
         end

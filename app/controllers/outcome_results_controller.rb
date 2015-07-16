@@ -301,7 +301,7 @@ class OutcomeResultsController < ApplicationController
   private
 
   def user_rollups(opts = {})
-    @results = find_outcome_results(users: @users, context: @context, outcomes: @outcomes).includes(:user)
+    @results = find_outcome_results(users: @users, context: @context, outcomes: @outcomes).preload(:user)
     outcome_results_rollups(@results, @users)
   end
 
@@ -357,12 +357,12 @@ class OutcomeResultsController < ApplicationController
   end
 
   def include_alignments
-    alignments = ContentTag.where(id: @results.map(&:content_tag_id)).includes(:content).map(&:content).uniq
+    alignments = ContentTag.where(id: @results.map(&:content_tag_id)).preload(:content).map(&:content).uniq
     outcome_results_include_alignments_json(alignments)
   end
 
   def include_outcomes_alignments
-    alignments = ContentTag.learning_outcome_alignments.not_deleted.where(learning_outcome_id: @outcomes).includes(:content).map(&:content).uniq
+    alignments = ContentTag.learning_outcome_alignments.not_deleted.where(learning_outcome_id: @outcomes).preload(:content).map(&:content).uniq
     outcome_results_include_alignments_json(alignments)
   end
 
@@ -408,7 +408,7 @@ class OutcomeResultsController < ApplicationController
   def require_outcomes
     @outcome_groups = @context.learning_outcome_groups
     outcome_group_ids = @outcome_groups.pluck(:id)
-    @outcome_links = ContentTag.learning_outcome_links.active.where(associated_asset_id: outcome_group_ids).includes(:learning_outcome_content)
+    @outcome_links = ContentTag.learning_outcome_links.active.where(associated_asset_id: outcome_group_ids).preload(:learning_outcome_content)
     reject! "can't filter by both outcome_ids and outcome_group_id" if params[:outcome_ids] && params[:outcome_group_id]
     if params[:outcome_ids]
       outcome_ids = Api.value_to_array(params[:outcome_ids]).map(&:to_i).uniq

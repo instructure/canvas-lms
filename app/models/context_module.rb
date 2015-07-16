@@ -101,7 +101,7 @@ class ContextModule < ActiveRecord::Base
 
   def evaluate_all_progressions
     current_column = 'context_module_progressions.current'
-    current_scope = context_module_progressions.where("#{current_column} IS NULL OR #{current_column} = ?", false).includes(:user)
+    current_scope = context_module_progressions.where("#{current_column} IS NULL OR #{current_column} = ?", false).preload(:user)
 
     current_scope.find_in_batches(batch_size: 100) do |progressions|
       cache_visibilities_for_students(progressions.map(&:user_id)) if differentiated_assignments_enabled?

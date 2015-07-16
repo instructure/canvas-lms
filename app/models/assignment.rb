@@ -308,7 +308,7 @@ class Assignment < ActiveRecord::Base
 
   def update_student_submissions
     graded_at = Time.zone.now
-    submissions.graded.includes(:user).find_each do |s|
+    submissions.graded.preload(:user).find_each do |s|
       if grading_type == 'pass_fail' && ['complete', 'pass'].include?(s.grade)
         s.score = points_possible
       end
@@ -1371,7 +1371,7 @@ class Assignment < ActiveRecord::Base
 
     includes = [:versions, :quiz_submission]
     includes << (grading_role == :grader ? :submission_comments : :all_submission_comments)
-    submissions = self.submissions.where(:user_id => students).includes(*includes)
+    submissions = self.submissions.where(:user_id => students).preload(*includes)
 
     res[:too_many_quiz_submissions] = too_many = too_many_qs_versions?(submissions)
     qs_versions = quiz_submission_versions(submissions, too_many)
@@ -1493,7 +1493,7 @@ class Assignment < ActiveRecord::Base
   # name.  for non-group assignments this just returns all visible users
   def representatives(user)
     if grade_as_group?
-      submissions = self.submissions.includes(:user).to_a
+      submissions = self.submissions.preload(:user).to_a
       users_with_submissions = submissions.select(&:has_submission?).map(&:user)
       users_with_turnitin_data = if turnitin_enabled?
                                    submissions
@@ -1535,7 +1535,7 @@ class Assignment < ActiveRecord::Base
 
   def groups_and_ungrouped(user)
     groups_and_users = group_category.
-      groups.active.includes(:group_memberships => :user).
+      groups.active.preload(group_memberships: :user).
       map { |g| [g.name, g.users] }
     users_in_group = groups_and_users.flat_map { |_,users| users }
     groupless_users = visible_students_for_speed_grader(user) - users_in_group
@@ -1727,14 +1727,14 @@ class Assignment < ActiveRecord::Base
     WHERE assignments.id = submissions.assignment_id
     AND submissions.grade IS NOT NULL) AS graded_count") }
 
-  scope :include_quiz_and_topic, -> { includes(:quiz, :discussion_topic) }
+  scope :include_quiz_and_topic, -> { preload(:quiz, :discussion_topic) }
 
   scope :no_graded_quizzes_or_topics, -> { where("submission_types NOT IN ('online_quiz', 'discussion_topic')") }
 
-  scope :with_submissions, -> { includes(:submissions) }
+  scope :with_submissions, -> { preload(:submissions) }
 
   scope :with_submissions_for_user, lambda { |user|
-    includes(:submissions).where("submissions.user_id = ?", user.id)
+    eager_load(:submissions).where("submissions.user_id = ?", user.id)
   }
 
   scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
@@ -1781,7 +1781,7 @@ class Assignment < ActiveRecord::Base
   # Return all assignments and their active overrides where either the
   # assignment or one of its overrides is due between start and ending.
   scope :due_between_with_overrides, lambda { |start, ending|
-    includes(:assignment_overrides).
+    eager_load(:assignment_overrides).
         where('assignments.due_at BETWEEN ? AND ?
               OR assignment_overrides.due_at_overridden AND
               assignment_overrides.due_at BETWEEN ? AND ?', start, ending, start, ending)

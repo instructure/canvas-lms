@@ -259,7 +259,7 @@ module AccountReports
         end
 
         csv << headers
-        courses = root_account.all_courses.includes(:account, :enrollment_term)
+        courses = root_account.all_courses.preload(:account, :enrollment_term)
         courses = courses.where("courses.sis_source_id IS NOT NULL") if @sis_format
 
         if @include_deleted

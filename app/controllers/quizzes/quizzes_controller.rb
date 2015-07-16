@@ -60,7 +60,7 @@ class Quizzes::QuizzesController < ApplicationController
 
     can_manage = @context.grants_right?(@current_user, session, :manage_assignments)
 
-    scope = @context.quizzes.active.includes([ :assignment ])
+    scope = @context.quizzes.active.preload(:assignment)
 
     # students only get to see published quizzes, and they will fetch the
     # overrides later using the API:

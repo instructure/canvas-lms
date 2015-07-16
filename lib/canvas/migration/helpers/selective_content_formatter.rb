@@ -316,7 +316,7 @@ module Canvas::Migration::Helpers
     end
 
     def course_assignment_data(content_list, source_course)
-      source_course.assignment_groups.active.includes(:assignments).select("id, name").each do |group|
+      source_course.assignment_groups.active.preload(:assignments).select("id, name").each do |group|
         item = course_item_hash('assignment_groups', group)
         content_list << item
         group.assignments.active.select(:id).select(:title).each do |asmnt|
@@ -327,7 +327,7 @@ module Canvas::Migration::Helpers
     end
 
     def course_attachments_data(content_list, source_course)
-      Canvas::ICU.collate_by(source_course.folders.active.select('id, full_name, name').includes(:active_file_attachments), &:full_name).each do |folder|
+      Canvas::ICU.collate_by(source_course.folders.active.select('id, full_name, name').preload(:active_file_attachments), &:full_name).each do |folder|
         next if folder.active_file_attachments.length == 0
 
         item = course_item_hash('folders', folder)
