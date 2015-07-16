@@ -7,7 +7,7 @@ $ic-left-side-width: $ic-sp*15;
 
 .ic-app-container {
   box-sizing: border-box;
-  min-height: 100vh;  
+  min-height: 100vh;
 }
 
 .ic-app-main-layout-vertical {
@@ -22,11 +22,16 @@ $ic-left-side-width: $ic-sp*15;
   transform: translate3d(0,0,0);
   flex: 1 0 auto;
   position: relative;
+  background:
+    transparent
+    0 100%
+    no-repeat;
+  background-image: $ic-brand-watermark;
   body.course-menu-expanded & { transform: translate3d($ic-left-side-width,0,0); }
   @include breakpoint(wide) {
     display: flex;
     position: static;
-    body.course-menu-expanded & { 
+    body.course-menu-expanded & {
       transform: none;
       transition: none;
     }
@@ -51,7 +56,7 @@ $ic-left-side-width: $ic-sp*15;
   width: $ic-left-side-width;
   padding: (($ic-sp*2) - 4) $ic-sp $ic-sp $ic-sp*2;
   opacity: 0;
-  body.course-menu-expanded & { 
+  body.course-menu-expanded & {
     opacity: 1;
     transform: translate3d(0,0,0);
   }
@@ -78,12 +83,12 @@ $ic-left-side-width: $ic-sp*15;
 
 .ic-app-main-content__secondary {
   box-sizing: border-box;
-  padding: $ic-sp*2; 
+  padding: $ic-sp*2;
   @include breakpoint(desktop) {
     flex: 0 0 $ic-sp*22;
     padding-left: $ic-sp;
   }
-  @include breakpoint(wide) { 
+  @include breakpoint(wide) {
     flex: 0 0 $ic-sp*24;
     padding-left: $ic-sp*2;
   }
@@ -107,12 +112,12 @@ $ic-left-side-width: $ic-sp*15;
 .ic-app-footer__links {
   flex: 1;
   display: flex;
-  a { 
+  a {
     color: $ic-font-color--subdued;
     margin-right: $ic-sp;
     font-size: 12px;
   }
-  @include breakpoint(desktop) { 
+  @include breakpoint(desktop) {
     justify-content: flex-end;
     a { margin-right: 0; margin-left: $ic-sp; }
   }
