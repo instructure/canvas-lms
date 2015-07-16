@@ -77,7 +77,10 @@ define [
       json
 
     onUnload: (ev) =>
-      if this && @checkUnsavedOnLeave && @hasUnsavedChanges()
+      # don't open the "are you sure" dialog unless we're still rendered in the page
+      # so that, for example, our specs that don't clean up after themselves don't
+      # fire this unintentionally
+      if this && @checkUnsavedOnLeave && @hasUnsavedChanges() && document.body.contains(@el)
         warning = @unsavedWarning()
         (ev || window.event).returnValue = warning
         return warning
@@ -91,7 +94,6 @@ define [
       @initWikiSidebar()
 
       @checkUnsavedOnLeave = true
-      view = this
       $(window).on 'beforeunload', @onUnload
 
       unless @firstRender
