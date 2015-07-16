@@ -2350,20 +2350,6 @@ ko:
       titles: 
         new: "새 협업 시작"
     index: 
-      description_rs: |-
-          [Google Docs](%{google_url})나 [EtherPad](%{etherpad_url})와 같은 무료 온라인 웹 도구는
-          학생이 그룹 프로젝트나 보고서, 공동 노트 작성 등을 하기에 좋은 훌륭한 공간입니다.
-          교사 *또는* 학생은 그룹 협업을 설정할 수 있습니다.
-      description_student: |-
-          **협업은 무엇을 의미합니까?**  여기에서는 공유된 문서를 함께 작업하기 위한 웹 기반 도구에 대해
-          이야기하고 있습니다. [Google Docs](%{google_url})와 [EtherPad](%{etherpad_url})같은 리소스를 이용하여
-          그룹 보고서나 노트 작성 등의 작업을 함께 할 수 있습니다. 이 페이지는
-          협업을 손쉽게 추적하고 이메일 교환 없이 설정할 수 있는 곳입니다.
-      description_teacher: |-
-          **협업은 무엇을 의미합니까?**  여기에서는 학생에게 친숙한 웹 기반 도구에 대해
-          이야기하고 있습니다. [Google Docs](%{google_url})와 [EtherPad](%{etherpad_url})같은 리소스를 이용하여
-          그룹 보고서나 노트 작성 등의 작업을 함께 할 수 있습니다. 이 페이지는
-          학생과 교사가 협업을 손쉽게 추적하고 이메일 교환 없이 설정할 수 있는 곳입니다.
       how_to_start_a_new_collaboration: "특정 유형의 협업에 대한 자세한 정보를 찾으려면 \"새 협업 시작\"을 클릭하고 드롭다운 리스트에서 유형을 선택합니다."
       links: 
         delete: "이 협업 삭제"

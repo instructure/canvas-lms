@@ -2800,23 +2800,6 @@ sv:
     google_drive: 
       file_not_found: "Samarbetsfil kunde inte hittas"
     index: 
-      description_rs: |-
-          Gratis onlineverktyg som [Google Docs](%{google_url}) och [EtherPad](%{etherpad_url})
-          är utmärkta platser för elever att arbeta på grupparbeten eller uppsatser, dela anteckningar, osv.
-          Lärare *eller* elever kan starta gruppsamarbeten.
-      description_student: |-
-          **Vad menar vi med samarbeten?** Vi pratar om webb-baserade verktyg för att
-          arbeta tillsammans på delade dokument. Du kan använda resurser som
-          [Google Docs](%{google_url}) och [EtherPad](%{etherpad_url})
-          för att arbeta på grupparbeten och skriva anteckningar tillsammans. Den här sidan
-          är en enkel plats att hålla koll på dessa samarbeten och dessusom starta dem
-          utan att behöva skicka en massa e-post meddelanden.
-      description_teacher: |-
-          **Vad menar vi med samarbeten?** Vi pratar om webb-baserade verktyg för att
-          arbeta tillsammans på delade dokument. Du kan använda resurser som
-          [Google Docs](%{google_url}) och [EtherPad](%{etherpad_url})
-          för att arbeta på grupparbeten och skriva anteckningar tillsammans. Den här sidan ger dem
-          (och dig) en smidig plats att hålla koll på dessa samarbeten och starta dem utan att behöva skicka en massa epost meddelanden.
       google: 
         drive: 
           upgrade: 

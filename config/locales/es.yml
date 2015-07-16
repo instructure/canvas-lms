@@ -2788,15 +2788,6 @@ es:
     google_drive: 
       file_not_found: "Archivo de colaboración no encontrado"
     index: 
-      description_rs: |
-          Herramientas gratis en línea como [Google Docs](%{google_url}) y [EtherPad](%{etherpad_url})
-          son un lugar excelente para que los estudiantes puedan trabajar en proyectos de grupo o artículos, tomen notas compartidas, etc.
-          El profesor *o* los estudiantes pueden establecer colaboraciones de grupo.
-      description_student: |-
-          **¿Qué queremos decir con colaboradores?**  Estamos hablando de herramientas en-línea para hablar juntos en un documento compartido. Puede usar recursos como
-          [Google Docs](%{google_url}) y [EtherPad](%{etherpad_url})
-          para trabajar colaborativamente en tareas como trabajos en grupo y toma de notas. Esta página es un lugar fácil para seguirle la pista a estas colaboraciones, y también 	  para establecerlas sin tener que intercambiar correos electrónicos.
-      description_teacher: "**¿Qué queremos decir con colaboradores?** Estamos hablando de herramientas en-línea que sus estudiantes probablemente ya conocen.Los estudiantes pueden usar recursos 	  como [Google Docs](%{google_url}) y [EtherPad](%{etherpad_url}) para trabajar colaborativamente en tareas como tareas en grupo o toma de notas. Esta página les da (y a 	  usted) un lugar para seguirle la pista a estas colaboraciones y también para establecerlos sin tener que intercambiar correos electrónicos."
       google: 
         drive: 
           upgrade: 
@@ -7490,6 +7481,7 @@ es:
   light_green_c1cd020d: "Verde claro"
   light_pink_e1214d62: "Rosado claro"
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Limitar cada intervalo a %{num_participants} *grupos.* **usuarios.**"
+  limit_file_size_limit_per_file_b336c0d8: "limite %{file_size_limit} por archivo"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Limitar participantes para que participen en %{num_appointments} cita(s)"
   limit_search_to_activity_after_c1ac2449: "Limitar la búsqueda a la actividad después"
   limit_search_to_activity_before_e05aad05: "Limitar la búsqueda a la actividad antes"
@@ -15087,6 +15079,10 @@ es:
       Usted necesitará [registrar una aplicación en web en GitHub](%{github_url}).
       Debe aconfigurar %{callback_url}  como una URL de retrollamada de Autorización.
       Después de haber creado su aplicación, anote el ID del cliente y el secreto del cliente, e ingréselos aquí.
+  you_will_need_to_register_an_application_on_linked_26ecb18d: |-
+      Usted necesitará [registrar una aplicación en LinkedIn](%{linkedin_url}).
+      Debe agregar %{callback_url} como una URL de redireccionamiento autorizada de OAuth 2.0 y establecer el estado de la aplicación a Live 
+      Después de crear su aplicación, anote el ID del cliente y secreto del cliente e ingréselos aquí.
   you_will_need_to_register_an_application_on_twitte_5ff04bee: |-
       Usted necesitará [registrar una aplicación en Twitter](%{twitter_url})..
       Debe aconfigurar %{callback_url}  como una URL de retrollamada.
