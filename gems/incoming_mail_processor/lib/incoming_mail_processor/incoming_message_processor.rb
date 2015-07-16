@@ -88,7 +88,9 @@ module IncomingMailProcessor
       body, html_body = extract_body(incoming_message)
 
       handle = @message_handler.handle(mailbox_account.address, body, html_body, incoming_message, tag)
-      CanvasStatsd::Statsd.increment("incoming_mail_processor.incoming_message_processed")
+
+      report_stats(incoming_message, mailbox_account)
+
       handle
     end
 
@@ -122,6 +124,21 @@ module IncomingMailProcessor
       end
 
       return text_body, html_body
+    end
+
+    def report_stats(incoming_message, mailbox_account)
+      CanvasStatsd::Statsd.increment("incoming_mail_processor.incoming_message_processed")
+
+      age = age(incoming_message)
+      if age
+        stat_name = "incoming_mail_processor.message_age.#{mailbox_account.escaped_address}"
+        CanvasStatsd::Statsd.timing(stat_name, age)
+      end
+    end
+
+    def age(message)
+      datetime = message.date
+      (Time.now - datetime).to_i * 1000 if datetime # age in ms, please
     end
 
     def self.mailbox_keys
