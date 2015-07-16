@@ -2791,10 +2791,6 @@ nl:
     google_drive: 
       file_not_found: "Bestand samenwerking niet gevonden "
     index: 
-      description_rs: "Gratis onlinewebtools zoals [Google Docs](%{google_url}) en [EtherPad](%{etherpad_url}) zijn zeer geschikt voor cursisten om  aan groepsprojecten of papers te werken, gedeelde notities te maken, enzovoort.  \n\
-          Docenten *en*  cursisten kunnen groepssamenwerkingen instellen. "
-      description_student: "**Wat bedoelen we met samenwerkingen?** Het gaat om webtools waarmee gezamenlijk aan een gedeeld document kan worden gewerkt. Je kunt resources/bronnen zoals [Google Drive](%{google_url}) en [EtherPad](%{etherpad_url}) gebruiken om samen te werken aan opdrachten zoals groepspapers of aan het maken van notities. Op deze pagina kun je deze samenwerkingen eenvoudig instellen en bijhouden zonder dat je e-mailberichten hoeft (uit) te wisselen. "
-      description_teacher: "**Wat bedoelen we met samenwerkingen?** Het gaat om webtools waar jouw ncursisten waarschijnlijk al mee bekend zijn. Cursisten kunnen resources/bronnen zoals [Google Drive](%{google_url}) en [EtherPad](%{etherpad_url}) gebruiken om samen te werken aan opdrachten zoals groepsopdrachten of het maken van notities.Op deze pagina kun je deze samenwerkingen eenvoudig instellen en bijhouden zonder dat u e-mailberichten hoeft (uit) te wisselen. "
       google: 
         drive: 
           upgrade: 
