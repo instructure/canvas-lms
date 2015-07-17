@@ -7470,7 +7470,6 @@ pl:
       student_view: 
         leave: "Opuść widok uczestnika"
         reset: "Zresetuj uczestnika"
-        reset_explanation: "Zresetowanie uczestnika testowego wyczyści całą historię tego uczestnika, %{line_break} umożliwiając Ci przeglądanie kursu jako zupełnie nowy uczestnik."
         warning_title: "Obecnie jesteś zalogowany/-a w widoku uczestnika"
     head: 
       default_page_title: "Canvas LMS"
