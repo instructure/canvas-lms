@@ -33,6 +33,17 @@ describe ContentMigration do
       expect(topic.posted_at.to_i).to eq new_topic.posted_at.to_i
     end
 
+    it "should copy group setting" do
+      group_category = @copy_from.group_categories.create!(name: 'blah')
+      topic = @copy_from.discussion_topics.create! group_category: group_category
+
+      run_course_copy
+
+      new_topic = @copy_to.discussion_topics.where(migration_id: mig_id(topic)).first
+      expect(new_topic).to be_has_group_category
+      expect(new_topic.group_category.name).to eq "Project Groups"
+    end
+
     it "should copy a discussion topic when assignment is selected" do
       graded_discussion_topic
 
