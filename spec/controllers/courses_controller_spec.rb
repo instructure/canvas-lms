@@ -747,8 +747,8 @@ describe CoursesController do
         @course1.save!
         @course1.wiki.wiki_pages.create!(:title => 'blah').set_as_front_page!
         get 'show', :id => @course1.id
-        expect(controller.js_env[:WIKI_RIGHTS]).to eql({:read => true})
-        expect(controller.js_env[:PAGE_RIGHTS]).to eql({:read => true})
+        expect(controller.js_env[:WIKI_RIGHTS].symbolize_keys).to eql({:read => true})
+        expect(controller.js_env[:PAGE_RIGHTS].symbolize_keys).to eql({:read => true})
         expect(controller.js_env[:COURSE_TITLE]).to eql @course1.name
       end
 

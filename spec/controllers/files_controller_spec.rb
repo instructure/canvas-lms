@@ -189,7 +189,7 @@ describe FilesController do
       user_file
       @file.context = @group
       get 'index', :group_id => @group.id
-      expect(assigns[:js_env]['FILES_CONTEXTS'][0]['file_menu_tools']).to eq []
+      expect(assigns[:js_env][:FILES_CONTEXTS][0][:file_menu_tools]).to eq []
     end
 
     describe 'across shards' do

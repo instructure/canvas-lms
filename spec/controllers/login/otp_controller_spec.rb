@@ -17,6 +17,7 @@
 #
 
 require_relative '../../spec_helper'
+require 'rotp'
 
 describe Login::OtpController do
   describe '#new' do
