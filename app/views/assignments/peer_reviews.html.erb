@@ -67,7 +67,7 @@
         <% if submission %>
         <% Canvas::ICU.collate_by(submission.assigned_assessments) {|r| r.asset.user.sortable_name }.each do |request| %>
           <% if (request && request.asset && request.asset.user) %>
-            <%= render :partial => 'peer_review_assignment', :object => request %>
+            <%= render :partial => 'peer_review_assignment', :locals => {:request => request} %>
           <% end %>
         <% end %>
         <% end %>
@@ -91,5 +91,5 @@
 <% end %>
 <a href="<%= context_url(@context, :context_assignment_assign_peer_review_url, @assignment.id, '{{ reviewer_id }}') %>" style="display: none;" class="assign_peer_review_url">&nbsp;</a>
 <ul style="display: none;">
-<%= render :partial => 'peer_review_assignment', :object => nil %>
+<%= render :partial => 'peer_review_assignment', :locals => {:request => nil} %>
 </ul>

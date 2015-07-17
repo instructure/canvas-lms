@@ -1,7 +1,7 @@
 <% skip_ul ||= false; exclude_files ||= false %>
 <% unless skip_ul %><ul><% end %>
   <% folders ||= [] %>
-  <% nested_content.compact.select{|i| !i.is_a?(Attachment) || !exclude_files}.each do |item| 
+  <% nested_content.compact.select{|i| !i.is_a?(Attachment) || !exclude_files}.each do |item|
     new_f = folders.to_a.find{|i| i.id == item.id} if folders && item.is_a?(Folder)
     item = new_f if new_f
     subcontent = folders.select{|f| f.parent_folder_id == f.id } if exclude_files && !folders.empty?

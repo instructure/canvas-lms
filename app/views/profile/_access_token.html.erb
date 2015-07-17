@@ -1,3 +1,4 @@
+<% access_token ||= nil %>
 <tr class="access_token <%= 'blank' unless access_token %>" style="<%= hidden unless access_token %>">
   <td class="app_name"><%= access_token.try(:app_name) || t(:default_app_name, "No App") %></td>
   <td class="purpose"><%= access_token.try(:purpose) || nbsp %></td>

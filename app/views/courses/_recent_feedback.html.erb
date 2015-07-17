@@ -1,10 +1,11 @@
-<% 
+<%
+  recent_feedback ||= nil
   show_context ||= false
   comment = nil
   grade = nil
   score = nil
 
-  cache(['recent_feedback_render', recent_feedback || 'blank_feedback', Time.zone.utc_offset].cache_key) do 
+  cache(['recent_feedback_render', recent_feedback || 'blank_feedback', Time.zone.utc_offset].cache_key) do
     context = recent_feedback.context
     assignment = recent_feedback.assignment
     url = context_url(context, :context_assignment_submission_url, :assignment_id => recent_feedback.assignment_id, :id=>@current_user.id)
@@ -12,10 +13,10 @@
     score = recent_feedback.score
     comment = recent_feedback.last_teacher_comment
     comment_text = comment.comment if comment
-    icon_explanation, icon_class = icon_data(:context => context, 
-                                             :current_user => @current_user, 
-                                             :recent_event => assignment, 
-                                             :submission => recent_feedback, 
+    icon_explanation, icon_class = icon_data(:context => context,
+                                             :current_user => @current_user,
+                                             :recent_event => assignment,
+                                             :submission => recent_feedback,
                                              :student_only => true)
   %>
 <li style="<%= hidden if is_hidden %>" class="event">
@@ -28,7 +29,7 @@
       <span class='tooltip-carat'></span>
       <span class="tooltip_text">
         <% if recent_feedback.workflow_state != 'unsubmitted' %>
-          <span style="display: block;"><%= before_label(icon_explanation.try(:capitalize)) %> 
+          <span style="display: block;"><%= before_label(icon_explanation.try(:capitalize)) %>
             <% if recent_feedback.workflow_state == 'graded' %>
               <span style="font-size: 0.8em;"><%= datetime_string(recent_feedback.graded_at) %></span>
             <% else %>

@@ -91,7 +91,11 @@ module RSpec::Rails
           attr_accessor :real_controller
 
           controller_class._helper_methods.each do |helper|
-            delegate helper, :to => :real_controller
+            class_eval <<-RUBY, __FILE__, __LINE__ + 1
+            def #{helper}(*args, &block)
+              real_controller.send(:#{helper}, *args, &block)
+            end
+            RUBY
           end
         end
 

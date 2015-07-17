@@ -510,7 +510,7 @@ class UsersController < ApplicationController
       assignments = upcoming_events.select{ |e| e.is_a?(Assignment) }
       Shard.partition_by_shard(assignments) do |shard_assignments|
         Submission.
-          select([:id, :assignment_id, :score, :workflow_state]).
+          select([:id, :assignment_id, :score, :workflow_state, :updated_at]).
           where(:assignment_id => shard_assignments, :user_id => user)
       end
     end

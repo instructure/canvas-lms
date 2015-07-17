@@ -1,9 +1,10 @@
+<% enrollment ||= nil %>
 <% show_section ||= false %>
 <% include_type ||= false; show_information_link ||= false %>
 <% enrollments = enrollment[1].sort_by(&:id) if enrollment.is_a?(Array) %>
 <% enrollment = enrollment[1][0] if enrollment.is_a?(Array) %>
 <% multiple_enrollments = enrollments && enrollments.length > 1 %>
-<li id="enrollment_<%= enrollment.try_rescue(:id) || "blank" %>" class="user <%= "pending" if enrollment.try_rescue(:pending?) %> <%= enrollment.class.to_s.underscore %> user_<%= enrollment.try_rescue(:user_id) %>" 
+<li id="enrollment_<%= enrollment.try_rescue(:id) || "blank" %>" class="user <%= "pending" if enrollment.try_rescue(:pending?) %> <%= enrollment.class.to_s.underscore %> user_<%= enrollment.try_rescue(:user_id) %>"
 <% if enrollment.try_rescue(:user) %>
   title="<%= enrollment.user.name %>: <%= enrollment.user.email %>"
 <% end %>>

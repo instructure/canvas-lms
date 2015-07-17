@@ -32,7 +32,7 @@ describe "/shared/_flash_notices" do
 
   it "uses the button icon based on auth type" do
     render partial: "shared/auth_type_icon", locals: local_options(auth_type: 'twitter')
-    expect(rendered).to match("sso-twitter.svg")
+    expect(rendered).to match(/sso-twitter(-)?\w*\.svg/)
   end
 
 end

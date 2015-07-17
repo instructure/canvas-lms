@@ -1,3 +1,4 @@
+<% page_section_static ||= nil %>
 <% page_section = page_section_static || nil %>
 <div class="section <%= "read_only" if (page_section && (page_section["attachment_id"] || page_section["submission_id"])) %>" id="page_section_<%= idx %>">
   <% if page_section %>

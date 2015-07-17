@@ -1,3 +1,4 @@
+<% external_feed ||= nil %>
 <li style="<%= hidden unless external_feed %>" id="feed_<%= external_feed ? external_feed.id : 'blank' %>" class="feed">
   <a href="<%= context_url(@context, :context_announcements_external_feed_url, external_feed ? external_feed.id : "{{ id }}") %>" class="delete_feed_link no-hover" title="<%= t "alts.deleted_feed", "Delete this Feed" %>"><%= image_tag "delete.png" %></a>
  <div><a class="display_name" title="<%= external_feed && external_feed.url %>" href="<%= external_feed ? external_feed.url : '{{ url }}' %>"><%= external_feed ? external_feed.display_name : nbsp %></a></div>

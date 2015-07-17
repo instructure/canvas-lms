@@ -1,3 +1,4 @@
+<% sidebar_weighting ||= nil %>
 <% groups = sidebar_weighting || @context.assignment_groups.active %>
 <% if @context.group_weighting_scheme == "percent" %>
   <%= before_label 'assignments_weighting', 'Assignments are weighted by group' %>

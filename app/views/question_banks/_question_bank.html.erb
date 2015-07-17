@@ -1,3 +1,4 @@
+<% question_bank ||= nil %>
 <% context = question_bank ? question_bank.context : @context %>
 <div class="question_bank" id="question_bank_<%= question_bank ? question_bank.id : "blank" %>" style="<%= hidden unless question_bank %>">
   <div class="header clearfix">

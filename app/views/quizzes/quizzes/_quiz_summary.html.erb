@@ -1,4 +1,5 @@
-<% q = quiz_summary || nil
+<% quiz_summary ||= nil
+   q = quiz_summary || nil
   submission = nil
   submission = @submissions_hash[q.id] if q
   submission = nil if submission && submission.settings_only?

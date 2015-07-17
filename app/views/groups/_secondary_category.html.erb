@@ -1,3 +1,4 @@
+<% secondary_category ||= nil %>
 <% category = secondary_category || nil %>
 <div id="sidebar_category_<%= category ? category.id : 'blank' %>" class="sidebar_category">
   <h3 style="margin: 0;" class="category"><%= category && category.name %></h3>

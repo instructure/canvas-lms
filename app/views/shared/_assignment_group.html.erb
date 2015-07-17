@@ -1,4 +1,6 @@
-<% group = assignment_group
+<%
+  assignment_group ||= nil
+  group = assignment_group
   multiple_groups ||= false
   skip_assignments ||= false %>
 <% cache(['assignment_group_render', @current_user || 'nobody', group || @context.asset_string, skip_assignments, Time.zone.utc_offset].cache_key, :expires_in => (tomorrow_at_midnight - Time.zone.now).to_i) do %>
@@ -55,8 +57,8 @@
       <%= t :no_assignments, "No assignments yet" %> <a href="<%= context_url(@context, :controller => :assignments, :action => :create) %>" class="add_assignment_link" style="padding-left: 15px;"> <%= t 'links.add_an_assignment', "Add an Assignment" %></a>
     </div>
     <% if !skip_assignments && group && group.active_assignments %>
-      <%= render :partial => "shared/assignment", 
-                 :collection => group.active_assignments, 
+      <%= render :partial => "shared/assignment",
+                 :collection => group.active_assignments,
                  :locals => {
                    :context => @context
                  } %>

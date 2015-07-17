@@ -1,3 +1,4 @@
+<% question_teaser ||= nil %>
 <% data = question_teaser.try_rescue(:data) %>
 <div class="quiz_sortable question_holder question_teaser" id="question_teaser_<%= question_teaser ? question_teaser.id : "blank" %>" style="<%= hidden unless question_teaser %>">
   <div class="display_question question">
@@ -17,7 +18,7 @@
       </div>
     </div>
     <div class="bottom_links">
-      <a href="#" class="move_question_link"><%= t('move_bank', 'move/copy question to another bank') %></a> 
+      <a href="#" class="move_question_link"><%= t('move_bank', 'move/copy question to another bank') %></a>
       <span class="assessment_question_id id" style="display: none;"><%= question_teaser && question_teaser.id %></span>
     </div>
     <div class="clear"></div>
