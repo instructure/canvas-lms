@@ -7322,7 +7322,6 @@ nb:
       student_view: 
         leave: "Forlat studentvisning"
         reset: "Tilbakestill student"
-        reset_explanation: "Tilbakestilling av teststudenten vil slette all historikk for denne studenten, %{line_break}og lar deg se kurset som en fersk student."
         warning_title: "Du er logget inn på studentvisning"
     head: 
       default_page_title: "Canvas læringsplattform"
