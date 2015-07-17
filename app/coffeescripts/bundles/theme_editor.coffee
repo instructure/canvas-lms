@@ -12,4 +12,5 @@ require [
     hasUnsavedChanges: window.ENV.hasUnsavedChanges
     variableSchema: window.ENV.variableSchema
     sharedBrandConfigs: window.ENV.sharedBrandConfigs
+    allowGlobalIncludes: window.ENV.allowGlobalIncludes
   }), document.body)

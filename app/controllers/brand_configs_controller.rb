@@ -13,7 +13,8 @@ class BrandConfigsController < ApplicationController
     js_env brandConfig: brand_config.as_json(include_root: false),
            hasUnsavedChanges: session.key?(:brand_config_md5),
            variableSchema: BrandableCSS::BRANDABLE_VARIABLES,
-           sharedBrandConfigs: BrandConfig.select('md5, name').where(share: true).as_json(include_root: false)
+           sharedBrandConfigs: BrandConfig.select('md5, name').where(share: true).as_json(include_root: false),
+           allowGlobalIncludes: @domain_root_account.allow_global_includes?
     render text: '', layout: 'layouts/bare'
   end
 
@@ -27,10 +28,16 @@ class BrandConfigsController < ApplicationController
   # If the css files for this BrandConfig have not been created yet, it will return a `Progress` object
   # indicating the progress of generating the css and pushing it to the CDN
   # @returns {BrandConfig, Progress}
-
   def create
     variables = process_variables(params[:brand_config][:variables])
-    brand_config = BrandConfig.for(variables)
+    js_overrides = process_file(params[:js_overrides])
+    css_overrides = process_file(params[:css_overrides])
+
+    brand_config = BrandConfig.for(
+      variables: variables,
+      js_overrides: js_overrides,
+      css_overrides: css_overrides
+    )
 
     if existing_config(brand_config)
       render json: { brand_config: brand_config.as_json(include_root: false) }
@@ -101,8 +108,16 @@ class BrandConfigsController < ApplicationController
   def process_variables(variables)
     variables.each_with_object({}) do |(key, value), memo|
       next unless value.present? && (config = BrandableCSS.variables_map[key])
-      value = upload_image(value) if config['type'] == 'image' && value.is_a?(ActionDispatch::Http::UploadedFile)
+      value = process_file(value) if config['type'] == 'image'
       memo[key] = value
+    end
+  end
+
+  def process_file(file)
+    if file.is_a?(ActionDispatch::Http::UploadedFile)
+      upload_file(file)
+    else
+      file
     end
   end
 
@@ -115,8 +130,8 @@ class BrandConfigsController < ApplicationController
     progress
   end
 
-  def upload_image(image)
-    attachment = Attachment.create(uploaded_data: image, context: @domain_root_account)
+  def upload_file(file)
+    attachment = Attachment.create(uploaded_data: file, context: @domain_root_account)
     expires_in = 15.years
     attachment.authenticated_s3_url({
       # this is how long the s3 verifier token will work

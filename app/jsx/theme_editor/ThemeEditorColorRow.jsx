@@ -14,7 +14,7 @@ define([
     propTypes: {
       varDef: customTypes.color,
       onChange: React.PropTypes.func.isRequired,
-      userInput: customTypes.userColorInput,
+      userInput: customTypes.userVariableInput,
       placeholder: React.PropTypes.string.isRequired
     },
 

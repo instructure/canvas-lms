@@ -17,7 +17,7 @@ define([
 
     propTypes: {
       varDef: customTypes.image,
-      userInput: customTypes.userColorInput,
+      userInput: customTypes.userVariableInput,
       onChange: React.PropTypes.func.isRequired,
       currentValue: React.PropTypes.string,
       placeholder: React.PropTypes.string
@@ -71,7 +71,9 @@ define([
               </div>
               <div className="Theme__editor-image_upload">
                 <label className="Theme__editor-image_upload-label">
-                  <span className="Theme__editor-button_upload Button Button--link">{I18n.t('Select Image')}</span>
+                  <span className="Theme__editor-button_upload Button Button--link">
+                    {I18n.t('Select Image')}
+                  </span>
                   <input
                     type="hidden"
                     name={!this.props.userInput.val && inputName}
