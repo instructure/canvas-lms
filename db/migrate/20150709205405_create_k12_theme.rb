@@ -15,7 +15,7 @@ class CreateK12Theme < ActiveRecord::Migration
     bc.name = NAME
     bc.share = true
     bc.save!
-    bc.save_file!
+    bc.save_scss_file!
   end
 
   def down
