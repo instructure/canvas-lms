@@ -7410,7 +7410,6 @@ pt-BR:
       student_view: 
         leave: "Sair da visão de aluno"
         reset: "Redefinir aluno"
-        reset_explanation: "Redefinir o aluno de teste apagará todo o histórico deste aluno, %{line_break}permitindo que você visualize o curso como um aluno totalmente novo."
         warning_title: "No momento, você está conectado com a visão de aluno"
     head: 
       default_page_title: "LMS do Canvas"
