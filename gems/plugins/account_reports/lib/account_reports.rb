@@ -135,7 +135,7 @@ module AccountReports
     account_report.update_attribute(:progress, 100)
     account_report.end_at ||= Time.now
     account_report.save
-    notification.create_message(account_report, [account_report.user])
+    notification.create_message(account_report, [account_report.user]) if notification
     message
   end
 
