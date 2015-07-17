@@ -16,3 +16,16 @@
     {{/if}}
   </div>
 </div>
+{{#if items_count}}
+<div id="bz-module-sequence-progress-container">
+  <div id="bz-module-sequence-progress-bar"></div>
+  <script>
+    try {
+      var percentage = {{items_current_position}} / {{items_count}} * 100;
+      var i = document.getElementById('bz-module-sequence-progress-bar');
+      i.style.width = percentage + '%';
+      i.innerHTML = '<span class="bz-progress-current-position">{{items_current_position}}</span><span class="bz-progress-item-count">{{items_count}}</span>';
+    } catch(e) { if(console) console.log(e); }
+  </script>
+</div>
+{{/if}}
