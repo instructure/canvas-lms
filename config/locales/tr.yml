@@ -7313,7 +7313,6 @@ tr:
       student_view: 
         leave: "Öğrenci Görünümünden Çık"
         reset: "Öğrenciyi Sıfırla"
-        reset_explanation: "Test öğrencisinin bilgilerini sıfırlamak, o öğrencinin tüm bilgilerini silerek %{line_break}dersi yeni bir öğrenci olarak görmenizi sağlar."
         warning_title: "Öğrenci görünümünde oturum açtınız"
     head: 
       default_page_title: "Canvas LMS"

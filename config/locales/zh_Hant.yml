@@ -7362,7 +7362,6 @@ zh_Hant:
       student_view: 
         leave: 離開學生檢視表
         reset: 重設學生
-        reset_explanation: "重設測試學生將清除這個學生的所有歷史記錄，%{line_break} 允許您作為一個全新的學生檢視課程。"
         warning_title: 您目前已登入學生檢視表
     head: 
       default_page_title: "Canvas LMS"

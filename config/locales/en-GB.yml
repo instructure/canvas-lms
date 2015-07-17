@@ -7414,7 +7414,6 @@ en-GB:
       student_view: 
         leave: "Leave student view"
         reset: "Reset student"
-        reset_explanation: "Resetting the test student will clear all history for this student, %{line_break}allowing you to view the course as a brand new student."
         warning_title: "You are currently logged in to student view"
     head: 
       default_page_title: "Canvas LMS"

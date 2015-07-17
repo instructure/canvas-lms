@@ -7705,7 +7705,6 @@ ar:
       student_view: 
         leave: "مغادرة عرض الطالب"
         reset: "إعادة ضبط الطالب"
-        reset_explanation: "إن إعادة ضبط طالب الاختبار سيؤدي إلى مسح كل المحفوظات لهذا الطالب، %{line_break}مما يسمح لك بعرض المساق كطالب جديد تمامًا."
         warning_title: "لقد قمت بتسجيل الدخول إلى عرض الطالب حاليًا"
     head: 
       default_page_title: "Canvas LMS"

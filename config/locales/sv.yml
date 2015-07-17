@@ -7410,7 +7410,6 @@ sv:
       student_view: 
         leave: "Lämna elev-vyn"
         reset: "Återställ elev"
-        reset_explanation: "Att återställa testeleven kommer rensa elevens fullständiga historia, %{line_break} och låta dig visa kursen som en helt ny elev."
         warning_title: "Du är för tillfället inloggad i Elev-vyn"
     head: 
       default_page_title: "Canvas LMS"

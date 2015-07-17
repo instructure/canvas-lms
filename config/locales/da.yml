@@ -7413,7 +7413,6 @@ da:
       student_view: 
         leave: "Forlad studievisning"
         reset: "Nulstil studerende"
-        reset_explanation: "Nulstilling af teststudrende vil rydde al historie for denne studrende, %{line_break} tillader dig at se kursus som en hel ny studerende."
         warning_title: "Du er for øjeblikket logget ind i studievisning"
     head: 
       default_page_title: "Canvas LMS"

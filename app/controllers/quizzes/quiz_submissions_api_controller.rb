@@ -173,10 +173,10 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
     elsif @quiz.grants_right?(@current_user, session, :submit)
       # students have access only to their own submissions, both in progress, or completed`
       submission = @quiz.quiz_submissions.where(:user_id => @current_user).first
-      if submission.workflow_state == "untaken"
+      if submission && submission.workflow_state == "untaken"
         [submission]
       else
-        submission.submitted_attempts
+        submission && submission.submitted_attempts
       end
     end
 

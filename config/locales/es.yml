@@ -7380,7 +7380,6 @@ es:
       student_view: 
         leave: "Abandonar la vista de alumno"
         reset: "Restablecer al alumno"
-        reset_explanation: "Al restablecer al alumno de prueba se borrará todo el historial de este alumno, %{line_break} permitiendo que usted vea el curso como un alumno nuevo."
         warning_title: "Ha iniciado sesión en vista de alumno"
     head: 
       default_page_title: "Canvas LMS"

@@ -7389,7 +7389,6 @@ fr:
       student_view: 
         leave: "Quitter l’affichage étudiant"
         reset: "Réinitialiser l’étudiant"
-        reset_explanation: "La réinitialisation de l’étudiant test entraîne la suppression de l’ensemble de son historique, %{line_break}ce qui vous permettra de voir le cours en tant que nouvel étudiant."
         warning_title: "Vous êtes actuellement connecté en mode d’affichage étudiant"
     head: 
       default_page_title: "Système de gestion d’apprentissage Canvas"

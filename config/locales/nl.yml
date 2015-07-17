@@ -7397,7 +7397,6 @@ nl:
       student_view: 
         leave: "Weergave voor cursisten verlaten"
         reset: "Cursist resetten"
-        reset_explanation: "Door de toetscursist te resetten zal de hele geschiedenis van deze cursist opgeruimd worden %{line_break}zodat je de cursus als een totaal nieuwe leerling kunt bekijken."
         warning_title: "Je bent momenteel aangemeld in de weergave voor de cursist"
     head: 
       default_page_title: "Canvas LMS"
