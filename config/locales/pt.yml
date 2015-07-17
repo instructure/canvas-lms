@@ -7404,7 +7404,6 @@ pt:
       student_view: 
         leave: "Sair da vista de aluno"
         reset: "Redefinir aluno"
-        reset_explanation: "A redefinição do aluno de teste irá limpar todo o histórico relativo a este aluno, %{line_break}permitindo-lhe ver a disciplina como um aluno novo."
         warning_title: "Tem sessão iniciada na vista de aluno"
     head: 
       default_page_title: "Canvas LMS"
