@@ -2,8 +2,6 @@
 define(function(require) {
   var React = require('react');
   var I18n = require('i18n!quiz_log_auditing');
-  var Button = require('jsx!../components/button');
-  var Actions = require('../actions');
   var classSet = require('canvas_quizzes/util/class_set');
   var K = require('../constants');
   var ReactRouter = require('canvas_packages/react-router');
@@ -38,23 +36,26 @@ define(function(require) {
 
     renderQuestion: function(question) {
       var currentEventId = this.props.currentEventId;
-      var answers = this.props.events.filter(function(event) {
-        return event.type === K.EVT_QUESTION_ANSWERED
-          && event.data.some(function(record) {
+      var answers = [];
+      this.props.events.filter(function(event) {
+        return event.type === K.EVT_QUESTION_ANSWERED &&
+          event.data.some(function(record) {
             return record.quizQuestionId === question.id;
           });
-      }).sort(function(event) {
-        return event.createdAt;
+      }).sort(function(a,b) {
+        return new Date(a.createdAt) - new Date(b.createdAt);
       }).map(function(event) {
-        var record = event.data.filter(function(record) {
+        var records = event.data.filter(function(record) {
           return record.quizQuestionId === question.id;
-        })[0];
+        });
 
-        return {
-          active: event.id === currentEventId,
-          value: record.answer,
-          answered: record.answered
-        };
+        records.map(function(record) {
+          answers.push({
+            active: event.id === currentEventId,
+            value: record.answer,
+            answered: record.answered
+          });
+        });
       });
 
       return (
