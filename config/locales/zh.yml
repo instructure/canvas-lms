@@ -7407,7 +7407,6 @@ zh:
       student_view: 
         leave: 离开学生视图
         reset: 重置学生
-        reset_explanation: "重置该测试学生将清除其所有历史记录，%{line_break}允许您作为全新学生查看课程。"
         warning_title: 您当前已登录到学生视图
     head: 
       default_page_title: "Canvas LMS"
