@@ -173,7 +173,7 @@ describe "assignment groups" do
     expect(@assignment.assignment_group).to eq @assignment_group
   end
 
-  it "should reorder assignment groups with drag and drop", priority: "2", test_id: 2100010 do
+  it "should reorder assignment groups with drag and drop", priority: "2", test_id: 210010 do
     ags = [@assignment_group]
     4.times do |i|
       ags << @course.assignment_groups.create!(:name => "group_#{i}")
