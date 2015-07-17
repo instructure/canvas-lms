@@ -40,7 +40,8 @@ describe "Groups API", type: :request do
       'role' => group.group_category.role,
       'group_category_id' => group.group_category_id,
       'storage_quota_mb' => group.storage_quota_mb,
-      'leader' => group.leader
+      'leader' => group.leader,
+      'has_submission' => group.submission?
     }
     if opts[:include_users]
       json['users'] = users_json(group.users, opts)

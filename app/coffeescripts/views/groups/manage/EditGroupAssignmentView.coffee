@@ -4,9 +4,10 @@ define [
   'i18n!EditGroupAssignmentView'
   'compiled/views/DialogFormView'
   'compiled/collections/GroupCollection'
+  'compiled/views/groups/manage/GroupCategoryCloneView'
   'jst/groups/manage/editGroupAssignment'
   'jst/EmptyDialogFormWrapper'
-], ($, _, I18n, DialogFormView, GroupCollection, template, wrapper) ->
+], ($, _, I18n, DialogFormView, GroupCollection, GroupCategoryCloneView, template, wrapper) ->
 
   class EditGroupAssignmentView extends DialogFormView
 
@@ -41,8 +42,26 @@ define [
       e.preventDefault()
       e.stopPropagation()
       targetGroup = @$('option:selected').val()
-      if targetGroup then @group.collection.category.reassignUser(@model, @group.collection.get(targetGroup))
-      @close()
+
+      if targetGroup
+        if @group.get('has_submission') or @group.collection.get(targetGroup).get('has_submission')
+          @close()
+          @cloneCategoryView = new GroupCategoryCloneView
+            model: @model.collection.category
+            openedFromCaution: true
+          @cloneCategoryView.open()
+          @cloneCategoryView.on "close", =>
+            if @cloneCategoryView.cloneSuccess
+              window.location.reload()
+            else if @cloneCategoryView.changeGroups
+              @moveUser(targetGroup, false)
+        else
+          @moveUser(targetGroup, true)
+
+    moveUser: (targetGroup, closeDialog) ->
+      @group.collection.category.reassignUser(@model, @group.collection.get(targetGroup))
+      if closeDialog
+        @close()
       # focus override to the user's new group heading if they're moved
       $("[data-id='#{targetGroup}'] .group-heading")?.focus()
 

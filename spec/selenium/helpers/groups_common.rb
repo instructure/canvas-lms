@@ -153,6 +153,88 @@ def manually_fill_limited_group(member_limit ="2",student_count = 0)
   expect(f('.show-group-full')).to be_displayed
 end
 
+# Used to enable self-signup on an already created group set by opening Edit Group Set
+def manually_enable_self_signup
+  f('.icon-settings').click
+  wait_for_ajaximations
+  f('.edit-category').click
+  wait_for_ajaximations
+
+  f('.self-signup-toggle').click
+end
+
+def open_clone_group_set_option
+  f('.icon-settings').click
+  wait_for_ajaximations
+  f('.clone-category').click
+  wait_for_ajaximations
+end
+
+def set_cloned_groupset_name(groupset_name="Test Group Set Clone",page_reload=false)
+  replace_content(f('#cloned_category_name'), groupset_name)
+  if page_reload
+    expect_new_page_load {f('#clone_category_submit_button').click}
+  else
+    f('#clone_category_submit_button').click
+    wait_for_ajaximations
+  end
+end
+
+def select_randomly_assign_students_option
+  f('.icon-settings').click
+  wait_for_ajaximations
+  f('.randomly-assign-members').click
+  wait_for_ajaximations
+  f('.randomly-assign-members-confirm').click
+  wait_for_ajaximations
+end
+
+def select_change_groups_option
+  (ff('#option_change_groups').last).click
+  (ff('#clone_category_submit_button').last).click
+  wait_for_ajaximations
+end
+
+def move_unassigned_student_to_group(group=0)
+  f('.assign-to-group').click
+  wait_for_ajaximations
+  ff('.set-group')[group].click
+  wait_for_ajaximations
+end
+
+# Moves student from one group to another group. Assumes student can be seen by toggling group's collapse arrow.
+def move_student_to_group(group_destination, student=0)
+  ff('.group-user-actions')[student].click
+  wait_for_ajaximations
+  ff('.edit-group-assignment')[student].click
+  wait_for_ajaximations
+  click_option('.single-select', "#{@testgroup[group_destination].name}")
+  f('.set-group').click
+  wait_for_ajaximations
+end
+
+# Assumes student can be seen by toggling group's collapse arrow
+def remove_student_from_group(student=0)
+  ff('.group-user-actions')[student].click
+  wait_for_ajaximations
+  ff('.remove-from-group')[student].click
+  wait_for_ajaximations
+end
+
+def toggle_group_collapse_arrow
+  f('.toggle-group').click
+  wait_for_ajaximations
+end
+
+def manually_delete_group
+  f('.group-actions .icon-settings').click
+  wait_for_ajaximations
+  f('.delete-group').click
+
+  driver.switch_to.alert.accept
+  wait_for_animations
+end
+
 def delete_group
   f(".icon-settings").click
   wait_for_animations
@@ -172,4 +254,12 @@ end
 def save_group_set
   f('#newGroupSubmitButton').click
   wait_for_ajaximations
+end
+
+def create_and_submit_assignment_from_group(student)
+  category = @group_category[0]
+  assignment = @course.assignments.create({
+    :name => "test assignment",
+    :group_category => category})
+  assignment.submit_homework(student)
 end

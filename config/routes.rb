@@ -63,6 +63,12 @@ CanvasRails::Application.routes.draw do
     get 'group_unassigned_members' => 'groups#unassigned_members'
   end
 
+  resources :group_categories do
+    member do
+      post 'clone_with_name'
+    end
+  end
+
   concern :files do
     resources :files do
       get 'inline' => 'files#text_show', as: :text_inline

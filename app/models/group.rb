@@ -226,6 +226,14 @@ class Group < ActiveRecord::Base
       (self.group_category.communities? || (self.group_category.student_organized? && self.context.user_is_student?(creator)))
   end
 
+  def submission?
+    if context_type == 'Course'
+      assignments = Assignment.for_group_category(group_category_id).active
+      return Submission.where(group_id: id, assignment_id: assignments).exists?
+    end
+    false
+  end
+
   def short_name
     name
   end

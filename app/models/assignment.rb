@@ -1654,6 +1654,7 @@ class Assignment < ActiveRecord::Base
 
   scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
   scope :for_course, lambda { |course_id| where(:context_type => 'Course', :context_id => course_id) }
+  scope :for_group_category, lambda { |group_category_id| where(:group_category_id => group_category_id) }
 
   # NOTE: only use for courses with differentiated assignments on
   scope :visible_to_students_in_course_with_da, lambda { |user_id, course_id|
