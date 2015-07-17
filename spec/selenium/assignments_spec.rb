@@ -44,7 +44,7 @@ describe "assignments" do
       end
     end
 
-    it "should edit an assignment" do
+    it "should edit an assignment", priority: "1", test_id: 56012 do
       assignment_name = 'first test assignment'
       due_date = Time.now.utc + 2.days
       group = @course.assignment_groups.create!(:name => "default")
@@ -91,7 +91,7 @@ describe "assignments" do
     end
 
 
-    it "should create an assignment using main add button" do
+    it "should create an assignment using main add button", priority: "1", test_id: 132582 do
       assignment_name = 'first assignment'
       # freeze for a certain time, so we don't get unexpected ui complications
       time = Timecop.freeze(2015,1,7,2,13)
@@ -315,7 +315,7 @@ describe "assignments" do
       end
     end
 
-    context "frozen assignment", priority: "2" do
+    context "frozen assignment" do
       before do
         stub_freezer_plugin Hash[Assignment::FREEZABLE_ATTRIBUTES.map { |a| [a, "true"] }]
         default_group = @course.assignment_groups.create!(:name => "default")
