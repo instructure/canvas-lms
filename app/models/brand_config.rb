@@ -3,9 +3,10 @@ class BrandConfig < ActiveRecord::Base
 
   self.primary_key = 'md5'
   serialize :variables, Hash
-  attr_accessible :variables
 
-  validates :variables, presence: true
+  attr_accessible :variables, :js_overrides, :css_overrides
+
+  validates :variables, presence: true, unless: :overrides?
   validates :md5, length: {is: 32}
 
   before_validation :generate_md5
@@ -17,11 +18,11 @@ class BrandConfig < ActiveRecord::Base
 
   has_many :accounts, foreign_key: 'brand_config_md5'
 
-  def self.for(variables)
-    if variables.nil? || variables.empty?
+  def self.for(variables:, js_overrides:, css_overrides:)
+    if variables.blank? && js_overrides.blank? && css_overrides.blank?
       default
     else
-      new_config = new(variables: variables)
+      new_config = new(variables: variables, js_overrides: js_overrides, css_overrides: css_overrides)
       existing_config = where(md5: new_config.generate_md5).first
       existing_config || new_config
     end
@@ -32,15 +33,23 @@ class BrandConfig < ActiveRecord::Base
   end
 
   def default?
-    variables.nil? || variables.empty?
+    self.variables.blank? && self.js_overrides.blank? && self.css_overrides.blank?
   end
 
   def generate_md5
-    self.id = Digest::MD5.hexdigest(self.variables.to_s)
+    self.id = Digest::MD5.hexdigest([
+      self.variables.to_s,
+      self.css_overrides,
+      self.js_overrides
+    ].join)
   end
 
   def get_value(variable_name)
     self.variables[variable_name]
+  end
+
+  def overrides?
+    self.js_overrides.present? || self.css_overrides.present?
   end
 
   def to_scss

@@ -204,6 +204,10 @@ describe ApplicationHelper do
   end
 
   context "include_account_css" do
+    before do
+      helper.stubs(:use_new_styles?).returns(false)
+    end
+
     before :once do
       @site_admin = Account.site_admin
       @domain_root_account = Account.default
@@ -211,7 +215,7 @@ describe ApplicationHelper do
 
     context "with no custom css" do
       it "should be empty" do
-        expect(include_account_css).to be_nil
+        expect(helper.include_account_css).to be_nil
       end
     end
 
@@ -221,7 +225,7 @@ describe ApplicationHelper do
         @domain_root_account.settings = @domain_root_account.settings.merge({ :global_stylesheet => '/path/to/css' })
         @domain_root_account.save!
 
-        output = include_account_css
+        output = helper.include_account_css
         expect(output).to have_tag 'link'
         expect(output).to match %r{/path/to/css}
       end
@@ -231,7 +235,7 @@ describe ApplicationHelper do
         @site_admin.settings = @site_admin.settings.merge({ :global_stylesheet => '/path/to/css' })
         @site_admin.save!
 
-        output = include_account_css
+        output = helper.include_account_css
         expect(output).to have_tag 'link'
         expect(output).to match %r{/path/to/css}
       end
@@ -241,7 +245,7 @@ describe ApplicationHelper do
         @site_admin.settings = @site_admin.settings.merge({ :global_stylesheet => '/path/to/css' })
         @site_admin.save!
 
-        output = include_account_css
+        output = helper.include_account_css
         expect(output).to have_tag 'link'
         expect(output.scan(%r{/path/to/css}).length).to eql 1
       end
@@ -255,7 +259,7 @@ describe ApplicationHelper do
         @domain_root_account.settings = @domain_root_account.settings.merge({ :global_stylesheet => '/path/to/root/css' })
         @domain_root_account.save!
 
-        output = include_account_css
+        output = helper.include_account_css
         expect(output).to have_tag 'link'
         expect(output.scan(%r{/path/to/(root/|admin/)?css})).to eql [['admin/'], ['root/']]
       end
@@ -266,7 +270,7 @@ describe ApplicationHelper do
         @domain_root_account.save!
 
         params[:global_includes] = '0'
-        output = include_account_css
+        output = helper.include_account_css
         expect(output).to be_nil
       end
     end
@@ -294,21 +298,21 @@ describe ApplicationHelper do
 
       it "should include sub-account css" do
         @context = @sub_account1
-        output = include_account_css
+        output = helper.include_account_css
         expect(output).to have_tag 'link'
         expect(output.scan(%r{/path/to/(sub1/|sub2/|root/|admin/)?css})).to eql [['admin/'], ['root/'], ['sub1/']]
       end
 
       it "should not include sub-account css when root account is context" do
         @context = @domain_root_account
-        output = include_account_css
+        output = helper.include_account_css
         expect(output).to have_tag 'link'
         expect(output.scan(%r{/path/to/(sub1/|sub2/|root/|admin/)?css})).to eql [['admin/'], ['root/']]
       end
 
       it "should include sub-account css for course context" do
         @context = @sub_account1.courses.create!
-        output = include_account_css
+        output = helper.include_account_css
         expect(output).to have_tag 'link'
         expect(output.scan(%r{/path/to/(sub1/|sub2/|root/|admin/)?css})).to eql [['admin/'], ['root/'], ['sub1/']]
       end
@@ -316,7 +320,7 @@ describe ApplicationHelper do
       it "should include sub-account css for group context" do
         @course = @sub_account1.courses.create!
         @context = @course.groups.create!
-        output = include_account_css
+        output = helper.include_account_css
         expect(output).to have_tag 'link'
         expect(output.scan(%r{/path/to/(sub1/|sub2/|root/|admin/)?css})).to eql [['admin/'], ['root/'], ['sub1/']]
       end
@@ -327,7 +331,7 @@ describe ApplicationHelper do
         student_in_course(:active_all => true)
         @context = @user
         @current_user = @user
-        output = include_account_css
+        output = helper.include_account_css
         expect(output).to have_tag 'link'
         expect(output.scan(%r{/path/to/(sub1/|sub2/|root/|admin/)?css})).to eql [['admin/'], ['root/'], ['sub1/']]
       end
@@ -341,7 +345,7 @@ describe ApplicationHelper do
         student_in_course(:active_all => true, :course => @course2, :user => @user)
         @context = @user
         @current_user = @user
-        output = include_account_css
+        output = helper.include_account_css
         expect(output).to have_tag 'link'
         expect(output.scan(%r{/path/to/(sub1/|sub2/|root/|admin/)?css})).to eql [['admin/'], ['root/']]
       end
@@ -352,7 +356,7 @@ describe ApplicationHelper do
         @sub_sub_account1.save!
 
         @context = @sub_sub_account1.courses.create!
-        output = include_account_css
+        output = helper.include_account_css
         expect(output).to have_tag 'link'
         expect(output.scan(%r{/path/to/(subsub1/|sub1/|sub2/|root/|admin/)?css})).to eql [['admin/'], ['root/'], ['sub1/'], ['subsub1/']]
       end
@@ -367,7 +371,7 @@ describe ApplicationHelper do
         student_in_course(:active_all => true)
         @context = @user
         @current_user = @user
-        output = include_account_css
+        output = helper.include_account_css
         expect(output).to have_tag 'link'
         expect(output.scan(%r{/path/to/(subsub1/|sub1/|sub2/|root/|admin/)?css})).to eql [['admin/'], ['root/'], ['sub1/'], ['subsub1/']]
       end
@@ -375,6 +379,10 @@ describe ApplicationHelper do
   end
 
   describe "include_account_js" do
+    before do
+      helper.stubs(:use_new_styles?).returns(false)
+    end
+
     before :once do
       @site_admin = Account.site_admin
       @domain_root_account = Account.default
@@ -382,7 +390,7 @@ describe ApplicationHelper do
 
     context "with no custom js" do
       it "should be empty" do
-        expect(include_account_js).to be_nil
+        expect(helper.include_account_js).to be_nil
       end
     end
 
@@ -392,7 +400,7 @@ describe ApplicationHelper do
         @domain_root_account.settings = @domain_root_account.settings.merge({ :global_javascript => '/path/to/js' })
         @domain_root_account.save!
 
-        output = include_account_js
+        output = helper.include_account_js
         expect(output).to have_tag 'script'
         expect(output).to match %r{\\?/path\\?/to\\?/js}
       end
@@ -402,7 +410,7 @@ describe ApplicationHelper do
         @site_admin.settings = @site_admin.settings.merge({ :global_javascript => '/path/to/js' })
         @site_admin.save!
 
-        output = include_account_js
+        output = helper.include_account_js
         expect(output).to have_tag 'script'
         expect(output).to match %r{\\?/path\\?/to\\?/js}
       end
@@ -416,7 +424,7 @@ describe ApplicationHelper do
         @site_admin.settings = @site_admin.settings.merge({ :global_javascript => '/path/to/admin/js' })
         @site_admin.save!
 
-        output = include_account_js
+        output = helper.include_account_js
         expect(output).to have_tag 'script'
         expect(output.scan(%r{\\?/path\\?/to\\?/(admin|root)?\\?/?js})).to eql [['admin'], ['root']]
       end
@@ -424,18 +432,22 @@ describe ApplicationHelper do
   end
 
   context "global_includes" do
+    before do
+      helper.stubs(:use_new_styles?).returns(false)
+    end
+
     it "should only compute includes once, with includes" do
       @site_admin = Account.site_admin
       @site_admin.expects(:global_includes_hash).once.returns({:css => "/path/to/css", :js => "/path/to/js"})
-      expect(include_account_css).to match %r{/path/to/css}
-      expect(include_account_js).to match %r{\\?/path\\?/to\\?/js}
+      expect(helper.include_account_css).to match %r{/path/to/css}
+      expect(helper.include_account_js).to match %r{\\?/path\\?/to\\?/js}
     end
 
     it "should only compute includes once, with includes" do
       @site_admin = Account.site_admin
       @site_admin.expects(:global_includes_hash).once.returns(nil)
-      expect(include_account_css).to be_nil
-      expect(include_account_js).to be_nil
+      expect(helper.include_account_css).to be_nil
+      expect(helper.include_account_js).to be_nil
     end
   end
 

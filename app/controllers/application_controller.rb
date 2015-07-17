@@ -1677,6 +1677,17 @@ class ApplicationController < ActionController::Base
   end
   helper_method :active_brand_config
 
+  def brand_config_includes
+    return @brand_config_includes if defined? @brand_config_includes
+    includes = {}
+    if @domain_root_account.allow_global_includes? && active_brand_config.present?
+      includes[:js] = active_brand_config[:js_overrides] if active_brand_config[:js_overrides].present?
+      includes[:css] = active_brand_config[:css_overrides] if active_brand_config[:css_overrides].present?
+    end
+    includes
+  end
+  helper_method :brand_config_includes
+
   def css_bundles
     @css_bundles ||= []
   end

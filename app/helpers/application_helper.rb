@@ -672,8 +672,13 @@ module ApplicationHelper
 
   def include_account_js(options = {})
     return if params[:global_includes] == '0'
-    includes = get_global_includes.map do |global_include|
-      global_include[:js] if global_include[:js].present?
+    if use_new_styles? 
+      includes = []
+      includes << brand_config_includes[:js] if brand_config_includes[:js].present?
+    else
+      includes = get_global_includes.map do |global_include|
+        global_include[:js] if global_include[:js].present?
+      end
     end
     includes.compact!
     if includes.length > 0
@@ -703,14 +708,19 @@ module ApplicationHelper
   end
 
   def include_account_css
-    return if params[:global_includes] == '0' || @domain_root_account.try(:feature_enabled?, :use_new_styles)
-    includes = get_global_includes.inject([]) do |css_includes, global_include|
-      css_includes << global_include[:css] if global_include[:css].present?
-      css_includes
+    return if params[:global_includes] == '0'
+    if use_new_styles? 
+      includes = [] 
+      includes << brand_config_includes[:css] if  brand_config_includes[:css].present? 
+    else
+      includes = get_global_includes.inject([]) do |css_includes, global_include|
+        css_includes << global_include[:css] if global_include[:css].present?
+        css_includes
+      end
     end
     if includes.length > 0
       includes << { :media => 'all' }
-      stylesheet_link_tag *includes
+      stylesheet_link_tag(*includes)
     end
   end
 

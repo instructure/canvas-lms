@@ -37,11 +37,17 @@ body, html {height: 100vh;margin: 0; padding: 0;}
 $te-bgd: $ic-color-neutral;
 $te-content-bgd: $ic-color-light;
 $te-border-color: darken($ic-color-neutral, 10);
+$te-input-height: 30px;
 //// Layout for Theme editor
 ///////
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 .Theme__container {
   height: 100vh;
   display: flex;
+  opacity: 0.01;
+  animation: fadeIn ease-in 1;
+  animation-fill-mode:forwards;
+  animation-duration: 0.2s;
 }
 .Theme__editor {
   height: 100vh;
@@ -135,58 +141,138 @@ $te-border-color: darken($ic-color-neutral, 10);
   color: $ic-color-light;
   background: lighten($ic-color-dark, 20);
   padding: $ic-sp;
-  border-top: 1px solid $te-border-color;
   border-bottom: 1px solid $te-border-color;
 
   select {
     margin: 0;
   }
 }
+
 //// Tabs for Theme Editor
 ///////
+.Theme__editor-tabs {
+  background: $gray-darker;
 
-@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-.Theme__container {
-  opacity: 0.01;
-  animation: fadeIn ease-in 1;
-  animation-fill-mode:forwards;
-  animation-duration: 0.2s;
-}
-//// TE Panel Header
-///////
-// TODO: get tabs working properly
-.Theme__editor-tabs_list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.Theme__editor-tabs_panel {
-  color: $ic-color-light;
-}
-.Theme__editor-tabs_list {
-  background: $ic-color-neutral;
-}
-.Theme__editor-tabs_list-item {
-  font-size: 16px;
-  font-weight: 300;
-  padding: $ic-sp;
-  flex: 1;
-  text-align: center;
-  &:hover {
-    background: darken($ic-color-neutral, 10);
-    text-decoration: none;
-    @if $use_high_contrast {text-decoration: underline;}
+  $te-tab-text-color: darken($ic-color-light, 10);
+  $te-tab-text-color-hover: $ic-color-light;
+
+  .Theme__editor-tabs_item {
+    color: $te-tab-text-color;
+    padding: $ic-sp;
+    display: inline-block;
+    font-size: 14px;
+    margin: 0;
+    cursor: pointer;
+    font-weight: normal;
+    vertical-align: 0;
+
+    &:hover, &:focus {
+      color: $te-tab-text-color-hover;
+    }
+  }
+
+  .Theme__editor-tabs_input {
+    opacity: 0;
+    position: absolute;
+    top: 0; left: 0;
+  }
+
+  .Theme__editor-tabs_panel {
+    border-top: 1px solid $te-border-color;
+  }
+
+  #te-editor:checked ~ #te-editor-tab,
+  #te-upload:checked ~ #te-upload-tab {
+     position: relative;
+     cursor: default;
+
+    &:before {
+      content: "";
+      border: 8px transparent solid;
+      width: 0; height: 0;
+      border-bottom-color: lighten($ic-color-dark, 20);
+      position: absolute;
+      bottom: 0;
+      left: 0; right: 0;
+      margin: 0 auto;
+    }
+
+    &:hover {
+      color: $te-tab-text-color;
+    }
+  }
+
+  #te-upload:checked ~ #te-upload-tab:before {
+    border-bottom-color: $te-bgd;
+  }
+
+  #te-editor:checked ~ #te-upload-panel,
+  #te-upload:checked ~ #te-editor-panel {
+    display: none;
+  }
+
+  .Theme__editor-tabs_item ~ .Theme__editor-tabs_panel {
+    border: none;
   }
 }
-.Theme__editor-tabs_list-item_link {
-  display: inline-block;
-  color: $ic-color-dark;
-  text-decoration: none;
-  @if $use_high_contrast {text-decoration: underline;}
 
+
+//// File Upload styles for Theme Editor
+///////
+
+.Theme__editor-upload-overrides {
+  background-color: $te-bgd;
+  color: $ic-color-dark;
+
+  .Theme__editor-upload-overrides_header {
+    font-weight: 300;
+    padding: $ic-sp;
+  }
+
+  .Theme__editor-upload-overrides_form {
+    background: $te-content-bgd;
+    color: $ic-color-light;
+  }
+}
+
+.ThemeEditorFileUpload {
+  padding: $ic-sp;
+  width: 100%;
+}
+
+.ThemeEditorFileUpload__file-chooser {
+  display: flex;
+  flex: 1;
+
+  input[type="file"] {
+    position: absolute;
+    top: 0; left: -9999px;
+    opacity: 0;
+  }
+}
+
+.ThemeEditorFileUpload__fake-input {
+  color: $gray-light;
+  white-space: nowrap;
+  overflow: hidden;
+  display: inline-block;
+  cursor: default;
+
+  input[type="file"]:focus ~ & {
+    border-color: $ic-brand-primary;
+  }
+}
+
+.ThemeEditorFileUpload__reset-button {
+  min-width: 44px;
+  cursor: pointer;
+  justify-content: center;
+
+  &:disabled {
+    cursor: default;
+  }
+  
+  @if $use_high_contrast == false { outline: none; }
 }
 
 //// Accordion styles for Theme Editor
@@ -346,7 +432,7 @@ $te-border-color: darken($ic-color-neutral, 10);
     border: none;
     outline: none;
   }
-  $te-input-height: 30px;
+  
   .Theme__editor-color-block_input-text {
     width: 75px;
     height: $te-input-height;
@@ -447,18 +533,18 @@ $te-border-color: darken($ic-color-neutral, 10);
     display: flex;
     align-items: center;
     justify-content: space-around;
+
     .Theme__editor-image_upload-label {
       margin-bottom: 0;
+      position: relative;
     }
     .Theme__editor-button_upload {
       width: 100%;
     }
     .Theme__editor-input_upload {
       position: absolute;
-      top: 0;
-      left: 0;
-      visibility: hidden;
-      z-index: 1;
+      top: 0; left: -9999px;
+      opacity: 0;
     }
     .Theme__editor-input_resets {
       z-index: 2; // make sure these go over the hidden input box

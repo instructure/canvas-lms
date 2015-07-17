@@ -3,6 +3,7 @@
 define([
   'i18n!theme_editor',
   'react',
+  'jquery',
   'react-modal',
   'underscore',
   'str/htmlEscape',
@@ -11,15 +12,33 @@ define([
   'compiled/react_files/components/ProgressBar',
   './PropTypes',
   './ThemeEditorAccordion',
-  './SharedBrandConfigPicker'
-], (I18n, React, Modal, _, htmlEscape, preventDefault, Progress, ProgressBar, customTypes, ThemeEditorAccordion, SharedBrandConfigPicker) => {
+  './SharedBrandConfigPicker',
+  './ThemeEditorFileUpload'
+], (I18n, React, $, Modal, _, htmlEscape, preventDefault, Progress, ProgressBar, customTypes, ThemeEditorAccordion, SharedBrandConfigPicker, ThemeEditorFileUpload) => {
+
+/*eslint no-alert:0*/
 
   Modal.setAppElement(document.body)
+
+  var TABS = [
+    {
+      id: 'te-editor',
+      label: I18n.t('Edit'),
+      value: 'edit',
+      selected: true
+    },
+    {
+      id: 'te-upload',
+      label: I18n.t('Upload'),
+      value: 'upload',
+      selected: false
+    }
+  ];
 
   function findVarDef (variableSchema, variableName) {
     for (var i = 0; i < variableSchema.length; i++) {
       for (var j = 0; j < variableSchema[i].variables.length; j++) {
-        var varDef =  variableSchema[i].variables[j]
+        var varDef = variableSchema[i].variables[j]
         if (varDef.variable_name === variableName){
           return varDef
         }
@@ -45,7 +64,8 @@ define([
       brandConfig: customTypes.brandConfig,
       hasUnsavedChanges: React.PropTypes.bool.isRequired,
       variableSchema: customTypes.variableSchema,
-      sharedBrandConfigs: customTypes.sharedBrandConfigs
+      sharedBrandConfigs: customTypes.sharedBrandConfigs,
+      allowGlobalIncludes: React.PropTypes.bool
     },
 
     getInitialState() {
@@ -63,7 +83,7 @@ define([
     },
 
     changeSomething(variableName, newValue, isInvalid) {
-      var change = {val: newValue, invalid: isInvalid}
+      var change = { val: newValue, invalid: isInvalid }
       this.state.changedValues[variableName] = change
       this.setState({
         changedValues: this.state.changedValues
@@ -76,9 +96,9 @@ define([
 
     somethingHasChanged() {
       return _.any(this.state.changedValues, (change, key) => {
-        var changedToNonDefault = change.val && (change.val != this.getDefault(key))
-        var changedBackToNothing = !change.val && this.getBrandConfigVar(key)
-        return changedToNonDefault || changedBackToNothing
+        // null means revert an unsaved change (should revert to saved brand config or fallback to default and not flag as a change)
+        // '' means clear a brand config value (should set to schema default and flag as a change)
+        return change.val === '' || (change.val !== this.getDefault(key) && change.val !== null)
       })
     },
 
@@ -91,7 +111,7 @@ define([
       // try getting the value from the active brand config next, but
       // distinguish "wasn't changed" from "was changed to '', meaning we want
       // to remove the brand config's value"
-      if (!val && val !== '') val = this.getBrandConfigVar(variableName)
+      if (!val && val !== '') val = this.getBrandConfig(variableName)
 
       // finally, resort to the default (which may recurse into looking up
       // another variable)
@@ -108,12 +128,14 @@ define([
       return this.getDisplayValue(variableName, {ignoreChanges: true})
     },
 
-    getBrandConfigVar(variableName) {
-      return this.props.brandConfig.variables[variableName]
+    getBrandConfig(variableName) {
+      return this.props.brandConfig[variableName] || this.props.brandConfig.variables[variableName]
     },
 
     getSchemaDefault(variableName, opts) {
-      val = findVarDef(this.props.variableSchema, variableName).default
+      var varDef = findVarDef(this.props.variableSchema, variableName)
+      var val = varDef ? varDef.default : null
+
       if (val && val[0] === '$') return this.getDisplayValue(val.slice(1), opts)
       return val
     },
@@ -126,7 +148,7 @@ define([
       if (this.props.hasUnsavedChanges || this.somethingHasChanged()) {
         var msg = I18n.t('You are about to lose any changes that you have not yet applied to your account.\n\n' +
                          'Would you still like to proceed?')
-        if (!confirm(msg)) {
+        if (!window.confirm(msg)) {
           return;
         }
       }
@@ -135,9 +157,8 @@ define([
 
     handleApplyClicked() {
       var msg = I18n.t('This will apply these changes to your entire account. Would you like to proceed?')
-      if (confirm(msg)) submitHtmlForm('/brand_configs/save_to_account', 'POST')
+      if (window.confirm(msg)) submitHtmlForm('/brand_configs/save_to_account', 'POST')
     },
-
 
     handleFormSubmit() {
       var newMd5
@@ -160,9 +181,37 @@ define([
       })
       .pipe(() => this.saveToSession(newMd5))
       .fail(() => {
-        alert(I18n.t('An error occurred trying to generate this theme, please try again.'))
+        window.alert(I18n.t('An error occurred trying to generate this theme, please try again.'))
         this.setState({showProgressModal: false})
       })
+    },
+
+    renderTabInputs() {
+      return this.props.allowGlobalIncludes ? TABS.map( (tab) => {
+        return (
+          <input type="radio"
+            id={tab.id}
+            key={tab.id}
+            name="te-action"
+            defaultValue={tab.value}
+            className="Theme__editor-tabs_input"
+            defaultChecked={tab.selected} />
+        );
+      }) : null;
+    },
+
+    renderTabLabels() {
+      return this.props.allowGlobalIncludes ? TABS.map( (tab) => {
+        return (
+          <label
+            htmlFor={tab.id}
+            key={`${tab.id}-tab`}
+            className="Theme__editor-tabs_item"
+            id={`${tab.id}-tab`}>
+              {tab.label}
+          </label>
+        );
+      }) : null;
     },
 
     render() {
@@ -217,6 +266,11 @@ define([
               </div>
 
               <div className="Theme__editor-tabs">
+
+                { this.renderTabInputs() }
+
+                { this.renderTabLabels() }
+
                 <div id="te-editor-panel" className="Theme__editor-tabs_panel">
                   <SharedBrandConfigPicker
                     sharedBrandConfigs={this.props.sharedBrandConfigs}
@@ -233,6 +287,40 @@ define([
                     changeSomething={this.changeSomething}
                   />
                 </div>
+
+                { this.props.allowGlobalIncludes ?
+                  <div id="te-upload-panel" className="Theme__editor-tabs_panel">
+                    <div className="Theme__editor-upload-overrides">
+
+                      <div className="Theme__editor-upload-overrides_header">
+                        { I18n.t('Upload CSS and JavaScript files to include on all page loads for your account') }
+                      </div>
+
+                      <div className="Theme__editor-upload-overrides_form">
+
+                        <ThemeEditorFileUpload
+                          label={I18n.t('Upload a CSS file...')}
+                          accept=".css"
+                          name="css_overrides"
+                          currentValue={this.props.brandConfig.css_overrides}
+                          userInput={this.state.changedValues.css_overrides}
+                          onChange={this.changeSomething.bind(null, 'css_overrides')}
+                        />
+
+                        <ThemeEditorFileUpload
+                          label={I18n.t('Upload a JS file...')}
+                          accept=".js"
+                          name="js_overrides"
+                          currentValue={this.props.brandConfig.js_overrides}
+                          userInput={this.state.changedValues.js_overrides}
+                          onChange={this.changeSomething.bind(null, 'js_overrides')}
+                        />
+
+                      </div>
+                    </div>
+                  </div>
+                : null}
+
               </div>
               <div className="Theme__preview">
                 { this.somethingHasChanged() ?

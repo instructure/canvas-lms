@@ -48,7 +48,7 @@ define([
     variables: React.PropTypes.arrayOf(types.varDef).isRequired
   })
 
-  types.userColorInput = React.PropTypes.shape({
+  types.userVariableInput = React.PropTypes.shape({
     val: React.PropTypes.string,
     invalid: React.PropTypes.bool
   })
