@@ -106,7 +106,6 @@ describe "assignment groups" do
   it "should edit assignment groups grade weights", priority: "1", test_id: 120675 do
     @course.update_attribute(:group_weighting_scheme, 'percent')
     ag1 = @course.assignment_groups.create!(name: "first group")
-    ag2 = @course.assignment_groups.create!(name: "second group")
 
     get "/courses/#{@course.id}/assignments"
 
@@ -271,6 +270,41 @@ describe "assignment groups" do
       wait_for_ajaximations
       fj("#ag_#{ag.id}_assignment_name").displayed?
     end
+  end
+
+  it "should correctly add group weights", priority: "2", test_id: 237014 do
+    @course.update_attribute(:group_weighting_scheme, 'percent')
+    ag1 = @course.assignment_groups.create!(name: 'Group 1')
+    ag2 = @course.assignment_groups.create!(name: 'Group 2')
+
+    get "/courses/#{@course.id}/assignments"
+
+    # setting weight for group 1
+    f("#ag_#{ag1.id}_manage_link").click
+    fj(".edit_group:visible:first").click
+
+    fj('input[name="group_weight"]:visible').send_keys('50')
+
+    fj('.create_group:visible').click
+    wait_for_ajaximations
+
+    # setting weight for group 2
+    f("#ag_#{ag2.id}_manage_link").click
+    fj(".edit_group:visible:first").click
+
+    fj('input[name="group_weight"]:visible').send_keys('40')
+
+    fj('.create_group:visible').click
+    wait_for_ajaximations
+
+    # validations
+    keep_trying_until { expect(f("#assignment_group_#{ag1.id} .ag-header-controls").text).to include('50% of Total') }
+    keep_trying_until { expect(f("#assignment_group_#{ag2.id} .ag-header-controls").text).to include('40% of Total') }
+
+    f("#assignmentSettingsCog").click
+    wait_for_ajaximations
+    # assignment settings Total should == 90%
+    expect(f("#percent_total").text).to match '90%'
   end
 
   context "frozen assignment group" do
