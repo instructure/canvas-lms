@@ -175,6 +175,9 @@ class RubricAssessment < ActiveRecord::Base
     given {|user, session| self.rubric_association && self.rubric_association.grants_right?(user, session, :manage) }
     can :create and can :read and can :delete
 
+    given {|user, session| self.rubric_association && self.rubric_association.grants_right?(user, session, :view_rubric_assessments) }
+    can :read
+
     given {|user, session|
       self.rubric_association &&
       self.rubric_association.grants_right?(user, session, :manage) &&
@@ -186,6 +189,7 @@ class RubricAssessment < ActiveRecord::Base
       self.can_read_assessor_name?(user, session)
     }
     can :read_assessor
+
   end
 
   scope :of_type, lambda { |type| where(:assessment_type => type.to_s) }
@@ -207,6 +211,7 @@ class RubricAssessment < ActiveRecord::Base
   end
 
   def can_read_assessor_name?(user, session)
+    self.assessment_type == 'grading' ||
     !self.considered_anonymous? ||
     self.assessor_id == user.id ||
     self.rubric_association.association_object.context.grants_right?(

@@ -27,7 +27,7 @@ describe 'SetSamlEntityId' do
     HostUrl.stubs(:default_host).returns('bob.cody.instructure.com')
     @account = Account.new
     @account.save
-    @aac = @account.account_authorization_configs.create!(:auth_type => "saml")
+    @aac = @account.authentication_providers.create!(:auth_type => "saml")
     AccountAuthorizationConfig.where(:id => @aac).update_all(:entity_id => nil)
   end
   

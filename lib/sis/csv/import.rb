@@ -59,7 +59,7 @@ module SIS
         @total_rows = 1
         @current_row = 0
         @current_row_for_pause_vars = 0
-    
+
         @progress_multiplier = opts[:progress_multiplier] || 1
         @progress_offset = opts[:progress_offset] || 0
 
@@ -82,7 +82,7 @@ module SIS
         @parallel_queue = nil if @parallel_queue.blank?
         update_pause_vars
       end
-    
+
       def self.process(root_account, opts = {})
         importer = Import.new(root_account, opts)
         importer.process
@@ -194,28 +194,28 @@ module SIS
         @tmp_dirs.each do |tmp_dir|
           FileUtils.rm_rf(tmp_dir, :secure => true) if File.directory?(tmp_dir)
         end
-      
+
         if @batch && @parallelism == 1
           @batch.data[:counts] = @counts
           @batch.processing_errors = @errors
           @batch.processing_warnings = @warnings
           @batch.save
         end
-      
+
         if @allow_printing and !@errors.empty? and !@batch
           # If there's no batch, then we must be working via the console and we should just error out
           @errors.each { |w| puts w.join ": " }
         end
       end
-    
+
       def logger
         @logger ||= Rails.logger
       end
-    
+
       def add_error(csv, message)
         @errors << [ csv ? csv[:file] : "", message ]
       end
-    
+
       def add_warning(csv, message)
         @warnings << [ csv ? csv[:file] : "", message ]
       end
@@ -339,7 +339,7 @@ module SIS
         @pause_every = (@batch.data[:pause_every] || Setting.get('sis_batch_pause_every', 100)).to_i
         @pause_duration = (@batch.data[:pause_duration] || Setting.get('sis_batch_pause_duration', 0)).to_f
       end
-    
+
       def rebalance_csvs(importer)
         rows_per_batch = (@rows[importer].to_f / @parallelism).ceil.to_i
         new_csvs = []
@@ -395,23 +395,11 @@ module SIS
         end
         @csvs[importer] = new_csvs
       end
-    
+
       def process_file(base, file)
         csv = { :base => base, :file => file, :fullpath => File.join(base, file) }
         if File.file?(csv[:fullpath]) && File.extname(csv[:fullpath]).downcase == '.csv'
-          # validate UTF-8
-          begin
-            Iconv.open('UTF-8', 'UTF-8') do |iconv|
-              File.open(csv[:fullpath]) do |file|
-                chunk = file.read(4096)
-                while chunk
-                  iconv.iconv(chunk)
-                  chunk = file.read(4096)
-                end
-                iconv.iconv(nil)
-              end
-            end
-          rescue Iconv::Failure
+          unless valid_utf8?(csv[:fullpath])
             add_error(csv, I18n.t("Invalid UTF-8"))
             return
           end
@@ -436,6 +424,38 @@ module SIS
         elsif !File.directory?(csv[:fullpath]) && !(csv[:fullpath] =~ IGNORE_FILES)
           add_warning(csv, I18n.t("Skipping unknown file type"))
         end
+      end
+
+      def valid_utf8?(path)
+        # validate UTF-8
+        Iconv.open('UTF-8', 'UTF-8') do |iconv|
+          File.open(path) do |file|
+            chunk = file.read(4096)
+            error_count = 0
+
+            while chunk
+              begin
+                iconv.iconv(chunk)
+              rescue Iconv::Failure
+                error_count += 1
+                if !file.eof? && error_count <= 4
+                  # we may have split a utf-8 character in the chunk - try to resolve it, but only to a point
+                  chunk << file.read(1)
+                  next
+                else
+                  raise
+                end
+              end
+
+              error_count = 0
+              chunk = file.read(4096)
+            end
+            iconv.iconv(nil)
+          end
+        end
+        true
+      rescue Iconv::Failure
+        false
       end
     end
   end

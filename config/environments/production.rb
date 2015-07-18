@@ -17,9 +17,6 @@ environment_configuration(defined?(config) && config) do |config|
   cache_store_rb = File.dirname(__FILE__) + "/cache_store.rb"
   eval(File.new(cache_store_rb).read, nil, cache_store_rb, 1)
 
-  # eval <env>-local.rb if it exists
-  Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) }
-
   # Specifies the header that your web server uses for directly sending files
   # If you have mod_xsendfile enabled in apache:
   # config.action_dispatch.x_sendfile_header = 'X-Sendfile'
@@ -59,4 +56,7 @@ environment_configuration(defined?(config) && config) do |config|
   unless CANVAS_RAILS3
     config.eager_load = true
   end
+
+  # eval <env>-local.rb if it exists
+  Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) }
 end

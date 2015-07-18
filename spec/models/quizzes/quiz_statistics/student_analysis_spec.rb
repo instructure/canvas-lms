@@ -235,7 +235,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       @quiz.context.root_account.any_instantiation.stubs(:trusted_account_ids).returns([account2.id])
 
       qs = @quiz.generate_submission(@student)
-      qs.grade_submission
+      Quizzes::SubmissionGrader.new(qs).grade_submission
       stats = CSV.parse(csv(:include_all_versions => true))
       expect(stats[1][3]).to eq 'school1'
     end

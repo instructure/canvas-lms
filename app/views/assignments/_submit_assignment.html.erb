@@ -36,7 +36,7 @@
         <li><a href="#submit_from_external_tool_form_<%= external_tool.id %>"
           class="external-tool"
           data-id="<%= external_tool.id %>"
-          data-name="<%= external_tool.name %>"><%= external_tool.name %></a></li>
+          data-name="<%= external_tool.name %>"><%= external_tool.label_for(:homework_submission, I18n.locale) %></a></li>
       <% end %>
       <% if @external_tools.length > 3 %>
         <li><a href="#submit_from_external_tool_form" class="submit_from_external_tool_option"><%= t 'links.submit.external_tool', "More" %></a></li>

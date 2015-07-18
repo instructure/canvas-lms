@@ -111,5 +111,24 @@ module AssignmentOverridesSeleniumHelper
     @user = user
   end
 
+  def add_user_specific_due_date_override(assignment, opts = {})
+    user = @user
+    new_section = @course.course_sections.create!(:name => 'New Section')
+    student_in_section(new_section)
+    override = assignment.assignment_overrides.build
+    override.set = new_section
+    override.due_at = opts.fetch(:due_at, Time.zone.now.advance(days:3))
+    override.due_at_overridden = true
+    override.lock_at = opts.fetch(:lock_at, Time.zone.now.advance(days:3))
+    override.lock_at_overridden = true
+    override.unlock_at = opts.fetch(:unlock_at, Time.zone.now.advance(days:-1))
+    override.unlock_at_overridden = true
+    override.save!
+    @user = user
+    @override = override
+    @new_section = new_section
+  end
+
+
 end
 

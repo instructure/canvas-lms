@@ -23,7 +23,7 @@ module Importers
       end
     end
 
-    def self.import_from_migration(hash, context, migration=nil, item=nil)
+    def self.import_from_migration(hash, context, migration, item=nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:grading_standards_to_import] && !hash[:grading_standards_to_import][hash[:migration_id]]
       item ||= GradingStandard.where(context_id: context, context_type: context.class.to_s, migration_id: hash[:migration_id]).first if hash[:migration_id]
@@ -38,7 +38,7 @@ module Importers
       end
 
       item.save!
-      migration.add_imported_item(item) if migration
+      migration.add_imported_item(item)
       item
     end
   end

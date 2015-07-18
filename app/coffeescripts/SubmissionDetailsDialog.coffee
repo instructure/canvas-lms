@@ -29,8 +29,9 @@ define [
         speedGraderUrl: speedGraderUrl
         loading: true
         showPointsPossible: (@assignment.points_possible || @assignment.points_possible == '0') && @assignment.grading_type != "gpa_scale"
+        shouldShowExcusedOption: true
       @submission["assignment_grading_type_is_#{@assignment.grading_type}"] = true
-
+      @submission.grade = "EX" if @submission.excused
       @$el = $('<div class="use-css-transitions-for-show-hide" style="padding:0;"/>')
       @$el.html(submissionDetailsDialog(@submission))
 
@@ -45,7 +46,7 @@ define [
       .delegate '.submission_details_grade_form', 'submit', (event) =>
         event.preventDefault()
         formData = $(event.currentTarget).getFormData()
-        if formData["submission[posted_grade]"] == "EX"
+        if formData["submission[posted_grade]"].toUpperCase() == "EX"
           formData = {"submission[excuse]": true}
         $(event.currentTarget.form).disableWhileLoading $.ajaxJSON @url, 'PUT', formData, (data) =>
           @update(data)
@@ -84,12 +85,10 @@ define [
         submission.turnitin = extractDataFor(submission, "submission_#{submission.id}", @options.context_url)
         for attachment in submission.attachments || []
           attachment.turnitin = extractDataFor(submission, "attachment_#{attachment.id}", @options.context_url)
+      @submission.grade = "EX" if @submission.excused
       @dialog.html(submissionDetailsDialog(@submission))
       @dialog.find('select').trigger('change')
       @scrollCommentsToBottom()
 
-    @cachedDialogs: {}
-
     @open: (assignment, student, options) ->
-      (SubmissionDetailsDialog.cachedDialogs["#{assignment.id}-#{student.id}"] ||= new SubmissionDetailsDialog(assignment, student, options)).open()
-
+      new SubmissionDetailsDialog(assignment, student, options).open()

@@ -59,3 +59,29 @@ define [
     dialog.open()
 
     equal dialog.dialog.find('.submisison-attachment').length, 3
+
+  module '_grading_box',
+
+    setup: ->
+      @assignment = new Assignment(id: 1, name: 'Test assignment', due_at: "2014-04-14T00:00:00Z")
+      @user       = { assignment_1: { submitted_at: "2014-04-20T00:00:00Z" }, id: 1, name: 'Test student' }
+      @options    = { speed_grader_enabled: false, change_grade_url: ':assignment/:student' }
+    teardown: ->
+      $('.submission_details_dialog').remove()
+
+  test "displays the grade as 'EX' if the submission is excused", ->
+    @assignment.grading_type = 'points'
+    @user.assignment_1.excused = true
+    dialog = new SubmissionDetailsDialog(@assignment, @user, @options)
+    dialog.open()
+    inputText = $('#student_grading_1').val()
+
+    deepEqual inputText, 'EX'
+
+  test "allows teacher to change grade to 'Ex'", ->
+    @assignment.grading_type = 'pass_fail'
+    dialog = new SubmissionDetailsDialog(@assignment, @user, @options)
+    dialog.open()
+
+    excusedOptionText = $('.grading_value option')[3].text
+    deepEqual excusedOptionText, 'Excused'

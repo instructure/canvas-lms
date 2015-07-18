@@ -31,6 +31,10 @@ describe GradingPeriodsController, type: :request do
 
     context "multiple grading periods feature flag turned on" do
       describe 'POST create' do
+        let(:weight) { 99 }
+        let(:start_date) { 5.months.since(now) }
+        let(:end_date) { 8.months.since(now) }
+        let(:now) { Time.zone.now.change(usec: 0) }
 
         def post_create(params, raw=false)
           helper = method(raw ? :raw_api_call : :api_call)
@@ -41,10 +45,16 @@ describe GradingPeriodsController, type: :request do
                       { grading_periods: [params] }, {}, {})
         end
 
-        it "creates a grading period successfully" do
-          now = Time.zone.now.change(usec: 0)
-          post_create(title: 'a title', weight: 99, start_date: 1.month.since(now), end_date: 2.month.since(now))
-          expect(@account.grading_periods.active.last.weight).to eq(99)
+        context "creates a grading period successfully" do
+          subject(:account_grading_periods) { @account.grading_periods }
+          before do
+            post_create(title: 'a title', weight: weight, start_date: start_date, end_date: end_date)
+          end
+
+          it { expect(account_grading_periods.count).to eql 4 }
+          it { expect(account_grading_periods.last.weight).to eq weight }
+          it { expect(account_grading_periods.last.start_date).to eq start_date }
+          it { expect(account_grading_periods.last.end_date).to eq end_date }
         end
       end
 
@@ -166,7 +176,12 @@ describe GradingPeriodsController, type: :request do
 
         it "creates a grading period successfully" do
           now = Time.zone.now
-          post_create(weight: 99, start_date: 1.month.since(now), end_date: 2.month.since(now))
+          post_create(
+            title: 'an period',
+            weight: 99,
+            start_date: 10.month.since(now),
+            end_date: 12.month.since(now)
+          )
           expect(@course.grading_periods.active.last.weight).to eq(99)
         end
       end

@@ -25,9 +25,6 @@ describe SubmissionList do
     expect(@sl).to be_is_a(SubmissionList)
     expect(@sl.course).to eql(@course)
 
-    expect{@sl = SubmissionList.new(@course)}.not_to raise_error
-    expect(@sl.course).to eql(@course)
-
     expect{@sl = SubmissionList.new(-1)}.to raise_error(ArgumentError, "Must provide a course.")
   end
 
@@ -64,6 +61,22 @@ describe SubmissionList do
     expect(@days[0].graders[0].assignments.size).to eq 1
     expect(@days[1].date).to eq Date.new(2011, 12, 31)
     expect(@days[1].graders[0].assignments.size).to eq 2
+  end
+
+  it "handles excused assignments" do
+    course_with_teacher(:active_all => true)
+    course_with_student(:course => @course, :active_all => true)
+
+    @some_assignment = @course.assignments.create!(:title => 'one', :points_possible => 10)
+    subs = @some_assignment.grade_student(@student, {grade: 8, grader: @teacher})
+    subs.each { |s| s.created_at = 3.days.ago; s.updated_at = 3.days.ago; s.save }
+    @some_assignment.grade_student(@student, {excuse: true, grader: @teacher})
+    @days = SubmissionList.days(@course)
+    submissions = @days[0].graders[0].assignments[0].submissions
+    submissions.each do |sub|
+      expect(sub.current_grade).to eq("EX")
+      expect(sub.new_grade).to eq("EX")
+    end
   end
 
   context "named loops" do
@@ -171,6 +184,7 @@ describe SubmissionList do
         )
     end
   end
+
   context "regrading" do
     it 'should include regrade events in the final data' do
       # Figure out how to manually regrade a test piece of data
@@ -195,7 +209,7 @@ describe SubmissionList do
       @answer = { :question_id => 1, :points => @points, :text => ""}
 
       @wrapper = Quizzes::QuizRegrader::Answer.new(@answer, @question_regrade)
-      @qs.grade_submission
+      Quizzes::SubmissionGrader.new(@qs).grade_submission
       @qs.score_before_regrade = 5.0
       @qs.score = 4.0
       @qs.attempt = 1
@@ -221,6 +235,67 @@ describe SubmissionList do
       expect(regrades.include?(5.0)).to be_truthy
     end
   end
+
+  context "remembers the most recent grade change" do
+    let(:grader)  { User.create name: 'some_grader' }
+    let(:student) { User.create name: "some student", workflow_state: "registered" }
+    let(:course)  { Course.create name: "some course", workflow_state: "available" }
+    let(:list)    { SubmissionList.new course }
+
+    let(:assignment) do
+      course.assignments.create title: "some assignment",
+      points_possible: 10,
+      workflow_state: "published"
+    end
+
+    let(:submission) do
+      list.days.first.
+        graders.first.
+        assignments.first.
+        submissions.first
+    end
+
+    let!(:enroll_teacher_and_student) do
+      course.enroll_teacher(grader).accept
+      course.enroll_student student
+    end
+
+    context "when the grade is not blank" do
+      let!(:grade_assignment) do
+        assignment.grade_student student, {grade: 5, grader: grader}
+        assignment.grade_student student, {grade: 3, grader: grader}
+      end
+
+      it "remembers the 'Before' grade " do
+        expect(submission.previous_grade).to eq "5"
+      end
+      it "remembers the 'After' grade" do
+        expect(submission.new_grade).to eq "3"
+      end
+      it "remembers the 'Current' grade" do
+        expect(submission.current_grade).to eq "3"
+      end
+    end
+
+    context "when the grade is blank" do
+      let!(:grade_assignment) do
+        assignment.grade_student student, {grade: 6, grader: grader}
+        assignment.grade_student student, {grade: 7, grader: grader}
+        assignment.grade_student student, {grade: "", grader: grader}
+      end
+
+      it "remembers the 'Before' grade" do
+       expect(submission.previous_grade).to eq "7"
+      end
+      it "remembers the 'After' grade" do
+       expect(submission.new_grade).to be_blank
+      end
+      it "remembers the 'Current' grade" do
+       expect(submission.current_grade).to be_blank
+      end
+    end
+  end
+
 end
 
 def interesting_submission_list(opts={})

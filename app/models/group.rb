@@ -450,81 +450,87 @@ class Group < ActiveRecord::Base
   # if you modify this set_policy block, note that we've denormalized this
   # permission check for efficiency -- see User#cached_contexts
   set_policy do
-    given { |user| user && self.has_member?(user) }
-    can :create_collaborations and
-    can :manage_calendar and
-    can :manage_content and
-    can :manage_files and
-    can :manage_wiki and
-    can :post_to_forum and
-    can :read and
-    can :read_forum and
-    can :read_roster and
-    can :send_messages and
-    can :send_messages_all and
-    can :view_unpublished_items
+    # Course-level groups don't grant any permissions unless their containing context can
+    # be read by the user in question
+    given { |user, session| self.context.is_a?(Account) || self.context.grants_right?(user, session, :read) }
 
-    # if I am a member of this group and I can moderate_forum in the group's context
-    # (makes it so group members cant edit each other's discussion entries)
-    given { |user, session| user && self.has_member?(user) && (!self.context || self.context.grants_right?(user, session, :moderate_forum)) }
-    can :moderate_forum
+    use_additional_policy do
+      given { |user| user && self.has_member?(user) }
+      can :create_collaborations and
+      can :manage_calendar and
+      can :manage_content and
+      can :manage_files and
+      can :manage_wiki and
+      can :post_to_forum and
+      can :read and
+      can :read_forum and
+      can :read_roster and
+      can :send_messages and
+      can :send_messages_all and
+      can :view_unpublished_items
 
-    given { |user| user && self.has_moderator?(user) }
-    can :delete and
-    can :manage and
-    can :manage_admin_users and
-    can :manage_students and
-    can :moderate_forum and
-    can :update
+      # if I am a member of this group and I can moderate_forum in the group's context
+      # (makes it so group members cant edit each other's discussion entries)
+      given { |user, session| user && self.has_member?(user) && (!self.context || self.context.grants_right?(user, session, :moderate_forum)) }
+      can :moderate_forum
 
-    given { |user| user && self.leader == user }
-    can :update
+      given { |user| user && self.has_moderator?(user) }
+      can :delete and
+      can :manage and
+      can :manage_admin_users and
+      can :manage_students and
+      can :moderate_forum and
+      can :update
 
-    given { |user| self.group_category.try(:communities?) }
-    can :create
+      given { |user| user && self.leader == user }
+      can :update
 
-    given { |user, session| self.context && self.context.grants_right?(user, session, :participate_as_student) }
-    can :participate_as_student
+      given { |user| self.group_category.try(:communities?) }
+      can :create
 
-    given { |user, session| self.grants_right?(user, session, :participate_as_student) && self.context.allow_student_organized_groups }
-    can :create
+      given { |user, session| self.context && self.context.grants_right?(user, session, :participate_as_student) }
+      can :participate_as_student
 
-    given { |user, session| self.context && self.context.grants_right?(user, session, :manage_groups) }
-    can :create and
-    can :create_collaborations and
-    can :delete and
-    can :manage and
-    can :manage_admin_users and
-    can :manage_content and
-    can :manage_files and
-    can :manage_students and
-    can :manage_wiki and
-    can :moderate_forum and
-    can :post_to_forum and
-    can :read and
-    can :read_forum and
-    can :read_roster and
-    can :send_messages and
-    can :send_messages_all and
-    can :update and
-    can :view_unpublished_items
+      given { |user, session| self.grants_right?(user, session, :participate_as_student) && self.context.allow_student_organized_groups }
+      can :create
 
-    given { |user, session| self.context && self.context.grants_right?(user, session, :view_group_pages) }
-    can :read and can :read_forum and can :read_roster
+      given { |user, session| self.context && self.context.grants_right?(user, session, :manage_groups) }
+      can :create and
+      can :create_collaborations and
+      can :delete and
+      can :manage and
+      can :manage_admin_users and
+      can :manage_content and
+      can :manage_files and
+      can :manage_students and
+      can :manage_wiki and
+      can :moderate_forum and
+      can :post_to_forum and
+      can :read and
+      can :read_forum and
+      can :read_roster and
+      can :send_messages and
+      can :send_messages_all and
+      can :update and
+      can :view_unpublished_items
 
-    # Participate means the user is connected to the group somehow and can be
-    given { |user| user && can_participate?(user) }
-    can :participate
+      given { |user, session| self.context && self.context.grants_right?(user, session, :view_group_pages) }
+      can :read and can :read_forum and can :read_roster
 
-    # Join is participate + the group being in a state that allows joining directly (free_association)
-    given { |user| user && can_participate?(user) && free_association?(user)}
-    can :join and can :read_roster
+      # Participate means the user is connected to the group somehow and can be
+      given { |user| user && can_participate?(user) }
+      can :participate
 
-    given { |user| user && (self.group_category.try(:allows_multiple_memberships?) || allow_self_signup?(user)) }
-    can :leave
+      # Join is participate + the group being in a state that allows joining directly (free_association)
+      given { |user| user && can_participate?(user) && free_association?(user)}
+      can :join and can :read_roster
 
-    given {|user, session| self.grants_right?(user, session, :manage_content) && self.context && self.context.grants_right?(user, session, :create_conferences)}
-    can :create_conferences
+      given { |user| user && (self.group_category.try(:allows_multiple_memberships?) || allow_self_signup?(user)) }
+      can :leave
+
+      given {|user, session| self.grants_right?(user, session, :manage_content) && self.context && self.context.grants_right?(user, session, :create_conferences)}
+      can :create_conferences
+    end
   end
 
   def users_visible_to(user)

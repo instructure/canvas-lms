@@ -87,25 +87,10 @@ describe GradingPeriodGroup do
   end
 
   context "Soft deletion" do
-    let(:account) { Account.create }
+    let(:account) { Account.create! }
     let(:creation_arguments) { {} }
     subject { account.grading_period_groups }
     include_examples "soft deletion"
-
-    describe "#destroy" do
-      let(:grading_period_group) { Account.default.grading_period_groups.create }
-
-      it "should soft delete grading periods that belong to the grading period group when it is destroyed" do
-        grading_period_1 = grading_period_group.grading_periods.create!(start_date: Time.now, end_date: 2.months.from_now)
-        grading_period_2 = grading_period_group.grading_periods.create!(start_date: 2.months.from_now, end_date: 3.months.from_now)
-
-        grading_period_group.destroy
-        expect(grading_period_1).to be_deleted
-        expect(grading_period_1).to_not be_destroyed
-        expect(grading_period_2).to be_deleted
-        expect(grading_period_2).to_not be_destroyed
-      end
-    end
   end
 
   describe "permissions:" do

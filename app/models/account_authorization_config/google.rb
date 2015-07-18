@@ -17,16 +17,16 @@
 #
 
 class AccountAuthorizationConfig::Google < AccountAuthorizationConfig::OpenIDConnect
-  def self.recognized_params
-    [ :login_attribute ].freeze
-  end
-
   include AccountAuthorizationConfig::PluginSettings
   self.plugin = :google_drive
   plugin_settings :client_id, client_secret: :client_secret_dec
 
   def login_button?
     true
+  end
+
+  def self.recognized_params
+    [ :login_attribute ].freeze
   end
 
   def self.login_attributes

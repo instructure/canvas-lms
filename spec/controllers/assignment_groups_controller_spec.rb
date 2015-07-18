@@ -114,6 +114,37 @@ describe AssignmentGroupsController do
 
   end
 
+  describe "POST 'reorder_assignments'"do
+    before(:once) do
+      @group1 = @course.assignment_groups.create!(:name => "group 1")
+      @group2 = @course.assignment_groups.create!(:name => "group 2")
+      @assignment1 = @course.assignments.create!(:title => "assignment 1", :assignment_group => @group1)
+      @assignment2 = @course.assignments.create!(:title => "assignment 2", :assignment_group => @group1)
+      @assignment3 = @course.assignments.create!(:title => "assignment 3", :assignment_group => @group2)
+      @order = "#{@assignment1.id},#{@assignment2.id},#{@assignment3.id}"
+    end
+    it "should require authorization" do
+      post :reorder_assignments, :course_id => @course.id, :assignment_group_id => @assignment1.assignment_group.id, :order => @order
+      assert_unauthorized
+    end
+
+    it "should not allow students to reorder" do
+      user_session(@student)
+      post :reorder_assignments, :course_id => @course.id, :assignment_group_id => @assignment1.assignment_group.id, :order => @order
+      assert_unauthorized
+    end
+
+    it "should move the assingment from its current assignment group to another assignment group" do
+      user_session(@teacher)
+      expect(response).to be_success
+      post :reorder_assignments, :course_id => @course.id, :assignment_group_id => @assignment1.assignment_group.id, :order => @order
+      @assignment3.reload
+      expect(@assignment3.assignment_group_id).to eq(@group1.id)
+      expect(@group2.assignments.count).to eq(0)
+      expect(@group1.assignments.count).to eq(3)
+    end
+  end
+
   describe "GET 'show'" do
     before(:once) { course_group }
 

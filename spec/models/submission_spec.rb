@@ -602,6 +602,7 @@ describe Submission do
 
         @submission.score = 1
         @submission.grade_it!
+        AdheresToPolicy::Cache.clear
 
         expect(@submission).to be_grants_right(@user, nil, :view_turnitin_report)
         expect(@submission.turnitin_report_url("submission_#{@submission.id}", @user)).not_to be_nil
@@ -618,6 +619,7 @@ describe Submission do
         @assignment.turnitin_settings[:originality_report_visibility] = 'immediate'
         @assignment.save
         @submission.reload
+        AdheresToPolicy::Cache.clear
 
         expect(@submission).to be_grants_right(@user, nil, :view_turnitin_report)
         expect(@submission.turnitin_report_url("submission_#{@submission.id}", @user)).not_to be_nil
@@ -635,6 +637,7 @@ describe Submission do
         @assignment.due_at = Time.now - 1.day
         @assignment.save
         @submission.reload
+        AdheresToPolicy::Cache.clear
 
         expect(@submission).to be_grants_right(@user, nil, :view_turnitin_report)
         expect(@submission.turnitin_report_url("submission_#{@submission.id}", @user)).not_to be_nil

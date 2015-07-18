@@ -893,6 +893,7 @@ define([
     setTimeout(function() {
       $("#content a:external,#content a.explicit_external_link").each(function(){
         $(this)
+          .not(".open_in_a_new_tab")
           .not(":has(img)")
           .not(".not_external")
           .addClass('external')

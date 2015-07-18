@@ -33,8 +33,7 @@ module Lti
         @lti_launch.link_text = I18n.t('lti2.register_tool', 'Register Tool')
         @lti_launch.launch_type = message.launch_presentation_document_target
 
-        render ExternalToolsController.display_template('borderless')
-
+        render Lti::AppUtil.display_template('borderless')
       end
     end
 
@@ -69,7 +68,7 @@ module Lti
           message.add_custom_params(ToolSetting.custom_settings(tool_proxy.id, @context, message.resource_link_id))
           @lti_launch.params = message.signed_post_params(tool_proxy.shared_secret)
 
-          render template: 'lti/framed_launch' and return
+          render Lti::AppUtil.display_template(display_override: params[:display]) and return
         end
       end
       not_found

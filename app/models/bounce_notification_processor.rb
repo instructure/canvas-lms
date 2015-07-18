@@ -68,12 +68,25 @@ class BounceNotificationProcessor
     return unless is_permanent_bounce?(bounce_notification)
 
     bouncy_addresses(bounce_notification).each do |address|
-      CommunicationChannel.bounce_for_path(address)
+      CommunicationChannel.bounce_for_path(
+        path: address,
+        timestamp: bounce_timestamp(bounce_notification),
+        details: bounce_notification,
+        suppression_bounce: is_suppression_bounce?(bounce_notification)
+      )
     end
   end
 
   def is_permanent_bounce?(bounce)
     bounce['bounceType'] == 'Permanent'
+  end
+
+  def is_suppression_bounce?(bounce)
+    bounce['bounceSubType'] == 'Suppressed'
+  end
+
+  def bounce_timestamp(bounce)
+    bounce['timestamp']
   end
 
   def bouncy_addresses(bounce)

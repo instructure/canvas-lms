@@ -79,6 +79,7 @@ module Api::V1::Course
       hash['sections'] = section_enrollments_json(enrollments) if includes.include?('sections')
       hash['total_students'] = course.students.count if includes.include?('total_students')
       hash['passback_status'] = post_grades_status_json(course) if includes.include?('passback_status')
+      hash['is_favorite'] = course.favorite_for_user?(user) if includes.include?('favorites')
       add_helper_dependant_entries(hash, course, builder)
     end
   end
@@ -105,5 +106,7 @@ module Api::V1::Course
     hash['html_url'] = course_url(course, :host => HostUrl.context_host(course, request.try(:host_with_port))) if builder.include_url
     hash
   end
+
+
 
 end

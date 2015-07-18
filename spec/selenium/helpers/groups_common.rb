@@ -66,25 +66,35 @@ def create_category(params={})
   category1
 end
 
-def create_student_group(params={})
+def create_group(params={})
   default_params = {
       group_name:'Windfury',
       enroll_student_count:0,
       add_self_to_group:true,
       category_name:'category1',
       is_leader:'true',
+      has_max_membership:false,
+      member_limit: 0,
+      group_category: nil,
   }
   params = default_params.merge(params)
 
+  # Sets up a group category for the group if one isn't passed in
+  params[:group_category] = create_category(category_name:params[:category_name]) if params[:group_category].nil?
+
   group = @course.groups.create!(
       name:params[:group_name],
-      group_category:create_category(category_name:params[:category_name]))
+      group_category:params[:group_category])
+
+  if params[:has_max_membership]
+    group.update_attribute(:max_membership,params[:member_limit])
+  end
 
   if params[:add_self_to_group] == true
     add_user_to_group(@student, group, params[:is_leader])
   end
 
-  seed_students(params[:enroll_student_count])
+  seed_students(params[:enroll_student_count]) if params[:enroll_student_count] > 0
 end
 
 def create_student_group_as_a_teacher(group_name = "Windfury", enroll_student_count = 0)
@@ -128,6 +138,19 @@ def manually_set_groupset_limit(member_limit = "2")
   replace_content(fj('input[name="group_limit"]:visible'), member_limit)
   fj('.btn.btn-primary[type=submit]').click
   wait_for_ajaximations
+end
+
+def manually_fill_limited_group(member_limit ="2",student_count = 0)
+  student_count.times do |n|
+    # Finds all student add buttons and updates the through each iteration
+    studs = ff('.assign-to-group')
+    studs.first.click
+
+    wait_for_ajaximations
+    f('.set-group').click
+    expect(f('.group-summary')).to include_text("#{n+1} / #{member_limit} students")
+  end
+  expect(f('.show-group-full')).to be_displayed
 end
 
 def delete_group

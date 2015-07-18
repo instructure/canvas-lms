@@ -20,7 +20,7 @@ describe "conversations new" do
       get_conversations
     end
 
-    it "should be allowed on new private conversations with students" do
+    it "should be allowed on new private conversations with students", priority: "1", test_id: 207094 do
       compose course: @course, to: [@s1, @s2], body: 'hallo!', send: false
 
       checkbox = f(".user_note")
@@ -34,7 +34,7 @@ describe "conversations new" do
       expect(@s2.user_notes.reload.count).to eq count2 + 1
     end
 
-    it "should be allowed with student groups" do
+    it "should be allowed with student groups", priority: "1", test_id: 207093 do
       compose course: @course, to: [@group], body: 'hallo!', send: false
 
       checkbox = f(".user_note")
@@ -46,21 +46,21 @@ describe "conversations new" do
       expect(@s1.user_notes.reload.count).to eq count1 + 1
     end
 
-    it "should not be allowed if disabled" do
+    it "should not be allowed if disabled", priority: "1", test_id: 207092 do
       @course.account.update_attribute(:enable_user_notes, false)
       get_conversations
       compose course: @course, to: [@s1], body: 'hallo!', send: false
       expect(f(".user_note")).not_to be_displayed
     end
 
-    it "should not be allowed for students" do
+    it "should not be allowed for students", priority: "1", test_id: 138686 do
       user_session(@s1)
       get_conversations
       compose course: @course, to: [@s2], body: 'hallo!', send: false
       expect(f(".user_note")).not_to be_displayed
     end
 
-    it "should not be allowed with non-student recipient" do
+    it "should not be allowed with non-student recipient", priority: "1", test_id: 138687 do
       compose course: @course, to: [@teacher], body: 'hallo!', send: false
       expect(f(".user_note")).not_to be_displayed
     end

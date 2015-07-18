@@ -18,11 +18,11 @@ define [
   AssignmentGroupSelector, DueDateOverrideView, EditView,
   GradingTypeSelector, GroupCategorySelector, PeerReviewsSelector, fakeENV, userSettings) ->
 
-  defaultAssignmentOpts =
-    name: 'Test Assignment'
-    assignment_overrides: []
-
   editView = (assignmentOpts = {}) ->
+    defaultAssignmentOpts =
+      name: 'Test Assignment'
+      assignment_overrides: []
+
     assignmentOpts = _.extend {}, assignmentOpts, defaultAssignmentOpts
     assignment = new Assignment assignmentOpts
 
@@ -51,7 +51,7 @@ define [
           model: dueDateList
           views: {}
 
-    sinon.stub(app, "_initializeWikiSidebar")
+    @stub(app, "_initializeWikiSidebar")
     app.render()
 
   module 'EditView',
@@ -60,41 +60,43 @@ define [
       ENV.VALID_DATE_RANGE = {}
     teardown: ->
       fakeENV.teardown()
+    editView: ->
+      editView.apply(this, arguments)
 
   test 'renders', ->
-    view = editView()
+    view = @editView()
     equal view.$('#assignment_name').val(), 'Test Assignment'
 
   test 'rejects a letter for points_possible', ->
-    view = editView()
+    view = @editView()
     data = points_possible: 'a'
     errors = view.validateBeforeSave(data, [])
     equal errors['points_possible'][0]['message'], 'Points possible must be a number'
 
   test 'does not allow group assignment for large rosters', ->
     ENV.IS_LARGE_ROSTER = true
-    view = editView()
+    view = @editView()
     equal view.$("#group_category_selector").length, 0
 
   test 'does not allow peer review for large rosters', ->
     ENV.IS_LARGE_ROSTER = true
-    view = editView()
+    view = @editView()
     equal view.$("#assignment_peer_reviews_fields").length, 0
 
   test 'adds and removes student group', ->
     ENV.GROUP_CATEGORIES = [{id: 1, name: "fun group"}]
     ENV.ASSIGNMENT_GROUPS = [{id: 1, name: "assignment group 1"}]
-    view = editView()
+    view = @editView()
     equal view.assignment.toView()['groupCategoryId'], null
 
   test 'does not allow point value of -1 or less if grading type is letter', ->
-    view = editView()
+    view = @editView()
     data = points_possible: '-1', grading_type: 'letter_grade'
     errors = view._validatePointsRequired(data, [])
     equal errors['points_possible'][0]['message'], 'Points possible must be 0 or more for selected grading type'
 
   test 'does show error message on assignment point change with submissions', ->
-    view = editView has_submitted_submissions: true
+    view = @editView has_submitted_submissions: true
     view.$el.appendTo $('#fixtures')
     ok !view.$el.find('#point_change_warning:visible').attr('aria-expanded')
     view.$el.find('#assignment_points_possible').val(1)
@@ -105,7 +107,7 @@ define [
     ok !view.$el.find('#point_change_warning:visible').attr('aria-expanded')
 
   test 'does show error message on assignment point change without submissions', ->
-    view = editView has_submitted_submissions: false
+    view = @editView has_submitted_submissions: false
     view.$el.appendTo $('#fixtures')
     ok !view.$el.find('#point_change_warning:visible').attr('aria-expanded')
     view.$el.find('#assignment_points_possible').val(1)
@@ -113,7 +115,7 @@ define [
     ok !view.$el.find('#point_change_warning:visible').attr('aria-expanded')
 
   test 'does not allow point value of "" if grading type is letter', ->
-    view = editView()
+    view = @editView()
     data = points_possible: '', grading_type: 'letter_grade'
     errors = view._validatePointsRequired(data, [])
     equal errors['points_possible'][0]['message'], 'Points possible must be 0 or more for selected grading type'
@@ -129,13 +131,13 @@ define [
     equal view.getFormData()['groupCategoryId'], null
 
   test 'does not allow blank external tool url', ->
-    view = editView()
+    view = @editView()
     data = submission_type: 'external_tool'
     errors = view._validateExternalTool(data, [])
     equal errors["external_tool_tag_attributes[url]"][0]['message'], 'External Tool URL cannot be left blank'
 
   test 'removes group_category_id if an external tool is selected', ->
-    view = editView()
+    view = @editView()
     data = {
       submission_type: 'external_tool'
       group_category_id: '1'
@@ -145,25 +147,28 @@ define [
 
   test 'renders escaped angle brackets properly', ->
     desc = "<p>&lt;E&gt;</p>"
-    view = editView description: "<p>&lt;E&gt;</p>"
+    view = @editView description: "<p>&lt;E&gt;</p>"
     equal view.$description.val().match(desc), desc
 
   module 'EditView: group category locked',
     setup: ->
       fakeENV.setup()
-      window.addGroupCategory = sinon.stub()
+      @oldAddGroupCategory = window.addGroupCategory
+      window.addGroupCategory = @stub()
     teardown: ->
       fakeENV.teardown()
-      window.addGroupCategory = null
+      window.addGroupCategory = @oldAddGroupCategory
+    editView: ->
+      editView.apply(this, arguments)
 
   test 'lock down group category after students submit', ->
-    view = editView has_submitted_submissions: true
+    view = @editView has_submitted_submissions: true
     ok view.$(".group_category_locked_explanation").length
     ok view.$("#has_group_category").prop("disabled")
     ok view.$("#assignment_group_category_id").prop("disabled")
     ok !view.$("[type=checkbox][name=grade_group_students_individually]").prop("disabled")
 
-    view = editView has_submitted_submissions: false
+    view = @editView has_submitted_submissions: false
     equal view.$(".group_category_locked_explanation").length, 0
     ok !view.$("#has_group_category").prop("disabled")
     ok !view.$("#assignment_group_category_id").prop("disabled")
@@ -172,32 +177,33 @@ define [
   module 'EditView: setDefaultsIfNew',
     setup: ->
       fakeENV.setup()
-      sinon.stub(userSettings, 'contextGet').returns {submission_types: "foo", peer_reviews: "1", assignment_group_id: 99}
+      @stub(userSettings, 'contextGet').returns {submission_types: "foo", peer_reviews: "1", assignment_group_id: 99}
     teardown: ->
-      userSettings.contextGet.restore()
       fakeENV.teardown()
+    editView: ->
+      editView.apply(this, arguments)
 
   test 'returns values from localstorage', ->
-    view = editView()
+    view = @editView()
     view.setDefaultsIfNew()
 
     equal view.assignment.get('submission_types'), "foo"
 
   test 'returns string booleans as integers', ->
-    view = editView()
+    view = @editView()
     view.setDefaultsIfNew()
 
     equal view.assignment.get('peer_reviews'), 1
 
   test 'doesnt overwrite existing assignment settings', ->
-    view = editView()
+    view = @editView()
     view.assignment.set('assignment_group_id', 22)
     view.setDefaultsIfNew()
 
     equal view.assignment.get('assignment_group_id'), 22
 
   test 'will overwrite empty arrays', ->
-    view = editView()
+    view = @editView()
     view.assignment.set('submission_types', [])
     view.setDefaultsIfNew()
 
@@ -206,13 +212,14 @@ define [
   module 'EditView: setDefaultsIfNew: no localStorage',
     setup: ->
       fakeENV.setup()
-      sinon.stub(userSettings, 'contextGet').returns null
+      @stub(userSettings, 'contextGet').returns null
     teardown: ->
-      userSettings.contextGet.restore()
       fakeENV.teardown()
+    editView: ->
+      editView.apply(this, arguments)
 
   test 'submission_type is online if no cache', ->
-    view = editView()
+    view = @editView()
     view.setDefaultsIfNew()
 
     equal view.assignment.get('submission_type'), "online"
@@ -222,18 +229,20 @@ define [
       fakeENV.setup()
     teardown: ->
       fakeENV.teardown()
+    editView: ->
+      editView.apply(this, arguments)
 
   test 'saves valid attributes to localstorage', ->
-    view = editView()
-    sinon.stub(view, 'getFormData').returns {points_possible: 34}
+    view = @editView()
+    @stub(view, 'getFormData').returns {points_possible: 34}
     userSettings.contextSet("new_assignment_settings", {})
     view.cacheAssignmentSettings()
 
     equal 34, userSettings.contextGet("new_assignment_settings")["points_possible"]
 
   test 'rejects invalid attributes when caching', ->
-    view = editView()
-    sinon.stub(view, 'getFormData').returns {invalid_attribute_example: 30}
+    view = @editView()
+    @stub(view, 'getFormData').returns {invalid_attribute_example: 30}
     userSettings.contextSet("new_assignment_settings", {})
     view.cacheAssignmentSettings()
 

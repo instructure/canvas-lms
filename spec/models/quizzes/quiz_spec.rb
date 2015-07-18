@@ -1537,6 +1537,12 @@ describe Quizzes::Quiz do
       expect(@quiz.grants_right?(@student, :submit)).to eq true
       expect(@quiz.grants_right?(@teacher, :read)).to eq true
     end
+
+    it "doesn't let students submit quizzes that are excused" do
+      @quiz.assignment.grade_student(@student, excuse: true)
+      expect(@quiz.grants_right?(@student, :submit)).to eq false
+      expect(@quiz.grants_right?(@student, :read)).to eq true
+    end
   end
 
   describe "#available?" do

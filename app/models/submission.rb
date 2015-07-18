@@ -155,13 +155,13 @@ class Submission < ActiveRecord::Base
 
   def adjust_needs_grading_count(mode = :increment)
     amount = mode == :increment ? 1 : -1
-    connection.execute sanitize_sql([<<-SQL, {amount: amount, now: Time.now.utc, assignment_id: assignment_id, user_id: user_id}])
-      UPDATE assignments
-      SET needs_grading_count = needs_grading_count + :amount, updated_at = :now
-      WHERE id = :assignment_id
-      AND context_type = 'Course'
-      AND EXISTS (SELECT 1 FROM enrollments WHERE #{Enrollment.active_student_conditions} AND user_id = :user_id AND course_id = assignments.context_id)
-      SQL
+    Assignment.
+      where(id: assignment_id, context_type: 'Course').
+      where("EXISTS (?)",
+        Enrollment.where(Enrollment.active_student_conditions).
+        where(user_id: user_id).
+        where("course_id=assignments.context_id")).
+      update_all(["needs_grading_count=needs_grading_count+?, updated_at=?", amount, Time.now.utc])
     # TODO: add this to the SQL above when DA is on for everybody
     # and remove NeedsGradingCountQuery#manual_count
     # AND EXISTS(SELECT assignment_student_visibilities.* WHERE assignment_student_visibilities.user_id = NEW.user_id AND assignment_student_visibilities.assignment_id = NEW.assignment_id);
@@ -1268,9 +1268,10 @@ class Submission < ActiveRecord::Base
             next
           end
 
-          if grade = user_data[:posted_grade]
+          if user_data[:posted_grade] || user_data.key?(:excuse)
             submissions = assignment.grade_student(user, :grader => grader,
-                                                   :grade => grade,
+                                                   :grade => user_data[:posted_grade],
+                                                   :excuse => Canvas::Plugin.value_to_boolean(user_data[:excuse]),
                                                    :skip_grade_calc => true)
             submissions.each { |s| graded_user_ids << s.user_id }
             submission = submissions.first

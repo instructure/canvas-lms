@@ -16,7 +16,7 @@ define([
       return (
         <div>
           <div className="ReactTray__header">
-            <h1 className="ReactTray__headline">{I18n.t('Profile')}</h1>
+            <h1 className="ReactTray__headline">{I18n.t('Account')}</h1>
             <button className="Button Button--icon-action ReactTray__closeBtn" type="button" onClick={this.props.closeTray}>
               <i className="icon-x"></i>
               <span className="screenreader-only">{I18n.t('Close')}</span>
@@ -27,7 +27,7 @@ define([
               <a href="/profile">{I18n.t('Profile')}</a>
             </li>
             <li>
-              <a href="/profile/settings">{I18n.t('Account Settings')}</a>
+              <a href="/profile/settings">{I18n.t('Settings')}</a>
             </li>
             <li>
               <a href="/profile/communication">{I18n.t('Notifications')}</a>

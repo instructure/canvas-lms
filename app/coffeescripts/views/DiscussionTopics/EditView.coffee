@@ -168,6 +168,7 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
         el: '#peer_review_options'
         parentModel: @assignment
         nested: true
+        hideAnonymousPeerReview: true
 
       @peerReviewSelector.render()
 

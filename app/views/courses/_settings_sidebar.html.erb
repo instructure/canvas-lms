@@ -2,8 +2,8 @@
   <% @course_settings_sub_navigation_tools.each do |tool| %>
     <a class='btn button-sidebar-wide course-settings-sub-navigation-lti'
       href="<%= course_external_tool_path(@context, tool, launch_type: 'course_settings_sub_navigation') %>">
-      <img class="icon" src="<%= tool.course_settings_sub_navigation(:icon_url) %>" />
-      <%= tool.label_for(:course_settings_sub_navigation) %>
+      <img class="icon" alt="" src="<%= tool.course_settings_sub_navigation(:icon_url) %>" />
+      <%= tool.label_for(:course_settings_sub_navigation, I18n.locale) %>
       <% if tool.integration_type == 'lor' %>
         <span class="badge new_badge pull-right"><%= t('links.new_badge', 'New') %></span>
       <% end %>

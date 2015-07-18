@@ -4,7 +4,7 @@ define [
   'compiled/views/content_migrations/subviews/DaySubstitutionView'
   'compiled/models/DaySubstitution'
   'jst/content_migrations/subviews/DateShift'
-], ($, Backbone, DaySubView, DaySubModel, template) -> 
+], ($, Backbone, DaySubView, DaySubModel, template) ->
   class DateShiftView extends Backbone.View
     template: template
 
@@ -13,7 +13,7 @@ define [
     @optionProperty 'oldEndDate'
     @optionProperty 'addHiddenInput'
 
-    els: 
+    els:
       ".dateAdjustContent" : "$dateAdjustContent"
       "#dateAdjustCheckbox": "$dateAdjustCheckbox"
       ".dateShiftContent"  : "$dateShiftContent"
@@ -24,7 +24,7 @@ define [
       "#newEndDate"        : "$newEndDate"
       "#daySubstitution"   : "$daySubstitution"
 
-    events: 
+    events:
       'click #dateAdjustCheckbox' : 'toggleContent'
       'click #dateRemoveOption'   : 'toggleShiftContent'
       'click #dateShiftOption'    : 'toggleShiftContent'
@@ -50,7 +50,7 @@ define [
 
     # Toggle shift content. Shows content when the "Shift dates" radio button
     # is selected, and hides content otherwise
-    # 
+    #
     # @expects jQuery event
     # @returns void
     # @api private
@@ -63,7 +63,7 @@ define [
     # Displays a new DaySubstitutionView by adding it to the collection.
     # @api private
 
-    createDaySubView: (event) => 
+    createDaySubView: (event) =>
       event.preventDefault()
       @collection.add new DaySubModel
 

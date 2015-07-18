@@ -571,55 +571,33 @@ describe StickySisFields do
     end
 
     it "should fire the callback in the right scenarios" do
-      class AbstractCourse
-        cattr_accessor :callback_counts
-        def self.count_callback(callback)
-          self.callback_counts ||= {}
-          method = instance_method(callback)
-          begin
-            remove_method(callback)
-            should_redefine_original_callback = true
-          rescue NameError => e
-            raise e unless "#{e}" =~ /method `#{Regexp.escape callback.to_s}' not defined in #{Regexp.escape self.name}/
-            should_redefine_original_callback = false
-          end
-          self.callback_counts[callback] = 0
-          define_method(callback) do
-            self.callback_counts[callback] += 1
-          end
-          begin
-            yield
-          ensure
-            remove_method(callback)
-            define_method(callback, method) if should_redefine_original_callback
-          end
-        end
+      ac = AbstractCourse.create!(name: "1",
+                                  short_name: "2",
+                                  account: Account.default,
+                                  root_account: Account.default,
+                                  enrollment_term: Account.default.default_enrollment_term)
+
+      ac.expects(:set_sis_stickiness).once
+      ac.save!
+
+      ac.expects(:set_sis_stickiness).never
+      AbstractCourse.process_as_sis do
+        ac.save!
       end
 
-      ac = AbstractCourse.create!(:name => "1",
-                                  :short_name => "2",
-                                  :account => Account.default,
-                                  :root_account => Account.default,
-                                  :enrollment_term => Account.default.default_enrollment_term)
-      AbstractCourse.count_callback(:set_sis_stickiness) do
+      ac.expects(:set_sis_stickiness).never
+      AbstractCourse.process_as_sis override_sis_stickiness: true do
         ac.save!
-        expect(AbstractCourse.callback_counts[:set_sis_stickiness]).to eq 1
-        AbstractCourse.process_as_sis do
-          ac.save!
-        end
-        expect(AbstractCourse.callback_counts[:set_sis_stickiness]).to eq 1
-        AbstractCourse.process_as_sis :override_sis_stickiness => true do
-          ac.save!
-        end
-        expect(AbstractCourse.callback_counts[:set_sis_stickiness]).to eq 1
-        AbstractCourse.process_as_sis :clear_sis_stickiness => true do
-          ac.save!
-        end
-        expect(AbstractCourse.callback_counts[:set_sis_stickiness]).to eq 2
-        AbstractCourse.process_as_sis :add_sis_stickiness => true do
-          ac.save!
-        end
-        expect(AbstractCourse.callback_counts[:set_sis_stickiness]).to eq 3
+      end
+
+      ac.expects(:set_sis_stickiness).once
+      AbstractCourse.process_as_sis clear_sis_stickiness: true do
+        ac.save!
+      end
+
+      ac.expects(:set_sis_stickiness).once
+      AbstractCourse.process_as_sis add_sis_stickiness: true do
+        ac.save!
       end
     end
   end

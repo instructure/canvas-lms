@@ -144,16 +144,28 @@ describe RubricAssessment do
         @assignment.update_attribute(:anonymous_peer_reviews, true)
         @reviewed = @student
         @reviewer = student_in_course(:active_all => true).user
-        @assignment.assign_peer_review(@reviewer, @student)
+        @assignment.assign_peer_review(@reviewer, @reviewed)
         @assessment = @association.assess({
           :user => @reviewed,
           :assessor => @reviewer,
-          :artifact => @assignment.find_or_create_submission(@student),
+          :artifact => @assignment.find_or_create_submission(@reviewed),
           :assessment => {
             :assessment_type => 'peer_review',
             :criterion_crit1 => {
               :points => 5,
               :comments => "Hey, it's a comment."
+            }
+          }
+        })
+        @teacher_assessment = @association.assess({
+          :user => @reviewed,
+          :assessor => @teacher,
+          :artifact => @assignment.find_or_create_submission(@student),
+          :assessment => {
+            :assessment_type => 'grading',
+            :criterion_crit1 => {
+              :points => 3,
+              :comments => "Hey, it's a teacher comment."
             }
           }
         })
@@ -170,7 +182,13 @@ describe RubricAssessment do
       it "should allow teacher to see reviewer's name" do
         expect(@assessment.grants_right?(@teacher, :read_assessor)).to be_truthy
       end
+
+      it "should allow reviewed to see reviewer's name if reviewer is teacher" do
+        expect(@teacher_assessment.grants_right?(@reviewed, :read_assessor)).to be_truthy
+      end
+
     end
+
 
     describe "#considered_anonymous?" do
       let_once(:assessment) {
@@ -186,6 +204,48 @@ describe RubricAssessment do
       it "should not blow up without a rubric_association" do
         expect{assessment.considered_anonymous?}.not_to raise_error
       end
+    end
+  end
+
+  describe "read permissions" do
+    before(:once) do
+      @account = @course.root_account
+      @assessment = @association.assess({
+                                          :user => @student,
+                                          :assessor => @teacher,
+                                          :artifact => @assignment.find_or_create_submission(@student),
+                                          :assessment => {
+                                            :assessment_type => 'grading',
+                                            :criterion_crit1 => {
+                                              :points => 5,
+                                              :comments => "comments",
+                                            }
+                                          }
+                                        })
+    end
+
+    it "grants :read to the user" do
+      expect(@assessment.grants_right?(@student, :read)).to eq true
+    end
+
+    it "grants :read to the assessor" do
+      expect(@assessment.grants_right?(@teacher, :read)).to eq true
+    end
+
+    it "does not grant :read to an account user without :manage_courses or :view_all_grades" do
+      user
+      role = custom_account_role('custom', :account => @account)
+      @account.account_users.create!(user: @user, role: role)
+      expect(@assessment.grants_right?(@user, :read)).to eq false
+    end
+
+    it "grants :read to an account user with :view_all_grades but not :manage_courses" do
+      user
+      role = custom_account_role('custom', :account => @account)
+      RoleOverride.create!(:context => @account, :permission => 'view_all_grades', :role => role, :enabled => true)
+      RoleOverride.create!(:context => @account, :permission => 'manage_courses', :role => role, :enabled => false)
+      @account.account_users.create!(user: @user, role: role)
+      expect(@assessment.grants_right?(@user, :read)).to eq true
     end
   end
 end

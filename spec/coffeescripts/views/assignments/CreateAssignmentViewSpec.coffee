@@ -156,7 +156,7 @@ define [
     equal view.$("#assign_1_assignment_type").length, 0
 
   test "onSaveSuccess adds model to assignment group for creation", ->
-    sinon.stub( DialogFormView.prototype, "close", -> )
+    @stub(DialogFormView.prototype, "close", ->)
 
     equal @group.get("assignments").length, 2
 
@@ -165,10 +165,8 @@ define [
 
     equal @group.get("assignments").length, 3
 
-    DialogFormView.prototype.close.restore()
-
   test "the form is cleared after adding an assignment", ->
-    sinon.stub( DialogFormView.prototype, "close", -> )
+    @stub(DialogFormView.prototype, "close", ->)
 
     view = createView(@group)
     view.onSaveSuccess()
@@ -176,27 +174,22 @@ define [
     equal view.$("#ag_#{@group.id}_assignment_name").val(), ""
     equal view.$("#ag_#{@group.id}_assignment_points").val(), "0"
 
-    DialogFormView.prototype.close.restore()
-
   test "moreOptions redirects to new page for creation", ->
-    sinon.stub( CreateAssignmentView.prototype, "newAssignmentUrl", -> )
-    sinon.stub( CreateAssignmentView.prototype, "redirectTo",       -> )
+    @stub(CreateAssignmentView.prototype, "newAssignmentUrl", ->)
+    @stub(CreateAssignmentView.prototype, "redirectTo", ->)
 
     view = createView(@group)
     view.moreOptions()
 
     ok view.redirectTo.called
-    CreateAssignmentView.prototype.newAssignmentUrl.restore()
-    CreateAssignmentView.prototype.redirectTo.restore()
 
   test "moreOptions redirects to edit page for editing", ->
-    sinon.stub( CreateAssignmentView.prototype, "redirectTo", -> )
+    @stub(CreateAssignmentView.prototype, "redirectTo", ->)
 
     view = createView(@assignment1)
     view.moreOptions()
 
     ok view.redirectTo.called
-    CreateAssignmentView.prototype.redirectTo.restore()
 
   test "generateNewAssignment builds new assignment model", ->
     view = createView(@group)
@@ -224,28 +217,22 @@ define [
     ok !json.canChooseType
 
   test "openAgain doesn't add datetime for multiple dates", ->
-    sinon.stub( DialogFormView.prototype, "openAgain", -> )
-    sinon.spy $.fn, "datetime_field"
+    @stub(DialogFormView.prototype, "openAgain", ->)
+    @spy $.fn, "datetime_field"
 
     view = createView(@assignment1)
     view.openAgain()
 
     ok $.fn.datetime_field.notCalled
 
-    $.fn.datetime_field.restore()
-    DialogFormView.prototype.openAgain.restore()
-
   test "openAgain adds datetime picker", ->
-    sinon.stub( DialogFormView.prototype, "openAgain", -> )
-    sinon.spy $.fn, "datetime_field"
+    @stub(DialogFormView.prototype, "openAgain", ->)
+    @spy $.fn, "datetime_field"
 
     view = createView(@assignment2)
     view.openAgain()
 
     ok $.fn.datetime_field.called
-
-    $.fn.datetime_field.restore()
-    DialogFormView.prototype.openAgain.restore()
 
   test "requires name to save assignment", ->
     view = createView(@assignment3)

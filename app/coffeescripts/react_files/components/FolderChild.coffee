@@ -199,7 +199,7 @@ define [
           FriendlyDatetime datetime: @props.model.get('created_at')
 
         div className:'ef-date-modified-col', role: 'gridcell',
-          FriendlyDatetime datetime: @props.model.get('updated_at')
+          FriendlyDatetime datetime: @props.model.get('modified_at')
 
         div className:'ef-modified-by-col ellipsis', role: 'gridcell',
           a href: @props.model.get('user')?.html_url, className: 'ef-plain-link',

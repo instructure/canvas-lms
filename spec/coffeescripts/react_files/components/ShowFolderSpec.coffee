@@ -61,11 +61,9 @@ define [
   #   expect(2)
   #   folder = new Folder()
   #   @makeComponent(currentFolder:folder)
-  #   forceUpdateSpy = sinon.spy(@component, 'forceUpdate')
+  #   forceUpdateSpy = @spy(@component, 'forceUpdate')
   #   folder.folders.trigger('some event')
   #   equal folder.folders._events.all[0].callback, @component.debouncedForceUpdate
   #   setTimeout ->
   #     ok forceUpdateSpy.calledOnce, 'eventually calls force update after some event was triggered on child collection'
-  #     forceUpdateSpy.restore()
   #     start()
-

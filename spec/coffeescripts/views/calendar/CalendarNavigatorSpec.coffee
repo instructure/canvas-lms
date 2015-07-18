@@ -13,7 +13,7 @@ define [
 
   test 'clicking a day in picker navigates to that date', ->
     # instrument the callback
-    handler = sinon.spy()
+    handler = @spy()
     @navigator.on('navigateDate', handler)
 
     # find and click a date other than today (typically tomorrow, but maybe
@@ -39,7 +39,7 @@ define [
 
   test 'hitting enter in date field navigates to date', ->
     # instrument the callback
-    handler = sinon.spy()
+    handler = @spy()
     @navigator.on('navigateDate', handler)
 
     # type and "enter" a date

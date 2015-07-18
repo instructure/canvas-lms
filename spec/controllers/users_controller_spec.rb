@@ -38,7 +38,16 @@ describe UsersController do
      tool.resource_selection = {
          :url => "http://#{HostUrl.default_host}/selection_test",
          :selection_width => 400,
-         :selection_height => 400}
+         :selection_height => 400
+     }
+     user_navigation = {
+         :text => 'example',
+         :labels => {
+             'en' => 'English Label',
+             'sp' => 'Spanish Label'
+         }
+     }
+     tool.settings[:user_navigation] = user_navigation
      tool.save!
      tool
    end
@@ -68,6 +77,15 @@ describe UsersController do
 
      get :external_tool, {id:tool.id, user_id:u.id}
      expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti?first=john&last=smith'
+   end
+
+   it "uses localized labels" do
+     u = user(:active_all => true)
+     account.account_users.create!(user: u)
+     user_session(@user)
+
+     get :external_tool, {id:tool.id, user_id:u.id}
+     expect(tool.label_for(:user_navigation, :en)).to eq 'English Label'
    end
  end
 

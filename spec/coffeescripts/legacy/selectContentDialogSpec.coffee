@@ -3,12 +3,11 @@ define [
 ], (SelectContentDialog) ->
   module "SelectContentDialog: Dialog options",
     setup: ->
-      sinon.spy($.fn, 'dialog')
+      @spy($.fn, 'dialog')
       $("#fixtures").html("<div id='select_context_content_dialog'></div>")
 
     teardown: ->
       $("#fixtures").html("")
-      $.fn.dialog.restore()
 
   test "opens a dialog with the width option", ->
     width = 500
@@ -20,10 +19,10 @@ define [
     height = 100
 
     INST.selectContentDialog({height: height})
-    equal $.fn.dialog.getCall(0).args[0].height, height 
+    equal $.fn.dialog.getCall(0).args[0].height, height
 
   test "opens a dialog with the dialog_title option", ->
     dialogTitle = "To be, or not to be?"
 
     INST.selectContentDialog({dialog_title: dialogTitle})
-    equal $.fn.dialog.getCall(0).args[0].title, dialogTitle 
+    equal $.fn.dialog.getCall(0).args[0].title, dialogTitle

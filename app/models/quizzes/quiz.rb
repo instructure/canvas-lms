@@ -352,8 +352,9 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     return false unless self.show_correct_answers
 
-    if user.present? && self.show_correct_answers_last_attempt && quiz_submission = user.quiz_submissions.where(quiz_id: self.id).first
-      return quiz_submission.attempts_left == 0 && quiz_submission.complete?
+    quiz_submission = user.present? && user.quiz_submissions.where(quiz_id: self.id).first
+    if self.show_correct_answers_last_attempt && quiz_submission
+      return quiz_submission.attempts_left == 0 && quiz_submission.completed?
     end
 
     # If we're showing the results only one time, and are letting students
@@ -674,7 +675,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       end
 
     end
-
+    submission.record_creation_event unless preview
     submission
   end
 
@@ -1020,7 +1021,15 @@ class Quizzes::Quiz < ActiveRecord::Base
         context.grants_right?(user, session, :participate_as_student) &&
         visible_to_user?(user)
     end
-    can :read and can :submit
+    can :read
+
+    given do |user, session|
+      available? &&
+        context.grants_right?(user, session, :participate_as_student) &&
+        visible_to_user?(user) &&
+        !excused_for_student?(user)
+    end
+    can :submit
 
     given { |user| context.grants_right?(user, :view_quiz_answer_audits) }
     can :view_answer_audits
@@ -1206,6 +1215,12 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def available?
     published?
+  end
+
+  def excused_for_student?(student)
+    if assignment
+      assignment.submission_for_student(student).excused?
+    end
   end
 
   delegate :feature_enabled?, to: :context

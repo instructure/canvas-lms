@@ -13,7 +13,7 @@ define [
     setup: ->
       fakeENV.setup()
       ENV.context_asset_string = "course_1"
-      @clock = sinon.useFakeTimers();
+      @clock = sinon.useFakeTimers()
       props =
         handleUpdate: ->
         dateValue: new Date(Date.UTC(2012, 1, 1, 7, 0, 0))
@@ -26,7 +26,7 @@ define [
     teardown: ->
       fakeENV.teardown()
       React.unmountComponentAtNode(@dueDateCalendarPicker.getDOMNode().parentNode)
-      @clock = sinon.restore();
+      @clock = sinon.restore()
 
   test 'renders', ->
     ok @dueDateCalendarPicker.isMounted()
@@ -40,14 +40,14 @@ define [
 
   test 'call the update prop when changed', ->
     dateInput = $(@dueDateCalendarPicker.getDOMNode()).find('.date_field').datetime_field()[0]
-    update = sinon.spy(@dueDateCalendarPicker.props, "handleUpdate")
+    update = @spy(@dueDateCalendarPicker.props, "handleUpdate")
     $(dateInput).val("tomorrow")
     $(dateInput).trigger("change")
     ok update.calledOnce
 
   test 'deals with empty inputs properly', ->
     dateInput = $(@dueDateCalendarPicker.getDOMNode()).find('.date_field').datetime_field()[0]
-    update = sinon.spy(@dueDateCalendarPicker.props, "handleUpdate")
+    update = @spy(@dueDateCalendarPicker.props, "handleUpdate")
     $(dateInput).val("")
     $(dateInput).trigger("change")
     ok update.calledWith(null)
@@ -61,7 +61,7 @@ define [
     setup: ->
       fakeENV.setup()
       ENV.context_asset_string = "course_1"
-      @clock = sinon.useFakeTimers();
+      @clock = sinon.useFakeTimers()
       props =
         handleUpdate: ->
         dateValue: new Date(Date.UTC(2012, 1, 1, 7, 0, 0))
@@ -74,7 +74,7 @@ define [
     teardown: ->
       fakeENV.teardown()
       React.unmountComponentAtNode(@dueDateCalendarPicker.getDOMNode().parentNode)
-      @clock = sinon.restore();
+      @clock = sinon.restore()
 
   test 'recieved proper class depending on dateType', ->
     classes = @dueDateCalendarPicker.refs.datePickerWrapper.props.className

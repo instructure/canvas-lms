@@ -10,6 +10,15 @@ describe "outcomes", priority: 1 do
       course_with_teacher_logged_in
     end
 
+    def save_without_error(value = 4, title = 'New Outcome')
+      replace_content(f('.outcomes-content input[name=title]'), title)
+      replace_content(f('input[name=calculation_int]'), value)
+      f('.submit_button').click
+      wait_for_ajaximations
+      expect(f(' .title').text).to include(title)
+      expect((f('#calculation_int').text).to_i).to eq(value)
+    end
+
     context "create/edit/delete outcomes" do
 
       it "should create a learning outcome with a new rating (root level)" do
@@ -36,20 +45,75 @@ describe "outcomes", priority: 1 do
         should_validate_calculation_method_dropdown
       end
 
-      it "should validate decaying average", test_id: 162377 do
-        should_validate_decaying_average
-      end
-
-      it "should validate n mastery", test_id: 162378 do
-        should_validate_n_mastery
-      end
-
       it "should require a title" do
         should_validate_short_description_presence
       end
 
       it "should require a title less than 255 chars" do
         should_validate_short_description_length
+      end
+
+      context "validate decaying average", test_id: 162377 do
+        before do
+          get outcome_url
+          f('.add_outcome_link').click
+        end
+
+        it "should validate default values" do
+          expect(f('#calculation_method')).to have_value('decaying_average')
+          expect(f('#calculation_int')).to have_value('65')
+          expect(f('#calculation_int_example')).to include_text("Most recent score counts as 65%"\
+                                                              " of mastery weight, average of all other scores count"\
+                                                              " as 35% of weight")
+        end
+
+        it "should validate calculation int out of range values" do
+          should_validate_decaying_average
+        end
+
+        it "should validate calculation int accepatble values" do
+          save_without_error(1)
+          f('.edit_button').click
+          save_without_error(99)
+        end
+
+        it "should retain the settings after saving" do
+          save_without_error(rand(99), 'Decaying Average')
+          expect(f('#calculation_method').text).to include('Decaying Average')
+        end
+      end
+
+      context "validate n mastery", test_id: 162378 do
+        before do
+          get outcome_url
+          f('.add_outcome_link').click
+        end
+
+        it "should validate default values" do
+          click_option('#calculation_method', "n Number of Times")
+          expect(f('#calculation_int')).to have_value('5')
+          expect(f('#mastery_points')).to have_value('3')
+          expect(f('#calculation_int_example')).to include_text("Must achieve mastery at least 5 times."\
+                                                              " Scores above mastery will be averaged"\
+                                                              " to calculate final score")
+        end
+
+        it "should validate calculation int out of range values" do
+          should_validate_n_mastery
+        end
+
+        it "should validate calculation int acceptable range values" do
+          click_option('#calculation_method', "n Number of Times")
+          save_without_error(2)
+          f('.edit_button').click
+          save_without_error(5)
+        end
+
+        it "should retain the settings after saving" do
+          click_option('#calculation_method', "n Number of Times")
+          save_without_error(rand(2..5), 'n Number of Times')
+          expect(f('#calculation_method').text).to include('n Number of Times')
+        end
       end
 
     context "create/edit/delete outcome groups" do

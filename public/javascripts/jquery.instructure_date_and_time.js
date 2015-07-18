@@ -22,12 +22,13 @@ define([
   'str/htmlEscape',
   'compiled/widget/DatetimeField',
   'compiled/util/parseDatetime',
+  'jsx/shared/render-datepicker-time',
   'jquery.keycodes' /* keycodes */,
   'vendor/date' /* Date.parse, Date.UTC, Date.today */,
   'jqueryui/datepicker' /* /\.datepicker/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/widget' /* /\.widget/ */
-], function(I18n, $, tz, htmlEscape, DatetimeField, parseDatetime) {
+], function(I18n, $, tz, htmlEscape, DatetimeField, parseDatetime, renderDatepickerTime) {
   // fudgeDateForProfileTimezone is used to apply an offset to the date which represents the
   // difference between the user's configured timezone in their profile, and the timezone
   // of the browser. We want to display times in the timezone of their profile. Use
@@ -155,14 +156,7 @@ define([
   $.datepicker._generateHTML = function(inst) {
     var html = $.datepicker._generateDatepickerHTML(inst);
     if(inst.settings.timePicker) {
-      var hr = inst.input.data('time-hour') || "";
-      hr = hr.replace(/'/g, "");
-      var min = inst.input.data('time-minute') || "";
-      min = min.replace(/'/g, "");
-      var ampm = inst.input.data('time-ampm') || "";
-      var selectedAM = (ampm == "am") ? "selected" : "";
-      var selectedPM = (ampm == "pm") ? "selected" : "";
-      html += "<div class='ui-datepicker-time ui-corner-bottom'><label for='ui-datepicker-time-hour'>" + htmlEscape(I18n.beforeLabel(I18n.t('labels.datepicker.time', "Time"))) + "</label> <input id='ui-datepicker-time-hour' type='text' value='" + htmlEscape(hr) + "' title='hr' class='ui-datepicker-time-hour' style='width: 20px;'/>:<input type='text' value='" + htmlEscape(min) + "' title='min' class='ui-datepicker-time-minute' style='width: 20px;'/> <select class='ui-datepicker-time-ampm un-bootrstrapify' title='" + htmlEscape(I18n.t('datepicker.titles.am_pm', "am/pm")) + "'><option value=''>&nbsp;</option><option value='am' " + htmlEscape(selectedAM) + ">" + htmlEscape(I18n.t('#time.am', "am")) + "</option><option value='pm' " + htmlEscape(selectedPM) + ">" + htmlEscape(I18n.t('#time.pm', "pm")) + "</option></select>&nbsp;&nbsp;&nbsp;<button type='button' class='btn btn-mini ui-datepicker-ok'>" + htmlEscape(I18n.t('#buttons.done', "Done")) + "</button></div>";
+      html += renderDatepickerTime(inst.input);
     }
     return html;
   };
@@ -196,11 +190,15 @@ define([
       var hr = $div.find(".ui-datepicker-time-hour").val() || $(this).data('time-hour');
       var min = $div.find(".ui-datepicker-time-minute").val() || $(this).data('time-minute');
       var ampm = $div.find(".ui-datepicker-time-ampm").val() || $(this).data('time-ampm');
-      if(hr) {
-        min = min || "00";
-        ampm = ampm || "pm";
-        var time = hr + ":" + min + " " + ampm;
-        text += " " + time;
+      if(hr || min) {
+        // intentionally not yet localized, because it's going to go in the val
+        // of the datepicker.
+        if (tz.hasMeridian()) {
+          ampm = ampm || "pm";
+        } else {
+          ampm = parseInt(hr, 10) > 12 ? "pm" : "am";
+        }
+        text += " " + hr + ":" + (min || "00") + " " + ampm;
       }
       picker.input.val(text).change();
     };

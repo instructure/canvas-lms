@@ -38,25 +38,26 @@ class LearningOutcome < ActiveRecord::Base
     'n_mastery'        => "n Number of Times",
     'highest'          => "Highest Score",
     'latest'           => "Most Recent Score",
-  }
+  }.freeze
   VALID_CALCULATION_INTS = {
     "decaying_average" => (1..99),
     "n_mastery" => (2..5),
-    "highest" => [],
-    "latest" => [],
-  }
+    "highest" => [].freeze,
+    "latest" => [].freeze,
+  }.freeze
 
-  validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :short_description, :maximum => maximum_string_length
-  validates_inclusion_of :calculation_method, :in => CALCULATION_METHODS.keys,
-    :message => t(
+  validates :description, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
+  validates :short_description, length: { maximum: maximum_string_length }
+  validates :display_name, length: { maximum: maximum_string_length, allow_nil: true, allow_blank: true }
+  validates :calculation_method, inclusion: { in: CALCULATION_METHODS.keys,
+    message: t(
       "calculation_method must be one of the following: %{calc_methods}",
       :calc_methods => CALCULATION_METHODS.keys.to_s
     )
-  validates_presence_of :short_description, :workflow_state
+  }
+  validates :short_description, :workflow_state, presence: true
   sanitize_field :description, CanvasSanitize::SANITIZE
-  validate :calculation_changes_after_asessing, if: :assessed?
-  validate :validate_calculation_int, unless: :assessed?
+  validate :validate_calculation_int
 
   set_policy do
     # managing a contextual outcome requires manage_outcomes on the outcome's context
@@ -85,21 +86,6 @@ class LearningOutcome < ActiveRecord::Base
     # if we are changing the calculation_method but not the calculation_int, set the int to the default value
     if calculation_method_changed? && !calculation_int_changed?
       self.calculation_int = default_calculation_int
-    end
-  end
-
-  def calculation_changes_after_asessing
-    # if we've been used to assess a student, refuse to accept any changes to our calculation options
-    if calculation_method_changed?
-      errors.add(:calculation_method, t(
-        "This outcome has been used to assess a student. The calculation method is locked",
-      ))
-    end
-
-    if calculation_int_changed?
-      errors.add(:calculation_int, t(
-        "This outcome has been used to assess a student. The calculation value is locked"
-      ))
     end
   end
 

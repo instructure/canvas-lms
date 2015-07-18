@@ -44,6 +44,9 @@ define [
     , OutcomeContentBase::events
 
     validations: _.extend
+      display_name: (data) ->
+        if data.display_name.length > 255
+          I18n.t('length_error', 'Must be 255 characters or less')
       mastery_points: (data) ->
         if _.isEmpty(data.mastery_points) or parseFloat(data.mastery_points) < 0
           I18n.t('mastery_error', 'Must be greater than or equal to 0')
@@ -169,10 +172,11 @@ define [
           data['mastery_points'] ||= 0
           @$el.html outcomeTemplate _.extend data,
             readOnly: @readOnly(),
-            native: @model.outcomeLink.outcome.context_id == @model.outcomeLink.context_id && @model.outcomeLink.outcome.context_type == @model.outcomeLink.context_type
+            native: @model.isNative(),
             setQuizMastery: @setQuizMastery,
             useForScoring: @useForScoring,
             isLargeRoster: ENV.IS_LARGE_ROSTER,
+            assessedInContext: @model.outcomeLink.assessed
 
       @$('input:first').focus()
       @screenreaderTitleFocus()

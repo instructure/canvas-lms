@@ -926,6 +926,17 @@ CanvasRails::Application.routes.draw do
       delete 'courses/:course_id/assignments/:id', action: :destroy, controller: :assignments
     end
 
+    scope(controller: :peer_reviews_api) do
+      get 'courses/:course_id/assignments/:assignment_id/peer_reviews', action: :index
+      get 'sections/:section_id/assignments/:assignment_id/peer_reviews', action: :index
+      get 'courses/:course_id/assignments/:assignment_id/submissions/:submission_id/peer_reviews', action: :index
+      get 'sections/:section_id/assignments/:assignment_id/submissions/:submission_id/peer_reviews', action: :index
+      post 'courses/:course_id/assignments/:assignment_id/submissions/:submission_id/peer_reviews', action: :create
+      post 'sections/:section_id/assignments/:assignment_id/submissions/:submission_id/peer_reviews', action: :create
+      delete 'courses/:course_id/assignments/:assignment_id/submissions/:submission_id/peer_reviews', action: :destroy
+      delete 'sections/:section_id/assignments/:assignment_id/submissions/:submission_id/peer_reviews', action: :destroy
+    end
+
     scope(controller: :assignment_overrides) do
       get 'courses/:course_id/assignments/:assignment_id/overrides', action: :index
       post 'courses/:course_id/assignments/:assignment_id/overrides', action: :create
@@ -1734,5 +1745,12 @@ CanvasRails::Application.routes.draw do
 
     #Tool Proxy Services
     get  "tool_proxy/:tool_proxy_guid", controller: 'lti/ims/tool_proxy', action: :show, as: "show_lti_tool_proxy"
+  end
+
+  ApiRouteSet.draw(self, '/api/sis') do
+    scope(controller: :sis_api) do
+      get 'accounts/:account_id/assignments', action: 'sis_assignments', as: :sis_account_assignments
+      get 'courses/:course_id/assignments', action: 'sis_assignments', as: :sis_course_assignments
+    end
   end
 end

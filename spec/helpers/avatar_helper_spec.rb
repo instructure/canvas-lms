@@ -47,7 +47,7 @@ describe AvatarHelper do
       end
 
       it "falls back to blank avatar when user's avatar has been reported during this session" do
-        self.expects(:session).returns({"reported_#{user.id}" => true})
+        self.expects(:session).at_least_once.returns({"reported_#{user.id}" => true})
         expect(avatar_image_attrs(user)).to eq ["/images/messages/avatar-50.png", '']
       end
 

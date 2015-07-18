@@ -156,3 +156,21 @@ def run_progress_job
   job = Delayed::Job.find(progress.delayed_job_id)
   job.invoke_job
 end
+
+def select_conversations(to_select = -1)
+  driver.action.key_down(modifier).perform
+  messages = ff('.messages li')
+  message_count = messages.length
+
+  # default of -1 will select all messages. If you enter in too large of number, it defaults to selecting all
+  to_select = message_count if (to_select == -1) || (to_select > ff('.messages li').length)
+
+  index = 0
+  messages.each do |message|
+    message.click
+    break if index > to_select
+    index += 1
+  end
+
+  driver.action.key_up(modifier).perform
+end

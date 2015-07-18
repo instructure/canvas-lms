@@ -69,14 +69,14 @@ module Qti
       # convert to 2.1
       dest_dir_2_1 = File.join(dirname, "qti_2_1")
       command = Qti.get_conversion_command(dest_dir_2_1, dirname)
-      `#{command}`
+      output = `#{command}`
   
       if $?.exitstatus == 0
         manifest = File.join(dest_dir_2_1, "imsmanifest.xml")
         questions = convert_questions(manifest, opts)
         assessments = convert_assessments(manifest, opts)
       else
-        raise "Error running python qti converter"
+        raise "Error running python qti converter: #{output}"
       end
     end
     [questions, assessments]

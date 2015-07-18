@@ -74,7 +74,7 @@ define([
       // %P as an empty string. ("reverse, look-ahead, reverse" pattern for
       // same reason as above)
       format = format.split("").reverse().join("");
-      if (_tz(datetime, '%P') === '' &&
+      if (!tz.hasMeridian() &&
           ((format.match(/[lI][-_]?%(%%)*(?!%)/) &&
             format.match(/p%(%%)*(?!%)/i)) ||
            format.match(/r[-_]?%(%%)*(?!%)/))) {
@@ -95,6 +95,10 @@ define([
 
       if (typeof formatted !== 'string') return null;
       return formatted;
+    },
+
+    hasMeridian: function() {
+      return _tz(new Date(), '%P') !== '';
     },
 
     // apply any number of non-format directives to the value (parsing it if

@@ -1611,7 +1611,7 @@ describe DiscussionTopic do
   describe "context_module_action" do
     context "group discussion" do
       before :once do
-        group_assignment_discussion
+        group_assignment_discussion(course: @course)
         @module = @course.context_modules.create!
         @topic_tag = @module.add_item(type: 'discussion_topic', id: @root_topic.id)
         @module.completion_requirements = { @topic_tag.id => { type: 'must_contribute' } }

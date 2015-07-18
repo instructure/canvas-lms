@@ -25,7 +25,7 @@ group :test do
   gem 'once-ler', '0.0.15'
 
   gem 'sequel', '4.5.0', require: false
-  gem 'selenium-webdriver', '2.43.0'
+  gem 'selenium-webdriver', '2.46.2'
     gem 'childprocess', '0.5.0', require: false
     gem 'websocket', '1.0.7', require: false
   gem 'test_after_commit', '0.4.0'

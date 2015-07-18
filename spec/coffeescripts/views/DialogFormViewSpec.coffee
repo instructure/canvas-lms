@@ -12,7 +12,6 @@ define [
   view = null
   model = null
   trigger = null
-  closeSpy = null
 
   # helpers
   openDialog = ->
@@ -25,7 +24,7 @@ define [
 
   module 'DialogFormView',
     setup: ->
-      closeSpy = sinon.spy DialogFormView::, 'close'
+      @closeSpy = @spy DialogFormView::, 'close'
       server = sinon.fakeServer.create()
       model = new Backbone.Model id:1, is_awesome: true
       model.url = '/test'
@@ -45,7 +44,6 @@ define [
     teardown: ->
       trigger.remove()
       server.restore()
-      closeSpy.restore()
       view.remove()
 
   test 'opening and closing the dialog with the trigger', ->
@@ -106,6 +104,4 @@ define [
   test 'closing the dialog calls view#close', ->
     openDialog()
     util.closeDialog()
-    ok closeSpy.called
-
-
+    ok @closeSpy.called

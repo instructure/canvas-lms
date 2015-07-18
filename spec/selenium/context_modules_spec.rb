@@ -454,6 +454,29 @@ describe "context modules" do
       expect(add_form.find_element(:css, 'tr.unlock_module_at_details')).not_to be_displayed
     end
 
+    it "should prompt relock when adding an unlock_at date" do
+      mod = @course.context_modules.create!(:name => "name")
+
+      get "/courses/#{@course.id}/modules"
+
+      keep_trying_until do
+        f(".ig-header-admin .al-trigger").click
+        f(".edit_module_link").click
+        expect(f('#add_context_module_form')).to be_displayed
+      end
+      edit_form = f('#add_context_module_form')
+
+      lock_check = edit_form.find_element(:id, 'unlock_module_at')
+      lock_check.click
+      wait_for_ajaximations
+      unlock_date = edit_form.find_element(:id, 'context_module_unlock_at')
+      unlock_date.send_keys((Date.today + 2.days).to_s)
+      wait_for_ajaximations
+      submit_form(edit_form)
+      expect(edit_form).not_to be_displayed
+      test_relock
+    end
+
     it "should properly change indent of an item with arrows" do
       get "/courses/#{@course.id}/modules"
 

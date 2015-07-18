@@ -233,7 +233,7 @@ define([
 
   function submissionStateName(submission) {
     if (submission && submission.workflow_state != 'unsubmitted' && (submission.submitted_at || !(typeof submission.grade == 'undefined'))) {
-      if (typeof submission.grade == 'undefined' || submission.grade === null || submission.workflow_state == 'pending_review') {
+      if (!submission.excused && (typeof submission.grade == 'undefined' || submission.grade === null || submission.workflow_state == 'pending_review')) {
         return "not_graded";
       } else if (submission.grade_matches_current_submission) {
         return "graded";
@@ -809,7 +809,7 @@ define([
     }
   });
 
-  window.onbeforeunload = function() {
+  function beforeLeavingSpeedgrader() {
     window.opener && window.opener.updateGrades && $.isFunction(window.opener.updateGrades) && window.opener.updateGrades();
 
     var userNamesWithPendingQuizSubmission = $.map(snapshotCache, function(snapshot) {
@@ -826,10 +826,13 @@ define([
         }
         return ret;
       })();
+    var hasUnsubmittedComments = $.trim($add_a_comment_textarea.val()) !== "";
     if (hasPendingQuizSubmissions) {
       return I18n.t('confirms.unsaved_changes', "The following students have unsaved changes to their quiz submissions: \n\n %{users}\nContinue anyway?", {'users': userNamesWithPendingQuizSubmission.join('\n ')});
+    } else if (hasUnsubmittedComments) {
+      return I18n.t("If you would like to keep your unsubmitted comments, please save them before navigating away from this page.");
     }
-  };
+  }
 
   // Public Variables and Methods
   var EG = {
@@ -925,6 +928,7 @@ define([
         e.preventDefault();
       });
 
+      window.onbeforeunload = beforeLeavingSpeedgrader;
     },
 
     jsonReady: function(){

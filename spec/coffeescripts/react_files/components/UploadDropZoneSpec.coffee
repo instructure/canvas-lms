@@ -23,7 +23,7 @@ define [
     ok(@uploadZone.getDOMNode().querySelector('.UploadDropZone__instructions'))
 
   test 'handles drop event on target', ->
-    sinon.stub(@uploadZone, 'onDrop')
+    @stub(@uploadZone, 'onDrop')
 
     @uploadZone.setState({active: true})
     dataTransfer = {
@@ -35,5 +35,3 @@ define [
     Simulate.dragOver(n, {dataTransfer: dataTransfer})
     Simulate.drop(n)
     ok(@uploadZone.onDrop.calledOnce, 'handles file drops')
-
-    @uploadZone.onDrop.restore()

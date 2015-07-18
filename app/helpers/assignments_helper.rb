@@ -40,7 +40,7 @@ module AssignmentsHelper
 
   def student_peer_review_link_for(context, assignment, assessment)
     link_options = assessment.completed? ? completed_link_options : in_progress_link_options
-    link_to assessment.asset_user_name, context_url(context, :context_assignment_submission_url, assignment.id, assessment.asset.user_id), link_options
+    link_to submission_author_name_for(assessment), context_url(context, :context_assignment_submission_url, assignment.id, assessment.asset.user_id), link_options
   end
 
   def due_at(assignment, user, format='datetime')
@@ -54,5 +54,21 @@ module AssignmentsHelper
 
   def assignment_publishing_enabled?(assignment, user)
     assignment.grants_right?(user, :update) && !assignment.has_student_submissions?
+  end
+
+  def assignment_submission_button(assignment, user, user_submission)
+    if assignment.expects_submission? && can_do(assignment, user, :submit)
+      submit_text = user_submission.try(:has_submission?) ? I18n.t("Re-submit Assignment") : I18n.t("Submit Assignment")
+      late = user_submission.try(:late?) ? "late" : ""
+      link_to(submit_text, '#', :class => "btn btn-primary submit_assignment_link #{late}")
+    end
+  end
+
+  def user_crumb_name
+    if @assessment_request
+      submission_author_name_for(@assessment_request)
+    else
+      @user.try_rescue(:short_name)
+    end
   end
 end

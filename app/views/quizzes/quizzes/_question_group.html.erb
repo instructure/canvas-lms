@@ -71,7 +71,7 @@
   </div>
 <% end %>
 <% hash_get(group, :questions, []).each do |question| %>
-  <%= render :partial => "display_question", :object => question, :locals => {:in_group => true, :editing => true, :asset_string => "quiz_question_#{question['id']}"} %>
+  <%= render :partial => "display_question", :object => question, :locals => {:in_group => true, :editing => true, :asset_string => "quiz_question_#{question['id']}", :group_id => group["id"]} %>
 <% end %>
 <div class="group_bottom" style="<%= "display: none;" unless group %>" id="<%= "group_bottom_template" unless group %>">
   &nbsp;

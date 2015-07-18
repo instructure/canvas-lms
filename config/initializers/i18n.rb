@@ -66,7 +66,9 @@ ActionView::Helpers::FormHelper.module_eval do
   alias_method_chain :label, :symbol_translation
 end
 
-ActionView::Helpers::InstanceTag.send(:include, I18nUtilities)
+if CANVAS_RAILS3
+  ActionView::Helpers::InstanceTag.send(:include, I18nUtilities)
+end
 ActionView::Helpers::FormTagHelper.send(:include, I18nUtilities)
 ActionView::Helpers::FormTagHelper.class_eval do
   def label_tag_with_symbol_translation(method, text = nil, options = {})

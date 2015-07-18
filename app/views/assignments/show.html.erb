@@ -3,7 +3,7 @@
   content_for :right_side, render(:partial => "assignment_sidebar")
 %>
 
-<% if @locked && !@locked[:due_at] %>
+<% if @locked && (@locked[:context_module] || @locked[:unlock_at]) %>
   <% js_bundle :module_sequence_footer %>
 
   <h1><%= @assignment.title %></h1>
@@ -24,7 +24,7 @@
           <%= @assignment.title %>
         </h1>
       </div>
-      <div class='edit-content'>
+      <div class='assignment-buttons'>
         <button
           id="assignment_publish_button"
           data-id='<%= @assignment.id %>'
@@ -46,7 +46,7 @@
           <% @assignment_menu_tools.each do |tool_hash| %>
             <li role="presentation">
               <a class="menu_tool_link" href="<%= tool_hash[:base_url] %>&assignments[]=<%= @assignment.id %>" tabindex="-1" role="menuitem">
-                <% if tool_hash[:icon_url] %><img class="icon" src="<%= tool_hash[:icon_url] %>" /><% end %>
+                <% if tool_hash[:icon_url] %><img class="icon" alt="" src="<%= tool_hash[:icon_url] %>" /><% end %>
                 <%= tool_hash[:title] %>
               </a>
             </li>
@@ -66,8 +66,10 @@
       <div class="edit-content">
         <%= render "shared/mark_as_done" %>
       </div>
+      <div class='assignment-buttons'>
+        <%= assignment_submission_button(@assignment, @current_user, @current_user_submission) %>
+      </div>
     </div>
-
     <ul class='student-assignment-overview'>
       <li>
         <span class='title'><%= t :due_at, 'Due' %></span>

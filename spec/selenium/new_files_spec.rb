@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 
 describe "better_file_browsing" do
   include_examples "in-process server selenium tests"
-  context "As a teacher", priority: 1 do
+  context "As a teacher" do
     before(:each) do
       course_with_teacher_logged_in
       add_file(fixture_file_upload('files/example.pdf', 'application/pdf'),
@@ -14,7 +14,7 @@ describe "better_file_browsing" do
       expect(f('.btn-upload')).to be_displayed
       expect(get_all_files_folders.count).to eq 1
     end
-    it "should edit file name", priority:1, test_id: 129430 do
+    it "should edit file name", priority: 1, test_id: 129430 do
       expect(fln("example.pdf")).to be_present
       file_rename_to = "Example_edited.pdf"
       edit_name_from_cog_icon(file_rename_to)
@@ -108,14 +108,12 @@ describe "better_file_browsing" do
       txt_files.map { |text_file| add_file(fixture_file_upload("files/#{text_file}", 'text/plain'), @course, text_file) }
       get "/courses/#{@course.id}/files"
     end
-
     it "should set focus to the folder tree when opening the dialog", priority: 1, test_id: 180641 do
       ff('.al-trigger')[0].click
       fln("Move").click
       wait_for_ajaximations
       check_element_has_focus(ff('.tree')[1])
     end
-
     it "should move a file", priority: 1, test_id: 129453 do
       file_name = "a_file.txt"
       add_folder("destination_folder")
@@ -129,7 +127,6 @@ describe "better_file_browsing" do
       expect(fln(file_name)).to be_displayed
     end
   end
-
 
   context "File Downloads" do
     it "should download a file from top toolbar successfully" do

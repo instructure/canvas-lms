@@ -4,8 +4,8 @@ gemspec
 gem 'simplecov', '0.8.2', :require => false
 gem 'simplecov-rcov', '0.2.3', :require => false
 
-platforms :ruby_20, :ruby_21 do
-  gem 'syck', '1.0.1'
+platforms :ruby_20, :ruby_21, :ruby_22 do
+  gem 'syck', '1.0.4'
 end
 
 require File.expand_path("../../../config/canvas_rails4", __FILE__)

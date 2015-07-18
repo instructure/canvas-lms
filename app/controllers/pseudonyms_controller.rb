@@ -337,7 +337,9 @@ class PseudonymsController < ApplicationController
 
   def find_authentication_provider
     return true unless params[:pseudonym][:authentication_provider_id]
-    params[:pseudonym][:authentication_provider] = @domain_root_account.account_authorization_configs.find(params[:pseudonym][:authentication_provider_id])
+    params[:pseudonym][:authentication_provider] = @domain_root_account.
+      authentication_providers.active.
+      find(params[:pseudonym][:authentication_provider_id])
   end
 
   def update_pseudonym_from_params
