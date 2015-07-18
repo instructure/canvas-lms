@@ -66,6 +66,33 @@ describe Login::SamlController do
     expect(Pseudonym.find(session['pseudonym_credentials_id'])).to eq user2.pseudonyms.first
   end
 
+  it "does not enforce a valid entity id" do
+    unique_id = 'foo@example.com'
+
+    account1 = account_with_saml
+    user1 = user_with_pseudonym({:active_all => true, :username => unique_id})
+    @pseudonym.account = account1
+    @pseudonym.save!
+
+    Onelogin::Saml::Response.stubs(:new).returns(
+        stub('response',
+             is_valid?: true,
+             success_status?: true,
+             name_id: unique_id,
+             name_qualifier: nil,
+             session_index: nil,
+             process: nil,
+             issuer: "such a lie"
+        )
+    )
+
+    controller.request.env['canvas.domain_root_account'] = account1
+    post :create, :SAMLResponse => "foo"
+    expect(response).to redirect_to(dashboard_url(:login_success => 1))
+    expect(session[:saml_unique_id]).to eq unique_id
+    expect(Pseudonym.find(session['pseudonym_credentials_id'])).to eq user1.pseudonyms.first
+  end
+
   it "should redirect when a user is authenticated but is not found in canvas" do
     unique_id = 'foo@example.com'
 
