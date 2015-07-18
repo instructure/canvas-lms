@@ -13,7 +13,7 @@ describe "assignment groups" do
     course_with_teacher_logged_in
     @course.require_assignment_group
     @assignment_group = @course.assignment_groups.first
-    @course.assignments.create(:name => "test", :assignment_group => @assignment_group)
+    @course.assignments.create(name: "test", assignment_group: @assignment_group)
   end
 
   it "should create a new assignment group", priority: "1", test_id: 120673  do
@@ -32,7 +32,7 @@ describe "assignment groups" do
 
   it "should default to proper group when using group's inline add assignment button", priority: "2", test_id: 209998 do
     @course.require_assignment_group
-    ag = @course.assignment_groups.create!(:name => "Pamplemousse")
+    ag = @course.assignment_groups.create!(name: "Pamplemousse")
 
     get "/courses/#{@course.id}/assignments"
     wait_for_ajaximations
@@ -49,7 +49,7 @@ describe "assignment groups" do
   #Per selenium guidelines, we should not test buttons navigating to a page
   # We could test that the page loads with the correct info from the params elsewhere
   it "should remember entered settings when 'more options' is pressed", priority: "2", test_id: 209999 do
-    ag2 = @course.assignment_groups.create!(:name => "blah")
+    ag2 = @course.assignment_groups.create!(name: "blah")
 
     get "/courses/#{@course.id}/assignments"
     wait_for_ajaximations
@@ -67,11 +67,11 @@ describe "assignment groups" do
   end
 
   it "should edit group details", priority: "1", test_id: 120672 do
-    assignment_group = @course.assignment_groups.create!(:name => "first test group")
+    assignment_group = @course.assignment_groups.create!(name: "first test group")
     4.times do
-      @course.assignments.create(:title => 'other assignment', :assignment_group => assignment_group)
+      @course.assignments.create(title: 'other assignment', assignment_group: assignment_group)
     end
-    assignment = @course.assignments.create(:title => 'assignment with rubric', :assignment_group => assignment_group)
+    assignment = @course.assignments.create(title: 'assignment with rubric', assignment_group:  assignment_group)
 
     get "/courses/#{@course.id}/assignments"
     wait_for_ajaximations
@@ -105,8 +105,8 @@ describe "assignment groups" do
 
   it "should edit assignment groups grade weights", priority: "1", test_id: 120675 do
     @course.update_attribute(:group_weighting_scheme, 'percent')
-    ag1 = @course.assignment_groups.create!(:name => "first group")
-    ag2 = @course.assignment_groups.create!(:name => "second group")
+    ag1 = @course.assignment_groups.create!(name: "first group")
+    ag2 = @course.assignment_groups.create!(name: "second group")
 
     get "/courses/#{@course.id}/assignments"
 
@@ -120,6 +120,23 @@ describe "assignment groups" do
     wait_for_ajaximations
 
     keep_trying_until { expect(f("#assignment_group_#{ag1.id} .ag-header-controls").text).to include('50% of Total') }
+  end
+
+  it "should round group weights to 2 decimal places", priority: "2", test_id: 120676 do
+    @course.update_attribute(:group_weighting_scheme, 'percent')
+    ag1 = @course.assignment_groups.create!(name: "first group")
+
+    get "/courses/#{@course.id}/assignments"
+
+    f("#ag_#{ag1.id}_manage_link").click
+    fj(".edit_group:visible:first").click
+
+    fj('input[name="group_weight"]:visible').send_keys('10.1111')
+
+    fj('.create_group:visible').click
+    wait_for_ajaximations
+
+    keep_trying_until { expect(f("#assignment_group_#{ag1.id} .ag-header-controls").text).to include('10.11% of Total') }
   end
 
   #This feels like it would be better suited here than in QUnit
@@ -151,8 +168,8 @@ describe "assignment groups" do
   #Because of the way this feature was made, i recommend we keep this one
   it "should move assignments to another assignment group", priority: "2", test_id: 210001 do
     before_count = @assignment_group.assignments.count
-    @ag2 = @course.assignment_groups.create!(:name => "2nd Group")
-    @assignment = @course.assignments.create(:name => "Test assignment", :assignment_group => @ag2)
+    @ag2 = @course.assignment_groups.create!(name: "2nd Group")
+    @assignment = @course.assignments.create(name: "Test assignment", assignment_group: @ag2)
     get "/courses/#{@course.id}/assignments"
     wait_for_ajaximations
 
@@ -176,7 +193,7 @@ describe "assignment groups" do
   it "should reorder assignment groups with drag and drop", priority: "2", test_id: 210010 do
     ags = [@assignment_group]
     4.times do |i|
-      ags << @course.assignment_groups.create!(:name => "group_#{i}")
+      ags << @course.assignment_groups.create!(name: "group_#{i}")
     end
     expect(ags.collect(&:position)).to eq [1,2,3,4,5]
 
@@ -259,7 +276,7 @@ describe "assignment groups" do
   context "frozen assignment group" do
     before do
       stub_freezer_plugin
-      default_group = @course.assignment_groups.create!(:name => "default")
+      default_group = @course.assignment_groups.create!(name: "default")
       @frozen_assign = frozen_assignment(default_group)
     end
 
@@ -270,8 +287,8 @@ describe "assignment groups" do
     end
 
     it "should not be locked for admin", priority: "2", test_id: 210086 do
-      @course.assignment_groups.create!(:name => "other")
-      course_with_admin_logged_in(:course => @course, :name => "admin user")
+      @course.assignment_groups.create!(name: "other")
+      course_with_admin_logged_in(course: @course, name: "admin user")
       orig_title = @frozen_assign.title
 
       run_assignment_edit(@frozen_assign) do
