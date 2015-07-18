@@ -121,7 +121,16 @@ module Api
       end
 
       def apply_mathml(node)
-        node['data-mathml'] = UserContent.latex_to_mathml(node.delete('alt').value)
+        self.class.apply_mathml(node)
+      end
+
+      def self.apply_mathml(node)
+        mathml = UserContent.latex_to_mathml(node['alt'])
+        return if mathml.blank?
+
+        # replace alt attribute with mathml
+        node.delete('alt')
+        node['data-mathml'] = mathml
       end
     end
   end
