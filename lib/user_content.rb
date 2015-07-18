@@ -37,8 +37,11 @@ module UserContent
     end
 
     find_equation_images(html) do |node|
-      mathml = latex_to_mathml(node.delete('alt').value)
+      mathml = latex_to_mathml(node['alt'])
       next if mathml.blank?
+
+      # replace alt attribute with mathml
+      node.delete('alt')
       mathml_span = Nokogiri::HTML::DocumentFragment.parse("<span class=\"hidden-readable\">#{mathml}</span>")
       node.add_next_sibling(mathml_span)
     end
@@ -48,7 +51,8 @@ module UserContent
 
   def self.latex_to_mathml(latex)
     Ritex::Parser.new.parse(latex)
-  rescue Ritex::LexError, Ritex::Error
+  rescue Racc::ParseError, Ritex::LexError, Ritex::Error
+    # invalid LaTeX; leave alt alone, skip mathml
     return ""
   end
 
