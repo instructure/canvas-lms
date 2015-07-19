@@ -20,12 +20,14 @@ module Mutable
   end
 
   def mute!
+    return if muted?
     self.update_attribute(:muted, true)
     clear_sent_messages
     hide_stream_items
   end
 
   def unmute!
+    return unless muted?
     self.update_attribute(:muted, false)
     broadcast_unmute_event
     show_stream_items
