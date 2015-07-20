@@ -1,9 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/groups_common')
 
 describe "gradebook2" do
   include_examples "in-process server selenium tests"
 
-  describe "multiple grading periods" do
+  context "multiple grading periods" do
     let!(:enable_mgp_and_navigate_to_gradebook) do
       course_with_admin_logged_in
       student_in_course
@@ -861,71 +862,6 @@ describe "gradebook2" do
         cell = f(selector)
         expect(cell.find_element(:css, '.gradebook-cell')).to have_class('grayed-out')
       end
-    end
-  end
-
-  context 'excused assignment' do
-    it 'default grade cannot be set to excused', priority: "1", test_id: 219380 do
-      init_course_with_students
-
-      assignment = @course.assignments.create! title: 'Test Me!', points_possible: 20
-      get "/courses/#{@course.id}/grades"
-      f('.assignment_header_drop').click
-      f('.gradebook-header-menu [data-action="setDefaultGrade"]').click
-
-      ['EX', 'eX', 'Ex', 'ex'].each_with_index do |ex, i|
-        replace_content f("#student_grading_#{assignment.id}"), "#{ex}\n"
-        wait_for_ajaximations
-        expect(ff('.ic-flash-error').length).to be i + 1
-        expect(f('.ic-flash-error').text).to include 'Default grade cannot be set to EX'
-      end
-    end
-
-    it 'formats excused grade like dropped assignment', priority: "1", test_id: 216380 do
-      init_course_with_students
-
-      assignment = @course.assignments.create! title: 'Excuse Me', points_possible: 20
-      assignment.grade_student(@students[0], {excuse: true})
-
-      user_session(@students[0])
-      get "/courses/#{@course.id}/grades"
-
-      grade_row = f("#submission_#{assignment.id}")
-      grade_cell = f(".assignment_score .grade", grade_row)
-      grade = grade_cell.text.scan(/\d+|EX/).first
-
-      expect(grade_row).to have_class '.excused'
-      expect(grade).to eq 'EX'
-      expect(grade_row.attribute 'title').to eq 'This assignment is excused and will not be considered in the total calculation'
-    end
-
-    it 'is not included in grade calculations', priority: "1", test_id: 196596 do
-      init_course_with_students
-
-      a1 = @course.assignments.create! title: 'Excuse Me', points_possible: 20
-      a2 = @course.assignments.create! title: 'Don\'t Excuse Me', points_possible: 20
-
-      a1.grade_student(@students[0], {grade: 20})
-      a2.grade_student(@students[0], {grade: 5})
-
-      get "/courses/#{@course.id}/gradebook/"
-      excused = f('#gradebook_grid .container_1 .slick-row .slick-cell:nth-child(2)')
-      excused.click
-      replace_content excused.find_element(:css, '.grade'), "EX\n"
-
-      row = ff('#gradebook_grid .container_1 .slick-row .slick-cell')
-
-      expect(row[0].text).to eq '20'
-      # this should show 'EX' and have dropped class
-      expect(row[1].text).to eq('EX')
-      expect(row[1]).to have_class 'dropped'
-
-      # only one cell should have 'dropped' class
-      dropped = ff('#gradebook_grid .container_1 .slick-row .dropped')
-      expect(dropped.length).to eq 1
-
-      # 'EX' should only affect that one cell
-      expect(row[2].text).to eq '100%'
     end
   end
 
