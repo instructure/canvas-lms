@@ -21,7 +21,7 @@ describe "quizzes" do
     @quiz = @course.quizzes.create!(:title => "score 10")
   end
 
-  it "should show tool launch links in the gear for items on the index" do
+  it "should show tool launch links in the gear for items on the index", priority: "1", test_id: 209942 do
     get "/courses/#{@course.id}/quizzes"
     wait_for_ajaximations
 
@@ -33,7 +33,7 @@ describe "quizzes" do
     expect(link['href']).to eq course_external_tool_url(@course, @tool) + "?launch_type=quiz_menu&quizzes[]=#{@quiz.id}"
   end
 
-  it "should show tool launch links in the gear for items on the show page" do
+  it "should show tool launch links in the gear for items on the show page", priority: "1", test_id: 209943 do
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     wait_for_ajaximations
 

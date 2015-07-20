@@ -10,7 +10,7 @@ describe "quizzes questions" do
 
   context "as a teacher" do
 
-    it "should edit a quiz question" do
+    it "should edit a quiz question", priority: "1", test_id: 209946 do
       @context = @course
       q = quiz_model
       quest1 = q.quiz_questions.create!(:question_data => {:name => "first question"})
@@ -47,7 +47,7 @@ describe "quizzes questions" do
       expect(question.find_elements(:css, '.answers .answer').length).to eq 3
     end
 
-    it "should ignore html added in the quiz description" do
+    it "should ignore html added in the quiz description", priority: "1", test_id: 209947 do
       bad_html = '<div id="question_16740547_question_text" class="question_text user_content enhanced">
                     <p>For Mead, what is the "essence" of the self?</p>
                   </div>
@@ -68,7 +68,7 @@ describe "quizzes questions" do
       expect(ffj(".question_form:visible .form_answers .answer").size).to eq 2
     end
 
-    it "should not show Missing Word option in question types dropdown" do
+    it "should not show Missing Word option in question types dropdown", priority: "1", test_id: 209948 do
       get "/courses/#{@course.id}/quizzes/new"
 
       expect(ff("#question_form_template option.missing_word").length).to eq 1
@@ -81,7 +81,7 @@ describe "quizzes questions" do
       expect(ff("#questions .question_holder option.missing_word").length).to eq 0
     end
 
-    it "should reorder questions with drag and drop" do
+    it "should reorder questions with drag and drop", priority: "1", test_id: 209949 do
       quiz_with_new_questions
       click_questions_tab
 
@@ -103,7 +103,7 @@ describe "quizzes questions" do
       expect(names[1].text).to eq 'first question'
     end
 
-    it "should not show the display details for text questions" do
+    it "should not show the display details for text questions", priority: "1", test_id: 209951 do
       quiz = start_quiz_question
 
       question = fj(".question_form:visible")
@@ -117,7 +117,7 @@ describe "quizzes questions" do
       expect(show_el).not_to be_displayed
     end
 
-    it "should not show the display details for essay questions" do
+    it "should not show the display details for essay questions", priority: "1", test_id: 209950 do
       quiz = start_quiz_question
 
       question = fj(".question_form:visible")
@@ -131,7 +131,7 @@ describe "quizzes questions" do
       expect(show_el).not_to be_displayed
     end
 
-    it "should show the display details when questions other than text or essay questions exist" do
+    it "should show the display details when questions other than text or essay questions exist", priority: "1", test_id: 209952 do
       quiz = start_quiz_question
       show_el = f('#show_question_details')
       question = fj(".question_form:visible")
@@ -146,7 +146,7 @@ describe "quizzes questions" do
       expect(show_el).to be_displayed
     end
 
-    it "should calculate correct quiz question points total" do
+    it "should calculate correct quiz question points total", priority: "1", test_id: 209953 do
       get "/courses/#{@course.id}/quizzes"
       expect_new_page_load { f('.new-quiz-link').click }
       @question_count = 0
@@ -164,7 +164,7 @@ describe "quizzes questions" do
       expect(quiz.quiz_questions.length).to eq @question_count
     end
 
-    it "should round published quiz points correctly on main quiz page" do
+    it "should round published quiz points correctly on main quiz page", priority: "1", test_id: 209954 do
       skip("bug 7402 - Quiz points not rounding correctly")
       q = @course.quizzes.create!(:title => "new quiz")
       75.times do
@@ -179,7 +179,7 @@ describe "quizzes questions" do
       expect(fj('.summary td:eq(2)').text).to eq "99.75%"
     end
 
-    it "should round numeric questions the same when created and taking a quiz" do
+    it "should round numeric questions the same when created and taking a quiz", priority: "1", test_id: 209955 do
       start_quiz_question
       question = fj(".question_form:visible")
       click_option('.question_form:visible .question_type', 'Numerical Answer')
