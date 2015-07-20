@@ -30,6 +30,9 @@ module CanvasRails
     config.action_dispatch.rescue_responses['AuthenticationMethods::LoggedOutError'] = 401
     if CANVAS_RAILS3
       config.action_dispatch.rescue_responses['ActionController::ParameterMissing'] = 400
+    else
+      config.action_dispatch.default_headers['X-UA-Compatible'] = "IE=Edge,chrome=1"
+      config.action_dispatch.default_headers.delete('X-Frame-Options')
     end
 
     config.app_generators do |c|

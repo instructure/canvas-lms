@@ -27,6 +27,11 @@ describe "site-wide" do
     consider_all_requests_local(true)
   end
 
+  let(:x_frame_options) { CANVAS_RAILS3 ? 'x-frame-options' : 'X-Frame-Options' }
+  let(:x_canvas_meta) { CANVAS_RAILS3 ? 'x-canvas-meta' : 'X-Canvas-Meta' }
+  let(:x_canvas_user_id) { CANVAS_RAILS3 ? 'x-canvas-user-id' : 'X-Canvas-User-Id' }
+  let(:x_canvas_real_user_id) { CANVAS_RAILS3 ? 'x-canvas-real-user-id' : 'X-Canvas-Real-User-Id' }
+
   it "should render 404 when user isn't logged in" do
     Setting.set 'show_feedback_link', 'true'
     get "/dashbo"
@@ -35,7 +40,8 @@ describe "site-wide" do
 
   it "should set the x-ua-compatible http header" do
     get "/login"
-    expect(response['x-ua-compatible']).to eq "IE=Edge,chrome=1"
+    key = CANVAS_RAILS3 ? 'x-ua-compatible' : 'X-UA-Compatible'
+    expect(response[key]).to eq "IE=Edge,chrome=1"
   end
 
   it "should set no-cache headers for html requests" do
@@ -53,7 +59,7 @@ describe "site-wide" do
   it "should set the x-frame-options http header" do
     get "/login"
     expect(assigns[:files_domain]).to be_falsey
-    expect(response['x-frame-options']).to eq "SAMEORIGIN"
+    expect(response[x_frame_options]).to eq "SAMEORIGIN"
   end
 
   it "should not set x-frame-options when on a files domain" do
@@ -61,23 +67,23 @@ describe "site-wide" do
     attachment_model(:context => @user)
     FilesController.any_instance.expects(:files_domain?).returns(true)
     get "http://files-test.host/files/#{@attachment.id}/download"
-    expect(response['x-frame-options']).to be_nil
+    expect(response[x_frame_options]).to be_nil
   end
 
   context "x-canvas-meta header" do
     it "should set action information in API requests" do
       course_with_teacher_logged_in
       get "/api/v1/courses/#{@course.id}"
-      expect(response['x-canvas-meta']).to match(%r{o=courses;n=show;})
+      expect(response[x_canvas_meta]).to match(%r{o=courses;n=show;})
     end
 
     it "should set page view information in user requests" do
       course_with_teacher_logged_in
       Setting.set('enable_page_views', 'db')
       get "/courses/#{@course.id}"
-      expect(response['x-canvas-meta']).to match(%r{o=courses;n=show;})
-      expect(response['x-canvas-meta']).to match(%r{t=Course;})
-      expect(response['x-canvas-meta']).to match(%r{x=5;})
+      expect(response[x_canvas_meta]).to match(%r{o=courses;n=show;})
+      expect(response[x_canvas_meta]).to match(%r{t=Course;})
+      expect(response[x_canvas_meta]).to match(%r{x=5;})
     end
   end
 
@@ -98,23 +104,23 @@ describe "site-wide" do
 
     it "should not set the logged in user headers when no one is logged in" do
       get "/"
-      expect(response['x-canvas-user-id']).to be_nil
-      expect(response['x-canvas-real-user-id']).to be_nil
+      expect(response[x_canvas_user_id]).to be_nil
+      expect(response[x_canvas_real_user_id]).to be_nil
     end
 
     it "should set them when a user is logged in" do
       user_session(@student, @student_pseudonym)
       get "/"
-      expect(response['x-canvas-user-id']).to eq @student.global_id.to_s
-      expect(response['x-canvas-real-user-id']).to be_nil
+      expect(response[x_canvas_user_id]).to eq @student.global_id.to_s
+      expect(response[x_canvas_real_user_id]).to be_nil
     end
 
     it "should set them when masquerading" do
       user_session(@admin, @admin.pseudonyms.first)
       post "/users/#{@student.id}/masquerade"
       get "/"
-      expect(response['x-canvas-user-id']).to eq @student.global_id.to_s
-      expect(response['x-canvas-real-user-id']).to eq @admin.global_id.to_s
+      expect(response[x_canvas_user_id]).to eq @student.global_id.to_s
+      expect(response[x_canvas_real_user_id]).to eq @admin.global_id.to_s
     end
   end
 
