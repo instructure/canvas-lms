@@ -18,7 +18,7 @@ class DiscussionTopic::ScopedToUser < ScopeFilter
     course_scope = course.discussion_topics.active
     course_level_topic_ids = DifferentiableAssignment.scope_filter(course_scope, user, course).pluck(:id)
     if course_level_topic_ids.any?
-      scope.where("root_topic_id IN (?) OR root_topic_id IS NULL OR id IN (?)", course_level_topic_ids, course_level_topic_ids)
+      scope.where("discussion_topics.root_topic_id IN (?) OR discussion_topics.root_topic_id IS NULL OR discussion_topics.id IN (?)", course_level_topic_ids, course_level_topic_ids)
     else
       scope.where(root_topic_id: nil)
     end
