@@ -13,8 +13,8 @@ else
   gem 'rails-observers', '0.1.2'
 end
 gem 'tzinfo', '0.3.43'
-gem 'encrypted_cookie_store-instructure', '1.1.10', require: 'encrypted_cookie_store'
-gem 'active_model_serializers', '0.9.0alpha1',
+gem 'encrypted_cookie_store-instructure', '1.1.11', require: 'encrypted_cookie_store'
+gem 'active_model_serializers',   '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
 gem 'authlogic', '3.4.2'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
