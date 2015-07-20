@@ -5,7 +5,9 @@ module BrandableCSS
   APP_ROOT = defined?(Rails) && Rails.root || Pathname.pwd
   CONFIG = YAML.load_file(APP_ROOT.join('config/brandable_css.yml')).freeze
   BRANDABLE_VARIABLES = JSON.parse(File.read(APP_ROOT.join(CONFIG['paths']['brandable_variables_json']))).freeze
-  SASS_STYLE = (ENV['SASS_STYLE'] || ((defined?(Rails) && Rails.env.production?) ? 'compressed' : 'nested')).freeze
+
+  use_compressed = (defined?(Rails) && Rails.env.production?) || (ENV['RAILS_ENV'] == 'production')
+  SASS_STYLE = ENV['SASS_STYLE'] || ((use_compressed ? 'compressed' : 'nested')).freeze
 
   class << self
     def variables_map
@@ -50,7 +52,7 @@ module BrandableCSS
           memo[k] = v['combinedChecksum']
         end.freeze
       elsif defined?(Rails) && Rails.env.production?
-        raise "you need to run #{cli} before you can serve css."
+        raise "#{file.expand_path} does not exist. You need to run #{cli} before you can serve css."
       else
         # for dev/test there might be cases where you don't want it to raise an exception
         # if you haven't ran `brandable_css` and the manifest file doesn't exist yet.
