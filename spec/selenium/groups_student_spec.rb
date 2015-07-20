@@ -107,6 +107,46 @@ describe "student groups" do
       end
     end
 
+    describe "new self sign-up groups" do
+      it "should allow a student to leave a group and not change the group leader", priority: "1", test_id: 96027 do
+        # Creating two groups, using one, and ensuring the second group remains empty
+        group_test_setup(4,1,2)
+        @group_category.first.configure_self_signup(true,false)
+        3.times do |n|
+          add_user_to_group(@students[n], @testgroup.first,false)
+        end
+        add_user_to_group(@students[3], @testgroup.first,true)
+
+        user_session(@students[0])
+        get "/courses/#{@course.id}/groups"
+
+        f('.student-group-header .icon-mini-arrow-right').click
+        wait_for_ajaximations
+
+        expect(f('div[role="list"]')).to include_text("#{@students[0].name}")
+
+        # First student leaves group
+        fj('.student-group-join :contains("Leave")').click
+        wait_for_ajaximations
+
+        expect(f('div[role="list"]')).not_to include_text("#{@students[0].name}")
+
+        user_session(@teacher)
+        get "/courses/#{@course.id}/groups"
+
+        f(".group[data-id=\"#{@testgroup[0].id}\"] .toggle-group").click
+        f(".group[data-id=\"#{@testgroup[1].id}\"] .toggle-group").click
+        wait_for_ajaximations
+
+        # Ensure First Student is no longer in groups, but in Unassigned Students section
+        expect(f('div[data-view="groups"]')).not_to include_text("#{@students[0].name}")
+        expect(f('.unassigned-students')).to include_text("#{@students[0].name}")
+        # Fourth student should remain group leader
+        expect(fj(".group[data-id=\"#{@testgroup[0].id}\"] ." \
+      "group-user:contains(\"#{@students[3].name}\") .group-leader")).to be_displayed
+      end
+    end
+
     describe "student group index page" do
       before(:each) do
        create_group(group_name:group_name)
