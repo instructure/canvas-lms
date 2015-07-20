@@ -14,7 +14,7 @@
             class="ic-app-header__menu-list"
             aria-label="<%= t('Main Navigation') %>"
           >
-            <li class="ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/') && request.fullpath.length == 1 %>">
+            <li class="ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/') && request.path.length == 1 %>">
               <a id="global_nav_dashboard_link" href="<%= dashboard_url %>" class="ic-app-header__menu-list-link">
                 <div class="menu-item-icon-container">
                     <%= svg_icon :dashboard %>
