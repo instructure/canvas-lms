@@ -26,6 +26,17 @@ describe "submissions" do
       f('button[type="submit"]').click
 
       expect(f("#sidebar_content")).to include_text("Turned In!")
+      expect(fj(".error_text")).to be_nil
+    end
+
+    it "should not let a student submit a text entry with no text entered", priority: "2", test_id: 238143 do
+      @assignment.update_attributes(submission_types: "online_text_entry")
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      f(".submit_assignment_link").click
+      f('button[type="submit"]').click
+
+      expect(fj(".error_text")).to be
     end
 
     it "should not break when you open and close the media comment dialog", priority: "1", test_id: 237020 do
