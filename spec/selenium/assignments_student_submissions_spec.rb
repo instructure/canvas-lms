@@ -17,6 +17,17 @@ describe "submissions" do
       @fourth_assignment = @course.assignments.create!(:title => 'assignment 4', :name => 'assignment 4', :due_at => @due_date - 1.day)
     end
 
+    it "should let a student submit a text entry", priority: "1", test_id: 56015 do
+      @assignment.update_attributes(submission_types: "online_text_entry")
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+      f(".submit_assignment_link").click
+      driver.execute_script "tinyMCE.activeEditor.setContent('text')"
+      f('button[type="submit"]').click
+
+      expect(f("#sidebar_content")).to include_text("Turned In!")
+    end
+
     it "should not break when you open and close the media comment dialog", priority: "1", test_id: 237020 do
       stub_kaltura
       #pending("failing because it is dependant on an external kaltura system")
