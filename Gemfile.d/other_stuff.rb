@@ -68,6 +68,7 @@ gem 'nokogiri', '1.6.6.2', require: false
 # oauth gem, with rails3 fixes rolled in
 gem 'oauth-instructure', '0.4.10', require: false
 gem 'oauth2', '1.0.0', require: false
+gem 'parallel', '1.4.1', require: false
 gem 'rack-mini-profiler', '0.9.2', require: false
 gem 'flamegraph', '0.1.0', require: false
   gem 'stackprof', '0.2.7', require: false

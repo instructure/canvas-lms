@@ -2,6 +2,7 @@ require 'guard'
 require 'guard/guard'
 require 'fileutils'
 require 'handlebars_tasks'
+require 'parallel'
 
 module Guard
   class JST < Guard
