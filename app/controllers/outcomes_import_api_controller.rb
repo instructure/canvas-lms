@@ -74,10 +74,10 @@ class OutcomesImportApiController < ApplicationController
     if !AcademicBenchmark.config
       render json: { error: "#{err} (needs api_key and api_url)" }
       return false
-    elsif !AcademicBenchmark.config["api_key"]
+    elsif !AcademicBenchmark.config["api_key"] || AcademicBenchmark.config["api_key"].empty?
       render json: { error: "#{err} (needs api_key)" }
       return false
-    elsif !AcademicBenchmark.config["api_url"]
+    elsif !AcademicBenchmark.config["api_url"] || AcademicBenchmark.config["api_url"].empty?
       render json: { error: "#{err} (needs api_url)" }
       return false
     end

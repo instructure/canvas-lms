@@ -23,7 +23,7 @@ module AcademicBenchmark
       if @archive_file
         convert_file
       elsif @settings[:authorities] || @settings[:guids] || @settings[:refresh_all_standards]
-        if @api_key
+        if @api_key && !@api_key.empty?
           if @settings[:refresh_all_standards]
             refresh_all_outcomes
           else
