@@ -84,7 +84,8 @@ define([
       var tool = this.state.tool;
       var hasPlacements = false;
       var appliedPlacements = _.map(allPlacements, function(value, key){
-        if (tool[key]) {
+        if (tool[key] || (tool["resource_selection"] && key == "assignment_selection") ||
+          (tool["resource_selection"] && key == "link_selection")) {
           hasPlacements = true;
           return <li>{ value }</li>;
         }
