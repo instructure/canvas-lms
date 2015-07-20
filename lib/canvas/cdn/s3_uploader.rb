@@ -1,3 +1,5 @@
+require 'parallel'
+
 module Canvas
   module CDN
     class S3Uploader

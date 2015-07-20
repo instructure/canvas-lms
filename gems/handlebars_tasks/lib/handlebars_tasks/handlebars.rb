@@ -22,7 +22,6 @@ module HandlebarsTasks
       #
       # OR an array of such
       def compile(*args)
-        require 'parallel'
         unless args.first.is_a? Array
           args = [args]
         end
@@ -30,6 +29,7 @@ module HandlebarsTasks
         args.each do |(root_path, compiled_path, plugin)|
           files.concat(Dir["#{root_path}/**/**.handlebars"].map { |file| [file, root_path, compiled_path, plugin] })
         end
+        require 'parallel'
         Parallel.each(files, :in_threads => Parallel.processor_count) do |file|
           compile_file *file
         end
