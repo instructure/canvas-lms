@@ -129,6 +129,15 @@ END
       root_opt_in: true,
       beta: true
     },
+    'epub_export' =>
+    {
+      display_name: -> { I18n.t('ePub Export') },
+      description: -> { I18n.t(<<END) },
+      This enables users to generate and download course ePub.
+END
+      applies_to: 'User',
+      state: 'hidden'
+    },
     'html5_first_videos' =>
     {
       display_name: -> { I18n.t('features.html5_first_videos', 'Prefer HTML5 for video playback') },

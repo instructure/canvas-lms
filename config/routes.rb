@@ -8,6 +8,8 @@ Dir["{gems,vendor}/plugins/*/config/pre_routes.rb"].each { |pre_routes|
 CanvasRails::Application.routes.draw do
   resources :submission_comments, only: :destroy
 
+  resources :epub_exports, only: [:index]
+
   get 'inbox' => 'context#inbox'
   get 'oauth/redirect_proxy' => 'oauth_proxy#redirect_proxy'
 
@@ -1680,6 +1682,18 @@ CanvasRails::Application.routes.draw do
         get "#{prefix}/:id", action: :show
       end
       get "courses/:course_id/content_list", action: :content_list, as: "course_content_list"
+    end
+
+    scope(controller: :epub_exports) do
+      get 'courses/:course_id/epub_exports/:id', {
+        action: :show
+      }
+      get 'epub_exports', {
+        action: :index
+      }
+      post 'courses/:course_id/epub_exports', {
+        action: :create
+      }
     end
 
     scope(controller: :grading_standards_api) do

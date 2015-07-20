@@ -1,0 +1,145 @@
+define [
+  'underscore',
+  'react',
+  'jsx/shared/ApiProgressBar'
+  'jsx/shared/stores/ProgressStore'
+], (_, React, ApiProgressBar, ProgressStore) ->
+  TestUtils = React.addons.TestUtils
+
+  module 'ApiProgressBarSpec',
+    setup: ->
+      @progress_id = '1'
+      @progress = {
+        id: @progress_id,
+        context_id: 1,
+        context_type: 'EpubExport',
+        user_id: 1,
+        tag: 'epub_export',
+        completion: 0,
+        workflow_state: 'queued'
+      }
+      @store_state = {}
+      @store_state[@progress_id] = @progress
+      @storeSpy = sinon.stub(ProgressStore, 'get', (=>
+        ProgressStore.setState(@store_state)
+      ))
+      @clock = sinon.useFakeTimers()
+
+    teardown: ->
+      ProgressStore.get.restore()
+      @clock.restore()
+
+  test 'shouldComponentUpdate', ->
+    component = TestUtils.renderIntoDocument(ApiProgressBar())
+
+    ok component.shouldComponentUpdate({
+      progress_id: @progress_id
+    }, {}), 'should update when progress_id prop changes'
+
+    ok component.shouldComponentUpdate({}, {
+      workflow_state: 'running'
+    }), 'should update when state changes'
+
+    component.setProps(progress_id: @progress_id)
+    component.setState(workflow_state: 'running')
+
+    ok !component.shouldComponentUpdate({
+      progress_id: @progress_id
+    }, {
+      workflow_state: component.state.workflow_state
+    }), 'should not update if state & props are the same'
+
+  test 'componentDidUpdate', ->
+    onCompleteSpy = sinon.spy()
+    component = TestUtils.renderIntoDocument(ApiProgressBar({
+      onComplete: onCompleteSpy,
+      progress_id: @progress_id
+    }))
+    @clock.tick(component.props.delay + 5)
+    ok !_.isNull(component.intervalID), 'should have interval id'
+
+    @progress.workflow_state = 'running'
+    @clock.tick(component.props.delay + 5)
+    ok !_.isNull(component.intervalID), 'should have an inverval id after updating to running'
+
+    @progress.workflow_state = 'completed'
+    @clock.tick(component.props.delay + 5)
+    ok _.isNull(component.intervalID), 'should not have an inverval id after updating to completed'
+    ok onCompleteSpy.called, 'should call callback on update if complete'
+
+  test 'handleStoreChange', ->
+    component = TestUtils.renderIntoDocument(ApiProgressBar({
+      progress_id: @progress_id
+    }))
+    @clock.tick(component.props.delay + 5)
+
+    _.each [ 'completion', 'workflow_state' ], (stateName) =>
+      equal component.state[stateName], @progress[stateName],
+        "component #{stateName} should equal progress #{stateName}"
+
+    @progress.workflow_state = 'running'
+    @progress.completion = 50
+    ProgressStore.setState(@store_state)
+
+    _.each [ 'completion', 'workflow_state' ], (stateName) =>
+      equal component.state[stateName], @progress[stateName],
+        "component #{stateName} should equal progress #{stateName}"
+
+    React.unmountComponentAtNode(component.getDOMNode().parentNode)
+
+  test 'isComplete', ->
+    component = TestUtils.renderIntoDocument(ApiProgressBar({
+      progress_id: @progress_id
+    }))
+    @clock.tick(component.props.delay + 5)
+
+    ok !component.isComplete(), 'is not complete if state is queued'
+
+    @progress.workflow_state = 'running'
+    @clock.tick(component.props.delay + 5)
+    ok !component.isComplete(), 'is not complete if state is running'
+
+    @progress.workflow_state = 'completed'
+    @clock.tick(component.props.delay + 5)
+    ok component.isComplete(), 'is complete if state is completed'
+
+  test 'isInProgress', ->
+    component = TestUtils.renderIntoDocument(ApiProgressBar({
+      progress_id: @progress_id
+    }))
+    @clock.tick(component.props.delay + 5)
+
+    ok component.isInProgress(), 'is in progress if state is queued'
+
+    @progress.workflow_state = 'running'
+    @clock.tick(component.props.delay + 5)
+    ok component.isInProgress(), 'is in progress if state is running'
+
+    @progress.workflow_state = 'completed'
+    @clock.tick(component.props.delay + 5)
+    ok !component.isInProgress(), 'is not in progress if state is completed'
+
+  test 'poll', ->
+    component = TestUtils.renderIntoDocument(ApiProgressBar())
+    component.poll()
+    ok !@storeSpy.called,
+      'should not fetch from progress store without progress id'
+
+    component.setProps(progress_id: @progress_id)
+    component.poll()
+    ok @storeSpy.called, 'should fetch when progress id is present'
+
+    React.unmountComponentAtNode(component.getDOMNode().parentNode)
+
+  test 'render', ->
+    component = TestUtils.renderIntoDocument(ApiProgressBar({
+      progress_id: @progress_id
+    }))
+    ok _.isNull(component.getDOMNode()),
+      'should not render to DOM if is not in progress'
+
+    @clock.tick(component.props.delay + 5)
+    ok !_.isNull(component.getDOMNode()),
+      'should render to DOM if is not in progress'
+
+    React.unmountComponentAtNode(component.getDOMNode().parentNode)

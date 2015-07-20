@@ -19,14 +19,14 @@
 class ContentExport < ActiveRecord::Base
   include Workflow
   belongs_to :context, :polymorphic => true
-
   belongs_to :user
   belongs_to :attachment
   belongs_to :content_migration
   has_many :attachments, :as => :context, :dependent => :destroy
+  has_one :epub_export
   has_a_broadcast_policy
   serialize :settings
-  attr_accessible :context
+  attr_accessible :context, :export_type, :user, :selected_content, :progress
   validates_presence_of :context_id, :workflow_state
   validates_inclusion_of :context_type, :in => ['Course', 'Group', 'User']
 
@@ -61,7 +61,7 @@ class ContentExport < ActiveRecord::Base
     p.whenever {|record|
       record.changed_state(:exported) && record.send_notification?
     }
-    
+
     p.dispatch :content_export_failed
     p.to { [user] }
     p.whenever {|record|
@@ -127,6 +127,7 @@ class ContentExport < ActiveRecord::Base
       self.job_progress.try :fail!
     ensure
       self.save
+      epub_export.try(:mark_exported) || true
     end
   end
 
@@ -200,11 +201,11 @@ class ContentExport < ActiveRecord::Base
   def zip_export?
     self.export_type == ZIP
   end
-  
+
   def error_message
     self.settings[:errors] ? self.settings[:errors].last : nil
   end
-  
+
   def error_messages
     self.settings[:errors] ||= []
   end
@@ -226,8 +227,8 @@ class ContentExport < ActiveRecord::Base
   end
 
   # Method Summary
-  #   Takes in an ActiveRecord object. Determines if the item being 
-  #   checked should be exported or not. 
+  #   Takes in an ActiveRecord object. Determines if the item being
+  #   checked should be exported or not.
   #
   #   Returns: bool
   def export_object?(obj, asset_type=nil)
@@ -249,7 +250,7 @@ class ContentExport < ActiveRecord::Base
   #   Takes a symbol containing the items that were selected to export.
   #   is_set? will return true if the item is selected. Also handles
   #   a case where 'everything' is set and returns true
-  #   
+  #
   # Returns: bool
   def export_symbol?(symbol)
     selected_content.empty? || is_set?(selected_content[symbol]) || is_set?(selected_content[:everything])
@@ -264,7 +265,7 @@ class ContentExport < ActiveRecord::Base
     selected_content[asset_type] ||= {}
     selected_content[asset_type][select_content_key(obj)] = true
   end
-  
+
   def add_error(user_message, exception_or_info=nil)
     self.settings[:errors] ||= []
     er = nil
@@ -283,11 +284,11 @@ class ContentExport < ActiveRecord::Base
   def root_account
     self.context.try_rescue(:root_account)
   end
-  
+
   def running?
     ['created', 'exporting'].member? self.workflow_state
   end
-  
+
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
@@ -298,27 +299,35 @@ class ContentExport < ActiveRecord::Base
   def settings
     read_attribute(:settings) || write_attribute(:settings,{}.with_indifferent_access)
   end
-  
+
   def fast_update_progress(val)
     content_migration.update_conversion_progress(val) if content_migration
     self.progress = val
     ContentExport.where(:id => self).update_all(:progress=>val)
     self.job_progress.try(:update_completion!, val)
   end
-  
-  scope :active, -> { where("workflow_state<>'deleted'") }
-  scope :not_for_copy, -> { where("export_type<>?", COURSE_COPY) }
-  scope :common_cartridge, -> { where(:export_type => COMMON_CARTRIDGE) }
-  scope :qti, -> { where(:export_type => QTI) }
-  scope :course_copy, -> { where(:export_type => COURSE_COPY) }
-  scope :running, -> { where(:workflow_state => ['created', 'exporting']) }
-  scope :admin, ->(user) { where("export_type NOT IN (?) OR user_id=?", [ZIP, USER_DATA], user) }
-  scope :non_admin, ->(user) { where("export_type IN (?) AND user_id=?", [ZIP, USER_DATA], user) }
+
+  scope :active, -> { where("content_exports.workflow_state<>'deleted'") }
+  scope :not_for_copy, -> { where("content_exports.export_type<>?", COURSE_COPY) }
+  scope :common_cartridge, -> { where(export_type: COMMON_CARTRIDGE) }
+  scope :qti, -> { where(export_type: QTI) }
+  scope :course_copy, -> { where(export_type: COURSE_COPY) }
+  scope :running, -> { where(workflow_state: ['created', 'exporting']) }
+  scope :admin, ->(user) {
+    where("content_exports.export_type NOT IN (?) OR content_exports.user_id=?", [
+      ZIP, USER_DATA
+    ], user)
+  }
+  scope :non_admin, ->(user) {
+    where("content_exports.export_type IN (?) AND content_exports.user_id=?", [
+      ZIP, USER_DATA
+    ], user)
+  }
+  scope :without_epub, -> {eager_load(:epub_export).where(epub_exports: {id: nil})}
 
   private
-
   def is_set?(option)
     Canvas::Plugin::value_to_boolean option
   end
-  
+
 end

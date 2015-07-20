@@ -274,6 +274,14 @@ TEXT
           <%= f.select :course_format, format_options %>
         </td>
       </tr><tr>
+        <td class="form-label"><label for="course_epub_export"><%= before_label('course_epub_export', %{Epub Export}) %></label></td>
+        <td colspan="3" id="course_visibility">
+          <div>
+            <%= f.check_box :organize_epub_by_content_type %>
+            <%= f.label :organize_epub_by_content_type, t("Organize epub by content type (default is by module).") %>
+          </div>
+        </td>
+      </tr><tr>
         <td class="form-label"><label for="course_public_description"><%= before_label('course_description', %{Description}) %></label></td>
         <td colspan="3">
           <%= f.text_area :public_description, :style => "height: 100px;" %>
