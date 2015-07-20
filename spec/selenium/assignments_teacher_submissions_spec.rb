@@ -11,7 +11,7 @@ describe "submissions" do
       course_with_teacher_logged_in
     end
 
-    it "should allow media comments" do
+    it "should allow media comments", priority: "1", test_id: 237032 do
       stub_kaltura
       #pending("failing because it is dependant on an external kaltura system")
 
@@ -29,7 +29,7 @@ describe "submissions" do
       expect(number_of_comments).to eq 2
     end
 
-    it "should display the grade in grade field" do
+    it "should display the grade in grade field", priority: "1", test_id: 237033 do
       student_in_course
       assignment = create_assignment
       assignment.submissions.create(:user => @student)
@@ -45,7 +45,7 @@ describe "submissions" do
       course_with_teacher_logged_in
     end
 
-    it "should allow a student view student to view/submit assignments" do
+    it "should allow a student view student to view/submit assignments", priority: "1", test_id: 237034 do
       @assignment = @course.assignments.create(
           :title => 'Cool Assignment',
           :points_possible => 10,
@@ -67,7 +67,7 @@ describe "submissions" do
       expect(f('#sidebar_content .details')).to include_text "Turned In!"
     end
 
-    it "should allow a student view student to submit file upload assignments" do
+    it "should allow a student view student to submit file upload assignments", priority: "1", test_id: 237035 do
       @assignment = @course.assignments.create(
           :title => 'Cool Assignment',
           :points_possible => 10,

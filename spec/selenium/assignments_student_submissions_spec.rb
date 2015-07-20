@@ -17,7 +17,7 @@ describe "submissions" do
       @fourth_assignment = @course.assignments.create!(:title => 'assignment 4', :name => 'assignment 4', :due_at => @due_date - 1.day)
     end
 
-    it "should not break when you open and close the media comment dialog" do
+    it "should not break when you open and close the media comment dialog", priority: "1", test_id: 237020 do
       stub_kaltura
       #pending("failing because it is dependant on an external kaltura system")
 
@@ -45,7 +45,7 @@ describe "submissions" do
       submit_form('#submit_media_recording_form')
     end
 
-    it "should not allow blank media submission" do
+    it "should not allow blank media submission", priority: "1", test_id: 237021 do
       stub_kaltura
       #pending("failing because it is dependant on an external kaltura system")
 
@@ -57,7 +57,7 @@ describe "submissions" do
       driver.switch_to.alert.accept
     end
 
-    it "should allow you to submit a file" do
+    it "should allow you to submit a file", priority: "1", test_id: 237022 do
       @assignment.submission_types = 'online_upload'
       @assignment.save!
       filename, fullpath, data = get_file("testfile1.txt")
@@ -78,7 +78,7 @@ describe "submissions" do
       expect(@submission.workflow_state).to eq 'submitted'
     end
 
-    it "should not allow a user to submit a file-submission assignment without attaching a file" do
+    it "should not allow a user to submit a file-submission assignment without attaching a file", priority: "1", test_id: 237023 do
       @assignment.submission_types = 'online_upload'
       @assignment.save!
 
@@ -97,7 +97,7 @@ describe "submissions" do
       driver.switch_to.default_content
     end
 
-    it "should not allow a user to submit a file-submission assignment with an illegal file extension" do
+    it "should not allow a user to submit a file-submission assignment with an illegal file extension", priority: "1", test_id: 237024 do
       @assignment.submission_types = 'online_upload'
       @assignment.allowed_extensions = ['bash']
       @assignment.save!
@@ -121,7 +121,7 @@ describe "submissions" do
       driver.switch_to.default_content
     end
 
-    it "should show as not turned in when submission was auto created in speedgrader" do
+    it "should show as not turned in when submission was auto created in speedgrader", priority: "1", test_id: 237025 do
       # given
       @assignment.update_attributes(:submission_types => "online_text_entry")
       @assignment.grade_student(@student, :grade => "0")
@@ -132,7 +132,7 @@ describe "submissions" do
       expect(f('.submit_assignment_link').text).to eq "Submit Assignment"
     end
 
-    it "should not show as turned in or not turned in when assignment doesnt expect a submission" do
+    it "should not show as turned in or not turned in when assignment doesnt expect a submission", priority: "1", test_id: 237025 do
       # given
       @assignment.update_attributes(:submission_types => "on_paper")
       @assignment.grade_student(@student, :grade => "0")
@@ -144,7 +144,7 @@ describe "submissions" do
       expect(f('.submit_assignment_link')).to be_nil
     end
 
-    it "should not allow blank submissions for text entry" do
+    it "should not allow blank submissions for text entry", priority: "1", test_id: 237026 do
       @assignment.update_attributes(:submission_types => "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f('.submit_assignment_link').click
@@ -167,7 +167,7 @@ describe "submissions" do
       expect(Submission.count).to eq 1
     end
 
-    it "should not allow a submission with only comments" do
+    it "should not allow a submission with only comments", priority: "1", test_id: 237027 do
       @assignment.update_attributes(:submission_types => "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f('.submit_assignment_link').click
@@ -186,7 +186,7 @@ describe "submissions" do
       driver.switch_to.default_content
     end
 
-    it "should not allow peer reviewers to see turnitin scores/reports" do
+    it "should not allow peer reviewers to see turnitin scores/reports", priority: "1", test_id: 237028 do
       @student1 = @user
       @assignment.submission_types = 'online_upload'
       @assignment.save!
@@ -232,7 +232,7 @@ describe "submissions" do
     end
 
 
-    it "should submit an assignment and validate confirmation information" do
+    it "should submit an assignment and validate confirmation information", priority: "1", test_id: 237029 do
       skip "BUG 6783 - Coming Up assignments update error"
       @assignment.update_attributes(:submission_types => 'online_url')
       @submission = @assignment.submit_homework(@student)
@@ -268,7 +268,7 @@ describe "submissions" do
         driver.execute_script("$('.folder_item').addClass('folder_item_hover')")
       end
 
-      it "should allow uploaded files to be used for submission" do
+      it "should allow uploaded files to be used for submission", priority: "1", test_id: 237030 do
         local_storage!
 
         user_with_pseudonym :username => "nobody2@example.com",
@@ -313,7 +313,7 @@ describe "submissions" do
         end
       end
 
-      it "should not allow a user to submit a file-submission assignment from previously uploaded files with an illegal file extension" do
+      it "should not allow a user to submit a file-submission assignment from previously uploaded files with an illegal file extension", priority: "1", test_id: 237031 do
         FILENAME = "hello-world.sh"
         FIXTURE_FN = "files/#{FILENAME}"
 
