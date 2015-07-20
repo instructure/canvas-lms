@@ -193,7 +193,7 @@ describe "context modules" do
       end
     end
 
-    it "should edit a module item and validate the changes stick" do
+    it "should edit a module item and validate the changes stick", priority: "1", test_id: 126737 do
       get "/courses/#{@course.id}/modules"
 
       item_edit_text = "Assignment Edit 1"
