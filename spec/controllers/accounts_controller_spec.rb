@@ -584,4 +584,38 @@ describe AccountsController do
       end
     end
   end
+
+  def admin_logged_in(account)
+    user_session(user)
+    Account.site_admin.account_users.create!(user: @user)
+    account_with_admin_logged_in(account: account)
+  end
+
+  describe "#account_courses" do
+    before do
+      @account = Account.create!
+      @c1 = course(account: @account, name: "foo")
+      @c2 = course(account: @account, name: "bar")
+    end
+
+    it "should get a list of courses" do
+      admin_logged_in(@account)
+      get 'courses_api', :account_id => @account.id
+
+      expect(response).to be_success
+      expect(response.body).to match(/#{@c1.id}/)
+      expect(response.body).to match(/#{@c2.id}/)
+    end
+
+    it "should properly remove sections from includes" do
+      @s1 = @course.course_sections.create!
+      @course.enroll_student(user(:active_all => true), :section => @s1, :allow_multiple_enrollments => true)
+
+      admin_logged_in(@account)
+      get 'courses_api', :account_id => @account.id, :include => [:sections]
+
+      expect(response).to be_success
+      expect(response.body).not_to match(/sections/)
+    end
+  end
 end

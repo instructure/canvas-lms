@@ -20,7 +20,7 @@ module Api::V1::SectionEnrollments
   def section_enrollments_json(enrollments)
     enrollments.map do |enrollment|
       section = enrollment.course_section
-      section_json = section.attributes.slice *%w(id name start_at end_at)
+      section_json = section.attributes.slice(*%w(id name start_at end_at))
       section_json[:enrollment_role] = enrollment.type
       section_json
     end
