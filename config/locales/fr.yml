@@ -9,8 +9,6 @@ fr:
     headings: 
       page: "Non autorisé"
     title: "Non autorisé"
-  558x270_png_a5e13e53: "PNG 558 x 270"
-  558x558_png_1_8x_the_standard_tile_size_so_it_can__4a9023e1: "PNG 558 x 558 (1,8 fois la taille standard, de sorte que cet élément peut être réduit ou agrandi selon les besoins)"
   EditAppointmentGroupDetails: 
     affect_reservations: "En quoi cela affectera-t-il les réservations ?"
     and_n_contexts: "et %{n} autres"
@@ -62,10 +60,6 @@ fr:
         api_key: "Clé API"
         api_url: "URL de l’API"
         common_core_guid: "GUID principale commune (facultatif)"
-  access_to_the_etherpad_collaborations_below_will_b_b6a0a288: |-
-      L'accès aux collaborations Etherpad ci-dessous va être abandonné le 8 Août 2015. Si vous désirez sauvegarder ces données, veuillez les migrer avant cette date.
-      
-      Pour découvrir comment créer une collaboration avec Google, [cliquez ici](%{google_collab_help_url}).
   access_token_is_valid_until_d2f048cf: "Le jeton d'accès est valide jusqu'à/au"
   account: 
     ask_canvas_network: "Poser la question à la communauté du réseau Canvas"
@@ -834,7 +828,6 @@ fr:
         allow_invitation_previews: "Aperçu des invitations"
         allow_sending_scores_in_emails: "Les étudiants peuvent choisir de recevoir leurs notes par messagerie"
         allow_sis_import: "Importations SIS"
-        apple_touch_icon_remove: "Revenir aux paramètres par défaut"
         author_email_in_notifications: "Afficher l’adresse e-mail de l’expéditeur pour les notifications relatives aux interactions avec les utilisateurs "
         canvas_authentication: "Authentification Canvas"
         default_language: "Langue par défaut"
@@ -849,11 +842,9 @@ fr:
         equella: Equella
         equella_endpoint: "Point de terminaison Equella"
         equella_teaser: "Commentaires Equella"
-        favicon_remove: "Revenir aux paramètres par défaut"
         global_includes: "Inclusions globales CSS/JavaScript"
         global_javascript: "URL JavaScript global"
         global_stylesheet: "URL CSS global"
-        header_image_remove: "Revenir aux paramètres par défaut"
         help_link_available_to: "Disponible pour"
         help_link_subtext: "Texte secondaire"
         help_link_text: "Texte à afficher pour le lien"
@@ -863,8 +854,6 @@ fr:
         login_handle_name: "Libellé de connexion"
         message: Message
         mfa_settings: "Authentification multifacteur"
-        msapplication_tile_square_remove: "Revenir aux paramètres par défaut"
-        msapplication_tile_wide_remove: "Revenir aux paramètres par défaut"
         name: "Nom du compte"
         no_enrollments_can_create_courses: "Utilisateurs sans inscription"
         open_registration: "Enregistrement libre"
@@ -1373,9 +1362,6 @@ fr:
   api_url_3ee7cb0a: "URL de l'API"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "Le centre d’applications apparaîtra dans l’onglet « Applications » de la page des paramètres d’un cours ou compte. L’URL fournie ci-dessous doit pointer sur une destination (Centre d’applications) valide (par exemple %{url}). N’oubliez pas la barre oblique à la fin."
   app_placements_6d877225: "Placements d'application"
-  appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "Ajoute un numéro à la fin de chaque titre d'évènement (ex: Évènement 1, Évènement 2, etc.)"
-  appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "Ajoute un numéro à la fin de chaque titre d'évènement (ex: Évènement 1, Évènement 2, etc.)\" pour=\"append_iterator"
-  apple_touch_icon_2c258bb3: "Icône AppleTouch"
   application: 
     errors: 
       feed_not_found: "Flux introuvable"
@@ -1969,9 +1955,6 @@ fr:
         submission: Envoi
         submission_not_turned_in: "Non remis !"
         submission_turned_in: Remis
-    submission_type_icon: 
-      tooltips: 
-        submitted: Envoyé
     submission_types_form: 
       advanced_turnitin_settings: "Paramètres Turnitin avancés"
       descriptions: 
@@ -2468,20 +2451,17 @@ fr:
         more_options: "Plus d’options"
     edit_calendar_event: 
       calendar: "Calendrier :"
-      count: " Comptage : "
       date: "Date :"
       from: "Du :"
       links: 
         more_options: "Plus d’options"
       location: "Lieu :"
-      repeat: "Répéter "
       timespan_separator: à
       title: "Titre :"
     edit_calendar_event_full: 
       buttons: 
         create: "Créer un événement"
         update: "Mettre à jour l’événement"
-      count: " Comptage :"
       date: Date
       delete: Supprimer
       different_date_for_each_section: "Utiliser une date différente pour chaque section"
@@ -2492,7 +2472,6 @@ fr:
       location_address: "Adresse :"
       location_name: "Lieu :"
       new_calendar_event_header: "Nouvel événement du calendrier"
-      repeat: Répéter
       start_time: "Heure de début"
     edit_event: 
       tabs: 
@@ -2566,7 +2545,6 @@ fr:
       would_you_like_to_cancel_that_and_sign_up_for_this: "Voulez-vous annuler cette réservation ci pour pour inscrire à celle-là ?"
       you_are_already_signed_up_for: "Vous êtes déjà inscrit à :"
     save: Enregistrer
-    save_and_publish: "Enregistrer et publier"
     save_changes: "Enregistrer les modifications"
     scheduler_right_side_admin_section: 
       create_a_new_set_of_appointments: "Créer un groupe de rendez-vous"
@@ -3370,14 +3348,8 @@ fr:
       delete_item: "Voulez-vous vraiment supprimer cet élément du module ?"
     content_next: 
       add_prerequisite: "Ajouter des prérequis à *%{module}*"
-      assignment_points_possible: "sur %{points_possible}"
-      button: 
-        delete_label: "Supprimer les conditions préalables"
-        delete_title: "Supprimer les conditions préalables"
       buttons: 
-        add_module: "Ajouter un module"
         add_prerequisite: "Ajouter des prérequis"
-      criterion_for_assignment: "Pour %{assignment}, les utilisateurs doivent %{select_criterion}"
       headings: 
         add_prerequisite: "Ajouter des prérequis pour %{name}"
         course_modules: "Modules du cours"
@@ -3406,50 +3378,17 @@ fr:
           one: "Retrait 1 niveau"
           other: "Retrait %{count} niveaux"
           zero: "Pas de retrait"
-      key: 
-        description: 
-          delete: "Supprimer le module/élément actuel"
-          edit: "Modifier le module/élément"
-          indent: "Augmenter le retrait"
-          new: "Nouveau module"
-          next: "Module/élément suivant"
-          outdent: "Diminuer le retrait"
-          previous: "Module/élément précédent"
-      keycode_descriptions: 
-        next_module_item: "Sélectionner le module ou l’élément de module suivant"
-        previous_module_item: "Sélectionner le module ou l’élément de module précédent"
-        toggle_module_dragging: "Sélectionner l’élément pour le déplacer ou lâcher l’élément déjà sélectionné "
-      keycodes: 
-        delete: d
-        edit: e
-        indent: i
-        new: "n"
-        next: j
-        next_module_item: Haut
-        outdent: o
-        previous: k
-        previous_module_item: Bas
-        toggle_module_dragging: Espace
       labels: 
         indent: Retrait
-        module_complete_when: "Ce module est terminé lorsque"
-        modules: 
-          before_students_view: "Avant que les étudiants ne voient ce module"
         new_tab: "Ouvrir dans un nouvel onglet"
-        publish_final_grade: "Publier la note finale de l’étudiant à la fin de ce module"
-        require_sequential_progress: "Les étudiants doivent avancer dans les matières obligatoires de ce module dans l’ordre"
         title: Titre
-        unlock_at: "Déverrouiller dans"
         url: URL
       links: 
-        add_prerequisite: "Ajouter des prérequis"
-        add_requirement: "Ajouter des conditions requises"
         student_progress: "Afficher la progression"
         title: 
           remove_prerequisite: "Supprimer ce prérequis"
       module: module
       module_details: "Les modules sont affichés dans l’ordre séquentiel, par conséquent seuls ceux placés au-dessus de %{name} peuvent être définis comme prérequis."
-      module_name: "Nom du module"
       modules_keyboard_hint_updated: "Avertissement : pour une meilleure accessibilité lors de la réorganisation des modules (ou de leurs éléments), utilisez l’option Accéder à la boîte de dialogue figurant dans le menu."
       move_module: 
         after: Après
@@ -3460,12 +3399,8 @@ fr:
         into: dans
         or: OU
         place: Placer
-      must_complete_prerequisites: "Ils doivent terminer"
-      no_preprequisites: "Aucun prérequis défini"
-      no_requirements: "Aucune condition requise définie"
       prerequisites: 
         another_module: "Autre module"
-      prerequisites_need_item: "Vous devrez ajouter des éléments avant de spécifier comment l’utilisateur terminera ce module"
       requirements: 
         must_contribute: "contribuer à la page"
         must_score_at_least: "obtenir au moins"
@@ -3473,7 +3408,6 @@ fr:
         must_view: "afficher l’élément"
       select_module: 
         instructions: "Sélectionner le module"
-        name: "le module %{module}"
       select_prerequisite: "Sélectionnez le type de prérequis. Les étudiants ne peuvent pas voir un module tant qu’ils n’ont pas satisfait aux prérequis."
     context_module: 
       unpublish: "Annuler la publication"
@@ -3568,13 +3502,6 @@ fr:
       quizzes: Questionnaires
       wiki_pages: "Pages Wiki"
     points_possible_short: "%{points} points"
-    prerequisites_footer: 
-      default_module_name: module
-      labels: 
-        prerequisites: Prérequis
-      links: 
-        title: 
-          remove_prerequisite: "Supprimer ce prérequis"
     progressions: 
       titles: 
         student_progress: "Progrès des étudiants"
@@ -4652,7 +4579,6 @@ fr:
       student: 
         count: "Nombre d’étudiants ayant donné des réponses erronées"
         ratio: "Ratio d’étudiants ayant donné des réponses erronées"
-  current_3ce5414a: "Actuelle :"
   current_mastery_score_score_out_of_mastery_points_fedd343f: "Score actuel de maîtrise : %{score} sur %{mastery_points} "
   current_provider_6c3f7f96: "Fournisseur actuel"
   current_score_6c81792: "Note actuelle"
@@ -4835,7 +4761,6 @@ fr:
       month: Mois
       second: Secondes
       year: Année
-  day_s_7cc1231f: Jour(s)
   decaying_average_8bf6a0dd: "Moyenne de décroissance"
   deep_orange_4c7eea99: "Orange foncé"
   deep_purple_bb3e2907: "Violet foncé"
@@ -5250,7 +5175,6 @@ fr:
       anonymous_user: Anonyme
     pinned_discussions: "Discussions épinglées"
     reply: 
-      error_saving_reply: "*Une erreur s’est produite*. Veuillez renvoyer votre réponse ultérieurement."
       saving_reply: "Enregistrement de la réponse..."
     reply_attachment: 
       attachment_label: "Pièce jointe"
@@ -5779,7 +5703,6 @@ fr:
   event_date_f05219e7: "Date de l'événement : "
   event_end_time_ef830e66: "Heure de fin de l'événement"
   event_start_time_441b491f: "Heure de début de l'événement"
-  every_665d821e: Chaque
   everyone_854554dd: Tous
   everyone_else_6c6dc7b6: "Tous les autres"
   example_84698b7d: Exemple
@@ -5951,7 +5874,6 @@ fr:
   failed_to_import_media_objects_4c1fcb4f: "Échec d'importation des objets multimédias"
   failed_to_log_in_7ceec561: "Échec de connexion"
   fair_use_bee47d77: "Usage loyal"
-  favicon_6e658914: Favicon
   feature_flags: 
     feature_flag: 
       allow: Autoriser
@@ -6109,7 +6031,6 @@ fr:
     no_deleting_root: "Impossible de supprimer le dossier racine"
     only_one_folder: "Impossible de définir le chemin et l’ID du dossier"
   for: pour
-  for_974cbb84: Pour
   for_all_devices_1f603968: "Pour tous les appareils"
   forgot_password_url_3f9c04b: "URL d'oubli du mot de passe"
   from_fdd4956d: De
@@ -7361,8 +7282,6 @@ fr:
   k12_description: |-
       Des fonctions, des paramètres  et des styles qui sont mieux adaptés à un environnement K-12. Pour le moment, cela 
       applique uniquement quelques changements de style, mais d’autres éléments propres au niveau K-12 peuvent être ajoutés par la suite.
-  labels: 
-    lock_module_until: "Verrouiller le module jusqu’à une date donnée"
   last_item_79583712: "Dernier élément : "
   last_user_access_title: "Dernier accès utilisateur"
   late_percent_b91d01b3: "En retard : %{percent}"
@@ -7373,15 +7292,12 @@ fr:
   launch_url_e150bd41: "URL de lancement"
   layouts: 
     application: 
-      bouncing_communication_channels: "Il y a apparemment un problème avec un de vos modes de contact. Vérifiez votre *Page des paramètres*."
       group_switch: Changer
-      javascript_required: "JavaScript doit être activé pour que vous puissiez accéder à ce site."
       keyboard_navigation: 
         close: "Appuyez sur la virgule pour refermer cette boîte de dialogue."
       links: 
         close: Fermer
         dashboard: "Mon tableau de bord"
-        skip_to_content: "Passer au contenu"
     fixed_bottom: 
       masquerading: 
         stop: "Arrêter l’usurpation"
@@ -7398,8 +7314,6 @@ fr:
       view_all_or_customize: "Afficher tout ou personnaliser"
     mobile_auth: 
       log_in_to_canvas: "Connexion à Canvas"
-    styleguide: 
-      default_page_title: "Canvas LMS"
   learning_mastery_gradebook_description: |-
       Le relevé de notes pour la maîtrise de l’apprentissage permet aux enseignants de voir rapidement 
       la progression des étudiants et du cours dans les différents apprentissages. 
@@ -7611,7 +7525,6 @@ fr:
   login_label_1dea0f9d: "Libellé de connexion"
   login_with_auth_type_a0aaa52a: "Se connecter avec *%{auth_type}*"
   login_with_provider_3fd3998e: "Se connecter avec %{provider}"
-  logo_a040ae0e: Logo
   logout_a9312e35: "Se déconnecter"
   looks_great_e4d883ed: "Cela semble excellent !"
   low_score_4eeb95b2: "Faible : %{score}"
@@ -9576,14 +9489,12 @@ fr:
     must_submit_incomplete: "doit envoyer le travail"
     must_view_complete: "a consulté la page"
     must_view_incomplete: "doit consulter la page"
-  month_s_5c17590e: Mois
   moodle_dropdown_many_warning_title: "%{count} questions à choix multiples issues de cette banque n’ont peut-être pas été importées correctement"
   moodle_dropdown_warning_title: "Il se peut qu’une question à choix multiples n’ait pas été importée correctement"
   moodle_formula_many_warning_title: "%{count} questions avec formule issues de cette banque nécessiteront une nouvelle génération des réponses possibles"
   moodle_formula_warning_title: "Les réponses possibles devront être générées à nouveau pour la question utilisant une formule"
   more_courses_5ebbe998: "Cours supplémentaires"
   most_recent_score_13a87e8c: "Note la plus récente"
-  most_recent_score_counts_as_calculation_int_of_mas_9a3bcf66: "Le résultat le plus récent compte pour %{calculation_int}% du score total de la maîtrise, la moyenne de tous les autres résultats compte pour %{remainder}% du score."
   move_abf00365: Déplacer
   move_dialog: 
     cancel: Annuler
@@ -9957,14 +9868,12 @@ fr:
     observee_added: "Observer maintenant %{user}"
     observing: Observer
   observing_f3c5e759: "En cours d'observation"
-  occurrence_s_c12d1aad: occurrence(s)
   of_students_5d1af0d2: "Nbre d’étudiants"
   ok_c47544a2: OK
   okay_got_it_d686d4e8: "OK, compris"
   on_time_percent_eebffe38: "Dans les temps : %{percent}"
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Une fois que vous avez changé une réponse, vous devez choisir une option avant d’actualiser la question."
   one_per_line_format_name_value_79647700: "Un par ligne. Format : name=value"
-  only_a_maximum_of_100_events_can_be_created_ad703982: "seulement 100 évènements au maximum peuvent être créés"
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} à temps, %{late} en retard, %{missing} manquant(s)"
   open_color_picker_f117df0a: "Ouvrir le sélecteur de couleurs"
   open_title_in_a_new_window_b29fed77: "Ouvrir %{title} dans une nouvelle fenêtre"
@@ -12356,7 +12265,6 @@ fr:
       one: "%{item} déplacé vers %{destinationFolder}"
       other: "%{count} éléments déplacés vers %{destinationFolder}"
     name: Nom
-    progress_error: "Une erreur s’est produite lors de la préparation du téléchargement. Veuillez réessayer."
     progress_message: "Préparation du téléchargement : %{percent}% effectués"
     restrict_access: "Limiter l’accès "
     results_count: "Afficher %{num_results} résultats pour la recherche"
@@ -12371,7 +12279,6 @@ fr:
     updated_at: "Date de modification"
     updated_at_short: Modifiés
     view: Afficher
-  read_more_about_windows_tiles_ac4ae6f5: "En savoir plus sur les mosaïques Windows"
   recaptcha_not_configured_3a6ef9ee: "ReCaptcha non configuré"
   recent_student: 
     last_logged_in: "dernière connexion : %{last_login}"
@@ -12876,7 +12783,6 @@ fr:
         crosslist_this_section: "Transférer cette section"
         current_enrollments: "Inscriptions actuelles"
         decrosslist_section: "Supprimer le transfert de cette section"
-  see_some_lti_tools_that_work_great_with_canvas_you_3c27bc7b: "*Découvrez quelques outils LTI* qui fonctionnent très bien avec Canvas. Vous pouvez également consulter les **sujets abordés au sein de la communauté Canvas à propos des outils LTI**."
   select_a_grading_period_aab25483: "Choisir la période de notation"
   select_content: "Sélectionner du contenu"
   select_content_checkbox: 
@@ -13290,7 +13196,6 @@ fr:
       start_a_new_course: "Commencer un nouveau cours"
     new_nav_header: 
       links: 
-        dashboard: "Mon tableau de bord"
         skip_to_content: "Passer au Contenu"
     no_recent_activity: 
       empty_stream_message: "Vous n’avez pas encore de message dans votre flux. Lorsque vous commencerez à participer aux cours, le flux affichera les messages des discussions, les mises à jour des notes, les messages privés entre vous et d’autres utilisateurs, etc."
@@ -13307,8 +13212,6 @@ fr:
       teacher: "%{course} comme enseignant."
       teacher_title: "Invité comme enseignant, cliquez pour voir le cours"
     primary_header_navigation: 
-      links: 
-        inbox: "Boîte de réception"
       menu: 
         calendar: Calendrier
         grades: Notes
@@ -14133,7 +14036,6 @@ fr:
   the_grading_period_was_deleted_7814a349: "La période de notation a été supprimée"
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "L’institution à partir de laquelle vous vous êtes connecté n’est pas configurée sur ce compte."
   the_list_of_results_has_been_updated_46e3c733: "La liste des résultats a été mise à jour."
-  the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "L’image du logo en haut à droite de l’en-tête Canvas. SVG ou PNG 200 x 200"
   the_material_is_in_the_public_domain_279c39a3: "Ce contenu appartient au domaine public"
   the_material_is_licensed_under_creative_commons_3242cb5e: "Ce contenu est couvert par une licence Creative Commons"
   the_material_is_subject_to_fair_use_exception_41bc6a4b: "Ce contenu est soumis à une exception pour l’usage loyal"
@@ -14148,7 +14050,6 @@ fr:
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "les rôles tenus par l'utilisateur effectuant une observation (étudiant, professeur, administrateur, etc.)"
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "L'outil de planification vous permet de définir des créneaux horaires auxquels les étudiants (ou groupes d'étudiants) peuvent s'inscrire.  Pour commencer, cliquez le bouton ci-dessous.  "
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "La sévérité du problème, telle que choisie par l'utilisateur dans un menu déroulant."
-  the_shortcut_icon_for_ios_android_devices_180x180__f87fa178: "L’icône du raccourci pour les appareils iOS/Android. PNG ou SVG 180 x 180"
   the_state_parameter_is_required_ffadf213: "Le paramètre d’état est obligatoire."
   the_top_track_represents_days_on_which_the_student_2a347099: "En haut, vous voyez quels jours * l’étudiant a envoyé des messages* aux enseignants du cours. En bas, vous voyez les **messages envoyés par les instructeurs** à l’étudiant."
   the_unique_id_used_for_representing_the_specific_r_3bdf5870: "L'identifiant unique utilisé pour représenter le cycle spécifique requête/réponse autour duquel ce signalement d'erreur s'est produit"
@@ -14186,8 +14087,6 @@ fr:
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Cela est très probablement dû au fait que vous avez importé le contenu du cours sans ses fichiers associés."
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "Ce résultat a été utilisé pour évaluer un étudiant et ne peut plus être mis à jour"
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Ce résultat a été utilisé pour évaluer un étudiant et ne peut ni être modifié, ni être supprimé. "
-  this_outcome_has_been_used_to_assess_a_student_the_1f04402e: "Ce résultat a été utilisé pour évaluer un étudiant. La méthode de calcul est verrouillée "
-  this_outcome_has_been_used_to_assess_a_student_the_1ff3a596: "Ce résultat a été utilisé pour évaluer un étudiant. La valeur de calcul est verrouillée"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Ce questionnaire n’est pas publié.* Seuls les enseignants peuvent le voir tant qu’il n’est pas publié."
   this_student_wrote_f1a3f22d: "Cet étudiant a écrit :"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Cela vous permettra d’authentifier Canvas pour publier les notes sur SIS."
@@ -14482,7 +14381,6 @@ fr:
   usage_rights_f0960ad6: "Droits d’utilisation"
   usage_rights_have_been_set_d1b433c7: "Les droits d’utilisation ont été définis."
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Les droits d’utilisation seront définis pour tous les fichiers contenus dans :"
-  use_a_single_16x16_32x32_48x48_ico_file_60bc8d91: "Utilisez un *seul fichier .ico 16 x 16, 32 x 32, 48 x 48*."
   use_new_folder_tree_in_files_eb5a451b: "Utilisez une nouvelle arborescence de dossiers dans Fichiers"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Utilisez le nouvel outil LTI de questionnaire à la place des questionnaires Canvas habituels "
   use_this_configuration_for_parent_observer_registr_e49f8f66: "Utiliser cette configuration pour l'inscription parentale/d'observateur"
@@ -14923,7 +14821,6 @@ fr:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Cours 6+ Blackboard Vista/CE, WebCT"
   webct_name: "Blackboard Vista/CE (WebCT)"
-  week_s_cb1492ee: Semaine(s)
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Bienvenue dans vos cours ! Pour personnaliser la liste des cours, cliquez sur le lien \"Tous les cours\" et marquez d'une étoile les cours à afficher."
   well_below_mastery_37664bdc: "Bien inférieur au niveau de maîtrise"
   what_should_the_csv_file_look_like_985a59ac: "À quoi ressemble le fichier CSV ?"
@@ -15087,9 +14984,6 @@ fr:
     external_urls: 
       archive: Archiver
       archive_link: "Afficher les archives"
-  windows_square_tile_4c00879e: "Mosaïque carrée Windows"
-  windows_tile_color_2b786bd9: "Couleur des mosaïques Windows"
-  windows_wide_tile_a3302508: "Grande mosaïque Windows"
   would_you_like_to_enable_this_app_ccdf735d: "Voulez-vous activer cette application ?"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Voulez-vous laisser les étudiants continuer le cours ou préférez-vous verrouiller à nouveau ces modules jusqu’à ce que les nouvelles conditions soient remplies ?"
   xml_configuration_5ea1b942: "Configuration XML "
