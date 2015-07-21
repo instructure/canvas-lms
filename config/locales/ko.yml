@@ -1628,9 +1628,6 @@ ko:
         submission: 제출물
         submission_not_turned_in: "제출 안 됨!"
         submission_turned_in: 제출됨!
-    submission_type_icon: 
-      tooltips: 
-        submitted: 제출됨
     submission_types_form: 
       advanced_turnitin_settings: "고급 Turnitin 설정"
       descriptions: 
@@ -2153,7 +2150,6 @@ ko:
       would_you_like_to_cancel_that_and_sign_up_for_this: "취소하고 여기에 등록하시겠습니까?"
       you_are_already_signed_up_for: "다음을 이미 등록했음:"
     save: 저장
-    save_and_publish: "저장 & 게시"
     save_changes: "변경 내용 저장"
     scheduler_right_side_admin_section: 
       create_a_new_set_of_appointments: "약속 그룹 만들기"
@@ -2874,11 +2870,8 @@ ko:
       delete_item: "이 항목을 모듈에서 제거하시겠습니까?"
     content_next: 
       add_prerequisite: "*%{module}*에 필수 조건 추가"
-      assignment_points_possible: "/ %{points_possible}"
       buttons: 
-        add_module: "모듈 추가"
         add_prerequisite: "필수 조건 추가"
-      criterion_for_assignment: "%{assignment}에서 사용자는 %{select_criterion}해야 함"
       headings: 
         add_prerequisite: "%{name}에 필수 조건 추가"
         course_modules: "과목 모듈"
@@ -2907,51 +2900,18 @@ ko:
           one: "한 수준 들여쓰기"
           other: "%{count} 수준 들여쓰기"
           zero: "들여쓰지 않음"
-      key: 
-        description: 
-          delete: "현재 모듈/항목 삭제"
-          edit: "모듈/항목 편집"
-          new: "새 모듈"
-          next: "다음 모듈/항목"
-          previous: "이전 모듈/항목"
-      keycode_descriptions: 
-        next_module_item: "다음 모듈이나 모듈 항목 선택"
-        previous_module_item: "이전 모듈이나 모듈 항목 선택"
-        toggle_module_dragging: "끌기를 시작할 항목을 선택하거나 이전에 선택한 항목을 놓기"
-      keycodes: 
-        delete: d
-        edit: e
-        indent: i
-        new: "n"
-        next: j
-        next_module_item: 위로
-        outdent: o
-        previous: k
-        previous_module_item: 아래로
-        toggle_module_dragging: 공백
       labels: 
         indent: 들여쓰기
-        module_complete_when: "다음 경우에 모듈을 마침"
-        modules: 
-          before_students_view: "학생이 이 모듈을 보기 전에"
         title: 제목
-        unlock_at: "잠금 해제 시각"
         url: URL
       links: 
-        add_prerequisite: "필수 조건 추가"
-        add_requirement: "요구 조건 추가"
         student_progress: "진행 상황 보기"
         title: 
           remove_prerequisite: "필수 조건 제거"
       module: 모듈
       module_details: "모듈은 순서대로 표시되므로 %{name} 위에 있는 모듈만 필수 조건으로 추가할 수 있습니다."
-      module_name: "모듈 이름"
-      must_complete_prerequisites: "다음을 마쳐야 함"
-      no_preprequisites: "정의된 필수 조건 없음"
-      no_requirements: "정의된 요구 조건 없음"
       prerequisites: 
         another_module: "다른 모듈"
-      prerequisites_need_item: "사용자가 이 모듈을 마치는 방법을 지정하기 전에 항목을 추가해야 함"
       requirements: 
         must_contribute: "페이지에 참여"
         must_score_at_least: "최저 점수를 얻기"
@@ -2959,7 +2919,6 @@ ko:
         must_view: "항목을 보기"
       select_module: 
         instructions: "모듈 선택"
-        name: "%{module} 모듈"
       select_prerequisite: "필수 조건의 유형을 선택하십시오. 모든 필수 조건이 만족될 때까지 학생은  모듈을 볼 수 없습니다."
     context_module: 
       unpublish: "게시 취소"
@@ -3048,13 +3007,6 @@ ko:
       quizzes: 퀴즈
       wiki_pages: "위키 페이지"
     points_possible_short: "%{points}점"
-    prerequisites_footer: 
-      default_module_name: 모듈
-      labels: 
-        prerequisites: "필수 조건"
-      links: 
-        title: 
-          remove_prerequisite: "필수 조건 제거"
     progressions: 
       titles: 
         student_progress: "학생 진행률"
@@ -4423,7 +4375,6 @@ ko:
       anonymous_user: 익명
     pinned_discussions: "고정된 토론"
     reply: 
-      error_saving_reply: "*오류가 발생했습니다*. 나중에 다시 답변을 게시하시기 바랍니다."
       saving_reply: "답변 저장 중..."
     reply_attachment: 
       attachment_label: 첨부
@@ -6116,7 +6067,6 @@ ko:
       links: 
         close: 닫기
         dashboard: "내 대시보드"
-        skip_to_content: "내용으로 건너 뛰기"
     fixed_bottom: 
       masquerading: 
         stop: "가장 중지"
@@ -6124,7 +6074,6 @@ ko:
       student_view: 
         leave: "학생 뷰 나가기"
         reset: "학생 초기화"
-        reset_explanation: "테스트 학생을 초기화하면 이 학생에 대한 모든 기록이 삭제되어 완전히 새로운 학생으로 과목을 볼 수 있습니다."
         warning_title: "현재 학생 뷰로 로그인함"
     head: 
       default_page_title: "Canvas LMS"
@@ -6133,8 +6082,6 @@ ko:
       view_all_groups: "모든 그룹 보기"
     mobile_auth: 
       log_in_to_canvas: "Canvas에 로그인"
-    styleguide: 
-      default_page_title: "Canvas LMS"
   learning_outcome: 
     no_comment: "의견 없음"
     no_description: "설명 없음"
@@ -6303,7 +6250,6 @@ ko:
       debug: 
         logout_response_redirect_from_idp: "IdP에서 받은 LogoutResponse"
         redirect_from_idp: "IdP에서 받은 LoginResponse"
-  logo_a040ae0e: 로고
   lower_limit_of_range_6ddd4983: "범위의 하한"
   lti: 
     lti_message: 
@@ -10961,8 +10907,6 @@ ko:
       teacher: "%{course} 교사입니다."
       teacher_title: "교사로 초대됨 - 과목을 보려면 클릭"
     primary_header_navigation: 
-      links: 
-        inbox: "받은 편지함"
       menu: 
         calendar: 달력
         grades: 평점
