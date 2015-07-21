@@ -72,16 +72,17 @@ class BrandConfigsController < ApplicationController
     @domain_root_account.brand_config = new_md5 && BrandConfig.find(new_md5)
     @domain_root_account.save!
     BrandConfig.destroy_if_unused(old_md5)
-    redirect_to :back, notice: t('Success! All users on this domain will now see this branding.')
+    redirect_to account_path(@domain_root_account), notice: t('Success! All users on this domain will now see this branding.')
   end
 
   # When you close the theme editor, it will send a DELETE to this action to
   # clear out the session brand_config that you were prevewing.
   def destroy
-    session.delete(:brand_config_md5)
-    BrandConfig.destroy_if_unused(session.delete(:brand_config_md5))
-    flash[:notice] = t('Theme editor changes have been cancelled.')
-    render json: {success: true}
+    if session.delete(:brand_config_md5).presence
+      session.delete(:brand_config_md5)
+      BrandConfig.destroy_if_unused(session.delete(:brand_config_md5))
+    end
+    redirect_to account_path(@domain_root_account), notice: t('Theme editor changes have been cancelled.')
   end
 
   protected
