@@ -1,4 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
+require File.expand_path(File.dirname(__FILE__) + '/groups_common')
 
 
 
@@ -138,6 +139,27 @@ def setup_sections_and_overrides_all_future
   @override = assignment_override_model(:assignment => @assignment, :set => @section2,
                                         :lock_at => @lock_at + 12.days,
                                         :unlock_at => Time.now.utc + 3.days)
+end
+
+def create_assignment_for_group(submission_type, grade_group_students_individually = false)
+  group_test_setup(2,1,2)
+  add_user_to_group(@students.first,@testgroup[0])
+  @assignment = @course.assignments.create!(title: 'assignment 1', name: 'assignment 1', due_at: Time.now.utc + 2.days,
+                                            points_possible: 50, submission_types: submission_type, group_category:@group_category[0],
+                                            grade_group_students_individually: grade_group_students_individually)
+end
+
+def create_assignment_with_group_category
+  get "/courses/#{@course.id}/assignments/new"
+
+  f('#assignment_name').send_keys('my title')
+  driver.execute_script 'tinyMCE.activeEditor.setContent("text")'
+
+  f('#assignment_text_entry').click
+  f('#has_group_category').click
+  f('#assignment_group_category_id').click
+  f('#assignment_group_category_id').send_keys :arrow_up
+  f('#assignment_group_category_id').send_keys :return
 end
 
 def create_file_list
