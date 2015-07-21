@@ -9,8 +9,6 @@ da:
     headings: 
       page: "Ikke autoriseret"
     title: "Ikke autoriseret"
-  558x270_png_a5e13e53: "558x270 png"
-  558x558_png_1_8x_the_standard_tile_size_so_it_can__4a9023e1: "558x558 png (1.8x standard flise størrelse, så den kan op- eller nedskaleres som nødvendig)"
   EditAppointmentGroupDetails: 
     affect_reservations: "Hvordan vil dette påvirke reservationer?"
     and_n_contexts: "og %{n} andre"
@@ -62,10 +60,6 @@ da:
         api_key: "API Nøgle"
         api_url: "API URL"
         common_core_guid: "Fælles kerne GUID (valgfri)"
-  access_to_the_etherpad_collaborations_below_will_b_b6a0a288: |-
-      Adgang til Etherpad samarbejder nedenfor vil ophøre 8. August, 2015. Hvis du ønsker at gemme dette indhold, overfør venligst indholdet før denne dato.
-      
-      For instruktioner om hvordan et samarbejde oprettes i Google, [klik her](%{google_collab_help_url}).
   access_token_is_valid_until_d2f048cf: "Adgangs token er gyldig indtil"
   account: 
     ask_canvas_network: "Spørg Canvas Network Community"
@@ -837,7 +831,6 @@ da:
         allow_invitation_previews: "Invitation forhåndsvisninger"
         allow_sending_scores_in_emails: "Studerende kan vælge at modtage karaktere i e-mail notifikationer"
         allow_sis_import: "SIS imports"
-        apple_touch_icon_remove: "Vend tilbage til standard"
         author_email_in_notifications: "Vis e-mailadresse for sender til bruger interaktionnotifikationer"
         canvas_authentication: "Canvas autorisering"
         default_language: "Standard Sprog"
@@ -852,11 +845,9 @@ da:
         equella: Equella
         equella_endpoint: "Equella slutpunkt"
         equella_teaser: "Equella Kommentarer"
-        favicon_remove: "Vend tilbage til standard"
         global_includes: "Global CSS-JavaScript inkludere"
         global_javascript: "Globalt JavaScript URL"
         global_stylesheet: "Globalt CSS URL"
-        header_image_remove: "Vend tilbage til standard"
         help_link_available_to: "Tilgængelig for"
         help_link_subtext: Undertekst
         help_link_text: "Tekst for visning for link"
@@ -866,8 +857,6 @@ da:
         login_handle_name: "Login mærke"
         message: Besked
         mfa_settings: "Multi-faktor bekræftelse"
-        msapplication_tile_square_remove: "Vend tilbage til standard"
-        msapplication_tile_wide_remove: "Vend tilbage til standard"
         name: "Konto Navn"
         no_enrollments_can_create_courses: "Brugere uden tilmeldinger"
         open_registration: "Åben Registrering"
@@ -1376,9 +1365,6 @@ da:
   api_url_3ee7cb0a: "API URL"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "App Center vil forekomme i \"Apps\" fanen på indstillingssiden af enten kursus eller konto. URL givet nedenfor bør pege på et gyldigt App Center endpoint (for eksempel, %{url} -- sørg for at udelade bagerste skråstreg"
   app_placements_6d877225: "App placeringer"
-  appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "Tilføjer et tal til slutningen af hver begivenhedstitel (f.eks. Begivenhed 1, Begivenhed 2 etc.)"
-  appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "Tilføjer et tal til slutningen af hver begivenhedstitel (f.eks. Begivenhed 1, Begivenhed 2 etc.)\" for=\"append_iterator"
-  apple_touch_icon_2c258bb3: "Apple Touch Icon"
   application: 
     errors: 
       feed_not_found: "Kunne ikke finde nyhedskilde."
@@ -1973,9 +1959,6 @@ da:
         submission: Indsendelse
         submission_not_turned_in: "Ikke Turned In!"
         submission_turned_in: "Turned In!"
-    submission_type_icon: 
-      tooltips: 
-        submitted: Indsendt
     submission_types_form: 
       advanced_turnitin_settings: "Avancerede Turnitin Indstillinger"
       descriptions: 
@@ -2472,20 +2455,17 @@ da:
         more_options: "Flere valgmuligheder"
     edit_calendar_event: 
       calendar: "Kalender:"
-      count: "Tæl:"
       date: "Dato:"
       from: "Fra:"
       links: 
         more_options: "Flere valgmuligheder"
       location: "Lokation:"
-      repeat: Gentag
       timespan_separator: til
       title: "Titel:"
     edit_calendar_event_full: 
       buttons: 
         create: "Opret begivenhed"
         update: "Opdater begivenhed"
-      count: "Tæl:"
       date: Dato
       delete: Slet
       different_date_for_each_section: "Benyt forskellige datoer for hver sektion"
@@ -2496,7 +2476,6 @@ da:
       location_address: "Adress:"
       location_name: "Lokation:"
       new_calendar_event_header: "Ny kalenderbegivenhed"
-      repeat: Gentag
       start_time: Starttid
     edit_event: 
       tabs: 
@@ -2570,7 +2549,6 @@ da:
       would_you_like_to_cancel_that_and_sign_up_for_this: "Ønsker du at annullere og tilmelde dig denne?"
       you_are_already_signed_up_for: "Du er allerede tilmeldt :"
     save: Gem
-    save_and_publish: "Gem & Udgiv"
     save_changes: "Gem Ændringer"
     scheduler_right_side_admin_section: 
       create_a_new_set_of_appointments: "Opret en aftalegruppe"
@@ -3380,14 +3358,8 @@ da:
       delete_item: "Er du sikker på, at du ønsker at fjerne dette element fra modulet?"
     content_next: 
       add_prerequisite: "Tilføj betingelse til *%{module}*"
-      assignment_points_possible: "ud af %{points_possible}"
-      button: 
-        delete_label: "Slet betingelser"
-        delete_title: "Slet betingelser"
       buttons: 
-        add_module: "Tilføj Modul"
         add_prerequisite: "Tilføj betingelser"
-      criterion_for_assignment: "For %{assignment} bugere skal %{select_criterion}"
       headings: 
         add_prerequisite: "Tilføj betingelse til %{name}"
         course_modules: Kursusmoduler
@@ -3416,50 +3388,17 @@ da:
           one: "Indryning 1 niveau"
           other: "Indrykning %{count} niveauer"
           zero: "Indryk ikke"
-      key: 
-        description: 
-          delete: "Slet nuværende modul/element"
-          edit: "Rediger modul/element"
-          indent: "Forøg indrykning"
-          new: "Næste modul"
-          next: "Næste modul/element"
-          outdent: "Formindsk indrykning"
-          previous: "Forrige modul/element"
-      keycode_descriptions: 
-        next_module_item: "Vælg næste modul eller modul element"
-        previous_module_item: "Vælg forrige modul eller modul element"
-        toggle_module_dragging: "Vælg element at trække, eller drop forrige valgte elementer"
-      keycodes: 
-        delete: d
-        edit: e
-        indent: i
-        new: "n"
-        next: j
-        next_module_item: Op
-        outdent: o
-        previous: k
-        previous_module_item: Ned
-        toggle_module_dragging: Rum
       labels: 
         indent: Indrykning
-        module_complete_when: "Dette moduler fuldført når"
-        modules: 
-          before_students_view: "Før studerende kan se dette modul"
         new_tab: "Load i ny fane"
-        publish_final_grade: "Offentliggør endlig karakter for studrende når dette modul er fuldført"
-        require_sequential_progress: "Studerende skal gennemgå krav for dette modul i en sekventiel orden"
         title: Titel
-        unlock_at: "Lås op ved"
         url: URL
       links: 
-        add_prerequisite: "Tilføj forudsætning"
-        add_requirement: "Tilføj krav"
         student_progress: "Se fremskridt"
         title: 
           remove_prerequisite: "Fjern denne forudsætning"
       module: modul
       module_details: "Moduler er vist i en sekventiel orden, så kun moduler, der er over %{name}, kan sættes som forudsætninger."
-      module_name: Modulnavn
       modules_keyboard_hint_updated: "Advarsel: For forbedre adgang til omordning af moduler (eller modul elementer), benyt venligst \"Flyt til\" dialog muligheden fundet i menuen."
       move_module: 
         after: Efter
@@ -3470,12 +3409,8 @@ da:
         into: "ind i"
         or: ELLER
         place: Sted
-      must_complete_prerequisites: "De skal fuldende"
-      no_preprequisites: "Ingen definerede forudsætninger"
-      no_requirements: "Ingen definerede krav"
       prerequisites: 
         another_module: "Andet modul"
-      prerequisites_need_item: "Du skal tilføje elementer før du kan specificere, hvordan en bruger vil fuldfære dette modul"
       requirements: 
         must_contribute: "bidrag til side"
         must_score_at_least: "score mindst"
@@ -3483,7 +3418,6 @@ da:
         must_view: "se dette element"
       select_module: 
         instructions: "Vælg Modul"
-        name: "modul, %{module}"
       select_prerequisite: "Vælg typen af forudsætning. Studerende kan ikke se et modul indtil alle forudsætnigner er opfyldt."
     context_module: 
       unpublish: "Ikke offentliggjort"
@@ -3578,13 +3512,6 @@ da:
       quizzes: Quiz
       wiki_pages: "Wiki Sider"
     points_possible_short: "%{points} pts"
-    prerequisites_footer: 
-      default_module_name: modul
-      labels: 
-        prerequisites: Forudsætninger
-      links: 
-        title: 
-          remove_prerequisite: "Fjern denne forudsætning"
     progressions: 
       titles: 
         student_progress: "Fremgang for studerende"
@@ -4662,7 +4589,6 @@ da:
       student: 
         count: "Antal forkert studerende "
         ratio: "Forkert studerende forhold"
-  current_3ce5414a: "Nuværende:"
   current_mastery_score_score_out_of_mastery_points_fedd343f: "Nuværende beherskelse score: %{score} ud af %{mastery_points}"
   current_provider_6c3f7f96: "Nuværende udbyder"
   current_score_6c81792: "Nuværende karakter"
@@ -4845,7 +4771,6 @@ da:
       month: Måned
       second: Sekunder
       year: År
-  day_s_7cc1231f: Dag(e)
   decaying_average_8bf6a0dd: "Henfaldende gennemsnit"
   deep_orange_4c7eea99: "Dyb orange"
   deep_purple_bb3e2907: "Dyb lilla"
@@ -5260,7 +5185,6 @@ da:
       anonymous_user: Annonym
     pinned_discussions: "Pinned diskussioner"
     reply: 
-      error_saving_reply: "*En fejl opstod*, venligst indsend dit svar igen senere"
       saving_reply: "Gemmer svar..."
     reply_attachment: 
       attachment_label: Bilag
@@ -5788,7 +5712,6 @@ da:
   event_date_f05219e7: "Begivenhedsdato:"
   event_end_time_ef830e66: Begivenhedssluttid
   event_start_time_441b491f: Begivenhedsstarttid
-  every_665d821e: Hver
   everyone_854554dd: Alle
   everyone_else_6c6dc7b6: "Alle andre"
   example_84698b7d: Eksempel
@@ -5960,7 +5883,6 @@ da:
   failed_to_import_media_objects_4c1fcb4f: "Import at medieobjekter mislykkedes"
   failed_to_log_in_7ceec561: "Login misllykkedes"
   fair_use_bee47d77: "Fair brug"
-  favicon_6e658914: Favicon
   feature_flags: 
     feature_flag: 
       allow: Tillad
@@ -6118,7 +6040,6 @@ da:
     no_deleting_root: "Kan ikke slette rodmappe"
     only_one_folder: "Kan ikke indstille mappesti og mappe id"
   for: for
-  for_974cbb84: For
   for_all_devices_1f603968: "For alle enheder"
   forgot_password_url_3f9c04b: "Glemt adgangskode URL"
   from_fdd4956d: Fra
@@ -7385,8 +7306,6 @@ da:
   k12_description: |-
       Funktioner, indstillinger og stile, der giver mere sans specielt i et K-12 miljø. For øjeblikket gælder det kun
       for visse stilændringer, men flere K-12 specificerede ting vil muligvis blive tilføjet i fremtiden.
-  labels: 
-    lock_module_until: "Lås modul indtil en given dato"
   last_item_79583712: "Sidste element:"
   last_user_access_title: "Sidste bruger adgang"
   late_percent_b91d01b3: "For sent: %{percent}"
@@ -7397,15 +7316,12 @@ da:
   launch_url_e150bd41: "Start URL"
   layouts: 
     application: 
-      bouncing_communication_channels: "Der ser ud til at være et problem med en af dine kontaktmetoder. Tjek venligst din *Indstillingsside*."
       group_switch: Skift
-      javascript_required: "Du skal have JavaScript aktiveret for at kunne få adgang til denne side."
       keyboard_navigation: 
         close: "Tryk komma for at lukke denne dialog."
       links: 
         close: Luk
         dashboard: "Mit Instrumentbræt"
-        skip_to_content: "Skip til indhold"
     fixed_bottom: 
       masquerading: 
         stop: "Stop maskering"
@@ -7422,8 +7338,6 @@ da:
       view_all_or_customize: "Se alle eller brugertilpas"
     mobile_auth: 
       log_in_to_canvas: "Log in til Canvas"
-    styleguide: 
-      default_page_title: "Canvas LMS"
   learning_mastery_gradebook_description: |-
       Learning Mastery Gradebook giver en måde for lærer til hurtigt at se studerende og kursus
       fremskridt på kurusindlæringsresultater. Resultater er præsenteret i en Gradebook lignende
@@ -7638,7 +7552,6 @@ da:
   login_label_1dea0f9d: Loginmærke
   login_with_auth_type_a0aaa52a: "Login med *%{auth_type}*"
   login_with_provider_3fd3998e: "Login med %{provider}"
-  logo_a040ae0e: Logo
   logout_a9312e35: Logout
   looks_great_e4d883ed: "Ser godt ud!!"
   low_score_4eeb95b2: "Lav: %{score}"
@@ -9610,14 +9523,12 @@ da:
     must_submit_incomplete: "skal indsende opgave"
     must_view_complete: "så siden"
     must_view_incomplete: "skal se siden"
-  month_s_5c17590e: Måned(-er)
   moodle_dropdown_many_warning_title: "Der er %{count} flere rullegardinssrøgsmål i denne bank, der muligvis er bleveet importeret forkert"
   moodle_dropdown_warning_title: "Flere rullegradinsspørgsmål er muligvis blevet importeret forkert"
   moodle_formula_many_warning_title: "Der er %{count} formulaspørgsmål i denne bank, der skal have deres mulige svar regenereret"
   moodle_formula_warning_title: "Mulige svar skal regenereres for formulaspørgsmål"
   more_courses_5ebbe998: "Flere kurser"
   most_recent_score_13a87e8c: "Nyeste score"
-  most_recent_score_counts_as_calculation_int_of_mas_9a3bcf66: "Nyeste score tæller som  %{calculation_int}% af beherskelsevægtning, gennemsnit over alle andre scorer tæller som  %{remainder}%  af vægtning."
   move_abf00365: Flyt
   move_dialog: 
     cancel: Annuller
@@ -9991,14 +9902,12 @@ da:
     observee_added: "Observere nu %{user}"
     observing: Observerer
   observing_f3c5e759: Observerer
-  occurrence_s_c12d1aad: forekomst(-er)
   of_students_5d1af0d2: "# af studerende"
   ok_c47544a2: OK
   okay_got_it_d686d4e8: "Okay, godt"
   on_time_percent_eebffe38: "Til tid: %{percent}"
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Når du har ændret et svar, skal du vælge en mulighed før opdatering af spørgsmål."
   one_per_line_format_name_value_79647700: "En pr. linje. Format: navn´=værdi"
-  only_a_maximum_of_100_events_can_be_created_ad703982: "kun et maksimmum af 100 begivenheder kan blive oprettet"
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} til tiden, %{late} sen, %{missing} manglende"
   open_color_picker_f117df0a: "Åben farvevælger"
   open_title_in_a_new_window_b29fed77: "Åben %{title} i et nyt vidue"
@@ -12376,7 +12285,6 @@ da:
       one: "%{item} flyttet til %{destinationFolder}"
       other: "%{count} elementer flyttet til %{destinationFolder}"
     name: Navn
-    progress_error: "En fejl opstod under forberedelse af download, prøv venligst igen."
     progress_message: "Forbereder download: %{percent}% fuldført"
     restrict_access: "Begræns adgang"
     results_count: "Viser %{num_results} søgeresultater"
@@ -12391,7 +12299,6 @@ da:
     updated_at: "Dato redigeret"
     updated_at_short: Redigeret
     view: Se
-  read_more_about_windows_tiles_ac4ae6f5: "Læs mere om windows fliser"
   recaptcha_not_configured_3a6ef9ee: "Recaptcha ikke konfigureret"
   recent_student: 
     last_logged_in: "sidst logget ind %{last_login}"
@@ -12896,7 +12803,6 @@ da:
         crosslist_this_section: "Krydslist denne sektion"
         current_enrollments: "Nuværende tilmeldinger"
         decrosslist_section: "Afkrydslist denne sektion"
-  see_some_lti_tools_that_work_great_with_canvas_you_3c27bc7b: "*Se nogle LTI værktøjer* der virker godt med Canvas. Du kan også tjekke **Canvas Fællesskabsemner om LTI værktøjer**."
   select_a_grading_period_aab25483: "Vælg en bedømmelsesperiode"
   select_content: "Vælg indhold"
   select_content_checkbox: 
@@ -13310,7 +13216,6 @@ da:
       start_a_new_course: "Start et nyt kursus"
     new_nav_header: 
       links: 
-        dashboard: "Mit Instrumentbræt"
         skip_to_content: "Skil til indhold"
     no_recent_activity: 
       empty_stream_message: "Du har endnu ikke nogen beskeder i din strøm. Når du begynder at deltage i dine kurser, vil du se denne strøm blive fyldt op med beskeder fra diskussioner, bedømmelsesopdateringer, private beskeder mellem dig og andre brugere etc. "
@@ -13327,8 +13232,6 @@ da:
       teacher: "%{course} som lærer."
       teacher_title: "Invisteret som lærer, klik for at se kursus"
     primary_header_navigation: 
-      links: 
-        inbox: Indbakke
       menu: 
         calendar: Kalender
         grades: Karakterer
@@ -14147,7 +14050,6 @@ da:
   the_grading_period_was_deleted_7814a349: "Bedømmelseperioden blev slettet"
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "Institutionen du logged in fra er ikke konfigureret i denne konto."
   the_list_of_results_has_been_updated_46e3c733: "Listen af resultater er blevet opdateret."
-  the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "Logo billedet på Canvas overskrivt øverst til højre. 200x200 svg eller png"
   the_material_is_in_the_public_domain_279c39a3: "Dette materiale er i det offentlige domæne"
   the_material_is_licensed_under_creative_commons_3242cb5e: "Dette materiale er under Creative Commons licens"
   the_material_is_subject_to_fair_use_exception_41bc6a4b: "Dette materialer er underlagt fair bruger undtagelse"
@@ -14162,7 +14064,6 @@ da:
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "Rolle for rapporterende bruger (studerende, lærer, admin, etc.)"
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "Planlægningsværktøjet lader dig oprette tidsrum for studerende (eller studiegrupper) så de kan tilmelde sig til. For at komme i gang, klik på nedenstående knap."
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "Alvoren af sagen, som valgt af brugeren fra rullegardinsmenuen."
-  the_shortcut_icon_for_ios_android_devices_180x180__f87fa178: "Genvejsikon for  iOS/Android devices. 180x180 png or svg"
   the_state_parameter_is_required_ffadf213: "Status parameter er nødvendig"
   the_top_track_represents_days_on_which_the_student_2a347099: "Top spor repræsenterer dage på hvilken den \"studerende sendte beskeder\" til kursus instruktører. Bundspor er for \"beskeder fra instruktører\" til den studerende."
   the_unique_id_used_for_representing_the_specific_r_3bdf5870: "Unik id benyttet for at repræsentere den specifikke anmodning/svar cyklus, som denne fejlrapport skete ved"
@@ -14200,8 +14101,6 @@ da:
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Dette skete mest sandsynligt fordi du importerede kususindhold unden dets associerede filer."
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "Dette resultat er blevet brugt til at vurdere en studerende og kan ikke længere blive opdateret"
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Dette resultat er bleveet benyttet til at vurdere en studerende og kan ikke blive redigeret eller slettet"
-  this_outcome_has_been_used_to_assess_a_student_the_1f04402e: "Dette resultat er blevet benyttet til at vurdere en studerende. Beregningsmetoden er låst"
-  this_outcome_has_been_used_to_assess_a_student_the_1ff3a596: "Dette resultat er blevet benyttet til at vurdere en studerende. Beregningsværdien er låst"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Denne quiz er ikke offentliggjort* Kun lærerer kan se quizzen indtil den er offentliggjort."
   this_student_wrote_f1a3f22d: "Denne studerende skrev:"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Dette vil tillade dig at autoricere Canvas for postering af karakterere til SIS"
@@ -14496,7 +14395,6 @@ da:
   usage_rights_f0960ad6: Brugsrettigheder
   usage_rights_have_been_set_d1b433c7: "Brugsrettigheder er blevet indstillet."
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Brugsrettigheder vil blive sat for alle filer indholdt i:"
-  use_a_single_16x16_32x32_48x48_ico_file_60bc8d91: "Brug en *enkelt 16x16, 32x32, 48x48 ico fil*.."
   use_new_folder_tree_in_files_eb5a451b: "Benyt nye mappetræ i filer"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Brug det nye quiz LTI værktøj i stedet for regulære canvas quizzer"
   use_this_configuration_for_parent_observer_registr_e49f8f66: "Benyt denne konfiguration for forældre/observatør registrering"
@@ -14940,7 +14838,6 @@ da:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ kursus"
   webct_name: "Blackboard Vista/CE (WebCT)"
-  week_s_cb1492ee: Uge(-r)
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Velkommen til dine kurser! For at brugertilpasse listen af kurser, klik på \"Alle Kurser\" linket og marker kurser for visning."
   well_below_mastery_37664bdc: "Langt under beherskelse"
   what_should_the_csv_file_look_like_985a59ac: "Hvad skal CSV filen se ud som?"
@@ -15104,9 +15001,6 @@ da:
     external_urls: 
       archive: Arkiv
       archive_link: "Vis arkiv(er)"
-  windows_square_tile_4c00879e: "Windows kvadrat flise"
-  windows_tile_color_2b786bd9: "Windows filse farve"
-  windows_wide_tile_a3302508: "Windows bred flise"
   would_you_like_to_enable_this_app_ccdf735d: "Ønsker du at aktivere denne app?"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Ønsker du at lade studerende fortsætte på kurset eller ønsker du at genlpse disse moduler indtil nye forudsætninger er fuldført?"
   xml_configuration_5ea1b942: "XML konfiguration"
