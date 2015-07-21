@@ -9,8 +9,6 @@ ja:
     headings: 
       page: 許可されていません
     title: 許可されていません
-  558x270_png_a5e13e53: "558x270 png"
-  558x558_png_1_8x_the_standard_tile_size_so_it_can__4a9023e1: "558x558 png (標準のタイル サイズの 1.8 倍なので、必要に応じて拡大縮小できます)"
   EditAppointmentGroupDetails: 
     affect_reservations: このことは予約にどのように影響しますか?
     and_n_contexts: "およびその他 %{n} 件"
@@ -62,10 +60,6 @@ ja:
         api_key: "API 鍵"
         api_url: "API の URL"
         common_core_guid: "共通コア GUID (オプション)"
-  access_to_the_etherpad_collaborations_below_will_b_b6a0a288: |-
-      以下のEtherPadではコラボレーションへのアクセスは2015年8月8日に廃止されます。このコンテンツを保存したい場合には、この日付け前にコンテンツを移行してください。
-      
-      どのようにGoogleでコラボレーションを作成するかの説明は、[ここをクリック](%{google_collab_help_url})。
   access_token_is_valid_until_d2f048cf: "アクセス トークンの有効期限は"
   account: 
     ask_canvas_network: "Canvas ネットワーク コミュニティに質問する"
@@ -836,7 +830,6 @@ ja:
         allow_invitation_previews: 招待プレビュー
         allow_sending_scores_in_emails: 受講生は、電子メール通知で採点を受け取ることを選択できる
         allow_sis_import: "SIS インポート"
-        apple_touch_icon_remove: デフォルトに戻す
         author_email_in_notifications: "ユーザ交流のお知らせで送信者の電子メール アドレスを表示"
         canvas_authentication: "Canvas 認証"
         default_language: デフォルトの言語
@@ -851,11 +844,9 @@ ja:
         equella: Equella
         equella_endpoint: "Equella エンドポイント"
         equella_teaser: "Equella コメント"
-        favicon_remove: デフォルトに戻す
         global_includes: "グローバル CSS/JavaScript に含まれる情報"
         global_javascript: "グローバル JavaScript URL"
         global_stylesheet: "グローバル CSS URL"
-        header_image_remove: デフォルトに戻す
         help_link_available_to: "使用可能:"
         help_link_subtext: サブテキスト
         help_link_text: リンクに表示するテキスト
@@ -865,8 +856,6 @@ ja:
         login_handle_name: "ログイン ラベル"
         message: メッセージ
         mfa_settings: マルチファクタ認証
-        msapplication_tile_square_remove: デフォルトに戻す
-        msapplication_tile_wide_remove: デフォルトに戻す
         name: アカウント名
         no_enrollments_can_create_courses: 登録のないユーザ
         open_registration: 登録を開く
@@ -1375,9 +1364,6 @@ ja:
   api_url_3ee7cb0a: "API URL"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "コースまたはアカウントの設定ページの「アプリ」タブにアプリ センターが表示されます。下の URL はアプリ センターのエンドポイントを指している必要があります。 (例: %{url} -- 末尾のスラッシュは省略します"
   app_placements_6d877225: アプリプレースメント
-  appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "各イベントのタイトルの末尾に番号を追加 (例：イベント1、イベント2、等)　"
-  appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "各イベントのタイトルの末尾に番号を追加 (例：イベント1、イベント2、等)\" for=\"append_iterator　"
-  apple_touch_icon_2c258bb3: "Apple タッチ アイコン"
   application: 
     errors: 
       feed_not_found: フィードが見つかりませんでした。
@@ -1972,9 +1958,6 @@ ja:
         submission: 提出
         submission_not_turned_in: 提出されていません!
         submission_turned_in: 提出されました!
-    submission_type_icon: 
-      tooltips: 
-        submitted: 提出済み
     submission_types_form: 
       advanced_turnitin_settings: "Turnitin の詳細設定"
       descriptions: 
@@ -2472,20 +2455,17 @@ ja:
         more_options: その他のオプション
     edit_calendar_event: 
       calendar: "カレンダー:"
-      count: "数:"
       date: "日付:"
       from: "自:"
       links: 
         more_options: その他のオプション
       location: "場所:"
-      repeat: 繰り返し
       timespan_separator: ～
       title: "タイトル:"
     edit_calendar_event_full: 
       buttons: 
         create: イベントの作成
         update: イベントの更新
-      count: "数:"
       date: 日付
       delete: 削除
       different_date_for_each_section: 各セクションに異なる日付を使用する
@@ -2496,7 +2476,6 @@ ja:
       location_address: "住所:"
       location_name: "場所:"
       new_calendar_event_header: "カレンダー イベントの新規作成"
-      repeat: 繰り返し
       start_time: 開始時刻
     edit_event: 
       tabs: 
@@ -2570,7 +2549,6 @@ ja:
       would_you_like_to_cancel_that_and_sign_up_for_this: 指定した予定を取り消して、この予定をサインアップしますか?
       you_are_already_signed_up_for: "既にサインアップしています:"
     save: 保存
-    save_and_publish: 保存して公開
     save_changes: 変更内容の保存
     scheduler_right_side_admin_section: 
       create_a_new_set_of_appointments: 予定グループを作成する
@@ -3380,14 +3358,8 @@ ja:
       delete_item: このアイテムをモジュールから削除してもよろしいですか?
     content_next: 
       add_prerequisite: "*%{module}* に前提条件を追加"
-      assignment_points_possible: "配点: %{points_possible}"
-      button: 
-        delete_label: 前提条件を削除
-        delete_title: 前提条件を削除
       buttons: 
-        add_module: モジュールの追加
         add_prerequisite: 前提条件の追加
-      criterion_for_assignment: "%{assignment} では、ユーザは %{select_criterion} をする必要があります"
       headings: 
         add_prerequisite: "%{name} への前提条件の追加"
         course_modules: "コース モジュール"
@@ -3416,50 +3388,17 @@ ja:
           one: "1 段階インデント"
           other: "%{count} 段階インデント"
           zero: インデントしない
-      key: 
-        description: 
-          delete: 現在のモジュール/アイテムを削除
-          edit: モジュール/アイテムを編集
-          indent: インデント
-          new: 新しいモジュール
-          next: 次のモジュール/アイテム
-          outdent: インデントを戻す
-          previous: 前のモジュール/アイテム
-      keycode_descriptions: 
-        next_module_item: "次のモジュールまたはモジュール アイテムを選択してください"
-        previous_module_item: "前のモジュールまたはモジュール アイテムを選択してください"
-        toggle_module_dragging: アイテムを選択してドラッグを開始するか、または前に選択したアイテムをドロップします
-      keycodes: 
-        delete: d
-        edit: e
-        indent: i
-        new: "n"
-        next: j
-        next_module_item: 上
-        outdent: o
-        previous: k
-        previous_module_item: 下
-        toggle_module_dragging: スペース
       labels: 
         indent: インデント
-        module_complete_when: "このモジュールは次の時点で完了:"
-        modules: 
-          before_students_view: 受講生がこのモジュールを表示するためには
         new_tab: 新しいタブに読み込み
-        publish_final_grade: このモジュールの完了時に、受講生の最終的な成績を公開します
-        require_sequential_progress: 受講生は、このモジュールの要件を順番に満たす必要があります
         title: タイトル
-        unlock_at: ロック解除の日時
         url: URL
       links: 
-        add_prerequisite: 前提条件を追加
-        add_requirement: 要件を追加
         student_progress: 進捗を表示
         title: 
           remove_prerequisite: この前提条件を削除
       module: モジュール
       module_details: "モジュールは順番に表示されるので、%{name} の上にあるモジュールのみを前提条件として設定できます。"
-      module_name: モジュール名
       modules_keyboard_hint_updated: "警告: モジュール (またはモジュール アイテム) を並べ替える際のアクセシビリティを高めるには、メニューにある移動先ダイアログ オプションを使用してください。"
       move_module: 
         after: 後
@@ -3470,12 +3409,8 @@ ja:
         into: 内へ
         or: または
         place: 場所
-      must_complete_prerequisites: "次のことを完了する必要があります:"
-      no_preprequisites: 前提条件が定義されていません
-      no_requirements: 要件が定義されていません
       prerequisites: 
         another_module: 別のモジュール
-      prerequisites_need_item: このモジュールの完了方法を指定するためには、その前にアイテムを追加する必要があります
       requirements: 
         must_contribute: ページへの貢献
         must_score_at_least: "最低限のスコア:"
@@ -3483,7 +3418,6 @@ ja:
         must_view: アイテムの閲覧
       select_module: 
         instructions: モジュールの選択
-        name: "モジュール「%{module}」"
       select_prerequisite: 前提条件のタイプを選択します。受講生は、すべての前提条件が満たされるまで、モジュールを表示できません。
     context_module: 
       unpublish: 未公開
@@ -3578,13 +3512,6 @@ ja:
       quizzes: クイズ
       wiki_pages: "Wiki ページ"
     points_possible_short: "%{points} 点"
-    prerequisites_footer: 
-      default_module_name: モジュール
-      labels: 
-        prerequisites: コース受講前提条件
-      links: 
-        title: 
-          remove_prerequisite: この前提条件を削除
     progressions: 
       titles: 
         student_progress: 受講生の進捗
@@ -4662,7 +4589,6 @@ ja:
       student: 
         count: 不正解の受講生数
         ratio: 受講生の不正解率
-  current_3ce5414a: "現在:"
   current_mastery_score_score_out_of_mastery_points_fedd343f: "現在の熟達スコア: %{mastery_points}のうちの%{score} "
   current_provider_6c3f7f96: 現在のプロバイダー
   current_score_6c81792: 現在のスコア
@@ -4845,7 +4771,6 @@ ja:
       month: 月
       second: 秒
       year: 年
-  day_s_7cc1231f: 日
   decaying_average_8bf6a0dd: 低下平均
   deep_orange_4c7eea99: ディープオレンジ
   deep_purple_bb3e2907: ディープパープル
@@ -5260,7 +5185,6 @@ ja:
       anonymous_user: 匿名
     pinned_discussions: 固定されたディスカッション
     reply: 
-      error_saving_reply: "*エラーが発生しました*。後でもう一度返信を投稿してください"
       saving_reply: 返信を保存しています...
     reply_attachment: 
       attachment_label: 添付ファイル
@@ -5789,7 +5713,6 @@ ja:
   event_date_f05219e7: "イベント日:"
   event_end_time_ef830e66: イベントの終了時間
   event_start_time_441b491f: イベントの開始時間
-  every_665d821e: それぞれの
   everyone_854554dd: 全員
   everyone_else_6c6dc7b6: 他の全員
   example_84698b7d: 例
@@ -5961,7 +5884,6 @@ ja:
   failed_to_import_media_objects_4c1fcb4f: "メディア オブジェクトのインポートに失敗しました"
   failed_to_log_in_7ceec561: ログインに失敗しました
   fair_use_bee47d77: 公正な使用
-  favicon_6e658914: お気に入りアイコン
   feature_flags: 
     feature_flag: 
       allow: 許可
@@ -6119,7 +6041,6 @@ ja:
     no_deleting_root: "ルート フォルダは削除できません"
     only_one_folder: "フォルダ パスおよびフォルダ ID を設定できません"
   for: ための
-  for_974cbb84: 対象
   for_all_devices_1f603968: すべてのデバイス
   forgot_password_url_3f9c04b: "パスワード URL を忘れた場合"
   from_fdd4956d: 変更前
@@ -7379,8 +7300,6 @@ ja:
   k12_description: |-
       K-12 環境で意味を持つ機能、設定、およびスタイルです。現時点では、一部のスタイル変更のみに当てはまりますが、
       将来的に K-12 固有の項目が追加される可能性があります。
-  labels: 
-    lock_module_until: 特定の日付までモジュールをロック
   last_item_79583712: "最終項目:"
   last_user_access_title: "最終ユーザ アクセス"
   late_percent_b91d01b3: "遅延: %{percent}"
@@ -7391,15 +7310,12 @@ ja:
   launch_url_e150bd41: "URL を起動"
   layouts: 
     application: 
-      bouncing_communication_channels: "連絡方法のいずれかに問題があるようです。*設定ページ* を確認してください。"
       group_switch: 切り替え
-      javascript_required: "このサイトにアクセスするには、JavaScript を有効にする必要があります。"
       keyboard_navigation: 
         close: "このダイアログを閉じるには、カンマ キーを押してください"
       links: 
         close: 閉じる
         dashboard: "マイ ダッシュボード"
-        skip_to_content: コンテンツまでスキップする
     fixed_bottom: 
       masquerading: 
         stop: マスカレードの停止
@@ -7416,8 +7332,6 @@ ja:
       view_all_or_customize: すべて表示またはカスタマイズ
     mobile_auth: 
       log_in_to_canvas: "Canvas へのログイン"
-    styleguide: 
-      default_page_title: "Canvas LMS"
   learning_mastery_gradebook_description: 講師は、学習の達成度の成績表を使用して、コース学習成果における受講生およびコースの進捗を簡単に表示できます。成果は成績表のような形式で表示され、受講生の進捗が、数字のスコアや達成/ほぼ達成/補習として表示されます。
   learning_outcome: 
     no_comment: コメントなし
@@ -7624,7 +7538,6 @@ ja:
   login_label_1dea0f9d: "ログイン ラベル"
   login_with_auth_type_a0aaa52a: "*%{auth_type}*でログイン"
   login_with_provider_3fd3998e: "%{provider}でログイン"
-  logo_a040ae0e: ロゴ
   logout_a9312e35: ログアウト
   looks_great_e4d883ed: 素晴らしいです！
   low_score_4eeb95b2: "低: %{score}"
@@ -9595,14 +9508,12 @@ ja:
     must_submit_incomplete: 課題を提出することが必要
     must_view_complete: ページを閲覧
     must_view_incomplete: ページを閲覧することが必要
-  month_s_5c17590e: 月
   moodle_dropdown_many_warning_title: "このバンクの %{count} 件の複数ドロップダウン問題が、正しくインポートされていない可能性があります"
   moodle_dropdown_warning_title: 複数のドロップダウン問題が正しくインポートされていない可能性があります
   moodle_formula_many_warning_title: "このバンクの %{count} 件の数式問題について、考えられる解答を再生成する必要があります"
   moodle_formula_warning_title: 数式問題について、考えられる解答を再生成する必要があります
   more_courses_5ebbe998: その他のコース
   most_recent_score_13a87e8c: 最新のスコア
-  most_recent_score_counts_as_calculation_int_of_mas_9a3bcf66: "最近のスコアが熟達スコアの %{calculation_int}%  のウエイトを占め、その他すべてのスコアの平均が %{remainder}%  のウエイトを占めています。"
   move_abf00365: 移動
   move_dialog: 
     cancel: キャンセル
@@ -9976,14 +9887,12 @@ ja:
     observee_added: "%{user} を監視しています"
     observing: 監視中
   observing_f3c5e759: 監視中
-  occurrence_s_c12d1aad: 発生
   of_students_5d1af0d2: 受講生数
   ok_c47544a2: OK
   okay_got_it_d686d4e8: わかりました
   on_time_percent_eebffe38: "時間内: %{percent}"
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: 解答を変更したら、問題を更新する前にオプションを選択する必要があります。
   one_per_line_format_name_value_79647700: "1 行に 1 つ。形式:名前=値"
-  only_a_maximum_of_100_events_can_be_created_ad703982: 最高100のイベントを作成することができます
   ontime_on_time_late_late_missing_missing_145e9e5d: "期日までに提出 %{onTime}、遅延 %{late}、未提出 %{missing}"
   open_color_picker_f117df0a: オープンカラーピッカー
   open_title_in_a_new_window_b29fed77: "%{title} を新しいウィンドウで表示"
@@ -12357,7 +12266,6 @@ ja:
       one: "%{count} 個のアイテムを %{destinationFolder} に移動しました"
       other: "%{count} 個のアイテムを %{destinationFolder} に移動しました"
     name: 名前
-    progress_error: ダウンロードの準備中にエラーが発生しました。もう一度やり直してください。
     progress_message: "ダウンロードの準備中: %{percent}% 完了"
     restrict_access: アクセスを制限
     results_count: "%{num_results} 件の検索結果を表示しています"
@@ -12372,7 +12280,6 @@ ja:
     updated_at: 変更日
     updated_at_short: 変更日
     view: 表示
-  read_more_about_windows_tiles_ac4ae6f5: "Windows タイルの詳細を見る"
   recaptcha_not_configured_3a6ef9ee: "Recaptcha が設定されていません"
   recent_student: 
     last_logged_in: "最終ログイン日時: %{last_login}"
@@ -12877,7 +12784,6 @@ ja:
         crosslist_this_section: このセクションをクロスリスティング
         current_enrollments: 現在の登録
         decrosslist_section: このセクションのクロスリスティングを除去
-  see_some_lti_tools_that_work_great_with_canvas_you_3c27bc7b: "Canvas との連携性に優れた *LTI ツール*をご確認ください。**LTI ツールについての Canvas コミュニティのトピック**もご覧ください。"
   select_a_grading_period_aab25483: 採点期間を選択
   select_content: コンテンツの選択
   select_content_checkbox: 
@@ -13290,7 +13196,6 @@ ja:
       start_a_new_course: 新しいコースの開始
     new_nav_header: 
       links: 
-        dashboard: "マイ ダッシュボード"
         skip_to_content: コンテンツまでスキップする
     no_recent_activity: 
       empty_stream_message: ストリームには、まだ表示するメッセージがありません。コースに参加し始めると、ディスカッションからのメッセージ、採点の更新、ご自分と他のユーザとの間で交わされる非公開メッセージなどで、このストリームが埋まっていきます。
@@ -13307,8 +13212,6 @@ ja:
       teacher: "%{course} (講師として)"
       teacher_title: 講師として招待されています。クリックしてコースを確認
     primary_header_navigation: 
-      links: 
-        inbox: 受信箱
       menu: 
         calendar: カレンダー
         grades: 成績
@@ -14134,7 +14037,6 @@ ja:
   the_grading_period_was_deleted_7814a349: 採点期間は削除されました
   the_institution_you_logged_in_from_is_not_configur_5ceac41: ログイン元の団体は、このアカウントに設定されていません。
   the_list_of_results_has_been_updated_46e3c733: 結果のリストが更新されています
-  the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "Canvas ヘッダの右上のロゴ画像。200x200 svg または png"
   the_material_is_in_the_public_domain_279c39a3: "この資料はパブリック ドメインです"
   the_material_is_licensed_under_creative_commons_3242cb5e: "この資料はクリエイティブ コモンズ ライセンスの対象となります"
   the_material_is_subject_to_fair_use_exception_41bc6a4b: この資料は公正使用の例外に該当します
@@ -14149,7 +14051,6 @@ ja:
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: レポーティングユーザの役割(生徒、教師、管理者等)
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: スケジューラーツールを使用すると、受講生(または受講生のグループ)がサインアップすることができるタイムスロットを設定できます。下のボタンをクリックして開始できます。
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: ドロップダウンメニューからユーザによって選択された問題の深刻度。
-  the_shortcut_icon_for_ios_android_devices_180x180__f87fa178: "iOS/Android デバイスのショートカット アイコン。180x180 png または svg"
   the_state_parameter_is_required_ffadf213: 状態パラメータが必要です
   the_top_track_represents_days_on_which_the_student_2a347099: "上部トラックは、コースのインストラクタに *受講生がメッセージを送信した* 日を表しています。下部トラックは、受講生に **インストラクタがメッセージを送信した** 日を表しています。"
   the_unique_id_used_for_representing_the_specific_r_3bdf5870: このエラー報告に発生した特定の要求/応答サイクルを表示するために使用されるユニークID
@@ -14187,8 +14088,6 @@ ja:
   this_most_likely_happened_because_you_imported_cou_a78ea880: これは、関連ファイルがない状態でコースのコンテンツをインポートしたことが原因で発生したと考えられます。
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: この成果は、受講生を査定するために使用されていて、更新することはできません
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: この成果は、受講生を査定するために使用されていて、編集、削除することはできません
-  this_outcome_has_been_used_to_assess_a_student_the_1f04402e: この成果は、受講生を査定するために使用されています。計算メソッドはロックされています
-  this_outcome_has_been_used_to_assess_a_student_the_1ff3a596: この成果は、受講生を査定するために使用されています。計算値はロックされています
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*このクイズは未公開です* 公開されるまでは、講師のみがこのクイズを表示できます。"
   this_student_wrote_f1a3f22d: "この受講生の記述:"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "これによって、Canvas が SIS に成績を投稿することを認証できます"
@@ -14483,7 +14382,6 @@ ja:
   usage_rights_f0960ad6: 使用権
   usage_rights_have_been_set_d1b433c7: 使用権が設定されています。
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "次に含まれるすべてのファイルに使用権が設定されます:"
-  use_a_single_16x16_32x32_48x48_ico_file_60bc8d91: "*単一の 16x16、32x32、48x48 アイコン ファイル* を使用します。"
   use_new_folder_tree_in_files_eb5a451b: ファイル中の新しいフォルダツリーを使う
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: 定期的なキャンバスクイズの代わりに、新しいクイズLTIツールを使用する
   use_this_configuration_for_parent_observer_registr_e49f8f66: 親/監視者の登録の設定を使う
@@ -14920,7 +14818,6 @@ ja:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE、WebCT 6+ コース"
   webct_name: "Blackboard Vista/CE (WebCT)"
-  week_s_cb1492ee: 週
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: コースへようこそ！コースのリストをカスタマイズするには、「すべてのコース」リンクをクリックし、コースの表示を開始してください。
   well_below_mastery_37664bdc: 熟達を大きく下回る
   what_should_the_csv_file_look_like_985a59ac: "CSV ファイルはどのような表示にしたいですか?"
@@ -15084,9 +14981,6 @@ ja:
     external_urls: 
       archive: アーカイブ
       archive_link: アーカイブを表示
-  windows_square_tile_4c00879e: "Windows の正方形タイル"
-  windows_tile_color_2b786bd9: "Windows のタイル カラー"
-  windows_wide_tile_a3302508: "Windows のワイド タイル"
   would_you_like_to_enable_this_app_ccdf735d: このアプリを有効にしますか?
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "受講生がコースを続行できるようにしますか? または、新しい要件が完了するまで、これらのモジュールを再度ロックしますか?"
   xml_configuration_5ea1b942: "XML 設定"
