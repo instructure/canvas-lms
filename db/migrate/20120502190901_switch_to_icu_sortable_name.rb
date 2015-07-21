@@ -18,8 +18,8 @@ class SwitchToIcuSortableName < ActiveRecord::Migration
 
       concurrently = " CONCURRENTLY" if connection.open_transactions == 0
       remove_index :users, :sortable_name
-      if connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='collkey'").to_i != 0
-        execute("CREATE INDEX#{concurrently} index_users_on_sortable_name ON users (collkey(sortable_name, 'root', true, 2, true))")
+      if collkey = connection.extension_installed?(:pg_collkey)
+        execute("CREATE INDEX#{concurrently} index_users_on_sortable_name ON users (#{collkey}.collkey(sortable_name, 'root', true, 2, true))")
       else
         execute("CREATE INDEX#{concurrently} index_users_on_sortable_name ON users (CAST(LOWER(sortable_name) AS bytea))")
       end
