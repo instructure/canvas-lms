@@ -191,6 +191,8 @@ define([
                     sharedBrandConfigs={this.props.sharedBrandConfigs}
                     activeBrandConfigMd5={this.props.brandConfig.md5}
                     saveToSession={this.saveToSession}
+                    hasUnsavedChanges={this.props.hasUnsavedChanges}
+                    somethingChanged={this.state.somethingChanged}
                   />
                   <ThemeEditorAccordion
                     variableSchema={this.props.variableSchema}

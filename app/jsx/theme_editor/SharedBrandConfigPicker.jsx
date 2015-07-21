@@ -17,7 +17,9 @@ define([
     propTypes: {
       activeBrandConfigMd5: customTypes.md5,
       sharedBrandConfigs: customTypes.sharedBrandConfigs,
-      saveToSession: React.PropTypes.func.isRequired
+      saveToSession: React.PropTypes.func.isRequired,
+      hasUnsavedChanges: React.PropTypes.bool,
+      somethingChanged: React.PropTypes.bool
     },
 
     selectBrandConfig(md5) {
@@ -25,7 +27,23 @@ define([
       this.props.saveToSession(md5)
     },
 
-    defaultValue() {
+    hasUnsavedCustomChanges() {
+      // return true the current brand config is not applied yet and it's not the default or a shared config
+      return this.props.hasUnsavedChanges && (this.props.activeBrandConfigMd5 !== null) && !this.selectedSharedConfig()
+    },
+
+    handleSelectChange(event) {
+      if (this.props.somethingChanged || this.hasUnsavedCustomChanges()) {
+        var msg = I18n.t('You are about to lose any changes that you have not yet applied to your account.\n\n' +
+                         'Would you still like to proceed?')
+        if (!confirm(msg)) {
+          return
+        }
+      }
+      this.selectBrandConfig(event.target.value)
+    },
+
+    selectedSharedConfig() {
       var found = _.find(this.props.sharedBrandConfigs, {md5: this.props.activeBrandConfigMd5})
       return found && found.md5
     },
@@ -41,8 +59,8 @@ define([
           </label>
           <select
             id="sharedThemes"
-            defaultValue={this.defaultValue()}
-            onChange={event => this.selectBrandConfig(event.target.value)}
+            defaultValue={this.selectedSharedConfig()}
+            onChange={this.handleSelectChange}
             className="ic-Input"
           >
             <option value="" disabled selected>
