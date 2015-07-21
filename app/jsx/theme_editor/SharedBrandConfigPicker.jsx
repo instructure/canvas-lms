@@ -37,15 +37,20 @@ define([
             className="screenreader-only"
             htmlFor="sharedThemes"
           >
-            {I18n.t('Start From a Template Theme:')}
+            {I18n.t('Start From a Theme Template')}
           </label>
           <select
             id="sharedThemes"
             defaultValue={this.defaultValue()}
             onChange={event => this.selectBrandConfig(event.target.value)}
+            className="ic-Input"
           >
-            <option value="" disabled selected> {I18n.t('-- Start From a Template --')} </option>
-            <option value={USE_CANVAS_DEFAULT}>{I18n.t('Canvas Default')}</option>
+            <option value="" disabled selected>
+              {I18n.t('Start from a template...')}
+            </option>
+            <option value={USE_CANVAS_DEFAULT}>
+              {I18n.t('Canvas Default')}
+            </option>
             {this.props.sharedBrandConfigs.map(brandConfig =>
               <option key={brandConfig.md5} value={brandConfig.md5}>
                 {brandConfig.name}

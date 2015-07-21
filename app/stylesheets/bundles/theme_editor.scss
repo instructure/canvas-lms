@@ -80,6 +80,9 @@ $te-border-color: darken($ic-color-neutral, 10);
   align-items: center;
   justify-content: center;
 }
+.Theme__preview-button-text {
+  padding-left: $ic-sp;
+}
 .Theme__preview iframe {
   border: none;
   width: 100%;
@@ -90,31 +93,40 @@ $te-border-color: darken($ic-color-neutral, 10);
 
 .Theme__editor-header {
   background: $ic-color-dark;
-  padding: 10px 0;
+  padding: 10px;
   display: flex;
   align-items: center;
+  position: relative;
+
   .Theme__editor-header_title {
-    padding: 0 0 0 $ic-sp;
-    margin: 0;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    @include overwrite-default-icon-size(18px);
+  }
+
+  .Theme__editor-header_title-text {
     color: $ic-color-light;
     line-height: normal;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 300;
+    margin: 0 0 0 $ic-sp;
     flex: 1;
-    text-align: center;
+    line-height: 1.2;
   }
+
   .Theme__editor-header_title-icon {
-    color: $ic-color-light;
+    line-height: 1;
+    color: #D5412F;
   }
+
   .Theme__editor-header_actions {
     display: flex;
     justify-content: flex-end;
   }
-  .Theme__editor-Button--trigger {
 
-  }
   .Theme__editor-header_button {
-    margin: 0 $ic-sp;
+    margin-left: $ic-sp/2;
   }
 }
 
@@ -125,6 +137,10 @@ $te-border-color: darken($ic-color-neutral, 10);
   padding: $ic-sp;
   border-top: 1px solid $te-border-color;
   border-bottom: 1px solid $te-border-color;
+
+  select {
+    margin: 0;
+  }
 }
 //// Tabs for Theme Editor
 ///////

@@ -71,6 +71,10 @@ define([
       })
     },
 
+    onProgress(data) {
+      this.setState({progress: data.completion})
+    },
+
     getDefault(variableName) {
       var val = this.state.changedValues[variableName] && this.state.changedValues[variableName].val
       if (val) return val
@@ -87,34 +91,24 @@ define([
       submitHtmlForm('/brand_configs/save_to_user_session', 'POST', md5)
     },
 
-    redirectToWhatIframeIsShowing() {
-      window.top.location = this.refs.previewIframe.getDOMNode().contentWindow.location
-    },
-
-    exit() {
+    handleCancelClicked() {
       if (this.props.hasUnsavedChanges || this.state.somethingChanged) {
-        var msg = I18n.t('You are about to lose any unsaved changes.\n\n' +
+        var msg = I18n.t('You are about to lose any changes that you have not yet applied to your account.\n\n' +
                          'Would you still like to proceed?')
-        if (confirm(msg)) {
-          $.ajax('/brand_configs', {type: 'DELETE'})
-            .then(this.redirectToWhatIframeIsShowing)
-            .then(null, () => alert(I18n.t('Something went wrong, please try again.')))
+        if (!confirm(msg)) {
+          return;
         }
-      } else {
-        this.redirectToWhatIframeIsShowing()
       }
+      submitHtmlForm('/brand_configs', 'DELETE');
     },
 
-    saveToAccount() {
+    handleApplyClicked() {
       var msg = I18n.t('This will apply these changes to your entire account. Would you like to proceed?')
       if (confirm(msg)) submitHtmlForm('/brand_configs/save_to_account', 'POST')
     },
 
-    onProgress(data) {
-      this.setState({progress: data.completion})
-    },
 
-    preview() {
+    handleFormSubmit() {
       var newMd5
 
       this.setState({showProgressModal: true})
@@ -143,61 +137,61 @@ define([
     render() {
       return (
         <div id="main">
-        <form
-          ref="ThemeEditorForm"
-          onSubmit={preventDefault(this.preview)}
-          encType="multipart/form-data"
-          acceptCharset="UTF-8"
-          action="/brand_configs"
-          method="POST"
-          className="Theme__container"
-        >
-          <input name="utf8" type="hidden" value="✓" />
-          <input name="authenticity_token" type="hidden" value={$.cookie('_csrf_token')} />
-          <div className="Theme__editor">
-            <div className="Theme__editor-header">
-              <h1 className="Theme__editor-header_title">
-                <button
-                  type='button'
-                  className="Theme__editor-header_title-icon btn-link pull-left"
-                  onClick={this.exit}
-                  title={I18n.t('Exit Theme Editor')}
-                >
-                  <i className="icon-x" />
-                  <span className="screenreader-only">{I18n.t('Exit Theme Editor')}</span>
-                </button>
+          <form
+            ref="ThemeEditorForm"
+            onSubmit={preventDefault(this.handleFormSubmit)}
+            encType="multipart/form-data"
+            acceptCharset="UTF-8"
+            action="/brand_configs"
+            method="POST"
+            className="Theme__container">
+            <input name="utf8" type="hidden" value="✓" />
+            <input name="authenticity_token" type="hidden" value={$.cookie('_csrf_token')} />
+            <div className="Theme__editor">
 
-                {I18n.t('Theme Editor')}
-              </h1>
-              <div className="Theme__editor-header_actions">
-                <span
-                  data-tooltip="bottom"
-                  title={this.state.somethingChanged ?
-                    I18n.t('you need to "Preview Your Changes" before applying to everyone') :
-                    null
-                  }
-                >
+              <div className="Theme__editor-header">
+                <div className="Theme__editor-header_title">
+                  <i className="Theme__editor-header_title-icon icon-instructure" />
+                  <h1 className="Theme__editor-header_title-text">
+                    {I18n.t('Theme Editor')}
+                  </h1>
+                </div>
+
+                <div className="Theme__editor-header_actions">
+                  <span
+                    data-tooltip="bottom"
+                    title={this.state.somethingChanged ?
+                      I18n.t('You need to "Preview Your Changes" before applying to everyone.') :
+                      null
+                    }
+                  >
+                    <button
+                      type="button"
+                      className="Theme__editor-header_button Button Button--success"
+                      disabled={!this.props.hasUnsavedChanges || this.state.somethingChanged}
+                      onClick={this.handleApplyClicked}
+                    >
+                      {I18n.t('Apply')}
+                    </button>
+
+                  </span>
                   <button
                     type="button"
-                    className="Theme__editor-header_button Button Button--success"
-                    disabled={!this.props.hasUnsavedChanges || this.state.somethingChanged}
-                    onClick={this.saveToAccount}
+                    className="Theme__editor-header_button Button"
+                    onClick={this.handleCancelClicked}
                   >
-                    {I18n.t('Apply')}
+                    {I18n.t('Cancel')}
                   </button>
-                </span>
+                </div>
               </div>
-            </div>
 
-            <SharedBrandConfigPicker
-              sharedBrandConfigs={this.props.sharedBrandConfigs}
-              activeBrandConfigMd5={this.props.brandConfig.md5}
-              saveToSession={this.saveToSession}
-            />
-
-            <div id="Theme__editor-tabs">
-              <div id="te-editor">
-                <div className="Theme__editor-tabs_panel">
+              <div className="Theme__editor-tabs">
+                <div id="te-editor-panel" className="Theme__editor-tabs_panel">
+                  <SharedBrandConfigPicker
+                    sharedBrandConfigs={this.props.sharedBrandConfigs}
+                    activeBrandConfigMd5={this.props.brandConfig.md5}
+                    saveToSession={this.saveToSession}
+                  />
                   <ThemeEditorAccordion
                     variableSchema={this.props.variableSchema}
                     brandConfigVariables={this.props.brandConfig.variables}
@@ -207,38 +201,44 @@ define([
                   />
                 </div>
               </div>
-            </div>
-          </div>
-
-          <div className="Theme__preview">
-            { this.state.somethingChanged ?
-              <div className="Theme__preview-overlay">
-                <div className="Theme__preview-overlay__container">
-                  <button type="submit" className="Button Button--primary" disabled={this.invalidForm()}>
-                    <i className="icon-refresh" />
-                    {I18n.t('Preview Your Changes')}
-                  </button>
-                </div>
+              
+              <div className="Theme__preview">
+                { this.state.somethingChanged ?
+                  <div className="Theme__preview-overlay">
+                    <div className="Theme__preview-overlay__container">
+                      <button 
+                        type="submit"
+                        className="Button Button--primary"
+                        disabled={this.invalidForm()}>
+                        <i className="icon-refresh" />
+                        <span className="Theme__preview-button-text">
+                          {I18n.t('Preview Your Changes')}
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                : null }
+                <iframe ref="previewIframe" src="/?editing_brand_config=1" />
               </div>
-            : null }
-            <iframe ref="previewIframe" src="/?editing_brand_config=1" />
-          </div>
-        </form>
-        <Modal
-          isOpen={this.state.showProgressModal}
-          className='ReactModal__Content--canvas ReactModal__Content--mini-modal'
-          overlayClassName='ReactModal__Overlay--Theme__editor_progress'
-        >
-          <div className="Theme__editor_progress">
-            <h4>{I18n.t('Generating Preview...')}</h4>
-            <ProgressBar
-              progress={this.state.progress}
-              title={I18n.t('%{percent} complete', {
-                percent: I18n.toPercentage(this.state.progress, {precision: 0})
-              })}
-            />
-          </div>
-        </Modal>
+
+            </div>
+          </form>
+
+          <Modal
+            isOpen={this.state.showProgressModal}
+            className='ReactModal__Content--canvas ReactModal__Content--mini-modal'
+            overlayClassName='ReactModal__Overlay--Theme__editor_progress'>
+            <div className="Theme__editor_progress">
+              <h4>{I18n.t('Generating Preview...')}</h4>
+              <ProgressBar
+                progress={this.state.progress}
+                title={I18n.t('%{percent} complete', {
+                  percent: I18n.toPercentage(this.state.progress, {precision: 0})
+                })}
+              />
+            </div>
+          </Modal>
+
         </div>
       )
     }
