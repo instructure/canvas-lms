@@ -185,6 +185,7 @@ describe SisApiController, type: :request do
       let_once(:assignment5) { @course.assignments.create!(post_to_sis: true) }
       let_once(:assignment6) { @course.assignments.create!(post_to_sis: true) }
       let_once(:assignment7) { @course.assignments.create!(post_to_sis: true) }
+      let_once(:assignment8) { @course.assignments.create!(post_to_sis: true) }
 
       let(:context) { @course }
 
@@ -223,7 +224,20 @@ describe SisApiController, type: :request do
 
           # third page
           get "/api/sis/courses/#{@course.id}/assignments", course_id: @course.id, per_page: 2, page: 3
-          expect(json_parse.length).to eq(0)
+          expect(json_parse.length).to eq(1)
+        end
+
+        it 'should return an assignment with an override' do
+          new_override = assignment8.assignment_overrides.build
+          new_override.override_due_at(3.days.from_now)
+          new_override.set_type = 'CourseSection'
+          new_override.set_id = assignment8.context.course_sections.first.id
+          new_override.save!
+          get "/api/sis/courses/#{@course.id}/assignments", course_id: @course.id, per_page: 2, page: 3
+          result_json = json_parse
+          override = result_json[0]['sections'].first['override']
+          expect(result_json.length).to eq(1)
+          expect(override).to include('override_title' => @course.name)
         end
 
         it 'accepts a sis_id as the course id' do
@@ -236,7 +250,7 @@ describe SisApiController, type: :request do
           result = json_parse
           assignment_ids = result.map{|a| a['id']}
 
-          expect(result.size).to eq 4
+          expect(result.size).to eq 5
           expect(assignment_ids).to include assignment4.id
           expect(assignment_ids).to include assignment5.id
           expect(assignment_ids).to include assignment6.id

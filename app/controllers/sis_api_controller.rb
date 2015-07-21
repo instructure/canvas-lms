@@ -28,6 +28,10 @@ class SisApiController < ApplicationController
   # Generally, the `origin_course` should be preferred when performing integration work. The `xlist_course` is provided
   # for consistency and is only present when the section has been cross-listed.
   #
+  # The `override` is only provided if the Differentiated Assignments course feature is turned on and the assignment
+  # has an override for that section. When there is an override for the assignment the override object's keys/values can
+  # be merged with the top level assignment object to create a view of the assignment object specific to that section.
+  #
   # @argument account_id [Integer] The ID of the account to query.
   # @argument course_id [Integer] The ID of the course to query.
   #
@@ -67,6 +71,10 @@ class SisApiController < ApplicationController
   #             "id": 6,
   #             "sis_id": "C6",
   #             "integration_id": "I-6"
+  #           },
+  #           "override": {
+  #             "override_title": "Assignment Title",
+  #             "due_at": "2015-02-01%17:00:00Z"
   #           }
   #         },
   #
@@ -124,7 +132,7 @@ class SisApiController < ApplicationController
       post_to_sis: true,
       context_type: 'Course',
       context_id: published_course_ids
-    ).preload(assignment_group: [], context: { course_sections: [:nonxlist_course] })
+    ).preload(assignment_group: [], assignment_overrides: [], context: { course_sections: [:nonxlist_course] })
   end
 
   def paginated_assignments
