@@ -41,7 +41,7 @@ class MessageMigration < ActiveRecord::Migration
         media_comment_type,
         ''#{mysql ? '' : '::TEXT'} AS signature
       FROM
-        #{connection.quote_table_name('context_mesages')}
+        #{connection.quote_table_name('context_messages')}
     SQL
     change_column :__migrated_messages, :signature, :text if mysql
     add_index :__migrated_messages, :id
@@ -52,7 +52,7 @@ class MessageMigration < ActiveRecord::Migration
         context_message_id AS migrated_message_id,
         user_id
       FROM
-        #{connection.quote_table_name('context_message_participant')}
+        #{connection.quote_table_name('context_message_participants')}
     SQL
     add_index :__migrated_message_participants, :migrated_message_id, :name => :index_mmp_on_message_id
 
