@@ -53,8 +53,8 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   #   :submission_correct_count_average=>1,
   #   :questions=>
   #     [output of stats_for_question for every question in submission_data]
-  def generate(legacy=true)
-    submissions = submissions_for_statistics
+  def generate(legacy=true, options = {})
+    submissions = submissions_for_statistics(options)
     # questions: questions from quiz#quiz_data
     #{1022=>
     # {"id"=>1022,
@@ -310,10 +310,16 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
 
   private
 
-  def submissions_for_statistics
+  def submissions_for_statistics(param_options = {})
     Shackles.activate(:slave) do
       scope = quiz.quiz_submissions.for_students(quiz)
       logged_out = quiz.quiz_submissions.logged_out
+
+      if param_options[:section_ids].present?
+        user_ids = Enrollment.active.where(course_section_id: param_options[:section_ids]).pluck(:user_id)
+        scope = scope.where(user_id: user_ids)
+        logged_out = logged_out.where(user_id: user_ids)
+      end
 
       all_submissions = []
       all_submissions = prep_submissions scope

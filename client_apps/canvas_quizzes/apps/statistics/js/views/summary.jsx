@@ -11,6 +11,7 @@ define(function(require) {
   var ScreenReaderContent = require('jsx!canvas_quizzes/components/screen_reader_content');
   var Spinner = require('jsx!canvas_quizzes/components/spinner');
   var NA_LABEL = I18n.t('not_available_abbrev', 'N/A');
+  var SectionSelect = require('jsx!./summary/section_select');
 
   var Column = React.createClass({
     render: function() {
@@ -62,10 +63,10 @@ define(function(require) {
             {isLoading && <Spinner />}
 
             <div className="pull-right">
+              <SectionSelect />
               {this.props.quizReports.map(this.renderReport)}
             </div>
           </header>
-
 
           <table className="text-left">
             <ScreenReaderContent tagName="caption" forceSentenceDelimiter>

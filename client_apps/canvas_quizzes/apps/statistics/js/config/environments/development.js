@@ -15,6 +15,7 @@ define(function(require) {
     // See ./README.md for more info on overriding these to use fixtures.
     quizStatisticsUrl: '/api/v1/courses/1/quizzes/1/statistics',
     quizReportsUrl: '/api/v1/courses/1/quizzes/1/reports',
+    courseSectionsUrl: '/api/v1/courses/1/sections'
 
     onError: function(message) {
       throw new Error(message);

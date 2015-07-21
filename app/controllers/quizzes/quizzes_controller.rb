@@ -528,6 +528,7 @@ class Quizzes::QuizzesController < ApplicationController
           js_env({
             quiz_url: api_v1_course_quiz_url(@context, @quiz),
             quiz_statistics_url: api_v1_course_quiz_statistics_url(@context, @quiz),
+            course_sections_url: api_v1_course_sections_url(@context),
             quiz_reports_url: api_v1_course_quiz_reports_url(@context, @quiz),
           })
 
