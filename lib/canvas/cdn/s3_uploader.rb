@@ -63,18 +63,29 @@ module Canvas
         s3_object = bucket.objects[remote_path]
         return log("skipping already existing #{remote_path}") if s3_object.exists?
         options = options_for(local_path)
-        gzipped = Pathname.new("#{local_path}.gz")
-        if gzipped.exist?
-          local_path = gzipped
-          options[:content_encoding] = 'gzip'
-        end
         log "uploading #{remote_path} #{options[:content_encoding]}"
-        s3_object.write(local_path, options)
+        s3_object.write(handle_compression(local_path, options), options)
       end
 
       def log(msg)
         Rails.logger.debug "#{self.class} - #{msg}"
       end
+
+      def handle_compression(file, options)
+        return file if file.size < 150 # gzipping small files is not worth it
+        gzipped = (CANVAS_RAILS3 ? Canvas::CDN::Gzip : ActiveSupport::Gzip).compress(file.read, Zlib::BEST_COMPRESSION)
+        compression = 100 - (100.0 * gzipped.size / file.size).round
+        # if we couldn't compress more than 5%, the gzip decoding cost to the
+        # client makes it is not worth serving gzipped
+        if compression > 5
+          options[:content_encoding] = 'gzip'
+          log "Using Gzipped #{file.basename}. was: #{file.size} now: #{gzipped.size} saved: #{compression}%"
+          return gzipped
+        else
+          return file
+        end
+      end
+
     end
   end
 end
