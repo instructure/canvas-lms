@@ -9,8 +9,6 @@ nl:
     headings: 
       page: "Geen toestemming"
     title: "Geen toestemming"
-  558x270_png_a5e13e53: "558 x 270 png"
-  558x558_png_1_8x_the_standard_tile_size_so_it_can__4a9023e1: "558 x 558 png (1.8 x de standaard tegelgrootte, zodat het naar behoefte naar boven of naar beneden geschaald kan worden)"
   EditAppointmentGroupDetails: 
     affect_reservations: "Wat is de invloed hiervan op reserveringen?"
     and_n_contexts: "en %{n} anderen"
@@ -62,10 +60,6 @@ nl:
         api_key: API-sleutel
         api_url: Api-URL
         common_core_guid: "Common Core GUID (optioneel)"
-  access_to_the_etherpad_collaborations_below_will_b_b6a0a288: |-
-      Toegang tot de onderstaande Etherpad samenwerkingen zal op 8 augustus 2015 beëindigd worden. Als je deze content wil bewaren, migreer deze content dan voor die datum.
-      
-      Voor instructies over het creëren van een samenwerking met Google, [klik hier](%{google_collab_help_url}).
   access_token_is_valid_until_d2f048cf: "Toegangstoken is geldig tot"
   account: 
     ask_canvas_network: "De Canvas Netwerk Community vragen"
@@ -837,7 +831,6 @@ nl:
         allow_invitation_previews: "Uitnodiging voorbeelden"
         allow_sending_scores_in_emails: "Cursisten kunnen ervoor kiezen om uitslagen per e-mail te ontvangen"
         allow_sis_import: SIS-imports
-        apple_touch_icon_remove: "Terug naar standaard"
         author_email_in_notifications: "Het e-mailadres van zender voor gebruiker interactie meldingen aangeven"
         canvas_authentication: Canvas-verificatie
         default_language: Standaardtaal
@@ -852,11 +845,9 @@ nl:
         equella: Equella
         equella_endpoint: Equella-eindpunt
         equella_teaser: Equella-opmerkingen
-        favicon_remove: "Terug naar standaard"
         global_includes: "Algemene CSS/Java Script bevat"
         global_javascript: "Algemene JavaScript-URL"
         global_stylesheet: "Algemene CSS-URL"
-        header_image_remove: "Terug naar standaard"
         help_link_available_to: "Beschikbaar voor"
         help_link_subtext: Subtekst
         help_link_text: "Tekst om bij link weer te geven "
@@ -866,8 +857,6 @@ nl:
         login_handle_name: Aanmeldingslabel
         message: Bericht
         mfa_settings: Multi-Factor-verificatie
-        msapplication_tile_square_remove: "Terug naar standaard"
-        msapplication_tile_wide_remove: "Terug naar standaard"
         name: Accountnaam
         no_enrollments_can_create_courses: "Gebruikers zonder inschrijvingen"
         open_registration: "Open registratie"
@@ -1373,9 +1362,6 @@ nl:
   api_url_3ee7cb0a: "API URL"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "App Center zal in het tabblad \"Apps\" verschijnen op de pagina met instellingen voor óf een cursus óf account. De URL hieronder moet naar het eindpunt van een geldig App Center wijzen (bijvoorbeeld %{url} -- zorg ervoor dat je de slash aan het einde weglaat "
   app_placements_6d877225: "Plaatsingen toevoegen"
-  appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "Bevestigt een nummer aan het eind van elke evenement titel (bijv. Evenement 1, Evenement 2, enz.)"
-  appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "Voegt een nummer toe aan het eind van elke evenement titel (bijv. Evenement 1, Evenement 2, enz.)"
-  apple_touch_icon_2c258bb3: "Apple Touch Pictogram"
   application: 
     errors: 
       feed_not_found: "Kan feed niet vinden."
@@ -1965,9 +1951,6 @@ nl:
         submission: Inzending
         submission_not_turned_in: "Niet ingeleverd!"
         submission_turned_in: Ingeleverd!
-    submission_type_icon: 
-      tooltips: 
-        submitted: Ingeleverd
     submission_types_form: 
       advanced_turnitin_settings: "Geavanceerde Turnitin instellingen"
       descriptions: 
@@ -2464,20 +2447,17 @@ nl:
         more_options: "Meer opties"
     edit_calendar_event: 
       calendar: "Kalender:"
-      count: "Telling:"
       date: "Datum:"
       from: "Van:"
       links: 
         more_options: "Meer opties"
       location: "Locatie:"
-      repeat: Herhalen
       timespan_separator: tot
       title: "Titel:"
     edit_calendar_event_full: 
       buttons: 
         create: "Gebeurtenis maken"
         update: "Gebeurtenis bijwerken"
-      count: "Telling:"
       date: Datum
       delete: Verwijderen
       different_date_for_each_section: "Voor iedere sectie een andere datum gebruiken"
@@ -2488,7 +2468,6 @@ nl:
       location_address: "Adres:"
       location_name: "Locatie:"
       new_calendar_event_header: "Nieuwe gebeurtenis op de kalender"
-      repeat: Herhalen
       start_time: Starttijd
     edit_event: 
       tabs: 
@@ -2562,7 +2541,6 @@ nl:
       would_you_like_to_cancel_that_and_sign_up_for_this: "Wil je dat annuleren en je hiervoor inschrijven?"
       you_are_already_signed_up_for: "Je bent al ingeschreven voor:"
     save: Opslaan
-    save_and_publish: "Opslaan & publiceren"
     save_changes: "Wijzigingen opslaan"
     scheduler_right_side_admin_section: 
       create_a_new_set_of_appointments: "Een afspraakgroep maken"
@@ -3372,14 +3350,8 @@ nl:
       delete_item: "Weet je zeker dat je dit item uit deze module wilt verwijderen?"
     content_next: 
       add_prerequisite: "Vereisten toevoegen aan *%{module}*"
-      assignment_points_possible: "op %{points_possible}"
-      button: 
-        delete_label: "Eerste vereisten verwijderen"
-        delete_title: "Eerste vereisten verwijderen"
       buttons: 
-        add_module: "Module toevoegen"
         add_prerequisite: "Vereiste toevoegen"
-      criterion_for_assignment: "Voor %{assignment} moeten gebruikers %{select_criterion}"
       headings: 
         add_prerequisite: "Vereiste toevoegen aan %{name}"
         course_modules: Cursusmodules
@@ -3408,50 +3380,17 @@ nl:
           one: "1 niveau inspringen"
           other: "%{count} niveaus inspringen"
           zero: "Niet inspringen"
-      key: 
-        description: 
-          delete: "Huidige module/huidig item verwijderen"
-          edit: "Module/item bewerken"
-          indent: "Inspringen vergroten"
-          new: "Nieuwe module"
-          next: "Volgend(e) module/item"
-          outdent: "Inspringen verkleinen"
-          previous: "Voorgaand(e) module/item"
-      keycode_descriptions: 
-        next_module_item: "Volgende module of volgend module-item selecteren"
-        previous_module_item: "Voorgaande module of voorgaand module-item selecteren"
-        toggle_module_dragging: "Item selecteren om te beginnen met slepen of om het eerder geselecteerde item neer te zetten"
-      keycodes: 
-        delete: d
-        edit: e
-        indent: i
-        new: "n"
-        next: j
-        next_module_item: Omhoog
-        outdent: o
-        previous: k
-        previous_module_item: Omlaag
-        toggle_module_dragging: Spatie
       labels: 
         indent: Inspringen
-        module_complete_when: "Deze module is voltooid wanneer"
-        modules: 
-          before_students_view: "Voordat cursisten deze module kunnen bekijken"
         new_tab: "In een nieuw tabblad laden"
-        publish_final_grade: " Wanneer deze module voltooid is eindcijfer voor/van de cursist publiceren "
-        require_sequential_progress: "Cursisten moeten in de juiste volgorde aan de vereisten voor deze module voldoen "
         title: Titel
-        unlock_at: "Ontgrendelen op"
         url: URL
       links: 
-        add_prerequisite: "Vereiste toevoegen"
-        add_requirement: "Vereiste toevoegen"
         student_progress: "Voortgang bekijken"
         title: 
           remove_prerequisite: "Deze vereiste verwijderen"
       module: module
       module_details: "Modules worden in een bepaalde volgorde  getoond, dus alleen modules boven %{name} kunnen als primaire vereisten aangegeven worden."
-      module_name: Modulenaam
       modules_keyboard_hint_updated: "Waarschuwing: Gebruik de optie Naar Dialoog Verplaatsen in het menu voor betere toegang tot herordening van Modules (of Module items).  "
       move_module: 
         after: Na
@@ -3462,12 +3401,8 @@ nl:
         into: in
         or: OF
         place: Locatie
-      must_complete_prerequisites: "Ze moeten voltooien"
-      no_preprequisites: "Geen vereisten gedefinieërd"
-      no_requirements: "Geen vereisten gedefinieërd"
       prerequisites: 
         another_module: "Andere module"
-      prerequisites_need_item: "Je moet items toevoegen voordat je kunt opgeven hoe een gebruiker deze module moet voltooien"
       requirements: 
         must_contribute: "Aan de pagina bijdragen"
         must_score_at_least: "minimaal scoren"
@@ -3475,7 +3410,6 @@ nl:
         must_view: "het item bekijken"
       select_module: 
         instructions: "Module selecteren"
-        name: "de module, %{module}"
       select_prerequisite: "Het type vereiste selecteren. Cursisten kunnen de module pas zien zodra aan alle vereisten zijn voldaan."
     context_module: 
       unpublish: "Publicatie ongedaan maken"
@@ -3570,13 +3504,6 @@ nl:
       quizzes: Toetsen
       wiki_pages: "Wiki-pagina's "
     points_possible_short: "%{points} punten"
-    prerequisites_footer: 
-      default_module_name: "module "
-      labels: 
-        prerequisites: "Primaire vereisten "
-      links: 
-        title: 
-          remove_prerequisite: "Deze primaire vereiste verwijderen "
     progressions: 
       titles: 
         student_progress: "Voortgang van cursist"
@@ -4655,7 +4582,6 @@ nl:
       student: 
         count: "Verkeerd aantal cursisten"
         ratio: "Verkeerde cursistratio"
-  current_3ce5414a: "Huidig:"
   current_mastery_score_score_out_of_mastery_points_fedd343f: "Huidige Meesterschap Score: %{score} out of %{mastery_points}"
   current_provider_6c3f7f96: "Huidige Provider"
   current_score_6c81792: "Huidige score"
@@ -4838,7 +4764,6 @@ nl:
       month: Maand
       second: Seconden
       year: Jaar
-  day_s_7cc1231f: Dag(en)
   decaying_average_8bf6a0dd: "Achteruitgaand Gemiddelde"
   deep_orange_4c7eea99: "Diep Oranje"
   deep_purple_bb3e2907: "Diep Paars"
@@ -5253,7 +5178,6 @@ nl:
       anonymous_user: Anoniem
     pinned_discussions: "Gepinde discussies"
     reply: 
-      error_saving_reply: "*Er is een fout opgetreden*, post het antwoord later opnieuw"
       saving_reply: "Deze met opslaan van antwoord..."
     reply_attachment: 
       attachment_label: Bijlage
@@ -5782,7 +5706,6 @@ nl:
   event_date_f05219e7: "Evenementdatum:"
   event_end_time_ef830e66: "Evenement Eindtijd"
   event_start_time_441b491f: "Evenement Begintijd"
-  every_665d821e: Elke
   everyone_854554dd: "Iedereen "
   everyone_else_6c6dc7b6: "Alle anderen"
   example_84698b7d: Voorbeeld
@@ -5954,7 +5877,6 @@ nl:
   failed_to_import_media_objects_4c1fcb4f: "Het importeren van media objecten mislukt"
   failed_to_log_in_7ceec561: "Kon niet aanmelden"
   fair_use_bee47d77: "Redelijk gebruik "
-  favicon_6e658914: Favpictogram
   feature_flags: 
     feature_flag: 
       allow: Toestaan
@@ -6112,7 +6034,6 @@ nl:
     no_deleting_root: "Kan de hoofdmap niet verwijderen"
     only_one_folder: "Kan het pad en de id van de map niet instellen"
   for: voor
-  for_974cbb84: Voor
   for_all_devices_1f603968: "Voor alle apparaten"
   forgot_password_url_3f9c04b: "Wachtwoord URL vergeten"
   from_fdd4956d: Van
@@ -7369,8 +7290,6 @@ nl:
   k12_description: |-
       Functies, instellingen en stijlen die meer van toepassing zijn in een omgeving van het basis onderwijs, het lager en hoger middelbaar onderwijs. Voor nu, houdt dit slechts
       enkele stijlwijzigingen in, maar meer specifieke aanpassingen voor het basis onderwijs, het lager en hoger middelbaar onderwijs kunnen in de toekomst toegevoegd worden.
-  labels: 
-    lock_module_until: "Module tot een bepaalde datum vergrendelen"
   last_item_79583712: "Laatste Item:"
   last_user_access_title: "Laatste gebruikerstoegang"
   late_percent_b91d01b3: "Laat: %{percent} "
@@ -7381,15 +7300,12 @@ nl:
   launch_url_e150bd41: "URL starten "
   layouts: 
     application: 
-      bouncing_communication_channels: "Er schijnt een probleem te zijn met een van jouw contact methoden. Jouw *Instellingen pagina* controleren."
       group_switch: Overschakelen
-      javascript_required: "Je moet JavaScript ingeschakeld hebben om toegang tot deze site te hebben."
       keyboard_navigation: 
         close: "Op komma drukken om deze dialoog te sluiten"
       links: 
         close: Sluiten
         dashboard: "Mijn dashboard"
-        skip_to_content: "Naar inhoud overslaan"
     fixed_bottom: 
       masquerading: 
         stop: "Voordoen als stoppen"
@@ -7406,8 +7322,6 @@ nl:
       view_all_or_customize: "Alles weergeven of aanpassen"
     mobile_auth: 
       log_in_to_canvas: "Aanmelden op Canvas"
-    styleguide: 
-      default_page_title: "Canvas LMS"
   learning_mastery_gradebook_description: "De cijferlijst bekwaam leren biedt een manier aan docenten om snel de voortgang van cusrsist en cursus  \n\
       op het gebied van leerresultaten te bekijken. Resultaten worden in een cijferlijst-achtige \n\
       formaat gepresenteerd en voortgang van cursist wordt als een numerieke score en als bekwaam/bijna \n\
@@ -7622,7 +7536,6 @@ nl:
   login_label_1dea0f9d: "Login Label"
   login_with_auth_type_a0aaa52a: "Login met *%{auth_type}*"
   login_with_provider_3fd3998e: "Login met %{provider}"
-  logo_a040ae0e: Logo
   logout_a9312e35: Uitloggen
   looks_great_e4d883ed: "Ziet er goed uit!"
   low_score_4eeb95b2: "Laag: %{score} "
@@ -9591,14 +9504,12 @@ nl:
     must_submit_incomplete: "moet de opdracht inzenden"
     must_view_complete: "de pagina bekeken"
     must_view_incomplete: "moet pagina bekijken"
-  month_s_5c17590e: Maand(en)
   moodle_dropdown_many_warning_title: "Deze toetsbank heeft %{count} meerdere dropdown vragen die misschien verkeerd zijn geimporteerd"
   moodle_dropdown_warning_title: "Meerdere vragen van de vervolgkeuzelijst zijn mogelijk verkeerd geimporteerd"
   moodle_formula_many_warning_title: "Deze toetsbank heeft %{count} vragen met formules waarvan de mogelijke antwoorden opnieuw gegenereerd moeten worden"
   moodle_formula_warning_title: "Mogelijke antwoorden zullen voor formule vragen opnieuw gegenereerd moeten worden"
   more_courses_5ebbe998: "Meer cursussen"
   most_recent_score_13a87e8c: "Meest Recente Score"
-  most_recent_score_counts_as_calculation_int_of_mas_9a3bcf66: "Meest recente score telt als %{calculation_int}%  van beheersingsgewicht, gemiddelde van alle andere scores telt als  %{remainder}% van het gewicht."
   move_abf00365: Verplaatsen
   move_dialog: 
     cancel: Annuleren
@@ -9967,14 +9878,12 @@ nl:
     observee_added: "Nu %{user} bezig met waarnemen"
     observing: "Bezig met waarnemen"
   observing_f3c5e759: "Bezig met waarnemen"
-  occurrence_s_c12d1aad: voorval(len)
   of_students_5d1af0d2: "# cursisten "
   ok_c47544a2: "OK "
   okay_got_it_d686d4e8: "Ok, ik snap het"
   on_time_percent_eebffe38: "Op tijd: %{percent} "
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Je zult een optie moeten kiezen als je eenmaal een antwoord gewijzigd hebt voordat je de vraag kunt bijwerken."
   one_per_line_format_name_value_79647700: "Een per regel. Formaat: naam=waarde "
-  only_a_maximum_of_100_events_can_be_created_ad703982: "er kunnen slechts maximaal 100 evenementen worden gemaakt"
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} op tijd, %{late} laat, %{missing} onbreekt"
   open_color_picker_f117df0a: "Open Kleur Kiezer"
   open_title_in_a_new_window_b29fed77: "%{title} in een nieuw venster openen"
@@ -12339,7 +12248,6 @@ nl:
       one: "%{item} verplaatst naar %{destinationFolder}"
       other: "%{count} items verplaatsen naar %{destinationFolder}"
     name: Naam
-    progress_error: "Er is een fout opgetreden bij het voorbereiden van de download, probeer nogmaals."
     progress_message: "Download aan het voorbereiden: %{percent}% voltooien"
     restrict_access: "Toegang beperken"
     results_count: "%{num_results} zoekresultaten aangeven\n\
@@ -12355,7 +12263,6 @@ nl:
     updated_at: "datum gewijzigd"
     updated_at_short: Gewijzigd
     view: Bekijken
-  read_more_about_windows_tiles_ac4ae6f5: "Meer informatie over windows tegels"
   recaptcha_not_configured_3a6ef9ee: "Recaptcha niet geconfigureerd "
   recent_student: 
     last_logged_in: "laatst aangemeld op  %{last_login}"
@@ -12860,7 +12767,6 @@ nl:
         crosslist_this_section: "Kruisverwijzing naar deze sectie maken"
         current_enrollments: "Huidige inschrijvingen"
         decrosslist_section: "Kruisverwijzing naar deze sectie ongedaan maken"
-  see_some_lti_tools_that_work_great_with_canvas_you_3c27bc7b: "*Sommige LTI tools bekijken* die heel goed met Canvas werken. Je kunt ook de **Canvas-gemeenschap onderwerpen over LTI tools** raadplegen. "
   select_a_grading_period_aab25483: "Beoordelingsperiode selecteren"
   select_content: "Inhoud selecteren"
   select_content_checkbox: 
@@ -13269,7 +13175,6 @@ nl:
       start_a_new_course: "Een nieuwe cursus starten"
     new_nav_header: 
       links: 
-        dashboard: "Mijn Dashboard"
         skip_to_content: "Ga door naar Content"
     no_recent_activity: 
       empty_stream_message: "Er staat nog geen enkel bericht in jouw stream. Eens je aan cursussen gaat deelnemen, zul je zien dat zal deze stream gevuld wordt met berichten uit discussies, cijferupdates, privéberichten van jou met andere gebruikers, etc."
@@ -13286,8 +13191,6 @@ nl:
       teacher: "%{course} als docent."
       teacher_title: "Uitgenodigd als docent, klik om de cursus te bekijken."
     primary_header_navigation: 
-      links: 
-        inbox: Inbox
       menu: 
         calendar: Kalender
         grades: Cijfers
@@ -14109,7 +14012,6 @@ nl:
   the_grading_period_was_deleted_7814a349: "De beoordelingsperiode is verwijderd"
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "De instelling waarbij je probeerde aan te melden, is niet geconfigureerd voor dit account."
   the_list_of_results_has_been_updated_46e3c733: "De lijst resultaten is bijgewerkt"
-  the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "Het logo rechtsboven in de Canvas header. 200 x 200 svg of png"
   the_material_is_in_the_public_domain_279c39a3: "Het materiaal bevindt zich in het openbaar domein "
   the_material_is_licensed_under_creative_commons_3242cb5e: "Het materiaal is onder Creative Commons gelicentieerd "
   the_material_is_subject_to_fair_use_exception_41bc6a4b: "Het materiaal is onderworpen aan faire gebruikersuitzondering  "
@@ -14124,7 +14026,6 @@ nl:
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "de rollen van de rapporterende gebruiker (cursist, docent, beheerder, enz)"
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "Met de tool planner kun je afspraaktijden instellen waar cursisten (of cursistengroepen) zich voor kunnen aanmelden. Klik onderstaande toets om te beginnen."
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "De ernst van het probleem, zoals door de gebruiker geselecteerd via het vervolgkeuzemenu "
-  the_shortcut_icon_for_ios_android_devices_180x180__f87fa178: "Het pictogram voor de snelkoppeling voor iOS/Android apparaten. 180 x 180 png of svg"
   the_state_parameter_is_required_ffadf213: "De staat parameter is verplicht"
   the_top_track_represents_days_on_which_the_student_2a347099: "De bovenste lijn vertegenwoordigt de dagen waarop de *cursist berichten verzond* aan de docenten van de cursus. De onderste lijn is voor **berichten van de docenten** aan de cursist."
   the_unique_id_used_for_representing_the_specific_r_3bdf5870: "Het unieke id dat gebruikt wordt voor het weergeven van de specifieke vraag/antwoord-cyclus waar dit foutenrapport op gebaseerd is"
@@ -14162,8 +14063,6 @@ nl:
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Dit gebeurde zeer waarschijnlijk omdat je de inhoud van de cursus zonder gekoppelde bestanden hebt geïmporteerd. "
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "Dit resultaat is gebruikt om een cursist te beoordelen en kan niet meer bewerkt worden"
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Dit resultaat is gebruikt om een cursist te beoordelen en kan niet bewerkt of verwijderd worden"
-  this_outcome_has_been_used_to_assess_a_student_the_1f04402e: "Dit resultaat is gebruikt om een student te beoordelen. De berekeningsmethode is vergrendeld."
-  this_outcome_has_been_used_to_assess_a_student_the_1ff3a596: "Dit resultaat is gebruikt om een cursist te beoordelen. De berekeningswaarde is vergrendeld"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Deze toets is niet gepubliceerd* Alleen docenten kunnen de toets zien totdat deze gepubliceerd wordt."
   this_student_wrote_f1a3f22d: "Deze cursist schreef: "
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Dit zal het je toestaan om Canvas te verifiëren om eindcijfers in SIS te posten "
@@ -14457,7 +14356,6 @@ nl:
   usage_rights_f0960ad6: "Gebruiksrechten "
   usage_rights_have_been_set_d1b433c7: "Gebruiksrechten zijn ingesteld "
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Gebruiksrechten zullen ingesteld worden voor alle bestanden opgenomen in: "
-  use_a_single_16x16_32x32_48x48_ico_file_60bc8d91: "Gebruik een *enkel 16x16, 32x32, 48x48 ico bestand*."
   use_new_folder_tree_in_files_eb5a451b: "Nieuwe mappenstructuur in Bestanden gebruiken"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Gebruik de nieuwe toets LTI tool in plaats van de gewone canvas toetsen"
   use_this_configuration_for_parent_observer_registr_e49f8f66: "Deze configuraie gebruiken voor registratie ouder/observeerder"
@@ -14894,7 +14792,6 @@ nl:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE, WebCT 6+-cursus"
   webct_name: "Blackboard Vista/CE (WebCT)"
-  week_s_cb1492ee: Week(weken)
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Welkom bij onze cursussen! Om de lijst van cursussen aan te passen, klik je op de link \"Alle Cursussen\" en duid de cursussen om weer te geven met een sterretje aan."
   well_below_mastery_37664bdc: "Ruim onder Meesterschap"
   what_should_the_csv_file_look_like_985a59ac: "Hoe zou het CSV-bestand er uit moeten zien?"
@@ -15058,9 +14955,6 @@ nl:
     external_urls: 
       archive: Archief
       archive_link: "Archief bekijken"
-  windows_square_tile_4c00879e: "Windows vierkante tegel"
-  windows_tile_color_2b786bd9: "Windows tegelkleur"
-  windows_wide_tile_a3302508: "Windows brede tegel"
   would_you_like_to_enable_this_app_ccdf735d: "Wil je deze app inschakelen?"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Wil je cursisten door laten gaan met de cursus, of wil je deze modules opnieuw vergrendelen tot de nieuwe vereisten voltooid zijn?"
   xml_configuration_5ea1b942: "XML Configuratie "
