@@ -9,8 +9,6 @@ es:
     headings: 
       page: "No autorizado"
     title: "No autorizado"
-  558x270_png_a5e13e53: "558x270 png"
-  558x558_png_1_8x_the_standard_tile_size_so_it_can__4a9023e1: "558x558 png (1,8 veces la escala de moscaico estándar, por lo que se puede ampliar más o menos en caso necesario)"
   EditAppointmentGroupDetails: 
     affect_reservations: "¿Cómo afectará esto a las reservas?"
     and_n_contexts: "y %{n} otros"
@@ -62,10 +60,6 @@ es:
         api_key: "Código API"
         api_url: "URL API"
         common_core_guid: "GUID principal común (optativo)"
-  access_to_the_etherpad_collaborations_below_will_b_b6a0a288: |-
-      El acceso a las colaboraciones de Etherpad de más abajo se suspenderán el 8 de agosto de 2015. Si desea guardar este contenido, por favor migre este contenido antes de esta fecha.
-      
-      Para obtener instrucciones sobre cómo crear una colaboración con Google, [haga clic aquí](%{google_collab_help_url}).
   access_token_is_valid_until_d2f048cf: "La clave de acceso es válida hasta"
   account: 
     ask_canvas_network: "Preguntar a la comunidad Canvas Network"
@@ -830,7 +824,6 @@ es:
         allow_invitation_previews: "Vistas previas de Invitaciones"
         allow_sending_scores_in_emails: "Estudiantes pueden optar para recibir calificaciones por correo electrónico"
         allow_sis_import: "Importaciones de SIS"
-        apple_touch_icon_remove: "Volver a predeterminado"
         author_email_in_notifications: "Mostrar las direcciones de correo electrónico del remitente para las notificaciones de interacciones del usuario"
         canvas_authentication: "Autenticación de Canvas"
         default_language: "Lenguaje Predeterminado"
@@ -845,11 +838,9 @@ es:
         equella: Equella
         equella_endpoint: "Punto Final/Terminal de Equella"
         equella_teaser: "Comentarios de Equella"
-        favicon_remove: "Volver a predeterminado"
         global_includes: "CSS/JavaScript Global incluye"
         global_javascript: "Global JavaScript URL"
         global_stylesheet: "Global CSS URL"
-        header_image_remove: "Volver a predeterminado"
         help_link_available_to: "Disponible para"
         help_link_subtext: Subtexto
         help_link_text: "Texto que aparecerá para el enlace"
@@ -859,8 +850,6 @@ es:
         login_handle_name: "Etiqueta de inicio de sesión"
         message: Mensaje
         mfa_settings: "Autenticación de factores múltiples"
-        msapplication_tile_square_remove: "Volver a predeterminado"
-        msapplication_tile_wide_remove: "Volver a predeterminado"
         name: "Nombre de Cuenta"
         no_enrollments_can_create_courses: "Usuarios sin inscripciones"
         open_registration: "Registro Abierto"
@@ -1371,9 +1360,6 @@ es:
   api_url_3ee7cb0a: "URL de la API"
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "App Center aparecerá en la pestaña \"Apps\" en la página de configuración de un curso o una cuenta. La URL que aparece más abajo deberá dirigir a un punto del App Center válido (por ejemplo, %{url}, asegúrese de omitir la barra final."
   app_placements_6d877225: "Colocaciones de la aplicación"
-  appends_a_number_to_the_end_of_each_event_title_e__bca98abd: "Agregue un número al final de cada título del evento (por ejemplo, Evento 1, Evento 2, etc)"
-  appends_a_number_to_the_end_of_each_event_title_e__e9573bf8: "Agregue un número al final de cada título del evento (por ejemplo, Evento 1, Evento 2, etc)\" for=append_iterator"
-  apple_touch_icon_2c258bb3: "Icono táctil de Apple"
   application: 
     errors: 
       feed_not_found: "No se pudo encontrar el canal."
@@ -1968,9 +1954,6 @@ es:
         submission: Envío
         submission_not_turned_in: "No se pudo entregar"
         submission_turned_in: ¡Entregado!
-    submission_type_icon: 
-      tooltips: 
-        submitted: Enviado
     submission_types_form: 
       advanced_turnitin_settings: "Configuraciones avanzadas de Turnitin"
       descriptions: 
@@ -2465,20 +2448,17 @@ es:
         more_options: "Más opciones"
     edit_calendar_event: 
       calendar: "Calendario:"
-      count: "Recuento:"
       date: "Fecha:"
       from: "Desde:"
       links: 
         more_options: "Más opciones"
       location: "Ubicación:"
-      repeat: Repetir
       timespan_separator: hasta
       title: "Título:"
     edit_calendar_event_full: 
       buttons: 
         create: "Crear Evento"
         update: "Actualizar Evento"
-      count: "Recuento: "
       date: Fecha
       delete: Borrar
       different_date_for_each_section: "Usar una fecha diferente para cada sección"
@@ -2489,7 +2469,6 @@ es:
       location_address: "Dirección:"
       location_name: "Ubicación:"
       new_calendar_event_header: "Nuevo evento del calendario"
-      repeat: "Repetir "
       start_time: "Hora de inicio"
     edit_event: 
       tabs: 
@@ -2563,7 +2542,6 @@ es:
       would_you_like_to_cancel_that_and_sign_up_for_this: "¿Le gustaría cancelar aquella y registrarse para esta?"
       you_are_already_signed_up_for: "Ya se ha inscrito para:"
     save: Guardar
-    save_and_publish: "Guardar y publicar"
     save_changes: "Guardar los Cambios"
     scheduler_right_side_admin_section: 
       create_a_new_set_of_appointments: "Crear un grupo de citas"
@@ -3369,14 +3347,8 @@ es:
       delete_item: "¿Seguro que quiere remover este elemento del módulo?"
     content_next: 
       add_prerequisite: "Agregar prerrequisito a *%{module}*"
-      assignment_points_possible: "de %{points_possible}"
-      button: 
-        delete_label: "Eliminar requisitos previos"
-        delete_title: "Eliminar requisitos previos"
       buttons: 
-        add_module: "Agregar Módulo"
         add_prerequisite: "Agregar Prerrequisito"
-      criterion_for_assignment: "Para %{assignment} usuarios deben %{select_criterion}"
       headings: 
         add_prerequisite: "Agregar Prerrequisito a %{name}"
         course_modules: "Módulos del curso"
@@ -3402,50 +3374,17 @@ es:
           one: "Agregar sangría 1 nivel"
           other: "Agregar sangría %{count} niveles"
           zero: "No agregar sangría"
-      key: 
-        description: 
-          delete: "Borrar el Módulo Actual/Elemento"
-          edit: "Editar el Módulo/Elemento"
-          indent: "Aumentar sangría"
-          new: "Módulo Nuevo"
-          next: "Siguiente Módulo/Elemento"
-          outdent: "Reducir sangría"
-          previous: "Módulo/Elemento Previo"
-      keycode_descriptions: 
-        next_module_item: "Seleccionar el módulo o elemento de módulo siguiente"
-        previous_module_item: "Seleccionar el módulo o elemento de módulo anterior"
-        toggle_module_dragging: "Seleccionar el elemento para comenzar a arrastrar o para soltar el elemento que ha seleccionado previamente"
-      keycodes: 
-        delete: d
-        edit: e
-        indent: i
-        new: "n"
-        next: j
-        next_module_item: Arriba
-        outdent: o
-        previous: k
-        previous_module_item: Abajo
-        toggle_module_dragging: "Barra espaciadora"
       labels: 
         indent: Sangría
-        module_complete_when: "Este módulo está completo cuando"
-        modules: 
-          before_students_view: "Antes que los estudiantes puedan ver este módulo"
         new_tab: "Cargar en una pestaña nueva"
-        publish_final_grade: "Publicar la calificación final del alumno cuando concluya este módulo"
-        require_sequential_progress: "Los alumnos deben desplazarse a través de los requisitos de este módulo en orden secuencial"
         title: Título
-        unlock_at: "Desbloquear en"
         url: URL
       links: 
-        add_prerequisite: "Agregar prerrequisito"
-        add_requirement: "Agregar requerimiento"
         student_progress: "Ver progreso"
         title: 
           remove_prerequisite: "Eliminar este requisito previo"
       module: módulo
       module_details: "Módulos se muestran en orden secuencial, solo módulos por encima de %{name} pueden ser establecidos como prerrequisitos."
-      module_name: "Nombre del módulo"
       modules_keyboard_hint_updated: "Aviso: Para mejorar la accesibilidad a la hora de reorganizar los módulos (o los elementos de un módulo), utilice la opción Mover a diálogo que se encuentra en el menú."
       move_module: 
         after: Después
@@ -3456,12 +3395,8 @@ es:
         into: en
         or: O
         place: Lugar
-      must_complete_prerequisites: "Deben completar"
-      no_preprequisites: "No se han definido prerrequisitos"
-      no_requirements: "No se han definido requerimientos"
       prerequisites: 
         another_module: "Otro Módulo"
-      prerequisites_need_item: "Necesitará agregar elementos antes de poder especificar como un usuario completará este módulo"
       requirements: 
         must_contribute: "contribuir a la página"
         must_score_at_least: "calificar al menos"
@@ -3469,7 +3404,6 @@ es:
         must_view: "ver el elemento"
       select_module: 
         instructions: "Seleccionar el Módulo"
-        name: "el módulo, %{module}"
       select_prerequisite: "Seleccione el tipo de requisitos previos. Los estudiantes no pueden ver un módulo hasta cumplir todos los requisitos previos."
     context_module: 
       unpublish: "No publicar"
@@ -3564,13 +3498,6 @@ es:
       quizzes: Evaluaciones
       wiki_pages: "Páginas Wiki"
     points_possible_short: "%{points} pts"
-    prerequisites_footer: 
-      default_module_name: módulo
-      labels: 
-        prerequisites: "Requisitos previos"
-      links: 
-        title: 
-          remove_prerequisite: "Eliminar este requisito previo"
     progressions: 
       titles: 
         student_progress: "Progreso del alumno"
@@ -4648,7 +4575,6 @@ es:
       student: 
         count: "Recuento erróneo de alumnos"
         ratio: "Relación errónea de alumnos"
-  current_3ce5414a: "Actual:"
   current_mastery_score_score_out_of_mastery_points_fedd343f: "Puntuación de dominio actual: %{score} de %{mastery_points}"
   current_provider_6c3f7f96: "Proveedor actual"
   current_score_6c81792: "Calificación actual"
@@ -4831,7 +4757,6 @@ es:
       month: Mes
       second: Segundos
       year: Año
-  day_s_7cc1231f: Día(s)
   decaying_average_8bf6a0dd: "Promedio de decaimiento"
   deep_orange_4c7eea99: "Naranjo oscuro"
   deep_purple_bb3e2907: "Morado oscuro"
@@ -5246,7 +5171,6 @@ es:
       anonymous_user: Anónimo
     pinned_discussions: "Foros Anclados"
     reply: 
-      error_saving_reply: "*Se ha producido un error*, por favor envie su respuesta en otro momento"
       saving_reply: "Guardando la respuesta..."
     reply_attachment: 
       attachment_label: "Archivo adjunto"
@@ -5769,7 +5693,6 @@ es:
   event_date_f05219e7: "Fecha del evento:"
   event_end_time_ef830e66: "Hora de finalización del evento"
   event_start_time_441b491f: "Hora de comienzo del evento"
-  every_665d821e: Cada
   everyone_854554dd: Todos
   everyone_else_6c6dc7b6: "Todos los demás"
   example_84698b7d: Ejemplo
@@ -5941,7 +5864,6 @@ es:
   failed_to_import_media_objects_4c1fcb4f: "Se produjo un error al importar los objetos multimedia"
   failed_to_log_in_7ceec561: "Error al iniciar sesión"
   fair_use_bee47d77: "Uso legítimo"
-  favicon_6e658914: "Icono de página"
   feature_flags: 
     feature_flag: 
       allow: Permitir
@@ -6097,7 +6019,6 @@ es:
     no_deleting_root: "No puede borrar una carpeta principal"
     only_one_folder: "No puede establecer la ruta de la carpeta y la ID de la carpeta"
   for: por
-  for_974cbb84: Para
   for_all_devices_1f603968: "Para todos los dispositivos"
   forgot_password_url_3f9c04b: "Olvidó URL de la contraseña"
   from_fdd4956d: De
@@ -7352,8 +7273,6 @@ es:
       next: Siguiente
       previous: Anterior
   k12_description: "Funciones, configuración y estilos que tienen más sentido específicamente en un entorno K-12. Por el momento, esto solo se aplica a algunas modificaciones de estilo, pero es posible que se incorporen más cosas específicas de K-12 en el futuro."
-  labels: 
-    lock_module_until: "Bloquear módulo hasta una fecha determinada"
   last_item_79583712: "Último elemento:"
   last_user_access_title: "Acceso del último usuario"
   late_percent_b91d01b3: "Atrasado: %{percent}"
@@ -7364,15 +7283,12 @@ es:
   launch_url_e150bd41: "Ejecutar URL"
   layouts: 
     application: 
-      bouncing_communication_channels: "Parece que hay un problema en uno de sus métodos de contacto. Consulte su *Página de configuración*."
       group_switch: Cambiar
-      javascript_required: "Debe tener activado JavaScript para poder acceder a este sitio."
       keyboard_navigation: 
         close: "Pulse la tecla coma para cerrar este cuadro de diálogo"
       links: 
         close: Cerrar
         dashboard: "Mi Tablero"
-        skip_to_content: "Saltar al Contenido"
     fixed_bottom: 
       masquerading: 
         stop: "Detener el Enmascarado"
@@ -7389,8 +7305,6 @@ es:
       view_all_or_customize: "Ver todo o Personalizar"
     mobile_auth: 
       log_in_to_canvas: "Iniciar sesión en Canvas"
-    styleguide: 
-      default_page_title: "Canvas LMS"
   learning_mastery_gradebook_description: "El libro de calificaciones de dominio del aprendizaje representa el modo en el que los profesores pueden ver de un vistazo el progreso del curso y de los alumnos en los resultados de aprendizaje de los cursos. Los resultados se presentan en un formato similar al de los libros de calificaciones y el progreso del alumno aparece tanto en el formato de puntuación numérica como clasificado como dominado/casi dominio/medidas correctoras."
   learning_outcome: 
     no_comment: "Sin Comentario"
@@ -7597,7 +7511,6 @@ es:
   login_label_1dea0f9d: "Etiqueta de Ingreso"
   login_with_auth_type_a0aaa52a: "Ingresar con *%{auth_type}*"
   login_with_provider_3fd3998e: "Ingresar con %{provider}"
-  logo_a040ae0e: Logo
   logout_a9312e35: "Cerrar sesión"
   looks_great_e4d883ed: "¡Se ve muy bien!"
   low_score_4eeb95b2: "Bajo: %{score}"
@@ -9560,14 +9473,12 @@ es:
     must_submit_incomplete: "debe enviar la tarea"
     must_view_complete: "visualizó la página"
     must_view_incomplete: "debe visualizar la página"
-  month_s_5c17590e: Mes(es)
   moodle_dropdown_many_warning_title: "Hay %{count} preguntas con menús desplegables en este grupo que es posible que se hayan importado de mandera incorrecta"
   moodle_dropdown_warning_title: "Es posible que las preguntas con varios menús desplegables se hayan importado de manera incorrecta"
   moodle_formula_many_warning_title: "Hay %{count} preguntas con fórmulas en este grupo cuyas posibles respuestas deben volverse a generar."
   moodle_formula_warning_title: "Es necesario volver a generar las respuestas posibles a las preguntas con fórmula"
   more_courses_5ebbe998: "Más cursos"
   most_recent_score_13a87e8c: "Puntuación más reciente"
-  most_recent_score_counts_as_calculation_int_of_mas_9a3bcf66: "La puntuación más reciente cuenta como el %{calculation_int}% del valor del dominio; la media del resto de las puntuaciones cuenta como el %{remainder}% del valor. "
   move_abf00365: Mover
   move_dialog: 
     cancel: Cancelar
@@ -9941,14 +9852,12 @@ es:
     observee_added: "En observación ahora %{user}"
     observing: "En observación"
   observing_f3c5e759: "En observación"
-  occurrence_s_c12d1aad: incidente(s)
   of_students_5d1af0d2: "número de alumnos"
   ok_c47544a2: Aceptar
   okay_got_it_d686d4e8: "De acuerdo, lo entiendo"
   on_time_percent_eebffe38: "A tiempo: %{percent}"
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Una vez que haya cambiado la respuesta, deberá elegir una opción para poder actualizar la pregunta."
   one_per_line_format_name_value_79647700: "Uno por línea. Formato: nombre=valor"
-  only_a_maximum_of_100_events_can_be_created_ad703982: "sólo se pueden crear un máximo de 100 eventos"
   ontime_on_time_late_late_missing_missing_145e9e5d: "%{onTime} a tiempo, %{late} tarde, %{missing} sin entregar"
   open_color_picker_f117df0a: "Abra el selector de color"
   open_title_in_a_new_window_b29fed77: "Abrir %{title} en una nueva ventana"
@@ -12320,7 +12229,6 @@ es:
       one: "%{item} se movió a %{destinationFolder}"
       other: "%{count} elementos se movieron a %{destinationFolder}"
     name: Nombre
-    progress_error: "Se produjo un error al intentar preparar la descarga. Inténtelo de nuevo."
     progress_message: "Preparando descarga:  %{percent}% completado"
     restrict_access: "Acceso restringido"
     results_count: "Mostrando %{num_results} resultados de búsqueda"
@@ -12335,7 +12243,6 @@ es:
     updated_at: "Fecha modificada"
     updated_at_short: Modificado
     view: Vista
-  read_more_about_windows_tiles_ac4ae6f5: "Más información sobre el mosaico de ventanas"
   recaptcha_not_configured_3a6ef9ee: "No se ha configurado Recaptcha"
   recent_student: 
     last_logged_in: "último inicio de sesión en %{last_login}"
@@ -12840,7 +12747,6 @@ es:
         crosslist_this_section: "Hacer el listado cruzado de esta sección"
         current_enrollments: "Inscripciones Actuales"
         decrosslist_section: "Eliminar el listado cruzado de esta sección"
-  see_some_lti_tools_that_work_great_with_canvas_you_3c27bc7b: "*Ver algunas de las herramientas LTI* que funcionan bien con Canvas. También puede consultar los **Temas de la comunidad Canvas sobre herramientas LTI**."
   select_a_grading_period_aab25483: "Seleccionar el período de calificación"
   select_content: "Seleccionar contenido"
   select_content_checkbox: 
@@ -13248,7 +13154,6 @@ es:
       start_a_new_course: "Comenzar un nuevo curso"
     new_nav_header: 
       links: 
-        dashboard: "Mi panel de control"
         skip_to_content: "Saltar al contenido"
     no_recent_activity: 
       empty_stream_message: " No tiene mensajes que mostrar aún en su stream. Una vez comience a participar en sus cursos verá este stream llenarse de mensajes de las foros, actualizaciones de calificaciones, mensajes privados entre usted y otros usuarios, etc. "
@@ -13265,8 +13170,6 @@ es:
       teacher: "%{course} como un profesor."
       teacher_title: "Invitado como un profesor, haga click para ver el Curso"
     primary_header_navigation: 
-      links: 
-        inbox: "Bandeja de entrada"
       menu: 
         calendar: Calendario
         grades: Calificaciones
@@ -14087,7 +13990,6 @@ es:
   the_grading_period_was_deleted_7814a349: "El período de calificación fue borrado"
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "La institución desde la que inició sesión no está configurada en esta cuenta."
   the_list_of_results_has_been_updated_46e3c733: "La lista de resultados ha sido actualizada."
-  the_logo_image_in_the_top_right_canvas_header_200x_9fa4d360: "La imagen del logo en la parte superior del encabezado de Canvas. 200X200 svg o png"
   the_material_is_in_the_public_domain_279c39a3: "El material es de dominio público"
   the_material_is_licensed_under_creative_commons_3242cb5e: "El material tiene licencia Creative Commons"
   the_material_is_subject_to_fair_use_exception_41bc6a4b: "El material está sujeto a la excepción de uso razonable"
@@ -14100,7 +14002,6 @@ es:
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "los roles del usurio que reporta (estudiante, maestro, administrador, etc)"
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "La herramienta del planeador le permite configurar los intervalos de tiempo en que los estudiantes (o grupos de estudiantes) se pueden inscribir. Para comenzar, haga clic en el botón de más abajo."
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "La severidad del problema, según lo seleccionado por el usuario desde el menú desplegable."
-  the_shortcut_icon_for_ios_android_devices_180x180__f87fa178: "El icono de acceso directo a los dispositivos iOS o Android. 180x180 png o svg"
   the_state_parameter_is_required_ffadf213: "El parámetro de estado es obligatorio"
   the_top_track_represents_days_on_which_the_student_2a347099: "La pista superior representa los días en los que el *alumno envía mensajes* al instructor. La pista inferior muestra los **mensajes de los instructores** al alumno."
   the_unique_id_used_for_representing_the_specific_r_3bdf5870: "El id único usado para representar la solicitud / respuesta específica alterna este informe de error ocurrido alrededor"
@@ -14138,8 +14039,6 @@ es:
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Esto ha sucedido probablemente porque ha importado contenido de un curso sin sus filas asociadas."
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "Se utilizó este resultado para evaluar a un estudiante y ya no puede ser actualizado"
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Se utilizó este resultado para evaluar a un estudiante y no puede ser editado o borrado"
-  this_outcome_has_been_used_to_assess_a_student_the_1f04402e: "Se utilizó este resultado para evaluar a un estudiante. El método de cálculo es fijo"
-  this_outcome_has_been_used_to_assess_a_student_the_1ff3a596: "Se utilizó este resultado para evaluar a un estudiante. El valor del cálculo es fijo"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Este cuestionario no está publicado* Solo los profesores pueden ver el cuestionario hasta que esté publicado."
   this_student_wrote_f1a3f22d: "El alumno ha escrito:"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Esto le permitirá autenticar a Canvas para que publique puntuaciones en SIS"
@@ -14434,7 +14333,6 @@ es:
   usage_rights_f0960ad6: "Derechos de uso"
   usage_rights_have_been_set_d1b433c7: "Se han configurado los derechos de uso"
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "Se configurarán los derechos de uso de todos los archivos que estén incluidos:"
-  use_a_single_16x16_32x32_48x48_ico_file_60bc8d91: "Utilice un *archivo ico 16x16, 32x32, 48x48 individual*."
   use_new_folder_tree_in_files_eb5a451b: "Use el árbol de carpeta nuevo en Archivos"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Use la nueva herramienta de LTI de evaluación en lugar de las evaluaciones de Canvas regulares"
   use_this_configuration_for_parent_observer_registr_e49f8f66: "Use esta configuración para la registración de padres/observador"
@@ -14867,7 +14765,6 @@ es:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Curso Blackboard Vista/CE, WebCT 6+"
   webct_name: "Blackboard Vista/CE (WebCT)"
-  week_s_cb1492ee: Semana(s)
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "¡Bienvenido a sus cursos! Para personalizar la lista de cursos, haga clic en el enlace de \"Todos los cursos\" y marque los cursos para mostrar."
   well_below_mastery_37664bdc: "Muy por debajo del dominio"
   what_should_the_csv_file_look_like_985a59ac: "¿Cómo se debería ver el archivo CSV?"
@@ -15031,9 +14928,6 @@ es:
     external_urls: 
       archive: Archivo
       archive_link: "Ver archivo(s)"
-  windows_square_tile_4c00879e: "Mosaico cuadrado de Windows"
-  windows_tile_color_2b786bd9: "Color de mosaico de Windows"
-  windows_wide_tile_a3302508: "Mosaico ancho de Windows"
   would_you_like_to_enable_this_app_ccdf735d: "¿Le gustaría habilitar esta aplicación?"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "¿Le gustaría permitir a los alumnos que continuen en el curso o desea bloquear de nuevo los módulos hasta que se completen los nuevos requisitos?"
   xml_configuration_5ea1b942: "Configuración XML"
