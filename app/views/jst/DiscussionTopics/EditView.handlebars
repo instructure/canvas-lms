@@ -60,16 +60,14 @@
 
   <div class="control-group">
     <label class="control-label"
-           role="button"
-           aria-label="{{#t}}Add Attachment{{/t}}"
-           tabindex="0"
-           for="discussion_attachment_uploaded_data">
+      aria-label="{{#t}}Add Attachment{{/t}}"
+      for="discussion_attachment_uploaded_data">
       {{#t "attachment"}}Attachment{{/t}}
     </label>
     <div class="controls">
       {{#each attachments}}
         <div class="attachmentRow">
-          <a href="{{url}}" class="{{mimeClass content-type}}">
+          <a aria-label="attachment" href="{{url}}" class="{{mimeClass content-type}}">
             {{display_name}}
           </a>
           <button type="button"
@@ -91,7 +89,7 @@
 
   {{#ifAny isTopic contextIsCourse canModerate showAssignment}}
   <div class="control-group">
-    <label class="control-label">{{#t "options"}}Options{{/t}}</label>
+    <div class="control-label">{{#t "options"}}Options{{/t}}</div>
     <div class="controls">
       {{#if isTopic}}
         <label class="checkbox" for="threaded">
