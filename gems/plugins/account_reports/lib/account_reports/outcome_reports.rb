@@ -278,6 +278,7 @@ module AccountReports
           @total = students.count
           i = 0
           students.find_each do |row|
+            row = row.attributes.dup
             row['submission date']=default_timezone_format(row['submission date'])
 
             csv << headers.map { |h| row[h] }

@@ -11,29 +11,33 @@ module ActiveRecord
             @conn = ActiveRecord::Base.connection
           end
 
+          def column(type)
+            CANVAS_RAILS3 ? PostgreSQLColumn.new(nil, 1, type) : PostgreSQLColumn.new(nil, 1, 1, type)
+          end
+
           describe "Infinity and NaN" do
             it 'properly quotes NaN' do
               nan = 0.0/0
-              c = Column.new(nil, 1, 'float')
+              c = column('float')
               assert_equal "'NaN'", @conn.quote(nan, c)
             end
 
             it 'properly quotes Infinity' do
               infinity = 1.0/0
-              c = Column.new(nil, 1, 'float')
+              c = column('float')
               assert_equal "'Infinity'", @conn.quote(infinity, c)
             end
 
             it 'properly quotes Infinity in a datetime column' do
               infinity = 1.0/0
-              c = Column.new(nil, 1, 'datetime')
+              c = column('datetime')
               assert_equal "'infinity'", @conn.quote(infinity, c)
             end
           end
 
           describe "integer enforcement" do
             before do
-              @col = Column.new(nil, 1, 'integer')
+              @col = column('integer')
             end
 
             it 'properly quotes Numerics' do
@@ -64,19 +68,19 @@ module ActiveRecord
           describe "fallback to original implementation" do
             it 'properly quotes strings in xml columns' do
               value = "<value/>"
-              c = Column.new(nil, 1, 'xml')
+              c = column('xml')
               assert_equal "xml '#{value}'", @conn.quote(value, c)
             end
 
             it 'properly quotes other Floats' do
               value = 1.23
-              c = Column.new(nil, 1, 'float')
+              c = column('float')
               assert_equal value.to_s, @conn.quote(value, c)
             end
 
             it 'properly quotes other non-Numerics' do
               value = "value"
-              c = Column.new(nil, 1, 'string')
+              c = column('string')
               assert_equal "'#{value}'", @conn.quote(value, c)
             end
           end

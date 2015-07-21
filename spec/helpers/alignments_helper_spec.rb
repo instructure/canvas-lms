@@ -39,19 +39,21 @@ describe AlignmentsHelper do
   }
 
   let_once(:alignment) {
-    (outcome.alignments << ContentTag.create({
+    tag = ContentTag.create(
       content: outcome,
       context: outcome.context,
-      tag_type: 'learning_outcome'
-    })).first
+      tag_type: 'learning_outcome')
+    outcome.alignments << tag
+    tag
   }
 
   let_once(:graded_alignment) {
-    (outcome.alignments << ContentTag.create({
-      content: @assignment,
-      context: outcome.context,
-      tag_type: 'learning_outcome'
-    })).first
+    tag = ContentTag.create(
+        content: @assignment,
+        context: outcome.context,
+        tag_type: 'learning_outcome')
+    outcome.alignments << tag
+    tag
   }
 
   describe "outcome_alignment_url" do
