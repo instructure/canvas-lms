@@ -41,6 +41,7 @@ class SisApiController < ApplicationController
   #       "course_id": 6,
   #       "name": "Assignment Title",
   #       "description": "Assignment Description",
+  #       "created_at": "2014-12-01T17:00:00Z",
   #       "due_at": "2015-01-01T17:00:00Z",
   #       "points_possible": 100,
   #       "integration_id": "IA-100",
