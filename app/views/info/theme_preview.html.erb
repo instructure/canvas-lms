@@ -1,0 +1,239 @@
+<%
+  js_bundle :theme_preview
+  css_bundle :theme_preview
+%>
+
+<h1 class="theme-preview__page-header"><%= t('Welcome to the Canvas Theme Editor') %></h1>
+<p>
+  <%= t do %>
+    This sample page includes common UI elements in Canvas to help you build your custom branding. Once you start making changes to the color values and images in the left sidebar, you will see a <b>Preview Your Changes</b> button. Click it to refresh this page and see how your changes look.
+    <% end %>
+</p>
+<p>
+  <%= t do %>
+    <em>Important note: Educational institutions have an obligation to make their content as accessible as possible. Instructure recommends at least a 3:1 text-to-background-color ratio to keep your text readable. Easily test your contrast ratios with the
+    <%= link_to "WebAIM Color Contrast Checker", "http://webaim.org/resources/contrastchecker/" %></em>.
+  <% end %>
+</p>
+<br />
+<div class="content-box">
+  <div class="grid-row">
+    <div class="col-xs-7">
+      <div class="ic-Form-group">
+        <div class="ic-Form-control">
+          <label for="theme-preview-input-1" class="ic-Label"><%= t('Text input') %></label>
+          <input type="text" id="theme-preview-input-1" class="ic-Input" ></input>
+        </div>
+        <div class="ic-Form-control">
+          <label for="theme-preview-input-3" class="ic-Label"><%= t('Select input') %></label>
+          <select id="theme-preview-input-3" class="ic-Input">
+            <option><%= t('Option 1') %></option>
+            <option><%= t('Option 2') %></option>
+            <option><%= t('Option 3') %></option>
+            <option><%= t('Option 4') %></option>
+          </select>
+        </div>
+        <div class="ic-Form-control">
+          <div class="grid-row">
+            <div class="col-xs-6">
+              <!-- start super toggle -->
+              <label class="ic-Super-toggle--on-off" for="theme-preview-input-2">
+                <div class="ic-Label"><%= t('Toggle-style checkbox') %></div>
+                <input type="checkbox" id="theme-preview-input-2" class="ic-Super-toggle__input" checked>
+                <div class="ic-Super-toggle__container" aria-hidden="true" data-checked="Yes" data-unchecked="No">
+                  <div class="ic-Super-toggle__switch">
+                    <div class="ic-Super-toggle__option--LEFT">
+                      <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" width="548.9" height="548.9" viewBox="0 0 548.9 548.9" xml:space="preserve"><polygon points="449.3 48 195.5 301.8 99.5 205.9 0 305.4 95.9 401.4 195.5 500.9 295 401.4 548.9 147.5 "/></svg>
+                    </div>
+                    <div class="ic-Super-toggle__option--RIGHT">
+                      <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" viewBox="0 0 28 28" xml:space="preserve"><polygon points="28 22.4 19.6 14 28 5.6 22.4 0 14 8.4 5.6 0 0 5.6 8.4 14 0 22.4 5.6 28 14 19.6 22.4 28 " fill="#030104"/></svg>
+                    </div>
+                  </div>
+                </div>
+              </label>
+              <!-- end super toggle -->
+            </div>
+            <div class="col-xs-6">
+              <!-- start super toggle -->
+              <label class="ic-Super-toggle--ui-switch" for="theme-preview-input-8">
+                <div class="ic-Label"><%= t('Switch-style checkbox') %></div>
+                <input type="checkbox" id="theme-preview-input-8" class="ic-Super-toggle__input">
+                <div class="ic-Super-toggle__container" aria-hidden="true" data-checked="Option A is selected" data-unchecked="Option B is selected">
+                  <div class="ic-Super-toggle__option--LEFT">
+                    <i class="icon-muted"></i>
+                  </div>
+                  <div class="ic-Super-toggle__switch"></div>
+                  <div class="ic-Super-toggle__option--RIGHT">
+                    <i class="icon-unmuted"></i>
+                  </div>
+                 </div>
+               </label>
+              <!-- end super toggle -->
+            </div>
+          </div>
+        </div>
+        <div class="ic-Checkbox-group">
+          <div class="ic-Form-control ic-Form-control--checkbox">
+            <input type="checkbox" id="theme-preview-input-4" checked>
+            <label class="ic-Label" for="theme-preview-input-4"><%= t('Regular-style checkbox') %></label>
+          </div>
+        </div>
+        <div class="ic-Form-control ic-Form-control--radio">
+          <div class="ic-Radio">
+            <input id="theme-preview-input-5" type="radio" value="hoodie" name="demo-radio-horiz-group-2" checked>
+            <label for="theme-preview-input-5" class="ic-Label"><%= t('Radio button option 1') %></label>
+          </div>
+          <div class="ic-Radio">
+            <input id="theme-preview-input-6" type="radio" value="frisbee" name="demo-radio-horiz-group-2">
+            <label for="theme-preview-input-6" class="ic-Label"><%= t('Radio button option 2') %></label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-4 off-xs-1">
+      <div>
+        <button type="button" class="Button Button--primary Button--block"><%= t('Primary color button') %></button>
+        <div class="content-box-mini">
+          <button type="button" class="Button Button--primary Button--block" disabled><%= t('Primary color button disabled') %></button>
+        </div>
+        <div class="content-box-mini">
+          <button type="button" class="Button Button--secondary Button--block"><%= t('Secondary color button') %></button>
+        </div>
+        <div class="content-box-mini">
+          <button type="button" class="Button Button--secondary Button--block" disabled><%= t('Secondary color button disabled') %></button>
+        </div>
+        <div class="al-dropdown__container">
+          <a class="al-trigger Button Button--block" role="button" href="#">
+            <%= t('Click to test dropdown') %>
+            <i class="icon-mini-arrow-down"></i>
+          </a>
+          <ul class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
+            <li>
+              <a href="#" class="icon-edit" tabindex="-1" role="menuitem"><%= t('Dropdown option 1') %></a>
+            </li>
+            <li>
+              <a href="#" class="icon-trash" tabindex="-1" role="menuitem"><%= t('Dropdown option 2') %></a>
+            </li>
+          </ul>
+        </div>
+        <div class="content-box">
+          <ul>
+            <li><a href="#"><%= t('Link number 1') %></a></li>
+            <li><a href="#"><%= t('Link number 2') %></a></li>
+            <li><a href="#"><%= t('Link number 3') %></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="content-box">
+  <div class="ic-app-nav-toggle-and-crumbs ic-app-nav-toggle-and-crumbs--theme-preview">
+    <button type="button" aria-hidden="true" class="Button Button--link Button--small ic-app-course-nav-toggle">
+      <i class="icon-hamburger"></i>
+    </button>
+    <div class="ic-app-crumbs">
+      <nav aria-label="breadcrumbs" id="breadcrumbs" role="navigation">
+        <ul>
+          <li class="home">
+            <a href="#">
+              <span class="ellipsible">
+                <i class="icon-home" title="My Dashboard"></i>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <span class="ellipsible"><%= t('Breadcrumb 1') %></span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <span class="ellipsible"><%= t('Breadcrumb 2') %></span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+  <div class="content-box">
+    <div class="grid-row">
+      <div class="col-xs-3">
+        <div class="list-view">
+          <nav aria-label="context" role="navigation">
+            <ul>
+              <li><a href="#"><%= t('Context nav link') %></a></li>
+              <li><a class="active" href="#"><%= t('Context nav link active') %></a></li>
+              <li><a href="#"><%= t('Context nav link') %></a></li>
+              <li><a href="#"><%= t('Context nav link') %></a></li>
+              <li><a href="#"><%= t('Context nav link') %></a></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+      <div class="col-xs-8 off-xs-1">
+        <table class="ic-Table ic-Table--hover-row">
+          <thead>
+            <tr>
+              <th><%= t('Name') %></th>
+              <th><%= t('Email address') %></th>
+              <th><%= t('More information') %></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><a href="#">Joe Bloggs</a></td>
+              <td>jbloggs1980@gmail.com</td>
+              <td><%= t('Hover over me') %></td>
+            </tr>
+            <tr>
+              <td><a href="#">Jane Doe</a></td>
+              <td>jane-doe-11@hotmail.com</td>
+              <td><%= t('Hover over me') %></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="grid-row">
+  <div class="col-xs-12 col-lg-7">
+    <div class="content-box-mini">
+      <div id="theme-preview-tabs">
+        <ul>
+          <li><a href="#tabs-1"><%= t('Tab 1') %></a></li>
+          <li><a href="#tabs-2"><%= t('Tab 2') %></a></li>
+          <li><a href="#tabs-3"><%= t('Tab 3') %></a></li>
+        </ul>
+        <div id="tabs-1"><%= t('Tab 1 content') %></div>
+        <div id="tabs-2"><%= t('Tab 2 content') %></div>
+        <div id="tabs-3"><%= t('Tab 3 content') %></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xs-12 col-lg-4 off-lg-1">
+    <div class="content-box-mini">
+      <div class="accordion ui-accordion--mini" id="theme-preview-accordion">
+        <h3><a href="#"><%= t('Accordion Section 1') %></a></h3>
+        <div>
+          <div class="pad-box-mini">
+            <%= t('Content for Section 1') %>
+          </div>
+        </div>
+        <h3><a href="#"><%= t('Accordion Section 2') %></a></h3>
+        <div>
+          <div class="pad-box-mini">
+            <%= t('Content for Section 2') %>
+          </div>
+        </div>
+        <h3><a href="#"><%= t('Accordion Section 3') %></a></h3>
+        <div>
+          <div class="pad-box-mini">
+            <%= t('Content for Section 3') %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -338,7 +338,7 @@ define([
                     </div>
                   </div>
                 : null }
-                <iframe ref="previewIframe" src="/?editing_brand_config=1" />
+                <iframe ref="previewIframe" src="/theme-preview/?editing_brand_config=1" />
               </div>
 
             </div>
