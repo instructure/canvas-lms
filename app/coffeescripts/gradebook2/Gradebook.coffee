@@ -901,12 +901,14 @@ define [
         showSisSync: @options.post_grades_feature_enabled,
         currentSection: @sectionToShow)
       @sectionMenu.render()
+      @togglePostGrades(not @sectionToShow?)
 
     updateCurrentSection: (section, author) =>
       @sectionToShow = section
       @postGradesStore.setSelectedSection @sectionToShow
       userSettings[if @sectionToShow then 'contextSet' else 'contextRemove']('grading_show_only_section', @sectionToShow)
       @buildRows() if @grid
+      @togglePostGrades(not @sectionToShow?)
 
     showSections: ->
       if @sections_enabled && @options.post_grades_feature_enabled
@@ -947,6 +949,21 @@ define [
           labelText: if $placeholder.hasClass('in-menu') then I18n.t 'PowerSchool' else I18n.t 'Post Grades',
           returnFocusTo: $('#post_grades')
         React.renderComponent(app, $placeholder[0])
+
+    togglePostGrades: (visible) =>
+      # hide external tools elements
+      $('.external-tools-dialog').toggle(visible)
+      # remove menu placeholder if legacy placehoder button hidden
+      $('li.post-grades-placeholder').toggle(!$('li.post-grades-placeholder a').hasClass('hidden'))
+      # hide menu if no menu items visible
+      menuVisible = _.any(
+        _.filter(
+          $('li.external-tools-dialog, .post-grades-placeholder'),
+          (item) ->
+            return $(item).css('display') != 'none'
+        )
+      )
+      $('#post_grades').toggle(menuVisible)
 
     initHeader: =>
       @drawSectionSelectButton() if @sections_enabled || @course
