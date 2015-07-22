@@ -17,8 +17,8 @@ define([
       variableSchema: customTypes.variableSchema,
       brandConfigVariables: React.PropTypes.object.isRequired,
       changedValues: React.PropTypes.object.isRequired,
-      somethingChanged: React.PropTypes.func.isRequired,
-      getDefault: React.PropTypes.func.isRequired
+      changeSomething: React.PropTypes.func.isRequired,
+      getDisplayValue: React.PropTypes.func.isRequired
     },
 
     componentDidMount() {
@@ -32,8 +32,8 @@ define([
       var props = {
         currentValue: this.props.brandConfigVariables[varDef.variable_name],
         userInput: this.props.changedValues[varDef.variable_name],
-        onChange: this.props.somethingChanged.bind(null, varDef.variable_name),
-        placeholder: this.props.getDefault(varDef.variable_name),
+        onChange: this.props.changeSomething.bind(null, varDef.variable_name),
+        placeholder: this.props.getDisplayValue(varDef.variable_name),
         varDef: varDef
       }
       return varDef.type === 'color' ? ThemeEditorColorRow(props) : ThemeEditorImageRow(props)

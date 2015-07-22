@@ -4,6 +4,7 @@ define([
   'i18n!theme_editor',
   'react',
   'react-modal',
+  'underscore',
   'str/htmlEscape',
   'compiled/fn/preventDefault',
   'compiled/models/Progress',
@@ -11,7 +12,7 @@ define([
   './PropTypes',
   './ThemeEditorAccordion',
   './SharedBrandConfigPicker'
-], (I18n, React, Modal, htmlEscape, preventDefault, Progress, ProgressBar, customTypes, ThemeEditorAccordion, SharedBrandConfigPicker) => {
+], (I18n, React, Modal, _, htmlEscape, preventDefault, Progress, ProgressBar, customTypes, ThemeEditorAccordion, SharedBrandConfigPicker) => {
 
   Modal.setAppElement(document.body)
 
@@ -49,7 +50,6 @@ define([
 
     getInitialState() {
       return {
-        somethingChanged: false,
         changedValues: {},
         showProgressModal: false,
         progress: 0
@@ -62,11 +62,10 @@ define([
       })
     },
 
-    somethingChanged(variableName, newValue, isInvalid) {
+    changeSomething(variableName, newValue, isInvalid) {
       var change = {val: newValue, invalid: isInvalid}
       this.state.changedValues[variableName] = change
       this.setState({
-        somethingChanged: true,
         changedValues: this.state.changedValues
       })
     },
@@ -75,15 +74,47 @@ define([
       this.setState({progress: data.completion})
     },
 
+    somethingHasChanged() {
+      return _.any(this.state.changedValues, (change, key) => {
+        var changedToNonDefault = change.val && (change.val != this.getDefault(key))
+        var changedBackToNothing = !change.val && this.getBrandConfigVar(key)
+        return changedToNonDefault || changedBackToNothing
+      })
+    },
+
+    getDisplayValue(variableName, opts) {
+      var val
+
+      // try getting the modified value first, unless we're skipping it
+      if (!opts || !opts.ignoreChanges) val = this.getChangedValue(variableName)
+
+      // try getting the value from the active brand config next, but
+      // distinguish "wasn't changed" from "was changed to '', meaning we want
+      // to remove the brand config's value"
+      if (!val && val !== '') val = this.getBrandConfigVar(variableName)
+
+      // finally, resort to the default (which may recurse into looking up
+      // another variable)
+      if (!val) val = this.getSchemaDefault(variableName, opts)
+
+      return val
+    },
+
+    getChangedValue(variableName) {
+      return this.state.changedValues[variableName] && this.state.changedValues[variableName].val
+    },
+
     getDefault(variableName) {
-      var val = this.state.changedValues[variableName] && this.state.changedValues[variableName].val
-      if (val) return val
-      if (val !== '') {
-        val = this.props.brandConfig.variables[variableName]
-        if (val) return val
-      }
+      return this.getDisplayValue(variableName, {ignoreChanges: true})
+    },
+
+    getBrandConfigVar(variableName) {
+      return this.props.brandConfig.variables[variableName]
+    },
+
+    getSchemaDefault(variableName, opts) {
       val = findVarDef(this.props.variableSchema, variableName).default
-      if (val && val[0] === '$') return this.getDefault(val.slice(1))
+      if (val && val[0] === '$') return this.getDisplayValue(val.slice(1), opts)
       return val
     },
 
@@ -92,7 +123,7 @@ define([
     },
 
     handleCancelClicked() {
-      if (this.props.hasUnsavedChanges || this.state.somethingChanged) {
+      if (this.props.hasUnsavedChanges || this.somethingHasChanged()) {
         var msg = I18n.t('You are about to lose any changes that you have not yet applied to your account.\n\n' +
                          'Would you still like to proceed?')
         if (!confirm(msg)) {
@@ -160,7 +191,7 @@ define([
                 <div className="Theme__editor-header_actions">
                   <span
                     data-tooltip="bottom"
-                    title={this.state.somethingChanged ?
+                    title={this.somethingHasChanged() ?
                       I18n.t('You need to "Preview Your Changes" before applying to everyone.') :
                       null
                     }
@@ -168,7 +199,7 @@ define([
                     <button
                       type="button"
                       className="Theme__editor-header_button Button Button--success"
-                      disabled={!this.props.hasUnsavedChanges || this.state.somethingChanged}
+                      disabled={!this.props.hasUnsavedChanges || this.somethingHasChanged()}
                       onClick={this.handleApplyClicked}
                     >
                       {I18n.t('Apply')}
@@ -192,23 +223,22 @@ define([
                     activeBrandConfigMd5={this.props.brandConfig.md5}
                     saveToSession={this.saveToSession}
                     hasUnsavedChanges={this.props.hasUnsavedChanges}
-                    somethingChanged={this.state.somethingChanged}
+                    somethingChanged={this.somethingHasChanged()}
                   />
                   <ThemeEditorAccordion
                     variableSchema={this.props.variableSchema}
                     brandConfigVariables={this.props.brandConfig.variables}
-                    getDefault={this.getDefault}
+                    getDisplayValue={this.getDisplayValue}
                     changedValues={this.state.changedValues}
-                    somethingChanged={this.somethingChanged}
+                    changeSomething={this.changeSomething}
                   />
                 </div>
               </div>
-              
               <div className="Theme__preview">
-                { this.state.somethingChanged ?
+                { this.somethingHasChanged() ?
                   <div className="Theme__preview-overlay">
                     <div className="Theme__preview-overlay__container">
-                      <button 
+                      <button
                         type="submit"
                         className="Button Button--primary"
                         disabled={this.invalidForm()}>

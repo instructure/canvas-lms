@@ -46,8 +46,8 @@ define([
     },
 
     hexVal(colorString) {
-      var rbgVal = this.changedColor(colorString);
-      return rgb2hex(rbgVal);
+      var rgbVal = this.changedColor(colorString);
+      return rgb2hex(rgbVal) || rgbVal;
     },
 
     invalidHexString(colorString) {
