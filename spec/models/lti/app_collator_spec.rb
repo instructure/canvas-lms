@@ -55,6 +55,8 @@ module Lti
         definition = definitions.first
         expect(definition).to eq({
                                    app_type: tool_proxy.class.name,
+                                   :context => tool_proxy.context_type,
+                                   :context_id => account.id,
                                    app_id: tool_proxy.id,
                                    name: tool_proxy.name,
                                    description: tool_proxy.description,
@@ -75,6 +77,8 @@ module Lti
         expect(definition).to eq( {
                                     app_type: external_tool.class.name,
                                     app_id: external_tool.id,
+                                    :context => external_tool.context_type,
+                                    :context_id => account.id,
                                     name: external_tool.name,
                                     description: external_tool.description,
                                     installed_locally: true,
