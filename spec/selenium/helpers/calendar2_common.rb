@@ -53,27 +53,29 @@ def make_event(params = {})
 end
 
 def create_quiz
-  due_at = 5.minute.from_now
+  due_at = 5.minutes.from_now
   unlock_at = Time.zone.now.advance(days:-2)
   lock_at = Time.zone.now.advance(days:4)
+  title = 'Test Quiz'
   @context = @course
   @quiz = quiz_model
   @quiz.generate_quiz_data
   @quiz.due_at = due_at
   @quiz.lock_at = lock_at
   @quiz.unlock_at = unlock_at
+  @quiz.title = title
   @quiz.save!
   @quiz
 end
 
 def create_graded_discussion
-  assignment = @course.assignments.create!(
+  @assignment = @course.assignments.create!(
       :title => 'assignment',
       :points_possible => 10,
       :due_at => Time.now + 5.minute,
       :submission_types => 'online_text_entry',
       :only_visible_to_overrides => true)
-  @course.discussion_topics.create!(:title => 'Graded Discussion', :assignment => assignment)
+  @gd = @course.discussion_topics.create!(:title => 'Graded Discussion', :assignment => @assignment)
 end
 
 def find_middle_day
@@ -192,4 +194,45 @@ def load_agenda_view
   get "/calendar2"
   f('#agenda').click
   wait_for_ajaximations
+end
+
+# This checks the date in the edit modal, since Week View and Month view events are placed via absolute
+# positioning and there is no other way to verify the elements are on the right date
+def assert_edit_modal_date(due_at)
+  f('.fc-event-inner').click
+  wait_for_ajaximations
+  expect(f('.event-details-timestring')).to include_text("#{due_at.utc.strftime('%b %d')}")
+end
+
+def assert_title(title,agenda_view)
+  if agenda_view
+    expect(f('.ig-title')).to include_text(title)
+  else
+    expect(f('.fc-event-inner')).to include_text(title)
+  end
+end
+
+# The following methods verify that created events of all kinds are present in each view and have correct dates
+def assert_agenda_view(title,due)
+  load_agenda_view
+  assert_title(title,true)
+  expect(f('.navigation_title')).to include_text(due.utc.strftime("%b %-d, %Y"))
+end
+
+def assert_week_view(title,due)
+  load_week_view
+  assert_title(title,false)
+  assert_edit_modal_date(due)
+end
+
+def assert_month_view(title,due)
+  load_month_view
+  assert_title(title,false)
+  assert_edit_modal_date(due)
+end
+
+def assert_views(title,due)
+  assert_agenda_view(title,due)
+  assert_week_view(title,due)
+  assert_month_view(title,due)
 end

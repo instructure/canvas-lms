@@ -240,57 +240,30 @@ describe "calendar2" do
     it "graded discussion appears on all calendars", priority: "1", test_id: 138851 do
       create_graded_discussion
 
-      load_agenda_view
-      expect(f(".ig-title")).to include_text('Graded Discussion')
-
-      load_week_view
-      expect(f(".fc-event-title")).to include_text('Graded Discussion')
-
-      load_month_view
-      expect(f(".fc-event-title")).to include_text('Graded Discussion')
+      # Even though graded discussion overwrites its assignment's title, less fragile to grab discussion's title
+      assert_views(@gd.title,@assignment.due_at)
     end
 
-    it "event appears on all calendars", priority: "1" do
-      title = "loom"
-      @course.calendar_events.create!(title: title, start_at: 5.minute.from_now)
+    it "event appears on all calendars", priority: "1", test_id: 138846 do
+      title = 'loom'
+      due_time = 5.minutes.from_now
+      @course.calendar_events.create!(title: title, start_at: due_time)
 
-
-      load_agenda_view
-      expect(f(".ig-title")).to include_text(title)
-
-      load_week_view
-      expect(f(".fc-event-inner")).to include_text(title)
-
-      load_month_view
-      expect(f(".fc-event-title")).to include_text(title)
+      assert_views(title,due_time)
     end
 
-    it "assignment appears on all calendars", priority: "1" do
-      title = "Zak McKracken"
-      @assignment = @course.assignments.create!(:name => title,:due_at => 5.minute.from_now)
+    it "assignment appears on all calendars", priority: "1", test_id: 238862 do
+      title = 'Zak McKracken'
+      due_time = 5.minutes.from_now
+      @assignment = @course.assignments.create!(name: title, due_at: due_time)
 
-
-      load_agenda_view
-      expect(f(".ig-title")).to include_text(title)
-
-      load_week_view
-      expect(f(".fc-event-title")).to include_text(title)
-
-      load_month_view
-      expect(f(".fc-event-title")).to include_text(title)
+      assert_views(title,due_time)
     end
 
-    it "quiz appears on all calendars", priority: "1" do
+    it "quiz appears on all calendars", priority: "1", test_id: 238863 do
       create_quiz
 
-      load_agenda_view
-      expect(f(".ig-title")).to include_text('Test Quiz')
-
-      load_week_view
-      expect(f(".fc-event-title")).to include_text('Test Quiz')
-
-      load_month_view
-      expect(f(".fc-event-title")).to include_text('Test Quiz')
+      assert_views(@quiz.title,@quiz.due_at)
     end
   end
 end
