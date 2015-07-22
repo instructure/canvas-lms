@@ -16,18 +16,19 @@ describe "sub account grading schemes" do
 
     describe "grading schemes" do
 
-      it "should add a grading scheme", priority: "1", test_id: 163992 do
+      it "should add a grading scheme", priority: "1", test_id: 238155 do
         should_add_a_grading_scheme
       end
 
-      it "should edit a grading scheme", priority: "1", test_id: 210075 do
+      it "should edit a grading scheme", priority: "1", test_id: 238156 do
         should_edit_a_grading_scheme(account, url)
       end
 
-      it "should delete a grading scheme", priority: "1", test_id: 210111 do
+      it "should delete a grading scheme", priority: "1", test_id: 238160 do
         should_delete_a_grading_scheme(account, url)
       end
     end
+
 
     describe "grading scheme items" do
 
@@ -35,22 +36,26 @@ describe "sub account grading schemes" do
         create_simple_standard_and_edit(account, url)
       end
 
-      it "should add a grading scheme item", priority: "1", test_id: 210113 do
+      it "should add a grading scheme item", priority: "1", test_id: 238157 do
         should_add_a_grading_scheme_item
       end
 
-      it "should edit a grading scheme item", priority: "1", test_id: 210114 do
+      it "should edit a grading scheme item", priority: "1", test_id: 238158 do
         should_edit_a_grading_scheme_item
       end
 
-      it "should delete a grading scheme item", priority: "1", test_id: 210115 do
+      it "should delete a grading scheme item", priority: "1", test_id: 238159 do
         should_delete_a_grading_scheme_item
+      end
+
+      it "should not update when invalid scheme input is given", priority: "1", test_id: 238162 do
+        should_not_update_invalid_grading_scheme_input
       end
     end
   end
 
   context "with Multiple Grading Periods enabled" do
-    it "should contain a tab for grading schemes and grading periods", priority: "1", test_id:202306  do
+    it "should contain a tab for grading schemes and grading periods", priority: "1", test_id:238150 do
       should_contain_a_tab_for_grading_schemes_and_periods(url)
     end
   end
