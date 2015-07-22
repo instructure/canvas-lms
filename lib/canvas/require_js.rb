@@ -60,8 +60,7 @@ module Canvas
       def paths(cache_busting = false)
         @paths ||= {
           :common => 'compiled/bundles/common',
-          :jqueryui => 'vendor/jqueryui',
-          :uploadify => '../flash/uploadify/jquery.uploadify-3.2.min',
+          :jqueryui => 'vendor/jqueryui'
         }.update(cache_busting ? cache_busting_paths : {}).
           update(plugin_paths).
           update(Canvas::RequireJs::PluginExtension.paths).
@@ -139,10 +138,6 @@ module Canvas
             'vendor/FileAPI/FileAPI.min': {
               deps: ['jquery', 'vendor/FileAPI/config'],
               exports: 'FileAPI'
-            },
-            'uploadify': {
-              deps: ['jquery'],
-              exports: '$'
             },
             'vendor/bootstrap-select/bootstrap-select' : {
               deps: ['jquery'],
