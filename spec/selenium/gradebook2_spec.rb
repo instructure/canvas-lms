@@ -960,6 +960,20 @@ describe "gradebook2" do
         expect(f('iframe.post-grades-frame')).to be_displayed
       end
 
+      it "should hide post grades lti button when section selected" do
+        create_post_grades_tool
+
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+        expect(f('button.external-tools-dialog')).to be_displayed
+
+        f('button.section-select-button').click
+        wait_for_ajaximations
+        fj('ul#section-to-show-menu li:nth(4)').click
+        wait_for_ajaximations
+        expect(f('button.external-tools-dialog')).not_to be_displayed
+      end
+
       it "should show as drop down menu when multiple tools are installed" do
         (0...10).each do |i|
           create_post_grades_tool(name: "test tool #{i}")
@@ -973,6 +987,22 @@ describe "gradebook2" do
         ff('li.external-tools-dialog > a').first.click
         wait_for_ajaximations
         expect(f('iframe.post-grades-frame')).to be_displayed
+      end
+
+      it "should hide post grades lti dropdown when section selected" do
+        (0...10).each do |i|
+          create_post_grades_tool(name: "test tool #{i}")
+        end
+
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+        expect(ff('li.external-tools-dialog').count).to eq(10)
+
+        f('button.section-select-button').click
+        wait_for_ajaximations
+        fj('ul#section-to-show-menu li:nth(4)').click
+        wait_for_ajaximations
+        expect(f('button#post_grades')).not_to be_displayed
       end
 
       it "should show as drop down menu with an ellipsis when too many tools are installed" do
@@ -1012,6 +1042,41 @@ describe "gradebook2" do
         ff('li.external-tools-dialog > a').first.click
         wait_for_ajaximations
         expect(f('iframe.post-grades-frame')).to be_displayed
+      end
+
+      it "should show menu with powerschool if section configured and selected and lti tools are disabled" do
+        Account.default.set_feature_flag!('post_grades', 'on')
+        @course.sis_source_id = 'xyz'
+        @course.save
+        @assignment.post_to_sis = true
+        @assignment.save
+
+        CourseSection.all.each_with_index do |course_section, index|
+          course_section.sis_source_id = index.to_s
+          course_section.save
+        end
+
+        create_post_grades_tool
+
+        get "/courses/#{@course.id}/gradebook2"
+        wait_for_ajaximations
+        expect(f('li.post-grades-placeholder > a')).to be_present
+        expect(f('li.external-tools-dialog')).to be_present
+
+        section_id = fj('ul#section-to-show-menu li:nth(3) a label')['for']
+        section_id.slice!('section_option_')
+
+        f('button.section-select-button').click
+        wait_for_ajaximations
+        fj('ul#section-to-show-menu li:nth(4)').click
+        wait_for_ajaximations
+        expect(f('button#post_grades')).to be_displayed
+
+        f('button#post_grades').click
+        wait_for_ajaximations
+        f('li.post-grades-placeholder > a').click
+        wait_for_ajaximations
+        expect(f('.post-grades-dialog')).to be_displayed
       end
     end
   end
