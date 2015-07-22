@@ -6,9 +6,11 @@ describe "context modules" do
 
   context "as a student", priority: "1" do
     before(:each) do
-      @locked_text = 'locked'
-      @completed_text = 'completed'
-      @in_progress_text = 'in progress'
+      @locked_icon = 'icon-lock'
+      @completed_icon = 'icon-check'
+      @in_progress_icon = 'icon-minimize'
+      @open_item_icon = 'icon-mark-as-read'
+      @no_icon = 'no-icon'
 
       course_with_student_logged_in
       #initial module setup
@@ -42,9 +44,9 @@ describe "context modules" do
 
       context_modules = ff('.context_module')
       #initial check to make sure everything was setup correctly
-      validate_context_module_status_text(0, @in_progress_text)
-      validate_context_module_status_text(1, @locked_text)
-      validate_context_module_status_text(2, @locked_text)
+      validate_context_module_status_icon(@module_1.id, @no_icon)
+      validate_context_module_status_icon(@module_2.id, @locked_icon)
+      validate_context_module_status_icon(@module_3.id, @locked_icon)
 
       expect(context_modules[1].find_element(:css, '.prerequisites_message')).to include_text(@module_1.name)
       expect(context_modules[2].find_element(:css, '.prerequisites_message')).to include_text(@module_2.name)
@@ -86,19 +88,19 @@ describe "context modules" do
 
       #sequential normal validation
       navigate_to_module_item(0, @assignment_1.title)
-      validate_context_module_status_text(0, @completed_text)
-      validate_context_module_status_text(1, @in_progress_text)
-      validate_context_module_status_text(2, @locked_text)
+      validate_context_module_status_icon(@module_1.id, @completed_icon)
+      validate_context_module_status_icon(@module_2.id, @no_icon)
+      validate_context_module_status_icon(@module_3.id, @locked_icon)
 
       navigate_to_module_item(1, @assignment_2.title)
-      validate_context_module_status_text(0, @completed_text)
-      validate_context_module_status_text(1, @completed_text)
-      validate_context_module_status_text(2, @in_progress_text)
+      validate_context_module_status_icon(@module_1.id, @completed_icon)
+      validate_context_module_status_icon(@module_2.id, @completed_icon)
+      validate_context_module_status_icon(@module_3.id, @no_icon)
 
       navigate_to_module_item(2, @quiz_1.title)
-      validate_context_module_status_text(0, @completed_text)
-      validate_context_module_status_text(1, @completed_text)
-      validate_context_module_status_text(2, @completed_text)
+      validate_context_module_status_icon(@module_1.id, @completed_icon)
+      validate_context_module_status_icon(@module_2.id, @completed_icon)
+      validate_context_module_status_icon(@module_3.id, @completed_icon)
     end
 
     it "should show progression in large_roster courses" do
@@ -106,7 +108,7 @@ describe "context modules" do
       @course.save!
       go_to_modules
       navigate_to_module_item(0, @assignment_1.title)
-      validate_context_module_status_text(0, @completed_text)
+      validate_context_module_status_icon(@module_1.id, @completed_icon)
     end
 
     it "should validate that a student can't get to a locked context module" do
@@ -217,19 +219,19 @@ describe "context modules" do
 
       #sequential normal validation
       navigate_to_module_item(0, @assignment_1.title)
-      validate_context_module_status_text(0, @completed_text)
-      validate_context_module_status_text(1, @in_progress_text)
-      validate_context_module_status_text(2, @locked_text)
+      validate_context_module_status_icon(@module_1.id, @completed_icon)
+      validate_context_module_status_icon(@module_2.id, @no_icon)
+      validate_context_module_status_icon(@module_3.id, @locked_icon)
 
       navigate_to_module_item(1, @assignment_2.title)
-      validate_context_module_status_text(0, @completed_text)
-      validate_context_module_status_text(1, @completed_text)
-      validate_context_module_status_text(2, @in_progress_text)
+      validate_context_module_status_icon(@module_1.id, @completed_icon)
+      validate_context_module_status_icon(@module_2.id, @completed_icon)
+      validate_context_module_status_icon(@module_3.id, @no_icon)
 
       navigate_to_module_item(2, @quiz_1.title)
-      validate_context_module_status_text(0, @completed_text)
-      validate_context_module_status_text(1, @completed_text)
-      validate_context_module_status_text(2, @completed_text)
+      validate_context_module_status_icon(@module_1.id, @completed_icon)
+      validate_context_module_status_icon(@module_2.id, @completed_icon)
+      validate_context_module_status_icon(@module_3.id, @completed_icon)
     end
 
     context "next and previous buttons", priority: "2" do
@@ -400,7 +402,8 @@ describe "context modules" do
       it "On the modules page: the user sees an incomplete module with a 'mark as done' requirement. The user clicks on the module item, marks it as done, and back on the modules page can now see that the module is completed" do
         setup
         go_to_modules
-        expect(f('.progression_state').text).to eq "in progress"
+
+        validate_context_module_status_icon(@mark_done_module.id, @no_icon)
         navigate_to_wikipage 'The page'
         el = f '#mark-as-done-checkbox'
         expect(el).to_not be_nil
@@ -408,9 +411,158 @@ describe "context modules" do
         el.click
         go_to_modules
         el = f "#context_modules .context_module[data-module-id='#{@mark_done_module.id}']"
-        expect(f('.progression_state', el).text).to eq "completed"
+        validate_context_module_status_icon(@mark_done_module.id, @completed_icon)
         expect(f("#context_module_item_#{@tag.id} .requirement-description .must_mark_done_requirement .fulfilled")).to be_displayed
         expect(f("#context_module_item_#{@tag.id} .requirement-description .must_mark_done_requirement .unfulfilled")).to_not be_displayed
+      end
+    end
+
+    describe "module header icons" do
+      before(:each) do
+        @course.enable_feature!(:nc_or)
+      end
+
+      def create_additional_assignment_for_module_1
+        @assignment_4 = @course.assignments.create!(:title => "assignment 4")
+        @tag_4 = @module_1.add_item({:id => @assignment_4.id, :type => 'assignment'})
+        @module_1.completion_requirements = {@tag_1.id => {:type => 'must_view'},
+                                             @tag_4.id => {:type => 'must_view'}}
+        @module_1.save!
+      end
+
+      def make_module_1_complete_one
+        @module_1.requirement_count = 1
+        @module_1.save!
+      end
+
+      it "should show a pill message that says 'Complete All Items'" do
+        go_to_modules
+        vaildate_correct_pill_message(@module_1.id, 'Complete All Items')
+      end
+
+      it "should show a pill message that says 'Complete One Item'" do
+        make_module_1_complete_one
+        go_to_modules
+
+        vaildate_correct_pill_message(@module_1.id, 'Complete One Item')
+      end
+
+      it "should show a completed icon when module is complete for 'Complete All Items' requirement" do
+        create_additional_assignment_for_module_1
+        go_to_modules
+
+        navigate_to_module_item(0, @assignment_1.title)
+        navigate_to_module_item(0, @assignment_4.title)
+        vaildate_correct_pill_message(@module_1.id, 'Complete All Items')
+        validate_context_module_status_icon(@module_1.id, @completed_icon)
+      end
+
+      it "should show a completed icon when module is complete for 'Complete One Item' requirement" do
+        create_additional_assignment_for_module_1
+        make_module_1_complete_one
+        go_to_modules
+
+        navigate_to_module_item(0, @assignment_1.title)
+        vaildate_correct_pill_message(@module_1.id, 'Complete One Item')
+        validate_context_module_status_icon(@module_1.id, @completed_icon)
+      end
+
+      it "should show a locked icon when module is locked" do
+        go_to_modules
+        validate_context_module_status_icon(@module_2.id, @locked_icon)
+      end
+
+      it "should show a warning in-progress icon when module has been started" do
+        create_additional_assignment_for_module_1
+        go_to_modules
+
+        navigate_to_module_item(0, @assignment_1.title)
+        validate_context_module_status_icon(@module_1.id, @in_progress_icon)
+      end
+
+      it "should not show an icon when module has not been started" do
+        go_to_modules
+        validate_context_module_status_icon(@module_1.id, @no_icon)
+      end
+    end
+
+    describe "module item icons" do
+      before(:each) do
+        @course.enable_feature!(:nc_or)
+      end
+
+      def add_non_requirement
+        @assignment_4 = @course.assignments.create!(:title => "assignment 4")
+        @tag_4 = @module_1.add_item({:id => @assignment_4.id, :type => 'assignment'})
+        @module_1.save!
+      end
+
+      def add_min_score_assignment
+        @assignment_4 = @course.assignments.create!(:title => "assignment 4")
+        @tag_4 = @module_1.add_item({:id => @assignment_4.id, :type => 'assignment'})
+        @module_1.completion_requirements = {@tag_1.id => {:type => 'must_view'},
+                                             @tag_4.id => {:type => 'min_score', :min_score => 90}}
+        @module_1.require_sequential_progress = false
+        @module_1.save!
+      end
+
+      def make_past_due
+        @assignment_4.due_at = '2015-01-01'
+        @assignment_4.save!
+      end
+
+      def grade_assignment(score)
+        @assignment_4.grade_student(@user, :grade => score)
+      end
+
+      it "should show a completed icon when module item is completed" do
+        go_to_modules
+        navigate_to_module_item(0, @assignment_1.title)
+        validate_context_module_item_icon(@tag_1.id, @completed_icon)
+      end
+
+      it "should show an incomplete circle icon when module item is requirement but not complete" do
+        go_to_modules
+        validate_context_module_item_icon(@tag_1.id, @open_item_icon)
+      end
+
+      it "should not show an icon when module item is not a requirement" do
+        add_non_requirement
+        go_to_modules
+        validate_context_module_item_icon(@tag_4.id, @no_icon)
+      end
+
+      it "should show a warning icon when module item is a min score requirement that didn't meet score requirment" do
+        add_min_score_assignment
+        grade_assignment(50)
+        go_to_modules
+
+        validate_context_module_item_icon(@tag_4.id, @in_progress_icon)
+      end
+
+      it "should show a completed icon when module item is a min score requirement that met the score requirement" do
+        add_min_score_assignment
+        grade_assignment(100)
+        go_to_modules
+
+        validate_context_module_item_icon(@tag_4.id, @completed_icon)
+      end
+
+      it "should show a warning icon when module item is past due and not submitted" do
+        add_min_score_assignment
+        make_past_due
+        go_to_modules
+
+        validate_context_module_item_icon(@tag_4.id, @in_progress_icon)
+      end
+
+      it "should show a completed icon when module item is past due but submitted" do
+        add_min_score_assignment
+        make_past_due
+        grade_assignment(100)
+        go_to_modules
+
+        validate_context_module_item_icon(@tag_4.id, @completed_icon)
       end
     end
   end

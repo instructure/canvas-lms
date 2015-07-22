@@ -42,9 +42,31 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     get "/courses/#{@course.id}/modules"
   end
 
-  def validate_context_module_status_text(module_num, text_to_validate)
-    context_modules_status = ff('.context_module .progression_container')
-    expect(context_modules_status[module_num]).to include_text(text_to_validate)
+  def validate_context_module_status_icon(module_id, icon_expected)
+    visible_icon = fj("#context_module_#{module_id} .completion_status i:visible")
+    if icon_expected == 'no-icon'
+      expect(visible_icon).to eq nil
+    else
+      expect(visible_icon).not_to eq nil
+      context_modules_status = f("#context_module_#{module_id} .completion_status")
+      expect(context_modules_status.find_element(:css, '.' + icon_expected)).to be_displayed
+    end
+  end
+
+  def validate_context_module_item_icon(module_item_id, icon_expected)
+    item_icon = fj("#context_module_item_#{module_item_id} .module-item-status-icon i:visible")
+    if icon_expected == 'no-icon'
+      expect(item_icon).to eq nil
+    else
+      expect(item_icon).not_to eq nil
+      item_status = f("#context_module_item_#{module_item_id} .module-item-status-icon")
+      expect(item_status.find_element(:css, '.' + icon_expected)).to be_displayed
+    end
+  end
+
+  def vaildate_correct_pill_message(module_id, message_expected)
+    pill_message = f("#context_module_#{module_id} .requirements_message li").text
+    expect(pill_message).to eq message_expected
   end
 
   def navigate_to_module_item(module_num, link_text)

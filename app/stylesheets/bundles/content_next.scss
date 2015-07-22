@@ -36,7 +36,7 @@
   display: none;
 }
 
-.locked_module .ig-header .icon-lock {
+.locked .ig-header .icon-lock {
   display: inline;
 }
 
@@ -67,22 +67,23 @@
   .prerequisites {
     display: flex;
     padding: 0 20px;
+    flex: 0 1 auto;
 
     .prerequisites_message {
       display: flex;
-      flex: 0 0 auto;
       align-items: center;
       font-size: 12px;
+      margin: 0;
     }
   }
 
   .requirements_message {
     display: flex;
     align-items: center;
+    flex: 0 0 auto;
 
     ul {
       display: flex;
-      flex: 0 0 auto;
       align-items: center;
       font-weight: bold;
     }
@@ -90,10 +91,24 @@
 
   .ig-header-admin {
     flex: 0 0 auto;
+    display: flex;
+    align-self: center;
 
-    .icon-publish {
+    .completion_status {
+      margin: 0 16px;
+      width: 16px;
+      vertical-align: middle;
+
+      i {
+        vertical-align: middle;
+      }
+    }
+
+    .publish-icon {
       display: flex;
       align-items: center;
+      padding-left: 10px;
+      padding-top: 12px;
     }
   }
 }
@@ -221,6 +236,7 @@ input.move-module-label-spacer {
 
 #add_context_module_form {
  padding: 10px 40px 0 40px;
+ overflow: visible;
 }
 
 .ui-dialog-titlebar.ui-widget-header.ui-corner-all.ui-helper-clearfix {

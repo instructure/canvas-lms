@@ -28,9 +28,6 @@
     <div class="prerequisites_entry form-section border border-t">
       <%= f.label :before_viewing, "Prerequisites", class: "ic-Label form-element" %>
       <div class="prerequisites_list">
-        <div class="no_prerequisites_message form-element">
-          <%= t('no_preprequisites', %{No prerequisites defined}) %>
-        </div>
         <div class="criteria_list" style="display: none;"></div>
         <div id="criterion_blank_prereq" class="criterion clearfix" style="display: none;">
           <div class="prereq-req-item">
@@ -39,13 +36,13 @@
           </div>
           <div class="prereq-req-item-delete">
             <button class="delete_criterion_link dim-till-hover" aria-label="<%= t('button.delete_label', %{Delete prerequisites}) %>" title="<%= t('button.delete_title', %{Delete prerequisites}) %>">
-              <i class="icon-end standalone-icon" ></i>
+              <i class="icon-end standalone-icon" alt="<%= t('remove icon') %>" ></i>
             </button>
           </div>
         </div>
         <div class="add-item">
           <button class="add_prerequisite_link add_prerequisite_or_requirement_link" tabindex="0" role="button">
-            <i class="icon-add"></i><%= t('links.add_prerequisite', %{Add prerequisite}) %>
+            <i class="icon-add" alt="<%= t('add icon') %>"></i><%= t('links.add_prerequisite', %{Add prerequisite}) %>
           </button>
         </div>
       </div>
@@ -78,13 +75,13 @@
         </div>
         <div class="prereq-req-item-delete">
           <button class="delete_criterion_link dim-till-hover" aria-label="<%= t('button.delete_label', %{Delete prerequisites}) %>" title="<%= t('button.delete_title', %{Delete prerequisites}) %>">
-            <i class="icon-end standalone-icon" ></i>
+            <i class="icon-end standalone-icon"  alt="<%= t('remove icon') %>"></i>
           </button>
         </div>
       </div>
       <div class="add-item">
         <button class="add_completion_criterion_link add_prerequisite_or_requirement_link" tabindex="0" role="button">
-          <i class="icon-add"></i><%= t('links.add_requirement', %{Add requirement}) %>
+          <i class="icon-add"  alt="<%= t('add icon') %>"></i><%= t('links.add_requirement', %{Add requirement}) %>
         </button>
       </div>
     </div>

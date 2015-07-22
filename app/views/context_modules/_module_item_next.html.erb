@@ -1,6 +1,8 @@
 <%
+  context_module ||= nil
   module_item_next ||= nil
   module_item = module_item_next
+  context_module_progression = context_module_progression_for_user(context_module)
   published_status = (module_item && module_item.published?) ? 'published' : 'unpublished'
   tag = module_item || nil; completion_criteria ||= nil; editable ||= false
 @module_item_image_tags ||= {
@@ -15,9 +17,10 @@
   'delete' => "<i class='icon-end'></i>".html_safe,
   'other' => image_tag("blank.png", :class => "image", :alt => '')
 }
- %>
-<% criterion = completion_criteria && completion_criteria.find{|c| c[:id] == tag.id} %>
 
+ criterion = criterion(module_item, completion_criteria)
+ module_item_info = !editable ? module_item_data(context_module, context_module_progression, module_item, criterion) : false
+  %>
 <li
   id="context_module_item_<%= tag ? tag.id : "blank" %>"
   style="<%= hidden unless module_item %>"
@@ -31,8 +34,8 @@
     <%= module_item.item_class if module_item %>
   "
 >
-<div class="ig-row <%= 'with-completion-requirements' if criterion%> <%= 'ig-published' if module_item && module_item.published? %>">
-    <div class="ig-title module-item-title ellipses">
+  <div class="ig-row <%= 'with-completion-requirements' if criterion%> <%= 'ig-published' if module_item && module_item.published? %>">
+    <div class="ig-title module-item-title ellipsis">
       <% if editable || module_item.nil? %>
       <span
         class="draggable-handle move_item_link"
@@ -64,36 +67,7 @@
         <span class="new_tab" style="display: none;"><%= tag.try(:new_tab) ? '1' : '0' if editable %></span>
       </span>
     </div>
-    <div class="requirement-description">
-      <span class="completion_requirement">
-        <span class="requirement_type min_score_requirement">
-          <% score_display = content_tag(:span, criterion && criterion[:min_score] || nbsp, class: 'min_score') %>
-          <span class="unfulfilled"><%= t 'min_score.unfulfilled', 'must score at least a %{score}', :score => score_display %></span>
-          <span class="fulfilled"><%= t 'min_score.fulfilled', 'scored at least a %{score}', :score => score_display %></span>
-        </span>
-        <span class="requirement_type max_score_requirement">
-          <% score_display = content_tag(:span, criterion && criterion[:max_score] || nbsp, class: 'min_score') %>
-          <span class="unfulfilled"><%= t 'max_score.unfulfilled', 'must score no more than a %{score}', :score => score_display %></span>
-          <span class="fulfilled"><%= t 'max_score.fulfilled', 'scored no more than a%{score}', :score => score_display %></span>
-        </span>
-        <span class="requirement_type must_view_requirement">
-          <span class="unfulfilled"><%= t('must_view.unfulfilled', %{must view the page}) %></span>
-          <span class="fulfilled"><%= t('must_view.fulfilled', %{viewed the page}) %></span>
-        </span>
-        <span class="requirement_type must_mark_done_requirement">
-          <span class="unfulfilled"><%= t 'must mark as done' %></span>
-          <span class="fulfilled"><%= t 'marked done' %></span>
-        </span>
-        <span class="requirement_type must_contribute_requirement">
-          <span class="unfulfilled"><%= t('must_contribute.unfulfilled', %{must contribute to the content of the page}) %></span>
-          <span class="fulfilled"><%= t('must_contribute.fulfilled', %{contributed to the content of the page}) %></span>
-        </span>
-        <span class="requirement_type must_submit_requirement">
-          <span class="unfulfilled"><%= t('must_submit.unfulfilled', %{must submit the assignment}) %></span>
-          <span class="fulfilled"><%= t('must_submit.fulfilled', %{submitted the assignment}) %></span>
-        </span>
-      </span>
-    </div> <!-- requirement description end -->
+
     <div class="module_item_icons nobr">
       <!-- dead code? -->
       <span class="criterion <%= 'defined' if criterion %>">
@@ -106,10 +80,63 @@
       <span class="graded" style="display: none;"><%= tag && tag.graded? ? '1' : '0' %></span>
     </div>
     <div class="ig-details">
-      <div class="due_date_display"></div>
-      <div class="points_possible_display"></div>
-    </div>
+      <div class="grid-row">
+        <div class="col-xs col-md">
+          <div class="due_date_display"></div>
+        </div>
+        <div class="col-xs col-md-3">
+          <div class="points_possible_display"></div>
+        </div>
+        <div class="col-xs col-md-3">
+          <div class="requirement-description">
+            <span class="completion_requirement">
+              <span class="requirement_type min_score_requirement">
+                <% score_display = content_tag(:span, criterion && criterion[:min_score] || nbsp, class: 'min_score') %>
+                <span class="unfulfilled"><%= t 'min_score.unfulfilled', 'Score: %{score}', :score => score_display %></span>
+                <span class="fulfilled"><%= t 'min_score.fulfilled', 'Score: %{score}', :score => score_display %></span>
+              </span>
+              <span class="requirement_type max_score_requirement">
+                <% score_display = content_tag(:span, criterion && criterion[:max_score] || nbsp, class: 'min_score') %>
+                <span class="unfulfilled"><%= t 'Score: %{score}', :score => score_display %></span>
+                <span class="fulfilled"><%= t 'Score: %{score}', :score => score_display %></span>
+              </span>
+              <span class="requirement_type must_view_requirement">
+                <span class="unfulfilled"><%= t('View') %></span>
+                <span class="fulfilled"><%= t('Viewed') %></span>
+              </span>
+              <span class="requirement_type must_mark_done_requirement">
+                <span class="unfulfilled"><%= t 'Mark done' %></span>
+                <span class="fulfilled"><%= t 'Marked done' %></span>
+              </span>
+              <span class="requirement_type must_contribute_requirement">
+                <span class="unfulfilled"><%= t('must_contribute.unfulfilled', 'Contribute') %></span>
+                <span class="fulfilled"><%= t('must_contribute.fulfilled', 'Contributed') %></span>
+              </span>
+              <span class="requirement_type must_submit_requirement">
+                <span class="unfulfilled"><%= t('must_submit.unfulfilled', 'Submit') %></span>
+                <span class="fulfilled"><%= t('must_submit.fulfilled', 'Submitted') %></span>
+              </span>
+            </span>
+          </div> <!-- requirement description end -->
+        </div>
+        <% if !editable %>
 
+          <div class='module-item-status-icon' tabindex="0">
+            <% if module_item_info && !editable %>
+              <i
+                class="<%= module_item_info[:icon_type][:css_class] %>"
+                data-tooltip
+                title="<%= module_item_info[:criterion_message] %>"
+                aria-label="<%= module_item_info[:criterion_message] %>"
+                alt="<%= module_item_info[:icon_type][:alt] %>"
+              ><span class="screenreader-only"><%= module_item_info[:criterion_message] %></span>
+              </i>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+    </div>
     <% if editable || module_item.nil? %>
       <div class="ig-admin">
         <span
@@ -129,7 +156,7 @@
           <i class="icon-<%= published_status %>"></i>
         </span>
 
-        <div class="inline-block cog-menu-container" role=application">
+        <div class="inline-block cog-menu-container" role="application">
           <a class="al-trigger al-trigger-gray" role="button" tabindex="0" href="#">
             <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
             <span class="screenreader-only"><%= t('settings', 'Settings') %></span>
@@ -183,4 +210,3 @@
 
   </div>
 </li>
-

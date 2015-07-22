@@ -59,6 +59,11 @@ class ContextModuleProgression < ActiveRecord::Base
     mark_as_outdated
   end
 
+  def highest_submission_score(tag)
+    subs = get_submissions(tag)
+    subs.map {|sub| get_submission_score(sub)}.max
+  end
+
   class CompletedRequirementCalculator
     attr_accessor :actions_done, :view_requirements, :met_requirement_count
 
@@ -154,8 +159,8 @@ class ContextModuleProgression < ActiveRecord::Base
         next
       end
 
-      sub = get_submission_or_quiz_submission(tag) if tag.scoreable?
-      if sub && (sub.respond_to?(:excused?) && sub.excused?)
+      subs = get_submissions(tag) if tag.scoreable?
+      if subs && subs.any?{|sub| sub.respond_to?(:excused?) && sub.excused?}
         calc.check_action!(req, true)
         next
       end
@@ -166,19 +171,18 @@ class ContextModuleProgression < ActiveRecord::Base
         # must_contribute is handled by ContextModule#update_for
         calc.check_action!(req, false)
       elsif req[:type] == 'must_submit'
-        req_met = false
-        if sub
+        req_met = !!(subs && subs.any? do |sub|
           if sub.graded? && sub.attempt.nil?
             # is a manual grade - doesn't count for submission
-            req_met = false
+            false
           elsif %w(submitted graded complete pending_review).include?(sub.workflow_state)
-            req_met = true
+            true
           end
-        end
+        end)
 
         calc.check_action!(req, req_met)
       elsif req[:type] == 'min_score' || req[:type] == 'max_score'
-        calc.check_action!(req, evaluate_score_requirement_met(req, sub))
+        calc.check_action!(req, evaluate_score_requirement_met(req, subs))
       end
     end
     calc.check_view_requirements
@@ -186,20 +190,21 @@ class ContextModuleProgression < ActiveRecord::Base
   end
   private :evaluate_uncompleted_requirements
 
-  def get_submission_or_quiz_submission(tag)
+  def get_submissions(tag)
+    subs = []
     if tag.content_type_quiz?
-      sub = Quizzes::QuizSubmission.where(quiz_id: tag.content_id, user_id: user).first
-      sub ||= Submission.where(assignment_id: tag.content.assignment_id, user_id: user).first
-      sub
+      subs = Quizzes::QuizSubmission.where(quiz_id: tag.content_id, user_id: user).to_a +
+        Submission.where(assignment_id: tag.content.assignment_id, user_id: user).to_a
     elsif tag.content_type_discussion?
       if tag.content
-        Submission.where(assignment_id: tag.content.assignment_id, user_id: user).first
+        subs = Submission.where(assignment_id: tag.content.assignment_id, user_id: user).to_a
       end
     else
-      Submission.where(assignment_id: tag.content_id, user_id: user).first
+      subs = Submission.where(assignment_id: tag.content_id, user_id: user).to_a
     end
+    subs
   end
-  private :get_submission_or_quiz_submission
+  private :get_submissions
 
   def get_submission_score(submission)
     if submission.is_a?(Quizzes::QuizSubmission)
@@ -210,12 +215,14 @@ class ContextModuleProgression < ActiveRecord::Base
   end
   private :get_submission_score
 
-  def evaluate_score_requirement_met(requirement, sub)
-    score = get_submission_score(sub)
-    if requirement[:type] == "max_score"
-      score.present? && score <= requirement[:max_score].to_f
-    else
-      score.present? && score >= requirement[:min_score].to_f
+  def evaluate_score_requirement_met(requirement, subs)
+    subs && subs.any? do |sub|
+      score = get_submission_score(sub)
+      if requirement[:type] == "max_score"
+        score.present? && score <= requirement[:max_score].to_f
+      else
+        score.present? && score >= requirement[:min_score].to_f
+      end
     end
   end
   private :evaluate_score_requirement_met

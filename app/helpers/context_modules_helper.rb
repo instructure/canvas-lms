@@ -102,4 +102,36 @@ module ContextModulesHelper
       I18n.t('Unknown Content Type')
     end
   end
+
+  def context_module_progression_for_user(context_module)
+    context_module &&
+    context_module.context_module_progressions.
+      where(user_id: @current_user, context_module_id: context_module).first
+  end
+
+  def criterion(module_item, completion_criteria)
+    completion_criteria && completion_criteria.find{|c| c[:id] == module_item.id}
+  end
+
+  # This method creates a hash that is used to determine which icon is displayed for
+  # a module item and which tooltip message is displayed on the icon
+  def module_item_data(context_module, context_module_progression, module_item, criterion)
+    return false unless context_module && context_module_progression && module_item &&
+                        ContextModuleItemIcons.module_item_requirement?(context_module, module_item)
+    icon_info = {}
+    highest_score = context_module_progression.highest_submission_score(module_item)
+    submission_status = ContextModuleItemIcons.submission_status(context_module, module_item, highest_score)
+    completion_status = ContextModuleItemIcons.module_item_completed?(context_module_progression, module_item)
+    past_due = ContextModuleItemIcons.past_due_date?(module_item)
+    initial_message = ContextModuleItemIcons.initial_criterion_message(criterion, submission_status, highest_score)
+
+    icon_info[:icon_type] =
+      ContextModuleItemIcons.module_item_progress_icon(context_module, context_module_progression,
+                                                      module_item, highest_score)
+    icon_info[:criterion_message] =
+      ContextModuleItemIcons.complete_criterion_message(initial_message, completion_status, past_due)
+    icon_info
+  end
+
+
 end

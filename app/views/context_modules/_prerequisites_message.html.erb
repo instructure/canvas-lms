@@ -9,9 +9,10 @@
     hide_footer = context_module && context_module.active_prerequisites && !context_module.active_prerequisites.empty?
     prerequisites = (context_module.active_prerequisites || []) if context_module
   end
+  prereq_list = prerequisite_list(prerequisites)
 %>
 
-<div class="prerequisites">
+<div class="prerequisites ellipsis">
   <% if context_module %>
     <% prerequisites.each do |pre| %>
       <div class="prerequisite_criterion <%= pre[:type] %>_criterion" style="float: left;">
@@ -22,9 +23,8 @@
     <% end %>
   <% end %>
 
-  <div class="prerequisites_message" tabindex="0" style="<%= hidden unless hide_footer%>">
-
-    <%= before_label('prerequisites', %{Prerequisites}) %> 
-    <%= prerequisite_list(prerequisites) %>
+  <div class="prerequisites_message ellipsis" title='<%= "#{t('Prerequisites:')} #{prereq_list}" %>' style="<%= hidden unless hide_footer%>">
+    <%= before_label('prerequisites', %{Prerequisites}) %>
+    <%= prereq_list %>
   </div>
 </div>

@@ -320,6 +320,33 @@ describe ContextModule do
       expect(@progression).to be_completed
     end
 
+    it "should set progression to complete for a module with 'Complete One Item' requirement when one item complete" do
+      course_module
+      @module.requirement_count = 1
+      @quiz = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment",
+                                    :scoring_policy => 'keep_highest')
+      @quiz.workflow_state = 'available'
+      @quiz.save!
+      @assignment = @course.assignments.create!(:title => "some assignment")
+
+      @tag = @module.add_item({:id => @quiz.id, :type => 'quiz'})
+      @tag2 = @module.add_item({:id => @assignment.id, :type => 'assignment'})
+      @module.completion_requirements = {@tag.id => {:type => 'min_score', :min_score => 90},
+                                         @tag2.id => {:type=> 'must_view'}}
+      @module.save!
+
+      @user = User.create!(:name => "some name")
+      @course.enroll_student(@user)
+
+      @progression = @module.evaluate_for(@user)
+      expect(@progression).to be_unlocked
+
+      @module.update_for(@user, :read, @tag2)
+      @progression = @module.evaluate_for(@user)
+      expect(@progression).to be_completed
+
+    end
+
     it "should trigger completion events" do
       course_module
       @module.completion_events = [:publish_final_grade]
