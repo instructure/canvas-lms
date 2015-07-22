@@ -1,12 +1,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
-describe "quizzes" do
-
-  include_examples "quizzes selenium tests"
+describe 'quizzes' do
+  include_examples 'quizzes selenium tests'
 
   def prepare_quiz
-    @quiz = quiz_model({ :course => @course, :time_limit => 5 })
-    @quiz.quiz_questions.create!(:question_data => multiple_choice_question_data)
+    @quiz = quiz_model({ course: @course, time_limit: 5 })
+    @quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
     @quiz.generate_quiz_data
     @quiz.save
     @quiz
@@ -16,9 +15,9 @@ describe "quizzes" do
     course_with_student_logged_in
   end
 
-  context "with a student" do
+  context 'with a student' do
 
-    it 'shouldn\'t see unpublished quizzes', priority: "1", test_id: 140651 do
+    it 'can\'t see unpublished quizzes', priority: "1", test_id: 140651 do
       # create course with an unpublished quiz
       assignment_quiz([], course: @course)
       @quiz.update_attribute(:published_at, nil)
@@ -28,7 +27,7 @@ describe "quizzes" do
       expect(f('#content-wrapper')).to include_text 'No quizzes available'
     end
 
-    it 'should see published quizzes', priority: "1", test_id: 220304 do
+    it 'can see published quizzes', priority: "1", test_id: 220304 do
       # create course with a published quiz
       assignment_quiz([], course: @course)
 
@@ -42,22 +41,33 @@ describe "quizzes" do
         @qsub = quiz_with_submission(false)
       end
 
-      context "when taking a timed quiz" do
+      context 'when taking a timed quiz' do
 
-        it "should warn the student before the lock date is exceeded" do
+        it 'warns the student before the lock date is exceeded',
+        priority: "1", test_id: 209407 do
           @context = @course
-          bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
+          bank = @course.assessment_question_banks.create!(title: 'Test Bank')
           q = quiz_model
           a = bank.assessment_questions.create!
-          bank.assessment_questions.create!
-          answers = [{id: 1, answer_text: 'A', weight: 100}, {id: 2, answer_text: 'B', weight: 0}]
+          answers = [
+            {
+              id: 1,
+              answer_text: 'A',
+              weight: 100
+            },
+            {
+              id: 2,
+              answer_text: 'B',
+              weight: 0
+            }
+          ]
           question = q.quiz_questions.create!(
-            :question_data => {
-              :name => "first question",
-              'question_type' => 'multiple_choice_question',
-              'answers' => answers,
-              :points_possible => 1
-            }, :assessment_question => a
+            question_data: {
+              name: 'first question',
+              question_type: 'multiple_choice_question',
+              answers: answers,
+              points_possible: 1
+            }, assessment_question: a
           )
 
           q.generate_quiz_data
@@ -65,7 +75,7 @@ describe "quizzes" do
           q.save!
 
           get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@student.id}"
-          f("#take_quiz_link").click
+          f('#take_quiz_link').click
           answer_one = f("#question_#{question.id}_answer_1")
 
           # force a save to create a submission
@@ -79,43 +89,46 @@ describe "quizzes" do
         end
       end
 
-      context "when functionality resumes" do
+      context 'when attempting to resume a quiz' do
         def update_quiz_lock(lock_at, unlock_at)
-          @quiz.update_attributes(:lock_at => lock_at, :unlock_at => unlock_at)
+          @quiz.update_attributes(lock_at: lock_at, unlock_at: unlock_at)
         end
 
-        describe "on individual quiz page" do
+        describe 'on individual quiz page' do
           def validate_resume_button_text(text)
             expect(f('#not_right_side .take_quiz_button').text).to eq text
           end
 
-          before do
+          before(:each) do
             @resume_text = 'Resume Quiz'
           end
 
-          it "should show the resume quiz button if the quiz is unlocked" do
+          it 'can see the resume quiz button if the quiz is unlocked',
+          priority: "1", test_id: 209408 do
             get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
             validate_resume_button_text(@resume_text)
           end
 
-          it "should show the resume quiz button if the quiz unlock_at date is < now" do
+          it 'can see the resume quiz button if the quiz unlock_at date is < now',
+          priority: "1", test_id: 209409 do
             update_quiz_lock(nil, 10.minutes.ago)
             get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
             validate_resume_button_text(@resume_text)
           end
 
-          it "should not show the resume quiz button if quiz is locked" do
+          it 'can\'t see the resume quiz button if quiz is locked',
+          priority: "1", test_id: 209410 do
             update_quiz_lock(5.minutes.ago, nil)
             get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
             expect(f('#not_right_side .take_quiz_button')).not_to be_present
           end
 
-          it "should not see the publish button" do
+          it 'can\'t see the publish button', priority: "1", test_id: 209411 do
             get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
             expect(f('#quiz-publish-link')).not_to be_present
           end
 
-          it "should not see unpublished warning" do
+          it 'can\'t see unpublished warning', priority: "1", test_id: 209412 do
             # set to unpublished state
             @quiz.last_edited_at = Time.now.utc
             @quiz.published_at   = 1.hour.ago
@@ -123,17 +136,18 @@ describe "quizzes" do
 
             get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-            expect(f(".unpublished_warning")).not_to be_present
+            expect(f('.unpublished_warning')).not_to be_present
           end
         end
       end
 
-      context "when logged out while taking a quiz" do
-        it "should be notified and able to relogin" do
+      context 'when logged out while taking a quiz' do
+
+        it 'is notified and able to relogin', priority: "1", test_id: 209413 do
           # setup a quiz and start taking it
           quiz_with_new_questions(!:goto_edit)
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-          expect_new_page_load { f("#take_quiz_link").click }
+          expect_new_page_load { f('#take_quiz_link').click }
           sleep 1 # sleep because display is updated on timer, not ajax callback
 
           # answer a question, and check that it is saved
@@ -166,12 +180,13 @@ describe "quizzes" do
     end
   end
 
-  context "with multiple fill in the blanks" do
-    it "should display mfitb responses in their respective boxes on submission view page" do
-      # create new multiple fill in the blank quiz and question
-      @quiz = quiz_model({ :course => @course, :time_limit => 5 })
+  context 'with multiple fill in the blanks' do
 
-      question = @quiz.quiz_questions.create!(:question_data => fill_in_multiple_blanks_question_data )
+    it 'displays MFITB responses in their respective boxes on submission view page', priority: "2", test_id: 209414 do
+      # create new multiple fill in the blank quiz and question
+      @quiz = quiz_model({ course: @course, time_limit: 5 })
+
+      question = @quiz.quiz_questions.create!(question_data: fill_in_multiple_blanks_question_data )
       @quiz.generate_quiz_data
       @quiz.tap(&:save)
       # create and grade a submission on our mfitb quiz
@@ -192,8 +207,9 @@ describe "quizzes" do
     end
   end
 
-  context "when closing the session without submitting" do
-    it "should automatically grade the submission when it becomes overdue" do
+  context 'when a student closes the session without submitting' do
+
+    it 'automatically grades the submission when it becomes overdue', priority: "1", test_id: 209415 do
       skip('disabled because of regression')
 
       job_tag = 'Quizzes::QuizSubmission#grade_if_untaken'
@@ -204,11 +220,11 @@ describe "quizzes" do
 
       take_and_answer_quiz(false)
 
-      driver.execute_script("window.close()")
+      driver.execute_script('window.close()')
 
       quiz_sub = @quiz.quiz_submissions.where(user_id: @user).first
       expect(quiz_sub).to be_present
-      expect(quiz_sub.workflow_state).to eq "untaken"
+      expect(quiz_sub.workflow_state).to eq 'untaken'
 
       job = Delayed::Job.find_by_tag(job_tag)
       expect(job).to be_present
@@ -219,7 +235,7 @@ describe "quizzes" do
       auto_grader.perform
 
       quiz_sub.reload
-      expect(quiz_sub.workflow_state).to eq "complete"
+      expect(quiz_sub.workflow_state).to eq 'complete'
     end
   end
 
@@ -229,7 +245,7 @@ describe "quizzes" do
       prepare_quiz
     end
 
-    it "should highlight correct answers" do
+    it 'highlights correct answers', priority: "2", test_id: 209417 do
       @quiz.update_attributes(show_correct_answers: true)
       @quiz.save!
 
@@ -238,8 +254,8 @@ describe "quizzes" do
       expect(ff('.correct_answer').length).to be > 0
     end
 
-    it "should always highlight incorrect answers" do
-      @quiz.update_attributes(show_correct_answers: false)
+    it 'always highlights incorrect answers', priority: "2", test_id: 209418 do
+      @quiz.update_attributes(show_correct_answers: true)
       @quiz.save!
 
       take_and_answer_quiz do |answers|
@@ -256,7 +272,7 @@ describe "quizzes" do
       prepare_quiz
     end
 
-    it "should not highlight correct answers" do
+    it 'doesn\'t highlight correct answers', priority: "2", test_id: 209416 do
       @quiz.update_attributes(show_correct_answers: false)
       @quiz.save!
 
@@ -265,7 +281,7 @@ describe "quizzes" do
       expect(ff('.correct_answer').length).to eq 0
     end
 
-    it "should always highlight incorrect answers" do
+    it 'always highlights incorrect answers', priority: "2", test_id: 209418 do
       @quiz.update_attributes(show_correct_answers: false)
       @quiz.save!
 

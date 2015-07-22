@@ -1,55 +1,54 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides.rb')
 
-describe "quizzes with draft state" do
+describe 'quizzes with draft state' do
 
   include AssignmentOverridesSeleniumHelper
-  include_examples "quizzes selenium tests"
+  include_examples 'quizzes selenium tests'
 
   before(:each) do
     course_with_student_logged_in
-    @course.update_attributes(:name => 'teacher course')
+    @course.update_attributes(name: 'teacher course')
     @course.save!
     @course.reload
+
+    @context = @course
+    @q = quiz_model
   end
 
+  context 'with a student' do
 
+    context 'with an unpublished quiz' do
 
-  context "with an unpublished quiz" do
+      before(:each) do
+        @q.unpublish!
+      end
 
-    it "should show an error to students" do
-      @context = @course
-      q = quiz_model
-      q.unpublish!
-      get "/courses/#{@course.id}/quizzes/#{q.id}"
-      wait_for_ajaximations
-      expect(f("#unauthorized_holder")).to be_displayed
+      it 'shows an error', priority: "1", test_id: 209419 do
+        get "/courses/#{@course.id}/quizzes/#{@q.id}"
+        wait_for_ajaximations
+        expect(f('#unauthorized_holder')).to be_displayed
+      end
+
+      it 'can\'t take an unpublished quiz', priority: "1", test_id: 209420 do
+        get "/courses/#{@course.id}/quizzes/#{@q.id}/take"
+        wait_for_ajaximations
+        expect(f('#unauthorized_holder')).to be_displayed
+      end
     end
 
-    it "should not be able to take unpublished quiz" do
-      @context = @course
-      q = quiz_model
-      q.unpublish!
-      get "/courses/#{@course.id}/quizzes/#{q.id}/take"
-      wait_for_ajaximations
-      expect(f("#unauthorized_holder")).to be_displayed
-    end
-  end
+    context 'when the available date is in the future' do
 
-  context "with an avaliable date in the future" do
+      before(:each) do
+        @q.unlock_at = Time.now.utc + 200.seconds
+        @q.publish!
+      end
 
-    before(:each) do
-      @context = @course
-      @q = quiz_model
-      @q.unlock_at = Time.now.utc + 200.seconds
-      @q.publish!
-
-    end
-    it "should show an error if avaliable date in future" do
-      get "/courses/#{@course.id}/quizzes/#{@q.id}/"
-      wait_for_ajaximations
-      expect(f(".lock_explanation")).to be_displayed
+      it 'shows an error', priority: "1", test_id: 209421 do
+        get "/courses/#{@course.id}/quizzes/#{@q.id}/"
+        wait_for_ajaximations
+        expect(f('.lock_explanation')).to be_displayed
+      end
     end
   end
 end
-
