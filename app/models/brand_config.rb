@@ -3,7 +3,6 @@ class BrandConfig < ActiveRecord::Base
 
   self.primary_key = 'md5'
   serialize :variables, Hash
-
   attr_accessible :variables
 
   validates :variables, presence: true
@@ -17,6 +16,24 @@ class BrandConfig < ActiveRecord::Base
   end
 
   has_many :accounts, foreign_key: 'brand_config_md5'
+
+  def self.for(variables)
+    if variables.nil? || variables.empty?
+      default
+    else
+      new_config = new(variables: variables)
+      existing_config = where(md5: new_config.generate_md5).first
+      existing_config || new_config
+    end
+  end
+
+  def self.default
+    new
+  end
+
+  def default?
+    variables.nil? || variables.empty?
+  end
 
   def generate_md5
     self.id = Digest::MD5.hexdigest(self.variables.to_s)

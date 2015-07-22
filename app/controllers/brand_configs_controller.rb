@@ -27,13 +27,13 @@ class BrandConfigsController < ApplicationController
   # If the css files for this BrandConfig have not been created yet, it will return a `Progress` object
   # indicating the progress of generating the css and pushing it to the CDN
   # @returns {BrandConfig, Progress}
-  def create
-    brand_config = BrandConfig.new(variables: process_variables(params[:brand_config][:variables]))
 
-    # handle if there is a brand config with these exact variables already in the db
-    existing_config = BrandConfig.where(md5: brand_config.generate_md5).first
-    if existing_config
-      render json: { brand_config: existing_config.as_json(include_root: false)}
+  def create
+    variables = process_variables(params[:brand_config][:variables])
+    brand_config = BrandConfig.for(variables)
+
+    if existing_config(brand_config)
+      render json: { brand_config: brand_config.as_json(include_root: false) }
     else
       render json: {
         brand_config: brand_config.as_json(include_root: false),
@@ -41,6 +41,11 @@ class BrandConfigsController < ApplicationController
       }
     end
   end
+
+  def existing_config(config)
+    config.default? || !config.new_record?
+  end
+  private :existing_config
 
   # Activiate a given brandConfig for the current users's session.
   # this is what is called after the user pushes "Preview"
