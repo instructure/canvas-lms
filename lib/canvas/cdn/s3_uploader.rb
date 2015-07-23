@@ -29,8 +29,8 @@ module Canvas
         end
       end
 
-      def fingerprint?(path)
-        /-[0-9a-fA-F]{32}$/.match(path.basename(path.extname).to_s)
+      def fingerprinted?(path)
+        /-[0-9a-fA-F]{10}$/.match(path.basename(path.extname).to_s)
       end
 
       def font?(path)
@@ -43,10 +43,9 @@ module Canvas
 
       def options_for(path)
         options = {acl: :public_read, content_type: mime_for(path)}
-        if fingerprint?(path)
+        if fingerprinted?(path)
           options.merge!({
-            cache_control: "public, max-age=#{1.year}",
-            expires: 1.year.from_now.httpdate
+            cache_control: "public, max-age=#{1.year}"
           })
         end
 
