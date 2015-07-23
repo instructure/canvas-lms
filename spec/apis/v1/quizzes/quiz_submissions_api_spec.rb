@@ -175,7 +175,17 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
   describe 'GET /courses/:course_id/quizzes/:quiz_id/submissions [INDEX]' do
     it 'should return an empty list' do
       json = qs_api_index
-      expect(json.has_key?('quiz_submissions')).to be_truthy
+      expect(json.key?('quiz_submissions')).to be_truthy
+      expect(json['quiz_submissions'].size).to eq 0
+    end
+
+    it 'should return an empty list for a student' do
+      enroll_student
+
+      @user = @student
+
+      json = qs_api_index
+      expect(json.key?('quiz_submissions')).to be_truthy
       expect(json['quiz_submissions'].size).to eq 0
     end
 
@@ -192,7 +202,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       enroll_student_and_submit
 
       json = qs_api_index
-      expect(json.has_key?('quiz_submissions')).to be_truthy
+      expect(json.key?('quiz_submissions')).to be_truthy
       expect(json['quiz_submissions'].length).to eq 1
     end
 
@@ -244,7 +254,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     it 'should grant access to its student' do
       @user = @student
       json = qs_api_show
-      expect(json.has_key?('quiz_submissions')).to be_truthy
+      expect(json.key?('quiz_submissions')).to be_truthy
       expect(json['quiz_submissions'].length).to eq 1
     end
 
@@ -253,7 +263,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       @quiz_submission.stubs(:id).returns 'self'
 
       json = qs_api_show
-      expect(json.has_key?('quiz_submissions')).to be_truthy
+      expect(json.key?('quiz_submissions')).to be_truthy
       expect(json['quiz_submissions'].length).to eq 1
     end
 
@@ -266,7 +276,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     context 'Output' do
       it 'should include the allowed quiz submission output fields' do
         json = qs_api_show
-        expect(json.has_key?('quiz_submissions')).to be_truthy
+        expect(json.key?('quiz_submissions')).to be_truthy
 
         qs_json = json['quiz_submissions'][0].with_indifferent_access
 
@@ -286,7 +296,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
         @quiz_submission.save!
 
         json = qs_api_show
-        expect(json.has_key?('quiz_submissions')).to be_truthy
+        expect(json.key?('quiz_submissions')).to be_truthy
         expect(json['quiz_submissions'][0]['time_spent']).to eq 5.minutes
       end
 
@@ -294,13 +304,13 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
         @quiz_submission.save!
 
         json = qs_api_show
-        expect(json.has_key?('quiz_submissions')).to be_truthy
+        expect(json.key?('quiz_submissions')).to be_truthy
         expect(json['quiz_submissions'][0]['questions_regraded_since_last_attempt']).to eq 0
       end
 
       it 'should include html_url' do
         json = qs_api_show
-        expect(json.has_key?('quiz_submissions')).to be_truthy
+        expect(json.key?('quiz_submissions')).to be_truthy
 
         qs_json = json['quiz_submissions'][0]
         expect(qs_json['html_url']).to eq course_quiz_quiz_submission_url(@course, @quiz, @quiz_submission)
@@ -313,7 +323,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
           :include => [ 'user' ]
         })
 
-        expect(json.has_key?('users')).to be_truthy
+        expect(json.key?('users')).to be_truthy
         expect(json['quiz_submissions'].size).to eq 1
         expect(json['users'].size).to eq 1
         expect(json['users'][0]['id']).to eq json['quiz_submissions'][0]['user_id']
@@ -324,7 +334,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
           :include => [ 'quiz' ]
         })
 
-        expect(json.has_key?('quizzes')).to be_truthy
+        expect(json.key?('quizzes')).to be_truthy
         expect(json['quiz_submissions'].size).to eq 1
         expect(json['quizzes'].size).to eq 1
         expect(json['quizzes'][0]['id']).to eq json['quiz_submissions'][0]['quiz_id']
@@ -335,7 +345,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
           :include => [ 'submission' ]
         })
 
-        expect(json.has_key?('submissions')).to be_truthy
+        expect(json.key?('submissions')).to be_truthy
         expect(json['quiz_submissions'].size).to eq 1
         expect(json['submissions'].size).to eq 1
         expect(json['submissions'][0]['id']).to eq json['quiz_submissions'][0]['submission_id']
@@ -346,9 +356,9 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
           :include => [ 'user', 'quiz', 'submission' ]
         })
 
-        expect(json.has_key?('users')).to be_truthy
-        expect(json.has_key?('quizzes')).to be_truthy
-        expect(json.has_key?('submissions')).to be_truthy
+        expect(json.key?('users')).to be_truthy
+        expect(json.key?('quizzes')).to be_truthy
+        expect(json.key?('submissions')).to be_truthy
       end
     end
 
@@ -377,7 +387,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
     it 'should create a quiz submission' do
       json = qs_api_create
-      expect(json.has_key?('quiz_submissions')).to be_truthy
+      expect(json.key?('quiz_submissions')).to be_truthy
       expect(json['quiz_submissions'].length).to eq 1
       expect(json['quiz_submissions'][0]['workflow_state']).to eq 'untaken'
     end
@@ -437,7 +447,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
         attempt: 1
       }
 
-      expect(json.has_key?('quiz_submissions')).to be_truthy
+      expect(json.key?('quiz_submissions')).to be_truthy
       expect(json['quiz_submissions'].length).to eq 1
       expect(json['quiz_submissions'][0]['workflow_state']).to eq 'complete'
     end
@@ -519,7 +529,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
         }]
       }
 
-      expect(json.has_key?('quiz_submissions')).to be_truthy
+      expect(json.key?('quiz_submissions')).to be_truthy
       expect(json['quiz_submissions'].length).to eq 1
       expect(json['quiz_submissions'][0]['fudge_points']).to eq 2.5
       expect(json['quiz_submissions'][0]['score']).to eq 97.5
@@ -537,7 +547,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
         }]
       }
 
-      expect(json.has_key?('quiz_submissions')).to be_truthy
+      expect(json.key?('quiz_submissions')).to be_truthy
       expect(json['quiz_submissions'].length).to eq 1
       expect(json['quiz_submissions'][0]['score']).to eq 55
     end
