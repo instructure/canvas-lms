@@ -38,4 +38,18 @@ describe 'Theme Editor' do
     # validations
     expect(fj('.Theme__preview-button-text').text).to include_text 'Preview Your Changes'
   end
+
+  it 'should not accept invalid hex IDs', priority: "1", test_id: 239987 do
+    open_theme_editor
+
+    # verifies theme editor is open
+    expect(fj('.Theme__editor-header_title').text).to include_text 'Theme Editor'
+
+    # enters invalid ID and presses tab
+    fj('.Theme__editor-color-block_input-text').send_keys('#xxxxx!')
+    fj('.Theme__editor-color-block_input-text').send_keys(:tab)
+
+    # validations
+    expect(fj('.ic-Form-message--error').text).to include_text "'#xxxxx!' is not a valid color."
+  end
 end
