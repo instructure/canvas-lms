@@ -37,6 +37,7 @@ es:
     cancel: Cancelar
     save: Guardar
   _section_not_synced_yet_cd07d0dd: "-- Sección no sincronizada aún"
+  _start_from_a_template__a03ea3b3: "Comience a partir de una plantilla."
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "En este método de cálculo no se utiliza un valor de cálculo"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "Un archivo llamado %{itemName} ya existe en esta carpeta."
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Una clave útil/descarga de datos de valores de un servidor de información de entorno interesante para el usuario que reporta"
@@ -1281,6 +1282,9 @@ es:
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Permitir que los estudiantes vean quien se ha inscrito para los intervalos de tiempo."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Permitir que los maestros marquen los datos de calificación para ser exportados en cantidad a las integraciones de SIS."
   always_3a59e701: Siempre
+  an_error_occured_trying_to_generate_this_theme_ple_6ae581d: "Se produjo un error al intentar generar este tema. Inténtelo de nuevo."
+  an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Se ha producido un error*, por favor envíe su respuesta en otro momento"
+  an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "Se produjo un error al intentar preparar la descarga. Inténtelo de nuevo."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Se ha producido un error al configurar el derecho de uso para %{filename}"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Se produjo un error desconocido en el servidor. Inténtelo de nuevo."
   analytics: 
@@ -1354,6 +1358,7 @@ es:
     podcast_feed_description_group: "Cualquier archivo de media enlazado desde o integrado dentro de los anuncios en el grupo \"%{group}\" aparecerá en este canal."
     podcast_feed_name: "%{course} Canal de Anuncios de Podcast"
   anonymous_e1b8ad27: Anónimo
+  anonymous_user: "Usuario anónimo"
   anonymous_user_d984b9ce: "Usuario anónimo"
   another_configuration_is_currently_selected_select_95b394e: "Otra configuración está seleccionada en este momento. El seleccionar esta configuración anulará la selección de la otra."
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Las respuestas se mostrarán tras su último intento"
@@ -1402,6 +1407,7 @@ es:
     wiki_front_page_default_content_course: "¡Bienvenido a nuestro nuevo wiki para el curso!"
     wiki_front_page_default_content_group: "¡Bienvenido a nuestro nuevo wiki para el grupo!"
   apply_781a2546: Aplicar
+  apply_changes_b1dffc70: "Aplicar los Cambios"
   appointment_group: 
     errors: 
       invalid_end_at: "La hora de finalización de la cita es anterior a la hora de inicio"
@@ -2663,6 +2669,7 @@ es:
   canvas_cartridge_file_description: "Paquete de exportación de cursos de Canvas"
   canvas_cartridge_name: "Importador de cartuchos de Canvas"
   canvas_cloud_information_fdd404f2: "Información de la Nube de Canvas"
+  canvas_default_7f81a6b8: "Predeterminado de Canvas"
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas no reconoció a su proveedor de identidad"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas no tiene una cuenta para el usuario: %{user}"
   canvas_error_report_ff678539: "Informe de error de Canvas"
@@ -2766,6 +2773,9 @@ es:
     google_drive: 
       file_not_found: "Archivo de colaboración no encontrado"
     index: 
+      description_student: |-
+          **¿Qué queremos decir con colaboraciones?**  Estamos hablando de herramientas en-línea para trabajar juntos en un documento compartido. Puede usar recursos como
+          [Google Docs](%{google_url}) para trabajar colaborativamente en tareas como trabajos en grupo y toma de notas. Esta página es un lugar fácil para seguirle la pista a estas colaboraciones, y también 	para establecerlas sin tener que intercambiar correos electrónicos.
       google: 
         drive: 
           upgrade: 
@@ -2862,6 +2872,8 @@ es:
     profile: 
       notices: 
         contact_registered: "Método de contacto registrado"
+  complete_all_items_e1779257: "Complete Todos los Elementos"
+  complete_one_item_90e5fb03: "Complete Un Elemento"
   concluded_courses_94782e21: "Cursos finalizados"
   conference_was_deleted_30869390: "La conferencia fue borrada"
   conferences: 
@@ -3336,6 +3348,21 @@ es:
     invalid_requirement_type: "Tipo de requisito de finalización inválido"
   context_module_sub_header_2f39e87b: "Sub-encabezado del módulo de contexto"
   context_modules: 
+    add_context_module_form: 
+      button: 
+        delete_label: "Eliminar prerrequisitos "
+        delete_title: "Eliminar prerrequisitos"
+      buttons: 
+        add_module: "Agregar Módulo"
+      labels: 
+        publish_final_grade: "Publicar la calificación final del alumno cuando concluya este módulo"
+        require_sequential_progress: "Los alumnos deben desplazarse a través de los requisitos de este módulo en orden secuencial"
+      links: 
+        add_prerequisite: "Agregar prerrequisito"
+        add_requirement: "Agregar requisito"
+      module_name: "Nombre del Módulo"
+      must_complete_prerequisites: "Debe completarse"
+      no_preprequisites: "No se han definido prerrequisitos"
     buttons: 
       add: "Agregar Módulo"
       add_item: "Agregar Elemento"
@@ -3347,8 +3374,10 @@ es:
       delete_item: "¿Seguro que quiere remover este elemento del módulo?"
     content_next: 
       add_prerequisite: "Agregar prerrequisito a *%{module}*"
+      assignment_points_possible: "/ %{points_possible} "
       buttons: 
         add_prerequisite: "Agregar Prerrequisito"
+      criterion_for_assignment: " %{assignment}  %{select_criterion}"
       headings: 
         add_prerequisite: "Agregar Prerrequisito a %{name}"
         course_modules: "Módulos del curso"
