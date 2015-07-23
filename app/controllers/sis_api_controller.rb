@@ -85,13 +85,14 @@ class SisApiController < ApplicationController
   private
 
   def context
-    if params[:account_id]
-      Account.find(params[:account_id])
-    elsif params[:course_id]
-      Course.find(params[:course_id])
-    else
-      fail ActiveRecord::RecordNotFound, 'unknown context type'
-    end
+    @context ||=
+        if params[:account_id]
+          api_find(Account, params[:account_id])
+        elsif params[:course_id]
+          api_find(Course, params[:course_id])
+        else
+          fail ActiveRecord::RecordNotFound, 'unknown context type'
+        end
   end
 
   def published_course_ids
