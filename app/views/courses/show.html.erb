@@ -165,7 +165,7 @@
       <%= t('headings.unpublished', %{This Course is Unpublished}) %>
 
       <span class="Reminder__course-setup-subttitle">
-        <%= t 'teachers_only', "Only teachers can see this course until it is *published*", :wrapper => (can_do(@context, @current_user, :update) ? '<a href="#" class="publish_course_in_wizard_link"><b>\1</b></a>' : '\1') %>
+        <%= t "Only teachers can see this course until it is published" %>
       </span>
     </h2>
     <div class="body Reminder__course-setup-body">

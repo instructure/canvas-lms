@@ -37,13 +37,11 @@ describe "courses" do
         @course.save!
         get "/courses/#{@course.id}"
         course_status_buttons = ff('#course_status_actions button')
-        expect(f('.publish_course_in_wizard_link')).to be_displayed
         expect(course_status_buttons.first).to have_class('disabled')
         expect(course_status_buttons.first.text).to eq 'Unpublished'
         expect(course_status_buttons.last).not_to have_class('disabled')
         expect(course_status_buttons.last.text).to eq 'Publish'
         expect_new_page_load { course_status_buttons.last.click }
-        expect(f('.publish_course_in_wizard_link')).to be_nil
         validate_action_button(:last, 'Published')
 
         @course.reload
@@ -53,13 +51,11 @@ describe "courses" do
       it "should allow unpublishing of a course through the course status actions" do
         get "/courses/#{@course.id}"
         course_status_buttons = ff('#course_status_actions button')
-        expect(f('.publish_course_in_wizard_link')).to be_nil
         expect(course_status_buttons.first).not_to have_class('disabled')
         expect(course_status_buttons.first.text).to eq 'Unpublish'
         expect(course_status_buttons.last).to have_class('disabled')
         expect(course_status_buttons.last.text).to eq 'Published'
         expect_new_page_load { course_status_buttons.first.click }
-        expect(f('.publish_course_in_wizard_link')).to be_displayed
         validate_action_button(:first, 'Unpublished')
       end
 
@@ -67,7 +63,6 @@ describe "courses" do
         course_with_student_submissions({submission_points: true, unpublished: true})
         get "/courses/#{@course.id}"
         course_status_buttons = ff('#course_status_actions button')
-        expect(f('.publish_course_in_wizard_link')).to be_displayed
         expect(course_status_buttons.first).to have_class('disabled')
         expect(course_status_buttons.first.text).to eq 'Unpublished'
         expect(course_status_buttons.last).not_to have_class('disabled')
