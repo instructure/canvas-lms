@@ -32,6 +32,14 @@ def preview_your_changes
   wait_for_ajaximations
 end
 
+def single_warning_message
+  f('.ic-Form-message--error')
+end
+
+def all_warning_messages
+  ff('.ic-Form-message--error')
+end
+
 def click_global_branding
   f('h3.ui-accordion-header.ui-helper-reset.ui-state-default.ui-accordion-icons.ui-corner-top > a > div.te-Flex > span.te-Flex__block').click
   wait_for_ajaximations
