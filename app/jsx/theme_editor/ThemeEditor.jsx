@@ -129,7 +129,7 @@ define([
       })
       .pipe(() => this.saveToSession(newMd5))
       .fail(() => {
-        alert(I18n.t('An error occured trying to generate this theme, please try again.'))
+        alert(I18n.t('An error occurred trying to generate this theme, please try again.'))
         this.setState({showProgressModal: false})
       })
     },
