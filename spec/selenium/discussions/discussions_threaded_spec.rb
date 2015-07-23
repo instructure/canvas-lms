@@ -29,9 +29,9 @@ describe "threaded discussions" do
 
   it "should allow replies more than 2 levels deep", priority: "1", test_id: 150512 do
     reply_depth = 10
-    reply_depth.times { |i| @topic.discussion_entries.create!(:user => @student,
-                                                              :message => "new threaded reply #{i} from student",
-                                                              :parent_entry => DiscussionEntry.last) }
+    reply_depth.times { |i| @topic.discussion_entries.create!(user: @student,
+                                                              message: "new threaded reply #{i} from student",
+                                                              parent_entry: DiscussionEntry.last) }
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     expect(DiscussionEntry.last.depth).to eq reply_depth
     expect(DiscussionEntry.last.parent_entry).to_not eq DiscussionEntry.first
@@ -42,19 +42,20 @@ describe "threaded discussions" do
                                                            title: 'Non threaded discussion',
                                                            message: 'discussion topic message')
     reply_depth = 3
-    reply_depth.times { |i| non_threaded_topic.discussion_entries.create!(:user => @student,
-                                                              :message => "new threaded reply #{i} from student",
-                                                              :parent_entry => DiscussionEntry.last) }
+    reply_depth.times { |i| non_threaded_topic.discussion_entries.create!(user: @student,
+                                                              message: "new threaded reply #{i} from student",
+                                                              parent_entry: DiscussionEntry.last) }
     get "/courses/#{@course.id}/discussion_topics/#{non_threaded_topic.id}"
     expect(DiscussionEntry.last.parent_entry).to eq DiscussionEntry.first
   end
 
   it "should allow edits to entries with replies", priority: "2", test_id: 222520 do
     edit_text = 'edit message'
-    entry       = @topic.discussion_entries.create!(:user => @student, :message => 'new threaded reply from student')
-    child_entry = @topic.discussion_entries.create!(:user => @student,
-                                                    :message => 'new threaded child reply from student',
-                                                    :parent_entry => entry)
+    entry       = @topic.discussion_entries.create!(user: @student,
+                                                    message: 'new threaded reply from student')
+    child_entry = @topic.discussion_entries.create!(user: @student,
+                                                    message: 'new threaded child reply from student',
+                                                    parent_entry: entry)
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     edit_entry(entry, edit_text)
     expect(entry.reload.message).to match(edit_text)
@@ -62,9 +63,9 @@ describe "threaded discussions" do
 
   it "should allow edits to discussion with replies", priority: "1", test_id: 150513 do
     reply_depth = 3
-    reply_depth.times { |i| @topic.discussion_entries.create!(:user => @student,
-                                                              :message => "new threaded reply #{i} from student",
-                                                              :parent_entry => DiscussionEntry.last) }
+    reply_depth.times { |i| @topic.discussion_entries.create!(user: @student,
+                                                              message: "new threaded reply #{i} from student",
+                                                              parent_entry: DiscussionEntry.last) }
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     expect_new_page_load{f(' .edit-btn').click}
     edit_topic('edited title', 'edited message')
@@ -73,14 +74,14 @@ describe "threaded discussions" do
 
   it "should edit a reply", priority: "1", test_id: 150514 do
     edit_text = 'edit message'
-    entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
+    entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     edit_entry(entry, edit_text)
   end
 
   it "should not allow students to edit replies to a locked topic", priority: "1", test_id: 222521 do
     user_session(@student)
-    entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
+    entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
     @topic.lock!
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     wait_for_ajaximations
@@ -119,21 +120,21 @@ describe "threaded discussions" do
   end
 
   it "should delete a reply", priority: "1", test_id: 150515 do
-    entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
+    entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     delete_entry(entry)
   end
 
   it "should display editor name and timestamp after edit", priority: "2", test_id: 222522 do
     edit_text = 'edit message'
-    entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
+    entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     edit_entry(entry, edit_text)
     expect(f("#entry-#{entry.id} .discussion-fyi").text).to match("Edited by #{@teacher.name} on")
   end
 
   it "should support repeated editing", priority: "2", test_id: 222523 do
-    entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
+    entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     edit_entry(entry, 'New text 1')
     expect(f("#entry-#{entry.id} .discussion-fyi").text).to match("Edited by #{@teacher.name} on")
@@ -145,7 +146,7 @@ describe "threaded discussions" do
 
   it "should re-render replies after editing", priority: "2", test_id: 222524 do
     edit_text = 'edit message'
-    entry = @topic.discussion_entries.create!(:user => @student, :message => "new threaded reply from student")
+    entry = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
 
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     @last_entry = f("#entry-#{entry.id}")
