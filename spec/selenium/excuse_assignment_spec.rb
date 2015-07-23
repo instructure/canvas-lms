@@ -4,20 +4,75 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/groups_common')
 describe 'Excuse an Assignment' do
   include_examples "in-process server selenium tests"
 
-  context 'SpeedGrader' do
-    before do
+  before do |example|
+    unless example.metadata[:group]
       course_with_teacher_logged_in
       course_with_student(course: @course, active_all: true, name: 'Student')
     end
+  end
 
+  context 'Student view details' do
+    before do
+      @assignment = @course.assignments.create! title: 'Excuse Me', submission_types: 'online_text_entry', points_possible: 20
+      @assignment.grade_student @student, excuse: true
+
+      user_session @student
+    end
+
+    it 'Assignment index displays scores as excused', priority: "1", test_id: 246616 do
+      get "/courses/#{@course.id}/assignments"
+      expect(f('[id^="assignment_"] span.non-screenreader').text).to eq 'Excused'
+    end
+
+    it 'Assignment details displays scores as excused', priority: "1", test_id: 201937 do
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      expect(f('#sidebar_content .details .header').text).to eq 'Excused!'
+    end
+
+    it 'Submission details displays scores as excused', priority: "1", test_id: 246617 do
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
+      expect(f('#content span.published_grade').text).to eq 'Excused'
+    end
+  end
+
+  it 'Gradebook export accounts for excused assignment', priority: "1", test_id: 209242 do
+    assignment = @course.assignments.create! title: 'Excuse Me', points_possible: 20
+    assignment.grade_student @student, excuse: true
+
+    csv = CSV.parse(@course.gradebook_to_csv)
+    _name, _id, _section, score = csv[-1]
+    expect(score).to eq 'EX'
+  end
+
+  it 'Gradebook import accounts for excused assignment', priority: "1", test_id: 223509 do
+    @course.assignments.create! title: 'Excuse Me', points_possible: 20
+    rows = ['Student Name,ID,Section,Excuse Me',
+            "Student,#{@student.id},,EX"]
+    _filename, fullpath, _data = get_file('gradebook.csv', rows.join("\n"))
+
+    get "/courses/#{@course.id}/gradebook_uploads/new"
+
+    f('#gradebook_upload_uploaded_data').send_keys(fullpath)
+    f('#new_gradebook_upload').submit
+    run_jobs
+    wait_for_ajaximations
+    expect(f('.canvas_1 .new-grade').text).to eq 'EX'
+
+    submit_form('#gradebook_grid_form')
+    driver.switch_to.alert.accept
+    wait_for_ajaximations
+    run_jobs
+
+    get "/courses/#{@course.id}/gradebook"
+    expect(f('.canvas_1 .slick-row .slick-cell:first-child').text).to eq 'EX'
+  end
+
+  context 'SpeedGrader' do
     it 'can excuse complete/incomplete assignments', priority: "1", test_id: 209315 do
-      @assignment = @course.assignments.build
-      @assignment.grading_type = 'pass_fail'
-      @assignment.publish
+      assignment = @course.assignments.create! title: 'Excuse Me', points_possible: 20, grading_type: 'pass_fail'
 
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      Selenium::WebDriver::Support::Select.new(f('#grading-box-extended'))
-                                          .select_by(:text, 'Excused')
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
+      click_option f('#grading-box-extended'), 'Excused'
 
       get "/courses/#{@course.id}/grades"
       dropped = f('#gradebook_grid .container_1 .slick-row :first-child')
@@ -78,15 +133,14 @@ describe 'Excuse an Assignment' do
             points_possible: 20
         )
 
-        assignment.grade_student @students[1], {excuse: true }
+        assignment.grade_student @students[1], {excuse: true}
         assignment.grade_student @students[0], {grade: 15}
 
         score_values = []
 
         if view == 'srgb'
           get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=srgb"
-          Selenium::WebDriver::Support::Select.new(f('#assignment_select'))
-                                              .select_by(:text, assignment.title)
+          click_option f('#assignment_select'), assignment.title
           next_student = f('.student_navigation button.next_object')
           4.times do
             next_student.click
@@ -146,17 +200,15 @@ describe 'Excuse an Assignment' do
         skip "Skipped because this spec fails if not run in foreground\n"\
           "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
         get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=srgb"
-        Selenium::WebDriver::Support::Select.new(f('#assignment_select'))
-                                            .select_by(:text, assignment.title)
-        Selenium::WebDriver::Support::Select.new(f('#student_select'))
-                                            .select_by(:text, @students[0].name)
+        click_option f('#assignment_select'), assignment.title
+        click_option f('#student_select'), @student.name
         replace_content f('#student_and_assignment_grade'), "EX\t"
         wait_for_ajaximations
       else
-        assignment.grade_student(@students[0], {excuse: true})
+        assignment.grade_student(@student, {excuse: true})
       end
 
-      user_session(@students[0])
+      user_session(@student)
       get "/courses/#{@course.id}/grades"
 
       grade_row = f("#submission_#{assignment.id}")
@@ -169,17 +221,17 @@ describe 'Excuse an Assignment' do
        'and will not be considered in the total calculation'
     end
 
-    ['percent', 'letter_grade', 'gpa_scale', 'points'].each do |type|
-      it "is not included in grade calculations (#{type})", priority: "1", test_id: view == 'srgb' ? 216379 : 196596 do
+    it 'is not included in grade calculations', priority: "1", test_id: view == 'srgb' ? 216379 : 1196596 do
+      ['percent', 'letter_grade', 'gpa_scale', 'points'].each do |type|
         a1 = @course.assignments.create! title: 'Excuse Me', grading_type: type, points_possible: 20
         a2 = @course.assignments.create! title: 'Don\'t Excuse Me', grading_type: type, points_possible: 20
 
         if type == 'points'
-          a1.grade_student(@students[0], {grade: 20})
-          a2.grade_student(@students[0], {grade: 13.2})
+          a1.grade_student(@student, {grade: 13.2})
+          a2.grade_student(@student, {grade: 20})
         else
-          a1.grade_student(@students[0], {grade: '100%'})
-          a2.grade_student(@students[0], {grade: '66%'})
+          a1.grade_student(@student, {grade: '66%'})
+          a2.grade_student(@student, {grade: '100%'})
         end
 
         total = ''
@@ -187,15 +239,12 @@ describe 'Excuse an Assignment' do
           skip "Skipped because this spec fails if not run in foreground\n"\
           "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
           get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=srgb"
-          Selenium::WebDriver::Support::Select.new(f('#student_select'))
-                                              .select_by(:text, @students[0].name)
-
+          click_option f('#student_select'), @student.name
           total = f('span.total-grade').text[/\d+(\.\d+)?%/]
           expect(total).to eq '83%'
 
-          Selenium::WebDriver::Support::Select.new(f('#assignment_select'))
-                                              .select_by(:text, a2.title)
-          replace_content f('#student_and_assignment_grade'), "EX"
+          click_option f('#assignment_select'), a1.title
+          replace_content f('#student_and_assignment_grade'), "EX\t"
           wait_for_ajaximations
           total = f('span.total-grade').text[/\d+(\.\d+)?%/]
         else
@@ -204,27 +253,19 @@ describe 'Excuse an Assignment' do
           total = f('.canvas_1 .slick-row .slick-cell:last-child').text
           expect(total).to eq '83%'
 
-          excused = f('.canvas_1 .slick-row .slick-cell:nth-child(2)')
+          excused = f('.canvas_1 .slick-row .slick-cell:first-child')
           excused.click
           replace_content f('.grade', excused), "EX\n"
 
           total = f('.canvas_1 .slick-row .slick-cell:last-child').text
         end
-
-
         expect(total).to eq '100%'
-
+        @course.assignments = []
       end
     end
   end
 
   context 'Gradebook Grid' do
-    before do |example|
-      unless example.metadata[:group]
-        init_course_with_students
-      end
-    end
-
     it_behaves_like 'Basic Behavior'
 
     it 'default grade cannot be set to excused', priority: "1", test_id: 209380 do
@@ -244,7 +285,7 @@ describe 'Excuse an Assignment' do
 
     it 'excused grade shows up in grading modal', priority: "1", test_id: 209324 do
       assignment = @course.assignments.create! title: 'Excuse Me', points_possible: 20
-      assignment.grade_student @students[0], excuse: true
+      assignment.grade_student @student, excuse: true
 
       get "/courses/#{@course.id}/gradebook/"
       driver.action.move_to(f('.canvas_1 .slick-cell')).perform
@@ -274,8 +315,8 @@ describe 'Excuse an Assignment' do
       end
     end
 
-    ['EX', 'ex', 'Ex', 'eX'].each do |ex|
-      it "#{ex} can be used to excuse assignments", priority: "1", test_id: 225630 do
+    it 'variations of \'EX\' can be used to excuse assignments', priority: "1", test_id: 225630 do
+      ['EX', 'ex', 'Ex', 'eX'].each do |ex|
         @course.assignments.create! title: 'Excuse Me', points_possible: 20
 
         get "/courses/#{@course.id}/gradebook/"
@@ -291,14 +332,7 @@ describe 'Excuse an Assignment' do
     end
   end
 
-
   context 'Individual View' do
-    before do |example|
-      unless example.metadata[:group]
-        init_course_with_students
-      end
-    end
-
     it_behaves_like 'Basic Behavior', 'srgb'
   end
 end
