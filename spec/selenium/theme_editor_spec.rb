@@ -39,6 +39,28 @@ describe 'Theme Editor' do
     expect(fj('.Theme__preview-button-text').text).to include_text 'Preview Your Changes'
   end
 
+  it 'should accept valid shortened Hex IDs', priority: "2", test_id: 240455 do
+    open_theme_editor
+
+    # verifies theme editor is open
+    expect(fj('.Theme__editor-header_title').text).to include_text 'Theme Editor'
+
+    fj('.Theme__editor-color-block_input-text').send_keys('#fff')
+    # validations
+    expect(fj('.Theme__preview-button-text').text).to include_text 'Preview Your Changes'
+  end
+
+  it 'should accept valid color names', priority: "2", test_id: 240233 do
+    open_theme_editor
+
+    # verifies theme editor is open
+    expect(fj('.Theme__editor-header_title').text).to include_text 'Theme Editor'
+
+    fj('.Theme__editor-color-block_input-text').send_keys('orange')
+    # validations
+    expect(fj('.Theme__preview-button-text').text).to include_text 'Preview Your Changes'
+  end
+
   it 'should not accept invalid hex IDs', priority: "1", test_id: 239987 do
     open_theme_editor
 
