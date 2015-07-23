@@ -21,6 +21,8 @@ describe SisApiController, type: :request do
     context 'for an account' do
       before :once do
         account_model
+        @account.root_account = Account.default
+        @account.save
         account_admin_user(account: @account, active_all: true)
       end
 
@@ -51,20 +53,20 @@ describe SisApiController, type: :request do
       end
 
       it 'requires :bulk_sis_grade_export feature to be enabled or post_grades tool to be installed' do
-        get "/api/sis/accounts/#{@account.id}/assignments", account_id: @account.id
+        get "/api/sis/accounts/#{context.id}/assignments", account_id: context.id
         expect(response.status).to eq 400
       end
 
       shared_examples 'account sis assignments api' do
         it 'requires :view_all_grades permission' do
-          @account.role_overrides.create!(permission: :view_all_grades, enabled: false, role: admin_role)
-          get "/api/sis/accounts/#{@account.id}/assignments", account_id: @account.id
+          context.role_overrides.create!(permission: :view_all_grades, enabled: false, role: admin_role)
+          get "/api/sis/accounts/#{context.id}/assignments", account_id: context.id
           assert_unauthorized
         end
 
         it 'returns paginated assignment list' do
           # first page
-          get "/api/sis/accounts/#{@account.id}/assignments", account_id: @account.id, per_page: 2
+          get "/api/sis/accounts/#{context.id}/assignments", account_id: context.id, per_page: 2
           expect(response).to be_success
           result_json = json_parse
           expect(result_json.length).to eq(2)
@@ -72,7 +74,7 @@ describe SisApiController, type: :request do
           expect(result_json[1]).to include('id' => assignment9.id)
 
           # second page
-          get "/api/sis/accounts/#{@account.id}/assignments", account_id: @account.id, per_page: 2, page: 2
+          get "/api/sis/accounts/#{context.id}/assignments", account_id: context.id, per_page: 2, page: 2
           expect(response).to be_success
           result_json = json_parse
           expect(result_json.length).to eq(2)
@@ -80,28 +82,28 @@ describe SisApiController, type: :request do
           expect(result_json[1]).to include('id' => assignment11.id)
 
           # third page
-          get "/api/sis/accounts/#{@account.id}/assignments", account_id: @account.id, per_page: 2, page: 3
+          get "/api/sis/accounts/#{context.id}/assignments", account_id: context.id, per_page: 2, page: 3
           expect(json_parse.length).to eq(0)
         end
 
         it "should return courses starting before starts_before" do
-          @account.courses.each(&:destroy)
+          context.courses.each(&:destroy)
           start_at = 1.week.ago
-          course1 = @account.courses.create!
-          course2 = @account.courses.create!(:start_at => start_at - 1.day)
-          course3 = @account.courses.create!(:start_at => start_at + 1.day)
+          course1 = context.courses.create!
+          course2 = context.courses.create!(:start_at => start_at - 1.day)
+          course3 = context.courses.create!(:start_at => start_at + 1.day)
 
-          term1 = @account.enrollment_terms.create!(:start_at => start_at - 1.day)
-          term2 = @account.enrollment_terms.create!(:start_at => start_at + 1.day)
-          course4 = @account.courses.create!(:enrollment_term => term1)
-          course5 = @account.courses.create!(:enrollment_term => term2)
+          term1 = context.root_account.enrollment_terms.create!(:start_at => start_at - 1.day)
+          term2 = context.root_account.enrollment_terms.create!(:start_at => start_at + 1.day)
+          course4 = context.courses.create!(:enrollment_term => term1)
+          course5 = context.courses.create!(:enrollment_term => term2)
 
-          @account.courses.not_deleted.each do |c|
+          context.courses.not_deleted.each do |c|
             c.update_attribute(:workflow_state, 'available')
             c.assignments.create!(:post_to_sis => true)
           end
 
-          get "/api/sis/accounts/#{@account.id}/assignments?starts_before=#{start_at.iso8601}", :account_id => @account.id
+          get "/api/sis/accounts/#{context.id}/assignments?starts_before=#{start_at.iso8601}", :account_id => context.id
           expect(response).to be_success
 
           result = json_parse
@@ -109,27 +111,44 @@ describe SisApiController, type: :request do
         end
 
         it "should return courses concluding after ends_after" do
-          @account.courses.each(&:destroy)
+          context.courses.each(&:destroy)
           end_at = 1.week.from_now
-          course1 = @account.courses.create!
-          course2 = @account.courses.create!(:conclude_at => end_at + 1.day)
-          course3 = @account.courses.create!(:conclude_at => end_at - 1.day)
+          course1 = context.courses.create!
+          course2 = context.courses.create!(:conclude_at => end_at + 1.day)
+          course3 = context.courses.create!(:conclude_at => end_at - 1.day)
 
-          term1 = @account.enrollment_terms.create!(:end_at => end_at + 1.day)
-          term2 = @account.enrollment_terms.create!(:end_at => end_at - 1.day)
-          course4 = @account.courses.create!(:enrollment_term => term1)
-          course5 = @account.courses.create!(:enrollment_term => term2)
+          term1 = context.root_account.enrollment_terms.create!(:end_at => end_at + 1.day)
+          term2 = context.root_account.enrollment_terms.create!(:end_at => end_at - 1.day)
+          course4 = context.courses.create!(:enrollment_term => term1)
+          course5 = context.courses.create!(:enrollment_term => term2)
 
-          @account.courses.not_deleted.each do |c|
+          context.courses.not_deleted.each do |c|
             c.update_attribute(:workflow_state, 'available')
             c.assignments.create!(:post_to_sis => true)
           end
 
-          get "/api/sis/accounts/#{@account.id}/assignments?ends_after=#{end_at.iso8601}", :account_id => @account.id
+          get "/api/sis/accounts/#{context.id}/assignments?ends_after=#{end_at.iso8601}", :account_id => context.id
           expect(response).to be_success
 
           result = json_parse
           expect(result.map{|h| h['course_id']}).to match_array [course1.id, course2.id, course4.id]
+        end
+
+        it 'accepts a sis_id as the account id' do
+          @account.sis_source_id = 'abc'
+          @account.save!
+
+          get "/api/sis/accounts/sis_account_id:abc/assignments"
+          expect(response).to be_success
+
+          result = json_parse
+          assignment_ids = result.map{|a| a['id']}
+
+          expect(result.size).to eq 4
+          expect(assignment_ids).to include assignment8.id
+          expect(assignment_ids).to include assignment9.id
+          expect(assignment_ids).to include assignment10.id
+          expect(assignment_ids).to include assignment11.id
         end
       end
 
@@ -205,6 +224,23 @@ describe SisApiController, type: :request do
           # third page
           get "/api/sis/courses/#{@course.id}/assignments", course_id: @course.id, per_page: 2, page: 3
           expect(json_parse.length).to eq(0)
+        end
+
+        it 'accepts a sis_id as the course id' do
+          context.sis_source_id = 'abc'
+          context.save!
+
+          get "/api/sis/courses/sis_course_id:abc/assignments"
+          expect(response).to be_success
+
+          result = json_parse
+          assignment_ids = result.map{|a| a['id']}
+
+          expect(result.size).to eq 4
+          expect(assignment_ids).to include assignment4.id
+          expect(assignment_ids).to include assignment5.id
+          expect(assignment_ids).to include assignment6.id
+          expect(assignment_ids).to include assignment7.id
         end
       end
 
