@@ -11,14 +11,12 @@ describe 'Theme Editor' do
 
   it 'should open theme editor', priority: "1", test_id: 239980 do
     open_theme_editor
-    wait_for_ajaximations
 
     expect(fj('.Theme__editor-header_title').text).to include_text 'Theme Editor'
   end
 
   it 'should close theme editor on cancel and redirect to account settings page', priority: "1", test_id: 239981 do
     open_theme_editor
-    wait_for_ajaximations
 
     # verifies theme editor is open
     expect(fj('.Theme__editor-header_title').text).to include_text 'Theme Editor'
@@ -32,8 +30,7 @@ describe 'Theme Editor' do
 
   it 'should display the preview button when valid change is made', priority: "1", test_id: 239984 do
     open_theme_editor
-    wait_for_ajaximations
-    
+
     # verifies theme editor is open
     expect(fj('.Theme__editor-header_title').text).to include_text 'Theme Editor'
 
@@ -41,5 +38,4 @@ describe 'Theme Editor' do
     # validations
     expect(fj('.Theme__preview-button-text').text).to include_text 'Preview Your Changes'
   end
-
 end
