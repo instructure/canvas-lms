@@ -48,7 +48,7 @@ class ExternalContentController < ApplicationController
             uri = URI.parse(value)
           end
           @retrieved_data[:url] = uri.to_s
-        rescue URI::InvalidURIError
+        rescue URI::Error
           @retrieved_data[:url] = nil
         end
       end

@@ -1410,7 +1410,7 @@ class Attachment < ActiveRecord::Base
         self.upload_error_message = t :upload_error_invalid_response_code, "Invalid response code, expected 200 got %{code}", :code => e.code
       when CanvasHttp::RelativeUriError
         self.upload_error_message = t :upload_error_relative_uri, "No host provided for the URL: %{url}", :url => url
-      when URI::InvalidURIError, ArgumentError
+      when URI::Error, ArgumentError
         # assigning all ArgumentError to InvalidUri may be incorrect
         self.upload_error_message = t :upload_error_invalid_url, "Could not parse the URL: %{url}", :url => url
       when Timeout::Error

@@ -1025,7 +1025,7 @@ class Account < ActiveRecord::Base
     begin
       value, uri = CanvasHttp.validate_url(self.settings[:auth_discovery_url])
       self.auth_discovery_url = value
-    rescue URI::InvalidURIError, ArgumentError
+    rescue URI::Error, ArgumentError
       errors.add(:discovery_url, t('errors.invalid_discovery_url', "The discovery URL is not valid" ))
     end
   end
@@ -1483,7 +1483,7 @@ class Account < ActiveRecord::Base
   def format_referer(referer_url)
     begin
       referer = URI(referer_url || '')
-    rescue URI::InvalidURIError
+    rescue URI::Error
       return
     end
     return unless referer.host

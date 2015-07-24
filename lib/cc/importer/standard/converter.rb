@@ -156,7 +156,7 @@ module CC::Importer::Standard
                   end
                 end
               end
-            rescue URI::InvalidURIError
+            rescue URI::Error
               Rails.logger.warn "attempting to translate invalid url: #{val}"
             end
           end

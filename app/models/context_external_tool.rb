@@ -184,7 +184,7 @@ class ContextExternalTool < ActiveRecord::Base
     begin
       value, uri = CanvasHttp.validate_url(self.vendor_help_link)
       self.vendor_help_link = uri.to_s
-    rescue URI::InvalidURIError, ArgumentError
+    rescue URI::Error, ArgumentError
       self.vendor_help_link = nil
     end
   end
@@ -225,7 +225,7 @@ class ContextExternalTool < ActiveRecord::Base
     converter = CC::Importer::BLTIConverter.new
     tool_hash = if config_type == 'by_url'
                   uri = URI.parse(config_url)
-                  raise URI::InvalidURIError unless uri.host && uri.port
+                  raise URI::Error unless uri.host && uri.port
                   converter.retrieve_and_convert_blti_url(config_url)
                 else
                   converter.convert_blti_xml(config_xml)
@@ -240,7 +240,7 @@ class ContextExternalTool < ActiveRecord::Base
     self.name = real_name unless real_name.blank?
   rescue CC::Importer::BLTIConverter::CCImportError => e
     @config_errors << [error_field, e.message]
-  rescue URI::InvalidURIError
+  rescue URI::Error
     @config_errors << [:config_url, "Invalid URL"]
   rescue ActiveRecord::RecordInvalid => e
     @config_errors += Array(e.record.errors)

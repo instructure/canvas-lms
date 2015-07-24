@@ -71,7 +71,7 @@ class ImportedHtmlConverter
 
   def self.relative_url?(url)
     URI.parse(url).relative? && !url.to_s.start_with?("//")
-  rescue URI::InvalidURIError
+  rescue URI::Error
     # leave the url as it was
     Rails.logger.warn "attempting to translate invalid url: #{url}"
     false

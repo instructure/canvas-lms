@@ -69,7 +69,7 @@ module HtmlTextHelper
              if src
                begin
                  src = URI.join(opts[:base_url], src) if opts[:base_url]
-               rescue URI::InvalidURIError
+               rescue URI::Error
                  # do nothing, let src pass through as is
                end
                node['alt'] ? "[#{node['alt']}](#{src})" : src
@@ -86,7 +86,7 @@ module HtmlTextHelper
                if href
                  begin
                    href = URI.join(opts[:base_url], href) if opts[:base_url]
-                 rescue URI::InvalidURIError
+                 rescue URI::Error
                    # do nothing, let href pass through as is
                  end
                  href == subtext ? subtext : "[#{subtext}](#{href})"

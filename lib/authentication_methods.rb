@@ -235,7 +235,7 @@ module AuthenticationMethods
     return nil if url.blank?
     begin
       uri = URI.parse(url)
-    rescue URI::InvalidURIError
+    rescue URI::Error
       return nil
     end
     return nil unless uri.path[0] == '/'
