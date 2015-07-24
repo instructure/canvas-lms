@@ -16,79 +16,7 @@ describe "account" do
     end
   end
 
-  describe "authentication configs" do
-
-    it "should allow setting up a secondary ldap server" do
-      get "/accounts/#{Account.default.id}/authentication_providers"
-      add_auth_type('LDAP')
-      ldap_form = f('#new_ldap')
-      expect(ldap_form).to be_displayed
-
-      ldap_form.find_element(:id, 'authentication_provider_auth_host').send_keys('primary.host.example.com')
-      ldap_form.find_element(:id, 'authentication_provider_auth_port').send_keys('1')
-      ldap_form.find_element(:id, 'authentication_provider_auth_over_tls_simple_tls').click
-      ldap_form.find_element(:id, 'authentication_provider_auth_base').send_keys('primary base')
-      ldap_form.find_element(:id, 'authentication_provider_auth_filter').send_keys('primary filter')
-      ldap_form.find_element(:id, 'authentication_provider_auth_username').send_keys('primary username')
-      ldap_form.find_element(:id, 'authentication_provider_auth_password').send_keys('primary password')
-      submit_form(ldap_form)
-
-      keep_trying_until { expect(Account.default.authentication_providers.length).to eq 1 }
-      config = Account.default.authentication_providers.first
-      expect(config.auth_host).to eq 'primary.host.example.com'
-      expect(config.auth_port).to eq 1
-      expect(config.auth_over_tls).to eq 'simple_tls'
-      expect(config.auth_base).to eq 'primary base'
-      expect(config.auth_filter).to eq 'primary filter'
-      expect(config.auth_username).to eq 'primary username'
-      expect(config.auth_decrypted_password).to eq 'primary password'
-
-      # now add a secondary ldap config
-      add_auth_type("LDAP")
-      ldap_form = f('#ldap_form form')
-      ldap_form.find_element(:id, 'authentication_provider_auth_host').send_keys('secondary.host.example.com')
-      ldap_form.find_element(:id, 'authentication_provider_auth_port').send_keys('2')
-      ldap_form.find_element(:id, 'authentication_provider_auth_base').send_keys('secondary base')
-      ldap_form.find_element(:id, 'authentication_provider_auth_filter').send_keys('secondary filter')
-      ldap_form.find_element(:id, 'authentication_provider_auth_username').send_keys('secondary username')
-      ldap_form.find_element(:id, 'authentication_provider_auth_password').send_keys('secondary password')
-      ldap_form.find_element(:id, 'authentication_provider_auth_over_tls_start_tls').click
-      submit_form(ldap_form)
-
-      keep_trying_until { expect(Account.default.authentication_providers.length).to eq 2 }
-      config = Account.default.authentication_providers.first
-      expect(config.auth_host).to eq 'primary.host.example.com'
-      expect(config.auth_over_tls).to eq 'simple_tls'
-
-      config = Account.default.authentication_providers[1]
-      expect(config.auth_host).to eq 'secondary.host.example.com'
-      expect(config.auth_port).to eq 2
-      expect(config.auth_over_tls).to eq 'start_tls'
-      expect(config.auth_base).to eq 'secondary base'
-      expect(config.auth_filter).to eq 'secondary filter'
-      expect(config.auth_username).to eq 'secondary username'
-      expect(config.auth_decrypted_password).to eq 'secondary password'
-
-      # test removing the secondary config
-      config = Account.default.authentication_providers.last
-      scroll_page_to_bottom
-      delete_id = "#delete-aac-#{config.id}"
-      keep_trying_until { driver.find_element(css: delete_id).displayed? }
-      expect_new_page_load(true) do
-        f(delete_id).click
-      end
-
-      keep_trying_until do
-        expect(Account.default.authentication_providers.active.length).to eq 1
-      end
-
-      # test removing the entire config
-      expect_new_page_load(true) do
-        f('.delete_auth_link').click
-      end
-
-      expect(Account.default.authentication_providers.active.length).to eq 0
-    end
+  describe "course and term create/update" do
 
     it "should show Login and Email fields in add user dialog for delegated auth accounts" do
       get "/accounts/#{Account.default.id}/users"
@@ -103,56 +31,6 @@ describe "account" do
       dialog = f("#add_user_dialog")
       expect(dialog.find_element(:id, "pseudonym_path")).to be_displayed
       expect(dialog.find_element(:id, "pseudonym_unique_id")).to be_displayed
-    end
-
-    it "should be able to set login labels for delegated auth accounts" do
-      get "/accounts/#{Account.default.id}/authentication_providers"
-      add_auth_type("CAS")
-      f("#authentication_provider_auth_base").send_keys("cas.example.com")
-      expect_new_page_load { submit_form('#cas_form form') }
-
-      expect(f("#sso_settings_login_handle_name")).to be_displayed
-      f("#sso_settings_login_handle_name").send_keys("CAS Username")
-      expect_new_page_load { submit_form('#edit_sso_settings') }
-
-      get "/accounts/#{Account.default.id}/users"
-      f(".add_user_link").click
-      dialog = f("#add_user_dialog")
-      expect(dialog.find_element(:css, 'label[for="pseudonym_unique_id"]').text).to eq "CAS Username: *"
-    end
-
-    context "cas" do
-      it "should be able to set unknown user url option" do
-        get "/accounts/#{Account.default.id}/authentication_providers"
-        add_auth_type("CAS")
-
-        expect_new_page_load { submit_form('#cas_form form') }
-
-        unknown_user_url = 'https://example.com/unknown_user'
-        f("#sso_settings_unknown_user_url").send_keys(unknown_user_url)
-
-        expect_new_page_load { submit_form('#edit_sso_settings') }
-
-        expect(Account.default.unknown_user_url).to eq unknown_user_url
-      end
-    end
-
-    context "saml" do
-      it "should be able to set unknown user url option" do
-        get "/accounts/#{Account.default.id}/authentication_providers"
-        add_auth_type("SAML")
-
-        expect(f("#authentication_provider_idp_entity_id")).to be_displayed
-
-        expect_new_page_load { submit_form('#saml_form form') }
-
-        unknown_user_url = 'https://example.com/unknown_user'
-        f("#sso_settings_unknown_user_url").send_keys(unknown_user_url)
-
-        expect_new_page_load { submit_form('#edit_sso_settings') }
-
-        expect(Account.default.unknown_user_url).to eq unknown_user_url
-      end
     end
 
     it "should be able to create a new course" do
@@ -268,64 +146,6 @@ describe "account" do
           :teacher_enrollment => ["term start", "term end"],
           :ta_enrollment => ["Jul 4", "Jul 28"]
       })
-    end
-
-    it "should load/refresh SAML debug info" do
-      enable_cache do
-        aac = Account.default.authentication_providers.create!(auth_type: 'saml')
-        get "/accounts/#{Account.default.id}/authentication_providers"
-
-        start = f("#start_saml_debugging")
-        refresh = f("#refresh_saml_debugging")
-        stop = f("#stop_saml_debugging")
-
-        start.click
-        wait_for_ajax_requests
-
-        debug_info = f("#saml_debug_info")
-        expect(debug_info.text).to match /Waiting for attempted login/
-
-        aac.debugging_keys.each_with_index do |key, i|
-          aac.debug_set(key, "testvalue#{i}")
-        end
-
-        refresh.click
-        wait_for_ajax_requests
-
-        debug_info = f("#saml_debug_info")
-
-        aac.debugging_keys.each_with_index do |key, i|
-          expect(debug_info.text).to match /testvalue#{i}/
-        end
-
-        stop.click
-        wait_for_ajax_requests
-        expect(aac.debugging?).to eq false
-
-        aac.debugging_keys.each do |key|
-          expect(aac.debug_get(key)).to eq nil
-        end
-      end
-    end
-
-    it "should configure discovery_url" do
-      auth_url = "http://example.com"
-      @account = Account.default
-      @account.authentication_providers.create!(auth_type: 'saml')
-      @account.authentication_providers.create!(auth_type: 'saml')
-      get "/accounts/#{Account.default.id}/authentication_providers"
-      f("#sso_settings_auth_discovery_url").send_keys(auth_url)
-      expect_new_page_load { submit_form("#edit_sso_settings") }
-
-      @account.reload
-      expect(@account.auth_discovery_url).to eq auth_url
-
-      f("#sso_settings_auth_discovery_url").clear()
-      expect_new_page_load { submit_form("#edit_sso_settings") }
-
-      expect(f("#sso_settings_auth_discovery_url").attribute(:value)).to eq ''
-      @account.reload
-      expect(@account.auth_discovery_url).to eq nil
     end
   end
 
