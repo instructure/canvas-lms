@@ -333,5 +333,24 @@ describe ContentMigration do
       expect(cal_2.start_at.utc).to eq cal.start_at.utc
     end
 
+    it "should not clear destination course dates" do
+      start_at = 1.day.ago
+      conclude_at = 2.days.from_now
+      @copy_to.start_at = start_at
+      @copy_to.conclude_at = conclude_at
+      @copy_to.save!
+      options = {
+        :everything => true,
+        :remove_dates => true,
+      }
+      @cm.copy_options = options
+      @cm.save!
+
+      run_course_copy
+
+      @copy_to.reload
+      expect(@copy_to.start_at).to eq start_at
+      expect(@copy_to.conclude_at).to eq conclude_at
+    end
   end
 end
