@@ -890,7 +890,7 @@ RSpec.configure do |config|
       klass.connection.bulk_insert klass.table_name, records
       scope = klass.order("id DESC").limit(records.size)
       return_type == :record ?
-        scope.all.reverse :
+        scope.to_a.reverse :
         scope.pluck(:id).reverse
     end
   end

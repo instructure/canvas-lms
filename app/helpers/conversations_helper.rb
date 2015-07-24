@@ -11,14 +11,14 @@ module ConversationsHelper
 
     if audience.size == 1 && include_private_conversation_enrollments
       enrollments = Shard.partition_by_shard(result[:courses].keys) do |course_ids|
-        Enrollment.where(course_id: course_ids, user_id: audience.first.id, workflow_state: 'active').select([:course_id, :type]).all
+        Enrollment.where(course_id: course_ids, user_id: audience.first.id, workflow_state: 'active').select([:course_id, :type]).to_a
       end
       enrollments.each do |enrollment|
         result[:courses][enrollment.course_id] << enrollment.type
       end
 
       memberships = Shard.partition_by_shard(result[:groups].keys) do |group_ids|
-        GroupMembership.where(group_id: result[:groups].keys, user_id: audience.first.id, workflow_state: 'accepted').select(:group_id).all
+        GroupMembership.where(group_id: result[:groups].keys, user_id: audience.first.id, workflow_state: 'accepted').select(:group_id).to_a
       end
       memberships.each do |membership|
         result[:groups][membership.group_id] = ['Member']

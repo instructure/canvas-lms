@@ -116,7 +116,7 @@ class CollaborationsController < ApplicationController
 
   def create
     return unless authorized_action(@context.collaborations.build, @current_user, :create)
-    users     = User.where(:id => Array(params[:user])).all
+    users     = User.where(:id => Array(params[:user])).to_a
     group_ids = Array(params[:group])
     params[:collaboration][:user] = @current_user
     @collaboration = Collaboration.typed_collaboration_instance(params[:collaboration].delete(:collaboration_type))
@@ -140,7 +140,7 @@ class CollaborationsController < ApplicationController
     @collaboration = @context.collaborations.find(params[:id])
     return unless authorized_action(@collaboration, @current_user, :update)
     begin
-      users     = User.where(:id => Array(params[:user])).all
+      users     = User.where(:id => Array(params[:user])).to_a
       group_ids = Array(params[:group])
       params[:collaboration].delete :collaboration_type
       @collaboration.attributes = params[:collaboration]

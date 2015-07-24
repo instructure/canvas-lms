@@ -131,7 +131,7 @@ class AuthenticationAuditApiController < AuditorApiController
         Account.joins(:pseudonyms).where(:pseudonyms => {
           :user_id => @user,
           :workflow_state => 'active'
-        }).all
+        }).to_a
       end
       visible_accounts = accounts.select{ |a| account_visible(a) }
       if visible_accounts == accounts
@@ -139,7 +139,7 @@ class AuthenticationAuditApiController < AuditorApiController
         render_events(events, @user)
       elsif visible_accounts.present?
         pseudonyms = Shard.partition_by_shard(visible_accounts) do |shard_accounts|
-          Pseudonym.active.where(user_id: @user, account_id: shard_accounts).all
+          Pseudonym.active.where(user_id: @user, account_id: shard_accounts).to_a
         end
         events = Auditors::Authentication.for_pseudonyms(pseudonyms, query_options)
         render_events(events, @user)

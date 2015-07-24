@@ -72,7 +72,7 @@ describe 'simply_versioned' do
       woozel.name = 'Piglet'
       woozel.with_versioning(&:save!)
       expect(woozel.versions.loaded?).to eq false
-      all = woozel.versions.all
+      all = woozel.versions.to_a
       Woozel.connection.expects(:select_all).never
       all.each do |version|
         expect(version.versionable).to eq woozel
@@ -142,7 +142,7 @@ describe 'simply_versioned' do
       end
     end
   end
-  
+
   # INSTRUCTURE: shim for quizzes namespacing
   describe '.versionable_type' do
     it 'returns the correct representation of a quiz submission' do

@@ -188,7 +188,7 @@ class ConferencesController < ApplicationController
     if @context.respond_to?(:participating_typical_users)
       scope = @context.participating_typical_users
     end
-    @users = scope.where("users.id<>?", @current_user).order(User.sortable_name_order_by_clause).all.uniq
+    @users = scope.where("users.id<>?", @current_user).order(User.sortable_name_order_by_clause).to_a.uniq
     # exposing the initial data as json embedded on page.
     js_env(
       current_conferences: ui_conferences_json(@new_conferences, @context, @current_user, session),

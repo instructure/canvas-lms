@@ -354,7 +354,7 @@ module ApplicationHelper
     # account_chain_ids is in the order we need to search for tools
     # unfortunately, the db will return an arbitrary one first.
     # so, we pull all the tools (probably will only have one anyway) and look through them here
-    tools = ContextExternalTool.active.where(:context_type => 'Account', :context_id => @context.account_chain, :tool_id => tool_id).all
+    tools = ContextExternalTool.active.where(:context_type => 'Account', :context_id => @context.account_chain, :tool_id => tool_id).to_a
     @context.account_chain.each do |account|
       tool = tools.find {|t| t.context_id == account.id}
       return tool if tool

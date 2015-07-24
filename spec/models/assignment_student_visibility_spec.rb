@@ -171,7 +171,7 @@ describe "differentiated_assignments" do
 
         it "should not return a visibility if ADHOC override is deleted" do
           student_in_course_with_adhoc_override(@assignment)
-          @assignment.assignment_overrides.all.each(&:destroy)
+          @assignment.assignment_overrides.each(&:destroy)
           ensure_user_does_not_see_assignment
         end
       end
@@ -228,7 +228,7 @@ describe "differentiated_assignments" do
           end
           it "should update when the override is deleted" do
             ensure_user_sees_assignment
-            @assignment.assignment_overrides.all.each(&:destroy!)
+            @assignment.assignment_overrides.each(&:destroy!)
             ensure_user_does_not_see_assignment
           end
           it "should not return duplicate visibilities with multiple visible sections" do

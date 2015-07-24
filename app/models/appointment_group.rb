@@ -466,7 +466,7 @@ class AppointmentGroup < ActiveRecord::Base
     @contexts_for_user[user.global_id] = begin
       context_codes = context_codes_for_user(user)
       course_ids = appointment_group_contexts.select{|agc| context_codes.include? agc.context_code }.map(&:context_id)
-      Course.where(:id => course_ids).all
+      Course.where(:id => course_ids).to_a
     end
   end
 

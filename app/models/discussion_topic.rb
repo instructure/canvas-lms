@@ -334,7 +334,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def update_participants_read_state(current_user, new_state, update_fields)
     entry_ids = discussion_entries.pluck(:id)
-    existing_entry_participants = DiscussionEntryParticipant.existing_participants(current_user, entry_ids).all
+    existing_entry_participants = DiscussionEntryParticipant.existing_participants(current_user, entry_ids).to_a
     update_or_create_participant(current_user: current_user,
       new_state: new_state,
       new_count: new_state == 'unread' ? self.default_unread_count : 0)

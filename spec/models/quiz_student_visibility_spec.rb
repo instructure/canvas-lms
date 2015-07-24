@@ -172,7 +172,7 @@ describe "differentiated_assignments" do
 
         it "should not return a visibility if ADHOC override is deleted" do
           student_in_course_with_adhoc_override(@quiz)
-          @quiz.assignment_overrides.all.each(&:destroy)
+          @quiz.assignment_overrides.to_a.each(&:destroy)
           ensure_user_does_not_see_quiz
         end
       end
@@ -221,7 +221,7 @@ describe "differentiated_assignments" do
         end
         it "should update when the override is deleted" do
           ensure_user_sees_quiz
-          @quiz.assignment_overrides.all.each(&:destroy!)
+          @quiz.assignment_overrides.to_a.each(&:destroy!)
           ensure_user_does_not_see_quiz
         end
       end

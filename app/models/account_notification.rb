@@ -108,7 +108,7 @@ class AccountNotification < ActiveRecord::Base
       Shard.partition_by_shard([Account.site_admin, account]) do |accounts|
         AccountNotification.where("account_id IN (?) AND start_at <? AND end_at>?", accounts, now, now).
           where("required_account_service IS NULL OR required_account_service IN (?)", enabled_flags).
-          order('start_at DESC').all
+          order('start_at DESC').to_a
       end
     end
   end

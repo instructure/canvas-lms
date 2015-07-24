@@ -521,7 +521,7 @@ describe "Folders API", type: :request do
 
       copy = Folder.find(json['id'])
       expect(copy.parent_folder).to eq(@dest_folder)
-      contents = copy.active_file_attachments.all
+      contents = copy.active_file_attachments.to_a
       expect(contents.size).to eq 1
       expect(contents.first.root_attachment).to eq @file
     end

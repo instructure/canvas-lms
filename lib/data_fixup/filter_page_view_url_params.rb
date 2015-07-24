@@ -9,7 +9,7 @@ module DataFixup::FilterPageViewUrlParams
 
   def self.run_for_db
     scope = PageView.select("request_id, url, created_at").order('request_id').limit(batch_size)
-    records = scope.all
+    records = scope.to_a
     while records.any?
       last_request_id = nil
       records.each do |pv|
@@ -17,7 +17,7 @@ module DataFixup::FilterPageViewUrlParams
         PageView.where(request_id: pv.request_id).update_all(url: pv.url) if pv.url_changed?
       end
       last_request_id = records.last.request_id
-      records = scope.where("request_id > ?", last_request_id).all
+      records = scope.where("request_id > ?", last_request_id).to_a
     end
   end
 

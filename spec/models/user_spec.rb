@@ -1999,15 +1999,15 @@ describe User do
     end
 
     it "should sort lexicographically" do
-      expect(User.order_by_sortable_name.where(id: ids).all.map(&:sortable_name)).to eq ["John, John", "Johnson, John"]
+      expect(User.order_by_sortable_name.where(id: ids).map(&:sortable_name)).to eq ["John, John", "Johnson, John"]
     end
 
     it "should sort support direction toggle" do
-      expect(User.order_by_sortable_name(:direction => :descending).where(id: ids).all.map(&:sortable_name)).to eq ["Johnson, John", "John, John"]
+      expect(User.order_by_sortable_name(:direction => :descending).where(id: ids).map(&:sortable_name)).to eq ["Johnson, John", "John, John"]
     end
 
     it "should sort support direction toggle with a prior select" do
-      expect(User.select([:id, :sortable_name]).order_by_sortable_name(:direction => :descending).where(id: ids).all.map(&:sortable_name)).to eq ["Johnson, John", "John, John"]
+      expect(User.select([:id, :sortable_name]).order_by_sortable_name(:direction => :descending).where(id: ids).map(&:sortable_name)).to eq ["Johnson, John", "John, John"]
     end
 
     it "should sort by the current locale with pg_collkey if possible" do

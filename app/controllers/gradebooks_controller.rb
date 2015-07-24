@@ -137,7 +137,7 @@ class GradebooksController < ApplicationController
     @enrollment ||= @context.all_student_enrollments.where(user_id: @current_user).first if !@context.grants_right?(@current_user, session, :manage_grades)
     add_crumb t(:crumb, 'Attendance')
     if !@enrollment && @context.grants_right?(@current_user, session, :manage_grades)
-      @assignments = @context.assignments.active.where(:submission_types => 'attendance').all
+      @assignments = @context.assignments.active.where(:submission_types => 'attendance').to_a
       @students = @context.students_visible_to(@current_user).order_by_sortable_name
       @at_least_one_due_at = @assignments.any?{|a| a.due_at }
       # Find which assignment group most attendance items belong to,
@@ -145,7 +145,7 @@ class GradebooksController < ApplicationController
       # in the list...
       @default_group_id = @assignments.to_a.inject(Hash.new(0)){|h,a| h[a.assignment_group_id] += 1; h}.sort_by{|id, cnt| cnt }.reverse.first[0] rescue nil
     elsif @enrollment && @enrollment.grants_right?(@current_user, session, :read_grades)
-      @assignments = @context.assignments.active.where(:submission_types => 'attendance').all
+      @assignments = @context.assignments.active.where(:submission_types => 'attendance').to_a
       @students = @context.students_visible_to(@current_user).order_by_sortable_name
       @submissions = @context.submissions.where(user_id: @enrollment.user_id).to_a
       @user = @enrollment.user

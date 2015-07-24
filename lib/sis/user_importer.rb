@@ -201,7 +201,7 @@ module SIS
               else
                 ccs = user.communication_channels
               end
-              ccs = ccs.email.by_path(email).all
+              ccs = ccs.email.by_path(email).to_a
 
               # sis_cc could be set from the previous user, if we're not on a transaction boundary,
               # and the previous user had an sis communication channel, and this user doesn't have one

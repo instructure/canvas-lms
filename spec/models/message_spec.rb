@@ -197,7 +197,7 @@ describe Message do
         ne = mock()
         ne.expects(:push_json).returns(false)
         ne.expects(:destroy)
-        @user.expects(:notification_endpoints).returns(mock(all: [ne]))
+        @user.expects(:notification_endpoints).returns([ne])
 
         message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :path_type => 'push', :user => @user)
         @message.deliver
@@ -207,7 +207,7 @@ describe Message do
         ne = mock()
         ne.expects(:push_json).twice.returns(true)
         ne.expects(:destroy).never
-        @user.expects(:notification_endpoints).returns(mock(all: [ne, ne]))
+        @user.expects(:notification_endpoints).returns([ne, ne])
 
         message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :path_type => 'push', :user => @user)
         @message.deliver

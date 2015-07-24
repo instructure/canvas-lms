@@ -2042,7 +2042,7 @@ describe Assignment do
       expect(res.find{|s| s.user == @u1}.submission_comments).not_to be_empty
       expect(res.find{|s| s.user == @u2}.submission_comments).not_to be_empty
       # all the comments should have the same group_comment_id, for deletion
-      comments = SubmissionComment.for_assignment_id(@a.id).all
+      comments = SubmissionComment.for_assignment_id(@a.id).to_a
       expect(comments.size).to eq 2
       group_comment_id = comments[0].group_comment_id
       expect(group_comment_id).to be_present
@@ -2491,21 +2491,21 @@ describe Assignment do
 
     it "should include assignments with no locks" do
       @quiz.save!
-      list = Assignment.not_locked.all
+      list = Assignment.not_locked.to_a
       expect(list.size).to eql 1
       expect(list.first.title).to eql 'Test Assignment'
     end
     it "should include assignments with unlock_at in the past" do
       @quiz.unlock_at = 1.day.ago
       @quiz.save!
-      list = Assignment.not_locked.all
+      list = Assignment.not_locked.to_a
       expect(list.size).to eql 1
       expect(list.first.title).to eql 'Test Assignment'
     end
     it "should include assignments where lock_at is future" do
       @quiz.lock_at = 1.day.from_now
       @quiz.save!
-      list = Assignment.not_locked.all
+      list = Assignment.not_locked.to_a
       expect(list.size).to eql 1
       expect(list.first.title).to eql 'Test Assignment'
     end
@@ -2513,7 +2513,7 @@ describe Assignment do
       @quiz.unlock_at = 1.day.ago
       @quiz.lock_at = 1.day.from_now
       @quiz.save!
-      list = Assignment.not_locked.all
+      list = Assignment.not_locked.to_a
       expect(list.size).to eql 1
       expect(list.first.title).to eql 'Test Assignment'
     end
@@ -2732,7 +2732,7 @@ describe Assignment do
 
       it "prefers people who aren't excused" do
         g1, _ = @groups
-        g1rep, *others = g1.users.all.shuffle
+        g1rep, *others = g1.users.to_a.shuffle
         others.each { |u|
           @assignment.grade_student(u, excuse: true)
         }

@@ -949,7 +949,7 @@ class Assignment < ActiveRecord::Base
         .where(Course.reflections[:student_enrollments].options[:conditions])
         .order("users.id") # this helps with preventing deadlock with other things that touch lots of users
         .uniq
-        .all
+        .to_a
     end
     [group, students]
   end
@@ -1419,7 +1419,7 @@ class Assignment < ActiveRecord::Base
   # name.  for non-group assignments this just returns all visible users
   def representatives(user)
     if grade_as_group?
-      submissions = self.submissions.includes(:user).all
+      submissions = self.submissions.includes(:user).to_a
       users_with_submissions = submissions.select(&:has_submission?).map(&:user)
       users_with_turnitin_data = if turnitin_enabled?
                                    submissions

@@ -206,7 +206,7 @@ module Api::V1::DiscussionTopics
   # Returns a hash.
   def discussion_entry_subentries(entry, user, context, session, includes)
     return {} unless includes.include?(:subentries) && entry.root_entry_id.nil?
-    replies = entry.flattened_discussion_subentries.active.newest_first.limit(11).all
+    replies = entry.flattened_discussion_subentries.active.newest_first.limit(11).to_a
 
     if replies.empty?
       {}

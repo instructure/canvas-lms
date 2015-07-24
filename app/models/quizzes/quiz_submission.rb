@@ -382,7 +382,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def quiz_questions
-    Quizzes::QuizQuestion.where(id: quiz_question_ids).all
+    Quizzes::QuizQuestion.where(id: quiz_question_ids).to_a
   end
 
   def update_quiz_points_possible

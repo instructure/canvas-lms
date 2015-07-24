@@ -62,7 +62,7 @@ class MessageableUser
         user_ids = users.first.is_a?(User) ? users.map(&:id) : users
         users = Shard.partition_by_shard(user_ids) do |shard_user_ids|
          MessageableUser.prepped(scope_options).
-            where(:id => shard_user_ids).all
+            where(:id => shard_user_ids).to_a
         end
         return [] unless users
       end
@@ -125,7 +125,7 @@ class MessageableUser
     # directed at. it may be confusing, however, to those not expecting it.
     def messageable_users_in_context(asset_string, options={})
       scope = messageable_users_in_context_scope(asset_string, options)
-      scope ? scope.all : []
+      scope ? scope.to_a : []
     end
 
     def count_messageable_users_in_context(asset_string, options={})
@@ -135,7 +135,7 @@ class MessageableUser
 
     def messageable_users_in_course(course_or_id, options={})
       scope = messageable_users_in_course_scope(course_or_id, options[:enrollment_types], options)
-      scope ? scope.all : []
+      scope ? scope.to_a : []
     end
 
     def count_messageable_users_in_course(course_or_id, options={})
@@ -145,7 +145,7 @@ class MessageableUser
 
     def messageable_users_in_section(section_or_id, options={})
       scope = messageable_users_in_section_scope(section_or_id, options[:enrollment_types], options)
-      scope ? scope.all : []
+      scope ? scope.to_a : []
     end
 
     def count_messageable_users_in_section(section_or_id, options={})
@@ -155,7 +155,7 @@ class MessageableUser
 
     def messageable_users_in_group(group_or_id, options={})
       scope = messageable_users_in_group_scope(group_or_id, options)
-      scope ? scope.all : []
+      scope ? scope.to_a : []
     end
 
     def count_messageable_users_in_group(group_or_id, options={})

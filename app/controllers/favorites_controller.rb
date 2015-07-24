@@ -59,13 +59,13 @@ class FavoritesController < ApplicationController
   # @returns [Course]
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/users/self/favorites/courses \ 
+  #     curl https://<canvas>/api/v1/users/self/favorites/courses \
   #       -H 'Authorization: Bearer <ACCESS_TOKEN>'
   #
   def list_favorite_courses
     includes = Set.new(Array(params[:include]))
     render :json => @current_user.menu_courses.map { |course|
-      enrollments = course.current_enrollments.where(:user_id => @current_user).all
+      enrollments = course.current_enrollments.where(:user_id => @current_user).to_a
       course_json(course, @current_user, session, includes, enrollments)
     }
   end
@@ -81,9 +81,9 @@ class FavoritesController < ApplicationController
   # @returns Favorite
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/users/self/favorites/courses/1170 \ 
-  #       -X POST \ 
-  #       -H 'Authorization: Bearer <ACCESS_TOKEN>' \ 
+  #     curl https://<canvas>/api/v1/users/self/favorites/courses/1170 \
+  #       -X POST \
+  #       -H 'Authorization: Bearer <ACCESS_TOKEN>' \
   #       -H 'Content-Length: 0'
   #
   def add_favorite_course
@@ -109,8 +109,8 @@ class FavoritesController < ApplicationController
   # @returns Favorite
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/users/self/favorites/courses/1170 \ 
-  #       -X DELETE \ 
+  #     curl https://<canvas>/api/v1/users/self/favorites/courses/1170 \
+  #       -X DELETE \
   #       -H 'Authorization: Bearer <ACCESS_TOKEN>'
   #
   def remove_favorite_course
@@ -136,8 +136,8 @@ class FavoritesController < ApplicationController
   # automatically generated list of enrolled courses
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/users/self/favorites/courses \ 
-  #       -X DELETE \ 
+  #     curl https://<canvas>/api/v1/users/self/favorites/courses \
+  #       -X DELETE \
   #       -H 'Authorization: Bearer <ACCESS_TOKEN>'
   #
   def reset_course_favorites

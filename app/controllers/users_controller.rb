@@ -1935,8 +1935,8 @@ class UsersController < ApplicationController
         includes(:assignment).
         where("user_id IN (?) AND #{Submission.needs_grading_conditions}", ids).
         except(:order).
-        order(:submitted_at).
-        all
+        order(:submitted_at).to_a
+
 
     ungraded_submissions.each do |submission|
       next unless student = data[submission.user_id]

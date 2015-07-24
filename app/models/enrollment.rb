@@ -149,7 +149,7 @@ class Enrollment < ActiveRecord::Base
   after_create :update_needs_grading_count, if: :active_student?
   after_update :update_needs_grading_count, if: :active_student_changed?
   def update_needs_grading_count
-    connection.after_transaction_commit do
+    self.class.connection.after_transaction_commit do
       adjust_needs_grading_count(active_student? ? :increment : :decrement)
     end
   end

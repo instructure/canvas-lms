@@ -412,8 +412,7 @@ class Course < ActiveRecord::Base
         course_ids = courses_or_course_ids
         courses = Course.where(:id => course_ids).
             includes(:course_sections => [:course, :nonxlist_course]).
-            select([:id, :account_id]).
-            all
+            select([:id, :account_id]).to_a
       end
       course_ids_to_update_user_account_associations = []
       CourseAccountAssociation.transaction do
@@ -502,7 +501,7 @@ class Course < ActiveRecord::Base
   end
 
   def associated_accounts
-    accounts = self.non_unique_associated_accounts.all.uniq.to_a
+    accounts = self.non_unique_associated_accounts.to_a.uniq
     accounts << self.account if account_id && !accounts.find { |a| a.id == account_id }
     accounts << self.root_account if root_account_id && !accounts.find { |a| a.id == root_account_id }
     accounts
@@ -1209,7 +1208,7 @@ class Course < ActiveRecord::Base
 
   def self.find_all_by_context_code(codes)
     ids = codes.map{|c| c.match(/\Acourse_(\d+)\z/)[1] rescue nil }.compact
-    Course.where(:id => ids).includes(:current_enrollments).all
+    Course.where(:id => ids).includes(:current_enrollments).to_a
   end
 
   def end_at
@@ -1281,7 +1280,7 @@ class Course < ActiveRecord::Base
       if account_chain_ids == [Account.site_admin.id]
         Account.site_admin.account_users_for(user)
       else
-        AccountUser.where(:account_id => account_chain_ids, :user_id => user).all
+        AccountUser.where(:account_id => account_chain_ids, :user_id => user).to_a
       end
     end
     @account_users[user.global_id] ||= []
@@ -1508,7 +1507,7 @@ class Course < ActiveRecord::Base
                 all_student_enrollments :
                 student_enrollments
             end
-    enrollments = scope.includes(includes).order_by_sortable_name.all
+    enrollments = scope.includes(includes).order_by_sortable_name.to_a
     enrollments.partition { |enrollment|
       enrollment.type != "StudentViewEnrollment"
     }.flatten
@@ -2059,7 +2058,7 @@ class Course < ActiveRecord::Base
     ce = options[:content_export]
     cm = options[:content_migration]
 
-    attachments = course.attachments.where("file_state <> 'deleted'").all
+    attachments = course.attachments.where("file_state <> 'deleted'").to_a
     total = attachments.count + 1
 
     Attachment.skip_media_object_creation do

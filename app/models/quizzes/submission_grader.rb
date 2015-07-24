@@ -121,7 +121,7 @@ module Quizzes
       return questions, ContentTag.learning_outcome_alignments.active.where(
           :content_type => 'AssessmentQuestionBank',
           :content_id => bank_ids).
-          includes(:learning_outcome, :context).all
+          includes(:learning_outcome, :context).to_a
     end
   end
 end

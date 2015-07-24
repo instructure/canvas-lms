@@ -6,8 +6,8 @@ module DataFixup::MoveAccountMembershipTypesToRoles
 
   Account.where("membership_types IS NOT NULL").select([:id, :membership_types]).
     find_in_batches do |accounts|
-      roles = Role.where(:account_id => accounts).select([:account_id, :name]).all
-      account_users = AccountUser.where(:account_id => accounts).select([:account_id, :membership_type]).uniq.all
+      roles = Role.where(:account_id => accounts).select([:account_id, :name]).to_a
+      account_users = AccountUser.where(:account_id => accounts).select([:account_id, :membership_type]).uniq.to_a
 
       accounts.each do |account|
         names = roles.select{|r| r.account_id == account.id}.collect(&:name) + Role::KNOWN_TYPES
@@ -44,7 +44,7 @@ module DataFixup::MoveAccountMembershipTypesToRoles
     RoleOverride.where("context_type='Account' AND enrollment_type NOT IN (?)", Role::KNOWN_TYPES).
                  uniq.
                  select([:context_id, :enrollment_type]).each_slice(500) do |role_overrides|
-      roles = Role.where(:account_id => role_overrides.collect(&:context_id).uniq).select([:account_id, :name]).all
+      roles = Role.where(:account_id => role_overrides.collect(&:context_id).uniq).select([:account_id, :name]).to_a
 
       role_overrides_to_add_for = role_overrides.select{|ro| roles.find{|r| r.account_id == ro.context_id && r.name == ro.enrollment_type}.nil?}
       role_overrides_to_add_for.each do |ro|

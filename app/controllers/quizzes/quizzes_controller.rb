@@ -544,7 +544,7 @@ class Quizzes::QuizzesController < ApplicationController
       end
       students = student_scope.order_by_sortable_name.to_a.uniq
 
-      @submissions_from_users = @quiz.quiz_submissions.for_user_ids(students.map(&:id)).not_settings_only.all
+      @submissions_from_users = @quiz.quiz_submissions.for_user_ids(students.map(&:id)).not_settings_only.to_a
 
       @submissions_from_users = Hash[@submissions_from_users.map { |s| [s.user_id,s] }]
 

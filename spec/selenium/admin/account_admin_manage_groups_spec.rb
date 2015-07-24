@@ -140,7 +140,7 @@ describe "account admin manage groups" do
       confirm_dialog.accept
       wait_for_ajaximations
       expect(driver.find_elements(:css, ".left_side .group")).to be_empty
-      expect(@admin_account.group_categories.all.count).to eq 0
+      expect(@admin_account.group_categories.count).to eq 0
     end
 
     it "should edit an individual group" do

@@ -341,7 +341,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def self.update_for(asset)
-    tags = ContentTag.where(:content_id => asset, :content_type => asset.class.to_s).not_deleted.select([:id, :tag_type, :content_type, :context_module_id]).all
+    tags = ContentTag.where(:content_id => asset, :content_type => asset.class.to_s).not_deleted.select([:id, :tag_type, :content_type, :context_module_id]).to_a
     module_ids = tags.map(&:context_module_id).compact
 
     # update title

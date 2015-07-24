@@ -331,7 +331,7 @@ class Group < ActiveRecord::Base
   def bulk_add_users_to_group(users, options = {})
     return if users.empty?
     user_ids = users.map(&:id)
-    old_group_memberships = self.group_memberships.where("user_id IN (?)", user_ids).all
+    old_group_memberships = self.group_memberships.where("user_id IN (?)", user_ids).to_a
     bulk_insert_group_memberships(users, options)
     all_group_memberships = self.group_memberships.where("user_id IN (?)", user_ids)
     new_group_memberships = all_group_memberships - old_group_memberships
@@ -391,7 +391,7 @@ class Group < ActiveRecord::Base
 
   def peer_groups
     return [] if !self.context || !self.group_category || self.group_category.allows_multiple_memberships?
-    self.group_category.groups.where("id<>?", self).all
+    self.group_category.groups.where("id<>?", self).to_a
   end
 
   def migrate_content_links(html, from_course)

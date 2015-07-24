@@ -314,7 +314,7 @@ class SubmissionsApiController < ApplicationController
     if params[:grading_period_id].present? && multiple_grading_periods?
       assignments = GradingPeriod.active.find(params[:grading_period_id]).assignments(assignment_scope)
     else
-      assignments = assignment_scope.all
+      assignments = assignment_scope.to_a
     end
 
     assignment_visibilities = {}
@@ -344,7 +344,7 @@ class SubmissionsApiController < ApplicationController
                       Submission.where(
                         :user_id => student_ids,
                         :assignment_id => assignments
-                      ).all
+                      ).to_a
                     else
                       Submission.joins(:assignment).where(
                         :user_id => student_ids,
@@ -352,7 +352,7 @@ class SubmissionsApiController < ApplicationController
                         "assignments.context_id" => @context.id
                       ).where(
                         "assignments.workflow_state != 'deleted'"
-                      ).all
+                      ).to_a
                     end
       bulk_load_attachments_and_previews(submissions)
       submissions_for_user = submissions.group_by(&:user_id)
@@ -632,7 +632,7 @@ class SubmissionsApiController < ApplicationController
           comment.slice(:media_comment_id, :media_comment_type, :group_comment)
         ).with_indifferent_access
         if file_ids = params[:comment][:file_ids]
-          attachments = Attachment.where(id: file_ids).all
+          attachments = Attachment.where(id: file_ids).to_a
           attachable = attachments.all? { |a|
             a.grants_right?(@current_user, :attach_to_submission_comment)
           }

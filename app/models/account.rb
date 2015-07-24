@@ -467,7 +467,7 @@ class Account < ActiveRecord::Base
     associated_courses = associated_courses.with_enrollments if opts[:hide_enrollmentless_courses]
     associated_courses = associated_courses.for_term(opts[:term]) if opts[:term].present?
     associated_courses = yield associated_courses if block_given?
-    associated_courses.limit(opts[:limit]).active_first.select(columns).all
+    associated_courses.limit(opts[:limit]).active_first.select(columns).to_a
   end
 
   def fast_all_courses(opts={})
@@ -868,7 +868,7 @@ class Account < ActiveRecord::Base
         if account_chain_ids == [Account.site_admin.id]
           Account.site_admin.account_users_for(user)
         else
-          AccountUser.where(:account_id => account_chain_ids, :user_id => user).all
+          AccountUser.where(:account_id => account_chain_ids, :user_id => user).to_a
         end
       end
     end

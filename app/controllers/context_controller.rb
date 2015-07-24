@@ -351,9 +351,9 @@ class ContextController < ApplicationController
       @item_types << @context.wiki.wiki_pages if @context.respond_to? :wiki
       @deleted_items = []
       @item_types.each do |scope|
-        @deleted_items += scope.where(:workflow_state => 'deleted').limit(25).all
+        @deleted_items += scope.where(:workflow_state => 'deleted').limit(25).to_a
       end
-      @deleted_items += @context.attachments.where(:file_state => 'deleted').limit(25).all
+      @deleted_items += @context.attachments.where(:file_state => 'deleted').limit(25).to_a
       @deleted_items.sort_by{|item| item.read_attribute(:deleted_at) || item.created_at }.reverse
     end
   end

@@ -1443,7 +1443,7 @@ class CoursesController < ApplicationController
       @course = api_find(scope, params[:id])
 
       if authorized_action(@course, @current_user, :read)
-        enrollments = @course.current_enrollments.where(:user_id => @current_user).all
+        enrollments = @course.current_enrollments.where(:user_id => @current_user).to_a
         includes << :hide_final_grades
         render :json => course_json(@course, @current_user, session, includes, enrollments)
       end
@@ -1552,7 +1552,7 @@ class CoursesController < ApplicationController
       when 'syllabus'
         add_crumb(t('#crumbs.syllabus', "Syllabus"))
         @syllabus_body = api_user_content(@context.syllabus_body, @context)
-        @groups = @context.assignment_groups.active.order(:position, AssignmentGroup.best_unicode_collation_key('name')).all
+        @groups = @context.assignment_groups.active.order(:position, AssignmentGroup.best_unicode_collation_key('name')).to_a
         @events = @context.calendar_events.active.to_a
         @events.concat @context.assignments.active.to_a
         @undated_events = @events.select {|e| e.start_at == nil}
