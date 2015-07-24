@@ -37,19 +37,6 @@ $page-dark: #ebeff2;
   border-bottom: 0;
 }
 
-#change_gradebook_version_link_holder a {
-  background: none;
-  border: none;
-  color: $ic-link-color !important;
-  font-size: 12px;
-  font-family: inherit;
-  text-shadow: none;
-
-  &:hover {
-    box-shadow: none;
-  }
-}
-
 /* checkbox view */
 .checkbox-view {
   border: 1px solid transparent;
@@ -179,6 +166,8 @@ $page-dark: #ebeff2;
 }
 
 .gradebook-header {
+  display: flex;
+  align-items: right;
   @if $use_new_styles {
     @include clearfix;
     padding-top: $ic-sp;
@@ -187,19 +176,27 @@ $page-dark: #ebeff2;
     }
     .gradebook-navigation { margin-top: 3px; }
   }
-  .section-button-placeholder {
-    position: relative;
-    float: right;
+
+  .header-buttons {
+    flex: 1;
+    text-align: right;
+    margin-bottom: $ic-sp;
     @if $use_new_styles == false {
-      margin: $header-child-margin;
+      margin-right: $ic-sp;
       top: 1px;
-      .section-select-button { padding: 3px 12px 3px 12px; }
+    }
+    .individual-view-button {
+      @if $use_new_styles == false {
+        padding: $ic-sp/4 $ic-sp;
+      }
+    }
+    .section-button-placeholder {
+      display: inline-block;
+      @if $use_new_styles == false {
+        .section-select-button { padding: $ic-sp/4 $ic-sp; }
+      }
     }
   }
-}
-
-.gradebook-navigation {
-  display: inline-block;
 }
 
 /* slickgrid */

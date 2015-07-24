@@ -10,12 +10,12 @@ describe "screenreader gradebook" do
 
     it "should switch to srgb", priority: "1", test_id: 209987 do
       get "/courses/#{@course.id}/gradebook"
-      f("#change_gradebook_version_link_holder .ellipsible").click
+      f("#change_gradebook_version_link_holder").click
       expect(f("#not_right_side")).to include_text("Gradebook: Individual View")
       refresh_page
       expect(f("#not_right_side")).to include_text("Gradebook: Individual View")
       f(".span12 a").click
-      expect(f("#change_gradebook_version_link_holder .ellipsible")).to be_displayed
+      expect(f("#change_gradebook_version_link_holder")).to be_displayed
     end
 
     it "Should show sections in drop-down", priority: "1", test_id: 209989 do
@@ -34,7 +34,7 @@ describe "screenreader gradebook" do
 
     it "should focus on accessible elements when setting default grades", priority: "1", test_id: 209991 do
       get "/courses/#{@course.id}/gradebook"
-      f("#change_gradebook_version_link_holder .ellipsible").click
+      f("#change_gradebook_version_link_holder").click
       refresh_page
       Selenium::WebDriver::Support::Select.new(f("#assignment_select"))
                                           .select_by(:text, 'second assignment')
