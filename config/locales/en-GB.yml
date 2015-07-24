@@ -2796,8 +2796,8 @@ en-GB:
           an easy place to keep track of those collaborations and also to set them
           up without having to swap emails.
       description_teacher: |-
-          **What do we mean by collaborations?** We're talking about web-based tools with which 
-          your students are quite likely already familiar. Students can use resources like
+          **What do we mean by collaborations?** We are talking about web-based tools with which 
+          your students are most likely already familiar. Students can use resources like
           [Google Docs](%{google_url})
           to work collaboratively on tasks like group papers or note taking. This page gives them
           (and you) an easy place to keep track of those collaborations and also to set them
@@ -3381,7 +3381,7 @@ en-GB:
       buttons: 
         add_module: "Add module"
       labels: 
-        publish_final_grade: "Publish final mark for the student when this module has been completed"
+        publish_final_grade: "When this module has been completed, publish final mark for the student"
         require_sequential_progress: "In this module, students must move through requirements in sequential order"
       links: 
         add_prerequisite: "Add prerequisite"
@@ -10610,7 +10610,7 @@ en-GB:
     labels: 
       requirements_must_be_completed: "The following requirements need to be completed before this page will be unlocked"
   presentation_2d9387ca: Presentation
-  preview_your_changes_373557d8: "Preview changes"
+  preview_your_changes_373557d8: "Preview your changes"
   previous_module_item_2bb5e499: "Previous module/item"
   previous_time_cc96b361: "Previous (%{time})"
   previous_timestamp_19343a58: "Previous (%{timestamp})"
@@ -13515,7 +13515,7 @@ en-GB:
       wiki_page_notice: "Select the wiki page you want to associate with this *module*, or add a new page by selecting \"New page\"."
       wiki_page_select_label: "Select the wiki page you want to associate, or add a new page by selecting \"New Page\"."
     static_notices: 
-      bouncing_communication_channels: "There appears to be a problem with one of your contact methods. Please check your *Settings Page*."
+      bouncing_communication_channels: "There appears to be a problem with one of your contact methods. Please check your *Settings page*."
       javascript_required: " To access this site, you must enable JavaScript."
     submission_comment: 
       assignment: Assignment
@@ -14198,7 +14198,7 @@ en-GB:
   this_most_likely_happened_because_you_imported_cou_a78ea880: "This most likely happened because you imported course content without its associated files."
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "This outcome has been used to assess a student and can no longer be updated."
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "This outcome has been used to assess a student and cannot be edited or deleted"
-  this_quiz_has_been_excused_d89d2b74: "This quiz has been excused"
+  this_quiz_has_been_excused_d89d2b74: "This quiz has been excused: the student is no longer required to take this quiz."
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*This quiz is unpublished* Only teachers can see the quiz until it is published."
   this_student_wrote_f1a3f22d: "This student wrote:"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "This will allow you to authenticate Canvas for posting grades to SIS"
@@ -15135,8 +15135,8 @@ en-GB:
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "You must select a course to copy content from"
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "You must set it to a number greater than or equal to %{min}"
   you_must_specify_a_usage_right_5eb57f87: "You must specify a usage right."
-  you_need_to_preview_your_changes_before_applying_t_cb048bed: "before applying to everyon, you need to 'Preview your changes' "
-  you_re_editing_your_canvas_theme_the_changes_have__c0ae1bd1: "You are editing your Canvas Theme. The changes have not yet been applied."
+  you_need_to_preview_your_changes_before_applying_t_cb048bed: "before applying to everyone, you need to 'Preview your changes' "
+  you_re_editing_your_canvas_theme_the_changes_have__c0ae1bd1: "You are editing your Canvas theme. The changes have not yet been applied."
   you_will_be_redirected_to_a_login_page_where_you_w_fc8df402: "You will be redirected to a Log-in page where you must log in with your child's credentials."
   you_will_need_to_create_a_new_app_on_facebook_face_8fe85297: |-
       You will need to create a [new app on Facebook](%{facebook_url}), and enable Client OAuth Login
