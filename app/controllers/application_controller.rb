@@ -821,7 +821,11 @@ class ApplicationController < ActionController::Base
   end
 
   def discard_flash_if_xhr
-    flash.discard if request.xhr? || request.format.to_s == 'text/plain'
+    if request.xhr? || request.format.to_s == 'text/plain'
+      flash.discard
+    else
+      flash.keep
+    end
   end
 
   def cancel_cache_buster

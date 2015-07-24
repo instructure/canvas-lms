@@ -187,10 +187,10 @@ class User < ActiveRecord::Base
   }
   scope :name_like, lambda { |name|
     scopes = []
-    scopes << where(wildcard('users.name', name))
-    scopes << where(wildcard('users.short_name', name))
-    scopes << joins(:pseudonyms).where(wildcard('pseudonyms.sis_user_id', name)).where(pseudonyms: {workflow_state: 'active'})
-    scopes << joins(:pseudonyms).where(wildcard('pseudonyms.unique_id', name)).where(pseudonyms: {workflow_state: 'active'})
+    scopes << unscoped.where(wildcard('users.name', name))
+    scopes << unscoped.where(wildcard('users.short_name', name))
+    scopes << unscoped.joins(:pseudonyms).where(wildcard('pseudonyms.sis_user_id', name)).where(pseudonyms: {workflow_state: 'active'})
+    scopes << unscoped.joins(:pseudonyms).where(wildcard('pseudonyms.unique_id', name)).where(pseudonyms: {workflow_state: 'active'})
 
     scopes.map!(&:to_sql)
     self.from("(#{scopes.join("\nUNION\n")}) users")
@@ -912,6 +912,7 @@ class User < ActiveRecord::Base
 
       self.update_account_associations
     end
+    self.reload
   end
 
   def associate_with_shard(shard, strength = :strong)

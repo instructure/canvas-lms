@@ -380,6 +380,8 @@ describe "dashboard" do
       assignment.reload
       assignment.submit_homework(student, {:submission_type => 'online_text_entry', :body => 'ABC'})
       assignment.reload
+
+      User.where(:id => @teacher).update_all(:updated_at => 1.day.ago) # ensure cache refresh
       enable_cache do
         get "/"
 

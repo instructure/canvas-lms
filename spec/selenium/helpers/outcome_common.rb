@@ -278,6 +278,7 @@ def should_validate_decaying_average
 
   # enter second invalid number above range
   replace_content(f('input[name=calculation_int]'), above_range)
+  wait_for_ajaximations
   f('.submit_button').click
   wait_for_ajaximations
   expect(f('.error_box')).to be_present
