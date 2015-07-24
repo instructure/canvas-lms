@@ -130,8 +130,8 @@ module BasicLTI
               <imsx_codeMajor></imsx_codeMajor>
               <imsx_severity>status</imsx_severity>
               <imsx_description></imsx_description>
-              <imsx_messageRefIdentifier></imsx_messageRefIdentifier> 
-              <imsx_operationRefIdentifier></imsx_operationRefIdentifier> 
+              <imsx_messageRefIdentifier></imsx_messageRefIdentifier>
+              <imsx_operationRefIdentifier></imsx_operationRefIdentifier>
             </imsx_statusInfo>
           </imsx_POXResponseHeaderInfo>
         </imsx_POXHeader>
@@ -193,11 +193,10 @@ module BasicLTI
         elsif !text && !url
           error_message = I18n.t('lib.basic_lti.no_score', "No score given")
         end
-
         if error_message
           self.code_major = 'failure'
           self.description = error_message
-        elsif assignment.points_possible.nil?
+        elsif assignment.grading_type != "pass_fail" && (assignment.points_possible.nil? || assignment.points_possible == 0)
 
           unless submission = Submission.where(user_id: user.id, assignment_id: assignment).first
             submission = Submission.create!(submission_hash.merge(:user => user,
@@ -215,6 +214,8 @@ to because the assignment has no points possible.
           end
 
           if new_score || raw_score
+            # meh, short circuit here
+            submission_hash[:grade] = "pass" if assignment.grading_type == "pass_fail" && new_score == 1
             @submission = assignment.grade_student(user, submission_hash).first
           end
 
