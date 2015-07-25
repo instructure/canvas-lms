@@ -4959,8 +4959,8 @@ en-GB:
     saving: Saving...
   differentiated_assignments_description: |-
       Differentiated Assignments is a feature that enables choosing to which section(s) or individual student(s) an assignment applies.
-      Sections that are not given an assignment will not see it in their course content and their final mark will be
-      calculated without those points.
+      Students who are not given an assignment will not see this feature in their course content, and their final mark will be
+      based accordingly.
   diigo_993c4646: Diigo
   disable_a5c05db3: Disable
   disabled_18c33a73: (disabled)
@@ -15136,7 +15136,7 @@ en-GB:
   you_must_set_it_to_a_number_greater_than_or_equal__eb1d9275: "You must set it to a number greater than or equal to %{min}"
   you_must_specify_a_usage_right_5eb57f87: "You must specify a usage right."
   you_need_to_preview_your_changes_before_applying_t_cb048bed: "before applying to everyone, you need to 'Preview your changes' "
-  you_re_editing_your_canvas_theme_the_changes_have__c0ae1bd1: "You are editing your Canvas theme. The changes have not yet been applied."
+  you_re_editing_your_canvas_theme_the_changes_have__c0ae1bd1: "You are editing your Canvas theme. Your changes have not yet been applied."
   you_will_be_redirected_to_a_login_page_where_you_w_fc8df402: "You will be redirected to a Log-in page where you must log in with your child's credentials."
   you_will_need_to_create_a_new_app_on_facebook_face_8fe85297: |-
       You will need to create a [new app on Facebook](%{facebook_url}), and enable Client OAuth Login
