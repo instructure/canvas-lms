@@ -1,7 +1,7 @@
 require 'parallel'
 
 module Canvas
-  module CDN
+  module Cdn
     class S3Uploader
 
       attr_accessor :bucket, :config
@@ -9,7 +9,7 @@ module Canvas
       def initialize(folder='dist')
         require 'aws-sdk'
         @folder = folder
-        @config = Canvas::CDN.config
+        @config = Canvas::Cdn.config
         @s3 = AWS::S3.new(access_key_id: config.aws_access_key_id,
                           secret_access_key: config.aws_secret_access_key)
         @bucket = @s3.buckets[config.bucket]
@@ -72,7 +72,7 @@ module Canvas
 
       def handle_compression(file, options)
         return file if file.size < 150 # gzipping small files is not worth it
-        gzipped = (CANVAS_RAILS3 ? Canvas::CDN::Gzip : ActiveSupport::Gzip).compress(file.read, Zlib::BEST_COMPRESSION)
+        gzipped = (CANVAS_RAILS3 ? Canvas::Cdn::Gzip : ActiveSupport::Gzip).compress(file.read, Zlib::BEST_COMPRESSION)
         compression = 100 - (100.0 * gzipped.size / file.size).round
         # if we couldn't compress more than 5%, the gzip decoding cost to the
         # client makes it is not worth serving gzipped
