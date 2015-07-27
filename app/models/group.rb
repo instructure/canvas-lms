@@ -532,6 +532,9 @@ class Group < ActiveRecord::Base
 
       given {|user, session| self.grants_right?(user, session, :manage_content) && self.context && self.context.grants_right?(user, session, :create_conferences)}
       can :create_conferences
+
+      given {|user, session| self.context && self.context.grants_right?(user, session, :read_as_admin)}
+      can :read_as_admin
     end
   end
 
