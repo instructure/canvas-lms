@@ -12,9 +12,9 @@ describe "Common Cartridge exporting" do
     content_export.context = course
     content_export.user = user
     content_export.save!
-    
+
     content_export.export_without_send_later
-    
+
     expect(content_export.error_messages.length).to eq 1
     error = content_export.error_messages.first
     expect(error.first).to eq "Failed to export wiki pages"
@@ -393,7 +393,7 @@ describe "Common Cartridge exporting" do
       expect(@manifest_doc.at_css('resource[href="course_settings/syllabus.html"]')).to be_nil
     end
 
-    it "should export syllabus when selected" do 
+    it "should export syllabus when selected" do
       @course.syllabus_body = "<p>Bodylicious</p>"
 
       @ce.selected_content = {
@@ -533,6 +533,38 @@ describe "Common Cartridge exporting" do
       node3 = @manifest_doc.at_css('resource[href$="third.jpg"] lom|rights')
       expect(node3.at_css('lom|copyrightAndOtherRestrictions > lom|value').text).to eq('yes')
       expect(node3.at_css('lom|description > lom|string').text).to eq('(C) 2014 Corellian Engineering Corporation\nCC Attribution')
+    end
+
+    context "considering rights of provided user" do
+      before do
+        @ag = @course.assignment_groups.create!(:name => 'group1')
+        @published = @course.assignments.create!({
+          :title => 'Assignment 1', :points_possible => 10, :assignment_group => @ag
+        })
+        @unpublished = @course.assignments.create!({
+          :title => 'Assignment 2', :points_possible => 10, :assignment_group => @ag
+        })
+        @unpublished.unpublish
+        @ce.save!
+      end
+
+      it "should show unpublished assignmnets for a teacher" do
+        run_export
+
+        check_resource_node(@published, CC::CCHelper::LOR)
+        check_resource_node(@unpublished, CC::CCHelper::LOR)
+      end
+
+      it "should not show unpublished assignments for a student" do
+        student_in_course(active_all: true, user_name: "a student")
+        @ce.user = @student
+        @ce.save!
+
+        run_export
+
+        check_resource_node(@published, CC::CCHelper::LOR)
+        check_resource_node(@unpublished, CC::CCHelper::LOR, false)
+      end
     end
   end
 end
