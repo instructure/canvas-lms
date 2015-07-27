@@ -64,7 +64,7 @@ class BrandConfig < ActiveRecord::Base
   end
 
   def sync_to_s3!(&block)
-    Canvas::CDN.push_to_s3!(public_folder, &block) if Canvas::CDN.enabled?
+    Canvas::Cdn.push_to_s3!(public_folder, &block) if Canvas::Cdn.enabled?
   end
 
   def save_and_sync_to_s3!(progress=nil)

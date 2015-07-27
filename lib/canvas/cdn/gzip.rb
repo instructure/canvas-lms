@@ -7,7 +7,7 @@ if CANVAS_RAILS3
   require 'stringio'
 
   module Canvas
-    module CDN
+    module Cdn
       # A convenient wrapper for the zlib standard library that allows
       # compression/decompression of strings with gzip.
       #

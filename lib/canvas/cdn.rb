@@ -1,5 +1,5 @@
 module Canvas
-  module CDN
+  module Cdn
     class << self
       def config
         @config ||= begin
@@ -17,7 +17,7 @@ module Canvas
 
       def push_to_s3!(*args, &block)
         return unless enabled?
-        uploader = Canvas::CDN::S3Uploader.new(*args)
+        uploader = Canvas::Cdn::S3Uploader.new(*args)
         uploader.upload!(&block)
       end
     end
