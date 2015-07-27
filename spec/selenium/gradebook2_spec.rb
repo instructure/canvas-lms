@@ -890,7 +890,7 @@ describe "gradebook2" do
       @assignment.save
     end
 
-    it "should not be visible by default" do
+    it "should not be visible by default", priority: "1", test_id: 244958 do
       get "/courses/#{@course.id}/gradebook2"
       expect(ff('.post-grades-placeholder').length).to eq 0
     end
@@ -903,7 +903,7 @@ describe "gradebook2" do
       expect(ff('.post-grades-placeholder').length).to eq 1
     end
 
-    it "should not be displayed if viewing outcome gradebook" do
+    it "should not be displayed if viewing outcome gradebook", priority: "1", test_id: 244959 do
       Account.default.set_feature_flag!('post_grades', 'on')
       Account.default.set_feature_flag!('outcome_gradebook', 'on')
 
@@ -919,7 +919,7 @@ describe "gradebook2" do
       expect(f('.post-grades-placeholder')).to be_displayed
     end
 
-    it "should display post grades button when powerschool is configured" do
+    it "should display post grades button when powerschool is configured", priority: "1", test_id: 164219 do
       Account.default.set_feature_flag!('post_grades', 'on')
       @course.sis_source_id = 'xyz'
       @course.save
@@ -949,7 +949,7 @@ describe "gradebook2" do
         post_grades_tool
       end
 
-      it "should show when a post_grades lti tool is installed" do
+      it "should show when a post_grades lti tool is installed", priority: "1", test_id: 244960 do
         create_post_grades_tool
 
         get "/courses/#{@course.id}/gradebook2"
@@ -960,7 +960,7 @@ describe "gradebook2" do
         expect(f('iframe.post-grades-frame')).to be_displayed
       end
 
-      it "should hide post grades lti button when section selected" do
+      it "should hide post grades lti button when section selected", priority: "1", test_id: 248027 do
         create_post_grades_tool
 
         get "/courses/#{@course.id}/gradebook2"
@@ -974,7 +974,7 @@ describe "gradebook2" do
         expect(f('button.external-tools-dialog')).not_to be_displayed
       end
 
-      it "should show as drop down menu when multiple tools are installed" do
+      it "should show as drop down menu when multiple tools are installed", priority: "1", test_id: 244920 do
         (0...10).each do |i|
           create_post_grades_tool(name: "test tool #{i}")
         end
@@ -989,7 +989,7 @@ describe "gradebook2" do
         expect(f('iframe.post-grades-frame')).to be_displayed
       end
 
-      it "should hide post grades lti dropdown when section selected" do
+      it "should hide post grades lti dropdown when section selected", priority: "1", test_id: 248027 do
         (0...10).each do |i|
           create_post_grades_tool(name: "test tool #{i}")
         end
@@ -1005,7 +1005,7 @@ describe "gradebook2" do
         expect(f('button#post_grades')).not_to be_displayed
       end
 
-      it "should show as drop down menu with an ellipsis when too many tools are installed" do
+      it "should show as drop down menu with an ellipsis when too many tools are installed", priority: "1", test_id: 244961 do
         (0...11).each do |i|
           create_post_grades_tool(name: "test tool #{i}")
         end
@@ -1017,7 +1017,7 @@ describe "gradebook2" do
         expect(ff('li.external-tools-dialog.ellip').count).to eq(1)
       end
 
-      it "should show as drop down menu when powerschool is configured and an lti tool is installed" do
+      it "should show as drop down menu when powerschool is configured and an lti tool is installed", priority: "1", test_id: 244962 do
         Account.default.set_feature_flag!('post_grades', 'on')
         @course.sis_source_id = 'xyz'
         @course.save

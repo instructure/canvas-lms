@@ -182,3 +182,20 @@ def create_file_list
     ]
   }
 end
+
+def create_post_grades_tool(opts = {})
+  post_grades_tool = @course.context_external_tools.create!(
+      name: opts[:name] || 'test tool',
+      domain: 'example.com',
+      url: 'http://example.com/lti',
+      consumer_key: 'key',
+      shared_secret: 'secret',
+      settings: {
+          post_grades: {
+              url: 'http://example.com/lti/post_grades'
+          }
+      }
+  )
+  post_grades_tool.context_external_tool_placements.create!(placement_type: 'post_grades')
+  post_grades_tool
+end
