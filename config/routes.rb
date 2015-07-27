@@ -1712,6 +1712,7 @@ CanvasRails::Application.routes.draw do
     post "xapi/:token", controller: :lti_api, action: :xapi_service, as: "lti_xapi"
     post "caliper/:token", controller: :lti_api, action: :caliper_service, as: "lti_caliper"
     post "logout_service/:token", controller: :lti_api, action: :logout_service, as: "lti_logout_service"
+    post "turnitin/outcomes_placement/:tool_id", controller: :lti_api, action: :turnitin_outcomes_placement, as: "lti_turnitin_outcomes_placement"
   end
 
   ApiRouteSet.draw(self, "/api/lti") do

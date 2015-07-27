@@ -346,7 +346,7 @@ describe LtiOutbound::ToolLaunch do
     it 'includes assignment outcome service params for student' do
       student_role = LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER
       user.current_roles = [student_role]
-      tool_launch.for_assignment!(assignment, '/my/test/url', '/my/other/test/url')
+      tool_launch.for_assignment!(assignment, '/my/test/url', '/my/other/test/url', '/my/favorite/url')
 
       hash = tool_launch.generate
 
@@ -360,7 +360,7 @@ describe LtiOutbound::ToolLaunch do
     end
 
     it 'includes assignment outcome service params for teacher' do
-      tool_launch.for_assignment!(assignment, '/my/test/url', '/my/other/test/url')
+      tool_launch.for_assignment!(assignment, '/my/test/url', '/my/other/test/url', '/a/test/url')
 
       hash = tool_launch.generate
 

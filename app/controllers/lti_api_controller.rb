@@ -143,6 +143,14 @@ class LtiApiController < ApplicationController
     return render :text => e, :status => 401
   end
 
+  def turnitin_outcomes_placement
+    verify_oauth
+    course, assignment, user = BasicLTI::BasicOutcomes.decode_source_id(@tool, params['lis_result_sourcedid'])
+    assignment.update_attribute(:turnitin_enabled,  false) if assignment.turnitin_enabled?
+    render json: {}, status: 200
+  end
+
+
   protected
 
   def verify_oauth(tool = nil)

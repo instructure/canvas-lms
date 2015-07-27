@@ -63,10 +63,10 @@ module Lti
       @tool_launch.generate(@overrides)
     end
 
-    def generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url)
+    def generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
       raise('Called generate_post_payload_for_assignment before calling prepare_tool_launch') unless @tool_launch
       lti_assignment = Lti::LtiAssignmentCreator.new(assignment, encode_source_id(assignment)).convert
-      @tool_launch.for_assignment!(lti_assignment, outcome_service_url, legacy_outcome_service_url)
+      @tool_launch.for_assignment!(lti_assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
       generate_post_payload
     end
 
@@ -82,15 +82,6 @@ module Lti
       @tool_launch.url
     end
 
-    private
-    def default_launch_url(resource_type = nil)
-      resource_type ? @tool.extension_setting(resource_type, :url) : @tool.url
-    end
-
-    def default_link_code
-      @tool.opaque_identifier_for(@context)
-    end
-
     # this is the lis_result_sourcedid field in the launch, and the
     # sourcedGUID/sourcedId in BLTI basic outcome requests.
     # it's a secure signature of the (tool, course, assignment, user). Combined with
@@ -102,5 +93,16 @@ module Lti
         "#{payload}-#{Canvas::Security.hmac_sha1(payload)}"
       end
     end
+
+    private
+    def default_launch_url(resource_type = nil)
+      resource_type ? @tool.extension_setting(resource_type, :url) : @tool.url
+    end
+
+    def default_link_code
+      @tool.opaque_identifier_for(@context)
+    end
+
+
   end
 end
