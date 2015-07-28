@@ -91,14 +91,10 @@ class BrandConfig < ActiveRecord::Base
     compile_css!
     progress.update_completion!(50) if progress
     sync_to_s3! do |percent_complete|
-      # send at most 1 UPDATE query per second
-      if progress && (progress.updated_at < 1.second.ago)
+      # send at most 1 UPDATE query per 2 seconds
+      if progress && (progress.updated_at < 2.seconds.ago)
         total_percent = 50 + percent_complete / 2
-        # This callback is called within a Parallel.each thread so
-        # we need to explicitly tell it to use the existing connection.
-        Progress.connection_pool.with_connection do
-          progress.update_completion!(total_percent)
-        end
+        progress.update_completion!(total_percent)
       end
     end
   end

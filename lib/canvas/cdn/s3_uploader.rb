@@ -1,4 +1,5 @@
 require 'parallel'
+require_dependency 'lib/canvas/cdn/gzip' if CANVAS_RAILS3
 
 module Canvas
   module Cdn
@@ -16,17 +17,15 @@ module Canvas
       end
 
       def local_files
-        Dir.chdir(Rails.public_path) { Dir["#{@folder}/**/**"]}
+        @local_files ||= Dir.chdir(Rails.public_path) { Dir["#{@folder}/**/**"]}
       end
 
       def upload!
-        total_files = local_files.count
-        uploaded_files = 0
-        Parallel.each(local_files, :in_threads=>8) do |file|
-          upload_file(file)
-          uploaded_files += 1
-          yield (100.0 * uploaded_files / total_files) if block_given?
+        opts = {in_threads: 16, progress: 'uploading to S3'}
+        if block_given?
+          opts[:finish] = -> (_, i, _) { yield (100.0 * i / local_files.count) }
         end
+        Parallel.each(local_files, opts) { |file| upload_file(file) }
       end
 
       def fingerprinted?(path)
@@ -62,7 +61,6 @@ module Canvas
         s3_object = bucket.objects[remote_path]
         return log("skipping already existing #{remote_path}") if s3_object.exists?
         options = options_for(local_path)
-        log "uploading #{remote_path} #{options[:content_encoding]}"
         s3_object.write(handle_compression(local_path, options), options)
       end
 
@@ -71,18 +69,19 @@ module Canvas
       end
 
       def handle_compression(file, options)
-        return file if file.size < 150 # gzipping small files is not worth it
-        gzipped = (CANVAS_RAILS3 ? Canvas::Cdn::Gzip : ActiveSupport::Gzip).compress(file.read, Zlib::BEST_COMPRESSION)
-        compression = 100 - (100.0 * gzipped.size / file.size).round
-        # if we couldn't compress more than 5%, the gzip decoding cost to the
-        # client makes it is not worth serving gzipped
-        if compression > 5
-          options[:content_encoding] = 'gzip'
-          log "Using Gzipped #{file.basename}. was: #{file.size} now: #{gzipped.size} saved: #{compression}%"
-          return gzipped
-        else
-          return file
+        if file.size > 150 # gzipping small files is not worth it
+          gzipped = (CANVAS_RAILS3 ? Canvas::Cdn::Gzip : ActiveSupport::Gzip).compress(file.read, Zlib::BEST_COMPRESSION)
+          compression = 100 - (100.0 * gzipped.size / file.size).round
+          # if we couldn't compress more than 5%, the gzip decoding cost to the
+          # client makes it is not worth serving gzipped
+          if compression > 5
+            options[:content_encoding] = 'gzip'
+            log "uploading gzipped #{file}. was: #{file.size} now: #{gzipped.size} saved: #{compression}%"
+            return gzipped
+          end
         end
+        log "uploading ungzipped #{file}"
+        file
       end
 
     end
