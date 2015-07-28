@@ -110,11 +110,11 @@
     "default": "/favicon.ico"
   },{
     "human_name": "Mobile Homescreen Icon",
-    "helper_text": "The shortcut icon for iOS/Android devices. 180x180 svg, png, jpg, gif",
+    "helper_text": "The shortcut icon for iOS/Android devices. 180x180 png",
     "variable_name": "ic-brand-apple-touch-icon",
     "type": "image",
-    "accept": "image/png,image/svg",
-    "default": "/apple-touch-icon.png"
+    "accept": "image/png",
+    "default": "/images/apple-touch-icon.png"
   },{
     "human_name": "Windows Tile Color",
     "variable_name": "ic-brand-msapplication-tile-color",
