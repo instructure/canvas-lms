@@ -25,7 +25,7 @@ describe "interaction with differentiated assignments on the dashboard and calen
       it "should not show inaccessible assignments in Recent activity" do
         create_section_override_for_assignment(@da_assignment, course_section: @section1)
         get "/"
-        expect(f("#not_right_side .no-recent-messages")).to include_text("No Recent Messages")
+        expect(f("#not_right_side .no_recent_messages")).to include_text("No Recent Messages")
       end
       it "should show assignments with an override in Recent activity" do
         skip "recent activity items are not being generated"
@@ -93,7 +93,7 @@ describe "interaction with differentiated assignments on the dashboard and calen
       it "should not show inaccessible assignments in Recent activity" do
         create_section_override_for_assignment(@da_assignment, course_section: @section1)
         get "/"
-        expect(f("#not_right_side .no-recent-messages")).to include_text("No Recent Messages")
+        expect(f("#not_right_side .no_recent_messages")).to include_text("No Recent Messages")
       end
       it "should show assignments with an override in Recent activity" do
         skip "recent activity is not working currently in these tests"

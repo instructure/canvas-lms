@@ -127,7 +127,7 @@ require [
       return if !confirm(I18n.t('confirm.close', "Are you sure you want to end this conference?\n\nYou will not be able to reopen it."))
       link = $(e.currentTarget)
       $.ajaxJSON(link.attr('href'), "POST", {}, (data) =>
-        link.parents('.conference.global-message').hide()
+        link.parents('.ic-notification.conference').hide()
       )
   new DashboardView
 

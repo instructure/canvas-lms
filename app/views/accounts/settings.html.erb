@@ -791,22 +791,25 @@ acknowledge that you have read and agreed to the
               <a href="#" rel="<%= context_url(@account, :context_account_notification_url, announcement) %>" class="delete_notification_link close" title="<%= t(:delete_announcement_tooltip, "Delete this Announcement") %>">×</a>
             <% end %>
 
-            <div class="global-message image-block">
-              <div class="image-block-image">
+            <div class="ic-notification ic-notification--admin-created ic-notification--<%= notification_container_classname(announcement) %>">
+              <div class="ic-notification__icon" role="presentation">
                 <i class="<%= notification_icon_classname(announcement) %>"></i>
-                <span class="hidden-inline-text">
+                <span class="screenreader-only">
                   <%= accessible_message_icon_text(notification_icon_type(announcement)) %>
                 </span>
               </div>
-              <div class="image-block-content">
-                <div class="subject title">
-                  <%= announcement.subject %>
-                </div>
-                <div class="message user_content">
-                  <%= user_content(announcement.message) %>
+              <div class="ic-notification__content">
+                <div class="ic-notification__message">
+                  <h4 class="ic-notification__title notification_subject">
+                    <%= announcement.subject %>
+                  </h4>
+                  <span class="notification_message">
+                    <%= user_content(announcement.message) %>
+                  </span>
                 </div>
               </div>
             </div>
+
             <div class="announcement-details">
               <span>
                 <%= t(:alert_timespan, "from %{start_at} to %{end_at}",
@@ -815,6 +818,7 @@ acknowledge that you have read and agreed to the
               </span>&nbsp;&nbsp;
               <%= link_to(context_user_name(@account, announcement.user_id), user_path(announcement.user_id)) %>
             </div>
+
             <% if announcement.required_account_service %>
               <div>
                 <%= AccountServices.allowable_services[announcement.required_account_service.to_sym].try(:[], :name) %>

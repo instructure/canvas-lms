@@ -17,27 +17,6 @@
 #
 
 module DashboardHelper
-  def accessible_message_icon_text(icon)
-    case icon
-    when "warning"
-      I18n.t('#global_message_icons.warning', "warning")
-    when "error"
-      I18n.t('#global_message_icons.error', "error")
-    when "information"
-      I18n.t('#global_message_icons.information', "information")
-    when "question"
-      I18n.t('#global_message_icons.question', "question")
-    when "calendar"
-      I18n.t('#global_message_icons.calendar', "calendar")
-    when "announcement"
-      I18n.t('#global_message_icons.announcement', "announcement")
-    when "invitation"
-      I18n.t('#global_message_icons.invitation', "invitation")
-    else
-      raise "Unknown dashboard message icon type"
-    end
-  end
-
   def show_welcome_message?
     @current_user.present? &&
       @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid], :preload_courses => true).select(&:active?).empty?

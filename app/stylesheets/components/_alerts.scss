@@ -177,3 +177,95 @@ a.Button--flash {
     }
   }
 }
+
+$ic-notification-icon-size: 22px;
+$ic-notification-border-thickness: 2px;
+
+@mixin ic-notification-color-scheme($color) {
+  border-color: $color;
+  .ic-notification__icon { background: $color; }
+}
+
+// .ic-notification
+.ic-notification {
+  display: flex;
+  border: $ic-notification-border-thickness solid $ic-brand-primary;
+  margin-bottom: $ic-sp;
+  box-shadow: 0 1px 6px rgba(black, 0.2);
+  border-radius: $baseBorderRadius;
+  box-sizing: border-box;
+  form { margin: 0; }
+  &.ic-notification--success { @include ic-notification-color-scheme($ic-color-success); }
+  &.ic-notification--alert { @include ic-notification-color-scheme($ic-color-alert); }
+  &.ic-notification--danger { @include ic-notification-color-scheme($ic-color-danger); }
+  // variant for global notifications created by admin via Settings
+  &.ic-notification--admin-created {
+    .ic-notification__content {
+      display: flex;
+      @include breakpoint(wide) { align-items: flex-start; }
+    }
+    .ic-notification__message { flex: 1; }
+    .ic-notification__actions {
+      margin-left: $ic-sp*2;
+      @include breakpoint(wide) { margin-left: $ic-sp*3; }
+    }
+    .ic-notification__title {
+      display: block;
+      font-size: $baseFontSize + 2;
+      margin: 0 0 $ic-sp/2;
+    }
+  }
+}
+
+.ic-notification__icon {
+  background: $ic-brand-primary;
+  flex: 0 0 $ic-sp*4;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-top-left-radius: ($baseBorderRadius - $ic-notification-border-thickness);
+  border-bottom-left-radius: ($baseBorderRadius - $ic-notification-border-thickness);
+  box-sizing: border-box;
+  @include overwrite-default-icon-size($ic-notification-icon-size);
+  i[class*=icon-], i[class^=icon-] {
+    color: $ic-color-light;
+    text-shadow: none;
+  }
+}
+
+.ic-notification__title {
+  margin-right: $ic-sp/3;
+  font-size: $baseFontSize;
+  display: inline;
+  font-weight: 500;
+}
+
+.ic-notification__content {
+  flex: 1;
+  padding: $ic-sp;
+  box-sizing: border-box;
+  background: $ic-color-light;
+  @include breakpoint(wide) {
+    display: flex;
+    align-items: center;
+
+  }
+}
+
+.ic-notification__message {
+  box-sizing: border-box;
+  margin-bottom: $ic-sp/2;
+  p:last-of-type { margin-bottom: 0; }
+  @include breakpoint(wide) {
+    flex: 1;
+    margin-bottom: 0;
+  }
+}
+
+.ic-notification__actions {
+  box-sizing: border-box;
+  @include breakpoint(wide) {
+    margin-left: $ic-sp*4;
+  }
+}
