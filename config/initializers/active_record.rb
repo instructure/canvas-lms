@@ -1418,7 +1418,7 @@ end
 
 module UnscopeCallbacks
   def run_callbacks(kind)
-    scope = self.class.base_class.unscoped
+    scope = CANVAS_RAILS3 ? self.class.unscoped : self.class.base_class.unscoped
     scope.default_scoped = true
     scope.scoping { super }
   end
