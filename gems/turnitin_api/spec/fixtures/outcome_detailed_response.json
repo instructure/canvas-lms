@@ -1,0 +1,57 @@
+{
+  "outcome_pdffile":{
+    "roles":[
+      "Learner",
+      "Instructor"
+    ],
+    "launch_url":"https://turnitin.com/api/lti/1p0/dow...72874634?lang=",
+    "text":null,
+    "label":"Download File in PDF Format"
+  },
+  "outcome_originalfile":{
+    "roles":[
+      "Learner",
+      "Instructor"
+    ],
+    "launch_url":"https://turnitin.com/api/lti/1p0/dow...72874634?lang=",
+    "text":null,
+    "label":"Download File in Original Format"
+  },
+  "outcome_resubmit":{
+    "roles":[
+      "Learner"
+    ],
+    "launch_url":"https://turnitin.com/api/lti/1p0/upl...72874634?lang=",
+    "text":null,
+    "label":"Resubmit File"
+  },
+  "outcome_originalityreport":{
+    "roles":[
+      "Instructor"
+    ],
+    "breakdown":{
+      "submitted_works_score":100,
+      "publications_score":0,
+      "internet_score":0
+    },
+    "launch_url":"https://turnitin.com/api/lti/1p0/dv/...72874634?lang=",
+    "text":"100%",
+    "numeric":{
+      "max":100,
+      "score":100
+    },
+    "label":"Open Originality Report"
+  },
+  "outcome_grademark":{
+    "roles":[
+      "Instructor"
+    ],
+    "launch_url":"https://turnitin.com/api/lti/1p0/dv/...72874634?lang=",
+    "text":"--",
+    "numeric":{
+      "max":100,
+      "score":null
+    },
+    "label":"Open GradeMark"
+  }
+}
