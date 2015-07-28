@@ -231,7 +231,7 @@ define([
 
               <div className="Theme__editor-header">
                 <div className="Theme__editor-header_title">
-                  <i className="Theme__editor-header_title-icon icon-instructure" />
+                  <i className="Theme__editor-header_title-icon icon-instructure" aria-hidden="true" />
                   <h1 className="Theme__editor-header_title-text">
                     {I18n.t('Theme Editor')}
                   </h1>
