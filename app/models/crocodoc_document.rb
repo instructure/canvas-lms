@@ -110,7 +110,7 @@ class CrocodocDocument < ActiveRecord::Base
       end
     end
 
-    if submissions.map(&:assignment).any?(&:anonymous_peer_reviews?)
+    if submissions.map(&:assignment).any? { |a| a.peer_reviews? && a.anonymous_peer_reviews? }
       opts[:editable] = false
       opts[:filter] = 'none'
     end
