@@ -27,6 +27,7 @@ describe "Common Cartridge exporting" do
 
     before do
       course_with_teacher
+      @course.offer!
       @ce = @course.content_exports.build
       @ce.export_type = ContentExport::COURSE_COPY
       @ce.user = @user
@@ -248,19 +249,23 @@ describe "Common Cartridge exporting" do
       @q1 = @course.quizzes.create(:title => 'quiz1')
 
       qq = @q1.quiz_questions.create!
-      data = {:correct_comments => "",
-                          :question_type => "multiple_choice_question",
-                          :question_bank_name => "Quiz",
-                          :assessment_question_id => "9270",
-                          :migration_id => "QUE_1014",
-                          :incorrect_comments => "",
-                          :question_name => "test fun",
-                          :name => "test fun",
-                          :points_possible => 1,
-                          :question_text => "Image yo: <img src=\"/courses/#{@course.id}/files/#{@att.id}/preview\">",
-                          :answers =>
-                                  [{:migration_id => "QUE_1016_A1", :text => "True", :weight => 100, :id => 8080},
-                                   {:migration_id => "QUE_1017_A2", :text => "False", :weight => 0, :id => 2279}]}.with_indifferent_access
+      data = {
+        :correct_comments => "",
+        :question_type => "multiple_choice_question",
+        :question_bank_name => "Quiz",
+        :assessment_question_id => "9270",
+        :migration_id => "QUE_1014",
+        :incorrect_comments => "",
+        :question_name => "test fun",
+        :name => "test fun",
+        :points_possible => 1,
+        :question_text => "Image yo: <img src=\"/courses/#{@course.id}/files/#{@att.id}/preview\">",
+        :answers => [{
+          :migration_id => "QUE_1016_A1", :text => "True", :weight => 100, :id => 8080
+        }, {
+          :migration_id => "QUE_1017_A2", :text => "False", :weight => 0, :id => 2279
+        }]
+      }.with_indifferent_access
       qq.write_attribute(:question_data, data)
       qq.save!
 
@@ -564,6 +569,54 @@ describe "Common Cartridge exporting" do
 
         check_resource_node(@published, CC::CCHelper::LOR)
         check_resource_node(@unpublished, CC::CCHelper::LOR, false)
+      end
+    end
+
+    context 'attachment permissions' do
+      before do
+        folder = Folder.root_folders(@course).first
+        @visible = Attachment.create!({
+          :uploaded_data => stub_png_data('visible.png'),
+          :folder => folder,
+          :context => @course
+        })
+        @hidden = Attachment.create!({
+          :uploaded_data => stub_png_data('hidden.png'),
+          :folder => folder,
+          :context => @course,
+          :hidden => true
+        })
+        @locked = Attachment.create!({
+          :uploaded_data => stub_png_data('locked.png'),
+          :folder => folder,
+          :context => @course,
+          :locked => true
+        })
+        @ce.selected_content = {
+          all_attachments: "1"
+        }
+        @ce.export_type = ContentExport::COMMON_CARTRIDGE
+        @ce.save!
+      end
+
+      it "should include all files for teacher" do
+        run_export
+
+        check_resource_node(@visible, CC::CCHelper::WEBCONTENT)
+        check_resource_node(@hidden, CC::CCHelper::WEBCONTENT)
+        check_resource_node(@locked, CC::CCHelper::WEBCONTENT)
+      end
+
+      it "should not include hidden or locked attachments for student" do
+        student_in_course(active_all: true, user_name: "a student", course: @course)
+        @ce.user = @student
+        @ce.save!
+
+        run_export
+
+        check_resource_node(@visible, CC::CCHelper::WEBCONTENT)
+        check_resource_node(@hidden, CC::CCHelper::WEBCONTENT, false)
+        check_resource_node(@locked, CC::CCHelper::WEBCONTENT, false)
       end
     end
   end

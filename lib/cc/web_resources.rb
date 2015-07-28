@@ -30,7 +30,8 @@ module CC
       files_with_metadata = { :folders => [], :files => [] }
       @added_attachment_ids = Set.new
 
-      zipper = ContentZipper.new(:check_user => false)
+      zipper = ContentZipper.new
+      zipper.user = @user
       zipper.process_folder(course_folder, @zip_file, [CCHelper::WEB_RESOURCES_FOLDER], :exporter => @manifest.exporter) do |file, folder_names|
         begin
           if file.is_a? Folder
@@ -84,19 +85,19 @@ module CC
           add_error(I18n.t('course_exports.errors.file', "The file \"%{file_name}\" failed to export", :file_name => title), $!)
         end
       end
-      
+
       add_meta_info_for_files(files_with_metadata)
     end
-    
+
     def files_meta_path
       File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::FILES_META)
     end
-    
+
     def add_meta_info_for_files(files)
       files_file = File.new(File.join(@canvas_resource_dir, CCHelper::FILES_META), 'w')
       rel_path = files_meta_path
       document = Builder::XmlMarkup.new(:target=>files_file, :indent=>2)
-      
+
       document.instruct!
       document.fileMeta(
           "xmlns" => CCHelper::CANVAS_NAMESPACE,
@@ -113,7 +114,7 @@ module CC
             end
           end
         end
-        
+
         if !files[:files].empty?
           root_node.files do |files_node|
             files[:files].each do |file, migration_id|
