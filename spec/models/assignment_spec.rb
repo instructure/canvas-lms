@@ -2806,7 +2806,7 @@ describe Assignment do
           json = @assignment.speed_grader_json(@teacher)
           expect(json[:submissions].first['submission_history'].size).to eq 1
 
-          Version.update_all("versionable_type = 'QuizSubmission'", "versionable_type = 'Quizzes::QuizSubmission'")
+          Version.where("versionable_type = 'QuizSubmission'").update_all("versionable_type = 'Quizzes::QuizSubmission'")
           json = @assignment.reload.speed_grader_json(@teacher)
           expect(json[:submissions].first['submission_history'].size).to eq 1
         end

@@ -203,7 +203,7 @@ class ActiveRecord::Base
   def touch_context
     return if (@@skip_touch_context ||= false || @skip_touch_context ||= false)
     if self.respond_to?(:context_type) && self.respond_to?(:context_id) && self.context_type && self.context_id
-      self.context_type.constantize.update_all({ updated_at: Time.now.utc }, { id: self.context_id })
+      self.context_type.constantize.where(id: self.context_id).update_all(updated_at: Time.now.utc)
     end
   rescue
     Canvas::Errors.capture_exception(:touch_context, $ERROR_INFO)
@@ -212,10 +212,10 @@ class ActiveRecord::Base
   def touch_user
     if self.respond_to?(:user_id) && self.user_id
       shard = self.user.shard
-      User.update_all({ :updated_at => Time.now.utc }, { :id => self.user_id })
+      User.where(:id => self.user_id).update_all(:updated_at => Time.now.utc)
       User.connection.after_transaction_commit do
         shard.activate do
-          User.update_all({ :updated_at => Time.now.utc }, { :id => self.user_id })
+          User.where(:id => self.user_id).update_all(:updated_at => Time.now.utc)
         end if shard != Shard.current
         User.invalidate_cache(self.user_id)
       end
@@ -1076,7 +1076,7 @@ end
 
 ActiveRecord::Associations::HasOneAssociation.class_eval do
   def create_scope
-    scope = scoped.scope_for_create.stringify_keys
+    scope = (CANVAS_RAILS3 ? self.scoped : self.scope).scope_for_create.stringify_keys
     scope = scope.except(klass.primary_key) unless klass.primary_key.to_s == reflection.foreign_key.to_s
     scope
   end
