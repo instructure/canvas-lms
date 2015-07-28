@@ -738,6 +738,12 @@ class RoleOverride < ActiveRecord::Base
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership),
         :account_allows => lambda {|a| a.settings[:catalog_enabled]}
+      },
+      :moderate_grades => {
+        :label => -> { t('Moderate Grades') },
+        :true_for => %w(AccountAdmin TeacherEnrollment),
+        :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment),
+        :account_allows => lambda {|a| a.feature_allowed?(:moderated_grading)}
       }
     })
 
