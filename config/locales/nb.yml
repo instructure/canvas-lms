@@ -2788,6 +2788,10 @@ nb:
           **Hva mener vi med samarbeid?** Vi snakker om nettbaserte verktøy for å samarbeide på et delt dokument. Du kan bruker ressurser som
           [Google Docs](%{google_url})
           for å samarbeide på oppgaver som gruppearbeid eller notater. Denne siden er et sted for å spore disse samarbeidene og sette dem opp uten å bruke e-post.
+      description_teacher: |-
+          **Hva mener vi med samarbeid?**  Vi snakker om nettbaserte verktøy som dine studenter mest sannsynligvis kjenner til.  Studenter kan bruke ressurser som
+          [Google Docs](%{google_url})
+          for å samarbeide på oppgaver som gruppeinnleveringer eller notater. Denne siden gir dem (og deg) en oversikt for å se fremgangen og det er også en rask måte å kommunisere på.
       google: 
         drive: 
           upgrade: 
@@ -4943,6 +4947,10 @@ nb:
     cancel: Avbryt
     save_settings: "Lagre innstillinger"
     saving: Lagrer...
+  differentiated_assignments_description: |-
+      Ulike innleveringer er en funksjon som gir deg mulighet for å velge hvilke(n) seksjon(er) eller enkelt(e) student(er) en innlevering skal gjelde.
+      Seksjoner som ikke er angitt en innlevering, skal ikke se det i sitt kursinnhold og deres sluttvurdering blir
+      beregnet uten disse poengene.
   diigo_993c4646: Diigo
   disable_a5c05db3: "Slå av"
   disabled_18c33a73: (deaktivert)
@@ -7377,6 +7385,7 @@ nb:
       student_view: 
         leave: "Forlat studentvisning"
         reset: "Tilbakestill student"
+        reset_explanation: "Ved å tilbakestille teststudenten sletter du all historikk for denne studenten, hvilket vil føre til at du oppretter en splitter ny student."
         warning_title: "Du er logget inn på studentvisning"
     head: 
       default_page_title: "Canvas læringsplattform"
@@ -9565,6 +9574,7 @@ nb:
   moodle_formula_many_warning_title: "Det er %{count} Formel-spørsmål i denne banken som må ha sine mulige svar regenerert"
   moodle_formula_warning_title: "Mulige svar må lages på nytt for Formel-spørsmål"
   more_courses_5ebbe998: "Flere kurs"
+  most_recent_result_counts_as_calculation_int_of_ma_13628bf0: "Nyligste resultatet teller som %{calculation_int}% av mester-vekten, gjennomsnittet av andre resultater teller som %{remainder}% av vekten. Minst 2 resultater må foreligge før en sum beregnes."
   most_recent_score_13a87e8c: "Siste Poeng"
   move_abf00365: Flytt
   move_dialog: 
