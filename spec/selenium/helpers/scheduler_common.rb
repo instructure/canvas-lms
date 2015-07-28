@@ -35,19 +35,25 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     replace_content(edit_form.find_element(:css, '.end_time'), '3')
   end
 
-  def submit_appointment_group_form
-    f('.ui-dialog-buttonset .ui-button').click
+  def submit_appointment_group_form(publish = true)
+    save, save_and_publish = ff('.ui-dialog-buttonset .ui-button')
+    if publish
+      save_and_publish.click
+    else
+      save.click
+    end
     wait_for_ajaximations
   end
 
   def create_appointment_group_manual(opts = {})
     opts = {
+        :publish => true,
         :new_appointment_text => 'new appointment group'
     }.with_indifferent_access.merge(opts)
 
     expect {
       fill_out_appointment_group_form(opts[:new_appointment_text], opts)
-      submit_appointment_group_form
+      submit_appointment_group_form(opts[:publish])
       expect(f('.view_calendar_link').text).to eq opts[:new_appointment_text]
     }.to change(AppointmentGroup, :count).by(1)
   end
