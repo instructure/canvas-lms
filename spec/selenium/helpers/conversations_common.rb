@@ -174,3 +174,39 @@ def select_conversations(to_select = -1)
 
   driver.action.key_up(modifier).perform
 end
+
+# Allows you to select between
+def click_more_options(opts,message = 0)
+  case
+  # First case is for clicking on message gear menu
+  when opts[:message]
+    # The More Options gear menu only shows up on mouse over of message
+    driver.mouse.move_to ff('.message-item-view')[message]
+    wait_for_ajaximations
+    f('.actions li .inline-block .al-trigger').click
+  # This case is for clicking on gear menu at conversation heading level
+  when opts[:convo]
+    f('.message-header .al-trigger').click
+  # Otherwise, it clicks the topmost gear menu
+  else f('#admin-btn.al-trigger').click
+  end
+  wait_for_ajaximations
+end
+
+# Manually forwards a message. Thankfully, each More Option button has the same menu elements within
+def forward_message(recipient)
+  ffj('.ui-menu-item .ui-corner-all:visible')[1].click
+  wait_for_ajaximations
+  add_message_recipient recipient
+  set_message_body('stuff')
+  f('.btn-primary.send-message').click
+  wait_for_ajaximations
+end
+
+def add_students(count)
+  @s = []
+  count.times do |n|
+    @s << User.create!(:name => "Test Student #{n+1}")
+    @course.enroll_student(@s.last).update_attribute(:workflow_state, 'active')
+  end
+end

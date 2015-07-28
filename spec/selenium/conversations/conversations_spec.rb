@@ -5,18 +5,13 @@ describe "conversations new" do
 
   before do
     conversation_setup
-    @s1 = user(name: "first student")
-    @s2 = user(name: "second student")
-    @teacher.update_attribute(:name, 'teacher')
-    [@s1, @s2].each { |s| @course.enroll_student(s).update_attribute(:workflow_state, 'active') }
-    cat = @course.group_categories.create(:name => "the groups")
-    @group = cat.groups.create(:name => "the group", :context => @course)
-    @group.users = [@s1, @s2]
+    add_students(3)
+    @teacher.update_attribute(:name, 'Teacher')
   end
 
   describe "message list" do
     before(:each) do
-      @participant = conversation(@teacher,@s1, body: 'hi there',workflow_state: 'unread')
+      @participant = conversation(@teacher, @s[0], @s[1], body: 'hi there', workflow_state: 'unread')
       @convo = @participant.conversation
       @convo.update_attribute(:subject, 'test')
     end
@@ -28,7 +23,7 @@ describe "conversations new" do
       @teacher.save!
       get_conversations
       expect(conversation_elements.size).to eq 1
-      expect(f('li .author')).to include_text("#{@teacher.name}, #{@s1.name}")
+      expect(f('li .author')).to include_text("#{@teacher.name}, #{@s[0].name}")
       expect(f('ul .read-state')).to be_present
       expect(f('li .subject')).to include_text('test')
       expect(f('li .summary')).to include_text('hi there')
@@ -41,13 +36,35 @@ describe "conversations new" do
       # We do all this to test the time rendered on screen against the time the object was created
       expect(Time.zone.parse(rendered_time).to_i).to match(@participant.last_message_at.to_i)
     end
+
+    it "should forward messages", priority: "1", test_id: 86608 do
+      get_conversations
+      message_count = @convo.conversation_messages.length
+      conversation_elements.first.click
+      wait_for_ajaximations
+
+      # Tests forwarding messages via the top level More Options gear menu
+      click_more_options(admin:true)
+      forward_message(@s[2])
+      expect(ffj('.message-item-view').length).to eq message_count += 1
+
+      # Tests forwarding messages via the conversation level More Options gear menu
+      click_more_options(convo:true)
+      forward_message(@s[0])
+      expect(ffj('.message-item-view').length).to eq message_count += 1
+
+      # Tests forwarding messages via the message level More Options gear menu
+      click_more_options({message:true}, 0)
+      forward_message(@s[1])
+      expect(ffj('.message-item-view').length).to eq message_count + 1
+    end
   end
 
   describe "view filter" do
     before do
-      conversation(@teacher, @s1, @s2, workflow_state: 'unread')
-      conversation(@teacher, @s1, @s2, workflow_state: 'read', starred: true)
-      conversation(@teacher, @s1, @s2, workflow_state: 'archived', starred: true)
+      conversation(@teacher, @s[0], @s[1], workflow_state: 'unread')
+      conversation(@teacher, @s[0], @s[1], workflow_state: 'read', starred: true)
+      conversation(@teacher, @s[0], @s[1], workflow_state: 'archived', starred: true)
     end
 
     it "should default to inbox view", priority: "1", test_id: 86601 do
@@ -127,8 +144,8 @@ describe "conversations new" do
 
   describe "starred" do
     before do
-      @conv_unstarred = conversation(@teacher, @s1, @s2)
-      @conv_starred = conversation(@teacher, @s1, @s2)
+      @conv_unstarred = conversation(@teacher, @s[0], @s[1])
+      @conv_starred = conversation(@teacher, @s[0], @s[1])
       @conv_starred.starred = true
       @conv_starred.save!
     end
