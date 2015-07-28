@@ -16,6 +16,21 @@ I18n.enforce_available_locales = true
 
 I18nliner.infer_interpolation_values = false
 
+unless CANVAS_RAILS3
+  module I18nliner
+    module RehashArrays
+      def infer_pluralization_hash(default, *args)
+        if default.is_a?(Array) && default.all?{|a| a.is_a?(Array) && a.size == 2 && a.first.is_a?(Symbol)}
+          # this was a pluralization hash but rails 4 made it an array in the view helpers
+          return Hash[default]
+        end
+        super
+      end
+    end
+    CallHelpers.extend(RehashArrays)
+  end
+end
+
 if ENV['LOLCALIZE']
   require 'i18n_tasks'
   I18n.send :extend, I18nTasks::Lolcalize
