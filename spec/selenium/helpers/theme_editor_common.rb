@@ -173,19 +173,3 @@ def create_theme(color = 'random')
   click_watermarks_and_other_images
   all_colors(all_watermarks, color)
 end
-
-def verify_colors(text, color)
-  # handle styling wih hex and rbg
-  text.each_with_index do |x, index|
-    if !color[index].attribute(:style).include?('rgb')
-      expect(color[index].attribute(:style)).to include_text(x.attribute(:placeholder))
-    else
-      # convert to rgb
-      hex = x.attribute(:placeholder)[1..-1]
-      rgb_array = hex.scan(/../).map {|color| color.to_i(16)}
-      color_string = "(#{rgb_array[0]}, #{rgb_array[1]}, #{rgb_array[2]})"
-
-      expect(color[index].attribute(:style)).to include_text(color_string)
-    end
-  end
-end

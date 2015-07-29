@@ -1,4 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/discussions_common')
+require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 describe "discussions" do
   include_examples "in-process server selenium tests"
@@ -102,6 +103,19 @@ describe "discussions" do
             set_value f('#discussion_topic_assignment_points_possible'), '123'
           end
           expect(Assignment.last.points_possible).to eq 123
+        end
+
+        it "should warn user when leaving leaving page unsaved" do
+          title = 'new title'
+          get url
+
+          replace_content(f('input[name=title]'), title)
+          f('.home').click
+
+          expect(alert_present?).to be_truthy
+
+          driver.switch_to.alert.dismiss
+          expect(fj('#discussion-title input[value=new title]'))
         end
       end
 

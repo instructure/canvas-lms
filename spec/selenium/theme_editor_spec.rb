@@ -1,5 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/theme_editor_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/color_common')
 
 describe 'Theme Editor' do
   include_examples 'in-process server selenium tests'
@@ -121,12 +122,12 @@ describe 'Theme Editor' do
     create_theme
 
     click_global_branding
-    verify_colors(all_global_branding, all_global_branding('color_box'))
+    verify_colors_for_arrays(all_global_branding, all_global_branding('color_box'))
 
     click_global_navigation
-    verify_colors(all_global_navigation, all_global_navigation('color_box'))
+    verify_colors_for_arrays(all_global_navigation, all_global_navigation('color_box'))
 
     click_watermarks_and_other_images
-    verify_colors(all_watermarks, all_watermarks('color_box'))
+    verify_colors_for_arrays(all_watermarks, all_watermarks('color_box'))
   end
 end
