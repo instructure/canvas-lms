@@ -342,6 +342,10 @@ define([
               </div>
 
             </div>
+            {/* Workaround to avoid corrupted XHR2 request body in IE10 / IE11,
+                needs to be last element in <form>. see:
+                https://blog.yorkxin.org/posts/2014/02/06/ajax-with-formdata-is-broken-on-ie10-ie11/ */}
+            <input type="hidden" name="_workaround_for_IE_10_and_11_formdata_bug" />
           </form>
 
           <Modal
