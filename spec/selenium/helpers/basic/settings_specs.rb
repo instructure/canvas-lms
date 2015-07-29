@@ -30,11 +30,11 @@ shared_examples_for "settings basic tests" do
       f("#tab-users-link").click
     end
 
-    it "should add an account admin" do
+    it "should add an account admin", priority: "1", test_id: 249780 do
       add_account_admin
     end
 
-    it "should delete an account admin" do
+    it "should delete an account admin", priority: "1", test_id: 249781 do
       admin_id = add_account_admin
       f("#enrollment_#{admin_id} .remove_account_user_link").click
       driver.switch_to.alert.accept
@@ -56,7 +56,7 @@ shared_examples_for "settings basic tests" do
       get account_settings_url
     end
 
-    it "should change the account name " do
+    it "should change the account name", priority: "1", test_id: 249782 do
       new_account_name = 'new default account name'
       replace_content(f("#account_name"), new_account_name)
       click_submit
@@ -65,7 +65,7 @@ shared_examples_for "settings basic tests" do
       expect(f("#account_name")).to have_value(new_account_name)
     end
 
-    it "should change the default quotas" do
+    it "should change the default quotas", priority: "1", test_id: 250003 do
       f('#tab-quotas-link').click
 
       # update the quotas
@@ -98,7 +98,7 @@ shared_examples_for "settings basic tests" do
       expect(fj('[name="default_group_storage_quota_mb"]')).to have_value(group_quota.to_s) # fj to avoid selenium caching
     end
 
-    it "should change the default user quota" do
+    it "should change the default user quota", priority: "1", test_id: 250002 do
       if account.root_account?
         f('#tab-quotas-link').click
 
@@ -124,7 +124,7 @@ shared_examples_for "settings basic tests" do
       end
     end
 
-    it "should manually change a course quota" do
+    it "should manually change a course quota", priority: "1", test_id: 250004 do
       f('#tab-quotas-link').click
 
       # find the course by id
@@ -151,7 +151,7 @@ shared_examples_for "settings basic tests" do
       expect(@course.storage_quota_mb).to eq 42
     end
 
-    it "should manually change a group quota" do
+    it "should manually change a group quota", priority: "1", test_id: 250005 do
       f('#tab-quotas-link').click
 
       # find the course by id
@@ -178,7 +178,7 @@ shared_examples_for "settings basic tests" do
       expect(@group.storage_quota_mb).to eq 42
     end
 
-    it "should change the default language to spanish" do
+    it "should change the default language to spanish", priority: "1", test_id: 250006 do
       f("#account_default_locale option[value='es']").click
       click_submit
       account.reload
