@@ -1,4 +1,4 @@
-define ['jquery', 'compiled/editor/EditorToggle'], ($, EditorToggle) ->
+define ['jquery', 'str/htmlEscape', 'compiled/editor/EditorToggle'], ($, htmlEscape, EditorToggle) ->
 
   ##
   # Toggles a multiple choice quiz answer between an editor and an element
@@ -41,7 +41,7 @@ define ['jquery', 'compiled/editor/EditorToggle'], ($, EditorToggle) ->
       id = @textArea.attr('id')
       @answerText.hide()
       if @content is ''
-        tinyMCE.get(id).setContent @answerText.val()
+        tinyMCE.get(id).setContent htmlEscape(@answerText.val())
       else
         tinyMCE.get(id).setContent @content
 
