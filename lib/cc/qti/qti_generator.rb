@@ -35,7 +35,7 @@ module CC
         qti = QTI::QTIGenerator.new(*args)
         qti.generate
       end
-      
+
       # Common Cartridge QTI doesn't support many of the quiz features needed
       # for canvas so this will export a CC-friendly QTI file and one that supports
       # everything needed for Canvas quizzes. In addition to the canvas-specific
@@ -43,21 +43,30 @@ module CC
       def generate
         non_cc_folder = File.join(@export_dir, ASSESSMENT_NON_CC_FOLDER)
         FileUtils::mkdir_p non_cc_folder
-        
+
         @course.assessment_question_banks.active.each do |bank|
           next unless export_object?(bank)
           begin
             generate_question_bank(bank)
           rescue
-            title = bank.title rescue I18n.t('unknown_question_bank', "Unknown question bank")
+            title = if bank
+                      bank.title
+                    else
+                      I18n.t('unknown_question_bank', "Unknown question bank")
+                    end
+
             add_error(I18n.t('course_exports.errors.question_bank', "The question bank \"%{title}\" failed to export", :title => title), $!)
           end
         end
-        
-        @course.quizzes.active.each do |quiz|
+
+        Quizzes::ScopedToUser.new(@course, @user, @course.quizzes.active).scope.each do |quiz|
           next unless export_object?(quiz) || export_object?(quiz.assignment)
 
-          title = quiz.title rescue I18n.t('unknown_quiz', "Unknown quiz")
+          title = if quiz
+                    quiz.title
+                  else
+                    I18n.t('unknown_quiz', "Unknown quiz")
+                  end
 
           if quiz.assignment && !quiz.assignment.can_copy?(@user)
             add_error(I18n.t('course_exports.errors.quiz_is_locked', "The quiz \"%{title}\" could not be copied because it is locked.", :title => title))
@@ -207,19 +216,19 @@ module CC
           end
         end
       end
-      
+
       def generate_assessment(doc, quiz, migration_id, for_cc=true)
         doc.instruct!
-        
+
         xsd_uri = for_cc ? 'http://www.imsglobal.org/profile/cc/ccv1p1/ccv1p1_qtiasiv1p2p1_v1p0.xsd' : 'http://www.imsglobal.org/xsd/ims_qtiasiv1p2p1.xsd'
-  
+
         doc.questestinterop("xmlns" => "http://www.imsglobal.org/xsd/ims_qtiasiv1p2",
                         "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
                         "xsi:schemaLocation"=> "http://www.imsglobal.org/xsd/ims_qtiasiv1p2 #{xsd_uri}"
         ) do |qti_node|
           qti_node.assessment(
                   :ident => migration_id,
-                  :title => quiz.title 
+                  :title => quiz.title
           ) do |asmnt_node|
             asmnt_node.qtimetadata do |meta_node|
               if for_cc
@@ -232,7 +241,7 @@ module CC
               allowed = quiz.allowed_attempts == -1 ? 'unlimited' : quiz.allowed_attempts
               meta_field(meta_node, 'cc_maxattempts', allowed)
             end # meta_node
-            
+
             asmnt_node.section(
                     :ident => "root_section"
             ) do |section_node|
@@ -284,7 +293,7 @@ module CC
           meta_node.fieldentry entry
         end
       end
-      
+
       # Common Cartridge only allows for one section in an assessment
       # that means that you can't have any groups. So we just choose
       # however many (supported) questions there are supposed to be
@@ -308,7 +317,7 @@ module CC
           end
         end
       end
-      
+
       def add_group(node, group)
         id = create_key("quizzes/quiz_group_#{group['id']}")
         node.section(
@@ -338,7 +347,7 @@ module CC
               end
             end
           end
-          
+
           unless group[:assessment_question_bank_id]
             group[:questions].each do |question|
               add_quiz_question(section_node, question)
