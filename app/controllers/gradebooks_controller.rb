@@ -29,21 +29,10 @@ class GradebooksController < ApplicationController
 
   batch_jobs_in_actions :only => :update_submission, :batch => { :priority => Delayed::LOW_PRIORITY }
 
-  before_filter :add_grades_crumb
-
+  add_crumb(proc { t '#crumbs.grades', "Grades" }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_grades_url }
   before_filter { |c| c.active_tab = "grades" }
 
   MAX_POST_GRADES_TOOLS = 10
-
-  def add_grades_crumb
-    if @context.grants_any_right?(@current_user, :manage_grades, :view_all_grades) && !params[:id]
-      crumb_label = t "Gradebook"
-    else
-      crumb_label = t "My Grades"
-    end
-    add_crumb(crumb_label, named_context_url(@context, :context_grades_url))
-  end
-  private :add_grades_crumb
 
   def grade_summary
     @presenter = GradeSummaryPresenter.new(@context, @current_user, params[:id])
