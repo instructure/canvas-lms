@@ -852,7 +852,7 @@ class Course < ActiveRecord::Base
   # to ensure permissions on the root folder are updated after hiding or showing the files tab
   def touch_root_folder_if_necessary
     if tab_configuration_changed?
-      files_tab_was_hidden = tab_configuration_was && tab_configuration_was.any? { |h| h['id'] == TAB_FILES && h['hidden'] }
+      files_tab_was_hidden = tab_configuration_was && tab_configuration_was.any? { |h| !h.blank? && h['id'] == TAB_FILES && h['hidden'] }
       Folder.root_folders(self).each { |f| f.touch } if files_tab_was_hidden != tab_hidden?(TAB_FILES)
     end
     true
