@@ -187,7 +187,7 @@ class PseudonymsController < ApplicationController
   #   them, or unassociated logins. New providers will only search for logins
   #   explicitly associated with them. This can be the integer ID of the
   #   provider, or the type of the provider (in which case, it will find the
-  #   first matching provider)
+  #   first matching provider).
   #
   # @example_request
   #
