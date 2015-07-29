@@ -37,7 +37,9 @@ module Canvas
       end
 
       def mime_for(path)
-        Mime::Type.lookup_by_extension(path.extname[1..-1])
+        ext = path.extname[1..-1]
+        # Mime::Type.lookup_by_extension doesn't have some types (like svg), so fall back to others
+        Mime::Type.lookup_by_extension(ext) || Rack::Mime.mime_type(".#{ext}") || MIME::Types.type_for(ext).first
       end
 
       def options_for(path)
