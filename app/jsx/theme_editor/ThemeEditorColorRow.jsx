@@ -31,14 +31,20 @@ define([
     warningLabel(){
       if (this.props.userInput.invalid && this.inputNotFocused()) {
         return(
-          <div className="ic-Form-message ic-Form-message--error">
-            <div className="ic-Form-message__Layout">
-              <i className="icon-warning" role="presentation"></i>
-              {I18n.t("'%{chosenColor}' is not a valid color.", {chosenColor: this.props.userInput.val})}
+          <span role="alert">
+            <div className="ic-Form-message ic-Form-message--error" tabIndex="0">
+              <div className="ic-Form-message__Layout">
+                <i className="icon-warning" role="presentation"></i>
+                {I18n.t("'%{chosenColor}' is not a valid color.", {chosenColor: this.props.userInput.val})}
+              </div>
             </div>
-          </div>
+          </span>
         )
-      };
+      } else {
+        // must return empty alert span so screenreaders
+        // read the error when it is inserted
+        return <span role="alert" />
+      }
     },
 
     changedColor(value) {
