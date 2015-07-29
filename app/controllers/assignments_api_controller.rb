@@ -431,17 +431,17 @@
 #           "type": "integer"
 #         },
 #         "published": {
-#           "description": "(Only visible if 'enable draft' account setting is on) whether the assignment is published",
+#           "description": "Whether the assignment is published",
 #           "example": true,
 #           "type": "boolean"
 #         },
 #         "unpublishable": {
-#           "description": "(Only visible if 'enable draft' account setting is on) Whether the assignment's 'published' state can be changed to false. Will be false if there are student submissions for the assignment.",
+#           "description": "Whether the assignment's 'published' state can be changed to false. Will be false if there are student submissions for the assignment.",
 #           "example": false,
 #           "type": "boolean"
 #         },
 #         "only_visible_to_overrides": {
-#           "description": "(Only visible if the Differentiated Assignments course feature is turned on) Whether the assignment is only visible to overrides.",
+#           "description": "Whether the assignment is only visible to overrides.",
 #           "example": false,
 #           "type": "boolean"
 #         },

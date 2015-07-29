@@ -86,6 +86,7 @@ class Assignment < ActiveRecord::Base
   validate :group_category_changes_ok?
   validate :discussion_group_ok?
   validate :positive_points_possible?
+  validate :moderation_setting_ok?
 
   accepts_nested_attributes_for :external_tool_tag, :update_only => true, :reject_if => proc { |attrs|
     # only accept the url, content_type, content_id, and new_tab params, the other accessible
@@ -136,6 +137,19 @@ class Assignment < ActiveRecord::Base
     return unless group_category_id && submission_types == 'discussion_topic'
     errors.add :group_category_id, I18n.t("discussion_group_category_locked",
       "Group categories cannot be set directly on a discussion assignment, but should be set on the discussion instead")
+  end
+
+  def graded_submissions_exist?
+    graded_count > 0
+  end
+
+  def moderation_setting_ok?
+    if moderated_grading_changed? && graded_submissions_exist?
+      errors.add :moderated_grading, I18n.t("Moderated grading setting cannot be changed if graded submissions exist")
+    end
+    if (moderated_grading_changed? || new_record?) && moderated_grading? && !graded?
+      errors.add :moderated_grading, I18n.t("Moderated grading setting cannot be enabled for ungraded assignments")
+    end
   end
 
   API_NEEDED_FIELDS = %w(

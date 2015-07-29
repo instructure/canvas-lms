@@ -403,6 +403,8 @@ class AssignmentsController < ApplicationController
         :GROUP_CATEGORIES => group_categories,
         :KALTURA_ENABLED => !!feature_enabled?(:kaltura),
         :POST_TO_SIS => Assignment.sis_grade_export_enabled?(@context),
+        :MODERATED_GRADING => @context.feature_enabled?(:moderated_grading),
+        :HAS_GRADED_SUBMISSIONS => @assignment.graded_submissions_exist?,
         :SECTION_LIST => (@context.course_sections.active.map { |section|
           {
             :id => section.id,

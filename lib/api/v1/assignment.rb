@@ -43,6 +43,7 @@ module Api::V1::Assignment
       grade_group_students_individually
       group_category_id
       grading_standard_id
+      moderated_grading
     )
   }.freeze
 
@@ -470,6 +471,10 @@ module Api::V1::Assignment
     post_to_sis = assignment_params.key?('post_to_sis') ? value_to_boolean(assignment_params['post_to_sis']) : nil
     unless post_to_sis.nil? || !Assignment.sis_grade_export_enabled?(assignment.context)
       assignment.post_to_sis = post_to_sis
+    end
+
+    if assignment.context.feature_enabled?(:moderated_grading) && assignment_params.key?('moderated_grading')
+      assignment.moderated_grading = value_to_boolean(assignment_params['moderated_grading'])
     end
 
     assignment.updating_user = user

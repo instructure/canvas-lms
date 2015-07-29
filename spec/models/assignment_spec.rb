@@ -3379,6 +3379,39 @@ describe Assignment do
       expect(a2.group_category_deleted_with_submissions?).to eq false
     end
   end
+
+  describe "moderated_grading validation" do
+    it "does not allow turning on if graded submissions exist" do
+      assignment_model(course: @course)
+      @assignment.grade_student @student, score: 0
+      @assignment.moderated_grading = true
+      expect(@assignment.save).to eq false
+      expect(@assignment.errors[:moderated_grading]).to be_present
+    end
+
+    it "does not allow turning off if graded submissions exist" do
+      assignment_model(course: @course, moderated_grading: true)
+      expect(@assignment).to be_moderated_grading
+      @assignment.grade_student @student, score: 0
+      @assignment.moderated_grading = false
+      expect(@assignment.save).to eq false
+      expect(@assignment.errors[:moderated_grading]).to be_present
+    end
+
+    it "does not allow turning on for an ungraded assignment" do
+      assignment_model(course: @course, submission_types: 'not_graded')
+      @assignment.moderated_grading = true
+      expect(@assignment.save).to eq false
+      expect(@assignment.errors[:moderated_grading]).to be_present
+    end
+
+    it "does not allow creating a new ungraded assignment with moderated grading" do
+      a = @course.assignments.build
+      a.moderated_grading = true
+      a.submission_types = 'not_graded'
+      expect(a).not_to be_valid
+    end
+  end
 end
 
 def setup_assignment_with_group

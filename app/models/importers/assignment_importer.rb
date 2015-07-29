@@ -171,6 +171,11 @@ module Importers
         item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
       end
 
+      # ^ merge into prop list above once this feature flag is retired
+      if hash[:moderated_grading] && context.feature_enabled?(:moderated_grading)
+        item.moderated_grading = true
+      end
+
       migration.add_imported_item(item)
 
       if migration.date_shift_options
