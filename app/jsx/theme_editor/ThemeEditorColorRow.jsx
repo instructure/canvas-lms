@@ -42,12 +42,17 @@ define([
     },
 
     changedColor(value) {
-      return $('<span>').css('background-color', value).css('background-color');
+      var color = $('<span>').css('background-color', value).css('background-color');
+       // FF returns 'transparent' for invalid colors, but we allow intentionally setting a value to 'transparent'
+      var isInvalid = (color === 'transparent' && value !== 'transparent');
+
+      return  isInvalid ? null : color
     },
 
     hexVal(colorString) {
       var rgbVal = this.changedColor(colorString);
-      return rgb2hex(rgbVal) || rgbVal;
+      // rgb2hex will fail if rgbVal is null or undefined
+      return rgbVal ? (rgb2hex(rgbVal) || rgbVal) : '';
     },
 
     invalidHexString(colorString) {
