@@ -18,6 +18,53 @@ define [
   moonwalk = new Date(Date.UTC(1969, 6, 21, 2, 56))
   epoch = new Date(Date.UTC(1970, 0, 1, 0, 0))
 
+  test 'moment(one-arg) complains', ->
+    err = null
+    try
+      tz.moment('June 24 at 10:00pm')
+    catch err
+    ok err.toString().match(/^Error: tz.moment only works on /)
+
+  test 'moment(non-string, fmt-string) complains', ->
+    err = null
+    try
+      tz.moment(moonwalk, 'MMMM D h:mmA')
+    catch err
+    ok err.toString().match(/^Error: tz.moment only works on /)
+
+  test 'moment(date-string, non-string) complains', ->
+    err = null
+    try
+      tz.moment('June 24 at 10:00pm', 123)
+    catch err
+    ok err.toString().match(/^Error: tz.moment only works on /)
+
+  test 'moment(date-string, fmt-string) works', ->
+    ok tz.moment('June 24 at 10:00pm', 'MMMM D h:mmA')
+
+  test 'moment(date-string, [fmt-strings]) works', ->
+    ok tz.moment('June 24 at 10:00pm', ['MMMM D h:mmA', 'L'])
+
+  test 'moment passes through invalid results', ->
+    m = tz.moment('not a valid date', 'L')
+    ok !m.isValid()
+
+  test 'moment returns moment for valid results', ->
+    m = tz.moment('June 24, 2015 at 10:00pm -04:00', 'MMMM D, YYYY h:mmA Z')
+    ok m.isValid()
+
+  test 'moment sans-timezone info parses according to profile timezone', ->
+    tz.changeZone(detroit, 'America/Detroit')
+    expected = new Date(1435197600000) # 10pm EDT on June 24, 2015
+    m = tz.moment('June 24, 2015 at 10:00pm', 'MMMM D, YYYY h:mmA')
+    equal +m.toDate(), +expected
+
+  test 'moment with-timezone info parses according to that timezone', ->
+    tz.changeZone(detroit, 'America/Detroit')
+    expected = new Date(1435204800000) # 10pm MDT on June 24, 2015
+    m = tz.moment('June 24, 2015 at 10:00pm -06:00', 'MMMM D, YYYY h:mmA Z')
+    equal +m.toDate(), +expected
+
   test 'parse(valid datetime string)', ->
     equal +tz.parse(moonwalk.toISOString()), +moonwalk
 

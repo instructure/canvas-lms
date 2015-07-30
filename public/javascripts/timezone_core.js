@@ -3,8 +3,9 @@ define([
   "underscore",
   "require",
   "vendor/timezone",
-  "i18nObj"
-], function($, _, require, tz, I18n) {
+  "i18nObj",
+  "moment"
+], function($, _, require, tz, I18n, moment) {
   // start with the bare vendor-provided tz() function
   var _tz = tz;
   var _preloadedData = {};
@@ -13,6 +14,49 @@ define([
   // version. each method is intended to act as a subset of bigeasy's generic
   // tz() functionality.
   tz = {
+    // wrap's moment() for parsing datetime strings. assumes the string to be
+    // parsed is in the profile timezone unless if contains an offset string
+    // *and* a format token to parse it, and unfudges the result.
+    moment: function(input, format) {
+      // ensure first argument is a string and second is a format or an array
+      // of formats
+      if (!_.isString(input) || !(_.isString(format) || _.isArray(format)))
+        throw new Error("tz.moment only works on string+format(s). just use " +
+                        "moment() directly for any other signature");
+
+      // call out to moment, leaving the result alone if invalid
+      var m = moment.apply(null, arguments);
+      if (!m.isValid()) return m;
+
+      // unfudge the result unless an offset was both specified and used in the
+      // parsed string.
+      //
+      // using moment internals here because I can't come up with any better
+      // reliable way to test for this :( fortunately, both _f and
+      // _pf.unusedTokens are always set as long as format is explicitly
+      // specified as either a string or array (which we've already checked
+      // for).
+      //
+      // _f lacking a 'Z' indicates that no offset token was specified in the
+      // format string used in parsing. we check this instead of just format in
+      // case format is an array, of which one contains a Z and the other
+      // doesn't, and we don't know until after parsing which format would best
+      // match the input.
+      //
+      // _pf.unusedTokens having a 'Z' token indicates that even though the
+      // format used contained a 'Z' token (since the first condition wasn't
+      // false), that token was not used during parsing; i.e. the input string
+      // didn't provide a value for it.
+      //
+      if (!m._f.match(/Z/) || m._pf.unusedTokens.indexOf('Z') >= 0) {
+        var l = m.locale();
+        m = moment(tz.parse(m.format('YYYY-MM-DD HH:mm:ss')));
+        m.locale(l);
+      }
+
+      return m;
+    },
+
     // parses a date value (string, integer, Date, date array, etc. -- see
     // bigeasy's tz() docs). returns null on parse failure. otherwise returns a
     // Date (rather than _tz()'s timestamp integer) because, when treated
@@ -134,13 +178,13 @@ define([
     restore: function(snapshot) {
       // we can't actually check that the snapshot is an appropriate function,
       // but we can at least verify it's a function.
-      if (typeof snapshot !== 'function') throw 'invalid tz() snapshot';
+      if (typeof snapshot !== 'function') throw new Error('invalid tz() snapshot');
       _tz = snapshot;
     },
 
     extendConfiguration: function() {
       var extended = _tz.apply(null, arguments);
-      if (typeof extended !== 'function') throw 'invalid tz() extension';
+      if (typeof extended !== 'function') throw new Error('invalid tz() extension');
       _tz = extended;
     },
 
