@@ -611,6 +611,9 @@ class DiscussionTopicsController < ApplicationController
   #   announcement's section rather than the discussions section. This requires
   #   announcment-posting permissions.
   #
+  # @argument pinned [Boolean]
+  #   If true, this topic will be listed in the "Pinned Discussion" section
+  #
   # @argument position_after [String]
   #   By default, discussions are sorted chronologically by creation date, you
   #   can pass the id of another topic to have this one show up after the other
@@ -619,6 +622,15 @@ class DiscussionTopicsController < ApplicationController
   # @argument group_category_id [Integer]
   #   If present, the topic will become a group discussion assigned
   #   to the group.
+  #
+  # @argument allow_rating [Boolean]
+  #   If true, users will be allowed to rate entries.
+  #
+  # @argument only_graders_can_rate [Boolean]
+  #   If true, only graders will be allowed to rate entries.
+  #
+  # @argument sort_by_rating [Boolean]
+  #   If true, entries will be sorted by rating.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \
@@ -684,6 +696,9 @@ class DiscussionTopicsController < ApplicationController
   #   If true, this topic is an announcement. It will appear in the
   #   announcement's section rather than the discussions section. This requires
   #   announcment-posting permissions.
+  #
+  # @argument pinned [Boolean]
+  #   If true, this topic will be listed in the "Pinned Discussion" section
   #
   # @argument position_after [String]
   #   By default, discussions are sorted chronologically by creation date, you
