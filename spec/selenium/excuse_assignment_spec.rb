@@ -128,7 +128,7 @@ describe 'Excuse an Assignment' do
 
         assignment = @course.assignments.create!(
             title: 'Group Assignment',
-            group_category_id: @testgroup[0].id,
+            group_category_id: @group_category[0].id,
             grade_group_students_individually: false,
             points_possible: 20
         )
@@ -163,7 +163,7 @@ describe 'Excuse an Assignment' do
 
         a1 = @course.assignments.create!(
             title: 'Group Assignment',
-            group_category_id: @testgroup[0].id,
+            group_category_id: @group_category[0].id,
             grade_group_students_individually: false,
             points_possible: 10
         )
