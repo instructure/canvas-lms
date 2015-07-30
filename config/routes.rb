@@ -1431,6 +1431,7 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: 'quizzes/quiz_groups') do
+      get "courses/:course_id/quizzes/:quiz_id/groups/:id", action: :show, as: 'course_quiz_group'
       post "courses/:course_id/quizzes/:quiz_id/groups", action: :create, as: 'course_quiz_group_create'
       put "courses/:course_id/quizzes/:quiz_id/groups/:id", action: :update, as: 'course_quiz_group_update'
       delete "courses/:course_id/quizzes/:quiz_id/groups/:id", action: :destroy, as: 'course_quiz_group_destroy'

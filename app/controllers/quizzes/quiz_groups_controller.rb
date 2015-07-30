@@ -76,6 +76,19 @@ class Quizzes::QuizGroupsController < ApplicationController
 
   before_filter :require_context, :require_quiz
 
+  # @API Get a single quiz group
+  # @beta
+  #
+  # Returns details of the quiz group with the given id.
+  #
+  # @returns QuizGroup
+  def show
+    if authorized_action(@quiz, @current_user, :read)
+      @group = @quiz.quiz_groups.find(params[:id])
+      render json: quiz_group_json(@group, @context, @current_user, session)
+    end
+  end
+
   # @API Create a question group
   # @beta
   #
