@@ -1,6 +1,16 @@
 Rails.application.config.to_prepare do
   Switchman.cache = -> { MultiCache.cache }
 
+  module Canvas
+    module Shard
+      def clear_cache
+        connection.after_transaction_commit { super }
+      end
+    end
+  end
+
+  Switchman::Shard.prepend(Canvas::Shard)
+
   Switchman::Shard.class_eval do
     class << self
       alias :birth :default unless instance_methods.include?(:birth)
