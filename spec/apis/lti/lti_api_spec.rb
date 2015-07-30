@@ -69,11 +69,6 @@ describe LtiApiController, type: :request do
 
     end
 
-    # verify tool_id
-    # check resource_link_id
-    # verify assignment_id
-    # check that we a url
-
   end
 
 

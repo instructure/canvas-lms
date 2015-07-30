@@ -3,6 +3,7 @@ require 'spec_helper'
 describe TurnitinApi::OutcomesResponseTransformer do
   let(:oauth_key) { 'key' }
   let(:oauth_secret) { 'secret' }
+  let(:lti_params) { {lti_verions: '1p0'} }
   let(:outcomes_response_json) do
     {
         'lis_result_sourcedid' => "6",
@@ -10,12 +11,13 @@ describe TurnitinApi::OutcomesResponseTransformer do
         'outcomes_tool_placement_url' => "http://turnitin.com/api/lti/1p0/outcome_tool_data/4321"
     }
   end
-  subject { described_class.new(oauth_key, oauth_secret, outcomes_response_json) }
+  subject { described_class.new(oauth_key, oauth_secret, lti_params, outcomes_response_json) }
 
   describe 'initialize' do
 
     it 'initializes properly' do
       expect(subject.key).to eq oauth_key
+      expect(subject.lti_params). to eq lti_params
       expect(subject.outcomes_response_json).to eq outcomes_response_json
     end
   end

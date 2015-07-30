@@ -145,9 +145,14 @@ class LtiApiController < ApplicationController
 
   def turnitin_outcomes_placement
     verify_oauth
-    course, assignment, user = BasicLTI::BasicOutcomes.decode_source_id(@tool, params['lis_result_sourcedid'])
+    _course, assignment, user = BasicLTI::BasicOutcomes.decode_source_id(@tool, params['lis_result_sourcedid'])
     assignment.update_attribute(:turnitin_enabled,  false) if assignment.turnitin_enabled?
+    request.body.rewind
+    turnitin_processor = Turnitin::OutcomeResponseProcessor.new(@tool, assignment, user, JSON.parse(request.body.read))
+    turnitin_processor.process
     render json: {}, status: 200
+  rescue BasicLTI::BasicOutcomes::Unauthorized => e
+    return render :text => e, status:401
   end
 
 
