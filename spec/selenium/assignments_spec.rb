@@ -524,17 +524,19 @@ describe "assignments" do
       end
 
       it 'should show when post_grades lti tool installed', priority: "1", test_id: 244957 do
-        Account.default.set_feature_flag!('post_grades', 'off')
-
-        get "/courses/#{@course.id}/assignments/new"
-        wait_for_ajaximations
-        expect(f('#assignment_post_to_sis')).to be_nil
-
         create_post_grades_tool
 
         get "/courses/#{@course.id}/assignments/new"
         wait_for_ajaximations
         expect(f('#assignment_post_to_sis')).to_not be_nil
+      end
+
+      it 'should not show when post_grades lti tool not installed', priority: "1", test_id: 250261 do
+        Account.default.set_feature_flag!('post_grades', 'off')
+
+        get "/courses/#{@course.id}/assignments/new"
+        wait_for_ajaximations
+        expect(f('#assignment_post_to_sis')).to be_nil
       end
     end
   end
