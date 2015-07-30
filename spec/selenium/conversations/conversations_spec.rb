@@ -58,6 +58,19 @@ describe "conversations new" do
       forward_message(@s[1])
       expect(ffj('.message-item-view').length).to eq message_count + 1
     end
+
+    it "should display message count", priority: "1", test_id: 138897 do
+      get_conversations
+      expect(f('.message-count')).to include_text('1')
+
+      select_view('sent')
+      select_message(0)
+      reply_to_message
+      expect(f('.message-count')).to include_text('2')
+
+      reply_to_message
+      expect(f('.message-count')).to include_text('3')
+    end
   end
 
   describe "view filter" do

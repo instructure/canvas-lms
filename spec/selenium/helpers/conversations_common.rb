@@ -82,6 +82,11 @@ def select_course(new_course)
   wait_for_ajaximations
 end
 
+def select_message(msg_index)
+  conversation_elements[msg_index].click
+  wait_for_ajaximations
+end
+
 def click_star_toggle_menu_item
   keep_trying_until do
     driver.execute_script(%q{$('#admin-btn').hover().click()})
@@ -209,4 +214,15 @@ def add_students(count)
     @s << User.create!(:name => "Test Student #{n+1}")
     @course.enroll_student(@s.last).update_attribute(:workflow_state, 'active')
   end
+end
+
+def click_reply
+  f('#reply-btn').click
+  wait_for_ajaximations
+end
+
+def reply_to_message(body = 'stuff')
+  click_reply
+  set_message_body(body)
+  click_send
 end
