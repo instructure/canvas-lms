@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/quizzes_common')
 
 describe 'quizzes question creation' do
 
-  include_examples 'quizzes selenium tests'
+  include_examples 'in-process server selenium tests'
 
   context 'when creating a new question' do
 

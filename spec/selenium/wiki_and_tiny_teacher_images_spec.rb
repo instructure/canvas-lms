@@ -3,7 +3,6 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe "Wiki pages and Tiny WYSIWYG editor Images" do
   include_examples "in-process server selenium tests"
-  include_examples "quizzes selenium tests"
 
   context "wiki and tiny images as a teacher" do
 

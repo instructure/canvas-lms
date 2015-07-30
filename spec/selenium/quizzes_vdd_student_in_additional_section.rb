@@ -4,7 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides
 
 describe "quizzes attempts" do
   include AssignmentOverridesSeleniumHelper
-  include_examples "quizzes selenium tests"
+  include_examples 'in-process server selenium tests'
   before :all do
     @student2 = user_with_pseudonym(:username => 'student2@example.com', :active_all => 1)
     @course1 = course_model

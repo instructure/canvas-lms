@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe "equation editor" do
-  include_examples "quizzes selenium tests"
+  include_examples 'in-process server selenium tests'
 
   let(:equation_selector){ "div[aria-label='Insert Math Equation'] button" }
 

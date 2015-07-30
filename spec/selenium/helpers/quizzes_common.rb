@@ -1,8 +1,5 @@
 require_relative "../common"
 
-shared_examples_for "quizzes selenium tests" do
-  include_examples "in-process server selenium tests"
-
   def create_quiz_with_default_due_dates
     due_at = Time.zone.now
     unlock_at = Time.zone.now.advance(days:-2)
@@ -432,4 +429,3 @@ shared_examples_for "quizzes selenium tests" do
     target = "#group_top_#{group_id} + *"
     js_drag_and_drop source, target
   end
-end
