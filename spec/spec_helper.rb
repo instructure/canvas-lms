@@ -62,6 +62,17 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
 
+unless CANVAS_RAILS3
+  Time.class_eval do
+    def compare_with_round(other)
+      other = Time.at(other.to_i, other.usec) if other.respond_to?(:usec)
+      Time.at(self.to_i, self.usec).compare_without_round(other)
+    end
+    alias_method :compare_without_round, :<=>
+    alias_method :<=>, :compare_with_round
+  end
+end
+
 module RSpec::Rails
   module ViewExampleGroup
     module ExampleMethods
