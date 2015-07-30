@@ -571,17 +571,15 @@ TEXT
                    the magic is in giving it an id of "<name_of_service>_help_dialog" and class="service_help_dialog" -->
               <div class="service_help_dialog" title="<%= t(:about_google_docs_tooltip, "About Google Docs Previews") %>" id="google_docs_previews_help_dialog">
                 <%= mt(:about_google_docs, <<-TEXT, :terms_url => "https://docs.google.com/viewer/TOS")
-Google Docs Previews allow users to view documents from
-within Canvas, rather than having to download them and
+Google Docs Previews allow users to view documents from 
+within Canvas, rather than having to download them and 
 open the corresponding program (e.g. Word or Excel).
 
-If Scribd has been enabled on this account, Canvas will
-try to use it to show the preview. If the document
-cannot be previewed in Scribd, or if the user does not
-have the Flash player installed (e.g. iPad/iPhone),
-Canvas will fall back to using Google Docs Previews
-if they are enabled. By using this service you
-acknowledge that you have read and agreed to the
+Google Docs Previews can also render file types
+not supported by the Canvas document previewer.
+
+By using this service you 
+acknowledge that you have read and agreed to the 
 [Google Docs Viewer Terms of Service](%{terms_url}).
                   TEXT
                 %>
