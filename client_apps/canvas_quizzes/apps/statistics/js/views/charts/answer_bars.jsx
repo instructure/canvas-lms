@@ -37,7 +37,8 @@ define(function(require) {
           id: answer.id,
           text: answer.text,
           correct: answer.correct,
-          responses: answer.responses
+          responses: answer.responses,
+          user_names: answer.user_names
         }
       });
 

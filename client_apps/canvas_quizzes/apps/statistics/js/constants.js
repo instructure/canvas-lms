@@ -26,6 +26,7 @@ define({
     'responses',
     'answers',
     'position',
+    'user_names',
 
     // multiple-choice & true/false
     'answered_student_count',
@@ -46,7 +47,7 @@ define({
 
     // Essay
     'full_credit',
-    'point_distribution',
+    'point_distribution'
   ],
 
   POINT_BISERIAL_ATTRS: [

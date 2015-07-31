@@ -136,6 +136,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
       s.submission_data.each do |a|
         q_id = a[:question_id]
         a[:user_id] = s.user_id || s.temporary_user_code
+        a[:user_name] = s.user.name
         responses_for_question[q_id] ||= []
         responses_for_question[q_id] << a
       end
