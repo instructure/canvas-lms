@@ -30,7 +30,9 @@ define(function(require) {
       var answerSet = answerSets.filter(function(answerSet) {
         return answerSet.id === answerSetId;
       })[0] || { answers: [] };
-
+      if(answerSet.answers){
+        answerSet.answers.forEach(function(answer){answer.poolId = answerSet.id})
+      }
       return answerSet.answers;
     },
 

@@ -280,3 +280,11 @@
     box-shadow: 0 1px 0 #333;
   }
 }
+
+.answer-response-list {
+  list-style-position: inside;
+  columns: 2;
+  -webkit-columns: 2;
+  -moz-columns: 2;
+}
+

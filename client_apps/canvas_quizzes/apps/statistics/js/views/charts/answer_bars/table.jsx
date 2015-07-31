@@ -1,8 +1,10 @@
 /** @jsx React.DOM */
 define(function(require) {
   var React = require('react');
+  var _ = require('lodash');
   var I18n = require('i18n!quiz_statistics.answer_bars_chart');
   var Text = require('jsx!canvas_quizzes/components/text');
+  var UserListDialog = require('jsx!../../questions/user_list_dialog');
 
   // A table for screen-readers that provides an alternative view of the data.
   var Table = React.createClass({
@@ -53,9 +55,21 @@ define(function(require) {
             }, {
               count: answer.responses
             })}
+            {this.renderRespondents(answer)}
           </td>
         </tr>
       );
+    },
+
+    renderRespondents: function (answer) {
+      if (!_.isEmpty(answer.user_names)) {
+        return(
+          <div>
+            <span className="screenreader-only">{I18n.t('Select for list of users who responded.')}</span>
+            <UserListDialog answer_id={answer.id} user_names={answer.user_names} />
+          </div>
+        );
+      }
     }
   });
 

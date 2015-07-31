@@ -142,8 +142,7 @@ describe 'quizzes stats' do
           wait_for_ajaximations
           fj('i.chart-help-trigger.icon-question').click
           wait_for_ajaximations
-
-          expect(f('span.ui-dialog-title')).to include_text('The Discrimination Index Chart')
+          expect(ff('span.ui-dialog-title').any? {|dialog| dialog.text == 'The Discrimination Index Chart'})
         end
       end
     end
