@@ -28,8 +28,12 @@ define([
       return {};
     },
 
+    showWarning(){
+      return this.props.userInput.invalid && this.inputNotFocused()
+    },
+
     warningLabel(){
-      if (this.props.userInput.invalid && this.inputNotFocused()) {
+      if (this.showWarning()) {
         return(
           <span role="alert">
             <div className="ic-Form-message ic-Form-message--error" tabIndex="0">
@@ -103,9 +107,11 @@ define([
           <input
               ref="textInput"
               type="text"
+              id={'brand_config[variables]['+ this.props.varDef.variable_name +']'}
               className={inputClasses}
               placeholder={this.props.placeholder}
               value={colorVal}
+              aria-invalid={this.showWarning()}
               onChange={event => this.inputChange(event.target.value) }
               onBlur={this.updateIfMounted} />
         </span>
