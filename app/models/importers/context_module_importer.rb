@@ -58,9 +58,9 @@ module Importers
       item ||= ContextModule.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first
       item ||= ContextModule.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
       item ||= ContextModule.new(:context => context)
+      item.migration_id = hash[:migration_id]
       migration.add_imported_item(item)
       item.name = hash[:title] || hash[:description]
-      item.migration_id = hash[:migration_id]
       if hash[:workflow_state] == 'unpublished'
         item.workflow_state = 'unpublished'
       else
