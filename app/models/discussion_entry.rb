@@ -52,6 +52,7 @@ class DiscussionEntry < ActiveRecord::Base
   validates_presence_of :discussion_topic_id
   before_validation :set_depth, :on => :create
   validate :validate_depth, on: :create
+  validate :discussion_not_deleted, on: :create
 
   sanitize_field :message, CanvasSanitize::SANITIZE
 
@@ -132,8 +133,13 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
 
+  def discussion_not_deleted
+    errors.add(:base, "Requires non-deleted discussion topic") if self.discussion_topic.deleted?
+  end
+
   def reply_from(opts)
     raise IncomingMail::Errors::UnknownAddress if self.context.root_account.deleted?
+    raise IncomingMail::Errors::ReplyToDeletedDiscussion if self.discussion_topic.deleted?
     user = opts[:user]
     if opts[:html]
       message = opts[:html].strip

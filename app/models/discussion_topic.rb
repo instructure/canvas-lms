@@ -728,6 +728,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def reply_from(opts)
+    raise IncomingMail::Errors::ReplyToDeletedDiscussion if self.deleted?
     raise IncomingMail::Errors::UnknownAddress if self.context.root_account.deleted?
     user = opts[:user]
     if opts[:html]
