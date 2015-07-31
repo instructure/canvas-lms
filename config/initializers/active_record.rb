@@ -1,6 +1,8 @@
 require 'active_support/callbacks/suspension'
 
 class ActiveRecord::Base
+  self.cache_timestamp_format = :number unless CANVAS_RAILS3
+
   def write_attribute(attr_name, *args)
     if CANVAS_RAILS3
       column = column_for_attribute(attr_name)
