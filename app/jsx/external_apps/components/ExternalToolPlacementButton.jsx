@@ -103,7 +103,7 @@ define([
           <div id={this.state.tool.name + "Heading"}
                className="ReactModal__Layout"
             >
-            <div className="ReactModal__InnerSection ReactModal__Header ReactModal__Header--force-no-corners">
+            <div className="ReactModal__Header">
               <div className="ReactModal__Header-Title">
                 <h4 tabindex="-1">{I18n.t('App Placements')}</h4>
               </div>
@@ -114,12 +114,12 @@ define([
                 </button>
               </div>
             </div>
-            <div tabindex="-1" className="ReactModal__InnerSection ReactModal__Body" >
+            <div tabindex="-1" className="ReactModal__Body" >
               <div id={ this.state.tool.name.replace(/\s/g,'') + 'Placements' } >
                 { this.placements() || I18n.t("No Placements Enabled")}
               </div>
             </div>
-            <div className="ReactModal__InnerSection ReactModal__Footer">
+            <div className="ReactModal__Footer">
               <div className="ReactModal__Footer-Actions">
                 <button
                   ref="btnClose" type="button" className="btn btn-default"

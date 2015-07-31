@@ -24,14 +24,14 @@ define([
       );
       return (
         <div className="Lti2Permissions">
-          <div className="ReactModal__InnerSection ReactModal__Body--force-no-corners ReactModal__Body">
+          <div className="ReactModal__Body">
             <p dangerouslySetInnerHTML={{ __html: p1 }}></p>
             <p>{I18n.t('Would you like to enable this app?')}</p>
           </div>
-          <div className="ReactModal__InnerSection ReactModal__Footer">
+          <div className="ReactModal__Footer">
             <div className="ReactModal__Footer-Actions">
-              <button type="button" className="btn btn-primary" onClick={this.props.handleActivateLti2}>{I18n.t('Enable')}</button>
-              <button type="button" className="btn btn-secondary" onClick={this.props.handleCancelLti2}>{I18n.t("Delete")}</button>
+              <button type="button" className="Button" onClick={this.props.handleCancelLti2}>{I18n.t("Delete")}</button>
+              <button type="button" className="Button Button--primary" onClick={this.props.handleActivateLti2}>{I18n.t('Enable')}</button>
             </div>
           </div>
         </div>

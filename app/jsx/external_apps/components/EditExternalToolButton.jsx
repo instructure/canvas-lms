@@ -126,7 +126,7 @@ define([
             isOpen={this.state.modalIsOpen}
             onRequestClose={this.closeModal}>
             <div className="ReactModal__Layout">
-              <div className="ReactModal__InnerSection ReactModal__Header ReactModal__Header--force-no-corners">
+              <div className="ReactModal__Header">
                 <div className="ReactModal__Header-Title">
                   <h4>{I18n.t('Edit App')}</h4>
                 </div>

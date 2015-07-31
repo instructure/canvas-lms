@@ -35,10 +35,8 @@ define([
                  onRequestClose={this.closeModal}
                  className={this.props.className}
                  overlayClassName={this.props.overlayClassName}>
-            
             <div className="ReactModal__Layout">
-
-              <div className="ReactModal__InnerSection ReactModal__Header">
+              <div className="ReactModal__Header">
                 <div className="ReactModal__Header-Title">
                   <h4>Modal Title Goes Here</h4>
                 </div>
@@ -49,29 +47,23 @@ define([
                   </button>
                 </div>
               </div>
-
-              <div className="ReactModal__InnerSection ReactModal__Body">
+              <div className="ReactModal__Body">
                 Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus deserunt doloremque, explicabo illo
                 ipsum libero magni odio officia optio perferendis ratione repellat suscipit tempore. Commodi hic sed.
                 Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus deserunt doloremque, explicabo illo
                 ipsum libero magni odio officia optio perferendis ratione repellat suscipit tempore. Commodi hic sed.
               </div>
-              
-              <div className="ReactModal__InnerSection ReactModal__Footer">
+              <div className="ReactModal__Footer">
                 <div className="ReactModal__Footer-Actions">
                   <button type="button" className="btn btn-default" onClick={this.closeModal}>Cancel</button>
                   <button type="submit" className="btn btn-primary" onClick={this.handleSubmit}>Submit</button>
                 </div>
               </div>
-
             </div>
-          
           </Modal>
         </div>
       );
     }
-
   });
-
   return ReactModalExample;
 });
