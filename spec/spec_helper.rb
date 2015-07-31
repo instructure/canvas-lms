@@ -71,6 +71,10 @@ unless CANVAS_RAILS3
     alias_method :compare_without_round, :<=>
     alias_method :<=>, :compare_with_round
   end
+
+  # temporary patch to keep things sane
+  # TODO: actually fix the deprecation messages once we're on Rails 4 permanently and remove this
+  ActiveSupport::Deprecation.silenced = true
 end
 
 module RSpec::Rails
