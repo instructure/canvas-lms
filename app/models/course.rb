@@ -20,7 +20,6 @@ require 'atom'
 require 'csv'
 
 class Course < ActiveRecord::Base
-
   include Context
   include Workflow
   include TextHelper
@@ -1491,30 +1490,6 @@ class Course < ActiveRecord::Base
         update_all(:grade_publishing_status => 'error', :grade_publishing_message => "Timed out.")
   end
 
-  def enrollments_for_csv(options={})
-    # user: used for name in csv output
-    # course_section: used for display_name in csv output
-    # user > pseudonyms: used for sis_user_id/unique_id if options[:include_sis_id]
-    # user > pseudonyms > account: used in find_pseudonym_for_account > works_for_account
-    includes = [:user, :course_section]
-    includes = {:user => {:pseudonyms => :account}, :course_section => []} if options[:include_sis_id]
-
-    scope = if options[:user]
-              enrollment_opts = options.slice(:include_priors)
-              enrollments_visible_to(options[:user], enrollment_opts)
-            else
-              options[:include_priors] ?
-                all_student_enrollments :
-                student_enrollments
-            end
-    enrollments = scope.includes(includes).order_by_sortable_name.to_a
-    enrollments.partition { |enrollment|
-      enrollment.type != "StudentViewEnrollment"
-    }.flatten
-  end
-
-  private :enrollments_for_csv
-
   def gradebook_to_csv_in_background(filename, user, options = {})
     progress = progresses.build(tag: 'gradebook_to_csv')
     progress.save!
@@ -1529,150 +1504,21 @@ class Course < ActiveRecord::Base
     exported_gradebook.progress = progress
     exported_gradebook.save!
 
-    progress.process_job(self, :generate_csv, {preserve_method_args: true}, options, attachment)
+    progress.process_job(
+      self,
+      :generate_csv,
+      { preserve_method_args: true },
+      options,
+      attachment
+    )
     {attachment_id: attachment.id, progress_id: progress.id}
   end
 
   def generate_csv(options, attachment)
-    csv = gradebook_to_csv(options)
+    csv = GradebookExporter.new(self, options).to_csv
     create_attachment(attachment, csv)
   end
 
-  def gradebook_to_csv(options = {})
-    student_enrollments = enrollments_for_csv(options)
-
-    student_section_names = {}
-    student_enrollments.each do |enrollment|
-      student_section_names[enrollment.user_id] ||= []
-      student_section_names[enrollment.user_id] << (enrollment.course_section.display_name rescue nil)
-    end
-    student_enrollments = student_enrollments.uniq(&:user_id) # remove duplicate enrollments for students enrolled in multiple sections
-
-    calc = GradeCalculator.new(student_enrollments.map(&:user_id), self, :ignore_muted => false)
-    grades = calc.compute_scores
-
-    submissions = {}
-    calc.submissions.each { |s| submissions[[s.user_id, s.assignment_id]] = s }
-
-    assignments = calc.assignments.sort_by do |a|
-      [a.assignment_group_id, a.position, a.due_at || CanvasSort::Last, a.title]
-    end
-    groups = calc.groups
-
-    read_only = t('csv.read_only_field', '(read only)')
-    t 'csv.student', 'Student'
-    t 'csv.id', 'ID'
-    t 'csv.sis_user_id', 'SIS User ID'
-    t 'csv.sis_login_id', 'SIS Login ID'
-    t 'csv.root_account', 'Root Acount'
-    t 'csv.section', 'Section'
-    t 'csv.comments', 'Comments'
-    t 'csv.current_score', 'Current Score'
-    t 'csv.final_score', 'Final Score'
-    t 'csv.final_grade', 'Final Grade'
-    t 'csv.points_possible', 'Points Possible'
-    include_root_account = self.root_account.trust_exists?
-    CSV.generate do |csv|
-      #First row
-      row = ["Student", "ID"]
-      if options[:include_sis_id]
-        row << "SIS User ID" << "SIS Login ID"
-        row << "Root Account" if include_root_account
-      end
-      row << "Section"
-      row.concat assignments.map(&:title_with_id)
-      include_points = !apply_group_weights?
-      groups.each { |g|
-        if include_points
-          row << "#{g.name} Current Points" << "#{g.name} Final Points"
-        end
-        row << "#{g.name} Current Score" << "#{g.name} Final Score"
-      }
-      row << "Current Points" << "Final Points" if include_points
-      row << "Current Score" << "Final Score"
-      row << "Current Grade" << "Final Grade" if grading_standard_enabled?
-      csv << row
-
-      group_filler_length = groups.size * (include_points ? 4 : 2)
-
-      #Possible muted row
-      if assignments.any?(&:muted)
-        #This is is not translated since we look for this exact string when we upload to gradebook.
-        row = [nil, nil, nil]
-        row << nil << nil if options[:include_sis_id]
-        row.concat(assignments.map { |a| 'Muted' if a.muted? })
-        row.concat([nil] * group_filler_length)
-        row << nil << nil if include_points
-        row << nil << nil
-        row << nil if self.grading_standard_enabled?
-        csv << row
-      end
-
-      #Second Row
-      row = ["    Points Possible", nil, nil]
-      row << nil << nil if options[:include_sis_id]
-      row << nil if options[:include_sis_id] && include_root_account
-      row.concat assignments.map(&:points_possible)
-      row.concat([read_only] * group_filler_length)
-      row << read_only << read_only if include_points
-      row << read_only << read_only
-      row << read_only if self.grading_standard_enabled?
-      csv << row
-
-      name_method = list_students_by_sortable_name? ?  :sortable_name : :name
-
-      student_enrollments.each_slice(100) do |student_enrollments_batch|
-
-        if da_enabled = feature_enabled?(:differentiated_assignments)
-          visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(user_id: student_enrollments_batch.map(&:user_id), course_id: id)
-        end
-
-        student_enrollments_batch.each do |student_enrollment|
-          student = student_enrollment.user
-          student_sections = student_section_names[student.id].sort.to_sentence
-          student_submissions = assignments.map do |a|
-            if da_enabled && visible_assignments[student.id] && !visible_assignments[student.id].include?(a.id)
-              "N/A"
-            else
-              submission = submissions[[student.id, a.id]]
-              if submission.try(:excused?)
-                "EX"
-              elsif a.grading_type == "gpa_scale" && submission.try(:score)
-                a.score_to_grade(submission.score)
-              else
-                submission.try(:score)
-              end
-            end
-          end
-          row = [student.send(name_method), student.id]
-          if options[:include_sis_id]
-            pseudonym = SisPseudonym.for(student, self, include_root_account)
-            row << pseudonym.try(:sis_user_id)
-            pseudonym ||= student.find_pseudonym_for_account(self.root_account, include_root_account)
-            row << pseudonym.try(:unique_id)
-            row << (pseudonym && HostUrl.context_host(pseudonym.account)) if include_root_account
-          end
-
-          row << student_sections
-          row.concat(student_submissions)
-
-          (current_info, current_group_info),
-            (final_info, final_group_info) = grades.shift
-          groups.each do |g|
-            row << current_group_info[g.id][:score] << final_group_info[g.id][:score] if include_points
-            row << current_group_info[g.id][:grade] << final_group_info[g.id][:grade]
-          end
-          row << current_info[:total] << final_info[:total] if include_points
-          row << current_info[:grade] << final_info[:grade]
-          if self.grading_standard_enabled?
-            row << score_to_grade(current_info[:grade])
-            row << score_to_grade(final_info[:grade])
-          end
-          csv << row
-        end
-      end
-    end
-  end
 
   def create_attachment(attachment, csv)
     attachment.uploaded_data = StringIO.new(csv)

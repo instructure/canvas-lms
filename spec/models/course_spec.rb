@@ -879,7 +879,7 @@ describe Course, "gradebook_to_csv" do
     @user.reload
     @course.reload
 
-    csv = @course.gradebook_to_csv
+    csv = GradebookExporter.new(@course).to_csv
     expect(csv).not_to be_nil
     rows = CSV.parse(csv)
     expect(rows.length).to equal(3)
@@ -920,7 +920,7 @@ describe Course, "gradebook_to_csv" do
     g1a1.grade_student(@user, grade: 10)
     g2a1.grade_student(@user, grade: 5)
 
-    csv = @course.gradebook_to_csv
+    csv = GradebookExporter.new(@course).to_csv
     expect(csv).not_to be_nil
     rows = CSV.parse(csv)
     expect(rows.length).to equal(3)
@@ -959,7 +959,7 @@ describe Course, "gradebook_to_csv" do
     @user.reload
     @course.reload
 
-    csv = @course.gradebook_to_csv
+    csv = GradebookExporter.new(@course).to_csv
     rows = CSV.parse(csv)
     assignments = rows[0].each_with_object([]) do |column, collection|
       collection << column.sub(/ \([0-9]+\)/, '') if column =~ /Assignment \d+/
@@ -985,7 +985,7 @@ describe Course, "gradebook_to_csv" do
     end
 
     it "should alphabetize by sortable name with the test student at the end" do
-      csv = @course.gradebook_to_csv
+      csv = GradebookExporter.new(@course).to_csv
       rows = CSV.parse(csv)
       expect([rows[2][0],
        rows[3][0],
@@ -995,7 +995,7 @@ describe Course, "gradebook_to_csv" do
 
     it "can show students by sortable name" do
       @course.enable_feature! :gradebook_list_students_by_sortable_name
-      csv = @course.gradebook_to_csv
+      csv = GradebookExporter.new(@course).to_csv
       rows = CSV.parse(csv)
       expect([rows[2][0],
        rows[3][0],
@@ -1008,7 +1008,7 @@ describe Course, "gradebook_to_csv" do
     student_in_course active_all: true
     a = @course.assignments.create! name: "asdf", points_possible: 10
     a.grade_student @student, excuse: true
-    csv = CSV.parse(@course.gradebook_to_csv)
+    csv = CSV.parse(GradebookExporter.new(@course).to_csv)
     _name, _id, _section, score, _ = csv[-1]
     expect(score).to eq "EX"
   end
@@ -1027,7 +1027,7 @@ describe Course, "gradebook_to_csv" do
     @course.enroll_user(students[2], 'StudentEnrollment', :section => sections[1], :enrollment_state => 'active', :allow_multiple_enrollments => true)
     @course.enroll_user(students[2], 'StudentEnrollment', :section => sections[2], :enrollment_state => 'active', :allow_multiple_enrollments => true)
 
-    csv = @course.gradebook_to_csv
+    csv = GradebookExporter.new(@course).to_csv
     expect(csv).not_to be_nil
     rows = CSV.parse(csv)
     expect(rows.length).to equal(5)
@@ -1049,7 +1049,7 @@ describe Course, "gradebook_to_csv" do
     @user.reload
     @course.reload
 
-    csv = @course.gradebook_to_csv
+    csv = GradebookExporter.new(@course).to_csv
     expect(csv).not_to be_nil
     rows = CSV.parse(csv)
     expect(rows.length).to equal(3)
@@ -1086,7 +1086,7 @@ describe Course, "gradebook_to_csv" do
     @course.recompute_student_scores
     @course.reload
 
-    csv = @course.gradebook_to_csv(:include_sis_id => true)
+    csv = GradebookExporter.new(@course, :include_sis_id => true).to_csv
     expect(csv).not_to be_nil
     rows = CSV.parse(csv)
     expect(rows.length).to eq 5
@@ -1128,7 +1128,7 @@ describe Course, "gradebook_to_csv" do
     HostUrl.expects(:context_host).with(@course.root_account).returns('school1')
     HostUrl.expects(:context_host).with(account2).returns('school2')
 
-    csv = @course.gradebook_to_csv(:include_sis_id => true)
+    csv = GradebookExporter.new(@course, :include_sis_id => true).to_csv
     expect(csv).not_to be_nil
     rows = CSV.parse(csv)
     expect(rows.length).to eq 5
@@ -1159,8 +1159,8 @@ describe Course, "gradebook_to_csv" do
     e = course_with_student active_all: true
     e.update_attribute :workflow_state, 'completed'
 
-    expect(@course.gradebook_to_csv).not_to include @student.name
-    expect(@course.gradebook_to_csv(include_priors: true)).to include @student.name
+    expect(GradebookExporter.new(@course).to_csv).not_to include @student.name
+    expect(GradebookExporter.new(@course, include_priors: true).to_csv).to include @student.name
   end
 
   context "accumulated points" do
@@ -1171,7 +1171,7 @@ describe Course, "gradebook_to_csv" do
     end
 
     it "includes points for unweighted courses" do
-      csv = CSV.parse(@course.gradebook_to_csv)
+      csv = CSV.parse(GradebookExporter.new(@course).to_csv)
       expect(csv[0][-8]).to eq "Assignments Current Points"
       expect(csv[0][-7]).to eq "Assignments Final Points"
       expect(csv[1][-8]).to eq "(read only)"
@@ -1188,7 +1188,7 @@ describe Course, "gradebook_to_csv" do
 
     it "doesn't include points for weighted courses" do
       @course.update_attribute(:group_weighting_scheme, 'percent')
-      csv = CSV.parse(@course.gradebook_to_csv)
+      csv = CSV.parse(GradebookExporter.new(@course).to_csv)
       expect(csv[0][-8]).not_to eq "Assignments Current Points"
       expect(csv[0][-7]).not_to eq "Assignments Final Points"
       expect(csv[0][-4]).not_to eq "Current Points"
@@ -1206,7 +1206,7 @@ describe Course, "gradebook_to_csv" do
     @s2 = @course.course_sections.create!(:name => 'section2')
     StudentEnrollment.create!(:user => @user1, :course => @course, :course_section => @s2)
     @course.reload
-    csv = @course.gradebook_to_csv(:include_sis_id => true)
+    csv = GradebookExporter.new(@course, :include_sis_id => true).to_csv
     rows = CSV.parse(csv)
     expect(rows.length).to eq 4
   end
@@ -1232,7 +1232,7 @@ describe Course, "gradebook_to_csv" do
       @course.recompute_student_scores
       @course.reload
 
-      csv = @course.gradebook_to_csv(:include_sis_id => true)
+      csv = GradebookExporter.new(@course, :include_sis_id => true).to_csv
       expect(csv).not_to be_nil
       rows = CSV.parse(csv)
       expect(rows.length).to eq 6
@@ -1267,7 +1267,7 @@ describe Course, "gradebook_to_csv" do
     @user2 = user_with_pseudonym(:active_all => true, :name => 'Jeremy', :username => 'jeremy@instructure.com')
     @course.enroll_student(@user2)
 
-    csv = @course.gradebook_to_csv(:user => @teacher)
+    csv = GradebookExporter.new(@course, :user => @teacher).to_csv
     expect(csv).not_to be_nil
     rows = CSV.parse(csv)
     # two header rows, and one student row
@@ -1282,7 +1282,7 @@ describe Course, "gradebook_to_csv" do
       title: "blah"
     a.publish
     a.grade_student(@student, grade: "C")
-    rows = CSV.parse(@course.gradebook_to_csv)
+    rows = CSV.parse(GradebookExporter.new(@course).to_csv)
     expect(rows[2][3]).to eql "C"
   end
 
@@ -1312,7 +1312,7 @@ describe Course, "gradebook_to_csv" do
     end
 
     it "should insert N/A for non-visible assignments" do
-      csv = @course.gradebook_to_csv(:user => @teacher)
+      csv = GradebookExporter.new(@course, :user => @teacher).to_csv
       expect(csv).not_to be_nil
       rows = CSV.parse(csv)
       expect(rows[2][3]).to eq "3"

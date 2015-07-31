@@ -39,7 +39,7 @@ describe 'Excuse an Assignment' do
     assignment = @course.assignments.create! title: 'Excuse Me', points_possible: 20
     assignment.grade_student @student, excuse: true
 
-    csv = CSV.parse(@course.gradebook_to_csv)
+    csv = CSV.parse(GradebookExporter.new(@course).to_csv)
     _name, _id, _section, score = csv[-1]
     expect(score).to eq 'EX'
   end
