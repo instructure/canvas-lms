@@ -271,7 +271,7 @@ $te-input-height: 30px;
   &:disabled {
     cursor: default;
   }
-  
+
   @if $use_high_contrast == false { outline: none; }
 }
 
@@ -392,6 +392,7 @@ $te-input-height: 30px;
     border: none;
     border-radius: 0;
     &.ui-accordion-content-active {
+      overflow: visible;
       border-radius: 0;
       box-shadow: inset 0px 0 5px lighten($ic-color-neutral, 0.2);
     }
@@ -432,7 +433,7 @@ $te-input-height: 30px;
     border: none;
     outline: none;
   }
-  
+
   .Theme__editor-color-block_input-text {
     width: 75px;
     height: $te-input-height;
@@ -461,8 +462,24 @@ $te-input-height: 30px;
   }
   .ic-Form-message.ic-Form-message--error{
     position: absolute;
-    left: 150px;
     top: 40px;
+    right: 40px;
+    left: auto;
+    height: auto; width: auto;
+    .ic-Form-message__Layout {
+      flex-direction: row;
+      max-width: 200px; // allows for better presentation for longer string errors
+      span {
+        box-sizing: border-box;
+        align-self: stretch;
+        display: block;
+        flex: 0 0 150px;
+      }
+      &:after {
+        right: 16px;
+        left: auto;
+      }
+    }
   }
 }
 ////
