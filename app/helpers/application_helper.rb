@@ -265,9 +265,7 @@ module ApplicationHelper
   end
 
   def css_variant
-    if k12?
-      variant = 'k12'
-    elsif use_new_styles?
+    if use_new_styles?
       variant = 'new_styles'
     else
       variant = 'legacy'

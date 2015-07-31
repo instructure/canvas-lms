@@ -3,9 +3,7 @@ define ->
 
   brandableCss =
     getCssVariant: ->
-      variant = if window.ENV.k12
-        'k12'
-      else if window.ENV.use_new_styles
+      variant = if window.ENV.use_new_styles
         'new_styles'
       else
         'legacy'
