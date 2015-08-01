@@ -17,6 +17,8 @@
 #
 
 class GradebookExporter
+  include GradebookTransformer
+
   def initialize(course, options = {})
     @course  = course
     @options = options
@@ -39,23 +41,14 @@ class GradebookExporter
     submissions = {}
     calc.submissions.each { |s| submissions[[s.user_id, s.assignment_id]] = s }
 
-    assignments = calc.assignments.sort_by do |a|
+    assignments = select_in_current_grading_periods calc.assignments, @course
+
+    assignments = assignments.sort_by do |a|
       [a.assignment_group_id, a.position, a.due_at || CanvasSort::Last, a.title]
     end
     groups = calc.groups
 
     read_only = I18n.t('csv.read_only_field', '(read only)')
-    I18n.t 'csv.student', 'Student'
-    I18n.t 'csv.id', 'ID'
-    I18n.t 'csv.sis_user_id', 'SIS User ID'
-    I18n.t 'csv.sis_login_id', 'SIS Login ID'
-    I18n.t 'csv.root_account', 'Root Account'
-    I18n.t 'csv.section', 'Section'
-    I18n.t 'csv.comments', 'Comments'
-    I18n.t 'csv.current_score', 'Current Score'
-    I18n.t 'csv.final_score', 'Final Score'
-    I18n.t 'csv.final_grade', 'Final Grade'
-    I18n.t 'csv.points_possible', 'Points Possible'
     include_root_account = @course.root_account.trust_exists?
     CSV.generate do |csv|
       # First row
