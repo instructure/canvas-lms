@@ -461,5 +461,24 @@ describe ContentMigration do
       expect(cal2_2.end_at.to_i).to eq cal2.end_at.to_i
       expect(cal2_2.description).to eq ''
     end
+
+    it "should not leave link placeholders on catastrophic failure" do
+      att = Attachment.create!(:filename => 'test.txt', :display_name => "testing.txt",
+        :uploaded_data => StringIO.new('file'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      topic = @copy_from.discussion_topics.create!(:title => "some topic", :message => "<img src='/courses/#{@copy_from.id}/files/#{att.id}/preview'>")
+
+      Importers::WikiPageImporter.stubs(:process_migration).raises(ArgumentError)
+
+      expect{
+        run_course_copy
+      }.to raise_error(ArgumentError)
+
+      new_att = @copy_to.attachments.where(migration_id: CC::CCHelper.create_key(att)).first
+      expect(new_att).not_to be_nil
+
+      new_topic = @copy_to.discussion_topics.where(migration_id: CC::CCHelper.create_key(topic)).first
+      expect(new_topic).not_to be_nil
+      expect(new_topic.message).to match(Regexp.new("/courses/#{@copy_to.id}/files/#{new_att.id}/preview"))
+    end
   end
 end
