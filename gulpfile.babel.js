@@ -15,6 +15,8 @@ const STUFF_TO_REV = [
   // In prod, the 'optimized' versions of these bundles will include all their deps
   'public/javascripts/compiled/bundles/**/*',
   'public/optimized/compiled/bundles/**/*',
+  'public/javascripts/plugins/*/compiled/bundles/**/*',
+  'public/optimized/plugins/*/compiled/bundles/**/*',
 
   // Special Cases:
 
