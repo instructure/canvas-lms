@@ -118,6 +118,10 @@ module Lti
                        -> { URI.parse(@request.url)
                                .merge(@controller.view_context.stylesheet_path(@controller.css_url_for(:common))).to_s }
 
+    register_expansion 'Canvas.shard.id', [],
+                       -> { Shard.current.id }
+    register_expansion 'Canvas.root_account.global_id', [],
+                       -> { @root_account.global_id }
     ##### Deprecated Substitutions #####
 
     register_expansion 'Canvas.root_account.id', [],
