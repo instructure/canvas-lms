@@ -2,6 +2,7 @@
 <%
   context_module_next ||= nil
   context_module = context_module_next
+  context_module_progression = context_module_progression_for_user(context_module)
   editable ||= can_do(@context, @current_user, :manage_content)
   workflow_state = context_module && context_module.workflow_state
   published_status = context_module && context_module.published? ? 'published' : 'unpublished'
@@ -65,7 +66,7 @@
 
     <%= render :partial => "context_modules/prerequisites_message", :locals => {:editable => editable, :context_module => context_module} %>
 
-    <% if @context.feature_enabled?(:nc_or) %>
+    <% if @context.feature_enabled?(:nc_or) && has_requirements?(context_module) %>
       <div class="requirements_message">
         <ul class="pill">
           <li aria-label="<%= context_module && context_module.requirement_count == 1 ? t("Complete One Item") : t("Complete All Items") %>" data-requirement-count="<%= ((context_module && context_module.requirement_count) || 0) %>" tabindex="0">
@@ -77,10 +78,11 @@
           </li>
         </ul>
       </div>
+    <% else %>
+      <div class='no-requirements'></div>
     <% end %>
-
     <div class="ig-header-admin">
-      <% if !editable %>
+      <% if !editable && ( has_requirements?(context_module)  || context_module_progression && context_module_progression.workflow_state == 'locked' ) %>
         <div class="completion_status">
           <i class="icon-check complete_icon"
             alt="<%= t('complete icon') %>"
@@ -107,6 +109,8 @@
             <span class="screenreader-only"><%= t("Module Locked") %></span>
           </i>
         </div>
+      <% elsif !editable && !has_requirements?(context_module) %>
+         <div class='no-requirements-icon'></div>
       <% end %>
 
       <% if editable %>
@@ -174,7 +178,7 @@
     <ul class="ig-list items context_module_items <%= 'manageable' if editable %>">
       <% if context_module %>
         <% context_module.content_tags_visible_to(@current_user).each do |tag| %>
-          <%= render :partial => 'context_modules/module_item_next', :object => tag, :locals => {:completion_criteria => context_module.completion_requirements, :editable => editable, :context_module => context_module} %>
+          <%= render :partial => 'context_modules/module_item_next', :object => tag, :locals => {:completion_criteria => context_module.completion_requirements, :editable => editable, :context_module => context_module, :context_module_progression => context_module_progression} %>
         <% end %>
       <% end %>
     </ul>

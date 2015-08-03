@@ -113,6 +113,10 @@ module ContextModulesHelper
     completion_criteria && completion_criteria.find{|c| c[:id] == module_item.id}
   end
 
+  def has_requirements?(context_module)
+    context_module && context_module.completion_requirements.length > 0
+  end
+
   # This method creates a hash that is used to determine which icon is displayed for
   # a module item and which tooltip message is displayed on the icon
   def module_item_data(context_module, context_module_progression, module_item, criterion)

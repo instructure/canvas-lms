@@ -2,7 +2,7 @@
   context_module ||= nil
   module_item_next ||= nil
   module_item = module_item_next
-  context_module_progression = context_module_progression_for_user(context_module)
+  context_module_progression ||= nil
   published_status = (module_item && module_item.published?) ? 'published' : 'unpublished'
   tag = module_item || nil; completion_criteria ||= nil; editable ||= false
 @module_item_image_tags ||= {

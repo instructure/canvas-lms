@@ -440,6 +440,10 @@ describe "context modules" do
 
       @course.reload
 
+      # No requirement message pill should be displayed
+      expect(fj('.requirements_message')).to be_nil
+      expect(fj('.no-requirements')).to be_displayed
+
       # add completion criterion
       f('.ig-header-admin .al-trigger').click
       wait_for_ajaximations

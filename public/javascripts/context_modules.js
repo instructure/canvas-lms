@@ -610,6 +610,18 @@ define([
     }
   }
 
+  var newPillMessage = function($module, requirement_count) {
+    if ($module.find('.pill li').length === 0) {
+      $module.find('.no-requirements')
+        .replaceWith('<div class="requirements_message"><ul class="pill"><li></li></ul></div>');
+    }
+
+    var $pillMessage = $module.find('.pill li');
+    var newPillMessageText = requirement_count === 1 ? I18n.t("Complete One Item") : I18n.t("Complete All Items");
+    $pillMessage.text(newPillMessageText);
+    $pillMessage.data("requirement-count", requirement_count);
+  }
+
   modules.initModuleManagement = function() {
     // Create the context modules backbone view to manage the publish button.
     var context_modules_view = new ContextModulesView({
@@ -656,10 +668,11 @@ define([
       updatePrerequisites($module, data.context_module.prerequisites);
 
       // Update requirement message pill
-      var $pillMessage = $module.find('.pill li');
-      var newPillMessage = data.context_module.requirement_count === 1 ? I18n.t("Complete One Item") : I18n.t("Complete All Items");
-      $pillMessage.text(newPillMessage);
-      $pillMessage.data("requirement-count", data.context_module.requirement_count);
+      if (data.context_module.completion_requirements.length === 0) {
+        $module.find('.requirements_message').replaceWith("<div class='no-requirements'></div>");
+      } else {
+        newPillMessage($module, data.context_module.requirement_count);
+      }
 
       $module.find(".context_module_items .context_module_item")
         .removeClass('progression_requirement')
