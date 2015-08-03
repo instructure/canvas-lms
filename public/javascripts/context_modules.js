@@ -123,7 +123,6 @@ define([
         }
         $.ajaxJSON(url, 'GET', {}, function(data) {
           $(".loading_module_progressions_link").remove();
-          var current_user_id = $("#identity .user_id").text();
           var $user_progression_list = $("#current_user_progression_list");
           var progressions = [];
           for(var idx in data) {
@@ -145,7 +144,7 @@ define([
               return;
             }
             var progression = data.context_module_progression;
-            if(progression.user_id == current_user_id) {
+            if (progression.user_id == window.ENV.current_user_id) {
               var $user_progression = $user_progression_list.find(".progression_" + progression.context_module_id)
 
               if($user_progression.length === 0 && $user_progression_list.length > 0) {
