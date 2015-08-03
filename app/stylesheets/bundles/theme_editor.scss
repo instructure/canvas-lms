@@ -392,7 +392,7 @@ $te-input-height: 30px;
     border: none;
     border-radius: 0;
     &.ui-accordion-content-active {
-      overflow: visible;
+      overflow: visible !important;
       border-radius: 0;
       box-shadow: inset 0px 0 5px lighten($ic-color-neutral, 0.2);
     }
@@ -553,10 +553,6 @@ $te-input-height: 30px;
 
     .Theme__editor-image_upload-label {
       margin-bottom: 0;
-      position: relative;
-    }
-    .Theme__editor-button_upload {
-      width: 100%;
     }
     .Theme__editor-input_upload {
       position: absolute;
