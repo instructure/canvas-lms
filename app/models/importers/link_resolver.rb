@@ -144,12 +144,8 @@ module Importers
     end
 
     def resolve_media_comment_data(node, rel_path)
-      if context.respond_to?(:attachment_path_id_lookup) &&
-        context.attachment_path_id_lookup &&
-        context.attachment_path_id_lookup[rel_path]
-        file = context.attachments.where(migration_id: context.attachment_path_id_lookup[rel_path]).first
-        if file && file.media_object
-          media_id = file.media_object.media_id
+      if file = find_file_in_context(rel_path)
+        if media_id = ((file.media_object && file.media_object.media_id) || file.media_entry_id)
           node['id'] = "media_comment_#{media_id}"
           return "/media_objects/#{media_id}"
         end
