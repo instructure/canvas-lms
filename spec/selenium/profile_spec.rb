@@ -92,7 +92,7 @@ describe "profile" do
       f('#communication_channels a[href="#register_email_address"]').click
       form = f("#register_email_address")
       test_email = 'nobody+1234@example.com'
-      form.find_element(:id, 'communication_channel_address').send_keys(test_email)
+      form.find_element(:id, 'communication_channel_email').send_keys(test_email)
       submit_form(form)
 
       confirmation_dialog = f("#confirm_email_channel")

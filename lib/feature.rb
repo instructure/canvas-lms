@@ -379,6 +379,14 @@ END
       development: true,
       root_opt_in: true,
     },
+    'international_sms' => {
+      display_name: -> { I18n.t('International SMS') },
+      description: -> { I18n.t('Allows users with international phone numbers to receive text messages from Canvas.') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      root_opt_in: true,
+      development: true
+    }
   )
 
   def self.definitions

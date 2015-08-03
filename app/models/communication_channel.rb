@@ -62,6 +62,44 @@ class CommunicationChannel < ActiveRecord::Base
 
   RETIRE_THRESHOLD = 3
 
+  # TODO: Will need to be internationalized. Also, do we want to allow this to be specified in a config file?
+  def self.country_codes
+    # [country code, name, true if email should be used instead of Twilio]
+    @country_codes ||= [
+      ['54', 'Argentina', false],
+      ['61', 'Australia', false],
+      ['32', 'Belgium', false],
+      ['55', 'Brazil', false],
+      ['1', 'Canada', false],
+      ['56', 'Chile', false],
+      ['57', 'Colombia', false],
+      ['45', 'Denmark', false],
+      ['358', 'Finland', false],
+      ['49', 'Germany', false],
+      ['504', 'Honduras', false],
+      ['852', 'Hong Kong', false],
+      ['353', 'Ireland', false],
+      ['352', 'Luxembourg', false],
+      ['60', 'Malaysia', false],
+      ['52', 'Mexico', false],
+      ['31', 'Netherlands', false],
+      ['64', 'New Zealand', false],
+      ['47', 'Norway', false],
+      ['507', 'Panama', false],
+      ['51', 'Peru', false],
+      ['63', 'Philippines', false],
+      ['974', 'Qatar', false],
+      ['966', 'Saudi Arabia', false],
+      ['65', 'Singapore', false],
+      ['34', 'Spain', false],
+      ['46', 'Sweden', false],
+      ['41', 'Switzerland', false],
+      ['971', 'United Arab Emirates', false],
+      ['44', 'United Kingdom', false],
+      ['1', 'United States', true]
+    ]
+  end
+
   def self.sms_carriers
     @sms_carriers ||= Canvas::ICU.collate_by((ConfigFile.load('sms', false) ||
         { 'AT&T' => 'txt.att.net',
