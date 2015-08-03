@@ -20,6 +20,7 @@ require 'atom'
 require 'set'
 require 'canvas/draft_state_validations'
 require 'bigdecimal'
+require_dependency 'turnitin'
 
 class Assignment < ActiveRecord::Base
   include Workflow
