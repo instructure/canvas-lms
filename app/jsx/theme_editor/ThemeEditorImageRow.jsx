@@ -70,15 +70,15 @@ define([
                 </div>
               </div>
               <div className="Theme__editor-image_upload">
-                <label className="Theme__editor-image_upload-label">
-                  <span className="Theme__editor-button_upload Button Button--link">
-                    {I18n.t('Select Image')}
-                  </span>
-                  <input
+                <input
                     type="hidden"
                     name={!this.props.userInput.val && inputName}
                     value={(this.props.userInput.val === '') ? '' : this.props.currentValue}
                   />
+                <label className="Theme__editor-image_upload-label">
+                  <span className="Theme__editor-button_upload Button Button--link">
+                    {I18n.t('Select Image')}
+                  </span>
                   <input
                     type="file"
                     className="Theme__editor-input_upload"
