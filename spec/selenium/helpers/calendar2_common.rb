@@ -201,7 +201,7 @@ end
 def assert_edit_modal_date(due_at)
   f('.fc-event-inner').click
   wait_for_ajaximations
-  expect(f('.event-details-timestring')).to include_text("#{due_at.utc.strftime('%b %d')}")
+  expect(f('.event-details-timestring')).to include_text("#{due_at.utc.strftime('%b %-d')}")
 end
 
 def assert_title(title,agenda_view)
