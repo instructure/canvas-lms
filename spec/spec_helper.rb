@@ -22,6 +22,7 @@ rescue LoadError
 end
 
 require 'securerandom'
+require 'test/unit' if RUBY_VERSION >= '2.2.0'
 
 RSpec.configure do |c|
   c.raise_errors_for_deprecations!
