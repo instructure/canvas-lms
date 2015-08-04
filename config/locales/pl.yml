@@ -2793,6 +2793,9 @@ pl:
     google_drive: 
       file_not_found: "Nie znaleziono pliku współpracy"
     index: 
+      description_rs: |-
+          Darmowe narzędzia internetowe takie jak  [Google Docs](%{google_url}) to doskonałe miejsca dla studentów do pracy nad projektami grupowymi, podejmowania wspólnych notatek itp.
+          Nauczyciel *bądź* uczniowie mogą skonfigurowac współpracę grupową.
       description_student: |-
           **Co oznacza współpraca grupowa?** Oznacza narzędzia sieciowe do
           wspólnej pracy nad jednym, udostępnionym dokumentem. Można korzystać z zasobów takich jak
