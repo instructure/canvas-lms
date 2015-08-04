@@ -2214,6 +2214,7 @@ class CoursesController < ApplicationController
       # destroy these after enrollment so
       # needs_grading_count callbacks work
       @fake_student.submissions.destroy_all
+      @fake_student.quiz_submissions.each{|qs| qs.events.destroy_all}
       @fake_student.quiz_submissions.destroy_all
 
       flash[:notice] = t('notices.reset_test_student', "The test student has been reset successfully.")
