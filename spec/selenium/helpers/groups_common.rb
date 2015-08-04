@@ -162,3 +162,14 @@ def delete_group
   driver.switch_to.alert.accept
   wait_for_animations
 end
+
+# Only use to add group_set if no group sets already exist
+def click_add_group_set
+  f('#add-group-set').click
+  wait_for_ajaximations
+end
+
+def save_group_set
+  f('#newGroupSubmitButton').click
+  wait_for_ajaximations
+end

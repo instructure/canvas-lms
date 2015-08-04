@@ -11,11 +11,9 @@ describe "new groups" do
 
     it "should allow teachers to add a group set", priority: "1", test_id: 94152 do
       get "/courses/#{@course.id}/groups"
-      f('#add-group-set').click
-      wait_for_ajaximations
+      click_add_group_set
       f('#new_category_name').send_keys("Test Group Set")
-      f('#newGroupSubmitButton').click
-      wait_for_ajaximations
+      save_group_set
       # Looks in the group tab list for the last item, which should be the group set
       expect(fj('.collectionViewItems[role=tablist]>li:last-child').text).to match "Test Group Set"
     end
@@ -134,8 +132,7 @@ describe "new groups" do
       group_test_setup(3,0,0)
       get "/courses/#{@course.id}/groups"
 
-      f('#add-group-set').click
-      wait_for_ajaximations
+      click_add_group_set
       f('#new_category_name').send_keys("Test Group Set")
       f('.self-signup-toggle').click
       manually_set_groupset_limit("2")
@@ -328,6 +325,27 @@ describe "new groups" do
 
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-user")).not_to include_text('Test Student 1')
       expect(f('.row-fluid .group-leader')).to be_nil
+    end
+
+    it "should split students into groups automatically", priority: "1", test_id: 163990 do
+      seed_students(4)
+
+      get "/courses/#{@course.id}/groups"
+
+      click_add_group_set
+      f('#new_category_name').send_keys('Test Group Set')
+      f('#split_groups').click
+      expect(f('.auto-group-leader-controls')).to be_displayed
+
+      replace_content(fj('.input-micro[name="create_group_count"]'),2)
+      save_group_set
+      # Need to run delayed jobs for the random group assignments to work, and then refresh the page
+      run_jobs
+      get "/courses/#{@course.id}/groups"
+      2.times do |n|
+        expect(ffj('.toggle-group.group-summary:visible')[n]).to include_text('2 students')
+      end
+      expect(ffj('.group-name:visible').size).to eq 2
     end
   end
 end
