@@ -12877,6 +12877,7 @@ sv:
         crosslist_this_section: "Cross-List den här sektionen"
         current_enrollments: "Nuvarande anmälningar"
         decrosslist_section: "De-Cross-List den här sektionen"
+  see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Se vissa LTI verktyg* som fungerar utmärkt med Canvas."
   select_a_grading_period_aab25483: "Välj en betygsperiod"
   select_content: "Välj innehål"
   select_content_checkbox: 
@@ -13511,6 +13512,7 @@ sv:
       wiki_page_notice: "Välj den wiki-sida du vill assoicera med en *här modulen* eller lägg till en ny sida genom att välja \"Ny sida\"."
       wiki_page_select_label: "Välj den wiki-sidan du vill associera eller lägg till en ny sida genom att välja \"Ny sida\"."
     static_notices: 
+      bouncing_communication_channels: "Det verkar vara ett problem med en utav dina kontaktmetoder. Vänligen kontrollera din *Inställningssida*."
       javascript_required: "Du måste aktivera JavaScript för att få tillgång till denna sidan."
     submission_comment: 
       assignment: Uppgift
