@@ -65,6 +65,28 @@ define [
     m = tz.moment('June 24, 2015 at 10:00pm -06:00', 'MMMM D, YYYY h:mmA Z')
     equal +m.toDate(), +expected
 
+  test 'moment can change locales with single arity', ->
+    tz.changeLocale("en_US")
+    m1 = tz.moment('mercredi 1 juillet 2015 15:00', 'LLLL');
+    ok !m1._locale._abbr.match(/fr/)
+    ok !m1.isValid()
+
+    tz.changeLocale("fr_FR")
+    m2 = tz.moment('mercredi 1 juillet 2015 15:00', 'LLLL');
+    ok m2._locale._abbr.match(/fr/)
+    ok m2.isValid()
+
+  test 'moment can change locales with multiple arity', ->
+    tz.changeLocale("en_US")
+    m1 = tz.moment('mercredi 1 juillet 2015 15:00', 'LLLL');
+    ok !m1._locale._abbr.match(/fr/)
+    ok !m1.isValid()
+
+    tz.changeLocale(french, "fr_FR")
+    m2 = tz.moment('mercredi 1 juillet 2015 15:00', 'LLLL');
+    ok m2._locale._abbr.match(/fr/)
+    ok m2.isValid()
+
   test 'parse(valid datetime string)', ->
     equal +tz.parse(moonwalk.toISOString()), +moonwalk
 

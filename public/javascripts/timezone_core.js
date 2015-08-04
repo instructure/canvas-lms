@@ -4,9 +4,11 @@ define([
   "require",
   "vendor/timezone",
   "i18nObj",
-  "moment"
-], function($, _, require, tz, I18n, moment) {
+  "moment",
+  "locale_converter"
+], function($, _, require, tz, I18n, moment, LocaleConverter) {
   // start with the bare vendor-provided tz() function
+  var currentLocale = "en_US" // default to US locale
   var _tz = tz;
   var _preloadedData = {};
 
@@ -25,7 +27,8 @@ define([
                         "moment() directly for any other signature");
 
       // call out to moment, leaving the result alone if invalid
-      var m = moment.apply(null, arguments);
+      var localeToUse = LocaleConverter.convertToMoment(currentLocale)
+      var m = moment.apply(null, [input, format, localeToUse]);
       if (!m.isValid()) return m;
 
       // unfudge the result unless an offset was both specified and used in the
@@ -227,11 +230,18 @@ define([
         });
       }
       return promise;
+    },
+
+    changeLocale: function(){
+      currentLocale = arguments.length > 1 ?
+        arguments[1] :
+        arguments[0]
+      return this.applyFeature.apply(this, arguments);
     }
   };
 
   // changing zone and locale are just aliases for applying a feature
-  tz.changeZone = tz.changeLocale = tz.applyFeature;
+  tz.changeZone = tz.applyFeature;
 
   return tz;
 });
