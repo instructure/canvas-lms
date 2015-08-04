@@ -347,5 +347,30 @@ describe "new groups" do
       end
       expect(ffj('.group-name:visible').size).to eq 2
     end
+
+    it 'should respect individual group member limits when randomly assigning', priority: "1", test_id: 134767 do
+      group_test_setup(16,1,2)
+      @testgroup.first.update_attribute(:max_membership,7)
+      get "/courses/#{@course.id}/groups"
+
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text('0 / 7 students')
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full").css_value 'display').to eq 'none'
+
+      f('a.al-trigger.btn').click
+      wait_for_ajaximations
+      f('.icon-user.randomly-assign-members.ui-corner-all').click
+      wait_for_ajaximations
+      f('button.btn.btn-primary.randomly-assign-members-confirm').click
+      wait_for_ajaximations
+
+      # Run delayed jobs for randomly assigning students to the groups
+      run_jobs
+
+      get "/courses/#{@course.id}/groups"
+
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-summary")).to include_text('7 / 7 students')
+      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full")).to be_displayed
+      expect(f(".group[data-id=\"#{@testgroup[1].id}\"] span.show-group-full").css_value 'display').to eq 'none'
+    end
   end
 end
