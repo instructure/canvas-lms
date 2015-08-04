@@ -2776,6 +2776,23 @@ nl:
     google_drive: 
       file_not_found: "Bestand samenwerking niet gevonden "
     index: 
+      description_rs: |-
+          Gratis online web tools zoals [Google Docs](%{google_url}) zijn een uitstekende plek voor cursisten om aan groepsprojecten of werkstukken te werken, om gedeelde notities te maken, enz.
+          Docent *of* cursisten kunnen groepsamenwerkingen opzetten.
+      description_student: |-
+          **Wat bedoelen we met samenwerkingen?** We praten over web-gebaseerde tools om
+          samen te werken op een gedeeld document. Je kunt bronnen gebruiken als
+          [Google Docs](%{google_url})
+          om samen te werken aan taken, zoals groepwerkstukken of aantekeningen maken. Deze
+          pagina is een gemakkelijke plek om deze samenwerkingen bij te houden en ook om ze 
+          in te stellen zonder e-mails uit te wisselen.
+      description_teacher: |-
+          **Wat bedoelen we met samenwerkingen?** We praten over web-gebaseerde tools die
+          je cursisten waarschijnlijk al kennen. Cursissen kunnen bronnen gebruiken als
+          [Google Docs](%{google_url})
+          om samen te werken aan taken, zoals groepwerkstukken of aantekeningen maken. Deze
+          pagina is een gemakkelijke plek voor hen (en voor jou) om deze samenwerkingen bij te
+          houden en ook om ze in te stellen zonder e-mails uit te wisselen.
       google: 
         drive: 
           upgrade: 
