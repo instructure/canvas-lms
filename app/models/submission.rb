@@ -19,11 +19,16 @@
 require 'atom'
 
 class Submission < ActiveRecord::Base
+  include Canvas::GradeValidations
+  include CustomValidations
   include SendToStream
+  include Workflow
+
   attr_protected :submitted_at
   attr_readonly :assignment_id
   attr_accessor :visible_to_user,
                 :skip_grade_calc
+
   belongs_to :attachment # this refers to the screenshot of the submission if it is a url submission
   belongs_to :assignment
   belongs_to :user
@@ -31,15 +36,16 @@ class Submission < ActiveRecord::Base
   belongs_to :group
   belongs_to :media_object
   belongs_to :student, :class_name => 'User', :foreign_key => :user_id
+  belongs_to :quiz_submission, :class_name => 'Quizzes::QuizSubmission'
   has_many :submission_comments, :order => 'created_at', :dependent => :destroy
   has_many :visible_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at, id', :conditions => { :hidden => false }
   has_many :hidden_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at, id', :conditions => { :hidden => true }
   has_many :assessment_requests, :as => :asset
   has_many :assigned_assessments, :class_name => 'AssessmentRequest', :as => :assessor_asset
-  belongs_to :quiz_submission, :class_name => 'Quizzes::QuizSubmission'
-  has_one :rubric_assessment, :as => :artifact, :conditions => {:assessment_type => "grading"}
   has_many :rubric_assessments, :as => :artifact
   has_many :attachment_associations, :as => :context
+  has_many :provisional_grades, class_name: 'ModeratedGrading::ProvisionalGrade'
+  has_one :rubric_assessment, :as => :artifact, :conditions => {:assessment_type => "grading"}
 
   # we no longer link submission comments and conversations, but we haven't fixed up existing
   # linked conversations so this relation might be useful
@@ -49,23 +55,29 @@ class Submission < ActiveRecord::Base
   has_many :content_participations, :as => :content
 
   EXPORTABLE_ATTRIBUTES = [
-    :id, :body, :url, :attachment_id, :grade, :score, :submitted_at, :assignment_id, :user_id, :submission_type, :workflow_state, :created_at, :updated_at, :group_id,
-    :attachment_ids, :processed, :process_attempts, :grade_matches_current_submission, :published_score, :published_grade, :graded_at, :student_entered_score, :grader_id,
-    :media_comment_id, :media_comment_type, :quiz_submission_id, :submission_comments_count, :has_rubric_assessment, :attempt, :context_code, :media_object_id,
-    :turnitin_data, :has_admin_comment, :cached_due_date
-  ]
+    :id, :body, :url, :attachment_id, :grade, :score, :submitted_at,
+    :assignment_id, :user_id, :submission_type, :workflow_state,
+    :created_at, :updated_at, :group_id, :attachment_ids, :processed,
+    :process_attempts, :grade_matches_current_submission, :published_score,
+    :published_grade, :graded_at, :student_entered_score, :grader_id,
+    :media_comment_id, :media_comment_type, :quiz_submission_id,
+    :submission_comments_count, :has_rubric_assessment, :attempt,
+    :context_code, :media_object_id, :turnitin_data, :has_admin_comment,
+    :cached_due_date
+  ].freeze
 
   EXPORTABLE_ASSOCIATIONS = [
-    :attachment, :assignment, :user, :grader, :group, :media_object, :student, :submission_comments, :assessment_requests, :assigned_assessments, :quiz_submission,
-    :rubric_assessment, :rubric_assessments, :attachments, :content_participations
-  ]
+    :attachment, :assignment, :user, :grader, :group, :media_object,
+    :student, :submission_comments, :assessment_requests,
+    :assigned_assessments, :quiz_submission, :rubric_assessment,
+    :rubric_assessments, :attachments, :content_participations
+  ].freeze
 
   serialize :turnitin_data, Hash
+
   validates_presence_of :assignment_id, :user_id
   validates_length_of :body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :published_grade, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :grade, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
-  include CustomValidations
   validates_as_url :url
 
   scope :with_comments, -> { includes(:submission_comments) }
@@ -92,6 +104,16 @@ class Submission < ActiveRecord::Base
   scope :for_course, lambda { |course|
     where("submissions.assignment_id IN (SELECT assignments.id FROM assignments WHERE assignments.context_id = ? AND assignments.context_type = 'Course')", course)
   }
+
+  workflow do
+    state :submitted do
+      event :grade_it, :transitions_to => :graded
+    end
+    state :unsubmitted
+    state :pending_review
+    state :graded
+  end
+
 
   # see #needs_grading?
   def self.needs_grading_conditions
@@ -788,17 +810,6 @@ class Submission < ActiveRecord::Base
   def grade_change_audit
     return true unless self.grade_changed?
     connection.after_transaction_commit { Auditors::GradeChange.record(self) }
-  end
-
-  include Workflow
-
-  workflow do
-    state :submitted do
-      event :grade_it, :transitions_to => :graded
-    end
-    state :unsubmitted
-    state :pending_review
-    state :graded
   end
 
   scope :with_assignment, -> { joins(:assignment).where("assignments.workflow_state <> 'deleted'")}

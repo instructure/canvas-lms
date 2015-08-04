@@ -1,4 +1,3 @@
-
 if CANVAS_RAILS3
   gem 'rails', '3.2.22'
   gem 'rack', '1.4.5'

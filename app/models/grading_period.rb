@@ -70,7 +70,6 @@ class GradingPeriod < ActiveRecord::Base
       .last == self
   end
 
-
   def overlapping?
     overlaps.active.exists?
   end
