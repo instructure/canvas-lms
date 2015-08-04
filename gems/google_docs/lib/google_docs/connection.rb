@@ -157,10 +157,8 @@ module GoogleDocs
             self.type = operation_type
           end
 
-          def to_xml(*opts)
-            n = XML::Node.new("batch:operation")
-            n['type'] = type
-            n
+          def to_xml(builder, *_opts)
+            builder['batch'].operation(type: type)
           end
         end
       end
@@ -173,10 +171,8 @@ module GoogleDocs
             self.role = "writer"
           end
 
-          def to_xml(*opts)
-            n = XML::Node.new("gAcl:role")
-            n['value'] = role
-            n
+          def to_xml(builder, *_opts)
+            builder['gAcl'].role(value: role)
           end
         end
 
@@ -188,11 +184,8 @@ module GoogleDocs
             self.value = email
           end
 
-          def to_xml(*opts)
-            n = XML::Node.new("gAcl:scope")
-            n['type'] = type
-            n['value'] = value
-            n
+          def to_xml(builder, *_opts)
+            builder['gAcl'].scope(type: type, value: value)
           end
         end
       end
@@ -228,7 +221,7 @@ module GoogleDocs
           category.label = "document"
         end
       end
-      xml = entry.to_xml
+      xml = entry.to_xml.to_s
       begin
         response = access_token.post(url, xml, {'Content-Type' => 'application/atom+xml'})
       rescue => e
@@ -274,7 +267,7 @@ module GoogleDocs
           end
         end
       end
-      response = access_token.post(url, request_feed.to_xml, {'Content-Type' => 'application/atom+xml'})
+      response = access_token.post(url, request_feed.to_xml.to_s, {'Content-Type' => 'application/atom+xml'})
       feed = Atom::Feed.load_feed(response.body)
       res = []
 
@@ -321,8 +314,8 @@ module GoogleDocs
 
       return unless user_added
 
-      response = access_token.post(url, request_feed.to_xml, {'Content-Type' => 'application/atom+xml'})
-      feed = Atom::Feed.load_feed(response.body)
+      post_response = access_token.post(url, request_feed.to_xml.to_s, {'Content-Type' => 'application/atom+xml'})
+      feed = Atom::Feed.load_feed(post_response.body)
       feed.entries.inject([]) do |response, entry|
         user = allowed_users.find do |u|
           u.id == entry['http://schemas.google.com/gdata/batch', 'id'][0].to_i
