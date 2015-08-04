@@ -38,18 +38,26 @@ module Api::V1::Conferences
   end
 
   def ui_conferences_json(conferences, context, user, session)
-    conferences.map do |c|
-      c.as_json(
-        permissions: {
-          user: user,
-          session: session,
-        },
-        url: named_context_url(context, :context_conference_url, c)
-      )
+    cs = conferences.map do |c|
+      begin
+        c.as_json(
+          permissions: {
+            user: user,
+            session: session,
+          },
+          url: named_context_url(context, :context_conference_url, c)
+        )
+      rescue => e
+        Canvas::Errors.capture_exception(:web_conferences, e)
+        @errors ||= []
+        @errors << e
+        nil
+      end
     end
+    cs.compact
   end
 
-  def default_conference_json(context, user, sesssion)
+  def default_conference_json(context, user, session)
     conference = context.web_conferences.build(
       :title => I18n.t(:default_conference_title, "%{course_name} Conference", :course_name => context.name),
       :duration => WebConference::DEFAULT_DURATION,
