@@ -1514,7 +1514,7 @@ class CoursesController < ApplicationController
             :add_students => course_users_path(course_id: @context),
             :add_files => context_url(@context, :context_files_url, :wizard => 1),
             :select_navigation => context_url(@context, :context_details_url),
-            :course_calendar => calendar_path(:wizard => 1),
+            :course_calendar => calendar_path(course_id: @context),
             :add_tas => course_users_path(:course_id => @context),
             :publish_course => course_path(@context)
           },
