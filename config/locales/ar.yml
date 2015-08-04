@@ -107,12 +107,17 @@ ar:
     default_delegated_login_handle_name: "تسجيل الدخول"
     default_login_handle_name: "البريد الإلكتروني"
   account_authorization_config/ldap: 
+    test_bind_failed: "فشل الربط مع ظهور الخطأ التالي: %{error}"
     test_connection_timeout: "المهلة أثناء الاتصال"
+    test_host_unknown: "مضيف غير معروف: %{host}"
+    test_login_auth_exception: "استثناء عند تسجيل الدخول: %{error}"
     test_login_auth_failed: "فشلت المصادقة"
+    test_search_failed: "فشل البحث نتيحة لوجود الخطأ التالي: %{error}"
   account_authorization_config/saml: 
     debug: 
       logout_redirect: "تم إرسال LogoutRequest إلى IdP"
       wait_for_login: "الانتظار لمحاولة تسجيل الدخول"
+    saml_eppn_domain_stripped: "%{eppn} (تم تجريد المجال)"
   account_authorization_configs: 
     account_required: "يجب أن تتم المصادقة من قِبل LDAP"
     index: 
@@ -9722,8 +9727,21 @@ ar:
         tweet: "تنبيه Canvas - دعوة: حضور %{title}, %{name}"
     web_conference_recording_ready: 
       email: 
+        body: "تسجيل %{title} الخاص بـ %{name} جاهز."
+        details_link: "يمكنك الاطلاع على التفاصيل هنا: %{link}"
         html: 
+          body: "تسجيل %{title} الخاص بـ %{name} جاهز."
           details_link: "انقر هنا لعرض التفاصيل"
+          subject: "تسجيل المؤتمر عبر الويب جاهز: %{name}"
+        subject: "تسجيل المؤتمر عبر الويب جاهز: %{name}"
+      sms: 
+        body: "تسجيل %{title} الخاص بـ %{name} جاهز."
+        link_message: "مزيد من المعلومات على %{url}"
+      summary: 
+        body: "تسجيل %{title} الخاص بـ %{name} جاهز."
+        subject: "تسجيل المؤتمر عبر الويب جاهز: %{name}"
+      twitter: 
+        tweet: "تنبيه Canvas - التسجيل جاهز: %{title}، %{name}"
   migration: 
     announcement_type: الإعلان
     assignment_group_type: "مجموعة المهام"
@@ -10285,11 +10303,19 @@ ar:
       oauth2_complete: "أنهى التطبيق سير عمل تسجيل الدخول، وينبغي أن يعيد التنشيط بعد قليل."
     confirm: 
       cancel: إلغاء
+      details: 
+        allow_application: "يطلب %{app_name} الوصول إلى حسابك."
+        email: "عنوان بريدك الإلكتروني هو %{email}."
+        login_name: "أنت تقوم بتسجيل الدخول إلى هذا التطبيق باسم %{user_name}."
       labels: 
         remember_access: "تذكر تخويلي لهذه الخدمة"
       page_title: "تسجيل الدخول إلى التطبيق"
     confirm_mobile: 
       cancel: إلغاء
+      details: 
+        allow_application: "يطلب %{app_name} الوصول إلى حسابك."
+        email: "عنوان بريدك الإلكتروني هو %{email}."
+        login_name: "أنت تقوم بتسجيل الدخول إلى هذا التطبيق باسم %{user_name}."
       login: "تسجيل الدخول"
       page_title: "تسجيل الدخول إلى التطبيق"
       remember_auth: "تذكر تخويلي لهذه الخدمة"
