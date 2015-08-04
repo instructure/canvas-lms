@@ -89,78 +89,172 @@ describe "courses" do
 
     end
 
-    it "should properly hide the wizard and remember its hidden state" do
-      # For now we are not allowing the wizard to popup automatically
-      # so this spec doesn't apply, it may in the future though.
-      pending
-      course_with_teacher_logged_in
-
-      create_new_course
-
-      wizard_box = f(".ic-wizard-box")
-      keep_trying_until { expect(wizard_box).to be_displayed }
-      f(".ic-wizard-box__close a").click
-
-      refresh_page
-      wait_for_ajaximations # we need to give the wizard a chance to pop up
-      wizard_box = f(".ic-wizard-box")
-      expect(wizard_box).to eq nil
-
-      # un-remember the setting
-      driver.execute_script "localStorage.clear()"
-    end
-
-    it "should open and close wizard after initial close" do
-      # For now we are not allowing the wizard to popup automatically
-      # so this spec doesn't apply, it may in the future though.
-      pending
-      def find_wizard_box
-        wizard_box = keep_trying_until do
-          wizard_box = f(".ic-wizard-box")
-          expect(wizard_box).to be_displayed
-          wizard_box
-        end
-        wizard_box
+    describe 'course wizard' do
+      def go_to_checklist
+        get "/courses/#{@course.id}"
+        f(".wizard_popup_link").click()
+        wizard_box = f(".ic-wizard-box")
+        keep_trying_until { expect(wizard_box).to be_displayed }
       end
 
-      course_with_teacher_logged_in
-      create_new_course
+      def check_if_item_complete(item)
+        elem = "#wizard_#{item}.ic-wizard-box__content-trigger--checked"
+        expect(f(elem)).to be_displayed
+      end
 
-      wait_for_ajaximations
-      wizard_box = find_wizard_box
-      f(".ic-wizard-box__close a").click
-      wait_for_ajaximations
-      wizard_box = f(".ic-wizard-box")
-      expect(wizard_box).to eq nil
-      checklist_button = f('.wizard_popup_link')
-      expect(checklist_button).to be_displayed
-      checklist_button.click
-      wait_for_ajaximations
-      wizard_box = find_wizard_box
-      f(".ic-wizard-box__close a").click
-      wait_for_ajaximations
-      wizard_box = f(".ic-wizard-box")
-      expect(wizard_box).to eq nil
-      expect(checklist_button).to be_displayed
-    end
+      def check_if_item_not_complete(item)
+        expect(f("#wizard_#{item}.ic-wizard-box__content-trigger")).to be_displayed
+        expect(f("#wizard_#{item}.ic-wizard-box__content-trigger--checked")).to be_nil
+      end
 
-    it "should open up the choose home page dialog from the wizard" do
-      course_with_teacher_logged_in
-      create_new_course
+      it "should properly hide the wizard and remember its hidden state" do
+        # For now we are not allowing the wizard to popup automatically
+        # so this spec doesn't apply, it may in the future though.
+        pending
+        course_with_teacher_logged_in
+        create_new_course
+        wizard_box = f(".ic-wizard-box")
+        keep_trying_until { expect(wizard_box).to be_displayed }
+        f(".ic-wizard-box__close a").click
+        refresh_page
+        wait_for_ajaximations # we need to give the wizard a chance to pop up
+        wizard_box = f(".ic-wizard-box")
+        expect(wizard_box).to eq nil
+        # un-remember the setting
+        driver.execute_script "localStorage.clear()"
+      end
 
-      # Because of the specs about automatically opening are currently
-      # pending, we need to cause the wizard to open by way of click. When
-      # those specs are no longer pendings, the click line should be removed.
-      f(".wizard_popup_link").click()
-      wizard_box = f(".ic-wizard-box")
-      keep_trying_until { expect(wizard_box).to be_displayed }
+      it "should open and close wizard after initial close" do
+        # For now we are not allowing the wizard to popup automatically
+        # so this spec doesn't apply, it may in the future though.
+        pending
+        def find_wizard_box
+          wizard_box = keep_trying_until do
+            wizard_box = f(".ic-wizard-box")
+            expect(wizard_box).to be_displayed
+            wizard_box
+          end
+          wizard_box
+        end
 
+        course_with_teacher_logged_in
+        create_new_course
 
-      f("#wizard_home_page").click
-      f(".ic-wizard-box__message-button a").click
-      wait_for_ajaximations
-      modal = f("#edit_course_home_content_form")
-      expect(modal).to be_displayed
+        wait_for_ajaximations
+        wizard_box = find_wizard_box
+        f(".ic-wizard-box__close a").click
+        wait_for_ajaximations
+        wizard_box = f(".ic-wizard-box")
+        expect(wizard_box).to eq nil
+        checklist_button = f('.wizard_popup_link')
+        expect(checklist_button).to be_displayed
+        checklist_button.click
+        wait_for_ajaximations
+        wizard_box = find_wizard_box
+        f(".ic-wizard-box__close a").click
+        wait_for_ajaximations
+        wizard_box = f(".ic-wizard-box")
+        expect(wizard_box).to eq nil
+        expect(checklist_button).to be_displayed
+      end
+
+      it "should open up the choose home page dialog from the wizard" do
+        course_with_teacher_logged_in
+        create_new_course
+
+        # Because of the specs about automatically opening are currently
+        # pending, we need to cause the wizard to open by way of click. When
+        # those specs are no longer pendings, the click line should be removed.
+        go_to_checklist
+
+        f("#wizard_home_page").click
+        f(".ic-wizard-box__message-button a").click
+        wait_for_ajaximations
+        modal = f("#edit_course_home_content_form")
+        expect(modal).to be_displayed
+      end
+
+      it "should have the correct initial state" do
+        course_with_teacher_logged_in
+        go_to_checklist
+
+        check_if_item_not_complete('content_import')
+        check_if_item_not_complete('add_assignments')
+        check_if_item_not_complete('add_students')
+        check_if_item_not_complete('add_files')
+        check_if_item_not_complete('content_import')
+        check_if_item_not_complete('select_navigation')
+        check_if_item_complete('home_page')
+        check_if_item_not_complete('course_calendar')
+        check_if_item_not_complete('add_tas')
+      end
+
+      it "should complete 'Add Course Assignments' checklist item" do
+        course_with_teacher_logged_in
+        @course.assignments.create({name: "Test Assignment"})
+        go_to_checklist
+        check_if_item_complete('add_assignments')
+      end
+
+      it "should complete 'Add Students to the Course' checklist item" do
+        course_with_teacher_logged_in
+        student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
+        student_in_course(:user => student, :active_all => 1)
+        go_to_checklist
+        check_if_item_complete('add_students')
+      end
+
+      it "should complete 'Select Navigation Links' checklist item" do
+        course_with_teacher_logged_in
+        get "/courses/#{@course.id}"
+
+        # Navigate to Navigation tab
+        go_to_checklist
+        f('#wizard_select_navigation').click()
+        f('.ic-wizard-box__message-button a').click()
+
+        # Modify Naviagtion
+        f('#navigation_tab').click()
+        f('.navitem.enabled.modules .al-trigger.al-trigger-gray').click()
+        f('.navitem.enabled.modules .admin-links .disable_nav_item_link').click()
+        f('#tab-navigation .btn').click()
+
+        go_to_checklist
+        check_if_item_complete('select_navigation')
+      end
+
+      it "should complete 'Add Course Calendar Events' checklist item" do
+        course_with_teacher_logged_in
+        get "/courses/#{@course.id}"
+
+        # Navigate to Calendar tab
+        go_to_checklist
+        f('#wizard_course_calendar').click()
+        f('.ic-wizard-box__message-button a').click()
+
+        # Add Event
+        f("#create_new_event_link").click()
+        wait_for_ajaximations
+        replace_content(f('#edit_calendar_event_form #calendar_event_title'), "Event")
+        f("#edit_calendar_event_form button.event_button").click()
+        wait_for_ajaximations
+
+        go_to_checklist
+        check_if_item_complete('course_calendar')
+      end
+
+      it "should complete 'Publish the Course' checklist item" do
+        course_with_teacher_logged_in
+        get "/courses/#{@course.id}"
+
+        # Publish from Checklist
+        go_to_checklist
+        f('#wizard_publish_course').click()
+        f('.ic-wizard-box__message-button button').click()
+
+        go_to_checklist
+        check_if_item_complete('publish_course')
+      end
     end
 
     it "should correctly update the course quota" do
