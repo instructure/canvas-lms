@@ -2785,6 +2785,9 @@ pt-BR:
     google_drive: 
       file_not_found: "Arquivo de Colaboração não encontrado"
     index: 
+      description_rs: |-
+          Ferramentas gratuitas on-line, como [Google Docs](%{google_url}) são um excelente lugar para os alunos trabalharem em projetos de grupo ou documentos, fazer anotações compartilhadas, etc.
+          Professor *ou* alunos podem começar colaborações de grupo.
       description_student: |-
           **O que queremos dizer com colaborações?** Estamos falando de ferramentas baseadas na web pra
           trabalhar juntos em um documento compartilhado. Você pode usar recursos como
