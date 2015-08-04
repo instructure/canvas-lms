@@ -55,8 +55,8 @@ describe "account admin outcomes" do
         should_create_an_outcome_group_root_level
       end
 
-      it "should create a learning outcome with a new rating (nested)" do
-        should_create_a_learning_outcome_with_a_new_rating_nested
+      it "should create an outcome group (nested)", priority: "1", test_id: 264776 do
+        should_create_an_outcome_group_nested
       end
 
       it "should edit an outcome group" do

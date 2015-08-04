@@ -357,7 +357,7 @@ def should_create_an_outcome_group_root_level
   expect(LearningOutcomeGroup.where(title: group_title).first).to be_present
 end
 
-def should_create_a_learning_outcome_with_a_new_rating_nested
+def should_create_an_outcome_group_nested
   get outcome_url
 
   ## when

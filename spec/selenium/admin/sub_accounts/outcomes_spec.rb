@@ -15,23 +15,23 @@ describe "sub account outcomes", priority: 2 do
 
       context "create/edit/delete outcomes" do
 
-        it "should create a learning outcome with a new rating (root level)" do
+        it "should create a learning outcome with a new rating (root level)", priority: "1", test_id: 263461 do
           should_create_a_learning_outcome_with_a_new_rating_root_level
         end
 
-        it "should create a learning outcome (nested)" do
+        it "should create a learning outcome (nested)", priority: "1", test_id: 263680 do
           should_create_a_learning_outcome_nested
         end
 
-        it "should edit a learning outcome and delete a rating" do
+        it "should edit a learning outcome and delete a rating", priority: "1", test_id: 263681 do
           should_edit_a_learning_outcome_and_delete_a_rating
         end
 
-        it "should delete a learning outcome" do
+        it "should delete a learning outcome", priority: "1", test_id: 263682 do
           should_delete_a_learning_outcome
         end
 
-        it "should validate mastery points" do
+        it "should validate mastery points", priority: "1", test_id: 263901 do
           should_validate_mastery_points
         end
 
@@ -50,25 +50,25 @@ describe "sub account outcomes", priority: 2 do
 
       context "create/edit/delete outcome groups" do
 
-        it "should create an outcome group (root level)" do
+        it "should create an outcome group (root level)", priority: "1", test_id: 263902 do
           should_create_an_outcome_group_root_level
         end
 
-        it "should create a learning outcome with a new rating (nested)" do
-          should_create_a_learning_outcome_with_a_new_rating_nested
+        it "should create an outcome group (nested)", priority: "1", test_id: 250521 do
+          should_create_an_outcome_group_nested
         end
 
-        it "should edit an outcome group" do
+        it "should edit an outcome group", priority: "1", test_id: 250522 do
           should_edit_an_outcome_group
         end
 
-        it "should delete an outcome group" do
+        it "should delete an outcome group", priority: "1", test_id: 250523 do
           should_delete_an_outcome_group
         end
       end
 
       describe "find/import dialog" do
-        it "should not allow importing top level groups" do
+        it "should not allow importing top level groups", priority: "1", test_id: 250524 do
           get outcome_url
           wait_for_ajaximations
 

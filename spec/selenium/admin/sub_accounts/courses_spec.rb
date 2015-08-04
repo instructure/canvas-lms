@@ -9,7 +9,7 @@ describe "sub account courses" do
       course_with_admin_logged_in
     end
 
-    it "should add a new course" do
+    it "should add a new course", priority: "1", test_id: 263241 do
       course_name = 'course 1'
       course_code = '12345'
       get url
