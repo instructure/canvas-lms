@@ -1288,6 +1288,7 @@ da:
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Tillader lærerne at vælge karakterdata for bulk eksport til SIS integrationer."
   always_3a59e701: Altid
   an_error_occured_trying_to_generate_this_theme_ple_6ae581d: "En fejl opsted mens dette tema blev oprettet. Prøv venligst igen."
+  an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*En fejl opstod*, post venligst dit svar igen senere"
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "En fejl opstod under forberedelse as download, prøv venligst igen."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Der opstod en fejl ved oprettelse af brugerrettigheder for %{filename}"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Der opstod en ukendt serverfejl. Prøve venligst igen."
@@ -2783,6 +2784,9 @@ da:
     google_drive: 
       file_not_found: "Samarbejdsfil ikke fundet"
     index: 
+      description_rs: |-
+          Gratis online web værktøjer så som [Google Docs](%{google_url}) er et fantastisk sted for studerende at samarbejde på gruppeprojekter eller artikler, tage fælles noter etc.
+          Lærer *eller* studerende kan opsætte gruppesamarbejder.
       description_student: |-
           **Hvad mener vi med samarbejder?** Vi taler om web-baserede værktøjer til
           at arbejde sammen på et delt dokument. Du kan bruge resurser så som
@@ -12881,6 +12885,7 @@ da:
         crosslist_this_section: "Krydslist denne sektion"
         current_enrollments: "Nuværende tilmeldinger"
         decrosslist_section: "Afkrydslist denne sektion"
+  see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Se nogle LTI værktøjer* der virker godt med Canvas."
   select_a_grading_period_aab25483: "Vælg en bedømmelsesperiode"
   select_content: "Vælg indhold"
   select_content_checkbox: 
@@ -13514,6 +13519,7 @@ da:
       wiki_page_notice: "Vælg den wiki side du ønsker at associere med dette *modul*, eller tilføj en ny side ved at vælge \"Ny side\"."
       wiki_page_select_label: "Vælg den wiki side du ønsker at associere med dette 'modul', eller tilføj en ny side ved at vælge \"Ny side\"."
     static_notices: 
+      bouncing_communication_channels: "Der forekommer at være et problem med en af dine kontakt metoder. Tjek venligst din *Indstillings side*."
       javascript_required: "Du skal have JavaScript aktiveret for at have adgang til denne side."
     submission_comment: 
       assignment: Besvarelse
