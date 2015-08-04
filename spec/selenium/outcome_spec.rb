@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/outcome_common')
 
-describe "outcomes", priority: 1 do
+describe "outcomes" do
   include_examples "in-process server selenium tests"
   let(:who_to_login) { 'teacher' }
   let(:outcome_url) { "/courses/#{@course.id}/outcomes" }
@@ -21,45 +21,45 @@ describe "outcomes", priority: 1 do
 
     context "create/edit/delete outcomes" do
 
-      it "should create a learning outcome with a new rating (root level)" do
+      it "should create a learning outcome with a new rating (root level)", priority: "1", test_id: 250533 do
         should_create_a_learning_outcome_with_a_new_rating_root_level
       end
 
-      it "should create a learning outcome (nested)" do
+      it "should create a learning outcome (nested)", priority: "1", test_id: 250534 do
         should_create_a_learning_outcome_nested
       end
 
-      it "should edit a learning outcome and delete a rating" do
+      it "should edit a learning outcome and delete a rating", priority: "1", test_id: 250535 do
         should_edit_a_learning_outcome_and_delete_a_rating
       end
 
-      it "should delete a learning outcome" do
+      it "should delete a learning outcome", priority: "1", test_id: 250536 do
         should_delete_a_learning_outcome
       end
 
-      it "should validate mastery points" do
+      it "should validate mastery points", priority: "1", test_id: 250537 do
         should_validate_mastery_points
       end
 
-      it "should_validate_calculation_method_dropdown", test_id: 162376 do
+      it "should_validate_calculation_method_dropdown", priority: "1", test_id: 162376 do
         should_validate_calculation_method_dropdown
       end
 
-      it "should require a title" do
+      it "should require a title", priority: "2", test_id: 250538 do
         should_validate_short_description_presence
       end
 
-      it "should require a title less than 255 chars" do
+      it "should require a title less than 255 chars", priority: "2", test_id: 250539 do
         should_validate_short_description_length
       end
 
-      context "validate decaying average", test_id: 162377 do
+      context "validate decaying average" do
         before do
           get outcome_url
           f('.add_outcome_link').click
         end
 
-        it "should validate default values" do
+        it "should validate default values", priority: "1", test_id: 261707 do
           expect(f('#calculation_method')).to have_value('decaying_average')
           expect(f('#calculation_int')).to have_value('65')
           expect(f('#calculation_int_example')).to include_text("Most recent result counts as 65%"\
@@ -68,29 +68,29 @@ describe "outcomes", priority: 1 do
                                                               " before a score is returned.")
         end
 
-        it "should validate calculation int out of range values" do
+        it "should validate calculation int out of range values", priority: "1", test_id: 261708 do
           should_validate_decaying_average
         end
 
-        it "should validate calculation int accepatble values" do
+        it "should validate calculation int accepatble values", priority: "1", test_id: 261709 do
           save_without_error(1)
           f('.edit_button').click
           save_without_error(99)
         end
 
-        it "should retain the settings after saving" do
+        it "should retain the settings after saving", priority: "1", test_id: 261710 do
           save_without_error(rand(99), 'Decaying Average')
           expect(f('#calculation_method').text).to include('Decaying Average')
         end
       end
 
-      context "validate n mastery", test_id: 162378 do
+      context "validate n mastery" do
         before do
           get outcome_url
           f('.add_outcome_link').click
         end
 
-        it "should validate default values" do
+        it "should validate default values", priority: "1", test_id: 261711 do
           click_option('#calculation_method', "n Number of Times")
           expect(f('#calculation_int')).to have_value('5')
           expect(f('#mastery_points')).to have_value('3')
@@ -99,26 +99,26 @@ describe "outcomes", priority: 1 do
                                                               " to calculate final score")
         end
 
-        it "should validate calculation int out of range values" do
+        it "should validate calculation int out of range values", priority: "1", test_id: 261712 do
           should_validate_n_mastery
         end
 
-        it "should validate calculation int acceptable range values" do
+        it "should validate calculation int acceptable range values", priority: "1", test_id: 261713 do
           click_option('#calculation_method', "n Number of Times")
           save_without_error(2)
           f('.edit_button').click
           save_without_error(5)
         end
 
-        it "should retain the settings after saving" do
+        it "should retain the settings after saving", priority: "1", test_id: 261714 do
           click_option('#calculation_method', "n Number of Times")
           save_without_error(rand(2..5), 'n Number of Times')
           expect(f('#calculation_method').text).to include('n Number of Times')
         end
       end
 
-    context "create/edit/delete outcome groups" do
-        it "should create an outcome group (root level)" do
+      context "create/edit/delete outcome groups" do
+        it "should create an outcome group (root level)", priority: "2", test_id: 560586 do
           should_create_an_outcome_group_root_level
         end
 
@@ -126,18 +126,41 @@ describe "outcomes", priority: 1 do
           should_create_an_outcome_group_nested
         end
 
-        it "should edit an outcome group" do
+        it "should edit an outcome group", priority: "2", test_id: 114340 do
           should_edit_an_outcome_group
         end
 
-        it "should delete an outcome group" do
+        it "should delete an outcome group", priority: "2", test_id: 250553 do
           should_delete_an_outcome_group
+        end
+
+        it "should drag and drop an outcome to an outcome group", priority: "2", test_id: 114339 do
+          group = @course.learning_outcome_groups.create!(title: 'groupage')
+          group2 = @course.learning_outcome_groups.create!(title: 'groupage2')
+          group.adopt_outcome_group(group2)
+          group2.add_outcome @course.created_learning_outcomes.create!(title: 'o1')
+          get "/courses/#{@course.id}/outcomes"
+          f(".ellipsis[title='groupage2']").click
+          wait_for_ajaximations
+
+          # make sure the outcome group 'groupage2' and outcome 'o1' are on different frames
+          expect(ffj(".outcome-level:first .outcome-group .ellipsis")[0]).to have_attribute("title", 'groupage2')
+          expect(ffj(".outcome-level:last .outcome-link .ellipsis")[0]).to have_attribute("title", 'o1')
+          drag_and_drop_element(ffj(".outcome-level:last .outcome-link .ellipsis")[0], ffj(' .outcome-level')[0])
+          wait_for_ajaximations
+
+          # after the drag and drop, the outcome and the group are on a same screen
+          expect(ffj(".outcome-level:last .outcome-group .ellipsis")[0]).to have_attribute("title", 'groupage2')
+          expect(ffj(".outcome-level:last .outcome-link .ellipsis")[0]).to have_attribute("title", 'o1')
+
+          # assert there is only one frame now after the drag and drop
+          expect(ffj(' .outcome-level:first')).to eq ffj(' .outcome-level:last')
         end
       end
     end
 
     context "actions" do
-      it "should not render an HTML-escaped title in outcome directory while editing" do
+      it "should not render an HTML-escaped title in outcome directory while editing", priority: "2", test_id: 250554 do
         title = 'escape & me <<->> if you dare'
         escaped_title = 'escape &amp; me &lt;&lt;-&gt;&gt; if you dare'
         who_to_login == 'teacher' ? @context = @course : @context = account
@@ -169,7 +192,7 @@ describe "outcomes", priority: 1 do
     end
 
     context "#show" do
-      it "should show rubrics as aligned items" do
+      it "should show rubrics as aligned items", priority: "2", test_id: 250555 do
         outcome_with_rubric
 
         get "/courses/#{@course.id}/outcomes/#{@outcome.id}"
