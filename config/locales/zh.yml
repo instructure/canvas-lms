@@ -15144,6 +15144,10 @@ zh:
       您将需要创建[新的Facebook应用程序](%{facebook_url})，以及在高级设置启用客户OAuth 登录
       作为有效的OAuth，您应重新定向URI配置%{callback_url}。
       在保存您的应用程序后，您记下应用程序的ID和应用程序的密钥，并在此输入它们。
+  you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
+      您将要在[谷歌开发者控制台]创建网络应用程序 [Google Developer Console](%{google_url})。
+      您应该添加 %{callback_url} 作为重新定向URI。
+      当您创建应用程序后，记下客户ID和客户密钥，并在此输入它们。
   you_will_need_to_register_an_application_on_github_3c8f213a: |-
       您将要[在GitHub注册一个应用程序](%{github_url})。
       您应该作为认证回调URL配置%{callback_url}。
