@@ -65,6 +65,22 @@ describe 'Excuse an Assignment' do
 
     get "/courses/#{@course.id}/gradebook"
     expect(f('.canvas_1 .slick-row .slick-cell:first-child').text).to eq 'EX'
+
+    # Test case insensitivity on 'EX'
+    assign = @course.assignments.create! title: 'Excuse Me 2', points_possible: 20
+    assign.grade_student @student, excuse: true
+    rows = ['Student Name,ID,Section,Excuse Me 2',
+            "Student,#{@student.id},,Ex"]
+    _filename, fullpath, _data = get_file('gradebook.csv', rows.join("\n"))
+
+    get "/courses/#{@course.id}/gradebook_uploads/new"
+
+    f('#gradebook_upload_uploaded_data').send_keys(fullpath)
+    f('#new_gradebook_upload').submit
+    run_jobs
+    wait_for_ajaximations
+
+    expect(f('#no_changes_detected')).not_to be_nil
   end
 
   context 'SpeedGrader' do

@@ -140,7 +140,12 @@ class GradebookImporter
         next if assignment.changed? && !readonly_assignment?(idx)
         indexes_to_delete << idx if readonly_assignment?(idx) || @students.all? do |student|
           submission = student.gradebook_importer_submissions[idx]
-          submission['original_grade'].to_s == submission['grade'] ||
+
+          # Have potentially mixed case excused in grade match case
+          # expectations for the compare so it doesn't look changed
+          submission['grade'] = 'EX' if submission['grade'].to_s.upcase == 'EX'
+
+          submission['original_grade'].to_s == submission['grade'].to_s ||
             (submission['original_grade'].blank? && submission['grade'].blank?)
         end
       end
