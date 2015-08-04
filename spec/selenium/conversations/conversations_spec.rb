@@ -71,6 +71,18 @@ describe "conversations new" do
       reply_to_message
       expect(f('.message-count')).to include_text('3')
     end
+
+    it "should show starred messages in the starred filter", priority: "1", test_id: 138896 do
+      get_conversations
+      unstarred_elt = conversation_elements.first
+
+      hover_over_message(unstarred_elt)
+      click_star_icon(unstarred_elt)
+      expect(f('.active', unstarred_elt)).to be_present
+      expect(@participant.reload.starred).to be_truthy
+      select_view('starred')
+      expect(conversation_elements.size).to eq 1
+    end
   end
 
   describe "view filter" do
@@ -167,14 +179,13 @@ describe "conversations new" do
       get_conversations
       unstarred_elt = conversation_elements[1]
       # make star button visible via mouse over
-      driver.mouse.move_to(unstarred_elt)
-      wait_for_ajaximations
+      hover_over_message(unstarred_elt)
+
       star_btn = f('.star-btn', unstarred_elt)
       expect(star_btn).to be_present
       expect(f('.active', unstarred_elt)).to be_nil
 
-      star_btn.click
-      wait_for_ajaximations
+      click_star_icon(unstarred_elt,star_btn)
       expect(f('.active', unstarred_elt)).to be_present
       expect(@conv_unstarred.reload.starred).to be_truthy
     end

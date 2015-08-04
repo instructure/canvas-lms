@@ -226,3 +226,18 @@ def reply_to_message(body = 'stuff')
   set_message_body(body)
   click_send
 end
+
+# makes a message's star and unread buttons visible via mouse over
+def hover_over_message(msg)
+  driver.mouse.move_to(msg)
+  wait_for_ajaximations
+end
+
+def click_star_icon(msg,star_btn = nil)
+  if star_btn == nil
+    star_btn = f('.star-btn', msg)
+  end
+
+  star_btn.click
+  wait_for_ajaximations
+end
