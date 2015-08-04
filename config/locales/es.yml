@@ -2773,6 +2773,9 @@ es:
     google_drive: 
       file_not_found: "Archivo de colaboración no encontrado"
     index: 
+      description_rs: |-
+          Las herramientas gratis en línea como [Google Docs](%{google_url}) son un lugar excelente para que los estudiantes trabajen en proyectos o artículos grupales, tomen notas compartidas, etc.
+          El instructor *o* los estudiantes pueden establecer colaboraciones de grupo.
       description_student: |-
           **¿Qué queremos decir con colaboraciones?**  Estamos hablando de herramientas en-línea para trabajar juntos en un documento compartido. Puede usar recursos como
           [Google Docs](%{google_url}) para trabajar colaborativamente en tareas como trabajos en grupo y toma de notas. Esta página es un lugar fácil para seguirle la pista a estas colaboraciones, y también 	para establecerlas sin tener que intercambiar correos electrónicos.
@@ -3438,6 +3441,7 @@ es:
         must_view: "ver el elemento"
       select_module: 
         instructions: "Seleccionar el Módulo"
+        name: "%{module}"
       select_prerequisite: "Seleccione el tipo de requisitos previos. Los estudiantes no pueden ver un módulo hasta cumplir todos los requisitos previos."
     context_module: 
       unpublish: "No publicar"
