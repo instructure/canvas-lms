@@ -301,11 +301,7 @@ class Submission < ActiveRecord::Base
             data[:web_overlap] = res[:web_overlap].to_f
             data[:publication_overlap] = res[:publication_overlap].to_f
             data[:student_overlap] = res[:student_overlap].to_f
-            data[:state] = 'failure'
-            data[:state] = 'problem' if data[:similarity_score] < 75
-            data[:state] = 'warning' if data[:similarity_score] < 50
-            data[:state] = 'acceptable' if data[:similarity_score] < 25
-            data[:state] = 'none' if data[:similarity_score] == 0
+            data[:state] = Turnitin.state_from_similarity_score data[:similarity_score]
             data[:status] = 'scored'
           else
             needs_retry ||= true

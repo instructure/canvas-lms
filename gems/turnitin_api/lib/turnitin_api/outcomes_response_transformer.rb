@@ -31,6 +31,10 @@ module TurnitinApi
       response.body['outcome_originalityreport'].select {|k, _| %w(breakdown numeric).include?(k)}
     end
 
+    def scored?
+      originality_data["numeric"]["score"].present?
+    end
+
     private
 
     def connection
