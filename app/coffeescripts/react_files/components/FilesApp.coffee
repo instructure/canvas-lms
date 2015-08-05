@@ -6,7 +6,7 @@ define [
   'compiled/react/shared/utils/withReactElement'
   'compiled/str/splitAssetString'
   './Toolbar'
-  './Breadcrumbs'
+  'jsx/files/Breadcrumbs'
   './FolderTree'
   './FilesUsage'
   '../mixins/MultiselectableMixin'

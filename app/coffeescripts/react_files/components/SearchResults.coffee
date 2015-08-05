@@ -6,7 +6,7 @@ define [
   'compiled/models/Folder'
   'compiled/collections/FilesCollection'
   'compiled/react/shared/utils/withReactElement'
-  './ColumnHeaders'
+  'jsx/files/ColumnHeaders'
   './LoadingIndicator'
   './FolderChild'
   '../modules/customPropTypes'
@@ -17,7 +17,7 @@ define [
   '../utils/locationOrigin'
 ], (_, I18n, React, ReactRouter, Folder, FilesCollection, withReactElement, ColumnHeadersComponent, LoadingIndicatorComponent, FolderChildComponent, customPropTypes, updateAPIQuerySortParams, getAllPages, FilePreviewComponent, NoResultsComponent) ->
 
-  ColumnHeaders = React.createFactory ColumnHeadersComponent
+  ColumnHeaders = ColumnHeadersComponent
   LoadingIndicator = React.createFactory LoadingIndicatorComponent
   FolderChild = React.createFactory FolderChildComponent
   FilePreview = React.createFactory FilePreviewComponent

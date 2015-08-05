@@ -5,7 +5,7 @@ define [
   'i18n!react_files'
   'compiled/react/shared/utils/withReactElement'
   '../modules/filesEnv'
-  './ColumnHeaders'
+  'jsx/files/ColumnHeaders'
   './LoadingIndicator'
   './FolderChild'
   '../utils/getAllPages'
@@ -17,7 +17,7 @@ define [
   '../utils/forceScreenreaderToReparse'
 ], (React, Router, _, I18n, withReactElement, filesEnv, ColumnHeadersComponent, LoadingIndicatorComponent, FolderChildComponent, getAllPages, updateAPIQuerySortParams, Folder, CurrentUploadsComponent, FilePreviewComponent, UploadDropZoneComponent, forceScreenreaderToReparse) ->
 
-  ColumnHeaders = React.createFactory ColumnHeadersComponent
+  ColumnHeaders = ColumnHeadersComponent
   LoadingIndicator = React.createFactory LoadingIndicatorComponent
   FolderChild = React.createFactory FolderChildComponent
   CurrentUploads = React.createFactory CurrentUploadsComponent

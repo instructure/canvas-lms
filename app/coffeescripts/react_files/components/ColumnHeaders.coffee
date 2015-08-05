@@ -38,8 +38,10 @@ define [
     className: 'ef-usage-rights-col'
   ]
 
-  ColumnHeaders = React.createClass
+  ColumnHeaders =
     displayName: 'ColumnHeaders'
+
+    columns: columns
 
     propTypes:
       to: React.PropTypes.string.isRequired
@@ -62,92 +64,4 @@ define [
       else
         'desc'
       _.defaults({sort: property, order: order}, query)
-
-    render: withReactElement ->
-      sort = @getQuery().sort or 'name'
-      order = @getQuery().order or 'asc'
-
-      selectAllCheckboxClass = classSet({
-        'screenreader-only': @state.hideToggleAll
-      })
-
-      selectAllLabelClass = classSet({
-        'screenreader-only': !@state.hideToggleAll
-      })
-
-      header className:'ef-directory-header', role: 'row',
-        div className: selectAllCheckboxClass, role: 'gridcell',
-          label {htmlFor: "selectAllCheckbox", className: selectAllLabelClass },
-            I18n.t('select_all', 'Select All')
-          input {
-            id: "selectAllCheckbox"
-            className: selectAllCheckboxClass
-            type: 'checkbox'
-            onFocus: (event) => @setState({hideToggleAll: false})
-            onBlur: (event) => @setState({hideToggleAll: true})
-            checked: @props.areAllItemsSelected()
-            onChange: (event) => @props.toggleAllSelected(event.target.checked)
-          },
-
-        columns.map (column) =>
-          # don't show any usage rights related stuff to people that don't have the feature flag on
-          return if (column.property is 'usage_rights') and !@props.usageRightsRequiredForContext
-
-          isSortedCol = sort is column.property
-
-          # This little bit is done so that we can get a dynamic key added into
-          # the object since string interpolation in an object key is forbidden
-          # by CoffeeScript... which makes a lot of sense.
-          columnClassNameObj =
-            "current-filter": isSortedCol
-          columnClassNameObj[column.className] = true
-
-          columnClassName = classSet(columnClassNameObj)
-
-          linkClassName = classSet({
-            'visible-desktop': column.displayNameShort
-            'ef-usage-rights-col-offset': (column.property == 'usage_rights')
-          })
-
-          div {
-            key: column.property
-            className: columnClassName
-            role: 'columnheader'
-            'aria-sort': {asc: 'ascending', desc: 'descending'}[isSortedCol and order] or 'none'
-          },
-            Link _.defaults({
-              query: @queryParamsFor(@getQuery(), column.property)
-              className: 'ef-plain-link'
-            }, @props),
-
-              span className: linkClassName,
-                if (column.property == 'select')
-                  span {className: 'screenreader-only'},
-                    column.displayName
-                else if (column.property == 'usage_rights')
-                  i {className: 'icon-files-copyright'},
-                    span {className: 'screenreader-only'},
-                      column.displayName
-                else
-                  column.displayName
-              if column.displayNameShort
-                span className: 'hidden-desktop',
-                  column.displayNameShort
-
-
-              if isSortedCol and order is 'asc'
-                i className:'icon-mini-arrow-up',
-                  span className: 'screenreader-only',
-                    I18n.t('sorted_ascending', "Sorted Ascending")
-              if isSortedCol and order is 'desc'
-                i className:'icon-mini-arrow-down',
-                  span className: 'screenreader-only',
-                    I18n.t('sorted_desending', "Sorted Descending")
-
-        div {
-          className:'ef-links-col'
-          role: 'columnheader'
-        },
-          span {className:'screenreader-only'},
-            I18n.t('Links')
 
