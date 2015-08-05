@@ -809,7 +809,9 @@ class CalendarEventsApiController < ApplicationController
         end
 
         if original_dates.present?
-          if (assignment.context.user_has_been_observer?(@current_user) && assignments.empty?) || (assignment.context.active_section_count != overridden_dates.size)
+          section_override_count = dates_list.count{|d| d[:set_type] == 'CourseSection'}
+          all_sections_overridden = section_override_count > 0 && section_override_count == assignment.context.active_section_count
+          if (assignment.context.user_has_been_observer?(@current_user) && assignments.empty?) || !all_sections_overridden
             assignments << assignment
           end
         end
