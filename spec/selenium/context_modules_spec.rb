@@ -1,4 +1,5 @@
 ﻿require File.expand_path(File.dirname(__FILE__) + '/helpers/context_modules_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_context')
 
 describe "context modules" do
   include_examples "in-process server selenium tests"
@@ -1054,6 +1055,18 @@ describe "context modules" do
     it "loads page with differentiated assignments on" do
       @course.disable_feature!(:differentiated_assignments)
       assert_page_loads
+    end
+  end
+
+  context "when a public course is accessed" do
+    include_context "public course as a logged out user"
+
+    it "should display modules list", priority: "1", test_id: 269812 do
+      @module = public_course.context_modules.create!(:name => "module 1")
+      @assignment = public_course.assignments.create!(:name => 'assignment 1', :assignment_group => @assignment_group)
+      @module.add_item :type => 'assignment', :id => @assignment.id
+      get "/courses/#{public_course.id}/modules"
+      validate_selector_displayed('.item-group-container')
     end
   end
 end

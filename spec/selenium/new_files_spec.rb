@@ -1,5 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_context')
 
 describe "better_file_browsing" do
   include_examples "in-process server selenium tests"
@@ -105,6 +106,15 @@ describe "better_file_browsing" do
         f('.ef-file-preview-header-close').click
         check_element_has_focus(f('.btn-view'))
       end
+    end
+  end
+
+  context "when a public course is accessed" do
+    include_context "public course as a logged out user"
+
+    it "should display course files", priority: "1", test_id: 270032 do
+      get "/courses/#{public_course.id}/files"
+      expect(f('div.ef-main[data-reactid]')).to be_displayed
     end
   end
 
@@ -331,4 +341,5 @@ describe "better_file_browsing" do
       end
     end
   end
+
 end

@@ -1,5 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_context')
 
 describe "Wiki Pages" do
   include_examples "in-process server selenium tests"
@@ -390,6 +391,18 @@ describe "Wiki Pages" do
       expect(link).to be_displayed
       expect(link.text).to match_ignoring_whitespace(@tool.label_for(:wiki_page_menu))
       expect(link['href']).to eq course_external_tool_url(@course, @tool) + "?launch_type=wiki_page_menu&pages[]=#{@wiki_page.id}"
+    end
+  end
+
+  context "when a public course is accessed" do
+    include_context "public course as a logged out user"
+
+    it "should display wiki content", priority: "1", test_id: 270035 do
+      title = "foo"
+      public_course.wiki.wiki_pages.create!(:title => title, :body => "bar")
+
+      get "/courses/#{public_course.id}/wiki/#{title}"
+      expect(f('.user_content')).not_to be_nil
     end
   end
 end

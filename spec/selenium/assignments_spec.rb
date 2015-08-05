@@ -1,5 +1,6 @@
 ﻿require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignments_common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_context')
 
 describe "assignments" do
 
@@ -538,6 +539,16 @@ describe "assignments" do
         wait_for_ajaximations
         expect(f('#assignment_post_to_sis')).to be_nil
       end
+    end
+  end
+
+  context "when a public course is accessed" do
+    include_context "public course as a logged out user"
+
+    it "should display assignments", priority: "1", test_id: 269811 do
+      public_course.assignments.create!(:name => 'assignment 1')
+      get "/courses/#{public_course.id}/assignments"
+      validate_selector_displayed('.assignment.search_show')
     end
   end
 end

@@ -1,4 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
+require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_context')
 
 describe "course syllabus" do
   include_examples "in-process server selenium tests"
@@ -61,6 +62,15 @@ describe "course syllabus" do
         f('.edit_syllabus_link').click
         check_element_has_focus(f('.jump_to_today_link'))
       end
+    end
+  end
+
+  context "when a public course is accessed" do
+    include_context "public course as a logged out user"
+
+    it "should display course syllabus", priority: "1", test_id: 270034 do
+      get "/courses/#{public_course.id}/assignments/syllabus"
+      expect(f('#course_syllabus')).to be_displayed
     end
   end
 end
