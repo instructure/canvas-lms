@@ -1,10 +1,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
 
-describe "Navigating to wiki pages" do
+describe "Wiki Pages" do
   include_examples "in-process server selenium tests"
 
-  describe "Navigation" do
+  context "Navigation" do
     before do
       account_model
       course_with_teacher_logged_in :account => @account
@@ -21,7 +21,27 @@ describe "Navigating to wiki pages" do
     end
   end
 
-  describe "Accessibility" do
+  context "Index Page" do
+    before do
+      account_model
+      course_with_teacher_logged_in :account => @account
+    end
+
+    it "should edit page title from pages index", priority: "1", test_id: 126849 do
+      @course.wiki.wiki_pages.create!(title: 'B-Team')
+      get "/courses/#{@course.id}/pages"
+      f('.al-trigger').click()
+      f('.edit-menu-item').click()
+      expect(f('.edit-control-text').attribute(:value)).to include_text('B-Team')
+      f('.edit-control-text').clear()
+      f('.edit-control-text').send_keys('A-Team')
+      fj('button:contains("Save")').click
+      wait_for_ajaximations
+      expect(f('.collectionViewItems').text).to include('A-Team')
+    end
+  end
+
+  context "Accessibility" do
 
     def check_header_focus(attribute)
       f("[data-sort-field='#{attribute}']").click()
@@ -70,7 +90,8 @@ describe "Navigating to wiki pages" do
       end
     end
 
-    describe "Publish Cloud" do
+    context "Publish Cloud" do
+
       it "should set focus back to the publish cloud after unpublish" do
         get "/courses/#{@course.id}/pages"
         f('.publish-icon').click
@@ -87,7 +108,7 @@ describe "Navigating to wiki pages" do
       end
     end
 
-    describe "Delete Page" do
+    context "Delete Page" do
 
       before do
         get "/courses/#{@course.id}/pages"
@@ -135,7 +156,7 @@ describe "Navigating to wiki pages" do
       end
     end
 
-    describe "Use as Front Page Link" do
+    context "Use as Front Page Link" do
       before :each do
         get "/courses/#{@course.id}/pages"
         f('.al-trigger').click
@@ -153,7 +174,7 @@ describe "Navigating to wiki pages" do
       end
     end
 
-    describe "Cog menu" do
+    context "Cog menu" do
       before :each do
         get "/courses/#{@course.id}/pages"
         f('.al-trigger').click
@@ -191,7 +212,7 @@ describe "Navigating to wiki pages" do
       end
     end
 
-    describe "Revisions Page" do
+    context "Revisions Page" do
       before :once do
         account_model
         course_with_teacher :account => @account, :active_all => true
@@ -245,7 +266,7 @@ describe "Navigating to wiki pages" do
 
     end
 
-    describe "Edit Page" do
+    context "Edit Page" do
       before :each do
         get "/courses/#{@course.id}/pages/bar/edit"
         wait_for_ajaximations
@@ -288,7 +309,7 @@ describe "Navigating to wiki pages" do
 
   end
 
-  describe "Show Page" do
+  context "Show Page" do
     it "shows lock information with prerequisites" do
       account_model
       course_with_student_logged_in account: @account
@@ -309,7 +330,7 @@ describe "Navigating to wiki pages" do
     end
   end
 
-  describe "Permissions" do
+  context "Permissions" do
     before do
       course_with_teacher
     end
