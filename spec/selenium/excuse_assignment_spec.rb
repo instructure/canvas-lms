@@ -144,10 +144,12 @@ describe 'Excuse an Assignment' do
           next_student = f('.student_navigation button.next_object')
           4.times do
             next_student.click
+            wait_for_ajaximations
             score_values << f('#student_and_assignment_grade').attribute('value')
           end
         else
           get "/courses/#{@course.id}/gradebook/"
+          wait_for_ajaximations
           score_values = ff('.canvas_1 .slick-row .slick-cell:first-child').map(& :text)
         end
 
@@ -182,10 +184,12 @@ describe 'Excuse an Assignment' do
           next_student = f('.student_navigation button.next_object')
           2.times do
             next_student.click
+            wait_for_ajaximations
             totals << f('span.total-grade').text[/\d+(\.\d+)?%/]
           end
         else
           get "/courses/#{@course.id}/gradebook/"
+          wait_for_ajaximations
           totals = ff('.canvas_1 .slick-row .slick-cell:last-child').map(& :text)
         end
 
