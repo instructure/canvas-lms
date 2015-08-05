@@ -251,16 +251,35 @@ describe "Navigating to wiki pages" do
         wait_for_ajaximations
       end
 
-      it "should alert user if navigating away from page with unsaved RCE changes" do
+      it "should alert user if navigating away from page with unsaved RCE changes", priority: "1", test_id: 267612 do
         add_text_to_tiny("derp")
         f('.home').click()
         expect(driver.switch_to.alert.text).to be_present
         driver.switch_to.alert.accept
       end
 
-      it "should alert user if navigating away from page with unsaved html changes" do
-        fj('a.switch_views:visible').click
+      it "should alert user if navigating away from page with unsaved html changes", priority: "1", test_id: 126838 do
+        fj('a.switch_views:visible').click()
         f('textarea').send_keys("derp")
+        f('.home').click()
+        expect(driver.switch_to.alert.text).to be_present
+        driver.switch_to.alert.accept
+      end
+
+      it "should not save changes when navigating away and not saving", priority: "1", test_id: 267613 do
+        fj('a.switch_views:visible').click()
+        f('textarea').send_keys('derp')
+        f('.home').click()
+        expect(driver.switch_to.alert.text).to be_present
+        driver.switch_to.alert.accept
+        get "/courses/#{@course.id}/pages/bar/edit"
+        expect(f('textarea')).not_to include_text('derp')
+      end
+
+      it "should alert user if navigating away from page after title change", priority: "1", test_id: 267832 do
+        fj('a.switch_views:visible').click()
+        f('.title').clear()
+        f('.title').send_keys("derpy-title")
         f('.home').click()
         expect(driver.switch_to.alert.text).to be_present
         driver.switch_to.alert.accept
