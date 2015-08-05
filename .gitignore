@@ -46,6 +46,7 @@ Gemfile.lock4
 /tmp/
 /vendor/plugins/rails_upgrade
 npm-debug.log
+mkmf.log
 /vendor/bundle
 
 # generated plugin stuff
