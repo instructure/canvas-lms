@@ -183,8 +183,9 @@
       <div class="comment_top"></div>
       <% edit_correct_comment_text = t('titles.click_to_enter_correct_answer_comments', "Click to enter comments for a correct answer") %>
       <a href="#" class="comment_focus" title="<%= edit_correct_comment_text %>">
-        <span class="ellipsis">...</span>
-        <i class="icon-edit standalone-icon"><span class="screenreader-only"><%= edit_correct_comment_text %></span></i>
+        <span class="ellipsis" aria-hidden="true">...</span>
+        <i class="icon-edit standalone-icon"></i>
+        <span class="screenreader-only"><%= edit_correct_comment_text %></span>
       </a>
       <span id="correct_label" class="details"><%= t(:correct_answer_comments, "Correct answer comments") %></span>
       <input type="hidden" name="correct_comments_html" />
@@ -195,8 +196,9 @@
       <div class="comment_top"></div>
       <% edit_incorrect_comment_text = t('titles.click_to_enter_wrong_answer_comments', "Click to enter comments for a wrong answer") %>
       <a href="#" class="comment_focus" title="<%= edit_incorrect_comment_text %>">
-        <span class="ellipsis">...</span>
-        <i class="icon-edit standalone-icon"><span class="screenreader-only"><%= edit_incorrect_comment_text %></span></i>
+        <span class="ellipsis" aria-hidden="true">...</span>
+        <i class="icon-edit standalone-icon"></i>
+        <span class="screenreader-only"><%= edit_incorrect_comment_text %></span>
       </a>
       <span id="wrong_label" class="details"><%= t(:wrong_answer_comments, "Wrong answer comments") %></span>
       <input type="hidden" name="incorrect_comments_html" />
@@ -207,8 +209,9 @@
       <div class="comment_top"></div>
       <% edit_neutral_comment_text = t('titles.click_to_enter_general_answer_comments', "Click to enter general comments") %>
       <a href="#" class="comment_focus" title="<%= edit_neutral_comment_text %>">
-        <span class="ellipsis">...</span>
-        <i class="icon-edit standalone-icon"><span class="screenreader-only"><%= edit_neutral_comment_text %></span></i>
+        <span class="ellipsis" aria-hidden="true">...</span>
+        <i class="icon-edit standalone-icon"></i>
+        <span class="screenreader-only"><%= edit_neutral_comment_text %></span>
       </a>
       <span id="general_label" class="details"><%= t(:general_answer_comments, "General answer comments") %></span>
       <input type="hidden" name="neutral_comments_html" />
