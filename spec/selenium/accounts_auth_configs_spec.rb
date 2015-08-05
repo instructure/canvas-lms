@@ -58,7 +58,7 @@ describe 'account authentication' do
         ldap_form = f("#edit_ldap#{config_id}")
         ldap_form.find_element(:id, 'authentication_provider_auth_host').clear
         ldap_form.find_element(:id, 'authentication_provider_auth_port').clear
-        ldap_form.find_element(:id, 'authentication_provider_auth_over_tls_false').click
+        ldap_form.find_element(:id, "no_tls_#{config_id}").click
         ldap_form.find_element(:id, 'authentication_provider_auth_base').clear
         ldap_form.find_element(:id, 'authentication_provider_auth_filter').clear
         ldap_form.find_element(:id, 'authentication_provider_auth_username').clear

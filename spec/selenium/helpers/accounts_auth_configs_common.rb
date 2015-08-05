@@ -29,7 +29,7 @@ def add_ldap_config(*)
   end
   ldap_form.find_element(:id, 'authentication_provider_auth_host').send_keys('host.example.dev')
   ldap_form.find_element(:id, 'authentication_provider_auth_port').send_keys('1')
-  ldap_form.find_element(:id, 'authentication_provider_auth_over_tls_simple_tls').click
+  ldap_form.find_element(:id, 'simple_tls_').click
   ldap_form.find_element(:id, 'authentication_provider_auth_base').send_keys('base')
   ldap_form.find_element(:id, 'authentication_provider_auth_filter').send_keys('filter')
   ldap_form.find_element(:id, 'authentication_provider_auth_username').send_keys('username')
