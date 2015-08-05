@@ -314,10 +314,14 @@ TEXT
                 <% end %>
                 <div>
                   <%= settings.check_box :global_includes, :checked => @account.settings[:global_includes] %>
+                  <%= settings.label :global_includes, :en => "Global CSS/JavaScript includes" %>
                   <% if use_new_styles? %>
-                    <%= settings.label :global_brand_includes, :en => "Upload global CSS/JavaScript includes in Theme Editor" %>
-                  <% else %>
-                    <%= settings.label :global_includes, :en => "Global CSS/JavaScript includes" %>
+                    <div class="account_settings__help-text">
+                      <%= t do %>
+                        When enabled, global JS and CSS files can be uploaded in the
+                        <%= link_to t("Theme Editor"), brand_configs_new_path %>.
+                      <% end %>
+                    </div>
                   <% end %>
                 </div>
                 <div id="show_scheduler_checkbox">
