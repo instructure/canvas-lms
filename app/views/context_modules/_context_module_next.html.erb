@@ -8,6 +8,7 @@
   published_status = context_module && context_module.published? ? 'published' : 'unpublished'
   differentiated_assignments_on = @context.feature_enabled?(:differentiated_assignments)
   @modules ||= []
+  min_score_items = context_module && min_score_items(context_module, context_module.content_tags_visible_to(@current_user))
 %>
 <% cache_if_module(context_module, editable, differentiated_assignments_on, @current_user, @context) do %>
 
@@ -81,39 +82,51 @@
     <% else %>
       <div class='no-requirements'></div>
     <% end %>
+
     <div class="ig-header-admin">
-      <% if !editable && ( has_requirements?(context_module)  || context_module_progression && context_module_progression.workflow_state == 'locked' ) %>
-        <div class="completion_status">
-          <i class="icon-check complete_icon"
-            alt="<%= t('complete icon') %>"
-            data-tooltip
-            title="<%= t('Completed')%>"
-          >
-            <span class="screenreader-only"><%= t("Module Completed") %></span>
-          </i>
-          <i class="icon-minimize in_progress_icon"
-            alt="in-progress-icon"
-            data-tooltip
-            title="<%= t('In Progress') %>"
-          >
-            <span class="screenreader-only"><%= t("Module In Progress") %></span>
-          </i>
-          <i class="icon-lock locked_icon"
-            alt="<%= t('lock icon') %>"
-            data-tooltip
-            title="<%=
-              context_module && context_module.to_be_unlocked ?
-                t('Will unlock %{unlock_date}', :unlock_date => (datetime_string(context_module.try_rescue(:unlock_at)) || nbsp))
-                : t('Locked') %>"
-          >
-            <span class="screenreader-only"><%=
-              context_module && context_module.to_be_unlocked ?
-                t('Module will unlock %{unlock_date}', :unlock_date => (datetime_string(context_module.try_rescue(:unlock_at)) || nbsp))
-                : t('Module Locked') %></span>
-          </i>
-        </div>
-      <% elsif !editable && !has_requirements?(context_module) %>
-         <div class='no-requirements-icon'></div>
+      <% if !editable %>
+        <% if context_module && context_module_progression &&
+          context_module_progression.workflow_state == 'unlocked' && min_score_items.length > 0 &&
+          has_submissions?(min_score_items) %>
+          <div class="completion_status">
+            <i class="icon-minimize"
+              alt="in-progress-icon"
+              data-tooltip
+              title="<%= t('Started') %>"
+            >
+              <span class="screenreader-only"><%= t("Module In Progress") %></span>
+            </i>
+          </div>
+        <% elsif has_requirements?(context_module)  || context_module_progression && context_module_progression.workflow_state == 'locked' %>
+          <div class="completion_status">
+            <i class="icon-check complete_icon"
+              alt="<%= t('complete icon') %>"
+              data-tooltip
+              title="<%= t('Completed')%>"
+            >
+              <span class="screenreader-only"><%= t("Module Completed") %></span>
+            </i>
+            <i class="icon-minimize in_progress_icon"
+              alt="in-progress-icon"
+              data-tooltip
+              title="<%= t('In Progress') %>"
+            >
+              <span class="screenreader-only"><%= t("Module In Progress") %></span>
+            </i>
+            <i class="icon-lock locked_icon"
+              alt="<%= t('lock icon') %>"
+              data-tooltip
+              title="<%=
+                context_module && context_module.to_be_unlocked ?
+                  t('Will unlock %{unlock_date}', :unlock_date => (datetime_string(context_module.try_rescue(:unlock_at)) || nbsp))
+                  : t('Locked') %>"
+            >
+              <span class="screenreader-only"><%= t("Module Locked") %></span>
+            </i>
+          </div>
+        <% elsif !has_requirements?(context_module) %>
+           <div class='no-requirements-icon'></div>
+        <% end %>
       <% end %>
 
       <% if editable %>

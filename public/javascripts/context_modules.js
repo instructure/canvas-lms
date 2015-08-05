@@ -549,7 +549,7 @@ define([
         $module.addClass(progression_state);
 
         // Locked tooltip title is added in _context_module_next.html.erb
-        if (progression_state != 'locked') $module.find('.completion_status i:visible').attr('title', progression_state_capitalized);
+        if (progression_state != 'locked' && progression_state != 'unlocked') $module.find('.completion_status i:visible').attr('title', progression_state_capitalized);
 
         if (progression_state == "completed" && !$module.find(".progression_requirement").length) {
           // this means that there were no requirements so even though the workflow_state says completed, dont show "completed" because there really wasnt anything to complete

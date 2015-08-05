@@ -117,6 +117,15 @@ module ContextModulesHelper
     context_module && context_module.completion_requirements.length > 0
   end
 
+  def min_score_items(context_module, content_tags)
+    ids = context_module.completion_requirements.map {|r| r[:id] if r[:type] == 'min_score'}.compact
+    content_tags.select {|c| ids.include? c.id}
+  end
+
+  def has_submissions?(content_tags)
+    content_tags.any? {|c| c.assignment.submissions.length > 0}
+  end
+
   # This method creates a hash that is used to determine which icon is displayed for
   # a module item and which tooltip message is displayed on the icon
   def module_item_data(context_module, context_module_progression, module_item, criterion)
