@@ -11662,12 +11662,7 @@ ar:
       stdev: "الانحراف المعياري"
       students_who_got_a_certain_score: 
         one: "حصل طالب واحد على الدرجة %{score}%."
-        other: "حصل %{count} من الطلاب على الدرجة %{score}%."
         zero: "لم يحصل أي طلاب على الدرجة %{score}%."
-      students_who_scored_in_a_range: 
-        one: "حصل طالب واحد على درجة بين %{start} و%{end}%."
-        other: "حصل %{count} من الطلاب على درجة بين %{start} و%{end}%."
-        zero: "لم يحصل أي طلاب على درجة بين %{start} و%{end}%."
       table_description: "ملخص الإحصائيات لكل عمليات الإرسال"
     title: "إحصائيات الاختبار"
     unknown_answer: "شيء آخر"
@@ -12366,7 +12361,6 @@ ar:
           other_answers: "إجابات أخرى"
         no_data: "بلا بيانات"
         no_responses: "لم يتم تسجيل استجابات لهذا السؤال"
-        percent_of_responses: "%{percent}% من %{total} محاولة (محاولات) محددة لهذه الإجابة"
         response_count: 
           few: "تم إعطاء %{count} من الطلاب هذا السؤال"
           many: "تم إعطاء %{count} من الطلاب هذا السؤال"
