@@ -106,7 +106,10 @@
                 t('Will unlock %{unlock_date}', :unlock_date => (datetime_string(context_module.try_rescue(:unlock_at)) || nbsp))
                 : t('Locked') %>"
           >
-            <span class="screenreader-only"><%= t("Module Locked") %></span>
+            <span class="screenreader-only"><%=
+              context_module && context_module.to_be_unlocked ?
+                t('Module will unlock %{unlock_date}', :unlock_date => (datetime_string(context_module.try_rescue(:unlock_at)) || nbsp))
+                : t('Module Locked') %></span>
           </i>
         </div>
       <% elsif !editable && !has_requirements?(context_module) %>
