@@ -138,13 +138,13 @@ describe SisApiController, type: :request do
           @account.sis_source_id = 'abc'
           @account.save!
 
-          get "/api/sis/accounts/sis_account_id:abc/assignments"
+          get "/api/sis/accounts/sis_account_id:#{@account.sis_source_id}/assignments"
           expect(response).to be_success
 
           result = json_parse
-          assignment_ids = result.map{|a| a['id']}
+          assignment_ids = result.map { |a| a['id'] }
 
-          expect(result.size).to eq 4
+          expect(result.size).to eq(4)
           expect(assignment_ids).to include assignment8.id
           expect(assignment_ids).to include assignment9.id
           expect(assignment_ids).to include assignment10.id
@@ -187,6 +187,30 @@ describe SisApiController, type: :request do
       let_once(:assignment7) { @course.assignments.create!(post_to_sis: true) }
       let_once(:assignment8) { @course.assignments.create!(post_to_sis: true) }
 
+      let_once(:active_override7) do
+        assignment7.assignment_overrides.build.tap do |override|
+          override.title = 'Active Override'
+          override.override_due_at(3.days.from_now)
+          override.set_type = 'CourseSection'
+          override.set_id = assignment7.context.course_sections.first.id
+          override.save!
+        end
+      end
+      let_once(:inactive_override8) do
+        assignment8.assignment_overrides.build.tap do |override|
+          override.title = 'Inactive Override'
+          override.override_due_at(3.days.from_now)
+          override.set_type = 'CourseSection'
+          override.set_id = assignment8.context.course_sections.first.id
+          override.save!
+          override.destroy
+        end
+      end
+
+      let_once(:inactive_section8) do
+        @course.course_sections.create!(name: 'Inactive Section').tap(&:destroy)
+      end
+
       let(:context) { @course }
 
       before do
@@ -224,37 +248,49 @@ describe SisApiController, type: :request do
 
           # third page
           get "/api/sis/courses/#{@course.id}/assignments", course_id: @course.id, per_page: 2, page: 3
-          expect(json_parse.length).to eq(1)
+          expect(response).to be_success
+          result_json = json_parse
+          expect(result_json.length).to eq(1)
+          expect(result_json[0]).to include('id' => assignment8.id)
         end
 
         it 'should return an assignment with an override' do
-          new_override = assignment8.assignment_overrides.build
-          new_override.override_due_at(3.days.from_now)
-          new_override.set_type = 'CourseSection'
-          new_override.set_id = assignment8.context.course_sections.first.id
-          new_override.save!
+          get "/api/sis/courses/#{@course.id}/assignments", course_id: @course.id, per_page: 2, page: 2
+          result_json = json_parse
+          assignment = result_json.detect { |a| a['id'] == assignment7.id }
+          override = assignment['sections'].first['override']
+          expect(override).to include('override_title' => active_override7.title)
+        end
+
+        it 'does not return assignments with inactive overrides' do
           get "/api/sis/courses/#{@course.id}/assignments", course_id: @course.id, per_page: 2, page: 3
           result_json = json_parse
-          override = result_json[0]['sections'].first['override']
-          expect(result_json.length).to eq(1)
-          expect(override).to include('override_title' => @course.name)
+          expect(result_json[0]['sections'].first).not_to include('override')
+        end
+
+        it 'does not return inactive sections' do
+          get "/api/sis/courses/#{@course.id}/assignments", course_id: @course.id, per_page: 2, page: 3
+          result_json = json_parse
+          section_ids = result_json[0]['sections'].map { |s| s['id'] }
+          expect(section_ids).not_to include(inactive_section8.id)
         end
 
         it 'accepts a sis_id as the course id' do
           context.sis_source_id = 'abc'
           context.save!
 
-          get "/api/sis/courses/sis_course_id:abc/assignments"
+          get "/api/sis/courses/sis_course_id:#{context.sis_source_id}/assignments"
           expect(response).to be_success
 
           result = json_parse
-          assignment_ids = result.map{|a| a['id']}
+          assignment_ids = result.map { |a| a['id'] }
 
-          expect(result.size).to eq 5
+          expect(result.size).to eq(5)
           expect(assignment_ids).to include assignment4.id
           expect(assignment_ids).to include assignment5.id
           expect(assignment_ids).to include assignment6.id
           expect(assignment_ids).to include assignment7.id
+          expect(assignment_ids).to include assignment8.id
         end
       end
 

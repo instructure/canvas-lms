@@ -35,8 +35,10 @@ class SisApiController < ApplicationController
   # @argument account_id [Integer] The ID of the account to query.
   # @argument course_id [Integer] The ID of the course to query.
   #
-  # @argument starts_before [DateTime, Optional] When searching on an account, restricts to courses that start before this date (if they have a start date)
-  # @argument ends_after [DateTime, Optional] When searching on an account, restricts to courses that end after this date (if they have an end date)
+  # @argument starts_before [DateTime, Optional] When searching on an account, restricts to courses that start before
+  #                                              this date (if they have a start date)
+  # @argument ends_after [DateTime, Optional] When searching on an account, restricts to courses that end after this
+  #                                              date (if they have an end date)
   #
   # @example_response
   #   [
@@ -128,11 +130,12 @@ class SisApiController < ApplicationController
   end
 
   def published_assignments
-    Assignment.published.where(
-      post_to_sis: true,
-      context_type: 'Course',
-      context_id: published_course_ids
-    ).preload(assignment_group: [], assignment_overrides: [], context: { course_sections: [:nonxlist_course] })
+    Assignment.published
+      .where(post_to_sis: true)
+      .where(context_type: 'Course', context_id: published_course_ids)
+      .preload(:assignment_group) # preload assignment group
+      .preload(:active_assignment_overrides) # preload *active* overrides
+      .preload(context: { active_course_sections: [:nonxlist_course] }) # preload courses and *active* sections
   end
 
   def paginated_assignments

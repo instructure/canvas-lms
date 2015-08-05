@@ -37,7 +37,7 @@ module Api::V1::SisAssignment
   }.freeze
 
   API_SIS_ASSIGNMENT_OVERRIDES_JSON_OPTS = {
-    only: %i{title due_at}.freeze,
+    only: %i(title due_at).freeze
   }.freeze
 
   def sis_assignments_json(assignments)
@@ -62,9 +62,10 @@ module Api::V1::SisAssignment
   end
 
   def add_sis_course_sections_json(assignment, json)
-    return unless assignment.association(:context).loaded? && assignment.context.respond_to?(:course_sections)
-    return unless assignment.context.association(:course_sections).loaded?
-    json.merge!(sections: sis_assignment_course_sections_json(assignment.context.course_sections, assignment))
+    return unless assignment.association(:context).loaded?
+    course_sections = active_course_sections_for(assignment.context)
+    return unless course_sections
+    json.merge!(sections: sis_assignment_course_sections_json(course_sections, assignment))
   end
 
   def sis_assignment_course_sections_json(course_sections, assignment)
@@ -87,9 +88,9 @@ module Api::V1::SisAssignment
   end
 
   def add_sis_assignment_override_json(json, assignment, course_section)
-    return unless assignment.association(:assignment_overrides).loaded? && assignment.assignment_overrides
-
-    override = assignment.assignment_overrides.detect do |assignment_override|
+    assignment_overrides = active_assignment_overrides_for(assignment)
+    return unless assignment_overrides
+    override = assignment_overrides.detect do |assignment_override|
       assignment_override.set_type == 'CourseSection' && assignment_override.set_id == course_section.id
     end
     return if override.nil?
@@ -97,5 +98,21 @@ module Api::V1::SisAssignment
     override_json = api_json(override, nil, nil, API_SIS_ASSIGNMENT_OVERRIDES_JSON_OPTS)
     override_json[:override_title] = override_json.delete(:title)
     json[:override] = override_json
+  end
+
+  private def active_course_sections_for(context)
+    if context.respond_to?(:active_course_sections) && context.association(:active_course_sections).loaded?
+      context.active_course_sections
+    elsif context.respond_to?(:course_sections) && context.association(:course_sections).loaded?
+      context.course_sections.select(&:active?)
+    end
+  end
+
+  private def active_assignment_overrides_for(assignment)
+    if assignment.association(:active_assignment_overrides).loaded?
+      assignment.active_assignment_overrides
+    elsif assignment.association(:assignment_overrides).loaded?
+      assignment.assignment_overrides.select(&:active?)
+    end
   end
 end
