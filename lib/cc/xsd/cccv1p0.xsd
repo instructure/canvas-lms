@@ -599,6 +599,8 @@
                   <xs:all minOccurs="0">
                     <xs:element name="hidden" type="xs:boolean" minOccurs="0"/>
                     <xs:element name="locked" type="xs:boolean" minOccurs="0"/>
+                    <xs:element name="lock_at" type="xs:dateTime" minOccurs="0"/>
+                    <xs:element name="unlock_at" type="xs:dateTime" minOccurs="0"/>
                   </xs:all>
                   <xs:attribute name="path" type="xs:string" use="required"/>
                 </xs:complexType>
@@ -615,6 +617,8 @@
                     <xs:element name="display_name" type="xs:string" minOccurs="0"/>
                     <xs:element name="hidden" type="xs:boolean" minOccurs="0"/>
                     <xs:element name="locked" type="xs:boolean" minOccurs="0"/>
+                    <xs:element name="lock_at" type="xs:dateTime" minOccurs="0"/>
+                    <xs:element name="unlock_at" type="xs:dateTime" minOccurs="0"/>
                     <xs:element name="usage_rights" minOccurs="0" maxOccurs="1">
                       <xs:complexType>
                         <xs:attribute name="use_justification" type="xs:string" use="required">

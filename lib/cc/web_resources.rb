@@ -19,6 +19,10 @@ require 'set'
 
 module CC
   module WebResources
+    def file_or_folder_restricted?(obj)
+      obj.hidden? || obj.locked || obj.unlock_at || obj.lock_at
+    end
+
     def add_course_files
       return if for_course_copy
 
@@ -36,14 +40,14 @@ module CC
         begin
           if file.is_a? Folder
             dir = File.join(folder_names[1..-1])
-            files_with_metadata[:folders] << [file, dir] if file.hidden? || file.locked
+            files_with_metadata[:folders] << [file, dir] if file_or_folder_restricted?(file)
             next
           end
 
           @added_attachment_ids << file.id
           path = File.join(folder_names, file.display_name)
           migration_id = CCHelper.create_key(file)
-          if file.hidden? || file.locked || file.usage_rights
+          if file_or_folder_restricted?(file) || file.usage_rights || file.display_name != file.unencoded_filename
             files_with_metadata[:files] << [file, migration_id]
           end
           @resources.resource(
@@ -110,6 +114,8 @@ module CC
               folders_node.folder(:path => path) do |folder_node|
                 folder_node.locked "true" if folder.locked
                 folder_node.hidden "true" if folder.hidden?
+                folder_node.lock_at CCHelper::ims_datetime(folder.lock_at) if folder.lock_at
+                folder_node.unlock_at CCHelper::ims_datetime(folder.unlock_at) if folder.unlock_at
               end
             end
           end
@@ -121,6 +127,8 @@ module CC
               files_node.file(:identifier => migration_id) do |file_node|
                 file_node.locked "true" if file.locked
                 file_node.hidden "true" if file.hidden?
+                file_node.lock_at CCHelper::ims_datetime(file.lock_at) if file.lock_at
+                file_node.unlock_at CCHelper::ims_datetime(file.unlock_at) if file.unlock_at
                 file_node.display_name file.display_name if file.display_name != file.unencoded_filename
                 if file.usage_rights
                   file_node.usage_rights(:use_justification => file.usage_rights.use_justification) do |node|
