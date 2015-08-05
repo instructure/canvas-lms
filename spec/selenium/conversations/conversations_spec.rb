@@ -83,6 +83,15 @@ describe "conversations new" do
       select_view('starred')
       expect(conversation_elements.size).to eq 1
     end
+
+    it "should show a flash message when deleting a message", priority: "1", test_id: 201492 do
+      get_conversations
+      conversation_elements.first.click
+      wait_for_ajaximations
+      f('#delete-btn').click
+      driver.switch_to.alert.accept
+      expect(flash_message_present?(:success, /Message Deleted!/)).to be_truthy
+    end
   end
 
   describe "view filter" do
