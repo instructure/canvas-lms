@@ -138,11 +138,6 @@ def window_title_color(option = 'text_field')
   return f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(3) > section.Theme__editor-accordion_element.Theme__editor-color.ic-Form-control > div.Theme__editor-form--color > div.Theme__editor-color-block > label.Theme__editor-color-label.Theme__editor-color-block_label-sample') if option == 'color_box'
 end
 
-def hex_color
-  values = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f']
-  color = "#" + values.sample + values.sample + values.sample + values.sample + values.sample + values.sample
-  color
-end
 
 def all_global_branding(option = 'text_field')
   [primary_color(option), primary_button(option), primary_button_text(option), secondary_button(option), secondary_button_text(option), link(option)]
@@ -159,7 +154,7 @@ end
 def all_colors(array, color = 'random')
   array.each do |x|
     x.send_keys(color) if color != 'random'
-    x.send_keys(hex_color) if color == 'random'
+    x.send_keys(random_hex_color) if color == 'random'
   end
 end
 

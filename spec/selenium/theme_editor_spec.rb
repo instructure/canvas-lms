@@ -10,6 +10,13 @@ describe 'Theme Editor' do
     Account.default.enable_feature!(:use_new_styles)
   end
 
+  it 'should open theme editor from the admin page', priority: "1", test_id: 244225 do
+    get "/accounts/#{Account.default.id}"
+
+    fj('#right-side > div:nth-of-type(4) > a.btn.button-sidebar-wide').click
+    expect(fj('.Theme__editor-header_title').text).to include_text 'Theme Editor'
+  end
+
   it 'should open theme editor', priority: "1", test_id: 239980 do
     open_theme_editor
 
@@ -88,23 +95,28 @@ describe 'Theme Editor' do
     expect(fj('.ic-Form-message--error').text).to include_text "'#xxxxx!' is not a valid color."
   end
 
-  it "K12 Theme should be automatically set when K12 Feature Flag is turned on", priority: "1", test_id: 240001 do
+  it 'K12 Theme should be automatically set when K12 Feature Flag is turned on', priority: "1", test_id: 240001 do
     skip("Skipped because the K12 template option does not appear in selenium tests")
     Account.default.enable_feature!(:k12)
     open_theme_editor
     expect(f('div.accordion.ui-accordion--mini.Theme__editor-accordion.ui-accordion.ui-widget.ui-helper-reset > div:nth-of-type(1) > section:first-child > div.Theme__editor-form--color > div.Theme__editor-color-block > span > input.Theme__editor-color-block_input-text.Theme__editor-color-block_input').attribute(:placeholder)).to include_text('#E66135')
   end
 
+  it 'Theme editor has a dropdown menu for Templates', priority: "1", test_id: 244889 do
+    open_theme_editor
+    expect(f('#sharedThemes')).to include_text('Start from a template...')
+  end
+
   it 'should preview should display a progress bar when generating preview', priority: "1", test_id: 239990 do
     open_theme_editor
-    fj('.Theme__editor-color-block_input-text').send_keys(hex_color)
+    fj('.Theme__editor-color-block_input-text').send_keys(random_hex_color)
 
     expect(f('div.progress-bar__bar-container')).not_to be
     preview_your_changes
     expect(f('div.progress-bar__bar-container')).to be
   end
 
-  it "should have validation for every text field", priority: "2", test_id: 241992 do
+  it 'should have validation for every text field', priority: "2", test_id: 241992 do
     open_theme_editor
 
     # input invalid text into every text field
@@ -117,7 +129,7 @@ describe 'Theme Editor' do
     expect(all_warning_messages.length).to eq 15
   end
 
-  it "should have color squares that match the hex value", priority: "2", test_id: 241993 do
+  it 'should have color squares that match the hex value', priority: "2", test_id: 241993 do
     open_theme_editor
     create_theme
 
