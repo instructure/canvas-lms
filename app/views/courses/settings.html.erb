@@ -512,7 +512,7 @@ TEXT
         <button type="submit" class="btn btn-primary"><%= t('#buttons.save', %{Save}) %></button>
       </p>
     <% end %>
-    <form id="move_nav_item_form" style="display:none" class="form-dialog" title="Move Navigation Item">
+    <form id="move_nav_item_form" style="display:none" class="form-dialog" title="Move Navigation Item" aria-hidden='true'>
       <div class="form-dialog-content">
         <h2><%= t('move_module.place', "Place ") %> <span id="move_nav_item_name"> </span></h2>
         <div class="move-nav-item-before-after-container">
