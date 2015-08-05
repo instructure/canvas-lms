@@ -16,7 +16,7 @@ describe "better_file_browsing" do
     end
 
     context "from cog icon" do
-      it "should edit file name", priority: "1", test_id: 133124 do
+      it "should edit file name", priority: "1", test_id: 133127 do
         expect(fln("example.pdf")).to be_present
         file_rename_to = "Example_edited.pdf"
         edit_name_from_cog_icon(file_rename_to)
@@ -39,12 +39,12 @@ describe "better_file_browsing" do
         expect(f('.btn-link.published-status.published')).to be_displayed
         expect(driver.find_element(:class => 'published')).to be_displayed
       end
-      it "should make file available to student with link", priority: "1", test_id: 133102 do
+      it "should make file available to student with link", priority: "1", test_id: 223504 do
         set_item_permissions(:restricted_access, :available_with_link, :cloud_icon)
         expect(f('.btn-link.published-status.hiddenState')).to be_displayed
         expect(driver.find_element(:class => 'hiddenState')).to be_displayed
       end
-      it "should make file available to student within given timeframe", priority: "1", test_id: 193159 do
+      it "should make file available to student within given timeframe", priority: "1", test_id: 223505 do
         set_item_permissions(:restricted_access, :available_with_timeline, :cloud_icon)
         expect(f('.btn-link.published-status.restricted')).to be_displayed
         expect(driver.find_element(:class => 'restricted')).to be_displayed
@@ -56,7 +56,7 @@ describe "better_file_browsing" do
         delete(0, :toolbar_menu)
         expect(get_all_files_folders.count).to eq 0
       end
-      it "should unpublish and publish a file", priority: "1", test_id: 133096 do
+      it "should unpublish and publish a file", priority: "1", test_id: 223503 do
         set_item_permissions(:unpublish, :toolbar_menu)
         expect(f('.btn-link.published-status.unpublished')).to be_displayed
         expect(driver.find_element(:class => 'unpublished')).to be_displayed

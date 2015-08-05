@@ -12,7 +12,7 @@ describe "better_file_browsing, folders" do
       add_folder(folder_name)
     end
 
-    it "should display the new folder form", priority: "1", test_id: 121884 do
+    it "should display the new folder form", priority: "1", test_id: 268052 do
       click_new_folder_button
       expect(f("form.ef-edit-name-form")).to be_displayed
     end
@@ -21,7 +21,16 @@ describe "better_file_browsing, folders" do
       expect(fln("new test folder")).to be_present
     end
 
-    it "should edit folder name", priority: "1", test_id: 133127 do
+    it "should display all cog icon options", priority: "1", test_id: 133124 do
+      create_new_folder
+      ff('.al-trigger')[0].click
+      expect(fln("Download")).to be_displayed
+      expect(fln("Rename")).to be_displayed
+      expect(fln("Move")).to be_displayed
+      expect(fln("Delete")).to be_displayed
+    end
+
+    it "should edit folder name", priority: "1", test_id: 223501 do
       folder_rename_to = "test folder"
       edit_name_from_cog_icon(folder_rename_to)
       wait_for_ajaximations
@@ -29,7 +38,7 @@ describe "better_file_browsing, folders" do
       expect(fln("test folder")).to be_present
     end
 
-    it "should delete a folder from cog icon", priority: "1", test_id: 133128 do
+    it "should delete a folder from cog icon", priority: "1", test_id: 223502 do
       delete(0, :cog_icon)
       expect(fln("new test folder")).not_to be_present
     end
@@ -43,7 +52,7 @@ describe "better_file_browsing, folders" do
       expect(driver.find_element(:class => 'published')).to be_displayed
     end
 
-    it "should make folder available to student with link", priority: "1", test_id: 193158 do
+    it "should make folder available to student with link", priority: "1", test_id: 133110 do
       set_item_permissions(:restricted_access, :available_with_link, :cloud_icon)
       expect(f('.btn-link.published-status.hiddenState')).to be_displayed
       expect(driver.find_element(:class => 'hiddenState')).to be_displayed
@@ -87,6 +96,12 @@ describe "better_file_browsing, folders" do
        new_folder = create_new_folder
        expect(get_all_files_folders.count).to eq 1
        expect(new_folder.text).to match /New Folder/
+     end
+
+     it "should handle duplicate folder names", priority: "1", test_id: 133130 do
+       create_new_folder
+       add_folder("New Folder")
+       expect(get_all_files_folders.last.text).to match /New Folder 2/
      end
 
      it "should create 15 new child folders and show them in the FolderTree when expanded", priority: "2", test_id: 121886 do
