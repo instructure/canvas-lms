@@ -390,12 +390,16 @@ describe "submissions" do
   end
 
   context 'Excused assignment' do
-    it 'indicates as excused in submission details page', priority: "1", test_id: 201937 do
-      init_course_with_students
+    let (:assignments) do
       assignments = []
       3.times do |i|
         assignments << assignment = @course.assignments.create!(title: "Assignment #{i}", submission_types: 'online_text_entry', points_possible: 20)
         assignment.submit_homework(@students[0], {submission_type: 'online_text_entry'}) unless i == 2
+      end
+
+      # Checks to see if types other than online show up as excused.
+      ['none', 'on_paper'].each do |type|
+        assignments << @course.assignments.create!(title: "Assignment #{type}", submission_types: type, points_possible: 20)
       end
 
       assignments[1].grade_student @students[0], {grade: 10}
@@ -403,6 +407,12 @@ describe "submissions" do
       assignments.each do |assignment|
         assignment.grade_student @students[0], {excuse: true}
       end
+
+      return assignments
+    end
+
+    it 'indicates as excused in submission details page', priority: "1", test_id: 201937 do
+      init_course_with_students
 
       user_session @students[0]
 
@@ -412,7 +422,7 @@ describe "submissions" do
         expect(score.text).to eq 'Excused'
       end
 
-      3.times do |i|
+      assignments.size.times do |i|
         get "/courses/#{@course.id}/assignments/#{assignments[i].id}"
         expect(f("#sidebar_content .header").text).to eq 'Excused!'
 
