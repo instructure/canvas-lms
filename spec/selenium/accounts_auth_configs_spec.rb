@@ -76,6 +76,50 @@ describe 'account authentication' do
         expect(config.auth_decrypted_password).to eq 'newpassword'
       end
 
+      it 'should allow update of multiple configs', priority: "1", test_id: 268056 do
+        add_ldap_config(1)
+        wait_for_ajax_requests
+        clear_ldap_form
+
+        config_id = Account.default.authentication_providers.active.last.id
+        ldap_form = f("#edit_ldap#{config_id}")
+        submit_form(ldap_form)
+
+        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 1 }
+        config = Account.default.authentication_providers.active.last
+        expect(config.auth_host).to eq ''
+        expect(config.auth_port).to eq nil
+        expect(config.auth_over_tls).to eq nil
+        expect(config.auth_base).to eq ''
+        expect(config.auth_filter).to eq ''
+        expect(config.auth_username).to eq ''
+        expect(config.auth_decrypted_password).to eq 'password2'
+
+        add_ldap_config(2)
+        wait_for_ajax_requests
+        clear_ldap_form
+
+        config_id = Account.default.authentication_providers.active.last.id
+        ldap_form = f("#edit_ldap#{config_id}")
+        ldap_form.find_element(:id, 'authentication_provider_auth_host').send_keys('host2.example.dev')
+        ldap_form.find_element(:id, 'authentication_provider_auth_port').send_keys('2')
+        ldap_form.find_element(:id, "start_tls_#{config_id}").click
+        ldap_form.find_element(:id, 'authentication_provider_auth_base').send_keys('base2')
+        ldap_form.find_element(:id, 'authentication_provider_auth_filter').send_keys('filter2')
+        ldap_form.find_element(:id, 'authentication_provider_auth_username').send_keys('username2')
+        submit_form(ldap_form)
+
+        keep_trying_until { expect(Account.default.authentication_providers.active.count).to eq 2 }
+        config = Account.default.authentication_providers.active.last
+        expect(config.auth_host).to eq 'host2.example.dev'
+        expect(config.auth_port).to eq 2
+        expect(config.auth_over_tls).to eq 'start_tls'
+        expect(config.auth_base).to eq 'base2'
+        expect(config.auth_filter).to eq 'filter2'
+        expect(config.auth_username).to eq 'username2'
+        expect(config.auth_decrypted_password).to eq 'password2'
+      end
+
       it 'should allow deletion of config', priority: "1", test_id: 250264 do
         add_ldap_config
         wait_for_ajax_requests

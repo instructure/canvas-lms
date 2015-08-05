@@ -22,11 +22,7 @@ end
 def add_ldap_config(*)
   get "/accounts/#{Account.default.id}/authentication_providers"
   add_auth_type('LDAP')
-  if f("#new_ldap").present?
-    ldap_form = f("#new_ldap")
-  else
-    ldap_form = f("#ldap_form form")
-  end
+  ldap_form = f("#new_ldap")
   ldap_form.find_element(:id, 'authentication_provider_auth_host').send_keys('host.example.dev')
   ldap_form.find_element(:id, 'authentication_provider_auth_port').send_keys('1')
   ldap_form.find_element(:id, 'simple_tls_').click
@@ -35,6 +31,18 @@ def add_ldap_config(*)
   ldap_form.find_element(:id, 'authentication_provider_auth_username').send_keys('username')
   ldap_form.find_element(:id, 'authentication_provider_auth_password').send_keys('password')
   submit_form(ldap_form)
+end
+
+def clear_ldap_form
+  config_id = Account.default.authentication_providers.active.last.id
+  ldap_form = f("#edit_ldap#{config_id}")
+  ldap_form.find_element(:id, 'authentication_provider_auth_host').clear
+  ldap_form.find_element(:id, 'authentication_provider_auth_port').clear
+  ldap_form.find_element(:id, "no_tls_#{config_id}").click
+  ldap_form.find_element(:id, 'authentication_provider_auth_base').clear
+  ldap_form.find_element(:id, 'authentication_provider_auth_filter').clear
+  ldap_form.find_element(:id, 'authentication_provider_auth_username').clear
+  ldap_form.find_element(:id, 'authentication_provider_auth_password').send_keys('password2')
 end
 
 def add_saml_config
