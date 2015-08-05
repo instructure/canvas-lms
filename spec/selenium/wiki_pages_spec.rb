@@ -19,9 +19,14 @@ describe "Wiki Pages" do
 
       keep_trying_until { expect(driver.current_url).to eq edit_url }
     end
+
+    it "should alert a teacher when accessing a non-existant page", priority: "1", test_id: 126842 do
+      get "/courses/#{@course.id}/pages/fake"
+      expect(flash_message_present?(:info)).to be_truthy
+    end
   end
 
-  context "Index Page" do
+  context "Index Page as a teacher" do
     before do
       account_model
       course_with_teacher_logged_in :account => @account
