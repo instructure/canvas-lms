@@ -5,8 +5,9 @@ define([
   "vendor/timezone",
   "i18nObj",
   "moment",
+  "moment_formats",
   "locale_converter"
-], function($, _, require, tz, I18n, moment, LocaleConverter) {
+], function($, _, require, tz, I18n, moment, MomentFormats, LocaleConverter) {
   // start with the bare vendor-provided tz() function
   var currentLocale = "en_US" // default to US locale
   var _tz = tz;
@@ -29,6 +30,12 @@ define([
       // call out to moment, leaving the result alone if invalid
       var localeToUse = LocaleConverter.convertToMoment(currentLocale)
       var m = moment.apply(null, [input, format, localeToUse]);
+      if (m._pf.unusedTokens.length > 0) {
+        // we didn't use strict at first, because we want to accept when
+        // there's unused input as long as we're using all tokens. but if the
+        // best non-strict match has unused tokens, reparse with strict
+        m = moment.apply(null, [input, format, localeToUse, true]);
+      }
       if (!m.isValid()) return m;
 
       // unfudge the result unless an offset was both specified and used in the
@@ -75,8 +82,24 @@ define([
       // integer. otherwise, it'll assume we mean to curry and give back a
       // (non-integer) function.
       var timestamp = _tz(value);
-      if (typeof timestamp !== 'number') return null;
+
+      if (typeof timestamp !== 'number') {
+        if ( !_.isString(value) ){ return null }
+
+        var formats = MomentFormats.getFormats()
+        var cleanValue = this.removeUnwantedChars(value)
+        var m = tz.moment(cleanValue, formats)
+
+        return m.isValid() ? m.toDate() : null
+      }
+
       return new Date(timestamp);
+    },
+
+    removeUnwantedChars: function(value){
+      return _.isString(value) ?
+        value.replace(".","") :
+        value
     },
 
     // format a date value (parsing it if necessary). returns null for parse
