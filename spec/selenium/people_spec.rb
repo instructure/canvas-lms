@@ -91,6 +91,19 @@ describe "people" do
       expect(fj('.collectionViewItems>li:first').text).to match "Everyone"
     end
 
+    it "should display activity report on clicking Student Interaction button", priority: "1", test_id: 244446 do
+      fln("Student Interactions Report").click
+      wait_for_ajaximations
+      user_name = f(".user_name").text
+      expect(f("h1").text).to eq "Teacher Activity Report for #{user_name}"
+    end
+
+    it "should not display Student Interaction button for a student", priority: "1", test_id: 244450  do
+      user_session(@student_1)
+      get "/courses/#{@course.id}/users"
+      expect(fln("Student Interactions Report")).not_to be_present
+    end
+
     it "should focus on the + Group Set button after the tabs" do
       driver.execute_script("$('.collectionViewItems > li:last a').focus()")
       active = driver.execute_script("return document.activeElement")
