@@ -573,16 +573,6 @@ describe "quizzes" do
       expect(f('.time_running').text).to match /19 Minutes/
     end
 
-
-    it "should display quiz statistics", priority: "1", test_id: 210071 do
-      quiz_with_submission
-      get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-
-      click_quiz_statistics_button
-
-      expect(f('#content .question-statistics .question-text')).to include_text("Which book(s) are required for this course?")
-    end
-
     it "should display a link to quiz statistics for a MOOC", priority: "2", test_id: 210072 do
       quiz_with_submission
       @course.large_roster = true
