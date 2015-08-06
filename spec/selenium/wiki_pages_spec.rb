@@ -30,7 +30,7 @@ describe "Wiki Pages" do
   context "Index Page as a teacher" do
     before do
       account_model
-      course_with_teacher_logged_in :account => @account
+      course_with_teacher_logged_in
     end
 
     it "should edit page title from pages index", priority: "1", test_id: 126849 do
@@ -44,6 +44,32 @@ describe "Wiki Pages" do
       fj('button:contains("Save")').click
       wait_for_ajaximations
       expect(f('.collectionViewItems').text).to include('A-Team')
+    end
+
+    it "should display a warning alert when accessing a deleted page", priority: "1", test_id: 126840 do
+      @course.wiki.wiki_pages.create!(title: 'deleted')
+      get "/courses/#{@course.id}/pages"
+      f('.al-trigger').click()
+      f('.delete-menu-item').click()
+      fj('button:contains("Delete")').click()
+      wait_for_ajaximations
+      get "/courses/#{@course.id}/pages/deleted"
+      expect(flash_message_present?(:info)).to be_truthy
+    end
+  end
+
+  context "Index Page as a student" do
+    before do
+      course_with_student_logged_in
+    end
+
+    it "should display a warning alert to a student when accessing a deleted page", priority: "1", test_id: 126839 do
+      page = @course.wiki.wiki_pages.create!(title: 'delete_deux')
+      # sets the workflow_state = deleted to act as a deleted page
+      page.workflow_state = 'deleted'
+      page.save!
+      get "/courses/#{@course.id}/pages/delete_deux"
+      expect(flash_message_present?(:warning)).to be_truthy
     end
   end
 
