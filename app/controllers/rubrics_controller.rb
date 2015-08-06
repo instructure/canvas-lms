@@ -23,7 +23,8 @@ class RubricsController < ApplicationController
   include Api::V1::Outcome
 
   def index
-    return unless authorized_action(@context, @current_user, :manage)
+    permission = @context.is_a?(User) ? :manage : :manage_rubrics
+    return unless authorized_action(@context, @current_user, permission)
     js_env :ROOT_OUTCOME_GROUP => get_root_outcome
     @rubric_associations = @context.rubric_associations.bookmarked.include_rubric.to_a
     @rubric_associations = Canvas::ICU.collate_by(@rubric_associations.select(&:rubric_id).uniq(&:rubric_id)) { |r| r.rubric.title }
@@ -32,7 +33,8 @@ class RubricsController < ApplicationController
   end
 
   def show
-    return unless authorized_action(@context, @current_user, :manage)
+    permission = @context.is_a?(User) ? :manage : :manage_rubrics
+    return unless authorized_action(@context, @current_user, permission)
     if (id = params[:id]) =~ Api::ID_REGEX
       js_env :ROOT_OUTCOME_GROUP => get_root_outcome
       @rubric_association = @context.rubric_associations.bookmarked.where(rubric_id: params[:id]).first
@@ -46,7 +48,7 @@ class RubricsController < ApplicationController
   def create
     update
   end
-  
+
   # This controller looks yucky (and is yucky) because it handles a funky logic.
   # If you try to update a rubric that is being used in more than one place,
   # instead of updating that rubric this will create a new rubric based on
@@ -70,7 +72,7 @@ class RubricsController < ApplicationController
       params[:rubric_association][:id] = @association.id if @association
       # Update the rubric if you can
       # Better specify params[:rubric_association_id] if you want it to update an existing association
-      
+
       # If this is a brand new rubric OR if the rubric isn't editable,
       # then create a new rubric
       if !@rubric || (@rubric.will_change_with_update?(params[:rubric]) && !@rubric.grants_right?(@current_user, session, :update))
@@ -90,7 +92,7 @@ class RubricsController < ApplicationController
       render :json => json_res
     end
   end
-  
+
   def destroy
     @rubric = RubricAssociation.where(rubric_id: params[:id], context_id: @context, context_type: @context.class.to_s).first.rubric
     if authorized_action(@rubric, @current_user, :delete_associations)

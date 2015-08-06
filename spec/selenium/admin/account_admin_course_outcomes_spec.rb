@@ -10,11 +10,19 @@ describe "account admin outcomes" do
   let(:account) { Account.default }
   describe "course outcomes" do
     before (:each) do
+      RoleOverride.create!(:context => account, :permission => 'manage_courses',
+        :role => admin_role, :enabled => false) # should not manage_courses permission
       course_with_admin_logged_in
     end
 
-    context "create/edit/delete outcomes" do
+    it "should be able to manage course rubrics" do
+      get "/courses/#{@course.id}/outcomes"
+      expect_new_page_load { f('.manage_rubrics').click }
 
+      expect(f('.add_rubric_link')).to be_displayed
+    end
+
+    context "create/edit/delete outcomes" do
       it "should create a learning outcome with a new rating (root level)", priority: "1", test_id: 250229 do
         should_create_a_learning_outcome_with_a_new_rating_root_level
       end
