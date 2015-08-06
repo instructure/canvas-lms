@@ -9,7 +9,7 @@ define([
   'str/htmlEscape',
   'compiled/fn/preventDefault',
   'compiled/models/Progress',
-  'compiled/react_files/components/ProgressBar',
+  'jsx/shared/ProgressBar',
   './PropTypes',
   './ThemeEditorAccordion',
   './SharedBrandConfigPicker',

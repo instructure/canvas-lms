@@ -11,7 +11,7 @@ define [
   '../utils/getAllPages'
   '../utils/updateAPIQuerySortParams'
   'compiled/models/Folder'
-  './CurrentUploads'
+  'jsx/files/CurrentUploads'
   './FilePreview'
   './UploadDropZone'
   '../utils/forceScreenreaderToReparse'

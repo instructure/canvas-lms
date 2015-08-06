@@ -3,12 +3,11 @@ define [
   'react'
   'compiled/util/friendlyBytes'
   'compiled/react/shared/utils/withReactElement'
-  './ProgressBar'
+  'jsx/shared/ProgressBar'
   '../modules/customPropTypes'
   '../utils/toFixedDecimal'
-], (I18n, React, friendlyBytes, withReactElement, ProgressBarComponent, customPropTypes, toFixedDecimal) ->
+], (I18n, React, friendlyBytes, withReactElement, ProgressBar, customPropTypes, toFixedDecimal) ->
 
-  ProgressBar = React.createFactory ProgressBarComponent
 
   FilesUsage = React.createClass
     displayName: 'FilesUsage'
