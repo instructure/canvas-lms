@@ -57,6 +57,11 @@ describe SubmissionComment do
       expect(@comment.messages_sent.keys).to_not be_include('Submission Comment')
     end
 
+    it "should not dispatch notification on create for provisional comments" do
+      @comment = @submission.add_comment(:author => @teacher, :comment => "huttah!", :provisional_grade_position => 1)
+      expect(@comment.messages_sent).to be_empty
+    end
+
     it "should dispatch notification on create to teachers even if submission not submitted yet" do
       student_in_course(active_all: true)
       @submission = @assignment.find_or_create_submission(@student)
@@ -97,18 +102,22 @@ This text has a http://www.google.com link in it...
     expect(body).to match(/quoted_text/)
   end
 
-  it "should send the submission to the stream" do
+  def prepare_test_submission
     assignment_model
     @assignment.workflow_state = 'published'
     @assignment.save
     @course.offer
     @course.enroll_teacher(user)
-    se = @course.enroll_student(user)
+    @se = @course.enroll_student(user)
     @assignment.reload
-    @submission = @assignment.submit_homework(se.user, :body => 'some message')
+    @submission = @assignment.submit_homework(@se.user, :body => 'some message')
     @submission.created_at = Time.now - 60
     @submission.save
-    @comment = @submission.add_comment(:author => se.user, :comment => "some comment")
+  end
+
+  it "should send the submission to the stream" do
+    prepare_test_submission
+    @comment = @submission.add_comment(:author => @se.user, :comment => "some comment")
     @item = StreamItem.last
     expect(@item).not_to be_nil
     expect(@item.asset).to eq @submission
@@ -116,6 +125,13 @@ This text has a http://www.google.com link in it...
     expect(@item.data.submission_comments.target).to eq [] # not stored on the stream item
     expect(@item.data.submission_comments).to eq [@comment] # but we can still get them
     expect(@item.stream_item_instances.first.read?).to be_truthy
+  end
+
+  it "should not create a stream item for a provisional comment" do
+    prepare_test_submission
+    expect {
+      @submission.add_comment(:author => @teacher, :comment => "some comment", :provisional_grade_position => 1)
+    }.to change(StreamItem, :count).by(0)
   end
 
   it "should ensure the media object exists" do
@@ -192,6 +208,19 @@ This text has a http://www.google.com link in it...
       expect {
         comment.reply_from(:user => @student, :text => "some reply")
       }.to raise_error(IncomingMail::Errors::UnknownAddress)
+    end
+
+    it "should create reply" do
+      comment = @submission.add_comment(:user => @teacher, :comment => "blah")
+      reply = comment.reply_from(:user => @teacher, :text => "oops I meant blah")
+      expect(reply.provisional_grade).to be_nil
+    end
+
+    it "should create reply in the same provisional grade" do
+      comment = @submission.add_comment(:user => @teacher, :comment => "blah", :provisional_grade_position => 1)
+      reply = comment.reply_from(:user => @teacher, :text => "oops I meant blah")
+      expect(reply.provisional_grade.scorer).to eq @teacher
+      expect(reply.provisional_grade.position).to eq 1
     end
   end
 

@@ -2585,6 +2585,14 @@ describe Assignment do
       expect(json[:submissions].first[:submission_comments].first[:created_at].to_i).to eql @comment.created_at.to_i
     end
 
+    it "should exclude provisional comments" do
+      setup_assignment_with_homework
+      @submission = @assignment.submissions.first
+      @comment = @submission.add_comment(:comment => 'comment', :provisional_grade_position => 1)
+      json = @assignment.speed_grader_json(@user)
+      expect(json[:submissions].first[:submission_comments]).to be_empty
+    end
+
     context "students and active course sections" do
       before(:once) do
         @course = course(:active_course => true)
