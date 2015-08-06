@@ -241,3 +241,20 @@ def click_star_icon(msg,star_btn = nil)
   star_btn.click
   wait_for_ajaximations
 end
+
+# Clicks the admin archive/unarchive button
+def click_archive_button
+  f('#archive-btn').click
+  wait_for_ajaximations
+end
+
+# Clicks star cog menu item
+def click_archive_menu_item
+  f('.archive-btn.ui-corner-all').click
+  wait_for_ajaximations
+end
+
+def click_message(msg)
+  conversation_elements[msg].click
+  wait_for_ajaximations
+end

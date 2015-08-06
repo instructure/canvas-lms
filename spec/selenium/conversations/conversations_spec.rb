@@ -40,8 +40,7 @@ describe "conversations new" do
     it "should forward messages", priority: "1", test_id: 86608 do
       get_conversations
       message_count = @convo.conversation_messages.length
-      conversation_elements.first.click
-      wait_for_ajaximations
+      click_message(0)
 
       # Tests forwarding messages via the top level More Options gear menu
       click_more_options(admin:true)
@@ -84,13 +83,91 @@ describe "conversations new" do
       expect(conversation_elements.size).to eq 1
     end
 
-    it "should show a flash message when deleting a message", priority: "1", test_id: 201492 do
+    it "should show a flash message when deleting a message via Trash Button", priority: "1", test_id: 201492 do
       get_conversations
-      conversation_elements.first.click
-      wait_for_ajaximations
+
+      click_message(0)
       f('#delete-btn').click
+
       driver.switch_to.alert.accept
       expect(flash_message_present?(:success, /Message Deleted!/)).to be_truthy
+    end
+
+    it "should show a flash message when deleting a message via cog dropdown", priority: "1", test_id: 201493 do
+      get_conversations
+
+      click_message(0)
+      # Clicks the title-level more options gear menu
+      click_more_options(convo:true)
+      f('.delete-btn.ui-corner-all').click
+      driver.switch_to.alert.accept
+      expect(flash_message_present?(:success, /Message Deleted!/)).to be_truthy
+    end
+
+    it "should archive a message via the admin archive button", priority: "1", test_id: 201494 do
+      get_conversations
+
+      click_message(0)
+      click_archive_button
+      # Archiving messages requires jobs to run to complete
+      run_progress_job
+      select_view('archived')
+      expect(conversation_elements.size).to eq 1
+    end
+
+    it "should archive a message via the cog dropdown", priority: "1", test_id: 201495 do
+      get_conversations
+
+      click_message(0)
+      # Clicks the title-level more options gear menu
+      click_more_options(convo:true)
+      click_archive_menu_item
+      # Archiving messages requires jobs to run to complete
+      run_progress_job
+      select_view('archived')
+      expect(conversation_elements.size).to eq 1
+    end
+
+    context "in archive view" do
+      before do
+        @participant.update_attribute(:workflow_state, 'archived')
+        conversation(@teacher, @s[0], @s[1], workflow_state: 'archived')
+        get_conversations
+        select_view('archived')
+        click_message(0)
+      end
+
+      it "should unarchive a message via the admin unarchive button", priority: "1", test_id: 201496 do
+        click_archive_button
+        # Unarchiving messages requires jobs to run to complete
+        run_progress_job
+        select_view('inbox')
+        expect(conversation_elements.size).to eq 1
+      end
+
+      it "should unarchive a message via the cog dropdown", priority: "1", test_id: 201497 do
+        # Clicks the title-level more options gear menu
+        click_more_options(convo:true)
+        click_archive_menu_item
+        # Unarchiving messages requires jobs to run to complete
+        run_progress_job
+        select_view('inbox')
+        expect(conversation_elements.size).to eq 1
+      end
+
+      it "should unarchive multiple messages via the admin unarchive button", priority: "1", test_id: 201498 do
+        # Selects both messages using the shift key. First was selected in before loop
+        driver.action.key_down(:shift).perform
+        click_message(1)
+        driver.action.key_up(:shift).perform
+
+        click_archive_button
+        # Unarchiving messages requires jobs to run to complete
+        run_progress_job
+
+        select_view('inbox')
+        expect(conversation_elements.size).to eq 2
+      end
     end
   end
 
