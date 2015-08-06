@@ -149,7 +149,7 @@ describe "context modules" do
       expect(f('#module_prerequisites_list')).to be_nil
     end
 
-    it "should validate that a student can't see an unpublished context module item" do
+    it "should validate that a student can't see an unpublished context module item", priority: "1", test_id: 126745 do
       @assignment_2.workflow_state = 'unpublished'
       @assignment_2.save!
 

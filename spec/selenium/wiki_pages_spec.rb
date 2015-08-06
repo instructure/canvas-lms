@@ -367,7 +367,7 @@ describe "Wiki Pages" do
       course_with_teacher
     end
 
-    it "displays public content to unregistered users" do
+    it "displays public content to unregistered users", priority: "1", test_id: 270035 do
       Canvas::Plugin.register(:kaltura, nil, :settings => {'partner_id' => 1, 'subpartner_id' => 2, 'kaltura_sis' => '1'})
 
       @course.is_public = true

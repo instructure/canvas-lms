@@ -42,7 +42,7 @@ describe "context modules" do
       end
     end
 
-    it "should rearrange child object to new module", priority: "1", test_id: 126735 do
+    it "should rearrange child object to new module", priority: "1", test_id: 126734 do
       modules = create_modules(2, true)
       #attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
       item1_mod1 = modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
@@ -909,12 +909,19 @@ describe "context modules" do
       get "/courses/#{@course.id}"
     end
 
-    it "should render as course home page" do
+    it "should render as course home page", priority: "1", test_id: 126740 do
       create_modules(1)
       @course.default_view = 'modules'
       @course.save!
       get "/courses/#{@course.id}"
       expect(f('.add_module_link').text).not_to be_nil
+    end
+
+    it "should add a new module", priority: "1", test_id: 126704 do
+      add_module('New Module')
+      wait_for_ajaximations
+      mod = @course.context_modules.first
+      expect(mod.name).to eq 'New Module'
     end
 
     it "publishes an unpublished module" do
@@ -970,29 +977,29 @@ describe "context modules" do
       expect(f('.context_module > .header')).not_to be_displayed
     end
 
-    it "should add an assignment to a module" do
+    it "should add an assignment to a module", priority: "1", test_id: 126723 do
       add_new_module_item('#assignments_select', 'Assignment', '[ New Assignment ]', 'New Assignment Title')
       expect(fln('New Assignment Title')).to be_displayed
     end
 
 
-    it "should add a quiz to a module" do
+    it "should add a quiz to a module", priority: "1", test_id: 126719 do
       add_new_module_item('#quizs_select', 'Quiz', '[ New Quiz ]', 'New Quiz Title')
       verify_persistence('New Quiz Title')
     end
 
-    it "should add a content page item to a module" do
+    it "should add a content page item to a module", priority: "1", test_id: 126708 do
       add_new_module_item('#wiki_pages_select', 'Content Page', '[ New Page ]', 'New Page Title')
       verify_persistence('New Page Title')
     end
 
-    it "should add a discussion item to a module" do
+    it "should add a discussion item to a module", priority: "1", test_id: 126711 do
       get "/courses/#{@course.id}/modules"
       add_new_module_item('#discussion_topics_select', 'Discussion', '[ New Topic ]', 'New Discussion Title')
       verify_persistence('New Discussion Title')
     end
 
-    it "should add an external url item to a module" do
+    it "should add an external url item to a module", priority: "1", test_id: 126707 do
       get "/courses/#{@course.id}/modules"
       add_new_external_item('External URL', 'www.google.com', 'Google')
       expect(fln('Google')).to be_displayed
