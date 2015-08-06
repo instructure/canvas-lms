@@ -11,6 +11,32 @@ describe "Wiki Pages" do
       course_with_teacher_logged_in :account => @account
     end
 
+    it "should navigate to pages tab with no front page set", priority: "1", test_id: 126843 do
+      @course.wiki.wiki_pages.create!(title: 'Page1')
+      @course.wiki.wiki_pages.create!(title: 'Page2')
+      get "/courses/#{@course.id}"
+      f('.pages').click()
+      expect(driver.current_url).to include("/courses/#{@course.id}/pages")
+      expect(driver.current_url).not_to include("/courses/#{@course.id}/wiki")
+      get "/courses/#{@course.id}/wiki"
+      expect(driver.current_url).to include("/courses/#{@course.id}/pages")
+      expect(driver.current_url).not_to include("/courses/#{@course.id}/wiki")
+    end
+
+    it "should navigate to front page when set", priority: "1", test_id: 126844 do
+      front = @course.wiki.wiki_pages.create!(title: 'Front')
+      front.set_as_front_page!
+      front.save!
+      get "/courses/#{@course.id}"
+      f('.pages').click()
+      expect(driver.current_url).not_to include("/courses/#{@course.id}/pages")
+      expect(driver.current_url).to include("/courses/#{@course.id}/wiki")
+      expect(f('span.front-page.label')).to include_text 'Front Page'
+      get "/courses/#{@course.id}/pages"
+      expect(driver.current_url).to include("/courses/#{@course.id}/pages")
+      expect(driver.current_url).not_to include("/courses/#{@course.id}/wiki")
+    end
+
     it "navigates to the wiki pages edit page from the show page" do
       wikiPage = @course.wiki.wiki_pages.create!(:title => "Foo")
       edit_url = edit_course_wiki_page_url(@course, wikiPage)
@@ -69,6 +95,11 @@ describe "Wiki Pages" do
       page.workflow_state = 'deleted'
       page.save!
       get "/courses/#{@course.id}/pages/delete_deux"
+      expect(flash_message_present?(:warning)).to be_truthy
+    end
+
+    it "should display a warning alert when accessing a non-existant page", priority: "1", test_id: 126841 do
+      get "/courses/#{@course.id}/pages/non-existant"
       expect(flash_message_present?(:warning)).to be_truthy
     end
   end
