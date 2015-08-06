@@ -112,16 +112,4 @@ describe "web conference" do
       end
     end
   end
-
-  context "when a public course is accessed" do
-    include_context "public course as a logged out user"
-
-    #this is currently broken - logged out users should not be able to access this page
-    it "should goes to conferences page" do
-      PluginSetting.create!(:name => "wimba", :settings =>
-                                                {"domain" => "wimba.instructure.com"})
-      get "/courses/#{public_course.id}/conferences"
-      expect(f('#new-conference-list')).to be_displayed
-    end
-  end
 end
