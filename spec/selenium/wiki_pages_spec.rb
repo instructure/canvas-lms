@@ -391,16 +391,32 @@ describe "Wiki Pages" do
         driver.switch_to.alert.accept
       end
     end
-
   end
 
   context "Show Page" do
-    it "shows lock information with prerequisites" do
+    before do
       account_model
       course_with_student_logged_in account: @account
-      foo = @course.wiki.wiki_pages.create! title: "foo"
-      bar = @course.wiki.wiki_pages.create! title: "bar"
-      mod = @course.context_modules.create! name: "teh_mod", require_sequential_progress: true
+    end
+    
+    it "should lock page based on module date", priority: "1", test_id: 126845 do
+      locked = @course.wiki.wiki_pages.create! title: 'locked'
+      mod2 = @course.context_modules.create! name: 'mod2', unlock_at: 1.day.from_now
+      mod2.add_item id: locked.id, type: 'wiki_page'
+      mod2.save!
+
+      get "/courses/#{@course.id}/pages/locked"
+      wait_for_ajaximations
+      # validation
+      lock_explanation = f('.lock_explanation').text
+      expect(lock_explanation).to include "This page is locked until"
+      expect(lock_explanation).to include 'The following requirements need to be completed before this page will be unlocked:'
+    end
+
+    it "should lock page based on module progression", priority: "1", test_id: 126846 do
+      foo = @course.wiki.wiki_pages.create! title: 'foo'
+      bar = @course.wiki.wiki_pages.create! title: 'bar'
+      mod = @course.context_modules.create! name: 'the_mod', require_sequential_progress: true
       foo_item = mod.add_item id: foo.id, type: 'wiki_page'
       bar_item = mod.add_item id: bar.id, type: 'wiki_page'
       mod.completion_requirements = {foo_item.id => {type: 'must_view'}, bar_item.id => {type: 'must_view'}}
@@ -408,9 +424,9 @@ describe "Wiki Pages" do
 
       get "/courses/#{@course.id}/pages/bar"
       wait_for_ajaximations
-
+      # validation
       lock_explanation = f('.lock_explanation').text
-      expect(lock_explanation).to include "This page is part of the module teh_mod and hasn't been unlocked yet"
+      expect(lock_explanation).to include "This page is part of the module the_mod and hasn't been unlocked yet"
       expect(lock_explanation).to match /foo\s+must view the page/
     end
   end
