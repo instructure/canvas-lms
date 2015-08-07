@@ -256,6 +256,15 @@ describe "profile" do
       local_storage!
     end
 
+    it "should save admin profile pics setting", priority: "1", test_id: 68933 do
+      site_admin_logged_in
+      get "/accounts/#{Account.default.id}/settings"
+      f('#account_services_avatars').click
+      f('.btn.btn-primary[type="submit"]').click
+      wait_for_ajaximations
+      expect(is_checked('#account_services_avatars')).to be_truthy
+    end
+
     it "should successfully upload profile pictures" do
       skip("intermittently fails")
       course_with_teacher_logged_in
