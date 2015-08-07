@@ -9,6 +9,45 @@ describe "conversations new" do
     @teacher.update_attribute(:name, 'Teacher')
   end
 
+  it "should have correct elements on the page when composing a new message", priority: "2", test_id: 86604 do
+    # For testing media comments button, we need to stub Kaltura
+    stub_kaltura
+    get_conversations
+    f('#compose-btn').click
+    wait_for_ajaximations
+
+    # Modal displays
+    expect(f('#compose-new-message')).to be_displayed
+    # Close button displays in titlebar
+    expect(f('.ui-dialog-titlebar-close')).to be_displayed
+    # Course Dropdown displays and defaults to Select course
+    expect(f('.btn.dropdown-toggle[data-id="compose-message-course"]')).to include_text('Select course')
+
+    # Selects course for rest of elements to display
+    select_message_course("#{@course.name}")
+    wait_for_ajaximations
+
+    # To field displays
+    expect(f('#compose-message-recipients')).to be_displayed
+    # Address Book/Recipient button displays
+    expect(f('.ac-search-btn#recipient-search-btn')).to be_displayed
+    # Subject field displays
+    expect(f('#compose-message-subject')).to be_displayed
+    # Send Individual messages checkbox displays and is unchecked
+    expect(f('#bulk_message').selected?).to be_falsey
+    expect(f('.icon-question')).to have_attribute('title','This will send an individual message to each of the recipients')
+    # Message field displays
+    expect(f('.conversation_body')).to be_displayed
+    # Attachment button displays
+    expect(f('#add-message-attachment-button')).to be_displayed
+    # Media Comment button displays
+    expect(f('.ui-button.attach-media')).to be_displayed
+    # Cancel button displays
+    expect(fj('.ui-button.ui-widget:visible:contains("Cancel")')).to be_displayed
+    # Send button displays
+    expect(fj('.btn-primary.send-message:visible')).to be_displayed
+  end
+
   describe "message list" do
     before(:each) do
       @participant = conversation(@teacher, @s[0], @s[1], body: 'hi there', workflow_state: 'unread')
