@@ -457,3 +457,49 @@ def quiz_create(params={})
   @quiz.save!
   @quiz
 end
+
+def seed_quiz_wth_submission(num=1)
+  quiz_data =
+      [
+          {
+              question_name: 'Multiple Choice',
+              points_possible: 10,
+              question_text: 'Pick wisely...',
+              answers: [
+                  {weight: 100, answer_text: 'Correct', id: 1},
+                  {weight: 0, answer_text: 'Wrong', id: 2},
+                  {weight: 0, answer_text: 'Wrong', id: 3}
+              ],
+              question_type: 'multiple_choice_question'
+          },
+          {
+              question_name: 'File Upload',
+              points_possible: 5,
+              question_text: 'Upload a file',
+              question_type: 'file_upload_question'
+          },
+          {
+              question_name: 'Short Essay',
+              points_possible: 20,
+              question_text: 'Write an essay',
+              question_type: 'essay_question'
+          }
+      ]
+
+  quiz = @course.quizzes.create title: 'Quiz Me!'
+
+  num.times do
+    quiz_data.each do |question|
+      quiz.quiz_questions.create! question_data: question
+    end
+  end
+
+  quiz.workflow_state = 'available'
+  quiz.save!
+
+  submission = quiz.generate_submission @students[0]
+  submission.workflow_state = 'complete'
+  submission.save!
+
+  quiz
+end

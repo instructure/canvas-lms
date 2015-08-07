@@ -56,3 +56,13 @@ def setup_and_grade_rubric(score1, score2)
   rubric_inputs[0].send_keys(score1)
   rubric_inputs[1].send_keys(score2)
 end
+
+def clear_grade_and_validate
+  @assignment.grade_student @students[0], {grade: ''}
+  @assignment.grade_student @students[1], {grade: ''}
+
+  refresh_page
+  expect(f('#grading-box-extended').attribute 'value').to eq ''
+  f('a.next').click
+  expect(f('#grading-box-extended').attribute 'value').to eq ''
+end
