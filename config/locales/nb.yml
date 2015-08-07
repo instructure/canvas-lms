@@ -13977,11 +13977,11 @@ nb:
   successfully_moved_model_to_newgroup_f7b7aa5a: "Vellykket flyttet %{model} til %{newGroup}"
   support: 
     array: 
-      last_word_connector: ", og"
+      last_word_connector: ", og "
       or: 
-        last_word_connector: ", eller"
-        two_words_connector: eller
-      two_words_connector: og
+        last_word_connector: ", eller "
+        two_words_connector: " eller "
+      two_words_connector: " og "
       words_connector: ", "
     help_menu: 
       cisco_netacad_facebook: "Støtte Samfunnet"
