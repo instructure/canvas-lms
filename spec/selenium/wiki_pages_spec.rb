@@ -37,6 +37,28 @@ describe "Wiki Pages" do
       expect(driver.current_url).not_to include("/courses/#{@course.id}/wiki")
     end
 
+    it "should have correct front page UI elements when set as home page", priority: "1", test_id: 126848 do
+      front = @course.wiki.wiki_pages.create!(title: 'Front')
+      front.set_as_front_page!
+      front.save!
+      get "/courses/#{@course.id}/wiki"
+      f('.home').click()
+      # setting front-page as home page
+      fj('.btn.button-sidebar-wide:contains("Choose Home Page")').click()
+      fj('input[type=radio][value=wiki]').click()
+      fj('button.btn.btn-primary.button_type_submit.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only').click()
+      f('.home').click()
+      wait_for_ajaximations
+      # validations
+      expect(element_exists('.al-trigger')).to be_truthy
+      expect(f('.course-title')).to include_text 'Unnamed Course'
+      expect(element_exists('span.front-page.label')).to be_falsey
+      expect(element_exists('button.btn.btn-published')).to be_falsey
+      f('.al-trigger').click()
+      expect(element_exists('.icon-trash')).to be_falsey
+      expect(element_exists('.icon-clock')).to be_truthy
+    end
+
     it "navigates to the wiki pages edit page from the show page" do
       wikiPage = @course.wiki.wiki_pages.create!(:title => "Foo")
       edit_url = edit_course_wiki_page_url(@course, wikiPage)
