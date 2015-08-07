@@ -417,26 +417,10 @@ $gradebook_header_height: 52px;
       font-weight: bold;
       line-height: 24px;
       padding-right: 4px;
-    }
-    li {
       float: left;
-      margin-right: 1px;
-      &:last-of-type {
-        margin-right: 0;
-      }
-      .icon {
-        display: block;
-        border: 1px solid #F0F0F0;
-        padding: 2px 3px;
-        border-radius: 2px;
-        img {
-          vertical-align: bottom;
-        }
-      }
-      a:hover .icon, a:focus .icon {
-        background: url(/images/h2_bg.png) repeat-x 0 -15px;
-        border-color: #888;
-      }
+    }
+    button {
+      float: left;
     }
   }
   #group_comment_wrapper {
