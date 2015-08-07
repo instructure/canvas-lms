@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_context')
 
 describe "better_file_browsing" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
   context "As a teacher" do
     before(:each) do
       course_with_teacher_logged_in

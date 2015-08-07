@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/../selenium/helpers/sis_grade_passback_common')
 
 describe "grade exchange course settings tab" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   it "should support grade submission" do
     skip "spec being rewritten in a refactor"

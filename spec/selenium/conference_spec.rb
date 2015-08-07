@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/conferences_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_context')
 
 describe "web conference" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
   let(:url) { "/courses/#{@course.id}/conferences" }
 
   context "with no conferences" do

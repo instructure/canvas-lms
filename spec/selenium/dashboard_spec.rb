@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "dashboard" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   shared_examples_for 'load events list' do
     it "should load events list sidebar", priority: "2", test_id: 210275 do

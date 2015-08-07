@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/context_modules_common')
 
 describe "context modules" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
   context "menu tools", priority: "1" do
       before do
         course_with_teacher_logged_in

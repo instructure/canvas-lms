@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides
 
 describe 'quizzes with draft state' do
   include AssignmentOverridesSeleniumHelper
-  include_examples 'in-process server selenium tests'
+  include_context 'in-process server selenium tests'
 
   before(:each) do
     course_with_teacher_logged_in

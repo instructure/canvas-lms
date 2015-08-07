@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/accounts_auth_configs_common')
 
 describe 'account authentication' do
-  include_examples 'in-process server selenium tests'
+  include_context 'in-process server selenium tests'
 
   before(:each) do
     course_with_admin_logged_in

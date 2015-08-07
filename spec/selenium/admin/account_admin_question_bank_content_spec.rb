@@ -4,7 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/testrail_report')
 
 
 describe "account admin question bank" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   before(:each) do
     admin_logged_in

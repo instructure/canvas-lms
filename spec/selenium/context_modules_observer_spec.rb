@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/context_modules_common')
 
 describe "context modules" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
   context "as an observer" do
     before(:each) do
       @course = course(:active_all => true)

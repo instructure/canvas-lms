@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 
 describe "better_file_browsing, folders" do
-   include_examples "in-process server selenium tests"
+   include_context "in-process server selenium tests"
 
   context "Folders" do
     before(:each) do

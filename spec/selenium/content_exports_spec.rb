@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require 'nokogiri'
 
 describe "content exports" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context "as a teacher" do
 

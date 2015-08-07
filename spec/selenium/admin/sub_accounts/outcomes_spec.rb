@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../common')
 require File.expand_path(File.dirname(__FILE__) + '/../../helpers/outcome_common')
 
 describe "sub account outcomes" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
     describe "account outcome specs" do
       let(:account) { Account.create(:name => 'sub account from default account', :parent_account => Account.default) }

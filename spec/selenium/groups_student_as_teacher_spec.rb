@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/groups_common')
 
 describe "student groups" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
   let(:group_name){ 'Windfury' }
   let(:group_category_name){ 'cat1' }
 

@@ -6,7 +6,7 @@ describe "assignments" do
 
   # note: due date testing can be found in assignments_overrides_spec
 
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context "as a teacher" do
 

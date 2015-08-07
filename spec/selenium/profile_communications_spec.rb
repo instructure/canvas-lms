@@ -18,7 +18,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "profile communication settings" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
   before :each do
     user_logged_in(:username => 'somebody@example.com')
 

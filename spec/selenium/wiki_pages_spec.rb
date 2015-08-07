@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common
 require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_context')
 
 describe "Wiki Pages" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context "Navigation" do
     before do

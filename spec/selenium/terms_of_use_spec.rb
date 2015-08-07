@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "terms of use test" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   before do
     user_with_pseudonym(active_user: true)
@@ -47,7 +47,7 @@ describe "terms of use test" do
 end
 
 describe "terms of use SOC2 compliance test" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   it "should prevent a user from accessing canvas if they are newly registered/imported after the SOC2 start date and have not yet accepted the terms", priority: "1", test_id: 268935 do
 

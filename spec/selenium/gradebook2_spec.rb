@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/groups_common')
 
 describe "gradebook2" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context "multiple grading periods" do
     let!(:enable_mgp_and_navigate_to_gradebook) do

@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 describe "sis imports ui" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   def account_with_admin_logged_in(opts = {})
     @account = Account.default

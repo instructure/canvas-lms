@@ -5,7 +5,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/assignments_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe 'assignments' do
-  include_examples 'in-process server selenium tests'
+  include_context 'in-process server selenium tests'
 
   before do
     course_with_teacher_logged_in

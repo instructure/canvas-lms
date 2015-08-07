@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/discussions_common')
 
 describe "post grades to sis" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   before :each do
     course_with_admin_logged_in

@@ -1,5 +1,5 @@
 shared_examples_for "permission tests" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   before (:each) do
     course_with_admin_logged_in

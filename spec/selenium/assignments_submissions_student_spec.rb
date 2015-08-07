@@ -4,7 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/submissions_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 
 describe "submissions" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context 'as a student' do
 
@@ -271,7 +271,7 @@ describe "submissions" do
     end
 
     describe 'uploaded files for submission' do
-      include_examples "in-process server selenium tests"
+      include_context "in-process server selenium tests"
 
       def fixture_file_path(file)
         path = ActionController::TestCase.respond_to?(:fixture_path) ? ActionController::TestCase.send(:fixture_path) : nil

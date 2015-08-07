@@ -2,7 +2,7 @@ require_relative '../helpers/android_common'
 require_relative 'landing_page_common'
 
 describe 'landing page' do
-  include_examples 'in-process server selenium tests'
+  include_context 'in-process server selenium tests'
 
   before(:all) do
     RSpec.configure do |c|

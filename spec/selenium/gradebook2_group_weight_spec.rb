@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 describe "group weights" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   def get_group_points
     group_points_holder = keep_trying_until do

@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
 
 describe "interaction with multiple grading periods" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context "gradebook" do
     before :each do

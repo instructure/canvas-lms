@@ -1,5 +1,5 @@
 shared_examples_for "question bank basic tests" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
   before (:each) do
     admin_logged_in
     get url

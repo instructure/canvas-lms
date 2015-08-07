@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_context')
 
 describe "course syllabus" do
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   def add_assignment(title, points)
     #assignment data

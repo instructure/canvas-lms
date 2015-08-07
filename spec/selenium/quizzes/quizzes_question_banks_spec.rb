@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/testrail_report')
 
 describe 'quizzes question banks' do
 
-  include_examples 'in-process server selenium tests'
+  include_context 'in-process server selenium tests'
 
   context 'when logged in as a teacher' do
 
