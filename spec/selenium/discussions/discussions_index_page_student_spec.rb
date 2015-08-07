@@ -54,6 +54,12 @@ describe "discussions" do
         expect(f('#new-discussion-btn')).to be_nil
       end
 
+      it "should not not be able to publish/unpublish discussions", priority: "1", test_id: 150508 do
+        @course.discussion_topics.create!(user: teacher, title: 'Philip J. Fry', message: 'teacher topic message')
+        get url
+        expect(f('.icon-unpublished')).to be_nil
+      end
+
       describe "gear menu" do
         it "should allow the student user who created the topic to delete/lock a topic", priority: "1", test_id: 270943 do
           student_topic
