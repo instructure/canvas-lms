@@ -21,19 +21,19 @@ describe "discussions" do
 
       let(:topic) { somebody_topic }
 
-      it "should start a new topic" do
+      it "should start a new topic", priority: "1", test_id: 270929 do
         get url
         expect_new_page_load { f('.btn-primary').click }
         edit('new topic title', 'new topic')
       end
 
       context "with blank pages fetched from server" do
-        it "should display empty version of view if there are no topics" do
+        it "should display empty version of view if there are no topics", priority: "2", test_id: 270930 do
           get url
           ff('.no-content').each { |div| expect(div).to be_displayed }
         end
 
-        it "should display topics even if first page is blank but later pages have data" do
+        it "should display topics even if first page is blank but later pages have data", priority: "2", test_id: 270931 do
           # topics that should be visible
           (1..5).each do |n|
             course.discussion_topics.create!({
@@ -55,7 +55,7 @@ describe "discussions" do
       end
 
       describe "subscription icon" do
-        it "should allow subscribing to a topic" do
+        it "should allow subscribing to a topic", priority: "1", test_id: 270931 do
           topic.unsubscribe(somebody)
           get(url)
           expect(f('.icon-discussion')).to be_displayed
@@ -68,7 +68,7 @@ describe "discussions" do
           expect(topic.subscribed?(somebody)).to be_truthy
         end
 
-        it "should allow unsubscribing from a topic" do
+        it "should allow unsubscribing from a topic", priority: "1", test_id: 270932 do
           topic.subscribe(somebody)
           get(url)
           driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
@@ -83,14 +83,14 @@ describe "discussions" do
         end
       end
 
-      it "should validate the discussion reply counter" do
+      it "should validate the discussion reply counter", priority: "1", test_id: 150504 do
         topic.reply_from(user: somebody, text: 'entry')
 
         get url
         expect(f('.total-items').text).to eq '1'
       end
 
-      it "should exclude deleted entries from unread and total reply count" do
+      it "should exclude deleted entries from unread and total reply count", priority: "1", test_id: 270933 do
         # Add two replies, delete one
         topic.reply_from(:user => teacher, :text => "entry")
         entry = topic.reply_from(:user => teacher, :text => "another entry")
@@ -110,37 +110,37 @@ describe "discussions" do
           get url
         end
 
-        it "should filter by assignments" do
+        it "should filter by assignments", priority: "1", test_id: 270934 do
           filter(only_graded: true)
           expect(index_is_showing?(@graded_unread_topic, @graded_read_topic)).to be_truthy
         end
 
-        it "should filter by unread" do
+        it "should filter by unread", priority: "1", test_id: 270935 do
           filter(only_unread: true)
           expect(index_is_showing?(@graded_unread_topic, @unread_topic)).to be_truthy
         end
 
-        it "should filter by unread and assignments" do
+        it "should filter by unread and assignments", priority: "1", test_id: 270936 do
           filter(only_unread: true, only_graded: true)
           expect(index_is_showing?(@graded_unread_topic)).to be_truthy
         end
 
-        it "should search by title" do
+        it "should search by title", priority: "1", test_id: 270937 do
           filter(term: 'ungraded unread topic title')
           expect(index_is_showing?(@unread_topic)).to be_truthy
         end
 
-        it "should search by body" do
+        it "should search by body", priority: "1", test_id: 270938 do
           filter(term: 'ungraded read topic message')
           expect(index_is_showing?(@read_topic)).to be_truthy
         end
 
-        it "should search by author" do
+        it "should search by author", priority: "1", test_id: 270939 do
           filter(term: 'student')
           expect(index_is_showing?(@read_topic, @unread_topic)).to be_truthy
         end
 
-        it "should return multiple items in the search" do
+        it "should return multiple items in the search", priority: "1", test_id: 270940 do
           filter(term: ' read')
           expect(index_is_showing?(@read_topic, @graded_read_topic)).to be_truthy
         end
