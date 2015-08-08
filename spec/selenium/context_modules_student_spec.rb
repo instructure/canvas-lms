@@ -204,6 +204,12 @@ describe "context modules" do
       expect(driver.current_url).to match %r{/courses/#{@course.id}/assignments/#{@assignment_2.id}}
     end
 
+    it "should lock module until a given date", priority: "1", test_id: 126741 do
+      mod_lock = @course.context_modules.create! name: 'a_locked_mod', unlock_at: 1.day.from_now
+      go_to_modules
+      expect(fj("#context_module_content_#{mod_lock.id} .unlock_details").text).to include_text 'Will unlock'
+    end
+
     it "should allow a student view student to progress through module content" do
       course_with_teacher_logged_in(:course => @course, :active_all => true)
       @fake_student = @course.student_view_student
