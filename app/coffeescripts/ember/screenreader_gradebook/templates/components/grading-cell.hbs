@@ -9,3 +9,18 @@
   {{input value=value id=input-id type="text"}}
 {{/if}}
 {{outOfText}}
+
+{{#unless isPassFail}}
+<div class="checkbox">
+  <label class="checkbox">
+    {{
+      input
+      type="checkbox"
+      id="submission-excused"
+      name="submission-excused"
+      checked=excused
+    }}
+    {{#t}}Excuse This Assignment for the Selected Student{{/t}}
+  </label>
+</div>
+{{/unless}}

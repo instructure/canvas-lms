@@ -450,8 +450,14 @@ class Group < ActiveRecord::Base
   # if you modify this set_policy block, note that we've denormalized this
   # permission check for efficiency -- see User#cached_contexts
   set_policy do
-    # Course-level groups don't grant any permissions unless their containing context can
-    # be read by the user in question
+    # Participate means the user is connected to the group somehow and can be
+    given { |user| user && can_participate?(user) }
+    can :participate
+
+    # Course-level groups don't grant any permissions besides :participate (because for a teacher to add a student to a
+    # group, the student must be able to :participate, and the teacher should be able to add students while the course
+    # is unpublished and therefore unreadable to said students) unless their containing context can be read by the user
+    # in question
     given { |user, session| self.context.is_a?(Account) || self.context.grants_right?(user, session, :read) }
 
     use_additional_policy do
@@ -516,10 +522,6 @@ class Group < ActiveRecord::Base
 
       given { |user, session| self.context && self.context.grants_right?(user, session, :view_group_pages) }
       can :read and can :read_forum and can :read_roster
-
-      # Participate means the user is connected to the group somehow and can be
-      given { |user| user && can_participate?(user) }
-      can :participate
 
       # Join is participate + the group being in a state that allows joining directly (free_association)
       given { |user| user && can_participate?(user) && free_association?(user)}

@@ -14817,7 +14817,7 @@ es:
     user_dashboard: 
       dashboard: "Panel de control "
       user_atom_feed: "Canal Atom del Usuario (Todos los Cursos)"
-      user_dashboard: "Usar el Tablero"
+      user_dashboard: "Tablero de Control"
     user_is_deleted: "%{user_name} ha sido borrado"
     user_merge_fail: "La unión del usuario falló. Por favor asegúrese que tiene el permiso apropiado e intente de nuevo."
     user_merge_success: "¡Unión de usuario tuvo éxito! %{first_user} y %{second_user} ahora son uno y el mismo."

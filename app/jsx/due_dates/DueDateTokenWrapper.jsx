@@ -75,11 +75,6 @@ define([
       this.props.handleTokenRemove(token)
     },
 
-    findMatchingOption(userInput){
-      if(typeof userInput !== 'string') { return userInput }
-      return this.enumerableContainsString(userInput, _.find)
-    },
-
     suppressKeys(e){
       var code = e.keyCode || e.which
       if (code === 13) {
@@ -95,32 +90,58 @@ define([
     //      Helpers
     // -------------------
 
+    exactMatchRegex(string){
+      return new RegExp('^' + rEscape(string) + '$', 'i')
+    },
+
+    startOfStringRegex(string){
+      return new RegExp('^' + rEscape(string), 'i')
+    },
+
+    substringMatchRegex(string){
+      return new RegExp(rEscape(string), 'i')
+    },
+
+    findMatchingOption(userInput){
+      if(typeof userInput !== 'string') { return userInput }
+      return this.findBestMatch(userInput)
+    },
+
+    sortedMatches(userInput){
+      var optsByMatch = _.groupBy(this.props.potentialOptions, (dropdownObj) => {
+        if (this.exactMatchRegex(userInput).test(dropdownObj.name)) { return "exact" }
+        if (this.startOfStringRegex(userInput).test(dropdownObj.name)) { return "start" }
+        if (this.substringMatchRegex(userInput).test(dropdownObj.name)) { return "substring" }
+      });
+      return _.union(
+        optsByMatch.exact, optsByMatch.start, optsByMatch.substring
+      );
+    },
+
+    findBestMatch(userInput){
+      return _.find(this.props.potentialOptions, (item) => this.exactMatchRegex(userInput).test(item.name)) ||
+      _.find(this.props.potentialOptions, (item) => this.startOfStringRegex(userInput).test(item.name)) ||
+      _.find(this.props.potentialOptions, (item) => this.substringMatchRegex(userInput).test(item.name))
+    },
+
+    filteredTags() {
+      if (this.state.userInput === '') return this.props.potentialOptions
+      return this.sortedMatches(this.state.userInput)
+    },
+
+    filteredTagsForType(type){
+      var groupedTags = this.groupBySectionOrStudent(this.filteredTags())
+      return groupedTags && groupedTags[type] || []
+    },
+
     groupBySectionOrStudent(options){
       return _.groupBy(options, function(opt){
         return opt["course_section_id"] ? "course_section" : "student"
       })
     },
 
-    enumerableContainsString(userInput, enumerable){
-      var escapedInput = rEscape(userInput)
-      var filter = new RegExp(escapedInput, 'i')
-      return enumerable(this.props.potentialOptions, function(option){
-        return filter.test(option.name)
-      })
-    },
-
     userSearchingThisInput(){
       return this.state.userInput && $.trim(this.state.userInput) !== ""
-    },
-
-    filteredTags() {
-      if (this.state.userInput === '') return this.props.potentialOptions
-      return this.enumerableContainsString(this.state.userInput, _.filter)
-    },
-
-    filteredTagsForType(type){
-      var groupedTags = this.groupBySectionOrStudent(this.filteredTags())
-      return groupedTags && groupedTags[type] || []
     },
 
     // -------------------

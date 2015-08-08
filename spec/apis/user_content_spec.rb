@@ -491,4 +491,63 @@ describe UserContent, type: :request do
       )).to eq({a1.id => a1, a2.id => a2, a3.id => a3})
     end
   end
+
+  describe "latex_to_mathml" do
+    it "returns mathml on success" do
+      valid_latex = '\frac{a}{b}'
+      expect(UserContent.latex_to_mathml(valid_latex)).to eql(%{<math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mfrac><mrow><mi>a</mi></mrow><mrow><mi>b</mi></mrow></mfrac></math>})
+    end
+
+    it "returns empty string on parse error" do
+      invalid_latex = '\frac{a}{'
+      expect(UserContent.latex_to_mathml(invalid_latex)).to eql('')
+    end
+  end
+
+  describe "escape" do
+    describe "with equation images" do
+      context "valid latex" do
+        before do
+          @latex = '\frac{a}{b}'
+          @html = "<img class='equation_image' alt='#{@latex}' />"
+        end
+
+        it "removes the alt attribute" do
+          escaped = UserContent.escape(@html)
+          node = Nokogiri::HTML::DocumentFragment.parse(escaped).css("img").first
+          expect(node['alt']).to be_nil
+        end
+
+        it "adds mathml in a span" do
+          escaped = UserContent.escape(@html)
+          node = Nokogiri::HTML::DocumentFragment.parse(escaped).css("img").first.next_sibling
+          expect(node.node_name).to eql("span")
+          expect(node.inner_html).to eql(Ritex::Parser.new.parse(@latex))
+        end
+      end
+
+      context "invalid latex" do
+        before do
+          @latex = '\frac{a}{' # incomplete
+          @html = "<img class='equation_image' alt='#{@latex}' />"
+        end
+
+        it "handles error gracefully" do
+          expect{ UserContent.escape(@html) }.not_to raise_error
+        end
+
+        it "retains the alt attribute" do
+          escaped = UserContent.escape(@html)
+          node = Nokogiri::HTML::DocumentFragment.parse(escaped).css("img").first
+          expect(node['alt']).to eql(@latex)
+        end
+
+        it "doesn't add mathml span" do
+          escaped = UserContent.escape(@html)
+          node = Nokogiri::HTML::DocumentFragment.parse(escaped).css("span").first
+          expect(node).to be_nil
+        end
+      end
+    end
+  end
 end

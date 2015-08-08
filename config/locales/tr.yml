@@ -5007,6 +5007,8 @@ tr:
     empty_message: "Mesaj yok"
   discussion_topic_dc85ad4c: "Tartışma Konusu"
   discussion_topic_menu_3d4684c6: "Tartışma Konusu Menüsü"
+  discussion_topic_will_be_available_starting_at_46aa7477: "Tartışma Konusu şu tarihten itibaren başlayacak"
+  discussion_topic_will_be_available_until_f5e3abc8: "Tartışma Konusu şu tarihe kadar geçerli olacak"
   discussion_topics: 
     assignment_details: 
       available_from: Kullanılabilir
@@ -5059,6 +5061,7 @@ tr:
       new_quiz: "Yeni Kısa Sınav"
     edit_crumb: Düzenle
     edit_view: 
+      allow_liking: "Beğenme seçeneği olsun"
       allow_threaded_replies: "Yanıtlara izin ver"
       attachment: "Dosya Eki"
       available_from: Kullanılabilen
@@ -5068,12 +5071,15 @@ tr:
         save_and_publish: "Kaydet & Yayınla"
       delay_posting: "Sonra gönder"
       enable_podcast_feed: "PodCast yayınları aktif"
+      include_replies_in_podcast_feed: "Podcast yayınlarında öğrenci cevaplarını dahil et"
+      only_graders_can_like: "Yalnızca not verenler beğenebilir"
       options: Seçenekler
       page_header_title: "Yeni Tartışma"
       points_possible: "Olası Puanlar"
       post_at: Gönderi
       save: Kaydet
       saving: Kaydediliyor...
+      sort_by_likes: "Beğenme durumuna göre sırala"
       topic_title: "Konu Başlığı"
       until: "Şu zamana kadar"
       use_for_grading: Değerlendirildi
@@ -5117,6 +5123,7 @@ tr:
       start_one_now: "Şimdi Bir Tane Başlat"
       suggestions: "Öneriler:"
       there_are_no_discussion_topics_to_show: "Hiçbir tartışma başlığı gösterilmiyor"
+      title_start_a_discussion: "Tartışma Başlat"
       try_different_more_general_or_fewer_keywords: "Daha farklı , daha genel veya daha az anahtar kelime kullanmayı deneyin."
       try_disabling_the_unread_or_assignments_filters: "\"Okunmamış\" veya \"Ödevler\" filtresini devre dışı bırakmayı deneyiniz."
       unread: Okunmamış
@@ -5231,6 +5238,7 @@ tr:
       edited_comment: "*%{editor.display_name}* tarafından %{edited_at} zamanında düzenlendi"
       go_to_parent: "Kaynağa Git"
       go_to_topic: "Konuya Git"
+      like_entry: "Yorumu beğen"
       manage_discussion_entry: "Tartışma Girişlerini Yönet"
       open_in_speedgrader: "SpeedGrader'da Aç"
       unknown_author: ">Bilinmeyen Yazar"
@@ -5239,6 +5247,9 @@ tr:
       show_more: "Daha fazla göster"
     hide_due_dates: "Bitiş Tarihlerini Gizle"
     initial_post_required_to_subscribe: "Takip etmeden önce bir cevap göndermeniz gerekmektedir"
+    like_count: 
+      one: "(%{count} beğeni)"
+      other: "(%{count} beğeni)"
     mark_as_read: "Okundu olarak işaretle"
     mark_as_unread: "Okunmadı olarak işaretle"
     no_content: "İçerik Yok"
@@ -5286,25 +5297,38 @@ tr:
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
       Bölüm derslerinde kayıtlı tüm öğrenciler arasında derslerdeki güncel
       notların dağılımı.
+  divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "%{num_minutes} dakikalık eşit aralıklara ayır. *Başla*"
   domain_3b54c511: Alan
+  domain_is_required_1d4c8b25: "Alan adı gerekli"
+  don_t_move_lti_query_params_to_post_body_21744487: "LTI sorgu parametrelerini POST gövdesine taşıma"
   don_t_show_again_15d8253e: "bir daha gösterme"
+  done_54e3d4b6: Tamam
+  done_8af51c9b: Tamam
+  download_scores_generated_on_date_ff5b9cd2: "%{date} tarihinde Üretilen Puanları İndir"
   download_submissions_7454665f: "Gönderileri İndir"
   due_a73610f6: Bitiş
+  due_at_5e18eeac: "Bitiş:"
   due_by_c263dc10: "son tarih"
+  due_date_5d0a953c: "Bitiş Tarihi:"
   due_date_6a281fe3: "Bitiş Tarihi: %{date}"
   due_date_822625d8: "Bitiş Tarihi"
   due_date_cannot_be_after_course_end_fd128a14: "Bitiş tarihi dersin bitiminden sonra olamaz"
+  due_date_cannot_be_after_lock_date_675b30aa: "Bitiş Tarihi kilitleme tarihinden sonra olamaz"
   due_date_cannot_be_after_section_end_b0f54388: "Bitiş tarihi bölüm bitiminden sonra olamaz"
   due_date_cannot_be_after_term_end_5d504cb1: "Bitiş tarihi dönem sonundan sonra olamaz"
   due_date_cannot_be_before_course_start_ecc523ba: "Bitiş tarihi dersin başlangıcından önce olamaz"
   due_date_cannot_be_before_section_start_f8950484: "Bitiş tarihi bölümün başlangıcından önce olamaz"
   due_date_cannot_be_before_term_start_ea660b2c: "Bitiş tarihi dönemin başlangıcından önce olamaz"
+  due_date_cannot_be_before_unlock_date_f263aab0: "Bitiş Tarihi kilitleme tarihinden önce olamaz"
+  due_date_field_for_styleguide_a88e02d6: "Stil kılavuzu için Bitiş Tarih alanı"
   due_dates: 
     due_at: "bitiş: %{assignment_due_date_time}"
     multiple_due_dates: "Bitiş: Çoklu Tarih"
     no_due_date: "bitiş: Bitiş Tarihi Yok"
   due_datetime_f5a81b81: "Teslim Tarihi: %{dateTime}"
+  due_format_like_yyyy_mm_dd_hh_mm_ef30a9ef: "Bitiş - YYYY-MM-DD hh:mm Formatında"
   due_multiple_dates_cc0ee3f5: "Teslim Tarihi: Birden Çok Gün"
+  due_on_date_5ffb2182: "Şu tarihte bitiyor"
   e_mail_only_2cc5e513: "Sadece E-Posta"
   each_bar_is_an_assignment_the_green_layer_represen_b6536ab1: "Her çubuk bir ödevdir. Yeşil tabaka ödevini *zamanında* teslim etmiş öğrencileri temsil eder. **Geç** teslim edilen ödevler sarı ve ***teslim edilmeyen*** ödevler ise kırmızıdır."
   each_bar_is_one_assignment_the_thin_vertical_whisk_17840129: "Her çubuk bir ödevdir. *İnce dikey diyagram* dersteki herhangi bir öğrenci için en düşük puandan en yükseğe doğru yayılır. **Kalın çubuk**, ***belirlenmiş medyanlı*** 25. yüzdeden 75. yüzdeye doğru yayılır."
@@ -5334,6 +5358,7 @@ tr:
       other: "%{count} olası puan"
     errors: 
       load_rubrics_failed: "Denetim listelerinin yüklenmesi başarısız, lütfen tekrar deneyin"
+    leave_different: "Leave different"
     messages: 
       loading_rubric_groups: "Denetim Listesi grupları yükleniyor..."
       loading_rubrics: "Denetim listeleri yükleniyor..."
@@ -5368,6 +5393,7 @@ tr:
         close_submenu: "Menü veya diyaloğu kapat, düzenleyici alan geri dönersiniz"
         navigate_toolbar: "Menü/araç çubuğu ile sola/sağa gezinin"
         open_dialog: "Yardım kutucuğunu aç"
+        open_menubar: "Düzenleyici menü çubuğunu aç"
         open_toolbar: "Düzenleyici araç çubuğunu aç"
     loading: Yükleniyor...
     mathjax_text_entry_field_label: "Denklemi LaTeX olarak gir."
@@ -5402,16 +5428,24 @@ tr:
       font_size: "Yazı büyüklüğü, aşağı tuşa basın ve seçin"
       formatting: "Format, aşağı tuşa basın ve seçin"
       rte_help: "Zengin Metin Alanı. Yardım için ALT+F8 e basın"
+  editor_button_6647db9c: "Düzenleyici Butonu"
   either_the_url_or_domain_should_be_set_c29cf8c1: "Web adresi ya da alan adından biri belirtilmeli."
   element_option_missing_error_an_element_to_attach__be433478: "`öğe` seçeneği eksik hatası: BBTreeBrowserView için dönüştürme seçeneği 'evet' olarak ayarlanacaksa TreeBrowserView'e eklenecek bir öğe beliritlmeli."
   email: 
     default_from_name: "Instructure Canvas"
+  email_already_in_use_330248e: "Eposta adresi zaten kullanılıyor"
   email_e366fa29: eposta
   email_is_invalid_e0d982eb: "Eposta adresi geçersiz!"
   ember_modules_description: "Ember'de yeniden yazılan Modüller. Harici konumlardan sürüklemeyi etkinleştirmek için gömülü sürükle bırak API'sini kullanır."
   enable_6f5d1328: Etkin
+  enable_feature_title_987d8e9a: "Şu özelliği etkinleştir: %{title}"
   enable_gradebook_list_students_by_sortable_name: "Öğrencileri Not Defterinde sıralanmış isimleri ile listeleyin. Sıralanmış isimler varsayılan olarak 'Soy adı, Adı' şeklindedir fakat ayarlarda değiştirilebilir."
+  enable_multiple_grading_periods: |-
+      Çoklu Notlandırma Peryotları öğretmenlerin ve yöneticilerin son işlem tarihli notlandorma 
+      peryot setleri oluşturmalarını sağlar. Ödevler not defterinde bu notlandırma tarihlerine göre filtrelenebilir.
+  enable_or_condition_for_modules_a16f02d8: "Modüller için \"VEYA\" Şartını Etkinleştir"
   end_date_e0093ed7: "Bitiş Tarihi"
+  ending_date_e1ea13a4: "Bitiş tarihi"
   enrollment: 
     default_course_name: Ders
     default_email: "Eposta yok"
@@ -5448,6 +5482,7 @@ tr:
       delete_default_term: "Varsayılan dönem silinemez"
       delete_term_with_courses: "Etki dersleri içeren bir dönem silinemez"
       not_unique: "ÖBS ID \"%{sis_source_id}\" zaten kullanılıyor"
+  enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "İsteğe bağlı bir renk kullanmak için bir hexcode girin."
   eportfolio: 
     buttons: 
       done_editing: "Düzenleme Tamamlandı"
@@ -5703,6 +5738,7 @@ tr:
       submissions: 
         body1: "Bu sayfanın en altında sınıfınızdan en güncel gönderi listesini fark etmişsinizdir (%{showme}). Portfolyonuzdaki yeni sayfalara buradan hızlı bir şekilde gönderiler ekleyebilirsiniz. Eklemek istediğiniz gönderiye tıkladığınızda küçük diyalog kutusu belirecektir."
         body2: "Harika! Gönderiyi eklemeyi tamamlamak için hangi bölüme eklemek istediğinizi seçip sayfaya isim vermelisiniz. \"Sayfa Ekle\" ye tıkladıktan sonra dilerseniz daha ayrıntılı düzenlemeniz için yeni sayfaya yönlendirileceksiniz."
+  eportfolios_f6dc4579: ePortfolyolar
   error_deleting_name_reason_11f9d399: "%{name}'i silerken hata oluştu: %{reason}"
   error_message_2b9d12ee: "Hata: %{message}"
   error_uploading_file_e2d31b56: "Dosya yüklemesinde hata."
@@ -5745,14 +5781,22 @@ tr:
       too_short: "çok kısa (minimum %{count} karakter)"
       wrong_length: "yanlış uzunluk (%{count} karakter olmalıdır)"
     no_attached_file: "Bu ödev için en az bir dosya eklemelisiniz"
+    notices: 
+      error_reported: "Yardımınız için teşekkürler! Bunu düzelteceğiz"
     registration_incomplete: "Bu sayfayı görebilmek için e-posta adresinizi onaylamalısınız"
     required: Zorunlu
     sis_id_in_use: "ÖBS ID \"%{sis_id}\" zaten kullanılıyor"
     unsaved_changes: "Kaydedilmemiş değişiklikler var."
     wrong_file_extension: "Seçmiş olduğunuz \"%{extension}\" uzantılı dosyanın gönderilmesine onay verilmemiş."
+  event_date_c9459fe3: "Olay Tarihi"
+  event_date_f05219e7: "Olay Tarihi:"
+  event_end_time_ef830e66: "Olay Bitiş Zamanı"
+  event_start_time_441b491f: "Olay Başlama Zamanı"
+  every_665d821e: Her
   everyone_854554dd: Herkes
   everyone_else_6c6dc7b6: "Geri kalan herkes"
   example_84698b7d: Örnek
+  example_final_score_355aff0f: "Örnek final puanı"
   example_final_score_a92b30b9: "Örnek final puanı]]"
   example_https_example_com_config_xml_be5f36ac: "Örneğin: https://example.com/config.xml"
   example_https_lti_tool_provider_example_herokuapp__e9802142: "Örnek: https://lti-tool-provider-example.herokuapp.com/register"
